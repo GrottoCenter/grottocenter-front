@@ -1,0 +1,11 @@
+{
+  "name": "@grotto-front/ts-config",
+  "version": "1.0.0",
+  "description": "Custom tsconfig rules",
+  "files": [
+    "tsconfig.json"
+  ],
+  "peerDependencies": {
+    "typescript": ">=4"
+  }
+}

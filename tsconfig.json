@@ -1,0 +1,10 @@
+{
+    "extends": "./packages/ts-config/tsconfig.json",
+    "compilerOptions": {
+        "baseUrl": ".",
+        "paths": {
+            "@grotto-front/web-app": ["packages/web-app/src"]
+        },
+        "rootDir": "."
+    }
+}

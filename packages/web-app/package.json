@@ -1,0 +1,79 @@
+{
+  "name": "@grotto-front/web-app",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "start": "craco start",
+    "build": "craco build",
+    "test": "craco test"
+  },
+  "dependencies": {
+    "@asymmetrik/leaflet-d3": "^4.4.0",
+    "@date-io/date-fns": "^1.3.13",
+    "@material-ui/core": "^4.11.3",
+    "@material-ui/icons": "^4.11.2",
+    "@material-ui/lab": "^4.0.0-alpha.48",
+    "@material-ui/pickers": "^3.2.10",
+    "@testing-library/jest-dom": "^5.11.4",
+    "@testing-library/react": "^11.1.0",
+    "@testing-library/user-event": "^12.1.10",
+    "d3": "^5.16.0",
+    "d3-hexbin": "^0.2.2",
+    "date-fns": "^2.15.0",
+    "isomorphic-fetch": "^3.0.0",
+    "jsonwebtoken": "^8.5.1",
+    "leaflet": "^1.7.1",
+    "leaflet.fullscreen": "^1.6.0",
+    "leaflet.locatecontrol": "^0.72.0",
+    "lodash": "^4.17.21",
+    "notistack": "^1.0.1",
+    "proj4": "^2.6.2",
+    "prop-types": "^15.7.2",
+    "ramda": "^0.27.0",
+    "react": "^17.0.2",
+    "react-alice-carousel": "^1.19.3",
+    "react-browser-hooks": "^2.2.4",
+    "react-csv": "^2.0.3",
+    "react-device-detect": "^1.6.2",
+    "react-dom": "^17.0.2",
+    "react-error-boundary": "3.1.3",
+    "react-intl": "^5.10.16",
+    "react-leaflet": "^3.2.0",
+    "react-redux": "^7.2.0",
+    "react-router": "^5.2.0",
+    "react-router-dom": "^5.2.0",
+    "react-scripts": "^4.0.3",
+    "react-socks": "^2.1.0",
+    "react-to-print": "^2.12.2",
+    "redux": "^4.0.5",
+    "redux-debounced": "^0.5.0",
+    "redux-thunk": "^2.2.0",
+    "styled-components": "^5.2.0",
+    "swagger-ui-dist": "^3.48.0",
+    "underscore.string": "^3.3.5",
+    "web-vitals": "^1.0.1"
+  },
+  "devDependencies": {
+    "@babel/plugin-proposal-nullish-coalescing-operator": "7.14.5",
+    "@babel/plugin-proposal-logical-assignment-operators": "7.14.5",
+    "@craco/craco": "6.1.2"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}

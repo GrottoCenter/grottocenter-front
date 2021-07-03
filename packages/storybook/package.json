@@ -1,0 +1,45 @@
+{
+  "name": "@grotto-front/storybook",
+  "version": "1.0.0",
+  "description": "Stories used for development",
+  "author": "Wikicaves",
+  "main": "index.js",
+  "license": "CC-BY-SA-3.0",
+  "scripts": {
+    "tsc:check": "tsc --noEmit",
+    "test": "../../node_modules/.bin/jest test",
+    "start": "start-storybook -p 6007"
+  },
+  "dependencies": {
+    "@grotto-front/web-app": "*",
+    "@material-ui/core": "4.11.3",
+    "@material-ui/icons": "4.11.2",
+    "@types/ramda": "^0.27.40",
+    "ramda": "^0.27.1",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "react-router-dom": "^5.2.0"
+  },
+  "devDependencies": {
+    "@grotto-front/eslint-config": "*",
+    "@grotto-front/eslint-config-typescript": "*",
+    "@grotto-front/ts-config": "*",
+    "@storybook/addon-actions": "6.2.8",
+    "@storybook/addon-essentials": "6.2.8",
+    "@storybook/addon-knobs": "6.2.8",
+    "@storybook/addon-links": "6.2.8",
+    "@storybook/addon-storyshots": "^6.2.8",
+    "@storybook/react": "6.2.8",
+    "@typescript-eslint/eslint-plugin": "4.14.2",
+    "@typescript-eslint/parser": "4.14.2",
+    "paths.macro": "3.0.1",
+    "react-test-renderer": "16.8.6",
+    "style-loader": "2.0.0",
+    "tsconfig-paths-webpack-plugin": "3.3.0"
+  },
+  "jest": {
+    "moduleNameMapper": {
+      "@grotto-front/webb-app(.*)$": "<rootDir>/../../external/web-app/src/$1"
+    }
+  }
+}
