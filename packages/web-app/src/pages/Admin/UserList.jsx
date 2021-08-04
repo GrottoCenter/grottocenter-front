@@ -5,7 +5,7 @@ import { useIntl } from 'react-intl';
 import Table from '../../components/common/Table';
 import {
   createColumns,
-  createDefaultHiddenColumns,
+  createDefaultHiddenColumns
 } from '../../components/common/Table/TableHead';
 
 import useMakeCustomCellRenders from './customCellRenders';
@@ -22,13 +22,13 @@ const defaultHiddenColumns = ['groups'];
  */
 const UserList = ({ isLoading, title, userList }) => {
   const { formatMessage } = useIntl();
-  const customCell = useMakeCustomCellRenders()
-  const makeTranslation = (id) => {
+  const customCell = useMakeCustomCellRenders();
+  const makeTranslation = id => {
     if (id === 'name') return formatMessage({ id: 'Caver.Name' });
     return formatMessage({ id: `${id[0].toUpperCase()}${id.slice(1)}` });
   };
   const [columns, setColumns] = useState(
-    createColumns(userList, makeTranslation),
+    createColumns(userList, makeTranslation)
   );
   const [hiddenColumns, setHiddenColumns] = useState(defaultHiddenColumns);
   const [order, setOrder] = React.useState('asc');
@@ -36,6 +36,7 @@ const UserList = ({ isLoading, title, userList }) => {
 
   useEffect(() => {
     setColumns(createColumns(userList, makeTranslation));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userList]);
 
   useEffect(() => {
@@ -71,6 +72,6 @@ const UserList = ({ isLoading, title, userList }) => {
 UserList.propTypes = {
   isLoading: PropTypes.bool.isRequired,
   title: PropTypes.string.isRequired,
-  userList: PropTypes.arrayOf(PropTypes.any).isRequired,
+  userList: PropTypes.arrayOf(PropTypes.any).isRequired
 };
 export default UserList;

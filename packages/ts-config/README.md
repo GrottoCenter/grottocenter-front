@@ -11,12 +11,12 @@ This setup rules for your Typescript project. Check the [tsconfig](.tsconfig.jso
 In your project folder, run:
 
 ```
-yarn install --dev @grotto-front/ts-config 
+yarn install --dev @grotto-front/ts-config
 ```
 
 ## Usage
 
-Create / update  `tsconfig.json` file like:
+Create / update `tsconfig.json` file like:
 
 ```tsconfig.json
 {
@@ -37,6 +37,6 @@ Create / update  `tsconfig.json` file like:
 
 ---
 
-*If you want to test new rules you can clone the project and use [npm link](https://docs.npmjs.com/cli/v6/commands/npm-link)*
+_If you want to test new rules you can clone the project and use [npm link](https://docs.npmjs.com/cli/v6/commands/npm-link)_
 
-*You might need to restart your IDE after config modifications*
+_You might need to restart your IDE after config modifications_

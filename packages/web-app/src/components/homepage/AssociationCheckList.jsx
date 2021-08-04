@@ -4,12 +4,6 @@ import CheckIcon from '@material-ui/icons/Check';
 import styled, { keyframes } from 'styled-components';
 import { withStyles } from '@material-ui/core';
 
-//
-//
-// S T Y L I N G - C O M P O N E N T S
-//
-//
-
 const CheckList = styled.ul`
   width: 100%;
   list-style-type: none;
@@ -38,7 +32,7 @@ const ListIcon = styled(CheckIcon)`
   height: 50px !important; // lesshint importantRule: false
   width: 50px !important; // lesshint importantRule: false
   float: left;
-  fill: ${(props) => props.color} !important; // lesshint importantRule: false
+  fill: ${props => props.color} !important; // lesshint importantRule: false
 
   :hover {
     animation: ${zoomAnimation} 500ms ease;
@@ -89,19 +83,13 @@ const ListItem = styled.li`
 `;
 
 const StyledListIcon = withStyles(
-  (theme) => ({
+  theme => ({
     root: {
-      fill: theme.palette.accent1Color,
-    },
+      fill: theme.palette.accent1Color
+    }
   }),
-  { withTheme: true },
+  { withTheme: true }
 )(ListIcon);
-
-//
-//
-// M A I N - C O M P O N E N T
-//
-//
 
 const AssociationCheckList = ({ title, entries }) => (
   <CheckListWrapper>
@@ -109,6 +97,7 @@ const AssociationCheckList = ({ title, entries }) => (
 
     <CheckList>
       {entries.map((entry, i) => (
+        // eslint-disable-next-line react/no-array-index-key
         <ListItem key={i}>
           <StyledListIcon />
           {entry.description}
@@ -119,8 +108,9 @@ const AssociationCheckList = ({ title, entries }) => (
 );
 
 AssociationCheckList.propTypes = {
+  // eslint-disable-next-line react/forbid-prop-types
   entries: PropTypes.array.isRequired,
-  title: PropTypes.element.isRequired,
+  title: PropTypes.element.isRequired
 };
 
 export default AssociationCheckList;

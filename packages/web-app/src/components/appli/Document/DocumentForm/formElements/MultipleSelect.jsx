@@ -7,11 +7,11 @@ import { MultipleSelectTypes } from '../../../../common/Form/types';
 
 // ======================
 
-const MultipleSelect = (props) => {
+const MultipleSelect = props => {
   const { contextValueName } = props;
   const {
     docAttributes: { [contextValueName]: value },
-    updateAttribute,
+    updateAttribute
   } = useContext(DocumentFormContext);
 
   const handleOnChange = (event, newValue, reason) => {
@@ -42,7 +42,7 @@ delete SelectInheritedProps.handleOnChange;
 
 MultipleSelect.propTypes = {
   contextValueName: PropTypes.string.isRequired,
-  ...SelectInheritedProps,
+  ...SelectInheritedProps
 };
 
 export default MultipleSelect;

@@ -2,7 +2,7 @@ import { isMobileOnly } from 'react-device-detect';
 import { TOGGLE_SIDEMENU } from '../actions/SideMenu';
 
 const initialState = {
-  open: !isMobileOnly,
+  open: !isMobileOnly
 };
 
 const reducer = (state = initialState, action) => {
@@ -10,7 +10,7 @@ const reducer = (state = initialState, action) => {
     case TOGGLE_SIDEMENU:
       return {
         ...state,
-        open: !state.open,
+        open: !state.open
       };
 
     default:

@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 
 import {
   fetchQuicksearchResult,
-  resetQuicksearch,
+  resetQuicksearch
 } from '../../../actions/Quicksearch';
 
 import Translate from '../../../components/common/Translate';
@@ -21,24 +21,24 @@ const MultipleCaversSelect = ({
   contextValueName,
   helperText,
   labelName,
-  required = false,
+  required = false
 }) => {
   const dispatch = useDispatch();
   const { error: searchError, isLoading, results: searchResults } = useSelector(
-    (state) => state.quicksearch,
+    state => state.quicksearch
   );
 
   const { isTrue: actionEnabled, true: enableAction } = useBoolean();
   const { isOpen: isCreateCaverOpen, toggle: toggleCreateCaver } = useBoolean();
   const [defaultNewName, setDefaultNewName] = useState('');
 
-  const loadSearchResults = (inputValue) => {
+  const loadSearchResults = inputValue => {
     dispatch(
       fetchQuicksearchResult({
         query: inputValue,
         resourceTypes: ['cavers'],
-        complete: false,
-      }),
+        complete: false
+      })
     );
     setDefaultNewName(inputValue);
   };
@@ -50,6 +50,7 @@ const MultipleCaversSelect = ({
     if (isLoading) {
       enableAction();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isLoading]);
 
   const handleOpenSideAction = () => {
@@ -60,7 +61,7 @@ const MultipleCaversSelect = ({
     <MultipleSelectComponent
       computeHasError={computeHasError}
       contextValueName={contextValueName}
-      getOptionLabel={(option) =>
+      getOptionLabel={option =>
         `${option.name}${
           option.surname ? ` ${option.surname.toUpperCase()}` : ''
         }`
@@ -84,8 +85,7 @@ const MultipleCaversSelect = ({
       sideActionDisabled={!actionEnabled}
       sideActionIcon={<AddCircle fontSize="large" />}
       isSideActionOpen={isCreateCaverOpen}
-      onSideAction={handleOpenSideAction}
-    >
+      onSideAction={handleOpenSideAction}>
       <CreateNewCaver
         contextValueName={contextValueName}
         enabled={isCreateCaverOpen}
@@ -102,7 +102,7 @@ MultipleCaversSelect.propTypes = {
   contextValueName: PropTypes.string.isRequired,
   helperText: PropTypes.string.isRequired,
   labelName: PropTypes.string.isRequired,
-  required: PropTypes.bool,
+  required: PropTypes.bool
 };
 
 export default MultipleCaversSelect;

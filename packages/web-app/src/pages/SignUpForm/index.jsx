@@ -7,7 +7,7 @@ import {
   CircularProgress,
   IconButton,
   InputAdornment,
-  Typography,
+  Typography
 } from '@material-ui/core';
 import Visibility from '@material-ui/icons/Visibility';
 import VisibilityOff from '@material-ui/icons/VisibilityOff';
@@ -45,7 +45,7 @@ const SignUpForm = ({
   onSignUp,
   onSurnameChange,
   loading,
-  signUpRequestSucceeded,
+  signUpRequestSucceeded
 }) => {
   const [isPasswordVisible, setIsPasswordVisible] = React.useState(false);
   const { formatMessage } = useIntl();
@@ -54,11 +54,11 @@ const SignUpForm = ({
   const toggleIsPasswordVisible = () => {
     setIsPasswordVisible(!isPasswordVisible);
   };
-  const handleMouseDownPassword = (event) => {
+  const handleMouseDownPassword = event => {
     event.preventDefault();
   };
 
-  const checkIfHasError = (fieldName) => {
+  const checkIfHasError = fieldName => {
     switch (fieldName) {
       case 'email':
         return isEmpty(match(emailRegexp, email));
@@ -83,19 +83,18 @@ const SignUpForm = ({
             <>
               <Typography align="center">
                 {formatMessage({
-                  id: 'Your account has been successfully created!',
+                  id: 'Your account has been successfully created!'
                 })}{' '}
                 {formatMessage({
                   id:
-                    'You can now log in to Grottocenter using the email and password you entered.',
+                    'You can now log in to Grottocenter using the email and password you entered.'
                 })}
               </Typography>
               <SpacedCenteredButton
                 color="primary"
                 onClick={() => history.push('/ui/login')}
                 style={{ display: 'block' }}
-                variant="contained"
-              >
+                variant="contained">
                 {formatMessage({ id: 'Log in' })}
               </SpacedCenteredButton>
             </>
@@ -104,7 +103,7 @@ const SignUpForm = ({
               <StringInput
                 fullWidth
                 helperText={formatMessage({
-                  id: 'The nickname defines how other users see you.',
+                  id: 'The nickname defines how other users see you.'
                 })}
                 onValueChange={onNicknameChange}
                 required
@@ -114,7 +113,7 @@ const SignUpForm = ({
               <StringInput
                 fullWidth
                 helperText={formatMessage({
-                  id: 'Your real name (optional).',
+                  id: 'Your real name (optional).'
                 })}
                 onValueChange={onNameChange}
                 value={name}
@@ -123,7 +122,7 @@ const SignUpForm = ({
               <StringInput
                 fullWidth
                 helperText={formatMessage({
-                  id: 'Your real surname (optional).',
+                  id: 'Your real surname (optional).'
                 })}
                 onValueChange={onSurnameChange}
                 value={surname}
@@ -146,8 +145,7 @@ const SignUpForm = ({
                       aria-label="toggle password visibility"
                       onClick={toggleIsPasswordVisible}
                       onMouseDown={handleMouseDownPassword}
-                      edge="end"
-                    >
+                      edge="end">
                       {isPasswordVisible ? <Visibility /> : <VisibilityOff />}
                     </IconButton>
                   </InputAdornment>
@@ -159,11 +157,11 @@ const SignUpForm = ({
                     id: `signUp.password.length.error`,
                     defaultMessage: `Your password must be at least {passwordMinLength} characters.`,
                     description:
-                      'Error displayed when the account password is too short.',
+                      'Error displayed when the account password is too short.'
                   },
                   {
-                    passwordMinLength: PASSWORD_MIN_LENGTH,
-                  },
+                    passwordMinLength: PASSWORD_MIN_LENGTH
+                  }
                 )}
                 onValueChange={onPasswordChange}
                 required
@@ -179,8 +177,7 @@ const SignUpForm = ({
                       aria-label="toggle password visibility"
                       onClick={toggleIsPasswordVisible}
                       onMouseDown={handleMouseDownPassword}
-                      edge="end"
-                    >
+                      edge="end">
                       {isPasswordVisible ? <Visibility /> : <VisibilityOff />}
                     </IconButton>
                   </InputAdornment>
@@ -197,8 +194,7 @@ const SignUpForm = ({
               <SpacedCenteredButton
                 type="submit"
                 size="large"
-                color={loading ? 'default' : 'primary'}
-              >
+                color={loading ? 'default' : 'primary'}>
                 {loading ? (
                   <CircularProgress size="2.8rem" />
                 ) : (
@@ -228,7 +224,7 @@ SignUpForm.propTypes = {
   onPasswordConfirmationChange: PropTypes.func.isRequired,
   onSurnameChange: PropTypes.func.isRequired,
   loading: PropTypes.bool.isRequired,
-  signUpRequestSucceeded: PropTypes.bool.isRequired,
+  signUpRequestSucceeded: PropTypes.bool.isRequired
 };
 
 export default SignUpForm;

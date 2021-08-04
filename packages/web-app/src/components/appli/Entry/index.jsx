@@ -20,8 +20,8 @@ export const Entry = ({ children }) => {
   const { formatMessage } = useIntl();
   const {
     state: {
-      details: { name, author, creationDate, lastEditor, editionDate },
-    },
+      details: { name, author, creationDate, lastEditor, editionDate }
+    }
   } = useContext(EntryContext);
 
   const footer = `${formatMessage({ id: 'Created by' })}
@@ -29,7 +29,7 @@ export const Entry = ({ children }) => {
         ${lastEditor &&
           editionDate &&
           ` - ${formatMessage({
-            id: 'Last modification by',
+            id: 'Last modification by'
           })} - ${lastEditor} (
           ${editionDate})`}`;
 
@@ -42,8 +42,7 @@ export const Entry = ({ children }) => {
           footer={footer}
           icon={<CustomIcon type="entry" />}
         />
-      }
-    >
+      }>
       {children}
     </Layout>
   );
@@ -56,13 +55,13 @@ const HydratedEntry = ({ children, ...props }) => (
 );
 
 Entry.propTypes = {
-  children: PropTypes.node.isRequired,
+  children: PropTypes.node.isRequired
 };
 
 HydratedEntry.propTypes = {
   details: detailsType.isRequired,
   loading: PropTypes.bool,
-  children: PropTypes.node.isRequired,
+  children: PropTypes.node.isRequired
 };
 
 export default HydratedEntry;

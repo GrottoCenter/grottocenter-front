@@ -1,4 +1,4 @@
-import fetch from 'isomorphic-fetch';
+// import fetch from 'isomorphic-fetch';
 import { decode } from 'jsonwebtoken';
 import { loginUrl } from '../conf/Config';
 import makeErrorMessage from '../helpers/makeErrorMessage';
@@ -16,60 +16,60 @@ export const LOGOUT = 'LOGOUT';
 // ==========
 
 export const fetchLogin = () => ({
-  type: FETCH_LOGIN,
+  type: FETCH_LOGIN
 });
 
 export const fetchLoginSuccess = (tokenDecoded, token) => ({
   type: FETCH_LOGIN_SUCCESS,
   tokenDecoded,
-  token,
+  token
 });
 
-export const fetchLoginFailure = (error) => ({
+export const fetchLoginFailure = error => ({
   type: FETCH_LOGIN_FAILURE,
-  error,
+  error
 });
 
 export const displayLoginDialog = () => ({
-  type: DISPLAY_LOGIN_DIALOG,
+  type: DISPLAY_LOGIN_DIALOG
 });
 
 export const hideLoginDialog = () => ({
-  type: HIDE_LOGIN_DIALOG,
+  type: HIDE_LOGIN_DIALOG
 });
 
 export const logout = () => ({
-  type: LOGOUT,
+  type: LOGOUT
 });
 
 export function postLogout() {
-  return (dispatch) => {
+  return dispatch => {
     dispatch(logout());
   };
 }
 
 export function postLogin(email, password) {
-  return (dispatch) => {
+  return dispatch => {
     dispatch(fetchLogin());
 
     const requestOptions = {
       method: 'POST',
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify({ email, password })
     };
 
     return fetch(loginUrl, requestOptions)
-      .then((response) => {
+      .then(response => {
         if (response.status >= 400) {
           throw new Error(response.status);
         } else {
           return response.json();
         }
       })
-      .then((json) => {
+      .then(json => {
         dispatch(fetchLoginSuccess(decode(json.token), json.token));
         dispatch(hideLoginDialog());
       })
-      .catch((error) => {
+      .catch(error => {
         const errorCode = Number(error.message);
         let errorMessage = 'An unknown error occurred.';
         if (errorCode === 401) {
@@ -80,8 +80,8 @@ export function postLogin(email, password) {
         }
         dispatch(
           fetchLoginFailure(
-            makeErrorMessage(errorCode, `Login - ${errorMessage}`),
-          ),
+            makeErrorMessage(errorCode, `Login - ${errorMessage}`)
+          )
         );
       });
   };

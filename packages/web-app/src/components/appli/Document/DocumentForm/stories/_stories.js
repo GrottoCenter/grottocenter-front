@@ -17,7 +17,7 @@ import {
   // allAuthors,
   // allEditors,
   allIdentifierTypes,
-  allLanguages,
+  allLanguages
   // allLibraries,
   // allMassifs,
   // allPartOf,
@@ -45,7 +45,7 @@ DefaultDocumentForm.propTypes = {};
 
 const DocFormProviderDecorator = (
   storyFn,
-  docAttributes = defaultContext.docAttributes,
+  docAttributes = defaultContext.docAttributes
 ) => (
   <DefaultDocumentForm>
     <DocumentFormProvider docAttributes={docAttributes}>
@@ -59,8 +59,8 @@ storiesOf('DocumentForm', module)
     'DescriptionEditor',
     () => <DescriptionEditor allLanguages={allLanguages} />,
     {
-      decorators: [(storyFn) => DocFormProviderDecorator(storyFn)],
-    },
+      decorators: [storyFn => DocFormProviderDecorator(storyFn)]
+    }
   )
   .add(
     'DocumentTypeSelect',
@@ -71,8 +71,8 @@ storiesOf('DocumentForm', module)
       />
     ),
     {
-      decorators: [(storyFn) => DocFormProviderDecorator(storyFn)],
-    },
+      decorators: [storyFn => DocFormProviderDecorator(storyFn)]
+    }
   )
   .add(
     'IdentifierEditor',
@@ -83,14 +83,14 @@ storiesOf('DocumentForm', module)
       />
     ),
     {
-      decorators: [(storyFn) => DocFormProviderDecorator(storyFn)],
-    },
+      decorators: [storyFn => DocFormProviderDecorator(storyFn)]
+    }
   )
   .add('PagesEditor', () => <PagesEditor />, {
-    decorators: [(storyFn) => DocFormProviderDecorator(storyFn)],
+    decorators: [storyFn => DocFormProviderDecorator(storyFn)]
   })
   .add('PublicationDatePicker', () => <PublicationDatePicker />, {
-    decorators: [(storyFn) => DocFormProviderDecorator(storyFn)],
+    decorators: [storyFn => DocFormProviderDecorator(storyFn)]
   })
   .add(
     'TitleEditor',
@@ -102,6 +102,6 @@ storiesOf('DocumentForm', module)
       />
     ),
     {
-      decorators: [(storyFn) => DocFormProviderDecorator(storyFn)],
-    },
+      decorators: [storyFn => DocFormProviderDecorator(storyFn)]
+    }
   );

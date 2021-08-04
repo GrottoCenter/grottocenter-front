@@ -11,7 +11,7 @@ const user = {
   surname: 'Doe',
   nickname: 'JDoe',
   mail: 'john@doe.com',
-  groups: [{ id: 1 }, { id: 2 }],
+  groups: [{ id: 1 }, { id: 2 }]
 };
 
 const UserGroupsWrapper = () => {

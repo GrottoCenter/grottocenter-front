@@ -2,9 +2,9 @@ import { useEffect, useState } from 'react';
 import { useMapEvent } from 'react-leaflet';
 import { isEmpty, isNil } from 'ramda';
 
-const useCurrentPosition = (defaultPosition) => {
+const useCurrentPosition = defaultPosition => {
   const [position, setPosition] = useState(null);
-  const map = useMapEvent('locationfound', (e) => {
+  const map = useMapEvent('locationfound', e => {
     setPosition(e.latlng);
     // TODO currently defaultPosition is not set. Sharing a map url will not work and it will always inter this condition
     if (isNil(defaultPosition) || isEmpty(defaultPosition)) {
@@ -14,6 +14,7 @@ const useCurrentPosition = (defaultPosition) => {
 
   useEffect(() => {
     map.locate();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return position;

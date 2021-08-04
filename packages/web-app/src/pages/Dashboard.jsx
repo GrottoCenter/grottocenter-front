@@ -17,14 +17,14 @@ const StyledList = styled(List)`
 `;
 
 const StyledListItem = styled(ListItem)`
-  border: 1px solid ${(props) => props.theme.palette.primary1Color};
-  flex-basis: calc(20% - ${(props) => props.theme.spacing(2) * 2}px);
+  border: 1px solid ${props => props.theme.palette.primary1Color};
+  flex-basis: calc(20% - ${props => props.theme.spacing(2) * 2}px);
   flex-direction: column;
-  margin: ${(props) => props.theme.spacing(2)}px;
+  margin: ${props => props.theme.spacing(2)}px;
 `;
 
 const DashboardBlock = styled.div`
-  margin-bottom: ${(props) => props.theme.spacing(4)}px;
+  margin-bottom: ${props => props.theme.spacing(4)}px;
 `;
 
 const Dashboard = () => {
@@ -32,7 +32,7 @@ const Dashboard = () => {
   const history = useHistory();
   const permissions = usePermissions();
 
-  const handleOnListItemClick = (url) => {
+  const handleOnListItemClick = url => {
     history.push(url);
   };
 
@@ -57,8 +57,7 @@ const Dashboard = () => {
                 <StyledListItem
                   button
                   key="manage-users-admin-tile-key"
-                  onClick={() => handleOnListItemClick('/ui/admin/users')}
-                >
+                  onClick={() => handleOnListItemClick('/ui/admin/users')}>
                   <PeopleIcon fontSize="large" color="primary" />
                   <Typography variant="h4" align="center">
                     {formatMessage({ id: 'Manage users' })}
@@ -78,8 +77,7 @@ const Dashboard = () => {
                   key="document-validation-admin-tile-key"
                   onClick={() =>
                     handleOnListItemClick('/ui/documents/validation')
-                  }
-                >
+                  }>
                   <DocumentListIcon fontSize="large" color="primary" />
                   <Typography variant="h4" align="center">
                     {formatMessage({ id: 'Document validation' })}

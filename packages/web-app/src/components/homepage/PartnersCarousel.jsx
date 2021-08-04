@@ -12,7 +12,7 @@ const PartnerVignette = withTheme(styled.div`
   margin-top: 2%;
   margin-bottom: 2%;
   background-color: white;
-  border: 1px solid ${(props) => props.theme.palette.primary1Color};
+  border: 1px solid ${props => props.theme.palette.primary1Color};
   border-radius: 2%;
   overflow: hidden;
   position: relative;
@@ -57,11 +57,11 @@ const CarouselDiv = withTheme(styled.div`
   width: 100%;
   li.alice-carousel__dots-item {
     opacity: 50%;
-    background-color: ${(props) => props.theme.palette.accent1Color};
+    background-color: ${props => props.theme.palette.accent1Color};
   }
   li.alice-carousel__dots-item.__active {
     opacity: 100%;
-    background-color: ${(props) => props.theme.palette.accent1Color};
+    background-color: ${props => props.theme.palette.accent1Color};
   }
 `);
 
@@ -74,7 +74,7 @@ const PartnerItem = ({ imagePath, name, onClick }) => (
 PartnerItem.propTypes = {
   imagePath: PropTypes.string,
   name: PropTypes.string,
-  onClick: PropTypes.func,
+  onClick: PropTypes.func
 };
 
 const PartnersCarousel = ({ fetch, partners, isFetching }) => {
@@ -95,11 +95,13 @@ const PartnersCarousel = ({ fetch, partners, isFetching }) => {
       fetch();
       isFirstLoad.current = false;
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   if (isFetching) {
     return <CircularProgress />;
-  } else if (rows.length > 0) {
+  }
+  if (rows.length > 0) {
     return (
       <CarouselDiv>
         <AliceCarousel
@@ -107,7 +109,11 @@ const PartnersCarousel = ({ fetch, partners, isFetching }) => {
           buttonsDisabled
           autoPlayInterval={5000}
           autoPlay
-          responsive={{ 0: { items: 3 }, 520: { items: 4 }, 1024: { items: 5 } }}
+          responsive={{
+            0: { items: 3 },
+            520: { items: 4 },
+            1024: { items: 5 }
+          }}
           items={rows}
         />
       </CarouselDiv>
@@ -119,7 +125,14 @@ const PartnersCarousel = ({ fetch, partners, isFetching }) => {
 PartnersCarousel.propTypes = {
   fetch: PropTypes.func.isRequired,
   isFetching: PropTypes.bool,
-  partners: PropTypes.any,
+  partners: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+      pictureFileName: PropTypes.string,
+      name: PropTypes.string,
+      customMessage: PropTypes.string
+    })
+  )
 };
 
 export default PartnersCarousel;

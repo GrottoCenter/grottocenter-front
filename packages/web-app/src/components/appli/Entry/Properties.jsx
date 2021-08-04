@@ -8,7 +8,7 @@ import {
   CalendarToday,
   Category,
   TrendingUp,
-  Public,
+  Public
 } from '@material-ui/icons';
 import CustomIcon from '../../common/CustomIcon';
 import { Property, Rating } from '../../common/Properties';
@@ -48,17 +48,17 @@ const Properties = () => {
         coordinates,
         mountain,
         altitude,
-        isDivingCave,
+        isDivingCave
       },
-      loading,
-    },
+      loading
+    }
   } = useContext(EntryContext);
   const { formatMessage } = useIntl();
-  const makeCoordinatesValue = (coordinatesValue) =>
+  const makeCoordinatesValue = coordinatesValue =>
     `${formatMessage({
-      id: 'Latitude',
+      id: 'Latitude'
     })}: ${coordinatesValue[0].toFixed(4)} - ${formatMessage({
-      id: 'Longitude',
+      id: 'Longitude'
     })}: ${coordinatesValue[1].toFixed(4)}`;
 
   return (
@@ -126,7 +126,7 @@ const Properties = () => {
           <Property
             label={formatMessage({ id: 'Diving cave' })}
             value={formatMessage({
-              id: isDivingCave ? 'Diving cave' : 'Not diving',
+              id: isDivingCave ? 'Diving cave' : 'Not diving'
             })}
             icon={<Waves color="primary" />}
             secondary

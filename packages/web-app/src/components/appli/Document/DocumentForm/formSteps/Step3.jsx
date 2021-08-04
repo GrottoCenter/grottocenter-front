@@ -13,7 +13,6 @@ import IssueEditor from '../formElements/IssueEditor';
 import { DocumentFormContext } from '../Provider';
 import { isArticle, isIssue } from '../DocumentTypesHelper';
 
-// ===================================
 const FlexWrapper = styled.div`
   display: flex;
   flex-wrap: wrap;
@@ -23,7 +22,6 @@ const FlexItemWrapper = styled.div`
   flex: 1;
   flex-basis: 300px;
 `;
-// ===================================
 
 const Step3 = ({ stepId }) => {
   const { formatMessage } = useIntl();
@@ -31,13 +29,13 @@ const Step3 = ({ stepId }) => {
   const {
     docAttributes: { authorComment, documentType },
     validatedSteps,
-    updateAttribute,
+    updateAttribute
   } = useContext(DocumentFormContext);
 
   const memoizedValues = [
     authorComment,
     documentType,
-    includes(stepId, validatedSteps),
+    includes(stepId, validatedSteps)
   ];
   return useMemo(
     () => (
@@ -53,7 +51,7 @@ const Step3 = ({ stepId }) => {
               <IssueEditor
                 helperText={formatMessage({
                   id:
-                    'Use the same wording that is used on the document: Vol.12, Number 15, No.158...',
+                    'Use the same wording that is used on the document: Vol.12, Number 15, No.158...'
                 })}
                 valueName={formatMessage({ id: 'Periodical issue' })}
                 required={false}
@@ -65,11 +63,9 @@ const Step3 = ({ stepId }) => {
         <StringInput
           hasError={false}
           helperText={formatMessage({
-            id: 'Additional information about the document.',
+            id: 'Additional information about the document.'
           })}
-          onValueChange={(newValue) =>
-            updateAttribute('authorComment', newValue)
-          }
+          onValueChange={newValue => updateAttribute('authorComment', newValue)}
           value={authorComment}
           valueName={formatMessage({ id: 'Comment' })}
         />
@@ -81,12 +77,13 @@ const Step3 = ({ stepId }) => {
         />
       </>
     ),
-    memoizedValues,
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    memoizedValues
   );
 };
 
 Step3.propTypes = {
-  stepId: PropTypes.number.isRequired,
+  stepId: PropTypes.number.isRequired
 };
 
 export default Step3;

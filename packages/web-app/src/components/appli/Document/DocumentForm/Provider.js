@@ -8,7 +8,7 @@ import {
   uniq,
   pipe,
   mergeRight,
-  __,
+  __
 } from 'ramda';
 import { isStepValid } from './formSteps/DocumentStepsHelper';
 import { DocumentTypes } from './DocumentTypesHelper';
@@ -18,7 +18,7 @@ const defaultFormSteps = [
   { id: 1, name: 'General Information', isValid: false },
   { id: 2, name: 'Classification', isValid: false },
   { id: 3, name: 'Additional information', isValid: false },
-  { id: 4, name: 'Synthesis', isValid: true },
+  { id: 4, name: 'Synthesis', isValid: true }
 ];
 
 export const defaultContext = {
@@ -44,33 +44,33 @@ export const defaultContext = {
     subjects: [],
     title: '',
     titleAndDescriptionLanguage: null,
-    formSteps: defaultFormSteps,
+    formSteps: defaultFormSteps
   },
   currentStep: 1,
 
   updateAttribute: (attributeName, newValue) => {}, // eslint-disable-line no-unused-vars
-  resetContext: () => {},
+  resetContext: () => {}
 };
 
 export const DocumentFormContext = createContext(defaultContext);
 
 const Provider = ({ children, defaultValues = {} }) => {
   const [docFormState, setState] = useState(
-    mergeRight(defaultContext.docAttributes, defaultValues),
+    mergeRight(defaultContext.docAttributes, defaultValues)
   );
   const [validatedSteps, setValidatedSteps] = useState([]);
   const [currentStep, setCurrentStep] = useState(
-    pathOr(null, [0, 'id'], defaultFormSteps),
+    pathOr(null, [0, 'id'], defaultFormSteps)
   );
   const [isFormValid, setIsFormValid] = useState(false);
   const updateAttribute = useCallback(
     (attributeName, newValue) => {
-      setState((prevState) => ({
+      setState(prevState => ({
         ...prevState,
-        [attributeName]: newValue,
+        [attributeName]: newValue
       }));
     },
-    [setState],
+    [setState]
   );
 
   const resetContext = useCallback(() => {
@@ -89,6 +89,7 @@ const Provider = ({ children, defaultValues = {} }) => {
         setValidatedSteps(invalidateSteps([currentStep]));
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [docFormState, currentStep]);
 
   useEffect(() => {
@@ -105,9 +106,8 @@ const Provider = ({ children, defaultValues = {} }) => {
         resetContext,
         updateAttribute,
         updateCurrentStep: setCurrentStep,
-        validatedSteps,
-      }}
-    >
+        validatedSteps
+      }}>
       {children}
     </DocumentFormContext.Provider>
   );
@@ -115,7 +115,7 @@ const Provider = ({ children, defaultValues = {} }) => {
 
 Provider.propTypes = {
   children: PropTypes.node.isRequired,
-  defaultValues: defaultValuesTypes,
+  defaultValues: defaultValuesTypes
 };
 
 export default Provider;

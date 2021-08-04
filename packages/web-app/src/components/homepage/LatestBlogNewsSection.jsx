@@ -7,24 +7,12 @@ import Translate from '../common/Translate';
 import LatestBlogNews from '../../containers/LatestBlogNews';
 import { FR_GC_BLOG, EN_GC_BLOG } from '../../conf/Config';
 
-//
-//
-// S T Y L I N G - C O M P O N E N T S
-//
-//
-
 const SectionTitle = withTheme(styled.h3`
-  color: ${(props) => props.theme.palette.accent1Color};
+  color: ${props => props.theme.palette.accent1Color};
   text-align: center;
   padding-bottom: 50px;
   font-size: 35px;
 `);
-
-//
-//
-// M A I N - C O M P O N E N T
-//
-//
 
 const LatestBlogNewsSection = () => (
   <LandingSection>

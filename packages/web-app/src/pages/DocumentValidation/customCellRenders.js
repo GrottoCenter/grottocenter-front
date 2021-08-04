@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-unused-vars
 import React from 'react';
 import { useIntl } from 'react-intl';
 import { propOr, map, pipe, join, head, isNil, reject, isEmpty } from 'ramda';
@@ -7,79 +8,79 @@ const useMakeCustomCellRenders = () => {
   return [
     {
       id: 'dateInscription',
-      customRender: (date) =>
+      customRender: date =>
         date
           ? `${formatDate(new Date(date))} ${formatTime(new Date(date))}`
-          : null,
+          : null
     },
     {
       id: 'dateValidation',
-      customRender: (date) => (date ? formatDate(new Date(date)) : null),
+      customRender: date => (date ? formatDate(new Date(date)) : null)
     },
     {
       id: 'authors',
       customRender: pipe(
         map(propOr('', 'nickname')),
         reject(isEmpty),
-        join(' - '),
-      ),
+        join(' - ')
+      )
     },
     {
       id: 'author',
-      customRender: propOr('', 'nickname'),
+      customRender: propOr('', 'nickname')
     },
     {
       id: 'identifierType',
-      customRender: propOr('', 'text'),
+      customRender: propOr('', 'text')
     },
     {
       id: 'license',
-      customRender: propOr('', 'text'),
+      customRender: propOr('', 'text')
     },
     {
       id: 'regions',
-      customRender: pipe(map(propOr('', 'code')), reject(isEmpty), join('; ')),
+      customRender: pipe(map(propOr('', 'code')), reject(isEmpty), join('; '))
     },
     {
       id: 'subjects',
-      customRender: pipe(map(propOr('', 'code')), reject(isEmpty), join('; ')),
+      customRender: pipe(map(propOr('', 'code')), reject(isEmpty), join('; '))
     },
     {
       id: 'library',
-      customRender: propOr('', 'name'),
+      customRender: propOr('', 'name')
     },
     {
       id: 'editor',
-      customRender: propOr('', 'name'),
+      customRender: propOr('', 'name')
     },
     {
       id: 'type',
-      customRender: propOr('', 'name'),
+      customRender: propOr('', 'name')
     },
     {
       id: 'entrance',
-      customRender: (entrance) =>
-        `${formatMessage({ id: 'City' })}: ${propOr('', 'city', entrance)}`,
+      customRender: entrance =>
+        `${formatMessage({ id: 'City' })}: ${propOr('', 'city', entrance)}`
     },
     {
       id: 'descriptions',
-      customRender: pipe(head, propOr('', 'text')),
+      customRender: pipe(head, propOr('', 'text'))
     },
     {
       id: 'titles',
-      customRender: pipe(head, propOr('', 'text')),
+      customRender: pipe(head, propOr('', 'text'))
     },
     {
       id: 'parent',
-      customRender: (parent) =>
+      customRender: parent =>
         !isNil(parent) &&
         !isNil(parent.refBbs) &&
         `${formatMessage({ id: 'BBS Reference' })}: ${propOr(
           '',
           'refBbs',
-          parent,
-        )}`,
-    },
+          parent
+        )}`
+    }
   ];
 };
 

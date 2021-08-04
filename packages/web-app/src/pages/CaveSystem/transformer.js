@@ -1,7 +1,7 @@
 import { pathOr } from 'ramda';
 
 // eslint-disable-next-line import/prefer-default-export
-export const getSafeData = (data) => ({
+export const getSafeData = data => ({
   accessRate: pathOr(0, ['accessRate'], data),
   altitude: pathOr(0, ['altitude'], data),
   author: pathOr('Author', ['author'], data),
@@ -21,5 +21,5 @@ export const getSafeData = (data) => ({
   name: data.name,
   progressionRate: pathOr(0, ['progressionRate'], data),
   temperature: pathOr(null, ['temperature'], data),
-  undergroundType: pathOr(null, ['massif', 'undergroundType'], data),
+  undergroundType: pathOr(null, ['massif', 'undergroundType'], data)
 });

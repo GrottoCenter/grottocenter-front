@@ -4,7 +4,7 @@ import {
   getMapCavesCoordinatesUrl,
   getMapEntrancesUrl,
   getMapEntrancesCoordinatesUrl,
-  getMapGrottosUrl,
+  getMapGrottosUrl
 } from '../conf/Config';
 import makeErrorMessage from '../helpers/makeErrorMessage';
 
@@ -35,51 +35,51 @@ export const LOADINGS = {
   NETWORKS_COORDINATES: 'networks_coordinates',
   ENTRANCES: 'entrances',
   ENTRANCES_COORDINATES: 'entrances_coordinates',
-  ORGANIZATIONS: 'organizations',
+  ORGANIZATIONS: 'organizations'
 };
 
 const makeUrl = (url, criteria) => {
   if (criteria) {
     return `${url}?${Object.keys(criteria)
-      .map((k) => `${k}=${encodeURIComponent(criteria[k])}`)
+      .map(k => `${k}=${encodeURIComponent(criteria[k])}`)
       .join('&')}`;
   }
   return url;
 };
 
-export const fetchNetworksCoordinates = (criteria) => {
+export const fetchNetworksCoordinates = criteria => {
   const thunkToDebounce = function(dispatch) {
     dispatch({
       type: FETCH_MAP_START_LOADING,
-      key: LOADINGS.NETWORKS_COORDINATES,
+      key: LOADINGS.NETWORKS_COORDINATES
     });
     const completedUrl = makeUrl(getMapCavesCoordinatesUrl, criteria);
     return fetch(completedUrl)
-      .then((response) => {
+      .then(response => {
         if (response.status >= 400) {
           throw new Error(response.status);
         }
         return response.text();
       })
-      .then((text) => {
+      .then(text => {
         dispatch({
           type: FETCH_MAP_NETWORKS_COORDINATES_SUCCESS,
-          data: JSON.parse(text),
+          data: JSON.parse(text)
         });
       })
-      .catch((error) => {
+      .catch(error => {
         dispatch({
           type: FETCH_MAP_NETWORKS_COORDINATES_FAILURE,
           error: makeErrorMessage(
             error.message,
-            `Fetching networks coordinates`,
-          ),
+            `Fetching networks coordinates`
+          )
         });
       })
       .finally(() => {
         dispatch({
           type: FETCH_MAP_END_LOADING,
-          key: LOADINGS.NETWORKS_COORDINATES,
+          key: LOADINGS.NETWORKS_COORDINATES
         });
       });
   };
@@ -87,37 +87,37 @@ export const fetchNetworksCoordinates = (criteria) => {
   thunkToDebounce.meta = {
     debounce: {
       time: 500,
-      key: 'FETCH_MAP_NETWORKS_COORDINATES',
-    },
+      key: 'FETCH_MAP_NETWORKS_COORDINATES'
+    }
   };
 
   return thunkToDebounce;
 };
 
-export const fetchNetworks = (criteria) => {
+export const fetchNetworks = criteria => {
   const thunkToDebounce = function(dispatch) {
     dispatch({ type: FETCH_MAP_START_LOADING, key: LOADINGS.NETWORKS });
     const completedUrl = makeUrl(getMapCavesUrl, criteria);
     return fetch(completedUrl)
-      .then((response) => {
+      .then(response => {
         if (response.status >= 400) {
           throw new Error(response.status);
         }
         return response.text();
       })
-      .then((text) => {
+      .then(text => {
         dispatch({ type: FETCH_MAP_NETWORKS_SUCCESS, data: JSON.parse(text) });
       })
-      .catch((error) => {
+      .catch(error => {
         dispatch({
           type: FETCH_MAP_NETWORKS_FAILURE,
-          error: makeErrorMessage(error.message, `Fetching networks`),
+          error: makeErrorMessage(error.message, `Fetching networks`)
         });
       })
       .finally(() => {
         dispatch({
           type: FETCH_MAP_END_LOADING,
-          key: LOADINGS.NETWORKS,
+          key: LOADINGS.NETWORKS
         });
       });
   };
@@ -125,46 +125,46 @@ export const fetchNetworks = (criteria) => {
   thunkToDebounce.meta = {
     debounce: {
       time: 500,
-      key: 'FETCH_MAP_NETWORKS',
-    },
+      key: 'FETCH_MAP_NETWORKS'
+    }
   };
 
   return thunkToDebounce;
 };
 
-export const fetchEntrancesCoordinates = (criteria) => {
+export const fetchEntrancesCoordinates = criteria => {
   const thunkToDebounce = function(dispatch) {
     dispatch({
       type: FETCH_MAP_START_LOADING,
-      key: LOADINGS.ENTRANCES_COORDINATES,
+      key: LOADINGS.ENTRANCES_COORDINATES
     });
     const completedUrl = makeUrl(getMapEntrancesCoordinatesUrl, criteria);
     return fetch(completedUrl)
-      .then((response) => {
+      .then(response => {
         if (response.status >= 400) {
           throw new Error(response.status);
         }
         return response.text();
       })
-      .then((text) => {
+      .then(text => {
         dispatch({
           type: FETCH_MAP_ENTRANCES_COORDINATES_SUCCESS,
-          data: JSON.parse(text),
+          data: JSON.parse(text)
         });
       })
-      .catch((error) => {
+      .catch(error => {
         dispatch({
           type: FETCH_MAP_ENTRANCES_COORDINATES_FAILURE,
           error: makeErrorMessage(
             error.message,
-            `Fetching entrances coordinates`,
-          ),
+            `Fetching entrances coordinates`
+          )
         });
       })
       .finally(() => {
         dispatch({
           type: FETCH_MAP_END_LOADING,
-          key: LOADINGS.ENTRANCES_COORDINATES,
+          key: LOADINGS.ENTRANCES_COORDINATES
         });
       });
   };
@@ -172,37 +172,37 @@ export const fetchEntrancesCoordinates = (criteria) => {
   thunkToDebounce.meta = {
     debounce: {
       time: 500,
-      key: 'FETCH_MAP_ENTRANCES',
-    },
+      key: 'FETCH_MAP_ENTRANCES'
+    }
   };
 
   return thunkToDebounce;
 };
 
-export const fetchEntrances = (criteria) => {
+export const fetchEntrances = criteria => {
   const thunkToDebounce = function(dispatch) {
     dispatch({ type: FETCH_MAP_START_LOADING, key: LOADINGS.ENTRANCES });
     const completedUrl = makeUrl(getMapEntrancesUrl, criteria);
     return fetch(completedUrl)
-      .then((response) => {
+      .then(response => {
         if (response.status >= 400) {
           throw new Error(response.status);
         }
         return response.text();
       })
-      .then((text) => {
+      .then(text => {
         dispatch({ type: FETCH_MAP_ENTRANCES_SUCCESS, data: JSON.parse(text) });
       })
-      .catch((error) => {
+      .catch(error => {
         dispatch({
           type: FETCH_MAP_ENTRANCES_FAILURE,
-          error: makeErrorMessage(error.message, `Fetching entrances`),
+          error: makeErrorMessage(error.message, `Fetching entrances`)
         });
       })
       .finally(() => {
         dispatch({
           type: FETCH_MAP_END_LOADING,
-          key: LOADINGS.ENTRANCES,
+          key: LOADINGS.ENTRANCES
         });
       });
   };
@@ -210,40 +210,40 @@ export const fetchEntrances = (criteria) => {
   thunkToDebounce.meta = {
     debounce: {
       time: 500,
-      key: 'FETCH_MAP_ENTRANCES',
-    },
+      key: 'FETCH_MAP_ENTRANCES'
+    }
   };
 
   return thunkToDebounce;
 };
 
-export const fetchOrganizations = (criteria) => {
+export const fetchOrganizations = criteria => {
   const thunkToDebounce = function(dispatch) {
     dispatch({ type: FETCH_MAP_START_LOADING, key: LOADINGS.ORGANIZATIONS });
     const completedUrl = makeUrl(getMapGrottosUrl, criteria);
     return fetch(completedUrl)
-      .then((response) => {
+      .then(response => {
         if (response.status >= 400) {
           throw new Error(response.status);
         }
         return response.text();
       })
-      .then((text) => {
+      .then(text => {
         dispatch({
           type: FETCH_MAP_ORGANIZATIONS_SUCCESS,
-          data: JSON.parse(text),
+          data: JSON.parse(text)
         });
       })
-      .catch((error) => {
+      .catch(error => {
         dispatch({
           type: FETCH_MAP_ORGANIZATIONS_FAILURE,
-          error: makeErrorMessage(error.message, `Fetching organizations`),
+          error: makeErrorMessage(error.message, `Fetching organizations`)
         });
       })
       .finally(() => {
         dispatch({
           type: FETCH_MAP_END_LOADING,
-          key: LOADINGS.ORGANIZATIONS,
+          key: LOADINGS.ORGANIZATIONS
         });
       });
   };
@@ -251,24 +251,24 @@ export const fetchOrganizations = (criteria) => {
   thunkToDebounce.meta = {
     debounce: {
       time: 500,
-      key: 'FETCH_MAP_ORGANIZATIONS',
-    },
+      key: 'FETCH_MAP_ORGANIZATIONS'
+    }
   };
 
   return thunkToDebounce;
 };
 
-export const changeZoom = (zoom) => ({
+export const changeZoom = zoom => ({
   type: CHANGE_ZOOM,
-  zoom,
+  zoom
 });
 
-export const focusOnLocation = (location) => ({
+export const focusOnLocation = location => ({
   type: FOCUS_ON_LOCATION,
-  location,
+  location
 });
 
-export const changeLocation = (location) => ({
+export const changeLocation = location => ({
   type: CHANGE_LOCATION,
-  location,
+  location
 });

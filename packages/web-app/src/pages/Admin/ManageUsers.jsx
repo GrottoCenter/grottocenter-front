@@ -29,17 +29,17 @@ const ManageUsers = () => {
   const [initialUser, setInitialUser] = useState(null);
 
   // Redux store
-  const { admins, isLoading, moderators } = useSelector((state) => state.caver);
+  const { admins, isLoading, moderators } = useSelector(state => state.caver);
   const {
     isLoading: isCaverGroupsLoading,
-    latestHttpCode: caverUserGroupsLatestHttpCode,
-  } = useSelector((state) => state.caverGroups);
+    latestHttpCode: caverUserGroupsLatestHttpCode
+  } = useSelector(state => state.caverGroups);
 
   const onSaveGroups = () => {
     dispatch(postCaverGroups(selectedUser.id, selectedUser.groups));
   };
 
-  const onSelection = (selection) => {
+  const onSelection = selection => {
     if (selection !== null) {
       setSelectedUser(selection);
       setInitialUser(selection);
@@ -53,11 +53,13 @@ const ManageUsers = () => {
       dispatch(getAdmins());
       dispatch(getModerators());
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isCaverGroupsLoading, caverUserGroupsLatestHttpCode]);
 
   useEffect(() => {
     dispatch(getAdmins());
     dispatch(getModerators());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

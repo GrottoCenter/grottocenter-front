@@ -5,11 +5,19 @@ import { withStyles } from '@material-ui/core';
 import InternationalizedLink from '../common/InternationalizedLink';
 import GCLink from '../common/GCLink';
 import GCLogo from '../common/GCLogo';
-import { licenceLinks, fseLinks, contactLinks, githubLink, facebookLink } from '../../conf/Config';
-import { twitterLink, rssLinks, bloggerLinks } from '../../conf/Config';
+import {
+  licenceLinks,
+  fseLinks,
+  contactLinks,
+  githubLink,
+  facebookLink,
+  twitterLink,
+  rssLinks,
+  bloggerLinks
+} from '../../conf/Config';
 
 const FooterBar = withStyles(
-  (theme) => ({
+  theme => ({
     root: {
       color: theme.palette.fullBlack,
       backgroundColor: theme.palette.primary3Color,
@@ -20,10 +28,10 @@ const FooterBar = withStyles(
       bottom: '0',
       width: 'calc(100% - 20px)',
       display: 'inline-flex',
-      justifyContent: 'space-between',
-    },
+      justifyContent: 'space-between'
+    }
   }),
-  { withTheme: true },
+  { withTheme: true }
 )(Toolbar);
 
 const SocialImage = styled.img`
@@ -51,7 +59,6 @@ const Version = styled.span`
 const RightDiv = styled.div`
   display: inline-flex;
 `;
-
 
 const AppFooter = () => (
   <FooterBar>
@@ -91,7 +98,10 @@ const AppFooter = () => (
         />
       </InternationalizedLink>
       <InternationalizedLink links={rssLinks}>
-        <SocialImage src="/images/icons8/brown/icons8-rss-filled-100.png" alt="RSS feed" />
+        <SocialImage
+          src="/images/icons8/brown/icons8-rss-filled-100.png"
+          alt="RSS feed"
+        />
       </InternationalizedLink>
       <InternationalizedLink links={bloggerLinks}>
         <SocialImage
@@ -106,7 +116,10 @@ const AppFooter = () => (
         />
       </InternationalizedLink>
       <GCLink internal href="/ui/faq">
-        <SocialImage src="/images/icons8/brown/icons8-faq-filled-100.png" alt="Need help?" />
+        <SocialImage
+          src="/images/icons8/brown/icons8-faq-filled-100.png"
+          alt="Need help?"
+        />
       </GCLink>
     </div>
   </FooterBar>

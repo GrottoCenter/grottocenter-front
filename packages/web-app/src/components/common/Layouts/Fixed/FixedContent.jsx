@@ -7,7 +7,7 @@ import {
   CardActions as MuiCardActions,
   IconButton as MuiIconButton,
   CardContent as MuiCardContent,
-  CardHeader,
+  CardHeader
 } from '@material-ui/core';
 import styled from 'styled-components';
 import CreateIcon from '@material-ui/icons/Create';
@@ -56,8 +56,7 @@ const FixedContent = ({ title, icon, content, footer, onEdit }) => {
           size="small"
           aria-label="edit"
           disabled={isNil(onEdit)}
-          onClick={onEdit}
-        >
+          onClick={onEdit}>
           <CreateIcon />
         </IconButton>
       </CardActions>
@@ -70,7 +69,7 @@ FixedContent.propTypes = {
   icon: PropTypes.node,
   content: PropTypes.node.isRequired,
   footer: PropTypes.string.isRequired,
-  onEdit: PropTypes.func,
+  onEdit: PropTypes.func
 };
 
 export default FixedContent;

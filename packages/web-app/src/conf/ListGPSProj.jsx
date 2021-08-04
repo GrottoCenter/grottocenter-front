@@ -3,12 +3,14 @@ export const unitsTab = {
     xName: 'Lat',
     xUnit: '°N',
     yName: 'Lng',
-    yUnit: '°E',
+    yUnit: '°E'
   },
   m: {
     xName: 'X',
     xUnit: 'm',
     yName: 'Y',
-    yUnit: 'm',
-  },
+    yUnit: 'm'
+  }
 };
+
+export default unitsTab;

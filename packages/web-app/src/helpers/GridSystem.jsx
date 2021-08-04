@@ -2,11 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import _ from 'underscore.string';
 
-//
-//
-// H E L P E R - F U N C T I O N S
-//
-//
 /* Encapsulate the grid mecanism in React components */
 
 export const GridContainer = ({ className, children }) => (
@@ -14,8 +9,8 @@ export const GridContainer = ({ className, children }) => (
 );
 
 GridContainer.propTypes = {
-  children: PropTypes.any.isRequired,
-  className: PropTypes.string,
+  children: PropTypes.node.isRequired,
+  className: PropTypes.string
 };
 
 export const GridRow = ({ className, children }) => (
@@ -23,8 +18,8 @@ export const GridRow = ({ className, children }) => (
 );
 
 GridRow.propTypes = {
-  children: PropTypes.any.isRequired,
-  className: PropTypes.string,
+  children: PropTypes.node.isRequired,
+  className: PropTypes.string
 };
 
 export const GridOneThirdColumn = ({ className, children }) => (
@@ -32,8 +27,8 @@ export const GridOneThirdColumn = ({ className, children }) => (
 );
 
 GridOneThirdColumn.propTypes = {
-  children: PropTypes.any.isRequired,
-  className: PropTypes.string,
+  children: PropTypes.node.isRequired,
+  className: PropTypes.string
 };
 
 export const GridTwoThirdColumn = ({ className, children }) => (
@@ -41,8 +36,8 @@ export const GridTwoThirdColumn = ({ className, children }) => (
 );
 
 GridTwoThirdColumn.propTypes = {
-  children: PropTypes.any.isRequired,
-  className: PropTypes.string,
+  children: PropTypes.node.isRequired,
+  className: PropTypes.string
 };
 
 export const GridOneHalfColumn = ({ className, children }) => (
@@ -50,8 +45,8 @@ export const GridOneHalfColumn = ({ className, children }) => (
 );
 
 GridOneHalfColumn.propTypes = {
-  children: PropTypes.any.isRequired,
-  className: PropTypes.string,
+  children: PropTypes.node.isRequired,
+  className: PropTypes.string
 };
 
 export const GridFullColumn = ({ className, children }) => (
@@ -59,6 +54,6 @@ export const GridFullColumn = ({ className, children }) => (
 );
 
 GridFullColumn.propTypes = {
-  children: PropTypes.any.isRequired,
-  className: PropTypes.string,
+  children: PropTypes.node.isRequired,
+  className: PropTypes.string
 };

@@ -19,7 +19,7 @@ const CustomCell = ({ id, value, customRenders }) => {
 CustomCell.propTypes = {
   id: PropTypes.oneOfType([
     PropTypes.string.isRequired,
-    PropTypes.number.isRequired,
+    PropTypes.number.isRequired
   ]),
   value: PropTypes.oneOfType([
     PropTypes.string.isRequired,
@@ -27,12 +27,12 @@ CustomCell.propTypes = {
     PropTypes.arrayOf(
       PropTypes.oneOfType([
         PropTypes.string.isRequired,
-        PropTypes.number.isRequired,
-      ]),
+        PropTypes.number.isRequired
+      ])
     ),
-    PropTypes.any,
+    PropTypes.any
   ]),
-  customRenders: PropTypes.func,
+  customRenders: PropTypes.func
 };
 
 export default CustomCell;

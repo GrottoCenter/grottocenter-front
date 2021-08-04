@@ -9,11 +9,11 @@ const StyledList = withStyles({
   root: {
     display: 'flex',
     flexWrap: 'wrap',
-    width: '100%',
-  },
+    width: '100%'
+  }
 })(List);
 
-const EntriesList = (props) => {
+const EntriesList = props => {
   const { entries, title, emptyMessageComponent } = props;
 
   return (
@@ -24,7 +24,7 @@ const EntriesList = (props) => {
           <StyledList>
             {entries
               .sort((a, b) => a.name > b.name)
-              .map((entry) => (
+              .map(entry => (
                 <EntryListItem key={entry.id} entry={entry} />
               ))}
           </StyledList>
@@ -43,13 +43,13 @@ const EntriesList = (props) => {
 EntriesList.propTypes = {
   entries: PropTypes.arrayOf(PropTypes.object),
   title: PropTypes.node,
-  emptyMessageComponent: PropTypes.node,
+  emptyMessageComponent: PropTypes.node
 };
 
 EntriesList.defaultProps = {
   entries: undefined,
   title: <Translate>Entries list</Translate>,
-  emptyMessageComponent: <Translate>Empty list</Translate>,
+  emptyMessageComponent: <Translate>Empty list</Translate>
 };
 
 export default EntriesList;

@@ -7,7 +7,7 @@ import {
   CalendarToday,
   Category,
   TrendingUp,
-  Public,
+  Public
 } from '@material-ui/icons';
 
 import CustomIcon from '../../common/CustomIcon';
@@ -50,14 +50,14 @@ const Properties = () => {
         discoveryYear,
         mountain,
         altitude,
-        isDivingCave,
+        isDivingCave
       },
       coordinates,
       selectedEntries,
       entries,
-      loading,
+      loading
     },
-    action: { onSelectEntry },
+    action: { onSelectEntry }
   } = useContext(CaveContext);
   const { formatMessage } = useIntl();
 
@@ -126,7 +126,7 @@ const Properties = () => {
           <Property
             label={formatMessage({ id: 'Diving cave' })}
             value={formatMessage({
-              id: isDivingCave ? 'Diving cave' : 'Not diving',
+              id: isDivingCave ? 'Diving cave' : 'Not diving'
             })}
             icon={<Waves color="primary" />}
             secondary

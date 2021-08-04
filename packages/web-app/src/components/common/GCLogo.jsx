@@ -3,12 +3,6 @@ import PropTypes from 'prop-types';
 import GCLink from './GCLink';
 import { logoGC } from '../../conf/Config';
 
-//
-//
-// M A I N - C O M P O N E N T
-//
-//
-
 const GCLogo = ({ className, showLink = true }) => {
   if (showLink) {
     return (
@@ -26,7 +20,7 @@ const GCLogo = ({ className, showLink = true }) => {
 
 GCLogo.propTypes = {
   className: PropTypes.string,
-  showLink: PropTypes.bool,
+  showLink: PropTypes.bool
 };
 
 export default GCLogo;

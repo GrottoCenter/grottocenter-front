@@ -13,25 +13,26 @@ const MultipleSubjectsSelect = ({
   contextValueName,
   helperText,
   labelName,
-  required = false,
+  required = false
 }) => {
   const dispatch = useDispatch();
   const { formatMessage } = useIntl();
-  const { isFetching, subjects } = useSelector((state) => state.subject);
+  const { isFetching, subjects } = useSelector(state => state.subject);
 
   React.useEffect(() => {
     dispatch(loadSubjects());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
     <MultipleSelectWithOptionsComponent
       computeHasError={computeHasError}
       contextValueName={contextValueName}
-      getOptionLabel={(option) => {
+      getOptionLabel={option => {
         const { code } = option;
         const subjectName = formatMessage({
           id: option.code,
-          defaultMessage: option.subject,
+          defaultMessage: option.subject
         });
         let parentText = '';
         if (option.parent) {
@@ -60,7 +61,7 @@ MultipleSubjectsSelect.propTypes = {
   contextValueName: PropTypes.string.isRequired,
   helperText: PropTypes.string.isRequired,
   labelName: PropTypes.string.isRequired,
-  required: PropTypes.bool,
+  required: PropTypes.bool
 };
 
 export default MultipleSubjectsSelect;

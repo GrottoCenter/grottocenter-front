@@ -6,38 +6,38 @@ import {
   propOr,
   reject,
   isEmpty,
-  head,
+  head
 } from 'ramda';
 
-export const makeOverview = (data) => ({
+export const makeOverview = data => ({
   createdBy: pathOr('', ['author', 'nickname'], data),
   creationDate: pathOr('', ['dateInscription'], data),
   authors: pipe(
     propOr([], 'authors'),
     map(propOr('', 'nickname')),
     reject(isEmpty),
-    defaultTo([]),
+    defaultTo([])
   )(data),
   language: pathOr('unknown', ['mainLanguage', 'refName'], data),
   title: pipe(
     propOr([], 'titles'),
     head,
-    propOr('No title provided', 'text'),
+    propOr('No title provided', 'text')
   )(data),
-  summary: pipe(propOr([], 'descriptions'), head, propOr('', 'text'))(data),
+  summary: pipe(propOr([], 'descriptions'), head, propOr('', 'text'))(data)
 });
 
-export const makeOrganizations = (data) => ({
+export const makeOrganizations = data => ({
   editor: pathOr('', ['editor', 'name'], data),
-  library: pathOr('', ['library', 'name'], data),
+  library: pathOr('', ['library', 'name'], data)
 });
 
-export const makeDetails = (data) => {
+export const makeDetails = data => {
   const formatedIdentfier = pathOr(null, ['identifierType', 'id'], data)
     ? `${propOr(
         '',
         'identifier',
-        data,
+        data
       )} (${data.identifierType.id.toUpperCase()})`
     : propOr('', 'identifier', data);
   return {
@@ -49,24 +49,24 @@ export const makeDetails = (data) => {
     parentDocument: pipe(
       pathOr([], ['parent', 'titles']),
       head,
-      propOr('', 'text'),
+      propOr('', 'text')
     )(data),
     pages: propOr('', 'pages', data),
     subjects: pipe(propOr([], 'subjects'), reject(isEmpty))(data),
-    regions: pipe(propOr([], 'regions'), reject(isEmpty))(data),
+    regions: pipe(propOr([], 'regions'), reject(isEmpty))(data)
   };
 };
 
-export const makeEntities = (data) => ({
+export const makeEntities = data => ({
   massif: pipe(
     pathOr([], ['massif', 'names']),
     head,
-    pathOr('', ['name']),
+    pathOr('', ['name'])
   )(data),
   cave: pipe(
     pathOr([], ['entrance', 'names']),
     head,
-    pathOr('', ['cave', 'name']),
+    pathOr('', ['cave', 'name'])
   )(data),
-  entrance: pathOr('', ['entrance', 'name'], data),
+  entrance: pathOr('', ['entrance', 'name'], data)
 });

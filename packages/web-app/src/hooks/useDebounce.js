@@ -13,6 +13,7 @@ export const useDebounce = (value, delay = 200) => {
     return () => {
       clearTimeout(handler);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value]);
 
   return debouncedValue;
@@ -20,5 +21,5 @@ export const useDebounce = (value, delay = 200) => {
 
 useDebounce.PropTypes = {
   value: PropTypes.string.isRequired,
-  delay: PropTypes.number,
+  delay: PropTypes.number
 };

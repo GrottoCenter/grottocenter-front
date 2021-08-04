@@ -35,7 +35,7 @@ const Property = ({
   label,
   value,
   icon,
-  secondary = false,
+  secondary = false
 }) => (
   <PropertyWrapper>
     {!isNil(icon) && icon}
@@ -52,7 +52,7 @@ const Property = ({
 );
 
 TooltipWrapper.propTypes = {
-  label: PropTypes.string,
+  label: PropTypes.string
 };
 
 Property.propTypes = {
@@ -61,7 +61,7 @@ Property.propTypes = {
   // eslint-disable-next-line react/forbid-prop-types
   icon: PropTypes.object,
   secondary: PropTypes.bool,
-  ...TooltipWrapper.propTypes,
+  ...TooltipWrapper.propTypes
 };
 
 export default Property;

@@ -4,7 +4,6 @@ Manage Grottocenter front packages and main app
 
 This project use:
 - [Yarn 2 'Berry'](https://github.com/yarnpkg/berry) & [yarn workspaces](https://classic.yarnpkg.com/en/docs/workspaces/)
-
   
 - [Lerna](https://github.com/lerna/lerna)
 
@@ -27,6 +26,7 @@ This project use:
 
 ## Getting Started
 
+- Use node >= 14
 - Install [Yarn](https://yarnpkg.com/getting-started/install)
 - `yarn` at the top-level of the repo, it will automatically install all dependencies and link local packages
 

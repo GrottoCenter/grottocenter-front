@@ -10,16 +10,16 @@ export const FETCH_SIGN_UP_FAILURE = 'FETCH_SIGN_UP_FAILURE';
 // ==========
 
 export const fetchSignUp = () => ({
-  type: FETCH_SIGN_UP,
+  type: FETCH_SIGN_UP
 });
 
 export const fetchSignUpSuccess = () => ({
-  type: FETCH_SIGN_UP_SUCCESS,
+  type: FETCH_SIGN_UP_SUCCESS
 });
 
-export const fetchSignUpFailure = (error) => ({
+export const fetchSignUpFailure = error => ({
   type: FETCH_SIGN_UP_FAILURE,
-  error,
+  error
 });
 
 /**
@@ -32,16 +32,16 @@ export const fetchSignUpFailure = (error) => ({
  * - password {String}
  */
 export function postSignUp(data) {
-  return (dispatch) => {
+  return dispatch => {
     dispatch(fetchSignUp());
 
     const requestOptions = {
       method: 'POST',
-      body: JSON.stringify(data),
+      body: JSON.stringify(data)
     };
 
     return fetch(signUpUrl, requestOptions)
-      .then((response) => {
+      .then(response => {
         if (response.ok) {
           // there is no content in the response in case of success
           dispatch(fetchSignUpSuccess());
@@ -49,17 +49,17 @@ export function postSignUp(data) {
           throw response;
         }
       })
-      .catch((response) => {
+      .catch(response => {
         const statusCode = response.status;
-        response.text().then((responseText) => {
+        response.text().then(responseText => {
           const errorMessage =
             statusCode === 500
               ? 'A server error occurred, please try again later or contact Wikicaves for more information.'
               : responseText;
           dispatch(
             fetchSignUpFailure(
-              makeErrorMessage(statusCode, `SignUp - ${errorMessage}`),
-            ),
+              makeErrorMessage(statusCode, `SignUp - ${errorMessage}`)
+            )
           );
         });
       });

@@ -1,3 +1,4 @@
+/* eslint-disable react/destructuring-assignment */
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import Card from '@material-ui/core/Card';
@@ -16,43 +17,37 @@ import { DateRibbon } from '../Toolbox';
 import GCLink from '../GCLink';
 import { DYNAMIC_NEWS_RELOAD_INTERVAL } from '../../../conf/Config';
 
-//
-//
-// S T Y L I N G - C O M P O N E N T S
-//
-//
-
 const StyledCardMedia = withStyles({
   root: {
-    height: '150px',
-  },
+    height: '150px'
+  }
 })(CardMedia);
 
 const StyledCardContent = withStyles({
   root: {
     minHeight: '150px',
-    textAlign: 'justify',
-  },
+    textAlign: 'justify'
+  }
 })(CardContent);
 
 const StyledCardActions = withStyles({
   root: {
-    justifyContent: 'flex-end',
-  },
+    justifyContent: 'flex-end'
+  }
 })(CardActions);
 
 const StyledCard = withStyles(
-  (theme) => ({
+  theme => ({
     root: {
       '&:nth-child(n+1)': {
         marginTop: '4%',
         [theme.breakpoints.up('550')]: {
-          marginTop: '0',
-        },
-      },
-    },
+          marginTop: '0'
+        }
+      }
+    }
   }),
-  { withTheme: true },
+  { withTheme: true }
 )(Card);
 
 const StyledActionCard = styled(StyledCard)`
@@ -60,57 +55,51 @@ const StyledActionCard = styled(StyledCard)`
 `;
 
 const StyledSyncIcon = withStyles(
-  (theme) => ({
+  theme => ({
     root: {
       '&:hover': {
-        fill: theme.palette.accent1Color,
+        fill: theme.palette.accent1Color
       },
-      fill: theme.palette.primary3Color,
-    },
+      fill: theme.palette.primary3Color
+    }
   }),
-  { withTheme: true },
+  { withTheme: true }
 )(SyncIcon);
 
 const StyledSyncKOIcon = withStyles(
-  (theme) => ({
+  theme => ({
     root: {
       '&:hover': {
-        fill: theme.palette.accent1Color,
+        fill: theme.palette.accent1Color
       },
-      fill: theme.palette.primary3Color,
-    },
+      fill: theme.palette.primary3Color
+    }
   }),
-  { withTheme: true },
+  { withTheme: true }
 )(SyncKOIcon);
 
 const StyledImageLoupe = withStyles(
-  (theme) => ({
+  theme => ({
     root: {
-      fill: theme.palette.accent1Color,
-    },
+      fill: theme.palette.accent1Color
+    }
   }),
-  { withTheme: true },
+  { withTheme: true }
 )(ImageLoupe);
 
 const StyledTitleTypography = withStyles({
   root: {
     fontSize: '24px',
-    minHeight: '60px',
-  },
+    minHeight: '60px'
+  }
 })(Typography);
 
 const StyledBodyTypography = withStyles({
   root: {
     fontSize: '14px',
-    textAlign: 'justify',
-  },
+    textAlign: 'justify'
+  }
 })(Typography);
-
-//
-//
-// M A I N - C O M P O N E N T
-//
-//
 
 class NewsCard extends Component {
   constructor(props) {
@@ -120,7 +109,10 @@ class NewsCard extends Component {
   }
 
   componentDidMount() {
-    this.interval = setInterval(() => this.props.refresh(), DYNAMIC_NEWS_RELOAD_INTERVAL);
+    this.interval = setInterval(
+      () => this.props.refresh(),
+      DYNAMIC_NEWS_RELOAD_INTERVAL
+    );
   }
 
   componentWillUnmount() {
@@ -154,7 +146,9 @@ class NewsCard extends Component {
           <StyledTitleTypography gutterBottom component="h3">
             {this.props.title}
           </StyledTitleTypography>
-          <StyledBodyTypography component="p">{this.props.text}</StyledBodyTypography>
+          <StyledBodyTypography component="p">
+            {this.props.text}
+          </StyledBodyTypography>
         </StyledCardContent>
         <Divider />
         {this.props.linkMore && (
@@ -173,13 +167,13 @@ class NewsCard extends Component {
 
 NewsCard.propTypes = {
   showSpinner: PropTypes.bool,
-  day: PropTypes.any,
+  day: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   month: PropTypes.string,
   title: PropTypes.string,
   text: PropTypes.string,
   linkMore: PropTypes.string,
   init: PropTypes.func.isRequired,
-  refresh: PropTypes.func.isRequired,
+  refresh: PropTypes.func.isRequired
 };
 
 export default NewsCard;

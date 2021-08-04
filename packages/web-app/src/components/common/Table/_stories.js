@@ -11,23 +11,22 @@ import StandardDialog from '../StandardDialog';
 import Table from './index';
 import { createColumns } from './TableHead';
 
-// memoize
 const makeCustomHeaderRenders = () => {
   return [
     {
       id: 'title',
-      customRender: () => 'Custom title',
-    },
+      customRender: () => 'Custom title'
+    }
   ];
 };
 
-// memoize
 const makeCustomRenders = () => {
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   const { formatDate } = useIntl();
   return [
     {
       id: 'submit_date',
-      customRender: (date) => {
+      customRender: date => {
         const tmpDate = new Date(date);
         const formattedDate =
           // eslint-disable-next-line no-self-compare
@@ -36,14 +35,14 @@ const makeCustomRenders = () => {
         return (
           <Typography variant="subtitle2">{`${formattedDate}`}</Typography>
         );
-      },
+      }
     },
     {
       id: 'title',
-      customRender: (title) => {
+      customRender: title => {
         return <Typography color="error">{title}</Typography>;
-      },
-    },
+      }
+    }
   ];
 };
 
@@ -56,14 +55,14 @@ const HydratedTable = ({
   hasOrder,
   hasCustomHeaderRenders,
   hasCustomRenders,
-  hasEmptyData,
+  hasEmptyData
 }) => {
   const { formatMessage } = useIntl();
-  const makeTranslation = (id) => formatMessage({ id });
+  const makeTranslation = id => formatMessage({ id });
   const [selection, setSelection] = useState([1]);
   const [hiddenColumns, setHiddenColumns] = useState(['id']);
   const [columns, setColumns] = useState(
-    createColumns(data.documents, makeTranslation),
+    createColumns(data.documents, makeTranslation)
   );
   const [detailedView, setDetailedView] = useState(null);
   const [currentPage, setCurrentPage] = useState(0);
@@ -73,39 +72,42 @@ const HydratedTable = ({
   const [currentData, updateCurrentData] = useState(
     data.documents.slice(
       currentPage * rowsPerPage,
-      currentPage * rowsPerPage + rowsPerPage,
-    ),
+      currentPage * rowsPerPage + rowsPerPage
+    )
   );
 
   const onFetchData = () => {
     updateCurrentData(
       data.documents.slice(
         currentPage * rowsPerPage,
-        currentPage * rowsPerPage + rowsPerPage,
-      ),
+        currentPage * rowsPerPage + rowsPerPage
+      )
     );
   };
 
   const handleSelection = useCallback(
-    (newSelection) => {
+    newSelection => {
       setSelection(newSelection);
     },
-    [setSelection],
+    [setSelection]
   );
 
   useEffect(() => {
     setColumns(createColumns(data.documents, makeTranslation));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data]);
 
   // When these table states change, fetch new data!
   useEffect(() => {
     // This might need a debounce
     onFetchData({ currentPage, rowsPerPage, orderBy, order });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [order, orderBy, rowsPerPage, currentPage]);
 
   // Force header rerender for storybook knobs
   useEffect(() => {
     setColumns(createColumns(data.documents, makeTranslation));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hasDetailedView, hasSelection]);
 
   return (
@@ -140,9 +142,11 @@ const HydratedTable = ({
         onClose={() => {
           setDetailedView(null);
         }}
-        title="detailed view"
-      >
-        <>detailed view number {detailedView || 'nothing'}</>
+        title="detailed view">
+        <>
+          detailed view number
+          {detailedView || 'nothing'}
+        </>
       </StandardDialog>
     </>
   );
@@ -171,5 +175,5 @@ HydratedTable.propTypes = {
   hasOrder: PropTypes.bool.isRequired,
   hasCustomRenders: PropTypes.bool.isRequired,
   hasCustomHeaderRenders: PropTypes.bool.isRequired,
-  hasEmptyData: PropTypes.bool.isRequired,
+  hasEmptyData: PropTypes.bool.isRequired
 };

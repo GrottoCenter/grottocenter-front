@@ -6,7 +6,7 @@ import useMakeCustomHeaderCellRenders from './customHeaderCellRenders';
 import Table from '../../components/common/Table';
 import {
   createColumns,
-  createDefaultHiddenColumns,
+  createDefaultHiddenColumns
 } from '../../components/common/Table/TableHead';
 
 const defaultHiddenColumns = [
@@ -35,7 +35,7 @@ const defaultHiddenColumns = [
   'refBbs',
   'reviewer',
   'validationComment',
-  'validator',
+  'validator'
 ];
 
 const DocumentsTable = ({
@@ -52,24 +52,25 @@ const DocumentsTable = ({
   updateOrderBy,
   updatePage,
   updateRowsPerPage,
-  updateSelected,
+  updateSelected
 }) => {
   const { formatMessage } = useIntl();
-  const customCell = useMakeCustomCellRenders()
-  const customHeader = useMakeCustomHeaderCellRenders()
+  const customCell = useMakeCustomCellRenders();
+  const customHeader = useMakeCustomHeaderCellRenders();
   const [hiddenColumns, setHiddenColumns] = useState(defaultHiddenColumns);
-  const makeTranslation = (id) =>
+  const makeTranslation = id =>
     formatMessage({ id: `${id[0].toUpperCase()}${id.slice(1)}` });
   const [columns, setColumns] = useState(
-    createColumns(documents, makeTranslation),
+    createColumns(documents, makeTranslation)
   );
 
   useEffect(() => {
     setColumns(
       createColumns(documents, makeTranslation).sort(
-        (c1, c2) => c1.label.localeCompare(c2.label) > 0,
-      ),
+        (c1, c2) => c1.label.localeCompare(c2.label) > 0
+      )
     );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [documents]);
 
   useEffect(() => {
@@ -107,8 +108,8 @@ DocumentsTable.propTypes = {
   documents: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-      title: PropTypes.string,
-    }),
+      title: PropTypes.string
+    })
   ),
   loading: PropTypes.bool.isRequired,
   openDetailedView: PropTypes.func.isRequired,
@@ -119,14 +120,14 @@ DocumentsTable.propTypes = {
   selected: PropTypes.arrayOf(
     PropTypes.oneOfType([
       PropTypes.number.isRequired,
-      PropTypes.string.isRequired,
-    ]),
+      PropTypes.string.isRequired
+    ])
   ).isRequired,
   updateOrder: PropTypes.func.isRequired,
   updateOrderBy: PropTypes.func.isRequired,
   updatePage: PropTypes.func.isRequired,
   updateRowsPerPage: PropTypes.func.isRequired,
-  updateSelected: PropTypes.func.isRequired,
+  updateSelected: PropTypes.func.isRequired
 };
 
 export default DocumentsTable;

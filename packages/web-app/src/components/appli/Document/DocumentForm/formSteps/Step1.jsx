@@ -18,10 +18,9 @@ import {
   isImage,
   isIssue,
   isOther,
-  isUnknown,
+  isUnknown
 } from '../DocumentTypesHelper';
 
-// ===================================
 const FlexWrapper = styled.div`
   display: flex;
   flex-wrap: wrap;
@@ -50,7 +49,7 @@ const PublicationDateWrapper = styled.div`
 const Step1 = ({ stepId }) => {
   const {
     docAttributes: { documentType },
-    validatedSteps,
+    validatedSteps
   } = useContext(DocumentFormContext);
 
   /**
@@ -121,12 +120,13 @@ const Step1 = ({ stepId }) => {
         </Fade>
       </>
     ),
-    memoizedValues,
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    memoizedValues
   );
 };
 
 Step1.propTypes = {
-  stepId: PropTypes.number.isRequired,
+  stepId: PropTypes.number.isRequired
 };
 
 export default Step1;

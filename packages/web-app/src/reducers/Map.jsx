@@ -15,7 +15,7 @@ import {
   FOCUS_ON_LOCATION,
   FETCH_MAP_START_LOADING,
   FETCH_MAP_END_LOADING,
-  LOADINGS,
+  LOADINGS
 } from '../actions/Map';
 import { defaultCoord, defaultZoom, focusZoom } from '../conf/Config';
 
@@ -33,8 +33,8 @@ const initialState = {
     [LOADINGS.NETWORKS_COORDINATES]: false,
     [LOADINGS.ENTRANCES]: false,
     [LOADINGS.ENTRANCES_COORDINATES]: false,
-    [LOADINGS.ORGANIZATIONS]: false,
-  },
+    [LOADINGS.ORGANIZATIONS]: false
+  }
 };
 
 const reducer = (state = initialState, action) => {
@@ -45,29 +45,29 @@ const reducer = (state = initialState, action) => {
     case FETCH_MAP_START_LOADING:
       return {
         ...state,
-        loadings: makeLoadings(true, action.key),
+        loadings: makeLoadings(true, action.key)
       };
     case FETCH_MAP_END_LOADING:
       return {
         ...state,
-        loadings: makeLoadings(false, action.key),
+        loadings: makeLoadings(false, action.key)
       };
     case FETCH_MAP_ENTRANCES_COORDINATES_SUCCESS:
       return {
         ...state,
         error: initialState.error,
-        entrancesCoordinates: action.data,
+        entrancesCoordinates: action.data
       };
     case FETCH_MAP_ENTRANCES_COORDINATES_FAILURE:
       return {
         ...state,
-        error: action.error,
+        error: action.error
       };
     case FETCH_MAP_ENTRANCES_SUCCESS:
       return {
         ...state,
         error: initialState.error,
-        entrances: action.data,
+        entrances: action.data
       };
     case FETCH_MAP_ENTRANCES_FAILURE:
       return { ...state, error: action.error };
@@ -75,7 +75,7 @@ const reducer = (state = initialState, action) => {
       return {
         ...state,
         error: initialState.error,
-        networks: action.data,
+        networks: action.data
       };
     case FETCH_MAP_NETWORKS_FAILURE:
       return { ...state, error: action.error };
@@ -83,7 +83,7 @@ const reducer = (state = initialState, action) => {
       return {
         ...state,
         error: initialState.error,
-        networksCoordinates: action.data,
+        networksCoordinates: action.data
       };
     case FETCH_MAP_NETWORKS_COORDINATES_FAILURE:
       return { ...state, error: action.error };
@@ -91,7 +91,7 @@ const reducer = (state = initialState, action) => {
       return {
         ...state,
         error: initialState.error,
-        organizations: action.data,
+        organizations: action.data
       };
     case FETCH_MAP_ORGANIZATIONS_FAILURE:
       return { ...state, error: action.error };

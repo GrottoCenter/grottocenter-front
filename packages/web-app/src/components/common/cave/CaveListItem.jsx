@@ -18,7 +18,7 @@ const CaveLengthIcon = styled.img`
   width: 2.5rem;
 `;
 
-const styles = (theme) => ({
+const styles = theme => ({
   caveItem: {
     alignItems: 'flex-start',
     flexDirection: 'column',
@@ -27,29 +27,29 @@ const styles = (theme) => ({
     padding: '10px',
     whiteSpace: 'nowrap',
     [theme.breakpoints.down('md')]: {
-      width: '50%',
+      width: '50%'
     },
     [theme.breakpoints.down('sm')]: {
-      width: '100%',
-    },
+      width: '100%'
+    }
   },
   caveLink: {
     overflow: 'hidden',
     textOverflow: 'ellipsis',
-    width: '100%',
+    width: '100%'
   },
   caveText: {
     overflow: 'hidden',
     padding: 0,
     textOverflow: 'ellipsis',
-    width: '100%',
-  },
+    width: '100%'
+  }
 });
 
-const CaveListItem = (props) => {
-  const { classes, cave } = props;
+const CaveListItem = ({ classes, cave, history }) => {
   const handleClick = () => {
-    cave.id && props.history.push(`/ui/caves/${cave.id}`);
+    // eslint-disable-next-line no-unused-expressions
+    cave.id && history.push(`/ui/caves/${cave.id}`);
   };
 
   return (
@@ -60,8 +60,12 @@ const CaveListItem = (props) => {
           <>
             <CaveDepthIcon src="/images/depth.svg" alt="Cave depth icon" />
             <span
-              style={{ marginRight: '5px', verticalAlign: 'super' }}
-            >{`${cave.depth.toLocaleString()}m`}</span>
+              style={{
+                marginRight: '5px',
+                verticalAlign: 'super'
+              }}>
+              {`${cave.depth.toLocaleString()}m`}
+            </span>
           </>
         ) : (
           ''
@@ -70,8 +74,11 @@ const CaveListItem = (props) => {
           <>
             <CaveLengthIcon src="/images/length.svg" alt="Cave depth icon" />
             <span
-              style={{ verticalAlign: 'super' }}
-            >{`${cave.length.toLocaleString()}m`}</span>
+              style={{
+                verticalAlign: 'super'
+              }}>
+              {`${cave.length.toLocaleString()}m`}
+            </span>
           </>
         ) : (
           ''
@@ -82,12 +89,20 @@ const CaveListItem = (props) => {
 };
 
 CaveListItem.propTypes = {
-  classes: PropTypes.shape({}).isRequired,
-  cave: PropTypes.shape({}),
-  history: PropTypes.shape({ push: PropTypes.func }).isRequired,
+  classes: PropTypes.shape({
+    caveItem: PropTypes.string,
+    caveText: PropTypes.string
+  }).isRequired,
+  cave: PropTypes.shape({
+    id: PropTypes.string,
+    name: PropTypes.string,
+    depth: PropTypes.number,
+    length: PropTypes.number
+  }),
+  history: PropTypes.shape({ push: PropTypes.func }).isRequired
 };
 CaveListItem.defaultProps = {
-  cave: undefined,
+  cave: undefined
 };
 
 export default withRouter(withStyles(styles)(CaveListItem));

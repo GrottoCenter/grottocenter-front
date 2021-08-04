@@ -8,7 +8,7 @@ import {
   CardContent,
   CardHeader,
   IconButton as MuiIconButton,
-  Typography,
+  Typography
 } from '@material-ui/core';
 import CreateIcon from '@material-ui/icons/Create';
 
@@ -48,8 +48,7 @@ const ScrollableContent = ({ title, icon, onEdit, content, footer }) => {
           size="small"
           aria-label="edit"
           disabled={isNil(onEdit)}
-          onClick={onEdit}
-        >
+          onClick={onEdit}>
           <CreateIcon />
         </IconButton>
       </CardActions>
@@ -62,7 +61,7 @@ ScrollableContent.propTypes = {
   icon: PropTypes.node,
   onEdit: PropTypes.func,
   content: PropTypes.node.isRequired,
-  footer: PropTypes.string,
+  footer: PropTypes.string
 };
 
 export default ScrollableContent;

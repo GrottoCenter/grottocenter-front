@@ -28,7 +28,7 @@ export const Search = () => (
 // Export for stories
 export const FakeAppBar = ({
   isSideMenuOpen, // eslint-disable-line react/prop-types
-  toggleSideMenu, // eslint-disable-line react/prop-types
+  toggleSideMenu // eslint-disable-line react/prop-types
 }) => (
   <AppBar
     isSideMenuOpen={isSideMenuOpen}
@@ -53,8 +53,7 @@ export const Default = ({ children }) => {
       AppBar={FakeAppBar}
       isSideMenuOpen={isSideMenuOpen}
       toggleSideMenu={toggleSideMenu}
-      SideBarQuickSearch={Search}
-    >
+      SideBarQuickSearch={Search}>
       {children}
     </Layout>
   );
@@ -194,7 +193,7 @@ const WithMap = () => {
   const [state] = React.useState({
     lat: 51.505,
     lng: -0.09,
-    zoom: 13,
+    zoom: 13
   });
 
   const position = [state.lat, state.lng];
@@ -203,8 +202,7 @@ const WithMap = () => {
       isSideMenuOpen={isSideMenuOpen}
       toggleSideMenu={toggleSideMenu}
       SideBarQuickSearch={Search}
-      AppBar={FakeAppBar}
-    >
+      AppBar={FakeAppBar}>
       <StyledMap center={position} zoom={state.zoom}>
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

@@ -16,17 +16,17 @@ const buttonsStyle = () => ({
     marginTop: '10px',
     padding: 0,
     textAlign: 'center',
-    width: '100%',
+    width: '100%'
   },
 
   bottomButton: {
-    margin: '0 4px',
+    margin: '0 4px'
   },
 
   bottomButtonSmallScreen: {
     marginBottom: '10px',
-    width: '100%',
-  },
+    width: '100%'
+  }
 });
 
 class SearchBottomActionButtons extends React.Component {
@@ -40,8 +40,7 @@ class SearchBottomActionButtons extends React.Component {
             className={classes.bottomButtonSmallScreen}
             type="submit"
             variant="contained"
-            size="large"
-          >
+            size="large">
             <SearchIcon />
             <Translate>Search</Translate>
           </Button>
@@ -54,8 +53,7 @@ class SearchBottomActionButtons extends React.Component {
             onClick={() => {
               this.setState(this.getInitialState());
               resetResults();
-            }}
-          >
+            }}>
             <ClearIcon />
             <Translate>Reset</Translate>
           </Button>
@@ -66,8 +64,7 @@ class SearchBottomActionButtons extends React.Component {
             className={classes.bottomButton}
             type="submit"
             variant="contained"
-            size="large"
-          >
+            size="large">
             <SearchIcon />
             <Translate>Search</Translate>
           </Button>
@@ -80,8 +77,7 @@ class SearchBottomActionButtons extends React.Component {
             onClick={() => {
               resetParentState();
               resetResults();
-            }}
-          >
+            }}>
             <ClearIcon />
             <Translate>Reset</Translate>
           </Button>
@@ -92,9 +88,13 @@ class SearchBottomActionButtons extends React.Component {
 }
 
 SearchBottomActionButtons.propTypes = {
-  classes: PropTypes.shape({}).isRequired,
+  classes: PropTypes.shape({
+    cardBottomButtons: PropTypes.string,
+    bottomButtonSmallScreen: PropTypes.string,
+    bottomButton: PropTypes.string
+  }).isRequired,
   resetResults: PropTypes.func.isRequired,
-  resetParentState: PropTypes.func.isRequired,
+  resetParentState: PropTypes.func.isRequired
 };
 
 export default withStyles(buttonsStyle)(SearchBottomActionButtons);

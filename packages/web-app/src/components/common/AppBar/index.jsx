@@ -5,7 +5,7 @@ import {
   Toolbar,
   IconButton,
   Typography,
-  Link,
+  Link
 } from '@material-ui/core';
 import MenuIcon from '@material-ui/icons/Menu';
 import styled from 'styled-components';
@@ -21,11 +21,11 @@ const StyledMuiAppBar = styled(MuiAppBar)`
 
 const LanguageWrapper = styled.div`
   height: 56px;
-  padding: ${(props) => props.theme.spacing(2)}px;
+  padding: ${props => props.theme.spacing(2)}px;
 `;
 
 const SearchWrapper = styled.div`
-  padding: ${(props) => props.theme.spacing(2)}px;
+  padding: ${props => props.theme.spacing(2)}px;
 `;
 
 const TitleWrapper = styled.div`
@@ -42,7 +42,7 @@ const LogoWrapper = styled.div`
 
 const LogoImage = styled.img`
   height: ${isMobileOnly ? '25' : '30'}px;
-  padding-right: ${(props) => props.theme.spacing(2)}px;
+  padding-right: ${props => props.theme.spacing(2)}px;
 `;
 
 const RightWrapper = styled.div`
@@ -57,7 +57,7 @@ const AppBar = ({
   onLoginClick,
   onLogoutClick,
   toggleMenu,
-  userNickname,
+  userNickname
 }) => (
   <>
     <StyledMuiAppBar>
@@ -66,8 +66,7 @@ const AppBar = ({
           color="inherit"
           aria-label="open drawer"
           edge="start"
-          onClick={toggleMenu}
-        >
+          onClick={toggleMenu}>
           <MenuIcon />
         </IconButton>
         <TitleWrapper>
@@ -108,13 +107,13 @@ AppBar.propTypes = {
   AutoCompleteSearch: PropTypes.oneOfType([
     PropTypes.node,
     PropTypes.element,
-    PropTypes.func,
+    PropTypes.func
   ]),
   toggleMenu: PropTypes.func.isRequired,
   isAuth: PropTypes.bool.isRequired,
   onLoginClick: PropTypes.func.isRequired,
   onLogoutClick: PropTypes.func.isRequired,
-  userNickname: PropTypes.string,
+  userNickname: PropTypes.string
 };
 
 export default AppBar;

@@ -6,47 +6,47 @@ export const useNotification = () => {
   const { enqueueSnackbar } = useSnackbar();
 
   const enqueueNotification = React.useCallback(
-    (type) => (message) => {
+    type => message => {
       enqueueSnackbar(message instanceof Error ? message.message : message, {
         variant: type,
-        preventDuplicate: true,
+        preventDuplicate: true
       });
     },
-    [enqueueSnackbar],
+    [enqueueSnackbar]
   );
 
   const handleError = React.useCallback(
-    (message) => {
+    message => {
       enqueueNotification('error')(message);
     },
-    [enqueueNotification],
+    [enqueueNotification]
   );
 
   const handleWarning = React.useCallback(
-    (message) => {
+    message => {
       enqueueNotification('warning')(message);
     },
-    [enqueueNotification],
+    [enqueueNotification]
   );
 
   const handleSuccess = React.useCallback(
-    (message) => {
+    message => {
       enqueueNotification('success')(message);
     },
-    [enqueueNotification],
+    [enqueueNotification]
   );
 
   const handleInfo = React.useCallback(
-    (message) => {
+    message => {
       enqueueNotification('info')(message);
     },
-    [enqueueNotification],
+    [enqueueNotification]
   );
 
   return {
     onError: handleError,
     onWarning: handleWarning,
     onSuccess: handleSuccess,
-    onInfo: handleInfo,
+    onInfo: handleInfo
   };
 };

@@ -13,5 +13,5 @@ export const AutoCompleteSearchTypes = {
   // errorMessage: PropTypes.string,
   isLoading: PropTypes.bool,
   disabled: PropTypes.bool,
-  hasFixWidth: PropTypes.bool,
+  hasFixWidth: PropTypes.bool
 };

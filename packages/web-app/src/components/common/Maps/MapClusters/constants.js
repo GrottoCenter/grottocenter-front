@@ -14,7 +14,7 @@ export const NETWORK_HEAT_COLORS = [blue[100], blue[900]];
 export const HEX_LAYER_OPTIONS = {
   radius: HEX_MAX_RADIUS,
   opacity: HEX_OPACITY,
-  duration: 400,
+  duration: 400
 };
 
 // For visibility we changes the options on
@@ -23,5 +23,5 @@ export const HEX_DETAILS_ZOOM = 8;
 const HEX_DETAILS_MIN_RADIUS = 10;
 export const HEX_DETAILS_RADIUS_RANGE = [
   HEX_DETAILS_MIN_RADIUS,
-  HEX_MAX_RADIUS,
+  HEX_MAX_RADIUS
 ];

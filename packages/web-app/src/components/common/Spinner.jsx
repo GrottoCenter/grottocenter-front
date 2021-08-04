@@ -4,19 +4,13 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 import styled from 'styled-components';
 import Translate from './Translate';
 
-//
-//
-// S T Y L I N G - C O M P O N E N T S
-//
-//
-
 const SpinnerDiv = styled.div`
   z-index: 99999;
   position: relative;
-  top: calc(50% - (${(props) => props.size}px / 2));
+  top: calc(50% - (${props => props.size}px / 2));
   margin: auto;
-  height: ${(props) => props.size}px;
-  width: ${(props) => props.size}px;
+  height: ${props => props.size}px;
+  width: ${props => props.size}px;
 `;
 
 const SpinnerText = styled.span`
@@ -26,12 +20,6 @@ const SpinnerText = styled.span`
   text-align: center;
   top: calc(50% - 10px);
 `;
-
-//
-//
-// M A I N - C O M P O N E N T
-//
-//
 
 const Spinner = ({ size, text }) => (
   <SpinnerDiv size={size}>
@@ -44,7 +32,7 @@ const Spinner = ({ size, text }) => (
 
 Spinner.propTypes = {
   size: PropTypes.number.isRequired,
-  text: PropTypes.string,
+  text: PropTypes.string
 };
 
 export default Spinner;

@@ -6,8 +6,6 @@ import Step2 from './formSteps/Step2';
 import Step3 from './formSteps/Step3';
 import Step4 from './formSteps/Step4';
 
-// ===================================
-
 const FormBody = ({ currentFormStepId }) => {
   return (
     <>
@@ -20,7 +18,7 @@ const FormBody = ({ currentFormStepId }) => {
 };
 
 FormBody.propTypes = {
-  currentFormStepId: PropTypes.number.isRequired,
+  currentFormStepId: PropTypes.number.isRequired
 };
 
 export default FormBody;

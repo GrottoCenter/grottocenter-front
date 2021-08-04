@@ -22,17 +22,17 @@ const CreateNewOrganization = ({
   defaultValue = '',
   enabled,
   onCreateSuccess,
-  contextValueName,
+  contextValueName
 }) => {
   const dispatch = useDispatch();
   const { isLoading, error, organization } = useSelector(
-    (state) => state.createOrganization,
+    state => state.createOrganization
   );
   const { updateAttribute } = useContext(DocumentFormContext);
   const { formatMessage } = useIntl();
   const inputRef = useRef(null);
   const [organizationName, setOrganizationName] = useState(defaultValue);
-  const handleChange = (event) => {
+  const handleChange = event => {
     setOrganizationName(event.target.value);
   };
 
@@ -61,6 +61,7 @@ const CreateNewOrganization = ({
       onCreateSuccess();
       setOrganizationName('');
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [organization]);
 
   return (
@@ -91,7 +92,7 @@ CreateNewOrganization.propTypes = {
   defaultValue: PropTypes.string,
   enabled: PropTypes.bool,
   onCreateSuccess: PropTypes.func,
-  contextValueName: PropTypes.string.isRequired,
+  contextValueName: PropTypes.string.isRequired
 };
 
 export default CreateNewOrganization;

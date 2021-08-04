@@ -16,8 +16,7 @@ const FakeAuthControls = () => {
   return (
     <Paper
       style={{ margin: '2rem', padding: '2rem', width: '300px' }}
-      align="center"
-    >
+      align="center">
       <Typography variant="h2">Story controls</Typography>
       <Button onClick={() => dispatch(fetchLoginSuccess({}, 'fakeAuthTok3n'))}>
         Fake log in

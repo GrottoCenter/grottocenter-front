@@ -1,23 +1,18 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-//
-//
-// H E L P E R - F U N C T I O N S
-//
-//
-
 export default function checkPermission(right) {
   // Control rights
   const granted = false;
+  // eslint-disable-next-line no-console
   console.debug('Under development', right);
 
   if (granted) {
-    return (Component) => {
-      const GrantedAccessComponent = (props) => <Component {...props} />;
+    return Component => {
+      const GrantedAccessComponent = props => <Component {...props} />;
 
       GrantedAccessComponent.contextTypes = {
-        direction: PropTypes.string.isRequired,
+        direction: PropTypes.string.isRequired
       };
       return GrantedAccessComponent;
     };

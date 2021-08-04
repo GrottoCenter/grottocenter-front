@@ -9,7 +9,7 @@ import {
   RadioGroup,
   Radio,
   Checkbox,
-  FormGroup,
+  FormGroup
 } from '@material-ui/core';
 import VisibilityIcon from '@material-ui/icons/Visibility';
 import { useIntl } from 'react-intl';
@@ -20,10 +20,10 @@ import CustomControl, { customControlProps } from '../common/CustomControl';
 export const heatmapTypes = {
   ENTRANCES: 'entrances',
   NETWORKS: 'networks',
-  NONE: 'none',
+  NONE: 'none'
 };
 const markerTypes = {
-  ORGANIZATIONS: 'organizations',
+  ORGANIZATIONS: 'organizations'
 };
 
 const Wrapper = styled.div`
@@ -42,7 +42,7 @@ const DataControl = ({ updateHeatmap, updateMarkers, ...props }) => {
   const [selectedHeat, setSelectedHeat] = useState(heatmapTypes.ENTRANCES);
   const [selectedMarkers, setSelectedMarkers] = useState([]);
 
-  const handleOpenMenu = (event) => {
+  const handleOpenMenu = event => {
     setAnchorEl(event.currentTarget);
   };
 
@@ -58,16 +58,18 @@ const DataControl = ({ updateHeatmap, updateMarkers, ...props }) => {
       setSelectedMarkers(
         includes(selection, selectedMarkers)
           ? without(selection, selectedMarkers)
-          : [...selectedMarkers, selection],
+          : [...selectedMarkers, selection]
       );
     }
   };
 
   useEffect(() => {
     updateHeatmap(selectedHeat);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedHeat]);
   useEffect(() => {
     updateMarkers(selectedMarkers);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedMarkers]);
 
   return (
@@ -80,8 +82,7 @@ const DataControl = ({ updateHeatmap, updateMarkers, ...props }) => {
           onClick={handleOpenMenu}
           onFocus={handleOpenMenu}
           // TODO enable on fullscreen as it's currently hidden
-          disabled={fullScreen}
-        >
+          disabled={fullScreen}>
           <VisibilityIcon fontSize="inherit" />
         </IconButton>
       </Wrapper>
@@ -92,8 +93,7 @@ const DataControl = ({ updateHeatmap, updateMarkers, ...props }) => {
         keepMounted
         open={Boolean(anchorEl)}
         onClose={handleClose}
-        MenuListProps={{ onMouseLeave: handleClose }}
-      >
+        MenuListProps={{ onMouseLeave: handleClose }}>
         <MenuItem disabled>
           {formatMessage({ id: 'heat map' }).toUpperCase()}
         </MenuItem>
@@ -125,8 +125,7 @@ const DataControl = ({ updateHeatmap, updateMarkers, ...props }) => {
         </MenuItem>
         <FormGroup>
           <MenuItem
-            onChange={handleChange('markers', markerTypes.ORGANIZATIONS)}
-          >
+            onChange={handleChange('markers', markerTypes.ORGANIZATIONS)}>
             <FormControlLabel
               control={
                 <Checkbox size="small" name={markerTypes.ORGANIZATIONS} />
@@ -145,7 +144,7 @@ const MemoizedDataControl = React.memo(DataControl);
 DataControl.propTypes = {
   updateHeatmap: PropTypes.func.isRequired,
   updateMarkers: PropTypes.func.isRequired,
-  ...customControlProps,
+  ...customControlProps
 };
 
 MemoizedDataControl.propTypes = DataControl.propTypes;

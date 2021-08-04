@@ -8,20 +8,18 @@ import {
   TableHead,
   TableRow,
   TableBody,
-  TableCell,
+  TableCell
 } from '@material-ui/core';
 import { includes, isNil, pathOr } from 'ramda';
 
 import { DocumentFormContext } from '../Provider';
-
-// ===================================
 
 const PropertyName = styled(TableCell)`
   font-weight: bold;
   text-transform: uppercase;
 `;
 
-const Property = ({ name, value, customToString = (v) => String(v) }) => {
+const Property = ({ name, value, customToString = v => String(v) }) => {
   // Handle '', null, undefined and []
   if (
     isNil(value) ||
@@ -37,7 +35,7 @@ const Property = ({ name, value, customToString = (v) => String(v) }) => {
       <TableCell>
         {Array.isArray(value) ? (
           <ul>
-            {value.map((v) => (
+            {value.map(v => (
               <li>
                 {customToString(v)}
                 <br />
@@ -58,10 +56,8 @@ const Property = ({ name, value, customToString = (v) => String(v) }) => {
 Property.propTypes = {
   name: PropTypes.string.isRequired,
   value: PropTypes.any, // eslint-disable-line react/forbid-prop-types
-  customToString: PropTypes.func,
+  customToString: PropTypes.func
 };
-
-// ===================================
 
 const Step4 = ({ stepId }) => {
   const { formatMessage } = useIntl();
@@ -94,7 +90,7 @@ const Step4 = ({ stepId }) => {
                 key="main_language"
                 name={formatMessage({ id: 'Document main language' })}
                 value={formatMessage({
-                  id: docAttributes.documentMainLanguage.refName,
+                  id: docAttributes.documentMainLanguage.refName
                 })}
               />
             )}
@@ -102,12 +98,12 @@ const Step4 = ({ stepId }) => {
             {pathOr(
               '',
               ['titleAndDescriptionLanguage', 'refName'],
-              docAttributes,
+              docAttributes
             ) !== '' && (
               <Property
                 name={formatMessage({ id: 'Title and description language' })}
                 value={formatMessage({
-                  id: docAttributes.titleAndDescriptionLanguage.refName,
+                  id: docAttributes.titleAndDescriptionLanguage.refName
                 })}
               />
             )}
@@ -131,7 +127,7 @@ const Step4 = ({ stepId }) => {
               key="authors"
               name={formatMessage({ id: 'Authors' })}
               value={docAttributes.authors}
-              customToString={(author) =>
+              customToString={author =>
                 author.name
                   ? `${author.name} ${author.surname}`
                   : author.nickname
@@ -141,9 +137,7 @@ const Step4 = ({ stepId }) => {
               key="subjects"
               name={formatMessage({ id: 'Subjects' })}
               value={docAttributes.subjects}
-              customToString={(subject) =>
-                `${subject.code} - ${subject.subject}`
-              }
+              customToString={subject => `${subject.code} - ${subject.subject}`}
             />
             <Property
               key="parent_document"
@@ -164,7 +158,7 @@ const Step4 = ({ stepId }) => {
               key="regions"
               name={formatMessage({ id: 'Regions' })}
               value={docAttributes.regions}
-              customToString={(region) => region.name}
+              customToString={region => region.name}
             />
             <Property
               key="massif"
@@ -211,12 +205,13 @@ const Step4 = ({ stepId }) => {
         </Table>
       </TableContainer>
     ),
-    memoizedValues,
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    memoizedValues
   );
 };
 
 Step4.propTypes = {
-  stepId: PropTypes.number.isRequired,
+  stepId: PropTypes.number.isRequired
 };
 
 export default Step4;

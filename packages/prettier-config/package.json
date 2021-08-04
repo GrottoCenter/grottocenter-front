@@ -1,0 +1,9 @@
+{
+  "name": "@grotto-front/prettier-config",
+  "version": "1.0.0",
+  "description": "Custom prettier rules",
+  "main": ".prettierrc.js",
+  "peerDependencies": {
+    "prettier": ">=2"
+  }
+}

@@ -15,37 +15,37 @@ export const RESET_API_MESSAGES = 'RESET_API_MESSAGES';
 // ==========
 
 export const postDocumentAction = () => ({
-  type: POST_DOCUMENT,
+  type: POST_DOCUMENT
 });
 
-export const postDocumentSuccess = (httpCode) => ({
+export const postDocumentSuccess = httpCode => ({
   type: POST_DOCUMENT_SUCCESS,
-  httpCode,
+  httpCode
 });
 
 export const postDocumentFailure = (errorMessages, httpCode) => ({
   type: POST_DOCUMENT_FAILURE,
   errorMessages,
-  httpCode,
+  httpCode
 });
 
 export const updateDocumentAction = () => ({
-  type: UPDATE_DOCUMENT,
+  type: UPDATE_DOCUMENT
 });
 
-export const updateDocumentSuccess = (httpCode) => ({
+export const updateDocumentSuccess = httpCode => ({
   type: UPDATE_DOCUMENT_SUCCESS,
-  httpCode,
+  httpCode
 });
 
 export const updateDocumentFailure = (errorMessages, httpCode) => ({
   type: UPDATE_DOCUMENT_FAILURE,
   errorMessages,
-  httpCode,
+  httpCode
 });
 
 export const resetApiMessages = () => ({
-  type: RESET_API_MESSAGES,
+  type: RESET_API_MESSAGES
 });
 
 export function postDocument(docAttributes) {
@@ -69,11 +69,11 @@ export function postDocument(docAttributes) {
     const requestOptions = {
       method: 'POST',
       body: JSON.stringify({ ...docAttributes, pages }),
-      headers: getState().login.authorizationHeader,
+      headers: getState().login.authorizationHeader
     };
 
-    return fetch(postDocumentUrl, requestOptions).then((response) => {
-      return response.text().then((responseText) => {
+    return fetch(postDocumentUrl, requestOptions).then(response => {
+      return response.text().then(responseText => {
         if (response.status >= 400) {
           const errorMessages = [];
           switch (response.status) {
@@ -82,22 +82,22 @@ export function postDocument(docAttributes) {
               break;
             case 401:
               errorMessages.push(
-                'You must be authenticated to post a document.',
+                'You must be authenticated to post a document.'
               );
               break;
             case 403:
               errorMessages.push(
-                'You are not authorized to create a document.',
+                'You are not authorized to create a document.'
               );
               break;
             case 404:
               errorMessages.push(
-                'Server-side creation of the document is not available.',
+                'Server-side creation of the document is not available.'
               );
               break;
             case 500:
               errorMessages.push(
-                'A server error occurred, please try again later or contact Wikicaves for more information.',
+                'A server error occurred, please try again later or contact Wikicaves for more information.'
               );
               break;
             default:
@@ -106,7 +106,7 @@ export function postDocument(docAttributes) {
           dispatch(postDocumentFailure(errorMessages, response.status));
           throw new Error(
             `Fetching ${postDocumentUrl} status: ${response.status}`,
-            errorMessages,
+            errorMessages
           );
         } else {
           dispatch(postDocumentSuccess(response.status));
@@ -138,12 +138,12 @@ export function updateDocument(docAttributes) {
     const requestOptions = {
       method: 'PUT',
       body: JSON.stringify({ ...docAttributes, pages }),
-      headers: getState().login.authorizationHeader,
+      headers: getState().login.authorizationHeader
     };
 
     return fetch(putDocumentUrl(docAttributes.id), requestOptions).then(
-      (response) => {
-        return response.text().then((responseText) => {
+      response => {
+        return response.text().then(responseText => {
           if (response.status >= 400) {
             const errorMessages = [];
             switch (response.status) {
@@ -152,22 +152,22 @@ export function updateDocument(docAttributes) {
                 break;
               case 401:
                 errorMessages.push(
-                  'You must be authenticated to update a document.',
+                  'You must be authenticated to update a document.'
                 );
                 break;
               case 403:
                 errorMessages.push(
-                  'You are not authorized to update a document.',
+                  'You are not authorized to update a document.'
                 );
                 break;
               case 404:
                 errorMessages.push(
-                  'Server-side update of the document is not available.',
+                  'Server-side update of the document is not available.'
                 );
                 break;
               case 500:
                 errorMessages.push(
-                  'A server error occurred, please try again later or contact Wikicaves for more information.',
+                  'A server error occurred, please try again later or contact Wikicaves for more information.'
                 );
                 break;
               default:
@@ -176,14 +176,14 @@ export function updateDocument(docAttributes) {
             dispatch(updateDocumentFailure(errorMessages, response.status));
             throw new Error(
               `Fetching ${putDocumentUrl} status: ${response.status}`,
-              errorMessages,
+              errorMessages
             );
           } else {
             dispatch(updateDocumentSuccess(response.status));
           }
           return response;
         });
-      },
+      }
     );
   };
 }

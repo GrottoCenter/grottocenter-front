@@ -7,25 +7,19 @@ import TextDiv from '../common/TextDiv';
 import GCLink from '../common/GCLink';
 import GCLogo from '../common/GCLogo';
 
-//
-//
-// S T Y L I N G - C O M P O N E N T S
-//
-//
-
 const FlexDiv = styled.div`
   display: inline-flex;
 `;
 
 const TitleZone1 = withTheme(styled(TextDiv)`
-  color: ${(props) => props.theme.palette.primary3Color};
+  color: ${props => props.theme.palette.primary3Color};
   font-weight: 500;
   font-size: 20px;
   line-height: 12px;
 `);
 
 const TitleZone2 = withTheme(styled(TextDiv)`
-  color: ${(props) => props.theme.palette.accent1Color};
+  color: ${props => props.theme.palette.accent1Color};
   font-size: 8px;
 `);
 
@@ -44,12 +38,6 @@ const LogoImage = styled(GCLogo)`
   }
 `;
 
-//
-//
-// M A I N - C O M P O N E N T
-//
-//
-
 const HeaderTitle = ({ className, title, subtitle }) => (
   <FlexDiv className={className}>
     <LogoImage />
@@ -65,7 +53,7 @@ const HeaderTitle = ({ className, title, subtitle }) => (
 HeaderTitle.propTypes = {
   title: PropTypes.string,
   subtitle: PropTypes.string,
-  className: PropTypes.string,
+  className: PropTypes.string
 };
 
 export default styled(HeaderTitle)`

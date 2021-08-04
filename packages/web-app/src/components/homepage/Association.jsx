@@ -7,21 +7,15 @@ import {
   GridRow,
   GridOneThirdColumn,
   GridTwoThirdColumn,
-  GridFullColumn,
+  GridFullColumn
 } from '../../helpers/GridSystem';
 import AssociationCheckList from './AssociationCheckList';
 import AssociationFlyingGoals from './AssociationFlyingGoals';
 import Translate from '../common/Translate';
 import GCLogo from '../common/GCLogo';
 
-//
-//
-// S T Y L I N G - C O M P O N E N T S
-//
-//
-
 const AssociationTitle = styled.h3`
-  color: ${(props) => props.color};
+  color: ${props => props.color};
   text-align: center;
   padding-bottom: 50px;
   font-size: 35px;
@@ -80,7 +74,7 @@ const listEntries = {
           Promote the development of the speleology in the world especially
           through web-based collaboration.
         </Translate>
-      ),
+      )
     },
     {
       word: <Translate>Share!</Translate>,
@@ -88,7 +82,7 @@ const listEntries = {
         <Translate>
           Share and spread the data related to the speleology
         </Translate>
-      ),
+      )
     },
     {
       word: <Translate>Open!</Translate>,
@@ -97,7 +91,7 @@ const listEntries = {
           Make access to the natural caves data easier especially by using
           Internet
         </Translate>
-      ),
+      )
     },
     {
       word: <Translate>Highlight!</Translate>,
@@ -106,7 +100,7 @@ const listEntries = {
           Highlight and help the protection of the natural caves and their
           surroundings
         </Translate>
-      ),
+      )
     },
     {
       word: <Translate>Help!</Translate>,
@@ -114,27 +108,20 @@ const listEntries = {
         <Translate>
           Help the exploration and the scientific study of natural caves
         </Translate>
-      ),
-    },
-  ],
+      )
+    }
+  ]
 };
 
-//
-//
-// M A I N - C O M P O N E N T
-//
-//
-
-const Association = (props) => {
+const Association = props => {
   const {
-    theme: { palette },
+    theme: { palette }
   } = props;
 
   return (
     <AssociationSection
       bgColor={palette.primary1Color}
-      fgColor={palette.textIconColor}
-    >
+      fgColor={palette.textIconColor}>
       <AssociationGridRow>
         <GridTwoThirdColumn>
           <AssociationTitle color={palette.accent1Color}>
@@ -185,9 +172,9 @@ Association.propTypes = {
       accent1Color: PropTypes.string.isRequired,
       primary1Color: PropTypes.string.isRequired,
       primary3Color: PropTypes.string.isRequired,
-      textIconColor: PropTypes.string.isRequired,
-    }),
-  }).isRequired,
+      textIconColor: PropTypes.string.isRequired
+    })
+  }).isRequired
 };
 
 export default withTheme(Association);

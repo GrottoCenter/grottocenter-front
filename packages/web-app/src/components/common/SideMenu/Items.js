@@ -15,7 +15,7 @@ const Item = ({
   label,
   nested = false,
   onClick = () => {},
-  children,
+  children
 }) => (
   <StyledListItem button $nested={nested} onClick={onClick}>
     <ListItemIcon>
@@ -58,8 +58,7 @@ export const DocumentItems = ({ isModerator = true, isUser = true }) => {
         <Item
           onClick={toggleIsDocumentCollapsed}
           ItemIcon={() => <DescriptionIcon color="primary" />}
-          label="Document"
-        >
+          label="Document">
           {isDocumentCollapsed ? <ExpandLess /> : <ExpandMore />}
         </Item>
         <Collapse in={isDocumentCollapsed} timeout="auto" unmountOnExit>
@@ -86,17 +85,17 @@ Item.propTypes = {
   onClick: PropTypes.func,
   nested: PropTypes.bool,
   // eslint-disable-next-line react/forbid-prop-types
-  children: PropTypes.any,
+  children: PropTypes.any
 };
 
 LinkedItem.propTypes = {
   href: PropTypes.string,
-  ...Item.propTypes,
+  ...Item.propTypes
 };
 
 DocumentItems.propTypes = {
   isModerator: PropTypes.bool,
-  isUser: PropTypes.bool,
+  isUser: PropTypes.bool
 };
 
 export default LinkedItem;

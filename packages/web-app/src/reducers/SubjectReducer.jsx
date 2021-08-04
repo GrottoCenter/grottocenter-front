@@ -5,27 +5,16 @@ import {
   SUBJECTS_SEARCH,
   SUBJECTS_SEARCH_FAILURE,
   SUBJECTS_SEARCH_SUCCESS,
-  RESET_SUBJECTS_SEARCH,
+  RESET_SUBJECTS_SEARCH
 } from '../actions/Subject';
-
-//
-//
-// D E F A U L T - S T A T E
-//
-//
 
 const initialState = {
   subjects: [],
   searchedSubjects: [],
   isFetching: false,
-  error: null,
+  error: null
 };
 
-//
-//
-// R E D U C E R
-//
-//
 const subject = (state = initialState, action) => {
   switch (action.type) {
     case FETCH_SUBJECTS:
@@ -36,14 +25,14 @@ const subject = (state = initialState, action) => {
       return {
         ...state,
         subjects: action.subjects,
-        isFetching: false,
+        isFetching: false
       };
 
     case SUBJECTS_SEARCH_SUCCESS:
       return {
         ...state,
         searchedSubjects: action.subjects,
-        isFetching: false,
+        isFetching: false
       };
 
     case FETCH_SUBJECTS_FAILURE:

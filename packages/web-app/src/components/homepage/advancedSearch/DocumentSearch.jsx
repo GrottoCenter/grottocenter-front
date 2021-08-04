@@ -17,7 +17,7 @@ import {
   ExpansionPanelSummary,
   ExpansionPanelDetails,
   FormLabel,
-  FormHelperText,
+  FormHelperText
 } from '@material-ui/core';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 
@@ -50,7 +50,7 @@ class DocumentSearch extends React.Component {
       'publication_year-range': {
         isEditable: false,
         min: yearMinValue,
-        max: yearMaxValue,
+        max: yearMaxValue
       },
       authors: '',
       description: '',
@@ -61,13 +61,13 @@ class DocumentSearch extends React.Component {
       title: '',
       matchAllFields: true,
       allFieldsRequest: '',
-      panelExpanded: 'all-fields-panel',
+      panelExpanded: 'all-fields-panel'
     };
   };
 
-  getSubjectObjFromCode = (code) => {
+  getSubjectObjFromCode = code => {
     const { allSubjects } = this.props;
-    return allSubjects.find((t) => t.code === code);
+    return allSubjects.find(t => t.code === code);
   };
 
   /**
@@ -78,7 +78,7 @@ class DocumentSearch extends React.Component {
    */
   handleValueChange = (keyName, event) => {
     this.setState({
-      [keyName]: event.target.value,
+      [keyName]: event.target.value
     });
   };
 
@@ -93,14 +93,14 @@ class DocumentSearch extends React.Component {
     keyName,
     values,
     minValueAuthorized,
-    maxValueAuthorized,
+    maxValueAuthorized
   ) => {
     const newState = {
       [keyName]: {
         ...this.state[keyName], // eslint-disable-line react/destructuring-assignment
         min: values[0] < minValueAuthorized ? minValueAuthorized : values[0],
-        max: values[1] > maxValueAuthorized ? maxValueAuthorized : values[1],
-      },
+        max: values[1] > maxValueAuthorized ? maxValueAuthorized : values[1]
+      }
     };
     this.setState(newState);
   };
@@ -109,28 +109,28 @@ class DocumentSearch extends React.Component {
    * This function set the state of the keyname property
    * to be the same value as the event of the slider.
    */
-  handleCheckedChange = (keyName) => (event) => {
+  handleCheckedChange = keyName => event => {
     const newState = {
       [keyName]: {
         ...this.state[keyName], // eslint-disable-line react/destructuring-assignment
-        isEditable: event.target.checked,
-      },
+        isEditable: event.target.checked
+      }
     };
     this.setState(newState);
   };
 
-  handleBooleanChange = (keyName) => (event) => {
+  handleBooleanChange = keyName => event => {
     this.setState({
-      [keyName]: event.target.checked,
+      [keyName]: event.target.checked
     });
   };
 
   /**
    * Change search panels state (expanded or not)
    */
-  handlePanelSelected = (panel) => (event, isExpanded) => {
+  handlePanelSelected = panel => (event, isExpanded) => {
     this.setState({
-      panelExpanded: isExpanded ? panel : '',
+      panelExpanded: isExpanded ? panel : ''
     });
   };
 
@@ -150,7 +150,7 @@ class DocumentSearch extends React.Component {
       yearMinValue,
       yearMaxValue,
       allSubjects,
-      intl,
+      intl
     } = this.props;
 
     const {
@@ -164,7 +164,7 @@ class DocumentSearch extends React.Component {
       publication_other_bbs_old,
       matchAllFields,
       allFieldsRequest,
-      panelExpanded,
+      panelExpanded
     } = this.state;
 
     return (
@@ -174,8 +174,7 @@ class DocumentSearch extends React.Component {
             variant="body1"
             gutterBottom
             paragraph
-            style={{ fontStyle: 'italic', textAlign: 'center' }}
-          >
+            style={{ fontStyle: 'italic', textAlign: 'center' }}>
             <Translate>
               The BBS (&quot;Bulletin Bibliographique Spéléologique&quot; in
               french) is an annual review of the worldwide speleological
@@ -192,13 +191,11 @@ class DocumentSearch extends React.Component {
 
           <ExpansionPanel
             expanded={panelExpanded === 'all-fields-panel'}
-            onChange={this.handlePanelSelected('all-fields-panel')}
-          >
+            onChange={this.handlePanelSelected('all-fields-panel')}>
             <ExpansionPanelSummary
               expandIcon={<ExpandMoreIcon />}
               aria-controls="all-fields-search-content"
-              id="all-fields-search-content"
-            >
+              id="all-fields-search-content">
               <Typography variant="h6">
                 <Translate>Search on all fields</Translate>
               </Typography>
@@ -216,7 +213,7 @@ class DocumentSearch extends React.Component {
               <form
                 noValidate
                 autoComplete="off"
-                onSubmit={(event) => {
+                onSubmit={event => {
                   event.preventDefault();
 
                   // We don't want to use allFieldsRequest for the search
@@ -236,12 +233,10 @@ class DocumentSearch extends React.Component {
 
                   startAdvancedsearch(stateToSearch, resourceType);
                 }}
-                className={classes.formContainer}
-              >
+                className={classes.formContainer}>
                 <div
                   className={classes.formPartContainer}
-                  style={{ justifyContent: 'flex-start' }}
-                >
+                  style={{ justifyContent: 'flex-start' }}>
                   <TextField
                     className={classes.formElement}
                     label={
@@ -249,7 +244,7 @@ class DocumentSearch extends React.Component {
                         <Translate>All fields request</Translate>
                       </span>
                     }
-                    onChange={(event) =>
+                    onChange={event =>
                       this.handleValueChange('allFieldsRequest', event)
                     }
                     value={allFieldsRequest}
@@ -266,13 +261,11 @@ class DocumentSearch extends React.Component {
 
           <ExpansionPanel
             expanded={panelExpanded === 'specific-fields-panel'}
-            onChange={this.handlePanelSelected('specific-fields-panel')}
-          >
+            onChange={this.handlePanelSelected('specific-fields-panel')}>
             <ExpansionPanelSummary
               expandIcon={<ExpandMoreIcon />}
               aria-controls="specific-fields-search-content"
-              id="specific-fields-search-content"
-            >
+              id="specific-fields-search-content">
               <Typography variant="h6">
                 <Translate>Search on specific fields</Translate>
               </Typography>
@@ -281,7 +274,7 @@ class DocumentSearch extends React.Component {
               <form
                 noValidate
                 autoComplete="off"
-                onSubmit={(event) => {
+                onSubmit={event => {
                   event.preventDefault();
 
                   // We don't want to use allFieldsRequest for the search
@@ -291,19 +284,17 @@ class DocumentSearch extends React.Component {
 
                   // Get subject from id
                   const subjectObj = this.getSubjectObjFromCode(
-                    stateToSearch[subjects],
+                    stateToSearch[subjects]
                   );
                   stateToSearch[subjects] = subjectObj
                     ? subjectObj.subject
                     : '';
                   startAdvancedsearch(stateToSearch, resourceType);
                 }}
-                className={classes.formContainer}
-              >
+                className={classes.formContainer}>
                 <div
                   className={classes.formPartContainer}
-                  style={{ justifyContent: 'flex-start' }}
-                >
+                  style={{ justifyContent: 'flex-start' }}>
                   <fieldset className={classes.fieldset}>
                     <legend className={classes.legend}>
                       <Translate>Content</Translate>
@@ -317,14 +308,14 @@ class DocumentSearch extends React.Component {
                             <Translate>Title</Translate>
                           </span>
                         }
-                        onChange={(event) =>
+                        onChange={event =>
                           this.handleValueChange('title', event)
                         }
                         value={title}
                         InputProps={{
                           classes: {
-                            input: classes.formElementFontSize,
-                          },
+                            input: classes.formElementFontSize
+                          }
                         }}
                       />
 
@@ -335,7 +326,7 @@ class DocumentSearch extends React.Component {
                             <Translate>Abstract</Translate>
                           </span>
                         }
-                        onChange={(event) =>
+                        onChange={event =>
                           this.handleValueChange('description', event)
                         }
                         value={abstract}
@@ -347,24 +338,22 @@ class DocumentSearch extends React.Component {
                         </InputLabel>
                         <Select
                           value={subjects}
-                          onChange={(event) =>
+                          onChange={event =>
                             this.handleValueChange('subjects', event)
                           }
                           inputProps={{
                             id: 'code',
-                            name: 'subject',
-                          }}
-                        >
+                            name: 'subject'
+                          }}>
                           <MenuItem key={-1} value="">
                             <i>
                               <Translate>All subjects</Translate>
                             </i>
                           </MenuItem>
-                          {allSubjects.map((choiceSubject) => (
+                          {allSubjects.map(choiceSubject => (
                             <MenuItem
                               key={choiceSubject.code}
-                              value={choiceSubject.code}
-                            >
+                              value={choiceSubject.code}>
                               {/* sub-subject indentation */}
                               {choiceSubject.parent !== null
                                 ? '\u00a0\u00a0\u00a0\u00a0'
@@ -385,9 +374,7 @@ class DocumentSearch extends React.Component {
                         <Translate>BBS Reference</Translate>
                       </span>
                     }
-                    onChange={(event) =>
-                      this.handleValueChange('ref_bbs', event)
-                    }
+                    onChange={event => this.handleValueChange('ref_bbs', event)}
                     value={ref_bbs}
                   />
 
@@ -398,9 +385,7 @@ class DocumentSearch extends React.Component {
                         <Translate>Regions</Translate>
                       </span>
                     }
-                    onChange={(event) =>
-                      this.handleValueChange('regions', event)
-                    }
+                    onChange={event => this.handleValueChange('regions', event)}
                     value={regions}
                   />
 
@@ -411,9 +396,7 @@ class DocumentSearch extends React.Component {
                         <Translate>Authors</Translate>
                       </span>
                     }
-                    onChange={(event) =>
-                      this.handleValueChange('authors', event)
-                    }
+                    onChange={event => this.handleValueChange('authors', event)}
                     value={authors}
                   />
 
@@ -424,7 +407,7 @@ class DocumentSearch extends React.Component {
                         <Translate>Publication</Translate>
                       </span>
                     }
-                    onChange={(event) =>
+                    onChange={event =>
                       this.handleValueChange('publication_other_bbs_old', event)
                     }
                     value={publication_other_bbs_old}
@@ -432,20 +415,20 @@ class DocumentSearch extends React.Component {
 
                   <SliderForm
                     label={intl.formatMessage({
-                      id: 'Year',
+                      id: 'Year'
                     })}
                     disabled={!yearRange.isEditable}
                     onDisable={this.handleCheckedChange(
-                      'publication_year-range',
+                      'publication_year-range'
                     )}
                     min={yearMinValue}
                     max={yearMaxValue}
-                    onChange={(values) => {
+                    onChange={values => {
                       this.handleRangeChange(
                         'publication_year-range',
                         values,
                         yearMinValue,
-                        yearMaxValue,
+                        yearMaxValue
                       );
                     }}
                     value={[yearRange.min, yearRange.max]}
@@ -454,8 +437,7 @@ class DocumentSearch extends React.Component {
 
                 <div
                   className={classes.formPartContainer}
-                  style={{ justifyContent: 'flex-start' }}
-                >
+                  style={{ justifyContent: 'flex-start' }}>
                   <FormControl>
                     <FormLabel className={classes.formLabel}>
                       <span>
@@ -504,12 +486,12 @@ DocumentSearch.propTypes = {
   yearMinValue: PropTypes.number,
   yearMaxValue: PropTypes.number,
 
-  intl: PropTypes.shape({}).isRequired,
+  intl: PropTypes.shape({ formatMessage: PropTypes.func }).isRequired
 };
 
 DocumentSearch.defaultProps = {
   yearMinValue: 1800,
-  yearMaxValue: new Date().getFullYear(),
+  yearMaxValue: new Date().getFullYear()
 };
 
 export default injectIntl(withStyles(styles)(DocumentSearch));

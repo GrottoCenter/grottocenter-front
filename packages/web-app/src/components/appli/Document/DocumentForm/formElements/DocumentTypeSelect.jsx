@@ -7,29 +7,27 @@ import {
   InputLabel,
   MenuItem,
   Select,
-  Tooltip,
+  Tooltip
 } from '@material-ui/core';
 import Translate from '../../../../common/Translate';
 
 import { isUnknown } from '../DocumentTypesHelper';
 import { DocumentFormContext } from '../Provider';
 
-// ===================================
-
 const DocumentTypeSelect = ({
   allDocumentTypes,
   helperText,
-  required = false,
+  required = false
 }) => {
   const {
     docAttributes: { documentType },
-    updateAttribute,
+    updateAttribute
   } = useContext(DocumentFormContext);
   const { formatMessage } = useIntl();
   const handleChange = (event, child) => {
     const newDocType = {
       id: event.target.value,
-      name: child.props.name,
+      name: child.props.name
     };
     updateAttribute('documentType', newDocType);
   };
@@ -47,9 +45,8 @@ const DocumentTypeSelect = ({
           onChange={handleChange}
           inputProps={{
             id: `document-type`,
-            name: `document-type`,
-          }}
-        >
+            name: `document-type`
+          }}>
           <MenuItem key={-1} value={-1} name="Undefined" disabled>
             <i>
               <Translate>Select a document type</Translate>
@@ -57,14 +54,13 @@ const DocumentTypeSelect = ({
           </MenuItem>
           {allDocumentTypes
             .sort((dt1, dt2) => dt1.id > dt2.id)
-            .map((t) => (
+            .map(t => (
               <Tooltip
                 name={t.name}
                 value={t.id}
                 key={t.id}
                 title={t.comment}
-                aria-label={t.comment}
-              >
+                aria-label={t.comment}>
                 <MenuItem>{formatMessage({ id: t.name })}</MenuItem>
               </Tooltip>
             ))}
@@ -76,7 +72,8 @@ const DocumentTypeSelect = ({
         )}
       </FormControl>
     ),
-    memoizedValues,
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    memoizedValues
   );
 };
 
@@ -84,11 +81,11 @@ DocumentTypeSelect.propTypes = {
   allDocumentTypes: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.number.isRequired,
-      name: PropTypes.string.isRequired,
-    }),
+      name: PropTypes.string.isRequired
+    })
   ).isRequired,
   helperText: PropTypes.string.isRequired,
-  required: PropTypes.bool,
+  required: PropTypes.bool
 };
 
 export default DocumentTypeSelect;

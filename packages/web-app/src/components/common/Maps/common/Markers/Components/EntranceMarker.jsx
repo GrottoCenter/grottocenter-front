@@ -6,8 +6,7 @@ import React from 'react';
 const EntranceIconMap = () => (
   <Icon
     color="inherit"
-    style={{ textAlign: 'center', height: '100%', width: '100%' }}
-  >
+    style={{ textAlign: 'center', height: '100%', width: '100%' }}>
     <img
       alt="entranceIcon"
       style={{ height: '100%' }}
@@ -20,7 +19,7 @@ export const EntranceMarker = L.divIcon({
   html: renderToString(<EntranceIconMap />),
   iconSize: new L.Point(12.5, 25),
   iconAnchor: [6.25, 25],
-  className: 'fade-in-markers',
+  className: 'fade-in-markers'
 });
 
 export default EntranceMarker;

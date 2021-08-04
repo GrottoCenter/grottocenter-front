@@ -18,27 +18,27 @@ storiesOf('Document details', module).add('Section', () => (
       {
         Icon: () => <Terrain fontSize="large" color="primary" />,
         label: 'Massif',
-        value: 'Sainte-Baume (massif de la)',
+        value: 'Sainte-Baume (massif de la)'
       },
       {
         Icon: () => <Public fontSize="large" color="primary" />,
         label: 'Région',
-        value: 'France Languedoc / Rousillon',
+        value: 'France Languedoc / Rousillon'
       },
       {
         label: 'Test',
-        value: 'section sans icon',
+        value: 'section sans icon'
       },
       {
         Icon: () => <CustomIcon type="entry" />,
         label: 'Entrée',
-        value: 'Cave aze dfe azetr',
+        value: 'Cave aze dfe azetr'
       },
       {
         Icon: () => <CustomIcon type="cave_system" />,
         label: 'Cave',
-        value: 'Miéraure (aven de) [Aven des]',
-      },
+        value: 'Miéraure (aven de) [Aven des]'
+      }
     ]}
   />
 ));

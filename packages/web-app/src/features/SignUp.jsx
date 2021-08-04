@@ -13,10 +13,10 @@ import SignUpForm from '../pages/SignUpForm';
 const SignUp = () => {
   const dispatch = useDispatch();
   const { formatMessage } = useIntl();
-  const signUpState = useSelector((state) => state.signUp);
+  const signUpState = useSelector(state => state.signUp);
   const [signUpRequestSent, setSignUpRequestSent] = React.useState(false);
   const [signUpRequestSucceeded, setSignUpRequestSucceeded] = React.useState(
-    false,
+    false
   );
   const [email, setEmail] = React.useState('');
   const [name, setName] = React.useState('');
@@ -41,12 +41,12 @@ const SignUp = () => {
           {
             id: `signUp.password.length.error`,
             defaultMessage: `Your password must be at least {passwordMinLength} characters.`,
-            description: 'Error displayed when the password is too short.',
+            description: 'Error displayed when the password is too short.'
           },
           {
-            passwordMinLength: PASSWORD_MIN_LENGTH,
-          },
-        ),
+            passwordMinLength: PASSWORD_MIN_LENGTH
+          }
+        )
       );
     }
     if (isEmpty(match(emailRegexp, email))) {
@@ -54,13 +54,13 @@ const SignUp = () => {
     }
 
     if (errors.length > 0) {
-      errors.map((e) => onError(e));
+      errors.map(e => onError(e));
       return false;
     }
     return true;
   };
 
-  const onSignUp = (event) => {
+  const onSignUp = event => {
     event.preventDefault();
     if (checkIfValuesAreValid()) {
       dispatch(
@@ -69,8 +69,8 @@ const SignUp = () => {
           name,
           nickname,
           password,
-          surname,
-        }),
+          surname
+        })
       );
       setSignUpRequestSent(true);
     }

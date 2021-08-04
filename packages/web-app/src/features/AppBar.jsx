@@ -7,7 +7,7 @@ import { pathOr } from 'ramda';
 import {
   displayLoginDialog,
   hideLoginDialog,
-  postLogout,
+  postLogout
 } from '../actions/Login';
 import AppBarComponent from '../components/common/AppBar';
 import { usePermissions } from '../hooks';
@@ -23,7 +23,7 @@ const HeaderAutoCompleteSearch = ({ isSideMenuOpen, HeaderQuickSearch }) => (
 
 const AppBar = ({ toggleSideMenu, isSideMenuOpen, HeaderQuickSearch }) => {
   const dispatch = useDispatch();
-  const authState = useSelector((state) => state.login);
+  const authState = useSelector(state => state.login);
   const permissions = usePermissions();
 
   const onLoginClick = () =>
@@ -36,7 +36,7 @@ const AppBar = ({ toggleSideMenu, isSideMenuOpen, HeaderQuickSearch }) => {
   };
 
   const authTokenExpirationDate = new Date(
-    pathOr(0, ['authTokenDecoded', 'exp'], authState) * 1000,
+    pathOr(0, ['authTokenDecoded', 'exp'], authState) * 1000
   ); // JS Date() uses miliseconds
 
   return (
@@ -63,8 +63,8 @@ AppBar.propTypes = {
   HeaderQuickSearch: PropTypes.oneOfType([
     PropTypes.node,
     PropTypes.element,
-    PropTypes.func,
-  ]).isRequired,
+    PropTypes.func
+  ]).isRequired
 };
 
 export default AppBar;

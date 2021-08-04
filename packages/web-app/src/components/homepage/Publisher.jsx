@@ -5,12 +5,6 @@ import { wikicavesLink } from '../../conf/Config';
 import Translate from '../common/Translate';
 import GCLogo from '../common/GCLogo';
 
-//
-//
-// S T Y L I N G - C O M P O N E N T S
-//
-//
-
 const PublisherInfo = styled.div`
   margin-right: 4px;
   display: inline-block;
@@ -28,12 +22,6 @@ const PublisherWrapper = styled.div`
   font-size: small;
   margin-top: 10px;
 `;
-
-//
-//
-// M A I N - C O M P O N E N T
-//
-//
 
 const Publisher = () => (
   <PublisherWrapper>

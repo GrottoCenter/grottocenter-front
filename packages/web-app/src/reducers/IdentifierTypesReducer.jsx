@@ -1,26 +1,15 @@
 import {
   FETCH_IDENTIFIER_TYPES,
   FETCH_IDENTIFIER_TYPES_FAILURE,
-  FETCH_IDENTIFIER_TYPES_SUCCESS,
+  FETCH_IDENTIFIER_TYPES_SUCCESS
 } from '../actions/IdentifierType';
-
-//
-//
-// D E F A U L T - S T A T E
-//
-//
 
 const initialState = {
   identifierTypes: [],
   isFetching: false,
-  error: null,
+  error: null
 };
 
-//
-//
-// R E D U C E R
-//
-//
 const identifierType = (state = initialState, action) => {
   switch (action.type) {
     case FETCH_IDENTIFIER_TYPES:
@@ -30,7 +19,7 @@ const identifierType = (state = initialState, action) => {
       return {
         ...state,
         identifierTypes: action.identifierTypes,
-        isFetching: false,
+        isFetching: false
       };
 
     case FETCH_IDENTIFIER_TYPES_FAILURE:

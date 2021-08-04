@@ -9,7 +9,7 @@ import {
   allPass,
   flatten,
   isNil,
-  isEmpty,
+  isEmpty
 } from 'ramda';
 import { useMap } from 'react-leaflet';
 import CustomMapContainer from '../common/MapContainer';
@@ -22,10 +22,10 @@ export const isValidPositions = allPass([
   is(Array),
   all(is(Array)),
   all(isPair),
-  isNumber,
+  isNumber
 ]);
 
-const makePosition = (pos) => ({ latitude: pos[0], longitude: pos[1] });
+const makePosition = pos => ({ latitude: pos[0], longitude: pos[1] });
 
 const MultipleMarkers = ({ positions }) => {
   const map = useMap();
@@ -36,19 +36,19 @@ const MultipleMarkers = ({ positions }) => {
     if (!isNil(positions) && !isEmpty(positions)) {
       map.fitBounds(positions);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [positions]);
 
   return null;
 };
 
-const HydratedMultipleMarkers = (props) => (
+const HydratedMultipleMarkers = props => (
   <CustomMapContainer
     wholePage={false}
     dragging={false}
     viewport={null}
     scrollWheelZoom={false}
-    zoom={14}
-  >
+    zoom={14}>
     <MultipleMarkers {...props} />
   </CustomMapContainer>
 );
@@ -56,7 +56,7 @@ const HydratedMultipleMarkers = (props) => (
 // eslint-disable-next-line no-multi-assign
 HydratedMultipleMarkers.propTypes = MultipleMarkers.propTypes = {
   positions: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.number)).isRequired,
-  loading: PropTypes.bool,
+  loading: PropTypes.bool
 };
 
 export default HydratedMultipleMarkers;

@@ -17,20 +17,20 @@ const ActionTypes = {
   edit: {
     confirmationText: '',
     helperText: '',
-    name: 'Edit',
+    name: 'Edit'
   },
   decline: {
     confirmationText: 'Confirmation of document refusal',
     helperText:
       'Indicate to the contributor(s) why you decline the document(s) he / she / they submitted.',
-    name: 'Decline',
+    name: 'Decline'
   },
   validate: {
     confirmationText: 'Confirmation of document approval',
     helperText:
       'Indicate to the contributor(s) why you validate the document(s) he / she / they submitted.',
-    name: 'Validate',
-  },
+    name: 'Validate'
+  }
 };
 
 const Wrapper = styled.div`
@@ -47,7 +47,7 @@ const isNilOrEmpty = anyPass([isNil, isEmpty]);
 const Actions = ({ selected, onEdit }) => {
   const { formatMessage } = useIntl();
   const dispatch = useDispatch();
-  const { isLoading, success } = useSelector((state) => state.processDocuments);
+  const { isLoading, success } = useSelector(state => state.processDocuments);
   const confirmationDialog = useBoolean(false);
   const [actionType, setActionType] = useState(null);
   const [comment, setComment] = useState('');
@@ -57,12 +57,12 @@ const Actions = ({ selected, onEdit }) => {
       postProcessDocuments(
         selected,
         actionType === ActionTypes.validate,
-        comment,
-      ),
+        comment
+      )
     );
   };
 
-  const handleActionConfirmation = (selectedType) => () => {
+  const handleActionConfirmation = selectedType => () => {
     setActionType(selectedType);
     confirmationDialog.open();
   };
@@ -78,6 +78,7 @@ const Actions = ({ selected, onEdit }) => {
       confirmationDialog.close();
       setComment('');
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [success]);
 
   return (
@@ -114,7 +115,7 @@ const Actions = ({ selected, onEdit }) => {
           <ActionButton
             key={0}
             label={`${formatMessage({
-              id: propOr(ActionTypes.validate.name, 'name', actionType),
+              id: propOr(ActionTypes.validate.name, 'name', actionType)
             })} ${selected.length} ${formatMessage({ id: 'document(s)' })}`}
             color={
               actionType === ActionTypes.validate ? 'primary' : 'secondary'
@@ -129,14 +130,13 @@ const Actions = ({ selected, onEdit }) => {
             }
             loading={isLoading}
             disabled={actionType === ActionTypes.decline && isEmpty(comment)}
-          />,
-        ]}
-      >
+          />
+        ]}>
         <StringInput
           helperText={
             !isNil(actionType)
               ? formatMessage({
-                  id: actionType.helperText,
+                  id: actionType.helperText
                 })
               : ''
           }
@@ -157,8 +157,8 @@ Actions.propTypes = {
   selected: PropTypes.arrayOf(
     PropTypes.oneOfType([
       PropTypes.number.isRequired,
-      PropTypes.string.isRequired,
-    ]),
+      PropTypes.string.isRequired
+    ])
   ).isRequired,
-  onEdit: PropTypes.func.isRequired,
+  onEdit: PropTypes.func.isRequired
 };

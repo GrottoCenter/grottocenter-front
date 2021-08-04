@@ -2,6 +2,12 @@
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+## API
+
+You can modify the
+`REACT_APP_API_URL` in `.env` 
+for example `REACT_APP_API_URL=https://beta.grottocenter.org` to use the production api 
+
 ## Available Scripts
 
 In the project directory, you can run:

@@ -8,25 +8,25 @@ export const REGIONS_SEARCH_FAILURE = 'REGIONS_SEARCH_FAILURE';
 export const RESET_REGIONS_SEARCH = 'RESET_REGIONS_SEARCH';
 
 export const searchRegions = () => ({
-  type: REGIONS_SEARCH,
+  type: REGIONS_SEARCH
 });
 
-export const searchRegionsSuccess = (regions) => ({
+export const searchRegionsSuccess = regions => ({
   type: REGIONS_SEARCH_SUCCESS,
-  regions,
+  regions
 });
 
-export const searchRegionsFailure = (error) => ({
+export const searchRegionsFailure = error => ({
   type: REGIONS_SEARCH_FAILURE,
-  error,
+  error
 });
 
 export const resetRegionsSearch = () => ({
-  type: RESET_REGIONS_SEARCH,
+  type: RESET_REGIONS_SEARCH
 });
 
 export function loadRegionsSearch(regionCode, regionName, isDeprecated) {
-  return (dispatch) => {
+  return dispatch => {
     dispatch(searchRegions());
 
     return fetch(regionsSearchUrl, {
@@ -34,25 +34,25 @@ export function loadRegionsSearch(regionCode, regionName, isDeprecated) {
       body: JSON.stringify({
         code: regionCode,
         name: regionName,
-        isDeprecated,
-      }),
+        isDeprecated
+      })
     })
-      .then((response) => {
+      .then(response => {
         if (response.status >= 400) {
           throw new Error(response.status);
         }
         return response.text();
       })
-      .then((text) => dispatch(searchRegionsSuccess(JSON.parse(text).regions)))
-      .catch((error) =>
+      .then(text => dispatch(searchRegionsSuccess(JSON.parse(text).regions)))
+      .catch(error =>
         dispatch(
           searchRegionsFailure(
             makeErrorMessage(
               error.message,
-              `Fetching region ${regionCode} ${regionName}`,
-            ),
-          ),
-        ),
+              `Fetching region ${regionCode} ${regionName}`
+            )
+          )
+        )
       );
   };
 }

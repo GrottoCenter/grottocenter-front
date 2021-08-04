@@ -8,7 +8,7 @@ import AutoCompleteSearch from '../AutoCompleteSearch';
 import User from './User';
 
 const AppBarWithState = ({ isAuth }) => {
-  const getOptionLabel = (option) => option.name;
+  const getOptionLabel = option => option.name;
   return (
     <>
       <AppBar
@@ -34,7 +34,7 @@ const AppBarWithState = ({ isAuth }) => {
 };
 
 AppBarWithState.propTypes = {
-  isAuth: PropTypes.bool.isRequired,
+  isAuth: PropTypes.bool.isRequired
 };
 
 const UserWithState = ({ isAuth }) => {
@@ -48,7 +48,7 @@ const UserWithState = ({ isAuth }) => {
 };
 
 UserWithState.propTypes = {
-  isAuth: PropTypes.bool.isRequired,
+  isAuth: PropTypes.bool.isRequired
 };
 
 storiesOf('AppBar', module)

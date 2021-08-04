@@ -11,12 +11,13 @@ const OrganizationPage = () => {
   const { organizationId } = useParams();
   const dispatch = useDispatch();
   const { organization, error, isFetching } = useSelector(
-    (state) => state.organization,
+    state => state.organization
   );
 
   useEffect(() => {
     dispatch(loadOrganization(organizationId));
     dispatch(setPageTitle('Organization'));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [organizationId]);
 
   return (

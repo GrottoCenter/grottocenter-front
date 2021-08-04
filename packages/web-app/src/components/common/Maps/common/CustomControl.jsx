@@ -6,14 +6,14 @@ const POSITION_CLASSES = {
   bottomleft: 'leaflet-bottom leaflet-left',
   bottomright: 'leaflet-bottom leaflet-right',
   topleft: 'leaflet-top leaflet-left',
-  topright: 'leaflet-top leaflet-right',
+  topright: 'leaflet-top leaflet-right'
 };
 
 const CustomControl = ({
   position = 'topright',
   containerProps,
   children,
-  style,
+  style
 }) => (
   <div className={POSITION_CLASSES[position]} style={style}>
     <div className="leaflet-control leaflet-bar" {...containerProps}>
@@ -28,11 +28,11 @@ export const customControlProps = {
   containerProps: PropTypes.any,
   children: PropTypes.node,
   // eslint-disable-next-line react/forbid-prop-types
-  style: PropTypes.object,
+  style: PropTypes.object
 };
 
 CustomControl.propTypes = {
-  ...customControlProps,
+  ...customControlProps
 };
 
 export default CustomControl;

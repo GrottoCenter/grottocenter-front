@@ -3,7 +3,7 @@ import {
   CardContent as MuiCardContent,
   Typography,
   List,
-  ListItemText,
+  ListItemText
 } from '@material-ui/core';
 import React from 'react';
 import PropTypes from 'prop-types';
@@ -63,19 +63,19 @@ const Item = ({ Icon, label, value, type }) => (
   <Wrapper>
     <IconContainer>{!isNil(Icon) && <Icon />}</IconContainer>
     <Label color="textSecondary" variant="caption">
-      {`${label}: `}&nbsp;
+      {`${label}: `}
+      &nbsp;
     </Label>
     {type === 'tree' && isArray(value) && (
       <TreeView
         defaultCollapseIcon={<ExpandMore />}
-        defaultExpandIcon={<ChevronRight />}
-      >
+        defaultExpandIcon={<ChevronRight />}>
         <TreeItem nodeId="1" label="test" />
       </TreeView>
     )}
     {type === 'list' && isArray(value) && (
       <ToRightList>
-        {value.map((item) => (
+        {value.map(item => (
           <ToRightListItemText key={item} primary={item} />
         ))}
       </ToRightList>
@@ -94,7 +94,7 @@ const Section = ({ title, content, loading }) => {
         {loading ? (
           <Skeleton variant="rect" height={100} />
         ) : (
-          content.map((item) =>
+          content.map(item =>
             !isEmpty(item.value) && !isNil(item.value) ? (
               <Item
                 key={item.label}
@@ -105,7 +105,7 @@ const Section = ({ title, content, loading }) => {
               />
             ) : (
               ''
-            ),
+            )
           )
         )}
       </CardContent>
@@ -120,13 +120,13 @@ Item.propTypes = {
   label: PropTypes.string.isRequired,
   value: PropTypes.oneOfType([
     PropTypes.string.isRequired,
-    PropTypes.arrayOf(PropTypes.string).isRequired,
+    PropTypes.arrayOf(PropTypes.string).isRequired
   ]),
-  type: PropTypes.oneOf(['list', 'tree']),
+  type: PropTypes.oneOf(['list', 'tree'])
 };
 
 Section.propTypes = {
   loading: PropTypes.bool.isRequired,
   title: PropTypes.string.isRequired,
-  content: PropTypes.arrayOf(PropTypes.shape(Item.propTypes)),
+  content: PropTypes.arrayOf(PropTypes.shape(Item.propTypes))
 };

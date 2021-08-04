@@ -8,7 +8,7 @@ import {
   ListItemText,
   Select,
   Checkbox,
-  MenuItem,
+  MenuItem
 } from '@material-ui/core';
 import Skeleton from '@material-ui/lab/Skeleton';
 import VisibilityIcon from '@material-ui/icons/Visibility';
@@ -23,25 +23,25 @@ const MenuProps = {
   PaperProps: {
     style: {
       maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
-      width: 250,
-    },
-  },
+      width: 250
+    }
+  }
 };
 
-const isSelected = (selection) => (n) => includes(n.id, selection);
+const isSelected = selection => n => includes(n.id, selection);
 
-const getEntriesName = (selection) =>
+const getEntriesName = selection =>
   pipe(filter(isSelected(selection)), pluck('name'), join(', '));
 
 const EntriesSelection = ({
   loading = false,
   entries,
   onSelect,
-  selection,
+  selection
 }) => {
   const { formatMessage } = useIntl();
 
-  const handleChange = (event) => {
+  const handleChange = event => {
     onSelect(event.target.value);
   };
   return (
@@ -58,14 +58,13 @@ const EntriesSelection = ({
               value={selection}
               onChange={handleChange}
               input={<Input />}
-              renderValue={(selected) => {
+              renderValue={selected => {
                 if (selected.length === 0) {
                   return <em>{formatMessage({ id: 'Visible entries' })}</em>;
                 }
                 return getEntriesName(selected)(entries);
               }}
-              MenuProps={MenuProps}
-            >
+              MenuProps={MenuProps}>
               <MenuItem disabled value="">
                 <em>{formatMessage({ id: 'Visible entries' })}</em>
               </MenuItem>
@@ -87,7 +86,7 @@ EntriesSelection.propTypes = {
   onSelect: PropTypes.func.isRequired,
   selection: PropTypes.arrayOf(PropTypes.string).isRequired,
   loading: PropTypes.bool,
-  entries: PropTypes.arrayOf(entryDetailsType),
+  entries: PropTypes.arrayOf(entryDetailsType)
 };
 
 export default EntriesSelection;

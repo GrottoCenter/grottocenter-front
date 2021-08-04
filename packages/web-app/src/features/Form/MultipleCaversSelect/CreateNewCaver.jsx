@@ -22,22 +22,22 @@ const CreateNewCaver = ({
   defaultSurname = '',
   enabled,
   onCreateSuccess,
-  contextValueName,
+  contextValueName
 }) => {
   const dispatch = useDispatch();
-  const { isLoading, caver } = useSelector((state) => state.createCaver);
+  const { isLoading, caver } = useSelector(state => state.createCaver);
   const {
     docAttributes: { [contextValueName]: value },
-    updateAttribute,
+    updateAttribute
   } = useContext(DocumentFormContext);
   const { formatMessage } = useIntl();
   const inputRef = useRef(null);
   const [name, setName] = useState(defaultName);
   const [surname, setSurname] = useState(defaultSurname);
-  const handleChangeName = (event) => {
+  const handleChangeName = event => {
     setName(event.target.value);
   };
-  const handleChangeSurname = (event) => {
+  const handleChangeSurname = event => {
     setSurname(event.target.value);
   };
 
@@ -66,6 +66,7 @@ const CreateNewCaver = ({
       setName('');
       setSurname('');
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [caver]);
 
   return (
@@ -107,7 +108,7 @@ CreateNewCaver.propTypes = {
   defaultSurname: PropTypes.string,
   enabled: PropTypes.bool,
   onCreateSuccess: PropTypes.func,
-  contextValueName: PropTypes.string.isRequired,
+  contextValueName: PropTypes.string.isRequired
 };
 
 export default CreateNewCaver;

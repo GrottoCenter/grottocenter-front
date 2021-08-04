@@ -7,7 +7,7 @@ import {
   ListItemText,
   IconButton,
   Tooltip,
-  ListItemIcon,
+  ListItemIcon
 } from '@material-ui/core';
 import Skeleton from '@material-ui/lab/Skeleton';
 import ListIcon from '@material-ui/icons/FormatListBulleted';
@@ -32,7 +32,7 @@ const EntriesList = () => {
   const { formatMessage } = useIntl();
   const {
     state: { selectedEntries, entries, loading },
-    action: { openEntryMap, openEntryDescription },
+    action: { openEntryMap, openEntryDescription }
   } = useContext(CaveContext);
 
   return (
@@ -43,11 +43,10 @@ const EntriesList = () => {
           {loading ? (
             <LoadingList />
           ) : (
-            entries.map((entry) => (
+            entries.map(entry => (
               <ListItem
                 key={entry.id}
-                selected={includes(entry.id, selectedEntries)}
-              >
+                selected={includes(entry.id, selectedEntries)}>
                 <ListItemIcon>
                   <CustomIcon type="entry" />
                 </ListItemIcon>
@@ -59,8 +58,7 @@ const EntriesList = () => {
                         disabled
                         onClick={() => openEntryMap(entry.id)}
                         edge="end"
-                        aria-label="entry map"
-                      >
+                        aria-label="entry map">
                         <MapIcon />
                       </IconButton>
                     </span>
@@ -69,8 +67,7 @@ const EntriesList = () => {
                     <IconButton
                       onClick={() => openEntryDescription(entry.id)}
                       edge="end"
-                      aria-label="entry description"
-                    >
+                      aria-label="entry description">
                       <LinkIcon />
                     </IconButton>
                   </Tooltip>

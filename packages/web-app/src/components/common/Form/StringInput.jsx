@@ -4,7 +4,7 @@ import {
   FilledInput,
   FormControl,
   FormHelperText,
-  InputLabel,
+  InputLabel
 } from '@material-ui/core';
 
 const StringInput = ({
@@ -17,9 +17,9 @@ const StringInput = ({
   required = false,
   type = 'text',
   value,
-  valueName,
+  valueName
 }) => {
-  const handleValueChange = (event) => {
+  const handleValueChange = event => {
     onValueChange(event.target.value);
   };
 
@@ -28,8 +28,7 @@ const StringInput = ({
       variant="filled"
       fullWidth={fullWidth}
       required={required}
-      error={(required && value === '') || hasError}
-    >
+      error={(required && value === '') || hasError}>
       <InputLabel>{valueName}</InputLabel>
       <FilledInput
         endAdornment={endAdornment}
@@ -56,7 +55,7 @@ StringInput.propTypes = {
   required: PropTypes.bool,
   type: PropTypes.oneOf(['text', 'email', 'password']),
   value: PropTypes.string.isRequired,
-  valueName: PropTypes.string.isRequired,
+  valueName: PropTypes.string.isRequired
 };
 
 export default StringInput;

@@ -8,14 +8,8 @@ import {
   FETCH_FULL_ADVANCEDSEARCH_STARTED,
   FETCH_FULL_ADVANCEDSEARCH_SUCCESS,
   FETCH_FULL_ADVANCEDSEARCH_FAILURE,
-  RESET_ADVANCEDSEARCH_RESULTS,
+  RESET_ADVANCEDSEARCH_RESULTS
 } from '../actions/Advancedsearch';
-
-//
-//
-// D E F A U L T - S T A T E
-//
-//
 
 const initialState = {
   totalNbResults: 0, // total number of results for the search
@@ -28,15 +22,9 @@ const initialState = {
   searchCriterias: {
     from: 0,
     size: 10,
-    resourceType: '', // results type (one of: entrances, grottos, massifs or documents)
-  },
+    resourceType: '' // results type (one of: entrances, grottos, massifs or documents)
+  }
 };
-
-//
-//
-// R E D U C E R
-//
-//
 
 const advancedsearch = (state = initialState, action) => {
   switch (action.type) {
@@ -48,9 +36,9 @@ const advancedsearch = (state = initialState, action) => {
         isLoading: true,
         results: undefined,
         searchCriterias: {
-          ...action.criterias,
+          ...action.criterias
         },
-        wantToDownloadCSV: false, // Reset the need of downloading as CSV because it's a new search
+        wantToDownloadCSV: false // Reset the need of downloading as CSV because it's a new search
       };
     }
     case FETCH_ADVANCEDSEARCH_SUCCESS: {
@@ -67,7 +55,7 @@ const advancedsearch = (state = initialState, action) => {
         ...state,
         totalNbResults: action.totalNbResults,
         results: mergedResults,
-        isLoading: false,
+        isLoading: false
       };
     }
     case FETCH_ADVANCEDSEARCH_FAILURE: {
@@ -82,8 +70,8 @@ const advancedsearch = (state = initialState, action) => {
         isLoading: true,
         searchCriterias: {
           ...state.searchCriterias,
-          ...action.criterias,
-        },
+          ...action.criterias
+        }
       };
     }
     case FETCH_NEXT_ADVANCEDSEARCH_SUCCESS: {
@@ -106,8 +94,8 @@ const advancedsearch = (state = initialState, action) => {
         isLoadingFullData: true,
         searchCriterias: {
           ...state.searchCriterias,
-          ...action.criterias,
-        },
+          ...action.criterias
+        }
       };
     }
     case FETCH_FULL_ADVANCEDSEARCH_SUCCESS: {
@@ -116,7 +104,7 @@ const advancedsearch = (state = initialState, action) => {
         ...state,
         fullResults: [...new Set(action.results)],
         isLoadingFullData: false,
-        wantToDownloadCSV: true,
+        wantToDownloadCSV: true
       };
     }
     case FETCH_FULL_ADVANCEDSEARCH_FAILURE: {
@@ -124,7 +112,7 @@ const advancedsearch = (state = initialState, action) => {
         ...state,
         error: action.error,
         isLoadingFullData: false,
-        wantToDownloadCSV: false,
+        wantToDownloadCSV: false
       };
     }
 

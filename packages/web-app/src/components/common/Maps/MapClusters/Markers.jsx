@@ -10,12 +10,12 @@ import {
   EntranceMarker,
   EntrancePopup,
   NetworkMarker,
-  NetworkPopup,
+  NetworkPopup
 } from '../common/Markers/Components';
 
 export const markerTypes = {
   ORGANIZATIONS: 'organizations',
-  ...heatmapTypes,
+  ...heatmapTypes
 };
 
 const isEntrances = includes(markerTypes.ENTRANCES);
@@ -26,22 +26,22 @@ const Markers = ({
   visibleMarkers,
   organizations = [],
   entrances = [],
-  networks = [],
+  networks = []
 }) => {
   const updateEntranceMarkers = useMarkers(
     EntranceMarker,
-    (entrance) => <EntrancePopup entrance={entrance} />,
-    (entrance) => propOr(null, 'name', entrance),
+    entrance => <EntrancePopup entrance={entrance} />,
+    entrance => propOr(null, 'name', entrance)
   );
   const updateNetworkMarkers = useMarkers(
     NetworkMarker,
-    (network) => <NetworkPopup network={network} />,
-    (network) => propOr(null, 'name', network),
+    network => <NetworkPopup network={network} />,
+    network => propOr(null, 'name', network)
   );
   const updateOrganizationMarkers = useMarkers(
     OrganizationMarker,
-    (organization) => <OrganizationPopup organization={organization} />,
-    (organization) => propOr(null, 'name', organization),
+    organization => <OrganizationPopup organization={organization} />,
+    organization => propOr(null, 'name', organization)
   );
 
   useEffect(() => {
@@ -50,6 +50,7 @@ const Markers = ({
     } else {
       updateEntranceMarkers(null);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [entrances, visibleMarkers]);
 
   useEffect(() => {
@@ -58,6 +59,7 @@ const Markers = ({
     } else {
       updateNetworkMarkers(null);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [networks, visibleMarkers]);
 
   useEffect(() => {
@@ -66,6 +68,7 @@ const Markers = ({
     } else {
       updateOrganizationMarkers(null);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [organizations, visibleMarkers]);
 
   return <MarkerGlobalCss />;
@@ -77,7 +80,7 @@ Markers.propTypes = {
   visibleMarkers: PropTypes.arrayOf(PropTypes.oneOf(values(markerTypes))),
   organizations: PropTypes.arrayOf(PropTypes.shape({})),
   entrances: PropTypes.arrayOf(PropTypes.shape({})),
-  networks: PropTypes.arrayOf(PropTypes.shape({})),
+  networks: PropTypes.arrayOf(PropTypes.shape({}))
 };
 MemoizedMarkers.propTypes = Markers.propTypes;
 

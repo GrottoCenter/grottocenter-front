@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import {
   GridContainer,
   GridRow,
-  GridFullColumn,
+  GridFullColumn
 } from '../../helpers/GridSystem';
 import { fseLinks } from '../../conf/Config';
 import InternationalizedLink from '../common/InternationalizedLink';

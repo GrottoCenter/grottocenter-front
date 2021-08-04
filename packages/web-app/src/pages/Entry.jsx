@@ -37,11 +37,13 @@ const Content = ({ title, children }) => {
 const EntryPage = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
-  const { loading, data, error } = useSelector((state) => state.entry);
+  const { loading, data, error } = useSelector(state => state.entry);
+  const { locale } = useSelector(state => state.intl);
   const { formatMessage } = useIntl();
 
   useEffect(() => {
     dispatch(fetchEntry(id));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
   const details = {
@@ -60,12 +62,12 @@ const EntryPage = () => {
     author: pathOr('Author', ['cave', 'author'], data),
     creationDate: pathOr(null, ['cave', 'dateInscription'], data),
     isDivingCave: pathOr(null, ['cave', 'isDiving'], data),
-    mountain: pathOr(null, ['massif', 'name'], data),
+    mountain: pathOr(null, ['massif', 'name'], data)
   };
 
   const externalLink = `${
-    detailPageV2Links[window.locale] !== undefined
-      ? detailPageV2Links[window.locale]
+    detailPageV2Links[locale] !== undefined
+      ? detailPageV2Links[locale]
       : detailPageV2Links['*']
   }&category=entry&id=${id}`;
 

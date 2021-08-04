@@ -7,22 +7,16 @@ import styled from 'styled-components';
 import checkPermission from '../../helpers/Permissions';
 import { VIEW_SIDEMENU } from '../../conf/Rights';
 
-//
-//
-// S T Y L I N G - C O M P O N E N T S
-//
-//
-
 const BurgerAvatar = withTheme(styled(Avatar)`
   position: relative;
   left: 20px;
-  background-color: ${(props) =>
+  background-color: ${props =>
     props.visible
       ? props.theme.palette.textIconColor
       : props.theme.palette.accent1Color} !important;
 
   > svg {
-    fill: ${(props) =>
+    fill: ${props =>
       props.visible
         ? props.theme.palette.primaryTextColor
         : props.theme.palette.textIconColor} !important;
@@ -30,6 +24,7 @@ const BurgerAvatar = withTheme(styled(Avatar)`
 `);
 
 const BurgerLink = ({ visible, onclick }) => (
+  // eslint-disable-next-line jsx-a11y/anchor-is-valid,jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions
   <a onClick={onclick}>
     <BurgerAvatar icon={<BurgerIcon />} visible={visible} />
   </a>
@@ -37,14 +32,8 @@ const BurgerLink = ({ visible, onclick }) => (
 
 BurgerLink.propTypes = {
   onclick: PropTypes.func.isRequired,
-  visible: PropTypes.bool.isRequired,
+  visible: PropTypes.bool.isRequired
 };
-
-//
-//
-// M A I N - C O M P O N E N T
-//
-//
 
 const SideMenuBurger = styled(BurgerLink)``;
 

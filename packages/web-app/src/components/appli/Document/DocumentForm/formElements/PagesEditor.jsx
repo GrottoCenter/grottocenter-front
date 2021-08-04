@@ -1,4 +1,4 @@
-import React, { useContext, useMemo } from 'react';
+import React, { useContext, useMemo, useEffect } from 'react';
 import styled from 'styled-components';
 
 import { Typography } from '@material-ui/core';
@@ -8,7 +8,6 @@ import Translate from '../../../../common/Translate';
 import { DocumentFormContext } from '../Provider';
 import NumberInput from '../../../../common/Form/NumberInput';
 
-// ===================================
 const InlineWrapper = styled.div`
   display: flex;
   flex-direction: row;
@@ -28,18 +27,16 @@ const PageIntervalWrapper = styled.div`
   flex-wrap: wrap;
 `;
 
-// ===================================
-
 const PagesEditor = () => {
   const [intervalError, setIntervalError] = React.useState('');
   const [positiveEndError, setPositiveEndError] = React.useState('');
   const [positiveStartError, setPositiveStartError] = React.useState('');
   const {
     docAttributes: { endPage, authorComment, startPage },
-    updateAttribute,
+    updateAttribute
   } = useContext(DocumentFormContext);
 
-  React.useEffect(() => {
+  useEffect(() => {
     const newEndGreater =
       !isNil(startPage) && !isNil(endPage) && startPage >= endPage
         ? 'The end page must be greater than the start page.'
@@ -54,7 +51,7 @@ const PagesEditor = () => {
       startPage < 0 ? 'The start page must be positive.' : '';
     if (newPositiveStart !== positiveStartError)
       setPositiveStartError(newPositiveStart);
-  });
+  }, [startPage, endPage, intervalError, positiveEndError, positiveStartError]);
 
   const handleValueChange = (contextValueName, newValue) => {
     updateAttribute(contextValueName, newValue);
@@ -66,7 +63,7 @@ const PagesEditor = () => {
     startPage,
     intervalError,
     positiveEndError,
-    positiveStartError,
+    positiveStartError
   ];
   return useMemo(
     () => (
@@ -89,7 +86,7 @@ const PagesEditor = () => {
               <NumberInput
                 hasError={positiveStartError !== '' || intervalError !== ''}
                 helperText="Page where the document starts if it's part of another document (ex: an article in a magazine). Leave it blank if you just want to mention the total number of pages (ex: a book)."
-                onValueChange={(newValue) =>
+                onValueChange={newValue =>
                   handleValueChange('startPage', newValue)
                 }
                 value={startPage}
@@ -105,7 +102,7 @@ const PagesEditor = () => {
               <NumberInput
                 hasError={positiveEndError !== '' || intervalError !== ''}
                 helperText="Page where the document ends if it's part of another document (ex: an article in a magazine)."
-                onValueChange={(newValue) =>
+                onValueChange={newValue =>
                   handleValueChange('endPage', newValue)
                 }
                 value={endPage}
@@ -116,7 +113,8 @@ const PagesEditor = () => {
         </InlineWrapper>
       </>
     ),
-    memoizedValues,
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    memoizedValues
   );
 };
 

@@ -23,7 +23,7 @@ export const OrganizationPopup = ({ organization }) => (
       secondary
       value={makeCoordinatesValue(
         organization.latitude,
-        organization.longitude,
+        organization.longitude
       )}
       icon={<GpsFixed color="primary" />}
     />
@@ -32,7 +32,7 @@ export const OrganizationPopup = ({ organization }) => (
 
 OrganizationPopup.propTypes = {
   // eslint-disable-next-line react/forbid-prop-types
-  organization: PropTypes.object.isRequired,
+  organization: PropTypes.object.isRequired
 };
 
 export default OrganizationPopup;

@@ -10,13 +10,12 @@ const OrganizationIcon = () => (
     style={{
       textAlign: 'center',
       height: '100%',
-      width: '100%',
-    }}
-  >
+      width: '100%'
+    }}>
     <img
       alt="organizationIcon"
       style={{ height: '100%' }}
-      src={markers.find((m) => m.name === 'Organizations').url}
+      src={markers.find(m => m.name === 'Organizations').url}
     />
   </Icon>
 );
@@ -25,7 +24,7 @@ export const OrganizationMarker = L.divIcon({
   html: renderToString(<OrganizationIcon />),
   iconSize: [24, 24],
   iconAnchor: [12, 24],
-  className: 'fade-in-markers',
+  className: 'fade-in-markers'
 });
 
 export default OrganizationMarker;

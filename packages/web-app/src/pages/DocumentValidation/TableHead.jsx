@@ -3,7 +3,7 @@ import {
   TableCell,
   TableRow,
   TableHead,
-  TableSortLabel,
+  TableSortLabel
 } from '@material-ui/core';
 import PropTypes from 'prop-types';
 import React from 'react';
@@ -17,10 +17,10 @@ function EnhancedTableHead(props) {
     numSelected,
     rowCount,
     onRequestSort,
-    columnNames,
+    columnNames
   } = props;
   const { formatMessage } = useIntl();
-  const createSortHandler = (property) => (event) => {
+  const createSortHandler = property => event => {
     onRequestSort(event, property);
   };
 
@@ -35,16 +35,14 @@ function EnhancedTableHead(props) {
             inputProps={{ 'aria-label': 'select all desserts' }}
           />
         </TableCell>
-        {columnNames.map((column) => (
+        {columnNames.map(column => (
           <TableCell
             key={column}
-            sortDirection={orderBy === column ? order : false}
-          >
+            sortDirection={orderBy === column ? order : false}>
             <TableSortLabel
               active={orderBy === column}
               direction={orderBy === column ? order : 'asc'}
-              onClick={createSortHandler(column)}
-            >
+              onClick={createSortHandler(column)}>
               {formatMessage({ id: column })}
               {orderBy === column ? (
                 <span>
@@ -52,7 +50,7 @@ function EnhancedTableHead(props) {
                     id:
                       order === 'desc'
                         ? 'sorted descending'
-                        : 'sorted ascending',
+                        : 'sorted ascending'
                   })}
                 </span>
               ) : null}
@@ -71,7 +69,7 @@ EnhancedTableHead.propTypes = {
   order: PropTypes.oneOf(['asc', 'desc']).isRequired,
   orderBy: PropTypes.string.isRequired,
   rowCount: PropTypes.number.isRequired,
-  columnNames: PropTypes.arrayOf(PropTypes.string.isRequired).isRequired,
+  columnNames: PropTypes.arrayOf(PropTypes.string.isRequired).isRequired
 };
 
 export default EnhancedTableHead;

@@ -11,9 +11,9 @@ const Row = ({
   onSelection,
   checked,
   hiddenColumns,
-  customCellRenders,
+  customCellRenders
 }) => {
-  const handleOpenDetailedView = (id) => () => {
+  const handleOpenDetailedView = id => () => {
     if (!isNil(onOpenDetailedView)) {
       onOpenDetailedView(id);
     }
@@ -35,14 +35,13 @@ const Row = ({
           <IconButton
             aria-label="detailed view"
             onClick={handleOpenDetailedView(row.id)}
-            size="small"
-          >
+            size="small">
             <ZoomInIcon />
           </IconButton>
         </TableCell>
       )}
       {keys(row).map(
-        (keyCell) =>
+        keyCell =>
           !includes(keyCell, hiddenColumns) && (
             <CustomCell
               key={keyCell}
@@ -52,7 +51,7 @@ const Row = ({
                 !isNil(customCellRenders) ? customCellRenders : undefined
               }
             />
-          ),
+          )
       )}
     </TableRow>
   );
@@ -62,14 +61,14 @@ Row.propTypes = {
   row: PropTypes.shape({
     id: PropTypes.oneOfType([
       PropTypes.string.isRequired,
-      PropTypes.number.isRequired,
-    ]),
+      PropTypes.number.isRequired
+    ])
   }),
   checked: PropTypes.bool.isRequired,
   onOpenDetailedView: PropTypes.func,
   onSelection: PropTypes.func,
   hiddenColumns: PropTypes.arrayOf(PropTypes.string).isRequired,
-  customCellRenders: PropTypes.func,
+  customCellRenders: PropTypes.func
 };
 
 export default Row;

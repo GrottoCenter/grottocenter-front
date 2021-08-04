@@ -19,10 +19,9 @@ import {
   isIssue,
   isArticle,
   isCollection,
-  isOther,
+  isOther
 } from '../DocumentTypesHelper';
 
-// ===================================
 const FlexWrapper = styled.div`
   display: flex;
   flex-wrap: wrap;
@@ -32,13 +31,12 @@ const FlexItemWrapper = styled.div`
   flex: 1;
   flex-basis: 300px;
 `;
-// ===================================
 
 const Step2 = ({ stepId }) => {
   const { formatMessage } = useIntl();
   const {
     docAttributes: { documentType },
-    validatedSteps,
+    validatedSteps
   } = useContext(DocumentFormContext);
 
   /*
@@ -53,7 +51,7 @@ const Step2 = ({ stepId }) => {
       ? 'document-issues'
       : isIssue(documentType)
       ? 'document-collections'
-      : 'documents',
+      : 'documents'
   ];
 
   const memoizedValues = [documentType, includes(stepId, validatedSteps)];
@@ -62,7 +60,7 @@ const Step2 = ({ stepId }) => {
     () => (
       <>
         <MultipleCaversSelect
-          computeHasError={(newAuthors) =>
+          computeHasError={newAuthors =>
             (isOther(documentType) || isArticle(documentType)) &&
             newAuthors.length === 0
           }
@@ -73,7 +71,7 @@ const Step2 = ({ stepId }) => {
         />
 
         <MultipleSubjectsSelect
-          computeHasError={(newSubjects) =>
+          computeHasError={newSubjects =>
             isArticle(documentType) && newSubjects.length === 0
           }
           contextValueName="subjects"
@@ -124,7 +122,7 @@ const Step2 = ({ stepId }) => {
                 labelText="Editor"
                 required={isCollection(documentType) || isIssue(documentType)}
                 searchLabelText={formatMessage({
-                  id: 'Search for an editor...',
+                  id: 'Search for an editor...'
                 })}
               />
             </FlexItemWrapper>
@@ -161,7 +159,7 @@ const Step2 = ({ stepId }) => {
                 labelText="Library"
                 required={false}
                 searchLabelText={formatMessage({
-                  id: 'Search for a library...',
+                  id: 'Search for a library...'
                 })}
               />
             </FlexItemWrapper>
@@ -193,7 +191,7 @@ const Step2 = ({ stepId }) => {
                 labelText="Massif"
                 required={false}
                 searchLabelText={formatMessage({
-                  id: 'Search for a massif...',
+                  id: 'Search for a massif...'
                 })}
               />
             </FlexItemWrapper>
@@ -201,12 +199,13 @@ const Step2 = ({ stepId }) => {
         </FlexWrapper>
       </>
     ),
-    memoizedValues,
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    memoizedValues
   );
 };
 
 Step2.propTypes = {
-  stepId: PropTypes.number.isRequired,
+  stepId: PropTypes.number.isRequired
 };
 
 export default Step2;

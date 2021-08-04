@@ -5,13 +5,13 @@ import {
   Table,
   TableBody,
   TableRow,
-    TableCell,
-    TableHead
+  TableCell,
+  TableHead
 } from '@material-ui/core';
 import GCLink from '../common/GCLink';
 import { Loading } from '../common/Toolbox';
 
-const EntriesOfInterestTableRow = (props) => {
+const EntriesOfInterestTableRow = props => {
   const {
     row: {
       id,
@@ -23,8 +23,8 @@ const EntriesOfInterestTableRow = (props) => {
       isOfInterest,
       entryInfo,
       stats,
-      timeInfo,
-    },
+      timeInfo
+    }
   } = props;
   return (
     <TableRow>
@@ -60,14 +60,14 @@ const EntriesOfInterestTableRow = (props) => {
 };
 
 EntriesOfInterestTableRow.propTypes = {
-  row: PropTypes.shape(PropTypes.any).isRequired,
+  row: PropTypes.shape(PropTypes.any).isRequired
 };
 
 export class EntriesOfInterest extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      items: [],
+      items: []
     };
     this.fetchData = this.fetchData.bind(this);
   }
@@ -78,16 +78,18 @@ export class EntriesOfInterest extends Component {
 
   fetchData() {
     const _this = this; // eslint-disable-line no-underscore-dangle
-    fetch('/api/admin/entrances/findAllOfInterest')
-      .then((response) => {
+    fetch(
+      `${process.env.REACT_APP_API_URL}/api/admin/entrances/findAllOfInterest`
+    )
+      .then(response => {
         if (response.status >= 400) {
           throw new Error('Bad response from server');
         }
         return response.json();
       })
-      .then((results) => {
+      .then(results => {
         _this.setState({
-          items: results,
+          items: results
         });
       });
   }
@@ -99,7 +101,7 @@ export class EntriesOfInterest extends Component {
     }
 
     const rows = [];
-    items.forEach((newRow) => {
+    items.forEach(newRow => {
       if (newRow !== undefined) {
         rows.push(<EntriesOfInterestTableRow key={newRow.id} row={newRow} />);
       }
@@ -113,8 +115,7 @@ export class EntriesOfInterest extends Component {
             multiSelectable={false}
             wrapperStyle={{ overflow: 'initial' }}
             bodyStyle={{ overflow: 'initial' }}
-            style={{ width: 'initial' }}
-          >
+            style={{ width: 'initial' }}>
             <TableHead>
               <TableRow>
                 <TableCell>Id</TableCell>
@@ -137,8 +138,7 @@ export class EntriesOfInterest extends Component {
             <TableBody
               displayRowCheckbox={false}
               adjustForCheckbox={false}
-              showRowHover
-            >
+              showRowHover>
               {rows}
             </TableBody>
           </Table>

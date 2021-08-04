@@ -7,7 +7,7 @@ import AddCircle from '@material-ui/icons/AddCircle';
 
 import {
   fetchQuicksearchResult,
-  resetQuicksearch,
+  resetQuicksearch
 } from '../../../actions/Quicksearch';
 
 import { entityOptionForSelector } from '../../../helpers/Entity';
@@ -31,7 +31,7 @@ const resultEndAdornment = (
 
 // ===================================
 
-const getOrganizationToString = (organization) => {
+const getOrganizationToString = organization => {
   return `#${organization.id} - ${organization.name}`;
 };
 
@@ -41,28 +41,28 @@ const OrganizationAutoComplete = ({
   helperContentIfValueIsForced,
   labelText,
   required = false,
-  searchLabelText,
+  searchLabelText
 }) => {
   const [defaultSearchValue, setDefaultSearchValue] = useState('');
   const [
     defaultNewOrganizationValue,
-    setDefaultNewOrganizationValue,
+    setDefaultNewOrganizationValue
   ] = useState('');
   const { isTrue: actionEnabled, true: enableAction } = useBoolean();
   const {
     isOpen: isCreateOrganizationOpen,
-    toggle: toggleCreateOrganization,
+    toggle: toggleCreateOrganization
   } = useBoolean();
   const dispatch = useDispatch();
   const { error, isLoading, results: suggestions } = useSelector(
-    (state) => state.quicksearch,
+    state => state.quicksearch
   );
 
-  const fetchSearchResults = (debouncedInput) => {
+  const fetchSearchResults = debouncedInput => {
     const criteria = {
       query: debouncedInput.trim(),
       complete: false,
-      resourceType: 'grottos',
+      resourceType: 'grottos'
     };
     setDefaultNewOrganizationValue(debouncedInput);
     dispatch(fetchQuicksearchResult(criteria));
@@ -76,6 +76,7 @@ const OrganizationAutoComplete = ({
     if (isLoading && !isEmpty(defaultNewOrganizationValue)) {
       enableAction();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isLoading, defaultNewOrganizationValue]);
 
   const handleOpenSideAction = () => {
@@ -113,8 +114,7 @@ const OrganizationAutoComplete = ({
       sideActionDisabled={!actionEnabled}
       sideActionIcon={<AddCircle fontSize="large" />}
       onSideAction={handleOpenSideAction}
-      isSideActionOpen={isCreateOrganizationOpen}
-    >
+      isSideActionOpen={isCreateOrganizationOpen}>
       <CreateNewOrganization
         contextValueName={contextValueName}
         enabled={isCreateOrganizationOpen}
@@ -131,7 +131,7 @@ OrganizationAutoComplete.propTypes = {
   helperContentIfValueIsForced: PropTypes.node,
   labelText: PropTypes.string.isRequired,
   required: PropTypes.bool,
-  searchLabelText: PropTypes.string.isRequired,
+  searchLabelText: PropTypes.string.isRequired
 };
 
 export default OrganizationAutoComplete;

@@ -6,7 +6,7 @@ import {
   Divider,
   FormControl,
   LinearProgress as MuiLinearProgress,
-  Typography,
+  Typography
 } from '@material-ui/core';
 import { includes } from 'ramda';
 import NavigateNextIcon from '@material-ui/icons/NavigateNext';
@@ -22,24 +22,22 @@ import Stepper from '../../../common/Form/Stepper';
 
 import FormBody from './FormBody';
 
-const NextStepButton = (props) => (
+const NextStepButton = props => (
   <Button
     {...props}
     variant="contained"
     color="primary"
-    endIcon={<NavigateNextIcon />}
-  >
+    endIcon={<NavigateNextIcon />}>
     <Translate>Next</Translate>
   </Button>
 );
 
-const PreviousStepButton = (props) => (
+const PreviousStepButton = props => (
   <Button
     {...props}
     variant="contained"
     color="primary"
-    startIcon={<NavigateBeforeIcon />}
-  >
+    startIcon={<NavigateBeforeIcon />}>
     <Translate>Back</Translate>
   </Button>
 );
@@ -90,16 +88,16 @@ const DocumentForm = ({ isLoading, onSubmit, onUpdate }) => {
     currentStep: currentFormStep,
     validatedSteps,
     updateCurrentStep,
-    docAttributes: { formSteps, isNewDocument },
+    docAttributes: { formSteps, isNewDocument }
   } = useContext(DocumentFormContext);
   const [isNextStepDisabled, setIsNextStepDisabled] = React.useState(true);
 
-  const handleSubmit = (event) => {
+  const handleSubmit = event => {
     event.preventDefault();
     onSubmit(docAttributes);
   };
 
-  const handleUpdate = (event) => {
+  const handleUpdate = event => {
     event.preventDefault();
     onUpdate(docAttributes);
   };
@@ -107,16 +105,16 @@ const DocumentForm = ({ isLoading, onSubmit, onUpdate }) => {
   useEffect(() => {
     setIsNextStepDisabled(
       currentFormStep === formSteps.length ||
-        !includes(currentFormStep, validatedSteps),
+        !includes(currentFormStep, validatedSteps)
     );
   }, [validatedSteps, currentFormStep, formSteps, setIsNextStepDisabled]);
 
   const handleStepNext = () => {
-    updateCurrentStep((prevFormStep) => prevFormStep + 1);
+    updateCurrentStep(prevFormStep => prevFormStep + 1);
   };
 
   const handleStepBack = () => {
-    updateCurrentStep((prevFormStep) => prevFormStep - 1);
+    updateCurrentStep(prevFormStep => prevFormStep - 1);
   };
 
   return (
@@ -182,8 +180,7 @@ const DocumentForm = ({ isLoading, onSubmit, onUpdate }) => {
                 variant="contained"
                 color="primary"
                 size="large"
-                disabled={!isFormValid}
-              >
+                disabled={!isFormValid}>
                 {isNewDocument ? (
                   <Translate>Submit</Translate>
                 ) : (
@@ -199,7 +196,7 @@ const DocumentForm = ({ isLoading, onSubmit, onUpdate }) => {
 };
 
 DocumentForm.propTypes = {
-  ...DocumentFormTypes,
+  ...DocumentFormTypes
 };
 
 export default DocumentForm;

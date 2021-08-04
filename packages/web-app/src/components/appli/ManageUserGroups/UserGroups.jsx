@@ -7,7 +7,7 @@ import {
   CircularProgress,
   FormControlLabel,
   Switch,
-  Typography,
+  Typography
 } from '@material-ui/core';
 
 import GROUPS from '../../../helpers/GroupHelper';
@@ -25,7 +25,7 @@ const UserGroups = ({
   isLoading,
   onSaveGroups,
   selectedUser,
-  setSelectedUser,
+  setSelectedUser
 }) => {
   const { formatMessage } = useIntl();
 
@@ -35,15 +35,13 @@ const UserGroups = ({
       ? selectedUser.groups.reduce(
           (groupsHaveChanged, g) =>
             groupsHaveChanged ||
-            !initialUser.groups.some(
-              (initialGroup) => g.id === initialGroup.id,
-            ),
-          false,
+            !initialUser.groups.some(initialGroup => g.id === initialGroup.id),
+          false
         ) || selectedUser.groups.length !== initialUser.groups.length
       : false;
 
   const handleGroupChange = (userId, groupId, isChecked) => {
-    const newGroups = selectedUser.groups.filter((g) => g.id !== groupId);
+    const newGroups = selectedUser.groups.filter(g => g.id !== groupId);
     if (isChecked === true) {
       newGroups.push({ id: groupId });
     }
@@ -55,19 +53,17 @@ const UserGroups = ({
       <Typography variant="h3" gutterBottom>
         {formatMessage({ id: 'Groups' })}
       </Typography>
-      {GROUPS.filter((g) => g.canBeChanged).map((possibleGroup) => (
+      {GROUPS.filter(g => g.canBeChanged).map(possibleGroup => (
         <FormControlLabel
           key={possibleGroup.id}
           control={
             <Switch
-              checked={selectedUser.groups.some(
-                (g) => g.id === possibleGroup.id,
-              )}
-              onChange={(event) =>
+              checked={selectedUser.groups.some(g => g.id === possibleGroup.id)}
+              onChange={event =>
                 handleGroupChange(
                   selectedUser.id,
                   possibleGroup.id,
-                  event.target.checked,
+                  event.target.checked
                 )
               }
               name={possibleGroup.name}
@@ -81,16 +77,14 @@ const UserGroups = ({
 
       <SpacedButton
         onClick={() => setSelectedUser(initialUser)}
-        disabled={!userGroupsHaveChanged || isLoading}
-      >
+        disabled={!userGroupsHaveChanged || isLoading}>
         {formatMessage({ id: 'Reset' })}
       </SpacedButton>
 
       <SpacedButton
         onClick={onSaveGroups}
         color={isLoading ? 'default' : 'primary'}
-        disabled={!userGroupsHaveChanged || isLoading}
-      >
+        disabled={!userGroupsHaveChanged || isLoading}>
         {isLoading ? (
           <CircularProgress size={20} color="primary" />
         ) : (
@@ -103,15 +97,15 @@ const UserGroups = ({
 
 UserGroups.propTypes = {
   initialUser: PropTypes.shape({
-    groups: PropTypes.arrayOf(PropTypes.any),
+    groups: PropTypes.arrayOf(PropTypes.any)
   }),
   isLoading: PropTypes.bool.isRequired,
   onSaveGroups: PropTypes.func.isRequired,
   selectedUser: PropTypes.shape({
     id: PropTypes.number,
-    groups: PropTypes.arrayOf(PropTypes.any),
+    groups: PropTypes.arrayOf(PropTypes.any)
   }),
-  setSelectedUser: PropTypes.func.isRequired,
+  setSelectedUser: PropTypes.func.isRequired
 };
 
 export default UserGroups;

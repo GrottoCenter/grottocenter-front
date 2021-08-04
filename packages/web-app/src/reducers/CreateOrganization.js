@@ -1,13 +1,13 @@
 import {
   POST_ORGANIZATION,
   POST_ORGANIZATION_FAILURE,
-  POST_ORGANIZATION_SUCCESS,
+  POST_ORGANIZATION_SUCCESS
 } from '../actions/CreateOrganization';
 
 const initialState = {
   error: null,
   isLoading: false,
-  organization: null,
+  organization: null
 };
 
 const createOrganization = (state = initialState, action) => {
@@ -15,18 +15,18 @@ const createOrganization = (state = initialState, action) => {
     case POST_ORGANIZATION:
       return {
         ...initialState,
-        isLoading: true,
+        isLoading: true
       };
     case POST_ORGANIZATION_SUCCESS:
       return {
         ...initialState,
         isLoading: false,
-        organization: action.organization,
+        organization: action.organization
       };
     case POST_ORGANIZATION_FAILURE:
       return {
         ...initialState,
-        error: action.error,
+        error: action.error
       };
     default:
       return state;

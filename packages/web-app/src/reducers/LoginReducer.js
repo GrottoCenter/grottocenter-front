@@ -5,15 +5,9 @@ import {
   FETCH_LOGIN_SUCCESS,
   DISPLAY_LOGIN_DIALOG,
   HIDE_LOGIN_DIALOG,
-  LOGOUT,
+  LOGOUT
 } from '../actions/Login';
 import { authTokenName } from '../conf/Config';
-
-//
-//
-// D E F A U L T - S T A T E
-//
-//
 
 const removeTokenFromLocalStorage = () => {
   window.localStorage.removeItem(authTokenName);
@@ -36,11 +30,11 @@ const getRawTokenIfNotExpired = () => {
 const initialState = {
   authTokenDecoded: decode(getRawTokenIfNotExpired()),
   authorizationHeader: {
-    Authorization: `Bearer ${getRawTokenIfNotExpired()}`,
+    Authorization: `Bearer ${getRawTokenIfNotExpired()}`
   },
   error: null,
   isFetching: false,
-  isLoginDialogDisplayed: false,
+  isLoginDialogDisplayed: false
 };
 
 //
@@ -56,7 +50,7 @@ const login = (state = initialState, action) => {
         authToken: undefined,
         authorizationHeader: undefined,
         isFetching: true,
-        error: null,
+        error: null
       };
     case FETCH_LOGIN_SUCCESS:
       window.localStorage.setItem(authTokenName, action.token);
@@ -66,13 +60,13 @@ const login = (state = initialState, action) => {
         authorizationHeader: { Authorization: `Bearer ${action.token}` },
         error: null,
         isFetching: false,
-        authTokenDecoded: action.tokenDecoded,
+        authTokenDecoded: action.tokenDecoded
       };
     case FETCH_LOGIN_FAILURE:
       return {
         ...state,
         isFetching: false,
-        error: action.error,
+        error: action.error
       };
     case DISPLAY_LOGIN_DIALOG:
       return { ...state, isLoginDialogDisplayed: true };
@@ -84,7 +78,7 @@ const login = (state = initialState, action) => {
         ...state,
         authToken: undefined,
         authorizationHeader: undefined,
-        authTokenDecoded: null,
+        authTokenDecoded: null
       };
     default:
       return state;

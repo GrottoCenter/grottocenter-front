@@ -20,8 +20,8 @@ export const CaveSystem = ({ children }) => {
   const { formatMessage } = useIntl();
   const {
     state: {
-      cave: { name, author, creationDate, lastEditor, editionDate },
-    },
+      cave: { name, author, creationDate, lastEditor, editionDate }
+    }
   } = useContext(CaveContext);
 
   const footer = `${formatMessage({ id: 'Created by' })}
@@ -29,7 +29,7 @@ export const CaveSystem = ({ children }) => {
         ${lastEditor &&
           editionDate &&
           ` - ${formatMessage({
-            id: 'Last modification by',
+            id: 'Last modification by'
           })} - ${lastEditor} (
           ${editionDate})`}`;
 
@@ -42,8 +42,7 @@ export const CaveSystem = ({ children }) => {
           footer={footer}
           icon={<CustomIcon type="cave_system" />}
         />
-      }
-    >
+      }>
       {children}
     </Layout>
   );
@@ -56,13 +55,13 @@ const HydratedCaveSystem = ({ children, ...props }) => (
 );
 
 CaveSystem.propTypes = {
-  children: PropTypes.node.isRequired,
+  children: PropTypes.node.isRequired
 };
 
 HydratedCaveSystem.propTypes = {
   data: caveTypes.isRequired,
   loading: PropTypes.bool,
-  children: PropTypes.node.isRequired,
+  children: PropTypes.node.isRequired
 };
 
 export default HydratedCaveSystem;

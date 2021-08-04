@@ -16,34 +16,21 @@ import { sideMenuWidth } from '../../conf/Config';
 import checkPermission from '../../helpers/Permissions';
 import { VIEW_SIDEMENU } from '../../conf/Rights';
 
-//
-//
-// S T Y L I N G - C O M P O N E N T S
-//
-//
-
 const Menubar = withTheme(styled(Drawer)`
   > div {
     width: ${sideMenuWidth} !important;
     top: 60px !important;
-    background-color: ${(props) => props.theme.palette.primary1Color} !important;
+    background-color: ${props => props.theme.palette.primary1Color} !important;
   }
 `);
 
-//
-//
-// M A I N - C O M P O N E N T
-//
-//
-
-const SideMenu = (props) => (
-  <Menubar open={props.visible}>
+const SideMenu = ({ visible }) => (
+  <Menubar open={visible}>
     <ComplexMenuEntryConnector
       identifier="entry1"
       open={false}
       icon={<ArrowDownIcon />}
-      text={<Translate>Entries</Translate>}
-    >
+      text={<Translate>Entries</Translate>}>
       <SimpleMenuEntryConnector
         identifier="entrysub1"
         open={false}
@@ -63,8 +50,7 @@ const SideMenu = (props) => (
       identifier="cave1"
       open={false}
       icon={<ArrowDownIcon />}
-      text={<Translate>Caves</Translate>}
-    >
+      text={<Translate>Caves</Translate>}>
       <SimpleMenuEntryConnector
         identifier="cavesub1"
         open={false}
@@ -105,7 +91,7 @@ const SideMenu = (props) => (
 );
 
 SideMenu.propTypes = {
-  visible: PropTypes.bool.isRequired,
+  visible: PropTypes.bool.isRequired
 };
 
 export default checkPermission(VIEW_SIDEMENU)(SideMenu);

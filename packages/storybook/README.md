@@ -8,7 +8,7 @@ Storybook is powerful frontend workshop environment tool that allows us to desig
 
 ## Usage
 
-Start storybook from here *(or the main `package.json`)* with yarn storybook
+Start storybook from here _(or the main `package.json`)_ with yarn storybook
 
 ## Warning:
 it's possible you got this [error](https://github.com/storybookjs/storybook/issues/13531)

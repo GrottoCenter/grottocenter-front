@@ -1,11 +1,11 @@
 const markers = [
   {
     name: 'Entrances',
-    url: '/images/gc-entry2.svg',
+    url: '/images/gc-entry2.svg'
   },
   {
     name: 'Caves',
-    url: '/images/entry-cluster.svg',
+    url: '/images/entry-cluster.svg'
   },
   // TODO: Not implemented yet.
   // {
@@ -14,8 +14,8 @@ const markers = [
   // },
   {
     name: 'Organizations',
-    url: '/images/club.svg',
-  },
+    url: '/images/club.svg'
+  }
 ];
 
 export default markers;

@@ -7,7 +7,7 @@ import {
   FilledInput,
   InputAdornment,
   IconButton,
-  Fade,
+  Fade
 } from '@material-ui/core';
 
 import Visibility from '@material-ui/icons/Visibility';
@@ -27,7 +27,7 @@ const LoginForm = ({
   onEmailChange,
   password,
   onPasswordChange,
-  authErrors,
+  authErrors
 }) => {
   const [isPasswordVisible, setIsPasswordVisible] = React.useState(false);
   const { formatMessage } = useIntl();
@@ -35,14 +35,14 @@ const LoginForm = ({
   const toggleIsPasswordVisible = () => {
     setIsPasswordVisible(!isPasswordVisible);
   };
-  const handleMouseDownPassword = (event) => {
+  const handleMouseDownPassword = event => {
     event.preventDefault();
   };
 
-  const handleEmailChange = (event) => {
+  const handleEmailChange = event => {
     onEmailChange(event.target.value);
   };
-  const handlePasswordChange = (event) => {
+  const handlePasswordChange = event => {
     onPasswordChange(event.target.value);
   };
 
@@ -77,8 +77,7 @@ const LoginForm = ({
                   aria-label="toggle password visibility"
                   onClick={toggleIsPasswordVisible}
                   onMouseDown={handleMouseDownPassword}
-                  edge="end"
-                >
+                  edge="end">
                   {isPasswordVisible ? <Visibility /> : <VisibilityOff />}
                 </IconButton>
               </InputAdornment>
@@ -89,7 +88,7 @@ const LoginForm = ({
 
         {authErrors.length > 0 && (
           <FormControl>
-            {authErrors.map((error) => (
+            {authErrors.map(error => (
               <Fade in={authErrors.length > 0} key={error}>
                 <ErrorMessage message={formatMessage({ id: error })} />
               </Fade>
@@ -106,7 +105,7 @@ LoginForm.propTypes = {
   email: PropTypes.string.isRequired,
   onEmailChange: PropTypes.func.isRequired,
   password: PropTypes.string.isRequired,
-  onPasswordChange: PropTypes.func.isRequired,
+  onPasswordChange: PropTypes.func.isRequired
 };
 
 export default LoginForm;

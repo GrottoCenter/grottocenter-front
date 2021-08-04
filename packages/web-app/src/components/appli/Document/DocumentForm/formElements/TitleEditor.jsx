@@ -7,19 +7,15 @@ import { DocumentFormContext } from '../Provider';
 
 import StringInput from '../../../../common/Form/StringInput';
 
-// ===================================
-
 const TitleContainer = styled.div`
   flex: 12;
   min-width: 300px;
 `;
 
-// ===================================
-
 const TitleEditor = ({ required = false }) => {
   const {
     docAttributes: { title },
-    updateAttribute,
+    updateAttribute
   } = useContext(DocumentFormContext);
   const { formatMessage } = useIntl();
 
@@ -30,21 +26,22 @@ const TitleEditor = ({ required = false }) => {
         <StringInput
           helperText={formatMessage({
             id:
-              'Copy the title of the text as it is. In its absence, put a fictitious title between [].',
+              'Copy the title of the text as it is. In its absence, put a fictitious title between [].'
           })}
-          onValueChange={(value) => updateAttribute('title', value)}
+          onValueChange={value => updateAttribute('title', value)}
           value={title}
           valueName={formatMessage({ id: 'Title' })}
           required={required}
         />
       </TitleContainer>
     ),
-    memoizedValues,
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    memoizedValues
   );
 };
 
 TitleEditor.propTypes = {
-  required: PropTypes.bool,
+  required: PropTypes.bool
 };
 
 export default TitleEditor;

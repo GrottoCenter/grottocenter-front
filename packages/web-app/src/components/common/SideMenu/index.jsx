@@ -56,12 +56,12 @@ SideMenu.propTypes = {
   AutoCompleteSearch: PropTypes.oneOfType([
     PropTypes.node,
     PropTypes.element,
-    PropTypes.func,
-  ]),
+    PropTypes.func
+  ])
 };
 
 UserInformation.propTypes = {
-  isAuth: PropTypes.bool,
+  isAuth: PropTypes.bool
 };
 
 export default SideMenu;

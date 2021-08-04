@@ -58,7 +58,7 @@ const data = {
       longitude: 5.81689,
       mountain: 'Sainte-Baume (massif de la)',
       altitude: 748,
-      isDivingCave: true,
+      isDivingCave: true
     },
     {
       id: 'entry2',
@@ -80,9 +80,9 @@ const data = {
       longitude: 5.82089,
       mountain: 'Sainte-Baume (massif de la)',
       altitude: 748,
-      isDivingCave: true,
-    },
-  ],
+      isDivingCave: true
+    }
+  ]
 };
 
 const Content = ({ title, icon }) => {
@@ -107,7 +107,7 @@ const Content = ({ title, icon }) => {
 
 Content.propTypes = {
   title: PropTypes.string.isRequired,
-  icon: PropTypes.element,
+  icon: PropTypes.element
 };
 
 // eslint-disable-next-line react/prop-types
@@ -140,8 +140,7 @@ const WithLayout = () => {
       isSideMenuOpen={isSideMenuOpen}
       toggleSideMenu={toggleSideMenu}
       HeaderQuickSearch={Search}
-      SideBarQuickSearch={Search}
-    >
+      SideBarQuickSearch={Search}>
       <EntryWithContent />
     </Layout>
   );
@@ -151,7 +150,7 @@ const WithLayout = () => {
 const WithStateEntriesList = ({ loading }) => {
   const {
     state: { selectedEntries, entries },
-    action: { onSelectEntry },
+    action: { onSelectEntry }
   } = useContext(CaveContext);
 
   return (
@@ -165,7 +164,7 @@ const WithStateEntriesList = ({ loading }) => {
 };
 
 storiesOf('Cave system', module)
-  .addDecorator((storyFn) => (
+  .addDecorator(storyFn => (
     <StoryContextProvider loading={boolean('Loading', false)}>
       {storyFn()}
     </StoryContextProvider>

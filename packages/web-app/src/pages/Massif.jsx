@@ -8,10 +8,11 @@ import { loadMassif } from '../actions/Massif';
 const MassifPage = () => {
   const { massifId } = useParams();
   const dispatch = useDispatch();
-  const { massif, isFetching, error } = useSelector((state) => state.massif);
+  const { massif, isFetching, error } = useSelector(state => state.massif);
 
   useEffect(() => {
     dispatch(loadMassif(massifId));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [massifId]);
 
   return <Massif isFetching={isFetching || !isNil(error)} massif={massif} />;

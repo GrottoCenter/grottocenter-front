@@ -9,13 +9,14 @@ const DocumentLanguageSelect = ({
   contextValueName,
   helperText,
   labelText,
-  required,
+  required
 }) => {
   const dispatch = useDispatch();
-  const { languages: allLanguages } = useSelector((state) => state.language);
+  const { languages: allLanguages } = useSelector(state => state.language);
 
   useEffect(() => {
     dispatch(loadLanguages(true));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
@@ -33,7 +34,7 @@ DocumentLanguageSelect.propTypes = {
   contextValueName: PropTypes.string.isRequired,
   helperText: PropTypes.string,
   labelText: PropTypes.string,
-  required: PropTypes.bool.isRequired,
+  required: PropTypes.bool.isRequired
 };
 
 export default DocumentLanguageSelect;

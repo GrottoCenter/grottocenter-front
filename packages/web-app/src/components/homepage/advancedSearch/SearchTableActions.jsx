@@ -7,23 +7,21 @@ import IconButton from '@material-ui/core/IconButton';
 import KeyboardArrowLeft from '@material-ui/icons/KeyboardArrowLeft';
 import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight';
 
-// ==========================
-
-const actionsStyles = (theme) => ({
+const actionsStyles = theme => ({
   root: {
     flexShrink: 0,
     color: theme.palette.text.secondary,
-    marginLeft: theme.spacing(2.5),
-  },
+    marginLeft: theme.spacing(2.5)
+  }
 });
 
 class TablePaginationActions extends React.Component {
-  handleBackButtonClick = (event) => {
+  handleBackButtonClick = event => {
     const { onChangePage, page } = this.props;
     onChangePage(event, page - 1);
   };
 
-  handleNextButtonClick = (event) => {
+  handleNextButtonClick = event => {
     const { onChangePage, page } = this.props;
     onChangePage(event, page + 1);
   };
@@ -36,16 +34,22 @@ class TablePaginationActions extends React.Component {
         <IconButton
           onClick={this.handleBackButtonClick}
           disabled={page === 0}
-          aria-label="Previous Page"
-        >
-          {theme.direction === 'rtl' ? <KeyboardArrowRight /> : <KeyboardArrowLeft />}
+          aria-label="Previous Page">
+          {theme.direction === 'rtl' ? (
+            <KeyboardArrowRight />
+          ) : (
+            <KeyboardArrowLeft />
+          )}
         </IconButton>
         <IconButton
           onClick={this.handleNextButtonClick}
           disabled={page * size + size >= count}
-          aria-label="Next Page"
-        >
-          {theme.direction === 'rtl' ? <KeyboardArrowLeft /> : <KeyboardArrowRight />}
+          aria-label="Next Page">
+          {theme.direction === 'rtl' ? (
+            <KeyboardArrowLeft />
+          ) : (
+            <KeyboardArrowRight />
+          )}
         </IconButton>
       </div>
     );
@@ -53,12 +57,14 @@ class TablePaginationActions extends React.Component {
 }
 
 TablePaginationActions.propTypes = {
-  classes: PropTypes.shape({}).isRequired,
+  classes: PropTypes.shape({ root: PropTypes.string }).isRequired,
   count: PropTypes.number.isRequired,
   onChangePage: PropTypes.func.isRequired,
   page: PropTypes.number.isRequired,
   size: PropTypes.number.isRequired,
-  theme: PropTypes.shape({}).isRequired,
+  theme: PropTypes.shape({ direction: PropTypes.string }).isRequired
 };
 
-export default withStyles(actionsStyles, { withTheme: true })(TablePaginationActions);
+export default withStyles(actionsStyles, { withTheme: true })(
+  TablePaginationActions
+);

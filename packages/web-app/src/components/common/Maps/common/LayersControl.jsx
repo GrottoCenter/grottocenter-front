@@ -2,7 +2,7 @@ import React from 'react';
 import { head, pluck } from 'ramda';
 import {
   LayersControl as LeafletLayersControl,
-  TileLayer,
+  TileLayer
 } from 'react-leaflet';
 import PropTypes from 'prop-types';
 
@@ -12,15 +12,14 @@ const possibleLayers = pluck('name', layers);
 
 const LayersControl = ({
   position = 'topleft',
-  initialLayerChecked = head(possibleLayers),
+  initialLayerChecked = head(possibleLayers)
 }) => (
   <LeafletLayersControl position={position}>
-    {layers.map((layer) => (
+    {layers.map(layer => (
       <LeafletLayersControl.BaseLayer
         key={layer.name}
         checked={layer.name === initialLayerChecked}
-        name={layer.name}
-      >
+        name={layer.name}>
         <TileLayer attribution={layer.attribution} url={layer.url} />
       </LeafletLayersControl.BaseLayer>
     ))}
@@ -32,9 +31,9 @@ LayersControl.propTypes = {
     'topright',
     'topleft',
     'bottomright',
-    'bottomleft',
+    'bottomleft'
   ]),
-  initialLayerChecked: PropTypes.oneOf(possibleLayers),
+  initialLayerChecked: PropTypes.oneOf(possibleLayers)
 };
 
 export default LayersControl;
