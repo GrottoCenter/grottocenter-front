@@ -9,23 +9,21 @@ import { DocumentFormContext } from '../Provider';
 import AutoCompleteSearchComponent from '../../../../common/AutoCompleteSearch';
 import { AutoCompleteSearchTypes } from '../../../../common/AutoCompleteSearch/types';
 
-// ===================================
-
-const SearchBar = (props) => {
+const SearchBar = props => {
   const {
     contextValueName,
     fetchSearchResults,
     getValueName,
     resetSearchResults,
-    inputValue: defaultInputValue = '',
+    inputValue: defaultInputValue = ''
   } = props;
   const {
     docAttributes: { [contextValueName]: value, partOf },
-    updateAttribute,
+    updateAttribute
   } = useContext(DocumentFormContext);
   const [inputValue, setInputValue] = React.useState(defaultInputValue);
   const debouncedInput = useDebounce(inputValue);
-  const handleInputChange = (newValue) => {
+  const handleInputChange = newValue => {
     if (value && getValueName(value) === newValue) {
       setInputValue('');
     } else {
@@ -35,7 +33,7 @@ const SearchBar = (props) => {
 
   const isValueForced = pathOr(null, [contextValueName], partOf) !== null;
 
-  const handleSelection = (newValue) => {
+  const handleSelection = newValue => {
     // Defensive programming because the selection is triggerred
     // when the input is emptied.
     if (newValue !== null) {
@@ -59,6 +57,7 @@ const SearchBar = (props) => {
     } else {
       resetSearchResults();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debouncedInput]);
 
   return (
@@ -85,7 +84,7 @@ SearchBar.propTypes = {
   getValueName: PropTypes.func.isRequired,
   resetSearchResults: PropTypes.func.isRequired,
   ...SearchBarInheritedProps,
-  inputValue: PropTypes.string,
+  inputValue: PropTypes.string
 };
 
 export default SearchBar;

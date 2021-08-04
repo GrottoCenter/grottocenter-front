@@ -7,12 +7,6 @@ import Typography from '@material-ui/core/Typography/Typography';
 import Translate from '../common/Translate';
 import { paypalLink, paypalImgLink, paypalId } from '../../conf/Config';
 
-//
-//
-// S T Y L I N G - C O M P O N E N T S
-//
-//
-
 const btEyeCatcher = keyframes`
   {
     0.3% {
@@ -70,7 +64,7 @@ const DonateFormWrapper = styled.div`
 `;
 
 const DonateButton = withStyles(
-  (theme) => ({
+  theme => ({
     root: {
       backgroundColor: theme.palette.accent1Color,
       color: theme.palette.textIconColor,
@@ -78,43 +72,43 @@ const DonateButton = withStyles(
       marginTop: '10px',
 
       '&:hover': {
-        backgroundColor: theme.palette.accent1Color,
+        backgroundColor: theme.palette.accent1Color
       },
 
       '&>div': {
         textAlign: 'center',
-        whiteSpace: 'nowrap',
+        whiteSpace: 'nowrap'
       },
 
       '& > span': {
-        textTransform: 'none',
-      },
-    },
+        textTransform: 'none'
+      }
+    }
   }),
-  { withTheme: true },
+  { withTheme: true }
 )(Button);
 
 const StyledGiftIcon = withStyles(
-  (theme) => ({
+  theme => ({
     root: {
       fill: theme.palette.textIconColor,
       width: '20px',
       height: '30px',
-      marginRight: '10px',
-    },
+      marginRight: '10px'
+    }
   }),
-  { withTheme: true },
+  { withTheme: true }
 )(GiftIcon);
 
 const StyledTypography = withStyles(
-  (theme) => ({
+  theme => ({
     root: {
       fontSize: 'small',
       textAlign: 'center',
-      color: theme.palette.textIconColor,
-    },
+      color: theme.palette.textIconColor
+    }
   }),
-  { withTheme: true },
+  { withTheme: true }
 )(Typography);
 
 const DonateForm = () => (

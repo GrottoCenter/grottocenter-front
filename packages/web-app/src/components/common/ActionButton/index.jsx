@@ -17,8 +17,7 @@ const ActionButton = ({
       disabled={disabled || loading}
       onClick={onClick}
       endIcon={icon}
-      {...buttonProps}
-    >
+      {...buttonProps}>
       {loading && (
         <CircularProgress
           style={{ marginRight: '8px' }}
@@ -38,7 +37,7 @@ ActionButton.propTypes = {
   loading: PropTypes.bool,
   disabled: PropTypes.bool,
   color: PropTypes.oneOf(['primary', 'secondary']),
-  icon: PropTypes.element,
+  icon: PropTypes.element
 };
 
 export default ActionButton;

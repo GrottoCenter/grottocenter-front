@@ -31,10 +31,10 @@ CustomIcon.propTypes = {
     'depth',
     'length',
     'cave_system',
-    'bibliography',
+    'bibliography'
   ]).isRequired,
   size: PropTypes.number,
-  margin: PropTypes.number,
+  margin: PropTypes.number
 };
 
 export default CustomIcon;

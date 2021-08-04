@@ -7,39 +7,39 @@ export const FETCH_IDENTIFIER_TYPES_SUCCESS = 'FETCH_IDENTIFIER_TYPES_SUCCESS';
 export const FETCH_IDENTIFIER_TYPES_FAILURE = 'FETCH_IDENTIFIER_TYPES_FAILURE';
 
 export const fetchIdentifierTypes = () => ({
-  type: FETCH_IDENTIFIER_TYPES,
+  type: FETCH_IDENTIFIER_TYPES
 });
 
-export const fetchIdentifierTypesSuccess = (identifierTypes) => ({
+export const fetchIdentifierTypesSuccess = identifierTypes => ({
   type: FETCH_IDENTIFIER_TYPES_SUCCESS,
-  identifierTypes,
+  identifierTypes
 });
 
-export const fetchIdentifierTypesFailure = (error) => ({
+export const fetchIdentifierTypesFailure = error => ({
   type: FETCH_IDENTIFIER_TYPES_FAILURE,
-  error,
+  error
 });
 
 export function loadIdentifierTypes() {
-  return (dispatch) => {
+  return dispatch => {
     dispatch(fetchIdentifierTypes());
 
     return fetch(identifierTypesUrl)
-      .then((response) => {
+      .then(response => {
         if (response.status >= 400) {
           throw new Error(response.status);
         }
         return response.text();
       })
-      .then((text) =>
-        dispatch(fetchIdentifierTypesSuccess(JSON.parse(text).identifierTypes)),
+      .then(text =>
+        dispatch(fetchIdentifierTypesSuccess(JSON.parse(text).identifierTypes))
       )
-      .catch((error) =>
+      .catch(error =>
         dispatch(
           fetchIdentifierTypesFailure(
-            makeErrorMessage(error.message, `Fetching identifier types`),
-          ),
-        ),
+            makeErrorMessage(error.message, `Fetching identifier types`)
+          )
+        )
       );
   };
 }

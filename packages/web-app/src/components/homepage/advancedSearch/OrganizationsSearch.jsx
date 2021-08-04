@@ -12,7 +12,7 @@ import {
   Switch,
   Typography,
   FormLabel,
-  FormHelperText,
+  FormHelperText
 } from '@material-ui/core';
 
 import SliderForm from './SliderForm';
@@ -37,7 +37,7 @@ class OrganizationsSearch extends React.Component {
       'number of cavers-range': {
         isEditable: false,
         min: numberOfCaversMinValue,
-        max: numberOfCaversMaxValue,
+        max: numberOfCaversMaxValue
       },
       city: '',
       county: '',
@@ -45,7 +45,7 @@ class OrganizationsSearch extends React.Component {
       name: '',
       postal_code: '',
       region: '',
-      matchAllFields: true,
+      matchAllFields: true
     };
   };
 
@@ -57,7 +57,7 @@ class OrganizationsSearch extends React.Component {
    */
   handleValueChange = (keyName, event) => {
     this.setState({
-      [keyName]: event.target.value,
+      [keyName]: event.target.value
     });
   };
 
@@ -72,14 +72,14 @@ class OrganizationsSearch extends React.Component {
     keyName,
     values,
     minValueAuthorized,
-    maxValueAuthorized,
+    maxValueAuthorized
   ) => {
     const newState = {
       [keyName]: {
         ...this.state[keyName], // eslint-disable-line react/destructuring-assignment
         min: values[0] < minValueAuthorized ? minValueAuthorized : values[0],
-        max: values[1] > maxValueAuthorized ? maxValueAuthorized : values[1],
-      },
+        max: values[1] > maxValueAuthorized ? maxValueAuthorized : values[1]
+      }
     };
     this.setState(newState);
   };
@@ -88,19 +88,19 @@ class OrganizationsSearch extends React.Component {
    * Set the state of the keyname property
    * to be the same value as the event of the slider.
    */
-  handleCheckedChange = (keyName) => (event) => {
+  handleCheckedChange = keyName => event => {
     const newState = {
       [keyName]: {
         ...this.state[keyName], // eslint-disable-line react/destructuring-assignment
-        isEditable: event.target.checked,
-      },
+        isEditable: event.target.checked
+      }
     };
     this.setState(newState);
   };
 
-  handleBooleanChange = (keyName) => (event) => {
+  handleBooleanChange = keyName => event => {
     this.setState({
-      [keyName]: event.target.checked,
+      [keyName]: event.target.checked
     });
   };
 
@@ -116,7 +116,7 @@ class OrganizationsSearch extends React.Component {
       startAdvancedsearch,
       numberOfCaversMinValue,
       numberOfCaversMaxValue,
-      intl,
+      intl
     } = this.props;
 
     const {
@@ -127,7 +127,7 @@ class OrganizationsSearch extends React.Component {
       name,
       postal_code,
       region,
-      matchAllFields,
+      matchAllFields
     } = this.state;
 
     return (
@@ -136,19 +136,17 @@ class OrganizationsSearch extends React.Component {
           <form
             noValidate
             autoComplete="off"
-            onSubmit={(event) => {
+            onSubmit={event => {
               event.preventDefault();
               startAdvancedsearch(this.state, resourceType);
             }}
-            className={classes.formContainer}
-          >
+            className={classes.formContainer}>
             <Typography variant="h6">
               <Translate>Organization properties</Translate>
             </Typography>
             <div
               className={classes.formPartContainer}
-              style={{ justifyContent: 'flex-start' }}
-            >
+              style={{ justifyContent: 'flex-start' }}>
               <TextField
                 className={classes.formElement}
                 label={
@@ -156,23 +154,23 @@ class OrganizationsSearch extends React.Component {
                     <Translate>Organization name</Translate>
                   </span>
                 }
-                onChange={(event) => this.handleValueChange('name', event)}
+                onChange={event => this.handleValueChange('name', event)}
                 value={name}
               />
               <SliderForm
                 label={intl.formatMessage({
-                  id: 'Number of cavers',
+                  id: 'Number of cavers'
                 })}
                 disabled={!numberOfCaversRange.isEditable}
                 onDisable={this.handleCheckedChange('number of cavers-range')}
                 min={numberOfCaversMinValue}
                 max={numberOfCaversMaxValue}
-                onChange={(values) => {
+                onChange={values => {
                   this.handleRangeChange(
                     'number of cavers-range',
                     values,
                     numberOfCaversMinValue,
-                    numberOfCaversMaxValue,
+                    numberOfCaversMaxValue
                   );
                 }}
                 value={[numberOfCaversRange.min, numberOfCaversRange.max]}
@@ -192,7 +190,7 @@ class OrganizationsSearch extends React.Component {
                       <Translate>City</Translate>
                     </span>
                   }
-                  onChange={(event) => this.handleValueChange('city', event)}
+                  onChange={event => this.handleValueChange('city', event)}
                   value={city}
                 />
 
@@ -203,7 +201,7 @@ class OrganizationsSearch extends React.Component {
                       <Translate>Postal code</Translate>
                     </span>
                   }
-                  onChange={(event) =>
+                  onChange={event =>
                     this.handleValueChange('postal_code', event)
                   }
                   value={postal_code}
@@ -216,7 +214,7 @@ class OrganizationsSearch extends React.Component {
                       <Translate>County</Translate>
                     </span>
                   }
-                  onChange={(event) => this.handleValueChange('county', event)}
+                  onChange={event => this.handleValueChange('county', event)}
                   value={county}
                 />
 
@@ -227,7 +225,7 @@ class OrganizationsSearch extends React.Component {
                       <Translate>Region</Translate>
                     </span>
                   }
-                  onChange={(event) => this.handleValueChange('region', event)}
+                  onChange={event => this.handleValueChange('region', event)}
                   value={region}
                 />
 
@@ -238,7 +236,7 @@ class OrganizationsSearch extends React.Component {
                       <Translate>Country</Translate>
                     </span>
                   }
-                  onChange={(event) => this.handleValueChange('country', event)}
+                  onChange={event => this.handleValueChange('country', event)}
                   value={country}
                 />
               </div>
@@ -246,8 +244,7 @@ class OrganizationsSearch extends React.Component {
 
             <div
               className={classes.formPartContainer}
-              style={{ justifyContent: 'flex-start' }}
-            >
+              style={{ justifyContent: 'flex-start' }}>
               <FormControl>
                 <FormLabel className={classes.formLabel}>
                   <span>
@@ -293,12 +290,12 @@ OrganizationsSearch.propTypes = {
   numberOfCaversMinValue: PropTypes.number,
   numberOfCaversMaxValue: PropTypes.number,
 
-  intl: PropTypes.shape({}).isRequired,
+  intl: PropTypes.shape({ formatMessage: PropTypes.func }).isRequired
 };
 
 OrganizationsSearch.defaultProps = {
   numberOfCaversMinValue: 0,
-  numberOfCaversMaxValue: 100,
+  numberOfCaversMaxValue: 100
 };
 
 export default injectIntl(withStyles(styles)(OrganizationsSearch));

@@ -2,7 +2,7 @@ import fetch from 'isomorphic-fetch';
 import {
   getAdminsUrl,
   getModeratorsUrl,
-  postCaverGroupsUrl,
+  postCaverGroupsUrl
 } from '../conf/Config';
 
 // ==========
@@ -21,18 +21,18 @@ export const GET_MODERATORS_FAILURE = 'GET_MODERATORS_FAILURE';
 // ==========
 
 export const postCaverGroupsAction = () => ({
-  type: POST_CAVER_GROUPS,
+  type: POST_CAVER_GROUPS
 });
 
-export const postCaverGroupsActionSuccess = (httpCode) => ({
+export const postCaverGroupsActionSuccess = httpCode => ({
   type: POST_CAVER_GROUPS_SUCCESS,
-  httpCode,
+  httpCode
 });
 
 export const postCaverGroupsActionFailure = (errorMessages, httpCode) => ({
   type: POST_CAVER_GROUPS_FAILURE,
   errorMessages,
-  httpCode,
+  httpCode
 });
 
 export function postCaverGroups(caverId, groups) {
@@ -42,74 +42,72 @@ export function postCaverGroups(caverId, groups) {
     const requestOptions = {
       method: 'POST',
       body: JSON.stringify({
-        groups,
+        groups
       }),
-      headers: getState().login.authorizationHeader,
+      headers: getState().login.authorizationHeader
     };
 
-    return fetch(postCaverGroupsUrl(caverId), requestOptions).then(
-      (response) => {
-        return response.text().then((responseText) => {
-          if (response.status >= 400) {
-            const errorMessages = [];
-            switch (response.status) {
-              case 400:
-                errorMessages.push(`Bad request: ${responseText}`);
-                break;
-              case 401:
-                errorMessages.push(
-                  'You must be authenticated to change an caver groups.',
-                );
-                break;
-              case 403:
-                errorMessages.push(
-                  'You are not authorized to change an caver groups.',
-                );
-                break;
-              case 404:
-                errorMessages.push(
-                  'Server-side update of an caver groups is not available.',
-                );
-                break;
-              case 500:
-                errorMessages.push(
-                  'A server error occurred, please try again later or contact Wikicaves for more information.',
-                );
-                break;
-              default:
-                break;
-            }
-            dispatch(
-              postCaverGroupsActionFailure(errorMessages, response.status),
-            );
-            throw new Error(
-              `Fetching ${postCaverGroupsUrl(caverId)} status: ${
-                response.status
-              }`,
-              errorMessages,
-            );
-          } else {
-            dispatch(postCaverGroupsActionSuccess(response.status));
+    return fetch(postCaverGroupsUrl(caverId), requestOptions).then(response => {
+      return response.text().then(responseText => {
+        if (response.status >= 400) {
+          const errorMessages = [];
+          switch (response.status) {
+            case 400:
+              errorMessages.push(`Bad request: ${responseText}`);
+              break;
+            case 401:
+              errorMessages.push(
+                'You must be authenticated to change an caver groups.'
+              );
+              break;
+            case 403:
+              errorMessages.push(
+                'You are not authorized to change an caver groups.'
+              );
+              break;
+            case 404:
+              errorMessages.push(
+                'Server-side update of an caver groups is not available.'
+              );
+              break;
+            case 500:
+              errorMessages.push(
+                'A server error occurred, please try again later or contact Wikicaves for more information.'
+              );
+              break;
+            default:
+              break;
           }
-          return response;
-        });
-      },
-    );
+          dispatch(
+            postCaverGroupsActionFailure(errorMessages, response.status)
+          );
+          throw new Error(
+            `Fetching ${postCaverGroupsUrl(caverId)} status: ${
+              response.status
+            }`,
+            errorMessages
+          );
+        } else {
+          dispatch(postCaverGroupsActionSuccess(response.status));
+        }
+        return response;
+      });
+    });
   };
 }
 
 export const getAdminsAction = () => ({
-  type: GET_ADMINS,
+  type: GET_ADMINS
 });
 
-export const getAdminsActionSuccess = (admins) => ({
+export const getAdminsActionSuccess = admins => ({
   type: GET_ADMINS_SUCCESS,
-  admins,
+  admins
 });
 
-export const getAdminsActionFailure = (errorMessage) => ({
+export const getAdminsActionFailure = errorMessage => ({
   type: GET_ADMINS_FAILURE,
-  errorMessage,
+  errorMessage
 });
 
 export function getAdmins() {
@@ -118,35 +116,33 @@ export function getAdmins() {
 
     const requestOptions = {
       method: 'GET',
-      headers: getState().login.authorizationHeader,
+      headers: getState().login.authorizationHeader
     };
 
     return fetch(getAdminsUrl, requestOptions)
-      .then((response) => {
+      .then(response => {
         if (response.status >= 400) {
           const errorMessage = `Fetching ${getAdminsUrl} status: ${response.status}`;
           dispatch(getAdminsActionFailure(errorMessage));
         }
         return response.text();
       })
-      .then((text) =>
-        dispatch(getAdminsActionSuccess(JSON.parse(text).cavers)),
-      );
+      .then(text => dispatch(getAdminsActionSuccess(JSON.parse(text).cavers)));
   };
 }
 
 export const getModeratorsAction = () => ({
-  type: GET_MODERATORS,
+  type: GET_MODERATORS
 });
 
-export const getModeratorsActionSuccess = (moderators) => ({
+export const getModeratorsActionSuccess = moderators => ({
   type: GET_MODERATORS_SUCCESS,
-  moderators,
+  moderators
 });
 
-export const getModeratorsActionFailure = (errorMessage) => ({
+export const getModeratorsActionFailure = errorMessage => ({
   type: GET_MODERATORS_FAILURE,
-  errorMessage,
+  errorMessage
 });
 
 export function getModerators() {
@@ -154,19 +150,19 @@ export function getModerators() {
     dispatch(getModeratorsAction());
     const requestOptions = {
       method: 'GET',
-      headers: getState().login.authorizationHeader,
+      headers: getState().login.authorizationHeader
     };
 
     return fetch(getModeratorsUrl, requestOptions)
-      .then((response) => {
+      .then(response => {
         if (response.status >= 400) {
           const errorMessage = `Fetching ${getModeratorsUrl} status: ${response.status}`;
           dispatch(getModeratorsActionFailure(errorMessage));
         }
         return response.text();
       })
-      .then((text) =>
-        dispatch(getModeratorsActionSuccess(JSON.parse(text).cavers)),
+      .then(text =>
+        dispatch(getModeratorsActionSuccess(JSON.parse(text).cavers))
       );
   };
 }

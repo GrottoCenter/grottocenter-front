@@ -8,7 +8,7 @@ import { cleanError } from '../actions/Error';
 const ErrorHandler = () => {
   const dispatch = useDispatch();
   const { formatMessage } = useIntl();
-  const { error } = useSelector((state) => state.error);
+  const { error } = useSelector(state => state.error);
   const { onError, onWarning } = useNotification();
 
   useEffect(() => {
@@ -21,43 +21,43 @@ const ErrorHandler = () => {
         case 400:
           onError(
             `${formatMessage({
-              id: 'Invalid request',
-            })} - ${errorMessage}`,
+              id: 'Invalid request'
+            })} - ${errorMessage}`
           );
           break;
         case 404:
           onError(
             `${formatMessage({
-              id: 'The resource you are looking was not found',
-            })} - ${errorMessage}`,
+              id: 'The resource you are looking was not found'
+            })} - ${errorMessage}`
           );
           break;
         case 409:
           onError(
             `${formatMessage({
-              id: 'Conflict',
-            })} - ${errorMessage}`,
+              id: 'Conflict'
+            })} - ${errorMessage}`
           );
           break;
         case 500:
           onError(
             `${formatMessage({
-              id: 'A server error occurred',
-            })} - ${errorMessage}`,
+              id: 'A server error occurred'
+            })} - ${errorMessage}`
           );
           break;
         case 401:
           onWarning(
             `${formatMessage({
-              id: 'You must be authenticated',
-            })} - ${errorMessage}`,
+              id: 'You must be authenticated'
+            })} - ${errorMessage}`
           );
           break;
         case 403:
           onWarning(
             `${formatMessage({
-              id: 'You are not authorized',
-            })} - ${errorMessage}`,
+              id: 'You are not authorized'
+            })} - ${errorMessage}`
           );
           break;
         default:
@@ -65,6 +65,7 @@ const ErrorHandler = () => {
       }
       dispatch(cleanError());
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [error]);
 
   return <div />;

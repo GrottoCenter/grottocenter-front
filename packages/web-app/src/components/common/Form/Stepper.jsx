@@ -7,31 +7,29 @@ import {
   FormControl,
   Step,
   StepLabel,
-  Stepper as MuiStepper,
+  Stepper as MuiStepper
 } from '@material-ui/core';
 import NavigateNextIcon from '@material-ui/icons/NavigateNext';
 import NavigateBeforeIcon from '@material-ui/icons/NavigateBefore';
 import Translate from '../Translate';
 
 // ===================================
-const NextStepButton = (props) => (
+const NextStepButton = props => (
   <Button
     {...props}
     variant="contained"
     color="primary"
-    endIcon={<NavigateNextIcon />}
-  >
+    endIcon={<NavigateNextIcon />}>
     <Translate>Next</Translate>
   </Button>
 );
 
-const PreviousStepButton = (props) => (
+const PreviousStepButton = props => (
   <Button
     {...props}
     variant="contained"
     color="primary"
-    startIcon={<NavigateBeforeIcon />}
-  >
+    startIcon={<NavigateBeforeIcon />}>
     <Translate>Back</Translate>
   </Button>
 );
@@ -48,16 +46,15 @@ const Stepper = ({
   completedSteps,
   handleStepBack,
   handleStepNext,
-  isNextStepButtonDisabled,
+  isNextStepButtonDisabled
 }) => (
   <>
     <MuiStepper activeStep={currentFormStepId.id - 1} alternativeLabel>
-      {formSteps.map((step) => (
+      {formSteps.map(step => (
         <Step
           key={step.id}
           active={step.id === currentFormStepId}
-          completed={includes(step.id, completedSteps)}
-        >
+          completed={includes(step.id, completedSteps)}>
           <StepLabel>
             <Translate>{step.name}</Translate>
           </StepLabel>
@@ -84,13 +81,13 @@ Stepper.propTypes = {
   formSteps: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.number.isRequired,
-      name: PropTypes.string.isRequired,
-    }),
+      name: PropTypes.string.isRequired
+    })
   ).isRequired,
   completedSteps: PropTypes.arrayOf(PropTypes.number).isRequired,
   handleStepBack: PropTypes.func.isRequired,
   handleStepNext: PropTypes.func.isRequired,
-  isNextStepButtonDisabled: PropTypes.bool.isRequired,
+  isNextStepButtonDisabled: PropTypes.bool.isRequired
 };
 
 export default Stepper;

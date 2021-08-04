@@ -6,7 +6,7 @@ import {
   FormHelperText,
   IconButton,
   InputLabel,
-  Collapse,
+  Collapse
 } from '@material-ui/core';
 
 import { isNil } from 'ramda';
@@ -52,7 +52,7 @@ const FormAutoComplete = ({
   sideActionIcon,
   sideActionDisabled = true,
   isSideActionOpen = false,
-  children,
+  children
 }) => {
   return (
     <>
@@ -60,8 +60,7 @@ const FormAutoComplete = ({
         variant="filled"
         required={required}
         error={hasError}
-        fullWidth
-      >
+        fullWidth>
         <InputLabel error={required && value === null}>
           <Translate>{label}</Translate>
         </InputLabel>
@@ -75,8 +74,7 @@ const FormAutoComplete = ({
           <StyledFormControl
             variant="filled"
             required={required}
-            error={hasError}
-          >
+            error={hasError}>
             <InputWrapper>
               {autoCompleteSearch}
               {!isNil(children) && (
@@ -89,8 +87,7 @@ const FormAutoComplete = ({
                 onClick={onSideAction}
                 disabled={sideActionDisabled}
                 color="secondary"
-                aria-label="new entity"
-              >
+                aria-label="new entity">
                 {!isNil(sideActionIcon) ? (
                   sideActionIcon
                 ) : (
@@ -108,7 +105,7 @@ const FormAutoComplete = ({
 };
 
 FormAutoComplete.propTypes = {
-  ...FormAutoCompleteTypes,
+  ...FormAutoCompleteTypes
 };
 
 export default FormAutoComplete;

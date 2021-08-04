@@ -17,7 +17,7 @@ const advancedSearchTypes = {
   ENTRANCES: 'entrances',
   ORGANIZATIONS: 'grottos',
   MASSIFS: 'massifs',
-  DOCUMENTS: 'documents',
+  DOCUMENTS: 'documents'
 };
 
 const TabIcon = styled.img`
@@ -31,7 +31,7 @@ const AdvancedSearch = ({
   resetAdvancedSearch,
   startAdvancedsearch,
   getSubjects,
-  subjects,
+  subjects
 }) => {
   const [selectedType, setSelectedType] = React.useState(0);
 
@@ -134,7 +134,7 @@ AdvancedSearch.propTypes = {
   resetAdvancedSearch: PropTypes.func.isRequired,
   startAdvancedsearch: PropTypes.func.isRequired,
   getSubjects: PropTypes.func.isRequired,
-  subjects: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
+  subjects: PropTypes.arrayOf(PropTypes.shape({})).isRequired
 };
 
 AdvancedSearch.defaultProps = {};

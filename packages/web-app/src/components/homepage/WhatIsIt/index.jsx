@@ -1,26 +1,22 @@
 import React from 'react';
 import styled from 'styled-components';
 import { withTheme } from '@material-ui/core/styles';
-import LandingSection from './LandingSection';
+import LandingSection from '../LandingSection';
 import {
   GridRow,
   GridOneHalfColumn,
-  GridFullColumn,
-} from '../../helpers/GridSystem';
-import Translate from '../common/Translate';
-import GCLink from '../common/GCLink';
-import InternationalizedLink from '../common/InternationalizedLink';
-import { wikiBBSLinks } from '../../conf/Config';
-import DynamicNumberConnector from '../../containers/DynamicNumberConnector';
+  GridFullColumn
+} from '../../../helpers/GridSystem';
+import Translate from '../../common/Translate';
+import GCLink from '../../common/GCLink';
+import InternationalizedLink from '../../common/InternationalizedLink';
+import { wikiBBSLinks } from '../../../conf/Config';
+import DynamicNumberConnector from '../../../containers/DynamicNumberConnector';
 
-//
-//
-// S T Y L I N G - C O M P O N E N T S
-//
-//
+import './style.css';
 
 const SectionTitle = withTheme(styled.h3`
-  color: ${(props) => props.theme.palette.accent1Color};
+  color: ${props => props.theme.palette.accent1Color};
   text-align: center;
   padding-bottom: 50px;
   font-size: 35px;
@@ -59,7 +55,7 @@ const NumberBlockFullWidth = styled(GridFullColumn)`
 const BlockIcon = withTheme(styled.span`
   margin-right: 10px;
   font-size: 4.2em;
-  color: ${(props) => props.theme.palette.primary1Color};
+  color: ${props => props.theme.palette.primary1Color};
   line-height: 1;
 
   :before {
@@ -76,19 +72,13 @@ const BbsIcon = styled.img`
 `;
 
 const NumberText = withTheme(styled(DynamicNumberConnector)`
-  color: ${(props) => props.theme.palette.primary1Color};
+  color: ${props => props.theme.palette.primary1Color};
   font-weight: 400;
 `);
 
 const BigNumberText = withTheme(styled(NumberText)`
   font-size: 2.7em;
 `);
-
-//
-//
-// M A I N - C O M P O N E N T
-//
-//
 
 const WhatIsIt = () => (
   <LandingSection>

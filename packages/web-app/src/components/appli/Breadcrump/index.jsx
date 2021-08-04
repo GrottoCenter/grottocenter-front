@@ -8,22 +8,16 @@ import { breadcrumpKeys } from '../../../conf/Config';
 import GCLink from '../../common/GCLink';
 import Translate from '../../common/Translate';
 
-//
-//
-// S T Y L I N G - C O M P O N E N T S
-//
-//
-
 const BreadcrumpBar = withTheme(styled.div`
-  color: ${(props) => props.theme.palette.primary1Color} !important;
-  background-color: ${(props) => props.theme.palette.primary3Color} !important;
+  color: ${props => props.theme.palette.primary1Color} !important;
+  background-color: ${props => props.theme.palette.primary3Color} !important;
   padding: 0px !important;
   height: ${({ theme }) => theme.breadcrumpHeight}px;
 
   & > a,
   & > a:visited {
     font-weight: 300;
-    color: ${(props) => props.theme.palette.primary1Color} !important;
+    color: ${props => props.theme.palette.primary1Color} !important;
 
     :hover,
     :active {
@@ -32,7 +26,7 @@ const BreadcrumpBar = withTheme(styled.div`
   }
 
   & > svg {
-    color: ${(props) => props.theme.palette.primary1Color} !important;
+    color: ${props => props.theme.palette.primary1Color} !important;
   }
 `);
 
@@ -50,12 +44,6 @@ const StyledHomeIcon = styled(HomeIcon)`
   padding-right: 5px;
 `;
 
-//
-//
-// M A I N - C O M P O N E N T
-//
-//
-
 const Breadcrump = () => {
   const location = useLocation();
   const [breadcrump, setBreadcrump] = useState([]);
@@ -65,7 +53,7 @@ const Breadcrump = () => {
     const cutPath = path.split('/');
     let itr = 0;
     const newBreadcrump = [];
-    cutPath.forEach((item) => {
+    cutPath.forEach(item => {
       if (item.trim().length > 0) {
         itr += 1;
         if (newBreadcrump.length > 0) {
@@ -78,12 +66,12 @@ const Breadcrump = () => {
                 return `${previousValue}/${currentValue}`;
               }
               return previousValue;
-            },
+            }
           );
           newBreadcrump.push(
             <StyledLink internal href={link} key={`l${item}`}>
               <Translate>{breadcrumpKeys[item]}</Translate>
-            </StyledLink>,
+            </StyledLink>
           );
         }
       }

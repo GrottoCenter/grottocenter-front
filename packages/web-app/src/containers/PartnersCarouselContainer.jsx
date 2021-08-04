@@ -8,13 +8,13 @@ import PartnersCarousel from '../components/homepage/PartnersCarousel';
 //
 //
 
-const mapDispatchToProps = (dispatch) => ({
-  fetch: () => dispatch(loadPartnersForCarousel()),
+const mapDispatchToProps = dispatch => ({
+  fetch: () => dispatch(loadPartnersForCarousel())
 });
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = state => ({
   isFetching: state.partnersCarousel.isFetching,
-  partners: state.partnersCarousel.partners,
+  partners: state.partnersCarousel.partners
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(PartnersCarousel);

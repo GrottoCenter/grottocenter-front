@@ -9,11 +9,11 @@ const StyledList = withStyles({
   root: {
     display: 'flex',
     flexWrap: 'wrap',
-    width: '100%',
-  },
+    width: '100%'
+  }
 })(List);
 
-const CavesList = (props) => {
+const CavesList = props => {
   const { caves, title, emptyMessageComponent } = props;
 
   return (
@@ -24,7 +24,7 @@ const CavesList = (props) => {
           <StyledList>
             {caves
               .sort((a, b) => a.name > b.name)
-              .map((cave) => (
+              .map(cave => (
                 <CaveListItem key={cave.id} cave={cave} />
               ))}
           </StyledList>
@@ -43,7 +43,7 @@ const CavesList = (props) => {
 CavesList.propTypes = {
   caves: PropTypes.arrayOf(PropTypes.object),
   title: PropTypes.node,
-  emptyMessageComponent: PropTypes.node,
+  emptyMessageComponent: PropTypes.node
 };
 
 CavesList.defaultProps = {
@@ -53,7 +53,7 @@ CavesList.defaultProps = {
       <Translate>Caves list</Translate>
     </strong>
   ),
-  emptyMessageComponent: <Translate>Empty list</Translate>,
+  emptyMessageComponent: <Translate>Empty list</Translate>
 };
 
 export default CavesList;

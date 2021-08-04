@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 
 export const ActionColumnIds = {
   selection: 'selection',
-  detailedView: 'detailedView',
+  detailedView: 'detailedView'
 };
 
 export const CustomHeaderCell = ({
@@ -14,7 +14,7 @@ export const CustomHeaderCell = ({
   customRenders,
   onSort,
   orderBy,
-  order,
+  order
 }) => {
   const customRender =
     !isNil(customRenders) && !isNil(customRenders(id))
@@ -30,8 +30,7 @@ export const CustomHeaderCell = ({
         <TableSortLabel
           active={orderBy === id}
           direction={orderBy === id ? order : 'asc'}
-          onClick={onSort(id)}
-        >
+          onClick={onSort(id)}>
           {displayedValue}
         </TableSortLabel>
       ) : (
@@ -44,7 +43,7 @@ export const CustomHeaderCell = ({
 CustomHeaderCell.propTypes = {
   id: PropTypes.oneOfType([
     PropTypes.string.isRequired,
-    PropTypes.number.isRequired,
+    PropTypes.number.isRequired
   ]),
   value: PropTypes.oneOfType([
     PropTypes.string.isRequired,
@@ -52,15 +51,15 @@ CustomHeaderCell.propTypes = {
     PropTypes.arrayOf(
       PropTypes.oneOfType([
         PropTypes.string.isRequired,
-        PropTypes.number.isRequired,
-      ]),
+        PropTypes.number.isRequired
+      ])
     ),
-    PropTypes.any,
+    PropTypes.any
   ]),
   customRenders: PropTypes.func,
   onSort: PropTypes.func,
   orderBy: PropTypes.string,
-  order: PropTypes.oneOf(['asc', 'desc']),
+  order: PropTypes.oneOf(['asc', 'desc'])
 };
 
 export default CustomHeaderCell;

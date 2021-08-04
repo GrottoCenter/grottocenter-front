@@ -12,87 +12,85 @@ export const SUBJECTS_SEARCH_FAILURE = 'SUBJECTS_SEARCH_FAILURE';
 export const RESET_SUBJECTS_SEARCH = 'RESET_SUBJECTS_SEARCH';
 
 export const fetchSubjects = () => ({
-  type: FETCH_SUBJECTS,
+  type: FETCH_SUBJECTS
 });
 
-export const fetchSubjectsSuccess = (subjects) => ({
+export const fetchSubjectsSuccess = subjects => ({
   type: FETCH_SUBJECTS_SUCCESS,
-  subjects,
+  subjects
 });
 
-export const fetchSubjectsFailure = (error) => ({
+export const fetchSubjectsFailure = error => ({
   type: FETCH_SUBJECTS_FAILURE,
-  error,
+  error
 });
 
 export const subjectsSearch = () => ({
-  type: SUBJECTS_SEARCH,
+  type: SUBJECTS_SEARCH
 });
 
-export const subjectsSearchSuccess = (subjects) => ({
+export const subjectsSearchSuccess = subjects => ({
   type: SUBJECTS_SEARCH_SUCCESS,
-  subjects,
+  subjects
 });
 
-export const subjectsSearchFailure = (error) => ({
+export const subjectsSearchFailure = error => ({
   type: SUBJECTS_SEARCH_FAILURE,
-  error,
+  error
 });
 
 export const resetSubjectsSearch = () => ({
-  type: RESET_SUBJECTS_SEARCH,
+  type: RESET_SUBJECTS_SEARCH
 });
 
 export function loadSubjects() {
-  return (dispatch) => {
+  return dispatch => {
     dispatch(fetchSubjects());
 
     return fetch(subjectsUrl)
-      .then((response) => {
+      .then(response => {
         if (response.status >= 400) {
           throw new Error(response.status);
         }
         return response.text();
       })
-      .then((text) => dispatch(fetchSubjectsSuccess(JSON.parse(text).subjects)))
-      .catch((error) =>
+      .then(text => dispatch(fetchSubjectsSuccess(JSON.parse(text).subjects)))
+      .catch(error =>
         dispatch(
           fetchSubjectsFailure(
-            makeErrorMessage(error.message, `Fetching subjects`),
-          ),
-        ),
+            makeErrorMessage(error.message, `Fetching subjects`)
+          )
+        )
       );
   };
 }
 
 export function loadSubjectsSearch(subjectCode, subjectName) {
-  return (dispatch) => {
+  return dispatch => {
     dispatch(subjectsSearch());
     return fetch(subjectsSearchUrl, {
       method: 'POST',
       body: JSON.stringify({
         code: subjectCode,
-        name: subjectName,
-      }),
+        name: subjectName
+      })
     })
-      .then((response) => {
+      .then(response => {
         if (response.status >= 400) {
           throw new Error(response.status);
         }
         return response.text();
       })
-      .then((text) =>
-        dispatch(subjectsSearchSuccess(JSON.parse(text).subjects)),
-      )
-      .catch((error) =>
+      .then(text => dispatch(subjectsSearchSuccess(JSON.parse(text).subjects)))
+      .catch(error =>
         dispatch(
           subjectsSearchFailure(
             makeErrorMessage(
               error.message,
-              `Fetching subjects search ${subjectName}`,
-            ),
-          ),
-        ),
+              `Fetching subjects search ${subjectName}`
+            )
+          )
+        )
       );
   };
 }

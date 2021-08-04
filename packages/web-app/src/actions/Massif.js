@@ -7,37 +7,37 @@ export const FETCH_MASSIF_SUCCESS = 'FETCH_MASSIF_SUCCESS';
 export const FETCH_MASSIF_FAILURE = 'FETCH_MASSIF_FAILURE';
 
 export const fetchMassif = () => ({
-  type: FETCH_MASSIF,
+  type: FETCH_MASSIF
 });
 
-export const fetchMassifSuccess = (massif) => ({
+export const fetchMassifSuccess = massif => ({
   type: FETCH_MASSIF_SUCCESS,
-  massif,
+  massif
 });
 
-export const fetchMassifFailure = (error) => ({
+export const fetchMassifFailure = error => ({
   type: FETCH_MASSIF_FAILURE,
-  error,
+  error
 });
 
 export function loadMassif(massifId) {
-  return (dispatch) => {
+  return dispatch => {
     dispatch(fetchMassif());
 
     return fetch(findMassifUrl + massifId)
-      .then((response) => {
+      .then(response => {
         if (response.status >= 400) {
           throw new Error(response.status);
         }
         return response.text();
       })
-      .then((text) => dispatch(fetchMassifSuccess(JSON.parse(text))))
-      .catch((error) =>
+      .then(text => dispatch(fetchMassifSuccess(JSON.parse(text))))
+      .catch(error =>
         dispatch(
           fetchMassifFailure(
-            makeErrorMessage(error.message, `Fetching massif id ${massifId}`),
-          ),
-        ),
+            makeErrorMessage(error.message, `Fetching massif id ${massifId}`)
+          )
+        )
       );
   };
 }

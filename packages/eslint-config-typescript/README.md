@@ -20,24 +20,22 @@ npx install-peerdeps or manually add -D
 
 ## Usage
 
-Create / update  `.eslintrc` `.eslintrc.js` file with the following content:
+Create / update `.eslintrc` `.eslintrc.js` file with the following content:
 
 ```json
 {
-  "extends": [
-    "@grotto-front/eslint-config-typescript"
-  ]
+  "extends": ["@grotto-front/eslint-config-typescript"]
 }
 ```
 
 ```js
 module.exports = {
-    extends: ['@@grotto-front/eslint-config-typescript']
+  extends: ['@@grotto-front/eslint-config-typescript']
 };
 ```
 
 ---
 
-*If you want to test new rules you can clone the project and use [npm link](https://docs.npmjs.com/cli/v6/commands/npm-link)*
+_If you want to test new rules you can clone the project and use [npm link](https://docs.npmjs.com/cli/v6/commands/npm-link)_
 
-*You might need to restart your IDE after config modifications*
+_You might need to restart your IDE after config modifications_

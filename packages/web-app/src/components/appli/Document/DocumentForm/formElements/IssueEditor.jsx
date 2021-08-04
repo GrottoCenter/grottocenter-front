@@ -10,10 +10,10 @@ import StringInput from '../../../../common/Form/StringInput';
 const IssueEditor = ({ helperText, valueName, required = false }) => {
   const {
     docAttributes: { issue },
-    updateAttribute,
+    updateAttribute
   } = useContext(DocumentFormContext);
 
-  const onValueChange = (newValue) => {
+  const onValueChange = newValue => {
     updateAttribute('issue', newValue);
   };
 
@@ -32,7 +32,7 @@ const IssueEditor = ({ helperText, valueName, required = false }) => {
 IssueEditor.propTypes = {
   helperText: PropTypes.string.isRequired,
   required: PropTypes.bool,
-  valueName: PropTypes.string.isRequired,
+  valueName: PropTypes.string.isRequired
 };
 
 export default IssueEditor;

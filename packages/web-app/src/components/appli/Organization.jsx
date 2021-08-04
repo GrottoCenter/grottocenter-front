@@ -7,7 +7,7 @@ import {
   Card,
   CardContent,
   CardHeader,
-  Typography,
+  Typography
 } from '@material-ui/core';
 import styled from 'styled-components';
 import EmailIcon from '@material-ui/icons/Email';
@@ -75,15 +75,13 @@ const Organization = ({ isFetching, organization }) => {
                   color="primary"
                   badgeContent={
                     !isNil(organization.cavers) ? organization.cavers.length : 0
-                  }
-                >
+                  }>
                   <CaverIcon src="/images/caver.svg" alt="Caver icon" />
                 </StyledBadge>
 
                 <StyledBadge
                   color="primary"
-                  badgeContent={organization.exploredCaves.length}
-                >
+                  badgeContent={organization.exploredCaves.length}>
                   <EntryIcon src="/images/entry-cluster.svg" alt="Cave icon" />
                 </StyledBadge>
               </>
@@ -111,7 +109,7 @@ const Organization = ({ isFetching, organization }) => {
               <StyledLocationIcon color="primary" />
               <Typography>
                 {`${safeGet(['country'])} - ${safeGet(['region'])} - ${safeGet([
-                  'county',
+                  'county'
                 ])}`}
                 {!isNil(organization.city) && ` - ${organization.city}`}
                 {!isNil(organization.village) && ` - ${organization.village}`}
@@ -166,8 +164,10 @@ const Organization = ({ isFetching, organization }) => {
 Organization.propTypes = {
   // TODO : mark some properties as required + add details for the "any""
   classes: PropTypes.shape({
+    // eslint-disable-next-line react/forbid-prop-types
     root: PropTypes.any,
-    badge: PropTypes.any,
+    // eslint-disable-next-line react/forbid-prop-types
+    badge: PropTypes.any
   }).isRequired,
   isFetching: PropTypes.bool.isRequired,
   organization: PropTypes.shape({
@@ -184,13 +184,15 @@ Organization.propTypes = {
     village: PropTypes.string,
     exploredCaves: PropTypes.arrayOf(PropTypes.any),
     partneredCaves: PropTypes.arrayOf(PropTypes.any),
+    // eslint-disable-next-line react/forbid-prop-types
     cavers: PropTypes.any,
-    yearBirth: PropTypes.any,
-  }),
+    // eslint-disable-next-line react/forbid-prop-types
+    yearBirth: PropTypes.any
+  })
 };
 
 Organization.defaultProps = {
-  organization: undefined,
+  organization: undefined
 };
 
 export default Organization;

@@ -9,16 +9,14 @@ import Translate from '../components/common/Translate';
 import StandardDialog from '../components/common/StandardDialog';
 import LoginForm from '../components/common/LoginForm';
 
-// ===========================
-
 const Login = () => {
   const dispatch = useDispatch();
-  const authState = useSelector((state) => state.login);
+  const authState = useSelector(state => state.login);
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
   const [authErrorMessages, setAuthErrorMessages] = React.useState([]);
 
-  const onLogin = (event) => {
+  const onLogin = event => {
     event.preventDefault();
 
     const newAuthErrorMessages = [
@@ -26,7 +24,7 @@ const Login = () => {
       ...(!!isEmpty(match(emailRegexp, email)) && !isEmpty(email)
         ? ['You must provide a valid email.']
         : []),
-      ...(isEmpty(password) ? ['You must provide a password.'] : []),
+      ...(isEmpty(password) ? ['You must provide a password.'] : [])
     ];
 
     setAuthErrorMessages(newAuthErrorMessages);
@@ -41,8 +39,7 @@ const Login = () => {
       type="submit"
       size="large"
       onClick={onLogin}
-      color={authState.isFetching ? 'default' : 'primary'}
-    >
+      color={authState.isFetching ? 'default' : 'primary'}>
       {authState.isFetching ? (
         <CircularProgress size="2.8rem" />
       ) : (
@@ -56,8 +53,7 @@ const Login = () => {
       open={authState.isLoginDialogDisplayed}
       onClose={() => dispatch(hideLoginDialog())}
       title={<Translate>Log in</Translate>}
-      actions={[LoginButton]}
-    >
+      actions={[LoginButton]}>
       <LoginForm
         authErrors={authErrorMessages}
         email={email}

@@ -24,11 +24,9 @@ const Wrapper = styled.div`
 const DocumentValidationPage = () => {
   const { formatMessage } = useIntl();
   const dispatch = useDispatch();
-  const { isLoading, data, totalCount } = useSelector(
-    (state) => state.documents,
-  );
+  const { isLoading, data, totalCount } = useSelector(state => state.documents);
   const { success: isActionSuccess } = useSelector(
-    (state) => state.processDocuments,
+    state => state.processDocuments
   );
   const [selected, setSelected] = React.useState([]);
   const [page, setPage] = React.useState(0);
@@ -60,9 +58,10 @@ const DocumentValidationPage = () => {
       limit: debouncedRowsPerPage,
       skip: debouncedPage * debouncedRowsPerPage,
       sortBy: debouncedOrderBy,
-      orderBy: debouncedOrder,
+      orderBy: debouncedOrder
     };
     dispatch(getDocuments(reject(isNil, criteria)));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debouncedRowsPerPage, debouncedOrderBy, debouncedOrder, debouncedPage]);
 
   const handleSuccessfulUpdate = () => {
@@ -121,8 +120,7 @@ const DocumentValidationPage = () => {
         scrollable
         open={!isNil(detailedView)}
         onClose={closeDetailedView}
-        title={formatMessage({ id: 'Detailed document view' })}
-      >
+        title={formatMessage({ id: 'Detailed document view' })}>
         <DocumentDetails id={detailedView} />
       </StandardDialog>
       <StandardDialog
@@ -132,8 +130,7 @@ const DocumentValidationPage = () => {
         scrollable
         open={!isNil(editView)}
         onClose={closeEditView}
-        title={formatMessage({ id: 'Edit document' })}
-      >
+        title={formatMessage({ id: 'Edit document' })}>
         <DocumentEdit
           onSuccessfulUpdate={handleSuccessfulUpdate}
           id={editView}

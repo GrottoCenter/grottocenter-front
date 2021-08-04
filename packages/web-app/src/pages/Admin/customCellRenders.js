@@ -4,8 +4,8 @@ const makeCustomCellRenders = () => {
   return [
     {
       id: 'groups',
-      customRender: pipe(map(propOr('', 'name')), reject(isEmpty), join(', ')),
-    },
+      customRender: pipe(map(propOr('', 'name')), reject(isEmpty), join(', '))
+    }
   ];
 };
 

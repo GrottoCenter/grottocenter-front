@@ -43,8 +43,7 @@ const ActionButton = ({ Icon, label, onClick }) => {
           aria-label={label}
           size="small"
           disabled={isNil(onClick)}
-          onClick={onClick}
-        >
+          onClick={onClick}>
           {Icon}
         </StyledFab>
       </span>
@@ -87,12 +86,12 @@ const ActionBar = ({ printRef }) => {
 ActionButton.propTypes = {
   Icon: PropTypes.node.isRequired,
   label: PropTypes.string.isRequired,
-  onClick: PropTypes.func,
+  onClick: PropTypes.func
 };
 
 ActionBar.propTypes = {
   // eslint-disable-next-line react/forbid-prop-types
-  printRef: PropTypes.any.isRequired,
+  printRef: PropTypes.any.isRequired
 };
 
 export default ActionBar;

@@ -6,12 +6,6 @@ import InternationalizedLink from '../common/InternationalizedLink';
 import { contactLinks, legalLinks, contributorsLink } from '../../conf/Config';
 import Translate from '../common/Translate';
 
-//
-//
-// S T Y L I N G - C O M P O N E N T S
-//
-//
-
 const FooterLinksList = styled.ul`
   list-style: none;
   font-size: large;
@@ -25,22 +19,18 @@ const FooterLinksLi = styled.li`
 const SocialLink = styled.div`
   text-decoration: none;
   font-size: medium;
-  color: ${(props) => props.theme.palette.textIconColor};
+  color: ${props => props.theme.palette.textIconColor};
 
   :hover {
-    color: ${(props) => props.theme.palette.accent1Color};
+    color: ${props => props.theme.palette.accent1Color};
   }
 `;
 
 const SocialGCLink = withTheme(SocialLink.withComponent(GCLink));
 
-const SocialIntlLink = withTheme(SocialLink.withComponent(InternationalizedLink));
-
-//
-//
-// M A I N - C O M P O N E N T
-//
-//
+const SocialIntlLink = withTheme(
+  SocialLink.withComponent(InternationalizedLink)
+);
 
 const FooterLinks = () => (
   <FooterLinksList>

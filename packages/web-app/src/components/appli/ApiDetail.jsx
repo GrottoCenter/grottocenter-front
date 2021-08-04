@@ -5,14 +5,8 @@ import Card from '@material-ui/core/Card';
 import { withStyles, withTheme } from '@material-ui/core/styles';
 import styled from 'styled-components';
 
-//
-//
-// S T Y L I N G - C O M P O N E N T S
-//
-//
-
 const StyledWrapper = withTheme(styled.div`
-  color: ${(props) => props.theme.palette.textIconColor};
+  color: ${props => props.theme.palette.textIconColor};
 `);
 
 const StyledCard = withStyles({
@@ -20,15 +14,9 @@ const StyledCard = withStyles({
     width: '80%',
     margin: 'auto',
     paddingRight: '40px',
-    paddingBottom: '20px',
-  },
+    paddingBottom: '20px'
+  }
 })(Card);
-
-//
-//
-// M A I N - C O M P O N E N T
-//
-//
 
 class ApiDetail extends Component {
   componentDidMount() {
@@ -38,7 +26,7 @@ class ApiDetail extends Component {
         url: `/swagger/apiV${version}.yaml`,
         dom_id: '#swaggerContainer',
         deepLinking: true,
-        presets: [SwaggerUIBundle.presets.apis],
+        presets: [SwaggerUIBundle.presets.apis]
       });
     }
   }
@@ -55,7 +43,7 @@ class ApiDetail extends Component {
 }
 
 ApiDetail.propTypes = {
-  version: PropTypes.number.isRequired,
+  version: PropTypes.number.isRequired
 };
 
 export default ApiDetail;

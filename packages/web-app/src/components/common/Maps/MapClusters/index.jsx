@@ -18,7 +18,7 @@ import { MARKERS_LIMIT } from './constants';
 
 const ZOOM_STATE = {
   MARKERS: 1,
-  HEAT: 2,
+  HEAT: 2
 };
 
 const HydratedMap = ({
@@ -30,7 +30,7 @@ const HydratedMap = ({
   projectionsList,
   zoom,
   onUpdate,
-  center,
+  center
 }) => {
   const { updateHeatData } = useHeatLayer(entrances);
   const [selectedHeat, setSelectedHeat] = useState('entrances');
@@ -41,23 +41,23 @@ const HydratedMap = ({
   const prevZoom = useRef(zoom);
   const currentPosition = useCurrentPosition(center);
 
-  const handleUpdateMarkers = (newSelection) => {
+  const handleUpdateMarkers = newSelection => {
     setSelectedMarkers(newSelection);
     if (zoomState.current === ZOOM_STATE.MARKERS) {
       setVisibleMarkers(
-        pipe(append(selectedHeat), uniq, without('none'))(newSelection),
+        pipe(append(selectedHeat), uniq, without('none'))(newSelection)
       );
     } else {
       setVisibleMarkers(newSelection);
     }
   };
-  const handleUpdateHeat = (newHeat) => {
+  const handleUpdateHeat = newHeat => {
     setSelectedHeat(newHeat);
     if (zoomState.current === ZOOM_STATE.HEAT) {
       setVisibleHeat(newHeat);
     } else {
       setVisibleMarkers(
-        pipe(append(newHeat), uniq, without('none'))(selectedMarkers),
+        pipe(append(newHeat), uniq, without('none'))(selectedMarkers)
       );
     }
   };
@@ -71,7 +71,7 @@ const HydratedMap = ({
       // do not update visible markers if it's already displayed
       if (zoomState.current !== ZOOM_STATE.MARKERS) {
         setVisibleMarkers(
-          pipe(append(selectedHeat), uniq, without('none'))(selectedMarkers),
+          pipe(append(selectedHeat), uniq, without('none'))(selectedMarkers)
         );
         setVisibleHeat('none');
         zoomState.current = ZOOM_STATE.MARKERS;
@@ -92,7 +92,7 @@ const HydratedMap = ({
       markers: visibleMarkers,
       zoom: map.getZoom(),
       center: map.getBounds().getCenter(),
-      bounds: map.getBounds(),
+      bounds: map.getBounds()
     });
   };
 
@@ -105,6 +105,7 @@ const HydratedMap = ({
   });
   useEffect(() => {
     handleUpdate();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visibleMarkers, visibleHeat]);
 
   // Update visible heat layer
@@ -119,6 +120,7 @@ const HydratedMap = ({
       default:
         updateHeatData([]);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visibleHeat, networks, entrances]);
 
   return (
@@ -144,8 +146,7 @@ const Index = ({ center, zoom, isSideMenuOpen, ...props }) => (
   <CustomMapContainer
     center={center}
     zoom={zoom}
-    isSideMenuOpen={isSideMenuOpen}
-  >
+    isSideMenuOpen={isSideMenuOpen}>
     <HydratedMap {...props} zoom={zoom} />
   </CustomMapContainer>
 );
@@ -154,7 +155,7 @@ const markerType = PropTypes.shape({
   latitude: PropTypes.number.isRequired,
   longitude: PropTypes.number.isRequired,
   id: PropTypes.number.isRequired,
-  name: PropTypes.string,
+  name: PropTypes.string
 });
 
 HydratedMap.propTypes = {
@@ -166,12 +167,12 @@ HydratedMap.propTypes = {
   projectionsList: PropTypes.arrayOf(PropTypes.any),
   zoom: PropTypes.number.isRequired,
   onUpdate: PropTypes.func,
-  center: PropTypes.arrayOf(PropTypes.number),
+  center: PropTypes.arrayOf(PropTypes.number)
 };
 
 Index.propTypes = {
   isSideMenuOpen: PropTypes.bool,
-  ...HydratedMap.propTypes,
+  ...HydratedMap.propTypes
 };
 
 export default Index;

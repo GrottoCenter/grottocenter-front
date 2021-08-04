@@ -52,7 +52,7 @@ const Layout = ({ children, fixedContent }) => {
 
 Layout.propTypes = {
   children: PropTypes.node.isRequired,
-  fixedContent: PropTypes.node.isRequired,
+  fixedContent: PropTypes.node.isRequired
 };
 
 export default Layout;

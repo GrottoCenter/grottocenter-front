@@ -6,22 +6,22 @@ import { BrowserRouter } from 'react-router-dom';
 import { withKnobs } from '@storybook/addon-knobs';
 
 export const parameters = {
-    actions: { argTypesRegex: '^on[A-Z].*' },
-    controls: { hideNoControlsWarning: true }
+  actions: { argTypesRegex: '^on[A-Z].*' },
+  controls: { hideNoControlsWarning: true }
 };
 
 export const decorators = [
-    Story => (
-        // <StylesProvider injectFirst>
-        //     <MUIThemeProvider>
-                <Story />
-            // </MUIThemeProvider>
-        // </StylesProvider>
-    ),
-    Story => (
-        <BrowserRouter>
-            <Story />
-        </BrowserRouter>
-    ),
-    withKnobs
+  Story => (
+    // <StylesProvider injectFirst>
+    //     <MUIThemeProvider>
+    <Story />
+    // </MUIThemeProvider>
+    // </StylesProvider>
+  ),
+  Story => (
+    <BrowserRouter>
+      <Story />
+    </BrowserRouter>
+  ),
+  withKnobs
 ];

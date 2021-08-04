@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import FullStarIcon from '@material-ui/icons/Star';
 import EmptyStarIcon from '@material-ui/icons/StarBorder';
@@ -7,16 +7,10 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 import styled from 'styled-components';
 import { withStyles } from '@material-ui/core';
 import { isNil } from 'ramda';
-
+import { useSelector } from 'react-redux';
 import GCLink from '../GCLink';
 import { detailPageV2Links } from '../../../conf/Config';
 import Translate from '../Translate';
-
-//
-//
-// S U B - C O M P O N E N T S
-//
-//
 
 const FlexWrapper = styled.div`
   display: flex;
@@ -39,9 +33,9 @@ const EntryData = ({ entry }) => {
 
   // TODO: improve get of the topo
   // 13 is the id of the type "TopographicData"
-  const topoDoc = documents ? documents.find((d) => d.type === 13) : null;
+  const topoDoc = documents ? documents.find(d => d.type === 13) : null;
   if (!isNil(topoDoc)) {
-    const topo = topoDoc.files.find((f) => f.pathOld !== null);
+    const topo = topoDoc.files.find(f => f.pathOld !== null);
     imageElement =
       topo && topo.pathOld ? <EntryImage src={topo.pathOld} /> : null;
   }
@@ -63,11 +57,11 @@ EntryData.propTypes = {
     documents: PropTypes.arrayOf(PropTypes.any),
     cave: PropTypes.shape({
       depth: PropTypes.number,
-      length: PropTypes.number,
+      length: PropTypes.number
     }),
     stats: PropTypes.shape({}),
-    timeInfo: PropTypes.any,
-  }).isRequired,
+    timeInfo: PropTypes.shape({})
+  }).isRequired
 };
 
 const EntryName = styled.h4`
@@ -100,8 +94,8 @@ EntryTitle.propTypes = {
     county: PropTypes.string,
     country: PropTypes.string,
     name: PropTypes.string,
-    region: PropTypes.string,
-  }).isRequired,
+    region: PropTypes.string
+  }).isRequired
 };
 
 const RatingList = styled.ul`
@@ -127,8 +121,8 @@ EntryStat.propTypes = {
   stat: PropTypes.shape({
     aestheticism: PropTypes.number,
     approach: PropTypes.number,
-    caving: PropTypes.number,
-  }).isRequired,
+    caving: PropTypes.number
+  }).isRequired
 };
 
 const StatEntry = styled.li`
@@ -151,20 +145,20 @@ const Stars = styled.div`
 
 const StyledFullStarIcon = withStyles({
   root: {
-    fill: '#ffd700',
-  },
+    fill: '#ffd700'
+  }
 })(FullStarIcon);
 
 const StyledHalfStarIcon = withStyles({
   root: {
-    fill: '#ffd700',
-  },
+    fill: '#ffd700'
+  }
 })(HalfStarIcon);
 
 const StyledEmptyStarIcon = withStyles({
   root: {
-    fill: '#ffd700',
-  },
+    fill: '#ffd700'
+  }
 })(EmptyStarIcon);
 
 const EntryStatItem = ({ itemLabel, itemScore }) => {
@@ -200,7 +194,7 @@ const EntryStatItem = ({ itemLabel, itemScore }) => {
 
 EntryStatItem.propTypes = {
   itemScore: PropTypes.number,
-  itemLabel: PropTypes.string.isRequired,
+  itemLabel: PropTypes.string.isRequired
 };
 
 const EntryInfos = ({ timeInfo, cave }) => (
@@ -246,13 +240,15 @@ const EntryInfos = ({ timeInfo, cave }) => (
 
 EntryInfos.propTypes = {
   timeInfo: PropTypes.shape({
+    // eslint-disable-next-line react/forbid-prop-types
     eTTrail: PropTypes.any,
-    eTUnderground: PropTypes.any,
+    // eslint-disable-next-line react/forbid-prop-types
+    eTUnderground: PropTypes.any
   }).isRequired,
   cave: PropTypes.shape({
     depth: PropTypes.number,
-    length: PropTypes.number,
-  }).isRequired,
+    length: PropTypes.number
+  }).isRequired
 };
 
 const EntryInfoWrapper = styled.div`
@@ -283,7 +279,7 @@ const EntryInfoItem = ({
   itemLabel,
   itemType,
   itemUnit,
-  itemValue,
+  itemValue
 }) => {
   if (isNil(itemValue)) {
     return <span />;
@@ -309,7 +305,7 @@ EntryInfoItem.propTypes = {
   itemUnit: PropTypes.string,
   itemLabel: PropTypes.string.isRequired,
   itemImg: PropTypes.string.isRequired,
-  itemType: PropTypes.string,
+  itemType: PropTypes.string
 };
 
 const TopoImage = styled.img`
@@ -334,7 +330,7 @@ const EntryImage = ({ src }) => (
 );
 
 EntryImage.propTypes = {
-  src: PropTypes.string.isRequired,
+  src: PropTypes.string.isRequired
 };
 
 const RandomEntryLink = styled(GCLink)`
@@ -350,49 +346,42 @@ const EntryWrapper = styled.div`
   padding: ${({ theme }) => theme.spacing(3)}px;
 `;
 
-//
-//
-// M A I N - C O M P O N E N T
-//
-//
+const RandomEntryCard = ({ entry, isFetching, fetch }) => {
+  const { locale } = useSelector(state => state.intl);
 
-class RandomEntryCard extends Component {
-  componentDidMount() {
-    const { fetch } = this.props;
+  useEffect(() => {
     fetch();
+  }, [fetch]);
+
+  if (isFetching) {
+    return <CircularProgress />;
   }
 
-  render() {
-    const { entry, isFetching } = this.props;
-    if (isFetching) {
-      return <CircularProgress />;
-    }
-    if (entry && entry.id) {
-      const detailPageV2Link =
-        detailPageV2Links[window.locale] !== undefined
-          ? detailPageV2Links[window.locale]
-          : detailPageV2Links['*'];
-      return (
-        <RandomEntryLink
-          href={`${detailPageV2Link}&category=entry&id=${entry.id}`}
-          target="blank"
-        >
-          <EntryWrapper>
-            <EntryData entry={entry} />
-          </EntryWrapper>
-        </RandomEntryLink>
-      );
-    }
-    return <div />;
+  if (entry && entry.id) {
+    const detailPageV2Link =
+      detailPageV2Links[locale] !== undefined
+        ? detailPageV2Links[locale]
+        : detailPageV2Links['*'];
+    return (
+      <RandomEntryLink
+        href={`${detailPageV2Link}&category=entry&id=${entry.id}`}
+        target="blank">
+        <EntryWrapper>
+          <EntryData entry={entry} />
+        </EntryWrapper>
+      </RandomEntryLink>
+    );
   }
-}
+  return <div />;
+};
 
 RandomEntryCard.propTypes = {
   fetch: PropTypes.func.isRequired,
   isFetching: PropTypes.bool,
   entry: PropTypes.shape({
-    id: PropTypes.any,
-  }),
+    // eslint-disable-next-line react/forbid-prop-types
+    id: PropTypes.any
+  })
 };
 
 export default RandomEntryCard;

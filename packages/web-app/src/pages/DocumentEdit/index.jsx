@@ -10,23 +10,25 @@ import docInfoGetters from './docInfoGetters';
 const DocumentEdit = ({ onSuccessfulUpdate, id }) => {
   const dispatch = useDispatch();
   const { isLoading, details, error } = useSelector(
-    (state) => state.documentDetails,
+    state => state.documentDetails
   );
 
   const { latestHttpCode, errorMessages } = useSelector(
-    (state) => state.document,
+    state => state.document
   );
 
   useEffect(() => {
     if (!isNil(id)) {
       dispatch(fetchDocumentDetails(id));
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
   useEffect(() => {
     if (latestHttpCode === 200 && isEmpty(errorMessages)) {
       onSuccessfulUpdate();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [latestHttpCode, errorMessages]);
 
   return isLoading || !isNil(error) ? (
@@ -39,7 +41,7 @@ const DocumentEdit = ({ onSuccessfulUpdate, id }) => {
         description: pipe(
           propOr([], ['descriptions']),
           head,
-          propOr(null, ['text']),
+          propOr(null, ['text'])
         )(details),
         documentMainLanguage: propOr(null, 'mainLanguage', details),
         documentType: pathOr(null, ['type'], details),
@@ -62,8 +64,8 @@ const DocumentEdit = ({ onSuccessfulUpdate, id }) => {
         titleAndDescriptionLanguage: pipe(
           propOr([], 'titles'),
           head,
-          propOr(null, 'language'),
-        )(details),
+          propOr(null, 'language')
+        )(details)
       })}
     />
   );
@@ -71,7 +73,7 @@ const DocumentEdit = ({ onSuccessfulUpdate, id }) => {
 
 DocumentEdit.propTypes = {
   onSuccessfulUpdate: PropTypes.func.isRequired,
-  id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  id: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
 };
 
 export default DocumentEdit;

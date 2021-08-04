@@ -7,39 +7,39 @@ export const FETCH_DOCUMENT_TYPES_SUCCESS = 'FETCH_DOCUMENT_TYPES_SUCCESS';
 export const FETCH_DOCUMENT_TYPES_FAILURE = 'FETCH_DOCUMENT_TYPES_FAILURE';
 
 export const fetchDocumentTypes = () => ({
-  type: FETCH_DOCUMENT_TYPES,
+  type: FETCH_DOCUMENT_TYPES
 });
 
-export const fetchDocumentTypesSuccess = (documentTypes) => ({
+export const fetchDocumentTypesSuccess = documentTypes => ({
   type: FETCH_DOCUMENT_TYPES_SUCCESS,
-  documentTypes,
+  documentTypes
 });
 
-export const fetchDocumentTypesFailure = (error) => ({
+export const fetchDocumentTypesFailure = error => ({
   type: FETCH_DOCUMENT_TYPES_FAILURE,
-  error,
+  error
 });
 
 export function loadDocumentTypes() {
-  return (dispatch) => {
+  return dispatch => {
     dispatch(fetchDocumentTypes());
 
     return fetch(getDocumentTypesUrl)
-      .then((response) => {
+      .then(response => {
         if (response.status >= 400) {
           throw new Error(response.status);
         }
         return response.text();
       })
-      .then((text) =>
-        dispatch(fetchDocumentTypesSuccess(JSON.parse(text).documentTypes)),
+      .then(text =>
+        dispatch(fetchDocumentTypesSuccess(JSON.parse(text).documentTypes))
       )
-      .catch((error) =>
+      .catch(error =>
         dispatch(
           fetchDocumentTypesFailure(
-            makeErrorMessage(error.message, `Fetching document types`),
-          ),
-        ),
+            makeErrorMessage(error.message, `Fetching document types`)
+          )
+        )
       );
   };
 }

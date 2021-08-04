@@ -13,51 +13,51 @@ export const FETCH_LOADING = 'FETCH_LOADING';
 export const resetQuicksearch = () => ({
   type: RESET_QUICKSEARCH,
   results: undefined,
-  error: undefined,
+  error: undefined
 });
 
-export const fetchQuicksearchSuccess = (results) => ({
+export const fetchQuicksearchSuccess = results => ({
   type: FETCH_QUICKSEARCH_SUCCESS,
-  results,
+  results
 });
 
-export const fetchQuicksearchFailure = (error) => ({
+export const fetchQuicksearchFailure = error => ({
   type: FETCH_QUICKSEARCH_FAILURE,
-  error,
+  error
 });
 
-export const setCurrentEntry = (entry) => ({
+export const setCurrentEntry = entry => ({
   type: SET_CURRENT_ENTRY,
-  entry,
+  entry
 });
 
 export const fetchLoading = () => ({
-  type: FETCH_LOADING,
+  type: FETCH_LOADING
 });
 
 // THUNKS
-export const fetchQuicksearchResult = (criteria) => (dispatch) => {
+export const fetchQuicksearchResult = criteria => dispatch => {
   dispatch(resetQuicksearch());
   dispatch(fetchLoading());
 
   return fetch(quicksearchUrl, {
     method: 'POST',
-    body: JSON.stringify(criteria),
+    body: JSON.stringify(criteria)
   })
-    .then((response) => {
+    .then(response => {
       if (response.status >= 400) {
         throw new Error(response.status);
       }
       return response.text();
     })
-    .then((text) => {
+    .then(text => {
       dispatch(fetchQuicksearchSuccess(JSON.parse(text).results));
     })
-    .catch((error) =>
+    .catch(error =>
       dispatch(
         fetchQuicksearchFailure(
-          makeErrorMessage(error.message, `Fetching quicksearch`),
-        ),
-      ),
+          makeErrorMessage(error.message, `Fetching quicksearch`)
+        )
+      )
     );
 };

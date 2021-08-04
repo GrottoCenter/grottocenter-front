@@ -4,15 +4,11 @@ import { useIntl } from 'react-intl';
 import styled from 'styled-components';
 import { Typography } from '@material-ui/core';
 
-// ==========
-
 const UserPropertyName = styled(Typography)`
   display: inline-block;
   margin-right: ${({ theme }) => theme.spacing(4)}px;
   width: 120px;
 `;
-
-// ==========
 
 const UserProperty = ({ propertyName, value }) => (
   <div>
@@ -20,8 +16,7 @@ const UserProperty = ({ propertyName, value }) => (
       variant="body1"
       color="primary"
       display="inline"
-      align="right"
-    >
+      align="right">
       <b>{propertyName}</b>
     </UserPropertyName>
     <Typography variant="body1" display="inline">
@@ -32,10 +27,8 @@ const UserProperty = ({ propertyName, value }) => (
 
 UserProperty.propTypes = {
   propertyName: PropTypes.string.isRequired,
-  value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  value: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
 };
-
-// ==========
 
 const UserProperties = ({ user }) => {
   const { formatMessage } = useIntl();
@@ -52,7 +45,7 @@ const UserProperties = ({ user }) => {
       <UserProperty
         propertyName={formatMessage({
           id: 'Caver.Name',
-          defaultMessage: 'Name',
+          defaultMessage: 'Name'
         })}
         value={user.name}
       />
@@ -78,8 +71,8 @@ UserProperties.propTypes = {
     mail: PropTypes.string,
     name: PropTypes.string,
     nickname: PropTypes.string,
-    surname: PropTypes.string,
-  }).isRequired,
+    surname: PropTypes.string
+  }).isRequired
 };
 
 export default UserProperties;

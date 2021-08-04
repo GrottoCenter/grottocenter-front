@@ -5,26 +5,15 @@ import {
   RESET_API_MESSAGES,
   UPDATE_DOCUMENT,
   UPDATE_DOCUMENT_FAILURE,
-  UPDATE_DOCUMENT_SUCCESS,
+  UPDATE_DOCUMENT_SUCCESS
 } from '../actions/Document';
-
-//
-//
-// D E F A U L T - S T A T E
-//
-//
 
 const initialState = {
   errorMessages: [],
   isLoading: false,
-  latestHttpCode: undefined,
+  latestHttpCode: undefined
 };
 
-//
-//
-// R E D U C E R
-//
-//
 const document = (state = initialState, action) => {
   switch (action.type) {
     case POST_DOCUMENT:
@@ -32,48 +21,48 @@ const document = (state = initialState, action) => {
         ...state,
         isLoading: true,
         errorMessages: [],
-        latestHttpCode: undefined,
+        latestHttpCode: undefined
       };
     case POST_DOCUMENT_SUCCESS:
       return {
         ...state,
         isLoading: false,
         errorMessages: [],
-        latestHttpCode: action.httpCode,
+        latestHttpCode: action.httpCode
       };
     case POST_DOCUMENT_FAILURE:
       return {
         ...state,
         isLoading: false,
         errorMessages: action.errorMessages,
-        latestHttpCode: action.httpCode,
+        latestHttpCode: action.httpCode
       };
     case RESET_API_MESSAGES:
       return {
         ...state,
         errorMessages: [],
-        latestHttpCode: undefined,
+        latestHttpCode: undefined
       };
     case UPDATE_DOCUMENT:
       return {
         ...state,
         isLoading: true,
         errorMessages: [],
-        latestHttpCode: undefined,
+        latestHttpCode: undefined
       };
     case UPDATE_DOCUMENT_SUCCESS:
       return {
         ...state,
         isLoading: false,
         errorMessages: [],
-        latestHttpCode: action.httpCode,
+        latestHttpCode: action.httpCode
       };
     case UPDATE_DOCUMENT_FAILURE:
       return {
         ...state,
         isLoading: false,
         errorMessages: action.errorMessages,
-        latestHttpCode: action.httpCode,
+        latestHttpCode: action.httpCode
       };
 
     default:

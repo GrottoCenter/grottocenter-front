@@ -2,7 +2,7 @@ import { brown, blue, orange, grey } from '@material-ui/core/colors';
 import {
   createMuiTheme,
   fade,
-  responsiveFontSizes,
+  responsiveFontSizes
 } from '@material-ui/core/styles';
 import { isMobile } from 'react-device-detect';
 
@@ -16,7 +16,7 @@ const fontFamily = [
   'sans-serif',
   '"Apple Color Emoji"',
   '"Segoe UI Emoji"',
-  '"Segoe UI Symbol"',
+  '"Segoe UI Symbol"'
 ].join(',');
 
 const sideMenuWidth = 240;
@@ -33,7 +33,7 @@ export const overridings = {
     paddingUnit * 2,
     paddingUnit * 3,
     paddingUnit * 4,
-    paddingUnit * 8,
+    paddingUnit * 8
   ],
   sideMenuWidth,
   appBarHeight,
@@ -44,20 +44,20 @@ export const overridings = {
       light: brown['500'],
       main: brown['700'],
       dark: brown['900'],
-      contrastText: grey['100'],
+      contrastText: grey['100']
     },
     secondary: {
       light: orange['500'],
       main: orange['700'],
       dark: orange['900'],
-      contrastText: grey['900'],
+      contrastText: grey['900']
     },
     common: {
       white: '#fff',
-      black: '#000',
+      black: '#000'
     },
     onPrimary: {
-      main: grey['100'],
+      main: grey['100']
     },
     action: {},
     backgroundColor: grey['100'],
@@ -81,41 +81,41 @@ export const overridings = {
     blackShadow: fade('#000000', 0.117647),
     backgroundButton: '#FFFFFF',
     errorColor: '#ff2020',
-    successColor: '#49dd3b',
+    successColor: '#49dd3b'
   },
   shape: {
-    borderRadius: '4px',
+    borderRadius: '4px'
   },
   typography: {
     fontFamily,
     htmlFontSize: 10,
     h1: {
-      fontSize: '4.2rem',
+      fontSize: '4.2rem'
     },
     h2: {
-      fontSize: '3.5rem',
+      fontSize: '3.5rem'
     },
     h3: {
-      fontSize: '2.9rem',
+      fontSize: '2.9rem'
     },
     h4: {
-      fontSize: '2.4rem',
+      fontSize: '2.4rem'
     },
     h5: {
-      fontSize: '2rem',
-    },
+      fontSize: '2rem'
+    }
   },
   // https://material-ui.com/customization/globals/#default-props
   props: {
     MuiTextField: {
-      variant: 'filled',
+      variant: 'filled'
     },
     MuiButton: {
-      variant: 'contained',
+      variant: 'contained'
     },
     MuiSkeleton: {
-      animation: 'wave',
-    },
+      animation: 'wave'
+    }
     // For default color on a specific variant on Typography
     // Wait until V5 to (maybe) use this for some titles
     // https://github.com/mui-org/material-ui/issues/15573
@@ -129,111 +129,111 @@ export const overridings = {
     MuiFormHelperText: {
       root: {
         color: brown['500'],
-        fontSize: '1.3rem',
-      },
+        fontSize: '1.3rem'
+      }
     },
     MuiCardContent: {
       root: {
-        padding: isMobile ? paddingUnit : paddingUnit * 2,
-      },
+        padding: isMobile ? paddingUnit : paddingUnit * 2
+      }
     },
     MuiCardHeader: {
       root: {
-        padding: isMobile ? paddingUnit : paddingUnit * 2,
-      },
+        padding: isMobile ? paddingUnit : paddingUnit * 2
+      }
     },
     MuiChip: {
       root: {
         backgroundColor: brown['500'],
-        color: '#fff',
-      },
+        color: '#fff'
+      }
     },
     MuiDialog: {
       paper: {
-        backgroundColor: grey['200'],
-      },
+        backgroundColor: grey['200']
+      }
     },
     MuiDrawer: {
       root: {
         width: sideMenuWidth,
-        flexShrink: 0,
+        flexShrink: 0
       },
       paper: {
         top: appBarHeight,
         height: `calc(100% - ${appBarHeight}px)`,
         width: sideMenuWidth,
-        padding: '8px',
-      },
+        padding: '8px'
+      }
     },
     MuiDivider: {
       root: {
-        backgroundColor: brown['500'],
-      },
+        backgroundColor: brown['500']
+      }
     },
     MuiInputBase: {
       root: {
-        color: 'inherit',
-      },
+        color: 'inherit'
+      }
     },
     MuiFormControl: {
       root: {
-        padding: '4px',
-      },
+        padding: '4px'
+      }
     },
     MuiSelect: {
       root: {
-        fontFamily,
-      },
+        fontFamily
+      }
     },
     MuiToolbar: {
       root: {
-        height: `${appBarHeight}px`,
-      },
+        height: `${appBarHeight}px`
+      }
     },
     gutterBottom: {
-      marginBottom: '1rem',
+      marginBottom: '1rem'
     },
     MuiLink: {
       root: {
-        display: 'flex',
-      },
+        display: 'flex'
+      }
     },
     MuiTableCell: {
       root: {
-        borderBottom: `1px solid ${brown['100']}`,
+        borderBottom: `1px solid ${brown['100']}`
       },
       head: {
         backgroundColor: brown['500'],
-        color: grey['100'],
-      },
+        color: grey['100']
+      }
     },
     MuiStepIcon: {
       active: {
         color: `${orange['700']} !important`,
-        borderRadius: '100%',
-      },
+        borderRadius: '100%'
+      }
     },
     MuiStepConnector: {
       line: {
-        borderWidth: '1px',
+        borderWidth: '1px'
       },
       lineHorizontal: {
-        borderWidth: '1px',
+        borderWidth: '1px'
       },
       active: {
         '& $line': {
           borderColor: brown['300'],
-          borderStyle: 'dashed',
-        },
+          borderStyle: 'dashed'
+        }
       },
       completed: {
         '& $line': {
           borderColor: brown['500'],
-          borderWidth: '2px',
-        },
-      },
-    },
-  },
+          borderWidth: '2px'
+        }
+      }
+    }
+  }
 };
 
 export default responsiveFontSizes(createMuiTheme(overridings));

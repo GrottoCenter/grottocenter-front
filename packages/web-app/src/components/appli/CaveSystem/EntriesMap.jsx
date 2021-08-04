@@ -4,11 +4,11 @@ import { isNil, isEmpty, pipe, filter, includes } from 'ramda';
 import Map from '../../common/Maps/MapMultipleMarkers';
 import { CaveContext, getPositions } from './Provider';
 
-const isSelected = (selection) => (entry) => includes(entry.id, selection);
+const isSelected = selection => entry => includes(entry.id, selection);
 
 const EntriesMap = () => {
   const {
-    state: { coordinates, loading, selectedEntries, entries },
+    state: { coordinates, loading, selectedEntries, entries }
   } = useContext(CaveContext);
 
   const getPositionsToDisplay = () => {

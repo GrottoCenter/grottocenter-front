@@ -16,10 +16,10 @@ const defaultContext = {
       progressionRate: 2.5,
       accessRate: 2.5,
       author: 'Author name',
-      creationDate: todayDate,
+      creationDate: todayDate
     },
-    position: [51.505, -0.09],
-  },
+    position: [51.505, -0.09]
+  }
 };
 
 const isPair = pipe(length, equals(2));
@@ -42,7 +42,7 @@ const Entry = ({ details, loading = true, children }) => {
       author: pathOr('Author', ['author'], details),
       creationDate: pathOr(todayDate, ['creationDate'], details),
       coordinates: pathOr([0, 0], ['coordinates'], details),
-      ...details,
+      ...details
     });
   }, [details]);
 
@@ -52,11 +52,10 @@ const Entry = ({ details, loading = true, children }) => {
         state: {
           loading,
           details: detailsState,
-          position: pathOr(null, ['coordinates'], details),
+          position: pathOr(null, ['coordinates'], details)
         },
-        action: {},
-      }}
-    >
+        action: {}
+      }}>
       {children}
     </EntryContext.Provider>
   );
@@ -80,7 +79,7 @@ export const detailsType = PropTypes.shape({
   discoveryYear: PropTypes.number,
   mountain: PropTypes.string,
   altitude: PropTypes.number,
-  isDivingCave: PropTypes.bool,
+  isDivingCave: PropTypes.bool
 });
 
 export const positionType = PropTypes.arrayOf(PropTypes.number);
@@ -88,7 +87,7 @@ export const positionType = PropTypes.arrayOf(PropTypes.number);
 Entry.propTypes = {
   details: detailsType.isRequired,
   loading: PropTypes.bool,
-  children: PropTypes.node.isRequired,
+  children: PropTypes.node.isRequired
 };
 
 export default Entry;

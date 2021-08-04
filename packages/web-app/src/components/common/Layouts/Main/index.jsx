@@ -17,7 +17,7 @@ const MainWrapper = styled.main`
         : theme.transitions.easing.sharp,
       duration: isSideMenuOpen
         ? theme.transitions.duration.enteringScreen
-        : theme.transitions.duration.leavingScreen,
+        : theme.transitions.duration.leavingScreen
     })};
   margin-left: ${({ theme, isSideMenuOpen }) =>
     !isMobileOnly && (isSideMenuOpen ? theme.sideMenuWidth : 0)}px;
@@ -29,7 +29,7 @@ const Layout = ({
   isSideMenuOpen,
   toggleSideMenu,
   SideBarQuickSearch,
-  AppBar,
+  AppBar
 }) => (
   <>
     <AppBar toggleSideMenu={toggleSideMenu} isSideMenuOpen={isSideMenuOpen} />
@@ -50,7 +50,7 @@ Layout.propTypes = {
   AppBar: PropTypes.oneOfType([
     PropTypes.node,
     PropTypes.element,
-    PropTypes.func,
+    PropTypes.func
   ]).isRequired,
   children: PropTypes.node,
   isAuth: PropTypes.bool,
@@ -59,8 +59,8 @@ Layout.propTypes = {
   SideBarQuickSearch: PropTypes.oneOfType([
     PropTypes.node,
     PropTypes.element,
-    PropTypes.func,
-  ]).isRequired,
+    PropTypes.func
+  ]).isRequired
 };
 
 export default Layout;

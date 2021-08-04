@@ -8,14 +8,14 @@ import FormAutoCompleteComponent from '../../components/common/Form/FormAutoComp
 import { FormAutoCompleteTypes } from '../../components/common/Form/types';
 // ===================================
 
-const FormAutoComplete = (props) => {
+const FormAutoComplete = props => {
   const {
     contextValueName,
     helperContent,
-    helperContentIfValueIsForced,
+    helperContentIfValueIsForced
   } = props;
   const {
-    docAttributes: { [contextValueName]: value, partOf },
+    docAttributes: { [contextValueName]: value, partOf }
   } = useContext(DocumentFormContext);
 
   const isValueForced = pathOr(null, [contextValueName], partOf) !== null;
@@ -38,7 +38,7 @@ delete FormAutoCompleteInheritedProps.isValueForced;
 
 FormAutoComplete.propTypes = {
   contextValueName: PropTypes.string.isRequired,
-  ...FormAutoCompleteInheritedProps,
+  ...FormAutoCompleteInheritedProps
 };
 
 export default FormAutoComplete;

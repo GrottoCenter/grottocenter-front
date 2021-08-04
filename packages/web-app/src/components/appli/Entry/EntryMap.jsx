@@ -5,7 +5,7 @@ import Map from '../../common/Maps/MapMultipleMarkers';
 
 const EntryMap = () => {
   const {
-    state: { position, loading },
+    state: { position, loading }
   } = useContext(EntryContext);
 
   return (

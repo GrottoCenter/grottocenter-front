@@ -33,7 +33,7 @@ const Rating = ({ value, label }) => {
 
 Rating.propTypes = {
   value: PropTypes.number.isRequired,
-  label: PropTypes.string.isRequired,
+  label: PropTypes.string.isRequired
 };
 
 export default Rating;

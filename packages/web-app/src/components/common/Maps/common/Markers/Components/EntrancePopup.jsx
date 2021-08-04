@@ -16,7 +16,7 @@ export const EntrancePopup = ({ entrance }) => (
     <Property
       secondary
       value={`${!isNil(entrance.city) && entrance.city}, ${!isNil(
-        entrance.region,
+        entrance.region
       ) && entrance.region}`}
       icon={<Public color="primary" />}
     />
@@ -53,9 +53,9 @@ EntrancePopup.propTypes = {
     cave: PropTypes.shape({
       name: PropTypes.string,
       depth: PropTypes.number,
-      length: PropTypes.number,
-    }),
-  }).isRequired,
+      length: PropTypes.number
+    })
+  }).isRequired
 };
 
 export default EntrancePopup;

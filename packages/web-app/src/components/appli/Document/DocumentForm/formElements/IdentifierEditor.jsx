@@ -8,7 +8,7 @@ import {
   InputLabel,
   MenuItem,
   Select,
-  Typography,
+  Typography
 } from '@material-ui/core';
 import { useIntl } from 'react-intl';
 import { pathOr } from 'ramda';
@@ -41,21 +41,21 @@ const IdentifierEditor = ({
   allIdentifierTypes,
   contextIdentifierValueName,
   contextIdentifierTypeValueName,
-  documentType,
+  documentType
 }) => {
   const { formatMessage } = useIntl();
   const {
     docAttributes: {
       [contextIdentifierValueName]: identifier,
-      [contextIdentifierTypeValueName]: identifierType,
+      [contextIdentifierTypeValueName]: identifierType
     },
-    updateAttribute,
+    updateAttribute
   } = useContext(DocumentFormContext);
   const regexp = pathOr(null, ['regexp'], identifierType);
   const isRegexpValid =
     regexp === null ? true : new RegExp(regexp).test(identifier);
 
-  const handleIdentifierChange = (newIdentifier) => {
+  const handleIdentifierChange = newIdentifier => {
     if (newIdentifier === '') {
       updateAttribute(contextIdentifierValueName, null);
       updateAttribute(contextIdentifierTypeValueName, null);
@@ -63,9 +63,9 @@ const IdentifierEditor = ({
     updateAttribute(contextIdentifierValueName, newIdentifier);
   };
 
-  const handleIdentifierTypeChange = (newIdentifierTypeId) => {
+  const handleIdentifierTypeChange = newIdentifierTypeId => {
     const newIdType = allIdentifierTypes.find(
-      (idType) => idType.id === newIdentifierTypeId,
+      idType => idType.id === newIdentifierTypeId
     );
     updateAttribute(contextIdentifierTypeValueName, newIdType);
   };
@@ -84,7 +84,7 @@ const IdentifierEditor = ({
           <StringInput
             helperText={formatMessage({
               id:
-                'Code for designating a document in a unique way. This can be a DOI, URL, ISBN or ISSN.',
+                'Code for designating a document in a unique way. This can be a DOI, URL, ISBN or ISSN.'
             })}
             onValueChange={handleIdentifierChange}
             value={identifier}
@@ -101,27 +101,25 @@ const IdentifierEditor = ({
                 variant="filled"
                 required={!isOther(documentType) && identifier !== ''}
                 fullWidth
-                error={!isOther(documentType) && !identifierType}
-              >
+                error={!isOther(documentType) && !identifierType}>
                 <InputLabel htmlFor="identifier-type">
                   <Translate>Identifier Type</Translate>
                 </InputLabel>
                 <Select
                   value={identifierType ? identifierType.id : -1}
-                  onChange={(event) =>
+                  onChange={event =>
                     handleIdentifierTypeChange(event.target.value)
                   }
                   inputProps={{
                     code: `identifier-type`,
-                    name: `identifier-type`,
-                  }}
-                >
+                    name: `identifier-type`
+                  }}>
                   <MenuItem key={-1} value={-1} disabled>
                     <i>
                       <Translate>Select an identifier type</Translate>
                     </i>
                   </MenuItem>
-                  {allIdentifierTypes.map((idType) => (
+                  {allIdentifierTypes.map(idType => (
                     <MenuItem key={idType.id} value={idType.id}>
                       {idType.id.toUpperCase()}
                     </MenuItem>
@@ -146,15 +144,15 @@ IdentifierEditor.propTypes = {
   allIdentifierTypes: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.string.isRequired,
-      text: PropTypes.string.isRequired,
-    }),
+      text: PropTypes.string.isRequired
+    })
   ),
   contextIdentifierValueName: PropTypes.string.isRequired,
   contextIdentifierTypeValueName: PropTypes.string.isRequired,
   documentType: PropTypes.shape({
     id: PropTypes.number.isRequired,
-    name: PropTypes.string.isRequired,
-  }).isRequired,
+    name: PropTypes.string.isRequired
+  }).isRequired
 };
 
 export default IdentifierEditor;

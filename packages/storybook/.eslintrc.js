@@ -1,3 +1,3 @@
 module.exports = {
-    extends: ['@navya/eslint-config', '@navya/eslint-config-typescript']
+  extends: '../eslint-config/.eslintrc.js'
 };

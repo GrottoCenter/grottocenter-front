@@ -1,16 +1,13 @@
 import { connect } from 'react-redux';
 import NewsCard from '../components/common/card/NewsCard';
-import { initLatestBlogNewsFetcher, loadLatestBlogNews } from '../actions/LatestBlogNews';
-
-//
-//
-// C O N T A I N E R  // C O N N E C T O R
-//
-//
+import {
+  initLatestBlogNewsFetcher,
+  loadLatestBlogNews
+} from '../actions/LatestBlogNews';
 
 const mapDispatchToProps = (dispatch, ownProps) => ({
   init: () => dispatch(initLatestBlogNewsFetcher(ownProps.blog, ownProps.url)),
-  refresh: () => dispatch(loadLatestBlogNews(ownProps.blog, ownProps.url)),
+  refresh: () => dispatch(loadLatestBlogNews(ownProps.blog, ownProps.url))
 });
 
 const mapStateToProps = (state, ownProps) => {
@@ -26,7 +23,7 @@ const mapStateToProps = (state, ownProps) => {
     month: attributes.news.month,
     title: attributes.news.title,
     text: attributes.news.text,
-    linkMore: attributes.news.link,
+    linkMore: attributes.news.link
   };
 };
 

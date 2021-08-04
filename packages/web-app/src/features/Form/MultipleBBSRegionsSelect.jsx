@@ -12,14 +12,14 @@ const MultipleBBSRegionsSelect = ({
   contextValueName,
   helperText,
   labelName,
-  required = false,
+  required = false
 }) => {
   const dispatch = useDispatch();
   const { error, isFetching, bbsRegionsByName: searchResults } = useSelector(
-    (state) => state.region,
+    state => state.region
   );
 
-  const loadSearchResults = (inputValue) => {
+  const loadSearchResults = inputValue => {
     dispatch(loadRegionsSearch(inputValue, inputValue, true));
   };
   const resetSearchResults = () => {
@@ -33,7 +33,7 @@ const MultipleBBSRegionsSelect = ({
       getOptionSelected={(optionToTest, valueToTest) =>
         optionToTest.id === valueToTest.id
       }
-      getOptionLabel={(option) => {
+      getOptionLabel={option => {
         if (option.name === null) {
           return option.code;
         }
@@ -60,7 +60,7 @@ MultipleBBSRegionsSelect.propTypes = {
   contextValueName: PropTypes.string.isRequired,
   helperText: PropTypes.string.isRequired,
   labelName: PropTypes.string.isRequired,
-  required: PropTypes.bool,
+  required: PropTypes.bool
 };
 
 export default MultipleBBSRegionsSelect;

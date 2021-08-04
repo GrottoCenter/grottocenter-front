@@ -21,7 +21,7 @@ class MassifsSearch extends React.Component {
   }
 
   getInitialState = () => ({
-    name: '',
+    name: ''
   });
 
   /**
@@ -32,7 +32,7 @@ class MassifsSearch extends React.Component {
    */
   handleValueChange = (keyName, event) => {
     this.setState({
-      [keyName]: event.target.value,
+      [keyName]: event.target.value
     });
   };
 
@@ -51,11 +51,10 @@ class MassifsSearch extends React.Component {
           <form
             noValidate
             autoComplete="off"
-            onSubmit={(event) => {
+            onSubmit={event => {
               event.preventDefault();
               startAdvancedsearch(this.state, resourceType);
-            }}
-          >
+            }}>
             <Typography variant="h6">
               <Translate>Massif properties</Translate>
             </Typography>
@@ -66,7 +65,7 @@ class MassifsSearch extends React.Component {
                   <Translate>Massif name</Translate>
                 </span>
               }
-              onChange={(event) => this.handleValueChange('name', event)}
+              onChange={event => this.handleValueChange('name', event)}
               value={name}
             />
 
@@ -85,7 +84,7 @@ MassifsSearch.propTypes = {
   classes: PropTypes.shape({}).isRequired,
   startAdvancedsearch: PropTypes.func.isRequired,
   resetResults: PropTypes.func.isRequired,
-  resourceType: PropTypes.string.isRequired,
+  resourceType: PropTypes.string.isRequired
 };
 
 MassifsSearch.defaultProps = {};

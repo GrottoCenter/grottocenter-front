@@ -7,7 +7,6 @@ import { DocumentFormContext } from '../Provider';
 
 import StringInput from '../../../../common/Form/StringInput';
 
-// ===================================
 const InlineWrapper = styled.div`
   display: flex;
   flex-direction: row;
@@ -19,13 +18,11 @@ const DescriptionContainer = styled.div`
   flex-basis: 300px;
 `;
 
-// ===================================
-
 const DescriptionEditor = ({ required = false }) => {
   const { formatMessage } = useIntl();
   const {
     docAttributes: { description },
-    updateAttribute,
+    updateAttribute
   } = useContext(DocumentFormContext);
 
   const memoizedValues = [description];
@@ -36,10 +33,10 @@ const DescriptionEditor = ({ required = false }) => {
           <StringInput
             helperText={formatMessage({
               id:
-                'Make a precise sentence that is pleasant to read and uses keywords.',
+                'Make a precise sentence that is pleasant to read and uses keywords.'
             })}
             multiline
-            onValueChange={(value) => updateAttribute('description', value)}
+            onValueChange={value => updateAttribute('description', value)}
             required={required}
             value={description}
             valueName={formatMessage({ id: 'Summary of document content' })}
@@ -47,12 +44,13 @@ const DescriptionEditor = ({ required = false }) => {
         </DescriptionContainer>
       </InlineWrapper>
     ),
-    memoizedValues,
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    memoizedValues
   );
 };
 
 DescriptionEditor.propTypes = {
-  required: PropTypes.bool,
+  required: PropTypes.bool
 };
 
 export default DescriptionEditor;

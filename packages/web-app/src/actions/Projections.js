@@ -6,22 +6,22 @@ export const FETCH_PROJECTIONS_SUCCESS = 'FETCH_PROJECTIONS_SUCCESS';
 export const FETCH_PROJECTIONS_FAILURE = 'FETCH_PROJECTIONS_FAILURE';
 export const FETCH_PROJECTIONS_LOADING = 'FETCH_PROJECTIONS_LOADING';
 
-export const fetchProjections = () => (dispatch) => {
+export const fetchProjections = () => dispatch => {
   dispatch({ type: FETCH_PROJECTIONS_LOADING });
   return fetch(fetchConvert)
-    .then((response) => {
+    .then(response => {
       if (response.status >= 400) {
         throw new Error(response.status);
       }
       return response.json();
     })
-    .then((data) => {
+    .then(data => {
       dispatch({ type: FETCH_PROJECTIONS_SUCCESS, data });
     })
-    .catch((error) =>
+    .catch(error =>
       dispatch({
         type: FETCH_PROJECTIONS_FAILURE,
-        error: makeErrorMessage(error.message, `Projections`),
-      }),
+        error: makeErrorMessage(error.message, `Projections`)
+      })
     );
 };

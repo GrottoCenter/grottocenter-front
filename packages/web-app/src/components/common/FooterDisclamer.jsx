@@ -6,15 +6,9 @@ import Translate from './Translate';
 import InternationalizedLink from './InternationalizedLink';
 import { licenceLinks } from '../../conf/Config';
 
-//
-//
-// S T Y L I N G - C O M P O N E N T S
-//
-//
-
 const FooterBar = withTheme(styled.div`
-  color: ${(props) => props.theme.palette.fullBlack};
-  background-color: ${(props) => props.theme.palette.primary1Color};
+  color: ${props => props.theme.palette.fullBlack};
+  background-color: ${props => props.theme.palette.primary1Color};
   text-align: center;
   padding-top: 15px;
 `);
@@ -47,7 +41,8 @@ const FooterDisclamer = ({ className }) => (
   <FooterBar className={className}>
     <DisclamerText>
       <Translate>
-        Unless stated otherwise, all text and documents are available under the terms
+        Unless stated otherwise, all text and documents are available under the
+        terms
       </Translate>
     </DisclamerText>
     <LicenceLink>
@@ -59,6 +54,6 @@ const FooterDisclamer = ({ className }) => (
 );
 
 FooterDisclamer.propTypes = {
-  className: PropTypes.string,
+  className: PropTypes.string
 };
 export default FooterDisclamer;

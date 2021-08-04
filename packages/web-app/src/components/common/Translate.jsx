@@ -10,11 +10,11 @@ const Translate = ({ children, ...props }) =>
   );
 
 Translate.propTypes = {
-  children: PropTypes.string,
+  children: PropTypes.string
 };
 
 Translate.defaultProps = {
-  children: null,
+  children: null
 };
 
 export default Translate;

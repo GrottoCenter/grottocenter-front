@@ -6,12 +6,6 @@ import { GridRow } from '../../helpers/GridSystem';
 import Translate from '../common/Translate';
 import LandingSection from './LandingSection';
 
-//
-//
-// S T Y L I N G - C O M P O N E N T S
-//
-//
-
 const RandomEntrySection = styled(LandingSection)`
   text-align: center;
 `;
@@ -26,17 +20,11 @@ const BgRandomEntrySection = styled(RandomEntrySection)`
 `;
 
 const SectionTitle = withTheme(styled.h3`
-  color: ${(props) => props.theme.palette.secondaryBlocTitle};
+  color: ${props => props.theme.palette.secondaryBlocTitle};
   text-align: center;
   padding-bottom: 50px;
   font-size: 35px;
 `);
-
-//
-//
-// M A I N - C O M P O N E N T
-//
-//
 
 const RandomEntry = () => (
   <BgRandomEntrySection>

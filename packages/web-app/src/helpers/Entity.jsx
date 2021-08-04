@@ -9,7 +9,7 @@ import Translate from '../components/common/Translate';
 //
 //
 
-export const isMappable = (entity) => entity.latitude && entity.longitude;
+export const isMappable = entity => entity.latitude && entity.longitude;
 
 const EntityIcon = styled.img`
   height: 30px;
@@ -31,7 +31,7 @@ const HighlightText = withTheme(styled.span`
   vertical-align: baseline;
   white-space: nowrap;
   em {
-    background-color: ${(props) => props.theme.palette.accent1Color};
+    background-color: ${props => props.theme.palette.accent1Color};
     color: white;
     font-style: normal;
     font-weight: bold;
@@ -48,10 +48,10 @@ const HighlightTextKey = styled.span`
   white-space: nowrap;
 `;
 
-export const entityOptionForSelector = (option) => {
+export const entityOptionForSelector = option => {
   const highlights = [];
   if (option.highlights) {
-    Object.keys(option.highlights).forEach((key) => {
+    Object.keys(option.highlights).forEach(key => {
       highlights.push({ [key]: option.highlights[key].join(' [...] ') });
     });
   }
@@ -97,7 +97,7 @@ export const entityOptionForSelector = (option) => {
       <EntityIcon src={iconPath} alt={`${option.type} icon`} />
       <EntityLabel>{textToDisplay}</EntityLabel>
 
-      {highlights.map((hl) => {
+      {highlights.map(hl => {
         const key = Object.keys(hl)[0];
         return (
           <React.Fragment key={key}>
@@ -106,7 +106,7 @@ export const entityOptionForSelector = (option) => {
             </HighlightTextKey>
             <HighlightText
               dangerouslySetInnerHTML={{
-                __html: `${hl[key]}`,
+                __html: `${hl[key]}`
               }}
             />
           </React.Fragment>

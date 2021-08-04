@@ -39,7 +39,7 @@ const DivingTypesForm = ({ onChange, value }) => {
 
 DivingTypesForm.propTypes = {
   onChange: PropTypes.func.isRequired,
-  value: PropTypes.string.isRequired,
+  value: PropTypes.string.isRequired
 };
 
 export default DivingTypesForm;

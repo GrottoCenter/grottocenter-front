@@ -1,3 +1,4 @@
+/* eslint-disable react/destructuring-assignment */
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import CircularProgress from '@material-ui/core/CircularProgress';
@@ -7,40 +8,28 @@ import { withStyles } from '@material-ui/core/styles';
 import { loadDynamicNumber } from '../../actions/DynamicNumber';
 import { DYNAMIC_NUMBER_RELOAD_INTERVAL } from '../../conf/Config';
 
-//
-//
-// S T Y L I N G - C O M P O N E N T S
-//
-//
-
 const StyledIconButton = withStyles(
-  (theme) => ({
+  theme => ({
     root: {
-      fill: theme.palette.accent1Color,
-    },
+      fill: theme.palette.accent1Color
+    }
   }),
-  { withTheme: true },
+  { withTheme: true }
 )(IconButton);
 
 const StyledSyncKOIcon = withStyles(
-  (theme) => ({
+  theme => ({
     root: {
       '&:hover': {
-        fill: theme.palette.accent1Color,
+        fill: theme.palette.accent1Color
       },
       fill: theme.palette.primary3Color,
       height: '48px',
-      width: '48px',
-    },
+      width: '48px'
+    }
   }),
-  { withTheme: true },
+  { withTheme: true }
 )(SyncKOIcon);
-
-//
-//
-// M A I N - C O M P O N E N T
-//
-//
 
 class DynamicNumber extends Component {
   constructor(props) {
@@ -49,6 +38,7 @@ class DynamicNumber extends Component {
     this.reloadNumber()();
   }
 
+  // eslint-disable-next-line react/sort-comp
   reloadNumber() {
     return () => this.props.dispatch(loadDynamicNumber(this.props.numberType));
   }
@@ -56,7 +46,7 @@ class DynamicNumber extends Component {
   componentDidMount() {
     this.interval = setInterval(
       this.reloadNumber(),
-      DYNAMIC_NUMBER_RELOAD_INTERVAL,
+      DYNAMIC_NUMBER_RELOAD_INTERVAL
     );
   }
 
@@ -84,7 +74,7 @@ DynamicNumber.propTypes = {
   number: PropTypes.number,
   numberType: PropTypes.string,
   className: PropTypes.string,
-  dispatch: PropTypes.any.isRequired,
+  dispatch: PropTypes.func.isRequired
 };
 
 export default DynamicNumber;

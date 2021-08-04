@@ -58,7 +58,7 @@ const DialogLoginForm = ({
   isOpen = true,
   authErrors = [],
   initialEmail = '',
-  initialPassword = '',
+  initialPassword = ''
 }) => {
   const [email, setEmail] = React.useState(initialEmail);
   const [password, setPassword] = React.useState(initialPassword);
@@ -78,23 +78,21 @@ const DialogLoginForm = ({
             size="large"
             onClick={action('onLogin')}
             color={isLoading ? '' : 'primary'}
-            key={0}
-          >
+            key={0}>
             {isLoading ? (
               <CircularProgress size="2.8rem" />
             ) : (
               <Translate>Log in</Translate>
             )}
-          </Button>,
-        ]}
-      >
+          </Button>
+        ]}>
         <StoryControlsWrapper>
           <div>
             <b>Form State StoryControls</b>
           </div>
           <Switch
             checked={isLoading}
-            onChange={(event) => setIsLoading(event.target.checked)}
+            onChange={event => setIsLoading(event.target.checked)}
             color="primary"
             inputProps={{ 'aria-label': 'primary checkbox' }}
           />
@@ -102,7 +100,7 @@ const DialogLoginForm = ({
 
           <Switch
             checked={hasErrors}
-            onChange={(event) => setHasErrors(event.target.checked)}
+            onChange={event => setHasErrors(event.target.checked)}
             color="primary"
             inputProps={{ 'aria-label': 'primary checkbox' }}
           />
@@ -125,7 +123,7 @@ DialogLoginForm.propTypes = {
   authErrors: PropTypes.arrayOf(PropTypes.string),
   initialEmail: PropTypes.string,
   initialPassword: PropTypes.string,
-  isOpen: PropTypes.bool,
+  isOpen: PropTypes.bool
 };
 
 storiesOf('Login', module)
@@ -135,7 +133,7 @@ storiesOf('Login', module)
       authErrors={[
         'You must provide an email.',
         'You must provide a valid email.',
-        'You must provide a password.',
+        'You must provide a password.'
       ]}
     />
   ));

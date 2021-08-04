@@ -8,8 +8,8 @@ const date = new Date();
 const todayDate = date.toISOString().substring(0, 10);
 
 export const getPositions = pipe(
-  map((entry) => [prop('latitude', entry), prop('longitude', entry)]),
-  reject(isNil),
+  map(entry => [prop('latitude', entry), prop('longitude', entry)]),
+  reject(isNil)
 );
 
 const defaultContext = {
@@ -24,11 +24,11 @@ const defaultContext = {
       progressionRate: 0,
       accessRate: 0,
       author: '',
-      creationDate: todayDate,
+      creationDate: todayDate
     },
     entries: null,
-    coordinates: null,
-  },
+    coordinates: null
+  }
 };
 
 export const CaveContext = createContext(defaultContext);
@@ -37,7 +37,7 @@ const Provider = ({ data, loading = true, children }) => {
   const { entries, ...caveData } = data;
   const [caveState, setCaveState] = useState(caveData || null);
   const [coordinatesState, setCoordinatesState] = useState(
-    getPositions(entries),
+    getPositions(entries)
   );
   const [entriesState, setEntriesState] = useState(entries || null);
   const [selectedEntries, setSelectedEntries] = useState([]);
@@ -46,21 +46,22 @@ const Provider = ({ data, loading = true, children }) => {
     setCaveState(caveData);
     setEntriesState(entries || null);
     setCoordinatesState(getPositions(entries));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data]);
 
-  const onSelectEntry = (selection) => {
+  const onSelectEntry = selection => {
     if (!isNil(selection)) {
       setSelectedEntries(selection);
     }
   };
 
-  const handleOpenEntryMap = (entryId) => {
+  const handleOpenEntryMap = entryId => {
     if (!isNil(entryId)) {
       // TODO
       window.open(`/ui/map`, '_blank');
     }
   };
-  const handleOpenEntryDescription = (entryId) => {
+  const handleOpenEntryDescription = entryId => {
     if (!isNil(entryId)) {
       window.open(`/ui/entries/${entryId}`, '_blank');
     }
@@ -74,15 +75,14 @@ const Provider = ({ data, loading = true, children }) => {
           cave: caveState,
           coordinates: coordinatesState,
           entries: entriesState,
-          selectedEntries,
+          selectedEntries
         },
         action: {
           onSelectEntry,
           openEntryMap: handleOpenEntryMap,
-          openEntryDescription: handleOpenEntryDescription,
-        },
-      }}
-    >
+          openEntryDescription: handleOpenEntryDescription
+        }
+      }}>
       {children}
     </CaveContext.Provider>
   );
@@ -107,13 +107,13 @@ export const caveTypes = PropTypes.shape({
   name: PropTypes.string,
   progressionRate: PropTypes.number,
   temperature: PropTypes.number,
-  undergroundType: PropTypes.string,
+  undergroundType: PropTypes.string
 });
 
 Provider.propTypes = {
   data: caveTypes.isRequired,
   loading: PropTypes.bool,
-  children: PropTypes.node.isRequired,
+  children: PropTypes.node.isRequired
 };
 
 export default Provider;

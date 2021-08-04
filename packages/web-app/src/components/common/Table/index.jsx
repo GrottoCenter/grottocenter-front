@@ -15,7 +15,7 @@ import {
   reject,
   unless,
   without,
-  isEmpty,
+  isEmpty
 } from 'ramda';
 import {
   Toolbar as MuiToolbar,
@@ -26,7 +26,7 @@ import {
   Typography,
   LinearProgress,
   TablePagination,
-  Divider,
+  Divider
 } from '@material-ui/core';
 import { useIntl } from 'react-intl';
 
@@ -89,7 +89,7 @@ const Table = ({
   rowsCount,
   loading,
   customHeaderCellRenders,
-  customCellRenders,
+  customCellRenders
 }) => {
   const { formatMessage } = useIntl();
   const isSelected = includes(__, selection);
@@ -104,50 +104,50 @@ const Table = ({
     reject(isHiddenColumn),
     unless(
       // eslint-disable-next-line no-unused-vars
-      (_) => isNil(openDetailedView),
-      prepend({ id: ActionColumnIds.detailedView }),
+      _ => isNil(openDetailedView),
+      prepend({ id: ActionColumnIds.detailedView })
     ),
     unless(
       // eslint-disable-next-line no-unused-vars
-      (_) => isNil(updateSelection),
-      prepend({ id: ActionColumnIds.selection }),
-    ),
+      _ => isNil(updateSelection),
+      prepend({ id: ActionColumnIds.selection })
+    )
   );
   const getCustomCellRenders = useCallback(
-    (id) =>
+    id =>
       pipe(
         defaultTo([]),
         find(propEq('id', id)),
         prop('customRender'),
-        defaultTo(undefined),
+        defaultTo(undefined)
       )(customCellRenders),
-    [customCellRenders],
+    [customCellRenders]
   );
 
   const getCustomHeaderCellRenders = useCallback(
-    (id) =>
+    id =>
       pipe(
         defaultTo([]),
         find(propEq('id', id)),
         prop('customRender'),
-        defaultTo(undefined),
+        defaultTo(undefined)
       )(customHeaderCellRenders),
-    [customHeaderCellRenders],
+    [customHeaderCellRenders]
   );
 
   // eslint-disable-next-line no-unused-vars
-  const handleSelection = (newSelection) => (e) => {
+  const handleSelection = newSelection => e => {
     const uncheck = without([newSelection]);
     const check = append(newSelection);
     if (!isNil(updateSelection)) {
       updateSelection(
-        isSelected(newSelection) ? uncheck(selection) : check(selection),
+        isSelected(newSelection) ? uncheck(selection) : check(selection)
       );
     }
   };
 
   // eslint-disable-next-line no-unused-vars
-  const handleSort = (property) => (event) => {
+  const handleSort = property => event => {
     const isAsc = orderBy === property && order === 'asc';
     if (!isNil(updateOrder) || !isNil(updateOrderBy)) {
       updateOrder(isAsc ? 'desc' : 'asc');
@@ -162,7 +162,7 @@ const Table = ({
     }
   };
 
-  const handleChangeRowsPerPage = (event) => {
+  const handleChangeRowsPerPage = event => {
     if (!isNil(updateRowsPerPage)) {
       updateRowsPerPage(parseInt(event.target.value, 10));
     }
@@ -204,7 +204,7 @@ const Table = ({
             {isFirstLoad ? (
               <InitialTable />
             ) : (
-              data.map((row) => (
+              data.map(row => (
                 <Row
                   key={row.id}
                   row={row}
@@ -251,25 +251,25 @@ Table.propTypes = {
     PropTypes.shape({
       id: PropTypes.oneOfType([
         PropTypes.string.isRequired,
-        PropTypes.number.isRequired,
+        PropTypes.number.isRequired
       ]),
-      label: PropTypes.string,
-    }),
+      label: PropTypes.string
+    })
   ).isRequired,
   currentPage: PropTypes.number,
   data: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.oneOfType([
         PropTypes.string.isRequired,
-        PropTypes.number.isRequired,
-      ]),
-    }),
+        PropTypes.number.isRequired
+      ])
+    })
   ).isRequired,
   hiddenColumns: PropTypes.arrayOf(
     PropTypes.oneOfType([
       PropTypes.string.isRequired,
-      PropTypes.number.isRequired,
-    ]),
+      PropTypes.number.isRequired
+    ])
   ).isRequired,
   loading: PropTypes.bool,
   openDetailedView: PropTypes.func,
@@ -280,8 +280,8 @@ Table.propTypes = {
   selection: PropTypes.arrayOf(
     PropTypes.oneOfType([
       PropTypes.string.isRequired,
-      PropTypes.number.isRequired,
-    ]),
+      PropTypes.number.isRequired
+    ])
   ),
   title: PropTypes.string,
   updateCurrentPage: PropTypes.func,
@@ -295,19 +295,19 @@ Table.propTypes = {
       customRender: PropTypes.func.isRequired,
       id: PropTypes.oneOfType([
         PropTypes.string.isRequired,
-        PropTypes.number.isRequired,
-      ]),
-    }),
+        PropTypes.number.isRequired
+      ])
+    })
   ),
   customCellRenders: PropTypes.arrayOf(
     PropTypes.shape({
       customRender: PropTypes.func.isRequired,
       id: PropTypes.oneOfType([
         PropTypes.string.isRequired,
-        PropTypes.number.isRequired,
-      ]),
-    }),
-  ),
+        PropTypes.number.isRequired
+      ])
+    })
+  )
 };
 
 export default Table;

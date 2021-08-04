@@ -29,7 +29,7 @@ const ConverterControl = ({
   const { formatMessage } = useIntl();
   const [anchorEl, setAnchorEl] = useState(null);
 
-  const handleOpenMenu = (event) => {
+  const handleOpenMenu = event => {
     setAnchorEl(event.currentTarget);
   };
 
@@ -45,8 +45,7 @@ const ConverterControl = ({
           onClick={handleOpenMenu}
           startIcon={<ConvertIcon fontSize="inherit" />}
           // TODO enable on fullscreen as it's currently hidden
-          disabled={fullScreen || isNilOrEmpty(projectionsList)}
-        >
+          disabled={fullScreen || isNilOrEmpty(projectionsList)}>
           {formatMessage({ id: 'Converter' })}
         </Button>
       </Wrapper>
@@ -54,8 +53,7 @@ const ConverterControl = ({
         <StandardDialog
           title={formatMessage({ id: 'Converter' })}
           open={Boolean(anchorEl)}
-          onClose={handleClose}
-        >
+          onClose={handleClose}>
           <Convert list={projectionsList} />
         </StandardDialog>
       )}
@@ -65,7 +63,7 @@ const ConverterControl = ({
 
 ConverterControl.propTypes = {
   ...customControlProps,
-  projectionsList: PropTypes.arrayOf(PropTypes.any),
+  projectionsList: PropTypes.arrayOf(PropTypes.any)
 };
 
 export default ConverterControl;

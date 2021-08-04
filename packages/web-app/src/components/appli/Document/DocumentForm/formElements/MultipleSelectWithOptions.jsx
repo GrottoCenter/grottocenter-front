@@ -5,13 +5,11 @@ import { DocumentFormContext } from '../Provider';
 import MultipleSelectComponentWithOptions from '../../../../common/Form/MultipleSelectWithOptions';
 import { MultipleSelectWithOptionsTypes } from '../../../../common/Form/types';
 
-// ======================
-
-const MultipleSelectWithOptions = (props) => {
+const MultipleSelectWithOptions = props => {
   const { contextValueName } = props;
   const {
     docAttributes: { [contextValueName]: value },
-    updateAttribute,
+    updateAttribute
   } = useContext(DocumentFormContext);
 
   const handleOnChange = (event, newValue, reason) => {
@@ -42,7 +40,7 @@ delete SelectInheritedProps.handleOnChange;
 
 MultipleSelectWithOptions.propTypes = {
   contextValueName: PropTypes.string.isRequired,
-  ...SelectInheritedProps,
+  ...SelectInheritedProps
 };
 
 export default MultipleSelectWithOptions;

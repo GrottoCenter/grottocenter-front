@@ -2,24 +2,8 @@ import {
   INIT_DYNNB_FETCHER,
   FETCH_DYNNB,
   FETCH_DYNNB_SUCCESS,
-  FETCH_DYNNB_FAILURE,
+  FETCH_DYNNB_FAILURE
 } from '../actions/DynamicNumber';
-
-// State
-// =====
-//   ???
-
-//
-//
-// D E F A U L T - S T A T E
-//
-//
-
-//
-//
-// R E D U C E R
-//
-//
 
 const dynamicNumber = (state = { dynamicNumber: [] }, action) => {
   let jDynNb = '';
@@ -31,8 +15,8 @@ const dynamicNumber = (state = { dynamicNumber: [] }, action) => {
         [action.numberType]: {
           isFetching: false,
           number: null,
-          revoked: true,
-        },
+          revoked: true
+        }
       };
 
     case FETCH_DYNNB:
@@ -40,8 +24,8 @@ const dynamicNumber = (state = { dynamicNumber: [] }, action) => {
         ...state,
         [action.numberType]: {
           isFetching: true,
-          number: null,
-        },
+          number: null
+        }
       };
 
     case FETCH_DYNNB_SUCCESS:
@@ -51,8 +35,8 @@ const dynamicNumber = (state = { dynamicNumber: [] }, action) => {
         ...state,
         [action.numberType]: {
           isFetching: false,
-          number: jDynNb.count,
-        },
+          number: jDynNb.count
+        }
       };
 
     case FETCH_DYNNB_FAILURE:
@@ -61,8 +45,8 @@ const dynamicNumber = (state = { dynamicNumber: [] }, action) => {
         [action.numberType]: {
           isFetching: false,
           number: null,
-          error: action.error,
-        },
+          error: action.error
+        }
       };
 
     default:

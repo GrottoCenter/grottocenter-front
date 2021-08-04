@@ -10,7 +10,7 @@ import Breadcrump from '../components/appli/Breadcrump';
 import AvailableTools, { EntriesOfInterest } from '../components/admin/Tools';
 
 const ApplicationHeader = withTheme(styled.header`
-  background-color: ${(props) => props.theme.palette.secondary1Color};
+  background-color: ${props => props.theme.palette.secondary1Color};
 `);
 
 const AppFooterStl = styled(AppFooter)`
@@ -25,25 +25,28 @@ const ArticleWrapper = styled.article`
 `;
 
 const Admin = () => (
-    <div id="adminpage">
-      <ApplicationHeader>
-        <AppToolbar />
-      </ApplicationHeader>
-      <aside>
-        <SideMenuConnector />
-      </aside>
-      <Breadcrump />
-      <ArticleWrapper>
-        <Switch>
-          <Route exact path="/admin/" component={AvailableTools} />
-          <Route path="/admin/listEntriesOfInterest" component={EntriesOfInterest} />
-          <Route path="/admin/*" to="/admin/" />
-        </Switch>
-      </ArticleWrapper>
-      <footer>
-        <AppFooterStl />
-      </footer>
-    </div>
+  <div id="adminpage">
+    <ApplicationHeader>
+      <AppToolbar />
+    </ApplicationHeader>
+    <aside>
+      <SideMenuConnector />
+    </aside>
+    <Breadcrump />
+    <ArticleWrapper>
+      <Switch>
+        <Route exact path="/admin/" component={AvailableTools} />
+        <Route
+          path="/admin/listEntriesOfInterest"
+          component={EntriesOfInterest}
+        />
+        <Route path="/admin/*" to="/admin/" />
+      </Switch>
+    </ArticleWrapper>
+    <footer>
+      <AppFooterStl />
+    </footer>
+  </div>
 );
 
 export default Admin;

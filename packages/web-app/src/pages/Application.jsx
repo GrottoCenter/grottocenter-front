@@ -31,7 +31,7 @@ import OrganizationPage from './Organization';
 
 const Application = () => {
   const dispatch = useDispatch();
-  const isSideMenuOpen = useSelector((state) => state.sideMenu.open);
+  const isSideMenuOpen = useSelector(state => state.sideMenu.open);
   const permissions = usePermissions();
   const toggleSideMenu = () => dispatch({ type: 'TOGGLE_SIDEMENU' });
 
@@ -47,8 +47,7 @@ const Application = () => {
       isAuth={permissions.isAuth}
       isSideMenuOpen={isSideMenuOpen}
       toggleSideMenu={toggleSideMenu}
-      SideBarQuickSearch={() => <QuickSearch />}
-    >
+      SideBarQuickSearch={() => <QuickSearch />}>
       <LoginDialog />
       <Switch>
         <Route exact path="/" component={HomePage} />

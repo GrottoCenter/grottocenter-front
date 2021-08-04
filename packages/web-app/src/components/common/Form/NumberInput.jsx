@@ -4,7 +4,7 @@ import {
   FilledInput,
   FormControl,
   FormHelperText,
-  InputLabel,
+  InputLabel
 } from '@material-ui/core';
 import Translate from '../Translate';
 
@@ -16,15 +16,15 @@ const NumberInput = ({
   hasError = false,
   onValueChange,
   value,
-  valueName,
+  valueName
 }) => {
   const [localStringValue, setLocalStringValue] = React.useState(
-    value ? value.toString() : '',
+    value ? value.toString() : ''
   );
   const [formatErrorText, setFormatErrorText] = React.useState('');
   const hasFormatError = formatErrorText !== '';
 
-  const handleValueChange = (event) => {
+  const handleValueChange = event => {
     setLocalStringValue(event.target.value);
     const numberValue = Number(event.target.value);
     if (event.target.value === '') {
@@ -43,8 +43,7 @@ const NumberInput = ({
       variant="filled"
       fullWidth={fullWidth}
       required={required}
-      error={hasError || hasFormatError}
-    >
+      error={hasError || hasFormatError}>
       <InputLabel>
         <Translate>{valueName}</Translate>
       </InputLabel>
@@ -82,7 +81,7 @@ NumberInput.propTypes = {
   required: PropTypes.bool,
   value: PropTypes.number,
   valueName: PropTypes.string.isRequired,
-  hasError: PropTypes.bool,
+  hasError: PropTypes.bool
 };
 
 export default NumberInput;

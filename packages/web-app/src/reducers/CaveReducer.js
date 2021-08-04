@@ -1,7 +1,7 @@
 import {
   LOAD_CAVE_SUCCESS,
   LOAD_CAVE_ERROR,
-  LOAD_CAVE_LOADING,
+  LOAD_CAVE_LOADING
 } from '../actions/Cave';
 
 const initialState = {
@@ -17,12 +17,12 @@ const initialState = {
       country: 'Country',
       region: 'Region',
       city: 'City',
-      author: 'Author',
+      author: 'Author'
     },
-    entries: [],
+    entries: []
   },
   loading: false,
-  error: null,
+  error: null
 };
 
 const reducer = (state = initialState, action) => {
@@ -31,18 +31,18 @@ const reducer = (state = initialState, action) => {
       return {
         ...state,
         error: null,
-        loading: true,
+        loading: true
       };
     case LOAD_CAVE_SUCCESS:
       return {
         ...initialState,
-        data: action.data,
+        data: action.data
       };
     case LOAD_CAVE_ERROR:
       return {
         ...state,
         loading: true,
-        error: action.error,
+        error: action.error
       };
     default:
       return state;

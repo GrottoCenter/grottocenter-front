@@ -7,7 +7,7 @@ import { useIntl } from 'react-intl';
 import AutoCompleteSearch from '../components/common/AutoCompleteSearch';
 import {
   fetchQuicksearchResult,
-  resetQuicksearch,
+  resetQuicksearch
 } from '../actions/Quicksearch';
 import { entityOptionForSelector } from '../helpers/Entity';
 import { useDebounce } from '../hooks';
@@ -19,11 +19,11 @@ export const searchableTypes = {
   documents: 'documents',
   entries: 'entries',
   massifs: 'massifs',
-  organizations: 'grottos',
+  organizations: 'grottos'
 };
 
-const renderOption = (option) => entityOptionForSelector(option);
-const getOptionLabel = (option) => option.name;
+const renderOption = option => entityOptionForSelector(option);
+const getOptionLabel = option => option.name;
 
 const QuickSearch = ({
   searchOnTypes = ['documents', 'entrances', 'grottos', 'massifs'],
@@ -33,12 +33,12 @@ const QuickSearch = ({
   const history = useHistory();
   const dispatch = useDispatch();
   const { results, errors, isLoading } = useSelector(
-    (state) => state.quicksearch,
+    state => state.quicksearch
   );
   const [input, setInput] = React.useState('');
   const debouncedInput = useDebounce(input);
 
-  const handleSelection = (selection) => {
+  const handleSelection = selection => {
     if (selection.id) {
       switch (selection.type) {
         case 'entrance':
@@ -66,13 +66,14 @@ const QuickSearch = ({
     if (length(debouncedInput) > 2) {
       const criterias = {
         query: debouncedInput.trim(),
-        complete: false,
+        complete: false
       };
       if (searchOnTypes.length !== 0) criterias.resourceTypes = searchOnTypes;
       dispatch(fetchQuicksearchResult(criterias));
     } else {
       dispatch(resetQuicksearch());
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debouncedInput]);
 
   return (
@@ -96,5 +97,5 @@ export default QuickSearch;
 QuickSearch.propTypes = {
   hasFixWidth: PropTypes.bool,
   label: PropTypes.string,
-  searchOnTypes: PropTypes.arrayOf(PropTypes.string),
+  searchOnTypes: PropTypes.arrayOf(PropTypes.string)
 };

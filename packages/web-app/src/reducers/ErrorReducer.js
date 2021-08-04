@@ -2,13 +2,13 @@ import { isNil } from 'ramda';
 import { CLEAN_ERROR } from '../actions/Error';
 
 const initialState = {
-  error: null,
+  error: null
 };
 
 const reducer = (state = initialState, { error, type }) => {
   if (!isNil(error)) {
     return {
-      error,
+      error
     };
   }
   if (type === CLEAN_ERROR) {

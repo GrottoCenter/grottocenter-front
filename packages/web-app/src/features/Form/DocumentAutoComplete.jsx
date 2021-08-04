@@ -7,7 +7,7 @@ import { InputAdornment } from '@material-ui/core';
 
 import {
   fetchQuicksearchResult,
-  resetQuicksearch,
+  resetQuicksearch
 } from '../../actions/Quicksearch';
 
 import { entityOptionForSelector } from '../../helpers/Entity';
@@ -38,11 +38,11 @@ const DocumentAutoComplete = ({
   labelText,
   required = false,
   resourceTypes = ['documents'],
-  searchLabelText,
+  searchLabelText
 }) => {
   const dispatch = useDispatch();
   const { error, isLoading, results: suggestions } = useSelector(
-    (state) => state.quicksearch,
+    state => state.quicksearch
   );
 
   const { formatMessage } = useIntl();
@@ -74,15 +74,15 @@ const DocumentAutoComplete = ({
     }
     return getPartOfName(
       part.partOf,
-      `${conditionalNamePart} ${part.issue} ${conditionalChildPart}`,
+      `${conditionalNamePart} ${part.issue} ${conditionalChildPart}`
     );
   };
 
-  const fetchSearchResults = (debouncedInput) => {
+  const fetchSearchResults = debouncedInput => {
     const criterias = {
       query: debouncedInput.trim(),
       complete: false,
-      resourceTypes,
+      resourceTypes
     };
     dispatch(fetchQuicksearchResult(criterias));
   };
@@ -128,10 +128,10 @@ DocumentAutoComplete.propTypes = {
   labelText: PropTypes.string.isRequired,
   required: PropTypes.bool,
   resourceTypes: PropTypes.arrayOf(
-    PropTypes.oneOf(['documents', 'document-collections', 'document-issues']),
+    PropTypes.oneOf(['documents', 'document-collections', 'document-issues'])
   ),
 
-  searchLabelText: PropTypes.string.isRequired,
+  searchLabelText: PropTypes.string.isRequired
 };
 
 export default DocumentAutoComplete;

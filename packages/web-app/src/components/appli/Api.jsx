@@ -2,6 +2,7 @@ import React from 'react';
 import { withStyles, withTheme } from '@material-ui/core/styles';
 import CheckIcon from '@material-ui/icons/Check';
 import styled from 'styled-components';
+import { useSelector } from 'react-redux';
 import GCLink from '../common/GCLink';
 import InternationalizedLink from '../common/InternationalizedLink';
 import {
@@ -13,7 +14,7 @@ import {
 import Translate from '../common/Translate';
 
 const StyledH3 = withTheme(styled.h3`
-  color: ${(props) => props.theme.palette.accent1Color};
+  color: ${props => props.theme.palette.accent1Color};
 `);
 
 const StyledImage = styled.img`
@@ -23,11 +24,11 @@ const StyledImage = styled.img`
 const StyledLinkToVersion = withTheme(styled(GCLink)`
   text-decoration: none;
   font-weight: 600;
-  color: ${(props) => props.theme.palette.accent1Color};
+  color: ${props => props.theme.palette.accent1Color};
 `);
 
 const StyledCheckIcon = withStyles(
-  (theme) => ({
+  theme => ({
     root: {
       fill: theme.palette.accent1Color,
       position: 'relative',
@@ -39,13 +40,16 @@ const StyledCheckIcon = withStyles(
 )(CheckIcon);
 
 const Api = () => {
+  const { locale } = useSelector(state => state.intl);
+
   const restApiLink =
-    restApiLinks[window.locale] !== undefined // eslint-disable-line no-undef
-    ? restApiLinks[window.locale] // eslint-disable-line no-undef
-    : restApiLinks['*'];
+    restApiLinks[locale] !== undefined // eslint-disable-line no-undef
+      ? restApiLinks[locale] // eslint-disable-line no-undef
+      : restApiLinks['*'];
 
   return (
     <div>
+      {/* eslint-disable-next-line jsx-a11y/aria-role */}
       <div role="section">
         <div className="container">
           <div className="row">
@@ -66,8 +70,7 @@ const Api = () => {
                     0: (
                       <GCLink
                         href={restApiLink}
-                        alt="Link to rest API documentation"
-                      >
+                        alt="Link to rest API documentation">
                         <Translate id="Rest API endpoints" />
                       </GCLink>
                     )
@@ -81,8 +84,7 @@ const Api = () => {
                     0: (
                       <InternationalizedLink
                         links={wikiApiLinks}
-                        alt="What is an API?"
-                      >
+                        alt="What is an API?">
                         <Translate id="API" />
                       </InternationalizedLink>
                     )
@@ -95,8 +97,7 @@ const Api = () => {
                     0: (
                       <InternationalizedLink
                         links={contactLinks}
-                        alt="Contact form"
-                      >
+                        alt="Contact form">
                         <Translate id="contact form" />
                       </InternationalizedLink>
                     )

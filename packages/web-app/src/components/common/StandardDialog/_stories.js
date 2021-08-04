@@ -23,9 +23,8 @@ storiesOf('Standard dialog', module).add('Default', () => (
           <SendIcon color="inherit" />
           Action
         </>
-      </Button>,
-    ]}
-  >
+      </Button>
+    ]}>
     <Content />
   </StandardDialog>
 ));

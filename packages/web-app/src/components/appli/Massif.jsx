@@ -6,7 +6,7 @@ import {
   CircularProgress,
   Card,
   CardContent,
-  CardHeader,
+  CardHeader
 } from '@material-ui/core';
 import { useIntl } from 'react-intl';
 
@@ -41,7 +41,7 @@ const Massif = ({ isFetching, massif }) => {
             <CavesList
               caves={massif.caves}
               emptyMessageComponent={formatMessage({
-                id: 'This massif has no caves listed yet',
+                id: 'This massif has no caves listed yet'
               })}
             />
           </CardContent>
@@ -55,11 +55,11 @@ Massif.propTypes = {
   isFetching: PropTypes.bool.isRequired,
   massif: PropTypes.shape({
     name: PropTypes.string,
-    caves: PropTypes.arrayOf(PropTypes.object),
-  }),
+    caves: PropTypes.arrayOf(PropTypes.object)
+  })
 };
 Massif.defaultProps = {
-  massif: undefined,
+  massif: undefined
 };
 
 export default Massif;

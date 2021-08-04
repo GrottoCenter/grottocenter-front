@@ -1,10 +1,7 @@
 module.exports = {
-  extends: ['react-app', 'airbnb', 'prettier'],
-  parser: 'babel-eslint',
+  extends: ['react-app', 'airbnb', 'prettier', 'prettier/react'],
   rules: {
-    'prettier/prettier': ['error'],
     'brace-style': 'error',
-    'arrow-parens': 1,
     'object-curly-newline': 'off',
     'func-names': 'off',
     'react/jsx-props-no-spreading': 'off',
@@ -24,21 +21,16 @@ module.exports = {
     'jsx-a11y/href-no-hash': ['off'],
     'react/jsx-filename-extension': ['warn', { extensions: ['.js', '.jsx'] }],
     'react/require-default-props': ['off'],
-    'comma-dangle': ['error', 'never']
+    'comma-dangle': ['error', 'never'],
+    'prettier/prettier': 'error'
   },
   settings: {
     'import/resolver': {
       node: {
         extensions: ['.js', '.jsx', '.ts', '.tsx'],
-        moduleDirectory: ['src']
+        moduleDirectory: ['node_modules', 'src']
       }
     }
-  },
-  globals: {
-    window: true,
-    document: true,
-    locale: true,
-    localesList: true
   },
   plugins: ['prettier']
 };

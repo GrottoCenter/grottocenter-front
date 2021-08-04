@@ -15,7 +15,7 @@ import {
   makeDetails,
   makeEntities,
   makeOrganizations,
-  makeOverview,
+  makeOverview
 } from './transformers';
 
 const Wrapper = styled.div`
@@ -29,7 +29,7 @@ const DocumentPage = ({
   overview,
   organizations,
   details,
-  entities,
+  entities
 }) => {
   const { formatMessage } = useIntl();
   return (
@@ -42,13 +42,13 @@ const DocumentPage = ({
           {
             Icon: () => <Home fontSize="large" color="primary" />,
             label: formatMessage({ id: 'Editor' }),
-            value: organizations.editor,
+            value: organizations.editor
           },
           {
             Icon: () => <CustomIcon type="bibliography" />,
             label: formatMessage({ id: 'Library' }),
-            value: organizations.library,
-          },
+            value: organizations.library
+          }
         ]}
       />
       <Section
@@ -57,54 +57,54 @@ const DocumentPage = ({
         content={[
           {
             label: formatMessage({ id: 'Identifier' }),
-            value: details.identifier,
+            value: details.identifier
           },
           {
             label: formatMessage({ id: 'BBS reference' }),
-            value: details.bbsReference,
+            value: details.bbsReference
           },
           {
             label: formatMessage({ id: 'Document type' }),
             value:
               details.documentType &&
-              formatMessage({ id: details.documentType }),
+              formatMessage({ id: details.documentType })
           },
           {
             label: formatMessage({ id: 'Publication date' }),
-            value: details.publicationDate,
+            value: details.publicationDate
           },
           {
             label: formatMessage({ id: 'Parent document' }),
-            value: details.parentDocument,
+            value: details.parentDocument
           },
           {
             label: formatMessage({ id: 'Pages' }),
-            value: details.pages,
+            value: details.pages
           },
           {
             label: formatMessage({ id: 'Subjects' }),
-            value: details.subjects.map((s) =>
+            value: details.subjects.map(s =>
               formatMessage({
                 id: s.code,
-                defaultMessage: s.subject,
-              }),
+                defaultMessage: s.subject
+              })
             ),
-            type: 'list',
+            type: 'list'
           },
           {
             label: formatMessage({ id: 'Regions' }),
-            value: details.regions.map((r) =>
+            value: details.regions.map(r =>
               formatMessage({
                 id: r.code,
-                defaultMessage: r.name,
-              }),
+                defaultMessage: r.name
+              })
             ),
-            type: 'list',
+            type: 'list'
           },
           {
             label: formatMessage({ id: 'Author comment' }),
-            value: details.authorComment,
-          },
+            value: details.authorComment
+          }
         ]}
       />
       <Section
@@ -114,18 +114,18 @@ const DocumentPage = ({
           {
             Icon: () => <Terrain fontSize="large" color="primary" />,
             label: formatMessage({ id: 'Massif' }),
-            value: entities.massif,
+            value: entities.massif
           },
           {
             Icon: () => <CustomIcon type="entry" />,
             label: formatMessage({ id: 'Entrance' }),
-            value: entities.entrance,
+            value: entities.entrance
           },
           {
             Icon: () => <CustomIcon type="cave_system" />,
             label: formatMessage({ id: 'Cave' }),
-            value: entities.cave,
-          },
+            value: entities.cave
+          }
         ]}
       />
     </Wrapper>
@@ -137,13 +137,14 @@ const HydratedDocumentPage = ({ id }) => {
   const documentId = documentIdFromRoute || id;
   const dispatch = useDispatch();
   const { isLoading, details, error } = useSelector(
-    (state) => state.documentDetails,
+    state => state.documentDetails
   );
 
   useEffect(() => {
     if (!isNil(documentId)) {
       dispatch(fetchDocumentDetails(documentId));
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [documentId]);
 
   return (
@@ -166,11 +167,11 @@ DocumentPage.propTypes = {
     authors: PropTypes.arrayOf(PropTypes.string).isRequired,
     language: PropTypes.string.isRequired,
     title: PropTypes.string.isRequired,
-    summary: PropTypes.string.isRequired,
+    summary: PropTypes.string.isRequired
   }),
   organizations: PropTypes.shape({
     editor: PropTypes.string,
-    library: PropTypes.string,
+    library: PropTypes.string
   }),
   details: PropTypes.shape({
     authorComment: PropTypes.string,
@@ -183,23 +184,23 @@ DocumentPage.propTypes = {
     subjects: PropTypes.arrayOf(
       PropTypes.shape({
         code: PropTypes.string,
-        subject: PropTypes.string,
-      }),
+        subject: PropTypes.string
+      })
     ),
     regions: PropTypes.arrayOf(
       PropTypes.shape({
         code: PropTypes.string,
-        name: PropTypes.string,
-      }),
-    ),
+        name: PropTypes.string
+      })
+    )
   }),
   entities: PropTypes.shape({
     massif: PropTypes.string,
     cave: PropTypes.string,
-    entrance: PropTypes.string,
-  }),
+    entrance: PropTypes.string
+  })
 };
 
 HydratedDocumentPage.propTypes = {
-  id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  id: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
 };

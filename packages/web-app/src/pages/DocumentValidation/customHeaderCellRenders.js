@@ -6,20 +6,20 @@ const useMakeCustomHeaderCellRenders = () => {
   return [
     {
       id: 'titles',
-      customRender: () => formatMessage({ id: 'Title' }),
+      customRender: () => formatMessage({ id: 'Title' })
     },
     {
       id: 'descriptions',
-      customRender: () => formatMessage({ id: 'Description' }),
+      customRender: () => formatMessage({ id: 'Description' })
     },
     {
       id: 'dateInscription',
-      customRender: () => formatMessage({ id: 'Submission date' }),
+      customRender: () => formatMessage({ id: 'Submission date' })
     },
     {
       id: 'examinator',
-      customRender: () => formatMessage({ id: 'Moderator' }),
-    },
+      customRender: () => formatMessage({ id: 'Moderator' })
+    }
   ];
 };
 

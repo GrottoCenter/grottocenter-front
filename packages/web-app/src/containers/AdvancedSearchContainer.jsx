@@ -1,27 +1,21 @@
 import { connect } from 'react-redux';
 import {
   fetchAdvancedsearchResults,
-  resetAdvancedSearchResults,
+  resetAdvancedSearchResults
 } from '../actions/Advancedsearch';
 import { loadSubjects } from '../actions/Subject';
 import AdvancedSearch from '../components/homepage/advancedSearch/AdvancedSearch';
 
-//
-//
-// C O N T A I N E R  // C O N N E C T O R
-//
-//
-
-const startAdvancedsearch = (formValues, resourceType) => (dispatch) => {
+const startAdvancedsearch = (formValues, resourceType) => dispatch => {
   // complete is set to true because we need the complete results about the data
   // resourceType is set to "entrances", "grottos", "massifs" or "documents"
   // according to the search desired
   const paramsToSend = {
     complete: true,
-    resourceType,
+    resourceType
   };
 
-  Object.keys(formValues).forEach((key) => {
+  Object.keys(formValues).forEach(key => {
     let keyValue = formValues[key];
 
     // If String trim it
@@ -48,23 +42,23 @@ const startAdvancedsearch = (formValues, resourceType) => (dispatch) => {
   dispatch(fetchAdvancedsearchResults(paramsToSend));
 };
 
-const resetAdvancedSearch = () => (dispatch) => {
+const resetAdvancedSearch = () => dispatch => {
   dispatch(resetAdvancedSearchResults());
 };
 
-const getSubjects = () => (dispatch) => {
+const getSubjects = () => dispatch => {
   dispatch(loadSubjects());
 };
 
-const mapDispatchToProps = (dispatch) => ({
+const mapDispatchToProps = dispatch => ({
   startAdvancedsearch: (formValues, resourceType) =>
     dispatch(startAdvancedsearch(formValues, resourceType)),
   resetAdvancedSearch: () => dispatch(resetAdvancedSearch()),
-  getSubjects: () => dispatch(getSubjects()),
+  getSubjects: () => dispatch(getSubjects())
 });
 
-const mapStateToProps = (state) => ({
-  subjects: state.subject.subjects,
+const mapStateToProps = state => ({
+  subjects: state.subject.subjects
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(AdvancedSearch);

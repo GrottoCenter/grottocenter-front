@@ -22,8 +22,7 @@ const DisabledTooltip = ({ disabled, children }) => {
       open={open}
       onClose={handleClose}
       onOpen={handleOpen}
-      title={<Translate>disabled</Translate>}
-    >
+      title={<Translate>disabled</Translate>}>
       {children}
     </Tooltip>
   );
@@ -31,7 +30,7 @@ const DisabledTooltip = ({ disabled, children }) => {
 
 DisabledTooltip.propTypes = {
   children: PropTypes.node.isRequired,
-  disabled: PropTypes.bool.isRequired,
+  disabled: PropTypes.bool.isRequired
 };
 
 export default DisabledTooltip;

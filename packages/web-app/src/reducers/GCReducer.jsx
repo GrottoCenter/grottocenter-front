@@ -29,12 +29,7 @@ import region from './RegionReducer';
 import sideMenu from './SideMenuReducer';
 import signUp from './SignUpReducer';
 import subject from './SubjectReducer';
-
-//
-//
-// M A I N - R E D U C E R
-//
-//
+import intl from './IntlReducer';
 
 const GCReducer = combineReducers({
   advancedsearch,
@@ -51,6 +46,7 @@ const GCReducer = combineReducers({
   entry,
   error,
   identifierType,
+  intl,
   language,
   latestBlogNews,
   login,
@@ -66,7 +62,7 @@ const GCReducer = combineReducers({
   region,
   sideMenu,
   signUp,
-  subject,
+  subject
 });
 
 export default GCReducer;

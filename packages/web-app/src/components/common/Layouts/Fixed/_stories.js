@@ -30,8 +30,7 @@ const WithState = () => {
           footer="footer"
           icon={<Index type="entry" />}
         />
-      }
-    >
+      }>
       <>
         <ScrollableContent
           title={formatMessage({ id: 'Description' })}

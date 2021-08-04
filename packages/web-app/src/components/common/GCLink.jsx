@@ -13,30 +13,39 @@ import { Link } from 'react-router-dom';
  * styles: (optional) Used to apply inline CSS styling
  * children: (Required) The DOM content contained inside the link
  */
-const GCLink = (props) => {
+const GCLink = ({
+  onClick,
+  className,
+  activeClassName,
+  style,
+  href,
+  children,
+  internal
+}) => {
   const params = {};
-  if (props.onClick) {
-    params.onClick = props.onClick;
+  if (onClick) {
+    params.onClick = onClick;
   }
-  if (props.className) {
-    params.className = props.className;
+  if (className) {
+    params.className = className;
   }
-  if (props.activeClassName) {
-    params.activeClassName = props.activeClassName;
+  if (activeClassName) {
+    params.activeClassName = activeClassName;
   }
-  if (props.style) {
-    params.style = props.style;
+  if (style) {
+    params.style = style;
   }
-  if (!props.internal) {
+  if (!internal) {
     return (
-      <a href={props.href} {...params} target="_blank">
-        {props.children}
+      // eslint-disable-next-line react/jsx-no-target-blank
+      <a href={href} {...params} target="_blank">
+        {children}
       </a>
     );
   }
   return (
-    <Link to={props.href} {...params}>
-      {props.children}
+    <Link to={href} {...params}>
+      {children}
     </Link>
   );
 };
@@ -46,9 +55,9 @@ GCLink.propTypes = {
   internal: PropTypes.bool,
   className: PropTypes.string,
   activeClassName: PropTypes.string,
-  style: PropTypes.object,
+  style: PropTypes.shape({}),
   onClick: PropTypes.func,
-  children: PropTypes.node.isRequired,
+  children: PropTypes.node.isRequired
 };
 
 export default GCLink;

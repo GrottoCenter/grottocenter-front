@@ -14,7 +14,7 @@ export const FormAutoCompleteTypes = {
   resultEndAdornment: PropTypes.node,
   sideActionDisabled: PropTypes.bool,
   sideActionIcon: PropTypes.node,
-  value: PropTypes.shape({}),
+  value: PropTypes.shape({})
 };
 
 // eslint-disable-next-line import/prefer-default-export
@@ -39,7 +39,7 @@ export const MultipleSelectTypes = {
   searchResults: PropTypes.arrayOf(PropTypes.any).isRequired,
   sideActionDisabled: PropTypes.bool,
   sideActionIcon: PropTypes.node,
-  value: PropTypes.arrayOf(PropTypes.any).isRequired,
+  value: PropTypes.arrayOf(PropTypes.any).isRequired
 };
 
 // eslint-disable-next-line import/prefer-default-export
@@ -54,5 +54,5 @@ export const MultipleSelectWithOptionsTypes = {
   options: PropTypes.arrayOf(PropTypes.any),
   renderOption: PropTypes.func,
   required: PropTypes.bool,
-  value: PropTypes.arrayOf(PropTypes.any).isRequired,
+  value: PropTypes.arrayOf(PropTypes.any).isRequired
 };

@@ -4,7 +4,7 @@ import {
   InputBase,
   CircularProgress,
   InputAdornment,
-  Popper,
+  Popper
 } from '@material-ui/core';
 import { fade } from '@material-ui/core/styles';
 import SearchIcon from '@material-ui/icons/Search';
@@ -67,7 +67,7 @@ const InputAdornments = ({ isLoading, hasError }) =>
     </InputAdornment>
   ) : null;
 
-const StyledPopper = (hasFixWidth) => (props) => (
+const StyledPopper = hasFixWidth => props => (
   <ResultsPopper {...props} $hasFixWidth={hasFixWidth} placement="bottom-end" />
 );
 const AutoCompleteSearch = ({
@@ -81,7 +81,7 @@ const AutoCompleteSearch = ({
   hasError = false,
   isLoading = false,
   disabled = false,
-  hasFixWidth = true,
+  hasFixWidth = true
 }) => {
   const [isOpen, setOpen] = React.useState(false);
 
@@ -128,14 +128,14 @@ const AutoCompleteSearch = ({
       color="inherit"
       // had to disable built-int filter
       // https://github.com/mui-org/material-ui/issues/20068
-      filterOptions={(x) => x}
+      filterOptions={x => x}
       onOpen={handleOpen}
       onClose={handleClose}
       open={isOpen}
       noOptionsText={
         <Translate>No result (enter at least 3 characters)</Translate>
       }
-      renderInput={(params) => (
+      renderInput={params => (
         <DisabledTooltip disabled={disabled}>
           <InputWrapper $hasFixWidth={hasFixWidth} disabled={disabled}>
             <SearchIconWrapper>
@@ -148,7 +148,7 @@ const AutoCompleteSearch = ({
               placeholder={label}
               error={hasError}
               inputProps={{
-                ...params.inputProps,
+                ...params.inputProps
               }}
               endAdornment={
                 <InputAdornments isLoading={isLoading} hasError={hasError} />
@@ -163,7 +163,7 @@ const AutoCompleteSearch = ({
 };
 
 AutoCompleteSearch.propTypes = {
-  ...AutoCompleteSearchTypes,
+  ...AutoCompleteSearchTypes
 };
 
 export default AutoCompleteSearch;

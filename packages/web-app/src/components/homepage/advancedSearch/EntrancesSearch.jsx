@@ -11,7 +11,7 @@ import {
   Switch,
   withStyles,
   Typography,
-  FormHelperText,
+  FormHelperText
 } from '@material-ui/core';
 
 import styles from './styles';
@@ -47,36 +47,36 @@ class EntrancesSearch extends React.Component {
       caveLengthMinValue,
       caveLengthMaxValue,
       cavingMinValue,
-      cavingMaxValue,
+      cavingMaxValue
     } = this.props;
 
     return {
       'aestheticism-range': {
         isEditable: false,
         min: aestheticismMinValue,
-        max: aestheticismMaxValue,
+        max: aestheticismMaxValue
       },
       'approach-range': {
         isEditable: false,
         min: approachMinValue,
-        max: approachMaxValue,
+        max: approachMaxValue
       },
       'cave depth-range': {
         isEditable: false,
         min: caveDepthMinValue,
-        max: caveDepthMaxValue,
+        max: caveDepthMaxValue
       },
       'cave is diving-bool': '',
       'cave length-range': {
         isEditable: false,
         min: caveLengthMinValue,
-        max: caveLengthMaxValue,
+        max: caveLengthMaxValue
       },
       'cave name': '',
       'caving-range': {
         isEditable: false,
         min: cavingMinValue,
-        max: cavingMaxValue,
+        max: cavingMaxValue
       },
       city: '',
       country: '',
@@ -88,9 +88,9 @@ class EntrancesSearch extends React.Component {
       'year_discovery-range': {
         isEditable: false,
         min: -1,
-        max: new Date().getFullYear(),
+        max: new Date().getFullYear()
       },
-      matchAllFields: true,
+      matchAllFields: true
     };
   };
 
@@ -98,12 +98,12 @@ class EntrancesSearch extends React.Component {
    * This function set the state of the keyname property
    * to be the same value as the event of the slider.
    */
-  handleCheckedChange = (keyName) => (event) => {
+  handleCheckedChange = keyName => event => {
     const newState = {
       [keyName]: {
         ...this.state[keyName], // eslint-disable-line react/destructuring-assignment
-        isEditable: event.target.checked,
-      },
+        isEditable: event.target.checked
+      }
     };
     this.setState(newState);
   };
@@ -116,7 +116,7 @@ class EntrancesSearch extends React.Component {
    */
   handleValueChange = (keyName, event) => {
     this.setState({
-      [keyName]: pathOr(event, ['target', 'value'], event),
+      [keyName]: pathOr(event, ['target', 'value'], event)
     });
   };
 
@@ -131,22 +131,22 @@ class EntrancesSearch extends React.Component {
     keyName,
     values,
     minValueAuthorized,
-    maxValueAuthorized,
+    maxValueAuthorized
   ) => {
     const newState = {
       [keyName]: {
         ...this.state[keyName], // eslint-disable-line react/destructuring-assignment
         min: values[0] < minValueAuthorized ? minValueAuthorized : values[0],
-        max: values[1] > maxValueAuthorized ? maxValueAuthorized : values[1],
-      },
+        max: values[1] > maxValueAuthorized ? maxValueAuthorized : values[1]
+      }
     };
 
     this.setState(newState);
   };
 
-  handleBooleanChange = (keyName) => (event) => {
+  handleBooleanChange = keyName => event => {
     this.setState({
-      [keyName]: event.target.checked,
+      [keyName]: event.target.checked
     });
   };
 
@@ -170,7 +170,7 @@ class EntrancesSearch extends React.Component {
       caveLengthMaxValue,
       cavingMinValue,
       cavingMaxValue,
-      intl,
+      intl
     } = this.props;
 
     const {
@@ -187,7 +187,7 @@ class EntrancesSearch extends React.Component {
       'massif name': massifName,
       name,
       region,
-      matchAllFields,
+      matchAllFields
       // 'underground type': undergroundType,
       // 'year_discovery-range': yearOfDiscoveryRange,
     } = this.state;
@@ -198,25 +198,23 @@ class EntrancesSearch extends React.Component {
           <form
             noValidate
             autoComplete="off"
-            onSubmit={(event) => {
+            onSubmit={event => {
               event.preventDefault();
               startAdvancedsearch(this.state, resourceType);
             }}
-            className={classes.formContainer}
-          >
+            className={classes.formContainer}>
             <Typography variant="h6">
               <Translate>Entrance properties</Translate>
             </Typography>
             <div
               className={classes.formPartContainer}
-              style={{ justifyContent: 'flex-start' }}
-            >
+              style={{ justifyContent: 'flex-start' }}>
               <TextField
                 className={classes.formElement}
                 label={intl.formatMessage({
-                  id: 'Entrance name',
+                  id: 'Entrance name'
                 })}
-                onChange={(event) => this.handleValueChange('name', event)}
+                onChange={event => this.handleValueChange('name', event)}
                 value={name}
               />
             </div>
@@ -230,45 +228,45 @@ class EntrancesSearch extends React.Component {
                 <TextField
                   className={classes.formElement}
                   label={intl.formatMessage({
-                    id: 'City',
+                    id: 'City'
                   })}
-                  onChange={(event) => this.handleValueChange('city', event)}
+                  onChange={event => this.handleValueChange('city', event)}
                   value={city}
                 />
 
                 <TextField
                   className={classes.formElement}
                   label={intl.formatMessage({
-                    id: 'County',
+                    id: 'County'
                   })}
-                  onChange={(event) => this.handleValueChange('county', event)}
+                  onChange={event => this.handleValueChange('county', event)}
                   value={county}
                 />
 
                 <TextField
                   className={classes.formElement}
                   label={intl.formatMessage({
-                    id: 'Region',
+                    id: 'Region'
                   })}
-                  onChange={(event) => this.handleValueChange('region', event)}
+                  onChange={event => this.handleValueChange('region', event)}
                   value={region}
                 />
 
                 <TextField
                   className={classes.formElement}
                   label={intl.formatMessage({
-                    id: 'Country',
+                    id: 'Country'
                   })}
-                  onChange={(event) => this.handleValueChange('country', event)}
+                  onChange={event => this.handleValueChange('country', event)}
                   value={country}
                 />
 
                 <TextField
                   className={classes.formElement}
                   label={intl.formatMessage({
-                    id: 'Massif name',
+                    id: 'Massif name'
                   })}
-                  onChange={(event) =>
+                  onChange={event =>
                     this.handleValueChange('massif name', event)
                   }
                   value={massifName}
@@ -283,54 +281,54 @@ class EntrancesSearch extends React.Component {
               <div className={classes.formPartContainer}>
                 <SliderForm
                   label={intl.formatMessage({
-                    id: 'Aesthetic',
+                    id: 'Aesthetic'
                   })}
                   disabled={!aestheticismRange.isEditable}
                   onDisable={this.handleCheckedChange('aestheticism-range')}
                   min={aestheticismMinValue}
                   max={aestheticismMaxValue}
-                  onChange={(values) => {
+                  onChange={values => {
                     this.handleRangeChange(
                       'aestheticism-range',
                       values,
                       aestheticismMinValue,
-                      aestheticismMaxValue,
+                      aestheticismMaxValue
                     );
                   }}
                   value={[aestheticismRange.min, aestheticismRange.max]}
                 />
                 <SliderForm
                   label={intl.formatMessage({
-                    id: 'Ease of move',
+                    id: 'Ease of move'
                   })}
                   disabled={!cavingRange.isEditable}
                   onDisable={this.handleCheckedChange('caving-range')}
                   min={cavingMinValue}
                   max={cavingMaxValue}
-                  onChange={(values) => {
+                  onChange={values => {
                     this.handleRangeChange(
                       'caving-range',
                       values,
                       cavingMinValue,
-                      cavingMaxValue,
+                      cavingMaxValue
                     );
                   }}
                   value={[cavingRange.min, cavingRange.max]}
                 />
                 <SliderForm
                   label={intl.formatMessage({
-                    id: 'Ease of reach',
+                    id: 'Ease of reach'
                   })}
                   disabled={!approachRange.isEditable}
                   onDisable={this.handleCheckedChange('approach-range')}
                   min={approachMinValue}
                   max={approachMaxValue}
-                  onChange={(values) => {
+                  onChange={values => {
                     this.handleRangeChange(
                       'approach-range',
                       values,
                       approachMinValue,
-                      approachMaxValue,
+                      approachMaxValue
                     );
                   }}
                   value={[approachRange.min, approachRange.max]}
@@ -347,37 +345,35 @@ class EntrancesSearch extends React.Component {
                 <TextField
                   className={classes.formElement}
                   label={intl.formatMessage({
-                    id: 'Network name',
+                    id: 'Network name'
                   })}
-                  onChange={(event) =>
-                    this.handleValueChange('cave name', event)
-                  }
+                  onChange={event => this.handleValueChange('cave name', event)}
                   value={caveName}
                 />
 
                 <DivingTypesForm
-                  onChange={(event) =>
+                  onChange={event =>
                     this.handleValueChange('cave is diving-bool', event)
                   }
                   value={caveIsDiving}
                 />
                 <SliderForm
                   label={intl.formatMessage({
-                    id: 'Depth',
+                    id: 'Depth'
                   })}
                   helperText={intl.formatMessage({
-                    id: 'In meters',
+                    id: 'In meters'
                   })}
                   disabled={!caveDepthRange.isEditable}
                   onDisable={this.handleCheckedChange('cave depth-range')}
                   min={caveDepthMinValue}
                   max={caveDepthMaxValue}
-                  onChange={(values) => {
+                  onChange={values => {
                     this.handleRangeChange(
                       'cave depth-range',
                       values,
                       caveDepthMinValue,
-                      caveDepthMaxValue,
+                      caveDepthMaxValue
                     );
                   }}
                   value={[caveDepthRange.min, caveDepthRange.max]}
@@ -385,21 +381,21 @@ class EntrancesSearch extends React.Component {
 
                 <SliderForm
                   label={intl.formatMessage({
-                    id: 'Length',
+                    id: 'Length'
                   })}
                   helperText={intl.formatMessage({
-                    id: 'In meters',
+                    id: 'In meters'
                   })}
                   disabled={!caveLengthRange.isEditable}
                   onDisable={this.handleCheckedChange('cave length-range')}
                   min={caveLengthMinValue}
                   max={caveLengthMaxValue}
-                  onChange={(values) => {
+                  onChange={values => {
                     this.handleRangeChange(
                       'cave length-range',
                       values,
                       caveLengthMinValue,
-                      caveLengthMaxValue,
+                      caveLengthMaxValue
                     );
                   }}
                   value={[caveLengthRange.min, caveLengthRange.max]}
@@ -409,8 +405,7 @@ class EntrancesSearch extends React.Component {
 
             <div
               className={classes.formPartContainer}
-              style={{ justifyContent: 'flex-start' }}
-            >
+              style={{ justifyContent: 'flex-start' }}>
               <FormControl>
                 <FormLabel className={classes.formLabel}>
                   <Translate>
@@ -463,7 +458,7 @@ EntrancesSearch.propTypes = {
   caveLengthMinValue: PropTypes.number,
   caveLengthMaxValue: PropTypes.number,
 
-  intl: PropTypes.shape({}).isRequired,
+  intl: PropTypes.shape({ formatMessage: PropTypes.func }).isRequired
 };
 
 EntrancesSearch.defaultProps = {
@@ -477,7 +472,7 @@ EntrancesSearch.defaultProps = {
   caveDepthMinValue: 0,
   caveDepthMaxValue: 2000,
   caveLengthMinValue: 0,
-  caveLengthMaxValue: 700000,
+  caveLengthMaxValue: 700000
 };
 
 export default injectIntl(withStyles(styles)(EntrancesSearch));

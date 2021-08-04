@@ -23,7 +23,7 @@ const MultipleSelectWithOptions = ({
   options,
   renderOption,
   required = false,
-  value,
+  value
 }) => {
   const [inputValue, setInputValue] = React.useState('');
 
@@ -61,7 +61,7 @@ const MultipleSelectWithOptions = ({
         filterSelectedOptions
         noOptionsText={noOptionsText}
         required={required}
-        renderInput={(params) => (
+        renderInput={params => (
           <TextField
             {...params}
             variant="filled"
@@ -81,7 +81,7 @@ const MultipleSelectWithOptions = ({
 };
 
 MultipleSelectWithOptions.propTypes = {
-  ...MultipleSelectWithOptionsTypes,
+  ...MultipleSelectWithOptionsTypes
 };
 
 export default MultipleSelectWithOptions;

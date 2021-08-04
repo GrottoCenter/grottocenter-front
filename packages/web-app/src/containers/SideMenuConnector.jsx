@@ -7,8 +7,8 @@ import SideMenu from '../components/appli/SideMenu';
 //
 //
 
-const mapStateToProps = (state) => ({
-  visible: state.sideMenu.visible,
+const mapStateToProps = state => ({
+  visible: state.sideMenu.visible
 });
 
 const SideMenuConnector = connect(mapStateToProps)(SideMenu);

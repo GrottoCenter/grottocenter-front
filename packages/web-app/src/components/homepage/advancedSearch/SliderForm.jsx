@@ -5,7 +5,7 @@ import {
   FormHelperText,
   FormLabel,
   Slider as MuiSlider,
-  Switch,
+  Switch
 } from '@material-ui/core';
 import styled from 'styled-components';
 
@@ -28,17 +28,17 @@ const SliderForm = ({
   min,
   max,
   value,
-  onChange,
+  onChange
 }) => {
   const marks = [
     {
       value: min,
-      label: min,
+      label: min
     },
     {
       value: max,
-      label: max,
-    },
+      label: max
+    }
   ];
 
   const handleChange = (event, newValue) => {
@@ -75,7 +75,7 @@ SliderForm.propTypes = {
   min: PropTypes.number.isRequired,
   max: PropTypes.number.isRequired,
   value: PropTypes.arrayOf(PropTypes.number),
-  onChange: PropTypes.func.isRequired,
+  onChange: PropTypes.func.isRequired
 };
 
 export default SliderForm;

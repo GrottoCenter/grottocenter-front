@@ -13,14 +13,14 @@ const UserMenu = ({
   isAuth,
   userNickname,
   onLoginClick,
-  onLogoutClick,
+  onLogoutClick
 }) => {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
   const { formatDate, formatMessage, formatTime } = useIntl();
   const theme = useTheme();
 
-  const handleMenu = (event) => {
+  const handleMenu = event => {
     setAnchorEl(event.currentTarget);
   };
 
@@ -44,8 +44,7 @@ const UserMenu = ({
           color="inherit"
           onClick={onLoginClick}
           startIcon={<AccountCircle />}
-          variant="text"
-        >
+          variant="text">
           {!isMobileOnly && <Translate>Log in</Translate>}
         </Button>
       ) : (
@@ -55,8 +54,7 @@ const UserMenu = ({
             aria-controls="menu-appbar"
             aria-haspopup="true"
             onClick={handleMenu}
-            color="inherit"
-          >
+            color="inherit">
             <AccountCircle />
           </IconButton>
           <Menu
@@ -64,40 +62,39 @@ const UserMenu = ({
             anchorEl={anchorEl}
             anchorOrigin={{
               vertical: 'top',
-              horizontal: 'right',
+              horizontal: 'right'
             }}
             keepMounted
             transformOrigin={{
               vertical: 'top',
-              horizontal: 'right',
+              horizontal: 'right'
             }}
             open={open}
-            onClose={handleClose}
-          >
+            onClose={handleClose}>
             <MenuItem disabled>
               {formatMessage(
                 {
                   id: 'Logged as {userNickname}',
-                  defaultMessage: 'Logged as {userNickname}',
+                  defaultMessage: 'Logged as {userNickname}'
                 },
                 {
                   userNickname: (
                     <span>
-                      &nbsp;<b>{userNickname}</b>
+                      &nbsp;
+                      <b>{userNickname}</b>
                     </span>
-                  ),
-                },
+                  )
+                }
               )}
             </MenuItem>
             <MenuItem
               divider
               disabled
-              style={isSessionExpired ? { opacity: 1 } : {}}
-            >
+              style={isSessionExpired ? { opacity: 1 } : {}}>
               {isSessionExpired ? (
                 <span style={{ color: theme.palette.errorColor }}>
                   {formatMessage({
-                    id: 'Your session has expired: please log in again.',
+                    id: 'Your session has expired: please log in again.'
                   })}
                 </span>
               ) : (
@@ -107,18 +104,23 @@ const UserMenu = ({
                       id:
                         'Expiration Date: {expirationDate} at {expirationHourAndMinutes}',
                       defaultMessage:
-                        'Expiration Date: {expirationDate} at {expirationHourAndMinutes}',
+                        'Expiration Date: {expirationDate} at {expirationHourAndMinutes}'
                     },
                     {
                       expirationDate: (
                         <span>
-                          &nbsp;{formatDate(authTokenExpirationDate)}&nbsp;
+                          &nbsp;
+                          {formatDate(authTokenExpirationDate)}
+                          &nbsp;
                         </span>
                       ),
                       expirationHourAndMinutes: (
-                        <span>&nbsp;{formatTime(authTokenExpirationDate)}</span>
-                      ),
-                    },
+                        <span>
+                          &nbsp;
+                          {formatTime(authTokenExpirationDate)}
+                        </span>
+                      )
+                    }
                   )}
                 </>
               )}
@@ -141,7 +143,7 @@ UserMenu.propTypes = {
   userNickname: PropTypes.string,
   isAuth: PropTypes.bool.isRequired,
   onLoginClick: PropTypes.func.isRequired,
-  onLogoutClick: PropTypes.func.isRequired,
+  onLogoutClick: PropTypes.func.isRequired
 };
 
 export default UserMenu;

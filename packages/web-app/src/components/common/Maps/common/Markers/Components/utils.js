@@ -1,4 +1,4 @@
-import { useIntl } from 'react-intl';
+// import { useIntl } from 'react-intl';
 
 // export const makeCoordinatesValue = (latitude, longitude) => {
 //   const { formatMessage } = useIntl();

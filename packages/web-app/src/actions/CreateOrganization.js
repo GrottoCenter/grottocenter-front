@@ -6,41 +6,41 @@ export const POST_ORGANIZATION_SUCCESS = 'POST_ORGANIZATION_SUCCESS';
 export const POST_ORGANIZATION_FAILURE = 'POST_ORGANIZATION_FAILURE';
 
 export const postOrganizationAction = () => ({
-  type: POST_ORGANIZATION,
+  type: POST_ORGANIZATION
 });
 
-export const postOrganizationSuccess = (organization) => ({
+export const postOrganizationSuccess = organization => ({
   type: POST_ORGANIZATION_SUCCESS,
-  organization,
+  organization
 });
 
-export const postOrganizationFailure = (error) => ({
+export const postOrganizationFailure = error => ({
   type: POST_ORGANIZATION_FAILURE,
-  error,
+  error
 });
 
-export const postOrganization = (name) => (dispatch, getState) => {
+export const postOrganization = name => (dispatch, getState) => {
   dispatch(postOrganizationAction());
 
   const requestOptions = {
     method: 'POST',
     body: JSON.stringify({
       name: {
-        text: name,
-      },
+        text: name
+      }
     }),
-    headers: getState().login.authorizationHeader,
+    headers: getState().login.authorizationHeader
   };
 
   return fetch(postOrganizationUrl, requestOptions)
-    .then((response) => {
+    .then(response => {
       if (response.status >= 400) {
         throw new Error(response.status);
       }
       return response.text();
     })
-    .then((text) => dispatch(postOrganizationSuccess(JSON.parse(text))))
-    .catch((errorMessage) => {
+    .then(text => dispatch(postOrganizationSuccess(JSON.parse(text))))
+    .catch(errorMessage => {
       dispatch(postOrganizationFailure(errorMessage));
     });
 };

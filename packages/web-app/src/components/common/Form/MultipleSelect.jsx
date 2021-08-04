@@ -5,7 +5,7 @@ import {
   Collapse as MuiCollapse,
   FormHelperText,
   IconButton,
-  TextField,
+  TextField
 } from '@material-ui/core';
 import { isNil, length } from 'ramda';
 
@@ -58,7 +58,7 @@ const MultipleSelect = ({
   sideActionIcon,
   sideActionDisabled = true,
   isSideActionOpen = false,
-  children,
+  children
 }) => {
   const [inputValue, setInputValue] = React.useState('');
   const debouncedInput = useDebounce(inputValue);
@@ -86,6 +86,7 @@ const MultipleSelect = ({
     } else {
       resetSearchResults();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debouncedInput]);
 
   const hasError = computeHasError(value);
@@ -107,7 +108,7 @@ const MultipleSelect = ({
             renderOption={renderOption}
             getOptionSelected={getOptionSelected}
             filterSelectedOptions
-            filterOptions={(options) => options} // This fixes a bug: without it, the autocomplete hides some results...
+            filterOptions={options => options} // This fixes a bug: without it, the autocomplete hides some results...
             noOptionsText={
               inputValue.length >= nbCharactersNeededToLaunchSearch ? (
                 noOptionsText
@@ -116,21 +117,21 @@ const MultipleSelect = ({
                   {formatMessage(
                     {
                       id: 'Type at least {nbOfChars} character(s)',
-                      defaultMessage: 'Type at least {nbOfChars} character(s)',
+                      defaultMessage: 'Type at least {nbOfChars} character(s)'
                     },
                     {
                       nbOfChars: (
                         <span key="notEnoughCharsEntered">
                           {nbCharactersNeededToLaunchSearch}
                         </span>
-                      ),
-                    },
+                      )
+                    }
                   )}
                 </span>
               )
             }
             required={required}
-            renderInput={(params) => (
+            renderInput={params => (
               <TextField
                 {...params}
                 variant="filled"
@@ -150,8 +151,7 @@ const MultipleSelect = ({
             onClick={onSideAction}
             disabled={sideActionDisabled}
             color="secondary"
-            aria-label="new entity"
-          >
+            aria-label="new entity">
             {!isNil(sideActionIcon) ? (
               sideActionIcon
             ) : (
@@ -170,7 +170,7 @@ const MultipleSelect = ({
 };
 
 MultipleSelect.propTypes = {
-  ...MultipleSelectTypes,
+  ...MultipleSelectTypes
 };
 
 export default MultipleSelect;

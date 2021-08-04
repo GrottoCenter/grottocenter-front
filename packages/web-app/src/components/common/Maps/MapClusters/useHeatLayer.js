@@ -19,7 +19,7 @@ import {
   HEX_DETAILS_RADIUS_RANGE,
   HEX_DETAILS_ZOOM,
   HEX_DETAILS_OPACITY,
-  HEX_OPACITY,
+  HEX_OPACITY
 } from './constants';
 
 export const HexGlobalCss = createGlobalStyle`
@@ -73,31 +73,32 @@ const useHeatLayer = (data = [], type = heatmapTypes.ENTRANCES) => {
           .colorRange(
             newType === heatmapTypes.NETWORKS
               ? NETWORK_HEAT_COLORS
-              : ENTRANCE_HEAT_COLORS,
+              : ENTRANCE_HEAT_COLORS
           )
           .hoverHandler(
             L.HexbinHoverHandler.compound({
               handlers: [
                 L.HexbinHoverHandler.resizeFill(),
                 L.HexbinHoverHandler.tooltip({
-                  tooltipContent: (nbr) =>
-                    `${nbr.length} ${formatMessage({ id: newType })}`,
-                }),
-              ],
-            }),
+                  tooltipContent: nbr =>
+                    `${nbr.length} ${formatMessage({ id: newType })}`
+                })
+              ]
+            })
           )
           .data(newData);
       }
     },
-    [hexLayer],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [hexLayer]
   );
 
-  const flyToHex = (hex) => {
+  const flyToHex = hex => {
     d3.selectAll('.hexbin-tooltip').attr('opacity', 0);
     const bounds = new L.LatLngBounds(convertD3Position(hex));
     map.flyToBounds(bounds, {
       maxZoom: MARKERS_LIMIT,
-      duration: HEX_FLY_TO_DURATION,
+      duration: HEX_FLY_TO_DURATION
     });
   };
 
@@ -108,6 +109,7 @@ const useHeatLayer = (data = [], type = heatmapTypes.ENTRANCES) => {
       // Remove tooltip
       d3.selectAll('.hexbin-tooltip').remove();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -117,19 +119,20 @@ const useHeatLayer = (data = [], type = heatmapTypes.ENTRANCES) => {
 
       hexLayer
         .radiusRange(HEX_RADIUS_RANGE)
-        .lng((d) => d[0])
-        .lat((d) => d[1])
-        .colorValue((d) => d.length)
-        .radiusValue((d) => d.length);
+        .lng(d => d[0])
+        .lat(d => d[1])
+        .colorValue(d => d.length)
+        .radiusValue(d => d.length);
 
       hexLayer.dispatch().on('click', flyToHex);
 
       updateHeatData(data);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hexLayer]);
 
   return {
-    updateHeatData,
+    updateHeatData
   };
 };
 

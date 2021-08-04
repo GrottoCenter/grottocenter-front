@@ -1,13 +1,13 @@
 import {
   POST_CAVER,
   POST_CAVER_FAILURE,
-  POST_CAVER_SUCCESS,
+  POST_CAVER_SUCCESS
 } from '../actions/CreateCaver';
 
 const initialState = {
   error: null,
   isLoading: false,
-  caver: null,
+  caver: null
 };
 
 const createCaver = (state = initialState, action) => {
@@ -15,18 +15,18 @@ const createCaver = (state = initialState, action) => {
     case POST_CAVER:
       return {
         ...initialState,
-        isLoading: true,
+        isLoading: true
       };
     case POST_CAVER_SUCCESS:
       return {
         ...initialState,
         isLoading: false,
-        caver: action.caver,
+        caver: action.caver
       };
     case POST_CAVER_FAILURE:
       return {
         ...initialState,
-        error: action.error,
+        error: action.error
       };
     default:
       return state;

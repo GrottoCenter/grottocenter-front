@@ -14,11 +14,12 @@ import { getSafeData } from './transformer';
 const CaveSystemPage = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
-  const { loading, data, error } = useSelector((state) => state.cave);
+  const { loading, data, error } = useSelector(state => state.cave);
   const { formatMessage } = useIntl();
 
   useEffect(() => {
     dispatch(fetchCave(id));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
   return (

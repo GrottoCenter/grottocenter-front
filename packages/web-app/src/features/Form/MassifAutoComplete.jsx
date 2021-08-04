@@ -6,7 +6,7 @@ import { InputAdornment } from '@material-ui/core';
 
 import {
   fetchQuicksearchResult,
-  resetQuicksearch,
+  resetQuicksearch
 } from '../../actions/Quicksearch';
 
 import { entityOptionForSelector } from '../../helpers/Entity';
@@ -24,7 +24,7 @@ const resultEndAdornment = (
 
 // ===================================
 
-const getMassifToString = (massif) => {
+const getMassifToString = massif => {
   return `#${massif.id} - ${massif.name}`;
 };
 
@@ -34,18 +34,18 @@ const MassifAutoComplete = ({
   helperContentIfValueIsForced,
   labelText,
   required = false,
-  searchLabelText,
+  searchLabelText
 }) => {
   const dispatch = useDispatch();
   const { error, isLoading, results: suggestions } = useSelector(
-    (state) => state.quicksearch,
+    state => state.quicksearch
   );
 
-  const fetchSearchResults = (debouncedInput) => {
+  const fetchSearchResults = debouncedInput => {
     const criterias = {
       query: debouncedInput.trim(),
       complete: false,
-      resourceType: 'massifs',
+      resourceType: 'massifs'
     };
     dispatch(fetchQuicksearchResult(criterias));
   };
@@ -90,7 +90,7 @@ MassifAutoComplete.propTypes = {
   helperContentIfValueIsForced: PropTypes.node,
   labelText: PropTypes.string.isRequired,
   required: PropTypes.bool,
-  searchLabelText: PropTypes.string.isRequired,
+  searchLabelText: PropTypes.string.isRequired
 };
 
 export default MassifAutoComplete;

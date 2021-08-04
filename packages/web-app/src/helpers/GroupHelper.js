@@ -2,28 +2,28 @@ const GROUPS = [
   {
     id: 1,
     name: 'Administrator',
-    canBeChanged: true,
+    canBeChanged: true
   },
   {
     id: 2,
     name: 'Moderator',
-    canBeChanged: true,
+    canBeChanged: true
   },
   {
     id: 3,
     name: 'User',
-    canBeChanged: false,
+    canBeChanged: false
   },
   {
     id: 4,
     name: 'Visitor',
-    canBeChanged: false,
+    canBeChanged: false
   },
   {
     id: 5,
     name: 'Leader',
-    canBeChanged: true,
-  },
+    canBeChanged: true
+  }
 ];
 
 export default GROUPS;

@@ -16,7 +16,7 @@ import {
   TableBody,
   TableHead,
   TablePagination,
-  TableRow,
+  TableRow
 } from '@material-ui/core';
 import { pathOr } from 'ramda';
 
@@ -36,20 +36,20 @@ const StyledTableFooter = styled.div`
 
 const styles = () => ({
   resultsContainer: {
-    marginTop: '24px',
+    marginTop: '24px'
   },
   table: {
     marginBottom: 0,
-    overflow: 'auto',
+    overflow: 'auto'
   },
   tableRow: {
     '&:hover': {
-      cursor: 'pointer',
-    },
+      cursor: 'pointer'
+    }
   },
   textError: {
-    color: '#ff3333',
-  },
+    color: '#ff3333'
+  }
 });
 
 const DEFAULT_FROM = 0;
@@ -73,7 +73,7 @@ class SearchResultsTable extends React.Component {
     this.state = {
       from: DEFAULT_FROM,
       page: DEFAULT_PAGE,
-      size: DEFAULT_SIZE,
+      size: DEFAULT_SIZE
     };
     this.entrancesTableHead = this.entrancesTableHead.bind(this);
     this.organizationsTableHead = this.organizationsTableHead.bind(this);
@@ -101,13 +101,13 @@ class SearchResultsTable extends React.Component {
       this.setState({
         from: DEFAULT_FROM,
         page: DEFAULT_PAGE,
-        size: DEFAULT_SIZE,
+        size: DEFAULT_SIZE
       });
     }
 
     if (results) {
       this.cardRef.current.scrollIntoView({
-        behavior: 'smooth',
+        behavior: 'smooth'
       });
     }
   };
@@ -144,7 +144,7 @@ class SearchResultsTable extends React.Component {
               src="/images/length.svg"
               title={intl.formatMessage({
                 id: 'Cave length',
-                defaultMessage: 'Cave length',
+                defaultMessage: 'Cave length'
               })}
               alt="Cave length icon"
             />
@@ -154,7 +154,7 @@ class SearchResultsTable extends React.Component {
               src="/images/depth.svg"
               title={intl.formatMessage({
                 id: 'Cave depth',
-                defaultMessage: 'Cave depth',
+                defaultMessage: 'Cave depth'
               })}
               alt="Cave depth icon"
             />
@@ -192,7 +192,7 @@ class SearchResultsTable extends React.Component {
               src="/images/caver-cluster.svg"
               title={intl.formatMessage({
                 id: 'Number of cavers',
-                defaultMessage: 'Number of cavers',
+                defaultMessage: 'Number of cavers'
               })}
               alt="Cavers icon"
             />
@@ -215,7 +215,7 @@ class SearchResultsTable extends React.Component {
               src="/images/entry-cluster.svg"
               title={intl.formatMessage({
                 id: 'Number of caves',
-                defaultMessage: 'Number of caves',
+                defaultMessage: 'Number of caves'
               })}
               alt="Cave icon"
             />
@@ -225,7 +225,7 @@ class SearchResultsTable extends React.Component {
               src="/images/gc-entries.svg"
               title={intl.formatMessage({
                 id: 'Number of entrances',
-                defaultMessage: 'Number of entrances',
+                defaultMessage: 'Number of entrances'
               })}
               alt="Entrances icon"
             />
@@ -262,7 +262,7 @@ class SearchResultsTable extends React.Component {
 
   // ===== Handle functions ===== //
 
-  handleRowClick = (id) => {
+  handleRowClick = id => {
     const { history, resourceType } = this.props;
     let urlToRedirectTo = '';
     switch (resourceType) {
@@ -315,11 +315,11 @@ class SearchResultsTable extends React.Component {
 
     this.setState({
       page: newPage,
-      from: newFrom,
+      from: newFrom
     });
   };
 
-  handleChangeRowsPerPage = (event) => {
+  handleChangeRowsPerPage = event => {
     const { results, getNewResults, totalNbResults } = this.props;
     const { from } = this.state;
 
@@ -345,7 +345,7 @@ class SearchResultsTable extends React.Component {
     this.setState({
       from: newFrom,
       page: newPage,
-      size: newSize,
+      size: newSize
     });
   };
 
@@ -361,7 +361,7 @@ class SearchResultsTable extends React.Component {
     switch (resourceType) {
       case 'entrances':
         // Flatten cave and massif
-        cleanedResults = fullResults.map((result) => {
+        cleanedResults = fullResults.map(result => {
           const cleanedResult = result;
           cleanedResult.cave = pathOr(null, ['cave', 'name'], result);
           cleanedResult.massif = pathOr(null, ['massif', 'name'], result);
@@ -373,7 +373,7 @@ class SearchResultsTable extends React.Component {
 
       case 'grottos':
       case 'massifs':
-        cleanedResults = fullResults.map((result) => {
+        cleanedResults = fullResults.map(result => {
           const cleanedResult = result;
           delete cleanedResult.type;
           delete cleanedResult.highlights;
@@ -383,18 +383,18 @@ class SearchResultsTable extends React.Component {
 
       case 'documents':
         // Flatten regions and subjects
-        cleanedResults = fullResults.map((result) => {
+        cleanedResults = fullResults.map(result => {
           const cleanedResult = result;
           if (result.regions) {
             cleanedResult.regions = result.regions
-              .map((s) => {
+              .map(s => {
                 return s.names;
               })
               .join(', ');
           }
           if (result.subjects) {
             cleanedResult.subjects = result.subjects
-              .map((s) => {
+              .map(s => {
                 return s.code;
               })
               .join(', ');
@@ -423,7 +423,7 @@ class SearchResultsTable extends React.Component {
       isLoadingFullData,
       wantToDownloadCSV,
       fullResults,
-      intl,
+      intl
     } = this.props;
     const { from, page, size } = this.state;
 
@@ -470,22 +470,19 @@ class SearchResultsTable extends React.Component {
             <Table
               className={classes.table}
               size="small"
-              style={{ display: tableDisplayValueForScroll }}
-            >
+              style={{ display: tableDisplayValueForScroll }}>
               <ResultsTableHead />
 
               <TableBody
                 style={{
-                  opacity: isLoading ? 0.3 : 1,
-                }}
-              >
-                {resultsSliced.map((result) => (
+                  opacity: isLoading ? 0.3 : 1
+                }}>
+                {resultsSliced.map(result => (
                   <TableRow
                     hover
                     key={result.id}
                     className={classes.tableRow}
-                    onClick={() => this.handleRowClick(result.id)}
-                  >
+                    onClick={() => this.handleRowClick(result.id)}>
                     {resourceType === 'entrances' && (
                       <>
                         <TableCell>{result.name}</TableCell>
@@ -563,14 +560,14 @@ class SearchResultsTable extends React.Component {
                         </TableCell>
                         <TableCell>
                           {result.subjects
-                            ? result.subjects.map((s) => s.code).join(', ')
+                            ? result.subjects.map(s => s.code).join(', ')
                             : '-'}
                         </TableCell>
                         <TableCell>
                           {result.regions
                             ? _.truncate(
-                                result.regions.map((s) => s.name).join(', '),
-                                30,
+                                result.regions.map(s => s.name).join(', '),
+                                30
                               )
                             : '-'}
                         </TableCell>
@@ -596,8 +593,7 @@ class SearchResultsTable extends React.Component {
                 variant="contained"
                 size="large"
                 onClick={this.loadCSVData}
-                startIcon={<DescriptionIcon />}
-              >
+                startIcon={<DescriptionIcon />}>
                 <Translate>Export to CSV</Translate>
               </Button>
 
@@ -616,12 +612,12 @@ class SearchResultsTable extends React.Component {
                 rowsPerPage={size}
                 page={page}
                 labelRowsPerPage={intl.formatMessage({
-                  id: 'Results per page',
+                  id: 'Results per page'
                 })}
                 onChangePage={(event, pageNb) =>
                   this.handleChangePage(event, pageNb)
                 }
-                onChangeRowsPerPage={(event) =>
+                onChangeRowsPerPage={event =>
                   this.handleChangeRowsPerPage(event)
                 }
                 ActionsComponent={() => (
@@ -651,7 +647,7 @@ class SearchResultsTable extends React.Component {
                     defaultMessage="Too many results to download ({0}). You can only download {1} results at once."
                     values={{
                       0: <b>{totalNbResults}</b>,
-                      1: <b>{MAX_NUMBER_OF_DATA_TO_EXPORT_IN_CSV}</b>,
+                      1: <b>{MAX_NUMBER_OF_DATA_TO_EXPORT_IN_CSV}</b>
                     }}
                   />
                 </p>
@@ -675,7 +671,7 @@ SearchResultsTable.propTypes = {
     resultsContainer: PropTypes.string,
     table: PropTypes.string,
     tableRow: PropTypes.string,
-    textError: PropTypes.string,
+    textError: PropTypes.string
   }).isRequired,
   history: PropTypes.shape({ push: PropTypes.func }).isRequired,
   isLoading: PropTypes.bool.isRequired,
@@ -686,19 +682,19 @@ SearchResultsTable.propTypes = {
     'entrances',
     'grottos',
     'massifs',
-    'documents',
+    'documents'
   ]).isRequired,
   getNewResults: PropTypes.func.isRequired,
   getFullResults: PropTypes.func.isRequired,
   wantToDownloadCSV: PropTypes.bool.isRequired,
   totalNbResults: PropTypes.number.isRequired,
   fullResults: PropTypes.arrayOf(PropTypes.shape({})),
-  intl: PropTypes.shape({}).isRequired,
+  intl: PropTypes.shape({ formatMessage: PropTypes.func }).isRequired
 };
 
 SearchResultsTable.defaultProps = {
   results: undefined,
-  fullResults: undefined,
+  fullResults: undefined
 };
 
 export default injectIntl(withRouter(withStyles(styles)(SearchResultsTable)));

@@ -3,7 +3,7 @@ import {
   Dialog,
   DialogActions,
   DialogContent as MuiDialogContent,
-  DialogTitle,
+  DialogTitle
 } from '@material-ui/core';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
@@ -34,7 +34,7 @@ const StandardDialog = ({
   onClose = () => {},
   title,
   children,
-  actions,
+  actions
 }) => (
   <Dialog
     fullScreen={fullScreen}
@@ -42,8 +42,7 @@ const StandardDialog = ({
     maxWidth={maxWidth}
     open={open}
     onClose={onClose}
-    PaperProps={{ style: { overflow: 'visible' } }}
-  >
+    PaperProps={{ style: { overflow: 'visible' } }}>
     {onClose && (
       <CloseButton aria-label="close" onClick={onClose} color="primary">
         <CloseIcon />
@@ -68,5 +67,5 @@ StandardDialog.propTypes = {
   open: PropTypes.bool,
   onClose: PropTypes.func,
   scrollable: PropTypes.bool,
-  title: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
+  title: PropTypes.oneOfType([PropTypes.string, PropTypes.node])
 };

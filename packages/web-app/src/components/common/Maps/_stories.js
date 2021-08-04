@@ -10,7 +10,7 @@ import Clusters from './MapClusters';
 import {
   EntrancePopup,
   NetworkPopup,
-  OrganizationPopup,
+  OrganizationPopup
 } from './common/Markers/Components';
 
 const Card = styled(MuiCard)`
@@ -22,19 +22,19 @@ const positions = {
   '1 marker': [[43.35266, 5.81689]],
   'multiple markers 1': [
     [43.35266, 5.81689],
-    [43.34166, 5.86689],
+    [43.34166, 5.86689]
   ],
   'multiple markers 2': [
     [43.35266, 5.81689],
     [43.34166, 5.86689],
-    [43.44166, 5.76689],
+    [43.44166, 5.76689]
   ],
   'multiple markers far distance': [
     [43.35266, 5.81689],
     [43.34166, 5.86689],
     [43.44166, 5.76689],
-    [43.0, 6.5],
-  ],
+    [43.0, 6.5]
+  ]
 };
 
 // eslint-disable-next-line react/prop-types
@@ -67,19 +67,19 @@ const ClustersMap = () => {
     id: i,
     name: 'name',
     city: 'city',
-    region: 'region',
+    region: 'region'
   }));
   const networks = generateRandomCoord();
   const networkMarkers = networks.map((network, i) => ({
     latitude: network[1],
     longitude: network[0],
-    id: i,
+    id: i
   }));
   const organizations = generateRandomCoord(300).map((org, i) => ({
     latitude: org[1],
     longitude: org[0],
     id: i,
-    name: 'organization name',
+    name: 'organization name'
   }));
   return (
     <Clusters
@@ -116,8 +116,8 @@ storiesOf('Maps', module)
           cave: {
             name: 'cave name',
             depth: 500,
-            length: 5000,
-          },
+            length: 5000
+          }
         }}
       />
     </Paper>
@@ -127,7 +127,7 @@ storiesOf('Maps', module)
       <NetworkPopup
         network={{
           id: 1,
-          name: 'network name',
+          name: 'network name'
         }}
       />
     </Paper>
@@ -141,7 +141,7 @@ storiesOf('Maps', module)
           address: 'Montpellier (FR) adresse',
           city: 'Montpellier (FR)',
           longitude: 58.18188,
-          latitude: 7.1857,
+          latitude: 7.1857
         }}
       />
     </Paper>

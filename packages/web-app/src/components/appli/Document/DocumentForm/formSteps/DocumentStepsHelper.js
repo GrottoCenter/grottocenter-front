@@ -10,7 +10,7 @@ const isStep1Valid = (stepData, documentType) => {
     titleAndDescriptionLanguage,
     documentMainLanguage,
     description,
-    publicationDate,
+    publicationDate
   } = stepData;
   const isValid =
     title !== '' && titleAndDescriptionLanguage !== null && description !== '';
@@ -51,7 +51,7 @@ const isStep2Valid = (stepData, documentType) => {
   }
 };
 
-const isStep3Valid = (stepData) => {
+const isStep3Valid = stepData => {
   if (isNil(stepData)) {
     return false;
   }

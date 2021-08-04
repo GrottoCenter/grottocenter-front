@@ -7,7 +7,7 @@ export const returnObject = ([currentValue, set]) => ({
   true: () => set(true),
   false: () => set(false),
   open: () => set(true),
-  close: () => set(false),
+  close: () => set(false)
 });
 
 export function useBoolean(defaultValue = false) {

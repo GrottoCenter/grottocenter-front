@@ -5,7 +5,7 @@ import SignUpForm from './index';
 
 const HydratedSignUpForm = () => {
   const [signUpRequestSucceeded, setSignUpRequestSucceeded] = React.useState(
-    false,
+    false
   );
   const [loading, setLoading] = React.useState(false);
   const [email, setEmail] = React.useState('');
@@ -19,14 +19,13 @@ const HydratedSignUpForm = () => {
     <>
       <Paper
         style={{ margin: '2rem', padding: '2rem', width: '300px' }}
-        align="center"
-      >
+        align="center">
         <Typography variant="h2">Story controls</Typography>
         <FormControlLabel
           control={
             <Switch
               checked={loading}
-              onChange={(event) => setLoading(event.target.checked)}
+              onChange={event => setLoading(event.target.checked)}
               name="Loading"
               color="primary"
             />

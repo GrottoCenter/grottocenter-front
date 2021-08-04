@@ -11,11 +11,11 @@ import {
   fetchNetworksCoordinates,
   fetchOrganizations,
   fetchEntrances,
-  fetchEntrancesCoordinates,
+  fetchEntrancesCoordinates
 } from '../actions/Map';
 import { fetchProjections } from '../actions/Projections';
 
-const encodePathLocation = (pathLocation) =>
+const encodePathLocation = pathLocation =>
   Buffer.from(pathLocation).toString('base64');
 
 const Map = () => {
@@ -31,16 +31,16 @@ const Map = () => {
     networksCoordinates,
     organizations,
     entrances,
-    entrancesCoordinates,
-  } = useSelector((state) => state.map);
-  const { open } = useSelector((state) => state.sideMenu);
-  const { projections } = useSelector((state) => state.projections);
+    entrancesCoordinates
+  } = useSelector(state => state.map);
+  const { open } = useSelector(state => state.sideMenu);
+  const { projections } = useSelector(state => state.projections);
   const handleUpdate = ({ heat, markers, zoom: newZoom, center, bounds }) => {
     const encodedPathLocation = encodePathLocation(
-      `lng=${center.lng}&lat=${center.lat}&zoom=${newZoom}`,
+      `lng=${center.lng}&lat=${center.lat}&zoom=${newZoom}`
     );
     history.push(
-      generatePath('/ui/map/:target', { target: encodedPathLocation }),
+      generatePath('/ui/map/:target', { target: encodedPathLocation })
     );
     dispatch(changeLocation(center));
     dispatch(changeZoom(zoom));
@@ -53,7 +53,7 @@ const Map = () => {
       ne_lat: bounds._northEast.lat,
       // eslint-disable-next-line no-underscore-dangle
       ne_lng: bounds._northEast.lng,
-      zoom: newZoom,
+      zoom: newZoom
     };
     if (includes('organizations', markers)) {
       dispatch(fetchOrganizations(criteria));
@@ -74,6 +74,7 @@ const Map = () => {
 
   useEffect(() => {
     dispatch(fetchProjections());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

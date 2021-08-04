@@ -11,12 +11,12 @@ import { isArticle } from '../components/appli/Document/DocumentForm/DocumentTyp
 import {
   postDocument,
   resetApiMessages,
-  updateDocument,
+  updateDocument
 } from '../actions/Document';
 import { displayLoginDialog } from '../actions/Login';
 
 import DocumentFormProvider, {
-  DocumentFormContext,
+  DocumentFormContext
 } from '../components/appli/Document/DocumentForm/Provider';
 import { defaultValuesTypes } from '../components/appli/Document/DocumentForm/types';
 
@@ -50,29 +50,29 @@ const DocumentSubmission = () => {
       library,
       partOf,
       publicationDate,
-      titleAndDescriptionLanguage,
+      titleAndDescriptionLanguage
     },
     resetContext,
-    updateAttribute,
+    updateAttribute
   } = useContext(DocumentFormContext);
 
   const [isDocSubmittedWithSuccess, setDocSubmittedWithSuccess] = useState(
-    false,
+    false
   );
   const [isDocSubmitted, setDocSubmitted] = useState(false);
 
-  const documentState = useSelector((state) => state.document);
+  const documentState = useSelector(state => state.document);
 
   const onLoginClick = () => {
     dispatch(displayLoginDialog());
   };
 
-  const submitForm = (formData) => {
+  const submitForm = formData => {
     dispatch(postDocument(formData));
     setDocSubmitted(true);
   };
 
-  const submitUpdateForm = (formData) => {
+  const submitUpdateForm = formData => {
     dispatch(updateDocument(formData));
     setDocSubmitted(true);
   };
@@ -117,12 +117,12 @@ const DocumentSubmission = () => {
                   isNewDocument
                     ? `${formatMessage({
                         id:
-                          'Your document has been successfully submitted, thank you!',
+                          'Your document has been successfully submitted, thank you!'
                       })} ${formatMessage({
-                        id: 'It will be verified by one of ours moderators.',
+                        id: 'It will be verified by one of ours moderators.'
                       })}`
                     : `${formatMessage({
-                        id: 'Document successfully updated.',
+                        id: 'Document successfully updated.'
                       })}`
                 }
               />
@@ -132,14 +132,13 @@ const DocumentSubmission = () => {
                     color="primary"
                     onClick={onSubmitAnotherArticle}
                     startIcon={<ReplayIcon />}
-                    variant="contained"
-                  >
+                    variant="contained">
                     <Translate>Submit another article</Translate>
                   </SpacedButton>
                   <Typography variant="body1">
                     {formatMessage({
                       id:
-                        'By clicking this button, you will be able to submit another article without re-typing some values (publication date, parent document etc.).',
+                        'By clicking this button, you will be able to submit another article without re-typing some values (publication date, parent document etc.).'
                     })}
                   </Typography>
                   <br />
@@ -149,14 +148,12 @@ const DocumentSubmission = () => {
                 <>
                   <SpacedButton
                     onClick={onSubmitAnotherDocument}
-                    variant="contained"
-                  >
+                    variant="contained">
                     <Translate>Submit another document</Translate>
                   </SpacedButton>
                   <SpacedButton
                     onClick={() => history.push('')}
-                    variant="contained"
-                  >
+                    variant="contained">
                     <Translate>Go to home page</Translate>
                   </SpacedButton>
                 </>
@@ -172,11 +169,10 @@ const DocumentSubmission = () => {
               />
               {documentState.errorMessages.length > 0 && (
                 <CenteredBlock>
-                  {documentState.errorMessages.map((error) => (
+                  {documentState.errorMessages.map(error => (
                     <Fade
                       in={documentState.errorMessages.length > 0}
-                      key={error}
-                    >
+                      key={error}>
                       <ErrorMessage message={formatMessage({ id: error })} />
                     </Fade>
                   ))}
@@ -189,7 +185,7 @@ const DocumentSubmission = () => {
               <ErrorMessage
                 message={formatMessage({
                   id:
-                    'You must be authenticated and an user to submit a document to Grottocenter.',
+                    'You must be authenticated and an user to submit a document to Grottocenter.'
                 })}
               />
               <SpacedButton onClick={onLoginClick} variant="contained">
@@ -197,8 +193,7 @@ const DocumentSubmission = () => {
               </SpacedButton>
               <SpacedButton
                 onClick={() => history.push('')}
-                variant="contained"
-              >
+                variant="contained">
                 <Translate>Go to home page</Translate>
               </SpacedButton>
             </CenteredBlock>
@@ -216,7 +211,7 @@ const HydratedDocumentSubmission = ({ defaultValues, ...props }) => (
 );
 
 HydratedDocumentSubmission.propTypes = {
-  defaultValues: defaultValuesTypes,
+  defaultValues: defaultValuesTypes
 };
 
 export default HydratedDocumentSubmission;

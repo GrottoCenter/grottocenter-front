@@ -1,8 +1,6 @@
 {
   "packages": [
-    "external/*",
-    "internal/*"
-
+    "packages/*"
   ],
   "nohoist": [
     "**/@types/lodash",

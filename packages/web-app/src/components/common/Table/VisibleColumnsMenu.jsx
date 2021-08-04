@@ -5,7 +5,7 @@ import {
   Menu,
   MenuItem,
   ListItemIcon,
-  ListItemText,
+  ListItemText
 } from '@material-ui/core';
 import VisibilityOffIcon from '@material-ui/icons/VisibilityOff';
 import { includes, without, __, values } from 'ramda';
@@ -14,19 +14,19 @@ import PropTypes from 'prop-types';
 
 export const ActionColumnIds = {
   selection: 'selection',
-  detailedView: 'detailedView',
+  detailedView: 'detailedView'
 };
 export const isActionColumn = includes(__, values(ActionColumnIds));
 
 const VisibleColumnsMenu = ({
   updateHiddenColumns,
   hiddenColumns,
-  allColumns,
+  allColumns
 }) => {
   const { formatMessage } = useIntl();
   const [anchorEl, setAnchorEl] = React.useState(null);
 
-  const handleClick = (event) => {
+  const handleClick = event => {
     setAnchorEl(event.currentTarget);
   };
 
@@ -34,11 +34,11 @@ const VisibleColumnsMenu = ({
     setAnchorEl(null);
   };
 
-  const handleUpdateHiddenColumns = (id) => () => {
+  const handleUpdateHiddenColumns = id => () => {
     updateHiddenColumns(
       includes(id, hiddenColumns)
         ? without(id, hiddenColumns)
-        : [...hiddenColumns, id],
+        : [...hiddenColumns, id]
     );
   };
 
@@ -52,17 +52,15 @@ const VisibleColumnsMenu = ({
         anchorEl={anchorEl}
         keepMounted
         open={Boolean(anchorEl)}
-        onClose={handleClose}
-      >
+        onClose={handleClose}>
         <MenuItem key="label" disabled>
           {formatMessage({ id: 'Hidden columns' })}
         </MenuItem>
-        {allColumns.map((column) => (
+        {allColumns.map(column => (
           <MenuItem
             key={column.id}
             button
-            onClick={handleUpdateHiddenColumns(column.id)}
-          >
+            onClick={handleUpdateHiddenColumns(column.id)}>
             <ListItemIcon>
               <Checkbox
                 size="small"
@@ -83,11 +81,11 @@ VisibleColumnsMenu.propTypes = {
   allColumns: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.string.isRequired,
-      label: PropTypes.string.isRequired,
-    }),
+      label: PropTypes.string.isRequired
+    })
   ).isRequired,
   hiddenColumns: PropTypes.arrayOf(PropTypes.string).isRequired,
-  updateHiddenColumns: PropTypes.func.isRequired,
+  updateHiddenColumns: PropTypes.func.isRequired
 };
 
 const MemoizedVisibleColumnsMenu = React.memo(VisibleColumnsMenu);

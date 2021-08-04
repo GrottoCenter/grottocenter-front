@@ -7,7 +7,7 @@ import { DocumentTypes } from './DocumentTypesHelper';
 export const DocumentFormTypes = {
   isLoading: PropTypes.bool.isRequired,
   onSubmit: PropTypes.func.isRequired,
-  onUpdate: PropTypes.func.isRequired,
+  onUpdate: PropTypes.func.isRequired
 };
 
 // eslint-disable-next-line import/prefer-default-export
@@ -19,7 +19,7 @@ const languageTypes = PropTypes.shape({
   refName: PropTypes.string,
   scope: PropTypes.string,
   type: PropTypes.string,
-  isPrefered: PropTypes.bool,
+  isPrefered: PropTypes.bool
 });
 const organizationTypes = PropTypes.shape({
   id: PropTypes.number,
@@ -34,12 +34,12 @@ const organizationTypes = PropTypes.shape({
         id: PropTypes.number,
         isMain: PropTypes.bool,
         language: PropTypes.string,
-        text: PropTypes.string,
-      }),
+        text: PropTypes.string
+      })
     ),
-    PropTypes.string,
+    PropTypes.string
   ]),
-  type: PropTypes.string,
+  type: PropTypes.string
 });
 export const authorsTypes = PropTypes.arrayOf(
   PropTypes.shape({
@@ -48,13 +48,13 @@ export const authorsTypes = PropTypes.arrayOf(
     name: PropTypes.string,
     nickname: PropTypes.string,
     surname: PropTypes.string,
-    type: PropTypes.string,
-  }),
+    type: PropTypes.string
+  })
 );
 export const documentMainLanguageTypes = languageTypes;
 export const documentTypeTypes = PropTypes.shape({
   id: PropTypes.oneOf(values(DocumentTypes)),
-  name: PropTypes.string,
+  name: PropTypes.string
 });
 
 export const editorTypes = organizationTypes;
@@ -68,15 +68,15 @@ export const regionsTypes = PropTypes.arrayOf(
     code: PropTypes.string,
     country: PropTypes.string,
     name: PropTypes.string,
-    isDeprecated: PropTypes.bool,
-  }),
+    isDeprecated: PropTypes.bool
+  })
 );
 export const subjectsTypes = PropTypes.arrayOf(
   PropTypes.shape({
     code: PropTypes.string,
     parent: PropTypes.shape({}),
-    subject: PropTypes.string,
-  }),
+    subject: PropTypes.string
+  })
 );
 export const titleAndDescriptionLanguageTypes = languageTypes;
 
@@ -99,5 +99,5 @@ export const defaultValuesTypes = PropTypes.shape({
   startPage: PropTypes.number,
   subjects: subjectsTypes,
   title: PropTypes.string,
-  titleAndDescriptionLanguage: titleAndDescriptionLanguageTypes,
+  titleAndDescriptionLanguage: titleAndDescriptionLanguageTypes
 });

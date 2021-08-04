@@ -34,7 +34,7 @@ const details = {
   coordinates: [43.35266, 5.81689],
   mountain: 'Sainte-Baume (massif de la)',
   altitude: 748,
-  isDivingCave: true,
+  isDivingCave: true
 };
 
 const Content = ({ title }) => {
@@ -57,7 +57,7 @@ const Content = ({ title }) => {
 };
 
 Content.propTypes = {
-  title: PropTypes.string.isRequired,
+  title: PropTypes.string.isRequired
 };
 
 // eslint-disable-next-line react/prop-types
@@ -102,15 +102,14 @@ const WithLayout = () => {
       AppBar={FakeAppBar}
       isSideMenuOpen={isSideMenuOpen}
       toggleSideMenu={toggleSideMenu}
-      SideBarQuickSearch={Search}
-    >
+      SideBarQuickSearch={Search}>
       <EntryWithContent />
     </Layout>
   );
 };
 
 storiesOf('Entry', module)
-  .addDecorator((storyFn) => (
+  .addDecorator(storyFn => (
     <StoryContextProvider loading={boolean('Loading', false)}>
       {storyFn()}
     </StoryContextProvider>

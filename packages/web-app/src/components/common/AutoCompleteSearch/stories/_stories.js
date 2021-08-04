@@ -6,7 +6,7 @@ import {
   Typography,
   Slider,
   Switch,
-  Divider as MuiDivider,
+  Divider as MuiDivider
 } from '@material-ui/core';
 
 import AutoCompleteSearch from '../index';
@@ -23,27 +23,27 @@ const Wrapper = styled.div`
 
 const SearchWrapper = styled.div`
   margin-left: auto;
-  width: ${(props) => (props.width ? props.width : 100)}%;
+  width: ${props => (props.width ? props.width : 100)}%;
 `;
 
 function countryToFlag(isoCode) {
   return typeof String.fromCodePoint !== 'undefined'
     ? isoCode
         .toUpperCase()
-        .replace(/./g, (char) =>
-          String.fromCodePoint(char.charCodeAt(0) + 127397),
+        .replace(/./g, char =>
+          String.fromCodePoint(char.charCodeAt(0) + 127397)
         )
     : isoCode;
 }
 
-const renderOption = (option) => (
+const renderOption = option => (
   <>
     <span>{countryToFlag(option.code)}</span>
     {option.label} ({option.code}) +{option.phone}
   </>
 );
 
-const getOptionLabel = (option) => option.label;
+const getOptionLabel = option => option.label;
 
 const WithState = () => {
   const [input, setInput] = React.useState('');
@@ -72,8 +72,8 @@ const WithState = () => {
   React.useEffect(() => {
     if (input.length > 2) {
       setHasError(false);
-      const newResults = countries.filter((s) =>
-        s.label.toLowerCase().includes(input.toLowerCase()),
+      const newResults = countries.filter(s =>
+        s.label.toLowerCase().includes(input.toLowerCase())
       );
       setIsLoading(true);
       setTimeout(() => {
@@ -81,6 +81,7 @@ const WithState = () => {
         setIsLoading(false);
       }, delay * 1000);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [input]);
 
   return (

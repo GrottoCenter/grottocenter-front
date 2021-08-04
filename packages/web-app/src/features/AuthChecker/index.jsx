@@ -54,7 +54,7 @@ const AuthChecker = ({ errorMessageComponent, componentToDisplay }) => {
             <>
               <ErrorMessage
                 message={formatMessage({
-                  id: 'You must be authenticated in order to use this feature.',
+                  id: 'You must be authenticated in order to use this feature.'
                 })}
               />
               <SpacedButton onClick={onLoginClick} variant="contained">
@@ -62,8 +62,7 @@ const AuthChecker = ({ errorMessageComponent, componentToDisplay }) => {
               </SpacedButton>
               <SpacedButton
                 onClick={() => history.push('')}
-                variant="contained"
-              >
+                variant="contained">
                 {formatMessage({ id: 'Go to home page' })}
               </SpacedButton>
             </>
@@ -76,7 +75,7 @@ const AuthChecker = ({ errorMessageComponent, componentToDisplay }) => {
 
 AuthChecker.propTypes = {
   errorMessageComponent: PropTypes.element,
-  componentToDisplay: PropTypes.element.isRequired,
+  componentToDisplay: PropTypes.element.isRequired
 };
 
 export default AuthChecker;

@@ -22,7 +22,7 @@ const countries = [
   { code: 'BF', label: 'Burkina Faso', phone: '226' },
   { code: 'BG', label: 'Bulgaria', phone: '359' },
   { code: 'BH', label: 'Bahrain', phone: '973' },
-  { code: 'BI', label: 'Burundi', phone: '257' },
+  { code: 'BI', label: 'Burundi', phone: '257' }
 ];
 
 export default countries;
