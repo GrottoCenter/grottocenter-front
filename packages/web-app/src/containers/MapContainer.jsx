@@ -1,4 +1,6 @@
+/*
 import { connect } from 'react-redux';
+
 import {
   fetchMapItemsResult,
   changeZoom,
@@ -21,3 +23,4 @@ const mapStateToProps = state => ({
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(GCMap);
+ */

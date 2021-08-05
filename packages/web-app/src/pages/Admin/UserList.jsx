@@ -10,10 +10,7 @@ import {
 
 import useMakeCustomCellRenders from './customCellRenders';
 
-// ==========
 const defaultHiddenColumns = ['groups'];
-
-// =====
 
 /**
  * In this component, the custom GC Table is used without multiple pages
@@ -72,6 +69,6 @@ const UserList = ({ isLoading, title, userList }) => {
 UserList.propTypes = {
   isLoading: PropTypes.bool.isRequired,
   title: PropTypes.string.isRequired,
-  userList: PropTypes.arrayOf(PropTypes.any).isRequired
+  userList: PropTypes.arrayOf(PropTypes.shape({})).isRequired
 };
 export default UserList;

@@ -1,8 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Avatar from '@material-ui/core/Avatar';
-import BurgerIcon from '@material-ui/icons/Navigation';
+import BurgerIcon from '@material-ui/icons/Help';
 import { withTheme } from '@material-ui/core/styles';
+import { Button } from '@material-ui/core';
 import styled from 'styled-components';
 import checkPermission from '../../helpers/Permissions';
 import { VIEW_SIDEMENU } from '../../conf/Rights';
@@ -24,10 +25,9 @@ const BurgerAvatar = withTheme(styled(Avatar)`
 `);
 
 const BurgerLink = ({ visible, onclick }) => (
-  // eslint-disable-next-line jsx-a11y/anchor-is-valid,jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions
-  <a onClick={onclick}>
+  <Button onClick={onclick}>
     <BurgerAvatar icon={<BurgerIcon />} visible={visible} />
-  </a>
+  </Button>
 );
 
 BurgerLink.propTypes = {

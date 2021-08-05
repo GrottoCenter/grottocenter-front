@@ -164,7 +164,7 @@ HydratedMap.propTypes = {
   networks: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.number)),
   networkMarkers: PropTypes.arrayOf(markerType),
   organizations: PropTypes.arrayOf(markerType),
-  projectionsList: PropTypes.arrayOf(PropTypes.any),
+  projectionsList: PropTypes.arrayOf(PropTypes.shape({})),
   zoom: PropTypes.number.isRequired,
   onUpdate: PropTypes.func,
   center: PropTypes.arrayOf(PropTypes.number)

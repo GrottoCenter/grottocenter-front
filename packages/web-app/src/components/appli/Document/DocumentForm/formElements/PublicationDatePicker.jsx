@@ -26,7 +26,6 @@ const ButtonsFlexWrapper = styled.div`
 const DateButton = styled(Button)`
   flex: 1;
 `;
-// ===================================
 
 const dateTypeFormats = {
   YEAR: 'yyyy',
@@ -77,6 +76,10 @@ const PublicationDatePicker = ({ required = false }) => {
    * @param {Date} newDate
    */
   const handleDateChange = newDate => {
+    if (newDate === null) {
+      updateAttribute('publicationDate', '');
+      return;
+    }
     const year = newDate.getFullYear();
     const month = newDate.getMonth() + 1;
     const day = newDate.getDate();

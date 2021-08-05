@@ -46,6 +46,8 @@ export const makeDetails = data => {
     bbsReference: propOr('', 'refBbs', data),
     documentType: pathOr('', ['type', 'name'], data),
     publicationDate: propOr('', 'datePublication', data),
+    oldPublication: propOr('', 'publication', data),
+    oldPublicationFascicule: propOr('', 'publicationFasciculeBBSOld', data),
     parentDocument: pipe(
       pathOr([], ['parent', 'titles']),
       head,

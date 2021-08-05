@@ -54,6 +54,7 @@ CustomHeaderCell.propTypes = {
         PropTypes.number.isRequired
       ])
     ),
+    // eslint-disable-next-line react/forbid-prop-types
     PropTypes.any
   ]),
   customRenders: PropTypes.func,

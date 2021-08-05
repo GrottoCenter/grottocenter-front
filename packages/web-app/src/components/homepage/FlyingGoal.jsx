@@ -36,25 +36,26 @@ const StyledSyncIcon = withStyles(
 
 class Goal extends Component {
   handleMouseOver() {
-    this.props.updateTargetZone(this.props.entry.description);
+    const { updateTargetZone, entry } = this.props;
+    updateTargetZone(entry.description);
   }
 
   handleMouseOut() {
-    this.props.updateTargetZone(this.props.title);
+    const { updateTargetZone, title } = this.props;
+    updateTargetZone(title);
   }
 
   render() {
+    const { className, textColor, entry } = this.props;
     return (
       // eslint-disable-next-line jsx-a11y/mouse-events-have-key-events
       <div
-        className={this.props.className}
+        className={className}
         onMouseOver={event => this.handleMouseOver(event)}
         onMouseOut={event => this.handleMouseOut(event)}>
-        <span style={{ color: this.props.textColor }}>
-          {this.props.entry.word}
-        </span>
+        <span style={{ color: textColor }}>{entry.word}</span>
         <StyledSyncIcon />
-        <GoalText>{this.props.entry.description}</GoalText>
+        <GoalText>{entry.description}</GoalText>
       </div>
     );
   }

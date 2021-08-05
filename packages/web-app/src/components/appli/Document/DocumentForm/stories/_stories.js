@@ -25,13 +25,10 @@ import {
   // allSubjects,
 } from './documentFormFakeData';
 
-// ==========================
-
 const PaddedCard = styled(Card)`
   padding: 2rem;
 `;
 
-// ==========================
 // eslint-disable-next-line react/prop-types
 const DefaultDocumentForm = ({ children }) => {
   return (

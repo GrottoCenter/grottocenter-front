@@ -49,8 +49,7 @@ const Api = () => {
 
   return (
     <div>
-      {/* eslint-disable-next-line jsx-a11y/aria-role */}
-      <div role="section">
+      <div>
         <div className="container">
           <div className="row">
             <div className="four columns">

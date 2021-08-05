@@ -63,7 +63,7 @@ const ConverterControl = ({
 
 ConverterControl.propTypes = {
   ...customControlProps,
-  projectionsList: PropTypes.arrayOf(PropTypes.any)
+  projectionsList: PropTypes.arrayOf(PropTypes.shape({}))
 };
 
 export default ConverterControl;

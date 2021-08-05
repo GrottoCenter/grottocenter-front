@@ -55,7 +55,7 @@ GCLink.propTypes = {
   internal: PropTypes.bool,
   className: PropTypes.string,
   activeClassName: PropTypes.string,
-  style: PropTypes.shape({}),
+  style: PropTypes.string,
   onClick: PropTypes.func,
   children: PropTypes.node.isRequired
 };

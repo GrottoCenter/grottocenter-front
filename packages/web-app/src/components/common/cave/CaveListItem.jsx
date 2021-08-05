@@ -48,8 +48,9 @@ const styles = theme => ({
 
 const CaveListItem = ({ classes, cave, history }) => {
   const handleClick = () => {
-    // eslint-disable-next-line no-unused-expressions
-    cave.id && history.push(`/ui/caves/${cave.id}`);
+    if (cave.id) {
+      history.push(`/ui/caves/${cave.id}`);
+    }
   };
 
   return (
@@ -94,7 +95,7 @@ CaveListItem.propTypes = {
     caveText: PropTypes.string
   }).isRequired,
   cave: PropTypes.shape({
-    id: PropTypes.string,
+    id: PropTypes.number,
     name: PropTypes.string,
     depth: PropTypes.number,
     length: PropTypes.number

@@ -4,8 +4,7 @@ import styled from 'styled-components';
 import { GridContainer } from '../../helpers/GridSystem';
 
 const Section = ({ className, children }) => (
-  // eslint-disable-next-line jsx-a11y/aria-role
-  <div role="section" className={className}>
+  <div className={className}>
     <GridContainer>{children}</GridContainer>
   </div>
 );

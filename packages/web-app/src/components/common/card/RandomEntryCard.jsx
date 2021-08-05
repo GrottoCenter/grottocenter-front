@@ -54,7 +54,7 @@ const EntryData = ({ entry }) => {
 
 EntryData.propTypes = {
   entry: PropTypes.shape({
-    documents: PropTypes.arrayOf(PropTypes.any),
+    documents: PropTypes.arrayOf(PropTypes.shape({})),
     cave: PropTypes.shape({
       depth: PropTypes.number,
       length: PropTypes.number
@@ -240,10 +240,8 @@ const EntryInfos = ({ timeInfo, cave }) => (
 
 EntryInfos.propTypes = {
   timeInfo: PropTypes.shape({
-    // eslint-disable-next-line react/forbid-prop-types
-    eTTrail: PropTypes.any,
-    // eslint-disable-next-line react/forbid-prop-types
-    eTUnderground: PropTypes.any
+    eTTrail: PropTypes.number,
+    eTUnderground: PropTypes.number
   }).isRequired,
   cave: PropTypes.shape({
     depth: PropTypes.number,

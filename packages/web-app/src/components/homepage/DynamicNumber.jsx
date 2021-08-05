@@ -38,11 +38,6 @@ class DynamicNumber extends Component {
     this.reloadNumber()();
   }
 
-  // eslint-disable-next-line react/sort-comp
-  reloadNumber() {
-    return () => this.props.dispatch(loadDynamicNumber(this.props.numberType));
-  }
-
   componentDidMount() {
     this.interval = setInterval(
       this.reloadNumber(),
@@ -54,18 +49,24 @@ class DynamicNumber extends Component {
     clearInterval(this.interval);
   }
 
+  reloadNumber() {
+    const { dispatch, numberType } = this.props;
+    return () => dispatch(loadDynamicNumber(numberType));
+  }
+
   render() {
-    if (this.props.isFetching) {
+    const { className, number, isFetching } = this.props;
+    if (isFetching) {
       return <CircularProgress />;
     }
-    if (!this.props.number) {
+    if (!number) {
       return (
         <StyledIconButton tooltip="Synchronisation error">
           <StyledSyncKOIcon />
         </StyledIconButton>
       );
     }
-    return <span className={this.props.className}>{this.props.number}</span>;
+    return <span className={className}>{number}</span>;
   }
 }
 

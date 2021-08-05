@@ -17,7 +17,7 @@ const Img = styled.img`
 const CustomIcon = ({ type, size = 35, margin = '0px 4px 0px 0px' }) => (
   <Icon color="inherit" margin={margin} size={size}>
     <Img
-      src={`../../../../images/iconsV3/${type}.svg`}
+      src={`/images/iconsV3/${type}.svg`}
       alt={type}
       height={size}
       width={size}

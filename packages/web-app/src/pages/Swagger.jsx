@@ -13,8 +13,9 @@ const Swagger = props => {
 
 Swagger.propTypes = {
   match: PropTypes.shape({
-    // eslint-disable-next-line react/forbid-prop-types
-    params: PropTypes.shape({ version: PropTypes.any })
+    params: PropTypes.shape({
+      version: PropTypes.string
+    })
   }).isRequired
 };
 

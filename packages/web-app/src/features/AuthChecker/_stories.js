@@ -8,7 +8,6 @@ import GCReducer from '../../reducers/GCReducer';
 import { fetchLoginSuccess, logout } from '../../actions/Login';
 import AuthChecker from './index';
 
-// ==========
 const store = createStore(GCReducer);
 
 const FakeAuthControls = () => {

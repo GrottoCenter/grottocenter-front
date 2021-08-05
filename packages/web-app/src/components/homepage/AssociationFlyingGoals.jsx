@@ -1,5 +1,4 @@
-/* eslint-disable react/destructuring-assignment */
-import React, { Component } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import FlyingGoal from './FlyingGoal';
@@ -89,46 +88,35 @@ const GoalWrapper = styled(FlyingGoal)`
   }
 `;
 
-class AssociationFlyingGoals extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      targetZone: this.props.title
-    };
-  }
-
-  render() {
-    return (
-      <div>
-        <CenteredText>
-          <span
-            ref={element => {
-              this.targetZone = element;
-            }}>
-            {this.state.targetZone}
-          </span>
-        </CenteredText>
-        <FlyingGoals>
-          {this.props.entries.map((entry, i) => (
-            <GoalWrapper
-              // eslint-disable-next-line react/no-array-index-key
-              key={i}
-              entry={entry}
-              updateTargetZone={text => {
-                this.setState({ targetZone: text });
-              }}
-              {...this.props}
-            />
-          ))}
-        </FlyingGoals>
-      </div>
-    );
-  }
-}
+const AssociationFlyingGoals = props => {
+  const { title, entries } = props;
+  const [targetZone, setTargetZone] = React.useState(title);
+  return (
+    <div>
+      <CenteredText>
+        <span>{targetZone}</span>
+      </CenteredText>
+      <FlyingGoals>
+        {entries.map(entry => (
+          <GoalWrapper
+            key={entry.word.props.children}
+            entry={entry}
+            updateTargetZone={setTargetZone}
+            {...props}
+          />
+        ))}
+      </FlyingGoals>
+    </div>
+  );
+};
 
 AssociationFlyingGoals.propTypes = {
-  // eslint-disable-next-line react/forbid-prop-types
-  entries: PropTypes.array.isRequired,
+  entries: PropTypes.arrayOf(
+    PropTypes.shape({
+      description: PropTypes.node,
+      word: PropTypes.node
+    })
+  ).isRequired,
   title: PropTypes.element.isRequired
 };
 

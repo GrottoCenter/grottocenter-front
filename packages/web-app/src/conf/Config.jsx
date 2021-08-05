@@ -157,12 +157,12 @@ export const paypalImgLink =
 // ===== Grottocenter API routes
 
 export const dynamicNumbersUrl = {
-  cavers: `${process.env.REACT_APP_API_URL}/api/${apiVersion}/cavers/count`,
   documents: `${process.env.REACT_APP_API_URL}/api/${apiVersion}/documents/count`,
   entrances: `${process.env.REACT_APP_API_URL}/api/${apiVersion}/entrances/count`,
   officialPartners: `${process.env.REACT_APP_API_URL}/api/${apiVersion}/partners/count`,
   organizations: `${process.env.REACT_APP_API_URL}/api/${apiVersion}/organizations/count`,
-  publicEntrances: `${process.env.REACT_APP_API_URL}/api/${apiVersion}/entrances/publicCount`
+  publicEntrances: `${process.env.REACT_APP_API_URL}/api/${apiVersion}/entrances/publicCount`,
+  users: `${process.env.REACT_APP_API_URL}/api/${apiVersion}/cavers/users/count`
 };
 
 export const fetchConvert = `${process.env.REACT_APP_API_URL}/api/convert`;
@@ -173,6 +173,8 @@ export const getMapCavesCoordinatesUrl = `${process.env.REACT_APP_API_URL}/api/$
 export const getMapEntrancesUrl = `${process.env.REACT_APP_API_URL}/api/${apiVersion}/geoloc/entrances`;
 export const getMapEntrancesCoordinatesUrl = `${process.env.REACT_APP_API_URL}/api/${apiVersion}/geoloc/entrancesCoordinates`;
 export const getMapGrottosUrl = `${process.env.REACT_APP_API_URL}/api/${apiVersion}/geoloc/grottos`;
+export const getCaversDocumentsUrl = caverId =>
+  `${process.env.REACT_APP_API_URL}/api/${apiVersion}/cavers/${caverId}/documents`;
 /**
  * @deprecated
  */

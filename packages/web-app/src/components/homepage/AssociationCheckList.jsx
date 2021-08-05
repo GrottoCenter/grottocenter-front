@@ -96,9 +96,8 @@ const AssociationCheckList = ({ title, entries }) => (
     <ListTitle>{title}</ListTitle>
 
     <CheckList>
-      {entries.map((entry, i) => (
-        // eslint-disable-next-line react/no-array-index-key
-        <ListItem key={i}>
+      {entries.map(entry => (
+        <ListItem key={entry.word.props.children}>
           <StyledListIcon />
           {entry.description}
         </ListItem>

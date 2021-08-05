@@ -19,6 +19,10 @@ const useMakeCustomHeaderCellRenders = () => {
     {
       id: 'examinator',
       customRender: () => formatMessage({ id: 'Moderator' })
+    },
+    {
+      id: 'isValidated',
+      customRender: () => formatMessage({ id: 'Is validated' })
     }
   ];
 };

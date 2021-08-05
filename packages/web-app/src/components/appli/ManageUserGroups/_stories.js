@@ -4,7 +4,6 @@ import { storiesOf } from '@storybook/react';
 import UserGroups from './UserGroups';
 import UserProperties from './UserProperties';
 
-// ==========
 const user = {
   id: 42,
   name: 'John',

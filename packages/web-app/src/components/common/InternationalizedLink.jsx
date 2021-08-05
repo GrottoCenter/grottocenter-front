@@ -19,7 +19,7 @@ const InternationalizedLink = ({ links, className, children }) => {
 InternationalizedLink.propTypes = {
   links: PropTypes.any.isRequired,
   className: PropTypes.string,
-  children: PropTypes.any
+  children: PropTypes.node
 };
 
 export default InternationalizedLink;

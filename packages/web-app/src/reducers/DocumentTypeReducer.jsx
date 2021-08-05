@@ -5,7 +5,7 @@ import {
 } from '../actions/DocumentType';
 
 const initialState = {
-  documentTypes: undefined,
+  documentTypes: [],
   error: null,
   isLoading: false
 };

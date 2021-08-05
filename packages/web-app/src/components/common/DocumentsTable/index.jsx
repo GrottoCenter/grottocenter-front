@@ -6,38 +6,10 @@ import useMakeCustomHeaderCellRenders from './customHeaderCellRenders';
 import Table from '../Table';
 import { createColumns, createDefaultHiddenColumns } from '../Table/TableHead';
 
-const defaultHiddenColumns = [
-  'author',
-  'authorComment',
-  'authors',
-  'cave',
-  'datePublication',
-  'dateValidation',
-  'descriptions',
-  'editor',
-  'entrance',
-  'files',
-  'id',
-  'identifier',
-  'identifierType',
-  'isValidated',
-  'library',
-  'license',
-  'massif',
-  'pages',
-  'parent',
-  'pathOld',
-  'publication',
-  'publicationFasciculeBBSOld',
-  'refBbs',
-  'reviewer',
-  'validationComment',
-  'validator'
-];
-
 const DocumentsTable = ({
   currentPage,
   documents,
+  defaultHiddenColumns,
   loading,
   openDetailedView,
   order,
@@ -62,16 +34,13 @@ const DocumentsTable = ({
   );
 
   useEffect(() => {
-    setColumns(
-      createColumns(documents, makeTranslation).sort(
-        (c1, c2) => c1.label.localeCompare(c2.label) > 0
-      )
-    );
+    setColumns(createColumns(documents, makeTranslation));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [documents]);
 
   useEffect(() => {
     setHiddenColumns(createDefaultHiddenColumns(columns, defaultHiddenColumns));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [columns]);
 
   return (
@@ -108,6 +77,7 @@ DocumentsTable.propTypes = {
       title: PropTypes.string
     })
   ),
+  defaultHiddenColumns: PropTypes.arrayOf(PropTypes.string),
   loading: PropTypes.bool.isRequired,
   openDetailedView: PropTypes.func.isRequired,
   order: PropTypes.oneOf(['asc', 'desc']).isRequired,

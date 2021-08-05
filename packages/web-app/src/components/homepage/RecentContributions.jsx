@@ -1,8 +1,9 @@
 import React from 'react';
+import { Button } from '@material-ui/core';
 
 const RecentContributions = () => (
   <div>
-    <div role="section" className="bgGradent recentContrib">
+    <div className="bgGradent recentContrib">
       <h2 style={{ 'text-align': 'center', 'padding-bottom': '50px' }}>
         RECENT CONTRIBUTIONS
       </h2>
@@ -25,11 +26,11 @@ const RecentContributions = () => (
                 }}>
                 <span>
                   <h5>
-                    <a href="#">
+                    <Button>
                       Lorem ipsum dolor sit amet, consectetur adipiscing elit,
                       sed do eiusmod tempor incididunt ut labore et dolore magna
                       aliqua.
-                    </a>
+                    </Button>
                   </h5>
                   <p>
                     Ut enim ad minim veniam, quis nostrud exercitation ullamco
@@ -67,11 +68,11 @@ const RecentContributions = () => (
                 }}>
                 <span>
                   <h5>
-                    <a href="#">
+                    <Button>
                       Lorem ipsum dolor sit amet, consectetur adipiscing elit,
                       sed do eiusmod tempor incididunt ut labore et dolore magna
                       aliqua.
-                    </a>
+                    </Button>
                   </h5>
                   <p>
                     Ut enim ad minim veniam, quis nostrud exercitation ullamco
@@ -109,11 +110,11 @@ const RecentContributions = () => (
                 }}>
                 <span>
                   <h5>
-                    <a href="#">
+                    <Button>
                       Lorem ipsum dolor sit amet, consectetur adipiscing elit,
                       sed do eiusmod tempor incididunt ut labore et dolore magna
                       aliqua.
-                    </a>
+                    </Button>
                   </h5>
                   <p>
                     Ut enim ad minim veniam, quis nostrud exercitation ullamco

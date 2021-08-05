@@ -26,11 +26,8 @@ const FirstLevelMenuItem = withTheme(styled(MenuItem)`
 class ComplexMenuEntry extends Component {
   constructor(props) {
     super(props);
-    this.props.register(
-      this.props.identifier,
-      this.props.open,
-      this.props.target
-    );
+    const { identifier, open, target, register } = props;
+    register(identifier, open, target);
   }
 
   render() {

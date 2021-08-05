@@ -497,13 +497,13 @@ class Convert extends React.Component {
 
 Convert.propTypes = {
   classes: PropTypes.shape({
-    bottomContainer: PropTypes.any,
-    element: PropTypes.any,
-    mainContainer: PropTypes.any,
-    subContainer: PropTypes.any,
-    subElement: PropTypes.any
+    bottomContainer: PropTypes.string,
+    element: PropTypes.string,
+    mainContainer: PropTypes.string,
+    subContainer: PropTypes.string,
+    subElement: PropTypes.string
   }).isRequired,
-  list: PropTypes.arrayOf(PropTypes.any).isRequired
+  list: PropTypes.arrayOf(PropTypes.shape({})).isRequired
 };
 
 export default withStyles(styles)(Convert);
