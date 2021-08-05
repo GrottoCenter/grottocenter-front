@@ -3,11 +3,8 @@ import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import useMakeCustomCellRenders from './customCellRenders';
 import useMakeCustomHeaderCellRenders from './customHeaderCellRenders';
-import Table from '../../components/common/Table';
-import {
-  createColumns,
-  createDefaultHiddenColumns
-} from '../../components/common/Table/TableHead';
+import Table from '../Table';
+import { createColumns, createDefaultHiddenColumns } from '../Table/TableHead';
 
 const defaultHiddenColumns = [
   'author',
