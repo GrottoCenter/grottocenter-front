@@ -14,26 +14,29 @@ const Wrapper = styled.div`
   padding: ${({ theme }) => theme.spacing(1)}px;
 `;
 
-const Rating = ({ value, label }) => {
-  return (
-    <Wrapper>
-      <Typography color="primary" component="legend">
-        <Translate>{label}</Translate>
-      </Typography>
-      <MuiRating
-        readOnly
-        name={label}
-        defaultValue={value}
-        precision={0.5}
-        emptyIcon={<StarBorderIcon fontSize="inherit" />}
-      />
-    </Wrapper>
-  );
-};
+const Rating = ({ value, label, size }) => (
+  <Wrapper>
+    <Typography
+      variant={size === 'small' ? 'body2' : undefined}
+      color="primary"
+      component="legend">
+      <Translate>{label}</Translate>
+    </Typography>
+    <MuiRating
+      size={size}
+      readOnly
+      name={label}
+      value={value}
+      precision={0.1}
+      emptyIcon={<StarBorderIcon fontSize="inherit" />}
+    />
+  </Wrapper>
+);
 
 Rating.propTypes = {
   value: PropTypes.number.isRequired,
-  label: PropTypes.string.isRequired
+  label: PropTypes.string.isRequired,
+  size: PropTypes.oneOf(['small', 'large'])
 };
 
 export default Rating;
