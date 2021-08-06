@@ -1,13 +1,24 @@
 import React, { useContext } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
+import { isEmpty } from 'ramda';
 
-import Provider, { detailsType, EntryContext } from './Provider';
+import Provider, {
+  commentsType,
+  detailsType,
+  EntryContext,
+  riggingsType,
+  descriptionsType
+} from './Provider';
 import Layout from '../../common/Layouts/Fixed';
 import FixedContent from '../../common/Layouts/Fixed/FixedContent';
 import CustomIcon from '../../common/CustomIcon';
 import EntryMap from './EntryMap';
 import Properties from './Properties';
+import Descriptions from './Descriptions';
+import Riggings from './Riggings';
+import Comments from './Comments';
+import TmpContent from './WipContent';
 
 const EntryProperties = () => (
   <>
@@ -16,11 +27,15 @@ const EntryProperties = () => (
   </>
 );
 
-export const Entry = ({ children }) => {
+export const Entry = () => {
   const { formatMessage } = useIntl();
   const {
     state: {
-      details: { name, author, creationDate, lastEditor, editionDate }
+      entryId,
+      details: { name, author, creationDate, lastEditor, editionDate },
+      descriptions,
+      riggings,
+      comments
     }
   } = useContext(EntryContext);
 
@@ -43,25 +58,30 @@ export const Entry = ({ children }) => {
           icon={<CustomIcon type="entry" />}
         />
       }>
-      {children}
+      <Descriptions descriptions={descriptions} entryId={entryId} />
+      {!isEmpty(riggings) && <Riggings riggings={riggings} />}
+      {!isEmpty(comments) && <Comments comments={comments} />}
+      <TmpContent title="Documents" />
+      <TmpContent title="History" />
     </Layout>
   );
 };
 
-const HydratedEntry = ({ children, ...props }) => (
+const HydratedEntry = ({ ...props }) => (
   <Provider {...props}>
-    <Entry>{children}</Entry>
+    <Entry />
   </Provider>
 );
 
-Entry.propTypes = {
-  children: PropTypes.node.isRequired
-};
+Entry.propTypes = {};
 
 HydratedEntry.propTypes = {
   details: detailsType.isRequired,
+  comments: commentsType.isRequired,
+  descriptions: descriptionsType.isRequired,
+  riggings: riggingsType.isRequired,
   loading: PropTypes.bool,
-  children: PropTypes.node.isRequired
+  entryId: PropTypes.string.isRequired
 };
 
 export default HydratedEntry;
