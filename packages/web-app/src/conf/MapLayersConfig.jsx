@@ -10,6 +10,7 @@ If the layer is available for the entire map, we should set its bounds to
 " new L.LatLngBounds(new L.LatLng(-90, -200), new L.LatLng(90, 200)) "
  */
 
+// eslint-disable-next-line import/prefer-default-export
 export const layers = [
   {
     name: 'OpenStreetMap Basic',
