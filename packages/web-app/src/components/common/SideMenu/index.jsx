@@ -6,9 +6,9 @@ import Translate from '../Translate';
 import MenuLinks from './MenuLinks';
 import Footer from './Footer';
 
-const UserIcon = styled.img`
-  width: 40px;
-  margin: auto;
+const Wrapper = styled.div`
+  display: flex;
+  flex-direction: row;
 `;
 
 const SideMenu = ({ isOpen, toggle, isAuth = false, AutoCompleteSearch }) => (
@@ -30,12 +30,11 @@ const UserContainer = styled.div`
 const UserInformation = ({ isAuth = false }) => (
   <UserContainer>
     {isAuth ? (
-      <>
-        <UserIcon src="/images/sidemenu/user.png" alt="user icon" />
-        <Typography>
+      <Wrapper>
+        <Typography variant="caption">
           <Translate>You are connected</Translate>
         </Typography>
-      </>
+      </Wrapper>
     ) : (
       <>
         <Typography variant="caption" fontWeight="fontWeightBold">

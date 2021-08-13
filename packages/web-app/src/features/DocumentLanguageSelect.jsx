@@ -1,9 +1,8 @@
-import React, { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import React from 'react';
+import { useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 
 import LanguageSelect from '../components/appli/Document/DocumentForm/formElements/LanguageSelect';
-import { loadLanguages } from '../actions/Language';
 
 const DocumentLanguageSelect = ({
   contextValueName,
@@ -11,13 +10,7 @@ const DocumentLanguageSelect = ({
   labelText,
   required
 }) => {
-  const dispatch = useDispatch();
   const { languages: allLanguages } = useSelector(state => state.language);
-
-  useEffect(() => {
-    dispatch(loadLanguages(true));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   return (
     <LanguageSelect

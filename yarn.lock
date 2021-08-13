@@ -2412,6 +2412,7 @@ __metadata:
     react-device-detect: ^1.6.2
     react-dom: ^17.0.2
     react-error-boundary: 3.1.3
+    react-hook-form: 7.12.2
     react-intl: ^5.10.16
     react-leaflet: ^3.2.0
     react-redux: ^7.2.0
@@ -19723,6 +19724,15 @@ fsevents@^1.2.7:
     react: ^16.6.0 || ^17.0.0
     react-dom: ^16.6.0 || ^17.0.0
   checksum: 8db5d875bb681dabc5f277ee3b0debe96d58f4b6d33cb2e9c72a026f4fd22e44722d2a7164a21b51a4002a6cd40d716195731ba37cc1d73167adf85e56441c1c
+  languageName: node
+  linkType: hard
+
+"react-hook-form@npm:7.12.2":
+  version: 7.12.2
+  resolution: "react-hook-form@npm:7.12.2"
+  peerDependencies:
+    react: ^16.8.0 || ^17
+  checksum: 77779cc10f2a8024b2b96cdea6398ec311dc23768f084d0175f53b6632f221a9e2966fb5ab27cf00b6670dfb4a5754990809f2949ffd41c4a910eabe66000c98
   languageName: node
   linkType: hard
 
