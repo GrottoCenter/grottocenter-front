@@ -60,15 +60,19 @@ export const makeDetails = data => {
 };
 
 export const makeEntities = data => ({
-  massif: pipe(
-    pathOr([], ['massif', 'names']),
-    head,
-    pathOr('', ['name'])
-  )(data),
-  cave: pipe(
-    pathOr([], ['entrance', 'names']),
-    head,
-    pathOr('', ['cave', 'name'])
-  )(data),
-  entrance: pathOr('', ['entrance', 'name'], data)
+  massif: pathOr(
+    pipe(pathOr([], ['massif', 'names']), head, pathOr('', ['name']))(data),
+    ['massif', 'name'],
+    data
+  ),
+  cave: pathOr(
+    pipe(pathOr([], ['cave', 'names']), head, pathOr('', ['name']))(data),
+    ['cave', 'name'],
+    data
+  ),
+  entrance: pathOr(
+    pipe(pathOr([], ['entrance', 'names']), head, pathOr('', ['name']))(data),
+    ['entrance', 'name'],
+    data
+  )
 });
