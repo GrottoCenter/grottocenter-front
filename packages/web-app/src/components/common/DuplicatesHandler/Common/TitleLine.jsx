@@ -1,0 +1,75 @@
+import React from 'react';
+import { useIntl } from 'react-intl';
+import { Grid, Typography } from '@material-ui/core';
+import PropTypes from 'prop-types';
+import ActionButton from '../../ActionButton';
+
+const margin = '20px';
+
+const Title = ({ children }) => {
+  return (
+    <Typography variant="h2" color="secondary">
+      {children}
+    </Typography>
+  );
+};
+
+const TitleLine = ({ title1, title2, handleAllClick1, handleAllClick2 }) => {
+  const { formatMessage } = useIntl();
+  return (
+    <Grid container direction="row">
+      <Grid container item xs={4} justify="flex-start">
+        <Title>
+          {formatMessage(
+            {
+              id: 'title duplicate',
+              defaultMessage: '{title}'
+            },
+            {
+              title: title1
+            }
+          )}
+        </Title>
+        <ActionButton
+          label={formatMessage({ id: 'Take all' })}
+          onClick={handleAllClick1}
+          style={{ marginLeft: margin }}
+        />
+      </Grid>
+      <Grid container item xs={4} justify="center">
+        <Title>{formatMessage({ id: 'Final result' })}</Title>
+      </Grid>
+      <Grid container item xs={4} justify="flex-end">
+        <ActionButton
+          label={formatMessage({ id: 'Take all' })}
+          onClick={handleAllClick2}
+          style={{ marginRight: margin }}
+        />
+        <Title>
+          {formatMessage(
+            {
+              id: 'title duplicate',
+              defaultMessage: '{title}'
+            },
+            {
+              title: title2
+            }
+          )}
+        </Title>
+      </Grid>
+    </Grid>
+  );
+};
+
+export default React.memo(TitleLine);
+
+TitleLine.propTypes = {
+  title1: PropTypes.string.isRequired,
+  title2: PropTypes.string.isRequired,
+  handleAllClick1: PropTypes.func.isRequired,
+  handleAllClick2: PropTypes.func.isRequired
+};
+
+Title.propTypes = {
+  children: PropTypes.node.isRequired
+};

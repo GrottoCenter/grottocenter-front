@@ -17,7 +17,8 @@ const StringInput = ({
   required = false,
   type = 'text',
   value,
-  valueName
+  valueName,
+  ...inputProps
 }) => {
   const handleValueChange = event => {
     onValueChange(event.target.value);
@@ -39,6 +40,7 @@ const StringInput = ({
         type={type}
         value={value}
         error={(required && value === '') || hasError}
+        {...inputProps}
       />
       {helperText && <FormHelperText>{helperText}</FormHelperText>}
     </FormControl>
@@ -51,11 +53,12 @@ StringInput.propTypes = {
   hasError: PropTypes.bool,
   helperText: PropTypes.string,
   multiline: PropTypes.bool,
-  onValueChange: PropTypes.func.isRequired,
+  onValueChange: PropTypes.func,
   required: PropTypes.bool,
   type: PropTypes.oneOf(['text', 'email', 'password']),
   value: PropTypes.string.isRequired,
-  valueName: PropTypes.string.isRequired
+  valueName: PropTypes.string.isRequired,
+  disabled: PropTypes.bool
 };
 
 export default StringInput;

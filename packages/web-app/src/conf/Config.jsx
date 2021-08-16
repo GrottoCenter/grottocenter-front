@@ -212,6 +212,15 @@ export const signUpUrl = `${process.env.REACT_APP_API_URL}/api/${apiVersion}/sig
 // ===== Grottocenter Client routes
 export const swaggerLinkV1 = `${process.env.REACT_APP_API_URL}/ui/swagger/1`;
 export const entryDetailPath = `${process.env.REACT_APP_API_URL}/api/${apiVersion}/entrances/`;
+export const postEntryUrl = `${process.env.REACT_APP_API_URL}/api/${apiVersion}/entrances`;
+export const putEntryUrl = entryId =>
+  `${process.env.REACT_APP_API_URL}/api/${apiVersion}/entrances/${entryId}`;
+export const getDuplicatesDocumentUrl = `${process.env.REACT_APP_API_URL}/api/duplicates-document`;
+export const getDuplicatesEntranceUrl = `${process.env.REACT_APP_API_URL}/api/duplicates-entrance`;
+export const getDuplicateDocumentUrl = duplicateId =>
+  `${process.env.REACT_APP_API_URL}/api/duplicates-document/${duplicateId}`;
+export const getDuplicateEntranceUrl = duplicateId =>
+  `${process.env.REACT_APP_API_URL}/api/duplicates-entrance/${duplicateId}`;
 
 // ===== Misc config values
 export const emailRegexp = /\S+@\S+/; // simple regexp TODO: use another one more robust

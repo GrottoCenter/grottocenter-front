@@ -9,6 +9,7 @@ import HomePage from './HomePage';
 import Admin from './Admin';
 import AdvancedSearchPage from './AdvancedSearchPage';
 import DocumentDetailsPage from './DocumentDetails';
+import DuplicateImportHandle from './DuplicateImportHandle';
 import Faq from '../components/appli/Faq';
 import LatestBlogNewsSection from '../components/homepage/LatestBlogNewsSection';
 import Layout from '../components/common/Layouts/Main';
@@ -79,6 +80,7 @@ const Application = () => {
           path="/ui/documents/:documentId"
           component={DocumentDetailsPage}
         />
+        <Route path="/ui/duplicates" component={DuplicateImportHandle} />
         <Redirect path="/ui/*" to="/ui" />
       </Switch>
     </Layout>
