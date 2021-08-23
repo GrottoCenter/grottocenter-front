@@ -44,7 +44,6 @@ const doGet = (url, criteria) => {
     keys,
     map(c => `${c}=${encodeURIComponent(criteria[c])}`),
     join('&'),
-    urlCriteria => `${queryDocuments}?${urlCriteria}`,
     urlCriteria => `${url}?${urlCriteria}`
   );
 
