@@ -18,7 +18,8 @@ const defaultFormSteps = [
   { id: 1, name: 'General Information', isValid: false },
   { id: 2, name: 'Classification', isValid: false },
   { id: 3, name: 'Additional information', isValid: false },
-  { id: 4, name: 'Synthesis', isValid: true }
+  { id: 4, name: 'Files', isValid: true },
+  { id: 5, name: 'Synthesis', isValid: true }
 ];
 
 export const defaultContext = {
@@ -36,6 +37,7 @@ export const defaultContext = {
     isNewDocument: true,
     issue: '',
     library: null,
+    license: null,
     massif: null,
     partOf: null,
     publicationDate: '',
@@ -44,6 +46,9 @@ export const defaultContext = {
     subjects: [],
     title: '',
     titleAndDescriptionLanguage: null,
+    files: [],
+    option: null,
+    authorizationDocument: null,
     formSteps: defaultFormSteps
   },
   currentStep: 1,

@@ -1,7 +1,8 @@
 import {
   FETCH_DOCUMENTS,
   FETCH_DOCUMENTS_SUCCESS,
-  FETCH_DOCUMENTS_FAILURE
+  FETCH_DOCUMENTS_FAILURE,
+  FETCH_AUTHORIZATION_DOCUMENTS_SUCCESS
 } from '../actions/Documents';
 
 const initialState = {
@@ -9,8 +10,9 @@ const initialState = {
   isLoading: false,
   data: {
     documents: [],
-    totalCount: 0
-  }
+    authorizationDocuments: []
+  },
+  totalCount: 0
 };
 
 const documents = (state = initialState, action) => {
@@ -24,7 +26,19 @@ const documents = (state = initialState, action) => {
     case FETCH_DOCUMENTS_SUCCESS:
       return {
         ...initialState,
-        data: action.documents,
+        data: {
+          documents: action.documents,
+          authorizationDocuments: state.data.authorizationDocuments
+        },
+        totalCount: action.totalCount
+      };
+    case FETCH_AUTHORIZATION_DOCUMENTS_SUCCESS:
+      return {
+        ...initialState,
+        data: {
+          documents: state.data.documents,
+          authorizationDocuments: action.documents
+        },
         totalCount: action.totalCount
       };
     case FETCH_DOCUMENTS_FAILURE:

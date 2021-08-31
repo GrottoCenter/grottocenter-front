@@ -12,9 +12,11 @@ import documentType from './DocumentTypeReducer';
 import dynamicNumber from './DynamicNumberReducer';
 import entry from './EntryReducer';
 import error from './ErrorReducer';
+import fileFormats from './FileFormatsReducer';
 import identifierType from './IdentifierTypesReducer';
 import language from './LanguageReducer';
 import latestBlogNews from './LatestBlogNewsReducer';
+import licenses from './LicensesReducer';
 import login from './LoginReducer';
 import map from './Map';
 import massif from './MassifReducer';
@@ -46,10 +48,12 @@ const GCReducer = combineReducers({
   dynamicNumber,
   entry,
   error,
+  fileFormats,
   identifierType,
   intl,
   language,
   latestBlogNews,
+  licenses,
   login,
   map,
   massif,

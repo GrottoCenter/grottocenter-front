@@ -39,6 +39,11 @@ const ToRightList = styled(List)`
   margin-right: 20%;
 `;
 
+const WrapperListItem = styled.div`
+  display: flex;
+  justify-content: flex-end;
+`;
+
 const ToRightListItemText = styled(ListItemText)`
   text-align: right;
 `;
@@ -59,7 +64,14 @@ const isString = is(String);
 
 // ==========
 
-const Item = ({ Icon, label, value, type }) => (
+const Item = ({
+  Icon,
+  label,
+  value,
+  type,
+  CustomComponent,
+  CustomComponentProps
+}) => (
   <Wrapper>
     <IconContainer>{!isNil(Icon) && <Icon />}</IconContainer>
     <Label color="textSecondary" variant="caption">
@@ -75,9 +87,21 @@ const Item = ({ Icon, label, value, type }) => (
     )}
     {type === 'list' && isArray(value) && (
       <ToRightList>
-        {value.map(item => (
-          <ToRightListItemText key={item} primary={item} />
-        ))}
+        {value.map((item, index) => {
+          const props = CustomComponentProps ? CustomComponentProps[index] : {};
+
+          const Component = CustomComponent || ToRightListItemText;
+
+          return (
+            <>
+              <WrapperListItem>
+                <Component key={item} {...props}>
+                  {item}
+                </Component>
+              </WrapperListItem>
+            </>
+          );
+        })}
       </ToRightList>
     )}
     {isString(value) && <Text>{value}</Text>}
@@ -102,6 +126,8 @@ const Section = ({ title, content, loading }) => {
                 label={item.label}
                 type={item.type}
                 value={item.value}
+                CustomComponent={item.CustomComponent}
+                CustomComponentProps={item.CustomComponentProps}
               />
             ) : (
               ''
@@ -122,7 +148,9 @@ Item.propTypes = {
     PropTypes.string.isRequired,
     PropTypes.arrayOf(PropTypes.string).isRequired
   ]),
-  type: PropTypes.oneOf(['list', 'tree'])
+  type: PropTypes.oneOf(['list', 'tree']),
+  CustomComponent: PropTypes.node,
+  CustomComponentProps: PropTypes.arrayOf(PropTypes.object)
 };
 
 Section.propTypes = {

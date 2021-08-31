@@ -1,4 +1,9 @@
-import { isNil } from 'ramda';
+import { isNil, isEmpty } from 'ramda';
+import {
+  AUTHORIZATION_FROM_AUTHOR,
+  DOCUMENT_AUTHORIZE_TO_PUBLISH,
+  LICENSE_IN_FILE
+} from '../../../../../hooks/useDocumentOptions';
 import { DocumentTypes } from '../DocumentTypesHelper';
 
 const isStep1Valid = (stepData, documentType) => {
@@ -77,6 +82,30 @@ const isStep3Valid = stepData => {
   );
 };
 
+const isStep4Valid = stepData => {
+  const { files, option, license, authorizationDocument } = stepData;
+  if (isEmpty(files)) {
+    return true;
+  }
+
+  for (let i = 0; i < files.length; i += 1) {
+    if (isEmpty(files[i].name)) {
+      return false;
+    }
+  }
+
+  switch (option) {
+    case AUTHORIZATION_FROM_AUTHOR:
+      return !isNil(license);
+    case LICENSE_IN_FILE:
+      return !isNil(license);
+    case DOCUMENT_AUTHORIZE_TO_PUBLISH:
+      return !isNil(authorizationDocument);
+    default:
+      return false;
+  }
+};
+
 // currentStep must be the index +1
 // eslint-disable-next-line import/prefer-default-export
 export const isStepValid = (currentStep, stepData, documentType) => {
@@ -87,7 +116,9 @@ export const isStepValid = (currentStep, stepData, documentType) => {
       return isStep2Valid(stepData, documentType);
     case 3:
       return isStep3Valid(stepData);
-    case 4: // case 4 is whole submission recap => it's always valid
+    case 4:
+      return isStep4Valid(stepData);
+    case 5: // case 5 is whole submission recap => it's always valid
       return true;
     default:
       return false;

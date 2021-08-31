@@ -6,7 +6,10 @@ import { isNil } from 'ramda';
 import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams, useHistory } from 'react-router-dom';
+import { Link } from '@material-ui/core';
 
+import AttachFileIcon from '@material-ui/icons/AttachFile';
+import DescriptionIcon from '@material-ui/icons/Description';
 import Overview from './Overview';
 import Section from './Section';
 import CustomIcon from '../../components/common/CustomIcon';
@@ -35,6 +38,8 @@ const DocumentPage = ({
   onEdit
 }) => {
   const { formatMessage } = useIntl();
+  const permissions = usePermissions();
+
   return (
     <Wrapper>
       <Overview
@@ -141,6 +146,19 @@ const DocumentPage = ({
             Icon: () => <CustomIcon type="cave_system" />,
             label: formatMessage({ id: 'Cave' }),
             value: entities.cave
+          },
+          {
+            Icon: () => <DescriptionIcon color="primary" />,
+            type: 'list',
+            label: formatMessage({ id: 'Files' }),
+            value: entities.files.fileNames,
+            CustomComponent: Link,
+            CustomComponentProps: entities.files.fileLinks
+          },
+          permissions.isModerator && {
+            Icon: () => <AttachFileIcon color="primary" />,
+            label: formatMessage({ id: 'Authorization document' }),
+            value: entities.authorizationDocument
           }
         ]}
       />
@@ -225,7 +243,14 @@ DocumentPage.propTypes = {
   entities: PropTypes.shape({
     massif: PropTypes.string,
     cave: PropTypes.string,
-    entrance: PropTypes.string
+    entrance: PropTypes.string,
+    files: PropTypes.shape({
+      fileNames: PropTypes.arrayOf(PropTypes.string),
+      fileLinks: PropTypes.arrayOf(PropTypes.string)
+    }),
+    authorizationDocument: PropTypes.shape({
+      titles: PropTypes.arrayOf(PropTypes.shape({ text: PropTypes.string }))
+    })
   }),
   isValidated: PropTypes.bool.isRequired,
   onEdit: PropTypes.func.isRequired

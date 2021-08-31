@@ -77,7 +77,11 @@ const DocumentEdit = ({
         propOr([], 'titles'),
         head,
         propOr(null, 'language')
-      )(details)
+      )(details),
+      files: docInfoGetters.getFiles(details),
+      authorizationDocument: propOr(null, 'authorizationDocument', details),
+      option: pathOr(null, ['option', 'name'], details),
+      license: propOr(null, 'license', details)
     }),
     ...(resetIsValidated
       ? {
