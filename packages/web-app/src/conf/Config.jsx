@@ -203,6 +203,8 @@ export const getAdminsUrl = `${process.env.REACT_APP_API_URL}/api/${apiVersion}/
 export const getModeratorsUrl = `${process.env.REACT_APP_API_URL}/api/${apiVersion}/cavers/moderators`;
 export const postCaverGroupsUrl = userId =>
   `${process.env.REACT_APP_API_URL}/api/${apiVersion}/cavers/${userId}/groups`;
+export const getLicensesUrl = `${process.env.REACT_APP_API_URL}/api/v1/licenses`;
+export const getFileFormatsUrl = `${process.env.REACT_APP_API_URL}/api/v1/file-formats`;
 
 // ===== Auth url
 export const loginUrl = `${process.env.REACT_APP_API_URL}/api/${apiVersion}/login`;

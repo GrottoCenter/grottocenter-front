@@ -1,4 +1,10 @@
 import fetch from 'isomorphic-fetch';
+import { keys } from 'ramda';
+import {
+  IS_DELETED,
+  IS_MODIFIED,
+  IS_NEW
+} from '../components/common/AddFileForm/FileHelpers';
 import { postDocumentUrl, putDocumentUrl } from '../conf/Config';
 
 // ==========
@@ -48,6 +54,28 @@ export const resetApiMessages = () => ({
   type: RESET_API_MESSAGES
 });
 
+// From https://stackoverflow.com/a/42483509/16600080
+// FormData can't send null values, so we omit them.
+const buildFormData = (formData, data, parentKey) => {
+  if (
+    data &&
+    typeof data === 'object' &&
+    !(data instanceof Date) &&
+    !(data instanceof File)
+  ) {
+    keys(data).forEach(key => {
+      buildFormData(
+        formData,
+        data[key],
+        parentKey ? `${parentKey}[${key}]` : key
+      );
+    });
+  } else {
+    // eslint-disable-next-line no-unused-expressions
+    (data || data === '') && formData.append(parentKey, data);
+  }
+};
+
 export function postDocument(docAttributes) {
   return (dispatch, getState) => {
     dispatch(postDocumentAction());
@@ -66,10 +94,24 @@ export function postDocument(docAttributes) {
       pages = `${startPage}-${endPage}`;
     }
 
+    const attributes = { ...docAttributes, pages };
+    delete attributes.files;
+    const formData = new FormData();
+
+    buildFormData(formData, attributes);
+
+    // Files must have the same key name for each file, as it is asked by the parser on server side.
+    const { files } = docAttributes;
+    files.forEach(file => {
+      formData.append('files', file.file, `${file.name}.${file.extension}`);
+    });
+
     const requestOptions = {
       method: 'POST',
-      body: JSON.stringify({ ...docAttributes, pages }),
-      headers: getState().login.authorizationHeader
+      body: formData,
+      headers: {
+        ...getState().login.authorizationHeader
+      }
     };
 
     return fetch(postDocumentUrl, requestOptions).then(response => {
@@ -135,9 +177,46 @@ export function updateDocument(docAttributes) {
       pages = `${startPage}-${endPage}`;
     }
 
+    const attributes = { ...docAttributes, pages };
+    delete attributes.files;
+    const formData = new FormData();
+
+    buildFormData(formData, attributes);
+
+    // Files must have the same key name for each file, as it is asked by the parser on server side.
+    const { files } = docAttributes;
+    let indexDeleted = 0;
+    let indexModified = 0;
+    files.forEach(file => {
+      // For a file that is modified or intact, baseFile corresponds to the file entity of the database.
+      const {
+        name,
+        extension,
+        file: fileObjectJS,
+        state,
+        previousState,
+        ...baseFile
+      } = file;
+      switch (state) {
+        case IS_NEW:
+          formData.append('files', fileObjectJS, `${name}.${extension}`);
+          break;
+        case IS_MODIFIED:
+          baseFile.fileName = `${name}.${extension}`;
+          buildFormData(formData, baseFile, `modifiedFiles[${indexModified}]`);
+          indexModified += 1;
+          break;
+        case IS_DELETED:
+          buildFormData(formData, baseFile, `deletedFiles[${indexDeleted}]`);
+          indexDeleted += 1;
+          break;
+        default:
+      }
+    });
+
     const requestOptions = {
       method: 'PUT',
-      body: JSON.stringify({ ...docAttributes, pages }),
+      body: formData,
       headers: getState().login.authorizationHeader
     };
 

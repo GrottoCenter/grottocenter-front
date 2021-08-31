@@ -74,5 +74,17 @@ export const makeEntities = data => ({
     pipe(pathOr([], ['entrance', 'names']), head, pathOr('', ['name']))(data),
     ['entrance', 'name'],
     data
-  )
+  ),
+  files: {
+    fileNames: pipe(pathOr([], ['files']), map(propOr('', 'fileName')))(data),
+    fileLinks: pipe(
+      pathOr([], ['files']),
+      map(file => ({ href: propOr('', 'completePath', file) }))
+    )(data)
+  },
+  authorizationDocument: pipe(
+    pathOr([], ['authorizationDocument', 'titles']),
+    head,
+    pathOr('', ['text'])
+  )(data)
 });

@@ -24,6 +24,9 @@ export const FETCH_DOCUMENTS = 'FETCH_DOCUMENTS';
 export const FETCH_DOCUMENTS_SUCCESS = 'FETCH_DOCUMENTS_SUCCESS';
 export const FETCH_DOCUMENTS_FAILURE = 'FETCH_DOCUMENTS_FAILURE';
 
+export const FETCH_AUTHORIZATION_DOCUMENTS_SUCCESS =
+  'FETCH_AUTHORIZATION_DOCUMENTS_SUCCESS';
+
 export const fetchDocuments = () => ({
   type: FETCH_DOCUMENTS
 });
@@ -37,6 +40,18 @@ export const fetchDocumentsSuccess = data => ({
 export const fetchDocumentsFailure = error => ({
   type: FETCH_DOCUMENTS_FAILURE,
   error
+});
+
+/*
+    Why does this action exists :
+    In the add/modify document form, we sometimes request the authorization documents.
+    In the validation page, the state is rewritten with those documents, so it doesn't show the doc which must be validated anymore.
+    So we store the authorization documents in another property of this state
+*/
+export const fetchAuthorizationDocumentsSuccess = data => ({
+  type: FETCH_AUTHORIZATION_DOCUMENTS_SUCCESS,
+  documents: data.documents,
+  totalCount: data.totalCount
 });
 
 const doGet = (url, criteria) => {
@@ -72,9 +87,13 @@ const doGet = (url, criteria) => {
         )(header);
 
       const parsedData = pathOr(['documents'], [], JSON.parse(data));
+      const successAction =
+        criteria && criteria.documentType === 'AuthorizeToPublish'
+          ? fetchAuthorizationDocumentsSuccess
+          : fetchDocumentsSuccess;
       return dispatch(
-        fetchDocumentsSuccess({
-          documents: parsedData,
+        successAction({
+          documents: parsedData.documents,
           totalCount: getTotalCount(parsedData.documents.length)
         })
       );
