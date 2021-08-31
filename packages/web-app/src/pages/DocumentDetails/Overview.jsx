@@ -1,6 +1,7 @@
 import {
   Card,
   CardContent as MuiCardContent,
+  IconButton,
   Typography,
   Box
 } from '@material-ui/core';
@@ -9,11 +10,16 @@ import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { Skeleton } from '@material-ui/lab';
-import { isEmpty } from 'ramda';
+import { isEmpty, isNil } from 'ramda';
+import CreateIcon from '@material-ui/icons/Create';
 
 const Header = styled.div`
   display: flex;
   justify-content: space-between;
+`;
+
+const EditButton = styled(Box)`
+  margin-left: auto;
 `;
 
 const Title = styled(Typography)`
@@ -63,7 +69,9 @@ const Overview = ({
   language,
   title,
   summary,
-  loading
+  loading,
+  isValidated,
+  onEdit
 }) => {
   const { formatMessage } = useIntl();
 
@@ -115,6 +123,24 @@ const Overview = ({
             )}
           </>
         )}
+        <EditButton>
+          {isValidated ? (
+            <IconButton
+              size="small"
+              aria-label="edit"
+              onClick={onEdit}
+              disabled={isNil(onEdit)}>
+              <CreateIcon />
+            </IconButton>
+          ) : (
+            <Typography variant="body1">
+              {formatMessage({
+                id:
+                  'A moderator needs to validate the last modification before being able to edit the document again.'
+              })}
+            </Typography>
+          )}
+        </EditButton>
       </CardContent>
     </Card>
   );
@@ -134,5 +160,7 @@ Overview.propTypes = {
   authors: PropTypes.arrayOf(PropTypes.string).isRequired,
   language: PropTypes.string.isRequired,
   title: PropTypes.string.isRequired,
-  summary: PropTypes.string.isRequired
+  summary: PropTypes.string.isRequired,
+  isValidated: PropTypes.bool.isRequired,
+  onEdit: PropTypes.func.isRequired
 };
