@@ -17,7 +17,8 @@ const StringInput = ({
   required = false,
   type = 'text',
   value,
-  valueName
+  valueName,
+  ...props
 }) => {
   const handleValueChange = event => {
     onValueChange(event.target.value);
@@ -39,6 +40,7 @@ const StringInput = ({
         type={type}
         value={value}
         error={(required && value === '') || hasError}
+        {...props}
       />
       {helperText && <FormHelperText>{helperText}</FormHelperText>}
     </FormControl>

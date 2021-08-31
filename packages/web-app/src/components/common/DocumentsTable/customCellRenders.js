@@ -40,7 +40,7 @@ const useMakeCustomCellRenders = () => {
     },
     {
       id: 'license',
-      customRender: propOr('', 'text')
+      customRender: propOr('', 'name')
     },
     {
       id: 'regions',
@@ -85,6 +85,22 @@ const useMakeCustomCellRenders = () => {
           'refBbs',
           parent
         )}`
+    },
+    {
+      id: 'option',
+      customRender: propOr('', 'name')
+    },
+    {
+      id: 'authorizationDocument',
+      customRender: pipe(propOr({}, 'titles'), head, propOr('', 'text'))
+    },
+    {
+      id: 'files',
+      customRender: pipe(
+        map(propOr('', 'fileName')),
+        reject(isEmpty),
+        join(' - ')
+      )
     }
   ];
 };
