@@ -2,7 +2,6 @@ import React, { useEffect, useState, useRef } from 'react';
 import PropTypes from 'prop-types';
 import 'd3';
 import 'd3-hexbin';
-import 'leaflet.fullscreen';
 import { useMapEvent } from 'react-leaflet';
 import { without, pipe, append, uniq, isNil } from 'ramda';
 import '@asymmetrik/leaflet-d3';

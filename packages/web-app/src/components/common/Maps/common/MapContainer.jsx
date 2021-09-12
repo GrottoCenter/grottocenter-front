@@ -1,7 +1,6 @@
 import React from 'react';
-import styled, { createGlobalStyle } from 'styled-components';
+import styled from 'styled-components';
 import { isMobileOnly } from 'react-device-detect';
-import 'leaflet.fullscreen';
 import { MapContainer } from 'react-leaflet';
 import PropTypes from 'prop-types';
 import LayersControl from './LayersControl';
@@ -17,12 +16,6 @@ ${({ wholePage, theme }) =>
 ${({ wholePage }) => !wholePage && `height: ${isMobileOnly ? '220' : '300'}px;`}
 ${({ wholePage, theme }) =>
   wholePage && `height: calc(100vh - ${theme.appBarHeight}px);`}
-`;
-
-export const FullscreenCSS = createGlobalStyle`
-   & .fullscreen-icon {
-   background-image:  url(${'/images/iconsV3/map/fullscreen.jpg'});
-   }
 `;
 
 const CustomMapContainer = ({
@@ -42,9 +35,7 @@ const CustomMapContainer = ({
       dragging={dragging}
       scrollWheelZoom={scrollWheelZoom}
       isSideMenuOpen={isSideMenuOpen}
-      minZoom={3}
-      fullscreenControl>
-      <FullscreenCSS />
+      minZoom={3}>
       <LayersControl />
       {children}
     </Map>

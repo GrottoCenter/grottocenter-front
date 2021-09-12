@@ -24,7 +24,6 @@
     "isomorphic-fetch": "^3.0.0",
     "jsonwebtoken": "^8.5.1",
     "leaflet": "^1.7.1",
-    "leaflet.fullscreen": "^1.6.0",
     "leaflet.locatecontrol": "^0.72.0",
     "lodash": "^4.17.21",
     "notistack": "^1.0.1",
