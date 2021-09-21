@@ -6,6 +6,7 @@ const date = new Date();
 const todayDate = date.toISOString().substring(0, 10);
 const defaultContext = {
   state: {
+    entryId: '',
     details: {
       id: 0,
       name: 'Cavitée',
@@ -18,6 +19,9 @@ const defaultContext = {
       author: 'Author name',
       creationDate: todayDate
     },
+    descriptions: [],
+    riggings: [],
+    comments: [],
     position: [51.505, -0.09]
   }
 };
@@ -27,8 +31,16 @@ export const isValidCoordinates = allPass([is(Array), all(is(Number)), isPair]);
 
 export const EntryContext = createContext(defaultContext);
 
-const Entry = ({ details, loading = true, children }) => {
-  const [detailsState, setState] = useState(defaultContext);
+const Entry = ({
+  details,
+  comments,
+  descriptions,
+  riggings,
+  entryId,
+  loading = true,
+  children
+}) => {
+  const [detailsState, setState] = useState(defaultContext.state.details);
 
   useEffect(() => {
     setState({
@@ -50,8 +62,12 @@ const Entry = ({ details, loading = true, children }) => {
     <EntryContext.Provider
       value={{
         state: {
+          entryId,
           loading,
           details: detailsState,
+          comments,
+          descriptions,
+          riggings,
           position: pathOr(null, ['coordinates'], details)
         },
         action: {}
@@ -61,33 +77,77 @@ const Entry = ({ details, loading = true, children }) => {
   );
 };
 
+const authorType = PropTypes.shape({
+  name: PropTypes.string
+});
 export const detailsType = PropTypes.shape({
-  id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-  name: PropTypes.string,
-  localisation: PropTypes.string,
+  accessRate: PropTypes.number,
+  altitude: PropTypes.number,
+  author: authorType,
+  coordinates: PropTypes.arrayOf(PropTypes.number),
+  creationDate: PropTypes.string,
   depth: PropTypes.number,
   development: PropTypes.number,
-  interestRate: PropTypes.number,
-  progressionRate: PropTypes.number,
-  accessRate: PropTypes.number,
-  author: PropTypes.string,
-  creationDate: PropTypes.string,
-  coordinates: PropTypes.arrayOf(PropTypes.number),
-  lastEditor: PropTypes.string,
-  editionDate: PropTypes.string,
-  undergroundType: PropTypes.string,
   discoveryYear: PropTypes.number,
+  editionDate: PropTypes.string,
+  id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+  interestRate: PropTypes.number,
+  isDivingCave: PropTypes.bool,
+  lastEditor: PropTypes.string,
+  localisation: PropTypes.string,
   mountain: PropTypes.string,
-  altitude: PropTypes.number,
-  isDivingCave: PropTypes.bool
+  name: PropTypes.string,
+  progressionRate: PropTypes.number,
+  undergroundType: PropTypes.string
 });
+
+export const commentType = PropTypes.shape({
+  accessRate: PropTypes.number,
+  author: authorType,
+  body: PropTypes.string,
+  date: PropTypes.string,
+  id: PropTypes.number,
+  interestRate: PropTypes.number,
+  language: PropTypes.string,
+  progressionRate: PropTypes.number,
+  title: PropTypes.string
+});
+
+export const commentsType = PropTypes.arrayOf(commentType);
+
+export const descriptionsType = PropTypes.arrayOf(
+  PropTypes.shape({
+    author: authorType,
+    body: PropTypes.string,
+    date: PropTypes.string,
+    id: PropTypes.number,
+    language: PropTypes.string.isRequired,
+    title: PropTypes.string.isRequired
+  })
+);
+export const riggingType = PropTypes.shape({
+  anchors: PropTypes.string,
+  author: authorType,
+  id: PropTypes.number,
+  language: PropTypes.string.isRequired,
+  observations: PropTypes.string,
+  obstacles: PropTypes.string,
+  ropes: PropTypes.string,
+  title: PropTypes.string.isRequired
+});
+
+export const riggingsType = PropTypes.arrayOf(riggingType);
 
 export const positionType = PropTypes.arrayOf(PropTypes.number);
 
 Entry.propTypes = {
+  children: PropTypes.node.isRequired,
+  comments: commentsType.isRequired,
+  descriptions: descriptionsType.isRequired,
   details: detailsType.isRequired,
   loading: PropTypes.bool,
-  children: PropTypes.node.isRequired
+  riggings: riggingsType.isRequired,
+  entryId: PropTypes.string.isRequired
 };
 
 export default Entry;

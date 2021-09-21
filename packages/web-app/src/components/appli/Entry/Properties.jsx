@@ -11,20 +11,13 @@ import {
   Public
 } from '@material-ui/icons';
 import CustomIcon from '../../common/CustomIcon';
-import { Property, Rating } from '../../common/Properties';
+import { Property } from '../../common/Properties';
 import { EntryContext, isValidCoordinates } from './Provider';
+import Ratings from './Ratings';
 
 const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
-`;
-
-const RatingWrapper = styled.div`
-  display: flex;
-  justify-content: space-evenly;
-  align-items: center;
-  flex-wrap: wrap;
-  padding: ${({ theme }) => theme.spacing(2)}px;
 `;
 
 const SecondaryPropertiesWrapper = styled.div`
@@ -133,20 +126,11 @@ const Properties = () => {
           />
         )}
       </SecondaryPropertiesWrapper>
-      <RatingWrapper>
-        <Rating
-          label={formatMessage({ id: 'Interest' })}
-          value={interestRate || 0}
-        />
-        <Rating
-          label={formatMessage({ id: 'Progression' })}
-          value={progressionRate || 0}
-        />
-        <Rating
-          label={formatMessage({ id: 'Access' })}
-          value={accessRate || 0}
-        />
-      </RatingWrapper>
+      <Ratings
+        accessRate={accessRate}
+        interestRate={interestRate}
+        progressionRate={progressionRate}
+      />
     </Wrapper>
   );
 };

@@ -6,7 +6,7 @@ import {
   Card as MuiCard,
   CardActions,
   CardContent,
-  CardHeader,
+  CardHeader as MuiCardHeader,
   IconButton as MuiIconButton,
   Typography
 } from '@material-ui/core';
@@ -26,24 +26,46 @@ const Title = styled.div`
   justify-content: space-between;
 `;
 
-const ScrollableContent = ({ title, icon, onEdit, content, footer }) => {
-  return (
-    <Card>
-      <CardHeader
-        title={
-          <Title>
-            <Typography variant="h1" color="secondary">
-              {title}
-            </Typography>
-            {!isNil(icon) && icon}
-          </Title>
-        }
-      />
-      <CardContent>{content}</CardContent>
+const CardHeader = styled(MuiCardHeader)`
+  ${({ $dense }) => $dense && `padding-bottom: 0px`}
+`;
+
+const Footer = ({ content }) => (
+  <>
+    {typeof content === 'string' ? (
+      <Typography variant="caption" align="right">
+        content
+      </Typography>
+    ) : (
+      content
+    )}
+  </>
+);
+
+const ScrollableContent = ({
+  title,
+  icon,
+  onEdit,
+  content,
+  footer,
+  dense = false
+}) => (
+  <Card>
+    <CardHeader
+      $dense={dense}
+      title={
+        <Title>
+          <Typography variant="h1" color="secondary">
+            {title}
+          </Typography>
+          {!isNil(icon) && icon}
+        </Title>
+      }
+    />
+    <CardContent>{content}</CardContent>
+    {!isNil(footer) && (
       <CardActions disableSpacing>
-        <Typography variant="caption" align="right">
-          {footer}
-        </Typography>
+        <Footer content={footer} />
         <IconButton
           size="small"
           aria-label="edit"
@@ -52,16 +74,21 @@ const ScrollableContent = ({ title, icon, onEdit, content, footer }) => {
           <CreateIcon />
         </IconButton>
       </CardActions>
-    </Card>
-  );
-};
+    )}
+  </Card>
+);
 
 ScrollableContent.propTypes = {
   title: PropTypes.string.isRequired,
   icon: PropTypes.node,
   onEdit: PropTypes.func,
   content: PropTypes.node.isRequired,
-  footer: PropTypes.string
+  footer: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
+  dense: PropTypes.bool
+};
+
+Footer.propTypes = {
+  content: PropTypes.oneOfType([PropTypes.string, PropTypes.node])
 };
 
 export default ScrollableContent;

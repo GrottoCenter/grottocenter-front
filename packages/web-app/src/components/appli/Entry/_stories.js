@@ -37,6 +37,71 @@ const details = {
   isDivingCave: true
 };
 
+const comments = [
+  {
+    accessRate: 2,
+    author: { name: 'Author' },
+    body: 'body description',
+    date: date.toISOString().substring(0, 10),
+    id: 3,
+    interestRate: 3,
+    language: 'fra',
+    progressionRate: 5,
+    title: 'titre'
+  },
+  {
+    accessRate: 2,
+    author: { name: 'Author' },
+    body: 'body description 2',
+    date: date.toISOString().substring(0, 10),
+    id: 4,
+    language: 'fra',
+    progressionRate: 2,
+    title: 'titre 2'
+  }
+];
+const descriptions = [
+  {
+    author: { name: 'Author' },
+    body:
+      "Toutes les cordes sur la progression vers le fond (siphon de Barnabé) ont été changées le 02/12/2017 (les cordes vers la salle Richard Chabardez n'ont pas été changées). Tout est équipé en place sauf le puits d'entrée (prévoir C40 et 7 mousquetons, tout broché).",
+    date: date.toISOString().substring(0, 10),
+    id: 3,
+    language: 'fra',
+    title: 'titre description'
+  },
+  {
+    author: { name: 'Author' },
+    body: 'body description body description body description',
+    date: date.toISOString().substring(0, 10),
+    id: 4,
+    language: 'fra',
+    title: 'titre description'
+  }
+];
+const riggings = [
+  {
+    anchors: 'anchor',
+    author: { name: 'Author' },
+    id: 1,
+    language: 'fra',
+    observations: 'observations',
+    obstacles: 'obstacles',
+    ropes: 'ropes',
+    title: 'titre riggings'
+  },
+  {
+    anchors: 'anchor',
+    author: { name: 'Author' },
+    id: 2,
+    language: 'fra',
+    observations: 'observations',
+    obstacles: 'obstacles',
+    ropes: 'ropes',
+    title: 'titre riggings'
+  }
+];
+
 const Content = ({ title }) => {
   const { formatMessage } = useIntl();
 
@@ -62,7 +127,12 @@ Content.propTypes = {
 
 // eslint-disable-next-line react/prop-types
 const StoryContextProvider = ({ loading, children }) => (
-  <Provider loading={loading} details={details}>
+  <Provider
+    loading={loading}
+    details={details}
+    comments={comments}
+    descriptions={descriptions}
+    riggings={riggings}>
     {children}
   </Provider>
 );
@@ -75,20 +145,6 @@ const PropertiesWithState = () => {
     </>
   );
 };
-
-const EntryWithContent = () => (
-  <Entry>
-    <>
-      <Content title="Localisation" />
-      <Content title="Description" />
-      <Content title="Topography" />
-      <Content title="Equipments" />
-      <Content title="History" />
-      <Content title="Comments" />
-      <Content title="Bibliography" />
-    </>
-  </Entry>
-);
 
 const WithLayout = () => {
   const [isSideMenuOpen, setToggleSideMenu] = React.useState(false);
@@ -103,7 +159,7 @@ const WithLayout = () => {
       isSideMenuOpen={isSideMenuOpen}
       toggleSideMenu={toggleSideMenu}
       SideBarQuickSearch={Search}>
-      <EntryWithContent />
+      <Entry />
     </Layout>
   );
 };
@@ -115,7 +171,7 @@ storiesOf('Entry', module)
     </StoryContextProvider>
   ))
   .add('Properties', () => <PropertiesWithState />)
-  .add('With Fixed-Content layout', () => <EntryWithContent />)
+  .add('With Fixed-Content layout', () => <Entry />)
   .add('With Fixed-Content and Main Layout', () => (
     <WithLayout loading={boolean('Loading', false)} />
   ));
