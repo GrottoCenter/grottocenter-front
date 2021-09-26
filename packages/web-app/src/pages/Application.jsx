@@ -17,6 +17,7 @@ import AppBar from '../features/AppBar';
 import LoginDialog from '../features/Login';
 import QuickSearch from '../features/QuickSearch';
 import SignUp from '../features/SignUp';
+import ForgotPassword from '../features/ForgotPassword';
 
 import { usePermissions } from '../hooks';
 
@@ -72,6 +73,7 @@ const Application = () => {
         <Route path="/ui/massifs/:massifId" component={MassifPage} />
         <Route path="/ui/login" component={HomePage} />
         <Route path="/ui/signup" component={SignUp} />
+        <Route path="/ui/forgotPassword" component={ForgotPassword} />
         <Route path="/ui/documents/add" component={DocumentSubmission} />
         <Route path="/ui/documents/validation" component={DocumentValidation} />
         <Route path="/ui/documents/edit/:documentId" component={DocumentEdit} />
