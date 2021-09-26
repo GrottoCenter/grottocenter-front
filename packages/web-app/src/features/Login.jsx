@@ -2,6 +2,7 @@ import React from 'react';
 import { Button, CircularProgress } from '@material-ui/core';
 import { useDispatch, useSelector } from 'react-redux';
 import { isEmpty, match } from 'ramda';
+import { useHistory } from 'react-router-dom';
 import { hideLoginDialog, postLogin } from '../actions/Login';
 
 import { emailRegexp } from '../conf/Config';
@@ -15,6 +16,7 @@ const Login = () => {
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
   const [authErrorMessages, setAuthErrorMessages] = React.useState([]);
+  const history = useHistory();
 
   const onLogin = event => {
     event.preventDefault();
@@ -48,21 +50,39 @@ const Login = () => {
     </Button>
   );
 
+  const handleCreateAccount = () => {
+    history.push(`/ui/signup`);
+    dispatch(hideLoginDialog());
+  };
+
+  const handleForgotPassword = () => {
+    history.push(`/ui/forgotPassword`);
+    dispatch(hideLoginDialog());
+  };
+
   return (
     <StandardDialog
       open={authState.isLoginDialogDisplayed}
       onClose={() => dispatch(hideLoginDialog())}
       title={<Translate>Log in</Translate>}
       actions={[LoginButton]}>
-      <LoginForm
-        authErrors={authErrorMessages}
-        email={email}
-        isFetching={authState.isFetching}
-        onEmailChange={setEmail}
-        onLogin={onLogin}
-        onPasswordChange={setPassword}
-        password={password}
-      />
+      <>
+        <LoginForm
+          authErrors={authErrorMessages}
+          email={email}
+          isFetching={authState.isFetching}
+          onEmailChange={setEmail}
+          onLogin={onLogin}
+          onPasswordChange={setPassword}
+          password={password}
+        />
+        <Button size="small" variant="text" onClick={handleCreateAccount}>
+          <Translate>no account yet?</Translate>
+        </Button>
+        <Button size="small" variant="text" onClick={handleForgotPassword}>
+          <Translate>Forgot password?</Translate>
+        </Button>
+      </>
     </StandardDialog>
   );
 };
