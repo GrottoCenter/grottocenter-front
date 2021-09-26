@@ -208,6 +208,7 @@ export const postCaverGroupsUrl = userId =>
 export const loginUrl = `${process.env.REACT_APP_API_URL}/api/${apiVersion}/login`;
 export const logoutUrl = `${process.env.REACT_APP_API_URL}/api/${apiVersion}/logout`;
 export const signUpUrl = `${process.env.REACT_APP_API_URL}/api/${apiVersion}/signup`;
+export const forgotPassword = `${process.env.REACT_APP_API_URL}/api/${apiVersion}/forgotPassword`;
 
 // ===== Grottocenter Client routes
 export const swaggerLinkV1 = `${process.env.REACT_APP_API_URL}/ui/swagger/1`;
