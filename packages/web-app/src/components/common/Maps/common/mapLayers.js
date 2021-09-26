@@ -13,7 +13,8 @@ If the layer is available for the entire map, we should set its bounds to
 const layers = [
   {
     name: 'OpenStreetMap Basic',
-    attribution: 'http://osm.org/copyright',
+    attribution:
+      '« © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap </a> contributors » under ODbL licence',
     url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
     bounds: new L.LatLngBounds(new L.LatLng(-90, -200), new L.LatLng(90, 200))
   },
