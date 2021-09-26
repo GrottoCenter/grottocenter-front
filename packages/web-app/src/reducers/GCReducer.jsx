@@ -30,6 +30,7 @@ import sideMenu from './SideMenuReducer';
 import signUp from './SignUpReducer';
 import subject from './SubjectReducer';
 import intl from './IntlReducer';
+import forgotPassword from './ForgotPasswordReducer';
 
 const GCReducer = combineReducers({
   advancedsearch,
@@ -62,6 +63,7 @@ const GCReducer = combineReducers({
   region,
   sideMenu,
   signUp,
+  forgotPassword,
   subject
 });
 
