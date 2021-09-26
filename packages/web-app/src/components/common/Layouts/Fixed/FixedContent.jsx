@@ -51,14 +51,12 @@ const FixedContent = ({ title, icon, content, footer, onEdit }) => {
       />
       <CardContent>{content}</CardContent>
       <CardActions disableSpacing>
-        <Typography variant="caption">{footer}</Typography>
-        <IconButton
-          size="small"
-          aria-label="edit"
-          disabled={isNil(onEdit)}
-          onClick={onEdit}>
-          <CreateIcon />
-        </IconButton>
+        {!isNil(footer) && <Typography variant="caption">{footer}</Typography>}
+        {!isNil(onEdit) && (
+          <IconButton size="small" aria-label="edit" onClick={onEdit}>
+            <CreateIcon />
+          </IconButton>
+        )}
       </CardActions>
     </Card>
   );
@@ -68,7 +66,7 @@ FixedContent.propTypes = {
   title: PropTypes.string.isRequired,
   icon: PropTypes.node,
   content: PropTypes.node.isRequired,
-  footer: PropTypes.string.isRequired,
+  footer: PropTypes.string,
   onEdit: PropTypes.func
 };
 
