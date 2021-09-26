@@ -3,12 +3,11 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useIntl } from 'react-intl';
 import { isEmpty, match } from 'ramda';
 
+import { useHistory } from 'react-router-dom';
 import { emailRegexp, PASSWORD_MIN_LENGTH } from '../conf/Config';
 import { postSignUp } from '../actions/SignUp';
-import { useNotification } from '../hooks';
+import { useNotification, usePermissions } from '../hooks';
 import SignUpForm from '../pages/SignUpForm';
-
-// ===========================
 
 const SignUp = () => {
   const dispatch = useDispatch();
@@ -25,6 +24,14 @@ const SignUp = () => {
   const [passwordConfirmation, setPasswordConfirmation] = React.useState('');
   const [surname, setSurname] = React.useState('');
   const { onError } = useNotification();
+  const permissions = usePermissions();
+  const history = useHistory();
+
+  useEffect(() => {
+    if (permissions.isAuth) {
+      history.push(``);
+    }
+  }, [history, permissions.isAuth]);
 
   /**
    * Display error notifications if some values are incorrect.
