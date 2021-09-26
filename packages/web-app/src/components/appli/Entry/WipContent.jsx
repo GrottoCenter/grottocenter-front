@@ -14,7 +14,11 @@ const Content = ({ title, children }) => {
       dense
       title={formatMessage({ id: title })}
       content={
-        isNil(children) ? <Typography>Work in progress</Typography> : children
+        isNil(children) ? (
+          <Typography>{formatMessage({ id: 'Work in progress' })}</Typography>
+        ) : (
+          children
+        )
       }
     />
   );

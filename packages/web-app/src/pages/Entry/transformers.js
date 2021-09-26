@@ -1,7 +1,8 @@
 import { isNil, pathOr } from 'ramda';
 
-const getAuthor = author => ({
-  name: author?.name || ''
+export const getAuthor = author => ({
+  name: author?.name || 'Author',
+  fullName: author?.nickname || author?.name || 'Author'
 });
 
 // eslint-disable-next-line import/prefer-default-export
@@ -31,8 +32,10 @@ export const getDetails = data => ({
   interestRate: pathOr(0, ['stats', 'aestheticism'], data) / 2,
   progressionRate: pathOr(0, ['stats', 'caving'], data) / 2,
   accessRate: pathOr(0, ['stats', 'approach'], data) / 2,
-  author: pathOr('Author', ['cave', 'author'], data),
-  creationDate: pathOr(null, ['cave', 'dateInscription'], data),
+  author: getAuthor(data?.author),
+  creationDate: data?.cave?.dateInscription
+    ? new Date(data?.cave?.dateInscription)
+    : '',
   isDivingCave: pathOr(null, ['cave', 'is_diving'], data),
   mountain: pathOr(null, ['massif', 'name'], data),
   undergroundType: pathOr(null, ['massif', 'undergroundType'], data),
@@ -44,7 +47,9 @@ export const getDescriptions = descriptions =>
   descriptions.map(description => ({
     author: getAuthor(description?.author),
     body: description?.body,
-    date: description?.date,
+    date: description?.dateInscription
+      ? new Date(description?.dateInscription)
+      : '',
     id: description?.id,
     language: description?.id,
     title: description?.title
@@ -52,12 +57,10 @@ export const getDescriptions = descriptions =>
 
 export const getRiggings = riggings =>
   riggings.map(rigging => ({
-    anchors: rigging?.anchors,
+    obstacles: isNil(rigging?.obstacles) ? [] : rigging.obstacles,
     author: getAuthor(rigging?.author),
     id: rigging.id,
     language: rigging?.language || '',
-    observations: rigging?.observations,
-    obstacles: rigging?.obstacles,
-    ropes: rigging?.ropes,
-    title: rigging?.title || ''
+    title: rigging?.title || '',
+    date: rigging?.dateInscription ? new Date(rigging.dateInscription) : ''
   }));

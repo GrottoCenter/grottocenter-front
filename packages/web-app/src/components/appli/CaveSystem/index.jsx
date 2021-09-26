@@ -1,6 +1,7 @@
 import React, { useContext } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
+import { isNil } from 'ramda';
 
 import Layout from '../../common/Layouts/Fixed';
 import FixedContent from '../../common/Layouts/Fixed/FixedContent';
@@ -17,7 +18,7 @@ const Content = () => (
 );
 
 export const CaveSystem = ({ children }) => {
-  const { formatMessage } = useIntl();
+  const { formatMessage, formatDate } = useIntl();
   const {
     state: {
       cave: { name, author, creationDate, lastEditor, editionDate }
@@ -25,13 +26,15 @@ export const CaveSystem = ({ children }) => {
   } = useContext(CaveContext);
 
   const footer = `${formatMessage({ id: 'Created by' })}
-        ${author} (${creationDate})
-        ${lastEditor &&
-          editionDate &&
-          ` - ${formatMessage({
-            id: 'Last modification by'
-          })} - ${lastEditor} (
-          ${editionDate})`}`;
+        ${author} ${isNil(creationDate) ? `(${formatDate(creationDate)})` : ''}
+        ${
+          !isNil(lastEditor) && !isNil(editionDate)
+            ? ` - ${formatMessage({
+                id: 'Last modification by'
+              })} ${lastEditor} (
+          ${formatDate(editionDate)})`
+            : ''
+        }`;
 
   return (
     <Layout

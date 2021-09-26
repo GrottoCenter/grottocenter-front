@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
-import { isEmpty } from 'ramda';
+import { isEmpty, isNil } from 'ramda';
 
 import Provider, {
   commentsType,
@@ -28,7 +28,7 @@ const EntryProperties = () => (
 );
 
 export const Entry = () => {
-  const { formatMessage } = useIntl();
+  const { formatMessage, formatDate } = useIntl();
   const {
     state: {
       entryId,
@@ -40,13 +40,17 @@ export const Entry = () => {
   } = useContext(EntryContext);
 
   const footer = `${formatMessage({ id: 'Created by' })}
-        ${author} (${creationDate})
-        ${lastEditor &&
-          editionDate &&
-          ` - ${formatMessage({
-            id: 'Last modification by'
-          })} - ${lastEditor} (
-          ${editionDate})`}`;
+        ${author.fullName} ${
+    !isNil(creationDate) ? `(${formatDate(creationDate)})` : ''
+  }
+        ${
+          !isNil(lastEditor) && !isNil(editionDate)
+            ? ` - ${formatMessage({
+                id: 'Last modification by'
+              })} ${lastEditor} (
+          ${formatDate(editionDate)})`
+            : ''
+        }`;
 
   return (
     <Layout
@@ -62,7 +66,7 @@ export const Entry = () => {
       {!isEmpty(riggings) && <Riggings riggings={riggings} />}
       {!isEmpty(comments) && <Comments comments={comments} />}
       <TmpContent title="Documents" />
-      <TmpContent title="History" />
+      {/* <TmpContent title="History" /> */}
     </Layout>
   );
 };

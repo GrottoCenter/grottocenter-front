@@ -17,9 +17,14 @@ import React from 'react';
 import { isNil } from 'ramda';
 import ScrollableContent from '../../common/Layouts/Fixed/ScrollableContent';
 import { riggingsType, riggingType } from './Provider';
+import { makeFormattedText } from './utils';
 
-const RiggingTable = ({ anchors, observations, obstacles, ropes, title }) => {
+const RiggingTable = ({ obstacles, title }) => {
   const { formatMessage } = useIntl();
+
+  if (isNil(obstacles[0].obstacle)) {
+    return null;
+  }
 
   return (
     <TableContainer>
@@ -40,14 +45,18 @@ const RiggingTable = ({ anchors, observations, obstacles, ropes, title }) => {
           </TableRow>
         </TableHead>
         <TableBody>
-          <TableRow>
-            <TableCell component="th" scope="row">
-              {obstacles}
-            </TableCell>
-            <TableCell align="right">{ropes}</TableCell>
-            <TableCell align="right">{anchors}</TableCell>
-            <TableCell align="right">{observations}</TableCell>
-          </TableRow>
+          {obstacles?.map(({ obstacle, rope, anchor, observation }) => (
+            <TableRow>
+              <TableCell component="th" scope="row">
+                {obstacle}
+              </TableCell>
+              <TableCell align="right">{rope}</TableCell>
+              <TableCell align="right">{makeFormattedText(anchor)}</TableCell>
+              <TableCell align="right">
+                {makeFormattedText(observation)}
+              </TableCell>
+            </TableRow>
+          ))}
         </TableBody>
       </Table>
     </TableContainer>
@@ -55,7 +64,7 @@ const RiggingTable = ({ anchors, observations, obstacles, ropes, title }) => {
 };
 
 const Riggings = ({ riggings }) => {
-  const { formatMessage } = useIntl();
+  const { formatMessage, formatDate } = useIntl();
 
   return (
     <ScrollableContent
@@ -63,7 +72,7 @@ const Riggings = ({ riggings }) => {
       title={formatMessage({ id: 'Riggings' })}
       content={
         <List>
-          {riggings.map((rigging, i) => (
+          {riggings?.map((rigging, i) => (
             <div key={rigging.id}>
               <ListItem primary="test">
                 <ListItemText
@@ -73,10 +82,20 @@ const Riggings = ({ riggings }) => {
                       component="span"
                       variant="caption"
                       color="textPrimary">
-                      {`${!isNil(rigging.author.name) &&
+                      {`${!isNil(rigging.author?.name) &&
                         formatMessage({ id: 'Posted by' })} ${
                         rigging.author.name
-                      } ${!isNil(rigging.date) ? `- ${rigging.date}` : ''}`}
+                      } ${
+                        !isNil(rigging.date)
+                          ? `- ${formatDate(rigging.date, {
+                              year: 'numeric',
+                              month: 'numeric',
+                              day: 'numeric',
+                              hour: 'numeric',
+                              minute: 'numeric'
+                            })}`
+                          : ''
+                      }`}
                     </Typography>
                   }
                 />
