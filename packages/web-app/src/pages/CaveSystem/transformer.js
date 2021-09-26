@@ -1,10 +1,12 @@
 import { pathOr } from 'ramda';
 
+import { getAuthor } from '../Entry/transformers';
+
 // eslint-disable-next-line import/prefer-default-export
 export const getSafeData = data => ({
   accessRate: pathOr(0, ['accessRate'], data),
   altitude: pathOr(0, ['altitude'], data),
-  author: pathOr('Author', ['author'], data),
+  author: getAuthor(data?.author),
   creationDate: pathOr(null, ['dateInscription'], data),
   depth: pathOr(0, ['depth'], data),
   development: pathOr(0, ['length'], data),

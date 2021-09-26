@@ -113,7 +113,19 @@ export const commentType = PropTypes.shape({
   title: PropTypes.string
 });
 
-export const commentsType = PropTypes.arrayOf(commentType);
+export const commentsType = PropTypes.arrayOf(
+  PropTypes.shape({
+    accessRate: PropTypes.number,
+    author: authorType,
+    body: PropTypes.string,
+    date: PropTypes.string,
+    id: PropTypes.number,
+    interestRate: PropTypes.number,
+    language: PropTypes.string,
+    progressionRate: PropTypes.number,
+    title: PropTypes.string
+  })
+);
 
 export const descriptionsType = PropTypes.arrayOf(
   PropTypes.shape({
@@ -125,14 +137,19 @@ export const descriptionsType = PropTypes.arrayOf(
     title: PropTypes.string.isRequired
   })
 );
+
+const obstacleType = PropTypes.shape({
+  obstacle: PropTypes.string,
+  rope: PropTypes.string,
+  observation: PropTypes.string,
+  anchor: PropTypes.string
+});
+
 export const riggingType = PropTypes.shape({
-  anchors: PropTypes.string,
+  obstacles: PropTypes.arrayOf(obstacleType),
   author: authorType,
   id: PropTypes.number,
   language: PropTypes.string.isRequired,
-  observations: PropTypes.string,
-  obstacles: PropTypes.string,
-  ropes: PropTypes.string,
   title: PropTypes.string.isRequired
 });
 

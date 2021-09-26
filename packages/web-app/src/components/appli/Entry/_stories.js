@@ -81,23 +81,47 @@ const descriptions = [
 ];
 const riggings = [
   {
-    anchors: 'anchor',
+    obstacles: [
+      {
+        obstacle: 'P17 (entrée)',
+        observation:
+          "Plusieurs broches à l'entrée. Plein de possibilités d'équipement de ce puit! Les AN sont des arbres.",
+        rope: 'C30',
+        anchor: '1 AN (MC) 1 AN (tête) 1B (dev)'
+      },
+      {
+        obstacle: 'P6',
+        observation: "l'AN est une barre de fer",
+        rope: 'C25',
+        anchor: '1B+1S (MC) 1 AN (tête de puits)'
+      }
+    ],
     author: { name: 'Author' },
     id: 1,
     language: 'fra',
-    observations: 'observations',
-    obstacles: 'obstacles',
-    ropes: 'ropes',
+    date: date.toISOString().substring(0, 10),
     title: 'titre riggings'
   },
   {
-    anchors: 'anchor',
+    obstacles: [
+      {
+        obstacle: 'P17 (entrée)',
+        observation:
+          "Plusieurs broches à l'entrée. Plein de possibilités d'équipement de ce puit! Les AN sont des arbres.",
+        rope: 'C30',
+        anchor: '1 AN (MC) 1 AN (tête) 1B (dev)'
+      },
+      {
+        obstacle: 'P6',
+        observation: "l'AN est une barre de fer",
+        rope: 'C25',
+        anchor: '1B+1S (MC) 1 AN (tête de puits)'
+      }
+    ],
     author: { name: 'Author' },
     id: 2,
     language: 'fra',
-    observations: 'observations',
-    obstacles: 'obstacles',
-    ropes: 'ropes',
+    date: date.toISOString().substring(0, 10),
     title: 'titre riggings'
   }
 ];

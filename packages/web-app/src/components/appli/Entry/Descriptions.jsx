@@ -14,9 +14,10 @@ import { useSelector } from 'react-redux';
 import ScrollableContent from '../../common/Layouts/Fixed/ScrollableContent';
 import { descriptionsType } from './Provider';
 import { detailPageV2Links } from '../../../conf/Config';
+import { makeFormattedText } from './utils';
 
 const Descriptions = ({ descriptions, entryId }) => {
-  const { formatMessage } = useIntl();
+  const { formatMessage, formatDate } = useIntl();
   const { locale } = useSelector(state => state.intl);
 
   const externalLink = `${
@@ -38,7 +39,9 @@ const Descriptions = ({ descriptions, entryId }) => {
                   primary={title}
                   secondary={
                     <>
-                      {body}
+                      <Typography variant="body2">
+                        {makeFormattedText(body)}
+                      </Typography>
                       <br />
                       <Typography
                         component="span"
@@ -46,7 +49,15 @@ const Descriptions = ({ descriptions, entryId }) => {
                         color="textPrimary">
                         {`${!isNil(author.name) &&
                           formatMessage({ id: 'Posted by' })} ${author.name} ${
-                          !isNil(date) ? `- ${date}` : ''
+                          !isNil(date)
+                            ? `- ${formatDate(date, {
+                                year: 'numeric',
+                                month: 'numeric',
+                                day: 'numeric',
+                                hour: 'numeric',
+                                minute: 'numeric'
+                              })}`
+                            : ''
                         }`}
                       </Typography>
                     </>

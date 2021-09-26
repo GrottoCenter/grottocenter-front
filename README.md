@@ -31,7 +31,7 @@ This project use:
 - `yarn` at the top-level of the repo, it will automatically install all dependencies and link local packages
 
 ## Scripts
-- `start:app` start main grottocenter app
+- `start:app` start main Grottocenter app **using the production api**
 - `storybook` start storybook
 - `test`: run unit `test` commands on all packages
 - `build`: builds all packages with `build` script

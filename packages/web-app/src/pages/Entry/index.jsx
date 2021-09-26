@@ -24,7 +24,7 @@ const EntryPage = () => {
   const details = getDetails(data);
   const comments = getComments(pathOr([], ['comments'], data));
   const descriptions = getDescriptions(pathOr([], ['descriptions'], data));
-  const riggings = getRiggings(pathOr([], ['riggins'], data));
+  const riggings = getRiggings(pathOr([], ['riggings'], data));
 
   return (
     <Entry

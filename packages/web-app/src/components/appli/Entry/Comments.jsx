@@ -13,6 +13,7 @@ import styled from 'styled-components';
 import ScrollableContent from '../../common/Layouts/Fixed/ScrollableContent';
 import { commentsType, commentType } from './Provider';
 import Ratings from './Ratings';
+import { makeFormattedText } from './utils';
 
 const StyledListItemText = styled(ListItemText)`
   width: 100%;
@@ -33,7 +34,8 @@ const Comment = ({
   accessRate,
   date
 }) => {
-  const { formatMessage } = useIntl();
+  const { formatMessage, formatDate } = useIntl();
+  const formattedBody = makeFormattedText(body);
 
   return (
     <ListItem>
@@ -41,12 +43,22 @@ const Comment = ({
         primary={title}
         secondary={
           <>
-            {body}
+            <Typography variant="body2">{formattedBody}</Typography>
             <br />
             <Typography component="span" variant="caption" color="textPrimary">
               {`${!isNil(author.name) && formatMessage({ id: 'Posted by' })} ${
                 author.name
-              } ${!isNil(date) ? `- ${date}` : ''}`}
+              } ${
+                !isNil(date)
+                  ? `- ${formatDate(date, {
+                      year: 'numeric',
+                      month: 'numeric',
+                      day: 'numeric',
+                      hour: 'numeric',
+                      minute: 'numeric'
+                    })}`
+                  : ''
+              }`}
             </Typography>
           </>
         }
