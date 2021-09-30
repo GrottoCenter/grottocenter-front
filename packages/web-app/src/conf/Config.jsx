@@ -82,13 +82,6 @@ export const licenceLinks = {
 };
 
 export const licensesODBLink = {
-  fr: 'https://opendatacommons.org/licenses/odbl/',
-  es: 'https://opendatacommons.org/licenses/odbl/',
-  ca: 'https://opendatacommons.org/licenses/odbl/',
-  de: 'https://opendatacommons.org/licenses/odbl/',
-  pt: 'https://opendatacommons.org/licenses/odbl/',
-  nl: 'https://opendatacommons.org/licenses/odbl/',
-  it: 'https://opendatacommons.org/licenses/odbl/',
   '*': 'https://opendatacommons.org/licenses/odbl/'
 };
 
