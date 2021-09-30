@@ -81,6 +81,17 @@ export const licenceLinks = {
   '*': 'https://creativecommons.org/licenses/by-sa/3.0/'
 };
 
+export const licensesODBLink = {
+  fr: 'https://opendatacommons.org/licenses/odbl/',
+  es: 'https://opendatacommons.org/licenses/odbl/',
+  ca: 'https://opendatacommons.org/licenses/odbl/',
+  de: 'https://opendatacommons.org/licenses/odbl/',
+  pt: 'https://opendatacommons.org/licenses/odbl/',
+  nl: 'https://opendatacommons.org/licenses/odbl/',
+  it: 'https://opendatacommons.org/licenses/odbl/',
+  '*': 'https://opendatacommons.org/licenses/odbl/'
+};
+
 export const contactLinks = {
   fr: ' http://fr.wikicaves.org/contact',
   '*': 'http://en.wikicaves.org/contact'
