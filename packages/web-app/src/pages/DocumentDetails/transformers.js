@@ -59,32 +59,53 @@ export const makeDetails = data => {
   };
 };
 
-export const makeEntities = data => ({
-  massif: pathOr(
-    pipe(pathOr([], ['massif', 'names']), head, pathOr('', ['name']))(data),
-    ['massif', 'name'],
-    data
-  ),
-  cave: pathOr(
-    pipe(pathOr([], ['cave', 'names']), head, pathOr('', ['name']))(data),
-    ['cave', 'name'],
-    data
-  ),
-  entrance: pathOr(
-    pipe(pathOr([], ['entrance', 'names']), head, pathOr('', ['name']))(data),
-    ['entrance', 'name'],
-    data
-  ),
-  files: {
-    fileNames: pipe(pathOr([], ['files']), map(propOr('', 'fileName')))(data),
-    fileLinks: pipe(
-      pathOr([], ['files']),
-      map(file => ({ href: propOr('', 'completePath', file) }))
+export const makeEntities = data => {
+  return {
+    massif: pathOr(
+      pipe(pathOr([], ['massif', 'names']), head, pathOr('', ['name']))(data),
+      ['massif', 'name'],
+      data
+    ),
+    cave: pathOr(
+      pipe(pathOr([], ['cave', 'names']), head, pathOr('', ['name']))(data),
+      ['cave', 'name'],
+      data
+    ),
+    entrance: pathOr(
+      pipe(pathOr([], ['entrance', 'names']), head, pathOr('', ['name']))(data),
+      ['entrance', 'name'],
+      data
+    ),
+    files: {
+      fileNames: pipe(pathOr([], ['files']), map(propOr('', 'fileName')))(data),
+      fileLinks: pipe(
+        pathOr([], ['files']),
+        map(file => ({ href: propOr('', 'completePath', file) }))
+      )(data)
+    },
+    authorizationDocument: pipe(
+      pathOr([], ['authorizationDocument', 'titles']),
+      head,
+      pathOr('', ['text'])
     )(data)
-  },
-  authorizationDocument: pipe(
-    pathOr([], ['authorizationDocument', 'titles']),
-    head,
-    pathOr('', ['text'])
-  )(data)
-});
+  };
+};
+
+export const makeDocumentChildren = (data, locale) => {
+  const makeChild = doc => ({
+    id: doc.id,
+    url: `/ui/documents/${doc.id}`,
+    title: pipe(
+      propOr([], 'titles'),
+      head,
+      propOr('No title provided', 'text')
+    )(doc),
+    childrenData: doc.children ? doc.children.map(c => makeChild(c)) : null
+  });
+
+  const children = data.map(childDoc => makeChild(childDoc));
+
+  return children.sort((c1, c2) =>
+    c1.title.localeCompare(c2.title, locale, { numeric: true })
+  );
+};

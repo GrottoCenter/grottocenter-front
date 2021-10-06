@@ -14,8 +14,10 @@ import Overview from './Overview';
 import Section from './Section';
 import CustomIcon from '../../components/common/CustomIcon';
 import { fetchDocumentDetails } from '../../actions/DocumentDetails';
+import { fetchDocumentChildren } from '../../actions/DocumentChildren';
 import {
   makeDetails,
+  makeDocumentChildren,
   makeEntities,
   makeOrganizations,
   makeOverview
@@ -34,8 +36,10 @@ const DocumentPage = ({
   organizations,
   details,
   entities,
+  documentChildren,
   isValidated,
-  onEdit
+  onEdit,
+  areDocumentChildrenLoading
 }) => {
   const { formatMessage } = useIntl();
   const permissions = usePermissions();
@@ -159,6 +163,14 @@ const DocumentPage = ({
             Icon: () => <AttachFileIcon color="primary" />,
             label: formatMessage({ id: 'Authorization document' }),
             value: entities.authorizationDocument
+          },
+          {
+            Icon: () => <CustomIcon type="bibliography" />,
+            label: formatMessage({ id: 'Child documents' }),
+            value: documentChildren,
+            type: 'tree',
+            isLabelAndIconOnTop: true,
+            isLoading: areDocumentChildrenLoading
           }
         ]}
       />
@@ -173,13 +185,20 @@ const HydratedDocumentPage = ({ id }) => {
   const { isLoading, details, error } = useSelector(
     state => state.documentDetails
   );
+  const {
+    isLoading: areDocumentChildrenLoading,
+    children,
+    childrenError
+  } = useSelector(state => state.documentChildren);
   const history = useHistory();
   const editPath = useRef('/ui');
   const permissions = usePermissions();
+  const { locale } = useSelector(state => state.intl);
 
   useEffect(() => {
     if (!isNil(documentId)) {
       dispatch(fetchDocumentDetails(documentId));
+      dispatch(fetchDocumentChildren(documentId));
       editPath.current = `/ui/documents/edit/${documentId}`;
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -195,7 +214,11 @@ const HydratedDocumentPage = ({ id }) => {
       organizations={makeOrganizations(details || {})}
       details={makeDetails(details || {})}
       entities={makeEntities(details || {})}
-      loading={isNil(documentId) || isLoading || !isNil(error)}
+      documentChildren={makeDocumentChildren(children || {}, locale)}
+      areDocumentChildrenLoading={areDocumentChildrenLoading}
+      loading={
+        isNil(documentId) || isLoading || !isNil(error) || !isNil(childrenError)
+      }
       isValidated={details.modifiedDocJson === null}
       onEdit={permissions.isAuth ? onEdit : undefined}
     />
@@ -206,6 +229,7 @@ export default HydratedDocumentPage;
 
 DocumentPage.propTypes = {
   loading: PropTypes.bool,
+  areDocumentChildrenLoading: PropTypes.bool,
   overview: PropTypes.shape({
     createdBy: PropTypes.string.isRequired,
     authors: PropTypes.arrayOf(PropTypes.string).isRequired,
@@ -248,10 +272,16 @@ DocumentPage.propTypes = {
       fileNames: PropTypes.arrayOf(PropTypes.string),
       fileLinks: PropTypes.arrayOf(PropTypes.string)
     }),
-    authorizationDocument: PropTypes.shape({
-      titles: PropTypes.arrayOf(PropTypes.shape({ text: PropTypes.string }))
-    })
+    authorizationDocument: PropTypes.string
   }),
+  documentChildren: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.number.isRequired,
+      title: PropTypes.string.isRequired,
+      url: PropTypes.string,
+      childrenData: PropTypes.arrayOf(PropTypes.shape({})) // recursive data
+    })
+  ),
   isValidated: PropTypes.bool.isRequired,
   onEdit: PropTypes.func.isRequired
 };

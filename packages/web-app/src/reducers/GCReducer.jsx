@@ -6,6 +6,7 @@ import caverGroups from './CaverGroupsReducer';
 import createCaver from './CreateCaver';
 import createOrganization from './CreateOrganization';
 import document from './DocumentReducer';
+import documentChildren from './DocumentChildrenReducer';
 import documentDetails from './DetailsDocumentReducer';
 import documents from './DocumentsReducer';
 import documentType from './DocumentTypeReducer';
@@ -42,6 +43,7 @@ const GCReducer = combineReducers({
   createCaver,
   createOrganization,
   document,
+  documentChildren,
   documentDetails,
   documents,
   documentType,
