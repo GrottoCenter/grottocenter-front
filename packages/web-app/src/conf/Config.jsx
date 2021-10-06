@@ -187,6 +187,8 @@ export const subjectsUrl = `${process.env.REACT_APP_API_URL}/api/${apiVersion}/d
 export const subjectsSearchUrl = `${process.env.REACT_APP_API_URL}/api/${apiVersion}/documents/subjects/search/logical/or`;
 export const getDocumentTypesUrl = `${process.env.REACT_APP_API_URL}/api/${apiVersion}/documents/types`;
 export const getDocuments = `${process.env.REACT_APP_API_URL}/api/${apiVersion}/documents`;
+export const getDocumentChildren = documentId =>
+  `${process.env.REACT_APP_API_URL}/api/${apiVersion}/documents/${documentId}/children`;
 export const processDocumentIds = `${process.env.REACT_APP_API_URL}/api/${apiVersion}/documents/validate`;
 export const getDocumentDetailsUrl = `${process.env.REACT_APP_API_URL}/api/${apiVersion}/documents/`;
 export const getEntryUrl = `${process.env.REACT_APP_API_URL}/api/${apiVersion}/entrances/`;
