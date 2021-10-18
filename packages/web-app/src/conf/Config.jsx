@@ -208,6 +208,12 @@ export const postCaverGroupsUrl = userId =>
 export const getLicensesUrl = `${process.env.REACT_APP_API_URL}/api/v1/licenses`;
 export const getFileFormatsUrl = `${process.env.REACT_APP_API_URL}/api/v1/file-formats`;
 
+// ===== ImportCSV url
+export const checkRowsEntrancesUrl = `${process.env.REACT_APP_API_URL}/api/${apiVersion}/entrances/check-rows`;
+export const checkRowsDocumentsUrl = `${process.env.REACT_APP_API_URL}/api/${apiVersion}/documents/check-rows`;
+export const importRowsEntrancesUrl = `${process.env.REACT_APP_API_URL}/api/${apiVersion}/entrances/import-rows`;
+export const importRowsDocumentsUrl = `${process.env.REACT_APP_API_URL}/api/${apiVersion}/documents/import-rows`;
+
 // ===== Auth url
 export const loginUrl = `${process.env.REACT_APP_API_URL}/api/${apiVersion}/login`;
 export const logoutUrl = `${process.env.REACT_APP_API_URL}/api/${apiVersion}/logout`;
@@ -233,6 +239,7 @@ export const breadcrumpKeys = {
   documents: 'Documents',
   entries: 'Entries',
   faq: 'FAQ',
+  'import-csv': 'Import',
   organizations: 'Organizations',
   manage: 'Manage',
   map: 'Map',
