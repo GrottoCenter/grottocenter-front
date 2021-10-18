@@ -31,6 +31,7 @@ import ManageUsers from './Admin/ManageUsers';
 import Map from './Map';
 import MassifPage from './Massif';
 import OrganizationPage from './Organization';
+import ImportContainer from './ImportCSV';
 
 const Application = () => {
   const dispatch = useDispatch();
@@ -81,6 +82,7 @@ const Application = () => {
           path="/ui/documents/:documentId"
           component={DocumentDetailsPage}
         />
+        <Route path="/ui/import-csv" component={ImportContainer} />
         <Redirect path="/ui/*" to="/ui" />
       </Switch>
     </Layout>

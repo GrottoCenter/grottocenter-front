@@ -15,6 +15,7 @@ import entry from './EntryReducer';
 import error from './ErrorReducer';
 import fileFormats from './FileFormatsReducer';
 import identifierType from './IdentifierTypesReducer';
+import importCsv from './ImportCsvReducer';
 import language from './LanguageReducer';
 import latestBlogNews from './LatestBlogNewsReducer';
 import licenses from './LicensesReducer';
@@ -52,6 +53,7 @@ const GCReducer = combineReducers({
   error,
   fileFormats,
   identifierType,
+  importCsv,
   intl,
   language,
   latestBlogNews,
