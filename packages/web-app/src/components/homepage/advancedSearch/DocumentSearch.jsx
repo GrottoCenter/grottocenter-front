@@ -28,6 +28,8 @@ import SearchBottomActionButtons from './SearchBottomActionButtons';
 import styles from './styles';
 import SliderForm from './SliderForm';
 
+const SUBJECT_NAME_MAX_LENGTH = 80;
+
 class DocumentSearch extends React.Component {
   /*
     The state is created with particular key names 
@@ -142,6 +144,25 @@ class DocumentSearch extends React.Component {
     // Don't reset the expanded panel
     delete initialState.panelExpanded;
     this.setState(initialState);
+  };
+
+  getTranslatedAndFormattedSubject = subject => {
+    const { intl } = this.props;
+    let formattedSubject = '';
+    const hasParentSubject = subject.parent !== null;
+    formattedSubject += hasParentSubject ? '\u00a0\u00a0\u00a0\u00a0' : ''; // indentation of sub-subject
+    formattedSubject += `${subject.code} - `;
+    const translatedSubject = intl.formatMessage({
+      id: subject.code,
+      defaultMessage: subject.subject
+    });
+
+    formattedSubject +=
+      translatedSubject.length > SUBJECT_NAME_MAX_LENGTH
+        ? `${translatedSubject.substring(0, SUBJECT_NAME_MAX_LENGTH)}…`
+        : translatedSubject;
+
+    return hasParentSubject ? formattedSubject : <b>{formattedSubject}</b>;
   };
 
   render() {
@@ -356,16 +377,9 @@ class DocumentSearch extends React.Component {
                               <Translate>All subjects</Translate>
                             </i>
                           </MenuItem>
-                          {allSubjects.map(choiceSubject => (
-                            <MenuItem
-                              key={choiceSubject.code}
-                              value={choiceSubject.code}>
-                              {/* sub-subject indentation */}
-                              {choiceSubject.parent !== null
-                                ? '\u00a0\u00a0\u00a0\u00a0'
-                                : ''}
-                              {`${choiceSubject.code} - `}
-                              <Translate>{choiceSubject.subject}</Translate>
+                          {allSubjects.map(subject => (
+                            <MenuItem key={subject.code} value={subject.code}>
+                              {this.getTranslatedAndFormattedSubject(subject)}
                             </MenuItem>
                           ))}
                         </Select>
