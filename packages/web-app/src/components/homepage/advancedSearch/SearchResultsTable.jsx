@@ -254,7 +254,8 @@ class SearchResultsTable extends React.Component {
           <Translate>Authors</Translate>
         </TableCell>
         <TableCell>
-          <Translate>Year</Translate>
+          {/* Considering the number of columns, "Publication Date" is a bit long */}
+          <Translate>Date</Translate>{' '}
         </TableCell>
       </TableRow>
     </TableHead>
@@ -575,8 +576,8 @@ class SearchResultsTable extends React.Component {
                           {result.authors ? result.authors : '-'}
                         </TableCell>
                         <TableCell>
-                          {result.publicationDate
-                            ? result.publicationDate
+                          {result.datePublication
+                            ? result.datePublication
                             : '-'}
                         </TableCell>
                       </>
