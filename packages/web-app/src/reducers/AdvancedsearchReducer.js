@@ -28,7 +28,6 @@ const initialState = {
 
 const advancedsearch = (state = initialState, action) => {
   switch (action.type) {
-    // Search "from nothing"
     case FETCH_ADVANCEDSEARCH_STARTED: {
       return {
         ...state,
@@ -47,9 +46,7 @@ const advancedsearch = (state = initialState, action) => {
         mergedResults = mergedResults.concat(state.results);
       }
       mergedResults = mergedResults.concat(action.results);
-
-      // Remove duplicates
-      mergedResults = [...new Set(mergedResults)];
+      mergedResults = [...new Set(mergedResults)]; // Remove duplicates
 
       return {
         ...state,
@@ -77,8 +74,7 @@ const advancedsearch = (state = initialState, action) => {
     case FETCH_NEXT_ADVANCEDSEARCH_SUCCESS: {
       let mergedResults = state.results ? state.results : [];
       mergedResults = mergedResults.concat(action.results);
-      // Remove duplicates
-      mergedResults = [...new Set(mergedResults)];
+      mergedResults = [...new Set(mergedResults)]; // Remove duplicates
 
       return { ...state, results: mergedResults, isLoading: false };
     }
@@ -99,10 +95,9 @@ const advancedsearch = (state = initialState, action) => {
       };
     }
     case FETCH_FULL_ADVANCEDSEARCH_SUCCESS: {
-      // Remove duplicates
       return {
         ...state,
-        fullResults: [...new Set(action.results)],
+        fullResults: [...new Set(action.results)], // Remove duplicates
         isLoadingFullData: false,
         wantToDownloadCSV: true
       };
