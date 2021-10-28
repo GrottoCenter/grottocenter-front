@@ -45,13 +45,13 @@ class DocumentSearch extends React.Component {
   }
 
   getInitialState = () => {
-    const { yearMinValue, yearMaxValue } = this.props;
+    const { publicationDateMinValue, publicationDateMaxValue } = this.props;
 
     return {
-      'publication_year-range': {
+      'date_publication-range': {
         isEditable: false,
-        min: yearMinValue,
-        max: yearMaxValue
+        min: publicationDateMinValue,
+        max: publicationDateMaxValue
       },
       authors: '',
       'contributor nickname': '',
@@ -150,15 +150,15 @@ class DocumentSearch extends React.Component {
       resourceType,
       resetResults,
       startAdvancedsearch,
-      yearMinValue,
-      yearMaxValue,
+      publicationDateMinValue,
+      publicationDateMaxValue,
       allDocumentTypes,
       allSubjects,
       intl
     } = this.props;
 
     const {
-      'publication_year-range': yearRange,
+      'date_publication-range': publicationDateRange,
       ref_bbs,
       title,
       authors,
@@ -461,23 +461,23 @@ class DocumentSearch extends React.Component {
 
                   <SliderForm
                     label={intl.formatMessage({
-                      id: 'Year'
+                      id: 'Publication Date'
                     })}
-                    disabled={!yearRange.isEditable}
+                    disabled={!publicationDateRange.isEditable}
                     onDisable={this.handleCheckedChange(
-                      'publication_year-range'
+                      'date_publication-range'
                     )}
-                    min={yearMinValue}
-                    max={yearMaxValue}
+                    min={publicationDateMinValue}
+                    max={publicationDateMaxValue}
                     onChange={values => {
                       this.handleRangeChange(
-                        'publication_year-range',
+                        'date_publication-range',
                         values,
-                        yearMinValue,
-                        yearMaxValue
+                        publicationDateMinValue,
+                        publicationDateMaxValue
                       );
                     }}
-                    value={[yearRange.min, yearRange.max]}
+                    value={[publicationDateRange.min, publicationDateRange.max]}
                   />
                 </div>
 
@@ -544,15 +544,15 @@ DocumentSearch.propTypes = {
       name: PropTypes.string.isRequired
     })
   ).isRequired,
-  yearMinValue: PropTypes.number,
-  yearMaxValue: PropTypes.number,
+  publicationDateMinValue: PropTypes.number,
+  publicationDateMaxValue: PropTypes.number,
 
   intl: PropTypes.shape({ formatMessage: PropTypes.func }).isRequired
 };
 
 DocumentSearch.defaultProps = {
-  yearMinValue: 1800,
-  yearMaxValue: new Date().getFullYear()
+  publicationDateMinValue: 1800,
+  publicationDateMaxValue: new Date().getFullYear()
 };
 
 export default injectIntl(withStyles(styles)(DocumentSearch));
