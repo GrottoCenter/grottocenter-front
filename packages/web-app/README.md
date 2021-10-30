@@ -6,7 +6,7 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 
 You can modify the
 `REACT_APP_API_URL` in `.env` 
-for example `REACT_APP_API_URL=https://beta.grottocenter.org` to use the production api 
+for example `REACT_APP_API_URL=https://api.grottocenter.org` to use the production api 
 
 ## Available Scripts
 
