@@ -50,6 +50,10 @@ const useMakeCustomCellRenders = () => {
       customRender: propOr('', 'name')
     },
     {
+      id: 'mainLanguage',
+      customRender: propOr('', 'refName')
+    },
+    {
       id: 'regions',
       customRender: pipe(map(propOr('', 'code')), reject(isEmpty), join('; '))
     },

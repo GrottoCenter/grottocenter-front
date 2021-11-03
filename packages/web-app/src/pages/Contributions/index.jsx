@@ -25,6 +25,7 @@ const Wrapper = styled.div`
 const defaultHiddenColumns = [
   'author',
   'authorComment',
+  'authorizationDocument',
   'authors',
   'cave',
   'datePublication',
@@ -38,6 +39,8 @@ const defaultHiddenColumns = [
   'library',
   'license',
   'massif',
+  'mainLanguage',
+  'modifiedDocJson',
   'pages',
   'parent',
   'pathOld',
