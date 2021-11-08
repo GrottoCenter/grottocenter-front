@@ -112,9 +112,6 @@ export const overridings = {
     },
     MuiButton: {
       variant: 'contained'
-    },
-    MuiSkeleton: {
-      animation: 'wave'
     }
     // For default color on a specific variant on Typography
     // Wait until V5 to (maybe) use this for some titles
@@ -126,6 +123,14 @@ export const overridings = {
     // },
   },
   overrides: {
+    MuiSkeleton: {
+      root: {
+        backgroundColor: brown['100']
+      },
+      pulse: {
+        animationDuration: '1s'
+      }
+    },
     MuiFormHelperText: {
       root: {
         color: brown['500'],
