@@ -3,16 +3,21 @@ import { makeStyles, Typography } from '@material-ui/core';
 import PublishIcon from '@material-ui/icons/Publish';
 import { useDispatch, useSelector } from 'react-redux';
 import { useIntl } from 'react-intl';
-import styled from 'styled-components';
 import { ImportPageContentContext } from '../Provider';
 import {
   checkRowsInBdd,
   importRows,
   resetImportState
 } from '../../../../actions/ImportCsv';
-import DownloadButtons from '../DownloadButtons';
 import ActionButton from '../../../common/ActionButton';
-import { ENTRANCE } from '../constants';
+import {
+  DOCUMENT,
+  ENTRANCE,
+  FAILURE_IMPORT,
+  SUCCESS_IMPORT
+} from '../constants';
+import Alert from '../../../common/Alert';
+import DownloadButton from '../DownloadButton';
 
 const useStyles = makeStyles({
   cardBottomButtons: {
@@ -22,28 +27,25 @@ const useStyles = makeStyles({
     padding: 0,
     textAlign: 'center',
     width: '100%'
-  },
-
-  bottomButton: {
-    margin: `${({ theme }) => theme.spacing(2)}px`
   }
 });
 
-const Title = styled.div`
-  font-size: 2rem;
-`;
+// https://formatjs.io/docs/core-concepts/icu-syntax/#select-format
+const translatedSingularType = `{importType, select,
+  ${DOCUMENT} {document}
+  ${ENTRANCE} {entrance}
+  other {}}`;
 
-const SecondaryTypo = styled.p`
-  color: ${({ theme }) => theme.palette.secondary.main};
-`;
+const translatedPluralType = `{importType, select,
+  ${DOCUMENT} {documents}
+  ${ENTRANCE} {entrances}
+  other {}}`;
 
-const SuccessTypo = styled.p`
-  color: ${({ theme }) => theme.palette.successColor};
-`;
-
-const ErrorTypo = styled.p`
-  color: ${({ theme }) => theme.palette.errorColor};
-`;
+const translatedTypePrefix = `{number, plural,
+  zero {no ${translatedPluralType}}
+  one {# ${translatedSingularType}}
+  other {# ${translatedPluralType}}
+}`;
 
 const Step4 = () => {
   const classes = useStyles();
@@ -65,39 +67,16 @@ const Step4 = () => {
     return () => {
       dispatch(resetImportState());
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const WontBeCreatedData = () => {
-    const { resultCheck } = importCsv;
-    const linesArray = [];
-    if (resultCheck && resultCheck.wontBeCreated.length > 0) {
-      resultCheck.wontBeCreated.forEach(row => {
-        linesArray.push(row.line);
-      });
-    }
-
-    return (
-      <ErrorTypo className={classes.errorTypo}>
-        {formatMessage(
-          {
-            id: 'duplicates found import csv',
-            defaultMessage: 'Lines concerned : {lines}.'
-          },
-          { lines: linesArray.toString() }
-        )}
-      </ErrorTypo>
-    );
-  };
+  }, [dispatch, selectedType, importData]);
 
   return (
     <>
-      <Title>
+      <Typography>
         {formatMessage({
           id:
             'The functionality to check for duplicates has not been fully implemented. Please be careful not to import any documents or entrances which are already present in Grottocenter.'
         })}
-      </Title>
+      </Typography>
       {importCsv.isLoading && (
         <Typography>
           {formatMessage({ id: 'Processing, this may take some time...' })}
@@ -108,37 +87,38 @@ const Step4 = () => {
 
       {wontBeCreateData && wontBeCreateData.length > 0 && (
         <>
-          <ErrorTypo className={classes.errorTypo}>
-            {formatMessage(
+          <Alert
+            severity="error"
+            title={formatMessage(
               {
                 id: 'importCsv not imported',
-                defaultMessage:
-                  "{nbDouble} {typeData} are already present in Grottocenter and won't be imported."
+                defaultMessage: `${translatedTypePrefix} {number, plural, one {is} other {are}} already present in Grottocenter and won't be imported.`
               },
               {
-                nbDouble: wontBeCreateData.length,
-                typeData: selectedType === ENTRANCE ? 'entrances' : 'documents'
+                number: wontBeCreateData.length,
+                importType: selectedType
               }
             )}
-          </ErrorTypo>
-          <WontBeCreatedData />
+            content={wontBeCreateData.map(row => `${row.line}, `)}
+          />
         </>
       )}
 
       {willBeCreatedData && willBeCreatedData.length > 0 && (
         <>
-          <SecondaryTypo>
-            {formatMessage(
+          <Alert
+            severity="info"
+            title={formatMessage(
               {
                 id: 'importCsv imported',
-                defaultMessage: '{nbNew} {typeData} will be imported.'
+                defaultMessage: `${translatedTypePrefix} will be imported.`
               },
               {
-                nbNew: willBeCreatedData.length,
-                typeData: selectedType === ENTRANCE ? 'entrances' : 'documents'
+                number: willBeCreatedData.length,
+                importType: selectedType
               }
             )}
-          </SecondaryTypo>
+          />
           <div className={classes.cardBottomButtons}>
             <ActionButton
               label={formatMessage({ id: 'Import' })}
@@ -150,43 +130,50 @@ const Step4 = () => {
         </>
       )}
 
-      {resultImport && (
-        <DownloadButtons
-          successfulImport={resultImport.successfulImport}
-          failureImport={resultImport.failureImport}
-        />
-      )}
-
       {resultImport && resultImport.total.success > 0 && (
         <>
-          <SuccessTypo className={classes.successTypo}>
-            {formatMessage(
+          <Alert
+            severity="success"
+            title={formatMessage(
               {
                 id: 'success import csv',
-                defaultMessage: '{nbNew} {typeData} were imported'
+                defaultMessage: `${translatedTypePrefix} {number, plural, one {was} other {were}} imported.`
               },
               {
-                nbNew: resultImport.total.success,
-                typeData: selectedType === ENTRANCE ? 'entrances' : 'documents'
+                number: resultImport.total.success,
+                importType: selectedType
               }
             )}
-          </SuccessTypo>
+            action={
+              <DownloadButton
+                data={resultImport.successfulImport}
+                filename={SUCCESS_IMPORT}
+              />
+            }
+          />
         </>
       )}
       {resultImport && resultImport.total.failure > 0 && (
         <>
-          <ErrorTypo className={classes.errorType}>
-            {formatMessage(
+          <Alert
+            severity="error"
+            title={formatMessage(
               {
                 id: 'failure import csv',
-                defaultMessage: '{nb} {typeData} were not imported'
+                defaultMessage: `${translatedTypePrefix} {number, plural, one {was} other {were}} not imported.`
               },
               {
-                nb: resultImport.total.failure,
-                typeData: selectedType === ENTRANCE ? 'entrances' : 'documents'
+                number: resultImport.total.failure,
+                importType: selectedType
               }
             )}
-          </ErrorTypo>
+            action={
+              <DownloadButton
+                data={resultImport.failureImport}
+                filename={FAILURE_IMPORT}
+              />
+            }
+          />
         </>
       )}
     </>
