@@ -5,6 +5,7 @@ import { Button, makeStyles } from '@material-ui/core';
 import InfoIcon from '@material-ui/icons/Info';
 import DownloadIcon from '@material-ui/icons/GetApp';
 import { useIntl } from 'react-intl';
+import { ENTRANCE, DOCUMENT } from './constants';
 
 const useStyles = makeStyles({
   karstlinkFooter: {
@@ -36,6 +37,21 @@ const ImportKarstlinkInfo = ({ selectType }) => {
   const { formatMessage } = useIntl();
   const classes = useStyles();
 
+  let title = '';
+  let link = '';
+  switch (selectType) {
+    case ENTRANCE:
+      title = 'Example - Entrance';
+      link = 'https://ontology.uis-speleo.org/example/V4.csv';
+      break;
+    case DOCUMENT:
+      title = 'Example - Document';
+      link = 'https://ontology.uis-speleo.org/example/Prospection.csv';
+      break;
+    default:
+      break;
+  }
+
   return (
     <>
       <div>
@@ -61,16 +77,12 @@ const ImportKarstlinkInfo = ({ selectType }) => {
           </Button>
           <Button
             target="_blank"
-            href={
-              selectType === 0
-                ? 'https://ontology.uis-speleo.org/example/V4.csv'
-                : 'https://ontology.uis-speleo.org/example/Prospection.csv'
-            }
+            href={link}
             className={classes.karstlinkButton}
             variant="contained">
             <DownloadIcon />
             {formatMessage({
-              id: selectType === 0 ? 'Example - Entrance' : 'Example - Document'
+              id: title
             })}
           </Button>
         </div>

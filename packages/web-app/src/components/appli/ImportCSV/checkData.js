@@ -1,22 +1,32 @@
 import { keys, includes } from 'ramda';
-import { ENTRANCE } from './constants';
+import {
+  ATTRIBUTION_NAME,
+  COUNTRY_CODE,
+  DOCUMENT,
+  ENTRANCE,
+  ID,
+  LATITUDE,
+  LICENSE,
+  LONGITUDE,
+  TYPE
+} from './constants';
 
 const requiredColumnsDocument = [
-  'id',
-  'rdf:type',
-  'dct:rights/cc:attributionName',
-  'dct:rights/karstlink:licenseType',
-  'gn:countryCode'
+  ID,
+  TYPE,
+  ATTRIBUTION_NAME,
+  LICENSE,
+  COUNTRY_CODE
 ];
 
 const requiredColumnsEntrance = [
-  'id',
-  'rdf:type',
-  'dct:rights/cc:attributionName',
-  'dct:rights/karstlink:licenseType',
-  'gn:countryCode',
-  'w3geo:latitude',
-  'w3geo:longitude'
+  ID,
+  TYPE,
+  ATTRIBUTION_NAME,
+  LICENSE,
+  COUNTRY_CODE,
+  LATITUDE,
+  LONGITUDE
 ];
 
 const checkData = (data, selectedType, formatMessage) => {
@@ -30,10 +40,16 @@ const checkData = (data, selectedType, formatMessage) => {
         });
       });
     } else {
-      const requiredColumns =
-        selectedType === ENTRANCE
-          ? requiredColumnsEntrance
-          : requiredColumnsDocument;
+      let requiredColumns;
+      switch (selectedType) {
+        case ENTRANCE:
+          requiredColumns = requiredColumnsEntrance;
+          break;
+        case DOCUMENT:
+          requiredColumns = requiredColumnsDocument;
+          break;
+        default:
+      }
 
       const rowDataKeys = keys(row.data);
       requiredColumns.forEach(requiredColumn => {

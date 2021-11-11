@@ -16,7 +16,7 @@ import Provider, { ImportPageContentContext } from './Provider';
 import ImportPageContent from './ImportPageContent';
 import Translate from '../../common/Translate';
 import { useBoolean } from '../../../hooks';
-import { ENTRANCE } from './constants';
+import { ENTRANCE, DOCUMENT } from './constants';
 
 const useStyles = makeStyles({
   root: {
@@ -62,13 +62,32 @@ const ImportContainer = () => {
   }, [updateCurrentStep]);
 
   useEffect(() => {
-    // eslint-disable-next-line no-unused-expressions
-    currentFormStep === formSteps.length ||
-    !includes(currentFormStep, validatedSteps)
-      ? enableNextStep()
-      : disableNextStep();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [validatedSteps, currentFormStep, formSteps]);
+    if (
+      currentFormStep === formSteps.length ||
+      !includes(currentFormStep, validatedSteps)
+    ) {
+      enableNextStep();
+    } else {
+      disableNextStep();
+    }
+  }, [
+    validatedSteps,
+    currentFormStep,
+    formSteps,
+    enableNextStep,
+    disableNextStep
+  ]);
+  let title = '';
+  switch (selectedType) {
+    case ENTRANCE:
+      title = 'Entrances import';
+      break;
+    case DOCUMENT:
+      title = 'Documents import';
+      break;
+    default:
+      break;
+  }
 
   return (
     <>
@@ -76,11 +95,7 @@ const ImportContainer = () => {
       <Card className={classes.root}>
         <CardContent>
           <Typography color="secondary" variant="h1">
-            {selectedType === ENTRANCE ? (
-              <Translate>Entrances import</Translate>
-            ) : (
-              <Translate>Documents import</Translate>
-            )}
+            <Translate>{title}</Translate>
           </Typography>
           <LinearProgress $isLoading={isLoading} />
 

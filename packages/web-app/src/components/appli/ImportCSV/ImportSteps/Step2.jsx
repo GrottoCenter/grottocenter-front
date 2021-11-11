@@ -40,8 +40,7 @@ const Step2 = () => {
   useEffect(() => {
     updateAttribute('importData', undefined);
     updateAttribute('fileImported', false);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [updateAttribute]);
 
   return (
     <>
