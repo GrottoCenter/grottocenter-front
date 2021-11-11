@@ -21,9 +21,18 @@ const initialState = {
 const importCsv = (state = initialState, action) => {
   switch (action.type) {
     case CHECK_ROWS_START:
+    case IMPORT_ROWS_START:
       return {
         ...state,
         isLoading: true
+      };
+
+    case CHECK_ROWS_FAILURE:
+    case IMPORT_ROWS_FAILURE:
+      return {
+        ...state,
+        isLoading: false,
+        error: action.error
       };
 
     case CHECK_ROWS_SUCCESS:
@@ -33,31 +42,13 @@ const importCsv = (state = initialState, action) => {
         resultCheck: action.result
       };
 
-    case CHECK_ROWS_FAILURE:
-      return {
-        ...state,
-        isLoading: false,
-        error: action.error
-      };
-
-    case IMPORT_ROWS_START:
-      return {
-        ...state,
-        isLoading: true
-      };
-
     case IMPORT_ROWS_SUCCESS:
       return {
         ...initialState,
+        isLoading: false,
         resultImport: action.result
       };
 
-    case IMPORT_ROWS_FAILURE:
-      return {
-        ...state,
-        isLoading: false,
-        error: action.error
-      };
     case RESET_IMPORT_STATE:
       return {
         ...initialState
