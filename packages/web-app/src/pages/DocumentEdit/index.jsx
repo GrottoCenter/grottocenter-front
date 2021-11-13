@@ -63,7 +63,6 @@ const DocumentEdit = ({
       identifier: pathOr(null, ['identifier'], details),
       identifierType: pathOr(null, ['identifierType'], details),
       isNewDocument: false,
-      // doesn't exist at the moment in the db, TODO
       issue: pathOr(null, ['issue'], details),
       library: pathOr(null, ['library'], details),
       massif: pathOr(null, ['massif'], details),

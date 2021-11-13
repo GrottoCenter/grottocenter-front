@@ -22,7 +22,7 @@ const DownloadButton = ({ data, filename }) => {
           outline: 'none'
         }}>
         <Tooltip title={formatMessage({ id: 'Download information' })}>
-          <IconButton color="primary">
+          <IconButton color="primary" size="small">
             <CloudDownloadIcon />
           </IconButton>
         </Tooltip>

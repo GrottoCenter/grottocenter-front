@@ -83,6 +83,15 @@ const Dashboard = () => {
                     {formatMessage({ id: 'Document validation' })}
                   </Typography>
                 </StyledListItem>
+                <StyledListItem
+                  button
+                  key="import-csv-user-tile-key"
+                  onClick={() => handleOnListItemClick('/ui/import-csv')}>
+                  <ImportExportIcon fontSize="large" color="primary" />
+                  <Typography variant="h4" align="center">
+                    {formatMessage({ id: 'CSV Import' })}
+                  </Typography>
+                </StyledListItem>
               </StyledList>
             </DashboardBlock>
           )}
@@ -99,15 +108,6 @@ const Dashboard = () => {
                   <ListAltIcon fontSize="large" color="primary" />
                   <Typography variant="h4" align="center">
                     {formatMessage({ id: 'My contributions' })}
-                  </Typography>
-                </StyledListItem>
-                <StyledListItem
-                  button
-                  key="import-csv-user-tile-key"
-                  onClick={() => handleOnListItemClick('/ui/import-csv')}>
-                  <ImportExportIcon fontSize="large" color="primary" />
-                  <Typography variant="h4" align="center">
-                    {formatMessage({ id: 'Import CSV' })}
                   </Typography>
                 </StyledListItem>
               </StyledList>

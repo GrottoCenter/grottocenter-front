@@ -1,8 +1,8 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { CSVReader } from 'react-papaparse';
 import { useTheme } from '@material-ui/core/styles';
-import { Typography } from '@material-ui/core';
 import { useIntl } from 'react-intl';
+import Alert from '../../../common/Alert';
 import { ImportPageContentContext } from '../Provider';
 import checkData from '../checkData';
 
@@ -15,7 +15,7 @@ const Step2 = () => {
   const theme = useTheme();
   const { formatMessage } = useIntl();
 
-  const [errorsRow, setErrorsRow] = useState([]);
+  const [rowErrors, setRowErrors] = useState([]);
 
   const handleOnFileLoad = data => {
     const errors = checkData(data, selectedType, formatMessage);
@@ -23,12 +23,12 @@ const Step2 = () => {
       updateAttribute('importData', data);
       updateAttribute('fileImported', true);
     } else {
-      setErrorsRow(errors);
+      setRowErrors(errors);
     }
   };
 
   const handleOnRemoveFile = () => {
-    setErrorsRow([]);
+    setRowErrors([]);
     updateAttribute('fileImported', false);
   };
 
@@ -60,9 +60,14 @@ const Step2 = () => {
           {formatMessage({ id: 'Drop CSV file here or click to upload.' })}
         </span>
       </CSVReader>
-      {errorsRow.map(err => (
-        <Typography
-          key={err}>{`Row ${err.row} : ${err.errorMessage}`}</Typography>
+      {rowErrors.map(err => (
+        <Alert
+          content={`${formatMessage({ id: 'Row' })} ${
+            err.row
+          } : ${formatMessage({ id: err.errorMessage })}`}
+          key={err.row + err.errorMessage}
+          severity="error"
+        />
       ))}
     </>
   );
