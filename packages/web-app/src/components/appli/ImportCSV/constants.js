@@ -2,6 +2,9 @@
 export const ENTRANCE = 0;
 export const DOCUMENT = 1;
 
+export const ENTRANCE_KARSTLINK = 'karstlink:UndergroundCavity';
+export const DOCUMENT_KARSTLINK = 'dct:BibliographicResource';
+
 // Name of the downloaded files after import
 export const SUCCESS_IMPORT = 'importGCsuccess';
 export const FAILURE_IMPORT = 'importGCfailure';
