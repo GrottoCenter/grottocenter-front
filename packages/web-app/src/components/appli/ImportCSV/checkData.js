@@ -3,7 +3,9 @@ import {
   ATTRIBUTION_NAME,
   COUNTRY_CODE,
   DOCUMENT,
+  DOCUMENT_KARSTLINK,
   ENTRANCE,
+  ENTRANCE_KARSTLINK,
   ID,
   LATITUDE,
   LICENSE,
@@ -33,6 +35,7 @@ const checkData = (data, selectedType, formatMessage) => {
   const errors = [];
   data.forEach((row, index) => {
     if (row.errors.length !== 0) {
+      // first we handle errors from csv downloader
       row.errors.forEach(err => {
         errors.push({
           errorMessage: err.message,
@@ -41,16 +44,29 @@ const checkData = (data, selectedType, formatMessage) => {
       });
     } else {
       let requiredColumns;
+      let rowType;
       switch (selectedType) {
         case ENTRANCE:
           requiredColumns = requiredColumnsEntrance;
+          rowType = ENTRANCE_KARSTLINK;
           break;
         case DOCUMENT:
           requiredColumns = requiredColumnsDocument;
+          rowType = DOCUMENT_KARSTLINK;
           break;
         default:
       }
 
+      // Then we check if the type of the imported file corresponds to the type the user is importing
+      if (row.data[TYPE] && row.data[TYPE].replaceAll(/\s/g, '') !== rowType) {
+        errors.push({
+          errorMessage: formatMessage({ id: 'The type column is incorrect.' }),
+          row: index + 2
+        });
+        return;
+      }
+
+      // Then we check for mandatory columns
       const rowDataKeys = keys(row.data);
       requiredColumns.forEach(requiredColumn => {
         if (
