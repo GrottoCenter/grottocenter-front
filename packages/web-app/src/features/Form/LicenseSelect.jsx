@@ -47,7 +47,7 @@ const LicenseSelect = ({ label, selected, updateSelected }) => {
     <Wrapper variant="filled">
       {label && <InputLabel>{label}</InputLabel>}
       <Select
-        value={selected}
+        value={selected || ''}
         onChange={event => updateSelected(event.target.value)}>
         {data &&
           data.map(license => (
@@ -63,6 +63,6 @@ export default LicenseSelect;
 
 LicenseSelect.propTypes = {
   label: PropTypes.string,
-  selected: PropTypes.oneOf([PropTypes.string, PropTypes.number]).isRequired,
+  selected: PropTypes.oneOf([PropTypes.string, PropTypes.number]),
   updateSelected: PropTypes.func.isRequired
 };
