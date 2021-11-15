@@ -21,10 +21,12 @@ const OptionSelect = ({ label, selectedOption, updateSelectedOption }) => {
     <Wrapper variant="filled">
       {label && <InputLabel>{label}</InputLabel>}
       <Select
-        value={selectedOption}
+        value={selectedOption || ''}
         onChange={event => updateSelectedOption(event.target.value)}>
         {options.map(option => (
-          <MenuItem value={option.value}>{option.translatedToUser}</MenuItem>
+          <MenuItem key={option.value} value={option.value}>
+            {option.translatedToUser}
+          </MenuItem>
         ))}
       </Select>
     </Wrapper>
@@ -33,7 +35,7 @@ const OptionSelect = ({ label, selectedOption, updateSelectedOption }) => {
 
 OptionSelect.propTypes = {
   label: PropTypes.string,
-  selectedOption: PropTypes.string.isRequired,
+  selectedOption: PropTypes.string,
   updateSelectedOption: PropTypes.func.isRequired
 };
 

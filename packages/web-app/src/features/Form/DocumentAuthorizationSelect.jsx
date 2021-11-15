@@ -54,7 +54,9 @@ const DocumentAuthorizationSelect = ({
         value={selectedDocument}
         onChange={event => updateSelectedDocument(event.target.value)}>
         {documents.map(document => (
-          <MenuItem value={document}>{document.titles[0].text}</MenuItem>
+          <MenuItem key={document.id} value={document}>
+            {document.titles[0].text}
+          </MenuItem>
         ))}
       </Select>
       {isLoading && <CircularProgress color="primary" />}

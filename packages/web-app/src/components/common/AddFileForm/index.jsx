@@ -160,15 +160,6 @@ const AddFileForm = ({
   return (
     <>
       <FormControl variant="filled">
-        <StyledTypography color="textSecondary">
-          {formatMessage(
-            {
-              id: 'Accepted files',
-              defaultMessage: 'Accepted files : {extensions}.'
-            },
-            { extensions: extensions.toString().replaceAll(',', ', ') }
-          )}
-        </StyledTypography>
         <StyledButton
           disabled={loading}
           loading={loading}
@@ -197,7 +188,7 @@ const AddFileForm = ({
             />
           </ListWrapper>
           <OptionSelect
-            label={formatMessage({ id: 'Choose one' })}
+            label={formatMessage({ id: 'License type' })}
             selectedOption={option}
             updateSelectedOption={updateOption}
           />
@@ -218,6 +209,21 @@ const AddFileForm = ({
         </>
       )}
       <ErrorsList errors={errors} />
+      <StyledTypography color="textSecondary">
+        {formatMessage(
+          {
+            id: 'Accepted file formats',
+            defaultMessage: 'Accepted file formats: {extensions}.'
+          },
+          {
+            extensions: extensions
+              .filter(e => e !== null)
+              .map(e => e.trim())
+              .sort((e1, e2) => e1 > e2)
+              .join(', ')
+          }
+        )}
+      </StyledTypography>
     </>
   );
 };
