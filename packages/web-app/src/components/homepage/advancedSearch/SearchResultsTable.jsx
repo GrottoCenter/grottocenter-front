@@ -10,6 +10,7 @@ import DescriptionIcon from '@material-ui/icons/Description';
 import {
   Button,
   Card,
+  CardContent,
   CircularProgress,
   Table,
   TableCell,
@@ -24,6 +25,7 @@ import { CSVDownload } from 'react-csv';
 import _ from 'lodash';
 
 import Translate from '../../common/Translate';
+import Alert from '../../common/Alert';
 
 import SearchTableActions from './SearchTableActions';
 
@@ -466,200 +468,214 @@ class SearchResultsTable extends React.Component {
 
     return resultsSliced !== undefined && resourceType !== '' ? (
       <Card className={classes.resultsContainer} ref={this.cardRef}>
-        {resultsSliced.length > 0 ? (
-          <>
-            <Table
-              className={classes.table}
-              size="small"
-              style={{ display: tableDisplayValueForScroll }}>
-              <ResultsTableHead />
+        <CardContent>
+          {resultsSliced.length > 0 ? (
+            <>
+              <Table
+                className={classes.table}
+                size="small"
+                style={{ display: tableDisplayValueForScroll }}>
+                <ResultsTableHead />
 
-              <TableBody
-                style={{
-                  opacity: isLoading ? 0.3 : 1
-                }}>
-                {resultsSliced.map(result => (
-                  <TableRow
-                    hover
-                    key={result.id}
-                    className={classes.tableRow}
-                    onClick={() => this.handleRowClick(result.id)}>
-                    {resourceType === 'entrances' && (
-                      <>
-                        <TableCell>{result.name}</TableCell>
-                        <TableCell>
-                          {result.countryCode ? result.countryCode : '-'}
-                        </TableCell>
-                        <TableCell>
-                          {pathOr('-', ['massif', 'name'], result)}
-                        </TableCell>
-                        <TableCell>
-                          {result.aestheticism
-                            ? Number(result.aestheticism.toFixed(1))
-                            : '-'}
-                        </TableCell>
-                        <TableCell>
-                          {result.caving
-                            ? Number(result.caving.toFixed(1))
-                            : '-'}
-                        </TableCell>
-                        <TableCell>
-                          {result.approach
-                            ? Number(result.approach.toFixed(1))
-                            : '-'}
-                        </TableCell>
-                        <TableCell>
-                          {pathOr('-', ['cave', 'name'], result)}
-                        </TableCell>
-                        <TableCell>
-                          {result.cave && result.cave.length
-                            ? `${result.cave.length}m`
-                            : '-'}
-                        </TableCell>
-                        <TableCell>
-                          {result.cave && result.cave.depth
-                            ? `${result.cave.depth}m`
-                            : '-'}
-                        </TableCell>
-                      </>
-                    )}
-                    {resourceType === 'grottos' && (
-                      <>
-                        <TableCell>{result.name}</TableCell>
-                        <TableCell>{result.mail ? result.mail : '-'}</TableCell>
-                        <TableCell>{result.city ? result.city : '-'}</TableCell>
-                        <TableCell>
-                          {result.county ? result.county : '-'}
-                        </TableCell>
-                        <TableCell>
-                          {result.region ? result.region : '-'}
-                        </TableCell>
-                        <TableCell>
-                          {result.countryCode ? result.countryCode : '-'}
-                        </TableCell>
-                        <TableCell>
-                          {result.nbCavers ? result.nbCavers : '0'}
-                        </TableCell>
-                      </>
-                    )}
-                    {resourceType === 'massifs' && (
-                      <>
-                        <TableCell>{result.name}</TableCell>
-                        <TableCell>
-                          {result.nbCaves ? result.nbCaves : '0'}
-                        </TableCell>
-                        <TableCell>
-                          {result.nbEntrances ? result.nbEntrances : '0'}
-                        </TableCell>
-                      </>
-                    )}
-                    {resourceType === 'documents' && (
-                      <>
-                        <TableCell>{result.title}</TableCell>
-                        <TableCell>
-                          {result.publication ? result.publication : '-'}
-                        </TableCell>
-                        <TableCell>
-                          {result.subjects
-                            ? result.subjects.map(s => s.code).join(', ')
-                            : '-'}
-                        </TableCell>
-                        <TableCell>
-                          {result.regions
-                            ? _.truncate(
-                                result.regions.map(s => s.name).join(', '),
-                                30
-                              )
-                            : '-'}
-                        </TableCell>
-                        <TableCell>
-                          {result.authors ? result.authors : '-'}
-                        </TableCell>
-                        <TableCell>
-                          {result.datePublication
-                            ? result.datePublication
-                            : '-'}
-                        </TableCell>
-                      </>
-                    )}
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                <TableBody
+                  style={{
+                    opacity: isLoading ? 0.3 : 1
+                  }}>
+                  {resultsSliced.map(result => (
+                    <TableRow
+                      hover
+                      key={result.id}
+                      className={classes.tableRow}
+                      onClick={() => this.handleRowClick(result.id)}>
+                      {resourceType === 'entrances' && (
+                        <>
+                          <TableCell>{result.name}</TableCell>
+                          <TableCell>
+                            {result.countryCode ? result.countryCode : '-'}
+                          </TableCell>
+                          <TableCell>
+                            {pathOr('-', ['massif', 'name'], result)}
+                          </TableCell>
+                          <TableCell>
+                            {result.aestheticism
+                              ? Number(result.aestheticism.toFixed(1))
+                              : '-'}
+                          </TableCell>
+                          <TableCell>
+                            {result.caving
+                              ? Number(result.caving.toFixed(1))
+                              : '-'}
+                          </TableCell>
+                          <TableCell>
+                            {result.approach
+                              ? Number(result.approach.toFixed(1))
+                              : '-'}
+                          </TableCell>
+                          <TableCell>
+                            {pathOr('-', ['cave', 'name'], result)}
+                          </TableCell>
+                          <TableCell>
+                            {result.cave && result.cave.length
+                              ? `${result.cave.length}m`
+                              : '-'}
+                          </TableCell>
+                          <TableCell>
+                            {result.cave && result.cave.depth
+                              ? `${result.cave.depth}m`
+                              : '-'}
+                          </TableCell>
+                        </>
+                      )}
+                      {resourceType === 'grottos' && (
+                        <>
+                          <TableCell>{result.name}</TableCell>
+                          <TableCell>
+                            {result.mail ? result.mail : '-'}
+                          </TableCell>
+                          <TableCell>
+                            {result.city ? result.city : '-'}
+                          </TableCell>
+                          <TableCell>
+                            {result.county ? result.county : '-'}
+                          </TableCell>
+                          <TableCell>
+                            {result.region ? result.region : '-'}
+                          </TableCell>
+                          <TableCell>
+                            {result.countryCode ? result.countryCode : '-'}
+                          </TableCell>
+                          <TableCell>
+                            {result.nbCavers ? result.nbCavers : '0'}
+                          </TableCell>
+                        </>
+                      )}
+                      {resourceType === 'massifs' && (
+                        <>
+                          <TableCell>{result.name}</TableCell>
+                          <TableCell>
+                            {result.nbCaves ? result.nbCaves : '0'}
+                          </TableCell>
+                          <TableCell>
+                            {result.nbEntrances ? result.nbEntrances : '0'}
+                          </TableCell>
+                        </>
+                      )}
+                      {resourceType === 'documents' && (
+                        <>
+                          <TableCell>{result.title}</TableCell>
+                          <TableCell>
+                            {result.publication ? result.publication : '-'}
+                          </TableCell>
+                          <TableCell>
+                            {result.subjects
+                              ? result.subjects.map(s => s.code).join(', ')
+                              : '-'}
+                          </TableCell>
+                          <TableCell>
+                            {result.regions
+                              ? _.truncate(
+                                  result.regions.map(s => s.name).join(', '),
+                                  30
+                                )
+                              : '-'}
+                          </TableCell>
+                          <TableCell>
+                            {result.authors ? result.authors : '-'}
+                          </TableCell>
+                          <TableCell>
+                            {result.datePublication
+                              ? result.datePublication
+                              : '-'}
+                          </TableCell>
+                        </>
+                      )}
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
 
-            <StyledTableFooter>
-              <Button
-                disabled={!canDownloadDataAsCSV}
-                type="button"
-                variant="contained"
-                size="large"
-                onClick={this.loadCSVData}
-                startIcon={<DescriptionIcon />}>
-                <Translate>Export to CSV</Translate>
-              </Button>
+              <StyledTableFooter>
+                <Button
+                  disabled={!canDownloadDataAsCSV}
+                  type="button"
+                  variant="contained"
+                  size="large"
+                  onClick={this.loadCSVData}
+                  startIcon={<DescriptionIcon />}>
+                  <Translate>Export to CSV</Translate>
+                </Button>
 
-              {!isLoadingFullData &&
-              fullResults.length === totalNbResults &&
-              wantToDownloadCSV ? (
-                <CSVDownload data={this.getFullResultsAsCSV()} target="_self" />
+                {!isLoadingFullData &&
+                fullResults.length === totalNbResults &&
+                wantToDownloadCSV ? (
+                  <CSVDownload
+                    data={this.getFullResultsAsCSV()}
+                    target="_self"
+                  />
+                ) : (
+                  ''
+                )}
+
+                <TablePagination
+                  rowsPerPageOptions={[5, 10, 20]}
+                  component="div"
+                  count={totalNbResults}
+                  rowsPerPage={size}
+                  page={page}
+                  labelRowsPerPage={intl.formatMessage({
+                    id: 'Results per page'
+                  })}
+                  onChangePage={(event, pageNb) =>
+                    this.handleChangePage(event, pageNb)
+                  }
+                  onChangeRowsPerPage={event =>
+                    this.handleChangeRowsPerPage(event)
+                  }
+                  ActionsComponent={() => (
+                    <SearchTableActions
+                      page={page}
+                      size={size}
+                      onChangePage={this.handleChangePage}
+                      count={totalNbResults}
+                    />
+                  )}
+                />
+              </StyledTableFooter>
+
+              {isLoadingFullData ? (
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                  <CircularProgress style={{ marginRight: '5px' }} />
+                  <Translate>Loading full data, please wait...</Translate>
+                </div>
               ) : (
                 ''
               )}
-
-              <TablePagination
-                rowsPerPageOptions={[5, 10, 20]}
-                component="div"
-                count={totalNbResults}
-                rowsPerPage={size}
-                page={page}
-                labelRowsPerPage={intl.formatMessage({
-                  id: 'Results per page'
-                })}
-                onChangePage={(event, pageNb) =>
-                  this.handleChangePage(event, pageNb)
-                }
-                onChangeRowsPerPage={event =>
-                  this.handleChangeRowsPerPage(event)
-                }
-                ActionsComponent={() => (
-                  <SearchTableActions
-                    page={page}
-                    size={size}
-                    onChangePage={this.handleChangePage}
-                    count={totalNbResults}
-                  />
-                )}
-              />
-            </StyledTableFooter>
-
-            {isLoadingFullData ? (
-              <div style={{ display: 'flex', alignItems: 'center' }}>
-                <CircularProgress style={{ marginRight: '5px' }} />
-                <Translate>Loading full data, please wait...</Translate>
-              </div>
-            ) : (
-              ''
-            )}
-            {!canDownloadDataAsCSV ? (
-              <>
-                <p className={classes.textError}>
-                  <Translate
-                    id="Too many results to download ({0}). You can only download {1} results at once."
-                    defaultMessage="Too many results to download ({0}). You can only download {1} results at once."
-                    values={{
-                      0: <b>{totalNbResults}</b>,
-                      1: <b>{MAX_NUMBER_OF_DATA_TO_EXPORT_IN_CSV}</b>
-                    }}
-                  />
-                </p>
-              </>
-            ) : (
-              ''
-            )}
-          </>
-        ) : (
-          <Translate>No results</Translate>
-        )}
+              {!canDownloadDataAsCSV ? (
+                <>
+                  <p className={classes.textError}>
+                    <Translate
+                      id="Too many results to download ({0}). You can only download {1} results at once."
+                      defaultMessage="Too many results to download ({0}). You can only download {1} results at once."
+                      values={{
+                        0: <b>{totalNbResults}</b>,
+                        1: <b>{MAX_NUMBER_OF_DATA_TO_EXPORT_IN_CSV}</b>
+                      }}
+                    />
+                  </p>
+                </>
+              ) : (
+                ''
+              )}
+            </>
+          ) : (
+            <Alert
+              severity="info"
+              title={intl.formatMessage({
+                id: 'No results'
+              })}
+            />
+          )}
+        </CardContent>
       </Card>
     ) : (
       ''
