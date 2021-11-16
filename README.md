@@ -9,7 +9,7 @@ This project use:
 
 
 
-###List of all available packages:
+### List of all available packages:
 - [**web-app**](/packages/web-app/README.md)
 
   Main web app
@@ -44,7 +44,7 @@ Github Actions is running 2 tasks on push and pull requests on `develop` :
 
 ## Release and publish
 
-#### WIP
+### WIP
 
 ## Production deployment (Azure)
 
