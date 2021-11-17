@@ -77,7 +77,7 @@ const Login = () => {
           password={password}
         />
         <Button size="small" variant="text" onClick={handleCreateAccount}>
-          <Translate>no account yet?</Translate>
+          <Translate>No account yet?</Translate>
         </Button>
         <Button size="small" variant="text" onClick={handleForgotPassword}>
           <Translate>Forgot password?</Translate>
