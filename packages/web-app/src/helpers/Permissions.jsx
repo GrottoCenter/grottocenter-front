@@ -1,11 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-export default function checkPermission(right) {
-  // Control rights
+export default function checkPermission() {
   const granted = false;
-  // eslint-disable-next-line no-console
-  console.debug('Under development', right);
 
   if (granted) {
     return Component => {

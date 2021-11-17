@@ -14,7 +14,6 @@ import SimpleMenuEntryConnector from '../../containers/SimpleMenuEntryConnector'
 import ComplexMenuEntryConnector from '../../containers/ComplexMenuEntryConnector';
 import { sideMenuWidth } from '../../conf/Config';
 import checkPermission from '../../helpers/Permissions';
-import { VIEW_SIDEMENU } from '../../conf/Rights';
 
 const Menubar = withTheme(styled(Drawer)`
   > div {
@@ -94,4 +93,4 @@ SideMenu.propTypes = {
   visible: PropTypes.bool.isRequired
 };
 
-export default checkPermission(VIEW_SIDEMENU)(SideMenu);
+export default checkPermission()(SideMenu);
