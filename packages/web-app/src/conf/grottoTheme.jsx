@@ -225,6 +225,10 @@ export const overridings = {
       lineHorizontal: {
         borderWidth: '1px'
       },
+      lineVertical: {
+        borderWidth: 0,
+        borderLeftWidth: '1px'
+      },
       active: {
         '& $line': {
           borderColor: brown['300'],

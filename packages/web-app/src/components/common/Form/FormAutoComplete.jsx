@@ -14,13 +14,13 @@ import { ExpandLess, ExpandMore } from '@material-ui/icons';
 import Translate from '../Translate';
 import { FormAutoCompleteTypes } from './types';
 
-const StyledInput = styled(FilledInput)`
+export const StyledInput = styled(FilledInput)`
   ${({ theme }) => `
   color: ${theme.palette.primaryTextColor} !important;
   `}
 `;
 
-const StyledFormControl = styled(FormControl)`
+export const StyledFormControl = styled(FormControl)`
   ${({ theme }) => `
   background-color: ${theme.palette.primary3Color};
   `};
@@ -30,7 +30,7 @@ const StyledFormControl = styled(FormControl)`
   align-items: center;
 `;
 
-const InputWrapper = styled.div`
+export const InputWrapper = styled.div`
   width: 100%;
   display: flex;
   flex-direction: column;
