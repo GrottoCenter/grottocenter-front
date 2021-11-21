@@ -220,8 +220,7 @@ EntranceForm.propTypes = {
     isDiving: PropTypes.bool,
     depth: PropTypes.number,
     length: PropTypes.number
-  }),
-  onSubmitForm: PropTypes.func
+  })
 };
 
 export default EntranceForm;

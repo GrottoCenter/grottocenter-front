@@ -175,6 +175,7 @@ export const getMapEntrancesCoordinatesUrl = `${process.env.REACT_APP_API_URL}/a
 export const getMapGrottosUrl = `${process.env.REACT_APP_API_URL}/api/${apiVersion}/geoloc/grottos`;
 export const getCaversDocumentsUrl = caverId =>
   `${process.env.REACT_APP_API_URL}/api/${apiVersion}/cavers/${caverId}/documents`;
+export const postCreateEntranceUrl = `${process.env.REACT_APP_API_URL}/api/${apiVersion}/entrances`;
 /**
  * @deprecated
  */

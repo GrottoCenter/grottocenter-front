@@ -89,6 +89,7 @@ const CaveSelection = ({ control, errors }) => {
     } else {
       resetSearchResults();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debouncedInput]);
 
   return (
