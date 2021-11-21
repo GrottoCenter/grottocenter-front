@@ -27,36 +27,43 @@ export const isValidPositions = allPass([
 
 const makePosition = pos => ({ latitude: pos[0], longitude: pos[1] });
 
-const MultipleMarkers = ({ positions }) => {
+const MultipleMarkers = ({ positions, zoom }) => {
   const map = useMap();
   const updateEntranceMarkers = useMarkers(EntranceMarker);
 
+  if (!isNil(zoom)) {
+    map.setZoom(zoom);
+  }
   useEffect(() => {
     updateEntranceMarkers(positions.map(makePosition));
     if (!isNil(positions) && !isEmpty(positions)) {
       map.fitBounds(positions);
     }
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [positions]);
 
   return null;
 };
 
-const HydratedMultipleMarkers = props => (
+const HydratedMultipleMarkers = ({ style, zoom, ...otherProps }) => (
   <CustomMapContainer
     wholePage={false}
     dragging={false}
     viewport={null}
     scrollWheelZoom={false}
-    zoom={14}>
-    <MultipleMarkers {...props} />
+    style={style}
+    zoom={zoom || 14}>
+    <MultipleMarkers {...otherProps} zoom={zoom} />
   </CustomMapContainer>
 );
 
 // eslint-disable-next-line no-multi-assign
 HydratedMultipleMarkers.propTypes = MultipleMarkers.propTypes = {
   positions: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.number)).isRequired,
-  loading: PropTypes.bool
+  loading: PropTypes.bool,
+  style: PropTypes.shape({}),
+  zoom: PropTypes.number
 };
 
 export default HydratedMultipleMarkers;
