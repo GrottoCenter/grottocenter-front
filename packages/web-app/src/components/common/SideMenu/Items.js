@@ -4,11 +4,12 @@ import ExpandLess from '@material-ui/icons/ExpandLess';
 import ExpandMore from '@material-ui/icons/ExpandMore';
 import { Collapse, List, ListItemIcon, ListItemText } from '@material-ui/core';
 import DocumentList from '@material-ui/icons/PlaylistAddCheck';
+import NoteAddIcon from '@material-ui/icons/NoteAdd';
 import PropTypes from 'prop-types';
 
 import { isNil } from 'ramda';
 import Translate from '../Translate';
-import { Icon, StyledLink, StyledListItem } from './styles';
+import { StyledLink, StyledListItem } from './styles';
 
 const Item = ({
   ItemIcon,
@@ -36,9 +37,7 @@ export const LinkedItem = ({ href = '', ...itemProps }) => (
 
 const AddDocument = () => (
   <LinkedItem
-    ItemIcon={() => (
-      <Icon src="/images/sidemenu/add-document.png" alt="add document icon" />
-    )}
+    ItemIcon={() => <NoteAddIcon color="primary" />}
     label="Add a BBS document"
     href="/ui/documents/add"
     nested
