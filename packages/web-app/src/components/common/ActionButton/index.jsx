@@ -33,7 +33,7 @@ const ActionButton = ({
 
 ActionButton.propTypes = {
   label: PropTypes.string.isRequired,
-  onClick: PropTypes.func.isRequired,
+  onClick: PropTypes.func,
   loading: PropTypes.bool,
   disabled: PropTypes.bool,
   color: PropTypes.oneOf(['primary', 'secondary']),
