@@ -62,8 +62,8 @@ const SearchBar = props => {
 
   return (
     <AutoCompleteSearchComponent
-      disabled={isValueForced}
-      isValueForce={isValueForced}
+      disabled={/* isValueForced */ false} // Don't disable search component, event if it's forced. See https://github.com/GrottoCenter/grottocenter-front/issues/58
+      isValueForced={isValueForced}
       onInputChange={handleInputChange}
       onSelection={handleSelection}
       {...props}
