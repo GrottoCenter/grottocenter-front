@@ -138,10 +138,8 @@ export const EntranceForm = ({ entranceValues = null }) => {
         language: data.language,
         text: data.name
       },
-      cave: {
-        id: data.caveId
-      },
-      country: { id: data.country },
+      cave: data.caveId,
+      country: data.country,
       depth: data.depth,
       isDiving: data.isDiving,
       length: data.length,
