@@ -6,10 +6,14 @@ export const LOAD_ENTRY_SUCCESS = 'LOAD_ENTRY_SUCCESS';
 export const LOAD_ENTRY_LOADING = 'LOAD_ENTRY_LOADING';
 export const LOAD_ENTRY_ERROR = 'LOAD_ENTRY_ERROR';
 
-export const fetchEntry = entranceId => dispatch => {
+export const fetchEntry = entranceId => (dispatch, getState) => {
   dispatch({ type: LOAD_ENTRY_LOADING });
-
-  return fetch(getEntryUrl + entranceId)
+  const requestOptions = {
+    headers: {
+      ...getState().login.authorizationHeader
+    }
+  };
+  return fetch(getEntryUrl + entranceId, requestOptions)
     .then(response => {
       if (response.status >= 400) {
         throw new Error(response.status);
