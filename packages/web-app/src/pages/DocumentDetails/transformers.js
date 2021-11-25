@@ -48,11 +48,6 @@ export const makeDetails = data => {
     publicationDate: propOr('', 'datePublication', data),
     oldPublication: propOr('', 'publication', data),
     oldPublicationFascicule: propOr('', 'publicationFasciculeBBSOld', data),
-    parentDocument: pipe(
-      pathOr([], ['parent', 'titles']),
-      head,
-      propOr('', 'text')
-    )(data),
     pages: propOr('', 'pages', data),
     subjects: pipe(propOr([], 'subjects'), reject(isEmpty))(data),
     regions: pipe(propOr([], 'regions'), reject(isEmpty))(data)
@@ -89,6 +84,16 @@ export const makeEntities = data => {
       pathOr('', ['text'])
     )(data)
   };
+};
+
+export const makeDocumentParent = data => {
+  const result = { title: '', url: '' };
+  const parent = propOr(null, 'parent', data);
+  if (parent) {
+    result.title = pipe(propOr([], 'titles'), head, propOr('', 'text'))(parent);
+    result.url = `/ui/documents/${parent.id}`;
+  }
+  return result;
 };
 
 export const makeDocumentChildren = (data, locale) => {

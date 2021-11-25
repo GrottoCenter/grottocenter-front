@@ -9,7 +9,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { isEmpty, isNil, is } from 'ramda';
-import { Skeleton, TreeItem, TreeView } from '@material-ui/lab';
+import { Skeleton, TreeItem, TreeView as MuiTreeView } from '@material-ui/lab';
 import { ExpandMore, ChevronRight, Launch } from '@material-ui/icons';
 
 import { isMobileOnly } from 'react-device-detect';
@@ -29,11 +29,6 @@ const Wrapper = styled.div`
 const CardContent = styled(MuiCardContent)`
   display: flex;
   flex-direction: column;
-`;
-
-const Text = styled(Typography)`
-  margin-left: auto;
-  text-align: right;
 `;
 
 const WrapperListItem = styled.div`
@@ -70,6 +65,11 @@ const IconAndLabelWrapper = styled.span`
 const ValueContainer = styled.div`
   flex: 1;
   margin-right: ${isMobileOnly ? '5%' : '20%'};
+  text-align: right;
+`;
+
+const TreeView = styled(MuiTreeView)`
+  text-align: left;
 `;
 
 const isArray = is(Array);
@@ -99,8 +99,9 @@ const ChildTreeItem = ({ item }) => {
 const Item = ({
   Icon,
   label,
-  value,
   type,
+  url,
+  value,
   CustomComponent,
   CustomComponentProps,
   isLabelAndIconOnTop = false,
@@ -145,7 +146,12 @@ const Item = ({
               })}
             </List>
           )}
-          {isString(value) && <Text>{value}</Text>}
+          {isString(value) &&
+            (url ? (
+              <GCLink href={url}>{value}</GCLink>
+            ) : (
+              <Typography>{value}</Typography>
+            ))}
         </>
       )}
     </ValueContainer>
@@ -175,6 +181,7 @@ const Section = ({ title, content, loading }) => {
                   Icon={item.Icon}
                   label={item.label}
                   type={item.type}
+                  url={item.url}
                   value={item.value}
                   CustomComponent={item.CustomComponent}
                   CustomComponentProps={item.CustomComponentProps}
@@ -213,6 +220,7 @@ Item.propTypes = {
     PropTypes.arrayOf(PropTypes.shape({}))
   ]),
   type: PropTypes.oneOf(['list', 'tree']),
+  url: PropTypes.string,
   CustomComponent: PropTypes.node,
   CustomComponentProps: PropTypes.arrayOf(PropTypes.object),
   isLabelAndIconOnTop: PropTypes.bool,
