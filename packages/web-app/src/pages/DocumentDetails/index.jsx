@@ -20,7 +20,8 @@ import {
   makeDocumentChildren,
   makeEntities,
   makeOrganizations,
-  makeOverview
+  makeOverview,
+  makeDocumentParent
 } from './transformers';
 import { usePermissions } from '../../hooks';
 
@@ -37,6 +38,7 @@ const DocumentPage = ({
   details,
   entities,
   documentChildren,
+  documentParent,
   isValidated,
   onEdit,
   areDocumentChildrenLoading
@@ -100,7 +102,8 @@ const DocumentPage = ({
           },
           {
             label: formatMessage({ id: 'Parent document' }),
-            value: details.parentDocument
+            value: documentParent.title,
+            url: documentParent.url
           },
           {
             label: formatMessage({ id: 'Pages' }),
@@ -215,6 +218,7 @@ const HydratedDocumentPage = ({ id }) => {
       details={makeDetails(details || {})}
       entities={makeEntities(details || {})}
       documentChildren={makeDocumentChildren(children || {}, locale)}
+      documentParent={makeDocumentParent(details || {})}
       areDocumentChildrenLoading={areDocumentChildrenLoading}
       loading={
         isNil(documentId) || isLoading || !isNil(error) || !isNil(childrenError)
@@ -282,6 +286,10 @@ DocumentPage.propTypes = {
       childrenData: PropTypes.arrayOf(PropTypes.shape({})) // recursive data
     })
   ),
+  documentParent: PropTypes.shape({
+    title: PropTypes.string.isRequired,
+    url: PropTypes.string.isRequired
+  }),
   isValidated: PropTypes.bool.isRequired,
   onEdit: PropTypes.func.isRequired
 };
