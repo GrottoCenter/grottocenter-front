@@ -74,7 +74,11 @@ const Step4 = () => {
       <Typography>
         {formatMessage({
           id:
-            'The functionality to check for duplicates has not been fully implemented. Please be careful not to import any documents or entrances which are already present in Grottocenter.'
+            'The functionality to check for duplicates has not been fully implemented.'
+        })}
+        {formatMessage({
+          id:
+            'Please be careful not to import any documents or entrances which are already present in Grottocenter.'
         })}
       </Typography>
       {importCsv.isLoading && (

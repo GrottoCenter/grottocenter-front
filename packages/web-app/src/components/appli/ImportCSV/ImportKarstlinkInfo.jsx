@@ -57,8 +57,20 @@ const ImportKarstlinkInfo = ({ selectType }) => {
       <div>
         <KarstlinkParagraph>
           {formatMessage({
+            id: 'You have probably wondered how to find data on caves?'
+          })}
+          &nbsp;
+          {formatMessage({
+            id: 'How to connect the caves to the documents that mention them?'
+          })}
+          &nbsp;
+          {formatMessage({
             id:
-              'You have probably wondered how to find data on caves? How to connect the caves to the documents that mention them? How to create links between scientific observations, the measurements made by the sensors and the cavities in which these observations and measurements were carried out? This is some of what the KarstLink project offers.'
+              'How to create links between scientific observations, the measurements made by the sensors and the cavities in which these observations and measurements were carried out? This is some of what the KarstLink project offers.'
+          })}
+          &nbsp;
+          {formatMessage({
+            id: 'This is some of what the KarstLink project offers.'
           })}
         </KarstlinkParagraph>
       </div>

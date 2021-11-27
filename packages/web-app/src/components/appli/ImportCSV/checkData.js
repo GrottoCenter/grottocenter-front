@@ -60,7 +60,14 @@ const checkData = (data, selectedType, formatMessage) => {
       // Then we check if the type of the imported file corresponds to the type the user is importing
       if (row.data[TYPE] && row.data[TYPE].replaceAll(/\s/g, '') !== rowType) {
         errors.push({
-          errorMessage: formatMessage({ id: 'The type column is incorrect.' }),
+          errorMessage: formatMessage(
+            {
+              id: 'The type column is incorrect, expecting {rowType}.',
+              defaultMessage:
+                'The type column is incorrect, expecting {rowType}.'
+            },
+            { rowType }
+          ),
           row: index + 2
         });
         return;
