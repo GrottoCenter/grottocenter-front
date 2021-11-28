@@ -2,7 +2,7 @@ import React from 'react';
 import { isNil } from 'ramda';
 import { useIntl } from 'react-intl';
 import { Tooltip, Fab } from '@material-ui/core';
-import { Share, Print, GpsFixed, Map } from '@material-ui/icons';
+import { Share, Print, Map, GpsFixed, Edit } from '@material-ui/icons';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
 import ReactToPrint from 'react-to-print';
@@ -51,11 +51,20 @@ const ActionButton = ({ Icon, label, onClick }) => {
   );
 };
 
-const ActionBar = ({ printRef }) => {
+const ActionBar = ({ printRef, onEdit }) => {
   const { formatMessage } = useIntl();
 
   return (
     <Wrapper>
+      {onEdit && (
+        <ActionButton
+          onClick={onEdit}
+          Icon={
+            <Edit fontSize={isMobile ? 'small' : 'default'} color="inherit" />
+          }
+          label={formatMessage({ id: 'Edit' })}
+        />
+      )}
       <ReactToPrint
         trigger={() => (
           <ActionButton
@@ -93,7 +102,8 @@ ActionBar.propTypes = {
   printRef: PropTypes.shape({
     // eslint-disable-next-line react/forbid-prop-types
     current: PropTypes.any
-  }).isRequired
+  }).isRequired,
+  onEdit: PropTypes.func
 };
 
 export default ActionBar;
