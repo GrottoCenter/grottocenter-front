@@ -37,6 +37,7 @@ import subject from './SubjectReducer';
 import intl from './IntlReducer';
 import forgotPassword from './ForgotPasswordReducer';
 import entrancePost from './EntrancePostReducer';
+import cavePost from './CavePostReducer';
 
 const GCReducer = combineReducers({
   advancedsearch,
@@ -76,7 +77,8 @@ const GCReducer = combineReducers({
   signUp,
   forgotPassword,
   subject,
-  entrancePost
+  entrancePost,
+  cavePost
 });
 
 export default GCReducer;
