@@ -57,11 +57,39 @@ const CaveSelection = ({ control, errors }) => {
     name: 'caveName',
     rules: { required: true }
   });
+  const {
+    field: { onChange: onLengthChange }
+  } = useController({
+    control,
+    name: 'length'
+  });
+  const {
+    field: { onChange: onDepthChange }
+  } = useController({
+    control,
+    name: 'depth'
+  });
+  const {
+    field: { onChange: onIsDivingChange }
+  } = useController({
+    control,
+    name: 'isDiving'
+  });
+  const {
+    field: { onChange: onTemperatureChange }
+  } = useController({
+    control,
+    name: 'temperature'
+  });
   const { isLoading, results: suggestions } = useSelector(
     state => state.quicksearch
   );
   const handleSelection = selection => {
     if (selection?.id) {
+      onLengthChange(Number(selection.length));
+      onDepthChange(Number(selection.depth));
+      onTemperatureChange(Number(selection.temperature));
+      onIsDivingChange(Boolean(selection.isDiving));
       onIdChange(Number(selection.id));
       onNameChange(selection.name);
     } else {

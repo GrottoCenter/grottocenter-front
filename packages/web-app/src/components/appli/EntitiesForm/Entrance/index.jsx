@@ -115,7 +115,8 @@ export const EntranceForm = ({ entranceValues = null }) => {
         'country',
         'depth',
         'length',
-        'temperature'
+        'temperature',
+        'isDiving'
       ],
       { shouldFocus: true }
     );
