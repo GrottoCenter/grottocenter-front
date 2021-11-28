@@ -50,6 +50,7 @@ const Details = ({ control, errors }) => {
           rules={{ valueAsNumber: true, validate: validateDistance }}
           render={({ field: { ref, ...field } }) => (
             <TextField
+              disabled
               fullWidth
               autoFocus
               label={formatMessage({ id: 'depth' })}
@@ -73,6 +74,7 @@ const Details = ({ control, errors }) => {
           rules={{ valueAsNumber: true, validate: validateDistance }}
           render={({ field: { ref, ...field } }) => (
             <TextField
+              disabled
               fullWidth
               label={formatMessage({ id: 'length' })}
               type="number"
@@ -98,6 +100,7 @@ const Details = ({ control, errors }) => {
           }}
           render={({ field: { ref, ...field } }) => (
             <TextField
+              disabled
               fullWidth
               label={formatMessage({ id: 'temperature' })}
               type="number"
@@ -121,12 +124,22 @@ const Details = ({ control, errors }) => {
         control={control}
         defaultValue={false}
         render={({ field: { ref, ...field } }) => (
-          <StyledFormControl component="fieldset" error={!!errors.isDiving}>
+          <StyledFormControl
+            disabled
+            component="fieldset"
+            error={!!errors.isDiving}>
             <FormLabel component="legend">
-              <Translate>The cavity is does contain water</Translate>
+              <Translate>The cave contains water</Translate>
             </FormLabel>
             <FormControlLabel
-              control={<Switch inputRef={ref} {...field} />}
+              control={
+                <Switch
+                  inputRef={ref}
+                  {...field}
+                  checked={field.value}
+                  onChange={e => field.onChange(e.target.checked)}
+                />
+              }
               label={formatMessage({ id: 'is diving' })}
             />
           </StyledFormControl>
