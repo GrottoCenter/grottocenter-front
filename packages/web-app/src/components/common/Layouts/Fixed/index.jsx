@@ -35,15 +35,15 @@ const ScrollableWrapper = styled.div`
   flex-direction: column;
 `;
 
-const Layout = ({ children, fixedContent }) => {
+const Layout = ({ children, fixedContent, onEdit }) => {
   const componentRef = useRef();
 
   return (
     <Wrapper ref={componentRef}>
-      {isMobile && <ActionBar printRef={componentRef} />}
+      {isMobile && <ActionBar printRef={componentRef} onEdit={onEdit} />}
       <FixedWrapper>{fixedContent}</FixedWrapper>
       <ScrollableWrapper>
-        {!isMobile && <ActionBar printRef={componentRef} />}
+        {!isMobile && <ActionBar printRef={componentRef} onEdit={onEdit} />}
         <ScrollableContent>{children}</ScrollableContent>
       </ScrollableWrapper>
     </Wrapper>
@@ -52,7 +52,8 @@ const Layout = ({ children, fixedContent }) => {
 
 Layout.propTypes = {
   children: PropTypes.node.isRequired,
-  fixedContent: PropTypes.node.isRequired
+  fixedContent: PropTypes.node.isRequired,
+  onEdit: PropTypes.func
 };
 
 export default Layout;

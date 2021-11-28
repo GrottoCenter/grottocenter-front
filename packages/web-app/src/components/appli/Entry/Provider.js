@@ -93,7 +93,10 @@ export const detailsType = PropTypes.shape({
   accessRate: PropTypes.number,
   altitude: PropTypes.number,
   author: authorType,
+  caveId: PropTypes.number,
+  caveName: PropTypes.string,
   coordinates: PropTypes.arrayOf(PropTypes.number),
+  country: PropTypes.string,
   creationDate: PropTypes.instanceOf(Date),
   depth: PropTypes.number,
   development: PropTypes.number,
@@ -111,7 +114,8 @@ export const detailsType = PropTypes.shape({
   name: PropTypes.string,
   progressionRate: PropTypes.number,
   temperature: PropTypes.number,
-  undergroundType: PropTypes.string
+  undergroundType: PropTypes.string,
+  language: PropTypes.string
 });
 
 export const commentType = PropTypes.shape({

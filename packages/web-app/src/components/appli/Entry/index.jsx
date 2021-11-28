@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
-import { isEmpty, isNil } from 'ramda';
+import { isEmpty, isNil, propOr } from 'ramda';
 
 import Provider, {
   commentsType,
@@ -24,6 +24,10 @@ import Riggings from './Riggings';
 import Comments from './Comments';
 import Documents from './Documents';
 import Histories from './Histories';
+import TmpContent from './WipContent';
+import { useBoolean, usePermissions } from '../../../hooks';
+import StandardDialog from '../../common/StandardDialog';
+import { EntranceForm } from '../EntitiesForm';
 
 const EntryProperties = () => (
   <>
@@ -36,7 +40,20 @@ export const Entry = () => {
   const { formatMessage, formatDate } = useIntl();
   const {
     state: {
-      details: { id, name, author, creationDate, lastEditor, editionDate },
+      details: {
+        name,
+        author,
+        creationDate,
+        lastEditor,
+        editionDate,
+        depth,
+        development,
+        caveId,
+        caveName,
+        language,
+        country
+      },
+      position,
       descriptions,
       documents,
       histories,
@@ -45,6 +62,8 @@ export const Entry = () => {
       comments
     }
   } = useContext(EntryContext);
+  const permissions = usePermissions();
+  const editPage = useBoolean();
 
   const footer = `${formatMessage({ id: 'Created by' })}
         ${author.fullName} ${
@@ -59,8 +78,13 @@ export const Entry = () => {
             : ''
         }`;
 
+  const handleEdit = () => {
+    editPage.open();
+  };
+
   return (
     <Layout
+      onEdit={permissions.isAuth ? handleEdit : undefined}
       fixedContent={
         <FixedContent
           title={name || ''}
@@ -75,6 +99,30 @@ export const Entry = () => {
       {!isEmpty(documents) && <Documents documents={documents} />}
       {!isEmpty(histories) && <Histories histories={histories} />}
       {!isEmpty(comments) && <Comments comments={comments} />}
+      <TmpContent title="Documents" />
+      {/* <TmpContent title="History" /> */}
+      {permissions.isAuth && (
+        <StandardDialog
+          fullWidth
+          maxWidth="md"
+          open={editPage.isOpen}
+          onClose={editPage.close}
+          title={formatMessage({ id: 'edition' })}>
+          <EntranceForm
+            entranceValues={{
+              name,
+              depth,
+              length: development,
+              latitude: propOr(undefined, 0, position),
+              longitude: propOr(undefined, 1, position),
+              caveId,
+              caveName,
+              language,
+              country
+            }}
+          />
+        </StandardDialog>
+      )}
     </Layout>
   );
 };
