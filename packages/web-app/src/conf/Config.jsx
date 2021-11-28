@@ -176,6 +176,7 @@ export const getMapGrottosUrl = `${process.env.REACT_APP_API_URL}/api/${apiVersi
 export const getCaversDocumentsUrl = caverId =>
   `${process.env.REACT_APP_API_URL}/api/${apiVersion}/cavers/${caverId}/documents`;
 export const postCreateEntranceUrl = `${process.env.REACT_APP_API_URL}/api/${apiVersion}/entrances`;
+export const postCreateCaveUrl = `${process.env.REACT_APP_API_URL}/api/${apiVersion}/caves`;
 /**
  * @deprecated
  */
