@@ -24,7 +24,7 @@ const renderOption = option => entityOptionForSelector(option);
 const getOptionLabel = option => option.name;
 
 const QuickSearch = ({
-  searchOnTypes = ['documents', 'entrances', 'grottos', 'massifs'],
+  searchOnTypes = ['documents', 'entrances', 'grottos', 'massifs', 'caves'],
   searchOnType,
   label,
   inputProps,
