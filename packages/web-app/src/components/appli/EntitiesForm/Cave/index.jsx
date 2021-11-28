@@ -13,16 +13,14 @@ import {
 import Icon from '@material-ui/core/Icon';
 import styled from 'styled-components';
 import { useDispatch, useSelector } from 'react-redux';
-import useGeolocation from 'react-hook-geolocation';
 
 import { useBoolean } from '../../../../hooks';
 import ActionButton from '../../../common/ActionButton';
-import { postEntrance } from '../../../../actions/Entry';
+import { postCave } from '../../../../actions/Cave';
 import Translate from '../../../common/Translate';
 
 import Cave from './Cave';
-import Entrance from './Entrance';
-import CaveDetails from '../Cave/Details';
+import Details from './Details';
 
 const FormWrapper = styled.form`
   display: flex;
@@ -48,13 +46,12 @@ const defaultValues = {
   description: '',
   descriptionTitle: '',
   language: 'fra',
-  caveId: null,
-  caveName: null,
-  country: 'FR'
+  depth: null,
+  length: null,
+  temperature: null
 };
 
-export const EntranceForm = ({ entranceValues = null }) => {
-  const { latitude, longitude } = useGeolocation();
+export const CaveForm = ({ caveValues = null }) => {
   const { formatMessage } = useIntl();
   const { languages: allLanguages } = useSelector(state => state.language);
   const { error } = useSelector(state => state.entrancePost);
@@ -63,37 +60,21 @@ export const EntranceForm = ({ entranceValues = null }) => {
     handleSubmit,
     reset,
     control,
-    getValues,
     trigger,
-    setFocus,
     formState: { errors, isDirty, isSubmitting, isSubmitSuccessful }
   } = useForm({
-    defaultValues: entranceValues || { ...defaultValues, latitude, longitude }
+    defaultValues: caveValues || { ...defaultValues }
   });
-
-  // TODO set latitude & longitude from the selected Entry
-  // TODO set country from position
-  useEffect(() => {
-    if (isNil(entranceValues?.latitude) || isNil(entranceValues?.longitude)) {
-      reset({ ...getValues(), latitude, longitude });
-    }
-  }, [entranceValues, getValues, latitude, longitude, reset]);
 
   const [activeStep, setActiveStep] = useState(0);
   const hasFinish = useBoolean();
   const stepExpanded = useBoolean();
 
   const steps = {
-    cave: <Cave control={control} errors={errors} />,
-    entrance: (
-      <Entrance
-        control={control}
-        allLanguages={allLanguages}
-        errors={errors}
-        setFocus={setFocus}
-      />
+    cave: (
+      <Cave control={control} errors={errors} allLanguages={allLanguages} />
     ),
-    details: <CaveDetails isReadonly control={control} errors={errors} />
+    details: <Details control={control} errors={errors} />
   };
   const stepKeys = keys(steps);
 
@@ -107,12 +88,9 @@ export const EntranceForm = ({ entranceValues = null }) => {
     const result = await trigger(
       [
         'name',
+        'description',
+        'descriptionTitle',
         'language',
-        'caveId',
-        'caveName',
-        'longitude',
-        'latitude',
-        'country',
         'depth',
         'length',
         'temperature',
@@ -139,23 +117,24 @@ export const EntranceForm = ({ entranceValues = null }) => {
         language: data.language,
         text: data.name
       },
-      cave: data.caveId,
-      country: data.country,
+      descriptionAndNameLanguage: {
+        language: data.language,
+        body: data.description,
+        title: data.descriptionTitle
+      },
       depth: data.depth,
       isDiving: data.isDiving,
       length: data.length,
-      longitude: data.longitude,
-      latitude: data.latitude,
       temperature: data.temperature
     };
-    return dispatch(postEntrance(transformedData));
+    return dispatch(postCave(transformedData));
   };
 
   return isSubmitSuccessful && isNil(error) ? (
     <FormWrapper>
       <Translate>New entrance successfully created!</Translate>
       <Button onClick={handleReset} color="primary">
-        {formatMessage({ id: 'Create a new Entrance' })}
+        {formatMessage({ id: 'Create a new Cave' })}
       </Button>
     </FormWrapper>
   ) : (
@@ -208,18 +187,16 @@ export const EntranceForm = ({ entranceValues = null }) => {
   );
 };
 
-EntranceForm.propTypes = {
-  entranceValues: PropTypes.shape({
+CaveForm.propTypes = {
+  caveValues: PropTypes.shape({
     name: PropTypes.string,
     description: PropTypes.string,
     descriptionTitle: PropTypes.string,
     language: PropTypes.string,
-    latitude: PropTypes.number,
-    longitude: PropTypes.number,
     isDiving: PropTypes.bool,
     depth: PropTypes.number,
     length: PropTypes.number
   })
 };
 
-export default EntranceForm;
+export default CaveForm;

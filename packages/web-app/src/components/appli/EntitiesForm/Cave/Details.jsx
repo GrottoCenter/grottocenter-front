@@ -23,7 +23,7 @@ const StyledFormControl = styled(FormControl)`
   margin-top: ${({ theme }) => theme.spacing(2)}px;
 `;
 
-const Details = ({ control, errors }) => {
+const Details = ({ isReadonly = false, control, errors }) => {
   const { formatMessage } = useIntl();
 
   const validateTemperature = value => {
@@ -50,8 +50,8 @@ const Details = ({ control, errors }) => {
           rules={{ valueAsNumber: true, validate: validateDistance }}
           render={({ field: { ref, ...field } }) => (
             <TextField
-              disabled
               fullWidth
+              disabled={isReadonly}
               autoFocus
               label={formatMessage({ id: 'depth' })}
               type="number"
@@ -74,8 +74,8 @@ const Details = ({ control, errors }) => {
           rules={{ valueAsNumber: true, validate: validateDistance }}
           render={({ field: { ref, ...field } }) => (
             <TextField
-              disabled
               fullWidth
+              disabled={isReadonly}
               label={formatMessage({ id: 'length' })}
               type="number"
               error={!!errors.length}
@@ -100,8 +100,8 @@ const Details = ({ control, errors }) => {
           }}
           render={({ field: { ref, ...field } }) => (
             <TextField
-              disabled
               fullWidth
+              disabled={isReadonly}
               label={formatMessage({ id: 'temperature' })}
               type="number"
               error={!!errors.temperature}
@@ -125,7 +125,7 @@ const Details = ({ control, errors }) => {
         defaultValue={false}
         render={({ field: { ref, ...field } }) => (
           <StyledFormControl
-            disabled
+            disabled={isReadonly}
             component="fieldset"
             error={!!errors.isDiving}>
             <FormLabel component="legend">
@@ -151,7 +151,8 @@ const Details = ({ control, errors }) => {
 
 Details.propTypes = {
   errors: PropTypes.objectOf(),
-  control: PropTypes.objectOf()
+  control: PropTypes.objectOf(),
+  isReadonly: PropTypes.bool
 };
 
 export default Details;
