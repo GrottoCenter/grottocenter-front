@@ -10,7 +10,7 @@ import {
 import styled from 'styled-components';
 import { includes, values } from 'ramda';
 import Translate from '../../components/common/Translate';
-import { EntranceForm } from '../../components/appli/EntitiesForm';
+import { EntranceForm, CaveForm } from '../../components/appli/EntitiesForm';
 
 const Header = styled.div`
   display: flex;
@@ -23,7 +23,7 @@ const StyledFormControl = styled(FormControl)`
 
 const ENTITY = {
   entrance: 'entrance',
-  cavity: 'cavity',
+  cave: 'cave',
   massif: 'massif',
   organization: 'organization'
 };
@@ -47,21 +47,17 @@ const EntityTypeSelect = ({ entity, onEntityChange }) => {
       <InputLabel shrink>
         <Translate>Entity type</Translate>
       </InputLabel>
-      <Select
-        value={selectedEntity}
-        onChange={handleChange}
-        displayEmpty
-        disabled>
+      <Select value={selectedEntity} onChange={handleChange} displayEmpty>
         <MenuItem value={ENTITY.entrance}>
           <Translate>entrance</Translate>
         </MenuItem>
-        <MenuItem value={ENTITY.cavity}>
+        <MenuItem value={ENTITY.cave}>
           <Translate>cave</Translate>
         </MenuItem>
-        <MenuItem value={ENTITY.massif}>
+        <MenuItem disabled value={ENTITY.massif}>
           <Translate>massif</Translate>
         </MenuItem>
-        <MenuItem value={ENTITY.organization}>
+        <MenuItem disabled value={ENTITY.organization}>
           <Translate>organization</Translate>
         </MenuItem>
       </Select>
@@ -76,8 +72,9 @@ const EntityForm = ({ selectedEntity }) => {
   switch (selectedEntity) {
     case ENTITY.entrance:
       return <EntranceForm />;
+    case ENTITY.cave:
+      return <CaveForm />;
     case ENTITY.massif:
-    case ENTITY.cavity:
     case ENTITY.organization:
     default:
       return (
