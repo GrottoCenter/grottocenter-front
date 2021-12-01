@@ -1,7 +1,7 @@
 import { brown, blue, orange, grey } from '@material-ui/core/colors';
 import {
-  createMuiTheme,
-  fade,
+  createTheme,
+  alpha,
   responsiveFontSizes
 } from '@material-ui/core/styles';
 import { isMobile } from 'react-device-detect';
@@ -78,7 +78,7 @@ export const overridings = {
     darkBlack: '#000000',
     fullBlack: '#000000',
     secondaryBlocTitle: '#FFFFFF',
-    blackShadow: fade('#000000', 0.117647),
+    blackShadow: alpha('#000000', 0.117647),
     backgroundButton: '#FFFFFF',
     errorColor: '#ff2020',
     successColor: '#49dd3b'
@@ -241,4 +241,4 @@ export const overridings = {
   }
 };
 
-export default responsiveFontSizes(createMuiTheme(overridings));
+export default responsiveFontSizes(createTheme(overridings));

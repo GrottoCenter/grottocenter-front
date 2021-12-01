@@ -625,7 +625,7 @@ class SearchResultsTable extends React.Component {
                   labelRowsPerPage={intl.formatMessage({
                     id: 'Results per page'
                   })}
-                  onChangePage={(event, pageNb) =>
+                  onPageChange={(event, pageNb) =>
                     this.handleChangePage(event, pageNb)
                   }
                   onChangeRowsPerPage={event =>
@@ -635,7 +635,7 @@ class SearchResultsTable extends React.Component {
                     <SearchTableActions
                       page={page}
                       size={size}
-                      onChangePage={this.handleChangePage}
+                      onPageChange={this.handleChangePage}
                       count={totalNbResults}
                     />
                   )}
