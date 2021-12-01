@@ -7,11 +7,10 @@ const markers = [
     name: 'Caves',
     url: '/images/entry-cluster.svg'
   },
-  // TODO: Not implemented yet.
-  // {
-  //   name: 'Massifs',
-  //   url: '/images/massif.svg',
-  // },
+  {
+    name: 'Massifs',
+    url: '/images/massif.svg'
+  },
   {
     name: 'Organizations',
     url: '/images/club.svg'

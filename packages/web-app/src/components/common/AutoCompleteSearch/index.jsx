@@ -144,7 +144,6 @@ const AutoCompleteSearch = ({
             <StyledInputBase
               disabled={params.disabled}
               ref={params.InputProps.ref}
-              // Todo: add translation
               placeholder={label}
               error={hasError}
               inputProps={{

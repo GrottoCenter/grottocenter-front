@@ -55,10 +55,6 @@ const AssociationSection = styled(LandingSection)`
   text-align: center;
 `;
 
-const AssociationGridRow = styled(GridRow)`
-  padding-top: 20px; /* ===> TODO ne fonctionne pas car GridRow a déjà une classe */
-`;
-
 const listEntries = {
   title: (
     <Translate>
@@ -122,7 +118,7 @@ const Association = props => {
     <AssociationSection
       bgColor={palette.primary1Color}
       fgColor={palette.textIconColor}>
-      <AssociationGridRow>
+      <GridRow>
         <GridTwoThirdColumn>
           <AssociationTitle color={palette.accent1Color}>
             <Translate>Wikicaves association</Translate>
@@ -144,9 +140,9 @@ const Association = props => {
             <AssociationLogoImage showLink={false} />
           </AssociationLogo>
         </GridOneThirdColumn>
-      </AssociationGridRow>
+      </GridRow>
 
-      <AssociationGridRow>
+      <GridRow>
         <GridFullColumn>
           <AssociationCheckList
             title={listEntries.title}
@@ -161,7 +157,7 @@ const Association = props => {
             iconHoverColor={palette.accent1Color}
           />
         </GridFullColumn>
-      </AssociationGridRow>
+      </GridRow>
     </AssociationSection>
   );
 };
