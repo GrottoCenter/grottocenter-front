@@ -17,13 +17,13 @@ const actionsStyles = theme => ({
 
 class TablePaginationActions extends React.Component {
   handleBackButtonClick = event => {
-    const { onChangePage, page } = this.props;
-    onChangePage(event, page - 1);
+    const { onPageChange, page } = this.props;
+    onPageChange(event, page - 1);
   };
 
   handleNextButtonClick = event => {
-    const { onChangePage, page } = this.props;
-    onChangePage(event, page + 1);
+    const { onPageChange, page } = this.props;
+    onPageChange(event, page + 1);
   };
 
   render() {
@@ -59,7 +59,7 @@ class TablePaginationActions extends React.Component {
 TablePaginationActions.propTypes = {
   classes: PropTypes.shape({ root: PropTypes.string }).isRequired,
   count: PropTypes.number.isRequired,
-  onChangePage: PropTypes.func.isRequired,
+  onPageChange: PropTypes.func.isRequired,
   page: PropTypes.number.isRequired,
   size: PropTypes.number.isRequired,
   theme: PropTypes.shape({ direction: PropTypes.string }).isRequired

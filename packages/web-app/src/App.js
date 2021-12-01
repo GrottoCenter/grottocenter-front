@@ -8,8 +8,8 @@ import { createStore, applyMiddleware, compose } from 'redux';
 import thunkMiddleware from 'redux-thunk';
 import { BrowserRouter } from 'react-router-dom';
 import {
+  createTheme,
   MuiThemeProvider,
-  createMuiTheme,
   StylesProvider
 } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -38,7 +38,7 @@ gcStore.dispatch(
   )
 );
 
-const theme = createMuiTheme(grottoTheme);
+const theme = createTheme(grottoTheme);
 
 const customOnIntlError = err => {
   /*

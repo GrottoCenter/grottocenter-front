@@ -13,9 +13,9 @@ import {
   withStyles,
   CardContent,
   Card,
-  ExpansionPanel,
-  ExpansionPanelSummary,
-  ExpansionPanelDetails,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
   FormLabel,
   FormHelperText
 } from '@material-ui/core';
@@ -216,18 +216,18 @@ class DocumentSearch extends React.Component {
             </InternationalizedLink>
           </Typography>
 
-          <ExpansionPanel
+          <Accordion
             expanded={panelExpanded === 'all-fields-panel'}
             onChange={this.handlePanelSelected('all-fields-panel')}>
-            <ExpansionPanelSummary
+            <AccordionSummary
               expandIcon={<ExpandMoreIcon />}
               aria-controls="all-fields-search-content"
               id="all-fields-search-content">
               <Typography variant="h6">
                 <Translate>Search on all fields</Translate>
               </Typography>
-            </ExpansionPanelSummary>
-            <ExpansionPanelDetails style={{ flexDirection: 'column' }}>
+            </AccordionSummary>
+            <AccordionDetails style={{ flexDirection: 'column' }}>
               <Typography variant="body1" gutterBottom paragraph>
                 <i>
                   <Translate>
@@ -283,21 +283,21 @@ class DocumentSearch extends React.Component {
                   resetParentState={this.resetToInitialState}
                 />
               </form>
-            </ExpansionPanelDetails>
-          </ExpansionPanel>
+            </AccordionDetails>
+          </Accordion>
 
-          <ExpansionPanel
+          <Accordion
             expanded={panelExpanded === 'specific-fields-panel'}
             onChange={this.handlePanelSelected('specific-fields-panel')}>
-            <ExpansionPanelSummary
+            <AccordionSummary
               expandIcon={<ExpandMoreIcon />}
               aria-controls="specific-fields-search-content"
               id="specific-fields-search-content">
               <Typography variant="h6">
                 <Translate>Search on specific fields</Translate>
               </Typography>
-            </ExpansionPanelSummary>
-            <ExpansionPanelDetails style={{ flexDirection: 'column' }}>
+            </AccordionSummary>
+            <AccordionDetails style={{ flexDirection: 'column' }}>
               <form
                 noValidate
                 autoComplete="off"
@@ -527,8 +527,8 @@ class DocumentSearch extends React.Component {
                   resetParentState={this.resetToInitialState}
                 />
               </form>
-            </ExpansionPanelDetails>
-          </ExpansionPanel>
+            </AccordionDetails>
+          </Accordion>
         </CardContent>
       </Card>
     );
