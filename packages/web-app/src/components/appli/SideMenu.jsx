@@ -13,7 +13,6 @@ import Translate from '../common/Translate';
 import SimpleMenuEntryConnector from '../../containers/SimpleMenuEntryConnector';
 import ComplexMenuEntryConnector from '../../containers/ComplexMenuEntryConnector';
 import { sideMenuWidth } from '../../conf/Config';
-import checkPermission from '../../helpers/Permissions';
 
 const Menubar = withTheme(styled(Drawer)`
   > div {
@@ -93,4 +92,4 @@ SideMenu.propTypes = {
   visible: PropTypes.bool.isRequired
 };
 
-export default checkPermission()(SideMenu);
+export default SideMenu;

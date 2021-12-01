@@ -5,7 +5,6 @@ import BurgerIcon from '@material-ui/icons/Help';
 import { withTheme } from '@material-ui/core/styles';
 import { Button } from '@material-ui/core';
 import styled from 'styled-components';
-import checkPermission from '../../helpers/Permissions';
 
 const BurgerAvatar = withTheme(styled(Avatar)`
   position: relative;
@@ -36,4 +35,4 @@ BurgerLink.propTypes = {
 
 const SideMenuBurger = styled(BurgerLink)``;
 
-export default checkPermission()(SideMenuBurger);
+export default SideMenuBurger;
