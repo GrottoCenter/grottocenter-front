@@ -69,7 +69,7 @@ Property.propTypes = {
     PropTypes.arrayOf(PropTypes.number),
     PropTypes.arrayOf(PropTypes.bool),
     PropTypes.arrayOf(PropTypes.object)
-  ]).isRequired,
+  ]),
   customToString: PropTypes.func
 };
 

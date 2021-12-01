@@ -628,7 +628,7 @@ class SearchResultsTable extends React.Component {
                   onPageChange={(event, pageNb) =>
                     this.handleChangePage(event, pageNb)
                   }
-                  onChangeRowsPerPage={event =>
+                  onRowsPerPageChange={event =>
                     this.handleChangeRowsPerPage(event)
                   }
                   ActionsComponent={() => (

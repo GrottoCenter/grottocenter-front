@@ -162,7 +162,6 @@ const AddFileForm = ({
       <FormControl variant="filled">
         <StyledButton
           disabled={loading}
-          loading={loading}
           color="secondary"
           variant="contained"
           component="label">

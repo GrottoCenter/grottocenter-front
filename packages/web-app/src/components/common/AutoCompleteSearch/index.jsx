@@ -61,7 +61,7 @@ const ResultsPopper = styled(Popper)`
 // eslint-disable-next-line react/prop-types
 const InputAdornments = ({ isLoading, hasError }) =>
   isLoading || hasError ? (
-    <InputAdornment>
+    <InputAdornment position="end">
       {isLoading && <CircularProgress color="secondary" size={24} />}
       {hasError && <ErrorIcon color="secondary" />}
     </InputAdornment>
