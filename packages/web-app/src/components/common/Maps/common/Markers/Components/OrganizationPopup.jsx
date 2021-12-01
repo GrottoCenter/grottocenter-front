@@ -34,7 +34,7 @@ OrganizationPopup.propTypes = {
   organization: PropTypes.shape({
     name: PropTypes.string,
     id: PropTypes.number,
-    address: PropTypes.shape({}),
+    address: PropTypes.string,
     latitude: PropTypes.number,
     longitude: PropTypes.number
   }).isRequired
