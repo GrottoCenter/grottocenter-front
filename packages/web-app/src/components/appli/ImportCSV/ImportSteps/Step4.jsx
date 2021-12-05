@@ -76,6 +76,7 @@ const Step4 = () => {
           id:
             'The functionality to check for duplicates has not been fully implemented.'
         })}
+        &nbsp;
         {formatMessage({
           id:
             'Please be careful not to import any documents or entrances which are already present in Grottocenter.'
