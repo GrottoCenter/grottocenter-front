@@ -23,7 +23,7 @@ const EditButton = styled(Box)`
 `;
 
 const Title = styled(Typography)`
-  align-self: center;
+  text-align: center;
   color: ${({ theme }) => theme.palette.secondary.main};
 `;
 
