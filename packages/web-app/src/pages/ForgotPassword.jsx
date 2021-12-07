@@ -56,10 +56,10 @@ const ForgotPasswordPage = ({
               </Typography>
               <SpacedCenteredButton
                 color="primary"
-                onClick={() => history.push('/ui/login')}
+                onClick={() => history.push('/')}
                 style={{ display: 'block' }}
                 variant="contained">
-                {formatMessage({ id: 'Log in' })}
+                {formatMessage({ id: 'Go to home page' })}
               </SpacedCenteredButton>
             </>
           ) : (
