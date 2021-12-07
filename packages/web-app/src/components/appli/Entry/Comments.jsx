@@ -46,9 +46,8 @@ const Comment = ({
             <Typography variant="body2">{formattedBody}</Typography>
             <br />
             <Typography component="span" variant="caption" color="textPrimary">
-              {`${!isNil(author.name) && formatMessage({ id: 'Posted by' })} ${
-                author.name
-              } ${
+              {`${!isNil(author.nickname) &&
+                formatMessage({ id: 'Posted by' })} ${author.nickname} ${
                 !isNil(date)
                   ? `- ${formatDate(date, {
                       year: 'numeric',

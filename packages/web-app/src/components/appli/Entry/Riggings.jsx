@@ -82,9 +82,9 @@ const Riggings = ({ riggings }) => {
                       component="span"
                       variant="caption"
                       color="textPrimary">
-                      {`${!isNil(rigging.author?.name) &&
+                      {`${!isNil(rigging.author?.nickname) &&
                         formatMessage({ id: 'Posted by' })} ${
-                        rigging.author.name
+                        rigging.author.nickname
                       } ${
                         !isNil(rigging.date)
                           ? `- ${formatDate(rigging.date, {
