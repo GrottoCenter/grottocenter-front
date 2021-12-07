@@ -46,7 +46,7 @@ const SignUp = () => {
       errors.push(
         formatMessage(
           {
-            id: `signUp.password.length.error`,
+            id: `password.length.error`,
             defaultMessage: `Your password must be at least {passwordMinLength} characters.`,
             description: 'Error displayed when the password is too short.'
           },

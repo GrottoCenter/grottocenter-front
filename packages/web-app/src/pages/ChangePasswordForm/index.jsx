@@ -12,9 +12,8 @@ import {
 import Visibility from '@material-ui/icons/Visibility';
 import VisibilityOff from '@material-ui/icons/VisibilityOff';
 import styled from 'styled-components';
-import { isEmpty, match } from 'ramda';
 
-import { emailRegexp, PASSWORD_MIN_LENGTH } from '../../conf/Config';
+import { PASSWORD_MIN_LENGTH } from '../../conf/Config';
 import Layout from '../../components/common/Layouts/Fixed/FixedContent';
 import StringInput from '../../components/common/Form/StringInput';
 
@@ -30,22 +29,14 @@ const SpacedCenteredButton = styled(Button)`
   margin: ${({ theme }) => theme.spacing(1)}px auto;
 `;
 
-const SignUpForm = ({
-  email,
-  name,
-  nickname,
+const ChangePasswordForm = ({
   password,
   passwordConfirmation,
-  surname,
-  onEmailChange,
-  onNameChange,
-  onNicknameChange,
   onPasswordChange,
   onPasswordConfirmationChange,
-  onSignUp,
-  onSurnameChange,
+  onChangePassword,
   loading,
-  signUpRequestSucceeded
+  changePasswordRequestSucceeded
 }) => {
   const [isPasswordVisible, setIsPasswordVisible] = React.useState(false);
   const { formatMessage } = useIntl();
@@ -60,8 +51,6 @@ const SignUpForm = ({
 
   const checkIfHasError = fieldName => {
     switch (fieldName) {
-      case 'email':
-        return isEmpty(match(emailRegexp, email));
       case 'password':
       case 'passwordConfirmation':
         return (
@@ -75,19 +64,19 @@ const SignUpForm = ({
 
   return (
     <Layout
-      title={formatMessage({ id: 'Join Grottocenter' })}
+      title={formatMessage({ id: 'Update password' })}
       footer=""
       content={
         <>
-          {signUpRequestSucceeded ? (
+          {changePasswordRequestSucceeded ? (
             <>
               <Typography align="center">
                 {formatMessage({
-                  id: 'Your account has been successfully created!'
+                  id: 'Your password has been successfully updated!'
                 })}{' '}
                 {formatMessage({
                   id:
-                    'You can now log in to Grottocenter using the email and password you entered.'
+                    'You can now log in to Grottocenter using your new password.'
                 })}
               </Typography>
               <SpacedCenteredButton
@@ -99,45 +88,7 @@ const SignUpForm = ({
               </SpacedCenteredButton>
             </>
           ) : (
-            <FormWrapper onSubmit={onSignUp}>
-              <StringInput
-                fullWidth
-                helperText={formatMessage({
-                  id: 'The nickname defines how other users see you.'
-                })}
-                onValueChange={onNicknameChange}
-                required
-                value={nickname}
-                valueName={formatMessage({ id: 'Nickname' })}
-              />
-              <StringInput
-                fullWidth
-                helperText={formatMessage({
-                  id: 'Your real name (optional).'
-                })}
-                onValueChange={onNameChange}
-                value={name}
-                valueName={formatMessage({ id: 'Caver.Name' })}
-              />
-              <StringInput
-                fullWidth
-                helperText={formatMessage({
-                  id: 'Your real surname (optional).'
-                })}
-                onValueChange={onSurnameChange}
-                value={surname}
-                valueName={formatMessage({ id: 'Surname' })}
-              />
-
-              <StringInput
-                fullWidth
-                hasError={checkIfHasError('email')}
-                onValueChange={onEmailChange}
-                required
-                value={email}
-                valueName={formatMessage({ id: 'Email' })}
-              />
-
+            <FormWrapper onSubmit={onChangePassword}>
               <StringInput
                 endAdornment={
                   <InputAdornment position="end">
@@ -198,7 +149,7 @@ const SignUpForm = ({
                 {loading ? (
                   <CircularProgress size="2.8rem" />
                 ) : (
-                  formatMessage({ id: 'Sign up' })
+                  formatMessage({ id: 'Update password' })
                 )}
               </SpacedCenteredButton>
             </FormWrapper>
@@ -209,22 +160,14 @@ const SignUpForm = ({
   );
 };
 
-SignUpForm.propTypes = {
-  email: PropTypes.string.isRequired,
-  name: PropTypes.string.isRequired,
-  nickname: PropTypes.string.isRequired,
-  password: PropTypes.string.isRequired,
-  passwordConfirmation: PropTypes.string.isRequired,
-  surname: PropTypes.string.isRequired,
-  onEmailChange: PropTypes.func.isRequired,
-  onSignUp: PropTypes.func.isRequired,
-  onNameChange: PropTypes.func.isRequired,
-  onNicknameChange: PropTypes.func.isRequired,
+ChangePasswordForm.propTypes = {
+  changePasswordRequestSucceeded: PropTypes.bool.isRequired,
+  loading: PropTypes.bool.isRequired,
+  onChangePassword: PropTypes.func.isRequired,
   onPasswordChange: PropTypes.func.isRequired,
   onPasswordConfirmationChange: PropTypes.func.isRequired,
-  onSurnameChange: PropTypes.func.isRequired,
-  loading: PropTypes.bool.isRequired,
-  signUpRequestSucceeded: PropTypes.bool.isRequired
+  password: PropTypes.string.isRequired,
+  passwordConfirmation: PropTypes.string.isRequired
 };
 
-export default SignUpForm;
+export default ChangePasswordForm;
