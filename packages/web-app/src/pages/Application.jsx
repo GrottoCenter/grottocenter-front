@@ -14,6 +14,7 @@ import LatestBlogNewsSection from '../components/homepage/LatestBlogNewsSection'
 import Layout from '../components/common/Layouts/Main';
 
 import AppBar from '../features/AppBar';
+import ChangePassword from '../features/ChangePassword';
 import LoginDialog from '../features/Login';
 import QuickSearch from '../features/QuickSearch';
 import SignUp from '../features/SignUp';
@@ -75,6 +76,7 @@ const Application = () => {
         <Route path="/ui/login" component={HomePage} />
         <Route path="/ui/signup" component={SignUp} />
         <Route path="/ui/forgotPassword" component={ForgotPassword} />
+        <Route path="/ui/changePassword" component={ChangePassword} />
         <Route path="/ui/documents/add" component={DocumentSubmission} />
         <Route path="/ui/documents/validation" component={DocumentValidation} />
         <Route path="/ui/documents/edit/:documentId" component={DocumentEdit} />

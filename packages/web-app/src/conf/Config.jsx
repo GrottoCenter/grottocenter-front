@@ -219,6 +219,7 @@ export const importRowsEntrancesUrl = `${process.env.REACT_APP_API_URL}/api/${ap
 export const importRowsDocumentsUrl = `${process.env.REACT_APP_API_URL}/api/${apiVersion}/documents/import-rows`;
 
 // ===== Auth url
+export const changePasswordUrl = `${process.env.REACT_APP_API_URL}/api/${apiVersion}/account/password`;
 export const loginUrl = `${process.env.REACT_APP_API_URL}/api/${apiVersion}/login`;
 export const logoutUrl = `${process.env.REACT_APP_API_URL}/api/${apiVersion}/logout`;
 export const signUpUrl = `${process.env.REACT_APP_API_URL}/api/${apiVersion}/signup`;

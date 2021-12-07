@@ -3,6 +3,7 @@ import advancedsearch from './AdvancedsearchReducer';
 import cave from './CaveReducer';
 import caver from './CaverReducer';
 import caverGroups from './CaverGroupsReducer';
+import changePassword from './ChangePassword';
 import createCaver from './CreateCaver';
 import createOrganization from './CreateOrganization';
 import document from './DocumentReducer';
@@ -41,6 +42,7 @@ const GCReducer = combineReducers({
   cave,
   caver,
   caverGroups,
+  changePassword,
   createCaver,
   createOrganization,
   document,
