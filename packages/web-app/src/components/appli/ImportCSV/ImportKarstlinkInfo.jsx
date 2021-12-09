@@ -66,7 +66,7 @@ const ImportKarstlinkInfo = ({ selectType }) => {
           &nbsp;
           {formatMessage({
             id:
-              'How to create links between scientific observations, the measurements made by the sensors and the cavities in which these observations and measurements were carried out? This is some of what the KarstLink project offers.'
+              'How to create links between scientific observations, the measurements made by the sensors and the cavities in which these observations and measurements were carried out?'
           })}
           &nbsp;
           {formatMessage({
@@ -81,8 +81,8 @@ const ImportKarstlinkInfo = ({ selectType }) => {
             target="_blank"
             href="https://ontology.uis-speleo.org/ontology/"
             className={classes.karstlinkButton}
-            variant="contained">
-            <InfoIcon />
+            variant="contained"
+            startIcon={<InfoIcon />}>
             {formatMessage({
               id: 'Find out'
             })}
@@ -91,8 +91,8 @@ const ImportKarstlinkInfo = ({ selectType }) => {
             target="_blank"
             href={link}
             className={classes.karstlinkButton}
-            variant="contained">
-            <DownloadIcon />
+            variant="contained"
+            startIcon={<DownloadIcon />}>
             {formatMessage({
               id: title
             })}

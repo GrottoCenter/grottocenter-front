@@ -57,8 +57,7 @@ const useCustomHeaderRender = () => {
     },
     {
       id: CONSTANTS.DESCRIPTION_DOCUMENT_TITLE,
-      customRender: () =>
-        formatMessage({ id: 'Title of the document description' })
+      customRender: () => formatMessage({ id: 'Title of the document' })
     },
     {
       id: CONSTANTS.DESCRIPTION_LOCATION,

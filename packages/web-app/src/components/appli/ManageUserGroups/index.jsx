@@ -100,7 +100,7 @@ const ManageUserGroups = ({
         <AutoCompleteSearch
           disabled={false}
           onSelection={handleOnSelection}
-          label="Search among Grottocenter users..."
+          label={formatMessage({ id: 'Search among Grottocenter users...' })}
           inputValue={inputValue}
           onInputChange={setInputValue}
           suggestions={results}

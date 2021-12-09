@@ -623,7 +623,7 @@ class SearchResultsTable extends React.Component {
                   rowsPerPage={size}
                   page={page}
                   labelRowsPerPage={intl.formatMessage({
-                    id: 'Results per page'
+                    id: 'Results per page:'
                   })}
                   onPageChange={(event, pageNb) =>
                     this.handleChangePage(event, pageNb)

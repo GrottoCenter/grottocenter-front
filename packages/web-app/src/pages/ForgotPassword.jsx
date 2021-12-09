@@ -51,7 +51,7 @@ const ForgotPasswordPage = ({
             <>
               <Typography align="center">
                 {formatMessage({
-                  id: 'Check your email to reset your password'
+                  id: 'Check your email to reset your password.'
                 })}
               </Typography>
               <SpacedCenteredButton

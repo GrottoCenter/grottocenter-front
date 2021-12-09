@@ -233,6 +233,7 @@ const Table = ({
         {updateCurrentPage && (
           <TablePagination
             rowsPerPageOptions={isNil(updateRowsPerPage) ? [50] : [5, 50, 100]}
+            labelRowsPerPage={formatMessage({ id: 'Results per page:' })}
             component="div"
             count={rowsCount}
             rowsPerPage={rowsPerPage}
