@@ -62,9 +62,9 @@ const Step2 = () => {
       </CSVReader>
       {rowErrors.map(err => (
         <Alert
-          content={`${formatMessage({ id: 'Row' })} ${
-            err.row
-          } : ${formatMessage({ id: err.errorMessage })}`}
+          content={`${formatMessage({ id: 'Row' })} ${err.row} : ${
+            err.errorMessage
+          }`}
           key={err.row + err.errorMessage}
           severity="error"
         />

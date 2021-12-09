@@ -96,7 +96,7 @@ const Step4 = () => {
             severity="error"
             title={formatMessage(
               {
-                id: 'importCsv not imported',
+                id: 'csvImport.willNotBeImported',
                 defaultMessage: `${translatedTypePrefix} {number, plural, one {is} other {are}} already present in Grottocenter and won't be imported.`
               },
               {
@@ -104,7 +104,9 @@ const Step4 = () => {
                 importType: selectedType
               }
             )}
-            content={wontBeCreateData.map(row => `${row.line}, `)}
+            content={`${formatMessage({
+              id: wontBeCreateData.length === 1 ? 'Row:' : 'Rows:'
+            })} ${wontBeCreateData.map(row => `${row.line}`).join(',')}`}
           />
         </>
       )}
@@ -115,12 +117,13 @@ const Step4 = () => {
             severity="info"
             title={formatMessage(
               {
-                id: 'importCsv imported',
+                id: 'csvImport.willBeImported',
                 defaultMessage: `${translatedTypePrefix} will be imported.`
               },
               {
                 number: willBeCreatedData.length,
-                importType: selectedType
+                importType: selectedType,
+                translatedTypePrefix
               }
             )}
           />
@@ -141,7 +144,7 @@ const Step4 = () => {
             severity="success"
             title={formatMessage(
               {
-                id: 'success import csv',
+                id: 'csvImport.successRecap',
                 defaultMessage: `${translatedTypePrefix} {number, plural, one {was} other {were}} imported.`
               },
               {
@@ -164,7 +167,7 @@ const Step4 = () => {
             severity="error"
             title={formatMessage(
               {
-                id: 'failure import csv',
+                id: 'csvImport.errorRecap',
                 defaultMessage: `${translatedTypePrefix} {number, plural, one {was} other {were}} not imported.`
               },
               {
