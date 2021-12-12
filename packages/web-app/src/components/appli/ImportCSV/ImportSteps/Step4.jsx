@@ -31,6 +31,8 @@ const useStyles = makeStyles({
 });
 
 // https://formatjs.io/docs/core-concepts/icu-syntax/#select-format
+// TODO: this is causing translation error and thus, is not translated in other languages than english.
+// This needs to be rewordked & simplified.
 const translatedSingularType = `{importType, select,
   ${DOCUMENT} {document}
   ${ENTRANCE} {entrance}
