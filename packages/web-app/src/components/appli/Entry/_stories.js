@@ -34,7 +34,8 @@ const details = {
   coordinates: [43.35266, 5.81689],
   mountain: 'Sainte-Baume (massif de la)',
   altitude: 748,
-  isDivingCave: true
+  isDivingCave: true,
+  temperature: 12
 };
 
 const comments = [
