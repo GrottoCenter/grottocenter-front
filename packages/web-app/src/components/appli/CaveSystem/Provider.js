@@ -63,7 +63,7 @@ const Provider = ({ data, loading = true, children }) => {
   };
   const handleOpenEntryDescription = entryId => {
     if (!isNil(entryId)) {
-      window.open(`/ui/entries/${entryId}`, '_blank');
+      window.open(`/ui/entrances/${entryId}`, '_blank');
     }
   };
 

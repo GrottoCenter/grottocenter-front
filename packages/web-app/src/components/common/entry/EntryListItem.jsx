@@ -40,13 +40,13 @@ const EntryListItem = props => {
   return (
     <ListItem
       className={classes.entryItem}
-      button /* onClick={() => props.history.push(`/ui/entries/${entry.id}`)} */
+      button /* onClick={() => props.history.push(`/ui/entrances/${entry.id}`)} */
     >
       <GClink
         className={classes.entryLink}
         internal={false}
         target="_blank"
-        href={`/ui/entries/${entry.id}`}>
+        href={`/ui/entrances/${entry.id}`}>
         {entry.name}
       </GClink>
       <ListItemText className={classes.entryText}>

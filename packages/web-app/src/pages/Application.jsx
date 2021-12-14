@@ -61,7 +61,7 @@ const Application = () => {
         <Route path="/ui/admin/users" component={ManageUsers} />
         <Route path="/ui/search" component={AdvancedSearchPage} />
         <Route path="/ui/api" component={Api} />
-        <Route path="/ui/entries/:id?" component={EntryPage} />
+        <Route path="/ui/entrances/:id?" component={EntryPage} />
         <Route path="/ui/caves/:id?" component={CaveSystemPage} />
         <Route path="/ui/faq" component={Faq} />
         <Route path="/ui/map/:target?" component={Map} />
