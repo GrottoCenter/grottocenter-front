@@ -101,6 +101,7 @@ export const detailsType = PropTypes.shape({
   mountain: PropTypes.string,
   name: PropTypes.string,
   progressionRate: PropTypes.number,
+  temperature: PropTypes.number,
   undergroundType: PropTypes.string
 });
 

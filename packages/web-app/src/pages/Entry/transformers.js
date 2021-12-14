@@ -22,27 +22,26 @@ export const getComments = (comments = []) =>
   }));
 
 export const getDetails = data => ({
-  id: data.id,
-  name: data.name,
-  localisation: `${data.city}, ${data.region}, ${data.country}`,
-  depth: pathOr(0, ['cave', 'depth'], data),
-  development: pathOr(0, ['cave', 'length'], data),
+  accessRate: pathOr(0, ['stats', 'approach'], data) / 2,
+  altitude: data.altitude,
+  author: getAuthor(data?.author),
   coordinates:
     !isNil(data.longitude) && !isNil(data.latitude)
       ? [data.latitude, data.longitude]
       : null,
+  creationDate: data.dateInscription ? new Date(data.dateInscription) : '',
+  discoveryYear: data.discoveryYear,
+  depth: pathOr(0, ['cave', 'depth'], data),
+  development: pathOr(0, ['cave', 'length'], data),
+  id: data.id,
   interestRate: pathOr(0, ['stats', 'aestheticism'], data) / 2,
-  progressionRate: pathOr(0, ['stats', 'caving'], data) / 2,
-  accessRate: pathOr(0, ['stats', 'approach'], data) / 2,
-  author: getAuthor(data?.author),
-  creationDate: data?.cave?.dateInscription
-    ? new Date(data?.cave?.dateInscription)
-    : '',
-  isDivingCave: pathOr(null, ['cave', 'is_diving'], data),
+  isDivingCave: pathOr(null, ['cave', 'isDiving'], data),
+  localisation: `${data.city}, ${data.region}, ${data.country}`,
   mountain: pathOr(null, ['massif', 'name'], data),
-  undergroundType: pathOr(null, ['massif', 'undergroundType'], data),
-  altitude: pathOr(null, ['altitude', 'undergroundType'], data),
-  discoveryYear: pathOr(null, ['discoveryYear', 'undergroundType'], data)
+  name: data.name,
+  progressionRate: pathOr(0, ['stats', 'caving'], data) / 2,
+  temperature: pathOr(null, ['cave', 'temperature'], data),
+  undergroundType: pathOr(null, ['massif', 'undergroundType'], data)
 });
 
 export const getDescriptions = descriptions =>
