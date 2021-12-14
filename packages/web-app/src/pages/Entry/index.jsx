@@ -8,6 +8,7 @@ import {
   getComments,
   getDetails,
   getDescriptions,
+  getLocations,
   getRiggings
 } from './transformers';
 
@@ -25,6 +26,7 @@ const EntryPage = () => {
   const comments = getComments(pathOr([], ['comments'], data));
   const descriptions = getDescriptions(pathOr([], ['descriptions'], data));
   const riggings = getRiggings(pathOr([], ['riggings'], data));
+  const locations = getLocations(pathOr([], ['locations'], data));
 
   return (
     <Entry
@@ -32,6 +34,7 @@ const EntryPage = () => {
       details={details}
       comments={comments}
       descriptions={descriptions}
+      locations={locations}
       riggings={riggings}
       entryId={id}
     />

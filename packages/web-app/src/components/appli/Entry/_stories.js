@@ -79,6 +79,26 @@ const descriptions = [
     title: 'titre description'
   }
 ];
+const locations = [
+  {
+    author: { name: 'Jean' },
+    body: 'body description body description body description',
+    date: date.toISOString().substring(0, 10),
+    id: 1,
+    language: 'fra',
+    relevance: 1,
+    title: 'Titre location'
+  },
+  {
+    author: { name: 'Kévin' },
+    body: 'body description body description body description',
+    date: date.toISOString().substring(0, 10),
+    id: 2,
+    language: 'fra',
+    relevance: 2,
+    title: 'Titre location'
+  }
+];
 const riggings = [
   {
     obstacles: [
@@ -156,6 +176,7 @@ const StoryContextProvider = ({ loading, children }) => (
     details={details}
     comments={comments}
     descriptions={descriptions}
+    locations={locations}
     riggings={riggings}>
     {children}
   </Provider>

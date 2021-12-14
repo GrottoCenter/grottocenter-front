@@ -19,10 +19,11 @@ const defaultContext = {
       author: 'Author name',
       creationDate: todayDate
     },
-    descriptions: [],
-    riggings: [],
     comments: [],
-    position: [51.505, -0.09]
+    descriptions: [],
+    locations: [],
+    position: [51.505, -0.09],
+    riggings: []
   }
 };
 
@@ -35,6 +36,7 @@ const Entry = ({
   details,
   comments,
   descriptions,
+  locations,
   riggings,
   entryId,
   loading = true,
@@ -67,6 +69,7 @@ const Entry = ({
           details: detailsState,
           comments,
           descriptions,
+          locations,
           riggings,
           position: pathOr(null, ['coordinates'], details)
         },
@@ -138,6 +141,18 @@ export const descriptionsType = PropTypes.arrayOf(
   })
 );
 
+const locationType = PropTypes.shape({
+  author: authorType,
+  body: PropTypes.string,
+  creationDate: PropTypes.string,
+  id: PropTypes.number,
+  language: PropTypes.string.isRequired,
+  relevance: PropTypes.number,
+  title: PropTypes.string.isRequired
+});
+
+export const locationsType = PropTypes.arrayOf(locationType);
+
 const obstacleType = PropTypes.shape({
   obstacle: PropTypes.string,
   rope: PropTypes.string,
@@ -163,6 +178,7 @@ Entry.propTypes = {
   descriptions: descriptionsType.isRequired,
   details: detailsType.isRequired,
   loading: PropTypes.bool,
+  locations: locationsType.isRequired,
   riggings: riggingsType.isRequired,
   entryId: PropTypes.string.isRequired
 };
