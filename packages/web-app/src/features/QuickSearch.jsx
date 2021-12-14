@@ -42,7 +42,7 @@ const QuickSearch = ({
     if (selection.id) {
       switch (selection.type) {
         case 'entrance':
-          history.push(`/ui/entries/${encodeURIComponent(selection.id)}`);
+          history.push(`/ui/entrances/${encodeURIComponent(selection.id)}`);
           break;
         case 'massif':
           history.push(`/ui/massifs/${encodeURIComponent(selection.id)}`);

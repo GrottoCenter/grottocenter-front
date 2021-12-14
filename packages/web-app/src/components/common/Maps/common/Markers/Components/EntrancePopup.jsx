@@ -11,7 +11,7 @@ export const EntrancePopup = ({ entrance }) => (
   <>
     <Title
       title={entrance.name && entrance.name.toUpperCase()}
-      link={`/ui/entries/${entrance.id}`}
+      link={`/ui/entrances/${entrance.id}`}
     />
     <Property
       secondary

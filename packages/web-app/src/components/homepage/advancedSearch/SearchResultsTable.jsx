@@ -270,7 +270,7 @@ class SearchResultsTable extends React.Component {
     let urlToRedirectTo = '';
     switch (resourceType) {
       case 'entrances':
-        urlToRedirectTo = `/ui/entries/${id}`;
+        urlToRedirectTo = `/ui/entrances/${id}`;
         break;
       case 'grottos':
         urlToRedirectTo = `/ui/organizations/${id}`;
