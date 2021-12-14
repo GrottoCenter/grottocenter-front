@@ -10,7 +10,7 @@ export const OrganizationPopup = ({ organization }) => (
   <>
     <Title
       title={organization.name && organization.name.toUpperCase()}
-      link={`/ui/groups/${organization.id}`}
+      link={`/ui/organizations/${organization.id}`}
     />
     {!isNil(organization.address) && (
       <Property
