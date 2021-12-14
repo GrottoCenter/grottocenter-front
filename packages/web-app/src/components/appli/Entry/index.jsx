@@ -7,8 +7,9 @@ import Provider, {
   commentsType,
   detailsType,
   EntryContext,
-  riggingsType,
-  descriptionsType
+  descriptionsType,
+  locationsType,
+  riggingsType
 } from './Provider';
 import Layout from '../../common/Layouts/Fixed';
 import FixedContent from '../../common/Layouts/Fixed/FixedContent';
@@ -16,6 +17,7 @@ import CustomIcon from '../../common/CustomIcon';
 import EntryMap from './EntryMap';
 import Properties from './Properties';
 import Descriptions from './Descriptions';
+import Locations from './Locations';
 import Riggings from './Riggings';
 import Comments from './Comments';
 import TmpContent from './WipContent';
@@ -34,6 +36,7 @@ export const Entry = () => {
       entryId,
       details: { name, author, creationDate, lastEditor, editionDate },
       descriptions,
+      locations,
       riggings,
       comments
     }
@@ -62,6 +65,7 @@ export const Entry = () => {
           icon={<CustomIcon type="entry" />}
         />
       }>
+      {!isEmpty(locations) && <Locations locations={locations} />}
       <Descriptions descriptions={descriptions} entryId={entryId} />
       {!isEmpty(riggings) && <Riggings riggings={riggings} />}
       {!isEmpty(comments) && <Comments comments={comments} />}
@@ -83,6 +87,7 @@ HydratedEntry.propTypes = {
   details: detailsType.isRequired,
   comments: commentsType.isRequired,
   descriptions: descriptionsType.isRequired,
+  locations: locationsType.isRequired,
   riggings: riggingsType.isRequired,
   loading: PropTypes.bool,
   entryId: PropTypes.string.isRequired

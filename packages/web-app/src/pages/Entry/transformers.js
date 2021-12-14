@@ -1,8 +1,10 @@
 import { isNil, pathOr } from 'ramda';
 
 export const getAuthor = author => ({
-  name: author?.name || 'Author',
-  fullName: author?.nickname || author?.name || 'Author'
+  fullName: author?.nickname || author?.name || author?.surname || 'Unknown',
+  name: author?.name || 'Unknown',
+  nickname: author?.nickname || 'Unknown',
+  surname: author?.surname || 'Unknown'
 });
 
 // eslint-disable-next-line import/prefer-default-export
@@ -51,7 +53,7 @@ export const getDescriptions = descriptions =>
       ? new Date(description?.dateInscription)
       : '',
     id: description?.id,
-    language: description?.id,
+    language: description?.language?.id,
     title: description?.title
   }));
 
@@ -64,3 +66,18 @@ export const getRiggings = riggings =>
     title: rigging?.title || '',
     date: rigging?.dateInscription ? new Date(rigging.dateInscription) : ''
   }));
+
+export const getLocations = locations =>
+  locations
+    .map(location => ({
+      author: getAuthor(location?.author),
+      body: location?.body,
+      creationDate: location?.dateInscription
+        ? new Date(location?.dateInscription)
+        : '',
+      id: location?.id,
+      language: location?.langauge?.id,
+      title: location?.title,
+      relevance: location?.relevance
+    }))
+    .sort((l1, l2) => l1.relevance > l2.relevance);
