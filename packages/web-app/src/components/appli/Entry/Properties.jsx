@@ -76,8 +76,9 @@ const Properties = () => {
         {massif && (
           <Property
             label={formatMessage({ id: 'Massif' })}
-            value={massif}
+            value={massif.name}
             icon={<Terrain fontSize="large" color="primary" />}
+            url={`/ui/massifs/${massif.id}`}
           />
         )}
       </Box>
