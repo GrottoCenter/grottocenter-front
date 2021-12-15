@@ -6,10 +6,10 @@ import {
   CalendarToday,
   Category,
   GpsFixed,
+  Height,
   Public,
   Terrain,
   Title,
-  TrendingUp,
   Waves
 } from '@material-ui/icons';
 import CustomIcon from '../../common/CustomIcon';
@@ -17,10 +17,14 @@ import { Property } from '../../common/Properties';
 import { EntryContext, isValidCoordinates } from './Provider';
 import Ratings from './Ratings';
 
-const Wrapper = styled.div`
+const GlobalWrapper = styled.div`
   display: flex;
   flex-direction: column;
   gap: ${({ theme }) => theme.spacing(2)}px;
+`;
+
+const SmallRatingsWrapper = styled.div`
+  transform: scale(0.85);
 `;
 
 const Properties = () => {
@@ -47,13 +51,12 @@ const Properties = () => {
   const { formatMessage } = useIntl();
   const makeCoordinatesValue = coordinatesValue =>
     `${formatMessage({
-      id: 'Latitude'
-    })}: ${coordinatesValue[0].toFixed(4)} - ${formatMessage({
-      id: 'Longitude'
-    })}: ${coordinatesValue[1].toFixed(4)}`;
+      id: 'Lat.'
+    })} / ${formatMessage({ id: 'Long.' })} - 
+    ${coordinatesValue[0].toFixed(4)} ${coordinatesValue[1].toFixed(4)}`;
 
   return (
-    <Wrapper>
+    <GlobalWrapper>
       <Box display="flex" flexDirection="column">
         {isValidCoordinates(coordinates) && (
           <Property
@@ -68,39 +71,59 @@ const Properties = () => {
           label={formatMessage({ id: 'Localisation' })}
           value={localisation}
           icon={<Public fontSize="large" color="primary" />}
+          secondary
         />
-        <Property
-          loading={loading}
-          label={formatMessage({ id: 'Depth' })}
-          value={`${depth} m`}
-          icon={<CustomIcon type="depth" />}
-        />
-        <Property
-          loading={loading}
-          label={formatMessage({ id: 'Development' })}
-          value={`${development} m`}
-          icon={<CustomIcon type="length" />}
-        />
-        <Property
-          loading={loading}
-          label={formatMessage({ id: 'Temperature' })}
-          value={`${temperature} °C`}
-          icon={<Title fontSize="large" color="primary" />}
-          // TODO: The Thermostat icon is only available in MUI v5
-          // icon={<Thermostat fontSize="large" color="primary"/>}
-        />
+        {mountain && (
+          <Property
+            label={formatMessage({ id: 'Massif' })}
+            value={mountain}
+            icon={<Terrain fontSize="large" color="primary" />}
+          />
+        )}
       </Box>
       <Box
         display="flex"
         flexDirection="row"
         flexWrap="wrap"
         justifyContent="space-evenly">
+        {depth && (
+          <Property
+            loading={loading}
+            label={formatMessage({ id: 'Depth' })}
+            value={`${depth} m`}
+            icon={<CustomIcon type="depth" />}
+          />
+        )}
+        {altitude && (
+          <Property
+            label={formatMessage({ id: 'Altitude' })}
+            value={`${altitude} m`}
+            icon={<Height color="primary" />}
+          />
+        )}
+        {development && (
+          <Property
+            loading={loading}
+            label={formatMessage({ id: 'Development' })}
+            value={`${development} m`}
+            icon={<CustomIcon type="length" />}
+          />
+        )}
+        {temperature && (
+          <Property
+            loading={loading}
+            label={formatMessage({ id: 'Temperature' })}
+            value={`${temperature} °C`}
+            icon={<Title fontSize="large" color="primary" />}
+            // TODO: The Thermostat icon is only available in MUI v5
+            // icon={<Thermostat fontSize="large" color="primary"/>}
+          />
+        )}
         {discoveryYear && (
           <Property
             label={formatMessage({ id: 'Year of discovery' })}
             value={discoveryYear}
             icon={<CalendarToday color="primary" />}
-            secondary
           />
         )}
         {undergroundType && (
@@ -108,42 +131,25 @@ const Properties = () => {
             label={formatMessage({ id: 'Underground type' })}
             value={undergroundType}
             icon={<Category color="primary" />}
-            secondary
-          />
-        )}
-        {mountain && (
-          <Property
-            label={formatMessage({ id: 'Mountain range' })}
-            value={mountain}
-            icon={<Terrain color="primary" />}
-            secondary
-          />
-        )}
-        {altitude && (
-          <Property
-            label={formatMessage({ id: 'Altitude' })}
-            value={`${altitude} m`}
-            icon={<TrendingUp color="primary" />}
-            secondary
           />
         )}
         {isDivingCave && (
           <Property
-            label={formatMessage({ id: 'Diving cave' })}
             value={formatMessage({
-              id: isDivingCave ? 'Diving cave' : 'Not diving'
+              id: 'Diving cave'
             })}
             icon={<Waves color="primary" />}
-            secondary
           />
         )}
       </Box>
-      <Ratings
-        accessRate={accessRate}
-        interestRate={interestRate}
-        progressionRate={progressionRate}
-      />
-    </Wrapper>
+      <SmallRatingsWrapper>
+        <Ratings
+          accessRate={accessRate}
+          interestRate={interestRate}
+          progressionRate={progressionRate}
+        />
+      </SmallRatingsWrapper>
+    </GlobalWrapper>
   );
 };
 
