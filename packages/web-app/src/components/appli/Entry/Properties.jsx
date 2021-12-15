@@ -40,7 +40,7 @@ const Properties = () => {
         interestRate,
         isDivingCave,
         localisation,
-        mountain,
+        massif,
         progressionRate,
         temperature,
         undergroundType
@@ -73,10 +73,10 @@ const Properties = () => {
           icon={<Public fontSize="large" color="primary" />}
           secondary
         />
-        {mountain && (
+        {massif && (
           <Property
             label={formatMessage({ id: 'Massif' })}
-            value={mountain}
+            value={massif}
             icon={<Terrain fontSize="large" color="primary" />}
           />
         )}

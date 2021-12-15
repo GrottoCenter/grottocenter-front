@@ -98,7 +98,7 @@ export const detailsType = PropTypes.shape({
   isDivingCave: PropTypes.bool,
   lastEditor: PropTypes.string,
   localisation: PropTypes.string,
-  mountain: PropTypes.string,
+  massif: PropTypes.string,
   name: PropTypes.string,
   progressionRate: PropTypes.number,
   temperature: PropTypes.number,

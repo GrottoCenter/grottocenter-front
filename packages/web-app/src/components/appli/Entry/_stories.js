@@ -32,7 +32,7 @@ const details = {
   undergroundType: 'Karstic (all carbonate rocks)',
   discoveryYear: 1925,
   coordinates: [43.35266, 5.81689],
-  mountain: 'Sainte-Baume (massif de la)',
+  massif: 'Sainte-Baume (massif de la)',
   altitude: 748,
   isDivingCave: true,
   temperature: 12
