@@ -37,7 +37,7 @@ export const getDetails = data => ({
   interestRate: pathOr(0, ['stats', 'aestheticism'], data) / 2,
   isDivingCave: pathOr(null, ['cave', 'isDiving'], data),
   localisation: `${data.city}, ${data.region}, ${data.country}`,
-  massif: pathOr(null, ['massif', 'name'], data),
+  massif: data.massif,
   name: data.name,
   progressionRate: pathOr(0, ['stats', 'caving'], data) / 2,
   temperature: pathOr(null, ['cave', 'temperature'], data),

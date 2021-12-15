@@ -5,6 +5,8 @@ import React from 'react';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
 
+import GCLink from '../GCLink';
+
 export const StyledTypography = styled(Typography)`
   margin-left: ${({ theme, variant }) =>
     variant === 'caption' && theme.spacing(2)}px;
@@ -28,12 +30,35 @@ const IconWrapper = styled(Box)`
   margin-right: ${({ theme }) => theme.spacing(1)}px;
 `;
 
+const ValueComponent = ({ secondary, value, url }) => {
+  const valueText = (
+    <StyledTypography variant={secondary ? 'body2' : 'body1'}>
+      {value || ''}
+    </StyledTypography>
+  );
+  if (url) {
+    return (
+      <GCLink internal href={url}>
+        {valueText}
+      </GCLink>
+    );
+  }
+  return valueText;
+};
+
+ValueComponent.propTypes = {
+  secondary: PropTypes.bool,
+  url: PropTypes.string,
+  value: PropTypes.oneOfType([PropTypes.number, PropTypes.string])
+};
+
 const Property = ({
   loading = false,
   label,
   value,
   icon,
-  secondary = false
+  secondary = false,
+  url
 }) => (
   <PropertyWrapper>
     {!isNil(icon) && <IconWrapper display="flex">{icon}</IconWrapper>}
@@ -42,9 +67,7 @@ const Property = ({
     ) : (
       <Box display="flex" flexDirection="column">
         <Title variant="caption">{label}</Title>
-        <StyledTypography variant={secondary ? 'body2' : 'body1'}>
-          {value || ''}
-        </StyledTypography>
+        <ValueComponent secondary={secondary} url={url} value={value} />
       </Box>
     )}
   </PropertyWrapper>
@@ -56,6 +79,7 @@ Property.propTypes = {
   loading: PropTypes.bool,
   label: PropTypes.string,
   secondary: PropTypes.bool,
+  url: PropTypes.string,
   value: PropTypes.oneOfType([PropTypes.number, PropTypes.string])
 };
 
