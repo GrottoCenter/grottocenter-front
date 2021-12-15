@@ -95,19 +95,19 @@ const Properties = () => {
             icon={<CustomIcon type="depth" />}
           />
         )}
-        {altitude && (
-          <Property
-            label={formatMessage({ id: 'Altitude' })}
-            value={`${altitude} m`}
-            icon={<Height color="primary" />}
-          />
-        )}
         {development && (
           <Property
             loading={loading}
             label={formatMessage({ id: 'Development' })}
             value={`${development} m`}
             icon={<CustomIcon type="length" />}
+          />
+        )}
+        {altitude && (
+          <Property
+            label={formatMessage({ id: 'Altitude' })}
+            value={`${altitude} m`}
+            icon={<Height color="primary" />}
           />
         )}
         {temperature && (
@@ -140,6 +140,7 @@ const Properties = () => {
               id: 'Diving cave'
             })}
             icon={<Waves color="primary" />}
+            secondary
           />
         )}
       </Box>
