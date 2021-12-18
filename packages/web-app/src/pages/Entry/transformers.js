@@ -1,4 +1,9 @@
 import { isNil, pathOr } from 'ramda';
+import {
+  makeDetails,
+  makeEntities,
+  makeOverview
+} from '../DocumentDetails/transformers';
 
 export const getAuthor = author => ({
   fullName: author?.nickname || author?.name || author?.surname || 'Unknown',
@@ -54,6 +59,14 @@ export const getDescriptions = descriptions =>
     id: description?.id,
     language: description?.language?.id,
     title: description?.title
+  }));
+
+export const getDocuments = documents =>
+  documents.map(document => ({
+    details: makeDetails(document),
+    entities: makeEntities(document),
+    id: document?.id,
+    overview: makeOverview(document)
   }));
 
 export const getRiggings = riggings =>
