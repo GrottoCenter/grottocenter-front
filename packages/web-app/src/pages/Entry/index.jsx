@@ -8,6 +8,7 @@ import {
   getComments,
   getDetails,
   getDescriptions,
+  getDocuments,
   getLocations,
   getRiggings
 } from './transformers';
@@ -22,11 +23,12 @@ const EntryPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
-  const details = getDetails(data);
   const comments = getComments(pathOr([], ['comments'], data));
   const descriptions = getDescriptions(pathOr([], ['descriptions'], data));
-  const riggings = getRiggings(pathOr([], ['riggings'], data));
+  const details = getDetails(data);
+  const documents = getDocuments(pathOr([], ['documents'], data));
   const locations = getLocations(pathOr([], ['locations'], data));
+  const riggings = getRiggings(pathOr([], ['riggings'], data));
 
   return (
     <Entry
@@ -34,6 +36,7 @@ const EntryPage = () => {
       details={details}
       comments={comments}
       descriptions={descriptions}
+      documents={documents}
       locations={locations}
       riggings={riggings}
       entryId={id}
