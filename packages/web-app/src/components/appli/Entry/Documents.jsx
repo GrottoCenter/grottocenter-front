@@ -59,7 +59,10 @@ const Document = ({ details, entities, id, overview }) => {
         secondary={
           <>
             <Typography component="span" variant="caption" color="textPrimary">
-              {`${formatMessage({ id: 'Type' })}: ${details.documentType ||
+              {`${formatMessage({ id: 'Type' })}: ${(details.documentType &&
+                formatMessage({
+                  id: details.documentType
+                })) ||
                 formatMessage({ id: 'unknown' })}`}
             </Typography>
             <Files
