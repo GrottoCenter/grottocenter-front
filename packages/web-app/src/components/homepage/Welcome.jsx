@@ -57,55 +57,31 @@ const Welcome = ({ theme }) => {
             <Translate>Welcome to Grottocenter!</Translate>
           </WelcomeTitle>
           <WelcomeParagraph>
-            <Translate>Grottocenter 3 is totally evolving!</Translate>
+            <Translate>
+              Welcome to the new version of Grottocenter, the community database
+              dedicated to caving.
+            </Translate>
           </WelcomeParagraph>
           <WelcomeParagraph>
             {formatMessage({
               id:
-                'This newer, faster and more up-to-date version of the site also aims to provide you with new functions. Some are already up and running: a fast and efficient search module, suggestions for document analyzes to people connected to their account, etc.'
+                'All information is freely accessible, creating an account will allow you to contribute: all together we will be able to complete and make more reliable the information on caves, documents, organizations and massifs, linked to the underground environment.'
             })}
           </WelcomeParagraph>
           <WelcomeParagraph>
             {formatMessage({
               id:
-                'Many more features are still in the works and we aim to get Grottocenter 3 fully operational in the coming months.'
+                'The Speleological Abstracts (SA / BBS) has joined Grottocenter to give you access to a very important collection of documents.'
             })}
-            &nbsp;
-            {formatMessage({
-              id: 'In order to be able to do this, we need your help.'
-            })}
-            &nbsp;
-            {formatMessage(
-              {
-                id:
-                  'Therefore, for a few weeks, you will have the opportunity to respond to our <fundRaisingOperationUrl>fund-raising operation</fundRaisingOperationUrl>.',
-                defaultMessage:
-                  'Therefore, for a few weeks, you will have the opportunity to respond to our <fundRaisingOperationUrl>fund-raising operation</fundRaisingOperationUrl>.'
-              },
-              {
-                fundRaisingOperationUrl: text => (
-                  <a href="https://www.kisskissbankbank.com/en/projects/grottocenter-v3">
-                    {text}
-                  </a>
-                )
-              }
-            )}
             &nbsp;
             {formatMessage({
               id:
-                'Every contribution is important and to thank you, we will offer you some nice little rewards.'
+                "You can now contribute to SA / BBS, either directly or by joining your country's contributing team."
             })}
-          </WelcomeParagraph>
-          <WelcomeParagraph>
-            <b>
-              {formatMessage({
-                id: 'PLEASE NOTE:'
-              })}
-            </b>
             &nbsp;
             {formatMessage({
               id:
-                'for a few weeks (during the database switching), you will not be able to add or edit the Grottocenter cave files. This maintenance delay is unfortunately necessary, we apologize for the inconvenience. We will inform you here as soon as the functions for editing cave files are available again.'
+                'Contact us if you have any questions or if you want to participate in the project.'
             })}
           </WelcomeParagraph>
         </GridTwoThirdColumn>
