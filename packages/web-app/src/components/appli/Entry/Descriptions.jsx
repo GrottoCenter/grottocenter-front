@@ -73,7 +73,8 @@ const Descriptions = ({ descriptions, entryId }) => {
             <ListItemText
               secondary={
                 <>
-                  {formatMessage({ id: 'For more details please visit ' })}
+                  {formatMessage({ id: 'For more details please visit' })}
+                  &nbsp;
                   <a
                     href={externalLink}
                     target="_blank"
