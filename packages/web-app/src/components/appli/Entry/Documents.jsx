@@ -1,11 +1,5 @@
 import { useIntl } from 'react-intl';
-import {
-  Divider,
-  List,
-  ListItem,
-  ListItemText,
-  Typography
-} from '@material-ui/core';
+import { Chip, Divider, List, ListItem, ListItemText } from '@material-ui/core';
 import React from 'react';
 import PropTypes from 'prop-types';
 import { isEmpty } from 'ramda';
@@ -30,15 +24,18 @@ const Files = ({ fileNames, fileLinks, licenseName, licenseUrl }) => {
     !isEmpty(fileNames) && (
       <List>
         {fileNames.map((fileName, index) => (
-          <Typography key={`${fileName}`}>
-            <GCLink internal={false} target="_blank" href={fileLinks[index]}>
+          <ListItem key={`${fileName}`} dense>
+            <GCLink
+              internal={false}
+              target="_blank"
+              href={fileLinks[index].href}>
               {fileName}
             </GCLink>
             &nbsp;
             <LicenseLink internal={false} target="_blank" href={licenseUrl}>
               {licenseName}
             </LicenseLink>
-          </Typography>
+          </ListItem>
         ))}
       </List>
     )
@@ -52,25 +49,34 @@ const Document = ({ details, entities, id, overview }) => {
     <ListItem>
       <StyledListItemText
         primary={
-          <GCLink internal={false} target="_blank" href={`/ui/documents/${id}`}>
-            {overview.title}
-          </GCLink>
-        }
-        secondary={
           <>
-            <Typography component="span" variant="caption" color="textPrimary">
-              {`${formatMessage({ id: 'Type' })}: ${(details.documentType &&
-                formatMessage({
-                  id: details.documentType
-                })) ||
-                formatMessage({ id: 'unknown' })}`}
-            </Typography>
-            <Files
-              {...entities.files}
-              licenseName={overview.license.name}
-              licenseUrl={overview.license.url}
+            <GCLink
+              internal={false}
+              target="_blank"
+              href={`/ui/documents/${id}`}>
+              {overview.title}
+            </GCLink>
+            &nbsp;
+            <Chip
+              variant="outlined"
+              size="small"
+              color="primary"
+              label={
+                (details.documentType &&
+                  formatMessage({
+                    id: details.documentType
+                  })) ||
+                formatMessage({ id: 'unknown' })
+              }
             />
           </>
+        }
+        secondary={
+          <Files
+            {...entities.files}
+            licenseName={overview.license.name}
+            licenseUrl={overview.license.url}
+          />
         }
       />
     </ListItem>
