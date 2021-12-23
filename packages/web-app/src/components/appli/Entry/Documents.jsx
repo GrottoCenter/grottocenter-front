@@ -13,6 +13,11 @@ const StyledListItemText = styled(ListItemText)`
   padding-right: ${({ theme }) => theme.spacing(2)}px;
 `;
 
+const StyledChip = styled(Chip)`
+  margin-left: ${({ theme }) => theme.spacing(2)}px;
+  padding: 0 ${({ theme }) => theme.spacing(1)}px;
+`;
+
 const LicenseLink = styled(GCLink)`
   text-decoration: none;
   font-size: small;
@@ -56,8 +61,7 @@ const Document = ({ details, entities, id, overview }) => {
               href={`/ui/documents/${id}`}>
               {overview.title}
             </GCLink>
-            &nbsp;
-            <Chip
+            <StyledChip
               variant="outlined"
               size="small"
               color="primary"
