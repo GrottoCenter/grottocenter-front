@@ -179,10 +179,6 @@ export const getMapEntrancesCoordinatesUrl = `${process.env.REACT_APP_API_URL}/a
 export const getMapGrottosUrl = `${process.env.REACT_APP_API_URL}/api/${apiVersion}/geoloc/grottos`;
 export const getCaversDocumentsUrl = caverId =>
   `${process.env.REACT_APP_API_URL}/api/${apiVersion}/cavers/${caverId}/documents`;
-/**
- * @deprecated
- */
-export const findMapBoundsUrl = `${process.env.REACT_APP_API_URL}/api/${apiVersion}/geoloc/TO_REMOVE`;
 export const findMassifUrl = `${process.env.REACT_APP_API_URL}/api/${apiVersion}/massifs/`;
 export const findOrganizationUrl = `${process.env.REACT_APP_API_URL}/api/${apiVersion}/organizations/`;
 export const advancedsearchUrl = `${process.env.REACT_APP_API_URL}/api/${apiVersion}/advanced-search`;

@@ -75,6 +75,7 @@ const Descriptions = ({ descriptions, entryId }) => {
               secondary={
                 <>
                   {formatMessage({ id: 'For more details please visit ' })}
+                  &nbsp;
                   <GClink
                     internal={false}
                     href={externalLink}
