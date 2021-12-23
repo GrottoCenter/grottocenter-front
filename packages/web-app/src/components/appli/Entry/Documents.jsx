@@ -19,9 +19,17 @@ const StyledChip = styled(Chip)`
 `;
 
 const LicenseLink = styled(GCLink)`
+  padding-left: ${({ theme }) => theme.spacing(1)}px;
   text-decoration: none;
-  font-size: small;
+  font-size: smaller;
   color: inherit;
+`;
+
+const FileListItem = styled(ListItem)`
+  margin: 0;
+  & > * {
+    margin: 0;
+  }
 `;
 
 const Files = ({ fileNames, fileLinks, licenseName, licenseUrl }) => {
@@ -29,18 +37,25 @@ const Files = ({ fileNames, fileLinks, licenseName, licenseUrl }) => {
     !isEmpty(fileNames) && (
       <List>
         {fileNames.map((fileName, index) => (
-          <ListItem key={`${fileName}`} dense>
-            <GCLink
-              internal={false}
-              target="_blank"
-              href={fileLinks[index].href}>
-              {fileName}
-            </GCLink>
-            &nbsp;
-            <LicenseLink internal={false} target="_blank" href={licenseUrl}>
-              {licenseName}
-            </LicenseLink>
-          </ListItem>
+          <FileListItem key={`${fileName}`} dense>
+            <ListItemText
+              primaryTypographyProps={{ display: 'inline' }}
+              primary={
+                <GCLink
+                  internal={false}
+                  target="_blank"
+                  href={fileLinks[index].href}>
+                  {fileName}
+                </GCLink>
+              }
+              secondaryTypographyProps={{ display: 'inline' }}
+              secondary={
+                <LicenseLink internal={false} target="_blank" href={licenseUrl}>
+                  {licenseName}
+                </LicenseLink>
+              }
+            />
+          </FileListItem>
         ))}
       </List>
     )
@@ -75,6 +90,7 @@ const Document = ({ details, entities, id, overview }) => {
             />
           </>
         }
+        secondaryTypographyProps={{ component: 'div' }}
         secondary={
           <Files
             {...entities.files}
@@ -97,12 +113,12 @@ const Documents = ({ documents }) => {
       content={
         <List>
           {documents.map((document, i) => (
-            <div key={document.id}>
-              <Document {...document} />
+            <>
+              <Document key={document.id} {...document} />
               {i < documents.length - 1 && (
                 <Divider variant="middle" component="li" />
               )}
-            </div>
+            </>
           ))}
         </List>
       }
