@@ -88,7 +88,7 @@ const doGet = (url, criteria) => {
 
       const parsedData = pathOr(['documents'], [], JSON.parse(data));
       const successAction =
-        criteria && criteria.documentType === 'AuthorizationToPublish'
+        criteria && criteria.documentType === 'Authorization To Publish'
           ? fetchAuthorizationDocumentsSuccess
           : fetchDocumentsSuccess;
       return dispatch(

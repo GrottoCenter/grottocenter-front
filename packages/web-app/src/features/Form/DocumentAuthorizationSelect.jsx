@@ -28,7 +28,7 @@ const DocumentAuthorizationSelect = ({
   useEffect(() => {
     const criteria = {
       isValidated: true,
-      documentType: 'AuthorizationToPublish'
+      documentType: 'Authorization To Publish'
     };
     dispatch(getDocuments(criteria));
     // eslint-disable-next-line react-hooks/exhaustive-deps
