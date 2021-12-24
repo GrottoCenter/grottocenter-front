@@ -4,7 +4,7 @@ import {
   DOCUMENT_AUTHORIZE_TO_PUBLISH,
   LICENSE_IN_FILE
 } from '../../../../../hooks/useDocumentOptions';
-import { DocumentTypes } from '../DocumentTypesHelper';
+import DocumentTypes from '../../../../../conf/DocumentTypes';
 
 const isStep1Valid = (stepData, documentType) => {
   if (isNil(stepData)) {

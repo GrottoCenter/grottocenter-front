@@ -11,7 +11,7 @@ import {
 } from '@material-ui/core';
 
 import Translate from '../../../../common/Translate';
-import { isUnknown } from '../DocumentTypesHelper';
+import useDocumentTypes from '../../../../../hooks/useDocumentTypes';
 import { DocumentFormContext } from '../Provider';
 
 const FIRST_DOCUMENT_TYPES_TO_DISPLAY = ['Article', 'Collection', 'Issue'];
@@ -25,6 +25,7 @@ const DocumentTypeSelect = ({
     docAttributes: { documentType },
     updateAttribute
   } = useContext(DocumentFormContext);
+  const { isUnknown } = useDocumentTypes();
   const { formatMessage } = useIntl();
   const handleChange = (event, child) => {
     const newDocType = {
