@@ -14,14 +14,7 @@ import PublicationDatePicker from '../formElements/PublicationDatePicker';
 import TitleEditor from '../formElements/TitleEditor';
 
 import DocumentLanguageSelect from '../../../../../features/DocumentLanguageSelect';
-
-import {
-  isCollection,
-  isImage,
-  isIssue,
-  isOther,
-  isUnknown
-} from '../DocumentTypesHelper';
+import useDocumentTypes from '../../../../../hooks/useDocumentTypes';
 
 const FlexWrapper = styled.div`
   display: flex;
@@ -57,6 +50,13 @@ const Step1 = ({ stepId }) => {
   const { isLoading, documentTypes: allDocumentTypes, error } = useSelector(
     state => state.documentType
   );
+  const {
+    isCollection,
+    isImage,
+    isIssue,
+    isOther,
+    isUnknown
+  } = useDocumentTypes();
 
   useEffect(() => {
     dispatch(loadDocumentTypes());

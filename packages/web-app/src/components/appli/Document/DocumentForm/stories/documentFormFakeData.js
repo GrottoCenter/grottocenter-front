@@ -1,4 +1,4 @@
-import { DocumentTypes } from '../DocumentTypesHelper';
+import DocumentTypes from '../../../../../conf/DocumentTypes';
 
 export const allAuthors = [
   {

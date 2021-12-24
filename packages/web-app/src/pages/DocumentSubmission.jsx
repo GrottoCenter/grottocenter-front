@@ -7,7 +7,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
 
 import { usePermissions } from '../hooks';
-import { isArticle } from '../components/appli/Document/DocumentForm/DocumentTypesHelper';
+import useDocumentTypes from '../hooks/useDocumentTypes';
 import {
   postDocument,
   resetApiMessages,
@@ -41,6 +41,7 @@ const DocumentSubmission = () => {
   const dispatch = useDispatch();
   const permissions = usePermissions();
   const { formatMessage } = useIntl();
+  const { isArticle } = useDocumentTypes();
   const {
     docAttributes: {
       documentMainLanguage,

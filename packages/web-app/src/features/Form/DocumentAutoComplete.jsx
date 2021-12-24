@@ -12,8 +12,7 @@ import {
 
 import { entityOptionForSelector } from '../../helpers/Entity';
 
-import { isCollection } from '../../components/appli/Document/DocumentForm/DocumentTypesHelper';
-
+import useDocumentTypes from '../../hooks/useDocumentTypes';
 import SearchBar from '../../components/appli/Document/DocumentForm/formElements/SearchBar';
 import FormAutoComplete from './FormAutoComplete';
 
@@ -44,8 +43,8 @@ const DocumentAutoComplete = ({
   const { error, isLoading, results: suggestions } = useSelector(
     state => state.quicksearch
   );
-
   const { formatMessage } = useIntl();
+  const { isCollection } = useDocumentTypes();
 
   /**
    * Recursive function to build the complete name of a "part" element

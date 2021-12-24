@@ -14,13 +14,7 @@ import MultipleBBSRegionsSelect from '../../../../../features/Form/MultipleBBSRe
 import MultipleCaversSelect from '../../../../../features/Form/MultipleCaversSelect';
 import MultipleSubjectsSelect from '../../../../../features/Form/MultipleSubjectsSelect';
 import OrganizationAutoComplete from '../../../../../features/Form/OrganizationAutoComplete';
-
-import {
-  isIssue,
-  isArticle,
-  isCollection,
-  isOther
-} from '../DocumentTypesHelper';
+import useDocumentTypes from '../../../../../hooks/useDocumentTypes';
 
 const FlexWrapper = styled.div`
   display: flex;
@@ -38,7 +32,7 @@ const Step2 = ({ stepId }) => {
     docAttributes: { documentType },
     validatedSteps
   } = useContext(DocumentFormContext);
-
+  const { isArticle, isCollection, isIssue, isOther } = useDocumentTypes();
   /*
     The user must not search all the documents everytime:
       - if he creates an article, he's searching for an issue

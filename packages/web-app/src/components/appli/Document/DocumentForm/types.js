@@ -1,7 +1,6 @@
 import PropTypes from 'prop-types';
 import { values } from 'ramda';
-
-import { DocumentTypes } from './DocumentTypesHelper';
+import DocumentTypes from '../../../../conf/DocumentTypes';
 
 // eslint-disable-next-line import/prefer-default-export
 export const DocumentFormTypes = {

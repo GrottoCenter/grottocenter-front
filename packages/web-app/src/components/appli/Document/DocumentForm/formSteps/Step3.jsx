@@ -11,7 +11,7 @@ import DocIdentifierEditor from '../../../../../features/DocIdentifierEditor';
 import StringInput from '../../../../common/Form/StringInput';
 import IssueEditor from '../formElements/IssueEditor';
 import { DocumentFormContext } from '../Provider';
-import { isArticle, isIssue } from '../DocumentTypesHelper';
+import useDocumentTypes from '../../../../../hooks/useDocumentTypes';
 
 const FlexWrapper = styled.div`
   display: flex;
@@ -25,12 +25,12 @@ const FlexItemWrapper = styled.div`
 
 const Step3 = ({ stepId }) => {
   const { formatMessage } = useIntl();
-
   const {
     docAttributes: { authorComment, documentType },
     validatedSteps,
     updateAttribute
   } = useContext(DocumentFormContext);
+  const { isArticle, isIssue } = useDocumentTypes();
 
   const memoizedValues = [
     authorComment,
