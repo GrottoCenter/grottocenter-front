@@ -52,8 +52,10 @@ const Properties = () => {
   const makeCoordinatesValue = coordinatesValue =>
     `${formatMessage({
       id: 'Lat.'
-    })} / ${formatMessage({ id: 'Long.' })} - 
-    ${coordinatesValue[0].toFixed(4)} ${coordinatesValue[1].toFixed(4)}`;
+    })} / ${formatMessage({ id: 'Long.' })} = 
+    ${coordinatesValue[0].toFixed(4)} °N / ${coordinatesValue[1].toFixed(
+      4
+    )} °E`;
 
   return (
     <GlobalWrapper>
@@ -61,7 +63,7 @@ const Properties = () => {
         {isValidCoordinates(coordinates) && (
           <Property
             loading={loading}
-            label={formatMessage({ id: 'Coordinates' })}
+            label={`${formatMessage({ id: 'Coordinates' })} (WGS84)`}
             value={makeCoordinatesValue(coordinates)}
             icon={<GpsFixed fontSize="large" color="primary" />}
           />
