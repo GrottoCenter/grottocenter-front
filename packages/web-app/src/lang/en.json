@@ -99,7 +99,7 @@
 	"Abchazia": "Abkhazia",
 	"abstract": "abstract",
 	"Abstract": "Abstract",
-	"Accepted file formats": "Accepted file formats",
+	"Accepted file formats: {extensions}": "Accepted file formats: {extensions}",
 	"Access": "Access",
 	"Açores": "Azores",
 	"Add": "Add",

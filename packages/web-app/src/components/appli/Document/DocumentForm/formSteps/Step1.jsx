@@ -1,9 +1,12 @@
-import React, { useContext, useMemo } from 'react';
+import React, { useContext, useEffect, useMemo } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { Fade } from '@material-ui/core';
+import { Skeleton } from '@material-ui/lab';
 import { includes } from 'ramda';
 
+import { loadDocumentTypes } from '../../../../../actions/DocumentType';
 import { DocumentFormContext } from '../Provider';
 import DescriptionEditor from '../formElements/DescriptionEditor';
 import DocumentTypeSelect from '../formElements/DocumentTypeSelect';
@@ -13,7 +16,6 @@ import TitleEditor from '../formElements/TitleEditor';
 import DocumentLanguageSelect from '../../../../../features/DocumentLanguageSelect';
 
 import {
-  allDocumentTypes,
   isCollection,
   isImage,
   isIssue,
@@ -51,75 +53,93 @@ const Step1 = ({ stepId }) => {
     docAttributes: { documentType },
     validatedSteps
   } = useContext(DocumentFormContext);
+  const dispatch = useDispatch();
+  const { isLoading, documentTypes: allDocumentTypes, error } = useSelector(
+    state => state.documentType
+  );
+
+  useEffect(() => {
+    dispatch(loadDocumentTypes());
+  }, [dispatch]);
 
   /**
    * Performance improvement to avoid useless re-rendering
    * Step1 needs to re-render only if :
    * - it becomes valid
    * - the DocumentType changes
+   * - all the document types are loaded
    */
-  const memoizedValues = [documentType, includes(stepId, validatedSteps)];
+  const memoizedValues = [
+    allDocumentTypes,
+    documentType,
+    isLoading,
+    includes(stepId, validatedSteps)
+  ];
+
   return useMemo(
-    () => (
-      <>
-        <FlexWrapper>
-          <FlexItemWrapper>
-            <DocumentTypeSelect
-              allDocumentTypes={allDocumentTypes}
-              helperText="Choose from the types of documents available."
-              required
-            />
-          </FlexItemWrapper>
-          <Fade in={!isUnknown(documentType) && !isImage(documentType)}>
+    () =>
+      isLoading || error ? (
+        <Skeleton variant="rect" height={200} />
+      ) : (
+        <>
+          <FlexWrapper>
             <FlexItemWrapper>
-              {!isUnknown(documentType) && !isImage(documentType) && (
-                <DocumentLanguageSelect
-                  helperText="Language used in the document."
-                  labelText="Document main language"
-                  contextValueName="documentMainLanguage"
-                  required={!isOther(documentType)}
-                />
-              )}
+              <DocumentTypeSelect
+                allDocumentTypes={allDocumentTypes}
+                helperText="Choose from the types of documents available."
+                required
+              />
             </FlexItemWrapper>
+            <Fade in={!isUnknown(documentType) && !isImage(documentType)}>
+              <FlexItemWrapper>
+                {!isUnknown(documentType) && !isImage(documentType) && (
+                  <DocumentLanguageSelect
+                    helperText="Language used in the document."
+                    labelText="Document main language"
+                    contextValueName="documentMainLanguage"
+                    required={!isOther(documentType)}
+                  />
+                )}
+              </FlexItemWrapper>
+            </Fade>
+          </FlexWrapper>
+
+          <Fade in={!isUnknown(documentType)}>
+            <div>
+              {!isUnknown(documentType) && (
+                <>
+                  <TitleAndDescriptionLanguageWrapper>
+                    <BigFlexItemWrapper>
+                      <TitleEditor required />
+                    </BigFlexItemWrapper>
+                    <FlexItemWrapper style={{ minWidth: '300px' }}>
+                      <DocumentLanguageSelect
+                        helperText="Language used for the title and the description you are writing."
+                        labelText="Title and description language"
+                        contextValueName="titleAndDescriptionLanguage"
+                        required
+                      />
+                    </FlexItemWrapper>
+                  </TitleAndDescriptionLanguageWrapper>
+
+                  <FlexWrapper>
+                    <FlexItemWrapper>
+                      <DescriptionEditor required />
+                      {!isCollection(documentType) && (
+                        <PublicationDateWrapper>
+                          <PublicationDatePicker
+                            required={isIssue(documentType)}
+                          />
+                        </PublicationDateWrapper>
+                      )}
+                    </FlexItemWrapper>
+                  </FlexWrapper>
+                </>
+              )}
+            </div>
           </Fade>
-        </FlexWrapper>
-
-        <Fade in={!isUnknown(documentType)}>
-          <div>
-            {!isUnknown(documentType) && (
-              <>
-                <TitleAndDescriptionLanguageWrapper>
-                  <BigFlexItemWrapper>
-                    <TitleEditor required />
-                  </BigFlexItemWrapper>
-                  <FlexItemWrapper style={{ minWidth: '300px' }}>
-                    <DocumentLanguageSelect
-                      helperText="Language used for the title and the description you are writing."
-                      labelText="Title and description language"
-                      contextValueName="titleAndDescriptionLanguage"
-                      required
-                    />
-                  </FlexItemWrapper>
-                </TitleAndDescriptionLanguageWrapper>
-
-                <FlexWrapper>
-                  <FlexItemWrapper>
-                    <DescriptionEditor required />
-                    {!isCollection(documentType) && (
-                      <PublicationDateWrapper>
-                        <PublicationDatePicker
-                          required={isIssue(documentType)}
-                        />
-                      </PublicationDateWrapper>
-                    )}
-                  </FlexItemWrapper>
-                </FlexWrapper>
-              </>
-            )}
-          </div>
-        </Fade>
-      </>
-    ),
+        </>
+      ),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     memoizedValues
   );
