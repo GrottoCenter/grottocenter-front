@@ -1,9 +1,17 @@
 import { useIntl } from 'react-intl';
-import { Chip, Divider, List, ListItem, ListItemText } from '@material-ui/core';
+import {
+  Button,
+  Chip,
+  Divider,
+  List,
+  ListItem,
+  ListItemText
+} from '@material-ui/core';
 import React from 'react';
 import PropTypes from 'prop-types';
 import { isEmpty } from 'ramda';
 import styled from 'styled-components';
+import DownloadIcon from '@material-ui/icons/GetApp';
 import ScrollableContent from '../../common/Layouts/Fixed/ScrollableContent';
 import { documentsType, documentType } from './Provider';
 import GCLink from '../../common/GCLink';
@@ -41,12 +49,14 @@ const Files = ({ fileNames, fileLinks, licenseName, licenseUrl }) => {
             <ListItemText
               primaryTypographyProps={{ display: 'inline' }}
               primary={
-                <GCLink
-                  internal={false}
+                <Button
+                  variant="text"
+                  size="small"
                   target="_blank"
+                  startIcon={<DownloadIcon />}
                   href={fileLinks[index].href}>
                   {fileName}
-                </GCLink>
+                </Button>
               }
               secondaryTypographyProps={{ display: 'inline' }}
               secondary={
