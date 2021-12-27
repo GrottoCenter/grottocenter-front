@@ -15,7 +15,6 @@ import ScrollableContent from '../../common/Layouts/Fixed/ScrollableContent';
 import { descriptionsType } from './Provider';
 import { detailPageV2Links } from '../../../conf/Config';
 import { makeFormattedText } from './utils';
-import GClink from '../../common/GCLink';
 
 const Descriptions = ({ descriptions, entryId }) => {
   const { formatMessage, formatDate } = useIntl();
@@ -75,14 +74,12 @@ const Descriptions = ({ descriptions, entryId }) => {
               secondary={
                 <>
                   {formatMessage({ id: 'For more details please visit ' })}
-                  &nbsp;
-                  <GClink
-                    internal={false}
+                  <a
                     href={externalLink}
                     target="_blank"
                     rel="noopener noreferrer">
                     Grottocenter V2
-                  </GClink>
+                  </a>
                 </>
               }
             />
