@@ -19,6 +19,7 @@ export const makeOverview = data => ({
     defaultTo([])
   )(data),
   language: pathOr('unknown', ['mainLanguage', 'refName'], data),
+  license: pathOr('unknown', ['license'], data),
   title: pipe(
     propOr([], 'titles'),
     head,

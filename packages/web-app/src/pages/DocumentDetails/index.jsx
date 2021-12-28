@@ -238,6 +238,10 @@ DocumentPage.propTypes = {
     createdBy: PropTypes.string.isRequired,
     authors: PropTypes.arrayOf(PropTypes.string).isRequired,
     language: PropTypes.string.isRequired,
+    license: PropTypes.shape({
+      name: PropTypes.string.isRequired,
+      url: PropTypes.string.isRequired
+    }),
     title: PropTypes.string.isRequired,
     summary: PropTypes.string.isRequired
   }),
