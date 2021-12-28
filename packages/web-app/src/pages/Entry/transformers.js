@@ -69,6 +69,16 @@ export const getDocuments = documents =>
     overview: makeOverview(document)
   }));
 
+export const getHistories = histories =>
+  histories.map(history => ({
+    author: getAuthor(history?.author),
+    body: history?.body,
+    date: history?.dateInscription ? new Date(history?.dateInscription) : '',
+    id: history?.id,
+    language: history?.language?.id,
+    title: history?.title
+  }));
+
 export const getRiggings = riggings =>
   riggings.map(rigging => ({
     obstacles: isNil(rigging?.obstacles) ? [] : rigging.obstacles,
