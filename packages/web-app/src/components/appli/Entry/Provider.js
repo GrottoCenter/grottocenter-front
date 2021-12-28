@@ -21,6 +21,7 @@ const defaultContext = {
     },
     comments: [],
     descriptions: [],
+    documents: [],
     locations: [],
     position: [51.505, -0.09],
     riggings: []
@@ -36,6 +37,7 @@ const Entry = ({
   details,
   comments,
   descriptions,
+  documents,
   locations,
   riggings,
   entryId,
@@ -69,6 +71,7 @@ const Entry = ({
           details: detailsState,
           comments,
           descriptions,
+          documents,
           locations,
           riggings,
           position: pathOr(null, ['coordinates'], details)
@@ -117,19 +120,7 @@ export const commentType = PropTypes.shape({
   title: PropTypes.string
 });
 
-export const commentsType = PropTypes.arrayOf(
-  PropTypes.shape({
-    accessRate: PropTypes.number,
-    author: authorType,
-    body: PropTypes.string,
-    date: PropTypes.string,
-    id: PropTypes.number,
-    interestRate: PropTypes.number,
-    language: PropTypes.string,
-    progressionRate: PropTypes.number,
-    title: PropTypes.string
-  })
-);
+export const commentsType = PropTypes.arrayOf(commentType);
 
 export const descriptionsType = PropTypes.arrayOf(
   PropTypes.shape({
@@ -141,6 +132,28 @@ export const descriptionsType = PropTypes.arrayOf(
     title: PropTypes.string.isRequired
   })
 );
+
+export const documentType = PropTypes.shape({
+  details: PropTypes.shape({
+    documentType: PropTypes.string
+  }),
+  entities: PropTypes.shape({
+    files: PropTypes.shape({
+      fileNames: PropTypes.arrayOf(PropTypes.string),
+      fileLinks: PropTypes.arrayOf(PropTypes.string)
+    })
+  }),
+  id: PropTypes.number,
+  overview: PropTypes.shape({
+    license: PropTypes.shape({
+      name: PropTypes.string.isRequired,
+      url: PropTypes.string.isRequired
+    }),
+    title: PropTypes.string.isRequired
+  })
+});
+
+export const documentsType = PropTypes.arrayOf(documentType);
 
 const locationType = PropTypes.shape({
   author: authorType,
@@ -171,12 +184,11 @@ export const riggingType = PropTypes.shape({
 
 export const riggingsType = PropTypes.arrayOf(riggingType);
 
-export const positionType = PropTypes.arrayOf(PropTypes.number);
-
 Entry.propTypes = {
   children: PropTypes.node.isRequired,
   comments: commentsType.isRequired,
   descriptions: descriptionsType.isRequired,
+  documents: documentsType.isRequired,
   details: detailsType.isRequired,
   loading: PropTypes.bool,
   locations: locationsType.isRequired,
