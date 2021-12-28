@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { pathOr, isNil } from 'ramda';
+import { propOr, isNil } from 'ramda';
 import { useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import Entry from '../../components/appli/Entry';
@@ -23,12 +23,12 @@ const EntryPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
-  const comments = getComments(pathOr([], ['comments'], data));
-  const descriptions = getDescriptions(pathOr([], ['descriptions'], data));
+  const comments = getComments(propOr([], 'comments', data));
+  const descriptions = getDescriptions(propOr([], 'descriptions', data));
   const details = getDetails(data);
-  const documents = getDocuments(pathOr([], ['documents'], data));
-  const locations = getLocations(pathOr([], ['locations'], data));
-  const riggings = getRiggings(pathOr([], ['riggings'], data));
+  const documents = getDocuments(propOr([], 'documents', data));
+  const locations = getLocations(propOr([], 'locations', data));
+  const riggings = getRiggings(propOr([], 'riggings', data));
 
   return (
     <Entry
