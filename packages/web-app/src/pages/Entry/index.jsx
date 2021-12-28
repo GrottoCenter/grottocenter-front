@@ -9,6 +9,7 @@ import {
   getDetails,
   getDescriptions,
   getDocuments,
+  getHistories,
   getLocations,
   getRiggings
 } from './transformers';
@@ -27,6 +28,7 @@ const EntryPage = () => {
   const descriptions = getDescriptions(propOr([], 'descriptions', data));
   const details = getDetails(data);
   const documents = getDocuments(propOr([], 'documents', data));
+  const histories = getHistories(propOr([], 'histories', data));
   const locations = getLocations(propOr([], 'locations', data));
   const riggings = getRiggings(propOr([], 'riggings', data));
 
@@ -37,6 +39,7 @@ const EntryPage = () => {
       comments={comments}
       descriptions={descriptions}
       documents={documents}
+      histories={histories}
       locations={locations}
       riggings={riggings}
       entryId={id}

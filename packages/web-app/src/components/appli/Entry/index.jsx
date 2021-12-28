@@ -9,6 +9,7 @@ import Provider, {
   EntryContext,
   descriptionsType,
   documentsType,
+  historiesType,
   locationsType,
   riggingsType
 } from './Provider';
@@ -22,7 +23,7 @@ import Locations from './Locations';
 import Riggings from './Riggings';
 import Comments from './Comments';
 import Documents from './Documents';
-import TmpContent from './WipContent';
+import Histories from './Histories';
 
 const EntryProperties = () => (
   <>
@@ -39,6 +40,7 @@ export const Entry = () => {
       details: { name, author, creationDate, lastEditor, editionDate },
       descriptions,
       documents,
+      histories,
       locations,
       riggings,
       comments
@@ -72,7 +74,7 @@ export const Entry = () => {
       <Descriptions descriptions={descriptions} entryId={entryId} />
       {!isEmpty(riggings) && <Riggings riggings={riggings} />}
       {!isEmpty(documents) && <Documents documents={documents} />}
-      <TmpContent title="History" />
+      {!isEmpty(histories) && <Histories histories={histories} />}
       {!isEmpty(comments) && <Comments comments={comments} />}
     </Layout>
   );
@@ -91,6 +93,7 @@ HydratedEntry.propTypes = {
   comments: commentsType.isRequired,
   descriptions: descriptionsType.isRequired,
   documents: documentsType.isRequired,
+  histories: historiesType.isRequired,
   locations: locationsType.isRequired,
   riggings: riggingsType.isRequired,
   loading: PropTypes.bool,

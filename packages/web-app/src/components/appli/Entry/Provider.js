@@ -22,6 +22,7 @@ const defaultContext = {
     comments: [],
     descriptions: [],
     documents: [],
+    histories: [],
     locations: [],
     position: [51.505, -0.09],
     riggings: []
@@ -38,6 +39,7 @@ const Entry = ({
   comments,
   descriptions,
   documents,
+  histories,
   locations,
   riggings,
   entryId,
@@ -72,6 +74,7 @@ const Entry = ({
           comments,
           descriptions,
           documents,
+          histories,
           locations,
           riggings,
           position: pathOr(null, ['coordinates'], details)
@@ -91,11 +94,11 @@ export const detailsType = PropTypes.shape({
   altitude: PropTypes.number,
   author: authorType,
   coordinates: PropTypes.arrayOf(PropTypes.number),
-  creationDate: PropTypes.string,
+  creationDate: PropTypes.instanceOf(Date),
   depth: PropTypes.number,
   development: PropTypes.number,
   discoveryYear: PropTypes.number,
-  editionDate: PropTypes.string,
+  editionDate: PropTypes.instanceOf(Date),
   id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
   interestRate: PropTypes.number,
   isDivingCave: PropTypes.bool,
@@ -112,7 +115,7 @@ export const commentType = PropTypes.shape({
   accessRate: PropTypes.number,
   author: authorType,
   body: PropTypes.string,
-  date: PropTypes.string,
+  date: PropTypes.instanceOf(Date),
   id: PropTypes.number,
   interestRate: PropTypes.number,
   language: PropTypes.string,
@@ -126,7 +129,7 @@ export const descriptionsType = PropTypes.arrayOf(
   PropTypes.shape({
     author: authorType,
     body: PropTypes.string,
-    date: PropTypes.string,
+    date: PropTypes.instanceOf(Date),
     id: PropTypes.number,
     language: PropTypes.string.isRequired,
     title: PropTypes.string.isRequired
@@ -155,14 +158,24 @@ export const documentType = PropTypes.shape({
 
 export const documentsType = PropTypes.arrayOf(documentType);
 
+export const historyType = PropTypes.shape({
+  author: authorType.isRequired,
+  body: PropTypes.string.isRequired,
+  date: PropTypes.instanceOf(Date).isRequired,
+  id: PropTypes.number.isRequired,
+  title: PropTypes.string
+});
+
+export const historiesType = PropTypes.arrayOf(historyType);
+
 const locationType = PropTypes.shape({
   author: authorType,
   body: PropTypes.string,
-  creationDate: PropTypes.string,
+  creationDate: PropTypes.instanceOf(Date),
   id: PropTypes.number,
   language: PropTypes.string.isRequired,
   relevance: PropTypes.number,
-  title: PropTypes.string.isRequired
+  title: PropTypes.string
 });
 
 export const locationsType = PropTypes.arrayOf(locationType);
@@ -190,6 +203,7 @@ Entry.propTypes = {
   descriptions: descriptionsType.isRequired,
   documents: documentsType.isRequired,
   details: detailsType.isRequired,
+  histories: historiesType.isRequired,
   loading: PropTypes.bool,
   locations: locationsType.isRequired,
   riggings: riggingsType.isRequired,
