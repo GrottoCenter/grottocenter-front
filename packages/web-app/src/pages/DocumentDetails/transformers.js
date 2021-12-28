@@ -11,7 +11,7 @@ import {
 
 export const makeOverview = data => ({
   createdBy: pathOr('', ['author', 'nickname'], data),
-  creationDate: pathOr('', ['dateInscription'], data),
+  creationDate: propOr('', 'dateInscription', data),
   authors: pipe(
     propOr([], 'authors'),
     map(propOr('', 'nickname')),
@@ -19,7 +19,7 @@ export const makeOverview = data => ({
     defaultTo([])
   )(data),
   language: pathOr('unknown', ['mainLanguage', 'refName'], data),
-  license: pathOr('unknown', ['license'], data),
+  license: propOr('unknown', 'license', data),
   title: pipe(
     propOr([], 'titles'),
     head,
@@ -58,31 +58,31 @@ export const makeDetails = data => {
 export const makeEntities = data => {
   return {
     massif: pathOr(
-      pipe(pathOr([], ['massif', 'names']), head, pathOr('', ['name']))(data),
+      pipe(pathOr([], ['massif', 'names']), head, propOr('', 'name'))(data),
       ['massif', 'name'],
       data
     ),
     cave: pathOr(
-      pipe(pathOr([], ['cave', 'names']), head, pathOr('', ['name']))(data),
+      pipe(pathOr([], ['cave', 'names']), head, propOr('', 'name'))(data),
       ['cave', 'name'],
       data
     ),
     entrance: pathOr(
-      pipe(pathOr([], ['entrance', 'names']), head, pathOr('', ['name']))(data),
+      pipe(pathOr([], ['entrance', 'names']), head, propOr('', 'name'))(data),
       ['entrance', 'name'],
       data
     ),
     files: {
-      fileNames: pipe(pathOr([], ['files']), map(propOr('', 'fileName')))(data),
+      fileNames: pipe(propOr([], 'files'), map(propOr('', 'fileName')))(data),
       fileLinks: pipe(
-        pathOr([], ['files']),
+        propOr([], 'files'),
         map(file => ({ href: propOr('', 'completePath', file) }))
       )(data)
     },
     authorizationDocument: pipe(
       pathOr([], ['authorizationDocument', 'titles']),
       head,
-      pathOr('', ['text'])
+      propOr('', 'text')
     )(data)
   };
 };
