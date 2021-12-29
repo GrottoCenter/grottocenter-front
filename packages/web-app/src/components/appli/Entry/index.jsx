@@ -36,7 +36,6 @@ export const Entry = () => {
   const { formatMessage, formatDate } = useIntl();
   const {
     state: {
-      entryId,
       details: { name, author, creationDate, lastEditor, editionDate },
       descriptions,
       documents,
@@ -71,7 +70,7 @@ export const Entry = () => {
         />
       }>
       {!isEmpty(locations) && <Locations locations={locations} />}
-      <Descriptions descriptions={descriptions} entryId={entryId} />
+      {!isEmpty(descriptions) && <Descriptions descriptions={descriptions} />}
       {!isEmpty(riggings) && <Riggings riggings={riggings} />}
       {!isEmpty(documents) && <Documents documents={documents} />}
       {!isEmpty(histories) && <Histories histories={histories} />}
@@ -96,8 +95,7 @@ HydratedEntry.propTypes = {
   histories: historiesType.isRequired,
   locations: locationsType.isRequired,
   riggings: riggingsType.isRequired,
-  loading: PropTypes.bool,
-  entryId: PropTypes.string.isRequired
+  loading: PropTypes.bool
 };
 
 export default HydratedEntry;
