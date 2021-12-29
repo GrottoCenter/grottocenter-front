@@ -1,7 +1,6 @@
 // eslint-disable-next-line react/prop-types
 import { useIntl } from 'react-intl';
 import { isNil } from 'ramda';
-import PropTypes from 'prop-types';
 import {
   Typography,
   Divider,
@@ -10,21 +9,12 @@ import {
   ListItemText
 } from '@material-ui/core';
 import React from 'react';
-import { useSelector } from 'react-redux';
 import ScrollableContent from '../../common/Layouts/Fixed/ScrollableContent';
 import { descriptionsType } from './Provider';
-import { detailPageV2Links } from '../../../conf/Config';
 import { makeFormattedText } from './utils';
 
-const Descriptions = ({ descriptions, entryId }) => {
+const Descriptions = ({ descriptions }) => {
   const { formatMessage, formatDate } = useIntl();
-  const { locale } = useSelector(state => state.intl);
-
-  const externalLink = `${
-    detailPageV2Links[locale] !== undefined
-      ? detailPageV2Links[locale]
-      : detailPageV2Links['*']
-  }&category=entry&id=${entryId}`;
 
   return (
     <ScrollableContent
@@ -69,22 +59,6 @@ const Descriptions = ({ descriptions, entryId }) => {
               <Divider variant="middle" component="li" />
             </div>
           ))}
-          <ListItem>
-            <ListItemText
-              secondary={
-                <>
-                  {formatMessage({ id: 'For more details please visit' })}
-                  &nbsp;
-                  <a
-                    href={externalLink}
-                    target="_blank"
-                    rel="noopener noreferrer">
-                    Grottocenter V2
-                  </a>
-                </>
-              }
-            />
-          </ListItem>
         </List>
       }
     />
@@ -92,8 +66,7 @@ const Descriptions = ({ descriptions, entryId }) => {
 };
 
 Descriptions.propTypes = {
-  descriptions: descriptionsType,
-  entryId: PropTypes.string
+  descriptions: descriptionsType
 };
 
 export default Descriptions;

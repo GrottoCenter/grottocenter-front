@@ -42,7 +42,6 @@ const EntryPage = () => {
       histories={histories}
       locations={locations}
       riggings={riggings}
-      entryId={id}
     />
   );
 };
