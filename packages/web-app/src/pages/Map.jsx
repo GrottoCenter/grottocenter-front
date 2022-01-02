@@ -44,15 +44,16 @@ const Map = () => {
     );
     dispatch(changeLocation(center));
     dispatch(changeZoom(zoom));
+
     const criteria = {
       // eslint-disable-next-line no-underscore-dangle
-      sw_lat: bounds._southWest.lat,
+      sw_lat: bounds._southWest.wrap().lat,
       // eslint-disable-next-line no-underscore-dangle
-      sw_lng: bounds._southWest.lng,
+      sw_lng: bounds._southWest.wrap().lng,
       // eslint-disable-next-line no-underscore-dangle
-      ne_lat: bounds._northEast.lat,
+      ne_lat: bounds._northEast.wrap().lat,
       // eslint-disable-next-line no-underscore-dangle
-      ne_lng: bounds._northEast.lng,
+      ne_lng: bounds._northEast.wrap().lng,
       zoom: newZoom
     };
     if (includes('organizations', markers)) {
