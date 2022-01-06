@@ -1,16 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { isNil } from 'ramda';
-import {
-  Typography,
-  CircularProgress,
-  Card,
-  CardContent,
-  CardHeader
-} from '@material-ui/core';
+import Skeleton from '@material-ui/lab/Skeleton';
 import { useIntl } from 'react-intl';
 
-import CavesList from '../common/cave/CavesList';
+import Layout from '../common/Layouts/Fixed/FixedContent';
+import EntrancesList from '../common/entrance/EntrancesList';
 import Translate from '../common/Translate';
 
 const Massif = ({ isFetching, massif }) => {
@@ -25,29 +20,21 @@ const Massif = ({ isFetching, massif }) => {
   }
 
   return (
-    <>
-      {isFetching ? (
-        <CircularProgress />
-      ) : (
-        <Card>
-          <CardHeader
-            title={
-              <Typography variant="h1" color="secondary">
-                {massif.name}
-              </Typography>
-            }
+    <Layout
+      title={massif?.name || formatMessage({ id: 'Loading massif data...' })}
+      content={
+        isFetching ? (
+          <Skeleton height={200} />
+        ) : (
+          <EntrancesList
+            entrances={massif.entrances}
+            emptyMessageComponent={formatMessage({
+              id: 'This massif has no entrances listed yet.'
+            })}
           />
-          <CardContent>
-            <CavesList
-              caves={massif.caves}
-              emptyMessageComponent={formatMessage({
-                id: 'This massif has no caves listed yet'
-              })}
-            />
-          </CardContent>
-        </Card>
-      )}
-    </>
+        )
+      }
+    />
   );
 };
 
@@ -55,7 +42,7 @@ Massif.propTypes = {
   isFetching: PropTypes.bool.isRequired,
   massif: PropTypes.shape({
     name: PropTypes.string,
-    caves: PropTypes.arrayOf(PropTypes.shape({}))
+    entrances: PropTypes.arrayOf(PropTypes.shape({}))
   })
 };
 Massif.defaultProps = {
