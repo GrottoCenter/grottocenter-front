@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import List from '@material-ui/core/List';
+import { List, Typography } from '@material-ui/core';
 import { withStyles } from '@material-ui/core/styles';
 import Translate from '../Translate';
 import CaveListItem from './CaveListItem';
@@ -18,20 +18,17 @@ const CavesList = props => {
 
   return (
     <div>
+      <Typography>{title}</Typography>
       {caves.length > 0 ? (
-        <>
-          {title}
-          <StyledList>
-            {caves
-              .sort((a, b) => a.name > b.name)
-              .map(cave => (
-                <CaveListItem key={cave.id} cave={cave} />
-              ))}
-          </StyledList>
-        </>
+        <StyledList>
+          {caves
+            .sort((a, b) => a.name.localeCompare(b.name))
+            .map(cave => (
+              <CaveListItem key={cave.id} cave={cave} />
+            ))}
+        </StyledList>
       ) : (
         <>
-          {title}
           <br />
           <em>{emptyMessageComponent}</em>
         </>
