@@ -18,7 +18,7 @@ const EntrancesList = props => {
 
   return (
     <div>
-      <Typography>{title}</Typography>
+      <Typography variant="h3">{title}</Typography>
       {entrances.length > 0 ? (
         <StyledList>
           {entrances

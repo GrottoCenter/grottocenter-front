@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Typography } from '@material-ui/core';
 import { useIntl } from 'react-intl';
 
 import CavesList from '../../common/cave/CavesList';
@@ -20,11 +19,7 @@ const RelatedCaves = ({
     <>
       <EntrancesList
         entrances={exploredEntrances}
-        title={
-          <Typography variant="h3">
-            {formatMessage({ id: 'Explored entrances' })}
-          </Typography>
-        }
+        title={formatMessage({ id: 'Explored entrances' })}
         emptyMessageComponent={
           <Translate>No explored entrances found.</Translate>
         }
@@ -32,11 +27,7 @@ const RelatedCaves = ({
       <br />
       <CavesList
         caves={exploredNetworks}
-        title={
-          <Typography variant="h3">
-            {formatMessage({ id: 'Explored networks' })}
-          </Typography>
-        }
+        title={formatMessage({ id: 'Explored networks' })}
         emptyMessageComponent={
           <Translate>No explored networks found.</Translate>
         }
@@ -45,11 +36,7 @@ const RelatedCaves = ({
       <hr />
       <EntrancesList
         entrances={partneredEntrances}
-        title={
-          <Typography variant="h3">
-            {formatMessage({ id: 'Partnered entrances' })}
-          </Typography>
-        }
+        title={formatMessage({ id: 'Partnered entrances' })}
         emptyMessageComponent={
           <Translate>No partnered entrances found.</Translate>
         }
@@ -57,11 +44,7 @@ const RelatedCaves = ({
       <br />
       <CavesList
         caves={partneredNetworks}
-        title={
-          <Typography variant="h3">
-            {formatMessage({ id: 'Partnered networks' })}
-          </Typography>
-        }
+        title={formatMessage({ id: 'Partnered networks' })}
         emptyMessageComponent={
           <Translate>No partnered networks found.</Translate>
         }

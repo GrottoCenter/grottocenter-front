@@ -33,7 +33,7 @@ const CaveListItem = ({ cave }) => {
         <Box display="flex" flexDirection="row" alignItems="flex-start">
           {cave.depth !== null && (
             <ListItem dense>
-              <ListItemIcon dense>
+              <ListItemIcon>
                 <CaveDepthIcon src="/images/depth.svg" alt="Cave depth icon" />
               </ListItemIcon>
               <ListItemText secondary={`${cave.depth.toLocaleString()}m`} />
@@ -41,7 +41,7 @@ const CaveListItem = ({ cave }) => {
           )}
           {cave.length !== null && (
             <ListItem dense>
-              <ListItemIcon dense>
+              <ListItemIcon>
                 <CaveLengthIcon
                   src="/images/length.svg"
                   alt="Cave length icon"

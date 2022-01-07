@@ -35,7 +35,7 @@ const Details = ({
       <ContentWrapper>
         <StyledLocationIcon color="primary" />
         <Typography>
-          {!isNil(country) && ` - ${country}`}
+          {!isNil(country) && `${country}`}
           {!isNil(region) && ` - ${region}`}
           {!isNil(county) && ` - ${county}`}
           {!isNil(city) && ` - ${city}`}
