@@ -6,7 +6,7 @@ import {
 
 const initialState = {
   organization: undefined,
-  isFetching: false,
+  isLoading: false,
   error: null
 };
 
@@ -15,20 +15,20 @@ const organization = (state = initialState, action) => {
     case FETCH_ORGANIZATION:
       return {
         ...initialState,
-        isFetching: true
+        isLoading: true
       };
     case FETCH_ORGANIZATION_SUCCESS:
       return {
         ...initialState,
         error: null,
-        isFetching: false,
+        isLoading: false,
         organization: action.organization
       };
     case FETCH_ORGANIZATION_FAILURE:
       return {
         ...initialState,
         error: action.error,
-        isFetching: false
+        isLoading: false
       };
     default:
       return state;

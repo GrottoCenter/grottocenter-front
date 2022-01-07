@@ -10,7 +10,7 @@ import { setPageTitle } from '../actions/PageTitle';
 const OrganizationPage = () => {
   const { organizationId } = useParams();
   const dispatch = useDispatch();
-  const { organization, error, isFetching } = useSelector(
+  const { organization, error, isLoading } = useSelector(
     state => state.organization
   );
 
@@ -22,7 +22,7 @@ const OrganizationPage = () => {
 
   return (
     <Organization
-      isFetching={isFetching || !isNil(error)}
+    isLoading={isLoading || !isNil(error)}
       organization={organization}
     />
   );

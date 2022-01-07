@@ -6,41 +6,28 @@ export const FETCH_ORGANIZATION = 'FETCH_ORGANIZATION';
 export const FETCH_ORGANIZATION_SUCCESS = 'FETCH_ORGANIZATION_SUCCESS';
 export const FETCH_ORGANIZATION_FAILURE = 'FETCH_ORGANIZATION_FAILURE';
 
-export const fetchOrganization = () => ({
-  type: FETCH_ORGANIZATION
-});
-
-export const fetchOrganizationSuccess = organization => ({
-  type: FETCH_ORGANIZATION_SUCCESS,
-  organization
-});
-
-export const fetchOrganizationFailure = error => ({
-  type: FETCH_ORGANIZATION_FAILURE,
-  error
-});
-
 export function loadOrganization(organizationId) {
   return dispatch => {
-    dispatch(fetchOrganization());
+    dispatch({ type: FETCH_ORGANIZATION });
 
     return fetch(`${findOrganizationUrl}${organizationId}`)
       .then(response => {
         if (response.status >= 400) {
           throw new Error(response.status);
         }
-        return response.text();
+        return response.json();
       })
-      .then(text => dispatch(fetchOrganizationSuccess(JSON.parse(text))))
+      .then(data =>
+        dispatch({ type: FETCH_ORGANIZATION_SUCCESS, organization: data })
+      )
       .catch(error =>
-        dispatch(
-          fetchOrganizationFailure(
-            makeErrorMessage(
-              error.message,
-              `Fetching organization id ${organizationId}`
-            )
+        dispatch({
+          type: FETCH_ORGANIZATION_FAILURE,
+          error: makeErrorMessage(
+            error.message,
+            `Fetching organization id ${organizationId}`
           )
-        )
+        })
       );
   };
 }
