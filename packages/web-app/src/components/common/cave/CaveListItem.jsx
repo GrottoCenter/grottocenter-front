@@ -1,15 +1,18 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { useSelector } from 'react-redux';
-import { Box, ListItem, ListItemIcon, ListItemText } from '@material-ui/core';
+import {
+  Avatar,
+  Box,
+  ListItem,
+  ListItemText,
+  Typography
+} from '@material-ui/core';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 
-const CaveDepthIcon = styled.img`
-  width: 2.5rem;
-`;
-
-const CaveLengthIcon = styled.img`
+const SmallAvatar = styled(Avatar)`
+  height: 2.5rem;
   width: 2.5rem;
 `;
 
@@ -34,27 +37,29 @@ const CaveListItem = ({ cave }) => {
       {(cave.depth || cave.length) && (
         <Box display="flex" flexDirection="row" alignItems="flex-start">
           {cave.depth !== null && (
-            <ListItem dense>
-              <ListItemIcon>
-                <CaveDepthIcon src="/images/depth.svg" alt="Cave depth icon" />
-              </ListItemIcon>
-              <ListItemText
-                secondary={`${cave.depth.toLocaleString(locale)}m`}
+            <>
+              <SmallAvatar
+                alt="Cave depth icon"
+                src="/images/depth.svg"
+                variant="square"
               />
-            </ListItem>
+              <Typography variant="caption">{`${cave.depth.toLocaleString(
+                locale
+              )}m`}</Typography>
+              &nbsp;
+            </>
           )}
           {cave.length !== null && (
-            <ListItem dense>
-              <ListItemIcon>
-                <CaveLengthIcon
-                  src="/images/length.svg"
-                  alt="Cave length icon"
-                />
-              </ListItemIcon>
-              <ListItemText
-                secondary={`${cave.length.toLocaleString(locale)}m`}
+            <>
+              <SmallAvatar
+                alt="Cave length icon"
+                src="/images/length.svg"
+                variant="square"
               />
-            </ListItem>
+              <Typography variant="caption">{`${cave.length.toLocaleString(
+                locale
+              )}m`}</Typography>
+            </>
           )}
         </Box>
       )}
