@@ -28,10 +28,7 @@ const CavesList = props => {
             ))}
         </StyledList>
       ) : (
-        <>
-          <br />
-          <em>{emptyMessageComponent}</em>
-        </>
+        <em>{emptyMessageComponent}</em>
       )}
     </div>
   );

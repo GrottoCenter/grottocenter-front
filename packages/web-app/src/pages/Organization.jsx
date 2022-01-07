@@ -1,11 +1,10 @@
 import React, { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { isNil } from 'ramda';
-// eslint-disable-next-line import/no-named-as-default
-import Organization from '../components/appli/Organization';
+
 import { loadOrganization } from '../actions/Organization';
 import { setPageTitle } from '../actions/PageTitle';
+import Organization from '../components/appli/Organization';
 
 const OrganizationPage = () => {
   const { organizationId } = useParams();
@@ -17,12 +16,12 @@ const OrganizationPage = () => {
   useEffect(() => {
     dispatch(loadOrganization(organizationId));
     dispatch(setPageTitle('Organization'));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [organizationId]);
+  }, [dispatch, organizationId]);
 
   return (
     <Organization
-    isLoading={isLoading || !isNil(error)}
+      error={error}
+      isLoading={isLoading}
       organization={organization}
     />
   );
