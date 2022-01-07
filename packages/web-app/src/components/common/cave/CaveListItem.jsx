@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { useSelector } from 'react-redux';
 import { Box, ListItem, ListItemIcon, ListItemText } from '@material-ui/core';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
@@ -21,6 +22,7 @@ const StyledListItem = styled(ListItem)`
 `;
 
 const CaveListItem = ({ cave }) => {
+  const { locale } = useSelector(state => state.intl);
   return (
     <StyledListItem
       button
@@ -36,7 +38,9 @@ const CaveListItem = ({ cave }) => {
               <ListItemIcon>
                 <CaveDepthIcon src="/images/depth.svg" alt="Cave depth icon" />
               </ListItemIcon>
-              <ListItemText secondary={`${cave.depth.toLocaleString()}m`} />
+              <ListItemText
+                secondary={`${cave.depth.toLocaleString(locale)}m`}
+              />
             </ListItem>
           )}
           {cave.length !== null && (
@@ -47,7 +51,9 @@ const CaveListItem = ({ cave }) => {
                   alt="Cave length icon"
                 />
               </ListItemIcon>
-              <ListItemText secondary={`${cave.length.toLocaleString()}m`} />
+              <ListItemText
+                secondary={`${cave.length.toLocaleString(locale)}m`}
+              />
             </ListItem>
           )}
         </Box>
