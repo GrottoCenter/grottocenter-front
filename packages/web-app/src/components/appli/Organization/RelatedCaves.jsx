@@ -11,8 +11,8 @@ import { EntrancePropTypes, NetworkPropTypes } from './propTypes';
 const RelatedCaves = ({
   exploredEntrances,
   exploredNetworks,
-  partneredEntrances,
-  partneredNetworks
+  partnerEntrances,
+  partnerNetworks
 }) => {
   const { formatMessage } = useIntl();
   return (
@@ -35,18 +35,18 @@ const RelatedCaves = ({
 
       <hr />
       <EntrancesList
-        entrances={partneredEntrances}
-        title={formatMessage({ id: 'Partnered entrances' })}
+        entrances={partnerEntrances}
+        title={formatMessage({ id: 'Partner entrances' })}
         emptyMessageComponent={
-          <Translate>No partnered entrances found.</Translate>
+          <Translate>No partner entrances found.</Translate>
         }
       />
       <br />
       <CavesList
-        caves={partneredNetworks}
-        title={formatMessage({ id: 'Partnered networks' })}
+        caves={partnerNetworks}
+        title={formatMessage({ id: 'Partner networks' })}
         emptyMessageComponent={
-          <Translate>No partnered networks found.</Translate>
+          <Translate>No partner networks found.</Translate>
         }
       />
     </>
@@ -56,8 +56,8 @@ const RelatedCaves = ({
 RelatedCaves.propTypes = {
   exploredEntrances: PropTypes.arrayOf(EntrancePropTypes),
   exploredNetworks: PropTypes.arrayOf(NetworkPropTypes),
-  partneredEntrances: PropTypes.arrayOf(EntrancePropTypes),
-  partneredNetworks: PropTypes.arrayOf(NetworkPropTypes)
+  partnerEntrances: PropTypes.arrayOf(EntrancePropTypes),
+  partnerNetworks: PropTypes.arrayOf(NetworkPropTypes)
 };
 
 export default RelatedCaves;
