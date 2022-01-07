@@ -42,11 +42,7 @@ CavesList.propTypes = {
 
 CavesList.defaultProps = {
   caves: undefined,
-  title: (
-    <strong>
-      <Translate>Caves list</Translate>
-    </strong>
-  ),
+  title: <Translate>Caves list</Translate>,
   emptyMessageComponent: <Translate>Empty list</Translate>
 };
 
