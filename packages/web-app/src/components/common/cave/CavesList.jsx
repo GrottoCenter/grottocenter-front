@@ -18,7 +18,7 @@ const CavesList = props => {
 
   return (
     <div>
-      <Typography>{title}</Typography>
+      <Typography variant="h3">{title}</Typography>
       {caves.length > 0 ? (
         <StyledList>
           {caves

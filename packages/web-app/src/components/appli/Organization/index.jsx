@@ -1,14 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { propOr } from 'ramda';
-import {
-  CircularProgress,
-  Card,
-  CardContent,
-  CardHeader,
-  Typography
-} from '@material-ui/core';
+import { Typography } from '@material-ui/core';
+import Skeleton from '@material-ui/lab/Skeleton';
 import { useIntl } from 'react-intl';
+
+import Layout from '../../common/Layouts/Fixed/FixedContent';
 
 import BadgesSection from './BadgesSection';
 import Details from './Details';
@@ -34,65 +31,82 @@ const Organization = ({ error, isLoading, organization }) => {
   }
 
   return (
-    <>
-      {isLoading && <CircularProgress />}
-      {organization && (
-        <Card>
-          <CardHeader
-            avatar={
-              <BadgesSection
-                nbCavers={propOr([], 'cavers', organization).length}
-                nbExploredEntrances={
-                  propOr([], 'exploredEntrances', organization).length
-                }
-                nbExploredNetworks={
-                  propOr([], 'exploredNetworks', organization).length
-                }
-              />
+    <Layout
+      avatar={
+        isLoading ? (
+          <Skeleton>
+            <BadgesSection />
+          </Skeleton>
+        ) : (
+          <BadgesSection
+            nbCavers={propOr([], 'cavers', organization).length}
+            nbExploredEntrances={
+              propOr([], 'exploredEntrances', organization).length
             }
-            title={
-              <Typography variant="h1" color="secondary">
-                {organization.name}
-              </Typography>
-            }
-            subheader={
-              <>
-                {organization.yearBirth &&
-                  `${formatMessage({ id: 'Since' })} ${organization.yearBirth}`}
-                {organization.yearBirth &&
-                  organization.isOfficialPartner &&
-                  ` - `}
-                {organization.isOfficialPartner && (
-                  <>{formatMessage({ id: 'Official partner' })}</>
-                )}
-              </>
+            nbExploredNetworks={
+              propOr([], 'exploredNetworks', organization).length
             }
           />
-          <CardContent>
-            <Details
-              address={organization.address}
-              city={organization.city}
-              country={organization.country}
-              county={organization.county}
-              customMessage={organization.customMessage}
-              mail={organization.mail}
-              postalCode={organization.postalCode}
-              region={organization.region}
-              village={organization.village}
-            />
+        )
+      }
+      subheader={
+        isLoading ? (
+          <Skeleton />
+        ) : (
+          organization && (
+            <>
+              {organization.yearBirth &&
+                `${formatMessage({ id: 'Since' })} ${organization.yearBirth}`}
+              {organization.yearBirth &&
+                organization.isOfficialPartner &&
+                ` - `}
+              {organization.isOfficialPartner && (
+                <>{formatMessage({ id: 'Official partner' })}</>
+              )}
+            </>
+          )
+        )
+      }
+      title={
+        organization?.name ||
+        formatMessage({ id: 'Loading organization data...' })
+      }
+      content={
+        <>
+          {isLoading && (
+            <>
+              <Skeleton height={150} /> {/* Details Skeleton */}
+              <Skeleton height={150} /> {/* Explored data Skeleton */}
+              <Skeleton height={150} /> {/* Partnered data Skeleton */}
+            </>
+          )}
+          {organization && (
+            <>
+              <Details
+                address={organization.address}
+                city={organization.city}
+                country={organization.country}
+                county={organization.county}
+                customMessage={organization.customMessage}
+                mail={organization.mail}
+                postalCode={organization.postalCode}
+                region={organization.region}
+                village={organization.village}
+              />
 
-            <hr />
+              <hr />
 
-            <RelatedCaves
-              exploredEntrances={organization.exploredEntrances}
-              exploredNetworks={organization.exploredNetworks}
-              partneredEntrances={organization.partneredEntrances}
-              partneredNetworks={organization.partneredNetworks}
-            />
-          </CardContent>
-        </Card>
-      )}
-    </>
+              <RelatedCaves
+                exploredEntrances={organization.exploredEntrances}
+                exploredNetworks={organization.exploredNetworks}
+                partneredEntrances={organization.partneredEntrances}
+                partneredNetworks={organization.partneredNetworks}
+              />
+            </>
+          )}
+        </>
+      }
+    />
   );
 };
 
@@ -118,10 +132,6 @@ Organization.propTypes = {
     village: PropTypes.string,
     yearBirth: PropTypes.number
   })
-};
-
-Organization.defaultProps = {
-  organization: undefined
 };
 
 export default Organization;
