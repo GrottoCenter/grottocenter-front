@@ -77,7 +77,7 @@ const Organization = ({ error, isLoading, organization }) => {
             <>
               <Skeleton height={150} /> {/* Details Skeleton */}
               <Skeleton height={150} /> {/* Explored data Skeleton */}
-              <Skeleton height={150} /> {/* Partnered data Skeleton */}
+              <Skeleton height={150} /> {/* Partner data Skeleton */}
             </>
           )}
           {organization && (
@@ -99,8 +99,8 @@ const Organization = ({ error, isLoading, organization }) => {
               <RelatedCaves
                 exploredEntrances={organization.exploredEntrances}
                 exploredNetworks={organization.exploredNetworks}
-                partneredEntrances={organization.partneredEntrances}
-                partneredNetworks={organization.partneredNetworks}
+                partnerEntrances={organization.partnerEntrances}
+                partnerNetworks={organization.partnerNetworks}
               />
             </>
           )}
@@ -126,8 +126,8 @@ Organization.propTypes = {
     isOfficialPartner: PropTypes.bool,
     name: PropTypes.string.isRequired,
     region: PropTypes.string,
-    partneredEntrances: PropTypes.arrayOf(EntrancePropTypes),
-    partneredNetworks: PropTypes.arrayOf(NetworkPropTypes),
+    partnerEntrances: PropTypes.arrayOf(EntrancePropTypes),
+    partnerNetworks: PropTypes.arrayOf(NetworkPropTypes),
     postalCode: PropTypes.string,
     village: PropTypes.string,
     yearBirth: PropTypes.number
