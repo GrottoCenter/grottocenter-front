@@ -42,11 +42,7 @@ EntrancesList.propTypes = {
 
 EntrancesList.defaultProps = {
   entrances: undefined,
-  title: (
-    <strong>
-      <Translate>Entrances list</Translate>
-    </strong>
-  ),
+  title: <Translate>Entrances list</Translate>,
   emptyMessageComponent: <Translate>Empty list</Translate>
 };
 
