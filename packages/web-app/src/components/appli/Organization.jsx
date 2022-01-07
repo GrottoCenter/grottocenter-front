@@ -50,11 +50,11 @@ const StyledEmailIcon = styled(EmailIcon)`
   margin-right: ${({ theme }) => theme.spacing(1)}px;
 `;
 
-const Organization = ({ isFetching, organization }) => {
+const Organization = ({ isLoading, organization }) => {
   const safeGet = pathOr('N/A', __, organization || {});
   const { formatMessage } = useIntl();
 
-  if (isNil(organization) && !isFetching) {
+  if (isNil(organization) && !isLoading) {
     return (
       <Translate>
         Error, the organization data you are looking for is not available.
@@ -64,7 +64,7 @@ const Organization = ({ isFetching, organization }) => {
 
   return (
     <>
-      {isFetching ? (
+      {isLoading ? (
         <CircularProgress />
       ) : (
         <Card>
@@ -162,7 +162,7 @@ const Organization = ({ isFetching, organization }) => {
 };
 
 Organization.propTypes = {
-  isFetching: PropTypes.bool.isRequired,
+  isLoading: PropTypes.bool.isRequired,
   organization: PropTypes.shape({
     address: PropTypes.string,
     mail: PropTypes.string,
