@@ -28,10 +28,7 @@ const EntrancesList = props => {
             ))}
         </StyledList>
       ) : (
-        <>
-          <br />
-          <em>{emptyMessageComponent}</em>
-        </>
+        <em>{emptyMessageComponent}</em>
       )}
     </div>
   );
