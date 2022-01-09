@@ -1,27 +1,29 @@
+import { useIntl } from 'react-intl';
 import {
   FormControl,
   InputAdornment,
   InputLabel,
   FormHelperText
 } from '@material-ui/core';
+import { useDispatch, useSelector } from 'react-redux';
 import React, { useEffect, useState } from 'react';
 import { useController } from 'react-hook-form';
-import { useIntl } from 'react-intl';
-import PropTypes from 'prop-types';
 import { isNil, length } from 'ramda';
-import { useDispatch, useSelector } from 'react-redux';
-import { entityOptionForSelector } from '../../../../helpers/Entity';
+import PropTypes from 'prop-types';
+
 import {
   fetchQuicksearchResult,
   resetQuicksearch
-} from '../../../../actions/Quicksearch';
-import AutoCompleteSearchComponent from '../../../common/AutoCompleteSearch';
+} from '../../../../../actions/Quicksearch';
+import { useDebounce } from '../../../../../hooks';
 import {
   StyledInput,
   StyledFormControl,
   InputWrapper
-} from '../../../common/Form/FormAutoComplete';
-import { useDebounce } from '../../../../hooks';
+} from '../../../../common/Form/FormAutoComplete';
+import { entityOptionForSelector } from '../../../../../helpers/Entity';
+import AutoCompleteSearchComponent from '../../../../common/AutoCompleteSearch';
+import Details from '../Details';
 
 const resultEndAdornment = (
   <InputAdornment position="end">
@@ -43,7 +45,7 @@ const CaveSelection = ({ control, errors }) => {
   const [inputValue, setInputValue] = useState('');
   const debouncedInput = useDebounce(inputValue);
   const {
-    field: { onChange: onIdChange },
+    field: { onChange: onIdChange, value: caveId },
     fieldState: { error }
   } = useController({
     control,
@@ -154,13 +156,16 @@ const CaveSelection = ({ control, errors }) => {
           })}
         </FormHelperText>
       </FormControl>
+      {!!caveId && <Details control={control} errors={errors} isReadonly />}
     </>
   );
 };
 
-CaveSelection.propTypes = {
-  control: PropTypes.objectOf(),
-  errors: PropTypes.objectOf()
-};
-
 export default CaveSelection;
+
+CaveSelection.propTypes = {
+  control: PropTypes.shape({}),
+  errors: PropTypes.shape({
+    caveName: PropTypes.string
+  })
+};

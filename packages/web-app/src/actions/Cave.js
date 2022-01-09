@@ -13,7 +13,8 @@ export const POST_CAVE_FAILURE = 'POST_CAVE_FAILURE';
 export const postCaveAction = () => ({
   type: POST_CAVE
 });
-export const postCaveSuccess = () => ({
+export const postCaveSuccess = cave => ({
+  cave,
   type: POST_CAVE_SUCCESS
 });
 export const postCaveFailure = (error, httpCode) => ({
@@ -51,20 +52,23 @@ export const postCave = data => {
       headers: getState().login.authorizationHeader
     };
 
-    return fetch(postCreateCaveUrl, requestOptions).then(response => {
-      return response.text().then(responseText => {
+    return fetch(postCreateCaveUrl, requestOptions)
+      .then(response => {
         if (response.status >= 400) {
-          dispatch(
-            postCaveFailure(
-              makeErrorMessage(response.status, `Bad request: ${responseText}`),
-              response.status
-            )
-          );
-        } else {
-          dispatch(postCaveSuccess());
+          throw new Error(response.status);
         }
-        return response;
-      });
-    });
+        return response.json();
+      })
+      .then(res => {
+        dispatch(postCaveSuccess(res));
+      })
+      .catch(error =>
+        dispatch(
+          postCaveFailure(
+            makeErrorMessage(error.message, `Bad request`),
+            error.message
+          )
+        )
+      );
   };
 };
