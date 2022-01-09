@@ -23,7 +23,7 @@ const StyledFormControl = styled(FormControl)`
   margin-top: ${({ theme }) => theme.spacing(2)}px;
 `;
 
-const Details = ({ control, errors }) => {
+const Details = ({ control, errors, isReadonly = false }) => {
   const { formatMessage } = useIntl();
 
   const validateTemperature = value => {
@@ -50,7 +50,7 @@ const Details = ({ control, errors }) => {
           rules={{ valueAsNumber: true, validate: validateDistance }}
           render={({ field: { ref, ...field } }) => (
             <TextField
-              disabled
+              disabled={isReadonly}
               fullWidth
               autoFocus
               label={formatMessage({ id: 'depth' })}
@@ -74,7 +74,7 @@ const Details = ({ control, errors }) => {
           rules={{ valueAsNumber: true, validate: validateDistance }}
           render={({ field: { ref, ...field } }) => (
             <TextField
-              disabled
+              disabled={isReadonly}
               fullWidth
               label={formatMessage({ id: 'length' })}
               type="number"
@@ -100,7 +100,7 @@ const Details = ({ control, errors }) => {
           }}
           render={({ field: { ref, ...field } }) => (
             <TextField
-              disabled
+              disabled={isReadonly}
               fullWidth
               label={formatMessage({ id: 'temperature' })}
               type="number"
@@ -125,7 +125,7 @@ const Details = ({ control, errors }) => {
         defaultValue={false}
         render={({ field: { ref, ...field } }) => (
           <StyledFormControl
-            disabled
+            disabled={isReadonly}
             component="fieldset"
             error={!!errors.isDiving}>
             <FormLabel component="legend">
@@ -151,7 +151,8 @@ const Details = ({ control, errors }) => {
 
 Details.propTypes = {
   errors: PropTypes.objectOf(),
-  control: PropTypes.objectOf()
+  control: PropTypes.objectOf(),
+  isReadonly: PropTypes.bool
 };
 
 export default Details;

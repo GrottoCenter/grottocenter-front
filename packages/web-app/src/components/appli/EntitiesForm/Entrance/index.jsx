@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import { useForm } from 'react-hook-form';
-import { isNil, keys, prop, length } from 'ramda';
+import { isNil, keys, prop, length, reject, equals } from 'ramda';
 import {
   Button as MuiButton,
   Step,
@@ -18,11 +18,13 @@ import useGeolocation from 'react-hook-geolocation';
 import { useBoolean } from '../../../../hooks';
 import ActionButton from '../../../common/ActionButton';
 import { postEntrance } from '../../../../actions/Entry';
+import { postCaveAndEntrance } from '../../../../actions/CaveAndEntrance';
 import Translate from '../../../common/Translate';
 
 import Cave from './Cave';
 import Entrance from './Entrance';
 import Details from './Details';
+import { makeCaveData, makeEntranceData } from './transformers';
 
 const FormWrapper = styled.form`
   display: flex;
@@ -43,7 +45,21 @@ const GlobalButtonWrapper = styled.div`
   display: flex;
 `;
 
-const defaultValues = {
+const defaultCaveValues = {
+  language: 'fra',
+  name: '',
+  latitude: undefined,
+  longitude: undefined,
+  descriptions: undefined,
+  isDiving: undefined,
+  depth: null,
+  length: null,
+  temperature: null,
+  massif: undefined,
+  country: 'FR'
+};
+
+const defaultEntranceValues = {
   name: '',
   description: '',
   descriptionTitle: '',
@@ -57,8 +73,10 @@ export const EntranceForm = ({ entranceValues = null }) => {
   const { latitude, longitude } = useGeolocation();
   const { formatMessage } = useIntl();
   const { languages: allLanguages } = useSelector(state => state.language);
-  const { error } = useSelector(state => state.entrancePost);
+  const { error: entranceError } = useSelector(state => state.entrancePost);
+  const { error: caveError } = useSelector(state => state.cavePost);
   const dispatch = useDispatch();
+  const [creationType, setCreationType] = useState('cave');
   const {
     handleSubmit,
     reset,
@@ -68,8 +86,19 @@ export const EntranceForm = ({ entranceValues = null }) => {
     setFocus,
     formState: { errors, isDirty, isSubmitting, isSubmitSuccessful }
   } = useForm({
-    defaultValues: entranceValues || { ...defaultValues, latitude, longitude }
+    defaultValues:
+      entranceValues ||
+      (creationType === 'cave'
+        ? { ...defaultCaveValues }
+        : { ...defaultEntranceValues } && {
+            latitude,
+            longitude
+          })
   });
+
+  const [activeStep, setActiveStep] = useState(0);
+  const hasFinish = useBoolean();
+  const stepExpanded = useBoolean();
 
   // TODO set latitude & longitude from the selected Entry
   // TODO set country from position
@@ -79,12 +108,28 @@ export const EntranceForm = ({ entranceValues = null }) => {
     }
   }, [entranceValues, getValues, latitude, longitude, reset]);
 
-  const [activeStep, setActiveStep] = useState(0);
-  const hasFinish = useBoolean();
-  const stepExpanded = useBoolean();
+  const handleUpdateCreationType = type => {
+    setCreationType(type);
+    reset({ ...getValues(), latitude, longitude });
+  };
+
+  const handleReset = useCallback(() => {
+    reset(defaultEntranceValues);
+    stepExpanded.close();
+    setActiveStep(0);
+  }, [reset, stepExpanded]);
 
   const steps = {
-    cave: <Cave control={control} errors={errors} />,
+    cave: (
+      <Cave
+        control={control}
+        errors={errors}
+        creationType={creationType}
+        updateCreationType={handleUpdateCreationType}
+        allLanguages={allLanguages}
+        reset={handleReset}
+      />
+    ),
     entrance: (
       <Entrance
         control={control}
@@ -95,19 +140,17 @@ export const EntranceForm = ({ entranceValues = null }) => {
     ),
     details: <Details control={control} errors={errors} />
   };
-  const stepKeys = keys(steps);
-
-  const handleReset = useCallback(() => {
-    reset(defaultValues);
-    stepExpanded.close();
-    setActiveStep(0);
-  }, [reset, stepExpanded]);
+  const stepKeys =
+    creationType === 'cave'
+      ? keys(steps)
+      : reject(equals('details'), keys(steps));
 
   const handleNext = async () => {
     const result = await trigger(
       [
         'name',
         'language',
+        'descriptions',
         'caveId',
         'caveName',
         'longitude',
@@ -134,24 +177,14 @@ export const EntranceForm = ({ entranceValues = null }) => {
   };
 
   const onSubmit = async data => {
-    const transformedData = {
-      name: {
-        language: data.language,
-        text: data.name
-      },
-      cave: data.caveId,
-      country: data.country,
-      depth: data.depth,
-      isDiving: data.isDiving,
-      length: data.length,
-      longitude: data.longitude,
-      latitude: data.latitude,
-      temperature: data.temperature
-    };
-    return dispatch(postEntrance(transformedData));
+    if (creationType === 'cave') {
+      dispatch(postCaveAndEntrance(makeCaveData(data), makeEntranceData(data)));
+    } else {
+      dispatch(postEntrance(makeEntranceData(data)));
+    }
   };
 
-  return isSubmitSuccessful && isNil(error) ? (
+  return isSubmitSuccessful && isNil(entranceError) && isNil(caveError) ? (
     <FormWrapper>
       <Translate>New entrance successfully created!</Translate>
       <Button onClick={handleReset} color="primary">

@@ -27,6 +27,7 @@ const reducer = (state = initialState, action) => {
     case POST_CAVE_SUCCESS:
       return {
         ...state,
+        data: action.cave,
         error: initialState.error,
         loading: false
       };
