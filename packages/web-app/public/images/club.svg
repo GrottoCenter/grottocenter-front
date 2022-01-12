@@ -15,7 +15,7 @@
    height="100"
    id="svg3052"
    version="1.1"
-   inkscape:version="0.91pre4 r13712"
+   inkscape:version="0.92.4 (5da689c313, 2019-01-14)"
    sodipodi:docname="club.svg"
    inkscape:export-filename="E:\Mes Documents\Dropbox\MaquetteGC\Test-Grottocenter3-Fred\img\icon\caver_flat64.png"
    inkscape:export-xdpi="3.5547156"
@@ -75,13 +75,13 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="3.56"
-     inkscape:cx="1.4464407"
+     inkscape:cx="49.245586"
      inkscape:cy="29.497182"
      inkscape:document-units="px"
      inkscape:current-layer="g8774"
      showgrid="false"
      inkscape:window-width="1920"
-     inkscape:window-height="1017"
+     inkscape:window-height="1009"
      inkscape:window-x="-8"
      inkscape:window-y="-8"
      inkscape:window-maximized="1"
@@ -94,7 +94,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -141,7 +141,7 @@
            inkscape:export-ydpi="3.4936316"
            transform="translate(243.17189,-135.57971)" />
         <path
-           style="fill:#f67e07;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:10;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+           style="fill:#5d4037;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:10;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
            d="m -887.60049,309.39869 c -11.2971,-4.00843 -26.82386,-17.4746 -33.73304,-29.25628 l -7.65748,-13.05766 -0.019,-240 c -0.0105,-132 0.96385,-243.51214 2.16512,-247.80474 3.03086,-10.83038 18.02124,-27.16938 31.00295,-33.79216 10.50687,-5.3602 18.94956,-5.54596 252.06446,-5.54596 265.0726,0 252.01811,-0.85447 269.40562,17.63382 17.73598,18.85882 16.6976,4.73361 17.60663,239.50904 0.45937,118.64286 -0.30303,230.20691 -1.6942,247.92014 -2.31725,29.50455 -3.23997,33.09923 -11.00085,42.85715 -4.65926,5.8582 -14.1336,13.54414 -21.05406,17.07985 l -12.58263,6.42857 -240.10889,-0.22542 c -132.05988,-0.1242 -242.03745,-0.91 -244.3946,-1.74635 z"
            id="path3093"
            inkscape:connector-curvature="0"
@@ -157,8 +157,8 @@
         <path
            inkscape:connector-curvature="0"
            id="path3982"
-           d="m -341.87184,8.6586622 0,-53.9363292 53.56103,0 53.56103,0 0,53.9363292 0,53.9363448 -53.56103,0 -53.56103,0 0,-53.9363448 z"
-           style="fill:#ffff00;fill-opacity:1;fill-rule:nonzero;stroke:#ffffff;stroke-width:29.07707405;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+           d="M -373.62853,8.1746396 V -46.245712 h 69.18283 69.18267 V 8.1746396 62.595007 h -69.18267 -69.18283 z"
+           style="fill:#f57c00;fill-opacity:1;fill-rule:nonzero;stroke:#ffffff;stroke-width:0;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
       </g>
     </g>
   </g>
