@@ -14,7 +14,7 @@
    height="100"
    id="svg3052"
    version="1.1"
-   inkscape:version="0.91pre4 r13712"
+   inkscape:version="0.92.4 (5da689c313, 2019-01-14)"
    sodipodi:docname="entry.svg"
    inkscape:export-filename="C:\Users\urien\speleo\Wikicaves\_icons\_entry2_clust.png"
    inkscape:export-xdpi="6.3911128"
@@ -66,16 +66,16 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="6.3539547"
-     inkscape:cx="50.000004"
+     inkscape:cx="93.888167"
      inkscape:cy="44.884375"
      inkscape:document-units="px"
-     inkscape:current-layer="layer1"
+     inkscape:current-layer="g4927"
      showgrid="false"
-     inkscape:window-width="1920"
-     inkscape:window-height="1017"
-     inkscape:window-x="-8"
-     inkscape:window-y="-8"
-     inkscape:window-maximized="1"
+     inkscape:window-width="873"
+     inkscape:window-height="913"
+     inkscape:window-x="936"
+     inkscape:window-y="63"
+     inkscape:window-maximized="0"
      units="px"
      showborder="false" />
   <metadata
@@ -103,7 +103,7 @@
        inkscape:export-ydpi="15.216935"
        style="stroke:#ffffff;stroke-width:20;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
     <path
-       style="fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:#ffffff;stroke-width:57.1428566;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       style="fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:#;stroke-width:57.1428566;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        d=""
        id="path3876"
        inkscape:connector-curvature="0" />
@@ -125,12 +125,12 @@
          inkscape:connector-curvature="0"
          id="path3093"
          d="m 8.2518048,1045.97 c -1.8122602,-0.6475 -4.3030348,-2.823 -5.4113929,-4.7263 l -1.228399,-2.1095 -0.00305,-38.7719 c -0.00168,-21.32462 0.1546191,-39.33939 0.3473246,-40.03286 0.486205,-1.74965 2.8909345,-4.38921 4.9734368,-5.45912 1.685493,-0.86594 3.0398539,-0.89595 40.4357217,-0.89595 42.522464,0 40.428287,-0.13804 43.21756,2.84874 2.845173,3.04664 2.678598,0.76472 2.824423,38.69265 0.07369,19.16674 -0.04861,37.18994 -0.27178,40.05144 -0.371729,4.7665 -0.51975,5.3472 -1.764737,6.9236 -0.74743,0.9464 -2.267286,2.188 -3.377454,2.7592 l -2.018482,1.0386 -38.517831,-0.036 c -21.184806,-0.02 -38.8272077,-0.1471 -39.2053375,-0.2822 z"
-         style="fill:#34558a;fill-opacity:1;fill-rule:nonzero;stroke:#ffffff;stroke-width:3.21966052;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+         style="fill:#5d4037;fill-opacity:1;fill-rule:nonzero;stroke-width:3.21966052;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
       <g
          transform="matrix(2.2751305,0,0,2.2751305,-10.264437,-1226.5477)"
          id="g4921">
         <path
-           style="fill:#ffff00;stroke:#ffff00;stroke-width:4.51826906;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+           style="fill:#f57c00;stroke:#f57c00;stroke-width:4.51826906;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
            d="m 10.341025,991.29143 29.818633,-0.0994"
            id="path3984"
            inkscape:connector-curvature="0"
