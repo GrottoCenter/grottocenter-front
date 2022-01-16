@@ -92,6 +92,15 @@ const Dashboard = () => {
                     {formatMessage({ id: 'CSV Import' })}
                   </Typography>
                 </StyledListItem>
+                <StyledListItem
+                  button
+                  key="duplicate-tool-user-tile-key"
+                  onClick={() => handleOnListItemClick('/ui/duplicates')}>
+                  <ImportExportIcon fontSize="large" color="primary" />
+                  <Typography variant="h4" align="center">
+                    {formatMessage({ id: 'Duplicate Tool' })}
+                  </Typography>
+                </StyledListItem>
               </StyledList>
             </DashboardBlock>
           )}
