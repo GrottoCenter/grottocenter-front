@@ -11,6 +11,7 @@ import documentChildren from './DocumentChildrenReducer';
 import documentDetails from './DetailsDocumentReducer';
 import documents from './DocumentsReducer';
 import documentType from './DocumentTypeReducer';
+import duplicatesImport from './DuplicatesImportReducer';
 import dynamicNumber from './DynamicNumberReducer';
 import entry from './EntryReducer';
 import error from './ErrorReducer';
@@ -52,6 +53,7 @@ const GCReducer = combineReducers({
   documentDetails,
   documents,
   documentType,
+  duplicatesImport,
   dynamicNumber,
   entry,
   error,
