@@ -227,6 +227,27 @@ export const forgotPassword = `${process.env.REACT_APP_API_URL}/api/${apiVersion
 // ===== Grottocenter Client routes
 export const swaggerLinkV1 = `${process.env.REACT_APP_API_URL}/ui/swagger/1`;
 export const entryDetailPath = `${process.env.REACT_APP_API_URL}/api/${apiVersion}/entrances/`;
+export const postEntryUrl = `${process.env.REACT_APP_API_URL}/api/${apiVersion}/entrances`;
+export const putEntryWithNewEntitiesUrl = entryId =>
+  `${process.env.REACT_APP_API_URL}/api/${apiVersion}/entrances/${entryId}/new-entities`;
+export const putDocumentyWithNewEntitiesUrl = docId =>
+  `${process.env.REACT_APP_API_URL}/api/${apiVersion}/documents/${docId}/new-entities`;
+export const createNewEntranceFromDuplicate = id =>
+  `${process.env.REACT_APP_API_URL}/api/create-from-duplicates-entrance/${id}`;
+export const createNewDocumentFromDuplicate = id =>
+  `${process.env.REACT_APP_API_URL}/api/create-from-duplicates-document/${id}`;
+export const getDuplicatesDocumentUrl = `${process.env.REACT_APP_API_URL}/api/duplicates-document`;
+export const getDuplicatesEntranceUrl = `${process.env.REACT_APP_API_URL}/api/duplicates-entrance`;
+export const getDuplicateDocumentUrl = duplicateId =>
+  `${process.env.REACT_APP_API_URL}/api/duplicates-document/${duplicateId}`;
+export const getDuplicateEntranceUrl = duplicateId =>
+  `${process.env.REACT_APP_API_URL}/api/duplicates-entrance/${duplicateId}`;
+export const deleteDuplicatesDocumentUrl = `${process.env.REACT_APP_API_URL}/api/duplicates-document`;
+export const deleteDuplicatesEntranceUrl = `${process.env.REACT_APP_API_URL}/api/duplicates-entrance`;
+export const deleteDuplicateDocumentUrl = id =>
+  `${process.env.REACT_APP_API_URL}/api/duplicates-document/${id}`;
+export const deleteDuplicateEntranceUrl = id =>
+  `${process.env.REACT_APP_API_URL}/api/duplicates-entrance/${id}`;
 
 // ===== Misc config values
 export const emailRegexp = /\S+@\S+/; // simple regexp TODO: use another one more robust

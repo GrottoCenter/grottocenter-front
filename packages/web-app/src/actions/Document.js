@@ -5,7 +5,11 @@ import {
   IS_MODIFIED,
   IS_NEW
 } from '../components/common/AddFileForm/FileHelpers';
-import { postDocumentUrl, putDocumentUrl } from '../conf/Config';
+import {
+  postDocumentUrl,
+  putDocumentUrl,
+  putDocumentyWithNewEntitiesUrl
+} from '../conf/Config';
 
 // ==========
 export const POST_DOCUMENT = 'POST_DOCUMENT';
@@ -73,6 +77,14 @@ const buildFormData = (formData, data, parentKey) => {
   } else if (data || data === '') {
     formData.append(parentKey, data);
   }
+};
+
+const checkStatus = response => {
+  if (response.status >= 200 && response.status <= 300) {
+    return response;
+  }
+  const errorMessage = new Error(response.status);
+  throw errorMessage;
 };
 
 export function postDocument(docAttributes) {
@@ -265,3 +277,37 @@ export function updateDocument(docAttributes) {
     );
   };
 }
+
+export const updateDocumentWithNewEntities = (
+  docAttributes,
+  newAuthors,
+  newDescriptions
+) => (dispatch, getState) => {
+  dispatch(updateDocumentAction());
+  const { id } = docAttributes;
+  const body = {
+    document: docAttributes,
+    newAuthors,
+    newDescriptions
+  };
+
+  const requestOptions = {
+    method: 'PUT',
+    body: JSON.stringify(body),
+    headers: getState().login.authorizationHeader
+  };
+
+  return fetch(putDocumentyWithNewEntitiesUrl(id), requestOptions)
+    .then(checkStatus)
+    .then(response => {
+      dispatch(updateDocumentSuccess(response.status));
+    })
+    .catch(error => {
+      dispatch(
+        updateDocumentFailure(
+          [`Unable to update the document id ${id}`],
+          error.message
+        )
+      );
+    });
+};
