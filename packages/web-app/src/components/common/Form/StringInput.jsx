@@ -53,11 +53,12 @@ StringInput.propTypes = {
   hasError: PropTypes.bool,
   helperText: PropTypes.string,
   multiline: PropTypes.bool,
-  onValueChange: PropTypes.func.isRequired,
+  onValueChange: PropTypes.func,
   required: PropTypes.bool,
   type: PropTypes.oneOf(['text', 'email', 'password']),
   value: PropTypes.string.isRequired,
-  valueName: PropTypes.string.isRequired
+  valueName: PropTypes.string.isRequired,
+  disabled: PropTypes.bool
 };
 
 export default StringInput;
