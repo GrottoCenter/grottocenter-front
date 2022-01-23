@@ -47,15 +47,14 @@ const Cave = ({
           <FormControlLabel
             value="entrance"
             control={<Radio />}
-            label={formatMessage({ id: 'linked to a network' })}
+            label={formatMessage({ id: 'Linked to a network' })}
           />
           <FormControlLabel
             value="cave"
             control={<Radio />}
-            label={formatMessage({ id: 'not linked to a network' })}
+            label={formatMessage({ id: 'Not linked to a network' })}
           />
         </RadioGroup>
-        {/* <FormHelperText>{helperText}</FormHelperText> */}
       </FormControl>
       {creationType === 'cave' ? (
         <CaveCreation
@@ -70,8 +69,8 @@ const Cave = ({
   );
 };
 Cave.propTypes = {
-  control: PropTypes.objectOf(),
-  errors: PropTypes.objectOf(),
+  control: PropTypes.shape({}),
+  errors: PropTypes.shape({}),
   creationType: PropTypes.oneOf(['cave', 'entrance']),
   updateCreationType: PropTypes.func,
   disabled: PropTypes.bool,

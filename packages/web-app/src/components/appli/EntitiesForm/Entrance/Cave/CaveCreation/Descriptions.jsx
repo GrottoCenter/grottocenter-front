@@ -42,7 +42,6 @@ const Description = ({ nestIndex, control, remove, errors }) => {
             <TextField
               fullWidth
               required
-              // eslint-disable-next-line react/prop-types
               error={!!errors?.descriptions?.[nestIndex]?.title}
               label={formatMessage({ id: 'Description title' })}
               inputRef={ref}
@@ -57,7 +56,6 @@ const Description = ({ nestIndex, control, remove, errors }) => {
           render={({ field: { ref, ...field } }) => (
             <TextField
               required
-              // eslint-disable-next-line react/prop-types
               error={!!errors?.descriptions?.[nestIndex]?.body}
               multiline
               fullWidth
@@ -116,15 +114,22 @@ const Descriptions = ({ control, errors }) => {
 };
 
 Descriptions.propTypes = {
-  control: PropTypes.objectOf(),
+  control: PropTypes.shape({}),
   errors: PropTypes.arrayOf(PropTypes.shape({}))
 };
 
 Description.propTypes = {
   nestIndex: PropTypes.number,
-  control: PropTypes.objectOf(),
+  control: PropTypes.shape({}),
   remove: PropTypes.func,
-  errors: PropTypes.shape({})
+  errors: PropTypes.shape({
+    descriptions: PropTypes.arrayOf(
+      PropTypes.shape({
+        title: PropTypes.string,
+        body: PropTypes.string
+      })
+    )
+  })
 };
 
 export default Descriptions;

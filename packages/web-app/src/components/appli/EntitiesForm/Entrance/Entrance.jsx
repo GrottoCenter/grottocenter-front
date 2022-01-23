@@ -21,7 +21,13 @@ const GlobalInfoWrapper = styled.div`
   justify-content: space-between;
 `;
 
-const Entrance = ({ allLanguages, control, errors, setFocus }) => {
+const Entrance = ({
+  allLanguages,
+  control,
+  errors,
+  setFocus,
+  creationType
+}) => {
   const { formatMessage } = useIntl();
   const caveIdValue = useDebounce(useWatch({ control, name: 'caveId' }), 300);
 
@@ -52,6 +58,7 @@ const Entrance = ({ allLanguages, control, errors, setFocus }) => {
           rules={{ required: true }}
           render={({ field: { ref, ...field } }) => (
             <TextField
+              disabled={creationType !== 'entrance'}
               fullWidth
               required
               error={!!errors.name}
@@ -61,33 +68,35 @@ const Entrance = ({ allLanguages, control, errors, setFocus }) => {
             />
           )}
         />
-        <Controller
-          name={formatMessage({ id: 'language' })}
-          control={control}
-          rules={{ required: true }}
-          render={({ field: { ref, ...field } }) => (
-            <FormControl required error={!!errors.language} fullWidth>
-              <InputLabel shrink>
-                <Translate>language</Translate>
-              </InputLabel>
-              <Select {...field} inputRef={ref}>
-                <MenuItem key={-1} value={-1} disabled>
-                  <i>
-                    <Translate>Select a language</Translate>
-                  </i>
-                </MenuItem>
-                {allLanguages.map(l => (
-                  <MenuItem key={l.id} value={l.id} name={l.refName}>
-                    <Translate>{l.refName}</Translate>
+        {creationType === 'entrance' && (
+          <Controller
+            name="language"
+            control={control}
+            rules={{ required: true }}
+            render={({ field: { ref, ...field } }) => (
+              <FormControl required error={!!errors.language} fullWidth>
+                <InputLabel shrink>
+                  <Translate>Language</Translate>
+                </InputLabel>
+                <Select {...field} inputRef={ref}>
+                  <MenuItem key={-1} value={-1} disabled>
+                    <i>
+                      <Translate>Select a language</Translate>
+                    </i>
                   </MenuItem>
-                ))}
-              </Select>
-              <FormHelperText>
-                <Translate>Title language</Translate>
-              </FormHelperText>
-            </FormControl>
-          )}
-        />
+                  {allLanguages.map(l => (
+                    <MenuItem key={l.id} value={l.id} name={l.refName}>
+                      <Translate>{l.refName}</Translate>
+                    </MenuItem>
+                  ))}
+                </Select>
+                <FormHelperText>
+                  <Translate>Title language</Translate>
+                </FormHelperText>
+              </FormControl>
+            )}
+          />
+        )}
       </GlobalInfoWrapper>
       <GlobalInfoWrapper>
         <Controller
@@ -104,11 +113,10 @@ const Entrance = ({ allLanguages, control, errors, setFocus }) => {
               fullWidth
               autoFocus
               required
-              label={formatMessage({ id: 'longitude' })}
+              label={formatMessage({ id: 'Longitude' })}
               type="number"
               error={!!errors.longitude}
               inputRef={ref}
-              // eslint-disable-next-line react/prop-types
               helperText={errors.longitude?.message}
               {...field}
               onChange={e => field.onChange(Number(e.target.value))}
@@ -129,11 +137,10 @@ const Entrance = ({ allLanguages, control, errors, setFocus }) => {
               key="latitude"
               fullWidth
               required
-              label={formatMessage({ id: 'latitude' })}
+              label={formatMessage({ id: 'Latitude' })}
               type="number"
               error={!!errors.latitude}
               inputRef={ref}
-              // eslint-disable-next-line react/prop-types
               helperText={errors.latitude?.message}
               {...field}
               onChange={e => field.onChange(Number(e.target.value))}
@@ -148,15 +155,21 @@ const Entrance = ({ allLanguages, control, errors, setFocus }) => {
 };
 
 Entrance.propTypes = {
-  errors: PropTypes.objectOf(),
-  control: PropTypes.objectOf(),
+  errors: PropTypes.shape({
+    latitude: PropTypes.shape({ message: PropTypes.string }),
+    longitude: PropTypes.shape({ message: PropTypes.string }),
+    language: PropTypes.shape({ message: PropTypes.string }),
+    name: PropTypes.shape({ message: PropTypes.string })
+  }),
+  control: PropTypes.shape({}),
   allLanguages: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.string.isRequired,
       refName: PropTypes.string.isRequired
     })
   ),
-  setFocus: PropTypes.func
+  setFocus: PropTypes.func,
+  creationType: PropTypes.oneOf(['cave', 'entrance'])
 };
 
 export default Entrance;

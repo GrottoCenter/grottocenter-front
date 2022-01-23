@@ -7,7 +7,7 @@ import {
   MenuItem
 } from '@material-ui/core';
 import React from 'react';
-import { Controller } from 'react-hook-form';
+import { Controller, useController } from 'react-hook-form';
 import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
@@ -25,6 +25,14 @@ const Wrapper = styled.div`
 const CaveCreation = ({ control, errors, allLanguages }) => {
   const { formatMessage } = useIntl();
 
+  const {
+    field: { onChange: onNameChange }
+  } = useController({
+    control,
+    name: 'name',
+    rules: { required: true }
+  });
+
   return (
     <Section sectionTitle={formatMessage({ id: 'name' })}>
       <Wrapper>
@@ -32,25 +40,29 @@ const CaveCreation = ({ control, errors, allLanguages }) => {
           name="caveName"
           control={control}
           rules={{ required: true }}
-          render={({ field: { ref, ...field } }) => (
+          render={({ field: { ref, onChange, ...field } }) => (
             <TextField
               fullWidth
               required
               error={!!errors.name}
               label={formatMessage({ id: 'Cave name' })}
               inputRef={ref}
+              onChange={event => {
+                onChange(event.target.value);
+                onNameChange(event.target.value);
+              }}
               {...field}
             />
           )}
         />
         <Controller
-          name={formatMessage({ id: 'language' })}
+          name="language"
           control={control}
           rules={{ required: true }}
           render={({ field: { ref, ...field } }) => (
             <FormControl required error={!!errors.language} fullWidth>
               <InputLabel shrink>
-                <Translate>language</Translate>
+                <Translate>Language</Translate>
               </InputLabel>
               <Select {...field} inputRef={ref}>
                 <MenuItem key={-1} value={-1} disabled>
@@ -83,10 +95,10 @@ CaveCreation.propTypes = {
       refName: PropTypes.string.isRequired
     })
   ),
-  control: PropTypes.objectOf(),
+  control: PropTypes.shape({}),
   errors: PropTypes.shape({
-    name: PropTypes.string,
-    language: PropTypes.string,
+    name: PropTypes.shape({ message: PropTypes.string }),
+    language: PropTypes.shape({ message: PropTypes.string }),
     descriptions: PropTypes.arrayOf(PropTypes.shape({}))
   })
 };

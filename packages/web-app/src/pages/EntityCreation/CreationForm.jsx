@@ -93,7 +93,7 @@ const CreationForm = () => {
   return (
     <>
       <Header>
-        <Translate>Entrance, cave, ...</Translate>
+        <Translate>Entrance, cave ...</Translate>
       </Header>
       <hr />
       <Wrapper>
@@ -108,11 +108,11 @@ const CreationForm = () => {
 };
 
 EntityForm.propTypes = {
-  selectedEntity: PropTypes.oneOfType(values(ENTITY)).isRequired
+  selectedEntity: PropTypes.oneOf(values(ENTITY)).isRequired
 };
 
 EntityTypeSelect.propTypes = {
-  entity: PropTypes.oneOfType(values(ENTITY)).isRequired,
+  entity: PropTypes.oneOf(values(ENTITY)).isRequired,
   onEntityChange: PropTypes.func.isRequired
 };
 

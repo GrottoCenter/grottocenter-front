@@ -36,7 +36,7 @@ const Details = ({ control, errors, isReadonly = false }) => {
   };
   const validateDistance = value => {
     if (value < 0) {
-      return formatMessage({ id: 'Distance must be superior or equal 0' });
+      return formatMessage({ id: 'Distance must be superior or equal to 0' });
     }
     return true;
   };
@@ -53,7 +53,7 @@ const Details = ({ control, errors, isReadonly = false }) => {
               disabled={isReadonly}
               fullWidth
               autoFocus
-              label={formatMessage({ id: 'depth' })}
+              label={formatMessage({ id: 'Depth' })}
               type="number"
               error={!!errors.depth}
               inputRef={ref}
@@ -62,7 +62,6 @@ const Details = ({ control, errors, isReadonly = false }) => {
                   <InputAdornment position="start">m</InputAdornment>
                 )
               }}
-              // eslint-disable-next-line react/prop-types
               helperText={errors.depth?.message}
               {...field}
             />
@@ -76,7 +75,7 @@ const Details = ({ control, errors, isReadonly = false }) => {
             <TextField
               disabled={isReadonly}
               fullWidth
-              label={formatMessage({ id: 'length' })}
+              label={formatMessage({ id: 'Length' })}
               type="number"
               error={!!errors.length}
               inputRef={ref}
@@ -85,7 +84,6 @@ const Details = ({ control, errors, isReadonly = false }) => {
                   <InputAdornment position="start">m</InputAdornment>
                 )
               }}
-              // eslint-disable-next-line react/prop-types
               helperText={errors.length?.message}
               {...field}
             />
@@ -102,7 +100,7 @@ const Details = ({ control, errors, isReadonly = false }) => {
             <TextField
               disabled={isReadonly}
               fullWidth
-              label={formatMessage({ id: 'temperature' })}
+              label={formatMessage({ id: 'Temperature' })}
               type="number"
               error={!!errors.temperature}
               inputRef={ref}
@@ -111,7 +109,6 @@ const Details = ({ control, errors, isReadonly = false }) => {
                   <InputAdornment position="start">°C</InputAdornment>
                 )
               }}
-              // eslint-disable-next-line react/prop-types
               helperText={errors.temperature?.message}
               {...field}
             />
@@ -140,7 +137,7 @@ const Details = ({ control, errors, isReadonly = false }) => {
                   onChange={e => field.onChange(e.target.checked)}
                 />
               }
-              label={formatMessage({ id: 'is diving' })}
+              label={formatMessage({ id: 'Is diving' })}
             />
           </StyledFormControl>
         )}
@@ -150,8 +147,13 @@ const Details = ({ control, errors, isReadonly = false }) => {
 };
 
 Details.propTypes = {
-  errors: PropTypes.objectOf(),
-  control: PropTypes.objectOf(),
+  errors: PropTypes.shape({
+    depth: PropTypes.shape({ message: PropTypes.string }),
+    length: PropTypes.shape({ message: PropTypes.string }),
+    temperature: PropTypes.shape({ message: PropTypes.string }),
+    isDiving: PropTypes.shape({ message: PropTypes.string })
+  }),
+  control: PropTypes.shape({}),
   isReadonly: PropTypes.bool
 };
 
