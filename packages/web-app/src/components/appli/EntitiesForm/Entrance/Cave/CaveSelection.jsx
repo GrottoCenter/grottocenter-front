@@ -35,8 +35,8 @@ const resultEndAdornment = (
   </InputAdornment>
 );
 
-const getCaveToString = massif => {
-  return `${massif.name}`;
+const getCaveToString = cave => {
+  return `${cave.name}`;
 };
 
 const CaveSelection = ({ control, errors }) => {

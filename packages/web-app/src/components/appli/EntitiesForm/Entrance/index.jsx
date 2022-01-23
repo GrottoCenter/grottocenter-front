@@ -136,6 +136,7 @@ export const EntranceForm = ({ entranceValues = null }) => {
         allLanguages={allLanguages}
         errors={errors}
         setFocus={setFocus}
+        creationType={creationType}
       />
     ),
     details: <Details control={control} errors={errors} />

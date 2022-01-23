@@ -75,8 +75,8 @@ export const PositionMap = ({ control }) => {
 };
 
 PositionMap.propTypes = {
-  control: PropTypes.objectOf()
+  control: PropTypes.shape({})
 };
 CountrySelection.propTypes = {
-  control: PropTypes.objectOf()
+  control: PropTypes.shape({})
 };
