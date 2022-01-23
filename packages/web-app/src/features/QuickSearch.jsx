@@ -24,7 +24,14 @@ const renderOption = option => entityOptionForSelector(option);
 const getOptionLabel = option => option.name;
 
 const QuickSearch = ({
-  searchOnTypes = ['documents', 'entrances', 'grottos', 'massifs', 'caves'],
+  searchOnTypes = [
+    'documents',
+    'entrances',
+    'grottos',
+    'massifs',
+    'caves',
+    'networks'
+  ],
   searchOnType,
   label,
   inputProps,
@@ -114,14 +121,22 @@ QuickSearch.propTypes = {
   hasFixWidth: PropTypes.bool,
   label: PropTypes.string,
   searchOnTypes: PropTypes.arrayOf(
-    PropTypes.oneOf('documents', 'entrances', 'grottos', 'massifs', 'caves')
+    PropTypes.oneOf(
+      'documents',
+      'entrances',
+      'grottos',
+      'massifs',
+      'caves',
+      'networks'
+    )
   ),
   searchOnType: PropTypes.oneOf(
     'documents',
     'entrances',
     'grottos',
     'massifs',
-    'caves'
+    'caves',
+    'networks'
   ),
   inputProps: PropTypes.string,
   error: PropTypes.bool
