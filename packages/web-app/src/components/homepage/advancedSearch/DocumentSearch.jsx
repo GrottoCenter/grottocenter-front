@@ -1,4 +1,3 @@
-/* eslint-disable camelcase */
 import React from 'react';
 import PropTypes from 'prop-types';
 import { injectIntl } from 'react-intl';
@@ -180,7 +179,7 @@ class DocumentSearch extends React.Component {
 
     const {
       'date_publication-range': publicationDateRange,
-      ref_bbs,
+      ref_bbs, // eslint-disable-line camelcase
       title,
       authors,
       'contributor nickname': contributorNickname,
@@ -188,7 +187,7 @@ class DocumentSearch extends React.Component {
       'type name': documentTypeName,
       subjects, // TODO: currently, we select only one subject via a dropdown menu. It should be possible to search multiple subjects.
       regions,
-      publication_other_bbs_old,
+      publication_other_bbs_old, // eslint-disable-line camelcase
       matchAllFields,
       allFieldsRequest,
       panelExpanded
@@ -435,7 +434,7 @@ class DocumentSearch extends React.Component {
                       </span>
                     }
                     onChange={event => this.handleValueChange('ref_bbs', event)}
-                    value={ref_bbs}
+                    value={ref_bbs} // eslint-disable-line camelcase
                   />
 
                   <TextField
@@ -470,7 +469,7 @@ class DocumentSearch extends React.Component {
                     onChange={event =>
                       this.handleValueChange('publication_other_bbs_old', event)
                     }
-                    value={publication_other_bbs_old}
+                    value={publication_other_bbs_old} // eslint-disable-line camelcase
                   />
 
                   <SliderForm

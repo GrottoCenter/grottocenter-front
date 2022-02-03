@@ -1,4 +1,3 @@
-/* eslint-disable react/forbid-prop-types */
 import React from 'react';
 import PropTypes from 'prop-types';
 import { useSelector } from 'react-redux';
@@ -17,6 +16,7 @@ const InternationalizedLink = ({ links, className, children }) => {
 };
 
 InternationalizedLink.propTypes = {
+  // eslint-disable-next-line react/forbid-prop-types
   links: PropTypes.any.isRequired,
   className: PropTypes.string,
   children: PropTypes.node

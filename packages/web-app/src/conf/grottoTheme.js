@@ -21,7 +21,7 @@ const fontFamily = [
 
 const sideMenuWidth = 240;
 const appBarHeight = 56;
-const breadcrumpHeight = 24; // eslint-disable-line no-unused-vars
+const breadcrumpHeight = 24;
 const paddingUnit = 8;
 
 export const overridings = {

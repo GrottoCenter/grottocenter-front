@@ -28,9 +28,9 @@ const makeCustomRenders = () => {
       id: 'submit_date',
       customRender: date => {
         const tmpDate = new Date(date);
-        const formattedDate =
-          // eslint-disable-next-line no-self-compare
-          tmpDate.getTime() === tmpDate.getTime() ? formatDate(tmpDate) : date;
+        const formattedDate = Number.isNaN(tmpDate.getTime())
+          ? formatDate(tmpDate)
+          : date;
 
         return (
           <Typography variant="subtitle2">{`${formattedDate}`}</Typography>

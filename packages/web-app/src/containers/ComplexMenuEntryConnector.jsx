@@ -8,8 +8,7 @@ const mapDispatchToProps = dispatch => ({
 
 const mapStateToProps = (state, ownProps) => {
   let currentItem;
-  // eslint-disable-next-line array-callback-return
-  state.sideMenu.items.map(item => {
+  state.sideMenu.items.forEach(item => {
     if (item.identifier === ownProps.identifier) {
       currentItem = item;
     }

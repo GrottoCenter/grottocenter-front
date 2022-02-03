@@ -94,10 +94,11 @@ const Provider = ({ children, defaultValues = {} }) => {
   }, [importFormState, currentStep]);
 
   useEffect(() => {
-    // eslint-disable-next-line no-unused-expressions
-    defaultFormSteps.length === validatedSteps.length
-      ? setFormValid()
-      : setFormInvalid();
+    if (defaultFormSteps.length === validatedSteps.length) {
+      setFormValid();
+    } else {
+      setFormInvalid();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [validatedSteps]);
 

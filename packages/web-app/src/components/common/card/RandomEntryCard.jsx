@@ -377,8 +377,7 @@ RandomEntryCard.propTypes = {
   fetch: PropTypes.func.isRequired,
   isFetching: PropTypes.bool,
   entry: PropTypes.shape({
-    // eslint-disable-next-line react/forbid-prop-types
-    id: PropTypes.any
+    id: PropTypes.number
   })
 };
 
