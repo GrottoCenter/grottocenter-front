@@ -19,7 +19,7 @@ const EntrancesList = props => {
   return (
     <div>
       <Typography variant="h3">{title}</Typography>
-      {entrances.length > 0 ? (
+      {entrances && entrances.length > 0 ? (
         <StyledList>
           {entrances
             .sort((a, b) => a.name.localeCompare(b.name))
@@ -41,7 +41,7 @@ EntrancesList.propTypes = {
 };
 
 EntrancesList.defaultProps = {
-  entrances: undefined,
+  entrances: [],
   title: <Translate>Entrances list</Translate>,
   emptyMessageComponent: <Translate>Empty list</Translate>
 };
