@@ -1,4 +1,3 @@
-/* eslint-disable camelcase */
 import React from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
@@ -125,7 +124,7 @@ class OrganizationsSearch extends React.Component {
       county,
       country,
       name,
-      postal_code,
+      postal_code, // eslint-disable-line camelcase
       region,
       matchAllFields
     } = this.state;
@@ -204,7 +203,7 @@ class OrganizationsSearch extends React.Component {
                   onChange={event =>
                     this.handleValueChange('postal_code', event)
                   }
-                  value={postal_code}
+                  value={postal_code} // eslint-disable-line camelcase
                 />
 
                 <TextField

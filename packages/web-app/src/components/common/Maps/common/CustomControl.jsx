@@ -24,10 +24,8 @@ const CustomControl = ({
 
 export const customControlProps = {
   position: PropTypes.oneOf(Object.keys(POSITION_CLASSES)),
-  // eslint-disable-next-line react/forbid-prop-types
   containerProps: PropTypes.any,
   children: PropTypes.node,
-  // eslint-disable-next-line react/forbid-prop-types
   style: PropTypes.object
 };
 

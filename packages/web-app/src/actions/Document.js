@@ -70,9 +70,8 @@ const buildFormData = (formData, data, parentKey) => {
         parentKey ? `${parentKey}[${key}]` : key
       );
     });
-  } else {
-    // eslint-disable-next-line no-unused-expressions
-    (data || data === '') && formData.append(parentKey, data);
+  } else if (data || data === '') {
+    formData.append(parentKey, data);
   }
 };
 

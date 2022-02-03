@@ -51,8 +51,7 @@ const latFn = d3.randomNormal(center[0], 1);
 const longFn = d3.randomNormal(center[1], 1);
 const generateRandomCoord = function(intensity = 1000) {
   const data = [];
-  // eslint-disable-next-line no-plusplus
-  for (let i = 0; i < intensity; i++) {
+  for (let i = 0; i < intensity; i += 1) {
     data.push([longFn(), latFn()]);
   }
   return data;
