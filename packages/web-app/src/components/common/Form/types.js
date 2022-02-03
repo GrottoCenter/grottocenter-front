@@ -1,6 +1,5 @@
 import PropTypes from 'prop-types';
 
-// eslint-disable-next-line import/prefer-default-export
 export const FormAutoCompleteTypes = {
   autoCompleteSearch: PropTypes.node,
   children: PropTypes.node,
@@ -17,7 +16,6 @@ export const FormAutoCompleteTypes = {
   value: PropTypes.shape({})
 };
 
-// eslint-disable-next-line import/prefer-default-export
 export const MultipleSelectTypes = {
   children: PropTypes.node,
   computeHasError: PropTypes.func.isRequired,
@@ -42,7 +40,6 @@ export const MultipleSelectTypes = {
   value: PropTypes.arrayOf(PropTypes.shape({})).isRequired
 };
 
-// eslint-disable-next-line import/prefer-default-export
 export const MultipleSelectWithOptionsTypes = {
   computeHasError: PropTypes.func.isRequired,
   getOptionLabel: PropTypes.func.isRequired,

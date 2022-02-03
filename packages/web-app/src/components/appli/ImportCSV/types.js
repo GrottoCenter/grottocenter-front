@@ -7,7 +7,6 @@ const defaultFormSteps = [
   { id: 4, name: 'Confirm or Rollback', isValid: true }
 ];
 
-// eslint-disable-next-line import/prefer-default-export
 export const ImportFormTypes = {
   isLoading: PropTypes.bool.isRequired,
   onSubmit: PropTypes.func.isRequired,

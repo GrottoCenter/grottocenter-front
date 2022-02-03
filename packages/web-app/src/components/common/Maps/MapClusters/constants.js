@@ -1,4 +1,3 @@
-// eslint-disable-next-line import/prefer-default-export
 import { blue, brown } from '@material-ui/core/colors';
 
 export const MARKERS_LIMIT = 13;

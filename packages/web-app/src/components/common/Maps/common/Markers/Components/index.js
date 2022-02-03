@@ -1,4 +1,3 @@
-// eslint-disable-next-line import/prefer-default-export
 export { EntranceMarker } from './EntranceMarker';
 export { EntrancePopup } from './EntrancePopup';
 export { NetworkMarker } from './NetworkMarker';
