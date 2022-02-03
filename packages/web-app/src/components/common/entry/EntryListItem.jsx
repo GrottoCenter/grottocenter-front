@@ -45,7 +45,6 @@ const EntryListItem = props => {
       <GClink
         className={classes.entryLink}
         internal={false}
-        target="_blank"
         href={`/ui/entrances/${entry.id}`}>
         {entry.name}
       </GClink>
