@@ -80,10 +80,7 @@ const Document = ({ details, entities, id, overview }) => {
       <StyledListItemText
         primary={
           <>
-            <GCLink
-              internal={false}
-              target="_blank"
-              href={`/ui/documents/${id}`}>
+            <GCLink internal={false} href={`/ui/documents/${id}`}>
               {overview.title}
             </GCLink>
             <StyledChip

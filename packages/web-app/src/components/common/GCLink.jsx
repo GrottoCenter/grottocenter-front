@@ -41,8 +41,7 @@ const GCLink = ({
   }
   if (!internal) {
     return (
-      // eslint-disable-next-line react/jsx-no-target-blank
-      <a href={href} {...params} target="_blank">
+      <a href={href} {...params} rel="noreferrer" target="_blank">
         {children}
       </a>
     );
