@@ -46,14 +46,12 @@ const Map = () => {
     dispatch(changeZoom(zoom));
 
     const criteria = {
-      // eslint-disable-next-line no-underscore-dangle
+      /* eslint-disable no-underscore-dangle */
       sw_lat: bounds._southWest.wrap().lat,
-      // eslint-disable-next-line no-underscore-dangle
       sw_lng: bounds._southWest.wrap().lng,
-      // eslint-disable-next-line no-underscore-dangle
       ne_lat: bounds._northEast.wrap().lat,
-      // eslint-disable-next-line no-underscore-dangle
       ne_lng: bounds._northEast.wrap().lng,
+      /* eslint-enable no-underscore-dangle */
       zoom: newZoom
     };
     if (includes('organizations', markers)) {

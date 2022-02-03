@@ -2,14 +2,12 @@ import PropTypes from 'prop-types';
 import { values } from 'ramda';
 import DocumentTypes from '../../../../conf/DocumentTypes';
 
-// eslint-disable-next-line import/prefer-default-export
 export const DocumentFormTypes = {
   isLoading: PropTypes.bool.isRequired,
   onSubmit: PropTypes.func.isRequired,
   onUpdate: PropTypes.func.isRequired
 };
 
-// eslint-disable-next-line import/prefer-default-export
 const languageTypes = PropTypes.shape({
   id: PropTypes.string,
   part2b: PropTypes.string,

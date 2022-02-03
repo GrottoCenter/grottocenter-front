@@ -1,4 +1,3 @@
-/* eslint-disable */
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import MenuItem from '@material-ui/core/MenuItem';
@@ -31,32 +30,41 @@ class ComplexMenuEntry extends Component {
   }
 
   render() {
-    const display = this.props.open ? 'inherit' : 'none';
+    const {
+      children,
+      icon: defaultIcon,
+      identifier,
+      open,
+      target,
+      text,
+      toggle,
+      toggleSideMenu
+    } = this.props;
+    const display = open ? 'inherit' : 'none';
 
-    let icon = this.props.open ? <ExpandLessIcon /> : <ExpandMoreIcon />;
-
-    if (!this.props.children) {
-      icon = this.props.icon;
+    let icon = open ? <ExpandLessIcon /> : <ExpandMoreIcon />;
+    if (!children) {
+      icon = defaultIcon;
     }
 
-    let callOnClick = () => this.props.toggle(this.props.identifier);
-    if (this.props.target) {
+    let callOnClick = () => toggle(identifier);
+    if (target) {
       callOnClick = () => {
-        BrowserRouter.push(this.props.target);
-        this.props.toggleSideMenu();
+        BrowserRouter.push(target);
+        toggleSideMenu();
       };
     }
 
     return (
       <div>
         <FirstLevelMenuItem onClick={callOnClick} leftIcon={icon}>
-          {this.props.text}
+          {text}
         </FirstLevelMenuItem>
         <div
           style={{
             display
           }}>
-          {this.props.children}
+          {children}
         </div>
       </div>
     );

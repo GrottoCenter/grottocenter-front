@@ -12,7 +12,6 @@ export const getAuthor = author => ({
   surname: author?.surname || 'Unknown'
 });
 
-// eslint-disable-next-line import/prefer-default-export
 export const getComments = (comments = []) =>
   comments.map(comment => ({
     accessRate: pathOr(0, ['approach'], comment) / 2,

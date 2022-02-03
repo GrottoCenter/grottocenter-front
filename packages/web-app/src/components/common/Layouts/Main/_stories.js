@@ -10,7 +10,6 @@ import AppBar from '../../AppBar';
 import Layout from './index';
 
 // Export for stories
-// eslint-disable-next-line import/prefer-default-export
 export const Search = () => (
   <AutoCompleteSearch
     disabled

@@ -43,8 +43,8 @@ const Api = () => {
   const { locale } = useSelector(state => state.intl);
 
   const restApiLink =
-    restApiLinks[locale] !== undefined // eslint-disable-line no-undef
-      ? restApiLinks[locale] // eslint-disable-line no-undef
+    restApiLinks[locale] !== undefined
+      ? restApiLinks[locale]
       : restApiLinks['*'];
 
   return (
