@@ -15,8 +15,6 @@ import styled from 'styled-components';
 import Section from '../../../FormSection';
 import Translate from '../../../../../common/Translate';
 
-import Descriptions from './Descriptions';
-
 const Wrapper = styled.div`
   display: flex;
   justify-content: space-between;
@@ -77,13 +75,14 @@ const CaveCreation = ({ control, errors, allLanguages }) => {
                 ))}
               </Select>
               <FormHelperText>
-                <Translate>Name language</Translate>
+                <Translate>Entrance name language</Translate>
               </FormHelperText>
             </FormControl>
           )}
         />
       </Wrapper>
-      <Descriptions control={control} errors={errors} />
+      {/* TODO HANDLE LOCATION FOR DESCRIPTION MULTIPLE FIELD (LOCATION) */}
+      {/* <Descriptions control={control} errors={errors} /> */}
     </Section>
   );
 };

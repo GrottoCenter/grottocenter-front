@@ -47,12 +47,14 @@ const Cave = ({
           <FormControlLabel
             value="entrance"
             control={<Radio />}
-            label={formatMessage({ id: 'Linked to a network' })}
+            label={formatMessage({ id: 'Linked to an existing network' })}
           />
           <FormControlLabel
             value="cave"
             control={<Radio />}
-            label={formatMessage({ id: 'Not linked to a network' })}
+            label={formatMessage({
+              id: 'First entrance of the cave (on Grottocenter)'
+            })}
           />
         </RadioGroup>
       </FormControl>

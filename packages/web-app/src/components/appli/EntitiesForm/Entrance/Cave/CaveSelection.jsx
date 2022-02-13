@@ -1,10 +1,5 @@
 import { useIntl } from 'react-intl';
-import {
-  FormControl,
-  InputAdornment,
-  InputLabel,
-  FormHelperText
-} from '@material-ui/core';
+import { FormControl, InputAdornment, InputLabel } from '@material-ui/core';
 import { useDispatch, useSelector } from 'react-redux';
 import React, { useEffect, useState } from 'react';
 import { useController } from 'react-hook-form';
@@ -150,11 +145,6 @@ const CaveSelection = ({ control, errors }) => {
             />
           </InputWrapper>
         </StyledFormControl>
-        <FormHelperText>
-          {formatMessage({
-            id: 'An entrance must be attached to an existing cave'
-          })}
-        </FormHelperText>
       </FormControl>
       {!!caveId && <Details control={control} errors={errors} isReadonly />}
     </>
