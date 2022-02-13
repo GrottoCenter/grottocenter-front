@@ -91,7 +91,7 @@ const Entrance = ({
                   ))}
                 </Select>
                 <FormHelperText>
-                  <Translate>Title language</Translate>
+                  <Translate>Entrance name language</Translate>
                 </FormHelperText>
               </FormControl>
             )}

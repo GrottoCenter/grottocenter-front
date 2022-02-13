@@ -18,7 +18,7 @@ export const makeCaveData = data => ({
     language: data.language,
     text: data.caveName
   },
-  descriptions: data.descriptions.map(desc => ({
+  descriptions: data.descriptions?.map(desc => ({
     body: desc.body,
     language: data.language,
     title: desc.title
