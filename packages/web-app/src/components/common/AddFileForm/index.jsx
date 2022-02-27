@@ -211,7 +211,7 @@ const AddFileForm = ({
       <StyledTypography color="textSecondary">
         {formatMessage(
           {
-            id: 'Accepted file formats',
+            id: 'Accepted file formats: {extensions}',
             defaultMessage: 'Accepted file formats: {extensions}.'
           },
           {

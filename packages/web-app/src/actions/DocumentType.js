@@ -24,7 +24,7 @@ export function loadDocumentTypes() {
   return dispatch => {
     dispatch(fetchDocumentTypes());
 
-    return fetch(getDocumentTypesUrl)
+    return fetch(`${getDocumentTypesUrl}?isAvailable=true`)
       .then(response => {
         if (response.status >= 400) {
           throw new Error(response.status);

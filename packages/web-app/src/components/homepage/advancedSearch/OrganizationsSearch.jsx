@@ -34,7 +34,7 @@ class OrganizationsSearch extends React.Component {
     const { numberOfCaversMinValue, numberOfCaversMaxValue } = this.props;
 
     return {
-      'number of cavers-range': {
+      'nb cavers-range': {
         isEditable: false,
         min: numberOfCaversMinValue,
         max: numberOfCaversMaxValue
@@ -120,7 +120,7 @@ class OrganizationsSearch extends React.Component {
     } = this.props;
 
     const {
-      'number of cavers-range': numberOfCaversRange,
+      'nb cavers-range': numberOfCaversRange,
       city,
       county,
       country,
@@ -162,12 +162,12 @@ class OrganizationsSearch extends React.Component {
                   id: 'Number of cavers'
                 })}
                 disabled={!numberOfCaversRange.isEditable}
-                onDisable={this.handleCheckedChange('number of cavers-range')}
+                onDisable={this.handleCheckedChange('nb cavers-range')}
                 min={numberOfCaversMinValue}
                 max={numberOfCaversMaxValue}
                 onChange={values => {
                   this.handleRangeChange(
-                    'number of cavers-range',
+                    'nb cavers-range',
                     values,
                     numberOfCaversMinValue,
                     numberOfCaversMaxValue

@@ -25,6 +25,7 @@ const CustomMapContainer = ({
   dragging = true,
   scrollWheelZoom = true,
   isSideMenuOpen = false,
+  style,
   children
 }) => {
   return (
@@ -35,7 +36,8 @@ const CustomMapContainer = ({
       dragging={dragging}
       scrollWheelZoom={scrollWheelZoom}
       isSideMenuOpen={isSideMenuOpen}
-      minZoom={3}>
+      minZoom={3}
+      style={style}>
       <LayersControl />
       {children}
     </Map>
@@ -49,7 +51,8 @@ CustomMapContainer.propTypes = {
   dragging: PropTypes.bool,
   scrollWheelZoom: PropTypes.bool,
   children: PropTypes.node.isRequired,
-  isSideMenuOpen: PropTypes.bool
+  isSideMenuOpen: PropTypes.bool,
+  style: PropTypes.shape({})
 };
 
 export default CustomMapContainer;

@@ -11,18 +11,10 @@ import PagesEditor from '../formElements/PagesEditor';
 import PublicationDatePicker from '../formElements/PublicationDatePicker';
 import TitleEditor from '../formElements/TitleEditor';
 
-import { allDocumentTypes } from '../DocumentTypesHelper';
-
 import {
-  // allAuthors,
-  // allEditors,
+  allDocumentTypes,
   allIdentifierTypes,
   allLanguages
-  // allLibraries,
-  // allMassifs,
-  // allPartOf,
-  // allRegions,
-  // allSubjects,
 } from './documentFormFakeData';
 
 const PaddedCard = styled(Card)`

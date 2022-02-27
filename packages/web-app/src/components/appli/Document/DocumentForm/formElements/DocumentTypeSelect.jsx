@@ -9,10 +9,12 @@ import {
   Select,
   Tooltip
 } from '@material-ui/core';
-import Translate from '../../../../common/Translate';
 
-import { isUnknown } from '../DocumentTypesHelper';
+import Translate from '../../../../common/Translate';
+import useDocumentTypes from '../../../../../hooks/useDocumentTypes';
 import { DocumentFormContext } from '../Provider';
+
+const FIRST_DOCUMENT_TYPES_TO_DISPLAY = ['Article', 'Collection', 'Issue'];
 
 const DocumentTypeSelect = ({
   allDocumentTypes,
@@ -23,6 +25,7 @@ const DocumentTypeSelect = ({
     docAttributes: { documentType },
     updateAttribute
   } = useContext(DocumentFormContext);
+  const { isUnknown } = useDocumentTypes();
   const { formatMessage } = useIntl();
   const handleChange = (event, child) => {
     const newDocType = {
@@ -31,6 +34,14 @@ const DocumentTypeSelect = ({
     };
     updateAttribute('documentType', newDocType);
   };
+
+  const firstDocumentTypes = allDocumentTypes
+    .filter(dt => FIRST_DOCUMENT_TYPES_TO_DISPLAY.includes(dt.name))
+    .sort((dt1, dt2) => dt1.name > dt2.name);
+  const otherDocumentTypes = allDocumentTypes
+    .filter(dt => !FIRST_DOCUMENT_TYPES_TO_DISPLAY.includes(dt.name))
+    .sort((dt1, dt2) => dt1.name > dt2.name);
+  const sortedDocumentTypes = [...firstDocumentTypes, ...otherDocumentTypes];
 
   const memoizedValues = [allDocumentTypes, documentType];
   return useMemo(
@@ -52,18 +63,16 @@ const DocumentTypeSelect = ({
               <Translate>Select a document type</Translate>
             </i>
           </MenuItem>
-          {allDocumentTypes
-            .sort((dt1, dt2) => dt1.id > dt2.id)
-            .map(t => (
-              <Tooltip
-                name={t.name}
-                value={t.id}
-                key={t.id}
-                title={t.comment}
-                aria-label={t.comment}>
-                <MenuItem>{formatMessage({ id: t.name })}</MenuItem>
-              </Tooltip>
-            ))}
+          {sortedDocumentTypes.map(dt => (
+            <Tooltip
+              key={dt.id}
+              name={dt.name}
+              value={dt.id}
+              title={dt.comment}
+              aria-label={dt.comment}>
+              <MenuItem>{formatMessage({ id: dt.name })}</MenuItem>
+            </Tooltip>
+          ))}
         </Select>
         {helperText && (
           <FormHelperText>
@@ -77,13 +86,15 @@ const DocumentTypeSelect = ({
   );
 };
 
+DocumentType.propTypes = {
+  id: PropTypes.number.isRequired,
+  comment: PropTypes.string,
+  name: PropTypes.string.isRequired
+};
+
 DocumentTypeSelect.propTypes = {
-  allDocumentTypes: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.number.isRequired,
-      name: PropTypes.string.isRequired
-    })
-  ).isRequired,
+  allDocumentTypes: PropTypes.arrayOf(PropTypes.shape(DocumentType.propTypes))
+    .isRequired,
   helperText: PropTypes.string.isRequired,
   required: PropTypes.bool
 };
