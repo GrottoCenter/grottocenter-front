@@ -11,7 +11,7 @@ import {
   __
 } from 'ramda';
 import { isStepValid } from './formSteps/DocumentStepsHelper';
-import { DocumentTypes } from './DocumentTypesHelper';
+import DocumentTypes from '../../../../conf/DocumentTypes';
 import { defaultValuesTypes } from './types';
 
 const defaultFormSteps = [

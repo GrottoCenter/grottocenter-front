@@ -18,8 +18,8 @@ const CavesList = props => {
 
   return (
     <div>
-      <Typography>{title}</Typography>
-      {caves.length > 0 ? (
+      <Typography variant="h3">{title}</Typography>
+      {caves && caves.length > 0 ? (
         <StyledList>
           {caves
             .sort((a, b) => a.name.localeCompare(b.name))
@@ -28,10 +28,7 @@ const CavesList = props => {
             ))}
         </StyledList>
       ) : (
-        <>
-          <br />
-          <em>{emptyMessageComponent}</em>
-        </>
+        <em>{emptyMessageComponent}</em>
       )}
     </div>
   );
@@ -44,12 +41,8 @@ CavesList.propTypes = {
 };
 
 CavesList.defaultProps = {
-  caves: undefined,
-  title: (
-    <strong>
-      <Translate>Caves list</Translate>
-    </strong>
-  ),
+  caves: [],
+  title: <Translate>Caves list</Translate>,
   emptyMessageComponent: <Translate>Empty list</Translate>
 };
 

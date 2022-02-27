@@ -36,10 +36,20 @@ const IconButton = styled(MuiIconButton)`
   margin-left: auto;
 `;
 
-const FixedContent = ({ title, icon, content, footer, onEdit }) => {
+const FixedContent = ({
+  avatar,
+  subheader,
+  title,
+  icon,
+  content,
+  footer,
+  onEdit
+}) => {
   return (
     <Card>
       <CardHeader
+        avatar={avatar}
+        subheader={subheader}
         title={
           <Title>
             <Typography variant="h1" color="secondary">
@@ -63,11 +73,13 @@ const FixedContent = ({ title, icon, content, footer, onEdit }) => {
 };
 
 FixedContent.propTypes = {
-  title: PropTypes.string.isRequired,
-  icon: PropTypes.node,
+  avatar: PropTypes.node,
   content: PropTypes.node.isRequired,
   footer: PropTypes.string,
-  onEdit: PropTypes.func
+  icon: PropTypes.node,
+  onEdit: PropTypes.func,
+  subheader: PropTypes.node,
+  title: PropTypes.string.isRequired
 };
 
 export default FixedContent;

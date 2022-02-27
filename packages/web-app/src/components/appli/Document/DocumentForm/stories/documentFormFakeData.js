@@ -1,3 +1,5 @@
+import DocumentTypes from '../../../../../conf/DocumentTypes';
+
 export const allAuthors = [
   {
     id: '1',
@@ -265,5 +267,39 @@ export const allIdentifierTypes = [
   {
     id: '4',
     text: 'URL'
+  }
+];
+
+export const allDocumentTypes = [
+  {
+    id: DocumentTypes.COLLECTION,
+    comment: 'Example: Stalactite - organ of the Swiss Speleological Society',
+    name: 'Collection',
+    parentId: null
+  },
+  {
+    id: DocumentTypes.IMAGE,
+    comment: 'A visual representation other than text',
+    name: 'Image',
+    parentId: null
+  },
+  {
+    id: DocumentTypes.TEXT,
+    comment: 'All other documents that have already been published',
+    name: 'Text',
+    parentId: null
+  },
+  {
+    id: DocumentTypes.ARTICLE,
+    comment:
+      'Example: “10th International Congress of Speleology” in UIS Bulletin n°33',
+    name: 'Article',
+    parentId: DocumentTypes.TEXT
+  },
+  {
+    id: DocumentTypes.ISSUE,
+    comment: 'Example: Spelunca n°155 (September 2009)',
+    name: 'Issue',
+    parentId: DocumentTypes.TEXT
   }
 ];

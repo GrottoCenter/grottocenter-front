@@ -14,8 +14,7 @@ import { useIntl } from 'react-intl';
 import { pathOr } from 'ramda';
 
 import Translate from '../../../../common/Translate';
-
-import { isOther } from '../DocumentTypesHelper';
+import useDocumentTypes from '../../../../../hooks/useDocumentTypes';
 import { DocumentFormContext } from '../Provider';
 import StringInput from '../../../../common/Form/StringInput';
 
@@ -51,6 +50,8 @@ const IdentifierEditor = ({
     },
     updateAttribute
   } = useContext(DocumentFormContext);
+  const { isOther } = useDocumentTypes();
+
   const regexp = pathOr(null, ['regexp'], identifierType);
   const isRegexpValid =
     regexp === null ? true : new RegExp(regexp).test(identifier);
