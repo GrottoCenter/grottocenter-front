@@ -25,8 +25,9 @@ const DocumentTypeSelect = ({
     docAttributes: { documentType },
     updateAttribute
   } = useContext(DocumentFormContext);
-  const { isIssue, isUnknown } = useDocumentTypes();
+  const { isArticle, isIssue, isUnknown } = useDocumentTypes();
   const { formatMessage } = useIntl();
+
   const handleChange = (event, child) => {
     const newDocType = {
       id: event.target.value,
@@ -35,6 +36,11 @@ const DocumentTypeSelect = ({
     // Delete issue attribute when changing from "Issue" type
     if (!isIssue(newDocType)) {
       updateAttribute('issue', null);
+    }
+    // Delete page attributes when changing from Article
+    if (!isArticle(newDocType)) {
+      updateAttribute('endPage', null);
+      updateAttribute('startPage', null);
     }
     updateAttribute('documentType', newDocType);
   };
