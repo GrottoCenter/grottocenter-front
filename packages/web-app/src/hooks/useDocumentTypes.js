@@ -51,36 +51,24 @@ const useDocumentTypes = () => {
     }
   }, [data, dispatch]);
 
-  const isUnknown = documentType => {
-    return documentType.id === DocumentTypes.UNKNOWN;
-  };
-  const isCollection = documentType => {
-    return documentType.id === DocumentTypes.COLLECTION;
-  };
-  const isIssue = documentType => {
-    return documentType.id === DocumentTypes.ISSUE;
-  };
-  const isArticle = documentType => {
-    return documentType.id === DocumentTypes.ARTICLE;
-  };
+  const isUnknown = docType => docType.id === DocumentTypes.UNKNOWN;
+  const isCollection = docType => docType.id === DocumentTypes.COLLECTION;
+  const isIssue = docType => docType.id === DocumentTypes.ISSUE;
+  const isArticle = docType => docType.id === DocumentTypes.ARTICLE;
+  const isImage = docType => docType.id === DocumentTypes.IMAGE;
+
   // Image is also included in "Other" type.
-  const isImage = documentType => {
-    return documentType.id === DocumentTypes.IMAGE;
-  };
-  const isOther = documentType => {
-    return (
-      !isUnknown(documentType) &&
-      !isCollection(documentType) &&
-      !isIssue(documentType) &&
-      !isArticle(documentType)
-    );
-  };
+  const isOther = docType =>
+    !isArticle(docType) &&
+    !isCollection(docType) &&
+    !isIssue(docType) &&
+    !isUnknown(docType);
 
   return {
     documentTypes: state.documentTypes,
     error,
-    isArticle: docType => isArticle(docType),
-    isCollection: docType => isCollection(docType),
+    isArticle,
+    isCollection,
     isIssue,
     isImage,
     isOther,
