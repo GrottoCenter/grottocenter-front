@@ -25,13 +25,17 @@ const DocumentTypeSelect = ({
     docAttributes: { documentType },
     updateAttribute
   } = useContext(DocumentFormContext);
-  const { isUnknown } = useDocumentTypes();
+  const { isIssue, isUnknown } = useDocumentTypes();
   const { formatMessage } = useIntl();
   const handleChange = (event, child) => {
     const newDocType = {
       id: event.target.value,
       name: child.props.name
     };
+    // Delete issue attribute when changing from "Issue" type
+    if (!isIssue(newDocType)) {
+      updateAttribute('issue', null);
+    }
     updateAttribute('documentType', newDocType);
   };
 
