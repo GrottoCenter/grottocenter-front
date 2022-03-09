@@ -4,15 +4,16 @@ import { useIntl } from 'react-intl';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
 
+const TabIcon = styled.img`
+  height: 2rem;
+  margin-right: 5px;
+  vertical-align: middle;
+  width: 2rem;
+`;
+
 const HeaderTabs = ({ selectedTab, setSelectedTab, disabledAllTabs }) => {
   const { formatMessage } = useIntl();
 
-  const TabIcon = styled.img`
-    height: 2rem;
-    margin-right: 5px;
-    vertical-align: middle;
-    width: 2rem;
-  `;
   return (
     <Tabs
       value={selectedTab}
