@@ -17,8 +17,7 @@ const HeaderTabs = ({ selectedTab, setSelectedTab, disabledAllTabs }) => {
     <Tabs
       value={selectedTab}
       onChange={(event, value) => setSelectedTab(value)}
-      variant="scrollable"
-      scrollButtons="on"
+      variant="standard"
       indicatorColor="primary"
       textColor="primary">
       <Tab
