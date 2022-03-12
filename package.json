@@ -48,7 +48,7 @@
     "webpack": "4.44.2"
   },
   "engines": {
-    "node": ">=14",
+    "node": "^16.14.0",
     "yarn": ">=3.0.*"
   },
   "dependenciesMeta": {
