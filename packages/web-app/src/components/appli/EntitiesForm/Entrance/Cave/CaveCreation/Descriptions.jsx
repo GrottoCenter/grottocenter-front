@@ -1,7 +1,7 @@
 import React from 'react';
 import { useIntl } from 'react-intl';
 import { Controller, useFieldArray } from 'react-hook-form';
-import { Button, IconButton, TextField } from '@material-ui/core';
+import { Box, Button, IconButton, TextField } from '@material-ui/core';
 import DeleteIcon from '@material-ui/icons/Delete';
 import AddIcon from '@material-ui/icons/Add';
 import styled from 'styled-components';
@@ -23,16 +23,11 @@ const FullWidthDiv = styled.div`
   width: 100%;
 `;
 
-const Wrapper = styled.div`
-  display: flex;
-  justify-content: space-between;
-`;
-
 const Description = ({ nestIndex, control, remove, errors }) => {
   const { formatMessage } = useIntl();
 
   return (
-    <Wrapper>
+    <Box display="flex" justifyContent="space-between">
       <FullWidthDiv>
         <Controller
           name={`descriptions.${nestIndex}.title`}
@@ -74,7 +69,7 @@ const Description = ({ nestIndex, control, remove, errors }) => {
           <DeleteIcon fontSize="small" />
         </IconButton>
       </CenterDiv>
-    </Wrapper>
+    </Box>
   );
 };
 

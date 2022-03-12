@@ -1,4 +1,5 @@
 import {
+  Box,
   FormControl,
   FormHelperText,
   InputLabel,
@@ -9,17 +10,11 @@ import {
 import React, { useEffect } from 'react';
 import { Controller, useWatch } from 'react-hook-form';
 import { useIntl } from 'react-intl';
-import styled from 'styled-components';
 import PropTypes from 'prop-types';
 import Translate from '../../../common/Translate';
 import Section from '../FormSection';
 import { useDebounce } from '../../../../hooks';
 import { CountrySelection, PositionMap } from './Position';
-
-const GlobalInfoWrapper = styled.div`
-  display: flex;
-  justify-content: space-between;
-`;
 
 const Entrance = ({
   allLanguages,
@@ -51,7 +46,7 @@ const Entrance = ({
 
   return (
     <Section sectionTitle={formatMessage({ id: 'main information' })}>
-      <GlobalInfoWrapper>
+      <Box display="flex" justifyContent="space-between">
         <Controller
           name="name"
           control={control}
@@ -97,8 +92,8 @@ const Entrance = ({
             )}
           />
         )}
-      </GlobalInfoWrapper>
-      <GlobalInfoWrapper>
+      </Box>
+      <Box display="flex" justifyContent="space-between">
         <Controller
           defaultValue={0}
           name="longitude"
@@ -148,7 +143,7 @@ const Entrance = ({
           )}
         />
         <CountrySelection control={control} />
-      </GlobalInfoWrapper>
+      </Box>
       <PositionMap control={control} />
     </Section>
   );
