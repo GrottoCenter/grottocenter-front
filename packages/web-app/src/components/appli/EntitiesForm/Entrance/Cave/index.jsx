@@ -37,7 +37,7 @@ const Cave = ({
     <div>
       <FormControl component="fieldset" disabled={disabled}>
         <FormLabel component="legend">
-          {formatMessage({ id: 'The cave is' })}
+          {formatMessage({ id: 'The new cave is:' })}
         </FormLabel>
         <RadioGroup
           aria-label="creationType"
@@ -47,7 +47,9 @@ const Cave = ({
           <FormControlLabel
             value="entrance"
             control={<Radio />}
-            label={formatMessage({ id: 'Linked to an existing network' })}
+            label={formatMessage({
+              id: 'Linked to an existing cave or network'
+            })}
           />
           <FormControlLabel
             value="cave"

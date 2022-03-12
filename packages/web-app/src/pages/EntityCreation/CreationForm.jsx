@@ -21,11 +21,11 @@ const StyledFormControl = styled(FormControl)`
   width: 300px;
 `;
 
-const ENTITY = {
-  entrance: 'entrance',
-  cavity: 'cavity',
-  massif: 'massif',
-  organization: 'organization'
+const ENTITIES = {
+  entrance: 'Entrance',
+  cavity: 'Cavity',
+  massif: 'Massif',
+  organization: 'Organization'
 };
 
 const Wrapper = styled.div`
@@ -36,7 +36,7 @@ const EntityTypeSelect = ({ entity, onEntityChange }) => {
   const [selectedEntity, setSelectedEntity] = useState(entity);
 
   const handleChange = event => {
-    if (includes(event.target.value, values(ENTITY))) {
+    if (includes(event.target.value, values(ENTITIES))) {
       setSelectedEntity(event.target.value);
       onEntityChange(event.target.value);
     }
@@ -52,17 +52,17 @@ const EntityTypeSelect = ({ entity, onEntityChange }) => {
         onChange={handleChange}
         displayEmpty
         disabled>
-        <MenuItem value={ENTITY.entrance}>
-          <Translate>entrance</Translate>
+        <MenuItem value={ENTITIES.entrance}>
+          <Translate>Entrance</Translate>
         </MenuItem>
-        <MenuItem value={ENTITY.cavity}>
-          <Translate>cave</Translate>
+        <MenuItem value={ENTITIES.cavity}>
+          <Translate>Cave</Translate>
         </MenuItem>
-        <MenuItem value={ENTITY.massif}>
-          <Translate>massif</Translate>
+        <MenuItem value={ENTITIES.massif}>
+          <Translate>Massif</Translate>
         </MenuItem>
-        <MenuItem value={ENTITY.organization}>
-          <Translate>organization</Translate>
+        <MenuItem value={ENTITIES.organization}>
+          <Translate>Organization</Translate>
         </MenuItem>
       </Select>
       <FormHelperText>
@@ -74,11 +74,11 @@ const EntityTypeSelect = ({ entity, onEntityChange }) => {
 
 const EntityForm = ({ selectedEntity }) => {
   switch (selectedEntity) {
-    case ENTITY.entrance:
+    case ENTITIES.entrance:
       return <EntranceForm />;
-    case ENTITY.massif:
-    case ENTITY.cavity:
-    case ENTITY.organization:
+    case ENTITIES.massif:
+    case ENTITIES.cavity:
+    case ENTITIES.organization:
     default:
       return (
         <div>
@@ -88,12 +88,15 @@ const EntityForm = ({ selectedEntity }) => {
   }
 };
 const CreationForm = () => {
-  const [selectedEntity, setSelectedEntity] = useState(ENTITY.entrance);
+  const [selectedEntity, setSelectedEntity] = useState(ENTITIES.entrance);
 
   return (
     <>
       <Header>
-        <Translate>Entrance, cave ...</Translate>
+        <Translate>
+          Create a new entity such as cave, entrance or organization in
+          Grottocenter using this form.
+        </Translate>
       </Header>
       <hr />
       <Wrapper>
@@ -108,11 +111,11 @@ const CreationForm = () => {
 };
 
 EntityForm.propTypes = {
-  selectedEntity: PropTypes.oneOf(values(ENTITY)).isRequired
+  selectedEntity: PropTypes.oneOf(values(ENTITIES)).isRequired
 };
 
 EntityTypeSelect.propTypes = {
-  entity: PropTypes.oneOf(values(ENTITY)).isRequired,
+  entity: PropTypes.oneOf(values(ENTITIES)).isRequired,
   onEntityChange: PropTypes.func.isRequired
 };
 

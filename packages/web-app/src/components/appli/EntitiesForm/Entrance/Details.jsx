@@ -1,10 +1,11 @@
 import {
+  Box,
   FormControl,
   FormControlLabel,
   FormLabel,
+  InputAdornment,
   Switch,
-  TextField,
-  InputAdornment
+  TextField
 } from '@material-ui/core';
 import React from 'react';
 import { Controller } from 'react-hook-form';
@@ -13,11 +14,6 @@ import styled from 'styled-components';
 import PropTypes from 'prop-types';
 import Section from '../FormSection';
 import Translate from '../../../common/Translate';
-
-const Wrapper = styled.div`
-  display: flex;
-  justify-content: space-between;
-`;
 
 const StyledFormControl = styled(FormControl)`
   margin-top: ${({ theme }) => theme.spacing(2)}px;
@@ -43,7 +39,7 @@ const Details = ({ control, errors, isReadonly = false }) => {
 
   return (
     <Section sectionTitle={formatMessage({ id: 'details' })}>
-      <Wrapper>
+      <Box display="flex" justifyContent="space-between">
         <Controller
           name="depth"
           control={control}
@@ -114,7 +110,7 @@ const Details = ({ control, errors, isReadonly = false }) => {
             />
           )}
         />
-      </Wrapper>
+      </Box>
 
       <Controller
         name="isDiving"
@@ -137,7 +133,11 @@ const Details = ({ control, errors, isReadonly = false }) => {
                   onChange={e => field.onChange(e.target.checked)}
                 />
               }
-              label={formatMessage({ id: 'Is diving' })}
+              label={
+                field.value
+                  ? formatMessage({ id: 'True' })
+                  : formatMessage({ id: 'False' })
+              }
             />
           </StyledFormControl>
         )}

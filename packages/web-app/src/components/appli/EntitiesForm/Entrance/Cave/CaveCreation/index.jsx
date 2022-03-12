@@ -75,7 +75,7 @@ const CaveCreation = ({ control, errors, allLanguages }) => {
                 ))}
               </Select>
               <FormHelperText>
-                <Translate>Entrance name language</Translate>
+                <Translate>Cave name language</Translate>
               </FormHelperText>
             </FormControl>
           )}

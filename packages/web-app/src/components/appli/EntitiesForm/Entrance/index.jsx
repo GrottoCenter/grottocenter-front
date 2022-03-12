@@ -4,6 +4,7 @@ import { useIntl } from 'react-intl';
 import { useForm } from 'react-hook-form';
 import { isNil, keys, prop, length, reject, equals } from 'ramda';
 import {
+  Box,
   Button as MuiButton,
   Step,
   StepContent,
@@ -32,17 +33,8 @@ const FormWrapper = styled.form`
   justify-content: center;
 `;
 
-const ButtonWrapper = styled.div`
-  display: flex;
-  justify-content: center;
-`;
-
 const Button = styled(MuiButton)`
   margin: ${({ theme }) => theme.spacing(2)}px;
-`;
-
-const GlobalButtonWrapper = styled.div`
-  display: flex;
 `;
 
 const defaultCaveValues = {
@@ -205,7 +197,7 @@ export const EntranceForm = ({ entranceValues = null }) => {
                 {prop(label, steps)}
               </div>
               {!stepExpanded.isOpen && (
-                <ButtonWrapper>
+                <Box display="flex" justifyContent="center">
                   <Button disabled={activeStep === 0} onClick={handleBack}>
                     {formatMessage({ id: 'back' })}
                   </Button>
@@ -218,13 +210,13 @@ export const EntranceForm = ({ entranceValues = null }) => {
                         activeStep === length(stepKeys) - 1 ? 'Review' : 'Next'
                     })}
                   </Button>
-                </ButtonWrapper>
+                </Box>
               )}
             </StepContent>
           </Step>
         ))}
       </Stepper>
-      <GlobalButtonWrapper>
+      <Box display="flex">
         <Button disabled={!isDirty} onClick={handleReset}>
           {formatMessage({ id: 'Reset' })}
         </Button>
@@ -237,7 +229,7 @@ export const EntranceForm = ({ entranceValues = null }) => {
           style={{ margin: '8px', marginLeft: 'auto' }}
           type="submit"
         />
-      </GlobalButtonWrapper>
+      </Box>
     </FormWrapper>
   );
 };
