@@ -34,7 +34,8 @@ const EntitiesCreation = () => {
             <CenteredBlock>
               <ErrorMessage
                 message={formatMessage({
-                  id: 'You must be authenticated to submit a new entity.'
+                  id:
+                    'You must be authenticated to submit a new entity to Grottocenter.'
                 })}
               />
               <Button onClick={handleLogin} variant="contained">

@@ -45,7 +45,7 @@ const Entrance = ({
   }, [caveIdValue, setFocus]);
 
   return (
-    <Section sectionTitle={formatMessage({ id: 'main information' })}>
+    <Section sectionTitle={formatMessage({ id: 'Entrance information' })}>
       <Box display="flex" justifyContent="space-between">
         <Controller
           name="name"
