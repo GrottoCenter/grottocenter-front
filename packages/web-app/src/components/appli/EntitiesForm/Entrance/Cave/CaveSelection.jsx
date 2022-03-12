@@ -138,7 +138,7 @@ const CaveSelection = ({ control, errors }) => {
               getOptionLabel={getCaveToString}
               hasError={!isNil(error)}
               isLoading={isLoading}
-              label={formatMessage({ id: 'Search a cave' })}
+              label={formatMessage({ id: 'Search for a cave' })}
               renderOption={entityOptionForSelector}
               inputValue={inputValue}
               suggestions={suggestions}

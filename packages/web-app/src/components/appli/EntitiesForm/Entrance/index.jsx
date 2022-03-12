@@ -18,9 +18,9 @@ import useGeolocation from 'react-hook-geolocation';
 
 import { useBoolean } from '../../../../hooks';
 import ActionButton from '../../../common/ActionButton';
+import Alert from '../../../common/Alert';
 import { postEntrance } from '../../../../actions/Entry';
 import { postCaveAndEntrance } from '../../../../actions/CaveAndEntrance';
-import Translate from '../../../common/Translate';
 
 import Cave from './Cave';
 import Entrance from './Entrance';
@@ -142,17 +142,17 @@ export const EntranceForm = ({ entranceValues = null }) => {
     const result = await trigger(
       [
         'name',
-        'language',
-        'descriptions',
         'caveId',
         'caveName',
-        'longitude',
-        'latitude',
         'country',
         'depth',
+        'descriptions',
+        'isDiving',
+        'language',
+        'latitude',
         'length',
-        'temperature',
-        'isDiving'
+        'longitude',
+        'temperature'
       ],
       { shouldFocus: true }
     );
@@ -179,7 +179,12 @@ export const EntranceForm = ({ entranceValues = null }) => {
 
   return isSubmitSuccessful && isNil(entranceError) && isNil(caveError) ? (
     <FormWrapper>
-      <Translate>New entrance successfully created!</Translate>
+      <Alert
+        severity="success"
+        title={formatMessage({
+          id: 'New entrance successfully created!'
+        })}
+      />
       <Button onClick={handleReset} color="primary">
         {formatMessage({ id: 'Create a new Entrance' })}
       </Button>
@@ -191,7 +196,11 @@ export const EntranceForm = ({ entranceValues = null }) => {
           <Step
             key={formatMessage({ id: label })}
             expanded={stepExpanded.isOpen}>
-            <StepLabel>{formatMessage({ id: label })}</StepLabel>
+            <StepLabel>
+              {formatMessage({
+                id: label[0].toUpperCase() + label.substring(1)
+              })}
+            </StepLabel>
             <StepContent>
               <div style={{ maxWidth: '600px', margin: '0 auto' }}>
                 {prop(label, steps)}
@@ -199,7 +208,7 @@ export const EntranceForm = ({ entranceValues = null }) => {
               {!stepExpanded.isOpen && (
                 <Box display="flex" justifyContent="center">
                   <Button disabled={activeStep === 0} onClick={handleBack}>
-                    {formatMessage({ id: 'back' })}
+                    {formatMessage({ id: 'Back' })}
                   </Button>
                   <Button
                     variant="contained"
