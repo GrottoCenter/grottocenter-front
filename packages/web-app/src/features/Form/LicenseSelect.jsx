@@ -50,9 +50,13 @@ const LicenseSelect = ({ label, selected, updateSelected }) => {
         value={selected || ''}
         onChange={event => updateSelected(event.target.value)}>
         {data &&
-          data.map(license => (
-            <MenuItem value={license}>{license.name}</MenuItem>
-          ))}
+          data
+            .sort((l1, l2) => l1.name > l2.name)
+            .map(license => (
+              <MenuItem key={license.id} value={license}>
+                {license.name}
+              </MenuItem>
+            ))}
       </Select>
       {loading && <CircularProgress color="primary" />}
     </Wrapper>
