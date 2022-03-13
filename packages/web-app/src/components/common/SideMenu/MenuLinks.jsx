@@ -44,7 +44,7 @@ const MenuLinks = () => {
       {permissions.isAuth && (
         <Item
           ItemIcon={() => <LibraryAddIcon color="primary" />}
-          label="Create new..."
+          label="Create new entity"
           href="/ui/entity/add"
         />
       )}
