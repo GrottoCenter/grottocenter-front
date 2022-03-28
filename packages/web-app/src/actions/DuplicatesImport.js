@@ -282,7 +282,7 @@ export const createNewEntityFromDuplicate = (id, duplicateType) => (
 
   const requestOptions = {
     headers: getState().login.authorizationHeader,
-    method: 'GET'
+    method: 'POST'
   };
 
   return fetch(url(id), requestOptions)
