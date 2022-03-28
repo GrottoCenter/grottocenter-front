@@ -3,7 +3,6 @@ import fetch from 'isomorphic-fetch';
 import {
   getEntryUrl,
   postCreateEntranceUrl,
-  postEntryUrl,
   putEntryWithNewEntitiesUrl
 } from '../conf/Config';
 
@@ -112,7 +111,7 @@ export const createEntry = entryData => (dispatch, getState) => {
     headers: getState().login.authorizationHeader
   };
 
-  return fetch(postEntryUrl, requestOptions)
+  return fetch(postCreateEntranceUrl, requestOptions)
     .then(checkStatus)
     .then(result => {
       dispatch({
