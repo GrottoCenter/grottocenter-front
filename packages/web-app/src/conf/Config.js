@@ -210,6 +210,12 @@ export const postCaverGroupsUrl = userId =>
   `${API_URL}/api/${apiVersion}/cavers/${userId}/groups`;
 export const getLicensesUrl = `${API_URL}/api/v1/licenses`;
 export const getFileFormatsUrl = `${API_URL}/api/v1/file-formats`;
+export const entryDetailPath = `${API_URL}/api/${apiVersion}/entrances/`;
+export const postEntryUrl = `${API_URL}/api/${apiVersion}/entrances`;
+export const putEntryWithNewEntitiesUrl = entryId =>
+  `${API_URL}/api/${apiVersion}/entrances/${entryId}/new-entities`;
+export const putDocumentyWithNewEntitiesUrl = docId =>
+  `${API_URL}/api/${apiVersion}/documents/${docId}/new-entities`;
 
 // ===== ImportCSV url
 export const checkRowsEntrancesUrl = `${API_URL}/api/${apiVersion}/entrances/check-rows`;
@@ -246,12 +252,6 @@ export const deleteDuplicateEntranceUrl = id =>
 
 // ===== Grottocenter Client routes
 export const swaggerLinkV1 = `${API_URL}/ui/swagger/1`;
-export const entryDetailPath = `${API_URL}/api/${apiVersion}/entrances/`;
-export const postEntryUrl = `${API_URL}/api/${apiVersion}/entrances`;
-export const putEntryWithNewEntitiesUrl = entryId =>
-  `${API_URL}/api/${apiVersion}/entrances/${entryId}/new-entities`;
-export const putDocumentyWithNewEntitiesUrl = docId =>
-  `${API_URL}/api/${apiVersion}/documents/${docId}/new-entities`;
 
 // ===== Misc config values
 export const emailRegexp = /\S+@\S+/; // simple regexp TODO: use another one more robust
