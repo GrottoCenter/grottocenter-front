@@ -224,14 +224,7 @@ export const logoutUrl = `${process.env.REACT_APP_API_URL}/api/${apiVersion}/log
 export const signUpUrl = `${process.env.REACT_APP_API_URL}/api/${apiVersion}/signup`;
 export const forgotPassword = `${process.env.REACT_APP_API_URL}/api/${apiVersion}/forgotPassword`;
 
-// ===== Grottocenter Client routes
-export const swaggerLinkV1 = `${process.env.REACT_APP_API_URL}/ui/swagger/1`;
-export const entryDetailPath = `${process.env.REACT_APP_API_URL}/api/${apiVersion}/entrances/`;
-export const postEntryUrl = `${process.env.REACT_APP_API_URL}/api/${apiVersion}/entrances`;
-export const putEntryWithNewEntitiesUrl = entryId =>
-  `${process.env.REACT_APP_API_URL}/api/${apiVersion}/entrances/${entryId}/new-entities`;
-export const putDocumentyWithNewEntitiesUrl = docId =>
-  `${process.env.REACT_APP_API_URL}/api/${apiVersion}/documents/${docId}/new-entities`;
+// ===== Duplicates urls
 export const createNewEntranceFromDuplicate = id =>
   `${process.env.REACT_APP_API_URL}/api/${apiVersion}/entrances/from-duplicate/${id}`;
 export const createNewDocumentFromDuplicate = id =>
@@ -248,6 +241,15 @@ export const deleteDuplicateDocumentUrl = id =>
   `${process.env.REACT_APP_API_URL}/api/${apiVersion}/document-duplicates/${id}`;
 export const deleteDuplicateEntranceUrl = id =>
   `${process.env.REACT_APP_API_URL}/api/${apiVersion}/entrance-duplicates/${id}`;
+
+// ===== Grottocenter Client routes
+export const swaggerLinkV1 = `${process.env.REACT_APP_API_URL}/ui/swagger/1`;
+export const entryDetailPath = `${process.env.REACT_APP_API_URL}/api/${apiVersion}/entrances/`;
+export const postEntryUrl = `${process.env.REACT_APP_API_URL}/api/${apiVersion}/entrances`;
+export const putEntryWithNewEntitiesUrl = entryId =>
+  `${process.env.REACT_APP_API_URL}/api/${apiVersion}/entrances/${entryId}/new-entities`;
+export const putDocumentyWithNewEntitiesUrl = docId =>
+  `${process.env.REACT_APP_API_URL}/api/${apiVersion}/documents/${docId}/new-entities`;
 
 // ===== Misc config values
 export const emailRegexp = /\S+@\S+/; // simple regexp TODO: use another one more robust
