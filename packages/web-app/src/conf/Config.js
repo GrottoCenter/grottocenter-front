@@ -181,7 +181,6 @@ export const getCaversDocumentsUrl = caverId =>
   `${API_URL}/api/${apiVersion}/cavers/${caverId}/documents`;
 export const postCreateEntranceUrl = `${API_URL}/api/${apiVersion}/entrances`;
 export const postCreateCaveUrl = `${API_URL}/api/${apiVersion}/caves`;
-export const findMapBoundsUrl = `${API_URL}/api/${apiVersion}/geoloc/TO_REMOVE`;
 export const findMassifUrl = `${API_URL}/api/${apiVersion}/massifs/`;
 export const findOrganizationUrl = `${API_URL}/api/${apiVersion}/organizations/`;
 export const advancedsearchUrl = `${API_URL}/api/${apiVersion}/advanced-search`;
@@ -211,7 +210,6 @@ export const postCaverGroupsUrl = userId =>
 export const getLicensesUrl = `${API_URL}/api/v1/licenses`;
 export const getFileFormatsUrl = `${API_URL}/api/v1/file-formats`;
 export const entryDetailPath = `${API_URL}/api/${apiVersion}/entrances/`;
-export const postEntryUrl = `${API_URL}/api/${apiVersion}/entrances`;
 export const putEntryWithNewEntitiesUrl = entryId =>
   `${API_URL}/api/${apiVersion}/entrances/${entryId}/new-entities`;
 export const putDocumentyWithNewEntitiesUrl = docId =>
