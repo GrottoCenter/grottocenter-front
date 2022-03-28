@@ -14,8 +14,8 @@ const DownloadButton = ({ data, filename }) => {
         type="button"
         filename={filename}
         style={{
-          'background-color': 'transparent',
-          'background-repeat': 'no-repeat',
+          backgroundColor: 'transparent',
+          backgroundRepeat: 'no-repeat',
           border: 'none',
           cursor: 'pointer',
           overflow: 'hidden',
