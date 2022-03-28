@@ -2,10 +2,11 @@ import React, { useEffect } from 'react';
 import { useIntl } from 'react-intl';
 import { useHistory } from 'react-router-dom';
 import { List, ListItem, Typography } from '@material-ui/core';
+import CallMergeIcon from '@material-ui/icons/CallMerge';
 import PeopleIcon from '@material-ui/icons/People';
 import DocumentListIcon from '@material-ui/icons/PlaylistAddCheck';
-import ImportExportIcon from '@material-ui/icons/ImportExport';
 import ListAltIcon from '@material-ui/icons/ListAlt';
+import PublishIcon from '@material-ui/icons/Publish';
 import styled from 'styled-components';
 
 import { usePermissions } from '../hooks';
@@ -87,7 +88,7 @@ const Dashboard = () => {
                   button
                   key="import-csv-user-tile-key"
                   onClick={() => handleOnListItemClick('/ui/import-csv')}>
-                  <ImportExportIcon fontSize="large" color="primary" />
+                  <PublishIcon fontSize="large" color="primary" />
                   <Typography variant="h4" align="center">
                     {formatMessage({ id: 'CSV Import' })}
                   </Typography>
@@ -96,7 +97,7 @@ const Dashboard = () => {
                   button
                   key="duplicate-tool-user-tile-key"
                   onClick={() => handleOnListItemClick('/ui/duplicates')}>
-                  <ImportExportIcon fontSize="large" color="primary" />
+                  <CallMergeIcon fontSize="large" color="primary" />
                   <Typography variant="h4" align="center">
                     {formatMessage({ id: 'Duplicate Tool' })}
                   </Typography>
