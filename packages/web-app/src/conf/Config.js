@@ -1,8 +1,8 @@
 import _ from 'underscore.string';
 import { isEmpty } from 'lodash';
 
-export const apiVersion = 'v1';
-
+const apiVersion = 'v1';
+const API_URL = process.env.REACT_APP_API_URL;
 export const LEFT_TO_RIGHT = 'LTR';
 export const RIGHT_TO_LEFT = 'RTL';
 
@@ -26,8 +26,8 @@ export const AVAILABLE_LANGUAGES = {
   ro: 'R<omână'
 };
 
-export const FR_GC_BLOG = `${process.env.REACT_APP_API_URL}/api/rss/FR`;
-export const EN_GC_BLOG = `${process.env.REACT_APP_API_URL}/api/rss/EN`;
+export const FR_GC_BLOG = `${API_URL}/api/rss/FR`;
+export const EN_GC_BLOG = `${API_URL}/api/rss/EN`;
 
 function generateLinks(link, defaultLang) {
   const resultArray = {};
@@ -161,95 +161,97 @@ export const paypalImgLink =
 // ===== Grottocenter API routes
 
 export const dynamicNumbersUrl = {
-  documents: `${process.env.REACT_APP_API_URL}/api/${apiVersion}/documents/count`,
-  entrances: `${process.env.REACT_APP_API_URL}/api/${apiVersion}/entrances/count`,
-  officialPartners: `${process.env.REACT_APP_API_URL}/api/${apiVersion}/partners/count`,
-  organizations: `${process.env.REACT_APP_API_URL}/api/${apiVersion}/organizations/count`,
-  publicEntrances: `${process.env.REACT_APP_API_URL}/api/${apiVersion}/entrances/publicCount`,
-  users: `${process.env.REACT_APP_API_URL}/api/${apiVersion}/cavers/users/count`
+  documents: `${API_URL}/api/${apiVersion}/documents/count`,
+  entrances: `${API_URL}/api/${apiVersion}/entrances/count`,
+  officialPartners: `${API_URL}/api/${apiVersion}/partners/count`,
+  organizations: `${API_URL}/api/${apiVersion}/organizations/count`,
+  publicEntrances: `${API_URL}/api/${apiVersion}/entrances/publicCount`,
+  users: `${API_URL}/api/${apiVersion}/cavers/users/count`
 };
 
-export const fetchConvert = `${process.env.REACT_APP_API_URL}/api/convert`;
-export const findRandomEntryUrl = `${process.env.REACT_APP_API_URL}/api/${apiVersion}/entrances/findRandom`;
-export const findForCarouselUrl = `${process.env.REACT_APP_API_URL}/api/${apiVersion}/partners/findForCarousel`;
-export const getMapCavesUrl = `${process.env.REACT_APP_API_URL}/api/${apiVersion}/geoloc/caves`;
-export const getMapCavesCoordinatesUrl = `${process.env.REACT_APP_API_URL}/api/${apiVersion}/geoloc/cavesCoordinates`;
-export const getMapEntrancesUrl = `${process.env.REACT_APP_API_URL}/api/${apiVersion}/geoloc/entrances`;
-export const getMapEntrancesCoordinatesUrl = `${process.env.REACT_APP_API_URL}/api/${apiVersion}/geoloc/entrancesCoordinates`;
-export const getMapGrottosUrl = `${process.env.REACT_APP_API_URL}/api/${apiVersion}/geoloc/grottos`;
+export const fetchConvert = `${API_URL}/api/convert`;
+export const findRandomEntryUrl = `${API_URL}/api/${apiVersion}/entrances/findRandom`;
+export const findForCarouselUrl = `${API_URL}/api/${apiVersion}/partners/findForCarousel`;
+export const getMapCavesUrl = `${API_URL}/api/${apiVersion}/geoloc/caves`;
+export const getMapCavesCoordinatesUrl = `${API_URL}/api/${apiVersion}/geoloc/cavesCoordinates`;
+export const getMapEntrancesUrl = `${API_URL}/api/${apiVersion}/geoloc/entrances`;
+export const getMapEntrancesCoordinatesUrl = `${API_URL}/api/${apiVersion}/geoloc/entrancesCoordinates`;
+export const getMapGrottosUrl = `${API_URL}/api/${apiVersion}/geoloc/grottos`;
 export const getCaversDocumentsUrl = caverId =>
-  `${process.env.REACT_APP_API_URL}/api/${apiVersion}/cavers/${caverId}/documents`;
-export const postCreateEntranceUrl = `${process.env.REACT_APP_API_URL}/api/${apiVersion}/entrances`;
-export const postCreateCaveUrl = `${process.env.REACT_APP_API_URL}/api/${apiVersion}/caves`;
-export const findMapBoundsUrl = `${process.env.REACT_APP_API_URL}/api/${apiVersion}/geoloc/TO_REMOVE`;
-export const findMassifUrl = `${process.env.REACT_APP_API_URL}/api/${apiVersion}/massifs/`;
-export const findOrganizationUrl = `${process.env.REACT_APP_API_URL}/api/${apiVersion}/organizations/`;
-export const advancedsearchUrl = `${process.env.REACT_APP_API_URL}/api/${apiVersion}/advanced-search`;
-export const quicksearchUrl = `${process.env.REACT_APP_API_URL}/api/${apiVersion}/search`;
-export const subjectsUrl = `${process.env.REACT_APP_API_URL}/api/${apiVersion}/documents/subjects`;
-export const subjectsSearchUrl = `${process.env.REACT_APP_API_URL}/api/${apiVersion}/documents/subjects/search/logical/or`;
-export const getDocumentTypesUrl = `${process.env.REACT_APP_API_URL}/api/${apiVersion}/documents/types`;
-export const getDocuments = `${process.env.REACT_APP_API_URL}/api/${apiVersion}/documents`;
+  `${API_URL}/api/${apiVersion}/cavers/${caverId}/documents`;
+export const postCreateEntranceUrl = `${API_URL}/api/${apiVersion}/entrances`;
+export const postCreateCaveUrl = `${API_URL}/api/${apiVersion}/caves`;
+export const findMapBoundsUrl = `${API_URL}/api/${apiVersion}/geoloc/TO_REMOVE`;
+export const findMassifUrl = `${API_URL}/api/${apiVersion}/massifs/`;
+export const findOrganizationUrl = `${API_URL}/api/${apiVersion}/organizations/`;
+export const advancedsearchUrl = `${API_URL}/api/${apiVersion}/advanced-search`;
+export const quicksearchUrl = `${API_URL}/api/${apiVersion}/search`;
+export const subjectsUrl = `${API_URL}/api/${apiVersion}/documents/subjects`;
+export const subjectsSearchUrl = `${API_URL}/api/${apiVersion}/documents/subjects/search/logical/or`;
+export const getDocumentTypesUrl = `${API_URL}/api/${apiVersion}/documents/types`;
+export const getDocuments = `${API_URL}/api/${apiVersion}/documents`;
 export const getDocumentChildren = documentId =>
-  `${process.env.REACT_APP_API_URL}/api/${apiVersion}/documents/${documentId}/children`;
-export const processDocumentIds = `${process.env.REACT_APP_API_URL}/api/${apiVersion}/documents/validate`;
-export const getDocumentDetailsUrl = `${process.env.REACT_APP_API_URL}/api/${apiVersion}/documents/`;
-export const getEntryUrl = `${process.env.REACT_APP_API_URL}/api/${apiVersion}/entrances/`;
-export const getCaveUrl = `${process.env.REACT_APP_API_URL}/api/${apiVersion}/caves/`;
-export const getLanguagesUrl = `${process.env.REACT_APP_API_URL}/api/${apiVersion}/languages`;
-export const postCaverUrl = `${process.env.REACT_APP_API_URL}/api/${apiVersion}/cavers`;
-export const postDocumentUrl = `${process.env.REACT_APP_API_URL}/api/${apiVersion}/documents`;
+  `${API_URL}/api/${apiVersion}/documents/${documentId}/children`;
+export const processDocumentIds = `${API_URL}/api/${apiVersion}/documents/validate`;
+export const getDocumentDetailsUrl = `${API_URL}/api/${apiVersion}/documents/`;
+export const getEntryUrl = `${API_URL}/api/${apiVersion}/entrances/`;
+export const getCaveUrl = `${API_URL}/api/${apiVersion}/caves/`;
+export const getLanguagesUrl = `${API_URL}/api/${apiVersion}/languages`;
+export const postCaverUrl = `${API_URL}/api/${apiVersion}/cavers`;
+export const postDocumentUrl = `${API_URL}/api/${apiVersion}/documents`;
 export const putDocumentUrl = documentId =>
-  `${process.env.REACT_APP_API_URL}/api/${apiVersion}/documents/${documentId}`;
-export const postOrganizationUrl = `${process.env.REACT_APP_API_URL}/api/${apiVersion}/organizations`;
-export const regionsSearchUrl = `${process.env.REACT_APP_API_URL}/api/${apiVersion}/regions/search/logical/or`;
-export const identifierTypesUrl = `${process.env.REACT_APP_API_URL}/api/${apiVersion}/documents/identifierTypes`;
-export const getAdminsUrl = `${process.env.REACT_APP_API_URL}/api/${apiVersion}/cavers/admins`;
-export const getModeratorsUrl = `${process.env.REACT_APP_API_URL}/api/${apiVersion}/cavers/moderators`;
+  `${API_URL}/api/${apiVersion}/documents/${documentId}`;
+export const postOrganizationUrl = `${API_URL}/api/${apiVersion}/organizations`;
+export const regionsSearchUrl = `${API_URL}/api/${apiVersion}/regions/search/logical/or`;
+export const identifierTypesUrl = `${API_URL}/api/${apiVersion}/documents/identifierTypes`;
+export const getAdminsUrl = `${API_URL}/api/${apiVersion}/cavers/admins`;
+export const getModeratorsUrl = `${API_URL}/api/${apiVersion}/cavers/moderators`;
 export const postCaverGroupsUrl = userId =>
-  `${process.env.REACT_APP_API_URL}/api/${apiVersion}/cavers/${userId}/groups`;
-export const getLicensesUrl = `${process.env.REACT_APP_API_URL}/api/v1/licenses`;
-export const getFileFormatsUrl = `${process.env.REACT_APP_API_URL}/api/v1/file-formats`;
+  `${API_URL}/api/${apiVersion}/cavers/${userId}/groups`;
+export const getLicensesUrl = `${API_URL}/api/v1/licenses`;
+export const getFileFormatsUrl = `${API_URL}/api/v1/file-formats`;
 
 // ===== ImportCSV url
-export const checkRowsEntrancesUrl = `${process.env.REACT_APP_API_URL}/api/${apiVersion}/entrances/check-rows`;
-export const checkRowsDocumentsUrl = `${process.env.REACT_APP_API_URL}/api/${apiVersion}/documents/check-rows`;
-export const importRowsEntrancesUrl = `${process.env.REACT_APP_API_URL}/api/${apiVersion}/entrances/import-rows`;
-export const importRowsDocumentsUrl = `${process.env.REACT_APP_API_URL}/api/${apiVersion}/documents/import-rows`;
+export const checkRowsEntrancesUrl = `${API_URL}/api/${apiVersion}/entrances/check-rows`;
+export const checkRowsDocumentsUrl = `${API_URL}/api/${apiVersion}/documents/check-rows`;
+export const importRowsEntrancesUrl = `${API_URL}/api/${apiVersion}/entrances/import-rows`;
+export const importRowsDocumentsUrl = `${API_URL}/api/${apiVersion}/documents/import-rows`;
 
 // ===== Auth url
-export const changePasswordUrl = `${process.env.REACT_APP_API_URL}/api/${apiVersion}/account/password`;
-export const loginUrl = `${process.env.REACT_APP_API_URL}/api/${apiVersion}/login`;
-export const logoutUrl = `${process.env.REACT_APP_API_URL}/api/${apiVersion}/logout`;
-export const signUpUrl = `${process.env.REACT_APP_API_URL}/api/${apiVersion}/signup`;
-export const forgotPassword = `${process.env.REACT_APP_API_URL}/api/${apiVersion}/forgotPassword`;
+export const changePasswordUrl = `${API_URL}/api/${apiVersion}/account/password`;
+export const loginUrl = `${API_URL}/api/${apiVersion}/login`;
+export const logoutUrl = `${API_URL}/api/${apiVersion}/logout`;
+export const signUpUrl = `${API_URL}/api/${apiVersion}/signup`;
+export const forgotPassword = `${API_URL}/api/${apiVersion}/forgotPassword`;
 
 // ===== Duplicates urls
 export const createNewEntranceFromDuplicate = id =>
-  `${process.env.REACT_APP_API_URL}/api/${apiVersion}/entrances/from-duplicate/${id}`;
+  `${API_URL}/api/${apiVersion}/entrances/from-duplicate/${id}`;
 export const createNewDocumentFromDuplicate = id =>
-  `${process.env.REACT_APP_API_URL}/api/${apiVersion}/documents/from-duplicate/${id}`;
-export const getDuplicatesDocumentUrl = `${process.env.REACT_APP_API_URL}/api/${apiVersion}/document-duplicates`;
-export const getDuplicatesEntranceUrl = `${process.env.REACT_APP_API_URL}/api/${apiVersion}/entrance-duplicates`;
+  `${API_URL}/api/${apiVersion}/documents/from-duplicate/${id}`;
+
+export const getDuplicatesDocumentUrl = `${API_URL}/api/${apiVersion}/document-duplicates`;
+export const getDuplicatesEntranceUrl = `${API_URL}/api/${apiVersion}/entrance-duplicates`;
 export const getDuplicateDocumentUrl = duplicateId =>
-  `${process.env.REACT_APP_API_URL}/api/${apiVersion}/document-duplicates/${duplicateId}`;
+  `${API_URL}/api/${apiVersion}/document-duplicates/${duplicateId}`;
 export const getDuplicateEntranceUrl = duplicateId =>
-  `${process.env.REACT_APP_API_URL}/api/${apiVersion}/entrance-duplicates/${duplicateId}`;
-export const deleteDuplicatesDocumentUrl = `${process.env.REACT_APP_API_URL}/api/${apiVersion}/document-duplicates`;
-export const deleteDuplicatesEntranceUrl = `${process.env.REACT_APP_API_URL}/api/${apiVersion}/entrance-duplicates`;
+  `${API_URL}/api/${apiVersion}/entrance-duplicates/${duplicateId}`;
+
+export const deleteDuplicatesDocumentUrl = `${API_URL}/api/${apiVersion}/document-duplicates`;
+export const deleteDuplicatesEntranceUrl = `${API_URL}/api/${apiVersion}/entrance-duplicates`;
 export const deleteDuplicateDocumentUrl = id =>
-  `${process.env.REACT_APP_API_URL}/api/${apiVersion}/document-duplicates/${id}`;
+  `${API_URL}/api/${apiVersion}/document-duplicates/${id}`;
 export const deleteDuplicateEntranceUrl = id =>
-  `${process.env.REACT_APP_API_URL}/api/${apiVersion}/entrance-duplicates/${id}`;
+  `${API_URL}/api/${apiVersion}/entrance-duplicates/${id}`;
 
 // ===== Grottocenter Client routes
-export const swaggerLinkV1 = `${process.env.REACT_APP_API_URL}/ui/swagger/1`;
-export const entryDetailPath = `${process.env.REACT_APP_API_URL}/api/${apiVersion}/entrances/`;
-export const postEntryUrl = `${process.env.REACT_APP_API_URL}/api/${apiVersion}/entrances`;
+export const swaggerLinkV1 = `${API_URL}/ui/swagger/1`;
+export const entryDetailPath = `${API_URL}/api/${apiVersion}/entrances/`;
+export const postEntryUrl = `${API_URL}/api/${apiVersion}/entrances`;
 export const putEntryWithNewEntitiesUrl = entryId =>
-  `${process.env.REACT_APP_API_URL}/api/${apiVersion}/entrances/${entryId}/new-entities`;
+  `${API_URL}/api/${apiVersion}/entrances/${entryId}/new-entities`;
 export const putDocumentyWithNewEntitiesUrl = docId =>
-  `${process.env.REACT_APP_API_URL}/api/${apiVersion}/documents/${docId}/new-entities`;
+  `${API_URL}/api/${apiVersion}/documents/${docId}/new-entities`;
 
 // ===== Misc config values
 export const emailRegexp = /\S+@\S+/; // simple regexp TODO: use another one more robust
