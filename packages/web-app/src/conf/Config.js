@@ -233,21 +233,21 @@ export const putEntryWithNewEntitiesUrl = entryId =>
 export const putDocumentyWithNewEntitiesUrl = docId =>
   `${process.env.REACT_APP_API_URL}/api/${apiVersion}/documents/${docId}/new-entities`;
 export const createNewEntranceFromDuplicate = id =>
-  `${process.env.REACT_APP_API_URL}/api/create-from-duplicates-entrance/${id}`;
+  `${process.env.REACT_APP_API_URL}/api/${apiVersion}/entrances/from-duplicate/${id}`;
 export const createNewDocumentFromDuplicate = id =>
-  `${process.env.REACT_APP_API_URL}/api/create-from-duplicates-document/${id}`;
-export const getDuplicatesDocumentUrl = `${process.env.REACT_APP_API_URL}/api/duplicates-document`;
-export const getDuplicatesEntranceUrl = `${process.env.REACT_APP_API_URL}/api/duplicates-entrance`;
+  `${process.env.REACT_APP_API_URL}/api/${apiVersion}/documents/from-duplicate/${id}`;
+export const getDuplicatesDocumentUrl = `${process.env.REACT_APP_API_URL}/api/${apiVersion}/document-duplicates`;
+export const getDuplicatesEntranceUrl = `${process.env.REACT_APP_API_URL}/api/${apiVersion}/entrance-duplicates`;
 export const getDuplicateDocumentUrl = duplicateId =>
-  `${process.env.REACT_APP_API_URL}/api/duplicates-document/${duplicateId}`;
+  `${process.env.REACT_APP_API_URL}/api/${apiVersion}/document-duplicates/${duplicateId}`;
 export const getDuplicateEntranceUrl = duplicateId =>
-  `${process.env.REACT_APP_API_URL}/api/duplicates-entrance/${duplicateId}`;
-export const deleteDuplicatesDocumentUrl = `${process.env.REACT_APP_API_URL}/api/duplicates-document`;
-export const deleteDuplicatesEntranceUrl = `${process.env.REACT_APP_API_URL}/api/duplicates-entrance`;
+  `${process.env.REACT_APP_API_URL}/api/${apiVersion}/entrance-duplicates/${duplicateId}`;
+export const deleteDuplicatesDocumentUrl = `${process.env.REACT_APP_API_URL}/api/${apiVersion}/document-duplicates`;
+export const deleteDuplicatesEntranceUrl = `${process.env.REACT_APP_API_URL}/api/${apiVersion}/entrance-duplicates`;
 export const deleteDuplicateDocumentUrl = id =>
-  `${process.env.REACT_APP_API_URL}/api/duplicates-document/${id}`;
+  `${process.env.REACT_APP_API_URL}/api/${apiVersion}/document-duplicates/${id}`;
 export const deleteDuplicateEntranceUrl = id =>
-  `${process.env.REACT_APP_API_URL}/api/duplicates-entrance/${id}`;
+  `${process.env.REACT_APP_API_URL}/api/${apiVersion}/entrance-duplicates/${id}`;
 
 // ===== Misc config values
 export const emailRegexp = /\S+@\S+/; // simple regexp TODO: use another one more robust
