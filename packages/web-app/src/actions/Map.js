@@ -7,6 +7,7 @@ import {
   getMapGrottosUrl
 } from '../conf/Config';
 import makeErrorMessage from '../helpers/makeErrorMessage';
+import { makeUrl } from './utils';
 
 export const FETCH_MAP_START_LOADING = 'FETCH_MAP_LOADING';
 export const FETCH_MAP_END_LOADING = 'FETCH_MAP_LOADING';
@@ -36,15 +37,6 @@ export const LOADINGS = {
   ENTRANCES: 'entrances',
   ENTRANCES_COORDINATES: 'entrances_coordinates',
   ORGANIZATIONS: 'organizations'
-};
-
-const makeUrl = (url, criteria) => {
-  if (criteria) {
-    return `${url}?${Object.keys(criteria)
-      .map(k => `${k}=${encodeURIComponent(criteria[k])}`)
-      .join('&')}`;
-  }
-  return url;
 };
 
 export const fetchNetworksCoordinates = criteria => {

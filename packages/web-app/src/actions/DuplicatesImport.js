@@ -12,6 +12,7 @@ import {
   deleteDuplicateEntranceUrl,
   deleteDuplicateDocumentUrl
 } from '../conf/Config';
+import { makeUrl } from './utils';
 import makeErrorMessage from '../helpers/makeErrorMessage';
 
 export const LOAD_DUPLICATES_LIST = 'LOAD_DUPLICATES_LIST';
@@ -122,15 +123,6 @@ const getBody = async response => ({
   content: await response.json(),
   statusCode: response.status
 });
-
-const makeUrl = (url, criteria) => {
-  if (criteria) {
-    return `${url}?${Object.keys(criteria)
-      .map(k => `${k}=${encodeURIComponent(criteria[k])}`)
-      .join('&')}`;
-  }
-  return url;
-};
 
 export const fetchDuplicatesList = (duplicateType, criteria) => (
   dispatch,

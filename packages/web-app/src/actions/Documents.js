@@ -1,10 +1,6 @@
 import fetch from 'isomorphic-fetch';
 import {
   pipe,
-  keys,
-  map,
-  join,
-  isNil,
   pathOr,
   split,
   tail,
@@ -18,6 +14,7 @@ import {
   getDocuments as queryDocuments,
   getCaversDocumentsUrl
 } from '../conf/Config';
+import { makeUrl } from './utils';
 import makeErrorMessage from '../helpers/makeErrorMessage';
 
 export const FETCH_DOCUMENTS = 'FETCH_DOCUMENTS';
@@ -54,26 +51,17 @@ export const fetchAuthorizationDocumentsSuccess = data => ({
   totalCount: data.totalCount
 });
 
-const doGet = (url, criteria) => {
-  const makeUrl = pipe(
-    keys,
-    map(c => `${c}=${encodeURIComponent(criteria[c])}`),
-    join('&'),
-    urlCriteria => `${url}?${urlCriteria}`
-  );
-
+const doGet = (url, criterias) => {
   return async dispatch => {
     dispatch(fetchDocuments());
 
     try {
-      const res = await fetch(isNil(criteria) ? url : makeUrl(criteria)).then(
-        response => {
-          if (response.status >= 400) {
-            throw new Error(response.status);
-          }
-          return response;
+      const res = await fetch(makeUrl(url, criterias)).then(response => {
+        if (response.status >= 400) {
+          throw new Error(response.status);
         }
-      );
+        return response;
+      });
       const data = await res.text();
       const header = await res.headers.get('Content-Range');
       const makeNumber = ifElse(identity, Number, always(1));
@@ -88,7 +76,7 @@ const doGet = (url, criteria) => {
 
       const parsedData = pathOr(['documents'], [], JSON.parse(data));
       const successAction =
-        criteria && criteria.documentType === 'Authorization To Publish'
+        criterias && criterias.documentType === 'Authorization To Publish'
           ? fetchAuthorizationDocumentsSuccess
           : fetchDocumentsSuccess;
       return dispatch(
