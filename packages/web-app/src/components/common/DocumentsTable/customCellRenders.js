@@ -82,6 +82,10 @@ const useMakeCustomCellRenders = () => {
       customRender: pipe(head, propOr('', 'text'))
     },
     {
+      id: 'intactDescriptions',
+      customRender: pipe(head, propOr('', 'title'))
+    },
+    {
       id: 'titles',
       customRender: pipe(head, propOr('', 'text'))
     },
