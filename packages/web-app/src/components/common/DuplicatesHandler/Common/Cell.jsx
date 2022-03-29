@@ -127,7 +127,7 @@ RightCell.propTypes = {
   value: PropTypes.oneOfType([PropTypes.string, PropTypes.object]).isRequired,
   render: PropTypes.func,
   updateState: PropTypes.func.isRequired,
-  disableButton: PropTypes.bool,
+  disableButton: PropTypes.func,
   showAdornment: PropTypes.bool.isRequired,
   severity: PropTypes.oneOf(['primary', 'secondary'])
 };
@@ -136,7 +136,7 @@ LeftCell.propTypes = {
   value: PropTypes.oneOfType([PropTypes.string, PropTypes.object]).isRequired,
   render: PropTypes.func,
   updateState: PropTypes.func.isRequired,
-  disableButton: PropTypes.bool,
+  disableButton: PropTypes.func,
   showAdornment: PropTypes.bool.isRequired,
   severity: PropTypes.oneOf(['primary', 'secondary'])
 };
