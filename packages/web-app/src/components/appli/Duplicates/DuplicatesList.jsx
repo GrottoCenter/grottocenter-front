@@ -32,7 +32,7 @@ const DuplicatesList = ({
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(50);
   const [order, setOrder] = useState('asc');
-  const [orderBy, setOrderBy] = useState();
+  const [sortBy, setSortBy] = useState('datePublication');
   const { loading, duplicatesList, latestHttpCodeOnDelete } = useSelector(
     state => state.duplicatesImport
   );
@@ -66,7 +66,7 @@ const DuplicatesList = ({
       const criteria = {
         limit: rowsPerPage,
         skip: page * rowsPerPage,
-        sortBy: orderBy,
+        sortBy,
         orderBy: order
       };
       dispatch(fetchDuplicatesList(duplicateType, criteria));
@@ -84,11 +84,11 @@ const DuplicatesList = ({
     const criteria = {
       limit: rowsPerPage,
       skip: page * rowsPerPage,
-      sortBy: orderBy,
+      sortBy,
       orderBy: order
     };
     dispatch(fetchDuplicatesList(duplicateType, criteria));
-  }, [rowsPerPage, page, order, orderBy, duplicateType]);
+  }, [rowsPerPage, page, order, sortBy, duplicateType]);
 
   return (
     <>
@@ -103,7 +103,7 @@ const DuplicatesList = ({
           loading={loading}
           openDetailedView={undefined}
           order={order}
-          orderBy={orderBy || undefined}
+          orderBy={sortBy || undefined}
           rowsCount={duplicatesList.length}
           rowsPerPage={rowsPerPage}
           selection={selectedDuplicates}
@@ -111,7 +111,7 @@ const DuplicatesList = ({
           updateCurrentPage={setPage}
           updateHiddenColumns={setHiddenColumns}
           updateOrder={setOrder}
-          updateOrderBy={setOrderBy}
+          updateOrderBy={setSortBy}
           updateRowsPerPage={setRowsPerPage}
           updateSelection={setSelectedDuplicates}
         />
