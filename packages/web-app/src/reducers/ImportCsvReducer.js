@@ -13,6 +13,7 @@ const initialState = {
   error: null,
   resultCheck: {
     willBeCreated: null,
+    willBeCreatedAsDuplicates: null,
     wontBeCreated: null
   },
   resultImport: null
