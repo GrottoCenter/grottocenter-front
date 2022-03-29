@@ -24,7 +24,7 @@ const TitleLine = ({ title1, title2, handleAllClick1, handleAllClick2 }) => {
   const { formatMessage } = useIntl();
   return (
     <StyledGrid container direction="row">
-      <Grid container item xs={4} justify="flex-start">
+      <Grid container item xs={4} justifyContent="flex-start">
         <Title>
           {formatMessage(
             {

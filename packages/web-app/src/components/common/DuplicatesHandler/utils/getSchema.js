@@ -3,13 +3,13 @@ import { useIntl } from 'react-intl';
 
 /**
  * This function is called on every input. It defines what is shown to the user.
- * The default value is '', it is returned if the value is null or undefined, or the specific pach is undefined.
+ * The default value is '', it is returned if the value is null or undefined, or the specific path is undefined.
  *
- * This function was necessary to handle a specific use case : if we have one attribute of a duplicate which is on object from the database,
+ * This function was necessary to handle a specific use case: if one attribute of a duplicate is an object from the database,
  * whereas the same attribute from the other duplicate is a simple string.
  *
- * @param {Array} specificPath : the path on the object to reach the desired value. Example ['author', 'name'].
- * @returns a function which takes the value as a parameter, and returned the value which must be shown to the user.
+ * @param {Array} specificPath : the path to the object to reach the desired value. Example ['author', 'name'].
+ * @returns a function which takes the value as a parameter and returns the value which must be shown to the user.
  */
 const customRender = specificPath => {
   let func = value => value;

@@ -42,5 +42,5 @@ export default ActionLine;
 ActionLine.propTypes = {
   handleSubmit: PropTypes.func.isRequired,
   handleNotDuplicatesSubmit: PropTypes.func.isRequired,
-  disableSubmit: PropTypes.func.isRequired
+  disableSubmit: PropTypes.bool.isRequired
 };
