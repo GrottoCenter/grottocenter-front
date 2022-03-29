@@ -126,7 +126,7 @@ const DocumentsHandler = ({
         reviewer: getIdOrUndefined(entrance),
         dateInscription,
         datePublication,
-        dateReviewed,
+        dateReviewed: dateReviewed === '' ? undefined : dateReviewed,
         authorComment,
         identifier,
         identifierType: getIdOrUndefined(identifierType),
