@@ -29,7 +29,7 @@ const LabelAdornment = () => {
           <ListItemText
             primary={formatMessage({
               id:
-                'Data are already in the database and should be selected when possible'
+                'Data is already in the database and should be selected when possible'
             })}
           />
         </ListItem>
@@ -40,7 +40,7 @@ const LabelAdornment = () => {
           <ListItemText
             primary={formatMessage({
               id:
-                'Data are not in the database and will be created when selected'
+                'Data is not in the database and will be created when selected'
             })}
           />
         </ListItem>

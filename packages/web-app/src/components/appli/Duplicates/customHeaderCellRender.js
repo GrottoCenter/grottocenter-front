@@ -10,7 +10,7 @@ const useMakeCustomHeaderCellRenders = () => {
     },
     {
       id: 'author',
-      customRender: () => formatMessage({ id: 'Made by' })
+      customRender: () => formatMessage({ id: 'Created by' })
     },
     {
       id: 'entrance',

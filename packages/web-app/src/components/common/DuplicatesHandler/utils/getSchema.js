@@ -134,7 +134,7 @@ export const getDocumentSchema = () => {
   return [
     {
       attribute: 'author',
-      label: formatMessage({ id: 'Document creator id' }),
+      label: formatMessage({ id: 'Document creator' }),
       customRender: customRender(['nickname']),
       disabled: true
     },
