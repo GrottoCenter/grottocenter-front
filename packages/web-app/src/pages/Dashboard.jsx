@@ -99,7 +99,7 @@ const Dashboard = () => {
                   onClick={() => handleOnListItemClick('/ui/duplicates')}>
                   <CallMergeIcon fontSize="large" color="primary" />
                   <Typography variant="h4" align="center">
-                    {formatMessage({ id: 'Duplicate Tool' })}
+                    {formatMessage({ id: 'Duplicates Tool' })}
                   </Typography>
                 </StyledListItem>
               </StyledList>
