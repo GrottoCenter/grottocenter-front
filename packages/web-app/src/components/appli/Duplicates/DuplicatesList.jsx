@@ -32,7 +32,7 @@ const DuplicatesList = ({
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(50);
   const [order, setOrder] = useState('asc');
-  const [sortBy, setSortBy] = useState('datePublication');
+  const [sortBy, setSortBy] = useState('dateInscription');
   const { loading, duplicatesList, latestHttpCodeOnDelete } = useSelector(
     state => state.duplicatesImport
   );
