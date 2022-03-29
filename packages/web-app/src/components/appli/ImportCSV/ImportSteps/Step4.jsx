@@ -1,5 +1,5 @@
 import React, { useContext, useEffect } from 'react';
-import { makeStyles, Typography } from '@material-ui/core';
+import { Box, Typography } from '@material-ui/core';
 import PublishIcon from '@material-ui/icons/Publish';
 import { useDispatch, useSelector } from 'react-redux';
 import { useIntl } from 'react-intl';
@@ -18,17 +18,6 @@ import {
 } from '../constants';
 import Alert from '../../../common/Alert';
 import DownloadButton from '../DownloadButton';
-
-const useStyles = makeStyles({
-  cardBottomButtons: {
-    display: 'block',
-    marginTop: `${({ theme }) => theme.spacing(2)}px`,
-    marginBottom: `${({ theme }) => theme.spacing(2)}px`,
-    padding: 0,
-    textAlign: 'center',
-    width: '100%'
-  }
-});
 
 // https://formatjs.io/docs/core-concepts/icu-syntax/#select-format
 // TODO: this is causing translation error and thus, is not translated in other languages than english.
@@ -50,18 +39,25 @@ const translatedTypePrefix = `{number, plural,
 }`;
 
 const Step4 = () => {
-  const classes = useStyles();
   const dispatch = useDispatch();
   const { formatMessage } = useIntl();
   const importCsv = useSelector(state => state.importCsv);
   const { importData, selectedType } = useContext(ImportPageContentContext);
 
-  const willBeCreatedData = importCsv.resultCheck.willBeCreated;
-  const wontBeCreateData = importCsv.resultCheck.wontBeCreated;
+  const {
+    willBeCreated: willBeCreatedData,
+    willBeCreatedAsDuplicates: willBeCreatedAsDuplicatesData,
+    wontBeCreated: wontBeCreateData
+  } = importCsv.resultCheck;
   const { resultImport } = importCsv;
 
   const handleOnClick = () => {
-    dispatch(importRows(willBeCreatedData, selectedType));
+    dispatch(
+      importRows(
+        [...willBeCreatedData, ...willBeCreatedAsDuplicatesData],
+        selectedType
+      )
+    );
   };
 
   useEffect(() => {
@@ -70,6 +66,10 @@ const Step4 = () => {
       dispatch(resetImportState());
     };
   }, [dispatch, selectedType, importData]);
+
+  const somethingWillBeCreated =
+    (willBeCreatedData && willBeCreatedData.length > 0) ||
+    (willBeCreatedAsDuplicatesData && willBeCreatedAsDuplicatesData.length > 0);
 
   return (
     <>
@@ -129,62 +129,102 @@ const Step4 = () => {
               }
             )}
           />
-          <div className={classes.cardBottomButtons}>
-            <ActionButton
-              label={formatMessage({ id: 'Import' })}
-              onClick={handleOnClick}
-              loading={importCsv.isLoading}
-              icon={<PublishIcon />}
-            />
-          </div>
         </>
       )}
 
-      {resultImport && resultImport.total.success > 0 && (
-        <>
-          <Alert
-            severity="success"
-            title={formatMessage(
-              {
-                id: 'csvImport.successRecap',
-                defaultMessage: `${translatedTypePrefix} {number, plural, one {was} other {were}} imported.`
-              },
-              {
-                number: resultImport.total.success,
-                importType: selectedType
-              }
-            )}
-            action={
-              <DownloadButton
-                data={resultImport.successfulImport}
-                filename={SUCCESS_IMPORT}
-              />
-            }
+      {willBeCreatedAsDuplicatesData &&
+        willBeCreatedAsDuplicatesData.length > 0 && (
+          <>
+            <Alert
+              severity="warning"
+              title={formatMessage(
+                {
+                  id: 'csvImport.willBeImportedAsDuplicates',
+                  defaultMessage: `${translatedTypePrefix} will be imported as duplicate(s).`
+                },
+                {
+                  number: willBeCreatedAsDuplicatesData.length,
+                  importType: selectedType,
+                  translatedTypePrefix
+                }
+              )}
+            />
+          </>
+        )}
+
+      {somethingWillBeCreated && (
+        <Box textAlign="center">
+          <ActionButton
+            label={formatMessage({ id: 'Import' })}
+            onClick={handleOnClick}
+            loading={importCsv.isLoading}
+            icon={<PublishIcon />}
           />
-        </>
+        </Box>
+      )}
+
+      {resultImport && resultImport.total.successfulImportAsDuplicates > 0 && (
+        <Alert
+          severity="warning"
+          title={formatMessage(
+            {
+              id: 'csvImport.successAsDuplicatesRecap',
+              defaultMessage: `${translatedTypePrefix} {number, plural, one {was} other {were}} imported as duplicate(s).`
+            },
+            {
+              number: resultImport.total.successfulImportAsDuplicates,
+              importType: selectedType
+            }
+          )}
+          action={
+            <DownloadButton
+              data={resultImport.successfulImportAsDuplicates}
+              filename={SUCCESS_IMPORT}
+            />
+          }
+        />
+      )}
+      {resultImport && resultImport.total.success > 0 && (
+        <Alert
+          severity="success"
+          title={formatMessage(
+            {
+              id: 'csvImport.successRecap',
+              defaultMessage: `${translatedTypePrefix} {number, plural, one {was} other {were}} imported.`
+            },
+            {
+              number: resultImport.total.success,
+              importType: selectedType
+            }
+          )}
+          action={
+            <DownloadButton
+              data={resultImport.successfulImport}
+              filename={SUCCESS_IMPORT}
+            />
+          }
+        />
       )}
       {resultImport && resultImport.total.failure > 0 && (
-        <>
-          <Alert
-            severity="error"
-            title={formatMessage(
-              {
-                id: 'csvImport.errorRecap',
-                defaultMessage: `${translatedTypePrefix} {number, plural, one {was} other {were}} not imported.`
-              },
-              {
-                number: resultImport.total.failure,
-                importType: selectedType
-              }
-            )}
-            action={
-              <DownloadButton
-                data={resultImport.failureImport}
-                filename={FAILURE_IMPORT}
-              />
+        <Alert
+          severity="error"
+          title={formatMessage(
+            {
+              id: 'csvImport.errorRecap',
+              defaultMessage: `${translatedTypePrefix} {number, plural, one {was} other {were}} not imported.`
+            },
+            {
+              number: resultImport.total.failure,
+              importType: selectedType
             }
-          />
-        </>
+          )}
+          action={
+            <DownloadButton
+              data={resultImport.failureImport}
+              filename={FAILURE_IMPORT}
+            />
+          }
+        />
       )}
     </>
   );
