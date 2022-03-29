@@ -38,7 +38,7 @@ const HeaderTabs = ({ selectedTab, setSelectedTab, disabledAllTabs }) => {
 };
 
 HeaderTabs.propTypes = {
-  selectedTab: PropTypes.arrayOf(PropTypes.number).isRequired,
+  selectedTab: PropTypes.number.isRequired,
   setSelectedTab: PropTypes.func.isRequired,
   disabledAllTabs: PropTypes.bool.isRequired
 };
