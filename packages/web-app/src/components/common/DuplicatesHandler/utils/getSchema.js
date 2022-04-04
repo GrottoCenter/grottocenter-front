@@ -16,7 +16,9 @@ const customRender = specificPath => {
   if (specificPath) {
     func = value => {
       const returnedValue = pathOr(value, specificPath, value);
-      return is(String, returnedValue) || is(Number, returnedValue)
+      return is(String, returnedValue) ||
+        is(Number, returnedValue) ||
+        is(Array, returnedValue)
         ? returnedValue
         : '';
     };
@@ -233,11 +235,14 @@ export const getDocumentSchema = () => {
       attribute: 'parent',
       label: formatMessage({ id: 'Document parent' }),
       customRender: value => {
-        // Render the first title found
-        const firstTitleObj = customRender(['titles'])(value)[0];
-        const language = firstTitleObj.language.part1 || '';
-        const title = firstTitleObj.text || '';
-        return `${language} : ${title}`;
+        if (value) {
+          // Render the first title found
+          const firstTitleObj = customRender(['titles'])(value)[0];
+          const language = firstTitleObj.language.part1 || '';
+          const title = firstTitleObj.text || '';
+          return `${language} : ${title}`;
+        }
+        return customRender();
       },
       disabled: true
     },
