@@ -8,7 +8,6 @@ import {
   GridFullColumn
 } from '../../../helpers/GridSystem';
 import Translate from '../../common/Translate';
-import GCLink from '../../common/GCLink';
 import InternationalizedLink from '../../common/InternationalizedLink';
 import { wikiBBSLinks } from '../../../conf/Config';
 import DynamicNumberConnector from '../../../containers/DynamicNumberConnector';
@@ -34,7 +33,7 @@ const NumberBlockHalfWidth = styled(GridOneHalfColumn)`
 
   @media (max-width: 550px) {
     :last-child {
-      margin-bottom: 0px;
+      margin-bottom: 0;
     }
   }
 `;
@@ -47,7 +46,7 @@ const NumberBlockFullWidth = styled(GridFullColumn)`
 
   @media (max-width: 550px) {
     :last-child {
-      margin-bottom: 0px;
+      margin-bottom: 0;
     }
   }
 `;
@@ -98,8 +97,7 @@ const WhatIsIt = () => (
           caves are freely accessible from the following page (
         </Translate>
         <NumberText numberType="entrances" />{' '}
-        <Translate>by logging on</Translate>{' '}
-        <GCLink href="http://www.grottocenter.org">Grotto v2</GCLink>)
+        <Translate>by logging on</Translate>)
       </NumberBlockHalfWidth>
       <NumberBlockHalfWidth>
         <BlockIcon className="icon-gc-club" />

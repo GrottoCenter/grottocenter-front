@@ -12,7 +12,6 @@ import {
   githubLink,
   facebookLink,
   twitterLink,
-  rssLinks,
   bloggerLinks
 } from '../../conf/Config';
 
@@ -95,12 +94,6 @@ const AppFooter = () => (
         <SocialImage
           src="/images/icons8/brown/icons8-twitter-filled-100.png"
           alt="Follow us on Twitter"
-        />
-      </InternationalizedLink>
-      <InternationalizedLink links={rssLinks}>
-        <SocialImage
-          src="/images/icons8/brown/icons8-rss-filled-100.png"
-          alt="RSS feed"
         />
       </InternationalizedLink>
       <InternationalizedLink links={bloggerLinks}>

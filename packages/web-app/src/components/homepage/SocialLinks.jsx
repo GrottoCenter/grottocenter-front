@@ -5,7 +5,6 @@ import GCLink from '../common/GCLink';
 import {
   bloggerLinks,
   wikiBatsLinks,
-  rssLinks,
   facebookLink,
   twitterLink,
   githubLink
@@ -16,8 +15,7 @@ const SocialLinksList = styled.ul`
   display: inline-block;
 
   @media (min-width: 550px) {
-    margin: 0;
-    margin-right: 5px;
+    margin: 0 5px 0 0;
   }
 `;
 
@@ -56,14 +54,6 @@ const SocialLinks = () => (
         <SocialImage
           src="/images/icons8/icons8-facebook-filled-100.png"
           alt="Follow us on Facebook"
-        />
-      </InternationalizedLink>
-    </SocialLinksListItem>
-    <SocialLinksListItem>
-      <InternationalizedLink links={rssLinks}>
-        <SocialImage
-          src="/images/icons8/icons8-rss-filled-100.png"
-          alt="RSS feed"
         />
       </InternationalizedLink>
     </SocialLinksListItem>

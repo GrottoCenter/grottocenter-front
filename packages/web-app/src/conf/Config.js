@@ -103,25 +103,10 @@ export const wikiBBSLinks = generateLinks(
   'https://wiki.grottocenter.org/wiki/GrottoCenter:%s/bbs',
   'en'
 );
-export const rssLinks = generateLinks(
-  'http://www.grottocenter.org/html/rss_%s.xml',
-  'en'
-);
 export const legalLinks = generateLinks(
   'https://wiki.grottocenter.org/wiki/GrottoCenter:%s/Legal_and_Privacy_Statement',
   'en'
 );
-
-export const detailPageV2Links = {
-  fr: 'http://www.grottocenter.org/html/file_Fr.php?lang=Fr',
-  es: 'http://www.grottocenter.org/html/file_Es.php?lang=Es',
-  ca: 'http://www.grottocenter.org/html/file_Ca.php?lang=Ca',
-  de: 'http://www.grottocenter.org/html/file_De.php?lang=De',
-  bg: 'http://www.grottocenter.org/html/file_Bg.php?lang=Bg',
-  nl: 'http://www.grottocenter.org/html/file_Nl.php?lang=Nl',
-  it: 'http://www.grottocenter.org/html/file_It.php?lang=It',
-  '*': 'http://www.grottocenter.org/html/file_En.php?lang=En'
-};
 
 export const pftGdLink =
   'https://docs.google.com/document/d/1SccuusPQcxrZJI3nvWcbUc2dgGyKc4ZJXqQzSPeE9Hg/edit?usp=sharing';

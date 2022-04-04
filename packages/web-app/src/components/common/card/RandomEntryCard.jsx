@@ -7,9 +7,7 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 import styled from 'styled-components';
 import { withStyles } from '@material-ui/core';
 import { isNil } from 'ramda';
-import { useSelector } from 'react-redux';
 import GCLink from '../GCLink';
-import { detailPageV2Links } from '../../../conf/Config';
 import Translate from '../Translate';
 
 const FlexWrapper = styled.div`
@@ -345,8 +343,6 @@ const EntryWrapper = styled.div`
 `;
 
 const RandomEntryCard = ({ entry, isFetching, fetch }) => {
-  const { locale } = useSelector(state => state.intl);
-
   useEffect(() => {
     fetch();
   }, [fetch]);
@@ -356,14 +352,8 @@ const RandomEntryCard = ({ entry, isFetching, fetch }) => {
   }
 
   if (entry && entry.id) {
-    const detailPageV2Link =
-      detailPageV2Links[locale] !== undefined
-        ? detailPageV2Links[locale]
-        : detailPageV2Links['*'];
     return (
-      <RandomEntryLink
-        href={`${detailPageV2Link}&category=entry&id=${entry.id}`}
-        target="blank">
+      <RandomEntryLink href={`/ui/entrances/${entry.id}`}>
         <EntryWrapper>
           <EntryData entry={entry} />
         </EntryWrapper>
