@@ -41,7 +41,7 @@ export const RightCellCollection = ({
         container
         item
         direction="row"
-        justify="flex-end"
+        justifyContent="flex-end"
         alignItems="center">
         <ActionButton
           label={formatMessage(
@@ -60,7 +60,7 @@ export const RightCellCollection = ({
             key={index}
             container
             direction="row"
-            justify="flex-end"
+            justifyContent="flex-end"
             alignItems="center">
             <MarginRightDiv>
               <Fab
@@ -158,7 +158,7 @@ export const LeftCellCollection = ({
         container
         item
         direction="row"
-        justify="flex-start"
+        justifyContent="flex-start"
         alignItems="center">
         <ActionButton
           label={formatMessage(

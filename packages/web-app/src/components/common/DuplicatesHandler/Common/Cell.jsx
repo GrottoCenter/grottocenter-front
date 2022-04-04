@@ -30,7 +30,11 @@ export const RightCell = ({
       iconColor = theme.palette.secondary.light;
   }
   return (
-    <Grid container direction="row" justify="flex-end" alignItems="center">
+    <Grid
+      container
+      direction="row"
+      justifyContent="flex-end"
+      alignItems="center">
       <MarginRightDiv>
         <Fab
           onClick={() => updateState(value)}
@@ -93,7 +97,11 @@ export const LeftCell = ({
       iconColor = theme.palette.secondary.light;
   }
   return (
-    <Grid container direction="row" justify="flex-start" alignItems="center">
+    <Grid
+      container
+      direction="row"
+      justifyContent="flex-start"
+      alignItems="center">
       <StringInput
         value={render(value)}
         valueName={label}

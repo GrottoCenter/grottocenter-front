@@ -233,7 +233,7 @@ export const getDocumentSchema = () => {
       attribute: 'parent',
       label: formatMessage({ id: 'Document parent' }),
       customRender: value => {
-        // We render the first title found
+        // Render the first title found
         const firstTitleObj = customRender(['titles'])(value)[0];
         const language = firstTitleObj.language.part1 || '';
         const title = firstTitleObj.text || '';

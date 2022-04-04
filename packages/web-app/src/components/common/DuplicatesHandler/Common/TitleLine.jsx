@@ -42,10 +42,10 @@ const TitleLine = ({ title1, title2, handleAllClick1, handleAllClick2 }) => {
           style={{ marginLeft: margin }}
         />
       </Grid>
-      <Grid container item xs={4} justify="center">
+      <Grid container item xs={4} justifyContent="center">
         <Title>{formatMessage({ id: 'Final result' })}</Title>
       </Grid>
-      <Grid container item xs={4} justify="flex-end">
+      <Grid container item xs={4} justifyContent="flex-end">
         <ActionButton
           label={formatMessage({ id: 'Take all' })}
           onClick={handleAllClick2}
