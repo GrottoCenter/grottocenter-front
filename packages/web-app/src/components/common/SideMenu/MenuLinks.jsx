@@ -1,7 +1,6 @@
 import React from 'react';
 import { List } from '@material-ui/core';
 import LibraryAddIcon from '@material-ui/icons/LibraryAdd';
-import ToolboxIcon from '@material-ui/icons/Build';
 import LocationIcon from '@material-ui/icons/LocationOn';
 import DashboardIcon from '@material-ui/icons/Dashboard';
 import HomeIcon from '@material-ui/icons/Home';
@@ -35,11 +34,6 @@ const MenuLinks = () => {
         ItemIcon={() => <LocationIcon color="primary" />}
         label="Map"
         href="/ui/map"
-      />
-      <Item
-        ItemIcon={() => <ToolboxIcon color="primary" />}
-        label="Toolbox"
-        href="#"
       />
       {permissions.isAuth && (
         <Item
