@@ -100,7 +100,6 @@ export const fetchAdvancedsearchResults = criterias => dispatch => {
         fetchAdvancedsearchSuccess(response.results, response.totalNbResults)
       );
     });
-  // .catch(error => dispatch(fetchRandomEntryFailure(error)))
 };
 
 export const fetchNextAdvancedsearchResults = (from, size) => (
@@ -141,7 +140,6 @@ export const fetchNextAdvancedsearchResults = (from, size) => (
       const response = JSON.parse(text);
       dispatch(fetchNextAdvancedSearchSucess(response.results));
     });
-  // .catch(error => dispatch(fetchRandomEntryFailure(error)))
 };
 
 export const fetchFullAdvancedsearchResults = () => (dispatch, getState) => {
@@ -176,5 +174,4 @@ export const fetchFullAdvancedsearchResults = () => (dispatch, getState) => {
       const response = JSON.parse(text);
       dispatch(fetchFullAdvancedSearchSucess(response.results));
     });
-  // .catch(error => dispatch(fetchRandomEntryFailure(error)))
 };
