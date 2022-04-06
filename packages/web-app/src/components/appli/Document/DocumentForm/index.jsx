@@ -1,5 +1,6 @@
 import React, { useContext, useEffect } from 'react';
 import { isMobileOnly } from 'react-device-detect';
+import { useIntl } from 'react-intl';
 import styled from 'styled-components';
 import {
   Button,
@@ -8,6 +9,7 @@ import {
   LinearProgress as MuiLinearProgress,
   Typography
 } from '@material-ui/core';
+import { Prompt } from 'react-router-dom';
 import { includes } from 'ramda';
 import NavigateNextIcon from '@material-ui/icons/NavigateNext';
 import NavigateBeforeIcon from '@material-ui/icons/NavigateBefore';
@@ -21,6 +23,7 @@ import InternationalizedLink from '../../../common/InternationalizedLink';
 import Stepper from '../../../common/Form/Stepper';
 
 import FormBody from './FormBody';
+import CreatingDocumentDialog from './CreatingDocumentDialog';
 
 const NextStepButton = props => (
   <Button
@@ -81,6 +84,9 @@ const BbsInfoText = styled(Typography)`
   margin-left: ${({ theme }) => theme.spacing(3)}px;
 `;
 
+const DONT_LEAVE_MESSAGE =
+  'If you leave now, some data would be lost. Are you sure you want to leave this page?';
+
 const DocumentForm = ({ isLoading, onSubmit, onUpdate }) => {
   const {
     docAttributes,
@@ -91,6 +97,7 @@ const DocumentForm = ({ isLoading, onSubmit, onUpdate }) => {
     docAttributes: { formSteps, isNewDocument }
   } = useContext(DocumentFormContext);
   const [isNextStepDisabled, setIsNextStepDisabled] = React.useState(true);
+  const { formatMessage } = useIntl();
 
   const handleSubmit = event => {
     event.preventDefault();
@@ -117,8 +124,21 @@ const DocumentForm = ({ isLoading, onSubmit, onUpdate }) => {
     updateCurrentStep(prevFormStep => prevFormStep - 1);
   };
 
+  // Prevent closing tab if it's loading
+  useEffect(() => {
+    if (isLoading) {
+      const confirmExit = () =>
+        formatMessage({
+          id: DONT_LEAVE_MESSAGE
+        });
+      window.onbeforeunload = confirmExit;
+    }
+  }, [isLoading, formatMessage]);
+
   return (
     <>
+      <CreatingDocumentDialog isLoading={isLoading} />
+
       <BbsHeader>
         <BbsIcon src="/images/bbs_logo.png" alt="BBS logo" />
         <BbsInfoText variant="body1" paragraph>
@@ -142,6 +162,10 @@ const DocumentForm = ({ isLoading, onSubmit, onUpdate }) => {
 
       <hr />
 
+      <Prompt
+        when={isLoading}
+        message={formatMessage({ id: DONT_LEAVE_MESSAGE })}
+      />
       <LinearProgress $isLoading={isLoading} />
 
       <div style={isLoading ? { opacity: '0.6' } : {}}>
@@ -174,20 +198,22 @@ const DocumentForm = ({ isLoading, onSubmit, onUpdate }) => {
           )}
 
           {currentFormStep === formSteps.length && (
-            <FormControl>
-              <SubmitButton
-                type="submit"
-                variant="contained"
-                color="primary"
-                size="large"
-                disabled={!isFormValid}>
-                {isNewDocument ? (
-                  <Translate>Submit</Translate>
-                ) : (
-                  <Translate>Update</Translate>
-                )}
-              </SubmitButton>
-            </FormControl>
+            <>
+              <FormControl>
+                <SubmitButton
+                  type="submit"
+                  variant="contained"
+                  color="primary"
+                  size="large"
+                  disabled={!isFormValid}>
+                  {isNewDocument ? (
+                    <Translate>Submit</Translate>
+                  ) : (
+                    <Translate>Update</Translate>
+                  )}
+                </SubmitButton>
+              </FormControl>
+            </>
           )}
         </FormWrapper>
       </div>

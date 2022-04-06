@@ -235,7 +235,6 @@ export const getDocumentSchema = () => {
       attribute: 'parent',
       label: formatMessage({ id: 'Document parent' }),
       customRender: value => {
-        console.log(value);
         if (value) {
           const titles = customRender(['titles'])(value);
           if (titles.length > 0) {
