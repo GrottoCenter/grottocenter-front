@@ -235,12 +235,16 @@ export const getDocumentSchema = () => {
       attribute: 'parent',
       label: formatMessage({ id: 'Document parent' }),
       customRender: value => {
+        console.log(value);
         if (value) {
-          // Render the first title found
-          const firstTitleObj = customRender(['titles'])(value)[0];
-          const language = firstTitleObj.language.part1 || '';
-          const title = firstTitleObj.text || '';
-          return `${language} : ${title}`;
+          const titles = customRender(['titles'])(value);
+          if (titles.length > 0) {
+            // Render the first title found only
+            const firstTitleObj = titles[0];
+            const language = firstTitleObj.language.part1 || '';
+            const title = firstTitleObj.text || '';
+            return `${language} : ${title}`;
+          }
         }
         return customRender();
       },
