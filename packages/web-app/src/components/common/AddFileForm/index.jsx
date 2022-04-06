@@ -12,6 +12,7 @@ import DocumentAuthorizationSelect from '../../../features/Form/DocumentAuthoriz
 import ErrorsList from './ErrorsList';
 import useFileFormats from '../../../hooks/useFileFormats';
 import OptionSelect from './OptionSelect';
+import { MAX_SIZE_OF_UPLOADED_FILES } from '../../../conf/Config';
 import { IS_DELETED, IS_INTACT, IS_MODIFIED, IS_NEW } from './FileHelpers';
 
 const StyledButton = styled(Button)`
@@ -59,15 +60,18 @@ const AddFileForm = ({
 
     const newAddedFiles = filesArray
       .filter(file => {
-        // File size is 100 Mo (Mb)
-        if (file.size && file.size > 100000000) {
+        if (file.size && file.size > MAX_SIZE_OF_UPLOADED_FILES) {
           errorsList.push(
             formatMessage(
               {
                 id: 'error on file size',
-                defaultMessage: 'The following file is too big : {file}.'
+                defaultMessage:
+                  'The following file is too big: {file}. Max accepted size: {maxSize}'
               },
-              { file: file.name }
+              {
+                file: file.name,
+                maxSize: `${MAX_SIZE_OF_UPLOADED_FILES / 1000000} Mo`
+              }
             )
           );
           return false;
