@@ -45,6 +45,14 @@ const useMakeCustomCellRenders = () => {
         formatMessage({ id: isValidated ? 'Yes' : 'No' })
     },
     {
+      id: 'languages',
+      customRender: pipe(
+        map(propOr('', 'refName')),
+        reject(isEmpty),
+        join('; ')
+      )
+    },
+    {
       id: 'license',
       customRender: propOr('', 'name')
     },
