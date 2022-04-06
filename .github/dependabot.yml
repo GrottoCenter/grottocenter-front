@@ -31,7 +31,7 @@ updates:
       interval: "weekly"
     open-pull-requests-limit: 10
   - package-ecosystem: "npm" 
-    directory: "/packages/eslint-config"-typescript 
+    directory: "/packages/eslint-config-typescript"
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 10
