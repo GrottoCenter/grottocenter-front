@@ -268,3 +268,5 @@ export const sideMenuWidth = '215px';
 export const logoGC = '/images/logo.svg';
 
 export const authTokenName = 'grottocenter_token';
+
+export const MAX_SIZE_OF_UPLOADED_FILES = 2000 * 1000000; // in bytes (2 Go)
