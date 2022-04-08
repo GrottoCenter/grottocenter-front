@@ -115,6 +115,10 @@ const useCustomHeaderRender = () => {
       customRender: () => formatMessage({ id: 'Label' })
     },
     {
+      id: CONSTANTS.LABEL_LANGUAGE,
+      customRender: () => formatMessage({ id: 'Label language' })
+    },
+    {
       id: CONSTANTS.LANGUAGE,
       customRender: () => formatMessage({ id: 'Language' })
     },

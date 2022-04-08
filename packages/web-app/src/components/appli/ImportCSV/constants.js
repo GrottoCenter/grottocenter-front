@@ -24,6 +24,7 @@ export const DESCRIPTION_DOCUMENT_TITLE =
   'karstlink:hasDescriptionDocument/dct:title';
 export const ID = 'id';
 export const LABEL = 'rdfs:label';
+export const LABEL_LANGUAGE = 'rdfs:label/dc:language';
 export const LICENSE = 'dct:rights/karstlink:licenseType';
 export const MODIFICATION_DATE = 'dct:rights/dct:modified';
 export const TYPE = 'rdf:type';
