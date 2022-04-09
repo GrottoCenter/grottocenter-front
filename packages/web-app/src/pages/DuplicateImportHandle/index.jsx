@@ -5,7 +5,7 @@ import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import Layout from '../../components/common/Layouts/Fixed/FixedContent';
 import DuplicatesList from '../../components/appli/Duplicates/DuplicatesList';
 import HeaderTabs from './HeaderTabs';
-import AuthChecker from '../../features/AuthChecker';
+import AuthChecker from '../../components/appli/AuthChecker';
 import ActionButton from '../../components/common/ActionButton';
 import HydratedEntranceDuplicates from '../../components/appli/Duplicates/HydratedEntranceDuplicates';
 import HydratedDocumentDuplicates from '../../components/appli/Duplicates/HydratedDocumentDuplicates';

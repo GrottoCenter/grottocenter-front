@@ -3,12 +3,12 @@ import { Button, CircularProgress } from '@material-ui/core';
 import { useDispatch, useSelector } from 'react-redux';
 import { isEmpty, match } from 'ramda';
 import { useHistory } from 'react-router-dom';
-import { hideLoginDialog, postLogin } from '../actions/Login';
+import { hideLoginDialog, postLogin } from '../../actions/Login';
 
-import { emailRegexp } from '../conf/Config';
-import Translate from '../components/common/Translate';
-import StandardDialog from '../components/common/StandardDialog';
-import LoginForm from '../components/common/LoginForm';
+import { emailRegexp } from '../../conf/Config';
+import Translate from '../common/Translate';
+import StandardDialog from '../common/StandardDialog';
+import LoginForm from '../common/LoginForm';
 
 const Login = () => {
   const dispatch = useDispatch();

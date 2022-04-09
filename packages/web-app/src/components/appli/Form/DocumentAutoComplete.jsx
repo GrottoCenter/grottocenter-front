@@ -8,12 +8,12 @@ import { InputAdornment } from '@material-ui/core';
 import {
   fetchQuicksearchResult,
   resetQuicksearch
-} from '../../actions/Quicksearch';
+} from '../../../actions/Quicksearch';
 
-import { entityOptionForSelector } from '../../helpers/Entity';
+import { entityOptionForSelector } from '../../../helpers/Entity';
 
-import useDocumentTypes from '../../hooks/useDocumentTypes';
-import SearchBar from '../../components/appli/Document/DocumentForm/formElements/SearchBar';
+import useDocumentTypes from '../../../hooks/useDocumentTypes';
+import SearchBar from '../Document/DocumentForm/formElements/SearchBar';
 import FormAutoComplete from './FormAutoComplete';
 
 // ===================================

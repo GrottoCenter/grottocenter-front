@@ -8,9 +8,9 @@ import {
   displayLoginDialog,
   hideLoginDialog,
   postLogout
-} from '../actions/Login';
-import AppBarComponent from '../components/common/AppBar';
-import { usePermissions } from '../hooks';
+} from '../../actions/Login';
+import AppBarComponent from '../common/AppBar';
+import { usePermissions } from '../../hooks';
 
 // eslint-disable-next-line react/prop-types
 const HeaderAutoCompleteSearch = ({ isSideMenuOpen, HeaderQuickSearch }) => (

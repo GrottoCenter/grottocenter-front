@@ -21,7 +21,7 @@ import grottoTheme from './conf/grottoTheme';
 import GCReducer from './reducers/GCReducer';
 import { changeLanguage, loadLanguages } from './actions/Language';
 import Application from './pages/Application';
-import ErrorHandler from './features/ErrorHandler';
+import ErrorHandler from './components/appli/ErrorHandler';
 import { DEFAULT_LANGUAGE, AVAILABLE_LANGUAGES } from './conf/Config';
 import './App.css';
 

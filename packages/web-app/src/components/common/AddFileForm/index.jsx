@@ -5,10 +5,10 @@ import { FormControl, Button, Typography } from '@material-ui/core';
 
 import styled from 'styled-components';
 import { isEmpty, isNil, remove } from 'ramda';
-import LicenseSelect from '../../../features/Form/LicenseSelect';
+import LicenseSelect from '../../appli/Form/LicenseSelect';
 import { DOCUMENT_AUTHORIZE_TO_PUBLISH } from '../../../hooks/useDocumentOptions';
 import FilesList from './FilesList';
-import DocumentAuthorizationSelect from '../../../features/Form/DocumentAuthorizationSelect';
+import DocumentAuthorizationSelect from '../../appli/Form/DocumentAuthorizationSelect';
 import ErrorsList from './ErrorsList';
 import useFileFormats from '../../../hooks/useFileFormats';
 import OptionSelect from './OptionSelect';

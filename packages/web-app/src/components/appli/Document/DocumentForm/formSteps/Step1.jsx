@@ -13,7 +13,7 @@ import DocumentTypeSelect from '../formElements/DocumentTypeSelect';
 import PublicationDatePicker from '../formElements/PublicationDatePicker';
 import TitleEditor from '../formElements/TitleEditor';
 
-import DocumentLanguageSelect from '../../../../../features/DocumentLanguageSelect';
+import DocumentLanguageSelect from '../../../DocumentLanguageSelect';
 import useDocumentTypes from '../../../../../hooks/useDocumentTypes';
 
 const FlexWrapper = styled.div`

@@ -13,12 +13,12 @@ import Faq from '../components/appli/Faq';
 import LatestBlogNewsSection from './homepage/LatestBlogNewsSection';
 import Layout from '../components/common/Layouts/Main';
 
-import AppBar from '../features/AppBar';
-import ChangePassword from '../features/ChangePassword';
-import LoginDialog from '../features/Login';
-import QuickSearch from '../features/QuickSearch';
-import SignUp from '../features/SignUp';
-import ForgotPassword from '../features/ForgotPassword';
+import AppBar from '../components/appli/AppBar';
+import ChangePassword from '../components/appli/ChangePassword';
+import LoginDialog from '../components/appli/Login';
+import QuickSearch from '../components/appli/QuickSearch';
+import SignUp from '../components/appli/SignUp';
+import ForgotPassword from '../components/appli/ForgotPassword';
 
 import { usePermissions } from '../hooks';
 

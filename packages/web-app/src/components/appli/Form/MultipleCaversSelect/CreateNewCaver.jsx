@@ -6,9 +6,9 @@ import { useIntl } from 'react-intl';
 import AddIcon from '@material-ui/icons/Add';
 import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
-import { postCaver } from '../../../actions/CreateCaver';
-import ActionButton from '../../../components/common/ActionButton';
-import { DocumentFormContext } from '../../../components/appli/Document/DocumentForm/Provider';
+import { postCaver } from '../../../../actions/CreateCaver';
+import ActionButton from '../../../common/ActionButton';
+import { DocumentFormContext } from '../../Document/DocumentForm/Provider';
 
 const Wrapper = styled.form`
   display: flex;
