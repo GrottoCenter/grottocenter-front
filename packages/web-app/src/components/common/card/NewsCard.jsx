@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import { Chip } from '@material-ui/core';
 import Card from '@material-ui/core/Card';
 import CardMedia from '@material-ui/core/CardMedia';
 import CardActions from '@material-ui/core/CardActions';
@@ -12,7 +13,6 @@ import SyncKOIcon from '@material-ui/icons/SyncProblem';
 import Divider from '@material-ui/core/Divider';
 import { withStyles } from '@material-ui/core/styles';
 import styled from 'styled-components';
-import { DateRibbon } from '../Toolbox';
 import GCLink from '../GCLink';
 import { DYNAMIC_NEWS_RELOAD_INTERVAL } from '../../../conf/Config';
 
@@ -138,7 +138,7 @@ class NewsCard extends Component {
     return (
       <StyledCard>
         <StyledCardMedia image="images/homepage/news.jpg" />
-        {day && month && <DateRibbon day={day} month={month} />}
+        {day && month && <Chip color="primary" label={`${day} ${month}`} />}
         <StyledCardContent>
           <StyledTitleTypography gutterBottom component="h3">
             {title}

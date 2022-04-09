@@ -6,7 +6,6 @@ import Api from '../components/appli/Api';
 import Dashboard from './Dashboard';
 import Swagger from './Swagger';
 import HomePage from './HomePage';
-import Admin from './Admin';
 import AdvancedSearchPage from './AdvancedSearchPage';
 import DocumentDetailsPage from './DocumentDetails';
 import DuplicateImportHandle from './DuplicateImportHandle';
@@ -58,7 +57,6 @@ const Application = () => {
       <LoginDialog />
       <Switch>
         <Route exact path="/" component={HomePage} />
-        <Route path="/admin" component={Admin} />
         <Route exact path="/ui" component={Dashboard} />
         <Route path="/ui/admin/users" component={ManageUsers} />
         <Route path="/ui/search" component={AdvancedSearchPage} />
