@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { withTheme } from '@material-ui/core/styles';
 import LandingSection from './LandingSection';
 import { GridRow, GridOneHalfColumn } from '../../helpers/GridSystem';
-import Translate from '../common/Translate';
+import Translate from '../../components/common/Translate';
 import LatestBlogNews from '../../containers/LatestBlogNews';
 import { FR_GC_BLOG, EN_GC_BLOG } from '../../conf/Config';
 

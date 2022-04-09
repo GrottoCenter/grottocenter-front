@@ -6,7 +6,7 @@ import { FormLabel } from '@material-ui/core';
 import styled from 'styled-components';
 
 import { StyledFormControl } from './SliderForm';
-import Translate from '../../common/Translate';
+import Translate from '../../../components/common/Translate';
 
 const ToggleButtonGroup = styled(MuiToggleButtonGroup)`
   padding: ${({ theme }) => theme.spacing(2)}px;

@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
 import { loadPartnersForCarousel } from '../actions/PartnersForCarousel';
-import PartnersCarousel from '../components/homepage/PartnersCarousel';
+import PartnersCarousel from '../pages/homepage/PartnersCarousel';
 
 //
 //

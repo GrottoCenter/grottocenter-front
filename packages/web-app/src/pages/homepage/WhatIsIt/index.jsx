@@ -7,8 +7,8 @@ import {
   GridOneHalfColumn,
   GridFullColumn
 } from '../../../helpers/GridSystem';
-import Translate from '../../common/Translate';
-import InternationalizedLink from '../../common/InternationalizedLink';
+import Translate from '../../../components/common/Translate';
+import InternationalizedLink from '../../../components/common/InternationalizedLink';
 import { wikiBBSLinks } from '../../../conf/Config';
 import DynamicNumberConnector from '../../../containers/DynamicNumberConnector';
 

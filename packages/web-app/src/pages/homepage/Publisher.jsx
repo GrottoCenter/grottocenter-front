@@ -1,9 +1,9 @@
 import React from 'react';
 import styled from 'styled-components';
-import InternationalizedLink from '../common/InternationalizedLink';
+import InternationalizedLink from '../../components/common/InternationalizedLink';
 import { wikicavesLink } from '../../conf/Config';
-import Translate from '../common/Translate';
-import GCLogo from '../common/GCLogo';
+import Translate from '../../components/common/Translate';
+import GCLogo from '../../components/common/GCLogo';
 
 const PublisherInfo = styled.div`
   margin-right: 4px;

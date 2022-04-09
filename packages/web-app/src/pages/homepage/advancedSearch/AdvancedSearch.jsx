@@ -9,7 +9,7 @@ import EntrancesSearch from './EntrancesSearch';
 import MassifsSearch from './MassifsSearch';
 import OrganizationsSearch from './OrganizationsSearch';
 
-import Translate from '../../common/Translate';
+import Translate from '../../../components/common/Translate';
 
 import SearchResultsContainer from '../../../containers/SearchResultsContainer';
 

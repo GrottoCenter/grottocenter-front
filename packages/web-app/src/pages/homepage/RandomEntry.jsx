@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { withTheme } from '@material-ui/core/styles';
 import RandomEntryCardContainer from '../../containers/RandomEntryCardContainer';
 import { GridRow } from '../../helpers/GridSystem';
-import Translate from '../common/Translate';
+import Translate from '../../components/common/Translate';
 import LandingSection from './LandingSection';
 
 const RandomEntrySection = styled(LandingSection)`

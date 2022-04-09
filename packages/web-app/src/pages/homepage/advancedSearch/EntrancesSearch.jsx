@@ -15,7 +15,7 @@ import {
 } from '@material-ui/core';
 
 import styles from './styles';
-import Translate from '../../common/Translate';
+import Translate from '../../../components/common/Translate';
 import SearchBottomActionButtons from './SearchBottomActionButtons';
 import SliderForm from './SliderForm';
 import DivingTypesForm from './DivingTypesForm';

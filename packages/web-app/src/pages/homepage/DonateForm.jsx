@@ -4,7 +4,7 @@ import Button from '@material-ui/core/Button';
 import { withStyles, withTheme } from '@material-ui/core/styles';
 import styled, { keyframes } from 'styled-components';
 import Typography from '@material-ui/core/Typography/Typography';
-import Translate from '../common/Translate';
+import Translate from '../../components/common/Translate';
 import { paypalLink, paypalImgLink, paypalId } from '../../conf/Config';
 
 const btEyeCatcher = keyframes`

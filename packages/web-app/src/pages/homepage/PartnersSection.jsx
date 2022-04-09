@@ -4,7 +4,7 @@ import { withTheme } from '@material-ui/core/styles';
 import LandingSection from './LandingSection';
 import { GridRow, GridFullColumn } from '../../helpers/GridSystem';
 import PartnersCarouselContainer from '../../containers/PartnersCarouselContainer';
-import Translate from '../common/Translate';
+import Translate from '../../components/common/Translate';
 
 const SectionTitle = withTheme(styled.h3`
   color: ${props => props.theme.palette.accent1Color};
