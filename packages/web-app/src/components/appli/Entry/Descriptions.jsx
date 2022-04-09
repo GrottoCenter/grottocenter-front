@@ -19,24 +19,22 @@ const Descriptions = ({ descriptions }) => {
   return (
     <ScrollableContent
       dense
-      title={formatMessage({ id: 'Description' })}
+      title={formatMessage({ id: 'Descriptions' })}
       content={
         <List>
           {descriptions.map(({ id, title, body, author, date }) => (
             <div key={id}>
               <ListItem>
                 <ListItemText
-                  primary={title}
+                  disableTypography
+                  primary={<Typography>{title}</Typography>}
                   secondary={
                     <>
-                      <Typography variant="body2">
+                      <Typography variant="body2" color="textSecondary">
                         {makeFormattedText(body)}
                       </Typography>
                       <br />
-                      <Typography
-                        component="span"
-                        variant="caption"
-                        color="textPrimary">
+                      <Typography variant="caption">
                         {`${!isNil(author.nickname) &&
                           formatMessage({ id: 'Posted by' })} ${
                           author.nickname

@@ -104,7 +104,10 @@ export const detailsType = PropTypes.shape({
   isDivingCave: PropTypes.bool,
   lastEditor: PropTypes.string,
   localisation: PropTypes.string,
-  massif: PropTypes.string,
+  massif: PropTypes.shape({
+    id: PropTypes.number.isRequired,
+    name: PropTypes.string.isRequired
+  }),
   name: PropTypes.string,
   progressionRate: PropTypes.number,
   temperature: PropTypes.number,

@@ -120,12 +120,12 @@ const Documents = ({ documents }) => {
       content={
         <List>
           {documents.map((document, i) => (
-            <>
-              <Document key={document.id} {...document} />
+            <span key={document.id}>
+              <Document {...document} />
               {i < documents.length - 1 && (
                 <Divider variant="middle" component="li" />
               )}
-            </>
+            </span>
           ))}
         </List>
       }

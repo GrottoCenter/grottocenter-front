@@ -59,7 +59,7 @@ const ActionBar = ({ printRef }) => {
       <ReactToPrint
         trigger={() => (
           <ActionButton
-            Icon={<Print fontSize={isMobile ? 'small' : 'default'} />}
+            Icon={<Print fontSize={isMobile ? 'small' : 'medium'} />}
             label={formatMessage({ id: 'Print' })}
           />
         )}
@@ -67,16 +67,16 @@ const ActionBar = ({ printRef }) => {
       />
       <ActionButton
         Icon={
-          <Share fontSize={isMobile ? 'small' : 'default'} color="inherit" />
+          <Share fontSize={isMobile ? 'small' : 'medium'} color="inherit" />
         }
         label={formatMessage({ id: 'Share' })}
       />
       <ActionButton
-        Icon={<GpsFixed fontSize={isMobile ? 'small' : 'default'} />}
+        Icon={<GpsFixed fontSize={isMobile ? 'small' : 'medium'} />}
         label={formatMessage({ id: 'GeoHack' })}
       />
       <ActionButton
-        Icon={<Map fontSize={isMobile ? 'small' : 'default'} />}
+        Icon={<Map fontSize={isMobile ? 'small' : 'medium'} />}
         label={formatMessage({ id: 'Map' })}
       />
     </Wrapper>

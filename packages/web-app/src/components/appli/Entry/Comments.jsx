@@ -40,12 +40,15 @@ const Comment = ({
   return (
     <ListItem>
       <StyledListItemText
-        primary={title}
+        disableTypography
+        primary={<Typography>{title}</Typography>}
         secondary={
           <>
-            <Typography variant="body2">{formattedBody}</Typography>
+            <Typography variant="body2" color="textSecondary">
+              {formattedBody}
+            </Typography>
             <br />
-            <Typography component="span" variant="caption" color="textPrimary">
+            <Typography variant="caption">
               {`${!isNil(author.nickname) &&
                 formatMessage({ id: 'Posted by' })} ${author.nickname} ${
                 !isNil(date)

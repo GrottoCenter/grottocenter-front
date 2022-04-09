@@ -35,7 +35,7 @@ const Property = ({ name, value, customToString = v => String(v) }) => {
   }
 
   return (
-    <TableRow>
+    <TableRow key={name}>
       <PropertyName align="right">{name}</PropertyName>
       <TableCell>
         {Array.isArray(value) ? (
