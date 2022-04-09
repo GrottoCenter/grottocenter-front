@@ -5,15 +5,16 @@ import styled from 'styled-components';
 import { Fade } from '@material-ui/core';
 import { Skeleton } from '@material-ui/lab';
 import { includes } from 'ramda';
-
+import { useIntl } from 'react-intl';
+import LanguageAutoComplete from '../../../Form/LanguageAutoComplete';
 import { loadDocumentTypes } from '../../../../../actions/DocumentType';
 import { DocumentFormContext } from '../Provider';
+
 import DescriptionEditor from '../formElements/DescriptionEditor';
 import DocumentTypeSelect from '../formElements/DocumentTypeSelect';
 import PublicationDatePicker from '../formElements/PublicationDatePicker';
 import TitleEditor from '../formElements/TitleEditor';
 
-import DocumentLanguageSelect from '../../../DocumentLanguageSelect';
 import useDocumentTypes from '../../../../../hooks/useDocumentTypes';
 
 const FlexWrapper = styled.div`
@@ -47,6 +48,7 @@ const Step1 = ({ stepId }) => {
     validatedSteps
   } = useContext(DocumentFormContext);
   const dispatch = useDispatch();
+  const { formatMessage } = useIntl();
   const { isLoading, documentTypes: allDocumentTypes, error } = useSelector(
     state => state.documentType
   );
@@ -93,11 +95,16 @@ const Step1 = ({ stepId }) => {
             <Fade in={!isUnknown(documentType) && !isImage(documentType)}>
               <FlexItemWrapper>
                 {!isUnknown(documentType) && !isImage(documentType) && (
-                  <DocumentLanguageSelect
-                    helperText="Language used in the document."
-                    labelText="Document main language"
+                  <LanguageAutoComplete
                     contextValueName="documentMainLanguage"
+                    helperContent={formatMessage({
+                      id: 'Language used in the document.'
+                    })}
+                    labelText="Document main language"
                     required={!isOther(documentType)}
+                    searchLabelText={formatMessage({
+                      id: 'Search for a language...'
+                    })}
                   />
                 )}
               </FlexItemWrapper>
@@ -113,11 +120,17 @@ const Step1 = ({ stepId }) => {
                       <TitleEditor required />
                     </BigFlexItemWrapper>
                     <FlexItemWrapper style={{ minWidth: '300px' }}>
-                      <DocumentLanguageSelect
-                        helperText="Language used for the title and the description you are writing."
-                        labelText="Title and description language"
+                      <LanguageAutoComplete
                         contextValueName="titleAndDescriptionLanguage"
+                        helperContent={formatMessage({
+                          id:
+                            'Language used for the title and the description you are writing.'
+                        })}
+                        labelText="Title and description language"
                         required
+                        searchLabelText={formatMessage({
+                          id: 'Search for a language...'
+                        })}
                       />
                     </FlexItemWrapper>
                   </TitleAndDescriptionLanguageWrapper>

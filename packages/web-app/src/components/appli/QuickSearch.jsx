@@ -126,6 +126,7 @@ QuickSearch.propTypes = {
       'documents',
       'entrances',
       'grottos',
+      'languages',
       'massifs',
       'caves',
       'networks'
@@ -135,6 +136,7 @@ QuickSearch.propTypes = {
     'documents',
     'entrances',
     'grottos',
+    'languages',
     'massifs',
     'caves',
     'networks'
