@@ -8,7 +8,7 @@ import { Button, CardActions } from '@material-ui/core';
 import { withStyles } from '@material-ui/core/styles';
 import { Breakpoint } from 'react-socks';
 
-import Translate from '../../common/Translate';
+import Translate from '../../../components/common/Translate';
 
 const buttonsStyle = () => ({
   cardBottomButtons: {

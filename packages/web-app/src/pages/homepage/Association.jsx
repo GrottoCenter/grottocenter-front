@@ -11,8 +11,8 @@ import {
 } from '../../helpers/GridSystem';
 import AssociationCheckList from './AssociationCheckList';
 import AssociationFlyingGoals from './AssociationFlyingGoals';
-import Translate from '../common/Translate';
-import GCLogo from '../common/GCLogo';
+import Translate from '../../components/common/Translate';
+import GCLogo from '../../components/common/GCLogo';
 
 const AssociationTitle = styled.h3`
   color: ${props => props.color};

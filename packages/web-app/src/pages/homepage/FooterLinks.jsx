@@ -1,10 +1,10 @@
 import React from 'react';
 import styled from 'styled-components';
 import { withTheme } from '@material-ui/core/styles';
-import GCLink from '../common/GCLink';
-import InternationalizedLink from '../common/InternationalizedLink';
+import GCLink from '../../components/common/GCLink';
+import InternationalizedLink from '../../components/common/InternationalizedLink';
 import { contactLinks, legalLinks, contributorsLink } from '../../conf/Config';
-import Translate from '../common/Translate';
+import Translate from '../../components/common/Translate';
 
 const FooterLinksList = styled.ul`
   list-style: none;

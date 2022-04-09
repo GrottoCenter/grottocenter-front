@@ -3,7 +3,7 @@ import { withTheme } from '@material-ui/core/styles';
 import styled from 'styled-components';
 import Divider from '@material-ui/core/Divider';
 import DonateForm from './DonateForm';
-import FooterDisclamer from '../common/FooterDisclamer';
+import FooterDisclamer from '../../components/common/FooterDisclamer';
 import Publisher from './Publisher';
 import SocialLinks from './SocialLinks';
 import FooterLinks from './FooterLinks';

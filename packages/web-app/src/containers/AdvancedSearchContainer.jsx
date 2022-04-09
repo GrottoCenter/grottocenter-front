@@ -5,7 +5,7 @@ import {
 } from '../actions/Advancedsearch';
 import { loadDocumentTypes } from '../actions/DocumentType';
 import { loadSubjects } from '../actions/Subject';
-import AdvancedSearch from '../components/homepage/advancedSearch/AdvancedSearch';
+import AdvancedSearch from '../pages/homepage/advancedSearch/AdvancedSearch';
 
 const startAdvancedsearch = (formValues, resourceType) => dispatch => {
   // complete is set to true because we need the complete results about the data

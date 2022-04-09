@@ -4,7 +4,7 @@ import { withStyles } from '@material-ui/core/styles';
 import { Card, CardContent, TextField, Typography } from '@material-ui/core';
 
 import SearchBottomActionButtons from './SearchBottomActionButtons';
-import Translate from '../../common/Translate';
+import Translate from '../../../components/common/Translate';
 import styles from './styles';
 
 class MassifsSearch extends React.Component {

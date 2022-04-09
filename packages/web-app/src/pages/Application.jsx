@@ -5,12 +5,12 @@ import { Redirect, Route, Switch } from 'react-router-dom';
 import Api from '../components/appli/Api';
 import Dashboard from './Dashboard';
 import Swagger from './Swagger';
-import HomePage from './HomePage';
+import HomePage from './homepage';
 import AdvancedSearchPage from './AdvancedSearchPage';
 import DocumentDetailsPage from './DocumentDetails';
 import DuplicateImportHandle from './DuplicateImportHandle';
 import Faq from '../components/appli/Faq';
-import LatestBlogNewsSection from '../components/homepage/LatestBlogNewsSection';
+import LatestBlogNewsSection from './homepage/LatestBlogNewsSection';
 import Layout from '../components/common/Layouts/Main';
 
 import AppBar from '../features/AppBar';

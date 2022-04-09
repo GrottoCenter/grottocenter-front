@@ -1,7 +1,7 @@
 import React from 'react';
 import styled, { keyframes } from 'styled-components';
-import InternationalizedLink from '../common/InternationalizedLink';
-import GCLink from '../common/GCLink';
+import InternationalizedLink from '../../components/common/InternationalizedLink';
+import GCLink from '../../components/common/GCLink';
 import {
   bloggerLinks,
   wikiBatsLinks,

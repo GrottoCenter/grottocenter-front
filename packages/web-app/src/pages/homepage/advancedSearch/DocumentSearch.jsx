@@ -20,8 +20,8 @@ import {
 } from '@material-ui/core';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 
-import Translate from '../../common/Translate';
-import InternationalizedLink from '../../common/InternationalizedLink';
+import Translate from '../../../components/common/Translate';
+import InternationalizedLink from '../../../components/common/InternationalizedLink';
 import { wikiBBSLinks } from '../../../conf/Config';
 import SearchBottomActionButtons from './SearchBottomActionButtons';
 import styles from './styles';

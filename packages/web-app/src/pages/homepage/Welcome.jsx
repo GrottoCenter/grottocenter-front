@@ -9,7 +9,7 @@ import {
   GridOneThirdColumn,
   GridTwoThirdColumn
 } from '../../helpers/GridSystem';
-import Translate from '../common/Translate';
+import Translate from '../../components/common/Translate';
 
 const WelcomeAvatar = styled.img`
   border-radius: 50%;

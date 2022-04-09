@@ -23,8 +23,8 @@ import { pathOr } from 'ramda';
 import { CSVDownload } from 'react-csv';
 import _ from 'lodash';
 
-import Translate from '../../common/Translate';
-import Alert from '../../common/Alert';
+import Translate from '../../../components/common/Translate';
+import Alert from '../../../components/common/Alert';
 
 import SearchTableActions from './SearchTableActions';
 

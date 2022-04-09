@@ -1,5 +1,5 @@
 import { connect } from 'react-redux';
-import DynamicNumber from '../components/homepage/DynamicNumber';
+import DynamicNumber from '../pages/homepage/DynamicNumber';
 
 const mapStateToProps = (state, ownProps) => {
   const attributes = state.dynamicNumber[ownProps.numberType];
