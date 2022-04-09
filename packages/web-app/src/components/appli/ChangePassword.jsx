@@ -3,11 +3,11 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useIntl } from 'react-intl';
 
 import { useLocation } from 'react-router-dom';
-import { PASSWORD_MIN_LENGTH } from '../conf/Config';
-import { postChangePassword } from '../actions/ChangePassword';
-import { logout } from '../actions/Login';
-import { useNotification } from '../hooks';
-import ChangePasswordForm from '../pages/ChangePasswordForm';
+import { PASSWORD_MIN_LENGTH } from '../../conf/Config';
+import { postChangePassword } from '../../actions/ChangePassword';
+import { logout } from '../../actions/Login';
+import { useNotification } from '../../hooks';
+import ChangePasswordForm from '../../pages/ChangePasswordForm';
 
 const ChangePassword = () => {
   const dispatch = useDispatch();

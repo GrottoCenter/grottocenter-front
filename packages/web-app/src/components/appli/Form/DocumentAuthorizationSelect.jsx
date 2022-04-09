@@ -9,7 +9,7 @@ import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
-import { getDocuments } from '../../actions/Documents';
+import { getDocuments } from '../../../actions/Documents';
 
 const Wrapper = styled(FormControl)`
   ${({ theme }) => `

@@ -8,12 +8,12 @@ import Translate from '../../../../common/Translate';
 
 import { DocumentFormContext } from '../Provider';
 
-import DocumentAutoComplete from '../../../../../features/Form/DocumentAutoComplete';
-import MassifAutoComplete from '../../../../../features/Form/MassifAutoComplete';
-import MultipleBBSRegionsSelect from '../../../../../features/Form/MultipleBBSRegionsSelect';
-import MultipleCaversSelect from '../../../../../features/Form/MultipleCaversSelect';
-import MultipleSubjectsSelect from '../../../../../features/Form/MultipleSubjectsSelect';
-import OrganizationAutoComplete from '../../../../../features/Form/OrganizationAutoComplete';
+import DocumentAutoComplete from '../../../Form/DocumentAutoComplete';
+import MassifAutoComplete from '../../../Form/MassifAutoComplete';
+import MultipleBBSRegionsSelect from '../../../Form/MultipleBBSRegionsSelect';
+import MultipleCaversSelect from '../../../Form/MultipleCaversSelect';
+import MultipleSubjectsSelect from '../../../Form/MultipleSubjectsSelect';
+import OrganizationAutoComplete from '../../../Form/OrganizationAutoComplete';
 import useDocumentTypes from '../../../../../hooks/useDocumentTypes';
 
 const FlexWrapper = styled.div`

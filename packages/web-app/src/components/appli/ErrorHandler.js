@@ -2,8 +2,8 @@ import React, { useEffect } from 'react';
 import { isNil } from 'ramda';
 import { useDispatch, useSelector } from 'react-redux';
 import { useIntl } from 'react-intl';
-import { useNotification } from '../hooks';
-import { cleanError } from '../actions/Error';
+import { useNotification } from '../../hooks';
+import { cleanError } from '../../actions/Error';
 
 const ErrorHandler = () => {
   const dispatch = useDispatch();

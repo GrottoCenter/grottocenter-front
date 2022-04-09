@@ -4,13 +4,13 @@ import { useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import { useHistory } from 'react-router-dom';
 import { useIntl } from 'react-intl';
-import AutoCompleteSearch from '../components/common/AutoCompleteSearch';
+import AutoCompleteSearch from '../common/AutoCompleteSearch';
 import {
   fetchQuicksearchResult,
   resetQuicksearch
-} from '../actions/Quicksearch';
-import { entityOptionForSelector } from '../helpers/Entity';
-import { useDebounce } from '../hooks';
+} from '../../actions/Quicksearch';
+import { entityOptionForSelector } from '../../helpers/Entity';
+import { useDebounce } from '../../hooks';
 
 export const searchableTypes = {
   cavers: 'cavers',

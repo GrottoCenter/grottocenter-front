@@ -5,7 +5,7 @@ import styled from 'styled-components';
 
 import { getAdmins, getModerators, postCaverGroups } from '../../actions/Caver';
 
-import AuthChecker from '../../features/AuthChecker';
+import AuthChecker from '../../components/appli/AuthChecker';
 
 import Layout from '../../components/common/Layouts/Fixed/FixedContent';
 import ManageUserGroups from '../../components/appli/ManageUserGroups';

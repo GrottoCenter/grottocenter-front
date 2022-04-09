@@ -6,7 +6,7 @@ import { useIntl } from 'react-intl';
 import { includes } from 'ramda';
 import PagesEditor from '../formElements/PagesEditor';
 
-import DocIdentifierEditor from '../../../../../features/DocIdentifierEditor';
+import DocIdentifierEditor from '../../../DocIdentifierEditor';
 
 import StringInput from '../../../../common/Form/StringInput';
 import IssueEditor from '../formElements/IssueEditor';

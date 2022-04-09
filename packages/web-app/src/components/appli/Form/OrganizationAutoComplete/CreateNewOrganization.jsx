@@ -7,9 +7,9 @@ import AddIcon from '@material-ui/icons/Add';
 import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { postOrganization } from '../../../actions/CreateOrganization';
-import ActionButton from '../../../components/common/ActionButton';
-import { DocumentFormContext } from '../../../components/appli/Document/DocumentForm/Provider';
+import { postOrganization } from '../../../../actions/CreateOrganization';
+import ActionButton from '../../../common/ActionButton';
+import { DocumentFormContext } from '../../Document/DocumentForm/Provider';
 
 const Wrapper = styled.div`
   display: flex;

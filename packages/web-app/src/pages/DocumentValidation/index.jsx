@@ -14,7 +14,7 @@ import Actions from './Actions';
 import DocumentDetails from '../DocumentDetails';
 import DocumentsTable from '../../components/common/DocumentsTable';
 import DocumentEdit from '../DocumentEdit';
-import AuthChecker from '../../features/AuthChecker';
+import AuthChecker from '../../components/appli/AuthChecker';
 
 const Wrapper = styled.div`
   display: flex;

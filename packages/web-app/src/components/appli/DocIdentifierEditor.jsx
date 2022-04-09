@@ -2,8 +2,8 @@ import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 
-import IdentifierEditor from '../components/appli/Document/DocumentForm/formElements/IdentifierEditor';
-import { loadIdentifierTypes } from '../actions/IdentifierType';
+import IdentifierEditor from './Document/DocumentForm/formElements/IdentifierEditor';
+import { loadIdentifierTypes } from '../../actions/IdentifierType';
 
 const DocIdentifierEditor = ({
   documentType,

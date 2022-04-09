@@ -3,9 +3,9 @@ import { storiesOf } from '@storybook/react';
 import { Button, Paper, Typography } from '@material-ui/core';
 import { createStore } from 'redux';
 import { Provider, useDispatch } from 'react-redux';
-import GCReducer from '../../reducers/GCReducer';
+import GCReducer from '../../../reducers/GCReducer';
 
-import { fetchLoginSuccess, logout } from '../../actions/Login';
+import { fetchLoginSuccess, logout } from '../../../actions/Login';
 import AuthChecker from './index';
 
 const store = createStore(GCReducer);

@@ -6,15 +6,15 @@ import PropTypes from 'prop-types';
 import {
   fetchQuicksearchResult,
   resetQuicksearch
-} from '../../../actions/Quicksearch';
+} from '../../../../actions/Quicksearch';
 
-import Translate from '../../../components/common/Translate';
+import Translate from '../../../common/Translate';
 
-import MultipleSelectComponent from '../../../components/appli/Document/DocumentForm/formElements/MultipleSelect';
+import MultipleSelectComponent from '../../Document/DocumentForm/formElements/MultipleSelect';
 
-import { entityOptionForSelector } from '../../../helpers/Entity';
+import { entityOptionForSelector } from '../../../../helpers/Entity';
 import CreateNewCaver from './CreateNewCaver';
-import { useBoolean } from '../../../hooks';
+import { useBoolean } from '../../../../hooks';
 
 const MultipleCaversSelect = ({
   computeHasError,

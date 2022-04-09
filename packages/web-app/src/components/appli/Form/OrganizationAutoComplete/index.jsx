@@ -8,13 +8,13 @@ import AddCircle from '@material-ui/icons/AddCircle';
 import {
   fetchQuicksearchResult,
   resetQuicksearch
-} from '../../../actions/Quicksearch';
+} from '../../../../actions/Quicksearch';
 
-import { entityOptionForSelector } from '../../../helpers/Entity';
+import { entityOptionForSelector } from '../../../../helpers/Entity';
 
-import SearchBar from '../../../components/appli/Document/DocumentForm/formElements/SearchBar';
+import SearchBar from '../../Document/DocumentForm/formElements/SearchBar';
 import FormAutoComplete from '../FormAutoComplete';
-import { useBoolean } from '../../../hooks';
+import { useBoolean } from '../../../../hooks';
 import CreateNewOrganization from './CreateNewOrganization';
 
 // ===================================
