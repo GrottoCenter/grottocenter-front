@@ -3,7 +3,7 @@ import {
   fetchNextAdvancedsearchResults,
   fetchFullAdvancedsearchResults
 } from '../actions/Advancedsearch';
-import SearchResultsTable from '../pages/homepage/advancedSearch/SearchResultsTable';
+import SearchResultsTable from '../components/appli/AdvancedSearch/SearchResultsTable';
 
 const getNewResults = (from, size) => dispatch => {
   dispatch(fetchNextAdvancedsearchResults(from, size));
