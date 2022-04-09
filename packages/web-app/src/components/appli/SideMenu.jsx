@@ -5,7 +5,6 @@ import ArrowDownIcon from '@material-ui/icons/Navigation';
 import AddIcon from '@material-ui/icons/Add';
 import SearchIcon from '@material-ui/icons/Search';
 import NetworkIcon from '@material-ui/icons/Timelapse';
-import AdminIcon from '@material-ui/icons/SupervisorAccount';
 import ExportIcon from '@material-ui/icons/ImportExport';
 import { withTheme } from '@material-ui/core/styles';
 import styled from 'styled-components';
@@ -70,13 +69,6 @@ const SideMenu = ({ visible }) => (
       icon={<NetworkIcon />}
       text={<Translate>Organizations</Translate>}
       target="/ui/orga/"
-    />
-    <ComplexMenuEntryConnector
-      identifier="admin1"
-      open={false}
-      icon={<AdminIcon />}
-      text={<Translate>Administration</Translate>}
-      target="/ui/admin/"
     />
     <ComplexMenuEntryConnector
       identifier="export1"
