@@ -92,14 +92,11 @@ const WhatIsIt = () => (
     <GridRow>
       <NumberBlockHalfWidth>
         <BlockIcon className="icon-gc-entries" />
-        <BigNumberText numberType="publicEntrances" />
+        <BigNumberText numberType="entrances" />
         <br />
         <Translate>
-          caves are freely accessible from the following page (
+          caves are freely accessible
         </Translate>
-        <NumberText numberType="entrances" />{' '}
-        <Translate>by logging on</Translate>{' '}
-        <GCLink href="http://www.grottocenter.org">Grotto v2</GCLink>)
       </NumberBlockHalfWidth>
       <NumberBlockHalfWidth>
         <BlockIcon className="icon-gc-club" />
