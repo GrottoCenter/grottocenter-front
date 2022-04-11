@@ -28,9 +28,9 @@ const QuickSearch = ({
     'documents',
     'entrances',
     'grottos',
-    'massifs',
-    'caves',
-    'networks'
+    'massifs'
+    // 'caves',     Cave search is suspended for the moment because they seems to be duplicates of entrances
+    // 'networks'   No network search because there is no network page currently
   ],
   searchOnType,
   label,
@@ -57,13 +57,11 @@ const QuickSearch = ({
           case 'entrance':
             history.push(`/ui/entrances/${encodeURIComponent(selection.id)}`);
             break;
-          case 'caves':
-            history.push(
-              `/ui/organizations/${encodeURIComponent(selection.id)}`
-            );
+          case 'cave':
+            history.push(`/ui/caves/${encodeURIComponent(selection.id)}`);
             break;
-          case 'massif':
-            history.push(`/ui/massifs/${encodeURIComponent(selection.id)}`);
+          case 'caver':
+            history.push(`/ui/cavers/${encodeURIComponent(selection.id)}`);
             break;
           case 'document':
             history.push(`/ui/documents/${encodeURIComponent(selection.id)}`);
@@ -73,8 +71,11 @@ const QuickSearch = ({
               `/ui/organizations/${encodeURIComponent(selection.id)}`
             );
             break;
-          case 'caver':
-            history.push(`/ui/cavers/${encodeURIComponent(selection.id)}`);
+          case 'massif':
+            history.push(`/ui/massifs/${encodeURIComponent(selection.id)}`);
+            break;
+          case 'network':
+            history.push(`/ui/networks/${encodeURIComponent(selection.id)}`);
             break;
           default:
         }
