@@ -37,7 +37,6 @@
   }
 }
 
-
 /*
 * Skeleton V2.0.4
 * Copyright 2014, Dave Gamache
@@ -228,7 +227,8 @@ body {
   /* currently ems cause chrome bug misinterpreting rems on body element */
   line-height: 1.6;
   font-weight: 400;
-  font-family: 'Raleway', 'HelveticaNeue', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-family: 'Raleway', 'HelveticaNeue', 'Helvetica Neue', Helvetica, Arial,
+    sans-serif;
   color: #222;
 }
 
@@ -309,7 +309,6 @@ p {
   margin-top: 0;
 }
 
-
 /* Lists
 –––––––––––––––––––––––––––––––––––––––––––––––––– */
 
@@ -337,25 +336,6 @@ ol ul {
 
 li {
   margin-bottom: 1rem;
-}
-
-/* Code
-–––––––––––––––––––––––––––––––––––––––––––––––––– */
-
-code {
-  padding: 0.2rem 0.5rem;
-  margin: 0 0.2rem;
-  font-size: 90%;
-  white-space: nowrap;
-  background: #f1f1f1;
-  border: 1px solid #e1e1e1;
-  border-radius: 4px;
-}
-
-pre > code {
-  display: block;
-  padding: 1rem 1.5rem;
-  white-space: pre;
 }
 
 /* Tables
