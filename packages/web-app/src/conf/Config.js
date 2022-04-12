@@ -234,7 +234,7 @@ export const deleteDuplicateEntranceUrl = id =>
   `${API_URL}/api/${apiVersion}/entrance-duplicates/${id}`;
 
 // ===== Grottocenter Client routes
-export const swaggerLinkV1 = `${API_URL}/ui/swagger/1`;
+export const swaggerLinkV1 = `${API_URL}/api/v1/swagger.yaml`;
 
 // ===== Misc config values
 export const emailRegexp = /\S+@\S+/; // simple regexp TODO: use another one more robust

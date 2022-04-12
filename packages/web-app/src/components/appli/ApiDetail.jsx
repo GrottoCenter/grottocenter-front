@@ -1,46 +1,32 @@
-import React, { Component } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
-import SwaggerUIBundle from 'swagger-ui-dist/swagger-ui-bundle';
-import Card from '@material-ui/core/Card';
-import { withStyles, withTheme } from '@material-ui/core/styles';
-import styled from 'styled-components';
+import { useIntl } from 'react-intl';
+import SwaggerUI from 'swagger-ui-react';
+import 'swagger-ui-react/swagger-ui.css';
+import { swaggerLinkV1 } from '../../conf/Config';
+import Alert from '../common/Alert';
 
-const StyledWrapper = withTheme(styled.div`
-  color: ${props => props.theme.palette.textIconColor};
-`);
-
-const StyledCard = withStyles({
-  root: {
-    width: '80%',
-    margin: 'auto',
-    paddingRight: '40px',
-    paddingBottom: '20px'
+const ApiDetail = ({ version }) => {
+  const { formatMessage } = useIntl();
+  if (version === 1) {
+    return <SwaggerUI url={swaggerLinkV1} />;
   }
-})(Card);
-
-class ApiDetail extends Component {
-  componentDidMount() {
-    const { version } = this.props;
-    if (version) {
-      SwaggerUIBundle({
-        url: `/swagger/apiV${version}.yaml`,
-        dom_id: '#swaggerContainer',
-        deepLinking: true,
-        presets: [SwaggerUIBundle.presets.apis]
-      });
-    }
-  }
-
-  render() {
-    return (
-      <StyledWrapper>
-        <StyledCard>
-          <div id="swaggerContainer" />
-        </StyledCard>
-      </StyledWrapper>
-    );
-  }
-}
+  return (
+    <Alert
+      severity="error"
+      title={formatMessage(
+        {
+          id: 'There is no api documentation for version {apiVersion}.',
+          defaultMessage:
+            'There is no api documentation for version {apiVersion}.'
+        },
+        {
+          apiVersion: version
+        }
+      )}
+    />
+  );
+};
 
 ApiDetail.propTypes = {
   version: PropTypes.number.isRequired

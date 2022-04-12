@@ -4,7 +4,7 @@ import { Redirect, Route, Switch } from 'react-router-dom';
 
 import Api from '../components/appli/Api';
 import Dashboard from './Dashboard';
-import Swagger from './Swagger';
+import ApiDoc from './ApiDoc';
 import HomePage from './homepage';
 import AdvancedSearchPage from './AdvancedSearchPage';
 import DocumentDetailsPage from './DocumentDetails';
@@ -60,13 +60,13 @@ const Application = () => {
         <Route exact path="/ui" component={Dashboard} />
         <Route path="/ui/admin/users" component={ManageUsers} />
         <Route path="/ui/search" component={AdvancedSearchPage} />
+        <Route path="/ui/api/:version" component={ApiDoc} />
         <Route path="/ui/api" component={Api} />
         <Route path="/ui/entrances/:id?" component={EntryPage} />
         <Route path="/ui/caves/:id?" component={CaveSystemPage} />
         <Route path="/ui/faq" component={Faq} />
         <Route path="/ui/map/:target?" component={Map} />
         <Route path="/ui/contributions" component={ContributionsPage} />
-        <Route path="/ui/swagger/:version" component={Swagger} />
         <Route path="/ui/test" component={LatestBlogNewsSection} />
         <Route
           path="/ui/organizations/:organizationId"
