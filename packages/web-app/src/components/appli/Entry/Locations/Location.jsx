@@ -12,10 +12,12 @@ const Location = ({ location }) => {
   return (
     <ListItem>
       <ListItemText
+        // whiteSpace property for description multi-lines display
+        style={{ whiteSpace: 'pre-line' }}
         primary={title}
         secondary={
           <>
-            <Typography variant="body2">{makeFormattedText(body)}</Typography>
+            {makeFormattedText(body)}
             <br />
             <Typography component="span" variant="caption" color="textPrimary">
               {`${!isNil(author.nickname) &&

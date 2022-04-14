@@ -200,6 +200,8 @@ export const putEntryWithNewEntitiesUrl = entryId =>
 export const putDocumentyWithNewEntitiesUrl = docId =>
   `${API_URL}/api/${apiVersion}/documents/${docId}/new-entities`;
 
+export const postLocationUrl = `${API_URL}/api/${apiVersion}/locations`;
+
 // ===== ImportCSV url
 export const checkRowsEntrancesUrl = `${API_URL}/api/${apiVersion}/entrances/check-rows`;
 export const checkRowsDocumentsUrl = `${API_URL}/api/${apiVersion}/documents/check-rows`;

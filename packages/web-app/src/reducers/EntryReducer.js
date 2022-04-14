@@ -11,6 +11,8 @@ import {
   RESET_ENTRY_STATE
 } from '../actions/Entry';
 
+import { POST_LOCATION_SUCCESS } from '../actions/CreateLocation';
+
 // remove once api give the information
 const today = new Date();
 
@@ -22,6 +24,7 @@ const initialState = {
     region: 'Region',
     city: 'City',
     latitude: null,
+    locations: [],
     longitude: null,
     cave: {
       dateInscription: today.toISOString().substring(0, 10)
@@ -72,6 +75,14 @@ const reducer = (state = initialState, action) => {
       };
     case RESET_ENTRY_STATE:
       return initialState;
+    case POST_LOCATION_SUCCESS:
+      return {
+        ...initialState,
+        data: {
+          ...state.data,
+          locations: [...state.data.locations, action.location]
+        }
+      };
     default:
       return state;
   }

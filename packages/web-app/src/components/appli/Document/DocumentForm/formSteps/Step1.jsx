@@ -6,7 +6,7 @@ import { Fade } from '@material-ui/core';
 import { Skeleton } from '@material-ui/lab';
 import { includes } from 'ramda';
 import { useIntl } from 'react-intl';
-import LanguageAutoComplete from '../../../Form/LanguageAutoComplete';
+import LanguageAutoComplete from '../../../Form/LanguageAutoCompleteWithProvider';
 import { loadDocumentTypes } from '../../../../../actions/DocumentType';
 import { DocumentFormContext } from '../Provider';
 
