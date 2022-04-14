@@ -176,7 +176,10 @@ export const locationType = PropTypes.shape({
   body: PropTypes.string,
   creationDate: PropTypes.instanceOf(Date),
   id: PropTypes.number,
-  language: PropTypes.string.isRequired,
+  language: PropTypes.shape({
+    id: PropTypes.number.isRequired,
+    refName: PropTypes.string.isRequired
+  }).isRequired,
   relevance: PropTypes.number,
   title: PropTypes.string
 });

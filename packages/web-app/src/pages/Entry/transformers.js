@@ -101,4 +101,4 @@ export const getLocations = locations =>
       title: location?.title,
       relevance: location?.relevance
     }))
-    .sort((l1, l2) => l1.relevance > l2.relevance);
+    .sort((l1, l2) => l1.relevance < l2.relevance);

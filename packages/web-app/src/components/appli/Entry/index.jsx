@@ -36,7 +36,7 @@ export const Entry = () => {
   const { formatMessage, formatDate } = useIntl();
   const {
     state: {
-      details: { name, author, creationDate, lastEditor, editionDate },
+      details: { id, name, author, creationDate, lastEditor, editionDate },
       descriptions,
       documents,
       histories,
@@ -69,7 +69,7 @@ export const Entry = () => {
           icon={<CustomIcon type="entry" />}
         />
       }>
-      {!isEmpty(locations) && <Locations locations={locations} />}
+      <Locations locations={locations} entranceId={id} />
       {!isEmpty(descriptions) && <Descriptions descriptions={descriptions} />}
       {!isEmpty(riggings) && <Riggings riggings={riggings} />}
       {!isEmpty(documents) && <Documents documents={documents} />}
