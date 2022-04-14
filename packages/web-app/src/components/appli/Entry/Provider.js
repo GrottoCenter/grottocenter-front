@@ -171,7 +171,7 @@ export const historyType = PropTypes.shape({
 
 export const historiesType = PropTypes.arrayOf(historyType);
 
-const locationType = PropTypes.shape({
+export const locationType = PropTypes.shape({
   author: authorType,
   body: PropTypes.string,
   creationDate: PropTypes.instanceOf(Date),
