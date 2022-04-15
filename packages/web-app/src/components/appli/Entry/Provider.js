@@ -193,7 +193,7 @@ const obstacleType = PropTypes.shape({
 export const riggingType = PropTypes.shape({
   obstacles: PropTypes.arrayOf(obstacleType),
   author: authorType,
-  id: PropTypes.number,
+  id: PropTypes.number.isRequired,
   language: PropTypes.string.isRequired,
   title: PropTypes.string.isRequired
 });

@@ -46,7 +46,7 @@ const RiggingTable = ({ obstacles, title }) => {
         </TableHead>
         <TableBody>
           {obstacles?.map(({ obstacle, rope, anchor, observation }) => (
-            <TableRow key={obstacle}>
+            <TableRow key={obstacle + rope + anchor}>
               <TableCell component="th" scope="row">
                 {obstacle}
               </TableCell>

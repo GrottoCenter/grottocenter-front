@@ -25,15 +25,16 @@ const StyledListItemIcon = styled(ListItemIcon)`
   justify-content: flex-end;
 `;
 
-const Comment = ({
-  title,
-  body,
-  author,
-  interestRate,
-  progressionRate,
-  accessRate,
-  date
-}) => {
+const Comment = ({ comment }) => {
+  const {
+    title,
+    body,
+    author,
+    interestRate,
+    progressionRate,
+    accessRate,
+    date
+  } = comment;
   const { formatMessage, formatDate } = useIntl();
   const formattedBody = makeFormattedText(body);
 
@@ -86,43 +87,23 @@ const Comments = ({ comments }) => {
       title={formatMessage({ id: 'Comments' })}
       content={
         <List>
-          {comments.map(
-            (
-              {
-                accessRate,
-                author,
-                body,
-                date,
-                id,
-                interestRate,
-                progressionRate,
-                title
-              },
-              i
-            ) => (
-              <div key={id}>
-                <Comment
-                  title={title}
-                  body={body}
-                  author={author}
-                  interestRate={interestRate}
-                  progressionRate={progressionRate}
-                  accessRate={accessRate}
-                  date={date}
-                />
-                {i < comments.length - 1 && (
-                  <Divider variant="middle" component="li" />
-                )}
-              </div>
-            )
-          )}
+          {comments.map((comment, i) => (
+            <div key={comment.id}>
+              <Comment comment={comment} />
+              {i < comments.length - 1 && (
+                <Divider variant="middle" component="li" />
+              )}
+            </div>
+          ))}
         </List>
       }
     />
   );
 };
 
-Comment.propTypes = commentType;
+Comment.propTypes = {
+  comment: commentType
+};
 
 Comments.propTypes = {
   comments: commentsType

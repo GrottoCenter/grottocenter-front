@@ -17,7 +17,7 @@ export const getComments = (comments = []) =>
     accessRate: pathOr(0, ['approach'], comment) / 2,
     author: getAuthor(comment?.author),
     body: comment?.body,
-    date: comment?.dateInscription,
+    date: new Date(comment?.dateInscription),
     id: comment?.id,
     interestRate: pathOr(0, ['aestheticism'], comment) / 2,
     language: comment?.language,
@@ -33,7 +33,7 @@ export const getDetails = data => ({
     !isNil(data.longitude) && !isNil(data.latitude)
       ? [data.latitude, data.longitude]
       : null,
-  creationDate: data.dateInscription ? new Date(data.dateInscription) : '',
+  creationDate: data.dateInscription ? new Date(data.dateInscription) : null,
   discoveryYear: data.discoveryYear,
   depth: pathOr(null, ['cave', 'depth'], data),
   development: pathOr(null, ['cave', 'length'], data),
@@ -54,9 +54,9 @@ export const getDescriptions = descriptions =>
     body: description?.body,
     date: description?.dateInscription
       ? new Date(description?.dateInscription)
-      : '',
+      : null,
     id: description?.id,
-    language: description?.language?.id,
+    language: description?.language,
     title: description?.title
   }));
 
@@ -72,7 +72,7 @@ export const getHistories = histories =>
   histories.map(history => ({
     author: getAuthor(history?.author),
     body: history?.body,
-    date: history?.dateInscription ? new Date(history?.dateInscription) : '',
+    date: history?.dateInscription ? new Date(history?.dateInscription) : null,
     id: history?.id,
     language: history?.language?.id,
     title: history?.title
@@ -85,7 +85,7 @@ export const getRiggings = riggings =>
     id: rigging.id,
     language: rigging?.language || '',
     title: rigging?.title || '',
-    date: rigging?.dateInscription ? new Date(rigging.dateInscription) : ''
+    date: rigging?.dateInscription ? new Date(rigging.dateInscription) : null
   }));
 
 export const getLocations = locations =>
@@ -95,7 +95,7 @@ export const getLocations = locations =>
       body: location?.body,
       creationDate: location?.dateInscription
         ? new Date(location?.dateInscription)
-        : '',
+        : null,
       id: location?.id,
       language: location?.langauge?.id,
       title: location?.title,
