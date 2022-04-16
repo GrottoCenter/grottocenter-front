@@ -1,8 +1,8 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { IntlProvider } from 'react-intl';
 import createDebounce from 'redux-debounced';
 import { SnackbarProvider } from 'notistack';
-import { Provider, useDispatch, useSelector } from 'react-redux';
+import { Provider, useSelector } from 'react-redux';
 import { ErrorBoundary } from 'react-error-boundary';
 import { createStore, applyMiddleware, compose } from 'redux';
 import thunkMiddleware from 'redux-thunk';
@@ -19,7 +19,7 @@ import PropTypes from 'prop-types';
 import { includes, keys } from 'ramda';
 import grottoTheme from './conf/grottoTheme';
 import GCReducer from './reducers/GCReducer';
-import { changeLanguage, loadLanguages } from './actions/Language';
+import { changeLanguage } from './actions/Language';
 import Application from './pages/Application';
 import ErrorHandler from './components/appli/ErrorHandler';
 import { DEFAULT_LANGUAGE, AVAILABLE_LANGUAGES } from './conf/Config';
@@ -47,7 +47,7 @@ const customOnIntlError = err => {
       This handler wrap everything in a collapsed group.
       */
   if (err.code === 'MISSING_TRANSLATION') {
-    console.groupCollapsed('MISSING_TRANSLATION'); // eslint-disable-line no-console
+    console.groupCollapsed(`MISSING_TRANSLATION FOR ${err.descriptor.id}`); // eslint-disable-line no-console
     console.warn(
       `Missing Translation for message with id: \n${err.descriptor.id}`
     );
@@ -59,12 +59,6 @@ const customOnIntlError = err => {
 
 const HydratedIntlProvider = ({ children }) => {
   const { locale, messages } = useSelector(state => state.intl);
-  const dispatch = useDispatch();
-
-  useEffect(() => {
-    dispatch(loadLanguages(true));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   return (
     <IntlProvider
