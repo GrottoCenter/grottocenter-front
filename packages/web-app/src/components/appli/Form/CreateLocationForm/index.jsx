@@ -1,5 +1,6 @@
 import React from 'react';
 import { useIntl } from 'react-intl';
+import { useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import { Box, Button, TextField } from '@material-ui/core';
 import { Controller, useForm } from 'react-hook-form';
@@ -13,18 +14,20 @@ const SpacedButton = styled(Button)`
   margin: 0 ${theme.spacing(1)}px;`}
 `;
 
-const defaultValues = {
+const getDefaultValues = language => ({
   title: '',
   body: '',
-  language: null
-};
+  language
+});
+
 const CreateLocationForm = ({ onSubmit }) => {
   const { formatMessage } = useIntl();
+  const { languageObject } = useSelector(state => state.intl);
   const { control, handleSubmit, reset } = useForm({
-    defaultValues
+    defaultValues: getDefaultValues(languageObject)
   });
   const resetToDefault = () => {
-    reset(defaultValues);
+    reset(getDefaultValues(languageObject));
   };
 
   return (

@@ -3,12 +3,14 @@ import { DEFAULT_LANGUAGE, AVAILABLE_LANGUAGES } from '../conf/Config';
 import { CHANGE_LOCALE } from '../actions/Intl';
 import translations from '../lang';
 
-const initialLocale = navigator.language.split(/[-_]/)[0];
+const navigatorLocale = navigator.language.split(/[-_]/)[0];
+const initialLocale = includes(navigatorLocale, keys(AVAILABLE_LANGUAGES))
+  ? navigatorLocale
+  : DEFAULT_LANGUAGE;
 
 const initialState = {
-  locale: includes(initialLocale, keys(AVAILABLE_LANGUAGES))
-    ? initialLocale
-    : DEFAULT_LANGUAGE,
+  locale: initialLocale,
+  languageObject: AVAILABLE_LANGUAGES[initialLocale],
   messages: translations,
   AVAILABLE_LANGUAGES
 };
@@ -16,7 +18,11 @@ const initialState = {
 const intl = (state = initialState, action) => {
   switch (action.type) {
     case CHANGE_LOCALE:
-      return { ...state, locale: action.locale };
+      return {
+        ...state,
+        locale: action.locale,
+        languageObject: AVAILABLE_LANGUAGES[action.locale]
+      };
     default:
       return state;
   }

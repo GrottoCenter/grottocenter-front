@@ -64,7 +64,7 @@ const LanguageSelector = () => {
 
   const items = Object.keys(AVAILABLE_LANGUAGES).map(id => (
     <MenuItem key={id} value={id}>
-      {AVAILABLE_LANGUAGES[id]}
+      {AVAILABLE_LANGUAGES[id].nativeName}
     </MenuItem>
   ));
 
