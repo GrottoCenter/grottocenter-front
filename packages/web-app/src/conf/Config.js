@@ -1,47 +1,54 @@
 import _ from 'underscore.string';
-import { isEmpty } from 'lodash';
 
 const apiVersion = 'v1';
 const API_URL = process.env.REACT_APP_API_URL;
 export const LEFT_TO_RIGHT = 'LTR';
 export const RIGHT_TO_LEFT = 'RTL';
 
-export const DEFAULT_LANGUAGE = 'en';
-
 export const AVAILABLE_LANGUAGES = {
-  ar: 'عربية',
-  bg: 'Български',
-  ca: 'Català',
-  de: 'Deutsch',
-  el: 'Ελληνικός',
-  en: 'English',
-  es: 'Español',
-  fr: 'Français',
-  he: 'עברי',
-  id: 'Indonesia',
-  it: 'Italiano',
-  ja: '日本語',
-  nl: 'Nederlands',
-  pt: 'Português',
-  ro: 'R<omână'
+  ar: { nativeName: 'عربية', id: 'ara', part1: 'ar', refName: 'Arabic' },
+  bg: { nativeName: 'Български', id: 'bul', part1: 'bg', refName: 'Bulgarian' },
+  ca: { nativeName: 'Català', id: 'cat', part1: 'ca', refName: 'Catalan' },
+  de: { nativeName: 'Deutsch', id: 'deu', part1: 'de', refName: 'German' },
+  el: {
+    nativeName: 'Ελληνικός',
+    id: 'ell',
+    part1: 'el',
+    refName: 'Modern Greek (1453-)'
+  },
+  en: { nativeName: 'English', id: 'eng', part1: 'en', refName: 'English' },
+  es: { nativeName: 'Español', id: 'spa', part1: 'es', refName: 'Spanish' },
+  fr: { nativeName: 'Français', id: 'fre', part1: 'fr', refName: 'French' },
+  he: { nativeName: 'עברי', id: 'hzb', part1: 'he', refName: 'Hebrew' },
+  id: {
+    nativeName: 'Indonesia',
+    id: 'ind',
+    part1: 'id',
+    refName: 'Indonesian'
+  },
+  it: { nativeName: 'Italiano', id: 'ita', part1: 'it', refName: 'Italian' },
+  ja: { nativeName: '日本語', id: 'jpn', part1: 'ja', refName: 'Japanse' },
+  nl: { nativeName: 'Nederlands', id: 'nld', part1: 'nl', refName: 'Dutch' },
+  pt: {
+    nativeName: 'Português',
+    id: 'por',
+    part1: 'pt',
+    refName: 'Portuguese'
+  },
+  ro: { nativeName: 'R<omână', id: 'ron', part1: 'ro', refName: 'Romanian' }
 };
+
+export const DEFAULT_LANGUAGE = AVAILABLE_LANGUAGES.en;
 
 export const FR_GC_BLOG = `${API_URL}/api/rss/FR`;
 export const EN_GC_BLOG = `${API_URL}/api/rss/EN`;
 
 function generateLinks(link, defaultLang) {
   const resultArray = {};
-  if (
-    typeof AVAILABLE_LANGUAGES === 'undefined' ||
-    isEmpty(AVAILABLE_LANGUAGES)
-  ) {
-    resultArray[0] = { en: 'English' };
-  } else {
-    Object.keys(AVAILABLE_LANGUAGES).forEach(value => {
-      resultArray[value] = _.replaceAll(link, '%s', _.capitalize(value));
-    });
-    resultArray['*'] = _.replaceAll(link, '%s', _.capitalize(defaultLang));
-  }
+  Object.keys(AVAILABLE_LANGUAGES).forEach(value => {
+    resultArray[value] = _.replaceAll(link, '%s', _.capitalize(value));
+  });
+  resultArray['*'] = _.replaceAll(link, '%s', _.capitalize(defaultLang));
   return resultArray;
 }
 
