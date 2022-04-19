@@ -9,7 +9,7 @@ import RemoveCircleIcon from '@material-ui/icons/RemoveCircle';
 import ScrollableContent from '../../../common/Layouts/Fixed/ScrollableContent';
 import { locationsType } from '../Provider';
 import Location from './Location';
-import CreateLocationForm from '../../Form/CreateLocationForm';
+import CreateLocationForm from '../../Form/LocationForm';
 import { postLocation } from '../../../../actions/CreateLocation';
 import { usePermissions } from '../../../../hooks';
 import Alert from '../../../common/Alert';
@@ -48,7 +48,7 @@ const Locations = ({ entranceId, locations }) => {
         <>
           {isFormVisible && (
             <>
-              <CreateLocationForm onSubmit={onSubmitForm} />
+              <CreateLocationForm isNewLocation onSubmit={onSubmitForm} />
               <Divider />
             </>
           )}

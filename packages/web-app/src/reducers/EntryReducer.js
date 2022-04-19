@@ -12,6 +12,7 @@ import {
 } from '../actions/Entry';
 
 import { POST_LOCATION_SUCCESS } from '../actions/CreateLocation';
+import { UPDATE_LOCATION_SUCCESS } from '../actions/UpdateLocation';
 
 // remove once api give the information
 const today = new Date();
@@ -81,6 +82,17 @@ const reducer = (state = initialState, action) => {
         data: {
           ...state.data,
           locations: [...state.data.locations, action.location]
+        }
+      };
+    case UPDATE_LOCATION_SUCCESS:
+      return {
+        ...initialState,
+        data: {
+          ...state.data,
+          locations: [
+            ...state.data.locations.filter(l => l.id !== action.location.id),
+            { ...action.location, entrance: action.location.entrance.id }
+          ]
         }
       };
     default:

@@ -175,6 +175,7 @@ export const locationType = PropTypes.shape({
   author: authorType,
   body: PropTypes.string,
   creationDate: PropTypes.instanceOf(Date),
+  entrance: PropTypes.number,
   id: PropTypes.number,
   language: PropTypes.shape({
     id: PropTypes.number.isRequired,
