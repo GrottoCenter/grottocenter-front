@@ -22,7 +22,7 @@ import { makeFormattedText } from './utils';
 const RiggingTable = ({ obstacles, title }) => {
   const { formatMessage } = useIntl();
 
-  if (isNil(obstacles[0].obstacle)) {
+  if (isNil(obstacles[0]) || isNil(obstacles[0].obstacle)) {
     return null;
   }
 
