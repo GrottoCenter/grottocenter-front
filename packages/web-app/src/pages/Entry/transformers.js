@@ -6,6 +6,7 @@ import {
 } from '../DocumentDetails/transformers';
 
 export const getAuthor = author => ({
+  id: author?.id,
   fullName: author?.nickname || author?.name || author?.surname || 'Unknown',
   name: author?.name || 'Unknown',
   nickname: author?.nickname || 'Unknown',
@@ -96,8 +97,9 @@ export const getLocations = locations =>
       creationDate: location?.dateInscription
         ? new Date(location?.dateInscription)
         : null,
+      entrance: location?.entrance,
       id: location?.id,
-      language: location?.langauge?.id,
+      language: location?.language,
       title: location?.title,
       relevance: location?.relevance
     }))

@@ -8,6 +8,7 @@ import styled from 'styled-components';
 import { isNil } from 'ramda';
 
 import LanguageAutoComplete from '../LanguageAutoComplete';
+import { locationType } from '../../Entry/Provider';
 
 const SpacedButton = styled(Button)`
   ${({ theme }) => `
@@ -20,14 +21,14 @@ const getDefaultValues = language => ({
   language
 });
 
-const CreateLocationForm = ({ onSubmit }) => {
+const CreateLocationForm = ({ closeForm, onSubmit, values, isNewLocation }) => {
   const { formatMessage } = useIntl();
   const { languageObject } = useSelector(state => state.intl);
   const { control, handleSubmit, reset } = useForm({
-    defaultValues: getDefaultValues(languageObject)
+    defaultValues: values || getDefaultValues(languageObject)
   });
   const resetToDefault = () => {
-    reset(getDefaultValues(languageObject));
+    reset(values || getDefaultValues(languageObject));
   };
 
   return (
@@ -100,15 +101,27 @@ const CreateLocationForm = ({ onSubmit }) => {
         type="submit"
         onClick={handleSubmit(onSubmit)}
         sx={{ mx: 1 }}>
-        {formatMessage({ id: 'Create' })}
+        {isNewLocation
+          ? formatMessage({ id: 'Create' })
+          : formatMessage({ id: 'Update' })}
       </SpacedButton>
-      <SpacedButton onClick={() => resetToDefault()}>
+      <SpacedButton onClick={resetToDefault}>
         {formatMessage({ id: 'Reset' })}
       </SpacedButton>
+      {closeForm && (
+        <SpacedButton onClick={closeForm}>
+          {formatMessage({ id: 'Cancel' })}
+        </SpacedButton>
+      )}
     </Box>
   );
 };
 
-CreateLocationForm.propTypes = { onSubmit: PropTypes.func.isRequired };
+CreateLocationForm.propTypes = {
+  closeForm: PropTypes.func,
+  isNewLocation: PropTypes.bool.isRequired,
+  onSubmit: PropTypes.func.isRequired,
+  values: locationType
+};
 
 export default CreateLocationForm;

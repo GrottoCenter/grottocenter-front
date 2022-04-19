@@ -1,6 +1,7 @@
 import { combineReducers } from 'redux';
 import advancedsearch from './AdvancedsearchReducer';
 import cave from './CaveReducer';
+import cavePost from './CavePostReducer';
 import caver from './CaverReducer';
 import caverGroups from './CaverGroupsReducer';
 import changePassword from './ChangePassword';
@@ -14,11 +15,14 @@ import documents from './DocumentsReducer';
 import documentType from './DocumentTypeReducer';
 import duplicatesImport from './DuplicatesImportReducer';
 import dynamicNumber from './DynamicNumberReducer';
+import entrancePost from './EntrancePostReducer';
 import entry from './EntryReducer';
 import error from './ErrorReducer';
 import fileFormats from './FileFormatsReducer';
+import forgotPassword from './ForgotPasswordReducer';
 import identifierType from './IdentifierTypesReducer';
 import importCsv from './ImportCsvReducer';
+import intl from './IntlReducer';
 import language from './LanguageReducer';
 import latestBlogNews from './LatestBlogNewsReducer';
 import licenses from './LicensesReducer';
@@ -36,14 +40,12 @@ import region from './RegionReducer';
 import sideMenu from './SideMenuReducer';
 import signUp from './SignUpReducer';
 import subject from './SubjectReducer';
-import intl from './IntlReducer';
-import forgotPassword from './ForgotPasswordReducer';
-import entrancePost from './EntrancePostReducer';
-import cavePost from './CavePostReducer';
+import updateLocation from './UpdateLocation';
 
 const GCReducer = combineReducers({
   advancedsearch,
   cave,
+  cavePost,
   caver,
   caverGroups,
   changePassword,
@@ -57,9 +59,11 @@ const GCReducer = combineReducers({
   documentType,
   duplicatesImport,
   dynamicNumber,
+  entrancePost,
   entry,
   error,
   fileFormats,
+  forgotPassword,
   identifierType,
   importCsv,
   intl,
@@ -79,10 +83,8 @@ const GCReducer = combineReducers({
   region,
   sideMenu,
   signUp,
-  forgotPassword,
   subject,
-  entrancePost,
-  cavePost
+  updateLocation
 });
 
 export default GCReducer;
