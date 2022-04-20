@@ -18,8 +18,8 @@ export const AVAILABLE_LANGUAGES = {
   },
   en: { nativeName: 'English', id: 'eng', part1: 'en', refName: 'English' },
   es: { nativeName: 'Español', id: 'spa', part1: 'es', refName: 'Spanish' },
-  fr: { nativeName: 'Français', id: 'fre', part1: 'fr', refName: 'French' },
-  he: { nativeName: 'עברי', id: 'hzb', part1: 'he', refName: 'Hebrew' },
+  fr: { nativeName: 'Français', id: 'fra', part1: 'fr', refName: 'French' },
+  he: { nativeName: 'עברי', id: 'heb', part1: 'he', refName: 'Hebrew' },
   id: {
     nativeName: 'Indonesia',
     id: 'ind',
