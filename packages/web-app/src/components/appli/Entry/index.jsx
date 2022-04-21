@@ -24,7 +24,6 @@ import Riggings from './Riggings';
 import Comments from './Comments';
 import Documents from './Documents';
 import Histories from './Histories';
-import TmpContent from './WipContent';
 import { useBoolean, usePermissions } from '../../../hooks';
 import StandardDialog from '../../common/StandardDialog';
 import { EntranceForm } from '../EntitiesForm';
@@ -40,6 +39,7 @@ export const Entry = () => {
   const { formatMessage, formatDate } = useIntl();
   const {
     state: {
+      entranceId,
       details: {
         name,
         author,
@@ -93,14 +93,12 @@ export const Entry = () => {
           icon={<CustomIcon type="entry" />}
         />
       }>
-      <Locations locations={locations} entranceId={id} />
+      <Locations locations={locations} entranceId={entranceId} />
       {!isEmpty(descriptions) && <Descriptions descriptions={descriptions} />}
       {!isEmpty(riggings) && <Riggings riggings={riggings} />}
       {!isEmpty(documents) && <Documents documents={documents} />}
       {!isEmpty(histories) && <Histories histories={histories} />}
       {!isEmpty(comments) && <Comments comments={comments} />}
-      <TmpContent title="Documents" />
-      {/* <TmpContent title="History" /> */}
       {permissions.isAuth && (
         <StandardDialog
           fullWidth
