@@ -105,7 +105,8 @@ export const Entry = () => {
           maxWidth="md"
           open={editPage.isOpen}
           onClose={editPage.close}
-          title={formatMessage({ id: 'edition' })}>
+          scrollable
+          title={formatMessage({ id: 'Entrance edition' })}>
           <EntranceForm
             entranceValues={{
               name,

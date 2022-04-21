@@ -230,7 +230,9 @@ export const EntranceForm = ({ entranceValues = null }) => {
           {formatMessage({ id: 'Reset' })}
         </Button>
         <ActionButton
-          label={formatMessage({ id: 'Create' })}
+          label={formatMessage({
+            id: entranceValues === null ? 'Create' : 'Update'
+          })}
           loading={isSubmitting}
           disabled={!hasFinish.isTrue}
           color="primary"
