@@ -1,5 +1,5 @@
 import { isNil } from 'ramda';
-import { Box, Typography } from '@material-ui/core';
+import { Typography } from '@material-ui/core';
 import Skeleton from '@material-ui/lab/Skeleton';
 import React from 'react';
 import styled from 'styled-components';
@@ -26,7 +26,7 @@ const Title = styled(Typography)`
   color: ${({ theme }) => theme.palette.secondaryTextColor};
 `;
 
-const IconWrapper = styled(Box)`
+const IconWrapper = styled.div`
   margin-right: ${({ theme }) => theme.spacing(1)}px;
 `;
 
@@ -65,10 +65,12 @@ const Property = ({
     {loading ? (
       <Skeleton variant="text" width="100%" />
     ) : (
-      <Box display="flex" flexDirection="column">
+      // Using div instead of Box for performance purpose on the marker's popup on the map.
+      // https://github.com/mui/material-ui/issues/21657#issuecomment-707140999
+      <div style={{ display: 'flex', flexDirection: 'column' }}>
         <Title variant="caption">{label}</Title>
         <ValueComponent secondary={secondary} url={url} value={value} />
-      </Box>
+      </div>
     )}
   </PropertyWrapper>
 );

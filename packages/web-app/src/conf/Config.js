@@ -271,8 +271,8 @@ export const breadcrumpKeys = {
   users: 'Users'
 };
 
-export const defaultCoord = { lat: 0, lng: 0 };
-export const defaultZoom = 3;
+export const defaultCoord = { lat: 47.5, lng: 19 }; // Budapest
+export const defaultZoom = 6;
 export const focusZoom = 13;
 export const sideMenuWidth = '215px';
 export const logoGC = '/images/logo.svg';
