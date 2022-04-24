@@ -36,8 +36,9 @@ const CustomMapContainer = ({
       dragging={dragging}
       scrollWheelZoom={scrollWheelZoom}
       isSideMenuOpen={isSideMenuOpen}
-      minZoom={3}
-      style={style}>
+      minZoom={5}
+      style={style}
+      preferCanvas>
       <LayersControl />
       {children}
     </Map>
