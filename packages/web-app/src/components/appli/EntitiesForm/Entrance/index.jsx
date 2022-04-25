@@ -145,7 +145,13 @@ export const EntranceForm = ({ caveValues = null, entranceValues = null }) => {
         creationType={creationType}
       />
     ),
-    details: <Details control={control} errors={errors} />
+    details: (
+      <Details
+        control={control}
+        errors={errors}
+        isReadonly={!isNewEntrance && creationType === ENTRANCE_ONLY}
+      />
+    )
   };
   const stepKeys =
     creationType === 'cave'
