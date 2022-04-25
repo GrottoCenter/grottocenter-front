@@ -1,8 +1,8 @@
 import {
-  POST_ENTRANCE,
-  POST_ENTRANCE_FAILURE,
-  POST_ENTRANCE_SUCCESS
-} from '../actions/Entry';
+  UPDATE_CAVE,
+  UPDATE_CAVE_FAILURE,
+  UPDATE_CAVE_SUCCESS
+} from '../actions/Cave';
 
 const initialState = {
   loading: false,
@@ -12,21 +12,22 @@ const initialState = {
 
 const reducer = (state = initialState, action) => {
   switch (action.type) {
-    case POST_ENTRANCE:
+    case UPDATE_CAVE:
       return {
         ...state,
         error: initialState.error,
         loading: true
       };
-    case POST_ENTRANCE_FAILURE:
+    case UPDATE_CAVE_FAILURE:
       return {
         ...state,
         error: action.error,
         loading: false
       };
-    case POST_ENTRANCE_SUCCESS:
+    case UPDATE_CAVE_SUCCESS:
       return {
         ...state,
+        data: action.cave,
         error: initialState.error,
         loading: false
       };

@@ -3,7 +3,8 @@ import fetch from 'isomorphic-fetch';
 import {
   getEntryUrl,
   postCreateEntranceUrl,
-  putEntryWithNewEntitiesUrl
+  putEntryWithNewEntitiesUrl,
+  putEntranceUrl
 } from '../conf/Config';
 
 import makeErrorMessage from '../helpers/makeErrorMessage';
@@ -28,9 +29,9 @@ export const postEntranceFailure = (error, httpCode) => ({
   httpCode
 });
 
-export const UPDATE_ENTRY_SUCCESS = 'UPDATE_ENTRY_SUCCESS';
-export const UPDATE_ENTRY_LOADING = 'UPDATE_ENTRY_LOADING';
-export const UPDATE_ENTRY_ERROR = 'UPDATE_ENTRY_ERROR';
+export const UPDATE_ENTRANCE_SUCCESS = 'UPDATE_ENTRANCE_SUCCESS';
+export const UPDATE_ENTRANCE = 'UPDATE_ENTRANCE';
+export const UPDATE_ENTRANCE_ERROR = 'UPDATE_ENTRANCE_ERROR';
 
 export const CREATE_ENTRY_SUCCESS = 'CREATE_ENTRY_SUCCESS';
 export const CREATE_ENTRY_LOADING = 'CREATE_ENTRY_LOADING';
@@ -135,7 +136,7 @@ export const updateEntryWithNewEntities = (
   newRiggings,
   newComments
 ) => (dispatch, getState) => {
-  dispatch({ type: UPDATE_ENTRY_LOADING });
+  dispatch({ type: UPDATE_ENTRANCE });
 
   const body = {
     entrance: entryData,
@@ -156,13 +157,39 @@ export const updateEntryWithNewEntities = (
     .then(checkStatus)
     .then(result => {
       dispatch({
-        type: UPDATE_ENTRY_SUCCESS,
+        type: UPDATE_ENTRANCE_SUCCESS,
         httpCode: result.status
       });
     })
     .catch(error => {
       dispatch({
-        type: UPDATE_ENTRY_ERROR,
+        type: UPDATE_ENTRANCE_ERROR,
+        error: error.message,
+        httpCode: error.status
+      });
+    });
+};
+
+export const updateEntrance = entryData => (dispatch, getState) => {
+  dispatch({ type: UPDATE_ENTRANCE });
+
+  const requestOptions = {
+    method: 'PUT',
+    body: JSON.stringify(entryData),
+    headers: getState().login.authorizationHeader
+  };
+
+  return fetch(putEntranceUrl(entryData.id), requestOptions)
+    .then(checkStatus)
+    .then(result => {
+      dispatch({
+        type: UPDATE_ENTRANCE_SUCCESS,
+        httpCode: result.status
+      });
+    })
+    .catch(error => {
+      dispatch({
+        type: UPDATE_ENTRANCE_ERROR,
         error: error.message,
         httpCode: error.status
       });

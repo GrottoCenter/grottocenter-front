@@ -37,7 +37,7 @@ const Cave = ({
     <div>
       <FormControl component="fieldset" disabled={disabled}>
         <FormLabel component="legend">
-          {formatMessage({ id: 'The new cave is:' })}
+          {formatMessage({ id: 'The cave is:' })}
         </FormLabel>
         <RadioGroup
           aria-label="creationType"

@@ -41,17 +41,18 @@ export const Entry = () => {
     state: {
       entranceId,
       details: {
-        name,
         author,
-        creationDate,
-        lastEditor,
-        editionDate,
-        depth,
-        development,
         caveId,
         caveName,
+        country,
+        creationDate,
+        depth,
+        development,
+        editionDate,
         language,
-        country
+        lastEditor,
+        name,
+        temperature
       },
       position,
       descriptions,
@@ -109,15 +110,16 @@ export const Entry = () => {
           title={formatMessage({ id: 'Entrance edition' })}>
           <EntranceForm
             entranceValues={{
-              name,
-              depth,
-              length: development,
-              latitude: propOr(undefined, 0, position),
-              longitude: propOr(undefined, 1, position),
               caveId,
               caveName,
+              country,
+              depth,
+              name,
               language,
-              country
+              latitude: propOr(undefined, 0, position),
+              length: development,
+              longitude: propOr(undefined, 1, position),
+              temperature
             }}
           />
         </StandardDialog>

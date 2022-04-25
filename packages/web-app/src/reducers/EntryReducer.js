@@ -2,9 +2,9 @@ import {
   LOAD_ENTRY_SUCCESS,
   LOAD_ENTRY_ERROR,
   LOAD_ENTRY_LOADING,
-  UPDATE_ENTRY_SUCCESS,
-  UPDATE_ENTRY_LOADING,
-  UPDATE_ENTRY_ERROR,
+  UPDATE_ENTRANCE_SUCCESS,
+  UPDATE_ENTRANCE,
+  UPDATE_ENTRANCE_ERROR,
   CREATE_ENTRY_LOADING,
   CREATE_ENTRY_SUCCESS,
   CREATE_ENTRY_ERROR,
@@ -40,7 +40,7 @@ const initialState = {
 const reducer = (state = initialState, action) => {
   switch (action.type) {
     case LOAD_ENTRY_LOADING:
-    case UPDATE_ENTRY_LOADING:
+    case UPDATE_ENTRANCE:
     case CREATE_ENTRY_LOADING:
       return {
         ...state,
@@ -59,14 +59,14 @@ const reducer = (state = initialState, action) => {
         loading: false,
         error: action.error
       };
-    case UPDATE_ENTRY_SUCCESS:
+    case UPDATE_ENTRANCE_SUCCESS:
     case CREATE_ENTRY_SUCCESS:
       return {
         ...state,
         loading: false,
         latestHttpCode: action.httpCode
       };
-    case UPDATE_ENTRY_ERROR:
+    case UPDATE_ENTRANCE_ERROR:
     case CREATE_ENTRY_ERROR:
       return {
         ...state,
