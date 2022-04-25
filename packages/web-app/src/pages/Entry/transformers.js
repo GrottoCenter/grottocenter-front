@@ -30,8 +30,7 @@ export const getDetails = data => ({
   accessRate: pathOr(0, ['stats', 'approach'], data) / 2,
   altitude: data.altitude,
   author: getAuthor(data?.author),
-  caveId: pathOr(null, ['cave', 'id'], data),
-  caveName: pathOr(null, ['cave', 'name'], data),
+  cave: data.cave,
   coordinates:
     !isNil(data.longitude) && !isNil(data.latitude)
       ? [data.latitude, data.longitude]

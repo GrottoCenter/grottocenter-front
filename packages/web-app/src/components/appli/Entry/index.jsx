@@ -39,16 +39,15 @@ export const Entry = () => {
   const { formatMessage, formatDate } = useIntl();
   const {
     state: {
-      entranceId,
       details: {
         author,
-        caveId,
-        caveName,
+        cave,
         country,
         creationDate,
         depth,
         development,
         editionDate,
+        id,
         language,
         lastEditor,
         name,
@@ -94,7 +93,7 @@ export const Entry = () => {
           icon={<CustomIcon type="entry" />}
         />
       }>
-      <Locations locations={locations} entranceId={entranceId} />
+      <Locations locations={locations} entranceId={id} />
       {!isEmpty(descriptions) && <Descriptions descriptions={descriptions} />}
       {!isEmpty(riggings) && <Riggings riggings={riggings} />}
       {!isEmpty(documents) && <Documents documents={documents} />}
@@ -110,10 +109,12 @@ export const Entry = () => {
           title={formatMessage({ id: 'Entrance edition' })}>
           <EntranceForm
             entranceValues={{
-              caveId,
-              caveName,
+              cave,
+              caveId: cave?.id,
+              caveName: cave?.name,
               country,
               depth,
+              id,
               name,
               language,
               latitude: propOr(undefined, 0, position),

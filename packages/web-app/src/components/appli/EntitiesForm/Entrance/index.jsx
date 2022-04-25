@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import { useForm } from 'react-hook-form';
@@ -6,10 +6,12 @@ import { isNil, keys, prop, length, reject, equals } from 'ramda';
 import {
   Box,
   Button as MuiButton,
+  CircularProgress,
   Step,
   StepContent,
   StepLabel,
-  Stepper
+  Stepper,
+  Typography
 } from '@material-ui/core';
 import Icon from '@material-ui/core/Icon';
 import styled from 'styled-components';
@@ -63,10 +65,20 @@ export const EntranceForm = ({ entranceValues = null }) => {
   const { latitude, longitude } = useGeolocation();
   const { formatMessage } = useIntl();
   const { languages: allLanguages } = useSelector(state => state.language);
-  const { error: entranceError } = useSelector(state => state.entrancePost);
-  const { error: caveError } = useSelector(state => state.cavePost);
+  const {
+    error: entranceError,
+    loading: entranceLoading
+  } = useSelector(state =>
+    isNewEntrance ? state.entrancePost : state.entrancePut
+  );
+  const { error: caveError, loading: caveLoading } = useSelector(state =>
+    isNewEntrance ? state.cavePost : state.cavePut
+  );
   const dispatch = useDispatch();
-  const [creationType, setCreationType] = useState('cave');
+  const creationTypeInitialValue = useMemo(() => {
+    return entranceValues.cave.entrances.length > 1 ? 'entrance' : 'cave';
+  }, [entranceValues.cave.entrances.length]);
+  const [creationType, setCreationType] = useState(creationTypeInitialValue);
   const {
     handleSubmit,
     reset,
@@ -112,11 +124,12 @@ export const EntranceForm = ({ entranceValues = null }) => {
   const steps = {
     cave: (
       <Cave
-        control={control}
-        errors={errors}
-        creationType={creationType}
-        updateCreationType={handleUpdateCreationType}
         allLanguages={allLanguages}
+        control={control}
+        creationType={creationType}
+        disabled={!isNewEntrance}
+        errors={errors}
+        updateCreationType={handleUpdateCreationType}
         reset={handleReset}
       />
     ),
@@ -168,8 +181,8 @@ export const EntranceForm = ({ entranceValues = null }) => {
   };
 
   const onSubmit = async data => {
-    const caveData = makeCaveData(data);
-    const entranceData = makeEntranceData(data);
+    const caveData = { ...makeCaveData(data), id: entranceValues?.cave.id };
+    const entranceData = { ...makeEntranceData(data), id: entranceValues?.id };
     if (isNewEntrance) {
       if (creationType === 'cave') {
         dispatch(postCaveAndEntrance(caveData, entranceData));
@@ -185,23 +198,47 @@ export const EntranceForm = ({ entranceValues = null }) => {
 
   return isSubmitSuccessful && isNil(entranceError) && isNil(caveError) ? (
     <Box display="flex" justifyContent="center" flexDirection="column">
-      <form>
-        <Alert
-          severity="success"
-          title={formatMessage({
-            id: isNewEntrance
-              ? 'Entrance successfully created!'
-              : 'Entrance successfully updated!'
-          })}
-        />
-        {isNewEntrance && (
-          <Button onClick={handleReset} color="primary">
+      {entranceLoading && (
+        <>
+          <Typography>
             {formatMessage({
-              id: 'Create a new Entrance'
+              id: isNewEntrance
+                ? 'Creating entrance...'
+                : 'Updating entrance...'
             })}
-          </Button>
-        )}
-      </form>
+          </Typography>
+          <CircularProgress />
+        </>
+      )}
+      {caveLoading && (
+        <>
+          <Typography>
+            {formatMessage({
+              id: isNewEntrance ? 'Creating cave...' : 'Updating cave...'
+            })}
+          </Typography>
+          <CircularProgress />
+        </>
+      )}
+      {!caveLoading && !entranceLoading && (
+        <form>
+          <Alert
+            severity="success"
+            title={formatMessage({
+              id: isNewEntrance
+                ? 'Entrance successfully created!'
+                : 'Entrance successfully updated!'
+            })}
+          />
+          {isNewEntrance && (
+            <Button onClick={handleReset} color="primary">
+              {formatMessage({
+                id: 'Create a new Entrance'
+              })}
+            </Button>
+          )}
+        </form>
+      )}
     </Box>
   ) : (
     <Box display="flex" justifyContent="center" flexDirection="column">
