@@ -12,6 +12,7 @@ import styled from 'styled-components';
 
 import CaveSelection from './CaveSelection';
 import CaveCreation from './CaveCreation';
+import { ENTRANCE_ONLY, ENTRANCE_AND_CAVE } from '../caveType';
 
 const FormControl = styled(MuiFormControl)`
   padding-bottom: ${({ theme }) => theme.spacing(4)}px;
@@ -20,8 +21,8 @@ const FormControl = styled(MuiFormControl)`
 const Cave = ({
   control,
   errors,
-  creationType,
-  updateCreationType,
+  entityType,
+  updateEntityType,
   allLanguages,
   reset,
   disabled = false
@@ -29,7 +30,7 @@ const Cave = ({
   const { formatMessage } = useIntl();
 
   const handleRadioChange = event => {
-    updateCreationType(event.target.value);
+    updateEntityType(event.target.value);
     reset();
   };
 
@@ -40,19 +41,19 @@ const Cave = ({
           {formatMessage({ id: 'The cave is:' })}
         </FormLabel>
         <RadioGroup
-          aria-label="creationType"
-          name="creationType"
-          value={creationType}
+          aria-label="entityType"
+          name="entityType"
+          value={entityType}
           onChange={handleRadioChange}>
           <FormControlLabel
-            value="entrance"
+            value={ENTRANCE_ONLY}
             control={<Radio />}
             label={formatMessage({
               id: 'Linked to an existing cave or network'
             })}
           />
           <FormControlLabel
-            value="cave"
+            value={ENTRANCE_AND_CAVE}
             control={<Radio />}
             label={formatMessage({
               id: 'First entrance of the cave (on Grottocenter)'
@@ -60,7 +61,7 @@ const Cave = ({
           />
         </RadioGroup>
       </FormControl>
-      {creationType === 'cave' ? (
+      {entityType === ENTRANCE_AND_CAVE ? (
         <CaveCreation
           control={control}
           errors={errors}
@@ -80,11 +81,11 @@ Cave.propTypes = {
     })
   ),
   control: PropTypes.shape({}),
-  creationType: PropTypes.oneOf(['cave', 'entrance']),
+  entityType: PropTypes.oneOf([ENTRANCE_ONLY, ENTRANCE_AND_CAVE]),
   disabled: PropTypes.bool,
   errors: PropTypes.shape({}),
   reset: PropTypes.func,
-  updateCreationType: PropTypes.func
+  updateEntityType: PropTypes.func
 };
 
 export default Cave;

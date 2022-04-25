@@ -1,9 +1,13 @@
-export const makeEntranceData = (data, creationType) => ({
+import { ENTRANCE_ONLY } from './caveType';
+
+export const makeEntranceData = (data, entityType) => ({
   // When creating a cave with a single entrance, the name of the entrance is the same as the cave one, in data.cave
   name: {
     language:
-      creationType === 'entrance' ? data.entrance.language : data.cave.language,
-    text: creationType === 'entrance' ? data.entrance.name : data.cave.name
+      entityType === ENTRANCE_ONLY
+        ? data.entrance.language
+        : data.cave.language,
+    text: entityType === ENTRANCE_ONLY ? data.entrance.name : data.cave.name
   },
   cave: data.cave.id,
   country: data.entrance.country,

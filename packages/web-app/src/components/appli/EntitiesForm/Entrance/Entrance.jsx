@@ -15,18 +15,14 @@ import Translate from '../../../common/Translate';
 import Section from '../FormSection';
 import { useDebounce } from '../../../../hooks';
 import { CountrySelection, PositionMap } from './Position';
+import { ENTRANCE_ONLY, ENTRANCE_AND_CAVE } from './caveType';
 
-const Entrance = ({
-  allLanguages,
-  control,
-  errors,
-  setFocus,
-  creationType
-}) => {
+const Entrance = ({ allLanguages, control, errors, setFocus, entityType }) => {
   const { formatMessage } = useIntl();
   const caveIdValue = useDebounce(useWatch({ control, name: 'cave.id' }), 300);
   // When creating a cave, the entrance get the same name as the cave.
-  const nameInputName = creationType === 'cave' ? 'cave.name' : 'entrance.name';
+  const nameInputName =
+    entityType === ENTRANCE_AND_CAVE ? 'cave.name' : 'entrance.name';
 
   const validateLatitude = value => {
     if (value > 90 || value < -90) {
@@ -55,7 +51,7 @@ const Entrance = ({
           rules={{ required: true }}
           render={({ field: { ref, ...field } }) => (
             <TextField
-              disabled={creationType !== 'entrance'}
+              disabled={entityType !== ENTRANCE_ONLY}
               fullWidth
               required
               error={!!errors?.entrance?.name}
@@ -65,7 +61,7 @@ const Entrance = ({
             />
           )}
         />
-        {creationType === 'entrance' && (
+        {entityType === ENTRANCE_ONLY && (
           <Controller
             name="entrance.language"
             control={control}
@@ -169,7 +165,7 @@ Entrance.propTypes = {
     })
   ),
   setFocus: PropTypes.func,
-  creationType: PropTypes.oneOf(['cave', 'entrance'])
+  entityType: PropTypes.oneOf([ENTRANCE_AND_CAVE, ENTRANCE_ONLY])
 };
 
 export default Entrance;
