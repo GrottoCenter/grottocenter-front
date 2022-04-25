@@ -294,9 +294,11 @@ export const EntranceForm = ({ caveValues = null, entranceValues = null }) => {
           ))}
         </Stepper>
         <Box display="flex">
-          <Button disabled={!isDirty} onClick={handleReset}>
-            {formatMessage({ id: 'Reset' })}
-          </Button>
+          {isNewEntrance && (
+            <Button disabled={!isDirty} onClick={handleReset}>
+              {formatMessage({ id: 'Reset' })}
+            </Button>
+          )}
           <ActionButton
             label={formatMessage({
               id: isNewEntrance ? 'Create' : 'Update'

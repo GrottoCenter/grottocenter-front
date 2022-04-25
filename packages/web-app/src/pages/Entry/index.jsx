@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
-import { propOr, isNil } from 'ramda';
+import React, { useEffect, useRef } from 'react';
+import { propOr, isNil, isEmpty } from 'ramda';
 import { useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import Entry from '../../components/appli/Entry';
@@ -18,11 +18,24 @@ const EntryPage = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
   const { loading, data, error } = useSelector(state => state.entry);
+  const { loading: updateLoading, error: updateError } = useSelector(
+    state => state.entrancePut
+  );
+  const prevUpdateLoading = useRef(updateLoading);
 
   useEffect(() => {
-    dispatch(fetchEntry(id));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id]);
+    const updateTerminatedWithSuccess =
+      prevUpdateLoading.current === true &&
+      updateLoading === false &&
+      updateError === null;
+    if (updateTerminatedWithSuccess || isEmpty(data)) {
+      dispatch(fetchEntry(id));
+    }
+  }, [dispatch, updateLoading, id, data, updateError]);
+
+  useEffect(() => {
+    prevUpdateLoading.current = updateLoading;
+  }, [updateLoading]);
 
   const comments = getComments(propOr([], 'comments', data));
   const descriptions = getDescriptions(propOr([], 'descriptions', data));

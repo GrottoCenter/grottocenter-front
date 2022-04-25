@@ -14,24 +14,8 @@ import {
 import { POST_LOCATION_SUCCESS } from '../actions/CreateLocation';
 import { UPDATE_LOCATION_SUCCESS } from '../actions/UpdateLocation';
 
-// remove once api give the information
-const today = new Date();
-
 const initialState = {
-  data: {
-    id: 1,
-    name: 'Name',
-    country: 'Country',
-    region: 'Region',
-    city: 'City',
-    latitude: null,
-    locations: [],
-    longitude: null,
-    cave: {
-      dateInscription: today.toISOString().substring(0, 10)
-    },
-    massif: {}
-  },
+  data: {},
   loading: false,
   error: null,
   latestHttpCode: null
