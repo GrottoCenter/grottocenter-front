@@ -31,6 +31,7 @@ import Cave from './Cave';
 import Entrance from './Entrance';
 import Details from './Details';
 import { makeCaveData, makeEntranceData } from './transformers';
+import { ENTRANCE_ONLY, ENTRANCE_AND_CAVE } from './caveType';
 
 const Button = styled(MuiButton)`
   margin: ${({ theme }) => theme.spacing(2)}px;
@@ -73,10 +74,10 @@ export const EntranceForm = ({ caveValues = null, entranceValues = null }) => {
     isNewEntrance ? state.cavePost : state.cavePut
   );
   const dispatch = useDispatch();
-  const creationTypeInitialValue = useMemo(() => {
-    return caveValues?.entrances.length > 1 ? 'entrance' : 'cave';
+  const entityTypeInitialValue = useMemo(() => {
+    return caveValues?.entrances.length > 1 ? ENTRANCE_ONLY : ENTRANCE_AND_CAVE;
   }, [caveValues?.entrances.length]);
-  const [creationType, setCreationType] = useState(creationTypeInitialValue);
+  const [entityType, setEntityType] = useState(entityTypeInitialValue);
 
   const {
     handleSubmit,
@@ -113,8 +114,8 @@ export const EntranceForm = ({ caveValues = null, entranceValues = null }) => {
     }
   }, [entranceValues, getValues, latitude, longitude, reset]);
 
-  const handleUpdateCreationType = type => {
-    setCreationType(type);
+  const handleUpdateEntityType = type => {
+    setEntityType(type);
     reset({ ...getValues() });
   };
 
@@ -129,10 +130,10 @@ export const EntranceForm = ({ caveValues = null, entranceValues = null }) => {
       <Cave
         allLanguages={allLanguages}
         control={control}
-        creationType={creationType}
+        entityType={entityType}
         disabled={!isNewEntrance}
         errors={errors}
-        updateCreationType={handleUpdateCreationType}
+        updateEntityType={handleUpdateEntityType}
         reset={handleReset}
       />
     ),
@@ -142,19 +143,19 @@ export const EntranceForm = ({ caveValues = null, entranceValues = null }) => {
         allLanguages={allLanguages}
         errors={errors}
         setFocus={setFocus}
-        creationType={creationType}
+        entityType={entityType}
       />
     ),
     details: (
       <Details
         control={control}
         errors={errors}
-        isReadonly={!isNewEntrance && creationType === ENTRANCE_ONLY}
+        isReadonly={!isNewEntrance && entityType === ENTRANCE_ONLY}
       />
     )
   };
   const stepKeys =
-    creationType === 'cave'
+    entityType === ENTRANCE_AND_CAVE
       ? keys(steps)
       : reject(equals('details'), keys(steps));
 
@@ -200,16 +201,16 @@ export const EntranceForm = ({ caveValues = null, entranceValues = null }) => {
       id: caveValues?.id
     };
     const entranceData = {
-      ...makeEntranceData(data, creationType),
+      ...makeEntranceData(data, entityType),
       id: entranceValues?.id
     };
     if (isNewEntrance) {
-      if (creationType === 'cave') {
+      if (entityType === ENTRANCE_AND_CAVE) {
         dispatch(postCaveAndEntrance(caveData, entranceData));
       } else {
         dispatch(postEntrance(entranceData));
       }
-    } else if (creationType === 'cave') {
+    } else if (entityType === ENTRANCE_AND_CAVE) {
       dispatch(updateCaveAndEntrance(caveData, entranceData));
     } else {
       dispatch(updateEntrance(entranceData));
