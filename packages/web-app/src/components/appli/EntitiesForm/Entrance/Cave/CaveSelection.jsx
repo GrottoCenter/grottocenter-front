@@ -34,7 +34,7 @@ const getCaveToString = cave => {
   return `${cave.name}`;
 };
 
-const CaveSelection = ({ control, errors }) => {
+const CaveSelection = ({ control, errors, disabled = false }) => {
   const { formatMessage } = useIntl();
   const dispatch = useDispatch();
   const [inputValue, setInputValue] = useState('');
@@ -134,6 +134,7 @@ const CaveSelection = ({ control, errors }) => {
           <InputWrapper>
             <AutoCompleteSearchComponent
               onInputChange={setInputValue}
+              disabled={disabled}
               onSelection={handleSelection}
               getOptionLabel={getCaveToString}
               hasError={!isNil(error)}
@@ -155,6 +156,7 @@ export default CaveSelection;
 
 CaveSelection.propTypes = {
   control: PropTypes.shape({}),
+  disabled: PropTypes.bool,
   errors: PropTypes.shape({
     caveName: PropTypes.string
   })

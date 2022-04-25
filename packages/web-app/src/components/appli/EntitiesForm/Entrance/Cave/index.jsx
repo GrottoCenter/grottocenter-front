@@ -67,24 +67,24 @@ const Cave = ({
           allLanguages={allLanguages}
         />
       ) : (
-        <CaveSelection control={control} errors={errors} />
+        <CaveSelection control={control} errors={errors} disabled={disabled} />
       )}
     </div>
   );
 };
 Cave.propTypes = {
-  control: PropTypes.shape({}),
-  errors: PropTypes.shape({}),
-  creationType: PropTypes.oneOf(['cave', 'entrance']),
-  updateCreationType: PropTypes.func,
-  disabled: PropTypes.bool,
   allLanguages: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.string.isRequired,
       refName: PropTypes.string.isRequired
     })
   ),
-  reset: PropTypes.func
+  control: PropTypes.shape({}),
+  creationType: PropTypes.oneOf(['cave', 'entrance']),
+  disabled: PropTypes.bool,
+  errors: PropTypes.shape({}),
+  reset: PropTypes.func,
+  updateCreationType: PropTypes.func
 };
 
 export default Cave;

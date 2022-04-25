@@ -8,16 +8,16 @@ const defaultContext = {
   state: {
     entryId: '',
     details: {
-      id: 0,
-      name: 'Cavitée',
-      localisation: 'France',
-      depth: 100,
-      development: 100,
-      interestRate: 2.5,
-      progressionRate: 2.5,
       accessRate: 2.5,
       author: 'Author name',
-      creationDate: todayDate
+      creationDate: todayDate,
+      depth: 100,
+      development: 100,
+      id: 0,
+      interestRate: 2.5,
+      localisation: 'France',
+      progressionRate: 2.5,
+      name: 'Cavité'
     },
     comments: [],
     descriptions: [],
@@ -214,11 +214,11 @@ Entry.propTypes = {
   descriptions: descriptionsType.isRequired,
   documents: documentsType.isRequired,
   details: detailsType.isRequired,
+  entryId: PropTypes.string.isRequired,
   histories: historiesType.isRequired,
   loading: PropTypes.bool,
   locations: locationsType.isRequired,
-  riggings: riggingsType.isRequired,
-  entryId: PropTypes.string.isRequired
+  riggings: riggingsType.isRequired
 };
 
 export default Entry;
