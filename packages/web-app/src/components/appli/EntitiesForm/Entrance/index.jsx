@@ -19,19 +19,16 @@ import useGeolocation from 'react-hook-geolocation';
 import { useBoolean } from '../../../../hooks';
 import ActionButton from '../../../common/ActionButton';
 import Alert from '../../../common/Alert';
-import { postEntrance } from '../../../../actions/Entry';
-import { postCaveAndEntrance } from '../../../../actions/CaveAndEntrance';
+import { postEntrance, updateEntrance } from '../../../../actions/Entry';
+import {
+  postCaveAndEntrance,
+  updateCaveAndEntrance
+} from '../../../../actions/CaveAndEntrance';
 
 import Cave from './Cave';
 import Entrance from './Entrance';
 import Details from './Details';
 import { makeCaveData, makeEntranceData } from './transformers';
-
-const FormWrapper = styled.form`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-`;
 
 const Button = styled(MuiButton)`
   margin: ${({ theme }) => theme.spacing(2)}px;
@@ -62,6 +59,7 @@ const defaultEntranceValues = {
 };
 
 export const EntranceForm = ({ entranceValues = null }) => {
+  const isNewEntrance = entranceValues === null;
   const { latitude, longitude } = useGeolocation();
   const { formatMessage } = useIntl();
   const { languages: allLanguages } = useSelector(state => state.language);
@@ -170,78 +168,98 @@ export const EntranceForm = ({ entranceValues = null }) => {
   };
 
   const onSubmit = async data => {
-    if (creationType === 'cave') {
-      dispatch(postCaveAndEntrance(makeCaveData(data), makeEntranceData(data)));
+    const caveData = makeCaveData(data);
+    const entranceData = makeEntranceData(data);
+    if (isNewEntrance) {
+      if (creationType === 'cave') {
+        dispatch(postCaveAndEntrance(caveData, entranceData));
+      } else {
+        dispatch(postEntrance(entranceData));
+      }
+    } else if (creationType === 'cave') {
+      dispatch(updateCaveAndEntrance(caveData, entranceData));
     } else {
-      dispatch(postEntrance(makeEntranceData(data)));
+      dispatch(updateEntrance(entranceData));
     }
   };
 
   return isSubmitSuccessful && isNil(entranceError) && isNil(caveError) ? (
-    <FormWrapper>
-      <Alert
-        severity="success"
-        title={formatMessage({
-          id: 'New entrance successfully created!'
-        })}
-      />
-      <Button onClick={handleReset} color="primary">
-        {formatMessage({ id: 'Create a new Entrance' })}
-      </Button>
-    </FormWrapper>
-  ) : (
-    <FormWrapper autoComplete="off" onSubmit={handleSubmit(onSubmit)}>
-      <Stepper activeStep={activeStep} orientation="vertical">
-        {stepKeys.map(label => (
-          <Step
-            key={formatMessage({ id: label })}
-            expanded={stepExpanded.isOpen}>
-            <StepLabel>
-              {formatMessage({
-                id: label[0].toUpperCase() + label.substring(1)
-              })}
-            </StepLabel>
-            <StepContent>
-              <div style={{ maxWidth: '600px', margin: '0 auto' }}>
-                {prop(label, steps)}
-              </div>
-              {!stepExpanded.isOpen && (
-                <Box display="flex" justifyContent="center">
-                  <Button disabled={activeStep === 0} onClick={handleBack}>
-                    {formatMessage({ id: 'Back' })}
-                  </Button>
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={handleNext}>
-                    {formatMessage({
-                      id:
-                        activeStep === length(stepKeys) - 1 ? 'Review' : 'Next'
-                    })}
-                  </Button>
-                </Box>
-              )}
-            </StepContent>
-          </Step>
-        ))}
-      </Stepper>
-      <Box display="flex">
-        <Button disabled={!isDirty} onClick={handleReset}>
-          {formatMessage({ id: 'Reset' })}
-        </Button>
-        <ActionButton
-          label={formatMessage({
-            id: entranceValues === null ? 'Create' : 'Update'
+    <Box display="flex" justifyContent="center" flexDirection="column">
+      <form>
+        <Alert
+          severity="success"
+          title={formatMessage({
+            id: isNewEntrance
+              ? 'Entrance successfully created!'
+              : 'Entrance successfully updated!'
           })}
-          loading={isSubmitting}
-          disabled={!hasFinish.isTrue}
-          color="primary"
-          icon={<Icon>send</Icon>}
-          style={{ margin: '8px', marginLeft: 'auto' }}
-          type="submit"
         />
-      </Box>
-    </FormWrapper>
+        {isNewEntrance && (
+          <Button onClick={handleReset} color="primary">
+            {formatMessage({
+              id: 'Create a new Entrance'
+            })}
+          </Button>
+        )}
+      </form>
+    </Box>
+  ) : (
+    <Box display="flex" justifyContent="center" flexDirection="column">
+      <form autoComplete="off" onSubmit={handleSubmit(onSubmit)}>
+        <Stepper activeStep={activeStep} orientation="vertical">
+          {stepKeys.map(label => (
+            <Step
+              key={formatMessage({ id: label })}
+              expanded={stepExpanded.isOpen}>
+              <StepLabel>
+                {formatMessage({
+                  id: label[0].toUpperCase() + label.substring(1)
+                })}
+              </StepLabel>
+              <StepContent>
+                <div style={{ maxWidth: '600px', margin: '0 auto' }}>
+                  {prop(label, steps)}
+                </div>
+                {!stepExpanded.isOpen && (
+                  <Box display="flex" justifyContent="center">
+                    <Button disabled={activeStep === 0} onClick={handleBack}>
+                      {formatMessage({ id: 'Back' })}
+                    </Button>
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      onClick={handleNext}>
+                      {formatMessage({
+                        id:
+                          activeStep === length(stepKeys) - 1
+                            ? 'Review'
+                            : 'Next'
+                      })}
+                    </Button>
+                  </Box>
+                )}
+              </StepContent>
+            </Step>
+          ))}
+        </Stepper>
+        <Box display="flex">
+          <Button disabled={!isDirty} onClick={handleReset}>
+            {formatMessage({ id: 'Reset' })}
+          </Button>
+          <ActionButton
+            label={formatMessage({
+              id: isNewEntrance ? 'Create' : 'Update'
+            })}
+            loading={isSubmitting}
+            disabled={!hasFinish.isTrue}
+            color="primary"
+            icon={<Icon>send</Icon>}
+            style={{ margin: '8px', marginLeft: 'auto' }}
+            type="submit"
+          />
+        </Box>
+      </form>
+    </Box>
   );
 };
 

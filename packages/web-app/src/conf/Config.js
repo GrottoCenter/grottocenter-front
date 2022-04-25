@@ -202,6 +202,10 @@ export const postCaverGroupsUrl = userId =>
 export const getLicensesUrl = `${API_URL}/api/v1/licenses`;
 export const getFileFormatsUrl = `${API_URL}/api/v1/file-formats`;
 export const entryDetailPath = `${API_URL}/api/${apiVersion}/entrances/`;
+export const putCaveUrl = caveId =>
+  `${API_URL}/api/${apiVersion}/caves/${caveId}`;
+export const putEntranceUrl = entranceId =>
+  `${API_URL}/api/${apiVersion}/entrances/${entranceId}`;
 export const putEntryWithNewEntitiesUrl = entryId =>
   `${API_URL}/api/${apiVersion}/entrances/${entryId}/new-entities`;
 export const putDocumentyWithNewEntitiesUrl = docId =>

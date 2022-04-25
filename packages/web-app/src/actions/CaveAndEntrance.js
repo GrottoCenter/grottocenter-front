@@ -3,10 +3,14 @@ import fetch from 'isomorphic-fetch';
 import { postCreateCaveUrl } from '../conf/Config';
 import makeErrorMessage from '../helpers/makeErrorMessage';
 
-import { postCaveAction, postCaveFailure } from './Cave';
-import { postEntrance } from './Entry';
+import {
+  postCaveAction,
+  postCaveFailure,
+  updateCave,
+  postCaveSuccess
+} from './Cave';
+import { postEntrance, updateEntrance } from './Entry';
 
-// eslint-disable-next-line import/prefer-default-export
 export const postCaveAndEntrance = (caveData, entranceData) => {
   return (dispatch, getState) => {
     dispatch(postCaveAction());
@@ -28,6 +32,7 @@ export const postCaveAndEntrance = (caveData, entranceData) => {
         return res;
       })
       .then(res => {
+        dispatch(postCaveSuccess());
         dispatch(postEntrance({ ...entranceData, cave: res.id }));
       })
       .catch(error =>
@@ -38,5 +43,12 @@ export const postCaveAndEntrance = (caveData, entranceData) => {
           )
         )
       );
+  };
+};
+
+export const updateCaveAndEntrance = (caveData, entranceData) => {
+  return dispatch => {
+    dispatch(updateCave(caveData));
+    dispatch(updateEntrance(entranceData));
   };
 };

@@ -2,6 +2,7 @@ import { combineReducers } from 'redux';
 import advancedsearch from './AdvancedsearchReducer';
 import cave from './CaveReducer';
 import cavePost from './CavePostReducer';
+import cavePut from './CavePutReducer';
 import caver from './CaverReducer';
 import caverGroups from './CaverGroupsReducer';
 import changePassword from './ChangePassword';
@@ -16,6 +17,7 @@ import documentType from './DocumentTypeReducer';
 import duplicatesImport from './DuplicatesImportReducer';
 import dynamicNumber from './DynamicNumberReducer';
 import entrancePost from './EntrancePostReducer';
+import entrancePut from './EntrancePutReducer';
 import entry from './EntryReducer';
 import error from './ErrorReducer';
 import fileFormats from './FileFormatsReducer';
@@ -46,6 +48,7 @@ const GCReducer = combineReducers({
   advancedsearch,
   cave,
   cavePost,
+  cavePut,
   caver,
   caverGroups,
   changePassword,
@@ -60,6 +63,7 @@ const GCReducer = combineReducers({
   duplicatesImport,
   dynamicNumber,
   entrancePost,
+  entrancePut,
   entry,
   error,
   fileFormats,
