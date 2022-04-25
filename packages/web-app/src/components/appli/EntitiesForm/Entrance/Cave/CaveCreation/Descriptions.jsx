@@ -30,7 +30,7 @@ const Description = ({ nestIndex, control, remove, errors }) => {
     <Box display="flex" justifyContent="space-between">
       <FullWidthDiv>
         <Controller
-          name={`descriptions.${nestIndex}.title`}
+          name={`cave.descriptions.${nestIndex}.title`}
           control={control}
           rules={{ required: true }}
           render={({ field: { ref, ...field } }) => (
@@ -45,7 +45,7 @@ const Description = ({ nestIndex, control, remove, errors }) => {
           )}
         />
         <Controller
-          name={`descriptions.${nestIndex}.body`}
+          name={`cave.descriptions.${nestIndex}.body`}
           control={control}
           rules={{ required: true }}
           render={({ field: { ref, ...field } }) => (

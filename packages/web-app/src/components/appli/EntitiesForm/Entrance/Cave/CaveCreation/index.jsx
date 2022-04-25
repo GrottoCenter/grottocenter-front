@@ -27,7 +27,7 @@ const CaveCreation = ({ control, errors, allLanguages }) => {
     field: { onChange: onNameChange }
   } = useController({
     control,
-    name: 'name',
+    name: 'cave.name',
     rules: { required: true }
   });
 
@@ -35,14 +35,14 @@ const CaveCreation = ({ control, errors, allLanguages }) => {
     <Section sectionTitle={formatMessage({ id: 'name' })}>
       <Wrapper>
         <Controller
-          name="caveName"
+          name="cave.name"
           control={control}
           rules={{ required: true }}
           render={({ field: { ref, onChange, ...field } }) => (
             <TextField
               fullWidth
               required
-              error={!!errors.name}
+              error={!!errors?.cave?.name}
               label={formatMessage({ id: 'Cave name' })}
               inputRef={ref}
               onChange={event => {
@@ -54,11 +54,11 @@ const CaveCreation = ({ control, errors, allLanguages }) => {
           )}
         />
         <Controller
-          name="language"
+          name="cave.language"
           control={control}
           rules={{ required: true }}
           render={({ field: { ref, ...field } }) => (
-            <FormControl required error={!!errors.language} fullWidth>
+            <FormControl required error={!!errors?.cave?.language} fullWidth>
               <InputLabel shrink>
                 <Translate>Language</Translate>
               </InputLabel>
@@ -96,9 +96,11 @@ CaveCreation.propTypes = {
   ),
   control: PropTypes.shape({}),
   errors: PropTypes.shape({
-    name: PropTypes.shape({ message: PropTypes.string }),
-    language: PropTypes.shape({ message: PropTypes.string }),
-    descriptions: PropTypes.arrayOf(PropTypes.shape({}))
+    cave: PropTypes.shape({
+      descriptions: PropTypes.arrayOf(PropTypes.shape({})),
+      language: PropTypes.shape({ message: PropTypes.string }),
+      name: PropTypes.shape({ message: PropTypes.string })
+    })
   })
 };
 

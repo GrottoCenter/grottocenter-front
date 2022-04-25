@@ -44,39 +44,39 @@ const CaveSelection = ({ control, errors, disabled = false }) => {
     fieldState: { error }
   } = useController({
     control,
-    name: 'caveId',
+    name: 'cave.id',
     rules: { required: true }
   });
   const {
     field: { onChange: onNameChange, value: caveNameValue }
   } = useController({
     control,
-    name: 'caveName',
+    name: 'cave.name',
     rules: { required: true }
   });
   const {
     field: { onChange: onLengthChange }
   } = useController({
     control,
-    name: 'length'
+    name: 'cave.length'
   });
   const {
     field: { onChange: onDepthChange }
   } = useController({
     control,
-    name: 'depth'
+    name: 'cave.depth'
   });
   const {
     field: { onChange: onIsDivingChange }
   } = useController({
     control,
-    name: 'isDiving'
+    name: 'cave.isDiving'
   });
   const {
     field: { onChange: onTemperatureChange }
   } = useController({
     control,
-    name: 'temperature'
+    name: 'cave.temperature'
   });
   const { isLoading, results: suggestions } = useSelector(
     state => state.quicksearch

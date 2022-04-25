@@ -109,9 +109,6 @@ export const Entry = () => {
           title={formatMessage({ id: 'Entrance edition' })}>
           <EntranceForm
             entranceValues={{
-              cave,
-              caveId: cave?.id,
-              caveName: cave?.name,
               country,
               depth,
               id,
@@ -121,6 +118,12 @@ export const Entry = () => {
               length: development,
               longitude: propOr(undefined, 1, position),
               temperature
+            }}
+            caveValues={{
+              ...cave,
+              name: cave && cave.names ? cave.names[0].name : undefined,
+              language: cave && cave.names ? cave.names[0].language : undefined,
+              massif: cave && cave.massif ? cave.massif.id : undefined
             }}
           />
         </StandardDialog>

@@ -1,34 +1,32 @@
-export const makeEntranceData = data => ({
+export const makeEntranceData = (data, creationType) => ({
+  // When creating a cave with a single entrance, the name of the entrance is the same as the cave one, in data.cave
   name: {
-    language: data.language,
-    text: data.name
+    language:
+      creationType === 'entrance' ? data.entrance.language : data.cave.language,
+    text: creationType === 'entrance' ? data.entrance.name : data.cave.name
   },
-  cave: data.caveId,
-  country: data.country,
-  depth: data.depth,
-  isDiving: data.isDiving,
-  length: data.length,
-  longitude: data.longitude,
-  latitude: data.latitude,
-  temperature: data.temperature
+  cave: data.cave.id,
+  country: data.entrance.country,
+  longitude: data.entrance.longitude,
+  latitude: data.entrance.latitude
 });
 
 export const makeCaveData = data => ({
   name: {
-    language: data.language,
-    text: data.caveName
+    language: data.cave.language,
+    text: data.cave.name
   },
-  descriptions: data.descriptions?.map(desc => ({
+  descriptions: data.cave.descriptions?.map(desc => ({
     body: desc.body,
     language: data.language,
     title: desc.title
   })),
-  massif: data.massif,
-  country: data.country,
-  depth: data.depth,
-  isDiving: data.isDiving,
-  length: data.length,
-  longitude: data.longitude,
-  latitude: data.latitude,
-  temperature: data.temperature
+  massif: data.cave.massif,
+  country: data.cave.country,
+  depth: data.cave.depth,
+  isDiving: data.cave.isDiving,
+  length: data.cave.length,
+  longitude: data.cave.longitude,
+  latitude: data.cave.latitude,
+  temperature: data.cave.temperature
 });

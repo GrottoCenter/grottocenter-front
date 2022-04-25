@@ -24,7 +24,9 @@ const Entrance = ({
   creationType
 }) => {
   const { formatMessage } = useIntl();
-  const caveIdValue = useDebounce(useWatch({ control, name: 'caveId' }), 300);
+  const caveIdValue = useDebounce(useWatch({ control, name: 'cave.id' }), 300);
+  // When creating a cave, the entrance get the same name as the cave.
+  const nameInputName = creationType === 'cave' ? 'cave.name' : 'entrance.name';
 
   const validateLatitude = value => {
     if (value > 90 || value < -90) {
@@ -41,14 +43,14 @@ const Entrance = ({
   };
 
   useEffect(() => {
-    setFocus('name');
-  }, [caveIdValue, setFocus]);
+    setFocus(nameInputName);
+  }, [caveIdValue, nameInputName, setFocus]);
 
   return (
     <Section sectionTitle={formatMessage({ id: 'Entrance information' })}>
       <Box display="flex" justifyContent="space-between">
         <Controller
-          name="name"
+          name={nameInputName}
           control={control}
           rules={{ required: true }}
           render={({ field: { ref, ...field } }) => (
@@ -56,7 +58,7 @@ const Entrance = ({
               disabled={creationType !== 'entrance'}
               fullWidth
               required
-              error={!!errors.name}
+              error={!!errors?.entrance?.name}
               label={formatMessage({ id: 'Entrance name' })}
               inputRef={ref}
               {...field}
@@ -65,11 +67,14 @@ const Entrance = ({
         />
         {creationType === 'entrance' && (
           <Controller
-            name="language"
+            name="entrance.language"
             control={control}
             rules={{ required: true }}
             render={({ field: { ref, ...field } }) => (
-              <FormControl required error={!!errors.language} fullWidth>
+              <FormControl
+                required
+                error={!!errors?.entrance?.language}
+                fullWidth>
                 <InputLabel shrink>
                   <Translate>Language</Translate>
                 </InputLabel>
@@ -95,8 +100,7 @@ const Entrance = ({
       </Box>
       <Box display="flex" justifyContent="space-between">
         <Controller
-          defaultValue={0}
-          name="longitude"
+          name="entrance.longitude"
           control={control}
           rules={{
             required: true,
@@ -104,15 +108,14 @@ const Entrance = ({
           }}
           render={({ field: { ref, ...field } }) => (
             <TextField
-              key="longitude"
               fullWidth
               autoFocus
               required
               label={formatMessage({ id: 'Longitude' })}
               type="number"
-              error={!!errors.longitude}
+              error={!!errors?.entrance?.longitude}
               inputRef={ref}
-              helperText={errors.longitude?.message}
+              helperText={errors?.entrance?.longitude?.message}
               {...field}
               onChange={e => field.onChange(Number(e.target.value))}
               value={field.value}
@@ -120,8 +123,7 @@ const Entrance = ({
           )}
         />
         <Controller
-          defaultValue={0}
-          name="latitude"
+          name="entrance.latitude"
           control={control}
           rules={{
             required: true,
@@ -129,14 +131,13 @@ const Entrance = ({
           }}
           render={({ field: { ref, ...field } }) => (
             <TextField
-              key="latitude"
               fullWidth
               required
               label={formatMessage({ id: 'Latitude' })}
               type="number"
-              error={!!errors.latitude}
+              error={!!errors?.entrance?.latitude}
               inputRef={ref}
-              helperText={errors.latitude?.message}
+              helperText={errors?.entrance?.latitude?.message}
               {...field}
               onChange={e => field.onChange(Number(e.target.value))}
             />
@@ -151,10 +152,12 @@ const Entrance = ({
 
 Entrance.propTypes = {
   errors: PropTypes.shape({
-    latitude: PropTypes.shape({ message: PropTypes.string }),
-    longitude: PropTypes.shape({ message: PropTypes.string }),
-    language: PropTypes.shape({ message: PropTypes.string }),
-    name: PropTypes.shape({ message: PropTypes.string })
+    entrance: PropTypes.shape({
+      latitude: PropTypes.shape({ message: PropTypes.string }),
+      longitude: PropTypes.shape({ message: PropTypes.string }),
+      language: PropTypes.shape({ message: PropTypes.string }),
+      name: PropTypes.shape({ message: PropTypes.string })
+    })
   }),
   control: PropTypes.shape({}),
   allLanguages: PropTypes.arrayOf(
