@@ -93,8 +93,10 @@ export const detailsType = PropTypes.shape({
   accessRate: PropTypes.number,
   altitude: PropTypes.number,
   author: authorType,
-  caveId: PropTypes.number,
-  caveName: PropTypes.string,
+  cave: PropTypes.shape({
+    id: PropTypes.number.isRequired,
+    name: PropTypes.string.isRequired
+  }),
   coordinates: PropTypes.arrayOf(PropTypes.number),
   country: PropTypes.string,
   creationDate: PropTypes.instanceOf(Date),

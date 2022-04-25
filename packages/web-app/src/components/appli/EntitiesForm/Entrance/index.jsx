@@ -37,17 +37,15 @@ const Button = styled(MuiButton)`
 `;
 
 const defaultCaveValues = {
-  language: 'fra',
+  language: '',
   name: '',
-  latitude: undefined,
-  longitude: undefined,
   descriptions: undefined,
   isDiving: undefined,
   depth: null,
   length: null,
   temperature: null,
   massif: undefined,
-  country: 'FR'
+  country: ''
 };
 
 const defaultEntranceValues = {
@@ -55,13 +53,13 @@ const defaultEntranceValues = {
   description: '',
   descriptionTitle: '',
   language: 'fra',
-  caveId: null,
-  caveName: null,
+  latitude: '',
+  longitude: '',
   country: 'FR'
 };
 
-export const EntranceForm = ({ entranceValues = null }) => {
-  const isNewEntrance = entranceValues === null;
+export const EntranceForm = ({ caveValues = null, entranceValues = null }) => {
+  const isNewEntrance = entranceValues === null || caveValues === null;
   const { latitude, longitude } = useGeolocation();
   const { formatMessage } = useIntl();
   const { languages: allLanguages } = useSelector(state => state.language);
@@ -76,9 +74,10 @@ export const EntranceForm = ({ entranceValues = null }) => {
   );
   const dispatch = useDispatch();
   const creationTypeInitialValue = useMemo(() => {
-    return entranceValues.cave.entrances.length > 1 ? 'entrance' : 'cave';
-  }, [entranceValues.cave.entrances.length]);
+    return caveValues?.entrances.length > 1 ? 'entrance' : 'cave';
+  }, [caveValues?.entrances.length]);
   const [creationType, setCreationType] = useState(creationTypeInitialValue);
+
   const {
     handleSubmit,
     reset,
@@ -88,14 +87,10 @@ export const EntranceForm = ({ entranceValues = null }) => {
     setFocus,
     formState: { errors, isDirty, isSubmitting, isSubmitSuccessful }
   } = useForm({
-    defaultValues:
-      entranceValues ||
-      (creationType === 'cave'
-        ? { ...defaultCaveValues }
-        : { ...defaultEntranceValues } && {
-            latitude,
-            longitude
-          })
+    defaultValues: {
+      entrance: entranceValues || defaultEntranceValues,
+      cave: caveValues || defaultCaveValues
+    }
   });
 
   const [activeStep, setActiveStep] = useState(0);
@@ -106,17 +101,25 @@ export const EntranceForm = ({ entranceValues = null }) => {
   // TODO set country from position
   useEffect(() => {
     if (isNil(entranceValues?.latitude) || isNil(entranceValues?.longitude)) {
-      reset({ ...getValues(), latitude, longitude });
+      const values = getValues();
+      reset({
+        ...values,
+        entrance: {
+          ...values.entrance,
+          latitude,
+          longitude
+        }
+      });
     }
   }, [entranceValues, getValues, latitude, longitude, reset]);
 
   const handleUpdateCreationType = type => {
     setCreationType(type);
-    reset({ ...getValues(), latitude, longitude });
+    reset({ ...getValues() });
   };
 
   const handleReset = useCallback(() => {
-    reset(defaultEntranceValues);
+    reset({ cave: defaultCaveValues, entrance: defaultEntranceValues });
     stepExpanded.close();
     setActiveStep(0);
   }, [reset, stepExpanded]);
@@ -152,18 +155,23 @@ export const EntranceForm = ({ entranceValues = null }) => {
   const handleNext = async () => {
     const result = await trigger(
       [
-        'name',
-        'caveId',
-        'caveName',
-        'country',
-        'depth',
-        'descriptions',
-        'isDiving',
-        'language',
-        'latitude',
-        'length',
-        'longitude',
-        'temperature'
+        'cave.country',
+        'cave.depth',
+        'cave.descriptions',
+        'cave.id',
+        'cave.isDiving',
+        'cave.language',
+        'cave.length',
+        'cave.massif',
+        'cave.name',
+        'cave.temperature',
+        'entrance.country',
+        'entrance.description',
+        'entrance.descriptionTitle',
+        'entrance.name',
+        'entrance.language',
+        'entrance.latitude',
+        'entrance.longitude'
       ],
       { shouldFocus: true }
     );
@@ -181,8 +189,14 @@ export const EntranceForm = ({ entranceValues = null }) => {
   };
 
   const onSubmit = async data => {
-    const caveData = { ...makeCaveData(data), id: entranceValues?.cave.id };
-    const entranceData = { ...makeEntranceData(data), id: entranceValues?.id };
+    const caveData = {
+      ...makeCaveData(data),
+      id: caveValues?.id
+    };
+    const entranceData = {
+      ...makeEntranceData(data, creationType),
+      id: entranceValues?.id
+    };
     if (isNewEntrance) {
       if (creationType === 'cave') {
         dispatch(postCaveAndEntrance(caveData, entranceData));
@@ -307,7 +321,11 @@ EntranceForm.propTypes = {
     descriptionTitle: PropTypes.string,
     language: PropTypes.string,
     latitude: PropTypes.number,
-    longitude: PropTypes.number,
+    longitude: PropTypes.number
+  }),
+  caveValues: PropTypes.shape({
+    name: PropTypes.string,
+    language: PropTypes.string,
     isDiving: PropTypes.bool,
     depth: PropTypes.number,
     length: PropTypes.number

@@ -28,7 +28,7 @@ export const CountrySelection = ({ control }) => {
         rules={{
           required: true
         }}
-        name="country"
+        name="entrance.country"
         control={control}
         render={({ field }) => (
           <Select {...field} fullWidth required>
@@ -46,11 +46,11 @@ export const CountrySelection = ({ control }) => {
 
 export const PositionMap = ({ control }) => {
   const debouncedLatitude = useDebounce(
-    useWatch({ control, name: 'latitude' }),
+    useWatch({ control, name: 'entrance.latitude' }),
     300
   );
   const debouncedLongitude = useDebounce(
-    useWatch({ control, name: 'longitude' }),
+    useWatch({ control, name: 'entrance.longitude' }),
     300
   );
   const validPosition = isValidPositions([

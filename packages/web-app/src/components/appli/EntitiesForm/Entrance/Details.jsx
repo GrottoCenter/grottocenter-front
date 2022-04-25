@@ -41,7 +41,7 @@ const Details = ({ control, errors, isReadonly = false }) => {
     <Section sectionTitle={formatMessage({ id: 'details' })}>
       <Box display="flex" justifyContent="space-between">
         <Controller
-          name="depth"
+          name="cave.depth"
           control={control}
           rules={{ valueAsNumber: true, validate: validateDistance }}
           render={({ field: { ref, ...field } }) => (
@@ -64,7 +64,7 @@ const Details = ({ control, errors, isReadonly = false }) => {
           )}
         />
         <Controller
-          name="length"
+          name="cave.length"
           control={control}
           rules={{ valueAsNumber: true, validate: validateDistance }}
           render={({ field: { ref, ...field } }) => (
@@ -86,7 +86,7 @@ const Details = ({ control, errors, isReadonly = false }) => {
           )}
         />
         <Controller
-          name="temperature"
+          name="cave.temperature"
           control={control}
           rules={{
             valueAsNumber: true,
@@ -113,7 +113,7 @@ const Details = ({ control, errors, isReadonly = false }) => {
       </Box>
 
       <Controller
-        name="isDiving"
+        name="cave.isDiving"
         control={control}
         defaultValue={false}
         render={({ field: { ref, ...field } }) => (
