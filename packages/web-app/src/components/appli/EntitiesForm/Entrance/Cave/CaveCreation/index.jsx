@@ -43,7 +43,7 @@ const CaveCreation = ({ control, errors, allLanguages }) => {
               fullWidth
               required
               error={!!errors?.cave?.name}
-              label={formatMessage({ id: 'Cave name' })}
+              label={formatMessage({ id: 'Cave (and entrance) name' })}
               inputRef={ref}
               onChange={event => {
                 onChange(event.target.value);
