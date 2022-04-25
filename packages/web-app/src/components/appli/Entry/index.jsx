@@ -116,14 +116,14 @@ export const Entry = () => {
               language,
               latitude: propOr(undefined, 0, position),
               length: development,
-              longitude: propOr(undefined, 1, position),
-              temperature
+              longitude: propOr(undefined, 1, position)
             }}
             caveValues={{
               ...cave,
               name: cave && cave.names ? cave.names[0].name : undefined,
               language: cave && cave.names ? cave.names[0].language : undefined,
-              massif: cave && cave.massif ? cave.massif.id : undefined
+              massif: cave && cave.massif ? cave.massif.id : undefined,
+              temperature
             }}
           />
         </StandardDialog>

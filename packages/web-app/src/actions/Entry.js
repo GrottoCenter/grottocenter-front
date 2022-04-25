@@ -32,6 +32,11 @@ export const postEntranceFailure = (error, httpCode) => ({
 export const UPDATE_ENTRANCE_SUCCESS = 'UPDATE_ENTRANCE_SUCCESS';
 export const UPDATE_ENTRANCE = 'UPDATE_ENTRANCE';
 export const UPDATE_ENTRANCE_ERROR = 'UPDATE_ENTRANCE_ERROR';
+export const updateEntranceFailure = (error, httpCode) => ({
+  type: UPDATE_ENTRANCE_ERROR,
+  error,
+  httpCode
+});
 
 export const CREATE_ENTRY_SUCCESS = 'CREATE_ENTRY_SUCCESS';
 export const CREATE_ENTRY_LOADING = 'CREATE_ENTRY_LOADING';
@@ -180,19 +185,24 @@ export const updateEntrance = entryData => (dispatch, getState) => {
   };
 
   return fetch(putEntranceUrl(entryData.id), requestOptions)
-    .then(checkStatus)
-    .then(result => {
+    .then(response => {
+      if (response.status >= 400) {
+        throw new Error(response.status);
+      } else {
+        return response;
+      }
+    })
+    .then(response => {
       dispatch({
         type: UPDATE_ENTRANCE_SUCCESS,
-        httpCode: result.status
+        httpCode: response.status
       });
     })
     .catch(error => {
-      dispatch({
-        type: UPDATE_ENTRANCE_ERROR,
-        error: error.message,
-        httpCode: error.status
-      });
+      const errorCode = Number(error.message);
+      dispatch(
+        updateEntranceFailure(makeErrorMessage(errorCode, `Update entrance`))
+      );
     });
 };
 
