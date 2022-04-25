@@ -100,6 +100,28 @@ const Entrance = ({
       </Box>
       <Box display="flex" justifyContent="space-between">
         <Controller
+          name="entrance.latitude"
+          control={control}
+          rules={{
+            required: true,
+            validate: validateLatitude
+          }}
+          render={({ field: { ref, ...field } }) => (
+            <TextField
+              fullWidth
+              required
+              label={formatMessage({ id: 'Latitude' })}
+              type="number"
+              error={!!errors?.entrance?.latitude}
+              inputRef={ref}
+              helperText={errors?.entrance?.latitude?.message}
+              {...field}
+              onChange={e => field.onChange(Number(e.target.value))}
+            />
+          )}
+        />
+
+        <Controller
           name="entrance.longitude"
           control={control}
           rules={{
@@ -122,27 +144,7 @@ const Entrance = ({
             />
           )}
         />
-        <Controller
-          name="entrance.latitude"
-          control={control}
-          rules={{
-            required: true,
-            validate: validateLatitude
-          }}
-          render={({ field: { ref, ...field } }) => (
-            <TextField
-              fullWidth
-              required
-              label={formatMessage({ id: 'Latitude' })}
-              type="number"
-              error={!!errors?.entrance?.latitude}
-              inputRef={ref}
-              helperText={errors?.entrance?.latitude?.message}
-              {...field}
-              onChange={e => field.onChange(Number(e.target.value))}
-            />
-          )}
-        />
+
         <CountrySelection control={control} />
       </Box>
       <PositionMap control={control} />
