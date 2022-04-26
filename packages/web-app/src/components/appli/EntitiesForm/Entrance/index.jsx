@@ -16,7 +16,7 @@ import {
 import Icon from '@material-ui/core/Icon';
 import styled from 'styled-components';
 import { useDispatch, useSelector } from 'react-redux';
-import useGeolocation from 'react-hook-geolocation';
+import { useGeolocation } from 'rooks';
 
 import { useBoolean } from '../../../../hooks';
 import ActionButton from '../../../common/ActionButton';
@@ -61,7 +61,10 @@ const defaultEntranceValues = {
 
 export const EntranceForm = ({ caveValues = null, entranceValues = null }) => {
   const isNewEntrance = entranceValues === null || caveValues === null;
-  const { latitude, longitude } = useGeolocation();
+  const geolocation = useGeolocation();
+  const latitude = geolocation?.lat;
+  const longitude = geolocation?.lng;
+
   const { formatMessage } = useIntl();
   const { languages: allLanguages } = useSelector(state => state.language);
   const {
