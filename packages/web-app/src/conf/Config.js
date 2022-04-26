@@ -35,7 +35,7 @@ export const AVAILABLE_LANGUAGES = {
     part1: 'pt',
     refName: 'Portuguese'
   },
-  ro: { nativeName: 'R<omână', id: 'ron', part1: 'ro', refName: 'Romanian' }
+  ro: { nativeName: 'Română', id: 'ron', part1: 'ro', refName: 'Romanian' }
 };
 
 export const DEFAULT_LANGUAGE = AVAILABLE_LANGUAGES.en;
@@ -100,6 +100,11 @@ export const contactLinks = {
 export const fseLinks = {
   fr: 'http://eurospeleo.eu/fr/',
   '*': 'http://eurospeleo.eu/en/'
+};
+
+export const userguideLinks = {
+  fr: 'https://wiki.grottocenter.org/wiki/GrottoCenter:Fr/User_Guide',
+  '*': 'https://wiki.grottocenter.org/wiki/GrottoCenter:En/User_Guide'
 };
 
 export const wikiBatsLinks = generateLinks(
