@@ -3,7 +3,12 @@ import styled from 'styled-components';
 import { withTheme } from '@material-ui/core/styles';
 import GCLink from '../../components/common/GCLink';
 import InternationalizedLink from '../../components/common/InternationalizedLink';
-import { contactLinks, legalLinks, contributorsLink } from '../../conf/Config';
+import {
+  contactLinks,
+  legalLinks,
+  contributorsLink,
+  userguideLinks
+} from '../../conf/Config';
 import Translate from '../../components/common/Translate';
 
 const FooterLinksList = styled.ul`
@@ -38,6 +43,11 @@ const FooterLinks = () => (
       <SocialGCLink internal href="/ui/faq">
         <Translate>FAQ</Translate>
       </SocialGCLink>
+    </FooterLinksLi>
+    <FooterLinksLi>
+      <SocialIntlLink links={userguideLinks}>
+        <Translate>User guide</Translate>
+      </SocialIntlLink>
     </FooterLinksLi>
     <FooterLinksLi>
       <SocialIntlLink links={contributorsLink}>
