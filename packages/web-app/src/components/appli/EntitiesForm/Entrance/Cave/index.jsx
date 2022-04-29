@@ -13,6 +13,7 @@ import styled from 'styled-components';
 import CaveSelection from './CaveSelection';
 import CaveCreation from './CaveCreation';
 import { ENTRANCE_ONLY, ENTRANCE_AND_CAVE } from '../caveType';
+import PolygonMap from '../../Massif/PolygonMap/Polygon';
 
 const FormControl = styled(MuiFormControl)`
   padding-bottom: ${({ theme }) => theme.spacing(4)}px;
@@ -40,6 +41,7 @@ const Cave = ({
         <FormLabel component="legend">
           {formatMessage({ id: 'The cave is:' })}
         </FormLabel>
+        <PolygonMap />
         <RadioGroup
           aria-label="entityType"
           name="entityType"
