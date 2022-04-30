@@ -24,6 +24,7 @@ import Alert from '../../../common/Alert';
 import { postMassif, updateMassif } from '../../../../actions/Massif';
 
 import Massif from './Massif';
+import PolygonMap from './PolygonMap/Polygon';
 //import PolygonMap from './PolygonMap/Polygon';
 
 const Button = styled(MuiButton)`
@@ -84,16 +85,10 @@ export const MassifForm = ({ massifValues = null }) => {
         errors={errors}
         reset={handleReset}
       />
-    ) /*
-    maps: (
-      <Entrance
-        control={control}
-        allLanguages={allLanguages}
-        errors={errors}
-        setFocus={setFocus}
-        entityType={entityType}
-      />
     ),
+    maps: (
+      <PolygonMap />
+    ) /*
     details: (
       <Details
         control={control}

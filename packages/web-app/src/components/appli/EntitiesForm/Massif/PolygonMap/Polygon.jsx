@@ -8,7 +8,10 @@ import 'leaflet/dist/leaflet.css';
 import 'leaflet-draw/dist/leaflet.draw.css';
 
 const PolygonMap = () => {
-  const [center, setCenter] = useState({ lat: 24.4539, lng: 54.3773 });
+  const [center, setCenter] = useState({
+    lat: 44,
+    lng: 3
+  });
   const [mapLayers, setMapLayers] = useState([]);
 
   const ZOOM_LEVEL = 12;
@@ -78,7 +81,7 @@ const PolygonMap = () => {
     <>
       <div className="row">
         <div className="col text-center">
-          <h2>React-leaflet - Create, edit and delete polygon on map</h2>
+          <h2>Create, edit and delete massif polygon the map</h2>
 
           <div className="col">
             <MapContainer
@@ -101,7 +104,6 @@ const PolygonMap = () => {
                   }}
                 />
               </FeatureGroup>
-
               <TileLayer
                 url={osm.maptiler.url}
                 attribution={osm.maptiler.attribution}
