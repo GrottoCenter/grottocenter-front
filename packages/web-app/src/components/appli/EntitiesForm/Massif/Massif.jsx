@@ -30,98 +30,96 @@ const Massif = ({ control, errors, allLanguages, reset, disabled = false }) => {
     <div>
       <FormControl component="fieldset" disabled={disabled}>
         <FormLabel component="legend">
-          {formatMessage({ id: 'The massif is:' })}
+          {formatMessage({ id: 'Basics Informations' })}
         </FormLabel>
         <Section sectionTitle={formatMessage({ id: 'name' })}>
-          <Wrapper>
-            <Controller
-              name="massif.name"
-              control={control}
-              rules={{ required: true }}
-              render={({ field: { ref, onChange, ...field } }) => (
-                <TextField
-                  fullWidth
-                  required
-                  error={!!errors?.massif?.name}
-                  label={formatMessage({ id: 'Massif name' })}
-                  inputRef={ref}
-                  onChange={event => {
-                    onChange(event.target.value);
-                    //   onNameChange(event.target.value);
-                  }}
-                  {...field}
-                />
-              )}
-            />
-            <Controller
-              name="massif.description"
-              control={control}
-              rules={{ required: true }}
-              render={({ field: { ref, onChange, ...field } }) => (
-                <TextField
-                  fullWidth
-                  required
-                  error={!!errors?.massif?.description}
-                  label={formatMessage({ id: 'Massif description' })}
-                  inputRef={ref}
-                  onChange={event => {
-                    onChange(event.target.value);
-                    //onNameChange(event.target.value);
-                  }}
-                  {...field}
-                />
-              )}
-            />
-            <Controller
-              name="massif.descriptionTitle"
-              control={control}
-              rules={{ required: true }}
-              render={({ field: { ref, onChange, ...field } }) => (
-                <TextField
-                  fullWidth
-                  required
-                  error={!!errors?.massif?.descriptionTitle}
-                  label={formatMessage({ id: 'Massif title description' })}
-                  inputRef={ref}
-                  onChange={event => {
-                    onChange(event.target.value);
-                    // onNameChange(event.target.value);
-                  }}
-                  {...field}
-                />
-              )}
-            />
-            <Controller
-              name="cave.language"
-              control={control}
-              rules={{ required: true }}
-              render={({ field: { ref, ...field } }) => (
-                <FormControl
-                  required
-                  error={!!errors?.massif?.language}
-                  fullWidth>
-                  <InputLabel shrink>
-                    <Translate>Language</Translate>
-                  </InputLabel>
-                  <Select {...field} inputRef={ref}>
-                    <MenuItem key={-1} value={-1} disabled>
-                      <i>
-                        <Translate>Select a language</Translate>
-                      </i>
+          <Controller
+            name="massif.name"
+            control={control}
+            rules={{ required: true }}
+            render={({ field: { ref, onChange, ...field } }) => (
+              <TextField
+                fullWidth
+                required
+                error={!!errors?.massif?.name}
+                label={formatMessage({ id: 'Massif name' })}
+                inputRef={ref}
+                onChange={event => {
+                  onChange(event.target.value);
+                  //   onNameChange(event.target.value);
+                }}
+                {...field}
+              />
+            )}
+          />
+          <Controller
+            name="massif.description"
+            control={control}
+            rules={{ required: true }}
+            render={({ field: { ref, onChange, ...field } }) => (
+              <TextField
+                fullWidth
+                required
+                error={!!errors?.massif?.description}
+                label={formatMessage({ id: 'Massif description' })}
+                inputRef={ref}
+                onChange={event => {
+                  onChange(event.target.value);
+                  //onNameChange(event.target.value);
+                }}
+                {...field}
+              />
+            )}
+          />
+          <Controller
+            name="massif.descriptionTitle"
+            control={control}
+            rules={{ required: true }}
+            render={({ field: { ref, onChange, ...field } }) => (
+              <TextField
+                fullWidth
+                required
+                error={!!errors?.massif?.descriptionTitle}
+                label={formatMessage({ id: 'Massif title description' })}
+                inputRef={ref}
+                onChange={event => {
+                  onChange(event.target.value);
+                  // onNameChange(event.target.value);
+                }}
+                {...field}
+              />
+            )}
+          />
+          <Controller
+            name="cave.language"
+            control={control}
+            rules={{ required: true }}
+            render={({ field: { ref, ...field } }) => (
+              <FormControl
+                required
+                error={!!errors?.massif?.language}
+                fullWidth>
+                <InputLabel shrink>
+                  <Translate>Language</Translate>
+                </InputLabel>
+                <Select {...field} inputRef={ref}>
+                  <MenuItem key={-1} value={-1} disabled>
+                    <i>
+                      <Translate>Select a language</Translate>
+                    </i>
+                  </MenuItem>
+                  {allLanguages.map(l => (
+                    <MenuItem key={l.id} value={l.id} name={l.refName}>
+                      <Translate>{l.refName}</Translate>
                     </MenuItem>
-                    {allLanguages.map(l => (
-                      <MenuItem key={l.id} value={l.id} name={l.refName}>
-                        <Translate>{l.refName}</Translate>
-                      </MenuItem>
-                    ))}
-                  </Select>
-                  <FormHelperText>
-                    <Translate>Cave name language</Translate>
-                  </FormHelperText>
-                </FormControl>
-              )}
-            />
-          </Wrapper>
+                  ))}
+                </Select>
+                <FormHelperText>
+                  <Translate>Cave name language</Translate>
+                </FormHelperText>
+              </FormControl>
+            )}
+          />
           {/* TODO HANDLE LOCATION FOR DESCRIPTION MULTIPLE FIELD (LOCATION) */}
           {/* <Descriptions control={control} errors={errors} /> */}
         </Section>
