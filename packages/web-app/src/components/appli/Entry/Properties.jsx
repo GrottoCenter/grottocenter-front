@@ -12,6 +12,7 @@ import {
   Title,
   Waves
 } from '@material-ui/icons';
+import Alert from '../../common/Alert';
 import CustomIcon from '../../common/CustomIcon';
 import { Property } from '../../common/Properties';
 import { EntryContext, isValidCoordinates } from './Provider';
@@ -27,6 +28,12 @@ const SmallRatingsWrapper = styled.div`
   transform: scale(0.85);
 `;
 
+const computePrecisionSeverity = precision => {
+  if (precision === undefined || precision === null) return 'warning';
+  if (precision === 0) return 'error';
+  return 'success';
+};
+
 const Properties = () => {
   const {
     state: {
@@ -41,6 +48,7 @@ const Properties = () => {
         isDivingCave,
         localisation,
         massif,
+        precision,
         progressionRate,
         temperature,
         undergroundType
@@ -57,6 +65,29 @@ const Properties = () => {
       4
     )} °E`;
 
+  const precisionSeverity = computePrecisionSeverity(precision);
+
+  let precisionText = '';
+  if (precision === 0)
+    precisionText = formatMessage({
+      id: 'Coordinates precision unavailable for restricted access entrance.'
+    });
+  else if (precision === undefined || precision === null)
+    precisionText = formatMessage({
+      id: 'Coordinates precision unknown.'
+    });
+  else {
+    precisionText = formatMessage(
+      {
+        id: 'Coordinates precision: ±{precision}m',
+        defaultMessage: 'Coordinates precision: ±{precision}m'
+      },
+      {
+        precision
+      }
+    );
+  }
+
   return (
     <GlobalWrapper>
       <Box display="flex" flexDirection="column">
@@ -68,6 +99,7 @@ const Properties = () => {
             icon={<GpsFixed fontSize="large" color="primary" />}
           />
         )}
+        <Alert severity={precisionSeverity} content={precisionText} />
         <Property
           loading={loading}
           label={formatMessage({ id: 'Localisation' })}

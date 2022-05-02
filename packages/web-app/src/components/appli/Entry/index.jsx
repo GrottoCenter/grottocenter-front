@@ -27,13 +27,18 @@ import Histories from './Histories';
 import { useBoolean, usePermissions } from '../../../hooks';
 import StandardDialog from '../../common/StandardDialog';
 import { EntranceForm } from '../EntitiesForm';
+import SensitiveCaveWarning from './SensitiveCaveWarning';
 
-const EntryProperties = () => (
+const EntryProperties = ({ isSensitive }) => (
   <>
+    {isSensitive && <SensitiveCaveWarning />}
     <EntryMap />
     <Properties />
   </>
 );
+EntryProperties.propTypes = {
+  isSensitive: PropTypes.bool.isRequired
+};
 
 export const Entry = () => {
   const { formatMessage, formatDate } = useIntl();
@@ -48,6 +53,7 @@ export const Entry = () => {
         development,
         editionDate,
         id,
+        isSensitive,
         language,
         lastEditor,
         name,
@@ -88,12 +94,18 @@ export const Entry = () => {
       fixedContent={
         <FixedContent
           title={name || ''}
-          content={<EntryProperties />}
+          content={<EntryProperties isSensitive={isSensitive} />}
           footer={footer}
           icon={<CustomIcon type="entry" />}
         />
       }>
-      {id && <Locations locations={locations} entranceId={id} />}
+      {id && (
+        <Locations
+          locations={locations}
+          entranceId={id}
+          isSensitive={isSensitive}
+        />
+      )}
       {!isEmpty(descriptions) && <Descriptions descriptions={descriptions} />}
       {!isEmpty(riggings) && <Riggings riggings={riggings} />}
       {!isEmpty(documents) && <Documents documents={documents} />}

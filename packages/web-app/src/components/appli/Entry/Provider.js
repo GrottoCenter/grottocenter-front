@@ -104,6 +104,7 @@ export const detailsType = PropTypes.shape({
   id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
   interestRate: PropTypes.number,
   isDivingCave: PropTypes.bool,
+  isSensitive: PropTypes.bool,
   lastEditor: PropTypes.string,
   localisation: PropTypes.string,
   massif: PropTypes.shape({

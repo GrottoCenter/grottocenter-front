@@ -14,7 +14,7 @@ import { postLocation } from '../../../../actions/CreateLocation';
 import { usePermissions } from '../../../../hooks';
 import Alert from '../../../common/Alert';
 
-const Locations = ({ entranceId, locations }) => {
+const Locations = ({ entranceId, locations, isSensitive }) => {
   const { formatMessage } = useIntl();
   const permissions = usePermissions();
   const dispatch = useDispatch();
@@ -64,9 +64,11 @@ const Locations = ({ entranceId, locations }) => {
             </List>
           ) : (
             <Alert
-              severity="info"
-              title={formatMessage({
-                id: 'There is currently no location for this entrance.'
+              severity={isSensitive ? 'warning' : 'info'}
+              content={formatMessage({
+                id: isSensitive
+                  ? 'This entrance has a restricted access, you can not see its locations.'
+                  : 'There is currently no location for this entrance.'
               })}
             />
           )}
@@ -78,7 +80,8 @@ const Locations = ({ entranceId, locations }) => {
 
 Locations.propTypes = {
   entranceId: PropTypes.number.isRequired,
-  locations: locationsType
+  locations: locationsType,
+  isSensitive: PropTypes.bool
 };
 
 export default Locations;
