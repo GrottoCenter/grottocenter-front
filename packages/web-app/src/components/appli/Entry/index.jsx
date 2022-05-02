@@ -124,6 +124,7 @@ export const Entry = () => {
               country,
               depth,
               id,
+              isSensitive,
               name,
               language,
               latitude: propOr(undefined, 0, position),
