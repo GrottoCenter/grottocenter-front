@@ -4,24 +4,36 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 const StyledAlert = styled(MuiAlert)`
-  margin-top: ${({ theme }) => theme.spacing(2)}px;
-  margin-bottom: ${({ theme }) => theme.spacing(2)}px;
+  margin-top: ${({ theme, disableMargins }) =>
+    !disableMargins && `${theme.spacing(2)}px`};
+  margin-bottom: ${({ theme, disableMargins }) =>
+    !disableMargins && `${theme.spacing(2)}px`};
 `;
 
-const Alert = ({ title, content, severity, icon, variant, action }) => {
+const Alert = ({
+  title,
+  content,
+  severity,
+  icon,
+  variant,
+  action,
+  disableMargins = false
+}) => {
   return (
     <StyledAlert
+      disableMargins={disableMargins}
       severity={severity}
       icon={icon}
       variant={variant}
       action={action}>
-      {title && <AlertTitle>{title}</AlertTitle>}
+      {title && <AlertTitle style={{ fontWeight: 'bold' }}>{title}</AlertTitle>}
       {content}
     </StyledAlert>
   );
 };
 
 Alert.propTypes = {
+  disableMargins: PropTypes.bool,
   title: PropTypes.string,
   content: PropTypes.node,
   severity: PropTypes.oneOf(['error', 'success', 'info', 'warning']),
