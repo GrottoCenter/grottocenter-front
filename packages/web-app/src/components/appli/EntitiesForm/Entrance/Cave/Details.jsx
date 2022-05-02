@@ -10,14 +10,9 @@ import {
 import React from 'react';
 import { Controller } from 'react-hook-form';
 import { useIntl } from 'react-intl';
-import styled from 'styled-components';
 import PropTypes from 'prop-types';
 import Section from '../../FormSection';
 import Translate from '../../../../common/Translate';
-
-const StyledFormControl = styled(FormControl)`
-  margin-top: ${({ theme }) => theme.spacing(2)}px;
-`;
 
 const Details = ({ control, errors, isReadonly = false }) => {
   const { formatMessage } = useIntl();
@@ -117,7 +112,8 @@ const Details = ({ control, errors, isReadonly = false }) => {
         control={control}
         defaultValue={false}
         render={({ field: { ref, ...field } }) => (
-          <StyledFormControl
+          <FormControl
+            margin="dense"
             disabled={isReadonly}
             component="fieldset"
             error={!!errors.isDiving}>
@@ -139,7 +135,7 @@ const Details = ({ control, errors, isReadonly = false }) => {
                   : formatMessage({ id: 'False' })
               }
             />
-          </StyledFormControl>
+          </FormControl>
         )}
       />
     </Section>

@@ -53,6 +53,7 @@ const defaultEntranceValues = {
   name: '',
   description: '',
   descriptionTitle: '',
+  isSensitive: false,
   language: 'fra',
   latitude: '',
   longitude: '',
@@ -144,11 +145,12 @@ export const EntranceForm = ({ caveValues = null, entranceValues = null }) => {
     ),
     entrance: (
       <Entrance
-        control={control}
         allLanguages={allLanguages}
-        errors={errors}
-        setFocus={setFocus}
+        control={control}
         entityType={entityType}
+        errors={errors}
+        getValues={getValues}
+        setFocus={setFocus}
       />
     ),
     details: (
@@ -250,7 +252,7 @@ export const EntranceForm = ({ caveValues = null, entranceValues = null }) => {
         <form>
           <Alert
             severity="success"
-            title={formatMessage({
+            content={formatMessage({
               id: isNewEntrance
                 ? 'Entrance successfully created!'
                 : 'Entrance successfully updated!'

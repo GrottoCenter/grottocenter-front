@@ -11,6 +11,7 @@ export const makeEntranceData = (data, entityType) => ({
   },
   cave: data.cave.id,
   country: data.entrance.country,
+  isSensitive: data.entrance.isSensitive,
   longitude: data.entrance.longitude,
   latitude: data.entrance.latitude
 });
