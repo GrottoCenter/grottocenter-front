@@ -77,7 +77,7 @@ export const MassifForm = ({ massifValues = null }) => {
   }, [reset, stepExpanded]);
 
   const steps = {
-    massif: (
+    /* massif: (
       <Massif
         allLanguages={allLanguages}
         control={control}
@@ -85,17 +85,10 @@ export const MassifForm = ({ massifValues = null }) => {
         errors={errors}
         reset={handleReset}
       />
-    ),
-    maps: (
-      <PolygonMap />
-    ) /*
-    details: (
-      <Details
-        control={control}
-        errors={errors}
-        isReadonly={!isNewEntrance && entityType === ENTRANCE_ONLY}
-      />
-    )*/
+    ),*/
+    location: (
+      <PolygonMap control={control} errors={errors} reset={handleReset} />
+    )
   };
   const stepKeys = keys(steps);
 
@@ -105,7 +98,8 @@ export const MassifForm = ({ massifValues = null }) => {
         'massif.description',
         'massif.descriptionTitle',
         'massif.name',
-        'massif.language'
+        'massif.language',
+        'massif.geogPolygon'
       ],
       { shouldFocus: true }
     );
@@ -123,26 +117,7 @@ export const MassifForm = ({ massifValues = null }) => {
   };
 
   const onSubmit = async data => {
-    /*
-    const Data = {
-      ...makeCaveData(data),
-      id: caveValues?.id
-    };
-    const entranceData = {
-      ...makeEntranceData(data, entityType),
-      id: entranceValues?.id
-    };
-    if (isNewEntrance) {
-      if (entityType === ENTRANCE_AND_CAVE) {
-        dispatch(postCaveAndEntrance(caveData, entranceData));
-      } else {
-        dispatch(postEntrance(entranceData));
-      }
-    } else if (entityType === ENTRANCE_AND_CAVE) {
-      dispatch(updateCaveAndEntrance(caveData, entranceData));
-    } else {
-      dispatch(updateEntrance(entranceData));
-    }*/
+    console.log(data);
   };
 
   return isSubmitSuccessful && isNil(massifError) ? (
