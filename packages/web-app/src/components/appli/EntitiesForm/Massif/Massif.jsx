@@ -91,7 +91,7 @@ const Massif = ({ control, errors, allLanguages, reset, disabled = false }) => {
             )}
           />
           <Controller
-            name="cave.language"
+            name="massif.language"
             control={control}
             rules={{ required: true }}
             render={({ field: { ref, ...field } }) => (

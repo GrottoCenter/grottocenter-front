@@ -1,13 +1,16 @@
+/* eslint-disable prettier/prettier */
 import React, { useState } from 'react';
-
+import PropTypes from 'prop-types';
+import { Controller } from 'react-hook-form';
 import { MapContainer, TileLayer, FeatureGroup } from 'react-leaflet';
 import { EditControl } from 'react-leaflet-draw';
-import osm from './providers';
 import { useRef } from 'react';
+import { formatMessage } from '@formatjs/intl';
+import osm from './providers';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-draw/dist/leaflet.draw.css';
 
-const PolygonMap = () => {
+const PolygonMap = ({ control, errors, reset, disabled = false }) => {
   const [center, setCenter] = useState({
     lat: 44,
     lng: 3
@@ -88,7 +91,7 @@ const PolygonMap = () => {
               center={center}
               zoom={ZOOM_LEVEL}
               ref={mapRef}
-              style={{ height: '100vh' }}>
+              style={{ height: '40vh' }}>
               <FeatureGroup>
                 <EditControl
                   position="topright"
@@ -109,15 +112,21 @@ const PolygonMap = () => {
                 attribution={osm.maptiler.attribution}
               />
             </MapContainer>
-
-            <pre className="text-left">
-              {JSON.stringify(mapTOGeoJson(mapLayers), 0, 2)}
-            </pre>
+            <pre>{JSON.stringify(mapTOGeoJson(mapLayers), 0, 2)}</pre>
           </div>
         </div>
       </div>
     </>
   );
+};
+
+PolygonMap.propTypes = {
+  control: PropTypes.shape({}),
+  disabled: PropTypes.bool,
+  errors: PropTypes.shape({
+    geogPolygon: PropTypes.shape({})
+  }),
+  reset: PropTypes.func
 };
 
 export default PolygonMap;
