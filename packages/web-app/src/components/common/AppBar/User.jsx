@@ -1,12 +1,15 @@
 import { Button, IconButton, Menu, MenuItem } from '@material-ui/core';
 import AccountCircle from '@material-ui/icons/AccountCircle';
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
+import { useHistory } from 'react-router-dom';
 import { useIntl } from 'react-intl';
 import { useTheme } from '@material-ui/core/styles';
 import { isMobileOnly } from 'react-device-detect';
 import PropTypes from 'prop-types';
+import { pathOr } from 'ramda';
 
 import Translate from '../Translate';
+import { useUserProperties } from '../../../hooks';
 
 const UserMenu = ({
   authTokenExpirationDate,
@@ -19,6 +22,9 @@ const UserMenu = ({
   const open = Boolean(anchorEl);
   const { formatDate, formatMessage, formatTime } = useIntl();
   const theme = useTheme();
+  const userId = pathOr(null, ['id'], useUserProperties());
+  const history = useHistory();
+  const accountPath = useRef('/ui');
 
   const handleMenu = event => {
     setAnchorEl(event.currentTarget);
@@ -33,6 +39,15 @@ const UserMenu = ({
   const handleLogoutClick = () => {
     handleClose();
     onLogoutClick();
+  };
+
+  useEffect(() => {
+    accountPath.current = `/ui/persons/${userId}`;
+  });
+
+  // redirects to the person page to see and modify the personnal data
+  const redirectPersonPage = () => {
+    history.push(accountPath.current);
   };
 
   const isSessionExpired = authTokenExpirationDate < Date.now();
@@ -125,7 +140,7 @@ const UserMenu = ({
                 </>
               )}
             </MenuItem>
-            <MenuItem disabled>
+            <MenuItem onClick={redirectPersonPage}>
               <Translate>My Account</Translate>
             </MenuItem>
             <MenuItem onClick={handleLogoutClick}>
