@@ -31,6 +31,7 @@ import EntryPage from './Entry';
 import ManageUsers from './Admin/ManageUsers';
 import Map from './Map';
 import MassifPage from './Massif';
+import PersonPage from './Person';
 import OrganizationPage from './Organization';
 import EntityCreation from './EntityCreation';
 import ImportContainer from './ImportCSV';
@@ -73,6 +74,7 @@ const Application = () => {
           component={OrganizationPage}
         />
         <Route path="/ui/massifs/:massifId" component={MassifPage} />
+        <Route path="/ui/persons/:personId" component={PersonPage} />
         <Route path="/ui/login" component={HomePage} />
         <Route path="/ui/signup" component={SignUp} />
         <Route path="/ui/entity/add" component={EntityCreation} />
