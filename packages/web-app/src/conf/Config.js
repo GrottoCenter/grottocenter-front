@@ -183,6 +183,7 @@ export const postCreateMassifUrl = `${API_URL}/api/${apiVersion}/massifs/`;
 export const putMassifUrl = massifId =>
   `${API_URL}/api/${apiVersion}/massifs/${massifId}`;
 export const findOrganizationUrl = `${API_URL}/api/${apiVersion}/organizations/`;
+export const findPersonUrl = `${API_URL}/api/${apiVersion}/cavers/`;
 export const advancedsearchUrl = `${API_URL}/api/${apiVersion}/advanced-search`;
 export const quicksearchUrl = `${API_URL}/api/${apiVersion}/search`;
 export const subjectsUrl = `${API_URL}/api/${apiVersion}/documents/subjects`;
