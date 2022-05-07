@@ -47,7 +47,7 @@ const EntriesSelection = ({
   return (
     <PropertyWrapper>
       <VisibilityIcon fontSize="large" color="primary" />
-      <Tooltip title={formatMessage({ id: 'Visible entries' })}>
+      <Tooltip title={formatMessage({ id: 'Network entrances' })}>
         {loading ? (
           <Skeleton variant="text" width="100%" />
         ) : (
@@ -60,13 +60,13 @@ const EntriesSelection = ({
               input={<Input />}
               renderValue={selected => {
                 if (selected.length === 0) {
-                  return <em>{formatMessage({ id: 'Visible entries' })}</em>;
+                  return <em>{formatMessage({ id: 'Network entrances' })}</em>;
                 }
                 return getEntriesName(selected)(entries);
               }}
               MenuProps={MenuProps}>
               <MenuItem disabled value="">
-                <em>{formatMessage({ id: 'Visible entries' })}</em>
+                <em>{formatMessage({ id: 'Network entrances' })}</em>
               </MenuItem>
               {entries.map(({ name, id }) => (
                 <MenuItem key={name} value={id}>
