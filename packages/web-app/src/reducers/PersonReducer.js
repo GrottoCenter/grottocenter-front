@@ -19,7 +19,7 @@ const person = (state = initialState, action) => {
     case FETCH_PERSON_FAILURE:
       return { person: null, isFetching: false, error: action.error };
     default:
-      return initialState;
+      return state;
   }
 };
 

@@ -2,9 +2,9 @@ import React, { useEffect, useRef } from 'react';
 import { useParams, useHistory } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { isNil, pathOr } from 'ramda';
-import Person from '../components/appli/Person/Person';
-import { loadPerson } from '../actions/Person';
-import { useUserProperties, usePermissions } from '../hooks';
+import Person from '../../components/appli/Person/Person';
+import { loadPerson } from '../../actions/Person';
+import { useUserProperties, usePermissions } from '../../hooks';
 
 const PersonPage = () => {
   const { personId } = useParams();
@@ -27,8 +27,6 @@ const PersonPage = () => {
   const onEdit = () => {
     history.push(editPath.current);
   };
-  // eslint-disable-next-line
-  console.log(person);
   return (
     <Person
       isFetching={isFetching || !isNil(error)}
