@@ -19,7 +19,7 @@ import AutoCompleteSearch from '../../common/AutoCompleteSearch';
 import ErrorMessage from '../../common/StatusMessage/ErrorMessage';
 import SuccessMessage from '../../common/StatusMessage/SuccessMessage';
 
-import UserProperties from './UserProperties';
+import PersonProperties from '../../common/Person/PersonProperties';
 import UserGroups from './UserGroups';
 
 const FeedbackBlock = styled.div`
@@ -120,7 +120,7 @@ const ManageUserGroups = ({
           </SpacedTopButton>
           <UserBlock>
             <FlexBlock style={{ flexBasis: '300px' }}>
-              <UserProperties user={selectedUser} />
+              <PersonProperties person={selectedUser} displayMail />
             </FlexBlock>
             <FlexBlock style={{ flexBasis: '200px' }}>
               <UserGroups

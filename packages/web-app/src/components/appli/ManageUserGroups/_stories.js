@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { storiesOf } from '@storybook/react';
 
 import UserGroups from './UserGroups';
-import UserProperties from './UserProperties';
+import PersonProperties from '../../common/Person/PersonProperties';
 
 const user = {
   id: 42,
@@ -28,5 +28,7 @@ const UserGroupsWrapper = () => {
 };
 
 storiesOf('ManageUserGroups', module)
-  .add('User Properties', () => <UserProperties user={user} />)
+  .add('Person Properties', () => (
+    <PersonProperties person={user} displayMail />
+  ))
   .add('User Groups', () => <UserGroupsWrapper />);
