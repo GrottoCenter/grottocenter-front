@@ -1,8 +1,8 @@
-import React, { useEffect, useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import { useForm } from 'react-hook-form';
-import { isNil, keys, prop, length, reject, equals } from 'ramda';
+import { isNil, keys, prop, length } from 'ramda';
 import {
   Box,
   Button as MuiButton,
@@ -15,8 +15,7 @@ import {
 } from '@material-ui/core';
 import Icon from '@material-ui/core/Icon';
 import styled from 'styled-components';
-import { useDispatch, useSelector } from 'react-redux';
-import { useGeolocation } from 'rooks';
+import { useSelector, useDispatch } from 'react-redux';
 
 import { useBoolean } from '../../../../hooks';
 import ActionButton from '../../../common/ActionButton';
@@ -25,6 +24,7 @@ import { postMassif, updateMassif } from '../../../../actions/Massif';
 
 import Massif from './Massif';
 import PolygonContainer from './PolygonContainer';
+import makeMassifData from './transformers';
 
 const Button = styled(MuiButton)`
   margin: ${({ theme }) => theme.spacing(2)}px;
@@ -35,14 +35,11 @@ const defaultMassifValues = {
   description: '',
   descriptionTitle: '',
   language: 'fra',
-  geogPolygon: ''
+  geoJson: null
 };
 
 export const MassifForm = ({ massifValues = null }) => {
   const isNewMassif = massifValues === null;
-  const geolocation = useGeolocation();
-  const latitude = geolocation?.lat;
-  const longitude = geolocation?.lng;
 
   const { formatMessage } = useIntl();
   const { languages: allLanguages } = useSelector(state => state.language);
@@ -55,9 +52,7 @@ export const MassifForm = ({ massifValues = null }) => {
     handleSubmit,
     reset,
     control,
-    getValues,
     trigger,
-    setFocus,
     formState: { errors, isDirty, isSubmitting, isSubmitSuccessful }
   } = useForm({
     defaultValues: {
@@ -77,16 +72,16 @@ export const MassifForm = ({ massifValues = null }) => {
 
   const steps = {
     massif: (
-      <Massif
-        allLanguages={allLanguages}
-        control={control}
-        disabled={!isNewMassif}
-        errors={errors}
-        reset={handleReset}
-      />
+      <Massif allLanguages={allLanguages} control={control} errors={errors} />
     ),
     location: (
-      <PolygonContainer control={control} errors={errors} reset={handleReset} />
+      <PolygonContainer
+        control={control}
+        errors={errors}
+        geoJson={
+          massifValues ? massifValues.geoJson : defaultMassifValues.geoJson
+        }
+      />
     )
   };
   const stepKeys = keys(steps);
@@ -98,7 +93,7 @@ export const MassifForm = ({ massifValues = null }) => {
         'massif.descriptionTitle',
         'massif.name',
         'massif.language',
-        'massif.geogPolygon'
+        'massif.geoJson'
       ],
       { shouldFocus: true }
     );
@@ -116,7 +111,12 @@ export const MassifForm = ({ massifValues = null }) => {
   };
 
   const onSubmit = async data => {
-    console.log(data);
+    const massif = makeMassifData(data);
+    if (isNewMassif) {
+      dispatch(postMassif(massif));
+    } else {
+      dispatch(updateMassif(massif));
+    }
   };
 
   return isSubmitSuccessful && isNil(massifError) ? (
@@ -218,7 +218,7 @@ MassifForm.propTypes = {
     name: PropTypes.string,
     description: PropTypes.string,
     descriptionTitle: PropTypes.string,
-    geogPolygon: PropTypes.string
+    geoJson: PropTypes.string
   })
 };
 

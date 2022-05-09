@@ -4,125 +4,112 @@ import {
   TextField,
   Select,
   MenuItem,
-  InputLabel,
-  FormHelperText,
-  RadioGroup,
-  FormControlLabel,
-  Radio
+  InputLabel
 } from '@material-ui/core';
-import { Wrapper } from '@material-ui/pickers/wrappers/Wrapper';
 import React from 'react';
-import { Controller, useController } from 'react-hook-form';
+import { Controller } from 'react-hook-form';
 import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import Translate from '../../../common/Translate';
-import Section from '../FormSection';
 
 const FormControl = styled(MuiFormControl)`
   padding-bottom: ${({ theme }) => theme.spacing(4)}px;
 `;
 
-const Massif = ({ control, errors, allLanguages, reset, disabled = false }) => {
+const Massif = ({ control, errors, allLanguages }) => {
   const { formatMessage } = useIntl();
 
   return (
     <div>
-      <FormControl component="fieldset" disabled={disabled}>
-        <FormLabel component="legend">
-          {formatMessage({ id: 'Basics Informations' })}
-        </FormLabel>
-        <Section sectionTitle={formatMessage({ id: 'name' })}>
-          <Controller
-            name="massif.name"
-            control={control}
-            rules={{ required: true }}
-            render={({ field: { ref, onChange, ...field } }) => (
-              <TextField
-                fullWidth
-                required
-                error={!!errors?.massif?.name}
-                label={formatMessage({ id: 'Massif name' })}
-                inputRef={ref}
-                onChange={event => {
-                  onChange(event.target.value);
-                  //   onNameChange(event.target.value);
-                }}
-                {...field}
-              />
-            )}
-          />
-          <Controller
-            name="massif.description"
-            control={control}
-            rules={{ required: true }}
-            render={({ field: { ref, onChange, ...field } }) => (
-              <TextField
-                fullWidth
-                required
-                error={!!errors?.massif?.description}
-                label={formatMessage({ id: 'Massif description' })}
-                inputRef={ref}
-                onChange={event => {
-                  onChange(event.target.value);
-                  // onNameChange(event.target.value);
-                }}
-                {...field}
-              />
-            )}
-          />
-          <Controller
-            name="massif.descriptionTitle"
-            control={control}
-            rules={{ required: true }}
-            render={({ field: { ref, onChange, ...field } }) => (
-              <TextField
-                fullWidth
-                required
-                error={!!errors?.massif?.descriptionTitle}
-                label={formatMessage({ id: 'Massif title description' })}
-                inputRef={ref}
-                onChange={event => {
-                  onChange(event.target.value);
-                  // onNameChange(event.target.value);
-                }}
-                {...field}
-              />
-            )}
-          />
-          <Controller
-            name="massif.language"
-            control={control}
-            rules={{ required: true }}
-            render={({ field: { ref, ...field } }) => (
-              <FormControl
-                required
-                error={!!errors?.massif?.language}
-                fullWidth>
-                <InputLabel shrink>
-                  <Translate>Language</Translate>
-                </InputLabel>
-                <Select {...field} inputRef={ref}>
-                  <MenuItem key={-1} value={-1} disabled>
-                    <i>
-                      <Translate>Select a language</Translate>
-                    </i>
+      <FormControl component="fieldset">
+        <FormLabel>{formatMessage({ id: 'Basic Informations' })}</FormLabel>
+
+        <Controller
+          name="massif.name"
+          control={control}
+          rules={{ required: true }}
+          render={({ field: { ref, onChange, ...field } }) => (
+            <TextField
+              fullWidth
+              required
+              error={!!errors?.massif?.name}
+              label={formatMessage({ id: 'Massif name' })}
+              inputRef={ref}
+              onChange={event => {
+                onChange(event.target.value);
+              }}
+              {...field}
+            />
+          )}
+        />
+        <Controller
+          name="massif.language"
+          control={control}
+          rules={{ required: true }}
+          render={({ field: { ref, ...field } }) => (
+            <FormControl required error={!!errors?.massif?.language} fullWidth>
+              <InputLabel shrink>
+                <Translate>Language</Translate>
+              </InputLabel>
+              <Select {...field} inputRef={ref}>
+                <MenuItem key={-1} value={-1} disabled>
+                  <i>
+                    <Translate>Select a language</Translate>
+                  </i>
+                </MenuItem>
+                {allLanguages.map(l => (
+                  <MenuItem key={l.id} value={l.id} name={l.refName}>
+                    <Translate>{l.refName}</Translate>
                   </MenuItem>
-                  {allLanguages.map(l => (
-                    <MenuItem key={l.id} value={l.id} name={l.refName}>
-                      <Translate>{l.refName}</Translate>
-                    </MenuItem>
-                  ))}
-                </Select>
-                <FormHelperText>
-                  <Translate>Cave name language</Translate>
-                </FormHelperText>
-              </FormControl>
-            )}
-          />
-          {/* TODO HANDLE LOCATION FOR DESCRIPTION MULTIPLE FIELD (LOCATION) */}
-          {/* <Descriptions control={control} errors={errors} /> */}
-        </Section>
+                ))}
+              </Select>
+            </FormControl>
+          )}
+        />
+
+        <FormLabel>
+          {formatMessage({ id: 'Description of the massif' })}
+        </FormLabel>
+
+        <Controller
+          name="massif.descriptionTitle"
+          control={control}
+          rules={{ required: true }}
+          render={({ field: { ref, onChange, ...field } }) => (
+            <TextField
+              fullWidth
+              required
+              error={!!errors?.massif?.descriptionTitle}
+              label={formatMessage({ id: 'Title' })}
+              inputRef={ref}
+              onChange={event => {
+                onChange(event.target.value);
+              }}
+              {...field}
+            />
+          )}
+        />
+        <Controller
+          name="massif.description"
+          control={control}
+          rules={{ required: true }}
+          render={({ field: { ref, onChange, ...field } }) => (
+            <TextField
+              fullWidth
+              required
+              error={!!errors?.massif?.description}
+              label={formatMessage({ id: 'Description' })}
+              inputRef={ref}
+              multiline
+              minRows={6}
+              onChange={event => {
+                onChange(event.target.value);
+              }}
+              {...field}
+            />
+          )}
+        />
       </FormControl>
     </div>
   );
@@ -135,7 +122,6 @@ Massif.propTypes = {
     })
   ),
   control: PropTypes.shape({}),
-  disabled: PropTypes.bool,
   errors: PropTypes.shape({
     massif: PropTypes.shape({
       description: PropTypes.arrayOf(PropTypes.shape({})),
@@ -143,8 +129,7 @@ Massif.propTypes = {
       language: PropTypes.shape({ message: PropTypes.string }),
       name: PropTypes.shape({ message: PropTypes.string })
     })
-  }),
-  reset: PropTypes.func
+  })
 };
 
 export default Massif;
