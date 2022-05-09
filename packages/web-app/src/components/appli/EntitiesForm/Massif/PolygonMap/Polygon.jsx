@@ -55,6 +55,7 @@ const PolygonMap = ({ onChange, data }) => {
     return () => {
       isMounted.current = false;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mapLayers]);
 
   useEffect(() => {
@@ -65,6 +66,7 @@ const PolygonMap = ({ onChange, data }) => {
     return () => {
       isMounted.current = false;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [geolocation]);
 
   const onCreate = e => {
@@ -144,7 +146,11 @@ const PolygonMap = ({ onChange, data }) => {
         center={center}
         zoom={ZOOM_LEVEL}
         whenCreated={setMap}
-        style={{ height: '60vh', width: '100vh' }}>
+        position="topLeft"
+        style={{
+          height: '40vh',
+          width: '50vh'
+        }}>
         <FeatureGroup
           ref={reactFGref => {
             if (data) {
