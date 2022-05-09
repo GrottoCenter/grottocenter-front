@@ -1,6 +1,6 @@
-import React /* , { useState } */ from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
-import { isNil /* ,  propOr */ } from 'ramda';
+import { isNil } from 'ramda';
 import Skeleton from '@material-ui/lab/Skeleton';
 import { useIntl } from 'react-intl';
 import styled from 'styled-components';
@@ -17,10 +17,8 @@ import Layout from '../../common/Layouts/Fixed/FixedContent';
 import EntrancesList from '../../common/entrance/EntrancesList';
 import EntrancePropTypes from './propTypes';
 import Translate from '../../common/Translate';
-// import DocumentsTable from '../../common/DocumentsTable';
-// import Section from '../../../pages/DocumentDetails/Section';
 
-import PersonProperties from './PersonProperties';
+import PersonProperties from '../../common/Person/PersonProperties';
 import OrganizationsList from '../../common/Organizations/OrganizationsList';
 import DocumentsList from '../../common/DocumentsList/DocumentsList';
 
@@ -33,21 +31,8 @@ const EditButton = styled(Box)`
   margin-left: 90%;
 `;
 
-const Person = ({
-  isFetching,
-  person,
-  personId,
-  onEdit,
-  isAllowed,
-  userNickname
-}) => {
+const Person = ({ isFetching, person, onEdit, isAllowed }) => {
   const { formatMessage } = useIntl();
-  // const [page, setPage] = React.useState(0);
-  // const [detailedView, setDetailedView] = useState(null);
-  /* if (isNil(person) && !isFetching) {
-  
-  } */
-  console.log(`nickname : ${userNickname}`);
 
   if (person == null) {
     return (
@@ -95,7 +80,11 @@ const Person = ({
                   )}
                 </EditButton>
                 <FlexBlock style={{ flexBasis: '300px' }}>
-                  <PersonProperties person={person} id={personId} />
+                  <PersonProperties
+                    person={person}
+                    displayLanguage={person.language !== '000'}
+                    displayGroups
+                  />
                 </FlexBlock>
               </CardContent>
             </Card>
@@ -132,7 +121,7 @@ const Person = ({
                 <EntrancesList
                   entrances={person.exploredEntrances}
                   emptyMessageComponent={formatMessage({
-                    id: 'This massif has no entrances listed yet.'
+                    id: 'This person has no entrances listed yet.'
                   })}
                   title={formatMessage({ id: 'List of explored cavities' })}
                 />
@@ -147,7 +136,6 @@ const Person = ({
 
 Person.propTypes = {
   isFetching: PropTypes.bool.isRequired,
-  personId: PropTypes.string,
   person: PropTypes.shape({
     name: PropTypes.string,
     surname: PropTypes.string,
@@ -159,8 +147,7 @@ Person.propTypes = {
     exploredEntrances: PropTypes.arrayOf(EntrancePropTypes)
   }),
   onEdit: PropTypes.func.isRequired,
-  isAllowed: PropTypes.bool.isRequired,
-  userNickname: PropTypes.string
+  isAllowed: PropTypes.bool.isRequired
 };
 
 Person.defaultProps = {
