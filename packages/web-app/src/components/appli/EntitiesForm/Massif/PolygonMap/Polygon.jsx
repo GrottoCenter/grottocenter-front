@@ -1,13 +1,16 @@
 import React, { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
-import { MapContainer, TileLayer, FeatureGroup } from 'react-leaflet';
-// eslint-disable-next-line import/no-extraneous-dependencies
+import {
+  MapContainer,
+  TileLayer,
+  FeatureGroup,
+  LayersControl
+} from 'react-leaflet';
 import { EditControl } from 'react-leaflet-draw';
 import { useGeolocation } from 'rooks';
 import L from 'leaflet';
-import osm from './providers';
+import TileLayers from '../../../../common/Maps/common/mapLayers';
 import 'leaflet/dist/leaflet.css';
-// eslint-disable-next-line import/no-extraneous-dependencies
 import 'leaflet-draw/dist/leaflet.draw.css';
 
 let displayValue = false;
@@ -55,8 +58,7 @@ const PolygonMap = ({ onChange, data }) => {
     return () => {
       isMounted.current = false;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mapLayers]);
+  }, [mapLayers, onChange]);
 
   useEffect(() => {
     isMounted.current = true;
@@ -66,18 +68,16 @@ const PolygonMap = ({ onChange, data }) => {
     return () => {
       isMounted.current = false;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [geolocation]);
+  }, [geolocation, map]);
 
   const onCreate = e => {
     const { layerType, layer } = e;
     if (layerType === 'polygon') {
-      // eslint-disable-next-line camelcase
-      const { _leaflet_id } = layer;
+      const { _leaflet_id: leafletId } = layer;
       if (isMounted.current) {
         setMapLayers(layers => [
           ...layers,
-          { id: _leaflet_id, latlngs: layer.getLatLngs()[0] }
+          { id: leafletId, latlngs: layer.getLatLngs()[0] }
         ]);
       }
     }
@@ -88,13 +88,12 @@ const PolygonMap = ({ onChange, data }) => {
       layers: { _layers }
     } = e;
 
-    // eslint-disable-next-line camelcase
-    Object.values(_layers).map(({ _leaflet_id, editing }) => {
+    Object.values(_layers).map(layer => {
+      const { _leaflet_id: leafletId, editing } = layer;
       if (isMounted.current) {
         return setMapLayers(layers => {
           return layers.map(l => {
-            // eslint-disable-next-line camelcase
-            return l.id === _leaflet_id
+            return l.id === leafletId
               ? { ...l, latlngs: { ...editing.latlngs[0] } }
               : l;
           });
@@ -109,11 +108,10 @@ const PolygonMap = ({ onChange, data }) => {
       layers: { _layers }
     } = e;
 
-    // eslint-disable-next-line camelcase
-    Object.values(_layers).map(({ _leaflet_id }) => {
+    Object.values(_layers).map(layer => {
+      const { _leaflet_id: leafletId } = layer;
       if (isMounted.current) {
-        // eslint-disable-next-line camelcase
-        return setMapLayers(layers => layers.filter(l => l.id !== _leaflet_id));
+        return setMapLayers(layers => layers.filter(l => l.id !== leafletId));
       }
       return null;
     });
@@ -171,10 +169,16 @@ const PolygonMap = ({ onChange, data }) => {
             }}
           />
         </FeatureGroup>
-        <TileLayer
-          url={osm.maptiler.url}
-          attribution={osm.maptiler.attribution}
-        />
+
+        <LayersControl position="bottomleft">
+          {TileLayers.map(layer => (
+            <LayersControl.BaseLayer
+              checked={layer.name === 'OpenStreetMap Basic'}
+              name={layer.name}>
+              <TileLayer url={layer.url} attribution={layer.url} />
+            </LayersControl.BaseLayer>
+          ))}
+        </LayersControl>
       </MapContainer>
     </>
   );

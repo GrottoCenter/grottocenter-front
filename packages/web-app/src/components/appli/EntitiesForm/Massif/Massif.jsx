@@ -35,9 +35,7 @@ const Massif = ({ control, errors, allLanguages }) => {
               error={!!errors?.massif?.name}
               label={formatMessage({ id: 'Massif name' })}
               inputRef={ref}
-              onChange={event => {
-                onChange(event.target.value);
-              }}
+              onChange={onChange}
               {...field}
             />
           )}
@@ -80,9 +78,7 @@ const Massif = ({ control, errors, allLanguages }) => {
               error={!!errors?.massif?.descriptionTitle}
               label={formatMessage({ id: 'Title' })}
               inputRef={ref}
-              onChange={event => {
-                onChange(event.target.value);
-              }}
+              onChange={onChange}
               {...field}
             />
           )}
@@ -100,9 +96,7 @@ const Massif = ({ control, errors, allLanguages }) => {
               inputRef={ref}
               multiline
               minRows={6}
-              onChange={event => {
-                onChange(event.target.value);
-              }}
+              onChange={onChange}
               {...field}
             />
           )}
