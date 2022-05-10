@@ -1,4 +1,8 @@
-import { FormControl as MuiFormControl, FormLabel } from '@material-ui/core';
+import {
+  FormControl as MuiFormControl,
+  FormHelperText,
+  FormLabel
+} from '@material-ui/core';
 
 import React from 'react';
 import { Controller } from 'react-hook-form';
@@ -15,8 +19,17 @@ const PolygonContainer = ({ control, geoJson, errors }) => {
   const { formatMessage } = useIntl();
 
   return (
-    <FormControl component="fieldset" required error={!!errors?.geoJson}>
+    <FormControl
+      component="fieldset"
+      required
+      error={!!errors?.massif?.geoJson}>
       <FormLabel>{formatMessage({ id: 'Massif area' })}</FormLabel>
+      <FormHelperText>
+        {formatMessage({
+          id:
+            'Draw the area covered by the massif using the tools at the right of the map.'
+        })}
+      </FormHelperText>
       <Controller
         name="massif.geoJson"
         control={control}
@@ -30,7 +43,9 @@ PolygonContainer.propTypes = {
   geoJson: PropTypes.shape({}),
   control: PropTypes.shape({}),
   errors: PropTypes.shape({
-    geoJson: PropTypes.shape({})
+    massif: PropTypes.shape({
+      geoJson: PropTypes.shape({})
+    })
   }),
   reset: PropTypes.func
 };
