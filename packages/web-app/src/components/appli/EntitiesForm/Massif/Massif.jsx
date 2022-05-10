@@ -10,14 +10,14 @@ import {
   FormControlLabel,
   Radio
 } from '@material-ui/core';
-import Section from '../FormSection';
-import Translate from '../../../common/Translate';
 import { Wrapper } from '@material-ui/pickers/wrappers/Wrapper';
 import React from 'react';
 import { Controller, useController } from 'react-hook-form';
 import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
+import Translate from '../../../common/Translate';
+import Section from '../FormSection';
 
 const FormControl = styled(MuiFormControl)`
   padding-bottom: ${({ theme }) => theme.spacing(4)}px;
@@ -65,7 +65,7 @@ const Massif = ({ control, errors, allLanguages, reset, disabled = false }) => {
                 inputRef={ref}
                 onChange={event => {
                   onChange(event.target.value);
-                  //onNameChange(event.target.value);
+                  // onNameChange(event.target.value);
                 }}
                 {...field}
               />

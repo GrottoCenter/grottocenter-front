@@ -1,75 +1,51 @@
 /* eslint-disable prettier/prettier */
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
-import { Controller } from 'react-hook-form';
 import { MapContainer, TileLayer, FeatureGroup } from 'react-leaflet';
 import { EditControl } from 'react-leaflet-draw';
-import { useRef } from 'react';
 import { formatMessage } from '@formatjs/intl';
 import osm from './providers';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-draw/dist/leaflet.draw.css';
+import { useGeolocation } from 'rooks';
 
-const PolygonMap = ({ control, errors, reset, disabled = false }) => {
+const PolygonMap = ({ onChange }) => {
+  const geolocation = useGeolocation();
+  const latitude = geolocation?.lat;
+  const longitude = geolocation?.lng;
+  console.log(geolocation);
   const [center, setCenter] = useState({
-    lat: 44,
-    lng: 3
+    lat: latitude || 43.6,
+    lng: longitude || 3.86
   });
+
   const [mapLayers, setMapLayers] = useState([]);
 
   const ZOOM_LEVEL = 12;
   const mapRef = useRef();
 
-  const _onCreate = e => {
-    console.log(e);
-
-    const { layerType, layer } = e;
-    if (layerType === 'polygon') {
-      const { _leaflet_id } = layer;
-
-      setMapLayers(layers => [
-        ...layers,
-        { id: _leaflet_id, latlngs: layer.getLatLngs()[0] }
-      ]);
+  const showMyLocation = () => {
+    if (geolocation.loaded && !geolocation.error) {
+      mapRef.current.leafletElement.flyTo(
+        [geolocation.coordinates.lat, geolocation.coordinates.lng],
+        ZOOM_LEVEL,
+        { animate: true }
+      );
+    } else {
+      alert(location.error.message);
     }
   };
 
-  const _onEdited = e => {
-    console.log(e);
-    const {
-      layers: { _layers }
-    } = e;
-
-    Object.values(_layers).map(({ _leaflet_id, editing }) => {
-      setMapLayers(layers =>
-        layers.map(l =>
-          l.id === _leaflet_id
-            ? { ...l, latlngs: { ...editing.latlngs[0] } }
-            : l
-        )
-      );
-    });
-  };
-
-  const _onDeleted = e => {
-    console.log(e);
-    const {
-      layers: { _layers }
-    } = e;
-
-    Object.values(_layers).map(({ _leaflet_id }) => {
-      setMapLayers(layers => layers.filter(l => l.id !== _leaflet_id));
-    });
-  };
-
-  const mapTOGeoJson = mapLayers => {
+  const mapTOGeoJson = layers => {
     const geoJson = {};
     geoJson.type = 'MultiPolygon';
     geoJson.coordinates = [[[]]];
     let i = 0;
 
-    for (const polygon of mapLayers) {
-      for (const coord of polygon.latlngs) {
+    for (const polygon of layers) {
+      for (const coord of polygon.latlngs instanceof Array
+        ? polygon.latlngs
+        : polygon.latlngs[0]) {
         geoJson.coordinates[0][i].push([coord.lng, coord.lat]);
       }
       geoJson.coordinates[0][i].push(geoJson.coordinates[0][i][0]);
@@ -78,6 +54,53 @@ const PolygonMap = ({ control, errors, reset, disabled = false }) => {
     }
     geoJson.coordinates[0].pop();
     return geoJson;
+  };
+
+  useEffect(() => {
+    onChange(JSON.stringify(mapTOGeoJson(mapLayers), 0, 2));
+  }, [mapLayers]);
+
+  useEffect(() => {
+    if (geolocation && geolocation.lat && geolocation.lng) {
+      console.log('get geo data');
+      showMyLocation();
+    }
+  }, [geolocation]);
+
+  const onCreate = e => {
+    const { layerType, layer } = e;
+    if (layerType === 'polygon') {
+      const { _leafletId } = layer;
+
+      setMapLayers(layers => [
+        ...layers,
+        { id: _leafletId, latlngs: layer.getLatLngs()[0] }
+      ]);
+    }
+  };
+
+  const onEdited = e => {
+    const {
+      layers: { _layers }
+    } = e;
+
+    Object.values(_layers).map(({ _leafletId, editing }) => {
+      setMapLayers(layers =>
+        layers.map(l =>
+          l.id === _leafletId ? { ...l, latlngs: { ...editing.latlngs[0] } } : l
+        )
+      );
+    });
+  };
+
+  const onDeleted = e => {
+    const {
+      layers: { _layers }
+    } = e;
+
+    Object.values(_layers).map(({ _leafletId }) => {
+      setMapLayers(layers => layers.filter(l => l.id !== _leafletId));
+    });
   };
 
   return (
@@ -95,9 +118,9 @@ const PolygonMap = ({ control, errors, reset, disabled = false }) => {
               <FeatureGroup>
                 <EditControl
                   position="topright"
-                  onCreated={_onCreate}
-                  onEdited={_onEdited}
-                  onDeleted={_onDeleted}
+                  onCreated={onCreate}
+                  onEdited={onEdited}
+                  onDeleted={onDeleted}
                   draw={{
                     rectangle: false,
                     polyline: false,
@@ -112,21 +135,11 @@ const PolygonMap = ({ control, errors, reset, disabled = false }) => {
                 attribution={osm.maptiler.attribution}
               />
             </MapContainer>
-            <pre>{JSON.stringify(mapTOGeoJson(mapLayers), 0, 2)}</pre>
           </div>
         </div>
       </div>
     </>
   );
-};
-
-PolygonMap.propTypes = {
-  control: PropTypes.shape({}),
-  disabled: PropTypes.bool,
-  errors: PropTypes.shape({
-    geogPolygon: PropTypes.shape({})
-  }),
-  reset: PropTypes.func
 };
 
 export default PolygonMap;
