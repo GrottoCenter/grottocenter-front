@@ -179,6 +179,9 @@ export const getCaversDocumentsUrl = caverId =>
 export const postCreateEntranceUrl = `${API_URL}/api/${apiVersion}/entrances`;
 export const postCreateCaveUrl = `${API_URL}/api/${apiVersion}/caves`;
 export const findMassifUrl = `${API_URL}/api/${apiVersion}/massifs/`;
+export const postCreateMassifUrl = `${API_URL}/api/${apiVersion}/massifs/`;
+export const putMassifUrl = massifId =>
+  `${API_URL}/api/${apiVersion}/massifs/${massifId}`;
 export const findOrganizationUrl = `${API_URL}/api/${apiVersion}/organizations/`;
 export const advancedsearchUrl = `${API_URL}/api/${apiVersion}/advanced-search`;
 export const quicksearchUrl = `${API_URL}/api/${apiVersion}/search`;
