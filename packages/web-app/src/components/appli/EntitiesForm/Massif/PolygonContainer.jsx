@@ -11,12 +11,12 @@ const FormControl = styled(MuiFormControl)`
   padding-bottom: ${({ theme }) => theme.spacing(4)}px;
 `;
 
-const PolygonContainer = ({ control, geoJson }) => {
+const PolygonContainer = ({ control, geoJson, errors }) => {
   const { formatMessage } = useIntl();
 
   return (
-    <FormControl component="fieldset">
-      <FormLabel>{formatMessage({ id: 'Location of the massif' })}</FormLabel>
+    <FormControl component="fieldset" required error={!!errors?.geoJson}>
+      <FormLabel>{formatMessage({ id: 'Massif area' })}</FormLabel>
       <Controller
         name="massif.geoJson"
         control={control}
@@ -30,7 +30,7 @@ PolygonContainer.propTypes = {
   geoJson: PropTypes.shape({}),
   control: PropTypes.shape({}),
   errors: PropTypes.shape({
-    geogPolygon: PropTypes.shape({})
+    geoJson: PropTypes.shape({})
   }),
   reset: PropTypes.func
 };
