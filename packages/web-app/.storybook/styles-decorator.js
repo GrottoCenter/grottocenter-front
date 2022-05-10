@@ -6,7 +6,7 @@ import { ThemeProvider as StyledThemeProvider } from 'styled-components';
 
 import MainTheme from '../src/conf/grottoTheme';
 
-const StylesDecorator = (storyFn) => (
+const StylesDecorator = storyFn => (
   <StylesProvider injectFirst>
     <CssBaseline />
     <StyledThemeProvider theme={MainTheme}>

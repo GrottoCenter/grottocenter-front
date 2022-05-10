@@ -24,8 +24,7 @@ import Alert from '../../../common/Alert';
 import { postMassif, updateMassif } from '../../../../actions/Massif';
 
 import Massif from './Massif';
-import PolygonMap from './PolygonMap/Polygon';
-//import PolygonMap from './PolygonMap/Polygon';
+import PolygonContainer from './PolygonContainer';
 
 const Button = styled(MuiButton)`
   margin: ${({ theme }) => theme.spacing(2)}px;
@@ -77,7 +76,7 @@ export const MassifForm = ({ massifValues = null }) => {
   }, [reset, stepExpanded]);
 
   const steps = {
-    /* massif: (
+    massif: (
       <Massif
         allLanguages={allLanguages}
         control={control}
@@ -85,9 +84,9 @@ export const MassifForm = ({ massifValues = null }) => {
         errors={errors}
         reset={handleReset}
       />
-    ),*/
+    ),
     location: (
-      <PolygonMap control={control} errors={errors} reset={handleReset} />
+      <PolygonContainer control={control} errors={errors} reset={handleReset} />
     )
   };
   const stepKeys = keys(steps);
