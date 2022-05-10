@@ -31,6 +31,8 @@ import licenses from './LicensesReducer';
 import login from './LoginReducer';
 import map from './Map';
 import massif from './MassifReducer';
+import massifPost from './MassifPostReducer';
+import massifPut from './MassifPutReducer';
 import organization from './OrganizationReducer';
 import pageTitle from './PageTitleReducer';
 import partnersCarousel from './PartnersCarouselReducer';
@@ -77,6 +79,8 @@ const GCReducer = combineReducers({
   login,
   map,
   massif,
+  massifPost,
+  massifPut,
   organization,
   pageTitle,
   partnersCarousel,

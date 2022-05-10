@@ -11,6 +11,7 @@ import styled from 'styled-components';
 import { includes, values } from 'ramda';
 import Translate from '../../components/common/Translate';
 import { EntranceForm } from '../../components/appli/EntitiesForm';
+import MassifForm from '../../components/appli/EntitiesForm/Massif';
 
 const Header = styled.div`
   display: flex;
@@ -47,11 +48,7 @@ const EntityTypeSelect = ({ entity, onEntityChange }) => {
       <InputLabel shrink>
         <Translate>Entity type</Translate>
       </InputLabel>
-      <Select
-        value={selectedEntity}
-        onChange={handleChange}
-        displayEmpty
-        disabled>
+      <Select value={selectedEntity} onChange={handleChange} displayEmpty>
         <MenuItem value={ENTITIES.entrance}>
           <Translate>Entrance</Translate>
         </MenuItem>
@@ -77,6 +74,7 @@ const EntityForm = ({ selectedEntity }) => {
     case ENTITIES.entrance:
       return <EntranceForm />;
     case ENTITIES.massif:
+      return <MassifForm />;
     case ENTITIES.cavity:
     case ENTITIES.organization:
     default:
