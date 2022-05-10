@@ -53,7 +53,13 @@ export const MassifForm = ({ massifValues = null }) => {
     reset,
     control,
     trigger,
-    formState: { errors, isDirty, isSubmitting, isSubmitSuccessful }
+    formState: {
+      errors,
+      isDirty,
+      isSubmitted,
+      isSubmitting,
+      isSubmitSuccessful
+    }
   } = useForm({
     defaultValues: {
       massif: massifValues || defaultMassifValues
@@ -119,7 +125,7 @@ export const MassifForm = ({ massifValues = null }) => {
     }
   };
 
-  return isSubmitSuccessful && isNil(massifError) ? (
+  return isSubmitted && isNil(massifError) ? (
     <Box display="flex" justifyContent="center" flexDirection="column">
       {massifLoading && (
         <>
@@ -131,7 +137,7 @@ export const MassifForm = ({ massifValues = null }) => {
           <CircularProgress />
         </>
       )}
-      {!massifLoading && (
+      {!massifLoading && isSubmitSuccessful && (
         <form>
           <Alert
             severity="success"
@@ -145,6 +151,26 @@ export const MassifForm = ({ massifValues = null }) => {
             <Button onClick={handleReset} color="primary">
               {formatMessage({
                 id: 'Create a new Massif'
+              })}
+            </Button>
+          )}
+        </form>
+      )}
+
+      {!massifLoading && !isSubmitSuccessful && (
+        <form>
+          <Alert
+            severity="error"
+            title={formatMessage({
+              id: isNewMassif
+                ? 'An error occurred when creating a massif!'
+                : 'An error occurred when updating a massif!'
+            })}
+          />
+          {isNewMassif && (
+            <Button onClick={handleReset} color="primary">
+              {formatMessage({
+                id: 'Retry'
               })}
             </Button>
           )}
