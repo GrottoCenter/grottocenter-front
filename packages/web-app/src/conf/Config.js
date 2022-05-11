@@ -202,6 +202,8 @@ export const postDocumentUrl = `${API_URL}/api/${apiVersion}/documents`;
 export const putDocumentUrl = documentId =>
   `${API_URL}/api/${apiVersion}/documents/${documentId}`;
 export const postOrganizationUrl = `${API_URL}/api/${apiVersion}/organizations`;
+export const putMassifUrl = organizationId =>
+  `${API_URL}/api/${apiVersion}/organizations/${organizationId}`;
 export const regionsSearchUrl = `${API_URL}/api/${apiVersion}/regions/search/logical/or`;
 export const identifierTypesUrl = `${API_URL}/api/${apiVersion}/documents/identifierTypes`;
 export const getAdminsUrl = `${API_URL}/api/${apiVersion}/cavers/admins`;

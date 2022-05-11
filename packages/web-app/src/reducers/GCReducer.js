@@ -37,6 +37,8 @@ import massifPost from './MassifPostReducer';
 import massifPut from './MassifPutReducer';
 import namePut from './NamePutReducer';
 import organization from './OrganizationReducer';
+import organizationPost from './OrganizationPostReducer';
+import organizationPut from './OrganizationPutReducer';
 import pageTitle from './PageTitleReducer';
 import partnersCarousel from './PartnersCarouselReducer';
 import person from './PersonReducer';
@@ -89,6 +91,8 @@ const GCReducer = combineReducers({
   massifPut,
   namePut,
   organization,
+  organizationPost,
+  organizationPut,
   pageTitle,
   partnersCarousel,
   person,
