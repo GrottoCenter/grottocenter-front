@@ -1,0 +1,46 @@
+import fetch from 'isomorphic-fetch';
+import { postOrganizationUrl } from '../conf/Config';
+
+export const UPDATE_ORGANIZATION = 'UPDATE_ORGANIZATION';
+export const UPDATE_ORGANIZATION_SUCCESS = 'UPDATE_ORGANIZATION_SUCCESS';
+export const UPDATE_ORGANIZATION_FAILURE = 'UPDATE_ORGANIZATION_FAILURE';
+
+export const updateOrganizationAction = () => ({
+  type: UPDATE_ORGANIZATION
+});
+
+export const updateOrganizationSuccess = organization => ({
+  type: UPDATE_ORGANIZATION_SUCCESS,
+  organization
+});
+
+export const updateOrganizationFailure = error => ({
+  type: UPDATE_ORGANIZATION_FAILURE,
+  error
+});
+
+export const updateOrganization = name => (dispatch, getState) => {
+  dispatch(updateOrganizationAction());
+
+  const requestOptions = {
+    method: 'PUT',
+    body: JSON.stringify({
+      name: {
+        text: name
+      }
+    }),
+    headers: getState().login.authorizationHeader
+  };
+
+  return fetch(postOrganizationUrl, requestOptions)
+    .then(response => {
+      if (response.status >= 400) {
+        throw new Error(response.status);
+      }
+      return response.text();
+    })
+    .then(text => dispatch(updateOrganizationSuccess(JSON.parse(text))))
+    .catch(errorMessage => {
+      dispatch(updateOrganizationFailure(errorMessage));
+    });
+};
