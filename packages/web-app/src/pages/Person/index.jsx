@@ -12,8 +12,12 @@ const PersonPage = () => {
   const permissions = usePermissions();
   const { person, error, isFetching } = useSelector(state => state.person);
   const userId = pathOr(null, ['id'], useUserProperties());
-  const isAllowed =
-    userId.toString() === personId.toString() || permissions.isAdmin;
+  let isAllowed = false;
+
+  if (!isNil(userId)) {
+    isAllowed =
+      userId.toString() === personId.toString() || permissions.isAdmin;
+  }
 
   const history = useHistory();
   const editPath = useRef('/ui');
