@@ -15,10 +15,13 @@ import {
   EntrancePropTypes,
   NetworkPropTypes
 } from './propTypes';
+import UsersList from '../../common/UsersList/UsersList';
+import Alert from '../../common/Alert';
 
 const Organization = ({ error, isLoading, organization }) => {
   const { formatMessage } = useIntl();
 
+  console.log(organization);
   if (error) {
     return (
       <Typography>
@@ -94,6 +97,19 @@ const Organization = ({ error, isLoading, organization }) => {
                 village={organization.village}
               />
 
+              <hr />
+              <UsersList
+                users={organization.cavers}
+                emptyMessageComponent={
+                  <Alert
+                    severity="info"
+                    title={formatMessage({
+                      id: 'This organization has no members yet.'
+                    })}
+                  />
+                }
+                title={formatMessage({ id: 'Members' })}
+              />
               <hr />
 
               <RelatedCaves
