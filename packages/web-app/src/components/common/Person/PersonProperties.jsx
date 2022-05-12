@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import styled from 'styled-components';
-import { Typography } from '@material-ui/core';
+import { Typography, Box } from '@material-ui/core';
 
 const UserPropertyName = styled(Typography)`
   display: inline-block;
@@ -11,7 +11,7 @@ const UserPropertyName = styled(Typography)`
 `;
 
 const UserProperty = ({ propertyName, value }) => (
-  <div>
+  <Box>
     <UserPropertyName
       variant="h5"
       color="primary"
@@ -22,7 +22,7 @@ const UserProperty = ({ propertyName, value }) => (
     <Typography variant="h5" display="inline">
       {value || <i>{value}</i>}
     </Typography>
-  </div>
+  </Box>
 );
 
 UserProperty.propTypes = {
@@ -37,19 +37,18 @@ const PersonProperties = ({
   displayGroups
 }) => {
   const { formatMessage } = useIntl();
+
   let groupString = '';
   if (displayGroups) {
-    person.groups.forEach((group, index) => {
-      if (index !== person.groups.length - 1) {
-        groupString += `${formatMessage({ id: group.name })}, `;
-      } else {
-        groupString += group.name;
-      }
-    });
+    const { groups } = person;
+    const mappedGroups = groups.map(
+      group => `${formatMessage({ id: group.name })}`
+    );
+    groupString = mappedGroups.join(', ');
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column' }}>
+    <Box sx={{ display: 'flex', flexDirection: 'column' }}>
       <Typography variant="h3" gutterBottom>
         {formatMessage({ id: 'User information' })}
       </Typography>
@@ -90,15 +89,15 @@ const PersonProperties = ({
           value={person.mail}
         />
       )}
-    </div>
+    </Box>
   );
 };
 
 PersonProperties.propTypes = {
   person: PropTypes.shape({
-    id: PropTypes.number,
+    id: PropTypes.number.isRequired,
     name: PropTypes.string,
-    nickname: PropTypes.string,
+    nickname: PropTypes.string.isRequired,
     surname: PropTypes.string,
     language: PropTypes.string,
     groups: PropTypes.arrayOf(PropTypes.shape({})),
