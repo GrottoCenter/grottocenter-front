@@ -1,24 +1,24 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { List, Typography } from '@material-ui/core';
-import { withStyles } from '@material-ui/core/styles';
+import styled from 'styled-components';
 import Translate from '../Translate';
 import EntranceListItem from './EntranceListItem';
 
-const StyledList = withStyles({
-  root: {
-    display: 'flex',
-    flexWrap: 'wrap',
-    width: '100%'
-  }
-})(List);
+const StyledList = styled(List)({
+  display: 'flex',
+  flexWrap: 'wrap',
+  width: '100%'
+});
 
 const EntrancesList = props => {
   const { entrances, title, emptyMessageComponent } = props;
 
   return (
-    <div>
-      <Typography variant="h3">{title}</Typography>
+    <>
+      <Typography variant="h3" gutterBottom>
+        {title}
+      </Typography>
       {entrances && entrances.length > 0 ? (
         <StyledList>
           {entrances
@@ -28,9 +28,9 @@ const EntrancesList = props => {
             ))}
         </StyledList>
       ) : (
-        <em>{emptyMessageComponent}</em>
+        emptyMessageComponent
       )}
-    </div>
+    </>
   );
 };
 

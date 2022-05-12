@@ -1,4 +1,5 @@
 import React from 'react';
+import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
 import { ListItem, ListItemText } from '@material-ui/core';
 import { Link } from 'react-router-dom';
@@ -10,6 +11,8 @@ const StyledListItem = styled(ListItem)`
 `;
 
 const EntranceListItem = ({ entrance }) => {
+  const { formatMessage } = useIntl();
+
   return (
     <StyledListItem
       button
@@ -17,7 +20,13 @@ const EntranceListItem = ({ entrance }) => {
         <Link {...props} to={`/ui/entrances/${entrance.id}`} ref={ref} />
       ))}>
       <ListItemText
-        primary={entrance.name}
+        primary={
+          entrance.name ? (
+            entrance.name
+          ) : (
+            <i sx="color : gray">{formatMessage({ id: 'no name' })}</i>
+          )
+        }
         primaryTypographyProps={{ style: { whiteSpace: 'normal' } }} // Multiple lines text
       />
     </StyledListItem>

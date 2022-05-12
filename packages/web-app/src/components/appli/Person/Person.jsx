@@ -4,19 +4,13 @@ import { isNil } from 'ramda';
 import Skeleton from '@material-ui/lab/Skeleton';
 import { useIntl } from 'react-intl';
 import styled from 'styled-components';
-import {
-  Card,
-  CardContent,
-  IconButton,
-  Typography,
-  Box
-} from '@material-ui/core';
+import { IconButton, Box } from '@material-ui/core';
 import CreateIcon from '@material-ui/icons/Create';
 
 import Layout from '../../common/Layouts/Fixed/FixedContent';
 import EntrancesList from '../../common/entrance/EntrancesList';
 import EntrancePropTypes from './propTypes';
-import Translate from '../../common/Translate';
+import Alert from '../../common/Alert';
 
 import PersonProperties from '../../common/Person/PersonProperties';
 import OrganizationsList from '../../common/Organizations/OrganizationsList';
@@ -34,101 +28,106 @@ const EditButton = styled(Box)`
 const Person = ({ isFetching, person, onEdit, isAllowed }) => {
   const { formatMessage } = useIntl();
 
-  if (person == null) {
-    return (
-      <h3>
-        <Translate>
-          Error, the person you are looking for is not available.
-        </Translate>
-      </h3>
-    );
-  }
-
-  if (person === undefined) {
-    return <Skeleton height={200} />;
-  }
-
+  let title = '';
   if (!isNil(person)) {
-    person.exploredEntrances.map(entrance => {
-      const entry = entrance;
-      if (!entry.name) {
-        entry.name = 'no name';
-      }
-      return entry;
-    });
+    if (person.name && person.surname) {
+      title += `${formatMessage({ id: 'Profile page of the user' })} : ${
+        person.name
+      } ${person.surname}`;
+    } else {
+      title += `${formatMessage({ id: 'Profile page of the user' })} : ${
+        person.nickname
+      }`;
+    }
   }
 
   return (
     <Layout
-      title={`Page profil de l'utilisateur ${person.name} ${person.surname}`}
+      title={title}
       content={
-        isFetching ? (
-          <Skeleton height={200} />
-        ) : (
-          <>
-            <Card>
-              <CardContent>
-                <EditButton>
-                  {isAllowed && (
-                    <IconButton
-                      size="medium"
-                      aria-label="edit"
-                      onClick={onEdit}
-                      disabled={isNil(onEdit)}>
-                      <CreateIcon />
-                    </IconButton>
-                  )}
-                </EditButton>
-                <FlexBlock style={{ flexBasis: '300px' }}>
-                  <PersonProperties
-                    person={person}
-                    displayLanguage={person.language !== '000'}
-                    displayGroups
+        <>
+          {isFetching && person === undefined && (
+            <>
+              <Skeleton width={600} /> {/* Title Skeleton */}
+              <Skeleton height={200} width={500} /> {/* Details Skeleton */}
+              <Skeleton height={100} /> {/* Documents list Skeleton */}
+              <Skeleton height={100} /> {/* Organizations list Skeleton */}
+              <Skeleton height={100} /> {/* Entrance list Skeleton */}
+            </>
+          )}
+          {person === null && (
+            <Alert
+              title={formatMessage({
+                id: 'Error, the person you are looking for is not available.'
+              })}
+              severity="error"
+            />
+          )}
+          {!isNil(person) && (
+            <>
+              <EditButton>
+                {isAllowed && (
+                  <IconButton
+                    size="medium"
+                    aria-label="edit"
+                    onClick={onEdit}
+                    disabled={isNil(onEdit)}>
+                    <CreateIcon />
+                  </IconButton>
+                )}
+              </EditButton>
+              <FlexBlock style={{ flexBasis: '300px' }}>
+                <PersonProperties
+                  person={person}
+                  displayLanguage={person.language !== '000'}
+                  displayGroups
+                />
+              </FlexBlock>
+              <hr />
+              <DocumentsList
+                docs={person.documents.map(doc => ({
+                  ...doc,
+                  title: doc.descriptions[0].title
+                }))}
+                emptyMessageComponent={
+                  <Alert
+                    severity="info"
+                    title={formatMessage({
+                      id: 'This person has no document listed yet.'
+                    })}
                   />
-                </FlexBlock>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent>
-                <Typography color="textPrimary" variant="h3" gutterBottom>
-                  Documents
-                </Typography>
-                <DocumentsList
-                  docs={person.documents.map(doc => {
-                    return { ...doc, title: doc.descriptions[0].title };
-                  })}
-                  emptyMessageComponent={formatMessage({
-                    id: 'This person has no document listed yet.'
-                  })}
-                />
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent>
-                <Typography color="textPrimary" variant="h3" gutterBottom>
-                  Organisations
-                </Typography>
-                <OrganizationsList
-                  orgas={person.organizations}
-                  emptyMessageComponent={formatMessage({
-                    id: 'This person has no organization listed yet.'
-                  })}
-                />
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent>
-                <EntrancesList
-                  entrances={person.exploredEntrances}
-                  emptyMessageComponent={formatMessage({
-                    id: 'This person has no entrances listed yet.'
-                  })}
-                  title={formatMessage({ id: 'List of explored cavities' })}
-                />
-              </CardContent>
-            </Card>
-          </>
-        )
+                }
+                title={formatMessage({ id: 'Documents' })}
+              />
+              <hr />
+              <OrganizationsList
+                orgas={person.organizations}
+                emptyMessageComponent={
+                  <Alert
+                    severity="info"
+                    title={formatMessage({
+                      id: 'This person has no organization listed yet.'
+                    })}
+                  />
+                }
+                title={formatMessage({ id: 'Organizations' })}
+              />
+              <hr />
+              <EntrancesList
+                entrances={person.exploredEntrances}
+                emptyMessageComponent={
+                  <Alert
+                    severity="info"
+                    title={formatMessage({
+                      id: 'This person has no entrances listed yet.'
+                    })}
+                  />
+                }
+                title={formatMessage({ id: 'List of explored cavities' })}
+              />
+            </>
+          )}
+        </>
       }
     />
   );

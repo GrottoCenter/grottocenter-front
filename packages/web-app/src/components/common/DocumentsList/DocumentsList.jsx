@@ -1,24 +1,26 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { List, Typography } from '@material-ui/core';
-import { withStyles } from '@material-ui/core/styles';
+import styled from 'styled-components';
 import Translate from '../Translate';
 import DocumentListItem from './DocumentListItem';
 
-const StyledList = withStyles({
-  root: {
-    display: 'flex',
-    flexWrap: 'wrap',
-    width: '100%'
-  }
-})(List);
+const StyledList = styled(List)({
+  display: 'flex',
+  flexWrap: 'wrap',
+  width: '100%'
+});
 
 const DocumentsList = props => {
   const { docs, title, emptyMessageComponent } = props;
 
   return (
-    <div>
-      {title && <Typography variant="h3">{title}</Typography>}
+    <>
+      {title && (
+        <Typography variant="h3" gutterBottom>
+          {title}
+        </Typography>
+      )}
       {docs && docs.length > 0 ? (
         <StyledList>
           {docs
@@ -28,9 +30,9 @@ const DocumentsList = props => {
             ))}
         </StyledList>
       ) : (
-        <em>{emptyMessageComponent}</em>
+        emptyMessageComponent
       )}
-    </div>
+    </>
   );
 };
 

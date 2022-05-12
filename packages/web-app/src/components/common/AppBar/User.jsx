@@ -1,6 +1,6 @@
 import { Button, IconButton, Menu, MenuItem } from '@material-ui/core';
 import AccountCircle from '@material-ui/icons/AccountCircle';
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 import { useHistory } from 'react-router-dom';
 import { useIntl } from 'react-intl';
 import { useTheme } from '@material-ui/core/styles';
@@ -24,7 +24,6 @@ const UserMenu = ({
   const theme = useTheme();
   const userId = pathOr(null, ['id'], useUserProperties());
   const history = useHistory();
-  const accountPath = useRef('/ui');
 
   const handleMenu = event => {
     setAnchorEl(event.currentTarget);
@@ -41,13 +40,9 @@ const UserMenu = ({
     onLogoutClick();
   };
 
-  useEffect(() => {
-    accountPath.current = `/ui/persons/${userId}`;
-  });
-
-  // redirects to the person page to see and modify the personnal data
-  const redirectPersonPage = () => {
-    history.push(accountPath.current);
+  // directs to the person page to see and modify the personnal data
+  const handleMyAccountClick = () => {
+    history.push(`/ui/persons/${userId}`);
   };
 
   const isSessionExpired = authTokenExpirationDate < Date.now();
@@ -140,7 +135,7 @@ const UserMenu = ({
                 </>
               )}
             </MenuItem>
-            <MenuItem onClick={redirectPersonPage}>
+            <MenuItem onClick={handleMyAccountClick}>
               <Translate>My Account</Translate>
             </MenuItem>
             <MenuItem onClick={handleLogoutClick}>
