@@ -70,7 +70,7 @@ const Properties = () => {
         )}
         <Property
           loading={loading}
-          label={formatMessage({ id: 'Localisation' })}
+          label={formatMessage({ id: '' })}
           value={localisation}
           icon={<Public fontSize="large" color="primary" />}
           secondary

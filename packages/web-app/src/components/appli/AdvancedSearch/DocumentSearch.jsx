@@ -220,76 +220,6 @@ class DocumentSearch extends React.Component {
             onChange={this.handlePanelSelected('all-fields-panel')}>
             <AccordionSummary
               expandIcon={<ExpandMoreIcon />}
-              aria-controls="all-fields-search-content"
-              id="all-fields-search-content">
-              <Typography variant="h6">
-                <Translate>Search on all fields</Translate>
-              </Typography>
-            </AccordionSummary>
-            <AccordionDetails style={{ flexDirection: 'column' }}>
-              <Typography variant="body1" gutterBottom paragraph>
-                <i>
-                  <Translate>
-                    Perform an advanced search on all the fields. Results
-                    displayed will have at least one field matching your
-                    request.
-                  </Translate>
-                </i>
-              </Typography>
-              <form
-                noValidate
-                autoComplete="off"
-                onSubmit={event => {
-                  event.preventDefault();
-
-                  // We don't want to use allFieldsRequest for the search
-                  const stateToSearch = this.getInitialState();
-                  delete stateToSearch.allFieldsRequest;
-                  delete stateToSearch.panelExpanded;
-
-                  // Fill state with same request
-                  stateToSearch.matchAllFields = false;
-                  stateToSearch.ref_bbs = allFieldsRequest;
-                  stateToSearch.title = allFieldsRequest;
-                  stateToSearch.authors = allFieldsRequest;
-                  stateToSearch.description = allFieldsRequest;
-                  stateToSearch.subjects = allFieldsRequest;
-                  stateToSearch.regions = allFieldsRequest;
-                  stateToSearch.publication_other_bbs_old = allFieldsRequest;
-
-                  startAdvancedsearch(stateToSearch, resourceType);
-                }}
-                className={classes.formContainer}>
-                <div
-                  className={classes.formPartContainer}
-                  style={{ justifyContent: 'flex-start' }}>
-                  <TextField
-                    className={classes.formElement}
-                    label={
-                      <span>
-                        <Translate>All fields request</Translate>
-                      </span>
-                    }
-                    onChange={event =>
-                      this.handleValueChange('allFieldsRequest', event)
-                    }
-                    value={allFieldsRequest}
-                  />
-                </div>
-
-                <SearchBottomActionButtons
-                  resetResults={resetResults}
-                  resetParentState={this.resetToInitialState}
-                />
-              </form>
-            </AccordionDetails>
-          </Accordion>
-
-          <Accordion
-            expanded={panelExpanded === 'specific-fields-panel'}
-            onChange={this.handlePanelSelected('specific-fields-panel')}>
-            <AccordionSummary
-              expandIcon={<ExpandMoreIcon />}
               aria-controls="specific-fields-search-content"
               id="specific-fields-search-content">
               <Typography variant="h6">
@@ -519,6 +449,74 @@ class DocumentSearch extends React.Component {
                       </Translate>
                     </FormHelperText>
                   </FormControl>
+                </div>
+
+                <SearchBottomActionButtons
+                  resetResults={resetResults}
+                  resetParentState={this.resetToInitialState}
+                />
+              </form>
+            </AccordionDetails>
+          </Accordion>
+
+          <Accordion>
+            <AccordionSummary
+              expandIcon={<ExpandMoreIcon />}
+              aria-controls="all-fields-search-content"
+              id="all-fields-search-content">
+              <Typography variant="h6">
+                <Translate>Search on all fields</Translate>
+              </Typography>
+            </AccordionSummary>
+            <AccordionDetails style={{ flexDirection: 'column' }}>
+              <Typography variant="body1" gutterBottom paragraph>
+                <i>
+                  <Translate>
+                    Perform an advanced search on all the fields. Results
+                    displayed will have at least one field matching your
+                    request.
+                  </Translate>
+                </i>
+              </Typography>
+              <form
+                noValidate
+                autoComplete="off"
+                onSubmit={event => {
+                  event.preventDefault();
+
+                  // We don't want to use allFieldsRequest for the search
+                  const stateToSearch = this.getInitialState();
+                  delete stateToSearch.allFieldsRequest;
+                  delete stateToSearch.panelExpanded;
+
+                  // Fill state with same request
+                  stateToSearch.matchAllFields = false;
+                  stateToSearch.ref_bbs = allFieldsRequest;
+                  stateToSearch.title = allFieldsRequest;
+                  stateToSearch.authors = allFieldsRequest;
+                  stateToSearch.description = allFieldsRequest;
+                  stateToSearch.subjects = allFieldsRequest;
+                  stateToSearch.regions = allFieldsRequest;
+                  stateToSearch.publication_other_bbs_old = allFieldsRequest;
+
+                  startAdvancedsearch(stateToSearch, resourceType);
+                }}
+                className={classes.formContainer}>
+                <div
+                  className={classes.formPartContainer}
+                  style={{ justifyContent: 'flex-start' }}>
+                  <TextField
+                    className={classes.formElement}
+                    label={
+                      <span>
+                        <Translate>All fields request</Translate>
+                      </span>
+                    }
+                    onChange={event =>
+                      this.handleValueChange('allFieldsRequest', event)
+                    }
+                    value={allFieldsRequest}
+                  />
                 </div>
 
                 <SearchBottomActionButtons
