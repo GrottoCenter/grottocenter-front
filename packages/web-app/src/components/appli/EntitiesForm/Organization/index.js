@@ -20,8 +20,8 @@ import countryList from 'react-select-country-list';
 import { useBoolean } from '../../../../hooks';
 import ActionButton from '../../../common/ActionButton';
 import Alert from '../../../common/Alert';
-import postOrganization from '../../../../actions/CreateOrganization';
-import updateOrganization from '../../../../actions/UpdateOrganization';
+import { postOrganization } from '../../../../actions/CreateOrganization';
+import { updateOrganization } from '../../../../actions/UpdateOrganization';
 import BasicInformationsForm from './BasicInformationsForm';
 import InformationsForm from './InformationsForm';
 // import Uploader from './Uploader'; //To uncomment when api will have logo field
