@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import { isNil } from 'ramda';
 import Skeleton from '@material-ui/lab/Skeleton';
 import { useIntl } from 'react-intl';
-import styled from 'styled-components';
 import { IconButton, Box } from '@material-ui/core';
 import CreateIcon from '@material-ui/icons/Create';
 
@@ -16,16 +15,7 @@ import PersonProperties from '../../common/Person/PersonProperties';
 import OrganizationsList from '../../common/Organizations/OrganizationsList';
 import DocumentsList from '../../common/DocumentsList/DocumentsList';
 
-const FlexBlock = styled.div`
-  flex: 1;
-  margin: ${({ theme }) => theme.spacing(3)}px;
-`;
-
-const EditButton = styled(Box)`
-  margin-left: 90%;
-`;
-
-const Person = ({ isFetching, person, onEdit, isAllowed }) => {
+const Person = ({ isFetching, person, onEdit, canEdit }) => {
   const { formatMessage } = useIntl();
 
   let title = '';
@@ -65,24 +55,27 @@ const Person = ({ isFetching, person, onEdit, isAllowed }) => {
           )}
           {!isNil(person) && (
             <>
-              <EditButton>
-                {isAllowed && (
-                  <IconButton
-                    size="medium"
-                    aria-label="edit"
-                    onClick={onEdit}
-                    disabled={isNil(onEdit)}>
-                    <CreateIcon />
-                  </IconButton>
-                )}
-              </EditButton>
-              <FlexBlock style={{ flexBasis: '300px' }}>
+              <Box
+                alignItems="start"
+                display="flex"
+                flexBasis="300px"
+                justifyContent="space-between">
                 <PersonProperties
                   person={person}
                   displayLanguage={person.language !== '000'}
                   displayGroups
                 />
-              </FlexBlock>
+                {canEdit && (
+                  <IconButton
+                    size="medium"
+                    aria-label="edit"
+                    color="primary"
+                    onClick={onEdit}
+                    disabled={isNil(onEdit)}>
+                    <CreateIcon />
+                  </IconButton>
+                )}
+              </Box>
               <hr />
               <DocumentsList
                 docs={person.documents.map(doc => ({
@@ -146,7 +139,7 @@ Person.propTypes = {
     exploredEntrances: PropTypes.arrayOf(EntrancePropTypes)
   }),
   onEdit: PropTypes.func.isRequired,
-  isAllowed: PropTypes.bool.isRequired
+  canEdit: PropTypes.bool.isRequired
 };
 
 Person.defaultProps = {
