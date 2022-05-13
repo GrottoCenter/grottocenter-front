@@ -28,7 +28,5 @@ const UserGroupsWrapper = () => {
 };
 
 storiesOf('ManageUserGroups', module)
-  .add('Person Properties', () => (
-    <PersonProperties person={user} displayMail />
-  ))
+  .add('Person Properties', () => <PersonProperties person={user} />)
   .add('User Groups', () => <UserGroupsWrapper />);
