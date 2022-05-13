@@ -2454,12 +2454,14 @@ __metadata:
     react-csv: ^2.0.3
     react-device-detect: ^1.6.2
     react-dom: ^17.0.2
+    react-dropzone-uploader: ^2.11.0
     react-error-boundary: 3.1.3
     react-hook-form: ^7.18.0
     react-intl: ^5.10.16
     react-leaflet: ^3.2.0
     react-leaflet-draw: ^0.19.8
     react-papaparse: ^3.17.2
+    react-phone-input-2: ^2.15.0
     react-redux: ^7.2.0
     react-router: ^5.2.0
     react-router-dom: ^5.2.0
@@ -6973,6 +6975,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"attr-accept@npm:^2.2.2":
+  version: 2.2.2
+  resolution: "attr-accept@npm:2.2.2"
+  checksum: 496f7249354ab53e522510c1dc8f67a1887382187adde4dc205507d2f014836a247073b05e9d9ea51e2e9c7f71b0d2aa21730af80efa9af2d68303e5f0565c4d
+  languageName: node
+  linkType: hard
+
 "autolinker@npm:^3.11.0":
   version: 3.15.0
   resolution: "autolinker@npm:3.15.0"
@@ -8243,7 +8252,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"classnames@npm:^2.3.1":
+"classnames@npm:^2.2.5, classnames@npm:^2.2.6, classnames@npm:^2.3.1":
   version: 2.3.1
   resolution: "classnames@npm:2.3.1"
   checksum: 14db8889d56c267a591f08b0834989fe542d47fac659af5a539e110cc4266694e8de86e4e3bbd271157dbd831361310a8293e0167141e80b0f03a0f175c80960
@@ -9014,6 +9023,13 @@ __metadata:
     path-type: ^4.0.0
     yaml: ^1.10.0
   checksum: 4be63e7117955fd88333d7460e4c466a90f556df6ef34efd59034d2463484e339666c41f02b523d574a797ec61f4a91918c5b89a316db2ea2f834e0d2d09465b
+  languageName: node
+  linkType: hard
+
+"country-flag-icons@npm:^1.0.2":
+  version: 1.4.26
+  resolution: "country-flag-icons@npm:1.4.26"
+  checksum: bf2a8bdb07f4f6b6a6805a7ae9e0bfd12642508ef7c4ca63280a4bc803e212bd0d97c5943db48609766a725984eff42f7285dd9d39aa51fb11f06e820a2604a5
   languageName: node
   linkType: hard
 
@@ -11933,6 +11949,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"file-selector@npm:^0.6.0":
+  version: 0.6.0
+  resolution: "file-selector@npm:0.6.0"
+  dependencies:
+    tslib: ^2.4.0
+  checksum: 7d051b6e5d793f3c6e2ab287ba5e7c2c6a0971bccc9d56e044c8047ba483e18f60fc0b5771c951dc707c0d15f4f36ccb4f1f1aaf385d21ec8f7700dadf8325ba
+  languageName: node
+  linkType: hard
+
 "file-system-cache@npm:^1.0.5":
   version: 1.0.5
   resolution: "file-system-cache@npm:1.0.5"
@@ -12880,6 +12905,7 @@ fsevents@^1.2.7:
     lint-staged: 11.1.1
     prettier: 1.19.1
     react-app-rewired: 2.1.8
+    react-phone-number-input: ^3.1.52
     react-scripts: 4.0.3
     typescript: 4.3.5
   dependenciesMeta:
@@ -13632,6 +13658,13 @@ fsevents@^1.2.7:
   languageName: node
   linkType: hard
 
+"imask@npm:^6.4.2":
+  version: 6.4.2
+  resolution: "imask@npm:6.4.2"
+  checksum: a713aec87f23b1b095aa3a515311222346211dc544bfcae25d4a0aa3bca9a8c13a3269985d8b913cd9af013b733cdae7f81278988d04a9a34b173744b081c0e9
+  languageName: node
+  linkType: hard
+
 "immer@npm:8.0.1":
   version: 8.0.1
   resolution: "immer@npm:8.0.1"
@@ -13793,6 +13826,15 @@ fsevents@^1.2.7:
   version: 0.1.1
   resolution: "inline-style-parser@npm:0.1.1"
   checksum: 5d545056a3e1f2bf864c928a886a0e1656a3517127d36917b973de581bd54adc91b4bf1febcb0da054f204b4934763f1a4e09308b4d55002327cf1d48ac5d966
+  languageName: node
+  linkType: hard
+
+"input-format@npm:^0.3.7":
+  version: 0.3.7
+  resolution: "input-format@npm:0.3.7"
+  dependencies:
+    prop-types: ^15.7.2
+  checksum: e465f968738fc152207997491f827daf4b71f3991d221fdfb0d128c56c459a75d2561a5e2c555e92e5992c8b1d4a80056bb4db39b44d9aee14a14813388102da
   languageName: node
   linkType: hard
 
@@ -15810,6 +15852,13 @@ fsevents@^1.2.7:
   languageName: node
   linkType: hard
 
+"libphonenumber-js@npm:^1.9.52":
+  version: 1.9.53
+  resolution: "libphonenumber-js@npm:1.9.53"
+  checksum: 36eb4078fbfb2c1f43b6af7709c13d41776396fb3358c6dd5d7177105c296bafe9a9afa891b95f77d484e40200b40b09df3acc49a08a96390cf092c426d5a428
+  languageName: node
+  linkType: hard
+
 "lines-and-columns@npm:^1.1.6":
   version: 1.1.6
   resolution: "lines-and-columns@npm:1.1.6"
@@ -16082,6 +16131,20 @@ fsevents@^1.2.7:
   version: 4.1.1
   resolution: "lodash.once@npm:4.1.1"
   checksum: d768fa9f9b4e1dc6453be99b753906f58990e0c45e7b2ca5a3b40a33111e5d17f6edf2f768786e2716af90a8e78f8f91431ab8435f761fef00f9b0c256f6d245
+  languageName: node
+  linkType: hard
+
+"lodash.reduce@npm:^4.6.0":
+  version: 4.6.0
+  resolution: "lodash.reduce@npm:4.6.0"
+  checksum: 81f2a1045440554f8427f895ef479f1de5c141edd7852dde85a894879312801efae0295116e5cf830c531c1a51cdab8f3628c3ad39fa21a9874bb9158d9ea075
+  languageName: node
+  linkType: hard
+
+"lodash.startswith@npm:^4.2.1":
+  version: 4.2.1
+  resolution: "lodash.startswith@npm:4.2.1"
+  checksum: 1847371cbf6f32c4125a555847aff8a1ff1a977f40882b0ad4e2656a32e364793cfa7602915c9165cc0bba61fbd802e561888126d242faadcf3fc77215bab19b
   languageName: node
   linkType: hard
 
@@ -20086,6 +20149,32 @@ fsevents@^1.2.7:
   languageName: node
   linkType: hard
 
+"react-dropzone-uploader@npm:^2.11.0":
+  version: 2.11.0
+  resolution: "react-dropzone-uploader@npm:2.11.0"
+  dependencies:
+    "@babel/runtime": ^7.1.2
+  peerDependencies:
+    prop-types: ">=15.5.10"
+    react: ">=16.2.0"
+    react-dom: ">=16.2.0"
+  checksum: 62a320f22d753d3916d0de4921e138892e02adeafe4fced1e9cd8e0199867f06317a631c256e83d0e2b06022fe45c89401f51a6f71ed2004328dcbfde5371009
+  languageName: node
+  linkType: hard
+
+"react-dropzone@npm:^14.2.1":
+  version: 14.2.1
+  resolution: "react-dropzone@npm:14.2.1"
+  dependencies:
+    attr-accept: ^2.2.2
+    file-selector: ^0.6.0
+    prop-types: ^15.8.1
+  peerDependencies:
+    react: ">= 16.8 || 18.0.0"
+  checksum: 8556d997d66bad79fe165a30d6dc8f917c67d8c7d23069c417eb2a0da6df824ba71b84b532707711e184da105122f6a6e81104341dc5b8c0f96e318267fdda91
+  languageName: node
+  linkType: hard
+
 "react-element-to-jsx-string@npm:^14.3.2":
   version: 14.3.2
   resolution: "react-element-to-jsx-string@npm:14.3.2"
@@ -20146,6 +20235,18 @@ fsevents@^1.2.7:
   peerDependencies:
     react: ^16.8.0 || ^17
   checksum: 039bc8fc687d0335ee1477014090c703256336f91e283cb1ef91013c1cb95d1ea496f16e1e5ef78832577d1f96980412900c026a9d42b76372b39a3504c88e7b
+  languageName: node
+  linkType: hard
+
+"react-imask@npm:^6.4.2":
+  version: 6.4.2
+  resolution: "react-imask@npm:6.4.2"
+  dependencies:
+    imask: ^6.4.2
+    prop-types: ^15.7.2
+  peerDependencies:
+    react: ">=0.14.0"
+  checksum: be31fca7780ca5592b59b44ca3789124ebd2c35903711eb85c1668f069e3d1c9bc2f332dd69e2a2d97513f63a75e4565c4c6310dcb1005d9c7585ae60b9f44a3
   languageName: node
   linkType: hard
 
@@ -20276,6 +20377,39 @@ fsevents@^1.2.7:
     "@types/papaparse": ^5.2.6
     papaparse: ^5.3.1
   checksum: d9c231025d84ace1d002ccfe12c808e9e517639a1e29b1167c0cef8a5b82537c2de7080b884926720748c24e36503756e0d3ce331fd6ef00552640d0a5b98b64
+  languageName: node
+  linkType: hard
+
+"react-phone-input-2@npm:^2.15.0":
+  version: 2.15.0
+  resolution: "react-phone-input-2@npm:2.15.0"
+  dependencies:
+    classnames: ^2.2.6
+    lodash.debounce: ^4.0.8
+    lodash.memoize: ^4.1.2
+    lodash.reduce: ^4.6.0
+    lodash.startswith: ^4.2.1
+    prop-types: ^15.7.2
+  peerDependencies:
+    react: ^16.12.0 || ^17.0.0
+    react-dom: ^16.12.0 || ^17.0.0
+  checksum: 5698abaf703a8ecc2b16b3965dfd95c84f359093a0f89c498434708111587735ce3a87f79cde9b4ac4d6a27bfd3c73007c940dd4c08c136894faf7bbbf9ab91b
+  languageName: node
+  linkType: hard
+
+"react-phone-number-input@npm:^3.1.52":
+  version: 3.1.52
+  resolution: "react-phone-number-input@npm:3.1.52"
+  dependencies:
+    classnames: ^2.2.5
+    country-flag-icons: ^1.0.2
+    input-format: ^0.3.7
+    libphonenumber-js: ^1.9.52
+    prop-types: ^15.7.2
+  peerDependencies:
+    react: ">=0.16.8"
+    react-dom: ">=0.16.8"
+  checksum: bb14ae0ef92da8fc0000f235aa0b05dd68be7f3cfa5f03c6c35d9c81955bcab6976edbfae165b70398d165a969290cf43708fa863c129c9c7ae7d54f24eea73b
   languageName: node
   linkType: hard
 
@@ -23556,6 +23690,13 @@ resolve@^2.0.0-next.3:
   version: 2.3.1
   resolution: "tslib@npm:2.3.1"
   checksum: de17a98d4614481f7fcb5cd53ffc1aaf8654313be0291e1bfaee4b4bb31a20494b7d218ff2e15017883e8ea9626599b3b0e0229c18383ba9dce89da2adf15cb9
+  languageName: node
+  linkType: hard
+
+"tslib@npm:^2.4.0":
+  version: 2.4.0
+  resolution: "tslib@npm:2.4.0"
+  checksum: 8c4aa6a3c5a754bf76aefc38026134180c053b7bd2f81338cb5e5ebf96fefa0f417bff221592bf801077f5bf990562f6264fecbc42cd3309b33872cb6fc3b113
   languageName: node
   linkType: hard
 
