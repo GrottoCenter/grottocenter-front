@@ -8,12 +8,7 @@ import Alert from '../../common/Alert';
 
 import { EntrancePropTypes, NetworkPropTypes } from './propTypes';
 
-const RelatedCaves = ({
-  exploredEntrances,
-  exploredNetworks,
-  partnerEntrances,
-  partnerNetworks
-}) => {
+const RelatedCaves = ({ exploredEntrances, exploredNetworks }) => {
   const { formatMessage } = useIntl();
   return (
     <>
@@ -42,42 +37,13 @@ const RelatedCaves = ({
           />
         }
       />
-
-      <hr />
-      <EntrancesList
-        entrances={partnerEntrances}
-        title={formatMessage({ id: 'Partner entrances' })}
-        emptyMessageComponent={
-          <Alert
-            severity="info"
-            title={formatMessage({
-              id: 'No partner entrances found.'
-            })}
-          />
-        }
-      />
-      <br />
-      <CavesList
-        caves={partnerNetworks}
-        title={formatMessage({ id: 'Partner networks' })}
-        emptyMessageComponent={
-          <Alert
-            severity="info"
-            title={formatMessage({
-              id: 'No partner networks found.'
-            })}
-          />
-        }
-      />
     </>
   );
 };
 
 RelatedCaves.propTypes = {
   exploredEntrances: PropTypes.arrayOf(EntrancePropTypes),
-  exploredNetworks: PropTypes.arrayOf(NetworkPropTypes),
-  partnerEntrances: PropTypes.arrayOf(EntrancePropTypes),
-  partnerNetworks: PropTypes.arrayOf(NetworkPropTypes)
+  exploredNetworks: PropTypes.arrayOf(NetworkPropTypes)
 };
 
 export default RelatedCaves;
