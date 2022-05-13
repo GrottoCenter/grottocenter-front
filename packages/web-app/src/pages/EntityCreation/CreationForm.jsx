@@ -10,6 +10,7 @@ import {
 import styled from 'styled-components';
 import { includes, values } from 'ramda';
 import Translate from '../../components/common/Translate';
+import OrganizationForm from '../../components/appli/EntitiesForm/Organization';
 import { EntranceForm, MassifForm } from '../../components/appli/EntitiesForm';
 
 const Header = styled.div`
@@ -76,6 +77,8 @@ const EntityForm = ({ selectedEntity }) => {
       return <MassifForm />;
     case ENTITIES.cavity:
     case ENTITIES.organization:
+      return <OrganizationForm />;
+
     default:
       return (
         <div>
