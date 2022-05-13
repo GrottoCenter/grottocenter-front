@@ -30,22 +30,20 @@ UserProperty.propTypes = {
   value: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
 };
 
-const PersonProperties = ({
-  person,
-  displayLanguage,
-  displayMail,
-  displayGroups
-}) => {
+const PersonProperties = ({ person }) => {
   const { formatMessage } = useIntl();
 
   let groupString = '';
-  if (displayGroups) {
-    const { groups } = person;
-    const mappedGroups = groups.map(
-      group => `${formatMessage({ id: group.name })}`
-    );
-    groupString = mappedGroups.join(', ');
-  }
+  let groupsComplete = true;
+  const { groups } = person;
+  const mappedGroups = groups.map(group => {
+    if (!group.name) {
+      groupsComplete = false;
+      return '';
+    }
+    return `${formatMessage({ id: group.name })}`;
+  });
+  groupString = mappedGroups.join(', ');
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column' }}>
@@ -71,19 +69,19 @@ const PersonProperties = ({
         propertyName={formatMessage({ id: 'Nickname' })}
         value={person.nickname}
       />
-      {displayLanguage && (
+      {person.language && person.language !== '000' && (
         <UserProperty
           propertyName={formatMessage({ id: 'Language' })}
           value={person.language}
         />
       )}
-      {displayGroups && (
+      {person.groups && groupsComplete && (
         <UserProperty
           propertyName={formatMessage({ id: 'Groups' })}
           value={groupString}
         />
       )}
-      {displayMail && (
+      {person.mail && (
         <UserProperty
           propertyName={formatMessage({ id: 'Mail' })}
           value={person.mail}
@@ -102,16 +100,7 @@ PersonProperties.propTypes = {
     language: PropTypes.string,
     groups: PropTypes.arrayOf(PropTypes.shape({})),
     mail: PropTypes.string
-  }).isRequired,
-  displayLanguage: PropTypes.bool,
-  displayMail: PropTypes.bool,
-  displayGroups: PropTypes.bool
-};
-
-PersonProperties.defaultProps = {
-  displayLanguage: false,
-  displayMail: false,
-  displayGroups: false
+  }).isRequired
 };
 
 export default PersonProperties;

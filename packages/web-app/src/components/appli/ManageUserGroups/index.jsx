@@ -120,7 +120,7 @@ const ManageUserGroups = ({
           </SpacedTopButton>
           <UserBlock>
             <FlexBlock style={{ flexBasis: '300px' }}>
-              <PersonProperties person={selectedUser} displayMail />
+              <PersonProperties person={selectedUser} />
             </FlexBlock>
             <FlexBlock style={{ flexBasis: '200px' }}>
               <UserGroups

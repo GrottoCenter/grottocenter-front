@@ -65,11 +65,7 @@ const Person = ({
                 display="flex"
                 flexBasis="300px"
                 justifyContent="space-between">
-                <PersonProperties
-                  person={person}
-                  displayLanguage={person.language !== '000'}
-                  displayGroups
-                />
+                <PersonProperties person={person} />
                 {canEdit && (
                   <IconButton
                     size="medium"
