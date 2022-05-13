@@ -9,7 +9,7 @@ const FormControl = styled(MuiFormControl)`
   padding-bottom: ${({ theme }) => theme.spacing(4)}px;
 `;
 
-const License = ({}) => {
+const License = () => {
   const { formatMessage } = useIntl();
 
   const Spaced = styled.div`
