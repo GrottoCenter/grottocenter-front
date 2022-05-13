@@ -4,7 +4,7 @@ import { useIntl } from 'react-intl';
 
 import CavesList from '../../common/cave/CavesList';
 import EntrancesList from '../../common/entrance/EntrancesList';
-import Translate from '../../common/Translate';
+import Alert from '../../common/Alert';
 
 import { EntrancePropTypes, NetworkPropTypes } from './propTypes';
 
@@ -21,7 +21,12 @@ const RelatedCaves = ({
         entrances={exploredEntrances}
         title={formatMessage({ id: 'Explored entrances' })}
         emptyMessageComponent={
-          <Translate>No explored entrances found.</Translate>
+          <Alert
+            severity="info"
+            title={formatMessage({
+              id: 'No explored entrances found.'
+            })}
+          />
         }
       />
       <br />
@@ -29,7 +34,12 @@ const RelatedCaves = ({
         caves={exploredNetworks}
         title={formatMessage({ id: 'Explored networks' })}
         emptyMessageComponent={
-          <Translate>No explored networks found.</Translate>
+          <Alert
+            severity="info"
+            title={formatMessage({
+              id: 'No explored networks found.'
+            })}
+          />
         }
       />
 
@@ -38,7 +48,12 @@ const RelatedCaves = ({
         entrances={partnerEntrances}
         title={formatMessage({ id: 'Partner entrances' })}
         emptyMessageComponent={
-          <Translate>No partner entrances found.</Translate>
+          <Alert
+            severity="info"
+            title={formatMessage({
+              id: 'No partner entrances found.'
+            })}
+          />
         }
       />
       <br />
@@ -46,7 +61,12 @@ const RelatedCaves = ({
         caves={partnerNetworks}
         title={formatMessage({ id: 'Partner networks' })}
         emptyMessageComponent={
-          <Translate>No partner networks found.</Translate>
+          <Alert
+            severity="info"
+            title={formatMessage({
+              id: 'No partner networks found.'
+            })}
+          />
         }
       />
     </>
