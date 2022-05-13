@@ -22,7 +22,7 @@ const Organization = ({ error, isLoading, organization }) => {
   const { formatMessage } = useIntl();
 
   console.log(organization);
-  if (error) {
+  /* if (error) {
     return (
       <Typography>
         {formatMessage({
@@ -31,7 +31,20 @@ const Organization = ({ error, isLoading, organization }) => {
         })}
       </Typography>
     );
+  } */
+  let title = '';
+  if (organization?.name) {
+    title = organization.name;
+  } else if (!error) {
+    title = formatMessage({ id: 'Loading organization data...' });
   }
+  console.log(organization?.latitude);
+  console.log(organization?.longitude);
+  let position = [];
+  if (organization?.latitude && organization?.longitude) {
+    position = [organization?.latitude, organization?.longitude];
+  }
+  console.log(position);
 
   return (
     <Layout
@@ -41,15 +54,19 @@ const Organization = ({ error, isLoading, organization }) => {
             <BadgesSection />
           </Skeleton>
         ) : (
-          <BadgesSection
-            nbCavers={propOr([], 'cavers', organization).length}
-            nbExploredEntrances={
-              propOr([], 'exploredEntrances', organization).length
-            }
-            nbExploredNetworks={
-              propOr([], 'exploredNetworks', organization).length
-            }
-          />
+          <>
+            {!error && (
+              <BadgesSection
+                nbCavers={propOr([], 'cavers', organization).length}
+                nbExploredEntrances={
+                  propOr([], 'exploredEntrances', organization).length
+                }
+                nbExploredNetworks={
+                  propOr([], 'exploredNetworks', organization).length
+                }
+              />
+            )}
+          </>
         )
       }
       subheader={
@@ -70,18 +87,25 @@ const Organization = ({ error, isLoading, organization }) => {
           )
         )
       }
-      title={
-        organization?.name ||
-        formatMessage({ id: 'Loading organization data...' })
-      }
+      title={title}
       content={
         <>
           {isLoading && (
             <>
               <Skeleton height={150} /> {/* Details Skeleton */}
+              <Skeleton height={100} /> {/* Members Skeleton */}
               <Skeleton height={150} /> {/* Explored data Skeleton */}
               <Skeleton height={150} /> {/* Partner data Skeleton */}
             </>
+          )}
+          {error && (
+            <Alert
+              title={formatMessage({
+                id:
+                  'Error, the organization data you are looking for is not available.'
+              })}
+              severity="error"
+            />
           )}
           {organization && (
             <>
@@ -95,6 +119,8 @@ const Organization = ({ error, isLoading, organization }) => {
                 postalCode={organization.postalCode}
                 region={organization.region}
                 village={organization.village}
+                position={position}
+                organization={organization}
               />
 
               <hr />
@@ -146,7 +172,9 @@ Organization.propTypes = {
     partnerNetworks: PropTypes.arrayOf(NetworkPropTypes),
     postalCode: PropTypes.string,
     village: PropTypes.string,
-    yearBirth: PropTypes.number
+    yearBirth: PropTypes.number,
+    longitude: PropTypes.number,
+    latitude: PropTypes.number
   })
 };
 
