@@ -1,5 +1,5 @@
 import fetch from 'isomorphic-fetch';
-import { postOrganizationUrl } from '../conf/Config';
+import { putOrganizationUrl } from '../conf/Config';
 
 export const UPDATE_ORGANIZATION = 'UPDATE_ORGANIZATION';
 export const UPDATE_ORGANIZATION_SUCCESS = 'UPDATE_ORGANIZATION_SUCCESS';
@@ -32,7 +32,7 @@ export const updateOrganization = name => (dispatch, getState) => {
     headers: getState().login.authorizationHeader
   };
 
-  return fetch(postOrganizationUrl, requestOptions)
+  return fetch(putOrganizationUrl, requestOptions)
     .then(response => {
       if (response.status >= 400) {
         throw new Error(response.status);
