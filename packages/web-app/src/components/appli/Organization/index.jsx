@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { propOr } from 'ramda';
-import { Typography } from '@material-ui/core';
 import Skeleton from '@material-ui/lab/Skeleton';
 import { useIntl } from 'react-intl';
 
@@ -17,34 +16,22 @@ import {
 } from './propTypes';
 import UsersList from '../../common/UsersList/UsersList';
 import Alert from '../../common/Alert';
+import DocumentsList from '../../common/DocumentsList/DocumentsList';
 
 const Organization = ({ error, isLoading, organization }) => {
   const { formatMessage } = useIntl();
 
-  console.log(organization);
-  /* if (error) {
-    return (
-      <Typography>
-        {formatMessage({
-          id:
-            'Error, the organization data you are looking for is not available.'
-        })}
-      </Typography>
-    );
-  } */
   let title = '';
   if (organization?.name) {
     title = organization.name;
   } else if (!error) {
     title = formatMessage({ id: 'Loading organization data...' });
   }
-  console.log(organization?.latitude);
-  console.log(organization?.longitude);
+
   let position = [];
   if (organization?.latitude && organization?.longitude) {
     position = [organization?.latitude, organization?.longitude];
   }
-  console.log(position);
 
   return (
     <Layout
@@ -137,12 +124,26 @@ const Organization = ({ error, isLoading, organization }) => {
                 title={formatMessage({ id: 'Members' })}
               />
               <hr />
+              <DocumentsList
+                docs={organization.documents.map(doc => ({
+                  ...doc,
+                  title: doc.titles[0].text
+                }))}
+                emptyMessageComponent={
+                  <Alert
+                    severity="info"
+                    title={formatMessage({
+                      id: 'This organization has no documents listed yet.'
+                    })}
+                  />
+                }
+                title={formatMessage({ id: 'Documents' })}
+              />
+              <hr />
 
               <RelatedCaves
                 exploredEntrances={organization.exploredEntrances}
                 exploredNetworks={organization.exploredNetworks}
-                partnerEntrances={organization.partnerEntrances}
-                partnerNetworks={organization.partnerNetworks}
               />
             </>
           )}
@@ -168,13 +169,12 @@ Organization.propTypes = {
     isOfficialPartner: PropTypes.bool,
     name: PropTypes.string.isRequired,
     region: PropTypes.string,
-    partnerEntrances: PropTypes.arrayOf(EntrancePropTypes),
-    partnerNetworks: PropTypes.arrayOf(NetworkPropTypes),
     postalCode: PropTypes.string,
     village: PropTypes.string,
     yearBirth: PropTypes.number,
     longitude: PropTypes.number,
-    latitude: PropTypes.number
+    latitude: PropTypes.number,
+    documents: PropTypes.arrayOf(PropTypes.shape({}))
   })
 };
 
