@@ -12,11 +12,10 @@ const PersonPage = () => {
   const permissions = usePermissions();
   const { person, error, isFetching } = useSelector(state => state.person);
   const userId = pathOr(null, ['id'], useUserProperties());
-  let isAllowed = false;
+  let canEdit = false;
 
   if (!isNil(userId)) {
-    isAllowed =
-      userId.toString() === personId.toString() || permissions.isAdmin;
+    canEdit = userId.toString() === personId.toString() || permissions.isAdmin;
   }
 
   const history = useHistory();
@@ -35,7 +34,7 @@ const PersonPage = () => {
       isFetching={isFetching || !isNil(error)}
       person={person}
       onEdit={onEdit}
-      isAllowed={isAllowed}
+      canEdit={canEdit}
     />
   );
 };
