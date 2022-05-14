@@ -18,7 +18,7 @@ import UsersList from '../../common/UsersList/UsersList';
 import Alert from '../../common/Alert';
 import DocumentsList from '../../common/DocumentsList/DocumentsList';
 
-const Organization = ({ error, isLoading, organization }) => {
+const Organization = ({ error, isLoading, organization, onEdit, canEdit }) => {
   const { formatMessage } = useIntl();
 
   let title = '';
@@ -108,6 +108,8 @@ const Organization = ({ error, isLoading, organization }) => {
                 village={organization.village}
                 position={position}
                 organization={organization}
+                canEdit={canEdit}
+                onEdit={onEdit}
               />
 
               <hr />
@@ -175,7 +177,9 @@ Organization.propTypes = {
     longitude: PropTypes.number,
     latitude: PropTypes.number,
     documents: PropTypes.arrayOf(PropTypes.shape({}))
-  })
+  }),
+  onEdit: PropTypes.func.isRequired,
+  canEdit: PropTypes.bool.isRequired
 };
 
 export default Organization;
