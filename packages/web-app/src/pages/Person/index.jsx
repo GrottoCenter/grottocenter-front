@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect } from 'react';
 import { useParams /* , useHistory */ } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { isNil, pathOr } from 'ramda';
@@ -19,16 +19,14 @@ const PersonPage = () => {
   }
 
   // const history = useHistory(); ### À décommenter lorsque la page edit sera prête
-  const editPath = useRef('/ui');
 
   useEffect(() => {
     dispatch(loadPerson(personId));
-    editPath.current = `/ui/person/edit/${personId}`;
   }, [personId, dispatch]);
 
   /* ### À décommenter lorsque la page edit sera prête
   const onEdit = () => {
-    history.push(editPath.current);
+    history.push(`/ui/person/edit/${personId}`);
   }; */
   return (
     <Person
