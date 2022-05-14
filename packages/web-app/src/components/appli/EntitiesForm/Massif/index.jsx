@@ -24,28 +24,30 @@ import { postMassif, updateMassif } from '../../../../actions/Massif';
 
 import Massif from './Massif';
 import PolygonContainer from './PolygonContainer';
-import makeMassifData from './transformers';
+import { makeMassifPostData, makeMassifPutData } from './transformers';
 
 const Button = styled(MuiButton)`
   margin: ${({ theme }) => theme.spacing(2)}px;
 `;
 
-const defaultMassifValues = {
+let defaultMassifValues = {
   name: '',
   description: '',
   descriptionTitle: '',
-  language: 'fra',
+  language: '',
   geoJson: null
 };
 
-export const MassifForm = ({ massifValues = null }) => {
-  const isNewMassif = massifValues === null;
-
+export const MassifForm = ({ massifValues }) => {
+  const isNewMassif = !massifValues;
+  defaultMassifValues = massifValues || defaultMassifValues;
   const { formatMessage } = useIntl();
   const { languages: allLanguages } = useSelector(state => state.language);
-  const { error: massifError, loading: massifLoading } = useSelector(state =>
-    isNewMassif ? state.massifPost : state.massifePut
-  );
+  const {
+    error: massifError,
+    loading: massifLoading,
+    massif
+  } = useSelector(state => (isNewMassif ? state.massifPost : state.massifPut));
   const dispatch = useDispatch();
 
   const {
@@ -62,7 +64,7 @@ export const MassifForm = ({ massifValues = null }) => {
     }
   } = useForm({
     defaultValues: {
-      massif: massifValues || defaultMassifValues
+      massif: defaultMassifValues
     }
   });
 
@@ -84,9 +86,7 @@ export const MassifForm = ({ massifValues = null }) => {
       <PolygonContainer
         control={control}
         errors={errors}
-        geoJson={
-          massifValues ? massifValues.geoJson : defaultMassifValues.geoJson
-        }
+        geoJson={defaultMassifValues.geoJson}
       />
     )
   };
@@ -117,11 +117,15 @@ export const MassifForm = ({ massifValues = null }) => {
   };
 
   const onSubmit = async data => {
-    const massif = makeMassifData(data);
     if (isNewMassif) {
-      dispatch(postMassif(massif));
+      const massifToPost = makeMassifPostData(data);
+      console.log('post');
+      console.log(massifToPost);
+      dispatch(postMassif(massifToPost));
     } else {
-      dispatch(updateMassif(massif));
+      const massifToUpdate = makeMassifPutData(data);
+      console.log('edit');
+      dispatch(updateMassif(massifToUpdate));
     }
   };
 
@@ -147,6 +151,7 @@ export const MassifForm = ({ massifValues = null }) => {
                 : 'Massif successfully updated!'
             })}
           />
+          <h1>{JSON.stringify(massif)}</h1>
           {isNewMassif && (
             <Button onClick={handleReset} color="primary">
               {formatMessage({
@@ -191,7 +196,7 @@ export const MassifForm = ({ massifValues = null }) => {
                 })}
               </StepLabel>
               <StepContent>
-                <div style={{ maxWidth: '600px', margin: '0 auto' }}>
+                <div style={{ maxWidth: '900px', margin: '0 auto' }}>
                   {prop(label, steps)}
                 </div>
                 {!stepExpanded.isOpen && (
@@ -217,11 +222,10 @@ export const MassifForm = ({ massifValues = null }) => {
           ))}
         </Stepper>
         <Box display="flex">
-          {isNewMassif && (
-            <Button disabled={!isDirty} onClick={handleReset}>
-              {formatMessage({ id: 'Reset' })}
-            </Button>
-          )}
+          <Button disabled={!isDirty} onClick={handleReset}>
+            {formatMessage({ id: 'Reset' })}
+          </Button>
+
           <ActionButton
             label={formatMessage({
               id: isNewMassif ? 'Create' : 'Update'
