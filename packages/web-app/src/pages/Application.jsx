@@ -35,6 +35,7 @@ import PersonPage from './Person';
 import OrganizationPage from './Organization';
 import EntityCreation from './EntityCreation';
 import ImportContainer from './ImportCSV';
+import MassifEdit from './EntityEdit/MassifEdit';
 
 const Application = () => {
   const dispatch = useDispatch();
@@ -73,6 +74,7 @@ const Application = () => {
           path="/ui/organizations/:organizationId"
           component={OrganizationPage}
         />
+        <Route path="/ui/massifs/edit/:massifId" component={MassifEdit} />
         <Route path="/ui/massifs/:massifId" component={MassifPage} />
         <Route path="/ui/persons/:personId" component={PersonPage} />
         <Route path="/ui/login" component={HomePage} />
