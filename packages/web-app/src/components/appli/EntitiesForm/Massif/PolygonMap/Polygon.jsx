@@ -146,8 +146,8 @@ const PolygonMap = ({ onChange, data }) => {
         whenCreated={setMap}
         position="topLeft"
         style={{
-          height: '40vh',
-          width: '50vh'
+          height: '70vh',
+          width: '60vw'
         }}>
         <FeatureGroup
           ref={reactFGref => {
