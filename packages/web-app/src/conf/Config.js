@@ -222,6 +222,10 @@ export const putDocumentyWithNewEntitiesUrl = docId =>
 export const postLocationUrl = `${API_URL}/api/${apiVersion}/locations`;
 export const putLocationUrl = locationId =>
   `${API_URL}/api/${apiVersion}/locations/${locationId}`;
+export const postCreateDescriptionUrl = `${API_URL}/api/${apiVersion}/descriptions`;
+export const patchDescriptionUrl = id =>
+  `${API_URL}/api/${apiVersion}/descriptions/${id}`;
+export const patchNameUrl = id => `${API_URL}/api/${apiVersion}/names/${id}`;
 
 // ===== ImportCSV url
 export const checkRowsEntrancesUrl = `${API_URL}/api/${apiVersion}/entrances/check-rows`;
