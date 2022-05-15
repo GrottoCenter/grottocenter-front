@@ -21,6 +21,11 @@ import { useBoolean } from '../../../../hooks';
 import ActionButton from '../../../common/ActionButton';
 import Alert from '../../../common/Alert';
 import { postMassif, updateMassif } from '../../../../actions/Massif';
+import {
+  updateDescription,
+  postDescription
+} from '../../../../actions/Description';
+import { updateName } from '../../../../actions/Name';
 
 import Massif from './Massif';
 import PolygonContainer from './PolygonContainer';
@@ -40,14 +45,22 @@ let defaultMassifValues = {
 
 export const MassifForm = ({ massifValues }) => {
   const isNewMassif = !massifValues;
+  const isNewDescription = massifValues ? !massifValues.descriptionId : true;
   defaultMassifValues = massifValues || defaultMassifValues;
   const { formatMessage } = useIntl();
   const { languages: allLanguages } = useSelector(state => state.language);
+  const { error: massifError, loading: massifLoading } = useSelector(state =>
+    isNewMassif ? state.massifPost : state.massifPut
+  );
+  const { error: nameError, loading: nameLoading } = useSelector(
+    state => state.namePatch
+  );
   const {
-    error: massifError,
-    loading: massifLoading,
-    massif
-  } = useSelector(state => (isNewMassif ? state.massifPost : state.massifPut));
+    error: descriptionError,
+    loading: descriptionLoading
+  } = useSelector(state =>
+    isNewDescription ? state.descriptionPost : state.descriptionPatch
+  );
   const dispatch = useDispatch();
 
   const {
@@ -80,7 +93,12 @@ export const MassifForm = ({ massifValues }) => {
 
   const steps = {
     massif: (
-      <Massif allLanguages={allLanguages} control={control} errors={errors} />
+      <Massif
+        allLanguages={allLanguages}
+        control={control}
+        errors={errors}
+        isNewDescription={isNewDescription}
+      />
     ),
     location: (
       <PolygonContainer
@@ -119,17 +137,47 @@ export const MassifForm = ({ massifValues }) => {
   const onSubmit = async data => {
     if (isNewMassif) {
       const massifToPost = makeMassifPostData(data);
-      console.log('post');
-      console.log(massifToPost);
       dispatch(postMassif(massifToPost));
     } else {
-      const massifToUpdate = makeMassifPutData(data);
-      console.log('edit');
+      if (data.massif.name !== defaultMassifValues.name) {
+        const newName = {
+          id: defaultMassifValues.nameId,
+          name: data.massif.name
+        };
+        dispatch(updateName(newName));
+      }
+
+      if (
+        data.massif.description !== defaultMassifValues.description ||
+        data.massif.descriptionTitle !== defaultMassifValues.descriptionTitle
+      ) {
+        if (isNewDescription) {
+          const newDescription = {
+            body: data.massif.description,
+            language: data.massif.language,
+            title: data.massif.descriptionTitle,
+            massifId: defaultMassifValues.massifId
+          };
+          dispatch(postDescription(newDescription));
+        } else {
+          const updatedDescription = {
+            id: data.massif.descriptionId,
+            body: data.massif.description,
+            title: data.massif.descriptionTitle
+          };
+          dispatch(updateDescription(updatedDescription));
+        }
+      }
+
+      const massifToUpdate = makeMassifPutData(data, defaultMassifValues);
       dispatch(updateMassif(massifToUpdate));
     }
   };
 
-  return isSubmitted && isNil(massifError) ? (
+  return isSubmitted &&
+    isNil(massifError) &&
+    isNil(nameError) &&
+    isNil(descriptionError) ? (
     <Box display="flex" justifyContent="center" flexDirection="column">
       {massifLoading && (
         <>
@@ -141,46 +189,51 @@ export const MassifForm = ({ massifValues }) => {
           <CircularProgress />
         </>
       )}
-      {!massifLoading && isSubmitSuccessful && (
-        <form>
-          <Alert
-            severity="success"
-            title={formatMessage({
-              id: isNewMassif
-                ? 'Massif successfully created!'
-                : 'Massif successfully updated!'
-            })}
-          />
-          <h1>{JSON.stringify(massif)}</h1>
-          {isNewMassif && (
-            <Button onClick={handleReset} color="primary">
-              {formatMessage({
-                id: 'Create a new Massif'
+      {!massifLoading &&
+        !nameLoading &&
+        !descriptionLoading &&
+        isSubmitSuccessful && (
+          <form>
+            <Alert
+              severity="success"
+              title={formatMessage({
+                id: isNewMassif
+                  ? 'Massif successfully created!'
+                  : 'Massif successfully updated!'
               })}
-            </Button>
-          )}
-        </form>
-      )}
+            />
+            {isNewMassif && (
+              <Button onClick={handleReset} color="primary">
+                {formatMessage({
+                  id: 'Create a new Massif'
+                })}
+              </Button>
+            )}
+          </form>
+        )}
 
-      {!massifLoading && !isSubmitSuccessful && (
-        <form>
-          <Alert
-            severity="error"
-            title={formatMessage({
-              id: isNewMassif
-                ? 'An error occurred when creating a massif!'
-                : 'An error occurred when updating a massif!'
-            })}
-          />
-          {isNewMassif && (
-            <Button onClick={handleReset} color="primary">
-              {formatMessage({
-                id: 'Retry'
+      {!massifLoading &&
+        !nameLoading &&
+        !descriptionLoading &&
+        !isSubmitSuccessful && (
+          <form>
+            <Alert
+              severity="error"
+              title={formatMessage({
+                id: isNewMassif
+                  ? 'An error occurred when creating a massif!'
+                  : 'An error occurred when updating a massif!'
               })}
-            </Button>
-          )}
-        </form>
-      )}
+            />
+            {isNewMassif && (
+              <Button onClick={handleReset} color="primary">
+                {formatMessage({
+                  id: 'Retry'
+                })}
+              </Button>
+            )}
+          </form>
+        )}
     </Box>
   ) : (
     <Box display="flex" justifyContent="center" flexDirection="column">

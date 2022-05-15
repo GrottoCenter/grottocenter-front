@@ -2,11 +2,12 @@ import React from 'react';
 import styled from 'styled-components';
 import { useIntl } from 'react-intl';
 import { isNil } from 'ramda';
-import MassifForm from '../../components/appli/EntitiesForm/Massif';
-import { makeMassifValueData } from '../../components/appli/EntitiesForm/Massif/transformers';
-import Spinner from '../../components/common/Spinner';
-import Layout from '../../components/common/Layouts/Fixed/FixedContent';
-import Translate from '../../components/common/Translate';
+import PropTypes from 'prop-types';
+import MassifForm from '../../../components/appli/EntitiesForm/Massif';
+import { makeMassifValueData } from '../../../components/appli/EntitiesForm/Massif/transformers';
+import Spinner from '../../../components/common/Spinner';
+import Layout from '../../../components/common/Layouts/Fixed/FixedContent';
+import Translate from '../../../components/common/Translate';
 
 const MassifEditContainer = ({ isFetching, massif }) => {
   const { formatMessage } = useIntl();
@@ -39,6 +40,13 @@ const MassifEditContainer = ({ isFetching, massif }) => {
       }
     />
   );
+};
+
+MassifEditContainer.propTypes = {
+  massif: PropTypes.shape({
+    name: PropTypes.shape({ message: PropTypes.string })
+  }),
+  isFetching: PropTypes.bool
 };
 
 export default MassifEditContainer;

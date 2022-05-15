@@ -35,7 +35,7 @@ import MassifPage from './Massif';
 import NetworkPage from './Network';
 import PersonPage from './Person';
 import OrganizationPage from './Organization';
-import MassifEdit from './EntityEdit/MassifEdit';
+import MassifEdit from './EntityEdit/Massif/MassifEdit';
 
 const Application = () => {
   const dispatch = useDispatch();
