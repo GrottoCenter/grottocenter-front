@@ -9,6 +9,8 @@ import changePassword from './ChangePassword';
 import createCaver from './CreateCaver';
 import createLocation from './CreateLocation';
 import createOrganization from './CreateOrganization';
+import descriptionPost from './DescriptionPostReducer';
+import descriptionPatch from './DescriptionPutReducer';
 import document from './DocumentReducer';
 import documentChildren from './DocumentChildrenReducer';
 import documentDetails from './DetailsDocumentReducer';
@@ -33,6 +35,7 @@ import map from './Map';
 import massif from './MassifReducer';
 import massifPost from './MassifPostReducer';
 import massifPut from './MassifPutReducer';
+import namePatch from './NamePutReducer';
 import organization from './OrganizationReducer';
 import pageTitle from './PageTitleReducer';
 import partnersCarousel from './PartnersCarouselReducer';
@@ -58,6 +61,8 @@ const GCReducer = combineReducers({
   createCaver,
   createLocation,
   createOrganization,
+  descriptionPost,
+  descriptionPatch,
   document,
   documentChildren,
   documentDetails,
@@ -82,6 +87,7 @@ const GCReducer = combineReducers({
   massif,
   massifPost,
   massifPut,
+  namePatch,
   organization,
   pageTitle,
   partnersCarousel,
