@@ -300,6 +300,7 @@ MassifForm.propTypes = {
   massifValues: PropTypes.shape({
     name: PropTypes.string,
     description: PropTypes.string,
+    descriptionId: PropTypes.string,
     descriptionTitle: PropTypes.string,
     geoJson: PropTypes.string
   })
