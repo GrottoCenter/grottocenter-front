@@ -35,7 +35,7 @@ import PersonPage from './Person';
 import OrganizationPage from './Organization';
 import EntityCreation from './EntityCreation';
 import ImportContainer from './ImportCSV';
-import MassifEdit from './EntityEdit/MassifEdit';
+import MassifEdit from './EntityEdit/Massif/MassifEdit';
 
 const Application = () => {
   const dispatch = useDispatch();
