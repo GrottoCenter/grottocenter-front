@@ -36,6 +36,7 @@ import NetworkPage from './Network';
 import PersonPage from './Person';
 import OrganizationPage from './Organization';
 import MassifEdit from './EntityEdit/Massif/MassifEdit';
+import OrganizationEdit from './EntityEdit/Organization/OrganizationEdit';
 
 const Application = () => {
   const dispatch = useDispatch();
@@ -70,6 +71,10 @@ const Application = () => {
         <Route path="/ui/map/:target?" component={Map} />
         <Route path="/ui/contributions" component={ContributionsPage} />
         <Route path="/ui/test" component={LatestBlogNewsSection} />
+        <Route
+          path="/ui/organizations/edit/:organizationId"
+          component={OrganizationEdit}
+        />
         <Route
           path="/ui/organizations/:organizationId"
           component={OrganizationPage}

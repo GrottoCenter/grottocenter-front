@@ -9,7 +9,6 @@ export const FETCH_ORGANIZATION_FAILURE = 'FETCH_ORGANIZATION_FAILURE';
 export function loadOrganization(organizationId) {
   return dispatch => {
     dispatch({ type: FETCH_ORGANIZATION });
-
     return fetch(`${findOrganizationUrl}${organizationId}`)
       .then(response => {
         if (response.status >= 400) {

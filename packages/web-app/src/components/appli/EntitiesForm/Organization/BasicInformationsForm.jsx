@@ -20,7 +20,12 @@ const FormControl = styled(MuiFormControl)`
   padding-bottom: ${({ theme }) => theme.spacing(4)}px;
 `;
 
-const BasicInformationsForm = ({ control, errors, allLanguages }) => {
+const BasicInformationsForm = ({
+  control,
+  errors,
+  allLanguages,
+  isNewOrganization
+}) => {
   const history = useHistory();
   const permissions = usePermissions();
   const { formatMessage } = useIntl();
@@ -62,7 +67,7 @@ const BasicInformationsForm = ({ control, errors, allLanguages }) => {
               <InputLabel shrink>
                 <Translate>Language</Translate>
               </InputLabel>
-              <Select {...field} inputRef={ref}>
+              <Select disabled={!isNewOrganization} {...field} inputRef={ref}>
                 <MenuItem key={-1} value={-1} disabled>
                   <i>
                     <Translate>Select a language</Translate>
@@ -170,7 +175,8 @@ BasicInformationsForm.propTypes = {
       name: PropTypes.shape({ message: PropTypes.string }),
       isPartner: PropTypes.bool
     })
-  })
+  }),
+  isNewOrganization: PropTypes.bool
 };
 
 export default BasicInformationsForm;

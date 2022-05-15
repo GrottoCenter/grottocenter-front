@@ -29,7 +29,7 @@ const InformationsForm = ({ control, errors, allCountries }) => {
   ); */
 
   const validateZipCode = value => {
-    if (value.isNan) {
+    if (value && value.isNan) {
       return formatMessage({ id: 'Must be a number' });
     }
     return true;

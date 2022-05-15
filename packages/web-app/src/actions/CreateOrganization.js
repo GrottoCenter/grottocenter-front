@@ -1,4 +1,5 @@
 import fetch from 'isomorphic-fetch';
+import makeErrorMessage from '../helpers/makeErrorMessage';
 import { postOrganizationUrl } from '../conf/Config';
 
 export const POST_ORGANIZATION = 'POST_ORGANIZATION';
@@ -19,28 +20,33 @@ export const postOrganizationFailure = error => ({
   error
 });
 
-export const postOrganization = name => (dispatch, getState) => {
-  dispatch(postOrganizationAction());
+export const postOrganization = data => {
+  return (dispatch, getState) => {
+    dispatch(postOrganizationAction());
 
-  const requestOptions = {
-    method: 'POST',
-    body: JSON.stringify({
-      name: {
-        text: name
-      }
-    }),
-    headers: getState().login.authorizationHeader
+    const requestOptions = {
+      method: 'POST',
+      body: JSON.stringify(data),
+      headers: getState().login.authorizationHeader
+    };
+
+    return fetch(postOrganizationUrl, requestOptions)
+      .then(response => {
+        if (response.status >= 400) {
+          throw new Error(response.status);
+        }
+        return response.json();
+      })
+      .then(res => {
+        dispatch(postOrganizationSuccess(res));
+      })
+      .catch(error =>
+        dispatch(
+          postOrganizationFailure(
+            makeErrorMessage(error.message, `Bad request`),
+            error.message
+          )
+        )
+      );
   };
-
-  return fetch(postOrganizationUrl, requestOptions)
-    .then(response => {
-      if (response.status >= 400) {
-        throw new Error(response.status);
-      }
-      return response.text();
-    })
-    .then(text => dispatch(postOrganizationSuccess(JSON.parse(text))))
-    .catch(errorMessage => {
-      dispatch(postOrganizationFailure(errorMessage));
-    });
 };
