@@ -19,20 +19,16 @@ export const updateOrganizationFailure = error => ({
   error
 });
 
-export const updateOrganization = name => (dispatch, getState) => {
+export const updateOrganization = data => (dispatch, getState) => {
   dispatch(updateOrganizationAction());
 
   const requestOptions = {
     method: 'PUT',
-    body: JSON.stringify({
-      name: {
-        text: name
-      }
-    }),
+    body: JSON.stringify(data),
     headers: getState().login.authorizationHeader
   };
 
-  return fetch(putOrganizationUrl, requestOptions)
+  return fetch(putOrganizationUrl(data.id), requestOptions)
     .then(response => {
       if (response.status >= 400) {
         throw new Error(response.status);

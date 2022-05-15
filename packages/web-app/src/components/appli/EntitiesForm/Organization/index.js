@@ -20,6 +20,7 @@ import countryList from 'react-select-country-list';
 import { useBoolean } from '../../../../hooks';
 import ActionButton from '../../../common/ActionButton';
 import Alert from '../../../common/Alert';
+import { updateName } from '../../../../actions/Name';
 import { postOrganization } from '../../../../actions/CreateOrganization';
 import { updateOrganization } from '../../../../actions/UpdateOrganization';
 import BasicInformationsForm from './BasicInformationsForm';
@@ -27,33 +28,37 @@ import InformationsForm from './InformationsForm';
 // import Uploader from './Uploader'; //To uncomment when api will have logo field
 import Location from './Location/index';
 import License from './License';
-import makeOrganizationData from './transformers';
+import {
+  makePostOrganizationData,
+  makePutOrganizationData
+} from './transformers';
 
 const Button = styled(MuiButton)`
   margin: ${({ theme }) => theme.spacing(2)}px;
 `;
 
-const defaultOrganizationValues = {
-  name: '',
+let defaultOrganizationValues = {
+  name: null,
   isPartner: false,
-  description: '',
-  descriptionTitle: '',
-  language: '',
-  firstAdress: '',
-  secondAdress: '',
-  zipCode: '',
-  city: '',
-  country: '',
-  phone: '',
-  mail: '',
-  url: '',
-  latitude: '',
-  longitude: '',
-  logo: ''
+  description: null,
+  descriptionTitle: null,
+  language: null,
+  firstAdress: null,
+  secondAdress: null,
+  zipCode: null,
+  city: null,
+  country: null,
+  phone: null,
+  mail: null,
+  url: null,
+  latitude: null,
+  longitude: null,
+  logo: null
 };
 
 export const OrganizationForm = ({ organizationValues = null }) => {
-  const isNewOrganization = organizationValues === null;
+  const isNewOrganization = !organizationValues;
+  defaultOrganizationValues = organizationValues || defaultOrganizationValues;
   const { formatMessage } = useIntl();
   const { languages: allLanguages } = useSelector(state => state.language);
   const allCountries = useMemo(() => countryList().getData(), []);
@@ -62,6 +67,9 @@ export const OrganizationForm = ({ organizationValues = null }) => {
     loading: organizationLoading
   } = useSelector(state =>
     isNewOrganization ? state.organizationPost : state.organizationPut
+  );
+  const { error: nameError, loading: nameLoading } = useSelector(
+    state => state.namePatch
   );
   const dispatch = useDispatch();
 
@@ -80,7 +88,7 @@ export const OrganizationForm = ({ organizationValues = null }) => {
     }
   } = useForm({
     defaultValues: {
-      organization: organizationValues || defaultOrganizationValues
+      organization: defaultOrganizationValues
     }
   });
 
@@ -97,6 +105,7 @@ export const OrganizationForm = ({ organizationValues = null }) => {
   const steps = {
     Organization: (
       <BasicInformationsForm
+        isNewOrganization={isNewOrganization}
         allLanguages={allLanguages}
         control={control}
         errors={errors}
@@ -155,15 +164,27 @@ export const OrganizationForm = ({ organizationValues = null }) => {
   };
 
   const onSubmit = async data => {
-    const organization = makeOrganizationData(data);
     if (isNewOrganization) {
-      dispatch(postOrganization(organization));
+      const organizationToPost = makePostOrganizationData(data);
+      dispatch(postOrganization(organizationToPost));
     } else {
-      dispatch(updateOrganization(organization));
+      if (data.organization.name !== defaultOrganizationValues) {
+        const newName = {
+          id: defaultOrganizationValues.nameId,
+          name: data.organization.name
+        };
+        dispatch(updateName(newName));
+      }
+
+      const organizationToUpdate = makePutOrganizationData(
+        data,
+        defaultOrganizationValues
+      );
+      dispatch(updateOrganization(organizationToUpdate));
     }
   };
 
-  return isSubmitted && isNil(organizationError) ? (
+  return isSubmitted && isNil(organizationError) && isNil(nameError) ? (
     <Box display="flex" justifyContent="center" flexDirection="column">
       {organizationLoading && (
         <>
@@ -177,7 +198,7 @@ export const OrganizationForm = ({ organizationValues = null }) => {
           <CircularProgress />
         </>
       )}
-      {!organizationLoading && isSubmitSuccessful && (
+      {!organizationLoading && !nameLoading && isSubmitSuccessful && (
         <form>
           <Alert
             severity="success"
@@ -197,7 +218,7 @@ export const OrganizationForm = ({ organizationValues = null }) => {
         </form>
       )}
 
-      {!organizationLoading && !isSubmitSuccessful && (
+      {!organizationLoading && !nameLoading && !isSubmitSuccessful && (
         <form>
           <Alert
             severity="error"
@@ -257,11 +278,10 @@ export const OrganizationForm = ({ organizationValues = null }) => {
           ))}
         </Stepper>
         <Box display="flex">
-          {isNewOrganization && (
-            <Button disabled={!isDirty} onClick={handleReset}>
-              {formatMessage({ id: 'Reset' })}
-            </Button>
-          )}
+          <Button disabled={!isDirty} onClick={handleReset}>
+            {formatMessage({ id: 'Reset' })}
+          </Button>
+
           <ActionButton
             label={formatMessage({
               id: isNewOrganization ? 'Create' : 'Update'

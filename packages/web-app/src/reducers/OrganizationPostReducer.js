@@ -7,7 +7,8 @@ import {
 const initialState = {
   loading: false,
   error: null,
-  data: null
+  data: null,
+  organization: null
 };
 
 const reducer = (state = initialState, action) => {
@@ -29,7 +30,8 @@ const reducer = (state = initialState, action) => {
         ...state,
         data: action.cave,
         error: initialState.error,
-        loading: false
+        loading: false,
+        organization: action.organization
       };
     default:
       return state;
