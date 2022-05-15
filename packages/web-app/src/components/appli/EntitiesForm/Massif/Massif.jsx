@@ -17,7 +17,7 @@ const FormControl = styled(MuiFormControl)`
   padding-bottom: ${({ theme }) => theme.spacing(4)}px;
 `;
 
-const Massif = ({ control, errors, allLanguages }) => {
+const Massif = ({ control, errors, allLanguages, isNewDescription }) => {
   const { formatMessage } = useIntl();
 
   return (
@@ -49,7 +49,7 @@ const Massif = ({ control, errors, allLanguages }) => {
               <InputLabel shrink>
                 <Translate>Language</Translate>
               </InputLabel>
-              <Select {...field} inputRef={ref}>
+              <Select disabled={!isNewDescription} {...field} inputRef={ref}>
                 <MenuItem key={-1} value={-1} disabled>
                   <i>
                     <Translate>Select a language</Translate>
@@ -120,7 +120,8 @@ Massif.propTypes = {
       language: PropTypes.shape({ message: PropTypes.string }),
       name: PropTypes.shape({ message: PropTypes.string })
     })
-  })
+  }),
+  isNewDescription: PropTypes.bool
 };
 
 export default Massif;
