@@ -21,7 +21,7 @@ const MassifPage = () => {
   }, [massifId, dispatch]);
 
   const onEdit = () => {
-    history.push(`/ui/massifs/edit/${massifId}`);
+    history.push(`/ui/massifs/${massifId}/edit`);
   };
 
   return (
