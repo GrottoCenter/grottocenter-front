@@ -84,7 +84,7 @@ const EntrancesSelection = ({
 
 EntrancesSelection.propTypes = {
   onSelect: PropTypes.func.isRequired,
-  selection: PropTypes.arrayOf(PropTypes.string).isRequired,
+  selection: PropTypes.arrayOf(PropTypes.number).isRequired,
   loading: PropTypes.bool,
   entrances: PropTypes.arrayOf(entranceDetailsType)
 };

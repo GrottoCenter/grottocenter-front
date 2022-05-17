@@ -1,8 +1,6 @@
 import React, { useContext } from 'react';
 import { storiesOf } from '@storybook/react';
 import { Typography } from '@material-ui/core';
-import DescriptionIcon from '@material-ui/icons/Description';
-import DocumentIcon from '@material-ui/icons/Filter';
 import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
 import { boolean } from '@storybook/addon-knobs';
@@ -15,6 +13,7 @@ import Properties from './Properties';
 import { Network } from './index';
 import EntrancesSelection from './EntrancesSelection';
 import EntrancesList from './EntrancesList';
+import Descriptions from './Descriptions';
 
 const date = new Date('2015-03');
 const today = new Date();
@@ -39,47 +38,29 @@ const data = {
   isDivingCave: true,
   entrances: [
     {
-      id: 'entry1',
+      id: 'Network 1',
       name: 'Petit Saint-Cassien (Gouffre du)',
-      localisation:
-        "Nans-les-Pins, Var (83), Provence-Alpes-Côte d'Azur (PAC), FRANCE",
       depth: 403,
       development: 10865,
-      interestRate: 3.5,
-      progressionRate: 2.5,
-      accessRate: 1.5,
       author: 'Author name',
       creationDate: date.toISOString().substring(0, 10),
-      lastEditor: 'Editor name',
-      editionDate: today.toISOString().substring(0, 10),
       undergroundType: 'Karstic (all carbonate rocks)',
-      discoveryYear: 1925,
       latitude: 43.35266,
       longitude: 5.81689,
-      mountain: 'Sainte-Baume (massif de la)',
-      altitude: 748,
+      massif: { id: 1, name: 'Sainte-Baume (massif de la)' },
       isDivingCave: true
     },
     {
-      id: 'entry2',
+      id: 'Network 2',
       name: '2 eme entrée (Gouffre du)',
-      localisation:
-        "Nans-les-Pins, Var (83), Provence-Alpes-Côte d'Azur (PAC), FRANCE",
       depth: 403,
       development: 10865,
-      interestRate: 3.5,
-      progressionRate: 2.5,
-      accessRate: 1.5,
       author: 'Author name',
       creationDate: date.toISOString().substring(0, 10),
-      lastEditor: 'Editor name',
-      editionDate: today.toISOString().substring(0, 10),
       undergroundType: 'Karstic (all carbonate rocks)',
-      discoveryYear: 1925,
       latitude: 43.35766,
       longitude: 5.82089,
-      mountain: 'Sainte-Baume (massif de la)',
-      altitude: 748,
+      massif: { id: 1, name: 'Sainte-Baume (massif de la)' },
       isDivingCave: true
     }
   ]
@@ -117,12 +98,11 @@ const StoryContextProvider = ({ loading, children }) => (
   </Provider>
 );
 
-const EntryWithContent = () => (
+const NetworkWithContent = () => (
   <Network>
     <>
       <EntrancesList />
-      <Content title="Description" icon={<DescriptionIcon color="primary" />} />
-      <Content title="Documents" icon={<DocumentIcon color="primary" />} />
+      <Descriptions />
     </>
   </Network>
 );
@@ -141,7 +121,7 @@ const WithLayout = () => {
       toggleSideMenu={toggleSideMenu}
       HeaderQuickSearch={Search}
       SideBarQuickSearch={Search}>
-      <EntryWithContent />
+      <NetworkWithContent />
     </Layout>
   );
 };
