@@ -74,7 +74,7 @@ const Application = () => {
           path="/ui/organizations/:organizationId"
           component={OrganizationPage}
         />
-        <Route path="/ui/massifs/edit/:massifId" component={MassifEdit} />
+        <Route path="/ui/massifs/:massifId/edit" component={MassifEdit} />
         <Route path="/ui/massifs/:massifId" component={MassifPage} />
         <Route path="/ui/persons/:personId" component={PersonPage} />
         <Route path="/ui/login" component={HomePage} />

@@ -1,3 +1,5 @@
+import { pathOr, pipe } from 'ramda';
+
 export const makeMassifPostData = data => ({
   name: data.massif.name,
   description: data.massif.description,
@@ -6,12 +8,11 @@ export const makeMassifPostData = data => ({
   geogPolygon: data.massif.geoJson
 });
 
-export const makeMassifPutData = (data, defautltValue) => {
+export const makeMassifPutData = (data, massifValues) => {
   const myObj = {};
-  myObj.id = defautltValue.massifId;
+  myObj.id = massifValues.massifId;
   if (
-    JSON.stringify(data.massif.geoJson) !==
-    JSON.stringify(defautltValue.geoJson)
+    JSON.stringify(data.massif.geoJson) !== JSON.stringify(massifValues.geoJson)
   ) {
     myObj.geogPolygon = data.massif.geoJson;
   }
@@ -20,26 +21,27 @@ export const makeMassifPutData = (data, defautltValue) => {
 };
 
 export const makeMassifValueData = data => {
-  const myObj = {};
   if (data) {
-    myObj.massifId = data.id;
-    myObj.name = data.name || '';
+    const getGeoJson = pipe(
+      d => pathOr('', ['geogPolygon'], d),
+      res => {
+        if (res) {
+          return JSON.parse(res);
+        }
+        return null;
+      }
+    );
 
-    if (data.names && data.names[0]) {
-      myObj.language = data.names[0].language || '';
-      myObj.nameId = data.names[0].id;
-    } else myObj.language = '';
-
-    if (data.descriptions && data.descriptions[0]) {
-      myObj.description = data.descriptions[0].body || '';
-      myObj.descriptionTitle = data.descriptions[0].title || '';
-      myObj.descriptionId = data.descriptions[0].id;
-    } else {
-      myObj.description = '';
-      myObj.descriptionTitle = '';
-    }
-
-    myObj.geoJson = data.geogPolygon ? JSON.parse(data.geogPolygon) : null;
+    const myObj = {
+      description: pathOr('', ['descriptions', 0, 'body'], data),
+      descriptionTitle: pathOr('', ['descriptions', 0, 'title'], data),
+      descriptionId: pathOr(undefined, ['descriptions', 0, 'id'], data),
+      language: pathOr('', ['names', 0, 'language'], data),
+      nameId: pathOr(undefined, ['names', 0, 'id'], data),
+      massifId: pathOr(undefined, ['id'], data),
+      name: pathOr('', ['name'], data),
+      geoJson: getGeoJson(data)
+    };
 
     return myObj;
   }
