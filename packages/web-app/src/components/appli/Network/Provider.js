@@ -2,13 +2,13 @@ import React, { useState, createContext, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { pipe, reject, isNil, map, prop } from 'ramda';
 
-import { detailsType as entryDetailsType } from '../Entry/Provider';
+import { detailsType as entranceDetailsType } from '../Entry/Provider';
 
 const date = new Date();
 const todayDate = date.toISOString().substring(0, 10);
 
 export const getPositions = pipe(
-  map(entry => [prop('latitude', entry), prop('longitude', entry)]),
+  map(entrance => [prop('latitude', entrance), prop('longitude', entrance)]),
   reject(isNil)
 );
 
@@ -16,7 +16,7 @@ const defaultContext = {
   state: {
     cave: {
       id: 0,
-      name: 'Cave System',
+      name: '',
       localisation: '',
       depth: 0,
       development: 0,
@@ -26,44 +26,44 @@ const defaultContext = {
       author: '',
       creationDate: todayDate
     },
-    entries: null,
-    coordinates: null
+    coordinates: null,
+    entrances: null
   }
 };
 
 export const CaveContext = createContext(defaultContext);
 
 const Provider = ({ data, loading = true, children }) => {
-  const { entries, ...caveData } = data;
+  const { entrances, ...caveData } = data;
   const [caveState, setCaveState] = useState(caveData || null);
   const [coordinatesState, setCoordinatesState] = useState(
-    getPositions(entries)
+    getPositions(entrances)
   );
-  const [entriesState, setEntriesState] = useState(entries || null);
-  const [selectedEntries, setSelectedEntries] = useState([]);
+  const [entrancesState, setEntrancesState] = useState(entrances || null);
+  const [selectedEntrances, setSelectedEntrances] = useState([]);
 
   useEffect(() => {
     setCaveState(caveData);
-    setEntriesState(entries || null);
-    setCoordinatesState(getPositions(entries));
+    setEntrancesState(entrances || null);
+    setCoordinatesState(getPositions(entrances));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data]);
 
-  const onSelectEntry = selection => {
+  const onSelectEntrance = selection => {
     if (!isNil(selection)) {
-      setSelectedEntries(selection);
+      setSelectedEntrances(selection);
     }
   };
 
-  const handleOpenEntryMap = entryId => {
-    if (!isNil(entryId)) {
+  const handleOpenEntranceMap = entranceId => {
+    if (!isNil(entranceId)) {
       // TODO
       window.open(`/ui/map`, '_blank');
     }
   };
-  const handleOpenEntryDescription = entryId => {
-    if (!isNil(entryId)) {
-      window.open(`/ui/entrances/${entryId}`, '_blank');
+  const handleOpenEntranceDescription = entranceId => {
+    if (!isNil(entranceId)) {
+      window.open(`/ui/entrances/${entranceId}`, '_blank');
     }
   };
 
@@ -74,13 +74,13 @@ const Provider = ({ data, loading = true, children }) => {
           loading,
           cave: caveState,
           coordinates: coordinatesState,
-          entries: entriesState,
-          selectedEntries
+          entrances: entrancesState,
+          selectedEntrances
         },
         action: {
-          onSelectEntry,
-          openEntryMap: handleOpenEntryMap,
-          openEntryDescription: handleOpenEntryDescription
+          onSelectEntrance,
+          openEntranceMap: handleOpenEntranceMap,
+          openEntranceDescription: handleOpenEntranceDescription
         }
       }}>
       {children}
@@ -97,7 +97,7 @@ export const caveTypes = PropTypes.shape({
   development: PropTypes.number,
   discoveryYear: PropTypes.number,
   editionDate: PropTypes.string,
-  entries: PropTypes.arrayOf(entryDetailsType),
+  entrances: PropTypes.arrayOf(entranceDetailsType),
   id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
   interestRate: PropTypes.number,
   isDivingCave: PropTypes.bool,

@@ -12,9 +12,9 @@ import Layout from '../../common/Layouts/Main';
 import { Search, FakeAppBar } from '../../common/Layouts/Main/_stories';
 import ScrollableContent from '../../common/Layouts/Fixed/ScrollableContent';
 import Properties from './Properties';
-import { CaveSystem } from './index';
-import EntriesSelection from './EntriesSelection';
-import EntriesList from './EntriesList';
+import { Network } from './index';
+import EntrancesSelection from './EntrancesSelection';
+import EntrancesList from './EntrancesList';
 
 const date = new Date('2015-03');
 const today = new Date();
@@ -37,7 +37,7 @@ const data = {
   discoveryYear: 1925,
   mountain: 'ARbas (massif d)',
   isDivingCave: true,
-  entries: [
+  entrances: [
     {
       id: 'entry1',
       name: 'Petit Saint-Cassien (Gouffre du)',
@@ -118,13 +118,13 @@ const StoryContextProvider = ({ loading, children }) => (
 );
 
 const EntryWithContent = () => (
-  <CaveSystem>
+  <Network>
     <>
-      <EntriesList />
+      <EntrancesList />
       <Content title="Description" icon={<DescriptionIcon color="primary" />} />
       <Content title="Documents" icon={<DocumentIcon color="primary" />} />
     </>
-  </CaveSystem>
+  </Network>
 );
 
 const WithLayout = () => {
@@ -147,17 +147,17 @@ const WithLayout = () => {
 };
 
 // eslint-disable-next-line react/prop-types
-const WithStateEntriesList = ({ loading }) => {
+const WithStateEntrancesList = ({ loading }) => {
   const {
-    state: { selectedEntries, entries },
-    action: { onSelectEntry }
+    state: { selectedEntrances, entrances },
+    action: { onSelectEntrance }
   } = useContext(CaveContext);
 
   return (
-    <EntriesSelection
-      onSelect={onSelectEntry}
-      entries={entries}
-      selection={selectedEntries}
+    <EntrancesSelection
+      onSelect={onSelectEntrance}
+      entrances={entrances}
+      selection={selectedEntrances}
       loading={loading}
     />
   );
@@ -169,10 +169,10 @@ storiesOf('Cave system', module)
       {storyFn()}
     </StoryContextProvider>
   ))
-  .add('Entries selection', () => (
-    <WithStateEntriesList loading={boolean('Loading', false)} />
+  .add('Entrances selection', () => (
+    <WithStateEntrancesList loading={boolean('Loading', false)} />
   ))
-  .add('Entries list', () => <EntriesList />)
+  .add('Entrances list', () => <EntrancesList />)
   .add('Properties', () => <Properties />)
   .add('With Layouts', () => (
     <WithLayout loading={boolean('Loading', false)} />

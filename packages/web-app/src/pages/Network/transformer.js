@@ -12,7 +12,7 @@ export const getSafeData = data => ({
   development: pathOr(0, ['length'], data),
   discoveryYear: pathOr(null, ['discoveryYear'], data),
   editionDate: pathOr(null, ['editionDate'], data),
-  entries: pathOr([], ['entries'], data),
+  entrances: pathOr([], ['entrances'], data),
   id: data.id,
   interestRate: pathOr(0, ['interestRate'], data),
   isDivingCave: pathOr(null, ['isDiving'], data),

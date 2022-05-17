@@ -14,7 +14,7 @@ import CustomIcon from '../../common/CustomIcon';
 import Rating from '../../common/Properties/Rating';
 import { isValidPositions } from '../../common/Maps/MapMultipleMarkers';
 import { Property } from '../../common/Properties';
-import EntriesSelection from './EntriesSelection';
+import EntrancesSelection from './EntrancesSelection';
 import { CaveContext } from './Provider';
 
 const Wrapper = styled.div`
@@ -53,22 +53,22 @@ const Properties = () => {
         isDivingCave
       },
       coordinates,
-      selectedEntries,
-      entries,
+      selectedEntrances,
+      entrances,
       loading
     },
-    action: { onSelectEntry }
+    action: { onSelectEntrance }
   } = useContext(CaveContext);
   const { formatMessage } = useIntl();
 
   return (
     <Wrapper>
       {isValidPositions(coordinates) && (
-        <EntriesSelection
-          onSelect={onSelectEntry}
+        <EntrancesSelection
+          onSelect={onSelectEntrance}
           loading={loading}
-          entries={entries}
-          selection={selectedEntries}
+          entrances={entrances}
+          selection={selectedEntrances}
         />
       )}
       <Property
