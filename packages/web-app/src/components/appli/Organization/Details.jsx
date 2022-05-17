@@ -38,7 +38,7 @@ const Details = ({
   village,
   position,
   organization,
-  // onEdit ### À décommenter lorsque la page edit sera prête
+  onEdit,
   canEdit
 }) => {
   const { formatMessage } = useIntl();
@@ -80,9 +80,8 @@ const Details = ({
             size="medium"
             aria-label="edit"
             color="primary"
-            // onClick={onEdit} ### À décommenter lorsque la page edit sera prête
-            disabled // ={isNil(onEdit)} ### À décommenter lorsque la page edit sera prête
-          >
+            onClick={onEdit}
+            disabled={isNil(onEdit)}>
             {formatMessage({ id: 'Edit' })}
             <CreateIcon />
           </IconButton>
@@ -122,7 +121,7 @@ Details.propTypes = {
   village: PropTypes.string,
   position: PropTypes.arrayOf(PropTypes.number),
   organization: PropTypes.shape({}),
-  // onEdit: PropTypes.func.isRequired, ### À décommenter lorsque la page edit sera prête
+  onEdit: PropTypes.func.isRequired,
   canEdit: PropTypes.bool.isRequired
 };
 
