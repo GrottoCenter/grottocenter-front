@@ -15,7 +15,7 @@ import VisibilityIcon from '@material-ui/icons/Visibility';
 import { useIntl } from 'react-intl';
 
 import { PropertyWrapper } from '../../common/Properties/Property';
-import { detailsType as entryDetailsType } from '../Entry/Provider';
+import { detailsType as entranceDetailsType } from '../Entry/Provider';
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -30,12 +30,12 @@ const MenuProps = {
 
 const isSelected = selection => n => includes(n.id, selection);
 
-const getEntriesName = selection =>
+const getEntrancesName = selection =>
   pipe(filter(isSelected(selection)), pluck('name'), join(', '));
 
-const EntriesSelection = ({
+const EntrancesSelection = ({
   loading = false,
-  entries,
+  entrances,
   onSelect,
   selection
 }) => {
@@ -62,13 +62,13 @@ const EntriesSelection = ({
                 if (selected.length === 0) {
                   return <em>{formatMessage({ id: 'Network entrances' })}</em>;
                 }
-                return getEntriesName(selected)(entries);
+                return getEntrancesName(selected)(entrances);
               }}
               MenuProps={MenuProps}>
               <MenuItem disabled value="">
                 <em>{formatMessage({ id: 'Network entrances' })}</em>
               </MenuItem>
-              {entries.map(({ name, id }) => (
+              {entrances.map(({ name, id }) => (
                 <MenuItem key={name} value={id}>
                   <Checkbox checked={includes(id, selection)} />
                   <ListItemText primary={name} />
@@ -82,11 +82,11 @@ const EntriesSelection = ({
   );
 };
 
-EntriesSelection.propTypes = {
+EntrancesSelection.propTypes = {
   onSelect: PropTypes.func.isRequired,
   selection: PropTypes.arrayOf(PropTypes.string).isRequired,
   loading: PropTypes.bool,
-  entries: PropTypes.arrayOf(entryDetailsType)
+  entrances: PropTypes.arrayOf(entranceDetailsType)
 };
 
-export default EntriesSelection;
+export default EntrancesSelection;

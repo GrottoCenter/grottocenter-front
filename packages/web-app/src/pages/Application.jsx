@@ -22,19 +22,19 @@ import ForgotPassword from '../components/appli/ForgotPassword';
 
 import { usePermissions } from '../hooks';
 
-import CaveSystemPage from './CaveSystem';
 import ContributionsPage from './Contributions';
 import DocumentSubmission from './DocumentSubmission';
 import DocumentValidation from './DocumentValidation';
 import DocumentEdit from './DocumentEdit';
+import EntityCreation from './EntityCreation';
 import EntryPage from './Entry';
+import ImportContainer from './ImportCSV';
 import ManageUsers from './Admin/ManageUsers';
 import Map from './Map';
 import MassifPage from './Massif';
+import NetworkPage from './Network';
 import PersonPage from './Person';
 import OrganizationPage from './Organization';
-import EntityCreation from './EntityCreation';
-import ImportContainer from './ImportCSV';
 
 const Application = () => {
   const dispatch = useDispatch();
@@ -64,7 +64,7 @@ const Application = () => {
         <Route path="/ui/api/:version" component={ApiDoc} />
         <Route path="/ui/api" component={Api} />
         <Route path="/ui/entrances/:id?" component={EntryPage} />
-        <Route path="/ui/caves/:id?" component={CaveSystemPage} />
+        <Route path="/ui/caves/:id?" component={NetworkPage} />
         <Route path="/ui/faq" component={Faq} />
         <Route path="/ui/map/:target?" component={Map} />
         <Route path="/ui/contributions" component={ContributionsPage} />

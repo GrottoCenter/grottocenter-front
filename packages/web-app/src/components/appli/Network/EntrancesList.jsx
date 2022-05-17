@@ -28,46 +28,46 @@ const LoadingList = () => (
   </>
 );
 
-const EntriesList = () => {
+const EntrancesList = () => {
   const { formatMessage } = useIntl();
   const {
-    state: { selectedEntries, entries, loading },
-    action: { openEntryMap, openEntryDescription }
+    state: { selectedEntrances, entrances, loading },
+    action: { openEntranceMap, openEntranceDescription }
   } = useContext(CaveContext);
 
   return (
     <ScrollableContent
-      title={formatMessage({ id: 'Entries' })}
+      title={formatMessage({ id: 'Entrances' })}
       content={
         <List dense>
           {loading ? (
             <LoadingList />
           ) : (
-            entries.map(entry => (
+            entrances.map(entrance => (
               <ListItem
-                key={entry.id}
-                selected={includes(entry.id, selectedEntries)}>
+                key={entrance.id}
+                selected={includes(entrance.id, selectedEntrances)}>
                 <ListItemIcon>
-                  <CustomIcon type="entry" />
+                  <CustomIcon type="entrance" />
                 </ListItemIcon>
-                <ListItemText primary={entry.name} />
+                <ListItemText primary={entrance.name} />
                 <ListItemSecondaryAction>
                   <DisabledTooltip disabled>
                     <span>
                       <IconButton
                         disabled
-                        onClick={() => openEntryMap(entry.id)}
+                        onClick={() => openEntranceMap(entrance.id)}
                         edge="end"
-                        aria-label="entry map">
+                        aria-label="entrance map">
                         <MapIcon />
                       </IconButton>
                     </span>
                   </DisabledTooltip>
                   <Tooltip title={formatMessage({ id: 'Go to description' })}>
                     <IconButton
-                      onClick={() => openEntryDescription(entry.id)}
+                      onClick={() => openEntranceDescription(entrance.id)}
                       edge="end"
-                      aria-label="entry description">
+                      aria-label="entrance description">
                       <LinkIcon />
                     </IconButton>
                   </Tooltip>
@@ -83,4 +83,4 @@ const EntriesList = () => {
   );
 };
 
-export default EntriesList;
+export default EntrancesList;

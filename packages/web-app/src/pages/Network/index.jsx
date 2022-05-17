@@ -5,13 +5,13 @@ import { useIntl } from 'react-intl';
 import { isNil } from 'ramda';
 import DescriptionIcon from '@material-ui/icons/Description';
 import DocumentIcon from '@material-ui/icons/Filter';
-import CaveSystem from '../../components/appli/CaveSystem';
-import EntriesList from '../../components/appli/CaveSystem/EntriesList';
+import Network from '../../components/appli/Network';
+import EntrancesList from '../../components/appli/Network/EntrancesList';
 import { fetchCave } from '../../actions/Cave';
 import Content from './Content';
 import { getSafeData } from './transformer';
 
-const CaveSystemPage = () => {
+const NetworkPage = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
   const { loading, data, error } = useSelector(state => state.cave);
@@ -23,9 +23,9 @@ const CaveSystemPage = () => {
   }, [id]);
 
   return (
-    <CaveSystem loading={loading || !isNil(error)} data={getSafeData(data)}>
+    <Network loading={loading || !isNil(error)} data={getSafeData(data)}>
       <>
-        <EntriesList />
+        <EntrancesList />
         <Content
           title={formatMessage({ id: 'Description' })}
           icon={<DescriptionIcon color="primary" />}
@@ -35,8 +35,8 @@ const CaveSystemPage = () => {
           icon={<DocumentIcon color="primary" />}
         />
       </>
-    </CaveSystem>
+    </Network>
   );
 };
 
-export default CaveSystemPage;
+export default NetworkPage;
