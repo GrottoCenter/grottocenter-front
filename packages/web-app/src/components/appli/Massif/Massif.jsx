@@ -13,7 +13,7 @@ import Alert from '../../common/Alert';
 import MassifPropTypes from './propTypes';
 import MapMassif from './MapMassif';
 
-const Massif = ({ isFetching, error, massif, canEdit /* , onEdit */ }) => {
+const Massif = ({ isFetching, error, massif, canEdit, onEdit }) => {
   const { formatMessage } = useIntl();
 
   let title = '';
@@ -85,9 +85,8 @@ const Massif = ({ isFetching, error, massif, canEdit /* , onEdit */ }) => {
                     size="medium"
                     aria-label="edit"
                     color="primary"
-                    // onClick={onEdit} ### À décommenter lorsque la page edit sera prête
-                    disabled // ={isNil(onEdit)} ### À décommenter lorsque la page edit sera prête
-                  >
+                    onClick={onEdit}
+                    disabled={isNil(onEdit)}>
                     {formatMessage({ id: 'Edit' })}
                     <CreateIcon />
                   </IconButton>
@@ -109,7 +108,7 @@ const Massif = ({ isFetching, error, massif, canEdit /* , onEdit */ }) => {
                   <Alert
                     severity="info"
                     title={formatMessage({
-                      id: 'This organization has no documents listed yet.'
+                      id: 'This massif has no documents listed yet.'
                     })}
                   />
                 }
