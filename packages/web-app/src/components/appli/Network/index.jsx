@@ -21,20 +21,13 @@ export const Network = ({ children }) => {
   const { formatMessage, formatDate } = useIntl();
   const {
     state: {
-      cave: { name, author, creationDate, lastEditor, editionDate }
+      cave: { author, creationDate, name }
     }
   } = useContext(CaveContext);
 
-  const footer = `${formatMessage({ id: 'Created by' })}
-        ${author} ${isNil(creationDate) ? `(${formatDate(creationDate)})` : ''}
-        ${
-          !isNil(lastEditor) && !isNil(editionDate)
-            ? ` - ${formatMessage({
-                id: 'Last modification by'
-              })} ${lastEditor} (
-          ${formatDate(editionDate)})`
-            : ''
-        }`;
+  const footer = `${formatMessage({ id: 'Created by' })} ${author.fullName} ${
+    !isNil(creationDate) ? `(${formatDate(creationDate)})` : ''
+  }`;
 
   return (
     <Layout

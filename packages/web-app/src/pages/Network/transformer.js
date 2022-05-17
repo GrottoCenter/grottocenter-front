@@ -4,24 +4,18 @@ import { getAuthor } from '../Entry/transformers';
 
 // eslint-disable-next-line import/prefer-default-export
 export const getSafeData = data => ({
-  accessRate: pathOr(0, ['accessRate'], data),
-  altitude: pathOr(0, ['altitude'], data),
+  altitude: data.altitude,
   author: getAuthor(data?.author),
   creationDate: pathOr(null, ['dateInscription'], data),
   depth: pathOr(0, ['depth'], data),
-  development: pathOr(0, ['length'], data),
+  length: pathOr(0, ['length'], data),
+  descriptions: data.descriptions,
   discoveryYear: pathOr(null, ['discoveryYear'], data),
-  editionDate: pathOr(null, ['editionDate'], data),
   entrances: pathOr([], ['entrances'], data),
   id: data.id,
-  interestRate: pathOr(0, ['interestRate'], data),
   isDivingCave: pathOr(null, ['isDiving'], data),
-  lastEditor: pathOr(null, ['lastEditor'], data),
-  localisation: `${data.city || 'city'}, ${data.region ||
-    'region'}, ${data.country || 'country'}`,
-  mountain: pathOr(null, ['massif', 'name'], data),
+  massif: pathOr(null, ['massif'], data),
   name: data.name,
-  progressionRate: pathOr(0, ['progressionRate'], data),
   temperature: pathOr(null, ['temperature'], data),
   undergroundType: pathOr(null, ['massif', 'undergroundType'], data)
 });

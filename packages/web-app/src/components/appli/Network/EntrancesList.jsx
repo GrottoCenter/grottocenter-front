@@ -1,24 +1,13 @@
 import React, { useContext } from 'react';
 import { useIntl } from 'react-intl';
-import {
-  List,
-  ListItem,
-  ListItemSecondaryAction,
-  ListItemText,
-  IconButton,
-  Tooltip,
-  ListItemIcon
-} from '@material-ui/core';
+import { List, ListItem, ListItemText, ListItemIcon } from '@material-ui/core';
 import Skeleton from '@material-ui/lab/Skeleton';
-import ListIcon from '@material-ui/icons/FormatListBulleted';
-import MapIcon from '@material-ui/icons/Map';
-import LinkIcon from '@material-ui/icons/Link';
 import { includes } from 'ramda';
+import { Link } from 'react-router-dom';
 
 import ScrollableContent from '../../common/Layouts/Fixed/ScrollableContent';
 import { CaveContext } from './Provider';
 import CustomIcon from '../../common/CustomIcon';
-import DisabledTooltip from '../../common/DisabledTooltip';
 
 const LoadingList = () => (
   <>
@@ -31,8 +20,7 @@ const LoadingList = () => (
 const EntrancesList = () => {
   const { formatMessage } = useIntl();
   const {
-    state: { selectedEntrances, entrances, loading },
-    action: { openEntranceMap, openEntranceDescription }
+    state: { selectedEntrances, entrances, loading }
   } = useContext(CaveContext);
 
   return (
@@ -43,42 +31,28 @@ const EntrancesList = () => {
           {loading ? (
             <LoadingList />
           ) : (
-            entrances.map(entrance => (
-              <ListItem
-                key={entrance.id}
-                selected={includes(entrance.id, selectedEntrances)}>
-                <ListItemIcon>
-                  <CustomIcon type="entrance" />
-                </ListItemIcon>
-                <ListItemText primary={entrance.name} />
-                <ListItemSecondaryAction>
-                  <DisabledTooltip disabled>
-                    <span>
-                      <IconButton
-                        disabled
-                        onClick={() => openEntranceMap(entrance.id)}
-                        edge="end"
-                        aria-label="entrance map">
-                        <MapIcon />
-                      </IconButton>
-                    </span>
-                  </DisabledTooltip>
-                  <Tooltip title={formatMessage({ id: 'Go to description' })}>
-                    <IconButton
-                      onClick={() => openEntranceDescription(entrance.id)}
-                      edge="end"
-                      aria-label="entrance description">
-                      <LinkIcon />
-                    </IconButton>
-                  </Tooltip>
-                </ListItemSecondaryAction>
-              </ListItem>
-            ))
+            entrances
+              .sort((e1, e2) => e1.name.localeCompare(e2.name))
+              .map(entrance => (
+                <ListItem
+                  component={React.forwardRef((props, ref) => (
+                    <Link
+                      {...props}
+                      to={`/ui/entrances/${entrance.id}`}
+                      ref={ref}
+                    />
+                  ))}
+                  key={entrance.id}
+                  selected={includes(entrance.id, selectedEntrances)}>
+                  <ListItemIcon>
+                    <CustomIcon type="entry" />
+                  </ListItemIcon>
+                  <ListItemText primary={entrance.name} />
+                </ListItem>
+              ))
           )}
         </List>
       }
-      footer={formatMessage({ id: 'Created by' })}
-      icon={<ListIcon color="primary" />}
     />
   );
 };

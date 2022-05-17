@@ -6,12 +6,10 @@ import {
   Waves,
   CalendarToday,
   Category,
-  TrendingUp,
-  Public
+  Title
 } from '@material-ui/icons';
 
 import CustomIcon from '../../common/CustomIcon';
-import Rating from '../../common/Properties/Rating';
 import { isValidPositions } from '../../common/Maps/MapMultipleMarkers';
 import { Property } from '../../common/Properties';
 import EntrancesSelection from './EntrancesSelection';
@@ -20,14 +18,6 @@ import { CaveContext } from './Provider';
 const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
-`;
-
-const RatingWrapper = styled.div`
-  display: flex;
-  justify-content: space-evenly;
-  align-items: center;
-  flex-wrap: wrap;
-  padding: ${({ theme }) => theme.spacing(2)}px;
 `;
 
 const SecondaryPropertiesWrapper = styled.div`
@@ -40,17 +30,13 @@ const Properties = () => {
   const {
     state: {
       cave: {
-        localisation,
         depth,
-        development,
-        interestRate,
-        progressionRate,
-        accessRate,
-        undergroundType,
         discoveryYear,
-        mountain,
-        altitude,
-        isDivingCave
+        isDivingCave,
+        length,
+        massif,
+        temperature,
+        undergroundType
       },
       coordinates,
       selectedEntrances,
@@ -73,12 +59,6 @@ const Properties = () => {
       )}
       <Property
         loading={loading}
-        label={formatMessage({ id: 'Localisation' })}
-        value={localisation}
-        icon={<Public fontSize="large" color="primary" />}
-      />
-      <Property
-        loading={loading}
         label={formatMessage({ id: 'Depth' })}
         value={`${depth} m`}
         icon={<CustomIcon type="depth" />}
@@ -86,7 +66,7 @@ const Properties = () => {
       <Property
         loading={loading}
         label={formatMessage({ id: 'Development' })}
-        value={`${development} m`}
+        value={`${length} m`}
         icon={<CustomIcon type="length" />}
       />
       <SecondaryPropertiesWrapper>
@@ -106,47 +86,35 @@ const Properties = () => {
             secondary
           />
         )}
-        {mountain && (
+        {massif && (
           <Property
-            label={formatMessage({ id: 'Mountain range' })}
-            value={mountain}
+            label={formatMessage({ id: 'Massif' })}
+            value={massif.name}
+            url={`/ui/massifs/${massif.id}`}
             icon={<Terrain color="primary" />}
-            secondary
-          />
-        )}
-        {altitude && (
-          <Property
-            label={formatMessage({ id: 'Altitude' })}
-            value={`${altitude} m`}
-            icon={<TrendingUp color="primary" />}
             secondary
           />
         )}
         {isDivingCave && (
           <Property
-            label={formatMessage({ id: 'Diving cave' })}
             value={formatMessage({
-              id: isDivingCave ? 'Diving cave' : 'Not diving'
+              id: 'Diving cave'
             })}
             icon={<Waves color="primary" />}
             secondary
           />
         )}
+        {temperature && (
+          <Property
+            loading={loading}
+            label={formatMessage({ id: 'Temperature' })}
+            value={`${temperature} °C`}
+            icon={<Title fontSize="large" color="primary" />}
+            // TODO: The Thermostat icon is only available in MUI v5
+            // icon={<Thermostat fontSize="large" color="primary"/>}
+          />
+        )}
       </SecondaryPropertiesWrapper>
-      <RatingWrapper>
-        <Rating
-          label={formatMessage({ id: 'Interest' })}
-          value={interestRate || 0}
-        />
-        <Rating
-          label={formatMessage({ id: 'Progression' })}
-          value={progressionRate || 0}
-        />
-        <Rating
-          label={formatMessage({ id: 'Access' })}
-          value={accessRate || 0}
-        />
-      </RatingWrapper>
     </Wrapper>
   );
 };

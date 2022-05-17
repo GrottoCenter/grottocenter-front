@@ -19,11 +19,9 @@ const defaultContext = {
       name: '',
       localisation: '',
       depth: 0,
+      descriptions: null,
       development: 0,
-      interestRate: 0,
-      progressionRate: 0,
-      accessRate: 0,
-      author: '',
+      author: null,
       creationDate: todayDate
     },
     coordinates: null,
@@ -55,18 +53,6 @@ const Provider = ({ data, loading = true, children }) => {
     }
   };
 
-  const handleOpenEntranceMap = entranceId => {
-    if (!isNil(entranceId)) {
-      // TODO
-      window.open(`/ui/map`, '_blank');
-    }
-  };
-  const handleOpenEntranceDescription = entranceId => {
-    if (!isNil(entranceId)) {
-      window.open(`/ui/entrances/${entranceId}`, '_blank');
-    }
-  };
-
   return (
     <CaveContext.Provider
       value={{
@@ -78,9 +64,7 @@ const Provider = ({ data, loading = true, children }) => {
           selectedEntrances
         },
         action: {
-          onSelectEntrance,
-          openEntranceMap: handleOpenEntranceMap,
-          openEntranceDescription: handleOpenEntranceDescription
+          onSelectEntrance
         }
       }}>
       {children}
@@ -89,26 +73,37 @@ const Provider = ({ data, loading = true, children }) => {
 };
 
 export const caveTypes = PropTypes.shape({
-  accessRate: PropTypes.number,
   altitude: PropTypes.number,
-  author: PropTypes.string,
+  author: PropTypes.shape({
+    nickname: PropTypes.string
+  }),
   creationDate: PropTypes.string,
   depth: PropTypes.number,
-  development: PropTypes.number,
   discoveryYear: PropTypes.number,
-  editionDate: PropTypes.string,
   entrances: PropTypes.arrayOf(entranceDetailsType),
   id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-  interestRate: PropTypes.number,
   isDivingCave: PropTypes.bool,
-  lastEditor: PropTypes.string,
-  localisation: PropTypes.string,
-  mountain: PropTypes.string,
+  length: PropTypes.number,
+  massif: PropTypes.shape({ id: PropTypes.number, name: PropTypes.string }),
   name: PropTypes.string,
-  progressionRate: PropTypes.number,
   temperature: PropTypes.number,
   undergroundType: PropTypes.string
 });
+
+const authorType = PropTypes.shape({
+  name: PropTypes.string
+});
+
+export const descriptionsType = PropTypes.arrayOf(
+  PropTypes.shape({
+    author: authorType,
+    body: PropTypes.string,
+    date: PropTypes.instanceOf(Date),
+    id: PropTypes.number,
+    language: PropTypes.string.isRequired,
+    title: PropTypes.string.isRequired
+  })
+);
 
 Provider.propTypes = {
   data: caveTypes.isRequired,
