@@ -24,6 +24,10 @@ const EntryPage = () => {
   const prevUpdateLoading = useRef(updateLoading);
 
   useEffect(() => {
+    dispatch(fetchEntry(id));
+  }, [id, dispatch]);
+
+  useEffect(() => {
     const updateTerminatedWithSuccess =
       prevUpdateLoading.current === true &&
       updateLoading === false &&
