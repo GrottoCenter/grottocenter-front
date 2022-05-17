@@ -19,8 +19,7 @@ const MassifPropTypes = {
     documents: PropTypes.arrayOf(PropTypes.shape({})),
     entrances: PropTypes.arrayOf(PropTypes.shape({})),
     networks: PropTypes.arrayOf(PropTypes.shape({})),
-    // eslint-disable-next-line react/forbid-prop-types
-    geogPolygon: PropTypes.any
+    geogPolygon: PropTypes.string
   }),
   onEdit: PropTypes.func.isRequired,
   canEdit: PropTypes.bool.isRequired
