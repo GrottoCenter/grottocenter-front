@@ -1,8 +1,10 @@
 import React from 'react';
-import { GeoJSON } from 'react-leaflet';
+import { GeoJSON, Marker, Popup } from 'react-leaflet';
 import PropTypes from 'prop-types';
 
 import CustomMapContainer from '../../common/Maps/common/MapContainer';
+import EntranceMarker from '../../common/Maps/common/Markers/Components/EntranceMarker';
+import EntrancePopup from '../../common/Maps/common/Markers/Components/EntrancePopup';
 
 const MapMassif = ({ massif }) => {
   let geoJson;
@@ -31,6 +33,21 @@ const MapMassif = ({ massif }) => {
           zoom={14}
           center={center}>
           <GeoJSON data={geoJson} />
+          {massif.entrances.map(entrance => {
+            if (!entrance.latitude || !entrance.longitude) {
+              return undefined;
+            }
+            return (
+              <Marker
+                key={entrance.id}
+                position={[entrance.latitude, entrance.longitude]}
+                icon={EntranceMarker}>
+                <Popup>
+                  <EntrancePopup entrance={entrance} />
+                </Popup>
+              </Marker>
+            );
+          })}
         </CustomMapContainer>
       )}
     </>
@@ -40,7 +57,14 @@ const MapMassif = ({ massif }) => {
 MapMassif.propTypes = {
   massif: PropTypes.shape({
     name: PropTypes.string,
-    geogPolygon: PropTypes.string
+    geogPolygon: PropTypes.string,
+    entrances: PropTypes.arrayOf(
+      PropTypes.shape({
+        id: PropTypes.number,
+        latitude: PropTypes.number,
+        longitude: PropTypes.number
+      })
+    )
   }).isRequired
 };
 

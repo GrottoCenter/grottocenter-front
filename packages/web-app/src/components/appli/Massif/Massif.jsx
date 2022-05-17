@@ -16,8 +16,6 @@ import MapMassif from './MapMassif';
 const Massif = ({ isFetching, error, massif, canEdit /* , onEdit */ }) => {
   const { formatMessage } = useIntl();
 
-  console.log(massif);
-
   let title = '';
   if (massif?.name) {
     title = massif.name;
