@@ -82,7 +82,6 @@ const Details = ({
             color="primary"
             onClick={onEdit}
             disabled={isNil(onEdit)}>
-            {formatMessage({ id: 'Edit' })}
             <CreateIcon />
           </IconButton>
         )}
