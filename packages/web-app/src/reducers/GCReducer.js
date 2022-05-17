@@ -7,6 +7,7 @@ import cavePut from './CavePutReducer';
 import caver from './CaverReducer';
 import caverGroups from './CaverGroupsReducer';
 import changePassword from './ChangePassword';
+import changeEmail from './ChangeEmail';
 import createCaver from './CreateCaver';
 import createLocation from './CreateLocation';
 import createHistory from './CreateHistory';
@@ -52,9 +53,11 @@ import region from './RegionReducer';
 import sideMenu from './SideMenuReducer';
 import signUp from './SignUpReducer';
 import subject from './SubjectReducer';
-import updateLocation from './UpdateLocation';
-import updateHistory from './UpdateHistory';
 import updateDescription from './UpdateDescription';
+import updateHistory from './UpdateHistory';
+import updateLocation from './UpdateLocation';
+import updateUser from './UpdateCaver';
+import user from './UserReducer';
 
 const GCReducer = combineReducers({
   advancedsearch,
@@ -65,6 +68,7 @@ const GCReducer = combineReducers({
   caver,
   caverGroups,
   changePassword,
+  changeEmail,
   createCaver,
   createLocation,
   createOrganization,
@@ -110,9 +114,11 @@ const GCReducer = combineReducers({
   sideMenu,
   signUp,
   subject,
-  updateLocation,
+  updateDescription,
   updateHistory,
-  updateDescription
+  updateLocation,
+  updateUser,
+  user
 });
 
 export default GCReducer;

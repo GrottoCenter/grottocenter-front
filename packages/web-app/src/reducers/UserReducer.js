@@ -10,7 +10,7 @@ const initialState = {
   error: null // fetch errors
 };
 
-const User = (state = initialState, action) => {
+const user = (state = initialState, action) => {
   switch (action.type) {
     case FETCH_USER:
       return { ...state, user: action.user, isFetching: true };
@@ -23,4 +23,4 @@ const User = (state = initialState, action) => {
   }
 };
 
-export default User;
+export default user;
