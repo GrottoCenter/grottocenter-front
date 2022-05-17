@@ -15,7 +15,7 @@ export const postDescriptionAction = () => ({
 });
 export const postDescriptionSuccess = description => ({
   description,
-  type: POST_DESCRIPTION_FAILURE
+  type: POST_DESCRIPTION_SUCCESS
 });
 export const postDescriptionFailure = (error, httpCode) => ({
   type: POST_DESCRIPTION_FAILURE,

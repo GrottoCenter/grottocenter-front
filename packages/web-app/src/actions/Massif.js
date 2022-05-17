@@ -111,18 +111,15 @@ export const postMassif = data => {
 
 export const updateMassif = data => {
   return (dispatch, getState) => {
-    const massifData = data;
-    const massifId = massifData.id;
-    delete massifData.id;
     dispatch(updateMassifAction());
 
     const requestOptions = {
       method: 'PUT',
-      body: JSON.stringify(massifData),
+      body: JSON.stringify(data),
       headers: getState().login.authorizationHeader
     };
 
-    return fetch(putMassifUrl(massifId), requestOptions)
+    return fetch(putMassifUrl(data.id), requestOptions)
       .then(response => {
         if (response.status >= 400) {
           throw new Error(response.status);
