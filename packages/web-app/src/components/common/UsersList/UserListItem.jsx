@@ -9,39 +9,26 @@ const StyledListItem = styled(ListItem)`
   min-width: 250px;
 `;
 
-const UsersListItem = ({ user }) => {
+const UserListItem = ({ user }) => {
   return (
     <StyledListItem
       button
       component={React.forwardRef((props, ref) => (
         <Link {...props} to={`/ui/persons/${user.id}`} ref={ref} />
       ))}>
-      <ListItemText
-        primary={
-          user.name && user.surname ? (
-            <>
-              {user.name} {user.surname}
-            </>
-          ) : (
-            <>{user.nickname}</>
-          )
-        }
-        primaryTypographyProps={{ style: { whiteSpace: 'normal' } }} // Multiple lines text
-      />
+      <ListItemText primary={user.nickname} />
     </StyledListItem>
   );
 };
 
-UsersListItem.propTypes = {
+UserListItem.propTypes = {
   user: PropTypes.shape({
     id: PropTypes.number.isRequired,
-    name: PropTypes.string,
-    surname: PropTypes.string,
-    nickname: PropTypes.string
+    nickname: PropTypes.string.isRequired
   })
 };
-UsersListItem.defaultProps = {
+UserListItem.defaultProps = {
   user: undefined
 };
 
-export default UsersListItem;
+export default UserListItem;
