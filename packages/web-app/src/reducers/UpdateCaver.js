@@ -2,7 +2,7 @@ import {
   UPDATE_CAVER,
   UPDATE_CAVER_FAILURE,
   UPDATE_CAVER_SUCCESS
-} from '../actions/UpdateCaver';
+} from '../actions/UpdateUser';
 
 const initialState = {
   error: null,
@@ -14,18 +14,18 @@ const updateCaver = (state = initialState, action) => {
   switch (action.type) {
     case UPDATE_CAVER:
       return {
-        ...initialState,
+        ...state,
         isLoading: true
       };
     case UPDATE_CAVER_SUCCESS:
       return {
-        ...initialState,
+        ...state,
         isLoading: false,
-        caver: action.caver
+        data: action.caver
       };
     case UPDATE_CAVER_FAILURE:
       return {
-        ...initialState,
+        ...state,
         error: action.error
       };
     default:
