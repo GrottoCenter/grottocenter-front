@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { List, Typography } from '@material-ui/core';
 import styled from 'styled-components';
 import Translate from '../Translate';
-import OrganizationListItem from './UsersListItem';
+import OrganizationListItem from './UserListItem';
 
 const StyledList = styled(List)({
   display: 'flex',
@@ -24,7 +24,7 @@ const UsersList = props => {
       {users && users.length > 0 ? (
         <StyledList>
           {users
-            .sort((a, b) => a.name.localeCompare(b.name))
+            .sort((a, b) => a.name.localeCompare(b.nickname))
             .map(user => (
               <OrganizationListItem key={user.id} user={user} />
             ))}
@@ -37,7 +37,12 @@ const UsersList = props => {
 };
 
 UsersList.propTypes = {
-  users: PropTypes.arrayOf(PropTypes.shape({})),
+  users: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.number.isRequired,
+      nickname: PropTypes.string.isRequired
+    })
+  ),
   title: PropTypes.node,
   emptyMessageComponent: PropTypes.node
 };
