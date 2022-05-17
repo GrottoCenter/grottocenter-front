@@ -25,7 +25,7 @@ const OrganizationPage = () => {
   }, [dispatch, organizationId]);
 
   const onEdit = () => {
-    history.push(`/ui/organizations/edit/${organizationId}`);
+    history.push(`/ui/organizations/${organizationId}/edit`);
   };
   return (
     <Organization
