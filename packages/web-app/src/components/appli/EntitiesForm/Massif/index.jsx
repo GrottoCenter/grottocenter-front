@@ -35,7 +35,7 @@ const Button = styled(MuiButton)`
   margin: ${({ theme }) => theme.spacing(2)}px;
 `;
 
-let defaultMassifValues = {
+const defaultMassifValues = {
   name: '',
   description: '',
   descriptionTitle: '',
@@ -46,20 +46,19 @@ let defaultMassifValues = {
 export const MassifForm = ({ massifValues }) => {
   const isNewMassif = !massifValues;
   const isNewDescription = massifValues ? !massifValues.descriptionId : true;
-  defaultMassifValues = massifValues || defaultMassifValues;
   const { formatMessage } = useIntl();
   const { languages: allLanguages } = useSelector(state => state.language);
   const { error: massifError, loading: massifLoading } = useSelector(state =>
     isNewMassif ? state.massifPost : state.massifPut
   );
   const { error: nameError, loading: nameLoading } = useSelector(
-    state => state.namePatch
+    state => state.namePut
   );
   const {
     error: descriptionError,
     loading: descriptionLoading
   } = useSelector(state =>
-    isNewDescription ? state.descriptionPost : state.descriptionPatch
+    isNewDescription ? state.descriptionPost : state.descriptionPut
   );
   const dispatch = useDispatch();
 
@@ -77,7 +76,7 @@ export const MassifForm = ({ massifValues }) => {
     }
   } = useForm({
     defaultValues: {
-      massif: defaultMassifValues
+      massif: massifValues
     }
   });
 
@@ -86,10 +85,10 @@ export const MassifForm = ({ massifValues }) => {
   const stepExpanded = useBoolean();
 
   const handleReset = useCallback(() => {
-    reset({ massif: defaultMassifValues });
+    reset({ massif: massifValues || defaultMassifValues });
     stepExpanded.close();
     setActiveStep(0);
-  }, [reset, stepExpanded]);
+  }, [massifValues, reset, stepExpanded]);
 
   const steps = {
     massif: (
@@ -104,7 +103,7 @@ export const MassifForm = ({ massifValues }) => {
       <PolygonContainer
         control={control}
         errors={errors}
-        geoJson={defaultMassifValues.geoJson}
+        geoJson={massifValues.geoJson || defaultMassifValues.geoJson}
       />
     )
   };
@@ -139,24 +138,24 @@ export const MassifForm = ({ massifValues }) => {
       const massifToPost = makeMassifPostData(data);
       dispatch(postMassif(massifToPost));
     } else {
-      if (data.massif.name !== defaultMassifValues.name) {
+      if (data.massif.name !== massifValues.name) {
         const newName = {
-          id: defaultMassifValues.nameId,
+          id: massifValues.nameId,
           name: data.massif.name
         };
         dispatch(updateName(newName));
       }
 
       if (
-        data.massif.description !== defaultMassifValues.description ||
-        data.massif.descriptionTitle !== defaultMassifValues.descriptionTitle
+        data.massif.description !== massifValues.description ||
+        data.massif.descriptionTitle !== massifValues.descriptionTitle
       ) {
         if (isNewDescription) {
           const newDescription = {
             body: data.massif.description,
             language: data.massif.language,
             title: data.massif.descriptionTitle,
-            massifId: defaultMassifValues.massifId
+            massifId: massifValues.massifId
           };
           dispatch(postDescription(newDescription));
         } else {
@@ -169,7 +168,7 @@ export const MassifForm = ({ massifValues }) => {
         }
       }
 
-      const massifToUpdate = makeMassifPutData(data, defaultMassifValues);
+      const massifToUpdate = makeMassifPutData(data, massifValues);
       dispatch(updateMassif(massifToUpdate));
     }
   };
@@ -298,10 +297,12 @@ export const MassifForm = ({ massifValues }) => {
 
 MassifForm.propTypes = {
   massifValues: PropTypes.shape({
-    name: PropTypes.string,
     description: PropTypes.string,
     descriptionId: PropTypes.string,
     descriptionTitle: PropTypes.string,
+    massifId: PropTypes.string,
+    name: PropTypes.string,
+    nameId: PropTypes.string,
     geoJson: PropTypes.string
   })
 };

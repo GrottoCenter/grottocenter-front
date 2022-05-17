@@ -1,20 +1,15 @@
 import React from 'react';
-import styled from 'styled-components';
 import { useIntl } from 'react-intl';
 import { isNil } from 'ramda';
 import PropTypes from 'prop-types';
+import { CircularProgress } from '@material-ui/core';
 import MassifForm from '../../../components/appli/EntitiesForm/Massif';
 import { makeMassifValueData } from '../../../components/appli/EntitiesForm/Massif/transformers';
-import Spinner from '../../../components/common/Spinner';
 import Layout from '../../../components/common/Layouts/Fixed/FixedContent';
 import Translate from '../../../components/common/Translate';
 
 const MassifEditContainer = ({ isFetching, massif }) => {
   const { formatMessage } = useIntl();
-
-  const Center = styled.div`
-    padding: 10%;
-  `;
 
   if (isNil(massif) && !isFetching) {
     return (
@@ -29,9 +24,7 @@ const MassifEditContainer = ({ isFetching, massif }) => {
       title={massif?.name || formatMessage({ id: 'Loading massif data...' })}
       content={
         isFetching ? (
-          <Center>
-            <Spinner text={' '} size={100} />
-          </Center>
+          <CircularProgress />
         ) : (
           <>
             <MassifForm massifValues={makeMassifValueData(massif)} />
