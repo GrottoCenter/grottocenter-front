@@ -5,38 +5,39 @@ export const UPDATE_CAVER = 'UPDATE_CAVER';
 export const UPDATE_CAVER_SUCCESS = 'UPDATE_CAVER_SUCCESS';
 export const UPDATE_CAVER_FAILURE = 'UPDATE_CAVER_FAILURE';
 
-export const updateCaverAction = () => ({
+export const updateUserAction = () => ({
   type: UPDATE_CAVER
 });
 
-export const updateCaverSuccess = caver => ({
+export const updateUserSuccess = user => ({
   type: UPDATE_CAVER_SUCCESS,
-  caver
+  user
 });
 
-export const updateCaverFailure = error => ({
+export const updateUserFailure = error => ({
   type: UPDATE_CAVER_FAILURE,
   error
 });
 
-export const updateCaver = ({ name, surname }) => (dispatch, getState) => {
-  dispatch(updateCaverAction());
-
+export const updateUser = data => (dispatch, getState) => {
+  console.log('avant update action');
+  dispatch(updateUserAction());
+  console.log('apres updateaction');
   const requestOptions = {
     method: 'PUT',
-    body: JSON.stringify({ name, surname }),
+    body: JSON.stringify(data),
     headers: getState().login.authorizationHeader
   };
 
-  return fetch(putCaverUrl, requestOptions)
+  return fetch(putCaverUrl(data.id), requestOptions)
     .then(response => {
       if (response.status >= 400) {
         throw new Error(response.status);
       }
       return response.text();
     })
-    .then(text => dispatch(updateCaverSuccess(JSON.parse(text))))
+    .then(text => dispatch(updateUserSuccess(JSON.parse(text))))
     .catch(errorMessage => {
-      dispatch(updateCaverFailure(errorMessage));
+      dispatch(updateUserFailure(errorMessage));
     });
 };

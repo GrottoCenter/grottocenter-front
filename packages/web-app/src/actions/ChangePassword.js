@@ -23,13 +23,21 @@ export const fetchChangePasswordFailure = error => ({
 });
 
 export function postChangePassword(password, resetPasswordToken) {
-  return dispatch => {
+  return (dispatch, getState) => {
     dispatch(fetchChangePassword());
-
-    const requestOptions = {
-      method: 'PATCH',
-      body: JSON.stringify({ password, token: resetPasswordToken })
-    };
+    let requestOptions;
+    if (resetPasswordToken) {
+      requestOptions = {
+        method: 'PATCH',
+        body: JSON.stringify({ password, token: resetPasswordToken })
+      };
+    } else {
+      requestOptions = {
+        method: 'PATCH',
+        body: JSON.stringify({ password }),
+        headers: getState().login.authorizationHeader
+      };
+    }
 
     return fetch(changePasswordUrl, requestOptions)
       .then(response => {
