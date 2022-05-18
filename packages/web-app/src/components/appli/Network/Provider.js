@@ -15,14 +15,14 @@ export const getPositions = pipe(
 const defaultContext = {
   state: {
     cave: {
-      id: 0,
-      name: '',
-      localisation: '',
+      author: null,
+      creationDate: todayDate,
       depth: 0,
       descriptions: null,
       development: 0,
-      author: null,
-      creationDate: todayDate
+      id: 0,
+      localisation: '',
+      name: ''
     },
     coordinates: null,
     entrances: null
