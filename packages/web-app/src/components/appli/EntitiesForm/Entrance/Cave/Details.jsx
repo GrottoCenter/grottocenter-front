@@ -12,8 +12,8 @@ import { Controller } from 'react-hook-form';
 import { useIntl } from 'react-intl';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
-import Section from '../FormSection';
-import Translate from '../../../common/Translate';
+import Section from '../../FormSection';
+import Translate from '../../../../common/Translate';
 
 const StyledFormControl = styled(FormControl)`
   margin-top: ${({ theme }) => theme.spacing(2)}px;
