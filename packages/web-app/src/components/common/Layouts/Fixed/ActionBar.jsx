@@ -60,7 +60,7 @@ const ActionBar = ({ printRef, onEdit }) => {
         <ActionButton
           onClick={onEdit}
           Icon={
-            <Edit fontSize={isMobile ? 'small' : 'default'} color="inherit" />
+            <Edit fontSize={isMobile ? 'small' : 'medium'} color="inherit" />
           }
           label={formatMessage({ id: 'Edit' })}
         />
