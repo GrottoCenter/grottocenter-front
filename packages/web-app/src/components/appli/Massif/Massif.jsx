@@ -1,10 +1,10 @@
 import React from 'react';
-import { isNil } from 'ramda';
+import { isNil, isEmpty } from 'ramda';
 import Skeleton from '@material-ui/lab/Skeleton';
 import { useIntl } from 'react-intl';
 import CreateIcon from '@material-ui/icons/Create';
 
-import { Box, IconButton, Typography } from '@material-ui/core';
+import { Box, IconButton } from '@material-ui/core';
 import Layout from '../../common/Layouts/Fixed/FixedContent';
 import CavesList from '../../common/cave/CavesList';
 import EntrancesList from '../../common/entrance/EntrancesList';
@@ -12,6 +12,7 @@ import DocumentsList from '../../common/DocumentsList/DocumentsList';
 import Alert from '../../common/Alert';
 import MassifPropTypes from './propTypes';
 import MapMassif from './MapMassif';
+import Descriptions from './Descriptions';
 
 const Massif = ({ isFetching, error, massif, canEdit, onEdit }) => {
   const { formatMessage } = useIntl();
@@ -66,19 +67,15 @@ const Massif = ({ isFetching, error, massif, canEdit, onEdit }) => {
                 display="flex"
                 flexBasis="300px"
                 justifyContent="space-between">
-                {massif.descriptions[0] ? (
-                  <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                    <Typography variant="h4">
-                      {massif.descriptions[0].title}
-                    </Typography>
-                    <Typography variant="body1">
-                      {massif.descriptions[0].body}
-                    </Typography>
-                  </Box>
+                {!isEmpty(massif.descriptions) ? (
+                  <Descriptions descriptions={massif.descriptions} />
                 ) : (
-                  <Typography variant="body1">
-                    {formatMessage({ id: 'No description for this massif' })}
-                  </Typography>
+                  <Alert
+                    severity="info"
+                    title={formatMessage({
+                      id: 'This massif does not have a description'
+                    })}
+                  />
                 )}
                 {canEdit && (
                   <IconButton
@@ -87,7 +84,6 @@ const Massif = ({ isFetching, error, massif, canEdit, onEdit }) => {
                     color="primary"
                     onClick={onEdit}
                     disabled={isNil(onEdit)}>
-                    {formatMessage({ id: 'Edit' })}
                     <CreateIcon />
                   </IconButton>
                 )}
