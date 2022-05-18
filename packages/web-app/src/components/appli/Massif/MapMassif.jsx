@@ -33,21 +33,20 @@ const MapMassif = ({ massif }) => {
           zoom={14}
           center={center}>
           <GeoJSON data={geoJson} />
-          {massif.entrances.map(entrance => {
-            if (!entrance.latitude || !entrance.longitude) {
-              return undefined;
-            }
-            return (
-              <Marker
-                key={entrance.id}
-                position={[entrance.latitude, entrance.longitude]}
-                icon={EntranceMarker}>
-                <Popup>
-                  <EntrancePopup entrance={entrance} />
-                </Popup>
-              </Marker>
-            );
-          })}
+          {massif.entrances.map(
+            entrance =>
+              entrance.latitude &&
+              entrance.longitude && (
+                <Marker
+                  key={entrance.id}
+                  position={[entrance.latitude, entrance.longitude]}
+                  icon={EntranceMarker}>
+                  <Popup>
+                    <EntrancePopup entrance={entrance} />
+                  </Popup>
+                </Marker>
+              )
+          )}
         </CustomMapContainer>
       )}
     </>
