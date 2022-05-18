@@ -18,7 +18,7 @@ import {
 } from '../../../../common/Form/FormAutoComplete';
 import { entityOptionForSelector } from '../../../../../helpers/Entity';
 import AutoCompleteSearchComponent from '../../../../common/AutoCompleteSearch';
-import Details from '../Details';
+import Details from './Details';
 
 const resultEndAdornment = (
   <InputAdornment position="end">

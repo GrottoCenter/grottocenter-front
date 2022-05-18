@@ -29,7 +29,7 @@ import {
 
 import Cave from './Cave';
 import Entrance from './Entrance';
-import Details from './Details';
+import Details from './Cave/Details';
 import { makeCaveData, makeEntranceData } from './transformers';
 import { ENTRANCE_ONLY, ENTRANCE_AND_CAVE } from './caveType';
 
