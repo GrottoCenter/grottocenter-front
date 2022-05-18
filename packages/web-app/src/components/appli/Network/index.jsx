@@ -3,12 +3,15 @@ import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import { isNil } from 'ramda';
 
+import { useBoolean, usePermissions } from '../../../hooks';
 import Layout from '../../common/Layouts/Fixed';
 import FixedContent from '../../common/Layouts/Fixed/FixedContent';
 import CustomIcon from '../../common/CustomIcon';
 import EntrancesMap from './EntrancesMap';
 import Provider, { CaveContext, caveTypes } from './Provider';
 import Properties from './Properties';
+import { NetworkForm } from '../EntitiesForm';
+import StandardDialog from '../../common/StandardDialog';
 
 const Content = () => (
   <>
@@ -20,17 +23,23 @@ const Content = () => (
 export const Network = ({ children }) => {
   const { formatMessage, formatDate } = useIntl();
   const {
-    state: {
-      cave: { author, creationDate, name }
-    }
+    state: { cave, entrances }
   } = useContext(CaveContext);
+  const { author, creationDate, name } = cave;
+  const editPage = useBoolean();
+  const permissions = usePermissions();
 
   const footer = `${formatMessage({ id: 'Created by' })} ${author.fullName} ${
     !isNil(creationDate) ? `(${formatDate(creationDate)})` : ''
   }`;
 
+  const handleEdit = () => {
+    editPage.open();
+  };
+
   return (
     <Layout
+      onEdit={permissions.isAuth ? handleEdit : undefined}
       fixedContent={
         <FixedContent
           title={name || ''}
@@ -40,6 +49,25 @@ export const Network = ({ children }) => {
         />
       }>
       {children}
+      {permissions.isAuth && (
+        <StandardDialog
+          fullWidth
+          maxWidth="md"
+          open={editPage.isOpen}
+          onClose={editPage.close}
+          scrollable
+          title={formatMessage({ id: 'Network edition' })}>
+          <NetworkForm
+            networkValues={{
+              ...cave,
+              entrances,
+              name: cave && cave.names ? cave.names[0].name : '',
+              language: cave && cave.names ? cave.names[0].language : '',
+              massif: cave?.massif || ''
+            }}
+          />
+        </StandardDialog>
+      )}
     </Layout>
   );
 };
