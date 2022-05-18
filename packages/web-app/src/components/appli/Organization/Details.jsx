@@ -7,7 +7,6 @@ import styled from 'styled-components';
 import EmailIcon from '@material-ui/icons/Email';
 import LocationIcon from '@material-ui/icons/LocationOn';
 import CreateIcon from '@material-ui/icons/Create';
-import { useIntl } from 'react-intl';
 
 import CustomMapContainer from '../../common/Maps/common/MapContainer';
 import OrganizationMarker from '../../common/Maps/common/Markers/Components/OrganizationMarker';
@@ -41,8 +40,6 @@ const Details = ({
   onEdit,
   canEdit
 }) => {
-  const { formatMessage } = useIntl();
-
   return (
     <>
       <Box
