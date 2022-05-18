@@ -1,7 +1,7 @@
 import React from 'react';
 import { Marker, Popup } from 'react-leaflet';
 import PropTypes from 'prop-types';
-import { isNil } from 'ramda';
+import { isNil, isEmpty } from 'ramda';
 import { Box, Typography, IconButton } from '@material-ui/core';
 import styled from 'styled-components';
 import EmailIcon from '@material-ui/icons/Email';
@@ -84,7 +84,7 @@ const Details = ({
         )}
       </Box>
       <br />
-      {position && (
+      {!isEmpty(position) && (
         <>
           <CustomMapContainer
             wholePage={false}
