@@ -10,8 +10,7 @@ import {
 import styled from 'styled-components';
 import { includes, values } from 'ramda';
 import Translate from '../../components/common/Translate';
-import { EntranceForm } from '../../components/appli/EntitiesForm';
-import MassifForm from '../../components/appli/EntitiesForm/Massif';
+import { EntranceForm, MassifForm } from '../../components/appli/EntitiesForm';
 
 const Header = styled.div`
   display: flex;
