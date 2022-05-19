@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { List, Typography } from '@material-ui/core';
 import styled from 'styled-components';
 import Translate from '../Translate';
-import OrganizationListItem from './UserListItem';
+import UserListItem from './UserListItem';
 
 const StyledList = styled(List)({
   display: 'flex',
@@ -26,7 +26,7 @@ const UsersList = props => {
           {users
             .sort((a, b) => a.name.localeCompare(b.nickname))
             .map(user => (
-              <OrganizationListItem key={user.id} user={user} />
+              <UserListItem key={user.id} user={user} />
             ))}
         </StyledList>
       ) : (
