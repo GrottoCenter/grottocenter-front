@@ -7,7 +7,6 @@ import {
 const initialState = {
   loading: false,
   error: null,
-  data: null,
   description: null
 };
 
@@ -28,7 +27,6 @@ const reducer = (state = initialState, action) => {
     case UPDATE_DESCRIPTION_SUCCESS:
       return {
         ...state,
-        data: action.cave,
         error: initialState.error,
         loading: false,
         description: action.description
