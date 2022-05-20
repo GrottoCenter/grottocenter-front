@@ -103,7 +103,9 @@ export const MassifForm = ({ massifValues }) => {
       <PolygonContainer
         control={control}
         errors={errors}
-        geoJson={massifValues.geoJson || defaultMassifValues.geoJson}
+        geoJson={
+          massifValues ? massifValues.geoJson : defaultMassifValues.geoJson
+        }
       />
     )
   };
