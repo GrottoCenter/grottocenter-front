@@ -132,8 +132,10 @@ export const EntranceForm = ({ caveValues = null, entranceValues = null }) => {
     cave: (
       <Cave
         allLanguages={allLanguages}
+        allowMoveFromCave={!isNewEntrance}
         control={control}
         entityType={entityType}
+        entranceId={entranceValues?.id}
         disabled={!isNewEntrance}
         errors={errors}
         updateEntityType={handleUpdateEntityType}

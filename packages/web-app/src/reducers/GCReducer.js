@@ -35,6 +35,7 @@ import map from './Map';
 import massif from './MassifReducer';
 import massifPost from './MassifPostReducer';
 import massifPut from './MassifPutReducer';
+import moveEntranceToCave from './MoveEntranceToCaveReducer';
 import namePut from './NamePutReducer';
 import organization from './OrganizationReducer';
 import organizationPost from './OrganizationPostReducer';
@@ -89,6 +90,7 @@ const GCReducer = combineReducers({
   massif,
   massifPost,
   massifPut,
+  moveEntranceToCave,
   namePut,
   organization,
   organizationPost,

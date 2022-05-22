@@ -3,12 +3,14 @@ import {
   FormLabel,
   RadioGroup,
   FormControlLabel,
+  Button,
   Radio
 } from '@material-ui/core';
 import React from 'react';
 import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
+import { useHistory } from 'react-router-dom';
 
 import CaveSelection from './CaveSelection';
 import CaveCreation from './CaveCreation';
@@ -19,20 +21,29 @@ const FormControl = styled(MuiFormControl)`
 `;
 
 const Cave = ({
+  allowMoveFromCave,
   control,
   errors,
   entityType,
+  entranceId,
   updateEntityType,
   allLanguages,
   reset,
   disabled = false
 }) => {
   const { formatMessage } = useIntl();
+  const history = useHistory();
 
   const handleRadioChange = event => {
     updateEntityType(event.target.value);
     reset();
   };
+
+  const handleLinkToExistingCaveClick = () => {
+    history.push(`/ui/entrances/${entranceId}/move`);
+  };
+
+  const canMoveEntranceToExistingCave = allowMoveFromCave && entranceId;
 
   return (
     <div>
@@ -60,6 +71,13 @@ const Cave = ({
             })}
           />
         </RadioGroup>
+        {canMoveEntranceToExistingCave && (
+          <Button onClick={handleLinkToExistingCaveClick} color="secondary">
+            {formatMessage({
+              id: 'Link to an existing cave or network'
+            })}
+          </Button>
+        )}
       </FormControl>
       {entityType === ENTRANCE_AND_CAVE ? (
         <CaveCreation
@@ -80,8 +98,10 @@ Cave.propTypes = {
       refName: PropTypes.string.isRequired
     })
   ),
+  allowMoveFromCave: PropTypes.bool.isRequired,
   control: PropTypes.shape({}),
   entityType: PropTypes.oneOf([ENTRANCE_ONLY, ENTRANCE_AND_CAVE]),
+  entranceId: PropTypes.number,
   disabled: PropTypes.bool,
   errors: PropTypes.shape({}),
   reset: PropTypes.func,
