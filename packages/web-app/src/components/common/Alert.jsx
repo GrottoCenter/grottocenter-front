@@ -23,7 +23,7 @@ const Alert = ({ title, content, severity, icon, variant, action }) => {
 
 Alert.propTypes = {
   title: PropTypes.string,
-  content: PropTypes.string,
+  content: PropTypes.node,
   severity: PropTypes.oneOf(['error', 'success', 'info', 'warning']),
   icon: PropTypes.element,
   variant: PropTypes.oneOf(['filled', 'outlined', 'standard', 'string']),

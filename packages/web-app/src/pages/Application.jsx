@@ -32,6 +32,7 @@ import ImportContainer from './ImportCSV';
 import ManageUsers from './Admin/ManageUsers';
 import Map from './Map';
 import MassifPage from './Massif';
+import MoveEntranceToCave from './MoveEntranceToCave';
 import NetworkPage from './Network';
 import PersonPage from './Person';
 import OrganizationPage from './Organization';
@@ -65,6 +66,7 @@ const Application = () => {
         <Route path="/ui/search" component={AdvancedSearchPage} />
         <Route path="/ui/api/:version" component={ApiDoc} />
         <Route path="/ui/api" component={Api} />
+        <Route path="/ui/entrances/:id?/move" component={MoveEntranceToCave} />
         <Route path="/ui/entrances/:id?" component={EntryPage} />
         <Route path="/ui/caves/:id?" component={NetworkPage} />
         <Route path="/ui/faq" component={Faq} />

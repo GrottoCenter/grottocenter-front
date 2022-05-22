@@ -229,6 +229,9 @@ export const patchDescriptionUrl = id =>
   `${API_URL}/api/${apiVersion}/descriptions/${id}`;
 export const patchNameUrl = id => `${API_URL}/api/${apiVersion}/names/${id}`;
 
+export const moveEntranceToCaveUrl = (entranceId, caveId) =>
+  `${API_URL}/api/${apiVersion}/entrances/${entranceId}/cave/${caveId}`;
+
 // ===== ImportCSV url
 export const checkRowsEntrancesUrl = `${API_URL}/api/${apiVersion}/entrances/check-rows`;
 export const checkRowsDocumentsUrl = `${API_URL}/api/${apiVersion}/documents/check-rows`;
