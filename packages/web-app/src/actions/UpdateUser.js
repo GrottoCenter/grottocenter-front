@@ -20,9 +20,8 @@ export const updateUserFailure = error => ({
 });
 
 export const updateUser = data => (dispatch, getState) => {
-  console.log('avant update action');
   dispatch(updateUserAction());
-  console.log('apres updateaction');
+
   const requestOptions = {
     method: 'PUT',
     body: JSON.stringify(data),

@@ -1,5 +1,5 @@
 import fetch from 'isomorphic-fetch';
-import { findPersonUrl } from '../conf/Config';
+import { findUserUrl } from '../conf/Config';
 import makeErrorMessage from '../helpers/makeErrorMessage';
 
 export const FETCH_PERSON = 'FETCH_PERSON';
@@ -24,7 +24,7 @@ export function loadPerson(personId) {
   return dispatch => {
     dispatch(fetchPerson());
 
-    return fetch(findPersonUrl + personId)
+    return fetch(findUserUrl + personId)
       .then(response => {
         if (response.status >= 400) {
           throw new Error(response.status);

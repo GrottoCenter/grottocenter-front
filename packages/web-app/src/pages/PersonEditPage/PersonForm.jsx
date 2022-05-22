@@ -1,57 +1,31 @@
-// import React, { useState } from 'react';
 import React from 'react';
 import PropTypes from 'prop-types';
-// import { useSelector } from 'react-redux';
 import { useIntl } from 'react-intl';
-import { useHistory } from 'react-router-dom';
-import { Controller } from 'react-hook-form';
 import {
-  Button,
+  FormControl as MuiFormControl,
   TextField,
-  CircularProgress,
   IconButton,
-  InputAdornment,
-  Typography
+  InputAdornment
 } from '@material-ui/core';
+
+import { Controller } from 'react-hook-form';
+
 import Visibility from '@material-ui/icons/Visibility';
 import VisibilityOff from '@material-ui/icons/VisibilityOff';
 import styled from 'styled-components';
 import { isEmpty, match } from 'ramda';
 
-import { emailRegexp, PASSWORD_MIN_LENGTH } from '../../conf/Config';
-import Layout from '../../components/common/Layouts/Fixed/FixedContent';
+import { emailRegexp } from '../../conf/Config';
+
 import StringInput from '../../components/common/Form/StringInput';
 
-const FormWrapper = styled.form`
-  display: flex;
-  flex-direction: column;
-  margin: auto;
-  margin-bottom: 0;
-  max-width: 500px;
+const FormControl = styled(MuiFormControl)`
+  padding-bottom: ${({ theme }) => theme.spacing(4)}px;
 `;
 
-const SpacedCenteredButton = styled(Button)`
-  margin: ${({ theme }) => theme.spacing(1)}px auto;
-`;
-
-const PersonEditForm = ({
-  control,
-  errors,
-  user,
-  onEmailChange,
-  onNameChange,
-  onNicknameChange,
-  onPasswordChange,
-  onPasswordConfirmationChange,
-  onPersonEdit,
-  onSurnameChange,
-  loading,
-  PersonEditRequestSucceeded
-}) => {
+const PersonEditForm = ({ control, errors, watch }) => {
   const [isPasswordVisible, setIsPasswordVisible] = React.useState(false);
   const { formatMessage } = useIntl();
-  const history = useHistory();
-  // const [User, setUser] = useState(null);
 
   const toggleIsPasswordVisible = () => {
     setIsPasswordVisible(!isPasswordVisible);
@@ -60,167 +34,198 @@ const PersonEditForm = ({
     event.preventDefault();
   };
 
-  const checkIfHasError = fieldName => {
-    switch (fieldName) {
-      case 'email':
-        return isEmpty(match(emailRegexp, user.email));
-      case 'password':
-      case 'passwordConfirmation':
-        return (
-          user.password < PASSWORD_MIN_LENGTH ||
-          user.password !== user.passwordConfirmation
-        );
-
-      default:
-        return false;
+  const validateName = value => {
+    if (value.length <= 0) {
+      return formatMessage({ id: 'You must have a name' });
     }
+    return true;
+  };
+  const validateSurname = value => {
+    if (value.length <= 0) {
+      return formatMessage({ id: 'You must have a surname' });
+    }
+    return true;
+  };
+
+  const validatePwd = value => {
+    if (value.length > 0 && value.length < 8) {
+      return formatMessage({
+        id: 'Invalid email or password.'
+      });
+    }
+    return true;
+  };
+  const validateEmail = value => {
+    if (value) {
+      if (value.length >= 0 && isEmpty(match(emailRegexp, value))) {
+        return formatMessage({
+          id: 'Invalid email or password.'
+        });
+      }
+    }
+    return true;
   };
 
   return (
-    <Layout
-      title={formatMessage({ id: 'Edit your profile' })}
-      footer=""
-      content={
-        <>
-          {!PersonEditRequestSucceeded ? (
-            <>
-              <Typography align="center">
-                {formatMessage({
-                  id: 'Your profile has been successfully edited!'
-                })}{' '}
-              </Typography>
-              <SpacedCenteredButton
-                color="primary"
-                onClick={() => history.push('/')}
-                style={{ display: 'block' }}
-                variant="contained">
-                {formatMessage({ id: 'Edit' })}
-              </SpacedCenteredButton>
-            </>
-          ) : (
-            <FormWrapper onSubmit={onPersonEdit}>
-              <StringInput
-                fullWidth
-                helperText={formatMessage({
-                  id: 'The nickname defines how other users see you.'
-                })}
-                onValueChange={onNicknameChange}
-                required
-                value={user.nickname}
-                valueName={formatMessage({ id: 'Nickname' })}
-              />
-              <Controller
-                name="user.name"
-                control={control}
-                rules={{ required: true }}
-                render={({ field: { ref, onChange, ...field } }) => (
-                  <TextField
-                    fullWidth
-                    required
-                    error={!!errors?.user?.name}
-                    label={formatMessage({ id: 'User name' })}
-                    value={errors.user.name}
-                    inputRef={ref}
-                    onChange={onChange}
-                    {...field}
-                  />
-                )}
-              />
-              <StringInput
-                fullWidth
-                helperText={formatMessage({
-                  id: 'Your real name (optional).'
-                })}
-                onValueChange={onNameChange}
-                value={user.name}
-                valueName={formatMessage({ id: 'Name' })}
-              />
-              <StringInput
-                fullWidth
-                helperText={formatMessage({
-                  id: 'Your real surname (optional).'
-                })}
-                onValueChange={onSurnameChange}
-                value={user.surname}
-                valueName={formatMessage({ id: 'Surname' })}
-              />
-
-              <StringInput
-                fullWidth
-                hasError={checkIfHasError('email')}
-                onValueChange={onEmailChange}
-                required
-                value={user.email}
-                valueName={formatMessage({ id: 'Email' })}
-              />
-              <StringInput
-                endAdornment={
-                  <InputAdornment position="end">
-                    <IconButton
-                      aria-label="toggle password visibility"
-                      onClick={toggleIsPasswordVisible}
-                      onMouseDown={handleMouseDownPassword}
-                      edge="end">
-                      {isPasswordVisible ? <Visibility /> : <VisibilityOff />}
-                    </IconButton>
-                  </InputAdornment>
-                }
-                fullWidth
-                hasError={checkIfHasError('password')}
-                helperText={formatMessage(
-                  {
-                    id: `password.length.error`,
-                    defaultMessage: `Your password must be at least {passwordMinLength} characters.`,
-                    description:
-                      'Error displayed when the account password is too short.'
-                  },
-                  {
-                    passwordMinLength: PASSWORD_MIN_LENGTH
-                  }
-                )}
-                onValueChange={onPasswordChange}
-                required
-                type={isPasswordVisible ? 'text' : 'password'}
-                value={user.password}
-                valueName={formatMessage({ id: 'Password' })}
-              />
-
-              <StringInput
-                endAdornment={
-                  <InputAdornment position="end">
-                    <IconButton
-                      aria-label="toggle password visibility"
-                      onClick={toggleIsPasswordVisible}
-                      onMouseDown={handleMouseDownPassword}
-                      edge="end">
-                      {isPasswordVisible ? <Visibility /> : <VisibilityOff />}
-                    </IconButton>
-                  </InputAdornment>
-                }
-                hasError={checkIfHasError('passwordConfirmation')}
-                helperText="Repeat your password here."
-                fullWidth
-                onValueChange={onPasswordConfirmationChange}
-                required
-                type={isPasswordVisible ? 'text' : 'password'}
-                value={user.passwordConfirmation}
-                valueName={formatMessage({ id: 'Password confirmation' })}
-              />
-              <SpacedCenteredButton
-                type="submit"
-                size="large"
-                color={loading ? 'default' : 'primary'}>
-                {loading ? (
-                  <CircularProgress size="2.8rem" />
-                ) : (
-                  formatMessage({ id: 'Edit' })
-                )}
-              </SpacedCenteredButton>
-            </FormWrapper>
+    <>
+      <FormControl component="fieldset" style={{ width: '50vh' }}>
+        <Controller
+          name="user.name"
+          control={control}
+          rules={{ required: true, validate: validateName }}
+          render={({ field: { ref, ...field } }) => (
+            <TextField
+              fullWidth
+              required
+              error={!!errors?.user?.name}
+              label={formatMessage({ id: 'Name' })}
+              inputRef={ref}
+              helperText={errors?.user?.name?.message}
+              {...field}
+              onChange={e => field.onChange(e.target.value)}
+              value={field.value}
+            />
           )}
-        </>
-      }
-    />
+        />
+        <Controller
+          name="user.surname"
+          control={control}
+          rules={{ required: true, validate: validateSurname }}
+          render={({ field: { ref, ...field } }) => (
+            <TextField
+              fullWidth
+              required
+              error={!!errors?.user?.surname}
+              label={formatMessage({ id: 'Surname' })}
+              inputRef={ref}
+              helperText={errors?.user?.surname?.message}
+              {...field}
+              onChange={e => field.onChange(e.target.value)}
+              value={field.value}
+            />
+          )}
+        />
+        <Controller
+          name="user.nickname"
+          control={control}
+          rules={{}}
+          render={({ field: { ref, onChange, ...field } }) => (
+            <TextField
+              fullWidth
+              error={!!errors?.user?.nickname}
+              label={formatMessage({ id: 'Nickname' })}
+              inputRef={ref}
+              onChange={onChange}
+              {...field}
+            />
+          )}
+        />
+        <Controller
+          name="user.email"
+          control={control}
+          rules={{ validate: validateEmail }}
+          render={({ field: { ref, ...field } }) => (
+            <TextField
+              fullWidth
+              error={!!errors?.user?.email}
+              label={formatMessage({ id: 'New email' })}
+              inputRef={ref}
+              helperText={errors?.user?.email?.message}
+              {...field}
+              onChange={e => field.onChange(e.target.value)}
+              value={field.value}
+              type="email"
+            />
+          )}
+        />
+        <Controller
+          name="user.emailConfirmation"
+          control={control}
+          rules={{
+            validate: value =>
+              (watch('user.email') !== ''
+                ? value === watch('user.email')
+                : true) || formatMessage({ id: 'The mails do not match' })
+          }}
+          render={({ field: { ref, ...field } }) => (
+            <TextField
+              fullWidth
+              error={!!errors?.user?.emailConfirmation}
+              label={formatMessage({ id: 'Email confirmation' })}
+              helperText={errors?.user?.emailConfirmation?.message}
+              inputRef={ref}
+              {...field}
+              onChange={e => field.onChange(e.target.value)}
+              value={field.value}
+              type="email"
+            />
+          )}
+        />
+        <Controller
+          name="user.password"
+          control={control}
+          rules={{ validate: value => (value ? validatePwd : true) }}
+          render={({ field: { ref, ...field } }) => (
+            <StringInput
+              endAdornment={
+                <InputAdornment position="end">
+                  <IconButton
+                    aria-label="toggle password visibility"
+                    onClick={toggleIsPasswordVisible}
+                    onMouseDown={handleMouseDownPassword}
+                    edge="end">
+                    {isPasswordVisible ? <Visibility /> : <VisibilityOff />}
+                  </IconButton>
+                </InputAdornment>
+              }
+              fullWidth
+              valueName={formatMessage({ id: 'New password' })}
+              error={!!errors?.user?.password}
+              helperText={errors?.user?.password?.message}
+              inputRef={ref}
+              {...field}
+              onChange={e => field.onChange(e.target.value)}
+              value={field.value}
+              type={isPasswordVisible ? 'text' : 'password'}
+            />
+          )}
+        />
+        <Controller
+          name="user.passwordConfirmation"
+          control={control}
+          rules={{
+            validate: value =>
+              (watch('user.password') !== ''
+                ? value === watch('user.password')
+                : true) || formatMessage({ id: 'The passwords do not match' })
+          }}
+          render={({ field: { ref, ...field } }) => (
+            <StringInput
+              endAdornment={
+                <InputAdornment position="end">
+                  <IconButton
+                    aria-label="toggle password visibility"
+                    onClick={toggleIsPasswordVisible}
+                    onMouseDown={handleMouseDownPassword}
+                    edge="end">
+                    {isPasswordVisible ? <Visibility /> : <VisibilityOff />}
+                  </IconButton>
+                </InputAdornment>
+              }
+              fullWidth
+              valueName={formatMessage({ id: 'Password confirmation' })}
+              error={!!errors?.user?.passwordConfirmation}
+              helperText={errors?.user?.passwordConfirmation?.message}
+              inputRef={ref}
+              {...field}
+              onChange={e => field.onChange(e.target.value)}
+              value={field.value}
+              type={isPasswordVisible ? 'text' : 'password'}
+            />
+          )}
+        />
+      </FormControl>
+    </>
   );
 };
 
@@ -228,29 +233,16 @@ PersonEditForm.propTypes = {
   control: PropTypes.shape({}),
   errors: PropTypes.shape({
     user: PropTypes.shape({
-      email: PropTypes.arrayOf(PropTypes.shape({})),
-      name: PropTypes.arrayOf(PropTypes.shape({})),
-      language: PropTypes.shape({ message: PropTypes.string }),
-      surname: PropTypes.shape({ message: PropTypes.string })
+      name: PropTypes.shape({ message: PropTypes.string }),
+      surname: PropTypes.shape({ message: PropTypes.string }),
+      nickname: PropTypes.shape({ message: PropTypes.string }),
+      email: PropTypes.shape({ message: PropTypes.string }),
+      emailConfirmation: PropTypes.shape({ message: PropTypes.string }),
+      password: PropTypes.shape({ message: PropTypes.string }),
+      passwordConfirmation: PropTypes.shape({ message: PropTypes.string })
     })
   }),
-  user: PropTypes.shape({
-    email: PropTypes.string.isRequired,
-    name: PropTypes.string.isRequired,
-    nickname: PropTypes.string.isRequired,
-    password: PropTypes.string.isRequired,
-    passwordConfirmation: PropTypes.string.isRequired,
-    surname: PropTypes.string.isRequired
-  }),
-  onEmailChange: PropTypes.func.isRequired,
-  onPersonEdit: PropTypes.func.isRequired,
-  onNameChange: PropTypes.func.isRequired,
-  onNicknameChange: PropTypes.func.isRequired,
-  onPasswordChange: PropTypes.func.isRequired,
-  onPasswordConfirmationChange: PropTypes.func.isRequired,
-  onSurnameChange: PropTypes.func.isRequired,
-  loading: PropTypes.bool.isRequired,
-  PersonEditRequestSucceeded: PropTypes.bool.isRequired
+  watch: PropTypes.shape({})
 };
 
 export default PersonEditForm;
