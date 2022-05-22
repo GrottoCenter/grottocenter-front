@@ -1,47 +1,14 @@
-import { useIntl } from 'react-intl';
-import { FormControl, InputAdornment, InputLabel } from '@material-ui/core';
-import { useDispatch, useSelector } from 'react-redux';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { useController } from 'react-hook-form';
-import { isNil, length } from 'ramda';
 import PropTypes from 'prop-types';
 
-import {
-  fetchQuicksearchResult,
-  resetQuicksearch
-} from '../../../../../actions/Quicksearch';
-import { useDebounce } from '../../../../../hooks';
-import {
-  StyledInput,
-  StyledFormControl,
-  InputWrapper
-} from '../../../../common/Form/FormAutoComplete';
-import { entityOptionForSelector } from '../../../../../helpers/Entity';
-import AutoCompleteSearchComponent from '../../../../common/AutoCompleteSearch';
 import Details from './Details';
-
-const resultEndAdornment = (
-  <InputAdornment position="end">
-    <img
-      src="/images/entry.svg"
-      alt="Document icon"
-      style={{ width: '40px' }}
-    />
-  </InputAdornment>
-);
-
-const getCaveToString = cave => {
-  return `${cave.name}`;
-};
+import CaveAutoCompleteSearch from '../../../../common/AutoCompleteSearch/CaveAutoCompleteSearch';
+import Alert from '../../../../common/Alert';
 
 const CaveSelection = ({ control, errors, disabled = false }) => {
-  const { formatMessage } = useIntl();
-  const dispatch = useDispatch();
-  const [inputValue, setInputValue] = useState('');
-  const debouncedInput = useDebounce(inputValue);
   const {
-    field: { onChange: onIdChange, value: caveId },
-    fieldState: { error }
+    field: { onChange: onIdChange, value: caveId }
   } = useController({
     control,
     name: 'cave.id',
@@ -78,9 +45,7 @@ const CaveSelection = ({ control, errors, disabled = false }) => {
     control,
     name: 'cave.temperature'
   });
-  const { isLoading, results: suggestions } = useSelector(
-    state => state.quicksearch
-  );
+
   const handleSelection = selection => {
     if (selection?.id) {
       onLengthChange(Number(selection.length));
@@ -92,61 +57,17 @@ const CaveSelection = ({ control, errors, disabled = false }) => {
     } else {
       onIdChange(null);
     }
-    setInputValue('');
   };
-
-  const fetchSearchResults = query => {
-    const criterias = {
-      query: query.trim(),
-      complete: false,
-      resourceType: 'caves'
-    };
-    dispatch(fetchQuicksearchResult(criterias));
-  };
-
-  const resetSearchResults = () => {
-    dispatch(resetQuicksearch());
-  };
-
-  useEffect(() => {
-    if (length(debouncedInput) > 2) {
-      fetchSearchResults(debouncedInput);
-    } else {
-      resetSearchResults();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [debouncedInput]);
 
   return (
     <>
-      <FormControl
-        variant="filled"
+      <CaveAutoCompleteSearch
+        disabled={disabled}
         required
-        error={!!errors.caveName}
-        fullWidth>
-        <InputLabel>{formatMessage({ id: 'Cave' })}</InputLabel>
-        <StyledInput
-          value={caveNameValue}
-          disabled
-          endAdornment={resultEndAdornment}
-        />
-        <StyledFormControl variant="filled" error={!errors.caveName}>
-          <InputWrapper>
-            <AutoCompleteSearchComponent
-              onInputChange={setInputValue}
-              disabled={disabled}
-              onSelection={handleSelection}
-              getOptionLabel={getCaveToString}
-              hasError={!isNil(error)}
-              isLoading={isLoading}
-              label={formatMessage({ id: 'Search for a cave' })}
-              renderOption={entityOptionForSelector}
-              inputValue={inputValue}
-              suggestions={suggestions}
-            />
-          </InputWrapper>
-        </StyledFormControl>
-      </FormControl>
+        onSelection={handleSelection}
+        value={{ name: caveNameValue }}
+      />
+      {errors?.caveName && <Alert severity="error" content={errors.caveName} />}
       {!!caveId && <Details control={control} errors={errors} isReadonly />}
     </>
   );
