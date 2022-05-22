@@ -207,7 +207,7 @@ export const getCaveUrl = `${API_URL}/api/${apiVersion}/caves/`;
 export const getLanguagesUrl = `${API_URL}/api/${apiVersion}/languages`;
 export const postCaverUrl = `${API_URL}/api/${apiVersion}/cavers`;
 export const putCaverUrl = userId =>
-  `${API_URL}/api/${apiVersion}/persons/${userId}`;
+  `${API_URL}/api/${apiVersion}/cavers/${userId}`;
 export const postDocumentUrl = `${API_URL}/api/${apiVersion}/documents`;
 export const putDocumentUrl = documentId =>
   `${API_URL}/api/${apiVersion}/documents/${documentId}`;
@@ -254,6 +254,7 @@ export const importRowsDocumentsUrl = `${API_URL}/api/${apiVersion}/documents/im
 
 // ===== Auth url
 export const changePasswordUrl = `${API_URL}/api/${apiVersion}/account/password`;
+export const changeEmailUrl = `${API_URL}/api/${apiVersion}/account/email`;
 export const loginUrl = `${API_URL}/api/${apiVersion}/login`;
 export const logoutUrl = `${API_URL}/api/${apiVersion}/logout`;
 export const signUpUrl = `${API_URL}/api/${apiVersion}/signup`;

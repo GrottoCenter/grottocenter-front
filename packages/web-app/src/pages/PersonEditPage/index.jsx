@@ -1,16 +1,34 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { useIntl } from 'react-intl';
+import styled from 'styled-components';
 import { isNil } from 'ramda';
-import { makeStyles } from '@material-ui/core/styles';
+import {
+  makeStyles,
+  Stepper,
+  Step,
+  StepLabel,
+  Button,
+  Icon,
+  Typography,
+  CircularProgress,
+  Box
+} from '@material-ui/core';
+import { useHistory } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
-import Stepper from '@material-ui/core/Stepper';
-import Step from '@material-ui/core/Step';
-import StepLabel from '@material-ui/core/StepLabel';
-import Button from '@material-ui/core/Button';
-import Typography from '@material-ui/core/Typography';
+
+import { useDispatch, useSelector } from 'react-redux';
+
+import Layout from '../../components/common/Layouts/Fixed/FixedContent';
+import ActionButton from '../../components/common/ActionButton';
+import Alert from '../../components/common/Alert';
+import { useBoolean } from '../../hooks';
+
 import PersonEditForm from './PersonForm';
-import EditOrganizations from './PersonOrganizationForm';
-// import { any } from 'prop-types';
+import makeUserData from './transformer';
+import { updateUser } from '../../actions/UpdateUser';
+import { postChangePassword } from '../../actions/ChangePassword';
+import { postChangeEmail } from '../../actions/ChangeEmail';
 import Summary from './Summary';
 
 const useStyles = makeStyles(theme => ({
@@ -27,116 +45,83 @@ const useStyles = makeStyles(theme => ({
 }));
 
 function getSteps() {
-  return ['Edit your profile', 'Connection to an organisation', 'Summary'];
+  return ['Edit your profile', 'Summary'];
 }
+const steps = getSteps();
 
-function getStepContent(step, userTest, control, errors) {
+function getStepContent(step, userValues, control, errors, watch) {
   switch (step) {
     case 0:
-      return (
-        <PersonEditForm
-          control={control}
-          errors={errors}
-          user={userTest}
-          onEmailChange=""
-          onNameChange=""
-          onNicknameChange=""
-          onPasswordChange=""
-          onPasswordConfirmationChange=""
-          onPersonEdit=""
-          onSurnameChange=""
-          loading=""
-          PersonEditRequestSucceeded
-        />
-      );
+      return <PersonEditForm control={control} errors={errors} watch={watch} />;
     case 1:
-      return <EditOrganizations user={userTest} />;
-    case 2:
-      return <Summary user={userTest} />;
+      return <Summary control={control} defautValues={userValues} />;
     default:
       return 'Unknown step';
   }
 }
 
-const PersonEditPage = ({ isFetching, userValues = null }) => {
-  const orga = [
-    {
-      key: 0,
-      email: 'testemail1',
-      name: 'testname1',
-      nickname: 'testnickname',
-      surname: 'testsurname'
-    },
-    {
-      key: 1,
-      email: 'testemail',
-      name: 'testname2',
-      nickname: 'testnickname',
-      surname: 'testsurname'
-    },
-    {
-      key: 4,
-      email: 'testemail',
-      name: 'testname3',
-      nickname: 'testnickname',
-      surname: 'testsurname'
-    }
-  ];
-  const userTest = {
-    name: 'testname',
-    nickname: 'testnickname',
-    surname: 'testsurname',
-    email: 'testemail@orange.fr',
-    password: 'testpassword',
-    passwordConfirmation: 'testpassword',
-    organizations: orga
-  };
+let defautValues = {
+  name: '',
+  surname: '',
+  nickname: '',
+  email: '',
+  emailConfirmation: '',
+  password: '',
+  passwordConfirmation: ''
+};
 
+const StyledActionButton = styled(ActionButton)`
+  margin-top: ${({ theme }) => theme.spacing(1)}px;
+  margin-bottom: ${({ theme }) => theme.spacing(1)}px;
+`;
+
+const PersonEditPage = ({ userValues }) => {
+  defautValues = userValues || defautValues;
+  const history = useHistory();
+  const { formatMessage } = useIntl();
+  const isValid = useBoolean();
   const {
+    handleSubmit,
+    reset,
     control,
+    watch,
     trigger,
-    formState: { errors }
+    formState: { errors, isSubmitted, isSubmitting, isSubmitSuccessful }
   } = useForm({
     defaultValues: {
-      user: userValues
+      user: defautValues
     }
   });
+  const { error: UserError, loading: UserLoading } = useSelector(
+    state => state.updateUser
+  );
+  const dispatch = useDispatch();
   const classes = useStyles();
   const [activeStep, setActiveStep] = React.useState(0);
-  const [skipped, setSkipped] = React.useState(new Set());
-  const steps = getSteps();
 
-  const isStepOptional = step => {
-    return step === 1;
-  };
-
-  const isStepSkipped = step => {
-    return skipped.has(step);
-  };
-  /*
-  const handleNext = () => {
-    let newSkipped = skipped;
-    if (isStepSkipped(activeStep)) {
-      newSkipped = new Set(newSkipped.values());
-      newSkipped.delete(activeStep);
-    }
-
-    setActiveStep(prevActiveStep => prevActiveStep + 1);
-    setSkipped(newSkipped);
-  };
-  */
+  const authState = useSelector(state => state.login);
 
   const handleNext = async () => {
-    const result = await trigger('user.name', { shouldFocus: true });
-    if (result) {
-      let newSkipped = skipped;
-      if (isStepSkipped(activeStep)) {
-        newSkipped = new Set(newSkipped.values());
-        newSkipped.delete(activeStep);
-      }
+    const result = await trigger(
+      [
+        'user.passwordConfirmation',
+        'user.name',
+        'user.surname',
+        'user.nickname',
+        'user.email',
+        'user.emailConfirmation',
+        'user.password',
+        'user.passwordConfirmation'
+      ],
 
+      {
+        shouldFocus: true
+      }
+    );
+    isValid.true();
+
+    if (result) {
       setActiveStep(prevActiveStep => prevActiveStep + 1);
-      setSkipped(newSkipped);
     }
   };
 
@@ -144,113 +129,156 @@ const PersonEditPage = ({ isFetching, userValues = null }) => {
     setActiveStep(prevActiveStep => prevActiveStep - 1);
   };
 
-  const handleSkip = () => {
-    if (!isStepOptional(activeStep)) {
-      // You probably want to guard against something like this,
-      // it should never occur unless someone's actively trying to break something.
-      throw new Error("You can't skip a step that isn't optional.");
-    }
-
+  const onSubmit = async data => {
     setActiveStep(prevActiveStep => prevActiveStep + 1);
-    setSkipped(prevSkipped => {
-      const newSkipped = new Set(prevSkipped.values());
-      newSkipped.add(activeStep);
-      return newSkipped;
-    });
+
+    const User = makeUserData(data);
+
+    dispatch(updateUser(User));
+
+    if (data.user.email !== undefined && data.user.email !== '') {
+      dispatch(postChangeEmail(data.user.email));
+    }
+    if (data.user.password !== undefined && data.user.password !== '') {
+      dispatch(
+        postChangePassword(data.user.password, authState.authTokenDecoded)
+      );
+    }
   };
 
   const handleReset = () => {
+    reset({ user: defautValues });
     setActiveStep(0);
   };
 
-  if (isNil(userValues)) {
-    return (
-      <Typography variant="h3">
-        user Error, the person you are looking for is not available.
-      </Typography>
-    );
-  }
-
-  if (!isFetching) {
-    return (
-      <Typography variant="h3">
-        fetching Error, the person you are looking for is not available.
-      </Typography>
-    );
-  }
+  const handleFinish = () => {
+    history.push(`/ui/persons/:${userValues.id}`);
+  };
 
   return (
-    <div className={classes.root}>
-      <Stepper activeStep={activeStep}>
-        {steps.map((label, index) => {
-          const stepProps = {};
-          const labelProps = {};
-          if (isStepOptional(index)) {
-            labelProps.optional = (
-              <Typography variant="caption">Optional</Typography>
-            );
-          }
-          if (isStepSkipped(index)) {
-            stepProps.completed = false;
-          }
-          return (
-            <Step key={label} {...stepProps}>
-              <StepLabel {...labelProps}>{label}</StepLabel>
-            </Step>
-          );
-        })}
-      </Stepper>
-      <div>
-        {activeStep === steps.length ? (
-          <div>
-            <Typography className={classes.instructions}>
-              All steps completed - you&apos;re finished
-            </Typography>
-            <Button onClick={handleReset} className={classes.button}>
-              Reset
-            </Button>
-          </div>
+    <Layout
+      title={formatMessage({ id: 'Edit your profile' })}
+      footer=""
+      content={
+        isSubmitted && isNil(UserError) ? (
+          <Box display="flex" justifyContent="center" flexDirection="column">
+            {UserLoading && (
+              <>
+                <Typography>
+                  {formatMessage({
+                    id: 'Updating user...'
+                  })}
+                </Typography>
+                <CircularProgress />
+              </>
+            )}
+            {!UserLoading && isSubmitSuccessful && (
+              <form>
+                <Alert
+                  severity="success"
+                  title={formatMessage({
+                    id: 'User successfully updated'
+                  })}
+                />
+              </form>
+            )}
+            {!UserLoading && !isSubmitSuccessful && (
+              <form>
+                <Alert
+                  severity="error"
+                  title={formatMessage({
+                    id: 'An error occurred when updating the user!'
+                  })}
+                />
+              </form>
+            )}
+          </Box>
         ) : (
-          <div>
-            <Typography className={classes.instructions}>
-              {getStepContent(activeStep, userTest, control, errors)}
-            </Typography>
-            <div>
-              <Button
-                disabled={activeStep === 0}
-                onClick={handleBack}
-                className={classes.button}>
-                Back
-              </Button>
-              {isStepOptional(activeStep) && (
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={handleSkip}
-                  className={classes.button}>
-                  Skip
-                </Button>
-              )}
+          <Box display="flex" justifyContent="center" flexDirection="column">
+            <form autoComplete="off" onSubmit={handleSubmit(onSubmit)}>
+              <Stepper activeStep={activeStep}>
+                {steps.map(label => {
+                  const stepProps = {};
+                  const labelProps = {};
 
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={handleNext}
-                className={classes.button}>
-                {activeStep === steps.length - 1 ? 'Finish' : 'Next'}
-              </Button>
-            </div>
-          </div>
-        )}
-      </div>
-    </div>
+                  return (
+                    <Step key={label} {...stepProps}>
+                      <StepLabel {...labelProps}>{label}</StepLabel>
+                    </Step>
+                  );
+                })}
+              </Stepper>
+
+              <div>
+                {activeStep === steps.length ? (
+                  <div>
+                    <Typography className={classes.instructions}>
+                      All steps completed - you&apos;re finished
+                    </Typography>
+                    <Button onClick={handleReset} className={classes.button}>
+                      {formatMessage({ id: 'Reset' })}
+                    </Button>
+                    <Button onClick={handleFinish} className={classes.button}>
+                      {formatMessage({ id: 'Finish' })}
+                    </Button>
+                  </div>
+                ) : (
+                  <div>
+                    <Typography
+                      component="div"
+                      className={classes.instructions}>
+                      {getStepContent(
+                        activeStep,
+                        defautValues,
+                        control,
+                        errors,
+                        watch
+                      )}
+                    </Typography>
+                    <div>
+                      <Button
+                        disabled={activeStep === 0}
+                        onClick={handleBack}
+                        className={classes.button}>
+                        Back
+                      </Button>
+                      {activeStep === steps.length - 1 ? (
+                        <StyledActionButton
+                          label={formatMessage({ id: 'Update' })}
+                          loading={isSubmitting}
+                          color="primary"
+                          icon={<Icon>send</Icon>}
+                          type="submit"
+                        />
+                      ) : (
+                        <Button
+                          variant="contained"
+                          color="primary"
+                          onClick={handleNext}
+                          className={classes.button}>
+                          {activeStep === steps.length - 1
+                            ? formatMessage({ id: 'Finish' })
+                            : formatMessage({ id: 'Next' })}
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </form>
+          </Box>
+        )
+      }
+    />
   );
 };
 
 PersonEditPage.propTypes = {
-  isFetching: PropTypes.bool,
   userValues: PropTypes.shape({
-    name: PropTypes.string
+    id: PropTypes.number,
+    name: PropTypes.string,
+    surname: PropTypes.string,
+    nickname: PropTypes.string
   })
 };
 
