@@ -6,7 +6,6 @@ const date = new Date();
 const todayDate = date.toISOString().substring(0, 10);
 const defaultContext = {
   state: {
-    entryId: '',
     details: {
       accessRate: 2.5,
       author: 'Author name',
@@ -42,7 +41,6 @@ const Entry = ({
   histories,
   locations,
   riggings,
-  entryId,
   loading = true,
   children
 }) => {
@@ -68,7 +66,6 @@ const Entry = ({
     <EntryContext.Provider
       value={{
         state: {
-          entryId,
           loading,
           details: detailsState,
           comments,
@@ -184,7 +181,7 @@ export const locationType = PropTypes.shape({
   entrance: PropTypes.number,
   id: PropTypes.number,
   language: PropTypes.shape({
-    id: PropTypes.number.isRequired,
+    id: PropTypes.string.isRequired,
     refName: PropTypes.string.isRequired
   }).isRequired,
   relevance: PropTypes.number,
@@ -216,7 +213,6 @@ Entry.propTypes = {
   descriptions: descriptionsType.isRequired,
   documents: documentsType.isRequired,
   details: detailsType.isRequired,
-  entryId: PropTypes.string.isRequired,
   histories: historiesType.isRequired,
   loading: PropTypes.bool,
   locations: locationsType.isRequired,

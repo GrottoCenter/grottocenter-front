@@ -93,7 +93,7 @@ export const Entry = () => {
           icon={<CustomIcon type="entry" />}
         />
       }>
-      <Locations locations={locations} entranceId={id} />
+      {id && <Locations locations={locations} entranceId={id} />}
       {!isEmpty(descriptions) && <Descriptions descriptions={descriptions} />}
       {!isEmpty(riggings) && <Riggings riggings={riggings} />}
       {!isEmpty(documents) && <Documents documents={documents} />}
