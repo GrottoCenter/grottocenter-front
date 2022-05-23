@@ -299,3 +299,4 @@ export const logoGC = '/images/logo.svg';
 export const authTokenName = 'grottocenter_token';
 
 export const MAX_SIZE_OF_UPLOADED_FILES = 2000 * 1000000; // in bytes (2 Go)
+export const MAX_ORGANIZATION_LOGO_SIZE_IN_BYTES = 10485760; // in bytes (10MB)

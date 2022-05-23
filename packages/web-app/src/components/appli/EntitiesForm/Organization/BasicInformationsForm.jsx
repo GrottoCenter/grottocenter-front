@@ -4,8 +4,7 @@ import {
   TextField,
   Select,
   MenuItem,
-  InputLabel,
-  Checkbox
+  InputLabel
 } from '@material-ui/core';
 import { React, useEffect } from 'react';
 import { Controller } from 'react-hook-form';
@@ -141,19 +140,6 @@ const BasicInformationsForm = ({
             />
           )}
         />
-        {permissions.isAdmin && (
-          <Controller
-            name="organization.isPartner"
-            control={control}
-            render={({ field }) => (
-              <Checkbox
-                onChange={e => field.onChange(e.target.checked)}
-                checked={field.value}
-                error={!!errors?.organization?.description}
-              />
-            )}
-          />
-        )}
       </FormControl>
     </div>
   );

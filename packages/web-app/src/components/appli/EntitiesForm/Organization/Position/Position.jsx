@@ -1,11 +1,16 @@
 import { Slide } from '@material-ui/core';
 import React from 'react';
+import styled from 'styled-components';
 import { useWatch } from 'react-hook-form';
 import PropTypes from 'prop-types';
 import MultipleMarkers, {
   isValidPositions
 } from '../../../../common/Maps/MapMultipleMarkers';
 import { useDebounce } from '../../../../../hooks';
+
+const Style = styled.div`
+  margin: ${({ theme }) => theme.spacing(4)}px;
+`;
 
 const PositionMap = ({ control }) => {
   const debouncedLatitude = useDebounce(
@@ -23,14 +28,16 @@ const PositionMap = ({ control }) => {
   return (
     <Slide direction="up" in={validPosition} mountOnEnter unmountOnExit>
       <div>
-        <MultipleMarkers
-          positions={
-            validPosition ? [[debouncedLatitude, debouncedLongitude]] : []
-          }
-          loading={validPosition}
-          zoom={10}
-          style={{ borderRadius: '4px', margin: '4px' }}
-        />
+        <Style>
+          <MultipleMarkers
+            positions={
+              validPosition ? [[debouncedLatitude, debouncedLongitude]] : []
+            }
+            loading={validPosition}
+            zoom={10}
+            style={{ borderRadius: '4px', margin: '4px' }}
+          />
+        </Style>
       </div>
     </Slide>
   );

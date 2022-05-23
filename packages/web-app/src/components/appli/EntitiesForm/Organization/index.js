@@ -25,19 +25,18 @@ import { postOrganization } from '../../../../actions/CreateOrganization';
 import { updateOrganization } from '../../../../actions/UpdateOrganization';
 import BasicInformationsForm from './BasicInformationsForm';
 import InformationsForm from './InformationsForm';
-// import Uploader from './Uploader'; //To uncomment when api will have logo field
-import Location from './Location/index';
 import License from './License';
 import {
   makePostOrganizationData,
   makePutOrganizationData
 } from './transformers';
+import Position from './Position/index';
 
 const Button = styled(MuiButton)`
   margin: ${({ theme }) => theme.spacing(2)}px;
 `;
 
-let defaultOrganizationValues = {
+const defaultOrganizationValues = {
   name: null,
   isPartner: false,
   description: null,
@@ -58,7 +57,6 @@ let defaultOrganizationValues = {
 
 export const OrganizationForm = ({ organizationValues = null }) => {
   const isNewOrganization = !organizationValues;
-  defaultOrganizationValues = organizationValues || defaultOrganizationValues;
   const { formatMessage } = useIntl();
   const { languages: allLanguages } = useSelector(state => state.language);
   const allCountries = useMemo(() => countryList().getData(), []);
@@ -88,7 +86,7 @@ export const OrganizationForm = ({ organizationValues = null }) => {
     }
   } = useForm({
     defaultValues: {
-      organization: defaultOrganizationValues
+      organization: organizationValues || defaultOrganizationValues
     }
   });
 
@@ -97,7 +95,7 @@ export const OrganizationForm = ({ organizationValues = null }) => {
   const stepExpanded = useBoolean();
 
   const handleReset = useCallback(() => {
-    reset({ organization: defaultOrganizationValues });
+    reset({ organization: organizationValues || defaultOrganizationValues });
     stepExpanded.close();
     setActiveStep(0);
   }, [reset, stepExpanded]);
@@ -119,7 +117,7 @@ export const OrganizationForm = ({ organizationValues = null }) => {
       />
     ),
     Location: (
-      <Location control={control} errors={errors} setFocus={setFocus} />
+      <Position control={control} errors={errors} setFocus={setFocus} />
     ),
     // Logo: <Uploader control={control} errors={errors} />, // To uncomment when api will be ready to store logo
     Licenses: <License />
@@ -168,9 +166,9 @@ export const OrganizationForm = ({ organizationValues = null }) => {
       const organizationToPost = makePostOrganizationData(data);
       dispatch(postOrganization(organizationToPost));
     } else {
-      if (data.organization.name !== defaultOrganizationValues) {
+      if (data.organization.name !== organizationValues) {
         const newName = {
-          id: defaultOrganizationValues.nameId,
+          id: organizationValues.nameId,
           name: data.organization.name
         };
         dispatch(updateName(newName));
@@ -178,7 +176,7 @@ export const OrganizationForm = ({ organizationValues = null }) => {
 
       const organizationToUpdate = makePutOrganizationData(
         data,
-        defaultOrganizationValues
+        organizationValues
       );
       dispatch(updateOrganization(organizationToUpdate));
     }

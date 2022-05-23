@@ -27,7 +27,7 @@ const reducer = (state = initialState, action) => {
     case UPDATE_ORGANIZATION_SUCCESS:
       return {
         ...state,
-        data: action.cave,
+        data: action.organization,
         error: initialState.error,
         loading: false
       };

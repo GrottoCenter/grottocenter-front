@@ -1,12 +1,11 @@
 import { FormControl as MuiFormControl, FormLabel } from '@material-ui/core';
-import { React, useEffect } from 'react';
+import { React } from 'react';
 import { Controller } from 'react-hook-form';
 import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { useHistory } from 'react-router-dom';
 import Dropzone from 'react-dropzone-uploader';
-import { usePermissions } from '../../../../hooks/usePermissions';
+import { MAX_ORGANIZATION_LOGO_SIZE_IN_BYTES } from '../../../../conf/Config';
 import 'react-phone-input-2/lib/style.css';
 import 'react-dropzone-uploader/dist/styles.css';
 
@@ -15,16 +14,8 @@ const FormControl = styled(MuiFormControl)`
 `;
 
 const Uploader = ({ control, errors }) => {
-  const history = useHistory();
-  const permissions = usePermissions();
   const { formatMessage } = useIntl();
-  useEffect(() => {
-    if (!permissions.isAuth) {
-      history.push('');
-    }
-  }, [permissions, history]);
 
-  const LOGO_SIZE_IN_BYTES = 10485760; // 10MB
   return (
     <div>
       <FormControl component="fieldset" style={{ width: '50vh' }}>
@@ -40,7 +31,7 @@ const Uploader = ({ control, errors }) => {
               <Dropzone
                 onChangeStatus={onChange}
                 maxFiles={1}
-                maxSizeBytes={LOGO_SIZE_IN_BYTES}
+                maxSizeBytes={MAX_ORGANIZATION_LOGO_SIZE_IN_BYTES}
                 inputWithFilesContent={files => `${1 - files.length} more`}
                 submitButtonDisabled={false}
                 accept="image/*"

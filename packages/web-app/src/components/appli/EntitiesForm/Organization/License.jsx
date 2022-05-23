@@ -8,15 +8,13 @@ import { licenceLinks, licensesODBLink } from '../../../../conf/Config';
 const FormControl = styled(MuiFormControl)`
   padding-bottom: ${({ theme }) => theme.spacing(4)}px;
 `;
+const Spaced = styled.div`
+  margin-left: ${({ theme }) => theme.spacing(4)}px;
+  margin-top: ${({ theme }) => theme.spacing(2)}px;
+`;
 
 const License = () => {
   const { formatMessage } = useIntl();
-
-  const Spaced = styled.div`
-    margin-left: 10%;
-    margin-top: 2%;
-    text-align: left;
-  `;
 
   const LicenceImage = styled.img`
     width: 100px;
@@ -26,7 +24,7 @@ const License = () => {
       <FormControl component="fieldset" style={{ width: '50vh' }}>
         <FormLabel>
           {formatMessage({
-            id: 'The following licenses will apply to your contribution'
+            id: 'The following licenses will apply to your contribution:'
           })}
         </FormLabel>
 
