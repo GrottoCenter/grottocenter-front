@@ -73,7 +73,7 @@ const Massif = ({ isFetching, error, massif, canEdit, onEdit }) => {
                   <Alert
                     severity="info"
                     title={formatMessage({
-                      id: 'This massif does not have a description'
+                      id: 'This massif has no description listed yet.'
                     })}
                   />
                 )}
@@ -145,9 +145,5 @@ const Massif = ({ isFetching, error, massif, canEdit, onEdit }) => {
 };
 
 Massif.propTypes = MassifPropTypes;
-
-Massif.defaultProps = {
-  massif: undefined
-};
 
 export default Massif;
