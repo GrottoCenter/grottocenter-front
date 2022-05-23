@@ -31,15 +31,15 @@ import { postChangeEmail } from '../../actions/ChangeEmail';
 import Summary from './Summary';
 
 const StyledTypography = styled(Typography)`
-  margintop: theme.spacing(1);
-  marginbottom: theme.spacing(1);
+  margin-top: theme.spacing(1);
+  margin-bottom: theme.spacing(1);
 `;
 const StyledActionButton = styled(ActionButton)`
   margin-top: ${({ theme }) => theme.spacing(1)}px;
   margin-bottom: ${({ theme }) => theme.spacing(1)}px;
 `;
 const StyledButton = styled(Button)`
-  marginright: theme.spacing(1);
+  margin-right: theme.spacing(1);
 `;
 
 function getSteps() {
