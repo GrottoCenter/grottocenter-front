@@ -4,7 +4,6 @@ import { useIntl } from 'react-intl';
 import styled from 'styled-components';
 import { isNil } from 'ramda';
 import {
-  makeStyles,
   Stepper,
   Step,
   StepLabel,
@@ -31,18 +30,17 @@ import { postChangePassword } from '../../actions/ChangePassword';
 import { postChangeEmail } from '../../actions/ChangeEmail';
 import Summary from './Summary';
 
-const useStyles = makeStyles(theme => ({
-  root: {
-    width: '100%'
-  },
-  button: {
-    marginRight: theme.spacing(1)
-  },
-  instructions: {
-    marginTop: theme.spacing(1),
-    marginBottom: theme.spacing(1)
-  }
-}));
+const StyledTypography = styled(Typography)`
+  margintop: theme.spacing(1);
+  marginbottom: theme.spacing(1);
+`;
+const StyledActionButton = styled(ActionButton)`
+  margin-top: ${({ theme }) => theme.spacing(1)}px;
+  margin-bottom: ${({ theme }) => theme.spacing(1)}px;
+`;
+const StyledButton = styled(Button)`
+  marginright: theme.spacing(1);
+`;
 
 function getSteps() {
   return ['Edit your profile', 'Summary'];
@@ -70,11 +68,6 @@ let defautValues = {
   passwordConfirmation: ''
 };
 
-const StyledActionButton = styled(ActionButton)`
-  margin-top: ${({ theme }) => theme.spacing(1)}px;
-  margin-bottom: ${({ theme }) => theme.spacing(1)}px;
-`;
-
 const PersonEditPage = ({ userValues }) => {
   defautValues = userValues || defautValues;
   const history = useHistory();
@@ -96,15 +89,12 @@ const PersonEditPage = ({ userValues }) => {
     state => state.updateUser
   );
   const dispatch = useDispatch();
-  const classes = useStyles();
-  const [activeStep, setActiveStep] = React.useState(0);
 
-  const authState = useSelector(state => state.login);
+  const [activeStep, setActiveStep] = React.useState(0);
 
   const handleNext = async () => {
     const result = await trigger(
       [
-        'user.passwordConfirmation',
         'user.name',
         'user.surname',
         'user.nickname',
@@ -139,10 +129,9 @@ const PersonEditPage = ({ userValues }) => {
     if (data.user.email !== undefined && data.user.email !== '') {
       dispatch(postChangeEmail(data.user.email));
     }
+    let token;
     if (data.user.password !== undefined && data.user.password !== '') {
-      dispatch(
-        postChangePassword(data.user.password, authState.authTokenDecoded)
-      );
+      dispatch(postChangePassword(data.user.password, token));
     }
   };
 
@@ -152,13 +141,12 @@ const PersonEditPage = ({ userValues }) => {
   };
 
   const handleFinish = () => {
-    history.push(`/ui/persons/:${userValues.id}`);
+    history.push(`/ui/persons/${userValues.id}`);
   };
 
   return (
     <Layout
       title={formatMessage({ id: 'Edit your profile' })}
-      footer=""
       content={
         isSubmitted && isNil(UserError) ? (
           <Box display="flex" justifyContent="center" flexDirection="column">
@@ -173,24 +161,20 @@ const PersonEditPage = ({ userValues }) => {
               </>
             )}
             {!UserLoading && isSubmitSuccessful && (
-              <form>
-                <Alert
-                  severity="success"
-                  title={formatMessage({
-                    id: 'User successfully updated'
-                  })}
-                />
-              </form>
+              <Alert
+                severity="success"
+                title={formatMessage({
+                  id: 'User successfully updated'
+                })}
+              />
             )}
             {!UserLoading && !isSubmitSuccessful && (
-              <form>
-                <Alert
-                  severity="error"
-                  title={formatMessage({
-                    id: 'An error occurred when updating the user!'
-                  })}
-                />
-              </form>
+              <Alert
+                severity="error"
+                title={formatMessage({
+                  id: 'An error occurred when updating the user!'
+                })}
+              />
             )}
           </Box>
         ) : (
@@ -212,21 +196,19 @@ const PersonEditPage = ({ userValues }) => {
               <div>
                 {activeStep === steps.length ? (
                   <div>
-                    <Typography className={classes.instructions}>
-                      All steps completed - you&apos;re finished
-                    </Typography>
-                    <Button onClick={handleReset} className={classes.button}>
+                    <StyledTypography>
+                      {formatMessage({ id: 'All steps completed' })}
+                    </StyledTypography>
+                    <StyledButton onClick={handleReset}>
                       {formatMessage({ id: 'Reset' })}
-                    </Button>
-                    <Button onClick={handleFinish} className={classes.button}>
+                    </StyledButton>
+                    <StyledButton onClick={handleFinish}>
                       {formatMessage({ id: 'Finish' })}
-                    </Button>
+                    </StyledButton>
                   </div>
                 ) : (
                   <div>
-                    <Typography
-                      component="div"
-                      className={classes.instructions}>
+                    <StyledTypography component="div">
                       {getStepContent(
                         activeStep,
                         defautValues,
@@ -234,14 +216,13 @@ const PersonEditPage = ({ userValues }) => {
                         errors,
                         watch
                       )}
-                    </Typography>
+                    </StyledTypography>
                     <div>
-                      <Button
+                      <StyledButton
                         disabled={activeStep === 0}
-                        onClick={handleBack}
-                        className={classes.button}>
+                        onClick={handleBack}>
                         Back
-                      </Button>
+                      </StyledButton>
                       {activeStep === steps.length - 1 ? (
                         <StyledActionButton
                           label={formatMessage({ id: 'Update' })}
@@ -251,15 +232,14 @@ const PersonEditPage = ({ userValues }) => {
                           type="submit"
                         />
                       ) : (
-                        <Button
+                        <StyledButton
                           variant="contained"
                           color="primary"
-                          onClick={handleNext}
-                          className={classes.button}>
+                          onClick={handleNext}>
                           {activeStep === steps.length - 1
                             ? formatMessage({ id: 'Finish' })
                             : formatMessage({ id: 'Next' })}
-                        </Button>
+                        </StyledButton>
                       )}
                     </div>
                   </div>
@@ -275,7 +255,7 @@ const PersonEditPage = ({ userValues }) => {
 
 PersonEditPage.propTypes = {
   userValues: PropTypes.shape({
-    id: PropTypes.number,
+    id: PropTypes.number.isRequired,
     name: PropTypes.string,
     surname: PropTypes.string,
     nickname: PropTypes.string

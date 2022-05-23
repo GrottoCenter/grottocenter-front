@@ -34,19 +34,6 @@ const PersonEditForm = ({ control, errors, watch }) => {
     event.preventDefault();
   };
 
-  const validateName = value => {
-    if (value.length <= 0) {
-      return formatMessage({ id: 'You must have a name' });
-    }
-    return true;
-  };
-  const validateSurname = value => {
-    if (value.length <= 0) {
-      return formatMessage({ id: 'You must have a surname' });
-    }
-    return true;
-  };
-
   const validatePwd = value => {
     if (value.length > 0 && value.length < 8) {
       return formatMessage({
@@ -72,7 +59,7 @@ const PersonEditForm = ({ control, errors, watch }) => {
         <Controller
           name="user.name"
           control={control}
-          rules={{ required: true, validate: validateName }}
+          rules={{ required: true, min: 1 }}
           render={({ field: { ref, ...field } }) => (
             <TextField
               fullWidth
@@ -90,7 +77,7 @@ const PersonEditForm = ({ control, errors, watch }) => {
         <Controller
           name="user.surname"
           control={control}
-          rules={{ required: true, validate: validateSurname }}
+          rules={{ required: true, min: 1 }}
           render={({ field: { ref, ...field } }) => (
             <TextField
               fullWidth
@@ -230,7 +217,7 @@ const PersonEditForm = ({ control, errors, watch }) => {
 };
 
 PersonEditForm.propTypes = {
-  control: PropTypes.shape({}),
+  control: PropTypes.shape({}).isRequired,
   errors: PropTypes.shape({
     user: PropTypes.shape({
       name: PropTypes.shape({ message: PropTypes.string }),
@@ -242,7 +229,7 @@ PersonEditForm.propTypes = {
       passwordConfirmation: PropTypes.shape({ message: PropTypes.string })
     })
   }),
-  watch: PropTypes.shape({})
+  watch: PropTypes.shape({}).isRequired
 };
 
 export default PersonEditForm;
