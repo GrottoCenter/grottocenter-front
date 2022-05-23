@@ -73,7 +73,7 @@ const Massif = ({ isFetching, error, massif, canEdit, onEdit }) => {
                   <Alert
                     severity="info"
                     title={formatMessage({
-                      id: 'This massif has no description listed yet.'
+                      id: 'This massif has no descriptions listed yet.'
                     })}
                   />
                 )}
