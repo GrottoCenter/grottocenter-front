@@ -67,7 +67,7 @@ export const OrganizationForm = ({ organizationValues = null }) => {
     isNewOrganization ? state.organizationPost : state.organizationPut
   );
   const { error: nameError, loading: nameLoading } = useSelector(
-    state => state.namePatch
+    state => state.namePut
   );
   const dispatch = useDispatch();
 
@@ -116,11 +116,8 @@ export const OrganizationForm = ({ organizationValues = null }) => {
         errors={errors}
       />
     ),
-    Location: (
-      <Position control={control} errors={errors} setFocus={setFocus} />
-    ),
+    Location: <Position control={control} errors={errors} setFocus={setFocus} />
     // Logo: <Uploader control={control} errors={errors} />, // To uncomment when api will be ready to store logo
-    Licenses: <License />
   };
   const stepKeys = keys(steps);
 
@@ -275,11 +272,15 @@ export const OrganizationForm = ({ organizationValues = null }) => {
             </Step>
           ))}
         </Stepper>
+        {stepExpanded.isOpen && (
+          <Box display="flex" justifyContent="center">
+            <License />
+          </Box>
+        )}
         <Box display="flex">
           <Button disabled={!isDirty} onClick={handleReset}>
             {formatMessage({ id: 'Reset' })}
           </Button>
-
           <ActionButton
             label={formatMessage({
               id: isNewOrganization ? 'Create' : 'Update'
