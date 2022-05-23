@@ -5,8 +5,8 @@ import { isNil } from 'ramda';
 import styled from 'styled-components';
 import { useIntl } from 'react-intl';
 import { useWatch } from 'react-hook-form';
-import Typography from '@material-ui/core/Typography';
-import Layout from '../../components/common/Layouts/Fixed/FixedContent';
+import { Typography } from '@material-ui/core';
+
 import { useDebounce } from '../../hooks';
 import InternationalizedLink from '../../components/common/InternationalizedLink';
 import { licensesODBLink } from '../../conf/Config';
@@ -66,59 +66,66 @@ const Summary = ({ control, defautValues }) => {
   };
 
   return (
-    <Layout
-      title={formatMessage({ id: 'Check the veracity of the information' })}
-      footer=""
-      content={
-        <>
-          {changes('name') ? (
-            <Typography variant="h2" gutterBottom>
-              {formatMessage({ id: 'Name' })} : {debouncedName}
-            </Typography>
-          ) : (
-            ''
-          )}
-          {changes('surname') ? (
-            <Typography variant="h2" gutterBottom>
-              {formatMessage({ id: 'Surname' })} : {debouncedSurname}
-            </Typography>
-          ) : (
-            ''
-          )}
-          {changes('nickname') ? (
-            <Typography variant="h2" gutterBottom>
-              {formatMessage({ id: 'Nickname' })} : {debouncedNickname}
-            </Typography>
-          ) : (
-            ''
-          )}
-          {changes('email') ? (
-            <Typography variant="h2" gutterBottom>
-              {formatMessage({ id: 'Email' })} : {debouncedMail}
-            </Typography>
-          ) : (
-            ''
-          )}
-          {changes('password') ? (
-            <Typography variant="h2" gutterBottom>
-              {formatMessage({ id: 'Your password will be changed' })}
-            </Typography>
-          ) : (
-            ''
-          )}
-          <InternationalizedLink links={licensesODBLink}>
-            <LicenceImage
-              src="/images/odbl.png"
-              alt="ODBL license"
-              title={formatMessage({
-                id:
-                  'The ODBL license applies to all data that is not copyrighted.'
-              })}
-            />
-          </InternationalizedLink>
-        </>
-      }
-    />
+    <>
+      <Typography variant="h2" gutterBottom>
+        {formatMessage({ id: 'Check the veracity of the information' })}
+      </Typography>
+
+      <>
+        {changes('name') ? (
+          <Typography variant="h3" gutterBottom>
+            {formatMessage({ id: 'Previous name' })} : {defautValues.name}
+            {' - '}
+            {formatMessage({ id: 'Modified name' })} : {debouncedName}
+          </Typography>
+        ) : (
+          ''
+        )}
+        {changes('surname') ? (
+          <Typography variant="h3" gutterBottom>
+            {formatMessage({ id: 'Previous surname' })} : {defautValues.surname}
+            {' - '}
+            {formatMessage({ id: 'Modified surname' })} : {debouncedSurname}
+          </Typography>
+        ) : (
+          ''
+        )}
+        {changes('nickname') ? (
+          <Typography variant="h3" gutterBottom>
+            {formatMessage({ id: 'Previous nickname' })} :{' '}
+            {defautValues.nickname}
+            {' - '}
+            {formatMessage({ id: 'Modified nickname' })} : {debouncedNickname}
+          </Typography>
+        ) : (
+          ''
+        )}
+        {changes('email') ? (
+          <Typography variant="h3" gutterBottom>
+            {formatMessage({ id: 'New email' })} : {debouncedMail}
+          </Typography>
+        ) : (
+          ''
+        )}
+        {changes('password') ? (
+          <Typography variant="h3" gutterBottom>
+            {formatMessage({ id: 'Your password will be changed' })}
+          </Typography>
+        ) : (
+          ''
+        )}
+        <InternationalizedLink links={licensesODBLink}>
+          <LicenceImage
+            src="/images/odbl.png"
+            alt="ODBL license"
+            title={formatMessage({
+              id:
+                'The ODBL license applies to all data that is not copyrighted.'
+            })}
+          />
+        </InternationalizedLink>
+      </>
+    </>
   );
 };
 

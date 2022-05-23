@@ -26,7 +26,7 @@ const PersonPage = () => {
 
   /* ### À décommenter lorsque la page edit sera prête
   const onEdit = () => {
-    history.push(`/ui/person/edit/${personId}`);
+    history.push(`/ui/person/${personId}/edit`);
   }; */
   return (
     <Person
