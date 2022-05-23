@@ -72,7 +72,7 @@ const Application = () => {
         <Route path="/ui/contributions" component={ContributionsPage} />
         <Route path="/ui/test" component={LatestBlogNewsSection} />
         <Route
-          path="/ui/organizations/edit/:organizationId"
+          path="/ui/organizations/:organizationId/edit"
           component={OrganizationEdit}
         />
         <Route

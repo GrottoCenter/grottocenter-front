@@ -3,25 +3,15 @@ import React from 'react';
 import { Controller } from 'react-hook-form';
 import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
+import {
+  validateLatitude,
+  validateLongitude
+} from '../../../../../util/ValidateLatLong';
 import Section from '../../FormSection';
 import PositionMap from './Position';
 
-const Location = ({ control, errors }) => {
+const Position = ({ control, errors }) => {
   const { formatMessage } = useIntl();
-
-  const validateLatitude = value => {
-    if (value > 90 || value < -90) {
-      return formatMessage({ id: 'Latitude must be between -90 and 90' });
-    }
-    return true;
-  };
-
-  const validateLongitude = value => {
-    if (value > 180 || value < -180) {
-      return formatMessage({ id: 'Longitude must be between -180 and 180' });
-    }
-    return true;
-  };
 
   return (
     <Section sectionTitle={formatMessage({ id: 'Organizaton information' })}>
@@ -30,7 +20,7 @@ const Location = ({ control, errors }) => {
           name="organization.latitude"
           control={control}
           rules={{
-            validate: validateLatitude
+            validate: value => validateLatitude(value, formatMessage)
           }}
           render={({ field: { ref, ...field } }) => (
             <TextField
@@ -50,7 +40,7 @@ const Location = ({ control, errors }) => {
           name="organization.longitude"
           control={control}
           rules={{
-            validate: validateLongitude
+            validate: value => validateLongitude(value, formatMessage)
           }}
           render={({ field: { ref, ...field } }) => (
             <TextField
@@ -73,7 +63,7 @@ const Location = ({ control, errors }) => {
   );
 };
 
-Location.propTypes = {
+Position.propTypes = {
   errors: PropTypes.shape({
     organization: PropTypes.shape({
       latitude: PropTypes.shape({ message: PropTypes.string }),
@@ -84,4 +74,4 @@ Location.propTypes = {
   setFocus: PropTypes.func
 };
 
-export default Location;
+export default Position;

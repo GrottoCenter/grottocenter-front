@@ -7,8 +7,7 @@ import {
 const initialState = {
   loading: false,
   error: null,
-  data: null,
-  organization: null
+  data: null
 };
 
 const reducer = (state = initialState, action) => {
@@ -28,10 +27,9 @@ const reducer = (state = initialState, action) => {
     case POST_ORGANIZATION_SUCCESS:
       return {
         ...state,
-        data: action.cave,
+        data: action.organization,
         error: initialState.error,
-        loading: false,
-        organization: action.organization
+        loading: false
       };
     default:
       return state;

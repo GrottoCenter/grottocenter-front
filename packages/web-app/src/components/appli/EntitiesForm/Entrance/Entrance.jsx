@@ -16,6 +16,10 @@ import Section from '../FormSection';
 import { useDebounce } from '../../../../hooks';
 import { CountrySelection, PositionMap } from './Position';
 import { ENTRANCE_ONLY, ENTRANCE_AND_CAVE } from './caveType';
+import {
+  validateLatitude,
+  validateLongitude
+} from '../../../../util/ValidateLatLong';
 
 const Entrance = ({ allLanguages, control, errors, setFocus, entityType }) => {
   const { formatMessage } = useIntl();
@@ -23,20 +27,6 @@ const Entrance = ({ allLanguages, control, errors, setFocus, entityType }) => {
   // When creating a cave, the entrance get the same name as the cave.
   const nameInputName =
     entityType === ENTRANCE_AND_CAVE ? 'cave.name' : 'entrance.name';
-
-  const validateLatitude = value => {
-    if (value > 90 || value < -90) {
-      return formatMessage({ id: 'Latitude must be between -90 and 90' });
-    }
-    return true;
-  };
-
-  const validateLongitude = value => {
-    if (value > 180 || value < -180) {
-      return formatMessage({ id: 'Longitude must be between -180 and 180' });
-    }
-    return true;
-  };
 
   useEffect(() => {
     setFocus(nameInputName);
@@ -100,7 +90,7 @@ const Entrance = ({ allLanguages, control, errors, setFocus, entityType }) => {
           control={control}
           rules={{
             required: true,
-            validate: validateLatitude
+            validate: value => validateLatitude(value, formatMessage)
           }}
           render={({ field: { ref, ...field } }) => (
             <TextField
@@ -122,7 +112,7 @@ const Entrance = ({ allLanguages, control, errors, setFocus, entityType }) => {
           control={control}
           rules={{
             required: true,
-            validate: validateLongitude
+            validate: value => validateLongitude(value, formatMessage)
           }}
           render={({ field: { ref, ...field } }) => (
             <TextField
