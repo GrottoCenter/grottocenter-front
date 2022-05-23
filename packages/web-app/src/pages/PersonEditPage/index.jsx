@@ -14,15 +14,15 @@ import {
   Box
 } from '@material-ui/core';
 import { useHistory } from 'react-router-dom';
-import { useForm } from 'react-hook-form';
+import { useWatch, useForm } from 'react-hook-form';
 
 import { useDispatch, useSelector } from 'react-redux';
 
 import Layout from '../../components/common/Layouts/Fixed/FixedContent';
 import ActionButton from '../../components/common/ActionButton';
 import Alert from '../../components/common/Alert';
-import { useBoolean } from '../../hooks';
 
+import { useBoolean, useDebounce } from '../../hooks';
 import PersonEditForm from './PersonForm';
 import makeUserData from './transformer';
 import { updateUser } from '../../actions/UpdateUser';
@@ -92,6 +92,40 @@ const PersonEditPage = ({ userValues }) => {
 
   const [activeStep, setActiveStep] = React.useState(0);
 
+  const debouncedName = useDebounce(
+    useWatch({ control, name: 'user.name' }),
+    300
+  );
+  const debouncedSurname = useDebounce(
+    useWatch({ control, name: 'user.surname' }),
+    300
+  );
+  const debouncedNickname = useDebounce(
+    useWatch({ control, name: 'user.nickname' }),
+    300
+  );
+
+  const debouncedMail = useDebounce(
+    useWatch({ control, name: 'user.email' }),
+    300
+  );
+  const debouncedPassword = useDebounce(
+    useWatch({ control, name: 'user.password' }),
+    300
+  );
+  const isChanged = () => {
+    if (
+      debouncedName !== defautValues.name ||
+      debouncedSurname !== defautValues.surname ||
+      debouncedNickname !== defautValues.nickname ||
+      (debouncedMail !== undefined && debouncedMail !== '') ||
+      (debouncedPassword !== undefined && debouncedPassword !== '')
+    ) {
+      return true;
+    }
+    return false;
+  };
+
   const handleNext = async () => {
     const result = await trigger(
       [
@@ -109,8 +143,7 @@ const PersonEditPage = ({ userValues }) => {
       }
     );
     isValid.true();
-
-    if (result) {
+    if (result && isChanged()) {
       setActiveStep(prevActiveStep => prevActiveStep + 1);
     }
   };
