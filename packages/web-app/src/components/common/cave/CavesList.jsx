@@ -28,7 +28,7 @@ const CavesList = props => {
             ))}
         </StyledList>
       ) : (
-        <em>{emptyMessageComponent}</em>
+        emptyMessageComponent
       )}
     </div>
   );
