@@ -118,7 +118,7 @@ const Person = ({
                     })}
                   />
                 }
-                title={formatMessage({ id: 'List of explored cavities' })}
+                title={formatMessage({ id: 'List of explored caves' })}
               />
             </>
           )}
