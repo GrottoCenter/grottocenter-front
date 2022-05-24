@@ -6,13 +6,11 @@ import {
   MenuItem,
   InputLabel
 } from '@material-ui/core';
-import { React, useEffect } from 'react';
+import { React } from 'react';
 import { Controller } from 'react-hook-form';
 import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { useHistory } from 'react-router-dom';
-import { usePermissions } from '../../../../hooks/usePermissions';
 import Translate from '../../../common/Translate';
 
 const FormControl = styled(MuiFormControl)`
@@ -25,14 +23,7 @@ const BasicInformationsForm = ({
   allLanguages,
   isNewOrganization
 }) => {
-  const history = useHistory();
-  const permissions = usePermissions();
   const { formatMessage } = useIntl();
-  useEffect(() => {
-    if (!permissions.isAuth) {
-      history.push('');
-    }
-  }, [permissions, history]);
 
   return (
     <div>

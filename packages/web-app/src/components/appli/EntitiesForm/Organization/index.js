@@ -98,7 +98,7 @@ export const OrganizationForm = ({ organizationValues = null }) => {
     reset({ organization: organizationValues || defaultOrganizationValues });
     stepExpanded.close();
     setActiveStep(0);
-  }, [reset, stepExpanded]);
+  }, [organizationValues, reset, stepExpanded]);
 
   const steps = {
     Organization: (

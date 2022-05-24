@@ -38,7 +38,7 @@ const Uploader = ({ control, errors }) => {
                 inputContent={(files, extra) =>
                   extra.reject
                     ? formatMessage({ id: 'Image only' })
-                    : formatMessage({ id: 'Drag your logo' })
+                    : formatMessage({ id: 'Drag and drop your logo here' })
                 }
                 styles={{
                   dropzone: { width: 400, height: 200 },
@@ -55,7 +55,7 @@ const Uploader = ({ control, errors }) => {
   );
 };
 Uploader.propTypes = {
-  control: PropTypes.shape({}),
+  control: PropTypes.shape({}).isRequired,
   errors: PropTypes.shape({
     organization: PropTypes.shape({
       logo: PropTypes.shape({ message: PropTypes.string })
