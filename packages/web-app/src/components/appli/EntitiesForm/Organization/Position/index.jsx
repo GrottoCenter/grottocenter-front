@@ -70,8 +70,7 @@ Position.propTypes = {
       longitude: PropTypes.shape({ message: PropTypes.string })
     })
   }),
-  control: PropTypes.shape({}),
-  setFocus: PropTypes.func
+  control: PropTypes.shape({}).isRequired
 };
 
 export default Position;
