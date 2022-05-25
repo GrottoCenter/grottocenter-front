@@ -20,7 +20,6 @@ const StyledFormControl = styled(FormControl)`
 `;
 
 const Details = ({ control, errors, isReadonly = false }) => {
-    overflow: 'scroll'
 
   const { formatMessage } = useIntl();
 
