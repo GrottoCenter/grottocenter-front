@@ -37,6 +37,7 @@ import NetworkPage from './Network';
 import PersonPage from './Person';
 import OrganizationPage from './Organization';
 import MassifEdit from './EntityEdit/Massif/MassifEdit';
+import PersonEdit from './PersonEdit';
 import OrganizationEdit from './EntityEdit/Organization/OrganizationEdit';
 
 const Application = () => {

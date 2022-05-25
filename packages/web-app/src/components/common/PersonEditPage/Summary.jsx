@@ -7,9 +7,9 @@ import { useIntl } from 'react-intl';
 import { useWatch } from 'react-hook-form';
 import { Typography } from '@material-ui/core';
 
-import { useDebounce } from '../../hooks';
-import InternationalizedLink from '../../components/common/InternationalizedLink';
-import { licensesODBLink } from '../../conf/Config';
+import { useDebounce } from '../../../hooks';
+import InternationalizedLink from '../InternationalizedLink';
+import { licensesODBLink } from '../../../conf/Config';
 
 const LicenceImage = styled.img`
   width: 75px;

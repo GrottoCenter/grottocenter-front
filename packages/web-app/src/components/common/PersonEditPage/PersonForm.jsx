@@ -15,9 +15,9 @@ import VisibilityOff from '@material-ui/icons/VisibilityOff';
 import styled from 'styled-components';
 import { isEmpty, match } from 'ramda';
 
-import { emailRegexp } from '../../conf/Config';
+import { emailRegexp } from '../../../conf/Config';
 
-import StringInput from '../../components/common/Form/StringInput';
+import StringInput from '../Form/StringInput';
 
 const FormControl = styled(MuiFormControl)`
   padding-bottom: ${({ theme }) => theme.spacing(4)}px;

@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { useParams /* , useHistory */ } from 'react-router-dom';
+import { useParams, useHistory } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { isNil, pathOr } from 'ramda';
 import Person from '../../components/appli/Person/Person';
@@ -18,21 +18,20 @@ const PersonPage = () => {
     canEdit = userId.toString() === personId.toString() || permissions.isAdmin;
   }
 
-  // const history = useHistory(); ### À décommenter lorsque la page edit sera prête
+  const history = useHistory();
 
   useEffect(() => {
     dispatch(loadPerson(personId));
   }, [personId, dispatch]);
 
-  /* ### À décommenter lorsque la page edit sera prête
   const onEdit = () => {
-    history.push(`/ui/person/${personId}/edit`);
-  }; */
+    history.push(`/ui/persons/${personId}/edit`);
+  };
   return (
     <Person
       isFetching={isFetching || !isNil(error)}
       person={person}
-      // onEdit={onEdit} ### À décommenter lorsque la page edit sera prête
+      onEdit={onEdit}
       canEdit={canEdit}
     />
   );
