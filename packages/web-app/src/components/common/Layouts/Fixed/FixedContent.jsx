@@ -14,13 +14,15 @@ import CreateIcon from '@material-ui/icons/Create';
 
 const Card = styled(MuiCard)`
   margin: ${({ theme }) => theme.spacing(2)}px;
-  min-height: 100%;
+  height: 100%;
   display: flex;
   flex-direction: column;
 `;
 
 const CardContent = styled(MuiCardContent)`
   flex-grow: 1;
+  overflow-y: auto;
+  scroll-behavior: smooth;
 `;
 
 const CardActions = styled(MuiCardActions)`
