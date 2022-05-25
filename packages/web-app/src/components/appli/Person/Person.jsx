@@ -15,12 +15,7 @@ import PersonProperties from '../../common/Person/PersonProperties';
 import OrganizationsList from '../../common/Organizations/OrganizationsList';
 import DocumentsList from '../../common/DocumentsList/DocumentsList';
 
-const Person = ({
-  isFetching,
-  person,
-  //  onEdit, ### À décommenter lorsque la page edit sera prête
-  canEdit
-}) => {
+const Person = ({ isFetching, person, onEdit, canEdit }) => {
   const { formatMessage } = useIntl();
 
   let title = '';
@@ -71,9 +66,8 @@ const Person = ({
                     size="medium"
                     aria-label="edit"
                     color="primary"
-                    // onClick={onEdit} ### À décommenter lorsque la page edit sera prête
-                    disabled // ={isNil(onEdit)} ### À décommenter lorsque la page edit sera prête
-                  >
+                    onClick={onEdit}
+                    disabled={isNil(onEdit)}>
                     <CreateIcon />
                   </IconButton>
                 )}
@@ -140,7 +134,7 @@ Person.propTypes = {
     documents: PropTypes.arrayOf(PropTypes.shape({})),
     exploredEntrances: PropTypes.arrayOf(EntrancePropTypes)
   }),
-  // onEdit: PropTypes.func.isRequired, ### À décommenter lorsque la page edit sera prête
+  onEdit: PropTypes.func.isRequired,
   canEdit: PropTypes.bool.isRequired
 };
 

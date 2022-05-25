@@ -6,12 +6,11 @@ import { Box, CircularProgress } from '@material-ui/core/';
 
 import { useIntl } from 'react-intl';
 
-import { useUserProperties, usePermissions } from '../../../hooks';
-import Layout from '../Layouts/Fixed/FixedContent';
+import { useUserProperties, usePermissions } from '../../hooks';
+import Layout from '../../components/common/Layouts/Fixed/FixedContent';
 
-import PersonEditPage from '../../../pages/PersonEditPage';
-
-import { loadPerson } from '../../../actions/Person';
+import PersonEditPage from '../../components/common/PersonEditPage';
+import { loadPerson } from '../../actions/Person';
 
 const PersonEdit = () => {
   const { formatMessage } = useIntl();
@@ -35,8 +34,9 @@ const PersonEdit = () => {
   return (
     <Layout
       title={
-        `${person?.name} ${person?.surname}` ||
-        formatMessage({ id: 'Loading user data...' })
+        person !== undefined
+          ? `${person?.name} ${person?.surname}`
+          : formatMessage({ id: 'Loading user data...' })
       }
       content={
         <>

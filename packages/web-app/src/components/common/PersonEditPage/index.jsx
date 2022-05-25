@@ -1,8 +1,9 @@
 import React from 'react';
+import { useParams, useHistory } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import styled from 'styled-components';
-import { isNil } from 'ramda';
+import { pathOr, isNil } from 'ramda';
 import {
   Stepper,
   Step,
@@ -13,21 +14,21 @@ import {
   CircularProgress,
   Box
 } from '@material-ui/core';
-import { useHistory } from 'react-router-dom';
-import { useWatch, useForm } from 'react-hook-form';
+
+import { useForm } from 'react-hook-form';
 
 import { useDispatch, useSelector } from 'react-redux';
 
-import Layout from '../../components/common/Layouts/Fixed/FixedContent';
-import ActionButton from '../../components/common/ActionButton';
-import Alert from '../../components/common/Alert';
+import Layout from '../Layouts/Fixed/FixedContent';
+import ActionButton from '../ActionButton';
+import Alert from '../Alert';
 
-import { useBoolean, useDebounce } from '../../hooks';
+import { useBoolean, useUserProperties } from '../../../hooks';
 import PersonEditForm from './PersonForm';
 import makeUserData from './transformer';
-import { updateUser } from '../../actions/UpdateUser';
-import { postChangePassword } from '../../actions/ChangePassword';
-import { postChangeEmail } from '../../actions/ChangeEmail';
+import { updateUser } from '../../../actions/UpdateUser';
+import { postChangePassword } from '../../../actions/ChangePassword';
+import { postChangeEmail } from '../../../actions/ChangeEmail';
 import Summary from './Summary';
 
 const StyledTypography = styled(Typography)`
@@ -71,15 +72,25 @@ let defautValues = {
 const PersonEditPage = ({ userValues }) => {
   defautValues = userValues || defautValues;
   const history = useHistory();
+  const { personId } = useParams();
+
+  const userId = pathOr(null, ['id'], useUserProperties());
+
   const { formatMessage } = useIntl();
   const isValid = useBoolean();
   const {
     handleSubmit,
-    reset,
     control,
+    reset,
     watch,
     trigger,
-    formState: { errors, isSubmitted, isSubmitting, isSubmitSuccessful }
+    formState: {
+      errors,
+      isDirty,
+      isSubmitted,
+      isSubmitting,
+      isSubmitSuccessful
+    }
   } = useForm({
     defaultValues: {
       user: defautValues
@@ -91,40 +102,6 @@ const PersonEditPage = ({ userValues }) => {
   const dispatch = useDispatch();
 
   const [activeStep, setActiveStep] = React.useState(0);
-
-  const debouncedName = useDebounce(
-    useWatch({ control, name: 'user.name' }),
-    300
-  );
-  const debouncedSurname = useDebounce(
-    useWatch({ control, name: 'user.surname' }),
-    300
-  );
-  const debouncedNickname = useDebounce(
-    useWatch({ control, name: 'user.nickname' }),
-    300
-  );
-
-  const debouncedMail = useDebounce(
-    useWatch({ control, name: 'user.email' }),
-    300
-  );
-  const debouncedPassword = useDebounce(
-    useWatch({ control, name: 'user.password' }),
-    300
-  );
-  const isChanged = () => {
-    if (
-      debouncedName !== defautValues.name ||
-      debouncedSurname !== defautValues.surname ||
-      debouncedNickname !== defautValues.nickname ||
-      (debouncedMail !== undefined && debouncedMail !== '') ||
-      (debouncedPassword !== undefined && debouncedPassword !== '')
-    ) {
-      return true;
-    }
-    return false;
-  };
 
   const handleNext = async () => {
     const result = await trigger(
@@ -143,13 +120,18 @@ const PersonEditPage = ({ userValues }) => {
       }
     );
     isValid.true();
-    if (result && isChanged()) {
+    if (result) {
       setActiveStep(prevActiveStep => prevActiveStep + 1);
     }
   };
 
   const handleBack = () => {
     setActiveStep(prevActiveStep => prevActiveStep - 1);
+  };
+
+  const handleReset = () => {
+    reset({ user: defautValues });
+    history.push(`/ui/persons/${userValues.id}`);
   };
 
   const onSubmit = async data => {
@@ -159,21 +141,21 @@ const PersonEditPage = ({ userValues }) => {
 
     dispatch(updateUser(User));
 
-    if (data.user.email !== undefined && data.user.email !== '') {
+    if (
+      data.user.email !== undefined &&
+      data.user.email !== '' &&
+      userId.toString() === personId.toString()
+    ) {
       dispatch(postChangeEmail(data.user.email));
     }
     let token;
-    if (data.user.password !== undefined && data.user.password !== '') {
+    if (
+      data.user.password !== undefined &&
+      data.user.password !== '' &&
+      userId.toString() === personId.toString()
+    ) {
       dispatch(postChangePassword(data.user.password, token));
     }
-  };
-
-  const handleReset = () => {
-    reset({ user: defautValues });
-    setActiveStep(0);
-  };
-
-  const handleFinish = () => {
     history.push(`/ui/persons/${userValues.id}`);
   };
 
@@ -227,56 +209,46 @@ const PersonEditPage = ({ userValues }) => {
               </Stepper>
 
               <div>
-                {activeStep === steps.length ? (
+                <div>
+                  <StyledTypography component="div">
+                    {getStepContent(
+                      activeStep,
+                      defautValues,
+                      control,
+                      errors,
+                      watch
+                    )}
+                  </StyledTypography>
                   <div>
-                    <StyledTypography>
-                      {formatMessage({ id: 'All steps completed' })}
-                    </StyledTypography>
+                    <StyledButton
+                      disabled={activeStep === 0}
+                      onClick={handleBack}>
+                      Back
+                    </StyledButton>
+                    {activeStep === steps.length - 1 ? (
+                      <StyledActionButton
+                        label={formatMessage({ id: 'Update' })}
+                        loading={isSubmitting}
+                        color="primary"
+                        icon={<Icon>send</Icon>}
+                        type="submit"
+                      />
+                    ) : (
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        disabled={!isDirty}
+                        onClick={handleNext}>
+                        {formatMessage({ id: 'Next' })}
+                      </Button>
+                    )}
+                  </div>
+                  <div>
                     <StyledButton onClick={handleReset}>
-                      {formatMessage({ id: 'Reset' })}
-                    </StyledButton>
-                    <StyledButton onClick={handleFinish}>
-                      {formatMessage({ id: 'Finish' })}
+                      {formatMessage({ id: 'Cancel' })}
                     </StyledButton>
                   </div>
-                ) : (
-                  <div>
-                    <StyledTypography component="div">
-                      {getStepContent(
-                        activeStep,
-                        defautValues,
-                        control,
-                        errors,
-                        watch
-                      )}
-                    </StyledTypography>
-                    <div>
-                      <StyledButton
-                        disabled={activeStep === 0}
-                        onClick={handleBack}>
-                        Back
-                      </StyledButton>
-                      {activeStep === steps.length - 1 ? (
-                        <StyledActionButton
-                          label={formatMessage({ id: 'Update' })}
-                          loading={isSubmitting}
-                          color="primary"
-                          icon={<Icon>send</Icon>}
-                          type="submit"
-                        />
-                      ) : (
-                        <StyledButton
-                          variant="contained"
-                          color="primary"
-                          onClick={handleNext}>
-                          {activeStep === steps.length - 1
-                            ? formatMessage({ id: 'Finish' })
-                            : formatMessage({ id: 'Next' })}
-                        </StyledButton>
-                      )}
-                    </div>
-                  </div>
-                )}
+                </div>
               </div>
             </form>
           </Box>
