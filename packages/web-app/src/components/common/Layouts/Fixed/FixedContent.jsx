@@ -21,6 +21,10 @@ const Card = styled(MuiCard)`
 
 const CardContent = styled(MuiCardContent)`
   flex-grow: 1;
+  overflow-y: scroll;
+  width: 480px;
+  height: 250px;
+  scroll-behavior: smooth;
 `;
 
 const CardActions = styled(MuiCardActions)`
