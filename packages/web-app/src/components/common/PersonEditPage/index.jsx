@@ -48,10 +48,17 @@ function getSteps() {
 }
 const steps = getSteps();
 
-function getStepContent(step, userValues, control, errors, watch) {
+function getStepContent(step, userValues, control, errors, watch, isUser) {
   switch (step) {
     case 0:
-      return <PersonEditForm control={control} errors={errors} watch={watch} />;
+      return (
+        <PersonEditForm
+          control={control}
+          errors={errors}
+          watch={watch}
+          isUser={isUser}
+        />
+      );
     case 1:
       return <Summary control={control} defautValues={userValues} />;
     default:
@@ -77,7 +84,7 @@ const PersonEditPage = ({ userValues }) => {
   const userId = pathOr(null, ['id'], useUserProperties());
 
   const { formatMessage } = useIntl();
-  const isValid = useBoolean();
+  const isUser = useBoolean(userId.toString() === personId.toString());
   const {
     handleSubmit,
     control,
@@ -119,7 +126,7 @@ const PersonEditPage = ({ userValues }) => {
         shouldFocus: true
       }
     );
-    isValid.true();
+
     if (result) {
       setActiveStep(prevActiveStep => prevActiveStep + 1);
     }
@@ -141,18 +148,14 @@ const PersonEditPage = ({ userValues }) => {
 
     dispatch(updateUser(User));
 
-    if (
-      data.user.email !== undefined &&
-      data.user.email !== '' &&
-      userId.toString() === personId.toString()
-    ) {
+    if (data.user.email !== undefined && data.user.email !== '' && isUser) {
       dispatch(postChangeEmail(data.user.email));
     }
     let token;
     if (
       data.user.password !== undefined &&
       data.user.password !== '' &&
-      userId.toString() === personId.toString()
+      isUser
     ) {
       dispatch(postChangePassword(data.user.password, token));
     }
@@ -216,7 +219,8 @@ const PersonEditPage = ({ userValues }) => {
                       defautValues,
                       control,
                       errors,
-                      watch
+                      watch,
+                      isUser
                     )}
                   </StyledTypography>
                   <div>
@@ -227,7 +231,11 @@ const PersonEditPage = ({ userValues }) => {
                     </StyledButton>
                     {activeStep === steps.length - 1 ? (
                       <StyledActionButton
-                        label={formatMessage({ id: 'Update' })}
+                        label={
+                          isUser
+                            ? formatMessage({ id: 'Update' })
+                            : formatMessage({ id: 'Update user' })
+                        }
                         loading={isSubmitting}
                         color="primary"
                         icon={<Icon>send</Icon>}
