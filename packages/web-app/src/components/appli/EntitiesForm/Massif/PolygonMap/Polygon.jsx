@@ -12,6 +12,7 @@ import L from 'leaflet';
 import TileLayers from '../../../../common/Maps/common/mapLayers';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-draw/dist/leaflet.draw.css';
+import getMultiPolygonCentroid from './utils';
 
 let displayValue = false;
 const PolygonMap = ({ onChange, data }) => {
@@ -21,11 +22,15 @@ const PolygonMap = ({ onChange, data }) => {
   const geolocation = useGeolocation();
   const latitude = geolocation?.lat;
   const longitude = geolocation?.lng;
-  const [center] = useState({
-    lat: latitude || 43.6,
-    lng: longitude || 3.86
-  });
-  const ZOOM_LEVEL = 12;
+  const [center] = useState(
+    data
+      ? getMultiPolygonCentroid(data.coordinates[0][0])
+      : {
+          lat: latitude || 43.6,
+          lng: longitude || 3.86
+        }
+  );
+  const ZOOM_LEVEL = 10;
 
   const mapTOGeoJson = layers => {
     const geoJson = {};
@@ -58,17 +63,19 @@ const PolygonMap = ({ onChange, data }) => {
     return () => {
       isMounted.current = false;
     };
-  }, [mapLayers, onChange]);
+    // Quick fix infinite loop if onChange is added to the array
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mapLayers]);
 
   useEffect(() => {
     isMounted.current = true;
-    if (geolocation && geolocation.lat && geolocation.lng) {
+    if (geolocation && geolocation.lat && geolocation.lng && !data) {
       map.setView([geolocation.lat, geolocation.lng]);
     }
     return () => {
       isMounted.current = false;
     };
-  }, [geolocation, map]);
+  }, [data, geolocation, map]);
 
   const onCreate = e => {
     const { layerType, layer } = e;
