@@ -66,7 +66,7 @@ function getStepContent(step, userValues, control, errors, watch, isUser) {
   }
 }
 
-let defautValues = {
+const emptyDefaultValues = {
   name: '',
   surname: '',
   nickname: '',
@@ -76,8 +76,19 @@ let defautValues = {
   passwordConfirmation: ''
 };
 
+/**
+ * Extract all values contained in emptyDefaultValues (userValues can contain way more properties than just the ones needed by the form).
+ */
+const extractDefaultValues = userValues =>
+  Object.keys(emptyDefaultValues).reduce((res, key) => {
+    res[key] = userValues[key];
+    return res;
+  }, {});
+
 const PersonEditPage = ({ userValues }) => {
-  defautValues = userValues || defautValues;
+  const defaultValues = userValues
+    ? extractDefaultValues(userValues)
+    : emptyDefaultValues;
   const history = useHistory();
   const { personId } = useParams();
 
@@ -100,7 +111,7 @@ const PersonEditPage = ({ userValues }) => {
     }
   } = useForm({
     defaultValues: {
-      user: defautValues
+      user: defaultValues
     }
   });
   const { error: UserError, loading: UserLoading } = useSelector(
@@ -137,7 +148,7 @@ const PersonEditPage = ({ userValues }) => {
   };
 
   const handleReset = () => {
-    reset({ user: defautValues });
+    reset({ user: defaultValues });
     history.push(`/ui/persons/${userValues.id}`);
   };
 
@@ -216,7 +227,7 @@ const PersonEditPage = ({ userValues }) => {
                   <StyledTypography component="div">
                     {getStepContent(
                       activeStep,
-                      defautValues,
+                      defaultValues,
                       control,
                       errors,
                       watch,
