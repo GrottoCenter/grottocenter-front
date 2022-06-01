@@ -27,11 +27,7 @@ export const makeOverview = data => ({
   )(data),
   language: pathOr('unknown', ['mainLanguage', 'refName'], data),
   license: data.license,
-  title: pipe(
-    propOr([], 'titles'),
-    head,
-    propOr('No title provided', 'text')
-  )(data),
+  title: pipe(propOr([], 'titles'), head, propOr('', 'text'))(data),
   summary: pipe(propOr([], 'descriptions'), head, propOr('', 'text'))(data)
 });
 

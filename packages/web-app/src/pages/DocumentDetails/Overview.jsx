@@ -1,40 +1,19 @@
-import {
-  Card,
-  CardContent as MuiCardContent,
-  IconButton,
-  Typography,
-  Box
-} from '@material-ui/core';
+import { Typography, Box } from '@material-ui/core';
 import React from 'react';
 import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { Skeleton } from '@material-ui/lab';
-import { isEmpty, isNil } from 'ramda';
-import CreateIcon from '@material-ui/icons/Create';
+import { isEmpty } from 'ramda';
 
 const Header = styled.div`
   display: flex;
   justify-content: space-between;
 `;
 
-const EditButton = styled(Box)`
-  margin-left: auto;
-`;
-
-const Title = styled(Typography)`
-  text-align: center;
-  color: ${({ theme }) => theme.palette.secondary.main};
-`;
-
 const SubTitle = styled(Typography)`
   margin-top: ${({ theme }) => theme.spacing(2)}px;
   text-transform: uppercase;
-`;
-
-const CardContent = styled(MuiCardContent)`
-  display: flex;
-  flex-direction: column;
 `;
 
 const CreatedByTypography = styled(Typography)`
@@ -67,83 +46,60 @@ const Overview = ({
   creationDate,
   authors,
   language,
-  title,
   summary,
-  loading,
-  isValidated,
-  onEdit
+  loading
 }) => {
   const { formatMessage } = useIntl();
 
   return (
-    <Card>
-      <CardContent>
-        <Header>
-          {loading ? (
+    <div>
+      <Header>
+        {loading ? (
+          <>
+            <Skeleton variant="rect" width={100} />
+            <Skeleton variant="rect" width={100} />
+          </>
+        ) : (
+          <>
+            <CreatedBy name={createdBy} creationDate={creationDate} />
+            <Typography color="textSecondary" variant="caption" gutterBottom>
+              {`${formatMessage({
+                id: 'Document language'
+              })}: ${formatMessage({ id: language })}`}
+            </Typography>
+          </>
+        )}
+      </Header>
+
+      {loading ? (
+        <Skeleton variant="rect" height={100} />
+      ) : (
+        <>
+          {summary && (
             <>
-              <Skeleton variant="rect" width={50} />
-              <Skeleton variant="rect" width={50} />
-            </>
-          ) : (
-            <>
-              <CreatedBy name={createdBy} creationDate={creationDate} />
-              <Typography color="textSecondary" variant="caption" gutterBottom>
-                {`${formatMessage({
-                  id: 'Document language'
-                })}: ${formatMessage({ id: language })}`}
+              <SubTitle variant="subtitle1" color="textSecondary">
+                {formatMessage({ id: 'Summary' })}
+              </SubTitle>
+              <Typography variant="body1" style={{ whiteSpace: 'pre-wrap' }}>
+                {summary}
               </Typography>
             </>
           )}
-        </Header>
-        <EditButton>
-          {isValidated ? (
-            <IconButton
-              color="primary"
-              size="small"
-              aria-label="edit"
-              onClick={onEdit}
-              disabled={isNil(onEdit)}>
-              <CreateIcon />
-            </IconButton>
-          ) : (
-            <Typography variant="body1">
-              {formatMessage({
-                id:
-                  'A moderator needs to validate the last modification before being able to edit the document again.'
-              })}
-            </Typography>
+          {!isEmpty(authors) && (
+            <>
+              <SubTitle variant="subtitle1" color="textSecondary">
+                {formatMessage({ id: 'Authors' })}
+              </SubTitle>
+              <Typography variant="body1">
+                {authors.map(
+                  (auth, i) => `${auth} ${i < authors.length - 1 ? ' - ' : ''}`
+                )}
+              </Typography>
+            </>
           )}
-        </EditButton>
-        <Title variant="h3" gutterBottom>
-          {title}
-        </Title>
-        {loading ? (
-          <Skeleton variant="rect" height={100} />
-        ) : (
-          <>
-            <SubTitle variant="subtitle1" color="textSecondary">
-              {formatMessage({ id: 'Summary' })}
-            </SubTitle>
-            <Typography variant="body1" style={{ whiteSpace: 'pre-wrap' }}>
-              {summary}
-            </Typography>
-            {!isEmpty(authors) && (
-              <>
-                <SubTitle variant="subtitle1" color="textSecondary">
-                  {formatMessage({ id: 'Authors' })}
-                </SubTitle>
-                <Typography variant="body1">
-                  {authors.map(
-                    (auth, i) =>
-                      `${auth} ${i < authors.length - 1 ? ' - ' : ''}`
-                  )}
-                </Typography>
-              </>
-            )}
-          </>
-        )}
-      </CardContent>
-    </Card>
+        </>
+      )}
+    </div>
   );
 };
 
@@ -160,8 +116,5 @@ Overview.propTypes = {
   creationDate: PropTypes.string.isRequired,
   authors: PropTypes.arrayOf(PropTypes.string).isRequired,
   language: PropTypes.string.isRequired,
-  title: PropTypes.string.isRequired,
-  summary: PropTypes.string.isRequired,
-  isValidated: PropTypes.bool.isRequired,
-  onEdit: PropTypes.func.isRequired
+  summary: PropTypes.string.isRequired
 };
