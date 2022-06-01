@@ -61,12 +61,16 @@ const DocumentPage = ({
           {
             Icon: () => <Home fontSize="large" color="primary" />,
             label: formatMessage({ id: 'Editor' }),
-            value: organizations.editor
+            value: organizations?.editor.name,
+            url: `/ui/organizations/${organizations?.editor.id}`,
+            internalUrl: true
           },
           {
             Icon: () => <CustomIcon type="bibliography" />,
             label: formatMessage({ id: 'Library' }),
-            value: organizations.library
+            value: organizations?.library.name,
+            url: `/ui/organizations/${organizations?.library.id}`,
+            internalUrl: true
           }
         ]}
       />
@@ -142,17 +146,21 @@ const DocumentPage = ({
           {
             Icon: () => <Terrain fontSize="large" color="primary" />,
             label: formatMessage({ id: 'Massif' }),
-            value: entities.massif
+            value: entities.massif?.name,
+            url: `/ui/massifs/${entities.massif?.id}`
           },
           {
             Icon: () => <CustomIcon type="entry" />,
+            internalUrl: true,
             label: formatMessage({ id: 'Entrance' }),
-            value: entities.entrance
+            value: entities.entrance?.name,
+            url: `/ui/entrances/${entities.entrance?.id}`
           },
           {
             Icon: () => <CustomIcon type="cave_system" />,
             label: formatMessage({ id: 'Cave' }),
-            value: entities.cave
+            value: entities.cave?.name,
+            url: `/ui/caves/${entities.cave?.id}`
           },
           {
             Icon: () => <DescriptionIcon color="primary" />,
@@ -246,8 +254,14 @@ DocumentPage.propTypes = {
     summary: PropTypes.string.isRequired
   }),
   organizations: PropTypes.shape({
-    editor: PropTypes.string,
-    library: PropTypes.string
+    editor: PropTypes.shape({
+      id: PropTypes.number,
+      name: PropTypes.string
+    }),
+    library: PropTypes.shape({
+      id: PropTypes.number,
+      name: PropTypes.string
+    })
   }),
   details: PropTypes.shape({
     authorComment: PropTypes.string,
@@ -273,9 +287,18 @@ DocumentPage.propTypes = {
     )
   }),
   entities: PropTypes.shape({
-    massif: PropTypes.string,
-    cave: PropTypes.string,
-    entrance: PropTypes.string,
+    cave: PropTypes.shape({
+      id: PropTypes.number,
+      name: PropTypes.string
+    }),
+    entrance: PropTypes.shape({
+      id: PropTypes.number,
+      name: PropTypes.string
+    }),
+    massif: PropTypes.shape({
+      id: PropTypes.number,
+      name: PropTypes.string
+    }),
     files: PropTypes.shape({
       fileNames: PropTypes.arrayOf(PropTypes.string),
       fileLinks: PropTypes.arrayOf(PropTypes.string)

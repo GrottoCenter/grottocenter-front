@@ -95,6 +95,25 @@ const Overview = ({
             </>
           )}
         </Header>
+        <EditButton>
+          {isValidated ? (
+            <IconButton
+              color="primary"
+              size="small"
+              aria-label="edit"
+              onClick={onEdit}
+              disabled={isNil(onEdit)}>
+              <CreateIcon />
+            </IconButton>
+          ) : (
+            <Typography variant="body1">
+              {formatMessage({
+                id:
+                  'A moderator needs to validate the last modification before being able to edit the document again.'
+              })}
+            </Typography>
+          )}
+        </EditButton>
         <Title variant="h3" gutterBottom>
           {title}
         </Title>
@@ -123,24 +142,6 @@ const Overview = ({
             )}
           </>
         )}
-        <EditButton>
-          {isValidated ? (
-            <IconButton
-              size="small"
-              aria-label="edit"
-              onClick={onEdit}
-              disabled={isNil(onEdit)}>
-              <CreateIcon />
-            </IconButton>
-          ) : (
-            <Typography variant="body1">
-              {formatMessage({
-                id:
-                  'A moderator needs to validate the last modification before being able to edit the document again.'
-              })}
-            </Typography>
-          )}
-        </EditButton>
       </CardContent>
     </Card>
   );
