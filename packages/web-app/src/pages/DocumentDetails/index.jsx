@@ -1,15 +1,15 @@
 import React, { useEffect, useRef } from 'react';
-import styled from 'styled-components';
 import { useIntl } from 'react-intl';
-import { Terrain, Home } from '@material-ui/icons';
+import { Terrain } from '@material-ui/icons';
 import { isNil } from 'ramda';
 import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams, useHistory } from 'react-router-dom';
-import { Link } from '@material-ui/core';
+import { Divider, Link } from '@material-ui/core';
 
 import AttachFileIcon from '@material-ui/icons/AttachFile';
 import DescriptionIcon from '@material-ui/icons/Description';
+import styled from 'styled-components';
 import Overview from './Overview';
 import Section from './Section';
 import CustomIcon from '../../components/common/CustomIcon';
@@ -24,11 +24,16 @@ import {
   makeDocumentParent
 } from './transformers';
 import { usePermissions } from '../../hooks';
+import Layout from '../../components/common/Layouts/Fixed/FixedContent';
 
-const Wrapper = styled.div`
-  & > div {
-    margin-bottom: ${({ theme }) => theme.spacing(3)}px;
-  }
+const OrganizationIcon = styled.img`
+  height: 35px;
+  width: 35px;
+`;
+
+const StyledDivider = styled(Divider)`
+  margin-top: ${({ theme }) => theme.spacing(4)}px;
+  margin-bottom: ${({ theme }) => theme.spacing(4)}px;
 `;
 
 const DocumentPage = ({
@@ -47,145 +52,169 @@ const DocumentPage = ({
   const permissions = usePermissions();
 
   return (
-    <Wrapper>
-      <Overview
-        {...overview}
-        loading={loading}
-        isValidated={isValidated}
-        onEdit={onEdit}
-      />
-      <Section
-        loading={loading}
-        title={formatMessage({ id: 'Organizations' })}
-        content={[
-          {
-            Icon: () => <Home fontSize="large" color="primary" />,
-            label: formatMessage({ id: 'Editor' }),
-            value: organizations?.editor.name,
-            url: `/ui/organizations/${organizations?.editor.id}`,
-            internalUrl: true
-          },
-          {
-            Icon: () => <CustomIcon type="bibliography" />,
-            label: formatMessage({ id: 'Library' }),
-            value: organizations?.library.name,
-            url: `/ui/organizations/${organizations?.library.id}`,
-            internalUrl: true
-          }
-        ]}
-      />
-      <Section
-        loading={loading}
-        title={formatMessage({ id: 'Details' })}
-        content={[
-          {
-            label: formatMessage({ id: 'Identifier' }),
-            value: details.identifier
-          },
-          {
-            label: formatMessage({ id: 'BBS reference' }),
-            value: details.bbsReference
-          },
-          {
-            label: formatMessage({ id: 'Document type' }),
-            value:
-              details.documentType &&
-              formatMessage({ id: details.documentType })
-          },
-          {
-            label: formatMessage({ id: 'Publication date' }),
-            value: details.publicationDate
-          },
-          {
-            label: formatMessage({ id: 'Publication (BBS legacy)' }),
-            value: details.oldPublication
-          },
-          {
-            label: formatMessage({ id: 'Publication number (BBS legacy)' }),
-            value: details.oldPublicationFascicule
-          },
-          {
-            label: formatMessage({ id: 'Parent document' }),
-            value: documentParent.title,
-            url: documentParent.url
-          },
-          {
-            label: formatMessage({ id: 'Pages' }),
-            value: details.pages
-          },
-          {
-            label: formatMessage({ id: 'Subjects' }),
-            value: details.subjects.map(s =>
-              formatMessage({
-                id: s.code,
-                defaultMessage: s.subject
-              })
-            ),
-            type: 'list'
-          },
-          {
-            label: formatMessage({ id: 'Regions' }),
-            value: details.regions.map(r =>
-              formatMessage({
-                id: r.code,
-                defaultMessage: r.name
-              })
-            ),
-            type: 'list'
-          },
-          {
-            label: formatMessage({ id: 'Author comment' }),
-            value: details.authorComment
-          }
-        ]}
-      />
-      <Section
-        loading={loading}
-        title={formatMessage({ id: 'Linked Entities' })}
-        content={[
-          {
-            Icon: () => <Terrain fontSize="large" color="primary" />,
-            label: formatMessage({ id: 'Massif' }),
-            value: entities.massif?.name,
-            url: `/ui/massifs/${entities.massif?.id}`
-          },
-          {
-            Icon: () => <CustomIcon type="entry" />,
-            internalUrl: true,
-            label: formatMessage({ id: 'Entrance' }),
-            value: entities.entrance?.name,
-            url: `/ui/entrances/${entities.entrance?.id}`
-          },
-          {
-            Icon: () => <CustomIcon type="cave_system" />,
-            label: formatMessage({ id: 'Cave' }),
-            value: entities.cave?.name,
-            url: `/ui/caves/${entities.cave?.id}`
-          },
-          {
-            Icon: () => <DescriptionIcon color="primary" />,
-            type: 'list',
-            label: formatMessage({ id: 'Files' }),
-            value: entities.files.fileNames,
-            CustomComponent: Link,
-            CustomComponentProps: entities.files.fileLinks
-          },
-          permissions.isModerator && {
-            Icon: () => <AttachFileIcon color="primary" />,
-            label: formatMessage({ id: 'Authorization document' }),
-            value: entities.authorizationDocument
-          },
-          {
-            Icon: () => <CustomIcon type="bibliography" />,
-            label: formatMessage({ id: 'Child documents' }),
-            value: documentChildren,
-            type: 'tree',
-            isLabelAndIconOnTop: true,
-            isLoading: areDocumentChildrenLoading
-          }
-        ]}
-      />
-    </Wrapper>
+    <Layout
+      onEdit={isValidated ? onEdit : undefined}
+      subheader={
+        !isValidated &&
+        formatMessage({
+          id:
+            'A moderator needs to validate the last modification before being able to edit the document again.'
+        })
+      }
+      title={
+        overview.title ||
+        (loading && formatMessage({ id: 'Loading document data...' }))
+      }
+      content={
+        <>
+          <Overview {...overview} loading={loading} />
+          <StyledDivider />
+          <Section
+            loading={loading}
+            title={formatMessage({ id: 'Organizations' })}
+            content={[
+              {
+                Icon: () => (
+                  <OrganizationIcon
+                    src="/images/club.svg"
+                    alt="Organization icon"
+                  />
+                ),
+                label: formatMessage({ id: 'Editor' }),
+                value: organizations?.editor.name,
+                url: `/ui/organizations/${organizations?.editor.id}`,
+                internalUrl: true
+              },
+              {
+                Icon: () => (
+                  <OrganizationIcon
+                    src="/images/club.svg"
+                    alt="Organization icon"
+                  />
+                ),
+                label: formatMessage({ id: 'Library' }),
+                value: organizations?.library.name,
+                url: `/ui/organizations/${organizations?.library.id}`,
+                internalUrl: true
+              }
+            ]}
+          />
+          <StyledDivider />
+          <Section
+            loading={loading}
+            title={formatMessage({ id: 'Details' })}
+            content={[
+              {
+                label: formatMessage({ id: 'Identifier' }),
+                value: details.identifier
+              },
+              {
+                label: formatMessage({ id: 'BBS reference' }),
+                value: details.bbsReference
+              },
+              {
+                label: formatMessage({ id: 'Document type' }),
+                value:
+                  details.documentType &&
+                  formatMessage({ id: details.documentType })
+              },
+              {
+                label: formatMessage({ id: 'Publication date' }),
+                value: details.publicationDate
+              },
+              {
+                label: formatMessage({ id: 'Publication (BBS legacy)' }),
+                value: details.oldPublication
+              },
+              {
+                label: formatMessage({ id: 'Publication number (BBS legacy)' }),
+                value: details.oldPublicationFascicule
+              },
+              {
+                label: formatMessage({ id: 'Parent document' }),
+                value: documentParent.title,
+                url: documentParent.url
+              },
+              {
+                label: formatMessage({ id: 'Pages' }),
+                value: details.pages
+              },
+              {
+                label: formatMessage({ id: 'Subjects' }),
+                value: details.subjects.map(s =>
+                  formatMessage({
+                    id: s.code,
+                    defaultMessage: s.subject
+                  })
+                ),
+                type: 'list'
+              },
+              {
+                label: formatMessage({ id: 'Regions' }),
+                value: details.regions.map(r =>
+                  formatMessage({
+                    id: r.code,
+                    defaultMessage: r.name
+                  })
+                ),
+                type: 'list'
+              },
+              {
+                label: formatMessage({ id: 'Author comment' }),
+                value: details.authorComment
+              }
+            ]}
+          />
+          <StyledDivider />
+          <Section
+            loading={loading}
+            title={formatMessage({ id: 'Linked Entities' })}
+            content={[
+              {
+                Icon: () => <Terrain fontSize="large" color="primary" />,
+                label: formatMessage({ id: 'Massif' }),
+                value: entities.massif?.name,
+                url: `/ui/massifs/${entities.massif?.id}`
+              },
+              {
+                Icon: () => <CustomIcon type="entry" />,
+                internalUrl: true,
+                label: formatMessage({ id: 'Entrance' }),
+                value: entities.entrance?.name,
+                url: `/ui/entrances/${entities.entrance?.id}`
+              },
+              {
+                Icon: () => <CustomIcon type="cave_system" />,
+                label: formatMessage({ id: 'Cave' }),
+                value: entities.cave?.name,
+                url: `/ui/caves/${entities.cave?.id}`
+              },
+              {
+                Icon: () => <DescriptionIcon color="primary" />,
+                type: 'list',
+                label: formatMessage({ id: 'Files' }),
+                value: entities.files.fileNames,
+                CustomComponent: Link,
+                CustomComponentProps: entities.files.fileLinks
+              },
+              permissions.isModerator && {
+                Icon: () => <AttachFileIcon color="primary" />,
+                label: formatMessage({ id: 'Authorization document' }),
+                value: entities.authorizationDocument
+              },
+              {
+                Icon: () => <CustomIcon type="bibliography" />,
+                label: formatMessage({ id: 'Child documents' }),
+                value: documentChildren,
+                type: 'tree',
+                isLabelAndIconOnTop: true,
+                isLoading: areDocumentChildrenLoading
+              }
+            ]}
+          />
+        </>
+      }
+    />
   );
 };
 

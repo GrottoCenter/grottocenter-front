@@ -1,10 +1,4 @@
-import {
-  Card,
-  CardContent as MuiCardContent,
-  Typography,
-  List,
-  ListItemText
-} from '@material-ui/core';
+import { Typography, List, ListItemText } from '@material-ui/core';
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
@@ -26,7 +20,7 @@ const Wrapper = styled.div`
   margin: 0 ${({ theme }) => theme.spacing(3)}px;
 `;
 
-const CardContent = styled(MuiCardContent)`
+const ContentWrapper = styled.div`
   display: flex;
   flex-direction: column;
 `;
@@ -164,8 +158,8 @@ const Item = ({
 const Section = ({ title, content, loading }) => {
   const isValueNotEmpty = value => !isEmpty(value) && !isNil(value);
   return (
-    <Card>
-      <CardContent>
+    <>
+      <ContentWrapper>
         <Typography color="textSecondary" variant="h6" gutterBottom>
           {title}
         </Typography>
@@ -195,8 +189,8 @@ const Section = ({ title, content, loading }) => {
               )
           )
         )}
-      </CardContent>
-    </Card>
+      </ContentWrapper>
+    </>
   );
 };
 

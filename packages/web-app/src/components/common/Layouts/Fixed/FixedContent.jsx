@@ -50,6 +50,17 @@ const FixedContent = ({
   return (
     <Card>
       <CardHeader
+        action={
+          !isNil(onEdit) && (
+            <IconButton
+              color="primary"
+              size="small"
+              aria-label="edit"
+              onClick={onEdit}>
+              <CreateIcon />
+            </IconButton>
+          )
+        }
         avatar={avatar}
         subheader={subheader}
         title={
@@ -64,11 +75,6 @@ const FixedContent = ({
       <CardContent>{content}</CardContent>
       <CardActions disableSpacing>
         {!isNil(footer) && <Typography variant="caption">{footer}</Typography>}
-        {!isNil(onEdit) && (
-          <IconButton size="small" aria-label="edit" onClick={onEdit}>
-            <CreateIcon />
-          </IconButton>
-        )}
       </CardActions>
     </Card>
   );
