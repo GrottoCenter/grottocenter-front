@@ -104,6 +104,7 @@ const Item = ({
   value,
   CustomComponent,
   CustomComponentProps,
+  internalUrl = false,
   isLabelAndIconOnTop = false,
   isLoading = false
 }) => (
@@ -148,7 +149,9 @@ const Item = ({
           )}
           {isString(value) &&
             (url ? (
-              <GCLink href={url}>{value}</GCLink>
+              <GCLink href={url} internal={internalUrl}>
+                {value}
+              </GCLink>
             ) : (
               <Typography>{value}</Typography>
             ))}
@@ -181,6 +184,7 @@ const Section = ({ title, content, loading }) => {
                   Icon={item.Icon}
                   label={item.label}
                   type={item.type}
+                  internalUrl={item.internalUrl}
                   url={item.url}
                   value={item.value}
                   CustomComponent={item.CustomComponent}
@@ -201,6 +205,7 @@ export default Section;
 // Recursive PropTypes : https://stackoverflow.com/questions/32063297/can-a-react-prop-type-be-defined-recursively/52411570
 const childTreeItemShape = {
   id: PropTypes.number.isRequired,
+  internalUrl: PropTypes.bool,
   title: PropTypes.string.isRequired,
   url: PropTypes.string
 };
@@ -220,6 +225,7 @@ Item.propTypes = {
     PropTypes.arrayOf(PropTypes.shape({}))
   ]),
   type: PropTypes.oneOf(['list', 'tree']),
+  internalUrl: PropTypes.bool,
   url: PropTypes.string,
   CustomComponent: PropTypes.node,
   CustomComponentProps: PropTypes.arrayOf(PropTypes.object),

@@ -9,6 +9,13 @@ import {
   head
 } from 'ramda';
 
+const getFirstName = (data, entity) =>
+  pathOr(
+    pipe(pathOr([], [entity, 'names']), head, propOr('', 'name'))(data),
+    [entity, 'name'],
+    data
+  );
+
 export const makeOverview = data => ({
   createdBy: pathOr('', ['author', 'nickname'], data),
   creationDate: propOr('', 'dateInscription', data),
@@ -19,7 +26,7 @@ export const makeOverview = data => ({
     defaultTo([])
   )(data),
   language: pathOr('unknown', ['mainLanguage', 'refName'], data),
-  license: propOr('unknown', 'license', data),
+  license: data.license,
   title: pipe(
     propOr([], 'titles'),
     head,
@@ -29,8 +36,14 @@ export const makeOverview = data => ({
 });
 
 export const makeOrganizations = data => ({
-  editor: pathOr('', ['editor', 'name'], data),
-  library: pathOr('', ['library', 'name'], data)
+  editor: {
+    id: data.editor?.id,
+    name: data.editor?.name
+  },
+  library: {
+    id: data.library?.id,
+    name: data.library?.name
+  }
 });
 
 export const makeDetails = data => {
@@ -57,21 +70,18 @@ export const makeDetails = data => {
 
 export const makeEntities = data => {
   return {
-    massif: pathOr(
-      pipe(pathOr([], ['massif', 'names']), head, propOr('', 'name'))(data),
-      ['massif', 'name'],
-      data
-    ),
-    cave: pathOr(
-      pipe(pathOr([], ['cave', 'names']), head, propOr('', 'name'))(data),
-      ['cave', 'name'],
-      data
-    ),
-    entrance: pathOr(
-      pipe(pathOr([], ['entrance', 'names']), head, propOr('', 'name'))(data),
-      ['entrance', 'name'],
-      data
-    ),
+    massif: {
+      id: data.massif?.id,
+      name: getFirstName(data, 'massif')
+    },
+    cave: {
+      id: data.cave?.id,
+      name: getFirstName(data, 'cave')
+    },
+    entrance: {
+      id: data.entrance?.id,
+      name: getFirstName(data, 'entrance')
+    },
     files: {
       fileNames: pipe(propOr([], 'files'), map(propOr('', 'fileName')))(data),
       fileLinks: pipe(
