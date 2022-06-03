@@ -11,9 +11,9 @@ export const fetchPartnersForCarousel = () => ({
   partners: undefined
 });
 
-export const fetchPartnersForCarouselSuccess = entry => ({
+export const fetchPartnersForCarouselSuccess = partners => ({
   type: FETCH_PARTNERS_FC_SUCCESS,
-  entry
+  partners
 });
 
 export const fetchPartnersForCarouselFailure = error => ({
@@ -32,7 +32,11 @@ export function loadPartnersForCarousel() {
         }
         return response.text();
       })
-      .then(text => dispatch(fetchPartnersForCarouselSuccess(JSON.parse(text))))
+      .then(text =>
+        dispatch(
+          fetchPartnersForCarouselSuccess(JSON.parse(text).organizations)
+        )
+      )
       .catch(error =>
         dispatch(
           fetchPartnersForCarouselFailure(

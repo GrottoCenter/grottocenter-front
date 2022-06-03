@@ -33,7 +33,7 @@ export const fetchFormats = () => dispatch => {
   return fetch(getFileFormatsUrl)
     .then(checkStatus)
     .then(response => {
-      dispatch(fetchFormatsSuccess(response));
+      dispatch(fetchFormatsSuccess(response.fileFormats));
     })
     .catch(error => {
       dispatch(fetchFormatsError(error.message));
