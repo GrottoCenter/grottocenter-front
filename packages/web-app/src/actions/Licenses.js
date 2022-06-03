@@ -33,7 +33,7 @@ export const fetchLicense = () => dispatch => {
   return fetch(getLicensesUrl)
     .then(checkStatus)
     .then(response => {
-      dispatch(fetchLicenseSuccess(response));
+      dispatch(fetchLicenseSuccess(response.licenses));
     })
     .catch(error => {
       dispatch(fetchLicenseError(error.message));

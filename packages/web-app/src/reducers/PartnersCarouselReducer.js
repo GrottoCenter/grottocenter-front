@@ -15,7 +15,7 @@ const partnersCarousel = (state = initialState, action) => {
     case FETCH_PARTNERS_FC:
       return { ...state, isFetching: true };
     case FETCH_PARTNERS_FC_SUCCESS:
-      return { ...state, isFetching: false, partners: action.entry };
+      return { ...state, isFetching: false, partners: action.partners };
     case FETCH_PARTNERS_FC_FAILURE:
       return { ...state, isFetching: false, error: action.error };
     default:
