@@ -24,7 +24,7 @@ const UsersList = props => {
       {users && users.length > 0 ? (
         <StyledList>
           {users
-            .sort((a, b) => a.name.localeCompare(b.nickname))
+            .sort((a, b) => a.nickname?.localeCompare(b.nickname))
             .map(user => (
               <UserListItem key={user.id} user={user} />
             ))}
