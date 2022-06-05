@@ -51,13 +51,13 @@ const Details = ({
           <ContentWrapper>
             <StyledLocationIcon color="primary" />
             <Typography>
-              {!isNil(country) && `${country}`}
-              {!isNil(region) && ` - ${region}`}
-              {!isNil(county) && ` - ${county}`}
-              {!isNil(city) && ` - ${city}`}
+              {!isNil(address) && `${address}`}
+              {!isNil(postalCode) && ` ${postalCode}`}
+              {!isNil(city) && ` ${city}`}
+              {!isNil(country) && ` ${country}`}
               {!isNil(village) && ` - ${village}`}
-              {!isNil(postalCode) && ` - ${postalCode}`}
-              {!isNil(address) && ` - ${address}`}
+              {!isNil(county) && ` - ${county}`}
+              {!isNil(region) && ` - ${region}`}
             </Typography>
           </ContentWrapper>
           {mail && (
