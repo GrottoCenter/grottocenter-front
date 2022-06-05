@@ -132,16 +132,20 @@ export const commentType = PropTypes.shape({
 
 export const commentsType = PropTypes.arrayOf(commentType);
 
-export const descriptionsType = PropTypes.arrayOf(
-  PropTypes.shape({
-    author: authorType,
-    body: PropTypes.string,
-    date: PropTypes.instanceOf(Date),
-    id: PropTypes.number,
-    language: PropTypes.string.isRequired,
-    title: PropTypes.string.isRequired
-  })
-);
+export const descriptionType = PropTypes.shape({
+  author: authorType,
+  body: PropTypes.string,
+  creationDate: PropTypes.instanceOf(Date),
+  id: PropTypes.number,
+  language: PropTypes.shape({
+    id: PropTypes.string.isRequired,
+    refName: PropTypes.string.isRequired
+  }).isRequired,
+  relevance: PropTypes.number,
+  title: PropTypes.string
+});
+
+export const descriptionsType = PropTypes.arrayOf(descriptionType);
 
 export const documentType = PropTypes.shape({
   details: PropTypes.shape({
@@ -168,9 +172,14 @@ export const documentsType = PropTypes.arrayOf(documentType);
 export const historyType = PropTypes.shape({
   author: authorType.isRequired,
   body: PropTypes.string.isRequired,
-  date: PropTypes.instanceOf(Date).isRequired,
+  creationDate: PropTypes.instanceOf(Date),
+  entrance: PropTypes.number,
   id: PropTypes.number.isRequired,
-  title: PropTypes.string
+  language: PropTypes.shape({
+    id: PropTypes.string.isRequired,
+    refName: PropTypes.string.isRequired
+  }).isRequired,
+  relevance: PropTypes.number
 });
 
 export const historiesType = PropTypes.arrayOf(historyType);

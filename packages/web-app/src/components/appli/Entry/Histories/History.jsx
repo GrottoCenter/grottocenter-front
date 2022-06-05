@@ -13,26 +13,26 @@ import { useDispatch } from 'react-redux';
 import EditIcon from '@material-ui/icons/Edit';
 import CancelIcon from '@material-ui/icons/Cancel';
 
-import { locationType } from '../Provider';
+import { historyType } from '../Provider';
 import { makeFormattedText } from '../utils';
-import CreateLocationForm from '../../Form/LocationForm/index';
-import { updateLocation } from '../../../../actions/UpdateLocation';
+import CreateHistoryForm from '../../Form/HistoryForm/index';
+import { updateHistory } from '../../../../actions/UpdateHistory';
 import { usePermissions } from '../../../../hooks';
 
-const Location = ({ location }) => {
+const History = ({ history }) => {
   const { formatMessage, formatDate } = useIntl();
   const dispatch = useDispatch();
   const permissions = usePermissions();
-  const { author, body, creationDate, title } = location;
+  const { author, body, creationDate } = history;
   const [isFormVisible, setIsFormVisible] = useState(false);
 
   const onSubmitForm = data => {
     dispatch(
-      updateLocation({
+      updateHistory({
         ...data,
-        entrance: location.entrance,
+        entrance: history.entrance,
         language: data.language.id,
-        location: location.id
+        history: history.id
       })
     );
     setIsFormVisible(false);
@@ -42,11 +42,11 @@ const Location = ({ location }) => {
     <ListItem>
       {isFormVisible ? (
         <Box width="100%">
-          <CreateLocationForm
+          <CreateHistoryForm
             closeForm={() => setIsFormVisible(false)}
-            isNewLocation={false}
+            isNewHistory={false}
             onSubmit={onSubmitForm}
-            values={location}
+            values={history}
           />
         </Box>
       ) : (
@@ -54,7 +54,6 @@ const Location = ({ location }) => {
           <ListItemText
             // whiteSpace property for description multi-lines display
             style={{ whiteSpace: 'pre-line' }}
-            primary={title}
             secondary={
               <>
                 {makeFormattedText(body)}
@@ -95,8 +94,8 @@ const Location = ({ location }) => {
   );
 };
 
-Location.propTypes = {
-  location: locationType
+History.propTypes = {
+  history: historyType
 };
 
-export default Location;
+export default History;

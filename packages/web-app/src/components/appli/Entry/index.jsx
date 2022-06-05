@@ -106,10 +106,10 @@ export const Entry = () => {
           isSensitive={isSensitive}
         />
       )}
-      {!isEmpty(descriptions) && <Descriptions descriptions={descriptions} />}
+      {id && <Descriptions descriptions={descriptions} entranceId={id} />}
       {!isEmpty(riggings) && <Riggings riggings={riggings} />}
       {id && <Documents documents={documents} entranceId={id} />}
-      {!isEmpty(histories) && <Histories histories={histories} />}
+      {id && <Histories histories={histories} entranceId={id} />}
       {!isEmpty(comments) && <Comments comments={comments} />}
       {permissions.isAuth && (
         <StandardDialog

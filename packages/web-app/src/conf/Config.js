@@ -232,9 +232,12 @@ export const putDocumentyWithNewEntitiesUrl = docId =>
 export const postLocationUrl = `${API_URL}/api/${apiVersion}/locations`;
 export const putLocationUrl = locationId =>
   `${API_URL}/api/${apiVersion}/locations/${locationId}`;
-export const postCreateDescriptionUrl = `${API_URL}/api/${apiVersion}/descriptions`;
-export const patchDescriptionUrl = id =>
-  `${API_URL}/api/${apiVersion}/descriptions/${id}`;
+export const postHistoryUrl = `${API_URL}/api/${apiVersion}/histories`;
+export const putHistoryUrl = historyId =>
+  `${API_URL}/api/${apiVersion}/histories/${historyId}`;
+export const postDescriptionUrl = `${API_URL}/api/${apiVersion}/descriptions`;
+export const putDescriptionUrl = descriptionId =>
+  `${API_URL}/api/${apiVersion}/descriptions/${descriptionId}`;
 export const patchNameUrl = id => `${API_URL}/api/${apiVersion}/names/${id}`;
 export const associateDocumentToEntranceUrl = (entranceId, documentId) =>
   `${API_URL}/api/${apiVersion}/entrances/${entranceId}/documents/${documentId}`;
