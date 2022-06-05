@@ -7,14 +7,14 @@ import AddCircleIcon from '@material-ui/icons/AddCircle';
 import RemoveCircleIcon from '@material-ui/icons/RemoveCircle';
 
 import ScrollableContent from '../../../common/Layouts/Fixed/ScrollableContent';
-import { locationsType } from '../Provider';
-import Location from './Location';
-import CreateLocationForm from '../../Form/LocationForm';
-import { postLocation } from '../../../../actions/CreateLocation';
+import { descriptionsType } from '../Provider';
+import Description from './Description';
+import CreateDescriptionForm from '../../Form/DescriptionForm';
+import { postDescription } from '../../../../actions/CreateDescription';
 import { usePermissions } from '../../../../hooks';
 import Alert from '../../../common/Alert';
 
-const Locations = ({ entranceId, locations, isSensitive }) => {
+const Descriptions = ({ entranceId, descriptions }) => {
   const { formatMessage } = useIntl();
   const permissions = usePermissions();
   const dispatch = useDispatch();
@@ -22,9 +22,9 @@ const Locations = ({ entranceId, locations, isSensitive }) => {
 
   const onSubmitForm = data => {
     dispatch(
-      postLocation({
+      postDescription({
         ...data,
-        entrance: entranceId,
+        entranceId,
         language: data.language.id
       })
     );
@@ -34,7 +34,7 @@ const Locations = ({ entranceId, locations, isSensitive }) => {
   return (
     <ScrollableContent
       dense
-      title={formatMessage({ id: 'Location' })}
+      title={formatMessage({ id: 'Description' })}
       icon={
         permissions.isAuth && (
           <IconButton
@@ -48,17 +48,17 @@ const Locations = ({ entranceId, locations, isSensitive }) => {
         <>
           {isFormVisible && (
             <>
-              <CreateLocationForm isNewLocation onSubmit={onSubmitForm} />
+              <CreateDescriptionForm isNewDescription onSubmit={onSubmitForm} />
               <Divider />
             </>
           )}
 
-          {locations.length > 0 ? (
+          {descriptions.length > 0 ? (
             <List>
-              {locations.map(location => (
-                <React.Fragment key={location.id}>
-                  <Location location={location} />
-                  {locations.length > 1 && (
+              {descriptions.map(description => (
+                <React.Fragment key={description.id}>
+                  <Description description={description} />
+                  {descriptions.length > 1 && (
                     <Divider variant="middle" component="li" />
                   )}
                 </React.Fragment>
@@ -66,11 +66,9 @@ const Locations = ({ entranceId, locations, isSensitive }) => {
             </List>
           ) : (
             <Alert
-              severity={isSensitive ? 'warning' : 'info'}
+              severity="info"
               content={formatMessage({
-                id: isSensitive
-                  ? 'This entrance has a restricted access, you can not see its locations.'
-                  : 'There is currently no location for this entrance.'
+                id: 'There is currently no description for this entrance.'
               })}
             />
           )}
@@ -80,10 +78,9 @@ const Locations = ({ entranceId, locations, isSensitive }) => {
   );
 };
 
-Locations.propTypes = {
+Descriptions.propTypes = {
   entranceId: PropTypes.number.isRequired,
-  locations: locationsType,
-  isSensitive: PropTypes.bool
+  descriptions: descriptionsType
 };
 
-export default Locations;
+export default Descriptions;

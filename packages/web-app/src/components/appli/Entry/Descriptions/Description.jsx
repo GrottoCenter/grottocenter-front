@@ -13,26 +13,25 @@ import { useDispatch } from 'react-redux';
 import EditIcon from '@material-ui/icons/Edit';
 import CancelIcon from '@material-ui/icons/Cancel';
 
-import { locationType } from '../Provider';
+import { descriptionType } from '../Provider';
 import { makeFormattedText } from '../utils';
-import CreateLocationForm from '../../Form/LocationForm/index';
-import { updateLocation } from '../../../../actions/UpdateLocation';
+import CreateDescriptionForm from '../../Form/DescriptionForm/index';
+import { updateDescription } from '../../../../actions/UpdateDescription';
 import { usePermissions } from '../../../../hooks';
 
-const Location = ({ location }) => {
+const Description = ({ description }) => {
   const { formatMessage, formatDate } = useIntl();
   const dispatch = useDispatch();
   const permissions = usePermissions();
-  const { author, body, creationDate, title } = location;
+  const { author, body, creationDate, title } = description;
   const [isFormVisible, setIsFormVisible] = useState(false);
 
   const onSubmitForm = data => {
     dispatch(
-      updateLocation({
+      updateDescription({
         ...data,
-        entrance: location.entrance,
         language: data.language.id,
-        location: location.id
+        description: description.id
       })
     );
     setIsFormVisible(false);
@@ -40,13 +39,13 @@ const Location = ({ location }) => {
 
   return (
     <ListItem>
-      {isFormVisible ? (
+      {isFormVisible && permissions.isAuth ? (
         <Box width="100%">
-          <CreateLocationForm
+          <CreateDescriptionForm
             closeForm={() => setIsFormVisible(false)}
-            isNewLocation={false}
+            isNewDescription={false}
             onSubmit={onSubmitForm}
-            values={location}
+            values={description}
           />
         </Box>
       ) : (
@@ -95,8 +94,8 @@ const Location = ({ location }) => {
   );
 };
 
-Location.propTypes = {
-  location: locationType
+Description.propTypes = {
+  description: descriptionType
 };
 
-export default Location;
+export default Description;

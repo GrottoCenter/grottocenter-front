@@ -57,16 +57,19 @@ export const getDetails = data => ({
 });
 
 export const getDescriptions = descriptions =>
-  descriptions.map(description => ({
-    author: getAuthor(description?.author),
-    body: description?.body,
-    date: description?.dateInscription
-      ? new Date(description?.dateInscription)
-      : null,
-    id: description?.id,
-    language: description?.language,
-    title: description?.title
-  }));
+  descriptions
+    .map(description => ({
+      author: getAuthor(description?.author),
+      body: description?.body,
+      creationDate: description?.dateInscription
+        ? new Date(description?.dateInscription)
+        : null,
+      id: description?.id,
+      language: description?.language,
+      title: description?.title,
+      relevance: description?.relevance
+    }))
+    .sort((l1, l2) => l1.relevance < l2.relevance);
 
 export const getDocuments = documents =>
   documents.map(document => ({
@@ -77,14 +80,19 @@ export const getDocuments = documents =>
   }));
 
 export const getHistories = histories =>
-  histories.map(history => ({
-    author: getAuthor(history?.author),
-    body: history?.body,
-    date: history?.dateInscription ? new Date(history?.dateInscription) : null,
-    id: history?.id,
-    language: history?.language?.id,
-    title: history?.title
-  }));
+  histories
+    .map(history => ({
+      author: getAuthor(history?.author),
+      body: history?.body,
+      creationDate: history?.dateInscription
+        ? new Date(history?.dateInscription)
+        : null,
+      entrance: history?.entrance,
+      id: history?.id,
+      language: history?.language,
+      relevance: history?.relevance
+    }))
+    .sort((l1, l2) => l1.relevance < l2.relevance);
 
 export const getRiggings = riggings =>
   riggings.map(rigging => ({

@@ -21,10 +21,8 @@ import { useBoolean } from '../../../../hooks';
 import ActionButton from '../../../common/ActionButton';
 import Alert from '../../../common/Alert';
 import { postMassif, updateMassif } from '../../../../actions/Massif';
-import {
-  updateDescription,
-  postDescription
-} from '../../../../actions/Description';
+import { updateDescription } from '../../../../actions/UpdateDescription';
+import { postDescription } from '../../../../actions/CreateDescription';
 import { updateName } from '../../../../actions/Name';
 
 import Massif from './Massif';
@@ -58,7 +56,7 @@ export const MassifForm = ({ massifValues }) => {
     error: descriptionError,
     loading: descriptionLoading
   } = useSelector(state =>
-    isNewDescription ? state.descriptionPost : state.descriptionPut
+    isNewDescription ? state.createDescription : state.updateDescription
   );
   const dispatch = useDispatch();
 
