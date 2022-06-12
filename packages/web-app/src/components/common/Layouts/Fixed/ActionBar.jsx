@@ -8,6 +8,7 @@ import PropTypes from 'prop-types';
 import ReactToPrint from 'react-to-print';
 import { isMobile } from 'react-device-detect';
 import grey from '@material-ui/core/colors/grey';
+import { useGeolocation } from 'rooks';
 
 const Wrapper = styled.div`
   position: sticky;
@@ -29,6 +30,10 @@ const StyledFab = styled(Fab)`
     background-color: ${grey[100]};
   }
 `;
+
+/* const showInMapClicked = () => {
+  window.open(`https://www.openstreetmap.org/#map=6/${ALTITUDE},${LONGITUDE}`);
+}; */
 
 const ActionButton = ({ Icon, label, onClick }) => {
   const { formatMessage } = useIntl();
@@ -53,6 +58,13 @@ const ActionButton = ({ Icon, label, onClick }) => {
 
 const ActionBar = ({ printRef, onEdit }) => {
   const { formatMessage } = useIntl();
+  const geolocation = useGeolocation();
+  const latitude = geolocation?.lat;
+  const longitude = geolocation?.lng;
+
+  const showInMapClicked = () => {
+    window.open(`https://maps.google.com?q=${latitude},${longitude}`);
+  };
 
   return (
     <Wrapper>
@@ -85,6 +97,7 @@ const ActionBar = ({ printRef, onEdit }) => {
         label={formatMessage({ id: 'GeoHack' })}
       />
       <ActionButton
+        onClick={showInMapClicked}
         Icon={<Map fontSize={isMobile ? 'small' : 'medium'} />}
         label={formatMessage({ id: 'Map' })}
       />
