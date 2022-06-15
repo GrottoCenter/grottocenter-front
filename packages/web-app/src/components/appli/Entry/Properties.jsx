@@ -2,6 +2,7 @@ import React, { useContext } from 'react';
 import { useIntl } from 'react-intl';
 import styled from 'styled-components';
 import { Box } from '@material-ui/core';
+import EmptyStarIcon from '@material-ui/icons/StarBorder';
 import {
   CalendarToday,
   Category,
@@ -178,6 +179,11 @@ const Properties = () => {
           />
         )}
       </Box>
+
+      <Property
+        label={formatMessage({ id: 'Average rating' })}
+        icon={<EmptyStarIcon fontSize="large" color="primary" />}
+      />
       <SmallRatingsWrapper>
         <Ratings
           accessRate={accessRate}
