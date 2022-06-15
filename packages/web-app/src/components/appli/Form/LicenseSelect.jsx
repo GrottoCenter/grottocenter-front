@@ -16,7 +16,7 @@ const Wrapper = styled(FormControl)`
     margin: ${theme.spacing(4)}px;`}
 `;
 
-const DEFAULT_LICENSE = 'CC-BY-SA';
+export const DEFAULT_LICENSE = 'CC-BY-SA';
 
 const LicenseSelect = ({ label, selected, updateSelected }) => {
   const dispatch = useDispatch();

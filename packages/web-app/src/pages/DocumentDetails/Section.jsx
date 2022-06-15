@@ -5,10 +5,14 @@ import styled from 'styled-components';
 import { isEmpty, isNil, is } from 'ramda';
 import { Skeleton, TreeItem, TreeView as MuiTreeView } from '@material-ui/lab';
 import { ExpandMore, ChevronRight, Launch } from '@material-ui/icons';
-
 import { isMobileOnly } from 'react-device-detect';
 
+import { documentType } from '../../components/appli/Entry/Provider';
+
 import GCLink from '../../components/common/GCLink';
+
+// j'ai essayé d'importer licenseName de license mais ca marche pas .
+import { DEFAULT_LICENSE } from '../../components/appli/Form/LicenseSelect';
 
 // ==========
 
@@ -90,6 +94,13 @@ const ChildTreeItem = ({ item }) => {
   );
 };
 
+const LicenseLink = styled(GCLink)`
+  padding-left: ${({ theme }) => theme.spacing(1)}px;
+  text-decoration: none;
+  font-size: smaller;
+  color: inherit;
+`;
+
 const Item = ({
   Icon,
   label,
@@ -132,10 +143,22 @@ const Item = ({
                   : {};
 
                 const Component = CustomComponent || ToRightListItemText;
-
                 return (
                   <WrapperListItem key={item}>
-                    <Component {...props}>{item}</Component>
+                    <Component {...props}>
+                      {item}
+                      <ListItemText
+                        secondaryTypographyProps={{ display: 'inline' }}
+                        secondary={
+                          <LicenseLink
+                            internal={false}
+                            target="_blank"
+                            href="https://creativecommons.org/licenses/by-sa/3.0/">
+                            {DEFAULT_LICENSE}
+                          </LicenseLink>
+                        }
+                      />
+                    </Component>
                   </WrapperListItem>
                 );
               })}
@@ -212,6 +235,10 @@ ChildTreeItem.propTypes = {
 
 Item.propTypes = {
   Icon: PropTypes.func,
+  fileName: PropTypes.arrayOf(PropTypes.string),
+  fileLinks: PropTypes.arrayOf(PropTypes.string),
+  licenseUrl: PropTypes.string,
+  licenseName: PropTypes.string,
   label: PropTypes.string.isRequired,
   value: PropTypes.oneOfType([
     PropTypes.string,
@@ -226,6 +253,8 @@ Item.propTypes = {
   isLabelAndIconOnTop: PropTypes.bool,
   isLoading: PropTypes.bool
 };
+
+Item.propTypes = documentType;
 
 Section.propTypes = {
   loading: PropTypes.bool.isRequired,
