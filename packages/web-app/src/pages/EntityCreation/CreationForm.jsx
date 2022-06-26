@@ -24,7 +24,6 @@ const StyledFormControl = styled(FormControl)`
 
 const ENTITIES = {
   entrance: 'Entrance',
-  cavity: 'Cavity',
   massif: 'Massif',
   organization: 'Organization'
 };
@@ -52,9 +51,6 @@ const EntityTypeSelect = ({ entity, onEntityChange }) => {
         <MenuItem value={ENTITIES.entrance}>
           <Translate>Entrance</Translate>
         </MenuItem>
-        <MenuItem value={ENTITIES.cavity}>
-          <Translate>Cave</Translate>
-        </MenuItem>
         <MenuItem value={ENTITIES.massif}>
           <Translate>Massif</Translate>
         </MenuItem>
@@ -75,7 +71,6 @@ const EntityForm = ({ selectedEntity }) => {
       return <EntranceForm />;
     case ENTITIES.massif:
       return <MassifForm />;
-    case ENTITIES.cavity:
     case ENTITIES.organization:
       return <OrganizationForm />;
 
@@ -93,10 +88,7 @@ const CreationForm = () => {
   return (
     <>
       <Header>
-        <Translate>
-          Create a new entity such as cave, entrance or organization in
-          Grottocenter using this form.
-        </Translate>
+        <Translate>Create a new entity in Grottocenter</Translate>
       </Header>
       <hr />
       <Wrapper>
