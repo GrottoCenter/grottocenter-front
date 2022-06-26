@@ -89,8 +89,7 @@ const CreationForm = () => {
     <>
       <Header>
         <Translate>
-          Create a new entity such as entrance or organization in Grottocenter
-          using this form.
+          Create a new entity in Grottocenter using this form.
         </Translate>
       </Header>
       <hr />
