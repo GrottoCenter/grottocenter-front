@@ -88,9 +88,7 @@ const CreationForm = () => {
   return (
     <>
       <Header>
-        <Translate>
-          Create a new entity in Grottocenter
-        </Translate>
+        <Translate>Create a new entity in Grottocenter</Translate>
       </Header>
       <hr />
       <Wrapper>
