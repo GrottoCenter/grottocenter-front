@@ -232,7 +232,7 @@ const AddFileForm = ({
 };
 
 AddFileForm.propTypes = {
-  files: PropTypes.arrayOf(PropTypes.object).isRequired,
+  files: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   setFiles: PropTypes.func.isRequired,
   option: PropTypes.string,
   setOption: PropTypes.func.isRequired,
