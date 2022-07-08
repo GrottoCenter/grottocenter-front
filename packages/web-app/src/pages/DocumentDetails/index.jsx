@@ -63,7 +63,7 @@ const DocumentPage = ({
       }
       title={
         overview.title ||
-        (loading && formatMessage({ id: 'Loading document data...' }))
+        (loading ? formatMessage({ id: 'Loading document data...' }) : '')
       }
       content={
         <>

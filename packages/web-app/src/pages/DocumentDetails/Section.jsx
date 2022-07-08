@@ -222,7 +222,7 @@ Item.propTypes = {
   internalUrl: PropTypes.bool,
   url: PropTypes.string,
   CustomComponent: PropTypes.node,
-  CustomComponentProps: PropTypes.arrayOf(PropTypes.object),
+  CustomComponentProps: PropTypes.shape({}),
   isLabelAndIconOnTop: PropTypes.bool,
   isLoading: PropTypes.bool
 };
