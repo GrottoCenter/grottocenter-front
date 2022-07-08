@@ -10,7 +10,7 @@ import OrganizationsSearch from './OrganizationsSearch';
 
 import Translate from '../../common/Translate';
 import { ADVANCED_SEARCH_TYPES } from '../../../conf/Config';
-import SearchResultsContainer from '../../../containers/SearchResultsContainer';
+import SearchResults from './SearchResults';
 
 const TabIcon = styled.img`
   height: 2rem;
@@ -113,7 +113,7 @@ const AdvancedSearch = ({
             />
           )}
 
-          <SearchResultsContainer />
+          <SearchResults />
         </CardContent>
       </Card>
     </div>
