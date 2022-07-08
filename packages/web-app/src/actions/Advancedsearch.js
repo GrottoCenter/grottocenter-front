@@ -75,7 +75,48 @@ export const resetAdvancedSearchResults = () => ({
   type: RESET_ADVANCEDSEARCH_RESULTS
 });
 
-export const fetchAdvancedsearchResults = criterias => dispatch => {
+const formatAdvancedSearchParams = (values, resourceType) => {
+  // complete is set to true because we need the complete results about the data
+  // resourceType is set to "entrances", "grottos", "massifs" or "documents"
+  // according to the search desired
+  const paramsToSend = {
+    complete: true,
+    resourceType
+  };
+
+  Object.keys(values).forEach(key => {
+    let keyValue = values[key];
+
+    // If String trim it
+    if (typeof values[key] === 'string') {
+      keyValue = values[key].trim();
+    }
+
+    // Handle range values
+    if (keyValue !== '' && key.split('-range').length === 1) {
+      paramsToSend[key] = keyValue;
+
+      // If the key contains '-range' and it is editable
+      // then we send the parameter in two parameters min and max
+    } else if (key.split('-range').length > 1 && keyValue.isEditable === true) {
+      const keyBase = key.split('-range');
+      const rangeMin = `${keyBase[0]}-min`;
+      const rangeMax = `${keyBase[0]}-max`;
+
+      paramsToSend[rangeMin] = keyValue.min;
+      paramsToSend[rangeMax] = keyValue.max;
+    }
+  });
+  return paramsToSend;
+};
+
+// ===============================
+
+export const fetchAdvancedsearchResults = (
+  parameters,
+  resourceType
+) => dispatch => {
+  const criterias = formatAdvancedSearchParams(parameters, resourceType);
   dispatch(fetchAdvancedsearchStarted(criterias));
 
   let completeUrl = advancedsearchUrl;
