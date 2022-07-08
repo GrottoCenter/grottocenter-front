@@ -14,7 +14,6 @@ import {
   Table,
   TableCell,
   TableBody,
-  TableHead,
   TablePagination,
   TableRow
 } from '@material-ui/core';
@@ -27,6 +26,8 @@ import Translate from '../../../common/Translate';
 import Alert from '../../../common/Alert';
 
 import SearchTableActions from './SearchTableActions';
+import ResultsTableHead from './ResultsTableHead';
+import { ADVANCED_SEARCH_TYPES } from '../../../../conf/Config';
 
 const StyledTableFooter = styled.div`
   align-items: center;
@@ -59,12 +60,6 @@ const DEFAULT_SIZE = 10;
 // Don't authorize anyone to download all the database in CSV
 const MAX_NUMBER_OF_DATA_TO_EXPORT_IN_CSV = 10000;
 
-const HeaderIcon = styled.img`
-  height: 3.6rem;
-  vertical-align: middle;
-  width: 3.6rem;
-`;
-
 // ============= MAIN COMPONENT ============= //
 
 class SearchResultsTable extends React.Component {
@@ -76,10 +71,6 @@ class SearchResultsTable extends React.Component {
       page: DEFAULT_PAGE,
       size: DEFAULT_SIZE
     };
-    this.entrancesTableHead = this.entrancesTableHead.bind(this);
-    this.organizationsTableHead = this.organizationsTableHead.bind(this);
-    this.massifsTableHead = this.massifsTableHead.bind(this);
-    this.documentsTableHead = this.documentsTableHead.bind(this);
     this.handleRowClick = this.handleRowClick.bind(this);
     this.loadCSVData = this.loadCSVData.bind(this);
     this.getFullResultsAsCSV = this.getFullResultsAsCSV.bind(this);
@@ -113,171 +104,22 @@ class SearchResultsTable extends React.Component {
     }
   };
 
-  // ===== Table headers ===== //
-  entrancesTableHead = () => {
-    const { intl } = this.props;
-    return (
-      <TableHead>
-        <TableRow>
-          <TableCell color="inherit">
-            <Translate>Name</Translate>
-          </TableCell>
-          <TableCell>
-            <Translate>Country</Translate>
-          </TableCell>
-          <TableCell>
-            <Translate>Massif name</Translate>
-          </TableCell>
-          <TableCell>
-            <Translate>Aesthetic</Translate>
-          </TableCell>
-          <TableCell>
-            <Translate>Ease of move</Translate>
-          </TableCell>
-          <TableCell>
-            <Translate>Ease of reach</Translate>
-          </TableCell>
-          <TableCell>
-            <Translate>Network name</Translate>
-          </TableCell>
-          <TableCell>
-            <HeaderIcon
-              src="/images/length.svg"
-              title={intl.formatMessage({
-                id: 'Cave length',
-                defaultMessage: 'Cave length'
-              })}
-              alt="Cave length icon"
-            />
-          </TableCell>
-          <TableCell>
-            <HeaderIcon
-              src="/images/depth.svg"
-              title={intl.formatMessage({
-                id: 'Cave depth',
-                defaultMessage: 'Cave depth'
-              })}
-              alt="Cave depth icon"
-            />
-          </TableCell>
-        </TableRow>
-      </TableHead>
-    );
-  };
-
-  organizationsTableHead = () => {
-    const { intl } = this.props;
-    return (
-      <TableHead>
-        <TableRow>
-          <TableCell>
-            <Translate>Name</Translate>
-          </TableCell>
-          <TableCell>
-            <Translate>Email</Translate>
-          </TableCell>
-          <TableCell>
-            <Translate>City</Translate>
-          </TableCell>
-          <TableCell>
-            <Translate>County</Translate>
-          </TableCell>
-          <TableCell>
-            <Translate>Region</Translate>
-          </TableCell>
-          <TableCell>
-            <Translate>Country</Translate>
-          </TableCell>
-          <TableCell>
-            <HeaderIcon
-              src="/images/caver-cluster.svg"
-              title={intl.formatMessage({
-                id: 'Number of cavers',
-                defaultMessage: 'Number of cavers'
-              })}
-              alt="Cavers icon"
-            />
-          </TableCell>
-        </TableRow>
-      </TableHead>
-    );
-  };
-
-  massifsTableHead = () => {
-    const { intl } = this.props;
-    return (
-      <TableHead>
-        <TableRow>
-          <TableCell>
-            <Translate>Name</Translate>
-          </TableCell>
-          <TableCell>
-            <HeaderIcon
-              src="/images/entry-cluster.svg"
-              title={intl.formatMessage({
-                id: 'Number of caves',
-                defaultMessage: 'Number of caves'
-              })}
-              alt="Cave icon"
-            />
-          </TableCell>
-          <TableCell>
-            <HeaderIcon
-              src="/images/gc-entries.svg"
-              title={intl.formatMessage({
-                id: 'Number of entrances',
-                defaultMessage: 'Number of entrances'
-              })}
-              alt="Entrances icon"
-            />
-          </TableCell>
-        </TableRow>
-      </TableHead>
-    );
-  };
-
-  documentsTableHead = () => (
-    <TableHead>
-      <TableRow>
-        <TableCell>
-          <Translate>Title</Translate>
-        </TableCell>
-        <TableCell>
-          <Translate>Published in</Translate>
-        </TableCell>
-        <TableCell>
-          <Translate>Subjects</Translate>
-        </TableCell>
-        <TableCell>
-          <Translate>Country or region</Translate>
-        </TableCell>
-        <TableCell>
-          <Translate>Authors</Translate>
-        </TableCell>
-        <TableCell>
-          {/* Considering the number of columns, "Publication Date" is a bit long */}
-          <Translate>Date</Translate>{' '}
-        </TableCell>
-      </TableRow>
-    </TableHead>
-  );
-
   // ===== Handle functions ===== //
 
   handleRowClick = id => {
     const { history, resourceType } = this.props;
     let urlToRedirectTo = '';
     switch (resourceType) {
-      case 'entrances':
+      case ADVANCED_SEARCH_TYPES.ENTRANCES:
         urlToRedirectTo = `/ui/entrances/${id}`;
         break;
-      case 'grottos':
+      case ADVANCED_SEARCH_TYPES.ORGANIZATIONS:
         urlToRedirectTo = `/ui/organizations/${id}`;
         break;
-      case 'massifs':
+      case ADVANCED_SEARCH_TYPES.MASSIFS:
         urlToRedirectTo = `/ui/massifs/${id}`;
         break;
-      case 'documents':
+      case ADVANCED_SEARCH_TYPES.DOCUMENTS:
         urlToRedirectTo = `/ui/documents/${id}`;
         break;
       default:
@@ -361,7 +203,7 @@ class SearchResultsTable extends React.Component {
     const { resourceType, fullResults } = this.props;
     let cleanedResults;
     switch (resourceType) {
-      case 'entrances':
+      case ADVANCED_SEARCH_TYPES.ENTRANCES:
         // Flatten cave and massif
         cleanedResults = fullResults.map(result => {
           const cleanedResult = result;
@@ -373,8 +215,8 @@ class SearchResultsTable extends React.Component {
         });
         break;
 
-      case 'grottos':
-      case 'massifs':
+      case ADVANCED_SEARCH_TYPES.ORGANIZATIONS:
+      case ADVANCED_SEARCH_TYPES.MASSIFS:
         cleanedResults = fullResults.map(result => {
           const cleanedResult = result;
           delete cleanedResult.type;
@@ -383,7 +225,7 @@ class SearchResultsTable extends React.Component {
         });
         break;
 
-      case 'documents':
+      case ADVANCED_SEARCH_TYPES.DOCUMENTS:
         // Flatten regions and subjects
         cleanedResults = fullResults.map(result => {
           const cleanedResult = result;
@@ -429,15 +271,6 @@ class SearchResultsTable extends React.Component {
     } = this.props;
     const { from, page, size } = this.state;
 
-    let ResultsTableHead;
-    if (resourceType === 'entrances')
-      ResultsTableHead = this.entrancesTableHead;
-    if (resourceType === 'grottos')
-      ResultsTableHead = this.organizationsTableHead;
-    if (resourceType === 'massifs') ResultsTableHead = this.massifsTableHead;
-    if (resourceType === 'documents')
-      ResultsTableHead = this.documentsTableHead;
-
     const canDownloadDataAsCSV =
       totalNbResults <= MAX_NUMBER_OF_DATA_TO_EXPORT_IN_CSV;
     /*
@@ -461,11 +294,12 @@ class SearchResultsTable extends React.Component {
       (for massif, no scroll needed because the results are not very large)
     */
     const tableDisplayValueForScroll =
-      window.innerWidth < 1200 && resourceType !== 'massifs'
+      window.innerWidth < 1200 && resourceType !== ADVANCED_SEARCH_TYPES.MASSIFS
         ? 'block'
         : 'table';
 
-    return resultsSliced !== undefined && resourceType !== '' ? (
+    if (resourceType === '' || resultsSliced === undefined) return '';
+    return (
       <Card className={classes.resultsContainer} ref={this.cardRef}>
         <CardContent>
           {resultsSliced.length > 0 ? (
@@ -474,7 +308,7 @@ class SearchResultsTable extends React.Component {
                 className={classes.table}
                 size="small"
                 style={{ display: tableDisplayValueForScroll }}>
-                <ResultsTableHead />
+                <ResultsTableHead resourceType={resourceType} />
 
                 <TableBody
                   style={{
@@ -486,7 +320,7 @@ class SearchResultsTable extends React.Component {
                       key={result.id}
                       className={classes.tableRow}
                       onClick={() => this.handleRowClick(result.id)}>
-                      {resourceType === 'entrances' && (
+                      {resourceType === ADVANCED_SEARCH_TYPES.ENTRANCES && (
                         <>
                           <TableCell>{result.name}</TableCell>
                           <TableCell>
@@ -525,7 +359,7 @@ class SearchResultsTable extends React.Component {
                           </TableCell>
                         </>
                       )}
-                      {resourceType === 'grottos' && (
+                      {resourceType === ADVANCED_SEARCH_TYPES.ORGANIZATIONS && (
                         <>
                           <TableCell>{result.name}</TableCell>
                           <TableCell>
@@ -548,7 +382,7 @@ class SearchResultsTable extends React.Component {
                           </TableCell>
                         </>
                       )}
-                      {resourceType === 'massifs' && (
+                      {resourceType === ADVANCED_SEARCH_TYPES.MASSIFS && (
                         <>
                           <TableCell>{result.name}</TableCell>
                           <TableCell>
@@ -559,7 +393,7 @@ class SearchResultsTable extends React.Component {
                           </TableCell>
                         </>
                       )}
-                      {resourceType === 'documents' && (
+                      {resourceType === ADVANCED_SEARCH_TYPES.DOCUMENTS && (
                         <>
                           <TableCell>{result.title}</TableCell>
                           <TableCell>
@@ -605,15 +439,13 @@ class SearchResultsTable extends React.Component {
                 </Button>
 
                 {!isLoadingFullData &&
-                fullResults.length === totalNbResults &&
-                wantToDownloadCSV ? (
-                  <CSVDownload
-                    data={this.getFullResultsAsCSV()}
-                    target="_self"
-                  />
-                ) : (
-                  ''
-                )}
+                  fullResults.length === totalNbResults &&
+                  wantToDownloadCSV && (
+                    <CSVDownload
+                      data={this.getFullResultsAsCSV()}
+                      target="_self"
+                    />
+                  )}
 
                 <TablePagination
                   rowsPerPageOptions={[5, 10, 20]}
@@ -641,15 +473,13 @@ class SearchResultsTable extends React.Component {
                 />
               </StyledTableFooter>
 
-              {isLoadingFullData ? (
+              {isLoadingFullData && (
                 <div style={{ display: 'flex', alignItems: 'center' }}>
                   <CircularProgress style={{ marginRight: '5px' }} />
                   <Translate>Loading full data, please wait...</Translate>
                 </div>
-              ) : (
-                ''
               )}
-              {!canDownloadDataAsCSV ? (
+              {!canDownloadDataAsCSV && (
                 <>
                   <p className={classes.textError}>
                     <Translate
@@ -662,8 +492,6 @@ class SearchResultsTable extends React.Component {
                     />
                   </p>
                 </>
-              ) : (
-                ''
               )}
             </>
           ) : (
@@ -676,8 +504,6 @@ class SearchResultsTable extends React.Component {
           )}
         </CardContent>
       </Card>
-    ) : (
-      ''
     );
   }
 }
@@ -693,13 +519,8 @@ SearchResultsTable.propTypes = {
   isLoading: PropTypes.bool.isRequired,
   isLoadingFullData: PropTypes.bool.isRequired,
   results: PropTypes.arrayOf(PropTypes.shape({})),
-  resourceType: PropTypes.oneOf([
-    '',
-    'entrances',
-    'grottos',
-    'massifs',
-    'documents'
-  ]).isRequired,
+  resourceType: PropTypes.oneOf(['', ...Object.values(ADVANCED_SEARCH_TYPES)])
+    .isRequired,
   getNewResults: PropTypes.func.isRequired,
   getFullResults: PropTypes.func.isRequired,
   wantToDownloadCSV: PropTypes.bool.isRequired,
