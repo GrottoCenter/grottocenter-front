@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Tabs from '@material-ui/core/Tabs';
-import Tab from '@material-ui/core/Tab';
+import { Tab, Tabs, Card, CardContent } from '@material-ui/core';
 import styled from 'styled-components';
 
 import DocumentSearch from './DocumentSearch';
@@ -10,15 +9,8 @@ import MassifsSearch from './MassifsSearch';
 import OrganizationsSearch from './OrganizationsSearch';
 
 import Translate from '../../common/Translate';
-
+import { ADVANCED_SEARCH_TYPES } from '../../../conf/Config';
 import SearchResultsContainer from '../../../containers/SearchResultsContainer';
-
-const advancedSearchTypes = {
-  ENTRANCES: 'entrances',
-  ORGANIZATIONS: 'grottos',
-  MASSIFS: 'massifs',
-  DOCUMENTS: 'documents'
-};
 
 const TabIcon = styled.img`
   height: 2rem;
@@ -86,42 +78,44 @@ const AdvancedSearch = ({
         />
       </Tabs>
 
-      <>
-        {selectedType === 0 && (
-          <EntrancesSearch
-            startAdvancedsearch={startAdvancedsearch}
-            resourceType={advancedSearchTypes.ENTRANCES}
-            resetResults={resetAdvancedSearch}
-          />
-        )}
-        {selectedType === 1 && (
-          <OrganizationsSearch
-            startAdvancedsearch={startAdvancedsearch}
-            resourceType={advancedSearchTypes.ORGANIZATIONS}
-            resetResults={resetAdvancedSearch}
-          />
-        )}
-        {selectedType === 2 && (
-          <MassifsSearch
-            startAdvancedsearch={startAdvancedsearch}
-            resourceType={advancedSearchTypes.MASSIFS}
-            resetResults={resetAdvancedSearch}
-          />
-        )}
-        {selectedType === 3 && (
-          <DocumentSearch
-            startAdvancedsearch={startAdvancedsearch}
-            resourceType={advancedSearchTypes.DOCUMENTS}
-            resetResults={resetAdvancedSearch}
-            getAllDocumentTypes={getDocumentTypes}
-            allDocumentTypes={documentTypes}
-            getAllSubjects={getSubjects}
-            allSubjects={subjects}
-          />
-        )}
+      <Card>
+        <CardContent>
+          {selectedType === 0 && (
+            <EntrancesSearch
+              startAdvancedsearch={startAdvancedsearch}
+              resourceType={ADVANCED_SEARCH_TYPES.ENTRANCES}
+              resetResults={resetAdvancedSearch}
+            />
+          )}
+          {selectedType === 1 && (
+            <OrganizationsSearch
+              startAdvancedsearch={startAdvancedsearch}
+              resourceType={ADVANCED_SEARCH_TYPES.ORGANIZATIONS}
+              resetResults={resetAdvancedSearch}
+            />
+          )}
+          {selectedType === 2 && (
+            <MassifsSearch
+              startAdvancedsearch={startAdvancedsearch}
+              resourceType={ADVANCED_SEARCH_TYPES.MASSIFS}
+              resetResults={resetAdvancedSearch}
+            />
+          )}
+          {selectedType === 3 && (
+            <DocumentSearch
+              startAdvancedsearch={startAdvancedsearch}
+              resourceType={ADVANCED_SEARCH_TYPES.DOCUMENTS}
+              resetResults={resetAdvancedSearch}
+              getAllDocumentTypes={getDocumentTypes}
+              allDocumentTypes={documentTypes}
+              getAllSubjects={getSubjects}
+              allSubjects={subjects}
+            />
+          )}
 
-        <SearchResultsContainer />
-      </>
+          <SearchResultsContainer />
+        </CardContent>
+      </Card>
     </div>
   );
 };

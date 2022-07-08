@@ -40,8 +40,12 @@ export const AVAILABLE_LANGUAGES = {
 
 export const DEFAULT_LANGUAGE = AVAILABLE_LANGUAGES.en;
 
-export const FR_GC_BLOG = `${API_URL}/api/rss/FR`;
-export const EN_GC_BLOG = `${API_URL}/api/rss/EN`;
+export const ADVANCED_SEARCH_TYPES = {
+  ENTRANCES: 'entrances',
+  ORGANIZATIONS: 'grottos',
+  MASSIFS: 'massifs',
+  DOCUMENTS: 'documents'
+};
 
 function generateLinks(link, defaultLang) {
   const resultArray = {};
@@ -53,6 +57,10 @@ function generateLinks(link, defaultLang) {
 }
 
 // ===== Misc links
+
+export const FR_GC_BLOG = `${API_URL}/api/rss/FR`;
+export const EN_GC_BLOG = `${API_URL}/api/rss/EN`;
+
 export const bbsLink = {
   '*': 'https://www.ssslib.ch/bbs/'
 };

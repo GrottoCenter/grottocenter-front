@@ -3,8 +3,6 @@ import PropTypes from 'prop-types';
 import { pathOr } from 'ramda';
 import { injectIntl } from 'react-intl';
 import {
-  Card,
-  CardContent,
   FormControl,
   FormLabel,
   TextField,
@@ -193,248 +191,242 @@ class EntrancesSearch extends React.Component {
     } = this.state;
 
     return (
-      <Card>
-        <CardContent>
-          <form
-            noValidate
-            autoComplete="off"
-            onSubmit={event => {
-              event.preventDefault();
-              startAdvancedsearch(this.state, resourceType);
-            }}
-            className={classes.formContainer}>
-            <Typography variant="h6">
-              <Translate>Entrance properties</Translate>
-            </Typography>
-            <div
-              className={classes.formPartContainer}
-              style={{ justifyContent: 'flex-start' }}>
-              <TextField
-                className={classes.formElement}
-                label={intl.formatMessage({
-                  id: 'Entrance name'
-                })}
-                onChange={event => this.handleValueChange('name', event)}
-                value={name}
-              />
-            </div>
+      <form
+        noValidate
+        autoComplete="off"
+        onSubmit={event => {
+          event.preventDefault();
+          startAdvancedsearch(this.state, resourceType);
+        }}
+        className={classes.formContainer}>
+        <Typography variant="h6">
+          <Translate>Entrance properties</Translate>
+        </Typography>
+        <div
+          className={classes.formPartContainer}
+          style={{ justifyContent: 'flex-start' }}>
+          <TextField
+            className={classes.formElement}
+            label={intl.formatMessage({
+              id: 'Entrance name'
+            })}
+            onChange={event => this.handleValueChange('name', event)}
+            value={name}
+          />
+        </div>
 
-            <fieldset className={classes.fieldset}>
-              <legend className={classes.legend}>
-                <Translate>Localization</Translate>
-              </legend>
+        <fieldset className={classes.fieldset}>
+          <legend className={classes.legend}>
+            <Translate>Localization</Translate>
+          </legend>
 
-              <div className={classes.formPartContainer}>
-                <TextField
-                  className={classes.formElement}
-                  label={intl.formatMessage({
-                    id: 'City'
-                  })}
-                  onChange={event => this.handleValueChange('city', event)}
-                  value={city}
-                />
-
-                <TextField
-                  className={classes.formElement}
-                  label={intl.formatMessage({
-                    id: 'County'
-                  })}
-                  onChange={event => this.handleValueChange('county', event)}
-                  value={county}
-                />
-
-                <TextField
-                  className={classes.formElement}
-                  label={intl.formatMessage({
-                    id: 'Region'
-                  })}
-                  onChange={event => this.handleValueChange('region', event)}
-                  value={region}
-                />
-
-                <TextField
-                  className={classes.formElement}
-                  label={intl.formatMessage({
-                    id: 'Country'
-                  })}
-                  onChange={event => this.handleValueChange('country', event)}
-                  value={country}
-                />
-
-                <TextField
-                  className={classes.formElement}
-                  label={intl.formatMessage({
-                    id: 'Massif name'
-                  })}
-                  onChange={event =>
-                    this.handleValueChange('massif name', event)
-                  }
-                  value={massifName}
-                />
-              </div>
-            </fieldset>
-
-            <fieldset className={classes.fieldset}>
-              <legend className={classes.legend}>
-                <Translate>Rating criterias</Translate>
-              </legend>
-              <div className={classes.formPartContainer}>
-                <SliderForm
-                  label={intl.formatMessage({
-                    id: 'Aesthetic'
-                  })}
-                  disabled={!aestheticismRange.isEditable}
-                  onDisable={this.handleCheckedChange('aestheticism-range')}
-                  min={aestheticismMinValue}
-                  max={aestheticismMaxValue}
-                  onChange={values => {
-                    this.handleRangeChange(
-                      'aestheticism-range',
-                      values,
-                      aestheticismMinValue,
-                      aestheticismMaxValue
-                    );
-                  }}
-                  value={[aestheticismRange.min, aestheticismRange.max]}
-                />
-                <SliderForm
-                  label={intl.formatMessage({
-                    id: 'Ease of move'
-                  })}
-                  disabled={!cavingRange.isEditable}
-                  onDisable={this.handleCheckedChange('caving-range')}
-                  min={cavingMinValue}
-                  max={cavingMaxValue}
-                  onChange={values => {
-                    this.handleRangeChange(
-                      'caving-range',
-                      values,
-                      cavingMinValue,
-                      cavingMaxValue
-                    );
-                  }}
-                  value={[cavingRange.min, cavingRange.max]}
-                />
-                <SliderForm
-                  label={intl.formatMessage({
-                    id: 'Ease of reach'
-                  })}
-                  disabled={!approachRange.isEditable}
-                  onDisable={this.handleCheckedChange('approach-range')}
-                  min={approachMinValue}
-                  max={approachMaxValue}
-                  onChange={values => {
-                    this.handleRangeChange(
-                      'approach-range',
-                      values,
-                      approachMinValue,
-                      approachMaxValue
-                    );
-                  }}
-                  value={[approachRange.min, approachRange.max]}
-                />
-              </div>
-            </fieldset>
-
-            <fieldset className={classes.fieldset}>
-              <legend className={classes.legend}>
-                <Translate>Network properties</Translate>
-              </legend>
-
-              <div className={classes.formPartContainer}>
-                <TextField
-                  className={classes.formElement}
-                  label={intl.formatMessage({
-                    id: 'Network name'
-                  })}
-                  onChange={event => this.handleValueChange('cave name', event)}
-                  value={caveName}
-                />
-
-                <DivingTypesForm
-                  onChange={event =>
-                    this.handleValueChange('cave is diving-bool', event)
-                  }
-                  value={caveIsDiving}
-                />
-                <SliderForm
-                  label={intl.formatMessage({
-                    id: 'Depth'
-                  })}
-                  helperText={intl.formatMessage({
-                    id: 'In meters'
-                  })}
-                  disabled={!caveDepthRange.isEditable}
-                  onDisable={this.handleCheckedChange('cave depth-range')}
-                  min={caveDepthMinValue}
-                  max={caveDepthMaxValue}
-                  onChange={values => {
-                    this.handleRangeChange(
-                      'cave depth-range',
-                      values,
-                      caveDepthMinValue,
-                      caveDepthMaxValue
-                    );
-                  }}
-                  value={[caveDepthRange.min, caveDepthRange.max]}
-                />
-
-                <SliderForm
-                  label={intl.formatMessage({
-                    id: 'Length'
-                  })}
-                  helperText={intl.formatMessage({
-                    id: 'In meters'
-                  })}
-                  disabled={!caveLengthRange.isEditable}
-                  onDisable={this.handleCheckedChange('cave length-range')}
-                  min={caveLengthMinValue}
-                  max={caveLengthMaxValue}
-                  onChange={values => {
-                    this.handleRangeChange(
-                      'cave length-range',
-                      values,
-                      caveLengthMinValue,
-                      caveLengthMaxValue
-                    );
-                  }}
-                  value={[caveLengthRange.min, caveLengthRange.max]}
-                />
-              </div>
-            </fieldset>
-
-            <div
-              className={classes.formPartContainer}
-              style={{ justifyContent: 'flex-start' }}>
-              <FormControl>
-                <FormLabel className={classes.formLabel}>
-                  <Translate>
-                    {matchAllFields
-                      ? 'Matching all fields'
-                      : 'Matching at least one field'}
-                  </Translate>
-                  <Switch
-                    checked={matchAllFields}
-                    onChange={this.handleBooleanChange('matchAllFields')}
-                    value={matchAllFields}
-                  />
-                </FormLabel>
-                <FormHelperText>
-                  <Translate>
-                    Specify if the search results must match all the fields you
-                    typed above (default is yes).
-                  </Translate>
-                </FormHelperText>
-              </FormControl>
-            </div>
-
-            <SearchBottomActionButtons
-              resetResults={resetResults}
-              resetParentState={this.resetToInitialState}
+          <div className={classes.formPartContainer}>
+            <TextField
+              className={classes.formElement}
+              label={intl.formatMessage({
+                id: 'City'
+              })}
+              onChange={event => this.handleValueChange('city', event)}
+              value={city}
             />
-          </form>
-        </CardContent>
-      </Card>
+
+            <TextField
+              className={classes.formElement}
+              label={intl.formatMessage({
+                id: 'County'
+              })}
+              onChange={event => this.handleValueChange('county', event)}
+              value={county}
+            />
+
+            <TextField
+              className={classes.formElement}
+              label={intl.formatMessage({
+                id: 'Region'
+              })}
+              onChange={event => this.handleValueChange('region', event)}
+              value={region}
+            />
+
+            <TextField
+              className={classes.formElement}
+              label={intl.formatMessage({
+                id: 'Country'
+              })}
+              onChange={event => this.handleValueChange('country', event)}
+              value={country}
+            />
+
+            <TextField
+              className={classes.formElement}
+              label={intl.formatMessage({
+                id: 'Massif name'
+              })}
+              onChange={event => this.handleValueChange('massif name', event)}
+              value={massifName}
+            />
+          </div>
+        </fieldset>
+
+        <fieldset className={classes.fieldset}>
+          <legend className={classes.legend}>
+            <Translate>Rating criterias</Translate>
+          </legend>
+          <div className={classes.formPartContainer}>
+            <SliderForm
+              label={intl.formatMessage({
+                id: 'Aesthetic'
+              })}
+              disabled={!aestheticismRange.isEditable}
+              onDisable={this.handleCheckedChange('aestheticism-range')}
+              min={aestheticismMinValue}
+              max={aestheticismMaxValue}
+              onChange={values => {
+                this.handleRangeChange(
+                  'aestheticism-range',
+                  values,
+                  aestheticismMinValue,
+                  aestheticismMaxValue
+                );
+              }}
+              value={[aestheticismRange.min, aestheticismRange.max]}
+            />
+            <SliderForm
+              label={intl.formatMessage({
+                id: 'Ease of move'
+              })}
+              disabled={!cavingRange.isEditable}
+              onDisable={this.handleCheckedChange('caving-range')}
+              min={cavingMinValue}
+              max={cavingMaxValue}
+              onChange={values => {
+                this.handleRangeChange(
+                  'caving-range',
+                  values,
+                  cavingMinValue,
+                  cavingMaxValue
+                );
+              }}
+              value={[cavingRange.min, cavingRange.max]}
+            />
+            <SliderForm
+              label={intl.formatMessage({
+                id: 'Ease of reach'
+              })}
+              disabled={!approachRange.isEditable}
+              onDisable={this.handleCheckedChange('approach-range')}
+              min={approachMinValue}
+              max={approachMaxValue}
+              onChange={values => {
+                this.handleRangeChange(
+                  'approach-range',
+                  values,
+                  approachMinValue,
+                  approachMaxValue
+                );
+              }}
+              value={[approachRange.min, approachRange.max]}
+            />
+          </div>
+        </fieldset>
+
+        <fieldset className={classes.fieldset}>
+          <legend className={classes.legend}>
+            <Translate>Network properties</Translate>
+          </legend>
+
+          <div className={classes.formPartContainer}>
+            <TextField
+              className={classes.formElement}
+              label={intl.formatMessage({
+                id: 'Network name'
+              })}
+              onChange={event => this.handleValueChange('cave name', event)}
+              value={caveName}
+            />
+
+            <DivingTypesForm
+              onChange={event =>
+                this.handleValueChange('cave is diving-bool', event)
+              }
+              value={caveIsDiving}
+            />
+            <SliderForm
+              label={intl.formatMessage({
+                id: 'Depth'
+              })}
+              helperText={intl.formatMessage({
+                id: 'In meters'
+              })}
+              disabled={!caveDepthRange.isEditable}
+              onDisable={this.handleCheckedChange('cave depth-range')}
+              min={caveDepthMinValue}
+              max={caveDepthMaxValue}
+              onChange={values => {
+                this.handleRangeChange(
+                  'cave depth-range',
+                  values,
+                  caveDepthMinValue,
+                  caveDepthMaxValue
+                );
+              }}
+              value={[caveDepthRange.min, caveDepthRange.max]}
+            />
+
+            <SliderForm
+              label={intl.formatMessage({
+                id: 'Length'
+              })}
+              helperText={intl.formatMessage({
+                id: 'In meters'
+              })}
+              disabled={!caveLengthRange.isEditable}
+              onDisable={this.handleCheckedChange('cave length-range')}
+              min={caveLengthMinValue}
+              max={caveLengthMaxValue}
+              onChange={values => {
+                this.handleRangeChange(
+                  'cave length-range',
+                  values,
+                  caveLengthMinValue,
+                  caveLengthMaxValue
+                );
+              }}
+              value={[caveLengthRange.min, caveLengthRange.max]}
+            />
+          </div>
+        </fieldset>
+
+        <div
+          className={classes.formPartContainer}
+          style={{ justifyContent: 'flex-start' }}>
+          <FormControl>
+            <FormLabel className={classes.formLabel}>
+              <Translate>
+                {matchAllFields
+                  ? 'Matching all fields'
+                  : 'Matching at least one field'}
+              </Translate>
+              <Switch
+                checked={matchAllFields}
+                onChange={this.handleBooleanChange('matchAllFields')}
+                value={matchAllFields}
+              />
+            </FormLabel>
+            <FormHelperText>
+              <Translate>
+                Specify if the search results must match all the fields you
+                typed above (default is yes).
+              </Translate>
+            </FormHelperText>
+          </FormControl>
+        </div>
+
+        <SearchBottomActionButtons
+          resetResults={resetResults}
+          resetParentState={this.resetToInitialState}
+        />
+      </form>
     );
   }
 }

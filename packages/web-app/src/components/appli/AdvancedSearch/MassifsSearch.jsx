@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
-import { Card, CardContent, TextField, Typography } from '@material-ui/core';
+import { TextField, Typography } from '@material-ui/core';
 
 import SearchBottomActionButtons from './SearchBottomActionButtons';
 import Translate from '../../common/Translate';
@@ -45,36 +45,32 @@ class MassifsSearch extends React.Component {
     const { name } = this.state;
 
     return (
-      <Card>
-        <CardContent>
-          <form
-            noValidate
-            autoComplete="off"
-            onSubmit={event => {
-              event.preventDefault();
-              startAdvancedsearch(this.state, resourceType);
-            }}>
-            <Typography variant="h6">
-              <Translate>Massif properties</Translate>
-            </Typography>
+      <form
+        noValidate
+        autoComplete="off"
+        onSubmit={event => {
+          event.preventDefault();
+          startAdvancedsearch(this.state, resourceType);
+        }}>
+        <Typography variant="h6">
+          <Translate>Massif properties</Translate>
+        </Typography>
 
-            <TextField
-              label={
-                <span>
-                  <Translate>Massif name</Translate>
-                </span>
-              }
-              onChange={event => this.handleValueChange('name', event)}
-              value={name}
-            />
+        <TextField
+          label={
+            <span>
+              <Translate>Massif name</Translate>
+            </span>
+          }
+          onChange={event => this.handleValueChange('name', event)}
+          value={name}
+        />
 
-            <SearchBottomActionButtons
-              resetResults={resetResults}
-              resetParentState={this.resetToInitialState}
-            />
-          </form>
-        </CardContent>
-      </Card>
+        <SearchBottomActionButtons
+          resetResults={resetResults}
+          resetParentState={this.resetToInitialState}
+        />
+      </form>
     );
   }
 }
