@@ -89,36 +89,28 @@ const AdvancedSearch = ({
       <>
         {selectedType === 0 && (
           <EntrancesSearch
-            startAdvancedsearch={(state, resourceType) => {
-              startAdvancedsearch(state, resourceType);
-            }}
+            startAdvancedsearch={startAdvancedsearch}
             resourceType={advancedSearchTypes.ENTRANCES}
             resetResults={resetAdvancedSearch}
           />
         )}
         {selectedType === 1 && (
           <OrganizationsSearch
-            startAdvancedsearch={(state, resourceType) => {
-              startAdvancedsearch(state, resourceType);
-            }}
+            startAdvancedsearch={startAdvancedsearch}
             resourceType={advancedSearchTypes.ORGANIZATIONS}
             resetResults={resetAdvancedSearch}
           />
         )}
         {selectedType === 2 && (
           <MassifsSearch
-            startAdvancedsearch={(state, resourceType) => {
-              startAdvancedsearch(state, resourceType);
-            }}
+            startAdvancedsearch={startAdvancedsearch}
             resourceType={advancedSearchTypes.MASSIFS}
             resetResults={resetAdvancedSearch}
           />
         )}
         {selectedType === 3 && (
           <DocumentSearch
-            startAdvancedsearch={(state, resourceType) => {
-              startAdvancedsearch(state, resourceType);
-            }}
+            startAdvancedsearch={startAdvancedsearch}
             resourceType={advancedSearchTypes.DOCUMENTS}
             resetResults={resetAdvancedSearch}
             getAllDocumentTypes={getDocumentTypes}
