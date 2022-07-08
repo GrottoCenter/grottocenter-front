@@ -4,8 +4,6 @@ import { withStyles } from '@material-ui/core/styles';
 import { injectIntl } from 'react-intl';
 
 import {
-  Card,
-  CardContent,
   FormControl,
   TextField,
   Switch,
@@ -130,151 +128,145 @@ class OrganizationsSearch extends React.Component {
     } = this.state;
 
     return (
-      <Card>
-        <CardContent>
-          <form
-            noValidate
-            autoComplete="off"
-            onSubmit={event => {
-              event.preventDefault();
-              startAdvancedsearch(this.state, resourceType);
+      <form
+        noValidate
+        autoComplete="off"
+        onSubmit={event => {
+          event.preventDefault();
+          startAdvancedsearch(this.state, resourceType);
+        }}
+        className={classes.formContainer}>
+        <Typography variant="h6">
+          <Translate>Organization properties</Translate>
+        </Typography>
+        <div
+          className={classes.formPartContainer}
+          style={{ justifyContent: 'flex-start' }}>
+          <TextField
+            className={classes.formElement}
+            label={
+              <span>
+                <Translate>Organization name</Translate>
+              </span>
+            }
+            onChange={event => this.handleValueChange('name', event)}
+            value={name}
+          />
+          <SliderForm
+            label={intl.formatMessage({
+              id: 'Number of cavers'
+            })}
+            disabled={!numberOfCaversRange.isEditable}
+            onDisable={this.handleCheckedChange('nb cavers-range')}
+            min={numberOfCaversMinValue}
+            max={numberOfCaversMaxValue}
+            onChange={values => {
+              this.handleRangeChange(
+                'nb cavers-range',
+                values,
+                numberOfCaversMinValue,
+                numberOfCaversMaxValue
+              );
             }}
-            className={classes.formContainer}>
-            <Typography variant="h6">
-              <Translate>Organization properties</Translate>
-            </Typography>
-            <div
-              className={classes.formPartContainer}
-              style={{ justifyContent: 'flex-start' }}>
-              <TextField
-                className={classes.formElement}
-                label={
-                  <span>
-                    <Translate>Organization name</Translate>
-                  </span>
-                }
-                onChange={event => this.handleValueChange('name', event)}
-                value={name}
-              />
-              <SliderForm
-                label={intl.formatMessage({
-                  id: 'Number of cavers'
-                })}
-                disabled={!numberOfCaversRange.isEditable}
-                onDisable={this.handleCheckedChange('nb cavers-range')}
-                min={numberOfCaversMinValue}
-                max={numberOfCaversMaxValue}
-                onChange={values => {
-                  this.handleRangeChange(
-                    'nb cavers-range',
-                    values,
-                    numberOfCaversMinValue,
-                    numberOfCaversMaxValue
-                  );
-                }}
-                value={[numberOfCaversRange.min, numberOfCaversRange.max]}
-              />
-            </div>
+            value={[numberOfCaversRange.min, numberOfCaversRange.max]}
+          />
+        </div>
 
-            <fieldset className={classes.fieldset}>
-              <legend className={classes.legend}>
-                <Translate>Localization</Translate>
-              </legend>
+        <fieldset className={classes.fieldset}>
+          <legend className={classes.legend}>
+            <Translate>Localization</Translate>
+          </legend>
 
-              <div className={classes.formPartContainer}>
-                <TextField
-                  className={classes.formElement}
-                  label={
-                    <span>
-                      <Translate>City</Translate>
-                    </span>
-                  }
-                  onChange={event => this.handleValueChange('city', event)}
-                  value={city}
-                />
-
-                <TextField
-                  className={classes.formElement}
-                  label={
-                    <span>
-                      <Translate>Postal code</Translate>
-                    </span>
-                  }
-                  onChange={event =>
-                    this.handleValueChange('postal_code', event)
-                  }
-                  value={postal_code} // eslint-disable-line camelcase
-                />
-
-                <TextField
-                  className={classes.formElement}
-                  label={
-                    <span>
-                      <Translate>County</Translate>
-                    </span>
-                  }
-                  onChange={event => this.handleValueChange('county', event)}
-                  value={county}
-                />
-
-                <TextField
-                  className={classes.formElement}
-                  label={
-                    <span>
-                      <Translate>Region</Translate>
-                    </span>
-                  }
-                  onChange={event => this.handleValueChange('region', event)}
-                  value={region}
-                />
-
-                <TextField
-                  className={classes.formElement}
-                  label={
-                    <span>
-                      <Translate>Country</Translate>
-                    </span>
-                  }
-                  onChange={event => this.handleValueChange('country', event)}
-                  value={country}
-                />
-              </div>
-            </fieldset>
-
-            <div
-              className={classes.formPartContainer}
-              style={{ justifyContent: 'flex-start' }}>
-              <FormControl>
-                <FormLabel className={classes.formLabel}>
-                  <span>
-                    <Translate>
-                      {matchAllFields
-                        ? 'Matching all fields'
-                        : 'Matching at least one field'}
-                    </Translate>
-                  </span>
-                  <Switch
-                    checked={matchAllFields}
-                    onChange={this.handleBooleanChange('matchAllFields')}
-                    value={matchAllFields}
-                  />
-                </FormLabel>
-                <FormHelperText>
-                  <Translate>
-                    Specify if the search results must match all the fields you
-                    typed above (default is yes).
-                  </Translate>
-                </FormHelperText>
-              </FormControl>
-            </div>
-
-            <SearchBottomActionButtons
-              resetResults={resetResults}
-              resetParentState={this.resetToInitialState}
+          <div className={classes.formPartContainer}>
+            <TextField
+              className={classes.formElement}
+              label={
+                <span>
+                  <Translate>City</Translate>
+                </span>
+              }
+              onChange={event => this.handleValueChange('city', event)}
+              value={city}
             />
-          </form>
-        </CardContent>
-      </Card>
+
+            <TextField
+              className={classes.formElement}
+              label={
+                <span>
+                  <Translate>Postal code</Translate>
+                </span>
+              }
+              onChange={event => this.handleValueChange('postal_code', event)}
+              value={postal_code} // eslint-disable-line camelcase
+            />
+
+            <TextField
+              className={classes.formElement}
+              label={
+                <span>
+                  <Translate>County</Translate>
+                </span>
+              }
+              onChange={event => this.handleValueChange('county', event)}
+              value={county}
+            />
+
+            <TextField
+              className={classes.formElement}
+              label={
+                <span>
+                  <Translate>Region</Translate>
+                </span>
+              }
+              onChange={event => this.handleValueChange('region', event)}
+              value={region}
+            />
+
+            <TextField
+              className={classes.formElement}
+              label={
+                <span>
+                  <Translate>Country</Translate>
+                </span>
+              }
+              onChange={event => this.handleValueChange('country', event)}
+              value={country}
+            />
+          </div>
+        </fieldset>
+
+        <div
+          className={classes.formPartContainer}
+          style={{ justifyContent: 'flex-start' }}>
+          <FormControl>
+            <FormLabel className={classes.formLabel}>
+              <span>
+                <Translate>
+                  {matchAllFields
+                    ? 'Matching all fields'
+                    : 'Matching at least one field'}
+                </Translate>
+              </span>
+              <Switch
+                checked={matchAllFields}
+                onChange={this.handleBooleanChange('matchAllFields')}
+                value={matchAllFields}
+              />
+            </FormLabel>
+            <FormHelperText>
+              <Translate>
+                Specify if the search results must match all the fields you
+                typed above (default is yes).
+              </Translate>
+            </FormHelperText>
+          </FormControl>
+        </div>
+
+        <SearchBottomActionButtons
+          resetResults={resetResults}
+          resetParentState={this.resetToInitialState}
+        />
+      </form>
     );
   }
 }
