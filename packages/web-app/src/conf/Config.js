@@ -41,10 +41,10 @@ export const AVAILABLE_LANGUAGES = {
 export const DEFAULT_LANGUAGE = AVAILABLE_LANGUAGES.en;
 
 export const ADVANCED_SEARCH_TYPES = {
+  DOCUMENTS: 'documents',
   ENTRANCES: 'entrances',
-  ORGANIZATIONS: 'grottos',
   MASSIFS: 'massifs',
-  DOCUMENTS: 'documents'
+  ORGANIZATIONS: 'grottos'
 };
 
 function generateLinks(link, defaultLang) {
