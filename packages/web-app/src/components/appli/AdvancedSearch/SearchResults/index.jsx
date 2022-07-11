@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   fetchNextAdvancedsearchResults,
@@ -6,7 +7,7 @@ import {
 } from '../../../../actions/Advancedsearch';
 import SearchResultsTable from './SearchResultsTable';
 
-const SearchResults = () => {
+const SearchResults = ({ onRowClick, selectedIds }) => {
   const {
     fullResults,
     isLoading,
@@ -37,8 +38,15 @@ const SearchResults = () => {
       results={results}
       totalNbResults={totalNbResults}
       wantToDownloadCSV={wantToDownloadCSV}
+      onRowClick={onRowClick}
+      selectedIds={selectedIds}
     />
   );
+};
+
+SearchResults.propTypes = {
+  onRowClick: PropTypes.func,
+  selectedIds: PropTypes.arrayOf(PropTypes.string.isRequired)
 };
 
 export default SearchResults;

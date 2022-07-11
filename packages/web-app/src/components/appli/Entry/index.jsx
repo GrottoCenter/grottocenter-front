@@ -108,7 +108,7 @@ export const Entry = () => {
       )}
       {!isEmpty(descriptions) && <Descriptions descriptions={descriptions} />}
       {!isEmpty(riggings) && <Riggings riggings={riggings} />}
-      {!isEmpty(documents) && <Documents documents={documents} />}
+      {id && <Documents documents={documents} entranceId={id} />}
       {!isEmpty(histories) && <Histories histories={histories} />}
       {!isEmpty(comments) && <Comments comments={comments} />}
       {permissions.isAuth && (

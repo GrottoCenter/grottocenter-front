@@ -14,32 +14,64 @@ import {
   getRiggings
 } from './transformers';
 
+const isUpdateSuccessful = (data, error, loading, prevLoading) => {
+  const updateTerminatedWithSuccess =
+    prevLoading.current === true && loading === false && error === null;
+  return updateTerminatedWithSuccess || isEmpty(data);
+};
+
 const EntryPage = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
   const { loading, data, error } = useSelector(state => state.entry);
-  const { loading: updateLoading, error: updateError } = useSelector(
+  const { loading: entrancePutLoading, error: entrancePutError } = useSelector(
     state => state.entrancePut
   );
-  const prevUpdateLoading = useRef(updateLoading);
+  const prevEntrancePutLoading = useRef(entrancePutLoading);
+  const {
+    loading: associateDocumentLoading,
+    error: associateDocumentError
+  } = useSelector(state => state.associateDocumentToEntrance);
+  const prevAssociateDocumentLoading = useRef(associateDocumentLoading);
 
+  // Initial data loading
   useEffect(() => {
     dispatch(fetchEntry(id));
   }, [id, dispatch]);
 
+  // Fetching entrance after successful update
   useEffect(() => {
-    const updateTerminatedWithSuccess =
-      prevUpdateLoading.current === true &&
-      updateLoading === false &&
-      updateError === null;
-    if (updateTerminatedWithSuccess || isEmpty(data)) {
+    if (
+      isUpdateSuccessful(
+        data,
+        entrancePutError,
+        entrancePutLoading,
+        prevEntrancePutLoading
+      )
+    ) {
       dispatch(fetchEntry(id));
     }
-  }, [dispatch, updateLoading, id, data, updateError]);
-
+  }, [dispatch, data, entrancePutLoading, id, entrancePutError]);
   useEffect(() => {
-    prevUpdateLoading.current = updateLoading;
-  }, [updateLoading]);
+    if (
+      isUpdateSuccessful(
+        data,
+        associateDocumentError,
+        associateDocumentLoading,
+        prevAssociateDocumentLoading
+      )
+    ) {
+      dispatch(fetchEntry(id));
+    }
+  }, [dispatch, data, id, associateDocumentError, associateDocumentLoading]);
+
+  // Track loadings
+  useEffect(() => {
+    prevAssociateDocumentLoading.current = associateDocumentLoading;
+  }, [associateDocumentLoading]);
+  useEffect(() => {
+    prevEntrancePutLoading.current = entrancePutLoading;
+  }, [entrancePutLoading]);
 
   const comments = getComments(propOr([], 'comments', data));
   const descriptions = getDescriptions(propOr([], 'descriptions', data));

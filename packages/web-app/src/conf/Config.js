@@ -236,7 +236,8 @@ export const postCreateDescriptionUrl = `${API_URL}/api/${apiVersion}/descriptio
 export const patchDescriptionUrl = id =>
   `${API_URL}/api/${apiVersion}/descriptions/${id}`;
 export const patchNameUrl = id => `${API_URL}/api/${apiVersion}/names/${id}`;
-
+export const associateDocumentToEntranceUrl = (entranceId, documentId) =>
+  `${API_URL}/api/${apiVersion}/entrances/${entranceId}/documents/${documentId}`;
 export const moveEntranceToCaveUrl = (entranceId, caveId) =>
   `${API_URL}/api/${apiVersion}/entrances/${entranceId}/cave/${caveId}`;
 
