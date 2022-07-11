@@ -68,6 +68,7 @@ const reducer = (state = initialState, action) => {
           locations: [...state.data.locations, action.location]
         }
       };
+
     case UPDATE_LOCATION_SUCCESS:
       return {
         ...initialState,

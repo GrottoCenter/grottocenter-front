@@ -113,6 +113,8 @@ const AdvancedSearch = ({
             />
           )}
 
+          <br />
+
           <SearchResults />
         </CardContent>
       </Card>

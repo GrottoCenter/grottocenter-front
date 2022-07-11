@@ -1,5 +1,6 @@
 import { combineReducers } from 'redux';
 import advancedsearch from './AdvancedsearchReducer';
+import associateDocumentToEntrance from './AssociateDocumentToEntrance';
 import cave from './CaveReducer';
 import cavePost from './CavePostReducer';
 import cavePut from './CavePutReducer';
@@ -55,6 +56,7 @@ import updateLocation from './UpdateLocation';
 
 const GCReducer = combineReducers({
   advancedsearch,
+  associateDocumentToEntrance,
   cave,
   cavePost,
   cavePut,
