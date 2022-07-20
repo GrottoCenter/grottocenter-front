@@ -105,11 +105,6 @@ To prevent a bad commit, we use the Git hooks [husky](https://github.com/typicod
 Some dependencies are not updated or needed due to incompatibility or issues.
 
 Added dependencies:
-
-- [`@craco/craco`](https://github.com/gsoft-inc/craco) used to add babel plugins require for `react-leaflet`.
-  
-  It can be removed once `react-script` use webpack 5 or if `react-leaflet` is patched:
-  [Issue](https://github.com/PaulLeCam/react-leaflet/issues/891#issuecomment-860152169)
   
   *Used on `web-app` package*
 - `eslint-config-react-app`
