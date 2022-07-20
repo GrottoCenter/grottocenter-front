@@ -70,6 +70,7 @@ const DocumentPage = ({
           <Overview {...overview} loading={loading} />
           <StyledDivider />
           <Section
+            license={overview.license}
             loading={loading}
             title={formatMessage({ id: 'Organizations' })}
             content={[
@@ -101,6 +102,7 @@ const DocumentPage = ({
           />
           <StyledDivider />
           <Section
+            license={overview.license}
             loading={loading}
             title={formatMessage({ id: 'Details' })}
             content={[
@@ -167,6 +169,7 @@ const DocumentPage = ({
           />
           <StyledDivider />
           <Section
+            license={overview.license}
             loading={loading}
             title={formatMessage({ id: 'Linked Entities' })}
             content={[

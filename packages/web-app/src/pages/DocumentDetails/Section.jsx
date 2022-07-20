@@ -2,9 +2,14 @@ import { Typography, List, ListItemText } from '@material-ui/core';
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { isEmpty, isNil, is } from 'ramda';
+import { isEmpty, isNil, is, values } from 'ramda';
 import { Skeleton, TreeItem, TreeView as MuiTreeView } from '@material-ui/lab';
-import { ExpandMore, ChevronRight, Launch } from '@material-ui/icons';
+import {
+  ExpandMore,
+  ChevronRight,
+  Launch,
+  ColorizeSharp
+} from '@material-ui/icons';
 
 import { isMobileOnly } from 'react-device-detect';
 
@@ -28,6 +33,15 @@ const ContentWrapper = styled.div`
 const WrapperListItem = styled.div`
   display: flex;
   justify-content: flex-end;
+`;
+
+const LicenseLink = styled(GCLink)`
+  font-size: 11px;
+  flex-direction: column;
+  text-decoration: none;
+  color: inherit;
+  margin: ${({ theme }) => theme.spacing(1)}px;
+  height: ${({ theme }) => theme.spacing(3)}px;
 `;
 
 const ToRightListItemText = styled(ListItemText)`
@@ -90,6 +104,23 @@ const ChildTreeItem = ({ item }) => {
   );
 };
 
+const CheckUrl = ({ value }) => {
+  if (value.endsWith('(URL)')) {
+    return <IsUrl value={value} />;
+  }
+  return <IsNotUrl value={value} />;
+};
+
+function IsUrl(value) {
+  const newUrl = value.value.toString().split(' ');
+
+  return <GCLink href={newUrl[0]}>{newUrl[0]}</GCLink>;
+}
+
+function IsNotUrl(value) {
+  return <Typography>{value.value}</Typography>;
+}
+
 const Item = ({
   Icon,
   label,
@@ -100,7 +131,9 @@ const Item = ({
   CustomComponentProps,
   internalUrl = false,
   isLabelAndIconOnTop = false,
-  isLoading = false
+  isLoading = false,
+  licenseName,
+  licenseUrl
 }) => (
   <Wrapper>
     <IconAndLabelWrapper isLabelAndIconOnTop={isLabelAndIconOnTop}>
@@ -136,6 +169,7 @@ const Item = ({
                 return (
                   <WrapperListItem key={item}>
                     <Component {...props}>{item}</Component>
+                    <LicenseLink href={licenseUrl}>({licenseName})</LicenseLink>
                   </WrapperListItem>
                 );
               })}
@@ -147,7 +181,7 @@ const Item = ({
                 {value}
               </GCLink>
             ) : (
-              <Typography>{value}</Typography>
+              <CheckUrl value={value} />
             ))}
         </>
       )}
@@ -155,7 +189,7 @@ const Item = ({
   </Wrapper>
 );
 
-const Section = ({ title, content, loading }) => {
+const Section = ({ license, title, content, loading }) => {
   const isValueNotEmpty = value => !isEmpty(value) && !isNil(value);
   return (
     <ContentWrapper>
@@ -184,6 +218,8 @@ const Section = ({ title, content, loading }) => {
                 CustomComponentProps={item.CustomComponentProps}
                 isLabelAndIconOnTop={item.isLabelAndIconOnTop}
                 isLoading={item.isLoading}
+                licenseName={license.name}
+                licenseUrl={license.url}
               />
             )
         )
@@ -222,10 +258,18 @@ Item.propTypes = {
   CustomComponent: PropTypes.node,
   CustomComponentProps: PropTypes.shape({}),
   isLabelAndIconOnTop: PropTypes.bool,
-  isLoading: PropTypes.bool
+  isLoading: PropTypes.bool,
+  license: PropTypes.shape({
+    name: PropTypes.string.isRequired,
+    url: PropTypes.string.isRequired
+  })
 };
 
 Section.propTypes = {
+  license: PropTypes.shape({
+    name: PropTypes.string.isRequired,
+    url: PropTypes.string.isRequired
+  }),
   loading: PropTypes.bool.isRequired,
   title: PropTypes.string.isRequired,
   content: PropTypes.arrayOf(
