@@ -8,7 +8,6 @@
     "eslint-config-airbnb": "^18.2.1",
     "eslint-config-prettier": ">=6",
     "eslint-config-react-app": ">=6",
-    "eslint-plugin-flowtype": ">=4",
     "eslint-plugin-import": ">=2",
     "eslint-plugin-jest": ">=24.3.6",
     "eslint-plugin-jsx-a11y": ">=6",
