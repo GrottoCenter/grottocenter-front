@@ -1,10 +1,7 @@
 module.exports = {
   parser: '@typescript-eslint/parser',
   plugins: ['@typescript-eslint', 'prettier'],
-  extends: [
-    'prettier/@typescript-eslint',
-    'plugin:@typescript-eslint/recommended'
-  ],
+  extends: ['prettier', 'plugin:@typescript-eslint/recommended'],
   rules: {
     '@typescript-eslint/explicit-module-boundary-types': 'off',
     // note you must disable the base rule as it can report incorrect errors
