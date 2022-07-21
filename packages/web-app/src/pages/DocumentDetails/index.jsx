@@ -74,7 +74,7 @@ const DocumentPage = ({
             title={formatMessage({ id: 'Organizations' })}
             content={[
               {
-                Icon: (
+                Icon: () => (
                   <OrganizationIcon
                     src="/images/club.svg"
                     alt="Organization icon"
@@ -86,7 +86,7 @@ const DocumentPage = ({
                 internalUrl: true
               },
               {
-                Icon: (
+                Icon: () => (
                   <OrganizationIcon
                     src="/images/club.svg"
                     alt="Organization icon"
@@ -171,26 +171,26 @@ const DocumentPage = ({
             title={formatMessage({ id: 'Linked Entities' })}
             content={[
               {
-                Icon: <Terrain fontSize="large" color="primary" />,
+                Icon: () => <Terrain fontSize="large" color="primary" />,
                 label: formatMessage({ id: 'Massif' }),
                 value: entities.massif?.name,
                 url: `/ui/massifs/${entities.massif?.id}`
               },
               {
-                Icon: <CustomIcon type="entry" />,
+                Icon: () => <CustomIcon type="entry" />,
                 internalUrl: true,
                 label: formatMessage({ id: 'Entrance' }),
                 value: entities.entrance?.name,
                 url: `/ui/entrances/${entities.entrance?.id}`
               },
               {
-                Icon: <CustomIcon type="cave_system" />,
+                Icon: () => <CustomIcon type="cave_system" />,
                 label: formatMessage({ id: 'Cave' }),
                 value: entities.cave?.name,
                 url: `/ui/caves/${entities.cave?.id}`
               },
               {
-                Icon: <DescriptionIcon color="primary" />,
+                Icon: () => <DescriptionIcon color="primary" />,
                 type: 'list',
                 label: formatMessage({ id: 'Files' }),
                 value: entities.files.fileNames,
@@ -198,12 +198,12 @@ const DocumentPage = ({
                 CustomComponentProps: entities.files.fileLinks
               },
               permissions.isModerator && {
-                Icon: <AttachFileIcon color="primary" />,
+                Icon: () => <AttachFileIcon color="primary" />,
                 label: formatMessage({ id: 'Authorization document' }),
                 value: entities.authorizationDocument
               },
               {
-                Icon: <CustomIcon type="bibliography" />,
+                Icon: () => <CustomIcon type="bibliography" />,
                 label: formatMessage({ id: 'Child documents' }),
                 value: documentChildren,
                 type: 'tree',
