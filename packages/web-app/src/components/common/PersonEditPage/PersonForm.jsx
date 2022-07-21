@@ -54,170 +54,167 @@ const PersonEditForm = ({ control, errors, watch, isUser }) => {
   };
 
   return (
-    <>
-      <FormControl component="fieldset" style={{ width: '50vh' }}>
-        <Controller
-          name="user.name"
-          control={control}
-          rules={{ required: true, min: 1 }}
-          render={({ field: { ref, ...field } }) => (
-            <TextField
-              fullWidth
-              required
-              error={!!errors?.user?.name}
-              label={formatMessage({ id: 'Name' })}
-              inputRef={ref}
-              helperText={errors?.user?.name?.message}
-              {...field}
-              onChange={e => field.onChange(e.target.value)}
-              value={field.value}
-            />
-          )}
-        />
-        <Controller
-          name="user.surname"
-          control={control}
-          rules={{ required: true, min: 1 }}
-          render={({ field: { ref, ...field } }) => (
-            <TextField
-              fullWidth
-              required
-              error={!!errors?.user?.surname}
-              label={formatMessage({ id: 'Surname' })}
-              inputRef={ref}
-              helperText={errors?.user?.surname?.message}
-              {...field}
-              onChange={e => field.onChange(e.target.value)}
-              value={field.value}
-            />
-          )}
-        />
-        <Controller
-          name="user.nickname"
-          control={control}
-          rules={{}}
-          render={({ field: { ref, onChange, ...field } }) => (
-            <TextField
-              fullWidth
-              error={!!errors?.user?.nickname}
-              label={formatMessage({ id: 'Nickname' })}
-              inputRef={ref}
-              onChange={onChange}
-              {...field}
-            />
-          )}
-        />
-        {isUser && (
-          <>
-            <Controller
-              name="user.email"
-              control={control}
-              rules={{ validate: validateEmail }}
-              render={({ field: { ref, ...field } }) => (
-                <TextField
-                  fullWidth
-                  error={!!errors?.user?.email}
-                  label={formatMessage({ id: 'New email' })}
-                  inputRef={ref}
-                  helperText={errors?.user?.email?.message}
-                  {...field}
-                  onChange={e => field.onChange(e.target.value)}
-                  value={field.value}
-                  type="email"
-                />
-              )}
-            />
-            <Controller
-              name="user.emailConfirmation"
-              control={control}
-              rules={{
-                validate: value =>
-                  (watch('user.email') !== ''
-                    ? value === watch('user.email')
-                    : true) || formatMessage({ id: 'The mails do not match' })
-              }}
-              render={({ field: { ref, ...field } }) => (
-                <TextField
-                  fullWidth
-                  error={!!errors?.user?.emailConfirmation}
-                  label={formatMessage({ id: 'Email confirmation' })}
-                  helperText={errors?.user?.emailConfirmation?.message}
-                  inputRef={ref}
-                  {...field}
-                  onChange={e => field.onChange(e.target.value)}
-                  value={field.value}
-                  type="email"
-                />
-              )}
-            />
-            <Controller
-              name="user.password"
-              control={control}
-              rules={{ validate: value => (value ? validatePwd : true) }}
-              render={({ field: { ref, ...field } }) => (
-                <StringInput
-                  endAdornment={
-                    <InputAdornment position="end">
-                      <IconButton
-                        aria-label="toggle password visibility"
-                        onClick={toggleIsPasswordVisible}
-                        onMouseDown={handleMouseDownPassword}
-                        edge="end">
-                        {isPasswordVisible ? <Visibility /> : <VisibilityOff />}
-                      </IconButton>
-                    </InputAdornment>
-                  }
-                  fullWidth
-                  valueName={formatMessage({ id: 'New password' })}
-                  error={!!errors?.user?.password}
-                  helperText={errors?.user?.password?.message}
-                  inputRef={ref}
-                  {...field}
-                  onChange={e => field.onChange(e.target.value)}
-                  value={field.value}
-                  type={isPasswordVisible ? 'text' : 'password'}
-                />
-              )}
-            />
-            <Controller
-              name="user.passwordConfirmation"
-              control={control}
-              rules={{
-                validate: value =>
-                  (watch('user.password') !== ''
-                    ? value === watch('user.password')
-                    : true) ||
-                  formatMessage({ id: 'The passwords do not match' })
-              }}
-              render={({ field: { ref, ...field } }) => (
-                <StringInput
-                  endAdornment={
-                    <InputAdornment position="end">
-                      <IconButton
-                        aria-label="toggle password visibility"
-                        onClick={toggleIsPasswordVisible}
-                        onMouseDown={handleMouseDownPassword}
-                        edge="end">
-                        {isPasswordVisible ? <Visibility /> : <VisibilityOff />}
-                      </IconButton>
-                    </InputAdornment>
-                  }
-                  fullWidth
-                  valueName={formatMessage({ id: 'Password confirmation' })}
-                  error={!!errors?.user?.passwordConfirmation}
-                  helperText={errors?.user?.passwordConfirmation?.message}
-                  inputRef={ref}
-                  {...field}
-                  onChange={e => field.onChange(e.target.value)}
-                  value={field.value}
-                  type={isPasswordVisible ? 'text' : 'password'}
-                />
-              )}
-            />
-          </>
+    <FormControl component="fieldset" style={{ width: '50vh' }}>
+      <Controller
+        name="user.name"
+        control={control}
+        rules={{ required: true, min: 1 }}
+        render={({ field: { ref, ...field } }) => (
+          <TextField
+            fullWidth
+            required
+            error={!!errors?.user?.name}
+            label={formatMessage({ id: 'Name' })}
+            inputRef={ref}
+            helperText={errors?.user?.name?.message}
+            {...field}
+            onChange={e => field.onChange(e.target.value)}
+            value={field.value}
+          />
         )}
-      </FormControl>
-    </>
+      />
+      <Controller
+        name="user.surname"
+        control={control}
+        rules={{ required: true, min: 1 }}
+        render={({ field: { ref, ...field } }) => (
+          <TextField
+            fullWidth
+            required
+            error={!!errors?.user?.surname}
+            label={formatMessage({ id: 'Surname' })}
+            inputRef={ref}
+            helperText={errors?.user?.surname?.message}
+            {...field}
+            onChange={e => field.onChange(e.target.value)}
+            value={field.value}
+          />
+        )}
+      />
+      <Controller
+        name="user.nickname"
+        control={control}
+        rules={{}}
+        render={({ field: { ref, onChange, ...field } }) => (
+          <TextField
+            fullWidth
+            error={!!errors?.user?.nickname}
+            label={formatMessage({ id: 'Nickname' })}
+            inputRef={ref}
+            onChange={onChange}
+            {...field}
+          />
+        )}
+      />
+      {isUser && (
+        <>
+          <Controller
+            name="user.email"
+            control={control}
+            rules={{ validate: validateEmail }}
+            render={({ field: { ref, ...field } }) => (
+              <TextField
+                fullWidth
+                error={!!errors?.user?.email}
+                label={formatMessage({ id: 'New email' })}
+                inputRef={ref}
+                helperText={errors?.user?.email?.message}
+                {...field}
+                onChange={e => field.onChange(e.target.value)}
+                value={field.value}
+                type="email"
+              />
+            )}
+          />
+          <Controller
+            name="user.emailConfirmation"
+            control={control}
+            rules={{
+              validate: value =>
+                (watch('user.email') !== ''
+                  ? value === watch('user.email')
+                  : true) || formatMessage({ id: 'The mails do not match' })
+            }}
+            render={({ field: { ref, ...field } }) => (
+              <TextField
+                fullWidth
+                error={!!errors?.user?.emailConfirmation}
+                label={formatMessage({ id: 'Email confirmation' })}
+                helperText={errors?.user?.emailConfirmation?.message}
+                inputRef={ref}
+                {...field}
+                onChange={e => field.onChange(e.target.value)}
+                value={field.value}
+                type="email"
+              />
+            )}
+          />
+          <Controller
+            name="user.password"
+            control={control}
+            rules={{ validate: value => (value ? validatePwd : true) }}
+            render={({ field: { ref, ...field } }) => (
+              <StringInput
+                endAdornment={
+                  <InputAdornment position="end">
+                    <IconButton
+                      aria-label="toggle password visibility"
+                      onClick={toggleIsPasswordVisible}
+                      onMouseDown={handleMouseDownPassword}
+                      edge="end">
+                      {isPasswordVisible ? <Visibility /> : <VisibilityOff />}
+                    </IconButton>
+                  </InputAdornment>
+                }
+                fullWidth
+                valueName={formatMessage({ id: 'New password' })}
+                error={!!errors?.user?.password}
+                helperText={errors?.user?.password?.message}
+                inputRef={ref}
+                {...field}
+                onChange={e => field.onChange(e.target.value)}
+                value={field.value}
+                type={isPasswordVisible ? 'text' : 'password'}
+              />
+            )}
+          />
+          <Controller
+            name="user.passwordConfirmation"
+            control={control}
+            rules={{
+              validate: value =>
+                (watch('user.password') !== ''
+                  ? value === watch('user.password')
+                  : true) || formatMessage({ id: 'The passwords do not match' })
+            }}
+            render={({ field: { ref, ...field } }) => (
+              <StringInput
+                endAdornment={
+                  <InputAdornment position="end">
+                    <IconButton
+                      aria-label="toggle password visibility"
+                      onClick={toggleIsPasswordVisible}
+                      onMouseDown={handleMouseDownPassword}
+                      edge="end">
+                      {isPasswordVisible ? <Visibility /> : <VisibilityOff />}
+                    </IconButton>
+                  </InputAdornment>
+                }
+                fullWidth
+                valueName={formatMessage({ id: 'Password confirmation' })}
+                error={!!errors?.user?.passwordConfirmation}
+                helperText={errors?.user?.passwordConfirmation?.message}
+                inputRef={ref}
+                {...field}
+                onChange={e => field.onChange(e.target.value)}
+                value={field.value}
+                type={isPasswordVisible ? 'text' : 'password'}
+              />
+            )}
+          />
+        </>
+      )}
+    </FormControl>
   );
 };
 
