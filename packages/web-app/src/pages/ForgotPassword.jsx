@@ -46,46 +46,44 @@ const ForgotPasswordPage = ({
     <Layout
       title={formatMessage({ id: 'Reset your password' })}
       content={
-        <>
-          {forgotPasswordRequestSucceeded ? (
-            <>
-              <Typography align="center">
-                {formatMessage({
-                  id: 'Check your email to reset your password.'
-                })}
-              </Typography>
-              <SpacedCenteredButton
-                color="primary"
-                onClick={() => history.push('/')}
-                style={{ display: 'block' }}
-                variant="contained">
-                {formatMessage({ id: 'Go to home page' })}
-              </SpacedCenteredButton>
-            </>
-          ) : (
-            <FormWrapper onSubmit={onForgotPassword}>
-              <StringInput
-                fullWidth
-                hasError={checkIfHasError('email')}
-                onValueChange={onEmailChange}
-                required
-                value={email}
-                valueName={formatMessage({ id: 'Email' })}
-              />
+        forgotPasswordRequestSucceeded ? (
+          <>
+            <Typography align="center">
+              {formatMessage({
+                id: 'Check your email to reset your password.'
+              })}
+            </Typography>
+            <SpacedCenteredButton
+              color="primary"
+              onClick={() => history.push('/')}
+              style={{ display: 'block' }}
+              variant="contained">
+              {formatMessage({ id: 'Go to home page' })}
+            </SpacedCenteredButton>
+          </>
+        ) : (
+          <FormWrapper onSubmit={onForgotPassword}>
+            <StringInput
+              fullWidth
+              hasError={checkIfHasError('email')}
+              onValueChange={onEmailChange}
+              required
+              value={email}
+              valueName={formatMessage({ id: 'Email' })}
+            />
 
-              <SpacedCenteredButton
-                type="submit"
-                size="large"
-                color={loading ? 'default' : 'primary'}>
-                {loading ? (
-                  <CircularProgress size="2.8rem" />
-                ) : (
-                  formatMessage({ id: 'Reset password' })
-                )}
-              </SpacedCenteredButton>
-            </FormWrapper>
-          )}
-        </>
+            <SpacedCenteredButton
+              type="submit"
+              size="large"
+              color={loading ? 'default' : 'primary'}>
+              {loading ? (
+                <CircularProgress size="2.8rem" />
+              ) : (
+                formatMessage({ id: 'Reset password' })
+              )}
+            </SpacedCenteredButton>
+          </FormWrapper>
+        )
       }
     />
   );

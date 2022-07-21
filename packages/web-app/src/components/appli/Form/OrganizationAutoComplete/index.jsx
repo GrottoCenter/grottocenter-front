@@ -31,9 +31,8 @@ const resultEndAdornment = (
 
 // ===================================
 
-const getOrganizationToString = organization => {
-  return `#${organization.id} - ${organization.name}`;
-};
+const getOrganizationToString = organization =>
+  `#${organization.id} - ${organization.name}`;
 
 const OrganizationAutoComplete = ({
   contextValueName,

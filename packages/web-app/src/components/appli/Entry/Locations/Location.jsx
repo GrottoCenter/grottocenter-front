@@ -14,7 +14,7 @@ import EditIcon from '@material-ui/icons/Edit';
 import CancelIcon from '@material-ui/icons/Cancel';
 
 import { locationType } from '../Provider';
-import { makeFormattedText } from '../utils';
+import makeFormattedText from '../utils';
 import CreateLocationForm from '../../Form/LocationForm/index';
 import { updateLocation } from '../../../../actions/UpdateLocation';
 import { usePermissions } from '../../../../hooks';
@@ -50,36 +50,34 @@ const Location = ({ location }) => {
           />
         </Box>
       ) : (
-        <>
-          <ListItemText
-            // whiteSpace property for description multi-lines display
-            style={{ whiteSpace: 'pre-line' }}
-            primary={title}
-            secondary={
-              <>
-                {makeFormattedText(body)}
-                <br />
-                <Typography
-                  component="span"
-                  variant="caption"
-                  color="textPrimary">
-                  {`${!isNil(author.nickname) &&
-                    formatMessage({ id: 'Posted by' })} ${author.nickname} ${
-                    !isNil(creationDate)
-                      ? `- ${formatDate(creationDate, {
-                          year: 'numeric',
-                          month: 'numeric',
-                          day: 'numeric',
-                          hour: 'numeric',
-                          minute: 'numeric'
-                        })}`
-                      : ''
-                  }`}
-                </Typography>
-              </>
-            }
-          />
-        </>
+        <ListItemText
+          // whiteSpace property for description multi-lines display
+          style={{ whiteSpace: 'pre-line' }}
+          primary={title}
+          secondary={
+            <>
+              {makeFormattedText(body)}
+              <br />
+              <Typography
+                component="span"
+                variant="caption"
+                color="textPrimary">
+                {`${!isNil(author.nickname) &&
+                  formatMessage({ id: 'Posted by' })} ${author.nickname} ${
+                  !isNil(creationDate)
+                    ? `- ${formatDate(creationDate, {
+                        year: 'numeric',
+                        month: 'numeric',
+                        day: 'numeric',
+                        hour: 'numeric',
+                        minute: 'numeric'
+                      })}`
+                    : ''
+                }`}
+              </Typography>
+            </>
+          }
+        />
       )}
       {permissions.isAuth && (
         <ListItemIcon style={{ alignSelf: 'start' }}>

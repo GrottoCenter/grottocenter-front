@@ -1,4 +1,10 @@
-import React, { useState, createContext, useEffect, useCallback } from 'react';
+import React, {
+  useState,
+  createContext,
+  useEffect,
+  useCallback,
+  useMemo
+} from 'react';
 import PropTypes from 'prop-types';
 import {
   pathOr,
@@ -101,18 +107,28 @@ const Provider = ({ children, defaultValues = {} }) => {
     setIsFormValid(defaultFormSteps.length === validatedSteps.length);
   }, [validatedSteps]);
 
+  const contextValue = useMemo(
+    () => ({
+      action: {},
+      currentStep,
+      docAttributes: docFormState,
+      isFormValid,
+      resetContext,
+      updateAttribute,
+      updateCurrentStep: setCurrentStep,
+      validatedSteps
+    }),
+    [
+      currentStep,
+      docFormState,
+      isFormValid,
+      resetContext,
+      updateAttribute,
+      validatedSteps
+    ]
+  );
   return (
-    <DocumentFormContext.Provider
-      value={{
-        action: {},
-        currentStep,
-        docAttributes: docFormState,
-        isFormValid,
-        resetContext,
-        updateAttribute,
-        updateCurrentStep: setCurrentStep,
-        validatedSteps
-      }}>
+    <DocumentFormContext.Provider value={contextValue}>
       {children}
     </DocumentFormContext.Provider>
   );

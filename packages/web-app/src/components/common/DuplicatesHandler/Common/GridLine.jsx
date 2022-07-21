@@ -13,15 +13,10 @@ const GridLine = ({
   updateState,
   disabled = false
 }) => {
-  const disableButton = value => {
-    return (
-      equals(render(value), render(stateValue)) || equals(render(value), '')
-    );
-  };
+  const disableButton = value =>
+    equals(render(value), render(stateValue)) || equals(render(value), '');
 
-  const showAdornment = value => {
-    return render(value) !== render(stateValue);
-  };
+  const showAdornment = value => render(value) !== render(stateValue);
 
   // The center cell can't be put in a function, or else each rerender will cause the loss of the focus on the input.
   return (

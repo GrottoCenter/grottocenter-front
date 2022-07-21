@@ -27,23 +27,21 @@ const CustomMapContainer = ({
   isSideMenuOpen = false,
   style,
   children
-}) => {
-  return (
-    <Map
-      wholePage={wholePage}
-      center={center}
-      zoom={zoom}
-      dragging={dragging}
-      scrollWheelZoom={scrollWheelZoom}
-      isSideMenuOpen={isSideMenuOpen}
-      minZoom={5}
-      style={style}
-      preferCanvas>
-      <LayersControl />
-      {children}
-    </Map>
-  );
-};
+}) => (
+  <Map
+    wholePage={wholePage}
+    center={center}
+    zoom={zoom}
+    dragging={dragging}
+    scrollWheelZoom={scrollWheelZoom}
+    isSideMenuOpen={isSideMenuOpen}
+    minZoom={5}
+    style={style}
+    preferCanvas>
+    <LayersControl />
+    {children}
+  </Map>
+);
 
 CustomMapContainer.propTypes = {
   wholePage: PropTypes.bool,

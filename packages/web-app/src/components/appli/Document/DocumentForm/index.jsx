@@ -198,22 +198,20 @@ const DocumentForm = ({ isLoading, onSubmit, onUpdate }) => {
           )}
 
           {currentFormStep === formSteps.length && (
-            <>
-              <FormControl>
-                <SubmitButton
-                  type="submit"
-                  variant="contained"
-                  color="primary"
-                  size="large"
-                  disabled={!isFormValid}>
-                  {isNewDocument ? (
-                    <Translate>Submit</Translate>
-                  ) : (
-                    <Translate>Update</Translate>
-                  )}
-                </SubmitButton>
-              </FormControl>
-            </>
+            <FormControl>
+              <SubmitButton
+                type="submit"
+                variant="contained"
+                color="primary"
+                size="large"
+                disabled={!isFormValid}>
+                {isNewDocument ? (
+                  <Translate>Submit</Translate>
+                ) : (
+                  <Translate>Update</Translate>
+                )}
+              </SubmitButton>
+            </FormControl>
           )}
         </FormWrapper>
       </div>

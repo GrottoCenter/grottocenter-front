@@ -27,7 +27,7 @@ class OrganizationsSearch extends React.Component {
     this.handleRangeChange = this.handleRangeChange.bind(this);
   }
 
-  getInitialState = () => {
+  getInitialState() {
     const { numberOfCaversMinValue, numberOfCaversMaxValue } = this.props;
 
     return {
@@ -44,7 +44,7 @@ class OrganizationsSearch extends React.Component {
       region: '',
       matchAllFields: true
     };
-  };
+  }
 
   /**
    * @param {string} keyName

@@ -3,8 +3,8 @@ import { isNil, isEmpty } from 'ramda';
 import Skeleton from '@material-ui/lab/Skeleton';
 import { useIntl } from 'react-intl';
 import CreateIcon from '@material-ui/icons/Create';
-
 import { Box, IconButton } from '@material-ui/core';
+
 import Layout from '../../common/Layouts/Fixed/FixedContent';
 import CavesList from '../../common/cave/CavesList';
 import EntrancesList from '../../common/entrance/EntrancesList';
@@ -28,16 +28,12 @@ const Massif = ({ isFetching, error, massif, canEdit, onEdit }) => {
     <Layout
       title={title}
       subheader={
-        <>
-          {isFetching && !error ? (
-            <Skeleton />
-          ) : (
-            massif &&
-            `${formatMessage({ id: 'Language' })} : ${
-              massif?.names[0].language
-            }`
-          )}
-        </>
+        isFetching && !error ? (
+          <Skeleton />
+        ) : (
+          massif &&
+          `${formatMessage({ id: 'Language' })} : ${massif?.names[0].language}`
+        )
       }
       content={
         <>

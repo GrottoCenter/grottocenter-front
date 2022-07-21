@@ -41,11 +41,9 @@ const OrganizationEdit = () => {
         !isFetching && !organization ? (
           <CircularProgress />
         ) : (
-          <>
-            <OrganizationForm
-              organizationValues={makeOrganizationValueData(organization)}
-            />
-          </>
+          <OrganizationForm
+            organizationValues={makeOrganizationValueData(organization)}
+          />
         )
       }
     />

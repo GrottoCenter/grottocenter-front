@@ -143,61 +143,59 @@ const PublicationDatePicker = ({ required = false }) => {
 
   return useMemo(
     () => (
-      <>
-        <MuiPickersUtilsProvider utils={DateFnsUtils}>
-          <CustomKeyboardDatePicker
-            inputVariant="filled"
-            margin="normal"
-            id="date-picker-dialog"
-            label={<Translate>Publication Date</Translate>}
-            format={getDisplayedDateFormat()}
-            value={getDateObjFromDateString(publicationDate)}
-            onChange={date => handleDateChange(date)}
-            KeyboardButtonProps={{
-              'aria-label': 'change date'
-            }}
-            minDate={new Date('1000-01-01')}
-            invalidDateMessage={<Translate>Invalid Date Format</Translate>}
-            disableFuture
-            FormHelperTextProps={formHelperProps}
-            required={required}
-            error={required && publicationDate === ''}
-            views={dateTypes}
-            open={isDatePickerOpen}
-            onClose={() => setIsDatePickerOpen(false)}
-            onOpen={() => setIsDatePickerOpen(true)}
-            cancelLabel={formatMessage({ id: 'Cancel' })}
-            okLabel={formatMessage({ id: 'Ok' })}
-          />
-          <ButtonsFlexWrapper>
-            <DateButton
-              color="primary"
-              size="small"
-              onClick={() => handleDateTypesChanges(['year'])}>
-              <Translate>Year</Translate>
-            </DateButton>
-            <DateButton
-              color="primary"
-              size="small"
-              style={{ margin: '0 4px' }}
-              onClick={() => handleDateTypesChanges(['year', 'month'])}>
-              <Translate>Year & Month</Translate>
-            </DateButton>
-            <DateButton
-              color="primary"
-              size="small"
-              onClick={() => handleDateTypesChanges(['year', 'month', 'date'])}>
-              <Translate>Full Date</Translate>
-            </DateButton>
-          </ButtonsFlexWrapper>
-          <FormHelperText>
-            <Translate>
-              Date on which the document you submit was made public. You can
-              refer to the date indicated on the document.
-            </Translate>
-          </FormHelperText>
-        </MuiPickersUtilsProvider>
-      </>
+      <MuiPickersUtilsProvider utils={DateFnsUtils}>
+        <CustomKeyboardDatePicker
+          inputVariant="filled"
+          margin="normal"
+          id="date-picker-dialog"
+          label={<Translate>Publication Date</Translate>}
+          format={getDisplayedDateFormat()}
+          value={getDateObjFromDateString(publicationDate)}
+          onChange={date => handleDateChange(date)}
+          KeyboardButtonProps={{
+            'aria-label': 'change date'
+          }}
+          minDate={new Date('1000-01-01')}
+          invalidDateMessage={<Translate>Invalid Date Format</Translate>}
+          disableFuture
+          FormHelperTextProps={formHelperProps}
+          required={required}
+          error={required && publicationDate === ''}
+          views={dateTypes}
+          open={isDatePickerOpen}
+          onClose={() => setIsDatePickerOpen(false)}
+          onOpen={() => setIsDatePickerOpen(true)}
+          cancelLabel={formatMessage({ id: 'Cancel' })}
+          okLabel={formatMessage({ id: 'Ok' })}
+        />
+        <ButtonsFlexWrapper>
+          <DateButton
+            color="primary"
+            size="small"
+            onClick={() => handleDateTypesChanges(['year'])}>
+            <Translate>Year</Translate>
+          </DateButton>
+          <DateButton
+            color="primary"
+            size="small"
+            style={{ margin: '0 4px' }}
+            onClick={() => handleDateTypesChanges(['year', 'month'])}>
+            <Translate>Year & Month</Translate>
+          </DateButton>
+          <DateButton
+            color="primary"
+            size="small"
+            onClick={() => handleDateTypesChanges(['year', 'month', 'date'])}>
+            <Translate>Full Date</Translate>
+          </DateButton>
+        </ButtonsFlexWrapper>
+        <FormHelperText>
+          <Translate>
+            Date on which the document you submit was made public. You can refer
+            to the date indicated on the document.
+          </Translate>
+        </FormHelperText>
+      </MuiPickersUtilsProvider>
     ),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     memoizedValues

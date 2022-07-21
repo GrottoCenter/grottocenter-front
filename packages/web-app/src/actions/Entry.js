@@ -80,32 +80,30 @@ export const fetchEntry = entranceId => (dispatch, getState) => {
     );
 };
 
-export const postEntrance = data => {
-  return (dispatch, getState) => {
-    dispatch(postEntranceAction());
+export const postEntrance = data => (dispatch, getState) => {
+  dispatch(postEntranceAction());
 
-    const requestOptions = {
-      method: 'POST',
-      body: JSON.stringify(data),
-      headers: getState().login.authorizationHeader
-    };
-
-    return fetch(postCreateEntranceUrl, requestOptions).then(response => {
-      return response.text().then(responseText => {
-        if (response.status >= 400) {
-          dispatch(
-            postEntranceFailure(
-              makeErrorMessage(response.status, `Bad request: ${responseText}`),
-              response.status
-            )
-          );
-        } else {
-          dispatch(postEntranceSuccess());
-        }
-        return response;
-      });
-    });
+  const requestOptions = {
+    method: 'POST',
+    body: JSON.stringify(data),
+    headers: getState().login.authorizationHeader
   };
+
+  return fetch(postCreateEntranceUrl, requestOptions).then(response =>
+    response.text().then(responseText => {
+      if (response.status >= 400) {
+        dispatch(
+          postEntranceFailure(
+            makeErrorMessage(response.status, `Bad request: ${responseText}`),
+            response.status
+          )
+        );
+      } else {
+        dispatch(postEntranceSuccess());
+      }
+      return response;
+    })
+  );
 };
 
 export const createEntry = entryData => (dispatch, getState) => {

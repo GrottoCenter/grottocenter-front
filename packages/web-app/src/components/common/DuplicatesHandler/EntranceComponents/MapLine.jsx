@@ -34,29 +34,24 @@ const DraggableMarker = ({ position, onChangePosition }) => {
   );
 };
 
-const MapComponent = ({ position, updatePosition }) => {
-  return (
-    <MapContainer
-      zoom={13}
-      style={{ height: '300px', width: '300px' }}
-      center={position}
-      scrollWheelZoom={false}>
-      <TileLayer
-        attribution='&copy; <a href="https://beta.grottocenter.org/">GrottoCenter</a> contributors'
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-      />
+const MapComponent = ({ position, updatePosition }) => (
+  <MapContainer
+    zoom={13}
+    style={{ height: '300px', width: '300px' }}
+    center={position}
+    scrollWheelZoom={false}>
+    <TileLayer
+      attribution='&copy; <a href="https://beta.grottocenter.org/">GrottoCenter</a> contributors'
+      url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+    />
 
-      {isNil(updatePosition) ? (
-        <Marker position={position} />
-      ) : (
-        <DraggableMarker
-          position={position}
-          onChangePosition={updatePosition}
-        />
-      )}
-    </MapContainer>
-  );
-};
+    {isNil(updatePosition) ? (
+      <Marker position={position} />
+    ) : (
+      <DraggableMarker position={position} onChangePosition={updatePosition} />
+    )}
+  </MapContainer>
+);
 
 const MapLine = ({
   position1,
@@ -65,9 +60,8 @@ const MapLine = ({
   updatePositionState
 }) => {
   const { formatMessage } = useIntl();
-  const disableAddButton = value => {
-    return value[0] === positionState[0] && value[1] === positionState[1];
-  };
+  const disableAddButton = value =>
+    value[0] === positionState[0] && value[1] === positionState[1];
 
   const onAddButtonClick = value => {
     const position = {

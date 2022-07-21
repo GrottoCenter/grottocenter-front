@@ -47,103 +47,99 @@ const UserMenu = ({
 
   const isSessionExpired = authTokenExpirationDate < Date.now();
 
-  return (
+  return !isAuth ? (
+    <Button
+      color="inherit"
+      onClick={onLoginClick}
+      startIcon={<AccountCircle />}
+      variant="text">
+      {!isMobileOnly && <Translate>Log in</Translate>}
+    </Button>
+  ) : (
     <>
-      {!isAuth ? (
-        <Button
-          color="inherit"
-          onClick={onLoginClick}
-          startIcon={<AccountCircle />}
-          variant="text">
-          {!isMobileOnly && <Translate>Log in</Translate>}
-        </Button>
-      ) : (
-        <>
-          <IconButton
-            aria-label="account of current user"
-            aria-controls="menu-appbar"
-            aria-haspopup="true"
-            onClick={handleMenu}
-            color="inherit">
-            <AccountCircle />
-          </IconButton>
-          <Menu
-            id="menu-appbar"
-            anchorEl={anchorEl}
-            anchorOrigin={{
-              vertical: 'top',
-              horizontal: 'right'
-            }}
-            keepMounted
-            transformOrigin={{
-              vertical: 'top',
-              horizontal: 'right'
-            }}
-            open={open}
-            onClose={handleClose}>
-            <MenuItem disabled>
+      <IconButton
+        aria-label="account of current user"
+        aria-controls="menu-appbar"
+        aria-haspopup="true"
+        onClick={handleMenu}
+        color="inherit">
+        <AccountCircle />
+      </IconButton>
+      <Menu
+        id="menu-appbar"
+        anchorEl={anchorEl}
+        anchorOrigin={{
+          vertical: 'top',
+          horizontal: 'right'
+        }}
+        keepMounted
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'right'
+        }}
+        open={open}
+        onClose={handleClose}>
+        <MenuItem disabled>
+          {formatMessage(
+            {
+              id: 'Logged as {userNickname}',
+              defaultMessage: 'Logged as {userNickname}'
+            },
+            {
+              userNickname: (
+                <span>
+                  &nbsp;
+                  <b>{userNickname}</b>
+                </span>
+              )
+            }
+          )}
+        </MenuItem>
+        <MenuItem
+          divider
+          disabled
+          style={isSessionExpired ? { opacity: 1 } : {}}>
+          {isSessionExpired ? (
+            <span style={{ color: theme.palette.errorColor }}>
+              {formatMessage({
+                id: 'Your session has expired: please log in again.'
+              })}
+            </span>
+          ) : (
+            <>
               {formatMessage(
                 {
-                  id: 'Logged as {userNickname}',
-                  defaultMessage: 'Logged as {userNickname}'
+                  id:
+                    'Expiration Date: {expirationDate} at {expirationHourAndMinutes}',
+                  defaultMessage:
+                    'Expiration Date: {expirationDate} at {expirationHourAndMinutes}'
                 },
                 {
-                  userNickname: (
+                  expirationDate: (
                     <span>
                       &nbsp;
-                      <b>{userNickname}</b>
+                      {formatDate(authTokenExpirationDate)}
+                      &nbsp;
+                    </span>
+                  ),
+                  expirationHourAndMinutes: (
+                    <span>
+                      &nbsp;
+                      {formatTime(authTokenExpirationDate)}
                     </span>
                   )
                 }
               )}
-            </MenuItem>
-            <MenuItem
-              divider
-              disabled
-              style={isSessionExpired ? { opacity: 1 } : {}}>
-              {isSessionExpired ? (
-                <span style={{ color: theme.palette.errorColor }}>
-                  {formatMessage({
-                    id: 'Your session has expired: please log in again.'
-                  })}
-                </span>
-              ) : (
-                <>
-                  {formatMessage(
-                    {
-                      id:
-                        'Expiration Date: {expirationDate} at {expirationHourAndMinutes}',
-                      defaultMessage:
-                        'Expiration Date: {expirationDate} at {expirationHourAndMinutes}'
-                    },
-                    {
-                      expirationDate: (
-                        <span>
-                          &nbsp;
-                          {formatDate(authTokenExpirationDate)}
-                          &nbsp;
-                        </span>
-                      ),
-                      expirationHourAndMinutes: (
-                        <span>
-                          &nbsp;
-                          {formatTime(authTokenExpirationDate)}
-                        </span>
-                      )
-                    }
-                  )}
-                </>
-              )}
-            </MenuItem>
-            <MenuItem onClick={handleMyAccountClick}>
-              <Translate>My Account</Translate>
-            </MenuItem>
-            <MenuItem onClick={handleLogoutClick}>
-              <Translate>Log out</Translate>
-            </MenuItem>
-          </Menu>
-        </>
-      )}
+            </>
+          )}
+        </MenuItem>
+        <MenuItem onClick={handleMyAccountClick}>
+          <Translate>My Account</Translate>
+        </MenuItem>
+        <MenuItem onClick={handleLogoutClick}>
+          <Translate>Log out</Translate>
+        </MenuItem>
+      </Menu>
     </>
   );
 };

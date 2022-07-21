@@ -43,7 +43,7 @@ class DocumentSearch extends React.Component {
     props.getAllSubjects();
   }
 
-  getInitialState = () => {
+  getInitialState() {
     const { publicationDateMinValue, publicationDateMaxValue } = this.props;
 
     return {
@@ -65,7 +65,7 @@ class DocumentSearch extends React.Component {
       allFieldsRequest: '',
       panelExpanded: 'specific-fields-panel'
     };
-  };
+  }
 
   getSubjectObjFromCode = code => {
     const { allSubjects } = this.props;

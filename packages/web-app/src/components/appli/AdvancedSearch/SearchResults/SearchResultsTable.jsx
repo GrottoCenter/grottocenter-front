@@ -76,7 +76,7 @@ class SearchResultsTable extends React.Component {
 
   // If the results are empty, the component must
   // get back to the initial pagination state.
-  componentDidUpdate = prevProps => {
+  componentDidUpdate(prevProps) {
     const { results: prevResults } = prevProps;
     const { results } = this.props;
     const { from, page, size } = this.state;
@@ -102,7 +102,7 @@ class SearchResultsTable extends React.Component {
         behavior: 'smooth'
       });
     }
-  };
+  }
 
   // ===== Handle functions ===== //
 
@@ -235,17 +235,11 @@ class SearchResultsTable extends React.Component {
         cleanedResults = fullResults.map(result => {
           const cleanedResult = result;
           if (result.regions) {
-            cleanedResult.regions = result.regions
-              .map(s => {
-                return s.names;
-              })
-              .join(', ');
+            cleanedResult.regions = result.regions.map(s => s.names).join(', ');
           }
           if (result.subjects) {
             cleanedResult.subjects = result.subjects
-              .map(s => {
-                return s.code;
-              })
+              .map(s => s.code)
               .join(', ');
           }
           delete cleanedResult.type;
@@ -482,18 +476,16 @@ class SearchResultsTable extends React.Component {
               </div>
             )}
             {!canDownloadDataAsCSV && (
-              <>
-                <p className={classes.textError}>
-                  <Translate
-                    id="Too many results to download ({0}). You can only download {1} results at once."
-                    defaultMessage="Too many results to download ({0}). You can only download {1} results at once."
-                    values={{
-                      0: <b>{totalNbResults}</b>,
-                      1: <b>{MAX_NUMBER_OF_DATA_TO_EXPORT_IN_CSV}</b>
-                    }}
-                  />
-                </p>
-              </>
+              <p className={classes.textError}>
+                <Translate
+                  id="Too many results to download ({0}). You can only download {1} results at once."
+                  defaultMessage="Too many results to download ({0}). You can only download {1} results at once."
+                  values={{
+                    0: <b>{totalNbResults}</b>,
+                    1: <b>{MAX_NUMBER_OF_DATA_TO_EXPORT_IN_CSV}</b>
+                  }}
+                />
+              </p>
             )}
           </>
         ) : (

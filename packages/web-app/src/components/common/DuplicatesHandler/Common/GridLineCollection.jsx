@@ -70,9 +70,7 @@ const GridLineCollection = ({
   };
 
   // Show the adornment if the value is not included in the state.
-  const showAdornment = value => {
-    return !disableButton(value);
-  };
+  const showAdornment = value => !disableButton(value);
 
   return (
     <Grid container direction="row">

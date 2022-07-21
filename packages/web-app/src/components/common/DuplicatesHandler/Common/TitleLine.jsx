@@ -7,13 +7,11 @@ import ActionButton from '../../ActionButton';
 
 const margin = '20px';
 
-const Title = ({ children }) => {
-  return (
-    <Typography variant="h2" color="secondary">
-      {children}
-    </Typography>
-  );
-};
+const Title = ({ children }) => (
+  <Typography variant="h2" color="secondary">
+    {children}
+  </Typography>
+);
 
 const StyledGrid = styled(Grid)`
   margin-top: ${({ theme }) => theme.spacing(2)}px;

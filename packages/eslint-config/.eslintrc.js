@@ -1,6 +1,11 @@
 module.exports = {
-  extends: ['airbnb', 'prettier'],
+  extends: ['airbnb', 'prettier', 'react-app'],
+  parserOptions: {
+    ecmaVersion: 2020
+  },
   rules: {
+    'react/no-unstable-nested-components': 'off', // TODO: remove it and fix them
+
     'brace-style': 'error',
     'object-curly-newline': 'off',
     'func-names': 'off',
@@ -36,5 +41,5 @@ module.exports = {
       }
     }
   },
-  plugins: ['prettier']
+  plugins: ['prettier', 'react', 'react-hooks']
 };

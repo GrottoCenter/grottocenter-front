@@ -13,7 +13,7 @@ import styled from 'styled-components';
 import ScrollableContent from '../../common/Layouts/Fixed/ScrollableContent';
 import { commentsType, commentType } from './Provider';
 import Ratings from './Ratings';
-import { makeFormattedText } from './utils';
+import makeFormattedText from './utils';
 
 const StyledListItemText = styled(ListItemText)`
   width: 100%;

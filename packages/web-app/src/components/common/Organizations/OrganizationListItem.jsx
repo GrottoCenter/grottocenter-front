@@ -9,20 +9,18 @@ const StyledListItem = styled(ListItem)`
   min-width: 250px;
 `;
 
-const OrganizationListItem = ({ orga }) => {
-  return (
-    <StyledListItem
-      button
-      component={React.forwardRef((props, ref) => (
-        <Link {...props} to={`/ui/organizations/${orga.id}`} ref={ref} />
-      ))}>
-      <ListItemText
-        primary={orga.name}
-        primaryTypographyProps={{ style: { whiteSpace: 'normal' } }} // Multiple lines text
-      />
-    </StyledListItem>
-  );
-};
+const OrganizationListItem = ({ orga }) => (
+  <StyledListItem
+    button
+    component={React.forwardRef((props, ref) => (
+      <Link {...props} to={`/ui/organizations/${orga.id}`} ref={ref} />
+    ))}>
+    <ListItemText
+      primary={orga.name}
+      primaryTypographyProps={{ style: { whiteSpace: 'normal' } }} // Multiple lines text
+    />
+  </StyledListItem>
+);
 
 OrganizationListItem.propTypes = {
   orga: PropTypes.shape({

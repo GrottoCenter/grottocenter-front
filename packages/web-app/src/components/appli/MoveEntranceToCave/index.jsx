@@ -32,31 +32,29 @@ const MoveEntranceToCave = () => {
       content={
         <AuthChecker
           componentToDisplay={
-            <>
-              {fetchLoading || fetchError ? (
-                <>
-                  {fetchLoading && (
-                    <>
-                      <Skeleton height={100} />
-                      <Divider />
-                      <Skeleton height={200} />
-                    </>
-                  )}
-                  {fetchError && (
-                    <Alert
-                      severity="error"
-                      content={formatMessage({
-                        id: `An error occured when loading the entrance of id ${entranceId}.`
-                      })}
-                    />
-                  )}
-                </>
-              ) : (
-                !isEmpty(entrance) && (
-                  <MoveEntranceToCaveForm entrance={entrance} />
-                )
-              )}
-            </>
+            fetchLoading || fetchError ? (
+              <>
+                {fetchLoading && (
+                  <>
+                    <Skeleton height={100} />
+                    <Divider />
+                    <Skeleton height={200} />
+                  </>
+                )}
+                {fetchError && (
+                  <Alert
+                    severity="error"
+                    content={formatMessage({
+                      id: `An error occured when loading the entrance of id ${entranceId}.`
+                    })}
+                  />
+                )}
+              </>
+            ) : (
+              !isEmpty(entrance) && (
+                <MoveEntranceToCaveForm entrance={entrance} />
+              )
+            )
           }
         />
       }

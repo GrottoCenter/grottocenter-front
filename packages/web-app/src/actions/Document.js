@@ -125,8 +125,8 @@ export function postDocument(docAttributes) {
       }
     };
 
-    return fetch(postDocumentUrl, requestOptions).then(response => {
-      return response.text().then(responseText => {
+    return fetch(postDocumentUrl, requestOptions).then(response =>
+      response.text().then(responseText => {
         if (response.status >= 400) {
           const errorMessages = [];
           switch (response.status) {
@@ -165,8 +165,8 @@ export function postDocument(docAttributes) {
           dispatch(postDocumentSuccess(response.status));
         }
         return response;
-      });
-    });
+      })
+    );
   };
 }
 
@@ -232,8 +232,8 @@ export function updateDocument(docAttributes) {
     };
 
     return fetch(putDocumentUrl(docAttributes.id), requestOptions).then(
-      response => {
-        return response.text().then(responseText => {
+      response =>
+        response.text().then(responseText => {
           if (response.status >= 400) {
             const errorMessages = [];
             switch (response.status) {
@@ -272,8 +272,7 @@ export function updateDocument(docAttributes) {
             dispatch(updateDocumentSuccess(response.status));
           }
           return response;
-        });
-      }
+        })
     );
   };
 }

@@ -20,37 +20,34 @@ const FileListItem = styled(ListItem)`
   }
 `;
 
-const Files = ({ fileNames, fileLinks, licenseName, licenseUrl }) => {
-  return (
-    !isEmpty(fileNames) && (
-      <List>
-        {fileNames.map((fileName, index) => (
-          <FileListItem key={`${fileName}`} dense>
-            <ListItemText
-              primaryTypographyProps={{ display: 'inline' }}
-              primary={
-                <Button
-                  variant="text"
-                  size="small"
-                  target="_blank"
-                  startIcon={<DownloadIcon />}
-                  href={fileLinks[index].href}>
-                  {fileName}
-                </Button>
-              }
-              secondaryTypographyProps={{ display: 'inline' }}
-              secondary={
-                <LicenseLink internal={false} target="_blank" href={licenseUrl}>
-                  {licenseName}
-                </LicenseLink>
-              }
-            />
-          </FileListItem>
-        ))}
-      </List>
-    )
+const Files = ({ fileNames, fileLinks, licenseName, licenseUrl }) =>
+  !isEmpty(fileNames) && (
+    <List>
+      {fileNames.map((fileName, index) => (
+        <FileListItem key={`${fileName}`} dense>
+          <ListItemText
+            primaryTypographyProps={{ display: 'inline' }}
+            primary={
+              <Button
+                variant="text"
+                size="small"
+                target="_blank"
+                startIcon={<DownloadIcon />}
+                href={fileLinks[index].href}>
+                {fileName}
+              </Button>
+            }
+            secondaryTypographyProps={{ display: 'inline' }}
+            secondary={
+              <LicenseLink internal={false} target="_blank" href={licenseUrl}>
+                {licenseName}
+              </LicenseLink>
+            }
+          />
+        </FileListItem>
+      ))}
+    </List>
   );
-};
 
 Files.propTypes = {
   fileNames: PropTypes.arrayOf(PropTypes.string),

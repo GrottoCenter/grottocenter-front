@@ -93,17 +93,15 @@ const HydratedDocumentDuplicates = ({
     <>
       {showLoading && <LinearProgress $isLoading={showLoading} />}
       {duplicate && isNil(error) && (
-        <>
-          <DuplicatesHandler
-            duplicateType="document"
-            duplicate1={duplicate.document}
-            duplicate2={duplicate.content}
-            titleDuplicate1={formatMessage({ id: 'Duplicate from database' })}
-            titleDuplicate2={formatMessage({ id: 'Duplicate from import' })}
-            handleSubmit={updateDocument}
-            handleNotDuplicatesSubmit={createDocument}
-          />
-        </>
+        <DuplicatesHandler
+          duplicateType="document"
+          duplicate1={duplicate.document}
+          duplicate2={duplicate.content}
+          titleDuplicate1={formatMessage({ id: 'Duplicate from database' })}
+          titleDuplicate2={formatMessage({ id: 'Duplicate from import' })}
+          handleSubmit={updateDocument}
+          handleNotDuplicatesSubmit={createDocument}
+        />
       )}
     </>
   );

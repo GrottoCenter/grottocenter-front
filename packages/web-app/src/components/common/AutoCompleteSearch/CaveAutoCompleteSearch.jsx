@@ -18,9 +18,7 @@ import {
 } from '../../../actions/Quicksearch';
 import { useDebounce } from '../../../hooks';
 
-const getCaveToString = cave => {
-  return cave?.name || '';
-};
+const getCaveToString = cave => cave?.name || '';
 
 const resultEndAdornment = (
   <InputAdornment position="end">

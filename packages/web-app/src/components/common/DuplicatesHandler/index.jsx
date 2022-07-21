@@ -41,7 +41,7 @@ const DuplicatesHandler = ({
       );
       break;
     default:
-      handler = <></>;
+      handler = '';
       break;
   }
 

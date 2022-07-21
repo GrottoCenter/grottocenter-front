@@ -11,14 +11,12 @@ import StandardDialog from '../StandardDialog';
 import Table from './index';
 import { createColumns } from './TableHead';
 
-const makeCustomHeaderRenders = () => {
-  return [
-    {
-      id: 'title',
-      customRender: () => 'Custom title'
-    }
-  ];
-};
+const makeCustomHeaderRenders = () => [
+  {
+    id: 'title',
+    customRender: () => 'Custom title'
+  }
+];
 
 const makeCustomRenders = () => {
   // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -39,9 +37,7 @@ const makeCustomRenders = () => {
     },
     {
       id: 'title',
-      customRender: title => {
-        return <Typography color="error">{title}</Typography>;
-      }
+      customRender: title => <Typography color="error">{title}</Typography>
     }
   ];
 };

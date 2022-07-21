@@ -18,19 +18,17 @@ const Alert = ({
   variant,
   action,
   disableMargins = false
-}) => {
-  return (
-    <StyledAlert
-      disableMargins={disableMargins}
-      severity={severity}
-      icon={icon}
-      variant={variant}
-      action={action}>
-      {title && <AlertTitle style={{ fontWeight: 'bold' }}>{title}</AlertTitle>}
-      {content}
-    </StyledAlert>
-  );
-};
+}) => (
+  <StyledAlert
+    disableMargins={disableMargins}
+    severity={severity}
+    icon={icon}
+    variant={variant}
+    action={action}>
+    {title && <AlertTitle style={{ fontWeight: 'bold' }}>{title}</AlertTitle>}
+    {content}
+  </StyledAlert>
+);
 
 Alert.propTypes = {
   disableMargins: PropTypes.bool,

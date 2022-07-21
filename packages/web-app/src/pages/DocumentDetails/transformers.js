@@ -64,34 +64,32 @@ export const makeDetails = data => {
   };
 };
 
-export const makeEntities = data => {
-  return {
-    massif: {
-      id: data.massif?.id,
-      name: getFirstName(data, 'massif')
-    },
-    cave: {
-      id: data.cave?.id,
-      name: getFirstName(data, 'cave')
-    },
-    entrance: {
-      id: data.entrance?.id,
-      name: getFirstName(data, 'entrance')
-    },
-    files: {
-      fileNames: pipe(propOr([], 'files'), map(propOr('', 'fileName')))(data),
-      fileLinks: pipe(
-        propOr([], 'files'),
-        map(file => ({ href: propOr('', 'completePath', file) }))
-      )(data)
-    },
-    authorizationDocument: pipe(
-      pathOr([], ['authorizationDocument', 'titles']),
-      head,
-      propOr('', 'text')
+export const makeEntities = data => ({
+  massif: {
+    id: data.massif?.id,
+    name: getFirstName(data, 'massif')
+  },
+  cave: {
+    id: data.cave?.id,
+    name: getFirstName(data, 'cave')
+  },
+  entrance: {
+    id: data.entrance?.id,
+    name: getFirstName(data, 'entrance')
+  },
+  files: {
+    fileNames: pipe(propOr([], 'files'), map(propOr('', 'fileName')))(data),
+    fileLinks: pipe(
+      propOr([], 'files'),
+      map(file => ({ href: propOr('', 'completePath', file) }))
     )(data)
-  };
-};
+  },
+  authorizationDocument: pipe(
+    pathOr([], ['authorizationDocument', 'titles']),
+    head,
+    propOr('', 'text')
+  )(data)
+});
 
 export const makeDocumentParent = data => {
   const result = { title: '', url: '' };

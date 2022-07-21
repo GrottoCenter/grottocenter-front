@@ -78,9 +78,11 @@ export const EntranceForm = ({ caveValues = null, entranceValues = null }) => {
     isNewEntrance ? state.cavePost : state.cavePut
   );
   const dispatch = useDispatch();
-  const entityTypeInitialValue = useMemo(() => {
-    return caveValues?.entrances.length > 1 ? ENTRANCE_ONLY : ENTRANCE_AND_CAVE;
-  }, [caveValues?.entrances.length]);
+  const entityTypeInitialValue = useMemo(
+    () =>
+      caveValues?.entrances.length > 1 ? ENTRANCE_ONLY : ENTRANCE_AND_CAVE,
+    [caveValues?.entrances.length]
+  );
   const [entityType, setEntityType] = useState(entityTypeInitialValue);
 
   const {

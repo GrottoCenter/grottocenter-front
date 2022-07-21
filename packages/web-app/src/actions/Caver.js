@@ -47,8 +47,8 @@ export function postCaverGroups(caverId, groups) {
       headers: getState().login.authorizationHeader
     };
 
-    return fetch(postCaverGroupsUrl(caverId), requestOptions).then(response => {
-      return response.text().then(responseText => {
+    return fetch(postCaverGroupsUrl(caverId), requestOptions).then(response =>
+      response.text().then(responseText => {
         if (response.status >= 400) {
           const errorMessages = [];
           switch (response.status) {
@@ -91,8 +91,8 @@ export function postCaverGroups(caverId, groups) {
           dispatch(postCaverGroupsActionSuccess(response.status));
         }
         return response;
-      });
-    });
+      })
+    );
   };
 }
 

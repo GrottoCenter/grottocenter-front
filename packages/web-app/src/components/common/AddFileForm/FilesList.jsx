@@ -17,9 +17,7 @@ import { IS_DELETED } from './FileHelpers';
 const FilesList = ({ files, updateFileName, removeFile, undoRemove }) => {
   const { formatMessage } = useIntl();
 
-  const isFileDeleted = file => {
-    return file.state === IS_DELETED;
-  };
+  const isFileDeleted = file => file.state === IS_DELETED;
 
   return (
     <List

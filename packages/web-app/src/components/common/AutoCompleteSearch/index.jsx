@@ -67,9 +67,16 @@ const InputAdornments = ({ isLoading, hasError }) =>
     </InputAdornment>
   ) : null;
 
-const StyledPopper = hasFixWidth => props => (
-  <ResultsPopper {...props} $hasFixWidth={hasFixWidth} placement="bottom-end" />
-);
+const StyledPopper = hasFixWidth =>
+  function(props) {
+    return (
+      <ResultsPopper
+        {...props}
+        $hasFixWidth={hasFixWidth}
+        placement="bottom-end"
+      />
+    );
+  };
 const AutoCompleteSearch = ({
   suggestions,
   renderOption,

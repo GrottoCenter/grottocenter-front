@@ -44,32 +44,26 @@ const AuthChecker = ({ errorMessageComponent, componentToDisplay }) => {
     dispatch(displayLoginDialog());
   };
 
-  return (
-    <>
-      {permissions.isAuth ? (
-        componentToDisplay
-      ) : (
-        <CenteredBlock>
-          {errorMessageComponent || (
-            <>
-              <ErrorMessage
-                message={formatMessage({
-                  id: 'You must be authenticated in order to use this feature.'
-                })}
-              />
-              <SpacedButton onClick={onLoginClick} variant="contained">
-                {formatMessage({ id: 'Log in' })}
-              </SpacedButton>
-              <SpacedButton
-                onClick={() => history.push('')}
-                variant="contained">
-                {formatMessage({ id: 'Go to home page' })}
-              </SpacedButton>
-            </>
-          )}
-        </CenteredBlock>
+  return permissions.isAuth ? (
+    componentToDisplay
+  ) : (
+    <CenteredBlock>
+      {errorMessageComponent || (
+        <>
+          <ErrorMessage
+            message={formatMessage({
+              id: 'You must be authenticated in order to use this feature.'
+            })}
+          />
+          <SpacedButton onClick={onLoginClick} variant="contained">
+            {formatMessage({ id: 'Log in' })}
+          </SpacedButton>
+          <SpacedButton onClick={() => history.push('')} variant="contained">
+            {formatMessage({ id: 'Go to home page' })}
+          </SpacedButton>
+        </>
       )}
-    </>
+    </CenteredBlock>
   );
 };
 

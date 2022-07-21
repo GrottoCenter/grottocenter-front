@@ -41,19 +41,17 @@ const Organization = ({ error, isLoading, organization, onEdit, canEdit }) => {
             <BadgesSection />
           </Skeleton>
         ) : (
-          <>
-            {!error && (
-              <BadgesSection
-                nbCavers={propOr([], 'cavers', organization).length}
-                nbExploredEntrances={
-                  propOr([], 'exploredEntrances', organization).length
-                }
-                nbExploredNetworks={
-                  propOr([], 'exploredNetworks', organization).length
-                }
-              />
-            )}
-          </>
+          !error && (
+            <BadgesSection
+              nbCavers={propOr([], 'cavers', organization).length}
+              nbExploredEntrances={
+                propOr([], 'exploredEntrances', organization).length
+              }
+              nbExploredNetworks={
+                propOr([], 'exploredNetworks', organization).length
+              }
+            />
+          )
         )
       }
       subheader={

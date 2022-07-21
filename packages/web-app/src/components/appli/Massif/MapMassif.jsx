@@ -13,43 +13,37 @@ const MapMassif = ({ massif }) => {
   }
   // calcul du centre du premier polygone
   const average = arr => arr.reduce((a, b) => a + b, 0) / arr.length;
-  const latitudes = geoJson.coordinates[0][0].map(coord => {
-    return coord[1];
-  });
-  const longitudes = geoJson.coordinates[0][0].map(coord => {
-    return coord[0];
-  });
+  const latitudes = geoJson.coordinates[0][0].map(coord => coord[1]);
+  const longitudes = geoJson.coordinates[0][0].map(coord => coord[0]);
 
   const center = [average(latitudes), average(longitudes)];
 
   return (
-    <>
-      {massif?.geogPolygon && (
-        <CustomMapContainer
-          wholePage={false}
-          dragging
-          viewport={null}
-          scrollWheelZoom={false}
-          zoom={14}
-          center={center}>
-          <GeoJSON data={geoJson} />
-          {massif.entrances.map(
-            entrance =>
-              entrance.latitude &&
-              entrance.longitude && (
-                <Marker
-                  key={entrance.id}
-                  position={[entrance.latitude, entrance.longitude]}
-                  icon={EntranceMarker}>
-                  <Popup>
-                    <EntrancePopup entrance={entrance} />
-                  </Popup>
-                </Marker>
-              )
-          )}
-        </CustomMapContainer>
-      )}
-    </>
+    massif?.geogPolygon && (
+      <CustomMapContainer
+        wholePage={false}
+        dragging
+        viewport={null}
+        scrollWheelZoom={false}
+        zoom={14}
+        center={center}>
+        <GeoJSON data={geoJson} />
+        {massif.entrances.map(
+          entrance =>
+            entrance.latitude &&
+            entrance.longitude && (
+              <Marker
+                key={entrance.id}
+                position={[entrance.latitude, entrance.longitude]}
+                icon={EntranceMarker}>
+                <Popup>
+                  <EntrancePopup entrance={entrance} />
+                </Popup>
+              </Marker>
+            )
+        )}
+      </CustomMapContainer>
+    )
   );
 };
 

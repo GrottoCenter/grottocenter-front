@@ -16,9 +16,7 @@ const HEADERS = {
   '': ''
 };
 
-const ResultsTableHead = ({ resourceType }) => {
-  return HEADERS[resourceType];
-};
+const ResultsTableHead = ({ resourceType }) => HEADERS[resourceType];
 
 ResultsTableHead.propTypes = {
   resourceType: PropTypes.oneOf(['', ...Object.values(ADVANCED_SEARCH_TYPES)])
