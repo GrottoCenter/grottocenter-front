@@ -1,10 +1,14 @@
 module.exports = {
-  extends: ['react-app', 'airbnb', 'prettier', 'prettier/react'],
+  extends: ['airbnb', 'prettier'],
   rules: {
     'brace-style': 'error',
     'object-curly-newline': 'off',
     'func-names': 'off',
     'react/jsx-props-no-spreading': 'off',
+    'react/function-component-definition': [
+      2,
+      { namedComponents: 'arrow-function' }
+    ],
     'import/no-named-as-default': 'off',
     'import/no-extraneous-dependencies': [
       'error',

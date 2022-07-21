@@ -1,4 +1,10 @@
 /* eslint-disable no-param-reassign */
+/**
+ * Since v5, Webpack doesn't include core modules such as crypto, stream or process.
+ * This file, combined with react-app-rewired, fixes this.
+ *
+ * Both can be removed once another solution is found.
+ * */
 
 const webpack = require('webpack');
 
