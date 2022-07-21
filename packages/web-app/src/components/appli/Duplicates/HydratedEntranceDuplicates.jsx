@@ -94,17 +94,15 @@ const HydratedEntranceDuplicates = ({
     <>
       {loading && <LinearProgress $isLoading={loading} />}
       {duplicate && isNil(error) && (
-        <>
-          <DuplicatesHandler
-            duplicateType="entrance"
-            duplicate1={duplicate.entrance}
-            duplicate2={duplicate.content}
-            titleDuplicate1={formatMessage({ id: 'Duplicate from database' })}
-            titleDuplicate2={formatMessage({ id: 'Duplicate from import' })}
-            handleSubmit={updateEntry}
-            handleNotDuplicatesSubmit={createEntry}
-          />
-        </>
+        <DuplicatesHandler
+          duplicateType="entrance"
+          duplicate1={duplicate.entrance}
+          duplicate2={duplicate.content}
+          titleDuplicate1={formatMessage({ id: 'Duplicate from database' })}
+          titleDuplicate2={formatMessage({ id: 'Duplicate from import' })}
+          handleSubmit={updateEntry}
+          handleNotDuplicatesSubmit={createEntry}
+        />
       )}
     </>
   );

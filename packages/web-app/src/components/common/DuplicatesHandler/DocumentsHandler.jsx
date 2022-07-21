@@ -101,9 +101,8 @@ const DocumentsHandler = ({
     }
   };
 
-  const isSubmittable = () => {
-    return !(isEmpty(author) || isEmpty(type) || isEmpty(license));
-  };
+  const isSubmittable = () =>
+    !(isEmpty(author) || isEmpty(type) || isEmpty(license));
 
   const onSubmit = () => {
     const {
@@ -238,7 +237,7 @@ const DocumentsHandler = ({
             />
           );
         }
-        return <></>;
+        return '';
       })}
       <ActionLine
         handleSubmit={onSubmit}

@@ -32,9 +32,7 @@ const Step2 = () => {
     updateAttribute('fileImported', false);
   };
 
-  const transformHeader = header => {
-    return header.trim();
-  };
+  const transformHeader = header => header.trim();
 
   // react-papaparse reset its content if go back to that step, so do we.
   useEffect(() => {

@@ -68,51 +68,47 @@ const PagesEditor = () => {
   ];
   return useMemo(
     () => (
-      <>
-        <InlineWrapper>
-          <PageIntervalWrapper>
-            {intervalError !== '' && (
-              <IntervalErrorWrapper>
-                <Typography align="center" color="error">
-                  <Translate>{intervalError}</Translate>
-                </Typography>
-              </IntervalErrorWrapper>
+      <InlineWrapper>
+        <PageIntervalWrapper>
+          {intervalError !== '' && (
+            <IntervalErrorWrapper>
+              <Typography align="center" color="error">
+                <Translate>{intervalError}</Translate>
+              </Typography>
+            </IntervalErrorWrapper>
+          )}
+          <InputWrapper>
+            {positiveStartError !== '' && (
+              <Typography align="center" color="error">
+                <Translate>{positiveStartError}</Translate>
+              </Typography>
             )}
-            <InputWrapper>
-              {positiveStartError !== '' && (
-                <Typography align="center" color="error">
-                  <Translate>{positiveStartError}</Translate>
-                </Typography>
-              )}
-              <NumberInput
-                hasError={positiveStartError !== '' || intervalError !== ''}
-                helperText="Page where the document starts if it's part of another document (ex: an article in a magazine). Leave it blank if you just want to mention the total number of pages (ex: a book)."
-                onValueChange={newValue =>
-                  handleValueChange('startPage', newValue)
-                }
-                value={startPage}
-                valueName="Start Page"
-              />
-            </InputWrapper>
-            <InputWrapper>
-              {positiveEndError !== '' && (
-                <Typography align="center" color="error">
-                  <Translate>{positiveEndError}</Translate>
-                </Typography>
-              )}
-              <NumberInput
-                hasError={positiveEndError !== '' || intervalError !== ''}
-                helperText="Page where the document ends if it's part of another document (ex: an article in a magazine)."
-                onValueChange={newValue =>
-                  handleValueChange('endPage', newValue)
-                }
-                value={endPage}
-                valueName="End Page"
-              />
-            </InputWrapper>
-          </PageIntervalWrapper>
-        </InlineWrapper>
-      </>
+            <NumberInput
+              hasError={positiveStartError !== '' || intervalError !== ''}
+              helperText="Page where the document starts if it's part of another document (ex: an article in a magazine). Leave it blank if you just want to mention the total number of pages (ex: a book)."
+              onValueChange={newValue =>
+                handleValueChange('startPage', newValue)
+              }
+              value={startPage}
+              valueName="Start Page"
+            />
+          </InputWrapper>
+          <InputWrapper>
+            {positiveEndError !== '' && (
+              <Typography align="center" color="error">
+                <Translate>{positiveEndError}</Translate>
+              </Typography>
+            )}
+            <NumberInput
+              hasError={positiveEndError !== '' || intervalError !== ''}
+              helperText="Page where the document ends if it's part of another document (ex: an article in a magazine)."
+              onValueChange={newValue => handleValueChange('endPage', newValue)}
+              value={endPage}
+              valueName="End Page"
+            />
+          </InputWrapper>
+        </PageIntervalWrapper>
+      </InlineWrapper>
     ),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     memoizedValues

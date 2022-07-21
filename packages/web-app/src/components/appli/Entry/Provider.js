@@ -1,4 +1,4 @@
-import React, { useState, createContext, useEffect } from 'react';
+import React, { useState, createContext, useEffect, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { all, allPass, equals, is, length, pathOr, pipe } from 'ramda';
 
@@ -62,22 +62,36 @@ const Entry = ({
     });
   }, [details]);
 
+  const contextValue = useMemo(
+    () => ({
+      state: {
+        loading,
+        details: detailsState,
+        comments,
+        descriptions,
+        documents,
+        histories,
+        locations,
+        riggings,
+        position: pathOr(null, ['coordinates'], details)
+      },
+      action: {}
+    }),
+    [
+      comments,
+      descriptions,
+      details,
+      detailsState,
+      documents,
+      histories,
+      loading,
+      locations,
+      riggings
+    ]
+  );
+
   return (
-    <EntryContext.Provider
-      value={{
-        state: {
-          loading,
-          details: detailsState,
-          comments,
-          descriptions,
-          documents,
-          histories,
-          locations,
-          riggings,
-          position: pathOr(null, ['coordinates'], details)
-        },
-        action: {}
-      }}>
+    <EntryContext.Provider value={contextValue}>
       {children}
     </EntryContext.Provider>
   );

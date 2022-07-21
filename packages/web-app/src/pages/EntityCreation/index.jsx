@@ -29,26 +29,24 @@ const EntitiesCreation = () => {
       title={formatMessage({ id: 'Create a new entity in Grottocenter' })}
       footer=""
       content={
-        <>
-          {!permissions.isAuth ? (
-            <CenteredBlock>
-              <ErrorMessage
-                message={formatMessage({
-                  id:
-                    'You must be authenticated to submit a new entity to Grottocenter.'
-                })}
-              />
-              <Button onClick={handleLogin} variant="contained">
-                <Translate>Log in</Translate>
-              </Button>
-              <Button onClick={() => history.push('')} variant="contained">
-                <Translate>Go to home page</Translate>
-              </Button>
-            </CenteredBlock>
-          ) : (
-            <CreationForm />
-          )}
-        </>
+        !permissions.isAuth ? (
+          <CenteredBlock>
+            <ErrorMessage
+              message={formatMessage({
+                id:
+                  'You must be authenticated to submit a new entity to Grottocenter.'
+              })}
+            />
+            <Button onClick={handleLogin} variant="contained">
+              <Translate>Log in</Translate>
+            </Button>
+            <Button onClick={() => history.push('')} variant="contained">
+              <Translate>Go to home page</Translate>
+            </Button>
+          </CenteredBlock>
+        ) : (
+          <CreationForm />
+        )
       }
     />
   );

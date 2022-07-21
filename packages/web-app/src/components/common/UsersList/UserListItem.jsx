@@ -9,17 +9,15 @@ const StyledListItem = styled(ListItem)`
   min-width: 250px;
 `;
 
-const UserListItem = ({ user }) => {
-  return (
-    <StyledListItem
-      button
-      component={React.forwardRef((props, ref) => (
-        <Link {...props} to={`/ui/persons/${user.id}`} ref={ref} />
-      ))}>
-      <ListItemText primary={user.nickname} />
-    </StyledListItem>
-  );
-};
+const UserListItem = ({ user }) => (
+  <StyledListItem
+    button
+    component={React.forwardRef((props, ref) => (
+      <Link {...props} to={`/ui/persons/${user.id}`} ref={ref} />
+    ))}>
+    <ListItemText primary={user.nickname} />
+  </StyledListItem>
+);
 
 UserListItem.propTypes = {
   user: PropTypes.shape({

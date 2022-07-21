@@ -24,9 +24,7 @@ const resultEndAdornment = (
 
 // ===================================
 
-const getMassifToString = massif => {
-  return `#${massif.id} - ${massif.name}`;
-};
+const getMassifToString = massif => `#${massif.id} - ${massif.name}`;
 
 const MassifAutoComplete = ({
   contextValueName,

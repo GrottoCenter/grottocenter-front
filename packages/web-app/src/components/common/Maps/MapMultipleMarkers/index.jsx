@@ -61,7 +61,6 @@ const HydratedMultipleMarkers = ({ style, zoom, ...otherProps }) => (
 // eslint-disable-next-line no-multi-assign
 HydratedMultipleMarkers.propTypes = MultipleMarkers.propTypes = {
   positions: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.number)).isRequired,
-  loading: PropTypes.bool,
   style: PropTypes.shape({}),
   zoom: PropTypes.number
 };

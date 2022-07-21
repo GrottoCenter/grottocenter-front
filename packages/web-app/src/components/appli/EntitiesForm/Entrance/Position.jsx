@@ -17,9 +17,7 @@ import { useDebounce } from '../../../../hooks';
 
 export const CountrySelection = ({ control }) => {
   const { formatMessage } = useIntl();
-  const options = useMemo(() => {
-    return countryList().getData();
-  }, []);
+  const options = useMemo(() => countryList().getData(), []);
 
   return (
     <FormControl variant="filled" fullWidth required>
@@ -64,7 +62,6 @@ export const PositionMap = ({ control }) => {
           positions={
             validPosition ? [[debouncedLatitude, debouncedLongitude]] : []
           }
-          loading={validPosition}
           zoom={10}
           // Same style as MuiTextField
           style={{ borderRadius: '4px', margin: '4px' }}

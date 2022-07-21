@@ -15,8 +15,7 @@ const isStep2Valid = (stepData, importData) => {
 };
 
 // currentStep must be the index +1
-const isStepValid = (currentStep, stepData, importData) => {
-  return currentStep === 2 ? isStep2Valid(stepData, importData) : true;
-};
+const isStepValid = (currentStep, stepData, importData) =>
+  currentStep === 2 ? isStep2Valid(stepData, importData) : true;
 
 export default isStepValid;

@@ -10,26 +10,24 @@ const ActionButton = ({
   color = 'primary',
   icon,
   ...buttonProps
-}) => {
-  return (
-    <Button
-      color={color}
-      disabled={disabled || loading}
-      onClick={onClick}
-      endIcon={icon}
-      {...buttonProps}>
-      {loading && (
-        <CircularProgress
-          style={{ marginRight: '8px' }}
-          size={20}
-          thickness={6}
-          color={color}
-        />
-      )}
-      {label}
-    </Button>
-  );
-};
+}) => (
+  <Button
+    color={color}
+    disabled={disabled || loading}
+    onClick={onClick}
+    endIcon={icon}
+    {...buttonProps}>
+    {loading && (
+      <CircularProgress
+        style={{ marginRight: '8px' }}
+        size={20}
+        thickness={6}
+        color={color}
+      />
+    )}
+    {label}
+  </Button>
+);
 
 ActionButton.propTypes = {
   label: PropTypes.string.isRequired,

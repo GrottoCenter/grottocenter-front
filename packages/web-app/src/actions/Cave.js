@@ -59,64 +59,60 @@ export const fetchCave = caveId => dispatch => {
     );
 };
 
-export const postCave = data => {
-  return (dispatch, getState) => {
-    dispatch(postCaveAction());
+export const postCave = data => (dispatch, getState) => {
+  dispatch(postCaveAction());
 
-    const requestOptions = {
-      method: 'POST',
-      body: JSON.stringify(data),
-      headers: getState().login.authorizationHeader
-    };
-
-    return fetch(postCreateCaveUrl, requestOptions)
-      .then(response => {
-        if (response.status >= 400) {
-          throw new Error(response.status);
-        }
-        return response.json();
-      })
-      .then(res => {
-        dispatch(postCaveSuccess(res));
-      })
-      .catch(error =>
-        dispatch(
-          postCaveFailure(
-            makeErrorMessage(error.message, `Bad request`),
-            error.message
-          )
-        )
-      );
+  const requestOptions = {
+    method: 'POST',
+    body: JSON.stringify(data),
+    headers: getState().login.authorizationHeader
   };
+
+  return fetch(postCreateCaveUrl, requestOptions)
+    .then(response => {
+      if (response.status >= 400) {
+        throw new Error(response.status);
+      }
+      return response.json();
+    })
+    .then(res => {
+      dispatch(postCaveSuccess(res));
+    })
+    .catch(error =>
+      dispatch(
+        postCaveFailure(
+          makeErrorMessage(error.message, `Bad request`),
+          error.message
+        )
+      )
+    );
 };
 
-export const updateCave = data => {
-  return (dispatch, getState) => {
-    dispatch(updateCaveAction());
+export const updateCave = data => (dispatch, getState) => {
+  dispatch(updateCaveAction());
 
-    const requestOptions = {
-      method: 'PUT',
-      body: JSON.stringify(data),
-      headers: getState().login.authorizationHeader
-    };
-
-    return fetch(putCaveUrl(data.id), requestOptions)
-      .then(response => {
-        if (response.status >= 400) {
-          throw new Error(response.status);
-        }
-        return response.json();
-      })
-      .then(res => {
-        dispatch(updateCaveSuccess(res));
-      })
-      .catch(error =>
-        dispatch(
-          updateCaveFailure(
-            makeErrorMessage(error.message, `Bad request`),
-            error.message
-          )
-        )
-      );
+  const requestOptions = {
+    method: 'PUT',
+    body: JSON.stringify(data),
+    headers: getState().login.authorizationHeader
   };
+
+  return fetch(putCaveUrl(data.id), requestOptions)
+    .then(response => {
+      if (response.status >= 400) {
+        throw new Error(response.status);
+      }
+      return response.json();
+    })
+    .then(res => {
+      dispatch(updateCaveSuccess(res));
+    })
+    .catch(error =>
+      dispatch(
+        updateCaveFailure(
+          makeErrorMessage(error.message, `Bad request`),
+          error.message
+        )
+      )
+    );
 };

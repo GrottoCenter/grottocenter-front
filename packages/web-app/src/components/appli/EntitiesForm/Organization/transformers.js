@@ -30,21 +30,19 @@ export const makePutOrganizationData = (data, defaultValues) => {
   return myObj;
 };
 
-export const makeOrganizationValueData = data => {
-  return {
-    name: data.name,
-    isPartner: data.isOfficialPartner,
-    customMessage: data.customMessage,
-    language: data.names[0].language,
-    firstAdress: data.address || null,
-    zipCode: data.postalCode || null,
-    city: data.city || null,
-    country: data.country || null,
-    mail: data.mail || null,
-    url: data.url || null,
-    latitude: data.latitude || null,
-    longitude: data.longitude || null,
-    organizationId: data.id,
-    nameId: data.names[0].id
-  };
-};
+export const makeOrganizationValueData = data => ({
+  name: data.name,
+  isPartner: data.isOfficialPartner,
+  customMessage: data.customMessage,
+  language: data.names[0].language,
+  firstAdress: data.address || null,
+  zipCode: data.postalCode || null,
+  city: data.city || null,
+  country: data.country || null,
+  mail: data.mail || null,
+  url: data.url || null,
+  latitude: data.latitude || null,
+  longitude: data.longitude || null,
+  organizationId: data.id,
+  nameId: data.names[0].id
+});

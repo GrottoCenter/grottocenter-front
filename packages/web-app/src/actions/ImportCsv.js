@@ -56,9 +56,7 @@ const checkStatus = response => {
   throw errorMessage;
 };
 
-const makeBody = rows => {
-  return rows.map(row => row.data);
-};
+const makeBody = rows => rows.map(row => row.data);
 
 export const checkRowsInBdd = (typeRow, rowsData) => (dispatch, getState) => {
   dispatch(checkRowsStart());

@@ -98,13 +98,13 @@ const PolygonMap = ({ onChange, data }) => {
     Object.values(_layers).map(layer => {
       const { _leaflet_id: leafletId, editing } = layer;
       if (isMounted.current) {
-        return setMapLayers(layers => {
-          return layers.map(l => {
-            return l.id === leafletId
+        return setMapLayers(layers =>
+          layers.map(l =>
+            l.id === leafletId
               ? { ...l, latlngs: { ...editing.latlngs[0] } }
-              : l;
-          });
-        });
+              : l
+          )
+        );
       }
       return null;
     });
@@ -146,48 +146,46 @@ const PolygonMap = ({ onChange, data }) => {
   };
 
   return (
-    <>
-      <MapContainer
-        center={center}
-        zoom={ZOOM_LEVEL}
-        whenCreated={setMap}
-        position="topLeft"
-        style={{
-          height: '70vh',
-          width: '60vw'
+    <MapContainer
+      center={center}
+      zoom={ZOOM_LEVEL}
+      whenCreated={setMap}
+      position="topLeft"
+      style={{
+        height: '70vh',
+        width: '60vw'
+      }}>
+      <FeatureGroup
+        ref={reactFGref => {
+          if (data) {
+            onFeatureGroupReady(reactFGref);
+          }
         }}>
-        <FeatureGroup
-          ref={reactFGref => {
-            if (data) {
-              onFeatureGroupReady(reactFGref);
-            }
-          }}>
-          <EditControl
-            position="topright"
-            onCreated={onCreate}
-            onEdited={onEdited}
-            onDeleted={onDeleted}
-            draw={{
-              rectangle: false,
-              polyline: false,
-              circle: false,
-              circlemarker: false,
-              marker: false
-            }}
-          />
-        </FeatureGroup>
+        <EditControl
+          position="topright"
+          onCreated={onCreate}
+          onEdited={onEdited}
+          onDeleted={onDeleted}
+          draw={{
+            rectangle: false,
+            polyline: false,
+            circle: false,
+            circlemarker: false,
+            marker: false
+          }}
+        />
+      </FeatureGroup>
 
-        <LayersControl position="bottomleft">
-          {TileLayers.map(layer => (
-            <LayersControl.BaseLayer
-              checked={layer.name === 'OpenStreetMap Basic'}
-              name={layer.name}>
-              <TileLayer url={layer.url} attribution={layer.url} />
-            </LayersControl.BaseLayer>
-          ))}
-        </LayersControl>
-      </MapContainer>
-    </>
+      <LayersControl position="bottomleft">
+        {TileLayers.map(layer => (
+          <LayersControl.BaseLayer
+            checked={layer.name === 'OpenStreetMap Basic'}
+            name={layer.name}>
+            <TileLayer url={layer.url} attribution={layer.url} />
+          </LayersControl.BaseLayer>
+        ))}
+      </LayersControl>
+    </MapContainer>
   );
 };
 

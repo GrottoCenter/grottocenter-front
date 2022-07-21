@@ -2,7 +2,7 @@ import React from 'react';
 import { storiesOf } from '@storybook/react';
 import { Card as MuiCard, Paper } from '@material-ui/core';
 import styled from 'styled-components';
-import { boolean, select } from '@storybook/addon-knobs';
+import { select } from '@storybook/addon-knobs';
 import * as d3 from 'd3';
 
 import MultipleMarkers from './MapMultipleMarkers';
@@ -38,13 +38,11 @@ const positions = {
 };
 
 // eslint-disable-next-line react/prop-types
-const MultipleMarkersMap = ({ loading, selection }) => {
-  return (
-    <Card style={{ width: '500px' }}>
-      <MultipleMarkers positions={selection} loading={loading} />
-    </Card>
-  );
-};
+const MultipleMarkersMap = ({ loading, selection }) => (
+  <Card style={{ width: '500px' }}>
+    <MultipleMarkers positions={selection} />
+  </Card>
+);
 
 const center = [46, 2];
 const latFn = d3.randomNormal(center[0], 1);
@@ -98,7 +96,6 @@ storiesOf('Maps', module)
   .add('Main with heatmap', () => <ClustersMap />)
   .add('Multiple markers', () => (
     <MultipleMarkersMap
-      loading={boolean('Loading', false)}
       selection={select('Entrance markers', positions, [[43.35266, 5.81689]])}
     />
   ))

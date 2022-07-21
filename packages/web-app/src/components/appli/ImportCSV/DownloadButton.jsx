@@ -8,26 +8,24 @@ import { useIntl } from 'react-intl';
 const DownloadButton = ({ data, filename }) => {
   const { formatMessage } = useIntl();
   return (
-    <>
-      <CSVDownloader
-        data={data}
-        type="button"
-        filename={filename}
-        style={{
-          backgroundColor: 'transparent',
-          backgroundRepeat: 'no-repeat',
-          border: 'none',
-          cursor: 'pointer',
-          overflow: 'hidden',
-          outline: 'none'
-        }}>
-        <Tooltip title={formatMessage({ id: 'Download information' })}>
-          <IconButton color="primary" size="small">
-            <CloudDownloadIcon />
-          </IconButton>
-        </Tooltip>
-      </CSVDownloader>
-    </>
+    <CSVDownloader
+      data={data}
+      type="button"
+      filename={filename}
+      style={{
+        backgroundColor: 'transparent',
+        backgroundRepeat: 'no-repeat',
+        border: 'none',
+        cursor: 'pointer',
+        overflow: 'hidden',
+        outline: 'none'
+      }}>
+      <Tooltip title={formatMessage({ id: 'Download information' })}>
+        <IconButton color="primary" size="small">
+          <CloudDownloadIcon />
+        </IconButton>
+      </Tooltip>
+    </CSVDownloader>
   );
 };
 

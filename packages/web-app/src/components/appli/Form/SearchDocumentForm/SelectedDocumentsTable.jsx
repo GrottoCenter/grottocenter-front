@@ -16,45 +16,39 @@ import Alert from '../../../common/Alert';
 const SelectedDocumentsTable = ({ documents, unselectDocument }) => {
   const { formatMessage } = useIntl();
 
-  return (
-    <>
-      {documents.length === 0 ? (
-        <Alert
-          severity="info"
-          content={formatMessage({
-            id: 'Select document(s) by clicking on the result table above.'
-          })}
-        />
-      ) : (
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>{formatMessage({ id: 'Id' })}</TableCell>
-              <TableCell>{formatMessage({ id: 'Title' })}</TableCell>
-              <TableCell>
-                {formatMessage({ id: 'Unselect document' })}
-              </TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {documents.map(doc => (
-              <TableRow key={doc.id}>
-                <TableCell>{doc.id}</TableCell>
-                <TableCell>{doc.title}</TableCell>
-                <TableCell>
-                  <IconButton
-                    size="small"
-                    color="primary"
-                    onClick={() => unselectDocument(doc.id)}>
-                    <DeleteIcon />
-                  </IconButton>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      )}
-    </>
+  return documents.length === 0 ? (
+    <Alert
+      severity="info"
+      content={formatMessage({
+        id: 'Select document(s) by clicking on the result table above.'
+      })}
+    />
+  ) : (
+    <Table>
+      <TableHead>
+        <TableRow>
+          <TableCell>{formatMessage({ id: 'Id' })}</TableCell>
+          <TableCell>{formatMessage({ id: 'Title' })}</TableCell>
+          <TableCell>{formatMessage({ id: 'Unselect document' })}</TableCell>
+        </TableRow>
+      </TableHead>
+      <TableBody>
+        {documents.map(doc => (
+          <TableRow key={doc.id}>
+            <TableCell>{doc.id}</TableCell>
+            <TableCell>{doc.title}</TableCell>
+            <TableCell>
+              <IconButton
+                size="small"
+                color="primary"
+                onClick={() => unselectDocument(doc.id)}>
+                <DeleteIcon />
+              </IconButton>
+            </TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
   );
 };
 

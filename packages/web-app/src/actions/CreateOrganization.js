@@ -20,33 +20,31 @@ export const postOrganizationFailure = error => ({
   error
 });
 
-export const postOrganization = data => {
-  return (dispatch, getState) => {
-    dispatch(postOrganizationAction());
+export const postOrganization = data => (dispatch, getState) => {
+  dispatch(postOrganizationAction());
 
-    const requestOptions = {
-      method: 'POST',
-      body: JSON.stringify(data),
-      headers: getState().login.authorizationHeader
-    };
-
-    return fetch(postOrganizationUrl, requestOptions)
-      .then(response => {
-        if (response.status >= 400) {
-          throw new Error(response.status);
-        }
-        return response.json();
-      })
-      .then(res => {
-        dispatch(postOrganizationSuccess(res));
-      })
-      .catch(error =>
-        dispatch(
-          postOrganizationFailure(
-            makeErrorMessage(error.message, `Bad request`),
-            error.message
-          )
-        )
-      );
+  const requestOptions = {
+    method: 'POST',
+    body: JSON.stringify(data),
+    headers: getState().login.authorizationHeader
   };
+
+  return fetch(postOrganizationUrl, requestOptions)
+    .then(response => {
+      if (response.status >= 400) {
+        throw new Error(response.status);
+      }
+      return response.json();
+    })
+    .then(res => {
+      dispatch(postOrganizationSuccess(res));
+    })
+    .catch(error =>
+      dispatch(
+        postOrganizationFailure(
+          makeErrorMessage(error.message, `Bad request`),
+          error.message
+        )
+      )
+    );
 };

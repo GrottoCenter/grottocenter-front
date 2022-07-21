@@ -99,30 +99,28 @@ const Step3 = () => {
   return flattenedColumns.length === 0 ? (
     formatMessage({ id: 'No result.' })
   ) : (
-    <>
-      <Table
-        columns={columns}
-        currentPage={currentPage}
-        customCellRenders={undefined}
-        customHeaderCellRenders={customHeaderRender}
-        data={currentData}
-        hiddenColumns={hiddenColumns}
-        loading={undefined}
-        openDetailedView={undefined}
-        order={order}
-        orderBy={orderBy || undefined}
-        rowsCount={flattenedColumns.length}
-        rowsPerPage={rowsPerPage}
-        selection={undefined}
-        title={formatMessage({ id: 'Csv content' })}
-        updateCurrentPage={setCurrentPage}
-        updateHiddenColumns={setHiddenColumns}
-        updateOrder={setOrder}
-        updateOrderBy={setOrderBy}
-        updateRowsPerPage={setRowsPerPage}
-        updateSelection={undefined}
-      />
-    </>
+    <Table
+      columns={columns}
+      currentPage={currentPage}
+      customCellRenders={undefined}
+      customHeaderCellRenders={customHeaderRender}
+      data={currentData}
+      hiddenColumns={hiddenColumns}
+      loading={undefined}
+      openDetailedView={undefined}
+      order={order}
+      orderBy={orderBy || undefined}
+      rowsCount={flattenedColumns.length}
+      rowsPerPage={rowsPerPage}
+      selection={undefined}
+      title={formatMessage({ id: 'Csv content' })}
+      updateCurrentPage={setCurrentPage}
+      updateHiddenColumns={setHiddenColumns}
+      updateOrder={setOrder}
+      updateOrderBy={setOrderBy}
+      updateRowsPerPage={setRowsPerPage}
+      updateSelection={undefined}
+    />
   );
 };
 

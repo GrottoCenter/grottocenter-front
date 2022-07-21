@@ -46,39 +46,37 @@ const FixedContent = ({
   content,
   footer,
   onEdit
-}) => {
-  return (
-    <Card>
-      <CardHeader
-        action={
-          !isNil(onEdit) && (
-            <IconButton
-              color="primary"
-              size="small"
-              aria-label="edit"
-              onClick={onEdit}>
-              <CreateIcon />
-            </IconButton>
-          )
-        }
-        avatar={avatar}
-        subheader={subheader}
-        title={
-          <Title>
-            <Typography variant="h1" color="secondary">
-              {title}
-            </Typography>
-            {!isNil(icon) && icon}
-          </Title>
-        }
-      />
-      <CardContent>{content}</CardContent>
-      <CardActions disableSpacing>
-        {!isNil(footer) && <Typography variant="caption">{footer}</Typography>}
-      </CardActions>
-    </Card>
-  );
-};
+}) => (
+  <Card>
+    <CardHeader
+      action={
+        !isNil(onEdit) && (
+          <IconButton
+            color="primary"
+            size="small"
+            aria-label="edit"
+            onClick={onEdit}>
+            <CreateIcon />
+          </IconButton>
+        )
+      }
+      avatar={avatar}
+      subheader={subheader}
+      title={
+        <Title>
+          <Typography variant="h1" color="secondary">
+            {title}
+          </Typography>
+          {!isNil(icon) && icon}
+        </Title>
+      }
+    />
+    <CardContent>{content}</CardContent>
+    <CardActions disableSpacing>
+      {!isNil(footer) && <Typography variant="caption">{footer}</Typography>}
+    </CardActions>
+  </Card>
+);
 
 FixedContent.propTypes = {
   avatar: PropTypes.node,

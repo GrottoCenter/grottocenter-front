@@ -4,15 +4,11 @@
  * @param {*} collection an array of js object
  * @returns js object which contains 2 array attributes (previousItem, which are those already in the db, and newItem)
  */
-export const retrieveFromObjectCollection = (collection, idLabel = 'id') => {
-  return {
-    newItems: collection.filter(item => item[idLabel] === undefined),
-    previousItems: collection
-      .filter(item => item[idLabel] !== undefined)
-      .map(item => item[idLabel])
-  };
-};
+export const retrieveFromObjectCollection = (collection, idLabel = 'id') => ({
+  newItems: collection.filter(item => item[idLabel] === undefined),
+  previousItems: collection
+    .filter(item => item[idLabel] !== undefined)
+    .map(item => item[idLabel])
+});
 
-export const getIdOrUndefined = data => {
-  return data === '' ? undefined : data.id;
-};
+export const getIdOrUndefined = data => (data === '' ? undefined : data.id);

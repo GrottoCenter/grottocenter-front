@@ -30,17 +30,14 @@ const CardHeader = styled(MuiCardHeader)`
   ${({ $dense }) => $dense && `padding-bottom: 0px`}
 `;
 
-const Footer = ({ content }) => (
-  <>
-    {typeof content === 'string' ? (
-      <Typography variant="caption" align="right">
-        content
-      </Typography>
-    ) : (
+const Footer = ({ content }) =>
+  typeof content === 'string' ? (
+    <Typography variant="caption" align="right">
       content
-    )}
-  </>
-);
+    </Typography>
+  ) : (
+    content
+  );
 
 const ScrollableContent = ({
   title,

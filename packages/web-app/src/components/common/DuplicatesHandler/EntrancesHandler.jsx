@@ -81,9 +81,8 @@ const EntrancesHandler = ({
 
   const entrancesSchema = useMemo(() => getEntranceSchema(), []);
 
-  const isSubmittable = () => {
-    return !(isEmpty(author) || isEmpty(latitude) || isEmpty(longitude));
-  };
+  const isSubmittable = () =>
+    !(isEmpty(author) || isEmpty(latitude) || isEmpty(longitude));
 
   const onSubmit = () => {
     const {
@@ -177,15 +176,14 @@ const EntrancesHandler = ({
   );
 
   // Latitude and longitude are not rendered, because they are handled in the map component below
-  const shoudLineRenderWithCoord = (isCollection, attribute) => {
-    return attribute !== 'latitude' && attribute !== 'longitude'
+  const shoudLineRenderWithCoord = (isCollection, attribute) =>
+    attribute !== 'latitude' && attribute !== 'longitude'
       ? shouldLineRender(
           isCollection,
           duplicate1[attribute],
           duplicate2[attribute]
         )
       : false;
-  };
 
   return (
     <Grid container direction="column" alignItems="center">
@@ -226,7 +224,7 @@ const EntrancesHandler = ({
             />
           );
         }
-        return <></>;
+        return '';
       })}
       <MapLine
         position1={[

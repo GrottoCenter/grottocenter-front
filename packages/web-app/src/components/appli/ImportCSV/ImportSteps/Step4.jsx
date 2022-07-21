@@ -93,63 +93,57 @@ const Step4 = () => {
       {importCsv.error && <Typography>{importCsv.error}</Typography>}
 
       {wontBeCreateData && wontBeCreateData.length > 0 && (
-        <>
-          <Alert
-            severity="error"
-            title={formatMessage(
-              {
-                id: 'csvImport.willNotBeImported',
-                defaultMessage: `${translatedTypePrefix} {number, plural, one {is} other {are}} already present in Grottocenter and won't be imported.`
-              },
-              {
-                number: wontBeCreateData.length,
-                importType: selectedType
-              }
-            )}
-            content={`${formatMessage({
-              id: wontBeCreateData.length === 1 ? 'Row:' : 'Rows:'
-            })} ${wontBeCreateData.map(row => `${row.line}`).join(',')}`}
-          />
-        </>
+        <Alert
+          severity="error"
+          title={formatMessage(
+            {
+              id: 'csvImport.willNotBeImported',
+              defaultMessage: `${translatedTypePrefix} {number, plural, one {is} other {are}} already present in Grottocenter and won't be imported.`
+            },
+            {
+              number: wontBeCreateData.length,
+              importType: selectedType
+            }
+          )}
+          content={`${formatMessage({
+            id: wontBeCreateData.length === 1 ? 'Row:' : 'Rows:'
+          })} ${wontBeCreateData.map(row => `${row.line}`).join(',')}`}
+        />
       )}
 
       {willBeCreatedData && willBeCreatedData.length > 0 && (
-        <>
+        <Alert
+          severity="info"
+          title={formatMessage(
+            {
+              id: 'csvImport.willBeImported',
+              defaultMessage: `${translatedTypePrefix} will be imported.`
+            },
+            {
+              number: willBeCreatedData.length,
+              importType: selectedType,
+              translatedTypePrefix
+            }
+          )}
+        />
+      )}
+
+      {willBeCreatedAsDuplicatesData &&
+        willBeCreatedAsDuplicatesData.length > 0 && (
           <Alert
-            severity="info"
+            severity="warning"
             title={formatMessage(
               {
-                id: 'csvImport.willBeImported',
-                defaultMessage: `${translatedTypePrefix} will be imported.`
+                id: 'csvImport.willBeImportedAsDuplicates',
+                defaultMessage: `${translatedTypePrefix} will be imported as duplicate(s).`
               },
               {
-                number: willBeCreatedData.length,
+                number: willBeCreatedAsDuplicatesData.length,
                 importType: selectedType,
                 translatedTypePrefix
               }
             )}
           />
-        </>
-      )}
-
-      {willBeCreatedAsDuplicatesData &&
-        willBeCreatedAsDuplicatesData.length > 0 && (
-          <>
-            <Alert
-              severity="warning"
-              title={formatMessage(
-                {
-                  id: 'csvImport.willBeImportedAsDuplicates',
-                  defaultMessage: `${translatedTypePrefix} will be imported as duplicate(s).`
-                },
-                {
-                  number: willBeCreatedAsDuplicatesData.length,
-                  importType: selectedType,
-                  translatedTypePrefix
-                }
-              )}
-            />
-          </>
         )}
 
       {somethingWillBeCreated && (

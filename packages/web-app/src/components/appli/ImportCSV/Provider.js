@@ -1,4 +1,10 @@
-import React, { useState, createContext, useEffect, useCallback } from 'react';
+import React, {
+  useState,
+  createContext,
+  useEffect,
+  useCallback,
+  useMemo
+} from 'react';
 import PropTypes from 'prop-types';
 import {
   __,
@@ -102,24 +108,37 @@ const Provider = ({ children, defaultValues = {} }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [validatedSteps]);
 
+  const contextValue = useMemo(
+    () => ({
+      action: {},
+      currentStep,
+      importAttributes: {
+        ...importFormState,
+        baseErrors: {},
+        fileImported: false
+      },
+      importData,
+      isFormValid,
+      selectedType,
+      resetContext,
+      updateAttribute,
+      updateCurrentStep: setCurrentStep,
+      validatedSteps
+    }),
+    [
+      currentStep,
+      importData,
+      importFormState,
+      isFormValid,
+      resetContext,
+      selectedType,
+      updateAttribute,
+      validatedSteps
+    ]
+  );
+
   return (
-    <ImportPageContentContext.Provider
-      value={{
-        action: {},
-        currentStep,
-        importAttributes: {
-          ...importFormState,
-          baseErrors: {},
-          fileImported: false
-        },
-        importData,
-        isFormValid,
-        selectedType,
-        resetContext,
-        updateAttribute,
-        updateCurrentStep: setCurrentStep,
-        validatedSteps
-      }}>
+    <ImportPageContentContext.Provider value={contextValue}>
       {children}
     </ImportPageContentContext.Provider>
   );

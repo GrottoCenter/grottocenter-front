@@ -1,4 +1,4 @@
-import React, { useState, createContext, useEffect } from 'react';
+import React, { useMemo, useState, createContext, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { pipe, reject, isNil, map, prop } from 'ramda';
 
@@ -53,22 +53,24 @@ const Provider = ({ data, loading = true, children }) => {
     }
   };
 
+  const contextValue = useMemo(
+    () => ({
+      state: {
+        loading,
+        cave: caveState,
+        coordinates: coordinatesState,
+        entrances: entrancesState,
+        selectedEntrances
+      },
+      action: {
+        onSelectEntrance
+      }
+    }),
+    [caveState, coordinatesState, entrancesState, loading, selectedEntrances]
+  );
+
   return (
-    <CaveContext.Provider
-      value={{
-        state: {
-          loading,
-          cave: caveState,
-          coordinates: coordinatesState,
-          entrances: entrancesState,
-          selectedEntrances
-        },
-        action: {
-          onSelectEntrance
-        }
-      }}>
-      {children}
-    </CaveContext.Provider>
+    <CaveContext.Provider value={contextValue}>{children}</CaveContext.Provider>
   );
 };
 

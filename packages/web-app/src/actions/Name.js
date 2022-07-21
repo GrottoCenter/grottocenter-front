@@ -19,33 +19,31 @@ export const updateNameFailure = (error, httpCode) => ({
   httpCode
 });
 
-export const updateName = data => {
-  return (dispatch, getState) => {
-    dispatch(updateNameAction());
+export const updateName = data => (dispatch, getState) => {
+  dispatch(updateNameAction());
 
-    const requestOptions = {
-      method: 'PATCH',
-      body: JSON.stringify(data),
-      headers: getState().login.authorizationHeader
-    };
-
-    return fetch(patchNameUrl(data.id), requestOptions)
-      .then(response => {
-        if (response.status >= 400) {
-          throw new Error(response.status);
-        }
-        return response.json();
-      })
-      .then(res => {
-        dispatch(updateNameSuccess(res));
-      })
-      .catch(error =>
-        dispatch(
-          updateNameFailure(
-            makeErrorMessage(error.message, `Bad request`),
-            error.message
-          )
-        )
-      );
+  const requestOptions = {
+    method: 'PATCH',
+    body: JSON.stringify(data),
+    headers: getState().login.authorizationHeader
   };
+
+  return fetch(patchNameUrl(data.id), requestOptions)
+    .then(response => {
+      if (response.status >= 400) {
+        throw new Error(response.status);
+      }
+      return response.json();
+    })
+    .then(res => {
+      dispatch(updateNameSuccess(res));
+    })
+    .catch(error =>
+      dispatch(
+        updateNameFailure(
+          makeErrorMessage(error.message, `Bad request`),
+          error.message
+        )
+      )
+    );
 };

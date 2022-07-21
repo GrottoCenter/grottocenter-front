@@ -1,3 +1,14 @@
 module.exports = {
-  extends: '../eslint-config/.eslintrc.js'
+  env: {
+    browser: true
+  },
+  extends: '../eslint-config/.eslintrc.js',
+  overrides: [
+    {
+      files: ['./src/reducers/**/*.js'],
+      rules: {
+        'default-param-last': 'off'
+      }
+    }
+  ]
 };

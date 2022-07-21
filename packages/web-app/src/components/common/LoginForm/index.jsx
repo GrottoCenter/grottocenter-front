@@ -47,56 +47,54 @@ const LoginForm = ({
   };
 
   return (
-    <>
-      <FormWrapper>
-        <FormControl variant="filled">
-          <InputLabel htmlFor="input-with-icon-adornment">
-            {formatMessage({ id: 'Email' })}
-          </InputLabel>
-          <FilledInput
-            name="email"
-            value={email}
-            onChange={handleEmailChange}
-            required
-            type="email"
-          />
-        </FormControl>
+    <FormWrapper>
+      <FormControl variant="filled">
+        <InputLabel htmlFor="input-with-icon-adornment">
+          {formatMessage({ id: 'Email' })}
+        </InputLabel>
+        <FilledInput
+          name="email"
+          value={email}
+          onChange={handleEmailChange}
+          required
+          type="email"
+        />
+      </FormControl>
 
-        <FormControl variant="filled">
-          <InputLabel htmlFor="filled-adornment-password">
-            {formatMessage({ id: 'Password' })}
-          </InputLabel>
-          <FilledInput
-            name="password"
-            type={isPasswordVisible ? 'text' : 'password'}
-            value={password}
-            onChange={handlePasswordChange}
-            endAdornment={
-              <InputAdornment position="end">
-                <IconButton
-                  aria-label="toggle password visibility"
-                  onClick={toggleIsPasswordVisible}
-                  onMouseDown={handleMouseDownPassword}
-                  edge="end">
-                  {isPasswordVisible ? <Visibility /> : <VisibilityOff />}
-                </IconButton>
-              </InputAdornment>
-            }
-            required
-          />
-        </FormControl>
+      <FormControl variant="filled">
+        <InputLabel htmlFor="filled-adornment-password">
+          {formatMessage({ id: 'Password' })}
+        </InputLabel>
+        <FilledInput
+          name="password"
+          type={isPasswordVisible ? 'text' : 'password'}
+          value={password}
+          onChange={handlePasswordChange}
+          endAdornment={
+            <InputAdornment position="end">
+              <IconButton
+                aria-label="toggle password visibility"
+                onClick={toggleIsPasswordVisible}
+                onMouseDown={handleMouseDownPassword}
+                edge="end">
+                {isPasswordVisible ? <Visibility /> : <VisibilityOff />}
+              </IconButton>
+            </InputAdornment>
+          }
+          required
+        />
+      </FormControl>
 
-        {authErrors.length > 0 && (
-          <FormControl>
-            {authErrors.map(error => (
-              <Fade in={authErrors.length > 0} key={error}>
-                <ErrorMessage message={formatMessage({ id: error })} />
-              </Fade>
-            ))}
-          </FormControl>
-        )}
-      </FormWrapper>
-    </>
+      {authErrors.length > 0 && (
+        <FormControl>
+          {authErrors.map(error => (
+            <Fade in={authErrors.length > 0} key={error}>
+              <ErrorMessage message={formatMessage({ id: error })} />
+            </Fade>
+          ))}
+        </FormControl>
+      )}
+    </FormWrapper>
   );
 };
 

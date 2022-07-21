@@ -14,4 +14,6 @@ import nl from './nl.json';
 import pt from './pt.json';
 import ro from './ro.json';
 
-export default { ar, bg, ca, de, el, en, es, fr, he, id, it, ja, nl, pt, ro };
+const langs = { ar, bg, ca, de, el, en, es, fr, he, id, it, ja, nl, pt, ro };
+
+export default langs;

@@ -33,7 +33,6 @@ const PositionMap = ({ control }) => {
             positions={
               validPosition ? [[debouncedLatitude, debouncedLongitude]] : []
             }
-            loading={validPosition}
             zoom={10}
             style={{ borderRadius: '4px', margin: '4px' }}
           />

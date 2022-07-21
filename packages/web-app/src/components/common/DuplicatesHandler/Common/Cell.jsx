@@ -63,17 +63,15 @@ export const RightCell = ({
   );
 };
 
-export const MiddleCell = ({ value, label, updateState, render, disabled }) => {
-  return (
-    <StringInput
-      value={render(value)}
-      valueName={label}
-      onValueChange={updateState}
-      disabled={disabled}
-      fullWidth
-    />
-  );
-};
+export const MiddleCell = ({ value, label, updateState, render, disabled }) => (
+  <StringInput
+    value={render(value)}
+    valueName={label}
+    onValueChange={updateState}
+    disabled={disabled}
+    fullWidth
+  />
+);
 
 export const LeftCell = ({
   value,

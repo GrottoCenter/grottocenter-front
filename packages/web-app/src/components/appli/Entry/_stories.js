@@ -185,14 +185,12 @@ const StoryContextProvider = ({ loading, children }) => (
   </Provider>
 );
 
-const PropertiesWithState = () => {
-  return (
-    <>
-      <EntryMap />
-      <Properties />
-    </>
-  );
-};
+const PropertiesWithState = () => (
+  <>
+    <EntryMap />
+    <Properties />
+  </>
+);
 
 const WithLayout = () => {
   const [isSideMenuOpen, setToggleSideMenu] = React.useState(false);

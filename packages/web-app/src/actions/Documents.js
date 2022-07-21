@@ -51,48 +51,46 @@ export const fetchAuthorizationDocumentsSuccess = data => ({
   totalCount: data.totalCount
 });
 
-const doGet = (url, criterias) => {
-  return async dispatch => {
-    dispatch(fetchDocuments());
+const doGet = (url, criterias) => async dispatch => {
+  dispatch(fetchDocuments());
 
-    try {
-      const res = await fetch(makeUrl(url, criterias)).then(response => {
-        if (response.status >= 400) {
-          throw new Error(response.status);
-        }
-        return response;
-      });
-      const data = await res.text();
-      const header = await res.headers.get('Content-Range');
-      const makeNumber = ifElse(identity, Number, always(1));
-      const getTotalCount = defaultCount =>
-        pipe(
-          defaultTo(''),
-          split('/'),
-          tail,
-          makeNumber,
-          ifElse(equals(0), always(defaultCount), identity)
-        )(header);
+  try {
+    const res = await fetch(makeUrl(url, criterias)).then(response => {
+      if (response.status >= 400) {
+        throw new Error(response.status);
+      }
+      return response;
+    });
+    const data = await res.text();
+    const header = await res.headers.get('Content-Range');
+    const makeNumber = ifElse(identity, Number, always(1));
+    const getTotalCount = defaultCount =>
+      pipe(
+        defaultTo(''),
+        split('/'),
+        tail,
+        makeNumber,
+        ifElse(equals(0), always(defaultCount), identity)
+      )(header);
 
-      const parsedData = pathOr(['documents'], [], JSON.parse(data));
-      const successAction =
-        criterias && criterias.documentType === 'Authorization To Publish'
-          ? fetchAuthorizationDocumentsSuccess
-          : fetchDocumentsSuccess;
-      return dispatch(
-        successAction({
-          documents: parsedData.documents,
-          totalCount: getTotalCount(parsedData.documents.length)
-        })
-      );
-    } catch (error) {
-      return dispatch(
-        fetchDocumentsFailure(
-          makeErrorMessage(error.message, `Fetching documents`)
-        )
-      );
-    }
-  };
+    const parsedData = pathOr(['documents'], [], JSON.parse(data));
+    const successAction =
+      criterias && criterias.documentType === 'Authorization To Publish'
+        ? fetchAuthorizationDocumentsSuccess
+        : fetchDocumentsSuccess;
+    return dispatch(
+      successAction({
+        documents: parsedData.documents,
+        totalCount: getTotalCount(parsedData.documents.length)
+      })
+    );
+  } catch (error) {
+    return dispatch(
+      fetchDocumentsFailure(
+        makeErrorMessage(error.message, `Fetching documents`)
+      )
+    );
+  }
 };
 
 export const getDocuments = criteria => doGet(queryDocuments, criteria);

@@ -14,7 +14,7 @@ import EditIcon from '@material-ui/icons/Edit';
 import CancelIcon from '@material-ui/icons/Cancel';
 
 import { historyType } from '../Provider';
-import { makeFormattedText } from '../utils';
+import makeFormattedText from '../utils';
 import CreateHistoryForm from '../../Form/HistoryForm/index';
 import { updateHistory } from '../../../../actions/UpdateHistory';
 import { usePermissions } from '../../../../hooks';
@@ -50,35 +50,33 @@ const History = ({ history }) => {
           />
         </Box>
       ) : (
-        <>
-          <ListItemText
-            // whiteSpace property for description multi-lines display
-            style={{ whiteSpace: 'pre-line' }}
-            secondary={
-              <>
-                {makeFormattedText(body)}
-                <br />
-                <Typography
-                  component="span"
-                  variant="caption"
-                  color="textPrimary">
-                  {`${!isNil(author.nickname) &&
-                    formatMessage({ id: 'Posted by' })} ${author.nickname} ${
-                    !isNil(creationDate)
-                      ? `- ${formatDate(creationDate, {
-                          year: 'numeric',
-                          month: 'numeric',
-                          day: 'numeric',
-                          hour: 'numeric',
-                          minute: 'numeric'
-                        })}`
-                      : ''
-                  }`}
-                </Typography>
-              </>
-            }
-          />
-        </>
+        <ListItemText
+          // whiteSpace property for description multi-lines display
+          style={{ whiteSpace: 'pre-line' }}
+          secondary={
+            <>
+              {makeFormattedText(body)}
+              <br />
+              <Typography
+                component="span"
+                variant="caption"
+                color="textPrimary">
+                {`${!isNil(author.nickname) &&
+                  formatMessage({ id: 'Posted by' })} ${author.nickname} ${
+                  !isNil(creationDate)
+                    ? `- ${formatDate(creationDate, {
+                        year: 'numeric',
+                        month: 'numeric',
+                        day: 'numeric',
+                        hour: 'numeric',
+                        minute: 'numeric'
+                      })}`
+                    : ''
+                }`}
+              </Typography>
+            </>
+          }
+        />
       )}
       {permissions.isAuth && (
         <ListItemIcon style={{ alignSelf: 'start' }}>

@@ -158,39 +158,37 @@ const Item = ({
 const Section = ({ title, content, loading }) => {
   const isValueNotEmpty = value => !isEmpty(value) && !isNil(value);
   return (
-    <>
-      <ContentWrapper>
-        <Typography color="textSecondary" variant="h6" gutterBottom>
-          {title}
-        </Typography>
-        {loading ? (
-          <Skeleton variant="rect" height={100} />
-        ) : (
-          content.map(
-            item =>
-              /* Display item if :
+    <ContentWrapper>
+      <Typography color="textSecondary" variant="h6" gutterBottom>
+        {title}
+      </Typography>
+      {loading ? (
+        <Skeleton variant="rect" height={100} />
+      ) : (
+        content.map(
+          item =>
+            /* Display item if :
                 - it's loading => a value will be displayed later
                 - it's not loading => a value must be set before rendering an <Item>
               */
-              (item.isLoading || isValueNotEmpty(item.value)) && (
-                <Item
-                  key={item.label}
-                  Icon={item.Icon}
-                  label={item.label}
-                  type={item.type}
-                  internalUrl={item.internalUrl}
-                  url={item.url}
-                  value={item.value}
-                  CustomComponent={item.CustomComponent}
-                  CustomComponentProps={item.CustomComponentProps}
-                  isLabelAndIconOnTop={item.isLabelAndIconOnTop}
-                  isLoading={item.isLoading}
-                />
-              )
-          )
-        )}
-      </ContentWrapper>
-    </>
+            (item.isLoading || isValueNotEmpty(item.value)) && (
+              <Item
+                key={item.label}
+                Icon={item.Icon}
+                label={item.label}
+                type={item.type}
+                internalUrl={item.internalUrl}
+                url={item.url}
+                value={item.value}
+                CustomComponent={item.CustomComponent}
+                CustomComponentProps={item.CustomComponentProps}
+                isLabelAndIconOnTop={item.isLabelAndIconOnTop}
+                isLoading={item.isLoading}
+              />
+            )
+        )
+      )}
+    </ContentWrapper>
   );
 };
 

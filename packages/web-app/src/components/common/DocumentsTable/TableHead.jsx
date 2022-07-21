@@ -9,7 +9,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { useIntl } from 'react-intl';
 
-function EnhancedTableHead(props) {
+const EnhancedTableHead = props => {
   const {
     onSelectAllClick,
     order,
@@ -60,7 +60,7 @@ function EnhancedTableHead(props) {
       </TableRow>
     </TableHead>
   );
-}
+};
 
 EnhancedTableHead.propTypes = {
   numSelected: PropTypes.number.isRequired,

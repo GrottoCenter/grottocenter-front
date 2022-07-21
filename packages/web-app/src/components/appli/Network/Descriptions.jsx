@@ -36,58 +36,55 @@ const Descriptions = () => {
       title={formatMessage({ id: 'Descriptions' })}
       content={
         <List>
+          {/* eslint-disable-next-line no-nested-ternary */}
           {loading ? (
             <LoadingList />
+          ) : descriptions && descriptions.length > 0 ? (
+            descriptions.map(({ id, title, body, author, date }) => (
+              <div key={id}>
+                <ListItem>
+                  <ListItemText
+                    disableTypography
+                    primary={<Typography>{title}</Typography>}
+                    secondary={
+                      <>
+                        <Typography
+                          variant="body2"
+                          color="textSecondary"
+                          style={{ whiteSpace: 'pre-wrap' }}>
+                          {body}
+                        </Typography>
+                        <br />
+                        <Typography variant="caption">
+                          {`${!isNil(author.nickname) &&
+                            formatMessage({ id: 'Posted by' })} ${
+                            author.nickname
+                          } ${
+                            !isNil(date)
+                              ? `- ${formatDate(date, {
+                                  year: 'numeric',
+                                  month: 'numeric',
+                                  day: 'numeric',
+                                  hour: 'numeric',
+                                  minute: 'numeric'
+                                })}`
+                              : ''
+                          }`}
+                        </Typography>
+                      </>
+                    }
+                  />
+                </ListItem>
+                <Divider variant="middle" component="li" />
+              </div>
+            ))
           ) : (
-            <>
-              {descriptions && descriptions.length > 0 ? (
-                descriptions.map(({ id, title, body, author, date }) => (
-                  <div key={id}>
-                    <ListItem>
-                      <ListItemText
-                        disableTypography
-                        primary={<Typography>{title}</Typography>}
-                        secondary={
-                          <>
-                            <Typography
-                              variant="body2"
-                              color="textSecondary"
-                              style={{ whiteSpace: 'pre-wrap' }}>
-                              {body}
-                            </Typography>
-                            <br />
-                            <Typography variant="caption">
-                              {`${!isNil(author.nickname) &&
-                                formatMessage({ id: 'Posted by' })} ${
-                                author.nickname
-                              } ${
-                                !isNil(date)
-                                  ? `- ${formatDate(date, {
-                                      year: 'numeric',
-                                      month: 'numeric',
-                                      day: 'numeric',
-                                      hour: 'numeric',
-                                      minute: 'numeric'
-                                    })}`
-                                  : ''
-                              }`}
-                            </Typography>
-                          </>
-                        }
-                      />
-                    </ListItem>
-                    <Divider variant="middle" component="li" />
-                  </div>
-                ))
-              ) : (
-                <Alert
-                  severity="info"
-                  title={formatMessage({
-                    id: 'There is currently no description for this network.'
-                  })}
-                />
-              )}
-            </>
+            <Alert
+              severity="info"
+              title={formatMessage({
+                id: 'There is currently no description for this network.'
+              })}
+            />
           )}
         </List>
       }

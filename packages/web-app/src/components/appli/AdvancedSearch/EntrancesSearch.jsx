@@ -34,7 +34,7 @@ class EntrancesSearch extends React.Component {
     this.handleRangeChange = this.handleRangeChange.bind(this);
   }
 
-  getInitialState = () => {
+  getInitialState() {
     const {
       aestheticismMinValue,
       aestheticismMaxValue,
@@ -90,7 +90,7 @@ class EntrancesSearch extends React.Component {
       },
       matchAllFields: true
     };
-  };
+  }
 
   /**
    * This function set the state of the keyname property

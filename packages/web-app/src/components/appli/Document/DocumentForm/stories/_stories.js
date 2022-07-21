@@ -22,13 +22,11 @@ const PaddedCard = styled(Card)`
 `;
 
 // eslint-disable-next-line react/prop-types
-const DefaultDocumentForm = ({ children }) => {
-  return (
-    <div style={{ padding: '3rem' }}>
-      <PaddedCard>{children}</PaddedCard>
-    </div>
-  );
-};
+const DefaultDocumentForm = ({ children }) => (
+  <div style={{ padding: '3rem' }}>
+    <PaddedCard>{children}</PaddedCard>
+  </div>
+);
 
 DefaultDocumentForm.propTypes = {};
 

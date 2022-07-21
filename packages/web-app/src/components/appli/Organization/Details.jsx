@@ -39,71 +39,67 @@ const Details = ({
   organization,
   onEdit,
   canEdit
-}) => {
-  return (
-    <>
-      <Box
-        alignItems="start"
-        display="flex"
-        flexBasis="200px"
-        justifyContent="space-between">
-        <Box display="block">
+}) => (
+  <>
+    <Box
+      alignItems="start"
+      display="flex"
+      flexBasis="200px"
+      justifyContent="space-between">
+      <Box display="block">
+        <ContentWrapper>
+          <StyledLocationIcon color="primary" />
+          <Typography>
+            {!isNil(address) && `${address}`}
+            {!isNil(postalCode) && ` ${postalCode}`}
+            {!isNil(city) && ` ${city}`}
+            {!isNil(country) && ` ${country}`}
+            {!isNil(village) && ` - ${village}`}
+            {!isNil(county) && ` - ${county}`}
+            {!isNil(region) && ` - ${region}`}
+          </Typography>
+        </ContentWrapper>
+        {mail && (
           <ContentWrapper>
-            <StyledLocationIcon color="primary" />
-            <Typography>
-              {!isNil(address) && `${address}`}
-              {!isNil(postalCode) && ` ${postalCode}`}
-              {!isNil(city) && ` ${city}`}
-              {!isNil(country) && ` ${country}`}
-              {!isNil(village) && ` - ${village}`}
-              {!isNil(county) && ` - ${county}`}
-              {!isNil(region) && ` - ${region}`}
-            </Typography>
+            <StyledEmailIcon color="primary" />
+            <Typography>{mail}</Typography>
           </ContentWrapper>
-          {mail && (
-            <ContentWrapper>
-              <StyledEmailIcon color="primary" />
-              <Typography>{mail}</Typography>
-            </ContentWrapper>
-          )}
-          {customMessage && (
-            <ContentWrapper>
-              <Typography>{customMessage}</Typography>
-            </ContentWrapper>
-          )}
-        </Box>
-        {canEdit && (
-          <IconButton
-            size="medium"
-            aria-label="edit"
-            color="primary"
-            onClick={onEdit}
-            disabled={isNil(onEdit)}>
-            <CreateIcon />
-          </IconButton>
+        )}
+        {customMessage && (
+          <ContentWrapper>
+            <Typography>{customMessage}</Typography>
+          </ContentWrapper>
         )}
       </Box>
-      <br />
-      {!isEmpty(position) && (
-        <>
-          <CustomMapContainer
-            wholePage={false}
-            dragging
-            viewport={null}
-            scrollWheelZoom={false}
-            zoom={14}
-            center={position}>
-            <Marker icon={OrganizationMarker} position={position}>
-              <Popup>
-                <OrganizationPopup organization={organization} />
-              </Popup>
-            </Marker>
-          </CustomMapContainer>
-        </>
+      {canEdit && (
+        <IconButton
+          size="medium"
+          aria-label="edit"
+          color="primary"
+          onClick={onEdit}
+          disabled={isNil(onEdit)}>
+          <CreateIcon />
+        </IconButton>
       )}
-    </>
-  );
-};
+    </Box>
+    <br />
+    {!isEmpty(position) && (
+      <CustomMapContainer
+        wholePage={false}
+        dragging
+        viewport={null}
+        scrollWheelZoom={false}
+        zoom={14}
+        center={position}>
+        <Marker icon={OrganizationMarker} position={position}>
+          <Popup>
+            <OrganizationPopup organization={organization} />
+          </Popup>
+        </Marker>
+      </CustomMapContainer>
+    )}
+  </>
+);
 
 Details.propTypes = {
   address: PropTypes.string,

@@ -10,26 +10,24 @@ import User from './User';
 const AppBarWithState = ({ isAuth }) => {
   const getOptionLabel = option => option.name;
   return (
-    <>
-      <AppBar
-        toggleMenu={action('toggle side menu')}
-        isAuth={isAuth}
-        onLoginClick={action('click log in')}
-        onLogoutClick={action('click log out')}
-        AutoCompleteSearch={() => (
-          <AutoCompleteSearch
-            hasFixWidth={false}
-            onSelection={() => {}}
-            input=""
-            inputValue=""
-            onInputChange={() => {}}
-            suggestions={[]}
-            renderOption={() => {}}
-            getOptionLabel={getOptionLabel}
-          />
-        )}
-      />
-    </>
+    <AppBar
+      toggleMenu={action('toggle side menu')}
+      isAuth={isAuth}
+      onLoginClick={action('click log in')}
+      onLogoutClick={action('click log out')}
+      AutoCompleteSearch={() => (
+        <AutoCompleteSearch
+          hasFixWidth={false}
+          onSelection={() => {}}
+          input=""
+          inputValue=""
+          onInputChange={() => {}}
+          suggestions={[]}
+          renderOption={() => {}}
+          getOptionLabel={getOptionLabel}
+        />
+      )}
+    />
   );
 };
 
@@ -37,15 +35,13 @@ AppBarWithState.propTypes = {
   isAuth: PropTypes.bool.isRequired
 };
 
-const UserWithState = ({ isAuth }) => {
-  return (
-    <User
-      isAuth={isAuth}
-      onLoginClick={action('onLoginClick')}
-      onLogoutClick={action('onLogouClick')}
-    />
-  );
-};
+const UserWithState = ({ isAuth }) => (
+  <User
+    isAuth={isAuth}
+    onLoginClick={action('onLoginClick')}
+    onLogoutClick={action('onLogouClick')}
+  />
+);
 
 UserWithState.propTypes = {
   isAuth: PropTypes.bool.isRequired

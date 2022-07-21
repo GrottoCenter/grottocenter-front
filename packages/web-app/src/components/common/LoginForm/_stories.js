@@ -66,56 +66,54 @@ const DialogLoginForm = ({
   const [hasErrors, setHasErrors] = React.useState(false);
 
   return (
-    <>
-      <StandardDialog
-        buttonType="button"
-        open={isOpen}
-        onClose={action('onClose')}
-        title={<Title />}
-        actions={[
-          <Button
-            type="submit"
-            size="large"
-            onClick={action('onLogin')}
-            color={isLoading ? '' : 'primary'}
-            key={0}>
-            {isLoading ? (
-              <CircularProgress size="2.8rem" />
-            ) : (
-              <Translate>Log in</Translate>
-            )}
-          </Button>
-        ]}>
-        <StoryControlsWrapper>
-          <div>
-            <b>Form State StoryControls</b>
-          </div>
-          <Switch
-            checked={isLoading}
-            onChange={event => setIsLoading(event.target.checked)}
-            color="primary"
-            inputProps={{ 'aria-label': 'primary checkbox' }}
-          />
-          <span>Is loading</span>
-
-          <Switch
-            checked={hasErrors}
-            onChange={event => setHasErrors(event.target.checked)}
-            color="primary"
-            inputProps={{ 'aria-label': 'primary checkbox' }}
-          />
-          <span>Has errors</span>
-        </StoryControlsWrapper>
-
-        <LoginForm
-          email={email}
-          onEmailChange={setEmail}
-          password={password}
-          onPasswordChange={setPassword}
-          authErrors={hasErrors ? authErrors : []}
+    <StandardDialog
+      buttonType="button"
+      open={isOpen}
+      onClose={action('onClose')}
+      title={<Title />}
+      actions={[
+        <Button
+          type="submit"
+          size="large"
+          onClick={action('onLogin')}
+          color={isLoading ? '' : 'primary'}
+          key={0}>
+          {isLoading ? (
+            <CircularProgress size="2.8rem" />
+          ) : (
+            <Translate>Log in</Translate>
+          )}
+        </Button>
+      ]}>
+      <StoryControlsWrapper>
+        <div>
+          <b>Form State StoryControls</b>
+        </div>
+        <Switch
+          checked={isLoading}
+          onChange={event => setIsLoading(event.target.checked)}
+          color="primary"
+          inputProps={{ 'aria-label': 'primary checkbox' }}
         />
-      </StandardDialog>
-    </>
+        <span>Is loading</span>
+
+        <Switch
+          checked={hasErrors}
+          onChange={event => setHasErrors(event.target.checked)}
+          color="primary"
+          inputProps={{ 'aria-label': 'primary checkbox' }}
+        />
+        <span>Has errors</span>
+      </StoryControlsWrapper>
+
+      <LoginForm
+        email={email}
+        onEmailChange={setEmail}
+        password={password}
+        onPasswordChange={setPassword}
+        authErrors={hasErrors ? authErrors : []}
+      />
+    </StandardDialog>
   );
 };
 

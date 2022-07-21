@@ -53,56 +53,45 @@ const FormAutoComplete = ({
   sideActionDisabled = true,
   isSideActionOpen = false,
   children
-}) => {
-  return (
-    <>
-      <FormControl
-        variant="filled"
-        required={required}
-        error={hasError}
-        fullWidth>
-        <InputLabel error={required && value === null}>
-          <Translate>{label}</Translate>
-        </InputLabel>
-        <StyledInput
-          disabled
-          value={value !== null ? getValueName(value) : ''}
-          endAdornment={resultEndAdornment}
-        />
+}) => (
+  <FormControl variant="filled" required={required} error={hasError} fullWidth>
+    <InputLabel error={required && value === null}>
+      <Translate>{label}</Translate>
+    </InputLabel>
+    <StyledInput
+      disabled
+      value={value !== null ? getValueName(value) : ''}
+      endAdornment={resultEndAdornment}
+    />
 
-        {autoCompleteSearch && (
-          <StyledFormControl
-            variant="filled"
-            required={required}
-            error={hasError}>
-            <InputWrapper>
-              {autoCompleteSearch}
-              {!isNil(children) && (
-                <Collapse in={isSideActionOpen}>{children}</Collapse>
-              )}
-            </InputWrapper>
-            {!isNil(onSideAction) && (
-              <IconButton
-                size="small"
-                onClick={onSideAction}
-                disabled={sideActionDisabled}
-                color="secondary"
-                aria-label="new entity">
-                {!isNil(sideActionIcon) ? (
-                  sideActionIcon
-                ) : (
-                  <ExpandIcon isOpen={isSideActionOpen} />
-                )}
-              </IconButton>
+    {autoCompleteSearch && (
+      <StyledFormControl variant="filled" required={required} error={hasError}>
+        <InputWrapper>
+          {autoCompleteSearch}
+          {!isNil(children) && (
+            <Collapse in={isSideActionOpen}>{children}</Collapse>
+          )}
+        </InputWrapper>
+        {!isNil(onSideAction) && (
+          <IconButton
+            size="small"
+            onClick={onSideAction}
+            disabled={sideActionDisabled}
+            color="secondary"
+            aria-label="new entity">
+            {!isNil(sideActionIcon) ? (
+              sideActionIcon
+            ) : (
+              <ExpandIcon isOpen={isSideActionOpen} />
             )}
-          </StyledFormControl>
+          </IconButton>
         )}
+      </StyledFormControl>
+    )}
 
-        {helperContent && <FormHelperText>{helperContent}</FormHelperText>}
-      </FormControl>
-    </>
-  );
-};
+    {helperContent && <FormHelperText>{helperContent}</FormHelperText>}
+  </FormControl>
+);
 
 FormAutoComplete.propTypes = {
   ...FormAutoCompleteTypes

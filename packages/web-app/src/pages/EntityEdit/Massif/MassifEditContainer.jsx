@@ -26,9 +26,7 @@ const MassifEditContainer = ({ isFetching, massif }) => {
         isFetching ? (
           <CircularProgress />
         ) : (
-          <>
-            <MassifForm massifValues={makeMassifValueData(massif)} />
-          </>
+          <MassifForm massifValues={makeMassifValueData(massif)} />
         )
       }
     />

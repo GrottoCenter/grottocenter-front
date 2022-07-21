@@ -30,11 +30,8 @@ export const RightCellCollection = ({
   const { formatMessage } = useIntl();
   const theme = useTheme();
 
-  const getAdornementColor = value => {
-    return value && value.id
-      ? theme.palette.successColor
-      : theme.palette.errorColor;
-  };
+  const getAdornementColor = value =>
+    value && value.id ? theme.palette.successColor : theme.palette.errorColor;
   return (
     <Grid container direction="column" alignItems="flex-end">
       <Grid
@@ -103,39 +100,37 @@ export const MiddleCellCollection = ({
   updateState,
   render,
   disabled
-}) => {
-  return (
-    <Grid container item direction="column" alignItems="center">
-      <Typography variant="h5" color="primary">
-        {label}
-      </Typography>
-      {Array.isArray(values) &&
-        values.map((state, index) => (
-          <Grid key={index} container direction="row" alignItems="center">
-            <Grid item xs={10}>
-              <StringInput
-                key={state}
-                value={render(state)}
-                valueName={`${label} ${index + 1}`}
-                fullWidth
-                disabled={disabled}
-              />
-            </Grid>
-            <Grid item xs={2}>
-              <MarginLeftDiv>
-                <Fab
-                  onClick={() => updateState(state)}
-                  color="primary"
-                  size="small">
-                  <RemoveIcon />
-                </Fab>
-              </MarginLeftDiv>
-            </Grid>
+}) => (
+  <Grid container item direction="column" alignItems="center">
+    <Typography variant="h5" color="primary">
+      {label}
+    </Typography>
+    {Array.isArray(values) &&
+      values.map((state, index) => (
+        <Grid key={index} container direction="row" alignItems="center">
+          <Grid item xs={10}>
+            <StringInput
+              key={state}
+              value={render(state)}
+              valueName={`${label} ${index + 1}`}
+              fullWidth
+              disabled={disabled}
+            />
           </Grid>
-        ))}
-    </Grid>
-  );
-};
+          <Grid item xs={2}>
+            <MarginLeftDiv>
+              <Fab
+                onClick={() => updateState(state)}
+                color="primary"
+                size="small">
+                <RemoveIcon />
+              </Fab>
+            </MarginLeftDiv>
+          </Grid>
+        </Grid>
+      ))}
+  </Grid>
+);
 
 export const LeftCellCollection = ({
   values,
@@ -149,9 +144,8 @@ export const LeftCellCollection = ({
   const { formatMessage } = useIntl();
   const theme = useTheme();
 
-  const getAdornementColor = value => {
-    return value.id ? theme.palette.successColor : theme.palette.errorColor;
-  };
+  const getAdornementColor = value =>
+    value.id ? theme.palette.successColor : theme.palette.errorColor;
   return (
     <Grid container direction="column">
       <Grid

@@ -12,6 +12,5 @@
 
 // TODO handle translations
 // eslint-disable-next-line import/prefer-default-export
-export const makeCoordinatesValue = (latitude, longitude) => {
-  return `Lat: ${latitude.toFixed(4)} - Long: ${longitude.toFixed(4)}`;
-};
+export const makeCoordinatesValue = (latitude, longitude) =>
+  `Lat: ${latitude.toFixed(4)} - Long: ${longitude.toFixed(4)}`;

@@ -78,64 +78,60 @@ export function loadMassif(massifId) {
       );
   };
 }
-export const postMassif = data => {
-  return (dispatch, getState) => {
-    dispatch(postMassifAction());
+export const postMassif = data => (dispatch, getState) => {
+  dispatch(postMassifAction());
 
-    const requestOptions = {
-      method: 'POST',
-      body: JSON.stringify(data),
-      headers: getState().login.authorizationHeader
-    };
-
-    return fetch(postCreateMassifUrl, requestOptions)
-      .then(response => {
-        if (response.status >= 400) {
-          throw new Error(response.status);
-        }
-        return response.json();
-      })
-      .then(res => {
-        dispatch(postMassifSuccess(res));
-      })
-      .catch(error =>
-        dispatch(
-          postMassifFailure(
-            makeErrorMessage(error.message, `Bad request`),
-            error.message
-          )
-        )
-      );
+  const requestOptions = {
+    method: 'POST',
+    body: JSON.stringify(data),
+    headers: getState().login.authorizationHeader
   };
+
+  return fetch(postCreateMassifUrl, requestOptions)
+    .then(response => {
+      if (response.status >= 400) {
+        throw new Error(response.status);
+      }
+      return response.json();
+    })
+    .then(res => {
+      dispatch(postMassifSuccess(res));
+    })
+    .catch(error =>
+      dispatch(
+        postMassifFailure(
+          makeErrorMessage(error.message, `Bad request`),
+          error.message
+        )
+      )
+    );
 };
 
-export const updateMassif = data => {
-  return (dispatch, getState) => {
-    dispatch(updateMassifAction());
+export const updateMassif = data => (dispatch, getState) => {
+  dispatch(updateMassifAction());
 
-    const requestOptions = {
-      method: 'PUT',
-      body: JSON.stringify(data),
-      headers: getState().login.authorizationHeader
-    };
-
-    return fetch(putMassifUrl(data.id), requestOptions)
-      .then(response => {
-        if (response.status >= 400) {
-          throw new Error(response.status);
-        }
-        return response.json();
-      })
-      .then(res => {
-        dispatch(updateMassifSuccess(res));
-      })
-      .catch(error =>
-        dispatch(
-          updateMassifFailure(
-            makeErrorMessage(error.message, `Bad request`),
-            error.message
-          )
-        )
-      );
+  const requestOptions = {
+    method: 'PUT',
+    body: JSON.stringify(data),
+    headers: getState().login.authorizationHeader
   };
+
+  return fetch(putMassifUrl(data.id), requestOptions)
+    .then(response => {
+      if (response.status >= 400) {
+        throw new Error(response.status);
+      }
+      return response.json();
+    })
+    .then(res => {
+      dispatch(updateMassifSuccess(res));
+    })
+    .catch(error =>
+      dispatch(
+        updateMassifFailure(
+          makeErrorMessage(error.message, `Bad request`),
+          error.message
+        )
+      )
+    );
 };

@@ -19,9 +19,11 @@ class MassifsSearch extends React.Component {
     this.handleValueChange = this.handleValueChange.bind(this);
   }
 
-  getInitialState = () => ({
-    name: ''
-  });
+  getInitialState() {
+    return {
+      name: ''
+    };
+  }
 
   /**
    * keyName: String

@@ -11,44 +11,41 @@ import {
 } from './Cave';
 import { postEntrance, updateEntrance } from './Entry';
 
-export const postCaveAndEntrance = (caveData, entranceData) => {
-  return (dispatch, getState) => {
-    dispatch(postCaveAction());
+export const postCaveAndEntrance = (caveData, entranceData) => (
+  dispatch,
+  getState
+) => {
+  dispatch(postCaveAction());
 
-    const requestOptions = {
-      method: 'POST',
-      body: JSON.stringify(caveData),
-      headers: getState().login.authorizationHeader
-    };
-
-    return fetch(postCreateCaveUrl, requestOptions)
-      .then(response => {
-        if (response.status >= 400) {
-          throw new Error(response.status);
-        }
-        return response.json();
-      })
-      .then(res => {
-        return res;
-      })
-      .then(res => {
-        dispatch(postCaveSuccess());
-        dispatch(postEntrance({ ...entranceData, cave: res.id }));
-      })
-      .catch(error =>
-        dispatch(
-          postCaveFailure(
-            makeErrorMessage(error.message, `Bad request`),
-            error.message
-          )
-        )
-      );
+  const requestOptions = {
+    method: 'POST',
+    body: JSON.stringify(caveData),
+    headers: getState().login.authorizationHeader
   };
+
+  return fetch(postCreateCaveUrl, requestOptions)
+    .then(response => {
+      if (response.status >= 400) {
+        throw new Error(response.status);
+      }
+      return response.json();
+    })
+    .then(res => res)
+    .then(res => {
+      dispatch(postCaveSuccess());
+      dispatch(postEntrance({ ...entranceData, cave: res.id }));
+    })
+    .catch(error =>
+      dispatch(
+        postCaveFailure(
+          makeErrorMessage(error.message, `Bad request`),
+          error.message
+        )
+      )
+    );
 };
 
-export const updateCaveAndEntrance = (caveData, entranceData) => {
-  return dispatch => {
-    dispatch(updateCave(caveData));
-    dispatch(updateEntrance(entranceData));
-  };
+export const updateCaveAndEntrance = (caveData, entranceData) => dispatch => {
+  dispatch(updateCave(caveData));
+  dispatch(updateEntrance(entranceData));
 };
