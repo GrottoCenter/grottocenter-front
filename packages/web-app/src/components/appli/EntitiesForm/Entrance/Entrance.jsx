@@ -1,6 +1,5 @@
 import {
   Box,
-  FormLabel,
   FormControlLabel,
   FormControl,
   FormHelperText,
@@ -42,7 +41,6 @@ const Entrance = ({
   to allow the user to mark and unmark it freely before submitting the form
   */
   const values = getValues();
-  const { isSensitive } = values.entrance;
   const initialIsSensitive = useRef(values.entrance.isSensitive).current;
 
   const caveIdValue = useDebounce(useWatch({ control, name: 'cave.id' }), 300);
@@ -168,11 +166,6 @@ const Entrance = ({
             margin="dense"
             component="fieldset"
             error={!!errors?.entrance?.isSensitive}>
-            <FormLabel component="legend">
-              {formatMessage({
-                id: `The cave access is ${isSensitive ? '' : 'not'} restricted.`
-              })}
-            </FormLabel>
             <FormControlLabel
               control={
                 <Switch
@@ -183,11 +176,9 @@ const Entrance = ({
                   onChange={e => field.onChange(e.target.checked)}
                 />
               }
-              label={
-                field.value
-                  ? formatMessage({ id: 'True' })
-                  : formatMessage({ id: 'False' })
-              }
+              label={formatMessage({
+                id: `The cave access is${field.value ? '' : ' not'} restricted.`
+              })}
             />
 
             {isSensitiveDisabled ? (
