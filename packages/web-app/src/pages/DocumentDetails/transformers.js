@@ -21,7 +21,7 @@ export const makeOverview = data => ({
   creationDate: propOr('', 'dateInscription', data),
   authors: pipe(
     propOr([], 'authors'),
-    map(propOr('', 'nickname')),
+    map(auth => getAuthor(auth)),
     reject(isEmpty),
     defaultTo([])
   )(data),
@@ -29,6 +29,15 @@ export const makeOverview = data => ({
   license: data.license,
   title: pipe(propOr([], 'titles'), head, propOr('', 'text'))(data),
   summary: pipe(propOr([], 'descriptions'), head, propOr('', 'text'))(data)
+});
+
+export const getAuthor = author => ({
+  id: author?.id,
+  fullName: author?.nickname || author?.name || author?.surname || 'Unknown',
+  name: author?.name || 'Unknown',
+  nickname: author?.nickname || 'Unknown',
+  surname: author?.surname || 'Unknown',
+  url: `/ui/persons/${author?.id}`
 });
 
 export const makeOrganizations = data => ({

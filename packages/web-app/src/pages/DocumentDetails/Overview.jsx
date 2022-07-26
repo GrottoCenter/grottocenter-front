@@ -91,9 +91,12 @@ const Overview = ({
                 {formatMessage({ id: 'Authors' })}
               </SubTitle>
               <Typography variant="body1">
-                {authors.map(
-                  (auth, i) => `${auth} ${i < authors.length - 1 ? ' - ' : ''}`
-                )}
+                {authors.map((auth, i) => (
+                  <>
+                    <a href={auth.url}>{auth.fullName}</a>
+                    {i < authors.length - 1 ? ' - ' : ''}
+                  </>
+                ))}
               </Typography>
             </>
           )}
@@ -114,7 +117,9 @@ Overview.propTypes = {
   loading: PropTypes.bool.isRequired,
   createdBy: PropTypes.string.isRequired,
   creationDate: PropTypes.string.isRequired,
-  authors: PropTypes.arrayOf(PropTypes.string).isRequired,
+  authors: PropTypes.arrayOf({
+    fullName: PropTypes.string.isRequired
+  }),
   language: PropTypes.string.isRequired,
   summary: PropTypes.string.isRequired
 };
