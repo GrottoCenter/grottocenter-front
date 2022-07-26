@@ -7,7 +7,7 @@ import {
   ListItemIcon,
   ListItem,
   ListItemText,
-  Typography,
+  Typography
 } from '@material-ui/core';
 import { useDispatch } from 'react-redux';
 import EditIcon from '@material-ui/icons/Edit';
