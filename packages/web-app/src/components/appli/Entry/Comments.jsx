@@ -35,8 +35,17 @@ const Comment = ({ comment }) => {
     accessRate,
     date
   } = comment;
-  const { formatMessage, formatDate } = useIntl();
+  const { formatDate } = useIntl();
   const formattedBody = makeFormattedText(body);
+  const authorLink =
+    !isNil(author.id) && !isNil(author.nickname) ? (
+      // eslint-disable-next-line jsx-a11y/label-has-associated-control
+      <label>
+        Posted by <a href={author.url}>{author.nickname}</a>
+      </label>
+    ) : (
+      ''
+    );
 
   return (
     <ListItem>
@@ -50,8 +59,8 @@ const Comment = ({ comment }) => {
             </Typography>
             <br />
             <Typography variant="caption">
-              {`${!isNil(author.nickname) &&
-                formatMessage({ id: 'Posted by' })} ${author.nickname} ${
+              {authorLink}
+              {`${
                 !isNil(date)
                   ? `- ${formatDate(date, {
                       year: 'numeric',

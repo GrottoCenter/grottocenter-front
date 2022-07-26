@@ -7,7 +7,7 @@ import {
   ListItemIcon,
   ListItem,
   ListItemText,
-  Typography
+  Typography,
 } from '@material-ui/core';
 import { useDispatch } from 'react-redux';
 import EditIcon from '@material-ui/icons/Edit';
@@ -20,11 +20,20 @@ import { updateLocation } from '../../../../actions/UpdateLocation';
 import { usePermissions } from '../../../../hooks';
 
 const Location = ({ location }) => {
-  const { formatMessage, formatDate } = useIntl();
+  const { formatDate } = useIntl();
   const dispatch = useDispatch();
   const permissions = usePermissions();
   const { author, body, creationDate, title } = location;
   const [isFormVisible, setIsFormVisible] = useState(false);
+  const authorLink =
+    !isNil(author.id) && !isNil(author.nickname) ? (
+      // eslint-disable-next-line jsx-a11y/label-has-associated-control
+      <label>
+        Posted by <a href={author.url}>{author.nickname}</a>
+      </label>
+    ) : (
+      ''
+    );
 
   const onSubmitForm = data => {
     dispatch(
@@ -62,8 +71,8 @@ const Location = ({ location }) => {
                 component="span"
                 variant="caption"
                 color="textPrimary">
-                {`${!isNil(author.nickname) &&
-                  formatMessage({ id: 'Posted by' })} ${author.nickname} ${
+                {authorLink}
+                {`${
                   !isNil(creationDate)
                     ? `- ${formatDate(creationDate, {
                         year: 'numeric',

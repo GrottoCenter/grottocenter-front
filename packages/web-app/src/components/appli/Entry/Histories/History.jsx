@@ -20,11 +20,20 @@ import { updateHistory } from '../../../../actions/UpdateHistory';
 import { usePermissions } from '../../../../hooks';
 
 const History = ({ history }) => {
-  const { formatMessage, formatDate } = useIntl();
+  const { formatDate } = useIntl();
   const dispatch = useDispatch();
   const permissions = usePermissions();
   const { author, body, creationDate } = history;
   const [isFormVisible, setIsFormVisible] = useState(false);
+  const authorLink =
+    !isNil(author.id) && !isNil(author.nickname) ? (
+      // eslint-disable-next-line jsx-a11y/label-has-associated-control
+      <label>
+        Posted by <a href={author.url}>{author.nickname}</a>
+      </label>
+    ) : (
+      ''
+    );
 
   const onSubmitForm = data => {
     dispatch(
@@ -61,8 +70,8 @@ const History = ({ history }) => {
                 component="span"
                 variant="caption"
                 color="textPrimary">
-                {`${!isNil(author.nickname) &&
-                  formatMessage({ id: 'Posted by' })} ${author.nickname} ${
+                {authorLink}
+                {`${
                   !isNil(creationDate)
                     ? `- ${formatDate(creationDate, {
                         year: 'numeric',
