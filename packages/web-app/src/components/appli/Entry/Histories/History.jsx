@@ -14,7 +14,7 @@ import EditIcon from '@material-ui/icons/Edit';
 import CancelIcon from '@material-ui/icons/Cancel';
 
 import { historyType } from '../Provider';
-import makeFormattedText from '../utils';
+import { makeFormattedText, authorLink } from '../utils';
 import CreateHistoryForm from '../../Form/HistoryForm/index';
 import { updateHistory } from '../../../../actions/UpdateHistory';
 import { usePermissions } from '../../../../hooks';
@@ -25,15 +25,6 @@ const History = ({ history }) => {
   const permissions = usePermissions();
   const { author, body, creationDate } = history;
   const [isFormVisible, setIsFormVisible] = useState(false);
-  const authorLink =
-    !isNil(author.id) && !isNil(author.nickname) ? (
-      // eslint-disable-next-line jsx-a11y/label-has-associated-control
-      <label>
-        Posted by <a href={author.url}>{author.nickname}</a>
-      </label>
-    ) : (
-      ''
-    );
 
   const onSubmitForm = data => {
     dispatch(
@@ -70,7 +61,7 @@ const History = ({ history }) => {
                 component="span"
                 variant="caption"
                 color="textPrimary">
-                {authorLink}
+                {authorLink(author)}
                 {`${
                   !isNil(creationDate)
                     ? `- ${formatDate(creationDate, {

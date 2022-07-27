@@ -14,7 +14,7 @@ import EditIcon from '@material-ui/icons/Edit';
 import CancelIcon from '@material-ui/icons/Cancel';
 
 import { locationType } from '../Provider';
-import makeFormattedText from '../utils';
+import { makeFormattedText, authorLink } from '../utils';
 import CreateLocationForm from '../../Form/LocationForm/index';
 import { updateLocation } from '../../../../actions/UpdateLocation';
 import { usePermissions } from '../../../../hooks';
@@ -25,15 +25,6 @@ const Location = ({ location }) => {
   const permissions = usePermissions();
   const { author, body, creationDate, title } = location;
   const [isFormVisible, setIsFormVisible] = useState(false);
-  const authorLink =
-    !isNil(author.id) && !isNil(author.nickname) ? (
-      // eslint-disable-next-line jsx-a11y/label-has-associated-control
-      <label>
-        Posted by <a href={author.url}>{author.nickname}</a>
-      </label>
-    ) : (
-      ''
-    );
 
   const onSubmitForm = data => {
     dispatch(
@@ -71,7 +62,7 @@ const Location = ({ location }) => {
                 component="span"
                 variant="caption"
                 color="textPrimary">
-                {authorLink}
+                {authorLink(author)}
                 {`${
                   !isNil(creationDate)
                     ? `- ${formatDate(creationDate, {

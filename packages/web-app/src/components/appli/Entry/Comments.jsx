@@ -12,8 +12,8 @@ import { isNil } from 'ramda';
 import styled from 'styled-components';
 import ScrollableContent from '../../common/Layouts/Fixed/ScrollableContent';
 import { commentsType, commentType } from './Provider';
+import { makeFormattedText, authorLink } from './utils';
 import Ratings from './Ratings';
-import makeFormattedText from './utils';
 
 const StyledListItemText = styled(ListItemText)`
   width: 100%;
@@ -37,15 +37,6 @@ const Comment = ({ comment }) => {
   } = comment;
   const { formatDate } = useIntl();
   const formattedBody = makeFormattedText(body);
-  const authorLink =
-    !isNil(author.id) && !isNil(author.nickname) ? (
-      // eslint-disable-next-line jsx-a11y/label-has-associated-control
-      <label>
-        Posted by <a href={author.url}>{author.nickname}</a>
-      </label>
-    ) : (
-      ''
-    );
 
   return (
     <ListItem>
@@ -59,7 +50,7 @@ const Comment = ({ comment }) => {
             </Typography>
             <br />
             <Typography variant="caption">
-              {authorLink}
+              {authorLink(author)}
               {`${
                 !isNil(date)
                   ? `- ${formatDate(date, {
