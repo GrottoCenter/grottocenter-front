@@ -2,17 +2,9 @@ import { isNil, pathOr } from 'ramda';
 import {
   makeDetails,
   makeEntities,
-  makeOverview
+  makeOverview,
+  getAuthor
 } from '../DocumentDetails/transformers';
-
-export const getAuthor = author => ({
-  id: author?.id,
-  fullName: author?.nickname || author?.name || author?.surname || 'Unknown',
-  name: author?.name || 'Unknown',
-  nickname: author?.nickname || 'Unknown',
-  surname: author?.surname || 'Unknown',
-  url: `/ui/persons/${author?.id}`
-});
 
 export const getComments = (comments = []) =>
   comments.map(comment => ({
