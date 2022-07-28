@@ -52,7 +52,8 @@ const Properties = () => {
         precision,
         progressionRate,
         temperature,
-        undergroundType
+        undergroundType,
+        cave
       },
       loading
     }
@@ -135,7 +136,7 @@ const Properties = () => {
             loading={loading}
             label={formatMessage({ id: 'Development' })}
             value={`${development} m`}
-            icon={<CustomIcon type="length" />}
+            icon={<c type="length" />}
           />
         )}
         {altitude && (
@@ -143,6 +144,14 @@ const Properties = () => {
             label={formatMessage({ id: 'Altitude' })}
             value={`${altitude} m`}
             icon={<Height color="primary" />}
+          />
+        )}
+        {cave && (
+          <Property
+            label={formatMessage({ id: 'Caves' })}
+            value={`${cave.name}`}
+            icon={<CustomIcon type="cave_system" />}
+            url={`/ui/caves/${cave.id}`}
           />
         )}
         {temperature && (
