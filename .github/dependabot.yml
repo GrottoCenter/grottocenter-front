@@ -1,0 +1,20 @@
+# To get started with Dependabot version updates, you'll need to specify which
+# package ecosystems to update and where the package manifests are located.
+# Please see the documentation for all configuration options:
+# https://docs.github.com/github/administering-a-repository/configuration-options-for-dependency-updates
+
+version: 2
+updates:
+  - package-ecosystem: 'npm' # See documentation for possible values
+    directory: '/'
+    # Updates currently disabled: re-enable them (with the value 5) when we had tests checking everything is ok after updating the packages
+    open-pull-requests-limit: 0
+    schedule:
+      interval: 'weekly'
+
+  - package-ecosystem: 'npm' # See documentation for possible values
+    directory: '/packages/web-app/'
+    # Updates currently disabled: re-enable them (with the value 5) when we had tests checking everything is ok after updating the packages
+    open-pull-requests-limit: 0
+    schedule:
+      interval: 'weekly'
