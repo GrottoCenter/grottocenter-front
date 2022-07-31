@@ -51,7 +51,7 @@
     "react-intl": "^5.10.16",
     "react-leaflet": "^3.2.0",
     "react-leaflet-draw": "^0.19.8",
-    "react-papaparse": "^3.17.2",
+    "react-papaparse": "^4.0.2",
     "react-phone-input-2": "^2.15.0",
     "react-redux": "^7.2.0",
     "react-router": "^5.2.0",
