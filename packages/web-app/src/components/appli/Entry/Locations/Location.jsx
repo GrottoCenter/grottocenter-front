@@ -15,12 +15,13 @@ import CancelIcon from '@material-ui/icons/Cancel';
 
 import { locationType } from '../Provider';
 import makeFormattedText from '../utils';
+import AuthorLink from '../../../common/AuthorLink/index';
 import CreateLocationForm from '../../Form/LocationForm/index';
 import { updateLocation } from '../../../../actions/UpdateLocation';
 import { usePermissions } from '../../../../hooks';
 
 const Location = ({ location }) => {
-  const { formatMessage, formatDate } = useIntl();
+  const { formatDate } = useIntl();
   const dispatch = useDispatch();
   const permissions = usePermissions();
   const { author, body, creationDate, title } = location;
@@ -62,8 +63,8 @@ const Location = ({ location }) => {
                 component="span"
                 variant="caption"
                 color="textPrimary">
-                {`${!isNil(author.nickname) &&
-                  formatMessage({ id: 'Posted by' })} ${author.nickname} ${
+                <AuthorLink author={author} />
+                {`${
                   !isNil(creationDate)
                     ? `- ${formatDate(creationDate, {
                         year: 'numeric',

@@ -4,14 +4,7 @@ import {
   makeEntities,
   makeOverview
 } from '../DocumentDetails/transformers';
-
-export const getAuthor = author => ({
-  id: author?.id,
-  fullName: author?.nickname || author?.name || author?.surname || 'Unknown',
-  name: author?.name || 'Unknown',
-  nickname: author?.nickname || 'Unknown',
-  surname: author?.surname || 'Unknown'
-});
+import getAuthor from '../../util/getAuthor';
 
 export const getComments = (comments = []) =>
   comments.map(comment => ({

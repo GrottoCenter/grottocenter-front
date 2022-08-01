@@ -9,6 +9,8 @@ import {
   head
 } from 'ramda';
 
+import getAuthor from '../../util/getAuthor';
+
 const getFirstName = (data, entity) =>
   pathOr(
     pipe(pathOr([], [entity, 'names']), head, propOr('', 'name'))(data),
@@ -21,7 +23,7 @@ export const makeOverview = data => ({
   creationDate: propOr('', 'dateInscription', data),
   authors: pipe(
     propOr([], 'authors'),
-    map(propOr('', 'nickname')),
+    map(auth => getAuthor(auth)),
     reject(isEmpty),
     defaultTo([])
   )(data),

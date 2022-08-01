@@ -1,6 +1,5 @@
 import { pathOr } from 'ramda';
-
-import { getAuthor } from '../Entry/transformers';
+import getAuthor from '../../util/getAuthor';
 
 // eslint-disable-next-line import/prefer-default-export
 export const getSafeData = data => ({

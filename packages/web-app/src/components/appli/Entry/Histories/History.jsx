@@ -15,12 +15,13 @@ import CancelIcon from '@material-ui/icons/Cancel';
 
 import { historyType } from '../Provider';
 import makeFormattedText from '../utils';
+import AuthorLink from '../../../common/AuthorLink/index';
 import CreateHistoryForm from '../../Form/HistoryForm/index';
 import { updateHistory } from '../../../../actions/UpdateHistory';
 import { usePermissions } from '../../../../hooks';
 
 const History = ({ history }) => {
-  const { formatMessage, formatDate } = useIntl();
+  const { formatDate } = useIntl();
   const dispatch = useDispatch();
   const permissions = usePermissions();
   const { author, body, creationDate } = history;
@@ -61,8 +62,8 @@ const History = ({ history }) => {
                 component="span"
                 variant="caption"
                 color="textPrimary">
-                {`${!isNil(author.nickname) &&
-                  formatMessage({ id: 'Posted by' })} ${author.nickname} ${
+                <AuthorLink author={author} />
+                {`${
                   !isNil(creationDate)
                     ? `- ${formatDate(creationDate, {
                         year: 'numeric',
