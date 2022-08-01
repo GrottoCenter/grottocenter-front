@@ -16,8 +16,8 @@ import {
 import React from 'react';
 import { isNil } from 'ramda';
 import ScrollableContent from '../../common/Layouts/Fixed/ScrollableContent';
-import { riggingsType, riggingType } from './Provider';
 import makeFormattedText from './utils';
+import { riggingsType, riggingType } from './Provider';
 
 const RiggingTable = ({ obstacles, title }) => {
   const { formatMessage } = useIntl();

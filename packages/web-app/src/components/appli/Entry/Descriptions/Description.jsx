@@ -15,12 +15,13 @@ import CancelIcon from '@material-ui/icons/Cancel';
 
 import { descriptionType } from '../Provider';
 import makeFormattedText from '../utils';
+import AuthorLink from '../../../common/AuthorLink/index';
 import CreateDescriptionForm from '../../Form/DescriptionForm/index';
 import { updateDescription } from '../../../../actions/UpdateDescription';
 import { usePermissions } from '../../../../hooks';
 
 const Description = ({ description }) => {
-  const { formatMessage, formatDate } = useIntl();
+  const { formatDate } = useIntl();
   const dispatch = useDispatch();
   const permissions = usePermissions();
   const { author, body, creationDate, title } = description;
@@ -61,8 +62,8 @@ const Description = ({ description }) => {
                 component="span"
                 variant="caption"
                 color="textPrimary">
-                {`${!isNil(author.nickname) &&
-                  formatMessage({ id: 'Posted by' })} ${author.nickname} ${
+                <AuthorLink author={author} />
+                {`${
                   !isNil(creationDate)
                     ? `- ${formatDate(creationDate, {
                         year: 'numeric',

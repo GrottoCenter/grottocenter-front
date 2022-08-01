@@ -12,8 +12,10 @@ import { isNil } from 'ramda';
 import styled from 'styled-components';
 import ScrollableContent from '../../common/Layouts/Fixed/ScrollableContent';
 import { commentsType, commentType } from './Provider';
-import Ratings from './Ratings';
 import makeFormattedText from './utils';
+import AuthorLink from '../../common/AuthorLink/index';
+
+import Ratings from './Ratings';
 
 const StyledListItemText = styled(ListItemText)`
   width: 100%;
@@ -35,7 +37,7 @@ const Comment = ({ comment }) => {
     accessRate,
     date
   } = comment;
-  const { formatMessage, formatDate } = useIntl();
+  const { formatDate } = useIntl();
   const formattedBody = makeFormattedText(body);
 
   return (
@@ -50,8 +52,8 @@ const Comment = ({ comment }) => {
             </Typography>
             <br />
             <Typography variant="caption">
-              {`${!isNil(author.nickname) &&
-                formatMessage({ id: 'Posted by' })} ${author.nickname} ${
+              <AuthorLink author={author} />
+              {`${
                 !isNil(date)
                   ? `- ${formatDate(date, {
                       year: 'numeric',
