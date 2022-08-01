@@ -12,6 +12,7 @@ import Provider, { CaveContext, caveTypes } from './Provider';
 import Properties from './Properties';
 import { NetworkForm } from '../EntitiesForm';
 import StandardDialog from '../../common/StandardDialog';
+import AuthorLink from '../../common/AuthorLink/index';
 
 const Content = () => (
   <>
@@ -29,10 +30,6 @@ export const Network = ({ children }) => {
   const editPage = useBoolean();
   const permissions = usePermissions();
 
-  const footer = `${formatMessage({ id: 'Created by' })} ${author.fullName} ${
-    !isNil(creationDate) ? `(${formatDate(creationDate)})` : ''
-  }`;
-
   const handleEdit = () => {
     editPage.open();
   };
@@ -44,7 +41,12 @@ export const Network = ({ children }) => {
         <FixedContent
           title={name || ''}
           content={<Content />}
-          footer={footer}
+          footer={
+            <span>
+              <AuthorLink author={author} verb="Created" />
+              {!isNil(creationDate) && ` (${formatDate(creationDate)})`}
+            </span>
+          }
           icon={<CustomIcon type="cave_system" />}
         />
       }>

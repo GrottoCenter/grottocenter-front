@@ -8,6 +8,7 @@ import { Link } from 'react-router-dom';
 import ScrollableContent from '../../common/Layouts/Fixed/ScrollableContent';
 import { CaveContext } from './Provider';
 import CustomIcon from '../../common/CustomIcon';
+import Alert from '../../common/Alert';
 
 const LoadingList = () => (
   <>
@@ -28,9 +29,8 @@ const EntrancesList = () => {
       title={formatMessage({ id: 'Entrances' })}
       content={
         <List dense>
-          {loading ? (
-            <LoadingList />
-          ) : (
+          {loading && <LoadingList />}
+          {entrances && entrances.length > 0 ? (
             entrances
               .sort((e1, e2) => e1.name.localeCompare(e2.name))
               .map(entrance => (
@@ -50,6 +50,13 @@ const EntrancesList = () => {
                   <ListItemText primary={entrance.name} />
                 </ListItem>
               ))
+          ) : (
+            <Alert
+              severity="info"
+              title={formatMessage({
+                id: 'There is currently no entrance for this network.'
+              })}
+            />
           )}
         </List>
       }

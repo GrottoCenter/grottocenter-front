@@ -18,6 +18,7 @@ import { isNil } from 'ramda';
 import ScrollableContent from '../../common/Layouts/Fixed/ScrollableContent';
 import makeFormattedText from './utils';
 import { riggingsType, riggingType } from './Provider';
+import AuthorLink from '../../common/AuthorLink';
 
 const RiggingTable = ({ obstacles, title }) => {
   const { formatMessage } = useIntl();
@@ -82,20 +83,15 @@ const Riggings = ({ riggings }) => {
                       component="span"
                       variant="caption"
                       color="textPrimary">
-                      {`${!isNil(rigging.author?.nickname) &&
-                        formatMessage({ id: 'Posted by' })} ${
-                        rigging.author.nickname
-                      } ${
-                        !isNil(rigging.date)
-                          ? `- ${formatDate(rigging.date, {
-                              year: 'numeric',
-                              month: 'numeric',
-                              day: 'numeric',
-                              hour: 'numeric',
-                              minute: 'numeric'
-                            })}`
-                          : ''
-                      }`}
+                      <AuthorLink author={rigging.author} />
+                      {!isNil(rigging.date) &&
+                        `- ${formatDate(rigging.date, {
+                          year: 'numeric',
+                          month: 'numeric',
+                          day: 'numeric',
+                          hour: 'numeric',
+                          minute: 'numeric'
+                        })}`}
                     </Typography>
                   }
                 />

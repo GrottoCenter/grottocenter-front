@@ -5,7 +5,7 @@ import getAuthor from '../../util/getAuthor';
 export const getSafeData = data => ({
   altitude: data.altitude,
   author: getAuthor(data?.author),
-  creationDate: data.inscriptionDate,
+  creationDate: data.dateInscription,
   depth: data.depth,
   length: data.length,
   descriptions: data.descriptions,

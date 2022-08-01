@@ -272,7 +272,11 @@ DocumentPage.propTypes = {
   loading: PropTypes.bool,
   areDocumentChildrenLoading: PropTypes.bool,
   overview: PropTypes.shape({
-    createdBy: PropTypes.string.isRequired,
+    author: {
+      id: PropTypes.number,
+      nickname: PropTypes.string,
+      url: PropTypes.string
+    },
     authors: PropTypes.arrayOf(PropTypes.string).isRequired,
     language: PropTypes.string.isRequired,
     license: PropTypes.shape({

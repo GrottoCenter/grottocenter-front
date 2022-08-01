@@ -1,5 +1,10 @@
 {
-  "createdBy": "Louis DUPONT",
+  "author": {
+    "id": 32,
+    "nickname": "Louis DUPONT",
+    "name": "Louis",
+    "surnmame": "DUPONT"
+  },
   "language": "French",
   "title": "this is a title",
   "summary": "this is a summary this is a summary this is a summary this is a summary this is a summary this is a summary this is a summary this is a summary this is a summary this is a summary this is a summary this is a summary this is a summary this is a summary this is a summary this is a summary this is a summary this is a summary this is a summary ",
