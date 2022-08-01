@@ -5,6 +5,7 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { Skeleton } from '@material-ui/lab';
 import { isEmpty } from 'ramda';
+import AuthorLink from '../../components/common/AuthorLink/index';
 
 const Header = styled.div`
   display: flex;
@@ -21,8 +22,8 @@ const CreatedByTypography = styled(Typography)`
   flex-direction: row;
 `;
 
-const CreatedBy = ({ name, creationDate }) => {
-  const { formatMessage, formatDate, formatTime } = useIntl();
+const CreatedBy = ({ author, creationDate }) => {
+  const { formatDate, formatTime } = useIntl();
 
   return (
     <CreatedByTypography
@@ -30,19 +31,18 @@ const CreatedBy = ({ name, creationDate }) => {
       color="textSecondary"
       variant="caption"
       gutterBottom>
-      <Box fontWeight="fontWeightLight">
-        {`${formatMessage({ id: 'Created by' })}:`}
-        &nbsp;
-      </Box>
       <Box fontWeight="fontWeightBold">
-        {`${name} (${formatDate(creationDate)} - ${formatTime(creationDate)})`}
+        <AuthorLink author={author} verb="Created" />
+        {` `}({formatDate(creationDate)}
+        {' - '}
+        {formatTime(creationDate)})
       </Box>
     </CreatedByTypography>
   );
 };
 
 const Overview = ({
-  createdBy,
+  author,
   creationDate,
   authors,
   language,
@@ -61,7 +61,7 @@ const Overview = ({
           </>
         ) : (
           <>
-            <CreatedBy name={createdBy} creationDate={creationDate} />
+            <CreatedBy author={author} creationDate={creationDate} />
             <Typography color="textSecondary" variant="caption" gutterBottom>
               {`${formatMessage({
                 id: 'Document language'
@@ -109,13 +109,21 @@ const Overview = ({
 export default Overview;
 
 CreatedBy.propTypes = {
-  name: PropTypes.string.isRequired,
+  author: PropTypes.shape({
+    id: PropTypes.number,
+    nickname: PropTypes.string,
+    url: PropTypes.string
+  }),
   creationDate: PropTypes.string.isRequired
 };
 
 Overview.propTypes = {
   loading: PropTypes.bool.isRequired,
-  createdBy: PropTypes.string.isRequired,
+  author: PropTypes.shape({
+    id: PropTypes.number,
+    nickname: PropTypes.string,
+    url: PropTypes.string
+  }),
   creationDate: PropTypes.string.isRequired,
   authors: PropTypes.arrayOf({
     fullName: PropTypes.string.isRequired

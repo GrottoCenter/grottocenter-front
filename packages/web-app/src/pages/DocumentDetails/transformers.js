@@ -19,7 +19,7 @@ const getFirstName = (data, entity) =>
   );
 
 export const makeOverview = data => ({
-  createdBy: pathOr('', ['author', 'nickname'], data),
+  author: getAuthor(data.author),
   creationDate: propOr('', 'dateInscription', data),
   authors: pipe(
     propOr([], 'authors'),

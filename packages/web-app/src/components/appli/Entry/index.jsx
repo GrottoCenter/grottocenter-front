@@ -28,6 +28,7 @@ import { useBoolean, usePermissions } from '../../../hooks';
 import StandardDialog from '../../common/StandardDialog';
 import { EntranceForm } from '../EntitiesForm';
 import SensitiveCaveWarning from './SensitiveCaveWarning';
+import AuthorLink from '../../common/AuthorLink';
 
 const EntryProperties = ({ isSensitive }) => (
   <>
@@ -71,19 +72,6 @@ export const Entry = () => {
   const permissions = usePermissions();
   const editPage = useBoolean();
 
-  const footer = `${formatMessage({ id: 'Created by' })}
-        ${author.fullName} ${
-    !isNil(creationDate) ? `(${formatDate(creationDate)})` : ''
-  }
-        ${
-          !isNil(lastEditor) && !isNil(editionDate)
-            ? ` - ${formatMessage({
-                id: 'Last modification by'
-              })} ${lastEditor} (
-          ${formatDate(editionDate)})`
-            : ''
-        }`;
-
   const handleEdit = () => {
     editPage.open();
   };
@@ -95,7 +83,18 @@ export const Entry = () => {
         <FixedContent
           title={name || ''}
           content={<EntryProperties isSensitive={isSensitive} />}
-          footer={footer}
+          footer={
+            <span>
+              <AuthorLink author={author} verb="Created" />
+              {!isNil(creationDate) && ` (${formatDate(creationDate)})`}
+              {!isNil(lastEditor) &&
+                !isNil(editionDate) &&
+                ` - ${formatMessage({
+                  id: 'Last modification by'
+                })} ${lastEditor} (
+                ${formatDate(editionDate)})`}
+            </span>
+          }
           icon={<CustomIcon type="entry" />}
         />
       }>
