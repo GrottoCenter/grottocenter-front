@@ -18,6 +18,15 @@ const getFirstName = (data, entity) =>
     data
   );
 
+export const makeIdentifier = data => {
+  const id = pathOr('', ['identifierType', 'id'], data);
+  const identifier = pathOr('', ['identifier'], data);
+  if (id === 'url') {
+    return identifier.toString();
+  }
+  return undefined;
+};
+
 export const makeOverview = data => ({
   author: getAuthor(data.author),
   creationDate: propOr('', 'dateInscription', data),
