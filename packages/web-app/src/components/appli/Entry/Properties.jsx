@@ -117,6 +117,14 @@ const Properties = () => {
             url={`/ui/massifs/${massif.id}`}
           />
         )}
+        {cave && (
+          <Property
+            label={formatMessage({ id: 'Cave' })}
+            value={`${cave.name}`}
+            icon={<CustomIcon type="cave_system" />}
+            url={`/ui/caves/${cave.id}`}
+          />
+        )}
       </Box>
       <Box
         display="flex"
@@ -144,14 +152,6 @@ const Properties = () => {
             label={formatMessage({ id: 'Altitude' })}
             value={`${altitude} m`}
             icon={<Height color="primary" />}
-          />
-        )}
-        {cave && (
-          <Property
-            label={formatMessage({ id: 'Caves' })}
-            value={`${cave.name}`}
-            icon={<CustomIcon type="cave_system" />}
-            url={`/ui/caves/${cave.id}`}
           />
         )}
         {temperature && (
