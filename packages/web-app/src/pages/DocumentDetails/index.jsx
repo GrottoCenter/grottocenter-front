@@ -21,8 +21,7 @@ import {
   makeEntities,
   makeOrganizations,
   makeOverview,
-  makeDocumentParent,
-  makeIdentifier
+  makeDocumentParent
 } from './transformers';
 import { usePermissions } from '../../hooks';
 import Layout from '../../components/common/Layouts/Fixed/FixedContent';
@@ -47,8 +46,7 @@ const DocumentPage = ({
   documentParent,
   isValidated,
   onEdit,
-  areDocumentChildrenLoading,
-  identifier
+  areDocumentChildrenLoading
 }) => {
   const { formatMessage } = useIntl();
   const permissions = usePermissions();
@@ -109,7 +107,7 @@ const DocumentPage = ({
               {
                 label: formatMessage({ id: 'Identifier' }),
                 value: details.identifier,
-                url: details.identifier
+                url: details.isUrl ? details.identifier : undefined
               },
               {
                 label: formatMessage({ id: 'BBS reference' }),
@@ -265,7 +263,6 @@ const HydratedDocumentPage = ({ id }) => {
       }
       isValidated={details.modifiedDocJson === null}
       onEdit={permissions.isAuth ? onEdit : undefined}
-      identifier={makeIdentifier(details || {})}
     />
   );
 };
@@ -275,7 +272,6 @@ export default HydratedDocumentPage;
 DocumentPage.propTypes = {
   loading: PropTypes.bool,
   areDocumentChildrenLoading: PropTypes.bool,
-  identifier: PropTypes.string,
   overview: PropTypes.shape({
     author: {
       id: PropTypes.number,
@@ -304,6 +300,7 @@ DocumentPage.propTypes = {
   details: PropTypes.shape({
     authorComment: PropTypes.string,
     identifier: PropTypes.string,
+    isUrl: PropTypes.string,
     bbsReference: PropTypes.string,
     documentType: PropTypes.string,
     oldPublication: PropTypes.string,

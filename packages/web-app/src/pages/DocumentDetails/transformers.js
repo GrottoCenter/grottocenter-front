@@ -18,15 +18,6 @@ const getFirstName = (data, entity) =>
     data
   );
 
-export const makeIdentifier = data => {
-  const id = pathOr('', ['identifierType', 'id'], data);
-  const identifier = pathOr('', ['identifier'], data);
-  if (id === 'url') {
-    return identifier.toString();
-  }
-  return undefined;
-};
-
 export const makeOverview = data => ({
   author: getAuthor(data.author),
   creationDate: propOr('', 'dateInscription', data),
@@ -54,10 +45,14 @@ export const makeOrganizations = data => ({
 });
 
 export const makeDetails = data => {
-  const formatedIdentfier = pathOr('', ['identifier'], data);
+  let formatedIdentfier = pathOr('', ['identifier'], data);
+  if (formatedIdentfier.startsWith('www')) {
+    formatedIdentfier = `http://${formatedIdentfier}`;
+  }
   return {
     authorComment: propOr('', 'authorComment', data),
     identifier: formatedIdentfier,
+    isUrl: formatedIdentfier.startsWith('http'),
     bbsReference: propOr('', 'refBbs', data),
     documentType: pathOr('', ['type', 'name'], data),
     publicationDate: propOr('', 'datePublication', data),
