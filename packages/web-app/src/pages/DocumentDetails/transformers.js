@@ -54,13 +54,7 @@ export const makeOrganizations = data => ({
 });
 
 export const makeDetails = data => {
-  const formatedIdentfier = pathOr(null, ['identifierType', 'id'], data)
-    ? `${propOr(
-        '',
-        'identifier',
-        data
-      )} (${data.identifierType.id.toUpperCase()})`
-    : propOr('', 'identifier', data);
+  const formatedIdentfier = pathOr('', ['identifier'], data);
   return {
     authorComment: propOr('', 'authorComment', data),
     identifier: formatedIdentfier,

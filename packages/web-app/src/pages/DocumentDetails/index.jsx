@@ -109,7 +109,7 @@ const DocumentPage = ({
               {
                 label: formatMessage({ id: 'Identifier' }),
                 value: details.identifier,
-                url: identifier
+                url: details.identifier
               },
               {
                 label: formatMessage({ id: 'BBS reference' }),
