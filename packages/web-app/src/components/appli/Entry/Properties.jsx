@@ -144,7 +144,7 @@ const Properties = () => {
             loading={loading}
             label={formatMessage({ id: 'Development' })}
             value={`${development} m`}
-            icon={<c type="length" />}
+            icon={<CustomIcon type="length" />}
           />
         )}
         {altitude && (
