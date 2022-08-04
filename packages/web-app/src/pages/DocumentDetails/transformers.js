@@ -44,25 +44,19 @@ export const makeOrganizations = data => ({
   }
 });
 
-export const makeDetails = data => {
-  let formatedIdentfier = pathOr('', ['identifier'], data);
-  if (formatedIdentfier.startsWith('www')) {
-    formatedIdentfier = `http://${formatedIdentfier}`;
-  }
-  return {
-    authorComment: propOr('', 'authorComment', data),
-    identifier: data.identifier,
-    identifierType: data.identifierType?.id,
-    bbsReference: propOr('', 'refBbs', data),
-    documentType: pathOr('', ['type', 'name'], data),
-    publicationDate: propOr('', 'datePublication', data),
-    oldPublication: propOr('', 'publication', data),
-    oldPublicationFascicule: propOr('', 'publicationFasciculeBBSOld', data),
-    pages: propOr('', 'pages', data),
-    subjects: pipe(propOr([], 'subjects'), reject(isEmpty))(data),
-    regions: pipe(propOr([], 'regions'), reject(isEmpty))(data)
-  };
-};
+export const makeDetails = data => ({
+  authorComment: propOr('', 'authorComment', data),
+  identifier: data.identifier,
+  identifierType: data.identifierType?.id,
+  bbsReference: propOr('', 'refBbs', data),
+  documentType: pathOr('', ['type', 'name'], data),
+  publicationDate: propOr('', 'datePublication', data),
+  oldPublication: propOr('', 'publication', data),
+  oldPublicationFascicule: propOr('', 'publicationFasciculeBBSOld', data),
+  pages: propOr('', 'pages', data),
+  subjects: pipe(propOr([], 'subjects'), reject(isEmpty))(data),
+  regions: pipe(propOr([], 'regions'), reject(isEmpty))(data)
+});
 
 export const makeEntities = data => ({
   massif: {
