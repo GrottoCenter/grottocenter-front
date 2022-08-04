@@ -51,8 +51,8 @@ export const makeDetails = data => {
   }
   return {
     authorComment: propOr('', 'authorComment', data),
-    identifier: formatedIdentfier,
-    isUrl: formatedIdentfier.startsWith('http'),
+    identifier: data.identifier,
+    identifierType: data.identifierType?.id,
     bbsReference: propOr('', 'refBbs', data),
     documentType: pathOr('', ['type', 'name'], data),
     publicationDate: propOr('', 'datePublication', data),
