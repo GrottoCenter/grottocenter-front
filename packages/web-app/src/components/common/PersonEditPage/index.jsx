@@ -3,7 +3,7 @@ import { useParams, useHistory } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import styled from 'styled-components';
-import { pathOr, isNil } from 'ramda';
+import { isNil } from 'ramda';
 import {
   Stepper,
   Step,
@@ -14,12 +14,12 @@ import {
   CircularProgress,
   Box
 } from '@material-ui/core';
+import CancelIconOutlined from '@material-ui/icons/CancelOutlined';
 
 import { useForm } from 'react-hook-form';
 
 import { useDispatch, useSelector } from 'react-redux';
 
-import Layout from '../Layouts/Fixed/FixedContent';
 import ActionButton from '../ActionButton';
 import Alert from '../Alert';
 
@@ -31,16 +31,9 @@ import { postChangePassword } from '../../../actions/ChangePassword';
 import { postChangeEmail } from '../../../actions/ChangeEmail';
 import Summary from './Summary';
 
-const StyledTypography = styled(Typography)`
-  margin-top: theme.spacing(1);
-  margin-bottom: theme.spacing(1);
-`;
 const StyledActionButton = styled(ActionButton)`
   margin-top: ${({ theme }) => theme.spacing(1)}px;
   margin-bottom: ${({ theme }) => theme.spacing(1)}px;
-`;
-const StyledButton = styled(Button)`
-  margin-right: theme.spacing(1);
 `;
 
 function getSteps() {
@@ -92,7 +85,7 @@ const PersonEditPage = ({ userValues }) => {
   const history = useHistory();
   const { personId } = useParams();
 
-  const userId = pathOr(null, ['id'], useUserProperties());
+  const { id: userId } = useUserProperties();
 
   const { formatMessage } = useIntl();
   const isUser = useBoolean(userId.toString() === personId.toString());
@@ -173,107 +166,98 @@ const PersonEditPage = ({ userValues }) => {
     history.push(`/ui/persons/${userValues.id}`);
   };
 
-  return (
-    <Layout
-      title={formatMessage({ id: 'Edit your profile' })}
-      content={
-        isSubmitted && isNil(UserError) ? (
-          <Box display="flex" justifyContent="center" flexDirection="column">
-            {UserLoading && (
-              <>
-                <Typography>
-                  {formatMessage({
-                    id: 'Updating user...'
-                  })}
-                </Typography>
-                <CircularProgress />
-              </>
-            )}
-            {!UserLoading && isSubmitSuccessful && (
-              <Alert
-                severity="success"
-                title={formatMessage({
-                  id: 'User successfully updated'
-                })}
-              />
-            )}
-            {!UserLoading && !isSubmitSuccessful && (
-              <Alert
-                severity="error"
-                title={formatMessage({
-                  id: 'An error occurred when updating the user!'
-                })}
-              />
-            )}
-          </Box>
-        ) : (
-          <Box display="flex" justifyContent="center" flexDirection="column">
-            <form autoComplete="off" onSubmit={handleSubmit(onSubmit)}>
-              <Stepper activeStep={activeStep}>
-                {steps.map(label => {
-                  const stepProps = {};
-                  const labelProps = {};
+  return isSubmitted && isNil(UserError) ? (
+    <Box display="flex" justifyContent="center" flexDirection="column">
+      {UserLoading && (
+        <>
+          <Typography>
+            {formatMessage({
+              id: 'Updating user...'
+            })}
+          </Typography>
+          <CircularProgress />
+        </>
+      )}
+      {!UserLoading && isSubmitSuccessful && (
+        <Alert
+          severity="success"
+          title={formatMessage({
+            id: 'User successfully updated'
+          })}
+        />
+      )}
+      {!UserLoading && !isSubmitSuccessful && (
+        <Alert
+          severity="error"
+          title={formatMessage({
+            id: 'An error occurred when updating the user!'
+          })}
+        />
+      )}
+    </Box>
+  ) : (
+    <Box display="flex" justifyContent="center" flexDirection="column">
+      <form autoComplete="off" onSubmit={handleSubmit(onSubmit)}>
+        <Stepper activeStep={activeStep}>
+          {steps.map(label => {
+            const stepProps = {};
+            const labelProps = {};
 
-                  return (
-                    <Step key={label} {...stepProps}>
-                      <StepLabel {...labelProps}>{label}</StepLabel>
-                    </Step>
-                  );
-                })}
-              </Stepper>
+            return (
+              <Step key={label} {...stepProps}>
+                <StepLabel {...labelProps}>{label}</StepLabel>
+              </Step>
+            );
+          })}
+        </Stepper>
 
-              <div>
-                <div>
-                  <StyledTypography component="div">
-                    {getStepContent(
-                      activeStep,
-                      defaultValues,
-                      control,
-                      errors,
-                      watch,
-                      isUser
-                    )}
-                  </StyledTypography>
-                  <div>
-                    <StyledButton
-                      disabled={activeStep === 0}
-                      onClick={handleBack}>
-                      Back
-                    </StyledButton>
-                    {activeStep === steps.length - 1 ? (
-                      <StyledActionButton
-                        label={
-                          isUser
-                            ? formatMessage({ id: 'Update' })
-                            : formatMessage({ id: 'Update user' })
-                        }
-                        loading={isSubmitting}
-                        color="primary"
-                        icon={<Icon>send</Icon>}
-                        type="submit"
-                      />
-                    ) : (
-                      <Button
-                        variant="contained"
-                        color="primary"
-                        disabled={!isDirty}
-                        onClick={handleNext}>
-                        {formatMessage({ id: 'Next' })}
-                      </Button>
-                    )}
-                  </div>
-                  <div>
-                    <StyledButton onClick={handleReset}>
-                      {formatMessage({ id: 'Cancel' })}
-                    </StyledButton>
-                  </div>
-                </div>
-              </div>
-            </form>
+        <Box display="flex" alignItems="center" flexDirection="column">
+          {getStepContent(
+            activeStep,
+            defaultValues,
+            control,
+            errors,
+            watch,
+            isUser
+          )}
+          {activeStep === steps.length - 1 && (
+            <Box marginBottom={2}>
+              <StyledActionButton
+                label={
+                  isUser
+                    ? formatMessage({ id: 'Update my profile' })
+                    : formatMessage({ id: 'Update user' })
+                }
+                loading={isSubmitting}
+                color="primary"
+                icon={<Icon>send</Icon>}
+                type="submit"
+              />
+            </Box>
+          )}
+          <Box display="flex" justifyContent="space-between" width="170px">
+            <Button disabled={activeStep === 0} onClick={handleBack}>
+              {formatMessage({ id: 'Back' })}
+            </Button>
+            <Button
+              variant="contained"
+              color="primary"
+              disabled={!isDirty || activeStep === steps.length - 1}
+              onClick={handleNext}>
+              {formatMessage({ id: 'Next' })}
+            </Button>
           </Box>
-        )
-      }
-    />
+          <Box marginTop={4}>
+            <Button
+              color="secondary"
+              onClick={handleReset}
+              startIcon={<CancelIconOutlined />}>
+              {formatMessage({ id: 'Cancel' })}
+            </Button>
+          </Box>
+        </Box>
+      </form>
+    </Box>
   );
 };
 
