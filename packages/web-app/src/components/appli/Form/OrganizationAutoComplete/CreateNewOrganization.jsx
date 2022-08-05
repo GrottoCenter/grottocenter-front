@@ -38,7 +38,9 @@ const CreateNewOrganization = ({
 
   const handleSubmit = () => {
     const organizationToPost = {
-      name: organizationName
+      name: {
+        text: organizationName
+      }
     };
     dispatch(postOrganization(organizationToPost));
   };
