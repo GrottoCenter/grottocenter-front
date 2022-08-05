@@ -56,7 +56,7 @@ import subject from './SubjectReducer';
 import updateDescription from './UpdateDescription';
 import updateHistory from './UpdateHistory';
 import updateLocation from './UpdateLocation';
-import updateUser from './UpdateCaver';
+import updatePerson from './UpdatePerson';
 
 const GCReducer = combineReducers({
   advancedsearch,
@@ -116,7 +116,7 @@ const GCReducer = combineReducers({
   updateDescription,
   updateHistory,
   updateLocation,
-  updateUser
+  updatePerson
 });
 
 export default GCReducer;

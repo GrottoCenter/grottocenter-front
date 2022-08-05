@@ -3,7 +3,6 @@ import { useParams, useHistory } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import styled from 'styled-components';
-import { isNil } from 'ramda';
 import {
   Stepper,
   Step,
@@ -23,10 +22,10 @@ import { useDispatch, useSelector } from 'react-redux';
 import ActionButton from '../ActionButton';
 import Alert from '../Alert';
 
-import { useBoolean, useUserProperties } from '../../../hooks';
+import { useUserProperties } from '../../../hooks';
 import PersonEditForm from './PersonForm';
 import makeUserData from './transformer';
-import { updateUser } from '../../../actions/UpdateUser';
+import { updatePerson } from '../../../actions/UpdatePerson';
 import { postChangePassword } from '../../../actions/ChangePassword';
 import { postChangeEmail } from '../../../actions/ChangeEmail';
 import Summary from './Summary';
@@ -88,7 +87,8 @@ const PersonEditPage = ({ userValues }) => {
   const { id: userId } = useUserProperties();
 
   const { formatMessage } = useIntl();
-  const isUser = useBoolean(userId.toString() === personId.toString());
+  const isUser = userId.toString() === personId.toString();
+
   const {
     handleSubmit,
     control,
@@ -107,12 +107,16 @@ const PersonEditPage = ({ userValues }) => {
       user: defaultValues
     }
   });
-  const { error: UserError, loading: UserLoading } = useSelector(
-    state => state.updateUser
+  const { error: userError, isLoading: userLoading } = useSelector(
+    state => state.updatePerson
   );
   const dispatch = useDispatch();
 
   const [activeStep, setActiveStep] = React.useState(0);
+
+  const goBackToUserProfile = () => {
+    history.push(`/ui/persons/${userValues.id}`);
+  };
 
   const handleNext = async () => {
     const result = await trigger(
@@ -142,15 +146,14 @@ const PersonEditPage = ({ userValues }) => {
 
   const handleReset = () => {
     reset({ user: defaultValues });
-    history.push(`/ui/persons/${userValues.id}`);
+    goBackToUserProfile();
   };
 
   const onSubmit = async data => {
     setActiveStep(prevActiveStep => prevActiveStep + 1);
 
-    const User = makeUserData(data);
-
-    dispatch(updateUser(User));
+    const user = makeUserData(data);
+    dispatch(updatePerson(userValues.id, user));
 
     if (data.user.email !== undefined && data.user.email !== '' && isUser) {
       dispatch(postChangeEmail(data.user.email));
@@ -163,12 +166,11 @@ const PersonEditPage = ({ userValues }) => {
     ) {
       dispatch(postChangePassword(data.user.password, token));
     }
-    history.push(`/ui/persons/${userValues.id}`);
   };
 
-  return isSubmitted && isNil(UserError) ? (
-    <Box display="flex" justifyContent="center" flexDirection="column">
-      {UserLoading && (
+  return isSubmitted ? (
+    <Box justifyContent="center" flexDirection="column">
+      {userLoading && (
         <>
           <Typography>
             {formatMessage({
@@ -178,21 +180,31 @@ const PersonEditPage = ({ userValues }) => {
           <CircularProgress />
         </>
       )}
-      {!UserLoading && isSubmitSuccessful && (
-        <Alert
-          severity="success"
-          title={formatMessage({
-            id: 'User successfully updated'
-          })}
-        />
+      {!userLoading && isSubmitSuccessful && !userError && (
+        <>
+          <Alert
+            severity="success"
+            title={formatMessage({
+              id: 'User successfully updated'
+            })}
+          />
+          <Button onClick={goBackToUserProfile}>
+            {formatMessage({ id: 'Go back to user profile' })}
+          </Button>
+        </>
       )}
-      {!UserLoading && !isSubmitSuccessful && (
-        <Alert
-          severity="error"
-          title={formatMessage({
-            id: 'An error occurred when updating the user!'
-          })}
-        />
+      {!userLoading && userError && (
+        <>
+          <Alert
+            severity="error"
+            title={formatMessage({
+              id: 'An error occurred when updating the user.'
+            })}
+          />
+          <Button onClick={goBackToUserProfile}>
+            {formatMessage({ id: 'Go back to user profile' })}
+          </Button>
+        </>
       )}
     </Box>
   ) : (
@@ -221,7 +233,7 @@ const PersonEditPage = ({ userValues }) => {
             isUser
           )}
           {activeStep === steps.length - 1 && (
-            <Box marginBottom={2}>
+            <Box mb={4}>
               <StyledActionButton
                 label={
                   isUser
@@ -235,7 +247,11 @@ const PersonEditPage = ({ userValues }) => {
               />
             </Box>
           )}
-          <Box display="flex" justifyContent="space-between" width="170px">
+          <Box
+            display="flex"
+            justifyContent="space-between"
+            width="170px"
+            mb={4}>
             <Button disabled={activeStep === 0} onClick={handleBack}>
               {formatMessage({ id: 'Back' })}
             </Button>
@@ -247,14 +263,12 @@ const PersonEditPage = ({ userValues }) => {
               {formatMessage({ id: 'Next' })}
             </Button>
           </Box>
-          <Box marginTop={4}>
-            <Button
-              color="secondary"
-              onClick={handleReset}
-              startIcon={<CancelIconOutlined />}>
-              {formatMessage({ id: 'Cancel' })}
-            </Button>
-          </Box>
+          <Button
+            color="secondary"
+            onClick={handleReset}
+            startIcon={<CancelIconOutlined />}>
+            {formatMessage({ id: 'Cancel' })}
+          </Button>
         </Box>
       </form>
     </Box>
