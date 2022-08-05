@@ -11,6 +11,23 @@ import Layout from '../../components/common/Layouts/Fixed/FixedContent';
 
 import PersonEditPage from '../../components/common/PersonEditPage';
 import { loadPerson } from '../../actions/Person';
+import Alert from '../../components/common/Alert';
+
+const computeTitle = (isFetching, person, formatMessage) => {
+  if (isFetching) return formatMessage({ id: 'Loading user data...' });
+  if (!isNil(person))
+    return formatMessage(
+      {
+        id: 'Editing {person}',
+        defaultMessage: 'Editing {person}'
+      },
+      {
+        person: person.nickname
+      }
+    );
+  if (isNil(person)) return formatMessage({ id: 'Editing an unknown user' });
+  return '';
+};
 
 const PersonEdit = () => {
   const { formatMessage } = useIntl();
@@ -19,11 +36,9 @@ const PersonEdit = () => {
   const { person, isFetching } = useSelector(state => state.person);
 
   const { personId } = useParams();
-  const permissions = usePermissions();
+  const { isAdmin } = usePermissions();
   const userId = pathOr(null, ['id'], useUserProperties());
-
-  const isAllowed =
-    userId.toString() === personId.toString() || permissions.isAdmin;
+  const isAllowed = userId?.toString() === personId.toString() || isAdmin;
 
   useEffect(() => {
     if (personId) {
@@ -33,38 +48,31 @@ const PersonEdit = () => {
 
   return (
     <Layout
-      title={
-        person !== undefined
-          ? `${person?.name} ${person?.surname}`
-          : formatMessage({ id: 'Loading user data...' })
-      }
+      title={computeTitle(isFetching, person, formatMessage)}
       content={
         <>
-          {!isAllowed && (
-            <Box display="flex" alignItems="center" justifyContent="center">
-              {formatMessage({
-                id: 'Error, the person you are looking for is not available.'
-              })}
-            </Box>
-          )}
-          {isFetching && isAllowed ? (
+          {isFetching && (
             <Box display="flex" alignItems="center" justifyContent="center">
               <CircularProgress size={100} />
             </Box>
-          ) : (
-            <>
-              {isNil(person) && (
-                <Box display="flex" alignItems="center" justifyContent="center">
-                  {formatMessage({
-                    id:
-                      'Error, the person you are looking for is not available.'
-                  })}
-                </Box>
-              )}
-
-              <PersonEditPage userValues={person} />
-            </>
           )}
+          {!isAllowed && !isNil(person) && !isFetching && (
+            <Alert
+              severity="error"
+              content={formatMessage({
+                id: 'You are not authorized to edit this person.'
+              })}
+            />
+          )}
+          {isNil(person) && !isFetching && (
+            <Alert
+              severity="error"
+              content={formatMessage({
+                id: "The person you are looking for doesn't exist."
+              })}
+            />
+          )}
+          {person && isAllowed && <PersonEditPage userValues={person} />}
         </>
       }
     />
