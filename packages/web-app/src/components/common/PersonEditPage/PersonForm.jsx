@@ -37,7 +37,7 @@ const PersonEditForm = ({ control, errors, watch, isUser }) => {
   const validatePwd = value => {
     if (value.length > 0 && value.length < 8) {
       return formatMessage({
-        id: 'Invalid email or password.'
+        id: 'Password too short.'
       });
     }
     return true;
@@ -46,7 +46,7 @@ const PersonEditForm = ({ control, errors, watch, isUser }) => {
     if (value) {
       if (value.length >= 0 && isEmpty(match(emailRegexp, value))) {
         return formatMessage({
-          id: 'Invalid email or password.'
+          id: 'Invalid email.'
         });
       }
     }

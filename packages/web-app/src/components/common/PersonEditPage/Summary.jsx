@@ -5,11 +5,11 @@ import { isNil } from 'ramda';
 import styled from 'styled-components';
 import { useIntl } from 'react-intl';
 import { useWatch } from 'react-hook-form';
-import { Typography } from '@material-ui/core';
+import { Box, Typography } from '@material-ui/core';
 
-import { useDebounce } from '../../../hooks';
 import InternationalizedLink from '../InternationalizedLink';
 import { licensesODBLink } from '../../../conf/Config';
+import Property from './Property';
 
 const LicenceImage = styled.img`
   width: 75px;
@@ -18,47 +18,26 @@ const LicenceImage = styled.img`
 const Summary = ({ control, defautValues }) => {
   const { formatMessage } = useIntl();
 
-  const debouncedName = useDebounce(
-    useWatch({ control, name: 'user.name' }),
-    300
-  );
-  const debouncedSurname = useDebounce(
-    useWatch({ control, name: 'user.surname' }),
-    300
-  );
-  const debouncedNickname = useDebounce(
-    useWatch({ control, name: 'user.nickname' }),
-    300
-  );
-
-  const debouncedMail = useDebounce(
-    useWatch({ control, name: 'user.email' }),
-    300
-  );
-  const debouncedPassword = useDebounce(
-    useWatch({ control, name: 'user.password' }),
-    300
-  );
-
+  const newName = useWatch({ control, name: 'user.name' });
+  const newSurname = useWatch({ control, name: 'user.surname' });
+  const newNickname = useWatch({ control, name: 'user.nickname' });
+  const newMail = useWatch({ control, name: 'user.email' });
+  const newPassword = useWatch({ control, name: 'user.password' });
   const changes = fieldName => {
     switch (fieldName) {
       case 'name':
-        return defautValues.name !== debouncedName;
+        return defautValues.name !== newName;
       case 'surname':
-        return defautValues.surname !== debouncedSurname;
+        return defautValues.surname !== newSurname;
       case 'nickname':
-        return defautValues.nickname !== debouncedNickname;
+        return defautValues.nickname !== newNickname;
       case 'email':
-        return !(
-          debouncedMail === undefined ||
-          isNil(debouncedMail) ||
-          debouncedMail === ''
-        );
+        return !(newMail === undefined || isNil(newMail) || newMail === '');
       case 'password':
         return !(
-          debouncedPassword === undefined ||
-          debouncedPassword == null ||
-          debouncedPassword === ''
+          newPassword === undefined ||
+          newPassword == null ||
+          newPassword === ''
         );
       default:
         return false;
@@ -68,52 +47,45 @@ const Summary = ({ control, defautValues }) => {
   return (
     <>
       <Typography variant="h2" gutterBottom>
-        {formatMessage({ id: 'Check the veracity of the information' })}
+        {formatMessage({ id: 'Modifications summary' })}
       </Typography>
 
-      <>
-        {changes('name') ? (
-          <Typography variant="h3" gutterBottom>
-            {formatMessage({ id: 'Previous name' })} : {defautValues.name}
-            {' - '}
-            {formatMessage({ id: 'Modified name' })} : {debouncedName}
-          </Typography>
-        ) : (
-          ''
+      <Box my={3}>
+        {changes('name') && (
+          <Property
+            newValue={newName}
+            oldValue={defautValues.name}
+            valueName="Name"
+          />
         )}
-        {changes('surname') ? (
-          <Typography variant="h3" gutterBottom>
-            {formatMessage({ id: 'Previous surname' })} : {defautValues.surname}
-            {' - '}
-            {formatMessage({ id: 'Modified surname' })} : {debouncedSurname}
-          </Typography>
-        ) : (
-          ''
+        {changes('surname') && (
+          <Property
+            newValue={newSurname}
+            oldValue={defautValues.surname}
+            valueName="Surname"
+          />
         )}
-        {changes('nickname') ? (
-          <Typography variant="h3" gutterBottom>
-            {formatMessage({ id: 'Previous nickname' })} :{' '}
-            {defautValues.nickname}
-            {' - '}
-            {formatMessage({ id: 'Modified nickname' })} : {debouncedNickname}
-          </Typography>
-        ) : (
-          ''
+        {changes('nickname') && (
+          <Property
+            newValue={newNickname}
+            oldValue={defautValues.nickname}
+            valueName="Nickname"
+          />
         )}
-        {changes('email') ? (
-          <Typography variant="h3" gutterBottom>
-            {formatMessage({ id: 'New email' })} : {debouncedMail}
-          </Typography>
-        ) : (
-          ''
+        {changes('email') && (
+          <Property newValue={newMail} valueName="New email" />
         )}
-        {changes('password') ? (
-          <Typography variant="h3" gutterBottom>
+        {changes('password') && (
+          <Typography
+            align="center"
+            gutterBottom
+            style={{ fontWeight: 'bold' }}>
             {formatMessage({ id: 'Your password will be changed' })}
           </Typography>
-        ) : (
-          ''
         )}
+      </Box>
+      <Box flexDirection="column" display="flex" alignItems="center" mb={3}>
+        <Typography>{formatMessage({ id: 'License' })}</Typography>
         <InternationalizedLink links={licensesODBLink}>
           <LicenceImage
             src="/images/odbl.png"
@@ -124,7 +96,7 @@ const Summary = ({ control, defautValues }) => {
             })}
           />
         </InternationalizedLink>
-      </>
+      </Box>
     </>
   );
 };

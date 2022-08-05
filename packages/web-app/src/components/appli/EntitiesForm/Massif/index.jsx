@@ -220,8 +220,8 @@ export const MassifForm = ({ massifValues }) => {
               severity="error"
               title={formatMessage({
                 id: isNewMassif
-                  ? 'An error occurred when creating a massif!'
-                  : 'An error occurred when updating a massif!'
+                  ? 'An error occurred when creating a massif.'
+                  : 'An error occurred when updating a massif.'
               })}
             />
             {isNewMassif && (
