@@ -29,6 +29,9 @@ const Details = ({ control, errors, isReadonly = false }) => {
     if (value < 0) {
       return formatMessage({ id: 'Distance must be superior or equal to 0' });
     }
+    if (!Number.isInteger(value)) {
+      return formatMessage({ id: 'Distance must be an integer (in m)' });
+    }
     return true;
   };
 
@@ -46,14 +49,14 @@ const Details = ({ control, errors, isReadonly = false }) => {
               autoFocus
               label={formatMessage({ id: 'Depth' })}
               type="number"
-              error={!!errors.depth}
+              error={!!errors.cave?.depth}
               inputRef={ref}
               InputProps={{
                 endAdornment: (
                   <InputAdornment position="start">m</InputAdornment>
                 )
               }}
-              helperText={errors.depth?.message}
+              helperText={errors.cave?.depth?.message}
               {...field}
             />
           )}
@@ -68,14 +71,14 @@ const Details = ({ control, errors, isReadonly = false }) => {
               fullWidth
               label={formatMessage({ id: 'Length' })}
               type="number"
-              error={!!errors.length}
+              error={!!errors.cave?.length}
               inputRef={ref}
               InputProps={{
                 endAdornment: (
                   <InputAdornment position="start">m</InputAdornment>
                 )
               }}
-              helperText={errors.length?.message}
+              helperText={errors.cave?.length?.message}
               {...field}
             />
           )}
@@ -93,14 +96,14 @@ const Details = ({ control, errors, isReadonly = false }) => {
               fullWidth
               label={formatMessage({ id: 'Temperature' })}
               type="number"
-              error={!!errors.temperature}
+              error={!!errors.cave?.temperature}
               inputRef={ref}
               InputProps={{
                 endAdornment: (
                   <InputAdornment position="start">°C</InputAdornment>
                 )
               }}
-              helperText={errors.temperature?.message}
+              helperText={errors.cave?.temperature?.message}
               {...field}
             />
           )}
@@ -116,7 +119,7 @@ const Details = ({ control, errors, isReadonly = false }) => {
             margin="dense"
             disabled={isReadonly}
             component="fieldset"
-            error={!!errors.isDiving}>
+            error={!!errors.cave?.isDiving}>
             <FormLabel component="legend">
               <Translate>The cave contains water</Translate>
             </FormLabel>
@@ -144,10 +147,12 @@ const Details = ({ control, errors, isReadonly = false }) => {
 
 Details.propTypes = {
   errors: PropTypes.shape({
-    depth: PropTypes.shape({ message: PropTypes.string }),
-    length: PropTypes.shape({ message: PropTypes.string }),
-    temperature: PropTypes.shape({ message: PropTypes.string }),
-    isDiving: PropTypes.shape({ message: PropTypes.string })
+    cave: PropTypes.shape({
+      depth: PropTypes.shape({ message: PropTypes.string }),
+      length: PropTypes.shape({ message: PropTypes.string }),
+      temperature: PropTypes.shape({ message: PropTypes.string }),
+      isDiving: PropTypes.shape({ message: PropTypes.string })
+    })
   }),
   control: PropTypes.shape({}),
   isReadonly: PropTypes.bool
