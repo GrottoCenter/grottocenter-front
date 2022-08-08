@@ -8,6 +8,7 @@ import PropTypes from 'prop-types';
 import ReactToPrint from 'react-to-print';
 import { isMobile } from 'react-device-detect';
 import grey from '@material-ui/core/colors/grey';
+import { useHistory, generatePath } from 'react-router-dom';
 
 const Wrapper = styled.div`
   position: sticky;
@@ -30,6 +31,9 @@ const StyledFab = styled(Fab)`
   }
 `;
 
+const encodePathLocation = pathLocation =>
+  Buffer.from(pathLocation).toString('base64');
+
 const ActionButton = ({ Icon, label, onClick }) => {
   const { formatMessage } = useIntl();
   const tooltipMessage = isNil(onClick)
@@ -43,6 +47,7 @@ const ActionButton = ({ Icon, label, onClick }) => {
           aria-label={label}
           size="small"
           disabled={isNil(onClick)}
+          // eslint-disable-next-line react/jsx-closing-bracket-location
           onClick={onClick}>
           {Icon}
         </StyledFab>
@@ -53,6 +58,12 @@ const ActionButton = ({ Icon, label, onClick }) => {
 
 const ActionBar = ({ printRef, onEdit }) => {
   const { formatMessage } = useIntl();
+  const history = useHistory();
+
+  const openMap = () => {
+    const args = encodePathLocation(`lng=${20}&lat=${20}&zoom=${20}`);
+    history.push(generatePath('/ui/map/:target', { target: args }));
+  };
 
   return (
     <Wrapper>
@@ -85,6 +96,7 @@ const ActionBar = ({ printRef, onEdit }) => {
         label={formatMessage({ id: 'GeoHack' })}
       />
       <ActionButton
+        onClick={openMap}
         Icon={<Map fontSize={isMobile ? 'small' : 'medium'} />}
         label={formatMessage({ id: 'Map' })}
       />
