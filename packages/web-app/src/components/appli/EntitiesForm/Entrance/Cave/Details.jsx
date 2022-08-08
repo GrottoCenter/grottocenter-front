@@ -18,7 +18,11 @@ const Details = ({ control, errors, isReadonly = false }) => {
   const { formatMessage } = useIntl();
 
   const validateTemperature = value => {
-    if (value > 100 || value < -100) {
+    const numberValue = Number(value);
+    if (Number.isNaN(numberValue) || !Number.isInteger(numberValue)) {
+      return formatMessage({ id: 'Temperature must be an integer (in °C)' });
+    }
+    if (numberValue > 100 || numberValue < -100) {
       return formatMessage({
         id: 'Temperature must be between -100 and 100 °C'
       });
@@ -26,11 +30,12 @@ const Details = ({ control, errors, isReadonly = false }) => {
     return true;
   };
   const validateDistance = value => {
-    if (value < 0) {
-      return formatMessage({ id: 'Distance must be superior or equal to 0' });
-    }
-    if (!Number.isInteger(Number(value))) {
+    const numberValue = Number(value);
+    if (Number.isNaN(numberValue) || !Number.isInteger(numberValue)) {
       return formatMessage({ id: 'Distance must be an integer (in m)' });
+    }
+    if (numberValue < 0) {
+      return formatMessage({ id: 'Distance must be superior or equal to 0' });
     }
     return true;
   };
