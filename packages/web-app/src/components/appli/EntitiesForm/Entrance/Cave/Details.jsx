@@ -29,7 +29,7 @@ const Details = ({ control, errors, isReadonly = false }) => {
     if (value < 0) {
       return formatMessage({ id: 'Distance must be superior or equal to 0' });
     }
-    if (!Number.isInteger(value)) {
+    if (!Number.isInteger(Number(value))) {
       return formatMessage({ id: 'Distance must be an integer (in m)' });
     }
     return true;
