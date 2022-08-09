@@ -10,7 +10,7 @@ const initialState = {
   history: null
 };
 
-const createHistory = (state = initialState, action) => {
+const reducer = (state = initialState, action) => {
   switch (action.type) {
     case POST_HISTORY:
       return {
@@ -33,4 +33,4 @@ const createHistory = (state = initialState, action) => {
   }
 };
 
-export default createHistory;
+export default reducer;

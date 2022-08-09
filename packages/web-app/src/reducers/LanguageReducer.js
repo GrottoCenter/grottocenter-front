@@ -13,7 +13,7 @@ const initialState = {
   error: null
 };
 
-const language = (state = initialState, action) => {
+const reducer = (state = initialState, action) => {
   switch (action.type) {
     case CHANGE_LANGUAGE:
       return { ...state, lang: action.lang };
@@ -36,4 +36,4 @@ const language = (state = initialState, action) => {
   }
 };
 
-export default language;
+export default reducer;

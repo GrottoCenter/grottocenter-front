@@ -11,7 +11,7 @@ const initialState = {
   error: null
 };
 
-const region = (state = initialState, action) => {
+const reducer = (state = initialState, action) => {
   switch (action.type) {
     case REGIONS_SEARCH:
       return { ...state, isFetching: true };
@@ -34,4 +34,4 @@ const region = (state = initialState, action) => {
   }
 };
 
-export default region;
+export default reducer;

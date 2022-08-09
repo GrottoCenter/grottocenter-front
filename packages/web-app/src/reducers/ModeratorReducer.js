@@ -11,7 +11,7 @@ const initialState = {
   moderators: []
 };
 
-const moderator = (state = initialState, action) => {
+const reducer = (state = initialState, action) => {
   switch (action.type) {
     case GET_MODERATORS:
       return {
@@ -39,4 +39,4 @@ const moderator = (state = initialState, action) => {
   }
 };
 
-export default moderator;
+export default reducer;

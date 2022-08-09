@@ -10,7 +10,7 @@ const initialState = {
   history: null
 };
 
-const updateHistory = (state = initialState, action) => {
+const reducer = (state = initialState, action) => {
   switch (action.type) {
     case UPDATE_HISTORY:
       return {
@@ -33,4 +33,4 @@ const updateHistory = (state = initialState, action) => {
   }
 };
 
-export default updateHistory;
+export default reducer;

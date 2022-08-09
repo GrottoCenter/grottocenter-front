@@ -10,7 +10,7 @@ const initialState = {
   partners: undefined // partners list
 };
 
-const partnersCarousel = (state = initialState, action) => {
+const reducer = (state = initialState, action) => {
   switch (action.type) {
     case FETCH_PARTNERS_FC:
       return { ...state, isFetching: true };
@@ -23,4 +23,4 @@ const partnersCarousel = (state = initialState, action) => {
   }
 };
 
-export default partnersCarousel;
+export default reducer;

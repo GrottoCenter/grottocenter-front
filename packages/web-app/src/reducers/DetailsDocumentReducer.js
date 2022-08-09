@@ -10,7 +10,7 @@ const initialState = {
   details: {}
 };
 
-const documentDetails = (state = initialState, action) => {
+const reducer = (state = initialState, action) => {
   switch (action.type) {
     case FETCH_DOCUMENT_DETAILS:
       return {
@@ -34,4 +34,4 @@ const documentDetails = (state = initialState, action) => {
   }
 };
 
-export default documentDetails;
+export default reducer;

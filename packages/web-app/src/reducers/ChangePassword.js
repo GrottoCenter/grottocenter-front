@@ -9,7 +9,7 @@ const initialState = {
   isFetching: false
 };
 
-const changePassword = (state = initialState, action) => {
+const reducer = (state = initialState, action) => {
   switch (action.type) {
     case FETCH_CHANGE_PASSWORD:
       return {
@@ -34,4 +34,4 @@ const changePassword = (state = initialState, action) => {
   }
 };
 
-export default changePassword;
+export default reducer;

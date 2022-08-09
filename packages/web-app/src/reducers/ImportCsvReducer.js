@@ -19,7 +19,7 @@ const initialState = {
   resultImport: null
 };
 
-const importCsv = (state = initialState, action) => {
+const reducer = (state = initialState, action) => {
   switch (action.type) {
     case CHECK_ROWS_START:
     case IMPORT_ROWS_START:
@@ -60,4 +60,4 @@ const importCsv = (state = initialState, action) => {
   }
 };
 
-export default importCsv;
+export default reducer;

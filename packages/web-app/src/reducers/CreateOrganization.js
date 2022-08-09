@@ -10,7 +10,7 @@ const initialState = {
   organization: null
 };
 
-const createOrganization = (state = initialState, action) => {
+const reducer = (state = initialState, action) => {
   switch (action.type) {
     case POST_ORGANIZATION:
       return {
@@ -33,4 +33,4 @@ const createOrganization = (state = initialState, action) => {
   }
 };
 
-export default createOrganization;
+export default reducer;

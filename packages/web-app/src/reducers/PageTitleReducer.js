@@ -5,7 +5,7 @@ const initialState = {
   pageTitleTooltip: ''
 };
 
-const pageTitle = (state = initialState, action) => {
+const reducer = (state = initialState, action) => {
   switch (action.type) {
     case SET_PAGE_TITLE: {
       return {
@@ -24,4 +24,4 @@ const pageTitle = (state = initialState, action) => {
   }
 };
 
-export default pageTitle;
+export default reducer;

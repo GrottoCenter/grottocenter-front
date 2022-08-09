@@ -10,7 +10,7 @@ const initialState = {
   description: null
 };
 
-const createDescription = (state = initialState, action) => {
+const reducer = (state = initialState, action) => {
   switch (action.type) {
     case POST_DESCRIPTION:
       return {
@@ -33,4 +33,4 @@ const createDescription = (state = initialState, action) => {
   }
 };
 
-export default createDescription;
+export default reducer;

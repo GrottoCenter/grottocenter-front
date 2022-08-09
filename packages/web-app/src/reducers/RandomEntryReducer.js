@@ -10,7 +10,7 @@ const initialState = {
   error: null
 };
 
-const randomEntry = (state = initialState, action) => {
+const reducer = (state = initialState, action) => {
   switch (action.type) {
     case FETCH_RANDOMENTRY:
       return { ...initialState, isFetching: true };
@@ -23,4 +23,4 @@ const randomEntry = (state = initialState, action) => {
   }
 };
 
-export default randomEntry;
+export default reducer;

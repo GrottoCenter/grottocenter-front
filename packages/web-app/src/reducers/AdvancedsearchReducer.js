@@ -26,7 +26,7 @@ const initialState = {
   }
 };
 
-const advancedsearch = (state = initialState, action) => {
+const reducer = (state = initialState, action) => {
   switch (action.type) {
     case FETCH_ADVANCEDSEARCH_STARTED: {
       return {
@@ -120,4 +120,4 @@ const advancedsearch = (state = initialState, action) => {
   }
 };
 
-export default advancedsearch;
+export default reducer;

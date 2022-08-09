@@ -10,7 +10,7 @@ const initialState = {
   description: null
 };
 
-const updateDescription = (state = initialState, action) => {
+const reducer = (state = initialState, action) => {
   switch (action.type) {
     case UPDATE_DESCRIPTION:
       return {
@@ -33,4 +33,4 @@ const updateDescription = (state = initialState, action) => {
   }
 };
 
-export default updateDescription;
+export default reducer;
