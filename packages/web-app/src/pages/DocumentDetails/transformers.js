@@ -18,6 +18,15 @@ const getFirstName = (data, entity) =>
     data
   );
 
+const getEntity = (data, entityName) => ({
+  ...(data[entityName] && {
+    entityName: {
+      id: data[entityName]?.id,
+      name: getFirstName(data, entityName)
+    }
+  })
+});
+
 export const makeOverview = data => ({
   author: getAuthor(data.author),
   creationDate: propOr('', 'dateInscription', data),
@@ -34,14 +43,18 @@ export const makeOverview = data => ({
 });
 
 export const makeOrganizations = data => ({
-  editor: {
-    id: data.editor?.id,
-    name: data.editor?.name
-  },
-  library: {
-    id: data.library?.id,
-    name: data.library?.name
-  }
+  ...(data.editor && {
+    editor: {
+      id: data.editor?.id,
+      name: data.editor?.name
+    }
+  }),
+  ...(data.library && {
+    library: {
+      id: data.library?.id,
+      name: data.library?.name
+    }
+  })
 });
 
 export const makeDetails = data => {
@@ -67,18 +80,9 @@ export const makeDetails = data => {
 };
 
 export const makeEntities = data => ({
-  massif: {
-    id: data.massif?.id,
-    name: getFirstName(data, 'massif')
-  },
-  cave: {
-    id: data.cave?.id,
-    name: getFirstName(data, 'cave')
-  },
-  entrance: {
-    id: data.entrance?.id,
-    name: getFirstName(data, 'entrance')
-  },
+  ...getEntity(data, 'cave'),
+  ...getEntity(data, 'entrance'),
+  ...getEntity(data, 'massif'),
   files: {
     fileNames: pipe(propOr([], 'files'), map(propOr('', 'fileName')))(data),
     fileLinks: pipe(

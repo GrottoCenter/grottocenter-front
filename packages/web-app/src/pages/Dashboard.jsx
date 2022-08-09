@@ -45,7 +45,6 @@ const Dashboard = () => {
 
   return (
     <Layout
-      footer=""
       title={formatMessage({ id: 'Dashboard' })}
       content={
         <>

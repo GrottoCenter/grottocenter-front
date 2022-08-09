@@ -15,7 +15,10 @@ const Contribution = ({ author, body, creationDate }) => (
 Contribution.propTypes = {
   author: authorType,
   body: PropTypes.string.isRequired,
-  creationDate: PropTypes.instanceOf(Date)
+  creationDate: PropTypes.oneOfType([
+    PropTypes.instanceOf(Date),
+    PropTypes.string
+  ])
 };
 
 export default Contribution;

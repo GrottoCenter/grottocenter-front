@@ -108,7 +108,6 @@ const DocumentSubmission = () => {
   return (
     <Layout
       title={formatMessage({ id: 'BBS document submission form' })}
-      footer=""
       content={
         <>
           {isDocSubmittedWithSuccess && (
