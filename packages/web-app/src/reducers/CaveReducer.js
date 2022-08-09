@@ -1,7 +1,7 @@
 import {
-  LOAD_CAVE_SUCCESS,
-  LOAD_CAVE_ERROR,
-  LOAD_CAVE_LOADING
+  FETCH_CAVE_SUCCESS,
+  FETCH_CAVE_ERROR,
+  FETCH_CAVE_LOADING
 } from '../actions/Cave/GetCave';
 
 const initialState = {
@@ -27,18 +27,18 @@ const initialState = {
 
 const reducer = (state = initialState, action) => {
   switch (action.type) {
-    case LOAD_CAVE_LOADING:
+    case FETCH_CAVE_LOADING:
       return {
         ...state,
         error: null,
         loading: true
       };
-    case LOAD_CAVE_SUCCESS:
+    case FETCH_CAVE_SUCCESS:
       return {
         ...initialState,
         data: action.data
       };
-    case LOAD_CAVE_ERROR:
+    case FETCH_CAVE_ERROR:
       return {
         ...state,
         loading: true,

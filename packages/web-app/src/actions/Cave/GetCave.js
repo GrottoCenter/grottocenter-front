@@ -2,12 +2,12 @@ import fetch from 'isomorphic-fetch';
 import { getCaveUrl } from '../../conf/Config';
 import makeErrorMessage from '../../helpers/makeErrorMessage';
 
-export const LOAD_CAVE_SUCCESS = 'LOAD_CAVE_SUCCESS';
-export const LOAD_CAVE_LOADING = 'LOAD_CAVE_LOADING';
-export const LOAD_CAVE_ERROR = 'LOAD_CAVE_ERROR';
+export const FETCH_CAVE_SUCCESS = 'FETCH_CAVE_SUCCESS';
+export const FETCH_CAVE_LOADING = 'FETCH_CAVE_LOADING';
+export const FETCH_CAVE_ERROR = 'FETCH_CAVE_ERROR';
 
 export const fetchCave = caveId => dispatch => {
-  dispatch({ type: LOAD_CAVE_LOADING });
+  dispatch({ type: FETCH_CAVE_LOADING });
 
   return fetch(getCaveUrl + caveId)
     .then(response => {
@@ -16,10 +16,10 @@ export const fetchCave = caveId => dispatch => {
       }
       return response.json();
     })
-    .then(data => dispatch({ type: LOAD_CAVE_SUCCESS, data }))
+    .then(data => dispatch({ type: FETCH_CAVE_SUCCESS, data }))
     .catch(error =>
       dispatch({
-        type: LOAD_CAVE_ERROR,
+        type: FETCH_CAVE_ERROR,
         error: makeErrorMessage(error.message, `Fetching cave id ${caveId}`)
       })
     );
