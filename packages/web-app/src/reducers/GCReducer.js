@@ -7,11 +7,12 @@ import cavePost from './CavePostReducer';
 import cavePut from './CavePutReducer';
 import changePassword from './ChangePassword';
 import changeEmail from './ChangeEmail';
-import createPerson from './CreatePerson';
-import createLocation from './CreateLocation';
-import createHistory from './CreateHistory';
-import createOrganization from './CreateOrganization';
 import createDescription from './CreateDescription';
+import createLocation from './CreateLocation';
+import createMassif from './CreateMassifReducer';
+import createOrganization from './CreateOrganization';
+import createPerson from './CreatePerson';
+import createHistory from './CreateHistory';
 import document from './DocumentReducer';
 import documentChildren from './DocumentChildrenReducer';
 import documentDetails from './DetailsDocumentReducer';
@@ -34,8 +35,6 @@ import licenses from './LicensesReducer';
 import login from './LoginReducer';
 import map from './Map';
 import massif from './MassifReducer';
-import massifPost from './MassifPostReducer';
-import massifPut from './MassifPutReducer';
 import moderator from './ModeratorReducer';
 import moveEntranceToCave from './MoveEntranceToCaveReducer';
 import namePut from './NamePutReducer';
@@ -57,6 +56,7 @@ import subject from './SubjectReducer';
 import updateDescription from './UpdateDescription';
 import updateHistory from './UpdateHistory';
 import updateLocation from './UpdateLocation';
+import updateMassif from './UpdateMassifReducer';
 import updatePerson from './UpdatePerson';
 
 const GCReducer = combineReducers({
@@ -68,11 +68,12 @@ const GCReducer = combineReducers({
   cavePut,
   changePassword,
   changeEmail,
-  createPerson,
-  createLocation,
-  createOrganization,
-  createHistory,
   createDescription,
+  createHistory,
+  createLocation,
+  createMassif,
+  createOrganization,
+  createPerson,
   document,
   documentChildren,
   documentDetails,
@@ -95,8 +96,6 @@ const GCReducer = combineReducers({
   login,
   map,
   massif,
-  massifPost,
-  massifPut,
   moderator,
   moveEntranceToCave,
   namePut,
@@ -117,6 +116,7 @@ const GCReducer = combineReducers({
   updateDescription,
   updateHistory,
   updateLocation,
+  updateMassif,
   updatePerson,
   updatePersonGroups
 });

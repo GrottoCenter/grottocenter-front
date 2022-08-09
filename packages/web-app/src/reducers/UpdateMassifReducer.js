@@ -2,7 +2,7 @@ import {
   UPDATE_MASSIF,
   UPDATE_MASSIF_FAILURE,
   UPDATE_MASSIF_SUCCESS
-} from '../actions/Massif';
+} from '../actions/Massif/UpdateMassif';
 
 const initialState = {
   loading: false,

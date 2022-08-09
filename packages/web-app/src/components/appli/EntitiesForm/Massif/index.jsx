@@ -20,7 +20,8 @@ import { useSelector, useDispatch } from 'react-redux';
 import { useBoolean } from '../../../../hooks';
 import ActionButton from '../../../common/ActionButton';
 import Alert from '../../../common/Alert';
-import { postMassif, updateMassif } from '../../../../actions/Massif';
+import { postMassif } from '../../../../actions/Massif/CreateMassif';
+import { updateMassif } from '../../../../actions/Massif/UpdateMassif';
 import { updateDescription } from '../../../../actions/Description/UpdateDescription';
 import { postDescription } from '../../../../actions/Description/CreateDescription';
 import { updateName } from '../../../../actions/Name';
@@ -47,7 +48,7 @@ export const MassifForm = ({ massifValues }) => {
   const { formatMessage } = useIntl();
   const { languages: allLanguages } = useSelector(state => state.language);
   const { error: massifError, loading: massifLoading } = useSelector(state =>
-    isNewMassif ? state.massifPost : state.massifPut
+    isNewMassif ? state.createMassif : state.updateMassif
   );
   const { error: nameError, loading: nameLoading } = useSelector(
     state => state.namePut
