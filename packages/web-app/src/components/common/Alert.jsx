@@ -4,10 +4,10 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 const StyledAlert = styled(MuiAlert)`
-  margin-top: ${({ theme, disableMargins }) =>
-    !disableMargins && `${theme.spacing(2)}px`};
-  margin-bottom: ${({ theme, disableMargins }) =>
-    !disableMargins && `${theme.spacing(2)}px`};
+  margin-top: ${({ theme, $disableMargins }) =>
+    !$disableMargins && `${theme.spacing(2)}px`};
+  margin-bottom: ${({ theme, $disableMargins }) =>
+    !$disableMargins && `${theme.spacing(2)}px`};
 `;
 
 const Alert = ({
@@ -20,7 +20,7 @@ const Alert = ({
   disableMargins = false
 }) => (
   <StyledAlert
-    disableMargins={disableMargins}
+    $disableMargins={disableMargins}
     severity={severity}
     icon={icon}
     variant={variant}
