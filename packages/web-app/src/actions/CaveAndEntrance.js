@@ -9,7 +9,8 @@ import {
   updateCave,
   postCaveSuccess
 } from './Cave';
-import { postEntrance, updateEntrance } from './Entry';
+import { postEntrance } from './Entrance/CreateEntrance';
+import { updateEntrance } from './Entrance/UpdateEntrance';
 
 export const postCaveAndEntrance = (caveData, entranceData) => (
   dispatch,

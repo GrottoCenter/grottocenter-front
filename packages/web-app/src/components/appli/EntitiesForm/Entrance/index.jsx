@@ -21,7 +21,8 @@ import { useGeolocation } from 'rooks';
 import { useBoolean } from '../../../../hooks';
 import ActionButton from '../../../common/ActionButton';
 import Alert from '../../../common/Alert';
-import { postEntrance, updateEntrance } from '../../../../actions/Entry';
+import { updateEntrance } from '../../../../actions/Entrance/UpdateEntrance';
+import { postEntrance } from '../../../../actions/Entrance/CreateEntrance';
 import {
   postCaveAndEntrance,
   updateCaveAndEntrance

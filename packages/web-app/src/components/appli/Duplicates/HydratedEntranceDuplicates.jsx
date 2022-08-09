@@ -11,7 +11,7 @@ import {
   fetchDuplicate
 } from '../../../actions/DuplicatesImport';
 import DuplicatesHandler from '../../common/DuplicatesHandler';
-import { updateEntryWithNewEntities } from '../../../actions/Entry';
+import { updateEntranceWithNewEntities } from '../../../actions/Entrance/UpdateEntrance';
 
 const LinearProgress = styled(MuiLinearProgress)`
   visibility: ${({ $isLoading }) => ($isLoading ? 'visible' : 'hidden')};
@@ -75,7 +75,7 @@ const HydratedEntranceDuplicates = ({
 
   const updateEntry = (entryObject, newRelatedEntitiesObject) => {
     dispatch(
-      updateEntryWithNewEntities(
+      updateEntranceWithNewEntities(
         entryObject,
         newRelatedEntitiesObject.newNames,
         newRelatedEntitiesObject.newDescriptions,
