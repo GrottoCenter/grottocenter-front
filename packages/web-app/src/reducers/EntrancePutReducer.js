@@ -2,7 +2,7 @@ import {
   UPDATE_ENTRANCE,
   UPDATE_ENTRANCE_ERROR,
   UPDATE_ENTRANCE_SUCCESS
-} from '../actions/Entry';
+} from '../actions/Entrance/UpdateEntrance';
 
 const initialState = {
   loading: false,

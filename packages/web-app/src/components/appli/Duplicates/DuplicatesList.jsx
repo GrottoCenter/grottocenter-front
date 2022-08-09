@@ -15,7 +15,7 @@ import useMakeCustomHeaderCellRenders from './customHeaderCellRender';
 import useMakeCustomCellRenders from './customCellRender';
 import TableActions from './TableActions';
 import { RESET_API_MESSAGES } from '../../../actions/Document';
-import { resetEntryState } from '../../../actions/Entry';
+import { resetEntranceState } from '../../../actions/Entrance/ResetEntrance';
 
 const Wrapper = styled.div`
   margin-top: 10px;
@@ -74,7 +74,7 @@ const DuplicatesList = ({
   }, [latestHttpCodeOnDelete]);
 
   useEffect(() => {
-    dispatch(resetEntryState());
+    dispatch(resetEntranceState());
     dispatch({
       type: RESET_API_MESSAGES
     });

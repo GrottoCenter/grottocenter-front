@@ -2,7 +2,7 @@ import {
   POST_ENTRANCE,
   POST_ENTRANCE_FAILURE,
   POST_ENTRANCE_SUCCESS
-} from '../actions/Entry';
+} from '../actions/Entrance/CreateEntrance';
 
 const initialState = {
   loading: false,
