@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 
 import IdentifierEditor from './Document/DocumentForm/formElements/IdentifierEditor';
 import { loadIdentifierTypes } from '../../actions/IdentifierType';
+import idNameType from '../../types/idName.type';
 
 const DocIdentifierEditor = ({
   documentType,
@@ -31,10 +32,7 @@ const DocIdentifierEditor = ({
 };
 
 DocIdentifierEditor.propTypes = {
-  documentType: PropTypes.shape({
-    id: PropTypes.number.isRequired,
-    name: PropTypes.string.isRequired
-  }).isRequired,
+  documentType: idNameType.isRequired,
   contextIdentifierValueName: PropTypes.string.isRequired,
   contextIdentifierTypeValueName: PropTypes.string.isRequired
 };

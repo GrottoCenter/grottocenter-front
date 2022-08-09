@@ -1,6 +1,8 @@
 import React, { useState, createContext, useEffect, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { all, allPass, equals, is, length, pathOr, pipe } from 'ramda';
+import authorType from '../../../types/author.type';
+import idNameType from '../../../types/idName.type';
 
 const date = new Date();
 const todayDate = date.toISOString().substring(0, 10);
@@ -97,17 +99,11 @@ const Entry = ({
   );
 };
 
-const authorType = PropTypes.shape({
-  name: PropTypes.string
-});
 export const detailsType = PropTypes.shape({
   accessRate: PropTypes.number,
   altitude: PropTypes.number,
   author: authorType,
-  cave: PropTypes.shape({
-    id: PropTypes.number.isRequired,
-    name: PropTypes.string.isRequired
-  }),
+  cave: idNameType,
   coordinates: PropTypes.arrayOf(PropTypes.number),
   country: PropTypes.string,
   creationDate: PropTypes.instanceOf(Date),
@@ -121,10 +117,7 @@ export const detailsType = PropTypes.shape({
   isSensitive: PropTypes.bool,
   lastEditor: PropTypes.string,
   localisation: PropTypes.string,
-  massif: PropTypes.shape({
-    id: PropTypes.number.isRequired,
-    name: PropTypes.string.isRequired
-  }),
+  massif: idNameType,
   name: PropTypes.string,
   progressionRate: PropTypes.number,
   temperature: PropTypes.number,

@@ -6,6 +6,7 @@ import styled from 'styled-components';
 import { Skeleton } from '@material-ui/lab';
 import { isEmpty } from 'ramda';
 import AuthorAndDate from '../../components/common/Contribution/AuthorAndDate';
+import authorType from '../../types/author.type';
 
 const Header = styled.div`
   display: flex;
@@ -91,11 +92,7 @@ export default Overview;
 
 Overview.propTypes = {
   loading: PropTypes.bool.isRequired,
-  author: PropTypes.shape({
-    id: PropTypes.number,
-    nickname: PropTypes.string,
-    url: PropTypes.string
-  }),
+  author: authorType,
   creationDate: PropTypes.string.isRequired,
   authors: PropTypes.arrayOf(
     PropTypes.shape({

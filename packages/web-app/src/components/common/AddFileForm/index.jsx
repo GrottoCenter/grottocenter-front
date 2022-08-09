@@ -14,6 +14,7 @@ import useFileFormats from '../../../hooks/useFileFormats';
 import OptionSelect from './OptionSelect';
 import { MAX_SIZE_OF_UPLOADED_FILES } from '../../../conf/Config';
 import { IS_DELETED, IS_INTACT, IS_MODIFIED, IS_NEW } from './FileHelpers';
+import { idNameTypeExtended } from '../../../types/idName.type';
 
 const StyledButton = styled(Button)`
   margin-left: ${({ theme }) => theme.spacing(4)}%;
@@ -236,9 +237,7 @@ AddFileForm.propTypes = {
   setFiles: PropTypes.func.isRequired,
   option: PropTypes.string,
   setOption: PropTypes.func.isRequired,
-  license: PropTypes.shape({
-    id: PropTypes.number,
-    name: PropTypes.string,
+  license: idNameTypeExtended({
     text: PropTypes.string
   }),
   setLicense: PropTypes.func.isRequired,

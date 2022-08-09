@@ -12,6 +12,7 @@ import {
 import NavigateNextIcon from '@material-ui/icons/NavigateNext';
 import NavigateBeforeIcon from '@material-ui/icons/NavigateBefore';
 import Translate from '../Translate';
+import idNameType from '../../../types/idName.type';
 
 // ===================================
 const NextStepButton = props => (
@@ -78,12 +79,7 @@ const Stepper = ({
 
 Stepper.propTypes = {
   currentFormStepId: PropTypes.number.isRequired,
-  formSteps: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.number.isRequired,
-      name: PropTypes.string.isRequired
-    })
-  ).isRequired,
+  formSteps: PropTypes.arrayOf(idNameType).isRequired,
   completedSteps: PropTypes.arrayOf(PropTypes.number).isRequired,
   handleStepBack: PropTypes.func.isRequired,
   handleStepNext: PropTypes.func.isRequired,

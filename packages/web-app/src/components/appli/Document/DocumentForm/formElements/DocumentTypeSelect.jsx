@@ -13,6 +13,7 @@ import {
 import Translate from '../../../../common/Translate';
 import useDocumentTypes from '../../../../../hooks/useDocumentTypes';
 import { DocumentFormContext } from '../Provider';
+import { idNameTypeExtended } from '../../../../../types/idName.type';
 
 const FIRST_DOCUMENT_TYPES_TO_DISPLAY = ['Article', 'Collection', 'Issue'];
 
@@ -96,11 +97,9 @@ const DocumentTypeSelect = ({
   );
 };
 
-DocumentType.propTypes = {
-  id: PropTypes.number.isRequired,
-  comment: PropTypes.string,
-  name: PropTypes.string.isRequired
-};
+DocumentType.propTypes = idNameTypeExtended({
+  comment: PropTypes.string
+});
 
 DocumentTypeSelect.propTypes = {
   allDocumentTypes: PropTypes.arrayOf(PropTypes.shape(DocumentType.propTypes))
