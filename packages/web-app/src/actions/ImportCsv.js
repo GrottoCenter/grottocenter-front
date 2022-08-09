@@ -5,6 +5,7 @@ import {
   importRowsEntrancesUrl,
   importRowsDocumentsUrl
 } from '../conf/Config';
+import { checkStatus } from './utils';
 
 export const CHECK_ROWS_START = 'CHECK_ROWS_START';
 export const CHECK_ROWS_SUCCESS = 'CHECK_ROWS_SUCCESS';
@@ -47,14 +48,6 @@ export const importRowsFailure = errorMessage => ({
 export const resetImportState = () => ({
   type: RESET_IMPORT_STATE
 });
-
-const checkStatus = response => {
-  if (response.status >= 200 && response.status <= 300) {
-    return response.json();
-  }
-  const errorMessage = new Error(response.statusText);
-  throw errorMessage;
-};
 
 const makeBody = rows => rows.map(row => row.data);
 
