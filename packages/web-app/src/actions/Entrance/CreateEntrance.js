@@ -19,11 +19,11 @@ export const postEntranceFailure = (error, httpCode) => ({
   httpCode
 });
 
-export const CREATE_ENTRY_SUCCESS = 'CREATE_ENTRY_SUCCESS';
-export const CREATE_ENTRY_LOADING = 'CREATE_ENTRY_LOADING';
-export const CREATE_ENTRY_ERROR = 'CREATE_ENTRY_ERROR';
+export const CREATE_ENTRANCE_SUCCESS = 'CREATE_ENTRANCE_SUCCESS';
+export const CREATE_ENTRANCE_LOADING = 'CREATE_ENTRANCE_LOADING';
+export const CREATE_ENTRANCE_ERROR = 'CREATE_ENTRANCE_ERROR';
 
-export const RESET_ENTRY_STATE = 'RESET_ENTRY_STATE';
+export const RESET_ENTRANCE_STATE = 'RESET_ENTRANCE_STATE';
 
 const checkStatus = response => {
   if (response.status >= 200 && response.status <= 300) {
@@ -61,12 +61,12 @@ export const postEntrance = data => (dispatch, getState) => {
   );
 };
 
-export const createEntry = entryData => (dispatch, getState) => {
-  dispatch({ type: CREATE_ENTRY_LOADING });
+export const createEntrance = entranceData => (dispatch, getState) => {
+  dispatch({ type: CREATE_ENTRANCE_LOADING });
 
   const requestOptions = {
     method: 'POST',
-    body: JSON.stringify(entryData),
+    body: JSON.stringify(entranceData),
     headers: getState().login.authorizationHeader
   };
 
@@ -74,13 +74,13 @@ export const createEntry = entryData => (dispatch, getState) => {
     .then(checkStatus)
     .then(result => {
       dispatch({
-        type: CREATE_ENTRY_SUCCESS,
+        type: CREATE_ENTRANCE_SUCCESS,
         httpCode: result.status
       });
     })
     .catch(error => {
       dispatch({
-        type: CREATE_ENTRY_ERROR,
+        type: CREATE_ENTRANCE_ERROR,
         error: error.message
       });
     });

@@ -22,7 +22,7 @@ import duplicatesImport from './DuplicatesImportReducer';
 import dynamicNumber from './DynamicNumberReducer';
 import entrancePost from './EntrancePostReducer';
 import entrancePut from './EntrancePutReducer';
-import entry from './EntryReducer';
+import entrance from './EntranceReducer';
 import error from './ErrorReducer';
 import fileFormats from './FileFormatsReducer';
 import forgotPassword from './ForgotPasswordReducer';
@@ -48,7 +48,7 @@ import person from './PersonReducer';
 import processDocuments from './ProcessDocumentsReducer';
 import projections from './Projections';
 import quicksearch from './QuicksearchReducer';
-import randomEntry from './RandomEntryReducer';
+import randomEntrance from './RandomEntranceReducer';
 import region from './RegionReducer';
 import sideMenu from './SideMenuReducer';
 import signUp from './SignUpReducer';
@@ -82,7 +82,7 @@ const GCReducer = combineReducers({
   dynamicNumber,
   entrancePost,
   entrancePut,
-  entry,
+  entrance,
   error,
   fileFormats,
   forgotPassword,
@@ -108,7 +108,7 @@ const GCReducer = combineReducers({
   processDocuments,
   projections,
   quicksearch,
-  randomEntry,
+  randomEntrance,
   region,
   sideMenu,
   signUp,

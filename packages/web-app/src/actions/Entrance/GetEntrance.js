@@ -1,21 +1,21 @@
 import fetch from 'isomorphic-fetch';
 
-import { getEntryUrl } from '../../conf/Config';
+import { getEntranceUrl } from '../../conf/Config';
 
 import makeErrorMessage from '../../helpers/makeErrorMessage';
 
-export const LOAD_ENTRY_SUCCESS = 'LOAD_ENTRY_SUCCESS';
-export const LOAD_ENTRY_LOADING = 'LOAD_ENTRY_LOADING';
-export const LOAD_ENTRY_ERROR = 'LOAD_ENTRY_ERROR';
+export const LOAD_ENTRANCE_SUCCESS = 'LOAD_ENTRANCE_SUCCESS';
+export const LOAD_ENTRANCE_LOADING = 'LOAD_ENTRANCE_LOADING';
+export const LOAD_ENTRANCE_ERROR = 'LOAD_ENTRANCE_ERROR';
 
-export const fetchEntry = entranceId => (dispatch, getState) => {
-  dispatch({ type: LOAD_ENTRY_LOADING });
+export const fetchEntrance = entranceId => (dispatch, getState) => {
+  dispatch({ type: LOAD_ENTRANCE_LOADING });
   const requestOptions = {
     headers: {
       ...getState().login.authorizationHeader
     }
   };
-  return fetch(getEntryUrl + entranceId, requestOptions)
+  return fetch(getEntranceUrl + entranceId, requestOptions)
     .then(response => {
       if (response.status >= 400) {
         throw new Error(response.status);
@@ -23,11 +23,11 @@ export const fetchEntry = entranceId => (dispatch, getState) => {
       return response.json();
     })
     .then(data => {
-      dispatch({ type: LOAD_ENTRY_SUCCESS, data });
+      dispatch({ type: LOAD_ENTRANCE_SUCCESS, data });
     })
     .catch(error =>
       dispatch({
-        type: LOAD_ENTRY_ERROR,
+        type: LOAD_ENTRANCE_ERROR,
         error: makeErrorMessage(
           error.message,
           `Fetching entrance id ${entranceId}`
