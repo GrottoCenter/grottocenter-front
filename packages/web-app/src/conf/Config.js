@@ -175,7 +175,7 @@ export const dynamicNumbersUrl = {
 };
 
 export const fetchConvert = `${API_URL}/api/convert`;
-export const findRandomEntryUrl = `${API_URL}/api/${apiVersion}/entrances/findRandom`;
+export const findRandomEntranceUrl = `${API_URL}/api/${apiVersion}/entrances/findRandom`;
 export const findForCarouselUrl = `${API_URL}/api/${apiVersion}/partners/findForCarousel`;
 export const getMapCavesUrl = `${API_URL}/api/${apiVersion}/geoloc/caves`;
 export const getMapCavesCoordinatesUrl = `${API_URL}/api/${apiVersion}/geoloc/cavesCoordinates`;
@@ -202,7 +202,7 @@ export const getDocumentChildren = documentId =>
   `${API_URL}/api/${apiVersion}/documents/${documentId}/children`;
 export const processDocumentIds = `${API_URL}/api/${apiVersion}/documents/validate`;
 export const getDocumentDetailsUrl = `${API_URL}/api/${apiVersion}/documents/`;
-export const getEntryUrl = `${API_URL}/api/${apiVersion}/entrances/`;
+export const getEntranceUrl = `${API_URL}/api/${apiVersion}/entrances/`;
 export const getCaveUrl = `${API_URL}/api/${apiVersion}/caves/`;
 export const getLanguagesUrl = `${API_URL}/api/${apiVersion}/languages`;
 export const postCaverUrl = `${API_URL}/api/${apiVersion}/cavers`;
@@ -222,13 +222,13 @@ export const postCaverGroupsUrl = userId =>
   `${API_URL}/api/${apiVersion}/cavers/${userId}/groups`;
 export const getLicensesUrl = `${API_URL}/api/v1/licenses`;
 export const getFileFormatsUrl = `${API_URL}/api/v1/file-formats`;
-export const entryDetailPath = `${API_URL}/api/${apiVersion}/entrances/`;
+export const entranceDetailPath = `${API_URL}/api/${apiVersion}/entrances/`;
 export const putCaveUrl = caveId =>
   `${API_URL}/api/${apiVersion}/caves/${caveId}`;
 export const putEntranceUrl = entranceId =>
   `${API_URL}/api/${apiVersion}/entrances/${entranceId}`;
-export const putEntryWithNewEntitiesUrl = entryId =>
-  `${API_URL}/api/${apiVersion}/entrances/${entryId}/new-entities`;
+export const putEntranceWithNewEntitiesUrl = entranceId =>
+  `${API_URL}/api/${apiVersion}/entrances/${entranceId}/new-entities`;
 export const putDocumentyWithNewEntitiesUrl = docId =>
   `${API_URL}/api/${apiVersion}/documents/${docId}/new-entities`;
 export const postLocationUrl = `${API_URL}/api/${apiVersion}/locations`;

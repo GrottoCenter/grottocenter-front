@@ -36,7 +36,9 @@ const DuplicatesList = ({
   const { loading, duplicatesList, latestHttpCodeOnDelete } = useSelector(
     state => state.duplicatesImport
   );
-  const { latestHttpCode: httpCodeEntry } = useSelector(state => state.entry);
+  const { latestHttpCode: httpCodeEntry } = useSelector(
+    state => state.entrance
+  );
 
   const { latestHttpCode: httpCodeDocument } = useSelector(
     state => state.document

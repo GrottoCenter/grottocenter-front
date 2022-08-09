@@ -3,7 +3,7 @@ import { propOr, isNil, isEmpty } from 'ramda';
 import { useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import Entry from '../../components/appli/Entry';
-import { fetchEntry } from '../../actions/Entrance/GetEntrance';
+import { fetchEntrance } from '../../actions/Entrance/GetEntrance';
 import {
   getComments,
   getDetails,
@@ -23,7 +23,7 @@ const isUpdateSuccessful = (data, error, loading, prevLoading) => {
 const EntryPage = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
-  const { loading, data, error } = useSelector(state => state.entry);
+  const { loading, data, error } = useSelector(state => state.entrance);
   const { loading: entrancePutLoading, error: entrancePutError } = useSelector(
     state => state.entrancePut
   );
@@ -36,7 +36,7 @@ const EntryPage = () => {
 
   // Initial data loading
   useEffect(() => {
-    dispatch(fetchEntry(id));
+    dispatch(fetchEntrance(id));
   }, [id, dispatch]);
 
   // Fetching entrance after successful update
@@ -49,7 +49,7 @@ const EntryPage = () => {
         prevEntrancePutLoading
       )
     ) {
-      dispatch(fetchEntry(id));
+      dispatch(fetchEntrance(id));
     }
   }, [dispatch, data, entrancePutLoading, id, entrancePutError]);
   useEffect(() => {
@@ -61,7 +61,7 @@ const EntryPage = () => {
         prevAssociateDocumentLoading
       )
     ) {
-      dispatch(fetchEntry(id));
+      dispatch(fetchEntrance(id));
     }
   }, [dispatch, data, id, associateDocumentError, associateDocumentLoading]);
 

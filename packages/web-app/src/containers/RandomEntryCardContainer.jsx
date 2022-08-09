@@ -1,5 +1,5 @@
 import { connect } from 'react-redux';
-import { loadRandomEntry } from '../actions/RandomEntry';
+import { loadRandomEntrance } from '../actions/RandomEntrance';
 import RandomEntryCard from '../components/common/card/RandomEntryCard';
 
 //
@@ -9,12 +9,12 @@ import RandomEntryCard from '../components/common/card/RandomEntryCard';
 //
 
 const mapDispatchToProps = dispatch => ({
-  fetch: () => dispatch(loadRandomEntry())
+  fetch: () => dispatch(loadRandomEntrance())
 });
 
 const mapStateToProps = state => ({
-  isFetching: state.randomEntry.isFetching,
-  entry: state.randomEntry.entry
+  isFetching: state.randomEntrance.isFetching,
+  entry: state.randomEntrance.entrance
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(RandomEntryCard);
