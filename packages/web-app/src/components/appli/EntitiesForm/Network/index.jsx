@@ -21,7 +21,7 @@ import { useBoolean } from '../../../../hooks';
 import ActionButton from '../../../common/ActionButton';
 import Alert from '../../../common/Alert';
 import { updateCave } from '../../../../actions/Cave';
-import { updateEntrance } from '../../../../actions/Entry';
+import { updateEntrance } from '../../../../actions/Entrance/UpdateEntrance';
 
 import Network from './Network';
 import makeNetworkData from './transformers';

@@ -3,7 +3,7 @@ import { propOr, isNil, isEmpty } from 'ramda';
 import { useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import Entry from '../../components/appli/Entry';
-import { fetchEntry } from '../../actions/Entry';
+import { fetchEntry } from '../../actions/Entrance/GetEntrance';
 import {
   getComments,
   getDetails,

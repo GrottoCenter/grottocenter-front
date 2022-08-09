@@ -1,15 +1,19 @@
 import {
   LOAD_ENTRY_SUCCESS,
   LOAD_ENTRY_ERROR,
-  LOAD_ENTRY_LOADING,
+  LOAD_ENTRY_LOADING
+} from '../actions/Entrance/GetEntrance';
+import {
   UPDATE_ENTRANCE_SUCCESS,
   UPDATE_ENTRANCE,
-  UPDATE_ENTRANCE_ERROR,
+  UPDATE_ENTRANCE_ERROR
+} from '../actions/Entrance/UpdateEntrance';
+import { RESET_ENTRY_STATE } from '../actions/Entrance/ResetEntrance';
+import {
   CREATE_ENTRY_LOADING,
   CREATE_ENTRY_SUCCESS,
-  CREATE_ENTRY_ERROR,
-  RESET_ENTRY_STATE
-} from '../actions/Entry';
+  CREATE_ENTRY_ERROR
+} from '../actions/Entrance/CreateEntrance';
 
 import { POST_LOCATION_SUCCESS } from '../actions/CreateLocation';
 import { UPDATE_LOCATION_SUCCESS } from '../actions/UpdateLocation';
