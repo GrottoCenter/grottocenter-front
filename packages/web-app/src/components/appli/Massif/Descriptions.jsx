@@ -11,15 +11,6 @@ import {
   Box
 } from '@material-ui/core';
 
-const makeFormattedText = text =>
-  text.split('\\n').map((item, key) => (
-    // eslint-disable-next-line react/no-array-index-key
-    <Fragment key={key}>
-      {item}
-      <br />
-    </Fragment>
-  ));
-
 const Descriptions = ({ descriptions }) => {
   const { formatMessage, formatDate } = useIntl();
 
@@ -37,8 +28,11 @@ const Descriptions = ({ descriptions }) => {
                 primary={<Typography>{title}</Typography>}
                 secondary={
                   <>
-                    <Typography variant="body2" color="textSecondary">
-                      {makeFormattedText(body)}
+                    <Typography
+                      variant="body2"
+                      color="textSecondary"
+                      style={{ whiteSpace: 'pre-wrap' }}>
+                      {body}
                     </Typography>
                     <br />
                     <Typography variant="caption">

@@ -15,10 +15,12 @@ import {
 } from '@material-ui/core';
 import React from 'react';
 import { isNil } from 'ramda';
+import styled from 'styled-components';
 import ScrollableContent from '../../common/Layouts/Fixed/ScrollableContent';
-import makeFormattedText from './utils';
 import { riggingsType, riggingType } from './Provider';
 import AuthorLink from '../../common/AuthorLink';
+
+const MultilinesTableCell = styled(TableCell)({ whiteSpace: 'pre-wrap' });
 
 const RiggingTable = ({ obstacles, title }) => {
   const { formatMessage } = useIntl();
@@ -52,10 +54,10 @@ const RiggingTable = ({ obstacles, title }) => {
                 {obstacle}
               </TableCell>
               <TableCell align="right">{rope}</TableCell>
-              <TableCell align="right">{makeFormattedText(anchor)}</TableCell>
-              <TableCell align="right">
-                {makeFormattedText(observation)}
-              </TableCell>
+              <MultilinesTableCell align="right">{anchor}</MultilinesTableCell>
+              <MultilinesTableCell align="right">
+                {observation}
+              </MultilinesTableCell>
             </TableRow>
           ))}
         </TableBody>

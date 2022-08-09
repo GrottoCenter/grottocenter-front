@@ -14,11 +14,11 @@ import EditIcon from '@material-ui/icons/Edit';
 import CancelIcon from '@material-ui/icons/Cancel';
 
 import { locationType } from '../Provider';
-import makeFormattedText from '../utils';
 import AuthorLink from '../../../common/AuthorLink/index';
 import CreateLocationForm from '../../Form/LocationForm/index';
 import { updateLocation } from '../../../../actions/UpdateLocation';
 import { usePermissions } from '../../../../hooks';
+import MultilinesTypography from '../../../common/MultilinesTypography';
 
 const Location = ({ location }) => {
   const { formatDate } = useIntl();
@@ -57,7 +57,7 @@ const Location = ({ location }) => {
           primary={title}
           secondary={
             <>
-              {makeFormattedText(body)}
+              <MultilinesTypography>{body}</MultilinesTypography>
               <br />
               <Typography
                 component="span"

@@ -12,10 +12,10 @@ import { isNil } from 'ramda';
 import styled from 'styled-components';
 import ScrollableContent from '../../common/Layouts/Fixed/ScrollableContent';
 import { commentsType, commentType } from './Provider';
-import makeFormattedText from './utils';
 import AuthorLink from '../../common/AuthorLink/index';
 
 import Ratings from './Ratings';
+import MultilinesTypography from '../../common/MultilinesTypography';
 
 const StyledListItemText = styled(ListItemText)`
   width: 100%;
@@ -38,18 +38,14 @@ const Comment = ({ comment }) => {
     date
   } = comment;
   const { formatDate } = useIntl();
-  const formattedBody = makeFormattedText(body);
 
   return (
     <ListItem>
       <StyledListItemText
-        disableTypography
-        primary={<Typography>{title}</Typography>}
+        primary={title}
         secondary={
           <>
-            <Typography variant="body2" color="textSecondary">
-              {formattedBody}
-            </Typography>
+            <MultilinesTypography>{body}</MultilinesTypography>
             <br />
             <Typography variant="caption">
               <AuthorLink author={author} />

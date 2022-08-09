@@ -14,11 +14,11 @@ import EditIcon from '@material-ui/icons/Edit';
 import CancelIcon from '@material-ui/icons/Cancel';
 
 import { descriptionType } from '../Provider';
-import makeFormattedText from '../utils';
 import AuthorLink from '../../../common/AuthorLink/index';
 import CreateDescriptionForm from '../../Form/DescriptionForm/index';
 import { updateDescription } from '../../../../actions/UpdateDescription';
 import { usePermissions } from '../../../../hooks';
+import MultilinesTypography from '../../../common/MultilinesTypography';
 
 const Description = ({ description }) => {
   const { formatDate } = useIntl();
@@ -51,12 +51,10 @@ const Description = ({ description }) => {
         </Box>
       ) : (
         <ListItemText
-          // whiteSpace property for description multi-lines display
-          style={{ whiteSpace: 'pre-line' }}
           primary={title}
           secondary={
             <>
-              {makeFormattedText(body)}
+              <MultilinesTypography>{body}</MultilinesTypography>
               <br />
               <Typography
                 component="span"
