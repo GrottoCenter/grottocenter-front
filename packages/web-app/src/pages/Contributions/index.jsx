@@ -123,7 +123,6 @@ const ContributionsPage = () => {
     <>
       <Layout
         title={formatMessage({ id: 'My contributions' })}
-        footer=""
         content={
           <AuthChecker
             componentToDisplay={

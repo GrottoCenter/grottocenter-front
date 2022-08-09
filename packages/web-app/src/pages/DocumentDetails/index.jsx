@@ -26,6 +26,7 @@ import {
 import { usePermissions } from '../../hooks';
 import Layout from '../../components/common/Layouts/Fixed/FixedContent';
 import idNameType from '../../types/idName.type';
+import authorType from '../../types/author.type';
 
 const OrganizationIcon = styled.img`
   height: 35px;
@@ -51,6 +52,8 @@ const DocumentPage = ({
 }) => {
   const { formatMessage } = useIntl();
   const permissions = usePermissions();
+
+  const { editor, library } = organizations;
 
   return (
     <Layout
@@ -82,8 +85,8 @@ const DocumentPage = ({
                   />
                 ),
                 label: formatMessage({ id: 'Editor' }),
-                value: organizations?.editor.name,
-                url: `/ui/organizations/${organizations?.editor.id}`,
+                value: editor?.name,
+                url: `/ui/organizations/${editor?.id}`,
                 internalUrl: true
               },
               {
@@ -94,8 +97,8 @@ const DocumentPage = ({
                   />
                 ),
                 label: formatMessage({ id: 'Library' }),
-                value: organizations?.library.name,
-                url: `/ui/organizations/${organizations?.library.id}`,
+                value: library?.name,
+                url: `/ui/organizations/${library?.id}`,
                 internalUrl: true
               }
             ]}
@@ -273,12 +276,8 @@ DocumentPage.propTypes = {
   loading: PropTypes.bool,
   areDocumentChildrenLoading: PropTypes.bool,
   overview: PropTypes.shape({
-    author: {
-      id: PropTypes.number,
-      nickname: PropTypes.string,
-      url: PropTypes.string
-    },
-    authors: PropTypes.arrayOf(PropTypes.string).isRequired,
+    author: authorType,
+    authors: PropTypes.arrayOf(authorType).isRequired,
     language: PropTypes.string.isRequired,
     license: PropTypes.shape({
       name: PropTypes.string.isRequired,

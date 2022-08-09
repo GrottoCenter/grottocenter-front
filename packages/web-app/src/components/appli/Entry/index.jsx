@@ -38,7 +38,7 @@ const EntryProperties = ({ isSensitive }) => (
   </>
 );
 EntryProperties.propTypes = {
-  isSensitive: PropTypes.bool.isRequired
+  isSensitive: PropTypes.bool
 };
 
 export const Entry = () => {

@@ -72,16 +72,14 @@ const FixedContent = ({
       }
     />
     <CardContent>{content}</CardContent>
-    <CardActions disableSpacing>
-      {!isNil(footer) && <Typography variant="caption">{footer}</Typography>}
-    </CardActions>
+    {!isNil(footer) && <CardActions disableSpacing> {footer}</CardActions>}
   </Card>
 );
 
 FixedContent.propTypes = {
   avatar: PropTypes.node,
   content: PropTypes.node.isRequired,
-  footer: PropTypes.string,
+  footer: PropTypes.node,
   icon: PropTypes.node,
   onEdit: PropTypes.func,
   subheader: PropTypes.node,

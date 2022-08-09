@@ -135,7 +135,6 @@ const DocumentValidationPage = () => {
     <>
       <Layout
         title={formatMessage({ id: 'Documents awaiting validation' })}
-        footer=""
         content={
           <AuthChecker
             componentToDisplay={
