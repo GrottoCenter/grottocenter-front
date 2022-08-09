@@ -1,7 +1,7 @@
 import {
-  LOAD_ENTRANCE_SUCCESS,
-  LOAD_ENTRANCE_ERROR,
-  LOAD_ENTRANCE_LOADING
+  FETCH_ENTRANCE_SUCCESS,
+  FETCH_ENTRANCE_ERROR,
+  FETCH_ENTRANCE_LOADING
 } from '../actions/Entrance/GetEntrance';
 import {
   UPDATE_ENTRANCE_SUCCESS,
@@ -31,7 +31,7 @@ const initialState = {
 
 const reducer = (state = initialState, action) => {
   switch (action.type) {
-    case LOAD_ENTRANCE_LOADING:
+    case FETCH_ENTRANCE_LOADING:
     case UPDATE_ENTRANCE:
     case CREATE_ENTRANCE_LOADING:
       return {
@@ -40,12 +40,12 @@ const reducer = (state = initialState, action) => {
         loading: true,
         latestHttpCode: null
       };
-    case LOAD_ENTRANCE_SUCCESS:
+    case FETCH_ENTRANCE_SUCCESS:
       return {
         ...initialState,
         data: action.data
       };
-    case LOAD_ENTRANCE_ERROR:
+    case FETCH_ENTRANCE_ERROR:
       return {
         ...state,
         loading: false,
