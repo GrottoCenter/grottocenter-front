@@ -2,7 +2,7 @@ import {
   UPDATE_LOCATION,
   UPDATE_LOCATION_FAILURE,
   UPDATE_LOCATION_SUCCESS
-} from '../actions/UpdateLocation';
+} from '../actions/Location/UpdateLocation';
 
 const initialState = {
   error: null,

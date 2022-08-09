@@ -10,7 +10,7 @@ import ScrollableContent from '../../../common/Layouts/Fixed/ScrollableContent';
 import { locationsType } from '../Provider';
 import Location from './Location';
 import CreateLocationForm from '../../Form/LocationForm';
-import { postLocation } from '../../../../actions/CreateLocation';
+import { postLocation } from '../../../../actions/Location/CreateLocation';
 import { usePermissions } from '../../../../hooks';
 import Alert from '../../../common/Alert';
 

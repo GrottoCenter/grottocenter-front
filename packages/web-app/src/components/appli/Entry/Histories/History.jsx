@@ -13,7 +13,7 @@ import CancelIcon from '@material-ui/icons/Cancel';
 
 import { historyType } from '../Provider';
 import CreateHistoryForm from '../../Form/HistoryForm/index';
-import { updateHistory } from '../../../../actions/UpdateHistory';
+import { updateHistory } from '../../../../actions/History/UpdateHistory';
 import { usePermissions } from '../../../../hooks';
 import Contribution from '../../../common/Contribution/Contribution';
 

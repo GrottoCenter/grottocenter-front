@@ -2,7 +2,7 @@ import {
   POST_LOCATION,
   POST_LOCATION_FAILURE,
   POST_LOCATION_SUCCESS
-} from '../actions/CreateLocation';
+} from '../actions/Location/CreateLocation';
 
 const initialState = {
   error: null,

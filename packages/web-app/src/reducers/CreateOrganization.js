@@ -2,7 +2,7 @@ import {
   POST_ORGANIZATION,
   POST_ORGANIZATION_FAILURE,
   POST_ORGANIZATION_SUCCESS
-} from '../actions/CreateOrganization';
+} from '../actions/Organization/CreateOrganization';
 
 const initialState = {
   error: null,

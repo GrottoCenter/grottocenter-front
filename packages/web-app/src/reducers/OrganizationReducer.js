@@ -2,7 +2,7 @@ import {
   FETCH_ORGANIZATION,
   FETCH_ORGANIZATION_FAILURE,
   FETCH_ORGANIZATION_SUCCESS
-} from '../actions/Organization';
+} from '../actions/Organization/GetOrganization';
 
 const initialState = {
   organization: undefined,

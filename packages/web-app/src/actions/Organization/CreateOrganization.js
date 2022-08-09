@@ -1,6 +1,6 @@
 import fetch from 'isomorphic-fetch';
-import makeErrorMessage from '../helpers/makeErrorMessage';
-import { postOrganizationUrl } from '../conf/Config';
+import makeErrorMessage from '../../helpers/makeErrorMessage';
+import { postOrganizationUrl } from '../../conf/Config';
 
 export const POST_ORGANIZATION = 'POST_ORGANIZATION';
 export const POST_ORGANIZATION_SUCCESS = 'POST_ORGANIZATION_SUCCESS';

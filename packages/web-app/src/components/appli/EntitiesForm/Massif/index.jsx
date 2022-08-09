@@ -21,8 +21,8 @@ import { useBoolean } from '../../../../hooks';
 import ActionButton from '../../../common/ActionButton';
 import Alert from '../../../common/Alert';
 import { postMassif, updateMassif } from '../../../../actions/Massif';
-import { updateDescription } from '../../../../actions/UpdateDescription';
-import { postDescription } from '../../../../actions/CreateDescription';
+import { updateDescription } from '../../../../actions/Description/UpdateDescription';
+import { postDescription } from '../../../../actions/Description/CreateDescription';
 import { updateName } from '../../../../actions/Name';
 
 import Massif from './Massif';

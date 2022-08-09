@@ -2,7 +2,7 @@ import {
   POST_DESCRIPTION,
   POST_DESCRIPTION_FAILURE,
   POST_DESCRIPTION_SUCCESS
-} from '../actions/CreateDescription';
+} from '../actions/Description/CreateDescription';
 
 const initialState = {
   error: null,

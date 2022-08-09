@@ -1,12 +1,12 @@
 import fetch from 'isomorphic-fetch';
-import { findOrganizationUrl } from '../conf/Config';
-import makeErrorMessage from '../helpers/makeErrorMessage';
+import { findOrganizationUrl } from '../../conf/Config';
+import makeErrorMessage from '../../helpers/makeErrorMessage';
 
 export const FETCH_ORGANIZATION = 'FETCH_ORGANIZATION';
 export const FETCH_ORGANIZATION_SUCCESS = 'FETCH_ORGANIZATION_SUCCESS';
 export const FETCH_ORGANIZATION_FAILURE = 'FETCH_ORGANIZATION_FAILURE';
 
-export function loadOrganization(organizationId) {
+export function fetchOrganization(organizationId) {
   return dispatch => {
     dispatch({ type: FETCH_ORGANIZATION });
     return fetch(`${findOrganizationUrl}${organizationId}`)

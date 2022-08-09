@@ -12,7 +12,7 @@ import CancelIcon from '@material-ui/icons/Cancel';
 
 import { locationType } from '../Provider';
 import CreateLocationForm from '../../Form/LocationForm/index';
-import { updateLocation } from '../../../../actions/UpdateLocation';
+import { updateLocation } from '../../../../actions/Location/UpdateLocation';
 import { usePermissions } from '../../../../hooks';
 import Contribution from '../../../common/Contribution/Contribution';
 

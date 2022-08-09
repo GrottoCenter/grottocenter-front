@@ -12,7 +12,7 @@ import CancelIcon from '@material-ui/icons/Cancel';
 
 import { descriptionType } from '../Provider';
 import CreateDescriptionForm from '../../Form/DescriptionForm/index';
-import { updateDescription } from '../../../../actions/UpdateDescription';
+import { updateDescription } from '../../../../actions/Description/UpdateDescription';
 import { usePermissions } from '../../../../hooks';
 import Contribution from '../../../common/Contribution/Contribution';
 
