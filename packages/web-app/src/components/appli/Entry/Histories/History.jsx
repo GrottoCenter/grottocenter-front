@@ -1,27 +1,23 @@
 import React, { useState } from 'react';
-import { useIntl } from 'react-intl';
-import { isNil } from 'ramda';
+import {} from 'react-intl';
 import {
   Box,
   IconButton,
   ListItemIcon,
   ListItem,
-  ListItemText,
-  Typography
+  ListItemText
 } from '@material-ui/core';
 import { useDispatch } from 'react-redux';
 import EditIcon from '@material-ui/icons/Edit';
 import CancelIcon from '@material-ui/icons/Cancel';
 
 import { historyType } from '../Provider';
-import AuthorLink from '../../../common/AuthorLink/index';
 import CreateHistoryForm from '../../Form/HistoryForm/index';
 import { updateHistory } from '../../../../actions/UpdateHistory';
 import { usePermissions } from '../../../../hooks';
-import MultilinesTypography from '../../../common/MultilinesTypography';
+import Contribution from '../../../common/Contribution/Contribution';
 
 const History = ({ history }) => {
-  const { formatDate } = useIntl();
   const dispatch = useDispatch();
   const permissions = usePermissions();
   const { author, body, creationDate } = history;
@@ -53,27 +49,11 @@ const History = ({ history }) => {
       ) : (
         <ListItemText
           secondary={
-            <>
-              <MultilinesTypography>{body}</MultilinesTypography>
-              <br />
-              <Typography
-                component="span"
-                variant="caption"
-                color="textPrimary">
-                <AuthorLink author={author} />
-                {`${
-                  !isNil(creationDate)
-                    ? `- ${formatDate(creationDate, {
-                        year: 'numeric',
-                        month: 'numeric',
-                        day: 'numeric',
-                        hour: 'numeric',
-                        minute: 'numeric'
-                      })}`
-                    : ''
-                }`}
-              </Typography>
-            </>
+            <Contribution
+              author={author}
+              body={body}
+              creationDate={creationDate}
+            />
           }
         />
       )}
