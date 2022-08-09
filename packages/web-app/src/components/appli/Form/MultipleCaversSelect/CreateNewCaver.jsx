@@ -6,7 +6,7 @@ import { useIntl } from 'react-intl';
 import AddIcon from '@material-ui/icons/Add';
 import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
-import { postCaver } from '../../../../actions/CreateCaver';
+import { postPerson } from '../../../../actions/Person/CreatePerson';
 import ActionButton from '../../../common/ActionButton';
 import { DocumentFormContext } from '../../Document/DocumentForm/Provider';
 
@@ -25,7 +25,7 @@ const CreateNewCaver = ({
   contextValueName
 }) => {
   const dispatch = useDispatch();
-  const { isLoading, caver } = useSelector(state => state.createCaver);
+  const { isLoading, caver } = useSelector(state => state.createPerson);
   const {
     docAttributes: { [contextValueName]: value },
     updateAttribute
@@ -42,7 +42,7 @@ const CreateNewCaver = ({
   };
 
   const handleSubmit = () => {
-    dispatch(postCaver({ name, surname }));
+    dispatch(postPerson({ name, surname }));
   };
 
   useEffect(() => {

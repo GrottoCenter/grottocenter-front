@@ -9,7 +9,7 @@ import OrganizationForm from '../../../components/appli/EntitiesForm/Organizatio
 import { makeOrganizationValueData } from '../../../components/appli/EntitiesForm/Organization/transformers';
 import Layout from '../../../components/common/Layouts/Fixed/FixedContent';
 import Translate from '../../../components/common/Translate';
-import { loadOrganization } from '../../../actions/Organization';
+import { fetchOrganization } from '../../../actions/Organization/GetOrganization';
 
 const OrganizationEdit = () => {
   const { organizationId } = useParams();
@@ -21,7 +21,7 @@ const OrganizationEdit = () => {
   );
 
   useEffect(() => {
-    dispatch(loadOrganization(organizationId));
+    dispatch(fetchOrganization(organizationId));
   }, [organizationId, dispatch]);
   if (!isNil(error)) {
     return (

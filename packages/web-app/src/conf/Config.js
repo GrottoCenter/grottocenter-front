@@ -205,7 +205,7 @@ export const getDocumentDetailsUrl = `${API_URL}/api/${apiVersion}/documents/`;
 export const getEntranceUrl = `${API_URL}/api/${apiVersion}/entrances/`;
 export const getCaveUrl = `${API_URL}/api/${apiVersion}/caves/`;
 export const getLanguagesUrl = `${API_URL}/api/${apiVersion}/languages`;
-export const postCaverUrl = `${API_URL}/api/${apiVersion}/cavers`;
+export const postPersonUrl = `${API_URL}/api/${apiVersion}/cavers`;
 export const putCaverUrl = userId =>
   `${API_URL}/api/${apiVersion}/cavers/${userId}`;
 export const postDocumentUrl = `${API_URL}/api/${apiVersion}/documents`;
@@ -218,7 +218,7 @@ export const regionsSearchUrl = `${API_URL}/api/${apiVersion}/regions/search/log
 export const identifierTypesUrl = `${API_URL}/api/${apiVersion}/documents/identifierTypes`;
 export const getAdminsUrl = `${API_URL}/api/${apiVersion}/cavers/admins`;
 export const getModeratorsUrl = `${API_URL}/api/${apiVersion}/cavers/moderators`;
-export const postCaverGroupsUrl = userId =>
+export const postPersonGroupsUrl = userId =>
   `${API_URL}/api/${apiVersion}/cavers/${userId}/groups`;
 export const getLicensesUrl = `${API_URL}/api/v1/licenses`;
 export const getFileFormatsUrl = `${API_URL}/api/v1/file-formats`;

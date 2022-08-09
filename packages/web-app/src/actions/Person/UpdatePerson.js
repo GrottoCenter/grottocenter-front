@@ -1,5 +1,5 @@
 import fetch from 'isomorphic-fetch';
-import { putCaverUrl } from '../conf/Config';
+import { putCaverUrl } from '../../conf/Config';
 
 export const UPDATE_PERSON = 'UPDATE_PERSON';
 export const UPDATE_PERSON_SUCCESS = 'UPDATE_PERSON_SUCCESS';

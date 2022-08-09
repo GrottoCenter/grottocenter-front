@@ -2,7 +2,7 @@ import {
   FETCH_PERSON,
   FETCH_PERSON_FAILURE,
   FETCH_PERSON_SUCCESS
-} from '../actions/Person';
+} from '../actions/Person/GetPerson';
 
 const initialState = {
   person: undefined, // person fetched

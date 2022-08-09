@@ -3,7 +3,7 @@ import { useParams, useHistory } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { isNil, pathOr } from 'ramda';
 import Person from '../../components/appli/Person/Person';
-import { loadPerson } from '../../actions/Person';
+import { loadPerson } from '../../actions/Person/GetPerson';
 import { useUserProperties, usePermissions } from '../../hooks';
 
 const PersonPage = () => {

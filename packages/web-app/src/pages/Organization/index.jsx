@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { useParams, useHistory } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { loadOrganization } from '../../actions/Organization';
+import { fetchOrganization } from '../../actions/Organization/GetOrganization';
 import { setPageTitle } from '../../actions/PageTitle';
 import Organization from '../../components/appli/Organization';
 import { usePermissions } from '../../hooks';
@@ -20,7 +20,7 @@ const OrganizationPage = () => {
   const history = useHistory();
 
   useEffect(() => {
-    dispatch(loadOrganization(organizationId));
+    dispatch(fetchOrganization(organizationId));
     dispatch(setPageTitle('Organization'));
   }, [dispatch, organizationId]);
 
