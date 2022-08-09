@@ -26,7 +26,7 @@ const WithState = () => {
         <FixedContent
           title="title"
           content="content"
-          footer="footer"
+          footer={<span>footer</span>}
           icon={<Index type="entry" />}
         />
       }>

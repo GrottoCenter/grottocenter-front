@@ -64,7 +64,6 @@ const ManageUsers = () => {
 
   return (
     <Layout
-      footer=""
       title={formatMessage({ id: 'Manage Users' })}
       content={
         <AuthChecker

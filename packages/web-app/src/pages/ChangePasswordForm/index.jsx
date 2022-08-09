@@ -65,7 +65,6 @@ const ChangePasswordForm = ({
   return (
     <Layout
       title={formatMessage({ id: 'Update password' })}
-      footer=""
       content={
         changePasswordRequestSucceeded ? (
           <>

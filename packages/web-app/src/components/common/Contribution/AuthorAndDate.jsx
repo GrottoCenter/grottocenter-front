@@ -28,7 +28,7 @@ const AuthorAndDate = ({ author, textColor, date, verb }) => {
 
 AuthorAndDate.propTypes = {
   author: authorType,
-  date: PropTypes.string,
+  date: PropTypes.oneOfType([PropTypes.instanceOf(Date), PropTypes.string]),
   textColor: PropTypes.oneOf([
     'textPrimary',
     'textSecondary',

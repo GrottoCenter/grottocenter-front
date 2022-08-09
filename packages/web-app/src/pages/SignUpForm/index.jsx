@@ -76,7 +76,6 @@ const SignUpForm = ({
   return (
     <Layout
       title={formatMessage({ id: 'Join Grottocenter' })}
-      footer=""
       content={
         signUpRequestSucceeded ? (
           <>

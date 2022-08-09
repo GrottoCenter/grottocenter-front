@@ -47,7 +47,6 @@ const DuplicateImportHandle = () => {
   return (
     <Layout
       title={formatMessage({ id: 'Duplicates from CSV import tool' })}
-      footer=""
       content={
         <AuthChecker
           componentToDisplay={

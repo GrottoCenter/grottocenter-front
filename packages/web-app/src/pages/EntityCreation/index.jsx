@@ -27,7 +27,6 @@ const EntitiesCreation = () => {
   return (
     <Layout
       title={formatMessage({ id: 'Create a new entity in Grottocenter' })}
-      footer=""
       content={
         !permissions.isAuth ? (
           <CenteredBlock>

@@ -10,7 +10,6 @@ const defaultContext = {
   state: {
     details: {
       accessRate: 2.5,
-      author: 'Author name',
       creationDate: todayDate,
       depth: 100,
       development: 100,
@@ -57,7 +56,7 @@ const Entry = ({
       interestRate: pathOr(0, ['interestRate'], details),
       progressionRate: pathOr(0, ['progressionRate'], details),
       accessRate: pathOr(0, ['accessRate'], details),
-      author: pathOr('Author', ['author'], details),
+      author: details?.author,
       creationDate: pathOr(todayDate, ['creationDate'], details),
       coordinates: pathOr([0, 0], ['coordinates'], details),
       ...details
