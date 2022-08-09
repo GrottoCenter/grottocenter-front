@@ -1,5 +1,5 @@
 import fetch from 'isomorphic-fetch';
-import { findRandomEntryUrl } from '../conf/Config';
+import { findRandomEntranceUrl } from '../conf/Config';
 import makeErrorMessage from '../helpers/makeErrorMessage';
 
 export const FETCH_RANDOMENTRY = 'FETCH_RANDOMENTRY';
@@ -24,7 +24,7 @@ export const fetchRandomEntryFailure = error => ({
 export const loadRandomEntry = () => dispatch => {
   dispatch(fetchRandomEntryNumber());
 
-  return fetch(findRandomEntryUrl)
+  return fetch(findRandomEntranceUrl)
     .then(response => {
       if (response.status >= 400) {
         throw new Error(response.status);

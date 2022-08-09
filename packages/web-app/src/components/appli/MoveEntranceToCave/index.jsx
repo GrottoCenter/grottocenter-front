@@ -7,7 +7,7 @@ import { useParams } from 'react-router-dom';
 import { isEmpty } from 'ramda';
 import { Divider } from '@material-ui/core';
 import Layout from '../../common/Layouts/Fixed/FixedContent';
-import { fetchEntry } from '../../../actions/Entrance/GetEntrance';
+import { fetchEntrance } from '../../../actions/Entrance/GetEntrance';
 import MoveEntranceToCaveForm from './MoveEntranceToCaveForm';
 import Alert from '../../common/Alert';
 import AuthChecker from '../AuthChecker';
@@ -23,7 +23,7 @@ const MoveEntranceToCave = () => {
   } = useSelector(state => state.entry);
 
   useEffect(() => {
-    dispatch(fetchEntry(entranceId));
+    dispatch(fetchEntrance(entranceId));
   }, [dispatch, entranceId]);
 
   return (

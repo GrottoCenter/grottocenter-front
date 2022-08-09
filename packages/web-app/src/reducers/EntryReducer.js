@@ -1,18 +1,18 @@
 import {
-  LOAD_ENTRY_SUCCESS,
-  LOAD_ENTRY_ERROR,
-  LOAD_ENTRY_LOADING
+  LOAD_ENTRANCE_SUCCESS,
+  LOAD_ENTRANCE_ERROR,
+  LOAD_ENTRANCE_LOADING
 } from '../actions/Entrance/GetEntrance';
 import {
   UPDATE_ENTRANCE_SUCCESS,
   UPDATE_ENTRANCE,
   UPDATE_ENTRANCE_ERROR
 } from '../actions/Entrance/UpdateEntrance';
-import { RESET_ENTRY_STATE } from '../actions/Entrance/ResetEntrance';
+import { RESET_ENTRANCE_STATE } from '../actions/Entrance/ResetEntrance';
 import {
-  CREATE_ENTRY_LOADING,
-  CREATE_ENTRY_SUCCESS,
-  CREATE_ENTRY_ERROR
+  CREATE_ENTRANCE_LOADING,
+  CREATE_ENTRANCE_SUCCESS,
+  CREATE_ENTRANCE_ERROR
 } from '../actions/Entrance/CreateEntrance';
 
 import { POST_LOCATION_SUCCESS } from '../actions/Location/CreateLocation';
@@ -31,42 +31,42 @@ const initialState = {
 
 const reducer = (state = initialState, action) => {
   switch (action.type) {
-    case LOAD_ENTRY_LOADING:
+    case LOAD_ENTRANCE_LOADING:
     case UPDATE_ENTRANCE:
-    case CREATE_ENTRY_LOADING:
+    case CREATE_ENTRANCE_LOADING:
       return {
         ...state,
         error: null,
         loading: true,
         latestHttpCode: null
       };
-    case LOAD_ENTRY_SUCCESS:
+    case LOAD_ENTRANCE_SUCCESS:
       return {
         ...initialState,
         data: action.data
       };
-    case LOAD_ENTRY_ERROR:
+    case LOAD_ENTRANCE_ERROR:
       return {
         ...state,
         loading: false,
         error: action.error
       };
     case UPDATE_ENTRANCE_SUCCESS:
-    case CREATE_ENTRY_SUCCESS:
+    case CREATE_ENTRANCE_SUCCESS:
       return {
         ...state,
         loading: false,
         latestHttpCode: action.httpCode
       };
     case UPDATE_ENTRANCE_ERROR:
-    case CREATE_ENTRY_ERROR:
+    case CREATE_ENTRANCE_ERROR:
       return {
         ...state,
         loading: false,
         latestHttpCode: action.httpCode,
         error: action.error
       };
-    case RESET_ENTRY_STATE:
+    case RESET_ENTRANCE_STATE:
       return initialState;
     case POST_LOCATION_SUCCESS:
       return {

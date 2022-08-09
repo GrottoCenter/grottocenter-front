@@ -1,6 +1,9 @@
 import fetch from 'isomorphic-fetch';
 
-import { putEntryWithNewEntitiesUrl, putEntranceUrl } from '../../conf/Config';
+import {
+  putEntranceWithNewEntitiesUrl,
+  putEntranceUrl
+} from '../../conf/Config';
 
 import makeErrorMessage from '../../helpers/makeErrorMessage';
 
@@ -22,7 +25,7 @@ const checkStatus = response => {
 };
 
 export const updateEntranceWithNewEntities = (
-  entryData,
+  entranceData,
   newNames,
   newDesc,
   newLoc,
@@ -32,7 +35,7 @@ export const updateEntranceWithNewEntities = (
   dispatch({ type: UPDATE_ENTRANCE });
 
   const body = {
-    entrance: entryData,
+    entrance: entranceData,
     newNames,
     newDescriptions: newDesc,
     newLocations: newLoc,
@@ -46,7 +49,7 @@ export const updateEntranceWithNewEntities = (
     headers: getState().login.authorizationHeader
   };
 
-  return fetch(putEntryWithNewEntitiesUrl(entryData.id), requestOptions)
+  return fetch(putEntranceWithNewEntitiesUrl(entranceData.id), requestOptions)
     .then(checkStatus)
     .then(result => {
       dispatch({
@@ -63,16 +66,16 @@ export const updateEntranceWithNewEntities = (
     });
 };
 
-export const updateEntrance = entryData => (dispatch, getState) => {
+export const updateEntrance = entranceData => (dispatch, getState) => {
   dispatch({ type: UPDATE_ENTRANCE });
 
   const requestOptions = {
     method: 'PUT',
-    body: JSON.stringify(entryData),
+    body: JSON.stringify(entranceData),
     headers: getState().login.authorizationHeader
   };
 
-  return fetch(putEntranceUrl(entryData.id), requestOptions)
+  return fetch(putEntranceUrl(entranceData.id), requestOptions)
     .then(response => {
       if (response.status >= 400) {
         throw new Error(response.status);

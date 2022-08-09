@@ -1,5 +1,5 @@
-export const RESET_ENTRY_STATE = 'RESET_ENTRY_STATE';
+export const RESET_ENTRANCE_STATE = 'RESET_ENTRANCE_STATE';
 
 export const resetEntranceState = () => ({
-  type: RESET_ENTRY_STATE
+  type: RESET_ENTRANCE_STATE
 });
