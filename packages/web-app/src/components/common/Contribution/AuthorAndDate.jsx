@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import { Typography } from '@material-ui/core';
 import { useIntl } from 'react-intl';
 import AuthorLink from '../AuthorLink/index';
+import authorType from '../../../types/author.type';
 
 const AuthorAndDate = ({ author, textColor, date, verb }) => {
   const { formatDate } = useIntl();

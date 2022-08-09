@@ -1,6 +1,5 @@
-import React, { Fragment } from 'react';
+import React from 'react';
 import { useIntl } from 'react-intl';
-import { isNil } from 'ramda';
 import PropTypes from 'prop-types';
 import {
   Typography,
@@ -10,9 +9,11 @@ import {
   ListItemText,
   Box
 } from '@material-ui/core';
+import Contribution from '../../common/Contribution/Contribution';
+import authorType from '../../../types/author.type';
 
 const Descriptions = ({ descriptions }) => {
-  const { formatMessage, formatDate } = useIntl();
+  const { formatMessage } = useIntl();
 
   return (
     <Box display="block">
@@ -24,35 +25,13 @@ const Descriptions = ({ descriptions }) => {
           <div key={id}>
             <ListItem>
               <ListItemText
-                disableTypography
-                primary={<Typography>{title}</Typography>}
+                primary={title}
                 secondary={
-                  <>
-                    <Typography
-                      variant="body2"
-                      color="textSecondary"
-                      style={{ whiteSpace: 'pre-wrap' }}>
-                      {body}
-                    </Typography>
-                    <br />
-                    <Typography variant="caption">
-                      {`${
-                        !isNil(author.nickname)
-                          ? formatMessage({ id: 'Posted by' })
-                          : ''
-                      } ${!isNil(author.nickname) ? author.nickname : ''} ${
-                        !isNil(date)
-                          ? `- ${formatDate(date, {
-                              year: 'numeric',
-                              month: 'numeric',
-                              day: 'numeric',
-                              hour: 'numeric',
-                              minute: 'numeric'
-                            })}`
-                          : ''
-                      }`}
-                    </Typography>
-                  </>
+                  <Contribution
+                    author={author}
+                    body={body}
+                    creationDate={date}
+                  />
                 }
               />
             </ListItem>
@@ -67,9 +46,7 @@ const Descriptions = ({ descriptions }) => {
 Descriptions.propTypes = {
   descriptions: PropTypes.arrayOf(
     PropTypes.shape({
-      author: PropTypes.shape({
-        name: PropTypes.string
-      }),
+      author: authorType,
       body: PropTypes.string,
       date: PropTypes.instanceOf(Date),
       id: PropTypes.number,

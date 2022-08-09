@@ -14,12 +14,23 @@ import MassifPropTypes from './propTypes';
 import MapMassif from './MapMassif';
 import Descriptions from './Descriptions';
 
-const Massif = ({ isFetching, error, massif, canEdit, onEdit }) => {
+const Massif = ({
+  isFetching,
+  error,
+  descriptions,
+  details,
+  documents,
+  entrances,
+  networks,
+  canEdit,
+  onEdit
+}) => {
   const { formatMessage } = useIntl();
 
+  const { geogPolygon, name, names } = details;
   let title = '';
-  if (massif?.name) {
-    title = massif.name;
+  if (name) {
+    title = name;
   } else if (!error) {
     title = formatMessage({ id: 'Loading massif data...' });
   }
@@ -31,8 +42,7 @@ const Massif = ({ isFetching, error, massif, canEdit, onEdit }) => {
         isFetching && !error ? (
           <Skeleton />
         ) : (
-          massif &&
-          `${formatMessage({ id: 'Language' })} : ${massif?.names[0].language}`
+          names && `${formatMessage({ id: 'Language' })} : ${names[0].language}`
         )
       }
       content={
@@ -56,15 +66,15 @@ const Massif = ({ isFetching, error, massif, canEdit, onEdit }) => {
               severity="error"
             />
           )}
-          {massif && (
+          {details && (
             <>
               <Box
                 alignItems="start"
                 display="flex"
                 flexBasis="300px"
                 justifyContent="space-between">
-                {!isEmpty(massif.descriptions) ? (
-                  <Descriptions descriptions={massif.descriptions} />
+                {!isEmpty(descriptions) ? (
+                  <Descriptions descriptions={descriptions} />
                 ) : (
                   <Alert
                     severity="info"
@@ -84,15 +94,15 @@ const Massif = ({ isFetching, error, massif, canEdit, onEdit }) => {
                   </IconButton>
                 )}
               </Box>
-              {massif.geogPolygon && (
+              {geogPolygon && entrances && (
                 <>
                   <hr />
-                  <MapMassif massif={massif} />
+                  <MapMassif entrances={entrances} geogPolygon={geogPolygon} />
                 </>
               )}
               <hr />
               <DocumentsList
-                docs={massif.documents.map(doc => ({
+                docs={documents.map(doc => ({
                   ...doc,
                   title: doc.titles[0].text
                 }))}
@@ -108,7 +118,7 @@ const Massif = ({ isFetching, error, massif, canEdit, onEdit }) => {
               />
               <hr />
               <EntrancesList
-                entrances={massif.entrances}
+                entrances={entrances}
                 emptyMessageComponent={
                   <Alert
                     severity="info"
@@ -121,7 +131,7 @@ const Massif = ({ isFetching, error, massif, canEdit, onEdit }) => {
               />
               <hr />
               <CavesList
-                caves={massif.networks}
+                caves={networks}
                 emptyMessageComponent={
                   <Alert
                     severity="info"

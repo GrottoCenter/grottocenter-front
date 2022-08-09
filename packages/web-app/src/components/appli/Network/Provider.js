@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { pipe, reject, isNil, map, prop } from 'ramda';
 
 import { detailsType as entranceDetailsType } from '../Entry/Provider';
+import authorType from '../../../types/author.type';
 
 const date = new Date();
 const todayDate = date.toISOString().substring(0, 10);
@@ -90,10 +91,6 @@ export const caveTypes = PropTypes.shape({
   name: PropTypes.string,
   temperature: PropTypes.number,
   undergroundType: PropTypes.string
-});
-
-const authorType = PropTypes.shape({
-  name: PropTypes.string
 });
 
 export const descriptionsType = PropTypes.arrayOf(
