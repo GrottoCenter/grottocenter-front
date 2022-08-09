@@ -17,6 +17,7 @@ import Translate from '../../../../common/Translate';
 import useDocumentTypes from '../../../../../hooks/useDocumentTypes';
 import { DocumentFormContext } from '../Provider';
 import StringInput from '../../../../common/Form/StringInput';
+import idNameType from '../../../../../types/idName.type';
 
 // ===================================
 const InlineWrapper = styled.div`
@@ -150,10 +151,7 @@ IdentifierEditor.propTypes = {
   ),
   contextIdentifierValueName: PropTypes.string.isRequired,
   contextIdentifierTypeValueName: PropTypes.string.isRequired,
-  documentType: PropTypes.shape({
-    id: PropTypes.number.isRequired,
-    name: PropTypes.string.isRequired
-  }).isRequired
+  documentType: idNameType.isRequired
 };
 
 export default IdentifierEditor;

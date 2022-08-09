@@ -24,6 +24,7 @@ import { wikiBBSLinks } from '../../../conf/Config';
 import SearchBottomActionButtons from './SearchBottomActionButtons';
 import styles from './styles';
 import SliderForm from './SliderForm';
+import { idNameTypeExtended } from '../../../types/idName.type';
 
 const SUBJECT_NAME_MAX_LENGTH = 80;
 
@@ -540,10 +541,8 @@ DocumentSearch.propTypes = {
   allSubjects: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   getAllDocumentTypes: PropTypes.func.isRequired,
   allDocumentTypes: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.number.isRequired,
-      isAvailable: PropTypes.bool.isRequired,
-      name: PropTypes.string.isRequired
+    idNameTypeExtended({
+      isAvailable: PropTypes.bool.isRequired
     })
   ).isRequired,
   publicationDateMinValue: PropTypes.number,

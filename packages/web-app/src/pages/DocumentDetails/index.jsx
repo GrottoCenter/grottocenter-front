@@ -25,6 +25,7 @@ import {
 } from './transformers';
 import { usePermissions } from '../../hooks';
 import Layout from '../../components/common/Layouts/Fixed/FixedContent';
+import idNameType from '../../types/idName.type';
 
 const OrganizationIcon = styled.img`
   height: 35px;
@@ -287,14 +288,8 @@ DocumentPage.propTypes = {
     summary: PropTypes.string.isRequired
   }),
   organizations: PropTypes.shape({
-    editor: PropTypes.shape({
-      id: PropTypes.number,
-      name: PropTypes.string
-    }),
-    library: PropTypes.shape({
-      id: PropTypes.number,
-      name: PropTypes.string
-    })
+    editor: idNameType,
+    library: idNameType
   }),
   details: PropTypes.shape({
     authorComment: PropTypes.string,
@@ -320,18 +315,9 @@ DocumentPage.propTypes = {
     )
   }),
   entities: PropTypes.shape({
-    cave: PropTypes.shape({
-      id: PropTypes.number,
-      name: PropTypes.string
-    }),
-    entrance: PropTypes.shape({
-      id: PropTypes.number,
-      name: PropTypes.string
-    }),
-    massif: PropTypes.shape({
-      id: PropTypes.number,
-      name: PropTypes.string
-    }),
+    cave: idNameType,
+    entrance: idNameType,
+    massif: idNameType,
     files: PropTypes.shape({
       fileNames: PropTypes.arrayOf(PropTypes.string),
       fileLinks: PropTypes.arrayOf(PropTypes.string)

@@ -1,8 +1,5 @@
-import PropTypes from 'prop-types';
+import idNameType from '../../../types/idName.type';
 
-const EntrancePropTypes = PropTypes.shape({
-  id: PropTypes.number.isRequired,
-  name: PropTypes.string
-});
+const EntrancePropTypes = idNameType;
 
 export default EntrancePropTypes;

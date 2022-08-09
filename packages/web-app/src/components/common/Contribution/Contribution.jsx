@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import MultilinesTypography from '../MultilinesTypography';
 import AuthorAndDate from './AuthorAndDate';
+import authorType from '../../../types/author.type';
 
 const Contribution = ({ author, body, creationDate }) => (
   <>
@@ -12,11 +13,7 @@ const Contribution = ({ author, body, creationDate }) => (
 );
 
 Contribution.propTypes = {
-  author: PropTypes.shape({
-    id: PropTypes.number,
-    nickname: PropTypes.string,
-    url: PropTypes.string
-  }),
+  author: authorType,
   body: PropTypes.string.isRequired,
   creationDate: PropTypes.instanceOf(Date)
 };

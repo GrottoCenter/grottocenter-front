@@ -25,6 +25,7 @@ import { updateEntrance } from '../../../../actions/Entry';
 
 import Network from './Network';
 import makeNetworkData from './transformers';
+import idNameType from '../../../../types/idName.type';
 
 const Button = styled(MuiButton)`
   margin: ${({ theme }) => theme.spacing(2)}px;
@@ -207,10 +208,7 @@ NetworkForm.propTypes = {
     isDivingCave: PropTypes.bool,
     language: PropTypes.string.isRequired,
     length: PropTypes.number,
-    massif: PropTypes.shape({
-      id: PropTypes.number.isRequired,
-      name: PropTypes.string.isRequired
-    }),
+    massif: idNameType,
     name: PropTypes.string.isRequired,
     temperature: PropTypes.number
   }).isRequired

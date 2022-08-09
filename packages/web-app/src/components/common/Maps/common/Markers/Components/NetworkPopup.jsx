@@ -1,6 +1,6 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import Title from './Title';
+import idNameType from '../../../../../../types/idName.type';
 
 export const NetworkPopup = ({ network }) => (
   <Title
@@ -10,10 +10,7 @@ export const NetworkPopup = ({ network }) => (
 );
 
 NetworkPopup.propTypes = {
-  network: PropTypes.shape({
-    name: PropTypes.string,
-    id: PropTypes.number
-  }).isRequired
+  network: idNameType.isRequired
 };
 
 export default NetworkPopup;
