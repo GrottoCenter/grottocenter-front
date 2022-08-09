@@ -7,12 +7,12 @@ import changePassword from './ChangePassword';
 import changeEmail from './ChangeEmail';
 import createCave from './CreateCaveReducer';
 import createDescription from './CreateDescription';
+import createDocument from './CreateDocumentReducer';
 import createLocation from './CreateLocation';
 import createMassif from './CreateMassifReducer';
 import createOrganization from './CreateOrganization';
 import createPerson from './CreatePerson';
 import createHistory from './CreateHistory';
-import document from './DocumentReducer';
 import documentChildren from './DocumentChildrenReducer';
 import documentDetails from './DetailsDocumentReducer';
 import documents from './DocumentsReducer';
@@ -54,6 +54,7 @@ import signUp from './SignUpReducer';
 import subject from './SubjectReducer';
 import updateCave from './UpdateCaveReducer';
 import updateDescription from './UpdateDescription';
+import updateDocument from './UpdateDocumentReducer';
 import updateHistory from './UpdateHistory';
 import updateLocation from './UpdateLocation';
 import updateMassif from './UpdateMassifReducer';
@@ -68,6 +69,7 @@ const GCReducer = combineReducers({
   changeEmail,
   createCave,
   createDescription,
+  createDocument,
   createHistory,
   createLocation,
   createMassif,
@@ -114,6 +116,7 @@ const GCReducer = combineReducers({
   subject,
   updateCave,
   updateDescription,
+  updateDocument,
   updateHistory,
   updateLocation,
   updateMassif,
