@@ -1,11 +1,11 @@
-import { Typography, Box } from '@material-ui/core';
+import { Typography } from '@material-ui/core';
 import React from 'react';
 import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { Skeleton } from '@material-ui/lab';
 import { isEmpty } from 'ramda';
-import AuthorLink from '../../components/common/AuthorLink/index';
+import AuthorAndDate from '../../components/common/Contribution/AuthorAndDate';
 
 const Header = styled.div`
   display: flex;
@@ -16,30 +16,6 @@ const SubTitle = styled(Typography)`
   margin-top: ${({ theme }) => theme.spacing(2)}px;
   text-transform: uppercase;
 `;
-
-const CreatedByTypography = styled(Typography)`
-  display: flex;
-  flex-direction: row;
-`;
-
-const CreatedBy = ({ author, creationDate }) => {
-  const { formatDate, formatTime } = useIntl();
-
-  return (
-    <CreatedByTypography
-      component="div"
-      color="textSecondary"
-      variant="caption"
-      gutterBottom>
-      <Box fontWeight="fontWeightBold">
-        <AuthorLink author={author} verb="Created" />
-        {` `}({formatDate(creationDate)}
-        {' - '}
-        {formatTime(creationDate)})
-      </Box>
-    </CreatedByTypography>
-  );
-};
 
 const Overview = ({
   author,
@@ -61,7 +37,12 @@ const Overview = ({
           </>
         ) : (
           <>
-            <CreatedBy author={author} creationDate={creationDate} />
+            <AuthorAndDate
+              author={author}
+              textColor="textSecondary"
+              date={creationDate}
+              verb="Created"
+            />
             <Typography color="textSecondary" variant="caption" gutterBottom>
               {`${formatMessage({
                 id: 'Document language'
@@ -92,10 +73,10 @@ const Overview = ({
               </SubTitle>
               <Typography variant="body1">
                 {authors.map((auth, i) => (
-                  <>
+                  <React.Fragment key={auth.id}>
                     <a href={auth.url}>{auth.fullName}</a>
                     {i < authors.length - 1 ? ' - ' : ''}
-                  </>
+                  </React.Fragment>
                 ))}
               </Typography>
             </>
@@ -108,15 +89,6 @@ const Overview = ({
 
 export default Overview;
 
-CreatedBy.propTypes = {
-  author: PropTypes.shape({
-    id: PropTypes.number,
-    nickname: PropTypes.string,
-    url: PropTypes.string
-  }),
-  creationDate: PropTypes.string.isRequired
-};
-
 Overview.propTypes = {
   loading: PropTypes.bool.isRequired,
   author: PropTypes.shape({
@@ -125,9 +97,13 @@ Overview.propTypes = {
     url: PropTypes.string
   }),
   creationDate: PropTypes.string.isRequired,
-  authors: PropTypes.arrayOf({
-    fullName: PropTypes.string.isRequired
-  }),
+  authors: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.number.isRequired,
+      fullName: PropTypes.string.isRequired,
+      url: PropTypes.string.isRequired
+    })
+  ),
   language: PropTypes.string.isRequired,
   summary: PropTypes.string.isRequired
 };

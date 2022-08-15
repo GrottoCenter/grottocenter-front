@@ -18,7 +18,7 @@ import { isNil } from 'ramda';
 import styled from 'styled-components';
 import ScrollableContent from '../../common/Layouts/Fixed/ScrollableContent';
 import { riggingsType, riggingType } from './Provider';
-import AuthorLink from '../../common/AuthorLink';
+import AuthorAndDate from '../../common/Contribution/AuthorAndDate';
 
 const MultilinesTableCell = styled(TableCell)({ whiteSpace: 'pre-wrap' });
 
@@ -67,7 +67,7 @@ const RiggingTable = ({ obstacles, title }) => {
 };
 
 const Riggings = ({ riggings }) => {
-  const { formatMessage, formatDate } = useIntl();
+  const { formatMessage } = useIntl();
 
   return (
     <ScrollableContent
@@ -77,24 +77,14 @@ const Riggings = ({ riggings }) => {
         <List>
           {riggings?.map((rigging, i) => (
             <div key={rigging.id}>
-              <ListItem primary="test">
+              <ListItem>
                 <ListItemText
                   primary={<RiggingTable {...rigging} />}
                   secondary={
-                    <Typography
-                      component="span"
-                      variant="caption"
-                      color="textPrimary">
-                      <AuthorLink author={rigging.author} />
-                      {!isNil(rigging.date) &&
-                        `- ${formatDate(rigging.date, {
-                          year: 'numeric',
-                          month: 'numeric',
-                          day: 'numeric',
-                          hour: 'numeric',
-                          minute: 'numeric'
-                        })}`}
-                    </Typography>
+                    <AuthorAndDate
+                      author={rigging.author}
+                      date={rigging.date}
+                    />
                   }
                 />
               </ListItem>

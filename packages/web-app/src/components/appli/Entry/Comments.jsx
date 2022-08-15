@@ -4,18 +4,14 @@ import {
   List,
   ListItem,
   ListItemText,
-  Typography,
   ListItemIcon
 } from '@material-ui/core';
 import React from 'react';
-import { isNil } from 'ramda';
 import styled from 'styled-components';
 import ScrollableContent from '../../common/Layouts/Fixed/ScrollableContent';
 import { commentsType, commentType } from './Provider';
-import AuthorLink from '../../common/AuthorLink/index';
-
 import Ratings from './Ratings';
-import MultilinesTypography from '../../common/MultilinesTypography';
+import Contribution from '../../common/Contribution/Contribution';
 
 const StyledListItemText = styled(ListItemText)`
   width: 100%;
@@ -37,31 +33,13 @@ const Comment = ({ comment }) => {
     accessRate,
     date
   } = comment;
-  const { formatDate } = useIntl();
 
   return (
     <ListItem>
       <StyledListItemText
         primary={title}
         secondary={
-          <>
-            <MultilinesTypography>{body}</MultilinesTypography>
-            <br />
-            <Typography variant="caption">
-              <AuthorLink author={author} />
-              {`${
-                !isNil(date)
-                  ? `- ${formatDate(date, {
-                      year: 'numeric',
-                      month: 'numeric',
-                      day: 'numeric',
-                      hour: 'numeric',
-                      minute: 'numeric'
-                    })}`
-                  : ''
-              }`}
-            </Typography>
-          </>
+          <Contribution author={author} body={body} creationDate={date} />
         }
       />
       <StyledListItemIcon>
