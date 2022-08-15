@@ -126,7 +126,7 @@ const Details = ({ control, errors, isReadonly = false }) => {
             component="fieldset"
             error={!!errors.cave?.isDiving}>
             <FormLabel component="legend">
-              <Translate>The cave contains water</Translate>
+              <Translate>Diving cave</Translate>
             </FormLabel>
             <FormControlLabel
               control={
