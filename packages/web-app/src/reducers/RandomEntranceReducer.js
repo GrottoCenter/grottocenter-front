@@ -5,8 +5,8 @@ import {
 } from '../actions/RandomEntrance';
 
 const initialState = {
-  isFetching: false, // show loading spinner
-  entrance: undefined, // random entry
+  isFetching: false,
+  entrance: undefined,
   error: null
 };
 

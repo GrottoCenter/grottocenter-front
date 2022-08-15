@@ -5,9 +5,9 @@ import {
 } from '../actions/Massif';
 
 const initialState = {
-  massif: undefined, // massif fetched
-  isFetching: false, // show loading spinner
-  error: null // fetch errors
+  massif: undefined,
+  isFetching: false,
+  error: null
 };
 
 const massif = (state = initialState, action) => {

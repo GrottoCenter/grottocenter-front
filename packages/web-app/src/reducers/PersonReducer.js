@@ -5,9 +5,9 @@ import {
 } from '../actions/Person';
 
 const initialState = {
-  person: undefined, // person fetched
-  isFetching: false, // show loading spinner
-  error: null // fetch errors
+  person: undefined,
+  isFetching: false,
+  error: null
 };
 
 const person = (state = initialState, action) => {

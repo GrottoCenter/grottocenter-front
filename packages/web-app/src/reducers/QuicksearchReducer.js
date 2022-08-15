@@ -7,10 +7,10 @@ import {
 } from '../actions/Quicksearch';
 
 const initialState = {
-  results: [], // search results
-  error: null, // fetch errors
+  results: [],
+  error: null,
   isLoading: false,
-  entry: undefined // marker entry
+  entry: undefined
 };
 
 const reducer = (state = initialState, action) => {
