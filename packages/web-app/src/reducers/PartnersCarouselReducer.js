@@ -6,8 +6,8 @@ import {
 
 const initialState = {
   error: null,
-  isFetching: false, // show loading spinner
-  partners: undefined // partners list
+  isFetching: false,
+  partners: undefined
 };
 
 const partnersCarousel = (state = initialState, action) => {
