@@ -1,5 +1,5 @@
-import React from 'react';
-import { isNil } from 'ramda';
+import React, { useContext } from 'react';
+import { isNil, propOr } from 'ramda';
 import { useIntl } from 'react-intl';
 import { Tooltip, Fab } from '@material-ui/core';
 import { Share, Print, Map, GpsFixed, Edit } from '@material-ui/icons';
@@ -8,7 +8,7 @@ import PropTypes from 'prop-types';
 import ReactToPrint from 'react-to-print';
 import { isMobile } from 'react-device-detect';
 import grey from '@material-ui/core/colors/grey';
-import { useHistory, generatePath } from 'react-router-dom';
+import { EntryContext } from '../../../appli/Entry/Provider';
 
 const Wrapper = styled.div`
   position: sticky;
@@ -30,9 +30,6 @@ const StyledFab = styled(Fab)`
     background-color: ${grey[100]};
   }
 `;
-
-const encodePathLocation = pathLocation =>
-  Buffer.from(pathLocation).toString('base64');
 
 const ActionButton = ({ Icon, label, onClick }) => {
   const { formatMessage } = useIntl();
@@ -58,11 +55,19 @@ const ActionButton = ({ Icon, label, onClick }) => {
 
 const ActionBar = ({ printRef, onEdit }) => {
   const { formatMessage } = useIntl();
-  const history = useHistory();
+
+  const {
+    state: { position }
+  } = useContext(EntryContext);
+  const latitude = propOr(undefined, 0, position);
+  const longitude = propOr(undefined, 1, position);
 
   const openMap = () => {
-    const args = encodePathLocation(`lng=${20}&lat=${20}&zoom=${20}`);
-    history.push(generatePath('/ui/map/:target', { target: args }));
+    window.open(
+      `https://www.openstreetmap.org/?mlat=${latitude}&mlon=${longitude}`,
+      '_blank',
+      'noopener,noreferrer'
+    );
   };
 
   return (
