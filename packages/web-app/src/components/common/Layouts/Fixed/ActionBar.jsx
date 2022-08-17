@@ -101,7 +101,7 @@ const ActionBar = ({ printRef, onEdit }) => {
         label={formatMessage({ id: 'GeoHack' })}
       />
       <ActionButton
-        onClick={openMap}
+        onClick={longitude ? openMap : undefined}
         Icon={<Map fontSize={isMobile ? 'small' : 'medium'} />}
         label={formatMessage({ id: 'Map' })}
       />
