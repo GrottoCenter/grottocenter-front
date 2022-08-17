@@ -2,7 +2,7 @@ import {
   UPDATE_PERSON,
   UPDATE_PERSON_FAILURE,
   UPDATE_PERSON_SUCCESS
-} from '../actions/UpdatePerson';
+} from '../actions/Person/UpdatePerson';
 
 const initialState = {
   error: null,

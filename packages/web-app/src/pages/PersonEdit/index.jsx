@@ -10,7 +10,7 @@ import { useUserProperties, usePermissions } from '../../hooks';
 import Layout from '../../components/common/Layouts/Fixed/FixedContent';
 
 import PersonEditPage from '../../components/common/PersonEditPage';
-import { loadPerson } from '../../actions/Person';
+import { loadPerson } from '../../actions/Person/GetPerson';
 import Alert from '../../components/common/Alert';
 
 const computeTitle = (isFetching, person, formatMessage) => {

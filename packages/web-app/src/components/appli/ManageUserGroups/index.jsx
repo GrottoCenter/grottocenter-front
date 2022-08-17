@@ -65,7 +65,7 @@ const ManageUserGroups = ({
     isLoading: searchIsLoading
   } = useSelector(state => state.quicksearch);
   const { errorMessages, isLoading, latestHttpCode } = useSelector(
-    state => state.caverGroups
+    state => state.updatePersonGroups
   );
 
   const renderOption = option => entityOptionForSelector(option);

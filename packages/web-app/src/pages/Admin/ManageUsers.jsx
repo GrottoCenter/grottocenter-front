@@ -3,7 +3,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useIntl } from 'react-intl';
 import styled from 'styled-components';
 
-import { getAdmins, getModerators, postCaverGroups } from '../../actions/Caver';
+import { getAdmins, getModerators } from '../../actions/Person/GetPerson';
+import { postPersonGroups } from '../../actions/Person/UpdatePersonGroups';
 
 import AuthChecker from '../../components/appli/AuthChecker';
 
@@ -29,14 +30,19 @@ const ManageUsers = () => {
   const [initialUser, setInitialUser] = useState(null);
 
   // Redux store
-  const { admins, isLoading, moderators } = useSelector(state => state.caver);
+  const { admins, isLoading: areAdminsLoading } = useSelector(
+    state => state.admin
+  );
+  const { isLoading: areModeratorsLoading, moderators } = useSelector(
+    state => state.moderator
+  );
   const {
     isLoading: isCaverGroupsLoading,
     latestHttpCode: caverUserGroupsLatestHttpCode
-  } = useSelector(state => state.caverGroups);
+  } = useSelector(state => state.updatePersonGroups);
 
   const onSaveGroups = () => {
-    dispatch(postCaverGroups(selectedUser.id, selectedUser.groups));
+    dispatch(postPersonGroups(selectedUser.id, selectedUser.groups));
   };
 
   const onSelection = selection => {
@@ -84,14 +90,14 @@ const ManageUsers = () => {
 
               <MarginBottomBlock>
                 <UserList
-                  isLoading={isLoading}
+                  isLoading={areAdminsLoading}
                   userList={admins}
                   title={formatMessage({ id: 'List of administrators' })}
                 />
               </MarginBottomBlock>
 
               <UserList
-                isLoading={isLoading}
+                isLoading={areModeratorsLoading}
                 userList={moderators}
                 title={formatMessage({ id: 'List of moderators' })}
               />
