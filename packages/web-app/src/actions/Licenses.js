@@ -1,5 +1,6 @@
 import { getLicensesUrl } from '../conf/Config';
 import makeErrorMessage from '../helpers/makeErrorMessage';
+import { checkAndGetStatus } from './utils';
 
 export const FETCH_LICENSES_LOAD = 'FETCH_LICENSES_LOAD';
 export const FETCH_LICENSES_SUCCESS = 'FETCH_LICENSES_SUCCESS';
@@ -19,19 +20,11 @@ export const fetchLicenseError = error => ({
   error: makeErrorMessage(error, 'Error while fetching licenses')
 });
 
-const checkStatus = response => {
-  if (response.status >= 200 && response.status <= 300) {
-    return response.json();
-  }
-  const errorCode = new Error(response.status);
-  throw errorCode;
-};
-
 export const fetchLicense = () => dispatch => {
   dispatch(fetchLicenseLoad());
 
   return fetch(getLicensesUrl)
-    .then(checkStatus)
+    .then(checkAndGetStatus)
     .then(response => {
       dispatch(fetchLicenseSuccess(response.licenses));
     })

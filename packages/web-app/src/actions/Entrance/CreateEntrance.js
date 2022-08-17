@@ -2,6 +2,7 @@ import fetch from 'isomorphic-fetch';
 
 import { postCreateEntranceUrl } from '../../conf/Config';
 import makeErrorMessage from '../../helpers/makeErrorMessage';
+import { checkStatusAndGetText } from '../utils';
 
 export const POST_ENTRANCE = 'POST_ENTRANCE';
 export const POST_ENTRANCE_SUCCESS = 'POST_ENTRANCE_SUCCESS';
@@ -24,14 +25,6 @@ export const CREATE_ENTRANCE_LOADING = 'CREATE_ENTRANCE_LOADING';
 export const CREATE_ENTRANCE_ERROR = 'CREATE_ENTRANCE_ERROR';
 
 export const RESET_ENTRANCE_STATE = 'RESET_ENTRANCE_STATE';
-
-const checkStatus = response => {
-  if (response.status >= 200 && response.status <= 300) {
-    return response;
-  }
-  const errorMessage = new Error(response.statusText);
-  throw errorMessage;
-};
 
 // TODO: why 2 methods to create entrance? One should be enough
 
@@ -71,7 +64,7 @@ export const createEntrance = entranceData => (dispatch, getState) => {
   };
 
   return fetch(postCreateEntranceUrl, requestOptions)
-    .then(checkStatus)
+    .then(checkStatusAndGetText)
     .then(result => {
       dispatch({
         type: CREATE_ENTRANCE_SUCCESS,

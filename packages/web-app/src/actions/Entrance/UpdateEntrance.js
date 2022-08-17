@@ -6,6 +6,7 @@ import {
 } from '../../conf/Config';
 
 import makeErrorMessage from '../../helpers/makeErrorMessage';
+import { checkStatusAndGetText } from '../utils';
 
 export const UPDATE_ENTRANCE_SUCCESS = 'UPDATE_ENTRANCE_SUCCESS';
 export const UPDATE_ENTRANCE = 'UPDATE_ENTRANCE';
@@ -15,14 +16,6 @@ export const updateEntranceFailure = (error, httpCode) => ({
   error,
   httpCode
 });
-
-const checkStatus = response => {
-  if (response.status >= 200 && response.status <= 300) {
-    return response;
-  }
-  const errorMessage = new Error(response.statusText);
-  throw errorMessage;
-};
 
 export const updateEntranceWithNewEntities = (
   entranceData,
@@ -50,7 +43,7 @@ export const updateEntranceWithNewEntities = (
   };
 
   return fetch(putEntranceWithNewEntitiesUrl(entranceData.id), requestOptions)
-    .then(checkStatus)
+    .then(checkStatusAndGetText)
     .then(result => {
       dispatch({
         type: UPDATE_ENTRANCE_SUCCESS,

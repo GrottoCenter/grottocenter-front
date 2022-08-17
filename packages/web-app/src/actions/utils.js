@@ -1,5 +1,4 @@
 // Remove the next line when other exports are created.
-// eslint-disable-next-line import/prefer-default-export
 export const makeUrl = (url, criterias) => {
   if (criterias) {
     return `${url}?${Object.keys(criterias)
@@ -7,4 +6,20 @@ export const makeUrl = (url, criterias) => {
       .join('&')}`;
   }
   return url;
+};
+
+export const checkStatusAndGetText = response => {
+  if (response.status >= 200 && response.status <= 300) {
+    return response;
+  }
+  const errorMessage = new Error(response.statusText);
+  throw errorMessage;
+};
+
+export const checkAndGetStatus = response => {
+  if (response.status >= 200 && response.status <= 300) {
+    return response;
+  }
+  const errorMessage = new Error(response.status);
+  throw errorMessage;
 };
