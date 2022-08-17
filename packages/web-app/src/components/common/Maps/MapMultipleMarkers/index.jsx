@@ -1,16 +1,6 @@
 import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
-import {
-  is,
-  pipe,
-  length,
-  equals,
-  all,
-  allPass,
-  flatten,
-  isNil,
-  isEmpty
-} from 'ramda';
+import { is, pipe, length, equals, all, allPass, flatten, isNil } from 'ramda';
 import { useMap } from 'react-leaflet';
 import CustomMapContainer from '../common/MapContainer';
 import useMarkers from '../common/Markers/useMarkers';
@@ -36,7 +26,7 @@ const MultipleMarkers = ({ positions, zoom }) => {
   }
   useEffect(() => {
     updateEntranceMarkers(positions.map(makePosition));
-    if (!isNil(positions) && !isEmpty(positions)) {
+    if (!isNil(positions) && !positions.every(p => !isNil(p))) {
       map.fitBounds(positions);
     }
 
