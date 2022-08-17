@@ -10,6 +10,7 @@ import {
   putDocumentUrl,
   putDocumentyWithNewEntitiesUrl
 } from '../conf/Config';
+import { checkAndGetStatus } from './utils';
 
 // ==========
 export const POST_DOCUMENT = 'POST_DOCUMENT';
@@ -77,14 +78,6 @@ const buildFormData = (formData, data, parentKey) => {
   } else if (data || data === '') {
     formData.append(parentKey, data);
   }
-};
-
-const checkStatus = response => {
-  if (response.status >= 200 && response.status <= 300) {
-    return response;
-  }
-  const errorMessage = new Error(response.status);
-  throw errorMessage;
 };
 
 export function postDocument(docAttributes) {
@@ -297,7 +290,7 @@ export const updateDocumentWithNewEntities = (
   };
 
   return fetch(putDocumentyWithNewEntitiesUrl(id), requestOptions)
-    .then(checkStatus)
+    .then(checkAndGetStatus)
     .then(response => {
       dispatch(updateDocumentSuccess(response.status));
     })

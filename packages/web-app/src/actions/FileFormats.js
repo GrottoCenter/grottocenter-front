@@ -1,5 +1,6 @@
 import { getFileFormatsUrl } from '../conf/Config';
 import makeErrorMessage from '../helpers/makeErrorMessage';
+import { checkAndGetStatus } from './utils';
 
 export const FETCH_FORMATS_LOAD = 'FETCH_FORMATS_LOAD';
 export const FETCH_FORMATS_SUCCESS = 'FETCH_FORMATS_SUCCESS';
@@ -19,19 +20,11 @@ export const fetchFormatsError = error => ({
   error: makeErrorMessage(error, 'Error while fetching formats')
 });
 
-const checkStatus = response => {
-  if (response.status >= 200 && response.status <= 300) {
-    return response.json();
-  }
-  const errorCode = new Error(response.status);
-  throw errorCode;
-};
-
 export const fetchFormats = () => dispatch => {
   dispatch(fetchFormatsLoad());
 
   return fetch(getFileFormatsUrl)
-    .then(checkStatus)
+    .then(checkAndGetStatus)
     .then(response => {
       dispatch(fetchFormatsSuccess(response.fileFormats));
     })

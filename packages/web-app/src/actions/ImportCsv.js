@@ -5,6 +5,7 @@ import {
   importRowsEntrancesUrl,
   importRowsDocumentsUrl
 } from '../conf/Config';
+import { checkStatusAndGetText } from './utils';
 
 export const CHECK_ROWS_START = 'CHECK_ROWS_START';
 export const CHECK_ROWS_SUCCESS = 'CHECK_ROWS_SUCCESS';
@@ -48,14 +49,6 @@ export const resetImportState = () => ({
   type: RESET_IMPORT_STATE
 });
 
-const checkStatus = response => {
-  if (response.status >= 200 && response.status <= 300) {
-    return response.json();
-  }
-  const errorMessage = new Error(response.statusText);
-  throw errorMessage;
-};
-
 const makeBody = rows => rows.map(row => row.data);
 
 export const checkRowsInBdd = (typeRow, rowsData) => (dispatch, getState) => {
@@ -87,7 +80,7 @@ export const checkRowsInBdd = (typeRow, rowsData) => (dispatch, getState) => {
 
   // eslint-disable-next-line consistent-return
   return fetch(url, requestOptions)
-    .then(checkStatus)
+    .then(checkStatusAndGetText)
     .then(response => {
       dispatch(checkRowsSuccess(response));
     })
@@ -123,7 +116,7 @@ export const importRows = (data, typeRow) => (dispatch, getState) => {
 
   // eslint-disable-next-line consistent-return
   return fetch(url, requestOptions)
-    .then(checkStatus)
+    .then(checkStatusAndGetText)
     .then(response => {
       dispatch(importRowsSuccess(response));
     })

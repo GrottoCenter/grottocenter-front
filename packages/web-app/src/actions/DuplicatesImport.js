@@ -12,7 +12,7 @@ import {
   deleteDuplicateEntranceUrl,
   deleteDuplicateDocumentUrl
 } from '../conf/Config';
-import { makeUrl } from './utils';
+import { checkAndGetStatus, makeUrl } from './utils';
 import makeErrorMessage from '../helpers/makeErrorMessage';
 
 export const LOAD_DUPLICATES_LIST = 'LOAD_DUPLICATES_LIST';
@@ -111,14 +111,6 @@ export const createNewEntityDuplicateError = error => ({
   httpCode: parseInt(error.type, 10)
 });
 
-const checkStatus = async response => {
-  if (response.status >= 200 && response.status <= 300) {
-    return response;
-  }
-  const errorMessage = new Error(response.status);
-  throw errorMessage;
-};
-
 const getBody = async response => ({
   content: await response.json(),
   statusCode: response.status
@@ -146,7 +138,7 @@ export const fetchDuplicatesList = (duplicateType, criteria) => (
   };
 
   return fetch(isNil(criteria) ? url : makeUrl(url, criteria), requestOptions)
-    .then(checkStatus)
+    .then(checkAndGetStatus)
     .then(getBody)
     .then(result => {
       dispatch(loadDuplicatesListSuccess(result));
@@ -175,7 +167,7 @@ export const fetchDuplicate = (id, duplicateType) => (dispatch, getState) => {
   };
 
   return fetch(url(id), requestOptions)
-    .then(checkStatus)
+    .then(checkAndGetStatus)
     .then(getBody)
     .then(result => {
       dispatch(loadDuplicateSuccess(result));
@@ -215,7 +207,7 @@ export const deleteDuplicates = (ids, duplicateType) => (
   };
 
   return fetch(url, requestOptions)
-    .then(checkStatus)
+    .then(checkAndGetStatus)
     .then(response => {
       dispatch(deleteDuplicatesSuccess(response.status));
     })
@@ -249,7 +241,7 @@ export const deleteDuplicate = (id, duplicateType) => (dispatch, getState) => {
   };
 
   return fetch(url(id), requestOptions)
-    .then(checkStatus)
+    .then(checkAndGetStatus)
     .then(response => {
       dispatch(deleteDuplicatesSuccess(response.status));
     })
@@ -286,7 +278,7 @@ export const createNewEntityFromDuplicate = (id, duplicateType) => (
   };
 
   return fetch(url(id), requestOptions)
-    .then(checkStatus)
+    .then(checkAndGetStatus)
     .then(response => {
       dispatch(createNewEntityDuplicateSuccess(response.status));
     })
