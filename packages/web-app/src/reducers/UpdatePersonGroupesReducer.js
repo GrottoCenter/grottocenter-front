@@ -1,8 +1,8 @@
 import {
-  POST_CAVER_GROUPS,
-  POST_CAVER_GROUPS_FAILURE,
-  POST_CAVER_GROUPS_SUCCESS
-} from '../actions/Caver';
+  POST_PERSON_GROUPS,
+  POST_PERSON_GROUPS_FAILURE,
+  POST_PERSON_GROUPS_SUCCESS
+} from '../actions/Person/UpdatePersonGroups';
 
 const initialState = {
   errorMessages: [],
@@ -10,23 +10,23 @@ const initialState = {
   latestHttpCode: undefined
 };
 
-const caver = (state = initialState, action) => {
+const personGroups = (state = initialState, action) => {
   switch (action.type) {
-    case POST_CAVER_GROUPS:
+    case POST_PERSON_GROUPS:
       return {
         ...state,
         isLoading: true,
         errorMessages: [],
         latestHttpCode: undefined
       };
-    case POST_CAVER_GROUPS_SUCCESS:
+    case POST_PERSON_GROUPS_SUCCESS:
       return {
         ...state,
         isLoading: false,
         errorMessages: [],
         latestHttpCode: action.httpCode
       };
-    case POST_CAVER_GROUPS_FAILURE:
+    case POST_PERSON_GROUPS_FAILURE:
       return {
         ...state,
         isLoading: false,
@@ -38,4 +38,4 @@ const caver = (state = initialState, action) => {
   }
 };
 
-export default caver;
+export default personGroups;

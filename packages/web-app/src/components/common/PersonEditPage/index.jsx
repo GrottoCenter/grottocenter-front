@@ -25,7 +25,7 @@ import Alert from '../Alert';
 import { useUserProperties } from '../../../hooks';
 import PersonEditForm from './PersonForm';
 import makeUserData from './transformer';
-import { updatePerson } from '../../../actions/UpdatePerson';
+import { updatePerson } from '../../../actions/Person/UpdatePerson';
 import { postChangePassword } from '../../../actions/ChangePassword';
 import { postChangeEmail } from '../../../actions/ChangeEmail';
 import Summary from './Summary';

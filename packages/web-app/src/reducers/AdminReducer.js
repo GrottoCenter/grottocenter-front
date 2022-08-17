@@ -1,11 +1,8 @@
 import {
   GET_ADMINS,
   GET_ADMINS_FAILURE,
-  GET_ADMINS_SUCCESS,
-  GET_MODERATORS,
-  GET_MODERATORS_FAILURE,
-  GET_MODERATORS_SUCCESS
-} from '../actions/Caver';
+  GET_ADMINS_SUCCESS
+} from '../actions/Person/GetPerson';
 
 const initialState = {
   errorMessages: [],
@@ -15,10 +12,9 @@ const initialState = {
   moderators: []
 };
 
-const caver = (state = initialState, action) => {
+const admin = (state = initialState, action) => {
   switch (action.type) {
     case GET_ADMINS:
-    case GET_MODERATORS:
       return {
         ...state,
         isLoading: true,
@@ -26,7 +22,6 @@ const caver = (state = initialState, action) => {
         latestHttpCode: undefined
       };
     case GET_ADMINS_FAILURE:
-    case GET_MODERATORS_FAILURE:
       return {
         ...state,
         isLoading: false,
@@ -40,16 +35,9 @@ const caver = (state = initialState, action) => {
         admins: action.admins
       };
 
-    case GET_MODERATORS_SUCCESS:
-      return {
-        ...state,
-        isLoading: false,
-        errorMessages: [],
-        moderators: action.moderators
-      };
     default:
       return state;
   }
 };
 
-export default caver;
+export default admin;
