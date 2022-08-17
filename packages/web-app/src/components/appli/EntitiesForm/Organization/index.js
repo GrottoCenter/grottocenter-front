@@ -21,8 +21,8 @@ import { useBoolean } from '../../../../hooks';
 import ActionButton from '../../../common/ActionButton';
 import Alert from '../../../common/Alert';
 import { updateName } from '../../../../actions/Name';
-import { postOrganization } from '../../../../actions/CreateOrganization';
-import { updateOrganization } from '../../../../actions/UpdateOrganization';
+import { postOrganization } from '../../../../actions/Organization/CreateOrganization';
+import { updateOrganization } from '../../../../actions/Organization/UpdateOrganization';
 import BasicInformationsForm from './BasicInformationsForm';
 import InformationsForm from './InformationsForm';
 import License from './License';
@@ -62,9 +62,9 @@ export const OrganizationForm = ({ organizationValues = null }) => {
   const allCountries = useMemo(() => countryList().getData(), []);
   const {
     error: organizationError,
-    loading: organizationLoading
+    isLoading: organizationLoading
   } = useSelector(state =>
-    isNewOrganization ? state.organizationPost : state.organizationPut
+    isNewOrganization ? state.createOrganization : state.organizationPut
   );
   const { error: nameError, loading: nameLoading } = useSelector(
     state => state.namePut
