@@ -2,12 +2,12 @@ import {
   UPDATE_ORGANIZATION,
   UPDATE_ORGANIZATION_FAILURE,
   UPDATE_ORGANIZATION_SUCCESS
-} from '../actions/UpdateOrganization';
+} from '../actions/Organization/UpdateOrganization';
 
 const initialState = {
-  loading: false,
+  data: null,
   error: null,
-  data: null
+  isLoading: false
 };
 
 const reducer = (state = initialState, action) => {

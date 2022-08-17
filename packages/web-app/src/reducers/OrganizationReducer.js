@@ -2,7 +2,7 @@ import {
   FETCH_ORGANIZATION,
   FETCH_ORGANIZATION_FAILURE,
   FETCH_ORGANIZATION_SUCCESS
-} from '../actions/Organization';
+} from '../actions/Organization/GetOrganization';
 
 const initialState = {
   organization: undefined,
@@ -10,7 +10,7 @@ const initialState = {
   error: null
 };
 
-const organization = (state = initialState, action) => {
+const reducer = (state = initialState, action) => {
   switch (action.type) {
     case FETCH_ORGANIZATION:
       return {
@@ -35,4 +35,4 @@ const organization = (state = initialState, action) => {
   }
 };
 
-export default organization;
+export default reducer;

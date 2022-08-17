@@ -40,8 +40,6 @@ import moderator from './ModeratorReducer';
 import moveEntranceToCave from './MoveEntranceToCaveReducer';
 import namePut from './NamePutReducer';
 import organization from './OrganizationReducer';
-import organizationPost from './OrganizationPostReducer';
-import organizationPut from './OrganizationPutReducer';
 import pageTitle from './PageTitleReducer';
 import partnersCarousel from './PartnersCarouselReducer';
 import person from './PersonReducer';
@@ -57,6 +55,7 @@ import subject from './SubjectReducer';
 import updateDescription from './UpdateDescription';
 import updateHistory from './UpdateHistory';
 import updateLocation from './UpdateLocation';
+import updateOrganization from './UpdateOrganization';
 import updatePerson from './UpdatePerson';
 
 const GCReducer = combineReducers({
@@ -101,8 +100,6 @@ const GCReducer = combineReducers({
   moveEntranceToCave,
   namePut,
   organization,
-  organizationPost,
-  organizationPut,
   pageTitle,
   partnersCarousel,
   person,
@@ -117,6 +114,7 @@ const GCReducer = combineReducers({
   updateDescription,
   updateHistory,
   updateLocation,
+  updateOrganization,
   updatePerson,
   updatePersonGroups
 });

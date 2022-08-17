@@ -1,5 +1,5 @@
 import fetch from 'isomorphic-fetch';
-import { putOrganizationUrl } from '../conf/Config';
+import { putOrganizationUrl } from '../../conf/Config';
 
 export const UPDATE_ORGANIZATION = 'UPDATE_ORGANIZATION';
 export const UPDATE_ORGANIZATION_SUCCESS = 'UPDATE_ORGANIZATION_SUCCESS';
