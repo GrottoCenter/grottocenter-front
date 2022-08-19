@@ -57,14 +57,14 @@ const ActionBar = ({ printRef, onEdit }) => {
   const { formatMessage } = useIntl();
 
   const {
-    state: { position }
+    state: { position: pos }
   } = useContext(EntryContext);
-  const latitude = propOr(undefined, 0, position);
-  const longitude = propOr(undefined, 1, position);
+  const lat = pos != null ? pos[0] : undefined;
+  const long = pos != null ? pos[1] : undefined;
 
   const openMap = () => {
     window.open(
-      `https://www.openstreetmap.org/?mlat=${latitude}&mlon=${longitude}`,
+      `https://www.openstreetmap.org/?mlat=${lat}&mlon=${long}`,
       '_blank',
       'noopener,noreferrer'
     );
@@ -101,7 +101,7 @@ const ActionBar = ({ printRef, onEdit }) => {
         label={formatMessage({ id: 'GeoHack' })}
       />
       <ActionButton
-        onClick={longitude ? openMap : undefined}
+        onClick={lat && long ? openMap : undefined}
         Icon={<Map fontSize={isMobile ? 'small' : 'medium'} />}
         label={formatMessage({ id: 'Map' })}
       />
