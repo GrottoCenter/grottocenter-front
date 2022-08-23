@@ -20,7 +20,7 @@ import EntryMap from './EntryMap';
 import Properties from './Properties';
 import Descriptions from './Descriptions';
 import Locations from './Locations';
-import Riggings from './Riggings';
+import Riggings from './Riggings/Riggings';
 import Comments from './Comments/index';
 import Documents from './Documents';
 import Histories from './Histories';
@@ -105,7 +105,7 @@ export const Entry = () => {
         />
       )}
       {id && <Descriptions descriptions={descriptions} entranceId={id} />}
-      {id && <Riggings riggings={riggings} />}
+      {id && <Riggings riggings={riggings} entranceId={id} />}
       {id && <Documents documents={documents} entranceId={id} />}
       {id && <Histories histories={histories} entranceId={id} />}
       {id && <Comments comments={comments} entranceId={id} />}

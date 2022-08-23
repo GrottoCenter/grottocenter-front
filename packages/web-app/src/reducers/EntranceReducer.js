@@ -21,6 +21,8 @@ import { POST_HISTORY_SUCCESS } from '../actions/History/CreateHistory';
 import { UPDATE_HISTORY_SUCCESS } from '../actions/History/UpdateHistory';
 import { POST_DESCRIPTION_SUCCESS } from '../actions/Description/CreateDescription';
 import { UPDATE_DESCRIPTION_SUCCESS } from '../actions/Description/UpdateDescription';
+import { POST_RIGGINGS_SUCCESS } from '../actions/Riggings/CreateRigging';
+import { UPDATE_RIGGINGS_SUCCESS } from '../actions/Riggings/UpdateRigging';
 import { POST_COMMENT_SUCCESS } from '../actions/Comment/CreateComment';
 import { UPDATE_COMMENT_SUCCESS } from '../actions/Comment/UpdateComment';
 
@@ -30,6 +32,30 @@ const initialState = {
   error: null,
   latestHttpCode: null
 };
+
+function transformRiggings(data) {
+  const obstacles = data.obstacles.split('|;|');
+  const ropes = data.ropes.split('|;|');
+  const anchors = data.anchors.split('|;|');
+  const observations = data.observations.split('|;|');
+  const rigging = {
+    id: data.id,
+    language: data.language,
+    title: data.title,
+    obstacles: []
+  };
+
+  for (let j = 0; j < obstacles.length; j += 1) {
+    rigging.obstacles.push({
+      obstacle: obstacles[j],
+      observation: observations[j],
+      rope: ropes[j],
+      anchor: anchors[j]
+    });
+  }
+
+  return rigging;
+}
 
 const reducer = (state = initialState, action) => {
   switch (action.type) {
@@ -167,26 +193,62 @@ const reducer = (state = initialState, action) => {
         };
       }
       return initialState;
+    case POST_RIGGINGS_SUCCESS:
+      if (
+        action.riggings?.entrance?.id &&
+        action.riggings?.entrance?.id === state.data?.id
+      ) {
+        return {
+          ...initialState,
+          data: {
+            ...state.data,
+            riggings: state.data.riggings
+              ? [...state.data.riggings, transformRiggings(action.riggings)]
+              : [action.riggings]
+          }
+        };
+      }
+      return initialState;
+    case UPDATE_RIGGINGS_SUCCESS:
+      if (
+        action.riggings?.entrance?.id &&
+        action.riggings?.entrance?.id === state.data?.id
+      ) {
+        return {
+          ...initialState,
+          data: {
+            ...state.data,
+            riggings: [
+              ...state.data.riggings.filter(l => l.id !== action.riggings.id),
+              {
+                ...transformRiggings(action.riggings),
+                entrance: action.riggings.entrance.id
+              }
+            ]
+          }
+        };
+      }
+      return initialState;
     case POST_COMMENT_SUCCESS:
       if (
-        action.comment?.entrance?.id &&
-        action.comment?.entrance?.id === state.data?.id
+          action.comment?.entrance?.id &&
+          action.comment?.entrance?.id === state.data?.id
       ) {
         return {
           ...initialState,
           data: {
             ...state.data,
             comments: state.data.comments
-              ? [...state.data.comments, action.comment]
-              : [action.comment]
+                ? [...state.data.comments, action.comment]
+                : [action.comment]
           }
         };
       }
       return initialState;
     case UPDATE_COMMENT_SUCCESS:
       if (
-        action.comment?.entrance?.id &&
-        action.comment?.entrance?.id === state.data?.id
+          action.comment?.entrance?.id &&
+          action.comment?.entrance?.id === state.data?.id
       ) {
         return {
           ...initialState,
