@@ -34,6 +34,11 @@ export const postCommentUrl = `${API_BASE_PATH}/comments`;
 export const putCommentUrl = commentId =>
   `${API_BASE_PATH}/comments/${commentId}`;
 
+// ===== Riggings urls
+export const postRiggingsUrl = `${API_BASE_PATH}/riggings`;
+export const putRiggingsUrl = riggingsId =>
+  `${API_BASE_PATH}/riggings/${riggingsId}`;
+
 // ===== Documents urls
 export const getDocumentChildrenUrl = documentId =>
   `${API_BASE_PATH}/documents/${documentId}/children`;
