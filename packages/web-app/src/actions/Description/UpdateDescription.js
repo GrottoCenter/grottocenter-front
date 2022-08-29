@@ -1,5 +1,5 @@
 import fetch from 'isomorphic-fetch';
-import { putDescriptionUrl } from '../conf/Config';
+import { putDescriptionUrl } from '../../conf/Config';
 
 export const UPDATE_DESCRIPTION = 'UPDATE_DESCRIPTION';
 export const UPDATE_DESCRIPTION_SUCCESS = 'UPDATE_DESCRIPTION_SUCCESS';

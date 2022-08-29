@@ -2,7 +2,7 @@ import {
   UPDATE_DESCRIPTION,
   UPDATE_DESCRIPTION_FAILURE,
   UPDATE_DESCRIPTION_SUCCESS
-} from '../actions/UpdateDescription';
+} from '../actions/Description/UpdateDescription';
 
 const initialState = {
   error: null,

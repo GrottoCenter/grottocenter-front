@@ -1,5 +1,5 @@
 import fetch from 'isomorphic-fetch';
-import { putLocationUrl } from '../conf/Config';
+import { putLocationUrl } from '../../conf/Config';
 
 export const UPDATE_LOCATION = 'UPDATE_LOCATION';
 export const UPDATE_LOCATION_SUCCESS = 'UPDATE_LOCATION_SUCCESS';

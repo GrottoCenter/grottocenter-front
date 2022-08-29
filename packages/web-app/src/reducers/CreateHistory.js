@@ -2,7 +2,7 @@ import {
   POST_HISTORY,
   POST_HISTORY_FAILURE,
   POST_HISTORY_SUCCESS
-} from '../actions/CreateHistory';
+} from '../actions/History/CreateHistory';
 
 const initialState = {
   error: null,
