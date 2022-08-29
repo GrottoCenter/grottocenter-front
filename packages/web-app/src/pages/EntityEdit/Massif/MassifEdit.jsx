@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { loadMassif } from '../../../actions/Massif';
+import { loadMassif } from '../../../actions/Massif/GetMassif';
 import MassifEditContainer from './MassifEditContainer';
 
 const MassifEdit = () => {

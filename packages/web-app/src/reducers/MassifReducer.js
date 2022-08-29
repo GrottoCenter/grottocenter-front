@@ -2,7 +2,7 @@ import {
   FETCH_MASSIF,
   FETCH_MASSIF_FAILURE,
   FETCH_MASSIF_SUCCESS
-} from '../actions/Massif';
+} from '../actions/Massif/GetMassif';
 
 const initialState = {
   massif: undefined,
@@ -10,7 +10,7 @@ const initialState = {
   error: null
 };
 
-const massif = (state = initialState, action) => {
+const reducer = (state = initialState, action) => {
   switch (action.type) {
     case FETCH_MASSIF:
       return { ...state, massif: action.massif, isFetching: true };
@@ -23,4 +23,4 @@ const massif = (state = initialState, action) => {
   }
 };
 
-export default massif;
+export default reducer;
