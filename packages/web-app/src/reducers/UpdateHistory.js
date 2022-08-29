@@ -2,7 +2,7 @@ import {
   UPDATE_HISTORY,
   UPDATE_HISTORY_FAILURE,
   UPDATE_HISTORY_SUCCESS
-} from '../actions/UpdateHistory';
+} from '../actions/History/UpdateHistory';
 
 const initialState = {
   error: null,

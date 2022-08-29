@@ -1,5 +1,5 @@
 import fetch from 'isomorphic-fetch';
-import { postDescriptionUrl } from '../conf/Config';
+import { postDescriptionUrl } from '../../conf/Config';
 
 export const POST_DESCRIPTION = 'POST_DESCRIPTION';
 export const POST_DESCRIPTION_SUCCESS = 'POST_DESCRIPTION_SUCCESS';

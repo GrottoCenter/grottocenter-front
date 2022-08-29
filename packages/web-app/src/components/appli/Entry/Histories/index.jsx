@@ -10,7 +10,7 @@ import ScrollableContent from '../../../common/Layouts/Fixed/ScrollableContent';
 import { historiesType } from '../Provider';
 import History from './History';
 import CreateHistoryForm from '../../Form/HistoryForm';
-import { postHistory } from '../../../../actions/CreateHistory';
+import { postHistory } from '../../../../actions/History/CreateHistory';
 import { usePermissions } from '../../../../hooks';
 import Alert from '../../../common/Alert';
 

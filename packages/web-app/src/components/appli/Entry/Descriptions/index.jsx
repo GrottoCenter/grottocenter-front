@@ -10,7 +10,7 @@ import ScrollableContent from '../../../common/Layouts/Fixed/ScrollableContent';
 import { descriptionsType } from '../Provider';
 import Description from './Description';
 import CreateDescriptionForm from '../../Form/DescriptionForm';
-import { postDescription } from '../../../../actions/CreateDescription';
+import { postDescription } from '../../../../actions/Description/CreateDescription';
 import { usePermissions } from '../../../../hooks';
 import Alert from '../../../common/Alert';
 

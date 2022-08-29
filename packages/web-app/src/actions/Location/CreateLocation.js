@@ -1,5 +1,5 @@
 import fetch from 'isomorphic-fetch';
-import { postLocationUrl } from '../conf/Config';
+import { postLocationUrl } from '../../conf/Config';
 
 export const POST_LOCATION = 'POST_LOCATION';
 export const POST_LOCATION_SUCCESS = 'POST_LOCATION_SUCCESS';

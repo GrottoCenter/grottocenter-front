@@ -15,12 +15,12 @@ import {
   CREATE_ENTRANCE_ERROR
 } from '../actions/Entrance/CreateEntrance';
 
-import { POST_LOCATION_SUCCESS } from '../actions/CreateLocation';
-import { UPDATE_LOCATION_SUCCESS } from '../actions/UpdateLocation';
-import { POST_HISTORY_SUCCESS } from '../actions/CreateHistory';
-import { UPDATE_HISTORY_SUCCESS } from '../actions/UpdateHistory';
-import { POST_DESCRIPTION_SUCCESS } from '../actions/CreateDescription';
-import { UPDATE_DESCRIPTION_SUCCESS } from '../actions/UpdateDescription';
+import { POST_LOCATION_SUCCESS } from '../actions/Location/CreateLocation';
+import { UPDATE_LOCATION_SUCCESS } from '../actions/Location/UpdateLocation';
+import { POST_HISTORY_SUCCESS } from '../actions/History/CreateHistory';
+import { UPDATE_HISTORY_SUCCESS } from '../actions/History/UpdateHistory';
+import { POST_DESCRIPTION_SUCCESS } from '../actions/Description/CreateDescription';
+import { UPDATE_DESCRIPTION_SUCCESS } from '../actions/Description/UpdateDescription';
 
 const initialState = {
   data: {},
