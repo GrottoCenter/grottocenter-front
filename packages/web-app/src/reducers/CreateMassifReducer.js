@@ -2,7 +2,7 @@ import {
   POST_MASSIF,
   POST_MASSIF_FAILURE,
   POST_MASSIF_SUCCESS
-} from '../actions/Massif';
+} from '../actions/Massif/CreateMassif';
 
 const initialState = {
   loading: false,

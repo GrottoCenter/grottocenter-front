@@ -3,7 +3,7 @@ import { useParams, useHistory } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { isNil, propOr } from 'ramda';
 import Massif from '../../components/appli/Massif/Massif';
-import { loadMassif } from '../../actions/Massif';
+import { loadMassif } from '../../actions/Massif/GetMassif';
 import { usePermissions } from '../../hooks';
 import {
   getDetails,
