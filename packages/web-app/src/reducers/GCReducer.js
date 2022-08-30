@@ -3,10 +3,9 @@ import admin from './AdminReducer';
 import advancedsearch from './AdvancedsearchReducer';
 import associateDocumentToEntrance from './AssociateDocumentToEntrance';
 import cave from './CaveReducer';
-import cavePost from './CavePostReducer';
-import cavePut from './CavePutReducer';
 import changePassword from './ChangePassword';
 import changeEmail from './ChangeEmail';
+import createCave from './CreateCaveReducer';
 import createDescription from './CreateDescription';
 import createLocation from './CreateLocation';
 import createMassif from './CreateMassifReducer';
@@ -51,6 +50,7 @@ import region from './RegionReducer';
 import sideMenu from './SideMenuReducer';
 import signUp from './SignUpReducer';
 import subject from './SubjectReducer';
+import updateCave from './UpdateCaveReducer';
 import updateDescription from './UpdateDescription';
 import updateHistory from './UpdateHistory';
 import updateLocation from './UpdateLocation';
@@ -63,10 +63,9 @@ const GCReducer = combineReducers({
   advancedsearch,
   associateDocumentToEntrance,
   cave,
-  cavePost,
-  cavePut,
   changePassword,
   changeEmail,
+  createCave,
   createDescription,
   createHistory,
   createLocation,
@@ -110,6 +109,7 @@ const GCReducer = combineReducers({
   sideMenu,
   signUp,
   subject,
+  updateCave,
   updateDescription,
   updateHistory,
   updateLocation,

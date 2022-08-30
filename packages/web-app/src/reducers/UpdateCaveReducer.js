@@ -2,7 +2,7 @@ import {
   UPDATE_CAVE,
   UPDATE_CAVE_FAILURE,
   UPDATE_CAVE_SUCCESS
-} from '../actions/Cave';
+} from '../actions/Cave/UpdateCave';
 
 const initialState = {
   loading: false,
