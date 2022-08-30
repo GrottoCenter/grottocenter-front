@@ -243,7 +243,7 @@ const HydratedDocumentPage = ({ id }) => {
     if (!isNil(documentId)) {
       dispatch(fetchDocumentDetails(documentId));
       dispatch(fetchDocumentChildren(documentId));
-      editPath.current = `/ui/documents/edit/${documentId}`;
+      editPath.current = `/ui/documents/${documentId}/edit`;
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [documentId]);

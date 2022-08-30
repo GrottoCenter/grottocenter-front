@@ -94,7 +94,7 @@ const Application = () => {
         <Route path="/ui/changePassword" component={ChangePassword} />
         <Route path="/ui/documents/add" component={DocumentSubmission} />
         <Route path="/ui/documents/validation" component={DocumentValidation} />
-        <Route path="/ui/documents/edit/:documentId" component={DocumentEdit} />
+        <Route path="/ui/documents/:documentId/edit" component={DocumentEdit} />
         <Route
           path="/ui/documents/:documentId"
           component={DocumentDetailsPage}
