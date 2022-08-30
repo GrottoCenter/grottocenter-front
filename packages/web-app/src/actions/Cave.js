@@ -40,10 +40,15 @@ export const updateCaveFailure = (error, httpCode) => ({
   httpCode
 });
 
-export const fetchCave = caveId => dispatch => {
+export const fetchCave = caveId => (dispatch, getState) => {
   dispatch({ type: LOAD_CAVE_LOADING });
 
-  return fetch(getCaveUrl + caveId)
+  const requestOptions = {
+    method: 'GET',
+    headers: getState().login.authorizationHeader
+  };
+
+  return fetch(getCaveUrl + caveId, requestOptions)
     .then(response => {
       if (response.status >= 400) {
         throw new Error(response.status);
