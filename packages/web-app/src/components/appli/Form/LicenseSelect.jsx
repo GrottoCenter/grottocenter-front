@@ -24,8 +24,7 @@ const LicenseSelect = ({ label, selected, updateSelected }) => {
 
   useEffect(() => {
     dispatch(fetchLicense());
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [dispatch]);
 
   /* Select uses reference comparison to check which license has been taken.
   If there is a default value, then the reference will be different from the object created when the licenses are retrieved.

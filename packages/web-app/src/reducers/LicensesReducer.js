@@ -20,7 +20,7 @@ const reducer = (state = initialState, action) => {
     case FETCH_LICENSES_SUCCESS:
       return {
         ...initialState,
-        data: action.payload
+        data: action.licenses
       };
     case FETCH_LICENSES_ERROR:
       return {

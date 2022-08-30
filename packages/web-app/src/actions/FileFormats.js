@@ -25,8 +25,9 @@ export const fetchFormats = () => dispatch => {
 
   return fetch(getFileFormatsUrl)
     .then(checkAndGetStatus)
-    .then(response => {
-      dispatch(fetchFormatsSuccess(response.fileFormats));
+    .then(response => response.json())
+    .then(data => {
+      dispatch(fetchFormatsSuccess(data.fileFormats));
     })
     .catch(error => {
       dispatch(fetchFormatsError(error.message));

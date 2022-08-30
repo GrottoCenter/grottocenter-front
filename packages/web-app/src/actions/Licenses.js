@@ -12,7 +12,7 @@ export const fetchLicenseLoad = () => ({
 
 export const fetchLicenseSuccess = licenses => ({
   type: FETCH_LICENSES_SUCCESS,
-  payload: licenses
+  licenses
 });
 
 export const fetchLicenseError = error => ({
@@ -25,8 +25,9 @@ export const fetchLicense = () => dispatch => {
 
   return fetch(getLicensesUrl)
     .then(checkAndGetStatus)
-    .then(response => {
-      dispatch(fetchLicenseSuccess(response.licenses));
+    .then(response => response.json())
+    .then(data => {
+      dispatch(fetchLicenseSuccess(data.licenses));
     })
     .catch(error => {
       dispatch(fetchLicenseError(error.message));
