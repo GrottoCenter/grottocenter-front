@@ -2,7 +2,7 @@ import {
   POST_CAVE,
   POST_CAVE_FAILURE,
   POST_CAVE_SUCCESS
-} from '../actions/Cave';
+} from '../actions/Cave/CreateCave';
 
 const initialState = {
   loading: false,

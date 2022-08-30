@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { isNil, isEmpty } from 'ramda';
 import Network from '../../components/appli/Network';
 import EntrancesList from '../../components/appli/Network/EntrancesList';
-import { fetchCave } from '../../actions/Cave';
+import { fetchCave } from '../../actions/Cave/GetCave';
 import { getSafeData } from './transformer';
 import Descriptions from '../../components/appli/Network/Descriptions';
 
@@ -13,7 +13,7 @@ const NetworkPage = () => {
   const dispatch = useDispatch();
   const { loading, data, error } = useSelector(state => state.cave);
   const { loading: updateLoading, error: updateError } = useSelector(
-    state => state.cavePut
+    state => state.updateCave
   );
   const prevUpdateLoading = useRef(updateLoading);
 

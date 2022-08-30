@@ -2,7 +2,7 @@ import {
   LOAD_CAVE_SUCCESS,
   LOAD_CAVE_ERROR,
   LOAD_CAVE_LOADING
-} from '../actions/Cave';
+} from '../actions/Cave/GetCave';
 
 const initialState = {
   data: {

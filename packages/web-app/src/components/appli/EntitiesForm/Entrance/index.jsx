@@ -76,7 +76,7 @@ export const EntranceForm = ({ caveValues = null, entranceValues = null }) => {
     isNewEntrance ? state.entrancePost : state.entrancePut
   );
   const { error: caveError, loading: caveLoading } = useSelector(state =>
-    isNewEntrance ? state.cavePost : state.cavePut
+    isNewEntrance ? state.createCave : state.updateCave
   );
   const dispatch = useDispatch();
   const entityTypeInitialValue = useMemo(

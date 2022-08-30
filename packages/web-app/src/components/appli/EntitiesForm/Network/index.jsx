@@ -20,7 +20,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { useBoolean } from '../../../../hooks';
 import ActionButton from '../../../common/ActionButton';
 import Alert from '../../../common/Alert';
-import { updateCave } from '../../../../actions/Cave';
+import { updateCave } from '../../../../actions/Cave/UpdateCave';
 import { updateEntrance } from '../../../../actions/Entrance/UpdateEntrance';
 
 import Network from './Network';
@@ -37,7 +37,7 @@ export const NetworkForm = ({ networkValues }) => {
   const { formatMessage } = useIntl();
   const { languages: allLanguages } = useSelector(state => state.language);
   const { error: networkError, loading: networkLoading } = useSelector(
-    state => state.cavePut
+    state => state.updateCave
   );
   const dispatch = useDispatch();
 

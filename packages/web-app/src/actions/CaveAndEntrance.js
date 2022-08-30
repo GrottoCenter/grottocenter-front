@@ -6,9 +6,9 @@ import makeErrorMessage from '../helpers/makeErrorMessage';
 import {
   postCaveAction,
   postCaveFailure,
-  updateCave,
   postCaveSuccess
-} from './Cave';
+} from './Cave/CreateCave';
+import { updateCave } from './Cave/UpdateCave';
 import { postEntrance } from './Entrance/CreateEntrance';
 import { updateEntrance } from './Entrance/UpdateEntrance';
 
