@@ -14,7 +14,7 @@ import Table from '../../common/Table';
 import useMakeCustomHeaderCellRenders from './customHeaderCellRender';
 import useMakeCustomCellRenders from './customCellRender';
 import TableActions from './TableActions';
-import { RESET_API_MESSAGES } from '../../../actions/Document';
+import { resetApiMessages } from '../../../actions/Document/ResetApiMessages';
 import { resetEntranceState } from '../../../actions/Entrance/ResetEntrance';
 
 const Wrapper = styled.div`
@@ -41,7 +41,7 @@ const DuplicatesList = ({
   );
 
   const { latestHttpCode: httpCodeDocument } = useSelector(
-    state => state.document
+    state => state.createDocument
   );
 
   const makeTranslation = id =>
@@ -77,9 +77,7 @@ const DuplicatesList = ({
 
   useEffect(() => {
     dispatch(resetEntranceState());
-    dispatch({
-      type: RESET_API_MESSAGES
-    });
+    dispatch(resetApiMessages());
   }, [httpCodeEntry, httpCodeDocument]);
 
   useEffect(() => {

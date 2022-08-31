@@ -1,12 +1,9 @@
 import {
   POST_DOCUMENT,
   POST_DOCUMENT_FAILURE,
-  POST_DOCUMENT_SUCCESS,
-  RESET_API_MESSAGES,
-  UPDATE_DOCUMENT,
-  UPDATE_DOCUMENT_FAILURE,
-  UPDATE_DOCUMENT_SUCCESS
-} from '../actions/Document';
+  POST_DOCUMENT_SUCCESS
+} from '../actions/Document/CreateDocument';
+import { RESET_API_MESSAGES } from '../actions/Document/ResetApiMessages';
 
 const initialState = {
   errorMessages: [],
@@ -42,27 +39,6 @@ const reducer = (state = initialState, action) => {
         ...state,
         errorMessages: [],
         latestHttpCode: undefined
-      };
-    case UPDATE_DOCUMENT:
-      return {
-        ...state,
-        isLoading: true,
-        errorMessages: [],
-        latestHttpCode: undefined
-      };
-    case UPDATE_DOCUMENT_SUCCESS:
-      return {
-        ...state,
-        isLoading: false,
-        errorMessages: [],
-        latestHttpCode: action.httpCode
-      };
-    case UPDATE_DOCUMENT_FAILURE:
-      return {
-        ...state,
-        isLoading: false,
-        errorMessages: action.errorMessages,
-        latestHttpCode: action.httpCode
       };
 
     default:

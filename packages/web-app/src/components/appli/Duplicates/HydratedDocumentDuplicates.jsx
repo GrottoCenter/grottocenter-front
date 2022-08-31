@@ -6,7 +6,7 @@ import { LinearProgress as MuiLinearProgress } from '@material-ui/core';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
 import { isNil } from 'ramda';
-import { updateDocumentWithNewEntities } from '../../../actions/Document';
+import { updateDocumentWithNewEntities } from '../../../actions/Document/UpdateDocument';
 import DuplicatesHandler from '../../common/DuplicatesHandler';
 import {
   createNewEntityFromDuplicate,
@@ -29,7 +29,7 @@ const HydratedDocumentDuplicates = ({
   const [currentDuplicate, setCurrentDuplicate] = useState(0);
 
   const { loading: docUpdateLoading, latestHttpCode } = useSelector(
-    state => state.document
+    state => state.updateDocument
   );
 
   const {

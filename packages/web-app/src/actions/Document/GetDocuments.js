@@ -13,9 +13,9 @@ import {
 import {
   getDocuments as queryDocuments,
   getCaversDocumentsUrl
-} from '../conf/Config';
-import { makeUrl } from './utils';
-import makeErrorMessage from '../helpers/makeErrorMessage';
+} from '../../conf/Config';
+import { makeUrl } from '../utils';
+import makeErrorMessage from '../../helpers/makeErrorMessage';
 
 export const FETCH_DOCUMENTS = 'FETCH_DOCUMENTS';
 export const FETCH_DOCUMENTS_SUCCESS = 'FETCH_DOCUMENTS_SUCCESS';

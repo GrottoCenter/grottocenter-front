@@ -3,7 +3,7 @@ import {
   FETCH_DOCUMENTS_SUCCESS,
   FETCH_DOCUMENTS_FAILURE,
   FETCH_AUTHORIZATION_DOCUMENTS_SUCCESS
-} from '../actions/Documents';
+} from '../actions/Document/GetDocuments';
 
 const initialState = {
   error: null,

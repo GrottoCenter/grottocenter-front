@@ -5,8 +5,8 @@ import { useIntl } from 'react-intl';
 import { reject, isNil, propOr, isEmpty } from 'ramda';
 import { isMobileOnly } from 'react-device-detect';
 
-import { getDocuments } from '../../actions/Documents';
-import { resetApiMessages } from '../../actions/Document';
+import { getDocuments } from '../../actions/Document/GetDocuments';
+import { resetApiMessages } from '../../actions/Document/ResetApiMessages';
 import Layout from '../../components/common/Layouts/Fixed/FixedContent';
 import StandardDialog from '../../components/common/StandardDialog';
 import { useDebounce } from '../../hooks';
