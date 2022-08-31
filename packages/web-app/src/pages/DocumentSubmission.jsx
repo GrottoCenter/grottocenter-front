@@ -8,11 +8,9 @@ import styled from 'styled-components';
 
 import { usePermissions } from '../hooks';
 import useDocumentTypes from '../hooks/useDocumentTypes';
-import {
-  postDocument,
-  resetApiMessages,
-  updateDocument
-} from '../actions/Document';
+import { resetApiMessages } from '../actions/Document/ResetApiMessages';
+import { postDocument } from '../actions/Document/CreateDocument';
+import { updateDocument } from '../actions/Document/UpdateDocument';
 import { displayLoginDialog } from '../actions/Login';
 
 import DocumentFormProvider, {
@@ -62,7 +60,7 @@ const DocumentSubmission = () => {
   );
   const [isDocSubmitted, setDocSubmitted] = useState(false);
 
-  const documentState = useSelector(state => state.document);
+  const documentState = useSelector(state => state.createDocument);
 
   const onLoginClick = () => {
     dispatch(displayLoginDialog());

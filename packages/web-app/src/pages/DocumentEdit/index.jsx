@@ -7,7 +7,7 @@ import { useHistory, useParams } from 'react-router-dom';
 import DocumentSubmission from '../DocumentSubmission';
 import { fetchDocumentDetails } from '../../actions/DocumentDetails';
 import docInfoGetters from './docInfoGetters';
-import { resetApiMessages } from '../../actions/Document';
+import { resetApiMessages } from '../../actions/Document/ResetApiMessages';
 
 const DocumentEdit = ({
   onSuccessfulUpdate,
@@ -24,7 +24,7 @@ const DocumentEdit = ({
   );
 
   const { latestHttpCode, errorMessages } = useSelector(
-    state => state.document
+    state => state.updateDocument
   );
 
   useEffect(() => {
