@@ -5,7 +5,7 @@ import {
   FETCH_LBNEWS_FAILURE
 } from '../actions/LatestBlogNews';
 
-const latestBlogNews = (state = {}, action) => {
+const reducer = (state = {}, action) => {
   let jNews = '';
 
   switch (action.type) {
@@ -60,4 +60,4 @@ const latestBlogNews = (state = {}, action) => {
   }
 };
 
-export default latestBlogNews;
+export default reducer;

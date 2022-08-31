@@ -9,7 +9,7 @@ const initialState = {
   loading: false
 };
 
-const associateDocumentToEntrance = (state = initialState, action) => {
+const reducer = (state = initialState, action) => {
   switch (action.type) {
     case ASSOCIATE_DOCUMENT_TO_ENTRANCE:
       return {
@@ -31,4 +31,4 @@ const associateDocumentToEntrance = (state = initialState, action) => {
   }
 };
 
-export default associateDocumentToEntrance;
+export default reducer;

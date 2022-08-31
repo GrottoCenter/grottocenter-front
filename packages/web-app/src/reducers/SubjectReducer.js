@@ -15,7 +15,7 @@ const initialState = {
   error: null
 };
 
-const subject = (state = initialState, action) => {
+const reducer = (state = initialState, action) => {
   switch (action.type) {
     case FETCH_SUBJECTS:
     case SUBJECTS_SEARCH:
@@ -47,4 +47,4 @@ const subject = (state = initialState, action) => {
   }
 };
 
-export default subject;
+export default reducer;

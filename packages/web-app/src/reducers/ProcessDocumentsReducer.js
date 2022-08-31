@@ -10,7 +10,7 @@ const initialState = {
   success: null
 };
 
-const processDocuments = (state = initialState, action) => {
+const reducer = (state = initialState, action) => {
   switch (action.type) {
     case POST_PROCESS_DOCUMENTS:
       return {
@@ -33,4 +33,4 @@ const processDocuments = (state = initialState, action) => {
   }
 };
 
-export default processDocuments;
+export default reducer;

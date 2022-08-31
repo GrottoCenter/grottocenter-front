@@ -10,7 +10,7 @@ const initialState = {
   location: null
 };
 
-const createLocation = (state = initialState, action) => {
+const reducer = (state = initialState, action) => {
   switch (action.type) {
     case POST_LOCATION:
       return {
@@ -33,4 +33,4 @@ const createLocation = (state = initialState, action) => {
   }
 };
 
-export default createLocation;
+export default reducer;

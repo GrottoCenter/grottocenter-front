@@ -10,7 +10,7 @@ const initialState = {
   latestHttpCode: undefined
 };
 
-const personGroups = (state = initialState, action) => {
+const reducer = (state = initialState, action) => {
   switch (action.type) {
     case POST_PERSON_GROUPS:
       return {
@@ -38,4 +38,4 @@ const personGroups = (state = initialState, action) => {
   }
 };
 
-export default personGroups;
+export default reducer;
