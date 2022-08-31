@@ -5,7 +5,7 @@ import {
   FETCH_DYNNB_FAILURE
 } from '../actions/DynamicNumber';
 
-const dynamicNumber = (state = { dynamicNumber: [] }, action) => {
+const reducer = (state = { dynamicNumber: [] }, action) => {
   let jDynNb = '';
 
   switch (action.type) {
@@ -54,4 +54,4 @@ const dynamicNumber = (state = { dynamicNumber: [] }, action) => {
   }
 };
 
-export default dynamicNumber;
+export default reducer;

@@ -10,7 +10,7 @@ const initialState = {
   error: null
 };
 
-const person = (state = initialState, action) => {
+const reducer = (state = initialState, action) => {
   switch (action.type) {
     case FETCH_PERSON:
       return { ...state, person: action.person, isFetching: true };
@@ -23,4 +23,4 @@ const person = (state = initialState, action) => {
   }
 };
 
-export default person;
+export default reducer;

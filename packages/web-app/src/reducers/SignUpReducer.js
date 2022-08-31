@@ -9,7 +9,7 @@ const initialState = {
   isFetching: false
 };
 
-const signUp = (state = initialState, action) => {
+const reducer = (state = initialState, action) => {
   switch (action.type) {
     case FETCH_SIGN_UP:
       return {
@@ -34,4 +34,4 @@ const signUp = (state = initialState, action) => {
   }
 };
 
-export default signUp;
+export default reducer;

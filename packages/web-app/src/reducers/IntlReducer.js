@@ -15,7 +15,7 @@ const initialState = {
   AVAILABLE_LANGUAGES
 };
 
-const intl = (state = initialState, action) => {
+const reducer = (state = initialState, action) => {
   switch (action.type) {
     case CHANGE_LOCALE:
       return {
@@ -28,4 +28,4 @@ const intl = (state = initialState, action) => {
   }
 };
 
-export default intl;
+export default reducer;

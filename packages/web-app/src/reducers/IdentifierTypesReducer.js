@@ -10,7 +10,7 @@ const initialState = {
   error: null
 };
 
-const identifierType = (state = initialState, action) => {
+const reducer = (state = initialState, action) => {
   switch (action.type) {
     case FETCH_IDENTIFIER_TYPES:
       return { ...state, isFetching: true };
@@ -30,4 +30,4 @@ const identifierType = (state = initialState, action) => {
   }
 };
 
-export default identifierType;
+export default reducer;

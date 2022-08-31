@@ -15,7 +15,7 @@ const initialState = {
   totalCount: 0
 };
 
-const documents = (state = initialState, action) => {
+const reducer = (state = initialState, action) => {
   switch (action.type) {
     case FETCH_DOCUMENTS:
       return {
@@ -52,4 +52,4 @@ const documents = (state = initialState, action) => {
   }
 };
 
-export default documents;
+export default reducer;

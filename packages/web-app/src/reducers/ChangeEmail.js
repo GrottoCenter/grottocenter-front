@@ -9,7 +9,7 @@ const initialState = {
   isFetching: false
 };
 
-const changeEmail = (state = initialState, action) => {
+const reducer = (state = initialState, action) => {
   switch (action.type) {
     case FETCH_CHANGE_EMAIL:
       return {
@@ -34,4 +34,4 @@ const changeEmail = (state = initialState, action) => {
   }
 };
 
-export default changeEmail;
+export default reducer;

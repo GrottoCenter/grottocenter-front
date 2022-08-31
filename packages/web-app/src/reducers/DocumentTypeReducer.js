@@ -10,7 +10,7 @@ const initialState = {
   isLoading: false
 };
 
-const documentType = (state = initialState, action) => {
+const reducer = (state = initialState, action) => {
   switch (action.type) {
     case FETCH_DOCUMENT_TYPES:
       return { ...state, isLoading: true, errorMessages: [] };
@@ -32,4 +32,4 @@ const documentType = (state = initialState, action) => {
   }
 };
 
-export default documentType;
+export default reducer;

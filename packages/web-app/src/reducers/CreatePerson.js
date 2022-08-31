@@ -10,7 +10,7 @@ const initialState = {
   caver: null
 };
 
-const createCaver = (state = initialState, action) => {
+const reducer = (state = initialState, action) => {
   switch (action.type) {
     case POST_PERSON:
       return {
@@ -33,4 +33,4 @@ const createCaver = (state = initialState, action) => {
   }
 };
 
-export default createCaver;
+export default reducer;

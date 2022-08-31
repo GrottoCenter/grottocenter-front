@@ -9,7 +9,7 @@ const initialState = {
   isFetching: false
 };
 
-const forgotPassword = (state = initialState, action) => {
+const reducer = (state = initialState, action) => {
   switch (action.type) {
     case FETCH_FORGOT_PASSWORD:
       return {
@@ -34,4 +34,4 @@ const forgotPassword = (state = initialState, action) => {
   }
 };
 
-export default forgotPassword;
+export default reducer;

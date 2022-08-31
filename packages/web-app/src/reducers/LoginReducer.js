@@ -42,7 +42,7 @@ const initialState = {
 // R E D U C E R
 //
 //
-const login = (state = initialState, action) => {
+const reducer = (state = initialState, action) => {
   switch (action.type) {
     case FETCH_LOGIN:
       return {
@@ -85,4 +85,4 @@ const login = (state = initialState, action) => {
   }
 };
 
-export default login;
+export default reducer;
