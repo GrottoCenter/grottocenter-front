@@ -110,7 +110,11 @@ const DocumentPage = ({
             content={[
               {
                 label: formatMessage({ id: 'Identifier' }),
-                value: details.identifier
+                value: details.identifier,
+                url:
+                  details.identifierType === 'url'
+                    ? details.identifier
+                    : undefined
               },
               {
                 label: formatMessage({ id: 'BBS reference' }),
@@ -293,6 +297,7 @@ DocumentPage.propTypes = {
   details: PropTypes.shape({
     authorComment: PropTypes.string,
     identifier: PropTypes.string,
+    identifierType: PropTypes.string,
     bbsReference: PropTypes.string,
     documentType: PropTypes.string,
     oldPublication: PropTypes.string,
