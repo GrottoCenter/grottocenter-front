@@ -238,8 +238,8 @@ const EntryInfos = ({ timeInfo, cave }) => (
 
 EntryInfos.propTypes = {
   timeInfo: PropTypes.shape({
-    eTTrail: PropTypes.number,
-    eTUnderground: PropTypes.number
+    eTTrail: PropTypes.string,
+    eTUnderground: PropTypes.string
   }).isRequired,
   cave: PropTypes.shape({
     depth: PropTypes.number,

@@ -6,18 +6,28 @@ import {
 } from '../DocumentDetails/transformers';
 import getAuthor from '../../util/getAuthor';
 
-export const getComments = (comments = []) =>
-  comments.map(comment => ({
-    accessRate: pathOr(0, ['approach'], comment) / 2,
-    author: getAuthor(comment?.author),
-    body: comment?.body,
-    date: new Date(comment?.dateInscription),
-    id: comment?.id,
-    interestRate: pathOr(0, ['aestheticism'], comment) / 2,
-    language: comment?.language,
-    progressionRate: pathOr(0, ['caving'], comment) / 2,
-    title: comment?.title
-  }));
+export const getComments = comments =>
+  comments
+    .map(comment => ({
+      accessRate: pathOr(0, ['approach'], comment) / 2,
+      author: getAuthor(comment?.author),
+      reviewer: comment?.reviewer ? getAuthor(comment?.reviewer) : null,
+      body: comment?.body,
+      date: comment?.dateInscription
+        ? new Date(comment?.dateInscription)
+        : null,
+      dateReviewed: comment?.dateReviewed
+        ? new Date(comment?.dateReviewed)
+        : null,
+      id: comment?.id,
+      interestRate: pathOr(0, ['aestheticism'], comment) / 2,
+      language: comment?.language,
+      progressionRate: pathOr(0, ['caving'], comment) / 2,
+      title: comment?.title,
+      eTTrail: comment?.eTTrail,
+      eTUnderground: comment?.eTUnderground
+    }))
+    .sort((l1, l2) => l1.date < l2.date);
 
 export const getDetails = data => ({
   accessRate: pathOr(0, ['stats', 'approach'], data) / 2,

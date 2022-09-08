@@ -29,6 +29,11 @@ export const postDescriptionUrl = `${API_BASE_PATH}/descriptions`;
 export const putDescriptionUrl = descriptionId =>
   `${API_BASE_PATH}/descriptions/${descriptionId}`;
 
+// ===== Comments urls
+export const postCommentUrl = `${API_BASE_PATH}/comments`;
+export const putCommentUrl = commentId =>
+  `${API_BASE_PATH}/comments/${commentId}`;
+
 // ===== Documents urls
 export const getDocumentChildrenUrl = documentId =>
   `${API_BASE_PATH}/documents/${documentId}/children`;
