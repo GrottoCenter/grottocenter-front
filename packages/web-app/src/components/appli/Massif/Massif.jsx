@@ -4,6 +4,7 @@ import Skeleton from '@material-ui/lab/Skeleton';
 import { useIntl } from 'react-intl';
 import { Box } from '@material-ui/core';
 
+import { useMassifSubscriptions } from '../../../hooks';
 import Layout from '../../common/Layouts/Fixed/FixedContent';
 import CavesList from '../../common/cave/CavesList';
 import EntrancesList from '../../common/entrance/EntrancesList';
@@ -22,9 +23,13 @@ const Massif = ({
   entrances,
   networks,
   canEdit,
-  onEdit
+  onEdit,
+  canSubscribe,
+  onSubscribe,
+  onUnsubscribe
 }) => {
   const { formatMessage } = useIntl();
+  const { isSubscribed, isLoading } = useMassifSubscriptions(details.id);
 
   const { geogPolygon, name, names } = details;
   let title = '';
@@ -34,9 +39,20 @@ const Massif = ({
     title = formatMessage({ id: 'Loading massif data...' });
   }
 
+  const handleChangeSubscribe = () => {
+    if (!isSubscribed) {
+      onSubscribe();
+    } else {
+      onUnsubscribe();
+    }
+  };
+
   return (
     <Layout
-      onEdit={canEdit && onEdit}
+      onEdit={canEdit ? onEdit : undefined}
+      isSubscribed={isSubscribed}
+      isSubscribeLoading={isLoading}
+      onChangeSubscribe={canSubscribe ? handleChangeSubscribe : undefined}
       title={title}
       subheader={
         isFetching && !error ? (
