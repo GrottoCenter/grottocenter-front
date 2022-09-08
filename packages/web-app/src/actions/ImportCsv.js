@@ -81,8 +81,9 @@ export const checkRowsInBdd = (typeRow, rowsData) => (dispatch, getState) => {
   // eslint-disable-next-line consistent-return
   return fetch(url, requestOptions)
     .then(checkStatusAndGetText)
-    .then(response => {
-      dispatch(checkRowsSuccess(response));
+    .then(response => response.json())
+    .then(responseJson => {
+      dispatch(checkRowsSuccess(responseJson));
     })
     .catch(error => {
       dispatch(checkRowsFailure(error.message));
@@ -117,8 +118,9 @@ export const importRows = (data, typeRow) => (dispatch, getState) => {
   // eslint-disable-next-line consistent-return
   return fetch(url, requestOptions)
     .then(checkStatusAndGetText)
-    .then(response => {
-      dispatch(importRowsSuccess(response));
+    .then(response => response.json())
+    .then(responseJson => {
+      dispatch(importRowsSuccess(responseJson));
     })
     .catch(error => {
       dispatch(importRowsFailure(error.message));
