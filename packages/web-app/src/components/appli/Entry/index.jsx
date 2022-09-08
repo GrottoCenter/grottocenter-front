@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
-import { isEmpty, isNil, propOr } from 'ramda';
+import { isNil, propOr } from 'ramda';
 
 import Provider, {
   commentsType,
@@ -21,7 +21,7 @@ import Properties from './Properties';
 import Descriptions from './Descriptions';
 import Locations from './Locations';
 import Riggings from './Riggings';
-import Comments from './Comments';
+import Comments from './Comments/index';
 import Documents from './Documents';
 import Histories from './Histories';
 import { useBoolean, usePermissions } from '../../../hooks';
@@ -75,7 +75,6 @@ export const Entry = () => {
   const handleEdit = () => {
     editPage.open();
   };
-
   return (
     <Layout
       onEdit={permissions.isAuth ? handleEdit : undefined}
@@ -106,10 +105,10 @@ export const Entry = () => {
         />
       )}
       {id && <Descriptions descriptions={descriptions} entranceId={id} />}
-      {!isEmpty(riggings) && <Riggings riggings={riggings} />}
+      {id && <Riggings riggings={riggings} />}
       {id && <Documents documents={documents} entranceId={id} />}
       {id && <Histories histories={histories} entranceId={id} />}
-      {!isEmpty(comments) && <Comments comments={comments} />}
+      {id && <Comments comments={comments} entranceId={id} />}
       {permissions.isAuth && (
         <StandardDialog
           fullWidth

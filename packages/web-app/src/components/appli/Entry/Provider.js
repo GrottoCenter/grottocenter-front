@@ -90,7 +90,6 @@ const Entry = ({
       riggings
     ]
   );
-
   return (
     <EntryContext.Provider value={contextValue}>
       {children}
@@ -129,11 +128,17 @@ export const commentType = PropTypes.shape({
   author: authorType,
   body: PropTypes.string,
   date: PropTypes.instanceOf(Date),
+  entrance: PropTypes.number,
   id: PropTypes.number,
   interestRate: PropTypes.number,
-  language: PropTypes.string,
+  language: PropTypes.shape({
+    id: PropTypes.string.isRequired,
+    refName: PropTypes.string.isRequired
+  }).isRequired,
   progressionRate: PropTypes.number,
-  title: PropTypes.string
+  title: PropTypes.string,
+  eTTrail: PropTypes.string, // hh:mm:ss
+  eTUnderground: PropTypes.string // hh:mm:ss
 });
 
 export const commentsType = PropTypes.arrayOf(commentType);

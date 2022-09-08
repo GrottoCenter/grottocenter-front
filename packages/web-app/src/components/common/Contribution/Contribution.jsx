@@ -4,11 +4,22 @@ import MultilinesTypography from '../MultilinesTypography';
 import AuthorAndDate from './AuthorAndDate';
 import authorType from '../../../types/author.type';
 
-const Contribution = ({ author, body, creationDate }) => (
+const Contribution = ({
+  author,
+  body,
+  creationDate,
+  reviewer,
+  dateReviewed
+}) => (
   <>
     <MultilinesTypography>{body}</MultilinesTypography>
     <br />
     <AuthorAndDate author={author} date={creationDate} />
+    {reviewer && (
+      <div>
+        <AuthorAndDate author={reviewer} date={dateReviewed} verb="Updated" />
+      </div>
+    )}
   </>
 );
 
@@ -16,6 +27,11 @@ Contribution.propTypes = {
   author: authorType,
   body: PropTypes.string.isRequired,
   creationDate: PropTypes.oneOfType([
+    PropTypes.instanceOf(Date),
+    PropTypes.string
+  ]),
+  reviewer: authorType,
+  dateReviewed: PropTypes.oneOfType([
     PropTypes.instanceOf(Date),
     PropTypes.string
   ])

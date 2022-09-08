@@ -81,7 +81,6 @@ const EntryPage = () => {
   const histories = getHistories(propOr([], 'histories', data));
   const locations = getLocations(propOr([], 'locations', data));
   const riggings = getRiggings(propOr([], 'riggings', data));
-
   return (
     <Entry
       loading={loading || !isNil(error)}

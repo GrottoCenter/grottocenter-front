@@ -21,6 +21,8 @@ import { POST_HISTORY_SUCCESS } from '../actions/History/CreateHistory';
 import { UPDATE_HISTORY_SUCCESS } from '../actions/History/UpdateHistory';
 import { POST_DESCRIPTION_SUCCESS } from '../actions/Description/CreateDescription';
 import { UPDATE_DESCRIPTION_SUCCESS } from '../actions/Description/UpdateDescription';
+import { POST_COMMENT_SUCCESS } from '../actions/Comment/CreateComment';
+import { UPDATE_COMMENT_SUCCESS } from '../actions/Comment/UpdateComment';
 
 const initialState = {
   data: {},
@@ -160,6 +162,39 @@ const reducer = (state = initialState, action) => {
                 l => l.id !== action.description.id
               ),
               { ...action.description }
+            ]
+          }
+        };
+      }
+      return initialState;
+    case POST_COMMENT_SUCCESS:
+      if (
+        action.comment?.entrance?.id &&
+        action.comment?.entrance?.id === state.data?.id
+      ) {
+        return {
+          ...initialState,
+          data: {
+            ...state.data,
+            comments: state.data.comments
+              ? [...state.data.comments, action.comment]
+              : [action.comment]
+          }
+        };
+      }
+      return initialState;
+    case UPDATE_COMMENT_SUCCESS:
+      if (
+        action.comment?.entrance?.id &&
+        action.comment?.entrance?.id === state.data?.id
+      ) {
+        return {
+          ...initialState,
+          data: {
+            ...state.data,
+            comments: [
+              ...state.data.comments.filter(l => l.id !== action.comment.id),
+              { ...action.comment, entrance: action.comment.entrance.id }
             ]
           }
         };

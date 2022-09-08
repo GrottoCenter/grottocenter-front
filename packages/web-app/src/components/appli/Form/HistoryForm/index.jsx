@@ -45,6 +45,7 @@ const CreateHistoryForm = ({ closeForm, onSubmit, values, isNewHistory }) => {
             error={!!error}
             fullWidth
             multiline
+            minRows={3}
             helperText={
               error ? formatMessage({ id: 'A text is required.' }) : ''
             }
