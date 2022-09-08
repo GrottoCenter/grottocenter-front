@@ -2,8 +2,7 @@ import React from 'react';
 import { isNil, isEmpty } from 'ramda';
 import Skeleton from '@material-ui/lab/Skeleton';
 import { useIntl } from 'react-intl';
-import CreateIcon from '@material-ui/icons/Create';
-import { Box, IconButton } from '@material-ui/core';
+import { Box } from '@material-ui/core';
 
 import Layout from '../../common/Layouts/Fixed/FixedContent';
 import CavesList from '../../common/cave/CavesList';
@@ -37,6 +36,7 @@ const Massif = ({
 
   return (
     <Layout
+      onEdit={canEdit && onEdit}
       title={title}
       subheader={
         isFetching && !error ? (
@@ -52,9 +52,9 @@ const Massif = ({
               <Box sx={{ display: 'flex', justifyContent: 'center' }}>
                 <Skeleton height={300} width={800} /> {/* Map Skeleton */}
               </Box>
-              <Skeleton height={100} /> {/* EntranceList data Skeleton */}
-              <Skeleton height={100} /> {/* CavesList data Skeleton */}
               <Skeleton height={100} /> {/* Documents Skeleton */}
+              <Skeleton height={100} /> {/* EntranceList Skeleton */}
+              <Skeleton height={100} /> {/* CavesList Skeleton */}
             </>
           )}
           {error && (
@@ -82,16 +82,6 @@ const Massif = ({
                       id: 'This massif has no descriptions listed yet.'
                     })}
                   />
-                )}
-                {canEdit && (
-                  <IconButton
-                    size="medium"
-                    aria-label="edit"
-                    color="primary"
-                    onClick={onEdit}
-                    disabled={isNil(onEdit)}>
-                    <CreateIcon />
-                  </IconButton>
                 )}
               </Box>
               {geogPolygon && entrances && (
