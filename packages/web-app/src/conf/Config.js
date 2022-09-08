@@ -246,6 +246,14 @@ export const associateDocumentToEntranceUrl = (entranceId, documentId) =>
 export const moveEntranceToCaveUrl = (entranceId, caveId) =>
   `${API_URL}/api/${apiVersion}/entrances/${entranceId}/cave/${caveId}`;
 
+// ===== Subscriptions urls
+export const fetchSubscriptionsUrl = caverId =>
+  `${API_URL}/api/${apiVersion}/cavers/${caverId}/subscriptions`;
+export const subscribeToMassifUrl = massifId =>
+  `${API_URL}/api/${apiVersion}/massifs/${massifId}/subscribe`;
+export const unsubscribeFromMassifUrl = massifId =>
+  `${API_URL}/api/${apiVersion}/massifs/${massifId}/unsubscribe`;
+
 // ===== ImportCSV url
 export const checkRowsEntrancesUrl = `${API_URL}/api/${apiVersion}/entrances/check-rows`;
 export const checkRowsDocumentsUrl = `${API_URL}/api/${apiVersion}/documents/check-rows`;

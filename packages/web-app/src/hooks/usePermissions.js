@@ -27,6 +27,7 @@ export function usePermissions() {
   return {
     isAdmin: hasRole(authState, 'Administrator'),
     isAuth: authState.authTokenDecoded !== null && !isTokenExpired(),
+    isLeader: hasRole(authState, 'Leader'),
     isModerator: hasRole(authState, 'Moderator'),
     isTokenExpired: isTokenExpired(),
     isUser: hasRole(authState, 'User')

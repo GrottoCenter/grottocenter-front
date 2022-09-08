@@ -22,7 +22,10 @@ const MassifPropTypes = {
   networks: PropTypes.arrayOf(PropTypes.shape({})),
   documents: PropTypes.arrayOf(PropTypes.shape({})),
   onEdit: PropTypes.func.isRequired,
-  canEdit: PropTypes.bool.isRequired
+  canEdit: PropTypes.bool.isRequired,
+  onSubscribe: PropTypes.func.isRequired,
+  onUnsubscribe: PropTypes.func.isRequired,
+  canSubscribe: PropTypes.bool.isRequired
 };
 
 export default MassifPropTypes;
