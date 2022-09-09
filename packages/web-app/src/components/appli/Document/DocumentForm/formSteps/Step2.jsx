@@ -14,7 +14,7 @@ import MultipleBBSRegionsSelect from '../../../Form/MultipleBBSRegionsSelect';
 import MultipleCaversSelect from '../../../Form/MultipleCaversSelect';
 import MultipleSubjectsSelect from '../../../Form/MultipleSubjectsSelect';
 import OrganizationAutoComplete from '../../../Form/OrganizationAutoComplete';
-import useDocumentTypes from '../../../../../hooks/useDocumentTypes';
+import { useDocumentTypes } from '../../../../../hooks';
 
 const FlexWrapper = styled.div`
   display: flex;

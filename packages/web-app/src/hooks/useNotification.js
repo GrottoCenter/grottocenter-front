@@ -1,15 +1,13 @@
 import * as React from 'react';
 import { useSnackbar } from 'notistack';
 
-// eslint-disable-next-line import/prefer-default-export
 export const useNotification = () => {
   const { enqueueSnackbar } = useSnackbar();
 
   const enqueueNotification = React.useCallback(
     type => message => {
       enqueueSnackbar(message instanceof Error ? message.message : message, {
-        variant: type,
-        preventDuplicate: true
+        variant: type
       });
     },
     [enqueueSnackbar]

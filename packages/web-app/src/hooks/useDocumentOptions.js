@@ -6,7 +6,7 @@ export const DOCUMENT_AUTHORIZE_TO_PUBLISH =
   'Authorization present in GrottoCenter';
 
 // This hook allows us to use the content of t_option table without needing to create translation in the table.
-const useDocumentOptions = () => {
+export const useDocumentOptions = () => {
   const { formatMessage } = useIntl();
 
   return [
@@ -37,5 +37,3 @@ const useDocumentOptions = () => {
     }
   ];
 };
-
-export default useDocumentOptions;

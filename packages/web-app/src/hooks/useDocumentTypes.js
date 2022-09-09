@@ -25,7 +25,7 @@ export const DocumentTypes = {
   AUTHORIZATION_TO_PUBLISH: 20
 };
 
-const useDocumentTypes = () => {
+export const useDocumentTypes = () => {
   const { documentTypes: data, loading, error } = useSelector(
     state => state.documentType
   );
@@ -76,5 +76,3 @@ const useDocumentTypes = () => {
     loading
   };
 };
-
-export default useDocumentTypes;

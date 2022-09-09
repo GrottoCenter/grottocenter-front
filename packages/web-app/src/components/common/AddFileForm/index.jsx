@@ -10,7 +10,7 @@ import { DOCUMENT_AUTHORIZE_TO_PUBLISH } from '../../../hooks/useDocumentOptions
 import FilesList from './FilesList';
 import DocumentAuthorizationSelect from '../../appli/Form/DocumentAuthorizationSelect';
 import ErrorsList from './ErrorsList';
-import useFileFormats from '../../../hooks/useFileFormats';
+import { useFileFormats } from '../../../hooks';
 import OptionSelect from './OptionSelect';
 import { MAX_SIZE_OF_UPLOADED_FILES } from '../../../conf/Config';
 import { IS_DELETED, IS_INTACT, IS_MODIFIED, IS_NEW } from './FileHelpers';

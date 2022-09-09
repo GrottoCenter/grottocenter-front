@@ -11,7 +11,7 @@ import DocIdentifierEditor from '../../../DocIdentifierEditor';
 import StringInput from '../../../../common/Form/StringInput';
 import IssueEditor from '../formElements/IssueEditor';
 import { DocumentFormContext } from '../Provider';
-import useDocumentTypes from '../../../../../hooks/useDocumentTypes';
+import { useDocumentTypes } from '../../../../../hooks';
 
 const FlexWrapper = styled.div`
   display: flex;

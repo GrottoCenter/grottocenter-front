@@ -11,7 +11,7 @@ import {
 } from '@material-ui/core';
 
 import Translate from '../../../../common/Translate';
-import useDocumentTypes from '../../../../../hooks/useDocumentTypes';
+import { useDocumentTypes } from '../../../../../hooks';
 import { DocumentFormContext } from '../Provider';
 import { idNameTypeExtended } from '../../../../../types/idName.type';
 

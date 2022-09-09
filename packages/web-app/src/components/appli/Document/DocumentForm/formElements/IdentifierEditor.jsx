@@ -14,7 +14,7 @@ import { useIntl } from 'react-intl';
 import { pathOr } from 'ramda';
 
 import Translate from '../../../../common/Translate';
-import useDocumentTypes from '../../../../../hooks/useDocumentTypes';
+import { useDocumentTypes } from '../../../../../hooks';
 import { DocumentFormContext } from '../Provider';
 import StringInput from '../../../../common/Form/StringInput';
 import idNameType from '../../../../../types/idName.type';

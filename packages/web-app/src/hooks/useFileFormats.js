@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchFormats } from '../actions/FileFormats';
 
-const useFileFormats = () => {
+export const useFileFormats = () => {
   const { data, loading, error } = useSelector(state => state.fileFormats);
   const dispatch = useDispatch();
   const [state, setState] = useState({
@@ -40,5 +40,3 @@ const useFileFormats = () => {
     error
   };
 };
-
-export default useFileFormats;

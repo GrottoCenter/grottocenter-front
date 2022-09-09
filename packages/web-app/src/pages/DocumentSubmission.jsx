@@ -6,8 +6,7 @@ import { useIntl } from 'react-intl';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
 
-import { usePermissions } from '../hooks';
-import useDocumentTypes from '../hooks/useDocumentTypes';
+import { usePermissions, useDocumentTypes } from '../hooks';
 import { resetApiMessages } from '../actions/Document/ResetApiMessages';
 import { postDocument } from '../actions/Document/CreateDocument';
 import { updateDocument } from '../actions/Document/UpdateDocument';

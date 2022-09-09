@@ -2,7 +2,7 @@ import React from 'react';
 import { FormControl, InputLabel, MenuItem, Select } from '@material-ui/core';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import useDocumentOptions from '../../../hooks/useDocumentOptions';
+import { useDocumentOptions } from '../../../hooks';
 
 const Wrapper = styled(FormControl)`
   ${({ theme }) => `
