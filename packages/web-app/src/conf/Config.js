@@ -245,6 +245,8 @@ export const associateDocumentToEntranceUrl = (entranceId, documentId) =>
   `${API_URL}/api/${apiVersion}/entrances/${entranceId}/documents/${documentId}`;
 export const moveEntranceToCaveUrl = (entranceId, caveId) =>
   `${API_URL}/api/${apiVersion}/entrances/${entranceId}/cave/${caveId}`;
+export const findCountryUrl = countryId =>
+  `${API_URL}/api/${apiVersion}/countries/${countryId}`;
 
 // ===== Subscriptions urls
 export const fetchSubscriptionsUrl = caverId =>

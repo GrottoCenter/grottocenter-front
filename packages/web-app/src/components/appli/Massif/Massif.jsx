@@ -4,7 +4,6 @@ import Skeleton from '@material-ui/lab/Skeleton';
 import { useIntl } from 'react-intl';
 import { Box } from '@material-ui/core';
 
-import { useMassifSubscriptions } from '../../../hooks';
 import Layout from '../../common/Layouts/Fixed/FixedContent';
 import CavesList from '../../common/cave/CavesList';
 import EntrancesList from '../../common/entrance/EntrancesList';
@@ -13,6 +12,7 @@ import Alert from '../../common/Alert';
 import MassifPropTypes from './propTypes';
 import MapMassif from './MapMassif';
 import Descriptions from './Descriptions';
+import { useSubscriptions } from '../../../hooks';
 
 const Massif = ({
   isFetching,
@@ -29,7 +29,11 @@ const Massif = ({
   onUnsubscribe
 }) => {
   const { formatMessage } = useIntl();
-  const { isSubscribed, isLoading } = useMassifSubscriptions(details.id);
+  const {
+    isSubscribed: isSubscribedMethod,
+    isMassifLoading: isLoading
+  } = useSubscriptions();
+  const isSubscribed = details ? isSubscribedMethod(details.id) : false;
 
   const { geogPolygon, name, names } = details;
   let title = '';

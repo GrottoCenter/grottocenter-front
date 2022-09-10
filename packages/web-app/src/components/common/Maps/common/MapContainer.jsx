@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import styled from 'styled-components';
 import { isMobileOnly } from 'react-device-detect';
-import { MapContainer } from 'react-leaflet';
+import { MapContainer, useMap } from 'react-leaflet';
 import PropTypes from 'prop-types';
 import LayersControl from './LayersControl';
 
@@ -18,6 +18,20 @@ ${({ wholePage, theme }) =>
   wholePage && `height: calc(100vh - ${theme.appBarHeight}px);`}
 `;
 
+// The Map, once mounted, doesn't change its center: this Centerer forces it
+// See https://github.com/PaulLeCam/react-leaflet/issues/796#issuecomment-743181396
+const Centerer = ({ center }) => {
+  const map = useMap();
+  useEffect(() => {
+    map.setView(center);
+  }, [center, map]);
+  return null;
+};
+
+Centerer.propTypes = {
+  center: PropTypes.arrayOf(PropTypes.number)
+};
+
 const CustomMapContainer = ({
   wholePage = true,
   center,
@@ -26,7 +40,8 @@ const CustomMapContainer = ({
   scrollWheelZoom = true,
   isSideMenuOpen = false,
   style,
-  children
+  children,
+  forceCentering
 }) => (
   <Map
     wholePage={wholePage}
@@ -35,9 +50,10 @@ const CustomMapContainer = ({
     dragging={dragging}
     scrollWheelZoom={scrollWheelZoom}
     isSideMenuOpen={isSideMenuOpen}
-    minZoom={5}
+    minZoom={0}
     style={style}
     preferCanvas>
+    {forceCentering && <Centerer center={center} />}
     <LayersControl />
     {children}
   </Map>
@@ -49,9 +65,10 @@ CustomMapContainer.propTypes = {
   zoom: PropTypes.number,
   dragging: PropTypes.bool,
   scrollWheelZoom: PropTypes.bool,
-  children: PropTypes.node.isRequired,
+  children: PropTypes.node,
   isSideMenuOpen: PropTypes.bool,
-  style: PropTypes.shape({})
+  style: PropTypes.shape({}),
+  forceCentering: PropTypes.bool
 };
 
 export default CustomMapContainer;

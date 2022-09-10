@@ -1,3 +1,4 @@
+export { CoordinatesMarker } from './CoordinatesMarker';
 export { EntranceMarker } from './EntranceMarker';
 export { EntrancePopup } from './EntrancePopup';
 export { NetworkMarker } from './NetworkMarker';
