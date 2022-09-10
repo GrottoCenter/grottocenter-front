@@ -28,7 +28,7 @@ const ErrorHandler = () => {
         case 404:
           onError(
             `${formatMessage({
-              id: 'The resource you are looking was not found'
+              id: 'The resource you are looking for is not found'
             })} - ${errorMessage}`
           );
           break;
