@@ -1,5 +1,6 @@
 import fetch from 'isomorphic-fetch';
 import { subscribeToCountryUrl } from '../../conf/Config';
+import makeErrorMessage from '../../helpers/makeErrorMessage';
 
 export const SUBSCRIBE_TO_COUNTRY = 'SUBSCRIBE_TO_COUNTRY';
 export const SUBSCRIBE_TO_COUNTRY_SUCCESS = 'SUBSCRIBE_TO_COUNTRY_SUCCESS';
@@ -13,9 +14,9 @@ export const subscribeToCountryActionSuccess = () => ({
   type: SUBSCRIBE_TO_COUNTRY_SUCCESS
 });
 
-export const subscribeToCountryActionFailure = errorMessages => ({
+export const subscribeToCountryActionFailure = error => ({
   type: SUBSCRIBE_TO_COUNTRY_FAILURE,
-  errorMessages
+  error
 });
 
 export function subscribeToCountry(countryId) {
@@ -28,36 +29,19 @@ export function subscribeToCountry(countryId) {
     };
 
     return fetch(subscribeToCountryUrl(countryId), requestOptions).then(
-      response =>
-        response.text().then(responseText => {
-          if (response.status >= 400) {
-            const errorMessages = [];
-            switch (response.status) {
-              case 404:
-                errorMessages.push('Country not found');
-                break;
-              case 500:
-                errorMessages.push(
-                  'A server error occurred, please try again later or contact Wikicaves for more information.'
-                );
-                break;
-              default:
-                break;
-            }
-            dispatch(
-              subscribeToCountryActionFailure(errorMessages, response.status)
-            );
-            throw new Error(
-              `Fetching ${subscribeToCountryUrl(countryId)} status: ${
-                response.status
-              }`,
-              errorMessages
-            );
-          } else {
-            dispatch(subscribeToCountryActionSuccess(response.status));
-          }
-          return response;
-        })
+      response => {
+        if (response.status >= 400) {
+          const error = `Subscribing you to country with id ${countryId}`;
+          dispatch(
+            subscribeToCountryActionFailure(
+              makeErrorMessage(response.status, error)
+            )
+          );
+        } else {
+          dispatch(subscribeToCountryActionSuccess());
+        }
+        return response;
+      }
     );
   };
 }
