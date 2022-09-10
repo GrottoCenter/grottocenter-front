@@ -121,7 +121,7 @@ const Organization = ({ error, isLoading, organization, onEdit, canEdit }) => {
                     })}
                   />
                 }
-                title={formatMessage({ id: 'Members' })}
+                title={formatMessage({ id: 'Members (former members)' })}
               />
               <hr />
               <DocumentsList
