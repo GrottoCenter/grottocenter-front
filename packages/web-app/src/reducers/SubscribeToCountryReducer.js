@@ -6,7 +6,7 @@ import {
 import REDUCER_STATUS from './ReducerStatus';
 
 const initialState = {
-  errorMessages: [],
+  error: undefined,
   status: REDUCER_STATUS.IDLE
 };
 
@@ -16,19 +16,19 @@ const reducer = (state = initialState, action) => {
       return {
         ...state,
         status: REDUCER_STATUS.LOADING,
-        errorMessages: []
+        error: undefined
       };
     case SUBSCRIBE_TO_COUNTRY_SUCCESS:
       return {
         ...state,
         status: REDUCER_STATUS.SUCCEEDED,
-        errorMessages: []
+        error: undefined
       };
     case SUBSCRIBE_TO_COUNTRY_FAILURE:
       return {
         ...state,
         status: REDUCER_STATUS.FAILED,
-        errorMessages: action.errorMessages
+        error: action.error
       };
     default:
       return state;

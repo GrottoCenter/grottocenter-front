@@ -34,17 +34,7 @@ export function unsubscribeFromMassif(massifId) {
     return fetch(unsubscribeFromMassifUrl(massifId), requestOptions).then(
       response => {
         if (response.status >= 400) {
-          let error = '';
-          switch (response.status) {
-            case 404:
-              error = 'Massif not found';
-              break;
-            case 500:
-              error = `Unsubscribing you from massif with id ${massifId}`;
-              break;
-            default:
-              break;
-          }
+          const error = `Unsubscribing you from massif with id ${massifId}`;
           dispatch(
             unsubscribeFromMassifActionFailure(
               makeErrorMessage(response.status, error)
