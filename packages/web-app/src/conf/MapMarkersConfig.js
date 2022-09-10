@@ -14,6 +14,10 @@ const markers = [
   {
     name: 'Organizations',
     url: '/images/club.svg'
+  },
+  {
+    name: 'Coordinates',
+    url: '/images/coordinates-icon.svg'
   }
 ];
 

@@ -5,6 +5,7 @@ import associateDocumentToEntrance from './AssociateDocumentToEntrance';
 import cave from './CaveReducer';
 import changePassword from './ChangePassword';
 import changeEmail from './ChangeEmail';
+import country from './CountryReducer';
 import createCave from './CreateCaveReducer';
 import createDescription from './CreateDescription';
 import createDocument from './CreateDocumentReducer';
@@ -71,6 +72,7 @@ const GCReducer = combineReducers({
   cave,
   changePassword,
   changeEmail,
+  country,
   createCave,
   createDescription,
   createDocument,

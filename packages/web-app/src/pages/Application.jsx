@@ -39,6 +39,7 @@ import OrganizationPage from './Organization';
 import MassifEdit from './EntityEdit/Massif/MassifEdit';
 import PersonEdit from './PersonEdit';
 import OrganizationEdit from './EntityEdit/Organization/OrganizationEdit';
+import CountryPage from './Country';
 
 const Application = () => {
   const dispatch = useDispatch();
@@ -70,6 +71,7 @@ const Application = () => {
         <Route path="/ui/entrances/:id?/move" component={MoveEntranceToCave} />
         <Route path="/ui/entrances/:id?" component={EntryPage} />
         <Route path="/ui/caves/:id?" component={NetworkPage} />
+        <Route path="/ui/countries/:id?" component={CountryPage} />
         <Route path="/ui/faq" component={Faq} />
         <Route path="/ui/map/:target?" component={Map} />
         <Route path="/ui/contributions" component={ContributionsPage} />
