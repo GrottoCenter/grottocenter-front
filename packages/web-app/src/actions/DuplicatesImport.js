@@ -40,10 +40,10 @@ export const loadDuplicatesList = () => ({
   type: LOAD_DUPLICATES_LIST
 });
 
-export const loadDuplicatesListSuccess = result => ({
+export const loadDuplicatesListSuccess = (duplicates, statusCode) => ({
   type: LOAD_DUPLICATES_LIST_SUCCESS,
-  payload: result.content,
-  httpCode: result.statusCode
+  duplicates,
+  httpCode: statusCode
 });
 
 export const loadDuplicatesListFailure = error => ({
@@ -55,10 +55,10 @@ export const loadDuplicate = () => ({
   type: LOAD_DUPLICATE
 });
 
-export const loadDuplicateSuccess = result => ({
+export const loadDuplicateSuccess = (duplicate, statusCode) => ({
   type: LOAD_DUPLICATE_SUCCESS,
-  payload: result.content,
-  httpCode: result.statusCode
+  duplicate,
+  httpCode: statusCode
 });
 
 export const loadDuplicateFailure = error => ({
@@ -140,8 +140,13 @@ export const fetchDuplicatesList = (duplicateType, criteria) => (
   return fetch(isNil(criteria) ? url : makeUrl(url, criteria), requestOptions)
     .then(checkAndGetStatus)
     .then(getBody)
-    .then(result => {
-      dispatch(loadDuplicatesListSuccess(result));
+    .then(contentAndStatus => {
+      dispatch(
+        loadDuplicatesListSuccess(
+          contentAndStatus.content.duplicates,
+          contentAndStatus.statusCode
+        )
+      );
     })
     .catch(error => {
       dispatch(loadDuplicatesListFailure(error.message));
@@ -169,8 +174,13 @@ export const fetchDuplicate = (id, duplicateType) => (dispatch, getState) => {
   return fetch(url(id), requestOptions)
     .then(checkAndGetStatus)
     .then(getBody)
-    .then(result => {
-      dispatch(loadDuplicateSuccess(result));
+    .then(contentAndStatus => {
+      dispatch(
+        loadDuplicateSuccess(
+          contentAndStatus.content,
+          contentAndStatus.statusCode
+        )
+      );
     })
     .catch(error => {
       dispatch(loadDuplicateFailure(error.message));

@@ -37,14 +37,14 @@ const reducer = (state = initialState, action) => {
       return {
         ...state,
         loading: false,
-        duplicatesList: action.payload,
+        duplicatesList: action.duplicates,
         latestHttpCodeOnFetch: action.httpCode
       };
     case LOAD_DUPLICATE_SUCCESS:
       return {
         ...state,
         loading: false,
-        duplicate: action.payload,
+        duplicate: action.duplicate,
         latestHttpCodeOnFetch: action.httpCode
       };
     case LOAD_DUPLICATES_LIST_FAILURE:
