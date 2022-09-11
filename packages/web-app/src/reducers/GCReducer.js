@@ -8,19 +8,19 @@ import changeEmail from './ChangeEmail';
 import createCave from './CreateCaveReducer';
 import createDescription from './CreateDescription';
 import createDocument from './CreateDocumentReducer';
+import createEntrance from './CreateEntranceReducer';
+import createHistory from './CreateHistory';
 import createLocation from './CreateLocation';
 import createMassif from './CreateMassifReducer';
 import createOrganization from './CreateOrganization';
 import createPerson from './CreatePerson';
-import createHistory from './CreateHistory';
 import documentChildren from './DocumentChildrenReducer';
 import documentDetails from './DetailsDocumentReducer';
 import documents from './DocumentsReducer';
 import documentType from './DocumentTypeReducer';
 import duplicatesImport from './DuplicatesImportReducer';
 import dynamicNumber from './DynamicNumberReducer';
-import entrancePost from './EntrancePostReducer';
-import entrancePut from './EntrancePutReducer';
+import updateEntrance from './UpdateEntranceReducer';
 import entrance from './EntranceReducer';
 import error from './ErrorReducer';
 import fileFormats from './FileFormatsReducer';
@@ -72,6 +72,7 @@ const GCReducer = combineReducers({
   createCave,
   createDescription,
   createDocument,
+  createEntrance,
   createHistory,
   createLocation,
   createMassif,
@@ -84,8 +85,7 @@ const GCReducer = combineReducers({
   documentType,
   duplicatesImport,
   dynamicNumber,
-  entrancePost,
-  entrancePut,
+  updateEntrance,
   entrance,
   error,
   fileFormats,

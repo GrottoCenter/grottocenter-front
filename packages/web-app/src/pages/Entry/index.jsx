@@ -24,10 +24,11 @@ const EntryPage = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
   const { loading, data, error } = useSelector(state => state.entrance);
-  const { loading: entrancePutLoading, error: entrancePutError } = useSelector(
-    state => state.entrancePut
-  );
-  const prevEntrancePutLoading = useRef(entrancePutLoading);
+  const {
+    loading: updateEntranceLoading,
+    error: updateEntranceError
+  } = useSelector(state => state.updateEntrance);
+  const prevupdateEntranceLoading = useRef(updateEntranceLoading);
   const {
     loading: associateDocumentLoading,
     error: associateDocumentError
@@ -44,14 +45,14 @@ const EntryPage = () => {
     if (
       isUpdateSuccessful(
         data,
-        entrancePutError,
-        entrancePutLoading,
-        prevEntrancePutLoading
+        updateEntranceError,
+        updateEntranceLoading,
+        prevupdateEntranceLoading
       )
     ) {
       dispatch(fetchEntrance(id));
     }
-  }, [dispatch, data, entrancePutLoading, id, entrancePutError]);
+  }, [dispatch, data, updateEntranceLoading, id, updateEntranceError]);
   useEffect(() => {
     if (
       isUpdateSuccessful(
@@ -70,8 +71,8 @@ const EntryPage = () => {
     prevAssociateDocumentLoading.current = associateDocumentLoading;
   }, [associateDocumentLoading]);
   useEffect(() => {
-    prevEntrancePutLoading.current = entrancePutLoading;
-  }, [entrancePutLoading]);
+    prevupdateEntranceLoading.current = updateEntranceLoading;
+  }, [updateEntranceLoading]);
 
   const comments = getComments(propOr([], 'comments', data));
   const descriptions = getDescriptions(propOr([], 'descriptions', data));

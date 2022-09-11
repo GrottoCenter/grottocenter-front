@@ -73,7 +73,7 @@ export const EntranceForm = ({ caveValues = null, entranceValues = null }) => {
     error: entranceError,
     loading: entranceLoading
   } = useSelector(state =>
-    isNewEntrance ? state.entrancePost : state.entrancePut
+    isNewEntrance ? state.createEntrance : state.updateEntrance
   );
   const { error: caveError, loading: caveLoading } = useSelector(state =>
     isNewEntrance ? state.createCave : state.updateCave
