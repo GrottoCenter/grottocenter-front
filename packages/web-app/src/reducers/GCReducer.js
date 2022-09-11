@@ -36,7 +36,7 @@ import map from './Map';
 import massif from './MassifReducer';
 import moderator from './ModeratorReducer';
 import moveEntranceToCave from './MoveEntranceToCaveReducer';
-import namePut from './NamePutReducer';
+import updateName from './UpdateNameReducer';
 import organization from './OrganizationReducer';
 import pageTitle from './PageTitleReducer';
 import partnersCarousel from './PartnersCarouselReducer';
@@ -101,7 +101,6 @@ const GCReducer = combineReducers({
   massif,
   moderator,
   moveEntranceToCave,
-  namePut,
   organization,
   pageTitle,
   partnersCarousel,
@@ -123,6 +122,7 @@ const GCReducer = combineReducers({
   updateHistory,
   updateLocation,
   updateMassif,
+  updateName,
   updateOrganization,
   updatePerson,
   updatePersonGroups
