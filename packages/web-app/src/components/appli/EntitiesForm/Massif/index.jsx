@@ -51,7 +51,7 @@ export const MassifForm = ({ massifValues }) => {
     isNewMassif ? state.createMassif : state.updateMassif
   );
   const { error: nameError, loading: nameLoading } = useSelector(
-    state => state.namePut
+    state => state.updateName
   );
   const {
     error: descriptionError,
