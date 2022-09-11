@@ -64,7 +64,7 @@ export const OrganizationForm = ({ organizationValues = null }) => {
     error: organizationError,
     isLoading: organizationLoading
   } = useSelector(state =>
-    isNewOrganization ? state.createOrganization : state.organizationPut
+    isNewOrganization ? state.createOrganization : state.updateOrganization
   );
   const { error: nameError, loading: nameLoading } = useSelector(
     state => state.namePut
