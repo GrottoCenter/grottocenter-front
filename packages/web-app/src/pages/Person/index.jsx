@@ -5,12 +5,17 @@ import { isNil, pathOr } from 'ramda';
 import Person from '../../components/appli/Person/Person';
 import { loadPerson } from '../../actions/Person/GetPerson';
 import { useUserProperties, usePermissions } from '../../hooks';
+import { fetchSubscriptions } from '../../actions/Subscriptions/GetSubscriptions';
 
 const PersonPage = () => {
   const { personId } = useParams();
   const dispatch = useDispatch();
   const permissions = usePermissions();
   const { person, error, isFetching } = useSelector(state => state.person);
+  const { subscriptions, status: subscriptionsStatus } = useSelector(
+    state => state.subscriptions
+  );
+
   const userId = pathOr(null, ['id'], useUserProperties());
   let canEdit = false;
 
@@ -22,6 +27,7 @@ const PersonPage = () => {
 
   useEffect(() => {
     dispatch(loadPerson(personId));
+    dispatch(fetchSubscriptions(personId));
   }, [personId, dispatch]);
 
   const onEdit = () => {
@@ -33,6 +39,8 @@ const PersonPage = () => {
       person={person}
       onEdit={onEdit}
       canEdit={canEdit}
+      subscriptions={subscriptions}
+      subscriptionsStatus={subscriptionsStatus}
     />
   );
 };

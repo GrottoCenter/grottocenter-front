@@ -107,6 +107,9 @@ export const overridings = {
   },
   // https://material-ui.com/customization/globals/#default-props
   props: {
+    MuiTooltip: {
+      arrow: true
+    },
     MuiTextField: {
       variant: 'filled'
     },
