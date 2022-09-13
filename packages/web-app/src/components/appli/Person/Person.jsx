@@ -6,16 +6,26 @@ import { useIntl } from 'react-intl';
 import { IconButton, Box } from '@material-ui/core';
 import CreateIcon from '@material-ui/icons/Create';
 
+import subscriptionsType from '../../../types/subscriptions.type';
+import REDUCER_STATUS from '../../../reducers/ReducerStatus';
 import Layout from '../../common/Layouts/Fixed/FixedContent';
 import EntrancesList from '../../common/entrance/EntrancesList';
 import EntrancePropTypes from './propTypes';
 import Alert from '../../common/Alert';
 
-import PersonProperties from '../../common/Person/PersonProperties';
-import OrganizationsList from '../../common/Organizations/OrganizationsList';
 import DocumentsList from '../../common/DocumentsList/DocumentsList';
+import OrganizationsList from '../../common/Organizations/OrganizationsList';
+import PersonProperties from '../../common/Person/PersonProperties';
+import SubscriptionsList from '../../common/Subscriptions/SubscriptionsList';
 
-const Person = ({ isFetching, person, onEdit, canEdit }) => {
+const Person = ({
+  isFetching,
+  person,
+  onEdit,
+  canEdit,
+  subscriptions,
+  subscriptionsStatus
+}) => {
   const { formatMessage } = useIntl();
 
   let title = '';
@@ -40,6 +50,7 @@ const Person = ({ isFetching, person, onEdit, canEdit }) => {
             <>
               <Skeleton width={600} /> {/* Title Skeleton */}
               <Skeleton height={200} width={500} /> {/* Details Skeleton */}
+              <Skeleton height={100} /> {/* Subscriptions list Skeleton */}
               <Skeleton height={100} /> {/* Documents list Skeleton */}
               <Skeleton height={100} /> {/* Organizations list Skeleton */}
               <Skeleton height={100} /> {/* Entrance list Skeleton */}
@@ -73,6 +84,21 @@ const Person = ({ isFetching, person, onEdit, canEdit }) => {
                 )}
               </Box>
               <hr />
+              <SubscriptionsList
+                canUnsubscribe={canEdit}
+                subscriptions={subscriptions}
+                subscriptionsStatus={subscriptionsStatus}
+                emptyMessageComponent={
+                  <Alert
+                    severity="info"
+                    title={formatMessage({
+                      id: 'This person has no subscriptions listed yet.'
+                    })}
+                  />
+                }
+                title={formatMessage({ id: 'Subscriptions' })}
+              />
+              <hr />
               <DocumentsList
                 docs={person.documents.map(doc => ({
                   ...doc,
@@ -82,7 +108,7 @@ const Person = ({ isFetching, person, onEdit, canEdit }) => {
                   <Alert
                     severity="info"
                     title={formatMessage({
-                      id: 'This person has no document listed yet.'
+                      id: 'This person has no documents listed yet.'
                     })}
                   />
                 }
@@ -123,7 +149,9 @@ const Person = ({ isFetching, person, onEdit, canEdit }) => {
 };
 
 Person.propTypes = {
+  canEdit: PropTypes.bool.isRequired,
   isFetching: PropTypes.bool.isRequired,
+  onEdit: PropTypes.func.isRequired,
   person: PropTypes.shape({
     name: PropTypes.string,
     surname: PropTypes.string,
@@ -134,8 +162,8 @@ Person.propTypes = {
     documents: PropTypes.arrayOf(PropTypes.shape({})),
     exploredEntrances: PropTypes.arrayOf(EntrancePropTypes)
   }),
-  onEdit: PropTypes.func.isRequired,
-  canEdit: PropTypes.bool.isRequired
+  subscriptions: subscriptionsType,
+  subscriptionsStatus: PropTypes.oneOf(Object.values(REDUCER_STATUS))
 };
 
 Person.defaultProps = {

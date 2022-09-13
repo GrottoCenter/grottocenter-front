@@ -24,6 +24,7 @@ import Application from './pages/Application';
 import ErrorHandler from './components/appli/ErrorHandler';
 import { DEFAULT_LANGUAGE, AVAILABLE_LANGUAGES } from './conf/Config';
 import './App.css';
+import './animations.css';
 
 const middlewares = applyMiddleware(createDebounce(), thunkMiddleware);
 const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;

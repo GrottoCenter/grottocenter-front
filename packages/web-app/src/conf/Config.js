@@ -253,6 +253,10 @@ export const subscribeToMassifUrl = massifId =>
   `${API_URL}/api/${apiVersion}/massifs/${massifId}/subscribe`;
 export const unsubscribeFromMassifUrl = massifId =>
   `${API_URL}/api/${apiVersion}/massifs/${massifId}/unsubscribe`;
+export const subscribeToCountryUrl = countryId =>
+  `${API_URL}/api/${apiVersion}/countries/${countryId}/subscribe`;
+export const unsubscribeFromCountryUrl = countryId =>
+  `${API_URL}/api/${apiVersion}/countries/${countryId}/unsubscribe`;
 
 // ===== ImportCSV url
 export const checkRowsEntrancesUrl = `${API_URL}/api/${apiVersion}/entrances/check-rows`;

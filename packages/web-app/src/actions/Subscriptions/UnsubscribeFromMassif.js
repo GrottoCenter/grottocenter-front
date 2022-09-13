@@ -12,8 +12,9 @@ export const unsubscribeFromMassifAction = () => ({
   type: UNSUBSCRIBE_FROM_MASSIF
 });
 
-export const unsubscribeFromMassifActionSuccess = () => ({
-  type: UNSUBSCRIBE_FROM_MASSIF_SUCCESS
+export const unsubscribeFromMassifActionSuccess = massifId => ({
+  type: UNSUBSCRIBE_FROM_MASSIF_SUCCESS,
+  massifId
 });
 
 export const unsubscribeFromMassifActionFailure = error => ({
@@ -50,7 +51,7 @@ export function unsubscribeFromMassif(massifId) {
             )
           );
         } else {
-          dispatch(unsubscribeFromMassifActionSuccess(response.status));
+          dispatch(unsubscribeFromMassifActionSuccess(massifId));
         }
         return response;
       }

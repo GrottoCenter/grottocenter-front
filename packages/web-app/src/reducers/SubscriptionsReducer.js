@@ -3,6 +3,8 @@ import {
   FETCH_SUBSCRIPTIONS_FAILURE,
   FETCH_SUBSCRIPTIONS_SUCCESS
 } from '../actions/Subscriptions/GetSubscriptions';
+import { UNSUBSCRIBE_FROM_COUNTRY_SUCCESS } from '../actions/Subscriptions/UnsubscribeFromCountry';
+import { UNSUBSCRIBE_FROM_MASSIF_SUCCESS } from '../actions/Subscriptions/UnsubscribeFromMassif';
 import REDUCER_STATUS from './ReducerStatus';
 
 const initialState = {
@@ -30,6 +32,30 @@ const reducer = (state = initialState, action) => {
         ...state,
         error: action.error,
         status: REDUCER_STATUS.FAILED
+      };
+    case UNSUBSCRIBE_FROM_COUNTRY_SUCCESS:
+      return {
+        ...state,
+        subscriptions: state.subscriptions
+          ? {
+              ...state.subscriptions,
+              countries: state.subscriptions.countries.filter(
+                s => s.id !== action.countryId
+              )
+            }
+          : undefined
+      };
+    case UNSUBSCRIBE_FROM_MASSIF_SUCCESS:
+      return {
+        ...state,
+        subscriptions: state.subscriptions
+          ? {
+              ...state.subscriptions,
+              massifs: state.subscriptions.massifs.filter(
+                s => s.id !== action.massifId
+              )
+            }
+          : undefined
       };
     default:
       return state;

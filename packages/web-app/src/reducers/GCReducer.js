@@ -50,8 +50,10 @@ import region from './RegionReducer';
 import sideMenu from './SideMenuReducer';
 import signUp from './SignUpReducer';
 import subject from './SubjectReducer';
+import subscribeToCountry from './SubscribeToCountryReducer';
 import subscribeToMassif from './SubscribeToMassifReducer';
 import subscriptions from './SubscriptionsReducer';
+import unsubscribeFromCountry from './UnsubscribeFromCountryReducer';
 import unsubscribeFromMassif from './UnsubscribeFromMassifReducer';
 import updateCave from './UpdateCaveReducer';
 import updateDescription from './UpdateDescription';
@@ -113,8 +115,10 @@ const GCReducer = combineReducers({
   sideMenu,
   signUp,
   subject,
+  subscribeToCountry,
   subscribeToMassif,
   subscriptions,
+  unsubscribeFromCountry,
   unsubscribeFromMassif,
   updateCave,
   updateDescription,
