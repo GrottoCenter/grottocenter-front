@@ -2,8 +2,10 @@ import React from 'react';
 import NotificationsOffIcon from '@material-ui/icons/NotificationsOff';
 import { Box, Divider, Menu, MenuItem, Typography } from '@material-ui/core';
 import { useDispatch, useSelector } from 'react-redux';
+import { useHistory } from 'react-router-dom';
 import { Skeleton } from '@material-ui/lab';
 import { useIntl } from 'react-intl';
+import styled from 'styled-components';
 import { usePermissions } from '../../../hooks';
 import NotificationsIcon from './NotificationsIcon';
 import { fetchMenuNotifications } from '../../../actions/Notifications/GetMenuNotifications';
@@ -13,6 +15,16 @@ import { readNotification } from '../../../actions/Notifications/ReadNotificatio
 import { countUnreadNotifications } from '../../../actions/Notifications/CountUnreadNotifications';
 
 const NOTIFICATION_WIDTH = 320;
+const NUMBER_OF_NOTIFICATIONS = 10;
+
+const SeeAllMenuItem = styled(MenuItem)`
+  ${({ theme }) => `
+    color: ${theme.palette.primary.main};
+    font-weight: bold;
+    justify-content: center;
+    padding: ${theme.spacing(3)}px;
+  `}
+`;
 
 const createSkeletons = n =>
   [...Array(n)].map((e, i) => (
@@ -25,6 +37,7 @@ const createSkeletons = n =>
 
 const NotificationMenu = () => {
   const dispatch = useDispatch();
+  const history = useHistory();
   const { formatMessage } = useIntl();
   const { isAuth } = usePermissions();
   const { notifications, status } = useSelector(
@@ -52,6 +65,11 @@ const NotificationMenu = () => {
     handleCloseMenu();
   };
 
+  const handleOnSeeAllLinkClick = () => {
+    handleCloseMenu();
+    history.push('/ui/notifications');
+  };
+
   if (!isAuth) return '';
   return (
     <>
@@ -71,16 +89,18 @@ const NotificationMenu = () => {
           createSkeletons(nbNotifications || 3)}
         {notifications &&
           notifications.length > 0 &&
-          notifications.map((notification, idx) => (
-            <div key={notification.id}>
-              <NotificationsMenuItem
-                notification={notification}
-                onClick={handleOnNotificationClick}
-                width={NOTIFICATION_WIDTH}
-              />
-              {idx !== notifications.length - 1 && <Divider />}
-            </div>
-          ))}
+          notifications
+            .slice(0, NUMBER_OF_NOTIFICATIONS)
+            .map((notification, idx) => (
+              <div key={notification.id}>
+                <NotificationsMenuItem
+                  notification={notification}
+                  onClick={handleOnNotificationClick}
+                  width={NOTIFICATION_WIDTH}
+                />
+                {idx !== notifications.length - 1 && <Divider />}
+              </div>
+            ))}
         {notifications && notifications.length === 0 && (
           <MenuItem disabled>
             <Box flexDirection="row" display="flex">
@@ -91,6 +111,9 @@ const NotificationMenu = () => {
             </Box>
           </MenuItem>
         )}
+        <SeeAllMenuItem onClick={handleOnSeeAllLinkClick}>
+          {formatMessage({ id: 'See all notifications' }).toUpperCase()}
+        </SeeAllMenuItem>
       </Menu>
     </>
   );

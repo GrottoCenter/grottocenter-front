@@ -30,7 +30,7 @@ const NotificationsPage = () => {
 
   const [order, setOrder] = React.useState('desc');
   const [orderBy, setOrderBy] = React.useState('dateInscription');
-  const [rowsPerPage, setRowsPerPage] = React.useState(5);
+  const [rowsPerPage, setRowsPerPage] = React.useState(50);
 
   const loadNotifications = useCallback(() => {
     const criterias = {
