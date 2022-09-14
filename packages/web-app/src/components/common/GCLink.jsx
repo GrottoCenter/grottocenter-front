@@ -10,7 +10,7 @@ import { Link } from 'react-router-dom';
  * internal: (optional) Used to define if the link target has to be opened on a new window (by default, a new window is opened)
  * className: (optional) Used to set the CSS classes
  * activeClassName: (optional) Used to set the CSS classes when link is active
- * styles: (optional) Used to apply inline CSS styling
+ * style: (optional) Used to apply inline CSS styling
  * children: (Required) The DOM content contained inside the link
  */
 const GCLink = ({
