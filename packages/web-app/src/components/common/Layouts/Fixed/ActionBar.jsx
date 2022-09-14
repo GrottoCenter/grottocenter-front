@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { isNil, propOr } from 'ramda';
+import { isNil } from 'ramda';
 import { useIntl } from 'react-intl';
 import { Tooltip, Fab } from '@material-ui/core';
 import { Share, Print, Map, GpsFixed, Edit } from '@material-ui/icons';
@@ -44,7 +44,6 @@ const ActionButton = ({ Icon, label, onClick }) => {
           aria-label={label}
           size="small"
           disabled={isNil(onClick)}
-          // eslint-disable-next-line react/jsx-closing-bracket-location
           onClick={onClick}>
           {Icon}
         </StyledFab>
@@ -103,7 +102,7 @@ const ActionBar = ({ printRef, onEdit }) => {
       <ActionButton
         onClick={lat && long ? openMap : undefined}
         Icon={<Map fontSize={isMobile ? 'small' : 'medium'} />}
-        label={formatMessage({ id: 'Map' })}
+        label={formatMessage({ id: 'Open on OpenStreetMap' })}
       />
     </Wrapper>
   );
