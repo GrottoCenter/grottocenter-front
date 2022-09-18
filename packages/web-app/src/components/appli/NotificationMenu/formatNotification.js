@@ -35,7 +35,7 @@ const getLinkAndIconPath = entity => {
 
   // Some entity redirect directly to them (cave, document, entrance, massif, organization).
   // Other ones (comment, description, history, location, rigging) redirect to the ones listed above because they don't have a dedicated page.
-  if (['comment', 'history'].includes(entity.type)) {
+  if (['comment', 'history', 'rigging'].includes(entity.type)) {
     const getters = [
       getRelatedCaveLinkAndIconPath,
       getRelatedEntranceLinkAndIconPath
