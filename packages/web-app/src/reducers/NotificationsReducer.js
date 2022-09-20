@@ -8,7 +8,8 @@ import REDUCER_STATUS from './ReducerStatus';
 const initialState = {
   error: undefined,
   notifications: undefined,
-  status: REDUCER_STATUS.IDLE
+  status: REDUCER_STATUS.IDLE,
+  totalCount: undefined
 };
 
 const reducer = (state = initialState, action) => {
@@ -23,7 +24,8 @@ const reducer = (state = initialState, action) => {
       return {
         ...state,
         status: REDUCER_STATUS.SUCCEEDED,
-        notifications: action.notifications
+        notifications: action.notifications,
+        totalCount: action.totalCount
       };
     case FETCH_NOTIFICATIONS_FAILURE:
       return {

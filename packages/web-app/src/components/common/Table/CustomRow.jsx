@@ -1,9 +1,19 @@
 import React from 'react';
 import { Checkbox, IconButton, TableCell, TableRow } from '@material-ui/core';
-import { includes, isNil, keys } from 'ramda';
+import { includes, isNil } from 'ramda';
 import ZoomInIcon from '@material-ui/icons/ZoomIn';
 import PropTypes from 'prop-types';
+import styled from 'styled-components';
 import CustomCell from './CustomCell';
+
+const StyledTableRow = styled(TableRow)`
+  ${({ onClick, theme }) => `
+    &:hover {
+      background: ${theme.palette.secondary.veryLight};
+      cursor: ${onClick && 'pointer'};
+    }
+  `}
+`;
 
 const Row = ({
   row,
@@ -11,7 +21,9 @@ const Row = ({
   onSelection,
   checked,
   hiddenColumns,
-  customCellRenders
+  customCellRenders,
+  columns,
+  onClick
 }) => {
   const handleOpenDetailedView = id => () => {
     if (!isNil(onOpenDetailedView)) {
@@ -19,8 +31,11 @@ const Row = ({
     }
   };
 
+  // Use the columns order to match the table headers order
+  const columnIds = columns.map(c => c.id);
+
   return (
-    <TableRow hover={!isNil(onSelection)}>
+    <StyledTableRow onClick={onClick} hover={!isNil(onSelection)}>
       {!isNil(onSelection) && (
         <TableCell padding="checkbox">
           <Checkbox
@@ -40,7 +55,7 @@ const Row = ({
           </IconButton>
         </TableCell>
       )}
-      {keys(row).map(
+      {columnIds.map(
         keyCell =>
           !includes(keyCell, hiddenColumns) && (
             <CustomCell
@@ -53,7 +68,7 @@ const Row = ({
             />
           )
       )}
-    </TableRow>
+    </StyledTableRow>
   );
 };
 
@@ -68,7 +83,17 @@ Row.propTypes = {
   onOpenDetailedView: PropTypes.func,
   onSelection: PropTypes.func,
   hiddenColumns: PropTypes.arrayOf(PropTypes.string).isRequired,
-  customCellRenders: PropTypes.func
+  customCellRenders: PropTypes.func,
+  columns: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.oneOfType([
+        PropTypes.string.isRequired,
+        PropTypes.number.isRequired
+      ]),
+      label: PropTypes.string
+    })
+  ).isRequired,
+  onClick: PropTypes.func
 };
 
 export default Row;
