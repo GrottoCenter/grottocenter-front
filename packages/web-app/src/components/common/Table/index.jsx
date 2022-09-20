@@ -89,7 +89,8 @@ const Table = ({
   rowsCount,
   loading,
   customHeaderCellRenders,
-  customCellRenders
+  customCellRenders,
+  onRowClick
 }) => {
   const { formatMessage } = useIntl();
   const isSelected = includes(__, selection);
@@ -206,6 +207,9 @@ const Table = ({
             ) : (
               data.map(row => (
                 <Row
+                  onClick={
+                    !isNil(onRowClick) ? () => onRowClick(row) : undefined
+                  }
                   key={row.id}
                   row={row}
                   checked={isSelected(row.id)}
@@ -217,6 +221,7 @@ const Table = ({
                   onOpenDetailedView={openDetailedView}
                   hiddenColumns={hiddenColumns}
                   customCellRenders={getCustomCellRenders}
+                  columns={columns}
                 />
               ))
             )}
@@ -308,7 +313,8 @@ Table.propTypes = {
         PropTypes.number.isRequired
       ])
     })
-  )
+  ),
+  onRowClick: PropTypes.func
 };
 
 export default Table;

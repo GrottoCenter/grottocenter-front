@@ -1,7 +1,7 @@
 import fetch from 'isomorphic-fetch';
 import { fetchNotificationsUrl } from '../../conf/Config';
 import makeErrorMessage from '../../helpers/makeErrorMessage';
-import { checkAndGetStatus } from '../utils';
+import { checkAndGetStatus, getTotalCount, makeUrl } from '../utils';
 
 export const FETCH_NOTIFICATIONS = 'FETCH_NOTIFICATIONS';
 export const FETCH_NOTIFICATIONS_SUCCESS = 'FETCH_NOTIFICATIONS_SUCCESS';
@@ -11,9 +11,10 @@ export const fetchNotificationsAction = () => ({
   type: FETCH_NOTIFICATIONS
 });
 
-export const fetchNotificationsActionSuccess = notifications => ({
+export const fetchNotificationsActionSuccess = (notifications, totalCount) => ({
   type: FETCH_NOTIFICATIONS_SUCCESS,
-  notifications
+  notifications,
+  totalCount
 });
 
 export const fetchNotificationsActionFailure = error => ({
@@ -21,8 +22,8 @@ export const fetchNotificationsActionFailure = error => ({
   error
 });
 
-export function fetchNotifications() {
-  return (dispatch, getState) => {
+export function fetchNotifications(criterias) {
+  return async (dispatch, getState) => {
     dispatch(fetchNotificationsAction());
 
     const requestOptions = {
@@ -30,19 +31,27 @@ export function fetchNotifications() {
       headers: getState().login.authorizationHeader
     };
 
-    return fetch(fetchNotificationsUrl, requestOptions)
-      .then(checkAndGetStatus)
-      .then(response => response.json())
-      .then(data => {
-        dispatch(fetchNotificationsActionSuccess(data.notifications));
-      })
-      .catch(error =>
-        dispatch(
-          fetchNotificationsActionFailure(
-            makeErrorMessage(error.message, `Fetching user notifications`),
-            error.message
-          )
+    try {
+      const response = checkAndGetStatus(
+        await fetch(makeUrl(fetchNotificationsUrl, criterias), requestOptions)
+      );
+
+      const data = await response.json();
+      const contentRangeHeader = response.headers.get('Content-Range');
+
+      return dispatch(
+        fetchNotificationsActionSuccess(
+          data.notifications,
+          getTotalCount(data.notifications.length, contentRangeHeader)
         )
       );
+    } catch (error) {
+      return dispatch(
+        fetchNotificationsActionFailure(
+          makeErrorMessage(error.message, `Fetching user notifications`),
+          error.message
+        )
+      );
+    }
   };
 }

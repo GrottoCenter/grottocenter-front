@@ -1,20 +1,10 @@
 import fetch from 'isomorphic-fetch';
-import {
-  pipe,
-  pathOr,
-  split,
-  tail,
-  ifElse,
-  identity,
-  always,
-  defaultTo,
-  equals
-} from 'ramda';
+import { pathOr } from 'ramda';
 import {
   getDocuments as queryDocuments,
   getCaversDocumentsUrl
 } from '../../conf/Config';
-import { makeUrl } from '../utils';
+import { getTotalCount, makeUrl } from '../utils';
 import makeErrorMessage from '../../helpers/makeErrorMessage';
 
 export const FETCH_DOCUMENTS = 'FETCH_DOCUMENTS';
@@ -62,16 +52,7 @@ const doGet = (url, criterias) => async dispatch => {
       return response;
     });
     const data = await res.text();
-    const header = await res.headers.get('Content-Range');
-    const makeNumber = ifElse(identity, Number, always(1));
-    const getTotalCount = defaultCount =>
-      pipe(
-        defaultTo(''),
-        split('/'),
-        tail,
-        makeNumber,
-        ifElse(equals(0), always(defaultCount), identity)
-      )(header);
+    const contentRangeHeader = await res.headers.get('Content-Range');
 
     const parsedData = pathOr(['documents'], [], JSON.parse(data));
     const successAction =
@@ -81,7 +62,10 @@ const doGet = (url, criterias) => async dispatch => {
     return dispatch(
       successAction({
         documents: parsedData.documents,
-        totalCount: getTotalCount(parsedData.documents.length)
+        totalCount: getTotalCount(
+          parsedData.documents.length,
+          contentRangeHeader
+        )
       })
     );
   } catch (error) {

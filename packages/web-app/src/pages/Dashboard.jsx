@@ -7,6 +7,7 @@ import PeopleIcon from '@material-ui/icons/People';
 import DocumentListIcon from '@material-ui/icons/PlaylistAddCheck';
 import ListAltIcon from '@material-ui/icons/ListAlt';
 import PublishIcon from '@material-ui/icons/Publish';
+import NotificationsIcon from '@material-ui/icons/Notifications';
 import styled from 'styled-components';
 
 import { usePermissions } from '../hooks';
@@ -117,6 +118,15 @@ const Dashboard = () => {
                   <ListAltIcon fontSize="large" color="primary" />
                   <Typography variant="h4" align="center">
                     {formatMessage({ id: 'My contributions' })}
+                  </Typography>
+                </StyledListItem>
+                <StyledListItem
+                  button
+                  key="my-notifications-user-tile-key"
+                  onClick={() => handleOnListItemClick('/ui/notifications')}>
+                  <NotificationsIcon fontSize="large" color="primary" />
+                  <Typography variant="h4" align="center">
+                    {formatMessage({ id: 'My notifications' })}
                   </Typography>
                 </StyledListItem>
               </StyledList>

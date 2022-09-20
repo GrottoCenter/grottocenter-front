@@ -1,3 +1,14 @@
+import {
+  pipe,
+  split,
+  tail,
+  ifElse,
+  identity,
+  always,
+  defaultTo,
+  equals
+} from 'ramda';
+
 // Remove the next line when other exports are created.
 export const makeUrl = (url, criterias) => {
   if (criterias) {
@@ -23,3 +34,13 @@ export const checkAndGetStatus = response => {
   const errorMessage = new Error(response.status);
   throw errorMessage;
 };
+
+const makeNumber = ifElse(identity, Number, always(1));
+export const getTotalCount = (defaultCount, contentRangeHeader) =>
+  pipe(
+    defaultTo(''),
+    split('/'),
+    tail,
+    makeNumber,
+    ifElse(equals(0), always(defaultCount), identity)
+  )(contentRangeHeader);

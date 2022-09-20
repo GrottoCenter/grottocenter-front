@@ -40,6 +40,7 @@ import MassifEdit from './EntityEdit/Massif/MassifEdit';
 import PersonEdit from './PersonEdit';
 import OrganizationEdit from './EntityEdit/Organization/OrganizationEdit';
 import CountryPage from './Country';
+import NotificationsPage from './Notifications';
 
 const Application = () => {
   const dispatch = useDispatch();
@@ -75,6 +76,7 @@ const Application = () => {
         <Route path="/ui/faq" component={Faq} />
         <Route path="/ui/map/:target?" component={Map} />
         <Route path="/ui/contributions" component={ContributionsPage} />
+        <Route path="/ui/notifications" component={NotificationsPage} />
         <Route path="/ui/test" component={LatestBlogNewsSection} />
         <Route
           path="/ui/organizations/:organizationId/edit"
