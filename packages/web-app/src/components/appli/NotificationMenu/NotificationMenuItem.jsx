@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import styled from 'styled-components';
 import UnreadNotificationIcon from '@material-ui/icons/FiberManualRecord';
-import formatNotification from './formatNotification';
+import formatNotification from '../../../util/formatNotification';
 
 const ICON_WIDTH = '2.5rem';
 const Icon = styled.img`
