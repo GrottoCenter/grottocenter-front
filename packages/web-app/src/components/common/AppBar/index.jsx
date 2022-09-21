@@ -14,6 +14,7 @@ import { isMobileOnly } from 'react-device-detect';
 import LanguageSelector from '../LanguageSelector';
 import UserMenu from './User';
 import { logoGC } from '../../../conf/Config';
+import NotificationMenu from '../../appli/NotificationMenu';
 
 const StyledMuiAppBar = styled(MuiAppBar)`
   flex-grow: 1;
@@ -89,6 +90,7 @@ const AppBar = ({
             <LanguageSelector />
           </LanguageWrapper>
         </RightWrapper>
+        <NotificationMenu />
         <UserMenu
           authTokenExpirationDate={authTokenExpirationDate}
           isAuth={isAuth}
