@@ -6,7 +6,7 @@ import PropTypes from 'prop-types';
 import {
   validateLatitude,
   validateLongitude
-} from '../../../../../util/ValidateLatLong';
+} from '../../../../../util/validateLatLong';
 import Section from '../../FormSection';
 import PositionMap from './Position';
 

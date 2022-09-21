@@ -22,7 +22,7 @@ import { ENTRANCE_ONLY, ENTRANCE_AND_CAVE } from './caveType';
 import {
   validateLatitude,
   validateLongitude
-} from '../../../../util/ValidateLatLong';
+} from '../../../../util/validateLatLong';
 import Alert from '../../../common/Alert';
 
 const Entrance = ({
