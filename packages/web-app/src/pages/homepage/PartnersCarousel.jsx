@@ -85,7 +85,7 @@ const PartnersCarousel = ({ fetch, partners, isFetching }) => {
           key={`partcs-${id}`}
           imagePath={`/images/partners/${pictureFileName}`}
           alt={name}
-          onClick={() => window.open(customMessage, 'grotto_partner')}
+          onClick={() => window.open(`/ui/organizations/${id}`)}
         />
       ))
     : [];
