@@ -47,6 +47,7 @@ export const overridings = {
       contrastText: grey['100']
     },
     secondary: {
+      veryLight: orange['50'],
       light: orange['500'],
       main: orange['700'],
       dark: orange['900'],

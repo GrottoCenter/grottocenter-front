@@ -6,6 +6,7 @@ import cave from './CaveReducer';
 import changePassword from './ChangePassword';
 import changeEmail from './ChangeEmail';
 import country from './CountryReducer';
+import countUnreadNotifications from './CountUnreadNotificationsReducer';
 import createCave from './CreateCaveReducer';
 import createDescription from './CreateDescription';
 import createDocument from './CreateDocumentReducer';
@@ -35,9 +36,10 @@ import licenses from './LicensesReducer';
 import login from './LoginReducer';
 import map from './Map';
 import massif from './MassifReducer';
+import menuNotifications from './MenuNotificationsReducer';
 import moderator from './ModeratorReducer';
 import moveEntranceToCave from './MoveEntranceToCaveReducer';
-import updateName from './UpdateNameReducer';
+import notifications from './NotificationsReducer';
 import organization from './OrganizationReducer';
 import pageTitle from './PageTitleReducer';
 import partnersCarousel from './PartnersCarouselReducer';
@@ -47,6 +49,7 @@ import processDocuments from './ProcessDocumentsReducer';
 import projections from './Projections';
 import quicksearch from './QuicksearchReducer';
 import randomEntrance from './RandomEntranceReducer';
+import readNotification from './ReadNotificationReducer';
 import region from './RegionReducer';
 import sideMenu from './SideMenuReducer';
 import signUp from './SignUpReducer';
@@ -62,6 +65,7 @@ import updateDocument from './UpdateDocumentReducer';
 import updateHistory from './UpdateHistory';
 import updateLocation from './UpdateLocation';
 import updateMassif from './UpdateMassifReducer';
+import updateName from './UpdateNameReducer';
 import updateOrganization from './UpdateOrganization';
 import updatePerson from './UpdatePerson';
 
@@ -73,6 +77,7 @@ const GCReducer = combineReducers({
   changePassword,
   changeEmail,
   country,
+  countUnreadNotifications,
   createCave,
   createDescription,
   createDocument,
@@ -103,8 +108,10 @@ const GCReducer = combineReducers({
   login,
   map,
   massif,
+  menuNotifications,
   moderator,
   moveEntranceToCave,
+  notifications,
   organization,
   pageTitle,
   partnersCarousel,
@@ -113,6 +120,7 @@ const GCReducer = combineReducers({
   projections,
   quicksearch,
   randomEntrance,
+  readNotification,
   region,
   sideMenu,
   signUp,

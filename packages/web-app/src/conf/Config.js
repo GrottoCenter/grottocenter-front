@@ -247,6 +247,10 @@ export const moveEntranceToCaveUrl = (entranceId, caveId) =>
   `${API_URL}/api/${apiVersion}/entrances/${entranceId}/cave/${caveId}`;
 export const findCountryUrl = countryId =>
   `${API_URL}/api/${apiVersion}/countries/${countryId}`;
+export const countUnreadNotificationsUrl = `${API_URL}/api/${apiVersion}/notifications/unread/count`;
+export const fetchNotificationsUrl = `${API_URL}/api/${apiVersion}/notifications`;
+export const readNotificationUrl = notificationId =>
+  `${API_URL}/api/${apiVersion}/notifications/${notificationId}/read`;
 
 // ===== Subscriptions urls
 export const fetchSubscriptionsUrl = caverId =>
