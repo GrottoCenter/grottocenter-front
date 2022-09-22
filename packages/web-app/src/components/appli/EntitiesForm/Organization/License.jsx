@@ -3,7 +3,7 @@ import { React } from 'react';
 import { useIntl } from 'react-intl';
 import styled from 'styled-components';
 import InternationalizedLink from '../../../common/InternationalizedLink';
-import { licenceLinks, licensesODBLink } from '../../../../conf/Config';
+import { licenceLinks, licensesODBLink } from '../../../../conf/externalLinks';
 
 const FormControl = styled(MuiFormControl)`
   padding-bottom: ${({ theme }) => theme.spacing(4)}px;

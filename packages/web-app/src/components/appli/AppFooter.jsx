@@ -13,7 +13,7 @@ import {
   facebookLink,
   twitterLink,
   bloggerLinks
-} from '../../conf/Config';
+} from '../../conf/externalLinks';
 
 const FooterBar = withStyles(
   theme => ({

@@ -5,7 +5,7 @@ import {
   GridRow,
   GridFullColumn
 } from '../../helpers/GridSystem';
-import { fseLinks } from '../../conf/Config';
+import { fseLinks } from '../../conf/externalLinks';
 import InternationalizedLink from '../../components/common/InternationalizedLink';
 import Translate from '../../components/common/Translate';
 import GCLogo from '../../components/common/GCLogo';

@@ -4,7 +4,7 @@ import { withTheme } from '@material-ui/core/styles';
 import styled from 'styled-components';
 import Translate from './Translate';
 import InternationalizedLink from './InternationalizedLink';
-import { licenceLinks } from '../../conf/Config';
+import { licenceLinks } from '../../conf/externalLinks';
 
 const FooterBar = withTheme(styled.div`
   color: ${props => props.theme.palette.fullBlack};

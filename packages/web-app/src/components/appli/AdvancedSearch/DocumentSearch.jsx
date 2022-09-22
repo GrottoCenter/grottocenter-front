@@ -20,7 +20,7 @@ import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 
 import Translate from '../../common/Translate';
 import InternationalizedLink from '../../common/InternationalizedLink';
-import { wikiBBSLinks } from '../../../conf/Config';
+import { wikiBBSLinks } from '../../../conf/externalLinks';
 import SearchBottomActionButtons from './SearchBottomActionButtons';
 import styles from './styles';
 import SliderForm from './SliderForm';

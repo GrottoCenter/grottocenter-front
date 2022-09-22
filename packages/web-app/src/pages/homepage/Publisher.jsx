@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import InternationalizedLink from '../../components/common/InternationalizedLink';
-import { wikicavesLink } from '../../conf/Config';
+import { wikicavesLink } from '../../conf/externalLinks';
 import Translate from '../../components/common/Translate';
 import GCLogo from '../../components/common/GCLogo';
 
