@@ -1,5 +1,5 @@
 import fetch from 'isomorphic-fetch';
-import { identifierTypesUrl } from '../conf/Config';
+import { identifierTypesUrl } from '../conf/apiRoutes';
 import makeErrorMessage from '../helpers/makeErrorMessage';
 
 export const FETCH_IDENTIFIER_TYPES = 'FETCH_IDENTIFIER_TYPES';

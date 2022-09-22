@@ -1,5 +1,5 @@
 import fetch from 'isomorphic-fetch';
-import { regionsSearchUrl } from '../conf/Config';
+import { regionsSearchUrl } from '../conf/apiRoutes';
 import makeErrorMessage from '../helpers/makeErrorMessage';
 
 export const REGIONS_SEARCH = 'REGIONS_SEARCH';

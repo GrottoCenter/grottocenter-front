@@ -15,7 +15,7 @@ import VisibilityOff from '@material-ui/icons/VisibilityOff';
 import styled from 'styled-components';
 import { isEmpty, match } from 'ramda';
 
-import { emailRegexp } from '../../../conf/Config';
+import { emailRegexp } from '../../../conf/config';
 
 import StringInput from '../Form/StringInput';
 

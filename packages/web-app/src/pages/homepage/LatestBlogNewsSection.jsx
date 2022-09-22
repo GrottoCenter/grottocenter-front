@@ -5,7 +5,7 @@ import LandingSection from './LandingSection';
 import { GridRow, GridOneHalfColumn } from '../../helpers/GridSystem';
 import Translate from '../../components/common/Translate';
 import LatestBlogNews from '../../containers/LatestBlogNews';
-import { FR_GC_BLOG, EN_GC_BLOG } from '../../conf/Config';
+import { frenchRssUrl, englishRssUrl } from '../../conf/apiRoutes';
 
 const SectionTitle = withTheme(styled.h3`
   color: ${props => props.theme.palette.accent1Color};
@@ -23,10 +23,10 @@ const LatestBlogNewsSection = () => (
     </GridRow>
     <GridRow>
       <GridOneHalfColumn>
-        <LatestBlogNews blog="fr" url={FR_GC_BLOG} />
+        <LatestBlogNews blog="fr" url={frenchRssUrl} />
       </GridOneHalfColumn>
       <GridOneHalfColumn>
-        <LatestBlogNews blog="en" url={EN_GC_BLOG} />
+        <LatestBlogNews blog="en" url={englishRssUrl} />
       </GridOneHalfColumn>
     </GridRow>
   </LandingSection>

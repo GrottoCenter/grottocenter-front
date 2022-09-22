@@ -1,5 +1,5 @@
 import fetch from 'isomorphic-fetch';
-import { advancedsearchUrl } from '../conf/Config';
+import { advancedsearchUrl } from '../conf/apiRoutes';
 
 export const FETCH_ADVANCEDSEARCH_STARTED = 'FETCH_ADVANCEDSEARCH_STARTED';
 export const FETCH_ADVANCEDSEARCH_SUCCESS = 'FETCH_ADVANCEDSEARCH_SUCCESS';

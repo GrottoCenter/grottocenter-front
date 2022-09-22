@@ -3,13 +3,13 @@ import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import SwaggerUI from 'swagger-ui-react';
 import 'swagger-ui-react/swagger-ui.css';
-import { swaggerLinkV1 } from '../../conf/Config';
+import { swaggerUrl } from '../../conf/apiRoutes';
 import Alert from '../common/Alert';
 
 const ApiDetail = ({ version }) => {
   const { formatMessage } = useIntl();
   if (version === 1) {
-    return <SwaggerUI url={swaggerLinkV1} />;
+    return <SwaggerUI url={swaggerUrl} />;
   }
   return (
     <Alert

@@ -1,5 +1,5 @@
 import fetch from 'isomorphic-fetch';
-import { postDescriptionUrl } from '../../conf/Config';
+import { postDescriptionUrl } from '../../conf/apiRoutes';
 import makeErrorMessage from '../../helpers/makeErrorMessage';
 import { checkAndGetStatus } from '../utils';
 

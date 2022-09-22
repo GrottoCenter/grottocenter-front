@@ -25,7 +25,7 @@ import Alert from '../../../common/Alert';
 
 import SearchTableActions from './SearchTableActions';
 import ResultsTableHead from './ResultsTableHead';
-import { ADVANCED_SEARCH_TYPES } from '../../../../conf/Config';
+import { ADVANCED_SEARCH_TYPES } from '../../../../conf/config';
 
 const StyledTableFooter = styled.div`
   align-items: center;

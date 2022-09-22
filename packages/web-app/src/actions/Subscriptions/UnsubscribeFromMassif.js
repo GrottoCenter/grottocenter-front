@@ -1,5 +1,5 @@
 import fetch from 'isomorphic-fetch';
-import { unsubscribeFromMassifUrl } from '../../conf/Config';
+import { unsubscribeFromMassifUrl } from '../../conf/apiRoutes';
 import makeErrorMessage from '../../helpers/makeErrorMessage';
 
 export const UNSUBSCRIBE_FROM_MASSIF = 'UNSUBSCRIBE_FROM_MASSIF';

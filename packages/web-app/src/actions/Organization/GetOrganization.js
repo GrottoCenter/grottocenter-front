@@ -1,5 +1,5 @@
 import fetch from 'isomorphic-fetch';
-import { findOrganizationUrl } from '../../conf/Config';
+import { getOrganizationUrl } from '../../conf/apiRoutes';
 import makeErrorMessage from '../../helpers/makeErrorMessage';
 
 export const FETCH_ORGANIZATION = 'FETCH_ORGANIZATION';
@@ -9,7 +9,7 @@ export const FETCH_ORGANIZATION_FAILURE = 'FETCH_ORGANIZATION_FAILURE';
 export function fetchOrganization(organizationId) {
   return dispatch => {
     dispatch({ type: FETCH_ORGANIZATION });
-    return fetch(`${findOrganizationUrl}${organizationId}`)
+    return fetch(`${getOrganizationUrl}${organizationId}`)
       .then(response => {
         if (response.status >= 400) {
           throw new Error(response.status);

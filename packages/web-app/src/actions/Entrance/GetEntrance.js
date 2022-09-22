@@ -1,6 +1,6 @@
 import fetch from 'isomorphic-fetch';
 
-import { getEntranceUrl } from '../../conf/Config';
+import { getEntranceUrl } from '../../conf/apiRoutes';
 
 import makeErrorMessage from '../../helpers/makeErrorMessage';
 

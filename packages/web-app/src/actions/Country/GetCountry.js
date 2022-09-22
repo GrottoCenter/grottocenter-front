@@ -1,5 +1,5 @@
 import fetch from 'isomorphic-fetch';
-import { findCountryUrl } from '../../conf/Config';
+import { getCountryUrl } from '../../conf/apiRoutes';
 import makeErrorMessage from '../../helpers/makeErrorMessage';
 import { checkAndGetStatus } from '../utils';
 
@@ -29,7 +29,7 @@ export function fetchCountry(countryId) {
       method: 'GET'
     };
 
-    return fetch(findCountryUrl(countryId), requestOptions)
+    return fetch(getCountryUrl(countryId), requestOptions)
       .then(checkAndGetStatus)
       .then(response => response.json())
       .then(data => {

@@ -1,6 +1,6 @@
 import fetch from 'isomorphic-fetch';
 
-import { postCreateCaveUrl } from '../conf/Config';
+import { postCreateCaveUrl } from '../conf/apiRoutes';
 import makeErrorMessage from '../helpers/makeErrorMessage';
 
 import {

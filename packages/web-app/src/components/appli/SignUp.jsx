@@ -4,7 +4,7 @@ import { useIntl } from 'react-intl';
 import { isEmpty, match } from 'ramda';
 
 import { useHistory } from 'react-router-dom';
-import { emailRegexp, PASSWORD_MIN_LENGTH } from '../../conf/Config';
+import { emailRegexp, PASSWORD_MIN_LENGTH } from '../../conf/config';
 import { postSignUp } from '../../actions/SignUp';
 import { useNotification, usePermissions } from '../../hooks';
 import SignUpForm from '../../pages/SignUpForm';

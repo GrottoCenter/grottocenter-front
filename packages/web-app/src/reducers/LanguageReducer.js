@@ -4,7 +4,7 @@ import {
   FETCH_LANGUAGES_FAILURE,
   FETCH_LANGUAGES_SUCCESS
 } from '../actions/Language';
-import { DEFAULT_LANGUAGE } from '../conf/Config';
+import { DEFAULT_LANGUAGE } from '../conf/config';
 
 const initialState = {
   lang: DEFAULT_LANGUAGE,

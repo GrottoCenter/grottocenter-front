@@ -9,7 +9,7 @@ import MassifsSearch from './MassifsSearch';
 import OrganizationsSearch from './OrganizationsSearch';
 
 import Translate from '../../common/Translate';
-import { ADVANCED_SEARCH_TYPES } from '../../../conf/Config';
+import { ADVANCED_SEARCH_TYPES } from '../../../conf/config';
 import SearchResults from './SearchResults';
 
 const TabIcon = styled.img`

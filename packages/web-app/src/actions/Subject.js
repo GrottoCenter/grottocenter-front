@@ -1,5 +1,5 @@
 import fetch from 'isomorphic-fetch';
-import { subjectsUrl, subjectsSearchUrl } from '../conf/Config';
+import { subjectsUrl, subjectsSearchUrl } from '../conf/apiRoutes';
 import makeErrorMessage from '../helpers/makeErrorMessage';
 
 export const FETCH_SUBJECTS = 'FETCH_SUBJECTS';

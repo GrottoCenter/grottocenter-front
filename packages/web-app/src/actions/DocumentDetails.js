@@ -1,5 +1,5 @@
 import fetch from 'isomorphic-fetch';
-import { getDocumentDetailsUrl } from '../conf/Config';
+import { getDocumentDetailsUrl } from '../conf/apiRoutes';
 import makeErrorMessage from '../helpers/makeErrorMessage';
 
 export const FETCH_DOCUMENT_DETAILS = 'FETCH_DOCUMENT_DETAILS';

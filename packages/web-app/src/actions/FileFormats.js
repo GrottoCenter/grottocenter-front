@@ -1,4 +1,4 @@
-import { getFileFormatsUrl } from '../conf/Config';
+import { getFileFormatsUrl } from '../conf/apiRoutes';
 import makeErrorMessage from '../helpers/makeErrorMessage';
 import { checkAndGetStatus } from './utils';
 

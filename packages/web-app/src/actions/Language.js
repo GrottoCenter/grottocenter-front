@@ -1,5 +1,5 @@
 import fetch from 'isomorphic-fetch';
-import { getLanguagesUrl } from '../conf/Config';
+import { getLanguagesUrl } from '../conf/apiRoutes';
 import makeErrorMessage from '../helpers/makeErrorMessage';
 
 export const FETCH_LANGUAGES = 'FETCH_LANGUAGES';

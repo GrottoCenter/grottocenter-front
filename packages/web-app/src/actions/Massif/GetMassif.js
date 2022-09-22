@@ -1,5 +1,5 @@
 import fetch from 'isomorphic-fetch';
-import { findMassifUrl } from '../../conf/Config';
+import { getMassifUrl } from '../../conf/apiRoutes';
 import makeErrorMessage from '../../helpers/makeErrorMessage';
 
 export const FETCH_MASSIF = 'FETCH_MASSIF';
@@ -24,7 +24,7 @@ export function loadMassif(massifId) {
   return dispatch => {
     dispatch(fetchMassif());
 
-    return fetch(findMassifUrl + massifId)
+    return fetch(getMassifUrl + massifId)
       .then(response => {
         if (response.status >= 400) {
           throw new Error(response.status);

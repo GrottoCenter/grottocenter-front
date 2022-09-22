@@ -1,9 +1,9 @@
 import fetch from 'isomorphic-fetch';
 import { pathOr } from 'ramda';
 import {
-  getDocuments as queryDocuments,
+  getDocumentsUrl as queryDocuments,
   getCaversDocumentsUrl
-} from '../../conf/Config';
+} from '../../conf/apiRoutes';
 import { getTotalCount, makeUrl } from '../utils';
 import makeErrorMessage from '../../helpers/makeErrorMessage';
 

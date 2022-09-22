@@ -1,5 +1,5 @@
 import fetch from 'isomorphic-fetch';
-import { associateDocumentToEntranceUrl } from '../conf/Config';
+import { associateDocumentToEntranceUrl } from '../conf/apiRoutes';
 
 export const ASSOCIATE_DOCUMENT_TO_ENTRANCE = 'ASSOCIATE_DOCUMENT_TO_ENTRANCE';
 export const ASSOCIATE_DOCUMENT_TO_ENTRANCE_SUCCESS =

@@ -1,5 +1,5 @@
 import fetch from 'isomorphic-fetch';
-import { postPersonUrl } from '../../conf/Config';
+import { postPersonUrl } from '../../conf/apiRoutes';
 
 export const POST_PERSON = 'POST_PERSON';
 export const POST_PERSON_SUCCESS = 'POST_PERSON_SUCCESS';

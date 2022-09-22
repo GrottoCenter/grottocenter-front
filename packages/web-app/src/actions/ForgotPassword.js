@@ -1,5 +1,5 @@
 import fetch from 'isomorphic-fetch';
-import { forgotPassword } from '../conf/Config';
+import { forgotPasswordUrl } from '../conf/apiRoutes';
 import makeErrorMessage from '../helpers/makeErrorMessage';
 
 export const FETCH_FORGOT_PASSWORD = 'FETCH_FORGOT_PASSWORD';
@@ -33,7 +33,7 @@ export function postForgotPassword(data) {
       body: JSON.stringify(data)
     };
 
-    return fetch(forgotPassword, requestOptions)
+    return fetch(forgotPasswordUrl, requestOptions)
       .then(response => {
         if (response.ok) {
           // there is no content in the response in case of success

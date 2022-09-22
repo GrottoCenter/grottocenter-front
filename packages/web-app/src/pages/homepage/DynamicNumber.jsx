@@ -5,7 +5,7 @@ import SyncKOIcon from '@material-ui/icons/SyncProblem';
 import IconButton from '@material-ui/core/IconButton';
 import { withStyles } from '@material-ui/core/styles';
 import { loadDynamicNumber } from '../../actions/DynamicNumber';
-import { DYNAMIC_NUMBER_RELOAD_INTERVAL } from '../../conf/Config';
+import { DYNAMIC_NUMBER_RELOAD_INTERVAL } from '../../conf/config';
 
 const StyledIconButton = withStyles(
   theme => ({

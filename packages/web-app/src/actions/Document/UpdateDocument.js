@@ -7,7 +7,7 @@ import {
 import {
   putDocumentUrl,
   putDocumentyWithNewEntitiesUrl
-} from '../../conf/Config';
+} from '../../conf/apiRoutes';
 import { checkAndGetStatus } from '../utils';
 import { buildFormData } from './utils';
 

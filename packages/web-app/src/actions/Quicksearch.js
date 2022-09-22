@@ -1,5 +1,5 @@
 import fetch from 'isomorphic-fetch';
-import { quicksearchUrl } from '../conf/Config';
+import { quicksearchUrl } from '../conf/apiRoutes';
 import makeErrorMessage from '../helpers/makeErrorMessage';
 
 // A C T I O N S

@@ -1,6 +1,6 @@
 // import fetch from 'isomorphic-fetch';
 import { decode } from 'jsonwebtoken';
-import { loginUrl } from '../conf/Config';
+import { loginUrl } from '../conf/apiRoutes';
 import makeErrorMessage from '../helpers/makeErrorMessage';
 
 // ==========

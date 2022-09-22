@@ -1,5 +1,5 @@
 import fetch from 'isomorphic-fetch';
-import { dynamicNumbersUrl } from '../conf/Config';
+import { dynamicNumbersUrl } from '../conf/apiRoutes';
 import makeErrorMessage from '../helpers/makeErrorMessage';
 
 export const INIT_DYNNB_FETCHER = 'INIT_DYNNB_FETCHER';

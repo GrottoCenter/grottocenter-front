@@ -11,7 +11,7 @@ import {
 } from '../../../../actions/Advancedsearch';
 import { loadDocumentTypes } from '../../../../actions/DocumentType';
 import { loadSubjects } from '../../../../actions/Subject';
-import { ADVANCED_SEARCH_TYPES } from '../../../../conf/Config';
+import { ADVANCED_SEARCH_TYPES } from '../../../../conf/config';
 import DocumentSearch from '../../AdvancedSearch/DocumentSearch';
 import SearchResults from '../../AdvancedSearch/SearchResults';
 import SelectedDocumentsTable from './SelectedDocumentsTable';

@@ -1,5 +1,5 @@
 import fetch from 'isomorphic-fetch';
-import { changeEmailUrl } from '../conf/Config';
+import { changeEmailUrl } from '../conf/apiRoutes';
 import makeErrorMessage from '../helpers/makeErrorMessage';
 
 // ==========

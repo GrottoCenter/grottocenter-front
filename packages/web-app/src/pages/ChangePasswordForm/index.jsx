@@ -13,7 +13,7 @@ import Visibility from '@material-ui/icons/Visibility';
 import VisibilityOff from '@material-ui/icons/VisibilityOff';
 import styled from 'styled-components';
 
-import { PASSWORD_MIN_LENGTH } from '../../conf/Config';
+import { PASSWORD_MIN_LENGTH } from '../../conf/config';
 import Layout from '../../components/common/Layouts/Fixed/FixedContent';
 import StringInput from '../../components/common/Form/StringInput';
 

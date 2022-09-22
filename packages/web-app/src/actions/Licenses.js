@@ -1,4 +1,4 @@
-import { getLicensesUrl } from '../conf/Config';
+import { getLicensesUrl } from '../conf/apiRoutes';
 import makeErrorMessage from '../helpers/makeErrorMessage';
 import { checkAndGetStatus } from './utils';
 

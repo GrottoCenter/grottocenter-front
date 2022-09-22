@@ -14,7 +14,7 @@ import Divider from '@material-ui/core/Divider';
 import { withStyles } from '@material-ui/core/styles';
 import styled from 'styled-components';
 import GCLink from '../GCLink';
-import { DYNAMIC_NEWS_RELOAD_INTERVAL } from '../../../conf/Config';
+import { DYNAMIC_NEWS_RELOAD_INTERVAL } from '../../../conf/config';
 
 const StyledCardMedia = withStyles({
   root: {

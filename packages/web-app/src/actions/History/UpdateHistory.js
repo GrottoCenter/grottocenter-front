@@ -1,5 +1,5 @@
 import fetch from 'isomorphic-fetch';
-import { putHistoryUrl } from '../../conf/Config';
+import { putHistoryUrl } from '../../conf/apiRoutes';
 
 export const UPDATE_HISTORY = 'UPDATE_HISTORY';
 export const UPDATE_HISTORY_SUCCESS = 'UPDATE_HISTORY_SUCCESS';

@@ -5,7 +5,7 @@ import { isEmpty, match } from 'ramda';
 import { useHistory } from 'react-router-dom';
 import { hideLoginDialog, postLogin } from '../../actions/Login';
 
-import { emailRegexp } from '../../conf/Config';
+import { emailRegexp } from '../../conf/config';
 import Translate from '../common/Translate';
 import StandardDialog from '../common/StandardDialog';
 import LoginForm from '../common/LoginForm';

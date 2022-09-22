@@ -7,11 +7,11 @@ import {
   getDuplicatesEntranceUrl,
   deleteDuplicatesDocumentUrl,
   deleteDuplicatesEntranceUrl,
-  createNewEntranceFromDuplicate,
-  createNewDocumentFromDuplicate,
+  createNewEntranceFromDuplicateUrl,
+  createNewDocumentFromDuplicateUrl,
   deleteDuplicateEntranceUrl,
   deleteDuplicateDocumentUrl
-} from '../conf/Config';
+} from '../conf/apiRoutes';
 import { checkAndGetStatus, makeUrl } from './utils';
 import makeErrorMessage from '../helpers/makeErrorMessage';
 
@@ -273,10 +273,10 @@ export const createNewEntityFromDuplicate = (id, duplicateType) => (
   let url = '';
   switch (duplicateType) {
     case 'entrance':
-      url = createNewEntranceFromDuplicate;
+      url = createNewEntranceFromDuplicateUrl;
       break;
     case 'document':
-      url = createNewDocumentFromDuplicate;
+      url = createNewDocumentFromDuplicateUrl;
       break;
     default:
       return dispatch(loadDuplicateFailure('Incorrect type of duplicates.'));

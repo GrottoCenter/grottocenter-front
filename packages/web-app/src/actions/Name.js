@@ -1,5 +1,5 @@
 import fetch from 'isomorphic-fetch';
-import { patchNameUrl } from '../conf/Config';
+import { patchNameUrl } from '../conf/apiRoutes';
 import makeErrorMessage from '../helpers/makeErrorMessage';
 
 export const UPDATE_NAME = 'UPDATE_NAME';
