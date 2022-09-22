@@ -5,7 +5,7 @@ import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import Dropzone from 'react-dropzone-uploader';
-import { MAX_ORGANIZATION_LOGO_SIZE_IN_BYTES } from '../../../../conf/Config';
+import { MAX_ORGANIZATION_LOGO_SIZE_IN_BYTES } from '../../../../conf/config';
 import 'react-phone-input-2/lib/style.css';
 import 'react-dropzone-uploader/dist/styles.css';
 

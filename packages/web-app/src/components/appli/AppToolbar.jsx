@@ -7,7 +7,7 @@ import styled from 'styled-components';
 
 import HeaderTitle from './HeaderTitle';
 import SideMenuBurgerConnector from '../../containers/SideMenuBurgerConnector';
-import { sideMenuWidth } from '../../conf/Config';
+import { sideMenuWidth } from '../../conf/config';
 import Translate from '../common/Translate';
 
 const StyledHelpIcon = withStyles(

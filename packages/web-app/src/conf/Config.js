@@ -1,7 +1,5 @@
 import _ from 'underscore.string';
 
-const apiVersion = 'v1';
-const API_URL = process.env.REACT_APP_API_URL;
 export const LEFT_TO_RIGHT = 'LTR';
 export const RIGHT_TO_LEFT = 'RTL';
 
@@ -57,10 +55,6 @@ function generateLinks(link, defaultLang) {
 }
 
 // ===== Misc links
-
-export const FR_GC_BLOG = `${API_URL}/api/rss/FR`;
-export const EN_GC_BLOG = `${API_URL}/api/rss/EN`;
-
 export const bbsLink = {
   '*': 'https://www.ssslib.ch/bbs/'
 };
@@ -162,144 +156,6 @@ export const paypalId = 'TJEU7C2TZ356Y';
 export const paypalLink = 'https://www.paypal.com/cgi-bin/webscr';
 export const paypalImgLink =
   'https://www.paypalobjects.com/fr_FR/i/scr/pixel.gif';
-
-// ===== Grottocenter API routes
-
-export const dynamicNumbersUrl = {
-  documents: `${API_URL}/api/${apiVersion}/documents/count`,
-  entrances: `${API_URL}/api/${apiVersion}/entrances/count`,
-  officialPartners: `${API_URL}/api/${apiVersion}/partners/count`,
-  organizations: `${API_URL}/api/${apiVersion}/organizations/count`,
-  publicEntrances: `${API_URL}/api/${apiVersion}/entrances/publicCount`,
-  users: `${API_URL}/api/${apiVersion}/cavers/users/count`
-};
-
-export const fetchConvert = `${API_URL}/api/convert`;
-export const findRandomEntranceUrl = `${API_URL}/api/${apiVersion}/entrances/findRandom`;
-export const findForCarouselUrl = `${API_URL}/api/${apiVersion}/partners/findForCarousel`;
-export const getMapCavesUrl = `${API_URL}/api/${apiVersion}/geoloc/caves`;
-export const getMapCavesCoordinatesUrl = `${API_URL}/api/${apiVersion}/geoloc/cavesCoordinates`;
-export const getMapEntrancesUrl = `${API_URL}/api/${apiVersion}/geoloc/entrances`;
-export const getMapEntrancesCoordinatesUrl = `${API_URL}/api/${apiVersion}/geoloc/entrancesCoordinates`;
-export const getMapGrottosUrl = `${API_URL}/api/${apiVersion}/geoloc/grottos`;
-export const getCaversDocumentsUrl = caverId =>
-  `${API_URL}/api/${apiVersion}/cavers/${caverId}/documents`;
-export const postCreateEntranceUrl = `${API_URL}/api/${apiVersion}/entrances`;
-export const postCreateCaveUrl = `${API_URL}/api/${apiVersion}/caves`;
-export const findMassifUrl = `${API_URL}/api/${apiVersion}/massifs/`;
-export const postCreateMassifUrl = `${API_URL}/api/${apiVersion}/massifs/`;
-export const putMassifUrl = massifId =>
-  `${API_URL}/api/${apiVersion}/massifs/${massifId}`;
-export const findOrganizationUrl = `${API_URL}/api/${apiVersion}/organizations/`;
-export const findUserUrl = `${API_URL}/api/${apiVersion}/cavers/`;
-export const advancedsearchUrl = `${API_URL}/api/${apiVersion}/advanced-search`;
-export const quicksearchUrl = `${API_URL}/api/${apiVersion}/search`;
-export const subjectsUrl = `${API_URL}/api/${apiVersion}/documents/subjects`;
-export const subjectsSearchUrl = `${API_URL}/api/${apiVersion}/documents/subjects/search/logical/or`;
-export const getDocumentTypesUrl = `${API_URL}/api/${apiVersion}/documents/types`;
-export const getDocuments = `${API_URL}/api/${apiVersion}/documents`;
-export const getDocumentChildren = documentId =>
-  `${API_URL}/api/${apiVersion}/documents/${documentId}/children`;
-export const processDocumentIds = `${API_URL}/api/${apiVersion}/documents/validate`;
-export const getDocumentDetailsUrl = `${API_URL}/api/${apiVersion}/documents/`;
-export const getEntranceUrl = `${API_URL}/api/${apiVersion}/entrances/`;
-export const getCaveUrl = `${API_URL}/api/${apiVersion}/caves/`;
-export const getLanguagesUrl = `${API_URL}/api/${apiVersion}/languages`;
-export const postPersonUrl = `${API_URL}/api/${apiVersion}/cavers`;
-export const putCaverUrl = userId =>
-  `${API_URL}/api/${apiVersion}/cavers/${userId}`;
-export const postDocumentUrl = `${API_URL}/api/${apiVersion}/documents`;
-export const putDocumentUrl = documentId =>
-  `${API_URL}/api/${apiVersion}/documents/${documentId}`;
-export const postOrganizationUrl = `${API_URL}/api/${apiVersion}/organizations`;
-export const putOrganizationUrl = organizationId =>
-  `${API_URL}/api/${apiVersion}/organizations/${organizationId}`;
-export const regionsSearchUrl = `${API_URL}/api/${apiVersion}/regions/search/logical/or`;
-export const identifierTypesUrl = `${API_URL}/api/${apiVersion}/documents/identifierTypes`;
-export const getAdminsUrl = `${API_URL}/api/${apiVersion}/cavers/admins`;
-export const getModeratorsUrl = `${API_URL}/api/${apiVersion}/cavers/moderators`;
-export const postPersonGroupsUrl = userId =>
-  `${API_URL}/api/${apiVersion}/cavers/${userId}/groups`;
-export const getLicensesUrl = `${API_URL}/api/v1/licenses`;
-export const getFileFormatsUrl = `${API_URL}/api/v1/file-formats`;
-export const entranceDetailPath = `${API_URL}/api/${apiVersion}/entrances/`;
-export const putCaveUrl = caveId =>
-  `${API_URL}/api/${apiVersion}/caves/${caveId}`;
-export const putEntranceUrl = entranceId =>
-  `${API_URL}/api/${apiVersion}/entrances/${entranceId}`;
-export const putEntranceWithNewEntitiesUrl = entranceId =>
-  `${API_URL}/api/${apiVersion}/entrances/${entranceId}/new-entities`;
-export const putDocumentyWithNewEntitiesUrl = docId =>
-  `${API_URL}/api/${apiVersion}/documents/${docId}/new-entities`;
-export const postLocationUrl = `${API_URL}/api/${apiVersion}/locations`;
-export const putLocationUrl = locationId =>
-  `${API_URL}/api/${apiVersion}/locations/${locationId}`;
-export const postHistoryUrl = `${API_URL}/api/${apiVersion}/histories`;
-export const putHistoryUrl = historyId =>
-  `${API_URL}/api/${apiVersion}/histories/${historyId}`;
-export const postDescriptionUrl = `${API_URL}/api/${apiVersion}/descriptions`;
-export const putDescriptionUrl = descriptionId =>
-  `${API_URL}/api/${apiVersion}/descriptions/${descriptionId}`;
-export const patchNameUrl = id => `${API_URL}/api/${apiVersion}/names/${id}`;
-export const associateDocumentToEntranceUrl = (entranceId, documentId) =>
-  `${API_URL}/api/${apiVersion}/entrances/${entranceId}/documents/${documentId}`;
-export const moveEntranceToCaveUrl = (entranceId, caveId) =>
-  `${API_URL}/api/${apiVersion}/entrances/${entranceId}/cave/${caveId}`;
-export const findCountryUrl = countryId =>
-  `${API_URL}/api/${apiVersion}/countries/${countryId}`;
-export const countUnreadNotificationsUrl = `${API_URL}/api/${apiVersion}/notifications/unread/count`;
-export const fetchNotificationsUrl = `${API_URL}/api/${apiVersion}/notifications`;
-export const readNotificationUrl = notificationId =>
-  `${API_URL}/api/${apiVersion}/notifications/${notificationId}/read`;
-
-// ===== Subscriptions urls
-export const fetchSubscriptionsUrl = caverId =>
-  `${API_URL}/api/${apiVersion}/cavers/${caverId}/subscriptions`;
-export const subscribeToMassifUrl = massifId =>
-  `${API_URL}/api/${apiVersion}/massifs/${massifId}/subscribe`;
-export const unsubscribeFromMassifUrl = massifId =>
-  `${API_URL}/api/${apiVersion}/massifs/${massifId}/unsubscribe`;
-export const subscribeToCountryUrl = countryId =>
-  `${API_URL}/api/${apiVersion}/countries/${countryId}/subscribe`;
-export const unsubscribeFromCountryUrl = countryId =>
-  `${API_URL}/api/${apiVersion}/countries/${countryId}/unsubscribe`;
-
-// ===== ImportCSV url
-export const checkRowsEntrancesUrl = `${API_URL}/api/${apiVersion}/entrances/check-rows`;
-export const checkRowsDocumentsUrl = `${API_URL}/api/${apiVersion}/documents/check-rows`;
-export const importRowsEntrancesUrl = `${API_URL}/api/${apiVersion}/entrances/import-rows`;
-export const importRowsDocumentsUrl = `${API_URL}/api/${apiVersion}/documents/import-rows`;
-
-// ===== Auth url
-export const changePasswordUrl = `${API_URL}/api/${apiVersion}/account/password`;
-export const changeEmailUrl = `${API_URL}/api/${apiVersion}/account/email`;
-export const loginUrl = `${API_URL}/api/${apiVersion}/login`;
-export const logoutUrl = `${API_URL}/api/${apiVersion}/logout`;
-export const signUpUrl = `${API_URL}/api/${apiVersion}/signup`;
-export const forgotPassword = `${API_URL}/api/${apiVersion}/forgotPassword`;
-
-// ===== Duplicates urls
-export const createNewEntranceFromDuplicate = id =>
-  `${API_URL}/api/${apiVersion}/entrances/from-duplicate/${id}`;
-export const createNewDocumentFromDuplicate = id =>
-  `${API_URL}/api/${apiVersion}/documents/from-duplicate/${id}`;
-
-export const getDuplicatesDocumentUrl = `${API_URL}/api/${apiVersion}/document-duplicates`;
-export const getDuplicatesEntranceUrl = `${API_URL}/api/${apiVersion}/entrance-duplicates`;
-export const getDuplicateDocumentUrl = duplicateId =>
-  `${API_URL}/api/${apiVersion}/document-duplicates/${duplicateId}`;
-export const getDuplicateEntranceUrl = duplicateId =>
-  `${API_URL}/api/${apiVersion}/entrance-duplicates/${duplicateId}`;
-
-export const deleteDuplicatesDocumentUrl = `${API_URL}/api/${apiVersion}/document-duplicates`;
-export const deleteDuplicatesEntranceUrl = `${API_URL}/api/${apiVersion}/entrance-duplicates`;
-export const deleteDuplicateDocumentUrl = id =>
-  `${API_URL}/api/${apiVersion}/document-duplicates/${id}`;
-export const deleteDuplicateEntranceUrl = id =>
-  `${API_URL}/api/${apiVersion}/entrance-duplicates/${id}`;
-
-// ===== Grottocenter Client routes
-export const swaggerLinkV1 = `${API_URL}/api/v1/swagger.yaml`;
 
 // ===== Misc config values
 export const emailRegexp = /\S+@\S+/; // simple regexp TODO: use another one more robust

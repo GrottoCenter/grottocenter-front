@@ -1,5 +1,5 @@
 import fetch from 'isomorphic-fetch';
-import { putCaveUrl } from '../../conf/Config';
+import { putCaveUrl } from '../../conf/apiRoutes';
 import makeErrorMessage from '../../helpers/makeErrorMessage';
 
 export const UPDATE_CAVE = 'UPDATE_CAVE';

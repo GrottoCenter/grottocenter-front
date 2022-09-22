@@ -1,5 +1,5 @@
 import fetch from 'isomorphic-fetch';
-import { signUpUrl } from '../conf/Config';
+import { signUpUrl } from '../conf/apiRoutes';
 import makeErrorMessage from '../helpers/makeErrorMessage';
 
 // ==========

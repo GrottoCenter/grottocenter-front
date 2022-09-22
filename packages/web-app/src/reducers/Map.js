@@ -17,7 +17,7 @@ import {
   FETCH_MAP_END_LOADING,
   LOADINGS
 } from '../actions/Map';
-import { defaultCoord, defaultZoom, focusZoom } from '../conf/Config';
+import { defaultCoord, defaultZoom, focusZoom } from '../conf/config';
 
 const initialState = {
   networksCoordinates: [],

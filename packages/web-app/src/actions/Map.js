@@ -5,7 +5,7 @@ import {
   getMapEntrancesUrl,
   getMapEntrancesCoordinatesUrl,
   getMapGrottosUrl
-} from '../conf/Config';
+} from '../conf/apiRoutes';
 import makeErrorMessage from '../helpers/makeErrorMessage';
 import { makeUrl } from './utils';
 

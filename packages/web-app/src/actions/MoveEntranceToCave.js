@@ -1,5 +1,5 @@
 import fetch from 'isomorphic-fetch';
-import { moveEntranceToCaveUrl } from '../conf/Config';
+import { moveEntranceToCaveUrl } from '../conf/apiRoutes';
 import makeErrorMessage from '../helpers/makeErrorMessage';
 
 export const MOVE_ENTRANCE_TO_CAVE = 'MOVE_ENTRANCE_TO_CAVE';

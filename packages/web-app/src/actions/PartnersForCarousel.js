@@ -1,5 +1,5 @@
 import fetch from 'isomorphic-fetch';
-import { findForCarouselUrl } from '../conf/Config';
+import { getForCarouselUrl } from '../conf/apiRoutes';
 import makeErrorMessage from '../helpers/makeErrorMessage';
 
 export const FETCH_PARTNERS_FC = 'FETCH_PARTNERS_FC';
@@ -25,7 +25,7 @@ export function loadPartnersForCarousel() {
   return function(dispatch) {
     dispatch(fetchPartnersForCarousel());
 
-    return fetch(findForCarouselUrl)
+    return fetch(getForCarouselUrl)
       .then(response => {
         if (response.status >= 400) {
           throw new Error(response.status);

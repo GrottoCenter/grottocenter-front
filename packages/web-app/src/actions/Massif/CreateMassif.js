@@ -1,5 +1,5 @@
 import fetch from 'isomorphic-fetch';
-import { postCreateMassifUrl } from '../../conf/Config';
+import { postCreateMassifUrl } from '../../conf/apiRoutes';
 import makeErrorMessage from '../../helpers/makeErrorMessage';
 
 export const POST_MASSIF = 'POST_MASSIF';

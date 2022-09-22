@@ -1,5 +1,5 @@
 import fetch from 'isomorphic-fetch';
-import { unsubscribeFromCountryUrl } from '../../conf/Config';
+import { unsubscribeFromCountryUrl } from '../../conf/apiRoutes';
 import makeErrorMessage from '../../helpers/makeErrorMessage';
 
 export const UNSUBSCRIBE_FROM_COUNTRY = 'UNSUBSCRIBE_FROM_COUNTRY';

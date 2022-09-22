@@ -1,5 +1,5 @@
 import { keys, includes } from 'ramda';
-import { DEFAULT_LANGUAGE, AVAILABLE_LANGUAGES } from '../conf/Config';
+import { DEFAULT_LANGUAGE, AVAILABLE_LANGUAGES } from '../conf/config';
 import { CHANGE_LOCALE } from '../actions/Intl';
 import translations from '../lang';
 

@@ -3,7 +3,7 @@ import fetch from 'isomorphic-fetch';
 import {
   putEntranceWithNewEntitiesUrl,
   putEntranceUrl
-} from '../../conf/Config';
+} from '../../conf/apiRoutes';
 
 import makeErrorMessage from '../../helpers/makeErrorMessage';
 import { checkStatusAndGetText } from '../utils';

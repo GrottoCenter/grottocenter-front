@@ -4,7 +4,7 @@ import ChevronIcon from '@material-ui/icons/ChevronRight';
 import HomeIcon from '@material-ui/icons/Home';
 import { withTheme } from '@material-ui/core/styles';
 import styled from 'styled-components';
-import { breadcrumpKeys } from '../../../conf/Config';
+import { breadcrumpKeys } from '../../../conf/config';
 import GCLink from '../../common/GCLink';
 import Translate from '../../common/Translate';
 

@@ -1,5 +1,5 @@
 import fetch from 'isomorphic-fetch';
-import { fetchSubscriptionsUrl } from '../../conf/Config';
+import { getSubscriptionsUrl } from '../../conf/apiRoutes';
 import makeErrorMessage from '../../helpers/makeErrorMessage';
 import { checkAndGetStatus } from '../utils';
 
@@ -30,7 +30,7 @@ export function fetchSubscriptions(caverId) {
       headers: getState().login.authorizationHeader
     };
 
-    return fetch(fetchSubscriptionsUrl(caverId), requestOptions)
+    return fetch(getSubscriptionsUrl(caverId), requestOptions)
       .then(checkAndGetStatus)
       .then(response => response.json())
       .then(data => {

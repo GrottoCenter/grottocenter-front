@@ -1,5 +1,5 @@
 import fetch from 'isomorphic-fetch';
-import { fetchConvert } from '../conf/Config';
+import { getProjectionsUrl } from '../conf/apiRoutes';
 import makeErrorMessage from '../helpers/makeErrorMessage';
 
 export const FETCH_PROJECTIONS_SUCCESS = 'FETCH_PROJECTIONS_SUCCESS';
@@ -8,7 +8,7 @@ export const FETCH_PROJECTIONS_LOADING = 'FETCH_PROJECTIONS_LOADING';
 
 export const fetchProjections = () => dispatch => {
   dispatch({ type: FETCH_PROJECTIONS_LOADING });
-  return fetch(fetchConvert)
+  return fetch(getProjectionsUrl)
     .then(response => {
       if (response.status >= 400) {
         throw new Error(response.status);

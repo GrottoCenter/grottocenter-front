@@ -6,7 +6,7 @@ import { Button, CircularProgress, Typography } from '@material-ui/core';
 import styled from 'styled-components';
 import { isEmpty, match } from 'ramda';
 
-import { emailRegexp } from '../conf/Config';
+import { emailRegexp } from '../conf/config';
 import Layout from '../components/common/Layouts/Fixed/FixedContent';
 import StringInput from '../components/common/Form/StringInput';
 

@@ -11,7 +11,7 @@ import styled from 'styled-components';
 import Translate from '../common/Translate';
 import SimpleMenuEntryConnector from '../../containers/SimpleMenuEntryConnector';
 import ComplexMenuEntryConnector from '../../containers/ComplexMenuEntryConnector';
-import { sideMenuWidth } from '../../conf/Config';
+import { sideMenuWidth } from '../../conf/config';
 
 const Menubar = withTheme(styled(Drawer)`
   > div {

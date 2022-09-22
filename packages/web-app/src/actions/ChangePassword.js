@@ -1,5 +1,5 @@
 import fetch from 'isomorphic-fetch';
-import { changePasswordUrl } from '../conf/Config';
+import { changePasswordUrl } from '../conf/apiRoutes';
 import makeErrorMessage from '../helpers/makeErrorMessage';
 
 // ==========

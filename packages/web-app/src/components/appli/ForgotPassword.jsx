@@ -4,7 +4,7 @@ import { useIntl } from 'react-intl';
 import { isEmpty, match } from 'ramda';
 
 import { useHistory } from 'react-router-dom';
-import { emailRegexp } from '../../conf/Config';
+import { emailRegexp } from '../../conf/config';
 import { postForgotPassword } from '../../actions/ForgotPassword';
 import { useBoolean, useNotification, usePermissions } from '../../hooks';
 import ForgotPasswordPage from '../../pages/ForgotPassword';

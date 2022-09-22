@@ -22,7 +22,7 @@ import GCReducer from './reducers/GCReducer';
 import { changeLanguage, loadLanguages } from './actions/Language';
 import Application from './pages/Application';
 import ErrorHandler from './components/appli/ErrorHandler';
-import { DEFAULT_LANGUAGE, AVAILABLE_LANGUAGES } from './conf/Config';
+import { DEFAULT_LANGUAGE, AVAILABLE_LANGUAGES } from './conf/config';
 import './App.css';
 import './animations.css';
 

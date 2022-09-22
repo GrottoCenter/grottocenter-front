@@ -1,5 +1,5 @@
 import fetch from 'isomorphic-fetch';
-import { postPersonGroupsUrl } from '../../conf/Config';
+import { postPersonGroupsUrl } from '../../conf/apiRoutes';
 
 // ==========
 

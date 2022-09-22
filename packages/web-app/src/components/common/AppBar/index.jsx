@@ -13,7 +13,7 @@ import { isMobileOnly } from 'react-device-detect';
 
 import LanguageSelector from '../LanguageSelector';
 import UserMenu from './User';
-import { logoGC } from '../../../conf/Config';
+import { logoGC } from '../../../conf/config';
 import NotificationMenu from '../../appli/NotificationMenu';
 
 const StyledMuiAppBar = styled(MuiAppBar)`

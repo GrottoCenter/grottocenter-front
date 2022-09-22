@@ -1,6 +1,6 @@
 import fetch from 'isomorphic-fetch';
 
-import { postDocumentUrl } from '../../conf/Config';
+import { postDocumentUrl } from '../../conf/apiRoutes';
 import { buildFormData } from './utils';
 
 // ==========

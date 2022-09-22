@@ -1,5 +1,5 @@
 import fetch from 'isomorphic-fetch';
-import { subscribeToCountryUrl } from '../../conf/Config';
+import { subscribeToCountryUrl } from '../../conf/apiRoutes';
 import makeErrorMessage from '../../helpers/makeErrorMessage';
 
 export const SUBSCRIBE_TO_COUNTRY = 'SUBSCRIBE_TO_COUNTRY';

@@ -1,6 +1,6 @@
 import fetch from 'isomorphic-fetch';
 import { pipe, defaultTo, map } from 'ramda';
-import { processDocumentIds } from '../conf/Config';
+import { processDocumentIdsUrl } from '../conf/apiRoutes';
 import makeErrorMessage from '../helpers/makeErrorMessage';
 
 export const POST_PROCESS_DOCUMENTS = 'POST_PROCESS_DOCUMENTS';
@@ -40,7 +40,7 @@ export const postProcessDocuments = (ids, isValidated, comment) => (
     headers: getState().login.authorizationHeader
   };
 
-  return fetch(processDocumentIds, requestOptions)
+  return fetch(processDocumentIdsUrl, requestOptions)
     .then(response => {
       if (response.status >= 400) {
         throw new Error(response.status);

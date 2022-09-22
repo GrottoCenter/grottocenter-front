@@ -7,7 +7,7 @@ import {
   HIDE_LOGIN_DIALOG,
   LOGOUT
 } from '../actions/Login';
-import { authTokenName } from '../conf/Config';
+import { authTokenName } from '../conf/config';
 
 const removeTokenFromLocalStorage = () => {
   window.localStorage.removeItem(authTokenName);

@@ -12,7 +12,7 @@ import DocumentAuthorizationSelect from '../../appli/Form/DocumentAuthorizationS
 import ErrorsList from './ErrorsList';
 import { useFileFormats } from '../../../hooks';
 import OptionSelect from './OptionSelect';
-import { MAX_SIZE_OF_UPLOADED_FILES } from '../../../conf/Config';
+import { MAX_SIZE_OF_UPLOADED_FILES } from '../../../conf/config';
 import { IS_DELETED, IS_INTACT, IS_MODIFIED, IS_NEW } from './FileHelpers';
 import { idNameTypeExtended } from '../../../types/idName.type';
 

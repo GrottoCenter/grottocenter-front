@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { ADVANCED_SEARCH_TYPES } from '../../../../conf/Config';
+import { ADVANCED_SEARCH_TYPES } from '../../../../conf/config';
 
 import DocumentsTableHead from './DocumentsTableHead';
 import EntrancesTableHead from './EntrancesTableHead';

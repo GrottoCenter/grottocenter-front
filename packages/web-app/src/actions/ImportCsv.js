@@ -4,7 +4,7 @@ import {
   checkRowsDocumentsUrl,
   importRowsEntrancesUrl,
   importRowsDocumentsUrl
-} from '../conf/Config';
+} from '../conf/apiRoutes';
 import { checkStatusAndGetText } from './utils';
 
 export const CHECK_ROWS_START = 'CHECK_ROWS_START';

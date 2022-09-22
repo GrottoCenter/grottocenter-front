@@ -1,5 +1,9 @@
 import fetch from 'isomorphic-fetch';
-import { getAdminsUrl, getModeratorsUrl, findUserUrl } from '../../conf/Config';
+import {
+  getAdminsUrl,
+  getModeratorsUrl,
+  getCaverUrl
+} from '../../conf/apiRoutes';
 import makeErrorMessage from '../../helpers/makeErrorMessage';
 
 // ==========
@@ -50,7 +54,7 @@ export function loadPerson(personId) {
   return dispatch => {
     dispatch(fetchPerson());
 
-    return fetch(findUserUrl + personId)
+    return fetch(getCaverUrl + personId)
       .then(response => {
         if (response.status >= 400) {
           throw new Error(response.status);
