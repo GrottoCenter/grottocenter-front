@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { Typography } from '@material-ui/core';
 import { useIntl } from 'react-intl';
 import InternationalizedLink from '../InternationalizedLink';
-import { licenceLinks, licensesODBLink } from '../../../conf/Config';
+import { licenceLinks, licensesODBLink } from '../../../conf/externalLinks';
 import GCLogo from '../GCLogo';
 
 const LogoFooter = styled(GCLogo)`

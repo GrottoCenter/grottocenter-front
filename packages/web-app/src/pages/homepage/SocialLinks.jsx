@@ -8,7 +8,7 @@ import {
   facebookLink,
   twitterLink,
   githubLink
-} from '../../conf/Config';
+} from '../../conf/externalLinks';
 
 const SocialLinksList = styled.ul`
   list-style: none;

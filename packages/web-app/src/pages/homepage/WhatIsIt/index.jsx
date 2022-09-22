@@ -9,7 +9,7 @@ import {
 } from '../../../helpers/GridSystem';
 import Translate from '../../../components/common/Translate';
 import InternationalizedLink from '../../../components/common/InternationalizedLink';
-import { wikiBBSLinks } from '../../../conf/Config';
+import { wikiBBSLinks } from '../../../conf/externalLinks';
 import DynamicNumberConnector from '../../../containers/DynamicNumberConnector';
 
 import './style.css';

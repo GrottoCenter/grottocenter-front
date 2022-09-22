@@ -7,7 +7,11 @@ import { useSelector } from 'react-redux';
 
 import GCLink from '../common/GCLink';
 import InternationalizedLink from '../common/InternationalizedLink';
-import { restApiLinks, wikiApiLinks, contactLinks } from '../../conf/Config';
+import {
+  restApiLinks,
+  wikiApiLinks,
+  contactLinks
+} from '../../conf/externalLinks';
 import Translate from '../common/Translate';
 import Layout from '../common/Layouts/Fixed/FixedContent';
 

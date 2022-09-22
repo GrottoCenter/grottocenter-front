@@ -8,7 +8,7 @@ import { useWatch } from 'react-hook-form';
 import { Box, Typography } from '@material-ui/core';
 
 import InternationalizedLink from '../InternationalizedLink';
-import { licensesODBLink } from '../../../conf/Config';
+import { licensesODBLink } from '../../../conf/externalLinks';
 import Property from './Property';
 
 const LicenceImage = styled.img`

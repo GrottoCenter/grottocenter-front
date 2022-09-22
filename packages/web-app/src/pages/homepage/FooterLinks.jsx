@@ -8,7 +8,7 @@ import {
   legalLinks,
   contributorsLink,
   userguideLinks
-} from '../../conf/Config';
+} from '../../conf/externalLinks';
 import Translate from '../../components/common/Translate';
 
 const FooterLinksList = styled.ul`

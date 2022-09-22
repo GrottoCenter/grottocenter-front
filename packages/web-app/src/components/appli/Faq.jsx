@@ -14,7 +14,7 @@ import {
   pftGdLink,
   contributorsLink,
   contributeLinks
-} from '../../conf/Config';
+} from '../../conf/externalLinks';
 import Translate from '../common/Translate';
 
 const FaqDiv = styled.div`
