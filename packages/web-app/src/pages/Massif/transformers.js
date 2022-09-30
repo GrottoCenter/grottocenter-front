@@ -31,7 +31,7 @@ const getDetails = massif => {
 
 const getDocuments = documents =>
   documents.map(document => ({
-    id: document?.id,
+    ...document,
     title: document?.titles[0].text
   }));
 

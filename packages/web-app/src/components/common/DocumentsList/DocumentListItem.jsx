@@ -18,7 +18,7 @@ const DocumentListItem = ({ doc }) => {
         <Link {...props} to={`/ui/documents/${doc.id}`} ref={ref} />
       ))}>
       <ListItemText
-        primary={`${doc.title}, ${date.toLocaleDateString('fr-FR')}`}
+        primary={`${doc.title} - ${date.toLocaleDateString('fr-FR')}`}
         primaryTypographyProps={{ style: { whiteSpace: 'normal' } }} // Multiple lines text
       />
     </StyledListItem>

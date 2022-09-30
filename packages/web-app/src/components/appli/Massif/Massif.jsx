@@ -112,10 +112,7 @@ const Massif = ({
               )}
               <hr />
               <DocumentsList
-                docs={documents.map(doc => ({
-                  ...doc,
-                  title: doc.titles[0].text
-                }))}
+                docs={documents}
                 emptyMessageComponent={
                   <Alert
                     severity="info"
