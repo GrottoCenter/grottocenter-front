@@ -1,5 +1,7 @@
 import fetch from 'isomorphic-fetch';
 import { postDescriptionUrl } from '../../conf/Config';
+import makeErrorMessage from '../../helpers/makeErrorMessage';
+import { checkAndGetStatus } from '../utils';
 
 export const POST_DESCRIPTION = 'POST_DESCRIPTION';
 export const POST_DESCRIPTION_SUCCESS = 'POST_DESCRIPTION_SUCCESS';
@@ -29,14 +31,15 @@ export const postDescription = data => (dispatch, getState) => {
   };
 
   return fetch(postDescriptionUrl, requestOptions)
-    .then(response => {
-      if (response.status >= 400) {
-        throw new Error(response.status);
-      }
-      return response.text();
-    })
-    .then(text => dispatch(postDescriptionSuccess(JSON.parse(text))))
-    .catch(errorMessage => {
-      dispatch(postDescriptionFailure(errorMessage));
-    });
+    .then(checkAndGetStatus)
+    .then(response => response.json())
+    .then(jsonData => dispatch(postDescriptionSuccess(jsonData)))
+    .catch(error =>
+      dispatch(
+        postDescriptionFailure(
+          makeErrorMessage(error.message, `Creating a new description`),
+          error.message
+        )
+      )
+    );
 };

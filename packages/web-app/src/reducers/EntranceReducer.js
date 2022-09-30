@@ -69,65 +69,102 @@ const reducer = (state = initialState, action) => {
     case RESET_ENTRANCE_STATE:
       return initialState;
     case POST_LOCATION_SUCCESS:
-      return {
-        ...initialState,
-        data: {
-          ...state.data,
-          locations: [...state.data.locations, action.location]
-        }
-      };
-
+      if (
+        action.location?.entrance?.id &&
+        action.location?.entrance?.id === state.data?.id
+      ) {
+        return {
+          ...initialState,
+          data: {
+            ...state.data,
+            locations: [...state.data.locations, action.location]
+          }
+        };
+      }
+      return initialState;
     case UPDATE_LOCATION_SUCCESS:
-      return {
-        ...initialState,
-        data: {
-          ...state.data,
-          locations: [
-            ...state.data.locations.filter(l => l.id !== action.location.id),
-            { ...action.location, entrance: action.location.entrance.id }
-          ]
-        }
-      };
+      if (
+        action.location?.entrance?.id &&
+        action.location?.entrance?.id === state.data?.id
+      ) {
+        return {
+          ...initialState,
+          data: {
+            ...state.data,
+            locations: [
+              ...state.data.locations.filter(l => l.id !== action.location.id),
+              { ...action.location, entrance: action.location.entrance.id }
+            ]
+          }
+        };
+      }
+      return initialState;
     case POST_HISTORY_SUCCESS:
-      return {
-        ...initialState,
-        data: {
-          ...state.data,
-          histories: [...state.data.histories, action.history]
-        }
-      };
+      if (
+        action.history?.entrance?.id &&
+        action.history?.entrance?.id === state.data?.id
+      ) {
+        return {
+          ...initialState,
+          data: {
+            ...state.data,
+            histories: [...state.data.histories, action.history]
+          }
+        };
+      }
+      return initialState;
     case UPDATE_HISTORY_SUCCESS:
-      return {
-        ...initialState,
-        data: {
-          ...state.data,
-          histories: [
-            ...state.data.histories.filter(l => l.id !== action.history.id),
-            { ...action.history, entrance: action.history.entrance.id }
-          ]
-        }
-      };
+      if (
+        action.history?.entrance?.id &&
+        action.history?.entrance?.id === state.data?.id
+      ) {
+        return {
+          ...initialState,
+          data: {
+            ...state.data,
+            histories: [
+              ...state.data.histories.filter(l => l.id !== action.history.id),
+              { ...action.history, entrance: action.history.entrance.id }
+            ]
+          }
+        };
+      }
+      return initialState;
     case POST_DESCRIPTION_SUCCESS:
-      return {
-        ...initialState,
-        data: {
-          ...state.data,
-          descriptions: [...state.data.descriptions, action.description]
-        }
-      };
+      if (
+        action.description?.entrance?.id &&
+        action.description?.entrance?.id === state.data?.id
+      ) {
+        return {
+          ...initialState,
+          data: {
+            ...state.data,
+            descriptions: state.data.descriptions
+              ? [...state.data.descriptions, action.description]
+              : [action.description]
+          }
+        };
+      }
+      return initialState;
     case UPDATE_DESCRIPTION_SUCCESS:
-      return {
-        ...initialState,
-        data: {
-          ...state.data,
-          descriptions: [
-            ...state.data.descriptions.filter(
-              l => l.id !== action.description.id
-            ),
-            { ...action.description }
-          ]
-        }
-      };
+      if (
+        action.description?.entrance?.id &&
+        action.description?.entrance?.id === state.data?.id
+      ) {
+        return {
+          ...initialState,
+          data: {
+            ...state.data,
+            descriptions: [
+              ...state.data.descriptions.filter(
+                l => l.id !== action.description.id
+              ),
+              { ...action.description }
+            ]
+          }
+        };
+      }
+      return initialState;
     default:
       return state;
   }
