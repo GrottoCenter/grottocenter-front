@@ -1,5 +1,5 @@
 import fetch from 'isomorphic-fetch';
-import { readNotificationUrl } from '../../conf/Config';
+import { readNotificationUrl } from '../../conf/apiRoutes';
 import makeErrorMessage from '../../helpers/makeErrorMessage';
 import { checkAndGetStatus } from '../utils';
 

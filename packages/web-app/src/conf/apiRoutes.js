@@ -94,6 +94,12 @@ export const getMassifUrl = `${API_BASE_PATH}/massifs/`;
 export const postCreateMassifUrl = `${API_BASE_PATH}/massifs/`;
 export const putMassifUrl = massifId => `${API_BASE_PATH}/massifs/${massifId}`;
 
+// ===== Notifications urls
+export const countUnreadNotificationsUrl = `${API_URL}/api/${apiVersion}/notifications/unread/count`;
+export const fetchNotificationsUrl = `${API_URL}/api/${apiVersion}/notifications`;
+export const readNotificationUrl = notificationId =>
+  `${API_URL}/api/${apiVersion}/notifications/${notificationId}/read`;
+
 // ===== Organizations urls
 export const getOrganizationUrl = `${API_BASE_PATH}/organizations/`;
 export const postOrganizationUrl = `${API_BASE_PATH}/organizations`;
