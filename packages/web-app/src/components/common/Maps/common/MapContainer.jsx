@@ -5,12 +5,9 @@ import { MapContainer, useMap } from 'react-leaflet';
 import PropTypes from 'prop-types';
 import LayersControl from './LayersControl';
 
-const Map = styled(MapContainer)`
-${({ wholePage, isSideMenuOpen, theme }) =>
-  wholePage &&
-  `width: calc(100% - ${isSideMenuOpen ? theme.sideMenuWidth : 0}px);`}
+const Wrapper = styled.div`
+  width: 100%;
 ${({ wholePage }) => !wholePage && `width: auto;`}
-${({ wholePage }) => (!wholePage ? `position: relative;` : `position: fixed;`)}
 ${({ wholePage, theme }) =>
   !wholePage && `margin-bottom: ${theme.spacing(2)}px;`}
 ${({ wholePage }) => !wholePage && `height: ${isMobileOnly ? '220' : '300'}px;`}
@@ -28,6 +25,15 @@ const Centerer = ({ center }) => {
   return null;
 };
 
+const handleResize = map => {
+  const myObserver = new ResizeObserver(() => {
+    setTimeout(() => {
+      map.invalidateSize(true);
+    }, 100);
+  });
+  myObserver.observe(map.getContainer());
+};
+
 Centerer.propTypes = {
   center: PropTypes.arrayOf(PropTypes.number)
 };
@@ -43,20 +49,23 @@ const CustomMapContainer = ({
   children,
   forceCentering
 }) => (
-  <Map
-    wholePage={wholePage}
-    center={center}
-    zoom={zoom}
-    dragging={dragging}
-    scrollWheelZoom={scrollWheelZoom}
-    isSideMenuOpen={isSideMenuOpen}
-    minZoom={0}
-    style={style}
-    preferCanvas>
-    {forceCentering && <Centerer center={center} />}
-    <LayersControl />
-    {children}
-  </Map>
+  <Wrapper wholePage={wholePage} isSideMenuOpen={isSideMenuOpen}>
+    <MapContainer
+      style={{ height: '100%', width: '100%', ...style }}
+      wholePage={wholePage}
+      center={center}
+      zoom={zoom}
+      dragging={dragging}
+      scrollWheelZoom={scrollWheelZoom}
+      isSideMenuOpen={isSideMenuOpen}
+      minZoom={0}
+      whenCreated={handleResize}
+      preferCanvas>
+      {forceCentering && <Centerer center={center} />}
+      <LayersControl />
+      {children}
+    </MapContainer>
+  </Wrapper>
 );
 
 CustomMapContainer.propTypes = {
