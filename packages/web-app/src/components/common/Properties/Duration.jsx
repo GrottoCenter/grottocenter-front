@@ -15,8 +15,8 @@ const Duration = ({ image, durationStr, title }) => {
   const { formatMessage } = useIntl();
   const splittedTime = durationStr.split(':');
   const valueToDisplay = `${
-    +splittedTime[0] > 0 ? `${+splittedTime[0]}h ` : ''
-  }${+splittedTime[1]}m`;
+    +splittedTime[0] > 0 ? `${+splittedTime[0]}h` : ''
+  }${+splittedTime[1] > 0 ? `${splittedTime[1].padStart(2, '0')}m` : ''}`;
   return (
     <DurationWrapper>
       <img

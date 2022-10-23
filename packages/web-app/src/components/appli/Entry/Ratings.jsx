@@ -2,7 +2,6 @@ import styled from 'styled-components';
 import React from 'react';
 import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
-import { isNil } from 'ramda';
 import { Rating } from '../../common/Properties';
 
 const RatingWrapper = styled.div`
@@ -19,21 +18,21 @@ const Ratings = ({ interestRate, progressionRate, accessRate, size }) => {
 
   return (
     <RatingWrapper size={size}>
-      {!!interestRate && !isNil(interestRate) && (
+      {!!interestRate && (
         <Rating
           label={formatMessage({ id: 'Interest' })}
           value={interestRate}
           size={size}
         />
       )}
-      {!!progressionRate && !isNil(progressionRate) && (
+      {!!progressionRate && (
         <Rating
           label={formatMessage({ id: 'Progression' })}
           value={progressionRate}
           size={size}
         />
       )}
-      {!!accessRate && !isNil(accessRate) && (
+      {!!accessRate && (
         <Rating
           label={formatMessage({ id: 'Access' })}
           value={accessRate}

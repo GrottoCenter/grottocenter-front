@@ -10,9 +10,9 @@ export const updateCommentAction = () => ({
   type: UPDATE_COMMENT
 });
 
-export const updateCommentSuccess = comments => ({
+export const updateCommentSuccess = comment => ({
   type: UPDATE_COMMENT_SUCCESS,
-  comments
+  comment
 });
 
 export const updateCommentFailure = error => ({

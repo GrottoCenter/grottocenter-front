@@ -26,16 +26,6 @@ const SpacedButton = styled(Button)`
   margin: 0 ${theme.spacing(1)}px;`}
 `;
 
-const RatingWrapper = styled.div`
-  display: flex;
-`;
-
-const NoRatingWrapper = styled.div`
-  display: flex;
-  justify-content: center;
-  flex-direction: column;
-`;
-
 const getDefaultValues = (values, language) => {
   if (values) {
     return {
@@ -184,7 +174,7 @@ const CreateCommentForm = ({ closeForm, onSubmit, values, isNewComment }) => {
         control={control}
         name="interestRate"
         render={({ field: { onChange, value } }) => (
-          <RatingWrapper>
+          <Box display="flex">
             <div>
               <Typography>{formatMessage({ id: 'Interest' })}</Typography>
               <Rating
@@ -216,20 +206,23 @@ const CreateCommentForm = ({ closeForm, onSubmit, values, isNewComment }) => {
               </div>
             )}
             {value === null && (
-              <NoRatingWrapper>
+              <Box
+                display="flex"
+                justifyContent="center"
+                flexDirection="column">
                 <Typography variant="caption">
                   {formatMessage({ id: 'No Rating' })}
                 </Typography>
-              </NoRatingWrapper>
+              </Box>
             )}
-          </RatingWrapper>
+          </Box>
         )}
       />
       <Controller
         control={control}
         name="progressionRate"
         render={({ field: { onChange, value } }) => (
-          <RatingWrapper>
+          <Box display="flex">
             <div>
               <Typography>{formatMessage({ id: 'Progression' })}</Typography>
               <Rating
@@ -260,14 +253,14 @@ const CreateCommentForm = ({ closeForm, onSubmit, values, isNewComment }) => {
                 </IconButton>
               </div>
             )}
-          </RatingWrapper>
+          </Box>
         )}
       />
       <Controller
         control={control}
         name="accessRate"
         render={({ field: { onChange, value } }) => (
-          <RatingWrapper>
+          <Box display="flex">
             <div>
               <Typography>{formatMessage({ id: 'Access' })}</Typography>
               <Rating
@@ -298,7 +291,7 @@ const CreateCommentForm = ({ closeForm, onSubmit, values, isNewComment }) => {
                 </IconButton>
               </div>
             )}
-          </RatingWrapper>
+          </Box>
         )}
       />
 
