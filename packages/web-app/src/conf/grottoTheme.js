@@ -53,6 +53,11 @@ export const overridings = {
       dark: orange['900'],
       contrastText: grey['900']
     },
+    text: {
+      primary: alpha('#000000', 0.95),
+      secondary: alpha('#000000', 0.75),
+      disabled: alpha('#000000', 0.38)
+    },
     common: {
       white: '#fff',
       black: '#000'

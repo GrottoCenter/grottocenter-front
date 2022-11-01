@@ -52,7 +52,7 @@ const ScrollableContent = ({
       $dense={dense}
       title={
         <Title>
-          <Typography variant="h1" color="secondary">
+          <Typography variant="h2" color="secondary">
             {title}
           </Typography>
           {!isNil(icon) && icon}

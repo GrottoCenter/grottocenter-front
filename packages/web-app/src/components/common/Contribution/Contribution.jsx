@@ -12,9 +12,14 @@ const Contribution = ({
   dateReviewed
 }) => (
   <>
-    <MultilinesTypography>{body}</MultilinesTypography>
-    <br />
-    <AuthorAndDate author={author} date={creationDate} />
+    {body && (
+      <MultilinesTypography variant="body1" component="div">
+        {body}
+      </MultilinesTypography>
+    )}
+    <div>
+      <AuthorAndDate author={author} date={creationDate} />
+    </div>
     {reviewer && (
       <div>
         <AuthorAndDate author={reviewer} date={dateReviewed} verb="Updated" />
@@ -25,7 +30,7 @@ const Contribution = ({
 
 Contribution.propTypes = {
   author: authorType,
-  body: PropTypes.string.isRequired,
+  body: PropTypes.string,
   creationDate: PropTypes.oneOfType([
     PropTypes.instanceOf(Date),
     PropTypes.string

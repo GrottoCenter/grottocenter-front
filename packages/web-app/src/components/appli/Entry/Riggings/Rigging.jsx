@@ -8,11 +8,8 @@ import {
   TableRow,
   TableCell,
   TableBody,
-  ListItemIcon,
-  Divider,
-  ListItem,
-  ListItemText,
-  Typography
+  Typography,
+  Tooltip
 } from '@material-ui/core';
 import EditIcon from '@material-ui/icons/Edit';
 import { useDispatch } from 'react-redux';
@@ -24,114 +21,139 @@ import PropTypes from 'prop-types';
 import { usePermissions } from '../../../../hooks';
 import { updateRiggings } from '../../../../actions/Riggings/UpdateRigging';
 import CreateRiggingsForm from '../../Form/RiggingsForm/index';
-import { riggingsType, riggingType } from '../Provider';
-import AuthorAndDate from '../../../common/Contribution/AuthorAndDate';
+import { riggingType, obstacleType } from '../Provider';
+import Contribution from '../../../common/Contribution/Contribution';
 
-const MultilinesTableCell = styled(TableCell)({ whiteSpace: 'pre-wrap' });
+const StyledTableRow = styled(TableRow)(({ theme }) => ({
+  backgroundColor: theme.palette.action.hover
+}));
 
 const RiggingTable = ({ obstacles, title }) => {
   const { formatMessage } = useIntl();
 
   if (isNil(obstacles[0]) || isNil(obstacles[0].obstacle)) {
-    return null;
+    return (
+      <Box my={3} mr="45px">
+        <Typography variant="h4">{title}</Typography>
+      </Box>
+    );
   }
 
   return (
-    <TableContainer>
-      <Typography variant="subtitle1">{title}</Typography>
-      <Table size="small" aria-label="riggings">
-        <TableHead>
-          <TableRow>
-            <TableCell>{formatMessage({ id: 'obstacles' })}</TableCell>
-            <TableCell align="right">
-              {formatMessage({ id: 'ropes' })}
-            </TableCell>
-            <TableCell align="right">
-              {formatMessage({ id: 'anchors' })}
-            </TableCell>
-            <TableCell align="right">
-              {formatMessage({ id: 'observations' })}
-            </TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {obstacles?.map(({ obstacle, rope, anchor, observation }) => (
-            <TableRow key={obstacle + rope + anchor}>
-              <TableCell component="th" scope="row">
-                {obstacle}
+    <Box>
+      <Box my={3} mr="45px">
+        <Typography variant="h4">{title}</Typography>
+      </Box>
+      <TableContainer>
+        <Table size="small" aria-label="riggings">
+          <TableHead>
+            <TableRow>
+              <TableCell>{formatMessage({ id: 'obstacles' })}</TableCell>
+              <TableCell align="right">
+                {formatMessage({ id: 'ropes' })}
               </TableCell>
-              <TableCell align="right">{rope}</TableCell>
-              <MultilinesTableCell align="right">{anchor}</MultilinesTableCell>
-              <MultilinesTableCell align="right">
-                {observation}
-              </MultilinesTableCell>
+              <TableCell align="right">
+                {formatMessage({ id: 'anchors' })}
+              </TableCell>
+              <TableCell align="right">
+                {formatMessage({ id: 'observations' })}
+              </TableCell>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </TableContainer>
+          </TableHead>
+          <TableBody>
+            {obstacles?.map(
+              ({ obstacle, rope, anchor, observation }, index) => (
+                // eslint-disable-next-line react/no-array-index-key
+                <StyledTableRow key={`${obstacle}${rope}${anchor}${index}`}>
+                  <TableCell component="th" scope="row">
+                    <span style={{ whiteSpace: 'pre-line' }}>{obstacle}</span>
+                  </TableCell>
+                  <TableCell align="right">
+                    <span style={{ whiteSpace: 'pre-line' }}>{rope}</span>
+                  </TableCell>
+                  <TableCell align="right">
+                    <span style={{ whiteSpace: 'pre-line' }}>{anchor}</span>
+                  </TableCell>
+                  <TableCell align="right">
+                    <span style={{ whiteSpace: 'pre-line' }}>
+                      {observation}
+                    </span>
+                  </TableCell>
+                </StyledTableRow>
+              )
+            )}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </Box>
   );
 };
 
-const Rigging = ({ riggings, rigging, index }) => {
+const Rigging = ({ rigging }) => {
   const dispatch = useDispatch();
   const permissions = usePermissions();
+  const { formatMessage } = useIntl();
   const [isFormVisible, setIsFormVisible] = useState(false);
   const onSubmitForm = data => {
     dispatch(
       updateRiggings({
         ...data,
-        language: data.language.id,
-        riggings: riggings.id
+        language: data.language.id
       })
     );
     setIsFormVisible(false);
   };
 
   return (
-    <div key={rigging.id}>
-      <ListItem>
-        {isFormVisible && permissions.isAuth ? (
-          <Box width="100%">
-            <CreateRiggingsForm
-              closeForm={() => setIsFormVisible(false)}
-              isNewComment={false}
-              onSubmit={onSubmitForm}
-              values={rigging}
-            />
-          </Box>
-        ) : (
-          <ListItemText
-            primary={<RiggingTable {...rigging} />}
-            secondary={
-              <AuthorAndDate author={rigging.author} date={rigging.date} />
-            }
-          />
-        )}
-        {permissions.isAuth && (
-          <ListItemIcon style={{ alignSelf: 'start' }}>
+    <Box key={rigging.id} position="relative">
+      {permissions.isAuth && (
+        <Box align="right" position="absolute" right="0">
+          <Tooltip
+            title={
+              isFormVisible
+                ? formatMessage({ id: 'Cancel edit' })
+                : formatMessage({ id: 'Edit these riggings' })
+            }>
             <IconButton
               onClick={() => setIsFormVisible(!isFormVisible)}
               color="primary"
               aria-label="edit">
               {isFormVisible ? <CancelIcon /> : <EditIcon />}
             </IconButton>
-          </ListItemIcon>
-        )}
-      </ListItem>
-      {index < riggings.length - 1 && (
-        <Divider variant="middle" component="li" />
+          </Tooltip>
+        </Box>
       )}
-    </div>
+      {isFormVisible && permissions.isAuth ? (
+        <Box width="100%">
+          <CreateRiggingsForm
+            closeForm={() => setIsFormVisible(false)}
+            isNew={false}
+            onSubmit={onSubmitForm}
+            values={rigging}
+          />
+        </Box>
+      ) : (
+        <Box>
+          <RiggingTable {...rigging} />
+          <Contribution
+            author={rigging.author}
+            creationDate={rigging.date}
+            reviewer={rigging.reviewer}
+            dateReviewed={rigging.dateReviewed}
+          />
+        </Box>
+      )}
+    </Box>
   );
 };
 
-RiggingTable.propTypes = { ...riggingType };
+RiggingTable.propTypes = {
+  obstacles: PropTypes.arrayOf(obstacleType),
+  title: PropTypes.string.isRequired
+};
 
 Rigging.propTypes = {
-  riggings: riggingsType,
-  rigging: riggingType,
-  index: PropTypes.number.isRequired
+  rigging: riggingType
 };
 
 export default Rigging;

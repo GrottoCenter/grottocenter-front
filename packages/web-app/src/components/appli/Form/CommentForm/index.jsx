@@ -209,7 +209,8 @@ const CreateCommentForm = ({ closeForm, onSubmit, values, isNewComment }) => {
               <Box
                 display="flex"
                 justifyContent="center"
-                flexDirection="column">
+                flexDirection="column"
+                sx={{ mt: 3 }}>
                 <Typography variant="caption">
                   {formatMessage({ id: 'No Rating' })}
                 </Typography>
@@ -253,6 +254,17 @@ const CreateCommentForm = ({ closeForm, onSubmit, values, isNewComment }) => {
                 </IconButton>
               </div>
             )}
+            {value === null && (
+              <Box
+                display="flex"
+                justifyContent="center"
+                flexDirection="column"
+                sx={{ mt: 3 }}>
+                <Typography variant="caption">
+                  {formatMessage({ id: 'No Rating' })}
+                </Typography>
+              </Box>
+            )}
           </Box>
         )}
       />
@@ -290,6 +302,17 @@ const CreateCommentForm = ({ closeForm, onSubmit, values, isNewComment }) => {
                   <NotInterestedIcon />
                 </IconButton>
               </div>
+            )}
+            {value === null && (
+              <Box
+                display="flex"
+                justifyContent="center"
+                flexDirection="column"
+                sx={{ mt: 3 }}>
+                <Typography variant="caption">
+                  {formatMessage({ id: 'No Rating' })}
+                </Typography>
+              </Box>
             )}
           </Box>
         )}

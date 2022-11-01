@@ -33,30 +33,6 @@ const initialState = {
   latestHttpCode: null
 };
 
-function transformRiggings(data) {
-  const obstacles = data.obstacles.split('|;|');
-  const ropes = data.ropes.split('|;|');
-  const anchors = data.anchors.split('|;|');
-  const observations = data.observations.split('|;|');
-  const rigging = {
-    id: data.id,
-    language: data.language,
-    title: data.title,
-    obstacles: []
-  };
-
-  for (let j = 0; j < obstacles.length; j += 1) {
-    rigging.obstacles.push({
-      obstacle: obstacles[j],
-      observation: observations[j],
-      rope: ropes[j],
-      anchor: anchors[j]
-    });
-  }
-
-  return rigging;
-}
-
 const reducer = (state = initialState, action) => {
   switch (action.type) {
     case FETCH_ENTRANCE_LOADING:
@@ -203,7 +179,7 @@ const reducer = (state = initialState, action) => {
           data: {
             ...state.data,
             riggings: state.data.riggings
-              ? [...state.data.riggings, transformRiggings(action.riggings)]
+              ? [...state.data.riggings, action.riggings]
               : [action.riggings]
           }
         };
@@ -220,10 +196,7 @@ const reducer = (state = initialState, action) => {
             ...state.data,
             riggings: [
               ...state.data.riggings.filter(l => l.id !== action.riggings.id),
-              {
-                ...transformRiggings(action.riggings),
-                entrance: action.riggings.entrance.id
-              }
+              { ...action.riggings, entrance: action.riggings.entrance.id }
             ]
           }
         };
@@ -231,24 +204,24 @@ const reducer = (state = initialState, action) => {
       return initialState;
     case POST_COMMENT_SUCCESS:
       if (
-          action.comment?.entrance?.id &&
-          action.comment?.entrance?.id === state.data?.id
+        action.comment?.entrance?.id &&
+        action.comment?.entrance?.id === state.data?.id
       ) {
         return {
           ...initialState,
           data: {
             ...state.data,
             comments: state.data.comments
-                ? [...state.data.comments, action.comment]
-                : [action.comment]
+              ? [...state.data.comments, action.comment]
+              : [action.comment]
           }
         };
       }
       return initialState;
     case UPDATE_COMMENT_SUCCESS:
       if (
-          action.comment?.entrance?.id &&
-          action.comment?.entrance?.id === state.data?.id
+        action.comment?.entrance?.id &&
+        action.comment?.entrance?.id === state.data?.id
       ) {
         return {
           ...initialState,
