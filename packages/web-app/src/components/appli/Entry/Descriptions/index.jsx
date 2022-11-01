@@ -4,7 +4,7 @@ import { useDispatch } from 'react-redux';
 import { useIntl } from 'react-intl';
 import { Divider, IconButton, List } from '@material-ui/core';
 import AddCircleIcon from '@material-ui/icons/AddCircle';
-import RemoveCircleIcon from '@material-ui/icons/RemoveCircle';
+import CancelIcon from '@material-ui/icons/Cancel';
 
 import ScrollableContent from '../../../common/Layouts/Fixed/ScrollableContent';
 import { descriptionsType } from '../Provider';
@@ -40,7 +40,7 @@ const Descriptions = ({ entranceId, descriptions }) => {
           <IconButton
             color="primary"
             onClick={() => setIsFormVisible(!isFormVisible)}>
-            {isFormVisible ? <RemoveCircleIcon /> : <AddCircleIcon />}
+            {isFormVisible ? <CancelIcon /> : <AddCircleIcon />}
           </IconButton>
         )
       }
@@ -54,13 +54,10 @@ const Descriptions = ({ entranceId, descriptions }) => {
           )}
 
           {descriptions.length > 0 ? (
-            <List>
+            <List dense disablePadding>
               {descriptions.map(description => (
                 <React.Fragment key={description.id}>
                   <Description description={description} />
-                  {descriptions.length > 1 && (
-                    <Divider variant="middle" component="li" />
-                  )}
                 </React.Fragment>
               ))}
             </List>

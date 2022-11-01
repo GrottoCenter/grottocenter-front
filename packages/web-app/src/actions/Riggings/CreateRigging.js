@@ -24,16 +24,7 @@ function transformData(data, entranceId) {
     id: data.id,
     language: data.language.id,
     title: data.title,
-    obstacles: data.obstacles
-      ? data.obstacles.map(x => x.obstacle).join('|;|')
-      : [],
-    observations: data.obstacles
-      ? data.obstacles.map(x => x.observation).join('|;|')
-      : [],
-    ropes: data.obstacles ? data.obstacles.map(x => x.rope).join('|;|') : [],
-    anchors: data.obstacles
-      ? data.obstacles.map(x => x.anchor).join('|;|')
-      : [],
+    obstacles: data.obstacles,
     entrance: entranceId
   };
 }

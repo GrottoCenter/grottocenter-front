@@ -4,7 +4,8 @@ import {
   IconButton,
   ListItemIcon,
   ListItem,
-  ListItemText
+  ListItemText,
+  Typography
 } from '@material-ui/core';
 import { useDispatch } from 'react-redux';
 import EditIcon from '@material-ui/icons/Edit';
@@ -35,7 +36,7 @@ const Location = ({ location }) => {
   };
 
   return (
-    <ListItem>
+    <ListItem disablePadding disableGutters divider alignItems="flex-start">
       {isFormVisible ? (
         <Box width="100%">
           <CreateLocationForm
@@ -47,7 +48,8 @@ const Location = ({ location }) => {
         </Box>
       ) : (
         <ListItemText
-          primary={title}
+          disableTypography
+          primary={<Typography variant="h4">{title}</Typography>}
           secondary={
             <Contribution
               author={author}

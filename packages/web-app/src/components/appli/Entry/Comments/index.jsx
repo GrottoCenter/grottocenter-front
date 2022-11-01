@@ -4,7 +4,7 @@ import { useDispatch } from 'react-redux';
 import { useIntl } from 'react-intl';
 import { Divider, IconButton, List } from '@material-ui/core';
 import AddCircleIcon from '@material-ui/icons/AddCircle';
-import RemoveCircleIcon from '@material-ui/icons/RemoveCircle';
+import CancelIcon from '@material-ui/icons/Cancel';
 
 import ScrollableContent from '../../../common/Layouts/Fixed/ScrollableContent';
 import { commentsType } from '../Provider';
@@ -36,7 +36,7 @@ const Comments = ({ entranceId, comments }) => {
           <IconButton
             color="primary"
             onClick={() => setIsFormVisible(!isFormVisible)}>
-            {isFormVisible ? <RemoveCircleIcon /> : <AddCircleIcon />}
+            {isFormVisible ? <CancelIcon /> : <AddCircleIcon />}
           </IconButton>
         )
       }
@@ -50,13 +50,10 @@ const Comments = ({ entranceId, comments }) => {
           )}
 
           {comments.length > 0 ? (
-            <List>
+            <List dense disablePadding>
               {comments.map(comment => (
                 <React.Fragment key={comment.id}>
                   <Comment comment={comment} />
-                  {comments.length > 1 && (
-                    <Divider variant="middle" component="li" />
-                  )}
                 </React.Fragment>
               ))}
             </List>

@@ -3,7 +3,8 @@ import {
   IconButton,
   Box,
   ListItemText,
-  ListItemIcon
+  ListItemIcon,
+  Typography
 } from '@material-ui/core';
 import React, { useState } from 'react';
 import styled from 'styled-components';
@@ -64,7 +65,7 @@ const Comment = ({ comment }) => {
     permissions.isModerator;
 
   return (
-    <ListItem>
+    <ListItem disablePadding disableGutters divider alignItems="flex-start">
       {isFormVisible && permissions.isAuth ? (
         <Box width="100%">
           <CreateCommentForm
@@ -75,9 +76,10 @@ const Comment = ({ comment }) => {
           />
         </Box>
       ) : (
-        <ListItem>
+        <>
           <StyledListItemText
-            primary={title}
+            disableTypography
+            primary={<Typography variant="h4">{title}</Typography>}
             secondary={
               <Contribution
                 author={author}
@@ -110,7 +112,7 @@ const Comment = ({ comment }) => {
               />
             )}
           </StyledListItemIcon>
-        </ListItem>
+        </>
       )}
       {canEdit && (
         <ListItemIcon style={{ alignSelf: 'start' }}>

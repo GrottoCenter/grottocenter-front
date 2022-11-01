@@ -24,10 +24,7 @@ function transformData(data) {
     id: data.id,
     language: data.language,
     title: data.title,
-    obstacles: data.obstacles.map(x => x.obstacle).join('|;|'),
-    observations: data.obstacles.map(x => x.observation).join('|;|'),
-    ropes: data.obstacles.map(x => x.rope).join('|;|'),
-    anchors: data.obstacles.map(x => x.anchor).join('|;|')
+    obstacles: data.obstacles
   };
 }
 

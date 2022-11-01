@@ -35,7 +35,7 @@ const History = ({ history }) => {
   };
 
   return (
-    <ListItem>
+    <ListItem disablePadding disableGutters divider alignItems="flex-start">
       {isFormVisible ? (
         <Box width="100%">
           <CreateHistoryForm
@@ -47,6 +47,7 @@ const History = ({ history }) => {
         </Box>
       ) : (
         <ListItemText
+          disableTypography
           secondary={
             <Contribution
               author={author}

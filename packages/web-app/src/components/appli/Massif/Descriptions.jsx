@@ -25,7 +25,7 @@ const Descriptions = ({ descriptions }) => {
           <div key={id}>
             <ListItem>
               <ListItemText
-                primary={title}
+                primary={<Typography variant="h4">{title}</Typography>}
                 secondary={
                   <Contribution
                     author={author}

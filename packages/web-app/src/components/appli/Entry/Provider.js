@@ -211,7 +211,7 @@ export const locationType = PropTypes.shape({
 
 export const locationsType = PropTypes.arrayOf(locationType);
 
-const obstacleType = PropTypes.shape({
+export const obstacleType = PropTypes.shape({
   obstacle: PropTypes.string,
   rope: PropTypes.string,
   observation: PropTypes.string,
@@ -222,7 +222,10 @@ export const riggingType = PropTypes.shape({
   obstacles: PropTypes.arrayOf(obstacleType),
   author: authorType,
   id: PropTypes.number.isRequired,
-  language: PropTypes.string.isRequired,
+  language: PropTypes.shape({
+    id: PropTypes.string.isRequired,
+    refName: PropTypes.string.isRequired
+  }).isRequired,
   title: PropTypes.string.isRequired
 });
 

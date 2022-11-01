@@ -9,7 +9,7 @@ import getAuthor from '../../util/getAuthor';
 export const getComments = comments =>
   comments
     .map(comment => ({
-      accessRate: pathOr(0, ['approach'], comment) / 2,
+      accessRate: comment?.approach ? comment.approach / 2 : null,
       author: getAuthor(comment?.author),
       reviewer: comment?.reviewer ? getAuthor(comment?.reviewer) : null,
       body: comment?.body,
@@ -20,9 +20,9 @@ export const getComments = comments =>
         ? new Date(comment?.dateReviewed)
         : null,
       id: comment?.id,
-      interestRate: pathOr(0, ['aestheticism'], comment) / 2,
+      interestRate: comment?.aestheticism ? comment.aestheticism / 2 : null,
       language: comment?.language,
-      progressionRate: pathOr(0, ['caving'], comment) / 2,
+      progressionRate: comment?.caving ? comment.caving / 2 : null,
       title: comment?.title,
       eTTrail: comment?.eTTrail,
       eTUnderground: comment?.eTUnderground
@@ -101,10 +101,12 @@ export const getRiggings = riggings =>
   riggings.map(rigging => ({
     obstacles: isNil(rigging?.obstacles) ? [] : rigging.obstacles,
     author: getAuthor(rigging?.author),
+    reviewer: rigging?.reviewer ? getAuthor(rigging?.reviewer) : null,
     id: rigging.id,
     language: rigging?.language || '',
     title: rigging?.title || '',
-    date: rigging?.dateInscription ? new Date(rigging.dateInscription) : null
+    date: rigging?.dateInscription ? new Date(rigging.dateInscription) : null,
+    dateReviewed: rigging?.dateReviewed ? new Date(rigging?.dateReviewed) : null
   }));
 
 export const getLocations = locations =>

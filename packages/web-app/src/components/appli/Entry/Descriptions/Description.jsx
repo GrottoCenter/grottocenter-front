@@ -4,7 +4,8 @@ import {
   IconButton,
   ListItemIcon,
   ListItem,
-  ListItemText
+  ListItemText,
+  Typography
 } from '@material-ui/core';
 import { useDispatch } from 'react-redux';
 import EditIcon from '@material-ui/icons/Edit';
@@ -34,7 +35,7 @@ const Description = ({ description }) => {
   };
 
   return (
-    <ListItem>
+    <ListItem disablePadding disableGutters divider alignItems="flex-start">
       {isFormVisible && permissions.isAuth ? (
         <Box width="100%">
           <CreateDescriptionForm
@@ -46,7 +47,8 @@ const Description = ({ description }) => {
         </Box>
       ) : (
         <ListItemText
-          primary={title}
+          disableTypography
+          primary={<Typography variant="h4">{title}</Typography>}
           secondary={
             <Contribution
               author={author}
