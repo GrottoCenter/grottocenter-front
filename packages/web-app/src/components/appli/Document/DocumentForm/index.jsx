@@ -17,7 +17,7 @@ import NavigateBeforeIcon from '@material-ui/icons/NavigateBefore';
 import { DocumentFormContext } from './Provider';
 import { DocumentFormTypes } from './types';
 
-import { bbsLink, wikiBBSLinks } from '../../../../conf/externalLinks';
+import { wikiBBSLinks } from '../../../../conf/externalLinks';
 import Translate from '../../../common/Translate';
 import InternationalizedLink from '../../../common/InternationalizedLink';
 import Stepper from '../../../common/Form/Stepper';
