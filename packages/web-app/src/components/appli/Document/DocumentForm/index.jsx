@@ -153,10 +153,6 @@ const DocumentForm = ({ isLoading, onSubmit, onUpdate }) => {
               Grottocenter-wiki page.
             </Translate>
           </InternationalizedLink>
-          <br />
-          <InternationalizedLink links={bbsLink}>
-            <Translate>Or directly on the BBS website.</Translate>
-          </InternationalizedLink>
         </BbsInfoText>
       </BbsHeader>
 
