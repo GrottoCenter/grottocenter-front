@@ -34,7 +34,7 @@ const RiggingTable = ({ obstacles, title }) => {
   if (isNil(obstacles[0]) || isNil(obstacles[0].obstacle)) {
     return (
       <Box my={3} mr="45px">
-        <Typography variant="h4">{title}</Typography>
+        <Typography variant="h4">{title}&nbsp;</Typography>
       </Box>
     );
   }
@@ -42,7 +42,7 @@ const RiggingTable = ({ obstacles, title }) => {
   return (
     <Box>
       <Box my={3} mr="45px">
-        <Typography variant="h4">{title}</Typography>
+        <Typography variant="h4">{title}&nbsp;</Typography>
       </Box>
       <TableContainer>
         <Table size="small" aria-label="riggings">
