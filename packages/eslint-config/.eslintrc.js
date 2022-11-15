@@ -1,5 +1,5 @@
 module.exports = {
-  extends: ['airbnb', 'prettier', 'react-app'],
+  extends: ['airbnb', 'prettier', 'react-app', 'plugin:cypress/recommended'],
   parserOptions: {
     ecmaVersion: 2020
   },
