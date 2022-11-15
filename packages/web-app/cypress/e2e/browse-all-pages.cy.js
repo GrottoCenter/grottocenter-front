@@ -1,4 +1,4 @@
-describe('Simple pages loader to check all major GC pages load correctly', () => {
+describe('Simple pages loader to check all major pages load correctly', () => {
   Cypress.Commands.add('checkPageLoaded', () => {
     // Very simple check to know if the app crashed (blank page) or not
     // Generally, if an error occurs, the h1 tag is not populated and a blank page is displayed.
