@@ -74,7 +74,11 @@ const AppBar = ({
           <LogoWrapper>
             <Typography variant="h4">
               <Link href="/" color="inherit">
-                <LogoImage src={logoGC} alt="Grottocenter" />
+                <LogoImage
+                  id="grottocenter-logo"
+                  src={logoGC}
+                  alt="Grottocenter"
+                />
                 {!isMobileOnly && `Grottocenter`}
               </Link>
             </Typography>
