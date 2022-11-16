@@ -14,7 +14,7 @@ const CountryPage = () => {
   const dispatch = useDispatch();
   const userProperties = useUserProperties();
   const permissions = usePermissions();
-  const { country, error, isLoading } = useSelector(state => state.country);
+  const { country, error, status } = useSelector(state => state.country);
   const onSubscribe = () => dispatch(subscribeToCountry(countryId));
   const onUnsubscribe = () => dispatch(unsubscribeFromCountry(countryId));
   const canSubscribe = permissions.isLeader;
@@ -31,9 +31,9 @@ const CountryPage = () => {
       canSubscribe={canSubscribe}
       country={country}
       error={error}
-      isLoading={isLoading}
       onSubscribe={onSubscribe}
       onUnsubscribe={onUnsubscribe}
+      status={status}
     />
   );
 };

@@ -21,13 +21,6 @@ import DocumentsList from '../../common/DocumentsList/DocumentsList';
 const Organization = ({ error, isLoading, organization, onEdit, canEdit }) => {
   const { formatMessage } = useIntl();
 
-  let title = '';
-  if (organization?.name) {
-    title = organization.name;
-  } else if (!error) {
-    title = formatMessage({ id: 'Loading organization data...' });
-  }
-
   let position = [];
   if (organization?.latitude && organization?.longitude) {
     position = [organization?.latitude, organization?.longitude];
@@ -72,7 +65,7 @@ const Organization = ({ error, isLoading, organization, onEdit, canEdit }) => {
           )
         )
       }
-      title={title}
+      title={isLoading ? <Skeleton /> : organization?.name}
       content={
         <>
           {isLoading && (

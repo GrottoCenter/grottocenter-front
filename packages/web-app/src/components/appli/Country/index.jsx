@@ -16,25 +16,18 @@ const Country = ({
   canSubscribe,
   country,
   error,
-  isLoading,
   onSubscribe,
   onUnsubscribe,
   status
 }) => {
   const { formatMessage } = useIntl();
+  const isLoading = status === REDUCER_STATUS.LOADING;
 
   const {
     isSubscribed: isSubscribedMethod,
     isCountryLoading: isSubscribeLoading
   } = useSubscriptions();
   const isSubscribed = country ? isSubscribedMethod(country.id) : false;
-
-  let title = '';
-  if (country?.nativeName) {
-    title = country.nativeName;
-  } else if (!error) {
-    title = formatMessage({ id: 'Loading country data...' });
-  }
 
   let position = [];
   if (country?.latitude && country?.longitude) {
@@ -49,6 +42,10 @@ const Country = ({
     }
   };
 
+  let title = '';
+  if (isLoading) title = <Skeleton />;
+  if (status === REDUCER_STATUS.SUCCEEDED) title = country.nativeName;
+
   return (
     <Layout
       title={title}
@@ -57,7 +54,7 @@ const Country = ({
       onChangeSubscribe={canSubscribe ? handleChangeSubscribe : undefined}
       content={
         <>
-          {status === REDUCER_STATUS.LOADING && <Skeleton height={150} />}
+          {isLoading && <Skeleton height={150} />}
           {error && (
             <Alert
               title={formatMessage({
@@ -67,7 +64,6 @@ const Country = ({
               severity="error"
             />
           )}
-          {isLoading && <Skeleton />}
           {!isEmpty(position) && (
             <CustomMapContainer
               center={position}

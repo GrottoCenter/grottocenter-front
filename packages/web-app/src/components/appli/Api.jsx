@@ -4,6 +4,7 @@ import { Grid, Typography } from '@material-ui/core';
 import CheckIcon from '@material-ui/icons/Check';
 import styled from 'styled-components';
 import { useSelector } from 'react-redux';
+import { useIntl } from 'react-intl';
 
 import GCLink from '../common/GCLink';
 import InternationalizedLink from '../common/InternationalizedLink';
@@ -37,6 +38,7 @@ const StyledCheckIcon = withStyles(
 )(CheckIcon);
 
 const Api = () => {
+  const { formatMessage } = useIntl();
   const { locale } = useSelector(state => state.intl);
 
   const restApiLink =
@@ -46,7 +48,7 @@ const Api = () => {
 
   return (
     <Layout
-      title={<Translate id="Grottocenter API" />}
+      title={formatMessage({ id: 'Grottocenter API' })}
       content={
         <Grid container justifyContent="center" spacing={2}>
           <Grid item md={6} xs={12} style={{ maxWidth: '400px' }}>

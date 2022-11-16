@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
-import { isNil } from 'ramda';
+import { isNil, is } from 'ramda';
 import {
   Typography,
   Card as MuiCard,
@@ -16,6 +16,9 @@ import styled from 'styled-components';
 import CreateIcon from '@material-ui/icons/Create';
 import NotificationsNoneIcon from '@material-ui/icons/NotificationsNone';
 import NotificationsActiveIcon from '@material-ui/icons/NotificationsActive';
+import { Skeleton } from '@material-ui/lab';
+
+const isString = is(String);
 
 const Card = styled(MuiCard)`
   margin: ${({ theme }) => theme.spacing(2)}px;
@@ -94,12 +97,16 @@ const FixedContent = ({
         avatar={avatar}
         subheader={subheader}
         title={
-          <Title>
-            <Typography variant="h1" color="secondary">
-              {title}
-            </Typography>
-            {!isNil(icon) && icon}
-          </Title>
+          isString(title) ? (
+            <Title>
+              <Typography variant="h1" color="secondary">
+                {title}
+              </Typography>
+              {!isNil(icon) && icon}
+            </Title>
+          ) : (
+            <Skeleton />
+          )
         }
       />
       <CardContent>{content}</CardContent>
@@ -118,7 +125,7 @@ FixedContent.propTypes = {
   onEdit: PropTypes.func,
   onChangeSubscribe: PropTypes.func,
   subheader: PropTypes.node,
-  title: PropTypes.string.isRequired
+  title: PropTypes.oneOfType([PropTypes.node, PropTypes.string]).isRequired
 };
 
 export default FixedContent;
