@@ -2,19 +2,17 @@ import React, { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { pathOr, isNil } from 'ramda';
 import { useDispatch, useSelector } from 'react-redux';
-import { Box, CircularProgress } from '@material-ui/core/';
-
 import { useIntl } from 'react-intl';
+import { Skeleton } from '@material-ui/lab';
 
-import { useUserProperties, usePermissions } from '../../hooks';
-import Layout from '../../components/common/Layouts/Fixed/FixedContent';
-
-import PersonEditPage from '../../components/common/PersonEditPage';
 import { loadPerson } from '../../actions/Person/GetPerson';
+import Layout from '../../components/common/Layouts/Fixed/FixedContent';
+import PersonEditPage from '../../components/common/PersonEditPage';
 import Alert from '../../components/common/Alert';
+import { useUserProperties, usePermissions } from '../../hooks';
 
 const computeTitle = (isFetching, person, formatMessage) => {
-  if (isFetching) return formatMessage({ id: 'Loading user data...' });
+  if (isFetching) return <Skeleton />;
   if (!isNil(person))
     return formatMessage(
       {
@@ -52,9 +50,10 @@ const PersonEdit = () => {
       content={
         <>
           {isFetching && (
-            <Box display="flex" alignItems="center" justifyContent="center">
-              <CircularProgress size={100} />
-            </Box>
+            <>
+              <Skeleton height={100} />
+              <Skeleton height={500} />
+            </>
           )}
           {!isAllowed && !isNil(person) && !isFetching && (
             <Alert

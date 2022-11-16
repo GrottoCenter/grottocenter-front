@@ -10,6 +10,7 @@ import { Divider, Link } from '@material-ui/core';
 import AttachFileIcon from '@material-ui/icons/AttachFile';
 import DescriptionIcon from '@material-ui/icons/Description';
 import styled from 'styled-components';
+import { Skeleton } from '@material-ui/lab';
 import Overview from './Overview';
 import Section from './Section';
 import CustomIcon from '../../components/common/CustomIcon';
@@ -65,10 +66,7 @@ const DocumentPage = ({
             'A moderator needs to validate the last modification before being able to edit the document again.'
         })
       }
-      title={
-        overview.title ||
-        (loading ? formatMessage({ id: 'Loading document data...' }) : '')
-      }
+      title={loading ? <Skeleton /> : overview.title}
       content={
         <>
           <Overview {...overview} loading={loading} />

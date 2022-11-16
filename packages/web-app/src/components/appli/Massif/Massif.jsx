@@ -57,7 +57,7 @@ const Massif = ({
       isSubscribed={isSubscribed}
       isSubscribeLoading={isLoading}
       onChangeSubscribe={canSubscribe ? handleChangeSubscribe : undefined}
-      title={title}
+      title={isFetching ? <Skeleton /> : title}
       subheader={
         isFetching && !error ? (
           <Skeleton />

@@ -53,7 +53,6 @@ describe('Simple pages loader to check all major pages load correctly', () => {
 
   it('document page', () => {
     cy.visit('/documents/22695'); // Collection
-    // Not perfect since the <h1> tag is used to display a "Loading data" message... To improve or change the page behaviour
     cy.checkPageLoaded();
     cy.visit('/documents/58048'); // Issue
     cy.checkPageLoaded();
@@ -63,13 +62,11 @@ describe('Simple pages loader to check all major pages load correctly', () => {
 
   it('organization page', () => {
     cy.visit('/organizations/2');
-    // Not perfect since the <h1> tag is used to display a "Loading data" message... To improve or change the page behaviour
     cy.checkPageLoaded();
   });
 
   it('country page', () => {
     cy.visit('/countries/FR');
-    // Not perfect since the <h1> tag is used to display a "Loading data" message... To improve or change the page behaviour
     cy.checkPageLoaded();
   });
 
