@@ -14,6 +14,7 @@
     "start:storybook": "lerna run --scope @grotto-front/storybook start --stream",
     "start:test": "yarn workspace @grotto-front/storybook start",
     "start:e2e-test": "yarn workspace @grotto-front/web-app perform-e2e",
+    "open:e2e-test": "yarn workspace @grotto-front/web-app e2e",
     "build": "lerna run build",
     "lint": "eslint . --ext .js,.jsx",
     "lint:fix": "eslint --fix --ext .js,.jsx,.ts,.tsx .",
