@@ -60,7 +60,7 @@ const Comment = ({ comment }) => {
   };
   const userId = pathOr(null, ['id'], useUserProperties());
   const canEdit =
-    userId?.toString() === comment?.author.id.toString() ||
+    (author?.id && userId?.toString() === author?.id.toString()) ||
     permissions.isAdmin ||
     permissions.isModerator;
 
