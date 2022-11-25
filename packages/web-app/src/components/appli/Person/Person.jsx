@@ -102,7 +102,7 @@ const Person = ({
               <DocumentsList
                 docs={person.documents.map(doc => ({
                   ...doc,
-                  title: doc.descriptions[0].title
+                  title: doc.titles[0].text
                 }))}
                 emptyMessageComponent={
                   <Alert
