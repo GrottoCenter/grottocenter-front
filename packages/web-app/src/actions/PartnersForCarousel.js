@@ -33,9 +33,7 @@ export function loadPartnersForCarousel() {
         return response.text();
       })
       .then(text =>
-        dispatch(
-          fetchPartnersForCarouselSuccess(JSON.parse(text).organizations)
-        )
+        dispatch(fetchPartnersForCarouselSuccess(JSON.parse(text).organization))
       )
       .catch(error =>
         dispatch(
