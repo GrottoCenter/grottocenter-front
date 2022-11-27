@@ -2,7 +2,9 @@ import { decode } from 'jsonwebtoken';
 import {
   FETCH_LOGIN,
   FETCH_LOGIN_FAILURE,
+  FETCH_LOGIN_MUST_RESET,
   FETCH_LOGIN_SUCCESS,
+  FETCH_LOGIN_RESET_SUCCESS,
   DISPLAY_LOGIN_DIALOG,
   HIDE_LOGIN_DIALOG,
   LOGOUT
@@ -34,7 +36,8 @@ const initialState = {
   },
   error: null,
   isFetching: false,
-  isLoginDialogDisplayed: false
+  isLoginDialogDisplayed: false,
+  isMustResetMessageDisplayed: false
 };
 
 //
@@ -62,14 +65,29 @@ const reducer = (state = initialState, action) => {
         isFetching: false,
         authTokenDecoded: action.tokenDecoded
       };
+    case FETCH_LOGIN_MUST_RESET:
+      return {
+        ...state,
+        isFetching: false,
+        isMustResetMessageDisplayed: true
+      };
     case FETCH_LOGIN_FAILURE:
       return {
         ...state,
         isFetching: false,
         error: action.error
       };
+    case FETCH_LOGIN_RESET_SUCCESS:
+      return {
+        ...state,
+        isFetching: false
+      };
     case DISPLAY_LOGIN_DIALOG:
-      return { ...state, isLoginDialogDisplayed: true };
+      return {
+        ...state,
+        isLoginDialogDisplayed: true,
+        isMustResetMessageDisplayed: false
+      };
     case HIDE_LOGIN_DIALOG:
       return { ...state, isLoginDialogDisplayed: false };
     case LOGOUT:
