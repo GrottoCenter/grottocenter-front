@@ -44,7 +44,9 @@ const Login = () => {
 
     if (authState.isMustResetMessageDisplayed) {
       dispatch(
-        postForgotPassword(email, msg => onSuccess(formatMessage({ id: msg })))
+        postForgotPassword(email, msg =>
+          onSuccess(formatMessage({ id: msg }, { email }))
+        )
       );
     } else {
       dispatch(postLogin(email, password));

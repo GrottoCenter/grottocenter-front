@@ -113,7 +113,7 @@ export function postForgotPassword(email, onSuccess) {
 
       responseStatus = response.status;
       if (response.ok) {
-        onSuccess(`Password reset email sent to ${email}`);
+        onSuccess(`Password reset email sent to {email}`);
         dispatch(fetchLoginResetSuccess());
         dispatch(hideLoginDialog());
         return;
