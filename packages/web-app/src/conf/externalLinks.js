@@ -34,6 +34,11 @@ export const githubLink = {
   '*': 'https://github.com/GrottoCenter'
 };
 
+export const createGitHubIssueForClientLinks = {
+  '*':
+    'https://github.com/GrottoCenter/grottocenter-front/issues/new?assignees=&labels=Type%3A+Bug&template=bug_report.md&title='
+};
+
 export const licenceLinks = {
   fr: 'https://creativecommons.org/licenses/by-sa/3.0/fr/',
   es: 'https://creativecommons.org/licenses/by-sa/3.0/deed.es_ES',
@@ -50,7 +55,7 @@ export const licensesODBLink = {
 };
 
 export const contactLinks = {
-  fr: ' http://fr.wikicaves.org/contact',
+  fr: 'http://fr.wikicaves.org/contact',
   '*': 'http://en.wikicaves.org/contact'
 };
 
