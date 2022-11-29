@@ -2,9 +2,9 @@ import React from 'react';
 import { isMobileOnly } from 'react-device-detect';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { ErrorBoundary } from 'react-error-boundary';
 
 import SideMenu from '../../SideMenu';
+import ErrorBoundary from '../../../appli/ErrorBoundary';
 
 const MainWrapper = styled.main`
   flex-grow: 1;

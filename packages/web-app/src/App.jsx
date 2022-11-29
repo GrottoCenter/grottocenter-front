@@ -3,7 +3,6 @@ import { IntlProvider } from 'react-intl';
 import createDebounce from 'redux-debounced';
 import { SnackbarProvider } from 'notistack';
 import { Provider, useDispatch, useSelector } from 'react-redux';
-import { ErrorBoundary } from 'react-error-boundary';
 import { createStore, applyMiddleware, compose } from 'redux';
 import thunkMiddleware from 'redux-thunk';
 import { BrowserRouter } from 'react-router-dom';
@@ -25,6 +24,7 @@ import ErrorHandler from './components/appli/ErrorHandler';
 import { DEFAULT_LANGUAGE, AVAILABLE_LANGUAGES } from './conf/config';
 import './App.css';
 import './animations.css';
+import ErrorBoundary from './components/appli/ErrorBoundary';
 
 const middlewares = applyMiddleware(createDebounce(), thunkMiddleware);
 const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
