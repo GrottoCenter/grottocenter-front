@@ -37,9 +37,9 @@ const getDefaultValues = (values, language) => {
   return {
     title: '',
     body: '',
-    interestRate: null,
-    progressionRate: null,
-    accessRate: null,
+    interest: null,
+    progression: null,
+    access: null,
     eTTrail: null,
     eTUnderground: null,
     language
@@ -172,18 +172,18 @@ const CreateCommentForm = ({ closeForm, onSubmit, values, isNewComment }) => {
       />
       <Controller
         control={control}
-        name="interestRate"
+        name="interest"
         render={({ field: { onChange, value } }) => (
           <Box display="flex">
             <div>
               <Typography>{formatMessage({ id: 'Interest' })}</Typography>
               <Rating
-                name="interestRate"
-                value={value}
+                name="interest"
+                value={value / 2}
                 precision={0.5}
                 size="large"
                 onChange={(event, newValue) => {
-                  onChange(newValue !== null ? +newValue : null);
+                  onChange(newValue !== null ? +newValue * 2 : null);
                 }}
                 emptyIcon={<StarBorderIcon fontSize="inherit" />}
               />
@@ -221,18 +221,18 @@ const CreateCommentForm = ({ closeForm, onSubmit, values, isNewComment }) => {
       />
       <Controller
         control={control}
-        name="progressionRate"
+        name="progression"
         render={({ field: { onChange, value } }) => (
           <Box display="flex">
             <div>
               <Typography>{formatMessage({ id: 'Progression' })}</Typography>
               <Rating
-                name="progressionRate"
-                value={value}
+                name="progression"
+                value={value / 2}
                 precision={0.5}
                 size="large"
                 onChange={(event, newValue) => {
-                  onChange(newValue !== null ? +newValue : null);
+                  onChange(newValue !== null ? +newValue * 2 : null);
                 }}
                 emptyIcon={<StarBorderIcon fontSize="inherit" />}
               />
@@ -270,18 +270,18 @@ const CreateCommentForm = ({ closeForm, onSubmit, values, isNewComment }) => {
       />
       <Controller
         control={control}
-        name="accessRate"
+        name="access"
         render={({ field: { onChange, value } }) => (
           <Box display="flex">
             <div>
               <Typography>{formatMessage({ id: 'Access' })}</Typography>
               <Rating
-                name="accessRate"
-                value={value}
+                name="access"
+                value={value / 2}
                 precision={0.5}
                 size="large"
                 onChange={(event, newValue) => {
-                  onChange(newValue !== null ? +newValue : null);
+                  onChange(newValue !== null ? +newValue * 2 : null);
                 }}
                 emptyIcon={<StarBorderIcon fontSize="inherit" />}
               />

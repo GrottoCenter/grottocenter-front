@@ -39,10 +39,10 @@ const Comment = ({ comment }) => {
     body,
     author,
     reviewer,
-    interestRate,
-    progressionRate,
-    accessRate,
-    date,
+    interest,
+    progression,
+    access,
+    creationDate,
     dateReviewed,
     eTTrail,
     eTUnderground
@@ -51,9 +51,15 @@ const Comment = ({ comment }) => {
   const onSubmitForm = data => {
     dispatch(
       updateComment({
-        ...data,
-        language: data.language.id,
-        comment: comment.id
+        id: data.id,
+        title: data.title,
+        body: data.body,
+        aestheticism: data.interest,
+        caving: data.progression,
+        approach: data.access,
+        eTTrail: data.eTTrail,
+        eTUnderground: data.eTUnderground,
+        language: data.language.id
       })
     );
     setIsFormVisible(false);
@@ -65,7 +71,7 @@ const Comment = ({ comment }) => {
     permissions.isModerator;
 
   return (
-    <ListItem disablePadding disableGutters divider alignItems="flex-start">
+    <ListItem disableGutters divider alignItems="flex-start">
       {isFormVisible && permissions.isAuth ? (
         <Box width="100%">
           <CreateCommentForm
@@ -84,7 +90,7 @@ const Comment = ({ comment }) => {
               <Contribution
                 author={author}
                 body={body}
-                creationDate={date}
+                creationDate={creationDate}
                 reviewer={reviewer}
                 dateReviewed={dateReviewed}
               />
@@ -92,9 +98,9 @@ const Comment = ({ comment }) => {
           />
           <StyledListItemIcon>
             <Ratings
-              interestRate={interestRate}
-              progressionRate={progressionRate}
-              accessRate={accessRate}
+              interest={interest}
+              progression={progression}
+              access={access}
               size="small"
             />
             {!!eTTrail && !isEmpty(eTTrail) && (

@@ -33,6 +33,14 @@ const initialState = {
   latestHttpCode: null
 };
 
+function arrFindReplaceOrAdd(arr, test, replacement) {
+  const newArr = arr.slice(); // Create a copy for immutability
+  const index = newArr.findIndex(test);
+  if (index < 0) newArr.push(replacement);
+  else newArr.splice(index, 1, replacement);
+  return newArr;
+}
+
 const reducer = (state = initialState, action) => {
   switch (action.type) {
     case FETCH_ENTRANCE_LOADING:
@@ -73,168 +81,70 @@ const reducer = (state = initialState, action) => {
     case RESET_ENTRANCE_STATE:
       return initialState;
     case POST_LOCATION_SUCCESS:
-      if (
-        action.location?.entrance?.id &&
-        action.location?.entrance?.id === state.data?.id
-      ) {
-        return {
-          ...initialState,
-          data: {
-            ...state.data,
-            locations: [...state.data.locations, action.location]
-          }
-        };
-      }
-      return initialState;
     case UPDATE_LOCATION_SUCCESS:
-      if (
-        action.location?.entrance?.id &&
-        action.location?.entrance?.id === state.data?.id
-      ) {
-        return {
-          ...initialState,
-          data: {
-            ...state.data,
-            locations: [
-              ...state.data.locations.filter(l => l.id !== action.location.id),
-              { ...action.location, entrance: action.location.entrance.id }
-            ]
-          }
-        };
-      }
-      return initialState;
+      return {
+        ...initialState,
+        data: {
+          ...state.data,
+          locations: arrFindReplaceOrAdd(
+            state.data.locations,
+            e => e.id === action.location.id,
+            action.location
+          )
+        }
+      };
     case POST_HISTORY_SUCCESS:
-      if (
-        action.history?.entrance?.id &&
-        action.history?.entrance?.id === state.data?.id
-      ) {
-        return {
-          ...initialState,
-          data: {
-            ...state.data,
-            histories: [...state.data.histories, action.history]
-          }
-        };
-      }
-      return initialState;
     case UPDATE_HISTORY_SUCCESS:
-      if (
-        action.history?.entrance?.id &&
-        action.history?.entrance?.id === state.data?.id
-      ) {
-        return {
-          ...initialState,
-          data: {
-            ...state.data,
-            histories: [
-              ...state.data.histories.filter(l => l.id !== action.history.id),
-              { ...action.history, entrance: action.history.entrance.id }
-            ]
-          }
-        };
-      }
-      return initialState;
+      return {
+        ...initialState,
+        data: {
+          ...state.data,
+          histories: arrFindReplaceOrAdd(
+            state.data.histories,
+            e => e.id === action.history.id,
+            action.history
+          )
+        }
+      };
     case POST_DESCRIPTION_SUCCESS:
-      if (
-        action.description?.entrance?.id &&
-        action.description?.entrance?.id === state.data?.id
-      ) {
-        return {
-          ...initialState,
-          data: {
-            ...state.data,
-            descriptions: state.data.descriptions
-              ? [...state.data.descriptions, action.description]
-              : [action.description]
-          }
-        };
-      }
-      return initialState;
     case UPDATE_DESCRIPTION_SUCCESS:
-      if (
-        action.description?.entrance?.id &&
-        action.description?.entrance?.id === state.data?.id
-      ) {
-        return {
-          ...initialState,
-          data: {
-            ...state.data,
-            descriptions: [
-              ...state.data.descriptions.filter(
-                l => l.id !== action.description.id
-              ),
-              { ...action.description }
-            ]
-          }
-        };
-      }
-      return initialState;
+      return {
+        ...initialState,
+        data: {
+          ...state.data,
+          descriptions: arrFindReplaceOrAdd(
+            state.data.descriptions,
+            e => e.id === action.description.id,
+            action.description
+          )
+        }
+      };
     case POST_RIGGINGS_SUCCESS:
-      if (
-        action.riggings?.entrance?.id &&
-        action.riggings?.entrance?.id === state.data?.id
-      ) {
-        return {
-          ...initialState,
-          data: {
-            ...state.data,
-            riggings: state.data.riggings
-              ? [...state.data.riggings, action.riggings]
-              : [action.riggings]
-          }
-        };
-      }
-      return initialState;
     case UPDATE_RIGGINGS_SUCCESS:
-      if (
-        action.riggings?.entrance?.id &&
-        action.riggings?.entrance?.id === state.data?.id
-      ) {
-        return {
-          ...initialState,
-          data: {
-            ...state.data,
-            riggings: [
-              ...state.data.riggings.filter(l => l.id !== action.riggings.id),
-              { ...action.riggings, entrance: action.riggings.entrance.id }
-            ]
-          }
-        };
-      }
-      return initialState;
+      return {
+        ...initialState,
+        data: {
+          ...state.data,
+          riggings: arrFindReplaceOrAdd(
+            state.data.riggings,
+            e => e.id === action.rigging.id,
+            action.rigging
+          )
+        }
+      };
     case POST_COMMENT_SUCCESS:
-      if (
-        action.comment?.entrance?.id &&
-        action.comment?.entrance?.id === state.data?.id
-      ) {
-        return {
-          ...initialState,
-          data: {
-            ...state.data,
-            comments: state.data.comments
-              ? [...state.data.comments, action.comment]
-              : [action.comment]
-          }
-        };
-      }
-      return initialState;
     case UPDATE_COMMENT_SUCCESS:
-      if (
-        action.comment?.entrance?.id &&
-        action.comment?.entrance?.id === state.data?.id
-      ) {
-        return {
-          ...initialState,
-          data: {
-            ...state.data,
-            comments: [
-              ...state.data.comments.filter(l => l.id !== action.comment.id),
-              { ...action.comment, entrance: action.comment.entrance.id }
-            ]
-          }
-        };
-      }
-      return initialState;
+      return {
+        ...initialState,
+        data: {
+          ...state.data,
+          comments: arrFindReplaceOrAdd(
+            state.data.comments,
+            e => e.id === action.comment.id,
+            action.comment
+          )
+        }
+      };
     default:
       return state;
   }

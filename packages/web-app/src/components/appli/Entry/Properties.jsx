@@ -39,18 +39,18 @@ const Properties = () => {
   const {
     state: {
       details: {
-        accessRate,
         altitude,
         coordinates,
         depth,
         development,
         discoveryYear,
-        interestRate,
+        access,
+        interest,
+        progression,
         isDivingCave,
         localisation,
         massif,
         precision,
-        progressionRate,
         temperature,
         undergroundType,
         cave
@@ -62,7 +62,7 @@ const Properties = () => {
   const makeCoordinatesValue = coordinatesValue =>
     `${formatMessage({
       id: 'Lat.'
-    })} / ${formatMessage({ id: 'Long.' })} = 
+    })} / ${formatMessage({ id: 'Long.' })} =
     ${coordinatesValue[0].toFixed(4)} °N / ${coordinatesValue[1].toFixed(
       4
     )} °E`;
@@ -195,9 +195,9 @@ const Properties = () => {
       />
       <SmallRatingsWrapper>
         <Ratings
-          accessRate={accessRate}
-          interestRate={interestRate}
-          progressionRate={progressionRate}
+          access={access}
+          interest={interest}
+          progression={progression}
         />
       </SmallRatingsWrapper>
     </GlobalWrapper>

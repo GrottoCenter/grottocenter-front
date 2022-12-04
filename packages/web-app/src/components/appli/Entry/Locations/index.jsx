@@ -23,8 +23,9 @@ const Locations = ({ entranceId, locations, isSensitive }) => {
   const onSubmitForm = data => {
     dispatch(
       postLocation({
-        ...data,
         entrance: entranceId,
+        title: data.title,
+        body: data.body,
         language: data.language.id
       })
     );

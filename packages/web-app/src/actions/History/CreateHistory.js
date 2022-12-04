@@ -1,5 +1,6 @@
 import fetch from 'isomorphic-fetch';
 import { postHistoryUrl } from '../../conf/apiRoutes';
+import { checkAndGetStatus } from '../utils';
 
 export const POST_HISTORY = 'POST_HISTORY';
 export const POST_HISTORY_SUCCESS = 'POST_HISTORY_SUCCESS';
@@ -19,7 +20,7 @@ export const postHistoryFailure = error => ({
   error
 });
 
-export const postHistory = ({ body, entrance, language }) => (
+export const postHistory = ({ entrance, body, language }) => (
   dispatch,
   getState
 ) => {
@@ -27,18 +28,14 @@ export const postHistory = ({ body, entrance, language }) => (
 
   const requestOptions = {
     method: 'POST',
-    body: JSON.stringify({ body, entrance, language }),
+    body: JSON.stringify({ entrance, body, language }),
     headers: getState().login.authorizationHeader
   };
 
   return fetch(postHistoryUrl, requestOptions)
-    .then(response => {
-      if (response.status >= 400) {
-        throw new Error(response.status);
-      }
-      return response.text();
-    })
-    .then(text => dispatch(postHistorySuccess(JSON.parse(text))))
+    .then(checkAndGetStatus)
+    .then(response => response.json())
+    .then(data => dispatch(postHistorySuccess(data)))
     .catch(errorMessage => {
       dispatch(postHistoryFailure(errorMessage));
     });

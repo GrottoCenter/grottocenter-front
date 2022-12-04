@@ -21,19 +21,25 @@ export const postDescriptionFailure = error => ({
   error
 });
 
-export const postDescription = data => (dispatch, getState) => {
+export const postDescription = ({
+  entrance,
+  massif,
+  title,
+  body,
+  language
+}) => (dispatch, getState) => {
   dispatch(postDescriptionAction());
 
   const requestOptions = {
     method: 'POST',
-    body: JSON.stringify(data),
+    body: JSON.stringify({ entrance, massif, title, body, language }),
     headers: getState().login.authorizationHeader
   };
 
   return fetch(postDescriptionUrl, requestOptions)
     .then(checkAndGetStatus)
     .then(response => response.json())
-    .then(jsonData => dispatch(postDescriptionSuccess(jsonData)))
+    .then(data => dispatch(postDescriptionSuccess(data)))
     .catch(error =>
       dispatch(
         postDescriptionFailure(

@@ -1,5 +1,6 @@
 import fetch from 'isomorphic-fetch';
 import { postRiggingsUrl } from '../../conf/apiRoutes';
+import { checkAndGetStatus } from '../utils';
 
 export const POST_RIGGINGS = 'POST_RIGGINGS';
 export const POST_RIGGINGS_SUCCESS = 'POST_RIGGINGS_SUCCESS';
@@ -9,9 +10,9 @@ export const postRiggingsAction = () => ({
   type: POST_RIGGINGS
 });
 
-export const postRiggingsSuccess = riggings => ({
+export const postRiggingsSuccess = rigging => ({
   type: POST_RIGGINGS_SUCCESS,
-  riggings
+  rigging
 });
 
 export const postRiggingsFailure = error => ({
@@ -19,33 +20,22 @@ export const postRiggingsFailure = error => ({
   error
 });
 
-function transformData(data, entranceId) {
-  return {
-    id: data.id,
-    language: data.language.id,
-    title: data.title,
-    obstacles: data.obstacles,
-    entrance: entranceId
-  };
-}
-
-export const postRiggings = (data, entranceId) => (dispatch, getState) => {
+export const postRiggings = ({ entrance, title, obstacles, language }) => (
+  dispatch,
+  getState
+) => {
   dispatch(postRiggingsAction());
 
   const requestOptions = {
     method: 'POST',
-    body: JSON.stringify(transformData(data, entranceId)),
+    body: JSON.stringify({ entrance, title, obstacles, language }),
     headers: getState().login.authorizationHeader
   };
 
   return fetch(postRiggingsUrl, requestOptions)
-    .then(response => {
-      if (response.status >= 400) {
-        throw new Error(response.status);
-      }
-      return response.json();
-    })
-    .then(json => dispatch(postRiggingsSuccess(json)))
+    .then(checkAndGetStatus)
+    .then(response => response.json())
+    .then(data => dispatch(postRiggingsSuccess(data)))
     .catch(errorMessage => {
       dispatch(postRiggingsFailure(errorMessage));
     });

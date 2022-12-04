@@ -1,5 +1,6 @@
 import fetch from 'isomorphic-fetch';
 import { putLocationUrl } from '../../conf/apiRoutes';
+import { checkAndGetStatus } from '../utils';
 
 export const UPDATE_LOCATION = 'UPDATE_LOCATION';
 export const UPDATE_LOCATION_SUCCESS = 'UPDATE_LOCATION_SUCCESS';
@@ -19,7 +20,7 @@ export const updateLocationFailure = error => ({
   error
 });
 
-export const updateLocation = ({ body, entrance, id, language, title }) => (
+export const updateLocation = ({ id, title, body, language }) => (
   dispatch,
   getState
 ) => {
@@ -27,18 +28,14 @@ export const updateLocation = ({ body, entrance, id, language, title }) => (
 
   const requestOptions = {
     method: 'PUT',
-    body: JSON.stringify({ body, entrance, language, title }),
+    body: JSON.stringify({ title, body, language }),
     headers: getState().login.authorizationHeader
   };
 
   return fetch(putLocationUrl(id), requestOptions)
-    .then(response => {
-      if (response.status >= 400) {
-        throw new Error(response.status);
-      }
-      return response.text();
-    })
-    .then(text => dispatch(updateLocationSuccess(JSON.parse(text))))
+    .then(checkAndGetStatus)
+    .then(response => response.json())
+    .then(data => dispatch(updateLocationSuccess(data)))
     .catch(errorMessage => {
       dispatch(updateLocationFailure(errorMessage));
     });

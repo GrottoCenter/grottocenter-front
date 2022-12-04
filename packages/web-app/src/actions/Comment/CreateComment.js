@@ -12,9 +12,9 @@ export const postCommentAction = () => ({
   type: POST_COMMENT
 });
 
-export const postCommentSuccess = comments => ({
+export const postCommentSuccess = comment => ({
   type: POST_COMMENT_SUCCESS,
-  comments
+  comment
 });
 
 export const postCommentFailure = error => ({
@@ -22,37 +22,39 @@ export const postCommentFailure = error => ({
   error
 });
 
-function transformData(data) {
-  return {
-    language: data.language,
-    title: data.title,
-    body: data.body,
-    aestheticism: data.interestRate !== null ? data.interestRate * 2 : null,
-    caving: data.progressionRate !== null ? data.progressionRate * 2 : null,
-    approach: data.accessRate !== null ? data.accessRate * 2 : null,
-    entrance: data.entrance,
-    eTTrail:
-      data.eTTrail !== null ? minutesToDurationString(data.eTTrail) : null,
-    eTUnderground:
-      data.eTUnderground !== null
-        ? minutesToDurationString(data.eTUnderground)
-        : null
-  };
-}
-
-export const postComment = data => (dispatch, getState) => {
+export const postComment = ({
+  entrance,
+  title,
+  body,
+  aestheticism,
+  caving,
+  approach,
+  eTTrail,
+  eTUnderground,
+  language
+}) => (dispatch, getState) => {
   dispatch(postCommentAction());
 
   const requestOptions = {
     method: 'POST',
-    body: JSON.stringify(transformData(data)),
+    body: JSON.stringify({
+      entrance,
+      title,
+      body,
+      aestheticism,
+      caving,
+      approach,
+      eTTrail: minutesToDurationString(eTTrail) ?? null,
+      eTUnderground: minutesToDurationString(eTUnderground) ?? null,
+      language
+    }),
     headers: getState().login.authorizationHeader
   };
 
   return fetch(postCommentUrl, requestOptions)
     .then(checkAndGetStatus)
     .then(response => response.json())
-    .then(json => dispatch(postCommentSuccess(json)))
+    .then(data => dispatch(postCommentSuccess(data)))
     .catch(error =>
       dispatch(
         postCommentFailure(

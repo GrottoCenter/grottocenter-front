@@ -23,8 +23,9 @@ const Descriptions = ({ entranceId, descriptions }) => {
   const onSubmitForm = data => {
     dispatch(
       postDescription({
-        ...data,
-        entranceId,
+        entrance: entranceId,
+        title: data.title,
+        body: data.body,
         language: data.language.id
       })
     );
@@ -56,9 +57,7 @@ const Descriptions = ({ entranceId, descriptions }) => {
           {descriptions.length > 0 ? (
             <List dense disablePadding>
               {descriptions.map(description => (
-                <React.Fragment key={description.id}>
-                  <Description description={description} />
-                </React.Fragment>
+                <Description description={description} key={description.id} />
               ))}
             </List>
           ) : (

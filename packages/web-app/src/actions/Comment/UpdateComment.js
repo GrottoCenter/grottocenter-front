@@ -1,6 +1,7 @@
 import fetch from 'isomorphic-fetch';
 import { putCommentUrl } from '../../conf/apiRoutes';
 import { minutesToDurationString } from '../../util/dateTimeDuration';
+import { checkAndGetStatus } from '../utils';
 
 export const UPDATE_COMMENT = 'UPDATE_COMMENT';
 export const UPDATE_COMMENT_SUCCESS = 'UPDATE_COMMENT_SUCCESS';
@@ -20,41 +21,38 @@ export const updateCommentFailure = error => ({
   error
 });
 
-function transformData(data) {
-  return {
-    id: data.id,
-    language: data.language,
-    title: data.title,
-    body: data.body,
-    aestheticism: data.interestRate !== null ? data.interestRate * 2 : null,
-    caving: data.progressionRate !== null ? data.progressionRate * 2 : null,
-    approach: data.accessRate !== null ? data.accessRate * 2 : null,
-    eTTrail:
-      data.eTTrail !== null ? minutesToDurationString(+data.eTTrail) : null,
-    eTUnderground:
-      data.eTUnderground !== null
-        ? minutesToDurationString(+data.eTUnderground)
-        : null
-  };
-}
-
-export const updateComment = data => (dispatch, getState) => {
+export const updateComment = ({
+  id,
+  title,
+  body,
+  aestheticism,
+  caving,
+  approach,
+  eTTrail,
+  eTUnderground,
+  language
+}) => (dispatch, getState) => {
   dispatch(updateCommentAction());
 
   const requestOptions = {
     method: 'PATCH',
-    body: JSON.stringify(transformData(data)),
+    body: JSON.stringify({
+      title,
+      body,
+      aestheticism,
+      caving,
+      approach,
+      eTTrail: minutesToDurationString(eTTrail) ?? null,
+      eTUnderground: minutesToDurationString(eTUnderground) ?? null,
+      language
+    }),
     headers: getState().login.authorizationHeader
   };
 
-  return fetch(putCommentUrl(data.id), requestOptions)
-    .then(response => {
-      if (response.status >= 400) {
-        throw new Error(response.status);
-      }
-      return response.text();
-    })
-    .then(text => dispatch(updateCommentSuccess(JSON.parse(text))))
+  return fetch(putCommentUrl(id), requestOptions)
+    .then(checkAndGetStatus)
+    .then(response => response.json())
+    .then(data => dispatch(updateCommentSuccess(data)))
     .catch(errorMessage => {
       dispatch(updateCommentFailure(errorMessage));
     });

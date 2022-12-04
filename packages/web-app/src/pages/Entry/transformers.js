@@ -9,20 +9,20 @@ import getAuthor from '../../util/getAuthor';
 export const getComments = comments =>
   comments
     .map(comment => ({
-      accessRate: comment?.approach ? comment.approach / 2 : null,
       author: getAuthor(comment?.author),
       reviewer: comment?.reviewer ? getAuthor(comment?.reviewer) : null,
       body: comment?.body,
-      date: comment?.dateInscription
+      creationDate: comment?.dateInscription
         ? new Date(comment?.dateInscription)
         : null,
       dateReviewed: comment?.dateReviewed
         ? new Date(comment?.dateReviewed)
         : null,
       id: comment?.id,
-      interestRate: comment?.aestheticism ? comment.aestheticism / 2 : null,
+      access: comment?.approach,
+      interest: comment?.aestheticism,
+      progression: comment?.caving,
       language: comment?.language,
-      progressionRate: comment?.caving ? comment.caving / 2 : null,
       title: comment?.title,
       eTTrail: comment?.eTTrail,
       eTUnderground: comment?.eTUnderground
@@ -30,7 +30,6 @@ export const getComments = comments =>
     .sort((l1, l2) => l1.date < l2.date);
 
 export const getDetails = data => ({
-  accessRate: pathOr(0, ['stats', 'approach'], data) / 2,
   altitude: data.altitude,
   author: getAuthor(data?.author),
   cave: data.cave,
@@ -44,7 +43,9 @@ export const getDetails = data => ({
   development: pathOr(0, ['cave', 'length'], data),
   discoveryYear: data.discoveryYear,
   id: data.id,
-  interestRate: pathOr(0, ['stats', 'aestheticism'], data) / 2,
+  access: pathOr(0, ['stats', 'approach'], data),
+  interest: pathOr(0, ['stats', 'aestheticism'], data),
+  progression: pathOr(0, ['stats', 'caving'], data),
   isDivingCave: pathOr(null, ['cave', 'isDiving'], data),
   isSensitive: data.isSensitive,
   language: pathOr(undefined, ['names', 0, 'language'], data),
@@ -54,7 +55,6 @@ export const getDetails = data => ({
   mountain: pathOr(null, ['massif', 'name'], data),
   name: data.name,
   precision: data.precision,
-  progressionRate: pathOr(0, ['stats', 'caving'], data) / 2,
   temperature: pathOr(null, ['cave', 'temperature'], data),
   undergroundType: pathOr(null, ['massif', 'undergroundType'], data)
 });
@@ -85,15 +85,18 @@ export const getDocuments = documents =>
 export const getHistories = histories =>
   histories
     .map(history => ({
-      author: getAuthor(history?.author),
-      body: history?.body,
+      id: history?.id,
       creationDate: history?.dateInscription
         ? new Date(history?.dateInscription)
         : null,
-      entrance: history?.entrance,
-      id: history?.id,
-      language: history?.language,
-      relevance: history?.relevance
+      reviewedDate: history?.dateReviewed
+        ? new Date(history?.dateReviewed)
+        : null,
+      author: getAuthor(history?.author),
+      reviewer: getAuthor(history?.reviewer),
+      body: history?.body,
+      relevance: history?.relevance,
+      language: history?.language
     }))
     .sort((l1, l2) => l1.relevance < l2.relevance);
 
@@ -112,15 +115,18 @@ export const getRiggings = riggings =>
 export const getLocations = locations =>
   locations
     .map(location => ({
+      id: location?.id,
+      title: location?.title,
       author: getAuthor(location?.author),
+      reviewer: getAuthor(location?.reviewer),
       body: location?.body,
       creationDate: location?.dateInscription
         ? new Date(location?.dateInscription)
         : null,
-      entrance: location?.entrance,
-      id: location?.id,
-      language: location?.language,
-      title: location?.title,
-      relevance: location?.relevance
+      reviewedDate: location?.dateReviewed
+        ? new Date(location?.dateReviewed)
+        : null,
+      relevance: location?.relevance,
+      language: location?.language
     }))
     .sort((l1, l2) => l1.relevance < l2.relevance);
