@@ -22,9 +22,9 @@ const details = {
     "Nans-les-Pins, Var (83), Provence-Alpes-Côte d'Azur (PAC), FRANCE",
   depth: 403,
   development: 10865,
-  interestRate: 3.5,
-  progressionRate: 2.5,
-  accessRate: 1.5,
+  interest: 7,
+  progression: 5,
+  access: 3,
   author: 'Author name',
   creationDate: date.toISOString().substring(0, 10),
   lastEditor: 'Editor name',
@@ -42,24 +42,24 @@ const details = {
 
 const comments = [
   {
-    accessRate: 2,
     author: { name: 'Author' },
     body: 'body description',
     date: date.toISOString().substring(0, 10),
     id: 3,
-    interestRate: 3,
+    interest: 6,
+    access: 4,
+    progression: 10,
     language: 'fra',
-    progressionRate: 5,
     title: 'titre'
   },
   {
-    accessRate: 2,
     author: { name: 'Author' },
     body: 'body description 2',
     date: date.toISOString().substring(0, 10),
     id: 4,
     language: 'fra',
-    progressionRate: 2,
+    access: 4,
+    progression: 4,
     title: 'titre 2'
   }
 ];

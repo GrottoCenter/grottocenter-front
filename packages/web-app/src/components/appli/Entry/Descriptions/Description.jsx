@@ -20,22 +20,30 @@ import Contribution from '../../../common/Contribution/Contribution';
 const Description = ({ description }) => {
   const dispatch = useDispatch();
   const permissions = usePermissions();
-  const { author, body, creationDate, title } = description;
+  const {
+    author,
+    reviewer,
+    body,
+    creationDate,
+    reviewedDate,
+    title
+  } = description;
   const [isFormVisible, setIsFormVisible] = useState(false);
 
   const onSubmitForm = data => {
     dispatch(
       updateDescription({
-        ...data,
-        language: data.language.id,
-        description: description.id
+        id: description.id,
+        title: data.title,
+        body: data.body,
+        language: data.language.id
       })
     );
     setIsFormVisible(false);
   };
 
   return (
-    <ListItem disablePadding disableGutters divider alignItems="flex-start">
+    <ListItem disableGutters divider alignItems="flex-start">
       {isFormVisible && permissions.isAuth ? (
         <Box width="100%">
           <CreateDescriptionForm
@@ -51,9 +59,11 @@ const Description = ({ description }) => {
           primary={<Typography variant="h4">{title}</Typography>}
           secondary={
             <Contribution
-              author={author}
               body={body}
+              author={author}
+              reviewer={reviewer}
               creationDate={creationDate}
+              dateReviewed={reviewedDate}
             />
           }
         />

@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { propOr, isNil, isEmpty } from 'ramda';
+import { isNil } from 'ramda';
 import { useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import Entry from '../../components/appli/Entry';
@@ -14,10 +14,10 @@ import {
   getRiggings
 } from './transformers';
 
-const isUpdateSuccessful = (data, error, loading, prevLoading) => {
+const isUpdateSuccessful = (error, loading, prevLoading) => {
   const updateTerminatedWithSuccess =
     prevLoading.current === true && loading === false && error === null;
-  return updateTerminatedWithSuccess || isEmpty(data);
+  return updateTerminatedWithSuccess;
 };
 
 const EntryPage = () => {
@@ -44,7 +44,6 @@ const EntryPage = () => {
   useEffect(() => {
     if (
       isUpdateSuccessful(
-        data,
         updateEntranceError,
         updateEntranceLoading,
         prevupdateEntranceLoading
@@ -52,11 +51,11 @@ const EntryPage = () => {
     ) {
       dispatch(fetchEntrance(id));
     }
-  }, [dispatch, data, updateEntranceLoading, id, updateEntranceError]);
+  }, [dispatch, updateEntranceLoading, id, updateEntranceError]);
+
   useEffect(() => {
     if (
       isUpdateSuccessful(
-        data,
         associateDocumentError,
         associateDocumentLoading,
         prevAssociateDocumentLoading
@@ -64,7 +63,7 @@ const EntryPage = () => {
     ) {
       dispatch(fetchEntrance(id));
     }
-  }, [dispatch, data, id, associateDocumentError, associateDocumentLoading]);
+  }, [dispatch, id, associateDocumentError, associateDocumentLoading]);
 
   // Track loadings
   useEffect(() => {
@@ -74,13 +73,13 @@ const EntryPage = () => {
     prevupdateEntranceLoading.current = updateEntranceLoading;
   }, [updateEntranceLoading]);
 
-  const comments = getComments(propOr([], 'comments', data));
-  const descriptions = getDescriptions(propOr([], 'descriptions', data));
+  const comments = getComments(data.comments ?? []);
+  const descriptions = getDescriptions(data.descriptions ?? []);
   const details = getDetails(data);
-  const documents = getDocuments(propOr([], 'documents', data));
-  const histories = getHistories(propOr([], 'histories', data));
-  const locations = getLocations(propOr([], 'locations', data));
-  const riggings = getRiggings(propOr([], 'riggings', data));
+  const documents = getDocuments(data.documents ?? []);
+  const histories = getHistories(data.histories ?? []);
+  const locations = getLocations(data.locations ?? []);
+  const riggings = getRiggings(data.riggings ?? []);
   return (
     <Entry
       loading={loading || !isNil(error)}

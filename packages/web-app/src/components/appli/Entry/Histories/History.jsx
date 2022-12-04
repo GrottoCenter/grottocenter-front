@@ -19,23 +19,22 @@ import Contribution from '../../../common/Contribution/Contribution';
 const History = ({ history }) => {
   const dispatch = useDispatch();
   const permissions = usePermissions();
-  const { author, body, creationDate } = history;
+  const { body, author, reviewer, creationDate, reviewedDate } = history;
   const [isFormVisible, setIsFormVisible] = useState(false);
 
   const onSubmitForm = data => {
     dispatch(
       updateHistory({
-        ...data,
-        entrance: history.entrance,
-        language: data.language.id,
-        history: history.id
+        id: data.id,
+        body: data.body,
+        language: data.language.id
       })
     );
     setIsFormVisible(false);
   };
 
   return (
-    <ListItem disablePadding disableGutters divider alignItems="flex-start">
+    <ListItem disableGutters divider alignItems="flex-start">
       {isFormVisible ? (
         <Box width="100%">
           <CreateHistoryForm
@@ -50,9 +49,11 @@ const History = ({ history }) => {
           disableTypography
           secondary={
             <Contribution
-              author={author}
               body={body}
+              author={author}
+              reviewer={reviewer}
               creationDate={creationDate}
+              dateReviewed={reviewedDate}
             />
           }
         />

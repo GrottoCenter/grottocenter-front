@@ -13,29 +13,29 @@ const RatingWrapper = styled.div`
   ${({ size }) => size === 'small' && `flex-direction: column`}
 `;
 
-const Ratings = ({ interestRate, progressionRate, accessRate, size }) => {
+const Ratings = ({ interest, progression, access, size }) => {
   const { formatMessage } = useIntl();
 
   return (
     <RatingWrapper size={size}>
-      {!!interestRate && (
+      {!!interest && (
         <Rating
           label={formatMessage({ id: 'Interest' })}
-          value={interestRate}
+          value={interest}
           size={size}
         />
       )}
-      {!!progressionRate && (
+      {!!progression && (
         <Rating
           label={formatMessage({ id: 'Progression' })}
-          value={progressionRate}
+          value={progression}
           size={size}
         />
       )}
-      {!!accessRate && (
+      {!!access && (
         <Rating
           label={formatMessage({ id: 'Access' })}
-          value={accessRate}
+          value={access}
           size={size}
         />
       )}
@@ -44,9 +44,9 @@ const Ratings = ({ interestRate, progressionRate, accessRate, size }) => {
 };
 
 Ratings.propTypes = {
-  interestRate: PropTypes.number,
-  progressionRate: PropTypes.number,
-  accessRate: PropTypes.number,
+  interest: PropTypes.number,
+  progression: PropTypes.number,
+  access: PropTypes.number,
   size: PropTypes.oneOf(['small', 'large'])
 };
 

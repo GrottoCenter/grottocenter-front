@@ -22,7 +22,17 @@ const Comments = ({ entranceId, comments }) => {
 
   const onSubmitForm = data => {
     dispatch(
-      postComment({ ...data, entrance: entranceId, language: data.language.id })
+      postComment({
+        entrance: entranceId,
+        title: data.title,
+        body: data.body,
+        aestheticism: data.interest,
+        caving: data.progression,
+        approach: data.access,
+        eTTrail: data.eTTrail,
+        eTUnderground: data.eTUnderground,
+        language: data.language.id
+      })
     );
     setIsFormVisible(false);
   };
@@ -52,9 +62,7 @@ const Comments = ({ entranceId, comments }) => {
           {comments.length > 0 ? (
             <List dense disablePadding>
               {comments.map(comment => (
-                <React.Fragment key={comment.id}>
-                  <Comment comment={comment} />
-                </React.Fragment>
+                <Comment comment={comment} key={comment.id} />
               ))}
             </List>
           ) : (

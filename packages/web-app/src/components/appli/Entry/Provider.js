@@ -9,14 +9,14 @@ const todayDate = date.toISOString().substring(0, 10);
 const defaultContext = {
   state: {
     details: {
-      accessRate: 2.5,
       creationDate: todayDate,
       depth: 100,
       development: 100,
       id: 0,
-      interestRate: 2.5,
+      accessRate: 5,
+      interest: 5,
+      progression: 5,
       localisation: 'France',
-      progressionRate: 2.5,
       name: 'Cavité'
     },
     comments: [],
@@ -53,9 +53,9 @@ const Entry = ({
       localisation: pathOr('Localisation', ['localisation'], details),
       depth: pathOr(0, ['depth'], details),
       development: pathOr(0, ['development'], details),
-      interestRate: pathOr(0, ['interestRate'], details),
-      progressionRate: pathOr(0, ['progressionRate'], details),
-      accessRate: pathOr(0, ['accessRate'], details),
+      interest: pathOr(0, ['interest'], details),
+      progression: pathOr(0, ['progression'], details),
+      access: pathOr(0, ['access'], details),
       author: details?.author,
       creationDate: pathOr(todayDate, ['creationDate'], details),
       coordinates: pathOr([0, 0], ['coordinates'], details),
@@ -98,7 +98,7 @@ const Entry = ({
 };
 
 export const detailsType = PropTypes.shape({
-  accessRate: PropTypes.number,
+  access: PropTypes.number,
   altitude: PropTypes.number,
   author: authorType,
   cave: idNameType,
@@ -110,50 +110,47 @@ export const detailsType = PropTypes.shape({
   discoveryYear: PropTypes.number,
   editionDate: PropTypes.instanceOf(Date),
   id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-  interestRate: PropTypes.number,
+  interest: PropTypes.number,
   isDivingCave: PropTypes.bool,
   isSensitive: PropTypes.bool,
   lastEditor: PropTypes.string,
   localisation: PropTypes.string,
   massif: idNameType,
   name: PropTypes.string,
-  progressionRate: PropTypes.number,
+  progression: PropTypes.number,
   temperature: PropTypes.number,
   undergroundType: PropTypes.string,
   language: PropTypes.string
 });
 
 export const commentType = PropTypes.shape({
-  accessRate: PropTypes.number,
-  author: authorType,
-  body: PropTypes.string,
-  date: PropTypes.instanceOf(Date),
-  entrance: PropTypes.number,
   id: PropTypes.number,
-  interestRate: PropTypes.number,
-  language: PropTypes.shape({
-    id: PropTypes.string.isRequired,
-    refName: PropTypes.string.isRequired
-  }).isRequired,
-  progressionRate: PropTypes.number,
   title: PropTypes.string,
+  body: PropTypes.string,
+  author: authorType.isRequired,
+  reviewer: authorType,
+  creationDate: PropTypes.instanceOf(Date),
+  reviewedDate: PropTypes.instanceOf(Date),
+  interest: PropTypes.number,
+  progression: PropTypes.number,
+  access: PropTypes.number,
   eTTrail: PropTypes.string, // hh:mm:ss
-  eTUnderground: PropTypes.string // hh:mm:ss
+  eTUnderground: PropTypes.string, // hh:mm:ss
+  language: PropTypes.string
 });
 
 export const commentsType = PropTypes.arrayOf(commentType);
 
 export const descriptionType = PropTypes.shape({
-  author: authorType,
-  body: PropTypes.string,
-  creationDate: PropTypes.instanceOf(Date),
   id: PropTypes.number,
-  language: PropTypes.shape({
-    id: PropTypes.string.isRequired,
-    refName: PropTypes.string.isRequired
-  }).isRequired,
-  relevance: PropTypes.number,
-  title: PropTypes.string
+  title: PropTypes.string,
+  body: PropTypes.string,
+  author: authorType,
+  reviewer: authorType,
+  creationDate: PropTypes.instanceOf(Date),
+  reviewedDate: PropTypes.instanceOf(Date),
+  language: PropTypes.string,
+  relevance: PropTypes.number
 });
 
 export const descriptionsType = PropTypes.arrayOf(descriptionType);
@@ -181,32 +178,28 @@ export const documentType = PropTypes.shape({
 export const documentsType = PropTypes.arrayOf(documentType);
 
 export const historyType = PropTypes.shape({
-  author: authorType.isRequired,
-  body: PropTypes.string.isRequired,
-  creationDate: PropTypes.instanceOf(Date),
-  entrance: PropTypes.number,
   id: PropTypes.number.isRequired,
-  language: PropTypes.shape({
-    id: PropTypes.string.isRequired,
-    refName: PropTypes.string.isRequired
-  }).isRequired,
-  relevance: PropTypes.number
+  body: PropTypes.string.isRequired,
+  author: authorType.isRequired,
+  reviewer: authorType,
+  creationDate: PropTypes.instanceOf(Date),
+  reviewedDate: PropTypes.instanceOf(Date),
+  relevance: PropTypes.number,
+  language: PropTypes.string
 });
 
 export const historiesType = PropTypes.arrayOf(historyType);
 
 export const locationType = PropTypes.shape({
-  author: authorType,
-  body: PropTypes.string,
-  creationDate: PropTypes.instanceOf(Date),
-  entrance: PropTypes.number,
   id: PropTypes.number,
-  language: PropTypes.shape({
-    id: PropTypes.string.isRequired,
-    refName: PropTypes.string.isRequired
-  }).isRequired,
+  title: PropTypes.string,
+  body: PropTypes.string,
+  author: authorType.isRequired,
+  reviewer: authorType,
+  creationDate: PropTypes.instanceOf(Date),
+  reviewedDate: PropTypes.instanceOf(Date),
   relevance: PropTypes.number,
-  title: PropTypes.string
+  language: PropTypes.string
 });
 
 export const locationsType = PropTypes.arrayOf(locationType);
@@ -219,14 +212,14 @@ export const obstacleType = PropTypes.shape({
 });
 
 export const riggingType = PropTypes.shape({
+  id: PropTypes.number.isRequired,
+  title: PropTypes.string.isRequired,
   obstacles: PropTypes.arrayOf(obstacleType),
   author: authorType,
-  id: PropTypes.number.isRequired,
-  language: PropTypes.shape({
-    id: PropTypes.string.isRequired,
-    refName: PropTypes.string.isRequired
-  }).isRequired,
-  title: PropTypes.string.isRequired
+  reviewer: authorType,
+  reviewedDate: PropTypes.instanceOf(Date),
+  creationDate: PropTypes.instanceOf(Date),
+  language: PropTypes.string
 });
 
 export const riggingsType = PropTypes.arrayOf(riggingType);

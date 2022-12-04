@@ -1,5 +1,6 @@
 import fetch from 'isomorphic-fetch';
 import { postLocationUrl } from '../../conf/apiRoutes';
+import { checkAndGetStatus } from '../utils';
 
 export const POST_LOCATION = 'POST_LOCATION';
 export const POST_LOCATION_SUCCESS = 'POST_LOCATION_SUCCESS';
@@ -19,7 +20,7 @@ export const postLocationFailure = error => ({
   error
 });
 
-export const postLocation = ({ body, entrance, language, title }) => (
+export const postLocation = ({ entrance, title, body, language }) => (
   dispatch,
   getState
 ) => {
@@ -27,18 +28,14 @@ export const postLocation = ({ body, entrance, language, title }) => (
 
   const requestOptions = {
     method: 'POST',
-    body: JSON.stringify({ body, entrance, language, title }),
+    body: JSON.stringify({ entrance, title, body, language }),
     headers: getState().login.authorizationHeader
   };
 
   return fetch(postLocationUrl, requestOptions)
-    .then(response => {
-      if (response.status >= 400) {
-        throw new Error(response.status);
-      }
-      return response.text();
-    })
-    .then(text => dispatch(postLocationSuccess(JSON.parse(text))))
+    .then(checkAndGetStatus)
+    .then(response => response.json())
+    .then(data => dispatch(postLocationSuccess(data)))
     .catch(errorMessage => {
       dispatch(postLocationFailure(errorMessage));
     });

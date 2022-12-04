@@ -123,10 +123,7 @@ LanguageAutoComplete.propTypes = {
   onSelection: PropTypes.func.isRequired,
   required: PropTypes.bool,
   searchLabelText: PropTypes.string.isRequired,
-  value: PropTypes.shape({
-    id: PropTypes.string.isRequired,
-    refName: PropTypes.string.isRequired
-  })
+  value: PropTypes.string.isRequired
 };
 
 export default LanguageAutoComplete;

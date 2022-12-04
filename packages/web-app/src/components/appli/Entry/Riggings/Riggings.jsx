@@ -24,7 +24,14 @@ const Riggings = ({ riggings, entranceId }) => {
   const permissions = usePermissions();
   const [isFormVisible, setIsFormVisible] = useState(false);
   const handleSubmitForm = data => {
-    dispatch(postRiggings(data, entranceId, data.language.id, riggings.id));
+    dispatch(
+      postRiggings({
+        entrance: entranceId,
+        title: data.title,
+        obstacles: data.obstacles,
+        language: data.language.id
+      })
+    );
     setIsFormVisible(false);
   };
 
@@ -64,10 +71,10 @@ const Riggings = ({ riggings, entranceId }) => {
           {riggings
             ?.sort((r1, r2) => r1.title.localeCompare(r2.title))
             .map((rigging, index) => (
-              <>
-                <Rigging rigging={rigging} key={rigging.id} />
+              <React.Fragment key={rigging.id}>
+                <Rigging rigging={rigging} />
                 {index < riggings.length - 1 && <DividerWithMargin />}
-              </>
+              </React.Fragment>
             ))}
         </>
       }

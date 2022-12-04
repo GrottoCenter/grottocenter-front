@@ -20,23 +20,30 @@ import Contribution from '../../../common/Contribution/Contribution';
 const Location = ({ location }) => {
   const dispatch = useDispatch();
   const permissions = usePermissions();
-  const { author, body, creationDate, title } = location;
+  const {
+    title,
+    body,
+    author,
+    reviewer,
+    creationDate,
+    reviewedDate
+  } = location;
   const [isFormVisible, setIsFormVisible] = useState(false);
 
   const onSubmitForm = data => {
     dispatch(
       updateLocation({
-        ...data,
-        entrance: location.entrance,
-        language: data.language.id,
-        location: location.id
+        id: data.id,
+        title: data.title,
+        body: data.body,
+        language: data.language.id
       })
     );
     setIsFormVisible(false);
   };
 
   return (
-    <ListItem disablePadding disableGutters divider alignItems="flex-start">
+    <ListItem disableGutters divider alignItems="flex-start">
       {isFormVisible ? (
         <Box width="100%">
           <CreateLocationForm
@@ -53,8 +60,10 @@ const Location = ({ location }) => {
           secondary={
             <Contribution
               author={author}
+              reviewer={reviewer}
               body={body}
               creationDate={creationDate}
+              dateReviewed={reviewedDate}
             />
           }
         />

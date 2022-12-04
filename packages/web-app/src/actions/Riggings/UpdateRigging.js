@@ -1,5 +1,6 @@
 import fetch from 'isomorphic-fetch';
 import { putRiggingsUrl } from '../../conf/apiRoutes';
+import { checkAndGetStatus } from '../utils';
 
 export const UPDATE_RIGGINGS = 'UPDATE_RIGGINGS';
 export const UPDATE_RIGGINGS_SUCCESS = 'UPDATE_RIGGINGS_SUCCESS';
@@ -9,9 +10,9 @@ export const updateRiggingsAction = () => ({
   type: UPDATE_RIGGINGS
 });
 
-export const updateRiggingsSuccess = riggings => ({
+export const updateRiggingsSuccess = rigging => ({
   type: UPDATE_RIGGINGS_SUCCESS,
-  riggings
+  rigging
 });
 
 export const updateRiggingsFailure = error => ({
@@ -19,31 +20,22 @@ export const updateRiggingsFailure = error => ({
   error
 });
 
-function transformData(data) {
-  return {
-    id: data.id,
-    language: data.language,
-    title: data.title,
-    obstacles: data.obstacles
-  };
-}
-
-export const updateRiggings = data => (dispatch, getState) => {
+export const updateRiggings = ({ id, title, obstacles, language }) => (
+  dispatch,
+  getState
+) => {
   dispatch(updateRiggingsAction());
+
   const requestOptions = {
     method: 'PATCH',
-    body: JSON.stringify(transformData(data)),
+    body: JSON.stringify({ title, obstacles, language }),
     headers: getState().login.authorizationHeader
   };
 
-  return fetch(putRiggingsUrl(data.id), requestOptions)
-    .then(response => {
-      if (response.status >= 400) {
-        throw new Error(response.status);
-      }
-      return response.text();
-    })
-    .then(text => dispatch(updateRiggingsSuccess(JSON.parse(text))))
+  return fetch(putRiggingsUrl(id), requestOptions)
+    .then(checkAndGetStatus)
+    .then(response => response.json())
+    .then(data => dispatch(updateRiggingsSuccess(data)))
     .catch(errorMessage => {
       dispatch(updateRiggingsFailure(errorMessage));
     });

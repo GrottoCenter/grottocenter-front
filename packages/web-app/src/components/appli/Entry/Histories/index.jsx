@@ -23,8 +23,8 @@ const Histories = ({ entranceId, histories }) => {
   const onSubmitForm = data => {
     dispatch(
       postHistory({
-        ...data,
         entrance: entranceId,
+        body: data.body,
         language: data.language.id
       })
     );
@@ -56,9 +56,7 @@ const Histories = ({ entranceId, histories }) => {
           {histories.length > 0 ? (
             <List dense disablePadding>
               {histories.map(history => (
-                <React.Fragment key={history.id}>
-                  <History history={history} />
-                </React.Fragment>
+                <History history={history} key={history.id} />
               ))}
             </List>
           ) : (

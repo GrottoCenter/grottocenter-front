@@ -13,7 +13,7 @@ export const FormAutoCompleteTypes = {
   resultEndAdornment: PropTypes.node,
   sideActionDisabled: PropTypes.bool,
   sideActionIcon: PropTypes.node,
-  value: PropTypes.shape({})
+  value: PropTypes.any
 };
 
 export const MultipleSelectTypes = {

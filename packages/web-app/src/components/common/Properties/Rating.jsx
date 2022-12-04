@@ -26,8 +26,8 @@ const Rating = ({ value, label, size }) => (
       size={size}
       readOnly
       name={label}
-      value={value}
-      precision={0.1}
+      value={value / 2}
+      precision={0.5}
       emptyIcon={<StarBorderIcon fontSize="inherit" />}
     />
   </Wrapper>

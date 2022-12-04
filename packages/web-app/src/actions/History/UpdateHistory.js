@@ -1,5 +1,6 @@
 import fetch from 'isomorphic-fetch';
 import { putHistoryUrl } from '../../conf/apiRoutes';
+import { checkAndGetStatus } from '../utils';
 
 export const UPDATE_HISTORY = 'UPDATE_HISTORY';
 export const UPDATE_HISTORY_SUCCESS = 'UPDATE_HISTORY_SUCCESS';
@@ -19,7 +20,7 @@ export const updateHistoryFailure = error => ({
   error
 });
 
-export const updateHistory = ({ body, entrance, id, language, title }) => (
+export const updateHistory = ({ id, body, language }) => (
   dispatch,
   getState
 ) => {
@@ -27,18 +28,14 @@ export const updateHistory = ({ body, entrance, id, language, title }) => (
 
   const requestOptions = {
     method: 'PUT',
-    body: JSON.stringify({ body, entrance, language, title }),
+    body: JSON.stringify({ body, language }),
     headers: getState().login.authorizationHeader
   };
 
   return fetch(putHistoryUrl(id), requestOptions)
-    .then(response => {
-      if (response.status >= 400) {
-        throw new Error(response.status);
-      }
-      return response.text();
-    })
-    .then(text => dispatch(updateHistorySuccess(JSON.parse(text))))
+    .then(checkAndGetStatus)
+    .then(response => response.json())
+    .then(data => dispatch(updateHistorySuccess(data)))
     .catch(errorMessage => {
       dispatch(updateHistoryFailure(errorMessage));
     });
