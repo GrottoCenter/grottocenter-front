@@ -64,9 +64,13 @@ export const getDescriptions = descriptions =>
   descriptions
     .map(description => ({
       author: getAuthor(description?.author),
+      reviewer: getAuthor(description?.reviewer),
       body: description?.body,
       creationDate: description?.dateInscription
         ? new Date(description?.dateInscription)
+        : null,
+      reviewedDate: description?.dateReviewed
+        ? new Date(description?.dateReviewed)
         : null,
       id: description?.id,
       language: description?.language,

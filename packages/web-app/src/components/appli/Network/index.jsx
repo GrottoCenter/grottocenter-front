@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import { isNil } from 'ramda';
@@ -14,19 +14,12 @@ import { NetworkForm } from '../EntitiesForm';
 import StandardDialog from '../../common/StandardDialog';
 import AuthorLink from '../../common/AuthorLink/index';
 
-const Content = () => (
-  <>
-    <EntrancesMap />
-    <Properties />
-  </>
-);
-
 export const Network = ({ children }) => {
   const { formatMessage, formatDate } = useIntl();
   const {
     state: { cave, entrances }
   } = useContext(CaveContext);
-  const { author, creationDate, name } = cave;
+  const { author, reviewer, creationDate, dateReviewed, name } = cave;
   const editPage = useBoolean();
   const permissions = usePermissions();
 
@@ -34,43 +27,62 @@ export const Network = ({ children }) => {
     editPage.open();
   };
 
+  const componentRef = useRef();
   return (
-    <Layout
-      onEdit={permissions.isAuth ? handleEdit : undefined}
-      fixedContent={
-        <FixedContent
-          title={name || ''}
-          content={<Content />}
-          footer={
-            <span>
-              <AuthorLink author={author} verb="Created" />
-              {!isNil(creationDate) && ` (${formatDate(creationDate)})`}
-            </span>
-          }
-          icon={<CustomIcon type="cave_system" />}
-        />
-      }>
-      {children}
-      {permissions.isAuth && (
-        <StandardDialog
-          fullWidth
-          maxWidth="md"
-          open={editPage.isOpen}
-          onClose={editPage.close}
-          scrollable
-          title={formatMessage({ id: 'Network edition' })}>
-          <NetworkForm
-            networkValues={{
-              ...cave,
-              entrances,
-              name: cave && cave.names ? cave.names[0].name : '',
-              language: cave && cave.names ? cave.names[0].language : '',
-              massif: cave?.massif || ''
-            }}
+    <div ref={componentRef}>
+      <Layout
+        fixedContent={
+          <FixedContent
+            title={name ?? ''}
+            icon={<CustomIcon type="cave_system" />}
+            onEdit={permissions.isAuth ? handleEdit : undefined}
+            printRef={componentRef}
+            content={
+              <>
+                <EntrancesMap />
+                <Properties />
+              </>
+            }
+            footer={
+              <span>
+                {isNil(reviewer) && (
+                  <AuthorLink author={author} verb="Created" />
+                )}
+                {isNil(reviewer) &&
+                  !isNil(creationDate) &&
+                  ` (${formatDate(creationDate)})`}
+                {!isNil(reviewer) && (
+                  <AuthorLink author={reviewer} verb="Updated" />
+                )}
+                {!isNil(reviewer) &&
+                  !isNil(dateReviewed) &&
+                  ` (${formatDate(dateReviewed)})`}
+              </span>
+            }
           />
-        </StandardDialog>
-      )}
-    </Layout>
+        }>
+        {children}
+        {permissions.isAuth && (
+          <StandardDialog
+            fullWidth
+            maxWidth="md"
+            open={editPage.isOpen}
+            onClose={editPage.close}
+            scrollable
+            title={formatMessage({ id: 'Network edition' })}>
+            <NetworkForm
+              networkValues={{
+                ...cave,
+                entrances,
+                name: cave && cave.names ? cave.names[0].name : '',
+                language: cave && cave.names ? cave.names[0].language : '',
+                massif: cave?.massif || ''
+              }}
+            />
+          </StandardDialog>
+        )}
+      </Layout>
+    </div>
   );
 };
 

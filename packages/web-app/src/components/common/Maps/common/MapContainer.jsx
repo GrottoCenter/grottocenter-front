@@ -1,21 +1,21 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { isMobileOnly } from 'react-device-detect';
 import { MapContainer, useMap, useMapEvents } from 'react-leaflet';
-
 import PropTypes from 'prop-types';
 import LayersControl from './LayersControl';
 import FullscreenControl from './FullscreenControl';
 
-const Wrapper = styled.div`
-  width: 100%;
-${({ wholePage }) => !wholePage && `width: auto;`}
-${({ wholePage, theme }) =>
-  !wholePage && `margin-bottom: ${theme.spacing(2)}px;`}
-${({ wholePage }) => !wholePage && `height: ${isMobileOnly ? '220' : '300'}px;`}
-${({ wholePage, theme }) =>
-  wholePage && `height: calc(100vh - ${theme.appBarHeight}px);`}
-`;
+const Wrapper = styled.div(
+  ({ theme, wholePage }) => `
+  width: calc(100% - 10px);
+  height: 400px;
+
+  ${theme.breakpoints.up('md')} {
+    ${!wholePage && `margin-right: ${theme.spacing(2)}px;`}
+  }
+${wholePage && `height: calc(100vh - ${theme.appBarHeight}px);`}
+`
+);
 
 // The Map, once mounted, doesn't change its center: this Centerer forces it
 // See https://github.com/PaulLeCam/react-leaflet/issues/796#issuecomment-743181396

@@ -1,3 +1,4 @@
+import arrFindReplaceOrAdd from './utils';
 import {
   FETCH_ENTRANCE_SUCCESS,
   FETCH_ENTRANCE_ERROR,
@@ -32,14 +33,6 @@ const initialState = {
   error: null,
   latestHttpCode: null
 };
-
-function arrFindReplaceOrAdd(arr, test, replacement) {
-  const newArr = arr.slice(); // Create a copy for immutability
-  const index = newArr.findIndex(test);
-  if (index < 0) newArr.push(replacement);
-  else newArr.splice(index, 1, replacement);
-  return newArr;
-}
 
 const reducer = (state = initialState, action) => {
   switch (action.type) {

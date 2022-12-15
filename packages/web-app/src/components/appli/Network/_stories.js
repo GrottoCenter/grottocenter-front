@@ -13,7 +13,7 @@ import Properties from './Properties';
 import { Network } from './index';
 import EntrancesSelection from './EntrancesSelection';
 import EntrancesList from './EntrancesList';
-import Descriptions from './Descriptions';
+import Descriptions from '../Descriptions';
 
 const date = new Date('2015-03');
 const today = new Date();

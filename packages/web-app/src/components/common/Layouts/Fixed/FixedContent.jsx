@@ -12,7 +12,9 @@ import {
   CircularProgress,
   Tooltip
 } from '@material-ui/core';
+import { Print } from '@material-ui/icons';
 import styled from 'styled-components';
+import ReactToPrint from 'react-to-print';
 import CreateIcon from '@material-ui/icons/Create';
 import NotificationsNoneIcon from '@material-ui/icons/NotificationsNone';
 import NotificationsActiveIcon from '@material-ui/icons/NotificationsActive';
@@ -39,10 +41,22 @@ const CardActions = styled(MuiCardActions)`
 
 const Title = styled.div`
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
 `;
+const TitleIcon = styled.div(
+  ({ theme }) => `
+  margin-right: 6px;
+  margin-top: 4px;
+
+  ${theme.breakpoints.up('md')} {
+    margin-top: 8px;
+  }
+`
+);
 
 const IconButton = styled(MuiIconButton)`
+  margin-right: 7px;
+  margin-top: 7px;
   margin-left: auto;
 `;
 
@@ -54,6 +68,7 @@ const FixedContent = ({
   content,
   footer,
   onEdit,
+  printRef,
   onChangeSubscribe,
   isSubscribed,
   isSubscribeLoading
@@ -78,6 +93,19 @@ const FixedContent = ({
                 <CreateIcon />
               </IconButton>
             )}
+            {!isNil(printRef) && (
+              <ReactToPrint
+                trigger={() => (
+                  <IconButton
+                    aria-label={formatMessage({ id: 'Print' })}
+                    color="primary">
+                    <Print />
+                  </IconButton>
+                )}
+                content={() => printRef.current}
+              />
+            )}
+
             {!isNil(onChangeSubscribe) && (
               <Tooltip
                 title={formatMessage({
@@ -99,10 +127,10 @@ const FixedContent = ({
         title={
           isString(title) ? (
             <Title>
+              {!isNil(icon) && <TitleIcon>{icon}</TitleIcon>}
               <Typography variant="h1" color="secondary">
                 {title}
               </Typography>
-              {!isNil(icon) && icon}
             </Title>
           ) : (
             <Skeleton />
@@ -123,6 +151,10 @@ FixedContent.propTypes = {
   isSubscribed: PropTypes.bool,
   isSubscribeLoading: PropTypes.bool,
   onEdit: PropTypes.func,
+  printRef: PropTypes.shape({
+    // eslint-disable-next-line react/forbid-prop-types
+    current: PropTypes.any
+  }).isRequired,
   onChangeSubscribe: PropTypes.func,
   subheader: PropTypes.node,
   title: PropTypes.oneOfType([PropTypes.node, PropTypes.string]).isRequired

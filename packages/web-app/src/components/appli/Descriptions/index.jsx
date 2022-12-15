@@ -6,15 +6,15 @@ import { Divider, IconButton, List } from '@material-ui/core';
 import AddCircleIcon from '@material-ui/icons/AddCircle';
 import CancelIcon from '@material-ui/icons/Cancel';
 
-import ScrollableContent from '../../../common/Layouts/Fixed/ScrollableContent';
-import { descriptionsType } from '../Provider';
+import ScrollableContent from '../../common/Layouts/Fixed/ScrollableContent';
+import { descriptionsType } from './propTypes';
 import Description from './Description';
-import CreateDescriptionForm from '../../Form/DescriptionForm';
-import { postDescription } from '../../../../actions/Description/CreateDescription';
-import { usePermissions } from '../../../../hooks';
-import Alert from '../../../common/Alert';
+import CreateDescriptionForm from '../Form/DescriptionForm';
+import { postDescription } from '../../../actions/Description/CreateDescription';
+import { usePermissions } from '../../../hooks';
+import Alert from '../../common/Alert';
 
-const Descriptions = ({ entranceId, descriptions }) => {
+const Descriptions = ({ entityType, entityId, descriptions }) => {
   const { formatMessage } = useIntl();
   const permissions = usePermissions();
   const dispatch = useDispatch();
@@ -23,7 +23,7 @@ const Descriptions = ({ entranceId, descriptions }) => {
   const onSubmitForm = data => {
     dispatch(
       postDescription({
-        entrance: entranceId,
+        [entityType]: entityId,
         title: data.title,
         body: data.body,
         language: data.language.id
@@ -64,7 +64,7 @@ const Descriptions = ({ entranceId, descriptions }) => {
             <Alert
               severity="info"
               content={formatMessage({
-                id: 'There is currently no description for this entrance.'
+                id: `There is currently no description for this ${entityType}.`
               })}
             />
           )}
@@ -75,7 +75,8 @@ const Descriptions = ({ entranceId, descriptions }) => {
 };
 
 Descriptions.propTypes = {
-  entranceId: PropTypes.number.isRequired,
+  entityType: PropTypes.oneOf(['entrance', 'cave', 'massif']),
+  entityId: PropTypes.number.isRequired,
   descriptions: descriptionsType
 };
 

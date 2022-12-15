@@ -1,13 +1,18 @@
 import React, { useRef } from 'react';
 import styled from 'styled-components';
-import { isMobile } from 'react-device-detect';
 import PropTypes from 'prop-types';
 
-import ActionBar from './ActionBar';
-
-const Wrapper = styled.div`
+const Wrapper = styled.div(
+  ({ theme, isFixedContent }) => `
   display: grid;
-  grid-template-columns: ${isMobile ? '100%' : '500px auto'};
+  ${isFixedContent && 'grid-template-columns: 100%;'}
+  ${theme.breakpoints.up('md')} {
+    ${
+      !isFixedContent
+        ? 'grid-template-columns: 100%;'
+        : 'grid-template-columns: 500px auto;'
+    }
+  }
   @media print {
     display: block;
     background-color: white;
@@ -16,19 +21,19 @@ const Wrapper = styled.div`
       margin: 15mm 15mm 15mm 15mm;
     }
   }
-`;
+  `
+);
 
-const FixedWrapper = styled.div`
-  position: ${!isMobile && 'sticky'};
-  top: ${({ theme }) => !isMobile && theme.appBarHeight}px;
-  height: calc(
-    ${isMobile ? '100%' : '100vh'} -
-      ${({ theme }) => theme.appBarHeight + theme.spacing(3)}px
-  );
+const FixedWrapper = styled.div(
+  ({ theme }) => `
   box-sizing: border-box;
-`;
-
-const ScrollableContent = styled.div``;
+  ${theme.breakpoints.up('md')} {
+    position: sticky;
+    top: ${theme.appBarHeight}px;
+    height: calc(100vh - ${theme.appBarHeight + theme.spacing(3)}px);
+  }
+`
+);
 
 const ScrollableWrapper = styled.div`
   display: flex;
@@ -37,22 +42,17 @@ const ScrollableWrapper = styled.div`
 
 const Layout = ({ children, fixedContent, onEdit }) => {
   const componentRef = useRef();
-
   return (
-    <Wrapper ref={componentRef}>
-      {isMobile && <ActionBar printRef={componentRef} onEdit={onEdit} />}
-      <FixedWrapper>{fixedContent}</FixedWrapper>
-      <ScrollableWrapper>
-        {!isMobile && <ActionBar printRef={componentRef} onEdit={onEdit} />}
-        <ScrollableContent>{children}</ScrollableContent>
-      </ScrollableWrapper>
+    <Wrapper ref={componentRef} isFixedContent={!!fixedContent}>
+      {fixedContent && <FixedWrapper>{fixedContent}</FixedWrapper>}
+      <ScrollableWrapper>{children}</ScrollableWrapper>
     </Wrapper>
   );
 };
 
 Layout.propTypes = {
   children: PropTypes.node.isRequired,
-  fixedContent: PropTypes.node.isRequired,
+  fixedContent: PropTypes.node,
   onEdit: PropTypes.func
 };
 

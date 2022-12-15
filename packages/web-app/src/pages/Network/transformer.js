@@ -3,23 +3,24 @@ import getAuthor from '../../util/getAuthor';
 
 // eslint-disable-next-line import/prefer-default-export
 export const getSafeData = data => ({
-  altitude: data.altitude,
+  id: data.id,
   author: getAuthor(data?.author),
-  reviewer: data?.reviewer ? getAuthor(data?.reviewer) : null,
+  reviewer: getAuthor(data?.reviewer),
   creationDate: data.dateInscription,
   reviewedDate: data.dateReviewed,
+  altitude: data.altitude,
   depth: data.depth,
   length: data.length,
-  descriptions: data.descriptions,
-  discoveryYear: data.discoveryYear,
-  entrances: pathOr([], ['entrances'], data),
-  id: data.id,
+  latitude: data.latitude,
+  longitude: data.longitude,
+  temperature: data.temperature,
   isDivingCave: data.isDiving,
+  descriptions: data.descriptions,
+  entrances: data.entrances ?? [],
   massif: pathOr(undefined, ['massifs', 0], data),
   massifs: data.massifs,
-  name: data.name,
+  name: pathOr(data.name, ['names', 0, 'name'], data),
   names: data.names,
-  temperature: data.temperature,
   undergroundType: pathOr(null, ['massif', 'undergroundType'], data),
   redirectTo: data.redirectTo
 });

@@ -8,7 +8,7 @@ import styled from 'styled-components';
 import { isNil } from 'ramda';
 
 import LanguageAutoComplete from '../LanguageAutoComplete';
-import { descriptionType } from '../../Entry/Provider';
+import { descriptionType } from '../../Descriptions/propTypes';
 
 const SpacedButton = styled(Button)`
   ${({ theme }) => `
