@@ -76,21 +76,19 @@ const Provider = ({ data, loading = true, children }) => {
 };
 
 export const caveTypes = PropTypes.shape({
-  altitude: PropTypes.number,
-  author: PropTypes.shape({
-    nickname: PropTypes.string
-  }),
-  creationDate: PropTypes.string,
-  depth: PropTypes.number,
-  discoveryYear: PropTypes.number,
-  entrances: PropTypes.arrayOf(entranceDetailsType),
   id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-  isDivingCave: PropTypes.bool,
-  length: PropTypes.number,
-  massif: PropTypes.shape({ id: PropTypes.number, name: PropTypes.string }),
+  author: authorType,
+  reviewer: authorType,
   name: PropTypes.string,
+  creationDate: PropTypes.string,
+  reviewedDate: PropTypes.string,
+  depth: PropTypes.number,
+  length: PropTypes.number,
+  altitude: PropTypes.number,
   temperature: PropTypes.number,
-  undergroundType: PropTypes.string
+  isDivingCave: PropTypes.bool,
+  entrances: PropTypes.arrayOf(entranceDetailsType),
+  massif: PropTypes.shape({ id: PropTypes.number, name: PropTypes.string })
 });
 
 export const descriptionsType = PropTypes.arrayOf(

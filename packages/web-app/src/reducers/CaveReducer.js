@@ -4,23 +4,12 @@ import {
   FETCH_CAVE_LOADING
 } from '../actions/Cave/GetCave';
 
+import { POST_DESCRIPTION_SUCCESS } from '../actions/Description/CreateDescription';
+import { UPDATE_DESCRIPTION_SUCCESS } from '../actions/Description/UpdateDescription';
+import arrFindReplaceOrAdd from './utils';
+
 const initialState = {
-  data: {
-    cave: {
-      id: 1,
-      depth: 0,
-      development: 0,
-      interest: 0,
-      progression: 0,
-      access: 0,
-      name: 'Cave Name',
-      country: 'Country',
-      region: 'Region',
-      city: 'City',
-      author: 'Author'
-    },
-    entries: []
-  },
+  data: {},
   loading: false,
   error: null
 };
@@ -43,6 +32,20 @@ const reducer = (state = initialState, action) => {
         ...state,
         loading: true,
         error: action.error
+      };
+
+    case POST_DESCRIPTION_SUCCESS:
+    case UPDATE_DESCRIPTION_SUCCESS:
+      return {
+        ...initialState,
+        data: {
+          ...state.data,
+          descriptions: arrFindReplaceOrAdd(
+            state.data.descriptions,
+            e => e.id === action.description.id,
+            action.description
+          )
+        }
       };
     default:
       return state;

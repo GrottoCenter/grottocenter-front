@@ -1,6 +1,7 @@
 import React, { useState, createContext, useEffect, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { all, allPass, equals, is, length, pathOr, pipe } from 'ramda';
+import { descriptionsType } from '../Descriptions/propTypes';
 import authorType from '../../../types/author.type';
 import idNameType from '../../../types/idName.type';
 
@@ -140,20 +141,6 @@ export const commentType = PropTypes.shape({
 });
 
 export const commentsType = PropTypes.arrayOf(commentType);
-
-export const descriptionType = PropTypes.shape({
-  id: PropTypes.number,
-  title: PropTypes.string,
-  body: PropTypes.string,
-  author: authorType,
-  reviewer: authorType,
-  creationDate: PropTypes.instanceOf(Date),
-  reviewedDate: PropTypes.instanceOf(Date),
-  language: PropTypes.string,
-  relevance: PropTypes.number
-});
-
-export const descriptionsType = PropTypes.arrayOf(descriptionType);
 
 export const documentType = PropTypes.shape({
   details: PropTypes.shape({

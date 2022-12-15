@@ -11,11 +11,11 @@ import { useDispatch } from 'react-redux';
 import EditIcon from '@material-ui/icons/Edit';
 import CancelIcon from '@material-ui/icons/Cancel';
 
-import { descriptionType } from '../Provider';
-import CreateDescriptionForm from '../../Form/DescriptionForm/index';
-import { updateDescription } from '../../../../actions/Description/UpdateDescription';
-import { usePermissions } from '../../../../hooks';
-import Contribution from '../../../common/Contribution/Contribution';
+import { descriptionType } from './propTypes';
+import CreateDescriptionForm from '../Form/DescriptionForm/index';
+import { updateDescription } from '../../../actions/Description/UpdateDescription';
+import { usePermissions } from '../../../hooks';
+import Contribution from '../../common/Contribution/Contribution';
 
 const Description = ({ description }) => {
   const dispatch = useDispatch();

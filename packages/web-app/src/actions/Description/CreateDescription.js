@@ -23,6 +23,7 @@ export const postDescriptionFailure = error => ({
 
 export const postDescription = ({
   entrance,
+  cave,
   massif,
   title,
   body,
@@ -32,7 +33,7 @@ export const postDescription = ({
 
   const requestOptions = {
     method: 'POST',
-    body: JSON.stringify({ entrance, massif, title, body, language }),
+    body: JSON.stringify({ entrance, cave, massif, title, body, language }),
     headers: getState().login.authorizationHeader
   };
 

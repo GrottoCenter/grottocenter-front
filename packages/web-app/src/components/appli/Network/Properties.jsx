@@ -1,13 +1,7 @@
 import React, { useContext } from 'react';
 import { useIntl } from 'react-intl';
 import styled from 'styled-components';
-import {
-  Terrain,
-  Waves,
-  CalendarToday,
-  Category,
-  Title
-} from '@material-ui/icons';
+import { Terrain, Waves, Title } from '@material-ui/icons';
 
 import CustomIcon from '../../common/CustomIcon';
 import { isValidPositions } from '../../common/Maps/MapMultipleMarkers';
@@ -22,22 +16,14 @@ const Wrapper = styled.div`
 
 const SecondaryPropertiesWrapper = styled.div`
   display: flex;
-  justify-content: space-evenly;
+  justify-content: flex-start;
   flex-wrap: wrap;
 `;
 
 const Properties = () => {
   const {
     state: {
-      cave: {
-        depth,
-        discoveryYear,
-        isDivingCave,
-        length,
-        massif,
-        temperature,
-        undergroundType
-      },
+      cave: { length, depth, temperature, isDivingCave, massif },
       coordinates,
       selectedEntrances,
       entrances,
@@ -57,35 +43,23 @@ const Properties = () => {
           selection={selectedEntrances}
         />
       )}
-      <Property
-        loading={loading}
-        label={formatMessage({ id: 'Depth' })}
-        value={`${depth} m`}
-        icon={<CustomIcon type="depth" />}
-      />
-      <Property
-        loading={loading}
-        label={formatMessage({ id: 'Development' })}
-        value={`${length} m`}
-        icon={<CustomIcon type="length" />}
-      />
+      {depth && (
+        <Property
+          loading={loading}
+          label={formatMessage({ id: 'Depth' })}
+          value={`${depth} m`}
+          icon={<CustomIcon type="depth" />}
+        />
+      )}
+      {length && (
+        <Property
+          loading={loading}
+          label={formatMessage({ id: 'Development' })}
+          value={`${length} m`}
+          icon={<CustomIcon type="length" />}
+        />
+      )}
       <SecondaryPropertiesWrapper>
-        {discoveryYear && (
-          <Property
-            label={formatMessage({ id: 'Year of discovery' })}
-            value={discoveryYear}
-            icon={<CalendarToday color="primary" />}
-            secondary
-          />
-        )}
-        {undergroundType && (
-          <Property
-            label={formatMessage({ id: 'Underground type' })}
-            value={undergroundType}
-            icon={<Category color="primary" />}
-            secondary
-          />
-        )}
         {massif && (
           <Property
             label={formatMessage({ id: 'Massif' })}

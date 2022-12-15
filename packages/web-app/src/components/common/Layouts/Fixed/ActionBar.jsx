@@ -2,7 +2,7 @@ import React, { useContext } from 'react';
 import { isNil } from 'ramda';
 import { useIntl } from 'react-intl';
 import { Tooltip, Fab } from '@material-ui/core';
-import { Share, Print, Map, GpsFixed, Edit } from '@material-ui/icons';
+import { Print, Map, Edit } from '@material-ui/icons';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
 import ReactToPrint from 'react-to-print';
@@ -88,16 +88,6 @@ const ActionBar = ({ printRef, onEdit }) => {
           />
         )}
         content={() => printRef.current}
-      />
-      <ActionButton
-        Icon={
-          <Share fontSize={isMobile ? 'small' : 'medium'} color="inherit" />
-        }
-        label={formatMessage({ id: 'Share' })}
-      />
-      <ActionButton
-        Icon={<GpsFixed fontSize={isMobile ? 'small' : 'medium'} />}
-        label={formatMessage({ id: 'GeoHack' })}
       />
       <ActionButton
         onClick={lat && long ? openMap : undefined}

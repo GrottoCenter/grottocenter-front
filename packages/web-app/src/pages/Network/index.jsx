@@ -6,7 +6,8 @@ import Network from '../../components/appli/Network';
 import EntrancesList from '../../components/appli/Network/EntrancesList';
 import { fetchCave } from '../../actions/Cave/GetCave';
 import { getSafeData } from './transformer';
-import Descriptions from '../../components/appli/Network/Descriptions';
+import { getDescriptions } from '../Entry/transformers';
+import Descriptions from '../../components/appli/Descriptions';
 import Deleted, {
   DELETED_ENTITIES
 } from '../../components/common/card/Deleted';
@@ -37,6 +38,8 @@ const NetworkPage = () => {
   useEffect(() => {
     prevUpdateLoading.current = updateLoading;
   }, [updateLoading]);
+
+  const descriptions = getDescriptions(data.descriptions ?? []);
   const safeData = getSafeData(data);
   return data.isDeleted ? (
     <Deleted
@@ -52,7 +55,11 @@ const NetworkPage = () => {
     <Network loading={loading || !isNil(error)} data={safeData}>
       <>
         <EntrancesList />
-        <Descriptions />
+        <Descriptions
+          descriptions={descriptions}
+          entityType="cave"
+          entityId={id}
+        />
       </>
     </Network>
   );

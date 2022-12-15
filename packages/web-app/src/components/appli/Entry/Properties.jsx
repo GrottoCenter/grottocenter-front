@@ -1,8 +1,7 @@
 import React, { useContext } from 'react';
 import { useIntl } from 'react-intl';
 import styled from 'styled-components';
-import { Box } from '@material-ui/core';
-import EmptyStarIcon from '@material-ui/icons/StarBorder';
+import { Box, IconButton } from '@material-ui/core';
 import {
   CalendarToday,
   Category,
@@ -11,7 +10,9 @@ import {
   Public,
   Terrain,
   Title,
-  Waves
+  Waves,
+  Place,
+  Map
 } from '@material-ui/icons';
 import Alert from '../../common/Alert';
 import CustomIcon from '../../common/CustomIcon';
@@ -20,6 +21,7 @@ import { EntryContext, isValidCoordinates } from './Provider';
 import Ratings from './Ratings';
 
 const GlobalWrapper = styled.div`
+  width: 100%;
   display: flex;
   flex-direction: column;
   gap: ${({ theme }) => theme.spacing(2)}px;
@@ -27,6 +29,15 @@ const GlobalWrapper = styled.div`
 
 const SmallRatingsWrapper = styled.div`
   transform: scale(0.85);
+`;
+
+const FlexContainer = styled.div`
+  display: flex;
+  justify-content: start;
+  align-items: center;
+`;
+const FlexContainerGrow = styled.div`
+  flex-grow: 1;
 `;
 
 const computePrecisionSeverity = precision => {
@@ -60,12 +71,8 @@ const Properties = () => {
   } = useContext(EntryContext);
   const { formatMessage } = useIntl();
   const makeCoordinatesValue = coordinatesValue =>
-    `${formatMessage({
-      id: 'Lat.'
-    })} / ${formatMessage({ id: 'Long.' })} =
-    ${coordinatesValue[0].toFixed(4)} °N / ${coordinatesValue[1].toFixed(
-      4
-    )} °E`;
+    `${formatMessage({ id: 'Lat.' })} / ${formatMessage({ id: 'Long.' })} =
+    ${coordinatesValue[0].toFixed(4)}, ${coordinatesValue[1].toFixed(4)}`;
 
   const precisionSeverity = computePrecisionSeverity(precision);
 
@@ -90,16 +97,49 @@ const Properties = () => {
     );
   }
 
+  const openOSM = () => {
+    window.open(
+      `https://www.openstreetmap.org/?mlat=${coordinates[0]}&mlon=${coordinates[1]}`,
+      '_blank',
+      'noopener,noreferrer'
+    );
+  };
+  const openGM = () => {
+    window.open(
+      `https://www.google.com/maps/search/?api=1&query=${coordinates[0]},${coordinates[1]}`,
+      '_blank',
+      'noopener,noreferrer'
+    );
+  };
+
   return (
     <GlobalWrapper>
       <Box display="flex" flexDirection="column">
         {isValidCoordinates(coordinates) && (
-          <Property
-            loading={loading}
-            label={`${formatMessage({ id: 'Coordinates' })} (WGS84)`}
-            value={makeCoordinatesValue(coordinates)}
-            icon={<GpsFixed fontSize="large" color="primary" />}
-          />
+          <FlexContainer>
+            <FlexContainerGrow>
+              <Property
+                loading={loading}
+                label={`${formatMessage({ id: 'Coordinates' })} (WGS84)`}
+                value={makeCoordinatesValue(coordinates)}
+                icon={<GpsFixed fontSize="large" color="primary" />}
+              />
+            </FlexContainerGrow>
+            <div>
+              <IconButton
+                aria-label={formatMessage({ id: 'Open on OpenStreetMap' })}
+                color="primary"
+                onClick={openOSM}>
+                <Map />
+              </IconButton>
+              <IconButton
+                aria-label={formatMessage({ id: 'Open on Google Maps' })}
+                color="primary"
+                onClick={openGM}>
+                <Place />
+              </IconButton>
+            </div>
+          </FlexContainer>
         )}
         <Alert severity={precisionSeverity} content={precisionText} />
         <Property
@@ -117,7 +157,7 @@ const Properties = () => {
             url={`/ui/massifs/${massif.id}`}
           />
         )}
-        {cave && (
+        {cave && cave.entrances.length > 1 && (
           <Property
             label={formatMessage({ id: 'Cave' })}
             value={`${cave.name}`}
@@ -130,8 +170,8 @@ const Properties = () => {
         display="flex"
         flexDirection="row"
         flexWrap="wrap"
-        justifyContent="space-evenly">
-        {depth && (
+        justifyContent="flex-start">
+        {!!depth && (
           <Property
             loading={loading}
             label={formatMessage({ id: 'Depth' })}
@@ -139,7 +179,7 @@ const Properties = () => {
             icon={<CustomIcon type="depth" />}
           />
         )}
-        {development && (
+        {!!development && (
           <Property
             loading={loading}
             label={formatMessage({ id: 'Development' })}
@@ -147,14 +187,14 @@ const Properties = () => {
             icon={<CustomIcon type="length" />}
           />
         )}
-        {altitude && (
+        {!!altitude && (
           <Property
             label={formatMessage({ id: 'Altitude' })}
             value={`${altitude} m`}
             icon={<Height color="primary" />}
           />
         )}
-        {temperature && (
+        {!!temperature && (
           <Property
             loading={loading}
             label={formatMessage({ id: 'Temperature' })}
@@ -164,21 +204,21 @@ const Properties = () => {
             // icon={<Thermostat fontSize="large" color="primary"/>}
           />
         )}
-        {discoveryYear && (
+        {!!discoveryYear && (
           <Property
             label={formatMessage({ id: 'Year of discovery' })}
             value={discoveryYear}
             icon={<CalendarToday color="primary" />}
           />
         )}
-        {undergroundType && (
+        {!!undergroundType && (
           <Property
             label={formatMessage({ id: 'Underground type' })}
             value={undergroundType}
             icon={<Category color="primary" />}
           />
         )}
-        {isDivingCave && (
+        {!!isDivingCave && (
           <Property
             value={formatMessage({
               id: 'Diving cave'
@@ -188,18 +228,15 @@ const Properties = () => {
           />
         )}
       </Box>
-
-      <Property
-        label={formatMessage({ id: 'Average rating' })}
-        icon={<EmptyStarIcon fontSize="large" color="primary" />}
-      />
-      <SmallRatingsWrapper>
-        <Ratings
-          access={access}
-          interest={interest}
-          progression={progression}
-        />
-      </SmallRatingsWrapper>
+      {(!!access || !!interest || !!progression) && (
+        <SmallRatingsWrapper>
+          <Ratings
+            access={access}
+            interest={interest}
+            progression={progression}
+          />
+        </SmallRatingsWrapper>
+      )}
     </GlobalWrapper>
   );
 };

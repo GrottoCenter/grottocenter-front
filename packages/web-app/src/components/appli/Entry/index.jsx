@@ -1,24 +1,25 @@
-import React, { useContext } from 'react';
+import React, { useContext, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import { isNil, propOr } from 'ramda';
 
+import styled from 'styled-components';
 import Provider, {
   commentsType,
   detailsType,
   EntryContext,
-  descriptionsType,
   documentsType,
   historiesType,
   locationsType,
   riggingsType
 } from './Provider';
+import { descriptionsType } from '../Descriptions/propTypes';
 import Layout from '../../common/Layouts/Fixed';
 import FixedContent from '../../common/Layouts/Fixed/FixedContent';
 import CustomIcon from '../../common/CustomIcon';
 import EntryMap from './EntryMap';
 import Properties from './Properties';
-import Descriptions from './Descriptions';
+import Descriptions from '../Descriptions';
 import Locations from './Locations';
 import Riggings from './Riggings/Riggings';
 import Comments from './Comments/index';
@@ -30,16 +31,15 @@ import { EntranceForm } from '../EntitiesForm';
 import SensitiveCaveWarning from './SensitiveCaveWarning';
 import AuthorLink from '../../common/AuthorLink';
 
-const EntryProperties = ({ isSensitive }) => (
-  <>
-    {isSensitive && <SensitiveCaveWarning />}
-    <EntryMap />
-    <Properties />
-  </>
+const HalfSplitContainer = styled.div(
+  ({ theme }) => `
+  display: flex;
+  flex-direction: column;
+  ${theme.breakpoints.up('md')} {
+    flex-direction: row;
+  }
+`
 );
-EntryProperties.propTypes = {
-  isSensitive: PropTypes.bool
-};
 
 export const Entry = () => {
   const { formatMessage, formatDate } = useIntl();
@@ -52,11 +52,11 @@ export const Entry = () => {
         creationDate,
         depth,
         development,
-        editionDate,
+        dateReviewed,
         id,
         isSensitive,
         language,
-        lastEditor,
+        reviewer,
         name,
         temperature
       },
@@ -75,71 +75,88 @@ export const Entry = () => {
   const handleEdit = () => {
     editPage.open();
   };
+
+  const componentRef = useRef();
   return (
-    <Layout
-      onEdit={permissions.isAuth ? handleEdit : undefined}
-      fixedContent={
+    <div ref={componentRef}>
+      <Layout>
         <FixedContent
           title={name || ''}
-          content={<EntryProperties isSensitive={isSensitive} />}
+          icon={<CustomIcon type="entry" />}
+          onEdit={permissions.isAuth ? handleEdit : undefined}
+          printRef={componentRef}
+          content={
+            <HalfSplitContainer>
+              {isSensitive && <SensitiveCaveWarning />}
+              <EntryMap />
+              <Properties />
+            </HalfSplitContainer>
+          }
           footer={
             <span>
-              <AuthorLink author={author} verb="Created" />
-              {!isNil(creationDate) && ` (${formatDate(creationDate)})`}
-              {!isNil(lastEditor) &&
-                !isNil(editionDate) &&
-                ` - ${formatMessage({
-                  id: 'Last modification by'
-                })} ${lastEditor} (
-                ${formatDate(editionDate)})`}
+              {isNil(reviewer) && <AuthorLink author={author} verb="Created" />}
+              {isNil(reviewer) &&
+                !isNil(creationDate) &&
+                ` (${formatDate(creationDate)})`}
+              {!isNil(reviewer) && (
+                <AuthorLink author={reviewer} verb="Updated" />
+              )}
+              {!isNil(reviewer) &&
+                !isNil(dateReviewed) &&
+                ` (${formatDate(dateReviewed)})`}
             </span>
           }
-          icon={<CustomIcon type="entry" />}
         />
-      }>
-      {id && (
-        <Locations
-          locations={locations}
-          entranceId={id}
-          isSensitive={isSensitive}
-        />
-      )}
-      {id && <Descriptions descriptions={descriptions} entranceId={id} />}
-      {id && <Riggings riggings={riggings} entranceId={id} />}
-      {id && <Documents documents={documents} entranceId={id} />}
-      {id && <Histories histories={histories} entranceId={id} />}
-      {id && <Comments comments={comments} entranceId={id} />}
-      {permissions.isAuth && (
-        <StandardDialog
-          fullWidth
-          maxWidth="md"
-          open={editPage.isOpen}
-          onClose={editPage.close}
-          scrollable
-          title={formatMessage({ id: 'Entrance edition' })}>
-          <EntranceForm
-            entranceValues={{
-              country,
-              depth,
-              id,
-              isSensitive,
-              name,
-              language,
-              latitude: propOr(undefined, 0, position),
-              length: development,
-              longitude: propOr(undefined, 1, position)
-            }}
-            caveValues={{
-              ...cave,
-              name: cave && cave.names ? cave.names[0].name : undefined,
-              language: cave && cave.names ? cave.names[0].language : undefined,
-              massif: cave && cave.massif ? cave.massif.id : undefined,
-              temperature
-            }}
+        {id && (
+          <Locations
+            locations={locations}
+            entranceId={id}
+            isSensitive={isSensitive}
           />
-        </StandardDialog>
-      )}
-    </Layout>
+        )}
+        {id && (
+          <Descriptions
+            descriptions={descriptions}
+            entityType="entrance"
+            entityId={id}
+          />
+        )}
+        {id && <Riggings riggings={riggings} entranceId={id} />}
+        {id && <Documents documents={documents} entranceId={id} />}
+        {id && <Histories histories={histories} entranceId={id} />}
+        {id && <Comments comments={comments} entranceId={id} />}
+        {permissions.isAuth && (
+          <StandardDialog
+            fullWidth
+            maxWidth="md"
+            open={editPage.isOpen}
+            onClose={editPage.close}
+            scrollable
+            title={formatMessage({ id: 'Entrance edition' })}>
+            <EntranceForm
+              entranceValues={{
+                country,
+                depth,
+                id,
+                isSensitive,
+                name,
+                language,
+                latitude: propOr(undefined, 0, position),
+                length: development,
+                longitude: propOr(undefined, 1, position)
+              }}
+              caveValues={{
+                ...cave,
+                name: cave?.names?.[0]?.name ?? cave?.name ?? name,
+                language: cave?.names?.[0]?.language ?? language,
+                massif: cave?.massif?.id,
+                temperature
+              }}
+            />
+          </StandardDialog>
+        )}
+      </Layout>
+    </div>
   );
 };
 
