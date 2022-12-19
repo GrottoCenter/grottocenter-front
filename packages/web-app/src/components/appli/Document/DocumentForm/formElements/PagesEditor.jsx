@@ -2,11 +2,13 @@ import React, { useContext, useMemo, useEffect } from 'react';
 import styled from 'styled-components';
 
 import { Typography } from '@material-ui/core';
-import { isNil } from 'ramda';
 import Translate from '../../../../common/Translate';
 
 import { DocumentFormContext } from '../Provider';
 import NumberInput from '../../../../common/Form/NumberInput';
+import checkDocumentPages, {
+  PageError
+} from '../../../../../helpers/validateDocumentPages';
 
 const InlineWrapper = styled.div`
   display: flex;
@@ -37,21 +39,12 @@ const PagesEditor = () => {
   } = useContext(DocumentFormContext);
 
   useEffect(() => {
-    const newEndGreaterOrEqual =
-      !isNil(startPage) && !isNil(endPage) && startPage > endPage
-        ? 'The end page must be greater or equal to the start page.'
-        : '';
-    if (newEndGreaterOrEqual !== intervalError)
-      setIntervalError(newEndGreaterOrEqual);
-
-    const newPositiveEnd = endPage < 0 ? 'The end page must be positive.' : '';
-    if (newPositiveEnd !== positiveEndError)
-      setPositiveEndError(newPositiveEnd);
-
-    const newPositiveStart =
-      startPage < 0 ? 'The start page must be positive.' : '';
-    if (newPositiveStart !== positiveStartError)
-      setPositiveStartError(newPositiveStart);
+    const errors = checkDocumentPages(startPage, endPage);
+    setPositiveEndError(errors.find(e => e === PageError.END_POSITIVE) || '');
+    setPositiveStartError(
+      errors.find(e => e === PageError.START_POSITIVE) || ''
+    );
+    setIntervalError(errors.find(e => e === PageError.INTERVAL) || '');
   }, [startPage, endPage, intervalError, positiveEndError, positiveStartError]);
 
   const handleValueChange = (contextValueName, newValue) => {
