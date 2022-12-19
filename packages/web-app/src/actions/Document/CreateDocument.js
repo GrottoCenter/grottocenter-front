@@ -1,7 +1,7 @@
 import fetch from 'isomorphic-fetch';
 
 import { postDocumentUrl } from '../../conf/apiRoutes';
-import { buildFormData } from './utils';
+import { buildFormData, buildPages } from './utils';
 
 // ==========
 export const POST_DOCUMENT = 'POST_DOCUMENT';
@@ -28,21 +28,8 @@ export const postDocumentFailure = (errorMessages, httpCode) => ({
 export function postDocument(docAttributes) {
   return (dispatch, getState) => {
     dispatch(postDocumentAction());
-
-    // Merge startPage and endPage in one attribute 'pages'
     const { startPage, endPage } = docAttributes;
-    let pages = null;
-
-    // A page can be 0 so check for 'if(startPage)' only will not work.
-    // That's why we use 'if(startPage === null)' here.
-    if (startPage === null && endPage !== null) {
-      pages = endPage;
-    } else if (startPage !== null && endPage === null) {
-      pages = `${startPage},`;
-    } else if (startPage !== null && endPage !== null) {
-      pages = `${startPage}-${endPage}`;
-    }
-
+    const pages = buildPages(startPage, endPage);
     const attributes = { ...docAttributes, pages };
     delete attributes.files;
     const formData = new FormData();
