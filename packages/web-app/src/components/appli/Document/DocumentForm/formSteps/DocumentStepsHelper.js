@@ -5,6 +5,7 @@ import {
   LICENSE_IN_FILE
 } from '../../../../../hooks/useDocumentOptions';
 import DocumentTypes from '../../../../../conf/DocumentTypes';
+import checkDocumentPages from '../../../../../helpers/validateDocumentPages';
 
 const isStep1Valid = (stepData, documentType) => {
   if (isNil(stepData)) {
@@ -62,12 +63,7 @@ const isStep3Valid = stepData => {
   }
   const { identifier, identifierType, startPage, endPage } = stepData;
 
-  let pagesAreOk = true;
-  if (startPage || endPage) {
-    pagesAreOk =
-      (startPage > 0 && endPage > 0 && endPage > startPage) ||
-      (!startPage && endPage > 0);
-  }
+  const arePagesOk = checkDocumentPages(startPage, endPage).length === 0;
 
   let regexpValidation = false;
   if (identifierType !== null) {
@@ -76,7 +72,7 @@ const isStep3Valid = stepData => {
   }
 
   return (
-    pagesAreOk &&
+    arePagesOk &&
     (identifier === '' ||
       (identifier !== '' && identifierType !== null && regexpValidation))
   );
