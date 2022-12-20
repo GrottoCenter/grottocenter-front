@@ -93,34 +93,30 @@ const Step2 = ({ stepId }) => {
         )}
 
         <FlexWrapper>
-          {(isCollection(documentType) ||
-            isIssue(documentType) ||
-            isArticle(documentType)) && (
-            <FlexItemWrapper>
-              <OrganizationAutoComplete
-                contextValueName="editor"
-                helperContent={
-                  <Translate>
-                    The editor is the organization that ensures the publication
-                    of the document. Choose one or more organizations from those
-                    already registered. If the organization you are looking for
-                    does not exist in Grottocenter, you can add it by using the
-                    “+” button on the right.
-                  </Translate>
-                }
-                helperContentIfValueIsForced={
-                  <Translate>
-                    The editor has been deduced from the parent document.
-                  </Translate>
-                }
-                labelText="Editor"
-                required={isCollection(documentType) || isIssue(documentType)}
-                searchLabelText={formatMessage({
-                  id: 'Search for an editor...'
-                })}
-              />
-            </FlexItemWrapper>
-          )}
+          <FlexItemWrapper>
+            <OrganizationAutoComplete
+              contextValueName="editor"
+              helperContent={
+                <Translate>
+                  The editor is the organization that ensures the publication of
+                  the document. Choose one or more organizations from those
+                  already registered. If the organization you are looking for
+                  does not exist in Grottocenter, you can add it by using the
+                  “+” button on the right.
+                </Translate>
+              }
+              helperContentIfValueIsForced={
+                <Translate>
+                  The editor has been deduced from the parent document.
+                </Translate>
+              }
+              labelText="Editor"
+              required={isCollection(documentType) || isIssue(documentType)}
+              searchLabelText={formatMessage({
+                id: 'Search for an editor...'
+              })}
+            />
+          </FlexItemWrapper>
 
           {(isIssue(documentType) || isArticle(documentType)) && (
             <FlexItemWrapper>
