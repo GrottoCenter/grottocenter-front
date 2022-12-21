@@ -23,7 +23,7 @@ const Massif = ({ control, errors, allLanguages, isNewDescription }) => {
   return (
     <div>
       <FormControl component="fieldset" style={{ width: '50vh' }}>
-        <FormLabel>{formatMessage({ id: 'Basic Informations' })}</FormLabel>
+        <FormLabel>{formatMessage({ id: 'Basic Information' })}</FormLabel>
         <Controller
           name="massif.name"
           control={control}

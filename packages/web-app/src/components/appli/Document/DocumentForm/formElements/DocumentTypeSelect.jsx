@@ -79,7 +79,7 @@ const DocumentTypeSelect = ({
               key={dt.id}
               name={dt.name}
               value={dt.id}
-              title={dt.comment}
+              title={formatMessage({ id: dt.comment })}
               aria-label={dt.comment}>
               <MenuItem>{formatMessage({ id: dt.name })}</MenuItem>
             </Tooltip>

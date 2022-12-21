@@ -134,7 +134,7 @@ storiesOf('Maps', module)
         organization={{
           id: 1,
           name: 'entrance name',
-          address: 'Montpellier (FR) adresse',
+          address: '3 rue des coquelicots',
           city: 'Montpellier (FR)',
           longitude: 58.18188,
           latitude: 7.1857
