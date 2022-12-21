@@ -17,7 +17,7 @@ const FormControl = styled(MuiFormControl)`
   padding-bottom: ${({ theme }) => theme.spacing(4)}px;
 `;
 
-const BasicInformationsForm = ({
+const BasicInformationForm = ({
   control,
   errors,
   allLanguages,
@@ -28,7 +28,7 @@ const BasicInformationsForm = ({
   return (
     <div>
       <FormControl component="fieldset" style={{ width: '50vh' }}>
-        <FormLabel>{formatMessage({ id: 'Basic Informations' })}</FormLabel>
+        <FormLabel>{formatMessage({ id: 'Basic Information' })}</FormLabel>
         <Controller
           name="organization.name"
           control={control}
@@ -135,7 +135,7 @@ const BasicInformationsForm = ({
     </div>
   );
 };
-BasicInformationsForm.propTypes = {
+BasicInformationForm.propTypes = {
   allLanguages: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.string.isRequired,
@@ -156,4 +156,4 @@ BasicInformationsForm.propTypes = {
   isNewOrganization: PropTypes.bool
 };
 
-export default BasicInformationsForm;
+export default BasicInformationForm;

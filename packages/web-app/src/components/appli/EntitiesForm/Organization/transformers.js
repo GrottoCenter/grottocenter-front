@@ -1,5 +1,5 @@
 export const makePostOrganizationData = data => ({
-  address: data.organization.firstAdress,
+  address: data.organization.address,
   city: data.organization.city,
   country: { id: data.organization.country },
   customMessage: data.organization.customMessage,
@@ -17,7 +17,7 @@ export const makePostOrganizationData = data => ({
 export const makePutOrganizationData = (data, defaultValues) => {
   const myObj = {};
   myObj.id = defaultValues.organizationId;
-  myObj.address = data.organization.firstAdress;
+  myObj.address = data.organization.address;
   myObj.city = data.organization.city;
   myObj.country = { id: data.organization.country };
   myObj.customMessage = data.organization.customMessage;
@@ -35,7 +35,7 @@ export const makeOrganizationValueData = data => ({
   isPartner: data.isOfficialPartner,
   customMessage: data.customMessage,
   language: data.names[0].language,
-  firstAdress: data.address || null,
+  address: data.address || null,
   zipCode: data.postalCode || null,
   city: data.city || null,
   country: data.country || null,

@@ -68,7 +68,7 @@ export const NetworkForm = ({ networkValues }) => {
   }, [networkValues, reset, stepExpanded]);
 
   const steps = {
-    'Basic Informations': (
+    'Basic Information': (
       <Network allLanguages={allLanguages} control={control} errors={errors} />
     )
   };

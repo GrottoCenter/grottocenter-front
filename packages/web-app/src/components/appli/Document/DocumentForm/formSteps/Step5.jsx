@@ -117,7 +117,11 @@ const Step5 = ({ stepId }) => {
             <Property
               key="doc_type"
               name={formatMessage({ id: 'Document type' })}
-              value={pathOr(null, ['documentType', 'name'], docAttributes)}
+              value={
+                docAttributes?.documentType?.name
+                  ? formatMessage({ id: docAttributes.documentType.name })
+                  : ''
+              }
             />
 
             {pathOr('', ['documentMainLanguage', 'refName'], docAttributes) !==

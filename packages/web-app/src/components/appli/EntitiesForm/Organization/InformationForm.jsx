@@ -20,7 +20,7 @@ const FormControl = styled(MuiFormControl)`
   padding-bottom: ${({ theme }) => theme.spacing(4)}px;
 `;
 
-const InformationsForm = ({ control, errors, allCountries }) => {
+const InformationForm = ({ control, errors, allCountries }) => {
   const { formatMessage } = useIntl(); // To uncomment when API will accept phone number
 
   /* const debouncedPhone = useDebounce(
@@ -40,13 +40,13 @@ const InformationsForm = ({ control, errors, allCountries }) => {
       <FormControl component="fieldset" style={{ width: '50vh' }}>
         <FormLabel>{formatMessage({ id: 'Additional information' })}</FormLabel>
         <Controller
-          name="organization.firstAdress"
+          name="organization.address"
           control={control}
           render={({ field: { ref, onChange, ...field } }) => (
             <TextField
               fullWidth
-              error={!!errors?.organization?.firstAdress}
-              label={formatMessage({ id: 'First Adress' })}
+              error={!!errors?.organization?.address}
+              label={formatMessage({ id: 'Address' })}
               inputRef={ref}
               onChange={onChange}
               {...field}
@@ -54,15 +54,15 @@ const InformationsForm = ({ control, errors, allCountries }) => {
           )}
         />
 
-        {/* To uncomment when api will have secondAdress field 
+        {/* To uncomment when api will have addressLine2 field 
         <Controller
-          name="organization.secondAdress"
+          name="organization.addressLine2"
           control={control}
           render={({ field: { ref, onChange, ...field } }) => (
             <TextField
               fullWidth
-              error={!!errors?.organization?.secondAdress}
-              label={formatMessage({ id: 'Second Adress' })}
+              error={!!errors?.organization?.addressLine2}
+              label={formatMessage({ id: 'Address (line 2)' })}
               inputRef={ref}
               onChange={onChange}
               {...field}
@@ -174,7 +174,7 @@ const InformationsForm = ({ control, errors, allCountries }) => {
     </div>
   );
 };
-InformationsForm.propTypes = {
+InformationForm.propTypes = {
   allCountries: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.string.isRequired,
@@ -185,8 +185,8 @@ InformationsForm.propTypes = {
   errors: PropTypes.shape({
     organization: PropTypes.shape({
       country: PropTypes.shape({ message: PropTypes.string }),
-      firstAdress: PropTypes.shape({ message: PropTypes.string }),
-      secondAdress: PropTypes.shape({ message: PropTypes.string }),
+      address: PropTypes.shape({ message: PropTypes.string }),
+      addressLine2: PropTypes.shape({ message: PropTypes.string }),
       zipCode: PropTypes.shape({ message: PropTypes.string }),
       city: PropTypes.shape({ message: PropTypes.string }),
       phone: PropTypes.shape({ message: PropTypes.string }),
@@ -196,4 +196,4 @@ InformationsForm.propTypes = {
   })
 };
 
-export default InformationsForm;
+export default InformationForm;

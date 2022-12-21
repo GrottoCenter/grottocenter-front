@@ -181,7 +181,7 @@ const SignUpForm = ({
                 </InputAdornment>
               }
               hasError={checkIfHasError('passwordConfirmation')}
-              helperText="Repeat your password here."
+              helperText={formatMessage({ id: 'Repeat your password here.' })}
               fullWidth
               onValueChange={onPasswordConfirmationChange}
               required

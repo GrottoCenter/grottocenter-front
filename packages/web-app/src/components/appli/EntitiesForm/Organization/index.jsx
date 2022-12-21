@@ -23,8 +23,8 @@ import Alert from '../../../common/Alert';
 import { updateName } from '../../../../actions/Name';
 import { postOrganization } from '../../../../actions/Organization/CreateOrganization';
 import { updateOrganization } from '../../../../actions/Organization/UpdateOrganization';
-import BasicInformationsForm from './BasicInformationsForm';
-import InformationsForm from './InformationsForm';
+import BasicInformationForm from './BasicInformationForm';
+import InformationForm from './InformationForm';
 import License from './License';
 import {
   makePostOrganizationData,
@@ -42,8 +42,8 @@ const defaultOrganizationValues = {
   description: null,
   descriptionTitle: null,
   language: null,
-  firstAdress: null,
-  secondAdress: null,
+  address: null,
+  addressLine2: null,
   zipCode: null,
   city: null,
   country: null,
@@ -102,15 +102,15 @@ export const OrganizationForm = ({ organizationValues = null }) => {
 
   const steps = {
     Organization: (
-      <BasicInformationsForm
+      <BasicInformationForm
         isNewOrganization={isNewOrganization}
         allLanguages={allLanguages}
         control={control}
         errors={errors}
       />
     ),
-    Informations: (
-      <InformationsForm
+    Information: (
+      <InformationForm
         allCountries={allCountries}
         control={control}
         errors={errors}
@@ -129,7 +129,7 @@ export const OrganizationForm = ({ organizationValues = null }) => {
         'organization.country',
         'organization.description',
         'organization.descriptionTitle',
-        'organization.firstAdress',
+        'organization.address',
         'organization.isPartner',
         'organization.latitude',
         'organization.language',
@@ -139,7 +139,7 @@ export const OrganizationForm = ({ organizationValues = null }) => {
         'organization.name',
         'organization.mail',
         'organization.phone',
-        'organization.secondAdress',
+        'organization.addressLine2',
         'organization.url',
         'organization.zipCode'
       ],
