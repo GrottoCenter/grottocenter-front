@@ -6,6 +6,10 @@ import { fetchOrganization } from '../../actions/Organization/GetOrganization';
 import { setPageTitle } from '../../actions/PageTitle';
 import Organization from '../../components/appli/Organization';
 import { usePermissions } from '../../hooks';
+import getAuthor from '../../util/getAuthor';
+import Deleted, {
+  DELETED_ENTITIES
+} from '../../components/common/card/Deleted';
 
 const OrganizationPage = () => {
   const { organizationId } = useParams();
@@ -27,7 +31,17 @@ const OrganizationPage = () => {
   const onEdit = () => {
     history.push(`/ui/organizations/${organizationId}/edit`);
   };
-  return (
+  return organization?.isDeleted ? (
+    <Deleted
+      redirectTo={organization.redirectTo}
+      entity={DELETED_ENTITIES.organization}
+      name={organization.name}
+      creationDate={organization.dateInscription}
+      dateReviewed={organization.dateReviewed}
+      author={getAuthor(organization.author)}
+      reviewer={getAuthor(organization.reviewer)}
+    />
+  ) : (
     <Organization
       error={error}
       isLoading={isLoading}

@@ -4,6 +4,7 @@ const getDescriptions = descriptions =>
   descriptions
     .map(description => ({
       author: getAuthor(description?.author),
+      reviewer: getAuthor(description?.reviewer),
       body: description?.body,
       creationDate: description?.dateInscription
         ? new Date(description?.dateInscription)
@@ -19,14 +20,17 @@ const getDetails = massif => {
   if (!massif) {
     return {};
   }
-  const {
-    descriptions,
-    documents,
-    entrances,
-    networks,
-    ...otherProps
-  } = massif;
-  return otherProps;
+  return {
+    id: massif.id,
+    author: getAuthor(massif?.author),
+    reviewer: massif?.reviewer ? getAuthor(massif?.reviewer) : null,
+    dateInscription: massif.dateInscription,
+    dateReviewed: massif.dateReviewed,
+    geogPolygon: massif.geoJson,
+    name: massif.name,
+    names: massif.names,
+    isDeleted: massif.isDeleted
+  };
 };
 
 const getDocuments = documents =>

@@ -13,7 +13,9 @@ import {
   getLocations,
   getRiggings
 } from './transformers';
-import DeletedEntrance from '../../components/appli/Entry/DeletedEntrance';
+import Deleted, {
+  DELETED_ENTITIES
+} from '../../components/common/card/Deleted';
 
 const isUpdateSuccessful = (error, loading, prevLoading) => {
   const updateTerminatedWithSuccess =
@@ -82,14 +84,15 @@ const EntryPage = () => {
   const locations = getLocations(data.locations ?? []);
   const riggings = getRiggings(data.riggings ?? []);
   return data.isDeleted ? (
-    <DeletedEntrance
+    <Deleted
       redirectTo={data.redirectTo}
-      localisation={details.localisation}
+      entity={DELETED_ENTITIES.entrance}
+      location={details.localisation}
       name={data.name}
       creationDate={data.dateInscription}
       dateReviewed={data.dateReviewed}
-      author={data.author}
-      reviewer={data.reviewer}
+      author={details.author}
+      reviewer={details.reviewer}
     />
   ) : (
     <Entry

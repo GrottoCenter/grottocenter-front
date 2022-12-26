@@ -12,6 +12,7 @@ import CreateRiggingsForm from '../../Form/RiggingsForm/index';
 import ScrollableContent from '../../../common/Layouts/Fixed/ScrollableContent';
 import Rigging from './Rigging';
 import { riggingsType } from '../Provider';
+import Alert from '../../../common/Alert';
 
 const DividerWithMargin = styled(Divider)`
   margin-top: 16px;
@@ -67,15 +68,23 @@ const Riggings = ({ riggings, entranceId }) => {
               <Divider />
             </>
           )}
-
-          {riggings
-            ?.sort((r1, r2) => r1.title.localeCompare(r2.title))
-            .map((rigging, index) => (
-              <React.Fragment key={rigging.id}>
-                <Rigging rigging={rigging} />
-                {index < riggings.length - 1 && <DividerWithMargin />}
-              </React.Fragment>
-            ))}
+          {riggings.length > 0 &&
+            riggings
+              .sort((r1, r2) => r1.title.localeCompare(r2.title))
+              .map((rigging, index) => (
+                <React.Fragment key={rigging.id}>
+                  <Rigging rigging={rigging} />
+                  {index < riggings.length - 1 && <DividerWithMargin />}
+                </React.Fragment>
+              ))}
+          {riggings.length === 0 && (
+            <Alert
+              severity="info"
+              content={formatMessage({
+                id: 'There is currently no rigging for this entrance.'
+              })}
+            />
+          )}
         </>
       }
     />

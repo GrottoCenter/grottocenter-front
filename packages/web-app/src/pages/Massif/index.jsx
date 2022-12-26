@@ -15,6 +15,9 @@ import {
 import { subscribeToMassif } from '../../actions/Subscriptions/SubscribeToMassif';
 import { fetchSubscriptions } from '../../actions/Subscriptions/GetSubscriptions';
 import { unsubscribeFromMassif } from '../../actions/Subscriptions/UnsubscribeFromMassif';
+import Deleted, {
+  DELETED_ENTITIES
+} from '../../components/common/card/Deleted';
 
 const MassifPage = () => {
   const dispatch = useDispatch();
@@ -48,7 +51,17 @@ const MassifPage = () => {
   const entrances = getEntrances(propOr([], 'entrances', massif));
   const networks = getNetworks(propOr([], 'networks', massif));
 
-  return (
+  return details.isDeleted ? (
+    <Deleted
+      redirectTo={massif.redirectTo}
+      entity={DELETED_ENTITIES.massif}
+      name={details.name}
+      creationDate={details.dateInscription}
+      dateReviewed={details.dateReviewed}
+      author={details.author}
+      reviewer={details.reviewer}
+    />
+  ) : (
     <Massif
       isFetching={isFetching || !isNil(error)}
       error={error}

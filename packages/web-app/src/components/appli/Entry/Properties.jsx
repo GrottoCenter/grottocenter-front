@@ -104,7 +104,7 @@ const Properties = () => {
         <Alert severity={precisionSeverity} content={precisionText} />
         <Property
           loading={loading}
-          label={formatMessage({ id: 'Localisation' })}
+          label={formatMessage({ id: 'Location' })}
           value={localisation}
           icon={<Public fontSize="large" color="primary" />}
           secondary

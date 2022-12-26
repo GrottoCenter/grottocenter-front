@@ -32,6 +32,7 @@ export const getComments = comments =>
 export const getDetails = data => ({
   altitude: data.altitude,
   author: getAuthor(data?.author),
+  reviewer: data?.reviewer ? getAuthor(data?.reviewer) : null,
   cave: data.cave,
   coordinates:
     !isNil(data.longitude) && !isNil(data.latitude)
@@ -49,7 +50,7 @@ export const getDetails = data => ({
   isDivingCave: pathOr(null, ['cave', 'isDiving'], data),
   isSensitive: data.isSensitive,
   language: pathOr(undefined, ['names', 0, 'language'], data),
-  localisation: `${data.city}, ${data.region}, ${data.country}`,
+  localisation: `${data.city}, ${data.region}, ${data.country}`, // TODO rename to location
   massif: pathOr(undefined, ['massifs', 0], data),
   massifs: data.massifs,
   mountain: pathOr(null, ['massif', 'name'], data),
