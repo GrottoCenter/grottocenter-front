@@ -3,12 +3,19 @@ import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { Button } from '@material-ui/core';
-import Alert from '../../common/Alert';
-import Translate from '../../common/Translate';
-import { Property } from '../../common/Properties';
-import AuthorAndDate from '../../common/Contribution/AuthorAndDate';
-import Layout from '../../common/Layouts/Fixed/FixedContent';
+import Alert from '../Alert';
+import AuthorAndDate from '../Contribution/AuthorAndDate';
+import Layout from '../Layouts/Fixed/FixedContent';
 import authorType from '../../../types/author.type';
+import { Property } from '../Properties';
+
+export const DELETED_ENTITIES = {
+  entrance: { str: 'Entrance', url: '/ui/entrances/' },
+  massif: { str: 'Massif', url: '/ui/massifs/' },
+  organization: { str: 'Organization', url: '/ui/organizations/' },
+  document: { str: 'Document', url: '/ui/documents/' },
+  network: { str: 'Network', url: '/ui/networks/' }
+};
 
 export const StyledLink = styled.div`
   padding-top: ${({ theme }) => theme.spacing(3)}px;
@@ -18,17 +25,19 @@ export const StyledAuthor = styled.div`
   padding-top: ${({ theme }) => theme.spacing(3)}px;
   padding-left: ${({ theme }) => theme.spacing(1)}px;
 `;
-
-const DeletedEntrance = ({
+const Deleted = ({
   redirectTo,
+  entity,
   name,
-  localisation,
   creationDate,
   dateReviewed,
   author,
-  reviewer
+  reviewer,
+  location
 }) => {
   const { formatMessage } = useIntl();
+  const entityI18n = formatMessage({ id: entity.str });
+  const redirectToUrl = redirectTo ? entity.url + redirectTo : null;
   return (
     <Layout
       title={name}
@@ -37,13 +46,21 @@ const DeletedEntrance = ({
           <Alert
             disableMargins
             severity="warning"
-            title={formatMessage({ id: 'This entrance has been deleted' })}
+            title={formatMessage(
+              {
+                id: 'deleted-card-intro-message',
+                defaultMessage: 'This {entity} has been deleted'
+              },
+              { entity: entityI18n }
+            )}
             content={
               <>
-                <Property
-                  label={formatMessage({ id: 'Localisation' })}
-                  value={localisation}
-                />
+                {!!location && (
+                  <Property
+                    label={formatMessage({ id: 'Location' })}
+                    value={location}
+                  />
+                )}
                 <StyledAuthor>
                   <AuthorAndDate author={author} date={creationDate} />
                   {reviewer && (
@@ -57,13 +74,19 @@ const DeletedEntrance = ({
               </>
             }
           />
-          {!!redirectTo && (
+          {!!redirectToUrl && (
             <StyledLink>
               <Button
                 variant="contained"
                 color="secondary"
-                href={`/ui/entrances/${redirectTo}`}>
-                <Translate id="Go to the linked entrance" />
+                href={redirectToUrl}>
+                {formatMessage(
+                  {
+                    id: 'deleted-card-go-to-related-btn',
+                    defaultMessage: 'Go to the linked {entity}'
+                  },
+                  { entity: entityI18n }
+                )}
               </Button>
             </StyledLink>
           )}
@@ -73,10 +96,13 @@ const DeletedEntrance = ({
   );
 };
 
-DeletedEntrance.propTypes = {
+Deleted.propTypes = {
   redirectTo: PropTypes.number,
+  entity: PropTypes.shape({
+    str: PropTypes.string,
+    url: PropTypes.string
+  }),
   name: PropTypes.string,
-  localisation: PropTypes.string,
   author: authorType,
   creationDate: PropTypes.oneOfType([
     PropTypes.instanceOf(Date),
@@ -86,7 +112,8 @@ DeletedEntrance.propTypes = {
   dateReviewed: PropTypes.oneOfType([
     PropTypes.instanceOf(Date),
     PropTypes.string
-  ])
+  ]),
+  location: PropTypes.string
 };
 
-export default DeletedEntrance;
+export default Deleted;

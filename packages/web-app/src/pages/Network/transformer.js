@@ -5,7 +5,9 @@ import getAuthor from '../../util/getAuthor';
 export const getSafeData = data => ({
   altitude: data.altitude,
   author: getAuthor(data?.author),
+  reviewer: data?.reviewer ? getAuthor(data?.reviewer) : null,
   creationDate: data.dateInscription,
+  reviewedDate: data.dateReviewed,
   depth: data.depth,
   length: data.length,
   descriptions: data.descriptions,
@@ -18,5 +20,6 @@ export const getSafeData = data => ({
   name: data.name,
   names: data.names,
   temperature: data.temperature,
-  undergroundType: pathOr(null, ['massif', 'undergroundType'], data)
+  undergroundType: pathOr(null, ['massif', 'undergroundType'], data),
+  redirectTo: data.redirectTo
 });

@@ -28,6 +28,9 @@ import { usePermissions } from '../../hooks';
 import Layout from '../../components/common/Layouts/Fixed/FixedContent';
 import idNameType from '../../types/idName.type';
 import authorType from '../../types/author.type';
+import Deleted, {
+  DELETED_ENTITIES
+} from '../../components/common/card/Deleted';
 
 const OrganizationIcon = styled.img`
   height: 35px;
@@ -254,7 +257,17 @@ const HydratedDocumentPage = ({ id }) => {
     history.push(editPath.current);
   };
 
-  return (
+  return details.isDeleted ? (
+    <Deleted
+      redirectTo={details.redirectTo}
+      entity={DELETED_ENTITIES.document}
+      name=""
+      creationDate={details.dateInscription}
+      dateReviewed={details.dateReviewed}
+      author={details.author}
+      reviewer={details.reviewer}
+    />
+  ) : (
     <DocumentPage
       overview={makeOverview(details || {})}
       organizations={makeOrganizations(details || {})}

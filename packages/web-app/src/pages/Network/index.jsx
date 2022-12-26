@@ -7,6 +7,9 @@ import EntrancesList from '../../components/appli/Network/EntrancesList';
 import { fetchCave } from '../../actions/Cave/GetCave';
 import { getSafeData } from './transformer';
 import Descriptions from '../../components/appli/Network/Descriptions';
+import Deleted, {
+  DELETED_ENTITIES
+} from '../../components/common/card/Deleted';
 
 const NetworkPage = () => {
   const { id } = useParams();
@@ -34,9 +37,19 @@ const NetworkPage = () => {
   useEffect(() => {
     prevUpdateLoading.current = updateLoading;
   }, [updateLoading]);
-
-  return (
-    <Network loading={loading || !isNil(error)} data={getSafeData(data)}>
+  const safeData = getSafeData(data);
+  return data.isDeleted ? (
+    <Deleted
+      redirectTo={safeData.redirectTo}
+      entity={DELETED_ENTITIES.network}
+      name={safeData.name}
+      creationDate={safeData.creationDate}
+      dateReviewed={safeData.reviewedDate}
+      author={safeData.author}
+      reviewer={safeData.reviewer}
+    />
+  ) : (
+    <Network loading={loading || !isNil(error)} data={safeData}>
       <>
         <EntrancesList />
         <Descriptions />
