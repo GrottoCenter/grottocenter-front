@@ -1,9 +1,11 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { isMobileOnly } from 'react-device-detect';
-import { MapContainer, useMap } from 'react-leaflet';
+import { MapContainer, useMap, useMapEvents } from 'react-leaflet';
+
 import PropTypes from 'prop-types';
 import LayersControl from './LayersControl';
+import FullscreenControl from './FullscreenControl';
 
 const Wrapper = styled.div`
   width: 100%;
@@ -38,6 +40,25 @@ Centerer.propTypes = {
   center: PropTypes.arrayOf(PropTypes.number)
 };
 
+const FullscreenInteraction = () => {
+  const [mapCenter, setMapCenter] = useState(null);
+  const [mapZoom, setMapZoom] = useState(null);
+  const map = useMapEvents({
+    enterFullscreen() {
+      setMapCenter(map.getCenter());
+      setMapZoom(map.getZoom());
+      map.dragging.enable();
+      map.scrollWheelZoom.enable();
+    },
+    exitFullscreen() {
+      map.setView(mapCenter, mapZoom, { animate: false });
+      map.dragging.disable();
+      map.scrollWheelZoom.disable();
+    }
+  });
+  return <FullscreenControl forceSeparateButton="true" />;
+};
+
 const CustomMapContainer = ({
   wholePage = true,
   center,
@@ -45,6 +66,8 @@ const CustomMapContainer = ({
   dragging = true,
   scrollWheelZoom = true,
   isSideMenuOpen = false,
+  isFullscreenAllowed = true,
+  shouldChangeControlInFullscreen = true,
   style,
   children,
   forceCentering
@@ -61,6 +84,12 @@ const CustomMapContainer = ({
       minZoom={0}
       whenCreated={handleResize}
       preferCanvas>
+      {isFullscreenAllowed && shouldChangeControlInFullscreen && (
+        <FullscreenInteraction />
+      )}
+      {isFullscreenAllowed && !shouldChangeControlInFullscreen && (
+        <FullscreenControl forceSeparateButton="true" />
+      )}
       {forceCentering && <Centerer center={center} />}
       <LayersControl />
       {children}
@@ -76,6 +105,8 @@ CustomMapContainer.propTypes = {
   scrollWheelZoom: PropTypes.bool,
   children: PropTypes.node,
   isSideMenuOpen: PropTypes.bool,
+  isFullscreenAllowed: PropTypes.bool,
+  shouldChangeControlInFullscreen: PropTypes.bool,
   style: PropTypes.shape({}),
   forceCentering: PropTypes.bool
 };

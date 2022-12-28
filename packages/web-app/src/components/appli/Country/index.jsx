@@ -71,6 +71,7 @@ const Country = ({
               forceCentering
               scrollWheelZoom={false}
               wholePage={false}
+              shouldChangeControlInFullscreen={false}
               zoom={4}>
               <Marker icon={CoordinatesMarker} position={position} />
             </CustomMapContainer>

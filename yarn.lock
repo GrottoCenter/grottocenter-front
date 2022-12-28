@@ -3809,6 +3809,7 @@ __metadata:
     "@material-ui/icons": ^4.11.2
     "@material-ui/lab": ^4.0.0-alpha.48
     "@material-ui/pickers": ^3.2.10
+    "@react-leaflet/core": 1.1.1
     "@storybook/addon-actions": 6.2.8
     "@storybook/addon-essentials": 6.2.8
     "@storybook/addon-knobs": 6.2.8
@@ -3832,6 +3833,7 @@ __metadata:
     jsonwebtoken: ^8.5.1
     leaflet: ^1.7.1
     leaflet-draw: ^1.0.4
+    leaflet.fullscreen: ^2.4.0
     leaflet.locatecontrol: ^0.72.0
     lodash: ^4.17.21
     notistack: ^1.0.1
@@ -5688,7 +5690,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@react-leaflet/core@npm:^1.1.1":
+"@react-leaflet/core@npm:1.1.1, @react-leaflet/core@npm:^1.1.1":
   version: 1.1.1
   resolution: "@react-leaflet/core@npm:1.1.1"
   peerDependencies:
@@ -18262,6 +18264,13 @@ fsevents@^1.2.7:
   version: 1.0.4
   resolution: "leaflet-draw@npm:1.0.4"
   checksum: 57a424e01ad21b782638e04f2647bec26af351938aa196d61249b0f996c86cc5f1e73f7fd9b706bbe4d38f007e3f4ab923a772ee06c78d3dfde58225c05597f2
+  languageName: node
+  linkType: hard
+
+"leaflet.fullscreen@npm:^2.4.0":
+  version: 2.4.0
+  resolution: "leaflet.fullscreen@npm:2.4.0"
+  checksum: 2740681a0a1314350c75fa0270afa73cc2ff236a43f15a1d8dd811522a07ddfcb19415eaef9ef17dab81f345431db3c3ded43bf73403265a91c52796543c99d1
   languageName: node
   linkType: hard
 
