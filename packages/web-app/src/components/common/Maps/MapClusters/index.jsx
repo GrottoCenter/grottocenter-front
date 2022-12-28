@@ -145,6 +145,7 @@ const Index = ({ center, zoom, isSideMenuOpen, ...props }) => (
   <CustomMapContainer
     center={center}
     zoom={zoom}
+    isFullscreenAllowed={false}
     isSideMenuOpen={isSideMenuOpen}>
     <HydratedMap {...props} zoom={zoom} />
   </CustomMapContainer>
