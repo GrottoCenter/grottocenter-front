@@ -1,4 +1,3 @@
-import { decode } from 'jsonwebtoken';
 import {
   FETCH_LOGIN,
   FETCH_LOGIN_FAILURE,
@@ -7,7 +6,8 @@ import {
   FETCH_LOGIN_RESET_SUCCESS,
   DISPLAY_LOGIN_DIALOG,
   HIDE_LOGIN_DIALOG,
-  LOGOUT
+  LOGOUT,
+  decodeJWT
 } from '../actions/Login';
 import { authTokenName } from '../conf/config';
 
@@ -17,7 +17,7 @@ const removeTokenFromLocalStorage = () => {
 
 const getRawTokenIfNotExpired = () => {
   const rawToken = window.localStorage.getItem(authTokenName);
-  const token = decode(rawToken);
+  const token = decodeJWT(rawToken);
   if (token === null) {
     return null;
   }
@@ -30,7 +30,7 @@ const getRawTokenIfNotExpired = () => {
 };
 
 const initialState = {
-  authTokenDecoded: decode(getRawTokenIfNotExpired()),
+  authTokenDecoded: decodeJWT(getRawTokenIfNotExpired()),
   authorizationHeader: {
     Authorization: `Bearer ${getRawTokenIfNotExpired()}`
   },

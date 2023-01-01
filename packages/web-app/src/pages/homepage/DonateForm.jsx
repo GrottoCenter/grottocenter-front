@@ -5,7 +5,7 @@ import { withStyles, withTheme } from '@material-ui/core/styles';
 import styled, { keyframes } from 'styled-components';
 import Typography from '@material-ui/core/Typography/Typography';
 import Translate from '../../components/common/Translate';
-import { paypalLink, paypalImgLink, paypalId } from '../../conf/config';
+import { paypalLink, paypalId } from '../../conf/config';
 
 const btEyeCatcher = keyframes`
   {
@@ -122,7 +122,6 @@ const DonateForm = () => (
           <Translate id="Donate now" />
         </StyledTypography>
       </DonateButton>
-      <img alt="" src={paypalImgLink} width="1" height="1" />
     </form>
   </DonateFormWrapper>
 );

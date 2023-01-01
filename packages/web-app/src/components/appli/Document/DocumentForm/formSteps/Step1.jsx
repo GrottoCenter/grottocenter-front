@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useMemo } from 'react';
+import React, { useContext, useEffect, useMemo, Suspense } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
@@ -12,11 +12,13 @@ import { DocumentFormContext } from '../Provider';
 
 import DescriptionEditor from '../formElements/DescriptionEditor';
 import DocumentTypeSelect from '../formElements/DocumentTypeSelect';
-import PublicationDatePicker from '../formElements/PublicationDatePicker';
 import TitleEditor from '../formElements/TitleEditor';
 
 import { useDocumentTypes } from '../../../../../hooks';
 
+const PublicationDatePicker = React.lazy(() =>
+  import('../formElements/PublicationDatePicker')
+);
 const FlexWrapper = styled.div`
   display: flex;
   flex-wrap: wrap;
@@ -140,9 +142,18 @@ const Step1 = ({ stepId }) => {
                       <DescriptionEditor required />
                       {!isCollection(documentType) && (
                         <PublicationDateWrapper>
-                          <PublicationDatePicker
-                            required={isIssue(documentType)}
-                          />
+                          <Suspense
+                            fallback={
+                              <>
+                                <Skeleton width={125} />
+                                <Skeleton width={75} />
+                                <Skeleton width={100} />
+                              </>
+                            }>
+                            <PublicationDatePicker
+                              required={isIssue(documentType)}
+                            />
+                          </Suspense>
                         </PublicationDateWrapper>
                       )}
                     </FlexItemWrapper>

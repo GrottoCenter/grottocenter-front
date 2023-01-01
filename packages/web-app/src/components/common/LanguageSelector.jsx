@@ -1,5 +1,5 @@
 import React from 'react';
-import { Select, MenuItem, Input } from '@material-ui/core';
+import { Select, MenuItem, Input, CircularProgress } from '@material-ui/core';
 import { withStyles } from '@material-ui/core/styles';
 import LanguageIcon from '@material-ui/icons/Translate';
 import styled from 'styled-components';
@@ -52,7 +52,9 @@ const Wrapper = styled.div`
 `;
 
 const LanguageSelector = () => {
-  const { locale, AVAILABLE_LANGUAGES } = useSelector(state => state.intl);
+  const { isLoading, locale, AVAILABLE_LANGUAGES } = useSelector(
+    state => state.intl
+  );
   const dispatch = useDispatch();
 
   const handleChange = event => {
@@ -70,7 +72,11 @@ const LanguageSelector = () => {
 
   return (
     <Wrapper>
-      <LanguageIcon />
+      {isLoading ? (
+        <CircularProgress size={25} color="white" />
+      ) : (
+        <LanguageIcon />
+      )}
       <StyledSelect
         value={locale}
         onChange={handleChange}

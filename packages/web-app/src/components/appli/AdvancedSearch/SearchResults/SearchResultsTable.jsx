@@ -18,8 +18,6 @@ import {
 import { pathOr } from 'ramda';
 
 import { CSVDownload } from 'react-csv';
-import _ from 'lodash';
-
 import Translate from '../../../common/Translate';
 import Alert from '../../../common/Alert';
 
@@ -54,6 +52,10 @@ const DEFAULT_PAGE = 0;
 const DEFAULT_SIZE = 10;
 // Don't authorize anyone to download all the database in CSV
 const MAX_NUMBER_OF_DATA_TO_EXPORT_IN_CSV = 10000;
+
+function truncateString(str, num) {
+  return str.length > num ? `${str.slice(0, num)}...` : str;
+}
 
 // ============= MAIN COMPONENT ============= //
 
@@ -402,7 +404,7 @@ class SearchResultsTable extends React.Component {
                         </TableCell>
                         <TableCell>
                           {result.regions
-                            ? _.truncate(
+                            ? truncateString(
                                 result.regions.map(s => s.name).join(', '),
                                 30
                               )

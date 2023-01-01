@@ -1,9 +1,9 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, Suspense } from 'react';
 import { includes } from 'ramda';
 import { useHistory, generatePath } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
+import PageLoader from '../components/common/PageLoader';
 
-import MapClusters from '../components/common/Maps/MapClusters';
 import {
   changeLocation,
   changeZoom,
@@ -14,6 +14,11 @@ import {
   fetchEntrancesCoordinates
 } from '../actions/Map';
 import { fetchProjections } from '../actions/Projections';
+import 'leaflet/dist/leaflet.css';
+
+const MapClusters = React.lazy(() =>
+  import('../components/common/Maps/MapClusters')
+);
 
 const encodePathLocation = pathLocation =>
   Buffer.from(pathLocation).toString('base64');
@@ -77,18 +82,20 @@ const Map = () => {
   }, []);
 
   return (
-    <MapClusters
-      center={[location.lat, location.lng]}
-      zoom={zoom}
-      entrances={entrancesCoordinates}
-      entranceMarkers={entrances}
-      networks={networksCoordinates}
-      networkMarkers={networks}
-      organizations={organizations}
-      onUpdate={handleUpdate}
-      isSideMenuOpen={open}
-      projectionsList={projections}
-    />
+    <Suspense fallback={<PageLoader />}>
+      <MapClusters
+        center={[location.lat, location.lng]}
+        zoom={zoom}
+        entrances={entrancesCoordinates}
+        entranceMarkers={entrances}
+        networks={networksCoordinates}
+        networkMarkers={networks}
+        organizations={organizations}
+        onUpdate={handleUpdate}
+        isSideMenuOpen={open}
+        projectionsList={projections}
+      />
+    </Suspense>
   );
 };
 
