@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, Suspense } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { Button as MuiButton } from '@material-ui/core';
@@ -6,9 +6,11 @@ import ConvertIcon from '@material-ui/icons/Transform';
 import { useIntl } from 'react-intl';
 import { anyPass, isEmpty, isNil } from 'ramda';
 import { useFullScreen } from 'react-browser-hooks';
+import { Skeleton } from '@material-ui/lab';
 import CustomControl, { customControlProps } from '../CustomControl';
 import StandardDialog from '../../../StandardDialog';
-import Convert from './Convert';
+
+const Convert = React.lazy(() => import('./Convert'));
 
 const Wrapper = styled.div`
   background: white;
@@ -54,7 +56,16 @@ const ConverterControl = ({
           title={formatMessage({ id: 'Converter' })}
           open={Boolean(anchorEl)}
           onClose={handleClose}>
-          <Convert list={projectionsList} />
+          <Suspense
+            fallback={
+              <>
+                <Skeleton width={125} />
+                <Skeleton width={75} />
+                <Skeleton width={100} />
+              </>
+            }>
+            <Convert list={projectionsList} />
+          </Suspense>
         </StandardDialog>
       )}
     </CustomControl>

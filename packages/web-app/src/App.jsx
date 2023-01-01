@@ -15,13 +15,12 @@ import CssBaseline from '@material-ui/core/CssBaseline';
 import { ThemeProvider as StyledThemeProvider } from 'styled-components';
 import PropTypes from 'prop-types';
 
-import { includes, keys } from 'ramda';
 import grottoTheme from './conf/grottoTheme';
 import GCReducer from './reducers/GCReducer';
-import { changeLanguage, loadLanguages } from './actions/Language';
+import { loadLanguages } from './actions/Language';
+import { bootstrapIntl } from './actions/Intl';
 import Application from './pages/Application';
 import ErrorHandler from './components/appli/ErrorHandler';
-import { DEFAULT_LANGUAGE, AVAILABLE_LANGUAGES } from './conf/config';
 import './App.css';
 import './animations.css';
 import ErrorBoundary from './components/appli/ErrorBoundary';
@@ -29,16 +28,6 @@ import ErrorBoundary from './components/appli/ErrorBoundary';
 const middlewares = applyMiddleware(createDebounce(), thunkMiddleware);
 const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 const gcStore = createStore(GCReducer, composeEnhancers(middlewares));
-
-const initialLocale = navigator.language.split(/[-_]/)[0];
-gcStore.dispatch(
-  changeLanguage(
-    includes(initialLocale, keys(AVAILABLE_LANGUAGES))
-      ? initialLocale
-      : DEFAULT_LANGUAGE
-  )
-);
-
 const theme = createTheme(grottoTheme);
 
 const customOnIntlError = err => {
@@ -63,6 +52,7 @@ const HydratedIntlProvider = ({ children }) => {
   const dispatch = useDispatch();
 
   useEffect(() => {
+    dispatch(bootstrapIntl());
     dispatch(loadLanguages(true));
   }, [dispatch]);
   return (

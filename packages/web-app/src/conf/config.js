@@ -32,6 +32,7 @@ export const AVAILABLE_LANGUAGES = {
     refName: 'Portuguese'
   },
   ro: { nativeName: 'Română', id: 'ron', part1: 'ro', refName: 'Romanian' }
+  // If you change root keys on this object, don't forget to also update the intlBootstrap allLanguages list in public/index.html
 };
 
 export const DEFAULT_LANGUAGE = AVAILABLE_LANGUAGES.en;
@@ -51,8 +52,6 @@ export const bloggerIcons = {
 // ===== Paypal
 export const paypalId = 'TJEU7C2TZ356Y';
 export const paypalLink = 'https://www.paypal.com/cgi-bin/webscr';
-export const paypalImgLink =
-  'https://www.paypalobjects.com/fr_FR/i/scr/pixel.gif';
 
 // ===== Misc config values
 export const emailRegexp = /\S+@\S+/; // simple regexp TODO: use another one more robust

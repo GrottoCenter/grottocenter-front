@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import PropTypes from 'prop-types';
-import ApiDetail from '../components/appli/ApiDetail';
+import PageLoader from '../components/common/PageLoader';
+
+const ApiDetail = React.lazy(() => import('../components/appli/ApiDetail'));
 
 const ApiDoc = props => {
   const {
@@ -8,7 +10,12 @@ const ApiDoc = props => {
       params: { version }
     }
   } = props;
-  return <ApiDetail version={Number.parseInt(version, 10)} />;
+
+  return (
+    <Suspense fallback={<PageLoader />}>
+      <ApiDetail version={Number.parseInt(version, 10)} />
+    </Suspense>
+  );
 };
 
 ApiDoc.propTypes = {

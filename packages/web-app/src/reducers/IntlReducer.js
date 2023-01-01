@@ -1,18 +1,24 @@
-import { keys, includes } from 'ramda';
-import { DEFAULT_LANGUAGE, AVAILABLE_LANGUAGES } from '../conf/config';
-import { CHANGE_LOCALE } from '../actions/Intl';
-import translations from '../lang';
+import { AVAILABLE_LANGUAGES } from '../conf/config';
+import {
+  CHANGE_LOCALE,
+  CHANGE_LOCALE_SUCCESS,
+  CHANGE_LOCALE_LOAD_SUCCESS,
+  CHANGE_LOCALE_LOAD_FAILURE
+} from '../actions/Intl';
 
-const navigatorLocale = navigator.language.split(/[-_]/)[0];
-const initialLocale = includes(navigatorLocale, keys(AVAILABLE_LANGUAGES))
-  ? navigatorLocale
-  : DEFAULT_LANGUAGE;
+const reactSupportedLanguages = Object.keys(AVAILABLE_LANGUAGES);
+if (intlBootstrap.allLanguages.length !== reactSupportedLanguages.length)
+  console.error(
+    'Warning: intlBootstrap languages does not match react supported langages'
+  );
 
 const initialState = {
-  locale: initialLocale,
-  languageObject: AVAILABLE_LANGUAGES[initialLocale],
-  messages: translations,
-  AVAILABLE_LANGUAGES
+  locale: intlBootstrap.initialLocale,
+  languageObject: AVAILABLE_LANGUAGES[intlBootstrap.initialLocale],
+  messages: {},
+  AVAILABLE_LANGUAGES,
+  error: null,
+  isLoading: false
 };
 
 const reducer = (state = initialState, action) => {
@@ -20,8 +26,29 @@ const reducer = (state = initialState, action) => {
     case CHANGE_LOCALE:
       return {
         ...state,
+        isLoading: true
+      };
+    case CHANGE_LOCALE_SUCCESS:
+      return {
+        ...state,
+        isLoading: false,
+        locale: action.locale
+      };
+    case CHANGE_LOCALE_LOAD_SUCCESS:
+      return {
+        ...state,
+        isLoading: false,
         locale: action.locale,
-        languageObject: AVAILABLE_LANGUAGES[action.locale]
+        messages: {
+          ...state.messages,
+          [action.locale]: action.messages
+        }
+      };
+    case CHANGE_LOCALE_LOAD_FAILURE:
+      return {
+        ...state,
+        isLoading: false,
+        error: action.error
       };
     default:
       return state;

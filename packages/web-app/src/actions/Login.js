@@ -1,5 +1,4 @@
 // import fetch from 'isomorphic-fetch';
-import { decode } from 'jsonwebtoken';
 import { loginUrl, forgotPasswordUrl } from '../conf/apiRoutes';
 import makeErrorMessage from '../helpers/makeErrorMessage';
 
@@ -58,6 +57,12 @@ export function postLogout() {
   };
 }
 
+/** Decode a JWT token BUT does NOT validate it */
+export function decodeJWT(token) {
+  if (!token) return null;
+  return JSON.parse(atob(token.split('.')[1]));
+}
+
 export function postLogin(email, password) {
   return async dispatch => {
     dispatch(fetchLogin());
@@ -71,7 +76,7 @@ export function postLogin(email, password) {
       responseStatus = response.status;
       if (response.ok) {
         const json = await response.json();
-        dispatch(fetchLoginSuccess(decode(json.token), json.token));
+        dispatch(fetchLoginSuccess(decodeJWT(json.token), json.token));
         dispatch(hideLoginDialog());
         return;
       }

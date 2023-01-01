@@ -10,5 +10,8 @@ module.exports = {
         'default-param-last': 'off'
       }
     }
-  ]
+  ],
+  globals: {
+    intlBootstrap: true
+  }
 };

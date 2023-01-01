@@ -19,21 +19,6 @@
       user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
     -->
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
-
-    <link
-      rel="stylesheet"
-      href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
-      integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
-      crossorigin=""
-    />
-    <link
-      rel="stylesheet"
-      href="https://fonts.googleapis.com/icon?family=Material+Icons"
-    />
-    <link
-      rel="stylesheet"
-      href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700"
-    />
     <!--
       Notice the use of %PUBLIC_URL% in the tags above.
       It will be replaced with the URL of the `public` folder during the build.
@@ -43,10 +28,152 @@
       work correctly both with client-side routing and a non-root public URL.
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
+
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+    />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700"
+    />
+
+    <style>
+      html,
+      body {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+      }
+      .loader {
+        width: 100%;
+        height: 100%;
+        position: fixed;
+        top: 0;
+        background-color: #5d4037;
+        transition: opacity 0.4s;
+        opacity: 1;
+      }
+      .loaderOff {
+        opacity: 0 !important;
+      }
+      .logo {
+        width: 25%;
+        margin: auto;
+        padding-top: 15%;
+      }
+      #bottom {
+        animation: bottomAnim 1.5s linear infinite;
+      }
+      #top {
+        animation: bottomTop 1.5s linear infinite;
+      }
+      @keyframes bottomTop {
+        0% {
+          stroke-dashoffset: 522.24;
+        }
+        100% {
+          stroke-dashoffset: 0;
+        }
+      }
+      @keyframes bottomAnim {
+        0% {
+          stroke-dashoffset: 391;
+        }
+        100% {
+          stroke-dashoffset: 0;
+        }
+      }
+      #root {
+        transition: opacity 0.4s;
+        opacity: 0;
+      }
+      .rootDisplay {
+        opacity: 1 !important;
+      }
+    </style>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
+    <div class="loader">
+      <div class="logo">
+        <svg
+          id="eEqkoNHJ67b1"
+          xmlns="http://www.w3.org/2000/svg"
+          xmlns:xlink="http://www.w3.org/1999/xlink"
+          viewBox="0 0 195.547 126.359"
+          shape-rendering="geometricPrecision"
+          text-rendering="geometricPrecision"
+        >
+          <path
+            id="point"
+            d="M107.375,84.331c-12.283,5.413-26.535-.37-31.834-12.918-5.3-12.547.363-27.107,12.646-32.52c12.284-5.413,26.536.371,31.835,12.918c5.232,12.391-.22,26.78-12.257,32.343"
+            transform="translate(-.654591 2.954649)"
+            fill="#9a140c"
+            fill-rule="evenodd"
+          />
+          <path d="" fill="none" stroke="#3f5787" stroke-width="0.5" />
+          <path
+            id="top"
+            d="M12.473017,77.858673c0,0,12.412281,2.607693,21.010105-4.357633C50.800657,59.471645,52.624768,12.449248,96.947764,12.449248s44.968303,41.17425,59.988902,56.761663c9.324112,9.675965,26.158727,8.647762,26.158727,8.647762"
+            transform="translate(.000002 0.000001)"
+            fill="none"
+            stroke="#059865"
+            stroke-width="25"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-dashoffset="522.24"
+            stroke-dasharray="261.118752"
+          />
+          <path
+            id="bottom"
+            d="M12.473018,114.104h170.622376"
+            transform="translate(.000001-.213255)"
+            fill="none"
+            stroke="#056598"
+            stroke-width="25"
+            stroke-linecap="round"
+            stroke-dashoffset="391"
+            stroke-dasharray="195.498402"
+          />
+        </svg>
+      </div>
+    </div>
+    <script>
+      // Intl management will be takeover by react once it is loaded
+      const intlBootstrap = {
+        defaultLocale: 'en',
+        allLanguages: [
+          'ar',
+          'bg',
+          'ca',
+          'de',
+          'el',
+          'en',
+          'es',
+          'fr',
+          'he',
+          'id',
+          'it',
+          'ja',
+          'nl',
+          'pt',
+          'ro'
+          // If you change this list, don't forget to also update the AVAILABLE_LANGUAGES object in src/conf/config.js
+        ],
+        initialLocale: navigator.language.split(/[-_]/)[0],
+        initialFetchP: null
+      };
+
+      if (!intlBootstrap.allLanguages.includes(intlBootstrap.initialLocale))
+        intlBootstrap.initialLocale = intlBootstrap.defaultLocale;
+      // While react is still loading we start to get the initial locale strings
+      intlBootstrap.initialFetchP = fetch(
+        `/lang/${intlBootstrap.initialLocale}.json`
+      ).then(r => r.json());
+    </script>
+
     <!--
       This HTML file is a template.
       If you open it directly in the browser, you will see an empty page.

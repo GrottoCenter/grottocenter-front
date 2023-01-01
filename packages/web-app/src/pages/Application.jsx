@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Redirect, Route, Switch } from 'react-router-dom';
 
@@ -42,11 +42,30 @@ import OrganizationEdit from './EntityEdit/Organization/OrganizationEdit';
 import CountryPage from './Country';
 import NotificationsPage from './Notifications';
 
+async function transitionToReact() {
+  await intlBootstrap.initialFetchP; // Make sure strings of the initial locale are loaded
+
+  const loaderEl = document.querySelector('.loader');
+  loaderEl.classList.add('loaderOff');
+  document.querySelector('#root').classList.add('rootDisplay');
+  setTimeout(() => {
+    // Remove the loader element after the opacity transition
+    loaderEl.remove();
+  }, 410);
+}
+
 const Application = () => {
   const dispatch = useDispatch();
   const isSideMenuOpen = useSelector(state => state.sideMenu.open);
   const permissions = usePermissions();
   const toggleSideMenu = () => dispatch({ type: 'TOGGLE_SIDEMENU' });
+
+  const firstRender = useRef(true);
+  useEffect(() => {
+    if (!firstRender.current) return;
+    transitionToReact();
+    firstRender.current = false;
+  });
 
   return (
     <Layout
