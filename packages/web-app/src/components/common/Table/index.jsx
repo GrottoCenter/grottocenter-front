@@ -43,7 +43,7 @@ const Wrapper = styled(Paper)`
 `;
 
 const TableContainer = styled(MuiTableContainer)`
-  max-height: calc(70vh - ${({ theme }) => theme.appBarHeight}px);
+  max-height: calc(70vh - ${({ theme }) => theme.appBarHeight});
 `;
 
 const TableBody = styled(MuiTableBody)`

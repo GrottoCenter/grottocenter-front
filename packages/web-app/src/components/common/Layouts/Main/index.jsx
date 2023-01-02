@@ -19,7 +19,7 @@ const MainWrapper = styled.main`
         : theme.transitions.duration.leavingScreen
     })};
   margin-left: ${({ theme, isSideMenuOpen }) =>
-    !isMobileOnly && (isSideMenuOpen ? theme.sideMenuWidth : 0)}px;
+    !isMobileOnly && (isSideMenuOpen ? theme.sideMenuWidth : 0)};
 `;
 
 const Layout = ({

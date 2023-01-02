@@ -12,7 +12,7 @@ import { EntryContext } from '../../../appli/Entry/Provider';
 
 const Wrapper = styled.div`
   position: sticky;
-  top: ${({ theme }) => theme.appBarHeight}px;
+  top: ${({ theme }) => theme.appBarHeight};
   display: flex;
   flex-wrap: wrap;
   flex-direction: ${!isMobile && 'row-reverse'};

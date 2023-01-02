@@ -20,8 +20,8 @@ const fontFamily = [
   '"Segoe UI Symbol"'
 ].join(',');
 
-const sideMenuWidth = 240;
-const appBarHeight = 56;
+const sideMenuWidth = '215px';
+const appBarHeight = '56px';
 const breadcrumpHeight = 24;
 const paddingUnit = 8;
 
@@ -184,7 +184,7 @@ export const overridings = {
         },
         paper: {
           top: appBarHeight,
-          height: `calc(100% - ${appBarHeight}px)`,
+          height: `calc(100% - ${appBarHeight})`,
           width: sideMenuWidth,
           padding: '8px'
         }
@@ -221,7 +221,7 @@ export const overridings = {
     MuiToolbar: {
       styleOverrides: {
         root: {
-          height: `${appBarHeight}px`
+          height: `${appBarHeight}`
         }
       },
       gutterBottom: {

@@ -11,11 +11,10 @@ import styled from 'styled-components';
 import Translate from '../common/Translate';
 import SimpleMenuEntryConnector from '../../containers/SimpleMenuEntryConnector';
 import ComplexMenuEntryConnector from '../../containers/ComplexMenuEntryConnector';
-import { sideMenuWidth } from '../../conf/config';
 
 const Menubar = withTheme(styled(Drawer)`
   > div {
-    width: ${sideMenuWidth} !important;
+    width: ${props => props.theme.sideMenuWidth} !important;
     top: 60px !important;
     background-color: ${props => props.theme.palette.primary1Color} !important;
   }

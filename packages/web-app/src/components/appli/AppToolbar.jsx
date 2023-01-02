@@ -9,7 +9,6 @@ import styled from 'styled-components';
 
 import HeaderTitle from './HeaderTitle';
 import SideMenuBurgerConnector from '../../containers/SideMenuBurgerConnector';
-import { sideMenuWidth } from '../../conf/config';
 import Translate from '../common/Translate';
 
 const StyledHelpIcon = withStyles(
@@ -65,9 +64,9 @@ const StyledPageTitleText = withTheme(styled.span`
 `);
 
 const TitleGroup = withStyles(
-  () => ({
+  theme => ({
     root: {
-      width: sideMenuWidth,
+      width: theme.sideMenuWidth,
       padding: '0px',
       alignItems: 'center',
       height: '60px'

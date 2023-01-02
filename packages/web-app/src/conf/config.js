@@ -81,7 +81,6 @@ export const breadcrumpKeys = {
 export const defaultCoord = { lat: 47.5, lng: 19 }; // Budapest
 export const defaultZoom = 6;
 export const focusZoom = 13;
-export const sideMenuWidth = '215px';
 export const logoGC = '/images/logo.svg';
 
 export const authTokenName = 'grottocenter_token';
