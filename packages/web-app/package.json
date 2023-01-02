@@ -21,6 +21,7 @@
     "@mui/lab": "^5.0.0-alpha.114",
     "@mui/material": "^5.11.2",
     "@mui/styles": "^5.11.2",
+    "@mui/x-date-pickers": "^5.0.12",
     "@react-leaflet/core": "1.1.1",
     "@testing-library/jest-dom": "^5.11.4",
     "@testing-library/react": "^11.1.0",
