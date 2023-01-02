@@ -3,14 +3,14 @@ import MuiToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import ToggleButton from '@mui/material/ToggleButton';
 import PropTypes from 'prop-types';
 import { FormLabel } from '@mui/material';
-import styled from 'styled-components';
+import { styled } from '@mui/material/styles';
 
 import { StyledFormControl } from './SliderForm';
 import Translate from '../../common/Translate';
 
-const ToggleButtonGroup = styled(MuiToggleButtonGroup)`
-  padding: ${({ theme }) => theme.spacing(2)};
-`;
+const ToggleButtonGroup = styled(MuiToggleButtonGroup)(({ theme }) => ({
+  padding: theme.spacing(2)
+}));
 
 const DivingTypesForm = ({ onChange, value }) => {
   const handleCavity = (_event, newSelection) => {

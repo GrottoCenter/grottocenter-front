@@ -2,25 +2,22 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Avatar from '@mui/material/Avatar';
 import BurgerIcon from '@mui/icons-material/Help';
-import withTheme from '@mui/styles/withTheme';
 import { Button } from '@mui/material';
-import styled from 'styled-components';
+import { styled } from '@mui/material/styles';
 
-const BurgerAvatar = withTheme(styled(Avatar)`
-  position: relative;
-  left: 20px;
-  background-color: ${props =>
-    props.visible
-      ? props.theme.palette.textIconColor
-      : props.theme.palette.accent1Color} !important;
+const BurgerAvatar = styled(Avatar)(({ theme, visible }) => ({
+  position: 'relative',
+  left: '20px',
+  backgroundColor: visible
+    ? theme.palette.textIconColor
+    : `${theme.palette.accent1Color} !important`,
 
-  > svg {
-    fill: ${props =>
-      props.visible
-        ? props.theme.palette.primaryTextColor
-        : props.theme.palette.textIconColor} !important;
+  '> svg': {
+    fill: visible
+      ? theme.palette.primaryTextColor
+      : `${theme.palette.textIconColor} !important`
   }
-`);
+}));
 
 const BurgerLink = ({ visible, onclick }) => (
   <Button onClick={onclick}>
@@ -33,6 +30,4 @@ BurgerLink.propTypes = {
   visible: PropTypes.bool.isRequired
 };
 
-const SideMenuBurger = styled(BurgerLink)``;
-
-export default SideMenuBurger;
+export default BurgerLink;

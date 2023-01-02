@@ -12,7 +12,7 @@ const Wrapper = styled('div')`
 `;
 
 const SideMenu = ({ isOpen, toggle, isAuth = false, AutoCompleteSearch }) => (
-  <Drawer variant="permanent" anchor="left" open={isOpen} onClose={toggle}>
+  <Drawer variant="persistent" anchor="left" open={isOpen} onClose={toggle}>
     <UserInformation isAuth={isAuth} />
     {!!AutoCompleteSearch && <AutoCompleteSearch />}
     <Divider />

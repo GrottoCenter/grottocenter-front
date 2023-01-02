@@ -1,7 +1,7 @@
 import React, { useContext, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from '@mui/material/styles';
 import DateFnsUtils from '@date-io/date-fns';
 import { Button, FormHelperText } from '@mui/material';
 import {
@@ -13,19 +13,19 @@ import Translate from '../../../../common/Translate';
 
 import { DocumentFormContext } from '../Provider';
 
-const CustomKeyboardDatePicker = styled(KeyboardDatePicker)`
-  margin: 0;
-  width: 100%;
-`;
+const CustomKeyboardDatePicker = styled(KeyboardDatePicker)(() => ({
+  margin: 0,
+  width: '100%'
+}));
 
-const ButtonsFlexWrapper = styled.div`
-  display: flex;
-  padding: 4px;
-`;
+const ButtonsFlexWrapper = styled('div')(() => ({
+  display: 'flex',
+  padding: '4px'
+}));
 
-const DateButton = styled(Button)`
-  flex: 1;
-`;
+const DateButton = styled(Button)(() => ({
+  flex: 1
+}));
 
 const dateTypeFormats = {
   YEAR: 'yyyy',

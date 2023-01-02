@@ -6,8 +6,9 @@ import Card from '@mui/material/Card';
 import CardTitle from '@mui/material/CardHeader';
 import CardText from '@mui/material/CardContent';
 import Collapse from '@mui/material/Collapse';
-import styled from 'styled-components';
+
 import { useSelector } from 'react-redux';
+import { styled } from '@mui/material/styles';
 import GCLink from '../common/GCLink';
 import InternationalizedLink from '../common/InternationalizedLink';
 import {
@@ -17,30 +18,18 @@ import {
 } from '../../conf/externalLinks';
 import Translate from '../common/Translate';
 
-const FaqDiv = styled.div`
-  margin: 20px;
-`;
+const FaqDiv = styled('div')({
+  margin: '20px'
+});
 
-const StyledCard = withStyles(
-  () => ({
-    root: {
-      marginBottom: '20px'
-    }
-  }),
-  { withTheme: true }
-)(Card);
+const StyledCard = styled(Card)({
+  marginBottom: '20px'
+});
 
-const StyledCardHeader = withStyles(
-  theme => ({
-    root: {
-      backgroundColor: theme.palette.secondary1Color
-    },
-    title: {
-      color: theme.palette.secondaryBlocTitle
-    }
-  }),
-  { withTheme: true }
-)(CardTitle);
+const StyledCardHeader = styled(CardTitle)(({ theme }) => ({
+  backgroundColor: theme.palette.primary.main,
+  color: theme.palette.primary.contrastText
+}));
 
 const StyledCardText = withStyles(
   theme => ({
@@ -51,9 +40,9 @@ const StyledCardText = withStyles(
   { withTheme: true }
 )(CardText);
 
-const ItemList = styled.ul`
-  list-style-type: none;
-`;
+const ItemList = styled('ul')({
+  listStyleType: 'none'
+});
 
 const StyledCheckIcon = withStyles(
   theme => ({

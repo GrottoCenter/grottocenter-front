@@ -1,47 +1,46 @@
 import React, { useContext, useEffect, useMemo, Suspense } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
+import { styled } from '@mui/material/styles';
 import { Fade, Skeleton } from '@mui/material';
 import { includes } from 'ramda';
 import { useIntl } from 'react-intl';
+
 import LanguageAutoComplete from '../../../Form/LanguageAutoCompleteWithProvider';
 import { loadDocumentTypes } from '../../../../../actions/DocumentType';
 import { DocumentFormContext } from '../Provider';
-
 import DescriptionEditor from '../formElements/DescriptionEditor';
 import DocumentTypeSelect from '../formElements/DocumentTypeSelect';
 import TitleEditor from '../formElements/TitleEditor';
-
 import { useDocumentTypes } from '../../../../../hooks';
 
 const PublicationDatePicker = React.lazy(() =>
   import('../formElements/PublicationDatePicker')
 );
-const FlexWrapper = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-`;
+const FlexWrapper = styled('div')(() => ({
+  display: 'flex',
+  flexWrap: 'wrap'
+}));
 
-const FlexItemWrapper = styled.div`
-  flex: 1;
-`;
+const FlexItemWrapper = styled('div')(() => ({
+  flex: 1
+}));
 
-const BigFlexItemWrapper = styled.div`
-  flex: 2;
-`;
+const BigFlexItemWrapper = styled('div')(() => ({
+  flex: 2
+}));
 
-const TitleAndDescriptionLanguageWrapper = styled.div`
-  display: flex;
-  flex: 1;
-  flex-basis: 600px;
-  flex-wrap: wrap;
-`;
+const TitleAndDescriptionLanguageWrapper = styled('div')(() => ({
+  display: 'flex',
+  flex: 1,
+  flexBasis: '600px',
+  flexWrap: 'wrap'
+}));
 
-const PublicationDateWrapper = styled.div`
-  flex: 1;
-  flex-basis: 350px;
-`;
+const PublicationDateWrapper = styled('div')(() => ({
+  flex: 1,
+  flexBasis: '350px'
+}));
 
 const Step1 = ({ stepId }) => {
   const {

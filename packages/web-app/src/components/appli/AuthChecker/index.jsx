@@ -4,25 +4,18 @@ import PropTypes from 'prop-types';
 import { Button } from '@mui/material';
 import { useIntl } from 'react-intl';
 import { useDispatch } from 'react-redux';
-import styled from 'styled-components';
-
+import { styled } from '@mui/material/styles';
 import { displayLoginDialog } from '../../../actions/Login';
 import ErrorMessage from '../../common/StatusMessage/ErrorMessage';
 import { usePermissions } from '../../../hooks';
 
-// ====================
+const SpacedButton = styled(Button)(({ theme }) => ({
+  margin: theme.spacing(1)
+}));
 
-const SpacedButton = styled(Button)`
-  ${({ theme }) => `
-    margin: ${theme.spacing(1)};
-`}
-`;
-
-const CenteredBlock = styled.div`
-  text-align: center;
-`;
-
-// ====================
+const CenteredBlock = styled('div')(() => ({
+  textAlign: 'center'
+}));
 
 /**
  * The AuthChecker checks if the user is authenticated:

@@ -1,5 +1,5 @@
 import {
-  FormControl as MuiFormControl,
+  FormControl,
   FormLabel,
   TextField,
   Select,
@@ -10,12 +10,8 @@ import React from 'react';
 import { Controller } from 'react-hook-form';
 import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
-import Translate from '../../../common/Translate';
 
-const FormControl = styled(MuiFormControl)`
-  padding-bottom: ${({ theme }) => theme.spacing(4)};
-`;
+import Translate from '../../../common/Translate';
 
 const Massif = ({ control, errors, allLanguages, isNewDescription }) => {
   const { formatMessage } = useIntl();

@@ -2,47 +2,44 @@ import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import ChevronIcon from '@mui/icons-material/ChevronRight';
 import HomeIcon from '@mui/icons-material/Home';
-import withTheme from '@mui/styles/withTheme';
-import styled from 'styled-components';
+import { styled } from '@mui/material/styles';
 import { breadcrumpKeys } from '../../../conf/config';
 import GCLink from '../../common/GCLink';
 import Translate from '../../common/Translate';
 
-const BreadcrumpBar = withTheme(styled.div`
-  color: ${props => props.theme.palette.primary1Color} !important;
-  background-color: ${props => props.theme.palette.primary3Color} !important;
-  padding: 0px !important;
-  height: ${({ theme }) => theme.breadcrumpHeight}px;
+const BreadcrumpBar = styled('div')(({ theme }) => ({
+  color: `${theme.palette.primary1Color} !important`,
+  backgroundColor: `${theme.palette.primary3Color} !important`,
+  padding: '0px !important',
+  height: theme.breadcrumpHeight,
 
-  & > a,
-  & > a:visited {
-    font-weight: 300;
-    color: ${props => props.theme.palette.primary1Color} !important;
+  '& > a,  & > a:visited': {
+    fontWeight: 300,
+    color: `${theme.palette.primary1Color} !important`,
 
-    :hover,
-    :active {
-      font-weight: 600;
+    ':hover, :active': {
+      fontWeight: 600
     }
+  },
+
+  '& > svg': {
+    color: `${theme.palette.primary1Color} !important`
   }
+}));
 
-  & > svg {
-    color: ${props => props.theme.palette.primary1Color} !important;
+const StyledLink = styled(GCLink)(() => ({
+  textDecoration: 'none',
+  position: 'relative',
+  top: '-7px',
+
+  '& > span': {
+    fontSize: 'small'
   }
-`);
+}));
 
-const StyledLink = styled(GCLink)`
-  text-decoration: none;
-  position: relative;
-  top: -7px;
-
-  & > span {
-    font-size: small;
-  }
-`;
-
-const StyledHomeIcon = styled(HomeIcon)`
-  padding-right: 5px;
-`;
+const StyledHomeIcon = styled(HomeIcon)(() => ({
+  paddingRight: '5px'
+}));
 
 const Breadcrump = () => {
   const location = useLocation();

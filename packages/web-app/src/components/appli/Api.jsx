@@ -1,8 +1,7 @@
 import React from 'react';
-import { lighten } from '@mui/material/styles';
+import { lighten, styled } from '@mui/material/styles';
 import { Grid, Typography } from '@mui/material';
 import CheckIcon from '@mui/icons-material/Check';
-import styled from 'styled-components';
 import { useSelector } from 'react-redux';
 import { useIntl } from 'react-intl';
 
@@ -16,14 +15,14 @@ import {
 import Translate from '../common/Translate';
 import Layout from '../common/Layouts/Fixed/FixedContent';
 
-const StyledLinkToVersion = styled(GCLink)`
-  text-decoration: none;
-  font-weight: 600;
-  color: ${props => props.theme.palette.accent1Color};
-  &:hover {
-    color: ${props => lighten(props.theme.palette.accent1Color, 0.3)};
+const StyledLinkToVersion = styled(GCLink)(({ theme }) => ({
+  textDecoration: 'none',
+  fontWeight: 600,
+  color: theme.palette.accent1Color,
+  '&:hover': {
+    color: lighten(theme.palette.accent1Color, 0.3)
   }
-`;
+}));
 
 const StyledCheckIcon = styled(CheckIcon)(({ theme }) => ({
   fill: theme.palette.accent1Color,

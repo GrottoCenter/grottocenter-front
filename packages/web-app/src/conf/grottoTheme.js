@@ -15,9 +15,9 @@ const fontFamily = [
   '"Segoe UI Symbol"'
 ].join(',');
 
-const sideMenuWidth = '215px';
+const sideMenuWidth = '240px';
 const appBarHeight = '56px';
-const breadcrumpHeight = 24;
+const breadcrumpHeight = '24px';
 const paddingUnit = 8;
 
 export const overridings = {
@@ -188,8 +188,13 @@ export const overridings = {
     MuiDivider: {
       styleOverrides: {
         root: {
-          backgroundColor: brown['500']
+          borderColor: brown['500']
         }
+      }
+    },
+    MuiSwitch: {
+      defaultProps: {
+        color: 'secondary'
       }
     },
     MuiInputBase: {
@@ -207,6 +212,11 @@ export const overridings = {
         root: {
           padding: '4px'
         }
+      }
+    },
+    MuiSlider: {
+      defaultProps: {
+        size: 'small'
       }
     },
     MuiSelect: {
@@ -230,6 +240,9 @@ export const overridings = {
       }
     },
     MuiLink: {
+      defaultProps: {
+        underline: 'hover'
+      },
       styleOverrides: {
         root: {
           display: 'flex'

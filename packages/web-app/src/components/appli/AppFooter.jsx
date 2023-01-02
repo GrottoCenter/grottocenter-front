@@ -1,7 +1,6 @@
 import React from 'react';
 import Toolbar from '@mui/material/Toolbar';
-import styled from 'styled-components';
-import withStyles from '@mui/styles/withStyles';
+import { styled } from '@mui/material/styles';
 import InternationalizedLink from '../common/InternationalizedLink';
 import GCLink from '../common/GCLink';
 import GCLogo from '../common/GCLogo';
@@ -15,49 +14,44 @@ import {
   bloggerLinks
 } from '../../conf/externalLinks';
 
-const FooterBar = withStyles(
-  theme => ({
-    root: {
-      color: theme.palette.fullBlack,
-      backgroundColor: theme.palette.primary3Color,
-      padding: '0 10px',
-      height: '45px',
-      minHeight: '45px',
-      position: 'fixed',
-      bottom: '0',
-      width: 'calc(100% - 20px)',
-      display: 'inline-flex',
-      justifyContent: 'space-between'
-    }
-  }),
-  { withTheme: true }
-)(Toolbar);
+const FooterBar = styled(Toolbar)(({ theme }) => ({
+  color: theme.palette.fullBlack,
+  backgroundColor: theme.palette.primary3Color,
+  padding: '0 10px',
+  height: '45px',
+  minHeight: '45px',
+  position: 'fixed',
+  bottom: '0',
+  width: 'calc(100% - 20px)',
+  display: 'inline-flex',
+  justifyContent: 'space-between'
+}));
 
-const SocialImage = styled.img`
-  height: 25px;
-  padding-top: 5px;
-  padding-left: 5px;
-  padding-right: 5px;
-`;
+const SocialImage = styled('img')({
+  height: '25px',
+  paddingTop: '5px',
+  paddingLeft: '5px',
+  paddingRight: '5px'
+});
 
-const LogoImage = styled(GCLogo)`
-  & > img {
-    height: 25px;
-    padding-top: 4px;
-    padding-left: 5px;
-    padding-right: 5px;
+const LogoImage = styled(GCLogo)({
+  '& > img': {
+    height: '25px',
+    paddingTop: '4px',
+    paddingLeft: '5px',
+    paddingRight: '5px'
   }
-`;
+});
 
-const Version = styled.span`
-  line-height: 36px;
-  font-size: x-small;
-  padding-left: 5px;
-`;
+const Version = styled('span')({
+  lineHeight: '36px',
+  fontSize: 'x-small',
+  paddingLeft: '5px'
+});
 
-const RightDiv = styled.div`
-  display: inline-flex;
-`;
+const RightDiv = styled('div')({
+  display: 'inline-flex'
+});
 
 const AppFooter = () => (
   <FooterBar>

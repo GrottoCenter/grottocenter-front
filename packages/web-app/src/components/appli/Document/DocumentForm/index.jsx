@@ -1,7 +1,7 @@
 import React, { useContext, useEffect } from 'react';
 import { isMobileOnly } from 'react-device-detect';
 import { useIntl } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from '@mui/material/styles';
 import {
   Button,
   Divider,
@@ -16,12 +16,10 @@ import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore';
 
 import { DocumentFormContext } from './Provider';
 import { DocumentFormTypes } from './types';
-
 import { wikiBBSLinks } from '../../../../conf/externalLinks';
 import Translate from '../../../common/Translate';
 import InternationalizedLink from '../../../common/InternationalizedLink';
 import Stepper from '../../../common/Form/Stepper';
-
 import FormBody from './FormBody';
 import CreatingDocumentDialog from './CreatingDocumentDialog';
 
@@ -45,44 +43,44 @@ const PreviousStepButton = props => (
   </Button>
 );
 
-const ChangeStepWrapper = styled(FormControl)`
-  display: block;
-`;
+const ChangeStepWrapper = styled(FormControl)(() => ({
+  display: 'block'
+}));
 
-const FormWrapper = styled.form`
-  display: flex;
-  flex-direction: column;
-`;
+const FormWrapper = styled('form')(() => ({
+  display: 'flex',
+  flexDirection: 'column'
+}));
 
-const StyledDivider = styled(Divider)`
-  margin: ${({ theme }) => theme.spacing(3)} 0;
-`;
+const StyledDivider = styled(Divider)(({ theme }) => ({
+  margin: `${theme.spacing(3)} 0`
+}));
 
-const SubmitButton = styled(Button)`
-  display: block;
-  margin: auto;
-`;
+const SubmitButton = styled(Button)(() => ({
+  display: 'block',
+  margin: 'auto'
+}));
 
-const LinearProgress = styled(MuiLinearProgress)`
-  visibility: ${({ $isLoading }) => ($isLoading ? 'visible' : 'hidden')};
-`;
+const LinearProgress = styled(MuiLinearProgress)(({ $isLoading }) => ({
+  visibility: $isLoading ? 'visible' : 'hidden'
+}));
 
-const BbsHeader = styled.div`
-  display: flex;
-  align-items: center;
-`;
+const BbsHeader = styled('div')(() => ({
+  display: 'flex',
+  alignItems: 'center'
+}));
 
-const BbsIcon = styled.img`
-  height: 60px;
-  width: 60px;
-`;
+const BbsIcon = styled('img')(() => ({
+  height: '60px',
+  width: '60px'
+}));
 
-const BbsInfoText = styled(Typography)`
-  flex: 1;
-  font-style: italic;
-  margin-bottom: 0;
-  margin-left: ${({ theme }) => theme.spacing(3)};
-`;
+const BbsInfoText = styled(Typography)(({ theme }) => ({
+  flex: 1,
+  fontStyle: 'italic',
+  marginBottom: 0,
+  marginLeft: theme.spacing(3)
+}));
 
 const DONT_LEAVE_MESSAGE =
   'If you leave now, some data would be lost. Are you sure you want to leave this page?';

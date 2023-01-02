@@ -7,18 +7,18 @@ import {
   Slider as MuiSlider,
   Switch
 } from '@mui/material';
-import styled from 'styled-components';
+import { styled } from '@mui/material/styles';
 
-const Slider = styled(MuiSlider)`
-  width: 200px;
-`;
+const Slider = styled(MuiSlider)(() => ({
+  width: '200px'
+}));
 
-export const StyledFormControl = styled(MuiFormControl)`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin: ${({ theme }) => theme.spacing(2)};
-`;
+export const StyledFormControl = styled(MuiFormControl)(({ theme }) => ({
+  display: 'flex',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  margin: theme.spacing(2)
+}));
 
 const SliderForm = ({
   label,

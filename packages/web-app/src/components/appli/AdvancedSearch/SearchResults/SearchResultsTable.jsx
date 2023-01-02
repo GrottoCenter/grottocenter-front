@@ -24,27 +24,27 @@ import SearchTableActions from './SearchTableActions';
 import ResultsTableHead from './ResultsTableHead';
 import { ADVANCED_SEARCH_TYPES } from '../../../../conf/config';
 
-const StyledTable = styled(Table)`
-  margin-bottom: 0;
-  overflow: 'auto';
-`;
+const StyledTable = styled(Table)(() => ({
+  marginBottom: 0,
+  overflow: 'auto'
+}));
 
-const StyledTableRow = styled(TableRow)`
+const StyledTableRow = styled(TableRow)(() => ({
   '&:hover': {
-    cursor: 'pointer';
+    cursor: 'pointer'
   }
-`;
+}));
 
-const StyledTableError = styled('p')`
-  color: '#ff3333';
-`;
+const StyledTableError = styled('p')(() => ({
+  color: '#ff3333'
+}));
 
-const StyledTableFooter = styled('div')`
-  align-items: center;
-  display: flex;
-  justify-content: space-between;
-  margin: ${({ theme }) => theme.spacing(2)};
-`;
+const StyledTableFooter = styled('div')(({ theme }) => ({
+  alignItems: 'center',
+  display: 'flex',
+  justifyContent: 'space-between',
+  margin: theme.spacing(2)
+}));
 
 const DEFAULT_FROM = 0;
 const DEFAULT_PAGE = 0;

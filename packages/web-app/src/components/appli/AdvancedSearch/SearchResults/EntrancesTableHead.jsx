@@ -1,13 +1,7 @@
 import React from 'react';
 import { TableCell, TableHead, TableRow } from '@mui/material';
 import { useIntl } from 'react-intl';
-import styled from 'styled-components';
-
-const HeaderIcon = styled.img`
-  height: 3.6rem;
-  vertical-align: middle;
-  width: 3.6rem;
-`;
+import HeaderIcon from './HeaderIcon';
 
 const EntrancesTableHead = () => {
   const { formatMessage } = useIntl();
