@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import MenuItem from '@material-ui/core/MenuItem';
-import { withTheme } from '@material-ui/core/styles';
+import MenuItem from '@mui/material/MenuItem';
+import withTheme from '@mui/styles/withTheme';
 import styled from 'styled-components';
 import { BrowserRouter } from 'react-router-dom';
 

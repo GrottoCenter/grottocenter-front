@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { CSVReader } from 'react-papaparse';
-import { useTheme } from '@material-ui/core/styles';
+import { useTheme } from '@mui/material/styles';
 import { useIntl } from 'react-intl';
 import Alert from '../../../common/Alert';
 import { ImportPageContentContext } from '../Provider';

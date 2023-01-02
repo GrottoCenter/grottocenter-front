@@ -1,5 +1,5 @@
 import { includes, isNil, values } from 'ramda';
-import { TableCell, TableSortLabel } from '@material-ui/core';
+import { TableCell, TableSortLabel } from '@mui/material';
 import React from 'react';
 import PropTypes from 'prop-types';
 

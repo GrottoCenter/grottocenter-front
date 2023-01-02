@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { storiesOf } from '@storybook/react';
-import { Card } from '@material-ui/core';
+import { Card } from '@mui/material';
 import DocumentFormProvider, { defaultContext } from '../Provider';
 
 import DescriptionEditor from '../formElements/DescriptionEditor';

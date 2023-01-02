@@ -9,7 +9,7 @@ const RatingWrapper = styled.div`
   justify-content: space-evenly;
   align-items: center;
   flex-wrap: wrap;
-  padding: ${({ theme }) => theme.spacing(2)}px;
+  padding: ${({ theme }) => theme.spacing(2)};
   ${({ size }) => size === 'small' && `flex-direction: column`}
 `;
 

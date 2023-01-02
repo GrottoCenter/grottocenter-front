@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
-import { FormControl, Button, Typography } from '@material-ui/core';
+import { FormControl, Button, Typography } from '@mui/material';
 
 import styled from 'styled-components';
 import { isEmpty, isNil, remove } from 'ramda';
@@ -27,8 +27,8 @@ const ListWrapper = styled.div`
 `;
 
 const StyledTypography = styled(Typography)`
-  margin-top: ${({ theme }) => theme.spacing(2)}px;
-  margin-bottom: ${({ theme }) => theme.spacing(2)}px;
+  margin-top: ${({ theme }) => theme.spacing(2)};
+  margin-bottom: ${({ theme }) => theme.spacing(2)};
 `;
 
 const AddFileForm = ({

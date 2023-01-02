@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import DescriptionIcon from '@material-ui/icons/Description';
-import ExpandLess from '@material-ui/icons/ExpandLess';
-import ExpandMore from '@material-ui/icons/ExpandMore';
-import { Collapse, List, ListItemIcon, ListItemText } from '@material-ui/core';
-import DocumentList from '@material-ui/icons/PlaylistAddCheck';
-import NoteAddIcon from '@material-ui/icons/NoteAdd';
+import DescriptionIcon from '@mui/icons-material/Description';
+import ExpandLess from '@mui/icons-material/ExpandLess';
+import ExpandMore from '@mui/icons-material/ExpandMore';
+import { Collapse, List, ListItemIcon, ListItemText } from '@mui/material';
+import DocumentList from '@mui/icons-material/PlaylistAddCheck';
+import NoteAddIcon from '@mui/icons-material/NoteAdd';
 import PropTypes from 'prop-types';
 
 import { isNil } from 'ramda';

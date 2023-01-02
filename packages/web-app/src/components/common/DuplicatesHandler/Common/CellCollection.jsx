@@ -1,18 +1,12 @@
 /* eslint-disable react/no-array-index-key */
 import React from 'react';
-import {
-  Fab,
-  Grid,
-  InputAdornment,
-  Typography,
-  useTheme
-} from '@material-ui/core';
-import ArrowForwardIosIcon from '@material-ui/icons/ArrowForwardIos';
-import ArrowBackIosIcon from '@material-ui/icons/ArrowBackIos';
-import RemoveIcon from '@material-ui/icons/Remove';
+import { Fab, Grid, InputAdornment, Typography, useTheme } from '@mui/material';
+import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
+import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
+import RemoveIcon from '@mui/icons-material/Remove';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
-import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';
+import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import StringInput from '../../Form/StringInput';
 import ActionButton from '../../ActionButton';
 import { MarginLeftDiv, MarginRightDiv } from './WrapperUtilities';

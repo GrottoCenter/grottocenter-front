@@ -1,9 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Avatar from '@material-ui/core/Avatar';
-import BurgerIcon from '@material-ui/icons/Help';
-import { withTheme } from '@material-ui/core/styles';
-import { Button } from '@material-ui/core';
+import Avatar from '@mui/material/Avatar';
+import BurgerIcon from '@mui/icons-material/Help';
+import withTheme from '@mui/styles/withTheme';
+import { Button } from '@mui/material';
 import styled from 'styled-components';
 
 const BurgerAvatar = withTheme(styled(Avatar)`

@@ -1,7 +1,7 @@
 import React, { useContext, useState, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
-import { Button, Fade, Typography } from '@material-ui/core';
-import ReplayIcon from '@material-ui/icons/Replay';
+import { Button, Fade, Typography } from '@mui/material';
+import ReplayIcon from '@mui/icons-material/Replay';
 import { useIntl } from 'react-intl';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
@@ -25,7 +25,7 @@ import SuccessMessage from '../components/common/StatusMessage/SuccessMessage';
 
 const SpacedButton = styled(Button)`
   ${({ theme }) => `
-    margin: ${theme.spacing(1)}px;
+    margin: ${theme.spacing(1)};
 `}
 `;
 

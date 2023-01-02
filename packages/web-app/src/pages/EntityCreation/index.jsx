@@ -1,7 +1,7 @@
 import React from 'react';
 import { useHistory } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
-import { Button } from '@material-ui/core';
+import { Button } from '@mui/material';
 import styled from 'styled-components';
 import { useIntl } from 'react-intl';
 import Layout from '../../components/common/Layouts/Fixed/FixedContent';

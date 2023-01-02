@@ -8,7 +8,7 @@ import {
   List,
   ListItemText,
   Box
-} from '@material-ui/core';
+} from '@mui/material';
 import Contribution from '../../common/Contribution/Contribution';
 import authorType from '../../../types/author.type';
 

@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import styled from 'styled-components';
-import { Tab, Tabs } from '@material-ui/core';
+import { Tab, Tabs } from '@mui/material';
 import Translate from '../../common/Translate';
 import { ImportPageContentContext } from './Provider';
 import { DOCUMENT, ENTRANCE } from './constants';

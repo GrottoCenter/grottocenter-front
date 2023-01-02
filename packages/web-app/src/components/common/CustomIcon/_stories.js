@@ -1,7 +1,7 @@
 import React from 'react';
 import { storiesOf } from '@storybook/react';
-import { Typography } from '@material-ui/core';
-import PersonIcon from '@material-ui/icons/Person';
+import { Typography } from '@mui/material';
+import PersonIcon from '@mui/icons-material/Person';
 import styled from 'styled-components';
 
 import CustomIcon from './index';

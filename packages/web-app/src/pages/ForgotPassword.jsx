@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import { useHistory } from 'react-router-dom';
-import { Button, CircularProgress, Typography } from '@material-ui/core';
+import { Button, CircularProgress, Typography } from '@mui/material';
 import styled from 'styled-components';
 import { isEmpty, match } from 'ramda';
 
@@ -19,7 +19,7 @@ const FormWrapper = styled.form`
 `;
 
 const SpacedCenteredButton = styled(Button)`
-  margin: ${({ theme }) => theme.spacing(1)}px auto;
+  margin: ${({ theme }) => theme.spacing(1)} auto;
 `;
 
 const ForgotPasswordPage = ({

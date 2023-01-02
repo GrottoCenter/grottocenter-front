@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { withTheme } from '@material-ui/core/styles';
+import withTheme from '@mui/styles/withTheme';
 import LandingSection from '../LandingSection';
 import {
   GridRow,

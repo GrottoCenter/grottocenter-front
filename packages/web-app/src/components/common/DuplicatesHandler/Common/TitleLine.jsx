@@ -1,6 +1,6 @@
 import React from 'react';
 import { useIntl } from 'react-intl';
-import { Grid, Typography } from '@material-ui/core';
+import { Grid, Typography } from '@mui/material';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import ActionButton from '../../ActionButton';
@@ -14,8 +14,8 @@ const Title = ({ children }) => (
 );
 
 const StyledGrid = styled(Grid)`
-  margin-top: ${({ theme }) => theme.spacing(2)}px;
-  margin-bottom: ${({ theme }) => theme.spacing(2)}px;
+  margin-top: ${({ theme }) => theme.spacing(2)};
+  margin-bottom: ${({ theme }) => theme.spacing(2)};
 `;
 
 const TitleLine = ({ title1, title2, handleAllClick1, handleAllClick2 }) => {

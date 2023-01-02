@@ -1,6 +1,6 @@
 import React from 'react';
-import Autocomplete from '@material-ui/lab/Autocomplete';
-import { FormHelperText, TextField } from '@material-ui/core';
+import Autocomplete from '@mui/material/Autocomplete';
+import { FormHelperText, TextField } from '@mui/material';
 
 import Translate from '../Translate';
 
@@ -57,7 +57,7 @@ const MultipleSelectWithOptions = ({
         inputValue={inputValue}
         getOptionLabel={getOptionLabel}
         renderOption={renderOption}
-        getOptionSelected={getOptionSelected}
+        isOptionEqualToValue={getOptionSelected}
         filterSelectedOptions
         noOptionsText={noOptionsText}
         required={required}

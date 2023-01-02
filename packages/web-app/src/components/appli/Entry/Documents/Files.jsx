@@ -1,13 +1,13 @@
-import { Button, List, ListItem, ListItemText } from '@material-ui/core';
+import { Button, List, ListItem, ListItemText } from '@mui/material';
 import React from 'react';
 import PropTypes from 'prop-types';
 import { isEmpty } from 'ramda';
 import styled from 'styled-components';
-import DownloadIcon from '@material-ui/icons/GetApp';
+import DownloadIcon from '@mui/icons-material/GetApp';
 import GCLink from '../../../common/GCLink';
 
 const LicenseLink = styled(GCLink)`
-  padding-left: ${({ theme }) => theme.spacing(1)}px;
+  padding-left: ${({ theme }) => theme.spacing(1)};
   text-decoration: none;
   font-size: smaller;
   color: inherit;

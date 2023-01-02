@@ -1,5 +1,5 @@
 import React from 'react';
-import { blue } from '@material-ui/core/colors';
+import { blue } from '@mui/material/colors';
 import { CircleMarker } from 'react-leaflet';
 import PropTypes from 'prop-types';
 

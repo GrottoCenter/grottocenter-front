@@ -1,10 +1,10 @@
-import { Typography, List, ListItemText } from '@material-ui/core';
+import { Typography, List, ListItemText, Skeleton } from '@mui/material';
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { isEmpty, isNil, is } from 'ramda';
-import { Skeleton, TreeItem, TreeView as MuiTreeView } from '@material-ui/lab';
-import { ExpandMore, ChevronRight, Launch } from '@material-ui/icons';
+import { TreeItem, TreeView as MuiTreeView } from '@mui/lab';
+import { ExpandMore, ChevronRight, Launch } from '@mui/icons-material';
 
 import { isMobileOnly } from 'react-device-detect';
 
@@ -17,7 +17,7 @@ const Wrapper = styled.div`
   flex-direction: row;
   align-items: center;
   min-height: 35px;
-  margin: 0 ${({ theme }) => theme.spacing(3)}px;
+  margin: 0 ${({ theme }) => theme.spacing(3)};
 `;
 
 const ContentWrapper = styled.div`
@@ -35,7 +35,7 @@ const ToRightListItemText = styled(ListItemText)`
 `;
 
 const Label = styled(Typography)`
-  margin-right: ${({ theme }) => theme.spacing(2)}px;
+  margin-right: ${({ theme }) => theme.spacing(2)};
   text-transform: uppercase;
 `;
 
@@ -46,7 +46,7 @@ const IconContainer = styled.div`
 `;
 
 const FollowURLIcon = styled(Launch)`
-  margin-left: ${({ theme }) => theme.spacing(2)}px;
+  margin-left: ${({ theme }) => theme.spacing(2)};
   vertical-align: bottom;
 `;
 
@@ -112,7 +112,7 @@ const Item = ({
       </Label>
     </IconAndLabelWrapper>
     <ValueContainer>
-      {isLoading && <Skeleton variant="rect" height={200} />}
+      {isLoading && <Skeleton variant="rectangular" height={200} />}
       {!isLoading && !isEmpty(value) && !isNil(value) && (
         <>
           {type === 'tree' && isArray(value) && (
@@ -163,7 +163,7 @@ const Section = ({ title, content, loading }) => {
         {title}
       </Typography>
       {loading ? (
-        <Skeleton variant="rect" height={100} />
+        <Skeleton variant="rectangular" height={100} />
       ) : (
         content.map(
           item =>

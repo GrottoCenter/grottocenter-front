@@ -9,7 +9,7 @@ import {
   TableRow,
   TableBody,
   TableCell
-} from '@material-ui/core';
+} from '@mui/material';
 import { includes, isNil, pathOr, isEmpty } from 'ramda';
 
 import {

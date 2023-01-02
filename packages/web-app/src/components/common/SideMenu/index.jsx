@@ -1,5 +1,5 @@
 import React from 'react';
-import { Divider, Drawer, Typography } from '@material-ui/core';
+import { Divider, Drawer, Typography } from '@mui/material';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import Translate from '../Translate';

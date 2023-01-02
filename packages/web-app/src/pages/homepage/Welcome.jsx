@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { useIntl } from 'react-intl';
-import { withTheme } from '@material-ui/core/styles';
+import withTheme from '@mui/styles/withTheme';
 import LandingSection from './LandingSection';
 import {
   GridRow,

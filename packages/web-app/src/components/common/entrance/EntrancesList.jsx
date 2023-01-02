@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { List, Typography } from '@material-ui/core';
+import { List, Typography } from '@mui/material';
 import styled from 'styled-components';
 import Translate from '../Translate';
 import EntranceListItem from './EntranceListItem';

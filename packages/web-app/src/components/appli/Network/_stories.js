@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { storiesOf } from '@storybook/react';
-import { Typography } from '@material-ui/core';
+import { Typography } from '@mui/material';
 import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
 import { boolean } from '@storybook/addon-knobs';

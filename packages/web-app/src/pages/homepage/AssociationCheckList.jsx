@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import CheckIcon from '@material-ui/icons/Check';
+import CheckIcon from '@mui/icons-material/Check';
 import styled, { keyframes } from 'styled-components';
-import { withStyles } from '@material-ui/core';
+import withStyles from '@mui/styles/withStyles';
 
 const CheckList = styled.ul`
   width: 100%;

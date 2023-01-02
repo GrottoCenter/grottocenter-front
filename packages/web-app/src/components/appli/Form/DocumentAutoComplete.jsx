@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
 import { isNil } from 'ramda';
-import { InputAdornment } from '@material-ui/core';
+import { InputAdornment } from '@mui/material';
 
 import {
   fetchQuicksearchResult,

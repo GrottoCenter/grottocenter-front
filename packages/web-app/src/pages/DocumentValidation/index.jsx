@@ -19,7 +19,7 @@ import AuthChecker from '../../components/appli/AuthChecker';
 const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
-  padding: ${({ theme }) => theme.spacing(2)}px;
+  padding: ${({ theme }) => theme.spacing(2)};
 `;
 
 const defaultHiddenColumns = [

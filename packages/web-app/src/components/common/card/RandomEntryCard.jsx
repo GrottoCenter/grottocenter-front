@@ -1,11 +1,11 @@
 import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
-import FullStarIcon from '@material-ui/icons/Star';
-import EmptyStarIcon from '@material-ui/icons/StarBorder';
-import HalfStarIcon from '@material-ui/icons/StarHalf';
-import CircularProgress from '@material-ui/core/CircularProgress';
+import FullStarIcon from '@mui/icons-material/Star';
+import EmptyStarIcon from '@mui/icons-material/StarBorder';
+import HalfStarIcon from '@mui/icons-material/StarHalf';
+import CircularProgress from '@mui/material/CircularProgress';
 import styled from 'styled-components';
-import { withStyles } from '@material-ui/core';
+import withStyles from '@mui/styles/withStyles';
 import { isNil } from 'ramda';
 import GCLink from '../GCLink';
 import Translate from '../Translate';
@@ -18,7 +18,7 @@ const FlexWrapper = styled.div`
 const FlexItemWrapper = styled.div`
   flex: 1;
   flex-basis: 300px;
-  margin: ${({ theme }) => theme.spacing(2)}px;
+  margin: ${({ theme }) => theme.spacing(2)};
   overflow: hidden;
 `;
 
@@ -336,10 +336,10 @@ const RandomEntryLink = styled(GCLink)`
 
 const EntryWrapper = styled.div`
   background-color: rgba(110, 110, 110, 0.5);
-  border-radius: ${({ theme }) => theme.spacing(1)}px;
+  border-radius: ${({ theme }) => theme.spacing(1)};
   color: white;
   margin: auto;
-  padding: ${({ theme }) => theme.spacing(3)}px;
+  padding: ${({ theme }) => theme.spacing(3)};
 `;
 
 const RandomEntryCard = ({ entry, isFetching, fetch }) => {

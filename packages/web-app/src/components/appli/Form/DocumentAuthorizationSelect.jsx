@@ -4,7 +4,7 @@ import {
   InputLabel,
   FormControl,
   CircularProgress
-} from '@material-ui/core';
+} from '@mui/material';
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
@@ -13,7 +13,7 @@ import { getDocuments } from '../../../actions/Document/GetDocuments';
 
 const Wrapper = styled(FormControl)`
   ${({ theme }) => `
-    margin: ${theme.spacing(4)}px;`}
+    margin: ${theme.spacing(4)};`}
 `;
 
 const DocumentAuthorizationSelect = ({

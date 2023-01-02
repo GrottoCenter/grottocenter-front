@@ -3,8 +3,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { Button, Typography } from '@material-ui/core';
-import ClearIcon from '@material-ui/icons/Clear';
+import { Button, Typography } from '@mui/material';
+import ClearIcon from '@mui/icons-material/Clear';
 import { isNil, length } from 'ramda';
 
 import {
@@ -23,7 +23,7 @@ import PersonProperties from '../../common/Person/PersonProperties';
 import UserGroups from './UserGroups';
 
 const FeedbackBlock = styled.div`
-  margin-top: ${({ theme }) => theme.spacing(4)}px;
+  margin-top: ${({ theme }) => theme.spacing(4)};
   text-align: center;
 `;
 
@@ -35,7 +35,7 @@ const UserBlock = styled.div`
 
 const FlexBlock = styled.div`
   flex: 1;
-  margin: ${({ theme }) => theme.spacing(3)}px;
+  margin: ${({ theme }) => theme.spacing(3)};
 `;
 
 const SearchBarBackground = styled.div`
@@ -43,7 +43,7 @@ const SearchBarBackground = styled.div`
 `;
 
 const SpacedTopButton = styled(Button)`
-  margin-top: ${({ theme }) => theme.spacing(2)}px;
+  margin-top: ${({ theme }) => theme.spacing(2)};
 `;
 
 const ManageUserGroups = ({

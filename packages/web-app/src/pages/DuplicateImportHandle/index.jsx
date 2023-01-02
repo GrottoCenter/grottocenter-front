@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useIntl } from 'react-intl';
 import styled from 'styled-components';
-import ArrowBackIcon from '@material-ui/icons/ArrowBack';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import Layout from '../../components/common/Layouts/Fixed/FixedContent';
 import DuplicatesList from '../../components/appli/Duplicates/DuplicatesList';
 import HeaderTabs from './HeaderTabs';
@@ -16,8 +16,8 @@ const DOCUMENT_TAB = 'document';
 const TABS = [ENTRANCE_TAB, DOCUMENT_TAB];
 
 const StyledActionButton = styled(ActionButton)`
-  margin-top: ${({ theme }) => theme.spacing(1)}px;
-  margin-bottom: ${({ theme }) => theme.spacing(1)}px;
+  margin-top: ${({ theme }) => theme.spacing(1)};
+  margin-bottom: ${({ theme }) => theme.spacing(1)};
 `;
 
 const DuplicateImportHandle = () => {

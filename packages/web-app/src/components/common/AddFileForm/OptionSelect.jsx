@@ -1,12 +1,12 @@
 import React from 'react';
-import { FormControl, InputLabel, MenuItem, Select } from '@material-ui/core';
+import { FormControl, InputLabel, MenuItem, Select } from '@mui/material';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { useDocumentOptions } from '../../../hooks';
 
 const Wrapper = styled(FormControl)`
   ${({ theme }) => `
-    margin: ${theme.spacing(4)}px;`}
+    margin: ${theme.spacing(4)};`}
 `;
 /*
   How to add an option :

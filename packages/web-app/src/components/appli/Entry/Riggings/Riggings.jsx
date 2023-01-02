@@ -1,10 +1,10 @@
 import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
-import { IconButton, Divider, Tooltip } from '@material-ui/core';
+import { IconButton, Divider, Tooltip } from '@mui/material';
 import { useDispatch } from 'react-redux';
 import React, { useState } from 'react';
-import AddCircleIcon from '@material-ui/icons/AddCircle';
-import CancelIcon from '@material-ui/icons/Cancel';
+import AddCircleIcon from '@mui/icons-material/AddCircle';
+import CancelIcon from '@mui/icons-material/Cancel';
 import styled from 'styled-components';
 import { usePermissions } from '../../../../hooks';
 import { postRiggings } from '../../../../actions/Riggings/CreateRigging';
@@ -50,7 +50,8 @@ const Riggings = ({ riggings, entranceId }) => {
             }>
             <IconButton
               color="primary"
-              onClick={() => setIsFormVisible(!isFormVisible)}>
+              onClick={() => setIsFormVisible(!isFormVisible)}
+              size="large">
               {isFormVisible ? <CancelIcon /> : <AddCircleIcon />}
             </IconButton>
           </Tooltip>

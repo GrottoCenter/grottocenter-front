@@ -1,7 +1,7 @@
 import React from 'react';
 import { useHistory } from 'react-router-dom';
 import PropTypes from 'prop-types';
-import { Button } from '@material-ui/core';
+import { Button } from '@mui/material';
 import { useIntl } from 'react-intl';
 import { useDispatch } from 'react-redux';
 import styled from 'styled-components';
@@ -14,7 +14,7 @@ import { usePermissions } from '../../../hooks';
 
 const SpacedButton = styled(Button)`
   ${({ theme }) => `
-    margin: ${theme.spacing(1)}px;
+    margin: ${theme.spacing(1)};
 `}
 `;
 

@@ -1,7 +1,7 @@
 import React from 'react';
-import { Checkbox, IconButton, TableCell, TableRow } from '@material-ui/core';
+import { Checkbox, IconButton, TableCell, TableRow } from '@mui/material';
 import { includes, isNil } from 'ramda';
-import ZoomInIcon from '@material-ui/icons/ZoomIn';
+import ZoomInIcon from '@mui/icons-material/ZoomIn';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import CustomCell from './CustomCell';

@@ -8,7 +8,7 @@ import {
   Select,
   Switch,
   TextField
-} from '@material-ui/core';
+} from '@mui/material';
 import React, { useEffect, useRef } from 'react';
 import { Controller, useWatch } from 'react-hook-form';
 import { useIntl } from 'react-intl';

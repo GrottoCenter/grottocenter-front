@@ -15,11 +15,11 @@ import {
   IconButton,
   Tooltip,
   ButtonGroup
-} from '@material-ui/core';
-import PlaylistAddIcon from '@material-ui/icons/PlaylistAdd';
-import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
-import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
-import DeleteIcon from '@material-ui/icons/Delete';
+} from '@mui/material';
+import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd';
+import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import DeleteIcon from '@mui/icons-material/Delete';
 import { Controller, useForm, useFieldArray } from 'react-hook-form';
 import styled from 'styled-components';
 import { isNil } from 'ramda';
@@ -36,7 +36,7 @@ const ButtonWrapper = styled.div`
 
 const SpacedButton = styled(Button)`
   ${({ theme }) => `
-  margin: 0 ${theme.spacing(1)}px;`}
+  margin: 0 ${theme.spacing(1)};`}
 `;
 
 const getDefaultValues = language => ({

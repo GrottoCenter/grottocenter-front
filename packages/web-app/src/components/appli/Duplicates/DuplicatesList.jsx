@@ -19,7 +19,7 @@ import { resetEntranceState } from '../../../actions/Entrance/ResetEntrance';
 
 const Wrapper = styled.div`
   margin-top: 10px;
-  margin-bottom: ${({ theme }) => theme.spacing(3)}px;
+  margin-bottom: ${({ theme }) => theme.spacing(3)};
 `;
 
 const DuplicatesList = ({

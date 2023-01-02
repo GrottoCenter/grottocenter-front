@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Tab, Tabs, Card, CardContent } from '@material-ui/core';
+import { Tab, Tabs, Card, CardContent } from '@mui/material';
 import styled from 'styled-components';
 
 import DocumentSearch from './DocumentSearch';

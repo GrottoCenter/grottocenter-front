@@ -2,11 +2,11 @@ import React from 'react';
 import { Marker, Popup } from 'react-leaflet';
 import PropTypes from 'prop-types';
 import { isNil, isEmpty } from 'ramda';
-import { Box, Typography, IconButton } from '@material-ui/core';
+import { Box, Typography, IconButton } from '@mui/material';
 import styled from 'styled-components';
-import EmailIcon from '@material-ui/icons/Email';
-import LocationIcon from '@material-ui/icons/LocationOn';
-import CreateIcon from '@material-ui/icons/Create';
+import EmailIcon from '@mui/icons-material/Email';
+import LocationIcon from '@mui/icons-material/LocationOn';
+import CreateIcon from '@mui/icons-material/Create';
 
 import CustomMapContainer from '../../common/Maps/common/MapContainer';
 import OrganizationMarker from '../../common/Maps/common/Markers/Components/OrganizationMarker';
@@ -14,15 +14,15 @@ import OrganizationPopup from '../../common/Maps/common/Markers/Components/Organ
 
 const ContentWrapper = styled.div`
   display: flex;
-  padding: ${({ theme }) => theme.spacing(1)}px;
+  padding: ${({ theme }) => theme.spacing(1)};
 `;
 
 const StyledLocationIcon = styled(LocationIcon)`
-  margin-right: ${({ theme }) => theme.spacing(1)}px;
+  margin-right: ${({ theme }) => theme.spacing(1)};
 `;
 
 const StyledEmailIcon = styled(EmailIcon)`
-  margin-right: ${({ theme }) => theme.spacing(1)}px;
+  margin-right: ${({ theme }) => theme.spacing(1)};
 `;
 
 const Details = ({

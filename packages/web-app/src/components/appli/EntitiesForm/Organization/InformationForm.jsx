@@ -5,7 +5,7 @@ import {
   Select,
   MenuItem,
   InputLabel
-} from '@material-ui/core';
+} from '@mui/material';
 import { React } from 'react';
 import { Controller /* useWatch */ } from 'react-hook-form'; // To uncomment when API will accept phone number
 import { useIntl } from 'react-intl';
@@ -17,7 +17,7 @@ import Translate from '../../../common/Translate';
 // import 'react-phone-input-2/lib/style.css'; // To uncomment when API will accept phone number
 
 const FormControl = styled(MuiFormControl)`
-  padding-bottom: ${({ theme }) => theme.spacing(4)}px;
+  padding-bottom: ${({ theme }) => theme.spacing(4)};
 `;
 
 const InformationForm = ({ control, errors, allCountries }) => {

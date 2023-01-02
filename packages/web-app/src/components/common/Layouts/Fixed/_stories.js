@@ -1,6 +1,6 @@
 import React from 'react';
 import { storiesOf } from '@storybook/react';
-import { Typography } from '@material-ui/core';
+import { Typography } from '@mui/material';
 import { useIntl } from 'react-intl';
 import Layout from './index';
 import FixedContent from './FixedContent';

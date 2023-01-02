@@ -8,7 +8,7 @@ import {
   MenuItem,
   Select,
   Tooltip
-} from '@material-ui/core';
+} from '@mui/material';
 
 import Translate from '../../../../common/Translate';
 import { useDocumentTypes } from '../../../../../hooks';

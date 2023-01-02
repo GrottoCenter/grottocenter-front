@@ -10,8 +10,9 @@ import {
   CardContent as MuiCardContent,
   CardHeader,
   CircularProgress,
-  Tooltip
-} from '@material-ui/core';
+  Tooltip,
+  Skeleton
+} from '@mui/material';
 import { Print } from '@material-ui/icons';
 import styled from 'styled-components';
 import ReactToPrint from 'react-to-print';
@@ -23,7 +24,7 @@ import { Skeleton } from '@material-ui/lab';
 const isString = is(String);
 
 const Card = styled(MuiCard)`
-  margin: ${({ theme }) => theme.spacing(2)}px;
+  margin: ${({ theme }) => theme.spacing(2)};
   height: 100%;
   display: flex;
   flex-direction: column;

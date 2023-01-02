@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Box, IconButton, Tooltip, Typography } from '@material-ui/core';
+import { Box, IconButton, Tooltip, Typography } from '@mui/material';
 import { Link } from 'react-router-dom';
-import NotificationsOffIcon from '@material-ui/icons/NotificationsOff';
+import NotificationsOffIcon from '@mui/icons-material/NotificationsOff';
 import { useIntl } from 'react-intl';
 import { useDispatch } from 'react-redux';
 import fadeOut from '../../../util/fadeOut';

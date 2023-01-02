@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import ChevronIcon from '@material-ui/icons/ChevronRight';
-import HomeIcon from '@material-ui/icons/Home';
-import { withTheme } from '@material-ui/core/styles';
+import ChevronIcon from '@mui/icons-material/ChevronRight';
+import HomeIcon from '@mui/icons-material/Home';
+import withTheme from '@mui/styles/withTheme';
 import styled from 'styled-components';
 import { breadcrumpKeys } from '../../../conf/config';
 import GCLink from '../../common/GCLink';

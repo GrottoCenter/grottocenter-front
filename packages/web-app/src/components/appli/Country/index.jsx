@@ -1,6 +1,6 @@
 import React from 'react';
 import { isEmpty } from 'ramda';
-import Skeleton from '@material-ui/lab/Skeleton';
+import Skeleton from '@mui/material/Skeleton';
 import { useIntl } from 'react-intl';
 
 import { Marker } from 'react-leaflet';

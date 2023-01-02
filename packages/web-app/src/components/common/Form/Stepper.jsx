@@ -8,9 +8,9 @@ import {
   Step,
   StepLabel,
   Stepper as MuiStepper
-} from '@material-ui/core';
-import NavigateNextIcon from '@material-ui/icons/NavigateNext';
-import NavigateBeforeIcon from '@material-ui/icons/NavigateBefore';
+} from '@mui/material';
+import NavigateNextIcon from '@mui/icons-material/NavigateNext';
+import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore';
 import Translate from '../Translate';
 import idNameType from '../../../types/idName.type';
 

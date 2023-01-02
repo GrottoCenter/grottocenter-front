@@ -2,8 +2,8 @@ import * as React from 'react';
 import styled from 'styled-components';
 import { storiesOf } from '@storybook/react';
 import { action } from '@storybook/addon-actions';
-import SendIcon from '@material-ui/icons/Send';
-import { Button } from '@material-ui/core';
+import SendIcon from '@mui/icons-material/Send';
+import { Button } from '@mui/material';
 import StandardDialog from './index';
 
 const Content = styled.div`

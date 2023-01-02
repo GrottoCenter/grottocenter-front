@@ -1,18 +1,18 @@
 import React from 'react';
 import { useIntl } from 'react-intl';
 import { Controller, useFieldArray } from 'react-hook-form';
-import { Box, Button, IconButton, TextField } from '@material-ui/core';
-import DeleteIcon from '@material-ui/icons/Delete';
-import AddIcon from '@material-ui/icons/Add';
+import { Box, Button, IconButton, TextField } from '@mui/material';
+import DeleteIcon from '@mui/icons-material/Delete';
+import AddIcon from '@mui/icons-material/Add';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
 
 const StyledButton = styled(Button)`
-  padding: ${({ theme }) => theme.spacing(2)}px;
+  padding: ${({ theme }) => theme.spacing(2)};
 `;
 
 const DescriptionWrapper = styled.div`
-  padding-bottom: ${({ theme }) => theme.spacing(2)}px;
+  padding-bottom: ${({ theme }) => theme.spacing(2)};
 `;
 
 const CenterDiv = styled.div`
@@ -65,7 +65,8 @@ const Description = ({ nestIndex, control, remove, errors }) => {
       <CenterDiv>
         <IconButton
           onClick={() => remove(nestIndex)}
-          aria-label="delete description">
+          aria-label="delete description"
+          size="large">
           <DeleteIcon fontSize="small" />
         </IconButton>
       </CenterDiv>

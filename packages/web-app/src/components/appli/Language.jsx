@@ -1,6 +1,6 @@
 import React from 'react';
-import Avatar from '@material-ui/core/Avatar';
-import LanguageIcon from '@material-ui/icons/Translate';
+import Avatar from '@mui/material/Avatar';
+import LanguageIcon from '@mui/icons-material/Translate';
 
 const Language = () => (
   <Avatar icon={<LanguageIcon style={{ color: 'red' }} />} />

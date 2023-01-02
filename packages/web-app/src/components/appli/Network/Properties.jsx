@@ -1,7 +1,13 @@
 import React, { useContext } from 'react';
 import { useIntl } from 'react-intl';
 import styled from 'styled-components';
-import { Terrain, Waves, Title } from '@material-ui/icons';
+import {
+  Terrain,
+  Waves,
+  CalendarToday,
+  Category,
+  Title
+} from '@mui/icons-material';
 
 import CustomIcon from '../../common/CustomIcon';
 import { isValidPositions } from '../../common/Maps/MapMultipleMarkers';

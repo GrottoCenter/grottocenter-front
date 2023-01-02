@@ -4,10 +4,10 @@ import {
   Card,
   CardContent,
   Divider,
-  makeStyles,
   Typography,
   LinearProgress as MuiLinearProgress
-} from '@material-ui/core';
+} from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
 import styled from 'styled-components';
 import { useSelector } from 'react-redux';
 import ImportTabs from './ImportTabs';
@@ -33,7 +33,7 @@ const LinearProgress = styled(MuiLinearProgress)`
 `;
 
 const StyledDivider = styled(Divider)`
-  margin: ${({ theme }) => theme.spacing(3)}px;
+  margin: ${({ theme }) => theme.spacing(3)};
 `;
 
 const ImportContainer = () => {

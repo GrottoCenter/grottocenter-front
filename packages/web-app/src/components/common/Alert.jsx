@@ -1,13 +1,13 @@
 import React from 'react';
-import { Alert as MuiAlert, AlertTitle } from '@material-ui/lab';
+import { Alert as MuiAlert, AlertTitle } from '@mui/material';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 const StyledAlert = styled(MuiAlert)`
   margin-top: ${({ theme, $disableMargins }) =>
-    !$disableMargins && `${theme.spacing(2)}px`};
+    !$disableMargins && theme.spacing(2)};
   margin-bottom: ${({ theme, $disableMargins }) =>
-    !$disableMargins && `${theme.spacing(2)}px`};
+    !$disableMargins && theme.spacing(2)};
 `;
 
 const Alert = ({

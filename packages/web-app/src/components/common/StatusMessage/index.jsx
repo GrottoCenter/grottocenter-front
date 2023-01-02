@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { Snackbar } from '@material-ui/core';
-import MuiAlert from '@material-ui/lab/Alert';
+import { Snackbar } from '@mui/material';
+import MuiAlert from '@mui/material/Alert';
 
 const StatusMessage = ({ message, severity }) => {
   const [open, setOpen] = useState(true);

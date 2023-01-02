@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Badge, Tooltip } from '@material-ui/core';
+import { Badge, Tooltip } from '@mui/material';
 import styled from 'styled-components';
 
 import { useIntl } from 'react-intl';
@@ -19,7 +19,7 @@ const EntranceIcon = styled.img`
 `;
 
 const StyledBadge = styled(Badge)`
-  margin: ${({ theme }) => theme.spacing(1)}px;
+  margin: ${({ theme }) => theme.spacing(1)};
 `;
 
 const BadgesSection = ({

@@ -5,7 +5,7 @@ import {
   FormControl,
   FormHelperText,
   InputLabel
-} from '@material-ui/core';
+} from '@mui/material';
 import Translate from '../Translate';
 
 const NumberInput = ({

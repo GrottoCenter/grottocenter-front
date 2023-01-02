@@ -1,7 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { withStyles, withTheme, Toolbar, Tooltip } from '@material-ui/core';
-import HelpIcon from '@material-ui/icons/Help';
+import { Toolbar, Tooltip } from '@mui/material';
+import withStyles from '@mui/styles/withStyles';
+import withTheme from '@mui/styles/withTheme';
+import HelpIcon from '@mui/icons-material/Help';
 
 import styled from 'styled-components';
 

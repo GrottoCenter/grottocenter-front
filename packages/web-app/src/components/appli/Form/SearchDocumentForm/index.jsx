@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useIntl } from 'react-intl';
 import { useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
-import { Box, Button } from '@material-ui/core';
+import { Box, Button } from '@mui/material';
 import styled from 'styled-components';
 
 import {
@@ -18,7 +18,7 @@ import SelectedDocumentsTable from './SelectedDocumentsTable';
 
 const SpacedButton = styled(Button)`
   ${({ theme }) => `
-  margin: 0 ${theme.spacing(1)}px;`}
+  margin: 0 ${theme.spacing(1)};`}
 `;
 
 const SearchDocumentForm = ({ closeForm, onSubmit }) => {

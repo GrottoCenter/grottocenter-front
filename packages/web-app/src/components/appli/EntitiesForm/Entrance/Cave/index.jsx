@@ -5,7 +5,7 @@ import {
   FormControlLabel,
   Button,
   Radio
-} from '@material-ui/core';
+} from '@mui/material';
 import React from 'react';
 import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
@@ -17,7 +17,7 @@ import CaveCreation from './CaveCreation';
 import { ENTRANCE_ONLY, ENTRANCE_AND_CAVE } from '../caveType';
 
 const FormControl = styled(MuiFormControl)`
-  padding-bottom: ${({ theme }) => theme.spacing(4)}px;
+  padding-bottom: ${({ theme }) => theme.spacing(4)};
 `;
 
 const Cave = ({

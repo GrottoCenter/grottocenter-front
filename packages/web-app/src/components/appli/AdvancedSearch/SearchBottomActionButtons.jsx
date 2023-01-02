@@ -1,11 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import SearchIcon from '@material-ui/icons/Search';
-import ClearIcon from '@material-ui/icons/Clear';
+import SearchIcon from '@mui/icons-material/Search';
+import ClearIcon from '@mui/icons-material/Clear';
 
-import { Button, CardActions } from '@material-ui/core';
-import { withStyles } from '@material-ui/core/styles';
+import { Button, CardActions } from '@mui/material';
+import withStyles from '@mui/styles/withStyles';
 import { Breakpoint } from 'react-socks';
 
 import Translate from '../../common/Translate';

@@ -7,10 +7,10 @@ import {
   IconButton,
   InputLabel,
   Collapse
-} from '@material-ui/core';
+} from '@mui/material';
 
 import { isNil } from 'ramda';
-import { ExpandLess, ExpandMore } from '@material-ui/icons';
+import { ExpandLess, ExpandMore } from '@mui/icons-material';
 import Translate from '../Translate';
 import { FormAutoCompleteTypes } from './types';
 

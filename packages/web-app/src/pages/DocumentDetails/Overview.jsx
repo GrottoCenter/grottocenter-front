@@ -1,9 +1,8 @@
-import { Typography } from '@material-ui/core';
+import { Typography, Skeleton } from '@mui/material';
 import React from 'react';
 import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { Skeleton } from '@material-ui/lab';
 import { isEmpty } from 'ramda';
 import AuthorAndDate from '../../components/common/Contribution/AuthorAndDate';
 import authorType from '../../types/author.type';
@@ -14,7 +13,7 @@ const Header = styled.div`
 `;
 
 const SubTitle = styled(Typography)`
-  margin-top: ${({ theme }) => theme.spacing(2)}px;
+  margin-top: ${({ theme }) => theme.spacing(2)};
   text-transform: uppercase;
 `;
 
@@ -33,8 +32,8 @@ const Overview = ({
       <Header>
         {loading ? (
           <>
-            <Skeleton variant="rect" width={100} />
-            <Skeleton variant="rect" width={100} />
+            <Skeleton variant="rectangular" width={100} />
+            <Skeleton variant="rectangular" width={100} />
           </>
         ) : (
           <>
@@ -54,7 +53,7 @@ const Overview = ({
       </Header>
 
       {loading ? (
-        <Skeleton variant="rect" height={100} />
+        <Skeleton variant="rectangular" height={100} />
       ) : (
         <>
           {summary && (

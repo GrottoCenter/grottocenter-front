@@ -1,4 +1,4 @@
-import { Box, TextField } from '@material-ui/core';
+import { Box, TextField } from '@mui/material';
 import React from 'react';
 import { Controller } from 'react-hook-form';
 import { useIntl } from 'react-intl';

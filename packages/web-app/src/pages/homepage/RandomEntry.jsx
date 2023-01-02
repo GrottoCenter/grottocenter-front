@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { withTheme } from '@material-ui/core/styles';
+import withTheme from '@mui/styles/withTheme';
 import RandomEntryCardContainer from '../../containers/RandomEntryCardContainer';
 import { GridRow } from '../../helpers/GridSystem';
 import Translate from '../../components/common/Translate';

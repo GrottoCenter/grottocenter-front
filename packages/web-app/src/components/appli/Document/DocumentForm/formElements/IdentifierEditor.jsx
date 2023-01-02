@@ -9,7 +9,7 @@ import {
   MenuItem,
   Select,
   Typography
-} from '@material-ui/core';
+} from '@mui/material';
 import { useIntl } from 'react-intl';
 import { pathOr } from 'ramda';
 

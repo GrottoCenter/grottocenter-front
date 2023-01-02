@@ -4,7 +4,7 @@ import {
   MenuItem,
   FormControl,
   InputLabel
-} from '@material-ui/core';
+} from '@mui/material';
 import React, { useMemo } from 'react';
 import { Controller, useWatch } from 'react-hook-form';
 import { useIntl } from 'react-intl';

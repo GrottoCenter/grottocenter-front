@@ -1,9 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { Button, makeStyles } from '@material-ui/core';
-import InfoIcon from '@material-ui/icons/Info';
-import DownloadIcon from '@material-ui/icons/GetApp';
+import { Button } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
+import InfoIcon from '@mui/icons-material/Info';
+import DownloadIcon from '@mui/icons-material/GetApp';
 import { useIntl } from 'react-intl';
 import { ENTRANCE, DOCUMENT } from './constants';
 

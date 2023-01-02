@@ -10,8 +10,8 @@ import {
   Radio,
   Checkbox,
   FormGroup
-} from '@material-ui/core';
-import VisibilityIcon from '@material-ui/icons/Visibility';
+} from '@mui/material';
+import VisibilityIcon from '@mui/icons-material/Visibility';
 import { useIntl } from 'react-intl';
 import { useFullScreen } from 'react-browser-hooks';
 import { includes, without } from 'ramda';
@@ -82,7 +82,8 @@ const DataControl = ({ updateHeatmap, updateMarkers, ...props }) => {
           onClick={handleOpenMenu}
           onFocus={handleOpenMenu}
           // TODO enable on fullscreen as it's currently hidden
-          disabled={fullScreen}>
+          disabled={fullScreen}
+          size="large">
           <VisibilityIcon fontSize="inherit" />
         </IconButton>
       </Wrapper>

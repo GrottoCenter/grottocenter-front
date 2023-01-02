@@ -1,5 +1,5 @@
 import { useIntl } from 'react-intl';
-import { Chip, ListItem, ListItemText } from '@material-ui/core';
+import { Chip, ListItem, ListItemText } from '@mui/material';
 import React from 'react';
 import styled from 'styled-components';
 import GCLink from '../../../common/GCLink';
@@ -8,12 +8,12 @@ import Files from './Files';
 
 const StyledListItemText = styled(ListItemText)`
   width: 100%;
-  padding-right: ${({ theme }) => theme.spacing(2)}px;
+  padding-right: ${({ theme }) => theme.spacing(2)};
 `;
 
 const StyledChip = styled(Chip)`
-  margin-left: ${({ theme }) => theme.spacing(2)}px;
-  padding: 0 ${({ theme }) => theme.spacing(1)}px;
+  margin-left: ${({ theme }) => theme.spacing(2)};
+  padding: 0 ${({ theme }) => theme.spacing(1)};
 `;
 
 const Document = ({ details, entities, id, overview }) => {

@@ -5,12 +5,12 @@ import {
   ListItemText,
   ListItemIcon,
   Typography
-} from '@material-ui/core';
+} from '@mui/material';
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import EditIcon from '@material-ui/icons/Edit';
+import EditIcon from '@mui/icons-material/Edit';
 import { useDispatch } from 'react-redux';
-import CancelIcon from '@material-ui/icons/Cancel';
+import CancelIcon from '@mui/icons-material/Cancel';
 import { isEmpty, pathOr } from 'ramda';
 import { usePermissions, useUserProperties } from '../../../../hooks';
 import { updateComment } from '../../../../actions/Comment/UpdateComment';
@@ -22,7 +22,7 @@ import Duration from '../../../common/Properties/Duration';
 
 const StyledListItemText = styled(ListItemText)`
   width: 100%;
-  padding-right: ${({ theme }) => theme.spacing(2)}px;
+  padding-right: ${({ theme }) => theme.spacing(2)};
 `;
 
 const StyledListItemIcon = styled(ListItemIcon)`
@@ -125,7 +125,8 @@ const Comment = ({ comment }) => {
           <IconButton
             onClick={() => setIsFormVisible(!isFormVisible)}
             color="primary"
-            aria-label="edit">
+            aria-label="edit"
+            size="large">
             {isFormVisible ? <CancelIcon /> : <EditIcon />}
           </IconButton>
         </ListItemIcon>

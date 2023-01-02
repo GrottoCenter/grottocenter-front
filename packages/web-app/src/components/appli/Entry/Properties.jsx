@@ -24,7 +24,7 @@ const GlobalWrapper = styled.div`
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: ${({ theme }) => theme.spacing(2)}px;
+  gap: ${({ theme }) => theme.spacing(2)};
 `;
 
 const SmallRatingsWrapper = styled.div`

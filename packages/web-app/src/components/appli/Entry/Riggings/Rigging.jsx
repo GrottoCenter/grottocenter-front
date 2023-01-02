@@ -10,10 +10,10 @@ import {
   TableBody,
   Typography,
   Tooltip
-} from '@material-ui/core';
-import EditIcon from '@material-ui/icons/Edit';
+} from '@mui/material';
+import EditIcon from '@mui/icons-material/Edit';
 import { useDispatch } from 'react-redux';
-import CancelIcon from '@material-ui/icons/Cancel';
+import CancelIcon from '@mui/icons-material/Cancel';
 import React, { useState } from 'react';
 import { isNil } from 'ramda';
 import styled from 'styled-components';
@@ -117,7 +117,8 @@ const Rigging = ({ rigging }) => {
             <IconButton
               onClick={() => setIsFormVisible(!isFormVisible)}
               color="primary"
-              aria-label="edit">
+              aria-label="edit"
+              size="large">
               {isFormVisible ? <CancelIcon /> : <EditIcon />}
             </IconButton>
           </Tooltip>

@@ -9,12 +9,12 @@ import {
   CardHeader as MuiCardHeader,
   IconButton as MuiIconButton,
   Typography
-} from '@material-ui/core';
-import CreateIcon from '@material-ui/icons/Create';
+} from '@mui/material';
+import CreateIcon from '@mui/icons-material/Create';
 
 const Card = styled(MuiCard)`
   overflow: inherit;
-  margin: ${({ theme }) => theme.spacing(2)}px;
+  margin: ${({ theme }) => theme.spacing(2)};
 `;
 
 const IconButton = styled(MuiIconButton)`

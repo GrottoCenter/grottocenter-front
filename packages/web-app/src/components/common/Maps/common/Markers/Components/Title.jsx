@@ -1,8 +1,8 @@
-import { Typography } from '@material-ui/core';
+import { Typography } from '@mui/material';
 import { Link } from 'react-router-dom';
 import React from 'react';
 import styled from 'styled-components';
-import DescriptionIcon from '@material-ui/icons/Description';
+import DescriptionIcon from '@mui/icons-material/Description';
 import PropTypes from 'prop-types';
 
 const StyledDescriptionIcon = styled(DescriptionIcon)`

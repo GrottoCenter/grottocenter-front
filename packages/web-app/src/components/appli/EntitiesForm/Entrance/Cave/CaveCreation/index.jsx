@@ -5,7 +5,7 @@ import {
   TextField,
   Select,
   MenuItem
-} from '@material-ui/core';
+} from '@mui/material';
 import React from 'react';
 import { Controller, useController } from 'react-hook-form';
 import { useIntl } from 'react-intl';

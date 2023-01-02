@@ -1,6 +1,6 @@
 import React from 'react';
 import { storiesOf } from '@storybook/react';
-import { Public, Terrain } from '@material-ui/icons';
+import { Public, Terrain } from '@mui/icons-material';
 
 import data from './data.json';
 import Section from './Section';

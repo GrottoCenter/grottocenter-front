@@ -1,6 +1,6 @@
 import { isNil } from 'ramda';
-import { Typography } from '@material-ui/core';
-import Skeleton from '@material-ui/lab/Skeleton';
+import { Typography } from '@mui/material';
+import Skeleton from '@mui/material/Skeleton';
 import React from 'react';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
@@ -9,16 +9,16 @@ import GCLink from '../GCLink';
 
 export const StyledTypography = styled(Typography)`
   margin-left: ${({ theme, variant }) =>
-    variant === 'caption' && theme.spacing(2)}px;
+    variant === 'caption' && theme.spacing(2)};
 `;
 
 export const PropertyWrapper = styled.div`
   align-items: center;
   display: flex;
   flex-basis: 33%;
-  padding: ${({ theme }) => theme.spacing(1)}px;
+  padding: ${({ theme }) => theme.spacing(1)};
   & > svg {
-    margin-right: ${({ theme }) => theme.spacing(1)}px;
+    margin-right: ${({ theme }) => theme.spacing(1)};
   }
 `;
 
@@ -27,7 +27,7 @@ const Title = styled(Typography)`
 `;
 
 const IconWrapper = styled.div`
-  margin-right: ${({ theme }) => theme.spacing(1)}px;
+  margin-right: ${({ theme }) => theme.spacing(1)};
 `;
 
 const ValueComponent = ({ secondary, value, url }) => {

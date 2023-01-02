@@ -1,8 +1,8 @@
 import React from 'react';
 import { storiesOf } from '@storybook/react';
 import { action } from '@storybook/addon-actions';
-import { Button, CircularProgress, Divider, Switch } from '@material-ui/core';
-import FaceIcon from '@material-ui/icons/Face';
+import { Button, CircularProgress, Divider, Switch } from '@mui/material';
+import FaceIcon from '@mui/icons-material/Face';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
 

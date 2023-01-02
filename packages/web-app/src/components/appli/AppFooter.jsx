@@ -1,7 +1,7 @@
 import React from 'react';
-import Toolbar from '@material-ui/core/Toolbar';
+import Toolbar from '@mui/material/Toolbar';
 import styled from 'styled-components';
-import { withStyles } from '@material-ui/core';
+import withStyles from '@mui/styles/withStyles';
 import InternationalizedLink from '../common/InternationalizedLink';
 import GCLink from '../common/GCLink';
 import GCLogo from '../common/GCLogo';

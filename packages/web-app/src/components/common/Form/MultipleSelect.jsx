@@ -1,16 +1,16 @@
 import React, { useEffect } from 'react';
 import { useIntl } from 'react-intl';
-import Autocomplete from '@material-ui/lab/Autocomplete';
+import Autocomplete from '@mui/material/Autocomplete';
 import {
   Collapse as MuiCollapse,
   FormHelperText,
   IconButton,
   TextField
-} from '@material-ui/core';
+} from '@mui/material';
 import { isNil, length } from 'ramda';
 
 import styled from 'styled-components';
-import { ExpandLess, ExpandMore } from '@material-ui/icons';
+import { ExpandLess, ExpandMore } from '@mui/icons-material';
 
 import { useDebounce } from '../../../hooks';
 import Translate from '../Translate';
@@ -31,7 +31,7 @@ const Wrapper = styled.div`
 `;
 
 const Collapse = styled(MuiCollapse)`
-  padding: ${({ theme }) => theme.spacing(1)}px;
+  padding: ${({ theme }) => theme.spacing(1)};
 `;
 
 // eslint-disable-next-line react/prop-types
@@ -106,7 +106,7 @@ const MultipleSelect = ({
             loading={isLoading}
             getOptionLabel={getOptionLabel}
             renderOption={renderOption}
-            getOptionSelected={getOptionSelected}
+            isOptionEqualToValue={getOptionSelected}
             filterSelectedOptions
             filterOptions={options => options} // This fixes a bug: without it, the autocomplete hides some results...
             noOptionsText={

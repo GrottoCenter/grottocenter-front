@@ -1,6 +1,6 @@
 import React from 'react';
 import { storiesOf } from '@storybook/react';
-import { FormControlLabel, Paper, Switch, Typography } from '@material-ui/core';
+import { FormControlLabel, Paper, Switch, Typography } from '@mui/material';
 import SignUpForm from './index';
 
 const HydratedSignUpForm = () => {

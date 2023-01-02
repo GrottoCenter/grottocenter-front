@@ -8,9 +8,9 @@ import {
   IconButton,
   InputAdornment,
   Typography
-} from '@material-ui/core';
-import Visibility from '@material-ui/icons/Visibility';
-import VisibilityOff from '@material-ui/icons/VisibilityOff';
+} from '@mui/material';
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import styled from 'styled-components';
 import { isEmpty, match } from 'ramda';
 
@@ -27,7 +27,7 @@ const FormWrapper = styled.form`
 `;
 
 const SpacedCenteredButton = styled(Button)`
-  margin: ${({ theme }) => theme.spacing(1)}px auto;
+  margin: ${({ theme }) => theme.spacing(1)} auto;
 `;
 
 const SignUpForm = ({
@@ -142,7 +142,8 @@ const SignUpForm = ({
                     aria-label="toggle password visibility"
                     onClick={toggleIsPasswordVisible}
                     onMouseDown={handleMouseDownPassword}
-                    edge="end">
+                    edge="end"
+                    size="large">
                     {isPasswordVisible ? <Visibility /> : <VisibilityOff />}
                   </IconButton>
                 </InputAdornment>
@@ -174,7 +175,8 @@ const SignUpForm = ({
                     aria-label="toggle password visibility"
                     onClick={toggleIsPasswordVisible}
                     onMouseDown={handleMouseDownPassword}
-                    edge="end">
+                    edge="end"
+                    size="large">
                     {isPasswordVisible ? <Visibility /> : <VisibilityOff />}
                   </IconButton>
                 </InputAdornment>

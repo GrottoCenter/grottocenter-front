@@ -1,9 +1,9 @@
-import { Button, IconButton, Menu, MenuItem } from '@material-ui/core';
-import AccountCircle from '@material-ui/icons/AccountCircle';
+import { Button, IconButton, Menu, MenuItem } from '@mui/material';
+import AccountCircle from '@mui/icons-material/AccountCircle';
 import React from 'react';
 import { useHistory } from 'react-router-dom';
 import { useIntl } from 'react-intl';
-import { useTheme } from '@material-ui/core/styles';
+import { useTheme } from '@mui/material/styles';
 import { isMobileOnly } from 'react-device-detect';
 import PropTypes from 'prop-types';
 import { pathOr } from 'ramda';
@@ -62,7 +62,8 @@ const UserMenu = ({
         aria-controls="menu-appbar"
         aria-haspopup="true"
         onClick={handleMenu}
-        color="inherit">
+        color="inherit"
+        size="large">
         <AccountCircle />
       </IconButton>
       <Menu

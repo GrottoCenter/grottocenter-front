@@ -13,7 +13,7 @@ import { Skeleton } from '@material-ui/lab';
 const PolygonMap = React.lazy(() => import('./PolygonMap/Polygon'));
 
 const FormControl = styled(MuiFormControl)`
-  padding-bottom: ${({ theme }) => theme.spacing(4)}px;
+  padding-bottom: ${({ theme }) => theme.spacing(4)};
 `;
 
 const PolygonContainer = ({ control, geoJson, errors }) => {

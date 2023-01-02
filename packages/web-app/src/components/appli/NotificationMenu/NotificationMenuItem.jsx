@@ -1,10 +1,10 @@
 import React from 'react';
-import { Box, ListItemIcon, MenuItem, Typography } from '@material-ui/core';
+import { Box, ListItemIcon, MenuItem, Typography } from '@mui/material';
 import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import styled from 'styled-components';
-import UnreadNotificationIcon from '@material-ui/icons/FiberManualRecord';
+import UnreadNotificationIcon from '@mui/icons-material/FiberManualRecord';
 import formatNotification from '../../../util/formatNotification';
 
 const ICON_WIDTH = '2.5rem';

@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 import { Link } from 'react-router-dom';
-import { ListItem } from '@material-ui/core';
+import { ListItem } from '@mui/material';
 
 export const StyledLink = styled(Link)`
   color: inherit;

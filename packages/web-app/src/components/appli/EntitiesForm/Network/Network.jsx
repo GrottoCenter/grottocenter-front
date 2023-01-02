@@ -9,7 +9,7 @@ import {
   InputAdornment,
   FormControlLabel,
   Switch
-} from '@material-ui/core';
+} from '@mui/material';
 import React from 'react';
 import { Controller } from 'react-hook-form';
 import { useIntl } from 'react-intl';
@@ -18,10 +18,10 @@ import styled from 'styled-components';
 import Translate from '../../../common/Translate';
 
 const FormControl = styled(MuiFormControl)`
-  padding-bottom: ${({ theme }) => theme.spacing(4)}px;
+  padding-bottom: ${({ theme }) => theme.spacing(4)};
 `;
 const StyledFormControl = styled(FormControl)`
-  margin-top: ${({ theme }) => theme.spacing(2)}px;
+  margin-top: ${({ theme }) => theme.spacing(2)};
 `;
 
 const Network = ({ control, errors, allLanguages }) => {

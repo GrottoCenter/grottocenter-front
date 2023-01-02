@@ -7,7 +7,7 @@ import {
   Slider,
   Switch,
   Divider as MuiDivider
-} from '@material-ui/core';
+} from '@mui/material';
 
 import AutoCompleteSearch from '../index';
 import countries from './suggestions';

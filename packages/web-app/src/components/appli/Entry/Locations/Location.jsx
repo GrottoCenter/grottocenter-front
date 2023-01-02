@@ -6,10 +6,10 @@ import {
   ListItem,
   ListItemText,
   Typography
-} from '@material-ui/core';
+} from '@mui/material';
 import { useDispatch } from 'react-redux';
-import EditIcon from '@material-ui/icons/Edit';
-import CancelIcon from '@material-ui/icons/Cancel';
+import EditIcon from '@mui/icons-material/Edit';
+import CancelIcon from '@mui/icons-material/Cancel';
 
 import { locationType } from '../Provider';
 import CreateLocationForm from '../../Form/LocationForm/index';
@@ -67,7 +67,8 @@ const Location = ({ location }) => {
           <IconButton
             onClick={() => setIsFormVisible(!isFormVisible)}
             color="primary"
-            aria-label="edit">
+            aria-label="edit"
+            size="large">
             {isFormVisible ? <CancelIcon /> : <EditIcon />}
           </IconButton>
         </ListItemIcon>

@@ -27,7 +27,7 @@ import {
   LinearProgress,
   TablePagination,
   Divider
-} from '@material-ui/core';
+} from '@mui/material';
 import { useIntl } from 'react-intl';
 
 import TableHead from './TableHead';
@@ -66,7 +66,7 @@ const TableFooter = styled.div`
 `;
 
 const SelectedTypography = styled(Typography)`
-  padding-left: ${({ theme }) => theme.spacing(4)}px;
+  padding-left: ${({ theme }) => theme.spacing(4)};
 `;
 
 const Table = ({

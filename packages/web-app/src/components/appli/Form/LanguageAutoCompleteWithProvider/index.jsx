@@ -3,8 +3,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
 import { isNil } from 'ramda';
-import { InputAdornment } from '@material-ui/core';
-import LanguageIcon from '@material-ui/icons/Language';
+import { InputAdornment } from '@mui/material';
+import LanguageIcon from '@mui/icons-material/Language';
 
 import {
   fetchQuicksearchResult,

@@ -4,7 +4,7 @@ import {
   TableRow,
   TableHead,
   TableSortLabel
-} from '@material-ui/core';
+} from '@mui/material';
 import PropTypes from 'prop-types';
 import React from 'react';
 import { useIntl } from 'react-intl';

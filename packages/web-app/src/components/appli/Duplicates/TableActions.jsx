@@ -7,9 +7,9 @@ import ActionButton from '../../common/ActionButton';
 const Wrapper = styled.div`
   display: flex;
   flex-direction: row;
-  margin-top: ${({ theme }) => theme.spacing(3)}px;
+  margin-top: ${({ theme }) => theme.spacing(3)};
   & > button {
-    margin-right: ${({ theme }) => theme.spacing(2)}px;
+    margin-right: ${({ theme }) => theme.spacing(2)};
   }
 `;
 

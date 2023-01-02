@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { isNil } from 'ramda';
-import { GpsFixed, Public } from '@material-ui/icons';
+import { GpsFixed, Public } from '@mui/icons-material';
 import { Property } from '../../../../Properties';
 import CustomIcon from '../../../../CustomIcon';
 import Title from './Title';

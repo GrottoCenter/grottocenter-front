@@ -1,7 +1,7 @@
 import React, { useContext, useMemo, useEffect } from 'react';
 import styled from 'styled-components';
 
-import { Typography } from '@material-ui/core';
+import { Typography } from '@mui/material';
 import Translate from '../../../../common/Translate';
 
 import { DocumentFormContext } from '../Provider';

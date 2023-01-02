@@ -1,4 +1,4 @@
-import { FormControl as MuiFormControl, FormLabel } from '@material-ui/core';
+import { FormControl as MuiFormControl, FormLabel } from '@mui/material';
 import { React } from 'react';
 import { useIntl } from 'react-intl';
 import styled from 'styled-components';
@@ -6,11 +6,11 @@ import InternationalizedLink from '../../../common/InternationalizedLink';
 import { licenceLinks, licensesODBLink } from '../../../../conf/externalLinks';
 
 const FormControl = styled(MuiFormControl)`
-  padding-bottom: ${({ theme }) => theme.spacing(4)}px;
+  padding-bottom: ${({ theme }) => theme.spacing(4)};
 `;
 const Spaced = styled.div`
-  margin-left: ${({ theme }) => theme.spacing(4)}px;
-  margin-top: ${({ theme }) => theme.spacing(2)}px;
+  margin-left: ${({ theme }) => theme.spacing(4)};
+  margin-top: ${({ theme }) => theme.spacing(2)};
 `;
 
 const License = () => {

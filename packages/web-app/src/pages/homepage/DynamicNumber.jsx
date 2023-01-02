@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import CircularProgress from '@material-ui/core/CircularProgress';
-import SyncKOIcon from '@material-ui/icons/SyncProblem';
-import IconButton from '@material-ui/core/IconButton';
-import { withStyles } from '@material-ui/core/styles';
+import CircularProgress from '@mui/material/CircularProgress';
+import SyncKOIcon from '@mui/icons-material/SyncProblem';
+import IconButton from '@mui/material/IconButton';
+import withStyles from '@mui/styles/withStyles';
 import { loadDynamicNumber } from '../../actions/DynamicNumber';
 import { DYNAMIC_NUMBER_RELOAD_INTERVAL } from '../../conf/config';
 

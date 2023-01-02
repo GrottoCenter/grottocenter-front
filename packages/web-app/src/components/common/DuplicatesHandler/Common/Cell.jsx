@@ -1,9 +1,9 @@
 import React from 'react';
-import { Fab, Grid, InputAdornment, useTheme } from '@material-ui/core';
-import ArrowForwardIosIcon from '@material-ui/icons/ArrowForwardIos';
-import ArrowBackIosIcon from '@material-ui/icons/ArrowBackIos';
+import { Fab, Grid, InputAdornment, useTheme } from '@mui/material';
+import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
+import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import PropTypes from 'prop-types';
-import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';
+import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import StringInput from '../../Form/StringInput';
 import { MarginLeftDiv, MarginRightDiv } from './WrapperUtilities';
 import AdornementPlaceholder from './AdornementPlaceholder';

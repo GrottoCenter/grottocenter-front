@@ -5,7 +5,7 @@ import {
   Select,
   MenuItem,
   InputLabel
-} from '@material-ui/core';
+} from '@mui/material';
 import { React } from 'react';
 import { Controller } from 'react-hook-form';
 import { useIntl } from 'react-intl';
@@ -14,7 +14,7 @@ import styled from 'styled-components';
 import Translate from '../../../common/Translate';
 
 const FormControl = styled(MuiFormControl)`
-  padding-bottom: ${({ theme }) => theme.spacing(4)}px;
+  padding-bottom: ${({ theme }) => theme.spacing(4)};
 `;
 
 const BasicInformationForm = ({

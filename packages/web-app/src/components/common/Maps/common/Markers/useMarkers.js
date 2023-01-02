@@ -6,10 +6,11 @@ import { renderToString } from 'react-dom/server';
 import {
   createGlobalStyle,
   keyframes,
-  ThemeProvider as StyledThemeProvider
+  ThemeProvider as StyledThemeProvider,
+  StyledEngineProvider
 } from 'styled-components';
 import { BrowserRouter } from 'react-router-dom';
-import { MuiThemeProvider } from '@material-ui/core/styles';
+import { ThemeProvider } from '@mui/material/styles';
 import { IntlProvider } from 'react-intl';
 import { useSelector } from 'react-redux';
 import theme from '../../../../../conf/grottoTheme';
@@ -50,9 +51,11 @@ const useMarkers = (icon, popupContent = null, tooltipContent = null) => {
               <IntlProvider locale={locale} messages={messages[locale]}>
                 <BrowserRouter>
                   <StyledThemeProvider theme={theme}>
-                    <MuiThemeProvider theme={theme}>
-                      {popupContent(marker)}
-                    </MuiThemeProvider>
+                    <StyledEngineProvider injectFirst>
+                      <ThemeProvider theme={theme}>
+                        {popupContent(marker)}
+                      </ThemeProvider>
+                    </StyledEngineProvider>
                   </StyledThemeProvider>
                 </BrowserRouter>
               </IntlProvider>

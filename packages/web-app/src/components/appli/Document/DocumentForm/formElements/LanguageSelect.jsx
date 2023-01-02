@@ -7,9 +7,9 @@ import {
   InputLabel,
   MenuItem,
   Select
-} from '@material-ui/core';
+} from '@mui/material';
 
-import LanguageIcon from '@material-ui/icons/Translate';
+import LanguageIcon from '@mui/icons-material/Translate';
 
 import Translate from '../../../../common/Translate';
 import { DocumentFormContext } from '../Provider';

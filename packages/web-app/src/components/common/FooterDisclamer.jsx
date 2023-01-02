@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { withTheme } from '@material-ui/core/styles';
+import withTheme from '@mui/styles/withTheme';
 import styled from 'styled-components';
 import Translate from './Translate';
 import InternationalizedLink from './InternationalizedLink';

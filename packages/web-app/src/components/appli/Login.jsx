@@ -1,10 +1,10 @@
 import React from 'react';
-import { Button, CircularProgress, Typography, Box } from '@material-ui/core';
+import { Button, CircularProgress, Typography, Box } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
 import { isEmpty, match } from 'ramda';
 import { useHistory } from 'react-router-dom';
 import { useIntl } from 'react-intl';
-import { WarningRounded } from '@material-ui/icons';
+import { WarningRounded } from '@mui/icons-material';
 
 import {
   hideLoginDialog,

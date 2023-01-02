@@ -6,7 +6,7 @@ import {
   CardContent,
   CardHeader,
   Typography
-} from '@material-ui/core';
+} from '@mui/material';
 import PropTypes from 'prop-types';
 import React from 'react';
 import { withRouter } from 'react-router-dom';

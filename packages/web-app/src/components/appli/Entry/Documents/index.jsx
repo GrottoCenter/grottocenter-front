@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
-import { Divider, IconButton, List } from '@material-ui/core';
-import AddCircleIcon from '@material-ui/icons/AddCircle';
-import RemoveCircleIcon from '@material-ui/icons/RemoveCircle';
+import { Divider, IconButton, List } from '@mui/material';
+import AddCircleIcon from '@mui/icons-material/AddCircle';
+import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
 import { useDispatch } from 'react-redux';
 
 import { associateDocumentToEntrance } from '../../../../actions/AssociateDocumentToEntrance';
@@ -40,9 +40,8 @@ const Documents = ({ documents, entranceId }) => {
         permissions.isAuth && (
           <IconButton
             color="primary"
-            onClick={() =>
-              setIsDocumentSearchVisible(!isDocumentSearchVisible)
-            }>
+            onClick={() => setIsDocumentSearchVisible(!isDocumentSearchVisible)}
+            size="large">
             {isDocumentSearchVisible ? <RemoveCircleIcon /> : <AddCircleIcon />}
           </IconButton>
         )

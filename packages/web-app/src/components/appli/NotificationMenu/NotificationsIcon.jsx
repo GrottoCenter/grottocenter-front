@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
-import { Badge, CircularProgress, IconButton } from '@material-ui/core';
-import MuiNotificationsIcon from '@material-ui/icons/Notifications';
+import { Badge, CircularProgress, IconButton } from '@mui/material';
+import MuiNotificationsIcon from '@mui/icons-material/Notifications';
 import { useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import { usePermissions } from '../../../hooks';
@@ -36,7 +36,8 @@ const NotificationsIcon = ({ onClick }) => {
     <IconButton
       aria-label="notifications of current user"
       onClick={onClick}
-      color="inherit">
+      color="inherit"
+      size="large">
       <Badge
         color={status === REDUCER_STATUS.FAILED ? 'error' : 'secondary'}
         badgeContent={getBadgeContent(nbNotifications, status)}>

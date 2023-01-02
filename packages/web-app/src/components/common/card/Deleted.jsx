@@ -2,7 +2,7 @@ import React from 'react';
 import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { Button } from '@material-ui/core';
+import { Button } from '@mui/material';
 import Alert from '../Alert';
 import AuthorAndDate from '../Contribution/AuthorAndDate';
 import Layout from '../Layouts/Fixed/FixedContent';
@@ -18,12 +18,12 @@ export const DELETED_ENTITIES = {
 };
 
 export const StyledLink = styled.div`
-  padding-top: ${({ theme }) => theme.spacing(3)}px;
+  padding-top: ${({ theme }) => theme.spacing(3)};
 `;
 export const StyledAuthor = styled.div`
   display: inline-grid;
-  padding-top: ${({ theme }) => theme.spacing(3)}px;
-  padding-left: ${({ theme }) => theme.spacing(1)}px;
+  padding-top: ${({ theme }) => theme.spacing(3)};
+  padding-left: ${({ theme }) => theme.spacing(1)};
 `;
 const Deleted = ({
   redirectTo,

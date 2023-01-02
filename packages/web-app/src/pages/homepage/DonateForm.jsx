@@ -1,9 +1,10 @@
 import React from 'react';
-import GiftIcon from '@material-ui/icons/CardGiftcard';
-import Button from '@material-ui/core/Button';
-import { withStyles, withTheme } from '@material-ui/core/styles';
+import GiftIcon from '@mui/icons-material/CardGiftcard';
+import Button from '@mui/material/Button';
+import withStyles from '@mui/styles/withStyles';
+import withTheme from '@mui/styles/withTheme';
 import styled, { keyframes } from 'styled-components';
-import Typography from '@material-ui/core/Typography/Typography';
+import Typography from '@mui/material/Typography/Typography';
 import Translate from '../../components/common/Translate';
 import { paypalLink, paypalId } from '../../conf/config';
 

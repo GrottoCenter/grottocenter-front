@@ -8,10 +8,12 @@ import thunkMiddleware from 'redux-thunk';
 import { BrowserRouter } from 'react-router-dom';
 import {
   createTheme,
-  MuiThemeProvider,
-  StylesProvider
-} from '@material-ui/core/styles';
-import CssBaseline from '@material-ui/core/CssBaseline';
+  ThemeProvider,
+  StyledEngineProvider,
+  adaptV4Theme
+} from '@mui/material/styles';
+import StylesProvider from '@mui/styles/StylesProvider';
+import CssBaseline from '@mui/material/CssBaseline';
 import { ThemeProvider as StyledThemeProvider } from 'styled-components';
 import PropTypes from 'prop-types';
 
@@ -28,7 +30,17 @@ import ErrorBoundary from './components/appli/ErrorBoundary';
 const middlewares = applyMiddleware(createDebounce(), thunkMiddleware);
 const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 const gcStore = createStore(GCReducer, composeEnhancers(middlewares));
-const theme = createTheme(grottoTheme);
+
+const initialLocale = navigator.language.split(/[-_]/)[0];
+gcStore.dispatch(
+  changeLanguage(
+    includes(initialLocale, keys(AVAILABLE_LANGUAGES))
+      ? initialLocale
+      : DEFAULT_LANGUAGE
+  )
+);
+
+const theme = createTheme(adaptV4Theme(grottoTheme));
 
 const customOnIntlError = err => {
   /*
@@ -73,22 +85,24 @@ const App = () => (
   <StylesProvider injectFirst>
     <CssBaseline />
     <StyledThemeProvider theme={theme}>
-      <MuiThemeProvider theme={theme}>
-        <BrowserRouter>
-          <div>
-            <SnackbarProvider maxSnack={3}>
-              <Provider store={gcStore}>
-                <HydratedIntlProvider onError={customOnIntlError}>
-                  <ErrorHandler />
-                  <ErrorBoundary>
-                    <Application />
-                  </ErrorBoundary>
-                </HydratedIntlProvider>
-              </Provider>
-            </SnackbarProvider>
-          </div>
-        </BrowserRouter>
-      </MuiThemeProvider>
+      <StyledEngineProvider injectFirst>
+        <ThemeProvider theme={theme}>
+          <BrowserRouter>
+            <div>
+              <SnackbarProvider maxSnack={3}>
+                <Provider store={gcStore}>
+                  <HydratedIntlProvider onError={customOnIntlError}>
+                    <ErrorHandler />
+                    <ErrorBoundary>
+                      <Application />
+                    </ErrorBoundary>
+                  </HydratedIntlProvider>
+                </Provider>
+              </SnackbarProvider>
+            </div>
+          </BrowserRouter>
+        </ThemeProvider>
+      </StyledEngineProvider>
     </StyledThemeProvider>
   </StylesProvider>
 );

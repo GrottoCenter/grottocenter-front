@@ -9,14 +9,14 @@ import {
   Select,
   MenuItem,
   Typography,
-  withStyles,
   Accordion,
   AccordionSummary,
   AccordionDetails,
   FormLabel,
   FormHelperText
-} from '@material-ui/core';
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+} from '@mui/material';
+import withStyles from '@mui/styles/withStyles';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 import Translate from '../../common/Translate';
 import InternationalizedLink from '../../common/InternationalizedLink';

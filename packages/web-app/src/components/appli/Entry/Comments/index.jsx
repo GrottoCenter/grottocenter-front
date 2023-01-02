@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { useDispatch } from 'react-redux';
 import { useIntl } from 'react-intl';
-import { Divider, IconButton, List } from '@material-ui/core';
-import AddCircleIcon from '@material-ui/icons/AddCircle';
-import CancelIcon from '@material-ui/icons/Cancel';
+import { Divider, IconButton, List } from '@mui/material';
+import AddCircleIcon from '@mui/icons-material/AddCircle';
+import CancelIcon from '@mui/icons-material/Cancel';
 
 import ScrollableContent from '../../../common/Layouts/Fixed/ScrollableContent';
 import { commentsType } from '../Provider';
@@ -45,7 +45,8 @@ const Comments = ({ entranceId, comments }) => {
         permissions.isAuth && (
           <IconButton
             color="primary"
-            onClick={() => setIsFormVisible(!isFormVisible)}>
+            onClick={() => setIsFormVisible(!isFormVisible)}
+            size="large">
             {isFormVisible ? <CancelIcon /> : <AddCircleIcon />}
           </IconButton>
         )

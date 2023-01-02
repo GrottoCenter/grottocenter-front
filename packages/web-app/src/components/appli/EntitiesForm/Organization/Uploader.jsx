@@ -1,4 +1,4 @@
-import { FormControl as MuiFormControl, FormLabel } from '@material-ui/core';
+import { FormControl as MuiFormControl, FormLabel } from '@mui/material';
 import { React } from 'react';
 import { Controller } from 'react-hook-form';
 import { useIntl } from 'react-intl';
@@ -10,7 +10,7 @@ import 'react-phone-input-2/lib/style.css';
 import 'react-dropzone-uploader/dist/styles.css';
 
 const FormControl = styled(MuiFormControl)`
-  padding-bottom: ${({ theme }) => theme.spacing(4)}px;
+  padding-bottom: ${({ theme }) => theme.spacing(4)};
 `;
 
 const Uploader = ({ control, errors }) => {

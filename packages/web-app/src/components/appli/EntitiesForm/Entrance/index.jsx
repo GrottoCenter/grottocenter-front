@@ -12,8 +12,8 @@ import {
   StepLabel,
   Stepper,
   Typography
-} from '@material-ui/core';
-import Icon from '@material-ui/core/Icon';
+} from '@mui/material';
+import Icon from '@mui/material/Icon';
 import styled from 'styled-components';
 import { useDispatch, useSelector } from 'react-redux';
 import { useGeolocation } from 'rooks';
@@ -35,7 +35,7 @@ import { makeCaveData, makeEntranceData } from './transformers';
 import { ENTRANCE_ONLY, ENTRANCE_AND_CAVE } from './caveType';
 
 const Button = styled(MuiButton)`
-  margin: ${({ theme }) => theme.spacing(2)}px;
+  margin: ${({ theme }) => theme.spacing(2)};
 `;
 
 const defaultCaveValues = {

@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 const SectionWrapper = styled.div`
   width: 100%;
   text-align: center;
-  padding: ${({ theme }) => theme.spacing(2)}px;
+  padding: ${({ theme }) => theme.spacing(2)};
 `;
 
 const Section = ({ children }) => <SectionWrapper>{children}</SectionWrapper>;

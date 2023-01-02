@@ -1,7 +1,7 @@
 import React from 'react';
-import { withTheme } from '@material-ui/core/styles';
+import withTheme from '@mui/styles/withTheme';
 import styled from 'styled-components';
-import Divider from '@material-ui/core/Divider';
+import Divider from '@mui/material/Divider';
 import DonateForm from './DonateForm';
 import FooterDisclamer from '../../components/common/FooterDisclamer';
 import Publisher from './Publisher';

@@ -1,16 +1,15 @@
 import React, { useEffect, useRef } from 'react';
 import { useIntl } from 'react-intl';
-import { Terrain } from '@material-ui/icons';
+import { Terrain } from '@mui/icons-material';
 import { isNil } from 'ramda';
 import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams, useHistory } from 'react-router-dom';
-import { Divider, Link } from '@material-ui/core';
+import { Divider, Link, Skeleton } from '@mui/material';
 
-import AttachFileIcon from '@material-ui/icons/AttachFile';
-import DescriptionIcon from '@material-ui/icons/Description';
+import AttachFileIcon from '@mui/icons-material/AttachFile';
+import DescriptionIcon from '@mui/icons-material/Description';
 import styled from 'styled-components';
-import { Skeleton } from '@material-ui/lab';
 import Overview from './Overview';
 import Section from './Section';
 import CustomIcon from '../../components/common/CustomIcon';
@@ -38,8 +37,8 @@ const OrganizationIcon = styled.img`
 `;
 
 const StyledDivider = styled(Divider)`
-  margin-top: ${({ theme }) => theme.spacing(4)}px;
-  margin-bottom: ${({ theme }) => theme.spacing(4)}px;
+  margin-top: ${({ theme }) => theme.spacing(4)};
+  margin-bottom: ${({ theme }) => theme.spacing(4)};
 `;
 
 const DocumentPage = ({

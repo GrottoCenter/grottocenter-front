@@ -2,8 +2,7 @@ import React, { useContext, useEffect, useMemo, Suspense } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { Fade } from '@material-ui/core';
-import { Skeleton } from '@material-ui/lab';
+import { Fade, Skeleton } from '@mui/material';
 import { includes } from 'ramda';
 import { useIntl } from 'react-intl';
 import LanguageAutoComplete from '../../../Form/LanguageAutoCompleteWithProvider';
@@ -80,7 +79,7 @@ const Step1 = ({ stepId }) => {
   return useMemo(
     () =>
       isLoading || error ? (
-        <Skeleton variant="rect" height={200} />
+        <Skeleton variant="rectangular" height={200} />
       ) : (
         <>
           <FlexWrapper>

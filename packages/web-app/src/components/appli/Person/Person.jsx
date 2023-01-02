@@ -1,10 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { isNil } from 'ramda';
-import Skeleton from '@material-ui/lab/Skeleton';
+import Skeleton from '@mui/material/Skeleton';
 import { useIntl } from 'react-intl';
-import { IconButton, Box } from '@material-ui/core';
-import CreateIcon from '@material-ui/icons/Create';
+import { IconButton, Box } from '@mui/material';
+import CreateIcon from '@mui/icons-material/Create';
 
 import subscriptionsType from '../../../types/subscriptions.type';
 import REDUCER_STATUS from '../../../reducers/ReducerStatus';

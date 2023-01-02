@@ -1,7 +1,8 @@
 import React from 'react';
-import { withStyles, lighten } from '@material-ui/core/styles';
-import { Grid, Typography } from '@material-ui/core';
-import CheckIcon from '@material-ui/icons/Check';
+import { lighten } from '@mui/material/styles';
+import withStyles from '@mui/styles/withStyles';
+import { Grid, Typography } from '@mui/material';
+import CheckIcon from '@mui/icons-material/Check';
 import styled from 'styled-components';
 import { useSelector } from 'react-redux';
 import { useIntl } from 'react-intl';

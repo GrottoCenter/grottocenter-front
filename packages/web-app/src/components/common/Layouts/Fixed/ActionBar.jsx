@@ -1,13 +1,13 @@
 import React, { useContext } from 'react';
 import { isNil } from 'ramda';
 import { useIntl } from 'react-intl';
-import { Tooltip, Fab } from '@material-ui/core';
-import { Print, Map, Edit } from '@material-ui/icons';
+import { Tooltip, Fab } from '@mui/material';
+import { Share, Print, Map, GpsFixed, Edit } from '@mui/icons-material';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
 import ReactToPrint from 'react-to-print';
 import { isMobile } from 'react-device-detect';
-import grey from '@material-ui/core/colors/grey';
+import { grey } from '@mui/material/colors';
 import { EntryContext } from '../../../appli/Entry/Provider';
 
 const Wrapper = styled.div`
@@ -25,7 +25,7 @@ const Wrapper = styled.div`
 `;
 
 const StyledFab = styled(Fab)`
-  margin: ${({ theme }) => theme.spacing(2)}px;
+  margin: ${({ theme }) => theme.spacing(2)};
   :disabled {
     background-color: ${grey[100]};
   }

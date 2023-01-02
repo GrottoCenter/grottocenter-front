@@ -1,4 +1,4 @@
-import { TableHead as MuiTableHead, TableRow } from '@material-ui/core';
+import { TableHead as MuiTableHead, TableRow } from '@mui/material';
 import {
   __,
   concat,

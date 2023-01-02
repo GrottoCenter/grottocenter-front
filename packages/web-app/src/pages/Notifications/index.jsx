@@ -13,7 +13,7 @@ import makeNotifications from './transformers';
 const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
-  padding: ${({ theme }) => theme.spacing(2)}px;
+  padding: ${({ theme }) => theme.spacing(2)};
 `;
 
 const defaultHiddenColumns = ['id', 'link'];

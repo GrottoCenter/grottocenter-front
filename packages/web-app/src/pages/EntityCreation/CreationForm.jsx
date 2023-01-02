@@ -6,7 +6,7 @@ import {
   Select,
   MenuItem,
   FormHelperText
-} from '@material-ui/core';
+} from '@mui/material';
 import styled from 'styled-components';
 import { includes, values } from 'ramda';
 import Translate from '../../components/common/Translate';
@@ -29,7 +29,7 @@ const ENTITIES = {
 };
 
 const Wrapper = styled.div`
-  padding: ${({ theme }) => theme.spacing(4)}px;
+  padding: ${({ theme }) => theme.spacing(4)};
 `;
 
 const EntityTypeSelect = ({ entity, onEntityChange }) => {

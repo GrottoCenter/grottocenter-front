@@ -2,7 +2,7 @@ import React from 'react';
 import { useIntl } from 'react-intl';
 import { useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
-import { Box, Button, TextField } from '@material-ui/core';
+import { Box, Button, TextField } from '@mui/material';
 import { Controller, useForm } from 'react-hook-form';
 import styled from 'styled-components';
 import { isNil } from 'ramda';
@@ -12,7 +12,7 @@ import { descriptionType } from '../../Descriptions/propTypes';
 
 const SpacedButton = styled(Button)`
   ${({ theme }) => `
-  margin: 0 ${theme.spacing(1)}px;`}
+  margin: 0 ${theme.spacing(1)};`}
 `;
 
 const getDefaultValues = language => ({

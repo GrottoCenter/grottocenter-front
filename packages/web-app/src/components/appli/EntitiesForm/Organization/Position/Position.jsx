@@ -1,4 +1,4 @@
-import { Slide } from '@material-ui/core';
+import { Slide } from '@mui/material';
 import React from 'react';
 import styled from 'styled-components';
 import { useWatch } from 'react-hook-form';
@@ -9,7 +9,7 @@ import MultipleMarkers, {
 import { useDebounce } from '../../../../../hooks';
 
 const Style = styled.div`
-  margin: ${({ theme }) => theme.spacing(4)}px;
+  margin: ${({ theme }) => theme.spacing(4)};
 `;
 
 const PositionMap = ({ control }) => {

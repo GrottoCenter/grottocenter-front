@@ -1,8 +1,8 @@
 import React, { useState, Suspense } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { Button as MuiButton } from '@material-ui/core';
-import ConvertIcon from '@material-ui/icons/Transform';
+import { Button as MuiButton } from '@mui/material';
+import ConvertIcon from '@mui/icons-material/Transform';
 import { useIntl } from 'react-intl';
 import { anyPass, isEmpty, isNil } from 'ramda';
 import { useFullScreen } from 'react-browser-hooks';

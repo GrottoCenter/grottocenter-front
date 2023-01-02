@@ -1,13 +1,13 @@
 import React, { useEffect } from 'react';
 import { useIntl } from 'react-intl';
 import { useHistory } from 'react-router-dom';
-import { List, ListItem, Typography } from '@material-ui/core';
-import CallMergeIcon from '@material-ui/icons/CallMerge';
-import PeopleIcon from '@material-ui/icons/People';
-import DocumentListIcon from '@material-ui/icons/PlaylistAddCheck';
-import ListAltIcon from '@material-ui/icons/ListAlt';
-import PublishIcon from '@material-ui/icons/Publish';
-import NotificationsIcon from '@material-ui/icons/Notifications';
+import { List, ListItem, Typography } from '@mui/material';
+import CallMergeIcon from '@mui/icons-material/CallMerge';
+import PeopleIcon from '@mui/icons-material/People';
+import DocumentListIcon from '@mui/icons-material/PlaylistAddCheck';
+import ListAltIcon from '@mui/icons-material/ListAlt';
+import PublishIcon from '@mui/icons-material/Publish';
+import NotificationsIcon from '@mui/icons-material/Notifications';
 import styled from 'styled-components';
 
 import { usePermissions } from '../hooks';
@@ -22,11 +22,11 @@ const StyledListItem = styled(ListItem)`
   border: 1px solid ${props => props.theme.palette.primary1Color};
   flex-basis: calc(20% - ${props => props.theme.spacing(2) * 2}px);
   flex-direction: column;
-  margin: ${props => props.theme.spacing(2)}px;
+  margin: ${props => props.theme.spacing(2)};
 `;
 
 const DashboardBlock = styled.div`
-  margin-bottom: ${props => props.theme.spacing(4)}px;
+  margin-bottom: ${props => props.theme.spacing(4)};
 `;
 
 const Dashboard = () => {

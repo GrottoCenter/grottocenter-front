@@ -16,7 +16,7 @@ import UserList from './UserList';
 // ==========
 
 const MarginBottomBlock = styled.div`
-  margin-bottom: ${({ theme }) => theme.spacing(4)}px;
+  margin-bottom: ${({ theme }) => theme.spacing(4)};
 `;
 
 // ==========

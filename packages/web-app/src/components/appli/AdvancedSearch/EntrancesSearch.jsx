@@ -7,10 +7,11 @@ import {
   FormLabel,
   TextField,
   Switch,
-  withStyles,
   Typography,
   FormHelperText
-} from '@material-ui/core';
+} from '@mui/material';
+
+import withStyles from '@mui/styles/withStyles';
 
 import styles from './styles';
 import Translate from '../../common/Translate';

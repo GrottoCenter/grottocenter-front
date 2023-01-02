@@ -1,5 +1,5 @@
 import React from 'react';
-import { TableCell, TableHead, TableRow } from '@material-ui/core';
+import { TableCell, TableHead, TableRow } from '@mui/material';
 import { useIntl } from 'react-intl';
 import styled from 'styled-components';
 

@@ -5,7 +5,7 @@ import { isNil } from 'ramda';
 import styled from 'styled-components';
 import { useIntl } from 'react-intl';
 import { useWatch } from 'react-hook-form';
-import { Box, Typography } from '@material-ui/core';
+import { Box, Typography } from '@mui/material';
 
 import InternationalizedLink from '../InternationalizedLink';
 import { licensesODBLink } from '../../../conf/externalLinks';

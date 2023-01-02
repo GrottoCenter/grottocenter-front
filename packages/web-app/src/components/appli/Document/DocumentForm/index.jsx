@@ -8,11 +8,11 @@ import {
   FormControl,
   LinearProgress as MuiLinearProgress,
   Typography
-} from '@material-ui/core';
+} from '@mui/material';
 import { Prompt } from 'react-router-dom';
 import { includes } from 'ramda';
-import NavigateNextIcon from '@material-ui/icons/NavigateNext';
-import NavigateBeforeIcon from '@material-ui/icons/NavigateBefore';
+import NavigateNextIcon from '@mui/icons-material/NavigateNext';
+import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore';
 
 import { DocumentFormContext } from './Provider';
 import { DocumentFormTypes } from './types';
@@ -55,7 +55,7 @@ const FormWrapper = styled.form`
 `;
 
 const StyledDivider = styled(Divider)`
-  margin: ${({ theme }) => theme.spacing(3)}px 0;
+  margin: ${({ theme }) => theme.spacing(3)} 0;
 `;
 
 const SubmitButton = styled(Button)`
@@ -81,7 +81,7 @@ const BbsInfoText = styled(Typography)`
   flex: 1;
   font-style: italic;
   margin-bottom: 0;
-  margin-left: ${({ theme }) => theme.spacing(3)}px;
+  margin-left: ${({ theme }) => theme.spacing(3)};
 `;
 
 const DONT_LEAVE_MESSAGE =

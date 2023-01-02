@@ -1,15 +1,15 @@
 import React from 'react';
-import MuiToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup';
-import ToggleButton from '@material-ui/lab/ToggleButton';
+import MuiToggleButtonGroup from '@mui/material/ToggleButtonGroup';
+import ToggleButton from '@mui/material/ToggleButton';
 import PropTypes from 'prop-types';
-import { FormLabel } from '@material-ui/core';
+import { FormLabel } from '@mui/material';
 import styled from 'styled-components';
 
 import { StyledFormControl } from './SliderForm';
 import Translate from '../../common/Translate';
 
 const ToggleButtonGroup = styled(MuiToggleButtonGroup)`
-  padding: ${({ theme }) => theme.spacing(2)}px;
+  padding: ${({ theme }) => theme.spacing(2)};
 `;
 
 const DivingTypesForm = ({ onChange, value }) => {

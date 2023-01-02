@@ -1,10 +1,10 @@
 import React from 'react';
-import { List } from '@material-ui/core';
-import LibraryAddIcon from '@material-ui/icons/LibraryAdd';
-import LocationIcon from '@material-ui/icons/LocationOn';
-import DashboardIcon from '@material-ui/icons/Dashboard';
-import HomeIcon from '@material-ui/icons/Home';
-import SearchIcon from '@material-ui/icons/Search';
+import { List } from '@mui/material';
+import LibraryAddIcon from '@mui/icons-material/LibraryAdd';
+import LocationIcon from '@mui/icons-material/LocationOn';
+import DashboardIcon from '@mui/icons-material/Dashboard';
+import HomeIcon from '@mui/icons-material/Home';
+import SearchIcon from '@mui/icons-material/Search';
 import Item, { DocumentItems } from './Items';
 
 import { usePermissions } from '../../../hooks';

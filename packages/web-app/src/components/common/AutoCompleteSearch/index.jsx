@@ -1,14 +1,14 @@
 import React from 'react';
-import Autocomplete from '@material-ui/lab/Autocomplete';
+import Autocomplete from '@mui/material/Autocomplete';
 import {
   InputBase,
   CircularProgress,
   InputAdornment,
   Popper
-} from '@material-ui/core';
-import { alpha } from '@material-ui/core/styles';
-import SearchIcon from '@material-ui/icons/Search';
-import ErrorIcon from '@material-ui/icons/Error';
+} from '@mui/material';
+import { alpha } from '@mui/material/styles';
+import SearchIcon from '@mui/icons-material/Search';
+import ErrorIcon from '@mui/icons-material/Error';
 import styled from 'styled-components';
 
 import { AutoCompleteSearchTypes } from './types';
@@ -37,7 +37,7 @@ const InputWrapper = styled.div`
 `;
 
 const SearchIconWrapper = styled.div`
-  padding: ${({ theme }) => theme.spacing(1)}px;
+  padding: ${({ theme }) => theme.spacing(1)};
   display: flex;
   align-items: center;
   justify-content: center;

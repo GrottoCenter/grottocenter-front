@@ -1,6 +1,6 @@
 import React from 'react';
 import { useIntl } from 'react-intl';
-import { ListItem, ListItemText } from '@material-ui/core';
+import { ListItem, ListItemText } from '@mui/material';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import idNameType from '../../../types/idName.type';

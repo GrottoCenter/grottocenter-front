@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { MapContainer, Marker, Popup, TileLayer } from 'react-leaflet';
 import { storiesOf } from '@storybook/react';
 import { action } from '@storybook/addon-actions';
-import { Typography } from '@material-ui/core';
+import { Typography } from '@mui/material';
 
 import AutoCompleteSearch from '../../AutoCompleteSearch';
 import AppBar from '../../AppBar';
