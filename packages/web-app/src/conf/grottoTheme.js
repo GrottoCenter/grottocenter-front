@@ -200,6 +200,9 @@ export const overridings = {
       }
     },
     MuiFormControl: {
+      defaultProps: {
+        variant: 'filled'
+      },
       styleOverrides: {
         root: {
           padding: '4px'
@@ -207,6 +210,9 @@ export const overridings = {
       }
     },
     MuiSelect: {
+      defaultProps: {
+        variant: 'filled'
+      },
       styleOverrides: {
         root: {
           fontFamily
