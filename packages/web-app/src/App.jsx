@@ -9,8 +9,7 @@ import { BrowserRouter } from 'react-router-dom';
 import {
   createTheme,
   ThemeProvider,
-  StyledEngineProvider,
-  adaptV4Theme
+  StyledEngineProvider
 } from '@mui/material/styles';
 import StylesProvider from '@mui/styles/StylesProvider';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -40,7 +39,7 @@ gcStore.dispatch(
   )
 );
 
-const theme = createTheme(adaptV4Theme(grottoTheme));
+const theme = createTheme(grottoTheme);
 
 const customOnIntlError = err => {
   /*

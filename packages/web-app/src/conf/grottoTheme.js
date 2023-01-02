@@ -1,10 +1,5 @@
 import { brown, blue, orange, grey } from '@mui/material/colors';
-import {
-  createTheme,
-  alpha,
-  responsiveFontSizes,
-  adaptV4Theme
-} from '@mui/material/styles';
+import { createTheme, alpha, responsiveFontSizes } from '@mui/material/styles';
 import { isMobile } from 'react-device-detect';
 
 const fontFamily = [
@@ -283,4 +278,4 @@ export const overridings = {
   }
 };
 
-export default responsiveFontSizes(createTheme(adaptV4Theme(overridings)));
+export default responsiveFontSizes(createTheme(overridings));
