@@ -96,11 +96,6 @@ class SearchBottomActionButtons extends React.Component {
 }
 
 SearchBottomActionButtons.propTypes = {
-  classes: PropTypes.shape({
-    cardBottomButtons: PropTypes.string,
-    bottomButtonSmallScreen: PropTypes.string,
-    bottomButton: PropTypes.string
-  }).isRequired,
   resetResults: PropTypes.func.isRequired,
   resetParentState: PropTypes.func.isRequired
 };

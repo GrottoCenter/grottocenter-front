@@ -8,5 +8,5 @@ export const StyledLink = styled(Link)`
 `;
 
 export const StyledListItem = styled(ListItem)`
-  padding-left: ${({ theme, $nested }) => ($nested ? theme.spacing(4) : 0)}px;
+  padding-left: ${({ theme, $nested }) => ($nested ? theme.spacing(4) : '0px')};
 `;

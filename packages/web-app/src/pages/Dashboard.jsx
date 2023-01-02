@@ -20,7 +20,7 @@ const StyledList = styled(List)`
 
 const StyledListItem = styled(ListItem)`
   border: 1px solid ${props => props.theme.palette.primary1Color};
-  flex-basis: calc(20% - ${props => props.theme.spacing(2) * 2}px);
+  flex-basis: calc(20% - ${props => props.theme.spacing(4)});
   flex-direction: column;
   margin: ${props => props.theme.spacing(2)};
 `;

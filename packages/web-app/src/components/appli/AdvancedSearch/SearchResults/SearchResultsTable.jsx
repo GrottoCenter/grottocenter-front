@@ -1,10 +1,9 @@
 import React, { createRef } from 'react';
+import { styled } from '@mui/material/styles';
 import PropTypes from 'prop-types';
 import { injectIntl } from 'react-intl';
-import withStyles from '@mui/styles/withStyles';
 import { withRouter } from 'react-router-dom';
 import { isMobile } from 'react-device-detect';
-import styled from 'styled-components';
 import DescriptionIcon from '@mui/icons-material/Description';
 import {
   Button,
@@ -25,27 +24,37 @@ import SearchTableActions from './SearchTableActions';
 import ResultsTableHead from './ResultsTableHead';
 import { ADVANCED_SEARCH_TYPES } from '../../../../conf/config';
 
-const StyledTableFooter = styled.div`
+const PREFIX = 'SearchResultsTable';
+
+const classes = {
+  table: `${PREFIX}-table`,
+  tableRow: `${PREFIX}-tableRow`,
+  textError: `${PREFIX}-textError`
+};
+
+const Root = styled('div')(() => ({
+  [`& .${classes.table}`]: {
+    marginBottom: 0,
+    overflow: 'auto'
+  },
+
+  [`& .${classes.tableRow}`]: {
+    '&:hover': {
+      cursor: 'pointer'
+    }
+  },
+
+  [`& .${classes.textError}`]: {
+    color: '#ff3333'
+  }
+}));
+
+const StyledTableFooter = styled('div')`
   align-items: center;
   display: flex;
   justify-content: space-between;
   margin: ${({ theme }) => theme.spacing(2)};
 `;
-
-const styles = () => ({
-  table: {
-    marginBottom: 0,
-    overflow: 'auto'
-  },
-  tableRow: {
-    '&:hover': {
-      cursor: 'pointer'
-    }
-  },
-  textError: {
-    color: '#ff3333'
-  }
-});
 
 const DEFAULT_FROM = 0;
 const DEFAULT_PAGE = 0;
@@ -260,7 +269,6 @@ class SearchResultsTable extends React.Component {
 
   render() {
     const {
-      classes,
       isLoading,
       results,
       resourceType,
@@ -302,11 +310,11 @@ class SearchResultsTable extends React.Component {
 
     if (resourceType === '' || resultsSliced === undefined) return '';
     return (
-      <div ref={this.containerRef}>
+      <Root ref={this.containerRef}>
         {resultsSliced.length > 0 ? (
           <>
             <Table
-              className={classes.table}
+              className={classes?.table}
               size="small"
               style={{ display: tableDisplayValueForScroll }}>
               <ResultsTableHead resourceType={resourceType} />
@@ -320,7 +328,7 @@ class SearchResultsTable extends React.Component {
                     hover
                     key={result.id}
                     selected={selectedIds && selectedIds.includes(result.id)}
-                    className={classes.tableRow}
+                    className={classes?.tableRow}
                     onClick={() => this.handleRowClick(result)}>
                     {resourceType === ADVANCED_SEARCH_TYPES.ENTRANCES && (
                       <>
@@ -478,7 +486,7 @@ class SearchResultsTable extends React.Component {
               </div>
             )}
             {!canDownloadDataAsCSV && (
-              <p className={classes.textError}>
+              <p className={classes?.textError}>
                 <Translate
                   id="Too many results to download ({0}). You can only download {1} results at once."
                   defaultMessage="Too many results to download ({0}). You can only download {1} results at once."
@@ -498,17 +506,12 @@ class SearchResultsTable extends React.Component {
             })}
           />
         )}
-      </div>
+      </Root>
     );
   }
 }
 
 SearchResultsTable.propTypes = {
-  classes: PropTypes.shape({
-    table: PropTypes.string,
-    tableRow: PropTypes.string,
-    textError: PropTypes.string
-  }).isRequired,
   history: PropTypes.shape({ push: PropTypes.func }).isRequired,
   isLoading: PropTypes.bool.isRequired,
   isLoadingFullData: PropTypes.bool.isRequired,
@@ -530,4 +533,4 @@ SearchResultsTable.defaultProps = {
   fullResults: undefined
 };
 
-export default injectIntl(withRouter(withStyles(styles)(SearchResultsTable)));
+export default injectIntl(withRouter(SearchResultsTable));

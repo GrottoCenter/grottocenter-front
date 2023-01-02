@@ -17,13 +17,13 @@ import { IS_DELETED, IS_INTACT, IS_MODIFIED, IS_NEW } from './FileHelpers';
 import { idNameTypeExtended } from '../../../types/idName.type';
 
 const StyledButton = styled(Button)`
-  margin-left: ${({ theme }) => theme.spacing(4)}%;
-  margin-right: ${({ theme }) => theme.spacing(4)}%;
+  margin-left: ${({ theme }) => theme.spacing(4)};
+  margin-right: ${({ theme }) => theme.spacing(4)};
 `;
 
 const ListWrapper = styled.div`
-  margin-left: ${({ theme }) => theme.spacing(4)}%;
-  margin-right: ${({ theme }) => theme.spacing(4)}%;
+  margin-left: ${({ theme }) => theme.spacing(4)};
+  margin-right: ${({ theme }) => theme.spacing(4)};
 `;
 
 const StyledTypography = styled(Typography)`
