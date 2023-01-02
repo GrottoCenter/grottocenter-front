@@ -68,7 +68,6 @@ const ManageUserGroups = ({
     state => state.updatePersonGroups
   );
 
-  const renderOption = option => entityOptionForSelector(option);
   const getOptionLabel = option => option.name;
 
   const handleOnSelection = selection => {
@@ -98,13 +97,12 @@ const ManageUserGroups = ({
       </Typography>
       <SearchBarBackground>
         <AutoCompleteSearch
-          disabled={false}
           onSelection={handleOnSelection}
           label={formatMessage({ id: 'Search among Grottocenter users...' })}
           inputValue={inputValue}
           onInputChange={setInputValue}
           suggestions={results}
-          renderOption={renderOption}
+          renderOption={entityOptionForSelector}
           getOptionLabel={getOptionLabel}
           errorMessage="Unexpected error"
           hasError={!isNil(quickSearchError)}

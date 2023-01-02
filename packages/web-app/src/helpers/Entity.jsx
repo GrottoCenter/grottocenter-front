@@ -1,6 +1,6 @@
 import React from 'react';
-import styled from 'styled-components';
-import withTheme from '@mui/styles/withTheme';
+import { styled } from '@mui/material/styles';
+
 import Translate from '../components/common/Translate';
 
 //
@@ -11,34 +11,34 @@ import Translate from '../components/common/Translate';
 
 export const isMappable = entity => entity.latitude && entity.longitude;
 
-const EntityIcon = styled.img`
+const EntityIcon = styled('img')`
   height: 30px;
   margin-right: 10px;
   width: 30px;
 `;
 
-const EntityLabel = styled.span`
+const EntityLabel = styled('span')`
   font-size: 1.5rem;
   white-space: nowrap;
 `;
 
 // The hightlighted words are inside <em> tags.
-const HighlightText = withTheme(styled.span`
-  color: #888;
-  font-size: 1.1rem;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  vertical-align: baseline;
-  white-space: nowrap;
-  em {
-    background-color: ${props => props.theme.palette.accent1Color};
-    color: white;
-    font-style: normal;
-    font-weight: bold;
+const HighlightText = styled('span')(({ theme }) => ({
+  color: '#888',
+  fontSize: '1.1rem',
+  overflow: 'hidden',
+  textOverflow: 'ellipsis',
+  verticalAlign: 'baseline',
+  whiteSpace: 'nowrap',
+  em: {
+    backgroundColor: theme.palette.accent1Color,
+    color: 'white',
+    fontStyle: 'normal',
+    fontWeight: 'bold'
   }
-`);
+}));
 
-const HighlightTextKey = styled.span`
+const HighlightTextKey = styled('span')`
   color: #888;
   font-size: 1.1rem;
   font-weight: bold;
@@ -48,9 +48,9 @@ const HighlightTextKey = styled.span`
   white-space: nowrap;
 `;
 
-export const entityOptionForSelector = option => {
+export const entityOptionForSelector = (props, option) => {
   const highlights = [];
-  if (option.highlights) {
+  if (option?.highlights) {
     Object.keys(option.highlights).forEach(key => {
       highlights.push({ [key]: option.highlights[key].join(' [...] ') });
     });
@@ -97,9 +97,8 @@ export const entityOptionForSelector = option => {
     default:
       break;
   }
-
   return (
-    <>
+    <li {...props} key={option.id}>
       {iconName && (
         <EntityIcon src={`/images/${iconName}`} alt={`${option.type} icon`} />
       )}
@@ -120,6 +119,6 @@ export const entityOptionForSelector = option => {
           </React.Fragment>
         );
       })}
-    </>
+    </li>
   );
 };
