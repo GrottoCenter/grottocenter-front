@@ -509,13 +509,6 @@ class Convert extends React.Component {
 }
 
 Convert.propTypes = {
-  classes: PropTypes.shape({
-    bottomContainer: PropTypes.string,
-    element: PropTypes.string,
-    mainContainer: PropTypes.string,
-    subContainer: PropTypes.string,
-    subElement: PropTypes.string
-  }).isRequired,
   list: PropTypes.arrayOf(PropTypes.shape({})).isRequired
 };
 

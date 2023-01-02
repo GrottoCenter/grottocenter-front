@@ -1,6 +1,5 @@
 import React from 'react';
 import { lighten } from '@mui/material/styles';
-import withStyles from '@mui/styles/withStyles';
 import { Grid, Typography } from '@mui/material';
 import CheckIcon from '@mui/icons-material/Check';
 import styled from 'styled-components';
@@ -26,17 +25,12 @@ const StyledLinkToVersion = styled(GCLink)`
   }
 `;
 
-const StyledCheckIcon = withStyles(
-  theme => ({
-    root: {
-      fill: theme.palette.accent1Color,
-      position: 'relative',
-      top: '6px',
-      marginRight: '10px'
-    }
-  }),
-  { withTheme: true }
-)(CheckIcon);
+const StyledCheckIcon = styled(CheckIcon)(({ theme }) => ({
+  fill: theme.palette.accent1Color,
+  position: 'relative',
+  top: '6px',
+  marginRight: '10px'
+}));
 
 const Api = () => {
   const { formatMessage } = useIntl();

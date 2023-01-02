@@ -1,14 +1,14 @@
 import React from 'react';
 import { isMobileOnly } from 'react-device-detect';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
+import { styled } from '@mui/material/styles';
 
 import SideMenu from '../../SideMenu';
 import ErrorBoundary from '../../../appli/ErrorBoundary';
 
-const MainWrapper = styled.main`
-  flex-grow: 1;
-  transition: ${({ theme, isSideMenuOpen }) =>
+const MainWrapper = styled('main')(({ theme, isSideMenuOpen }) => ({
+  flexGrow: 1,
+  transition:
     !isMobileOnly &&
     theme.transitions.create('margin', {
       easing: isSideMenuOpen
@@ -17,11 +17,9 @@ const MainWrapper = styled.main`
       duration: isSideMenuOpen
         ? theme.transitions.duration.enteringScreen
         : theme.transitions.duration.leavingScreen
-    })};
-  margin-left: ${({ theme, isSideMenuOpen }) =>
-    !isMobileOnly && (isSideMenuOpen ? theme.sideMenuWidth : 0)};
-`;
-
+    }),
+  marginLeft: !isMobileOnly && (isSideMenuOpen ? theme.sideMenuWidth : 0)
+}));
 const Layout = ({
   children,
   isAuth = false,

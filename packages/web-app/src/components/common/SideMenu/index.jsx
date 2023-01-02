@@ -1,18 +1,18 @@
 import React from 'react';
 import { Divider, Drawer, Typography } from '@mui/material';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
+import { styled } from '@mui/material/styles';
 import Translate from '../Translate';
 import MenuLinks from './MenuLinks';
 import Footer from './Footer';
 
-const Wrapper = styled.div`
+const Wrapper = styled('div')`
   display: flex;
   flex-direction: row;
 `;
 
 const SideMenu = ({ isOpen, toggle, isAuth = false, AutoCompleteSearch }) => (
-  <Drawer variant="persistent" anchor="left" open={isOpen} onClose={toggle}>
+  <Drawer variant="permanent" anchor="left" open={isOpen} onClose={toggle}>
     <UserInformation isAuth={isAuth} />
     {!!AutoCompleteSearch && <AutoCompleteSearch />}
     <Divider />
@@ -21,7 +21,7 @@ const SideMenu = ({ isOpen, toggle, isAuth = false, AutoCompleteSearch }) => (
   </Drawer>
 );
 
-const UserContainer = styled.div`
+const UserContainer = styled('div')`
   display: flex;
   flex-direction: column;
   align-self: center;

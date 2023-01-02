@@ -24,30 +24,20 @@ import SearchTableActions from './SearchTableActions';
 import ResultsTableHead from './ResultsTableHead';
 import { ADVANCED_SEARCH_TYPES } from '../../../../conf/config';
 
-const PREFIX = 'SearchResultsTable';
+const StyledTable = styled(Table)`
+  margin-bottom: 0;
+  overflow: 'auto';
+`;
 
-const classes = {
-  table: `${PREFIX}-table`,
-  tableRow: `${PREFIX}-tableRow`,
-  textError: `${PREFIX}-textError`
-};
-
-const Root = styled('div')(() => ({
-  [`& .${classes.table}`]: {
-    marginBottom: 0,
-    overflow: 'auto'
-  },
-
-  [`& .${classes.tableRow}`]: {
-    '&:hover': {
-      cursor: 'pointer'
-    }
-  },
-
-  [`& .${classes.textError}`]: {
-    color: '#ff3333'
+const StyledTableRow = styled(TableRow)`
+  '&:hover': {
+    cursor: 'pointer';
   }
-}));
+`;
+
+const StyledTableError = styled('p')`
+  color: '#ff3333';
+`;
 
 const StyledTableFooter = styled('div')`
   align-items: center;
@@ -310,11 +300,10 @@ class SearchResultsTable extends React.Component {
 
     if (resourceType === '' || resultsSliced === undefined) return '';
     return (
-      <Root ref={this.containerRef}>
+      <div ref={this.containerRef}>
         {resultsSliced.length > 0 ? (
           <>
-            <Table
-              className={classes?.table}
+            <StyledTable
               size="small"
               style={{ display: tableDisplayValueForScroll }}>
               <ResultsTableHead resourceType={resourceType} />
@@ -324,11 +313,10 @@ class SearchResultsTable extends React.Component {
                   opacity: isLoading ? 0.3 : 1
                 }}>
                 {resultsSliced.map(result => (
-                  <TableRow
+                  <StyledTableRow
                     hover
                     key={result.id}
                     selected={selectedIds && selectedIds.includes(result.id)}
-                    className={classes?.tableRow}
                     onClick={() => this.handleRowClick(result)}>
                     {resourceType === ADVANCED_SEARCH_TYPES.ENTRANCES && (
                       <>
@@ -428,10 +416,10 @@ class SearchResultsTable extends React.Component {
                         </TableCell>
                       </>
                     )}
-                  </TableRow>
+                  </StyledTableRow>
                 ))}
               </TableBody>
-            </Table>
+            </StyledTable>
 
             <StyledTableFooter>
               <Button
@@ -486,7 +474,7 @@ class SearchResultsTable extends React.Component {
               </div>
             )}
             {!canDownloadDataAsCSV && (
-              <p className={classes?.textError}>
+              <StyledTableError>
                 <Translate
                   id="Too many results to download ({0}). You can only download {1} results at once."
                   defaultMessage="Too many results to download ({0}). You can only download {1} results at once."
@@ -495,7 +483,7 @@ class SearchResultsTable extends React.Component {
                     1: <b>{MAX_NUMBER_OF_DATA_TO_EXPORT_IN_CSV}</b>
                   }}
                 />
-              </p>
+              </StyledTableError>
             )}
           </>
         ) : (
@@ -506,7 +494,7 @@ class SearchResultsTable extends React.Component {
             })}
           />
         )}
-      </Root>
+      </div>
     );
   }
 }
