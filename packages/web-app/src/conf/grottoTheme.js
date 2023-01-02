@@ -113,142 +113,170 @@ export const overridings = {
     }
   },
   // https://material-ui.com/customization/globals/#default-props
-  props: {
+  components: {
     MuiTooltip: {
-      arrow: true
+      defaultProps: {
+        arrow: true
+      }
     },
     MuiTextField: {
-      variant: 'filled'
+      defaultProps: {
+        variant: 'filled'
+      }
     },
     MuiButton: {
-      variant: 'contained'
-    }
-    // For default color on a specific variant on Typography
-    // Wait until V5 to (maybe) use this for some titles
-    // https://github.com/mui-org/material-ui/issues/15573
-    // MuiTypography: {
-    //   h5: {
-    //     color: 'secondary',
-    //   },
-    // },
-  },
-  overrides: {
+      defaultProps: {
+        variant: 'contained'
+      }
+    },
     MuiSkeleton: {
-      root: {
-        backgroundColor: brown['100']
-      },
-      pulse: {
-        animationDuration: '1s'
+      styleOverrides: {
+        root: {
+          backgroundColor: brown['100']
+        },
+        pulse: {
+          animationDuration: '1s'
+        }
       }
     },
     MuiFormHelperText: {
-      root: {
-        color: brown['500'],
-        fontSize: '1.3rem'
+      styleOverrides: {
+        root: {
+          color: brown['500'],
+          fontSize: '1.3rem'
+        }
       }
     },
     MuiCardContent: {
-      root: {
-        padding: isMobile ? paddingUnit : paddingUnit * 2
+      styleOverrides: {
+        root: {
+          padding: isMobile ? paddingUnit : paddingUnit * 2
+        }
       }
     },
     MuiCardHeader: {
-      root: {
-        padding: isMobile ? paddingUnit : paddingUnit * 2
+      styleOverrides: {
+        root: {
+          padding: isMobile ? paddingUnit : paddingUnit * 2
+        }
       }
     },
     MuiChip: {
-      root: {
-        backgroundColor: brown['500'],
-        color: '#fff'
+      styleOverrides: {
+        root: {
+          backgroundColor: brown['500'],
+          color: '#fff'
+        }
       }
     },
     MuiDialog: {
-      paper: {
-        backgroundColor: grey['200']
+      styleOverrides: {
+        paper: {
+          backgroundColor: grey['200']
+        }
       }
     },
     MuiDrawer: {
-      root: {
-        width: sideMenuWidth,
-        flexShrink: 0
-      },
-      paper: {
-        top: appBarHeight,
-        height: `calc(100% - ${appBarHeight}px)`,
-        width: sideMenuWidth,
-        padding: '8px'
+      styleOverrides: {
+        root: {
+          width: sideMenuWidth,
+          flexShrink: 0
+        },
+        paper: {
+          top: appBarHeight,
+          height: `calc(100% - ${appBarHeight}px)`,
+          width: sideMenuWidth,
+          padding: '8px'
+        }
       }
     },
     MuiDivider: {
-      root: {
-        backgroundColor: brown['500']
+      styleOverrides: {
+        root: {
+          backgroundColor: brown['500']
+        }
       }
     },
     MuiInputBase: {
-      root: {
-        color: 'inherit'
+      styleOverrides: {
+        root: {
+          color: 'inherit'
+        }
       }
     },
     MuiFormControl: {
-      root: {
-        padding: '4px'
+      styleOverrides: {
+        root: {
+          padding: '4px'
+        }
       }
     },
     MuiSelect: {
-      root: {
-        fontFamily
+      styleOverrides: {
+        root: {
+          fontFamily
+        }
       }
     },
     MuiToolbar: {
-      root: {
-        height: `${appBarHeight}px`
+      styleOverrides: {
+        root: {
+          height: `${appBarHeight}px`
+        }
+      },
+      gutterBottom: {
+        marginBottom: '1rem'
       }
     },
-    gutterBottom: {
-      marginBottom: '1rem'
-    },
     MuiLink: {
-      root: {
-        display: 'flex'
+      styleOverrides: {
+        root: {
+          display: 'flex'
+        }
       }
     },
     MuiTableCell: {
-      root: {
-        borderBottom: `1px solid ${brown['100']}`
-      },
-      head: {
-        backgroundColor: brown['500'],
-        color: grey['100']
+      styleOverrides: {
+        root: {
+          borderBottom: `1px solid ${brown['100']}`
+        },
+        head: {
+          backgroundColor: brown['500'],
+          color: grey['100']
+        }
       }
     },
     MuiStepIcon: {
-      active: {
-        color: `${orange['700']} !important`,
-        borderRadius: '100%'
+      styleOverrides: {
+        active: {
+          color: `${orange['700']} !important`,
+          borderRadius: '100%'
+        }
       }
     },
     MuiStepConnector: {
-      line: {
-        borderWidth: '1px'
-      },
-      lineHorizontal: {
-        borderWidth: '1px'
-      },
-      lineVertical: {
-        borderWidth: 0,
-        borderLeftWidth: '1px'
-      },
-      active: {
-        '& $line': {
-          borderColor: brown['300'],
-          borderStyle: 'dashed'
-        }
-      },
-      completed: {
-        '& $line': {
-          borderColor: brown['500'],
-          borderWidth: '2px'
+      styleOverrides: {
+        line: {
+          borderWidth: '1px'
+        },
+        lineHorizontal: {
+          borderWidth: '1px'
+        },
+        lineVertical: {
+          borderWidth: 0,
+          borderLeftWidth: '1px'
+        },
+        active: {
+          '& $line': {
+            borderColor: brown['300'],
+            borderStyle: 'dashed'
+          }
+        },
+        completed: {
+          '& $line': {
+            borderColor: brown['500'],
+            borderWidth: '2px'
+          }
         }
       }
     }

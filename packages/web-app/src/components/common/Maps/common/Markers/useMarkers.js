@@ -6,11 +6,11 @@ import { renderToString } from 'react-dom/server';
 import {
   createGlobalStyle,
   keyframes,
-  ThemeProvider as StyledThemeProvider,
-  StyledEngineProvider
+  ThemeProvider as StyledThemeProvider
 } from 'styled-components';
+import { StyledEngineProvider, ThemeProvider } from '@mui/material/styles';
+
 import { BrowserRouter } from 'react-router-dom';
-import { ThemeProvider } from '@mui/material/styles';
 import { IntlProvider } from 'react-intl';
 import { useSelector } from 'react-redux';
 import theme from '../../../../../conf/grottoTheme';
