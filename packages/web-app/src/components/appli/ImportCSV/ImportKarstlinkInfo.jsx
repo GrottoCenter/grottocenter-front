@@ -1,34 +1,41 @@
 import React from 'react';
+import { styled } from '@mui/material/styles';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
 import { Button } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
 import InfoIcon from '@mui/icons-material/Info';
 import DownloadIcon from '@mui/icons-material/GetApp';
 import { useIntl } from 'react-intl';
 import { ENTRANCE, DOCUMENT } from './constants';
 
-const useStyles = makeStyles({
-  karstlinkFooter: {
+const PREFIX = 'ImportKarstlinkInfo';
+
+const classes = {
+  karstlinkFooter: `${PREFIX}-karstlinkFooter`,
+  karstlinkButton: `${PREFIX}-karstlinkButton`
+};
+
+// TODO jss-to-styled codemod: The Fragment root was replaced by div. Change the tag if needed.
+const Root = styled('div')({
+  [`& .${classes.karstlinkFooter}`]: {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-around',
     width: 'auto'
   },
 
-  karstlinkButton: {
+  [`& .${classes.karstlinkButton}`]: {
     width: 'fit-content',
     margin: '0 0 0 1rem'
   }
 });
 
-const KarstlinkLogo = styled.img`
+const KarstlinkLogo = styled('img')`
   width: 15%;
   height: 15%;
   border-radius: 0.5rem;
 `;
 
-const KarstlinkParagraph = styled.p`
+const KarstlinkParagraph = styled('p')`
   text-align: justify;
   font-weight: 300;
   font-size: large;
@@ -36,7 +43,6 @@ const KarstlinkParagraph = styled.p`
 
 const ImportKarstlinkInfo = ({ selectType }) => {
   const { formatMessage } = useIntl();
-  const classes = useStyles();
 
   let title = '';
   let link = '';
@@ -54,7 +60,7 @@ const ImportKarstlinkInfo = ({ selectType }) => {
   }
 
   return (
-    <>
+    <Root>
       <div>
         <KarstlinkParagraph>
           {formatMessage({
@@ -99,7 +105,7 @@ const ImportKarstlinkInfo = ({ selectType }) => {
           </Button>
         </div>
       </div>
-    </>
+    </Root>
   );
 };
 ImportKarstlinkInfo.propTypes = {

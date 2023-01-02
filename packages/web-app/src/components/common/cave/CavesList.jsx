@@ -1,17 +1,25 @@
 import React from 'react';
+import { styled } from '@mui/material/styles';
 import PropTypes from 'prop-types';
 import { List, Typography } from '@mui/material';
-import withStyles from '@mui/styles/withStyles';
 import Translate from '../Translate';
 import CaveListItem from './CaveListItem';
 
-const StyledList = withStyles({
-  root: {
+const PREFIX = 'CavesList';
+
+const classes = {
+  root: `${PREFIX}-root`
+};
+
+const StyledTranslate = styled(Translate)({
+  [`& .${classes.root}`]: {
     display: 'flex',
     flexWrap: 'wrap',
     width: '100%'
   }
-})(List);
+});
+
+const StyledList = List;
 
 const CavesList = props => {
   const { caves, title, emptyMessageComponent } = props;
@@ -20,7 +28,10 @@ const CavesList = props => {
     <div>
       <Typography variant="h3">{title}</Typography>
       {caves && caves.length > 0 ? (
-        <StyledList>
+        <StyledList
+          classes={{
+            root: classes.root
+          }}>
           {caves
             .sort((a, b) => a.name.localeCompare(b.name))
             .map(cave => (
@@ -42,7 +53,7 @@ CavesList.propTypes = {
 
 CavesList.defaultProps = {
   caves: [],
-  title: <Translate>Caves list</Translate>,
+  title: <StyledTranslate>Caves list</StyledTranslate>,
   emptyMessageComponent: <Translate>Empty list</Translate>
 };
 

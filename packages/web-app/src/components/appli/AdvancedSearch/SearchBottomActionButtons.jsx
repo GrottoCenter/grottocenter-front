@@ -1,17 +1,25 @@
 import React from 'react';
+import { styled } from '@mui/material/styles';
 import PropTypes from 'prop-types';
 
 import SearchIcon from '@mui/icons-material/Search';
 import ClearIcon from '@mui/icons-material/Clear';
 
 import { Button, CardActions } from '@mui/material';
-import withStyles from '@mui/styles/withStyles';
 import { Breakpoint } from 'react-socks';
 
 import Translate from '../../common/Translate';
 
-const buttonsStyle = () => ({
-  cardBottomButtons: {
+const PREFIX = 'SearchBottomActionButtons';
+
+const classes = {
+  cardBottomButtons: `${PREFIX}-cardBottomButtons`,
+  bottomButton: `${PREFIX}-bottomButton`,
+  bottomButtonSmallScreen: `${PREFIX}-bottomButtonSmallScreen`
+};
+
+const StyledCardActions = styled(CardActions)(() => ({
+  [`&.${classes.cardBottomButtons}`]: {
     display: 'block',
     marginTop: '10px',
     padding: 0,
@@ -19,22 +27,22 @@ const buttonsStyle = () => ({
     width: '100%'
   },
 
-  bottomButton: {
+  [`& .${classes.bottomButton}`]: {
     margin: '0 4px'
   },
 
-  bottomButtonSmallScreen: {
+  [`& .${classes.bottomButtonSmallScreen}`]: {
     marginBottom: '10px',
     width: '100%'
   }
-});
+}));
 
 class SearchBottomActionButtons extends React.Component {
   render() {
-    const { classes, resetResults, resetParentState } = this.props;
+    const { resetResults, resetParentState } = this.props;
 
     return (
-      <CardActions className={classes.cardBottomButtons}>
+      <StyledCardActions className={classes.cardBottomButtons}>
         <Breakpoint customQuery="(max-width: 450px)">
           <Button
             className={classes.bottomButtonSmallScreen}
@@ -82,7 +90,7 @@ class SearchBottomActionButtons extends React.Component {
             <Translate>Reset</Translate>
           </Button>
         </Breakpoint>
-      </CardActions>
+      </StyledCardActions>
     );
   }
 }
@@ -97,4 +105,4 @@ SearchBottomActionButtons.propTypes = {
   resetParentState: PropTypes.func.isRequired
 };
 
-export default withStyles(buttonsStyle)(SearchBottomActionButtons);
+export default SearchBottomActionButtons;

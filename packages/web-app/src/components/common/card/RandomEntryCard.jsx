@@ -1,21 +1,42 @@
 import React, { useEffect } from 'react';
+import { styled } from '@mui/material/styles';
 import PropTypes from 'prop-types';
 import FullStarIcon from '@mui/icons-material/Star';
 import EmptyStarIcon from '@mui/icons-material/StarBorder';
 import HalfStarIcon from '@mui/icons-material/StarHalf';
 import CircularProgress from '@mui/material/CircularProgress';
-import styled from 'styled-components';
-import withStyles from '@mui/styles/withStyles';
 import { isNil } from 'ramda';
 import GCLink from '../GCLink';
 import Translate from '../Translate';
 
-const FlexWrapper = styled.div`
+const PREFIX = 'RandomEntryCard';
+
+const classes = {
+  root: `${PREFIX}-root`,
+  root2: `${PREFIX}-root2`,
+  root3: `${PREFIX}-root3`
+};
+
+const Root = styled('div')({
+  [`& .${classes.root}`]: {
+    fill: '#ffd700'
+  },
+
+  [`& .${classes.root2}`]: {
+    fill: '#ffd700'
+  },
+
+  [`& .${classes.root3}`]: {
+    fill: '#ffd700'
+  }
+});
+
+const FlexWrapper = styled('div')`
   display: flex;
   flex-wrap: wrap;
 `;
 
-const FlexItemWrapper = styled.div`
+const FlexItemWrapper = styled('div')`
   flex: 1;
   flex-basis: 300px;
   margin: ${({ theme }) => theme.spacing(2)};
@@ -24,7 +45,7 @@ const FlexItemWrapper = styled.div`
 
 const EntryData = ({ entry }) => {
   if (!entry) {
-    return <div />;
+    return <Root />;
   }
   let imageElement = null;
   const { documents, cave, stats, timeInfo } = entry;
@@ -62,12 +83,12 @@ EntryData.propTypes = {
   }).isRequired
 };
 
-const EntryName = styled.h4`
+const EntryName = styled('h4')`
   font-weight: 400;
   margin-bottom: 0;
 `;
 
-const EntryLocalizationPart = styled.h5`
+const EntryLocalizationPart = styled('h5')`
   font-size: 1.5em;
   margin-bottom: 0;
   overflow: hidden;
@@ -96,7 +117,7 @@ EntryTitle.propTypes = {
   }).isRequired
 };
 
-const RatingList = styled.ul`
+const RatingList = styled('ul')`
   list-style-type: none;
 `;
 
@@ -123,7 +144,7 @@ EntryStat.propTypes = {
   }).isRequired
 };
 
-const StatEntry = styled.li`
+const StatEntry = styled('li')`
   display: inline-flex;
   width: 100%;
 
@@ -136,28 +157,16 @@ const StatEntry = styled.li`
   }
 `;
 
-const Stars = styled.div`
+const Stars = styled('div')`
   display: inline;
   white-space: nowrap;
 `;
 
-const StyledFullStarIcon = withStyles({
-  root: {
-    fill: '#ffd700'
-  }
-})(FullStarIcon);
+const StyledFullStarIcon = FullStarIcon;
 
-const StyledHalfStarIcon = withStyles({
-  root: {
-    fill: '#ffd700'
-  }
-})(HalfStarIcon);
+const StyledHalfStarIcon = HalfStarIcon;
 
-const StyledEmptyStarIcon = withStyles({
-  root: {
-    fill: '#ffd700'
-  }
-})(EmptyStarIcon);
+const StyledEmptyStarIcon = EmptyStarIcon;
 
 const EntryStatItem = ({ itemLabel, itemScore }) => {
   if (!itemScore) {
@@ -169,16 +178,37 @@ const EntryStatItem = ({ itemLabel, itemScore }) => {
   let displayed = 0;
 
   for (let i = 0; i < Math.floor(score); i += 1) {
-    starsToDisplay.push(<StyledFullStarIcon key={`star${i}`} />);
+    starsToDisplay.push(
+      <StyledFullStarIcon
+        key={`star${i}`}
+        classes={{
+          root: classes.root
+        }}
+      />
+    );
     displayed += 1;
   }
   if (Math.floor(score) < score) {
-    starsToDisplay.push(<StyledHalfStarIcon key="starh" />);
+    starsToDisplay.push(
+      <StyledHalfStarIcon
+        key="starh"
+        classes={{
+          root: classes.root2
+        }}
+      />
+    );
     displayed += 1;
   }
   if (displayed < 5) {
     for (let i = displayed; i < 5; i += 1) {
-      starsToDisplay.push(<StyledEmptyStarIcon key={`star${i}`} />);
+      starsToDisplay.push(
+        <StyledEmptyStarIcon
+          key={`star${i}`}
+          classes={{
+            root: classes.root3
+          }}
+        />
+      );
     }
   }
 
@@ -247,7 +277,7 @@ EntryInfos.propTypes = {
   }).isRequired
 };
 
-const EntryInfoWrapper = styled.div`
+const EntryInfoWrapper = styled('div')`
   width: 50%;
   display: inline-flex;
   line-height: 50px;
@@ -255,17 +285,17 @@ const EntryInfoWrapper = styled.div`
   font-size: 1.4em;
 `;
 
-const InfoImage = styled.img`
+const InfoImage = styled('img')`
   height: 50px;
   width: 50px;
 `;
 
-const InfoValue = styled.span`
+const InfoValue = styled('span')`
   margin-left: 6px;
   white-space: nowrap;
 `;
 
-const InfoUnit = styled.span`
+const InfoUnit = styled('span')`
   margin-left: 6px;
   white-space: nowrap;
 `;
@@ -304,12 +334,12 @@ EntryInfoItem.propTypes = {
   itemType: PropTypes.string
 };
 
-const TopoImage = styled.img`
+const TopoImage = styled('img')`
   width: 100%;
   background-color: white;
 `;
 
-const NoImage = styled.img`
+const NoImage = styled('img')`
   font-weight: 300;
   font-style: italic;
 `;
@@ -334,7 +364,7 @@ const RandomEntryLink = styled(GCLink)`
   color: white;
 `;
 
-const EntryWrapper = styled.div`
+const EntryWrapper = styled('div')`
   background-color: rgba(110, 110, 110, 0.5);
   border-radius: ${({ theme }) => theme.spacing(1)};
   color: white;

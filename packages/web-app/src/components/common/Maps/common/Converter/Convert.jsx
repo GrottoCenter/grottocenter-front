@@ -1,11 +1,10 @@
 /* eslint-disable react/forbid-prop-types */
 import React from 'react';
-import withStyles from '@mui/styles/withStyles';
+import { styled } from '@mui/material/styles';
 import withTheme from '@mui/styles/withTheme';
 import PropTypes from 'prop-types';
 import proj4 from 'proj4';
 import Button from '@mui/material/Button';
-import styled from 'styled-components';
 import Input from '@mui/material/Input';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
@@ -14,30 +13,44 @@ import Divider from '@mui/material/Divider';
 import { unitsTab } from '../../../../../conf/ListGPSProj';
 import Translate from '../../../Translate';
 
-const styles = theme => ({
-  mainContainer: {
+const PREFIX = 'Convert';
+
+const classes = {
+  mainContainer: `${PREFIX}-mainContainer`,
+  subContainer: `${PREFIX}-subContainer`,
+  bottomContainer: `${PREFIX}-bottomContainer`,
+  element: `${PREFIX}-element`,
+  subElement: `${PREFIX}-subElement`
+};
+
+const Root = styled('div')(({ theme }) => ({
+  [`&.${classes.mainContainer}`]: {
     backgroundColor: theme.palette.primary1Color,
     padding: '10px'
   },
-  subContainer: {
+
+  [`& .${classes.subContainer}`]: {
     backgroundColor: theme.palette.primary3Color,
     padding: '10px',
     margin: '20px',
     textAlign: 'center'
   },
-  bottomContainer: {
+
+  [`& .${classes.bottomContainer}`]: {
     padding: '10px',
     margin: '20px',
     textAlign: 'center'
   },
-  element: {
+
+  [`& .${classes.element}`]: {
     display: 'table'
   },
-  subElement: {
+
+  [`& .${classes.subElement}`]: {
     display: 'table-cell',
     verticalAlign: 'middle'
   }
-});
+}));
 
 // For input of coordinates
 const StyledInput = withTheme(styled(Input)`
@@ -97,7 +110,7 @@ const StyledDivider = withTheme(styled(Divider)`
   }
 `);
 
-const StyledTitle = styled.h5`
+const StyledTitle = styled('h5')`
   font-weight: bold;
 `;
 
@@ -284,7 +297,6 @@ class Convert extends React.Component {
   }
 
   render() {
-    const { classes } = this.props;
     const {
       hemiInput,
       hemiOutput,
@@ -327,7 +339,7 @@ class Convert extends React.Component {
     });
 
     return (
-      <div id="convert" className={classes.mainContainer}>
+      <Root id="convert" className={classes.mainContainer}>
         {/* INPUT SECTION */}
         <div id="input" className={classes.subContainer}>
           <StyledTitle>
@@ -491,7 +503,7 @@ class Convert extends React.Component {
             <a href="http://spatialreference.org">Spatial Reference</a>.
           </span>
         </div>
-      </div>
+      </Root>
     );
   }
 }
@@ -507,4 +519,4 @@ Convert.propTypes = {
   list: PropTypes.arrayOf(PropTypes.shape({})).isRequired
 };
 
-export default withStyles(styles)(Convert);
+export default Convert;

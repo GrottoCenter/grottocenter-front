@@ -1,4 +1,5 @@
 import React, { useContext, useEffect, useCallback } from 'react';
+import { styled } from '@mui/material/styles';
 import { includes } from 'ramda';
 import {
   Card,
@@ -7,8 +8,6 @@ import {
   Typography,
   LinearProgress as MuiLinearProgress
 } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
-import styled from 'styled-components';
 import { useSelector } from 'react-redux';
 import ImportTabs from './ImportTabs';
 import Stepper from '../../common/Form/Stepper';
@@ -18,12 +17,19 @@ import Translate from '../../common/Translate';
 import { useBoolean } from '../../../hooks';
 import { ENTRANCE, DOCUMENT } from './constants';
 
-const useStyles = makeStyles({
-  root: {
+const PREFIX = 'HydratedImportContainer';
+
+const classes = {
+  root: `${PREFIX}-root`,
+  stepper: `${PREFIX}-stepper`
+};
+
+const StyledProvider = styled(Provider)({
+  [`& .${classes.root}`]: {
     minWidth: 275
   },
 
-  stepper: {
+  [`& .${classes.stepper}`]: {
     margin: '0 0 1rem 0'
   }
 });
@@ -37,7 +43,6 @@ const StyledDivider = styled(Divider)`
 `;
 
 const ImportContainer = () => {
-  const classes = useStyles();
   const {
     isTrue: isNextStepDisabled,
     true: enableNextStep,
@@ -118,9 +123,9 @@ const ImportContainer = () => {
   );
 };
 const HydratedImportContainer = () => (
-  <Provider>
+  <StyledProvider>
     <ImportContainer />
-  </Provider>
+  </StyledProvider>
 );
 
 HydratedImportContainer.propTypes = {};
