@@ -41,7 +41,6 @@ import moderator from './ModeratorReducer';
 import moveEntranceToCave from './MoveEntranceToCaveReducer';
 import notifications from './NotificationsReducer';
 import organization from './OrganizationReducer';
-import pageTitle from './PageTitleReducer';
 import partnersCarousel from './PartnersCarouselReducer';
 import person from './PersonReducer';
 import updatePersonGroups from './UpdatePersonGroupesReducer';
@@ -113,7 +112,6 @@ const GCReducer = combineReducers({
   moveEntranceToCave,
   notifications,
   organization,
-  pageTitle,
   partnersCarousel,
   person,
   processDocuments,

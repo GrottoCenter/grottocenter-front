@@ -3,7 +3,6 @@ import { useParams, useHistory } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { fetchOrganization } from '../../actions/Organization/GetOrganization';
-import { setPageTitle } from '../../actions/PageTitle';
 import Organization from '../../components/appli/Organization';
 import { usePermissions } from '../../hooks';
 import getAuthor from '../../util/getAuthor';
@@ -25,7 +24,6 @@ const OrganizationPage = () => {
 
   useEffect(() => {
     dispatch(fetchOrganization(organizationId));
-    dispatch(setPageTitle('Organization'));
   }, [dispatch, organizationId]);
 
   const onEdit = () => {
