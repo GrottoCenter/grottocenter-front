@@ -1,9 +1,9 @@
 import { useMapEvent } from 'react-leaflet';
-import { useCallback, useEffect, useState } from 'react';
-import { isNil, pipe, pluck, map as rMap, reverse } from 'ramda';
+import { useCallback, useEffect, useState, useRef } from 'react';
+import { isNil } from 'ramda';
 import * as d3 from 'd3';
-import 'd3-hexbin';
 import * as L from 'leaflet';
+import 'd3-hexbin';
 // after L import
 import '@asymmetrik/leaflet-d3';
 import { createGlobalStyle } from 'styled-components';
@@ -44,11 +44,10 @@ export const HexGlobalCss = createGlobalStyle`
 
 // For more customization see https://github.com/Asymmetrik/leaflet-d3 documentation
 
-const convertD3Position = pipe(pluck('o'), rMap(reverse));
-
 const useHeatLayer = (data = [], type = heatmapTypes.ENTRANCES) => {
   const { formatMessage } = useIntl();
   const [hexLayer, setHexLayer] = useState();
+  const lastMoveEndTs = useRef(0);
 
   // On zoom lvl, hex opacity and size can change
   const map = useMapEvent('zoomend', () => {
@@ -93,9 +92,18 @@ const useHeatLayer = (data = [], type = heatmapTypes.ENTRANCES) => {
     [hexLayer]
   );
 
-  const flyToHex = hex => {
+  useMapEvent('moveend', () => {
+    lastMoveEndTs.current = Date.now();
+  });
+
+  const flyToHex = (_, hexPoints) => {
+    const timeSinceMapMoveMs = Date.now() - lastMoveEndTs.current;
+    if (timeSinceMapMoveMs < 20) return; // Prevent drag click
+
     d3.selectAll('.hexbin-tooltip').attr('opacity', 0);
-    const bounds = new L.LatLngBounds(convertD3Position(hex));
+    const bounds = new L.LatLngBounds(
+      hexPoints.map(point => point.o.reverse())
+    );
     map.flyToBounds(bounds, {
       maxZoom: MARKERS_LIMIT,
       duration: HEX_FLY_TO_DURATION
