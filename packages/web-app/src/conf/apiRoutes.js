@@ -109,6 +109,8 @@ export const getSnapshotsUrl = (typeId, typeName, isNetwork) =>
 export const getMassifUrl = `${API_BASE_PATH}/massifs/`;
 export const postCreateMassifUrl = `${API_BASE_PATH}/massifs/`;
 export const putMassifUrl = massifId => `${API_BASE_PATH}/massifs/${massifId}`;
+export const getStatisticsMassifUrl = massifId =>
+  `${API_BASE_PATH}/massifs/${massifId}/statistics`;
 
 // ===== Notifications urls
 export const countUnreadNotificationsUrl = `${API_URL}/api/${apiVersion}/notifications/unread/count`;
