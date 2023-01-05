@@ -63,6 +63,7 @@ const MassifPage = () => {
     />
   ) : (
     <Massif
+      massifId={massifId}
       isFetching={isFetching || !isNil(error)}
       error={error}
       descriptions={descriptions}

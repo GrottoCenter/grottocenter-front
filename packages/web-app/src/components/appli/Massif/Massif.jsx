@@ -12,8 +12,10 @@ import MassifPropTypes from './propTypes';
 import MapMassif from './MapMassif';
 import Descriptions from './Descriptions';
 import { useSubscriptions } from '../../../hooks';
+import Dashboard from '../Dashboard';
 
 const Massif = ({
+  massifId,
   isFetching,
   error,
   descriptions,
@@ -28,8 +30,10 @@ const Massif = ({
   onUnsubscribe
 }) => {
   const { formatMessage } = useIntl();
-  const { isSubscribed: isSubscribedMethod, isMassifLoading: isLoading } =
-    useSubscriptions();
+  const {
+    isSubscribed: isSubscribedMethod,
+    isMassifLoading: isLoading
+  } = useSubscriptions();
   const isSubscribed = details ? isSubscribedMethod(details.id) : false;
 
   const { geogPolygon, name, names } = details;
@@ -77,7 +81,8 @@ const Massif = ({
           {error && (
             <Alert
               title={formatMessage({
-                id: 'Error, the massif data you are looking for is not available.'
+                id:
+                  'Error, the massif data you are looking for is not available.'
               })}
               severity="error"
             />
@@ -106,6 +111,8 @@ const Massif = ({
                   <MapMassif entrances={entrances} geogPolygon={geogPolygon} />
                 </>
               )}
+              <hr />
+              <Dashboard id={massifId} />
               <hr />
               <DocumentsList
                 docs={documents}
