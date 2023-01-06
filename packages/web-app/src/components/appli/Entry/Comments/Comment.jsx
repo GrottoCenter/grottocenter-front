@@ -12,6 +12,7 @@ import EditIcon from '@material-ui/icons/Edit';
 import { useDispatch } from 'react-redux';
 import CancelIcon from '@material-ui/icons/Cancel';
 import { isEmpty, pathOr } from 'ramda';
+import HistoryIcon from '@material-ui/icons/History';
 import { usePermissions, useUserProperties } from '../../../../hooks';
 import { updateComment } from '../../../../actions/Comment/UpdateComment';
 import CreateCommentForm from '../../Form/CommentForm/index';
@@ -35,6 +36,7 @@ const Comment = ({ comment }) => {
   const dispatch = useDispatch();
   const permissions = usePermissions();
   const {
+    id,
     title,
     body,
     author,
@@ -127,6 +129,9 @@ const Comment = ({ comment }) => {
             color="primary"
             aria-label="edit">
             {isFormVisible ? <CancelIcon /> : <EditIcon />}
+          </IconButton>
+          <IconButton href={`/ui/comments/${id}/snapshots`} color="primary">
+            <HistoryIcon />
           </IconButton>
         </ListItemIcon>
       )}

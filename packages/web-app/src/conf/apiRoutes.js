@@ -99,6 +99,10 @@ export const postLocationUrl = `${API_BASE_PATH}/locations`;
 export const putLocationUrl = locationId =>
   `${API_BASE_PATH}/locations/${locationId}`;
 
+// ===== Snapshots urls
+export const getSnapshotsUrl = (typeId, typeName) =>
+  `${API_BASE_PATH}/${typeName}/${typeId}/snapshots`;
+
 // ===== Massifs urls
 export const getMassifUrl = `${API_BASE_PATH}/massifs/`;
 export const postCreateMassifUrl = `${API_BASE_PATH}/massifs/`;

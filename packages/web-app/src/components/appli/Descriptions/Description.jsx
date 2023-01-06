@@ -10,6 +10,7 @@ import {
 import { useDispatch } from 'react-redux';
 import EditIcon from '@material-ui/icons/Edit';
 import CancelIcon from '@material-ui/icons/Cancel';
+import HistoryIcon from '@material-ui/icons/History';
 
 import { descriptionType } from './propTypes';
 import CreateDescriptionForm from '../Form/DescriptionForm/index';
@@ -20,7 +21,7 @@ import Contribution from '../../common/Contribution/Contribution';
 const Description = ({ description }) => {
   const dispatch = useDispatch();
   const permissions = usePermissions();
-  const { author, reviewer, body, creationDate, reviewedDate, title } =
+  const { id, author, reviewer, body, creationDate, reviewedDate, title } =
     description;
   const [isFormVisible, setIsFormVisible] = useState(false);
 
@@ -72,6 +73,11 @@ const Description = ({ description }) => {
           </IconButton>
         </ListItemIcon>
       )}
+      <ListItemIcon style={{ alignSelf: 'start' }}>
+        <IconButton href={`/ui/descriptions/${id}/snapshots`} color="primary">
+          <HistoryIcon />
+        </IconButton>
+      </ListItemIcon>
     </ListItem>
   );
 };
