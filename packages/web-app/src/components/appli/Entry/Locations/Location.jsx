@@ -10,6 +10,7 @@ import {
 import { useDispatch } from 'react-redux';
 import EditIcon from '@material-ui/icons/Edit';
 import CancelIcon from '@material-ui/icons/Cancel';
+import HistoryIcon from '@material-ui/icons/History';
 
 import { locationType } from '../Provider';
 import CreateLocationForm from '../../Form/LocationForm/index';
@@ -72,6 +73,13 @@ const Location = ({ location }) => {
           </IconButton>
         </ListItemIcon>
       )}
+      <ListItemIcon style={{ alignSelf: 'start' }}>
+        <IconButton
+          href={`/ui/locations/${location.id}/snapshots`}
+          color="primary">
+          <HistoryIcon />
+        </IconButton>
+      </ListItemIcon>
     </ListItem>
   );
 };

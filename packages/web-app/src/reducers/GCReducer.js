@@ -53,6 +53,7 @@ import readNotification from './ReadNotificationReducer';
 import region from './RegionReducer';
 import sideMenu from './SideMenuReducer';
 import signUp from './SignUpReducer';
+import snapshots from './SnapshotReducer';
 import subject from './SubjectReducer';
 import subscribeToCountry from './SubscribeToCountryReducer';
 import subscribeToMassif from './SubscribeToMassifReducer';
@@ -124,6 +125,7 @@ const GCReducer = combineReducers({
   region,
   sideMenu,
   signUp,
+  snapshots,
   subject,
   subscribeToCountry,
   subscribeToMassif,
