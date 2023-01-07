@@ -1,19 +1,18 @@
-import React, { useContext, useMemo } from 'react';
+import React, { useContext, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import { styled } from '@mui/material/styles';
-import DateFnsUtils from '@date-io/date-fns';
-import { Button, FormHelperText } from '@mui/material';
-import {
-  KeyboardDatePicker,
-  MuiPickersUtilsProvider
-} from '@material-ui/pickers';
+import { Button, FormHelperText, TextField } from '@mui/material';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import { DatePicker } from '@mui/x-date-pickers';
+
 import { set as setDate } from 'date-fns';
 import Translate from '../../../../common/Translate';
 
 import { DocumentFormContext } from '../Provider';
 
-const CustomKeyboardDatePicker = styled(KeyboardDatePicker)(() => ({
+const StyledDatePicker = styled(DatePicker)(() => ({
   margin: 0,
   width: '100%'
 }));
@@ -33,19 +32,23 @@ const dateTypeFormats = {
   YEAR_MONTH_DAY: 'dd/MM/yyyy'
 };
 
+const MIN_DATE = new Date('1000-01-01');
+
 const PublicationDatePicker = ({ required = false }) => {
-  const { formatMessage } = useIntl();
+  const { formatMessage, formatDate } = useIntl();
+  const [error, setError] = useState(null);
   const {
     docAttributes: { publicationDate },
     updateAttribute
   } = useContext(DocumentFormContext);
-  const [dateTypes, setDateTypes] = React.useState(
+
+  const [dateTypes, setDateTypes] = useState(
     // Default date format type is deduced from the publicationDate
     publicationDate === ''
-      ? ['year', 'month', 'date']
-      : ['year', 'month', 'date'].slice(0, publicationDate.split('-').length)
+      ? ['year', 'month', 'day']
+      : ['year', 'month', 'day'].slice(0, publicationDate.split('-').length)
   );
-  const [isDatePickerOpen, setIsDatePickerOpen] = React.useState(false);
+  const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
   const handleDateTypesChanges = newTypes => {
     if (newTypes !== dateTypes) {
       setDateTypes(newTypes);
@@ -55,7 +58,7 @@ const PublicationDatePicker = ({ required = false }) => {
 
   const getDisplayedDateFormat = () => {
     if (dateTypes.includes('month')) {
-      if (dateTypes.includes('date')) {
+      if (dateTypes.includes('day')) {
         return dateTypeFormats.YEAR_MONTH_DAY;
       }
       return dateTypeFormats.YEAR_MONTH;
@@ -100,20 +103,31 @@ const PublicationDatePicker = ({ required = false }) => {
     }
   };
 
-  const formHelperProps = {
-    component: props => {
-      /* eslint-disable react/prop-types */
-      const { children } = props;
-      let textToDisplay = children;
-      if (children && children.props) {
-        textToDisplay = children.props.children; // I don't really understand why it's nested like this: should be just props.children once no?
-      }
-      /* eslint-enable react/prop-types */
-      return (
-        <FormHelperText>
-          <Translate>{textToDisplay}</Translate>
-        </FormHelperText>
-      );
+  const handleError = reason => {
+    switch (reason) {
+      case 'disableFuture':
+        setError(
+          formatMessage({ id: 'Date should be in the past or present.' })
+        );
+        break;
+      case 'minDate':
+        setError(
+          formatMessage(
+            {
+              id: 'Date should be after {date}.',
+              defaultMessage: 'Date should be after {date}.'
+            },
+            {
+              date: formatDate(MIN_DATE)
+            }
+          )
+        );
+        break;
+      case 'invalidDate':
+        setError(formatMessage({ id: 'Invalid date.' }));
+        break;
+      default:
+        setError(reason);
     }
   };
 
@@ -143,30 +157,29 @@ const PublicationDatePicker = ({ required = false }) => {
 
   return useMemo(
     () => (
-      <MuiPickersUtilsProvider utils={DateFnsUtils}>
-        <CustomKeyboardDatePicker
-          inputVariant="filled"
-          margin="normal"
-          id="date-picker-dialog"
-          label={<Translate>Publication Date</Translate>}
-          format={getDisplayedDateFormat()}
-          value={getDateObjFromDateString(publicationDate)}
-          onChange={date => handleDateChange(date)}
-          KeyboardButtonProps={{
-            'aria-label': 'change date'
-          }}
-          minDate={new Date('1000-01-01')}
-          invalidDateMessage={<Translate>Invalid Date Format</Translate>}
+      <LocalizationProvider dateAdapter={AdapterDateFns}>
+        <StyledDatePicker
           disableFuture
-          FormHelperTextProps={formHelperProps}
-          required={required}
-          error={required && publicationDate === ''}
-          views={dateTypes}
-          open={isDatePickerOpen}
+          id="date-picker-dialog"
+          inputFormat={getDisplayedDateFormat()}
+          label={<Translate>Publication Date</Translate>}
+          minDate={MIN_DATE}
+          onChange={date => handleDateChange(date)}
           onClose={() => setIsDatePickerOpen(false)}
+          onError={handleError}
           onOpen={() => setIsDatePickerOpen(true)}
-          cancelLabel={formatMessage({ id: 'Cancel' })}
-          okLabel={formatMessage({ id: 'Ok' })}
+          open={isDatePickerOpen}
+          renderInput={params => (
+            <TextField
+              {...params}
+              error={!!error}
+              required={required}
+              helperText={!!error && error}
+            />
+          )}
+          required={required}
+          value={getDateObjFromDateString(publicationDate)}
+          views={dateTypes}
         />
         <ButtonsFlexWrapper>
           <DateButton
@@ -185,7 +198,7 @@ const PublicationDatePicker = ({ required = false }) => {
           <DateButton
             color="primary"
             size="small"
-            onClick={() => handleDateTypesChanges(['year', 'month', 'date'])}>
+            onClick={() => handleDateTypesChanges(['year', 'month', 'day'])}>
             <Translate>Full Date</Translate>
           </DateButton>
         </ButtonsFlexWrapper>
@@ -195,7 +208,7 @@ const PublicationDatePicker = ({ required = false }) => {
             to the date indicated on the document.
           </Translate>
         </FormHelperText>
-      </MuiPickersUtilsProvider>
+      </LocalizationProvider>
     ),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     memoizedValues
