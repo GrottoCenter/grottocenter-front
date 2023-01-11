@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
-import { useIntl } from 'react-intl';
 import { Typography, Box } from '@material-ui/core';
+import { useSelector } from 'react-redux';
 
 const StyledIcon = withStyles(() => ({
   root: {
@@ -25,13 +25,13 @@ const StyledText = withStyles(() => ({
 }))(Typography);
 
 const InlineData = ({ icon, numberData, text }) => {
-  const { formatMessage } = useIntl();
+  const locale = useSelector(state => state.intl);
 
   return (
     <StyledLine>
       <StyledIcon>{icon}</StyledIcon>
       <StyledText>
-        {numberData} {formatMessage({ id: text })}
+        {numberData.toLocaleString(locale)} {text}
       </StyledText>
     </StyledLine>
   );

@@ -5,9 +5,9 @@ import {
 } from '../actions/Massif/GetStatisticsMassif';
 
 const initialState = {
-  data: {},
-  loading: false,
-  error: null
+  dataMassif: {},
+  loadingMassif: false,
+  errorMassif: null
 };
 
 const reducer = (state = initialState, action) => {
@@ -15,19 +15,19 @@ const reducer = (state = initialState, action) => {
     case FETCH_STATISTICS_MASSIF_LOADING:
       return {
         ...state,
-        error: null,
-        loading: true
+        errorMassif: null,
+        loadingMassif: true
       };
     case FETCH_STATISTICS_MASSIF_SUCCESS:
       return {
         ...initialState,
-        data: action.data
+        dataMassif: action.data
       };
     case FETCH_STATISTICS_MASSIF_ERROR:
       return {
         ...state,
-        loading: false,
-        error: action.error
+        loadingMassif: false,
+        errorMassif: action.error
       };
     default:
       return state;

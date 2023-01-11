@@ -55,6 +55,7 @@ import sideMenu from './SideMenuReducer';
 import signUp from './SignUpReducer';
 import snapshots from './SnapshotReducer';
 import statisticsMassif from './StatisticsMassifReducer';
+import statisticsCountry from './StatisticsCountryReducer';
 import subject from './SubjectReducer';
 import subscribeToCountry from './SubscribeToCountryReducer';
 import subscribeToMassif from './SubscribeToMassifReducer';
@@ -128,6 +129,7 @@ const GCReducer = combineReducers({
   signUp,
   snapshots,
   statisticsMassif,
+  statisticsCountry,
   subject,
   subscribeToCountry,
   subscribeToMassif,
