@@ -1,6 +1,5 @@
 import fetch from 'isomorphic-fetch';
 import { getStatisticsMassifUrl } from '../../conf/apiRoutes';
-import makeErrorMessage from '../../helpers/makeErrorMessage';
 
 export const FETCH_STATISTICS_MASSIF_SUCCESS =
   'FETCH_STATISTICS_MASSIF_SUCCESS';
@@ -28,10 +27,7 @@ export const fetchStatisticsMassif = massifId => (dispatch, getState) => {
     .catch(error =>
       dispatch({
         type: FETCH_STATISTICS_MASSIF_ERROR,
-        error: makeErrorMessage(
-          error.message,
-          `Fetching statistics massif id ${massifId}`
-        )
+        error
       })
     );
 };

@@ -19,7 +19,8 @@ const StyledBadge = withStyles(() => ({
 const StyledBox = withStyles(() => ({
   root: {
     display: 'flex',
-    justifyContent: 'space-around'
+    justifyContent: 'space-around',
+    flexWrap: 'wrap'
   }
 }))(Box);
 
@@ -44,11 +45,11 @@ const CavesStatistics = ({ avgDepth, avgLength, totalLength }) => {
                 <img
                   style={styledImg}
                   src="/images/iconsV3/depth.svg"
-                  alt="entry icon"
+                  alt={formatMessage({ id: 'Depth icon' })}
                 />
               }
               numberData={avgDepth}
-              text="average depth"
+              text={formatMessage({ id: 'average depth' })}
             />
           )}
 
@@ -58,12 +59,12 @@ const CavesStatistics = ({ avgDepth, avgLength, totalLength }) => {
                 <img
                   style={styledImg}
                   src="/images/iconsV3/length.svg"
-                  alt="entry icon"
+                  alt={formatMessage({ id: 'Length icon' })}
                 />
               }
               alt="entry icon"
               numberData={avgLength}
-              text="average length"
+              text={formatMessage({ id: 'average length' })}
             />
           )}
 
@@ -78,14 +79,13 @@ const CavesStatistics = ({ avgDepth, avgLength, totalLength }) => {
                     <img
                       style={styledImg}
                       src="/images/iconsV3/length.svg"
-                      alt="network icon"
+                      alt={formatMessage({ id: 'Length icon' })}
                     />
                   </StyledBadge>
                 </Tooltip>
               }
-              // TODO: rename variable in back
               numberData={totalLength.value}
-              text="cumulated length"
+              text={formatMessage({ id: 'cumulated length' })}
             />
           )}
         </StyledBox>

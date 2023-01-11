@@ -15,42 +15,67 @@ const StyledDivider = () => (
   </Box>
 );
 
-const CavesData = ({ nbCaves, nbDivingCaves, nbNetworks }) => {
+const CavesData = ({
+  title,
+  nbMassifs,
+  nbCaves,
+  nbDivingCaves,
+  nbNetworks
+}) => {
   const { formatMessage } = useIntl();
 
   return (
     <ScrollableContent
       dense
-      title={formatMessage({ id: 'Networks and caves' })}
+      title={title}
       content={
         <>
-          {nbCaves && (
+          {nbMassifs !== undefined && nbMassifs !== null && (
+            <>
+              <InlineData
+                icon={
+                  <img
+                    style={styledImg}
+                    src="/images/massif.svg"
+                    alt={formatMessage({ id: 'Massif icon' })}
+                  />
+                }
+                numberData={nbMassifs}
+                text={formatMessage({
+                  id: 'massifs are present in this country.'
+                })}
+              />
+              <StyledDivider />
+            </>
+          )}
+
+          {nbCaves !== undefined && nbCaves !== null && (
             <InlineData
               icon={
                 <img
                   style={styledImg}
                   src="/images/iconsV3/entry.svg"
-                  alt="entry icon"
+                  alt={formatMessage({ id: 'Entrance icon' })}
                 />
               }
               numberData={nbCaves}
-              text="caves are freely accessible."
+              text={formatMessage({ id: 'caves are freely accessible.' })}
             />
           )}
 
-          {nbDivingCaves && (
+          {nbDivingCaves !== undefined && nbDivingCaves !== null && (
             <>
               <StyledDivider />
               <InlineData
                 icon={<Waves color="primary" />}
-                alt="entry icon"
+                alt={formatMessage({ id: 'Waves icon' })}
                 numberData={nbDivingCaves}
-                text="caves are diving."
+                text={formatMessage({ id: 'caves are diving.' })}
               />
             </>
           )}
 
-          {nbNetworks && (
+          {nbNetworks !== undefined && nbNetworks !== null && (
             <>
               <StyledDivider />
               <InlineData
@@ -58,11 +83,11 @@ const CavesData = ({ nbCaves, nbDivingCaves, nbNetworks }) => {
                   <img
                     style={styledImg}
                     src="/images/iconsV3/cave_system.svg"
-                    alt="network icon"
+                    alt={formatMessage({ id: 'Network icon' })}
                   />
                 }
                 numberData={nbNetworks}
-                text="networks are freely accessible."
+                text={formatMessage({ id: 'networks are freely accessible.' })}
               />
             </>
           )}
@@ -73,6 +98,8 @@ const CavesData = ({ nbCaves, nbDivingCaves, nbNetworks }) => {
 };
 
 CavesData.propTypes = {
+  title: PropTypes.string,
+  nbMassifs: PropTypes.number,
   nbCaves: PropTypes.number,
   nbDivingCaves: PropTypes.number,
   nbNetworks: PropTypes.number

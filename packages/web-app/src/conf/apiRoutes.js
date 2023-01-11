@@ -24,6 +24,12 @@ export const getCaveUrl = `${API_BASE_PATH}/caves/`;
 export const postCreateCaveUrl = `${API_BASE_PATH}/caves`;
 export const putCaveUrl = caveId => `${API_BASE_PATH}/caves/${caveId}`;
 
+// ===== Countries urls
+export const getCountryUrl = countryId =>
+  `${API_BASE_PATH}/countries/${countryId}`;
+export const getStatisticsCountryUrl = countryId =>
+  `${API_BASE_PATH}/countries/${countryId}/statistics`;
+
 // ===== Descriptions urls
 export const postDescriptionUrl = `${API_BASE_PATH}/descriptions`;
 export const putDescriptionUrl = descriptionId =>
@@ -172,8 +178,6 @@ export const getLanguagesUrl = `${API_BASE_PATH}/languages`;
 export const regionsSearchUrl = `${API_BASE_PATH}/regions/search/logical/or`;
 export const getLicensesUrl = `${API_BASE_PATH}/licenses`;
 export const getFileFormatsUrl = `${API_BASE_PATH}/file-formats`;
-export const getCountryUrl = countryId =>
-  `${API_BASE_PATH}/countries/${countryId}`;
 
 export const putEntranceWithNewEntitiesUrl = entranceId =>
   `${API_BASE_PATH}/entrances/${entranceId}/new-entities`;

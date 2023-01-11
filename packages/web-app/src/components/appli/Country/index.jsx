@@ -2,8 +2,8 @@ import React from 'react';
 import { isEmpty } from 'ramda';
 import Skeleton from '@material-ui/lab/Skeleton';
 import { useIntl } from 'react-intl';
-
 import { Marker } from 'react-leaflet';
+import StatisticsDataDashboard from '../StatisticsDataDashboard';
 import CustomMapContainer from '../../common/Maps/common/MapContainer';
 import Layout from '../../common/Layouts/Fixed/FixedContent';
 import Alert from '../../common/Alert';
@@ -75,6 +75,8 @@ const Country = ({
               <Marker icon={CoordinatesMarker} position={position} />
             </CustomMapContainer>
           )}
+          <hr />
+          {country && <StatisticsDataDashboard countryId={country?.id} />}
         </>
       }
     />
