@@ -20,23 +20,22 @@ export const updateDescriptionFailure = error => ({
   error
 });
 
-export const updateDescription = ({ id, title, body, language }) => (
-  dispatch,
-  getState
-) => {
-  dispatch(updateDescriptionAction());
+export const updateDescription =
+  ({ id, title, body, language }) =>
+  (dispatch, getState) => {
+    dispatch(updateDescriptionAction());
 
-  const requestOptions = {
-    method: 'PATCH',
-    body: JSON.stringify({ title, body, language }),
-    headers: getState().login.authorizationHeader
+    const requestOptions = {
+      method: 'PATCH',
+      body: JSON.stringify({ title, body, language }),
+      headers: getState().login.authorizationHeader
+    };
+
+    return fetch(putDescriptionUrl(id), requestOptions)
+      .then(checkAndGetStatus)
+      .then(response => response.json())
+      .then(data => dispatch(updateDescriptionSuccess(data)))
+      .catch(errorMessage => {
+        dispatch(updateDescriptionFailure(errorMessage));
+      });
   };
-
-  return fetch(putDescriptionUrl(id), requestOptions)
-    .then(checkAndGetStatus)
-    .then(response => response.json())
-    .then(data => dispatch(updateDescriptionSuccess(data)))
-    .catch(errorMessage => {
-      dispatch(updateDescriptionFailure(errorMessage));
-    });
-};

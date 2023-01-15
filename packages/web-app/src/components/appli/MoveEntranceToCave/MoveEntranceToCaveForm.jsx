@@ -68,8 +68,7 @@ const MoveEntranceToCaveForm = ({ entrance }) => {
         <Alert
           severity="warning"
           content={formatMessage({
-            id:
-              'The entrance is the only one of the cave. Moving it to another existing cave or network will result in deleting it and losing its cave data (depth, discovery year, length, temperature, locations etc.): be careful!'
+            id: 'The entrance is the only one of the cave. Moving it to another existing cave or network will result in deleting it and losing its cave data (depth, discovery year, length, temperature, locations etc.): be careful!'
           })}
         />
       )}
@@ -78,8 +77,7 @@ const MoveEntranceToCaveForm = ({ entrance }) => {
         <Alert
           content={formatMessage(
             {
-              id:
-                'Entrance successfully moved from {intialCave} to {finalCave}!',
+              id: 'Entrance successfully moved from {intialCave} to {finalCave}!',
               defaultMessage:
                 'Entrance successfully moved from {intialCave} to {finalCave}!'
             },

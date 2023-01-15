@@ -50,8 +50,7 @@ const Step3 = ({ stepId }) => {
             <FlexItemWrapper>
               <IssueEditor
                 helperText={formatMessage({
-                  id:
-                    'Use the same wording that is used on the document: Vol.12, Number 15, No.158...'
+                  id: 'Use the same wording that is used on the document: Vol.12, Number 15, No.158...'
                 })}
                 valueName={formatMessage({ id: 'Periodical issue' })}
                 required={false}

@@ -20,39 +20,37 @@ export const postProcessDocumentsFailure = error => ({
   error
 });
 
-export const postProcessDocuments = (ids, isValidated, comment) => (
-  dispatch,
-  getState
-) => {
-  dispatch(postProcessDocumentsAction());
+export const postProcessDocuments =
+  (ids, isValidated, comment) => (dispatch, getState) => {
+    dispatch(postProcessDocumentsAction());
 
-  const documentsBody = pipe(
-    defaultTo([]),
-    map(id => ({
-      id,
-      isValidated: isValidated.toString(),
-      validationComment: comment
-    }))
-  )(ids);
-  const requestOptions = {
-    method: 'PUT',
-    body: JSON.stringify({ documents: documentsBody }),
-    headers: getState().login.authorizationHeader
+    const documentsBody = pipe(
+      defaultTo([]),
+      map(id => ({
+        id,
+        isValidated: isValidated.toString(),
+        validationComment: comment
+      }))
+    )(ids);
+    const requestOptions = {
+      method: 'PUT',
+      body: JSON.stringify({ documents: documentsBody }),
+      headers: getState().login.authorizationHeader
+    };
+
+    return fetch(processDocumentIdsUrl, requestOptions)
+      .then(response => {
+        if (response.status >= 400) {
+          throw new Error(response.status);
+        } else {
+          dispatch(postProcessDocumentsSuccess());
+        }
+      })
+      .catch(error => {
+        dispatch(
+          postProcessDocumentsFailure(
+            makeErrorMessage(error.message, `Process document ids ${ids}`)
+          )
+        );
+      });
   };
-
-  return fetch(processDocumentIdsUrl, requestOptions)
-    .then(response => {
-      if (response.status >= 400) {
-        throw new Error(response.status);
-      } else {
-        dispatch(postProcessDocumentsSuccess());
-      }
-    })
-    .catch(error => {
-      dispatch(
-        postProcessDocumentsFailure(
-          makeErrorMessage(error.message, `Process document ids ${ids}`)
-        )
-      );
-    });
-};

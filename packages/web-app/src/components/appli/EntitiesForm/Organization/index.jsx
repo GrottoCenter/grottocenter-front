@@ -60,12 +60,10 @@ export const OrganizationForm = ({ organizationValues = null }) => {
   const { formatMessage } = useIntl();
   const { languages: allLanguages } = useSelector(state => state.language);
   const allCountries = useMemo(() => countryList().getData(), []);
-  const {
-    error: organizationError,
-    isLoading: organizationLoading
-  } = useSelector(state =>
-    isNewOrganization ? state.createOrganization : state.updateOrganization
-  );
+  const { error: organizationError, isLoading: organizationLoading } =
+    useSelector(state =>
+      isNewOrganization ? state.createOrganization : state.updateOrganization
+    );
   const { error: nameError, loading: nameLoading } = useSelector(
     state => state.updateName
   );

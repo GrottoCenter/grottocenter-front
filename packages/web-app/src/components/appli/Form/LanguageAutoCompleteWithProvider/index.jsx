@@ -27,9 +27,11 @@ const LanguageAutoCompleteWithProvider = ({
   searchLabelText
 }) => {
   const dispatch = useDispatch();
-  const { error, isLoading, results: suggestions } = useSelector(
-    state => state.quicksearch
-  );
+  const {
+    error,
+    isLoading,
+    results: suggestions
+  } = useSelector(state => state.quicksearch);
 
   const { formatMessage } = useIntl();
 

@@ -20,23 +20,22 @@ export const postLocationFailure = error => ({
   error
 });
 
-export const postLocation = ({ entrance, title, body, language }) => (
-  dispatch,
-  getState
-) => {
-  dispatch(postLocationAction());
+export const postLocation =
+  ({ entrance, title, body, language }) =>
+  (dispatch, getState) => {
+    dispatch(postLocationAction());
 
-  const requestOptions = {
-    method: 'POST',
-    body: JSON.stringify({ entrance, title, body, language }),
-    headers: getState().login.authorizationHeader
+    const requestOptions = {
+      method: 'POST',
+      body: JSON.stringify({ entrance, title, body, language }),
+      headers: getState().login.authorizationHeader
+    };
+
+    return fetch(postLocationUrl, requestOptions)
+      .then(checkAndGetStatus)
+      .then(response => response.json())
+      .then(data => dispatch(postLocationSuccess(data)))
+      .catch(errorMessage => {
+        dispatch(postLocationFailure(errorMessage));
+      });
   };
-
-  return fetch(postLocationUrl, requestOptions)
-    .then(checkAndGetStatus)
-    .then(response => response.json())
-    .then(data => dispatch(postLocationSuccess(data)))
-    .catch(errorMessage => {
-      dispatch(postLocationFailure(errorMessage));
-    });
-};

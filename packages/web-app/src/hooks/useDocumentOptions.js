@@ -31,8 +31,7 @@ export const useDocumentOptions = () => {
       value: DOCUMENT_AUTHORIZE_TO_PUBLISH,
       translatedOption: formatMessage({ id: DOCUMENT_AUTHORIZE_TO_PUBLISH }),
       translatedToUser: formatMessage({
-        id:
-          'There is an authorization to publish from the author on GrottoCenter'
+        id: 'There is an authorization to publish from the author on GrottoCenter'
       })
     }
   ];

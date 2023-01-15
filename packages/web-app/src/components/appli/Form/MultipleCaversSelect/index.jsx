@@ -24,9 +24,11 @@ const MultipleCaversSelect = ({
   required = false
 }) => {
   const dispatch = useDispatch();
-  const { error: searchError, isLoading, results: searchResults } = useSelector(
-    state => state.quicksearch
-  );
+  const {
+    error: searchError,
+    isLoading,
+    results: searchResults
+  } = useSelector(state => state.quicksearch);
 
   const { isTrue: actionEnabled, true: enableAction } = useBoolean();
   const { isOpen: isCreateCaverOpen, toggle: toggleCreateCaver } = useBoolean();

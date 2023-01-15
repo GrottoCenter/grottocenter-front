@@ -51,16 +51,13 @@ const Step1 = ({ stepId }) => {
   } = useContext(DocumentFormContext);
   const dispatch = useDispatch();
   const { formatMessage } = useIntl();
-  const { isLoading, documentTypes: allDocumentTypes, error } = useSelector(
-    state => state.documentType
-  );
   const {
-    isCollection,
-    isImage,
-    isIssue,
-    isOther,
-    isUnknown
-  } = useDocumentTypes();
+    isLoading,
+    documentTypes: allDocumentTypes,
+    error
+  } = useSelector(state => state.documentType);
+  const { isCollection, isImage, isIssue, isOther, isUnknown } =
+    useDocumentTypes();
 
   useEffect(() => {
     dispatch(loadDocumentTypes());
@@ -125,8 +122,7 @@ const Step1 = ({ stepId }) => {
                       <LanguageAutoComplete
                         contextValueName="titleAndDescriptionLanguage"
                         helperContent={formatMessage({
-                          id:
-                            'Language used for the title and the description you are writing.'
+                          id: 'Language used for the title and the description you are writing.'
                         })}
                         labelText="Title and description language"
                         required

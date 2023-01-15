@@ -79,8 +79,7 @@ const Organization = ({ error, isLoading, organization, onEdit, canEdit }) => {
           {error && (
             <Alert
               title={formatMessage({
-                id:
-                  'Error, the organization data you are looking for is not available.'
+                id: 'Error, the organization data you are looking for is not available.'
               })}
               severity="error"
             />

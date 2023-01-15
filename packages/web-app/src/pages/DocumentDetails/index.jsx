@@ -65,8 +65,7 @@ const DocumentPage = ({
       subheader={
         !isValidated &&
         formatMessage({
-          id:
-            'A moderator needs to validate the last modification before being able to edit the document again.'
+          id: 'A moderator needs to validate the last modification before being able to edit the document again.'
         })
       }
       title={loading ? <Skeleton /> : overview.title}

@@ -84,8 +84,7 @@ const SignUpForm = ({
                 id: 'Your account has been successfully created!'
               })}{' '}
               {formatMessage({
-                id:
-                  'You can now log in to Grottocenter using the email and password you entered.'
+                id: 'You can now log in to Grottocenter using the email and password you entered.'
               })}
             </Typography>
             <SpacedCenteredButton

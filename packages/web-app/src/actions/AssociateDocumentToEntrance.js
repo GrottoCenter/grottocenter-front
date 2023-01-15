@@ -21,28 +21,27 @@ export const associateDocumentToEntranceFailure = error => ({
   error
 });
 
-export const associateDocumentToEntrance = ({ entranceId, documentId }) => (
-  dispatch,
-  getState
-) => {
-  dispatch(associateDocumentToEntranceAction());
+export const associateDocumentToEntrance =
+  ({ entranceId, documentId }) =>
+  (dispatch, getState) => {
+    dispatch(associateDocumentToEntranceAction());
 
-  const requestOptions = {
-    method: 'PUT',
-    headers: getState().login.authorizationHeader
+    const requestOptions = {
+      method: 'PUT',
+      headers: getState().login.authorizationHeader
+    };
+
+    return fetch(
+      associateDocumentToEntranceUrl(entranceId, documentId),
+      requestOptions
+    )
+      .then(response => {
+        if (response.status >= 400) {
+          throw new Error(response.status);
+        }
+        return dispatch(associateDocumentToEntranceSuccess());
+      })
+      .catch(errorMessage => {
+        dispatch(associateDocumentToEntranceFailure(errorMessage));
+      });
   };
-
-  return fetch(
-    associateDocumentToEntranceUrl(entranceId, documentId),
-    requestOptions
-  )
-    .then(response => {
-      if (response.status >= 400) {
-        throw new Error(response.status);
-      }
-      return dispatch(associateDocumentToEntranceSuccess());
-    })
-    .catch(errorMessage => {
-      dispatch(associateDocumentToEntranceFailure(errorMessage));
-    });
-};

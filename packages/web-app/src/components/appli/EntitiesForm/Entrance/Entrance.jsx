@@ -194,8 +194,7 @@ const Entrance = ({
                 disableMargins
                 severity="warning"
                 content={formatMessage({
-                  id:
-                    'To be used for a cave requiring special protection. For more details see the User Guide. When a cave access is marked as "restricted", location of the entrance will no longer be available to Grottocenter users and visitors.'
+                  id: 'To be used for a cave requiring special protection. For more details see the User Guide. When a cave access is marked as "restricted", location of the entrance will no longer be available to Grottocenter users and visitors.'
                 })}
               />
             )}

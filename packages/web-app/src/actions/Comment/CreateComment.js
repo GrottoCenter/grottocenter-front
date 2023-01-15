@@ -22,45 +22,47 @@ export const postCommentFailure = error => ({
   error
 });
 
-export const postComment = ({
-  entrance,
-  title,
-  body,
-  aestheticism,
-  caving,
-  approach,
-  eTTrail,
-  eTUnderground,
-  language
-}) => (dispatch, getState) => {
-  dispatch(postCommentAction());
+export const postComment =
+  ({
+    entrance,
+    title,
+    body,
+    aestheticism,
+    caving,
+    approach,
+    eTTrail,
+    eTUnderground,
+    language
+  }) =>
+  (dispatch, getState) => {
+    dispatch(postCommentAction());
 
-  const requestOptions = {
-    method: 'POST',
-    body: JSON.stringify({
-      entrance,
-      title,
-      body,
-      aestheticism,
-      caving,
-      approach,
-      eTTrail: minutesToDurationString(eTTrail) ?? null,
-      eTUnderground: minutesToDurationString(eTUnderground) ?? null,
-      language
-    }),
-    headers: getState().login.authorizationHeader
-  };
+    const requestOptions = {
+      method: 'POST',
+      body: JSON.stringify({
+        entrance,
+        title,
+        body,
+        aestheticism,
+        caving,
+        approach,
+        eTTrail: minutesToDurationString(eTTrail) ?? null,
+        eTUnderground: minutesToDurationString(eTUnderground) ?? null,
+        language
+      }),
+      headers: getState().login.authorizationHeader
+    };
 
-  return fetch(postCommentUrl, requestOptions)
-    .then(checkAndGetStatus)
-    .then(response => response.json())
-    .then(data => dispatch(postCommentSuccess(data)))
-    .catch(error =>
-      dispatch(
-        postCommentFailure(
-          makeErrorMessage(error.message, `Creating a new comment`),
-          error.message
+    return fetch(postCommentUrl, requestOptions)
+      .then(checkAndGetStatus)
+      .then(response => response.json())
+      .then(data => dispatch(postCommentSuccess(data)))
+      .catch(error =>
+        dispatch(
+          postCommentFailure(
+            makeErrorMessage(error.message, `Creating a new comment`),
+            error.message
+          )
         )
-      )
-    );
-};
+      );
+  };

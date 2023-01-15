@@ -19,36 +19,34 @@ export const moveEntranceToCaveFailure = (error, httpCode) => ({
   httpCode
 });
 
-export const moveEntranceToCave = (entranceId, caveId) => (
-  dispatch,
-  getState
-) => {
-  dispatch(moveEntranceToCaveAction());
+export const moveEntranceToCave =
+  (entranceId, caveId) => (dispatch, getState) => {
+    dispatch(moveEntranceToCaveAction());
 
-  const requestOptions = {
-    method: 'PATCH',
-    headers: getState().login.authorizationHeader
-  };
+    const requestOptions = {
+      method: 'PATCH',
+      headers: getState().login.authorizationHeader
+    };
 
-  return fetch(moveEntranceToCaveUrl(entranceId, caveId), requestOptions)
-    .then(response => {
-      if (response.status >= 400) {
-        throw new Error(response.status);
-      }
-      return response.json();
-    })
-    .then(res => {
-      dispatch(moveEntranceToCaveSuccess(res));
-    })
-    .catch(error =>
-      dispatch(
-        moveEntranceToCaveFailure(
-          makeErrorMessage(
-            error.message,
-            error.message >= 500 ? 'Server error' : 'Bad request'
-          ),
-          error.message
+    return fetch(moveEntranceToCaveUrl(entranceId, caveId), requestOptions)
+      .then(response => {
+        if (response.status >= 400) {
+          throw new Error(response.status);
+        }
+        return response.json();
+      })
+      .then(res => {
+        dispatch(moveEntranceToCaveSuccess(res));
+      })
+      .catch(error =>
+        dispatch(
+          moveEntranceToCaveFailure(
+            makeErrorMessage(
+              error.message,
+              error.message >= 500 ? 'Server error' : 'Bad request'
+            ),
+            error.message
+          )
         )
-      )
-    );
-};
+      );
+  };

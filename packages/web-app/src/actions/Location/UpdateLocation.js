@@ -20,23 +20,22 @@ export const updateLocationFailure = error => ({
   error
 });
 
-export const updateLocation = ({ id, title, body, language }) => (
-  dispatch,
-  getState
-) => {
-  dispatch(updateLocationAction());
+export const updateLocation =
+  ({ id, title, body, language }) =>
+  (dispatch, getState) => {
+    dispatch(updateLocationAction());
 
-  const requestOptions = {
-    method: 'PUT',
-    body: JSON.stringify({ title, body, language }),
-    headers: getState().login.authorizationHeader
+    const requestOptions = {
+      method: 'PUT',
+      body: JSON.stringify({ title, body, language }),
+      headers: getState().login.authorizationHeader
+    };
+
+    return fetch(putLocationUrl(id), requestOptions)
+      .then(checkAndGetStatus)
+      .then(response => response.json())
+      .then(data => dispatch(updateLocationSuccess(data)))
+      .catch(errorMessage => {
+        dispatch(updateLocationFailure(errorMessage));
+      });
   };
-
-  return fetch(putLocationUrl(id), requestOptions)
-    .then(checkAndGetStatus)
-    .then(response => response.json())
-    .then(data => dispatch(updateLocationSuccess(data)))
-    .catch(errorMessage => {
-      dispatch(updateLocationFailure(errorMessage));
-    });
-};

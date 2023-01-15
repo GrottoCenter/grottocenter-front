@@ -43,19 +43,17 @@ const OrganizationAutoComplete = ({
   searchLabelText
 }) => {
   const [defaultSearchValue, setDefaultSearchValue] = useState('');
-  const [
-    defaultNewOrganizationValue,
-    setDefaultNewOrganizationValue
-  ] = useState('');
+  const [defaultNewOrganizationValue, setDefaultNewOrganizationValue] =
+    useState('');
   const { isTrue: actionEnabled, true: enableAction } = useBoolean();
-  const {
-    isOpen: isCreateOrganizationOpen,
-    toggle: toggleCreateOrganization
-  } = useBoolean();
+  const { isOpen: isCreateOrganizationOpen, toggle: toggleCreateOrganization } =
+    useBoolean();
   const dispatch = useDispatch();
-  const { error, isLoading, results: suggestions } = useSelector(
-    state => state.quicksearch
-  );
+  const {
+    error,
+    isLoading,
+    results: suggestions
+  } = useSelector(state => state.quicksearch);
 
   const fetchSearchResults = debouncedInput => {
     const criteria = {

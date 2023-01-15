@@ -85,10 +85,8 @@ const EntrancesHandler = ({
     !(isEmpty(author) || isEmpty(latitude) || isEmpty(longitude));
 
   const onSubmit = () => {
-    const {
-      newItems: newNames,
-      previousItems: previousNames
-    } = retrieveFromObjectCollection(names);
+    const { newItems: newNames, previousItems: previousNames } =
+      retrieveFromObjectCollection(names);
 
     const {
       newItems: newPopulatedDescriptions,
@@ -99,20 +97,14 @@ const EntrancesHandler = ({
       author: newDesc.author.id
     }));
 
-    const {
-      newItems: newLocations,
-      previousItems: previousLocations
-    } = retrieveFromObjectCollection(locations);
+    const { newItems: newLocations, previousItems: previousLocations } =
+      retrieveFromObjectCollection(locations);
 
-    const {
-      newItems: newRiggings,
-      previousItems: previousRiggings
-    } = retrieveFromObjectCollection(riggings);
+    const { newItems: newRiggings, previousItems: previousRiggings } =
+      retrieveFromObjectCollection(riggings);
 
-    const {
-      newItems: newComments,
-      previousItems: previousComments
-    } = retrieveFromObjectCollection(comments);
+    const { newItems: newComments, previousItems: previousComments } =
+      retrieveFromObjectCollection(comments);
 
     const nullifyNumericalValue = value => (value === '' ? null : value);
     handleSubmit(

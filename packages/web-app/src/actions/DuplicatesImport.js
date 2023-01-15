@@ -116,42 +116,40 @@ const getBody = async response => ({
   statusCode: response.status
 });
 
-export const fetchDuplicatesList = (duplicateType, criteria) => (
-  dispatch,
-  getState
-) => {
-  dispatch(loadDuplicatesList());
-  let url = '';
-  switch (duplicateType) {
-    case 'entrance':
-      url = getDuplicatesEntranceUrl;
-      break;
-    case 'document':
-      url = getDuplicatesDocumentUrl;
-      break;
-    default:
-      return dispatch(loadDuplicateFailure('Incorrect type of duplicates.'));
-  }
+export const fetchDuplicatesList =
+  (duplicateType, criteria) => (dispatch, getState) => {
+    dispatch(loadDuplicatesList());
+    let url = '';
+    switch (duplicateType) {
+      case 'entrance':
+        url = getDuplicatesEntranceUrl;
+        break;
+      case 'document':
+        url = getDuplicatesDocumentUrl;
+        break;
+      default:
+        return dispatch(loadDuplicateFailure('Incorrect type of duplicates.'));
+    }
 
-  const requestOptions = {
-    headers: getState().login.authorizationHeader
+    const requestOptions = {
+      headers: getState().login.authorizationHeader
+    };
+
+    return fetch(isNil(criteria) ? url : makeUrl(url, criteria), requestOptions)
+      .then(checkAndGetStatus)
+      .then(getBody)
+      .then(contentAndStatus => {
+        dispatch(
+          loadDuplicatesListSuccess(
+            contentAndStatus.content.duplicates,
+            contentAndStatus.statusCode
+          )
+        );
+      })
+      .catch(error => {
+        dispatch(loadDuplicatesListFailure(error.message));
+      });
   };
-
-  return fetch(isNil(criteria) ? url : makeUrl(url, criteria), requestOptions)
-    .then(checkAndGetStatus)
-    .then(getBody)
-    .then(contentAndStatus => {
-      dispatch(
-        loadDuplicatesListSuccess(
-          contentAndStatus.content.duplicates,
-          contentAndStatus.statusCode
-        )
-      );
-    })
-    .catch(error => {
-      dispatch(loadDuplicatesListFailure(error.message));
-    });
-};
 
 export const fetchDuplicate = (id, duplicateType) => (dispatch, getState) => {
   dispatch(loadDuplicate());
@@ -187,48 +185,46 @@ export const fetchDuplicate = (id, duplicateType) => (dispatch, getState) => {
     });
 };
 
-export const deleteDuplicates = (ids, duplicateType) => (
-  dispatch,
-  getState
-) => {
-  dispatch(deleteDuplicatesAction());
+export const deleteDuplicates =
+  (ids, duplicateType) => (dispatch, getState) => {
+    dispatch(deleteDuplicatesAction());
 
-  let url = '';
-  switch (duplicateType) {
-    case 'entrance':
-      url = deleteDuplicatesEntranceUrl;
-      break;
-    case 'document':
-      url = deleteDuplicatesDocumentUrl;
-      break;
-    default:
-      return dispatch(deleteDuplicatesError('Incorrect type of duplicates.'));
-  }
+    let url = '';
+    switch (duplicateType) {
+      case 'entrance':
+        url = deleteDuplicatesEntranceUrl;
+        break;
+      case 'document':
+        url = deleteDuplicatesDocumentUrl;
+        break;
+      default:
+        return dispatch(deleteDuplicatesError('Incorrect type of duplicates.'));
+    }
 
-  url = pipe(
-    map(id => `id=${encodeURIComponent(id)}`),
-    join('&'),
-    urlCriteria => `${url}?${urlCriteria}`
-  )(ids);
+    url = pipe(
+      map(id => `id=${encodeURIComponent(id)}`),
+      join('&'),
+      urlCriteria => `${url}?${urlCriteria}`
+    )(ids);
 
-  const requestOptions = {
-    headers: getState().login.authorizationHeader,
-    method: 'DELETE'
+    const requestOptions = {
+      headers: getState().login.authorizationHeader,
+      method: 'DELETE'
+    };
+
+    return fetch(url, requestOptions)
+      .then(checkAndGetStatus)
+      .then(response => {
+        dispatch(deleteDuplicatesSuccess(response.status));
+      })
+      .catch(error => {
+        dispatch(
+          deleteDuplicatesError(
+            makeErrorMessage(error.message, `Deleting duplicates`)
+          )
+        );
+      });
   };
-
-  return fetch(url, requestOptions)
-    .then(checkAndGetStatus)
-    .then(response => {
-      dispatch(deleteDuplicatesSuccess(response.status));
-    })
-    .catch(error => {
-      dispatch(
-        deleteDuplicatesError(
-          makeErrorMessage(error.message, `Deleting duplicates`)
-        )
-      );
-    });
-};
 
 export const deleteDuplicate = (id, duplicateType) => (dispatch, getState) => {
   dispatch(deleteDuplicatesAction());
@@ -264,42 +260,43 @@ export const deleteDuplicate = (id, duplicateType) => (dispatch, getState) => {
     });
 };
 
-export const createNewEntityFromDuplicate = (id, duplicateType) => (
-  dispatch,
-  getState
-) => {
-  dispatch(deleteDuplicatesAction());
+export const createNewEntityFromDuplicate =
+  (id, duplicateType) => (dispatch, getState) => {
+    dispatch(deleteDuplicatesAction());
 
-  let url = '';
-  switch (duplicateType) {
-    case 'entrance':
-      url = createNewEntranceFromDuplicateUrl;
-      break;
-    case 'document':
-      url = createNewDocumentFromDuplicateUrl;
-      break;
-    default:
-      return dispatch(loadDuplicateFailure('Incorrect type of duplicates.'));
-  }
+    let url = '';
+    switch (duplicateType) {
+      case 'entrance':
+        url = createNewEntranceFromDuplicateUrl;
+        break;
+      case 'document':
+        url = createNewDocumentFromDuplicateUrl;
+        break;
+      default:
+        return dispatch(loadDuplicateFailure('Incorrect type of duplicates.'));
+    }
 
-  const requestOptions = {
-    headers: getState().login.authorizationHeader,
-    method: 'POST'
+    const requestOptions = {
+      headers: getState().login.authorizationHeader,
+      method: 'POST'
+    };
+
+    return fetch(url(id), requestOptions)
+      .then(checkAndGetStatus)
+      .then(response => {
+        dispatch(createNewEntityDuplicateSuccess(response.status));
+      })
+      .catch(error => {
+        dispatch(
+          createNewEntityDuplicateError(
+            makeErrorMessage(
+              error.message,
+              `Creating new entity from duplicate`
+            )
+          )
+        );
+      });
   };
-
-  return fetch(url(id), requestOptions)
-    .then(checkAndGetStatus)
-    .then(response => {
-      dispatch(createNewEntityDuplicateSuccess(response.status));
-    })
-    .catch(error => {
-      dispatch(
-        createNewEntityDuplicateError(
-          makeErrorMessage(error.message, `Creating new entity from duplicate`)
-        )
-      );
-    });
-};
 
 export const resetState = () => ({
   type: RESET_STATE

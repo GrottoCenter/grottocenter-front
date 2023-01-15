@@ -105,8 +105,7 @@ export const allLibraries = [
   },
   {
     id: '3',
-    name:
-      'Bibliothèque centrale Société Suisse de Spéléologie / Centre Documentation UIS'
+    name: 'Bibliothèque centrale Société Suisse de Spéléologie / Centre Documentation UIS'
   },
   {
     id: '4',
@@ -125,13 +124,11 @@ export const allRegions = [
   },
   {
     id: '2',
-    name:
-      'F/B - France Bourgogne. Côte d´Or (21); Nièvre (58); Saône et Loire (71); Yonne (89)'
+    name: 'F/B - France Bourgogne. Côte d´Or (21); Nièvre (58); Saône et Loire (71); Yonne (89)'
   },
   {
     id: '3',
-    name:
-      'F/F - France Midi/Pyrénées. Ariège (09); Aveyron (12); Haute Garonne (31); Gers (32); Lot (46); Hautes Pyrénées (65); Tarn (81); Tarn et Garonne (82)'
+    name: 'F/F - France Midi/Pyrénées. Ariège (09); Aveyron (12); Haute Garonne (31); Gers (32); Lot (46); Hautes Pyrénées (65); Tarn (81); Tarn et Garonne (82)'
   },
   {
     id: '4',

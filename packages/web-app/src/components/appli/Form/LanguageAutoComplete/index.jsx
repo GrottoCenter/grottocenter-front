@@ -29,9 +29,11 @@ const LanguageAutoComplete = ({
   value
 }) => {
   const dispatch = useDispatch();
-  const { error: searchError, isLoading, results: suggestions } = useSelector(
-    state => state.quicksearch
-  );
+  const {
+    error: searchError,
+    isLoading,
+    results: suggestions
+  } = useSelector(state => state.quicksearch);
   const [inputValue, setInputValue] = useState('');
   const debouncedInput = useDebounce(inputValue);
 

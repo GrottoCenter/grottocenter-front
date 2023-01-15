@@ -105,10 +105,8 @@ const DocumentsHandler = ({
     !(isEmpty(author) || isEmpty(type) || isEmpty(license));
 
   const onSubmit = () => {
-    const {
-      newItems: newAuthors,
-      previousItems: previousAuthors
-    } = retrieveFromObjectCollection(authors);
+    const { newItems: newAuthors, previousItems: previousAuthors } =
+      retrieveFromObjectCollection(authors);
 
     const {
       newItems: newPopulatedDescriptions,

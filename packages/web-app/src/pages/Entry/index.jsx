@@ -27,15 +27,11 @@ const EntryPage = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
   const { loading, data, error } = useSelector(state => state.entrance);
-  const {
-    loading: updateEntranceLoading,
-    error: updateEntranceError
-  } = useSelector(state => state.updateEntrance);
+  const { loading: updateEntranceLoading, error: updateEntranceError } =
+    useSelector(state => state.updateEntrance);
   const prevupdateEntranceLoading = useRef(updateEntranceLoading);
-  const {
-    loading: associateDocumentLoading,
-    error: associateDocumentError
-  } = useSelector(state => state.associateDocumentToEntrance);
+  const { loading: associateDocumentLoading, error: associateDocumentError } =
+    useSelector(state => state.associateDocumentToEntrance);
   const prevAssociateDocumentLoading = useRef(associateDocumentLoading);
 
   // Initial data loading

@@ -20,23 +20,22 @@ export const postRiggingsFailure = error => ({
   error
 });
 
-export const postRiggings = ({ entrance, title, obstacles, language }) => (
-  dispatch,
-  getState
-) => {
-  dispatch(postRiggingsAction());
+export const postRiggings =
+  ({ entrance, title, obstacles, language }) =>
+  (dispatch, getState) => {
+    dispatch(postRiggingsAction());
 
-  const requestOptions = {
-    method: 'POST',
-    body: JSON.stringify({ entrance, title, obstacles, language }),
-    headers: getState().login.authorizationHeader
+    const requestOptions = {
+      method: 'POST',
+      body: JSON.stringify({ entrance, title, obstacles, language }),
+      headers: getState().login.authorizationHeader
+    };
+
+    return fetch(postRiggingsUrl, requestOptions)
+      .then(checkAndGetStatus)
+      .then(response => response.json())
+      .then(data => dispatch(postRiggingsSuccess(data)))
+      .catch(errorMessage => {
+        dispatch(postRiggingsFailure(errorMessage));
+      });
   };
-
-  return fetch(postRiggingsUrl, requestOptions)
-    .then(checkAndGetStatus)
-    .then(response => response.json())
-    .then(data => dispatch(postRiggingsSuccess(data)))
-    .catch(errorMessage => {
-      dispatch(postRiggingsFailure(errorMessage));
-    });
-};

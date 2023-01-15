@@ -20,23 +20,22 @@ export const postHistoryFailure = error => ({
   error
 });
 
-export const postHistory = ({ entrance, body, language }) => (
-  dispatch,
-  getState
-) => {
-  dispatch(postHistoryAction());
+export const postHistory =
+  ({ entrance, body, language }) =>
+  (dispatch, getState) => {
+    dispatch(postHistoryAction());
 
-  const requestOptions = {
-    method: 'POST',
-    body: JSON.stringify({ entrance, body, language }),
-    headers: getState().login.authorizationHeader
+    const requestOptions = {
+      method: 'POST',
+      body: JSON.stringify({ entrance, body, language }),
+      headers: getState().login.authorizationHeader
+    };
+
+    return fetch(postHistoryUrl, requestOptions)
+      .then(checkAndGetStatus)
+      .then(response => response.json())
+      .then(data => dispatch(postHistorySuccess(data)))
+      .catch(errorMessage => {
+        dispatch(postHistoryFailure(errorMessage));
+      });
   };
-
-  return fetch(postHistoryUrl, requestOptions)
-    .then(checkAndGetStatus)
-    .then(response => response.json())
-    .then(data => dispatch(postHistorySuccess(data)))
-    .catch(errorMessage => {
-      dispatch(postHistoryFailure(errorMessage));
-    });
-};

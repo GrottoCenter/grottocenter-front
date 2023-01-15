@@ -73,8 +73,7 @@ const ChangePasswordForm = ({
                 id: 'Your password has been successfully updated!'
               })}{' '}
               {formatMessage({
-                id:
-                  'You can now log in to Grottocenter using your new password.'
+                id: 'You can now log in to Grottocenter using your new password.'
               })}
             </Typography>
             <SpacedCenteredButton

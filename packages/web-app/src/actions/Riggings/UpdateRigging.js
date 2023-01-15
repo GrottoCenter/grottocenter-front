@@ -20,23 +20,22 @@ export const updateRiggingsFailure = error => ({
   error
 });
 
-export const updateRiggings = ({ id, title, obstacles, language }) => (
-  dispatch,
-  getState
-) => {
-  dispatch(updateRiggingsAction());
+export const updateRiggings =
+  ({ id, title, obstacles, language }) =>
+  (dispatch, getState) => {
+    dispatch(updateRiggingsAction());
 
-  const requestOptions = {
-    method: 'PATCH',
-    body: JSON.stringify({ title, obstacles, language }),
-    headers: getState().login.authorizationHeader
+    const requestOptions = {
+      method: 'PATCH',
+      body: JSON.stringify({ title, obstacles, language }),
+      headers: getState().login.authorizationHeader
+    };
+
+    return fetch(putRiggingsUrl(id), requestOptions)
+      .then(checkAndGetStatus)
+      .then(response => response.json())
+      .then(data => dispatch(updateRiggingsSuccess(data)))
+      .catch(errorMessage => {
+        dispatch(updateRiggingsFailure(errorMessage));
+      });
   };
-
-  return fetch(putRiggingsUrl(id), requestOptions)
-    .then(checkAndGetStatus)
-    .then(response => response.json())
-    .then(data => dispatch(updateRiggingsSuccess(data)))
-    .catch(errorMessage => {
-      dispatch(updateRiggingsFailure(errorMessage));
-    });
-};

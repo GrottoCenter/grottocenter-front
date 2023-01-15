@@ -91,8 +91,7 @@ const Summary = ({ control, defautValues }) => {
             src="/images/odbl.png"
             alt="ODBL license"
             title={formatMessage({
-              id:
-                'The ODBL license applies to all data that is not copyrighted.'
+              id: 'The ODBL license applies to all data that is not copyrighted.'
             })}
           />
         </InternationalizedLink>

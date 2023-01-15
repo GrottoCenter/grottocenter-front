@@ -66,8 +66,7 @@ const comments = [
 const descriptions = [
   {
     author: { name: 'Author' },
-    body:
-      "Toutes les cordes sur la progression vers le fond (siphon de Barnabé) ont été changées le 02/12/2017 (les cordes vers la salle Richard Chabardez n'ont pas été changées). Tout est équipé en place sauf le puits d'entrée (prévoir C40 et 7 mousquetons, tout broché).",
+    body: "Toutes les cordes sur la progression vers le fond (siphon de Barnabé) ont été changées le 02/12/2017 (les cordes vers la salle Richard Chabardez n'ont pas été changées). Tout est équipé en place sauf le puits d'entrée (prévoir C40 et 7 mousquetons, tout broché).",
     date: date.toISOString().substring(0, 10),
     id: 3,
     language: 'fra',

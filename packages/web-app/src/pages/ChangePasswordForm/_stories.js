@@ -4,10 +4,8 @@ import { FormControlLabel, Paper, Switch, Typography } from '@material-ui/core';
 import ChangePasswordForm from './index';
 
 const HydratedChangePasswordForm = () => {
-  const [
-    changePasswordRequestSucceeded,
-    setChangePasswordRequestSucceeded
-  ] = useState(false);
+  const [changePasswordRequestSucceeded, setChangePasswordRequestSucceeded] =
+    useState(false);
   const [loading, setLoading] = useState(false);
   const [password, setPassword] = useState('');
   const [passwordConfirmation, setPasswordConfirmation] = useState('');

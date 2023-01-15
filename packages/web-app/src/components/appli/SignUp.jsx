@@ -14,9 +14,8 @@ const SignUp = () => {
   const { formatMessage } = useIntl();
   const signUpState = useSelector(state => state.signUp);
   const [signUpRequestSent, setSignUpRequestSent] = React.useState(false);
-  const [signUpRequestSucceeded, setSignUpRequestSucceeded] = React.useState(
-    false
-  );
+  const [signUpRequestSucceeded, setSignUpRequestSucceeded] =
+    React.useState(false);
   const [email, setEmail] = React.useState('');
   const [name, setName] = React.useState('');
   const [nickname, setNickname] = React.useState('');

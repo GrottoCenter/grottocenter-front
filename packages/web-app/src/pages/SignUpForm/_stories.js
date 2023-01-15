@@ -4,9 +4,8 @@ import { FormControlLabel, Paper, Switch, Typography } from '@material-ui/core';
 import SignUpForm from './index';
 
 const HydratedSignUpForm = () => {
-  const [signUpRequestSucceeded, setSignUpRequestSucceeded] = React.useState(
-    false
-  );
+  const [signUpRequestSucceeded, setSignUpRequestSucceeded] =
+    React.useState(false);
   const [loading, setLoading] = React.useState(false);
   const [email, setEmail] = React.useState('');
   const [name, setName] = React.useState('');

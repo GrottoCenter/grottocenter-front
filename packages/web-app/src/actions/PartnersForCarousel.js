@@ -22,7 +22,7 @@ export const fetchPartnersForCarouselFailure = error => ({
 });
 
 export function loadPartnersForCarousel() {
-  return function(dispatch) {
+  return function (dispatch) {
     dispatch(fetchPartnersForCarousel());
 
     return fetch(getForCarouselUrl)

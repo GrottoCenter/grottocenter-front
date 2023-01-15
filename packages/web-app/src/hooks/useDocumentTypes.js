@@ -26,9 +26,11 @@ export const DocumentTypes = {
 };
 
 export const useDocumentTypes = () => {
-  const { documentTypes: data, loading, error } = useSelector(
-    state => state.documentType
-  );
+  const {
+    documentTypes: data,
+    loading,
+    error
+  } = useSelector(state => state.documentType);
   const dispatch = useDispatch();
   const [state, setState] = useState({
     documentTypes: []

@@ -40,7 +40,7 @@ export const LOADINGS = {
 };
 
 export const fetchNetworksCoordinates = criteria => {
-  const thunkToDebounce = function(dispatch) {
+  const thunkToDebounce = function (dispatch) {
     dispatch({
       type: FETCH_MAP_START_LOADING,
       key: LOADINGS.NETWORKS_COORDINATES
@@ -87,7 +87,7 @@ export const fetchNetworksCoordinates = criteria => {
 };
 
 export const fetchNetworks = criteria => {
-  const thunkToDebounce = function(dispatch) {
+  const thunkToDebounce = function (dispatch) {
     dispatch({ type: FETCH_MAP_START_LOADING, key: LOADINGS.NETWORKS });
     const completedUrl = makeUrl(getMapCavesUrl, criteria);
     return fetch(completedUrl)
@@ -125,7 +125,7 @@ export const fetchNetworks = criteria => {
 };
 
 export const fetchEntrancesCoordinates = criteria => {
-  const thunkToDebounce = function(dispatch) {
+  const thunkToDebounce = function (dispatch) {
     dispatch({
       type: FETCH_MAP_START_LOADING,
       key: LOADINGS.ENTRANCES_COORDINATES
@@ -172,7 +172,7 @@ export const fetchEntrancesCoordinates = criteria => {
 };
 
 export const fetchEntrances = criteria => {
-  const thunkToDebounce = function(dispatch) {
+  const thunkToDebounce = function (dispatch) {
     dispatch({ type: FETCH_MAP_START_LOADING, key: LOADINGS.ENTRANCES });
     const completedUrl = makeUrl(getMapEntrancesUrl, criteria);
     return fetch(completedUrl)
@@ -210,7 +210,7 @@ export const fetchEntrances = criteria => {
 };
 
 export const fetchOrganizations = criteria => {
-  const thunkToDebounce = function(dispatch) {
+  const thunkToDebounce = function (dispatch) {
     dispatch({ type: FETCH_MAP_START_LOADING, key: LOADINGS.ORGANIZATIONS });
     const completedUrl = makeUrl(getMapGrottosUrl, criteria);
     return fetch(completedUrl)

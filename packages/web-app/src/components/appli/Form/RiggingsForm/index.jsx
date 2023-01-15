@@ -145,8 +145,7 @@ const CreateRiggingsForm = ({ closeForm, onSubmit, values, isNew }) => {
                           helperText={
                             error
                               ? formatMessage({
-                                  id:
-                                    'Please delete this line or fill at least the obstacle cell.'
+                                  id: 'Please delete this line or fill at least the obstacle cell.'
                                 })
                               : ''
                           }

@@ -53,11 +53,9 @@ export const MassifForm = ({ massifValues }) => {
   const { error: nameError, loading: nameLoading } = useSelector(
     state => state.updateName
   );
-  const {
-    error: descriptionError,
-    loading: descriptionLoading
-  } = useSelector(state =>
-    isNewDescription ? state.createDescription : state.updateDescription
+  const { error: descriptionError, loading: descriptionLoading } = useSelector(
+    state =>
+      isNewDescription ? state.createDescription : state.updateDescription
   );
   const dispatch = useDispatch();
 

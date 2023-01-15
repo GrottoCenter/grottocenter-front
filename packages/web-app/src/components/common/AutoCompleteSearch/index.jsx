@@ -68,7 +68,7 @@ const InputAdornments = ({ isLoading, hasError }) =>
   ) : null;
 
 const StyledPopper = hasFixWidth =>
-  function(props) {
+  function (props) {
     return (
       <ResultsPopper
         {...props}

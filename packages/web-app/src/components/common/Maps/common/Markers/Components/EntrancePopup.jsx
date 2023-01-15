@@ -15,9 +15,9 @@ export const EntrancePopup = ({ entrance }) => (
     />
     <Property
       secondary
-      value={`${!isNil(entrance.city) && entrance.city}, ${!isNil(
-        entrance.region
-      ) && entrance.region}`}
+      value={`${!isNil(entrance.city) && entrance.city}, ${
+        !isNil(entrance.region) && entrance.region
+      }`}
       icon={<Public color="primary" />}
     />
     <Property

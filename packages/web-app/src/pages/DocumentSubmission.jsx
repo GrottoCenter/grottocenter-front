@@ -54,9 +54,8 @@ const DocumentSubmission = () => {
     updateAttribute
   } = useContext(DocumentFormContext);
 
-  const [isDocSubmittedWithSuccess, setDocSubmittedWithSuccess] = useState(
-    false
-  );
+  const [isDocSubmittedWithSuccess, setDocSubmittedWithSuccess] =
+    useState(false);
   const [isDocSubmitted, setDocSubmitted] = useState(false);
 
   const documentState = useSelector(state => state.createDocument);
@@ -113,8 +112,7 @@ const DocumentSubmission = () => {
                 message={
                   isNewDocument
                     ? `${formatMessage({
-                        id:
-                          'Your document has been successfully submitted, thank you!'
+                        id: 'Your document has been successfully submitted, thank you!'
                       })} ${formatMessage({
                         id: 'It will be verified by one of ours moderators.'
                       })}`
@@ -134,8 +132,7 @@ const DocumentSubmission = () => {
                   </SpacedButton>
                   <Typography variant="body1">
                     {formatMessage({
-                      id:
-                        'By clicking this button, you will be able to submit another article without re-typing some values (publication date, parent document etc.).'
+                      id: 'By clicking this button, you will be able to submit another article without re-typing some values (publication date, parent document etc.).'
                     })}
                   </Typography>
                   <br />
@@ -181,8 +178,7 @@ const DocumentSubmission = () => {
             <CenteredBlock>
               <ErrorMessage
                 message={formatMessage({
-                  id:
-                    'You must be authenticated and an user to submit a document to Grottocenter.'
+                  id: 'You must be authenticated and an user to submit a document to Grottocenter.'
                 })}
               />
               <SpacedButton onClick={onLoginClick} variant="contained">

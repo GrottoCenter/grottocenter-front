@@ -58,8 +58,7 @@ const Country = ({
           {error && (
             <Alert
               title={formatMessage({
-                id:
-                  'Error, the country data you are looking for is not available.'
+                id: 'Error, the country data you are looking for is not available.'
               })}
               severity="error"
             />

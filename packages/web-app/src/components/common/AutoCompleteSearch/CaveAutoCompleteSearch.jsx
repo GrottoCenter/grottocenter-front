@@ -40,9 +40,11 @@ const CaveAutoCompleteSearch = ({
   const { formatMessage } = useIntl();
   const [inputValue, setInputValue] = useState('');
   const debouncedInput = useDebounce(inputValue);
-  const { isLoading, results: suggestions, error } = useSelector(
-    state => state.quicksearch
-  );
+  const {
+    isLoading,
+    results: suggestions,
+    error
+  } = useSelector(state => state.quicksearch);
 
   const fetchSearchResults = useCallback(
     query => {

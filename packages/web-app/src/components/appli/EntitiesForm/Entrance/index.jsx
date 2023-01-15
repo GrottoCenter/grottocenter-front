@@ -69,11 +69,8 @@ export const EntranceForm = ({ caveValues = null, entranceValues = null }) => {
 
   const { formatMessage } = useIntl();
   const { languages: allLanguages } = useSelector(state => state.language);
-  const {
-    error: entranceError,
-    loading: entranceLoading
-  } = useSelector(state =>
-    isNewEntrance ? state.createEntrance : state.updateEntrance
+  const { error: entranceError, loading: entranceLoading } = useSelector(
+    state => (isNewEntrance ? state.createEntrance : state.updateEntrance)
   );
   const { error: caveError, loading: caveLoading } = useSelector(state =>
     isNewEntrance ? state.createCave : state.updateCave

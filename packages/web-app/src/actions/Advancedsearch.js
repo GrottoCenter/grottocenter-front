@@ -112,76 +112,72 @@ const formatAdvancedSearchParams = (values, resourceType) => {
 
 // ===============================
 
-export const fetchAdvancedsearchResults = (
-  parameters,
-  resourceType
-) => dispatch => {
-  const criterias = formatAdvancedSearchParams(parameters, resourceType);
-  dispatch(fetchAdvancedsearchStarted(criterias));
+export const fetchAdvancedsearchResults =
+  (parameters, resourceType) => dispatch => {
+    const criterias = formatAdvancedSearchParams(parameters, resourceType);
+    dispatch(fetchAdvancedsearchStarted(criterias));
 
-  let completeUrl = advancedsearchUrl;
-  if (criterias) {
-    completeUrl += `?${Object.keys(criterias)
-      .map(k => `${k}=${encodeURIComponent(criterias[k])}`)
-      .join('&')}`;
-  }
+    let completeUrl = advancedsearchUrl;
+    if (criterias) {
+      completeUrl += `?${Object.keys(criterias)
+        .map(k => `${k}=${encodeURIComponent(criterias[k])}`)
+        .join('&')}`;
+    }
 
-  return fetch(completeUrl, { method: 'POST' })
-    .then(response => {
-      if (response.status >= 400) {
-        const errorMessage = `Fetching ${completeUrl} status: ${response.status}`;
-        dispatch(fetchAdvancedsearchFailure(errorMessage));
-        throw new Error(errorMessage);
-      }
-      return response.text();
-    })
-    .then(text => {
-      const response = JSON.parse(text);
-      dispatch(
-        fetchAdvancedsearchSuccess(response.results, response.totalNbResults)
-      );
-    });
-};
-
-export const fetchNextAdvancedsearchResults = (from, size) => (
-  dispatch,
-  getState
-) => {
-  const currentState = getState().advancedsearch;
-
-  // Load only new data (to avoid duplicates)
-  const newFrom = currentState.results.length;
-  const newSize = from + size - currentState.results.length;
-
-  const criterias = {
-    ...currentState.searchCriterias,
-    from: newFrom,
-    size: newSize
+    return fetch(completeUrl, { method: 'POST' })
+      .then(response => {
+        if (response.status >= 400) {
+          const errorMessage = `Fetching ${completeUrl} status: ${response.status}`;
+          dispatch(fetchAdvancedsearchFailure(errorMessage));
+          throw new Error(errorMessage);
+        }
+        return response.text();
+      })
+      .then(text => {
+        const response = JSON.parse(text);
+        dispatch(
+          fetchAdvancedsearchSuccess(response.results, response.totalNbResults)
+        );
+      });
   };
 
-  dispatch(fetchNextAdvancedSearchStarted(criterias));
+export const fetchNextAdvancedsearchResults =
+  (from, size) => (dispatch, getState) => {
+    const currentState = getState().advancedsearch;
 
-  let completeUrl = advancedsearchUrl;
-  if (criterias) {
-    completeUrl += `?${Object.keys(criterias)
-      .map(k => `${k}=${encodeURIComponent(criterias[k])}`)
-      .join('&')}`;
-  }
+    // Load only new data (to avoid duplicates)
+    const newFrom = currentState.results.length;
+    const newSize = from + size - currentState.results.length;
 
-  return fetch(completeUrl, { method: 'POST' })
-    .then(response => {
-      if (response.status >= 400) {
-        const errorMessage = `Fetching ${completeUrl} status: ${response.status}`;
-        dispatch(fetchNextAdvancedSearchFailure(errorMessage));
-        throw new Error(errorMessage);
-      }
-      return response.text();
-    })
-    .then(text => {
-      const response = JSON.parse(text);
-      dispatch(fetchNextAdvancedSearchSucess(response.results));
-    });
-};
+    const criterias = {
+      ...currentState.searchCriterias,
+      from: newFrom,
+      size: newSize
+    };
+
+    dispatch(fetchNextAdvancedSearchStarted(criterias));
+
+    let completeUrl = advancedsearchUrl;
+    if (criterias) {
+      completeUrl += `?${Object.keys(criterias)
+        .map(k => `${k}=${encodeURIComponent(criterias[k])}`)
+        .join('&')}`;
+    }
+
+    return fetch(completeUrl, { method: 'POST' })
+      .then(response => {
+        if (response.status >= 400) {
+          const errorMessage = `Fetching ${completeUrl} status: ${response.status}`;
+          dispatch(fetchNextAdvancedSearchFailure(errorMessage));
+          throw new Error(errorMessage);
+        }
+        return response.text();
+      })
+      .then(text => {
+        const response = JSON.parse(text);
+        dispatch(fetchNextAdvancedSearchSucess(response.results));
+      });
+  };
 
 export const fetchFullAdvancedsearchResults = () => (dispatch, getState) => {
   const currentState = getState().advancedsearch;

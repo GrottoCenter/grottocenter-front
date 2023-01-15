@@ -32,8 +32,7 @@ const DescriptionEditor = ({ required = false }) => {
         <DescriptionContainer>
           <StringInput
             helperText={formatMessage({
-              id:
-                'Make a precise sentence that is pleasant to read and uses keywords.'
+              id: 'Make a precise sentence that is pleasant to read and uses keywords.'
             })}
             multiline
             onValueChange={value => updateAttribute('description', value)}

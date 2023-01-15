@@ -23,10 +23,8 @@ const HydratedEntranceDuplicates = ({
   goBack,
   selectedDuplicates
 }) => {
-  const {
-    loading: loadingSubmitAction,
-    latestHttpCode: httpCodeUpdateEntry
-  } = useSelector(state => state.entrance);
+  const { loading: loadingSubmitAction, latestHttpCode: httpCodeUpdateEntry } =
+    useSelector(state => state.entrance);
   const {
     loading: loadingDuplicate,
     duplicate,

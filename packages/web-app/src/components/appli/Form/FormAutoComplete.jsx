@@ -9,11 +9,8 @@ import { FormAutoCompleteTypes } from '../../common/Form/types';
 // ===================================
 
 const FormAutoComplete = props => {
-  const {
-    contextValueName,
-    helperContent,
-    helperContentIfValueIsForced
-  } = props;
+  const { contextValueName, helperContent, helperContentIfValueIsForced } =
+    props;
   const {
     docAttributes: { [contextValueName]: value, partOf }
   } = useContext(DocumentFormContext);

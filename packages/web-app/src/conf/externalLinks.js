@@ -35,8 +35,7 @@ export const githubLink = {
 };
 
 export const createGitHubIssueForClientLinks = {
-  '*':
-    'https://github.com/GrottoCenter/grottocenter-front/issues/new?assignees=&labels=Type%3A+Bug&template=bug_report.md&title='
+  '*': 'https://github.com/GrottoCenter/grottocenter-front/issues/new?assignees=&labels=Type%3A+Bug&template=bug_report.md&title='
 };
 
 export const licenceLinks = {

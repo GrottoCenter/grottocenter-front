@@ -21,39 +21,41 @@ export const updateCommentFailure = error => ({
   error
 });
 
-export const updateComment = ({
-  id,
-  title,
-  body,
-  aestheticism,
-  caving,
-  approach,
-  eTTrail,
-  eTUnderground,
-  language
-}) => (dispatch, getState) => {
-  dispatch(updateCommentAction());
+export const updateComment =
+  ({
+    id,
+    title,
+    body,
+    aestheticism,
+    caving,
+    approach,
+    eTTrail,
+    eTUnderground,
+    language
+  }) =>
+  (dispatch, getState) => {
+    dispatch(updateCommentAction());
 
-  const requestOptions = {
-    method: 'PATCH',
-    body: JSON.stringify({
-      title,
-      body,
-      aestheticism,
-      caving,
-      approach,
-      eTTrail: minutesToDurationString(eTTrail) ?? null,
-      eTUnderground: minutesToDurationString(eTUnderground) ?? null,
-      language
-    }),
-    headers: getState().login.authorizationHeader
+    const requestOptions = {
+      method: 'PATCH',
+      body: JSON.stringify({
+        title,
+        body,
+        aestheticism,
+        caving,
+        approach,
+        eTTrail: minutesToDurationString(eTTrail) ?? null,
+        eTUnderground: minutesToDurationString(eTUnderground) ?? null,
+        language
+      }),
+      headers: getState().login.authorizationHeader
+    };
+
+    return fetch(putCommentUrl(id), requestOptions)
+      .then(checkAndGetStatus)
+      .then(response => response.json())
+      .then(data => dispatch(updateCommentSuccess(data)))
+      .catch(errorMessage => {
+        dispatch(updateCommentFailure(errorMessage));
+      });
   };
-
-  return fetch(putCommentUrl(id), requestOptions)
-    .then(checkAndGetStatus)
-    .then(response => response.json())
-    .then(data => dispatch(updateCommentSuccess(data)))
-    .catch(errorMessage => {
-      dispatch(updateCommentFailure(errorMessage));
-    });
-};

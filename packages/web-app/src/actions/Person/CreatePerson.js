@@ -19,24 +19,26 @@ export const postPersonFailure = error => ({
   error
 });
 
-export const postPerson = ({ name, surname }) => (dispatch, getState) => {
-  dispatch(postPersonAction());
+export const postPerson =
+  ({ name, surname }) =>
+  (dispatch, getState) => {
+    dispatch(postPersonAction());
 
-  const requestOptions = {
-    method: 'POST',
-    body: JSON.stringify({ name, surname }),
-    headers: getState().login.authorizationHeader
+    const requestOptions = {
+      method: 'POST',
+      body: JSON.stringify({ name, surname }),
+      headers: getState().login.authorizationHeader
+    };
+
+    return fetch(postPersonUrl, requestOptions)
+      .then(response => {
+        if (response.status >= 400) {
+          throw new Error(response.status);
+        }
+        return response.text();
+      })
+      .then(text => dispatch(postPersonSuccess(JSON.parse(text))))
+      .catch(errorMessage => {
+        dispatch(postPersonFailure(errorMessage));
+      });
   };
-
-  return fetch(postPersonUrl, requestOptions)
-    .then(response => {
-      if (response.status >= 400) {
-        throw new Error(response.status);
-      }
-      return response.text();
-    })
-    .then(text => dispatch(postPersonSuccess(JSON.parse(text))))
-    .catch(errorMessage => {
-      dispatch(postPersonFailure(errorMessage));
-    });
-};

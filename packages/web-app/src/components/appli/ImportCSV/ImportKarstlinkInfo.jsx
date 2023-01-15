@@ -65,8 +65,7 @@ const ImportKarstlinkInfo = ({ selectType }) => {
           })}
           &nbsp;
           {formatMessage({
-            id:
-              'How to create links between scientific observations, the measurements made by the sensors and the cavities in which these observations and measurements were carried out?'
+            id: 'How to create links between scientific observations, the measurements made by the sensors and the cavities in which these observations and measurements were carried out?'
           })}
           &nbsp;
           {formatMessage({

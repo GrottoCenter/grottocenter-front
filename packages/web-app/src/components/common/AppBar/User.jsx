@@ -109,8 +109,7 @@ const UserMenu = ({
             <>
               {formatMessage(
                 {
-                  id:
-                    'Expiration Date: {expirationDate} at {expirationHourAndMinutes}',
+                  id: 'Expiration Date: {expirationDate} at {expirationHourAndMinutes}',
                   defaultMessage:
                     'Expiration Date: {expirationDate} at {expirationHourAndMinutes}'
                 },

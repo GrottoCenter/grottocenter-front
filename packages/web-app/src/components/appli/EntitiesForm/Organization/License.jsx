@@ -34,8 +34,7 @@ const License = () => {
               src="/images/odbl.png"
               alt="ODBL license"
               title={formatMessage({
-                id:
-                  'The ODBL license applies to all data that is not copyrighted.'
+                id: 'The ODBL license applies to all data that is not copyrighted.'
               })}
             />
           </InternationalizedLink>
@@ -46,8 +45,7 @@ const License = () => {
               src="/images/CC-BY-SA.png"
               alt="CC-BY-SA licence"
               title={formatMessage({
-                id:
-                  'Unless stated otherwise, the CC-BY-SA license applies for documents and texts subject to copyright.'
+                id: 'Unless stated otherwise, the CC-BY-SA license applies for documents and texts subject to copyright.'
               })}
             />
           </InternationalizedLink>

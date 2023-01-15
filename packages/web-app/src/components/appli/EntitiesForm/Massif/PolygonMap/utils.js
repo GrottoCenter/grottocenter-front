@@ -1,4 +1,4 @@
-const getMultiPolygonCentroid = function(coordinates) {
+const getMultiPolygonCentroid = function (coordinates) {
   const result = coordinates.reduce(
     (x, y) => [
       x[0] + y[0] / coordinates.length,

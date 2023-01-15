@@ -25,8 +25,7 @@ const TitleEditor = ({ required = false }) => {
       <TitleContainer>
         <StringInput
           helperText={formatMessage({
-            id:
-              'Copy the title of the text as it is. In its absence, put a fictitious title between [].'
+            id: 'Copy the title of the text as it is. In its absence, put a fictitious title between [].'
           })}
           onValueChange={value => updateAttribute('title', value)}
           value={title}

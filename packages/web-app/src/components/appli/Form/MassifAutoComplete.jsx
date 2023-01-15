@@ -35,9 +35,11 @@ const MassifAutoComplete = ({
   searchLabelText
 }) => {
   const dispatch = useDispatch();
-  const { error, isLoading, results: suggestions } = useSelector(
-    state => state.quicksearch
-  );
+  const {
+    error,
+    isLoading,
+    results: suggestions
+  } = useSelector(state => state.quicksearch);
 
   const fetchSearchResults = debouncedInput => {
     const criterias = {

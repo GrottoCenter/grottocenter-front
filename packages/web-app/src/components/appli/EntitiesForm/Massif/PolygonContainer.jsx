@@ -35,8 +35,7 @@ const PolygonContainer = ({ control, geoJson, errors }) => {
         <FormLabel>{formatMessage({ id: 'Massif area' })}</FormLabel>
         <FormHelperText>
           {formatMessage({
-            id:
-              'Draw the area covered by the massif using the tools at the right of the map.'
+            id: 'Draw the area covered by the massif using the tools at the right of the map.'
           })}
         </FormHelperText>
         <Controller

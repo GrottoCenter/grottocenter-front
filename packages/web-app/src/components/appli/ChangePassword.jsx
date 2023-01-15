@@ -13,13 +13,10 @@ const ChangePassword = () => {
   const dispatch = useDispatch();
   const { formatMessage } = useIntl();
   const changePasswordState = useSelector(state => state.changePassword);
-  const [changePasswordRequestSent, setChangePasswordRequestSent] = useState(
-    false
-  );
-  const [
-    changePasswordRequestSucceeded,
-    setChangePasswordRequestSucceeded
-  ] = useState(false);
+  const [changePasswordRequestSent, setChangePasswordRequestSent] =
+    useState(false);
+  const [changePasswordRequestSucceeded, setChangePasswordRequestSucceeded] =
+    useState(false);
   const [password, setPassword] = useState('');
   const [passwordConfirmation, setPasswordConfirmation] = useState('');
   const { onError } = useNotification();

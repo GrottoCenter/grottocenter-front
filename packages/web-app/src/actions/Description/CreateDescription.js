@@ -21,32 +21,27 @@ export const postDescriptionFailure = error => ({
   error
 });
 
-export const postDescription = ({
-  entrance,
-  cave,
-  massif,
-  title,
-  body,
-  language
-}) => (dispatch, getState) => {
-  dispatch(postDescriptionAction());
+export const postDescription =
+  ({ entrance, cave, massif, title, body, language }) =>
+  (dispatch, getState) => {
+    dispatch(postDescriptionAction());
 
-  const requestOptions = {
-    method: 'POST',
-    body: JSON.stringify({ entrance, cave, massif, title, body, language }),
-    headers: getState().login.authorizationHeader
-  };
+    const requestOptions = {
+      method: 'POST',
+      body: JSON.stringify({ entrance, cave, massif, title, body, language }),
+      headers: getState().login.authorizationHeader
+    };
 
-  return fetch(postDescriptionUrl, requestOptions)
-    .then(checkAndGetStatus)
-    .then(response => response.json())
-    .then(data => dispatch(postDescriptionSuccess(data)))
-    .catch(error =>
-      dispatch(
-        postDescriptionFailure(
-          makeErrorMessage(error.message, `Creating a new description`),
-          error.message
+    return fetch(postDescriptionUrl, requestOptions)
+      .then(checkAndGetStatus)
+      .then(response => response.json())
+      .then(data => dispatch(postDescriptionSuccess(data)))
+      .catch(error =>
+        dispatch(
+          postDescriptionFailure(
+            makeErrorMessage(error.message, `Creating a new description`),
+            error.message
+          )
         )
-      )
-    );
-};
+      );
+  };

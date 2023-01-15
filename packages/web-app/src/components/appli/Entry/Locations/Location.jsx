@@ -20,14 +20,8 @@ import Contribution from '../../../common/Contribution/Contribution';
 const Location = ({ location }) => {
   const dispatch = useDispatch();
   const permissions = usePermissions();
-  const {
-    title,
-    body,
-    author,
-    reviewer,
-    creationDate,
-    reviewedDate
-  } = location;
+  const { title, body, author, reviewer, creationDate, reviewedDate } =
+    location;
   const [isFormVisible, setIsFormVisible] = useState(false);
 
   const onSubmitForm = data => {

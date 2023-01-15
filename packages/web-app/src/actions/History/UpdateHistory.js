@@ -20,23 +20,22 @@ export const updateHistoryFailure = error => ({
   error
 });
 
-export const updateHistory = ({ id, body, language }) => (
-  dispatch,
-  getState
-) => {
-  dispatch(updateHistoryAction());
+export const updateHistory =
+  ({ id, body, language }) =>
+  (dispatch, getState) => {
+    dispatch(updateHistoryAction());
 
-  const requestOptions = {
-    method: 'PUT',
-    body: JSON.stringify({ body, language }),
-    headers: getState().login.authorizationHeader
+    const requestOptions = {
+      method: 'PUT',
+      body: JSON.stringify({ body, language }),
+      headers: getState().login.authorizationHeader
+    };
+
+    return fetch(putHistoryUrl(id), requestOptions)
+      .then(checkAndGetStatus)
+      .then(response => response.json())
+      .then(data => dispatch(updateHistorySuccess(data)))
+      .catch(errorMessage => {
+        dispatch(updateHistoryFailure(errorMessage));
+      });
   };
-
-  return fetch(putHistoryUrl(id), requestOptions)
-    .then(checkAndGetStatus)
-    .then(response => response.json())
-    .then(data => dispatch(updateHistorySuccess(data)))
-    .catch(errorMessage => {
-      dispatch(updateHistoryFailure(errorMessage));
-    });
-};

@@ -129,36 +129,33 @@ export function updateDocument(docAttributes) {
   };
 }
 
-export const updateDocumentWithNewEntities = (
-  docAttributes,
-  newAuthors,
-  newDescriptions
-) => (dispatch, getState) => {
-  dispatch(updateDocumentAction());
-  const { id } = docAttributes;
-  const body = {
-    document: docAttributes,
-    newAuthors,
-    newDescriptions
-  };
+export const updateDocumentWithNewEntities =
+  (docAttributes, newAuthors, newDescriptions) => (dispatch, getState) => {
+    dispatch(updateDocumentAction());
+    const { id } = docAttributes;
+    const body = {
+      document: docAttributes,
+      newAuthors,
+      newDescriptions
+    };
 
-  const requestOptions = {
-    method: 'PUT',
-    body: JSON.stringify(body),
-    headers: getState().login.authorizationHeader
-  };
+    const requestOptions = {
+      method: 'PUT',
+      body: JSON.stringify(body),
+      headers: getState().login.authorizationHeader
+    };
 
-  return fetch(putDocumentyWithNewEntitiesUrl(id), requestOptions)
-    .then(checkAndGetStatus)
-    .then(response => {
-      dispatch(updateDocumentSuccess(response.status));
-    })
-    .catch(error => {
-      dispatch(
-        updateDocumentFailure(
-          [`Unable to update the document with id ${id}`],
-          error.message
-        )
-      );
-    });
-};
+    return fetch(putDocumentyWithNewEntitiesUrl(id), requestOptions)
+      .then(checkAndGetStatus)
+      .then(response => {
+        dispatch(updateDocumentSuccess(response.status));
+      })
+      .catch(error => {
+        dispatch(
+          updateDocumentFailure(
+            [`Unable to update the document with id ${id}`],
+            error.message
+          )
+        );
+      });
+  };

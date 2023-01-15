@@ -15,9 +15,11 @@ const MultipleBBSRegionsSelect = ({
   required = false
 }) => {
   const dispatch = useDispatch();
-  const { error, isFetching, bbsRegionsByName: searchResults } = useSelector(
-    state => state.region
-  );
+  const {
+    error,
+    isFetching,
+    bbsRegionsByName: searchResults
+  } = useSelector(state => state.region);
 
   const loadSearchResults = inputValue => {
     dispatch(loadRegionsSearch(inputValue, inputValue, true));

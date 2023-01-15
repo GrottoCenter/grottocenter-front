@@ -64,24 +64,20 @@ const Welcome = ({ theme }) => {
           </WelcomeParagraph>
           <WelcomeParagraph>
             {formatMessage({
-              id:
-                'All information is freely accessible, creating an account will allow you to contribute: all together we will be able to complete and make more reliable the information on caves, documents, organizations and massifs, linked to the underground environment.'
+              id: 'All information is freely accessible, creating an account will allow you to contribute: all together we will be able to complete and make more reliable the information on caves, documents, organizations and massifs, linked to the underground environment.'
             })}
           </WelcomeParagraph>
           <WelcomeParagraph>
             {formatMessage({
-              id:
-                'The Speleological Abstracts (SA / BBS) has joined Grottocenter to give you access to a very important collection of documents.'
+              id: 'The Speleological Abstracts (SA / BBS) has joined Grottocenter to give you access to a very important collection of documents.'
             })}
             &nbsp;
             {formatMessage({
-              id:
-                "You can now contribute to SA / BBS, either directly or by joining your country's contributing team."
+              id: "You can now contribute to SA / BBS, either directly or by joining your country's contributing team."
             })}
             &nbsp;
             {formatMessage({
-              id:
-                'Contact us if you have any questions or if you want to participate in the project.'
+              id: 'Contact us if you have any questions or if you want to participate in the project.'
             })}
           </WelcomeParagraph>
         </GridTwoThirdColumn>
