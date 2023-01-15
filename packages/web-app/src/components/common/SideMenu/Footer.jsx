@@ -41,7 +41,7 @@ const Footer = () => {
     <Container>
       <AlignText>
         <LogoFooter />
-        <Typography variant="caption"> v22.0.27 </Typography>
+        <Typography variant="caption"> v23.0.0 </Typography>
       </AlignText>
       <Spaced>
         <InternationalizedLink links={licensesODBLink}>

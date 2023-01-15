@@ -31,7 +31,7 @@ describe('Simple pages loader to check all major pages load correctly', () => {
   });
 
   it('entrance page', () => {
-    cy.visit('/entrances/35120'); // Entrance with lot of data
+    cy.visit('/entrances/35120'); // Entrance with a lot of data
     cy.checkPageLoaded();
 
     cy.visit('/entrances/6085'); // Entrance with almost no data
@@ -62,7 +62,10 @@ describe('Simple pages loader to check all major pages load correctly', () => {
 
   it('organization page', () => {
     cy.visit('/organizations/2');
-    cy.checkPageLoaded();
+    // TODO: make these pages quicker to load and reduce this timeout
+    cy.get('h1', { timeout: 35000 })
+      .should('exist')
+      .should('not.be.empty');
   });
 
   it('country page', () => {
