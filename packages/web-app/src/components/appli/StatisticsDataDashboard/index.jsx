@@ -82,6 +82,10 @@ const StatisticsDataDashboard = ({ countryId, massifId }) => {
     setIsCountry(false);
   }, [dataMassif]);
 
+  useEffect(() => {
+    setIsCountry(!!countryId);
+  }, [countryId]);
+
   return (
     <>
       <Typography variant="h3" gutterBottom>
@@ -137,6 +141,11 @@ const StatisticsDataDashboard = ({ countryId, massifId }) => {
                 nbCaves={data.nb_caves}
                 nbDivingCaves={data.diving_caves}
                 nbNetworks={data.nb_networks}
+                url={
+                  isCountry
+                    ? `/ui/countries/${countryId}/entrances`
+                    : `/ui/massifs/${massifId}/entrances`
+                }
               />
             </DataBox>
             <DataBox>
