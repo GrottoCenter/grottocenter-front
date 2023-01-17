@@ -42,6 +42,7 @@ import OrganizationEdit from './EntityEdit/Organization/OrganizationEdit';
 import CountryPage from './Country';
 import NotificationsPage from './Notifications';
 import SnapshotPage from '../components/appli/Entry/Snapshots';
+import EntrancesListPage from './EntrancesList';
 
 async function transitionToReact() {
   await intlBootstrap.initialFetchP; // Make sure strings of the initial locale are loaded
@@ -93,6 +94,10 @@ const Application = () => {
         <Route path="/ui/entrances/:id?/move" component={MoveEntranceToCave} />
         <Route path="/ui/entrances/:id?" component={EntryPage} />
         <Route path="/ui/caves/:id?" component={NetworkPage} />
+        <Route
+          path="/ui/countries/:countryId/entrances"
+          component={EntrancesListPage}
+        />
         <Route path="/ui/countries/:id?" component={CountryPage} />
         <Route path="/ui/faq" component={Faq} />
         <Route path="/ui/map/:target?" component={Map} />
@@ -109,6 +114,10 @@ const Application = () => {
         />
 
         <Route path="/ui/massifs/:massifId/edit" component={MassifEdit} />
+        <Route
+          path="/ui/massifs/:massifId/entrances"
+          component={EntrancesListPage}
+        />
         <Route path="/ui/massifs/:massifId" component={MassifPage} />
         <Route path="/ui/persons/:personId/edit" component={PersonEdit} />
         <Route path="/ui/persons/:personId" component={PersonPage} />

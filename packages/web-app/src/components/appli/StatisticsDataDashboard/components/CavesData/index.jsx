@@ -2,9 +2,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import { Waves } from '@material-ui/icons';
-import { Box } from '@material-ui/core';
+import { Box, Typography, useTheme } from '@material-ui/core';
+import { Link } from 'react-router-dom';
 import InlineData from './InlineData';
-
 import ScrollableContent from '../../../../common/Layouts/Fixed/ScrollableContent';
 
 const styledImg = { width: '100%', height: 'auto' };
@@ -20,9 +20,11 @@ const CavesData = ({
   nbMassifs,
   nbCaves,
   nbDivingCaves,
-  nbNetworks
+  nbNetworks,
+  url
 }) => {
   const { formatMessage } = useIntl();
+  const theme = useTheme();
 
   return (
     <ScrollableContent
@@ -37,13 +39,11 @@ const CavesData = ({
                   <img
                     style={styledImg}
                     src="/images/massif.svg"
-                    alt={formatMessage({ id: 'Massif icon' })}
+                    alt="entry icon"
                   />
                 }
                 numberData={nbMassifs}
-                text={formatMessage({
-                  id: 'massifs are present in this country.'
-                })}
+                text="massifs are present in this country."
               />
               <StyledDivider />
             </>
@@ -55,11 +55,11 @@ const CavesData = ({
                 <img
                   style={styledImg}
                   src="/images/iconsV3/entry.svg"
-                  alt={formatMessage({ id: 'Entrance icon' })}
+                  alt="entry icon"
                 />
               }
               numberData={nbCaves}
-              text={formatMessage({ id: 'caves are freely accessible.' })}
+              text="caves are freely accessible."
             />
           )}
 
@@ -68,9 +68,9 @@ const CavesData = ({
               <StyledDivider />
               <InlineData
                 icon={<Waves color="primary" />}
-                alt={formatMessage({ id: 'Waves icon' })}
+                alt="entry icon"
                 numberData={nbDivingCaves}
-                text={formatMessage({ id: 'caves are diving.' })}
+                text="caves are diving."
               />
             </>
           )}
@@ -83,14 +83,26 @@ const CavesData = ({
                   <img
                     style={styledImg}
                     src="/images/iconsV3/cave_system.svg"
-                    alt={formatMessage({ id: 'Network icon' })}
+                    alt="network icon"
                   />
                 }
                 numberData={nbNetworks}
-                text={formatMessage({ id: 'networks are freely accessible.' })}
+                text="networks are freely accessible."
               />
             </>
           )}
+
+          <Box
+            display="flex"
+            justifyContent="flex-end"
+            alignItems="flex-end"
+            marginRight="40px">
+            <Link style={{ color: theme.palette.secondary.main }} to={url}>
+              <Typography fontSize="small">
+                {formatMessage({ id: 'Access entrances list' })}
+              </Typography>
+            </Link>
+          </Box>
         </>
       }
     />
@@ -102,7 +114,8 @@ CavesData.propTypes = {
   nbMassifs: PropTypes.number,
   nbCaves: PropTypes.number,
   nbDivingCaves: PropTypes.number,
-  nbNetworks: PropTypes.number
+  nbNetworks: PropTypes.number,
+  url: PropTypes.string
 };
 
 export default CavesData;

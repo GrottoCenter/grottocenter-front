@@ -71,6 +71,8 @@ import updateMassif from './UpdateMassifReducer';
 import updateName from './UpdateNameReducer';
 import updateOrganization from './UpdateOrganization';
 import updatePerson from './UpdatePerson';
+import massifEntrances from './MassifEntrancesDataQualityReducer';
+import countryEntrances from './CountryEntrancesDataQualityReducer';
 
 const GCReducer = combineReducers({
   admin,
@@ -111,6 +113,7 @@ const GCReducer = combineReducers({
   login,
   map,
   massif,
+  massifEntrances,
   menuNotifications,
   moderator,
   moveEntranceToCave,
@@ -145,7 +148,8 @@ const GCReducer = combineReducers({
   updateName,
   updateOrganization,
   updatePerson,
-  updatePersonGroups
+  updatePersonGroups,
+  countryEntrances
 });
 
 export default GCReducer;

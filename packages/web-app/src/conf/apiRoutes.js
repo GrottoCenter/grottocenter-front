@@ -29,6 +29,8 @@ export const getCountryUrl = countryId =>
   `${API_BASE_PATH}/countries/${countryId}`;
 export const getStatisticsCountryUrl = countryId =>
   `${API_BASE_PATH}/countries/${countryId}/statistics`;
+export const getCountryEntrancesUrl = countryId =>
+  `${API_BASE_PATH}/entrances/with-quality/countries/${countryId}`;
 
 // ===== Descriptions urls
 export const postDescriptionUrl = `${API_BASE_PATH}/descriptions`;
@@ -117,6 +119,8 @@ export const postCreateMassifUrl = `${API_BASE_PATH}/massifs/`;
 export const putMassifUrl = massifId => `${API_BASE_PATH}/massifs/${massifId}`;
 export const getStatisticsMassifUrl = massifId =>
   `${API_BASE_PATH}/massifs/${massifId}/statistics`;
+export const getMassifEntrancesUrl = massifId =>
+  `${API_BASE_PATH}/entrances/with-quality/massifs/${massifId}`;
 
 // ===== Notifications urls
 export const countUnreadNotificationsUrl = `${API_URL}/api/${apiVersion}/notifications/unread/count`;
