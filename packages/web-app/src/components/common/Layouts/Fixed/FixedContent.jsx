@@ -12,7 +12,7 @@ import {
   CircularProgress,
   Tooltip
 } from '@material-ui/core';
-import { Print } from '@material-ui/icons';
+import { Print, History } from '@material-ui/icons';
 import styled from 'styled-components';
 import ReactToPrint from 'react-to-print';
 import CreateIcon from '@material-ui/icons/Create';
@@ -69,6 +69,8 @@ const FixedContent = ({
   footer,
   onEdit,
   printRef,
+  snapshotId,
+  isNetwork = false,
   onChangeSubscribe,
   isSubscribed,
   isSubscribeLoading
@@ -104,6 +106,13 @@ const FixedContent = ({
                 )}
                 content={() => printRef.current}
               />
+            )}
+            {snapshotId && (
+              <IconButton
+                href={`/ui/entrances/${snapshotId}/snapshots?isNetwork=${isNetwork}`}
+                color="primary">
+                <History />
+              </IconButton>
             )}
 
             {!isNil(onChangeSubscribe) && (
@@ -155,6 +164,8 @@ FixedContent.propTypes = {
     // eslint-disable-next-line react/forbid-prop-types
     current: PropTypes.any
   }).isRequired,
+  snapshotId: PropTypes.number,
+  isNetwork: PropTypes.bool,
   onChangeSubscribe: PropTypes.func,
   subheader: PropTypes.node,
   title: PropTypes.oneOfType([PropTypes.node, PropTypes.string]).isRequired
