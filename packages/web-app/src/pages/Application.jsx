@@ -80,7 +80,8 @@ const Application = () => {
       isAuth={permissions.isAuth}
       isSideMenuOpen={isSideMenuOpen}
       toggleSideMenu={toggleSideMenu}
-      SideBarQuickSearch={() => <QuickSearch />}>
+      SideBarQuickSearch={() => <QuickSearch />}
+    >
       <LoginDialog />
       <Switch>
         <Route exact path="/" component={HomePage} />
@@ -89,6 +90,7 @@ const Application = () => {
         <Route path="/ui/search" component={AdvancedSearchPage} />
         <Route path="/ui/api/:version" component={ApiDoc} />
         <Route path="/ui/api" component={Api} />
+        <Route path="/ui/:type/:id/snapshots" component={SnapshotPage} />
         <Route path="/ui/entrances/:id?/move" component={MoveEntranceToCave} />
         <Route path="/ui/entrances/:id?" component={EntryPage} />
         <Route path="/ui/caves/:id?" component={NetworkPage} />
@@ -98,7 +100,6 @@ const Application = () => {
         <Route path="/ui/contributions" component={ContributionsPage} />
         <Route path="/ui/notifications" component={NotificationsPage} />
         <Route path="/ui/test" component={LatestBlogNewsSection} />
-        <Route path="/ui/:type/:id/snapshots" component={SnapshotPage} />
         <Route
           path="/ui/organizations/:organizationId/edit"
           component={OrganizationEdit}
