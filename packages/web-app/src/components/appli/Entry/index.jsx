@@ -86,8 +86,11 @@ export const Entry = () => {
           icon={<CustomIcon type="entry" />}
           onEdit={permissions.isAuth ? handleEdit : undefined}
           printRef={componentRef}
-          snapshotId={id}
-          isNetwork={cave?.entrances.length > 1}
+          snapshot={{
+            id,
+            entity: 'entrances',
+            isNetwork: cave?.entrances.length > 1
+          }}
           content={
             <HalfSplitContainer>
               {isSensitive && <SensitiveCaveWarning />}

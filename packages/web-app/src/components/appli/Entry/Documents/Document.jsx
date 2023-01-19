@@ -1,5 +1,12 @@
 import { useIntl } from 'react-intl';
-import { Chip, ListItem, ListItemText } from '@material-ui/core';
+import {
+  Chip,
+  ListItem,
+  ListItemText,
+  ListItemIcon,
+  IconButton
+} from '@material-ui/core';
+import HistoryIcon from '@material-ui/icons/History';
 import React from 'react';
 import styled from 'styled-components';
 import GCLink from '../../../common/GCLink';
@@ -50,6 +57,11 @@ const Document = ({ details, entities, id, overview }) => {
           />
         }
       />
+      <ListItemIcon style={{ alignSelf: 'start' }}>
+        <IconButton href={`/ui/documents/${id}/snapshots`} color="primary">
+          <HistoryIcon />
+        </IconButton>
+      </ListItemIcon>
     </ListItem>
   );
 };

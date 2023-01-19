@@ -63,21 +63,23 @@ const Description = ({ description }) => {
           }
         />
       )}
-      {permissions.isAuth && (
+      <Box sx={{ display: 'flex', flexDirection: 'column' }}>
         <ListItemIcon style={{ alignSelf: 'start' }}>
-          <IconButton
-            onClick={() => setIsFormVisible(!isFormVisible)}
-            color="primary"
-            aria-label="edit">
-            {isFormVisible ? <CancelIcon /> : <EditIcon />}
+          <IconButton href={`/ui/descriptions/${id}/snapshots`} color="primary">
+            <HistoryIcon />
           </IconButton>
         </ListItemIcon>
-      )}
-      <ListItemIcon style={{ alignSelf: 'start' }}>
-        <IconButton href={`/ui/descriptions/${id}/snapshots`} color="primary">
-          <HistoryIcon />
-        </IconButton>
-      </ListItemIcon>
+        {permissions.isAuth && (
+          <ListItemIcon style={{ alignSelf: 'start' }}>
+            <IconButton
+              onClick={() => setIsFormVisible(!isFormVisible)}
+              color="primary"
+              aria-label="edit">
+              {isFormVisible ? <CancelIcon /> : <EditIcon />}
+            </IconButton>
+          </ListItemIcon>
+        )}
+      </Box>
     </ListItem>
   );
 };

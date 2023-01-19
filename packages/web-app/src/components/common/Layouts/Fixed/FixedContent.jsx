@@ -69,8 +69,7 @@ const FixedContent = ({
   footer,
   onEdit,
   printRef,
-  snapshotId,
-  isNetwork = false,
+  snapshot,
   onChangeSubscribe,
   isSubscribed,
   isSubscribeLoading
@@ -107,9 +106,13 @@ const FixedContent = ({
                 content={() => printRef.current}
               />
             )}
-            {snapshotId && (
+            {snapshot && snapshot.id && (
               <IconButton
-                href={`/ui/entrances/${snapshotId}/snapshots?isNetwork=${isNetwork}`}
+                href={`/ui/${snapshot.entity}/${snapshot.id}/snapshots${
+                  snapshot.isNetwork !== undefined
+                    ? `?isNetwork=${snapshot.isNetwork}`
+                    : ''
+                }`}
                 color="primary">
                 <History />
               </IconButton>
@@ -164,8 +167,7 @@ FixedContent.propTypes = {
     // eslint-disable-next-line react/forbid-prop-types
     current: PropTypes.any
   }).isRequired,
-  snapshotId: PropTypes.number,
-  isNetwork: PropTypes.bool,
+  snapshot: PropTypes.node,
   onChangeSubscribe: PropTypes.func,
   subheader: PropTypes.node,
   title: PropTypes.oneOfType([PropTypes.node, PropTypes.string]).isRequired

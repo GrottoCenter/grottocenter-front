@@ -5,11 +5,10 @@ import { useDispatch } from 'react-redux';
 import CancelIcon from '@material-ui/icons/Cancel';
 import HistoryIcon from '@material-ui/icons/History';
 import React, { useState } from 'react';
-import PropTypes from 'prop-types';
 import { usePermissions } from '../../../../hooks';
 import { updateRiggings } from '../../../../actions/Riggings/UpdateRigging';
 import CreateRiggingsForm from '../../Form/RiggingsForm/index';
-import { riggingType, obstacleType } from '../Provider';
+import { riggingType } from '../Provider';
 import Contribution from '../../../common/Contribution/Contribution';
 import RiggingTable from './RiggingTable';
 
@@ -47,7 +46,7 @@ const Rigging = ({ rigging }) => {
           </Tooltip>
         )}
         <IconButton
-          href={`/ui/rigging/${rigging.id}/snapshots`}
+          href={`/ui/riggings/${rigging.id}/snapshots`}
           color="primary">
           <HistoryIcon />
         </IconButton>
@@ -74,11 +73,6 @@ const Rigging = ({ rigging }) => {
       )}
     </Box>
   );
-};
-
-RiggingTable.propTypes = {
-  obstacles: PropTypes.arrayOf(obstacleType),
-  title: PropTypes.string.isRequired
 };
 
 Rigging.propTypes = {

@@ -2,13 +2,14 @@ import * as React from 'react';
 import { useIntl } from 'react-intl';
 import { GpsFixed, Height, Waves, Title } from '@material-ui/icons';
 import { Box } from '@material-ui/core';
+import PropTypes from 'prop-types';
 
 import { Property } from '../../../common/Properties';
 import CustomIcon from '../../../common/CustomIcon';
 
 const EntranceCaveSnapshot = information => {
-  const entrance = information.entrance;
-  const cave = entrance.cave;
+  const { entrance } = information;
+  const { cave } = entrance;
   const { formatMessage } = useIntl();
 
   const makeCoordinatesValue = coordinatesValue =>
@@ -73,5 +74,8 @@ const EntranceCaveSnapshot = information => {
     </Box>
   );
 };
-
+EntranceCaveSnapshot.propTypes = {
+  // eslint-disable-next-line react/no-unused-prop-types
+  information: PropTypes.node
+};
 export default EntranceCaveSnapshot;
