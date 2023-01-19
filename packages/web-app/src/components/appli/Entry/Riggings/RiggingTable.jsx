@@ -12,6 +12,8 @@ import {
 import React from 'react';
 import { isNil } from 'ramda';
 import styled from 'styled-components';
+import PropTypes from 'prop-types';
+import { obstacleType } from '../Provider';
 
 const StyledTableRow = styled(TableRow)(({ theme }) => ({
   backgroundColor: theme.palette.action.hover
@@ -76,6 +78,11 @@ const RiggingTable = ({ obstacles, title }) => {
       </TableContainer>
     </Box>
   );
+};
+
+RiggingTable.propTypes = {
+  obstacles: PropTypes.arrayOf(obstacleType),
+  title: PropTypes.string.isRequired
 };
 
 export default RiggingTable;

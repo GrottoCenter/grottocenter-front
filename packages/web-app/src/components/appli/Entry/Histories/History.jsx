@@ -9,6 +9,7 @@ import {
 import { useDispatch } from 'react-redux';
 import EditIcon from '@material-ui/icons/Edit';
 import CancelIcon from '@material-ui/icons/Cancel';
+import HistoryIcon from '@material-ui/icons/History';
 
 import { historyType } from '../Provider';
 import CreateHistoryForm from '../../Form/HistoryForm/index';
@@ -19,7 +20,7 @@ import Contribution from '../../../common/Contribution/Contribution';
 const History = ({ history }) => {
   const dispatch = useDispatch();
   const permissions = usePermissions();
-  const { body, author, reviewer, creationDate, reviewedDate } = history;
+  const { id, body, author, reviewer, creationDate, reviewedDate } = history;
   const [isFormVisible, setIsFormVisible] = useState(false);
 
   const onSubmitForm = data => {
@@ -58,16 +59,23 @@ const History = ({ history }) => {
           }
         />
       )}
-      {permissions.isAuth && (
-        <ListItemIcon style={{ alignSelf: 'start' }}>
-          <IconButton
-            onClick={() => setIsFormVisible(!isFormVisible)}
-            color="primary"
-            aria-label="edit">
-            {isFormVisible ? <CancelIcon /> : <EditIcon />}
+      <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+        <ListItemIcon>
+          <IconButton href={`/ui/histories/${id}/snapshots`} color="primary">
+            <HistoryIcon />
           </IconButton>
         </ListItemIcon>
-      )}
+        {permissions.isAuth && (
+          <ListItemIcon style={{ alignSelf: 'start' }}>
+            <IconButton
+              onClick={() => setIsFormVisible(!isFormVisible)}
+              color="primary"
+              aria-label="edit">
+              {isFormVisible ? <CancelIcon /> : <EditIcon />}
+            </IconButton>
+          </ListItemIcon>
+        )}
+      </Box>
     </ListItem>
   );
 };

@@ -63,23 +63,25 @@ const Location = ({ location }) => {
           }
         />
       )}
-      {permissions.isAuth && (
+      <Box sx={{ display: 'flex', flexDirection: 'column' }}>
         <ListItemIcon style={{ alignSelf: 'start' }}>
           <IconButton
-            onClick={() => setIsFormVisible(!isFormVisible)}
-            color="primary"
-            aria-label="edit">
-            {isFormVisible ? <CancelIcon /> : <EditIcon />}
+            href={`/ui/locations/${location.id}/snapshots`}
+            color="primary">
+            <HistoryIcon />
           </IconButton>
         </ListItemIcon>
-      )}
-      <ListItemIcon style={{ alignSelf: 'start' }}>
-        <IconButton
-          href={`/ui/locations/${location.id}/snapshots`}
-          color="primary">
-          <HistoryIcon />
-        </IconButton>
-      </ListItemIcon>
+        {permissions.isAuth && (
+          <ListItemIcon style={{ alignSelf: 'start' }}>
+            <IconButton
+              onClick={() => setIsFormVisible(!isFormVisible)}
+              color="primary"
+              aria-label="edit">
+              {isFormVisible ? <CancelIcon /> : <EditIcon />}
+            </IconButton>
+          </ListItemIcon>
+        )}
+      </Box>
     </ListItem>
   );
 };

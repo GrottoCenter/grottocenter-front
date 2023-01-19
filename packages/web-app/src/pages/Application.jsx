@@ -80,8 +80,7 @@ const Application = () => {
       isAuth={permissions.isAuth}
       isSideMenuOpen={isSideMenuOpen}
       toggleSideMenu={toggleSideMenu}
-      SideBarQuickSearch={() => <QuickSearch />}
-    >
+      SideBarQuickSearch={() => <QuickSearch />}>
       <LoginDialog />
       <Switch>
         <Route exact path="/" component={HomePage} />

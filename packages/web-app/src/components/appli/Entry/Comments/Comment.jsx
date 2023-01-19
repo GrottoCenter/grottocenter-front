@@ -123,17 +123,19 @@ const Comment = ({ comment }) => {
         </>
       )}
       {canEdit && (
-        <ListItemIcon style={{ alignSelf: 'start' }}>
-          <IconButton
-            onClick={() => setIsFormVisible(!isFormVisible)}
-            color="primary"
-            aria-label="edit">
-            {isFormVisible ? <CancelIcon /> : <EditIcon />}
-          </IconButton>
-          <IconButton href={`/ui/comments/${id}/snapshots`} color="primary">
-            <HistoryIcon />
-          </IconButton>
-        </ListItemIcon>
+        <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+          <ListItemIcon>
+            <IconButton href={`/ui/comments/${id}/snapshots`} color="primary">
+              <HistoryIcon />
+            </IconButton>
+            <IconButton
+              onClick={() => setIsFormVisible(!isFormVisible)}
+              color="primary"
+              aria-label="edit">
+              {isFormVisible ? <CancelIcon /> : <EditIcon />}
+            </IconButton>
+          </ListItemIcon>
+        </Box>
       )}
     </ListItem>
   );

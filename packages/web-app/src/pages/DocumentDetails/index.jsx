@@ -59,6 +59,9 @@ const DocumentPage = ({
 
   const { editor, library } = organizations;
 
+  const { documentId: documentIdFromRoute } = useParams();
+  const documentId = documentIdFromRoute;
+
   return (
     <Layout
       onEdit={isValidated ? onEdit : undefined}
@@ -68,6 +71,7 @@ const DocumentPage = ({
           id: 'A moderator needs to validate the last modification before being able to edit the document again.'
         })
       }
+      snapshot={{ id: documentId, entity: 'documents' }}
       title={loading ? <Skeleton /> : overview.title}
       content={
         <>
