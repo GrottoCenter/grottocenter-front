@@ -6,7 +6,6 @@ import { Box } from '@material-ui/core';
 
 import Layout from '../../common/Layouts/Fixed/FixedContent';
 import CavesList from '../../common/cave/CavesList';
-import EntrancesList from '../../common/entrance/EntrancesList';
 import DocumentsList from '../../common/DocumentsList/DocumentsList';
 import Alert from '../../common/Alert';
 import MassifPropTypes from './propTypes';
@@ -119,19 +118,6 @@ const Massif = ({
                   />
                 }
                 title={formatMessage({ id: 'Documents' })}
-              />
-              <hr />
-              <EntrancesList
-                entrances={entrances}
-                emptyMessageComponent={
-                  <Alert
-                    severity="info"
-                    title={formatMessage({
-                      id: 'This massif has no entrances listed yet.'
-                    })}
-                  />
-                }
-                title={formatMessage({ id: 'Entrances list' })}
               />
               <hr />
               <CavesList
