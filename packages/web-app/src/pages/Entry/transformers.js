@@ -84,7 +84,8 @@ export const getDocuments = documents =>
     details: makeDetails(document),
     entities: makeEntities(document),
     id: document?.id,
-    overview: makeOverview(document)
+    overview: makeOverview(document),
+    snapshot: document
   }));
 
 export const getHistories = histories =>

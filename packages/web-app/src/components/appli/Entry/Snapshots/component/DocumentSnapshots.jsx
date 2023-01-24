@@ -11,6 +11,8 @@ import {
 import { useIntl } from 'react-intl';
 import { pathOr } from 'ramda';
 import PropTypes from 'prop-types';
+import intactDescription from '../../../../../types/intactDescription.type';
+import licenseType from '../../../../../types/license.type';
 
 const PropertyName = styled(TableCell)`
   font-weight: bold;
@@ -29,8 +31,7 @@ Property.propTypes = {
 };
 const INFORMATION_NOT_FOUND = 'unknown';
 
-const DocumentSnapshots = information => {
-  const { document } = information;
+const DocumentSnapshots = ({ document }) => {
   const {
     type,
     datePublication,
@@ -38,8 +39,11 @@ const DocumentSnapshots = information => {
     identifier,
     license,
     parent,
-    description
+    description,
+    intactDescriptions
   } = document;
+  const documentDescription =
+    description ?? (intactDescriptions ? intactDescriptions[0] : {});
   const { formatMessage } = useIntl();
   return (
     <TableContainer>
@@ -64,28 +68,25 @@ const DocumentSnapshots = information => {
               )
             })}
           />
-          {pathOr(
-            formatMessage({ id: INFORMATION_NOT_FOUND }),
-            ['language', 'refName'],
-            description
-          ) !== '' && (
-            <Property
-              name={formatMessage({ id: 'Title and description language' })}
-              value={formatMessage({
-                id: description.language.refName
-              })}
-            />
-          )}
-
+          <Property
+            name={formatMessage({ id: 'Title and description language' })}
+            value={formatMessage({
+              id: pathOr(
+                INFORMATION_NOT_FOUND,
+                ['language', 'refName'],
+                documentDescription
+              )
+            })}
+          />
           <Property
             key="title"
             name={formatMessage({ id: 'Title' })}
-            value={description.title}
+            value={documentDescription.title}
           />
           <Property
             key="description"
             name={formatMessage({ id: 'Description' })}
-            value={description.body}
+            value={documentDescription.body}
           />
           <Property
             name={formatMessage({ id: 'Publication Date' })}
@@ -116,19 +117,40 @@ const DocumentSnapshots = information => {
               license
             )}
           />
-          <Property
-            key="parent_document"
-            name={formatMessage({ id: 'Parent document' })}
-            value={pathOr(
-              formatMessage({ id: INFORMATION_NOT_FOUND }),
-              ['id'],
-              parent
+          <TableRow key="parent_document">
+            <PropertyName align="right">
+              {formatMessage({ id: 'Parent document' })}
+            </PropertyName>
+            {parent ? (
+              <TableCell numeric component="a" href={`/ui/documents/${parent}`}>
+                {parent}
+              </TableCell>
+            ) : (
+              <TableCell>
+                {formatMessage({ id: INFORMATION_NOT_FOUND })}
+              </TableCell>
             )}
-          />
+          </TableRow>
         </TableBody>
       </Table>
     </TableContainer>
   );
+};
+DocumentSnapshots.propTypes = {
+  document: PropTypes.shape({
+    type: PropTypes.string,
+    datePublication: PropTypes.string,
+    editor: PropTypes.shape({
+      name: PropTypes.string,
+      surname: PropTypes.string,
+      nickname: PropTypes.string
+    }),
+    identifier: PropTypes.string,
+    license: licenseType,
+    parent: PropTypes.number,
+    description: intactDescription,
+    intactDescriptions: intactDescription
+  })
 };
 
 export default DocumentSnapshots;

@@ -10,7 +10,7 @@ import {
 import { useDispatch } from 'react-redux';
 import EditIcon from '@material-ui/icons/Edit';
 import CancelIcon from '@material-ui/icons/Cancel';
-import HistoryIcon from '@material-ui/icons/History';
+import { SnapshotButton } from '../Entry/Snapshots/UtilityFunction';
 
 import { descriptionType } from './propTypes';
 import CreateDescriptionForm from '../Form/DescriptionForm/index';
@@ -65,9 +65,7 @@ const Description = ({ description }) => {
       )}
       <Box sx={{ display: 'flex', flexDirection: 'column' }}>
         <ListItemIcon style={{ alignSelf: 'start' }}>
-          <IconButton href={`/ui/descriptions/${id}/snapshots`} color="primary">
-            <HistoryIcon />
-          </IconButton>
+          <SnapshotButton id={id} type="descriptions" content={description} />
         </ListItemIcon>
         {permissions.isAuth && (
           <ListItemIcon style={{ alignSelf: 'start' }}>

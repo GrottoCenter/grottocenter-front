@@ -9,13 +9,13 @@ import {
 import { useDispatch } from 'react-redux';
 import EditIcon from '@material-ui/icons/Edit';
 import CancelIcon from '@material-ui/icons/Cancel';
-import HistoryIcon from '@material-ui/icons/History';
 
 import { historyType } from '../Provider';
 import CreateHistoryForm from '../../Form/HistoryForm/index';
 import { updateHistory } from '../../../../actions/History/UpdateHistory';
 import { usePermissions } from '../../../../hooks';
 import Contribution from '../../../common/Contribution/Contribution';
+import { SnapshotButton } from '../Snapshots/UtilityFunction';
 
 const History = ({ history }) => {
   const dispatch = useDispatch();
@@ -61,9 +61,7 @@ const History = ({ history }) => {
       )}
       <Box sx={{ display: 'flex', flexDirection: 'column' }}>
         <ListItemIcon>
-          <IconButton href={`/ui/histories/${id}/snapshots`} color="primary">
-            <HistoryIcon />
-          </IconButton>
+          <SnapshotButton id={id} type="histories" content={history} />
         </ListItemIcon>
         {permissions.isAuth && (
           <ListItemIcon style={{ alignSelf: 'start' }}>
