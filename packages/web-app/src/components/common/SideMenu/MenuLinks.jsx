@@ -35,13 +35,11 @@ const MenuLinks = () => {
         label="Map"
         href="/ui/map"
       />
-      {permissions.isAuth && (
-        <Item
-          ItemIcon={() => <LibraryAddIcon color="primary" />}
-          label="Create new entity"
-          href="/ui/entity/add"
-        />
-      )}
+      <Item
+        ItemIcon={() => <LibraryAddIcon color="primary" />}
+        label="Contribute"
+        href="/ui/entity/add"
+      />
       <DocumentItems
         isModerator={permissions.isModerator}
         isUser={permissions.isUser}

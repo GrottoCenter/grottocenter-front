@@ -2,13 +2,11 @@ import React from 'react';
 import { useController } from 'react-hook-form';
 import PropTypes from 'prop-types';
 
-import Details from './Details';
-import CaveAutoCompleteSearch from '../../../../common/AutoCompleteSearch/CaveAutoCompleteSearch';
-import Alert from '../../../../common/Alert';
+import CaveAutoCompleteSearch from '../../../common/AutoCompleteSearch/CaveAutoCompleteSearch';
 
-const CaveSelection = ({ control, errors, disabled = false }) => {
+const CaveSelection = ({ control, disabled = false }) => {
   const {
-    field: { onChange: onIdChange, value: caveId }
+    field: { onChange: onIdChange }
   } = useController({
     control,
     name: 'cave.id',
@@ -60,16 +58,12 @@ const CaveSelection = ({ control, errors, disabled = false }) => {
   };
 
   return (
-    <>
-      <CaveAutoCompleteSearch
-        disabled={disabled}
-        required
-        onSelection={handleSelection}
-        value={{ name: caveNameValue }}
-      />
-      {errors?.caveName && <Alert severity="error" content={errors.caveName} />}
-      {!!caveId && <Details control={control} errors={errors} isReadonly />}
-    </>
+    <CaveAutoCompleteSearch
+      disabled={disabled}
+      required
+      onSelection={handleSelection}
+      value={{ name: caveNameValue }}
+    />
   );
 };
 

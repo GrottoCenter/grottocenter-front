@@ -1,8 +1,7 @@
 import fetch from 'isomorphic-fetch';
 
 import { postCreateEntranceUrl } from '../../conf/apiRoutes';
-import makeErrorMessage from '../../helpers/makeErrorMessage';
-import { checkStatusAndGetText } from '../utils';
+import { checkAndGetStatus } from '../utils';
 
 export const POST_ENTRANCE = 'POST_ENTRANCE';
 export const POST_ENTRANCE_SUCCESS = 'POST_ENTRANCE_SUCCESS';
@@ -11,22 +10,19 @@ export const POST_ENTRANCE_FAILURE = 'POST_ENTRANCE_FAILURE';
 export const postEntranceAction = () => ({
   type: POST_ENTRANCE
 });
-export const postEntranceSuccess = () => ({
+export const postEntranceSuccess = data => ({
+  data,
   type: POST_ENTRANCE_SUCCESS
 });
-export const postEntranceFailure = (error, httpCode) => ({
+export const postEntranceFailure = error => ({
   type: POST_ENTRANCE_FAILURE,
-  error,
-  httpCode
+  error
 });
 
 export const CREATE_ENTRANCE_SUCCESS = 'CREATE_ENTRANCE_SUCCESS';
 export const CREATE_ENTRANCE_LOADING = 'CREATE_ENTRANCE_LOADING';
 export const CREATE_ENTRANCE_ERROR = 'CREATE_ENTRANCE_ERROR';
-
 export const RESET_ENTRANCE_STATE = 'RESET_ENTRANCE_STATE';
-
-// TODO: why 2 methods to create entrance? One should be enough
 
 export const postEntrance = data => (dispatch, getState) => {
   dispatch(postEntranceAction());
@@ -37,44 +33,11 @@ export const postEntrance = data => (dispatch, getState) => {
     headers: getState().login.authorizationHeader
   };
 
-  return fetch(postCreateEntranceUrl, requestOptions).then(response =>
-    response.text().then(responseText => {
-      if (response.status >= 400) {
-        dispatch(
-          postEntranceFailure(
-            makeErrorMessage(response.status, `Bad request: ${responseText}`),
-            response.status
-          )
-        );
-      } else {
-        dispatch(postEntranceSuccess());
-      }
-      return response;
-    })
-  );
-};
-
-export const createEntrance = entranceData => (dispatch, getState) => {
-  dispatch({ type: CREATE_ENTRANCE_LOADING });
-
-  const requestOptions = {
-    method: 'POST',
-    body: JSON.stringify(entranceData),
-    headers: getState().login.authorizationHeader
-  };
-
   return fetch(postCreateEntranceUrl, requestOptions)
-    .then(checkStatusAndGetText)
-    .then(result => {
-      dispatch({
-        type: CREATE_ENTRANCE_SUCCESS,
-        httpCode: result.status
-      });
-    })
-    .catch(error => {
-      dispatch({
-        type: CREATE_ENTRANCE_ERROR,
-        error: error.message
-      });
+    .then(checkAndGetStatus)
+    .then(response => response.json())
+    .then(d => dispatch(postEntranceSuccess(d)))
+    .catch(errorMessage => {
+      dispatch(postEntranceFailure(errorMessage));
     });
 };

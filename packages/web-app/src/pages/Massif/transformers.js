@@ -26,7 +26,7 @@ const getDetails = massif => {
     reviewer: massif?.reviewer ? getAuthor(massif?.reviewer) : null,
     dateInscription: massif.dateInscription,
     dateReviewed: massif.dateReviewed,
-    geogPolygon: massif.geoJson,
+    geogPolygon: massif.geogPolygon,
     name: massif.name,
     names: massif.names,
     isDeleted: massif.isDeleted

@@ -58,7 +58,8 @@ export const Entry = () => {
         language,
         reviewer,
         name,
-        temperature
+        temperature,
+        discoveryYear
       },
       position,
       descriptions,
@@ -143,7 +144,8 @@ export const Entry = () => {
                 language,
                 latitude: propOr(undefined, 0, position),
                 length: development,
-                longitude: propOr(undefined, 1, position)
+                longitude: propOr(undefined, 1, position),
+                yearDiscovery: discoveryYear
               }}
               caveValues={{
                 ...cave,

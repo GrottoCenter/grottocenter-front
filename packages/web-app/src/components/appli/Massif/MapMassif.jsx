@@ -1,28 +1,33 @@
-import React from 'react';
-import { GeoJSON, Marker, Popup } from 'react-leaflet';
+import React, { useEffect } from 'react';
+import { GeoJSON, Marker, Popup, useMap } from 'react-leaflet';
 import PropTypes from 'prop-types';
 
 import CustomMapContainer from '../../common/Maps/common/MapContainer';
 import EntranceMarker from '../../common/Maps/common/Markers/Components/EntranceMarker';
 import EntrancePopup from '../../common/Maps/common/Markers/Components/EntrancePopup';
 
+// Needed because useMap is only accessible from inside <MapContainer>
+const MapBind = ({ positions }) => {
+  const map = useMap();
+  useEffect(() => {
+    map.fitBounds(positions.map(e => [e[1], e[0]]));
+  }, [map, positions]);
+
+  return null;
+};
+MapBind.propTypes = {
+  positions: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.number)).isRequired
+};
+
 const MapMassif = ({ entrances, geogPolygon }) => {
   const geoJson = JSON.parse(geogPolygon);
-  // calcul du centre du premier polygone
-  const average = arr => arr.reduce((a, b) => a + b, 0) / arr.length;
-  const latitudes = geoJson.coordinates[0][0].map(coord => coord[1]);
-  const longitudes = geoJson.coordinates[0][0].map(coord => coord[0]);
-
-  const center = [average(latitudes), average(longitudes)];
 
   return (
     <CustomMapContainer
       wholePage={false}
       dragging
       viewport={null}
-      scrollWheelZoom={false}
-      zoom={14}
-      center={center}>
+      scrollWheelZoom={false}>
       <GeoJSON data={geoJson} />
       {entrances.map(
         entrance =>
@@ -38,6 +43,7 @@ const MapMassif = ({ entrances, geogPolygon }) => {
             </Marker>
           )
       )}
+      <MapBind positions={geoJson.coordinates[0][0]} />
     </CustomMapContainer>
   );
 };

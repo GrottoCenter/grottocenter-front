@@ -9,10 +9,23 @@ import {
 import { EditControl } from 'react-leaflet-draw';
 import { useGeolocation } from 'rooks';
 import L from 'leaflet';
-import TileLayers from '../../../../common/Maps/common/mapLayers';
+import TileLayers from '../../../common/Maps/common/mapLayers';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-draw/dist/leaflet.draw.css';
-import getMultiPolygonCentroid from './utils';
+
+const getMultiPolygonCentroid = function (coordinates) {
+  const result = coordinates.reduce(
+    (x, y) => [
+      x[0] + y[0] / coordinates.length,
+      x[1] + y[1] / coordinates.length
+    ],
+    [0, 0]
+  );
+  return {
+    lat: result[1],
+    lng: result[0]
+  };
+};
 
 let displayValue = false;
 const PolygonMap = ({ onChange, data }) => {
@@ -153,7 +166,7 @@ const PolygonMap = ({ onChange, data }) => {
       position="topLeft"
       style={{
         height: '70vh',
-        width: '60vw'
+        width: '100%'
       }}>
       <FeatureGroup
         ref={reactFGref => {
@@ -181,7 +194,7 @@ const PolygonMap = ({ onChange, data }) => {
           <LayersControl.BaseLayer
             checked={layer.name === 'OpenStreetMap Basic'}
             name={layer.name}>
-            <TileLayer url={layer.url} attribution={layer.url} />
+            <TileLayer url={layer.url} attribution={layer.attribution} />
           </LayersControl.BaseLayer>
         ))}
       </LayersControl>
