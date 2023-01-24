@@ -7,7 +7,7 @@ import {
 const initialState = {
   error: null,
   isLoading: false,
-  organization: null
+  data: null
 };
 
 const reducer = (state = initialState, action) => {
@@ -25,7 +25,7 @@ const reducer = (state = initialState, action) => {
     case POST_ORGANIZATION_SUCCESS:
       return {
         ...initialState,
-        organization: action.organization
+        data: action.organization
       };
     default:
       return state;

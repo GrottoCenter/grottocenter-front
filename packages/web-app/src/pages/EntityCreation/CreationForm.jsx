@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
+import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
 import {
   FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  FormHelperText
+  RadioGroup,
+  Radio,
+  FormControlLabel,
+  FormLabel
 } from '@material-ui/core';
 import styled from 'styled-components';
 import { includes, values } from 'ramda';
@@ -13,13 +14,8 @@ import Translate from '../../components/common/Translate';
 import OrganizationForm from '../../components/appli/EntitiesForm/Organization';
 import { EntranceForm, MassifForm } from '../../components/appli/EntitiesForm';
 
-const Header = styled.div`
-  display: flex;
-  align-items: center;
-`;
-
 const StyledFormControl = styled(FormControl)`
-  width: 300px;
+  margin-bottom: 2em;
 `;
 
 const ENTITIES = {
@@ -28,12 +24,9 @@ const ENTITIES = {
   organization: 'Organization'
 };
 
-const Wrapper = styled.div`
-  padding: ${({ theme }) => theme.spacing(4)}px;
-`;
-
 const EntityTypeSelect = ({ entity, onEntityChange }) => {
   const [selectedEntity, setSelectedEntity] = useState(entity);
+  const { formatMessage } = useIntl();
 
   const handleChange = event => {
     if (includes(event.target.value, values(ENTITIES))) {
@@ -44,23 +37,29 @@ const EntityTypeSelect = ({ entity, onEntityChange }) => {
 
   return (
     <StyledFormControl variant="filled" required>
-      <InputLabel shrink>
+      <FormLabel shrink>
         <Translate>Entity type</Translate>
-      </InputLabel>
-      <Select value={selectedEntity} onChange={handleChange} displayEmpty>
-        <MenuItem value={ENTITIES.entrance}>
-          <Translate>Entrance</Translate>
-        </MenuItem>
-        <MenuItem value={ENTITIES.massif}>
-          <Translate>Massif</Translate>
-        </MenuItem>
-        <MenuItem value={ENTITIES.organization}>
-          <Translate>Organization</Translate>
-        </MenuItem>
-      </Select>
-      <FormHelperText>
-        <Translate>Type of the new entity to create</Translate>
-      </FormHelperText>
+      </FormLabel>
+      <RadioGroup row value={selectedEntity} onChange={handleChange}>
+        <FormControlLabel
+          labelPlacement="bottom"
+          control={<Radio />}
+          value={ENTITIES.entrance}
+          label={formatMessage({ id: 'Entrance' })}
+        />
+        <FormControlLabel
+          labelPlacement="bottom"
+          control={<Radio />}
+          value={ENTITIES.massif}
+          label={formatMessage({ id: 'Massif' })}
+        />
+        <FormControlLabel
+          labelPlacement="bottom"
+          control={<Radio />}
+          value={ENTITIES.organization}
+          label={formatMessage({ id: 'Organization' })}
+        />
+      </RadioGroup>
     </StyledFormControl>
   );
 };
@@ -87,17 +86,11 @@ const CreationForm = () => {
 
   return (
     <>
-      <Header>
-        <Translate>Create a new entity in Grottocenter</Translate>
-      </Header>
-      <hr />
-      <Wrapper>
-        <EntityTypeSelect
-          entity={selectedEntity}
-          onEntityChange={setSelectedEntity}
-        />
-        <EntityForm selectedEntity={selectedEntity} />
-      </Wrapper>
+      <EntityTypeSelect
+        entity={selectedEntity}
+        onEntityChange={setSelectedEntity}
+      />
+      <EntityForm selectedEntity={selectedEntity} />
     </>
   );
 };

@@ -13,7 +13,10 @@ export const makeEntranceData = (data, entityType) => ({
   country: data.entrance.country,
   isSensitive: data.entrance.isSensitive,
   longitude: data.entrance.longitude,
-  latitude: data.entrance.latitude
+  latitude: data.entrance.latitude,
+  yearDiscovery: data.entrance.yearDiscovery
+    ? Number(data.entrance.yearDiscovery)
+    : null
 });
 
 export const makeCaveData = data => ({

@@ -1,26 +1,10 @@
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import PropTypes from 'prop-types';
-import { useIntl } from 'react-intl';
 import { useForm } from 'react-hook-form';
-import { isNil, keys, prop, length, reject, equals } from 'ramda';
-import {
-  Box,
-  Button as MuiButton,
-  CircularProgress,
-  Step,
-  StepContent,
-  StepLabel,
-  Stepper,
-  Typography
-} from '@material-ui/core';
-import Icon from '@material-ui/core/Icon';
-import styled from 'styled-components';
+import { isNil } from 'ramda';
 import { useDispatch, useSelector } from 'react-redux';
 import { useGeolocation } from 'rooks';
 
-import { useBoolean } from '../../../../hooks';
-import ActionButton from '../../../common/ActionButton';
-import Alert from '../../../common/Alert';
 import { updateEntrance } from '../../../../actions/Entrance/UpdateEntrance';
 import { postEntrance } from '../../../../actions/Entrance/CreateEntrance';
 import {
@@ -28,26 +12,25 @@ import {
   updateCaveAndEntrance
 } from '../../../../actions/CaveAndEntrance';
 
-import Cave from './Cave';
-import Entrance from './Entrance';
-import Details from './Cave/Details';
+import { FormContainer, FormActionRow } from '../utils/FormContainers';
+import LicenseBox from '../utils/LicenseBox';
+import FormProgressInfo from '../utils/FormProgressInfo';
+import EditTypeSelection from './EditTypeSelection';
+import EntranceDetail from './EntranceDetail';
+import CaveDetail from './CaveDetail';
 import { makeCaveData, makeEntranceData } from './transformers';
 import { ENTRANCE_ONLY, ENTRANCE_AND_CAVE } from './caveType';
-
-const Button = styled(MuiButton)`
-  margin: ${({ theme }) => theme.spacing(2)}px;
-`;
 
 const defaultCaveValues = {
   language: '',
   name: '',
-  descriptions: undefined,
-  isDiving: undefined,
-  depth: null,
-  length: null,
-  temperature: null,
-  massif: undefined,
-  country: ''
+  descriptions: [],
+  isDiving: false,
+  depth: '',
+  length: '',
+  temperature: '',
+  massif: '',
+  country: 'FR'
 };
 
 const defaultEntranceValues = {
@@ -55,10 +38,11 @@ const defaultEntranceValues = {
   description: '',
   descriptionTitle: '',
   isSensitive: false,
-  language: 'fra',
+  language: '',
   latitude: '',
   longitude: '',
-  country: 'FR'
+  country: 'FR',
+  yearDiscovery: ''
 };
 
 export const EntranceForm = ({ caveValues = null, entranceValues = null }) => {
@@ -67,10 +51,16 @@ export const EntranceForm = ({ caveValues = null, entranceValues = null }) => {
   const latitude = geolocation?.lat;
   const longitude = geolocation?.lng;
 
-  const { formatMessage } = useIntl();
-  const { languages: allLanguages } = useSelector(state => state.language);
-  const { error: entranceError, loading: entranceLoading } = useSelector(
-    state => (isNewEntrance ? state.createEntrance : state.updateEntrance)
+  const { locale, AVAILABLE_LANGUAGES } = useSelector(state => state.intl);
+
+  defaultCaveValues.language = AVAILABLE_LANGUAGES[locale].id;
+  defaultEntranceValues.language = AVAILABLE_LANGUAGES[locale].id;
+  const {
+    error: entranceError,
+    loading: entranceLoading,
+    data: entranceData
+  } = useSelector(state =>
+    isNewEntrance ? state.createEntrance : state.updateEntrance
   );
   const { error: caveError, loading: caveLoading } = useSelector(state =>
     isNewEntrance ? state.createCave : state.updateCave
@@ -88,8 +78,6 @@ export const EntranceForm = ({ caveValues = null, entranceValues = null }) => {
     reset,
     control,
     getValues,
-    trigger,
-    setFocus,
     formState: { errors, isDirty, isSubmitting, isSubmitSuccessful }
   } = useForm({
     defaultValues: {
@@ -97,10 +85,6 @@ export const EntranceForm = ({ caveValues = null, entranceValues = null }) => {
       cave: caveValues || defaultCaveValues
     }
   });
-
-  const [activeStep, setActiveStep] = useState(0);
-  const hasFinish = useBoolean();
-  const stepExpanded = useBoolean();
 
   // TODO set latitude & longitude from the selected Entry
   // TODO set country from position
@@ -125,208 +109,84 @@ export const EntranceForm = ({ caveValues = null, entranceValues = null }) => {
 
   const handleReset = useCallback(() => {
     reset({ cave: defaultCaveValues, entrance: defaultEntranceValues });
-    stepExpanded.close();
-    setActiveStep(0);
-  }, [reset, stepExpanded]);
-
-  const steps = {
-    cave: (
-      <Cave
-        allLanguages={allLanguages}
-        allowMoveFromCave={!isNewEntrance}
-        control={control}
-        entityType={entityType}
-        entranceId={entranceValues?.id}
-        disabled={!isNewEntrance}
-        errors={errors}
-        updateEntityType={handleUpdateEntityType}
-        reset={handleReset}
-      />
-    ),
-    entrance: (
-      <Entrance
-        allLanguages={allLanguages}
-        control={control}
-        entityType={entityType}
-        errors={errors}
-        getValues={getValues}
-        setFocus={setFocus}
-      />
-    ),
-    details: (
-      <Details
-        control={control}
-        errors={errors}
-        isReadonly={!isNewEntrance && entityType === ENTRANCE_ONLY}
-      />
-    )
-  };
-  const stepKeys =
-    entityType === ENTRANCE_AND_CAVE
-      ? keys(steps)
-      : reject(equals('details'), keys(steps));
-
-  const handleNext = async () => {
-    const result = await trigger(
-      [
-        'cave.country',
-        'cave.depth',
-        'cave.descriptions',
-        'cave.id',
-        'cave.isDiving',
-        'cave.language',
-        'cave.length',
-        'cave.massif',
-        'cave.name',
-        'cave.temperature',
-        'entrance.country',
-        'entrance.description',
-        'entrance.descriptionTitle',
-        'entrance.name',
-        'entrance.language',
-        'entrance.latitude',
-        'entrance.longitude'
-      ],
-      { shouldFocus: true }
-    );
-    if (result) {
-      setActiveStep(prevActiveStep => prevActiveStep + 1);
-      if (stepKeys.length - 1 === activeStep) {
-        stepExpanded.open();
-        hasFinish.true();
-      }
-    }
-  };
-
-  const handleBack = () => {
-    setActiveStep(prevActiveStep => prevActiveStep - 1);
-  };
+  }, [reset]);
 
   const onSubmit = async data => {
     const caveData = {
       ...makeCaveData(data),
       id: caveValues?.id
     };
-    const entranceData = {
+    const entranceDataFmt = {
       ...makeEntranceData(data, entityType),
       id: entranceValues?.id
     };
+
     if (isNewEntrance) {
       if (entityType === ENTRANCE_AND_CAVE) {
-        dispatch(postCaveAndEntrance(caveData, entranceData));
+        dispatch(postCaveAndEntrance(caveData, entranceDataFmt));
       } else {
-        dispatch(postEntrance(entranceData));
+        dispatch(postEntrance(entranceDataFmt));
       }
     } else if (entityType === ENTRANCE_AND_CAVE) {
-      dispatch(updateCaveAndEntrance(caveData, entranceData));
+      dispatch(updateCaveAndEntrance(caveData, entranceDataFmt));
     } else {
-      dispatch(updateEntrance(entranceData));
+      dispatch(updateEntrance(entranceDataFmt));
     }
   };
 
-  return isSubmitSuccessful && isNil(entranceError) && isNil(caveError) ? (
-    <Box display="flex" justifyContent="center" flexDirection="column">
-      {entranceLoading && (
-        <>
-          <Typography>
-            {formatMessage({
-              id: isNewEntrance
-                ? 'Creating entrance...'
-                : 'Updating entrance...'
-            })}
-          </Typography>
-          <CircularProgress />
-        </>
-      )}
-      {caveLoading && (
-        <>
-          <Typography>
-            {formatMessage({
-              id: isNewEntrance ? 'Creating cave...' : 'Updating cave...'
-            })}
-          </Typography>
-          <CircularProgress />
-        </>
-      )}
-      {!caveLoading && !entranceLoading && (
-        <form>
-          <Alert
-            severity="success"
-            content={formatMessage({
-              id: isNewEntrance
-                ? 'Entrance successfully created!'
-                : 'Entrance successfully updated!'
-            })}
-          />
-          {isNewEntrance && (
-            <Button onClick={handleReset} color="primary">
-              {formatMessage({
-                id: 'Create a new Entrance'
-              })}
-            </Button>
-          )}
-        </form>
-      )}
-    </Box>
-  ) : (
-    <Box display="flex" justifyContent="center" flexDirection="column">
+  if (isSubmitSuccessful) {
+    return (
+      <FormProgressInfo
+        isLoading={
+          caveLoading || entranceLoading || (isNewEntrance && !entranceData)
+        }
+        isError={!!(entranceError || caveError)}
+        labelLoading={
+          isNewEntrance ? 'Creating entrance...' : 'Updating entrance...'
+        }
+        labelError="A server error occurred"
+        resetFn={handleReset}
+        getRedirectFn={() =>
+          isNewEntrance ? `/ui/entrances/${entranceData.id}` : ''
+        }
+      />
+    );
+  }
+
+  return (
+    <FormContainer>
       <form autoComplete="off" onSubmit={handleSubmit(onSubmit)}>
-        <Stepper activeStep={activeStep} orientation="vertical">
-          {stepKeys.map(label => (
-            <Step
-              key={formatMessage({ id: label })}
-              expanded={stepExpanded.isOpen}>
-              <StepLabel>
-                {formatMessage({
-                  id: label[0].toUpperCase() + label.substring(1)
-                })}
-              </StepLabel>
-              <StepContent>
-                <div style={{ maxWidth: '600px', margin: '0 auto' }}>
-                  {prop(label, steps)}
-                </div>
-                {!stepExpanded.isOpen && (
-                  <Box display="flex" justifyContent="center">
-                    <Button disabled={activeStep === 0} onClick={handleBack}>
-                      {formatMessage({ id: 'Back' })}
-                    </Button>
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      onClick={handleNext}>
-                      {formatMessage({
-                        id:
-                          activeStep === length(stepKeys) - 1
-                            ? 'Review'
-                            : 'Next'
-                      })}
-                    </Button>
-                  </Box>
-                )}
-              </StepContent>
-            </Step>
-          ))}
-        </Stepper>
-        <Box display="flex">
-          {isNewEntrance && (
-            <Button disabled={!isDirty} onClick={handleReset}>
-              {formatMessage({ id: 'Reset' })}
-            </Button>
-          )}
-          <ActionButton
-            label={formatMessage({
-              id: isNewEntrance ? 'Create' : 'Update'
-            })}
-            loading={isSubmitting}
-            disabled={!hasFinish.isTrue}
-            color="primary"
-            icon={<Icon>send</Icon>}
-            style={{ margin: '8px', marginLeft: 'auto' }}
-            type="submit"
-          />
-        </Box>
+        <EditTypeSelection
+          control={control}
+          errors={errors}
+          entityType={entityType}
+          updateEntityType={handleUpdateEntityType}
+          allowMoveFromCave={!isNewEntrance}
+          entranceId={entranceValues?.id}
+          reset={handleReset}
+          disabled={!isNewEntrance}
+        />
+        <EntranceDetail
+          control={control}
+          errors={errors}
+          getValues={getValues}
+        />
+        <CaveDetail
+          control={control}
+          errors={errors}
+          isReadonly={!isNewEntrance && entityType === ENTRANCE_ONLY}
+        />
+        <FormActionRow
+          isDirty={isDirty}
+          isNew={isNewEntrance}
+          isSubmitting={isSubmitting}
+          onReset={handleReset}
+          isResetAllowed={isNewEntrance}
+        />
       </form>
-    </Box>
+
+      <LicenseBox />
+    </FormContainer>
   );
 };
 

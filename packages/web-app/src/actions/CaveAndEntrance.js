@@ -29,7 +29,6 @@ export const postCaveAndEntrance =
         }
         return response.json();
       })
-      .then(res => res)
       .then(res => {
         dispatch(postCaveSuccess());
         dispatch(postEntrance({ ...entranceData, cave: res.id }));

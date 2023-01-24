@@ -13,7 +13,7 @@ const FormControl = styled(MuiFormControl)`
   padding-bottom: ${({ theme }) => theme.spacing(4)}px;
 `;
 
-const Uploader = ({ control, errors }) => {
+const OrganizationLogo = ({ control, errors }) => {
   const { formatMessage } = useIntl();
 
   return (
@@ -54,7 +54,7 @@ const Uploader = ({ control, errors }) => {
     </div>
   );
 };
-Uploader.propTypes = {
+OrganizationLogo.propTypes = {
   control: PropTypes.shape({}).isRequired,
   errors: PropTypes.shape({
     organization: PropTypes.shape({
@@ -63,4 +63,4 @@ Uploader.propTypes = {
   })
 };
 
-export default Uploader;
+export default OrganizationLogo;

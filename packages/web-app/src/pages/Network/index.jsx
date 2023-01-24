@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { isNil, isEmpty } from 'ramda';
+import { isNil } from 'ramda';
 import Network from '../../components/appli/Network';
 import EntrancesList from '../../components/appli/Network/EntrancesList';
 import { fetchCave } from '../../actions/Cave/GetCave';
@@ -30,7 +30,7 @@ const NetworkPage = () => {
       prevUpdateLoading.current === true &&
       updateLoading === false &&
       updateError === null;
-    if (updateTerminatedWithSuccess || isEmpty(data)) {
+    if (updateTerminatedWithSuccess) {
       dispatch(fetchCave(id));
     }
   }, [dispatch, updateLoading, id, data, updateError]);

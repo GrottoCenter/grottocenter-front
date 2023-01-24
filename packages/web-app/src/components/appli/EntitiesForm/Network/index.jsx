@@ -1,198 +1,92 @@
-import React, { useState, useCallback } from 'react';
+import React, { useCallback, useRef } from 'react';
 import PropTypes from 'prop-types';
-import { useIntl } from 'react-intl';
 import { useForm } from 'react-hook-form';
-import { isNil, keys, prop, length } from 'ramda';
-import {
-  Box,
-  Button as MuiButton,
-  CircularProgress,
-  Step,
-  StepContent,
-  StepLabel,
-  Stepper,
-  Typography
-} from '@material-ui/core';
-import Icon from '@material-ui/core/Icon';
-import styled from 'styled-components';
 import { useSelector, useDispatch } from 'react-redux';
-
-import { useBoolean } from '../../../../hooks';
-import ActionButton from '../../../common/ActionButton';
-import Alert from '../../../common/Alert';
 import { updateCave } from '../../../../actions/Cave/UpdateCave';
-import { updateEntrance } from '../../../../actions/Entrance/UpdateEntrance';
-
-import Network from './Network';
+import { FormContainer, FormActionRow, FormRow } from '../utils/FormContainers';
+import InputText from '../utils/InputText';
+import InputLanguage from '../utils/InputLanguage';
+import FormProgressInfo from '../utils/FormProgressInfo';
+import CaveDetail from '../Entrance/CaveDetail';
 import makeNetworkData from './transformers';
 
-const Button = styled(MuiButton)`
-  margin: ${({ theme }) => theme.spacing(2)}px;
-`;
-
-// A Network can't be created. It's always starting wiht an entrance with a cave and then,
+// A Network can't be created. It's always starting with an entrance with a cave and then,
 // entrance are being attached to the initial cave to form a network.
 export const NetworkForm = ({ networkValues }) => {
-  const { formatMessage } = useIntl();
-  const { languages: allLanguages } = useSelector(state => state.language);
-  const { error: networkError, loading: networkLoading } = useSelector(
-    state => state.updateCave
-  );
+  const {
+    error: networkError,
+    loading: networkLoading,
+    data: networkData
+  } = useSelector(state => state.updateCave);
+
   const dispatch = useDispatch();
+  const defaultNetworkValue = useRef({ ...networkValues });
+
+  const { locale, AVAILABLE_LANGUAGES } = useSelector(state => state.intl);
+  if (!defaultNetworkValue.current.language)
+    defaultNetworkValue.current.language = AVAILABLE_LANGUAGES[locale].id;
 
   const {
     handleSubmit,
     reset,
     control,
-    trigger,
-    formState: {
-      errors,
-      isDirty,
-      isSubmitted,
-      isSubmitting,
-      isSubmitSuccessful
-    }
+    formState: { errors, isDirty, isSubmitting, isSubmitSuccessful }
   } = useForm({
-    defaultValues: networkValues
+    defaultValues: {
+      cave: defaultNetworkValue.current
+    }
   });
 
-  const [activeStep, setActiveStep] = useState(0);
-  const hasFinish = useBoolean();
-  const stepExpanded = useBoolean();
-
   const handleReset = useCallback(() => {
-    reset(networkValues);
-    stepExpanded.close();
-    setActiveStep(0);
-  }, [networkValues, reset, stepExpanded]);
-
-  const steps = {
-    'Basic Information': (
-      <Network allLanguages={allLanguages} control={control} errors={errors} />
-    )
-  };
-  const stepKeys = keys(steps);
-
-  const handleNext = async () => {
-    const result = await trigger(
-      ['depth', 'isDiving', 'language', 'length', 'name', 'temperature'],
-      { shouldFocus: true }
-    );
-    if (result) {
-      setActiveStep(prevActiveStep => prevActiveStep + 1);
-      if (stepKeys.length - 1 === activeStep) {
-        stepExpanded.open();
-        hasFinish.true();
-      }
-    }
-  };
-
-  const handleBack = () => {
-    setActiveStep(prevActiveStep => prevActiveStep - 1);
-  };
+    reset({ cave: defaultNetworkValue.current });
+  }, [defaultNetworkValue, reset]);
 
   const onSubmit = async data => {
-    const network = makeNetworkData(data);
-    if (data.entrances.length === 1) {
-      // Name must be the same for the only one entrance
-      dispatch(
-        updateEntrance({ id: data.entrances[0].id, name: network.name })
-      );
-    }
-    dispatch(updateCave(network));
+    dispatch(updateCave(makeNetworkData(data.cave)));
   };
 
-  return isSubmitted && isNil(networkError) ? (
-    <Box display="flex" justifyContent="center" flexDirection="column">
-      {networkLoading && (
-        <>
-          <Typography>
-            {formatMessage({
-              id: 'Updating network...'
-            })}
-          </Typography>
-          <CircularProgress />
-        </>
-      )}
-      {!networkLoading && isSubmitSuccessful && (
-        <form>
-          <Alert
-            severity="success"
-            title={formatMessage({
-              id: 'Network successfully updated!'
-            })}
-          />
-        </form>
-      )}
+  if (isSubmitSuccessful) {
+    return (
+      <FormProgressInfo
+        isLoading={networkLoading || !networkData}
+        isError={!!networkError}
+        labelLoading="Updating network..."
+        labelError="'An error occurred when updating the network!'"
+        resetFn={handleReset}
+        getRedirectFn={() => `/ui/caves/${networkData.id}`}
+      />
+    );
+  }
 
-      {!networkLoading && !isSubmitSuccessful && (
-        <form>
-          <Alert
-            severity="error"
-            title={formatMessage({
-              id: 'An error occurred when updating the network!'
-            })}
-          />
-        </form>
-      )}
-    </Box>
-  ) : (
-    <Box display="flex" justifyContent="center" flexDirection="column">
+  return (
+    <FormContainer>
       <form autoComplete="off" onSubmit={handleSubmit(onSubmit)}>
-        <Stepper activeStep={activeStep} orientation="vertical">
-          {stepKeys.map(label => (
-            <Step
-              key={formatMessage({ id: label })}
-              expanded={stepExpanded.isOpen}>
-              <StepLabel>
-                {formatMessage({
-                  id: label[0].toUpperCase() + label.substring(1)
-                })}
-              </StepLabel>
-              <StepContent>
-                <div style={{ maxWidth: '600px', margin: '0 auto' }}>
-                  {prop(label, steps)}
-                </div>
-                {!stepExpanded.isOpen && (
-                  <Box display="flex" justifyContent="center">
-                    <Button disabled={activeStep === 0} onClick={handleBack}>
-                      {formatMessage({ id: 'Back' })}
-                    </Button>
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      onClick={handleNext}>
-                      {formatMessage({
-                        id:
-                          activeStep === length(stepKeys) - 1
-                            ? 'Review'
-                            : 'Next'
-                      })}
-                    </Button>
-                  </Box>
-                )}
-              </StepContent>
-            </Step>
-          ))}
-        </Stepper>
-        <Box display="flex">
-          <Button disabled={!isDirty} onClick={handleReset}>
-            {formatMessage({ id: 'Reset' })}
-          </Button>
-          <ActionButton
-            label={formatMessage({
-              id: 'Update'
-            })}
-            loading={isSubmitting}
-            disabled={!hasFinish.isTrue}
-            color="primary"
-            icon={<Icon>send</Icon>}
-            style={{ margin: '8px', marginLeft: 'auto' }}
-            type="submit"
+        <FormRow>
+          <InputText
+            formKey="cave.name"
+            labelName="Cave name"
+            control={control}
+            isError={!!errors?.cave?.name}
+            isRequired
           />
-        </Box>
+
+          <InputLanguage
+            formKey="cave.language"
+            control={control}
+            isError={!!errors?.cave?.language}
+          />
+        </FormRow>
+
+        <CaveDetail control={control} errors={errors} />
+
+        <FormActionRow
+          isDirty={isDirty}
+          isNew={false}
+          isSubmitting={isSubmitting}
+          onReset={handleReset}
+        />
       </form>
-    </Box>
+    </FormContainer>
   );
 };
 

@@ -28,7 +28,7 @@ const reducer = (state = initialState, action) => {
     case POST_MASSIF_SUCCESS:
       return {
         ...state,
-        data: action.cave,
+        data: action.massif,
         error: initialState.error,
         loading: false,
         massif: action.massif
