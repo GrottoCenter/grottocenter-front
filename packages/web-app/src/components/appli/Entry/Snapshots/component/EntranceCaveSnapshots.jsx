@@ -3,14 +3,20 @@ import { useIntl } from 'react-intl';
 import { GpsFixed, Height, Waves, Title } from '@material-ui/icons';
 import { Box } from '@material-ui/core';
 import PropTypes from 'prop-types';
+import { pathOr } from 'ramda';
 
-import { Property } from '../../../common/Properties';
-import CustomIcon from '../../../common/CustomIcon';
+import { Property } from '../../../../common/Properties';
+import CustomIcon from '../../../../common/CustomIcon';
 
-const EntranceCaveSnapshot = information => {
+const EntranceCaveSnapshots = information => {
   const { entrance } = information;
   const { cave } = entrance;
+  const caveId = pathOr(cave, ['id'], cave);
+  const caveName = pathOr(entrance.caveName, ['name'], cave) ?? entrance.name;
+
   const { formatMessage } = useIntl();
+  const lat = Number(entrance.latitude);
+  const long = Number(entrance.longitude);
 
   const makeCoordinatesValue = coordinatesValue =>
     `${formatMessage({ id: 'Lat.' })} / ${formatMessage({ id: 'Long.' })} =
@@ -18,14 +24,13 @@ const EntranceCaveSnapshot = information => {
 
   return (
     <Box display="flex" flexDirection="column" width="100%">
-      <Property
-        label={`${formatMessage({ id: 'Coordinates' })} (WGS84)`}
-        value={makeCoordinatesValue([
-          Number(entrance.latitude),
-          Number(entrance.longitude)
-        ])}
-        icon={<GpsFixed fontSize="large" color="primary" />}
-      />
+      {!(isNaN(lat) && isNaN(long)) && (
+        <Property
+          label={`${formatMessage({ id: 'Coordinates' })} (WGS84)`}
+          value={makeCoordinatesValue([lat, long])}
+          icon={<GpsFixed fontSize="large" color="primary" />}
+        />
+      )}
       {entrance.altitude && (
         <Property
           label={formatMessage({ id: 'Altitude' })}
@@ -36,9 +41,9 @@ const EntranceCaveSnapshot = information => {
       {cave && (
         <Property
           label={formatMessage({ id: 'Cave' })}
-          value={`${entrance.name}`}
+          value={`${caveName}`}
           icon={<CustomIcon type="cave_system" />}
-          url={`/ui/caves/${cave.id}`}
+          url={`/ui/caves/${caveId}`}
         />
       )}
       {cave?.depth && (
@@ -74,8 +79,8 @@ const EntranceCaveSnapshot = information => {
     </Box>
   );
 };
-EntranceCaveSnapshot.propTypes = {
+EntranceCaveSnapshots.propTypes = {
   // eslint-disable-next-line react/no-unused-prop-types
   information: PropTypes.node
 };
-export default EntranceCaveSnapshot;
+export default EntranceCaveSnapshots;

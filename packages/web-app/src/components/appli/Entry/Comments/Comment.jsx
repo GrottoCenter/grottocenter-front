@@ -12,7 +12,6 @@ import EditIcon from '@material-ui/icons/Edit';
 import { useDispatch } from 'react-redux';
 import CancelIcon from '@material-ui/icons/Cancel';
 import { isEmpty, pathOr } from 'ramda';
-import HistoryIcon from '@material-ui/icons/History';
 import { usePermissions, useUserProperties } from '../../../../hooks';
 import { updateComment } from '../../../../actions/Comment/UpdateComment';
 import CreateCommentForm from '../../Form/CommentForm/index';
@@ -20,6 +19,7 @@ import { commentType } from '../Provider';
 import Ratings from '../Ratings';
 import Contribution from '../../../common/Contribution/Contribution';
 import Duration from '../../../common/Properties/Duration';
+import { SnapshotButton } from '../Snapshots/UtilityFunction';
 
 const StyledListItemText = styled(ListItemText)`
   width: 100%;
@@ -125,9 +125,7 @@ const Comment = ({ comment }) => {
       {canEdit && (
         <Box sx={{ display: 'flex', flexDirection: 'column' }}>
           <ListItemIcon>
-            <IconButton href={`/ui/comments/${id}/snapshots`} color="primary">
-              <HistoryIcon />
-            </IconButton>
+            <SnapshotButton id={id} type="comments" content={comment} />
             <IconButton
               onClick={() => setIsFormVisible(!isFormVisible)}
               color="primary"

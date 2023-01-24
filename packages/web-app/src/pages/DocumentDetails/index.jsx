@@ -52,7 +52,8 @@ const DocumentPage = ({
   documentParent,
   isValidated,
   onEdit,
-  areDocumentChildrenLoading
+  areDocumentChildrenLoading,
+  actualEntity
 }) => {
   const { formatMessage } = useIntl();
   const permissions = usePermissions();
@@ -71,7 +72,11 @@ const DocumentPage = ({
           id: 'A moderator needs to validate the last modification before being able to edit the document again.'
         })
       }
-      snapshot={{ id: documentId, entity: 'documents' }}
+      snapshot={{
+        id: documentId,
+        entity: 'documents',
+        actualVersion: actualEntity
+      }}
       title={loading ? <Skeleton /> : overview.title}
       content={
         <>
@@ -284,6 +289,7 @@ const HydratedDocumentPage = ({ id }) => {
       }
       isValidated={details.modifiedDocJson === null}
       onEdit={permissions.isAuth ? onEdit : undefined}
+      actualEntity={details}
     />
   );
 };
@@ -355,7 +361,9 @@ DocumentPage.propTypes = {
     url: PropTypes.string.isRequired
   }),
   isValidated: PropTypes.bool.isRequired,
-  onEdit: PropTypes.func.isRequired
+  onEdit: PropTypes.func.isRequired,
+  // eslint-disable-next-line react/forbid-prop-types
+  actualEntity: PropTypes.any
 };
 
 HydratedDocumentPage.propTypes = {

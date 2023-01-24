@@ -67,7 +67,8 @@ export const Entry = () => {
       histories,
       locations,
       riggings,
-      comments
+      comments,
+      details
     }
   } = useContext(EntryContext);
   const permissions = usePermissions();
@@ -78,6 +79,15 @@ export const Entry = () => {
   };
 
   const componentRef = useRef();
+
+  const snap = {
+    ...details,
+    latitude: position ? position[0] : undefined,
+    longitude: position ? position[1] : undefined,
+    cave: cave?.id,
+    caveName: cave?.names?.[0]?.name ?? cave?.name ?? name
+  };
+
   return (
     <div ref={componentRef}>
       <Layout>
@@ -89,6 +99,7 @@ export const Entry = () => {
           snapshot={{
             id,
             entity: 'entrances',
+            actualVersion: snap,
             isNetwork: cave?.entrances.length > 1
           }}
           content={

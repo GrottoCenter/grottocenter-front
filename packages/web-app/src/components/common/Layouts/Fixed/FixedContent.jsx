@@ -12,13 +12,14 @@ import {
   CircularProgress,
   Tooltip
 } from '@material-ui/core';
-import { Print, History } from '@material-ui/icons';
+import { Print } from '@material-ui/icons';
 import styled from 'styled-components';
 import ReactToPrint from 'react-to-print';
 import CreateIcon from '@material-ui/icons/Create';
 import NotificationsNoneIcon from '@material-ui/icons/NotificationsNone';
 import NotificationsActiveIcon from '@material-ui/icons/NotificationsActive';
 import { Skeleton } from '@material-ui/lab';
+import { SnapshotButton } from '../../../appli/Entry/Snapshots/UtilityFunction';
 
 const isString = is(String);
 
@@ -106,16 +107,13 @@ const FixedContent = ({
                 content={() => printRef.current}
               />
             )}
-            {snapshot && snapshot.id && (
-              <IconButton
-                href={`/ui/${snapshot.entity}/${snapshot.id}/snapshots${
-                  snapshot.isNetwork !== undefined
-                    ? `?isNetwork=${snapshot.isNetwork}`
-                    : ''
-                }`}
-                color="primary">
-                <History />
-              </IconButton>
+            {snapshot && (
+              <SnapshotButton
+                id={snapshot.id}
+                type={snapshot.entity}
+                content={snapshot.actualVersion}
+                isNetwork={snapshot.isNetwork}
+              />
             )}
 
             {!isNil(onChangeSubscribe) && (
@@ -167,7 +165,13 @@ FixedContent.propTypes = {
     // eslint-disable-next-line react/forbid-prop-types
     current: PropTypes.any
   }).isRequired,
-  snapshot: PropTypes.node,
+  snapshot: PropTypes.shape({
+    id: PropTypes.number.isRequired,
+    entity: PropTypes.string.isRequired,
+    isNetwork: PropTypes.bool,
+    // eslint-disable-next-line react/forbid-prop-types
+    actualVersion: PropTypes.any
+  }),
   onChangeSubscribe: PropTypes.func,
   subheader: PropTypes.node,
   title: PropTypes.oneOfType([PropTypes.node, PropTypes.string]).isRequired

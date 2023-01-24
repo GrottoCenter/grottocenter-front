@@ -1,17 +1,11 @@
 import { useIntl } from 'react-intl';
-import {
-  Chip,
-  ListItem,
-  ListItemText,
-  ListItemIcon,
-  IconButton
-} from '@material-ui/core';
-import HistoryIcon from '@material-ui/icons/History';
+import { Chip, ListItem, ListItemText, ListItemIcon } from '@material-ui/core';
 import React from 'react';
 import styled from 'styled-components';
 import GCLink from '../../../common/GCLink';
 import { documentType } from '../Provider';
 import Files from './Files';
+import { SnapshotButton } from '../Snapshots/UtilityFunction';
 
 const StyledListItemText = styled(ListItemText)`
   width: 100%;
@@ -23,7 +17,7 @@ const StyledChip = styled(Chip)`
   padding: 0 ${({ theme }) => theme.spacing(1)}px;
 `;
 
-const Document = ({ details, entities, id, overview }) => {
+const Document = ({ details, entities, id, overview, snapshot }) => {
   const { formatMessage } = useIntl();
 
   return (
@@ -58,9 +52,7 @@ const Document = ({ details, entities, id, overview }) => {
         }
       />
       <ListItemIcon style={{ alignSelf: 'start' }}>
-        <IconButton href={`/ui/documents/${id}/snapshots`} color="primary">
-          <HistoryIcon />
-        </IconButton>
+        <SnapshotButton id={id} type="documents" content={snapshot} />
       </ListItemIcon>
     </ListItem>
   );

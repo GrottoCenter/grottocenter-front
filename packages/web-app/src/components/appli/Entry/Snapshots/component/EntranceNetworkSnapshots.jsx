@@ -4,11 +4,13 @@ import { GpsFixed, Height } from '@material-ui/icons';
 import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
 
-import { Property } from '../../../common/Properties';
-import CustomIcon from '../../../common/CustomIcon';
+import { Property } from '../../../../common/Properties';
+import CustomIcon from '../../../../common/CustomIcon';
 
-const EntranceNetworkSnapshot = information => {
+const EntranceNetworkSnapshots = information => {
   const { entrance } = information;
+  const lat = Number(entrance.latitude);
+  const long = Number(entrance.longitude);
 
   const { formatMessage } = useIntl();
 
@@ -18,14 +20,13 @@ const EntranceNetworkSnapshot = information => {
 
   return (
     <Box display="flex" flexDirection="column" width="100%">
-      <Property
-        label={`${formatMessage({ id: 'Coordinates' })} (WGS84)`}
-        value={makeCoordinatesValue([
-          Number(entrance.latitude),
-          Number(entrance.longitude)
-        ])}
-        icon={<GpsFixed fontSize="large" color="primary" />}
-      />
+      {!(isNaN(lat) && isNaN(long)) && (
+        <Property
+          label={`${formatMessage({ id: 'Coordinates' })} (WGS84)`}
+          value={makeCoordinatesValue([lat, long])}
+          icon={<GpsFixed fontSize="large" color="primary" />}
+        />
+      )}
       {entrance.altitude && (
         <Property
           label={formatMessage({ id: 'Altitude' })}
@@ -44,8 +45,8 @@ const EntranceNetworkSnapshot = information => {
     </Box>
   );
 };
-EntranceNetworkSnapshot.propTypes = {
+EntranceNetworkSnapshots.propTypes = {
   // eslint-disable-next-line react/no-unused-prop-types
   information: PropTypes.node
 };
-export default EntranceNetworkSnapshot;
+export default EntranceNetworkSnapshots;

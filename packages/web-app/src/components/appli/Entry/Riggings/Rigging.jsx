@@ -3,7 +3,6 @@ import { Box, IconButton, Tooltip } from '@material-ui/core';
 import EditIcon from '@material-ui/icons/Edit';
 import { useDispatch } from 'react-redux';
 import CancelIcon from '@material-ui/icons/Cancel';
-import HistoryIcon from '@material-ui/icons/History';
 import React, { useState } from 'react';
 import { usePermissions } from '../../../../hooks';
 import { updateRiggings } from '../../../../actions/Riggings/UpdateRigging';
@@ -11,6 +10,7 @@ import CreateRiggingsForm from '../../Form/RiggingsForm/index';
 import { riggingType } from '../Provider';
 import Contribution from '../../../common/Contribution/Contribution';
 import RiggingTable from './RiggingTable';
+import { SnapshotButton } from '../Snapshots/UtilityFunction';
 
 const Rigging = ({ rigging }) => {
   const dispatch = useDispatch();
@@ -29,7 +29,13 @@ const Rigging = ({ rigging }) => {
 
   return (
     <Box key={rigging.id} position="relative">
-      <Box align="right">
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'flex-end'
+        }}>
+        <SnapshotButton id={rigging.id} type="riggings" content={rigging} />
         {permissions.isAuth && (
           <Tooltip
             title={
@@ -45,11 +51,6 @@ const Rigging = ({ rigging }) => {
             </IconButton>
           </Tooltip>
         )}
-        <IconButton
-          href={`/ui/riggings/${rigging.id}/snapshots`}
-          color="primary">
-          <HistoryIcon />
-        </IconButton>
       </Box>
       {isFormVisible && permissions.isAuth ? (
         <Box width="100%">

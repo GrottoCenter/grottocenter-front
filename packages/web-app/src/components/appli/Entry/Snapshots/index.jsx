@@ -1,58 +1,49 @@
-import * as React from 'react';
-import { useIntl } from 'react-intl';
+import React, { useState, useEffect } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { useEffect } from 'react';
-import {
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
-  AccordionActions,
-  Typography
-} from '@material-ui/core';
+import { Typography } from '@material-ui/core';
 import { Skeleton } from '@material-ui/lab';
-import ExpandMore from '@material-ui/icons/ExpandMore';
 import { pathOr } from 'ramda';
 
-import Alert from '../../../common/Alert';
 import Contribution from '../../../common/Contribution/Contribution';
 import { fetchSnapshot } from '../../../../actions/Snapshot/GetSnapshots';
-import GenericSnapshot from './GenericSnapshots';
-import RiggingSnapshot from './RiggingSnapshots';
-import EntranceCaveSnapshot from './EntranceCaveSnapshots';
-import EntranceNetworkSnapshots from './EntranceNetworkSnapshots';
 import REDUCER_STATUS from '../../../../reducers/ReducerStatus';
 import ScrollableContent from '../../../common/Layouts/Fixed/ScrollableContent';
 import getAuthor from '../../../../util/getAuthor';
-import DocumentSnapshots from './DocumentSnapshots';
 import SensitiveCaveWarning from '../SensitiveCaveWarning';
-
-function renderComponent(type, data, isNetwork) {
-  switch (type) {
-    case 'riggings':
-      return <RiggingSnapshot rigging={data} key={data.id} />;
-    case 'entrances':
-      return isNetwork ? (
-        <EntranceNetworkSnapshots entrance={data} key={data.id} />
-      ) : (
-        <EntranceCaveSnapshot entrance={data} key={data.id} />
-      );
-    case 'documents':
-      return <DocumentSnapshots document={data} key={data.id} />;
-    default:
-      return <GenericSnapshot data={data} key={data.id} />;
-  }
-}
+import AccordionSnapshotList from './AccordionSnapshotList';
+import Alert403 from './error/403Alert';
+import Alert404 from './error/404Alert';
+import { getAccordionBodyFromType } from './UtilityFunction';
+import Translate from '../../../common/Translate';
 
 const SnapshotPage = () => {
-  const { formatMessage } = useIntl();
   const dispatch = useDispatch();
   const location = useLocation();
   const queryParameters = new URLSearchParams(location.search);
   const isNetwork = queryParameters.get('isNetwork') === 'true';
+  const [actualTItem, setActualTItem] = useState({});
+
+  useEffect(() => {
+    /* 
+    LocalStorage is used to pass data from one tab to another 
+    SessionStorage is used to keep data inside a tab (When refreshing a page for instance)
+    */
+    const jsonSessionStorage = sessionStorage.getItem('t_item');
+    const json = jsonSessionStorage ?? localStorage.getItem('t_item');
+    const items = json !== 'undefined' ? JSON.parse(json) : undefined;
+    if (items) {
+      setActualTItem(items);
+    }
+    if (!jsonSessionStorage) {
+      sessionStorage.setItem('t_item', json);
+    }
+    return localStorage.removeItem('t_item');
+  }, []);
 
   const { id, type } = useParams();
-  const { data, error, status, latestHttpCode } = useSelector(
+
+  const { data, status, latestHttpCode } = useSelector(
     state => state.snapshots
   );
 
@@ -62,85 +53,49 @@ const SnapshotPage = () => {
 
   const isLoading = status === REDUCER_STATUS.LOADING;
   const isSuccess = status === REDUCER_STATUS.SUCCEEDED;
-  const is404 = error && latestHttpCode === 404;
-  const is403 = error && latestHttpCode === 403;
-  const isSensitive = pathOr(false, ['entrances', '0', 'isSensitive'], data);
+  const is404 = !isSuccess && latestHttpCode === 404;
+  const is403 = !isSuccess && latestHttpCode === 403;
+  const isSensitive =
+    pathOr(false, ['entrances', '0', 'isSensitive'], data) ||
+    actualTItem.isSensitive;
   return (
     <>
-      {isLoading && <Skeleton height={300} />}
       {isSensitive && <SensitiveCaveWarning />}
-      {is404 && (
-        <Alert
-          title={formatMessage({
-            id: `This ${type} has no related snapshot.`
-          })}
-          severity="error"
-        />
-      )}
-      {is403 && (
-        <Alert
-          title={formatMessage({
-            id: `This {type} is related to a sensitive entrance. Only administrator can see this.`
-          })}
-          severity="warning"
-        />
-      )}
-      {isSuccess && (
+      {Object.keys(actualTItem).length > 0 && (
         <ScrollableContent
           dense
-          title={formatMessage({ id: `${type} snapshots` })}
+          title={
+            <Translate
+              id="Actual {type}"
+              values={{
+                type
+              }}
+              defaultMessage={`Actual ${type}`}
+            />
+          }
           content={
-            data && Object.keys(data).length > 0 ? (
-              Object.keys(data).map(snapshotType =>
-                data[snapshotType].map(snapshot => {
-                  const author = getAuthor(snapshot.author);
-                  const reviewer = getAuthor(snapshot.reviewer);
-                  return (
-                    <Accordion>
-                      <AccordionSummary expandIcon={<ExpandMore />}>
-                        <Typography>
-                          {reviewer
-                            ? `${reviewer?.nickname} - `
-                            : `${author?.nickname ? author?.nickname : ''} - `}
-                          {snapshot.id
-                            ? ` ${new Date(
-                                snapshot.id
-                              ).toLocaleDateString()}-${new Date(
-                                snapshot.id
-                              ).toLocaleTimeString()} `
-                            : ' '}
-                          {snapshot.title ?? snapshot.name ?? ''}
-                        </Typography>
-                      </AccordionSummary>
-                      <AccordionDetails>
-                        {renderComponent(
-                          snapshotType,
-                          snapshot,
-                          isNetwork ?? false
-                        )}
-                      </AccordionDetails>
-                      <AccordionActions>
-                        <Contribution
-                          author={author}
-                          creationDate={snapshot.date}
-                          reviewer={reviewer}
-                          dateReviewed={snapshot.dateReviewed}
-                        />
-                      </AccordionActions>
-                    </Accordion>
-                  );
-                })
-              )
-            ) : (
-              <Alert
-                severity="info"
-                content={formatMessage({
-                  id: `There is currently no snapshot registered for this ${type}.`
-                })}
+            <>
+              {type !== 'riggings' && (
+                <Typography variant="h4">
+                  {actualTItem.title ?? actualTItem.name}
+                </Typography>
+              )}
+              {getAccordionBodyFromType(type, actualTItem, isNetwork ?? false)}
+              <Contribution
+                author={getAuthor(actualTItem.author)}
+                creationDate={actualTItem.date}
+                reviewer={getAuthor(actualTItem.reviewer)}
+                dateReviewed={actualTItem.dateReviewed}
               />
-            )
+            </>
           }
         />
+      )}
+      {is403 && <Alert403 type={type} />}
+      {is404 && <Alert404 type={type} />}
+      {isLoading && <Skeleton height={300} />}
+      {isSuccess && (
+        <AccordionSnapshotList data={data} type={type} isNetwork={isNetwork} />
       )}
     </>
   );

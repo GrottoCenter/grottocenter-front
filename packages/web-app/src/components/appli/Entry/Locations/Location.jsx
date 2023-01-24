@@ -10,18 +10,18 @@ import {
 import { useDispatch } from 'react-redux';
 import EditIcon from '@material-ui/icons/Edit';
 import CancelIcon from '@material-ui/icons/Cancel';
-import HistoryIcon from '@material-ui/icons/History';
 
 import { locationType } from '../Provider';
 import CreateLocationForm from '../../Form/LocationForm/index';
 import { updateLocation } from '../../../../actions/Location/UpdateLocation';
 import { usePermissions } from '../../../../hooks';
 import Contribution from '../../../common/Contribution/Contribution';
+import { SnapshotButton } from '../Snapshots/UtilityFunction';
 
 const Location = ({ location }) => {
   const dispatch = useDispatch();
   const permissions = usePermissions();
-  const { title, body, author, reviewer, creationDate, reviewedDate } =
+  const { id, title, body, author, reviewer, creationDate, reviewedDate } =
     location;
   const [isFormVisible, setIsFormVisible] = useState(false);
 
@@ -65,11 +65,7 @@ const Location = ({ location }) => {
       )}
       <Box sx={{ display: 'flex', flexDirection: 'column' }}>
         <ListItemIcon style={{ alignSelf: 'start' }}>
-          <IconButton
-            href={`/ui/locations/${location.id}/snapshots`}
-            color="primary">
-            <HistoryIcon />
-          </IconButton>
+          <SnapshotButton id={id} type="locations" content={location} />
         </ListItemIcon>
         {permissions.isAuth && (
           <ListItemIcon style={{ alignSelf: 'start' }}>
