@@ -9,7 +9,8 @@ const StyledBox = withStyles(() => ({
     padding: '15px',
     borderRadius: '20px',
     margin: '0 20px',
-    marginBottom: '5px'
+    marginBottom: '5px',
+    cursor: 'pointer'
   }
 }))(Box);
 

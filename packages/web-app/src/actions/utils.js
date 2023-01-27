@@ -44,3 +44,5 @@ export const getTotalCount = (defaultCount, contentRangeHeader) =>
     makeNumber,
     ifElse(equals(0), always(defaultCount), identity)
   )(contentRangeHeader);
+
+export const convertKmIntoMiles = km => km * 0.621371;
