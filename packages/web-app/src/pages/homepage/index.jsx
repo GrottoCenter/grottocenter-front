@@ -8,12 +8,12 @@ import Header from './Header';
 import Welcome from './Welcome';
 import LatestBlogNewsSection from './LatestBlogNewsSection';
 import Association from './Association';
-import WhatIsIt from './WhatIsIt';
 import RandomEntry from './RandomEntry';
 import PartnersSection from './PartnersSection';
 import Footer from './Footer';
 
 import { usePermissions } from '../../hooks';
+import DataHomepage from '../../components/appli/DataHomepage';
 
 const HomePage = () => {
   const location = useLocation();
@@ -34,7 +34,7 @@ const HomePage = () => {
     <>
       <Header />
       <Welcome />
-      <WhatIsIt />
+      <DataHomepage />
       <RandomEntry />
       <LatestBlogNewsSection />
       <Association />

@@ -8,8 +8,11 @@ export const dynamicNumbersUrl = {
   officialPartners: `${API_BASE_PATH}/partners/count`,
   organizations: `${API_BASE_PATH}/organizations/count`,
   publicEntrances: `${API_BASE_PATH}/entrances/publicCount`,
-  users: `${API_BASE_PATH}/cavers/users/count`
+  users: `${API_BASE_PATH}/cavers/users/count`,
+  countries: `${API_BASE_PATH}/countries/count`
 };
+
+export const cumulatedLengthUrl = `${API_BASE_PATH}/caves/cumulated-length`;
 
 // ===== Auth urls
 export const changePasswordUrl = `${API_BASE_PATH}/account/password`;

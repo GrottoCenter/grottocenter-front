@@ -16,6 +16,7 @@ import createLocation from './CreateLocation';
 import createMassif from './CreateMassifReducer';
 import createOrganization from './CreateOrganization';
 import createPerson from './CreatePerson';
+import cumulatedLength from './CumulatedLengthReducer';
 import documentChildren from './DocumentChildrenReducer';
 import documentDetails from './DetailsDocumentReducer';
 import documents from './DocumentsReducer';
@@ -90,6 +91,7 @@ const GCReducer = combineReducers({
   createMassif,
   createOrganization,
   createPerson,
+  cumulatedLength,
   document,
   documentChildren,
   documentDetails,
