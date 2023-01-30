@@ -100,7 +100,8 @@ export const Entry = () => {
             id,
             entity: 'entrances',
             actualVersion: snap,
-            isNetwork: cave?.entrances.length > 1
+            isNetwork: cave?.entrances.length > 1,
+            all: true
           }}
           content={
             <HalfSplitContainer>

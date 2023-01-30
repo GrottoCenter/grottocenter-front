@@ -2,6 +2,8 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { IconButton } from '@material-ui/core';
 import HistoryIcon from '@material-ui/icons/History';
+import TimelineIcon from '@material-ui/icons/Timeline';
+import PropTypes from 'prop-types';
 import {
   CommentSnapshots,
   DocumentSnapshots,
@@ -49,4 +51,20 @@ const SnapshotButton = item => {
     </IconButton>
   );
 };
-export { SnapshotButton, getAccordionBodyFromType };
+
+const PageVersionningButton = ({ id, isNetwork }) => (
+  <IconButton
+    component={Link}
+    to={`/ui/entrances/${id}/snapshots?isNetwork=${isNetwork}&all=true`}
+    color="primary"
+    target="_blank"
+    rel="noreferrer">
+    <TimelineIcon />
+  </IconButton>
+);
+PageVersionningButton.propTypes = {
+  id: PropTypes.number,
+  isNetwork: PropTypes.bool
+};
+
+export { SnapshotButton, PageVersionningButton, getAccordionBodyFromType };

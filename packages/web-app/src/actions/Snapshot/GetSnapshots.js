@@ -7,7 +7,7 @@ export const FETCH_SNAPSHOT_LOADING = 'FETCH_SNAPSHOT_LOADING';
 export const FETCH_SNAPSHOT_ERROR = 'FETCH_SNAPSHOT_ERROR';
 
 export const fetchSnapshot =
-  (typeId, typeName, isNetwork = undefined) =>
+  (typeId, typeName, isNetwork = undefined, getAll = undefined) =>
   (dispatch, getState) => {
     dispatch({ type: FETCH_SNAPSHOT_LOADING });
     const requestOptions = {
@@ -15,7 +15,10 @@ export const fetchSnapshot =
         ...getState().login.authorizationHeader
       }
     };
-    return fetch(getSnapshotsUrl(typeId, typeName, isNetwork), requestOptions)
+    return fetch(
+      getSnapshotsUrl(typeId, typeName, isNetwork, getAll),
+      requestOptions
+    )
       .then(response => {
         if (response.status >= 400) {
           throw new Error(response.status);

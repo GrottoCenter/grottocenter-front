@@ -22,6 +22,7 @@ const SnapshotPage = () => {
   const location = useLocation();
   const queryParameters = new URLSearchParams(location.search);
   const isNetwork = queryParameters.get('isNetwork') === 'true';
+  const getAll = queryParameters.get('all') === 'true';
   const [actualTItem, setActualTItem] = useState({});
 
   useEffect(() => {
@@ -48,8 +49,8 @@ const SnapshotPage = () => {
   );
 
   useEffect(() => {
-    dispatch(fetchSnapshot(id, type, isNetwork));
-  }, [id, type, isNetwork, dispatch]);
+    dispatch(fetchSnapshot(id, type, isNetwork, getAll));
+  }, [id, type, isNetwork, getAll, dispatch]);
 
   const isLoading = status === REDUCER_STATUS.LOADING;
   const isSuccess = status === REDUCER_STATUS.SUCCEEDED;
