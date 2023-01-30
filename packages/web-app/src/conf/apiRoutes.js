@@ -106,10 +106,10 @@ export const putLocationUrl = locationId =>
   `${API_BASE_PATH}/locations/${locationId}`;
 
 // ===== Snapshots urls
-export const getSnapshotsUrl = (typeId, typeName, isNetwork) =>
-  isNetwork
-    ? `${API_BASE_PATH}/${typeName}/${typeId}/snapshots?isNetwork=${isNetwork}`
-    : `${API_BASE_PATH}/${typeName}/${typeId}/snapshots`;
+export const getSnapshotsUrl = (typeId, typeName, isNetwork, getAll) =>
+  `${API_BASE_PATH}/${typeName}/${typeId}/${
+    getAll ? 'all-snapshots' : 'snapshots'
+  }${isNetwork ? `?isNetwork=${isNetwork}` : ''}`;
 
 // ===== Massifs urls
 export const getMassifUrl = `${API_BASE_PATH}/massifs/`;

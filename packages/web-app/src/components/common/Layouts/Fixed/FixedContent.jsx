@@ -19,7 +19,10 @@ import CreateIcon from '@material-ui/icons/Create';
 import NotificationsNoneIcon from '@material-ui/icons/NotificationsNone';
 import NotificationsActiveIcon from '@material-ui/icons/NotificationsActive';
 import { Skeleton } from '@material-ui/lab';
-import { SnapshotButton } from '../../../appli/Entry/Snapshots/UtilityFunction';
+import {
+  SnapshotButton,
+  PageVersionningButton
+} from '../../../appli/Entry/Snapshots/UtilityFunction';
 
 const isString = is(String);
 
@@ -115,7 +118,12 @@ const FixedContent = ({
                 isNetwork={snapshot.isNetwork}
               />
             )}
-
+            {snapshot?.all && (
+              <PageVersionningButton
+                id={snapshot.id}
+                isNetwork={snapshot.isNetwork}
+              />
+            )}
             {!isNil(onChangeSubscribe) && (
               <Tooltip
                 title={formatMessage({
@@ -170,7 +178,8 @@ FixedContent.propTypes = {
     entity: PropTypes.string.isRequired,
     isNetwork: PropTypes.bool,
     // eslint-disable-next-line react/forbid-prop-types
-    actualVersion: PropTypes.any
+    actualVersion: PropTypes.any,
+    all: PropTypes.bool
   }),
   onChangeSubscribe: PropTypes.func,
   subheader: PropTypes.node,
