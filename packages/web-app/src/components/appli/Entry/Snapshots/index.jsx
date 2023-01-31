@@ -14,7 +14,8 @@ import SensitiveCaveWarning from '../SensitiveCaveWarning';
 import AccordionSnapshotList from './AccordionSnapshotList';
 import Alert403 from './error/403Alert';
 import Alert404 from './error/404Alert';
-import { getAccordionBodyFromType } from './UtilityFunction';
+import { getAccordionBodyFromType, sortSnapshots } from './UtilityFunction';
+import AccordionSnapshotListPage from './AccordionSnapshotListPage';
 import Translate from '../../../common/Translate';
 
 const SnapshotPage = () => {
@@ -26,8 +27,8 @@ const SnapshotPage = () => {
   const [actualTItem, setActualTItem] = useState({});
 
   useEffect(() => {
-    /* 
-    LocalStorage is used to pass data from one tab to another 
+    /*
+    LocalStorage is used to pass data from one tab to another
     SessionStorage is used to keep data inside a tab (When refreshing a page for instance)
     */
     const jsonSessionStorage = sessionStorage.getItem('t_item');
@@ -95,9 +96,20 @@ const SnapshotPage = () => {
       {is403 && <Alert403 type={type} />}
       {is404 && <Alert404 type={type} />}
       {isLoading && <Skeleton height={300} />}
-      {isSuccess && (
-        <AccordionSnapshotList data={data} type={type} isNetwork={isNetwork} />
-      )}
+      {isSuccess &&
+        (getAll ? (
+          <AccordionSnapshotListPage
+            data={sortSnapshots(data)}
+            type={type}
+            isNetwork={isNetwork}
+          />
+        ) : (
+          <AccordionSnapshotList
+            data={data}
+            type={type}
+            isNetwork={isNetwork}
+          />
+        ))}
     </>
   );
 };

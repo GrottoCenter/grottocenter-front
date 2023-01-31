@@ -1,6 +1,7 @@
 import React from 'react';
+import { useIntl } from 'react-intl';
 import { Link } from 'react-router-dom';
-import { IconButton } from '@material-ui/core';
+import { Tooltip, IconButton } from '@material-ui/core';
 import HistoryIcon from '@material-ui/icons/History';
 import TimelineIcon from '@material-ui/icons/Timeline';
 import PropTypes from 'prop-types';
@@ -37,34 +38,72 @@ const getAccordionBodyFromType = (type, data, isNetwork) => {
 
 const SnapshotButton = item => {
   const { id, type, content, isNetwork } = item;
+  const { formatMessage } = useIntl();
   return (
-    <IconButton
-      component={Link}
-      to={`/ui/${type}/${id}/snapshots${
-        isNetwork !== undefined ? `?isNetwork=${isNetwork}` : ''
-      }`}
-      onClick={() => storeInLocalStorage(content)}
-      color="primary"
-      target="_blank"
-      rel="noreferrer">
-      <HistoryIcon />
-    </IconButton>
+    <Tooltip title={formatMessage({ id: 'Access to snapshot page' })}>
+      <IconButton
+        component={Link}
+        to={`/ui/${type}/${id}/snapshots${
+          isNetwork !== undefined ? `?isNetwork=${isNetwork}` : ''
+        }`}
+        onClick={() => storeInLocalStorage(content)}
+        color="primary"
+        target="_blank"
+        rel="noreferrer">
+        <HistoryIcon />
+      </IconButton>
+    </Tooltip>
   );
 };
 
-const PageVersionningButton = ({ id, isNetwork }) => (
-  <IconButton
-    component={Link}
-    to={`/ui/entrances/${id}/snapshots?isNetwork=${isNetwork}&all=true`}
-    color="primary"
-    target="_blank"
-    rel="noreferrer">
-    <TimelineIcon />
-  </IconButton>
-);
-PageVersionningButton.propTypes = {
+const SnapshotPageButton = ({ id, isNetwork }) => {
+  const { formatMessage } = useIntl();
+  return (
+    <Tooltip title={formatMessage({ id: 'Access to general entrance page' })}>
+      <IconButton
+        component={Link}
+        to={`/ui/entrances/${id}/snapshots?isNetwork=${isNetwork}&all=true`}
+        color="primary"
+        target="_blank"
+        rel="noreferrer">
+        <TimelineIcon />
+      </IconButton>
+    </Tooltip>
+  );
+};
+SnapshotPageButton.propTypes = {
   id: PropTypes.number,
   isNetwork: PropTypes.bool
 };
 
-export { SnapshotButton, PageVersionningButton, getAccordionBodyFromType };
+const sortSnapshots = dataToStore => {
+  const sortedItems = [];
+
+  Object.keys(dataToStore).map(type =>
+    dataToStore[type].map(item => sortedItems.push({ [type]: [item] }))
+  );
+
+  sortedItems.sort((aObj, bObj) => {
+    const a = aObj[Object.keys(aObj)[0]];
+    const b = bObj[Object.keys(bObj)[0]];
+    const aDate = new Date(a[0].id);
+    const bDate = new Date(b[0].id);
+    return new Date(bDate) - new Date(aDate);
+  });
+
+  return sortedItems;
+};
+
+sortSnapshots.prototype = {
+  type: PropTypes.shape({
+    id: PropTypes.string,
+    t_id: PropTypes.string
+  })
+};
+
+export {
+  SnapshotButton,
+  SnapshotPageButton,
+  getAccordionBodyFromType,
+  sortSnapshots
+};

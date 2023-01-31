@@ -19,11 +19,13 @@ const AccordionSnapshot = ({
   snapshotType,
   isNetwork,
   author,
-  reviewer
+  reviewer,
+  all
 }) => (
   <Accordion>
     <AccordionSummary expandIcon={<ExpandMore />}>
       <Typography>
+        {all ? `${snapshotType} : ` : ''}
         {reviewer
           ? `${reviewer?.nickname} - `
           : `${author?.nickname ? author?.nickname : ''} - `}
@@ -62,6 +64,7 @@ AccordionSnapshot.propTypes = {
   snapshotType: PropTypes.string,
   isNetwork: PropTypes.bool,
   author: authorType,
-  reviewer: authorType
+  reviewer: authorType,
+  all: PropTypes.bool
 };
 export default AccordionSnapshot;

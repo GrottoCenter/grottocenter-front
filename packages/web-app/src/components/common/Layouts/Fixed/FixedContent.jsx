@@ -21,7 +21,7 @@ import NotificationsActiveIcon from '@material-ui/icons/NotificationsActive';
 import { Skeleton } from '@material-ui/lab';
 import {
   SnapshotButton,
-  PageVersionningButton
+  SnapshotPageButton
 } from '../../../appli/Entry/Snapshots/UtilityFunction';
 
 const isString = is(String);
@@ -119,7 +119,7 @@ const FixedContent = ({
               />
             )}
             {snapshot?.all && (
-              <PageVersionningButton
+              <SnapshotPageButton
                 id={snapshot.id}
                 isNetwork={snapshot.isNetwork}
               />
