@@ -1,6 +1,7 @@
 import fetch from 'isomorphic-fetch';
 import { getLanguagesUrl } from '../conf/apiRoutes';
 import makeErrorMessage from '../helpers/makeErrorMessage';
+import { checkAndGetStatus } from './utils';
 
 export const FETCH_LANGUAGES = 'FETCH_LANGUAGES';
 export const FETCH_LANGUAGES_SUCCESS = 'FETCH_LANGUAGES_SUCCESS';
@@ -27,13 +28,9 @@ export function loadLanguages(isPreferredLanguage) {
     dispatch(fetchLanguages());
 
     return fetch(`${getLanguagesUrl}?isPreferedLanguage=${isPreferredLanguage}`)
-      .then(response => {
-        if (response.status >= 400) {
-          throw new Error(response.status);
-        }
-        return response.text();
-      })
-      .then(text => dispatch(fetchLanguagesSuccess(JSON.parse(text).languages)))
+      .then(checkAndGetStatus)
+      .then(response => response.json())
+      .then(data => dispatch(fetchLanguagesSuccess(data.languages)))
       .catch(error =>
         dispatch(
           fetchLanguagesFailure(
