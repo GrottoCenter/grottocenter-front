@@ -10,6 +10,7 @@ const initialState = {
   lang: DEFAULT_LANGUAGE,
   languages: [],
   isFetching: false,
+  isLoaded: false,
   error: null
 };
 
@@ -25,6 +26,7 @@ const reducer = (state = initialState, action) => {
       return {
         ...state,
         languages: action.languages.sort((l1, l2) => l1.refName > l2.refName),
+        isLoaded: true,
         isFetching: false
       };
 
