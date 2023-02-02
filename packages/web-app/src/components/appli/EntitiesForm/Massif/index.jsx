@@ -26,7 +26,6 @@ const defaultMassifValues = {
 export const MassifForm = ({ massifValues }) => {
   const isNewMassif = !massifValues;
   const isNewDescription = massifValues ? !massifValues.descriptionId : true;
-  const { languages: allLanguages } = useSelector(state => state.language);
   const {
     error: massifError,
     loading: massifLoading,
@@ -129,7 +128,6 @@ export const MassifForm = ({ massifValues }) => {
     <FormContainer>
       <form autoComplete="off" onSubmit={handleSubmit(onSubmit)}>
         <MassifFields
-          allLanguages={allLanguages}
           control={control}
           errors={errors}
           isNewDescription={isNewDescription}

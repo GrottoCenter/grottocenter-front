@@ -17,7 +17,6 @@ import PropTypes from 'prop-types';
 
 import grottoTheme from './conf/grottoTheme';
 import GCReducer from './reducers/GCReducer';
-import { loadLanguages } from './actions/Language';
 import { bootstrapIntl } from './actions/Intl';
 import Application from './pages/Application';
 import ErrorHandler from './components/appli/ErrorHandler';
@@ -53,7 +52,6 @@ const HydratedIntlProvider = ({ children }) => {
 
   useEffect(() => {
     dispatch(bootstrapIntl());
-    dispatch(loadLanguages(true));
   }, [dispatch]);
   return (
     <IntlProvider

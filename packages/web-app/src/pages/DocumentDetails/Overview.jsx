@@ -75,7 +75,7 @@ const Overview = ({
               <Typography variant="body1">
                 {authors.map((auth, i) => (
                   <React.Fragment key={auth.id}>
-                    <a href={auth.url}>{auth.fullName}</a>
+                    <a href={auth.url}>{auth.nickname}</a>
                     {i < authors.length - 1 ? ' - ' : ''}
                   </React.Fragment>
                 ))}
@@ -97,7 +97,7 @@ Overview.propTypes = {
   authors: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.number.isRequired,
-      fullName: PropTypes.string.isRequired,
+      nickname: PropTypes.string.isRequired,
       url: PropTypes.string.isRequired
     })
   ),
