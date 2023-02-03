@@ -13,6 +13,7 @@ import PropTypes from 'prop-types';
 import Contribution from '../../../common/Contribution/Contribution';
 import { getAccordionBodyFromType } from './UtilityFunction';
 import authorType from '../../../../types/author.type';
+import RestoreSnapshot from './component/RestoreSnapshot';
 
 const AccordionSnapshot = ({
   snapshot,
@@ -41,6 +42,15 @@ const AccordionSnapshot = ({
       <Box sx={{ width: '100%' }}>
         {getAccordionBodyFromType(snapshotType, snapshot, isNetwork ?? false)}
       </Box>
+      {snapshotType !== 'documents' && (
+        <Box>
+          <RestoreSnapshot
+            snapshot={snapshot}
+            snapshotType={snapshotType}
+            isNetwork={isNetwork}
+          />
+        </Box>
+      )}
     </AccordionDetails>
     <AccordionActions>
       <Contribution
