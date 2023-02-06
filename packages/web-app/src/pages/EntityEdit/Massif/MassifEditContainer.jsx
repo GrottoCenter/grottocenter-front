@@ -35,7 +35,7 @@ const MassifEditContainer = ({ isFetching, massif }) => {
 
 MassifEditContainer.propTypes = {
   massif: PropTypes.shape({
-    name: PropTypes.shape({ message: PropTypes.string })
+    name: PropTypes.string
   }),
   isFetching: PropTypes.bool
 };

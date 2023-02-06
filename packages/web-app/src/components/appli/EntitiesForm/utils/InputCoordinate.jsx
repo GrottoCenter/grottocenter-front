@@ -33,7 +33,7 @@ const InputCoordinate = ({
           helperText={helperText}
           value={value}
           onChange={e => {
-            const reg = /^\d*(\.|,)?(\d+)?$/;
+            const reg = /^-?\d*(\.|,)?(\d+)?$/;
             const oldV = value ?? '';
             const newV = e.target.value;
             const res = newV.match(reg) ? newV : oldV;

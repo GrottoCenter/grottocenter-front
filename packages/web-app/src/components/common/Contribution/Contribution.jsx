@@ -13,17 +13,17 @@ const Contribution = ({
 }) => (
   <>
     {body && (
-      <MultilinesTypography variant="body1" component="div">
+      <MultilinesTypography variant="body1" component="span">
         {body}
       </MultilinesTypography>
     )}
-    <div>
-      <AuthorAndDate author={author} date={creationDate} />
-    </div>
+    <br />
+    <AuthorAndDate author={author} date={creationDate} />
     {reviewer && (
-      <div>
+      <>
+        <br />
         <AuthorAndDate author={reviewer} date={dateReviewed} verb="Updated" />
-      </div>
+      </>
     )}
   </>
 );

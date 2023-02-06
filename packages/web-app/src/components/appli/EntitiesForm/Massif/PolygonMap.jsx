@@ -27,9 +27,9 @@ const getMultiPolygonCentroid = function (coordinates) {
   };
 };
 
-let displayValue = false;
 const PolygonMap = ({ onChange, data }) => {
   const isMounted = useRef(true);
+  const displayValue = useRef(false);
   const [map, setMap] = useState();
   const [mapLayers, setMapLayers] = useState([]);
   const geolocation = useGeolocation();
@@ -138,7 +138,7 @@ const PolygonMap = ({ onChange, data }) => {
   };
 
   const onFeatureGroupReady = ref => {
-    if (ref && !displayValue) {
+    if (ref && !displayValue.current) {
       const editableFG = ref;
       // eslint-disable-next-line no-restricted-syntax
       for (const polygon of data.coordinates[0]) {
@@ -154,7 +154,7 @@ const PolygonMap = ({ onChange, data }) => {
         onCreate(myObj);
       });
 
-      displayValue = true;
+      displayValue.current = true;
     }
   };
 
@@ -192,6 +192,7 @@ const PolygonMap = ({ onChange, data }) => {
       <LayersControl position="bottomleft">
         {TileLayers.map(layer => (
           <LayersControl.BaseLayer
+            key={layer.name}
             checked={layer.name === 'OpenStreetMap Basic'}
             name={layer.name}>
             <TileLayer url={layer.url} attribution={layer.attribution} />
@@ -205,7 +206,9 @@ const PolygonMap = ({ onChange, data }) => {
 PolygonMap.propTypes = {
   onChange: PropTypes.func,
   data: PropTypes.shape({
-    coordinates: PropTypes.arrayOf([])
+    coordinates: PropTypes.arrayOf(
+      PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.number)))
+    )
   })
 };
 

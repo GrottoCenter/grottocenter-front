@@ -86,7 +86,7 @@ export const MassifForm = ({ massifValues }) => {
               body: data.massif.description,
               language: data.massif.language,
               title: data.massif.descriptionTitle,
-              massifId: massifValues.massifId
+              massif: massifValues.massifId
             })
           );
         } else {
@@ -150,12 +150,12 @@ export const MassifForm = ({ massifValues }) => {
 MassifForm.propTypes = {
   massifValues: PropTypes.shape({
     description: PropTypes.string,
-    descriptionId: PropTypes.string,
+    descriptionId: PropTypes.number,
     descriptionTitle: PropTypes.string,
-    massifId: PropTypes.string,
+    massifId: PropTypes.number,
     name: PropTypes.string,
-    nameId: PropTypes.string,
-    geoJson: PropTypes.string
+    nameId: PropTypes.number,
+    geoJson: PropTypes.shape({})
   })
 };
 

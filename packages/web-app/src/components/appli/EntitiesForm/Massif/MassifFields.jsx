@@ -67,7 +67,9 @@ const MassifFields = ({ control, errors, geoJson }) => {
           name="massif.geoJson"
           control={control}
           rules={{ required: true }}
-          render={({ field }) => <PolygonMap data={geoJson} {...field} />}
+          render={({ field }) => (
+            <PolygonMap data={geoJson} onChange={field.onChange} />
+          )}
         />
       </Suspense>
     </>
@@ -84,8 +86,7 @@ MassifFields.propTypes = {
       geoJson: PropTypes.shape({})
     })
   }),
-  geoJson: PropTypes.shape({}),
-  isNewDescription: PropTypes.bool
+  geoJson: PropTypes.shape({})
 };
 
 export default MassifFields;
