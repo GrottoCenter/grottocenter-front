@@ -127,6 +127,7 @@ const MapMarkerSelector = ({ control, formLatitudeKey, formLongitudeKey }) => {
       <LayersControl>
         {TileLayers.map(layer => (
           <LayersControl.BaseLayer
+            key={layer.name}
             checked={layer.name === 'OpenStreetMap Basic'}
             name={layer.name}>
             <TileLayer url={layer.url} attribution={layer.attribution} />

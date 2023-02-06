@@ -164,7 +164,7 @@ FixedContent.propTypes = {
   printRef: PropTypes.shape({
     // eslint-disable-next-line react/forbid-prop-types
     current: PropTypes.any
-  }).isRequired,
+  }),
   snapshot: PropTypes.shape({
     id: PropTypes.number.isRequired,
     entity: PropTypes.string.isRequired,
