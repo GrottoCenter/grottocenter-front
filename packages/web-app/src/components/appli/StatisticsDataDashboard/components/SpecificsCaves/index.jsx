@@ -14,7 +14,7 @@ const StyledBox = withStyles(() => ({
   }
 }))(Box);
 
-const SpecificsCaves = ({ maxDepthCave, maxLengthCave }) => {
+const SpecificsCaves = ({ maxDepthCave, maxLengthCave, parentEntity }) => {
   const { formatMessage } = useIntl();
   const theme = useTheme();
 
@@ -29,7 +29,9 @@ const SpecificsCaves = ({ maxDepthCave, maxLengthCave }) => {
               idCave={maxDepthCave.id_cave}
               nameCave={maxDepthCave.name_cave}
               numberData={maxDepthCave.value}
-              text={formatMessage({ id: 'is the deepest cave of the massif.' })}
+              text={`${formatMessage({
+                id: 'is the deepest cave of the'
+              })} ${parentEntity}`}
               backgroundColor={theme.palette.secondary.main}
             />
           )}
@@ -39,7 +41,9 @@ const SpecificsCaves = ({ maxDepthCave, maxLengthCave }) => {
               idCave={maxLengthCave.id_cave}
               nameCave={maxLengthCave.name_cave}
               numberData={maxLengthCave.value}
-              text={formatMessage({ id: 'is the longest cave of the massif.' })}
+              text={`${formatMessage({
+                id: 'is the longest cave of the'
+              })} ${parentEntity}`}
               backgroundColor={theme.palette.primary.main}
             />
           )}
@@ -59,7 +63,8 @@ SpecificsCaves.propTypes = {
     name_cave: PropTypes.string,
     id_cave: PropTypes.number,
     value: PropTypes.number
-  })
+  }),
+  parentEntity: PropTypes.string
 };
 
 export default SpecificsCaves;

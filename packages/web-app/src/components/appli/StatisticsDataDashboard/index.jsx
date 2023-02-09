@@ -159,6 +159,11 @@ const StatisticsDataDashboard = ({ countryId, massifId }) => {
               <SpecificsCaves
                 maxDepthCave={data.cave_with_max_depth}
                 maxLengthCave={data.cave_with_max_length}
+                parentEntity={
+                  isCountry
+                    ? formatMessage({ id: 'country' })
+                    : formatMessage({ id: 'massif' })
+                }
               />
             </DataBox>
           </>
