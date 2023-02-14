@@ -1,18 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useWatch, useController } from 'react-hook-form';
-import {
-  MapContainer,
-  TileLayer,
-  LayersControl,
-  useMap,
-  useMapEvent
-} from 'react-leaflet';
+import { MapContainer, useMap, useMapEvent } from 'react-leaflet';
 import PropTypes from 'prop-types';
 import { isMobile } from 'react-device-detect';
 import styled from 'styled-components';
 import { useDebounce } from '../../../../hooks';
 import { defaultCoord, defaultZoom } from '../../../../conf/config';
-import TileLayers from '../../../common/Maps/common/mapLayers';
+import LayersControl from '../../../common/Maps/common/LayersControl';
 
 const StyledMapContainer = styled(MapContainer)`
   margin: 0 4px;
@@ -124,16 +118,7 @@ const MapMarkerSelector = ({ control, formLatitudeKey, formLongitudeKey }) => {
       doubleClickZoom="center"
       touchZoom="center"
       preferCanvas>
-      <LayersControl>
-        {TileLayers.map(layer => (
-          <LayersControl.BaseLayer
-            key={layer.name}
-            checked={layer.name === 'OpenStreetMap Basic'}
-            name={layer.name}>
-            <TileLayer url={layer.url} attribution={layer.attribution} />
-          </LayersControl.BaseLayer>
-        ))}
-      </LayersControl>
+      <LayersControl />
 
       <MapBind center={currentPosition} onMoveEnd={onMoveEnd} />
 

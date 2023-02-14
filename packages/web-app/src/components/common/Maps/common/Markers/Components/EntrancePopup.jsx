@@ -13,6 +13,9 @@ export const EntrancePopup = ({ entrance }) => (
       title={entrance.name && entrance.name.toUpperCase()}
       link={`/ui/entrances/${entrance.id}`}
     />
+    {entrance.caveName && entrance.caveName !== entrance.name && (
+      <Title title={entrance.caveName} link={`/ui/caves/${entrance.caveId}`} />
+    )}
     <Property
       secondary
       value={`${!isNil(entrance.city) && entrance.city}, ${
@@ -25,17 +28,17 @@ export const EntrancePopup = ({ entrance }) => (
       value={makeCoordinatesValue(entrance.latitude, entrance.longitude)}
       icon={<GpsFixed color="primary" />}
     />
-    {entrance.cave && entrance.cave.depth && (
+    {entrance.depth && (
       <Property
         secondary
-        value={`${entrance.cave.depth} m`}
+        value={`${entrance.depth} m`}
         icon={<CustomIcon size={25} type="depth" />}
       />
     )}
-    {entrance.cave && entrance.cave.length && (
+    {entrance.length && (
       <Property
         secondary
-        value={`${entrance.cave.length} m`}
+        value={`${entrance.length} m`}
         icon={<CustomIcon size={25} type="length" />}
       />
     )}
@@ -50,11 +53,10 @@ EntrancePopup.propTypes = {
     city: PropTypes.string,
     longitude: PropTypes.number,
     latitude: PropTypes.number,
-    cave: PropTypes.shape({
-      name: PropTypes.string,
-      depth: PropTypes.number,
-      length: PropTypes.number
-    })
+    caveName: PropTypes.string,
+    caveId: PropTypes.number,
+    depth: PropTypes.number,
+    length: PropTypes.number
   }).isRequired
 };
 

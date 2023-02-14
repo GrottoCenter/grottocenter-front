@@ -94,11 +94,11 @@ export const putEntranceUrl = entranceId =>
   `${API_BASE_PATH}/entrances/${entranceId}`;
 
 // ===== Geoloc urls
-export const getMapCavesUrl = `${API_BASE_PATH}/geoloc/caves`;
-export const getMapCavesCoordinatesUrl = `${API_BASE_PATH}/geoloc/cavesCoordinates`;
+export const getMapCavesUrl = `${API_BASE_PATH}/geoloc/networks`;
+export const getMapCavesCoordinatesUrl = `${API_BASE_PATH}/geoloc/networksCoordinates`;
 export const getMapEntrancesUrl = `${API_BASE_PATH}/geoloc/entrances`;
 export const getMapEntrancesCoordinatesUrl = `${API_BASE_PATH}/geoloc/entrancesCoordinates`;
-export const getMapGrottosUrl = `${API_BASE_PATH}/geoloc/grottos`;
+export const getMapGrottosUrl = `${API_BASE_PATH}/geoloc/organizations`;
 
 // ===== Histories urls
 export const postHistoryUrl = `${API_BASE_PATH}/histories`;
