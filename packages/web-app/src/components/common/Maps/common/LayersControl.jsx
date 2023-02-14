@@ -2,17 +2,22 @@ import React from 'react';
 import { head, pluck } from 'ramda';
 import {
   LayersControl as LeafletLayersControl,
-  TileLayer
+  TileLayer,
+  WMSTileLayer
 } from 'react-leaflet';
 import PropTypes from 'prop-types';
 
 import layers from './mapLayers';
 
 const possibleLayers = pluck('name', layers);
+const localStorageBaseLayer = possibleLayers.find(
+  name => name === window.localStorage.getItem('selectedBaseLayer')
+);
+const selectedBaseLayer = localStorageBaseLayer || head(possibleLayers);
 
 const LayersControl = ({
   position = 'topleft',
-  initialLayerChecked = head(possibleLayers)
+  initialLayerChecked = selectedBaseLayer
 }) => (
   <LeafletLayersControl position={position}>
     {layers.map(layer => (
@@ -20,7 +25,21 @@ const LayersControl = ({
         key={layer.name}
         checked={layer.name === initialLayerChecked}
         name={layer.name}>
-        <TileLayer attribution={layer.attribution} url={layer.url} />
+        {layer.type === 'WMTS' && (
+          <TileLayer
+            attribution={layer.attribution}
+            url={layer.url}
+            maxZoom={layer.maxZoom ? layer.maxZoom : 22}
+            maxNativeZoom={layer.maxNativeZoom ? layer.maxNativeZoom : 22}
+          />
+        )}
+        {layer.type === 'WMS' && (
+          <WMSTileLayer
+            attribution={layer.attribution}
+            layers={layer.layers}
+            url={layer.url}
+          />
+        )}
       </LeafletLayersControl.BaseLayer>
     ))}
   </LeafletLayersControl>

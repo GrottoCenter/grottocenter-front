@@ -1,15 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
-import {
-  MapContainer,
-  TileLayer,
-  FeatureGroup,
-  LayersControl
-} from 'react-leaflet';
+import { MapContainer, FeatureGroup } from 'react-leaflet';
 import { EditControl } from 'react-leaflet-draw';
 import { useGeolocation } from 'rooks';
 import L from 'leaflet';
-import TileLayers from '../../../common/Maps/common/mapLayers';
+import LayersControl from '../../../common/Maps/common/LayersControl';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-draw/dist/leaflet.draw.css';
 
@@ -189,16 +184,7 @@ const PolygonMap = ({ onChange, data }) => {
         />
       </FeatureGroup>
 
-      <LayersControl position="bottomleft">
-        {TileLayers.map(layer => (
-          <LayersControl.BaseLayer
-            key={layer.name}
-            checked={layer.name === 'OpenStreetMap Basic'}
-            name={layer.name}>
-            <TileLayer url={layer.url} attribution={layer.attribution} />
-          </LayersControl.BaseLayer>
-        ))}
-      </LayersControl>
+      <LayersControl />
     </MapContainer>
   );
 };

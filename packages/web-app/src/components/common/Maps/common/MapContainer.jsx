@@ -34,6 +34,11 @@ const handleResize = map => {
     }, 100);
   });
   myObserver.observe(map.getContainer());
+  map.on('baselayerchange', baseLayerChange);
+};
+
+const baseLayerChange = event => {
+  window.localStorage.setItem('selectedBaseLayer', event.name);
 };
 
 Centerer.propTypes = {
@@ -81,7 +86,7 @@ const CustomMapContainer = ({
       dragging={dragging}
       scrollWheelZoom={scrollWheelZoom}
       isSideMenuOpen={isSideMenuOpen}
-      minZoom={0}
+      minZoom={1}
       whenCreated={handleResize}
       preferCanvas>
       {isFullscreenAllowed && shouldChangeControlInFullscreen && (

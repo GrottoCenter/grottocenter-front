@@ -12,6 +12,7 @@ import {
   isNil
 } from 'ramda';
 import { useMap } from 'react-leaflet';
+import { isMobile } from 'react-device-detect';
 import CustomMapContainer from '../common/MapContainer';
 import useMarkers from '../common/Markers/useMarkers';
 import { EntranceMarker } from '../common/Markers/Components';
@@ -53,12 +54,12 @@ const MultipleMarkers = ({ positions, zoom }) => {
 const HydratedMultipleMarkers = ({ style, zoom, ...otherProps }) => (
   <CustomMapContainer
     wholePage={false}
-    dragging={false}
+    dragging={!isMobile} // For usability only use two fingers drag/zoom on mobile
     viewport={null}
     scrollWheelZoom={false}
     style={style}
     zoom={zoom || 14}>
-    <MultipleMarkers {...otherProps} zoom={zoom} />
+    <MultipleMarkers {...otherProps} zoom={zoom || 14} />
   </CustomMapContainer>
 );
 
