@@ -50,10 +50,14 @@ const StyledInputBase = styled(InputBase)`
 
 const ResultsPopper = styled(Popper)`
   width: fit-content;
+
+  ul.MuiAutocomplete-listbox {
+    max-height: 70vh;
+  }
+
   > div {
     width: fit-content;
-    min-width: 100%;
-    max-width: 50vw;
+    max-width: 80vw;
     ${({ $hasFixWidth }) => !$hasFixWidth && 'float: right'};
   }
 `;
@@ -122,6 +126,7 @@ const AutoCompleteSearch = ({
 
   return (
     <StyledAutocomplete
+      // clearOnBlur={false} // Usefull for development
       disabled={disabled}
       id={`AutoCompleteSearch${hasFixWidth}${label}`}
       inputValue={inputValue}

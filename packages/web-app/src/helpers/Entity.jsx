@@ -1,7 +1,5 @@
 import React from 'react';
 import styled from 'styled-components';
-import { withTheme } from '@material-ui/core/styles';
-import Translate from '../components/common/Translate';
 
 //
 //
@@ -17,72 +15,61 @@ const EntityIcon = styled.img`
   width: 30px;
 `;
 
-const EntityLabel = styled.span`
+const EntityTitle = styled.div`
   font-size: 1.5rem;
   white-space: nowrap;
+  margin: 0;
 `;
 
-// The hightlighted words are inside <em> tags.
-const HighlightText = withTheme(styled.span`
-  color: #888;
-  font-size: 1.1rem;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  vertical-align: baseline;
+const EntitySubtitle = styled.div`
+  font-size: 1.2rem;
   white-space: nowrap;
-  em {
-    background-color: ${props => props.theme.palette.accent1Color};
-    color: white;
-    font-style: normal;
-    font-weight: bold;
-  }
-`);
-
-const HighlightTextKey = styled.span`
-  color: #888;
-  font-size: 1.1rem;
-  font-weight: bold;
-  margin-left: 10px;
-  margin-right: 2px;
-  vertical-align: baseline;
-  white-space: nowrap;
+  margin: 0;
 `;
 
 export const entityOptionForSelector = option => {
-  const highlights = [];
-  if (option.highlights) {
-    Object.keys(option.highlights).forEach(key => {
-      highlights.push({ [key]: option.highlights[key].join(' [...] ') });
-    });
-  }
-
   let iconName;
-  let textToDisplay = option.name; // Default for all entities
+  let title = option.name; // Default for all entities
+  let subtitle = '';
   switch (option.type) {
     case 'caver':
       if (!option.name && !option.surname) {
-        textToDisplay = option.nickname;
+        title = option.nickname;
       } else if (option.name) {
-        textToDisplay = option.name;
+        title = option.name;
         if (option.surname) {
-          textToDisplay += ` ${option.surname.toUpperCase()}`;
+          title += ` ${option.surname.toUpperCase()}`;
         }
       } else {
-        textToDisplay = option.surname.toUpperCase();
+        title = option.surname.toUpperCase();
       }
 
       iconName = 'caver.svg';
       break;
+
     case 'document-collection':
     case 'document-issue':
-    case 'document':
-      textToDisplay = `${option.name} [${option.documentType.name}]`;
+    case 'document': {
       iconName = 'bibliography.svg';
+      title = `[${option.documentType.name}] ${option.name}`;
+      const maxSubTitleLength = Math.max((title.length - 3) * 1.2, 80);
+      subtitle = (option.description ?? '').slice(0, maxSubTitleLength);
+      if (option.description?.length > maxSubTitleLength) subtitle += '...';
       break;
+    }
+
     case 'cave':
-    case 'entrance':
+    case 'entrance': {
       iconName = 'entry.svg';
+      subtitle = option.region ?? '';
+      const caveInfo = [];
+      if (option.cave?.depth) caveInfo.push(`↕ ${option.cave?.depth}m`);
+      if (option.cave?.length) caveInfo.push(`↔ ${option.cave?.length}m`);
+      if (caveInfo.length !== 0)
+        subtitle += `${subtitle.length === 0 ? '' : ', '}${caveInfo.join(' ')}`;
       break;
+    }
+
     case 'grotto':
       iconName = 'club.svg';
       break;
@@ -103,23 +90,10 @@ export const entityOptionForSelector = option => {
       {iconName && (
         <EntityIcon src={`/images/${iconName}`} alt={`${option.type} icon`} />
       )}
-      <EntityLabel>{textToDisplay}</EntityLabel>
-
-      {highlights.map(hl => {
-        const key = Object.keys(hl)[0];
-        return (
-          <React.Fragment key={key}>
-            <HighlightTextKey>
-              <Translate>{key}</Translate>:
-            </HighlightTextKey>
-            <HighlightText
-              dangerouslySetInnerHTML={{
-                __html: `${hl[key]}`
-              }}
-            />
-          </React.Fragment>
-        );
-      })}
+      <div>
+        <EntityTitle>{title}</EntityTitle>
+        <EntitySubtitle>{subtitle}</EntitySubtitle>
+      </div>
     </>
   );
 };
