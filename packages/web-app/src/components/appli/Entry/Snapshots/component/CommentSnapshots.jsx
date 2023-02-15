@@ -3,12 +3,9 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { isEmpty, pathOr } from 'ramda';
 
-import MultilinesTypography from '../../../../common/MultilinesTypography';
-import Translate from '../../../../common/Translate';
 import Ratings from '../../Ratings';
 import Duration from '../../../../common/Properties/Duration';
-
-const INFORMATION_NOT_FOUND = 'unknown';
+import GenericSnapshots from './GenericSnapshots';
 
 function convertMinutes(totalMinutes) {
   const time = `${totalMinutes}`;
@@ -29,7 +26,7 @@ const HalfSplitContainer = styled.div(
   `
 );
 
-const CommentSnapshots = ({ comment }) => {
+const CommentSnapshots = ({ comment, previous }) => {
   const {
     body,
     aestheticism,
@@ -43,9 +40,7 @@ const CommentSnapshots = ({ comment }) => {
   } = comment;
   return (
     <>
-      <MultilinesTypography variant="body1" component="div">
-        <Translate>{body ?? INFORMATION_NOT_FOUND}</Translate>
-      </MultilinesTypography>
+      <GenericSnapshots data={{ body }} previous={previous} />
       <HalfSplitContainer>
         {!isEmpty(eTTrail) && (
           <Duration
@@ -76,6 +71,21 @@ const CommentSnapshots = ({ comment }) => {
 
 CommentSnapshots.propTypes = {
   comment: PropTypes.shape({
+    body: PropTypes.string,
+    aestheticism: PropTypes.string,
+    caving: PropTypes.string,
+    approach: PropTypes.string,
+    interest: PropTypes.number,
+    progression: PropTypes.number,
+    access: PropTypes.number,
+    eTUnderground: PropTypes.shape({
+      minutes: PropTypes.number
+    }),
+    eTTrail: PropTypes.shape({
+      minutes: PropTypes.number
+    })
+  }),
+  previous: PropTypes.shape({
     body: PropTypes.string,
     aestheticism: PropTypes.string,
     caving: PropTypes.string,

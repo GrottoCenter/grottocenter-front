@@ -3827,6 +3827,7 @@ __metadata:
     d3: ^7.0.0
     d3-hexbin: ^0.2.2
     date-fns: ^2.15.0
+    diff: ^5.1.0
     eslint-config-react-app: ^7.0.1
     https-browserify: ^1.0.0
     isomorphic-fetch: ^3.0.0
@@ -12419,6 +12420,13 @@ __metadata:
   version: 4.0.2
   resolution: "diff@npm:4.0.2"
   checksum: f2c09b0ce4e6b301c221addd83bf3f454c0bc00caa3dd837cf6c127d6edf7223aa2bbe3b688feea110b7f262adbfc845b757c44c8a9f8c0c5b15d8fa9ce9d20d
+  languageName: node
+  linkType: hard
+
+"diff@npm:^5.1.0":
+  version: 5.1.0
+  resolution: "diff@npm:5.1.0"
+  checksum: c7bf0df7c9bfbe1cf8a678fd1b2137c4fb11be117a67bc18a0e03ae75105e8533dbfb1cda6b46beb3586ef5aed22143ef9d70713977d5fb1f9114e21455fba90
   languageName: node
   linkType: hard
 

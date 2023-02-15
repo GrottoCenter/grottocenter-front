@@ -108,6 +108,7 @@ const SnapshotPage = () => {
             data={data}
             type={type}
             isNetwork={isNetwork}
+            actualItem={actualTItem}
           />
         ))}
     </>

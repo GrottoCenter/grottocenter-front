@@ -6,11 +6,14 @@ import PropTypes from 'prop-types';
 
 import { Property } from '../../../../common/Properties';
 import CustomIcon from '../../../../common/CustomIcon';
+import { HighLightsLine } from '../../../../common/Highlights';
 
 const EntranceNetworkSnapshots = information => {
-  const { entrance } = information;
+  const { entrance, previous } = information;
   const lat = Number(entrance.latitude);
   const long = Number(entrance.longitude);
+  const previousLat = Number(previous?.latitude);
+  const previousLong = Number(previous?.longitude);
 
   const { formatMessage } = useIntl();
 
@@ -23,7 +26,16 @@ const EntranceNetworkSnapshots = information => {
       {!(isNaN(lat) && isNaN(long)) && (
         <Property
           label={`${formatMessage({ id: 'Coordinates' })} (WGS84)`}
-          value={makeCoordinatesValue([lat, long])}
+          value={
+            <HighLightsLine
+              oldText={
+                !(isNaN(previousLat) && isNaN(previousLong))
+                  ? makeCoordinatesValue([previousLat, previousLong])
+                  : undefined
+              }
+              newText={makeCoordinatesValue([lat, long])}
+            />
+          }
           icon={<GpsFixed fontSize="large" color="primary" />}
         />
       )}
@@ -37,7 +49,12 @@ const EntranceNetworkSnapshots = information => {
       {entrance.cave && (
         <Property
           label={formatMessage({ id: 'Cave' })}
-          value={`${entrance.caveName}`}
+          value={
+            <HighLightsLine
+              oldText={previous?.caveName}
+              newText={entrance.caveName}
+            />
+          }
           icon={<CustomIcon type="cave_system" />}
           url={`/ui/caves/${entrance.cave}`}
         />

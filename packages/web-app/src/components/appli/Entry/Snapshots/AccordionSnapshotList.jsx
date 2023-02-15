@@ -8,42 +8,49 @@ import authorType from '../../../../types/author.type';
 import AccordionSnapshot from './AccordionSnapshot';
 import Translate from '../../../common/Translate';
 
-const AccordionSnapshotList = ({ data, type, isNetwork }) => (
-  <ScrollableContent
-    dense
-    title={
-      <Translate
-        id="{type} snapshots"
-        values={{
-          type
-        }}
-        defaultMessage={`${type} snapshots`}
-      />
-    }
-    content={
-      data && Object.keys(data).length > 0 ? (
-        Object.keys(data).map(snapshotType =>
-          data[snapshotType].map(snapshot => {
-            const author = getAuthor(snapshot.author);
-            const reviewer = getAuthor(snapshot.reviewer);
-            return (
-              <AccordionSnapshot
-                key={snapshot.id + snapshot.t_id}
-                snapshot={snapshot}
-                snapshotType={snapshotType}
-                isNetwork={isNetwork}
-                author={author}
-                reviewer={reviewer}
-              />
-            );
+const AccordionSnapshotList = ({ data, type, isNetwork, actualItem }) => {
+  let previousVersion = actualItem;
+  return (
+    <ScrollableContent
+      dense
+      title={
+        <Translate
+          id="{type} snapshots"
+          values={{
+            type
+          }}
+          defaultMessage={`${type} snapshots`}
+        />
+      }
+      content={
+        data && Object.keys(data).length > 0 ? (
+          Object.keys(data).map(snapshotType => {
+            const reversed = [...data[snapshotType]].reverse();
+            return reversed.map(snapshot => {
+              const author = getAuthor(snapshot.author);
+              const reviewer = getAuthor(snapshot.reviewer);
+              const accordionSnapshot = (
+                <AccordionSnapshot
+                  key={snapshot.id + snapshot.t_id}
+                  snapshot={snapshot}
+                  snapshotType={snapshotType}
+                  isNetwork={isNetwork}
+                  author={author}
+                  reviewer={reviewer}
+                  previous={previousVersion}
+                />
+              );
+              previousVersion = snapshot;
+              return accordionSnapshot;
+            });
           })
+        ) : (
+          <Alert404 type={type} />
         )
-      ) : (
-        <Alert404 type={type} />
-      )
-    }
-  />
-);
+      }
+    />
+  );
+};
 
 AccordionSnapshotList.propTypes = {
   data: PropTypes.shape({
@@ -58,6 +65,15 @@ AccordionSnapshotList.propTypes = {
     })
   }),
   type: PropTypes.string,
-  isNetwork: PropTypes.bool
+  isNetwork: PropTypes.bool,
+  actualItem: PropTypes.shape({
+    id: PropTypes.string,
+    title: PropTypes.string,
+    name: PropTypes.string,
+    author: authorType,
+    reviewer: authorType,
+    date: PropTypes.string,
+    dateReviewed: PropTypes.string
+  })
 };
 export default AccordionSnapshotList;

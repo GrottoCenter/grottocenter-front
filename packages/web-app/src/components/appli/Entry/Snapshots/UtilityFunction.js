@@ -17,22 +17,36 @@ import {
 const storeInLocalStorage = item =>
   localStorage.setItem('t_item', JSON.stringify(item));
 
-const getAccordionBodyFromType = (type, data, isNetwork) => {
+const getAccordionBodyFromType = (type, data, isNetwork, previous) => {
   switch (type) {
     case 'riggings':
-      return <RiggingSnapshots rigging={data} key={data.id} />;
+      return (
+        <RiggingSnapshots rigging={data} previous={previous} key={data.id} />
+      );
     case 'entrances':
       return isNetwork ? (
-        <EntranceNetworkSnapshots entrance={data} key={data.id} />
+        <EntranceNetworkSnapshots
+          entrance={data}
+          previous={previous}
+          key={data.id}
+        />
       ) : (
-        <EntranceCaveSnapshots entrance={data} key={data.id} />
+        <EntranceCaveSnapshots
+          entrance={data}
+          previous={previous}
+          key={data.id}
+        />
       );
     case 'documents':
-      return <DocumentSnapshots document={data} key={data.id} />;
+      return (
+        <DocumentSnapshots document={data} previous={previous} key={data.id} />
+      );
     case 'comments':
-      return <CommentSnapshots comment={data} key={data.id} />;
+      return (
+        <CommentSnapshots comment={data} previous={previous} key={data.id} />
+      );
     default:
-      return <GenericSnapshots data={data} key={data.id} />;
+      return <GenericSnapshots data={data} previous={previous} key={data.id} />;
   }
 };
 
