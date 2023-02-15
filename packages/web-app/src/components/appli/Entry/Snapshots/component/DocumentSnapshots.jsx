@@ -13,25 +13,29 @@ import { pathOr } from 'ramda';
 import PropTypes from 'prop-types';
 import intactDescription from '../../../../../types/intactDescription.type';
 import licenseType from '../../../../../types/license.type';
+import { HighLightsLine } from '../../../../common/Highlights';
 
 const PropertyName = styled(TableCell)`
   font-weight: bold;
   text-transform: uppercase;
 `;
 
-const Property = ({ name, value }) => (
+const Property = ({ name, value, oldValue }) => (
   <TableRow key={name}>
     <PropertyName align="right">{name}</PropertyName>
-    <TableCell>{value}</TableCell>
+    <TableCell>
+      <HighLightsLine newText={value} oldText={oldValue} />
+    </TableCell>
   </TableRow>
 );
 Property.propTypes = {
   name: PropTypes.string.isRequired,
-  value: PropTypes.string
+  value: PropTypes.string,
+  oldValue: PropTypes.string
 };
 const INFORMATION_NOT_FOUND = 'unknown';
 
-const DocumentSnapshots = ({ document }) => {
+const DocumentSnapshots = ({ document, previous }) => {
   const {
     type,
     datePublication,
@@ -44,6 +48,9 @@ const DocumentSnapshots = ({ document }) => {
   } = document;
   const documentDescription =
     description ?? (intactDescriptions ? intactDescriptions[0] : {});
+  const previousDescription = previous?.descriptions
+    ? previous?.descriptions[0]
+    : previous?.description;
   const { formatMessage } = useIntl();
   return (
     <TableContainer>
@@ -67,6 +74,7 @@ const DocumentSnapshots = ({ document }) => {
                 type
               )
             })}
+            oldValue={previous?.type.name}
           />
           <Property
             name={formatMessage({ id: 'Title and description language' })}
@@ -77,22 +85,26 @@ const DocumentSnapshots = ({ document }) => {
                 documentDescription
               )
             })}
+            oldValue={previousDescription?.language?.refName}
           />
           <Property
             key="title"
             name={formatMessage({ id: 'Title' })}
             value={documentDescription.title}
+            oldValue={previousDescription?.title}
           />
           <Property
             key="description"
             name={formatMessage({ id: 'Description' })}
             value={documentDescription.body}
+            oldValue={previousDescription?.body ?? previousDescription?.text}
           />
           <Property
             name={formatMessage({ id: 'Publication Date' })}
             value={
               datePublication ?? formatMessage({ id: INFORMATION_NOT_FOUND })
             }
+            oldValue={previous?.datePublication}
           />
           <Property
             name={formatMessage({ id: 'Editor' })}
@@ -107,6 +119,7 @@ const DocumentSnapshots = ({ document }) => {
             key="identifier"
             name={formatMessage({ id: 'Identifier' })}
             value={identifier ?? formatMessage({ id: INFORMATION_NOT_FOUND })}
+            oldValue={previous?.identifier}
           />
           <Property
             key="license"
@@ -116,6 +129,7 @@ const DocumentSnapshots = ({ document }) => {
               ['name'],
               license
             )}
+            oldValue={previous?.license?.name}
           />
           <TableRow key="parent_document">
             <PropertyName align="right">
@@ -123,7 +137,7 @@ const DocumentSnapshots = ({ document }) => {
             </PropertyName>
             {parent ? (
               <TableCell numeric component="a" href={`/ui/documents/${parent}`}>
-                {parent}
+                <HighLightsLine newText={parent} oldText={previous?.parent} />
               </TableCell>
             ) : (
               <TableCell>
@@ -150,6 +164,20 @@ DocumentSnapshots.propTypes = {
     parent: PropTypes.number,
     description: intactDescription,
     intactDescriptions: intactDescription
+  }),
+  previous: PropTypes.shape({
+    type: PropTypes.string,
+    datePublication: PropTypes.string,
+    editor: PropTypes.shape({
+      name: PropTypes.string,
+      surname: PropTypes.string,
+      nickname: PropTypes.string
+    }),
+    identifier: PropTypes.string,
+    license: licenseType,
+    parent: PropTypes.number,
+    descriptions: intactDescription,
+    description: intactDescription
   })
 };
 

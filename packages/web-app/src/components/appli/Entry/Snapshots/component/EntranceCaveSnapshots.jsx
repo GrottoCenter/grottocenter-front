@@ -7,9 +7,10 @@ import { pathOr } from 'ramda';
 
 import { Property } from '../../../../common/Properties';
 import CustomIcon from '../../../../common/CustomIcon';
+import { HighLightsLine } from '../../../../common/Highlights';
 
 const EntranceCaveSnapshots = information => {
-  const { entrance } = information;
+  const { entrance, previous } = information;
   const { cave } = entrance;
   const caveId = pathOr(cave, ['id'], cave);
   const caveName = pathOr(entrance.caveName, ['name'], cave) ?? entrance.name;
@@ -17,6 +18,8 @@ const EntranceCaveSnapshots = information => {
   const { formatMessage } = useIntl();
   const lat = Number(entrance.latitude);
   const long = Number(entrance.longitude);
+  const previousLat = Number(previous?.latitude);
+  const previousLong = Number(previous?.longitude);
 
   const makeCoordinatesValue = coordinatesValue =>
     `${formatMessage({ id: 'Lat.' })} / ${formatMessage({ id: 'Long.' })} =
@@ -27,21 +30,39 @@ const EntranceCaveSnapshots = information => {
       {!(isNaN(lat) && isNaN(long)) && (
         <Property
           label={`${formatMessage({ id: 'Coordinates' })} (WGS84)`}
-          value={makeCoordinatesValue([lat, long])}
+          value={
+            <HighLightsLine
+              oldText={
+                !(isNaN(previousLat) && isNaN(previousLong))
+                  ? makeCoordinatesValue([previousLat, previousLong])
+                  : undefined
+              }
+              newText={makeCoordinatesValue([lat, long])}
+            />
+          }
           icon={<GpsFixed fontSize="large" color="primary" />}
         />
       )}
       {entrance.altitude && (
         <Property
           label={formatMessage({ id: 'Altitude' })}
-          value={`${entrance.altitude} m`}
+          value={
+            <HighLightsLine
+              oldText={
+                previous?.altitude ? `${previous?.altitude} m` : undefined
+              }
+              newText={`${entrance.altitude} m`}
+            />
+          }
           icon={<Height color="primary" />}
         />
       )}
       {cave && (
         <Property
           label={formatMessage({ id: 'Cave' })}
-          value={`${caveName}`}
+          value={
+            <HighLightsLine oldText={previous?.caveName} newText={caveName} />
+          }
           icon={<CustomIcon type="cave_system" />}
           url={`/ui/caves/${caveId}`}
         />
@@ -49,7 +70,14 @@ const EntranceCaveSnapshots = information => {
       {cave?.depth && (
         <Property
           label={formatMessage({ id: 'Depth' })}
-          value={`${cave.depth} m`}
+          value={
+            <HighLightsLine
+              oldText={
+                previous?.cave?.depth ? `${previous?.cave?.depth} m` : undefined
+              }
+              newText={`${cave.depth} m`}
+            />
+          }
           icon={<CustomIcon type="depth" />}
         />
       )}
@@ -63,7 +91,16 @@ const EntranceCaveSnapshots = information => {
       {cave?.temperature && (
         <Property
           label={formatMessage({ id: 'Temperature' })}
-          value={`${cave.temperature} °C`}
+          value={
+            <HighLightsLine
+              oldText={
+                previous?.cave?.temperature
+                  ? `${previous?.cave?.temperature} °C`
+                  : undefined
+              }
+              newText={`${cave.temperature} °C`}
+            />
+          }
           icon={<Title fontSize="large" color="primary" />}
         />
       )}

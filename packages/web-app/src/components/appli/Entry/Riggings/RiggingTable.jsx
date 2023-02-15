@@ -14,14 +14,28 @@ import { isNil } from 'ramda';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
 import { obstacleType } from '../Provider';
+import { HighLightsLine } from '../../../common/Highlights';
 
 const StyledTableRow = styled(TableRow)(({ theme }) => ({
   backgroundColor: theme.palette.action.hover
 }));
 
-const RiggingTable = ({ obstacles, title }) => {
-  const { formatMessage } = useIntl();
+const HighligtedTableCell = ({ data, oldData }) => (
+  <TableCell component="th" scope="row">
+    <span style={{ whiteSpace: 'pre-line' }}>
+      {oldData ? <HighLightsLine newText={data} oldText={oldData} /> : data}
+    </span>
+  </TableCell>
+);
 
+HighligtedTableCell.propTypes = {
+  data: PropTypes.string.isRequired,
+  oldData: PropTypes.string
+};
+
+const RiggingTable = ({ obstacles, title, previous }) => {
+  const { formatMessage } = useIntl();
+  const previousObstacles = previous?.obstacles;
   if (isNil(obstacles[0]) || isNil(obstacles[0].obstacle)) {
     return (
       <Box my={3} mr="45px">
@@ -53,25 +67,29 @@ const RiggingTable = ({ obstacles, title }) => {
           </TableHead>
           <TableBody>
             {obstacles?.map(
-              ({ obstacle, rope, anchor, observation }, index) => (
-                // eslint-disable-next-line react/no-array-index-key
-                <StyledTableRow key={`${obstacle}${rope}${anchor}${index}`}>
-                  <TableCell component="th" scope="row">
-                    <span style={{ whiteSpace: 'pre-line' }}>{obstacle}</span>
-                  </TableCell>
-                  <TableCell align="right">
-                    <span style={{ whiteSpace: 'pre-line' }}>{rope}</span>
-                  </TableCell>
-                  <TableCell align="right">
-                    <span style={{ whiteSpace: 'pre-line' }}>{anchor}</span>
-                  </TableCell>
-                  <TableCell align="right">
-                    <span style={{ whiteSpace: 'pre-line' }}>
-                      {observation}
-                    </span>
-                  </TableCell>
-                </StyledTableRow>
-              )
+              ({ obstacle, rope, anchor, observation }, index) => {
+                const oldData = previousObstacles
+                  ? previousObstacles[index]
+                  : undefined;
+                return (
+                  // eslint-disable-next-line react/no-array-index-key
+                  <StyledTableRow key={`${obstacle}${rope}${anchor}${index}`}>
+                    <HighligtedTableCell
+                      data={obstacle}
+                      oldData={oldData?.obstacle}
+                    />
+                    <HighligtedTableCell data={rope} oldData={oldData?.rope} />
+                    <HighligtedTableCell
+                      data={anchor}
+                      oldData={oldData?.anchor}
+                    />
+                    <HighligtedTableCell
+                      data={observation}
+                      oldData={oldData?.observation}
+                    />
+                  </StyledTableRow>
+                );
+              }
             )}
           </TableBody>
         </Table>
@@ -82,6 +100,7 @@ const RiggingTable = ({ obstacles, title }) => {
 
 RiggingTable.propTypes = {
   obstacles: PropTypes.arrayOf(obstacleType),
+  previous: PropTypes.arrayOf(obstacleType),
   title: PropTypes.string.isRequired
 };
 
