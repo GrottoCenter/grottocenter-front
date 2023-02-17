@@ -26,7 +26,7 @@ const AccordionSnapshot = ({
   all
 }) => {
   const snapshotTitle = snapshot.title ?? snapshot.name ?? '';
-  const previousVersionTitle = previous.title ?? previous.name ?? undefined;
+  const previousVersionTitle = previous?.title ?? previous?.name ?? undefined;
   return (
     <Accordion>
       <AccordionSummary expandIcon={<ExpandMore />}>
