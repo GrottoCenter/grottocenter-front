@@ -49,7 +49,7 @@
     "babel-loader": "8.1.0"
   },
   "engines": {
-    "node": "^16.14.0",
+    "node": "16",
     "yarn": ">=3.0.*"
   },
   "dependenciesMeta": {

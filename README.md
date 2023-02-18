@@ -26,7 +26,7 @@ This project use:
 
 ## Getting Started
 
-- Use node >= 16
+- Use node v16
 - Install [Yarn](https://yarnpkg.com/getting-started/install)
 - `yarn` at the top-level of the repo, it will automatically install all dependencies and link local packages
 
