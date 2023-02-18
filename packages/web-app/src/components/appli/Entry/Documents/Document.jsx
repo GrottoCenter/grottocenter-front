@@ -52,7 +52,13 @@ const Document = ({ details, entities, id, overview, snapshot }) => {
         }
       />
       <ListItemIcon style={{ alignSelf: 'start' }}>
-        <SnapshotButton id={id} type="documents" content={snapshot} />
+        <SnapshotButton
+          color="primary"
+          variant="outlined"
+          id={id}
+          type="documents"
+          content={snapshot}
+        />
       </ListItemIcon>
     </ListItem>
   );

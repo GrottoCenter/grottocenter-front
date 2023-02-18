@@ -38,7 +38,7 @@ const RiggingTable = ({ obstacles, title, previous }) => {
   const previousObstacles = previous?.obstacles;
   if (isNil(obstacles[0]) || isNil(obstacles[0].obstacle)) {
     return (
-      <Box my={3} mr="45px">
+      <Box mb={3}>
         <Typography variant="h4">{title}&nbsp;</Typography>
       </Box>
     );
@@ -46,7 +46,7 @@ const RiggingTable = ({ obstacles, title, previous }) => {
 
   return (
     <Box>
-      <Box my={3} mr="45px">
+      <Box mb={3}>
         <Typography variant="h4">{title}&nbsp;</Typography>
       </Box>
       <TableContainer>

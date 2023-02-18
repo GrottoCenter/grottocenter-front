@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { useDispatch } from 'react-redux';
 import { useIntl } from 'react-intl';
-import { Divider, IconButton, List } from '@material-ui/core';
+import { Button, Divider, List, Tooltip } from '@material-ui/core';
 import AddCircleIcon from '@material-ui/icons/AddCircle';
 import CancelIcon from '@material-ui/icons/Cancel';
 
@@ -38,11 +38,20 @@ const Locations = ({ entranceId, locations, isSensitive }) => {
       title={formatMessage({ id: 'Location' })}
       icon={
         permissions.isAuth && (
-          <IconButton
-            color="primary"
-            onClick={() => setIsFormVisible(!isFormVisible)}>
-            {isFormVisible ? <CancelIcon /> : <AddCircleIcon />}
-          </IconButton>
+          <Tooltip
+            title={
+              isFormVisible
+                ? formatMessage({ id: 'Cancel adding a new location' })
+                : formatMessage({ id: 'Add a new location' })
+            }>
+            <Button
+              color={isFormVisible ? '' : 'secondary'}
+              variant="outlined"
+              onClick={() => setIsFormVisible(!isFormVisible)}
+              startIcon={isFormVisible ? <CancelIcon /> : <AddCircleIcon />}>
+              {formatMessage({ id: isFormVisible ? 'Cancel' : 'New' })}
+            </Button>
+          </Tooltip>
         )
       }
       content={

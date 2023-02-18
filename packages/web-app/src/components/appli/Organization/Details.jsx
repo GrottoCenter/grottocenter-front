@@ -2,11 +2,10 @@ import React from 'react';
 import { Marker, Popup } from 'react-leaflet';
 import PropTypes from 'prop-types';
 import { isNil, isEmpty } from 'ramda';
-import { Box, Typography, IconButton } from '@material-ui/core';
+import { Box, Typography } from '@material-ui/core';
 import styled from 'styled-components';
 import EmailIcon from '@material-ui/icons/Email';
 import LocationIcon from '@material-ui/icons/LocationOn';
-import CreateIcon from '@material-ui/icons/Create';
 
 import CustomMapContainer from '../../common/Maps/common/MapContainer';
 import OrganizationMarker from '../../common/Maps/common/Markers/Components/OrganizationMarker';
@@ -36,9 +35,7 @@ const Details = ({
   region,
   village,
   position,
-  organization,
-  onEdit,
-  canEdit
+  organization
 }) => (
   <>
     <Box
@@ -71,16 +68,6 @@ const Details = ({
           </ContentWrapper>
         )}
       </Box>
-      {canEdit && (
-        <IconButton
-          size="medium"
-          aria-label="edit"
-          color="primary"
-          onClick={onEdit}
-          disabled={isNil(onEdit)}>
-          <CreateIcon />
-        </IconButton>
-      )}
     </Box>
     <br />
     {!isEmpty(position) && (
@@ -112,9 +99,7 @@ Details.propTypes = {
   postalCode: PropTypes.string,
   village: PropTypes.string,
   position: PropTypes.arrayOf(PropTypes.number),
-  organization: PropTypes.shape({}),
-  onEdit: PropTypes.func.isRequired,
-  canEdit: PropTypes.bool.isRequired
+  organization: PropTypes.shape({})
 };
 
 export default Details;

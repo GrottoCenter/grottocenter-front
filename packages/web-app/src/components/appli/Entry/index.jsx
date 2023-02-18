@@ -29,20 +29,20 @@ import { useBoolean, usePermissions } from '../../../hooks';
 import StandardDialog from '../../common/StandardDialog';
 import { EntranceForm } from '../EntitiesForm';
 import SensitiveCaveWarning from './SensitiveCaveWarning';
-import AuthorLink from '../../common/AuthorLink';
+import AuthorAndDate from '../../common/Contribution/AuthorAndDate';
 
 const HalfSplitContainer = styled.div(
   ({ theme }) => `
   display: flex;
   flex-direction: column;
-  ${theme.breakpoints.up('md')} {
+  ${theme.breakpoints.up('lg')} {
     flex-direction: row;
   }
 `
 );
 
 export const Entry = () => {
-  const { formatMessage, formatDate } = useIntl();
+  const { formatMessage } = useIntl();
   const {
     state: {
       details: {
@@ -111,18 +111,22 @@ export const Entry = () => {
             </HalfSplitContainer>
           }
           footer={
-            <span>
-              {isNil(reviewer) && <AuthorLink author={author} verb="Created" />}
-              {isNil(reviewer) &&
-                !isNil(creationDate) &&
-                ` (${formatDate(creationDate)})`}
-              {!isNil(reviewer) && (
-                <AuthorLink author={reviewer} verb="Updated" />
+            <>
+              {!isNil(author) && (
+                <AuthorAndDate
+                  author={author}
+                  verb="Created"
+                  date={creationDate}
+                />
               )}
-              {!isNil(reviewer) &&
-                !isNil(dateReviewed) &&
-                ` (${formatDate(dateReviewed)})`}
-            </span>
+              {!isNil(reviewer) && (
+                <AuthorAndDate
+                  author={reviewer}
+                  verb="Updated"
+                  date={dateReviewed}
+                />
+              )}
+            </>
           }
         />
         {id && (

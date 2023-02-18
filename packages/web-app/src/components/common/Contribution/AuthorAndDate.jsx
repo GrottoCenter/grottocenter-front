@@ -3,25 +3,28 @@ import { isNil } from 'ramda';
 import PropTypes from 'prop-types';
 import { Typography } from '@material-ui/core';
 import { useIntl } from 'react-intl';
+import styled from 'styled-components';
 import AuthorLink from '../AuthorLink/index';
 import authorType from '../../../types/author.type';
 
+const DateSpan = styled(Typography)`
+  color: ${({ theme }) => theme.palette.secondaryTextColor};
+  margin-left: 4px;
+`;
 const AuthorAndDate = ({ author, textColor, date, verb }) => {
   const { formatDate } = useIntl();
   return (
     <Typography component="span" variant="caption" color={textColor}>
       <AuthorLink author={author} verb={verb} />
-      {`${
-        !isNil(date)
-          ? ` - ${formatDate(date, {
-              year: 'numeric',
-              month: 'numeric',
-              day: 'numeric',
-              hour: 'numeric',
-              minute: 'numeric'
-            })}`
-          : ''
-      }`}
+      {!isNil(date) && (
+        <DateSpan variant="caption">
+          {formatDate(date, {
+            year: '2-digit',
+            month: 'numeric',
+            day: 'numeric'
+          })}
+        </DateSpan>
+      )}
     </Typography>
   );
 };

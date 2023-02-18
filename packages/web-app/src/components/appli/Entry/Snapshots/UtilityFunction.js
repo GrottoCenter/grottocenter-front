@@ -1,7 +1,7 @@
 import React from 'react';
 import { useIntl } from 'react-intl';
 import { Link } from 'react-router-dom';
-import { Tooltip, IconButton } from '@material-ui/core';
+import { Tooltip, Button } from '@material-ui/core';
 import HistoryIcon from '@material-ui/icons/History';
 import TimelineIcon from '@material-ui/icons/Timeline';
 import PropTypes from 'prop-types';
@@ -51,37 +51,43 @@ const getAccordionBodyFromType = (type, data, isNetwork, previous) => {
 };
 
 const SnapshotButton = item => {
-  const { id, type, content, isNetwork } = item;
+  const { id, type, content, isNetwork, showLabel = false, ...grpProps } = item;
   const { formatMessage } = useIntl();
   return (
-    <Tooltip title={formatMessage({ id: 'Access to snapshot page' })}>
-      <IconButton
+    <Tooltip
+      title={formatMessage({ id: 'Access the revisions (history) page' })}>
+      <Button
+        {...grpProps}
         component={Link}
         to={`/ui/${type}/${id}/snapshots${
           isNetwork !== undefined ? `?isNetwork=${isNetwork}` : ''
         }`}
         onClick={() => storeInLocalStorage(content)}
-        color="primary"
         target="_blank"
-        rel="noreferrer">
-        <HistoryIcon />
-      </IconButton>
+        rel="noreferrer"
+        startIcon={showLabel && <HistoryIcon />}>
+        {showLabel ? formatMessage({ id: 'Revisions' }) : <HistoryIcon />}
+      </Button>
     </Tooltip>
   );
 };
 
-const SnapshotPageButton = ({ id, isNetwork }) => {
+const SnapshotPageButton = ({ id, isNetwork, ...grpProps }) => {
   const { formatMessage } = useIntl();
   return (
-    <Tooltip title={formatMessage({ id: 'Access to general entrance page' })}>
-      <IconButton
+    <Tooltip
+      title={formatMessage({
+        id: 'Page of all revisions (history) for this entrance'
+      })}>
+      <Button
+        {...grpProps}
         component={Link}
         to={`/ui/entrances/${id}/snapshots?isNetwork=${isNetwork}&all=true`}
-        color="primary"
         target="_blank"
-        rel="noreferrer">
-        <TimelineIcon />
-      </IconButton>
+        rel="noreferrer"
+        startIcon={<TimelineIcon />}>
+        {formatMessage({ id: 'All revisions' })}
+      </Button>
     </Tooltip>
   );
 };
