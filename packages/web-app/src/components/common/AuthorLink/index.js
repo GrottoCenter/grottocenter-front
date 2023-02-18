@@ -2,6 +2,7 @@ import React from 'react';
 import { isNil } from 'ramda';
 import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
+import { Typography } from '@material-ui/core';
 import GCLink from '../GCLink';
 import authorType from '../../../types/author.type';
 
@@ -9,7 +10,9 @@ const AuthorLink = ({ author, verb = 'Posted' }) => {
   const { formatMessage } = useIntl();
   return !isNil(author?.id) && !isNil(author?.nickname) ? (
     <span>
-      {formatMessage({ id: `${verb} by` })}{' '}
+      <Typography variant="caption">
+        {formatMessage({ id: `${verb} by` })}{' '}
+      </Typography>
       <GCLink internal href={author.url}>
         {author.nickname}
       </GCLink>

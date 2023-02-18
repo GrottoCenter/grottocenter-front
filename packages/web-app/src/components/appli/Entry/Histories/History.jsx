@@ -1,15 +1,18 @@
 import React, { useState } from 'react';
 import {
   Box,
-  IconButton,
   ListItemIcon,
   ListItem,
-  ListItemText
+  ListItemText,
+  ButtonGroup,
+  Tooltip,
+  Button
 } from '@material-ui/core';
 import { useDispatch } from 'react-redux';
 import EditIcon from '@material-ui/icons/Edit';
-import CancelIcon from '@material-ui/icons/Cancel';
 
+import styled from 'styled-components';
+import { useIntl } from 'react-intl';
 import { historyType } from '../Provider';
 import CreateHistoryForm from '../../Form/HistoryForm/index';
 import { updateHistory } from '../../../../actions/History/UpdateHistory';
@@ -17,6 +20,9 @@ import { usePermissions } from '../../../../hooks';
 import Contribution from '../../../common/Contribution/Contribution';
 import { SnapshotButton } from '../Snapshots/UtilityFunction';
 
+const ListItemStyled = styled(ListItem)`
+  flex-direction: column;
+`;
 const History = ({ history }) => {
   const dispatch = useDispatch();
   const permissions = usePermissions();
@@ -33,20 +39,57 @@ const History = ({ history }) => {
     );
     setIsFormVisible(false);
   };
-
+  const { formatMessage } = useIntl();
   return (
-    <ListItem disableGutters divider alignItems="flex-start">
+    <ListItemStyled disableGutters divider alignItems="flex-start">
+      <Box sx={{ alignSelf: 'flex-end' }}>
+        {!isFormVisible && (
+          <ListItemIcon style={{ marginTop: 0 }}>
+            <ButtonGroup color="primary">
+              <Tooltip
+                title={formatMessage({
+                  id: 'Edit this history'
+                })}>
+                <Button
+                  disabled={!permissions.isAuth}
+                  onClick={() => setIsFormVisible(!isFormVisible)}
+                  color="primary"
+                  aria-label="edit">
+                  <EditIcon />
+                </Button>
+              </Tooltip>
+              <SnapshotButton id={id} type="histories" content={history} />
+            </ButtonGroup>
+          </ListItemIcon>
+        )}
+      </Box>
       {isFormVisible ? (
-        <Box width="100%">
-          <CreateHistoryForm
-            closeForm={() => setIsFormVisible(false)}
-            isNewHistory={false}
-            onSubmit={onSubmitForm}
-            values={history}
-          />
-        </Box>
+        <>
+          <Box sx={{ alignSelf: 'flex-end' }}>
+            {permissions.isAuth && (
+              <ListItemIcon style={{ marginTop: 0 }}>
+                <Button
+                  variant="outlined"
+                  color="primary"
+                  onClick={() => setIsFormVisible(!isFormVisible)}
+                  aria-label="cancel">
+                  {formatMessage({ id: `Cancel` })}
+                </Button>
+              </ListItemIcon>
+            )}
+          </Box>
+          <Box width="100%">
+            <CreateHistoryForm
+              closeForm={() => setIsFormVisible(false)}
+              isNewHistory={false}
+              onSubmit={onSubmitForm}
+              values={history}
+            />
+          </Box>
+        </>
       ) : (
         <ListItemText
+          style={{ margin: 0 }}
           disableTypography
           secondary={
             <Contribution
@@ -59,22 +102,7 @@ const History = ({ history }) => {
           }
         />
       )}
-      <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-        <ListItemIcon>
-          <SnapshotButton id={id} type="histories" content={history} />
-        </ListItemIcon>
-        {permissions.isAuth && (
-          <ListItemIcon style={{ alignSelf: 'start' }}>
-            <IconButton
-              onClick={() => setIsFormVisible(!isFormVisible)}
-              color="primary"
-              aria-label="edit">
-              {isFormVisible ? <CancelIcon /> : <EditIcon />}
-            </IconButton>
-          </ListItemIcon>
-        )}
-      </Box>
-    </ListItem>
+    </ListItemStyled>
   );
 };
 

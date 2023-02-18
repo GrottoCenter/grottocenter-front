@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
-import { Divider, IconButton, List } from '@material-ui/core';
+import { Button, Divider, List, Tooltip } from '@material-ui/core';
 import AddCircleIcon from '@material-ui/icons/AddCircle';
-import RemoveCircleIcon from '@material-ui/icons/RemoveCircle';
 import { useDispatch } from 'react-redux';
 
+import CancelIcon from '@material-ui/icons/Cancel';
 import { associateDocumentToEntrance } from '../../../../actions/AssociateDocumentToEntrance';
 import ScrollableContent from '../../../common/Layouts/Fixed/ScrollableContent';
 import SearchDocumentForm from '../../Form/SearchDocumentForm';
@@ -38,13 +38,26 @@ const Documents = ({ documents, entranceId }) => {
       title={formatMessage({ id: 'Documents' })}
       icon={
         permissions.isAuth && (
-          <IconButton
-            color="primary"
-            onClick={() =>
-              setIsDocumentSearchVisible(!isDocumentSearchVisible)
+          <Tooltip
+            title={
+              isDocumentSearchVisible
+                ? formatMessage({ id: 'Cancel this search' })
+                : formatMessage({ id: 'Assign an existing document' })
             }>
-            {isDocumentSearchVisible ? <RemoveCircleIcon /> : <AddCircleIcon />}
-          </IconButton>
+            <Button
+              color={isDocumentSearchVisible ? '' : 'secondary'}
+              variant="outlined"
+              onClick={() =>
+                setIsDocumentSearchVisible(!isDocumentSearchVisible)
+              }
+              startIcon={
+                isDocumentSearchVisible ? <CancelIcon /> : <AddCircleIcon />
+              }>
+              {formatMessage({
+                id: isDocumentSearchVisible ? 'Cancel' : 'Add'
+              })}
+            </Button>
+          </Tooltip>
         )
       }
       content={

@@ -1,6 +1,6 @@
 import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
-import { IconButton, Divider, Tooltip } from '@material-ui/core';
+import { Divider, Tooltip, Button } from '@material-ui/core';
 import { useDispatch } from 'react-redux';
 import React, { useState } from 'react';
 import AddCircleIcon from '@material-ui/icons/AddCircle';
@@ -45,14 +45,16 @@ const Riggings = ({ riggings, entranceId }) => {
           <Tooltip
             title={
               isFormVisible
-                ? formatMessage({ id: 'Cancel' })
+                ? formatMessage({ id: 'Cancel adding a new riggings' })
                 : formatMessage({ id: 'Add a new riggings' })
             }>
-            <IconButton
-              color="primary"
-              onClick={() => setIsFormVisible(!isFormVisible)}>
-              {isFormVisible ? <CancelIcon /> : <AddCircleIcon />}
-            </IconButton>
+            <Button
+              color={isFormVisible ? '' : 'secondary'}
+              variant="outlined"
+              onClick={() => setIsFormVisible(!isFormVisible)}
+              startIcon={isFormVisible ? <CancelIcon /> : <AddCircleIcon />}>
+              {formatMessage({ id: isFormVisible ? 'Cancel' : 'New' })}
+            </Button>
           </Tooltip>
         )
       }

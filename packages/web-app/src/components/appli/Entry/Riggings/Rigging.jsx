@@ -1,8 +1,7 @@
 import { useIntl } from 'react-intl';
-import { Box, IconButton, Tooltip } from '@material-ui/core';
+import { Box, Button, ButtonGroup, Tooltip } from '@material-ui/core';
 import EditIcon from '@material-ui/icons/Edit';
 import { useDispatch } from 'react-redux';
-import CancelIcon from '@material-ui/icons/Cancel';
 import React, { useState } from 'react';
 import { usePermissions } from '../../../../hooks';
 import { updateRiggings } from '../../../../actions/Riggings/UpdateRigging';
@@ -28,29 +27,32 @@ const Rigging = ({ rigging }) => {
   };
 
   return (
-    <Box key={rigging.id} position="relative">
+    <Box key={rigging.id} position="relative" mt={2}>
       <Box
         sx={{
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'flex-end'
         }}>
-        <SnapshotButton id={rigging.id} type="riggings" content={rigging} />
-        {permissions.isAuth && (
+        <ButtonGroup color="primary">
           <Tooltip
             title={
               isFormVisible
                 ? formatMessage({ id: 'Cancel edit' })
                 : formatMessage({ id: 'Edit these riggings' })
             }>
-            <IconButton
+            <Button
+              disabled={!permissions.isAuth}
               onClick={() => setIsFormVisible(!isFormVisible)}
               color="primary"
               aria-label="edit">
-              {isFormVisible ? <CancelIcon /> : <EditIcon />}
-            </IconButton>
+              {isFormVisible ? formatMessage({ id: `Cancel` }) : <EditIcon />}
+            </Button>
           </Tooltip>
-        )}
+          {!isFormVisible && (
+            <SnapshotButton id={rigging.id} type="riggings" content={rigging} />
+          )}
+        </ButtonGroup>
       </Box>
       {isFormVisible && permissions.isAuth ? (
         <Box width="100%">

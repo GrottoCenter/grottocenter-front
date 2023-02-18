@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import { useIntl } from 'react-intl';
 import styled from 'styled-components';
-import { Box, IconButton } from '@material-ui/core';
+import { Box, Button, ButtonGroup, Tooltip } from '@material-ui/core';
 import {
   CalendarToday,
   Category,
@@ -76,7 +76,7 @@ const Properties = () => {
 
   const precisionSeverity = computePrecisionSeverity(precision);
 
-  let precisionText = '';
+  let precisionText;
   if (precision === 0)
     precisionText = formatMessage({
       id: 'Coordinates precision unavailable for restricted access entrance.'
@@ -126,18 +126,18 @@ const Properties = () => {
               />
             </FlexContainerGrow>
             <div>
-              <IconButton
-                aria-label={formatMessage({ id: 'Open on OpenStreetMap' })}
-                color="primary"
-                onClick={openOSM}>
-                <Map />
-              </IconButton>
-              <IconButton
-                aria-label={formatMessage({ id: 'Open on Google Maps' })}
-                color="primary"
-                onClick={openGM}>
-                <Place />
-              </IconButton>
+              <ButtonGroup color="primary" variant="outlined" size="small">
+                <Tooltip title={formatMessage({ id: 'Open on OpenStreetMap' })}>
+                  <Button onClick={openOSM} startIcon={<Map />}>
+                    OSM
+                  </Button>
+                </Tooltip>
+                <Tooltip title={formatMessage({ id: 'Open on Google Maps' })}>
+                  <Button onClick={openGM} startIcon={<Place />}>
+                    GMaps
+                  </Button>
+                </Tooltip>
+              </ButtonGroup>
             </div>
           </FlexContainer>
         )}

@@ -6,15 +6,16 @@ import {
   Typography,
   Card as MuiCard,
   CardActions as MuiCardActions,
-  IconButton as MuiIconButton,
   CardContent as MuiCardContent,
   CardHeader,
   CircularProgress,
-  Tooltip
+  Tooltip,
+  ButtonGroup,
+  Button
 } from '@material-ui/core';
 import { Print } from '@material-ui/icons';
 import styled from 'styled-components';
-import ReactToPrint from 'react-to-print';
+import { useReactToPrint } from 'react-to-print';
 import CreateIcon from '@material-ui/icons/Create';
 import NotificationsNoneIcon from '@material-ui/icons/NotificationsNone';
 import NotificationsActiveIcon from '@material-ui/icons/NotificationsActive';
@@ -42,6 +43,9 @@ const CardContent = styled(MuiCardContent)`
 const CardActions = styled(MuiCardActions)`
   display: flex;
 `;
+const CardActionsBtn = styled(SnapshotButton)`
+  margin-left: auto;
+`;
 
 const Title = styled.div`
   display: flex;
@@ -57,11 +61,12 @@ const TitleIcon = styled.div(
   }
 `
 );
-
-const IconButton = styled(MuiIconButton)`
-  margin-right: 7px;
-  margin-top: 7px;
-  margin-left: auto;
+const CardHeaderStyled = styled(CardHeader)`
+  ${({ theme }) => theme.breakpoints.down('sm')} {
+    flex-direction: column;
+    align-items: flex-start;
+    grid-gap: 8px;
+  }
 `;
 
 const FixedContent = ({
@@ -84,39 +89,51 @@ const FixedContent = ({
     if (isSubscribed) SubscribeIcon = <NotificationsActiveIcon />;
     else SubscribeIcon = <NotificationsNoneIcon />;
   }
+  const handlePrint = useReactToPrint({
+    content: () => printRef.current
+  });
   return (
     <Card>
-      <CardHeader
+      <CardHeaderStyled
         action={
-          <>
-            {!isNil(onEdit) && (
-              <IconButton
-                color="primary"
-                size="small"
-                aria-label="edit"
-                onClick={onEdit}>
-                <CreateIcon />
-              </IconButton>
-            )}
+          <ButtonGroup color="primary">
             {!isNil(printRef) && (
-              <ReactToPrint
-                trigger={() => (
-                  <IconButton
-                    aria-label={formatMessage({ id: 'Print' })}
-                    color="primary">
-                    <Print />
-                  </IconButton>
-                )}
-                content={() => printRef.current}
-              />
+              <Button
+                style={{ verticalAlign: 'top' }}
+                variant="outlined"
+                aria-label={formatMessage({ id: 'Print' })}
+                color="primary"
+                onClick={handlePrint}>
+                <Print />
+              </Button>
             )}
-            {snapshot && (
-              <SnapshotButton
-                id={snapshot.id}
-                type={snapshot.entity}
-                content={snapshot.actualVersion}
-                isNetwork={snapshot.isNetwork}
-              />
+            <Tooltip
+              title={formatMessage({
+                id: 'Edit properties'
+              })}>
+              <Button
+                aria-label="edit"
+                onClick={onEdit}
+                disabled={isNil(onEdit)}>
+                <CreateIcon />
+              </Button>
+            </Tooltip>
+            {!isNil(onChangeSubscribe) && (
+              <Tooltip
+                title={formatMessage({
+                  id: isSubscribed ? 'Unsubscribe' : 'Subscribe'
+                })}>
+                <Button
+                  color={isSubscribed ? 'secondary' : 'primary'}
+                  size="small"
+                  aria-label="edit"
+                  onClick={onChangeSubscribe}
+                  startIcon={SubscribeIcon}>
+                  {formatMessage({
+                    id: isSubscribed ? 'Unsubscribe' : 'Subscribe'
+                  })}
+                </Button>
+              </Tooltip>
             )}
             {snapshot?.all && (
               <SnapshotPageButton
@@ -124,21 +141,7 @@ const FixedContent = ({
                 isNetwork={snapshot.isNetwork}
               />
             )}
-            {!isNil(onChangeSubscribe) && (
-              <Tooltip
-                title={formatMessage({
-                  id: isSubscribed ? 'Unsubscribe' : 'Subscribe'
-                })}>
-                <IconButton
-                  color={isSubscribed ? 'secondary' : 'primary'}
-                  size="small"
-                  aria-label="edit"
-                  onClick={onChangeSubscribe}>
-                  {SubscribeIcon}
-                </IconButton>
-              </Tooltip>
-            )}
-          </>
+          </ButtonGroup>
         }
         avatar={avatar}
         subheader={subheader}
@@ -156,7 +159,23 @@ const FixedContent = ({
         }
       />
       <CardContent>{content}</CardContent>
-      {!isNil(footer) && <CardActions disableSpacing> {footer}</CardActions>}
+      {!isNil(footer) && (
+        <CardActions disableSpacing>
+          {footer}
+          {snapshot && (
+            <CardActionsBtn
+              size="small"
+              variant="outlined"
+              color="primary"
+              id={snapshot.id}
+              type={snapshot.entity}
+              content={snapshot.actualVersion}
+              isNetwork={snapshot.isNetwork}
+              showLabel
+            />
+          )}
+        </CardActions>
+      )}
     </Card>
   );
 };

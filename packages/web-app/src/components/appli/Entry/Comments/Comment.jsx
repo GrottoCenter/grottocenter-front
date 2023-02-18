@@ -1,17 +1,19 @@
 import {
   ListItem,
-  IconButton,
   Box,
   ListItemText,
   ListItemIcon,
-  Typography
+  Typography,
+  ButtonGroup,
+  Tooltip,
+  Button
 } from '@material-ui/core';
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import EditIcon from '@material-ui/icons/Edit';
 import { useDispatch } from 'react-redux';
-import CancelIcon from '@material-ui/icons/Cancel';
 import { isEmpty, pathOr } from 'ramda';
+import { useIntl } from 'react-intl';
 import { usePermissions, useUserProperties } from '../../../../hooks';
 import { updateComment } from '../../../../actions/Comment/UpdateComment';
 import CreateCommentForm from '../../Form/CommentForm/index';
@@ -20,6 +22,10 @@ import Ratings from '../Ratings';
 import Contribution from '../../../common/Contribution/Contribution';
 import Duration from '../../../common/Properties/Duration';
 import { SnapshotButton } from '../Snapshots/UtilityFunction';
+
+const ListItemStyled = styled(ListItem)`
+  flex-direction: column;
+`;
 
 const StyledListItemText = styled(ListItemText)`
   width: 100%;
@@ -71,23 +77,62 @@ const Comment = ({ comment }) => {
     (author?.id && userId?.toString() === author?.id.toString()) ||
     permissions.isAdmin ||
     permissions.isModerator;
-
+  const { formatMessage } = useIntl();
   return (
-    <ListItem disableGutters divider alignItems="flex-start">
+    <ListItemStyled disableGutters divider alignItems="flex-start">
+      <Box sx={{ alignSelf: 'flex-end' }}>
+        {!isFormVisible && (
+          <ListItemIcon style={{ marginTop: 0 }}>
+            <ButtonGroup color="primary">
+              <Tooltip
+                title={formatMessage({
+                  id: 'Edit this comment'
+                })}>
+                <Button
+                  disabled={!permissions.isAuth || !canEdit}
+                  onClick={() => setIsFormVisible(!isFormVisible)}
+                  color="primary"
+                  aria-label="edit">
+                  <EditIcon />
+                </Button>
+              </Tooltip>
+              <SnapshotButton id={id} type="comments" content={comment} />
+            </ButtonGroup>
+          </ListItemIcon>
+        )}
+      </Box>
       {isFormVisible && permissions.isAuth ? (
-        <Box width="100%">
-          <CreateCommentForm
-            closeForm={() => setIsFormVisible(false)}
-            isNewComment={false}
-            onSubmit={onSubmitForm}
-            values={comment}
-          />
-        </Box>
+        <>
+          <Box sx={{ alignSelf: 'flex-end' }}>
+            <ListItemIcon style={{ marginTop: 0 }}>
+              <Button
+                variant="outlined"
+                color="primary"
+                onClick={() => setIsFormVisible(!isFormVisible)}
+                aria-label="cancel">
+                {formatMessage({ id: `Cancel` })}
+              </Button>
+            </ListItemIcon>
+          </Box>
+          <Box width="100%">
+            <CreateCommentForm
+              closeForm={() => setIsFormVisible(false)}
+              isNewComment={false}
+              onSubmit={onSubmitForm}
+              values={comment}
+            />
+          </Box>
+        </>
       ) : (
         <>
           <StyledListItemText
+            style={{ margin: 0 }}
             disableTypography
-            primary={<Typography variant="h4">{title}</Typography>}
+            primary={
+              <Typography variant="h4" style={{ marginBottom: 7 }}>
+                {title}
+              </Typography>
+            }
             secondary={
               <Contribution
                 author={author}
@@ -122,20 +167,7 @@ const Comment = ({ comment }) => {
           </StyledListItemIcon>
         </>
       )}
-      {canEdit && (
-        <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-          <ListItemIcon>
-            <SnapshotButton id={id} type="comments" content={comment} />
-            <IconButton
-              onClick={() => setIsFormVisible(!isFormVisible)}
-              color="primary"
-              aria-label="edit">
-              {isFormVisible ? <CancelIcon /> : <EditIcon />}
-            </IconButton>
-          </ListItemIcon>
-        </Box>
-      )}
-    </ListItem>
+    </ListItemStyled>
   );
 };
 

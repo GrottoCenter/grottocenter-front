@@ -28,6 +28,7 @@ const Organization = ({ error, isLoading, organization, onEdit, canEdit }) => {
 
   return (
     <Layout
+      onEdit={canEdit ? onEdit : null}
       avatar={
         isLoading ? (
           <Skeleton>
@@ -98,8 +99,6 @@ const Organization = ({ error, isLoading, organization, onEdit, canEdit }) => {
                 village={organization.village}
                 position={position}
                 organization={organization}
-                canEdit={canEdit}
-                onEdit={onEdit}
               />
 
               <hr />

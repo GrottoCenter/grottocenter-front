@@ -1,15 +1,18 @@
 import React, { useState } from 'react';
 import {
   Box,
-  IconButton,
   ListItemIcon,
   ListItem,
   ListItemText,
-  Typography
+  Typography,
+  ButtonGroup,
+  Button,
+  Tooltip
 } from '@material-ui/core';
 import { useDispatch } from 'react-redux';
 import EditIcon from '@material-ui/icons/Edit';
-import CancelIcon from '@material-ui/icons/Cancel';
+import styled from 'styled-components';
+import { useIntl } from 'react-intl';
 import { SnapshotButton } from '../Entry/Snapshots/UtilityFunction';
 
 import { descriptionType } from './propTypes';
@@ -18,6 +21,9 @@ import { updateDescription } from '../../../actions/Description/UpdateDescriptio
 import { usePermissions } from '../../../hooks';
 import Contribution from '../../common/Contribution/Contribution';
 
+const ListItemStyled = styled(ListItem)`
+  flex-direction: column;
+`;
 const Description = ({ description }) => {
   const dispatch = useDispatch();
   const permissions = usePermissions();
@@ -36,22 +42,65 @@ const Description = ({ description }) => {
     );
     setIsFormVisible(false);
   };
-
+  const { formatMessage } = useIntl();
   return (
-    <ListItem disableGutters divider alignItems="flex-start">
+    <ListItemStyled disableGutters divider alignItems="flex-start">
+      <Box sx={{ alignSelf: 'flex-end' }}>
+        {!isFormVisible && (
+          <ListItemIcon style={{ marginTop: 0 }}>
+            <ButtonGroup color="primary">
+              <Tooltip
+                title={formatMessage({
+                  id: 'Edit this description'
+                })}>
+                <Button
+                  disabled={!permissions.isAuth}
+                  onClick={() => setIsFormVisible(!isFormVisible)}
+                  color="primary"
+                  aria-label="edit">
+                  <EditIcon />
+                </Button>
+              </Tooltip>
+              <SnapshotButton
+                id={id}
+                type="descriptions"
+                content={description}
+              />
+            </ButtonGroup>
+          </ListItemIcon>
+        )}
+      </Box>
       {isFormVisible && permissions.isAuth ? (
-        <Box width="100%">
-          <CreateDescriptionForm
-            closeForm={() => setIsFormVisible(false)}
-            isNewDescription={false}
-            onSubmit={onSubmitForm}
-            values={description}
-          />
-        </Box>
+        <>
+          <Box sx={{ alignSelf: 'flex-end' }}>
+            <ListItemIcon style={{ marginTop: 0 }}>
+              <Button
+                variant="outlined"
+                color="primary"
+                onClick={() => setIsFormVisible(!isFormVisible)}
+                aria-label="cancel">
+                {formatMessage({ id: `Cancel` })}
+              </Button>
+            </ListItemIcon>
+          </Box>
+          <Box width="100%">
+            <CreateDescriptionForm
+              closeForm={() => setIsFormVisible(false)}
+              isNewDescription={false}
+              onSubmit={onSubmitForm}
+              values={description}
+            />
+          </Box>
+        </>
       ) : (
         <ListItemText
+          style={{ margin: 0 }}
           disableTypography
-          primary={<Typography variant="h4">{title}</Typography>}
+          primary={
+            <Typography variant="h4" style={{ marginBottom: 7 }}>
+              {title}
+            </Typography>
+          }
           secondary={
             <Contribution
               body={body}
@@ -63,22 +112,7 @@ const Description = ({ description }) => {
           }
         />
       )}
-      <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-        <ListItemIcon style={{ alignSelf: 'start' }}>
-          <SnapshotButton id={id} type="descriptions" content={description} />
-        </ListItemIcon>
-        {permissions.isAuth && (
-          <ListItemIcon style={{ alignSelf: 'start' }}>
-            <IconButton
-              onClick={() => setIsFormVisible(!isFormVisible)}
-              color="primary"
-              aria-label="edit">
-              {isFormVisible ? <CancelIcon /> : <EditIcon />}
-            </IconButton>
-          </ListItemIcon>
-        )}
-      </Box>
-    </ListItem>
+    </ListItemStyled>
   );
 };
 

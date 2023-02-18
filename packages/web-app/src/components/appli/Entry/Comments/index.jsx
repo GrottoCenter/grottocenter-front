@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { useDispatch } from 'react-redux';
 import { useIntl } from 'react-intl';
-import { Divider, IconButton, List } from '@material-ui/core';
+import { Button, Divider, List, Tooltip } from '@material-ui/core';
 import AddCircleIcon from '@material-ui/icons/AddCircle';
 import CancelIcon from '@material-ui/icons/Cancel';
 
@@ -43,11 +43,20 @@ const Comments = ({ entranceId, comments }) => {
       title={formatMessage({ id: 'Comment' })}
       icon={
         permissions.isAuth && (
-          <IconButton
-            color="primary"
-            onClick={() => setIsFormVisible(!isFormVisible)}>
-            {isFormVisible ? <CancelIcon /> : <AddCircleIcon />}
-          </IconButton>
+          <Tooltip
+            title={
+              isFormVisible
+                ? formatMessage({ id: 'Cancel adding a new comment' })
+                : formatMessage({ id: 'Add a new comment' })
+            }>
+            <Button
+              color={isFormVisible ? '' : 'secondary'}
+              variant="outlined"
+              onClick={() => setIsFormVisible(!isFormVisible)}
+              startIcon={isFormVisible ? <CancelIcon /> : <AddCircleIcon />}>
+              {formatMessage({ id: isFormVisible ? 'Cancel' : 'New' })}
+            </Button>
+          </Tooltip>
         )
       }
       content={
