@@ -18,10 +18,16 @@ jobs:
     strategy:
      matrix:
        browsers: [firefox, chrome]
+       node: [ 16 ]
 
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+      - name: Use Node.js ${{ matrix.node }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node }}
+          cache: 'yarn'
       # Install NPM dependencies, cache them correctly
       # and run all Cypress tests
       - name: Cypress run

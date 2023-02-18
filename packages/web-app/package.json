@@ -92,6 +92,9 @@
     "storybook-addon-intl": "2.4.1",
     "storybook-react-router": "1.0.8"
   },
+  "engines": {
+    "node": "16"
+  },
   "resolutions": {
     "babel-loader": "8.1.0"
   },
