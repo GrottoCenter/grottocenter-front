@@ -6,6 +6,7 @@ import { Button, Divider, List, Tooltip } from '@material-ui/core';
 import AddCircleIcon from '@material-ui/icons/AddCircle';
 import CancelIcon from '@material-ui/icons/Cancel';
 
+import styled from 'styled-components';
 import ScrollableContent from '../../common/Layouts/Fixed/ScrollableContent';
 import { descriptionsType } from './propTypes';
 import Description from './Description';
@@ -14,6 +15,9 @@ import { postDescription } from '../../../actions/Description/CreateDescription'
 import { usePermissions } from '../../../hooks';
 import Alert from '../../common/Alert';
 
+const ListStyled = styled(List)`
+  border-top: 1px solid #e0e0e0;
+`;
 const Descriptions = ({ entityType, entityId, descriptions }) => {
   const { formatMessage } = useIntl();
   const permissions = usePermissions();
@@ -64,11 +68,11 @@ const Descriptions = ({ entityType, entityId, descriptions }) => {
           )}
 
           {descriptions.length > 0 ? (
-            <List dense disablePadding>
+            <ListStyled dense disablePadding>
               {descriptions.map(description => (
                 <Description description={description} key={description.id} />
               ))}
-            </List>
+            </ListStyled>
           ) : (
             <Alert
               severity="info"

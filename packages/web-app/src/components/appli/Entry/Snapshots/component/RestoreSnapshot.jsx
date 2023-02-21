@@ -1,8 +1,17 @@
 import * as React from 'react';
 import { useDispatch } from 'react-redux';
-import { IconButton } from '@material-ui/core';
+import {
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  Tooltip
+} from '@material-ui/core';
 import RestorePageIcon from '@material-ui/icons/RestorePage';
 import { pathOr } from 'ramda';
+import { useIntl } from 'react-intl';
 import { updateDescription } from '../../../../../actions/Description/UpdateDescription';
 import { updateHistory } from '../../../../../actions/History/UpdateHistory';
 import { updateRiggings } from '../../../../../actions/Riggings/UpdateRigging';
@@ -11,6 +20,8 @@ import { updateComment } from '../../../../../actions/Comment/UpdateComment';
 import { usePermissions, useUserProperties } from '../../../../../hooks';
 import { updateEntrance } from '../../../../../actions/Entrance/UpdateEntrance';
 import { updateCaveAndEntrance } from '../../../../../actions/CaveAndEntrance';
+import Translate from '../../../../common/Translate';
+import { durationStringToMinutes } from '../../../../../util/dateTimeDuration';
 
 function sleep(ms) {
   // eslint-disable-next-line no-promise-executor-return
@@ -21,12 +32,22 @@ const RestoreSnapshot = item => {
   const { snapshot, snapshotType, isNetwork } = item;
   const userId = pathOr(null, ['id'], useUserProperties());
   const permissions = usePermissions();
+  const { formatMessage } = useIntl();
   const canEditComment =
     (snapshot.author?.id &&
       userId?.toString() === snapshot.author?.id.toString()) ||
     permissions.isAdmin ||
     permissions.isModerator;
+  const [open, setOpen] = React.useState(false);
+  const [openSuccess, setOpenSuccess] = React.useState(false);
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+  const handleClose = () => {
+    setOpen(false);
+  };
   const restoreSnapshot = (typeItem, content) => {
+    setOpen(false);
     switch (typeItem) {
       case 'comments':
         if (canEditComment) {
@@ -34,11 +55,8 @@ const RestoreSnapshot = item => {
             updateComment({
               ...content,
               id: content.t_id,
-              title: content.title,
-              eTTrail: content.eTTrail ? content.eTTrail.minutes : 0,
-              eTUnderground: content.eTUnderground
-                ? content.eTUnderground.minutes
-                : 0
+              eTTrail: durationStringToMinutes(content.eTTrail),
+              eTUnderground: durationStringToMinutes(content.eTUnderground)
             })
           );
         }
@@ -55,7 +73,7 @@ const RestoreSnapshot = item => {
         // eslint-disable-next-line no-case-declarations
         const updatedEntrance = {
           name: {
-            language: content.nameLanguage,
+            language: content.names[0].language,
             text: content.name
           },
           cave: content.cave.id ?? content.cave,
@@ -77,7 +95,7 @@ const RestoreSnapshot = item => {
             },
             depth: Number(content.cave.depth),
             isDiving: content.cave.isDiving,
-            length: Number(content.cave.caveLength),
+            length: Number(content.cave.length),
             longitude: content.cave.longitude,
             latitude: content.cave.latitude,
             temperature: Number(content.cave.temperature),
@@ -113,13 +131,60 @@ const RestoreSnapshot = item => {
       default:
         break;
     }
-    sleep(500).then(() => window.close());
+    window.opener.location.reload();
+    setOpenSuccess(true);
+    sleep(10000).then(() => window.close());
   };
   return (
     permissions.isAuth && (
-      <IconButton onClick={() => restoreSnapshot(snapshotType, snapshot)}>
-        <RestorePageIcon />
-      </IconButton>
+      <>
+        <Tooltip title={formatMessage({ id: 'Restore this version' })}>
+          <Button
+            onClick={handleClickOpen}
+            startIcon={<RestorePageIcon />}
+            variant="outlined"
+            color="secondary">
+            {formatMessage({ id: 'Restore' })}
+          </Button>
+        </Tooltip>
+        <Dialog open={open} onClose={handleClose}>
+          <DialogTitle id="alert-dialog-title">
+            <Translate>Restore this revision?</Translate>
+          </DialogTitle>
+          <DialogContent>
+            <DialogContentText>
+              <Translate>
+                If you click YES, the content of this revision will be saved as
+                the new current revision.
+              </Translate>
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleClose} color="default">
+              <Translate>No</Translate>
+            </Button>
+            <Button
+              onClick={() => restoreSnapshot(snapshotType, snapshot)}
+              color="secondary"
+              autoFocus>
+              <Translate>Yes</Translate>
+            </Button>
+          </DialogActions>
+        </Dialog>
+        <Dialog open={openSuccess}>
+          <DialogTitle id="alert-dialog-title">
+            <Translate>Restore completed</Translate>
+          </DialogTitle>
+          <DialogContent>
+            <DialogContentText>
+              <Translate>
+                This window will be closed shortly and your origin page
+                refreshed...
+              </Translate>
+            </DialogContentText>
+          </DialogContent>
+        </Dialog>
+      </>
     )
   );
 };

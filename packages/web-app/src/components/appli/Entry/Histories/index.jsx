@@ -6,6 +6,7 @@ import { Button, Divider, List, Tooltip } from '@material-ui/core';
 import AddCircleIcon from '@material-ui/icons/AddCircle';
 import CancelIcon from '@material-ui/icons/Cancel';
 
+import styled from 'styled-components';
 import ScrollableContent from '../../../common/Layouts/Fixed/ScrollableContent';
 import { historiesType } from '../Provider';
 import History from './History';
@@ -14,6 +15,9 @@ import { postHistory } from '../../../../actions/History/CreateHistory';
 import { usePermissions } from '../../../../hooks';
 import Alert from '../../../common/Alert';
 
+const ListStyled = styled(List)`
+  border-top: 1px solid #e0e0e0;
+`;
 const Histories = ({ entranceId, histories }) => {
   const { formatMessage } = useIntl();
   const permissions = usePermissions();
@@ -63,11 +67,11 @@ const Histories = ({ entranceId, histories }) => {
           )}
 
           {histories.length > 0 ? (
-            <List dense disablePadding>
+            <ListStyled dense disablePadding>
               {histories.map(history => (
                 <History history={history} key={history.id} />
               ))}
-            </List>
+            </ListStyled>
           ) : (
             <Alert
               severity="info"

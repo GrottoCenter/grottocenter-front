@@ -1,10 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Box, IconButton, Tooltip, Typography } from '@material-ui/core';
-import { Link } from 'react-router-dom';
-import NotificationsOffIcon from '@material-ui/icons/NotificationsOff';
+import { Chip, Tooltip } from '@material-ui/core';
+import { useHistory } from 'react-router-dom';
 import { useIntl } from 'react-intl';
 import { useDispatch } from 'react-redux';
+import NotificationsIcon from '@material-ui/icons/Notifications';
 import fadeOut from '../../../util/fadeOut';
 import { unsubscribeFromMassif } from '../../../actions/Subscriptions/UnsubscribeFromMassif';
 import massifType from '../../../types/massif.type';
@@ -13,6 +13,7 @@ import { unsubscribeFromCountry } from '../../../actions/Subscriptions/Unsubscri
 
 const SubscriptionItem = ({ canUnsubscribe, subscription, type }) => {
   const { formatMessage } = useIntl();
+  const history = useHistory();
   const dispatch = useDispatch();
   const url =
     type === 'MASSIF'
@@ -28,20 +29,15 @@ const SubscriptionItem = ({ canUnsubscribe, subscription, type }) => {
   };
 
   return (
-    <Box display="flex">
-      <Link to={url}>
-        <Typography variant="h5" display="inline" gutterBottom>
-          {type === 'MASSIF' ? subscription.name : subscription.nativeName}
-        </Typography>
-      </Link>
-      {canUnsubscribe && (
-        <Tooltip title={formatMessage({ id: 'Unsubscribe' })}>
-          <IconButton color="primary" size="small" onClick={handleUnsubscribe}>
-            <NotificationsOffIcon />
-          </IconButton>
-        </Tooltip>
-      )}
-    </Box>
+    <Tooltip title={formatMessage({ id: 'Click the cross to unsubscribe' })}>
+      <Chip
+        icon={<NotificationsIcon />}
+        label={type === 'MASSIF' ? subscription.name : subscription.nativeName}
+        onClick={() => history.push(url)}
+        onDelete={canUnsubscribe ? handleUnsubscribe : undefined}
+        color="primary"
+      />
+    </Tooltip>
   );
 };
 

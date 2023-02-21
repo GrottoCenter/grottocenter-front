@@ -73,10 +73,10 @@ const Riggings = ({ riggings, entranceId }) => {
           {riggings.length > 0 &&
             riggings
               .sort((r1, r2) => r1.title.localeCompare(r2.title))
-              .map((rigging, index) => (
+              .map(rigging => (
                 <React.Fragment key={rigging.id}>
+                  <DividerWithMargin />
                   <Rigging rigging={rigging} />
-                  {index < riggings.length - 1 && <DividerWithMargin />}
                 </React.Fragment>
               ))}
           {riggings.length === 0 && (

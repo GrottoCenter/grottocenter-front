@@ -13,15 +13,7 @@ const AccordionSnapshotList = ({ data, type, isNetwork, actualItem }) => {
   return (
     <ScrollableContent
       dense
-      title={
-        <Translate
-          id="{type} snapshots"
-          values={{
-            type
-          }}
-          defaultMessage={`${type} snapshots`}
-        />
-      }
+      title={<Translate>Revisions</Translate>}
       content={
         data && Object.keys(data).length > 0 ? (
           Object.keys(data).map(snapshotType => {
@@ -67,7 +59,7 @@ AccordionSnapshotList.propTypes = {
   type: PropTypes.string,
   isNetwork: PropTypes.bool,
   actualItem: PropTypes.shape({
-    id: PropTypes.string,
+    id: PropTypes.number,
     title: PropTypes.string,
     name: PropTypes.string,
     author: authorType,

@@ -6,6 +6,7 @@ import AddCircleIcon from '@material-ui/icons/AddCircle';
 import { useDispatch } from 'react-redux';
 
 import CancelIcon from '@material-ui/icons/Cancel';
+import styled from 'styled-components';
 import { associateDocumentToEntrance } from '../../../../actions/AssociateDocumentToEntrance';
 import ScrollableContent from '../../../common/Layouts/Fixed/ScrollableContent';
 import SearchDocumentForm from '../../Form/SearchDocumentForm';
@@ -14,6 +15,9 @@ import { usePermissions } from '../../../../hooks';
 import { documentsType } from '../Provider';
 import Document from './Document';
 
+const DividerStyled = styled(Divider)`
+  background-color: ${props => props.theme.palette.divider};
+`;
 const Documents = ({ documents, entranceId }) => {
   const { formatMessage } = useIntl();
   const permissions = usePermissions();
@@ -65,18 +69,16 @@ const Documents = ({ documents, entranceId }) => {
           {isDocumentSearchVisible && (
             <>
               <SearchDocumentForm onSubmit={onSubmitForm} />
-              <Divider />
+              <DividerStyled />
             </>
           )}
 
           {documents.length > 0 ? (
             <List>
-              {documents.map((document, i) => (
+              {documents.map(document => (
                 <span key={document.id}>
+                  <DividerStyled variant="middle" component="li" />
                   <Document {...document} />
-                  {i < documents.length - 1 && (
-                    <Divider variant="middle" component="li" />
-                  )}
                 </span>
               ))}
             </List>

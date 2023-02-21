@@ -7,7 +7,6 @@ const SubscriptionNameTypography = styled(Typography)`
   display: inline-block;
   margin-right: ${({ theme }) => theme.spacing(4)}px;
   text-align: right;
-  width: 110px;
 `;
 
 const SubscriptionName = ({ name }) => (

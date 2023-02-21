@@ -142,6 +142,7 @@
     </div>
     <script>
       // Intl management will be takeover by react once it is loaded
+      const selectedLanguage = window.localStorage.getItem('selectedLanguage') ?? navigator.language.split(/[-_]/)[0];
       const intlBootstrap = {
         defaultLocale: 'en',
         allLanguages: [
@@ -162,7 +163,7 @@
           'ro'
           // If you change this list, don't forget to also update the AVAILABLE_LANGUAGES object in src/conf/config.js
         ],
-        initialLocale: navigator.language.split(/[-_]/)[0],
+        initialLocale: selectedLanguage,
         initialFetchP: null
       };
 

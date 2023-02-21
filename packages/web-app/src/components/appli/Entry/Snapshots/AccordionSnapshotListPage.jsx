@@ -13,10 +13,15 @@ const AccordionSnapshotListPage = ({ data, type, isNetwork }) => {
   return (
     <ScrollableContent
       dense
-      title={formatMessage({ id: `${type} snapshots` })}
+      title={formatMessage(
+        {
+          defaultMessage: 'Full {type} revision history'
+        },
+        { type }
+      )}
       content={
         data ? (
-          data.map((snapshotType, index) =>
+          data.map(snapshotType =>
             snapshotType[Object.keys(snapshotType)[0]].map(snapshot => {
               const author = getAuthor(snapshot.author);
               const reviewer = getAuthor(snapshot.reviewer);

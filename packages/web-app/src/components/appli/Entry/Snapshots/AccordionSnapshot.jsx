@@ -10,12 +10,17 @@ import {
 import ExpandMore from '@material-ui/icons/ExpandMore';
 import PropTypes from 'prop-types';
 
+import styled from 'styled-components';
 import Contribution from '../../../common/Contribution/Contribution';
 import { getAccordionBodyFromType } from './UtilityFunction';
 import authorType from '../../../../types/author.type';
 import { HighLightsChar } from '../../../common/Highlights';
 import RestoreSnapshot from './component/RestoreSnapshot';
+import Translate from '../../../common/Translate';
 
+const FlexDiv50 = styled.div`
+  flex-basis: 50%;
+`;
 const AccordionSnapshot = ({
   snapshot,
   snapshotType,
@@ -30,24 +35,46 @@ const AccordionSnapshot = ({
   return (
     <Accordion>
       <AccordionSummary expandIcon={<ExpandMore />}>
-        <Typography>
-          {all ? `${snapshotType} : ` : ''}
-          {reviewer
-            ? `${reviewer?.nickname} - `
-            : `${author?.nickname ? author?.nickname : ''} - `}
-          {snapshot.id
-            ? ` ${new Date(snapshot.id).toLocaleDateString()}-${new Date(
-                snapshot.id
-              ).toLocaleTimeString()} `
-            : ' '}
+        <FlexDiv50>
+          {all ? (
+            <strong>
+              <Translate>
+                {snapshotType.charAt(0).toUpperCase() + snapshotType.slice(1)}
+              </Translate>
+            </strong>
+          ) : (
+            ''
+          )}
+          <Typography>
+            {snapshot.id
+              ? ` ${new Date(snapshot.id).toLocaleDateString()} - ${new Date(
+                  snapshot.id
+                ).toLocaleTimeString()}`
+              : ''}
+            {' - '}
+            {reviewer
+              ? `${reviewer?.nickname}`
+              : `${author?.nickname ? author?.nickname : ''}`}
+          </Typography>
+        </FlexDiv50>
+        <FlexDiv50>
           <HighLightsChar
             oldText={previousVersionTitle}
             newText={snapshotTitle}
           />
-        </Typography>
+        </FlexDiv50>
       </AccordionSummary>
       <AccordionDetails>
         <Box sx={{ width: '100%' }}>
+          {snapshotType !== 'documents' && (
+            <Box>
+              <RestoreSnapshot
+                snapshot={snapshot}
+                snapshotType={snapshotType}
+                isNetwork={isNetwork}
+              />
+            </Box>
+          )}
           {getAccordionBodyFromType(
             snapshotType,
             snapshot,
@@ -55,20 +82,11 @@ const AccordionSnapshot = ({
             previous
           )}
         </Box>
-        {snapshotType !== 'documents' && (
-          <Box>
-            <RestoreSnapshot
-              snapshot={snapshot}
-              snapshotType={snapshotType}
-              isNetwork={isNetwork}
-            />
-          </Box>
-        )}
       </AccordionDetails>
       <AccordionActions>
         <Contribution
           author={author}
-          creationDate={snapshot.date}
+          creationDate={snapshot.dateInscription}
           reviewer={reviewer}
           dateReviewed={snapshot.dateReviewed}
         />
@@ -82,7 +100,7 @@ AccordionSnapshot.propTypes = {
     id: PropTypes.string,
     title: PropTypes.string,
     name: PropTypes.string,
-    date: PropTypes.string,
+    dateInscription: PropTypes.string,
     dateReviewed: PropTypes.string
   }),
   snapshotType: PropTypes.string,
@@ -90,7 +108,7 @@ AccordionSnapshot.propTypes = {
   author: authorType,
   reviewer: authorType,
   previous: PropTypes.shape({
-    id: PropTypes.string,
+    id: PropTypes.number,
     title: PropTypes.string,
     name: PropTypes.string,
     date: PropTypes.string,

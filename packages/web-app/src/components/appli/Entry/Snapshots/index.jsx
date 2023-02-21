@@ -17,6 +17,7 @@ import Alert404 from './error/404Alert';
 import { getAccordionBodyFromType, sortSnapshots } from './UtilityFunction';
 import AccordionSnapshotListPage from './AccordionSnapshotListPage';
 import Translate from '../../../common/Translate';
+import { fetchEntrance } from '../../../../actions/Entrance/GetEntrance';
 
 const SnapshotPage = () => {
   const dispatch = useDispatch();
@@ -49,45 +50,63 @@ const SnapshotPage = () => {
     state => state.snapshots
   );
 
+  const { data: currentEntrance } = useSelector(state => state.entrance);
+
   useEffect(() => {
     dispatch(fetchSnapshot(id, type, isNetwork, getAll));
   }, [id, type, isNetwork, getAll, dispatch]);
 
+  useEffect(() => {
+    if (type === 'entrances') {
+      dispatch(fetchEntrance(id));
+    }
+  }, [id, type, dispatch]);
+
+  let currentTItem;
+  switch (type) {
+    case 'entrances':
+      currentTItem = currentEntrance;
+      break;
+    default:
+      currentTItem = actualTItem;
+  }
   const isLoading = status === REDUCER_STATUS.LOADING;
   const isSuccess = status === REDUCER_STATUS.SUCCEEDED;
   const is404 = !isSuccess && latestHttpCode === 404;
   const is403 = !isSuccess && latestHttpCode === 403;
   const isSensitive =
     pathOr(false, ['entrances', '0', 'isSensitive'], data) ||
-    actualTItem.isSensitive;
+    currentTItem.isSensitive;
   return (
     <>
       {isSensitive && <SensitiveCaveWarning />}
-      {Object.keys(actualTItem).length > 0 && (
+      {Object.keys(currentTItem).length > 0 && (
         <ScrollableContent
           dense
           title={
             <Translate
-              id="Actual {type}"
+              id="{type}: Revision history"
               values={{
                 type
               }}
-              defaultMessage={`Actual ${type}`}
+              defaultMessage={`${type}: Revision history`}
             />
           }
           content={
             <>
+              <Typography variant="h3">
+                <Translate>Current</Translate>
+              </Typography>
               {type !== 'riggings' && (
                 <Typography variant="h4">
-                  {actualTItem.title ?? actualTItem.name}
+                  {currentTItem.title ?? currentTItem.name}
                 </Typography>
               )}
-              {getAccordionBodyFromType(type, actualTItem, isNetwork ?? false)}
+              {getAccordionBodyFromType(type, currentTItem, isNetwork ?? false)}
               <Contribution
-                author={getAuthor(actualTItem.author)}
-                creationDate={actualTItem.date}
-                reviewer={getAuthor(actualTItem.reviewer)}
-                dateReviewed={actualTItem.dateReviewed}
+                reviewer={getAuthor(currentTItem.reviewer)}
+                dateReviewed={currentTItem.reviewedDate}
+                withHours
               />
             </>
           }
@@ -108,7 +127,7 @@ const SnapshotPage = () => {
             data={data}
             type={type}
             isNetwork={isNetwork}
-            actualItem={actualTItem}
+            actualItem={currentTItem}
           />
         ))}
     </>
