@@ -11,7 +11,13 @@ const DateSpan = styled(Typography)`
   color: ${({ theme }) => theme.palette.secondaryTextColor};
   margin-left: 4px;
 `;
-const AuthorAndDate = ({ author, textColor, date, verb }) => {
+const AuthorAndDate = ({
+  author,
+  textColor,
+  date,
+  verb,
+  withHours = false
+}) => {
   const { formatDate } = useIntl();
   return (
     <Typography component="span" variant="caption" color={textColor}>
@@ -21,7 +27,10 @@ const AuthorAndDate = ({ author, textColor, date, verb }) => {
           {formatDate(date, {
             year: '2-digit',
             month: 'numeric',
-            day: 'numeric'
+            day: 'numeric',
+            hour: withHours ? 'numeric' : undefined,
+            minute: withHours ? 'numeric' : undefined,
+            second: withHours ? 'numeric' : undefined
           })}
         </DateSpan>
       )}
@@ -41,7 +50,8 @@ AuthorAndDate.propTypes = {
     'secondary',
     'error'
   ]),
-  verb: PropTypes.string
+  verb: PropTypes.string,
+  withHours: PropTypes.bool
 };
 
 AuthorAndDate.defaultProps = {

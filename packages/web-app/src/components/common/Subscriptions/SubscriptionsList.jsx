@@ -61,7 +61,7 @@ const SubscriptionsList = ({
               <HalfWidthBox>
                 <SubscriptionName name={formatMessage({ id: 'Countries' })} />
                 {countries.length > 0 ? (
-                  <Box display="flex" flexDirection="column" flex={1}>
+                  <Box>
                     {countries
                       .sort((a, b) => a.nativeName.localeCompare(b.nativeName))
                       .map(country => (
@@ -83,7 +83,7 @@ const SubscriptionsList = ({
               <HalfWidthBox>
                 <SubscriptionName name={formatMessage({ id: 'Massifs' })} />
                 {massifs.length > 0 ? (
-                  <Box display="flex" flexDirection="column" flex={1}>
+                  <Box>
                     {massifs
                       .sort((a, b) => a.name.localeCompare(b.name))
                       .map(massif => (

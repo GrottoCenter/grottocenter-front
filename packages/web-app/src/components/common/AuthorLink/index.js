@@ -11,7 +11,7 @@ const AuthorLink = ({ author, verb = 'Posted' }) => {
   return !isNil(author?.id) && !isNil(author?.nickname) ? (
     <span>
       <Typography variant="caption">
-        {formatMessage({ id: `${verb} by` })}{' '}
+        {verb ? `${formatMessage({ id: `${verb} by` })} ` : ''}
       </Typography>
       <GCLink internal href={author.url}>
         {author.nickname}

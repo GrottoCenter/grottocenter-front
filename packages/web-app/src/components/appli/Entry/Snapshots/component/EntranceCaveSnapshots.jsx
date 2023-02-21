@@ -24,7 +24,6 @@ const EntranceCaveSnapshots = information => {
   const makeCoordinatesValue = coordinatesValue =>
     `${formatMessage({ id: 'Lat.' })} / ${formatMessage({ id: 'Long.' })} =
     ${coordinatesValue[0].toFixed(4)}, ${coordinatesValue[1].toFixed(4)}`;
-
   return (
     <Box display="flex" flexDirection="column" width="100%">
       {!(isNaN(lat) && isNaN(long)) && (
@@ -81,10 +80,10 @@ const EntranceCaveSnapshots = information => {
           icon={<CustomIcon type="depth" />}
         />
       )}
-      {cave?.caveLength && (
+      {cave?.length && (
         <Property
           label={formatMessage({ id: 'Development' })}
-          value={`${cave.caveLength} m`}
+          value={`${cave.length} m`}
           icon={<CustomIcon type="length" />}
         />
       )}

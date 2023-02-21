@@ -76,7 +76,7 @@ const ScrollableContent = ({
 );
 
 ScrollableContent.propTypes = {
-  title: PropTypes.string.isRequired,
+  title: PropTypes.oneOfType([PropTypes.string, PropTypes.node]).isRequired,
   icon: PropTypes.node,
   onEdit: PropTypes.func,
   content: PropTypes.node.isRequired,

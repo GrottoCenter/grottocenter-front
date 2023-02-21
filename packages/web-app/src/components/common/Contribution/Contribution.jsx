@@ -9,7 +9,8 @@ const Contribution = ({
   body,
   creationDate,
   reviewer,
-  dateReviewed
+  dateReviewed,
+  withHours = false
 }) => (
   <>
     {body && (
@@ -18,11 +19,22 @@ const Contribution = ({
       </MultilinesTypography>
     )}
     <br />
-    <AuthorAndDate author={author} date={creationDate} />
+    {author && (
+      <AuthorAndDate
+        author={author}
+        date={creationDate}
+        withHours={withHours}
+      />
+    )}
     {reviewer && (
       <>
         <br />
-        <AuthorAndDate author={reviewer} date={dateReviewed} verb="Updated" />
+        <AuthorAndDate
+          author={reviewer}
+          date={dateReviewed}
+          verb={author ? 'Updated' : ''}
+          withHours={withHours}
+        />
       </>
     )}
   </>
@@ -39,7 +51,8 @@ Contribution.propTypes = {
   dateReviewed: PropTypes.oneOfType([
     PropTypes.instanceOf(Date),
     PropTypes.string
-  ])
+  ]),
+  withHours: PropTypes.bool
 };
 
 export default Contribution;

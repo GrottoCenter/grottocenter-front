@@ -3,8 +3,7 @@ import PropTypes from 'prop-types';
 import { isNil } from 'ramda';
 import Skeleton from '@material-ui/lab/Skeleton';
 import { useIntl } from 'react-intl';
-import { IconButton, Box } from '@material-ui/core';
-import CreateIcon from '@material-ui/icons/Create';
+import { Box } from '@material-ui/core';
 
 import subscriptionsType from '../../../types/subscriptions.type';
 import REDUCER_STATUS from '../../../reducers/ReducerStatus';
@@ -44,6 +43,7 @@ const Person = ({
   return (
     <Layout
       title={title}
+      onEdit={canEdit ? onEdit : undefined}
       content={
         <>
           {isFetching && person === undefined && (
@@ -72,16 +72,6 @@ const Person = ({
                 flexBasis="300px"
                 justifyContent="space-between">
                 <PersonProperties person={person} />
-                {canEdit && (
-                  <IconButton
-                    size="medium"
-                    aria-label="edit"
-                    color="primary"
-                    onClick={onEdit}
-                    disabled={isNil(onEdit)}>
-                    <CreateIcon />
-                  </IconButton>
-                )}
               </Box>
               <hr />
               <SubscriptionsList

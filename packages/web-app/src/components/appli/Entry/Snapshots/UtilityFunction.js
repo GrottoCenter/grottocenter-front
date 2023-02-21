@@ -54,8 +54,7 @@ const SnapshotButton = item => {
   const { id, type, content, isNetwork, showLabel = false, ...grpProps } = item;
   const { formatMessage } = useIntl();
   return (
-    <Tooltip
-      title={formatMessage({ id: 'Access the revisions (history) page' })}>
+    <Tooltip title={formatMessage({ id: 'Access the revision history page' })}>
       <Button
         {...grpProps}
         component={Link}
@@ -64,7 +63,7 @@ const SnapshotButton = item => {
         }`}
         onClick={() => storeInLocalStorage(content)}
         target="_blank"
-        rel="noreferrer"
+        rel="opener"
         startIcon={showLabel && <HistoryIcon />}>
         {showLabel ? formatMessage({ id: 'Revisions' }) : <HistoryIcon />}
       </Button>
@@ -77,14 +76,14 @@ const SnapshotPageButton = ({ id, isNetwork, ...grpProps }) => {
   return (
     <Tooltip
       title={formatMessage({
-        id: 'Page of all revisions (history) for this entrance'
+        id: 'Page of all types of revision history for this entrance'
       })}>
       <Button
         {...grpProps}
         component={Link}
         to={`/ui/entrances/${id}/snapshots?isNetwork=${isNetwork}&all=true`}
         target="_blank"
-        rel="noreferrer"
+        rel="opener"
         startIcon={<TimelineIcon />}>
         {formatMessage({ id: 'All revisions' })}
       </Button>

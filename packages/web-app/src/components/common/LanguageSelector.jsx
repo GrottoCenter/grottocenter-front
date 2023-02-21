@@ -60,6 +60,7 @@ const LanguageSelector = () => {
   const handleChange = event => {
     const { value } = event.target;
     if (value !== locale) {
+      window.localStorage.setItem('selectedLanguage', value);
       dispatch(changeLocale(value));
     }
   };
