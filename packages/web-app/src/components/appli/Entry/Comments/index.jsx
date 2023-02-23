@@ -6,7 +6,6 @@ import { Button, Divider, List, Tooltip } from '@material-ui/core';
 import AddCircleIcon from '@material-ui/icons/AddCircle';
 import CancelIcon from '@material-ui/icons/Cancel';
 
-import styled from 'styled-components';
 import ScrollableContent from '../../../common/Layouts/Fixed/ScrollableContent';
 import { commentsType } from '../Provider';
 import Comment from './Comment';
@@ -15,9 +14,6 @@ import { postComment } from '../../../../actions/Comment/CreateComment';
 import { usePermissions } from '../../../../hooks';
 import Alert from '../../../common/Alert';
 
-const ListStyled = styled(List)`
-  border-top: 1px solid ${props => props.theme.palette.divider};
-`;
 const Comments = ({ entranceId, comments }) => {
   const { formatMessage } = useIntl();
   const permissions = usePermissions();
@@ -73,11 +69,11 @@ const Comments = ({ entranceId, comments }) => {
           )}
 
           {comments.length > 0 ? (
-            <ListStyled dense disablePadding>
+            <List dense disablePadding>
               {comments.map(comment => (
                 <Comment comment={comment} key={comment.id} />
               ))}
-            </ListStyled>
+            </List>
           ) : (
             <Alert
               severity="info"

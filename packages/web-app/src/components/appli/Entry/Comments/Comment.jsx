@@ -25,6 +25,7 @@ import { SnapshotButton } from '../Snapshots/UtilityFunction';
 
 const ListItemStyled = styled(ListItem)`
   flex-direction: column;
+  border-top: 1px solid ${props => props.theme.palette.divider};
 `;
 
 const StyledListItemText = styled(ListItemText)`
@@ -33,11 +34,19 @@ const StyledListItemText = styled(ListItemText)`
 `;
 
 const StyledListItemIcon = styled(ListItemIcon)`
-  flex-shrink: 1;
-  justify-content: flex-end;
+  width: 100%;
   flex-direction: column;
 `;
-
+const StyledRatings = styled(Ratings)`
+  gap: 20px;
+  padding-bottom: 10px;
+`;
+const DurationContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  gap: 20px;
+`;
 const Comment = ({ comment }) => {
   const dispatch = useDispatch();
   const permissions = usePermissions();
@@ -79,7 +88,7 @@ const Comment = ({ comment }) => {
     permissions.isModerator;
   const { formatMessage } = useIntl();
   return (
-    <ListItemStyled disableGutters divider alignItems="flex-start">
+    <ListItemStyled disableGutters alignItems="flex-start">
       <Box sx={{ alignSelf: 'flex-end' }}>
         {!isFormVisible && (
           <ListItemIcon style={{ marginTop: 0 }}>
@@ -144,26 +153,28 @@ const Comment = ({ comment }) => {
             }
           />
           <StyledListItemIcon>
-            <Ratings
+            <StyledRatings
               interest={interest}
               progression={progression}
               access={access}
               size="small"
             />
-            {!!eTTrail && !isEmpty(eTTrail) && (
-              <Duration
-                image="/images/time-to-go.svg"
-                durationStr={eTTrail}
-                title="Time to go"
-              />
-            )}
-            {!!eTUnderground && !isEmpty(eTUnderground) && (
-              <Duration
-                image="/images/underground_time.svg"
-                durationStr={eTUnderground}
-                title="Underground time"
-              />
-            )}
+            <DurationContainer>
+              {!!eTTrail && !isEmpty(eTTrail) && (
+                <Duration
+                  image="/images/time-to-go.svg"
+                  durationStr={eTTrail}
+                  title="Time to go"
+                />
+              )}
+              {!!eTUnderground && !isEmpty(eTUnderground) && (
+                <Duration
+                  image="/images/underground_time.svg"
+                  durationStr={eTUnderground}
+                  title="Underground time"
+                />
+              )}
+            </DurationContainer>
           </StyledListItemIcon>
         </>
       )}

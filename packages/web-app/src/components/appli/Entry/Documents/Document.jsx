@@ -9,19 +9,23 @@ import { SnapshotButton } from '../Snapshots/UtilityFunction';
 
 const StyledListItemText = styled(ListItemText)`
   width: 100%;
-  padding-right: ${({ theme }) => theme.spacing(2)}px;
+  margin: 0;
 `;
 
 const StyledChip = styled(Chip)`
   margin-left: ${({ theme }) => theme.spacing(2)}px;
   padding: 0 ${({ theme }) => theme.spacing(1)}px;
 `;
+const StyledListItem = styled(ListItem)`
+  padding: 4px 0;
+  margin: 0;
+`;
 
 const Document = ({ details, entities, id, overview, snapshot }) => {
   const { formatMessage } = useIntl();
 
   return (
-    <ListItem>
+    <StyledListItem>
       <StyledListItemText
         primary={
           <>
@@ -60,7 +64,7 @@ const Document = ({ details, entities, id, overview, snapshot }) => {
           content={snapshot}
         />
       </ListItemIcon>
-    </ListItem>
+    </StyledListItem>
   );
 };
 

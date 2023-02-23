@@ -6,18 +6,14 @@ import { Rating } from '../../common/Properties';
 
 const RatingWrapper = styled.div`
   display: flex;
-  justify-content: space-evenly;
-  align-items: center;
   flex-wrap: wrap;
-  padding: ${({ theme }) => theme.spacing(2)}px;
-  ${({ size }) => size === 'small' && `flex-direction: column`}
 `;
 
-const Ratings = ({ interest, progression, access, size }) => {
+const Ratings = ({ className, interest, progression, access, size }) => {
   const { formatMessage } = useIntl();
 
   return (
-    <RatingWrapper size={size}>
+    <RatingWrapper className={className}>
       {!!interest && (
         <Rating
           label={formatMessage({ id: 'Interest' })}
@@ -44,6 +40,7 @@ const Ratings = ({ interest, progression, access, size }) => {
 };
 
 Ratings.propTypes = {
+  className: PropTypes.string,
   interest: PropTypes.number,
   progression: PropTypes.number,
   access: PropTypes.number,

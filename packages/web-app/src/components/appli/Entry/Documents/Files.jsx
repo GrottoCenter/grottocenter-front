@@ -18,6 +18,7 @@ const FileListItem = styled(ListItem)`
   & > * {
     margin: 0;
   }
+  padding: 0;
 `;
 
 const Files = ({ fileNames, fileLinks, licenseName, licenseUrl }) =>
