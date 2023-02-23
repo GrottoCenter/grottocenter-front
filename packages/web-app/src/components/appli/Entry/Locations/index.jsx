@@ -6,7 +6,6 @@ import { Button, Divider, List, Tooltip } from '@material-ui/core';
 import AddCircleIcon from '@material-ui/icons/AddCircle';
 import CancelIcon from '@material-ui/icons/Cancel';
 
-import styled from 'styled-components';
 import ScrollableContent from '../../../common/Layouts/Fixed/ScrollableContent';
 import { locationsType } from '../Provider';
 import Location from './Location';
@@ -15,9 +14,6 @@ import { postLocation } from '../../../../actions/Location/CreateLocation';
 import { usePermissions } from '../../../../hooks';
 import Alert from '../../../common/Alert';
 
-const ListStyled = styled(List)`
-  border-top: 1px solid ${props => props.theme.palette.divider};
-`;
 const Locations = ({ entranceId, locations, isSensitive }) => {
   const { formatMessage } = useIntl();
   const permissions = usePermissions();
@@ -68,13 +64,13 @@ const Locations = ({ entranceId, locations, isSensitive }) => {
           )}
 
           {locations.length > 0 ? (
-            <ListStyled dense disablePadding>
+            <List dense disablePadding>
               {locations.map(location => (
                 <React.Fragment key={location.id}>
                   <Location location={location} />
                 </React.Fragment>
               ))}
-            </ListStyled>
+            </List>
           ) : (
             <Alert
               severity={isSensitive ? 'warning' : 'info'}

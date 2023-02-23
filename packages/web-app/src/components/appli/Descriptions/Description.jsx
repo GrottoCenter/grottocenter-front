@@ -23,6 +23,7 @@ import Contribution from '../../common/Contribution/Contribution';
 
 const ListItemStyled = styled(ListItem)`
   flex-direction: column;
+  border-top: 1px solid ${props => props.theme.palette.divider};
 `;
 const Description = ({ description }) => {
   const dispatch = useDispatch();
@@ -44,7 +45,7 @@ const Description = ({ description }) => {
   };
   const { formatMessage } = useIntl();
   return (
-    <ListItemStyled disableGutters divider alignItems="flex-start">
+    <ListItemStyled disableGutters alignItems="flex-start">
       <Box sx={{ alignSelf: 'flex-end' }}>
         {!isFormVisible && (
           <ListItemIcon style={{ marginTop: 0 }}>

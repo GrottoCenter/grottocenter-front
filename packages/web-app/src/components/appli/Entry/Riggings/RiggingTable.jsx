@@ -16,16 +16,33 @@ import PropTypes from 'prop-types';
 import { obstacleType } from '../Provider';
 import { HighLightsLine } from '../../../common/Highlights';
 
-const StyledTableRow = styled(TableRow)(({ theme }) => ({
-  backgroundColor: theme.palette.action.hover
-}));
+const StyledTable = styled(Table)`
+  border-left: 1px solid ${props => props.theme.palette.primary.veryLight};
+`;
+const StyledTableRow = styled(TableRow)`
+  background-color: ${props => props.theme.palette.action.hover};
+`;
+const StyledTableContainer = styled(TableContainer)`
+  overflow-wrap: anywhere;
+  overflow: scroll;
+`;
+const StyledTableCell = styled(TableCell)`
+  border: 1px solid ${props => props.theme.palette.primary.veryLight};
+  padding: 6px !important;
+  min-width: 40px;
+  ${props => ({
+    [props.theme.breakpoints.down('xs')]: {
+      fontSize: '10px'
+    }
+  })};
+`;
 
 const HighligtedTableCell = ({ data, oldData }) => (
-  <TableCell component="th" scope="row">
+  <StyledTableCell component="th" scope="row">
     <span style={{ whiteSpace: 'pre-line' }}>
       {oldData ? <HighLightsLine newText={data} oldText={oldData} /> : data}
     </span>
-  </TableCell>
+  </StyledTableCell>
 );
 
 HighligtedTableCell.propTypes = {
@@ -49,20 +66,22 @@ const RiggingTable = ({ obstacles, title, previous }) => {
       <Box mb={3}>
         <Typography variant="h4">{title}&nbsp;</Typography>
       </Box>
-      <TableContainer>
-        <Table size="small" aria-label="riggings">
+      <StyledTableContainer>
+        <StyledTable size="small" aria-label="riggings">
           <TableHead>
             <TableRow>
-              <TableCell>{formatMessage({ id: 'obstacles' })}</TableCell>
-              <TableCell align="right">
+              <StyledTableCell>
+                {formatMessage({ id: 'obstacles' })}
+              </StyledTableCell>
+              <StyledTableCell>
                 {formatMessage({ id: 'ropes' })}
-              </TableCell>
-              <TableCell align="right">
+              </StyledTableCell>
+              <StyledTableCell>
                 {formatMessage({ id: 'anchors' })}
-              </TableCell>
-              <TableCell align="right">
+              </StyledTableCell>
+              <StyledTableCell>
                 {formatMessage({ id: 'observations' })}
-              </TableCell>
+              </StyledTableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -92,8 +111,8 @@ const RiggingTable = ({ obstacles, title, previous }) => {
               }
             )}
           </TableBody>
-        </Table>
-      </TableContainer>
+        </StyledTable>
+      </StyledTableContainer>
     </Box>
   );
 };

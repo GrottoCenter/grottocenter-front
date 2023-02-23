@@ -39,7 +39,9 @@ const FlexContainer = styled.div`
 const FlexContainerGrow = styled.div`
   flex-grow: 1;
 `;
-
+const StyledRatings = styled(Ratings)`
+  justify-content: space-evenly;
+`;
 const computePrecisionSeverity = precision => {
   if (precision === undefined || precision === null) return 'warning';
   if (precision === 0) return 'error';
@@ -230,7 +232,7 @@ const Properties = () => {
       </Box>
       {(!!access || !!interest || !!progression) && (
         <SmallRatingsWrapper>
-          <Ratings
+          <StyledRatings
             access={access}
             interest={interest}
             progression={progression}

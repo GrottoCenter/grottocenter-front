@@ -16,15 +16,17 @@ function convertMinutes(totalMinutes) {
   return `${hours}:${minutes}:00`;
 }
 
-const HalfSplitContainer = styled.div(
-  ({ theme }) => `
-    display: flex;
-    flex-direction: column;
-    ${theme.breakpoints.up('md')} {
-      flex-direction: row;
-    }
-  `
-);
+const HalfSplitContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+`;
+const DurationContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  gap: 20px;
+  padding-top: 10px;
+`;
 
 const CommentSnapshots = ({ comment, previous }) => {
   const {
@@ -42,28 +44,33 @@ const CommentSnapshots = ({ comment, previous }) => {
     <>
       <GenericSnapshots data={{ body }} previous={previous} />
       <HalfSplitContainer>
-        {!isEmpty(eTTrail) && (
-          <Duration
-            image="/images/time-to-go.svg"
-            durationStr={convertMinutes(pathOr(eTTrail, ['minutes'], eTTrail))}
-            title="Time to go"
-          />
-        )}
-        {!isEmpty(eTUnderground) && (
-          <Duration
-            image="/images/underground_time.svg"
-            durationStr={convertMinutes(
-              pathOr(eTUnderground, ['minutes'], eTUnderground)
-            )}
-            title="Underground time"
-          />
-        )}
         <Ratings
           interest={aestheticism ?? interest}
           progression={caving ?? progression}
           access={approach ?? access}
           size="small"
+          mode="column"
         />
+        <DurationContainer>
+          {!isEmpty(eTTrail) && (
+            <Duration
+              image="/images/time-to-go.svg"
+              durationStr={convertMinutes(
+                pathOr(eTTrail, ['minutes'], eTTrail)
+              )}
+              title="Time to go"
+            />
+          )}
+          {!isEmpty(eTUnderground) && (
+            <Duration
+              image="/images/underground_time.svg"
+              durationStr={convertMinutes(
+                pathOr(eTUnderground, ['minutes'], eTUnderground)
+              )}
+              title="Underground time"
+            />
+          )}
+        </DurationContainer>
       </HalfSplitContainer>
     </>
   );
