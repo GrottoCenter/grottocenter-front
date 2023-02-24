@@ -1,11 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { Link } from 'react-router-dom';
 import {
   AppBar as MuiAppBar,
   Toolbar,
   IconButton,
-  Typography,
-  Link
+  Typography
 } from '@material-ui/core';
 import MenuIcon from '@material-ui/icons/Menu';
 import styled from 'styled-components';
@@ -50,6 +50,12 @@ const RightWrapper = styled.div`
   margin-left: auto;
   display: flex;
 `;
+export const StyledLink = styled(Link)`
+  color: inherit;
+  text-decoration: inherit;
+  cursor: pointer;
+  display: flex;
+`;
 
 const AppBar = ({
   authTokenExpirationDate,
@@ -73,14 +79,14 @@ const AppBar = ({
         <TitleWrapper>
           <LogoWrapper>
             <Typography variant="h4">
-              <Link href="/" color="inherit">
+              <StyledLink to="">
                 <LogoImage
                   id="grottocenter-logo"
                   src={logoGC}
                   alt="Grottocenter"
                 />
                 {!isMobileOnly && `Grottocenter`}
-              </Link>
+              </StyledLink>
             </Typography>
           </LogoWrapper>
         </TitleWrapper>

@@ -62,12 +62,15 @@ export const fseLinks = {
   fr: 'http://eurospeleo.eu/fr/',
   '*': 'http://eurospeleo.eu/en/'
 };
-
+export const wikiLinks = {
+  fr: 'https://wiki.grottocenter.org/wiki/GrottoCenter:Fr/Main_Page_/_Accueil',
+  en: 'https://wiki.grottocenter.org/wiki/GrottoCenter:En/Main_Page_/_Accueil',
+  '*': 'https://wiki.grottocenter.org'
+};
 export const userguideLinks = {
   fr: 'https://wiki.grottocenter.org/wiki/GrottoCenter:Fr/User_Guide',
   '*': 'https://wiki.grottocenter.org/wiki/GrottoCenter:En/User_Guide'
 };
-
 export const wikiBatsLinks = generateLinks(
   'https://wiki.grottocenter.org/wiki/GrottoCenter:%s/bats',
   'en'

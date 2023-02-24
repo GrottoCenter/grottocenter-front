@@ -49,10 +49,6 @@ export const bloggerIcons = {
   '*': 'blogger-En.svg'
 };
 
-// ===== Paypal
-export const paypalId = 'TJEU7C2TZ356Y';
-export const paypalLink = 'https://www.paypal.com/cgi-bin/webscr';
-
 // ===== Misc config values
 export const emailRegexp = /\S+@\S+/; // simple regexp TODO: use another one more robust
 export const PASSWORD_MIN_LENGTH = 8;
