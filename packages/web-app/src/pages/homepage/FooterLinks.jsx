@@ -7,7 +7,7 @@ import {
   contactLinks,
   legalLinks,
   contributorsLink,
-  userguideLinks
+  wikiLinks
 } from '../../conf/externalLinks';
 import Translate from '../../components/common/Translate';
 
@@ -45,8 +45,8 @@ const FooterLinks = () => (
       </SocialGCLink>
     </FooterLinksLi>
     <FooterLinksLi>
-      <SocialIntlLink links={userguideLinks}>
-        <Translate>User guide</Translate>
+      <SocialIntlLink links={wikiLinks}>
+        <Translate>Wiki</Translate>
       </SocialIntlLink>
     </FooterLinksLi>
     <FooterLinksLi>

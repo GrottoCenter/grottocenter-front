@@ -52,7 +52,7 @@ const Dashboard = () => {
           {permissions.isAdmin && (
             <DashboardBlock>
               <Typography variant="h2">
-                {formatMessage({ id: 'Administrator Dashboard' })}
+                {formatMessage({ id: 'Administrator' })}
               </Typography>
               <StyledList cols={3}>
                 <StyledListItem
@@ -70,7 +70,7 @@ const Dashboard = () => {
           {permissions.isModerator && (
             <DashboardBlock>
               <Typography variant="h2">
-                {formatMessage({ id: 'Moderator Dashboard' })}
+                {formatMessage({ id: 'Moderator' })}
               </Typography>
               <StyledList cols={3}>
                 <StyledListItem
@@ -108,7 +108,7 @@ const Dashboard = () => {
           {permissions.isUser && (
             <DashboardBlock>
               <Typography variant="h2">
-                {formatMessage({ id: 'User Dashboard' })}
+                {formatMessage({ id: 'User' })}
               </Typography>
               <StyledList cols={6}>
                 <StyledListItem

@@ -1,10 +1,24 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Typography } from '@material-ui/core';
+import {
+  List,
+  ListItemIcon,
+  ListItemSecondaryAction,
+  ListItemText,
+  Typography
+} from '@material-ui/core';
 import { useIntl } from 'react-intl';
+import { Launch, MenuBook } from '@material-ui/icons';
+import { useSelector } from 'react-redux';
 import InternationalizedLink from '../InternationalizedLink';
-import { licenceLinks, licensesODBLink } from '../../../conf/externalLinks';
+import {
+  licenceLinks,
+  licensesODBLink,
+  userguideLinks
+} from '../../../conf/externalLinks';
 import GCLogo from '../GCLogo';
+import Translate from '../Translate';
+import { StyledListItem } from './styles';
 
 const LogoFooter = styled(GCLogo)`
   & > img {
@@ -23,22 +37,57 @@ const Container = styled.div`
   display: flex;
   flex-direction: row;
   justify-content: space-between;
+  flex-wrap: wrap;
 `;
 
 const Spaced = styled.div`
-  margin-left: 10%;
   text-align: center;
+  flex: 1;
 `;
 
 const AlignText = styled.div`
   padding-top: 10px;
   text-align: center;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+`;
+const WikiContainer = styled.div`
+  margin-top: auto;
+  flex: auto;
+  flex-direction: row;
+  justify-content: space-between;
 `;
 
 const Footer = () => {
   const { formatMessage } = useIntl();
+  const { locale } = useSelector(state => state.intl);
+  const linkUrl =
+    userguideLinks[locale] !== undefined
+      ? userguideLinks[locale]
+      : userguideLinks['*'];
   return (
     <Container>
+      <WikiContainer>
+        <List>
+          <StyledListItem
+            button
+            component="a"
+            href={linkUrl}
+            target="_blank"
+            rel="noreferrer">
+            <ListItemIcon>
+              <MenuBook color="primary" />
+            </ListItemIcon>
+            <ListItemText>
+              <Translate>User guide</Translate>
+            </ListItemText>
+            <ListItemSecondaryAction>
+              <Launch fontSize="small" color="action" />
+            </ListItemSecondaryAction>
+          </StyledListItem>
+        </List>
+      </WikiContainer>
       <AlignText>
         <LogoFooter />
         <Typography variant="caption"> v23.0.0 </Typography>

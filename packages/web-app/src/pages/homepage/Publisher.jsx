@@ -22,6 +22,9 @@ const PublisherWrapper = styled.div`
   font-size: small;
   margin-top: 10px;
 `;
+const StyledInternationalizedLink = styled(InternationalizedLink)`
+  color: inherit;
+`;
 
 const Publisher = () => (
   <PublisherWrapper>
@@ -29,10 +32,10 @@ const Publisher = () => (
       <Translate>Published by</Translate>
     </PublisherInfo>
 
-    <InternationalizedLink links={wikicavesLink}>
+    <StyledInternationalizedLink links={wikicavesLink}>
       <Translate>Wikicaves association</Translate>
       <PublisherLogo showLink={false} />
-    </InternationalizedLink>
+    </StyledInternationalizedLink>
   </PublisherWrapper>
 );
 
