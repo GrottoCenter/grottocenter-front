@@ -81,7 +81,9 @@ const formatAdvancedSearchParams = (values, resourceType) => {
   // according to the search desired
   const paramsToSend = {
     complete: true,
-    resourceType
+    resourceType,
+    from: 0,
+    size: 20
   };
 
   Object.keys(values).forEach(key => {

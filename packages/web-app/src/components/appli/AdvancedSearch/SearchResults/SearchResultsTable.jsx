@@ -28,6 +28,7 @@ import { ADVANCED_SEARCH_TYPES } from '../../../../conf/config';
 const StyledTableFooter = styled.div`
   align-items: center;
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   margin: ${({ theme }) => theme.spacing(2)}px;
 `;
@@ -49,7 +50,7 @@ const styles = () => ({
 
 const DEFAULT_FROM = 0;
 const DEFAULT_PAGE = 0;
-const DEFAULT_SIZE = 10;
+const DEFAULT_SIZE = 20;
 // Don't authorize anyone to download all the database in CSV
 const MAX_NUMBER_OF_DATA_TO_EXPORT_IN_CSV = 10000;
 
@@ -426,6 +427,30 @@ class SearchResultsTable extends React.Component {
             </Table>
 
             <StyledTableFooter>
+              <TablePagination
+                rowsPerPageOptions={[20, 100, 200]}
+                component="div"
+                count={totalNbResults}
+                rowsPerPage={size}
+                page={page}
+                labelRowsPerPage={intl.formatMessage({
+                  id: isMobile ? 'Per page:' : 'Results per page:'
+                })}
+                onPageChange={(event, pageNb) =>
+                  this.handleChangePage(event, pageNb)
+                }
+                onRowsPerPageChange={event =>
+                  this.handleChangeRowsPerPage(event)
+                }
+                ActionsComponent={() => (
+                  <SearchTableActions
+                    page={page}
+                    size={size}
+                    onPageChange={this.handleChangePage}
+                    count={totalNbResults}
+                  />
+                )}
+              />
               <Button
                 disabled={!canDownloadDataAsCSV}
                 type="button"
@@ -444,31 +469,6 @@ class SearchResultsTable extends React.Component {
                     target="_self"
                   />
                 )}
-
-              <TablePagination
-                rowsPerPageOptions={[5, 10, 20]}
-                component="div"
-                count={totalNbResults}
-                rowsPerPage={size}
-                page={page}
-                labelRowsPerPage={intl.formatMessage({
-                  id: 'Results per page:'
-                })}
-                onPageChange={(event, pageNb) =>
-                  this.handleChangePage(event, pageNb)
-                }
-                onRowsPerPageChange={event =>
-                  this.handleChangeRowsPerPage(event)
-                }
-                ActionsComponent={() => (
-                  <SearchTableActions
-                    page={page}
-                    size={size}
-                    onPageChange={this.handleChangePage}
-                    count={totalNbResults}
-                  />
-                )}
-              />
             </StyledTableFooter>
 
             {isLoadingFullData && (
