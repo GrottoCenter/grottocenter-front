@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
-import { MapContainer, FeatureGroup } from 'react-leaflet';
+import { MapContainer, FeatureGroup, ScaleControl } from 'react-leaflet';
 import { EditControl } from 'react-leaflet-draw';
 import { useGeolocation } from 'rooks';
 import L from 'leaflet';
@@ -184,6 +184,7 @@ const PolygonMap = ({ onChange, data }) => {
         />
       </FeatureGroup>
 
+      <ScaleControl position="bottomright" />
       <LayersControl />
     </MapContainer>
   );
