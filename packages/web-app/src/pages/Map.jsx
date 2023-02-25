@@ -1,6 +1,6 @@
 import React, { useEffect, Suspense } from 'react';
 import { includes } from 'ramda';
-import { useHistory, generatePath } from 'react-router-dom';
+import { useHistory, generatePath, useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import PageLoader from '../components/common/PageLoader';
 
@@ -20,12 +20,20 @@ const MapClusters = React.lazy(() =>
   import('../components/common/Maps/MapClusters')
 );
 
-const encodePathLocation = pathLocation =>
-  Buffer.from(pathLocation).toString('base64');
+const encodeMapTarget = (center, zoom) => `${center.lat},${center.lng},${zoom}`;
+
+function decodeMapTarget(target) {
+  if (!target) return null;
+  const [lat, lng, zoom] = target.split(',');
+  if (!lat || !lng || !zoom) return null;
+
+  return { lng, lat, zoom: parseInt(zoom, 10) };
+}
 
 const Map = () => {
   const history = useHistory();
   const dispatch = useDispatch();
+  const params = useParams();
   const {
     location,
     zoom,
@@ -40,13 +48,12 @@ const Map = () => {
   } = useSelector(state => state.map);
   const { open } = useSelector(state => state.sideMenu);
   const { projections } = useSelector(state => state.projections);
+
   const handleUpdate = ({ heat, markers, zoom: newZoom, center, bounds }) => {
-    const encodedPathLocation = encodePathLocation(
-      `lng=${center.lng}&lat=${center.lat}&zoom=${newZoom}`
-    );
-    history.push(
-      generatePath('/ui/map/:target', { target: encodedPathLocation })
-    );
+    const newPath = generatePath('/ui/map/:target', {
+      target: encodeMapTarget(center, newZoom)
+    });
+    history.replace(newPath);
     dispatch(changeLocation(center));
     dispatch(changeZoom(zoom));
 
@@ -78,6 +85,11 @@ const Map = () => {
 
   useEffect(() => {
     dispatch(fetchProjections());
+    const target = decodeMapTarget(params.target);
+    if (!target) return;
+
+    dispatch(changeLocation({ lat: target.lat, lng: target.lng }));
+    dispatch(changeZoom(target.zoom));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

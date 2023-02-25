@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useWatch, useController } from 'react-hook-form';
-import { MapContainer, useMap, useMapEvent } from 'react-leaflet';
+import { MapContainer, useMap, useMapEvent, ScaleControl } from 'react-leaflet';
 import PropTypes from 'prop-types';
 import { isMobile } from 'react-device-detect';
 import styled from 'styled-components';
@@ -118,6 +118,7 @@ const MapMarkerSelector = ({ control, formLatitudeKey, formLongitudeKey }) => {
       doubleClickZoom="center"
       touchZoom="center"
       preferCanvas>
+      <ScaleControl position="bottomright" />
       <LayersControl />
 
       <MapBind center={currentPosition} onMoveEnd={onMoveEnd} />

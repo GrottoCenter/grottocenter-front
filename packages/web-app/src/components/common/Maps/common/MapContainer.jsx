@@ -1,6 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { MapContainer, useMap, useMapEvents } from 'react-leaflet';
+import {
+  MapContainer,
+  useMap,
+  useMapEvents,
+  ScaleControl
+} from 'react-leaflet';
 import PropTypes from 'prop-types';
 import LayersControl from './LayersControl';
 import FullscreenControl from './FullscreenControl';
@@ -96,6 +101,7 @@ const CustomMapContainer = ({
         <FullscreenControl forceSeparateButton="true" />
       )}
       {forceCentering && <Centerer center={center} />}
+      <ScaleControl position="bottomright" />
       <LayersControl />
       {children}
     </MapContainer>
