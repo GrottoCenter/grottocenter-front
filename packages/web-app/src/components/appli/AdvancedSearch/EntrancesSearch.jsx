@@ -17,6 +17,7 @@ import Translate from '../../common/Translate';
 import SearchBottomActionButtons from './SearchBottomActionButtons';
 import SliderForm from './SliderForm';
 import DivingTypesForm from './DivingTypesForm';
+import SliderNonLinearForm from './SliderNonLinearForm';
 
 class EntrancesSearch extends React.Component {
   // TODO: Handle the max of depth and length dynamically
@@ -351,7 +352,7 @@ class EntrancesSearch extends React.Component {
               }
               value={caveIsDiving}
             />
-            <SliderForm
+            <SliderNonLinearForm
               label={intl.formatMessage({
                 id: 'Depth'
               })}
@@ -360,8 +361,6 @@ class EntrancesSearch extends React.Component {
               })}
               disabled={!caveDepthRange.isEditable}
               onDisable={this.handleCheckedChange('cave depth-range')}
-              min={caveDepthMinValue}
-              max={caveDepthMaxValue}
               onChange={values => {
                 this.handleRangeChange(
                   'cave depth-range',
@@ -371,9 +370,10 @@ class EntrancesSearch extends React.Component {
                 );
               }}
               value={[caveDepthRange.min, caveDepthRange.max]}
+              marks={depthMarks}
             />
 
-            <SliderForm
+            <SliderNonLinearForm
               label={intl.formatMessage({
                 id: 'Length'
               })}
@@ -382,8 +382,6 @@ class EntrancesSearch extends React.Component {
               })}
               disabled={!caveLengthRange.isEditable}
               onDisable={this.handleCheckedChange('cave length-range')}
-              min={caveLengthMinValue}
-              max={caveLengthMaxValue}
               onChange={values => {
                 this.handleRangeChange(
                   'cave length-range',
@@ -393,6 +391,7 @@ class EntrancesSearch extends React.Component {
                 );
               }}
               value={[caveLengthRange.min, caveLengthRange.max]}
+              marks={lengthMarks}
             />
           </div>
         </fieldset>
@@ -469,9 +468,70 @@ EntrancesSearch.defaultProps = {
   cavingMaxValue: 10,
 
   caveDepthMinValue: 0,
-  caveDepthMaxValue: 2000,
+  caveDepthMaxValue: 3000,
   caveLengthMinValue: 0,
   caveLengthMaxValue: 700000
 };
+
+const lengthMarks = [
+  {
+    value: 0,
+    scaledValue: 0,
+    label: '0'
+  },
+  {
+    value: 20,
+    scaledValue: 100,
+    label: '100'
+  },
+  {
+    value: 40,
+    scaledValue: 1000,
+    label: '1k'
+  },
+  {
+    value: 60,
+    scaledValue: 10000,
+    label: '10k'
+  },
+  {
+    value: 80,
+    scaledValue: 100000,
+    label: '100k'
+  },
+  {
+    value: 100,
+    scaledValue: 700000,
+    label: '700k'
+  }
+];
+
+const depthMarks = [
+  {
+    value: 0,
+    scaledValue: 0,
+    label: '0'
+  },
+  {
+    value: 25,
+    scaledValue: 50,
+    label: '50'
+  },
+  {
+    value: 50,
+    scaledValue: 500,
+    label: '500'
+  },
+  {
+    value: 75,
+    scaledValue: 1000,
+    label: '1000'
+  },
+  {
+    value: 100,
+    scaledValue: 3000,
+    label: '3000'
+  }
+];
 
 export default injectIntl(withStyles(styles)(EntrancesSearch));
