@@ -9,6 +9,7 @@ import {
 import PropTypes from 'prop-types';
 import LayersControl from './LayersControl';
 import FullscreenControl from './FullscreenControl';
+import LocateControl from './LocateControl';
 
 const Wrapper = styled.div(
   ({ theme, wholePage }) => `
@@ -76,6 +77,7 @@ const CustomMapContainer = ({
   dragging = true,
   scrollWheelZoom = true,
   isSideMenuOpen = false,
+  isLocateControl = false,
   isFullscreenAllowed = true,
   shouldChangeControlInFullscreen = true,
   style,
@@ -101,6 +103,7 @@ const CustomMapContainer = ({
         <FullscreenControl forceSeparateButton="true" />
       )}
       {forceCentering && <Centerer center={center} />}
+      {isLocateControl && <LocateControl />}
       <ScaleControl position="bottomright" />
       <LayersControl />
       {children}
@@ -116,6 +119,7 @@ CustomMapContainer.propTypes = {
   scrollWheelZoom: PropTypes.bool,
   children: PropTypes.node,
   isSideMenuOpen: PropTypes.bool,
+  isLocateControl: PropTypes.bool,
   isFullscreenAllowed: PropTypes.bool,
   shouldChangeControlInFullscreen: PropTypes.bool,
   style: PropTypes.shape({}),
