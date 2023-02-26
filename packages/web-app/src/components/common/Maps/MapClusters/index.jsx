@@ -1,15 +1,13 @@
 import React, { useEffect, useState, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { useMapEvent } from 'react-leaflet';
-import { without, pipe, append, uniq, isNil } from 'ramda';
+import { without, pipe, append, uniq } from 'ramda';
 
 import DataControl, { heatmapTypes } from './DataControl';
 import ConverterControl from '../common/Converter';
 import useHeatLayer, { HexGlobalCss } from './useHeatLayer';
-import useCurrentPosition from './useCurrentPosition';
 import Markers from './Markers';
 import CustomMapContainer from '../common/MapContainer';
-import { LocationMarker } from '../common/Markers/Components';
 import { MARKERS_LIMIT } from './constants';
 
 const ZOOM_STATE = {
@@ -25,8 +23,7 @@ const HydratedMap = ({
   organizations,
   projectionsList,
   zoom,
-  onUpdate,
-  center
+  onUpdate
 }) => {
   const { updateHeatData } = useHeatLayer(entrances);
   const [selectedHeat, setSelectedHeat] = useState('entrances');
@@ -35,7 +32,6 @@ const HydratedMap = ({
   const [visibleMarkers, setVisibleMarkers] = useState(selectedMarkers);
   const zoomState = useRef(ZOOM_STATE.HEAT);
   const prevZoom = useRef(zoom);
-  const currentPosition = useCurrentPosition(center);
 
   const handleUpdateMarkers = newSelection => {
     setSelectedMarkers(newSelection);
@@ -133,7 +129,6 @@ const HydratedMap = ({
         networks={networkMarkers}
         entrances={entranceMarkers}
       />
-      {!isNil(currentPosition) && <LocationMarker position={currentPosition} />}
     </>
   );
 };
@@ -143,7 +138,8 @@ const Index = ({ center, zoom, isSideMenuOpen, ...props }) => (
     center={center}
     zoom={zoom}
     isFullscreenAllowed={false}
-    isSideMenuOpen={isSideMenuOpen}>
+    isSideMenuOpen={isSideMenuOpen}
+    isLocateControl>
     <HydratedMap {...props} zoom={zoom} />
   </CustomMapContainer>
 );
@@ -163,12 +159,12 @@ HydratedMap.propTypes = {
   organizations: PropTypes.arrayOf(markerType),
   projectionsList: PropTypes.arrayOf(PropTypes.shape({})),
   zoom: PropTypes.number.isRequired,
-  onUpdate: PropTypes.func,
-  center: PropTypes.arrayOf(PropTypes.number)
+  onUpdate: PropTypes.func
 };
 
 Index.propTypes = {
   isSideMenuOpen: PropTypes.bool,
+  center: PropTypes.arrayOf(PropTypes.number),
   ...HydratedMap.propTypes
 };
 

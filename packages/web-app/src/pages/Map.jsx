@@ -27,7 +27,11 @@ function decodeMapTarget(target) {
   const [lat, lng, zoom] = target.split(',');
   if (!lat || !lng || !zoom) return null;
 
-  return { lng, lat, zoom: parseInt(zoom, 10) };
+  return {
+    lng: parseFloat(lng),
+    lat: parseFloat(lat),
+    zoom: parseInt(zoom, 10)
+  };
 }
 
 const Map = () => {

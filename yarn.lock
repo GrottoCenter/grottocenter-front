@@ -3834,7 +3834,7 @@ __metadata:
     leaflet: ^1.7.1
     leaflet-draw: ^1.0.4
     leaflet.fullscreen: ^2.4.0
-    leaflet.locatecontrol: ^0.72.0
+    leaflet.locatecontrol: ^0.79.0
     notistack: ^1.0.1
     os-browserify: ^0.3.0
     package: ^1.0.1
@@ -18080,10 +18080,10 @@ fsevents@^1.2.7:
   languageName: node
   linkType: hard
 
-"leaflet.locatecontrol@npm:^0.72.0":
-  version: 0.72.2
-  resolution: "leaflet.locatecontrol@npm:0.72.2"
-  checksum: 1539990dcac4acc288552636b232718725220fb7b01f535ed5959a5f602594c63dcd83a0edd15e33295857d4a577b028422ebd6b41ccd38b2e38b22c6cc62a79
+"leaflet.locatecontrol@npm:^0.79.0":
+  version: 0.79.0
+  resolution: "leaflet.locatecontrol@npm:0.79.0"
+  checksum: d6828ca17ac8e7ab1dd8d42d5e0c83f6314b7e867f02e3336168c5e2b4f430528b434c32d6b4cba3491fc1a2f0bb84c41fd088128ec8ce669c50e8c2baaaf30d
   languageName: node
   linkType: hard
 

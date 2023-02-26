@@ -34,7 +34,7 @@
     "leaflet": "^1.7.1",
     "leaflet-draw": "^1.0.4",
     "leaflet.fullscreen": "^2.4.0",
-    "leaflet.locatecontrol": "^0.72.0",
+    "leaflet.locatecontrol": "^0.79.0",
     "notistack": "^1.0.1",
     "os-browserify": "^0.3.0",
     "package": "^1.0.1",
