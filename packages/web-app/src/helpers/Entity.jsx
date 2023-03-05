@@ -78,8 +78,9 @@ export const entityOptionForSelector = option => {
       iconName = 'massif.svg';
       break;
 
-    // TODO : language icon
-    // case 'language':
+    case 'language':
+      title = option.refName;
+      break;
 
     default:
       break;
