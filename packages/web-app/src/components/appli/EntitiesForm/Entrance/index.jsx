@@ -29,8 +29,7 @@ const defaultCaveValues = {
   depth: '',
   length: '',
   temperature: '',
-  massif: '',
-  country: 'FR'
+  massif: ''
 };
 
 const defaultEntranceValues = {
@@ -41,7 +40,6 @@ const defaultEntranceValues = {
   language: '',
   latitude: '',
   longitude: '',
-  country: 'FR',
   yearDiscovery: ''
 };
 
@@ -87,7 +85,6 @@ export const EntranceForm = ({ caveValues = null, entranceValues = null }) => {
   });
 
   // TODO set latitude & longitude from the selected Entry
-  // TODO set country from position
   useEffect(() => {
     if (isNil(entranceValues?.latitude) || isNil(entranceValues?.longitude)) {
       const values = getValues();

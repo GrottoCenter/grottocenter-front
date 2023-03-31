@@ -22,7 +22,9 @@ const EntranceCaveSnapshots = information => {
   const previousLong = Number(previous?.longitude);
 
   const makeCoordinatesValue = coordinatesValue =>
-    `${formatMessage({ id: 'Lat.' })} / ${formatMessage({ id: 'Long.' })} =
+    `${formatMessage({ id: 'Lat.' })} (N) / ${formatMessage({
+      id: 'Long.'
+    })} (E) =
     ${coordinatesValue[0].toFixed(4)}, ${coordinatesValue[1].toFixed(4)}`;
   return (
     <Box display="flex" flexDirection="column" width="100%">
