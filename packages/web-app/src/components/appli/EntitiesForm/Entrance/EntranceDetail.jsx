@@ -14,7 +14,6 @@ import Translate from '../../../common/Translate';
 import InputCoordinate from '../utils/InputCoordinate';
 import { usePermissions } from '../../../../hooks';
 
-import InputCountry from '../utils/InputCountry';
 import { ENTRANCE_ONLY, ENTRANCE_AND_CAVE } from './caveType';
 import {
   validateLatitude,
@@ -111,7 +110,6 @@ const EntranceDetail = ({ control, errors, getValues }) => {
           helperText={errors?.entrance?.longitude?.message}
           isRequired
         />
-        <InputCountry control={control} formKey="entrance.country" />
         <Controller
           name="entrance.yearDiscovery"
           control={control}

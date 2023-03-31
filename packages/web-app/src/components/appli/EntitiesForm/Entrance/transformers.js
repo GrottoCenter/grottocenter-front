@@ -10,7 +10,6 @@ export const makeEntranceData = (data, entityType) => ({
     text: entityType === ENTRANCE_ONLY ? data.entrance.name : data.cave.name
   },
   cave: data.cave.id,
-  country: data.entrance.country,
   isSensitive: data.entrance.isSensitive,
   longitude: data.entrance.longitude,
   latitude: data.entrance.latitude,
@@ -30,7 +29,6 @@ export const makeCaveData = data => ({
     title: desc.title
   })),
   massif: data.cave.massif,
-  country: data.cave.country,
   depth: Number(data.cave.depth),
   isDiving: data.cave.isDiving,
   length: Number(data.cave.length),
