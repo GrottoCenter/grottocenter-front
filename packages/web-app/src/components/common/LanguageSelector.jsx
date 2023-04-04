@@ -7,26 +7,10 @@ import { isMobileOnly } from 'react-device-detect';
 import { useDispatch, useSelector } from 'react-redux';
 import { changeLocale } from '../../actions/Intl';
 
-const LanguageInput = withStyles(
-  theme => ({
-    root: {
-      background: 'none'
-    },
-    underline: {
-      '&:before,&:hover,&:after,&:focus': {
-        borderColor: `${theme.palette.textIconColor} !important`,
-        background: 'none'
-      }
-    }
-  }),
-  { withTheme: true }
-)(Input);
-
 const StyledSelect = withStyles(
   theme => ({
     root: {
       paddingLeft: '10px',
-      color: theme.palette.onPrimary.main,
       minWidth: isMobileOnly ? 'auto' : '150px',
       width: 'initial'
     },
@@ -40,7 +24,7 @@ const StyledSelect = withStyles(
       }
     },
     icon: {
-      color: theme.palette.onPrimary.main
+      color: theme.palette.type === 'dark' ? 'white' : 'inherit'
     }
   }),
   { withTheme: true }
@@ -78,10 +62,7 @@ const LanguageSelector = () => {
       ) : (
         <LanguageIcon />
       )}
-      <StyledSelect
-        value={locale}
-        onChange={handleChange}
-        input={<LanguageInput />}>
+      <StyledSelect value={locale} onChange={handleChange} input={<Input />}>
         {items}
       </StyledSelect>
     </Wrapper>

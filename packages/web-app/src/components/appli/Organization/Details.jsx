@@ -7,9 +7,11 @@ import styled from 'styled-components';
 import EmailIcon from '@material-ui/icons/Email';
 import LocationIcon from '@material-ui/icons/LocationOn';
 
+import { FlagRounded } from '@material-ui/icons';
 import CustomMapContainer from '../../common/Maps/common/MapContainer';
 import OrganizationMarker from '../../common/Maps/common/Markers/Components/OrganizationMarker';
 import OrganizationPopup from '../../common/Maps/common/Markers/Components/OrganizationPopup';
+import { Property } from '../../common/Properties';
 
 const ContentWrapper = styled.div`
   display: flex;
@@ -50,12 +52,20 @@ const Details = ({
             {!isNil(address) && `${address}`}
             {!isNil(postalCode) && ` ${postalCode}`}
             {!isNil(city) && ` ${city}`}
-            {!isNil(country) && ` ${country}`}
             {!isNil(village) && ` - ${village}`}
             {!isNil(county) && ` - ${county}`}
             {!isNil(region) && ` - ${region}`}
           </Typography>
         </ContentWrapper>
+        {!isNil(country) && (
+          <Property
+            label=""
+            value={country}
+            url={`/ui/countries/${country}`}
+            icon={<FlagRounded fontSize="large" color="primary" />}
+            secondary
+          />
+        )}
         {mail && (
           <ContentWrapper>
             <StyledEmailIcon color="primary" />

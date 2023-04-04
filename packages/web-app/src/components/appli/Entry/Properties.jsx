@@ -12,7 +12,8 @@ import {
   Title,
   Waves,
   Place,
-  Map
+  Map,
+  FlagRounded
 } from '@material-ui/icons';
 import Alert from '../../common/Alert';
 import CustomIcon from '../../common/CustomIcon';
@@ -61,7 +62,9 @@ const Properties = () => {
         interest,
         progression,
         isDivingCave,
-        localisation,
+        country,
+        city,
+        region,
         massif,
         precision,
         temperature,
@@ -144,29 +147,51 @@ const Properties = () => {
           </FlexContainer>
         )}
         <Alert severity={precisionSeverity} content={precisionText} />
-        <Property
-          loading={loading}
-          label={formatMessage({ id: 'Location' })}
-          value={localisation}
-          icon={<Public fontSize="large" color="primary" />}
-          secondary
-        />
-        {massif && (
+        <Box
+          display="flex"
+          flexDirection="row"
+          flexWrap="wrap"
+          justifyContent="flex-start">
           <Property
-            label={formatMessage({ id: 'Massif' })}
-            value={massif.name}
-            icon={<Terrain fontSize="large" color="primary" />}
-            url={`/ui/massifs/${massif.id}`}
+            loading={loading}
+            label={formatMessage({ id: 'Country' })}
+            value={country}
+            url={`/ui/countries/${country}`}
+            icon={<FlagRounded fontSize="large" color="primary" />}
+            secondary
           />
-        )}
-        {cave && cave.entrances.length > 1 && (
           <Property
-            label={formatMessage({ id: 'Cave' })}
-            value={`${cave.name}`}
-            icon={<CustomIcon type="cave_system" />}
-            url={`/ui/caves/${cave.id}`}
+            flexBasis="fill"
+            loading={loading}
+            label={formatMessage({ id: 'Location' })}
+            value={[city, region].flatMap(f => (f ? [f] : [])).join(', ')}
+            icon={<Public fontSize="large" color="primary" />}
+            secondary
           />
-        )}
+        </Box>
+        <Box
+          display="flex"
+          flexDirection="row"
+          flexWrap="wrap"
+          justifyContent="flex-start">
+          {massif && (
+            <Property
+              label={formatMessage({ id: 'Massif' })}
+              value={massif.name}
+              icon={<Terrain fontSize="large" color="primary" />}
+              url={`/ui/massifs/${massif.id}`}
+            />
+          )}
+          {cave && cave.entrances.length > 1 && (
+            <Property
+              flexBasis="fit-content"
+              label={formatMessage({ id: 'Cave' })}
+              value={`${cave.name}`}
+              icon={<CustomIcon type="cave_system" />}
+              url={`/ui/caves/${cave.id}`}
+            />
+          )}
+        </Box>
       </Box>
       <Box
         display="flex"

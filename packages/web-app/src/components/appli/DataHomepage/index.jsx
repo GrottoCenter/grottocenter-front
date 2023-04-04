@@ -17,6 +17,7 @@ import DataCard from './components/DataCard';
 import DataLine from './components/DataLine';
 
 import './style.css';
+import GCLink from '../../common/GCLink';
 
 const SectionTitle = withStyles(
   theme => ({
@@ -43,6 +44,9 @@ const BlockIcon = withTheme(styled.span`
     vertical-align: top;
   }
 `);
+const StyledLink = styled(GCLink)`
+  text-decoration: none;
+`;
 
 const DataHomepage = () => {
   const { formatMessage } = useIntl();
@@ -149,17 +153,19 @@ const DataHomepage = () => {
 
           <Grid item xs={12} sm={4}>
             {countries && (
-              <DataCard
-                isColored
-                icon={<Language style={{ fontSize: 55 }} color="primary" />}
-                numberData={countries.number}
-                isFetching={countries.isFetching}
-                title={formatMessage({ id: 'countries' })}
-                globalText={formatMessage({
-                  id: 'are represented on this website.'
-                })}
-                width="36%"
-              />
+              <StyledLink internal href="/ui/countries">
+                <DataCard
+                  isColored
+                  icon={<Language style={{ fontSize: 55 }} color="primary" />}
+                  numberData={countries.number}
+                  isFetching={countries.isFetching}
+                  title={formatMessage({ id: 'countries' })}
+                  globalText={formatMessage({
+                    id: 'are represented on this website.'
+                  })}
+                  width="36%"
+                />
+              </StyledLink>
             )}
           </Grid>
           <Grid item xs={12} sm={4}>

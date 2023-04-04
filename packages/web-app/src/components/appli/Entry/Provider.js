@@ -17,7 +17,9 @@ const defaultContext = {
       accessRate: 5,
       interest: 5,
       progression: 5,
-      localisation: 'France',
+      country: 'France',
+      city: 'Paris',
+      region: '',
       name: 'Cavité'
     },
     comments: [],
@@ -51,7 +53,9 @@ const Entry = ({
   useEffect(() => {
     setState({
       name: pathOr('Name', ['name'], details),
-      localisation: pathOr('Localisation', ['localisation'], details),
+      city: pathOr('', ['city'], details),
+      region: pathOr('', ['region'], details),
+      country: pathOr('', ['country'], details),
       depth: pathOr(0, ['depth'], details),
       development: pathOr(0, ['development'], details),
       interest: pathOr(0, ['interest'], details),
@@ -115,7 +119,8 @@ export const detailsType = PropTypes.shape({
   isDivingCave: PropTypes.bool,
   isSensitive: PropTypes.bool,
   lastEditor: PropTypes.string,
-  localisation: PropTypes.string,
+  city: PropTypes.string,
+  region: PropTypes.string,
   massif: idNameType,
   name: PropTypes.string,
   progression: PropTypes.number,

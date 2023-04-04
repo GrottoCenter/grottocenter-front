@@ -5,12 +5,14 @@ import {
   AppBar as MuiAppBar,
   Toolbar,
   IconButton,
-  Typography
+  Typography,
+  ThemeProvider,
+  Fade
 } from '@material-ui/core';
 import MenuIcon from '@material-ui/icons/Menu';
 import styled from 'styled-components';
-import { isMobileOnly } from 'react-device-detect';
 
+import { createTheme } from '@material-ui/core/styles';
 import LanguageSelector from '../LanguageSelector';
 import UserMenu from './User';
 import { logoGC } from '../../../conf/config';
@@ -23,10 +25,16 @@ const StyledMuiAppBar = styled(MuiAppBar)`
 const LanguageWrapper = styled.div`
   height: 56px;
   padding: ${props => props.theme.spacing(2)}px;
+  ${props => props.theme.breakpoints.down('xs')} {
+    display: none;
+  }
 `;
 
 const SearchWrapper = styled.div`
   padding: ${props => props.theme.spacing(2)}px;
+  ${props => props.theme.breakpoints.down('xs')} {
+    display: none;
+  }
 `;
 
 const TitleWrapper = styled.div`
@@ -41,10 +49,23 @@ const LogoWrapper = styled.div`
   align-items: baseline;
 `;
 
-const LogoImage = styled.img`
-  height: ${isMobileOnly ? '25' : '30'}px;
-  padding-right: ${props => props.theme.spacing(2)}px;
-`;
+const LogoImage = styled.img(
+  ({ theme }) => `
+  padding-right: ${theme.spacing(2)}px;
+  height: 30px;
+  ${theme.breakpoints.down('xs')} {
+    height: 25px;
+  }
+`
+);
+
+const GrottoTxt = styled.div(
+  ({ theme }) => `
+  ${theme.breakpoints.down('xs')} {
+    display: none;
+  }
+`
+);
 
 const RightWrapper = styled.div`
   margin-left: auto;
@@ -64,7 +85,8 @@ const AppBar = ({
   onLoginClick,
   onLogoutClick,
   toggleMenu,
-  userNickname
+  userNickname,
+  isSideMenuOpen
 }) => (
   <>
     <StyledMuiAppBar>
@@ -85,20 +107,35 @@ const AppBar = ({
                   src={logoGC}
                   alt="Grottocenter"
                 />
-                {!isMobileOnly && `Grottocenter`}
+                <GrottoTxt>Grottocenter</GrottoTxt>
               </StyledLink>
             </Typography>
           </LogoWrapper>
         </TitleWrapper>
         <RightWrapper>
-          {!!AutoCompleteSearch && !isMobileOnly && (
-            <SearchWrapper>
-              <AutoCompleteSearch />
-            </SearchWrapper>
+          {!!AutoCompleteSearch && (
+            <>
+              <SearchWrapper>
+                <AutoCompleteSearch />
+              </SearchWrapper>
+              <Fade in={!isSideMenuOpen}>
+                <LanguageWrapper>
+                  <ThemeProvider
+                    theme={theme =>
+                      createTheme({
+                        ...theme,
+                        palette: {
+                          ...theme.palette,
+                          type: 'dark'
+                        }
+                      })
+                    }>
+                    <LanguageSelector />
+                  </ThemeProvider>
+                </LanguageWrapper>
+              </Fade>
+            </>
           )}
-          <LanguageWrapper>
-            <LanguageSelector />
-          </LanguageWrapper>
         </RightWrapper>
         <NotificationMenu />
         <UserMenu
@@ -125,7 +162,8 @@ AppBar.propTypes = {
   isAuth: PropTypes.bool.isRequired,
   onLoginClick: PropTypes.func.isRequired,
   onLogoutClick: PropTypes.func.isRequired,
-  userNickname: PropTypes.string
+  userNickname: PropTypes.string,
+  isSideMenuOpen: PropTypes.bool.isRequired
 };
 
 export default AppBar;
