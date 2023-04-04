@@ -4,6 +4,7 @@ import LibraryAddIcon from '@material-ui/icons/LibraryAdd';
 import DashboardIcon from '@material-ui/icons/Dashboard';
 import MapIcon from '@material-ui/icons/Map';
 import SearchIcon from '@material-ui/icons/Search';
+import { FlagRounded } from '@material-ui/icons';
 import Item, { DocumentItems } from './Items';
 
 import { usePermissions } from '../../../hooks';
@@ -38,6 +39,11 @@ const MenuLinks = () => {
           href="/ui"
         />
       )}
+      <Item
+        ItemIcon={() => <FlagRounded color="primary" />}
+        label="Countries"
+        href="/ui/countries"
+      />
     </List>
   );
 };

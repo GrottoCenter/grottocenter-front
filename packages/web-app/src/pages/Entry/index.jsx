@@ -6,8 +6,8 @@ import Entry from '../../components/appli/Entry';
 import { fetchEntrance } from '../../actions/Entrance/GetEntrance';
 import {
   getComments,
-  getDetails,
   getDescriptions,
+  getDetails,
   getDocuments,
   getHistories,
   getLocations,
@@ -17,11 +17,8 @@ import Deleted, {
   DELETED_ENTITIES
 } from '../../components/common/card/Deleted';
 
-const isUpdateSuccessful = (error, loading, prevLoading) => {
-  const updateTerminatedWithSuccess =
-    prevLoading.current === true && loading === false && error === null;
-  return updateTerminatedWithSuccess;
-};
+const isUpdateSuccessful = (error, loading, prevLoading) =>
+  prevLoading.current === true && loading === false && error === null;
 
 const EntryPage = () => {
   const { id } = useParams();
@@ -83,7 +80,7 @@ const EntryPage = () => {
     <Deleted
       redirectTo={data.redirectTo}
       entity={DELETED_ENTITIES.entrance}
-      location={details.localisation}
+      location={details.country}
       name={data.name}
       creationDate={data.dateInscription}
       dateReviewed={data.dateReviewed}

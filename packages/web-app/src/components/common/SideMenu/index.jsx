@@ -5,6 +5,7 @@ import styled from 'styled-components';
 import Translate from '../Translate';
 import MenuLinks from './MenuLinks';
 import Footer from './Footer';
+import LanguageSelector from '../LanguageSelector';
 
 const Wrapper = styled.div`
   display: flex;
@@ -18,6 +19,7 @@ const SideMenu = ({ isOpen, toggle, isAuth = false, AutoCompleteSearch }) => (
     <Divider />
     <MenuLinks />
     <Footer />
+    {!!AutoCompleteSearch && <LanguageSelector />}
   </Drawer>
 );
 

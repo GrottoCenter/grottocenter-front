@@ -18,8 +18,9 @@ const today = new Date();
 
 const details = {
   name: 'Petit Saint-Cassien (Gouffre du)',
-  localisation:
-    "Nans-les-Pins, Var (83), Provence-Alpes-Côte d'Azur (PAC), FRANCE",
+  country: 'FRANCE',
+  city: 'Nans-les-Pins',
+  region: "Provence-Alpes-Côte d'Azur (PAC)",
   depth: 403,
   development: 10865,
   interest: 7,

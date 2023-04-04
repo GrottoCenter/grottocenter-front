@@ -43,6 +43,7 @@ import CountryPage from './Country';
 import NotificationsPage from './Notifications';
 import SnapshotPage from '../components/appli/Entry/Snapshots';
 import EntrancesListPage from './EntrancesList';
+import CountryListPage from './CountryList';
 
 async function transitionToReact() {
   await intlBootstrap.initialFetchP; // Make sure strings of the initial locale are loaded
@@ -98,7 +99,8 @@ const Application = () => {
           path="/ui/countries/:countryId/entrances"
           component={EntrancesListPage}
         />
-        <Route path="/ui/countries/:id?" component={CountryPage} />
+        <Route path="/ui/countries/:id" component={CountryPage} />
+        <Route path="/ui/countries" component={CountryListPage} />
         <Route path="/ui/faq" component={Faq} />
         <Route path="/ui/map/:target?" component={Map} />
         <Route path="/ui/contributions" component={ContributionsPage} />

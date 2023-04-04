@@ -50,7 +50,8 @@ export const getDetails = data => ({
   isDivingCave: pathOr(null, ['cave', 'isDiving'], data),
   isSensitive: data.isSensitive,
   language: pathOr(undefined, ['names', 0, 'language'], data),
-  localisation: `${data.city}, ${data.region}, ${data.country}`, // TODO rename to location
+  city: data.city,
+  region: data.region,
   massif: pathOr(undefined, ['massifs', 0], data),
   massifs: data.massifs,
   mountain: pathOr(null, ['massif', 'name'], data),

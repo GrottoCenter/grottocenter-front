@@ -48,6 +48,7 @@ const AppBar = ({ toggleSideMenu, isSideMenuOpen, HeaderQuickSearch }) => {
           HeaderQuickSearch={HeaderQuickSearch}
         />
       )}
+      isSideMenuOpen={isSideMenuOpen}
       isAuth={permissions.isAuth}
       onLoginClick={onLoginClick}
       onLogoutClick={onLogoutClick}
