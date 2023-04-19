@@ -49,14 +49,14 @@ const HydratedEntranceDuplicates = ({
   }, [currentDuplicate]);
 
   useEffect(() => {
-    if (httpCodeUpdateEntry === 200) {
+    if ([200, 204].includes(httpCodeUpdateEntry)) {
       dispatch(deleteDuplicate(currentDuplicateId, 'entrance'));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [httpCodeUpdateEntry]);
 
   useEffect(() => {
-    if (latestHttpCodeOnDelete === 200) {
+    if ([200, 204].includes(latestHttpCodeOnDelete)) {
       onSuccessSubmit();
       setCurrentDuplicate(currentDuplicate + 1);
     }
@@ -64,7 +64,7 @@ const HydratedEntranceDuplicates = ({
   }, [latestHttpCodeOnDelete]);
 
   useEffect(() => {
-    if (latestHttpCodeOnCreate === 200) {
+    if ([200, 204].includes(latestHttpCodeOnCreate)) {
       onSuccessNotDuplicateSubmit();
       setCurrentDuplicate(currentDuplicate + 1);
     }

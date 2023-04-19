@@ -192,16 +192,16 @@ const DocumentsHandler = ({
 
   return (
     <Grid container direction="column" alignItems="center">
+      <ActionLine
+        handleSubmit={onSubmit}
+        handleNotDuplicatesSubmit={onNotDuplicatesSubmit}
+        disableSubmit={!isSubmittable()}
+      />
       <TitleLine
         title1={title1}
         title2={title2}
         handleAllClick1={() => handleAllClick(duplicate1)}
         handleAllClick2={() => handleAllClick(duplicate2)}
-      />
-      <ActionLine
-        handleSubmit={onSubmit}
-        handleNotDuplicatesSubmit={onNotDuplicatesSubmit}
-        disableSubmit={!isSubmittable()}
       />
       {documentsSchema.map(line => {
         if (

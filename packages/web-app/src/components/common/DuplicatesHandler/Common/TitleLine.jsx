@@ -44,11 +44,6 @@ const TitleLine = ({ title1, title2, handleAllClick1, handleAllClick2 }) => {
         <Title>{formatMessage({ id: 'Final result' })}</Title>
       </Grid>
       <Grid container item xs={4} justifyContent="flex-end">
-        <ActionButton
-          label={formatMessage({ id: 'Take all' })}
-          onClick={handleAllClick2}
-          style={{ marginRight: margin }}
-        />
         <Title>
           {formatMessage(
             {
@@ -60,6 +55,11 @@ const TitleLine = ({ title1, title2, handleAllClick1, handleAllClick2 }) => {
             }
           )}
         </Title>
+        <ActionButton
+          label={formatMessage({ id: 'Take all' })}
+          onClick={handleAllClick2}
+          style={{ marginRight: margin }}
+        />
       </Grid>
     </StyledGrid>
   );
