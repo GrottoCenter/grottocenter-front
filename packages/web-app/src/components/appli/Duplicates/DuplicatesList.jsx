@@ -64,7 +64,7 @@ const DuplicatesList = ({
   }, [duplicatesList]);
 
   useEffect(() => {
-    if (latestHttpCodeOnDelete === 200) {
+    if ([200, 204].includes(latestHttpCodeOnDelete)) {
       const criteria = {
         limit: rowsPerPage,
         skip: page * rowsPerPage,

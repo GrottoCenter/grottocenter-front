@@ -67,14 +67,14 @@ const HydratedDocumentDuplicates = ({
   }, [currentDuplicate]);
 
   useEffect(() => {
-    if (latestHttpCode === 200) {
+    if ([200, 204].includes(latestHttpCode)) {
       dispatch(deleteDuplicate(currentDuplicateId, 'document'));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [latestHttpCode]);
 
   useEffect(() => {
-    if (latestHttpCodeOnDelete === 200) {
+    if ([200, 204].includes(latestHttpCodeOnDelete)) {
       onSuccessSubmit();
       setCurrentDuplicate(currentDuplicate + 1);
     }
@@ -82,7 +82,7 @@ const HydratedDocumentDuplicates = ({
   }, [latestHttpCodeOnDelete]);
 
   useEffect(() => {
-    if (latestHttpCodeOnCreate === 200) {
+    if ([200, 204].includes(latestHttpCodeOnCreate)) {
       onSuccessNotDuplicateSubmit();
       setCurrentDuplicate(currentDuplicate + 1);
     }
