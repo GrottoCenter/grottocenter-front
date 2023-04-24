@@ -6,6 +6,7 @@ import { updateName } from '../../../../actions/Name';
 import { postOrganization } from '../../../../actions/Organization/CreateOrganization';
 import { updateOrganization } from '../../../../actions/Organization/UpdateOrganization';
 import FormProgressInfo from '../utils/FormProgressInfo';
+import { normelizeCoordinate } from '../utils/InputCoordinate';
 import OrganizationFields from './OrganizationFields';
 import LicenseBox from '../utils/LicenseBox';
 import {
@@ -68,6 +69,17 @@ export const OrganizationForm = ({ organizationValues = null }) => {
   }, [organizationValues, reset]);
 
   const onSubmit = async data => {
+    /* eslint-disable no-param-reassign */
+    if (data?.organization?.longitude)
+      data.organization.longitude = normelizeCoordinate(
+        data.organization.longitude
+      );
+    if (data?.organization?.latitude)
+      data.organization.latitude = normelizeCoordinate(
+        data.organization.latitude
+      );
+    /* eslint-enable no-param-reassign */
+
     if (isNewOrganization) {
       const organizationToPost = makePostOrganizationData(data);
       dispatch(postOrganization(organizationToPost));

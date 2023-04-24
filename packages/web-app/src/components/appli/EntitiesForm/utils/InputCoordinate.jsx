@@ -4,6 +4,14 @@ import { Controller } from 'react-hook-form';
 import { useIntl } from 'react-intl';
 import { TextField } from '@material-ui/core';
 
+// The InputCoordinate input accept coordinate with ',' or '.'
+// But the api only accept notation with '.'
+// So before submitting to the api, coordinates must be normalised
+export function normelizeCoordinate(coordStr) {
+  if (typeof coordStr != 'string') return coordStr;
+  return coordStr.replace(',', '.');
+}
+
 const InputCoordinate = ({
   formKey,
   labelName,
