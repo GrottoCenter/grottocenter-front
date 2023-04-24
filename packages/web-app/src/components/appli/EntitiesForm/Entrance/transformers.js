@@ -28,11 +28,8 @@ export const makeCaveData = data => ({
     language: data.language,
     title: desc.title
   })),
-  massif: data.cave.massif,
   depth: Number(data.cave.depth),
   isDiving: data.cave.isDiving,
   length: Number(data.cave.length),
-  longitude: data.cave.longitude,
-  latitude: data.cave.latitude,
   temperature: Number(data.cave.temperature)
 });

@@ -13,6 +13,7 @@ import {
 } from '../../../../actions/CaveAndEntrance';
 
 import { FormContainer, FormActionRow } from '../utils/FormContainers';
+import { normelizeCoordinate } from '../utils/InputCoordinate';
 import LicenseBox from '../utils/LicenseBox';
 import FormProgressInfo from '../utils/FormProgressInfo';
 import EditTypeSelection from './EditTypeSelection';
@@ -109,6 +110,13 @@ export const EntranceForm = ({ caveValues = null, entranceValues = null }) => {
   }, [reset]);
 
   const onSubmit = async data => {
+    /* eslint-disable no-param-reassign */
+    if (data?.entrance?.longitude)
+      data.entrance.longitude = normelizeCoordinate(data.entrance.longitude);
+    if (data?.entrance?.latitude)
+      data.entrance.latitude = normelizeCoordinate(data.entrance.latitude);
+    /* eslint-enable no-param-reassign */
+
     const caveData = {
       ...makeCaveData(data),
       id: caveValues?.id
