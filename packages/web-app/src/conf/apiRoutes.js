@@ -196,3 +196,5 @@ export const associateDocumentToEntranceUrl = (entranceId, documentId) =>
   `${API_BASE_PATH}/entrances/${entranceId}/documents/${documentId}`;
 export const moveEntranceToCaveUrl = (entranceId, caveId) =>
   `${API_BASE_PATH}/entrances/${entranceId}/cave/${caveId}`;
+
+export const getRecentChanges = `${API_BASE_PATH}/changes/recent`;

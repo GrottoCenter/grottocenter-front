@@ -51,6 +51,7 @@ import projections from './Projections';
 import quicksearch from './QuicksearchReducer';
 import randomEntrance from './RandomEntranceReducer';
 import readNotification from './ReadNotificationReducer';
+import recentChange from './RecentChangeReducer';
 import region from './RegionReducer';
 import sideMenu from './SideMenuReducer';
 import signUp from './SignUpReducer';
@@ -129,6 +130,7 @@ const GCReducer = combineReducers({
   quicksearch,
   randomEntrance,
   readNotification,
+  recentChange,
   region,
   sideMenu,
   signUp,

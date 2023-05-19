@@ -9,6 +9,7 @@ import Welcome from './Welcome';
 import LatestBlogNewsSection from './LatestBlogNewsSection';
 import Association from './Association';
 import RandomEntry from './RandomEntry';
+import RecentChanges from './RecentChanges';
 import PartnersSection from './PartnersSection';
 import Footer from './Footer';
 
@@ -36,6 +37,7 @@ const HomePage = () => {
       <Welcome />
       <DataHomepage />
       <RandomEntry />
+      <RecentChanges />
       <LatestBlogNewsSection />
       <Association />
       <PartnersSection />
