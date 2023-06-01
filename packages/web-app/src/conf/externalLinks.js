@@ -92,11 +92,6 @@ export const contributeLinks = {
   '*': 'http://en.wikicaves.org/contribute-participer'
 };
 
-export const restApiLinks = {
-  fr: 'https://fr.wikipedia.org/wiki/Representational_state_transfer',
-  '*': 'https://en.wikipedia.org/wiki/Representational_state_transfer'
-};
-
 export const wikiApiLinks = {
   fr: 'https://fr.wikipedia.org/wiki/Interface_de_programmation',
   '*': 'https://en.wikipedia.org/wiki/Application_programming_interface'

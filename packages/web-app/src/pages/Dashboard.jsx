@@ -1,14 +1,17 @@
 import React, { useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import { useIntl } from 'react-intl';
 import { useHistory } from 'react-router-dom';
-import { List, ListItem, Typography } from '@material-ui/core';
+import { List, ListItem, Typography, Button } from '@material-ui/core';
 import CallMergeIcon from '@material-ui/icons/CallMerge';
 import PeopleIcon from '@material-ui/icons/People';
 import DocumentListIcon from '@material-ui/icons/PlaylistAddCheck';
 import ListAltIcon from '@material-ui/icons/ListAlt';
 import PublishIcon from '@material-ui/icons/Publish';
+import ArchiveIcon from '@material-ui/icons/Archive';
 import NotificationsIcon from '@material-ui/icons/Notifications';
 import styled from 'styled-components';
+import { fetchDBExportUrl } from '../actions/DBExport';
 
 import { usePermissions } from '../hooks';
 import Layout from '../components/common/Layouts/Fixed/FixedContent';
@@ -25,6 +28,10 @@ const StyledListItem = styled(ListItem)`
   margin: ${props => props.theme.spacing(2)}px;
 `;
 
+const StyledListItemDBExport = styled(StyledListItem)`
+  min-width: 215px;
+`;
+
 const DashboardBlock = styled.div`
   margin-bottom: ${props => props.theme.spacing(4)}px;
 `;
@@ -33,16 +40,23 @@ const Dashboard = () => {
   const { formatMessage } = useIntl();
   const history = useHistory();
   const permissions = usePermissions();
+  const dispatch = useDispatch();
+  const dbExport = useSelector(state => state.dbExport);
 
-  const handleOnListItemClick = url => {
-    history.push(url);
-  };
+  const handleOnListItemClick = url => history.push(url);
 
   useEffect(() => {
     if (!permissions.isAuth) {
       history.push('');
     }
   }, [permissions, history]);
+
+  useEffect(() => {
+    if (permissions.isLeader) {
+      dispatch(fetchDBExportUrl());
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dispatch]);
 
   return (
     <Layout
@@ -102,6 +116,41 @@ const Dashboard = () => {
                     {formatMessage({ id: 'Duplicates Tool' })}
                   </Typography>
                 </StyledListItem>
+              </StyledList>
+            </DashboardBlock>
+          )}
+          {permissions.isLeader && (
+            <DashboardBlock>
+              <Typography variant="h2" id="leader">
+                {formatMessage({ id: 'Leader' })}
+              </Typography>
+
+              <StyledList cols={6}>
+                <StyledListItemDBExport key="leader-db-snapshot">
+                  <Typography variant="h4" align="center">
+                    {formatMessage({ id: 'Database export' })}
+                  </Typography>
+                  <br />
+                  <Button
+                    variant="outlined"
+                    size="small"
+                    onClick={() => window.open(dbExport.url, '_blank')}
+                    startIcon={<ArchiveIcon color="primary" />}>
+                    Download
+                  </Button>
+                  <br />
+                  <Typography variant="body2">
+                    {formatMessage({ id: 'Last update' })}:{' '}
+                    {dbExport.lastUpdate.split('T')[0]}
+                  </Typography>
+                  <Typography variant="body2">
+                    {formatMessage({ id: 'Size' })}:{' '}
+                    {Math.round((dbExport.size * 10) / (1024 * 1024)) / 10} Mo
+                  </Typography>
+                  <Typography variant="body2">
+                    {formatMessage({ id: 'License: CC-BY-SA' })}
+                  </Typography>
+                </StyledListItemDBExport>
               </StyledList>
             </DashboardBlock>
           )}

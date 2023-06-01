@@ -145,6 +145,7 @@ export const postPersonUrl = `${API_BASE_PATH}/cavers`;
 export const postPersonGroupsUrl = userId =>
   `${API_BASE_PATH}/cavers/${userId}/groups`;
 export const putCaverUrl = userId => `${API_BASE_PATH}/cavers/${userId}`;
+export const getDbExportUrls = `${API_BASE_PATH}/cavers/export/db`;
 
 // ===== RSS urls
 export const frenchRssUrl = `${API_URL}/api/rss/FR`;
