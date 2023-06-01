@@ -1,50 +1,31 @@
 import React from 'react';
-import { withStyles, lighten } from '@material-ui/core/styles';
-import { Grid, Typography } from '@material-ui/core';
-import CheckIcon from '@material-ui/icons/Check';
+import { Grid, Typography, Button } from '@material-ui/core';
 import styled from 'styled-components';
 import { useSelector } from 'react-redux';
 import { useIntl } from 'react-intl';
+import { useHistory } from 'react-router-dom';
 
 import GCLink from '../common/GCLink';
 import InternationalizedLink from '../common/InternationalizedLink';
-import {
-  restApiLinks,
-  wikiApiLinks,
-  contactLinks
-} from '../../conf/externalLinks';
+import { wikiApiLinks, contactLinks } from '../../conf/externalLinks';
 import Translate from '../common/Translate';
 import Layout from '../common/Layouts/Fixed/FixedContent';
 
-const StyledLinkToVersion = styled(GCLink)`
-  text-decoration: none;
-  font-weight: 600;
-  color: ${props => props.theme.palette.accent1Color};
-  &:hover {
-    color: ${props => lighten(props.theme.palette.accent1Color, 0.3)};
-  }
+const PaddedButton = styled(Button)`
+  margin-top: 1em;
+  margin-bottom: 2em;
+  text-align: center;
 `;
-
-const StyledCheckIcon = withStyles(
-  theme => ({
-    root: {
-      fill: theme.palette.accent1Color,
-      position: 'relative',
-      top: '6px',
-      marginRight: '10px'
-    }
-  }),
-  { withTheme: true }
-)(CheckIcon);
 
 const Api = () => {
   const { formatMessage } = useIntl();
+  const history = useHistory();
   const { locale } = useSelector(state => state.intl);
 
-  const restApiLink =
-    restApiLinks[locale] !== undefined
-      ? restApiLinks[locale]
-      : restApiLinks['*'];
+  const wikiApiLink =
+    wikiApiLinks[locale] !== undefined
+      ? wikiApiLinks[locale]
+      : wikiApiLinks['*'];
 
   return (
     <Layout
@@ -62,64 +43,50 @@ const Api = () => {
             <Typography gutterBottom>
               <Translate id="You need to manipulate worldwide speleology data on your website? Trust Grottocenter to manage it for you!" />
             </Typography>
+            <br />
             <Typography gutterBottom>
               <Translate
-                id="We offer you a set of {0} that you can easily insert in your pages to access this data"
+                id="We provide an {0} to easily access the data of Grottocenter"
                 values={{
                   0: (
                     <GCLink
-                      href={restApiLink}
+                      href={wikiApiLink}
                       alt="Link to rest API documentation">
-                      <Translate id="Rest API endpoints" />
+                      <Translate id="API" />
                     </GCLink>
                   )
                 }}
               />
             </Typography>
+            <PaddedButton
+              variant="outlined"
+              onClick={() => history.push(`/ui/api/1`)}>
+              {' '}
+              <Translate id="API documentation" />{' '}
+            </PaddedButton>
             <Typography gutterBottom>
               <Translate
-                id="To use them, you just need an {0} key, and few lines of code!"
+                id="A complete export of the database is also available to {0} for leader users."
                 values={{
                   0: (
-                    <InternationalizedLink
-                      links={wikiApiLinks}
-                      alt="What is an API?">
-                      <Translate id="API" />
-                    </InternationalizedLink>
+                    <GCLink href="/ui">
+                      <Translate id="download" />
+                    </GCLink>
                   )
                 }}
               />
-              &nbsp;
+            </Typography>
+            <br />
+            <Typography gutterBottom>
               <Translate
-                id="And to get your own API key, send us an email using the {0}"
+                id="Need support? Request access? {0}"
                 values={{
                   0: (
                     <InternationalizedLink
                       links={contactLinks}
                       alt="Contact form">
-                      <Translate id="contact form" />
-                    </InternationalizedLink>
-                  )
-                }}
-              />
-            </Typography>
-            <Typography gutterBottom variant="h5" component="h2">
-              <Translate id="Available versions:" />
-            </Typography>
-            <Typography variant="h4" component="h3" gutterBottom>
-              <StyledCheckIcon />
-              <StyledLinkToVersion internal href="/ui/api/1">
-                <Translate id="Version 1" />
-              </StyledLinkToVersion>
-            </Typography>
-            <Typography gutterBottom>
-              <Translate
-                id="Not familiar with Swagger? Need support? {0}"
-                values={{
-                  0: (
-                    <GCLink href="https://grottocenter.slack.com/messages/C858CHARY/">
                       <Translate id="Contact us!" />
-                    </GCLink>
+                    </InternationalizedLink>
                   )
                 }}
               />
