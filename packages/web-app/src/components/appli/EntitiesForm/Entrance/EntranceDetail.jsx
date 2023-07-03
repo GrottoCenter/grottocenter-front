@@ -122,7 +122,7 @@ const EntranceDetail = ({ control, errors, getValues }) => {
               error={!!errors.entrance?.yearDiscovery}
               inputRef={ref}
               InputProps={{
-                inputProps: { min: 0, max: new Date().getFullYear() }
+                inputProps: { max: new Date().getFullYear() }
               }}
               value={value}
               onChange={onChange}
