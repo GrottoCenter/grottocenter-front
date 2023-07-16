@@ -82,7 +82,7 @@ const CreateRiggingsForm = ({ closeForm, onSubmit, values, isNew }) => {
               label={formatMessage({ id: 'Title' })}
               onChange={onChange}
               required
-              sx={{ mb: 2 }}
+              style={{ mb: 2 }}
               value={value}
             />
           </Box>
@@ -133,7 +133,7 @@ const CreateRiggingsForm = ({ closeForm, onSubmit, values, isNew }) => {
                 }}
                 onMouseLeave={() => setShowActionId(-1)}>
                 <TableCell scope="row" padding="none">
-                  <Box sx={{ mx: 1 }}>
+                  <Box style={{ mx: 1 }}>
                     <Controller
                       control={control}
                       name={`obstacles.${index}.obstacle`}
@@ -160,7 +160,7 @@ const CreateRiggingsForm = ({ closeForm, onSubmit, values, isNew }) => {
                   </Box>
                 </TableCell>
                 <TableCell align="right" padding="none">
-                  <Box sx={{ m: 1 }}>
+                  <Box style={{ m: 1 }}>
                     <Controller
                       control={control}
                       name={`obstacles.${index}.rope`}
@@ -178,7 +178,7 @@ const CreateRiggingsForm = ({ closeForm, onSubmit, values, isNew }) => {
                   </Box>
                 </TableCell>
                 <TableCell align="right" padding="none">
-                  <Box sx={{ m: 1 }}>
+                  <Box style={{ m: 1 }}>
                     <Controller
                       control={control}
                       name={`obstacles.${index}.anchor`}
@@ -196,7 +196,7 @@ const CreateRiggingsForm = ({ closeForm, onSubmit, values, isNew }) => {
                   </Box>
                 </TableCell>
                 <TableCell align="right" padding="none">
-                  <Box sx={{ m: 1 }}>
+                  <Box style={{ m: 1 }}>
                     <Controller
                       control={control}
                       name={`obstacles[${index}].observation`}
@@ -262,7 +262,7 @@ const CreateRiggingsForm = ({ closeForm, onSubmit, values, isNew }) => {
           </TableBody>
         </Table>
       </TableContainer>
-      <Box textAlign="center" width="100%" sx={{ mb: 3, mt: -3 }}>
+      <Box textAlign="center" width="100%" style={{ mb: 3, mt: -3 }}>
         <Button
           onClick={() => append(getDefaultValues(languageObject).obstacles[0])}
           color="secondary"
@@ -283,7 +283,7 @@ const CreateRiggingsForm = ({ closeForm, onSubmit, values, isNew }) => {
         color="primary"
         type="submit"
         onClick={handleSubmit(onSubmit)}
-        sx={{ mx: 1 }}>
+        style={{ mx: 1 }}>
         {isNew
           ? formatMessage({ id: 'Create' })
           : formatMessage({ id: 'Update' })}

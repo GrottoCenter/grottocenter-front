@@ -46,7 +46,7 @@ const PersonProperties = ({ person }) => {
   groupString = mappedGroups.join(', ');
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+    <Box style={{ display: 'flex', flexDirection: 'column' }}>
       <Typography variant="h3" gutterBottom>
         {formatMessage({ id: 'User information' })}
       </Typography>

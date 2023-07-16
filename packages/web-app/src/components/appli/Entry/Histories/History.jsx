@@ -43,7 +43,7 @@ const History = ({ history }) => {
   const { formatMessage } = useIntl();
   return (
     <ListItemStyled disableGutters alignItems="flex-start">
-      <Box sx={{ alignSelf: 'flex-end' }}>
+      <Box style={{ alignSelf: 'flex-end' }}>
         {!isFormVisible && (
           <ListItemIcon style={{ marginTop: 0 }}>
             <ButtonGroup color="primary">
@@ -66,7 +66,7 @@ const History = ({ history }) => {
       </Box>
       {isFormVisible ? (
         <>
-          <Box sx={{ alignSelf: 'flex-end' }}>
+          <Box style={{ alignSelf: 'flex-end' }}>
             {permissions.isAuth && (
               <ListItemIcon style={{ marginTop: 0 }}>
                 <Button

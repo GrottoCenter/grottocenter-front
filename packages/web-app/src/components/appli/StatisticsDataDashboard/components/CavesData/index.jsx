@@ -10,7 +10,7 @@ import ScrollableContent from '../../../../common/Layouts/Fixed/ScrollableConten
 const styledImg = { width: '100%', height: 'auto' };
 
 const StyledDivider = () => (
-  <Box sx={{ margin: '-20px  40px' }}>
+  <Box style={{ margin: '-20px  40px' }}>
     <hr />
   </Box>
 );

@@ -12,3 +12,30 @@
   integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
   crossorigin=""
 />
+<script>
+  const selectedLanguage =
+    window.localStorage.getItem('selectedLanguage') ??
+    navigator.language.split(/[-_]/)[0];
+  const intlBootstrap = {
+    defaultLocale: 'en',
+    allLanguages: [
+      'ar',
+      'bg',
+      'ca',
+      'de',
+      'el',
+      'en',
+      'es',
+      'fr',
+      'he',
+      'id',
+      'it',
+      'ja',
+      'nl',
+      'pt',
+      'ro'
+    ],
+    initialLocale: selectedLanguage,
+    initialFetchP: null
+  };
+</script>

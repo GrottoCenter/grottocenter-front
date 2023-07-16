@@ -12,14 +12,14 @@ import FullscreenControl from './FullscreenControl';
 import LocateControl from './LocateControl';
 
 const Wrapper = styled.div(
-  ({ theme, wholePage }) => `
+  ({ theme, $wholePage }) => `
   width: calc(100% - 10px);
   height: 400px;
 
   ${theme.breakpoints.up('md')} {
-    ${!wholePage && `margin-right: ${theme.spacing(2)}px;`}
+    ${!$wholePage && `margin-right: ${theme.spacing(2)}px;`}
   }
-${wholePage && `height: calc(100vh - ${theme.appBarHeight}px);`}
+${$wholePage && `height: calc(100vh - ${theme.appBarHeight}px);`}
 `
 );
 
@@ -33,7 +33,12 @@ const Centerer = ({ center }) => {
   return null;
 };
 
+const baseLayerChange = event => {
+  window.localStorage.setItem('selectedBaseLayer', event.name);
+};
+
 const handleResize = map => {
+  if (!map) return;
   const myObserver = new ResizeObserver(() => {
     setTimeout(() => {
       map.invalidateSize(true);
@@ -41,10 +46,6 @@ const handleResize = map => {
   });
   myObserver.observe(map.getContainer());
   map.on('baselayerchange', baseLayerChange);
-};
-
-const baseLayerChange = event => {
-  window.localStorage.setItem('selectedBaseLayer', event.name);
 };
 
 Centerer.propTypes = {
@@ -84,7 +85,7 @@ const CustomMapContainer = ({
   children,
   forceCentering
 }) => (
-  <Wrapper wholePage={wholePage} isSideMenuOpen={isSideMenuOpen}>
+  <Wrapper $wholePage={wholePage}>
     <MapContainer
       style={{ height: '100%', width: '100%', ...style }}
       wholePage={wholePage}
@@ -94,7 +95,7 @@ const CustomMapContainer = ({
       scrollWheelZoom={scrollWheelZoom}
       isSideMenuOpen={isSideMenuOpen}
       minZoom={1}
-      whenCreated={handleResize}
+      ref={handleResize}
       preferCanvas>
       {isFullscreenAllowed && shouldChangeControlInFullscreen && (
         <FullscreenInteraction />

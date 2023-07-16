@@ -29,7 +29,7 @@ const Rigging = ({ rigging }) => {
   return (
     <Box key={rigging.id} position="relative" mt={2}>
       <Box
-        sx={{
+        style={{
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'flex-end'

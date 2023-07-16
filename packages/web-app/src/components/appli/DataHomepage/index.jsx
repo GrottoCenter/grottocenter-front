@@ -77,7 +77,7 @@ const DataHomepage = () => {
   }, [dispatch, languageObject]);
 
   return (
-    <Box sx={{ margin: '10px 5%' }}>
+    <Box style={{ margin: '10px 5%' }}>
       <SectionTitle>
         {formatMessage({ id: 'Grottocenter in numbers' })}
       </SectionTitle>
@@ -91,7 +91,10 @@ const DataHomepage = () => {
             numberData={officialPartners.number}
             isFetching={officialPartners.isFetching}
             icon={
-              <BlockIcon className="icon-gc-club" style={{ margin: '10px' }} />
+              <BlockIcon
+                className="icon icon-gc-club"
+                style={{ margin: '10px' }}
+              />
             }
           />
         )}
@@ -120,7 +123,7 @@ const DataHomepage = () => {
             {users && (
               <DataCard
                 isColored
-                icon={<BlockIcon className="icon-gc-speleo" />}
+                icon={<BlockIcon className="icon icon-gc-speleo" />}
                 numberData={users.number}
                 isFetching={users.isFetching}
                 title={formatMessage({ id: 'cavers' })}
@@ -195,7 +198,7 @@ const DataHomepage = () => {
             {organizations && (
               <DataCard
                 isColored
-                icon={<BlockIcon className="icon-gc-expe" />}
+                icon={<BlockIcon className="icon icon-gc-expe" />}
                 numberData={organizations.number}
                 isFetching={organizations.isFetching}
                 title={formatMessage({ id: 'organizations' })}

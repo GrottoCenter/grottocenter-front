@@ -4,9 +4,9 @@ name: Test
 on:
   # Triggers the workflow on push or pull request events but only for the develop branch
   push:
-    branches: [ develop ]
+    branches: [develop]
   pull_request:
-    branches: [ develop ]
+    branches: [develop]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -16,9 +16,9 @@ jobs:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
     strategy:
-     matrix:
-       browsers: [firefox, chrome]
-       node: [ 16 ]
+      matrix:
+        browsers: [firefox, chrome]
+        node: [20]
 
     steps:
       - name: Checkout
@@ -31,9 +31,9 @@ jobs:
       # Install NPM dependencies, cache them correctly
       # and run all Cypress tests
       - name: Cypress run
-        uses: cypress-io/github-action@v4.2.0
+        uses: cypress-io/github-action@v5
         with:
           build: yarn build
           project: packages/web-app
-          start: yarn start:app
+          start: yarn start
           wait-on: 'http://localhost:3000'

@@ -36,7 +36,7 @@ const SliderNonLinearForm = ({
   helperText,
   disabled,
   onDisable,
-  value, // value not used because it create glitch with descale...
+  // value, // value not used because it create glitch with descale...
   onChange,
   marks
 }) => {

@@ -128,13 +128,11 @@ const formatNotification = notification => {
     rigging
   };
   let entity;
-  for (const key in possibleEntities) {
-    if (Object.prototype.hasOwnProperty.call(possibleEntities, key)) {
-      const possibleEntity = possibleEntities[key];
-      if (possibleEntity) {
-        entity = { ...possibleEntity, type: key };
-        break;
-      }
+  for (const key of Object.keys(possibleEntities)) {
+    const possibleEntity = possibleEntities[key];
+    if (possibleEntity) {
+      entity = { ...possibleEntity, type: key };
+      break;
     }
   }
 

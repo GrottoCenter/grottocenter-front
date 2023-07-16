@@ -38,6 +38,7 @@ const NotificationsIcon = ({ onClick }) => {
       onClick={onClick}
       color="inherit">
       <Badge
+        overlap="rectangular"
         color={status === REDUCER_STATUS.FAILED ? 'error' : 'secondary'}
         badgeContent={getBadgeContent(nbNotifications, status)}>
         <MuiNotificationsIcon />

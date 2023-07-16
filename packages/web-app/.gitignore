@@ -13,7 +13,7 @@
 
 # Cypress
 cypress/videos
-cypress/screenshots	
+cypress/screenshots
 
 # misc
 .DS_Store

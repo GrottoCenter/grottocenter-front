@@ -162,7 +162,9 @@ const ChangeTable = styled.div(
 );
 
 const RecentChangesCard = ({ changes, isFetching, fetch }) => {
-  useEffect(() => fetch(), [fetch]);
+  useEffect(() => {
+    fetch();
+  }, [fetch]);
 
   if (isFetching || !changes) return <CircularProgress />;
   return (

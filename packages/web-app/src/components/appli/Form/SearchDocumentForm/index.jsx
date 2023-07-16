@@ -109,7 +109,7 @@ const SearchDocumentForm = ({ closeForm, onSubmit }) => {
           color="primary"
           type="submit"
           onClick={handleOnSubmit}
-          sx={{ mx: 1 }}>
+          style={{ mx: 1 }}>
           {formatMessage({ id: 'Associate' })}
         </SpacedButton>
       </Box>

@@ -4,16 +4,16 @@
   "description": "Custom eslint rules",
   "main": ".eslintrc.js",
   "peerDependencies": {
-    "eslint": ">=6",
-    "eslint-config-airbnb": "^18.2.1",
-    "eslint-config-prettier": ">=6",
-    "eslint-config-react-app": ">=6",
+    "eslint": ">=8",
+    "eslint-config-airbnb": ">=19",
+    "eslint-config-prettier": ">=8",
+    "eslint-plugin-cypress": ">=2",
     "eslint-plugin-import": ">=2",
-    "eslint-plugin-jest": ">=24.3.6",
     "eslint-plugin-jsx-a11y": ">=6",
-    "eslint-plugin-prettier": ">=3",
-    "eslint-plugin-react": ">=6",
-    "eslint-plugin-react-hooks": ">=1",
-    "prettier": ">=2"
+    "eslint-plugin-prettier": ">=5",
+    "eslint-plugin-react": ">=7",
+    "eslint-plugin-react-hooks": ">=4",
+    "eslint-plugin-storybook": ">=0",
+    "prettier": ">=3"
   }
 }

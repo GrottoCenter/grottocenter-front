@@ -38,7 +38,7 @@ const positions = {
 };
 
 // eslint-disable-next-line react/prop-types
-const MultipleMarkersMap = ({ loading, selection }) => (
+const MultipleMarkersMap = ({ selection }) => (
   <Card style={{ width: '500px' }}>
     <MultipleMarkers positions={selection} />
   </Card>

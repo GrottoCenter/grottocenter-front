@@ -64,11 +64,11 @@ const EntrancesList = props => {
   return (
     <>
       <Box
-        sx={{
+        style={{
           display: 'flex',
           justifyContent: 'space-between'
         }}>
-        <Box sx={{ display: 'flex' }}>
+        <Box style={{ display: 'flex' }}>
           <Typography variant="h3" gutterBottom>
             {formatMessage({
               id: 'Entrance list and available data quality'
@@ -85,7 +85,7 @@ const EntrancesList = props => {
             />
           </Box>
         </Box>
-        <Box sx={{ marginRight: '40px' }}>
+        <Box style={{ marginRight: '40px' }}>
           {dateOfUpdate && (
             <>
               <Typography variant="body2">
@@ -108,7 +108,7 @@ const EntrancesList = props => {
           </StyledList>
           {entrances.length > nbEntrancesPerPage && (
             <Box
-              sx={{
+              style={{
                 display: 'flex',
                 justifyContent: 'center',
                 marginTop: '10px'

@@ -24,7 +24,7 @@ const EntranceListItem = ({ entrance }) => {
           entrance.name ? (
             entrance.name
           ) : (
-            <i sx="color : gray">{formatMessage({ id: 'no name' })}</i>
+            <i>{formatMessage({ id: 'no name' })}</i>
           )
         }
         primaryTypographyProps={{ style: { whiteSpace: 'normal' } }} // Multiple lines text

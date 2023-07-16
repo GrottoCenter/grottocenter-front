@@ -18,8 +18,11 @@ const StyledListItem = styled(ListItem)`
 `;
 
 const CircularProgressWithLabel = ({ value, color }) => (
-  <Box position="relative" display="inline-flex" sx={{ marginRight: '10px' }}>
-    <Box sx={{ display: 'flex' }}>
+  <Box
+    position="relative"
+    display="inline-flex"
+    style={{ marginRight: '10px' }}>
+    <Box style={{ display: 'flex' }}>
       <CircularProgress
         variant="determinate"
         value={100}
@@ -39,7 +42,7 @@ const CircularProgressWithLabel = ({ value, color }) => (
       display="flex"
       alignItems="center"
       justifyContent="center"
-      sx={{ color }}>
+      style={{ color }}>
       <Typography variant="caption" component="div" style={{ fontWeight: 700 }}>
         {value}
       </Typography>
@@ -86,7 +89,7 @@ const EntranceListItem = ({ entrance }) => {
           entrance.name ? (
             entrance.name
           ) : (
-            <i sx="color : gray">{formatMessage({ id: 'no name' })}</i>
+            <i>{formatMessage({ id: 'no name' })}</i>
           )
         }
         primaryTypographyProps={{ style: { whiteSpace: 'normal' } }} // Multiple lines text

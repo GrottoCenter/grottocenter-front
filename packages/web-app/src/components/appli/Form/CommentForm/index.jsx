@@ -76,7 +76,7 @@ const CreateCommentForm = ({ closeForm, onSubmit, values, isNewComment }) => {
             label={formatMessage({ id: 'Title' })}
             onChange={onChange}
             required
-            sx={{ mb: 2 }}
+            style={{ mb: 2 }}
             value={value}
           />
         )}
@@ -98,7 +98,7 @@ const CreateCommentForm = ({ closeForm, onSubmit, values, isNewComment }) => {
             label={formatMessage({ id: 'Text' })}
             onChange={onChange}
             required
-            sx={{ mb: 2 }}
+            style={{ mb: 2 }}
             value={value}
           />
         )}
@@ -135,7 +135,7 @@ const CreateCommentForm = ({ closeForm, onSubmit, values, isNewComment }) => {
             label={formatMessage({ id: 'Access duration' })}
             onChange={onChange}
             onKeyPress={e => !/\d/.test(e.key) && e.preventDefault()}
-            sx={{ mb: 2 }}
+            style={{ mb: 2 }}
             value={value}
             InputProps={{
               endAdornment: (
@@ -160,7 +160,7 @@ const CreateCommentForm = ({ closeForm, onSubmit, values, isNewComment }) => {
             label={formatMessage({ id: 'Underground time' })}
             onChange={onChange}
             onKeyPress={e => !/\d/.test(e.key) && e.preventDefault()}
-            sx={{ mb: 2 }}
+            style={{ mb: 2 }}
             value={value}
             InputProps={{
               endAdornment: (
@@ -210,7 +210,7 @@ const CreateCommentForm = ({ closeForm, onSubmit, values, isNewComment }) => {
                 display="flex"
                 justifyContent="center"
                 flexDirection="column"
-                sx={{ mt: 3 }}>
+                style={{ mt: 3 }}>
                 <Typography variant="caption">
                   {formatMessage({ id: 'No Rating' })}
                 </Typography>
@@ -259,7 +259,7 @@ const CreateCommentForm = ({ closeForm, onSubmit, values, isNewComment }) => {
                 display="flex"
                 justifyContent="center"
                 flexDirection="column"
-                sx={{ mt: 3 }}>
+                style={{ mt: 3 }}>
                 <Typography variant="caption">
                   {formatMessage({ id: 'No Rating' })}
                 </Typography>
@@ -308,7 +308,7 @@ const CreateCommentForm = ({ closeForm, onSubmit, values, isNewComment }) => {
                 display="flex"
                 justifyContent="center"
                 flexDirection="column"
-                sx={{ mt: 3 }}>
+                style={{ mt: 3 }}>
                 <Typography variant="caption">
                   {formatMessage({ id: 'No Rating' })}
                 </Typography>
@@ -330,7 +330,7 @@ const CreateCommentForm = ({ closeForm, onSubmit, values, isNewComment }) => {
         color="primary"
         type="submit"
         onClick={handleSubmit(onSubmit)}
-        sx={{ mx: 1 }}>
+        style={{ mx: 1 }}>
         {isNewComment
           ? formatMessage({ id: 'Create' })
           : formatMessage({ id: 'Update' })}

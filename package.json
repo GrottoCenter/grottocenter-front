@@ -10,52 +10,44 @@
   "author": "Wikicaves",
   "license": "CC-BY-SA-3.0",
   "scripts": {
-    "start:app": "lerna run --scope @grotto-front/web-app start --stream ",
-    "start:storybook": "lerna run --scope @grotto-front/storybook start --stream",
-    "start:test": "yarn workspace @grotto-front/storybook start",
-    "start:e2e-test": "yarn workspace @grotto-front/web-app perform-e2e",
-    "open:e2e-test": "yarn workspace @grotto-front/web-app e2e",
-    "build": "lerna run build",
-    "lint": "eslint . --ext .js,.jsx",
+    "start": "yarn workspace @grotto-front/web-app start",
+    "build": "yarn workspace @grotto-front/web-app build",
+    "lint": "eslint --ext .js,.jsx,.ts,.tsx .",
     "lint:fix": "eslint --fix --ext .js,.jsx,.ts,.tsx .",
-    "lint:format": "prettier --config .prettierrc.js './packages/**' --write",
-    "storybook": "lerna run --scope @grotto-front/web-app storybook --stream"
+    "e2e:run": "yarn workspace @grotto-front/web-app e2e-run",
+    "e2e:open": "yarn workspace @grotto-front/web-app e2e",
+    "storybook": "yarn workspace @grotto-front/web-app storybook",
+    "prepare": "husky install"
   },
   "devDependencies": {
-    "@commitlint/config-conventional": "13.1.0",
-    "babel-eslint": "10.1.0",
-    "commitlint": "13.1.0",
+    "@commitlint/config-conventional": "17.6.6",
     "cross-env": "7.0.3",
-    "customize-cra": "1.0.0",
-    "eslint": "8.20.0",
+    "eslint": "8.44.0",
     "eslint-config-airbnb": "19.0.4",
-    "eslint-config-prettier": "8.6.0",
-    "eslint-config-react-app": "7.0.1",
-    "eslint-plugin-cypress": "^2.12.1",
-    "eslint-plugin-import": "2.26.0",
-    "eslint-plugin-jsx-a11y": "6.6.0",
-    "eslint-plugin-prettier": "4.2.1",
-    "eslint-plugin-react": "7.30.1",
+    "eslint-config-prettier": "8.8.0",
+    "eslint-plugin-cypress": "^2.13.3",
+    "eslint-plugin-import": "2.27.5",
+    "eslint-plugin-jsx-a11y": "6.7.1",
+    "eslint-plugin-prettier": "5.0.0",
+    "eslint-plugin-react": "7.32.2",
     "eslint-plugin-react-hooks": "4.6.0",
-    "husky": "4.2.5",
-    "lerna": "4.0.0",
-    "lint-staged": "11.1.1",
-    "prettier": "2.8.3",
-    "react-app-rewired": "2.1.8",
-    "react-scripts": "^5.0.0",
-    "typescript": "4.3.5"
-  },
-  "resolutions": {
-    "babel-loader": "8.1.0"
+    "eslint-plugin-storybook": "^0.6.12",
+    "husky": "^8.0.3",
+    "lint-staged": "13.2.3",
+    "prettier": "3.0.0",
+    "typescript": "5.1.6"
   },
   "engines": {
-    "node": "16",
+    "node": ">=18",
     "yarn": ">=3.0.*"
   },
-  "dependenciesMeta": {
-    "open@7.4.2": {
-      "unplugged": true
-    }
+  "packageManager": "yarn@3.2.1",
+  "lint-staged": {
+    "*.{js, jsx, ts, tsx}": [
+      "eslint --cache --fix"
+    ]
   },
-  "packageManager": "yarn@3.2.1"
+  "dependencies": {
+    "@commitlint/cli": "^17.6.6"
+  }
 }

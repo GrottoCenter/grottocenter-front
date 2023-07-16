@@ -8,18 +8,18 @@ import ErrorBoundary from '../../../appli/ErrorBoundary';
 
 const MainWrapper = styled.main`
   flex-grow: 1;
-  transition: ${({ theme, isSideMenuOpen }) =>
+  transition: ${({ theme, $isSideMenuOpen }) =>
     !isMobileOnly &&
     theme.transitions.create('margin', {
-      easing: isSideMenuOpen
+      easing: $isSideMenuOpen
         ? theme.transitions.easing.easeOut
         : theme.transitions.easing.sharp,
-      duration: isSideMenuOpen
+      duration: $isSideMenuOpen
         ? theme.transitions.duration.enteringScreen
         : theme.transitions.duration.leavingScreen
     })};
-  margin-left: ${({ theme, isSideMenuOpen }) =>
-    !isMobileOnly && (isSideMenuOpen ? theme.sideMenuWidth : 0)}px;
+  margin-left: ${({ theme, $isSideMenuOpen }) =>
+    !isMobileOnly && ($isSideMenuOpen ? theme.sideMenuWidth : 0)}px;
 `;
 
 const Layout = ({
@@ -38,7 +38,7 @@ const Layout = ({
       toggle={toggleSideMenu}
       AutoCompleteSearch={SideBarQuickSearch}
     />
-    <MainWrapper isSideMenuOpen={isSideMenuOpen}>
+    <MainWrapper $isSideMenuOpen={isSideMenuOpen}>
       <ErrorBoundary>{children}</ErrorBoundary>
     </MainWrapper>
   </>

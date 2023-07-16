@@ -28,6 +28,10 @@ export const MarkerGlobalCss = createGlobalStyle`
   & .fade-in-markers {
    animation: 0.3s ${fadeIn} ease-out;
   }
+
+  .leaflet-container{
+    font-size: 1rem;
+  }
 `;
 
 const useMarkers = (icon, popupContent = null, tooltipContent = null) => {
@@ -58,7 +62,7 @@ const useMarkers = (icon, popupContent = null, tooltipContent = null) => {
               </IntlProvider>
             )
           )
-          .bindTooltip(tooltipContent(marker), { direction: 'bottom' });
+          .bindTooltip(`${tooltipContent(marker)}`, {});
       }
       return L.marker([latitude, longitude], options).bindPopup(
         renderToString(popupContent(marker))

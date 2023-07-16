@@ -51,7 +51,7 @@ const CreateLocationForm = ({ closeForm, onSubmit, values, isNewLocation }) => {
             label={formatMessage({ id: 'Title' })}
             onChange={onChange}
             required
-            sx={{ mb: 2 }}
+            style={{ mb: 2 }}
             value={value}
           />
         )}
@@ -73,7 +73,7 @@ const CreateLocationForm = ({ closeForm, onSubmit, values, isNewLocation }) => {
             label={formatMessage({ id: 'Text' })}
             onChange={onChange}
             required
-            sx={{ mb: 2 }}
+            style={{ mb: 2 }}
             value={value}
           />
         )}
@@ -107,7 +107,7 @@ const CreateLocationForm = ({ closeForm, onSubmit, values, isNewLocation }) => {
         color="primary"
         type="submit"
         onClick={handleSubmit(onSubmit)}
-        sx={{ mx: 1 }}>
+        style={{ mx: 1 }}>
         {isNewLocation
           ? formatMessage({ id: 'Create' })
           : formatMessage({ id: 'Update' })}

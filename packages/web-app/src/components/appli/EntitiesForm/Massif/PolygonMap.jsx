@@ -157,7 +157,9 @@ const PolygonMap = ({ onChange, data }) => {
     <MapContainer
       center={center}
       zoom={ZOOM_LEVEL}
-      whenCreated={setMap}
+      ref={ref => {
+        if (ref) setMap(ref);
+      }}
       position="topLeft"
       style={{
         height: '70vh',

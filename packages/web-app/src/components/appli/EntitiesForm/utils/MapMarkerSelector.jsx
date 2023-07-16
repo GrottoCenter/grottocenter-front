@@ -63,7 +63,7 @@ MapBind.propTypes = {
 const boundMinMax = (min, max, value) => Math.max(min, Math.min(max, value));
 const toFloat = value => {
   let v = value ?? '';
-  if (typeof v == 'string') v = v.replace(',', '.');
+  if (typeof v === 'string') v = v.replace(',', '.');
   return parseFloat(v);
 };
 
@@ -94,7 +94,8 @@ const MapMarkerSelector = ({ control, formLatitudeKey, formLongitudeKey }) => {
   useEffect(() => {
     // Prevent dispatching a setCurrentPosition event triggered by a setForm below
     const timeSinceSetFormMs = Date.now() - lastSetFormTs.current;
-    const shouldUpdate = !isNaN(validLatitude) && !isNaN(validLongitude);
+    const shouldUpdate =
+      !Number.isNaN(validLatitude) && !Number.isNaN(validLongitude);
 
     if (shouldUpdate && timeSinceSetFormMs > DEBOUNCE_TIME_MS + 100) {
       setCurrentPosition({ lat: validLatitude, lng: validLongitude });

@@ -1,18 +1,25 @@
 module.exports = {
-  extends: ['airbnb', 'prettier', 'react-app', 'plugin:cypress/recommended'],
+  extends: [
+    'eslint:recommended',
+    'airbnb',
+    'airbnb/hooks',
+    'prettier',
+    'plugin:cypress/recommended',
+    'plugin:storybook/recommended'
+  ],
   parserOptions: {
-    ecmaVersion: 2020
+    ecmaVersion: 'latest'
   },
   rules: {
-    'react/no-unstable-nested-components': 'off', // TODO: remove it and fix them
-
     'brace-style': 'error',
     'object-curly-newline': 'off',
+    'comma-dangle': ['error', 'never'],
     'func-names': 'off',
-    'react/jsx-props-no-spreading': 'off',
-    'react/function-component-definition': [
-      2,
-      { namedComponents: 'arrow-function' }
+    'no-restricted-syntax': [
+      'error',
+      'ForInStatement',
+      'LabeledStatement',
+      'WithStatement'
     ],
     'import/no-named-as-default': 'off',
     'import/no-extraneous-dependencies': [
@@ -27,10 +34,14 @@ module.exports = {
         allow: ['warn', 'error']
       }
     ],
-    'jsx-a11y/href-no-hash': ['off'],
-    'react/jsx-filename-extension': ['warn', { extensions: ['.js', '.jsx'] }],
-    'react/require-default-props': ['off'],
-    'comma-dangle': ['error', 'never'],
+    'react/require-default-props': 'off',
+    'react/no-unstable-nested-components': 'off', // TODO: remove it and fix them
+    'react/jsx-filename-extension': ['warn', { extensions: ['.js', '.jsx'] }], // TODO: Rename .js file
+    'react/jsx-props-no-spreading': 'off', // TODO: Remove spreaded props
+    'react/function-component-definition': [
+      2,
+      { namedComponents: 'arrow-function' }
+    ],
     'prettier/prettier': 'error'
   },
   settings: {
@@ -41,5 +52,5 @@ module.exports = {
       }
     }
   },
-  plugins: ['prettier', 'react', 'react-hooks']
+  plugins: ['prettier']
 };
