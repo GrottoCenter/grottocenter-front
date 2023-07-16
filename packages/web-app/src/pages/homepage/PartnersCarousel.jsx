@@ -19,11 +19,7 @@ const PartnerVignette = withTheme(styled.div`
   display: inline-block;
   width: 90px;
   height: 90px;
-
-  :hover {
-    transform: scale(1.1);
-    cursor: pointer;
-  }
+  cursor: pointer;
 
   @media (min-width: 354px) and (max-width: 515px) {
     width: 85px;
@@ -80,7 +76,7 @@ PartnerItem.propTypes = {
 const PartnersCarousel = ({ fetch, partners, isFetching }) => {
   const isFirstLoad = useRef(true);
   const rows = partners
-    ? partners.map(({ id, pictureFileName, name, customMessage }) => (
+    ? partners.map(({ id, pictureFileName, name }) => (
         <PartnerItem
           key={`partcs-${id}`}
           imagePath={`/images/partners/${pictureFileName}`}
@@ -105,8 +101,8 @@ const PartnersCarousel = ({ fetch, partners, isFetching }) => {
     return (
       <CarouselDiv>
         <AliceCarousel
-          mouseTrackingEnabled
-          buttonsDisabled
+          mouseTracking
+          disableButtonsControls
           autoPlayInterval={5000}
           autoPlay
           responsive={{

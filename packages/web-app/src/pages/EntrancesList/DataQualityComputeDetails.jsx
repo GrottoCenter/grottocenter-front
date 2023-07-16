@@ -16,7 +16,7 @@ import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
 import DataQualityComputeTable from './DataQualityComputeTable';
 
 const ImageBox = withStyles(
-  theme => ({
+  () => ({
     root: {
       padding: '5px 10px'
     }
@@ -63,7 +63,7 @@ const DataQualityComputeDetails = () => {
         <AccordionDetails>
           {/* General details */}
           <Box
-            sx={{
+            style={{
               display: 'flex',
               flexDirection: 'column',
               padding: '0px 10px',
@@ -133,7 +133,7 @@ const DataQualityComputeDetails = () => {
 
             {/* Table */}
             <Box
-              sx={{
+              style={{
                 width: '100%',
                 overflowX: 'scroll'
               }}>

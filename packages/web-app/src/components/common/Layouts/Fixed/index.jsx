@@ -40,7 +40,7 @@ const ScrollableWrapper = styled.div`
   flex-direction: column;
 `;
 
-const Layout = ({ children, fixedContent, onEdit }) => {
+const Layout = ({ children, fixedContent }) => {
   const componentRef = useRef();
   return (
     <Wrapper ref={componentRef} isFixedContent={!!fixedContent}>
@@ -52,8 +52,7 @@ const Layout = ({ children, fixedContent, onEdit }) => {
 
 Layout.propTypes = {
   children: PropTypes.node.isRequired,
-  fixedContent: PropTypes.node,
-  onEdit: PropTypes.func
+  fixedContent: PropTypes.node
 };
 
 export default Layout;

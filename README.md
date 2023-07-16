@@ -1,46 +1,45 @@
-# grottocenter-front
+# Grottocenter-front
 
-Manage Grottocenter front packages and main app
+The web app frontend for the [GrottoCenter project](https://fr.wikicaves.org/)
 
-This project use:
-- [Yarn 2 'Berry'](https://github.com/yarnpkg/berry) & [yarn workspaces](https://classic.yarnpkg.com/en/docs/workspaces/)
-  
-- [Lerna](https://github.com/lerna/lerna)
+This project uses [Yarn](https://yarnpkg.com/) & [Yarn workspaces](https://yarnpkg.com/features/workspaces)
 
-
-
-### List of all available packages:
-- [**web-app**](/packages/web-app/README.md)
-
-  Main web app
-    
-- **configurations**
-  
-  Shared quality and formatting rules
-  
-  - [eslint-config](/packages/eslint-config/README.md)
-  - [eslint-config-typescript](/external/eslint-config/README.md)
-  - [ts-config](/external/ts-config/README.md)
-    
-- [**Storybook**](/packages/storybook/README.md)
+> For the backend server see [GrottoCenter/grottocenter-api](https://github.com/GrottoCenter/grottocenter-api)
 
 ## Getting Started
 
-- Use node v16
-- Install [Yarn](https://yarnpkg.com/getting-started/install)
-- `yarn` at the top-level of the repo, it will automatically install all dependencies and link local packages
+- Install [NodeJs](https://nodejs.org) (v20 minimum) and [Yarn](https://yarnpkg.com/getting-started/install)
+- Run `yarn` to install dependencies
+- Run `yarn start` to launch the app
+
+> By default the app use the production api as backend. To modify it change the `REACT_APP_API_URL` variable in the `packages\web-app\.env` file
+
+### Packages:
+
+- [**Main web app**](/packages/web-app/README.md)
+
+- **Configurations**:
+  - [eslint-config](/packages/eslint-config/README.md)
+  - `eslint-config-typescript`
+  - [`prettier-config`](/packages/prettier-config/README.md)
+  - `ts-config`
 
 ## Scripts
-- `start:app` start main Grottocenter app **using the production api**
-- `storybook` start storybook
-- `test`: run unit `test` commands on all packages
-- `build`: builds all packages with `build` script
+
+- `start` Start Grottocenter front
+- `build` Build the Grottocenter front
+- `lint` Check linting rules
+- `lint:fix` Same as `lint` but will also try to fix errors
+- `e2e:run` Run the end to end test suite (_require a running app_)
+- `e2e:open` Open the end to end test suite browser (_require a running app_)
+- `storybook` Start storybook
 
 ## CI
 
 Github Actions is running 2 tasks on push and pull requests on `develop` :
- - Lint
- - Azure Static Web Apps deploy
+
+- Lint
+- Azure Static Web Apps deploy
 
 ## Release and publish
 
@@ -61,20 +60,3 @@ To prevent a bad commit, we use the Git hooks [husky](https://github.com/typicod
 #### Commit type
 
 [Commitlint rules](https://www.conventionalcommits.org/en/v1.0.0/) define in [commitlint config](commitlint.config.js)
-
-
-## Specific dependencies or fixed version, known errors
-Some dependencies are not updated or needed due to incompatibility or issues.
-
-Added dependencies:
-  
-  *Used on `web-app` package*
-- `eslint-config-react-app`
-  Related to `yarn 2`: [issue](https://github.com/facebook/create-react-app/issues/10463)
-  
-
-Current problem:
-
-error related bad dependencies:
-https://yarnpkg.com/getting-started/migration
-.yarnrc.yml

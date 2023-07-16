@@ -93,7 +93,7 @@ const StatisticsDataDashboard = ({ countryId, massifId }) => {
       </Typography>
       {(loadingCountry || loadingMassif) && (
         <Box
-          sx={{
+          style={{
             display: 'flex',
             justifyContent: 'center',
             marginTop: '-50px'

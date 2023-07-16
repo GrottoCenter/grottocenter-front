@@ -15,7 +15,7 @@ export const StyledTypography = styled(Typography)`
 export const PropertyWrapper = styled.div`
   align-items: center;
   display: flex;
-  flex-basis: ${props => props.flexBasis};
+  flex-basis: ${({ $flexBasis }) => $flexBasis};
   padding: ${({ theme }) => theme.spacing(1)}px;
   & > svg {
     margin-right: ${({ theme }) => theme.spacing(1)}px;
@@ -61,7 +61,7 @@ const Property = ({
   url,
   flexBasis = '33%'
 }) => (
-  <PropertyWrapper flexBasis={flexBasis}>
+  <PropertyWrapper $flexBasis={flexBasis}>
     {!isNil(icon) && <IconWrapper display="flex">{icon}</IconWrapper>}
     {loading ? (
       <Skeleton variant="text" width="100%" />

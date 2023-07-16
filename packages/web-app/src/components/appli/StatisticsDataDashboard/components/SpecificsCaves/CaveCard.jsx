@@ -27,7 +27,7 @@ const CaveCard = ({ idCave, nameCave, numberData, text, backgroundColor }) => {
     <StyledBox
       bgcolor={alpha(backgroundColor, 0.6)}
       onClick={() => window.open(`/ui/caves/${idCave}`, '_blank')}>
-      <Box sx={{ display: 'flex' }}>
+      <Box style={{ display: 'flex' }}>
         <Typography variant="h4">{`${nameCave}`} &nbsp;</Typography>
         <BoldTypography variant="h4">{`${numberData.toLocaleString(
           locale

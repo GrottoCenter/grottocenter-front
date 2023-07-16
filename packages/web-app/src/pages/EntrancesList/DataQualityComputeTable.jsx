@@ -68,7 +68,7 @@ const rows = [
 const getTotal = () => {
   const total = createData('Total', 0, 0, 0, 0, 0, 0, 0);
   rows.forEach(row => {
-    total.absent += isNaN(Number(row.absent)) ? 0 : row.absent;
+    total.absent += Number.isNaN(Number(row.absent)) ? 0 : row.absent;
     total.one += row.one;
     total.twoAndMore += row.twoAndMore;
     total.moreThan10 += row.moreThan10;

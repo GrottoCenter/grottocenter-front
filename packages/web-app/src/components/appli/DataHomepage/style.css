@@ -1,6 +1,7 @@
 @font-face {
   font-family: 'gc-icon';
-  src: url('./fonts/gc-icon.svg?6159bbcd3fc1c7ecee0fc0915aba5869#gc-icon')
+  src:
+    url('./fonts/gc-icon.svg?6159bbcd3fc1c7ecee0fc0915aba5869#gc-icon')
       format('svg'),
     url('./fonts/gc-icon.woff?6159bbcd3fc1c7ecee0fc0915aba5869') format('woff'),
     url('./fonts/gc-icon.eot?6159bbcd3fc1c7ecee0fc0915aba5869?#iefix')

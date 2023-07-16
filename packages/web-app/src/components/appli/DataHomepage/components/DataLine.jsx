@@ -51,7 +51,7 @@ const DataLine = props => {
               </Grid>
               <Grid item xs={7} sm={8}>
                 <Box
-                  sx={{
+                  style={{
                     display: 'flex',
                     justifyContent: 'center'
                   }}>

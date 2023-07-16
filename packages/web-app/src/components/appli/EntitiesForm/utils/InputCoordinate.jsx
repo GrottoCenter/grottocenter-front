@@ -8,7 +8,7 @@ import { TextField } from '@material-ui/core';
 // But the api only accept notation with '.'
 // So before submitting to the api, coordinates must be normalised
 export function normelizeCoordinate(coordStr) {
-  if (typeof coordStr != 'string') return coordStr;
+  if (typeof coordStr !== 'string') return coordStr;
   return coordStr.replace(',', '.');
 }
 

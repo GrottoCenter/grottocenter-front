@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { CSVReader } from 'react-papaparse';
+import { useCSVReader } from 'react-papaparse';
 import { useTheme } from '@material-ui/core/styles';
 import { useIntl } from 'react-intl';
 import Alert from '../../../common/Alert';
@@ -14,6 +14,7 @@ const Step2 = () => {
   );
   const theme = useTheme();
   const { formatMessage } = useIntl();
+  const { CSVReader } = useCSVReader();
 
   const [rowErrors, setRowErrors] = useState([]);
 

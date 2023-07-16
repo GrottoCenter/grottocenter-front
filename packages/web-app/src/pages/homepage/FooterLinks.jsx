@@ -1,6 +1,5 @@
 import React from 'react';
 import styled from 'styled-components';
-import { withTheme } from '@material-ui/core/styles';
 import GCLink from '../../components/common/GCLink';
 import InternationalizedLink from '../../components/common/InternationalizedLink';
 import {
@@ -31,38 +30,32 @@ const SocialLink = styled.div`
   }
 `;
 
-const SocialGCLink = withTheme(SocialLink.withComponent(GCLink));
-
-const SocialIntlLink = withTheme(
-  SocialLink.withComponent(InternationalizedLink)
-);
-
 const FooterLinks = () => (
   <FooterLinksList>
     <FooterLinksLi>
-      <SocialGCLink internal href="/ui/faq">
+      <SocialLink as={GCLink} internal href="/ui/faq">
         <Translate>FAQ</Translate>
-      </SocialGCLink>
+      </SocialLink>
     </FooterLinksLi>
     <FooterLinksLi>
-      <SocialIntlLink links={wikiLinks}>
+      <SocialLink as={InternationalizedLink} links={wikiLinks}>
         <Translate>Wiki</Translate>
-      </SocialIntlLink>
+      </SocialLink>
     </FooterLinksLi>
     <FooterLinksLi>
-      <SocialIntlLink links={contributorsLink}>
+      <SocialLink as={InternationalizedLink} links={contributorsLink}>
         <Translate>Contributors</Translate>
-      </SocialIntlLink>
+      </SocialLink>
     </FooterLinksLi>
     <FooterLinksLi>
-      <SocialIntlLink links={contactLinks}>
+      <SocialLink as={InternationalizedLink} links={contactLinks}>
         <Translate>Contact</Translate>
-      </SocialIntlLink>
+      </SocialLink>
     </FooterLinksLi>
     <FooterLinksLi>
-      <SocialIntlLink links={legalLinks}>
+      <SocialLink as={InternationalizedLink} links={legalLinks}>
         <Translate>Legal notice</Translate>
-      </SocialIntlLink>
+      </SocialLink>
     </FooterLinksLi>
   </FooterLinksList>
 );

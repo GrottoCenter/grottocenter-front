@@ -65,7 +65,7 @@ const AccordionSnapshot = ({
         </FlexDiv50>
       </AccordionSummary>
       <AccordionDetails>
-        <Box sx={{ width: '100%' }}>
+        <Box style={{ width: '100%' }}>
           {snapshotType !== 'documents' && (
             <Box>
               <RestoreSnapshot

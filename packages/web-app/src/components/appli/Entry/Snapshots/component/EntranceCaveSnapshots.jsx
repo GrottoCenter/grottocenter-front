@@ -28,13 +28,13 @@ const EntranceCaveSnapshots = information => {
     ${coordinatesValue[0].toFixed(4)}, ${coordinatesValue[1].toFixed(4)}`;
   return (
     <Box display="flex" flexDirection="column" width="100%">
-      {!(isNaN(lat) && isNaN(long)) && (
+      {!(Number.isNaN(lat) && Number.isNaN(long)) && (
         <Property
           label={`${formatMessage({ id: 'Coordinates' })} (WGS84)`}
           value={
             <HighLightsLine
               oldText={
-                !(isNaN(previousLat) && isNaN(previousLong))
+                !(Number.isNaN(previousLat) && Number.isNaN(previousLong))
                   ? makeCoordinatesValue([previousLat, previousLong])
                   : undefined
               }

@@ -37,7 +37,7 @@ const EntityTypeSelect = ({ entity, onEntityChange }) => {
 
   return (
     <StyledFormControl variant="filled" required>
-      <FormLabel shrink>
+      <FormLabel>
         <Translate>Entity type</Translate>
       </FormLabel>
       <RadioGroup row value={selectedEntity} onChange={handleChange}>

@@ -16,7 +16,7 @@ const ErrorBoundary = ({ children }) => {
         setHasError(false);
       }
     });
-    return history;
+    // return history;
   }, [hasError, history]);
 
   return (

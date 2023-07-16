@@ -52,7 +52,7 @@ const CreateHistoryForm = ({ closeForm, onSubmit, values, isNewHistory }) => {
             label={formatMessage({ id: 'Text' })}
             onChange={onChange}
             required
-            sx={{ mb: 2 }}
+            style={{ mb: 2 }}
             value={value}
           />
         )}
@@ -88,7 +88,7 @@ const CreateHistoryForm = ({ closeForm, onSubmit, values, isNewHistory }) => {
         color="primary"
         type="submit"
         onClick={handleSubmit(onSubmit)}
-        sx={{ mx: 1 }}>
+        style={{ mx: 1 }}>
         {isNewHistory
           ? formatMessage({ id: 'Create' })
           : formatMessage({ id: 'Update' })}

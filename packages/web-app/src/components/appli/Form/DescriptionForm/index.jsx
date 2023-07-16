@@ -56,7 +56,7 @@ const CreateDescriptionForm = ({
             label={formatMessage({ id: 'Title' })}
             onChange={onChange}
             required
-            sx={{ mb: 2 }}
+            style={{ mb: 2 }}
             value={value}
           />
         )}
@@ -78,7 +78,7 @@ const CreateDescriptionForm = ({
             label={formatMessage({ id: 'Text' })}
             onChange={onChange}
             required
-            sx={{ mb: 2 }}
+            style={{ mb: 2 }}
             value={value}
           />
         )}
@@ -114,7 +114,7 @@ const CreateDescriptionForm = ({
         color="primary"
         type="submit"
         onClick={handleSubmit(onSubmit)}
-        sx={{ mx: 1 }}>
+        style={{ mx: 1 }}>
         {isNewDescription
           ? formatMessage({ id: 'Create' })
           : formatMessage({ id: 'Update' })}

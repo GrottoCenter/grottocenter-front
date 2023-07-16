@@ -19,11 +19,72 @@ import SliderForm from './SliderForm';
 import DivingTypesForm from './DivingTypesForm';
 import SliderNonLinearForm from './SliderNonLinearForm';
 
+const lengthMarks = [
+  {
+    value: 0,
+    scaledValue: 0,
+    label: '0'
+  },
+  {
+    value: 20,
+    scaledValue: 100,
+    label: '100'
+  },
+  {
+    value: 40,
+    scaledValue: 1000,
+    label: '1k'
+  },
+  {
+    value: 60,
+    scaledValue: 10000,
+    label: '10k'
+  },
+  {
+    value: 80,
+    scaledValue: 100000,
+    label: '100k'
+  },
+  {
+    value: 100,
+    scaledValue: 700000,
+    label: '700k'
+  }
+];
+
+const depthMarks = [
+  {
+    value: 0,
+    scaledValue: 0,
+    label: '0'
+  },
+  {
+    value: 25,
+    scaledValue: 50,
+    label: '50'
+  },
+  {
+    value: 50,
+    scaledValue: 500,
+    label: '500'
+  },
+  {
+    value: 75,
+    scaledValue: 1000,
+    label: '1000'
+  },
+  {
+    value: 100,
+    scaledValue: 3000,
+    label: '3000'
+  }
+];
+
 class EntrancesSearch extends React.Component {
   // TODO: Handle the max of depth and length dynamically
 
   /*
-    The state is created with particular key names because, 
+    The state is created with particular key names because,
     these names are directly linked to
     the names of these properties in Elasticsearch.
    */
@@ -472,66 +533,5 @@ EntrancesSearch.defaultProps = {
   caveLengthMinValue: 0,
   caveLengthMaxValue: 700000
 };
-
-const lengthMarks = [
-  {
-    value: 0,
-    scaledValue: 0,
-    label: '0'
-  },
-  {
-    value: 20,
-    scaledValue: 100,
-    label: '100'
-  },
-  {
-    value: 40,
-    scaledValue: 1000,
-    label: '1k'
-  },
-  {
-    value: 60,
-    scaledValue: 10000,
-    label: '10k'
-  },
-  {
-    value: 80,
-    scaledValue: 100000,
-    label: '100k'
-  },
-  {
-    value: 100,
-    scaledValue: 700000,
-    label: '700k'
-  }
-];
-
-const depthMarks = [
-  {
-    value: 0,
-    scaledValue: 0,
-    label: '0'
-  },
-  {
-    value: 25,
-    scaledValue: 50,
-    label: '50'
-  },
-  {
-    value: 50,
-    scaledValue: 500,
-    label: '500'
-  },
-  {
-    value: 75,
-    scaledValue: 1000,
-    label: '1000'
-  },
-  {
-    value: 100,
-    scaledValue: 3000,
-    label: '3000'
-  }
-];
 
 export default injectIntl(withStyles(styles)(EntrancesSearch));

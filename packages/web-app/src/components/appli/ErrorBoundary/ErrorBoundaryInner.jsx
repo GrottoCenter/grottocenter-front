@@ -26,11 +26,11 @@ class ErrorBoundaryInner extends React.Component {
     this.goHome = this.goHome.bind(this);
   }
 
-  static getDerivedStateFromError(_error) {
+  static getDerivedStateFromError() {
     return { hasError: true };
   }
 
-  componentDidUpdate(prevProps, _previousState) {
+  componentDidUpdate(prevProps) {
     const { hasError } = this.props;
     const { hasError: prevHasError } = prevProps;
     if (!hasError && prevHasError) {
@@ -38,7 +38,7 @@ class ErrorBoundaryInner extends React.Component {
     }
   }
 
-  componentDidCatch(_error, _errorInfo) {
+  componentDidCatch() {
     const { setHasError } = this.props;
     setHasError(true);
   }

@@ -22,7 +22,7 @@ const StyledList = styled(List)({
 const sortByDataQuality = entrances =>
   entrances.sort((a, b) => b.data_quality - a.data_quality);
 
-const EntrancesListPage = props => {
+const EntrancesListPage = () => {
   const { countryId, massifId } = useParams();
   const { formatMessage } = useIntl();
   const dispatch = useDispatch();

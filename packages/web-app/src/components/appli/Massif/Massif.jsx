@@ -68,7 +68,7 @@ const Massif = ({
         <>
           {isFetching && isNil(error) && (
             <>
-              <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+              <Box style={{ display: 'flex', justifyContent: 'center' }}>
                 <Skeleton height={300} width={800} /> {/* Map Skeleton */}
               </Box>
               <Skeleton height={100} /> {/* Documents Skeleton */}

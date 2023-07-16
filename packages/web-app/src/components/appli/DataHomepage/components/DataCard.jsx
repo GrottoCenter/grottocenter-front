@@ -33,20 +33,22 @@ const DataCard = props => {
 
   return (
     <StyledBox
-      sx={{
+      style={{
         backgroundColor: isColored
           ? alpha(theme.palette.secondary.main, 0.4)
           : '',
         border: isColored ? '' : '1px solid'
       }}
       boxShadow={2}>
-      <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+      <Box style={{ display: 'flex', justifyContent: 'center' }}>
         {icon}
-        {isFetching ? (
+        {isFetching || Number.isNaN(numberData) ? (
           <CircularProgress />
         ) : (
           <StyledTypography variant="h1">
-            {numberData && numberData.toLocaleString('fr-FR')}
+            {numberData &&
+              !Number.isNaN(numberData) &&
+              numberData.toLocaleString('fr-FR')}
           </StyledTypography>
         )}
       </Box>
@@ -54,7 +56,7 @@ const DataCard = props => {
         <Typography variant="h3">{title}</Typography>
         <Typography
           variant="body1"
-          align="justify"
+          align="center"
           style={{ marginBottom: '-7px', lineHeight: '18px' }}>
           {globalText}
         </Typography>
