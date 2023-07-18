@@ -57,10 +57,27 @@ export function postLogout() {
   };
 }
 
-/** Decode a JWT token BUT does NOT validate it */
+/**
+ * Decode a JWT token BUT does NOT validate it.
+ * Source: https://stackoverflow.com/a/38552302/16939610
+ */
 export function decodeJWT(token) {
   if (!token) return null;
-  return JSON.parse(atob(token.split('.')[1]));
+  const tokenParts = token.split('.');
+  const payload = tokenParts[1];
+  // replaces all occurrences of "-" with "+" and "_" with "/" in the base64Url string
+  // to conform to the base64 standard.
+  const base64 = payload.replace(/-/g, '+').replace(/_/g, '/');
+  const jsonPayload = decodeURIComponent(
+    window
+      // With atob, special characters are not preserved.
+      // They are decoded in the map function.
+      .atob(base64)
+      .split('')
+      .map(c => `%${`00${c.charCodeAt(0).toString(16)}`.slice(-2)}`)
+      .join('')
+  );
+  return JSON.parse(jsonPayload);
 }
 
 export function postLogin(email, password) {
