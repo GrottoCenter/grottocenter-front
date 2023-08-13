@@ -32,69 +32,57 @@ const requiredColumnsEntrance = [
 ];
 
 const checkData = (data, selectedType, formatMessage) => {
-  const errors = [];
-  data.forEach((row, index) => {
-    if (row.errors.length !== 0) {
-      // first we handle errors from csv downloader
-      row.errors.forEach(err => {
-        errors.push({
-          errorMessage: err.message,
-          row: err.row + 2
-        });
-      });
-    } else {
-      let requiredColumns;
-      let rowType;
-      switch (selectedType) {
-        case ENTRANCE:
-          requiredColumns = requiredColumnsEntrance;
-          rowType = ENTRANCE_KARSTLINK;
-          break;
-        case DOCUMENT:
-          requiredColumns = requiredColumnsDocument;
-          rowType = DOCUMENT_KARSTLINK;
-          break;
-        default:
-      }
+  let requiredColumns;
+  let rowType;
+  if (selectedType === ENTRANCE) {
+    requiredColumns = requiredColumnsEntrance;
+    rowType = ENTRANCE_KARSTLINK;
+  } else if (selectedType === DOCUMENT) {
+    requiredColumns = requiredColumnsDocument;
+    rowType = DOCUMENT_KARSTLINK;
+  }
 
-      // Then we check if the type of the imported file corresponds to the type the user is importing
-      if (row.data[TYPE] && row.data[TYPE].replaceAll(/\s/g, '') !== rowType) {
+  const errors = [];
+  for (let i = 0; i < data.length; i += 1) {
+    const row = data[i];
+
+    // We check if the type of the imported file corresponds to the type the user is importing
+    if (row[TYPE] && row[TYPE].replaceAll(/\s/g, '') !== rowType) {
+      errors.push({
+        errorMessage: formatMessage(
+          {
+            id: 'The type column is incorrect, expecting {rowType}.',
+            defaultMessage: 'The type column is incorrect, expecting {rowType}.'
+          },
+          { rowType }
+        ),
+        row: i + 2
+      });
+      // eslint-disable-next-line no-continue
+      continue;
+    }
+
+    // Then we check for mandatory columns
+    const rowDataKeys = keys(row);
+    for (const requiredColumn of requiredColumns) {
+      if (
+        !includes(requiredColumn, rowDataKeys) ||
+        row[requiredColumn] === ''
+      ) {
         errors.push({
           errorMessage: formatMessage(
             {
-              id: 'The type column is incorrect, expecting {rowType}.',
+              id: 'column value missing',
               defaultMessage:
-                'The type column is incorrect, expecting {rowType}.'
+                'The following column is missing a value : {column}.'
             },
-            { rowType }
+            { column: requiredColumn }
           ),
-          row: index + 2
+          row: i + 2
         });
-        return;
       }
-
-      // Then we check for mandatory columns
-      const rowDataKeys = keys(row.data);
-      requiredColumns.forEach(requiredColumn => {
-        if (
-          !includes(requiredColumn, rowDataKeys) ||
-          row.data[requiredColumn] === ''
-        ) {
-          errors.push({
-            errorMessage: formatMessage(
-              {
-                id: 'column value missing',
-                defaultMessage:
-                  'The following column is missing a value : {column}.'
-              },
-              { column: requiredColumn }
-            ),
-            row: index + 2
-          });
-        }
-      });
     }
-  });
+  }
   return errors;
 };
 
