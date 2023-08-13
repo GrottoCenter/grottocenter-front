@@ -4,14 +4,11 @@ import styled from 'styled-components';
 import {
   __,
   append,
-  defaultTo,
-  find,
   includes,
   isNil,
   pipe,
   prepend,
   prop,
-  propEq,
   reject,
   unless,
   without,
@@ -115,24 +112,12 @@ const Table = ({
     )
   );
   const getCustomCellRenders = useCallback(
-    id =>
-      pipe(
-        defaultTo([]),
-        find(propEq('id', id)),
-        prop('customRender'),
-        defaultTo(undefined)
-      )(customCellRenders),
+    id => customCellRenders.find(r => r.id === id)?.customRender,
     [customCellRenders]
   );
 
   const getCustomHeaderCellRenders = useCallback(
-    id =>
-      pipe(
-        defaultTo([]),
-        find(propEq('id', id)),
-        prop('customRender'),
-        defaultTo(undefined)
-      )(customHeaderCellRenders),
+    id => customHeaderCellRenders.find(r => r.id === id)?.customRender,
     [customHeaderCellRenders]
   );
 
