@@ -112,12 +112,12 @@ const Table = ({
     )
   );
   const getCustomCellRenders = useCallback(
-    id => customCellRenders.find(r => r.id === id)?.customRender,
+    id => customCellRenders?.find(r => r.id === id)?.customRender,
     [customCellRenders]
   );
 
   const getCustomHeaderCellRenders = useCallback(
-    id => customHeaderCellRenders.find(r => r.id === id)?.customRender,
+    id => customHeaderCellRenders?.find(r => r.id === id)?.customRender,
     [customHeaderCellRenders]
   );
 

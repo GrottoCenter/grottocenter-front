@@ -49,8 +49,6 @@ export const resetImportState = () => ({
   type: RESET_IMPORT_STATE
 });
 
-const makeBody = rows => rows.map(row => row.data);
-
 export const checkRowsInBdd = (typeRow, rowsData) => (dispatch, getState) => {
   dispatch(checkRowsStart());
   let url;
@@ -66,15 +64,9 @@ export const checkRowsInBdd = (typeRow, rowsData) => (dispatch, getState) => {
       return;
   }
 
-  const body = makeBody(rowsData);
-
-  const requestBody = JSON.stringify({
-    data: body
-  });
-
   const requestOptions = {
     method: 'POST',
-    body: requestBody,
+    body: JSON.stringify({ data: rowsData }),
     headers: getState().login.authorizationHeader
   };
 

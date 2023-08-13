@@ -59,16 +59,11 @@ const Step3 = () => {
     return returnedHiddenColumns;
   }, [selectedType]);
 
-  const flattenedColumns = useMemo(
-    () => importData.map(column => column.data),
-    [importData]
-  );
-
   const { formatMessage } = useIntl();
   const makeTranslation = id => formatMessage({ id });
   const [hiddenColumns, setHiddenColumns] = useState(defaulHiddenColumns);
   const [columns, setColumns] = useState(
-    createColumns(flattenedColumns, makeTranslation)
+    createColumns(importData, makeTranslation)
   );
   const [currentPage, setCurrentPage] = useState(0);
   const customHeaderRender = useCustomHeaderRender();
@@ -76,27 +71,27 @@ const Step3 = () => {
   const [orderBy, setOrderBy] = useState(null);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [currentData, updateCurrentData] = useState(
-    flattenedColumns.slice(
+    importData.slice(
       currentPage * rowsPerPage,
       currentPage * rowsPerPage + rowsPerPage
     )
   );
 
   useEffect(() => {
-    setColumns(createColumns(flattenedColumns, makeTranslation));
+    setColumns(createColumns(importData, makeTranslation));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [flattenedColumns]);
+  }, [importData]);
 
   useEffect(() => {
     updateCurrentData(
-      flattenedColumns.slice(
+      importData.slice(
         currentPage * rowsPerPage,
         currentPage * rowsPerPage + rowsPerPage
       )
     );
-  }, [order, orderBy, rowsPerPage, currentPage, flattenedColumns]);
+  }, [order, orderBy, rowsPerPage, currentPage, importData]);
 
-  return flattenedColumns.length === 0 ? (
+  return importData.length === 0 ? (
     formatMessage({ id: 'No result.' })
   ) : (
     <Table
@@ -110,7 +105,7 @@ const Step3 = () => {
       openDetailedView={undefined}
       order={order}
       orderBy={orderBy || undefined}
-      rowsCount={flattenedColumns.length}
+      rowsCount={importData.length}
       rowsPerPage={rowsPerPage}
       selection={undefined}
       title={formatMessage({ id: 'Csv content' })}
