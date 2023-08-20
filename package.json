@@ -39,9 +39,9 @@
   },
   "engines": {
     "node": ">=18",
-    "yarn": ">=3.0.*"
+    "yarn": "3.6.2"
   },
-  "packageManager": "yarn@3.2.1",
+  "packageManager": "yarn@3.6.2",
   "lint-staged": {
     "*.{js, jsx, ts, tsx}": [
       "eslint --cache --fix"
