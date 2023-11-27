@@ -43,7 +43,7 @@ const CavesData = ({
                   />
                 }
                 numberData={nbMassifs}
-                text="massifs are present in this country."
+                text="massif(s)"
               />
               <StyledDivider />
             </>
@@ -59,7 +59,7 @@ const CavesData = ({
                 />
               }
               numberData={nbCaves}
-              text="caves are freely accessible."
+              text="cave(s) (1 or multiple entrances)"
             />
           )}
 
@@ -70,7 +70,7 @@ const CavesData = ({
                 icon={<Waves color="primary" />}
                 alt="entry icon"
                 numberData={nbDivingCaves}
-                text="caves are diving."
+                text="cave(s) are diveable"
               />
             </>
           )}
@@ -87,7 +87,7 @@ const CavesData = ({
                   />
                 }
                 numberData={nbNetworks}
-                text="networks are freely accessible."
+                text="network(s) (cave of more than 1 entrance)"
               />
             </>
           )}

@@ -114,7 +114,7 @@ const DataHomepage = () => {
                 numberData={entrances.number}
                 isFetching={entrances.isFetching}
                 title={formatMessage({ id: 'caves' })}
-                globalText={formatMessage({ id: 'are freely accessible.' })}
+                globalText={formatMessage({ id: 'are accessible.' })}
               />
             )}
           </Grid>
