@@ -21,7 +21,6 @@ export const MultipleSelectTypes = {
   computeHasError: PropTypes.func.isRequired,
   getOptionLabel: PropTypes.func.isRequired,
   getOptionSelected: PropTypes.func.isRequired,
-  handleOnChange: PropTypes.func.isRequired, // handleOnChange(event: object, value: T | T[], reason: string)
   helperText: PropTypes.string.isRequired,
   isLoading: PropTypes.bool,
   isSideActionOpen: PropTypes.bool,
@@ -36,20 +35,18 @@ export const MultipleSelectTypes = {
   searchError: PropTypes.string,
   searchResults: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   sideActionDisabled: PropTypes.bool,
-  sideActionIcon: PropTypes.node,
-  value: PropTypes.arrayOf(PropTypes.shape({})).isRequired
+  sideActionIcon: PropTypes.node
 };
 
 export const MultipleSelectWithOptionsTypes = {
   computeHasError: PropTypes.func.isRequired,
   getOptionLabel: PropTypes.func.isRequired,
   getOptionSelected: PropTypes.func.isRequired,
-  handleOnChange: PropTypes.func.isRequired, // handleOnChange(event: object, value: T | T[], reason: string)
   helperText: PropTypes.string.isRequired,
   labelName: PropTypes.string.isRequired,
   noOptionsText: PropTypes.node,
   options: PropTypes.arrayOf(PropTypes.shape({})),
   renderOption: PropTypes.func,
   required: PropTypes.bool,
-  value: PropTypes.arrayOf(PropTypes.shape({})).isRequired
+  contextValueName: PropTypes.string.isRequired
 };

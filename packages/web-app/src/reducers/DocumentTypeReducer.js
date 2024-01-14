@@ -7,7 +7,8 @@ import {
 const initialState = {
   documentTypes: [],
   error: null,
-  isLoading: false
+  isLoading: false,
+  isLoaded: false
 };
 
 const reducer = (state = initialState, action) => {
@@ -18,6 +19,7 @@ const reducer = (state = initialState, action) => {
       return {
         ...state,
         isLoading: false,
+        isLoaded: true,
         error: null,
         documentTypes: action.documentTypes
       };

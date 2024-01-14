@@ -6,7 +6,7 @@ import {
 } from '../actions/Region';
 
 const initialState = {
-  bbsRegionsByName: [],
+  results: [],
   isFetching: false,
   error: null
 };
@@ -19,7 +19,7 @@ const reducer = (state = initialState, action) => {
     case REGIONS_SEARCH_SUCCESS:
       return {
         ...state,
-        bbsRegionsByName: action.regions,
+        results: action.results,
         isFetching: false
       };
 
@@ -27,7 +27,7 @@ const reducer = (state = initialState, action) => {
       return { ...state, error: action.error, isFetching: false };
 
     case RESET_REGIONS_SEARCH:
-      return { ...state, bbsRegionsByName: [] };
+      return { ...state, results: [] };
 
     default:
       return state;

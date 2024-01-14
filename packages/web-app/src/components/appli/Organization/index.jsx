@@ -116,10 +116,8 @@ const Organization = ({ error, isLoading, organization, onEdit, canEdit }) => {
               />
               <hr />
               <DocumentsList
-                docs={organization.documents.map(doc => ({
-                  ...doc,
-                  title: doc.titles[0].text
-                }))}
+                title={formatMessage({ id: 'Documents' })}
+                documents={organization.documents}
                 emptyMessageComponent={
                   <Alert
                     severity="info"
@@ -128,7 +126,6 @@ const Organization = ({ error, isLoading, organization, onEdit, canEdit }) => {
                     })}
                   />
                 }
-                title={formatMessage({ id: 'Documents' })}
               />
               <hr />
 

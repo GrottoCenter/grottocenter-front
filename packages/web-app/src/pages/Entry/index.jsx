@@ -8,7 +8,6 @@ import {
   getComments,
   getDescriptions,
   getDetails,
-  getDocuments,
   getHistories,
   getLocations,
   getRiggings
@@ -28,7 +27,7 @@ const EntryPage = () => {
     useSelector(state => state.updateEntrance);
   const prevupdateEntranceLoading = useRef(updateEntranceLoading);
   const { loading: associateDocumentLoading, error: associateDocumentError } =
-    useSelector(state => state.associateDocumentToEntrance);
+    useSelector(state => state.linkDocumentToEntrance);
   const prevAssociateDocumentLoading = useRef(associateDocumentLoading);
 
   // Initial data loading
@@ -72,7 +71,7 @@ const EntryPage = () => {
   const comments = getComments(data.comments ?? []);
   const descriptions = getDescriptions(data.descriptions ?? []);
   const details = getDetails(data);
-  const documents = getDocuments(data.documents ?? []);
+  const documents = data.documents ?? [];
   const histories = getHistories(data.histories ?? []);
   const locations = getLocations(data.locations ?? []);
   const riggings = getRiggings(data.riggings ?? []);

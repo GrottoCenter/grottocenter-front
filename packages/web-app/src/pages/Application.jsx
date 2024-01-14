@@ -23,7 +23,6 @@ import ForgotPassword from '../components/appli/ForgotPassword';
 import { usePermissions } from '../hooks';
 
 import ContributionsPage from './Contributions';
-import DocumentSubmission from './DocumentSubmission';
 import DocumentValidation from './DocumentValidation';
 import DocumentEdit from './DocumentEdit';
 import EntityCreation from './EntityCreation';
@@ -128,7 +127,6 @@ const Application = () => {
         <Route path="/ui/entity/add" component={EntityCreation} />
         <Route path="/ui/forgotPassword" component={ForgotPassword} />
         <Route path="/ui/changePassword" component={ChangePassword} />
-        <Route path="/ui/documents/add" component={DocumentSubmission} />
         <Route path="/ui/documents/validation" component={DocumentValidation} />
         <Route path="/ui/documents/:documentId/edit" component={DocumentEdit} />
         <Route

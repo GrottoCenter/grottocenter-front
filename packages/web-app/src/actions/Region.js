@@ -1,5 +1,6 @@
 import fetch from 'isomorphic-fetch';
 import { regionsSearchUrl } from '../conf/apiRoutes';
+import { checkAndGetStatus } from './utils';
 import makeErrorMessage from '../helpers/makeErrorMessage';
 
 export const REGIONS_SEARCH = 'REGIONS_SEARCH';
@@ -11,9 +12,9 @@ export const searchRegions = () => ({
   type: REGIONS_SEARCH
 });
 
-export const searchRegionsSuccess = regions => ({
+export const searchRegionsSuccess = results => ({
   type: REGIONS_SEARCH_SUCCESS,
-  regions
+  results
 });
 
 export const searchRegionsFailure = error => ({
@@ -25,32 +26,21 @@ export const resetRegionsSearch = () => ({
   type: RESET_REGIONS_SEARCH
 });
 
-export function loadRegionsSearch(regionCode, regionName, isDeprecated) {
+export function loadRegionsSearch(query) {
   return dispatch => {
     dispatch(searchRegions());
 
     return fetch(regionsSearchUrl, {
       method: 'POST',
-      body: JSON.stringify({
-        code: regionCode,
-        name: regionName,
-        isDeprecated
-      })
+      body: JSON.stringify({ query })
     })
-      .then(response => {
-        if (response.status >= 400) {
-          throw new Error(response.status);
-        }
-        return response.text();
-      })
-      .then(text => dispatch(searchRegionsSuccess(JSON.parse(text).regions)))
+      .then(checkAndGetStatus)
+      .then(response => response.json())
+      .then(data => dispatch(searchRegionsSuccess(data.results)))
       .catch(error =>
         dispatch(
           searchRegionsFailure(
-            makeErrorMessage(
-              error.message,
-              `Fetching region ${regionCode} ${regionName}`
-            )
+            makeErrorMessage(error.message, `Fetching region ${query}`)
           )
         )
       );

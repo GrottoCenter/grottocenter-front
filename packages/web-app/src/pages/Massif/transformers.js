@@ -33,13 +33,4 @@ const getDetails = massif => {
   };
 };
 
-const getDocuments = documents =>
-  documents.map(document => ({
-    ...document,
-    title: document?.titles[0].text
-  }));
-
-const getEntrances = entrances => entrances;
-const getNetworks = networks => networks;
-
-export { getDescriptions, getDetails, getDocuments, getEntrances, getNetworks };
+export { getDescriptions, getDetails };

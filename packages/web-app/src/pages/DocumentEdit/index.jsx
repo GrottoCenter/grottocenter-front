@@ -2,23 +2,20 @@ import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { CircularProgress } from '@material-ui/core';
 import { useDispatch, useSelector } from 'react-redux';
-import { isEmpty, isNil, head, pathOr, propOr, reject, pipe } from 'ramda';
+import { isEmpty, isNil } from 'ramda';
 import { useHistory, useParams } from 'react-router-dom';
-import DocumentSubmission from '../DocumentSubmission';
+import { useIntl } from 'react-intl';
+import DocumentSubmission from '../../components/appli/EntitiesForm/Document';
 import { fetchDocumentDetails } from '../../actions/DocumentDetails';
-import docInfoGetters from './docInfoGetters';
 import { resetApiMessages } from '../../actions/Document/ResetApiMessages';
+import Layout from '../../components/common/Layouts/Fixed/FixedContent';
 
-const DocumentEdit = ({
-  onSuccessfulUpdate,
-  id,
-  resetIsValidated,
-  requireUpdate = false
-}) => {
+const DocumentEdit = ({ onSuccessfulUpdate, id, requireUpdate = false }) => {
   const { documentId: documentIdFromRoute } = useParams();
   const documentId = documentIdFromRoute || id;
   const history = useHistory();
   const dispatch = useDispatch();
+  const { formatMessage } = useIntl();
   const { isLoading, details, error } = useSelector(
     state => state.documentDetails
   );
@@ -46,61 +43,19 @@ const DocumentEdit = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [latestHttpCode, errorMessages]);
 
-  const defaultValues = {
-    ...reject(isNil, {
-      authorComment: propOr(null, 'authorComment', details),
-      authors: pathOr(null, ['authors'], details),
-      description: pipe(
-        propOr([], ['descriptions']),
-        head,
-        propOr(null, ['text'])
-      )(details),
-      documentMainLanguage: propOr(null, 'mainLanguage', details),
-      documentType: pathOr(null, ['type'], details),
-      editor: pathOr(null, ['editor'], details),
-      endPage: docInfoGetters.getEndPage(details),
-      id: details.id,
-      identifier: pathOr(null, ['identifier'], details),
-      identifierType: pathOr(null, ['identifierType'], details),
-      isNewDocument: false,
-      issue: pathOr(null, ['issue'], details),
-      library: pathOr(null, ['library'], details),
-      massif: pathOr(null, ['massif'], details),
-      partOf: docInfoGetters.getAndConvertParentDocument(details),
-      publicationDate: propOr('', 'datePublication', details),
-      regions: pathOr(null, ['regions'], details),
-      startPage: docInfoGetters.getStartPage(details),
-      subjects: pathOr(null, ['subjects'], details),
-      title: pipe(propOr([], 'titles'), head, propOr(null, 'text'))(details),
-      titleAndDescriptionLanguage: pipe(
-        propOr([], 'titles'),
-        head,
-        propOr(null, 'language')
-      )(details),
-      files: docInfoGetters.getFiles(details),
-      authorizationDocument: propOr(null, 'authorizationDocument', details),
-      option: pathOr(null, ['option', 'name'], details),
-      license: propOr(null, 'license', details)
-    }),
-    ...(resetIsValidated
-      ? {
-          isValidated: false,
-          dateValidation: null
-        }
-      : {})
-  };
-
-  return isLoading || !isNil(error) ? (
+  return isLoading || !isNil(error) || !details.id ? (
     <CircularProgress />
   ) : (
-    <DocumentSubmission defaultValues={defaultValues} />
+    <Layout
+      title={formatMessage({ id: 'BBS document submission form' })}
+      content={<DocumentSubmission initialValues={details} />}
+    />
   );
 };
 
 DocumentEdit.propTypes = {
   onSuccessfulUpdate: PropTypes.func,
   id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-  resetIsValidated: PropTypes.bool,
   requireUpdate: PropTypes.bool
 };
 

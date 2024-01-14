@@ -195,6 +195,8 @@ export const putDocumentyWithNewEntitiesUrl = docId =>
 export const patchNameUrl = id => `${API_BASE_PATH}/names/${id}`;
 export const associateDocumentToEntranceUrl = (entranceId, documentId) =>
   `${API_BASE_PATH}/entrances/${entranceId}/documents/${documentId}`;
+export const associateDocumentToMassifUrl = (massifId, documentId) =>
+  `${API_BASE_PATH}/massifs/${massifId}/documents/${documentId}`;
 export const moveEntranceToCaveUrl = (entranceId, caveId) =>
   `${API_BASE_PATH}/entrances/${entranceId}/cave/${caveId}`;
 

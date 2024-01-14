@@ -13,6 +13,7 @@ import { includes, values } from 'ramda';
 import Translate from '../../components/common/Translate';
 import OrganizationForm from '../../components/appli/EntitiesForm/Organization';
 import { EntranceForm, MassifForm } from '../../components/appli/EntitiesForm';
+import DocumentSubmission from '../../components/appli/EntitiesForm/Document';
 
 const StyledFormControl = styled(FormControl)`
   margin-bottom: 2em;
@@ -21,7 +22,8 @@ const StyledFormControl = styled(FormControl)`
 const ENTITIES = {
   entrance: 'Entrance',
   massif: 'Massif',
-  organization: 'Organization'
+  organization: 'Organization',
+  document: 'Document'
 };
 
 const EntityTypeSelect = ({ entity, onEntityChange }) => {
@@ -50,6 +52,12 @@ const EntityTypeSelect = ({ entity, onEntityChange }) => {
         <FormControlLabel
           labelPlacement="bottom"
           control={<Radio />}
+          value={ENTITIES.document}
+          label={formatMessage({ id: 'Document' })}
+        />
+        <FormControlLabel
+          labelPlacement="bottom"
+          control={<Radio />}
           value={ENTITIES.massif}
           label={formatMessage({ id: 'Massif' })}
         />
@@ -68,6 +76,8 @@ const EntityForm = ({ selectedEntity }) => {
   switch (selectedEntity) {
     case ENTITIES.entrance:
       return <EntranceForm />;
+    case ENTITIES.document:
+      return <DocumentSubmission />;
     case ENTITIES.massif:
       return <MassifForm />;
     case ENTITIES.organization:

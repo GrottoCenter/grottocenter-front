@@ -8,15 +8,13 @@ const DocumentsTableHead = () => {
   return (
     <TableHead>
       <TableRow>
+        <TableCell>{formatMessage({ id: 'Type' })}</TableCell>
         <TableCell>{formatMessage({ id: 'Title' })}</TableCell>
-        <TableCell>{formatMessage({ id: 'Published in' })}</TableCell>
+        <TableCell>{formatMessage({ id: 'Description' })}</TableCell>
         <TableCell>{formatMessage({ id: 'Subjects' })}</TableCell>
         <TableCell>{formatMessage({ id: 'Country or region' })}</TableCell>
         <TableCell>{formatMessage({ id: 'Authors' })}</TableCell>
-        <TableCell>
-          {/* Considering the number of columns, "Publication Date" is a bit long */}
-          {formatMessage({ id: 'Date' })}
-        </TableCell>
+        {/* <TableCell>{formatMessage({ id: 'Date' })}</TableCell> */}
       </TableRow>
     </TableHead>
   );

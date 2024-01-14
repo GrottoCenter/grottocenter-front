@@ -9,7 +9,7 @@ import {
   putDocumentyWithNewEntitiesUrl
 } from '../../conf/apiRoutes';
 import { checkAndGetStatus } from '../utils';
-import { buildFormData, buildPages } from './utils';
+import { buildFormData } from './utils';
 
 // ==========
 
@@ -37,20 +37,17 @@ export const updateDocumentFailure = (errorMessages, httpCode) => ({
 export function updateDocument(docAttributes) {
   return (dispatch, getState) => {
     dispatch(updateDocumentAction());
-
-    const { startPage, endPage } = docAttributes;
-    const pages = buildPages(startPage, endPage);
-    const attributes = { ...docAttributes, pages };
+    const attributes = { ...docAttributes };
+    const { files } = attributes;
     delete attributes.files;
-    const formData = new FormData();
 
+    const formData = new FormData();
     buildFormData(formData, attributes);
 
     // Files must have the same key name for each file, as it is asked by the parser on server side.
-    const { files } = docAttributes;
     let indexDeleted = 0;
     let indexModified = 0;
-    files.forEach(file => {
+    for (const file of files) {
       // For a file that is modified or intact, baseFile corresponds to the file entity of the database.
       const {
         name,
@@ -75,7 +72,7 @@ export function updateDocument(docAttributes) {
           break;
         default:
       }
-    });
+    }
 
     const requestOptions = {
       method: 'PUT',

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, memo } from 'react';
 import {
   Checkbox,
   IconButton,
@@ -8,7 +8,7 @@ import {
   ListItemText
 } from '@material-ui/core';
 import VisibilityOffIcon from '@material-ui/icons/VisibilityOff';
-import { includes, without, __, values } from 'ramda';
+import { includes, __, values } from 'ramda';
 import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
 
@@ -24,7 +24,7 @@ const VisibleColumnsMenu = ({
   allColumns
 }) => {
   const { formatMessage } = useIntl();
-  const [anchorEl, setAnchorEl] = React.useState(null);
+  const [anchorEl, setAnchorEl] = useState(null);
 
   const handleClick = event => {
     setAnchorEl(event.currentTarget);
@@ -35,11 +35,13 @@ const VisibleColumnsMenu = ({
   };
 
   const handleUpdateHiddenColumns = id => () => {
-    updateHiddenColumns(
-      includes(id, hiddenColumns)
-        ? without(id, hiddenColumns)
-        : [...hiddenColumns, id]
-    );
+    const idx = hiddenColumns.indexOf(id);
+    if (idx === -1) {
+      updateHiddenColumns([...hiddenColumns, id]);
+    } else {
+      hiddenColumns.splice(idx, 1);
+      updateHiddenColumns([...hiddenColumns]);
+    }
   };
 
   return (
@@ -64,7 +66,7 @@ const VisibleColumnsMenu = ({
             <ListItemIcon>
               <Checkbox
                 size="small"
-                checked={includes(column.id, hiddenColumns)}
+                checked={hiddenColumns.includes(column.id)}
                 onChange={() => {}}
                 name={column.id}
               />
@@ -88,6 +90,4 @@ VisibleColumnsMenu.propTypes = {
   updateHiddenColumns: PropTypes.func.isRequired
 };
 
-const MemoizedVisibleColumnsMenu = React.memo(VisibleColumnsMenu);
-
-export default MemoizedVisibleColumnsMenu;
+export default memo(VisibleColumnsMenu);

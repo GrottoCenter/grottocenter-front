@@ -1,9 +1,4 @@
 import { isNil, pathOr } from 'ramda';
-import {
-  makeDetails,
-  makeEntities,
-  makeOverview
-} from '../DocumentDetails/transformers';
 import getAuthor from '../../util/getAuthor';
 
 export const getComments = comments =>
@@ -79,15 +74,6 @@ export const getDescriptions = descriptions =>
       relevance: description?.relevance
     }))
     .sort((l1, l2) => l1.relevance < l2.relevance);
-
-export const getDocuments = documents =>
-  documents.map(document => ({
-    details: makeDetails(document),
-    entities: makeEntities(document),
-    id: document?.id,
-    overview: makeOverview(document),
-    snapshot: document
-  }));
 
 export const getHistories = histories =>
   histories

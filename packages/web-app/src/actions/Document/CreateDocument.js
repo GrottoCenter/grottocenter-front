@@ -1,14 +1,11 @@
 import fetch from 'isomorphic-fetch';
 
 import { postDocumentUrl } from '../../conf/apiRoutes';
-import { buildFormData, buildPages } from './utils';
+import { buildFormData } from './utils';
 
-// ==========
 export const POST_DOCUMENT = 'POST_DOCUMENT';
 export const POST_DOCUMENT_SUCCESS = 'POST_DOCUMENT_SUCCESS';
 export const POST_DOCUMENT_FAILURE = 'POST_DOCUMENT_FAILURE';
-
-// ==========
 
 export const postDocumentAction = () => ({
   type: POST_DOCUMENT
@@ -28,16 +25,14 @@ export const postDocumentFailure = (errorMessages, httpCode) => ({
 export function postDocument(docAttributes) {
   return (dispatch, getState) => {
     dispatch(postDocumentAction());
-    const { startPage, endPage } = docAttributes;
-    const pages = buildPages(startPage, endPage);
-    const attributes = { ...docAttributes, pages };
+    const attributes = { ...docAttributes };
+    const { files } = attributes;
     delete attributes.files;
-    const formData = new FormData();
 
+    const formData = new FormData();
     buildFormData(formData, attributes);
 
     // Files must have the same key name for each file, as it is asked by the parser on server side.
-    const { files } = docAttributes;
     files.forEach(file => {
       formData.append('files', file.file, `${file.name}.${file.extension}`);
     });

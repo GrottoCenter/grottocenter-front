@@ -1,234 +1,233 @@
-import { Typography, List, ListItemText } from '@material-ui/core';
-import React from 'react';
+import {
+  Typography,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  Divider
+} from '@material-ui/core';
+import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { isEmpty, isNil, is } from 'ramda';
-import { Skeleton, TreeItem, TreeView as MuiTreeView } from '@material-ui/lab';
-import { ExpandMore, ChevronRight, Launch } from '@material-ui/icons';
-
-import { isMobileOnly } from 'react-device-detect';
+import { Description } from '@material-ui/icons';
 
 import GCLink from '../../components/common/GCLink';
-
-// ==========
-
-const Wrapper = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  min-height: 35px;
-  margin: 0 ${({ theme }) => theme.spacing(3)}px;
-`;
-
-const ContentWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-`;
-
-const WrapperListItem = styled.div`
-  display: flex;
-  justify-content: flex-end;
-`;
-
-const ToRightListItemText = styled(ListItemText)`
-  text-align: right;
-`;
 
 const Label = styled(Typography)`
   margin-right: ${({ theme }) => theme.spacing(2)}px;
   text-transform: uppercase;
 `;
-
-const IconContainer = styled.div`
-  min-width: ${isMobileOnly ? '0' : '15rem'};
-  display: flex;
-  justify-content: center;
-`;
-
-const FollowURLIcon = styled(Launch)`
-  margin-left: ${({ theme }) => theme.spacing(2)}px;
-  vertical-align: bottom;
-`;
-
 const IconAndLabelWrapper = styled.span`
-  align-items: center;
-  align-self: ${props => (props.isLabelAndIconOnTop ? 'flex-start' : 'center')};
-  display: flex;
-`;
-
-const ValueContainer = styled.div`
-  flex: 1;
-  margin-right: ${isMobileOnly ? '5%' : '20%'};
   text-align: right;
 `;
 
-const TreeView = styled(MuiTreeView)`
-  text-align: left;
+export const SectionDivider = styled(Divider)`
+  margin-top: 1em;
+  margin-bottom: 1em;
+  background-color: ${props => props.theme.palette.divider};
 `;
 
-const isArray = is(Array);
-const isString = is(String);
-
-// ==========
-
-const ChildTreeItem = ({ item }) => {
-  const { id, url, title, childrenData } = item;
+export const ItemString = ({ label, value, url }) => {
+  if (!value) return false;
   return (
-    <TreeItem
-      nodeId={String(id)}
-      label={
-        <>
-          {title}
-          <GCLink href={url}>
-            <FollowURLIcon fontSize="small" />
-          </GCLink>
-        </>
-      }>
-      {childrenData &&
-        childrenData.map(c => <ChildTreeItem key={c.id} item={c} />)}
-    </TreeItem>
-  );
-};
-
-const Item = ({
-  Icon,
-  label,
-  type,
-  url,
-  value,
-  CustomComponent,
-  CustomComponentProps,
-  internalUrl = false,
-  isLabelAndIconOnTop = false,
-  isLoading = false
-}) => (
-  <Wrapper>
-    <IconAndLabelWrapper isLabelAndIconOnTop={isLabelAndIconOnTop}>
-      <IconContainer>{!isNil(Icon) && <Icon />}</IconContainer>
-      <Label color="textSecondary" variant="caption">
-        {' '}
-        {`${label}: `}
-        &nbsp;
-      </Label>
-    </IconAndLabelWrapper>
-    <ValueContainer>
-      {isLoading && <Skeleton variant="rect" height={200} />}
-      {!isLoading && !isEmpty(value) && !isNil(value) && (
-        <>
-          {type === 'tree' && isArray(value) && (
-            <TreeView
-              defaultCollapseIcon={<ExpandMore />}
-              defaultExpandIcon={<ChevronRight />}>
-              {value.map(child => (
-                <ChildTreeItem key={child.id} item={child} />
-              ))}
-            </TreeView>
-          )}
-          {type === 'list' && isArray(value) && (
-            <List>
-              {value.map((item, index) => {
-                const props = CustomComponentProps
-                  ? CustomComponentProps[index]
-                  : {};
-
-                const Component = CustomComponent || ToRightListItemText;
-
-                return (
-                  <WrapperListItem key={item}>
-                    <Component {...props}>{item}</Component>
-                  </WrapperListItem>
-                );
-              })}
-            </List>
-          )}
-          {isString(value) &&
-            (url ? (
-              <GCLink href={url} internal={internalUrl}>
-                {value}
-              </GCLink>
-            ) : (
-              <Typography>{value}</Typography>
-            ))}
-        </>
-      )}
-    </ValueContainer>
-  </Wrapper>
-);
-
-const Section = ({ title, content, loading }) => {
-  const isValueNotEmpty = value => !isEmpty(value) && !isNil(value);
-  return (
-    <ContentWrapper>
-      <Typography color="textSecondary" variant="h6" gutterBottom>
-        {title}
-      </Typography>
-      {loading ? (
-        <Skeleton variant="rect" height={100} />
+    <>
+      <IconAndLabelWrapper>
+        <Label color="textSecondary" variant="caption">
+          {`${label}: `}
+          &nbsp;
+        </Label>
+      </IconAndLabelWrapper>
+      {url ? (
+        <GCLink href={url} internal={url.startsWith('/ui')}>
+          {value}
+        </GCLink>
       ) : (
-        content.map(
-          item =>
-            /* Display item if :
-                - it's loading => a value will be displayed later
-                - it's not loading => a value must be set before rendering an <Item>
-              */
-            (item.isLoading || isValueNotEmpty(item.value)) && (
-              <Item
-                key={item.label}
-                Icon={item.Icon}
-                label={item.label}
-                type={item.type}
-                internalUrl={item.internalUrl}
-                url={item.url}
-                value={item.value}
-                CustomComponent={item.CustomComponent}
-                CustomComponentProps={item.CustomComponentProps}
-                isLabelAndIconOnTop={item.isLabelAndIconOnTop}
-                isLoading={item.isLoading}
-              />
-            )
-        )
+        <Typography component="span">{value}</Typography>
       )}
-    </ContentWrapper>
+    </>
   );
 };
-
-export default Section;
-
-// Recursive PropTypes : https://stackoverflow.com/questions/32063297/can-a-react-prop-type-be-defined-recursively/52411570
-const childTreeItemShape = {
-  id: PropTypes.number.isRequired,
-  internalUrl: PropTypes.bool,
-  title: PropTypes.string.isRequired,
+ItemString.propTypes = {
+  label: PropTypes.string,
+  value: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
   url: PropTypes.string
 };
-childTreeItemShape.childrenData = PropTypes.arrayOf(
-  PropTypes.shape(childTreeItemShape)
-);
-ChildTreeItem.propTypes = {
-  item: PropTypes.shape(childTreeItemShape)
-};
 
-Item.propTypes = {
-  Icon: PropTypes.func,
+export const ItemList = ({ label, children }) => {
+  if (!children || children.length === 0) return false;
+  return (
+    <>
+      <IconAndLabelWrapper>
+        <Label color="textSecondary" variant="caption">
+          {`${label}: `}
+          &nbsp;
+        </Label>
+      </IconAndLabelWrapper>
+      <List>{children}</List>
+    </>
+  );
+};
+ItemList.propTypes = {
   label: PropTypes.string.isRequired,
-  value: PropTypes.oneOfType([
-    PropTypes.string,
-    PropTypes.arrayOf(PropTypes.string),
-    PropTypes.arrayOf(PropTypes.shape({}))
-  ]),
-  type: PropTypes.oneOf(['list', 'tree']),
-  internalUrl: PropTypes.bool,
-  url: PropTypes.string,
-  CustomComponent: PropTypes.node,
-  CustomComponentProps: PropTypes.shape({}),
-  isLabelAndIconOnTop: PropTypes.bool,
-  isLoading: PropTypes.bool
+  children: PropTypes.node
 };
 
-Section.propTypes = {
-  loading: PropTypes.bool.isRequired,
-  title: PropTypes.string.isRequired,
-  content: PropTypes.arrayOf(
-    PropTypes.oneOf([PropTypes.shape(Item.propTypes), PropTypes.node])
+export const ListElement = ({ icon, value, secondary, url }) => {
+  if (!value) return false;
+  return (
+    <ListItem>
+      {icon && <ListItemIcon>{icon}</ListItemIcon>}
+      <ListItemText
+        primary={<TextLink value={value} url={url} />}
+        secondary={secondary}
+      />
+    </ListItem>
+  );
+};
+ListElement.propTypes = {
+  icon: PropTypes.node,
+  value: PropTypes.string,
+  secondary: PropTypes.string,
+  url: PropTypes.string
+};
+
+export const TextLink = ({ value, url }) =>
+  url ? (
+    <GCLink href={url} internal={url.startsWith('/ui')}>
+      {value}
+    </GCLink>
+  ) : (
+    <Typography>{value}</Typography>
+  );
+TextLink.propTypes = {
+  value: PropTypes.string.isRequired,
+  url: PropTypes.node
+};
+
+export const SectionTitle = ({ children }) => (
+  <Typography color="textSecondary" variant="h6" gutterBottom>
+    {children}
+  </Typography>
+);
+SectionTitle.propTypes = {
+  children: PropTypes.node
+};
+
+export const SectionTitleLink = ({ title, value, url }) => {
+  if (!value) return false;
+
+  return (
+    <Typography variant="body1" paragraph>
+      {title} <TextLink value={value} url={url} />
+    </Typography>
+  );
+};
+SectionTitleLink.propTypes = {
+  title: PropTypes.string,
+  value: PropTypes.string,
+  url: PropTypes.string
+};
+
+const SectionTextContainer = styled(Typography)`
+  white-space: pre-wrap;
+`;
+export const SectionText = ({ title, children }) => {
+  if (!children || children.length === 0) return false;
+  return (
+    <>
+      <SectionTitle>{title}</SectionTitle>
+      <SectionTextContainer paragraph>{children}</SectionTextContainer>
+    </>
+  );
+};
+SectionText.propTypes = {
+  title: PropTypes.string,
+  children: PropTypes.node
+};
+
+const SectionDetailsContainer = styled.div`
+  display: grid;
+  grid-template-columns: auto auto;
+  align-items: center;
+  row-gap: 10px;
+`;
+export const SectionDetails = ({ title, children }) => {
+  if (!children || children.length === 0) return false;
+  return (
+    <>
+      <SectionTitle>{title}</SectionTitle>
+      <SectionDetailsContainer>{children}</SectionDetailsContainer>
+      <SectionDivider light />
+    </>
+  );
+};
+SectionDetails.propTypes = {
+  title: PropTypes.string,
+  children: PropTypes.node
+};
+
+const SectionListContainer = styled(List)`
+  & .MuiListItem-root {
+    width: initial;
+  }
+
+  & .MuiListItemText-secondary {
+    white-space: pre-wrap;
+  }
+
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+`;
+export const SectionList = ({ title, children }) => {
+  if (!children || children.length === 0) return false;
+  return (
+    <>
+      <SectionTitle>{title}</SectionTitle>
+      <SectionListContainer>{children}</SectionListContainer>
+    </>
+  );
+};
+SectionList.propTypes = {
+  title: PropTypes.string,
+  children: PropTypes.node
+};
+
+const SectionFilesPreviewIfFrame = styled.iframe`
+  border: 0;
+  width: 100%;
+  min-height: 500px;
+`;
+export const SectionFilesPreview = ({ title, files }) => {
+  const PREVIEW_EXTENTIONS = ['.pdf', '.png', '.jpg', '.mp3', '.mp4'];
+  const getExtention = url => `.${url.split('.').pop().toLowerCase()}`;
+  if (!files || files.length === 0) return false;
+  return (
+    <>
+      <SectionTitle>{title}</SectionTitle>
+      {files.map(e => (
+        <Fragment key={e.completePath}>
+          <ListElement
+            key={e.completePath}
+            icon={<Description color="primary" />}
+            value={e.fileName}
+            url={e.completePath}
+          />
+          {PREVIEW_EXTENTIONS.includes(getExtention(e.completePath)) && (
+            <SectionFilesPreviewIfFrame src={e.completePath} />
+          )}
+        </Fragment>
+      ))}
+    </>
+  );
+};
+SectionFilesPreview.propTypes = {
+  title: PropTypes.string,
+  files: PropTypes.arrayOf(
+    PropTypes.shape({
+      fileName: PropTypes.string,
+      completePath: PropTypes.string
+    })
   )
 };

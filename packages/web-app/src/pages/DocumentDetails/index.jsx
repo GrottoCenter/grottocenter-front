@@ -1,73 +1,139 @@
 import React, { useEffect, useRef } from 'react';
 import { useIntl } from 'react-intl';
+import { Chip } from '@material-ui/core';
 import { Terrain } from '@material-ui/icons';
 import { isNil } from 'ramda';
 import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams, useHistory } from 'react-router-dom';
-import { Divider, Link } from '@material-ui/core';
-
-import AttachFileIcon from '@material-ui/icons/AttachFile';
-import DescriptionIcon from '@material-ui/icons/Description';
-import styled from 'styled-components';
 import { Skeleton } from '@material-ui/lab';
-import Overview from './Overview';
-import Section from './Section';
+
+import getAuthor from '../../util/getAuthor';
+import { loadLanguages } from '../../actions/Language';
+
+import {
+  SectionDivider,
+  SectionText,
+  SectionDetails,
+  SectionList,
+  SectionTitleLink,
+  SectionFilesPreview,
+  ItemString,
+  ItemList,
+  ListElement,
+  TextLink
+} from './Section';
 import CustomIcon from '../../components/common/CustomIcon';
 import { fetchDocumentDetails } from '../../actions/DocumentDetails';
 import { fetchDocumentChildren } from '../../actions/DocumentChildren';
-import {
-  makeDetails,
-  makeDocumentChildren,
-  makeEntities,
-  makeOrganizations,
-  makeOverview,
-  makeDocumentParent
-} from './transformers';
 import { usePermissions } from '../../hooks';
-import Layout from '../../components/common/Layouts/Fixed/FixedContent';
-import idNameType from '../../types/idName.type';
-import authorType from '../../types/author.type';
+import FixedContent from '../../components/common/Layouts/Fixed/FixedContent';
 import Deleted, {
   DELETED_ENTITIES
 } from '../../components/common/card/Deleted';
-
-const OrganizationIcon = styled.img`
-  height: 35px;
-  width: 35px;
-`;
-
-const StyledDivider = styled(Divider)`
-  margin-top: ${({ theme }) => theme.spacing(4)}px;
-  margin-bottom: ${({ theme }) => theme.spacing(4)}px;
-`;
+import AuthorAndDate from '../../components/common/Contribution/AuthorAndDate';
 
 const DocumentPage = ({
   loading = true,
-  overview,
-  organizations,
-  details,
-  entities,
+  documentId,
+  documentData,
   documentChildren,
-  documentParent,
-  isValidated,
-  onEdit,
-  areDocumentChildrenLoading,
-  actualEntity
+  onEdit
 }) => {
   const { formatMessage } = useIntl();
   const permissions = usePermissions();
+  const dispatch = useDispatch();
 
-  const { editor, library } = organizations;
+  const isLoading = loading || !documentData || !documentChildren;
 
-  const { documentId: documentIdFromRoute } = useParams();
-  const documentId = documentIdFromRoute;
+  const { languages, isLoaded: isLanguagesLoaded } = useSelector(
+    state => state.language
+  );
+
+  useEffect(() => {
+    if (!isLanguagesLoaded) {
+      dispatch(loadLanguages(true));
+    }
+  }, [dispatch, isLanguagesLoaded]);
+
+  const allAuthors = [];
+  const childIssues = [];
+  const childArticles = [];
+  const childOther = [];
+  const linkedEntities = [];
+
+  if (!loading) {
+    // eslint-disable-next-line no-param-reassign
+    if (documentData.mainLanguage === '000') documentData.mainLanguage = null;
+
+    for (const author of documentData?.authors ?? []) {
+      allAuthors.push(
+        <TextLink
+          key={author.id}
+          value={author.nickname}
+          url={`/ui/cavers/${author.id}`}
+        />,
+        ' - '
+      );
+    }
+    for (const author of documentData?.authorsOrganization ?? []) {
+      allAuthors.push(
+        <TextLink
+          key={author.id}
+          value={author.name}
+          url={`/ui/organizations/${author.id}`}
+        />,
+        ' - '
+      );
+    }
+    if (allAuthors.length > 0) allAuthors.splice(allAuthors.length - 1);
+
+    for (const doc of documentChildren) {
+      if (doc.type === 'Issue') childIssues.push(doc);
+      else if (doc.type === 'Article') childArticles.push(doc);
+      else childOther.push(doc);
+    }
+
+    if (documentData?.massifs && documentData?.massifs.length > 0)
+      linkedEntities.push(
+        ...(documentData?.massifs?.map(e => (
+          <ListElement
+            key={e.id}
+            icon={<Terrain fontSize="large" color="primary" />}
+            value={e.name}
+            secondary={formatMessage({ id: 'Massif' })}
+            url={`/ui/massifs/${e.id}`}
+          />
+        )) ?? [])
+      );
+    if (documentData?.cave)
+      linkedEntities.push(
+        <ListElement
+          key={documentData?.cave.id}
+          icon={<CustomIcon type="cave_system" />}
+          value={documentData?.cave.name}
+          secondary={formatMessage({ id: 'Cave' })}
+          url={`/ui/caves/${documentData?.cave.id}`}
+        />
+      );
+    if (documentData?.entrance)
+      linkedEntities.push(
+        <ListElement
+          key={documentData?.entrance.id}
+          icon={<CustomIcon type="entry" />}
+          value={documentData?.entrance.name}
+          secondary={formatMessage({ id: 'Entrance' })}
+          url={`/ui/entrances/${documentData?.entrance.id}`}
+        />
+      );
+  }
 
   return (
-    <Layout
-      onEdit={isValidated ? onEdit : undefined}
+    <FixedContent
+      onEdit={documentData.isValidated ? onEdit : undefined}
       subheader={
-        !isValidated &&
+        !isLoading &&
+        !documentData.isValidated &&
         formatMessage({
           id: 'A moderator needs to validate the last modification before being able to edit the document again.'
         })
@@ -75,187 +141,192 @@ const DocumentPage = ({
       snapshot={{
         id: documentId,
         entity: 'documents',
-        actualVersion: actualEntity
+        actualVersion: documentData
       }}
-      title={loading ? <Skeleton /> : overview.title}
+      title={documentData.title}
       content={
-        <>
-          <Overview {...overview} loading={loading} />
-          <StyledDivider />
-          <Section
-            loading={loading}
-            title={formatMessage({ id: 'Organizations' })}
-            content={[
-              {
-                Icon: () => (
-                  <OrganizationIcon
-                    src="/images/club.svg"
-                    alt="Organization icon"
-                  />
-                ),
-                label: formatMessage({ id: 'Editor' }),
-                value: editor?.name,
-                url: `/ui/organizations/${editor?.id}`,
-                internalUrl: true
-              },
-              {
-                Icon: () => (
-                  <OrganizationIcon
-                    src="/images/club.svg"
-                    alt="Organization icon"
-                  />
-                ),
-                label: formatMessage({ id: 'Library' }),
-                value: library?.name,
-                url: `/ui/organizations/${library?.id}`,
-                internalUrl: true
-              }
-            ]}
-          />
-          <StyledDivider />
-          <Section
-            loading={loading}
-            title={formatMessage({ id: 'Details' })}
-            content={[
-              {
-                label: formatMessage({ id: 'Identifier' }),
-                value: details.identifier,
-                url:
-                  details.identifierType === 'url'
-                    ? details.identifier
+        isLoading ? (
+          <>
+            <Skeleton width={75} />
+            <Skeleton />
+            <Skeleton width={100} />
+            <Skeleton variant="rect" height={150} />
+            <Skeleton width={125} />
+            <Skeleton variant="rect" height={80} />
+          </>
+        ) : (
+          <>
+            <SectionTitleLink
+              title={formatMessage({ id: 'Is Part of' })}
+              value={documentData.parent?.title}
+              url={`/ui/documents/${documentData.parent?.id}`}
+            />
+            <SectionText title={formatMessage({ id: 'Summary' })}>
+              {documentData.description}
+            </SectionText>
+            <SectionDivider />
+            <SectionDetails title={formatMessage({ id: 'Details' })}>
+              <ItemString
+                label={formatMessage({ id: 'Type' })}
+                value={<Chip color="primary" label={documentData.type} />}
+              />
+              <ItemString
+                label={formatMessage({ id: 'Language' })}
+                value={
+                  languages.find(e => e.id === documentData.mainLanguage)
+                    ?.refName ?? documentData.mainLanguage
+                }
+              />
+              <ItemString
+                label={documentData.identifierType?.toUpperCase()}
+                value={documentData.identifier}
+                url={
+                  documentData.identifierType === 'url'
+                    ? documentData.identifier
                     : undefined
-              },
-              {
-                label: formatMessage({ id: 'BBS reference' }),
-                value: details.bbsReference
-              },
-              {
-                label: formatMessage({ id: 'Document type' }),
-                value:
-                  details.documentType &&
-                  formatMessage({ id: details.documentType })
-              },
-              {
-                label: formatMessage({ id: 'Publication date' }),
-                value: details.publicationDate
-              },
-              {
-                label: formatMessage({ id: 'Publication (BBS legacy)' }),
-                value: details.oldPublication
-              },
-              {
-                label: formatMessage({ id: 'Publication number (BBS legacy)' }),
-                value: details.oldPublicationFascicule
-              },
-              {
-                label: formatMessage({ id: 'Parent document' }),
-                value: documentParent.title,
-                url: documentParent.url
-              },
-              {
-                label: formatMessage({ id: 'Pages' }),
-                value: details.pages
-              },
-              {
-                label: formatMessage({ id: 'Subjects' }),
-                value: details.subjects.map(s =>
-                  formatMessage({
-                    id: s.code,
-                    defaultMessage: s.subject
-                  })
-                ),
-                type: 'list'
-              },
-              {
-                label: formatMessage({ id: 'Regions' }),
-                value: details.regions.map(r =>
-                  formatMessage({
-                    id: r.code,
-                    defaultMessage: r.name
-                  })
-                ),
-                type: 'list'
-              },
-              {
-                label: formatMessage({ id: 'Author comment' }),
-                value: details.authorComment
-              }
-            ]}
-          />
-          <StyledDivider />
-          <Section
-            loading={loading}
-            title={formatMessage({ id: 'Linked Entities' })}
-            content={[
-              {
-                Icon: () => <Terrain fontSize="large" color="primary" />,
-                label: formatMessage({ id: 'Massif' }),
-                value: entities.massif?.name,
-                url: `/ui/massifs/${entities.massif?.id}`
-              },
-              {
-                Icon: () => <CustomIcon type="entry" />,
-                internalUrl: true,
-                label: formatMessage({ id: 'Entrance' }),
-                value: entities.entrance?.name,
-                url: `/ui/entrances/${entities.entrance?.id}`
-              },
-              {
-                Icon: () => <CustomIcon type="cave_system" />,
-                label: formatMessage({ id: 'Cave' }),
-                value: entities.cave?.name,
-                url: `/ui/caves/${entities.cave?.id}`
-              },
-              {
-                Icon: () => <DescriptionIcon color="primary" />,
-                type: 'list',
-                label: formatMessage({ id: 'Files' }),
-                value: entities.files.fileNames,
-                CustomComponent: Link,
-                CustomComponentProps: entities.files.fileLinks
-              },
-              permissions.isModerator && {
-                Icon: () => <AttachFileIcon color="primary" />,
-                label: formatMessage({ id: 'Authorization document' }),
-                value: entities.authorizationDocument
-              },
-              {
-                Icon: () => <CustomIcon type="bibliography" />,
-                label: formatMessage({ id: 'Child documents' }),
-                value: documentChildren,
-                type: 'tree',
-                isLabelAndIconOnTop: true,
-                isLoading: areDocumentChildrenLoading
-              }
-            ]}
-          />
-        </>
+                }
+              />
+              <ItemList label={formatMessage({ id: 'Authors' })}>
+                {allAuthors}
+              </ItemList>
+              <ItemString
+                label={formatMessage({ id: 'Editor' })}
+                value={documentData.editor?.name}
+                url={`/ui/organizations/${documentData.editor?.id}`}
+              />
+              <ItemString
+                label={formatMessage({ id: 'Library' })}
+                value={documentData.library?.name}
+                url={`/ui/organizations/${documentData.library?.id}`}
+              />
+              <ItemString
+                label={formatMessage({ id: 'Publication date' })}
+                value={documentData.datePublication}
+              />
+              <ItemString
+                label={formatMessage({ id: 'Publication (BBS legacy)' })}
+                value={documentData?.oldBBS?.publicationOther}
+              />
+              <ItemString
+                label={formatMessage({ id: 'Publication number (BBS legacy)' })}
+                value={documentData?.oldBBS?.publicationFascicule}
+              />
+              <ItemString
+                label={formatMessage({ id: 'Pages' })}
+                value={documentData.pages}
+              />
+              <ItemString
+                label={formatMessage({ id: 'Issue' })}
+                value={documentData.issue}
+              />
+              <ItemList label={formatMessage({ id: 'Subjects' })}>
+                {documentData.subjects?.map(
+                  s =>
+                    `${s.id} ${formatMessage({
+                      id: s.id,
+                      defaultMessage: s.subject
+                    })}`
+                )}
+              </ItemList>
+              <ItemList label={formatMessage({ id: 'Regions' })}>
+                {documentData.iso3166?.map(e => `${e.name} (${e.iso})`)}
+              </ItemList>
+              {permissions.isModerator && (
+                <ItemString
+                  label={formatMessage({ id: 'Authorization' })}
+                  value={documentData?.authorizationDocument?.title}
+                  url={`/ui/documents/${documentData.authorizationDocument?.id}`}
+                />
+              )}
+              <ItemString
+                label={formatMessage({ id: 'Source' })}
+                value={
+                  documentData.importSource
+                    ? `${documentData.importId}#${documentData.importSource}`
+                    : null
+                }
+              />
+              <ItemString
+                label={formatMessage({ id: 'License' })}
+                value={documentData.license}
+              />
+            </SectionDetails>
+            <SectionList title={formatMessage({ id: 'Linked entities' })}>
+              {linkedEntities}
+            </SectionList>
+            <SectionList title={formatMessage({ id: 'Articles' })}>
+              {childArticles?.map(doc => (
+                <ListElement
+                  key={doc.id}
+                  icon={<CustomIcon type="bibliography" />}
+                  value={doc.title}
+                  secondary={doc.description}
+                  url={`/ui/documents/${doc.id}`}
+                />
+              ))}
+            </SectionList>
+            <SectionList title={formatMessage({ id: 'Issues' })}>
+              {childIssues?.map(doc => (
+                <ListElement
+                  key={doc.id}
+                  icon={<CustomIcon type="bibliography" />}
+                  value={doc.title}
+                  secondary={doc.description}
+                  url={`/ui/documents/${doc.id}`}
+                />
+              ))}
+            </SectionList>
+            <SectionList title={formatMessage({ id: 'Child documents' })}>
+              {childOther?.map(doc => (
+                <ListElement
+                  key={doc.id}
+                  icon={<CustomIcon type="bibliography" />}
+                  value={doc.title}
+                  secondary={doc.description}
+                  url={`/ui/documents/${doc.id}`}
+                />
+              ))}
+            </SectionList>
+            <SectionFilesPreview
+              title={formatMessage({ id: 'Files' })}
+              files={documentData?.files}
+            />
+
+            <AuthorAndDate
+              author={getAuthor(documentData.creator)}
+              textColor="textSecondary"
+              date={documentData.dateInscription}
+              verb="Created"
+            />
+          </>
+        )
       }
     />
   );
 };
 
 const HydratedDocumentPage = ({ id }) => {
-  const { documentId: documentIdFromRoute } = useParams();
-  const documentId = documentIdFromRoute || id;
   const dispatch = useDispatch();
+  const { locale } = useSelector(state => state.intl);
+  const { documentId: documentIdFromRoute } = useParams();
+  const documentId = parseInt(documentIdFromRoute ?? id, 10);
   const { isLoading, details, error } = useSelector(
     state => state.documentDetails
   );
   const {
-    isLoading: areDocumentChildrenLoading,
+    isLoading: isDocumentChildrenLoading,
     children,
     childrenError
   } = useSelector(state => state.documentChildren);
+
   const history = useHistory();
   const editPath = useRef('/ui');
   const permissions = usePermissions();
-  const { locale } = useSelector(state => state.intl);
 
   useEffect(() => {
     if (!isNil(documentId)) {
       dispatch(fetchDocumentDetails(documentId));
-      dispatch(fetchDocumentChildren(documentId));
+      dispatch(fetchDocumentChildren(documentId, locale));
       editPath.current = `/ui/documents/${documentId}/edit`;
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -277,93 +348,108 @@ const HydratedDocumentPage = ({ id }) => {
     />
   ) : (
     <DocumentPage
-      overview={makeOverview(details || {})}
-      organizations={makeOrganizations(details || {})}
-      details={makeDetails(details || {})}
-      entities={makeEntities(details || {})}
-      documentChildren={makeDocumentChildren(children || {}, locale)}
-      documentParent={makeDocumentParent(details || {})}
-      areDocumentChildrenLoading={areDocumentChildrenLoading}
+      documentId={documentId}
+      documentData={details}
+      documentChildren={children}
       loading={
-        isNil(documentId) || isLoading || !isNil(error) || !isNil(childrenError)
+        isNil(documentId) ||
+        isLoading ||
+        isDocumentChildrenLoading ||
+        !isNil(error) ||
+        !isNil(childrenError)
       }
       isValidated={details.modifiedDocJson === null}
       onEdit={permissions.isAuth ? onEdit : undefined}
-      actualEntity={details}
     />
   );
 };
 
 export default HydratedDocumentPage;
 
+const simpleCaver = PropTypes.shape({
+  id: PropTypes.number.isRequired,
+  nickname: PropTypes.string.isRequired
+});
+const simpleOrganization = PropTypes.shape({
+  id: PropTypes.number.isRequired,
+  name: PropTypes.string.isRequired
+});
+const simpleSubject = PropTypes.shape({
+  id: PropTypes.number.isRequired,
+  subject: PropTypes.string.isRequired
+});
+const simpleLinkedEntity = PropTypes.shape({
+  id: PropTypes.number.isRequired,
+  name: PropTypes.string.isRequired
+});
+const simpleDocument = PropTypes.shape({
+  id: PropTypes.number.isRequired,
+  title: PropTypes.string,
+  description: PropTypes.string
+});
+const fullDocument = PropTypes.shape({
+  id: PropTypes.number,
+  importSource: PropTypes.string,
+  importId: PropTypes.number,
+  type: PropTypes.string,
+  isValidated: PropTypes.bool,
+  dateInscription: PropTypes.string,
+  dateReviewed: PropTypes.string,
+  dateValidation: PropTypes.string,
+  datePublication: PropTypes.string,
+  creator: simpleCaver,
+  authors: PropTypes.arrayOf(simpleCaver),
+  authorsOrganization: PropTypes.arrayOf(simpleOrganization),
+  reviewer: simpleCaver,
+  validator: simpleCaver,
+  title: PropTypes.string,
+  description: PropTypes.string,
+  mainLanguage: PropTypes.string,
+  identifier: PropTypes.string,
+  identifierType: PropTypes.string,
+  library: simpleOrganization,
+  editor: simpleOrganization,
+  subjects: PropTypes.arrayOf(simpleSubject),
+  issue: PropTypes.string,
+  pages: PropTypes.string,
+  license: PropTypes.string,
+  iso3166: PropTypes.arrayOf(PropTypes.string),
+  authorizationDocument: PropTypes.string,
+  cave: simpleLinkedEntity,
+  entrance: simpleLinkedEntity,
+  massifs: PropTypes.arrayOf(simpleLinkedEntity),
+  parent: simpleDocument,
+  oldBBS: PropTypes.shape({
+    publicationOther: PropTypes.string,
+    publicationFascicule: PropTypes.string
+  }),
+  files: PropTypes.arrayOf(
+    PropTypes.shape({
+      fileName: PropTypes.string,
+      completePath: PropTypes.string
+    })
+  )
+});
+const deletedDocument = PropTypes.shape({
+  id: PropTypes.number,
+  isDeleted: PropTypes.number,
+  redirectTo: PropTypes.number,
+  dateInscription: PropTypes.string,
+  dateReviewed: PropTypes.string,
+  author: simpleCaver,
+  reviewer: simpleCaver
+});
+
 DocumentPage.propTypes = {
   loading: PropTypes.bool,
-  areDocumentChildrenLoading: PropTypes.bool,
-  overview: PropTypes.shape({
-    author: authorType,
-    authors: PropTypes.arrayOf(authorType).isRequired,
-    language: PropTypes.string.isRequired,
-    license: PropTypes.shape({
-      name: PropTypes.string.isRequired,
-      url: PropTypes.string.isRequired
-    }),
-    title: PropTypes.string.isRequired,
-    summary: PropTypes.string.isRequired
-  }),
-  organizations: PropTypes.shape({
-    editor: idNameType,
-    library: idNameType
-  }),
-  details: PropTypes.shape({
-    authorComment: PropTypes.string,
-    identifier: PropTypes.string,
-    identifierType: PropTypes.string,
-    bbsReference: PropTypes.string,
-    documentType: PropTypes.string,
-    oldPublication: PropTypes.string,
-    oldPublicationFascicule: PropTypes.string,
-    publicationDate: PropTypes.string,
-    parentDocument: PropTypes.string,
-    pages: PropTypes.string,
-    subjects: PropTypes.arrayOf(
-      PropTypes.shape({
-        code: PropTypes.string,
-        subject: PropTypes.string
-      })
-    ),
-    regions: PropTypes.arrayOf(
-      PropTypes.shape({
-        code: PropTypes.string,
-        name: PropTypes.string
-      })
-    )
-  }),
-  entities: PropTypes.shape({
-    cave: idNameType,
-    entrance: idNameType,
-    massif: idNameType,
-    files: PropTypes.shape({
-      fileNames: PropTypes.arrayOf(PropTypes.string),
-      fileLinks: PropTypes.arrayOf(PropTypes.string)
-    }),
-    authorizationDocument: PropTypes.string
-  }),
-  documentChildren: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.number.isRequired,
-      title: PropTypes.string.isRequired,
-      url: PropTypes.string,
-      childrenData: PropTypes.arrayOf(PropTypes.shape({})) // recursive data
-    })
-  ),
-  documentParent: PropTypes.shape({
-    title: PropTypes.string.isRequired,
-    url: PropTypes.string.isRequired
-  }),
-  isValidated: PropTypes.bool.isRequired,
-  onEdit: PropTypes.func.isRequired,
-  // eslint-disable-next-line react/forbid-prop-types
-  actualEntity: PropTypes.any
+  documentId: PropTypes.number,
+  documentData: PropTypes.oneOfType([
+    PropTypes.shape({}),
+    fullDocument,
+    deletedDocument
+  ]),
+  documentChildren: PropTypes.arrayOf(simpleDocument),
+  onEdit: PropTypes.func
 };
 
 HydratedDocumentPage.propTypes = {

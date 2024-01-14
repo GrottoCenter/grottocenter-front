@@ -202,7 +202,7 @@ FixedContent.propTypes = {
   }),
   onChangeSubscribe: PropTypes.func,
   subheader: PropTypes.node,
-  title: PropTypes.oneOfType([PropTypes.node, PropTypes.string]).isRequired
+  title: PropTypes.oneOfType([PropTypes.node, PropTypes.string])
 };
 
 export default FixedContent;

@@ -23,37 +23,38 @@ const Wrapper = styled.div`
 `;
 
 const defaultHiddenColumns = [
-  'author',
-  'authorComment',
-  'authorizationDocument',
-  'authors',
-  'cave',
-  'datePublication',
-  'dateValidation',
-  'descriptions',
-  'editor',
-  'entrance',
-  'files',
-  'id',
+  // 'id',
+  'importId',
+  'importSource',
   'identifier',
   'identifierType',
-  'intactDescriptions',
+  'dateReviewed',
+  'dateValidation',
+  'datePublication',
+  'isDeleted',
+  'redirectTo',
   'isValidated',
-  'library',
-  'license',
-  'massif',
-  'mainLanguage',
-  'modifiedDocJson',
-  'option',
-  'pages',
-  'parent',
-  'pathOld',
-  'publication',
-  'publicationFasciculeBBSOld',
-  'refBbs',
+  'creator',
+  'creatorComment',
+  'authors',
+  'authorsOrganization',
   'reviewer',
-  'validationComment',
-  'validator'
+  'validator',
+  'validatorComment',
+  'editor',
+  'library',
+  'pages',
+  'license',
+  'option',
+  'languages',
+  'files',
+  'massifs',
+  'cave',
+  'entrance',
+  'parent',
+  'authorizationDocument',
+  'modifiedDocJson',
+  'oldBBS'
 ];
 
 const DocumentValidationPage = () => {
@@ -63,11 +64,11 @@ const DocumentValidationPage = () => {
   const { success: isActionSuccess } = useSelector(
     state => state.processDocuments
   );
-  const [selected, setSelected] = React.useState([]);
-  const [page, setPage] = React.useState(0);
-  const [order, setOrder] = React.useState('asc');
-  const [orderBy, setOrderBy] = React.useState();
-  const [rowsPerPage, setRowsPerPage] = React.useState(50);
+  const [selected, setSelected] = useState([]);
+  const [page, setPage] = useState(0);
+  const [order, setOrder] = useState('asc');
+  const [orderBy, setOrderBy] = useState();
+  const [rowsPerPage, setRowsPerPage] = useState(50);
   const [detailedView, setDetailedView] = useState(null);
   const [editView, setEditView] = useState(null);
   const [refreshPage, setRefreshPage] = useState(false);
@@ -170,7 +171,7 @@ const DocumentValidationPage = () => {
         open={!isNil(detailedView)}
         onClose={closeDetailedView}
         title={formatMessage({ id: 'Detailed document view' })}>
-        <DocumentDetails id={detailedView} />
+        {detailedView && <DocumentDetails id={detailedView} />}
       </StandardDialog>
       <StandardDialog
         maxWidth="lg"

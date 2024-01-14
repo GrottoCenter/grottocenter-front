@@ -26,6 +26,8 @@ import { POST_RIGGINGS_SUCCESS } from '../actions/Riggings/CreateRigging';
 import { UPDATE_RIGGINGS_SUCCESS } from '../actions/Riggings/UpdateRigging';
 import { POST_COMMENT_SUCCESS } from '../actions/Comment/CreateComment';
 import { UPDATE_COMMENT_SUCCESS } from '../actions/Comment/UpdateComment';
+import { LINK_DOCUMENT_TO_ENTRANCE_SUCCESS } from '../actions/LinkDocumentToEntrance';
+import { UNLINK_DOCUMENT_TO_ENTRANCE_SUCCESS } from '../actions/UnlinkDocumentToEntrance';
 
 const initialState = {
   data: {},
@@ -123,6 +125,28 @@ const reducer = (state = initialState, action) => {
             e => e.id === action.rigging.id,
             action.rigging
           )
+        }
+      };
+    case LINK_DOCUMENT_TO_ENTRANCE_SUCCESS:
+      return {
+        ...initialState,
+        data: {
+          ...state.data,
+          documents: arrFindReplaceOrAdd(
+            state.data.documents,
+            e => e.id === action.document.id,
+            action.document
+          )
+        }
+      };
+    case UNLINK_DOCUMENT_TO_ENTRANCE_SUCCESS:
+      return {
+        ...initialState,
+        data: {
+          ...state.data,
+          documents: [
+            ...state.data.documents.filter(e => e.id !== action.documentId)
+          ]
         }
       };
     case POST_COMMENT_SUCCESS:

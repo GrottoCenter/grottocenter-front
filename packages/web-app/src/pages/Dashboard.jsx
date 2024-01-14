@@ -126,31 +126,33 @@ const Dashboard = () => {
               </Typography>
 
               <StyledList cols={6}>
-                <StyledListItemDBExport key="leader-db-snapshot">
-                  <Typography variant="h4" align="center">
-                    {formatMessage({ id: 'Database export' })}
-                  </Typography>
-                  <br />
-                  <Button
-                    variant="outlined"
-                    size="small"
-                    onClick={() => window.open(dbExport.url, '_blank')}
-                    startIcon={<ArchiveIcon color="primary" />}>
-                    Download
-                  </Button>
-                  <br />
-                  <Typography variant="body2">
-                    {formatMessage({ id: 'Last update' })}:{' '}
-                    {dbExport.lastUpdate.split('T')[0]}
-                  </Typography>
-                  <Typography variant="body2">
-                    {formatMessage({ id: 'Size' })}:{' '}
-                    {Math.round((dbExport.size * 10) / (1024 * 1024)) / 10} Mo
-                  </Typography>
-                  <Typography variant="body2">
-                    {formatMessage({ id: 'License: CC-BY-SA' })}
-                  </Typography>
-                </StyledListItemDBExport>
+                {dbExport.url && (
+                  <StyledListItemDBExport key="leader-db-snapshot">
+                    <Typography variant="h4" align="center">
+                      {formatMessage({ id: 'Database export' })}
+                    </Typography>
+                    <br />
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      onClick={() => window.open(dbExport.url, '_blank')}
+                      startIcon={<ArchiveIcon color="primary" />}>
+                      Download
+                    </Button>
+                    <br />
+                    <Typography variant="body2">
+                      {formatMessage({ id: 'Last update' })}:{' '}
+                      {dbExport.lastUpdate.split('T')[0]}
+                    </Typography>
+                    <Typography variant="body2">
+                      {formatMessage({ id: 'Size' })}:{' '}
+                      {Math.round((dbExport.size * 10) / (1024 * 1024)) / 10} Mo
+                    </Typography>
+                    <Typography variant="body2">
+                      {formatMessage({ id: 'License: CC-BY-SA' })}
+                    </Typography>
+                  </StyledListItemDBExport>
+                )}
               </StyledList>
             </DashboardBlock>
           )}

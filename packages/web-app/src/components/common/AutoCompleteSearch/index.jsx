@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import {
   InputBase,
@@ -94,7 +94,7 @@ const AutoCompleteSearch = ({
   disabled = false,
   hasFixWidth = true
 }) => {
-  const [isOpen, setOpen] = React.useState(false);
+  const [isOpen, setOpen] = useState(false);
 
   const handleSelectionChange = (_event, newSelection) => {
     onSelection(newSelection);
@@ -111,12 +111,10 @@ const AutoCompleteSearch = ({
     setOpen(false);
   };
   const handleOpen = () => {
-    if (inputValue !== '') {
-      setOpen(true);
-    }
+    if (inputValue !== '') setOpen(true);
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (inputValue === '') {
       setOpen(false);
     } else {
@@ -154,6 +152,7 @@ const AutoCompleteSearch = ({
               <SearchIcon color={disabled ? 'disabled' : 'inherit'} />
             </SearchIconWrapper>
             <StyledInputBase
+              required={false}
               disabled={params.disabled}
               ref={params.InputProps.ref}
               placeholder={label}

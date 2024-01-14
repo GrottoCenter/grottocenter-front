@@ -30,7 +30,7 @@ const SUBJECT_NAME_MAX_LENGTH = 80;
 
 class DocumentSearch extends React.Component {
   /*
-    The state is created with particular key names 
+    The state is created with particular key names
     because these names are directly linked to
     the names of these properties in Elasticsearch. Here we have a syntax that
     allow us to distinguish search range parameters from others parameters.
@@ -57,8 +57,9 @@ class DocumentSearch extends React.Component {
       'contributor nickname': '',
       description: '',
       publication_other_bbs_old: '',
-      regions: '',
-      ref_bbs: '',
+      iso_regions: '',
+      countries: '',
+      id_db_import: '',
       subjects: '',
       title: '',
       'type name': '',
@@ -178,14 +179,15 @@ class DocumentSearch extends React.Component {
 
     const {
       'date_publication-range': publicationDateRange,
-      ref_bbs, // eslint-disable-line camelcase
+      id_db_import, // eslint-disable-line camelcase
       title,
       authors,
       'contributor nickname': contributorNickname,
       description: abstract,
       'type name': documentTypeName,
       subjects, // TODO: currently, we select only one subject via a dropdown menu. It should be possible to search multiple subjects.
-      regions,
+      iso_regions, // eslint-disable-line camelcase
+      countries,
       publication_other_bbs_old, // eslint-disable-line camelcase
       matchAllFields,
       allFieldsRequest,
@@ -336,84 +338,115 @@ class DocumentSearch extends React.Component {
                     </FormControl>
                   </div>
                 </fieldset>
+                <fieldset className={classes.fieldset}>
+                  <legend className={classes.legend}>
+                    <Translate>Attributes</Translate>
+                  </legend>
+                  <TextField
+                    className={classes.formElement}
+                    label={
+                      <span>
+                        <Translate>Contributor nickname</Translate>
+                      </span>
+                    }
+                    onChange={event =>
+                      this.handleValueChange('contributor nickname', event)
+                    }
+                    value={contributorNickname}
+                  />
 
-                <TextField
-                  className={classes.formElement}
-                  label={
-                    <span>
-                      <Translate>Contributor nickname</Translate>
-                    </span>
-                  }
-                  onChange={event =>
-                    this.handleValueChange('contributor nickname', event)
-                  }
-                  value={contributorNickname}
-                />
+                  <TextField
+                    className={classes.formElement}
+                    label={
+                      <span>
+                        <Translate>Authors</Translate>
+                      </span>
+                    }
+                    onChange={event => this.handleValueChange('authors', event)}
+                    value={authors}
+                  />
 
-                <TextField
-                  className={classes.formElement}
-                  label={
-                    <span>
-                      <Translate>BBS Reference</Translate>
-                    </span>
-                  }
-                  onChange={event => this.handleValueChange('ref_bbs', event)}
-                  value={ref_bbs} // eslint-disable-line camelcase
-                />
+                  <TextField
+                    className={classes.formElement}
+                    label={
+                      <span>
+                        <Translate>Publication</Translate>
+                      </span>
+                    }
+                    onChange={event =>
+                      this.handleValueChange('publication_other_bbs_old', event)
+                    }
+                    value={publication_other_bbs_old} // eslint-disable-line camelcase
+                  />
 
-                <TextField
-                  className={classes.formElement}
-                  label={
-                    <span>
-                      <Translate>Regions</Translate>
-                    </span>
-                  }
-                  onChange={event => this.handleValueChange('regions', event)}
-                  value={regions}
-                />
+                  <TextField
+                    className={classes.formElement}
+                    label={
+                      <span>
+                        <Translate>ISO Countries</Translate>
+                      </span>
+                    }
+                    onChange={event =>
+                      this.handleValueChange('countries', event)
+                    }
+                    value={countries}
+                    helperText={<Translate>Apha 2 format (eg: FR)</Translate>}
+                  />
 
-                <TextField
-                  className={classes.formElement}
-                  label={
-                    <span>
-                      <Translate>Authors</Translate>
-                    </span>
-                  }
-                  onChange={event => this.handleValueChange('authors', event)}
-                  value={authors}
-                />
+                  <TextField
+                    className={classes.formElement}
+                    label={
+                      <span>
+                        <Translate>ISO Regions</Translate>
+                      </span>
+                    }
+                    onChange={event =>
+                      this.handleValueChange('iso_regions', event)
+                    }
+                    value={iso_regions} // eslint-disable-line camelcase
+                    helperText={
+                      <Translate>ISO 3166-2 codes (eg: FR-OCC)</Translate>
+                    }
+                  />
 
-                <TextField
-                  className={classes.formElement}
-                  label={
-                    <span>
-                      <Translate>Publication</Translate>
-                    </span>
-                  }
-                  onChange={event =>
-                    this.handleValueChange('publication_other_bbs_old', event)
-                  }
-                  value={publication_other_bbs_old} // eslint-disable-line camelcase
-                />
-
-                <SliderForm
-                  label={intl.formatMessage({
-                    id: 'Publication Date'
-                  })}
-                  disabled={!publicationDateRange.isEditable}
-                  onDisable={this.handleCheckedChange('date_publication-range')}
-                  min={publicationDateMinValue}
-                  max={publicationDateMaxValue}
-                  onChange={values => {
-                    this.handleRangeChange(
-                      'date_publication-range',
-                      values,
-                      publicationDateMinValue,
-                      publicationDateMaxValue
-                    );
-                  }}
-                  value={[publicationDateRange.min, publicationDateRange.max]}
-                />
+                  <TextField
+                    className={classes.formElement}
+                    label={
+                      <span>
+                        <Translate>Source id</Translate>
+                      </span>
+                    }
+                    onChange={event =>
+                      this.handleValueChange('id_db_import', event)
+                    }
+                    value={id_db_import} // eslint-disable-line camelcase
+                    helperText={
+                      <Translate>
+                        Original id from an imported database
+                      </Translate>
+                    }
+                  />
+                  <SliderForm
+                    label={intl.formatMessage({
+                      id: 'Publication Date'
+                    })}
+                    disabled={!publicationDateRange.isEditable}
+                    onDisable={this.handleCheckedChange(
+                      'date_publication-range'
+                    )}
+                    min={publicationDateMinValue}
+                    max={publicationDateMaxValue}
+                    onChange={values => {
+                      this.handleRangeChange(
+                        'date_publication-range',
+                        values,
+                        publicationDateMinValue,
+                        publicationDateMaxValue
+                      );
+                    }}
+                    value={[publicationDateRange.min, publicationDateRange.max]}
+                  />
+                </fieldset>
               </div>
 
               <div
@@ -484,12 +517,13 @@ class DocumentSearch extends React.Component {
 
                 // Fill state with same request
                 stateToSearch.matchAllFields = false;
-                stateToSearch.ref_bbs = allFieldsRequest;
+                stateToSearch.id_db_import = allFieldsRequest;
                 stateToSearch.title = allFieldsRequest;
                 stateToSearch.authors = allFieldsRequest;
                 stateToSearch.description = allFieldsRequest;
                 stateToSearch.subjects = allFieldsRequest;
-                stateToSearch.regions = allFieldsRequest;
+                stateToSearch.iso_regions = allFieldsRequest;
+                stateToSearch.countries = allFieldsRequest;
                 stateToSearch.publication_other_bbs_old = allFieldsRequest;
 
                 startAdvancedsearch(stateToSearch, resourceType);
