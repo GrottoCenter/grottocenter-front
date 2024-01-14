@@ -394,31 +394,31 @@ class SearchResultsTable extends React.Component {
                     )}
                     {resourceType === ADVANCED_SEARCH_TYPES.DOCUMENTS && (
                       <>
+                        <TableCell>{result.documentType}</TableCell>
                         <TableCell>{result.title}</TableCell>
                         <TableCell>
-                          {result.publication ? result.publication : '-'}
-                        </TableCell>
-                        <TableCell>
-                          {result.subjects
-                            ? result.subjects.map(s => s.code).join(', ')
+                          {result.description
+                            ? truncateString(result.description, 50)
                             : '-'}
                         </TableCell>
                         <TableCell>
-                          {result.regions
-                            ? truncateString(
-                                result.regions.map(s => s.name).join(', '),
-                                30
-                              )
+                          {result.subjects
+                            ? truncateString(result.subjects, 30)
+                            : '-'}
+                        </TableCell>
+                        <TableCell>
+                          {result.iso3166
+                            ? truncateString(result.iso3166.join(', '), 30)
                             : '-'}
                         </TableCell>
                         <TableCell>
                           {result.authors ? result.authors : '-'}
                         </TableCell>
-                        <TableCell>
+                        {/* <TableCell>
                           {result.datePublication
                             ? result.datePublication
                             : '-'}
-                        </TableCell>
+                        </TableCell> */}
                       </>
                     )}
                   </TableRow>

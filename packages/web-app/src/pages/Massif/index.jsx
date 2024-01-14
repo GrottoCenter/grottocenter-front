@@ -5,13 +5,7 @@ import { isNil, propOr } from 'ramda';
 import Massif from '../../components/appli/Massif/Massif';
 import { loadMassif } from '../../actions/Massif/GetMassif';
 import { usePermissions, useUserProperties } from '../../hooks';
-import {
-  getDetails,
-  getDescriptions,
-  getDocuments,
-  getEntrances,
-  getNetworks
-} from './transformers';
+import { getDetails, getDescriptions } from './transformers';
 import { subscribeToMassif } from '../../actions/Subscriptions/SubscribeToMassif';
 import { fetchSubscriptions } from '../../actions/Subscriptions/GetSubscriptions';
 import { unsubscribeFromMassif } from '../../actions/Subscriptions/UnsubscribeFromMassif';
@@ -47,9 +41,9 @@ const MassifPage = () => {
   const onUnsubscribe = () => dispatch(unsubscribeFromMassif(massifId));
   const descriptions = getDescriptions(propOr([], 'descriptions', massif));
   const details = getDetails(massif);
-  const documents = getDocuments(propOr([], 'documents', massif));
-  const entrances = getEntrances(propOr([], 'entrances', massif));
-  const networks = getNetworks(propOr([], 'networks', massif));
+  const documents = massif?.documents ?? [];
+  const entrances = massif?.entrances ?? [];
+  const networks = massif?.networks ?? [];
 
   return details.isDeleted ? (
     <Deleted

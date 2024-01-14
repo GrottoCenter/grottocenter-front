@@ -9,6 +9,13 @@ const CustomCell = ({ id, value, customRenders }) => {
       ? customRenders(id)
       : undefined;
 
+  if (!customRender && value && typeof value === 'object')
+    console.warn(
+      'Table CustomCell Bad value (a customRender might be missing)',
+      id,
+      value
+    );
+
   return (
     <TableCell align="right">
       {!isNil(customRender) ? customRender(value) : value || ''}

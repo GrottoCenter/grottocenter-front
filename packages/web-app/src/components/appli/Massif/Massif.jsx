@@ -6,10 +6,10 @@ import { Box } from '@material-ui/core';
 
 import Layout from '../../common/Layouts/Fixed/FixedContent';
 import CavesList from '../../common/cave/CavesList';
-import DocumentsList from '../../common/DocumentsList/DocumentsList';
 import Alert from '../../common/Alert';
 import MassifPropTypes from './propTypes';
 import MapMassif from './MapMassif';
+import Documents from './Documents';
 import Descriptions from './Descriptions';
 import { useSubscriptions } from '../../../hooks';
 import StatisticsDataDashboard from '../StatisticsDataDashboard';
@@ -111,18 +111,7 @@ const Massif = ({
               <hr />
               <StatisticsDataDashboard massifId={massifId} />
               <hr />
-              <DocumentsList
-                docs={documents}
-                emptyMessageComponent={
-                  <Alert
-                    severity="info"
-                    title={formatMessage({
-                      id: 'This massif has no documents listed yet.'
-                    })}
-                  />
-                }
-                title={formatMessage({ id: 'Documents' })}
-              />
+              <Documents documents={documents} massifId={massifId} />
               <hr />
               <CavesList
                 caves={networks}

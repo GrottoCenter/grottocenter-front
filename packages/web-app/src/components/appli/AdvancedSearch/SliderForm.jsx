@@ -10,7 +10,8 @@ import {
 import styled from 'styled-components';
 
 const Slider = styled(MuiSlider)`
-  width: 200px;
+  width: 100%;
+  max-width: 500px;
 `;
 
 export const StyledFormControl = styled(MuiFormControl)`

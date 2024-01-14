@@ -1,37 +1,20 @@
 import { TableHead as MuiTableHead, TableRow } from '@material-ui/core';
-import {
-  __,
-  concat,
-  defaultTo,
-  filter,
-  head,
-  isNil,
-  keys,
-  map,
-  pipe,
-  prop
-} from 'ramda';
 import React from 'react';
 import PropTypes from 'prop-types';
 
 import { InitialHead } from './InitialTable';
 import CustomHeaderCell from './CustomHeaderCell';
 
-export const createColumns = (rawData, makeTranslation) => {
-  const makeColumn = key => ({
+export const createColumns = (rawData, makeTranslation) =>
+  Object.keys(rawData[0] ?? {}).map(key => ({
     label: makeTranslation(key),
     id: key
-  });
+  }));
 
-  return pipe(head, defaultTo({}), keys, map(makeColumn))(rawData);
-};
-
-export const createDefaultHiddenColumns = (columns, defaults) =>
-  pipe(
-    map(prop('id')),
-    filter(id => id[0] === '@'),
-    concat(__, defaults)
-  )(columns);
+export const createDefaultHiddenColumns = (columns, defaults) => [
+  ...columns.map(e => e.id).filter(id => id[0] === '@'),
+  ...defaults
+];
 
 const TableHead = ({
   visibleColumns,
@@ -50,9 +33,7 @@ const TableHead = ({
             value={label}
             id={id}
             customRenders={
-              !isNil(customHeaderCellRenders)
-                ? customHeaderCellRenders
-                : undefined
+              !customHeaderCellRenders ? customHeaderCellRenders : undefined
             }
             {...orderProps}
           />

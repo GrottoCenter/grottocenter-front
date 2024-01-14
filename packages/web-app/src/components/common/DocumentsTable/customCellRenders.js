@@ -33,11 +33,15 @@ const useMakeCustomCellRenders = () => {
     },
     {
       id: 'author',
-      customRender: propOr('', 'nickname')
+      customRender: v => v?.nickname ?? ''
+    },
+    {
+      id: 'creator',
+      customRender: v => v?.nickname ?? ''
     },
     {
       id: 'identifierType',
-      customRender: propOr('', 'text')
+      customRender: v => v?.text ?? ''
     },
     {
       id: 'isValidated',
@@ -54,11 +58,7 @@ const useMakeCustomCellRenders = () => {
     },
     {
       id: 'license',
-      customRender: propOr('', 'name')
-    },
-    {
-      id: 'mainLanguage',
-      customRender: propOr('', 'refName')
+      customRender: v => v?.name ?? ''
     },
     {
       id: 'regions',
@@ -66,7 +66,7 @@ const useMakeCustomCellRenders = () => {
     },
     {
       id: 'subjects',
-      customRender: pipe(map(propOr('', 'code')), reject(isEmpty), join('; '))
+      customRender: v => v.map(e => e?.id).join('; ')
     },
     {
       id: 'library',
@@ -77,8 +77,8 @@ const useMakeCustomCellRenders = () => {
       customRender: propOr('', 'name')
     },
     {
-      id: 'type',
-      customRender: propOr('', 'name')
+      id: 'iso3166',
+      customRender: v => v.map(e => e.iso).join(' - ')
     },
     {
       id: 'entrance',

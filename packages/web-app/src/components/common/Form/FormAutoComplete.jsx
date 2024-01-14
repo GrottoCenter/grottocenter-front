@@ -40,14 +40,14 @@ export const InputWrapper = styled.div`
 const ExpandIcon = ({ isOpen }) => (isOpen ? <ExpandLess /> : <ExpandMore />);
 
 const FormAutoComplete = ({
-  autoCompleteSearch,
   getValueName,
+  value,
+  autoCompleteSearch,
   hasError,
   helperContent,
   label,
   required,
   resultEndAdornment,
-  value,
   onSideAction,
   sideActionIcon,
   sideActionDisabled = true,

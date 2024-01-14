@@ -5,7 +5,7 @@ import DashboardIcon from '@material-ui/icons/Dashboard';
 import MapIcon from '@material-ui/icons/Map';
 import SearchIcon from '@material-ui/icons/Search';
 import { FlagRounded } from '@material-ui/icons';
-import Item, { DocumentItems } from './Items';
+import Item from './Items';
 
 import { usePermissions } from '../../../hooks';
 
@@ -27,10 +27,6 @@ const MenuLinks = () => {
         ItemIcon={() => <LibraryAddIcon color="primary" />}
         label="Contribute"
         href="/ui/entity/add"
-      />
-      <DocumentItems
-        isModerator={permissions.isModerator}
-        isUser={permissions.isUser}
       />
       {permissions.isAuth && (
         <Item

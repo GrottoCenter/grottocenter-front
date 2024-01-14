@@ -1,50 +1,52 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { List, Typography } from '@material-ui/core';
+import { List, Typography, Divider } from '@material-ui/core';
 import styled from 'styled-components';
-import Translate from '../Translate';
-import DocumentListItem from './DocumentListItem';
+import Document from './Document';
 
-const StyledList = styled(List)({
-  display: 'flex',
-  flexWrap: 'wrap',
-  width: '100%'
-});
+const DividerStyled = styled(Divider)`
+  background-color: ${props => props.theme.palette.divider};
+  margin: 10px 0px;
+`;
 
-const DocumentsList = props => {
-  const { docs, title, emptyMessageComponent } = props;
-
-  return (
-    <>
-      {title && (
-        <Typography variant="h3" gutterBottom>
-          {title}
-        </Typography>
-      )}
-      {docs && docs.length > 0 ? (
-        <StyledList>
-          {docs
-            .sort((a, b) => a.title.localeCompare(b.title))
-            .map(doc => (
-              <DocumentListItem key={doc.id} doc={doc} />
-            ))}
-        </StyledList>
-      ) : (
-        emptyMessageComponent
-      )}
-    </>
-  );
-};
+const DocumentsList = ({
+  documents,
+  title,
+  emptyMessageComponent,
+  hasSnapshotButton = false,
+  onUnlink
+}) => (
+  <>
+    {title && (
+      <Typography variant="h3" gutterBottom>
+        {title}
+      </Typography>
+    )}
+    {documents && documents.length > 0 ? (
+      <List>
+        {documents.map((document, i) => (
+          <li key={document.id}>
+            <Document
+              document={document}
+              hasSnapshotButton={hasSnapshotButton}
+              onUnlink={onUnlink}
+            />
+            {documents.length - 1 !== i && <DividerStyled variant="middle" />}
+          </li>
+        ))}
+      </List>
+    ) : (
+      emptyMessageComponent
+    )}
+  </>
+);
 
 DocumentsList.propTypes = {
-  docs: PropTypes.arrayOf(PropTypes.shape({})),
+  documents: PropTypes.arrayOf(PropTypes.shape(Document.propTypes)),
   title: PropTypes.node,
-  emptyMessageComponent: PropTypes.node
-};
-
-DocumentsList.defaultProps = {
-  docs: [],
-  emptyMessageComponent: <Translate>Empty list</Translate>
+  emptyMessageComponent: PropTypes.node,
+  hasSnapshotButton: PropTypes.bool,
+  onUnlink: PropTypes.func
 };
 
 export default DocumentsList;

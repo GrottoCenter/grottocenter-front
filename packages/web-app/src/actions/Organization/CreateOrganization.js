@@ -1,6 +1,7 @@
 import fetch from 'isomorphic-fetch';
 import makeErrorMessage from '../../helpers/makeErrorMessage';
 import { postOrganizationUrl } from '../../conf/apiRoutes';
+import { checkAndGetStatus } from '../utils';
 
 export const POST_ORGANIZATION = 'POST_ORGANIZATION';
 export const POST_ORGANIZATION_SUCCESS = 'POST_ORGANIZATION_SUCCESS';
@@ -20,24 +21,20 @@ export const postOrganizationFailure = error => ({
   error
 });
 
-export const postOrganization = data => (dispatch, getState) => {
+export const postOrganization = body => (dispatch, getState) => {
   dispatch(postOrganizationAction());
 
   const requestOptions = {
     method: 'POST',
-    body: JSON.stringify(data),
+    body: JSON.stringify(body),
     headers: getState().login.authorizationHeader
   };
 
   return fetch(postOrganizationUrl, requestOptions)
-    .then(response => {
-      if (response.status >= 400) {
-        throw new Error(response.status);
-      }
-      return response.json();
-    })
-    .then(res => {
-      dispatch(postOrganizationSuccess(res));
+    .then(checkAndGetStatus)
+    .then(response => response.json())
+    .then(data => {
+      dispatch(postOrganizationSuccess(data));
     })
     .catch(error =>
       dispatch(

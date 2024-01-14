@@ -90,10 +90,8 @@ const Person = ({
               />
               <hr />
               <DocumentsList
-                docs={person.documents.map(doc => ({
-                  ...doc,
-                  title: doc.titles[0].text
-                }))}
+                title={formatMessage({ id: 'Documents' })}
+                documents={person.documents}
                 emptyMessageComponent={
                   <Alert
                     severity="info"
@@ -102,7 +100,6 @@ const Person = ({
                     })}
                   />
                 }
-                title={formatMessage({ id: 'Documents' })}
               />
               <hr />
               <OrganizationsList

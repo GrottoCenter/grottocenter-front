@@ -1,19 +1,19 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
-import { Button, Divider, List, Tooltip } from '@material-ui/core';
+import { Button, Divider, Tooltip } from '@material-ui/core';
 import AddCircleIcon from '@material-ui/icons/AddCircle';
 import { useDispatch } from 'react-redux';
 
 import CancelIcon from '@material-ui/icons/Cancel';
 import styled from 'styled-components';
-import { associateDocumentToEntrance } from '../../../../actions/AssociateDocumentToEntrance';
+import { linkDocumentToEntrance } from '../../../../actions/LinkDocumentToEntrance';
+import { unlinkDocumentToEntrance } from '../../../../actions/UnlinkDocumentToEntrance';
 import ScrollableContent from '../../../common/Layouts/Fixed/ScrollableContent';
 import SearchDocumentForm from '../../Form/SearchDocumentForm';
 import Alert from '../../../common/Alert';
 import { usePermissions } from '../../../../hooks';
-import { documentsType } from '../Provider';
-import Document from './Document';
+import DocumentsList from '../../../common/DocumentsList/DocumentsList';
 
 const DividerStyled = styled(Divider)`
   background-color: ${props => props.theme.palette.divider};
@@ -27,9 +27,9 @@ const Documents = ({ documents, entranceId }) => {
   const onSubmitForm = newDocuments => {
     newDocuments.forEach(d => {
       dispatch(
-        associateDocumentToEntrance({
+        linkDocumentToEntrance({
           entranceId,
-          documentId: d.id
+          document: d
         })
       );
     });
@@ -73,23 +73,30 @@ const Documents = ({ documents, entranceId }) => {
             </>
           )}
 
-          {documents.length > 0 ? (
-            <List>
-              {documents.map(document => (
-                <span key={document.id}>
-                  <DividerStyled variant="middle" component="li" />
-                  <Document {...document} />
-                </span>
-              ))}
-            </List>
-          ) : (
-            <Alert
-              severity="info"
-              content={formatMessage({
-                id: 'There is currently no document for this entrance.'
-              })}
-            />
-          )}
+          <DocumentsList
+            documents={documents}
+            hasSnapshotButton
+            emptyMessageComponent={
+              <Alert
+                severity="info"
+                title={formatMessage({
+                  id: 'There is currently no document for this entrance.'
+                })}
+              />
+            }
+            onUnlink={
+              !permissions.isModerator
+                ? false
+                : async document => {
+                    dispatch(
+                      unlinkDocumentToEntrance({
+                        entranceId,
+                        documentId: document.id
+                      })
+                    );
+                  }
+            }
+          />
         </>
       }
     />
@@ -97,7 +104,7 @@ const Documents = ({ documents, entranceId }) => {
 };
 
 Documents.propTypes = {
-  documents: documentsType,
+  documents: DocumentsList.propTypes.documents,
   entranceId: PropTypes.number.isRequired
 };
 

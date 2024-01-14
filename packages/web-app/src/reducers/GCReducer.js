@@ -1,7 +1,8 @@
 import { combineReducers } from 'redux';
 import admin from './AdminReducer';
 import advancedsearch from './AdvancedsearchReducer';
-import associateDocumentToEntrance from './AssociateDocumentToEntrance';
+import linkDocumentToEntrance from './LinkDocumentToEntrance';
+import unlinkDocumentToEntrance from './UnlinkDocumentToEntrance';
 import cave from './CaveReducer';
 import changePassword from './ChangePassword';
 import changeEmail from './ChangeEmail';
@@ -80,7 +81,8 @@ import countryEntrances from './CountryEntrancesDataQualityReducer';
 const GCReducer = combineReducers({
   admin,
   advancedsearch,
-  associateDocumentToEntrance,
+  linkDocumentToEntrance,
+  unlinkDocumentToEntrance,
   cave,
   changePassword,
   changeEmail,
