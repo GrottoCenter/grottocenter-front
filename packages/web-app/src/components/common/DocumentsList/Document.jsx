@@ -3,8 +3,8 @@ import PropTypes from 'prop-types';
 import {
   Chip,
   ListItem,
-  ListItemText,
   ListItemIcon,
+  Typography,
   ButtonGroup,
   Tooltip,
   Button
@@ -18,7 +18,7 @@ import { SnapshotButton } from '../../appli/Entry/Snapshots/UtilityFunction';
 import Translate from '../Translate';
 import StandardDialog from '../StandardDialog';
 
-const StyledListItemText = styled(ListItemText)`
+const StyledListItemContainer = styled.div`
   width: 100%;
   margin: 0;
 `;
@@ -32,8 +32,9 @@ const StyledListItem = styled(ListItem)`
   margin: 0;
 `;
 
-const DocumentDescription = styled.div`
-  white-space: pre;
+const DocumentDescription = styled(Typography)`
+  margin: 0.5em 0;
+  white-space: break-spaces;
   color: ${({ theme }) => theme.palette.text.primary};
 `;
 
@@ -43,34 +44,27 @@ const Document = ({ document, hasSnapshotButton = false, onUnlink }) => {
 
   return (
     <StyledListItem>
-      <StyledListItemText
-        primary={
-          <>
-            <GCLink internal={false} href={`/ui/documents/${document.id}`}>
-              {document.title}
-            </GCLink>
-            <StyledChip
-              variant="outlined"
-              size="small"
-              color="primary"
-              label={
-                (document.type && formatMessage({ id: document.type })) ||
-                formatMessage({ id: 'unknown' })
-              }
-            />
-          </>
-        }
-        secondary={
-          <>
-            {document.description ? (
-              <DocumentDescription>{document.description}</DocumentDescription>
-            ) : (
-              false
-            )}
-            {document.files ? <Files files={document.files} /> : false}
-          </>
-        }
-      />
+      <StyledListItemContainer>
+        <GCLink internal={false} href={`/ui/documents/${document.id}`}>
+          {document.title}
+        </GCLink>
+        <StyledChip
+          variant="outlined"
+          size="small"
+          color="primary"
+          label={
+            (document.type && formatMessage({ id: document.type })) ||
+            formatMessage({ id: 'unknown' })
+          }
+        />
+        {document.description ? (
+          <DocumentDescription>{document.description}</DocumentDescription>
+        ) : (
+          false
+        )}
+        {document.files ? <Files files={document.files} /> : false}
+      </StyledListItemContainer>
+
       {hasSnapshotButton || onUnlink ? (
         <ListItemIcon style={{ alignSelf: 'start' }}>
           <ButtonGroup color="primary">
@@ -112,12 +106,14 @@ const Document = ({ document, hasSnapshotButton = false, onUnlink }) => {
           title={formatMessage({ id: 'Unlink this document?' })}
           actions={[
             <Button
+              key="no"
               onClick={() => setUnlinkDialogOpen(false)}
               color="default"
               disableElevation>
               <Translate>No</Translate>
             </Button>,
             <Button
+              key="yes"
               disableElevation
               onClick={() => {
                 setUnlinkDialogOpen(false);

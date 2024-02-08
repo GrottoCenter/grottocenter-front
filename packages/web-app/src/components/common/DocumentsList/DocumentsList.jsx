@@ -25,14 +25,14 @@ const DocumentsList = ({
     {documents && documents.length > 0 ? (
       <List>
         {documents.map((document, i) => (
-          <li key={document.id}>
+          <div key={document.id}>
             <Document
               document={document}
               hasSnapshotButton={hasSnapshotButton}
               onUnlink={onUnlink}
             />
             {documents.length - 1 !== i && <DividerStyled variant="middle" />}
-          </li>
+          </div>
         ))}
       </List>
     ) : (
