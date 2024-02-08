@@ -16,7 +16,7 @@ const Files = ({ files }) => {
   if (files.length === 0) return false;
 
   return files.map(file => (
-    <FileListItem key={`${file.fileName}`} dense>
+    <FileListItem key={`${file.fileName}`} dense component="div">
       <ListItemText
         primaryTypographyProps={{ display: 'inline' }}
         primary={
