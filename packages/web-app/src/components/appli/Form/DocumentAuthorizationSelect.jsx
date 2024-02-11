@@ -55,7 +55,7 @@ const DocumentAuthorizationSelect = ({
         onChange={event => updateSelectedDocument(event.target.value)}>
         {documents.map(document => (
           <MenuItem key={document.id} value={document}>
-            {document.titles[0].text}
+            {document.titles?.[0].text}
           </MenuItem>
         ))}
       </Select>

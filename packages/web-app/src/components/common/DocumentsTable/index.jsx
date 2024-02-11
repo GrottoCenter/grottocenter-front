@@ -6,6 +6,41 @@ import useMakeCustomHeaderCellRenders from './customHeaderCellRenders';
 import Table from '../Table';
 import { createColumns, createDefaultHiddenColumns } from '../Table/TableHead';
 
+const documentDefaultHiddenColumns = [
+  // 'id',
+  'importId',
+  'importSource',
+  'identifier',
+  'identifierType',
+  'dateReviewed',
+  'dateValidation',
+  'datePublication',
+  'isDeleted',
+  'redirectTo',
+  'isValidated',
+  'creator',
+  'creatorComment',
+  'authors',
+  'authorsOrganization',
+  'reviewer',
+  'validator',
+  'validatorComment',
+  'editor',
+  'library',
+  'pages',
+  'license',
+  'option',
+  'languages',
+  'files',
+  'massifs',
+  'cave',
+  'entrance',
+  'parent',
+  'authorizationDocument',
+  'modifiedDocJson',
+  'oldBBS'
+];
+
 const DocumentsTable = ({
   currentPage,
   documents,
@@ -26,7 +61,9 @@ const DocumentsTable = ({
   const { formatMessage } = useIntl();
   const customCell = useMakeCustomCellRenders();
   const customHeader = useMakeCustomHeaderCellRenders();
-  const [hiddenColumns, setHiddenColumns] = useState(defaultHiddenColumns);
+  const [hiddenColumns, setHiddenColumns] = useState(
+    defaultHiddenColumns ?? documentDefaultHiddenColumns
+  );
   const makeTranslation = id =>
     formatMessage({ id: `${id[0].toUpperCase()}${id.slice(1)}` });
   const [columns, setColumns] = useState(
@@ -39,7 +76,12 @@ const DocumentsTable = ({
   }, [documents]);
 
   useEffect(() => {
-    setHiddenColumns(createDefaultHiddenColumns(columns, defaultHiddenColumns));
+    setHiddenColumns(
+      createDefaultHiddenColumns(
+        columns,
+        defaultHiddenColumns ?? documentDefaultHiddenColumns
+      )
+    );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [columns]);
 

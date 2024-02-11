@@ -22,38 +22,6 @@ const Wrapper = styled.div`
   padding: ${({ theme }) => theme.spacing(2)}px;
 `;
 
-const defaultHiddenColumns = [
-  'author',
-  'authorComment',
-  'authorizationDocument',
-  'authors',
-  'cave',
-  'children',
-  'datePublication',
-  'descriptions',
-  'editor',
-  'entrance',
-  'files',
-  'identifier',
-  'identifierType',
-  'issue',
-  'library',
-  'license',
-  'massif',
-  'mainLanguage',
-  'modifiedDocJson',
-  'option',
-  'pages',
-  'parent',
-  'pathOld',
-  'publication',
-  'publicationFasciculeBBSOld',
-  'refBbs',
-  'reviewer',
-  'validationComment',
-  'validator'
-];
-
 const ContributionsPage = () => {
   const userId = pathOr(null, ['id'], useUserProperties());
   const { formatMessage } = useIntl();
@@ -130,7 +98,6 @@ const ContributionsPage = () => {
                 <DocumentsTable
                   currentPage={page}
                   documents={propOr([], 'documents', data)}
-                  defaultHiddenColumns={defaultHiddenColumns}
                   loading={isLoading}
                   openDetailedView={setDetailedView}
                   order={order}

@@ -22,41 +22,6 @@ const Wrapper = styled.div`
   padding: ${({ theme }) => theme.spacing(2)}px;
 `;
 
-const defaultHiddenColumns = [
-  // 'id',
-  'importId',
-  'importSource',
-  'identifier',
-  'identifierType',
-  'dateReviewed',
-  'dateValidation',
-  'datePublication',
-  'isDeleted',
-  'redirectTo',
-  'isValidated',
-  'creator',
-  'creatorComment',
-  'authors',
-  'authorsOrganization',
-  'reviewer',
-  'validator',
-  'validatorComment',
-  'editor',
-  'library',
-  'pages',
-  'license',
-  'option',
-  'languages',
-  'files',
-  'massifs',
-  'cave',
-  'entrance',
-  'parent',
-  'authorizationDocument',
-  'modifiedDocJson',
-  'oldBBS'
-];
-
 const DocumentValidationPage = () => {
   const { formatMessage } = useIntl();
   const dispatch = useDispatch();
@@ -143,7 +108,6 @@ const DocumentValidationPage = () => {
                 <DocumentsTable
                   currentPage={page}
                   documents={propOr([], 'documents', data)}
-                  defaultHiddenColumns={defaultHiddenColumns}
                   loading={isLoading}
                   openDetailedView={setDetailedView}
                   order={order}
