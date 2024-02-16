@@ -18,7 +18,9 @@ const CountryList = ({ countries }) => {
 
   return (
     <ScrollableContent
-      title={formatMessage({ id: 'Countries' })}
+      title={formatMessage({
+        id: 'Countries : Sovereign countries and autonomous territories (ISO 3166-1)'
+      })}
       content={
         <TableContainer component={Paper} style={{ width: '500px' }}>
           <Table size="small">
