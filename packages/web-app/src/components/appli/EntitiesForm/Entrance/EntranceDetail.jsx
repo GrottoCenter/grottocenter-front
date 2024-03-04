@@ -92,24 +92,28 @@ const EntranceDetail = ({ control, errors, getValues }) => {
       />
 
       <FormRow>
-        <InputCoordinate
-          formKey="entrance.latitude"
-          labelName="Latitude"
-          control={control}
-          validatorFn={validateLatitude}
-          isError={!!errors?.entrance?.latitude}
-          helperText={errors?.entrance?.latitude?.message}
-          isRequired
-        />
-        <InputCoordinate
-          formKey="entrance.longitude"
-          labelName="Longitude"
-          control={control}
-          validatorFn={validateLongitude}
-          isError={!!errors?.entrance?.longitude}
-          helperText={errors?.entrance?.longitude?.message}
-          isRequired
-        />
+        {!isSensitiveDisabled && (
+          <InputCoordinate
+            formKey="entrance.latitude"
+            labelName="Latitude"
+            control={control}
+            validatorFn={validateLatitude}
+            isError={!!errors?.entrance?.latitude}
+            helperText={errors?.entrance?.latitude?.message}
+            isRequired
+          />
+        )}
+        {!isSensitiveDisabled && (
+          <InputCoordinate
+            formKey="entrance.longitude"
+            labelName="Longitude"
+            control={control}
+            validatorFn={validateLongitude}
+            isError={!!errors?.entrance?.longitude}
+            helperText={errors?.entrance?.longitude?.message}
+            isRequired
+          />
+        )}
         <Controller
           name="entrance.yearDiscovery"
           control={control}
@@ -130,11 +134,13 @@ const EntranceDetail = ({ control, errors, getValues }) => {
           )}
         />
       </FormRow>
-      <MapMarkerSelector
-        control={control}
-        formLatitudeKey="entrance.latitude"
-        formLongitudeKey="entrance.longitude"
-      />
+      {!isSensitiveDisabled && (
+        <MapMarkerSelector
+          control={control}
+          formLatitudeKey="entrance.latitude"
+          formLongitudeKey="entrance.longitude"
+        />
+      )}
     </>
   );
 };
