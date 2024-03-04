@@ -34,7 +34,8 @@ export const makeOrganizationValueData = data => ({
   name: data.name,
   isPartner: data.isOfficialPartner,
   customMessage: data.customMessage,
-  language: data.names[0].language,
+  language: data.language,
+  nameId: data.nameId,
   address: data.address || null,
   zipCode: data.postalCode || null,
   city: data.city || null,
@@ -43,6 +44,5 @@ export const makeOrganizationValueData = data => ({
   url: data.url || null,
   latitude: data.latitude || null,
   longitude: data.longitude || null,
-  organizationId: data.id,
-  nameId: data.names[0].id
+  organizationId: data.id
 });
