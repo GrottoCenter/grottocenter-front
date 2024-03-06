@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
+import { styled } from '@mui/material/styles';
 import {
   __,
   append,
@@ -24,7 +24,7 @@ import {
   LinearProgress,
   TablePagination,
   Divider
-} from '@material-ui/core';
+} from '@mui/material';
 import { useIntl } from 'react-intl';
 
 import TableHead from './TableHead';
@@ -43,7 +43,9 @@ const TableContainer = styled(MuiTableContainer)`
   max-height: calc(70vh - ${({ theme }) => theme.appBarHeight}px);
 `;
 
-const TableBody = styled(MuiTableBody)`
+const TableBody = styled(MuiTableBody, {
+  shouldForwardProp: aProp => aProp[0] !== '$'
+})`
   filter: ${({ $loading }) => $loading && 'blur(6px)'};
   pointer-events: ${({ $loading }) => $loading && 'none'};
 `;
@@ -53,7 +55,7 @@ const Toolbar = styled(MuiToolbar)`
   justify-content: space-between;
 `;
 
-const TableFooter = styled.div`
+const TableFooter = styled('div')`
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -63,7 +65,7 @@ const TableFooter = styled.div`
 `;
 
 const SelectedTypography = styled(Typography)`
-  padding-left: ${({ theme }) => theme.spacing(4)}px;
+  padding-left: ${({ theme }) => theme.spacing(4)};
 `;
 
 const Table = ({
@@ -186,7 +188,7 @@ const Table = ({
             isInitializing={isFirstLoad}
             customHeaderCellRenders={getCustomHeaderCellRenders}
           />
-          <TableBody $loading={loading}>
+          <TableBody $loading={loading ? 1 : 0}>
             {isFirstLoad ? (
               <InitialTable />
             ) : (

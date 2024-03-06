@@ -1,8 +1,8 @@
 import React, { useRef } from 'react';
-import styled from 'styled-components';
+import { styled } from '@mui/material/styles';
 import PropTypes from 'prop-types';
 
-const Wrapper = styled.div(
+const Wrapper = styled('div')(
   ({ theme, isFixedContent }) => `
   display: grid;
   ${isFixedContent && 'grid-template-columns: 100%;'}
@@ -24,18 +24,18 @@ const Wrapper = styled.div(
   `
 );
 
-const FixedWrapper = styled.div(
+const FixedWrapper = styled('div')(
   ({ theme }) => `
   box-sizing: border-box;
   ${theme.breakpoints.up('md')} {
     position: sticky;
     top: ${theme.appBarHeight}px;
-    height: calc(100vh - ${theme.appBarHeight + theme.spacing(3)}px);
+    height: calc(100vh - ${theme.appBarHeight + theme.spacing(3)});
   }
 `
 );
 
-const ScrollableWrapper = styled.div`
+const ScrollableWrapper = styled('div')`
   display: flex;
   flex-direction: column;
 `;

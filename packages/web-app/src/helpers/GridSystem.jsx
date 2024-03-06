@@ -1,11 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import _ from 'underscore.string';
 
 /* Encapsulate the grid mecanism in React components */
 
 export const GridContainer = ({ className, children }) => (
-  <div className={_.join(' ', 'container', className)}>{children}</div>
+  <div className={['container', className].join(' ')}>{children}</div>
 );
 
 GridContainer.propTypes = {
@@ -14,7 +13,7 @@ GridContainer.propTypes = {
 };
 
 export const GridRow = ({ className, children }) => (
-  <div className={_.join(' ', 'row', className)}>{children}</div>
+  <div className={['row', className].join(' ')}>{children}</div>
 );
 
 GridRow.propTypes = {
@@ -23,7 +22,7 @@ GridRow.propTypes = {
 };
 
 export const GridOneThirdColumn = ({ className, children }) => (
-  <div className={_.join(' ', 'four columns', className)}>{children}</div>
+  <div className={['four columns', className].join(' ')}>{children}</div>
 );
 
 GridOneThirdColumn.propTypes = {
@@ -32,7 +31,7 @@ GridOneThirdColumn.propTypes = {
 };
 
 export const GridTwoThirdColumn = ({ className, children }) => (
-  <div className={_.join(' ', 'eight columns', className)}>{children}</div>
+  <div className={['eight columns', className].join(' ')}>{children}</div>
 );
 
 GridTwoThirdColumn.propTypes = {
@@ -41,7 +40,7 @@ GridTwoThirdColumn.propTypes = {
 };
 
 export const GridOneHalfColumn = ({ className, children }) => (
-  <div className={_.join(' ', 'six columns', className)}>{children}</div>
+  <div className={['six columns', className].join(' ')}>{children}</div>
 );
 
 GridOneHalfColumn.propTypes = {
@@ -50,7 +49,7 @@ GridOneHalfColumn.propTypes = {
 };
 
 export const GridFullColumn = ({ className, children }) => (
-  <div className={_.join(' ', 'twelve columns', className)}>{children}</div>
+  <div className={['twelve columns', className].join(' ')}>{children}</div>
 );
 
 GridFullColumn.propTypes = {

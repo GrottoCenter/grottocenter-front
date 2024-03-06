@@ -7,10 +7,10 @@ import {
   ButtonGroup,
   Tooltip,
   Button
-} from '@material-ui/core';
+} from '@mui/material';
 import React, { useState } from 'react';
-import styled from 'styled-components';
-import EditIcon from '@material-ui/icons/Edit';
+import { styled } from '@mui/material/styles';
+import EditIcon from '@mui/icons-material/Edit';
 import { useDispatch } from 'react-redux';
 import { isEmpty, pathOr } from 'ramda';
 import { useIntl } from 'react-intl';
@@ -30,7 +30,7 @@ const ListItemStyled = styled(ListItem)`
 
 const StyledListItemText = styled(ListItemText)`
   width: 100%;
-  padding-right: ${({ theme }) => theme.spacing(2)}px;
+  padding-right: ${({ theme }) => theme.spacing(2)};
 `;
 
 const StyledListItemIcon = styled(ListItemIcon)`
@@ -41,7 +41,7 @@ const StyledRatings = styled(Ratings)`
   gap: 20px;
   padding-bottom: 10px;
 `;
-const DurationContainer = styled.div`
+const DurationContainer = styled('div')`
   display: flex;
   flex-direction: row;
   justify-content: flex-start;

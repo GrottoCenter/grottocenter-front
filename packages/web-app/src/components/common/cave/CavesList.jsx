@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { List, Typography } from '@material-ui/core';
-import { withStyles } from '@material-ui/core/styles';
+import { List, Typography } from '@mui/material';
+import withStyles from '@mui/styles/withStyles';
 import Translate from '../Translate';
 import CaveListItem from './CaveListItem';
 

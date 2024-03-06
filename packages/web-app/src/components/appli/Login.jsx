@@ -1,10 +1,10 @@
 import React from 'react';
-import { Button, CircularProgress, Typography, Box } from '@material-ui/core';
+import { Button, CircularProgress, Typography, Box } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
 import { isEmpty, match } from 'ramda';
 import { useHistory } from 'react-router-dom';
 import { useIntl } from 'react-intl';
-import { WarningRounded } from '@material-ui/icons';
+import { WarningRounded } from '@mui/icons-material';
 
 import {
   hideLoginDialog,
@@ -64,7 +64,7 @@ const Login = () => {
       type="submit"
       size="large"
       onClick={onLogin}
-      color={authState.isFetching ? 'default' : 'primary'}>
+      color={authState.isFetching ? 'inherit' : 'primary'}>
       {authState.isFetching ? (
         <CircularProgress size="2.8rem" />
       ) : (

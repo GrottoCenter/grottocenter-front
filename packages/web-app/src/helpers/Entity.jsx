@@ -1,5 +1,5 @@
 import React from 'react';
-import styled from 'styled-components';
+import { styled } from '@mui/material/styles';
 
 //
 //
@@ -9,25 +9,25 @@ import styled from 'styled-components';
 
 export const isMappable = entity => entity.latitude && entity.longitude;
 
-const EntityIcon = styled.img`
+const EntityIcon = styled('img')`
   height: 30px;
   margin-right: 10px;
   width: 30px;
 `;
 
-const EntityTitle = styled.div`
+const EntityTitle = styled('div')`
   font-size: 1.5rem;
   white-space: nowrap;
   margin: 0;
 `;
 
-const EntitySubtitle = styled.div`
+const EntitySubtitle = styled('div')`
   font-size: 1.2rem;
   white-space: nowrap;
   margin: 0;
 `;
 
-export const entityOptionForSelector = option => {
+export const entityOptionForSelector = (props, option) => {
   let iconName;
   let title = option.name; // Default for all entities
   let subtitle = '';
@@ -87,7 +87,7 @@ export const entityOptionForSelector = option => {
   }
 
   return (
-    <>
+    <li {...props}>
       {iconName && (
         <EntityIcon src={`/images/${iconName}`} alt={`${option.type} icon`} />
       )}
@@ -95,6 +95,6 @@ export const entityOptionForSelector = option => {
         <EntityTitle>{title}</EntityTitle>
         <EntitySubtitle>{subtitle}</EntitySubtitle>
       </div>
-    </>
+    </li>
   );
 };

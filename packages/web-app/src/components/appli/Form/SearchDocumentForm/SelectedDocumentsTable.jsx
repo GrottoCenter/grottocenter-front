@@ -7,9 +7,9 @@ import {
   TableHead,
   TableRow,
   IconButton
-} from '@material-ui/core';
+} from '@mui/material';
 import { useIntl } from 'react-intl';
-import DeleteIcon from '@material-ui/icons/Delete';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 import Alert from '../../../common/Alert';
 

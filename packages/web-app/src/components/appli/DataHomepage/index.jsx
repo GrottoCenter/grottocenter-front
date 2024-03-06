@@ -1,16 +1,9 @@
 import React, { useEffect } from 'react';
 import { useIntl } from 'react-intl';
-import {
-  Box,
-  Grid,
-  Tooltip,
-  Typography,
-  withStyles,
-  withTheme
-} from '@material-ui/core';
-import styled from 'styled-components';
+import { Box, Grid, Tooltip } from '@mui/material';
+import { styled } from '@mui/material/styles';
 import { useDispatch, useSelector } from 'react-redux';
-import { DirectionsWalk, Language } from '@material-ui/icons';
+import { DirectionsWalk, Language } from '@mui/icons-material';
 import { loadDynamicNumber } from '../../../actions/DynamicNumber';
 import { fetchCumulatedLength } from '../../../actions/CumulatedLength';
 import DataCard from './components/DataCard';
@@ -19,22 +12,18 @@ import DataLine from './components/DataLine';
 import './style.css';
 import GCLink from '../../common/GCLink';
 
-const SectionTitle = withStyles(
-  theme => ({
-    root: {
-      color: theme.palette.secondary.main,
-      textAlign: 'center',
-      padding: '40px',
-      fontSize: '35px'
-    }
-  }),
-  { withTheme: true }
-)(Typography);
+const SectionTitle = styled('h3')`
+  text-align: center;
+  padding: 40px;
+  font-size: 35px;
+  padding: 20px;
+  color: ${({ theme }) => theme.palette.secondary.main};
+`;
 
-const BlockIcon = withTheme(styled.span`
+const BlockIcon = styled('span')`
   margin-right: 10px;
   font-size: 4.2em;
-  color: ${props => props.theme.palette.primary1Color};
+  color: ${({ theme }) => theme.palette.primary1Color};
   line-height: 1;
 
   :before {
@@ -43,7 +32,8 @@ const BlockIcon = withTheme(styled.span`
     font-weight: normal !important;
     vertical-align: top;
   }
-`);
+`;
+
 const StyledLink = styled(GCLink)`
   text-decoration: none;
 `;

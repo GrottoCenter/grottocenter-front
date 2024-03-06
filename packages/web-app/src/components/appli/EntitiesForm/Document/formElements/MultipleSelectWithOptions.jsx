@@ -1,8 +1,8 @@
 import React, { useContext, useState } from 'react';
 import PropTypes from 'prop-types';
 
-import Autocomplete from '@material-ui/lab/Autocomplete';
-import { FormHelperText, TextField } from '@material-ui/core';
+import Autocomplete from '@mui/material/Autocomplete';
+import { FormHelperText, TextField } from '@mui/material';
 import { DocumentFormContext } from '../Provider';
 
 import Translate from '../../../../common/Translate';
@@ -45,8 +45,8 @@ const MultipleSelectWithOptions = ({
       case 'clear':
         updateAttribute(contextValueName, []);
         break;
-      case 'select-option':
-      case 'remove-option':
+      case 'selectOption':
+      case 'removeOption':
         updateAttribute(contextValueName, newValue);
         break;
       default:
@@ -67,7 +67,7 @@ const MultipleSelectWithOptions = ({
         inputValue={inputValue}
         getOptionLabel={getOptionLabel}
         renderOption={renderOption}
-        getOptionSelected={getOptionSelected}
+        isOptionEqualToValue={getOptionSelected}
         filterSelectedOptions
         noOptionsText={noOptionsText}
         required={required}

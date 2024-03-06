@@ -2,16 +2,16 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import { isNil } from 'ramda';
-import styled from 'styled-components';
+import { styled } from '@mui/material/styles';
 import { useIntl } from 'react-intl';
 import { useWatch } from 'react-hook-form';
-import { Box, Typography } from '@material-ui/core';
+import { Box, Typography } from '@mui/material';
 
 import InternationalizedLink from '../InternationalizedLink';
 import { licensesODBLink } from '../../../conf/externalLinks';
 import Property from './Property';
 
-const LicenceImage = styled.img`
+const LicenceImage = styled('img')`
   width: 75px;
 `;
 

@@ -1,12 +1,12 @@
 import { useMapEvent } from 'react-leaflet';
-import { useCallback, useEffect, useState, useRef } from 'react';
+import React, { useCallback, useEffect, useState, useRef } from 'react';
 import { isNil } from 'ramda';
 import * as d3 from 'd3';
 import * as L from 'leaflet';
 import 'd3-hexbin';
 // after L import
 import '@asymmetrik/leaflet-d3';
-import { createGlobalStyle } from 'styled-components';
+import { GlobalStyles } from '@mui/material';
 import { useIntl } from 'react-intl';
 import { heatmapTypes } from './DataControl';
 import {
@@ -22,25 +22,28 @@ import {
   HEX_OPACITY
 } from './constants';
 
-export const HexGlobalCss = createGlobalStyle`
-   & .hexbin-hexagon {
-   stroke: #000;
-   stroke-width: .5px;
-   }
-   & .hexbin-container:hover .hexbin-hexagon {
-  transition: 200ms;
-  stroke-width: 1.5px;
-  stroke-opacity: 1;
+export const HexGlobalCss = (
+  <GlobalStyles
+    styles="
+& .hexbin-hexagon {
+  stroke: #000;
+  stroke-width: .5px;
   }
-  & .hexbin-tooltip {
-   padding: 8px;
-   background: #616161e6;
-   color: white;
-   border-radius: 2px;
-   font-size: 12px;
-   font-weight: 400;
-  }
-`;
+  & .hexbin-container:hover .hexbin-hexagon {
+ transition: 200ms;
+ stroke-width: 1.5px;
+ stroke-opacity: 1;
+ }
+ & .hexbin-tooltip {
+  padding: 8px;
+  background: #616161e6;
+  color: white;
+  border-radius: 2px;
+  font-size: 12px;
+  font-weight: 400;
+ }"
+  />
+);
 
 // For more customization see https://github.com/Asymmetrik/leaflet-d3 documentation
 

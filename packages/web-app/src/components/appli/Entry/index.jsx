@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import { isNil, propOr } from 'ramda';
 
-import styled from 'styled-components';
+import { styled } from '@mui/material/styles';
 import Provider, {
   commentsType,
   detailsType,
@@ -31,7 +31,7 @@ import { EntranceForm } from '../EntitiesForm';
 import SensitiveCaveWarning from './SensitiveCaveWarning';
 import AuthorAndDate from '../../common/Contribution/AuthorAndDate';
 
-const HalfSplitContainer = styled.div(
+const HalfSplitContainer = styled('div')(
   ({ theme }) => `
   display: flex;
   flex-direction: column;

@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import { useIntl } from 'react-intl';
-import styled from 'styled-components';
-import { Box, Button, ButtonGroup, Tooltip } from '@material-ui/core';
+import { styled } from '@mui/material/styles';
+import { Box, Button, ButtonGroup, Tooltip } from '@mui/material';
 import {
   CalendarToday,
   Category,
@@ -14,30 +14,30 @@ import {
   Place,
   Map,
   FlagRounded
-} from '@material-ui/icons';
+} from '@mui/icons-material';
 import Alert from '../../common/Alert';
 import CustomIcon from '../../common/CustomIcon';
 import { Property } from '../../common/Properties';
 import { EntryContext, isValidCoordinates } from './Provider';
 import Ratings from './Ratings';
 
-const GlobalWrapper = styled.div`
+const GlobalWrapper = styled('div')`
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: ${({ theme }) => theme.spacing(2)}px;
+  gap: ${({ theme }) => theme.spacing(2)};
 `;
 
-const SmallRatingsWrapper = styled.div`
+const SmallRatingsWrapper = styled('div')`
   transform: scale(0.85);
 `;
 
-const FlexContainer = styled.div`
+const FlexContainer = styled('div')`
   display: flex;
   justify-content: start;
   align-items: center;
 `;
-const FlexContainerGrow = styled.div`
+const FlexContainerGrow = styled('div')`
   flex-grow: 1;
 `;
 const StyledRatings = styled(Ratings)`

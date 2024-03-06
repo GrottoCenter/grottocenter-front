@@ -2,9 +2,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import { useIntl } from 'react-intl';
-import { Box, Typography } from '@material-ui/core';
+import { Box, Typography } from '@mui/material';
 
-import ArrowRightIcon from '@material-ui/icons/ArrowRight';
+import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 
 const Property = ({ newValue, oldValue, valueName }) => {
   const { formatMessage } = useIntl();

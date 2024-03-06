@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Controller } from 'react-hook-form';
 import { useIntl } from 'react-intl';
-import { TextField } from '@material-ui/core';
+import { TextField } from '@mui/material';
 
 // The InputCoordinate input accept coordinate with ',' or '.'
 // But the api only accept notation with '.'

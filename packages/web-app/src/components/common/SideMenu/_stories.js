@@ -1,17 +1,17 @@
 import React from 'react';
-import styled from 'styled-components';
+import { styled } from '@mui/material/styles';
 import { storiesOf } from '@storybook/react';
 // import { action } from '@storybook/addon-actions';
 import { isMobileOnly } from 'react-device-detect';
 
-import { AppBar, Toolbar, Typography, IconButton } from '@material-ui/core';
-import MenuIcon from '@material-ui/icons/Menu';
+import { AppBar, Toolbar, Typography, IconButton } from '@mui/material';
+import MenuIcon from '@mui/icons-material/Menu';
 
 import SideMenu from './index';
 
-const MainWrapper = styled.main`
+const MainWrapper = styled('main')`
   flex-grow: 1;
-  padding: ${({ theme }) => theme.spacing(3)}px;
+  padding: ${({ theme }) => theme.spacing(3)};
   transition: ${({ theme, isSideMenuOpen }) =>
     !isMobileOnly &&
     theme.transitions.create('margin', {
@@ -41,7 +41,8 @@ const WithState = () => {
             color="inherit"
             aria-label="open drawer"
             edge="end"
-            onClick={toggleSideMenu}>
+            onClick={toggleSideMenu}
+            size="large">
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" noWrap>

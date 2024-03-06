@@ -1,10 +1,9 @@
-import { FormHelperText } from '@material-ui/core';
+import { FormHelperText, Skeleton } from '@mui/material';
 import React, { Suspense } from 'react';
 import { Controller } from 'react-hook-form';
 import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
 
-import { Skeleton } from '@material-ui/lab';
 import InputLanguage from '../utils/InputLanguage';
 import InputText from '../utils/InputText';
 import { FormRow, FormSectionLabel } from '../utils/FormContainers';

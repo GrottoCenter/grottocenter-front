@@ -1,9 +1,9 @@
 import React from 'react';
 import { useIntl } from 'react-intl';
 import { Link } from 'react-router-dom';
-import { Tooltip, Button } from '@material-ui/core';
-import HistoryIcon from '@material-ui/icons/History';
-import TimelineIcon from '@material-ui/icons/Timeline';
+import { Tooltip, Button } from '@mui/material';
+import HistoryIcon from '@mui/icons-material/History';
+import TimelineIcon from '@mui/icons-material/Timeline';
 import PropTypes from 'prop-types';
 import {
   CommentSnapshots,

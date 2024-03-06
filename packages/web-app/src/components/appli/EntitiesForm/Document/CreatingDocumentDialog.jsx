@@ -7,7 +7,7 @@ import {
   Dialog,
   DialogContent,
   DialogTitle
-} from '@material-ui/core';
+} from '@mui/material';
 
 import Alert from '../../../common/Alert';
 

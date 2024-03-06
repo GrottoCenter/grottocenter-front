@@ -8,10 +8,10 @@ import {
   TableCell,
   TableBody,
   Typography
-} from '@material-ui/core';
+} from '@mui/material';
 import React from 'react';
 import { isNil } from 'ramda';
-import styled from 'styled-components';
+import { styled } from '@mui/material/styles';
 import PropTypes from 'prop-types';
 import { obstacleType } from '../Provider';
 import { HighLightsLine } from '../../../common/Highlights';
@@ -31,7 +31,7 @@ const StyledTableCell = styled(TableCell)`
   padding: 6px !important;
   min-width: 40px;
   ${props => ({
-    [props.theme.breakpoints.down('xs')]: {
+    [props.theme.breakpoints.down('md')]: {
       fontSize: '10px'
     }
   })};

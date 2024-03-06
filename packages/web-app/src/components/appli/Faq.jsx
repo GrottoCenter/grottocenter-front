@@ -1,12 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { withStyles } from '@material-ui/core/styles';
-import CheckIcon from '@material-ui/icons/Check';
-import Card from '@material-ui/core/Card';
-import CardTitle from '@material-ui/core/CardHeader';
-import CardText from '@material-ui/core/CardContent';
-import Collapse from '@material-ui/core/Collapse';
-import styled from 'styled-components';
+import withStyles from '@mui/styles/withStyles';
+import CheckIcon from '@mui/icons-material/Check';
+import Card from '@mui/material/Card';
+import CardTitle from '@mui/material/CardHeader';
+import CardText from '@mui/material/CardContent';
+import Collapse from '@mui/material/Collapse';
+import { styled } from '@mui/material/styles';
 import { useSelector } from 'react-redux';
 import GCLink from '../common/GCLink';
 import InternationalizedLink from '../common/InternationalizedLink';
@@ -17,7 +17,7 @@ import {
 } from '../../conf/externalLinks';
 import Translate from '../common/Translate';
 
-const FaqDiv = styled.div`
+const FaqDiv = styled('div')`
   margin: 20px;
 `;
 
@@ -51,7 +51,7 @@ const StyledCardText = withStyles(
   { withTheme: true }
 )(CardText);
 
-const ItemList = styled.ul`
+const ItemList = styled('ul')`
   list-style-type: none;
 `;
 

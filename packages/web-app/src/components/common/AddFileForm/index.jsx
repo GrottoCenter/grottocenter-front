@@ -1,9 +1,9 @@
 import React, { useState, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
-import { FormControl, Button, Typography } from '@material-ui/core';
+import { FormControl, Button, Typography } from '@mui/material';
 
-import styled from 'styled-components';
+import { styled } from '@mui/material/styles';
 import { isEmpty, isNil, remove } from 'ramda';
 import LicenseSelect from '../../appli/Form/LicenseSelect';
 import { DOCUMENT_AUTHORIZE_TO_PUBLISH } from '../../../hooks/useDocumentOptions';
@@ -21,14 +21,14 @@ const StyledButton = styled(Button)`
   margin-right: ${({ theme }) => theme.spacing(4)}%;
 `;
 
-const ListWrapper = styled.div`
+const ListWrapper = styled('div')`
   margin-left: ${({ theme }) => theme.spacing(4)}%;
   margin-right: ${({ theme }) => theme.spacing(4)}%;
 `;
 
 const StyledTypography = styled(Typography)`
-  margin-top: ${({ theme }) => theme.spacing(2)}px;
-  margin-bottom: ${({ theme }) => theme.spacing(2)}px;
+  margin-top: ${({ theme }) => theme.spacing(2)};
+  margin-bottom: ${({ theme }) => theme.spacing(2)};
 `;
 
 const AddFileForm = ({

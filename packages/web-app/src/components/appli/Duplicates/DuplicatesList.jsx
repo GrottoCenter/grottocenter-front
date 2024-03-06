@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { isEmpty } from 'ramda';
 import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
+import { styled } from '@mui/material/styles';
 import {
   deleteDuplicates,
   fetchDuplicatesList
@@ -17,9 +17,9 @@ import TableActions from './TableActions';
 import { resetApiMessages } from '../../../actions/Document/ResetApiMessages';
 import { resetEntranceState } from '../../../actions/Entrance/ResetEntrance';
 
-const Wrapper = styled.div`
+const Wrapper = styled('div')`
   margin-top: 10px;
-  margin-bottom: ${({ theme }) => theme.spacing(3)}px;
+  margin-bottom: ${({ theme }) => theme.spacing(3)};
 `;
 
 const DuplicatesList = ({

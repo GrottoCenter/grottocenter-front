@@ -1,5 +1,5 @@
-import { TableCell, TableRow } from '@material-ui/core';
-import Skeleton from '@material-ui/lab/Skeleton';
+import { TableCell, TableRow } from '@mui/material';
+import Skeleton from '@mui/material/Skeleton';
 import React from 'react';
 
 const ROW_COUNT = 8;

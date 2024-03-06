@@ -1,6 +1,6 @@
 import * as React from 'react';
-import { Box } from '@material-ui/core';
-import { GpsFixed, Height } from '@material-ui/icons';
+import { Box } from '@mui/material';
+import { GpsFixed, Height } from '@mui/icons-material';
 import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
 

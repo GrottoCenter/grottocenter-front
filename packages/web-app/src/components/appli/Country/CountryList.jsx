@@ -8,7 +8,7 @@ import {
   TableCell,
   TableBody,
   Paper
-} from '@material-ui/core';
+} from '@mui/material';
 import PropTypes from 'prop-types';
 import ScrollableContent from '../../common/Layouts/Fixed/ScrollableContent';
 import GCLink from '../../common/GCLink';

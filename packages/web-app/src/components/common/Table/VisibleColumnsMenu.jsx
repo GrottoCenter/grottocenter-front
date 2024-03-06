@@ -6,8 +6,8 @@ import {
   MenuItem,
   ListItemIcon,
   ListItemText
-} from '@material-ui/core';
-import VisibilityOffIcon from '@material-ui/icons/VisibilityOff';
+} from '@mui/material';
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import { includes, __, values } from 'ramda';
 import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
@@ -46,7 +46,10 @@ const VisibleColumnsMenu = ({
 
   return (
     <>
-      <IconButton aria-label="visible columns button" onClick={handleClick}>
+      <IconButton
+        aria-label="visible columns button"
+        onClick={handleClick}
+        size="large">
         <VisibilityOffIcon />
       </IconButton>
       <Menu

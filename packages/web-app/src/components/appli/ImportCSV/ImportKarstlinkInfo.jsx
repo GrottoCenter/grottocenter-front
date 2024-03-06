@@ -1,9 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
-import { Button, makeStyles } from '@material-ui/core';
-import InfoIcon from '@material-ui/icons/Info';
-import DownloadIcon from '@material-ui/icons/GetApp';
+import { styled } from '@mui/material/styles';
+import { Button } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
+import InfoIcon from '@mui/icons-material/Info';
+import DownloadIcon from '@mui/icons-material/GetApp';
 import { useIntl } from 'react-intl';
 import { ENTRANCE, DOCUMENT } from './constants';
 
@@ -21,13 +22,13 @@ const useStyles = makeStyles({
   }
 });
 
-const KarstlinkLogo = styled.img`
+const KarstlinkLogo = styled('img')`
   width: 15%;
   height: 15%;
   border-radius: 0.5rem;
 `;
 
-const KarstlinkParagraph = styled.p`
+const KarstlinkParagraph = styled('p')`
   text-align: justify;
   font-weight: 300;
   font-size: large;

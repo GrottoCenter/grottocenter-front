@@ -4,16 +4,16 @@ import {
   MenuItem,
   CircularProgress,
   FormControl
-} from '@material-ui/core';
+} from '@mui/material';
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
+import { styled } from '@mui/material/styles';
 import { fetchLicense } from '../../../actions/Licenses';
 
 const Wrapper = styled(FormControl)`
   ${({ theme }) => `
-    margin: ${theme.spacing(4)}px;`}
+    margin: ${theme.spacing(4)};`}
 `;
 
 const DEFAULT_LICENSE = 'CC-BY-SA';

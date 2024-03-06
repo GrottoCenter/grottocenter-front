@@ -1,9 +1,8 @@
 import React from 'react';
-import GiftIcon from '@material-ui/icons/CardGiftcard';
-import Button from '@material-ui/core/Button';
-import { withStyles, withTheme } from '@material-ui/core/styles';
-import styled, { keyframes } from 'styled-components';
-import Typography from '@material-ui/core/Typography/Typography';
+import GiftIcon from '@mui/icons-material/CardGiftcard';
+import Button from '@mui/material/Button';
+import { styled, keyframes } from '@mui/material/styles';
+import Typography from '@mui/material/Typography/Typography';
 import Translate from '../../components/common/Translate';
 
 const btEyeCatcher = keyframes`
@@ -60,7 +59,7 @@ const btEyeCatcher = keyframes`
 }
 `;
 
-const DonateFormWrapper = styled.div`
+const DonateFormWrapper = styled('div')`
   animation: ${btEyeCatcher} 3s linear infinite;
 
   @media (max-width: 550px) {
@@ -71,53 +70,39 @@ const DonateFormWrapper = styled.div`
   }
 `;
 
-const DonateButton = withStyles(
-  theme => ({
-    root: {
-      backgroundColor: theme.palette.accent1Color,
-      color: theme.palette.textIconColor,
-      height: 'auto',
-      marginTop: '10px',
+const DonateButton = styled(Button)`
+  background-color: ${({ theme }) => theme.palette.accent1Color};
+  color: ${({ theme }) => theme.palette.textIconColor};
+  height: auto;
+  margin-ttop: 10px;
 
-      '&:hover': {
-        backgroundColor: theme.palette.accent1Color
-      },
+  &:hover {
+    background-color: ${({ theme }) => theme.palette.accent1Color};
+  }
 
-      '&>div': {
-        textAlign: 'center',
-        whiteSpace: 'nowrap'
-      },
+  & > div {
+    textalign: center;
+    whitespace: nowrap;
+  }
 
-      '& > span': {
-        textTransform: 'none'
-      }
-    }
-  }),
-  { withTheme: true }
-)(Button);
+  & > span {
+    texttransform: none;
+  }
+`;
 
-const StyledGiftIcon = withStyles(
-  theme => ({
-    root: {
-      fill: theme.palette.textIconColor,
-      width: '20px',
-      height: '30px',
-      marginRight: '10px'
-    }
-  }),
-  { withTheme: true }
-)(GiftIcon);
+const StyledGiftIcon = styled(GiftIcon)`
+  fill: ${({ theme }) => theme.palette.textIconColor};
+  width: 20px;
+  height: 30px;
+  margin-right: 10px;
+`;
 
-const StyledTypography = withStyles(
-  theme => ({
-    root: {
-      fontSize: 'small',
-      textAlign: 'center',
-      color: theme.palette.textIconColor
-    }
-  }),
-  { withTheme: true }
-)(Typography);
+const StyledTypography = styled(Typography)`
+  color: ${({ theme }) => theme.palette.textIconColor};
+  font-size: small;
+  text-align: center;
+  margin-right: 10px;
+`;
 
 const DonateForm = () => (
   <DonateFormWrapper>
@@ -132,4 +117,4 @@ const DonateForm = () => (
   </DonateFormWrapper>
 );
 
-export default withTheme(DonateForm);
+export default DonateForm;

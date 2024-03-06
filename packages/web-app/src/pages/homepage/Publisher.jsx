@@ -1,11 +1,11 @@
 import React from 'react';
-import styled from 'styled-components';
+import { styled } from '@mui/material/styles';
 import InternationalizedLink from '../../components/common/InternationalizedLink';
 import { wikicavesLink } from '../../conf/externalLinks';
 import Translate from '../../components/common/Translate';
 import GCLogo from '../../components/common/GCLogo';
 
-const PublisherInfo = styled.div`
+const PublisherInfo = styled('div')`
   margin-right: 4px;
   display: inline-block;
 `;
@@ -17,7 +17,7 @@ const PublisherLogo = styled(GCLogo)`
   }
 `;
 
-const PublisherWrapper = styled.div`
+const PublisherWrapper = styled('div')`
   display: inline-block;
   font-size: small;
   margin-top: 10px;

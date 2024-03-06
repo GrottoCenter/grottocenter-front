@@ -2,15 +2,15 @@ import React, { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useIntl } from 'react-intl';
 import { useHistory } from 'react-router-dom';
-import { List, ListItem, Typography, Button } from '@material-ui/core';
-import CallMergeIcon from '@material-ui/icons/CallMerge';
-import PeopleIcon from '@material-ui/icons/People';
-import DocumentListIcon from '@material-ui/icons/PlaylistAddCheck';
-import ListAltIcon from '@material-ui/icons/ListAlt';
-import PublishIcon from '@material-ui/icons/Publish';
-import ArchiveIcon from '@material-ui/icons/Archive';
-import NotificationsIcon from '@material-ui/icons/Notifications';
-import styled from 'styled-components';
+import { List, Typography, Button, ListItemButton } from '@mui/material';
+import CallMergeIcon from '@mui/icons-material/CallMerge';
+import PeopleIcon from '@mui/icons-material/People';
+import DocumentListIcon from '@mui/icons-material/PlaylistAddCheck';
+import ListAltIcon from '@mui/icons-material/ListAlt';
+import PublishIcon from '@mui/icons-material/Publish';
+import ArchiveIcon from '@mui/icons-material/Archive';
+import NotificationsIcon from '@mui/icons-material/Notifications';
+import { styled } from '@mui/material/styles';
 import { fetchDBExportUrl } from '../actions/DBExport';
 
 import { usePermissions } from '../hooks';
@@ -21,19 +21,19 @@ const StyledList = styled(List)`
   flex-wrap: wrap;
 `;
 
-const StyledListItem = styled(ListItem)`
+const StyledListItem = styled(ListItemButton)`
   border: 1px solid ${props => props.theme.palette.primary1Color};
-  flex-basis: calc(20% - ${props => props.theme.spacing(2) * 2}px);
+  flex: 0 0 220px;
   flex-direction: column;
-  margin: ${props => props.theme.spacing(2)}px;
+  margin: ${props => props.theme.spacing(2)};
 `;
 
 const StyledListItemDBExport = styled(StyledListItem)`
-  min-width: 215px;
+  flex-basis: 250px;
 `;
 
-const DashboardBlock = styled.div`
-  margin-bottom: ${props => props.theme.spacing(4)}px;
+const DashboardBlock = styled('div')`
+  margin-bottom: ${props => props.theme.spacing(4)};
 `;
 
 const Dashboard = () => {

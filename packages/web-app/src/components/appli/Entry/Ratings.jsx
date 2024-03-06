@@ -1,10 +1,10 @@
-import styled from 'styled-components';
+import { styled } from '@mui/material/styles';
 import React from 'react';
 import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
 import { Rating } from '../../common/Properties';
 
-const RatingWrapper = styled.div`
+const RatingWrapper = styled('div')`
   display: flex;
   flex-wrap: wrap;
 `;

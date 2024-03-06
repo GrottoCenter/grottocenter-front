@@ -1,6 +1,6 @@
 import { useIntl } from 'react-intl';
-import { Box, Button, ButtonGroup, Tooltip } from '@material-ui/core';
-import EditIcon from '@material-ui/icons/Edit';
+import { Box, Button, ButtonGroup, Tooltip } from '@mui/material';
+import EditIcon from '@mui/icons-material/Edit';
 import { useDispatch } from 'react-redux';
 import React, { useState } from 'react';
 import { usePermissions } from '../../../../hooks';

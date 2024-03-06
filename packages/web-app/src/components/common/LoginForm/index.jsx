@@ -8,15 +8,15 @@ import {
   InputAdornment,
   IconButton,
   Fade
-} from '@material-ui/core';
+} from '@mui/material';
 
-import Visibility from '@material-ui/icons/Visibility';
-import VisibilityOff from '@material-ui/icons/VisibilityOff';
-import styled from 'styled-components';
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
+import { styled } from '@mui/material/styles';
 
 import ErrorMessage from '../StatusMessage/ErrorMessage';
 
-const FormWrapper = styled.form`
+const FormWrapper = styled('form')`
   display: flex;
   flex-direction: column;
   margin-bottom: 0;
@@ -76,7 +76,8 @@ const LoginForm = ({
                 aria-label="toggle password visibility"
                 onClick={toggleIsPasswordVisible}
                 onMouseDown={handleMouseDownPassword}
-                edge="end">
+                edge="end"
+                size="large">
                 {isPasswordVisible ? <Visibility /> : <VisibilityOff />}
               </IconButton>
             </InputAdornment>

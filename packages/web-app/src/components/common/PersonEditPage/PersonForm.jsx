@@ -6,13 +6,13 @@ import {
   TextField,
   IconButton,
   InputAdornment
-} from '@material-ui/core';
+} from '@mui/material';
 
 import { Controller } from 'react-hook-form';
 
-import Visibility from '@material-ui/icons/Visibility';
-import VisibilityOff from '@material-ui/icons/VisibilityOff';
-import styled from 'styled-components';
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
+import { styled } from '@mui/material/styles';
 import { isEmpty, match } from 'ramda';
 
 import { emailRegexp } from '../../../conf/config';
@@ -20,7 +20,7 @@ import { emailRegexp } from '../../../conf/config';
 import StringInput from '../Form/StringInput';
 
 const FormControl = styled(MuiFormControl)`
-  padding-bottom: ${({ theme }) => theme.spacing(4)}px;
+  padding-bottom: ${({ theme }) => theme.spacing(4)};
 `;
 
 const PersonEditForm = ({ control, errors, watch, isUser }) => {
@@ -161,7 +161,8 @@ const PersonEditForm = ({ control, errors, watch, isUser }) => {
                       aria-label="toggle password visibility"
                       onClick={toggleIsPasswordVisible}
                       onMouseDown={handleMouseDownPassword}
-                      edge="end">
+                      edge="end"
+                      size="large">
                       {isPasswordVisible ? <Visibility /> : <VisibilityOff />}
                     </IconButton>
                   </InputAdornment>
@@ -195,7 +196,8 @@ const PersonEditForm = ({ control, errors, watch, isUser }) => {
                       aria-label="toggle password visibility"
                       onClick={toggleIsPasswordVisible}
                       onMouseDown={handleMouseDownPassword}
-                      edge="end">
+                      edge="end"
+                      size="large">
                       {isPasswordVisible ? <Visibility /> : <VisibilityOff />}
                     </IconButton>
                   </InputAdornment>

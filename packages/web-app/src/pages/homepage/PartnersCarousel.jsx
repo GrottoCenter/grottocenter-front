@@ -1,12 +1,12 @@
 import React, { useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
-import CircularProgress from '@material-ui/core/CircularProgress';
-import styled from 'styled-components';
-import { withTheme } from '@material-ui/core/styles';
+import CircularProgress from '@mui/material/CircularProgress';
+import { styled } from '@mui/material/styles';
+import withTheme from '@mui/styles/withTheme';
 import AliceCarousel from 'react-alice-carousel';
 import 'react-alice-carousel/lib/alice-carousel.css';
 
-const PartnerVignette = withTheme(styled.div`
+const PartnerVignette = withTheme(styled('div')`
   margin-left: 2%;
   margin-right: 2%;
   margin-top: 2%;
@@ -37,7 +37,7 @@ const PartnerVignette = withTheme(styled.div`
   }
 `);
 
-const PartnerImage = styled.img`
+const PartnerImage = styled('img')`
   display: block;
   max-width: 100%;
   max-height: 100%;
@@ -48,7 +48,7 @@ const PartnerImage = styled.img`
   transform: translate(-50%, -50%);
 `;
 
-const CarouselDiv = withTheme(styled.div`
+const CarouselDiv = withTheme(styled('div')`
   text-align: center;
   width: 100%;
   li.alice-carousel__dots-item {

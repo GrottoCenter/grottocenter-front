@@ -11,15 +11,16 @@ import {
   CircularProgress,
   Tooltip,
   ButtonGroup,
-  Button
-} from '@material-ui/core';
-import { Print } from '@material-ui/icons';
-import styled from 'styled-components';
+  Button,
+  Skeleton
+} from '@mui/material';
+import { Print } from '@mui/icons-material';
+import { styled } from '@mui/material/styles';
 import { useReactToPrint } from 'react-to-print';
-import CreateIcon from '@material-ui/icons/Create';
-import NotificationsNoneIcon from '@material-ui/icons/NotificationsNone';
-import NotificationsActiveIcon from '@material-ui/icons/NotificationsActive';
-import { Skeleton } from '@material-ui/lab';
+import CreateIcon from '@mui/icons-material/Create';
+import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
+import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
+
 import {
   SnapshotButton,
   SnapshotPageButton
@@ -28,7 +29,7 @@ import {
 const isString = is(String);
 
 const Card = styled(MuiCard)`
-  margin: ${({ theme }) => theme.spacing(2)}px;
+  margin: ${({ theme }) => theme.spacing(2)};
   height: 100%;
   display: flex;
   flex-direction: column;
@@ -47,11 +48,11 @@ const CardActionsBtn = styled(SnapshotButton)`
   margin-left: auto;
 `;
 
-const Title = styled.div`
+const Title = styled('div')`
   display: flex;
   justify-content: flex-start;
 `;
-const TitleIcon = styled.div(
+const TitleIcon = styled('div')(
   ({ theme }) => `
   margin-right: 6px;
   margin-top: 4px;
@@ -62,7 +63,7 @@ const TitleIcon = styled.div(
 `
 );
 const CardHeaderStyled = styled(CardHeader)`
-  ${({ theme }) => theme.breakpoints.down('sm')} {
+  ${({ theme }) => theme.breakpoints.down('lg')} {
     flex-direction: column;
     align-items: flex-start;
     grid-gap: 8px;
@@ -107,17 +108,17 @@ const FixedContent = ({
                 <Print />
               </Button>
             )}
-            <Tooltip
-              title={formatMessage({
-                id: 'Edit properties'
-              })}>
-              <Button
-                aria-label="edit"
-                onClick={onEdit}
-                disabled={isNil(onEdit)}>
-                <CreateIcon />
-              </Button>
-            </Tooltip>
+            {onEdit && (
+              <Tooltip
+                title={formatMessage({
+                  id: 'Edit properties'
+                })}>
+                <Button aria-label="edit" onClick={onEdit}>
+                  <CreateIcon />
+                </Button>
+              </Tooltip>
+            )}
+
             {!isNil(onChangeSubscribe) && (
               <Tooltip
                 title={formatMessage({

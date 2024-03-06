@@ -1,18 +1,18 @@
-import { FormLabel } from '@material-ui/core';
+import { FormLabel } from '@mui/material';
 import { React } from 'react';
 import { useIntl } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from '@mui/material/styles';
 import InternationalizedLink from '../../../common/InternationalizedLink';
 import { licenceLinks, licensesODBLink } from '../../../../conf/externalLinks';
 
-const LicenceBoxStyle = styled.div`
+const LicenceBoxStyle = styled('div')`
   display: flex;
   justify-content: center;
   align-items: center;
   margin: 10px 0;
 `;
 
-const LicenceImage = styled.img`
+const LicenceImage = styled('img')`
   width: 100px;
   margin-left: 10px;
 `;

@@ -1,12 +1,11 @@
 import React, { useEffect, useRef } from 'react';
 import { useIntl } from 'react-intl';
-import { Chip } from '@material-ui/core';
-import { Terrain } from '@material-ui/icons';
+import { Chip, Skeleton } from '@mui/material';
+import { Terrain } from '@mui/icons-material';
 import { isNil } from 'ramda';
 import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams, useHistory } from 'react-router-dom';
-import { Skeleton } from '@material-ui/lab';
 
 import getAuthor from '../../util/getAuthor';
 import { loadLanguages } from '../../actions/Language';
@@ -150,9 +149,9 @@ const DocumentPage = ({
             <Skeleton width={75} />
             <Skeleton />
             <Skeleton width={100} />
-            <Skeleton variant="rect" height={150} />
+            <Skeleton variant="rectangular" height={150} />
             <Skeleton width={125} />
-            <Skeleton variant="rect" height={80} />
+            <Skeleton variant="rectangular" height={80} />
           </>
         ) : (
           <>

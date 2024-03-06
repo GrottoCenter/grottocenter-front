@@ -1,12 +1,12 @@
 import React from 'react';
-import styled from 'styled-components';
-import { withTheme } from '@material-ui/core/styles';
+import { styled } from '@mui/material/styles';
+import withTheme from '@mui/styles/withTheme';
 import LandingSection from './LandingSection';
 import { GridRow, GridFullColumn } from '../../helpers/GridSystem';
 import PartnersCarouselContainer from '../../containers/PartnersCarouselContainer';
 import Translate from '../../components/common/Translate';
 
-const SectionTitle = withTheme(styled.h3`
+const SectionTitle = withTheme(styled('h3')`
   color: ${props => props.theme.palette.accent1Color};
   text-align: center;
   padding-bottom: 20px;

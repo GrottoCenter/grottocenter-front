@@ -1,15 +1,16 @@
 /* eslint-disable react/forbid-prop-types */
 import React from 'react';
-import { withStyles, withTheme } from '@material-ui/core';
+import withStyles from '@mui/styles/withStyles';
+import withTheme from '@mui/styles/withTheme';
 import PropTypes from 'prop-types';
 import proj4 from 'proj4';
-import Button from '@material-ui/core/Button';
-import styled from 'styled-components';
-import Input from '@material-ui/core/Input';
-import MenuItem from '@material-ui/core/MenuItem';
-import FormControl from '@material-ui/core/FormControl';
-import Select from '@material-ui/core/Select';
-import Divider from '@material-ui/core/Divider';
+import Button from '@mui/material/Button';
+import { styled } from '@mui/material/styles';
+import Input from '@mui/material/Input';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import Select from '@mui/material/Select';
+import Divider from '@mui/material/Divider';
 import { unitsTab } from '../../../../../conf/ListGPSProj';
 import Translate from '../../../Translate';
 
@@ -96,7 +97,7 @@ const StyledDivider = withTheme(styled(Divider)`
   }
 `);
 
-const StyledTitle = styled.h5`
+const StyledTitle = styled('h5')`
   font-weight: bold;
 `;
 

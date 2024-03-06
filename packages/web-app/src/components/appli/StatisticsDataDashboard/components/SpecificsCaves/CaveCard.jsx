@@ -1,24 +1,20 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { alpha, withStyles } from '@material-ui/core/styles';
-import { Typography, Box } from '@material-ui/core';
+import { alpha, styled } from '@mui/material/styles';
+import { Typography, Box } from '@mui/material';
 import { useSelector } from 'react-redux';
 
-const StyledBox = withStyles(() => ({
-  root: {
-    padding: '15px',
-    borderRadius: '20px',
-    margin: '0 20px',
-    marginBottom: '5px',
-    cursor: 'pointer'
-  }
-}))(Box);
+const StyledBox = styled(Box)`
+  padding: 15px;
+  border-radius: 20px;
+  margin: 0 20px;
+  margin-bottom: 5px;
+  cursor: pointer;
+`;
 
-const BoldTypography = withStyles(() => ({
-  root: {
-    fontWeight: 500
-  }
-}))(Typography);
+const BoldTypography = styled(Typography)`
+  font-weight: 500;
+`;
 
 const CaveCard = ({ idCave, nameCave, numberData, text, backgroundColor }) => {
   const locale = useSelector(state => state.intl);

@@ -1,4 +1,4 @@
-import { blue, brown } from '@material-ui/core/colors';
+import { blue, brown } from '@mui/material/colors';
 
 export const MARKERS_LIMIT = 13;
 

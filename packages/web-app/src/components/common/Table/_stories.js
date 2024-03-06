@@ -5,7 +5,7 @@ import { useIntl } from 'react-intl';
 import { boolean } from '@storybook/addon-knobs';
 
 import PropTypes from 'prop-types';
-import { Typography } from '@material-ui/core';
+import { Typography } from '@mui/material';
 import data from './data.json';
 import StandardDialog from '../StandardDialog';
 import Table from './index';

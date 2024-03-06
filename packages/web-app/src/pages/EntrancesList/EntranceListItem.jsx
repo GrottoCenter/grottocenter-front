@@ -8,8 +8,8 @@ import {
   Box,
   Typography,
   useTheme
-} from '@material-ui/core';
-import styled from 'styled-components';
+} from '@mui/material';
+import { styled } from '@mui/material/styles';
 
 const StyledListItem = styled(ListItem)`
   flex-basis: 25%;

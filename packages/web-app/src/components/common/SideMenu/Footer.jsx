@@ -1,14 +1,14 @@
 import React from 'react';
-import styled from 'styled-components';
+import { styled } from '@mui/material/styles';
 import {
   List,
   ListItemIcon,
   ListItemSecondaryAction,
   ListItemText,
   Typography
-} from '@material-ui/core';
+} from '@mui/material';
 import { useIntl } from 'react-intl';
-import { Launch, MenuBook } from '@material-ui/icons';
+import { Launch, MenuBook } from '@mui/icons-material';
 import { useSelector } from 'react-redux';
 import InternationalizedLink from '../InternationalizedLink';
 import {
@@ -28,11 +28,11 @@ const LogoFooter = styled(GCLogo)`
   }
 `;
 
-const LicenceImage = styled.img`
+const LicenceImage = styled('img')`
   width: 75px;
 `;
 
-const Container = styled.div`
+const Container = styled('div')`
   margin-top: auto;
   display: flex;
   flex-direction: row;
@@ -40,19 +40,19 @@ const Container = styled.div`
   flex-wrap: wrap;
 `;
 
-const Spaced = styled.div`
+const Spaced = styled('div')`
   text-align: center;
   flex: 1;
 `;
 
-const AlignText = styled.div`
+const AlignText = styled('div')`
   padding-top: 10px;
   text-align: center;
   flex: 1;
   display: flex;
   flex-direction: column;
 `;
-const WikiContainer = styled.div`
+const WikiContainer = styled('div')`
   margin-top: auto;
   flex: auto;
   flex-direction: row;

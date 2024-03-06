@@ -1,7 +1,7 @@
 import React from 'react';
 import { storiesOf } from '@storybook/react';
-import { Card as MuiCard, Paper } from '@material-ui/core';
-import styled from 'styled-components';
+import { Card as MuiCard, Paper } from '@mui/material';
+import { styled } from '@mui/material/styles';
 import { select } from '@storybook/addon-knobs';
 import * as d3 from 'd3';
 
@@ -14,7 +14,7 @@ import {
 } from './common/Markers/Components';
 
 const Card = styled(MuiCard)`
-  margin: ${({ theme }) => theme.spacing(2)}px;
+  margin: ${({ theme }) => theme.spacing(2)};
 `;
 
 const positions = {

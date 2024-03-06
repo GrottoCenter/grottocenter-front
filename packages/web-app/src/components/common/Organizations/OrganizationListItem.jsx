@@ -1,7 +1,7 @@
 import React from 'react';
-import { ListItem, ListItemText } from '@material-ui/core';
+import { ListItem, ListItemText } from '@mui/material';
 import { Link } from 'react-router-dom';
-import styled from 'styled-components';
+import { styled } from '@mui/material/styles';
 import idNameType from '../../../types/idName.type';
 
 const StyledListItem = styled(ListItem)`

@@ -1,10 +1,10 @@
 import React from 'react';
 import { useHistory } from 'react-router-dom';
 import PropTypes from 'prop-types';
-import { Button } from '@material-ui/core';
+import { Button } from '@mui/material';
 import { useIntl } from 'react-intl';
 import { useDispatch } from 'react-redux';
-import styled from 'styled-components';
+import { styled } from '@mui/material/styles';
 
 import { displayLoginDialog } from '../../../actions/Login';
 import ErrorMessage from '../../common/StatusMessage/ErrorMessage';
@@ -14,11 +14,11 @@ import { usePermissions } from '../../../hooks';
 
 const SpacedButton = styled(Button)`
   ${({ theme }) => `
-    margin: ${theme.spacing(1)}px;
+    margin: ${theme.spacing(1)};
 `}
 `;
 
-const CenteredBlock = styled.div`
+const CenteredBlock = styled('div')`
   text-align: center;
 `;
 

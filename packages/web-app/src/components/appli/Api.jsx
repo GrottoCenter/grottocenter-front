@@ -1,6 +1,6 @@
 import React from 'react';
-import { Grid, Typography, Button } from '@material-ui/core';
-import styled from 'styled-components';
+import { Grid, Typography, Button } from '@mui/material';
+import { styled } from '@mui/material/styles';
 import { useSelector } from 'react-redux';
 import { useIntl } from 'react-intl';
 import { useHistory } from 'react-router-dom';

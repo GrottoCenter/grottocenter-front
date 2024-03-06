@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Divider } from '@material-ui/core';
+import { Box, Divider } from '@mui/material';
 import { useIntl } from 'react-intl';
 import { useController, useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';

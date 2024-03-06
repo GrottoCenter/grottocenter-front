@@ -7,11 +7,11 @@ import {
   ButtonGroup,
   Tooltip,
   Button
-} from '@material-ui/core';
+} from '@mui/material';
 import { useDispatch } from 'react-redux';
-import EditIcon from '@material-ui/icons/Edit';
+import EditIcon from '@mui/icons-material/Edit';
 
-import styled from 'styled-components';
+import { styled } from '@mui/material/styles';
 import { useIntl } from 'react-intl';
 import { historyType } from '../Provider';
 import CreateHistoryForm from '../../Form/HistoryForm/index';

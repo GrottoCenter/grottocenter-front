@@ -2,7 +2,7 @@ import React from 'react';
 import { useParams, useHistory } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from '@mui/material/styles';
 import {
   Stepper,
   Step,
@@ -12,8 +12,8 @@ import {
   Typography,
   CircularProgress,
   Box
-} from '@material-ui/core';
-import CancelIconOutlined from '@material-ui/icons/CancelOutlined';
+} from '@mui/material';
+import CancelIconOutlined from '@mui/icons-material/CancelOutlined';
 
 import { useForm } from 'react-hook-form';
 
@@ -31,8 +31,8 @@ import { postChangeEmail } from '../../../actions/ChangeEmail';
 import Summary from './Summary';
 
 const StyledActionButton = styled(ActionButton)`
-  margin-top: ${({ theme }) => theme.spacing(1)}px;
-  margin-bottom: ${({ theme }) => theme.spacing(1)}px;
+  margin-top: ${({ theme }) => theme.spacing(1)};
+  margin-bottom: ${({ theme }) => theme.spacing(1)};
 `;
 
 function getSteps() {

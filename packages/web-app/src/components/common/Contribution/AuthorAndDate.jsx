@@ -1,9 +1,9 @@
 import React from 'react';
 import { isNil } from 'ramda';
 import PropTypes from 'prop-types';
-import { Typography } from '@material-ui/core';
+import { Typography } from '@mui/material';
 import { useIntl } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from '@mui/material/styles';
 import AuthorLink from '../AuthorLink/index';
 import authorType from '../../../types/author.type';
 

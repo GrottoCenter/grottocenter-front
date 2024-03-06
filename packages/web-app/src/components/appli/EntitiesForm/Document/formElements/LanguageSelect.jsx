@@ -6,9 +6,10 @@ import {
   FormHelperText,
   InputLabel,
   MenuItem,
-  Select,
-  withStyles
-} from '@material-ui/core';
+  Select
+} from '@mui/material';
+
+import withStyles from '@mui/styles/withStyles';
 
 import { DocumentFormContext } from '../Provider';
 import { loadLanguages } from '../../../../../actions/Language';
@@ -41,7 +42,7 @@ const LanguageSelect = ({ contextValueName, labelText, required = false }) => {
   }, [dispatch, isLoaded]);
 
   return (
-    <FormControlLanguage required={required}>
+    <FormControlLanguage required={required} variant="standard">
       <InputLabel shrink>
         <Translate>Language</Translate>
       </InputLabel>

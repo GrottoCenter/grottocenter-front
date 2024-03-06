@@ -9,9 +9,9 @@ import {
   Select,
   Checkbox,
   MenuItem
-} from '@material-ui/core';
-import Skeleton from '@material-ui/lab/Skeleton';
-import VisibilityIcon from '@material-ui/icons/Visibility';
+} from '@mui/material';
+import Skeleton from '@mui/material/Skeleton';
+import VisibilityIcon from '@mui/icons-material/Visibility';
 import { useIntl } from 'react-intl';
 
 import { PropertyWrapper } from '../../common/Properties/Property';

@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { List, Typography, Divider } from '@material-ui/core';
-import styled from 'styled-components';
+import { List, Typography, Divider } from '@mui/material';
+import { styled } from '@mui/material/styles';
 import Document from './Document';
 
 const DividerStyled = styled(Divider)`

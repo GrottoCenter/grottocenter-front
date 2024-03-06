@@ -1,9 +1,9 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import { isEmpty, isNil } from 'ramda';
-import { TextField } from '@material-ui/core';
-import styled from 'styled-components';
+import { TextField } from '@mui/material';
+import { styled } from '@mui/material/styles';
 import { useIntl } from 'react-intl';
-import AddIcon from '@material-ui/icons/Add';
+import AddIcon from '@mui/icons-material/Add';
 import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -11,7 +11,7 @@ import { postOrganization } from '../../../../../../actions/Organization/CreateO
 import ActionButton from '../../../../../common/ActionButton';
 import { DocumentFormContext } from '../../Provider';
 
-const Wrapper = styled.div`
+const Wrapper = styled('div')`
   display: flex;
   align-items: center;
   justify-content: space-between;

@@ -1,7 +1,6 @@
 import React from 'react';
-import { withTheme } from '@material-ui/core/styles';
-import styled from 'styled-components';
-import Divider from '@material-ui/core/Divider';
+import withTheme from '@mui/styles/withTheme';
+import { styled } from '@mui/material/styles';
 import DonateForm from './DonateForm';
 import FooterDisclamer from '../../components/common/FooterDisclamer';
 import Publisher from './Publisher';
@@ -13,7 +12,8 @@ import {
   GridOneHalfColumn
 } from '../../helpers/GridSystem';
 
-const FooterWrapper = withTheme(styled.div`
+const FooterWrapper = withTheme(styled('div')`
+  padding-top: 1em;
   background-color: ${props => props.theme.palette.primary1Color};
   color: ${props => props.theme.palette.textIconColor};
   text-align: center;
@@ -32,8 +32,6 @@ const Footer = () => (
             <DonateForm />
           </GridOneHalfColumn>
         </GridRow>
-
-        <Divider />
 
         <GridRow>
           <GridOneHalfColumn>

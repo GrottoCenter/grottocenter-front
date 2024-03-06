@@ -1,9 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
+import { styled } from '@mui/material/styles';
 import { useIntl } from 'react-intl';
 
-const DurationWrapper = styled.div`
+const DurationWrapper = styled('div')`
   display: flex;
   align-items: center;
   & > span {

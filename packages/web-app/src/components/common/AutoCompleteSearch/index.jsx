@@ -1,15 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import Autocomplete from '@material-ui/lab/Autocomplete';
+import Autocomplete from '@mui/material/Autocomplete';
 import {
   InputBase,
   CircularProgress,
   InputAdornment,
   Popper
-} from '@material-ui/core';
-import { alpha } from '@material-ui/core/styles';
-import SearchIcon from '@material-ui/icons/Search';
-import ErrorIcon from '@material-ui/icons/Error';
-import styled from 'styled-components';
+} from '@mui/material';
+import { alpha, styled } from '@mui/material/styles';
+import SearchIcon from '@mui/icons-material/Search';
+import ErrorIcon from '@mui/icons-material/Error';
 
 import { AutoCompleteSearchTypes } from './types';
 import Translate from '../Translate';
@@ -20,7 +19,7 @@ const StyledAutocomplete = styled(Autocomplete)`
   width: 100%;
 `;
 
-const InputWrapper = styled.div`
+const InputWrapper = styled('div')`
   display: flex;
   margin-left: auto;
   width: ${({ $hasFixWidth }) => ($hasFixWidth ? 100 : 80)}%;
@@ -36,8 +35,8 @@ const InputWrapper = styled.div`
   }
 `;
 
-const SearchIconWrapper = styled.div`
-  padding: ${({ theme }) => theme.spacing(1)}px;
+const SearchIconWrapper = styled('div')`
+  padding: ${({ theme }) => theme.spacing(1)};
   display: flex;
   align-items: center;
   justify-content: center;

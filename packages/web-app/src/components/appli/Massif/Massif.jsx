@@ -1,8 +1,8 @@
 import React from 'react';
 import { isNil, isEmpty } from 'ramda';
-import Skeleton from '@material-ui/lab/Skeleton';
+import Skeleton from '@mui/material/Skeleton';
 import { useIntl } from 'react-intl';
-import { Box } from '@material-ui/core';
+import { Box } from '@mui/material';
 
 import Layout from '../../common/Layouts/Fixed/FixedContent';
 import CavesList from '../../common/cave/CavesList';

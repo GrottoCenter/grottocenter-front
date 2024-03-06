@@ -1,6 +1,6 @@
 import React, { useContext, useEffect } from 'react';
-import { Box, Typography } from '@material-ui/core';
-import PublishIcon from '@material-ui/icons/Publish';
+import { Box, Typography } from '@mui/material';
+import PublishIcon from '@mui/icons-material/Publish';
 import { useDispatch, useSelector } from 'react-redux';
 import { useIntl } from 'react-intl';
 import { ImportPageContentContext } from '../Provider';

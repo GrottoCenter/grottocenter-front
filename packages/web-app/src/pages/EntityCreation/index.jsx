@@ -1,8 +1,8 @@
 import React from 'react';
 import { useHistory } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
-import { Button } from '@material-ui/core';
-import styled from 'styled-components';
+import { Button } from '@mui/material';
+import { styled } from '@mui/material/styles';
 import { useIntl } from 'react-intl';
 import Layout from '../../components/common/Layouts/Fixed/FixedContent';
 import ErrorMessage from '../../components/common/StatusMessage/ErrorMessage';
@@ -11,7 +11,7 @@ import { usePermissions } from '../../hooks';
 import { displayLoginDialog } from '../../actions/Login';
 import CreationForm from './CreationForm';
 
-const CenteredBlock = styled.div`
+const CenteredBlock = styled('div')`
   text-align: center;
 `;
 

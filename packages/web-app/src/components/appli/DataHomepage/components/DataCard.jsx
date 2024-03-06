@@ -1,30 +1,22 @@
 import React from 'react';
-import { Box, CircularProgress, Typography } from '@material-ui/core';
-import { useTheme, withStyles } from '@material-ui/core/styles';
+import { Box, CircularProgress, Typography } from '@mui/material';
+import { useTheme, alpha, styled } from '@mui/material/styles';
 import PropTypes from 'prop-types';
-import { alpha } from '@material-ui/core/styles/colorManipulator';
 
-const StyledBox = withStyles(
-  theme => ({
-    root: {
-      padding: '15px',
-      margin: '10px',
-      borderRadius: '10px',
-      borderColor: theme.palette.primary.main,
-      color: theme.palette.primary.dark,
-      textAlign: 'center',
-      height: '90%'
-    }
-  }),
-  { withTheme: true }
-)(Box);
+const StyledBox = styled(Box)`
+  padding: 15px;
+  margin: 10px;
+  border-radius: 10px;
+  border-color: ${({ theme }) => theme.palette.primary.main};
+  color: ${({ theme }) => theme.palette.primary.dark};
+  text-align: center;
+  height: 90%;
+`;
 
-const StyledTypography = withStyles(() => ({
-  root: {
-    display: 'flex',
-    alignItems: 'center'
-  }
-}))(Typography);
+const StyledTypography = styled(Typography)`
+  display: flex;
+  align-items: center;
+`;
 
 const DataCard = props => {
   const { isColored, numberData, isFetching, title, globalText, icon } = props;

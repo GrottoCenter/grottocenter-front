@@ -1,31 +1,28 @@
 import React, { useContext, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
-import styled from 'styled-components';
-import DateFnsUtils from '@date-io/date-fns';
-import { Button, FormHelperText } from '@material-ui/core';
-import {
-  KeyboardDatePicker,
-  MuiPickersUtilsProvider
-} from '@material-ui/pickers';
+import { styled } from '@mui/material/styles';
+import { Button, FormHelperText } from '@mui/material';
+import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { set as setDate } from 'date-fns';
 import Translate from '../../../../common/Translate';
 
 import { DocumentFormContext } from '../Provider';
 
-const CustomKeyboardDatePicker = styled(KeyboardDatePicker)`
+const CustomKeyboardDatePicker = styled(DatePicker)`
   margin: 0;
   width: 100%;
 `;
 
-const ButtonsFlexWrapper = styled.div`
+const ButtonsFlexWrapper = styled('div')`
   display: flex;
   flex-direction: column;
   align-items: center;
   flex: 1;
 `;
 
-const Wrapper = styled.div`
+const Wrapper = styled('div')`
   display: flex;
   padding: 4px;
 `;
@@ -143,7 +140,7 @@ const PublicationDatePicker = ({ required = false }) => {
   return (
     <Wrapper>
       <div>
-        <MuiPickersUtilsProvider utils={DateFnsUtils}>
+        <LocalizationProvider dateAdapter={AdapterDateFns}>
           <CustomKeyboardDatePicker
             inputVariant="filled"
             margin="normal"
@@ -168,7 +165,7 @@ const PublicationDatePicker = ({ required = false }) => {
             cancelLabel={formatMessage({ id: 'Cancel' })}
             okLabel={formatMessage({ id: 'Ok' })}
           />
-        </MuiPickersUtilsProvider>
+        </LocalizationProvider>
         <FormHelperText>
           <Translate>
             Date on which the document you submit was made public. You can refer

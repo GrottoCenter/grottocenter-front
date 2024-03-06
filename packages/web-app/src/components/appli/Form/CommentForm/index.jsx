@@ -9,13 +9,13 @@ import {
   Typography,
   IconButton,
   InputAdornment
-} from '@material-ui/core';
-import Rating from '@material-ui/lab/Rating';
+} from '@mui/material';
+import Rating from '@mui/material/Rating';
 import { Controller, useForm } from 'react-hook-form';
-import styled from 'styled-components';
+import { styled } from '@mui/material/styles';
 import { isNil } from 'ramda';
-import NotInterestedIcon from '@material-ui/icons/NotInterested';
-import StarBorderIcon from '@material-ui/icons/StarBorder';
+import NotInterestedIcon from '@mui/icons-material/NotInterested';
+import StarBorderIcon from '@mui/icons-material/StarBorder';
 
 import LanguageAutoComplete from '../LanguageAutoComplete';
 import { commentType } from '../../Entry/Provider';
@@ -23,7 +23,7 @@ import { durationStringToMinutes } from '../../../../util/dateTimeDuration';
 
 const SpacedButton = styled(Button)`
   ${({ theme }) => `
-  margin: 0 ${theme.spacing(1)}px;`}
+  margin: 0 ${theme.spacing(1)};`}
 `;
 
 const getDefaultValues = (values, language) => {

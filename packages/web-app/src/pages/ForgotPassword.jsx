@@ -2,15 +2,15 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import { useHistory } from 'react-router-dom';
-import { Button, CircularProgress, Typography } from '@material-ui/core';
-import styled from 'styled-components';
+import { Button, CircularProgress, Typography } from '@mui/material';
+import { styled } from '@mui/material/styles';
 import { isEmpty, match } from 'ramda';
 
 import { emailRegexp } from '../conf/config';
 import Layout from '../components/common/Layouts/Fixed/FixedContent';
 import StringInput from '../components/common/Form/StringInput';
 
-const FormWrapper = styled.form`
+const FormWrapper = styled('form')`
   display: flex;
   flex-direction: column;
   margin: auto;
@@ -19,7 +19,7 @@ const FormWrapper = styled.form`
 `;
 
 const SpacedCenteredButton = styled(Button)`
-  margin: ${({ theme }) => theme.spacing(1)}px auto;
+  margin: ${({ theme }) => theme.spacing(1)} auto;
 `;
 
 const ForgotPasswordPage = ({
@@ -75,7 +75,7 @@ const ForgotPasswordPage = ({
             <SpacedCenteredButton
               type="submit"
               size="large"
-              color={loading ? 'default' : 'primary'}>
+              color={loading ? 'inherit' : 'primary'}>
               {loading ? (
                 <CircularProgress size="2.8rem" />
               ) : (

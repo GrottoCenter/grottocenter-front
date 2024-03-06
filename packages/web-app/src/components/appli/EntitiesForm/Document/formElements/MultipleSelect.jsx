@@ -1,16 +1,16 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { useIntl } from 'react-intl';
-import Autocomplete from '@material-ui/lab/Autocomplete';
+import Autocomplete from '@mui/material/Autocomplete';
 import {
   Collapse as MuiCollapse,
   FormHelperText,
   IconButton,
   TextField
-} from '@material-ui/core';
+} from '@mui/material';
 import { isNil } from 'ramda';
 
-import styled from 'styled-components';
-import { ExpandLess, ExpandMore } from '@material-ui/icons';
+import { styled } from '@mui/material/styles';
+import { ExpandLess, ExpandMore } from '@mui/icons-material';
 
 import { useDebounce } from '../../../../../hooks';
 import Translate from '../../../../common/Translate';
@@ -18,13 +18,13 @@ import { MultipleSelectTypes } from '../../../../common/Form/types';
 
 import { DocumentFormContext } from '../Provider';
 
-const InputWrapper = styled.div`
+const InputWrapper = styled('div')`
   width: 100%;
   display: flex;
   flex-direction: column;
 `;
 
-const Wrapper = styled.div`
+const Wrapper = styled('div')`
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -32,7 +32,7 @@ const Wrapper = styled.div`
 `;
 
 const Collapse = styled(MuiCollapse)`
-  padding: ${({ theme }) => theme.spacing(1)}px;
+  padding: ${({ theme }) => theme.spacing(1)};
 `;
 
 // eslint-disable-next-line react/prop-types
@@ -71,8 +71,8 @@ const MultipleSelect = ({
       case 'clear':
         updateAttribute(contextValueName, []);
         break;
-      case 'select-option':
-      case 'remove-option':
+      case 'selectOption':
+      case 'removeOption':
         updateAttribute(contextValueName, newValue);
         break;
       default:
@@ -105,7 +105,6 @@ const MultipleSelect = ({
   }, [debouncedInput]);
 
   const hasError = computeHasError(document[contextValueName]);
-
   return (
     <>
       <Wrapper>
@@ -121,7 +120,7 @@ const MultipleSelect = ({
             loading={isLoading}
             getOptionLabel={getOptionLabel}
             renderOption={renderOption}
-            getOptionSelected={getOptionSelected}
+            isOptionEqualToValue={getOptionSelected}
             filterSelectedOptions
             filterOptions={options => options} // This fixes a bug: without it, the autocomplete hides some results...
             noOptionsText={

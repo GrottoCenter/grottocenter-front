@@ -7,8 +7,8 @@ import {
   Radio,
   FormControlLabel,
   FormLabel
-} from '@material-ui/core';
-import styled from 'styled-components';
+} from '@mui/material';
+import { styled } from '@mui/material/styles';
 import { includes, values } from 'ramda';
 import Translate from '../../components/common/Translate';
 import OrganizationForm from '../../components/appli/EntitiesForm/Organization';

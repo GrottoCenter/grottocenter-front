@@ -37,6 +37,12 @@
   }
 }
 
+.fadeOut {
+  opacity: 0;
+  transition: opacity 0.5s;
+}
+
+
 /*
 * Skeleton V2.0.4
 * Copyright 2014, Dave Gamache
@@ -346,12 +352,6 @@ td {
   padding: 12px 15px;
   text-align: left;
   border-bottom: 1px solid #e1e1e1;
-}
-
-th:first-child,
-th:last-child,
-td:last-child {
-  padding-right: 0;
 }
 
 /* Spacing

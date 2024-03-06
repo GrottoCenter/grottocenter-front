@@ -1,5 +1,5 @@
-import { Typography } from '@material-ui/core';
-import styled from 'styled-components';
+import { Typography } from '@mui/material';
+import { styled } from '@mui/material/styles';
 
 const MultilinesTypography = styled(Typography)({
   whiteSpace: 'pre-wrap',

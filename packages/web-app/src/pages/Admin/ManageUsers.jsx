@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useIntl } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from '@mui/material/styles';
 
 import { getAdmins, getModerators } from '../../actions/Person/GetPerson';
 import { postPersonGroups } from '../../actions/Person/UpdatePersonGroups';
@@ -15,8 +15,8 @@ import UserList from './UserList';
 
 // ==========
 
-const MarginBottomBlock = styled.div`
-  margin-bottom: ${({ theme }) => theme.spacing(4)}px;
+const MarginBottomBlock = styled('div')`
+  margin-bottom: ${({ theme }) => theme.spacing(4)};
 `;
 
 // ==========

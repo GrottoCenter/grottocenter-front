@@ -7,7 +7,7 @@ import {
   TableRow,
   TableCell,
   styled
-} from '@material-ui/core';
+} from '@mui/material';
 import { useIntl } from 'react-intl';
 import { pathOr } from 'ramda';
 import PropTypes from 'prop-types';

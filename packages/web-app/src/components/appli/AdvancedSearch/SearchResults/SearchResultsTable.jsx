@@ -1,11 +1,11 @@
 import React, { createRef } from 'react';
 import PropTypes from 'prop-types';
 import { injectIntl } from 'react-intl';
-import { withStyles } from '@material-ui/core/styles';
+import withStyles from '@mui/styles/withStyles';
 import { withRouter } from 'react-router-dom';
 import { isMobile } from 'react-device-detect';
-import styled from 'styled-components';
-import DescriptionIcon from '@material-ui/icons/Description';
+import { styled } from '@mui/material/styles';
+import DescriptionIcon from '@mui/icons-material/Description';
 import {
   Button,
   CircularProgress,
@@ -14,7 +14,7 @@ import {
   TableBody,
   TablePagination,
   TableRow
-} from '@material-ui/core';
+} from '@mui/material';
 import { pathOr } from 'ramda';
 
 import { CSVDownload } from 'react-csv';
@@ -25,12 +25,12 @@ import SearchTableActions from './SearchTableActions';
 import ResultsTableHead from './ResultsTableHead';
 import { ADVANCED_SEARCH_TYPES } from '../../../../conf/config';
 
-const StyledTableFooter = styled.div`
+const StyledTableFooter = styled('div')`
   align-items: center;
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
-  margin: ${({ theme }) => theme.spacing(2)}px;
+  margin: ${({ theme }) => theme.spacing(2)} 0;
 `;
 
 const styles = () => ({

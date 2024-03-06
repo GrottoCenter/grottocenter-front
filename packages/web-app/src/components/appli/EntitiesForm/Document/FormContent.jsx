@@ -1,7 +1,7 @@
 import React, { useContext, Suspense } from 'react';
-import styled from 'styled-components';
-import { FormControl, Button } from '@material-ui/core';
-import { Skeleton } from '@material-ui/lab';
+import { styled } from '@mui/material/styles';
+import { FormControl, Button, Skeleton } from '@mui/material';
+
 import { useIntl } from 'react-intl';
 
 import { DocumentFormContext } from './Provider';

@@ -1,12 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
-import styled from 'styled-components';
-import { Typography, Box } from '@material-ui/core';
+import { styled } from '@mui/material/styles';
+import { Typography, Box } from '@mui/material';
 
 const UserPropertyName = styled(Typography)`
   display: inline-block;
-  margin-right: ${({ theme }) => theme.spacing(4)}px;
+  margin-right: ${({ theme }) => theme.spacing(4)};
   width: 200px;
 `;
 

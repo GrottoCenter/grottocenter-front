@@ -1,5 +1,5 @@
 import React from 'react';
-import styled, { keyframes } from 'styled-components';
+import { styled, keyframes } from '@mui/material/styles';
 import InternationalizedLink from '../../components/common/InternationalizedLink';
 import GCLink from '../../components/common/GCLink';
 import {
@@ -10,7 +10,7 @@ import {
   githubLink
 } from '../../conf/externalLinks';
 
-const SocialLinksList = styled.ul`
+const SocialLinksList = styled('ul')`
   list-style: none;
   display: inline-block;
 
@@ -19,7 +19,7 @@ const SocialLinksList = styled.ul`
   }
 `;
 
-const SocialLinksListItem = styled.li`
+const SocialLinksListItem = styled('li')`
   display: inline-block;
   width: 40px;
   margin: 0 10px;
@@ -29,7 +29,7 @@ const SocialLinksListItem = styled.li`
   }
 `;
 
-const SocialImage = styled.img`
+const SocialImage = styled('img')`
   width: 100%;
   padding: 2px;
   border-radius: 10px;

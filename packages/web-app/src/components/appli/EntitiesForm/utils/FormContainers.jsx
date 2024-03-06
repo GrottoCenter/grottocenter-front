@@ -1,11 +1,11 @@
-import styled from 'styled-components';
-import { Box, Button as MuiButton, Icon, FormLabel } from '@material-ui/core';
+import { styled } from '@mui/material/styles';
+import { Box, Button as MuiButton, Icon, FormLabel } from '@mui/material';
 import { React } from 'react';
 import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
 import ActionButton from '../../../common/ActionButton';
 
-export const FormContainer = styled.div(
+export const FormContainer = styled('div')(
   ({ theme }) => `
     display: flex;
     justify-content: center;
@@ -16,7 +16,7 @@ export const FormContainer = styled.div(
   `
 );
 
-export const FormRow = styled.div(
+export const FormRow = styled('div')(
   ({ theme }) => `
     display: flex;
     justify-content: space-between;
@@ -30,8 +30,8 @@ export const FormRow = styled.div(
 
 const StyledFormLabel = styled(FormLabel)`
   display: block;
-  padding-top: ${({ theme }) => theme.spacing(4)}px;
-  padding-bottom: ${({ theme }) => theme.spacing(1)}px;
+  padding-top: ${({ theme }) => theme.spacing(4)};
+  padding-bottom: ${({ theme }) => theme.spacing(1)};
 `;
 
 export const FormSectionLabel = ({ label }) => {
@@ -41,7 +41,7 @@ export const FormSectionLabel = ({ label }) => {
 FormSectionLabel.propTypes = { label: PropTypes.string.isRequired };
 
 const Button = styled(MuiButton)`
-  margin: ${({ theme }) => theme.spacing(2)}px;
+  margin: ${({ theme }) => theme.spacing(2)};
 `;
 
 export const FormActionRow = ({

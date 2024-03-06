@@ -1,11 +1,18 @@
 import React from 'react';
-import NotificationsOffIcon from '@material-ui/icons/NotificationsOff';
-import { Box, Divider, Menu, MenuItem, Typography } from '@material-ui/core';
+import NotificationsOffIcon from '@mui/icons-material/NotificationsOff';
+import {
+  Box,
+  Divider,
+  Menu,
+  MenuItem,
+  Typography,
+  Skeleton
+} from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
-import { Skeleton } from '@material-ui/lab';
+
 import { useIntl } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from '@mui/material/styles';
 import { usePermissions } from '../../../hooks';
 import NotificationsIcon from './NotificationsIcon';
 import { fetchMenuNotifications } from '../../../actions/Notifications/GetMenuNotifications';
@@ -22,7 +29,7 @@ const SeeAllMenuItem = styled(MenuItem)`
     color: ${theme.palette.primary.main};
     font-weight: bold;
     justify-content: center;
-    padding: ${theme.spacing(3)}px;
+    padding: ${theme.spacing(3)};
   `}
 `;
 
@@ -86,7 +93,7 @@ const NotificationMenu = () => {
         {status === REDUCER_STATUS.LOADING &&
           !notifications &&
           // Arbitrary number (3) of notifications if real number is not available
-          createSkeletons(nbNotifications || 3)}
+          createSkeletons(Math.min(nbNotifications, 100) || 3)}
         {notifications &&
           notifications.length > 0 &&
           notifications

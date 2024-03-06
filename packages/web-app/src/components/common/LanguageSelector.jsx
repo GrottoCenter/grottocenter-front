@@ -1,8 +1,8 @@
 import React from 'react';
-import { Select, MenuItem, Input, CircularProgress } from '@material-ui/core';
-import { withStyles } from '@material-ui/core/styles';
-import LanguageIcon from '@material-ui/icons/Translate';
-import styled from 'styled-components';
+import { Select, MenuItem, Input, CircularProgress } from '@mui/material';
+import withStyles from '@mui/styles/withStyles';
+import LanguageIcon from '@mui/icons-material/Translate';
+import { styled } from '@mui/material/styles';
 import { isMobileOnly } from 'react-device-detect';
 import { useDispatch, useSelector } from 'react-redux';
 import { changeLocale } from '../../actions/Intl';
@@ -24,13 +24,13 @@ const StyledSelect = withStyles(
       }
     },
     icon: {
-      color: theme.palette.type === 'dark' ? 'white' : 'inherit'
+      color: theme.palette.mode === 'dark' ? 'white' : 'inherit'
     }
   }),
   { withTheme: true }
 )(Select);
 
-const Wrapper = styled.div`
+const Wrapper = styled('div')`
   display: flex;
   align-items: center;
 `;
@@ -58,7 +58,7 @@ const LanguageSelector = () => {
   return (
     <Wrapper>
       {isLoading ? (
-        <CircularProgress size={25} color="white" />
+        <CircularProgress size={25} color="inherit" />
       ) : (
         <LanguageIcon />
       )}

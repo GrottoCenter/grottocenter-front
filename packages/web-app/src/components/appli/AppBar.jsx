@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Fade } from '@material-ui/core';
+import { Fade } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
 import { pathOr } from 'ramda';
 

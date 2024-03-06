@@ -6,11 +6,11 @@ import {
   ListItem,
   InputAdornment,
   Typography
-} from '@material-ui/core';
+} from '@mui/material';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
-import DeleteIcon from '@material-ui/icons/Delete';
-import UndoIcon from '@material-ui/icons/Undo';
+import DeleteIcon from '@mui/icons-material/Delete';
+import UndoIcon from '@mui/icons-material/Undo';
 import StringInput from '../Form/StringInput';
 import { IS_DELETED } from './FileHelpers';
 
@@ -47,11 +47,11 @@ const FilesList = ({ files, updateFileName, removeFile, undoRemove }) => {
               }
             />
             {isDeleted ? (
-              <IconButton onClick={() => undoRemove(index)}>
+              <IconButton onClick={() => undoRemove(index)} size="large">
                 <UndoIcon color="secondary" />
               </IconButton>
             ) : (
-              <IconButton onClick={() => removeFile(index)}>
+              <IconButton onClick={() => removeFile(index)} size="large">
                 <DeleteIcon color="error" />
               </IconButton>
             )}

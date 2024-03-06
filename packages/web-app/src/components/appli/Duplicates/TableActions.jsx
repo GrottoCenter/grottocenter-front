@@ -1,15 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
+import { styled } from '@mui/material/styles';
 import { useIntl } from 'react-intl';
 import ActionButton from '../../common/ActionButton';
 
-const Wrapper = styled.div`
+const Wrapper = styled('div')`
   display: flex;
   flex-direction: row;
-  margin-top: ${({ theme }) => theme.spacing(3)}px;
+  margin-top: ${({ theme }) => theme.spacing(3)};
   & > button {
-    margin-right: ${({ theme }) => theme.spacing(2)}px;
+    margin-right: ${({ theme }) => theme.spacing(2)};
   }
 `;
 

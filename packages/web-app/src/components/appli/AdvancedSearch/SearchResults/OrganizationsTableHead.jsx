@@ -1,9 +1,9 @@
 import React from 'react';
-import { TableCell, TableHead, TableRow } from '@material-ui/core';
+import { TableCell, TableHead, TableRow } from '@mui/material';
 import { useIntl } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from '@mui/material/styles';
 
-const HeaderIcon = styled.img`
+const HeaderIcon = styled('img')`
   height: 3.6rem;
   vertical-align: middle;
   width: 3.6rem;

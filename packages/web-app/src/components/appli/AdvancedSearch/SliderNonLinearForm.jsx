@@ -6,8 +6,8 @@ import {
   FormLabel,
   Slider as MuiSlider,
   Switch
-} from '@material-ui/core';
-import styled from 'styled-components';
+} from '@mui/material';
+import { styled } from '@mui/material/styles';
 
 const Slider = styled(MuiSlider)`
   width: 200px;
@@ -17,7 +17,7 @@ export const StyledFormControl = styled(MuiFormControl)`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin: ${({ theme }) => theme.spacing(2)}px;
+  margin: ${({ theme }) => theme.spacing(2)};
 `;
 
 function valueLabelFormat(val) {

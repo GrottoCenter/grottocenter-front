@@ -1,10 +1,10 @@
 import React from 'react';
 import { isEmpty } from 'ramda';
-import Skeleton from '@material-ui/lab/Skeleton';
+import Skeleton from '@mui/material/Skeleton';
 import { useIntl } from 'react-intl';
 import { Marker } from 'react-leaflet';
-import { Button } from '@material-ui/core';
-import ArrowBackIcon from '@material-ui/icons/ArrowBack';
+import { Button } from '@mui/material';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useHistory } from 'react-router-dom';
 import StatisticsDataDashboard from '../StatisticsDataDashboard';
 import CustomMapContainer from '../../common/Maps/common/MapContainer';

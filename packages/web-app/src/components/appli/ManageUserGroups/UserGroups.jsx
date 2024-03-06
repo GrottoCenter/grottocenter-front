@@ -1,19 +1,19 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from '@mui/material/styles';
 import {
   Button,
   CircularProgress,
   FormControlLabel,
   Switch,
   Typography
-} from '@material-ui/core';
+} from '@mui/material';
 
 import GROUPS from '../../../helpers/GroupHelper';
 
 const SpacedButton = styled(Button)`
-  margin: ${({ theme }) => theme.spacing(1)}px;
+  margin: ${({ theme }) => theme.spacing(1)};
 `;
 
 const UserGroups = ({
@@ -79,7 +79,7 @@ const UserGroups = ({
 
       <SpacedButton
         onClick={onSaveGroups}
-        color={isLoading ? 'default' : 'primary'}
+        color={isLoading ? 'inherit' : 'primary'}
         disabled={!userGroupsHaveChanged || isLoading}>
         {isLoading ? (
           <CircularProgress size={20} color="primary" />

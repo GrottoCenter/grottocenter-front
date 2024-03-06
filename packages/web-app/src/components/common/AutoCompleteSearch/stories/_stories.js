@@ -1,13 +1,13 @@
 import React from 'react';
 import { storiesOf } from '@storybook/react';
 import { action } from '@storybook/addon-actions';
-import styled from 'styled-components';
+import { styled } from '@mui/material/styles';
 import {
   Typography,
   Slider,
   Switch,
   Divider as MuiDivider
-} from '@material-ui/core';
+} from '@mui/material';
 
 import AutoCompleteSearch from '../index';
 import countries from './suggestions';
@@ -15,13 +15,13 @@ import countries from './suggestions';
 const Divider = styled(MuiDivider)`
   margin-bottom: 8px;
 `;
-const Wrapper = styled.div`
+const Wrapper = styled('div')`
   padding: 10px;
   width: 500px;
   background-color: ${({ theme }) => theme.palette.primary.light};
 `;
 
-const SearchWrapper = styled.div`
+const SearchWrapper = styled('div')`
   margin-left: auto;
   width: ${props => (props.width ? props.width : 100)}%;
 `;
@@ -36,11 +36,11 @@ function countryToFlag(isoCode) {
     : isoCode;
 }
 
-const renderOption = option => (
-  <>
+const renderOption = (props, option) => (
+  <li {...props}>
     <span>{countryToFlag(option.code)}</span>
     {option.label} ({option.code}) +{option.phone}
-  </>
+  </li>
 );
 
 const getOptionLabel = option => option.label;

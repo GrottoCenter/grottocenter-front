@@ -3,7 +3,7 @@ import { useWatch, useController } from 'react-hook-form';
 import { MapContainer, useMap, useMapEvent, ScaleControl } from 'react-leaflet';
 import PropTypes from 'prop-types';
 import { isMobile } from 'react-device-detect';
-import styled from 'styled-components';
+import { styled } from '@mui/material/styles';
 import { useDebounce } from '../../../../hooks';
 import { defaultCoord } from '../../../../conf/config';
 import LayersControl from '../../../common/Maps/common/LayersControl';

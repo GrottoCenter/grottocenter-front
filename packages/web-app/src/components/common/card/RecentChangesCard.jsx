@@ -1,10 +1,10 @@
 import React, { useEffect } from 'react';
 import { useIntl } from 'react-intl';
-import CircularProgress from '@material-ui/core/CircularProgress';
+import CircularProgress from '@mui/material/CircularProgress';
 import PropTypes from 'prop-types';
-import { Chip } from '@material-ui/core';
-import { withTheme } from '@material-ui/core/styles';
-import styled from 'styled-components';
+import { Chip } from '@mui/material';
+import withTheme from '@mui/styles/withTheme';
+import { styled } from '@mui/material/styles';
 import GCLink from '../GCLink';
 
 const nowd = new Date();
@@ -79,7 +79,11 @@ const ChangeItem = ({ changeInfo }) => {
   const { formatMessage } = useIntl();
 
   const dateEl = (
-    <Chip color="primary" label={timeDiff(changeInfo.date, formatMessage)} />
+    <Chip
+      color="primary"
+      sx={{ backgroundColor: '#5d4037' }}
+      label={timeDiff(changeInfo.date, formatMessage)}
+    />
   );
   const authorEl = (
     <GCLinkStyled href={`/ui/persons/${changeInfo.authorId}`} internal>
@@ -138,7 +142,7 @@ const ChangeItem = ({ changeInfo }) => {
   );
 };
 
-const ChangeTable = styled.div(
+const ChangeTable = styled('div')(
   ({ theme }) => `
     display: grid;
     gap: 0.3em;

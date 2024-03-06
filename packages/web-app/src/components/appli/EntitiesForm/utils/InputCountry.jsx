@@ -1,4 +1,4 @@
-import { Select, MenuItem, FormControl, InputLabel } from '@material-ui/core';
+import { Select, MenuItem, FormControl, InputLabel } from '@mui/material';
 import React, { useMemo } from 'react';
 import { Controller } from 'react-hook-form';
 import { useIntl } from 'react-intl';
