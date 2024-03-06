@@ -1,12 +1,15 @@
-import _ from 'underscore.string';
 import { AVAILABLE_LANGUAGES } from './config';
+
+function capitalize(string) {
+  return string.charAt(0).toUpperCase() + string.slice(1);
+}
 
 function generateLinks(link, defaultLang) {
   const resultArray = {};
   Object.keys(AVAILABLE_LANGUAGES).forEach(value => {
-    resultArray[value] = _.replaceAll(link, '%s', _.capitalize(value));
+    resultArray[value] = link.replaceAll('%s', capitalize(value));
   });
-  resultArray['*'] = _.replaceAll(link, '%s', _.capitalize(defaultLang));
+  resultArray['*'] = link.replaceAll('%s', capitalize(defaultLang));
   return resultArray;
 }
 

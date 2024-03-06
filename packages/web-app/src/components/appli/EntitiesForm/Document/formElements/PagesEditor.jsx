@@ -4,7 +4,7 @@ import {
   FormControl,
   FormHelperText,
   InputLabel
-} from '@material-ui/core';
+} from '@mui/material';
 import Translate from '../../../../common/Translate';
 
 import { DocumentFormContext, isDocumentPagesFormatValid } from '../Provider';

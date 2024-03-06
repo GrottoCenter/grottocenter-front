@@ -1,11 +1,11 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useIntl } from 'react-intl';
-import Skeleton from '@material-ui/lab/Skeleton';
+import Skeleton from '@mui/material/Skeleton';
 
 import { useParams } from 'react-router-dom';
 import { isEmpty } from 'ramda';
-import { Divider } from '@material-ui/core';
+import { Divider } from '@mui/material';
 import Layout from '../../common/Layouts/Fixed/FixedContent';
 import { fetchEntrance } from '../../../actions/Entrance/GetEntrance';
 import MoveEntranceToCaveForm from './MoveEntranceToCaveForm';

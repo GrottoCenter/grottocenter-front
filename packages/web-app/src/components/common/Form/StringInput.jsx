@@ -5,7 +5,7 @@ import {
   FormControl,
   FormHelperText,
   InputLabel
-} from '@material-ui/core';
+} from '@mui/material';
 
 const StringInput = ({
   endAdornment,

@@ -1,28 +1,24 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
-import { withStyles } from '@material-ui/core/styles';
-import { Badge, Box, Tooltip } from '@material-ui/core';
+import { Badge, Box, Tooltip } from '@mui/material';
+import { styled } from '@mui/material/styles';
 import InfoBlock from './InfoBlock';
 
 import ScrollableContent from '../../../../common/Layouts/Fixed/ScrollableContent';
 
-const StyledBadge = withStyles(() => ({
-  badge: {
-    right: 3,
-    top: 4,
-    padding: '0px 4px',
-    fontSize: '10px'
-  }
-}))(Badge);
+const StyledBadge = styled(Badge)`
+  right: 3;
+  top: 4;
+  padding: 0px 4px;
+  font-size: 10px;
+`;
 
-const StyledBox = withStyles(() => ({
-  root: {
-    display: 'flex',
-    justifyContent: 'space-around',
-    flexWrap: 'wrap'
-  }
-}))(Box);
+const StyledBox = styled(Box)`
+  display: flex;
+  justify-content: space-around;
+  flexwrap: wrap;
+`;
 
 const styledImg = { width: '100%', height: 'auto' };
 

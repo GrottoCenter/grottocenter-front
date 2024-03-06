@@ -1,9 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
+import { styled } from '@mui/material/styles';
 import FlyingGoal from './FlyingGoal';
 
-const FlyingGoals = styled.div`
+const FlyingGoals = styled('div')`
   display: none;
   margin-top: 50px;
 
@@ -14,7 +14,7 @@ const FlyingGoals = styled.div`
   }
 `;
 
-const CenteredText = styled.div`
+const CenteredText = styled('div')`
   display: none;
   text-align: center;
   font-weight: 300;
@@ -38,7 +38,7 @@ const CenteredText = styled.div`
     left: ~'calc((100% - 200px) / 2)';
     width: 200px;
     height: 150px;
-    font-size: 1.05em;
+    font-size: 1.55em;
   }
 `;
 
@@ -48,7 +48,7 @@ const GoalWrapper = styled(FlyingGoal)`
     width: 129px;
     text-align: center;
     float: left;
-    font-size: 1.3em;
+    font-size: 1.9em;
     font-weight: 400;
 
     & > span {

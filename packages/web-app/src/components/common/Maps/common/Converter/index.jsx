@@ -1,23 +1,24 @@
 import React, { useState, Suspense } from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
-import { Button as MuiButton } from '@material-ui/core';
-import ConvertIcon from '@material-ui/icons/Transform';
+import { styled } from '@mui/material/styles';
+import { Button as MuiButton, Skeleton } from '@mui/material';
+import ConvertIcon from '@mui/icons-material/Transform';
 import { useIntl } from 'react-intl';
 import { anyPass, isEmpty, isNil } from 'ramda';
 import { useFullScreen } from 'react-browser-hooks';
-import { Skeleton } from '@material-ui/lab';
+
 import CustomControl, { customControlProps } from '../CustomControl';
 import StandardDialog from '../../../StandardDialog';
 
 const Convert = React.lazy(() => import('./Convert'));
 
-const Wrapper = styled.div`
-  background: white;
-`;
-
 const Button = styled(MuiButton)`
-  background-color: white;
+  background: ${props => props.theme.palette.backgroundButton};
+  color: black;
+
+  &:hover {
+    color: white;
+  }
 `;
 
 const isNilOrEmpty = anyPass([isNil, isEmpty]);
@@ -41,16 +42,14 @@ const ConverterControl = ({
 
   return (
     <CustomControl position={position} {...props}>
-      <Wrapper>
-        <Button
-          aria-label="data-control"
-          onClick={handleOpenMenu}
-          startIcon={<ConvertIcon fontSize="inherit" />}
-          // TODO enable on fullscreen as it's currently hidden
-          disabled={fullScreen || isNilOrEmpty(projectionsList)}>
-          {formatMessage({ id: 'Converter' })}
-        </Button>
-      </Wrapper>
+      <Button
+        aria-label="data-control"
+        onClick={handleOpenMenu}
+        startIcon={<ConvertIcon fontSize="inherit" />}
+        // TODO enable on fullscreen as it's currently hidden
+        disabled={fullScreen || isNilOrEmpty(projectionsList)}>
+        {formatMessage({ id: 'Converter' })}
+      </Button>
       {!isNilOrEmpty(projectionsList) && (
         <StandardDialog
           title={formatMessage({ id: 'Converter' })}

@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
-import { InputAdornment } from '@material-ui/core';
+import { InputAdornment } from '@mui/material';
 
 import { DocumentFormContext } from '../Provider';
 

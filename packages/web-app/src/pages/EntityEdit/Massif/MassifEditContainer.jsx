@@ -2,7 +2,7 @@ import React from 'react';
 import { useIntl } from 'react-intl';
 import { isNil } from 'ramda';
 import PropTypes from 'prop-types';
-import { CircularProgress } from '@material-ui/core';
+import { CircularProgress } from '@mui/material';
 import MassifForm from '../../../components/appli/EntitiesForm/Massif';
 import { makeMassifValueData } from '../../../components/appli/EntitiesForm/Massif/transformers';
 import Layout from '../../../components/common/Layouts/Fixed/FixedContent';

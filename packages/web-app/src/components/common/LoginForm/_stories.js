@@ -1,9 +1,9 @@
 import React from 'react';
 import { storiesOf } from '@storybook/react';
 import { action } from '@storybook/addon-actions';
-import { Button, CircularProgress, Divider, Switch } from '@material-ui/core';
-import FaceIcon from '@material-ui/icons/Face';
-import styled from 'styled-components';
+import { Button, CircularProgress, Divider, Switch } from '@mui/material';
+import FaceIcon from '@mui/icons-material/Face';
+import { styled } from '@mui/material/styles';
 import PropTypes from 'prop-types';
 
 import Translate from '../Translate';
@@ -26,7 +26,7 @@ const DefaultLoginForm = () => {
   );
 };
 
-const StoryControlsWrapper = styled.div`
+const StoryControlsWrapper = styled('div')`
   background-color: ${({ theme }) => theme.palette.primary.light};
   font-size: 1.5rem;
   left: 0;
@@ -36,7 +36,7 @@ const StoryControlsWrapper = styled.div`
   top: -75px;
 `;
 
-const TitleWrapper = styled.div`
+const TitleWrapper = styled('div')`
   display: flex;
   align-items: center;
   justify-content: center;

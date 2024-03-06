@@ -1,8 +1,8 @@
 import React from 'react';
-import CircularProgress from '@material-ui/core/CircularProgress';
-import styled from 'styled-components';
+import CircularProgress from '@mui/material/CircularProgress';
+import { styled } from '@mui/material/styles';
 
-const Container = styled.div`
+const Container = styled('div')`
   width: 100%;
   height: 200px;
   display: flex;

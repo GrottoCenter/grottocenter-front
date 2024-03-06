@@ -1,21 +1,21 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import CheckIcon from '@material-ui/icons/Check';
-import styled, { keyframes } from 'styled-components';
-import { withStyles } from '@material-ui/core';
+import CheckIcon from '@mui/icons-material/Check';
+import { styled, keyframes } from '@mui/material/styles';
+import withStyles from '@mui/styles/withStyles';
 
-const CheckList = styled.ul`
+const CheckList = styled('ul')`
   width: 100%;
   list-style-type: none;
 `;
 
-const ListTitle = styled.p`
+const ListTitle = styled('p')`
   margin-bottom: 40px;
   display: block;
   font-weight: 600;
 `;
 
-const CheckListWrapper = styled.div`
+const CheckListWrapper = styled('div')`
   @media (min-width: 550px) {
     display: none;
   }
@@ -44,7 +44,7 @@ const ListIcon = styled(CheckIcon)`
   }
 `;
 
-const ListItem = styled.li`
+const ListItem = styled('li')`
   display: inline-block;
   font-weight: 300;
   font-size: large;

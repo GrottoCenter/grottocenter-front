@@ -1,10 +1,10 @@
 import React, { useRef, useMemo } from 'react';
-import { Grid, Fab } from '@material-ui/core';
+import { Grid, Fab } from '@mui/material';
 import { MapContainer, TileLayer, Marker } from 'react-leaflet';
 import { isNil } from 'ramda';
 import PropTypes from 'prop-types';
-import ArrowForwardIosIcon from '@material-ui/icons/ArrowForwardIos';
-import ArrowBackIosIcon from '@material-ui/icons/ArrowBackIos';
+import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
+import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import { useIntl } from 'react-intl';
 
 const paddingVertical = '20px';

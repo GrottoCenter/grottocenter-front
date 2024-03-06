@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
+import { styled } from '@mui/material/styles';
 import { isEmpty, pathOr } from 'ramda';
 
 import Ratings from '../../Ratings';
@@ -16,11 +16,11 @@ function convertMinutes(totalMinutes) {
   return `${hours}:${minutes}:00`;
 }
 
-const HalfSplitContainer = styled.div`
+const HalfSplitContainer = styled('div')`
   display: flex;
   flex-direction: column;
 `;
-const DurationContainer = styled.div`
+const DurationContainer = styled('div')`
   display: flex;
   flex-direction: row;
   justify-content: flex-start;

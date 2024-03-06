@@ -6,11 +6,11 @@ import {
   AccordionActions,
   Typography,
   Box
-} from '@material-ui/core';
-import ExpandMore from '@material-ui/icons/ExpandMore';
+} from '@mui/material';
+import ExpandMore from '@mui/icons-material/ExpandMore';
 import PropTypes from 'prop-types';
 
-import styled from 'styled-components';
+import { styled } from '@mui/material/styles';
 import Contribution from '../../../common/Contribution/Contribution';
 import { getAccordionBodyFromType } from './UtilityFunction';
 import authorType from '../../../../types/author.type';
@@ -18,7 +18,7 @@ import { HighLightsChar } from '../../../common/Highlights';
 import RestoreSnapshot from './component/RestoreSnapshot';
 import Translate from '../../../common/Translate';
 
-const FlexDiv50 = styled.div`
+const FlexDiv50 = styled('div')`
   flex-basis: 50%;
 `;
 const AccordionSnapshot = ({

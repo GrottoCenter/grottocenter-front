@@ -1,5 +1,6 @@
 import React from 'react';
-import { useTheme, makeStyles } from '@material-ui/core/styles';
+import { useTheme, styled } from '@mui/material/styles';
+import makeStyles from '@mui/styles/makeStyles';
 import { useIntl } from 'react-intl';
 import {
   Table,
@@ -10,8 +11,7 @@ import {
   TableRow,
   TableFooter,
   Paper
-} from '@material-ui/core';
-import styled from 'styled-components';
+} from '@mui/material';
 
 const useStyles = makeStyles({
   table: {

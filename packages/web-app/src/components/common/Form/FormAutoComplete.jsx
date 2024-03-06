@@ -1,5 +1,5 @@
 import React from 'react';
-import styled from 'styled-components';
+import { styled } from '@mui/material/styles';
 import {
   FilledInput,
   FormControl,
@@ -7,30 +7,31 @@ import {
   IconButton,
   InputLabel,
   Collapse
-} from '@material-ui/core';
+} from '@mui/material';
 
 import { isNil } from 'ramda';
-import { ExpandLess, ExpandMore } from '@material-ui/icons';
+import { ExpandLess, ExpandMore } from '@mui/icons-material';
 import Translate from '../Translate';
 import { FormAutoCompleteTypes } from './types';
 
 export const StyledInput = styled(FilledInput)`
-  ${({ theme }) => `
-  color: ${theme.palette.primaryTextColor} !important;
-  `}
+  & .Mui-disabled {
+    color: ${({ theme }) => theme.palette.primaryTextColor};
+    -webkit-text-fill-color: initial;
+  }
+
+  color: ${({ theme }) => theme.palette.primaryTextColor};
 `;
 
 export const StyledFormControl = styled(FormControl)`
-  ${({ theme }) => `
-  background-color: ${theme.palette.primary3Color};
-  `};
+  background-color: ${({ theme }) => theme.palette.primary3Color};
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
 `;
 
-export const InputWrapper = styled.div`
+export const InputWrapper = styled('div')`
   width: 100%;
   display: flex;
   flex-direction: column;

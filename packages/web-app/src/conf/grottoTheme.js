@@ -1,9 +1,10 @@
-import { brown, blue, orange, grey } from '@material-ui/core/colors';
+import { brown, blue, orange, grey } from '@mui/material/colors';
 import {
   createTheme,
   alpha,
-  responsiveFontSizes
-} from '@material-ui/core/styles';
+  responsiveFontSizes,
+  adaptV4Theme
+} from '@mui/material/styles';
 import { isMobile } from 'react-device-detect';
 
 const fontFamily = [
@@ -222,9 +223,11 @@ export const overridings = {
       }
     },
     MuiStepIcon: {
-      active: {
-        color: `${orange['700']} !important`,
-        borderRadius: '100%'
+      root: {
+        '&.Mui-active': {
+          color: `${orange['700']} !important`,
+          borderRadius: '100%'
+        }
       }
     },
     MuiStepConnector: {
@@ -238,20 +241,22 @@ export const overridings = {
         borderWidth: 0,
         borderLeftWidth: '1px'
       },
-      active: {
-        '& $line': {
-          borderColor: brown['300'],
-          borderStyle: 'dashed'
-        }
-      },
-      completed: {
-        '& $line': {
-          borderColor: brown['500'],
-          borderWidth: '2px'
+      root: {
+        '&.Mui-active': {
+          '& $line': {
+            borderColor: brown['300'],
+            borderStyle: 'dashed'
+          }
+        },
+        '&.Mui-completed': {
+          '& $line': {
+            borderColor: brown['500'],
+            borderWidth: '2px'
+          }
         }
       }
     }
   }
 };
 
-export default responsiveFontSizes(createTheme(overridings));
+export default responsiveFontSizes(createTheme(adaptV4Theme(overridings)));

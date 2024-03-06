@@ -4,11 +4,11 @@ import {
   DialogActions,
   DialogContent as MuiDialogContent,
   DialogTitle
-} from '@material-ui/core';
-import styled from 'styled-components';
+} from '@mui/material';
+import { styled } from '@mui/material/styles';
 import PropTypes from 'prop-types';
-import CloseIcon from '@material-ui/icons/Close';
-import IconButton from '@material-ui/core/IconButton';
+import CloseIcon from '@mui/icons-material/Close';
+import IconButton from '@mui/material/IconButton';
 
 const CustomDialogTitle = styled(DialogTitle)`
   margin-top: 1rem;

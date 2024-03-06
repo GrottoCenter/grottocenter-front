@@ -7,12 +7,12 @@ import {
   IconButton,
   Typography,
   ThemeProvider,
+  StyledEngineProvider,
   Fade
-} from '@material-ui/core';
-import MenuIcon from '@material-ui/icons/Menu';
-import styled from 'styled-components';
+} from '@mui/material';
+import MenuIcon from '@mui/icons-material/Menu';
+import { styled, createTheme } from '@mui/material/styles';
 
-import { createTheme } from '@material-ui/core/styles';
 import LanguageSelector from '../LanguageSelector';
 import UserMenu from './User';
 import { logoGC } from '../../../conf/config';
@@ -22,52 +22,52 @@ const StyledMuiAppBar = styled(MuiAppBar)`
   flex-grow: 1;
 `;
 
-const LanguageWrapper = styled.div`
+const LanguageWrapper = styled('div')`
   height: 56px;
-  padding: ${props => props.theme.spacing(2)}px;
-  ${props => props.theme.breakpoints.down('xs')} {
+  padding: ${props => props.theme.spacing(2)};
+  ${props => props.theme.breakpoints.down('sm')} {
     display: none;
   }
 `;
 
-const SearchWrapper = styled.div`
-  padding: ${props => props.theme.spacing(2)}px;
-  ${props => props.theme.breakpoints.down('xs')} {
+const SearchWrapper = styled('div')`
+  padding: ${props => props.theme.spacing(2)};
+  ${props => props.theme.breakpoints.down('sm')} {
     display: none;
   }
 `;
 
-const TitleWrapper = styled.div`
+const TitleWrapper = styled('div')`
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   align-items: baseline;
 `;
 
-const LogoWrapper = styled.div`
+const LogoWrapper = styled('div')`
   display: flex;
   align-items: baseline;
 `;
 
-const LogoImage = styled.img(
+const LogoImage = styled('img')(
   ({ theme }) => `
-  padding-right: ${theme.spacing(2)}px;
+  padding-right: ${theme.spacing(2)};
   height: 30px;
-  ${theme.breakpoints.down('xs')} {
+  ${theme.breakpoints.down('sm')} {
     height: 25px;
   }
 `
 );
 
-const GrottoTxt = styled.div(
+const GrottoTxt = styled('div')(
   ({ theme }) => `
-  ${theme.breakpoints.down('xs')} {
+  ${theme.breakpoints.down('sm')} {
     display: none;
   }
 `
 );
 
-const RightWrapper = styled.div`
+const RightWrapper = styled('div')`
   margin-left: auto;
   display: flex;
 `;
@@ -95,7 +95,8 @@ const AppBar = ({
           color="inherit"
           aria-label="open drawer"
           edge="start"
-          onClick={toggleMenu}>
+          onClick={toggleMenu}
+          size="large">
           <MenuIcon />
         </IconButton>
         <TitleWrapper>
@@ -120,18 +121,20 @@ const AppBar = ({
               </SearchWrapper>
               <Fade in={!isSideMenuOpen}>
                 <LanguageWrapper>
-                  <ThemeProvider
-                    theme={theme =>
-                      createTheme({
-                        ...theme,
-                        palette: {
-                          ...theme.palette,
-                          type: 'dark'
-                        }
-                      })
-                    }>
-                    <LanguageSelector />
-                  </ThemeProvider>
+                  <StyledEngineProvider injectFirst>
+                    <ThemeProvider
+                      theme={theme =>
+                        createTheme({
+                          ...theme,
+                          palette: {
+                            ...theme.palette,
+                            type: 'dark'
+                          }
+                        })
+                      }>
+                      <LanguageSelector />
+                    </ThemeProvider>
+                  </StyledEngineProvider>
                 </LanguageWrapper>
               </Fade>
             </>

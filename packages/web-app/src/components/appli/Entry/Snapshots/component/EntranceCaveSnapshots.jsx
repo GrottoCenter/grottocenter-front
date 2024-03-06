@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { useIntl } from 'react-intl';
-import { GpsFixed, Height, Waves, Title } from '@material-ui/icons';
-import { Box } from '@material-ui/core';
+import { GpsFixed, Height, Waves, Title } from '@mui/icons-material';
+import { Box } from '@mui/material';
 import PropTypes from 'prop-types';
 import { pathOr } from 'ramda';
 

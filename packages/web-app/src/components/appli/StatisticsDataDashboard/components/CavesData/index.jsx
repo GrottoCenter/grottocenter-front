@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
-import { Waves } from '@material-ui/icons';
-import { Box, Typography, useTheme } from '@material-ui/core';
+import { Waves } from '@mui/icons-material';
+import { Box, Typography, useTheme } from '@mui/material';
 import { Link } from 'react-router-dom';
 import InlineData from './InlineData';
 import ScrollableContent from '../../../../common/Layouts/Fixed/ScrollableContent';

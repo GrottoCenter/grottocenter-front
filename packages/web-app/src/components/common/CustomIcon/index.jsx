@@ -1,7 +1,7 @@
-import { Icon as MuiIcon } from '@material-ui/core';
+import { Icon as MuiIcon } from '@mui/material';
 import React from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
+import { styled } from '@mui/material/styles';
 
 const Icon = styled(MuiIcon)`
   text-align: center;
@@ -10,8 +10,8 @@ const Icon = styled(MuiIcon)`
   margin: ${({ theme, margin }) => (margin ? theme.spacing(margin) : 0)}px;
 `;
 
-const Img = styled.img`
-  padding: ${({ theme }) => theme.spacing(0)}px;
+const Img = styled('img')`
+  padding: ${({ theme }) => theme.spacing(0)};
 `;
 
 const CustomIcon = ({ type, size = 35, margin = '0px 4px 0px 0px' }) => (

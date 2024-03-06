@@ -1,6 +1,6 @@
 import React from 'react';
 import { useIntl } from 'react-intl';
-import { withStyles } from '@material-ui/core/styles';
+import withStyles from '@mui/styles/withStyles';
 import {
   Box,
   useTheme,
@@ -10,9 +10,9 @@ import {
   Typography,
   List,
   ListItem
-} from '@material-ui/core';
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
+} from '@mui/material';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import DataQualityComputeTable from './DataQualityComputeTable';
 
 const ImageBox = withStyles(

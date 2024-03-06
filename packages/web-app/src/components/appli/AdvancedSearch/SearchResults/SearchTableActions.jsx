@@ -1,11 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { withStyles } from '@material-ui/core/styles';
+import withStyles from '@mui/styles/withStyles';
 
-import IconButton from '@material-ui/core/IconButton';
-import KeyboardArrowLeft from '@material-ui/icons/KeyboardArrowLeft';
-import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight';
+import IconButton from '@mui/material/IconButton';
+import KeyboardArrowLeft from '@mui/icons-material/KeyboardArrowLeft';
+import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight';
 
 const actionsStyles = theme => ({
   root: {
@@ -34,7 +34,8 @@ class TablePaginationActions extends React.Component {
         <IconButton
           onClick={this.handleBackButtonClick}
           disabled={page === 0}
-          aria-label="Previous Page">
+          aria-label="Previous Page"
+          size="large">
           {theme.direction === 'rtl' ? (
             <KeyboardArrowRight />
           ) : (
@@ -44,7 +45,8 @@ class TablePaginationActions extends React.Component {
         <IconButton
           onClick={this.handleNextButtonClick}
           disabled={page * size + size >= count}
-          aria-label="Next Page">
+          aria-label="Next Page"
+          size="large">
           {theme.direction === 'rtl' ? (
             <KeyboardArrowLeft />
           ) : (

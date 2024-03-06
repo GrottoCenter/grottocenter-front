@@ -1,10 +1,10 @@
 import React from 'react';
-import { Tabs, Tab } from '@material-ui/core';
+import { Tabs, Tab } from '@mui/material';
 import { useIntl } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from '@mui/material/styles';
 import PropTypes from 'prop-types';
 
-const TabIcon = styled.img`
+const TabIcon = styled('img')`
   height: 2rem;
   margin-right: 5px;
   vertical-align: middle;

@@ -1,5 +1,5 @@
 import React from 'react';
-import styled from 'styled-components';
+import { styled } from '@mui/material/styles';
 import {
   GridContainer,
   GridRow,
@@ -11,8 +11,8 @@ import Translate from '../../components/common/Translate';
 import GCLogo from '../../components/common/GCLogo';
 
 const HeaderGridContainer = styled(GridContainer)`
-  width: 100%;
-  max-width: 100%;
+  width: 100% !important;
+  max-width: 100% !important;
   padding: 0;
   background: url('/images/caves/topo.jpg') 0 center;
   background-repeat: no-repeat;
@@ -33,25 +33,21 @@ const BrandRow = styled(GridRow)`
   text-align: center;
 `;
 
-const Sitename = styled.h1`
+const Sitename = styled('h1')`
   font-weight: 600;
   font-size: 55px;
   line-height: 1.2;
   letter-spacing: -2px;
-
-  @media (min-width: 550px) {
-    font-size: 3.5em;
-  }
 `;
 
-const Slogan = styled.span`
+const Slogan = styled('span')`
   font-size: large;
   font-weight: 400;
 `;
 
-const FseInfos = styled.span`
+const FseInfos = styled('span')`
   display: flex;
-  font-size: normal;
+  font-size: medium;
   font-weight: 300;
   line-height: 40px;
 
@@ -68,7 +64,7 @@ const FseInfos = styled.span`
   }
 `;
 
-const FseImage = styled.img`
+const FseImage = styled('img')`
   width: 40px;
   height: 40px;
   margin: 0 10px;

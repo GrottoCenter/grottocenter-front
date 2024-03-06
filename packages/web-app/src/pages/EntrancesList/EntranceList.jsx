@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
-import { List, Typography, Box, useTheme } from '@material-ui/core';
-import styled from 'styled-components';
-import { Pagination } from '@material-ui/lab';
-import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
+import { List, Typography, Box, useTheme, Pagination } from '@mui/material';
+import { styled } from '@mui/material/styles';
+
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import { useSelector } from 'react-redux';
 import formatDistanceToNow from 'date-fns/formatDistanceToNow';
 import EntranceListItem from './EntranceListItem';

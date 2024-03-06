@@ -1,8 +1,8 @@
-import { Button, ListItem, ListItemText } from '@material-ui/core';
+import { Button, ListItem, ListItemText } from '@mui/material';
 import React from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
-import { Description } from '@material-ui/icons';
+import { styled } from '@mui/material/styles';
+import { Description } from '@mui/icons-material';
 
 const FileListItem = styled(ListItem)`
   margin: 0;

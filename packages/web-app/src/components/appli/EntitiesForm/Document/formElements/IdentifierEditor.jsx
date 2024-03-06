@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import styled from 'styled-components';
+import { styled } from '@mui/material/styles';
 import {
   Fade,
   FormControl,
@@ -9,7 +9,7 @@ import {
   MenuItem,
   Select,
   Typography
-} from '@material-ui/core';
+} from '@mui/material';
 import { useIntl } from 'react-intl';
 
 import Translate from '../../../../common/Translate';
@@ -17,18 +17,18 @@ import { DocumentFormContext } from '../Provider';
 import StringInput from '../../../../common/Form/StringInput';
 import { loadIdentifierTypes } from '../../../../../actions/IdentifierType';
 
-const InlineWrapper = styled.div`
+const InlineWrapper = styled('div')`
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
 `;
 
-const IdentifierContainer = styled.div`
+const IdentifierContainer = styled('div')`
   flex: 12;
   min-width: 300px;
 `;
 
-const IdentifierTypeContainer = styled.div`
+const IdentifierTypeContainer = styled('div')`
   flex: 5;
   min-width: 200px;
 `;

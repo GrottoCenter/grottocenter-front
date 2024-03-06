@@ -1,18 +1,18 @@
 import React from 'react';
-import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';
+import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import {
   useTheme,
   List,
   ListItem,
   ListItemText,
   ListItemIcon
-} from '@material-ui/core';
+} from '@mui/material';
 import { useIntl } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from '@mui/material/styles';
 
-const Wrapper = styled.div`
-  margin-top: ${({ theme }) => theme.spacing(1)}px;
-  margin-bot: ${({ theme }) => theme.spacing(1)}px;
+const Wrapper = styled('div')`
+  margin-top: ${({ theme }) => theme.spacing(1)};
+  margin-bot: ${({ theme }) => theme.spacing(1)};
 `;
 
 const LabelAdornment = () => {

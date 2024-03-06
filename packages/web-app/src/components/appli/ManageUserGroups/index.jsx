@@ -2,9 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
-import { Button, Typography } from '@material-ui/core';
-import ClearIcon from '@material-ui/icons/Clear';
+import { styled } from '@mui/material/styles';
+import { Button, Typography } from '@mui/material';
+import ClearIcon from '@mui/icons-material/Clear';
 import { isNil, length } from 'ramda';
 
 import {
@@ -22,28 +22,28 @@ import SuccessMessage from '../../common/StatusMessage/SuccessMessage';
 import PersonProperties from '../../common/Person/PersonProperties';
 import UserGroups from './UserGroups';
 
-const FeedbackBlock = styled.div`
-  margin-top: ${({ theme }) => theme.spacing(4)}px;
+const FeedbackBlock = styled('div')`
+  margin-top: ${({ theme }) => theme.spacing(4)};
   text-align: center;
 `;
 
-const UserBlock = styled.div`
+const UserBlock = styled('div')`
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
 `;
 
-const FlexBlock = styled.div`
+const FlexBlock = styled('div')`
   flex: 1;
-  margin: ${({ theme }) => theme.spacing(3)}px;
+  margin: ${({ theme }) => theme.spacing(3)};
 `;
 
-const SearchBarBackground = styled.div`
+const SearchBarBackground = styled('div')`
   background-color: ${({ theme }) => theme.palette.primary.veryLight};
 `;
 
 const SpacedTopButton = styled(Button)`
-  margin-top: ${({ theme }) => theme.spacing(2)}px;
+  margin-top: ${({ theme }) => theme.spacing(2)};
 `;
 
 const ManageUserGroups = ({
@@ -68,7 +68,6 @@ const ManageUserGroups = ({
     state => state.updatePersonGroups
   );
 
-  const renderOption = option => entityOptionForSelector(option);
   const getOptionLabel = option => option.name;
 
   const handleOnSelection = selection => {
@@ -104,7 +103,7 @@ const ManageUserGroups = ({
           inputValue={inputValue}
           onInputChange={setInputValue}
           suggestions={results}
-          renderOption={renderOption}
+          renderOption={entityOptionForSelector}
           getOptionLabel={getOptionLabel}
           errorMessage="Unexpected error"
           hasError={!isNil(quickSearchError)}

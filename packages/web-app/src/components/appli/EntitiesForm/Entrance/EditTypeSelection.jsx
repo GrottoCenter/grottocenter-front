@@ -5,11 +5,11 @@ import {
   FormControlLabel,
   Button,
   Radio
-} from '@material-ui/core';
+} from '@mui/material';
 import React from 'react';
 import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
+import { styled } from '@mui/material/styles';
 import { useHistory } from 'react-router-dom';
 import { useController } from 'react-hook-form';
 import CaveSelection from './CaveSelect';
@@ -21,7 +21,7 @@ import InputLanguage from '../utils/InputLanguage';
 import InputText from '../utils/InputText';
 
 const FormControl = styled(MuiFormControl)`
-  padding-bottom: ${({ theme }) => theme.spacing(4)}px;
+  padding-bottom: ${({ theme }) => theme.spacing(4)};
 `;
 
 const EditTypeSelection = ({

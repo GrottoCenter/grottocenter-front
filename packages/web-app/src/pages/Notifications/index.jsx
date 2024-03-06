@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect } from 'react';
-import styled from 'styled-components';
+import { styled } from '@mui/material/styles';
 import { useDispatch, useSelector } from 'react-redux';
 import { useIntl } from 'react-intl';
 
@@ -10,10 +10,10 @@ import NotificationsTable from '../../components/common/NotificationsTable';
 import { fetchNotifications } from '../../actions/Notifications/GetNotifications';
 import makeNotifications from './transformers';
 
-const Wrapper = styled.div`
+const Wrapper = styled('div')`
   display: flex;
   flex-direction: column;
-  padding: ${({ theme }) => theme.spacing(2)}px;
+  padding: ${({ theme }) => theme.spacing(2)};
 `;
 
 const defaultHiddenColumns = ['id', 'link'];

@@ -1,15 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { useSelector } from 'react-redux';
-import {
-  Avatar,
-  Box,
-  ListItem,
-  ListItemText,
-  Typography
-} from '@material-ui/core';
+import { Avatar, Box, ListItem, ListItemText, Typography } from '@mui/material';
 import { Link } from 'react-router-dom';
-import styled from 'styled-components';
+import { styled } from '@mui/material/styles';
 
 const SmallAvatar = styled(Avatar)`
   height: 2.5rem;

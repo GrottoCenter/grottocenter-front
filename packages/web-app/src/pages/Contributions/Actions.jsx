@@ -2,9 +2,9 @@ import React from 'react';
 import { isNil, anyPass, isEmpty, head } from 'ramda';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from '@mui/material/styles';
 import { useSelector } from 'react-redux';
-import EditIcon from '@material-ui/icons/Edit';
+import EditIcon from '@mui/icons-material/Edit';
 import ActionButton from '../../components/common/ActionButton';
 
 const ActionTypes = {
@@ -15,12 +15,12 @@ const ActionTypes = {
   }
 };
 
-const Wrapper = styled.div`
+const Wrapper = styled('div')`
   display: flex;
   flex-direction: row;
-  margin-top: ${({ theme }) => theme.spacing(3)}px;
+  margin-top: ${({ theme }) => theme.spacing(3)};
   & > button {
-    margin-right: ${({ theme }) => theme.spacing(2)}px;
+    margin-right: ${({ theme }) => theme.spacing(2)};
   }
 `;
 

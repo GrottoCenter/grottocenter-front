@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { useDispatch } from 'react-redux';
 import { useIntl } from 'react-intl';
-import { Button, Divider, List, Tooltip } from '@material-ui/core';
-import AddCircleIcon from '@material-ui/icons/AddCircle';
-import CancelIcon from '@material-ui/icons/Cancel';
+import { Button, Divider, List, Tooltip } from '@mui/material';
+import AddCircleIcon from '@mui/icons-material/AddCircle';
+import CancelIcon from '@mui/icons-material/Cancel';
 
 import ScrollableContent from '../../common/Layouts/Fixed/ScrollableContent';
 import { descriptionsType } from './propTypes';

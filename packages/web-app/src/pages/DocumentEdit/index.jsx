@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { CircularProgress } from '@material-ui/core';
+import { CircularProgress } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
 import { isEmpty, isNil } from 'ramda';
 import { useHistory, useParams } from 'react-router-dom';

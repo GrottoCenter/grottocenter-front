@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Box, CircularProgress, Typography } from '@material-ui/core';
+import { Box, CircularProgress, Typography } from '@mui/material';
 import { useIntl } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from '@mui/material/styles';
 import REDUCER_STATUS from '../../../reducers/ReducerStatus';
 import subscriptionsType from '../../../types/subscriptions.type';
 import Translate from '../Translate';

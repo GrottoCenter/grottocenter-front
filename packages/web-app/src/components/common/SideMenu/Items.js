@@ -1,6 +1,6 @@
 import React from 'react';
 import { isNil } from 'ramda';
-import { ListItemIcon, ListItemText } from '@material-ui/core';
+import { ListItemIcon, ListItemText } from '@mui/material';
 import PropTypes from 'prop-types';
 
 import Translate from '../Translate';
@@ -13,7 +13,7 @@ const Item = ({
   onClick = () => {},
   children
 }) => (
-  <StyledListItem button $nested={nested} onClick={onClick}>
+  <StyledListItem button $nested={nested ? 1 : 0} onClick={onClick}>
     <ListItemIcon>
       <ItemIcon />
     </ListItemIcon>

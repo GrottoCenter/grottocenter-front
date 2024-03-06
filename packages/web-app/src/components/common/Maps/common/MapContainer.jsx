@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import styled from 'styled-components';
+import { styled } from '@mui/material/styles';
 import {
   MapContainer,
   useMap,
@@ -11,13 +11,13 @@ import LayersControl from './LayersControl';
 import FullscreenControl from './FullscreenControl';
 import LocateControl from './LocateControl';
 
-const Wrapper = styled.div(
+const Wrapper = styled('div')(
   ({ theme, $wholePage }) => `
   width: calc(100% - 10px);
   height: 400px;
 
   ${theme.breakpoints.up('md')} {
-    ${!$wholePage && `margin-right: ${theme.spacing(2)}px;`}
+    ${!$wholePage && `margin-right: ${theme.spacing(2)};`}
   }
 ${$wholePage && `height: calc(100vh - ${theme.appBarHeight}px);`}
 `

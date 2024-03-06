@@ -2,8 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import { isEmpty, isNil } from 'ramda';
-import { InputAdornment } from '@material-ui/core';
-import AddCircle from '@material-ui/icons/AddCircle';
+import { InputAdornment } from '@mui/material';
+import AddCircle from '@mui/icons-material/AddCircle';
 
 import {
   fetchQuicksearchResult,

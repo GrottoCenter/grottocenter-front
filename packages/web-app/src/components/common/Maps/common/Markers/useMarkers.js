@@ -3,13 +3,13 @@ import { useMap } from 'react-leaflet';
 import * as L from 'leaflet';
 import { anyPass, forEach, isEmpty, isNil, map as rMap } from 'ramda';
 import { renderToString } from 'react-dom/server';
-import {
-  createGlobalStyle,
-  keyframes,
-  ThemeProvider as StyledThemeProvider
-} from 'styled-components';
 import { BrowserRouter } from 'react-router-dom';
-import { MuiThemeProvider } from '@material-ui/core/styles';
+import {
+  ThemeProvider,
+  StyledEngineProvider,
+  keyframes
+} from '@mui/material/styles';
+import { GlobalStyles } from '@mui/material';
 import { IntlProvider } from 'react-intl';
 import { useSelector } from 'react-redux';
 import theme from '../../../../../conf/grottoTheme';
@@ -24,15 +24,19 @@ const fadeIn = keyframes`
     opacity: 1;
   }
 `;
-export const MarkerGlobalCss = createGlobalStyle`
-  & .fade-in-markers {
-   animation: 0.3s ${fadeIn} ease-out;
-  }
 
-  .leaflet-container{
-    font-size: 1rem;
-  }
-`;
+export const MarkerGlobalCss = (
+  <GlobalStyles
+    styles={`
+    & .fade-in-markers {
+      animation: 0.3s ${fadeIn} ease-out;
+     }
+
+     .leaflet-container{
+       font-size: 1rem;
+     }`}
+  />
+);
 
 const useMarkers = (icon, popupContent = null, tooltipContent = null) => {
   const map = useMap();
@@ -53,11 +57,11 @@ const useMarkers = (icon, popupContent = null, tooltipContent = null) => {
               // One way to optimize it would be to not use MUI for the markers
               <IntlProvider locale={locale} messages={messages[locale]}>
                 <BrowserRouter>
-                  <StyledThemeProvider theme={theme}>
-                    <MuiThemeProvider theme={theme}>
+                  <StyledEngineProvider injectFirst>
+                    <ThemeProvider theme={theme}>
                       {popupContent(marker)}
-                    </MuiThemeProvider>
-                  </StyledThemeProvider>
+                    </ThemeProvider>
+                  </StyledEngineProvider>
                 </BrowserRouter>
               </IntlProvider>
             )

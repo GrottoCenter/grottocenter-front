@@ -20,7 +20,6 @@ export const searchableTypes = {
   organizations: 'grottos'
 };
 
-const renderOption = option => entityOptionForSelector(option);
 const getOptionLabel = option => option.name;
 
 const QuickSearch = ({
@@ -107,7 +106,7 @@ const QuickSearch = ({
       label={label || formatMessage({ id: 'Quick search' })}
       suggestions={results}
       onSelection={handleSelection}
-      renderOption={renderOption}
+      renderOption={entityOptionForSelector}
       getOptionLabel={getOptionLabel}
       hasError={!isNil(errors) || error}
       isLoading={isLoading}

@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import { pathOr, isNil } from 'ramda';
 import { useDispatch, useSelector } from 'react-redux';
 import { useIntl } from 'react-intl';
-import { Skeleton } from '@material-ui/lab';
+import { Skeleton } from '@mui/material';
 
 import { loadPerson } from '../../actions/Person/GetPerson';
 import Layout from '../../components/common/Layouts/Fixed/FixedContent';

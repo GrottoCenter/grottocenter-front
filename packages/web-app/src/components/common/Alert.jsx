@@ -1,13 +1,15 @@
 import React from 'react';
-import { Alert as MuiAlert, AlertTitle } from '@material-ui/lab';
+import { Alert as MuiAlert, AlertTitle } from '@mui/material';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
+import { styled } from '@mui/material/styles';
 
-const StyledAlert = styled(MuiAlert)`
-  margin-top: ${({ theme, $disableMargins }) =>
-    !$disableMargins && `${theme.spacing(2)}px`};
-  margin-bottom: ${({ theme, $disableMargins }) =>
-    !$disableMargins && `${theme.spacing(2)}px`};
+const StyledAlert = styled(MuiAlert, {
+  shouldForwardProp: prop => prop[0] !== '$'
+})`
+  margin-top: ${({ theme, $disablemargins }) =>
+    !$disablemargins && theme.spacing(2)};
+  margin-bottom: ${({ theme, $disablemargins }) =>
+    !$disablemargins && theme.spacing(2)};
 `;
 
 const Alert = ({
@@ -20,7 +22,7 @@ const Alert = ({
   disableMargins = false
 }) => (
   <StyledAlert
-    $disableMargins={disableMargins}
+    $disablemargins={disableMargins ? 1 : 0}
     severity={severity}
     icon={icon}
     variant={variant}

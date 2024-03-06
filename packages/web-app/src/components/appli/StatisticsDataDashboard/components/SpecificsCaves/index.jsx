@@ -1,18 +1,16 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
-import { useTheme, withStyles } from '@material-ui/core/styles';
-import { Box } from '@material-ui/core';
+import { useTheme, styled } from '@mui/material/styles';
+import { Box } from '@mui/material';
 import CaveCard from './CaveCard';
 import ScrollableContent from '../../../../common/Layouts/Fixed/ScrollableContent';
 
-const StyledBox = withStyles(() => ({
-  root: {
-    display: 'flex',
-    justifyContent: 'center',
-    flexWrap: 'wrap'
-  }
-}))(Box);
+const StyledBox = styled(Box)`
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+`;
 
 const SpecificsCaves = ({ maxDepthCave, maxLengthCave, parentEntity }) => {
   const { formatMessage } = useIntl();

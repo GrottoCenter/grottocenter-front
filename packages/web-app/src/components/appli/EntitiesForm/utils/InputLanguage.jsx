@@ -7,9 +7,9 @@ import {
   FormHelperText,
   InputLabel,
   MenuItem,
-  Select,
-  withStyles
-} from '@material-ui/core';
+  Select
+} from '@mui/material';
+import withStyles from '@mui/styles/withStyles';
 import { loadLanguages } from '../../../../actions/Language';
 import Translate from '../../../common/Translate';
 
@@ -47,7 +47,7 @@ const InputLanguage = ({
       control={control}
       rules={{ required: true }}
       render={({ field: { ref, value, onChange } }) => (
-        <FormControlLanguage required error={isError}>
+        <FormControlLanguage required error={isError} variant="standard">
           <InputLabel shrink>
             <Translate>Language</Translate>
           </InputLabel>

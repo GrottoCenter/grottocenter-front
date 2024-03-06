@@ -1,5 +1,5 @@
 import React from 'react';
-import styled from 'styled-components';
+import { styled } from '@mui/material/styles';
 import GCLink from '../../components/common/GCLink';
 import InternationalizedLink from '../../components/common/InternationalizedLink';
 import {
@@ -10,17 +10,17 @@ import {
 } from '../../conf/externalLinks';
 import Translate from '../../components/common/Translate';
 
-const FooterLinksList = styled.ul`
+const FooterLinksList = styled('ul')`
   list-style: none;
   font-size: large;
 `;
 
-const FooterLinksLi = styled.li`
+const FooterLinksLi = styled('li')`
   display: inline-block;
   margin-right: 15px;
 `;
 
-const SocialLink = styled.div`
+const SocialLink = styled('div')`
   text-decoration: none;
   font-size: medium;
   color: ${props => props.theme.palette.textIconColor};

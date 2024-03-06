@@ -2,11 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { isNil, anyPass, isEmpty, head, propOr } from 'ramda';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from '@mui/material/styles';
 import { useDispatch, useSelector } from 'react-redux';
-import SendIcon from '@material-ui/icons/Send';
-import DeclineIcon from '@material-ui/icons/NotInterested';
-import EditIcon from '@material-ui/icons/Edit';
+import SendIcon from '@mui/icons-material/Send';
+import DeclineIcon from '@mui/icons-material/NotInterested';
+import EditIcon from '@mui/icons-material/Edit';
 import { postProcessDocuments } from '../../actions/ProcessDocuments';
 import ActionButton from '../../components/common/ActionButton';
 import StandardDialog from '../../components/common/StandardDialog';
@@ -33,12 +33,12 @@ const ActionTypes = {
   }
 };
 
-const Wrapper = styled.div`
+const Wrapper = styled('div')`
   display: flex;
   flex-direction: row;
-  margin-top: ${({ theme }) => theme.spacing(3)}px;
+  margin-top: ${({ theme }) => theme.spacing(3)};
   & > button {
-    margin-right: ${({ theme }) => theme.spacing(2)}px;
+    margin-right: ${({ theme }) => theme.spacing(2)};
   }
 `;
 

@@ -1,11 +1,11 @@
 import React, { useContext, useState, useEffect } from 'react';
 import { useHistory, Prompt } from 'react-router-dom';
-import { Button, Fade, Typography } from '@material-ui/core';
-import Alert from '@material-ui/lab/Alert';
-import ReplayIcon from '@material-ui/icons/Replay';
+import { Button, Fade, Typography } from '@mui/material';
+import Alert from '@mui/material/Alert';
+import ReplayIcon from '@mui/icons-material/Replay';
 import { useIntl } from 'react-intl';
 import { useDispatch, useSelector } from 'react-redux';
-import styled from 'styled-components';
+import { styled } from '@mui/material/styles';
 
 import { usePermissions, useDocumentTypes } from '../../../../hooks';
 import { resetApiMessages } from '../../../../actions/Document/ResetApiMessages';
@@ -25,24 +25,24 @@ import { wikiBBSLinks } from '../../../../conf/externalLinks';
 
 const SpacedButton = styled(Button)`
   ${({ theme }) => `
-    margin: ${theme.spacing(1)}px;
+    margin: ${theme.spacing(1)};
 `}
 `;
 
-const CenteredBlock = styled.div`
+const CenteredBlock = styled('div')`
   text-align: center;
 `;
 
-const BbsHeader = styled.div`
+const BbsHeader = styled('div')`
   display: flex;
   align-items: center;
 `;
 
-const Spacer = styled.div`
+const Spacer = styled('div')`
   height: 20px;
 `;
 
-const BbsIcon = styled.img`
+const BbsIcon = styled('img')`
   height: 60px;
   width: 60px;
 `;
@@ -51,7 +51,7 @@ const BbsInfoText = styled(Typography)`
   flex: 1;
   font-style: italic;
   margin-bottom: 0;
-  margin-left: ${({ theme }) => theme.spacing(3)}px;
+  margin-left: ${({ theme }) => theme.spacing(3)};
 `;
 
 const DONT_LEAVE_MESSAGE =

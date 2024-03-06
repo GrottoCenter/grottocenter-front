@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Tab, Tabs, Card, CardContent } from '@material-ui/core';
-import styled from 'styled-components';
+import { Tab, Tabs, Card, CardContent } from '@mui/material';
+import { styled } from '@mui/material/styles';
 
 import DocumentSearch from './DocumentSearch';
 import EntrancesSearch from './EntrancesSearch';
@@ -12,7 +12,7 @@ import Translate from '../../common/Translate';
 import { ADVANCED_SEARCH_TYPES } from '../../../conf/config';
 import SearchResults from './SearchResults';
 
-const TabIcon = styled.img`
+const TabIcon = styled('img')`
   height: 2rem;
   margin-right: 5px;
   vertical-align: middle;

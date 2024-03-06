@@ -5,19 +5,19 @@ import {
   ListItemIcon,
   ListItemText,
   Divider
-} from '@material-ui/core';
+} from '@mui/material';
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
-import { Description } from '@material-ui/icons';
+import { styled } from '@mui/material/styles';
+import { Description } from '@mui/icons-material';
 
 import GCLink from '../../components/common/GCLink';
 
 const Label = styled(Typography)`
-  margin-right: ${({ theme }) => theme.spacing(2)}px;
+  margin-right: ${({ theme }) => theme.spacing(2)};
   text-transform: uppercase;
 `;
-const IconAndLabelWrapper = styled.span`
+const IconAndLabelWrapper = styled('span')`
   text-align: right;
 `;
 
@@ -145,7 +145,7 @@ SectionText.propTypes = {
   children: PropTypes.node
 };
 
-const SectionDetailsContainer = styled.div`
+const SectionDetailsContainer = styled('div')`
   display: grid;
   grid-template-columns: auto auto;
   align-items: center;
@@ -194,7 +194,7 @@ SectionList.propTypes = {
   children: PropTypes.node
 };
 
-const SectionFilesPreviewIfFrame = styled.iframe`
+const SectionFilesPreviewIfFrame = styled('iframe')`
   border: 0;
   width: 100%;
   min-height: 500px;

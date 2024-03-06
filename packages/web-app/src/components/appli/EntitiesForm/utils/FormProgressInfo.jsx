@@ -1,4 +1,4 @@
-import { Box, Button, CircularProgress, Typography } from '@material-ui/core';
+import { Box, Button, CircularProgress, Typography } from '@mui/material';
 import { React, useRef } from 'react';
 import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';

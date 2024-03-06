@@ -1,6 +1,6 @@
-import styled from 'styled-components';
+import { styled } from '@mui/material/styles';
 
-const AdornementPlaceholder = styled.div`
+const AdornementPlaceholder = styled('div')`
   width: 30px;
 `;
 

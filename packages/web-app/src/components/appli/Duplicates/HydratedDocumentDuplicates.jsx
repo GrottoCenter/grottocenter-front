@@ -2,8 +2,8 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useIntl } from 'react-intl';
-import { LinearProgress as MuiLinearProgress } from '@material-ui/core';
-import styled from 'styled-components';
+import { LinearProgress as MuiLinearProgress } from '@mui/material';
+import { styled } from '@mui/material/styles';
 import PropTypes from 'prop-types';
 import { isNil } from 'ramda';
 import { updateDocumentWithNewEntities } from '../../../actions/Document/UpdateDocument';

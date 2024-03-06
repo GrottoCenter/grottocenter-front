@@ -8,8 +8,8 @@ import {
   DialogContentText,
   DialogTitle,
   Tooltip
-} from '@material-ui/core';
-import RestorePageIcon from '@material-ui/icons/RestorePage';
+} from '@mui/material';
+import RestorePageIcon from '@mui/icons-material/RestorePage';
 import { pathOr } from 'ramda';
 import { useIntl } from 'react-intl';
 import { updateDescription } from '../../../../../actions/Description/UpdateDescription';
@@ -160,7 +160,7 @@ const RestoreSnapshot = item => {
             </DialogContentText>
           </DialogContent>
           <DialogActions>
-            <Button onClick={handleClose} color="default">
+            <Button onClick={handleClose}>
               <Translate>No</Translate>
             </Button>
             <Button

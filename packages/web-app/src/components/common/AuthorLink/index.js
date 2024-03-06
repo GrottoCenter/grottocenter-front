@@ -2,7 +2,7 @@ import React from 'react';
 import { isNil } from 'ramda';
 import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
-import { Typography } from '@material-ui/core';
+import { Typography } from '@mui/material';
 import GCLink from '../GCLink';
 import authorType from '../../../types/author.type';
 

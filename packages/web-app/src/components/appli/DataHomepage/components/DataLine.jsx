@@ -1,35 +1,22 @@
 // DataHomepage
 import React from 'react';
 import { useIntl } from 'react-intl';
-import {
-  Box,
-  CircularProgress,
-  Grid,
-  Typography,
-  withStyles
-} from '@material-ui/core';
-import { alpha } from '@material-ui/core/styles/colorManipulator';
+import { Box, CircularProgress, Grid, Typography } from '@mui/material';
+import { alpha, styled } from '@mui/material/styles';
 import PropTypes from 'prop-types';
 
-const StyledBox = withStyles(
-  theme => ({
-    root: {
-      backgroundColor: alpha(theme.palette.secondary.main, 0.4),
-      borderRadius: '10px',
-      padding: '15px',
-      margin: '10px'
-    }
-  }),
-  { withTheme: true }
-)(Box);
+const StyledBox = styled(Box)`
+  background-color: ${({ theme }) => alpha(theme.palette.secondary.main, 0.4)};
+  border-radius: 10px;
+  padding: 15px;
+  margin: 10px;
+`;
 
-const StyledTypography = withStyles(() => ({
-  root: {
-    display: 'flex',
-    justifyContent: 'center', // Centered horizontally
-    alignItems: 'center' // Centered vertically
-  }
-}))(Typography);
+const StyledTypography = styled(Typography)`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
 
 const DataLine = props => {
   const { formatMessage } = useIntl();

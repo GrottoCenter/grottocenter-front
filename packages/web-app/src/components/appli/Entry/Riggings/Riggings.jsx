@@ -1,11 +1,11 @@
 import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
-import { Divider, Tooltip, Button } from '@material-ui/core';
+import { Divider, Tooltip, Button } from '@mui/material';
 import { useDispatch } from 'react-redux';
 import React, { useState } from 'react';
-import AddCircleIcon from '@material-ui/icons/AddCircle';
-import CancelIcon from '@material-ui/icons/Cancel';
-import styled from 'styled-components';
+import AddCircleIcon from '@mui/icons-material/AddCircle';
+import CancelIcon from '@mui/icons-material/Cancel';
+import { styled } from '@mui/material/styles';
 import { usePermissions } from '../../../../hooks';
 import { postRiggings } from '../../../../actions/Riggings/CreateRigging';
 import CreateRiggingsForm from '../../Form/RiggingsForm/index';

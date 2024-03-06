@@ -1,5 +1,5 @@
 import React from 'react';
-import { Grid } from '@material-ui/core';
+import { Grid } from '@mui/material';
 import { equals } from 'ramda';
 import PropTypes from 'prop-types';
 import { LeftCell, MiddleCell, RightCell } from './Cell';

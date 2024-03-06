@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { List, Typography } from '@material-ui/core';
-import styled from 'styled-components';
+import { List, Typography } from '@mui/material';
+import { styled } from '@mui/material/styles';
 import Translate from '../Translate';
 import UserListItem from './UserListItem';
 

@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { propOr } from 'ramda';
-import Skeleton from '@material-ui/lab/Skeleton';
+import Skeleton from '@mui/material/Skeleton';
 import { useIntl } from 'react-intl';
 
 import Layout from '../../common/Layouts/Fixed/FixedContent';

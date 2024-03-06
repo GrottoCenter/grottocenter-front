@@ -8,24 +8,24 @@ import {
   ButtonGroup,
   Tooltip,
   Button
-} from '@material-ui/core';
-import LinkOffIcon from '@material-ui/icons/LinkOff';
+} from '@mui/material';
+import LinkOffIcon from '@mui/icons-material/LinkOff';
 import React, { useState } from 'react';
-import styled from 'styled-components';
+import { styled } from '@mui/material/styles';
 import GCLink from '../GCLink';
 import Files from './Files';
 import { SnapshotButton } from '../../appli/Entry/Snapshots/UtilityFunction';
 import Translate from '../Translate';
 import StandardDialog from '../StandardDialog';
 
-const StyledListItemContainer = styled.div`
+const StyledListItemContainer = styled('div')`
   width: 100%;
   margin: 0;
 `;
 
 const StyledChip = styled(Chip)`
-  margin-left: ${({ theme }) => theme.spacing(2)}px;
-  padding: 0 ${({ theme }) => theme.spacing(1)}px;
+  margin-left: ${({ theme }) => theme.spacing(2)};
+  padding: 0 ${({ theme }) => theme.spacing(1)};
 `;
 const StyledListItem = styled(ListItem)`
   padding: 4px 0;
@@ -108,7 +108,6 @@ const Document = ({ document, hasSnapshotButton = false, onUnlink }) => {
             <Button
               key="no"
               onClick={() => setUnlinkDialogOpen(false)}
-              color="default"
               disableElevation>
               <Translate>No</Translate>
             </Button>,

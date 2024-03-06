@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import { useIntl } from 'react-intl';
-import styled from 'styled-components';
-import { Terrain, Waves, Title } from '@material-ui/icons';
+import { styled } from '@mui/material/styles';
+import { Terrain, Waves, Title } from '@mui/icons-material';
 
 import CustomIcon from '../../common/CustomIcon';
 import { isValidPositions } from '../../common/Maps/MapMultipleMarkers';
@@ -9,12 +9,12 @@ import { Property } from '../../common/Properties';
 import EntrancesSelection from './EntrancesSelection';
 import { CaveContext } from './Provider';
 
-const Wrapper = styled.div`
+const Wrapper = styled('div')`
   display: flex;
   flex-direction: column;
 `;
 
-const SecondaryPropertiesWrapper = styled.div`
+const SecondaryPropertiesWrapper = styled('div')`
   display: flex;
   justify-content: flex-start;
   flex-wrap: wrap;

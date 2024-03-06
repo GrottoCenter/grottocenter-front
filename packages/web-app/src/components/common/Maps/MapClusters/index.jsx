@@ -117,7 +117,7 @@ const HydratedMap = ({
 
   return (
     <>
-      <HexGlobalCss visibleHeat={visibleHeat} />
+      {HexGlobalCss}
       <DataControl
         updateHeatmap={handleUpdateHeat}
         updateMarkers={handleUpdateMarkers}

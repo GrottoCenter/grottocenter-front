@@ -1,12 +1,12 @@
 import React from 'react';
 import { storiesOf } from '@storybook/react';
-import { Typography } from '@material-ui/core';
-import PersonIcon from '@material-ui/icons/Person';
-import styled from 'styled-components';
+import { Typography } from '@mui/material';
+import PersonIcon from '@mui/icons-material/Person';
+import { styled } from '@mui/material/styles';
 
 import CustomIcon from './index';
 
-const Wrapper = styled.div`
+const Wrapper = styled('div')`
   display: flex;
   flex-direction: column;
 `;

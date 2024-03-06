@@ -1,8 +1,8 @@
 import React from 'react';
 import { useCSVDownloader } from 'react-papaparse';
 import PropTypes from 'prop-types';
-import CloudDownloadIcon from '@material-ui/icons/CloudDownload';
-import { IconButton, Tooltip } from '@material-ui/core';
+import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
+import { IconButton, Tooltip } from '@mui/material';
 import { useIntl } from 'react-intl';
 
 const DownloadButton = ({ data, filename }) => {

@@ -71,7 +71,7 @@ const Markers = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [organizations, visibleMarkers]);
 
-  return <MarkerGlobalCss />;
+  return MarkerGlobalCss;
 };
 
 const MemoizedMarkers = React.memo(Markers);

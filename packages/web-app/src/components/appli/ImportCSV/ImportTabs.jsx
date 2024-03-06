@@ -1,11 +1,11 @@
 import React, { useContext } from 'react';
-import styled from 'styled-components';
-import { Tab, Tabs } from '@material-ui/core';
+import { styled } from '@mui/material/styles';
+import { Tab, Tabs } from '@mui/material';
 import Translate from '../../common/Translate';
 import { ImportPageContentContext } from './Provider';
 import { DOCUMENT, ENTRANCE } from './constants';
 
-const TabIcon = styled.img`
+const TabIcon = styled('img')`
   height: 2rem;
   margin-right: 5px;
   vertical-align: middle;

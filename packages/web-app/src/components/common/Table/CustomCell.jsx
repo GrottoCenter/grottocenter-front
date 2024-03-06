@@ -1,5 +1,5 @@
 import React from 'react';
-import { TableCell } from '@material-ui/core';
+import { TableCell } from '@mui/material';
 import { isNil } from 'ramda';
 import PropTypes from 'prop-types';
 

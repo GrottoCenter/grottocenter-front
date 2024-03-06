@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import { useDispatch, useSelector } from 'react-redux';
 import { isNil, length } from 'ramda';
-import { FormControl, InputAdornment, InputLabel } from '@material-ui/core';
+import { FormControl, InputAdornment, InputLabel } from '@mui/material';
 
 import {
   StyledInput,

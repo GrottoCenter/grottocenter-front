@@ -8,17 +8,17 @@ import {
   IconButton,
   InputAdornment,
   Typography
-} from '@material-ui/core';
-import Visibility from '@material-ui/icons/Visibility';
-import VisibilityOff from '@material-ui/icons/VisibilityOff';
-import styled from 'styled-components';
+} from '@mui/material';
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
+import { styled } from '@mui/material/styles';
 import { isEmpty, match } from 'ramda';
 
 import { emailRegexp, PASSWORD_MIN_LENGTH } from '../../conf/config';
 import Layout from '../../components/common/Layouts/Fixed/FixedContent';
 import StringInput from '../../components/common/Form/StringInput';
 
-const FormWrapper = styled.form`
+const FormWrapper = styled('form')`
   display: flex;
   flex-direction: column;
   margin: auto;
@@ -27,7 +27,7 @@ const FormWrapper = styled.form`
 `;
 
 const SpacedCenteredButton = styled(Button)`
-  margin: ${({ theme }) => theme.spacing(1)}px auto;
+  margin: ${({ theme }) => theme.spacing(1)} auto;
 `;
 
 const SignUpForm = ({
@@ -142,7 +142,8 @@ const SignUpForm = ({
                     aria-label="toggle password visibility"
                     onClick={toggleIsPasswordVisible}
                     onMouseDown={handleMouseDownPassword}
-                    edge="end">
+                    edge="end"
+                    size="large">
                     {isPasswordVisible ? <Visibility /> : <VisibilityOff />}
                   </IconButton>
                 </InputAdornment>
@@ -174,7 +175,8 @@ const SignUpForm = ({
                     aria-label="toggle password visibility"
                     onClick={toggleIsPasswordVisible}
                     onMouseDown={handleMouseDownPassword}
-                    edge="end">
+                    edge="end"
+                    size="large">
                     {isPasswordVisible ? <Visibility /> : <VisibilityOff />}
                   </IconButton>
                 </InputAdornment>
@@ -191,7 +193,7 @@ const SignUpForm = ({
             <SpacedCenteredButton
               type="submit"
               size="large"
-              color={loading ? 'default' : 'primary'}>
+              color={loading ? 'inherit' : 'primary'}>
               {loading ? (
                 <CircularProgress size="2.8rem" />
               ) : (

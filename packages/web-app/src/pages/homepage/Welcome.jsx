@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
+import { styled } from '@mui/material/styles';
 import { useIntl } from 'react-intl';
-import { withTheme } from '@material-ui/core/styles';
+import withTheme from '@mui/styles/withTheme';
 import LandingSection from './LandingSection';
 import {
   GridRow,
@@ -11,13 +11,13 @@ import {
 } from '../../helpers/GridSystem';
 import Translate from '../../components/common/Translate';
 
-const WelcomeAvatar = styled.img`
+const WelcomeAvatar = styled('img')`
   border-radius: 50%;
   width: 60%;
   height: 60%;
 `;
 
-const WelcomeTitle = styled.h3`
+const WelcomeTitle = styled('h3')`
   color: ${props => props.color};
   padding-top: 30px;
   text-align: center;
@@ -29,7 +29,7 @@ const WelcomeTitle = styled.h3`
   }
 `;
 
-const WelcomeParagraph = styled.p`
+const WelcomeParagraph = styled('p')`
   text-align: justify;
   font-weight: 300;
   font-size: large;

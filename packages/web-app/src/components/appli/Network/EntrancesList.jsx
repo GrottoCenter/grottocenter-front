@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import { useIntl } from 'react-intl';
-import { List, ListItem, ListItemText, ListItemIcon } from '@material-ui/core';
-import Skeleton from '@material-ui/lab/Skeleton';
+import { List, ListItem, ListItemText, ListItemIcon } from '@mui/material';
+import Skeleton from '@mui/material/Skeleton';
 import { includes } from 'ramda';
 import { Link } from 'react-router-dom';
 

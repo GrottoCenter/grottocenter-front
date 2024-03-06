@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import AddCircle from '@material-ui/icons/AddCircle';
-import Cancel from '@material-ui/icons/Cancel';
+import AddCircle from '@mui/icons-material/AddCircle';
+import Cancel from '@mui/icons-material/Cancel';
 import PropTypes from 'prop-types';
 
 import {

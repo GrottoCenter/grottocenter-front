@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { withStyles } from '@material-ui/core';
-import SyncIcon from '@material-ui/icons/Sync';
-import styled from 'styled-components';
+import withStyles from '@mui/styles/withStyles';
+import SyncIcon from '@mui/icons-material/Sync';
+import { styled } from '@mui/material/styles';
 
-const GoalText = styled.span`
+const GoalText = styled('span')`
   display: none !important; // lesshint importantRule: false
 `;
 
@@ -12,13 +12,13 @@ const StyledSyncIcon = withStyles(
   theme => ({
     root: {
       fill: theme.palette.iconColor,
-      transition: 'all 450ms cubic-bezier(0.23, 1, 0.32, 1) 0ms',
+      transition: 'all 450ms cubic-bezier(0.23, 1, 0.32, 1) 0ms !important',
       '&:hover': {
         fill: theme.palette.accent1Color
       },
       [theme.breakpoints.up('550')]: {
-        width: '180px',
-        height: '180px',
+        width: '180px !important',
+        height: '180px !important',
         top: '-57px',
         left: '-26px',
         position: 'absolute',

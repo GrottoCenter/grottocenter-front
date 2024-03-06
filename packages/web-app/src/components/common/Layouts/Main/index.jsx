@@ -1,12 +1,12 @@
 import React from 'react';
 import { isMobileOnly } from 'react-device-detect';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
+import { styled } from '@mui/material/styles';
 
 import SideMenu from '../../SideMenu';
 import ErrorBoundary from '../../../appli/ErrorBoundary';
 
-const MainWrapper = styled.main`
+const MainWrapper = styled('main')`
   flex-grow: 1;
   transition: ${({ theme, $isSideMenuOpen }) =>
     !isMobileOnly &&

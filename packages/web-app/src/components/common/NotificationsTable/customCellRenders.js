@@ -1,12 +1,12 @@
 import React from 'react';
-import CheckIcon from '@material-ui/icons/Check';
-import AddIcon from '@material-ui/icons/Add';
-import EditIcon from '@material-ui/icons/Edit';
-import ClearIcon from '@material-ui/icons/Clear';
-import DoneIcon from '@material-ui/icons/Done';
-import UnreadNotificationIcon from '@material-ui/icons/FiberManualRecord';
+import CheckIcon from '@mui/icons-material/Check';
+import AddIcon from '@mui/icons-material/Add';
+import EditIcon from '@mui/icons-material/Edit';
+import ClearIcon from '@mui/icons-material/Clear';
+import DoneIcon from '@mui/icons-material/Done';
+import UnreadNotificationIcon from '@mui/icons-material/FiberManualRecord';
 import { useIntl } from 'react-intl';
-import { Tooltip } from '@material-ui/core';
+import { Tooltip } from '@mui/material';
 import GCLink from '../GCLink';
 
 const useMakeCustomCellRenders = () => {

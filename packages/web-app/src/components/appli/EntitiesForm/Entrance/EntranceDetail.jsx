@@ -4,12 +4,12 @@ import {
   FormLabel,
   Switch,
   TextField
-} from '@material-ui/core';
-import { withStyles } from '@material-ui/core/styles';
+} from '@mui/material';
 import React, { useRef } from 'react';
 import { Controller } from 'react-hook-form';
 import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
+import { styled } from '@mui/material/styles';
 import Translate from '../../../common/Translate';
 import InputCoordinate from '../utils/InputCoordinate';
 import { usePermissions } from '../../../../hooks';
@@ -23,18 +23,15 @@ import Alert from '../../../common/Alert';
 import MapMarkerSelector from '../utils/MapMarkerSelector';
 import { FormRow } from '../utils/FormContainers';
 
-const FormControlInline = withStyles({
-  root: {
-    flexWrap: 'wrap',
-    alignItems: 'center',
-    flexDirection: 'row'
-  }
-})(FormControl);
-const FormControlLabelInline = withStyles({
-  root: {
-    paddingLeft: '10px'
-  }
-})(FormControlLabel);
+const FormControlInline = styled(FormControl)`
+  flex-wrap: wrap;
+  align-items: center;
+  flex-direction: row;
+`;
+
+const FormControlLabelInline = styled(FormControlLabel)`
+  padding-left: 10px;
+`;
 
 const EntranceDetail = ({ control, errors, getValues }) => {
   const { formatMessage } = useIntl();

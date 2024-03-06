@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { Typography } from '@material-ui/core';
-import { Skeleton } from '@material-ui/lab';
+import { Typography, Skeleton } from '@mui/material';
+
 import { pathOr } from 'ramda';
 
 import Contribution from '../../../common/Contribution/Contribution';

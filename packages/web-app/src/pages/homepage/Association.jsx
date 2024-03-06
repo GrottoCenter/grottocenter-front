@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
-import { withTheme } from '@material-ui/core/styles';
+import { styled } from '@mui/material/styles';
+import withTheme from '@mui/styles/withTheme';
 import LandingSection from './LandingSection';
 import {
   GridRow,
@@ -14,7 +14,7 @@ import AssociationFlyingGoals from './AssociationFlyingGoals';
 import Translate from '../../components/common/Translate';
 import GCLogo from '../../components/common/GCLogo';
 
-const AssociationTitle = styled.h3`
+const AssociationTitle = styled('h3')`
   color: ${props => props.color};
   text-align: center;
   padding-bottom: 50px;
@@ -25,12 +25,12 @@ const AssociationTitle = styled.h3`
   }
 `;
 
-const AssociationDetails = styled.h5`
+const AssociationDetails = styled('h5')`
   font-size: large;
   text-align: justify;
 `;
 
-const AssociationLogo = styled.div`
+const AssociationLogo = styled('div')`
   padding: 20px 10px;
   min-width: 100px;
   background-color: #e8dcd8;

@@ -1,37 +1,26 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { withStyles } from '@material-ui/core/styles';
-import { Typography, Box } from '@material-ui/core';
+import { Typography, Box } from '@mui/material';
 import { useSelector } from 'react-redux';
+import { styled } from '@mui/material/styles';
 
-const StyledIcon = withStyles(() => ({
-  root: {
-    width: '45px',
-    height: '45px'
-  }
-}))(Box);
+const StyledIcon = styled(Box)`
+  width: 45px;
+  height: 45px;
+`;
 
-const Block = withStyles(() => ({
-  root: {
-    display: 'flex'
-  }
-}))(Box);
+const Block = styled(Box)`
+  display: flex;
+`;
 
-const TextBox = withStyles(() => ({
-  root: {
-    paddingLeft: '12px'
-  }
-}))(Box);
+const TextBox = styled(Box)`
+  padding-left: 12px;
+`;
 
-const StyledText = withStyles(
-  theme => ({
-    root: {
-      color: theme.palette.secondary.main,
-      marginBottom: '-10px'
-    }
-  }),
-  { withTheme: true }
-)(Typography);
+const StyledText = styled(Typography)`
+  color: ${({ theme }) => theme.palette.secondary.main};
+  margin-bottom: 10px;
+`;
 
 const InfoBlock = ({ icon, numberData, text }) => {
   const locale = useSelector(state => state.intl);

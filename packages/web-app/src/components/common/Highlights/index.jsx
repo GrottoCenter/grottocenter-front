@@ -1,17 +1,17 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { diffChars, diffSentences } from 'diff';
-import styled from 'styled-components';
+import { styled } from '@mui/material/styles';
 import { isNil } from 'ramda';
 
-const AddedText = styled.span`
+const AddedText = styled('span')`
   background-color: rgb(70, 149, 74, 0.4);
 `;
 
-const RemovedText = styled.span`
+const RemovedText = styled('span')`
   background-color: rgb(229, 83, 74, 0.4);
 `;
-const UnchangedText = styled.span``;
+const UnchangedText = styled('span')``;
 
 const HighLightsChar = ({ oldText, newText }) => {
   if (isNil(oldText)) {

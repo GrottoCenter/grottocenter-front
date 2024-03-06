@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { Box, Typography } from '@material-ui/core';
-import Skeleton from '@material-ui/lab/Skeleton';
-import { withStyles } from '@material-ui/core/styles';
+import { Box, Typography } from '@mui/material';
+import Skeleton from '@mui/material/Skeleton';
 import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
-import AssessmentIcon from '@material-ui/icons/Assessment';
+import AssessmentIcon from '@mui/icons-material/Assessment';
+import { styled } from '@mui/material/styles';
 import { fetchStatisticsCountry } from '../../../actions/Country/GetStatisticsCountry';
 import { fetchStatisticsMassif } from '../../../actions/Massif/GetStatisticsMassif';
 import SpecificsCaves from './components/SpecificsCaves';
@@ -13,42 +13,28 @@ import CavesData from './components/CavesData/index';
 import CavesStatistics from './components/CavesStatistics';
 import Alert from '../../common/Alert';
 
-const Title = withStyles(() => ({
-  root: {
-    paddingLeft: '15px',
-    verticalAlign: 'middle',
-    display: 'inline-flex'
-  }
-}))(Typography);
+const Title = styled(Typography)`
+  padding-left: 15px;
+  vertical-align: middle;
+  display: inline-flex;
+`;
 
-const TitleBox = withStyles(
-  theme => ({
-    root: {
-      backgroundColor: theme.palette.primary.light,
-      color: '#FFFFFF',
-      padding: '15px 30px',
-      marginBottom: '20px'
-    }
-  }),
-  { withTheme: true }
-)(Box);
+const TitleBox = styled(Box)`
+  background-color: ${({ theme }) => theme.palette.primary.light};
+  color: #ffffff;
+  padding: 15px 30px;
+  margin-bottom: 20px;
+`;
 
-const DataBox = withStyles(() => ({
-  root: {
-    margin: '0px 2%',
-    marginTop: '30px'
-  }
-}))(Box);
+const DataBox = styled(Box)`
+  margin: 0px 2%;
+  margin-top: 30px;
+`;
 
-const DashboardBox = withStyles(
-  theme => ({
-    root: {
-      backgroundColor: theme.palette.backgroundColor,
-      margin: '10px 5%'
-    }
-  }),
-  { withTheme: true }
-)(Box);
+const DashboardBox = styled(Box)`
+  background-color: ${({ theme }) => theme.palette.backgroundColor};
+  margin: 10px 5%;
+`;
 
 const StatisticsDataDashboard = ({ countryId, massifId }) => {
   const dispatch = useDispatch();

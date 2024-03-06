@@ -1,9 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { isNil } from 'ramda';
-import Skeleton from '@material-ui/lab/Skeleton';
+import Skeleton from '@mui/material/Skeleton';
 import { useIntl } from 'react-intl';
-import { Box } from '@material-ui/core';
+import { Box } from '@mui/material';
 
 import subscriptionsType from '../../../types/subscriptions.type';
 import REDUCER_STATUS from '../../../reducers/ReducerStatus';
