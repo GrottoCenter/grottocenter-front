@@ -2,9 +2,10 @@ import React, { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { MapContainer, FeatureGroup, ScaleControl } from 'react-leaflet';
 import { EditControl } from 'react-leaflet-draw';
-import { useGeolocation } from 'rooks';
 import L from 'leaflet';
 import LayersControl from '../../../common/Maps/common/LayersControl';
+import LocateControl from '../../../common/Maps/common/LocateControl';
+
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-draw/dist/leaflet.draw.css';
 
@@ -25,17 +26,15 @@ const getMultiPolygonCentroid = function (coordinates) {
 const PolygonMap = ({ onChange, data }) => {
   const isMounted = useRef(true);
   const displayValue = useRef(false);
+  // eslint-disable-next-line no-unused-vars
   const [map, setMap] = useState();
   const [mapLayers, setMapLayers] = useState([]);
-  const geolocation = useGeolocation();
-  const latitude = geolocation?.lat;
-  const longitude = geolocation?.lng;
   const [center] = useState(
     data
       ? getMultiPolygonCentroid(data.coordinates[0][0])
       : {
-          lat: latitude || 43.6,
-          lng: longitude || 3.86
+          lat: 43.6,
+          lng: 3.86
         }
   );
   const ZOOM_LEVEL = 10;
@@ -74,16 +73,6 @@ const PolygonMap = ({ onChange, data }) => {
     // Quick fix infinite loop if onChange is added to the array
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mapLayers]);
-
-  useEffect(() => {
-    isMounted.current = true;
-    if (geolocation && geolocation.lat && geolocation.lng && !data) {
-      map.setView([geolocation.lat, geolocation.lng]);
-    }
-    return () => {
-      isMounted.current = false;
-    };
-  }, [data, geolocation, map]);
 
   const onCreate = e => {
     const { layerType, layer } = e;
@@ -186,6 +175,7 @@ const PolygonMap = ({ onChange, data }) => {
         />
       </FeatureGroup>
 
+      <LocateControl />
       <ScaleControl position="bottomright" />
       <LayersControl />
     </MapContainer>

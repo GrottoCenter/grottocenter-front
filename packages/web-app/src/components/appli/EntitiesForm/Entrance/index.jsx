@@ -1,9 +1,7 @@
-import React, { useEffect, useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { useForm } from 'react-hook-form';
-import { isNil } from 'ramda';
 import { useDispatch, useSelector } from 'react-redux';
-import { useGeolocation } from 'rooks';
 
 import { updateEntrance } from '../../../../actions/Entrance/UpdateEntrance';
 import { postEntrance } from '../../../../actions/Entrance/CreateEntrance';
@@ -46,9 +44,6 @@ const defaultEntranceValues = {
 
 export const EntranceForm = ({ caveValues = null, entranceValues = null }) => {
   const isNewEntrance = entranceValues === null || caveValues === null;
-  const geolocation = useGeolocation();
-  const latitude = geolocation?.lat;
-  const longitude = geolocation?.lng;
 
   const { locale, AVAILABLE_LANGUAGES } = useSelector(state => state.intl);
 
@@ -86,19 +81,6 @@ export const EntranceForm = ({ caveValues = null, entranceValues = null }) => {
   });
 
   // TODO set latitude & longitude from the selected Entry
-  useEffect(() => {
-    if (isNil(entranceValues?.latitude) || isNil(entranceValues?.longitude)) {
-      const values = getValues();
-      reset({
-        ...values,
-        entrance: {
-          ...values.entrance,
-          latitude,
-          longitude
-        }
-      });
-    }
-  }, [entranceValues, getValues, latitude, longitude, reset]);
 
   const handleUpdateEntityType = type => {
     setEntityType(type);

@@ -5,8 +5,9 @@ import PropTypes from 'prop-types';
 import { isMobile } from 'react-device-detect';
 import styled from 'styled-components';
 import { useDebounce } from '../../../../hooks';
-import { defaultCoord, defaultZoom } from '../../../../conf/config';
+import { defaultCoord } from '../../../../conf/config';
 import LayersControl from '../../../common/Maps/common/LayersControl';
+import LocateControl from '../../../common/Maps/common/LocateControl';
 
 const StyledMapContainer = styled(MapContainer)`
   margin: 0 4px;
@@ -113,12 +114,13 @@ const MapMarkerSelector = ({ control, formLatitudeKey, formLongitudeKey }) => {
     <StyledMapContainer
       style={{ height: '40vh', width: 'calc(100% - 8px)' }}
       center={currentPosition}
-      zoom={defaultZoom}
+      zoom={14}
       dragging={!isMobile} // For usability only use two fingers drag/zoom on mobile
       scrollWheelZoom="center" // To avoid losing the coordinate when only zooming
       doubleClickZoom="center"
       touchZoom="center"
       preferCanvas>
+      <LocateControl />
       <ScaleControl position="bottomright" />
       <LayersControl />
 

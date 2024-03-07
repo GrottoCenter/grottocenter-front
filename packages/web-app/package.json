@@ -58,7 +58,6 @@
     "redux": "^4.2.1",
     "redux-debounced": "^0.5.0",
     "redux-thunk": "^2.4.2",
-    "rooks": "^7.14.1",
     "styled-components": "^6.0.4",
     "swagger-ui-react": "^4.19.1",
     "underscore.string": "^3.3.6",
