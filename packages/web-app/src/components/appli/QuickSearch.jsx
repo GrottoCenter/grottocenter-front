@@ -60,7 +60,7 @@ const QuickSearch = ({
             history.push(`/ui/caves/${encodeURIComponent(selection.id)}`);
             break;
           case 'caver':
-            history.push(`/ui/cavers/${encodeURIComponent(selection.id)}`);
+            history.push(`/ui/persons/${encodeURIComponent(selection.id)}`);
             break;
           case 'document':
             history.push(`/ui/documents/${encodeURIComponent(selection.id)}`);
