@@ -71,7 +71,7 @@ const DocumentPage = ({
         <TextLink
           key={author.id}
           value={author.nickname}
-          url={`/ui/cavers/${author.id}`}
+          url={`/ui/persons/${author.id}`}
         />,
         ' - '
       );

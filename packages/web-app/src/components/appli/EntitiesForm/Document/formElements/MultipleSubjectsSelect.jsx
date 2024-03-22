@@ -41,8 +41,8 @@ const MultipleSubjectsSelect = ({
         return `${parentText} ${option.id ?? option.code} ${subjectName}`;
       }}
       getOptionSelected={(optionToTest, valueToTest) =>
-        optionToTest.code === valueToTest.code ||
-        optionToTest.id === valueToTest.id
+        (optionToTest.code && optionToTest.code === valueToTest.code) ||
+        (optionToTest.id && optionToTest.id === valueToTest.id)
       }
       helperText={helperText}
       isLoading={isFetching}
