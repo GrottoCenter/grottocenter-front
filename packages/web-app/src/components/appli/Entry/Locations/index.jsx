@@ -45,7 +45,7 @@ const Locations = ({ entranceId, locations, isSensitive }) => {
                 : formatMessage({ id: 'Add a new location' })
             }>
             <Button
-              color={isFormVisible ? '' : 'secondary'}
+              color={isFormVisible ? 'inherit' : 'secondary'}
               variant="outlined"
               onClick={() => setIsFormVisible(!isFormVisible)}
               startIcon={isFormVisible ? <CancelIcon /> : <AddCircleIcon />}>
