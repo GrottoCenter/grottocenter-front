@@ -76,7 +76,7 @@ const DialogLoginForm = ({
           type="submit"
           size="large"
           onClick={action('onLogin')}
-          color={isLoading ? '' : 'primary'}
+          color={isLoading ? 'inherit' : 'primary'}
           key={0}>
           {isLoading ? (
             <CircularProgress size="2.8rem" />

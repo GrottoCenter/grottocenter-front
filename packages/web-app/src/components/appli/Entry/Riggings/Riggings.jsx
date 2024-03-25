@@ -49,7 +49,7 @@ const Riggings = ({ riggings, entranceId }) => {
                 : formatMessage({ id: 'Add a new riggings' })
             }>
             <Button
-              color={isFormVisible ? '' : 'secondary'}
+              color={isFormVisible ? 'inherit' : 'secondary'}
               variant="outlined"
               onClick={() => setIsFormVisible(!isFormVisible)}
               startIcon={isFormVisible ? <CancelIcon /> : <AddCircleIcon />}>

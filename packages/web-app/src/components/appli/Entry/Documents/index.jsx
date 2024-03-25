@@ -49,7 +49,7 @@ const Documents = ({ documents, entranceId }) => {
                 : formatMessage({ id: 'Assign an existing document' })
             }>
             <Button
-              color={isDocumentSearchVisible ? '' : 'secondary'}
+              color={isDocumentSearchVisible ? 'inherit' : 'secondary'}
               variant="outlined"
               onClick={() =>
                 setIsDocumentSearchVisible(!isDocumentSearchVisible)

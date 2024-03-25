@@ -44,7 +44,7 @@ const Histories = ({ entranceId, histories }) => {
                 : formatMessage({ id: 'Add a new history' })
             }>
             <Button
-              color={isFormVisible ? '' : 'secondary'}
+              color={isFormVisible ? 'inherit' : 'secondary'}
               variant="outlined"
               onClick={() => setIsFormVisible(!isFormVisible)}
               startIcon={isFormVisible ? <CancelIcon /> : <AddCircleIcon />}>

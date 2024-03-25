@@ -50,7 +50,7 @@ const Comments = ({ entranceId, comments }) => {
                 : formatMessage({ id: 'Add a new comment' })
             }>
             <Button
-              color={isFormVisible ? '' : 'secondary'}
+              color={isFormVisible ? 'inherit' : 'secondary'}
               variant="outlined"
               onClick={() => setIsFormVisible(!isFormVisible)}
               startIcon={isFormVisible ? <CancelIcon /> : <AddCircleIcon />}>
