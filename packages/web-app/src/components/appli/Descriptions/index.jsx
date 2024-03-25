@@ -45,7 +45,7 @@ const Descriptions = ({ entityType, entityId, descriptions }) => {
                 : formatMessage({ id: 'Add a new description' })
             }>
             <Button
-              color={isFormVisible ? '' : 'secondary'}
+              color={isFormVisible ? 'inherit' : 'secondary'}
               variant="outlined"
               onClick={() => setIsFormVisible(!isFormVisible)}
               startIcon={isFormVisible ? <CancelIcon /> : <AddCircleIcon />}>
