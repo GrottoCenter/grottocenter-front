@@ -29,20 +29,23 @@ const FilesList = ({ files, updateFileName, removeFile, undoRemove }) => {
       }>
       {files.map((file, index) => {
         const isDeleted = isFileDeleted(file);
+
+        const parts = file.fileName.split('.');
+        const extension = parts.length > 1 ? parts.pop() : '';
+        const fileName = parts.join('.');
+
         return (
           // eslint-disable-next-line react/no-array-index-key
           <ListItem key={index} style={isDeleted ? { opacity: 0.4 } : {}}>
             <StringInput
               required
-              value={file.name}
-              valueName={formatMessage({ id: 'Name' })}
+              value={fileName}
+              valueName={formatMessage({ id: 'File' })}
               onValueChange={updateFileName(index)}
               disabled={isDeleted}
               endAdornment={
                 <InputAdornment position="end">
-                  <Typography color="textSecondary">
-                    .{file.extension}
-                  </Typography>
+                  <Typography color="textSecondary">.{extension}</Typography>
                 </InputAdornment>
               }
             />

@@ -5,13 +5,12 @@ import { FormControl, Button, Typography } from '@mui/material';
 
 import { styled } from '@mui/material/styles';
 import { isEmpty, isNil, remove } from 'ramda';
-import LicenseSelect from '../../appli/Form/LicenseSelect';
-import { DOCUMENT_AUTHORIZE_TO_PUBLISH } from '../../../hooks/useDocumentOptions';
+import LicenseSelect from './LicenseSelect';
 import FilesList from './FilesList';
 import DocumentAuthorizationSelect from '../../appli/Form/DocumentAuthorizationSelect';
 import ErrorsList from './ErrorsList';
 import { useFileFormats } from '../../../hooks';
-import OptionSelect from './OptionSelect';
+import OptionSelect, { DOCUMENT_AUTHORIZE_TO_PUBLISH } from './OptionSelect';
 import { MAX_SIZE_OF_UPLOADED_FILES } from '../../../conf/config';
 import { IS_DELETED, IS_INTACT, IS_MODIFIED, IS_NEW } from './FileHelpers';
 import { idNameTypeExtended } from '../../../types/idName.type';
@@ -105,17 +104,12 @@ const AddFileForm = ({
         return true;
       })
       .map(file => {
-        let fileName = '';
-        let fileExtension = '';
         // file.name may not be supported (only for Opera Android)
-        if (file.name) {
-          [fileName, fileExtension] = file.name.split('.');
-        }
+        const fileName = file.name ?? '';
 
         return {
           file,
-          name: fileName,
-          extension: fileExtension,
+          fileName,
           state: IS_NEW
         };
       });
@@ -154,10 +148,9 @@ const AddFileForm = ({
     const newFilesState = [...files];
     const updatedFile = newFilesState[index];
     return newName => {
-      updatedFile.name = newName;
-      if (updatedFile.state === IS_INTACT) {
-        updatedFile.state = IS_MODIFIED;
-      }
+      const extention = updatedFile.fileName.split('.').pop();
+      updatedFile.fileName = `${newName}.${extention}`;
+      if (updatedFile.state !== IS_NEW) updatedFile.state = IS_MODIFIED;
       setFiles(newFilesState);
     };
   };
@@ -191,18 +184,17 @@ const AddFileForm = ({
               undoRemove={undoRemove}
             />
           </ListWrapper>
+          <LicenseSelect
+            label={formatMessage({ id: 'License' })}
+            selected={license}
+            updateSelected={setLicense}
+          />
+
           <OptionSelect
             label={formatMessage({ id: 'License type' })}
             selectedOption={option}
             updateSelectedOption={updateOption}
           />
-          {option && (
-            <LicenseSelect
-              label={formatMessage({ id: 'License' })}
-              selected={license}
-              updateSelected={setLicense}
-            />
-          )}
           {showAuthDocSelect && (
             <DocumentAuthorizationSelect
               label={formatMessage({ id: 'Authorization from authors' })}
