@@ -11,6 +11,8 @@ import { styled } from '@mui/material/styles';
 import PropTypes from 'prop-types';
 import { getDocuments } from '../../../actions/Document/GetDocuments';
 
+import Translate from '../../common/Translate';
+
 const Wrapper = styled(FormControl)`
   ${({ theme }) => `
     margin: ${theme.spacing(4)};`}
@@ -51,15 +53,22 @@ const DocumentAuthorizationSelect = ({
     <Wrapper variant="filled">
       {label && <InputLabel>{label}</InputLabel>}
       <Select
-        value={selectedDocument}
+        value={isLoading ? -1 : selectedDocument ?? -1}
         onChange={event => updateSelectedDocument(event.target.value)}>
+        <MenuItem key={-1} value={-1} disabled>
+          {isLoading && <CircularProgress fontSize="small" />}
+          <i>
+            <Translate>
+              {isLoading ? 'Loading...' : 'Select an authorization'}
+            </Translate>
+          </i>
+        </MenuItem>
         {documents.map(document => (
           <MenuItem key={document.id} value={document}>
-            {document.titles?.[0].text}
+            {document.title}
           </MenuItem>
         ))}
       </Select>
-      {isLoading && <CircularProgress color="primary" />}
     </Wrapper>
   );
 };
