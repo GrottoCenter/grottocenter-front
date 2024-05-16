@@ -49,20 +49,12 @@ export function updateDocument(docAttributes) {
     let indexModified = 0;
     for (const file of files) {
       // For a file that is modified or intact, baseFile corresponds to the file entity of the database.
-      const {
-        name,
-        extension,
-        file: fileObjectJS,
-        state,
-        previousState,
-        ...baseFile
-      } = file;
+      const { file: fileObjectJS, state, ...baseFile } = file;
       switch (state) {
         case IS_NEW:
-          formData.append('files', fileObjectJS, `${name}.${extension}`);
+          formData.append('files', fileObjectJS, baseFile.fileName);
           break;
         case IS_MODIFIED:
-          baseFile.fileName = `${name}.${extension}`;
           buildFormData(formData, baseFile, `modifiedFiles[${indexModified}]`);
           indexModified += 1;
           break;

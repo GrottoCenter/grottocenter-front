@@ -34,7 +34,7 @@ export function postDocument(docAttributes) {
 
     // Files must have the same key name for each file, as it is asked by the parser on server side.
     files.forEach(file => {
-      formData.append('files', file.file, `${file.name}.${file.extension}`);
+      formData.append('files', file.file, file.fileName);
     });
 
     const requestOptions = {

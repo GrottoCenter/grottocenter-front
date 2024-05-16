@@ -56,6 +56,8 @@ const checkFormValidation = document => {
     isValid = new RegExp(document.identifierType?.regexp).test(
       document.identifier
     );
+  if (document.files.length > 0 && (!document.license || !document.option))
+    isValid = false;
 
   return !!isValid;
 };

@@ -31,7 +31,7 @@ const LicenseSelect = ({ label, selected, updateSelected }) => {
   */
   useEffect(() => {
     if (data) {
-      const licenseName = selected ? selected.name : DEFAULT_LICENSE;
+      const licenseName = selected ?? DEFAULT_LICENSE;
       const selectedLicense = data.find(
         license => license.name === licenseName
       );
@@ -46,13 +46,15 @@ const LicenseSelect = ({ label, selected, updateSelected }) => {
     <Wrapper variant="filled">
       {label && <InputLabel>{label}</InputLabel>}
       <Select
-        value={selected || ''}
-        onChange={event => updateSelected(event.target.value)}>
+        value={selected?.name || ''}
+        onChange={event =>
+          updateSelected(data.find(e => e.name === event.target.value))
+        }>
         {data &&
           data
             .sort((l1, l2) => l1.name > l2.name)
             .map(license => (
-              <MenuItem key={license.id} value={license}>
+              <MenuItem key={license.id} value={license.name}>
                 {license.name}
               </MenuItem>
             ))}
