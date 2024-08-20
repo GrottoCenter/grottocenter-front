@@ -14,8 +14,8 @@ const SpacedButton = styled(Button)`
 
 const FormActions = ({ apiError, entrance, loading, newCave, onReset }) => {
   const { formatMessage } = useIntl();
-
-  const isSameCave = newCave && Number(newCave.id) === entrance.cave.id;
+  const isSameCave =
+    newCave && entrance.cave && Number(newCave.id) === entrance.cave.id;
 
   return (
     <>

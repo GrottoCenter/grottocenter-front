@@ -472,7 +472,7 @@
   "Entrance name language": "Idioma del nombre de la entrada",
   "Entrance properties": "Propiedades de la entrada",
   "Entrance successfully created!": "¡Entrada creada con éxito!",
-  "Entrance successfully moved from {intialCave} to {finalCave}!": "¡Entrada movida con éxito de {intialCave} a {finalCave}!",
+  "Entrance successfully moved from {initialCave} to {finalCave}!": "¡Entrada movida con éxito de {initialCave} a {finalCave}!",
   "Entrance successfully updated!": "¡Entrada actualizada con éxito!",
   "entrances": "entradas",
   "Entrances": "Entradas",
