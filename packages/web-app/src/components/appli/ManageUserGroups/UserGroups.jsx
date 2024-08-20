@@ -24,6 +24,8 @@ const UserGroups = ({
   setSelectedUser
 }) => {
   const { formatMessage } = useIntl();
+  // eslint-disable-next-line no-param-reassign
+  if (!initialUser.groups) initialUser.groups = [];
 
   const userGroupsHaveChanged =
     // Check if groups are different between selectedUser and initialUser

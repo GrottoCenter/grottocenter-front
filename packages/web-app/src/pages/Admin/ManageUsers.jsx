@@ -42,7 +42,7 @@ const ManageUsers = () => {
   } = useSelector(state => state.updatePersonGroups);
 
   const onSaveGroups = () => {
-    dispatch(postPersonGroups(selectedUser.id, selectedUser.groups));
+    dispatch(postPersonGroups(selectedUser.id, selectedUser.groups ?? []));
   };
 
   const onSelection = selection => {
