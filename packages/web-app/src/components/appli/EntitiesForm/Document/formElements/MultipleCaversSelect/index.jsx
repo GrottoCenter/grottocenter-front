@@ -92,8 +92,8 @@ const MultipleCaversSelect = ({
         contextValueName={contextValueName}
         enabled={isCreateCaverOpen}
         onCreateSuccess={handleOpenSideAction}
-        defaultName={defaultNewName}
-        defaultSurname=""
+        defaultName=""
+        defaultSurname={defaultNewName}
       />
     </MultipleSelectComponent>
   );

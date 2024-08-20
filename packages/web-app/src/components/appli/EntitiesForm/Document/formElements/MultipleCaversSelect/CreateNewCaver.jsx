@@ -69,6 +69,15 @@ const CreateNewCaver = ({
   return (
     <Wrapper>
       <TextField
+        variant="standard"
+        disabled={isLoading}
+        id="create-caver-surname-input"
+        label={formatMessage({ id: 'Surname' })}
+        value={surname}
+        onChange={handleChangeSurname}
+        fullWidth
+      />
+      <TextField
         inputRef={inputRef}
         variant="standard"
         disabled={isLoading}
@@ -76,15 +85,6 @@ const CreateNewCaver = ({
         label={formatMessage({ id: 'Caver.Name' })}
         value={name}
         onChange={handleChangeName}
-        fullWidth
-      />
-      <TextField
-        variant="standard"
-        disabled={isLoading}
-        id="create-caver-surname-input"
-        label={formatMessage({ id: 'Surname' })}
-        value={surname}
-        onChange={handleChangeSurname}
         fullWidth
       />
       <ActionButton
