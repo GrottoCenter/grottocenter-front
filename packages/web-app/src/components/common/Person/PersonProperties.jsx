@@ -35,6 +35,8 @@ const PersonProperties = ({ person }) => {
 
   let groupString = '';
   let groupsComplete = true;
+  // eslint-disable-next-line no-param-reassign
+  if (!person.groups) person.groups = [];
   const { groups } = person;
   const mappedGroups = groups.map(group => {
     if (!group.name) {
