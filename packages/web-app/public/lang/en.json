@@ -575,7 +575,7 @@
   "Entrance name language": "Entrance name language",
   "Entrance properties": "Entrance properties",
   "Entrance successfully created!": "Entrance successfully created!",
-  "Entrance successfully moved from {intialCave} to {finalCave}!": "Entrance successfully moved from {intialCave} to {finalCave}!",
+  "Entrance successfully moved from {initialCave} to {finalCave}!": "Entrance successfully moved from {initialCave} to {finalCave}!",
   "Entrance successfully updated!": "Entrance successfully updated!",
   "entrances": "entrances",
   "Entrances": "Entrances",

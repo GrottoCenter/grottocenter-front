@@ -37,7 +37,7 @@ const MoveEntranceToCaveForm = ({ entrance }) => {
   const { loading, error: apiError } = useSelector(
     state => state.moveEntranceToCave
   );
-  const isLinkedToANetwork = entrance.cave.entrances.length > 1;
+  const isLinkedToANetwork = entrance.cave?.entrances?.length > 1;
 
   const handleOnSelection = selectedCave => {
     onNewCaveChange({ ...selectedCave, id: Number(selectedCave.id) });
@@ -77,12 +77,14 @@ const MoveEntranceToCaveForm = ({ entrance }) => {
         <Alert
           content={formatMessage(
             {
-              id: 'Entrance successfully moved from {intialCave} to {finalCave}!',
+              id: 'Entrance successfully moved from {initialCave} to {finalCave}!',
               defaultMessage:
-                'Entrance successfully moved from {intialCave} to {finalCave}!'
+                'Entrance successfully moved from {initialCave} to {finalCave}!'
             },
             {
-              intialCave: <b>{entrance.cave.name}</b>,
+              initialCave: (
+                <b>{entrance.cave?.name ?? formatMessage({ id: 'none' })}</b>
+              ),
               finalCave: <b>{newCave.name}</b>
             }
           )}

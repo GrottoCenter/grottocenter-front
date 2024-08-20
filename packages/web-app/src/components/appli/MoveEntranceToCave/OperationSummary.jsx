@@ -20,8 +20,8 @@ const OperationSummary = ({ entrance, isLinkedToANetwork, newCave }) => {
           label={formatMessage({
             id: isLinkedToANetwork ? 'Previous network' : 'Previous cave'
           })}
-          url={`/ui/caves/${entrance.cave.id}`}
-          value={entrance.cave.name}
+          url={entrance.cave ? `/ui/caves/${entrance.cave?.id}` : null}
+          value={entrance.cave?.name ?? formatMessage({ id: 'none' })}
         />
       </Box>
       <Box mx={4}>
