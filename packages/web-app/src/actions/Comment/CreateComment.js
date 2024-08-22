@@ -8,16 +8,16 @@ export const POST_COMMENT = 'POST_COMMENT';
 export const POST_COMMENT_SUCCESS = 'POST_COMMENT_SUCCESS';
 export const POST_COMMENT_FAILURE = 'POST_COMMENT_FAILURE';
 
-export const postCommentAction = () => ({
+const postCommentAction = () => ({
   type: POST_COMMENT
 });
 
-export const postCommentSuccess = comment => ({
+const postCommentSuccess = comment => ({
   type: POST_COMMENT_SUCCESS,
   comment
 });
 
-export const postCommentFailure = error => ({
+const postCommentFailure = error => ({
   type: POST_COMMENT_FAILURE,
   error
 });

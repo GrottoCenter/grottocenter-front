@@ -6,16 +6,16 @@ export const UPDATE_HISTORY = 'UPDATE_HISTORY';
 export const UPDATE_HISTORY_SUCCESS = 'UPDATE_HISTORY_SUCCESS';
 export const UPDATE_HISTORY_FAILURE = 'UPDATE_HISTORY_FAILURE';
 
-export const updateHistoryAction = () => ({
+const updateHistoryAction = () => ({
   type: UPDATE_HISTORY
 });
 
-export const updateHistorySuccess = history => ({
+const updateHistorySuccess = history => ({
   type: UPDATE_HISTORY_SUCCESS,
   history
 });
 
-export const updateHistoryFailure = error => ({
+const updateHistoryFailure = error => ({
   type: UPDATE_HISTORY_FAILURE,
   error
 });

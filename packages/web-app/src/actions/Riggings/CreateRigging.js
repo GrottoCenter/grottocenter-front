@@ -6,16 +6,16 @@ export const POST_RIGGINGS = 'POST_RIGGINGS';
 export const POST_RIGGINGS_SUCCESS = 'POST_RIGGINGS_SUCCESS';
 export const POST_RIGGINGS_FAILURE = 'POST_RIGGINGS_FAILURE';
 
-export const postRiggingsAction = () => ({
+const postRiggingsAction = () => ({
   type: POST_RIGGINGS
 });
 
-export const postRiggingsSuccess = rigging => ({
+const postRiggingsSuccess = rigging => ({
   type: POST_RIGGINGS_SUCCESS,
   rigging
 });
 
-export const postRiggingsFailure = error => ({
+const postRiggingsFailure = error => ({
   type: POST_RIGGINGS_FAILURE,
   error
 });

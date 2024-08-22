@@ -6,16 +6,16 @@ export const UPDATE_RIGGINGS = 'UPDATE_RIGGINGS';
 export const UPDATE_RIGGINGS_SUCCESS = 'UPDATE_RIGGINGS_SUCCESS';
 export const UPDATE_RIGGINGS_FAILURE = 'UPDATE_RIGGINGS_FAILURE';
 
-export const updateRiggingsAction = () => ({
+const updateRiggingsAction = () => ({
   type: UPDATE_RIGGINGS
 });
 
-export const updateRiggingsSuccess = rigging => ({
+const updateRiggingsSuccess = rigging => ({
   type: UPDATE_RIGGINGS_SUCCESS,
   rigging
 });
 
-export const updateRiggingsFailure = error => ({
+const updateRiggingsFailure = error => ({
   type: UPDATE_RIGGINGS_FAILURE,
   error
 });

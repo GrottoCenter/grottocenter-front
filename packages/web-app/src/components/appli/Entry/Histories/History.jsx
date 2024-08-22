@@ -1,21 +1,13 @@
-import React, { useState } from 'react';
-import {
-  Box,
-  ListItemIcon,
-  ListItem,
-  ListItemText,
-  ButtonGroup,
-  Tooltip,
-  Button
-} from '@mui/material';
+import React, { useState, useEffect } from 'react';
+import { Box, ListItem, ListItemText } from '@mui/material';
 import { useDispatch } from 'react-redux';
-import EditIcon from '@mui/icons-material/Edit';
-
 import { styled } from '@mui/material/styles';
-import { useIntl } from 'react-intl';
 import { historyType } from '../Provider';
 import CreateHistoryForm from '../../Form/HistoryForm/index';
 import { updateHistory } from '../../../../actions/History/UpdateHistory';
+import { deleteHistory } from '../../../../actions/History/DeleteHistory';
+import { restoreHistory } from '../../../../actions/History/RestoreHistory';
+import ActionButtons from '../ActionButtons';
 import { usePermissions } from '../../../../hooks';
 import Contribution from '../../../common/Contribution/Contribution';
 import { SnapshotButton } from '../Snapshots/UtilityFunction';
@@ -27,8 +19,13 @@ const ListItemStyled = styled(ListItem)`
 const History = ({ history }) => {
   const dispatch = useDispatch();
   const permissions = usePermissions();
-  const { id, body, author, reviewer, creationDate, reviewedDate } = history;
-  const [isFormVisible, setIsFormVisible] = useState(false);
+  const [isUpdateFormVisible, setIsUpdateFormVisible] = useState(false);
+  const [wantedDeletedState, setWantedDeletedState] = useState(false);
+
+  useEffect(() => {
+    setWantedDeletedState(history.isDeleted);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const onSubmitForm = data => {
     dispatch(
@@ -38,67 +35,62 @@ const History = ({ history }) => {
         language: data.language.id
       })
     );
-    setIsFormVisible(false);
+    setIsUpdateFormVisible(false);
   };
-  const { formatMessage } = useIntl();
+
+  const onDeletePress = isPermanent => {
+    setWantedDeletedState(true);
+    dispatch(deleteHistory({ id: history.id, isPermanent }));
+  };
+  const onRestorePress = () => {
+    setWantedDeletedState(false);
+    dispatch(restoreHistory({ id: history.id }));
+  };
+
+  const isActionLoading = wantedDeletedState !== history.isDeleted;
+
   return (
     <ListItemStyled disableGutters alignItems="flex-start">
       <Box style={{ alignSelf: 'flex-end' }}>
-        {!isFormVisible && (
-          <ListItemIcon style={{ marginTop: 0 }}>
-            <ButtonGroup color="primary">
-              <Tooltip
-                title={formatMessage({
-                  id: 'Edit this history'
-                })}>
-                <Button
-                  disabled={!permissions.isAuth}
-                  onClick={() => setIsFormVisible(!isFormVisible)}
-                  color="primary"
-                  aria-label="edit">
-                  <EditIcon />
-                </Button>
-              </Tooltip>
-              <SnapshotButton id={id} type="histories" content={history} />
-            </ButtonGroup>
-          </ListItemIcon>
-        )}
-      </Box>
-      {isFormVisible ? (
-        <>
-          <Box style={{ alignSelf: 'flex-end' }}>
-            {permissions.isAuth && (
-              <ListItemIcon style={{ marginTop: 0 }}>
-                <Button
-                  variant="outlined"
-                  color="primary"
-                  onClick={() => setIsFormVisible(!isFormVisible)}
-                  aria-label="cancel">
-                  {formatMessage({ id: `Cancel` })}
-                </Button>
-              </ListItemIcon>
-            )}
-          </Box>
-          <Box width="100%">
-            <CreateHistoryForm
-              closeForm={() => setIsFormVisible(false)}
-              isNewHistory={false}
-              onSubmit={onSubmitForm}
-              values={history}
+        <ActionButtons
+          isLoading={isActionLoading}
+          isUpdating={isUpdateFormVisible}
+          setIsUpdating={setIsUpdateFormVisible}
+          isDeleted={history.isDeleted}
+          canEdit={permissions.isAuth}
+          canDelete={permissions.isModerator}
+          snapshotEl={
+            <SnapshotButton
+              id={history.id}
+              type="histories"
+              content={history}
             />
-          </Box>
-        </>
+          }
+          onDeletePress={onDeletePress}
+          onRestorePress={onRestorePress}
+        />
+      </Box>
+      {isUpdateFormVisible && permissions.isAuth ? (
+        <Box width="100%">
+          <CreateHistoryForm
+            closeForm={() => setIsUpdateFormVisible(false)}
+            isNewHistory={false}
+            onSubmit={onSubmitForm}
+            values={history}
+          />
+        </Box>
       ) : (
         <ListItemText
           style={{ margin: 0 }}
           disableTypography
           secondary={
             <Contribution
-              body={body}
-              author={author}
-              reviewer={reviewer}
-              creationDate={creationDate}
-              dateReviewed={reviewedDate}
+              body={history.body}
+              author={history.author}
+              reviewer={history.reviewer}
+              creationDate={history.creationDate}
+              dateReviewed={history.reviewedDate}
+              isDeletedWithHeader={history.isDeleted}
             />
           }
         />

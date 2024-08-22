@@ -6,16 +6,16 @@ export const POST_LOCATION = 'POST_LOCATION';
 export const POST_LOCATION_SUCCESS = 'POST_LOCATION_SUCCESS';
 export const POST_LOCATION_FAILURE = 'POST_LOCATION_FAILURE';
 
-export const postLocationAction = () => ({
+const postLocationAction = () => ({
   type: POST_LOCATION
 });
 
-export const postLocationSuccess = location => ({
+const postLocationSuccess = location => ({
   type: POST_LOCATION_SUCCESS,
   location
 });
 
-export const postLocationFailure = error => ({
+const postLocationFailure = error => ({
   type: POST_LOCATION_FAILURE,
   error
 });

@@ -6,16 +6,16 @@ export const POST_HISTORY = 'POST_HISTORY';
 export const POST_HISTORY_SUCCESS = 'POST_HISTORY_SUCCESS';
 export const POST_HISTORY_FAILURE = 'POST_HISTORY_FAILURE';
 
-export const postHistoryAction = () => ({
+const postHistoryAction = () => ({
   type: POST_HISTORY
 });
 
-export const postHistorySuccess = history => ({
+const postHistorySuccess = history => ({
   type: POST_HISTORY_SUCCESS,
   history
 });
 
-export const postHistoryFailure = error => ({
+const postHistoryFailure = error => ({
   type: POST_HISTORY_FAILURE,
   error
 });

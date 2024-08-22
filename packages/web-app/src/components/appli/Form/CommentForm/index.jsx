@@ -323,9 +323,6 @@ const CreateCommentForm = ({ closeForm, onSubmit, values, isNewComment }) => {
           {formatMessage({ id: 'Cancel' })}
         </SpacedButton>
       )}
-      <SpacedButton onClick={resetToDefault}>
-        {formatMessage({ id: 'Reset' })}
-      </SpacedButton>
       <SpacedButton
         color="primary"
         type="submit"
@@ -334,6 +331,9 @@ const CreateCommentForm = ({ closeForm, onSubmit, values, isNewComment }) => {
         {isNewComment
           ? formatMessage({ id: 'Create' })
           : formatMessage({ id: 'Update' })}
+      </SpacedButton>
+      <SpacedButton variant="outlined" onClick={resetToDefault}>
+        {formatMessage({ id: 'Reset' })}
       </SpacedButton>
     </Box>
   );

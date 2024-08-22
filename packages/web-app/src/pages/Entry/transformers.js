@@ -14,6 +14,7 @@ export const getComments = comments =>
         ? new Date(comment?.dateReviewed)
         : null,
       id: comment?.id,
+      isDeleted: comment?.isDeleted,
       access: comment?.approach,
       interest: comment?.aestheticism,
       progression: comment?.caving,
@@ -69,6 +70,7 @@ export const getDescriptions = descriptions =>
         ? new Date(description?.dateReviewed)
         : null,
       id: description?.id,
+      isDeleted: description?.isDeleted,
       language: description?.language,
       title: description?.title,
       relevance: description?.relevance
@@ -79,6 +81,7 @@ export const getHistories = histories =>
   histories
     .map(history => ({
       id: history?.id,
+      isDeleted: history?.isDeleted,
       creationDate: history?.dateInscription
         ? new Date(history?.dateInscription)
         : null,
@@ -99,6 +102,7 @@ export const getRiggings = riggings =>
     author: getAuthor(rigging?.author),
     reviewer: rigging?.reviewer ? getAuthor(rigging?.reviewer) : null,
     id: rigging.id,
+    isDeleted: rigging?.isDeleted,
     language: rigging?.language || '',
     title: rigging?.title || '',
     date: rigging?.dateInscription ? new Date(rigging.dateInscription) : null,
@@ -109,6 +113,7 @@ export const getLocations = locations =>
   locations
     .map(location => ({
       id: location?.id,
+      isDeleted: location?.isDeleted,
       title: location?.title,
       author: getAuthor(location?.author),
       reviewer: getAuthor(location?.reviewer),
