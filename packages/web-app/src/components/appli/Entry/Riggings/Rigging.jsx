@@ -1,10 +1,11 @@
-import { useIntl } from 'react-intl';
-import { Box, Button, ButtonGroup, Tooltip } from '@mui/material';
-import EditIcon from '@mui/icons-material/Edit';
+import { Box } from '@mui/material';
 import { useDispatch } from 'react-redux';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { usePermissions } from '../../../../hooks';
 import { updateRiggings } from '../../../../actions/Riggings/UpdateRigging';
+import { deleteRiggings } from '../../../../actions/Riggings/DeleteRigging';
+import { restoreRiggings } from '../../../../actions/Riggings/RestoreRigging';
+import ActionButtons from '../ActionButtons';
 import CreateRiggingsForm from '../../Form/RiggingsForm/index';
 import { riggingType } from '../Provider';
 import Contribution from '../../../common/Contribution/Contribution';
@@ -14,17 +15,33 @@ import { SnapshotButton } from '../Snapshots/UtilityFunction';
 const Rigging = ({ rigging }) => {
   const dispatch = useDispatch();
   const permissions = usePermissions();
-  const { formatMessage } = useIntl();
-  const [isFormVisible, setIsFormVisible] = useState(false);
-  const onSubmitForm = data => {
+  const [isUpdateFormVisible, setIsUpdateFormVisible] = useState(false);
+  const [wantedDeletedState, setWantedDeletedState] = useState(false);
+
+  useEffect(() => {
+    setWantedDeletedState(rigging.isDeleted);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const onSubmitUpdateForm = data => {
     dispatch(
       updateRiggings({
         ...data,
         language: data.language.id
       })
     );
-    setIsFormVisible(false);
+    setIsUpdateFormVisible(false);
   };
+  const onDeletePress = isPermanent => {
+    setWantedDeletedState(true);
+    dispatch(deleteRiggings({ id: rigging.id, isPermanent }));
+  };
+  const onRestorePress = () => {
+    setWantedDeletedState(false);
+    dispatch(restoreRiggings({ id: rigging.id }));
+  };
+
+  const isActionLoading = wantedDeletedState !== rigging.isDeleted;
 
   return (
     <Box key={rigging.id} position="relative" mt={2}>
@@ -34,32 +51,26 @@ const Rigging = ({ rigging }) => {
           flexDirection: 'column',
           alignItems: 'flex-end'
         }}>
-        <ButtonGroup color="primary">
-          <Tooltip
-            title={
-              isFormVisible
-                ? formatMessage({ id: 'Cancel edit' })
-                : formatMessage({ id: 'Edit these riggings' })
-            }>
-            <Button
-              disabled={!permissions.isAuth}
-              onClick={() => setIsFormVisible(!isFormVisible)}
-              color="primary"
-              aria-label="edit">
-              {isFormVisible ? formatMessage({ id: `Cancel` }) : <EditIcon />}
-            </Button>
-          </Tooltip>
-          {!isFormVisible && (
+        <ActionButtons
+          isLoading={isActionLoading}
+          isUpdating={isUpdateFormVisible}
+          setIsUpdating={setIsUpdateFormVisible}
+          isDeleted={rigging.isDeleted}
+          canEdit={permissions.isAuth}
+          canDelete={permissions.isModerator}
+          snapshotEl={
             <SnapshotButton id={rigging.id} type="riggings" content={rigging} />
-          )}
-        </ButtonGroup>
+          }
+          onDeletePress={onDeletePress}
+          onRestorePress={onRestorePress}
+        />
       </Box>
-      {isFormVisible && permissions.isAuth ? (
+      {isUpdateFormVisible && permissions.isAuth ? (
         <Box width="100%">
           <CreateRiggingsForm
-            closeForm={() => setIsFormVisible(false)}
+            closeForm={() => setIsUpdateFormVisible(false)}
             isNew={false}
-            onSubmit={onSubmitForm}
+            onSubmit={onSubmitUpdateForm}
             values={rigging}
           />
         </Box>

@@ -1,22 +1,14 @@
-import React, { useState } from 'react';
-import {
-  Box,
-  ListItemIcon,
-  ListItem,
-  ListItemText,
-  Typography,
-  ButtonGroup,
-  Button,
-  Tooltip
-} from '@mui/material';
+import React, { useState, useEffect } from 'react';
+import { Box, ListItem, ListItemText } from '@mui/material';
 import { useDispatch } from 'react-redux';
-import EditIcon from '@mui/icons-material/Edit';
-
 import { styled } from '@mui/material/styles';
-import { useIntl } from 'react-intl';
+import { updateLocation } from '../../../../actions/Location/UpdateLocation';
+import { deleteLocation } from '../../../../actions/Location/DeleteLocation';
+import { restoreLocation } from '../../../../actions/Location/RestoreLocation';
+import ActionButtons from '../ActionButtons';
+import SectionTitle from '../SectionTitle';
 import { locationType } from '../Provider';
 import CreateLocationForm from '../../Form/LocationForm/index';
-import { updateLocation } from '../../../../actions/Location/UpdateLocation';
 import { usePermissions } from '../../../../hooks';
 import Contribution from '../../../common/Contribution/Contribution';
 import { SnapshotButton } from '../Snapshots/UtilityFunction';
@@ -28,9 +20,13 @@ const ListItemStyled = styled(ListItem)`
 const Location = ({ location }) => {
   const dispatch = useDispatch();
   const permissions = usePermissions();
-  const { id, title, body, author, reviewer, creationDate, reviewedDate } =
-    location;
-  const [isFormVisible, setIsFormVisible] = useState(false);
+  const [isUpdateFormVisible, setIsUpdateFormVisible] = useState(false);
+  const [wantedDeletedState, setWantedDeletedState] = useState(false);
+
+  useEffect(() => {
+    setWantedDeletedState(location.isDeleted);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const onSubmitForm = data => {
     dispatch(
@@ -41,72 +37,68 @@ const Location = ({ location }) => {
         language: data.language.id
       })
     );
-    setIsFormVisible(false);
+    setIsUpdateFormVisible(false);
   };
-  const { formatMessage } = useIntl();
+
+  const onDeletePress = isPermanent => {
+    setWantedDeletedState(true);
+    dispatch(deleteLocation({ id: location.id, isPermanent }));
+  };
+  const onRestorePress = () => {
+    setWantedDeletedState(false);
+    dispatch(restoreLocation({ id: location.id }));
+  };
+
+  const isActionLoading = wantedDeletedState !== location.isDeleted;
+
   return (
     <ListItemStyled disableGutters alignItems="flex-start">
       <Box style={{ alignSelf: 'flex-end' }}>
-        {!isFormVisible && (
-          <ListItemIcon style={{ marginTop: 0 }}>
-            <ButtonGroup color="primary">
-              <Tooltip
-                title={formatMessage({
-                  id: 'Edit this location'
-                })}>
-                <Button
-                  disabled={!permissions.isAuth}
-                  onClick={() => setIsFormVisible(!isFormVisible)}
-                  color="primary"
-                  aria-label="edit">
-                  <EditIcon />
-                </Button>
-              </Tooltip>
-              <SnapshotButton id={id} type="locations" content={location} />
-            </ButtonGroup>
-          </ListItemIcon>
-        )}
-      </Box>
-      {isFormVisible ? (
-        <>
-          <Box style={{ alignSelf: 'flex-end' }}>
-            {permissions.isAuth && (
-              <ListItemIcon style={{ marginTop: 0 }}>
-                <Button
-                  variant="outlined"
-                  color="primary"
-                  onClick={() => setIsFormVisible(!isFormVisible)}
-                  aria-label="cancel">
-                  {formatMessage({ id: `Cancel` })}
-                </Button>
-              </ListItemIcon>
-            )}
-          </Box>
-          <Box width="100%">
-            <CreateLocationForm
-              closeForm={() => setIsFormVisible(false)}
-              isNewLocation={false}
-              onSubmit={onSubmitForm}
-              values={location}
+        <ActionButtons
+          isLoading={isActionLoading}
+          isUpdating={isUpdateFormVisible}
+          setIsUpdating={setIsUpdateFormVisible}
+          isDeleted={location.isDeleted}
+          canEdit={permissions.isAuth}
+          canDelete={permissions.isModerator}
+          snapshotEl={
+            <SnapshotButton
+              id={location.id}
+              type="locations"
+              content={location}
             />
-          </Box>
-        </>
+          }
+          onDeletePress={onDeletePress}
+          onRestorePress={onRestorePress}
+        />
+      </Box>
+      {isUpdateFormVisible && permissions.isAuth ? (
+        <Box width="100%">
+          <CreateLocationForm
+            closeForm={() => setIsUpdateFormVisible(false)}
+            isNewLocation={false}
+            onSubmit={onSubmitForm}
+            values={location}
+          />
+        </Box>
       ) : (
         <ListItemText
           style={{ margin: 0 }}
           disableTypography
           primary={
-            <Typography variant="h4" style={{ marginBottom: 7 }}>
-              {title}
-            </Typography>
+            <SectionTitle
+              title={location.title}
+              isDeleted={location.isDeleted}
+            />
           }
           secondary={
             <Contribution
-              author={author}
-              reviewer={reviewer}
-              body={body}
-              creationDate={creationDate}
-              dateReviewed={reviewedDate}
+              author={location.author}
+              reviewer={location.reviewer}
+              body={location.body}
+              creationDate={location.creationDate}
+              dateReviewed={location.reviewedDate}
+              isDeleted={location.isDeleted}
             />
           }
         />

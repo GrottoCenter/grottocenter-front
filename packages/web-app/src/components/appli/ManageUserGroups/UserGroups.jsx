@@ -74,12 +74,6 @@ const UserGroups = ({
       ))}
 
       <SpacedButton
-        onClick={() => setSelectedUser(initialUser)}
-        disabled={!userGroupsHaveChanged || isLoading}>
-        {formatMessage({ id: 'Reset' })}
-      </SpacedButton>
-
-      <SpacedButton
         onClick={onSaveGroups}
         color={isLoading ? 'inherit' : 'primary'}
         disabled={!userGroupsHaveChanged || isLoading}>
@@ -88,6 +82,13 @@ const UserGroups = ({
         ) : (
           formatMessage({ id: 'Save' })
         )}
+      </SpacedButton>
+
+      <SpacedButton
+        variant="outlined"
+        onClick={() => setSelectedUser(initialUser)}
+        disabled={!userGroupsHaveChanged || isLoading}>
+        {formatMessage({ id: 'Reset' })}
       </SpacedButton>
     </>
   );

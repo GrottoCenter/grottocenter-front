@@ -6,16 +6,16 @@ export const UPDATE_LOCATION = 'UPDATE_LOCATION';
 export const UPDATE_LOCATION_SUCCESS = 'UPDATE_LOCATION_SUCCESS';
 export const UPDATE_LOCATION_FAILURE = 'UPDATE_LOCATION_FAILURE';
 
-export const updateLocationAction = () => ({
+const updateLocationAction = () => ({
   type: UPDATE_LOCATION
 });
 
-export const updateLocationSuccess = location => ({
+const updateLocationSuccess = location => ({
   type: UPDATE_LOCATION_SUCCESS,
   location
 });
 
-export const updateLocationFailure = error => ({
+const updateLocationFailure = error => ({
   type: UPDATE_LOCATION_FAILURE,
   error
 });

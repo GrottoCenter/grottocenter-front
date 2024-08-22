@@ -26,7 +26,9 @@ const Title = styled('div')`
   justify-content: space-between;
 `;
 
-const CardHeader = styled(MuiCardHeader)`
+const CardHeader = styled(MuiCardHeader, {
+  shouldForwardProp: prop => prop[0] !== '$'
+})`
   ${({ $dense }) => $dense && `padding-bottom: 0px`}
 `;
 
@@ -49,7 +51,7 @@ const ScrollableContent = ({
 }) => (
   <Card>
     <CardHeader
-      $dense={dense}
+      $dense={dense ? 1 : 0}
       title={
         <Title>
           <Typography variant="h2" color="secondary">

@@ -1,21 +1,14 @@
-import {
-  ListItem,
-  Box,
-  ListItemText,
-  ListItemIcon,
-  Typography,
-  ButtonGroup,
-  Tooltip,
-  Button
-} from '@mui/material';
-import React, { useState } from 'react';
+import { ListItem, Box, ListItemText, ListItemIcon } from '@mui/material';
+import React, { useState, useEffect } from 'react';
 import { styled } from '@mui/material/styles';
-import EditIcon from '@mui/icons-material/Edit';
 import { useDispatch } from 'react-redux';
-import { isEmpty, pathOr } from 'ramda';
-import { useIntl } from 'react-intl';
+import { isEmpty } from 'ramda';
 import { usePermissions, useUserProperties } from '../../../../hooks';
 import { updateComment } from '../../../../actions/Comment/UpdateComment';
+import { deleteComment } from '../../../../actions/Comment/DeleteComment';
+import { restoreComment } from '../../../../actions/Comment/RestoreComment';
+import ActionButtons from '../ActionButtons';
+import SectionTitle from '../SectionTitle';
 import CreateCommentForm from '../../Form/CommentForm/index';
 import { commentType } from '../Provider';
 import Ratings from '../Ratings';
@@ -47,24 +40,18 @@ const DurationContainer = styled('div')`
   justify-content: flex-start;
   gap: 20px;
 `;
+
 const Comment = ({ comment }) => {
   const dispatch = useDispatch();
   const permissions = usePermissions();
-  const {
-    id,
-    title,
-    body,
-    author,
-    reviewer,
-    interest,
-    progression,
-    access,
-    creationDate,
-    dateReviewed,
-    eTTrail,
-    eTUnderground
-  } = comment;
-  const [isFormVisible, setIsFormVisible] = useState(false);
+  const [isUpdateFormVisible, setIsUpdateFormVisible] = useState(false);
+  const [wantedDeletedState, setWantedDeletedState] = useState(false);
+
+  useEffect(() => {
+    setWantedDeletedState(comment.isDeleted);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const onSubmitForm = data => {
     dispatch(
       updateComment({
@@ -79,98 +66,94 @@ const Comment = ({ comment }) => {
         language: data.language.id
       })
     );
-    setIsFormVisible(false);
+    setIsUpdateFormVisible(false);
   };
-  const userId = pathOr(null, ['id'], useUserProperties());
+
+  const onDeletePress = isPermanent => {
+    setWantedDeletedState(true);
+    dispatch(deleteComment({ id: comment.id, isPermanent }));
+  };
+  const onRestorePress = () => {
+    setWantedDeletedState(false);
+    dispatch(restoreComment({ id: comment.id }));
+  };
+
+  const isActionLoading = wantedDeletedState !== comment.isDeleted;
+
+  const userId = useUserProperties()?.id ?? null;
   const canEdit =
-    (author?.id && userId?.toString() === author?.id.toString()) ||
+    (comment.author?.id &&
+      userId?.toString() === comment.author?.id.toString()) ||
     permissions.isAdmin ||
     permissions.isModerator;
-  const { formatMessage } = useIntl();
+
   return (
     <ListItemStyled disableGutters alignItems="flex-start">
       <Box style={{ alignSelf: 'flex-end' }}>
-        {!isFormVisible && (
-          <ListItemIcon style={{ marginTop: 0 }}>
-            <ButtonGroup color="primary">
-              <Tooltip
-                title={formatMessage({
-                  id: 'Edit this comment'
-                })}>
-                <Button
-                  disabled={!permissions.isAuth || !canEdit}
-                  onClick={() => setIsFormVisible(!isFormVisible)}
-                  color="primary"
-                  aria-label="edit">
-                  <EditIcon />
-                </Button>
-              </Tooltip>
-              <SnapshotButton id={id} type="comments" content={comment} />
-            </ButtonGroup>
-          </ListItemIcon>
-        )}
+        <ActionButtons
+          isLoading={isActionLoading}
+          isUpdating={isUpdateFormVisible}
+          setIsUpdating={setIsUpdateFormVisible}
+          isDeleted={comment.isDeleted}
+          canEdit={permissions.isAuth && canEdit}
+          canDelete={permissions.isModerator}
+          snapshotEl={
+            <SnapshotButton id={comment.id} type="comments" content={comment} />
+          }
+          onDeletePress={onDeletePress}
+          onRestorePress={onRestorePress}
+        />
       </Box>
-      {isFormVisible && permissions.isAuth ? (
-        <>
-          <Box style={{ alignSelf: 'flex-end' }}>
-            <ListItemIcon style={{ marginTop: 0 }}>
-              <Button
-                variant="outlined"
-                color="primary"
-                onClick={() => setIsFormVisible(!isFormVisible)}
-                aria-label="cancel">
-                {formatMessage({ id: `Cancel` })}
-              </Button>
-            </ListItemIcon>
-          </Box>
-          <Box width="100%">
-            <CreateCommentForm
-              closeForm={() => setIsFormVisible(false)}
-              isNewComment={false}
-              onSubmit={onSubmitForm}
-              values={comment}
-            />
-          </Box>
-        </>
+      {isUpdateFormVisible && permissions.isAuth ? (
+        <Box width="100%">
+          <CreateCommentForm
+            closeForm={() => setIsUpdateFormVisible(false)}
+            isNewComment={false}
+            onSubmit={onSubmitForm}
+            values={comment}
+          />
+        </Box>
       ) : (
         <>
           <StyledListItemText
             style={{ margin: 0 }}
             disableTypography
             primary={
-              <Typography variant="h4" style={{ marginBottom: 7 }}>
-                {title}
-              </Typography>
+              <SectionTitle
+                title={comment.title}
+                isDeleted={comment.isDeleted}
+              />
             }
             secondary={
               <Contribution
-                author={author}
-                body={body}
-                creationDate={creationDate}
-                reviewer={reviewer}
-                dateReviewed={dateReviewed}
+                author={comment.author}
+                body={comment.body}
+                creationDate={comment.creationDate}
+                reviewer={comment.reviewer}
+                dateReviewed={comment.dateReviewed}
+                isDeleted={comment.isDeleted}
               />
             }
           />
           <StyledListItemIcon>
             <StyledRatings
-              interest={interest}
-              progression={progression}
-              access={access}
+              interest={comment.interest}
+              progression={comment.progression}
+              access={comment.access}
               size="small"
             />
             <DurationContainer>
-              {!!eTTrail && !isEmpty(eTTrail) && (
+              {!!comment.eTTrail && !isEmpty(comment.eTTrail) && (
                 <Duration
                   image="/images/time-to-go.svg"
-                  durationStr={eTTrail}
+                  durationStr={comment.eTTrail}
                   title="Time to go"
                 />
               )}
-              {!!eTUnderground && !isEmpty(eTUnderground) && (
+              {!!comment.eTUnderground && !isEmpty(comment.eTUnderground) && (
                 <Duration
                   image="/images/underground_time.svg"
-                  durationStr={eTUnderground}
+                  durationStr={comment.eTUnderground}
                   title="Underground time"
                 />
               )}

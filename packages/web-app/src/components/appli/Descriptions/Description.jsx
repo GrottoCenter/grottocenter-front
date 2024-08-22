@@ -1,23 +1,15 @@
-import React, { useState } from 'react';
-import {
-  Box,
-  ListItemIcon,
-  ListItem,
-  ListItemText,
-  Typography,
-  ButtonGroup,
-  Button,
-  Tooltip
-} from '@mui/material';
+import React, { useState, useEffect } from 'react';
+import { Box, ListItem, ListItemText } from '@mui/material';
 import { useDispatch } from 'react-redux';
-import EditIcon from '@mui/icons-material/Edit';
 import { styled } from '@mui/material/styles';
-import { useIntl } from 'react-intl';
 import { SnapshotButton } from '../Entry/Snapshots/UtilityFunction';
-
 import { descriptionType } from './propTypes';
 import CreateDescriptionForm from '../Form/DescriptionForm/index';
 import { updateDescription } from '../../../actions/Description/UpdateDescription';
+import { deleteDescription } from '../../../actions/Description/DeleteDescription';
+import { restoreDescription } from '../../../actions/Description/RestoreDescription';
+import ActionButtons from '../Entry/ActionButtons';
+import SectionTitle from '../Entry/SectionTitle';
 import { usePermissions } from '../../../hooks';
 import Contribution from '../../common/Contribution/Contribution';
 
@@ -28,9 +20,13 @@ const ListItemStyled = styled(ListItem)`
 const Description = ({ description }) => {
   const dispatch = useDispatch();
   const permissions = usePermissions();
-  const { id, author, reviewer, body, creationDate, reviewedDate, title } =
-    description;
-  const [isFormVisible, setIsFormVisible] = useState(false);
+  const [isUpdateFormVisible, setIsUpdateFormVisible] = useState(false);
+  const [wantedDeletedState, setWantedDeletedState] = useState(false);
+
+  useEffect(() => {
+    setWantedDeletedState(description.isDeleted);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const onSubmitForm = data => {
     dispatch(
@@ -41,74 +37,68 @@ const Description = ({ description }) => {
         language: data.language.id
       })
     );
-    setIsFormVisible(false);
+    setIsUpdateFormVisible(false);
   };
-  const { formatMessage } = useIntl();
+
+  const onDeletePress = isPermanent => {
+    setWantedDeletedState(true);
+    dispatch(deleteDescription({ id: description.id, isPermanent }));
+  };
+  const onRestorePress = () => {
+    setWantedDeletedState(false);
+    dispatch(restoreDescription({ id: description.id }));
+  };
+
+  const isActionLoading = wantedDeletedState !== description.isDeleted;
+
   return (
     <ListItemStyled disableGutters alignItems="flex-start">
       <Box style={{ alignSelf: 'flex-end' }}>
-        {!isFormVisible && (
-          <ListItemIcon style={{ marginTop: 0 }}>
-            <ButtonGroup color="primary">
-              <Tooltip
-                title={formatMessage({
-                  id: 'Edit this description'
-                })}>
-                <Button
-                  disabled={!permissions.isAuth}
-                  onClick={() => setIsFormVisible(!isFormVisible)}
-                  color="primary"
-                  aria-label="edit">
-                  <EditIcon />
-                </Button>
-              </Tooltip>
-              <SnapshotButton
-                id={id}
-                type="descriptions"
-                content={description}
-              />
-            </ButtonGroup>
-          </ListItemIcon>
-        )}
-      </Box>
-      {isFormVisible && permissions.isAuth ? (
-        <>
-          <Box style={{ alignSelf: 'flex-end' }}>
-            <ListItemIcon style={{ marginTop: 0 }}>
-              <Button
-                variant="outlined"
-                color="primary"
-                onClick={() => setIsFormVisible(!isFormVisible)}
-                aria-label="cancel">
-                {formatMessage({ id: `Cancel` })}
-              </Button>
-            </ListItemIcon>
-          </Box>
-          <Box width="100%">
-            <CreateDescriptionForm
-              closeForm={() => setIsFormVisible(false)}
-              isNewDescription={false}
-              onSubmit={onSubmitForm}
-              values={description}
+        <ActionButtons
+          isLoading={isActionLoading}
+          isUpdating={isUpdateFormVisible}
+          setIsUpdating={setIsUpdateFormVisible}
+          isDeleted={description.isDeleted}
+          canEdit={permissions.isAuth}
+          canDelete={permissions.isModerator}
+          snapshotEl={
+            <SnapshotButton
+              id={description.id}
+              type="descriptions"
+              content={description}
             />
-          </Box>
-        </>
+          }
+          onDeletePress={onDeletePress}
+          onRestorePress={onRestorePress}
+        />
+      </Box>
+      {isUpdateFormVisible && permissions.isAuth ? (
+        <Box width="100%">
+          <CreateDescriptionForm
+            closeForm={() => setIsUpdateFormVisible(false)}
+            isNewDescription={false}
+            onSubmit={onSubmitForm}
+            values={description}
+          />
+        </Box>
       ) : (
         <ListItemText
           style={{ margin: 0 }}
           disableTypography
           primary={
-            <Typography variant="h4" style={{ marginBottom: 7 }}>
-              {title}
-            </Typography>
+            <SectionTitle
+              title={description.title}
+              isDeleted={description.isDeleted}
+            />
           }
           secondary={
             <Contribution
-              body={body}
-              author={author}
-              reviewer={reviewer}
-              creationDate={creationDate}
-              dateReviewed={reviewedDate}
+              body={description.body}
+              author={description.author}
+              reviewer={description.reviewer}
+              creationDate={description.creationDate}
+              dateReviewed={description.reviewedDate}
+              isDeleted={description.isDeleted}
             />
           }
         />

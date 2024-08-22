@@ -107,9 +107,6 @@ const CreateDescriptionForm = ({
           {formatMessage({ id: 'Cancel' })}
         </SpacedButton>
       )}
-      <SpacedButton onClick={resetToDefault}>
-        {formatMessage({ id: 'Reset' })}
-      </SpacedButton>
       <SpacedButton
         color="primary"
         type="submit"
@@ -118,6 +115,9 @@ const CreateDescriptionForm = ({
         {isNewDescription
           ? formatMessage({ id: 'Create' })
           : formatMessage({ id: 'Update' })}
+      </SpacedButton>
+      <SpacedButton variant="outlined" onClick={resetToDefault}>
+        {formatMessage({ id: 'Reset' })}
       </SpacedButton>
     </Box>
   );

@@ -1,9 +1,5 @@
 import { useSelector } from 'react-redux';
 
-import { pathOr } from 'ramda';
-
-// =========================================
-
 const isTokenExpired = authState => {
   try {
     if (authState.authTokenDecoded.exp < Date.now() / 1000) {
@@ -16,7 +12,7 @@ const isTokenExpired = authState => {
 };
 
 const hasRole = (authState, roleName) => {
-  const groups = pathOr(null, ['authTokenDecoded', 'groups'], authState);
+  const groups = authState?.authTokenDecoded?.groups ?? null;
   if (groups === null) return false;
   return groups.some(g => g.name === roleName);
 };

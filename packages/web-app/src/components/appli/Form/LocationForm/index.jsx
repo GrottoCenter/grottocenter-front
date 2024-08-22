@@ -100,9 +100,6 @@ const CreateLocationForm = ({ closeForm, onSubmit, values, isNewLocation }) => {
           {formatMessage({ id: 'Cancel' })}
         </SpacedButton>
       )}
-      <SpacedButton onClick={resetToDefault}>
-        {formatMessage({ id: 'Reset' })}
-      </SpacedButton>
       <SpacedButton
         color="primary"
         type="submit"
@@ -111,6 +108,9 @@ const CreateLocationForm = ({ closeForm, onSubmit, values, isNewLocation }) => {
         {isNewLocation
           ? formatMessage({ id: 'Create' })
           : formatMessage({ id: 'Update' })}
+      </SpacedButton>
+      <SpacedButton variant="outlined" onClick={resetToDefault}>
+        {formatMessage({ id: 'Reset' })}
       </SpacedButton>
     </Box>
   );

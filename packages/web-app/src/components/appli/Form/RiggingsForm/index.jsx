@@ -276,9 +276,6 @@ const CreateRiggingsForm = ({ closeForm, onSubmit, values, isNew }) => {
           {formatMessage({ id: 'Cancel' })}
         </SpacedButton>
       )}
-      <SpacedButton onClick={resetToDefault}>
-        {formatMessage({ id: 'Reset' })}
-      </SpacedButton>
       <SpacedButton
         color="primary"
         type="submit"
@@ -287,6 +284,9 @@ const CreateRiggingsForm = ({ closeForm, onSubmit, values, isNew }) => {
         {isNew
           ? formatMessage({ id: 'Create' })
           : formatMessage({ id: 'Update' })}
+      </SpacedButton>
+      <SpacedButton variant="outlined" onClick={resetToDefault}>
+        {formatMessage({ id: 'Reset' })}
       </SpacedButton>
     </Box>
   );

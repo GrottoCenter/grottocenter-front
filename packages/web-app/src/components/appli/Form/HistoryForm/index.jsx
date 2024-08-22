@@ -57,7 +57,6 @@ const CreateHistoryForm = ({ closeForm, onSubmit, values, isNewHistory }) => {
           />
         )}
       />
-
       <Controller
         control={control}
         name="language"
@@ -75,15 +74,11 @@ const CreateHistoryForm = ({ closeForm, onSubmit, values, isNewHistory }) => {
           />
         )}
       />
-
       {closeForm && (
         <SpacedButton onClick={closeForm}>
           {formatMessage({ id: 'Cancel' })}
         </SpacedButton>
       )}
-      <SpacedButton onClick={resetToDefault}>
-        {formatMessage({ id: 'Reset' })}
-      </SpacedButton>
       <SpacedButton
         color="primary"
         type="submit"
@@ -92,6 +87,9 @@ const CreateHistoryForm = ({ closeForm, onSubmit, values, isNewHistory }) => {
         {isNewHistory
           ? formatMessage({ id: 'Create' })
           : formatMessage({ id: 'Update' })}
+      </SpacedButton>
+      <SpacedButton variant="outlined" onClick={resetToDefault}>
+        {formatMessage({ id: 'Reset' })}
       </SpacedButton>
     </Box>
   );

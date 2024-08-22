@@ -39,14 +39,17 @@ const FormActions = ({ apiError, entrance, loading, newCave, onReset }) => {
 
         {!loading && (
           <>
-            <SpacedButton disabled={!newCave} onClick={onReset}>
-              {formatMessage({ id: 'Reset' })}
-            </SpacedButton>
             <SpacedButton
               disabled={!newCave || isSameCave}
               color="primary"
               type="submit">
               {formatMessage({ id: 'Validate' })}
+            </SpacedButton>
+            <SpacedButton
+              variant="outlined"
+              disabled={!newCave}
+              onClick={onReset}>
+              {formatMessage({ id: 'Reset' })}
             </SpacedButton>
           </>
         )}

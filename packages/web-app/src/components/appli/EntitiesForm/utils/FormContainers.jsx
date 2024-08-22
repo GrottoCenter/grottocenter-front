@@ -54,11 +54,6 @@ export const FormActionRow = ({
   const { formatMessage } = useIntl();
   return (
     <Box display="flex">
-      {isResetAllowed && (
-        <Button disabled={!isDirty} onClick={onReset}>
-          {formatMessage({ id: 'Reset' })}
-        </Button>
-      )}
       <ActionButton
         label={formatMessage({
           id: isNew ? 'Create' : 'Update'
@@ -69,6 +64,11 @@ export const FormActionRow = ({
         style={{ margin: '8px', marginLeft: 'auto' }}
         type="submit"
       />
+      {isResetAllowed && (
+        <Button variant="outlined" disabled={!isDirty} onClick={onReset}>
+          {formatMessage({ id: 'Reset' })}
+        </Button>
+      )}
     </Box>
   );
 };

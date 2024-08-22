@@ -7,16 +7,16 @@ export const UPDATE_COMMENT = 'UPDATE_COMMENT';
 export const UPDATE_COMMENT_SUCCESS = 'UPDATE_COMMENT_SUCCESS';
 export const UPDATE_COMMENT_FAILURE = 'UPDATE_COMMENT_FAILURE';
 
-export const updateCommentAction = () => ({
+const updateCommentAction = () => ({
   type: UPDATE_COMMENT
 });
 
-export const updateCommentSuccess = comment => ({
+const updateCommentSuccess = comment => ({
   type: UPDATE_COMMENT_SUCCESS,
   comment
 });
 
-export const updateCommentFailure = error => ({
+const updateCommentFailure = error => ({
   type: UPDATE_COMMENT_FAILURE,
   error
 });
