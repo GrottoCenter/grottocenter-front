@@ -575,7 +575,7 @@
   "Entrance name language": "Език за името на входа",
   "Entrance properties": "свойства на Входа",
   "Entrance successfully created!": "Входът е създаден успешно!",
-  "Entrance successfully moved from {initialCave} to {finalCave}!": "Вход успешно преместен от {initialCave} в {finalCave}!",
+  "Entrance successfully moved from {initialCave} to {finalCave}!": "Вход успешно преместен от {intialCave} в {finalCave}!",
   "Entrance successfully updated!": "Входът е актуализиран успешно!",
   "entrances": "входове",
   "Entrances": "Входове",
