@@ -153,6 +153,15 @@ export const getStatisticsMassifUrl = massifId =>
   `${API_BASE_PATH}/massifs/${massifId}/statistics`;
 export const getMassifEntrancesUrl = massifId =>
   `${API_BASE_PATH}/entrances/with-quality/massifs/${massifId}`;
+export const deleteMassifUrl = (massifId, { entityId, isPermanent = false }) =>
+  `${API_BASE_PATH}/massifs/${massifId}?${[
+    isPermanent ? 'isPermanent=1' : '',
+    entityId ? `entityId=${entityId}` : ''
+  ]
+    .filter(e => e)
+    .join('&')}`;
+export const restoreMassifUrl = massifId =>
+  `${API_BASE_PATH}/massifs/${massifId}/restore`;
 
 // ===== Notifications urls
 export const countUnreadNotificationsUrl = `${API_URL}/api/${apiVersion}/notifications/unread/count`;
@@ -165,6 +174,18 @@ export const getOrganizationUrl = `${API_BASE_PATH}/organizations/`;
 export const postOrganizationUrl = `${API_BASE_PATH}/organizations`;
 export const putOrganizationUrl = organizationId =>
   `${API_BASE_PATH}/organizations/${organizationId}`;
+export const deleteOrganizationUrl = (
+  organizationId,
+  { entityId, isPermanent = false }
+) =>
+  `${API_BASE_PATH}/organizations/${organizationId}?${[
+    isPermanent ? 'isPermanent=1' : '',
+    entityId ? `entityId=${entityId}` : ''
+  ]
+    .filter(e => e)
+    .join('&')}`;
+export const restoreOrganizationUrl = organizationId =>
+  `${API_BASE_PATH}/organizations/${organizationId}/restore`;
 
 // ===== Persons / cavers urls
 export const getAdminsUrl = `${API_BASE_PATH}/cavers/admins`;

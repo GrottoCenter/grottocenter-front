@@ -1,49 +1,37 @@
 import fetch from 'isomorphic-fetch';
 import { putMassifUrl } from '../../conf/apiRoutes';
-import makeErrorMessage from '../../helpers/makeErrorMessage';
+import { checkAndGetStatus } from '../utils';
 
 export const UPDATE_MASSIF = 'UPDATE_MASSIF';
 export const UPDATE_MASSIF_SUCCESS = 'UPDATE_MASSIF_SUCCESS';
 export const UPDATE_MASSIF_FAILURE = 'UPDATE_MASSIF_FAILURE';
 
-export const updateMassifAction = () => ({
+const updateMassifAction = () => ({
   type: UPDATE_MASSIF
 });
-export const updateMassifSuccess = massif => ({
+const updateMassifSuccess = massif => ({
   massif,
   type: UPDATE_MASSIF_SUCCESS
 });
-export const updateMassifFailure = (error, httpCode) => ({
+const updateMassifFailure = error => ({
   type: UPDATE_MASSIF_FAILURE,
-  error,
-  httpCode
+  error
 });
 
-export const updateMassif = data => (dispatch, getState) => {
+export const updateMassif = body => (dispatch, getState) => {
   dispatch(updateMassifAction());
 
   const requestOptions = {
     method: 'PUT',
-    body: JSON.stringify(data),
+    body: JSON.stringify(body),
     headers: getState().login.authorizationHeader
   };
 
-  return fetch(putMassifUrl(data.id), requestOptions)
-    .then(response => {
-      if (response.status >= 400) {
-        throw new Error(response.status);
-      }
-      return response.json();
+  return fetch(putMassifUrl(body.id), requestOptions)
+    .then(checkAndGetStatus)
+    .then(response => response.json())
+    .then(data => {
+      dispatch(updateMassifSuccess(data));
     })
-    .then(res => {
-      dispatch(updateMassifSuccess(res));
-    })
-    .catch(error =>
-      dispatch(
-        updateMassifFailure(
-          makeErrorMessage(error.message, `Bad request`),
-          error.message
-        )
-      )
-    );
+    .catch(error => dispatch(updateMassifFailure(error)));
 };

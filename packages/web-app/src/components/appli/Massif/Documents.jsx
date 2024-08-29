@@ -55,7 +55,7 @@ const Documents = ({ documents, massifId }) => {
                   : formatMessage({ id: 'Assign an existing document' })
               }>
               <Button
-                color={isDocumentSearchVisible ? '' : 'secondary'}
+                color={isDocumentSearchVisible ? undefined : 'secondary'}
                 variant="outlined"
                 onClick={() =>
                   setIsDocumentSearchVisible(!isDocumentSearchVisible)
@@ -107,7 +107,7 @@ const Documents = ({ documents, massifId }) => {
 
 Documents.propTypes = {
   documents: DocumentsList.propTypes.documents,
-  massifId: PropTypes.number.isRequired
+  massifId: PropTypes.string.isRequired
 };
 
 export default Documents;

@@ -12,7 +12,8 @@ import {
   getLocations,
   getRiggings
 } from './transformers';
-import Deleted, {
+import {
+  Deleted,
   DELETED_ENTITIES
 } from '../../components/common/card/Deleted';
 
@@ -76,16 +77,7 @@ const EntryPage = () => {
   const locations = getLocations(data.locations ?? []);
   const riggings = getRiggings(data.riggings ?? []);
   return data.isDeleted ? (
-    <Deleted
-      redirectTo={data.redirectTo}
-      entity={DELETED_ENTITIES.entrance}
-      location={details.country}
-      name={data.name}
-      creationDate={data.dateInscription}
-      dateReviewed={data.dateReviewed}
-      author={details.author}
-      reviewer={details.reviewer}
-    />
+    <Deleted entityType={DELETED_ENTITIES.entrance} entity={data} />
   ) : (
     <Entry
       loading={loading || !isNil(error)}

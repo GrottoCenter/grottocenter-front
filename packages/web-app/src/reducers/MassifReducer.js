@@ -4,6 +4,11 @@ import {
   FETCH_MASSIF_FAILURE,
   FETCH_MASSIF_SUCCESS
 } from '../actions/Massif/GetMassif';
+import {
+  DELETE_MASSIF_SUCCESS,
+  DELETE_MASSIF_PERMANENT_SUCCESS
+} from '../actions/Massif/DeleteMassif';
+import { RESTORE_MASSIF_SUCCESS } from '../actions/Massif/RestoreMassif';
 import { LINK_DOCUMENT_TO_MASSIF_SUCCESS } from '../actions/LinkDocumentToMassif';
 import { UNLINK_DOCUMENT_TO_MASSIF_SUCCESS } from '../actions/UnlinkDocumentToMassif';
 
@@ -18,6 +23,9 @@ const reducer = (state = initialState, action) => {
     case FETCH_MASSIF:
       return { ...state, massif: action.massif, isFetching: true };
     case FETCH_MASSIF_SUCCESS:
+    case DELETE_MASSIF_SUCCESS:
+    case DELETE_MASSIF_PERMANENT_SUCCESS:
+    case RESTORE_MASSIF_SUCCESS:
       return { ...state, massif: action.massif, isFetching: false };
     case FETCH_MASSIF_FAILURE:
       return { ...state, error: action.error, isFetching: false };

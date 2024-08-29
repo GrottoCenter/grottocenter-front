@@ -1,72 +1,117 @@
-import React from 'react';
-import { isNil, isEmpty } from 'ramda';
+import React, { useState, useEffect } from 'react';
+
+import PropTypes from 'prop-types';
+import { useParams, useHistory } from 'react-router-dom';
+
+import { useDispatch } from 'react-redux';
 import Skeleton from '@mui/material/Skeleton';
 import { useIntl } from 'react-intl';
 import { Box } from '@mui/material';
 
+import { usePermissions, useSubscriptions } from '../../../hooks';
+import { subscribeToMassif } from '../../../actions/Subscriptions/SubscribeToMassif';
+import { unsubscribeFromMassif } from '../../../actions/Subscriptions/UnsubscribeFromMassif';
+import { deleteMassif } from '../../../actions/Massif/DeleteMassif';
+import { restoreMassif } from '../../../actions/Massif/RestoreMassif';
 import Layout from '../../common/Layouts/Fixed/FixedContent';
 import CavesList from '../../common/cave/CavesList';
 import Alert from '../../common/Alert';
-import MassifPropTypes from './propTypes';
 import MapMassif from './MapMassif';
 import Documents from './Documents';
 import Descriptions from './Descriptions';
-import { useSubscriptions } from '../../../hooks';
 import StatisticsDataDashboard from '../StatisticsDataDashboard';
+import {
+  DeletedCard,
+  DeleteConfirmationDialog,
+  DELETED_ENTITIES
+} from '../../common/card/Deleted';
 
-const Massif = ({
-  massifId,
-  isFetching,
-  error,
-  descriptions,
-  details,
-  documents,
-  entrances,
-  networks,
-  canEdit,
-  onEdit,
-  canSubscribe,
-  onSubscribe,
-  onUnsubscribe
-}) => {
+const Massif = ({ isLoading, error, massif }) => {
+  const dispatch = useDispatch();
+  const { massifId } = useParams();
+  const history = useHistory();
+  const permissions = usePermissions();
   const { formatMessage } = useIntl();
-  const { isSubscribed: isSubscribedMethod, isMassifLoading: isLoading } =
-    useSubscriptions();
-  const isSubscribed = details ? isSubscribedMethod(details.id) : false;
+  const [isDeleteConfirmationOpen, setIsDeleteConfirmationOpen] =
+    useState(false);
+  const [isDeleteConfirmationPermanent, setIsDeleteConfirmationPermanent] =
+    useState(false);
+  const [wantedDeletedState, setWantedDeletedState] = useState(false);
 
-  const { geogPolygon, name, names } = details;
+  useEffect(() => {
+    if (massif) setWantedDeletedState(massif.isDeleted);
+  }, [massif]);
+
+  let onEdit = null;
+  let onDelete = null;
+  if (permissions.isAuth && !massif?.isDeleted) {
+    onEdit = () => {
+      history.push(`/ui/massifs/${massifId}/edit`);
+    };
+    if (permissions.isModerator) {
+      onDelete = () => {
+        setIsDeleteConfirmationPermanent(false);
+        setIsDeleteConfirmationOpen(true);
+      };
+    }
+  }
+
+  const onDeletePress = (entityId, isPermanent) => {
+    setWantedDeletedState(true);
+    dispatch(deleteMassif({ id: massifId, entityId, isPermanent }));
+    if (isPermanent) history.replace('/');
+  };
+  const onRestorePress = () => {
+    setWantedDeletedState(false);
+    dispatch(restoreMassif({ id: massifId }));
+  };
+
+  const {
+    isSubscribed: isSubscribedMethod,
+    isMassifLoading: isSubscribeLoading
+  } = useSubscriptions();
+  const isSubscribed = massif ? isSubscribedMethod(massif.id) : false;
+
+  const handleChangeSubscribe = () => {
+    if (!isSubscribed) {
+      dispatch(subscribeToMassif(massifId));
+    } else {
+      dispatch(unsubscribeFromMassif(massifId));
+    }
+  };
+
+  const isActionLoading = wantedDeletedState !== massif?.isDeleted;
+
   let title = '';
-  if (name) {
-    title = name;
+  if (massif?.name) {
+    title = massif?.name;
   } else if (!error) {
     title = formatMessage({ id: 'Loading massif data...' });
   }
 
-  const handleChangeSubscribe = () => {
-    if (!isSubscribed) {
-      onSubscribe();
-    } else {
-      onUnsubscribe();
-    }
-  };
-
   return (
     <Layout
-      onEdit={canEdit ? onEdit : undefined}
+      onEdit={onEdit}
+      onDelete={onDelete}
       isSubscribed={isSubscribed}
-      isSubscribeLoading={isLoading}
-      onChangeSubscribe={canSubscribe ? handleChangeSubscribe : undefined}
-      title={isFetching ? <Skeleton /> : title}
+      isSubscribeLoading={isSubscribeLoading}
+      onChangeSubscribe={
+        permissions.isLeader && !massif?.isDeleted
+          ? handleChangeSubscribe
+          : undefined
+      }
+      title={isLoading ? <Skeleton /> : title}
       subheader={
-        isFetching && !error ? (
+        isLoading && !error ? (
           <Skeleton />
         ) : (
-          names && `${formatMessage({ id: 'Language' })} : ${names[0].language}`
+          massif?.names &&
+          `${formatMessage({ id: 'Language' })} : ${massif?.names[0].language}`
         )
       }
       content={
         <>
-          {isFetching && isNil(error) && (
+          {isLoading && !!error && (
             <>
               <Box style={{ display: 'flex', justifyContent: 'center' }}>
                 <Skeleton height={300} width={800} /> {/* Map Skeleton */}
@@ -84,15 +129,41 @@ const Massif = ({
               severity="error"
             />
           )}
-          {details && (
+          {massif && (
             <>
+              {massif.isDeleted && (
+                <>
+                  <DeletedCard
+                    entityType={DELETED_ENTITIES.massif}
+                    entity={massif}
+                    isLoading={isActionLoading}
+                    onRestorePress={onRestorePress}
+                    onPermanentDeletePress={() => {
+                      setIsDeleteConfirmationPermanent(true);
+                      setIsDeleteConfirmationOpen(true);
+                    }}
+                  />
+                  <hr />
+                </>
+              )}
+              <DeleteConfirmationDialog
+                entityType={DELETED_ENTITIES.massif}
+                isOpen={isDeleteConfirmationOpen}
+                isLoading={isActionLoading}
+                isPermanent={isDeleteConfirmationPermanent}
+                onClose={() => setIsDeleteConfirmationOpen(false)}
+                onConfirmation={entity => {
+                  onDeletePress(entity?.id, isDeleteConfirmationPermanent);
+                }}
+              />
+
               <Box
                 alignItems="start"
                 display="flex"
                 flexBasis="300px"
                 justifyContent="space-between">
-                {!isEmpty(descriptions) ? (
-                  <Descriptions descriptions={descriptions} />
+                {massif?.descriptions?.length > 0 ? (
+                  <Descriptions descriptions={massif.descriptions} />
                 ) : (
                   <Alert
                     severity="info"
@@ -102,19 +173,25 @@ const Massif = ({
                   />
                 )}
               </Box>
-              {geogPolygon && entrances && (
+              {massif?.geogPolygon && massif?.entrances && (
                 <>
                   <hr />
-                  <MapMassif entrances={entrances} geogPolygon={geogPolygon} />
+                  <MapMassif
+                    entrances={massif?.entrances}
+                    geogPolygon={massif?.geogPolygon}
+                  />
                 </>
               )}
               <hr />
-              <StatisticsDataDashboard massifId={massifId} />
+              <StatisticsDataDashboard massifId={parseInt(massifId, 10)} />
               <hr />
-              <Documents documents={documents} massifId={massifId} />
+              <Documents
+                documents={massif?.documents ?? []}
+                massifId={massifId}
+              />
               <hr />
               <CavesList
-                caves={networks}
+                caves={massif?.networks ?? []}
                 emptyMessageComponent={
                   <Alert
                     severity="info"
@@ -133,6 +210,29 @@ const Massif = ({
   );
 };
 
-Massif.propTypes = MassifPropTypes;
+Massif.propTypes = {
+  isLoading: PropTypes.bool.isRequired,
+  error: PropTypes.shape({}),
+  massif: PropTypes.shape({
+    isDeleted: PropTypes.bool,
+    id: PropTypes.number,
+    name: PropTypes.string,
+    names: PropTypes.arrayOf(
+      PropTypes.shape({
+        language: PropTypes.string
+      })
+    ),
+    geogPolygon: PropTypes.string,
+    descriptions: PropTypes.arrayOf(
+      PropTypes.shape({
+        title: PropTypes.string,
+        body: PropTypes.string
+      })
+    ),
+    entrances: PropTypes.arrayOf(PropTypes.shape({})),
+    networks: PropTypes.arrayOf(PropTypes.shape({})),
+    documents: PropTypes.arrayOf(PropTypes.shape({}))
+  })
+};
 
 export default Massif;

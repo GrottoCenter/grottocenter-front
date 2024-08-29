@@ -8,7 +8,8 @@ import { fetchCave } from '../../actions/Cave/GetCave';
 import { getSafeData } from './transformer';
 import { getDescriptions } from '../Entry/transformers';
 import Descriptions from '../../components/appli/Descriptions';
-import Deleted, {
+import {
+  Deleted,
   DELETED_ENTITIES
 } from '../../components/common/card/Deleted';
 
@@ -42,15 +43,7 @@ const NetworkPage = () => {
   const descriptions = getDescriptions(data.descriptions ?? []);
   const safeData = getSafeData(data);
   return data.isDeleted ? (
-    <Deleted
-      redirectTo={safeData.redirectTo}
-      entity={DELETED_ENTITIES.network}
-      name={safeData.name}
-      creationDate={safeData.creationDate}
-      dateReviewed={safeData.reviewedDate}
-      author={safeData.author}
-      reviewer={safeData.reviewer}
-    />
+    <Deleted entityType={DELETED_ENTITIES.network} entity={data} />
   ) : (
     <Network loading={loading || !isNil(error)} data={safeData}>
       <>

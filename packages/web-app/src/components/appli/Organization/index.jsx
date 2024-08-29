@@ -1,11 +1,10 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { propOr } from 'ramda';
-import Skeleton from '@mui/material/Skeleton';
+import { useDispatch } from 'react-redux';
 import { useIntl } from 'react-intl';
-
-import Layout from '../../common/Layouts/Fixed/FixedContent';
-
+import { useParams, useHistory } from 'react-router-dom';
+import Skeleton from '@mui/material/Skeleton';
+import FixedContent from '../../common/Layouts/Fixed/FixedContent';
 import BadgesSection from './BadgesSection';
 import Details from './Details';
 import RelatedCaves from './RelatedCaves';
@@ -16,10 +15,57 @@ import {
 } from './propTypes';
 import UsersList from '../../common/UsersList/UsersList';
 import Alert from '../../common/Alert';
+import { usePermissions } from '../../../hooks';
 import DocumentsList from '../../common/DocumentsList/DocumentsList';
+import {
+  DeletedCard,
+  DeleteConfirmationDialog,
+  DELETED_ENTITIES
+} from '../../common/card/Deleted';
+import { deleteOrganization } from '../../../actions/Organization/DeleteOrganization';
+import { restoreOrganization } from '../../../actions/Organization/RestoreOrganization';
 
-const Organization = ({ error, isLoading, organization, onEdit, canEdit }) => {
+const Organization = ({ error, isLoading, organization }) => {
   const { formatMessage } = useIntl();
+  const history = useHistory();
+  const permissions = usePermissions();
+  const dispatch = useDispatch();
+  const { organizationId } = useParams();
+  const [isDeleteConfirmationOpen, setIsDeleteConfirmationOpen] =
+    useState(false);
+  const [isDeleteConfirmationPermanent, setIsDeleteConfirmationPermanent] =
+    useState(false);
+  const [wantedDeletedState, setWantedDeletedState] = useState(false);
+
+  useEffect(() => {
+    if (organization) setWantedDeletedState(organization.isDeleted);
+  }, [organization]);
+
+  let onEdit = null;
+  let onDelete = null;
+  if (permissions.isAuth && !organization?.isDeleted) {
+    onEdit = () => {
+      history.push(`/ui/organizations/${organizationId}/edit`);
+    };
+    if (permissions.isModerator) {
+      onDelete = () => {
+        setIsDeleteConfirmationPermanent(false);
+        setIsDeleteConfirmationOpen(true);
+      };
+    }
+  }
+
+  const onDeletePress = (entityId, isPermanent) => {
+    setWantedDeletedState(true);
+    dispatch(deleteOrganization({ id: organizationId, entityId, isPermanent }));
+    if (isPermanent) history.replace('/');
+  };
+  const onRestorePress = () => {
+    setWantedDeletedState(false);
+    dispatch(restoreOrganization({ id: organizationId }));
+  };
+
+  const isActionLoading = wantedDeletedState !== organization?.isDeleted;
 
   let position = [];
   if (organization?.latitude && organization?.longitude) {
@@ -27,8 +73,9 @@ const Organization = ({ error, isLoading, organization, onEdit, canEdit }) => {
   }
 
   return (
-    <Layout
-      onEdit={canEdit ? onEdit : null}
+    <FixedContent
+      onEdit={onEdit}
+      onDelete={onDelete}
       avatar={
         isLoading ? (
           <Skeleton>
@@ -37,13 +84,11 @@ const Organization = ({ error, isLoading, organization, onEdit, canEdit }) => {
         ) : (
           !error && (
             <BadgesSection
-              nbCavers={propOr([], 'cavers', organization).length}
+              nbCavers={(organization?.cavers ?? []).length}
               nbExploredEntrances={
-                propOr([], 'exploredEntrances', organization).length
+                (organization?.exploredEntrances ?? []).length
               }
-              nbExploredNetworks={
-                propOr([], 'exploredNetworks', organization).length
-              }
+              nbExploredNetworks={(organization?.exploredNetworks ?? []).length}
             />
           )
         )
@@ -87,6 +132,32 @@ const Organization = ({ error, isLoading, organization, onEdit, canEdit }) => {
           )}
           {organization && (
             <>
+              {organization.isDeleted && (
+                <>
+                  <DeletedCard
+                    entityType={DELETED_ENTITIES.organization}
+                    entity={organization}
+                    isLoading={isActionLoading}
+                    onRestorePress={onRestorePress}
+                    onPermanentDeletePress={() => {
+                      setIsDeleteConfirmationPermanent(true);
+                      setIsDeleteConfirmationOpen(true);
+                    }}
+                  />
+                  <hr />
+                </>
+              )}
+              <DeleteConfirmationDialog
+                entityType={DELETED_ENTITIES.organization}
+                isOpen={isDeleteConfirmationOpen}
+                isLoading={isActionLoading}
+                hasSearch={!isDeleteConfirmationPermanent}
+                isPermanent={isDeleteConfirmationPermanent}
+                onClose={() => setIsDeleteConfirmationOpen(false)}
+                onConfirmation={entity => {
+                  onDeletePress(entity?.id, isDeleteConfirmationPermanent);
+                }}
+              />
               <Details
                 address={organization.address}
                 city={organization.city}
@@ -145,6 +216,7 @@ Organization.propTypes = {
   error: PropTypes.shape({}),
   isLoading: PropTypes.bool.isRequired,
   organization: PropTypes.shape({
+    isDeleted: PropTypes.bool,
     address: PropTypes.string,
     mail: PropTypes.string,
     customMessage: PropTypes.string,
@@ -163,9 +235,7 @@ Organization.propTypes = {
     longitude: PropTypes.number,
     latitude: PropTypes.number,
     documents: PropTypes.arrayOf(PropTypes.shape({}))
-  }),
-  onEdit: PropTypes.func.isRequired,
-  canEdit: PropTypes.bool.isRequired
+  })
 };
 
 export default Organization;

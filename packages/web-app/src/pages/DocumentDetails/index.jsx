@@ -7,7 +7,6 @@ import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams, useHistory } from 'react-router-dom';
 
-import getAuthor from '../../util/getAuthor';
 import { loadLanguages } from '../../actions/Language';
 
 import {
@@ -27,7 +26,8 @@ import { fetchDocumentDetails } from '../../actions/DocumentDetails';
 import { fetchDocumentChildren } from '../../actions/DocumentChildren';
 import { usePermissions } from '../../hooks';
 import FixedContent from '../../components/common/Layouts/Fixed/FixedContent';
-import Deleted, {
+import {
+  Deleted,
   DELETED_ENTITIES
 } from '../../components/common/card/Deleted';
 import AuthorAndDate from '../../components/common/Contribution/AuthorAndDate';
@@ -292,7 +292,7 @@ const DocumentPage = ({
             />
 
             <AuthorAndDate
-              author={getAuthor(documentData.creator)}
+              author={documentData.creator}
               textColor="textSecondary"
               date={documentData.dateInscription}
               verb="Created"
@@ -336,15 +336,7 @@ const HydratedDocumentPage = ({ id }) => {
   };
 
   return details.isDeleted ? (
-    <Deleted
-      redirectTo={details.redirectTo}
-      entity={DELETED_ENTITIES.document}
-      name=""
-      creationDate={details.dateInscription}
-      dateReviewed={details.dateReviewed}
-      author={details.author}
-      reviewer={details.reviewer}
-    />
+    <Deleted entityType={DELETED_ENTITIES.document} entity={details} />
   ) : (
     <DocumentPage
       documentId={documentId}

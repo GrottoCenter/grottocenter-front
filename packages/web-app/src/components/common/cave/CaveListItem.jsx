@@ -30,7 +30,7 @@ const CaveListItem = ({ cave }) => {
       <ListItemText primary={cave.name} />
       {(cave.depth || cave.length) && (
         <Box display="flex" flexDirection="row" alignItems="flex-start">
-          {cave.depth !== null && (
+          {cave.depth && (
             <>
               <SmallAvatar
                 alt="Cave depth icon"
@@ -43,7 +43,7 @@ const CaveListItem = ({ cave }) => {
               &nbsp;
             </>
           )}
-          {cave.length !== null && (
+          {cave.length && (
             <>
               <SmallAvatar
                 alt="Cave length icon"

@@ -30,7 +30,7 @@ const FixedWrapper = styled('div')(
   ${theme.breakpoints.up('md')} {
     position: sticky;
     top: ${theme.appBarHeight}px;
-    height: calc(100vh - ${theme.appBarHeight + theme.spacing(3)});
+    height: calc(100vh - ${theme.appBarHeight + 16}px );
   }
 `
 );

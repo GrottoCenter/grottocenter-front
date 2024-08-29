@@ -9,7 +9,7 @@ import { styled } from '@mui/material/styles';
 
 export const isMappable = entity => entity.latitude && entity.longitude;
 
-const EntityIcon = styled('img')`
+export const EntityIcon = styled('img')`
   height: 30px;
   margin-right: 10px;
   width: 30px;
@@ -27,7 +27,7 @@ const EntitySubtitle = styled('div')`
   margin: 0;
 `;
 
-export const entityOptionForSelector = (props, option) => {
+export const nomelizeSearchEntity = option => {
   let iconName;
   let title = option.name; // Default for all entities
   let subtitle = '';
@@ -85,7 +85,11 @@ export const entityOptionForSelector = (props, option) => {
     default:
       break;
   }
+  return { iconName, title, subtitle, id: option.id };
+};
 
+export const entityOptionForSelector = (props, option) => {
+  const { iconName, title, subtitle } = nomelizeSearchEntity(option);
   return (
     <li {...props}>
       {iconName && (

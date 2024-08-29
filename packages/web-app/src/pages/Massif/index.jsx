@@ -1,29 +1,22 @@
 import React, { useEffect } from 'react';
-import { useParams, useHistory } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { isNil, propOr } from 'ramda';
 import Massif from '../../components/appli/Massif/Massif';
 import { loadMassif } from '../../actions/Massif/GetMassif';
-import { usePermissions, useUserProperties } from '../../hooks';
-import { getDetails, getDescriptions } from './transformers';
-import { subscribeToMassif } from '../../actions/Subscriptions/SubscribeToMassif';
 import { fetchSubscriptions } from '../../actions/Subscriptions/GetSubscriptions';
-import { unsubscribeFromMassif } from '../../actions/Subscriptions/UnsubscribeFromMassif';
-import Deleted, {
+import { usePermissions, useUserProperties } from '../../hooks';
+import {
+  Deleted,
   DELETED_ENTITIES
 } from '../../components/common/card/Deleted';
 
 const MassifPage = () => {
   const dispatch = useDispatch();
-  const { massifId: massifIdString } = useParams();
-  const massifId = Number(massifIdString);
-  const history = useHistory();
+  const { massifId } = useParams();
   const permissions = usePermissions();
   const userProperties = useUserProperties();
 
   const { massif, isFetching, error } = useSelector(state => state.massif);
-  const canEdit = permissions.isAuth;
-  const canSubscribe = permissions.isLeader;
 
   // Initial data fetch
   useEffect(() => {
@@ -33,44 +26,10 @@ const MassifPage = () => {
     }
   }, [massifId, userProperties, dispatch]);
 
-  const onEdit = () => {
-    history.push(`/ui/massifs/${massifId}/edit`);
-  };
-
-  const onSubscribe = () => dispatch(subscribeToMassif(massifId));
-  const onUnsubscribe = () => dispatch(unsubscribeFromMassif(massifId));
-  const descriptions = getDescriptions(propOr([], 'descriptions', massif));
-  const details = getDetails(massif);
-  const documents = massif?.documents ?? [];
-  const entrances = massif?.entrances ?? [];
-  const networks = massif?.networks ?? [];
-
-  return details.isDeleted ? (
-    <Deleted
-      redirectTo={massif.redirectTo}
-      entity={DELETED_ENTITIES.massif}
-      name={details.name}
-      creationDate={details.dateInscription}
-      dateReviewed={details.dateReviewed}
-      author={details.author}
-      reviewer={details.reviewer}
-    />
+  return massif?.isDeleted && !permissions.isModerator ? (
+    <Deleted entityType={DELETED_ENTITIES.massif} entity={massif} />
   ) : (
-    <Massif
-      massifId={massifId}
-      isFetching={isFetching || !isNil(error)}
-      error={error}
-      descriptions={descriptions}
-      details={details}
-      documents={documents}
-      entrances={entrances}
-      networks={networks}
-      onEdit={onEdit}
-      canEdit={canEdit}
-      onSubscribe={onSubscribe}
-      onUnsubscribe={onUnsubscribe}
-      canSubscribe={canSubscribe}
-    />
+    <Massif isLoading={isFetching} error={error} massif={massif} />
   );
 };
 export default MassifPage;
