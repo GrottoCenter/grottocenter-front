@@ -1,5 +1,4 @@
 import React from 'react';
-import { isNil } from 'ramda';
 import PropTypes from 'prop-types';
 import { Typography } from '@mui/material';
 import { useIntl } from 'react-intl';
@@ -22,7 +21,7 @@ const AuthorAndDate = ({
   return (
     <Typography component="span" variant="caption" color={textColor}>
       <AuthorLink author={author} verb={verb} />
-      {!isNil(date) && (
+      {date && (
         <DateSpan variant="caption">
           {formatDate(date, {
             year: '2-digit',
