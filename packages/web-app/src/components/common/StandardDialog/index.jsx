@@ -14,7 +14,9 @@ const CustomDialogTitle = styled(DialogTitle)`
   margin-top: 1rem;
 `;
 
-const DialogContent = styled(MuiDialogContent)`
+const DialogContent = styled(MuiDialogContent, {
+  shouldForwardProp: prop => prop[0] !== '$'
+})`
   && {
     overflow: ${({ $scrollable }) => ($scrollable ? 'auto' : 'visible')};
   }

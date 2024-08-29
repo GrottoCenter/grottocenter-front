@@ -18,6 +18,7 @@ import { Print } from '@mui/icons-material';
 import { styled } from '@mui/material/styles';
 import { useReactToPrint } from 'react-to-print';
 import CreateIcon from '@mui/icons-material/Create';
+import DeleteIcon from '@mui/icons-material/Delete';
 import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
 import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
 
@@ -78,6 +79,7 @@ const FixedContent = ({
   content,
   footer,
   onEdit,
+  onDelete,
   printRef,
   snapshot,
   onChangeSubscribe,
@@ -115,6 +117,16 @@ const FixedContent = ({
                 })}>
                 <Button aria-label="edit" onClick={onEdit}>
                   <CreateIcon />
+                </Button>
+              </Tooltip>
+            )}
+            {onDelete && (
+              <Tooltip
+                title={formatMessage({
+                  id: 'Delete'
+                })}>
+                <Button aria-label="delete" onClick={onDelete}>
+                  <DeleteIcon />
                 </Button>
               </Tooltip>
             )}
@@ -189,6 +201,7 @@ FixedContent.propTypes = {
   isSubscribed: PropTypes.bool,
   isSubscribeLoading: PropTypes.bool,
   onEdit: PropTypes.func,
+  onDelete: PropTypes.func,
   printRef: PropTypes.shape({
     // eslint-disable-next-line react/forbid-prop-types
     current: PropTypes.any

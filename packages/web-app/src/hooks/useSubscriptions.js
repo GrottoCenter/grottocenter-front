@@ -32,7 +32,7 @@ export const useSubscriptions = () => {
       if (subscriptions && subscriptions.countries) {
         isSubscribedToCountry = subscriptions.countries.some(c => c.id === id);
       }
-      if (!isSubscribedToMassif && subscriptions && subscriptions.massifs) {
+      if (subscriptions && subscriptions.massifs) {
         isSubscribedToMassif = subscriptions.massifs.some(m => m.id === id);
       }
       return isSubscribedToCountry || isSubscribedToMassif;

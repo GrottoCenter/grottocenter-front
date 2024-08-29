@@ -31,7 +31,7 @@ const BadgesSection = ({
   return (
     <>
       <Tooltip title={formatMessage({ id: 'Number of cavers' })}>
-        <StyledBadge color="primary" badgeContent={nbCavers} showZero>
+        <StyledBadge color="secondary" badgeContent={nbCavers} showZero>
           <CaverIcon src="/images/caver.svg" alt="Caver icon" />
         </StyledBadge>
       </Tooltip>
