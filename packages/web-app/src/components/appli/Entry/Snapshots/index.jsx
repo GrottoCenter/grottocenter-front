@@ -9,7 +9,6 @@ import Contribution from '../../../common/Contribution/Contribution';
 import { fetchSnapshot } from '../../../../actions/Snapshot/GetSnapshots';
 import REDUCER_STATUS from '../../../../reducers/ReducerStatus';
 import ScrollableContent from '../../../common/Layouts/Fixed/ScrollableContent';
-import getAuthor from '../../../../util/getAuthor';
 import SensitiveCaveWarning from '../SensitiveCaveWarning';
 import AccordionSnapshotList from './AccordionSnapshotList';
 import Alert403 from './error/403Alert';
@@ -104,7 +103,7 @@ const SnapshotPage = () => {
               )}
               {getAccordionBodyFromType(type, currentTItem, isNetwork ?? false)}
               <Contribution
-                reviewer={getAuthor(currentTItem.reviewer)}
+                reviewer={currentTItem.reviewer}
                 dateReviewed={currentTItem.reviewedDate}
                 withHours
               />

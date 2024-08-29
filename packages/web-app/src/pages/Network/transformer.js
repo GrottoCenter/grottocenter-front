@@ -1,11 +1,8 @@
-import { pathOr } from 'ramda';
-import getAuthor from '../../util/getAuthor';
-
 // eslint-disable-next-line import/prefer-default-export
 export const getSafeData = data => ({
   id: data.id,
-  author: getAuthor(data?.author),
-  reviewer: getAuthor(data?.reviewer),
+  author: data?.author,
+  reviewer: data?.reviewer,
   creationDate: data.dateInscription,
   reviewedDate: data.dateReviewed,
   altitude: data.altitude,
@@ -17,10 +14,10 @@ export const getSafeData = data => ({
   isDivingCave: data.isDiving,
   descriptions: data.descriptions,
   entrances: data.entrances ?? [],
-  massif: pathOr(undefined, ['massifs', 0], data),
+  massif: data?.massifs?.[0] ?? undefined,
   massifs: data.massifs,
-  name: pathOr(data.name, ['names', 0, 'name'], data),
+  name: data?.names?.[0]?.name ?? data.name,
   names: data.names,
-  undergroundType: pathOr(null, ['massif', 'undergroundType'], data),
+  undergroundType: data?.massif?.undergroundType ?? null,
   redirectTo: data.redirectTo
 });

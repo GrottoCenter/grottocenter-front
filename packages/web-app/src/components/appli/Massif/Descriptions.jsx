@@ -21,16 +21,20 @@ const Descriptions = ({ descriptions }) => {
         {formatMessage({ id: 'Descriptions' })}
       </Typography>
       <List>
-        {descriptions.map(({ id, title, body, author, date }) => (
-          <div key={id}>
+        {descriptions.map(description => (
+          <div key={description.id}>
             <ListItem>
               <ListItemText
-                primary={<Typography variant="h4">{title}</Typography>}
+                primary={
+                  <Typography variant="h4">{description.title}</Typography>
+                }
                 secondary={
                   <Contribution
-                    author={author}
-                    body={body}
-                    creationDate={date}
+                    body={description.body}
+                    author={description.author}
+                    reviewer={description.reviewer}
+                    creationDate={description.dateInscription}
+                    dateReviewed={description.dateReviewed}
                   />
                 }
               />
@@ -46,12 +50,13 @@ const Descriptions = ({ descriptions }) => {
 Descriptions.propTypes = {
   descriptions: PropTypes.arrayOf(
     PropTypes.shape({
-      author: authorType,
-      body: PropTypes.string,
-      date: PropTypes.instanceOf(Date),
       id: PropTypes.number,
-      language: PropTypes.string.isRequired,
-      title: PropTypes.string.isRequired
+      author: authorType,
+      reviewer: authorType,
+      dateInscription: PropTypes.string,
+      dateReviewed: PropTypes.string,
+      title: PropTypes.string.isRequired,
+      body: PropTypes.string
     })
   )
 };

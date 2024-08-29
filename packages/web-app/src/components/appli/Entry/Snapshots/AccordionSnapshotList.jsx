@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import ScrollableContent from '../../../common/Layouts/Fixed/ScrollableContent';
-import getAuthor from '../../../../util/getAuthor';
 import Alert404 from './error/404Alert';
 import authorType from '../../../../types/author.type';
 import AccordionSnapshot from './AccordionSnapshot';
@@ -19,16 +18,14 @@ const AccordionSnapshotList = ({ data, type, isNetwork, actualItem }) => {
           Object.keys(data).map(snapshotType => {
             const reversed = [...data[snapshotType]].reverse();
             return reversed.map(snapshot => {
-              const author = getAuthor(snapshot.author);
-              const reviewer = getAuthor(snapshot.reviewer);
               const accordionSnapshot = (
                 <AccordionSnapshot
                   key={snapshot.id + snapshot.t_id}
                   snapshot={snapshot}
                   snapshotType={snapshotType}
                   isNetwork={isNetwork}
-                  author={author}
-                  reviewer={reviewer}
+                  author={snapshot.author}
+                  reviewer={snapshot.reviewer}
                   previous={previousVersion}
                 />
               );
