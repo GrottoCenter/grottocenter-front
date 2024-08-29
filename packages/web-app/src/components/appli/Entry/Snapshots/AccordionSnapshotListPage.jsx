@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import ScrollableContent from '../../../common/Layouts/Fixed/ScrollableContent';
-import getAuthor from '../../../../util/getAuthor';
 import Alert404 from './error/404Alert';
 import authorType from '../../../../types/author.type';
 import AccordionSnapshot from './AccordionSnapshot';
@@ -23,21 +22,17 @@ const AccordionSnapshotListPage = ({ data, type, isNetwork }) => (
     content={
       data ? (
         data.map(snapshotType =>
-          snapshotType[Object.keys(snapshotType)[0]].map(snapshot => {
-            const author = getAuthor(snapshot.author);
-            const reviewer = getAuthor(snapshot.reviewer);
-            return (
-              <AccordionSnapshot
-                key={snapshot.id + snapshot.t_id}
-                snapshot={snapshot}
-                snapshotType={Object.keys(snapshotType)[0]}
-                isNetwork={isNetwork}
-                author={author}
-                reviewer={reviewer}
-                all
-              />
-            );
-          })
+          snapshotType[Object.keys(snapshotType)[0]].map(snapshot => (
+            <AccordionSnapshot
+              key={snapshot.id + snapshot.t_id}
+              snapshot={snapshot}
+              snapshotType={Object.keys(snapshotType)[0]}
+              isNetwork={isNetwork}
+              author={snapshot.author}
+              reviewer={snapshot.reviewer}
+              all
+            />
+          ))
         )
       ) : (
         <Alert404 type={type} />

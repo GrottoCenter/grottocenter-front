@@ -1,11 +1,8 @@
-import { isNil, pathOr } from 'ramda';
-import getAuthor from '../../util/getAuthor';
-
 export const getComments = comments =>
   comments
     .map(comment => ({
-      author: getAuthor(comment?.author),
-      reviewer: comment?.reviewer ? getAuthor(comment?.reviewer) : null,
+      author: comment?.author,
+      reviewer: comment?.reviewer,
       body: comment?.body,
       creationDate: comment?.dateInscription
         ? new Date(comment?.dateInscription)
@@ -27,41 +24,39 @@ export const getComments = comments =>
 
 export const getDetails = data => ({
   altitude: data.altitude,
-  author: getAuthor(data?.author),
-  reviewer: data?.reviewer ? getAuthor(data?.reviewer) : null,
+  author: data?.author,
+  reviewer: data?.reviewer,
   cave: data.cave,
   coordinates:
-    !isNil(data.longitude) && !isNil(data.latitude)
-      ? [data.latitude, data.longitude]
-      : null,
+    data.longitude && data.latitude ? [data.latitude, data.longitude] : null,
   country: data.country,
   creationDate: data.dateInscription ? new Date(data.dateInscription) : null,
-  depth: pathOr(0, ['cave', 'depth'], data),
-  development: pathOr(0, ['cave', 'length'], data),
+  depth: data?.cave?.depth ?? 0,
+  development: data?.cave?.length ?? 0,
   discoveryYear: data.discoveryYear,
   id: data.id,
-  access: pathOr(0, ['stats', 'approach'], data),
-  interest: pathOr(0, ['stats', 'aestheticism'], data),
-  progression: pathOr(0, ['stats', 'caving'], data),
-  isDivingCave: pathOr(null, ['cave', 'isDiving'], data),
+  access: data?.stats?.approach ?? 0,
+  interest: data?.stats?.aestheticism ?? 0,
+  progression: data?.stats?.caving ?? 0,
+  isDivingCave: data?.cave?.isDiving ?? null,
   isSensitive: data.isSensitive,
-  language: pathOr(undefined, ['names', 0, 'language'], data),
+  language: data?.names?.[0]?.language ?? null,
   city: data.city,
   region: data.region,
-  massif: pathOr(undefined, ['massifs', 0], data),
+  massif: data.massifs?.[0] ?? undefined,
   massifs: data.massifs,
-  mountain: pathOr(null, ['massif', 'name'], data),
+  mountain: data?.massif?.name ?? null,
   name: data.name,
   precision: data.precision,
-  temperature: pathOr(null, ['cave', 'temperature'], data),
-  undergroundType: pathOr(null, ['massif', 'undergroundType'], data)
+  temperature: data?.cave?.temperature ?? null,
+  undergroundType: data?.massif?.undergroundType ?? null
 });
 
 export const getDescriptions = descriptions =>
   descriptions
     .map(description => ({
-      author: getAuthor(description?.author),
-      reviewer: getAuthor(description?.reviewer),
+      author: description?.author,
+      reviewer: description?.reviewer,
       body: description?.body,
       creationDate: description?.dateInscription
         ? new Date(description?.dateInscription)
@@ -88,8 +83,8 @@ export const getHistories = histories =>
       reviewedDate: history?.dateReviewed
         ? new Date(history?.dateReviewed)
         : null,
-      author: getAuthor(history?.author),
-      reviewer: getAuthor(history?.reviewer),
+      author: history?.author,
+      reviewer: history?.reviewer,
       body: history?.body,
       relevance: history?.relevance,
       language: history?.language
@@ -98,9 +93,9 @@ export const getHistories = histories =>
 
 export const getRiggings = riggings =>
   riggings.map(rigging => ({
-    obstacles: isNil(rigging?.obstacles) ? [] : rigging.obstacles,
-    author: getAuthor(rigging?.author),
-    reviewer: rigging?.reviewer ? getAuthor(rigging?.reviewer) : null,
+    obstacles: rigging?.obstacles ?? [],
+    author: rigging?.author,
+    reviewer: rigging?.reviewer,
     id: rigging.id,
     isDeleted: rigging?.isDeleted,
     language: rigging?.language || '',
@@ -115,8 +110,8 @@ export const getLocations = locations =>
       id: location?.id,
       isDeleted: location?.isDeleted,
       title: location?.title,
-      author: getAuthor(location?.author),
-      reviewer: getAuthor(location?.reviewer),
+      author: location?.author,
+      reviewer: location?.reviewer,
       body: location?.body,
       creationDate: location?.dateInscription
         ? new Date(location?.dateInscription)
