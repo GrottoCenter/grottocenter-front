@@ -7,16 +7,14 @@ export const POST_ORGANIZATION = 'POST_ORGANIZATION';
 export const POST_ORGANIZATION_SUCCESS = 'POST_ORGANIZATION_SUCCESS';
 export const POST_ORGANIZATION_FAILURE = 'POST_ORGANIZATION_FAILURE';
 
-export const postOrganizationAction = () => ({
+const postOrganizationAction = () => ({
   type: POST_ORGANIZATION
 });
-
-export const postOrganizationSuccess = organization => ({
+const postOrganizationSuccess = organization => ({
   type: POST_ORGANIZATION_SUCCESS,
   organization
 });
-
-export const postOrganizationFailure = error => ({
+const postOrganizationFailure = error => ({
   type: POST_ORGANIZATION_FAILURE,
   error
 });

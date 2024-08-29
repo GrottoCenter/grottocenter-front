@@ -3,6 +3,11 @@ import {
   FETCH_ORGANIZATION_FAILURE,
   FETCH_ORGANIZATION_SUCCESS
 } from '../actions/Organization/GetOrganization';
+import {
+  DELETE_ORGANIZATION_SUCCESS,
+  DELETE_ORGANIZATION_PERMANENT_SUCCESS
+} from '../actions/Organization/DeleteOrganization';
+import { RESTORE_ORGANIZATION_SUCCESS } from '../actions/Organization/RestoreOrganization';
 
 const initialState = {
   organization: undefined,
@@ -18,6 +23,9 @@ const reducer = (state = initialState, action) => {
         isLoading: true
       };
     case FETCH_ORGANIZATION_SUCCESS:
+    case DELETE_ORGANIZATION_SUCCESS:
+    case DELETE_ORGANIZATION_PERMANENT_SUCCESS:
+    case RESTORE_ORGANIZATION_SUCCESS:
       return {
         ...initialState,
         error: null,

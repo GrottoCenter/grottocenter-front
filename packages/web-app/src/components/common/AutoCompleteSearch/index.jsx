@@ -19,7 +19,9 @@ const StyledAutocomplete = styled(Autocomplete)`
   width: 100%;
 `;
 
-const InputWrapper = styled('div')`
+const InputWrapper = styled('div', {
+  shouldForwardProp: prop => prop[0] !== '$'
+})`
   display: flex;
   margin-left: auto;
   width: ${({ $hasFixWidth }) => ($hasFixWidth ? 100 : 80)}%;
@@ -47,7 +49,9 @@ const StyledInputBase = styled(InputBase)`
   width: 100%;
 `;
 
-const ResultsPopper = styled(Popper)`
+const ResultsPopper = styled(Popper, {
+  shouldForwardProp: prop => prop[0] !== '$'
+})`
   width: fit-content;
 
   ul.MuiAutocomplete-listbox {

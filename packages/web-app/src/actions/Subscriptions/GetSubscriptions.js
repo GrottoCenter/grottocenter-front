@@ -7,16 +7,16 @@ export const FETCH_SUBSCRIPTIONS = 'FETCH_SUBSCRIPTIONS';
 export const FETCH_SUBSCRIPTIONS_SUCCESS = 'FETCH_SUBSCRIPTIONS_SUCCESS';
 export const FETCH_SUBSCRIPTIONS_FAILURE = 'FETCH_SUBSCRIPTIONS_FAILURE';
 
-export const fetchSubscriptionsAction = () => ({
+const fetchSubscriptionsAction = () => ({
   type: FETCH_SUBSCRIPTIONS
 });
 
-export const fetchSubscriptionsActionSuccess = subscriptions => ({
+const fetchSubscriptionsActionSuccess = subscriptions => ({
   type: FETCH_SUBSCRIPTIONS_SUCCESS,
   subscriptions
 });
 
-export const fetchSubscriptionsActionFailure = error => ({
+const fetchSubscriptionsActionFailure = error => ({
   type: FETCH_SUBSCRIPTIONS_FAILURE,
   error
 });

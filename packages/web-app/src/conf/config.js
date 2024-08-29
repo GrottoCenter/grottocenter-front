@@ -41,7 +41,8 @@ export const ADVANCED_SEARCH_TYPES = {
   DOCUMENTS: 'documents',
   ENTRANCES: 'entrances',
   MASSIFS: 'massifs',
-  ORGANIZATIONS: 'grottos'
+  ORGANIZATIONS: 'grottos',
+  CAVES: 'caves'
 };
 
 export const bloggerIcons = {

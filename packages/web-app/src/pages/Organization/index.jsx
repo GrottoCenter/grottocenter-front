@@ -1,13 +1,12 @@
 import React, { useEffect } from 'react';
-import { useParams, useHistory } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { fetchOrganization } from '../../actions/Organization/GetOrganization';
-import { setPageTitle } from '../../actions/PageTitle';
 import Organization from '../../components/appli/Organization';
 import { usePermissions } from '../../hooks';
-import getAuthor from '../../util/getAuthor';
-import Deleted, {
+import {
+  Deleted,
   DELETED_ENTITIES
 } from '../../components/common/card/Deleted';
 
@@ -19,35 +18,17 @@ const OrganizationPage = () => {
     state => state.organization
   );
 
-  const canEdit = permissions.isAuth;
-
-  const history = useHistory();
-
   useEffect(() => {
     dispatch(fetchOrganization(organizationId));
-    dispatch(setPageTitle('Organization'));
   }, [dispatch, organizationId]);
 
-  const onEdit = () => {
-    history.push(`/ui/organizations/${organizationId}/edit`);
-  };
-  return organization?.isDeleted ? (
-    <Deleted
-      redirectTo={organization.redirectTo}
-      entity={DELETED_ENTITIES.organization}
-      name={organization.name}
-      creationDate={organization.dateInscription}
-      dateReviewed={organization.dateReviewed}
-      author={getAuthor(organization.author)}
-      reviewer={getAuthor(organization.reviewer)}
-    />
+  return organization?.isDeleted && !permissions.isModerator ? (
+    <Deleted entityType={DELETED_ENTITIES.organization} entity={organization} />
   ) : (
     <Organization
       error={error}
       isLoading={isLoading}
       organization={organization}
-      onEdit={onEdit}
-      canEdit={canEdit}
     />
   );
 };

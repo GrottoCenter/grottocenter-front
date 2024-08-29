@@ -1,43 +1,37 @@
 import fetch from 'isomorphic-fetch';
 import { getMassifUrl } from '../../conf/apiRoutes';
-import makeErrorMessage from '../../helpers/makeErrorMessage';
+import { checkAndGetStatus } from '../utils';
 
 export const FETCH_MASSIF = 'FETCH_MASSIF';
 export const FETCH_MASSIF_SUCCESS = 'FETCH_MASSIF_SUCCESS';
 export const FETCH_MASSIF_FAILURE = 'FETCH_MASSIF_FAILURE';
 
-export const fetchMassif = () => ({
+const fetchMassif = () => ({
   type: FETCH_MASSIF
 });
 
-export const fetchMassifSuccess = massif => ({
+const fetchMassifSuccess = massif => ({
   type: FETCH_MASSIF_SUCCESS,
   massif
 });
 
-export const fetchMassifFailure = error => ({
+const fetchMassifFailure = error => ({
   type: FETCH_MASSIF_FAILURE,
   error
 });
 
 export function loadMassif(massifId) {
-  return dispatch => {
+  return (dispatch, getState) => {
     dispatch(fetchMassif());
 
-    return fetch(getMassifUrl + massifId)
-      .then(response => {
-        if (response.status >= 400) {
-          throw new Error(response.status);
-        }
-        return response.text();
-      })
-      .then(text => dispatch(fetchMassifSuccess(JSON.parse(text))))
-      .catch(error =>
-        dispatch(
-          fetchMassifFailure(
-            makeErrorMessage(error.message, `Fetching massif id ${massifId}`)
-          )
-        )
-      );
+    const requestOptions = {
+      headers: getState().login.authorizationHeader
+    };
+
+    return fetch(getMassifUrl + massifId, requestOptions)
+      .then(checkAndGetStatus)
+      .then(response => response.json())
+      .then(data => dispatch(fetchMassifSuccess(data)))
+      .catch(error => dispatch(fetchMassifFailure(error)));
   };
 }
