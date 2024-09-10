@@ -5,10 +5,8 @@ import PropTypes from 'prop-types';
 import { Box, Button, TextField } from '@mui/material';
 import { Controller, useForm } from 'react-hook-form';
 import { styled } from '@mui/material/styles';
-import { isNil } from 'ramda';
-
 import LanguageAutoComplete from '../LanguageAutoComplete';
-import { locationType } from '../../Entry/Provider';
+import { LocationPropTypes } from '../../../../types/entrance.type';
 
 const SpacedButton = styled(Button)`
   ${({ theme }) => `
@@ -85,7 +83,7 @@ const CreateLocationForm = ({ closeForm, onSubmit, values, isNewLocation }) => {
         rules={{ required: true }}
         render={({ field: { onChange, value }, fieldState: { error } }) => (
           <LanguageAutoComplete
-            hasError={!isNil(error)}
+            hasError={!!error}
             helperContent={formatMessage({ id: 'The title and text language' })}
             labelText="Language"
             onSelection={onChange}
@@ -95,11 +93,6 @@ const CreateLocationForm = ({ closeForm, onSubmit, values, isNewLocation }) => {
         )}
       />
 
-      {closeForm && (
-        <SpacedButton onClick={closeForm}>
-          {formatMessage({ id: 'Cancel' })}
-        </SpacedButton>
-      )}
       <SpacedButton
         color="primary"
         type="submit"
@@ -112,6 +105,11 @@ const CreateLocationForm = ({ closeForm, onSubmit, values, isNewLocation }) => {
       <SpacedButton variant="outlined" onClick={resetToDefault}>
         {formatMessage({ id: 'Reset' })}
       </SpacedButton>
+      {closeForm && (
+        <SpacedButton onClick={closeForm}>
+          {formatMessage({ id: 'Cancel' })}
+        </SpacedButton>
+      )}
     </Box>
   );
 };
@@ -120,7 +118,7 @@ CreateLocationForm.propTypes = {
   closeForm: PropTypes.func,
   isNewLocation: PropTypes.bool.isRequired,
   onSubmit: PropTypes.func.isRequired,
-  values: locationType
+  values: LocationPropTypes
 };
 
 export default CreateLocationForm;

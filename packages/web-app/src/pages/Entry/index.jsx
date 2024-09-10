@@ -1,94 +1,29 @@
-import React, { useEffect, useRef } from 'react';
-import { isNil } from 'ramda';
+import React, { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import Entry from '../../components/appli/Entry';
 import { fetchEntrance } from '../../actions/Entrance/GetEntrance';
-import {
-  getComments,
-  getDescriptions,
-  getDetails,
-  getHistories,
-  getLocations,
-  getRiggings
-} from './transformers';
+import { usePermissions } from '../../hooks';
 import {
   Deleted,
   DELETED_ENTITIES
 } from '../../components/common/card/Deleted';
 
-const isUpdateSuccessful = (error, loading, prevLoading) =>
-  prevLoading.current === true && loading === false && error === null;
-
 const EntryPage = () => {
-  const { id } = useParams();
   const dispatch = useDispatch();
+  const { entranceId } = useParams();
+  const permissions = usePermissions();
   const { loading, data, error } = useSelector(state => state.entrance);
-  const { loading: updateEntranceLoading, error: updateEntranceError } =
-    useSelector(state => state.updateEntrance);
-  const prevupdateEntranceLoading = useRef(updateEntranceLoading);
-  const { loading: associateDocumentLoading, error: associateDocumentError } =
-    useSelector(state => state.linkDocumentToEntrance);
-  const prevAssociateDocumentLoading = useRef(associateDocumentLoading);
-
-  // Initial data loading
-  useEffect(() => {
-    dispatch(fetchEntrance(id));
-  }, [id, dispatch]);
-
-  // Fetching entrance after successful update
-  useEffect(() => {
-    if (
-      isUpdateSuccessful(
-        updateEntranceError,
-        updateEntranceLoading,
-        prevupdateEntranceLoading
-      )
-    ) {
-      dispatch(fetchEntrance(id));
-    }
-  }, [dispatch, updateEntranceLoading, id, updateEntranceError]);
 
   useEffect(() => {
-    if (
-      isUpdateSuccessful(
-        associateDocumentError,
-        associateDocumentLoading,
-        prevAssociateDocumentLoading
-      )
-    ) {
-      dispatch(fetchEntrance(id));
-    }
-  }, [dispatch, id, associateDocumentError, associateDocumentLoading]);
+    dispatch(fetchEntrance(entranceId));
+  }, [entranceId, dispatch]);
 
-  // Track loadings
-  useEffect(() => {
-    prevAssociateDocumentLoading.current = associateDocumentLoading;
-  }, [associateDocumentLoading]);
-  useEffect(() => {
-    prevupdateEntranceLoading.current = updateEntranceLoading;
-  }, [updateEntranceLoading]);
-
-  const comments = getComments(data.comments ?? []);
-  const descriptions = getDescriptions(data.descriptions ?? []);
-  const details = getDetails(data);
-  const documents = data.documents ?? [];
-  const histories = getHistories(data.histories ?? []);
-  const locations = getLocations(data.locations ?? []);
-  const riggings = getRiggings(data.riggings ?? []);
-  return data.isDeleted ? (
+  return data?.isDeleted && !permissions.isModerator ? (
     <Deleted entityType={DELETED_ENTITIES.entrance} entity={data} />
   ) : (
-    <Entry
-      loading={loading || !isNil(error)}
-      details={details}
-      comments={comments}
-      descriptions={descriptions}
-      documents={documents}
-      histories={histories}
-      locations={locations}
-      riggings={riggings}
-    />
+    <Entry isLoading={loading} error={error} entrance={data} />
   );
 };
+
 export default EntryPage;

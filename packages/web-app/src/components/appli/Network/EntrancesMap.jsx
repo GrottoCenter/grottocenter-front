@@ -1,24 +1,24 @@
-import React, { useContext } from 'react';
-import { isNil, isEmpty, pipe, filter, includes } from 'ramda';
+import React from 'react';
+import PropTypes from 'prop-types';
 
 import Map from '../../common/Maps/MapMultipleMarkers';
-import { CaveContext, getPositions } from './Provider';
+import idNameType from '../../../types/idName.type';
 
-const isSelected = selection => entrance => includes(entrance.id, selection);
-
-const EntrancesMap = () => {
-  const {
-    state: { coordinates, loading, selectedEntrances, entrances }
-  } = useContext(CaveContext);
-
+const EntrancesMap = ({ isLoading, entrances, selectedEntrancesId = [] }) => {
   const getPositionsToDisplay = () => {
-    if (isNil(selectedEntrances) || isEmpty(selectedEntrances)) {
-      return coordinates;
-    }
-    return pipe(filter(isSelected(selectedEntrances)), getPositions)(entrances);
+    if (selectedEntrancesId.length > 0)
+      return entrances.filter(e => selectedEntrancesId.includes(e.id));
+
+    return entrances;
   };
 
-  return <Map positions={getPositionsToDisplay()} loading={loading} />;
+  return <Map positions={getPositionsToDisplay()} loading={isLoading} />;
+};
+
+EntrancesMap.propTypes = {
+  isLoading: PropTypes.bool,
+  entrances: PropTypes.arrayOf(idNameType),
+  selectedEntrancesId: PropTypes.arrayOf(PropTypes.number)
 };
 
 export default EntrancesMap;

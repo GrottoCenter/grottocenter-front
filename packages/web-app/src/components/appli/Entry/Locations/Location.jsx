@@ -2,12 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { Box, ListItem, ListItemText } from '@mui/material';
 import { useDispatch } from 'react-redux';
 import { styled } from '@mui/material/styles';
+import PropTypes from 'prop-types';
 import { updateLocation } from '../../../../actions/Location/UpdateLocation';
 import { deleteLocation } from '../../../../actions/Location/DeleteLocation';
 import { restoreLocation } from '../../../../actions/Location/RestoreLocation';
 import ActionButtons from '../ActionButtons';
 import SectionTitle from '../SectionTitle';
-import { locationType } from '../Provider';
+import { LocationPropTypes } from '../../../../types/entrance.type';
 import CreateLocationForm from '../../Form/LocationForm/index';
 import { usePermissions } from '../../../../hooks';
 import Contribution from '../../../common/Contribution/Contribution';
@@ -17,7 +18,7 @@ const ListItemStyled = styled(ListItem)`
   flex-direction: column;
   border-top: 1px solid ${props => props.theme.palette.divider};
 `;
-const Location = ({ location }) => {
+const Location = ({ location, isEditAllowed }) => {
   const dispatch = useDispatch();
   const permissions = usePermissions();
   const [isUpdateFormVisible, setIsUpdateFormVisible] = useState(false);
@@ -59,8 +60,8 @@ const Location = ({ location }) => {
           isUpdating={isUpdateFormVisible}
           setIsUpdating={setIsUpdateFormVisible}
           isDeleted={location.isDeleted}
-          canEdit={permissions.isAuth}
-          canDelete={permissions.isModerator}
+          canEdit={isEditAllowed && permissions.isAuth}
+          canDelete={isEditAllowed && permissions.isModerator}
           snapshotEl={
             <SnapshotButton
               id={location.id}
@@ -108,7 +109,8 @@ const Location = ({ location }) => {
 };
 
 Location.propTypes = {
-  location: locationType
+  location: LocationPropTypes,
+  isEditAllowed: PropTypes.bool
 };
 
 export default Location;

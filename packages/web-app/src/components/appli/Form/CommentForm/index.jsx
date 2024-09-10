@@ -18,7 +18,7 @@ import NotInterestedIcon from '@mui/icons-material/NotInterested';
 import StarBorderIcon from '@mui/icons-material/StarBorder';
 
 import LanguageAutoComplete from '../LanguageAutoComplete';
-import { commentType } from '../../Entry/Provider';
+import { CommentPropTypes } from '../../../../types/entrance.type';
 import { durationStringToMinutes } from '../../../../util/dateTimeDuration';
 
 const SpacedButton = styled(Button)`
@@ -37,9 +37,9 @@ const getDefaultValues = (values, language) => {
   return {
     title: '',
     body: '',
-    interest: null,
-    progression: null,
-    access: null,
+    aestheticism: null,
+    caving: null,
+    approach: null,
     eTTrail: null,
     eTUnderground: null,
     language
@@ -172,7 +172,7 @@ const CreateCommentForm = ({ closeForm, onSubmit, values, isNewComment }) => {
       />
       <Controller
         control={control}
-        name="interest"
+        name="aestheticism"
         render={({ field: { onChange, value } }) => (
           <Box display="flex">
             <div>
@@ -221,7 +221,7 @@ const CreateCommentForm = ({ closeForm, onSubmit, values, isNewComment }) => {
       />
       <Controller
         control={control}
-        name="progression"
+        name="caving"
         render={({ field: { onChange, value } }) => (
           <Box display="flex">
             <div>
@@ -270,7 +270,7 @@ const CreateCommentForm = ({ closeForm, onSubmit, values, isNewComment }) => {
       />
       <Controller
         control={control}
-        name="access"
+        name="approach"
         render={({ field: { onChange, value } }) => (
           <Box display="flex">
             <div>
@@ -318,11 +318,6 @@ const CreateCommentForm = ({ closeForm, onSubmit, values, isNewComment }) => {
         )}
       />
 
-      {closeForm && (
-        <SpacedButton onClick={closeForm}>
-          {formatMessage({ id: 'Cancel' })}
-        </SpacedButton>
-      )}
       <SpacedButton
         color="primary"
         type="submit"
@@ -335,6 +330,11 @@ const CreateCommentForm = ({ closeForm, onSubmit, values, isNewComment }) => {
       <SpacedButton variant="outlined" onClick={resetToDefault}>
         {formatMessage({ id: 'Reset' })}
       </SpacedButton>
+      {closeForm && (
+        <SpacedButton onClick={closeForm}>
+          {formatMessage({ id: 'Cancel' })}
+        </SpacedButton>
+      )}
     </Box>
   );
 };
@@ -343,7 +343,7 @@ CreateCommentForm.propTypes = {
   closeForm: PropTypes.func,
   isNewComment: PropTypes.bool.isRequired,
   onSubmit: PropTypes.func.isRequired,
-  values: commentType
+  values: CommentPropTypes
 };
 
 export default CreateCommentForm;

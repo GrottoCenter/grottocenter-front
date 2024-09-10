@@ -14,7 +14,7 @@ const AuthorLink = ({ author, verb = 'Posted' }) => {
     <span>
       {verb && (
         <Typography variant="caption">
-          {formatMessage({ id: `${verb} by` })}
+          {formatMessage({ id: `${verb} by` })}&nbsp;
         </Typography>
       )}
       <GCLink internal href={`/ui/persons/${author?.id}`}>

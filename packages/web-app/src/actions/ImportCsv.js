@@ -5,7 +5,7 @@ import {
   importRowsEntrancesUrl,
   importRowsDocumentsUrl
 } from '../conf/apiRoutes';
-import { checkStatusAndGetText } from './utils';
+import { checkAndGetStatus } from './utils';
 
 export const CHECK_ROWS_START = 'CHECK_ROWS_START';
 export const CHECK_ROWS_SUCCESS = 'CHECK_ROWS_SUCCESS';
@@ -72,7 +72,7 @@ export const checkRowsInBdd = (typeRow, rowsData) => (dispatch, getState) => {
 
   // eslint-disable-next-line consistent-return
   return fetch(url, requestOptions)
-    .then(checkStatusAndGetText)
+    .then(checkAndGetStatus)
     .then(response => response.json())
     .then(responseJson => {
       dispatch(checkRowsSuccess(responseJson));
@@ -109,7 +109,7 @@ export const importRows = (data, typeRow) => (dispatch, getState) => {
 
   // eslint-disable-next-line consistent-return
   return fetch(url, requestOptions)
-    .then(checkStatusAndGetText)
+    .then(checkAndGetStatus)
     .then(response => response.json())
     .then(responseJson => {
       dispatch(importRowsSuccess(responseJson));

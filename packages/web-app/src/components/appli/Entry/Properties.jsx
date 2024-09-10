@@ -1,4 +1,5 @@
-import React, { useContext } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import { styled } from '@mui/material/styles';
 import { Box, Button, ButtonGroup, Tooltip } from '@mui/material';
@@ -9,7 +10,7 @@ import {
   Height,
   Public,
   Terrain,
-  Title,
+  Thermostat,
   Waves,
   Place,
   Map,
@@ -18,8 +19,8 @@ import {
 import Alert from '../../common/Alert';
 import CustomIcon from '../../common/CustomIcon';
 import { Property } from '../../common/Properties';
-import { EntryContext, isValidCoordinates } from './Provider';
 import Ratings from './Ratings';
+import { EntrancePropTypes } from '../../../types/entrance.type';
 
 const GlobalWrapper = styled('div')`
   width: 100%;
@@ -49,71 +50,34 @@ const computePrecisionSeverity = precision => {
   return 'success';
 };
 
-const Properties = () => {
-  const {
-    state: {
-      details: {
-        altitude,
-        coordinates,
-        depth,
-        development,
-        discoveryYear,
-        access,
-        interest,
-        progression,
-        isDivingCave,
-        country,
-        city,
-        region,
-        massif,
-        precision,
-        temperature,
-        undergroundType,
-        cave
-      },
-      loading
-    }
-  } = useContext(EntryContext);
+const Properties = ({ isLoading = false, entrance }) => {
   const { formatMessage } = useIntl();
-  const makeCoordinatesValue = coordinatesValue =>
-    `${formatMessage({ id: 'Lat.' })} (N) / ${formatMessage({
-      id: 'Long.'
-    })} (E) =
-    ${coordinatesValue[0].toFixed(4)}, ${coordinatesValue[1].toFixed(4)}`;
 
-  const precisionSeverity = computePrecisionSeverity(precision);
-
-  let precisionText;
-  if (precision === 0)
+  let precisionText = '';
+  if (entrance.precision === 0) {
     precisionText = formatMessage({
       id: 'Coordinates precision unavailable for restricted access entrance.'
     });
-  else if (precision === undefined || precision === null)
-    precisionText = formatMessage({
-      id: 'Coordinates precision unknown.'
-    });
-  else {
+  } else if (entrance.precision !== undefined && entrance.precision !== null) {
     precisionText = formatMessage(
       {
         id: 'Coordinates precision: ±{precision}m',
         defaultMessage: 'Coordinates precision: ±{precision}m'
       },
-      {
-        precision
-      }
+      { precision: entrance.precision }
     );
   }
 
   const openOSM = () => {
     window.open(
-      `https://www.openstreetmap.org/?mlat=${coordinates[0]}&mlon=${coordinates[1]}`,
+      `https://www.openstreetmap.org/?mlat=${entrance.latitude}&mlon=${entrance.longitude}`,
       '_blank',
       'noopener,noreferrer'
     );
   };
   const openGM = () => {
     window.open(
-      `https://www.google.com/maps/search/?api=1&query=${coordinates[0]},${coordinates[1]}`,
+      `https://www.google.com/maps/search/?api=1&query=${entrance.latitude},${entrance.longitude}`,
       '_blank',
       'noopener,noreferrer'
     );
@@ -122,13 +86,17 @@ const Properties = () => {
   return (
     <GlobalWrapper>
       <Box display="flex" flexDirection="column">
-        {isValidCoordinates(coordinates) && (
+        {entrance.latitude && entrance.longitude && (
           <FlexContainer>
             <FlexContainerGrow>
               <Property
-                loading={loading}
+                loading={isLoading}
                 label={`${formatMessage({ id: 'Coordinates' })} (WGS84)`}
-                value={makeCoordinatesValue(coordinates)}
+                value={`${formatMessage({ id: 'Lat.' })} (N) / ${formatMessage({
+                  id: 'Long.'
+                })} (E) = ${entrance.latitude.toFixed(
+                  4
+                )}, ${entrance.longitude.toFixed(4)}`}
                 icon={<GpsFixed fontSize="large" color="primary" />}
               />
             </FlexContainerGrow>
@@ -148,25 +116,32 @@ const Properties = () => {
             </div>
           </FlexContainer>
         )}
-        <Alert severity={precisionSeverity} content={precisionText} />
+        {precisionText && (
+          <Alert
+            severity={computePrecisionSeverity(entrance.precision)}
+            content={precisionText}
+          />
+        )}
         <Box
           display="flex"
           flexDirection="row"
           flexWrap="wrap"
           justifyContent="flex-start">
           <Property
-            loading={loading}
+            loading={isLoading}
             label={formatMessage({ id: 'Country' })}
-            value={country}
-            url={`/ui/countries/${country}`}
+            value={entrance.country}
+            url={`/ui/countries/${entrance.country}`}
             icon={<FlagRounded fontSize="large" color="primary" />}
             secondary
           />
           <Property
             flexBasis="fill"
-            loading={loading}
+            loading={isLoading}
             label={formatMessage({ id: 'Location' })}
-            value={[city, region].flatMap(f => (f ? [f] : [])).join(', ')}
+            value={[entrance.city, entrance.region]
+              .flatMap(f => (f ? [f] : []))
+              .join(', ')}
             icon={<Public fontSize="large" color="primary" />}
             secondary
           />
@@ -176,21 +151,21 @@ const Properties = () => {
           flexDirection="row"
           flexWrap="wrap"
           justifyContent="flex-start">
-          {massif && (
+          {entrance.massif && (
             <Property
               label={formatMessage({ id: 'Massif' })}
-              value={massif.name}
+              value={entrance.massif.name}
               icon={<Terrain fontSize="large" color="primary" />}
-              url={`/ui/massifs/${massif.id}`}
+              url={`/ui/massifs/${entrance.massif.id}`}
             />
           )}
-          {cave && cave.entrances.length > 1 && (
+          {entrance.cave && entrance.cave.entrances.length > 1 && (
             <Property
               flexBasis="fit-content"
               label={formatMessage({ id: 'Cave' })}
-              value={`${cave.name}`}
+              value={`${entrance.cave.name}`}
               icon={<CustomIcon type="cave_system" />}
-              url={`/ui/caves/${cave.id}`}
+              url={`/ui/caves/${entrance.cave.id}`}
             />
           )}
         </Box>
@@ -200,54 +175,52 @@ const Properties = () => {
         flexDirection="row"
         flexWrap="wrap"
         justifyContent="flex-start">
-        {!!depth && (
+        {!!entrance.cave?.depth && (
           <Property
-            loading={loading}
+            loading={isLoading}
             label={formatMessage({ id: 'Depth' })}
-            value={`${depth} m`}
+            value={`${entrance.cave.depth} m`}
             icon={<CustomIcon type="depth" />}
           />
         )}
-        {!!development && (
+        {!!entrance.cave?.length && (
           <Property
-            loading={loading}
+            loading={isLoading}
             label={formatMessage({ id: 'Development' })}
-            value={`${development} m`}
+            value={`${entrance.cave.length} m`}
             icon={<CustomIcon type="length" />}
           />
         )}
-        {!!altitude && (
+        {!!entrance.altitude && (
           <Property
             label={formatMessage({ id: 'Altitude' })}
-            value={`${altitude} m`}
+            value={`${entrance.altitude} m`}
             icon={<Height color="primary" />}
           />
         )}
-        {!!temperature && (
+        {!!entrance.cave?.temperature && (
           <Property
-            loading={loading}
+            loading={isLoading}
             label={formatMessage({ id: 'Temperature' })}
-            value={`${temperature} °C`}
-            icon={<Title fontSize="large" color="primary" />}
-            // TODO: The Thermostat icon is only available in MUI v5
-            // icon={<Thermostat fontSize="large" color="primary"/>}
+            value={`${entrance.cave.temperature} °C`}
+            icon={<Thermostat fontSize="large" color="primary" />}
           />
         )}
-        {!!discoveryYear && (
+        {!!entrance.discoveryYear && (
           <Property
             label={formatMessage({ id: 'Year of discovery' })}
-            value={discoveryYear}
+            value={entrance.discoveryYear}
             icon={<CalendarToday color="primary" />}
           />
         )}
-        {!!undergroundType && (
+        {!!entrance.massif?.undergroundType && (
           <Property
             label={formatMessage({ id: 'Underground type' })}
-            value={undergroundType}
+            value={entrance.undergroundType}
             icon={<Category color="primary" />}
           />
         )}
-        {!!isDivingCave && (
+        {!!entrance.cave.isDiving && (
           <Property
             value={formatMessage({
               id: 'Diving cave'
@@ -257,17 +230,25 @@ const Properties = () => {
           />
         )}
       </Box>
-      {(!!access || !!interest || !!progression) && (
-        <SmallRatingsWrapper>
-          <StyledRatings
-            access={access}
-            interest={interest}
-            progression={progression}
-          />
-        </SmallRatingsWrapper>
-      )}
+      {!!entrance.stats &&
+        !!entrance.stats.approach &&
+        !!entrance.stats.aestheticism &&
+        !!entrance.stats.caving && (
+          <SmallRatingsWrapper>
+            <StyledRatings
+              access={entrance.stats.approach}
+              interest={entrance.stats.aestheticism}
+              progression={entrance.stats.caving}
+            />
+          </SmallRatingsWrapper>
+        )}
     </GlobalWrapper>
   );
+};
+
+Properties.propTypes = {
+  isLoading: PropTypes.bool,
+  entrance: EntrancePropTypes
 };
 
 export default Properties;

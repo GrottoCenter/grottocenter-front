@@ -1,43 +1,41 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { isNil } from 'ramda';
 import { GpsFixed, Public } from '@mui/icons-material';
-import { Property } from '../../../../Properties';
 import CustomIcon from '../../../../CustomIcon';
-import Title from './Title';
-import { makeCoordinatesValue } from './utils';
+import { Information, makeCoordinatesValue } from './utils';
 
 export const EntrancePopup = ({ entrance }) => (
   <>
-    <Title
-      title={entrance.name && entrance.name.toUpperCase()}
-      link={`/ui/entrances/${entrance.id}`}
+    <Information
+      isTitle
+      value={`${entrance.name}`}
+      url={`/ui/entrances/${entrance.id}`}
     />
     {entrance.caveName && entrance.caveName !== entrance.name && (
-      <Title title={entrance.caveName} link={`/ui/caves/${entrance.caveId}`} />
+      <Information
+        value={`${entrance.caveName}`}
+        icon={<CustomIcon size={24} type="cave_system" />}
+        url={`/ui/caves/${entrance.caveId}`}
+      />
     )}
-    <Property
-      secondary
-      value={`${!isNil(entrance.city) && entrance.city}, ${
-        !isNil(entrance.region) && entrance.region
+    <Information
+      value={`${entrance.city && entrance.city}, ${
+        entrance.region && entrance.region
       }`}
       icon={<Public color="primary" />}
     />
-    <Property
-      secondary
+    <Information
       value={makeCoordinatesValue(entrance.latitude, entrance.longitude)}
       icon={<GpsFixed color="primary" />}
     />
     {entrance.depth && (
-      <Property
-        secondary
+      <Information
         value={`${entrance.depth} m`}
         icon={<CustomIcon size={25} type="depth" />}
       />
     )}
     {entrance.length && (
-      <Property
-        secondary
+      <Information
         value={`${entrance.length} m`}
         icon={<CustomIcon size={25} type="length" />}
       />

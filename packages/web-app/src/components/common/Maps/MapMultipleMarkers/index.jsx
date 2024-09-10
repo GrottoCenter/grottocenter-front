@@ -1,57 +1,41 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import PropTypes from 'prop-types';
-import {
-  is,
-  isEmpty,
-  pipe,
-  length,
-  equals,
-  all,
-  allPass,
-  flatten,
-  isNil
-} from 'ramda';
 import { useMap } from 'react-leaflet';
 import { isMobile } from 'react-device-detect';
 import CustomMapContainer from '../common/MapContainer';
 import useMarkers from '../common/Markers/useMarkers';
 import { EntranceMarker } from '../common/Markers/Components';
 
-const isPair = pipe(length, equals(2));
-const isNumber = pipe(flatten, all(is(Number)));
-export const isValidPositions = allPass([
-  is(Array),
-  all(is(Array)),
-  all(isPair),
-  isNumber
-]);
-
-const makePosition = pos => ({ latitude: pos[0], longitude: pos[1] });
+export const filterValidPositions = positions =>
+  (positions ?? []).filter(
+    e => typeof e.latitude === 'number' && typeof e.longitude === 'number'
+  );
 
 const MultipleMarkers = ({ positions, zoom }) => {
   const map = useMap();
-  const updateEntranceMarkers = useMarkers(EntranceMarker);
+  const updateEntranceMarkers = useMarkers({
+    icon: EntranceMarker,
+    tooltipContent: entrance => entrance.name,
+    shouldFitMapBound: true
+  });
 
-  if (!isNil(zoom)) {
-    map.setZoom(zoom);
-  }
+  if (zoom) map.setZoom(zoom);
+
+  const validPositions = useMemo(
+    () => filterValidPositions(positions),
+    [positions]
+  );
+
   useEffect(() => {
-    updateEntranceMarkers(positions.map(makePosition));
-    if (
-      !isNil(positions) &&
-      !isEmpty(positions) &&
-      positions.every(p => !isNil(p[0]) && !isNil(p[1]))
-    ) {
-      map.fitBounds(positions);
-    }
-
+    if (validPositions.length === 0) return;
+    updateEntranceMarkers(validPositions);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [positions]);
+  }, [validPositions]);
 
   return null;
 };
 
-const HydratedMultipleMarkers = ({ style, zoom, ...otherProps }) => (
+const MapMultipleMarkers = ({ style, zoom, ...otherProps }) => (
   <CustomMapContainer
     wholePage={false}
     dragging={!isMobile} // For usability only use two fingers drag/zoom on mobile
@@ -64,10 +48,10 @@ const HydratedMultipleMarkers = ({ style, zoom, ...otherProps }) => (
 );
 
 // eslint-disable-next-line no-multi-assign
-HydratedMultipleMarkers.propTypes = MultipleMarkers.propTypes = {
-  positions: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.number)).isRequired,
+MapMultipleMarkers.propTypes = MultipleMarkers.propTypes = {
+  positions: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   style: PropTypes.shape({}),
   zoom: PropTypes.number
 };
 
-export default HydratedMultipleMarkers;
+export default MapMultipleMarkers;
