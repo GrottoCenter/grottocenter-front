@@ -8,11 +8,7 @@ import FixedContent from '../../common/Layouts/Fixed/FixedContent';
 import BadgesSection from './BadgesSection';
 import Details from './Details';
 import RelatedCaves from './RelatedCaves';
-import {
-  CaverPropTypes,
-  EntrancePropTypes,
-  NetworkPropTypes
-} from './propTypes';
+import { GrottoFullPropTypes } from '../../../types/grotto.type';
 import UsersList from '../../common/UsersList/UsersList';
 import Alert from '../../common/Alert';
 import { usePermissions } from '../../../hooks';
@@ -67,20 +63,13 @@ const Organization = ({ error, isLoading, organization }) => {
 
   const isActionLoading = wantedDeletedState !== organization?.isDeleted;
 
-  let position = [];
-  if (organization?.latitude && organization?.longitude) {
-    position = [organization?.latitude, organization?.longitude];
-  }
-
   return (
     <FixedContent
-      onEdit={onEdit}
-      onDelete={onDelete}
+      onEdit={!error ? onEdit : null}
+      onDelete={!error ? onDelete : null}
       avatar={
         isLoading ? (
-          <Skeleton>
-            <BadgesSection />
-          </Skeleton>
+          <Skeleton />
         ) : (
           !error && (
             <BadgesSection
@@ -111,10 +100,10 @@ const Organization = ({ error, isLoading, organization }) => {
           )
         )
       }
-      title={isLoading ? <Skeleton /> : organization?.name}
+      title={isLoading ? <Skeleton /> : organization?.name ?? ''}
       content={
         <>
-          {isLoading && (
+          {isLoading && !error && (
             <>
               <Skeleton height={150} /> {/* Details Skeleton */}
               <Skeleton height={100} /> {/* Members Skeleton */}
@@ -133,19 +122,16 @@ const Organization = ({ error, isLoading, organization }) => {
           {organization && (
             <>
               {organization.isDeleted && (
-                <>
-                  <DeletedCard
-                    entityType={DELETED_ENTITIES.organization}
-                    entity={organization}
-                    isLoading={isActionLoading}
-                    onRestorePress={onRestorePress}
-                    onPermanentDeletePress={() => {
-                      setIsDeleteConfirmationPermanent(true);
-                      setIsDeleteConfirmationOpen(true);
-                    }}
-                  />
-                  <hr />
-                </>
+                <DeletedCard
+                  entityType={DELETED_ENTITIES.organization}
+                  entity={organization}
+                  isLoading={isActionLoading}
+                  onRestorePress={onRestorePress}
+                  onPermanentDeletePress={() => {
+                    setIsDeleteConfirmationPermanent(true);
+                    setIsDeleteConfirmationOpen(true);
+                  }}
+                />
               )}
               <DeleteConfirmationDialog
                 entityType={DELETED_ENTITIES.organization}
@@ -158,19 +144,7 @@ const Organization = ({ error, isLoading, organization }) => {
                   onDeletePress(entity?.id, isDeleteConfirmationPermanent);
                 }}
               />
-              <Details
-                address={organization.address}
-                city={organization.city}
-                country={organization.country}
-                county={organization.county}
-                customMessage={organization.customMessage}
-                mail={organization.mail}
-                postalCode={organization.postalCode}
-                region={organization.region}
-                village={organization.village}
-                position={position}
-                organization={organization}
-              />
+              <Details organization={organization} />
 
               <hr />
               <UsersList
@@ -215,27 +189,7 @@ const Organization = ({ error, isLoading, organization }) => {
 Organization.propTypes = {
   error: PropTypes.shape({}),
   isLoading: PropTypes.bool.isRequired,
-  organization: PropTypes.shape({
-    isDeleted: PropTypes.bool,
-    address: PropTypes.string,
-    mail: PropTypes.string,
-    customMessage: PropTypes.string,
-    cavers: PropTypes.arrayOf(CaverPropTypes),
-    city: PropTypes.string,
-    country: PropTypes.string,
-    county: PropTypes.string,
-    exploredEntrances: PropTypes.arrayOf(EntrancePropTypes),
-    exploredNetworks: PropTypes.arrayOf(NetworkPropTypes),
-    isOfficialPartner: PropTypes.bool,
-    name: PropTypes.string.isRequired,
-    region: PropTypes.string,
-    postalCode: PropTypes.string,
-    village: PropTypes.string,
-    yearBirth: PropTypes.number,
-    longitude: PropTypes.number,
-    latitude: PropTypes.number,
-    documents: PropTypes.arrayOf(PropTypes.shape({}))
-  })
+  organization: GrottoFullPropTypes
 };
 
 export default Organization;

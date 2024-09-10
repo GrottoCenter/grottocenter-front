@@ -1,105 +1,211 @@
-import React, { useContext, useRef } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
-import { isNil } from 'ramda';
+import { useParams, useHistory } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import Skeleton from '@mui/material/Skeleton';
+import { Box, Card } from '@mui/material';
 
-import { useBoolean, usePermissions } from '../../../hooks';
-import Layout from '../../common/Layouts/Fixed';
+import { usePermissions } from '../../../hooks';
+import FixedLayout from '../../common/Layouts/Fixed';
 import FixedContent from '../../common/Layouts/Fixed/FixedContent';
 import CustomIcon from '../../common/CustomIcon';
 import EntrancesMap from './EntrancesMap';
-import Provider, { CaveContext, caveTypes } from './Provider';
 import Properties from './Properties';
+import { deleteCave } from '../../../actions/Cave/DeleteCave';
+import { restoreCave } from '../../../actions/Cave/RestoreCave';
+import EntrancesSelector from './EntrancesSelector';
 import { NetworkForm } from '../EntitiesForm';
 import StandardDialog from '../../common/StandardDialog';
-import AuthorLink from '../../common/AuthorLink/index';
+import AuthorAndDate from '../../common/Contribution/AuthorAndDate';
+import Alert from '../../common/Alert';
+import EntrancesList from './EntrancesList';
+import Descriptions from '../Descriptions';
+import { filterValidPositions } from '../../common/Maps/MapMultipleMarkers';
+import { CavePropTypes } from '../../../types/cave.type';
+import {
+  DeletedCard,
+  DeleteConfirmationDialog,
+  DELETED_ENTITIES
+} from '../../common/card/Deleted';
 
-export const Network = ({ children }) => {
-  const { formatMessage, formatDate } = useIntl();
-  const {
-    state: { cave, entrances }
-  } = useContext(CaveContext);
-  const { author, reviewer, creationDate, dateReviewed, name } = cave;
-  const editPage = useBoolean();
+export const Network = ({ isLoading, error, cave }) => {
+  const dispatch = useDispatch();
+  const { formatMessage } = useIntl();
+  const history = useHistory();
+  const { caveId } = useParams();
   const permissions = usePermissions();
+  const componentRef = useRef();
+  const [isEditing, setEditing] = useState(false);
+  const [selectedEntrancesId, setSelectedEntrancesId] = useState([]);
+  const [isDeleteConfirmationOpen, setIsDeleteConfirmationOpen] =
+    useState(false);
+  const [isDeleteConfirmationPermanent, setIsDeleteConfirmationPermanent] =
+    useState(false);
+  const [wantedDeletedState, setWantedDeletedState] = useState(false);
 
-  const handleEdit = () => {
-    editPage.open();
+  useEffect(() => {
+    if (cave) setWantedDeletedState(cave.isDeleted);
+  }, [cave]);
+
+  let onDelete = null;
+  if (!cave?.isDeleted && permissions.isModerator) {
+    onDelete = () => {
+      setIsDeleteConfirmationPermanent(false);
+      setIsDeleteConfirmationOpen(true);
+    };
+  }
+
+  const onDeletePress = (entityId, isPermanent) => {
+    setWantedDeletedState(true);
+    dispatch(deleteCave({ id: caveId, entityId, isPermanent }));
+    if (isPermanent) history.replace('/');
+  };
+  const onRestorePress = () => {
+    setWantedDeletedState(false);
+    dispatch(restoreCave({ id: caveId }));
   };
 
-  const componentRef = useRef();
+  const isActionLoading = wantedDeletedState !== cave?.isDeleted;
+
   return (
     <div ref={componentRef}>
-      <Layout
+      <FixedLayout
         fixedContent={
-          <FixedContent
-            title={name ?? ''}
-            icon={<CustomIcon type="cave_system" />}
-            onEdit={permissions.isAuth ? handleEdit : undefined}
-            printRef={componentRef}
-            content={
-              <>
-                <EntrancesMap />
-                <Properties />
-              </>
-            }
-            footer={
-              <span>
-                {isNil(reviewer) && (
-                  <AuthorLink author={author} verb="Created" />
-                )}
-                {isNil(reviewer) &&
-                  !isNil(creationDate) &&
-                  ` (${formatDate(creationDate)})`}
-                {!isNil(reviewer) && (
-                  <AuthorLink author={reviewer} verb="Updated" />
-                )}
-                {!isNil(reviewer) &&
-                  !isNil(dateReviewed) &&
-                  ` (${formatDate(dateReviewed)})`}
-              </span>
-            }
-          />
-        }>
-        {children}
-        {permissions.isAuth && (
-          <StandardDialog
-            fullWidth
-            maxWidth="md"
-            open={editPage.isOpen}
-            onClose={editPage.close}
-            scrollable
-            title={formatMessage({ id: 'Network edition' })}>
-            <NetworkForm
-              networkValues={{
-                ...cave,
-                entrances,
-                name: cave && cave.names ? cave.names[0].name : '',
-                language: cave && cave.names ? cave.names[0].language : '',
-                massif: cave?.massif || ''
-              }}
+          cave && (
+            <FixedContent
+              title={cave?.name ?? ''}
+              icon={<CustomIcon type="cave_system" />}
+              onEdit={
+                permissions.isAuth && !cave?.isDeleted
+                  ? () => setEditing(true)
+                  : undefined
+              }
+              onDelete={onDelete}
+              printRef={componentRef}
+              content={
+                <>
+                  {cave.isDeleted && (
+                    <DeletedCard
+                      entityType={DELETED_ENTITIES.network}
+                      entity={cave}
+                      isLoading={isActionLoading}
+                      onRestorePress={onRestorePress}
+                      onPermanentDeletePress={() => {
+                        setIsDeleteConfirmationPermanent(true);
+                        setIsDeleteConfirmationOpen(true);
+                      }}
+                    />
+                  )}
+                  <DeleteConfirmationDialog
+                    entityType={DELETED_ENTITIES.network}
+                    isOpen={isDeleteConfirmationOpen}
+                    isLoading={isActionLoading}
+                    isPermanent={isDeleteConfirmationPermanent}
+                    isSearchMandatory={
+                      isDeleteConfirmationPermanent &&
+                      (cave?.entrances ?? []).length > 0
+                    }
+                    onClose={() => setIsDeleteConfirmationOpen(false)}
+                    onConfirmation={entity => {
+                      onDeletePress(entity?.id, isDeleteConfirmationPermanent);
+                    }}
+                  />
+
+                  <EntrancesMap
+                    isLoading={isLoading ?? true}
+                    entrances={cave?.entrances ?? []}
+                    selectedEntrancesId={selectedEntrancesId}
+                  />
+                  <Properties isLoading={isLoading} cave={cave ?? {}}>
+                    {filterValidPositions(cave?.entrances ?? []).length > 1 && (
+                      <EntrancesSelector
+                        onSelect={newSelection =>
+                          setSelectedEntrancesId(newSelection)
+                        }
+                        isLoading={isLoading}
+                        entrances={cave?.entrances}
+                        selectedEntrancesId={selectedEntrancesId}
+                      />
+                    )}
+                  </Properties>
+                </>
+              }
+              footer={
+                <>
+                  {cave.author && (
+                    <AuthorAndDate
+                      author={cave.author}
+                      verb="Created"
+                      date={cave.creationDate}
+                    />
+                  )}
+                  {cave.reviewer && (
+                    <AuthorAndDate
+                      author={cave.reviewer}
+                      verb="Updated"
+                      date={cave.dateReviewed}
+                    />
+                  )}
+                </>
+              }
             />
-          </StandardDialog>
+          )
+        }>
+        {isLoading && (
+          <Card sx={{ padding: 3 }}>
+            <Box style={{ display: 'flex', justifyContent: 'center' }}>
+              <Skeleton height={300} width={800} /> {/* Map Skeleton */}
+            </Box>
+            <Skeleton height={100} /> {/* EntranceList Skeleton */}
+            <Skeleton height={100} /> {/* Description Skeleton */}
+          </Card>
         )}
-      </Layout>
+        {error && (
+          <Card sx={{ padding: 3 }}>
+            <Alert
+              title={formatMessage({
+                id: 'Error, the network data you are looking for is not available.'
+              })}
+              severity="error"
+            />
+          </Card>
+        )}
+        {cave && (
+          <>
+            <EntrancesList
+              isLoading={isLoading}
+              entrances={cave.entrances}
+              selectedEntrancesId={selectedEntrancesId}
+            />
+            <Descriptions
+              descriptions={cave.descriptions}
+              entityType="cave"
+              entityId={cave.id}
+              isEditAllowed={!cave.isDeleted}
+            />
+            {permissions.isAuth && (
+              <StandardDialog
+                fullWidth
+                maxWidth="md"
+                open={isEditing}
+                onClose={() => setEditing(false)}
+                scrollable
+                title={formatMessage({ id: 'Network edition' })}>
+                <NetworkForm networkValues={{ ...cave }} />
+              </StandardDialog>
+            )}
+          </>
+        )}
+      </FixedLayout>
     </div>
   );
 };
 
-const HydratedNetwork = ({ children, ...props }) => (
-  <Provider {...props}>
-    <Network>{children}</Network>
-  </Provider>
-);
-
 Network.propTypes = {
-  children: PropTypes.node.isRequired
+  isLoading: PropTypes.bool.isRequired,
+  error: PropTypes.shape({}),
+  cave: CavePropTypes
 };
 
-HydratedNetwork.propTypes = {
-  data: caveTypes.isRequired,
-  loading: PropTypes.bool,
-  children: PropTypes.node.isRequired
-};
-
-export default HydratedNetwork;
+export default Network;

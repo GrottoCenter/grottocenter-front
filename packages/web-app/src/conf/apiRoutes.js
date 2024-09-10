@@ -26,6 +26,15 @@ export const forgotPasswordUrl = `${API_BASE_PATH}/forgotPassword`;
 export const getCaveUrl = `${API_BASE_PATH}/caves/`;
 export const postCreateCaveUrl = `${API_BASE_PATH}/caves`;
 export const putCaveUrl = caveId => `${API_BASE_PATH}/caves/${caveId}`;
+export const deleteCaveUrl = (caveId, { entityId, isPermanent = false }) =>
+  `${API_BASE_PATH}/caves/${caveId}?${[
+    isPermanent ? 'isPermanent=1' : '',
+    entityId ? `entityId=${entityId}` : ''
+  ]
+    .filter(e => e)
+    .join('&')}`;
+export const restoreCaveUrl = caveId =>
+  `${API_BASE_PATH}/caves/${caveId}/restore`;
 
 // ===== Countries urls
 export const getCountryUrl = countryId =>
@@ -110,6 +119,18 @@ export const entranceDetailPath = `${API_BASE_PATH}/entrances/`;
 export const postCreateEntranceUrl = `${API_BASE_PATH}/entrances`;
 export const putEntranceUrl = entranceId =>
   `${API_BASE_PATH}/entrances/${entranceId}`;
+export const deleteEntranceUrl = (
+  entranceId,
+  { entityId, isPermanent = false }
+) =>
+  `${API_BASE_PATH}/entrances/${entranceId}?${[
+    isPermanent ? 'isPermanent=1' : '',
+    entityId ? `entityId=${entityId}` : ''
+  ]
+    .filter(e => e)
+    .join('&')}`;
+export const restoreEntranceUrl = entranceId =>
+  `${API_BASE_PATH}/entrances/${entranceId}/restore`;
 
 // ===== Geoloc urls
 export const getMapCavesUrl = `${API_BASE_PATH}/geoloc/networks`;
