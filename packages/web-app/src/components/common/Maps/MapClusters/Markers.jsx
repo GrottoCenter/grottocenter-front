@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { includes, propOr, values } from 'ramda';
+import { includes, values } from 'ramda';
 import PropTypes from 'prop-types';
 
 import { heatmapTypes } from './DataControl';
@@ -28,21 +28,23 @@ const Markers = ({
   entrances = [],
   networks = []
 }) => {
-  const updateEntranceMarkers = useMarkers(
-    EntranceMarker,
-    entrance => <EntrancePopup entrance={entrance} />,
-    entrance => propOr(null, 'name', entrance)
-  );
-  const updateNetworkMarkers = useMarkers(
-    NetworkMarker,
-    network => <NetworkPopup network={network} />,
-    network => propOr(null, 'name', network)
-  );
-  const updateOrganizationMarkers = useMarkers(
-    OrganizationMarker,
-    organization => <OrganizationPopup organization={organization} />,
-    organization => propOr(null, 'name', organization)
-  );
+  const updateEntranceMarkers = useMarkers({
+    icon: EntranceMarker,
+    popupContent: entrance => <EntrancePopup entrance={entrance} />,
+    tooltipContent: entrance => entrance?.name
+  });
+  const updateNetworkMarkers = useMarkers({
+    icon: NetworkMarker,
+    popupContent: network => <NetworkPopup network={network} />,
+    tooltipContent: network => network?.name
+  });
+  const updateOrganizationMarkers = useMarkers({
+    icon: OrganizationMarker,
+    popupContent: organization => (
+      <OrganizationPopup organization={organization} />
+    ),
+    tooltipContent: organization => organization?.name
+  });
 
   useEffect(() => {
     if (isEntrances(visibleMarkers)) {

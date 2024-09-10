@@ -12,7 +12,7 @@ import React from 'react';
 import { isNil } from 'ramda';
 import { styled } from '@mui/material/styles';
 import PropTypes from 'prop-types';
-import { obstacleType } from '../Provider';
+import { ObstaclePropTypes } from '../../../../types/entrance.type';
 
 import { HighLightsLine } from '../../../common/Highlights';
 import SectionTitle from '../SectionTitle';
@@ -122,8 +122,8 @@ const RiggingTable = ({ obstacles, title, previous, isDeleted }) => {
 };
 
 RiggingTable.propTypes = {
-  obstacles: PropTypes.arrayOf(obstacleType),
-  previous: PropTypes.arrayOf(obstacleType),
+  obstacles: PropTypes.arrayOf(ObstaclePropTypes),
+  previous: PropTypes.arrayOf(ObstaclePropTypes),
   title: PropTypes.string.isRequired,
   isDeleted: PropTypes.bool
 };

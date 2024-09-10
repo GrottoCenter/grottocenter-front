@@ -1,18 +1,19 @@
 import { Box } from '@mui/material';
 import { useDispatch } from 'react-redux';
 import React, { useState, useEffect } from 'react';
+import PropTypes from 'prop-types';
 import { usePermissions } from '../../../../hooks';
 import { updateRiggings } from '../../../../actions/Riggings/UpdateRigging';
 import { deleteRiggings } from '../../../../actions/Riggings/DeleteRigging';
 import { restoreRiggings } from '../../../../actions/Riggings/RestoreRigging';
 import ActionButtons from '../ActionButtons';
 import CreateRiggingsForm from '../../Form/RiggingsForm/index';
-import { riggingType } from '../Provider';
+import { RiggingPropTypes } from '../../../../types/entrance.type';
 import Contribution from '../../../common/Contribution/Contribution';
 import RiggingTable from './RiggingTable';
 import { SnapshotButton } from '../Snapshots/UtilityFunction';
 
-const Rigging = ({ rigging }) => {
+const Rigging = ({ rigging, isEditAllowed }) => {
   const dispatch = useDispatch();
   const permissions = usePermissions();
   const [isUpdateFormVisible, setIsUpdateFormVisible] = useState(false);
@@ -56,8 +57,8 @@ const Rigging = ({ rigging }) => {
           isUpdating={isUpdateFormVisible}
           setIsUpdating={setIsUpdateFormVisible}
           isDeleted={rigging.isDeleted}
-          canEdit={permissions.isAuth}
-          canDelete={permissions.isModerator}
+          canEdit={isEditAllowed && permissions.isAuth}
+          canDelete={isEditAllowed && permissions.isModerator}
           snapshotEl={
             <SnapshotButton id={rigging.id} type="riggings" content={rigging} />
           }
@@ -90,7 +91,8 @@ const Rigging = ({ rigging }) => {
 };
 
 Rigging.propTypes = {
-  rigging: riggingType
+  rigging: RiggingPropTypes,
+  isEditAllowed: PropTypes.bool
 };
 
 export default Rigging;

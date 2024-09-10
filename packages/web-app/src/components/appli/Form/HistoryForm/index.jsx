@@ -8,7 +8,7 @@ import { styled } from '@mui/material/styles';
 import { isNil } from 'ramda';
 
 import LanguageAutoComplete from '../LanguageAutoComplete';
-import { historyType } from '../../Entry/Provider';
+import { HistoryPropTypes } from '../../../../types/entrance.type';
 
 const SpacedButton = styled(Button)`
   ${({ theme }) => `
@@ -74,11 +74,7 @@ const CreateHistoryForm = ({ closeForm, onSubmit, values, isNewHistory }) => {
           />
         )}
       />
-      {closeForm && (
-        <SpacedButton onClick={closeForm}>
-          {formatMessage({ id: 'Cancel' })}
-        </SpacedButton>
-      )}
+
       <SpacedButton
         color="primary"
         type="submit"
@@ -91,6 +87,11 @@ const CreateHistoryForm = ({ closeForm, onSubmit, values, isNewHistory }) => {
       <SpacedButton variant="outlined" onClick={resetToDefault}>
         {formatMessage({ id: 'Reset' })}
       </SpacedButton>
+      {closeForm && (
+        <SpacedButton onClick={closeForm}>
+          {formatMessage({ id: 'Cancel' })}
+        </SpacedButton>
+      )}
     </Box>
   );
 };
@@ -99,7 +100,7 @@ CreateHistoryForm.propTypes = {
   closeForm: PropTypes.func,
   isNewHistory: PropTypes.bool.isRequired,
   onSubmit: PropTypes.func.isRequired,
-  values: historyType
+  values: HistoryPropTypes
 };
 
 export default CreateHistoryForm;

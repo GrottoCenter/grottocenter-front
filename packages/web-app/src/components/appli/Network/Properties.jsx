@@ -1,13 +1,11 @@
-import React, { useContext } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import { styled } from '@mui/material/styles';
-import { Terrain, Waves, Title } from '@mui/icons-material';
+import { Terrain, Waves, Thermostat } from '@mui/icons-material';
 
 import CustomIcon from '../../common/CustomIcon';
-import { isValidPositions } from '../../common/Maps/MapMultipleMarkers';
 import { Property } from '../../common/Properties';
-import EntrancesSelection from './EntrancesSelection';
-import { CaveContext } from './Provider';
 
 const Wrapper = styled('div')`
   display: flex;
@@ -20,77 +18,77 @@ const SecondaryPropertiesWrapper = styled('div')`
   flex-wrap: wrap;
 `;
 
-const Properties = () => {
-  const {
-    state: {
-      cave: { length, depth, temperature, isDivingCave, massif },
-      coordinates,
-      selectedEntrances,
-      entrances,
-      loading
-    },
-    action: { onSelectEntrance }
-  } = useContext(CaveContext);
+const Properties = ({ isLoading, cave, children }) => {
   const { formatMessage } = useIntl();
 
   return (
     <Wrapper>
-      {isValidPositions(coordinates) && (
-        <EntrancesSelection
-          onSelect={onSelectEntrance}
-          loading={loading}
-          entrances={entrances}
-          selection={selectedEntrances}
-        />
-      )}
-      {depth && (
+      {children}
+      {!!cave.depth && (
         <Property
-          loading={loading}
+          loading={isLoading}
           label={formatMessage({ id: 'Depth' })}
-          value={`${depth} m`}
+          value={`${cave.depth} m`}
           icon={<CustomIcon type="depth" />}
         />
       )}
-      {length && (
+      {!!cave.length && (
         <Property
-          loading={loading}
+          loading={isLoading}
           label={formatMessage({ id: 'Development' })}
-          value={`${length} m`}
+          value={`${cave.length} m`}
           icon={<CustomIcon type="length" />}
         />
       )}
       <SecondaryPropertiesWrapper>
-        {massif && (
+        {!!cave.massifs &&
+          cave.massifs.map(massif => (
+            <Property
+              id={massif.id}
+              label={formatMessage({ id: 'Massif' })}
+              value={massif.name}
+              url={`/ui/massifs/${massif.id}`}
+              icon={<Terrain color="primary" />}
+              secondary
+            />
+          ))}
+        {!!cave.isDiving && (
           <Property
-            label={formatMessage({ id: 'Massif' })}
-            value={massif.name}
-            url={`/ui/massifs/${massif.id}`}
-            icon={<Terrain color="primary" />}
-            secondary
-          />
-        )}
-        {isDivingCave && (
-          <Property
-            value={formatMessage({
-              id: 'Diving cave'
-            })}
+            loading={isLoading}
+            value={formatMessage({ id: 'Diving cave' })}
             icon={<Waves color="primary" />}
             secondary
           />
         )}
-        {temperature && (
+        {!!cave.temperature && (
           <Property
-            loading={loading}
+            loading={isLoading}
             label={formatMessage({ id: 'Temperature' })}
-            value={`${temperature} °C`}
-            icon={<Title fontSize="large" color="primary" />}
-            // TODO: The Thermostat icon is only available in MUI v5
-            // icon={<Thermostat fontSize="large" color="primary"/>}
+            value={`${cave.temperature} °C`}
+            icon={<Thermostat fontSize="large" color="primary" />}
           />
         )}
       </SecondaryPropertiesWrapper>
     </Wrapper>
   );
+};
+
+Properties.propTypes = {
+  isLoading: PropTypes.bool.isRequired,
+  children: PropTypes.node,
+  cave: PropTypes.shape({
+    id: PropTypes.number.isRequired,
+    depth: PropTypes.number,
+    length: PropTypes.number,
+    temperature: PropTypes.number,
+    isDiving: PropTypes.bool,
+    massifs: PropTypes.arrayOf(
+      PropTypes.shape({
+        id: PropTypes.number.isRequired,
+        name: PropTypes.string.isRequired
+      })
+    )
+  })
 };
 
 export default Properties;

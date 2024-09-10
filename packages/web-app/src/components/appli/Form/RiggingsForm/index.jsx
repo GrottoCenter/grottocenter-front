@@ -22,10 +22,9 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { Controller, useForm, useFieldArray } from 'react-hook-form';
 import { styled } from '@mui/material/styles';
-import { isNil } from 'ramda';
 
 import LanguageAutoComplete from '../LanguageAutoComplete';
-import { riggingType } from '../../Entry/Provider';
+import { RiggingPropTypes } from '../../../../types/entrance.type';
 
 const touch = matchMedia('(hover: none), (pointer: coarse)').matches;
 
@@ -94,7 +93,7 @@ const CreateRiggingsForm = ({ closeForm, onSubmit, values, isNew }) => {
         rules={{ required: true }}
         render={({ field: { onChange, value }, fieldState: { error } }) => (
           <LanguageAutoComplete
-            hasError={!isNil(error)}
+            hasError={!!error}
             helperContent={formatMessage({
               id: 'The title and text language'
             })}
@@ -271,11 +270,6 @@ const CreateRiggingsForm = ({ closeForm, onSubmit, values, isNew }) => {
           {formatMessage({ id: 'New line' })}
         </Button>
       </Box>
-      {closeForm && (
-        <SpacedButton onClick={closeForm}>
-          {formatMessage({ id: 'Cancel' })}
-        </SpacedButton>
-      )}
       <SpacedButton
         color="primary"
         type="submit"
@@ -288,6 +282,11 @@ const CreateRiggingsForm = ({ closeForm, onSubmit, values, isNew }) => {
       <SpacedButton variant="outlined" onClick={resetToDefault}>
         {formatMessage({ id: 'Reset' })}
       </SpacedButton>
+      {closeForm && (
+        <SpacedButton onClick={closeForm}>
+          {formatMessage({ id: 'Cancel' })}
+        </SpacedButton>
+      )}
     </Box>
   );
 };
@@ -296,7 +295,7 @@ CreateRiggingsForm.propTypes = {
   closeForm: PropTypes.func,
   isNew: PropTypes.bool.isRequired,
   onSubmit: PropTypes.func.isRequired,
-  values: riggingType
+  values: RiggingPropTypes
 };
 
 export default CreateRiggingsForm;

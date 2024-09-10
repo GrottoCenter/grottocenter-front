@@ -19,14 +19,6 @@ export const makeUrl = (url, criterias) => {
   return url;
 };
 
-export const checkStatusAndGetText = response => {
-  if (response.status >= 200 && response.status <= 300) {
-    return response;
-  }
-  const errorMessage = new Error(response.statusText);
-  throw errorMessage;
-};
-
 export const checkAndGetStatus = response => {
   if (response.status >= 200 && response.status <= 300) {
     return response;

@@ -1,3 +1,17 @@
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
 .App {
   text-align: center;
 }
@@ -40,6 +54,24 @@
 .fadeOut {
   opacity: 0;
   transition: opacity 0.5s;
+}
+
+
+.map-popup-property {
+  display: flex;
+  align-items: center;
+  font-size: 13px;
+}
+
+.map-popup-property p {
+  margin: 1em 0;
+}
+.map-popup-property img, .map-popup-property svg {
+  margin-right: 1em;
+}
+
+.leaflet-tooltip{
+  font-size: 13px;
 }
 
 

@@ -61,7 +61,10 @@ const StandardDialog = ({
 export default StandardDialog;
 
 StandardDialog.propTypes = {
-  actions: PropTypes.arrayOf(PropTypes.node),
+  actions: PropTypes.oneOfType([
+    PropTypes.node,
+    PropTypes.arrayOf(PropTypes.node)
+  ]),
   children: PropTypes.node,
   fullScreen: PropTypes.bool,
   fullWidth: PropTypes.bool,

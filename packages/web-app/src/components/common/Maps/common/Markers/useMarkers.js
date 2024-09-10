@@ -1,20 +1,18 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useMap } from 'react-leaflet';
 import * as L from 'leaflet';
-import { anyPass, forEach, isEmpty, isNil, map as rMap } from 'ramda';
 import { renderToString } from 'react-dom/server';
 import { BrowserRouter } from 'react-router-dom';
 import {
   ThemeProvider,
   StyledEngineProvider,
-  keyframes
+  keyframes,
+  css
 } from '@mui/material/styles';
 import { GlobalStyles } from '@mui/material';
 import { IntlProvider } from 'react-intl';
 import { useSelector } from 'react-redux';
-import theme from '../../../../../conf/grottoTheme';
-
-const isNilOrEmpty = anyPass([isNil, isEmpty]);
+import grottoTheme from '../../../../../conf/grottoTheme';
 
 const fadeIn = keyframes`
   0% {
@@ -27,76 +25,77 @@ const fadeIn = keyframes`
 
 export const MarkerGlobalCss = (
   <GlobalStyles
-    styles={`
-    & .fade-in-markers {
-      animation: 0.3s ${fadeIn} ease-out;
-     }
+    styles={css`
+      & .fade-in-markers {
+        animation: 0.3s ${fadeIn} ease-out;
+      }
 
-     .leaflet-container{
-       font-size: 1rem;
-     }`}
+      .leaflet-container {
+        font-size: 1rem;
+      }
+    `}
   />
 );
 
-const useMarkers = (icon, popupContent = null, tooltipContent = null) => {
+const useMarkers = ({
+  icon,
+  popupContent = null,
+  tooltipContent = null,
+  shouldFitMapBound = false
+}) => {
   const map = useMap();
   const [canvas] = useState(L.canvas());
-  const [markers, setMarkers] = useState(null);
-  const options = { icon, renderer: canvas };
+  const [markers, setMarkers] = useState([]);
   const { locale, messages } = useSelector(state => state.intl);
+  const options = { icon, renderer: canvas };
 
-  const makeMarkers = rMap(marker => {
-    const { latitude, longitude } = marker;
-    if (!isNil(popupContent)) {
-      if (!isNil(tooltipContent)) {
-        return L.marker([latitude, longitude], options)
-          .bindPopup(
-            renderToString(
-              // Without theme provider the CSS doesn't work properly
-              // It's makes the map slower when there is a lot of markers
-              // One way to optimize it would be to not use MUI for the markers
-              <IntlProvider locale={locale} messages={messages[locale]}>
-                <BrowserRouter>
-                  <StyledEngineProvider injectFirst>
-                    <ThemeProvider theme={theme}>
-                      {popupContent(marker)}
-                    </ThemeProvider>
-                  </StyledEngineProvider>
-                </BrowserRouter>
-              </IntlProvider>
-            )
+  const makeMarkers = newMarkers =>
+    newMarkers.map(marker => {
+      const { latitude, longitude } = marker;
+      const markerEl = L.marker([latitude, longitude], options);
+
+      if (popupContent) {
+        markerEl.bindPopup(
+          renderToString(
+            // Without theme provider the CSS doesn't work properly
+            // It's makes the map slower when there is a lot of markers
+            // One way to optimize it would be to not use MUI for the markers
+            <IntlProvider locale={locale} messages={messages[locale]}>
+              <BrowserRouter>
+                <StyledEngineProvider injectFirst>
+                  <ThemeProvider theme={grottoTheme}>
+                    {popupContent(marker)}
+                  </ThemeProvider>
+                </StyledEngineProvider>
+              </BrowserRouter>
+            </IntlProvider>
           )
-          .bindTooltip(`${tooltipContent(marker)}`, {});
+        );
       }
-      return L.marker([latitude, longitude], options).bindPopup(
-        renderToString(popupContent(marker))
-      );
-    }
-    return L.marker([latitude, longitude], options);
-  });
 
-  const addMarkers = forEach(marker => marker.addTo(map));
-  const deleteMarkers = forEach(marker => marker.remove(map));
+      if (tooltipContent) {
+        markerEl.bindTooltip(`${tooltipContent(marker)}`, {});
+      }
+
+      return markerEl;
+    });
 
   useEffect(() => {
-    if (!isNilOrEmpty(markers)) {
-      addMarkers(markers);
+    for (const marker of markers) marker.addTo(map);
+
+    if (shouldFitMapBound && markers.length > 0) {
+      map.fitBounds(
+        markers.map(e => e.getLatLng()),
+        { padding: [40, 40], maxZoom: 16 }
+      );
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [markers]);
+  }, [markers, map, shouldFitMapBound]);
 
-  const handleUpdateMarkers = useCallback(
-    newMarkers => {
-      if (!isNilOrEmpty(markers)) {
-        deleteMarkers(markers);
-      }
-      setMarkers(isNilOrEmpty(newMarkers) ? null : makeMarkers(newMarkers));
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [deleteMarkers]
-  );
-
-  return handleUpdateMarkers;
+  return newMarkers => {
+    for (const marker of markers) marker.remove(map);
+    if (newMarkers && newMarkers.length > 0)
+      setMarkers(makeMarkers(newMarkers));
+  };
 };
 
 export default useMarkers;

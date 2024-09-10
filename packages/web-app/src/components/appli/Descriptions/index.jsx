@@ -7,14 +7,19 @@ import AddCircleIcon from '@mui/icons-material/AddCircle';
 import CancelIcon from '@mui/icons-material/Cancel';
 
 import ScrollableContent from '../../common/Layouts/Fixed/ScrollableContent';
-import { descriptionsType } from './propTypes';
+import { DescriptionPropTypes } from '../../../types/description.type';
 import Description from './Description';
 import CreateDescriptionForm from '../Form/DescriptionForm';
 import { postDescription } from '../../../actions/Description/CreateDescription';
 import { usePermissions } from '../../../hooks';
 import Alert from '../../common/Alert';
 
-const Descriptions = ({ entityType, entityId, descriptions }) => {
+const Descriptions = ({
+  entityType,
+  entityId,
+  descriptions,
+  isEditAllowed = true
+}) => {
   const { formatMessage } = useIntl();
   const permissions = usePermissions();
   const dispatch = useDispatch();
@@ -37,7 +42,8 @@ const Descriptions = ({ entityType, entityId, descriptions }) => {
       dense
       title={formatMessage({ id: 'Description' })}
       icon={
-        permissions.isAuth && (
+        permissions.isAuth &&
+        isEditAllowed && (
           <Tooltip
             title={
               isFormVisible
@@ -66,7 +72,11 @@ const Descriptions = ({ entityType, entityId, descriptions }) => {
           {descriptions.length > 0 ? (
             <List dense disablePadding>
               {descriptions.map(description => (
-                <Description description={description} key={description.id} />
+                <Description
+                  description={description}
+                  isEditAllowed={isEditAllowed}
+                  key={description.id}
+                />
               ))}
             </List>
           ) : (
@@ -86,7 +96,8 @@ const Descriptions = ({ entityType, entityId, descriptions }) => {
 Descriptions.propTypes = {
   entityType: PropTypes.oneOf(['entrance', 'cave', 'massif']),
   entityId: PropTypes.number.isRequired,
-  descriptions: descriptionsType
+  descriptions: PropTypes.arrayOf(DescriptionPropTypes),
+  isEditAllowed: PropTypes.bool
 };
 
 export default Descriptions;

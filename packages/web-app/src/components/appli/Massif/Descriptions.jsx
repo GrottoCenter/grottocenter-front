@@ -10,7 +10,7 @@ import {
   Box
 } from '@mui/material';
 import Contribution from '../../common/Contribution/Contribution';
-import authorType from '../../../types/author.type';
+import { DescriptionPropTypes } from '../../../types/description.type';
 
 const Descriptions = ({ descriptions }) => {
   const { formatMessage } = useIntl();
@@ -48,17 +48,7 @@ const Descriptions = ({ descriptions }) => {
 };
 
 Descriptions.propTypes = {
-  descriptions: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.number,
-      author: authorType,
-      reviewer: authorType,
-      dateInscription: PropTypes.string,
-      dateReviewed: PropTypes.string,
-      title: PropTypes.string.isRequired,
-      body: PropTypes.string
-    })
-  )
+  descriptions: PropTypes.arrayOf(DescriptionPropTypes)
 };
 
 export default Descriptions;

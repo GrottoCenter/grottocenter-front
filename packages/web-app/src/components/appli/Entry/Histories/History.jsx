@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Box, ListItem, ListItemText } from '@mui/material';
 import { useDispatch } from 'react-redux';
 import { styled } from '@mui/material/styles';
-import { historyType } from '../Provider';
+import PropTypes from 'prop-types';
+import { HistoryPropTypes } from '../../../../types/entrance.type';
 import CreateHistoryForm from '../../Form/HistoryForm/index';
 import { updateHistory } from '../../../../actions/History/UpdateHistory';
 import { deleteHistory } from '../../../../actions/History/DeleteHistory';
@@ -16,7 +17,7 @@ const ListItemStyled = styled(ListItem)`
   flex-direction: column;
   border-top: 1px solid ${props => props.theme.palette.divider};
 `;
-const History = ({ history }) => {
+const History = ({ history, isEditAllowed }) => {
   const dispatch = useDispatch();
   const permissions = usePermissions();
   const [isUpdateFormVisible, setIsUpdateFormVisible] = useState(false);
@@ -57,8 +58,8 @@ const History = ({ history }) => {
           isUpdating={isUpdateFormVisible}
           setIsUpdating={setIsUpdateFormVisible}
           isDeleted={history.isDeleted}
-          canEdit={permissions.isAuth}
-          canDelete={permissions.isModerator}
+          canEdit={isEditAllowed && permissions.isAuth}
+          canDelete={isEditAllowed && permissions.isModerator}
           snapshotEl={
             <SnapshotButton
               id={history.id}
@@ -100,7 +101,8 @@ const History = ({ history }) => {
 };
 
 History.propTypes = {
-  history: historyType
+  history: HistoryPropTypes,
+  isEditAllowed: PropTypes.bool
 };
 
 export default History;

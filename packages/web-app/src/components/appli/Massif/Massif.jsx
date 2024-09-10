@@ -5,15 +5,15 @@ import { useParams, useHistory } from 'react-router-dom';
 
 import { useDispatch } from 'react-redux';
 import Skeleton from '@mui/material/Skeleton';
-import { useIntl } from 'react-intl';
 import { Box } from '@mui/material';
+import { useIntl } from 'react-intl';
 
 import { usePermissions, useSubscriptions } from '../../../hooks';
 import { subscribeToMassif } from '../../../actions/Subscriptions/SubscribeToMassif';
 import { unsubscribeFromMassif } from '../../../actions/Subscriptions/UnsubscribeFromMassif';
 import { deleteMassif } from '../../../actions/Massif/DeleteMassif';
 import { restoreMassif } from '../../../actions/Massif/RestoreMassif';
-import Layout from '../../common/Layouts/Fixed/FixedContent';
+import FixedContent from '../../common/Layouts/Fixed/FixedContent';
 import CavesList from '../../common/cave/CavesList';
 import Alert from '../../common/Alert';
 import MapMassif from './MapMassif';
@@ -25,6 +25,8 @@ import {
   DeleteConfirmationDialog,
   DELETED_ENTITIES
 } from '../../common/card/Deleted';
+
+import { MassifTypes } from '../../../types/massif.type';
 
 const Massif = ({ isLoading, error, massif }) => {
   const dispatch = useDispatch();
@@ -90,19 +92,19 @@ const Massif = ({ isLoading, error, massif }) => {
   }
 
   return (
-    <Layout
-      onEdit={onEdit}
-      onDelete={onDelete}
-      isSubscribed={isSubscribed}
+    <FixedContent
+      onEdit={!error ? onEdit : null}
+      onDelete={!error ? onDelete : null}
+      isSubscribed={!error ? isSubscribed : null}
       isSubscribeLoading={isSubscribeLoading}
       onChangeSubscribe={
-        permissions.isLeader && !massif?.isDeleted
+        !error && permissions.isLeader && !massif?.isDeleted
           ? handleChangeSubscribe
           : undefined
       }
       title={isLoading ? <Skeleton /> : title}
       subheader={
-        isLoading && !error ? (
+        isLoading ? (
           <Skeleton />
         ) : (
           massif?.names &&
@@ -111,7 +113,7 @@ const Massif = ({ isLoading, error, massif }) => {
       }
       content={
         <>
-          {isLoading && !!error && (
+          {isLoading && (
             <>
               <Box style={{ display: 'flex', justifyContent: 'center' }}>
                 <Skeleton height={300} width={800} /> {/* Map Skeleton */}
@@ -132,19 +134,16 @@ const Massif = ({ isLoading, error, massif }) => {
           {massif && (
             <>
               {massif.isDeleted && (
-                <>
-                  <DeletedCard
-                    entityType={DELETED_ENTITIES.massif}
-                    entity={massif}
-                    isLoading={isActionLoading}
-                    onRestorePress={onRestorePress}
-                    onPermanentDeletePress={() => {
-                      setIsDeleteConfirmationPermanent(true);
-                      setIsDeleteConfirmationOpen(true);
-                    }}
-                  />
-                  <hr />
-                </>
+                <DeletedCard
+                  entityType={DELETED_ENTITIES.massif}
+                  entity={massif}
+                  isLoading={isActionLoading}
+                  onRestorePress={onRestorePress}
+                  onPermanentDeletePress={() => {
+                    setIsDeleteConfirmationPermanent(true);
+                    setIsDeleteConfirmationOpen(true);
+                  }}
+                />
               )}
               <DeleteConfirmationDialog
                 entityType={DELETED_ENTITIES.massif}
@@ -213,26 +212,7 @@ const Massif = ({ isLoading, error, massif }) => {
 Massif.propTypes = {
   isLoading: PropTypes.bool.isRequired,
   error: PropTypes.shape({}),
-  massif: PropTypes.shape({
-    isDeleted: PropTypes.bool,
-    id: PropTypes.number,
-    name: PropTypes.string,
-    names: PropTypes.arrayOf(
-      PropTypes.shape({
-        language: PropTypes.string
-      })
-    ),
-    geogPolygon: PropTypes.string,
-    descriptions: PropTypes.arrayOf(
-      PropTypes.shape({
-        title: PropTypes.string,
-        body: PropTypes.string
-      })
-    ),
-    entrances: PropTypes.arrayOf(PropTypes.shape({})),
-    networks: PropTypes.arrayOf(PropTypes.shape({})),
-    documents: PropTypes.arrayOf(PropTypes.shape({}))
-  })
+  massif: MassifTypes
 };
 
 export default Massif;
