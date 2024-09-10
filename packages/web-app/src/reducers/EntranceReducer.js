@@ -15,6 +15,11 @@ import {
   CREATE_ENTRANCE_SUCCESS,
   CREATE_ENTRANCE_ERROR
 } from '../actions/Entrance/CreateEntrance';
+import {
+  DELETE_ENTRANCE_SUCCESS,
+  DELETE_ENTRANCE_PERMANENT_SUCCESS
+} from '../actions/Entrance/DeleteEntrance';
+import { RESTORE_ENTRANCE_SUCCESS } from '../actions/Entrance/RestoreEntrance';
 
 import { LINK_DOCUMENT_TO_ENTRANCE_SUCCESS } from '../actions/LinkDocumentToEntrance';
 import { UNLINK_DOCUMENT_TO_ENTRANCE_SUCCESS } from '../actions/UnlinkDocumentToEntrance';
@@ -60,7 +65,7 @@ import {
 import { RESTORE_DESCRIPTION_SUCCESS } from '../actions/Description/RestoreDescription';
 
 const initialState = {
-  data: {},
+  data: undefined,
   loading: false,
   error: null,
   latestHttpCode: null
@@ -78,6 +83,9 @@ const reducer = (state = initialState, action) => {
         latestHttpCode: null
       };
     case FETCH_ENTRANCE_SUCCESS:
+    case DELETE_ENTRANCE_SUCCESS:
+    case DELETE_ENTRANCE_PERMANENT_SUCCESS:
+    case RESTORE_ENTRANCE_SUCCESS:
       return {
         ...initialState,
         data: action.data
@@ -164,7 +172,7 @@ const reducer = (state = initialState, action) => {
         data: {
           ...state.data,
           descriptions: arrFindReplaceOrAdd(
-            state.data.descriptions,
+            state.data?.descriptions ?? [],
             e => e.id === action.description.id,
             action.description
           )
@@ -175,7 +183,7 @@ const reducer = (state = initialState, action) => {
         ...initialState,
         data: {
           ...state.data,
-          descriptions: state.data.descriptions.filter(
+          descriptions: state.data.descriptions?.filter(
             e => e.id !== action.description.id
           )
         }

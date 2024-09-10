@@ -1,23 +1,16 @@
-import React, { useContext, useRef } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
-import { isNil, propOr } from 'ramda';
-
+import { useDispatch } from 'react-redux';
+import { useParams, useHistory } from 'react-router-dom';
 import { styled } from '@mui/material/styles';
-import Provider, {
-  commentsType,
-  detailsType,
-  EntryContext,
-  documentsType,
-  historiesType,
-  locationsType,
-  riggingsType
-} from './Provider';
-import { descriptionsType } from '../Descriptions/propTypes';
-import Layout from '../../common/Layouts/Fixed';
+import Skeleton from '@mui/material/Skeleton';
+import { Box, Card } from '@mui/material';
+
+import FixedLayout from '../../common/Layouts/Fixed';
 import FixedContent from '../../common/Layouts/Fixed/FixedContent';
 import CustomIcon from '../../common/CustomIcon';
-import EntryMap from './EntryMap';
+
 import Properties from './Properties';
 import Descriptions from '../Descriptions';
 import Locations from './Locations';
@@ -25,11 +18,21 @@ import Riggings from './Riggings/Riggings';
 import Comments from './Comments/index';
 import Documents from './Documents';
 import Histories from './Histories';
-import { useBoolean, usePermissions } from '../../../hooks';
+import { deleteEntrance } from '../../../actions/Entrance/DeleteEntrance';
+import { restoreEntrance } from '../../../actions/Entrance/RestoreEntrance';
+import { usePermissions } from '../../../hooks';
 import StandardDialog from '../../common/StandardDialog';
 import { EntranceForm } from '../EntitiesForm';
 import SensitiveCaveWarning from './SensitiveCaveWarning';
 import AuthorAndDate from '../../common/Contribution/AuthorAndDate';
+import Alert from '../../common/Alert';
+import Map from '../../common/Maps/MapMultipleMarkers';
+import { EntrancePropTypes } from '../../../types/entrance.type';
+import {
+  DeletedCard,
+  DeleteConfirmationDialog,
+  DELETED_ENTITIES
+} from '../../common/card/Deleted';
 
 const HalfSplitContainer = styled('div')(
   ({ theme }) => `
@@ -41,165 +44,236 @@ const HalfSplitContainer = styled('div')(
 `
 );
 
-export const Entry = () => {
+export const Entry = ({ isLoading, error, entrance }) => {
+  const dispatch = useDispatch();
   const { formatMessage } = useIntl();
-  const {
-    state: {
-      details: {
-        author,
-        cave,
-        country,
-        creationDate,
-        depth,
-        development,
-        dateReviewed,
-        id,
-        isSensitive,
-        language,
-        reviewer,
-        name,
-        temperature,
-        discoveryYear
-      },
-      position,
-      descriptions,
-      documents,
-      histories,
-      locations,
-      riggings,
-      comments,
-      details
-    }
-  } = useContext(EntryContext);
+  const history = useHistory();
+  const { entranceId } = useParams();
   const permissions = usePermissions();
-  const editPage = useBoolean();
-
-  const handleEdit = () => {
-    editPage.open();
-  };
-
   const componentRef = useRef();
+  const [isEditing, setEditing] = useState(false);
+  const [isDeleteConfirmationOpen, setIsDeleteConfirmationOpen] =
+    useState(false);
+  const [isDeleteConfirmationPermanent, setIsDeleteConfirmationPermanent] =
+    useState(false);
+  const [wantedDeletedState, setWantedDeletedState] = useState(false);
 
-  const snap = {
-    ...details,
-    latitude: position ? position[0] : undefined,
-    longitude: position ? position[1] : undefined,
-    cave: cave?.id,
-    caveName: cave?.names?.[0]?.name ?? cave?.name ?? name
+  useEffect(() => {
+    if (entrance) setWantedDeletedState(entrance.isDeleted);
+  }, [entrance]);
+
+  let onDelete = null;
+  if (!entrance?.isDeleted && permissions.isModerator) {
+    onDelete = () => {
+      setIsDeleteConfirmationPermanent(false);
+      setIsDeleteConfirmationOpen(true);
+    };
+  }
+
+  const onDeletePress = (entityId, isPermanent) => {
+    setWantedDeletedState(true);
+    dispatch(deleteEntrance({ id: entranceId, entityId, isPermanent }));
+    if (isPermanent) history.replace('/');
   };
+  const onRestorePress = () => {
+    setWantedDeletedState(false);
+    dispatch(restoreEntrance({ id: entranceId }));
+  };
+
+  const isActionLoading = wantedDeletedState !== entrance?.isDeleted;
 
   return (
     <div ref={componentRef}>
-      <Layout>
-        <FixedContent
-          title={name || ''}
-          icon={<CustomIcon type="entry" />}
-          onEdit={permissions.isAuth ? handleEdit : undefined}
-          printRef={componentRef}
-          snapshot={{
-            id,
-            entity: 'entrances',
-            actualVersion: snap,
-            isNetwork: cave?.entrances.length > 1,
-            all: true
-          }}
-          content={
-            <HalfSplitContainer>
-              {isSensitive && <SensitiveCaveWarning />}
-              <EntryMap />
-              <Properties />
-            </HalfSplitContainer>
-          }
-          footer={
-            <>
-              {!isNil(author) && (
-                <AuthorAndDate
-                  author={author}
-                  verb="Created"
-                  date={creationDate}
+      <FixedLayout>
+        {entrance && (
+          <FixedContent
+            title={entrance.name ?? ''}
+            icon={<CustomIcon type="entry" />}
+            onEdit={
+              permissions.isAuth && !entrance.isDeleted
+                ? () => setEditing(true)
+                : undefined
+            }
+            onDelete={onDelete}
+            printRef={componentRef}
+            snapshot={{
+              id: entrance.id,
+              entity: 'entrances',
+              actualVersion: {
+                ...entrance,
+                latitude: entrance?.latitude,
+                longitude: entrance?.longitude,
+                cave: entrance?.cave?.id,
+                caveName: entrance?.cave?.name
+              },
+              isNetwork: entrance.cave?.entrances.length > 1,
+              all: true
+            }}
+            content={
+              <>
+                {entrance.isDeleted && (
+                  <DeletedCard
+                    entityType={DELETED_ENTITIES.entrance}
+                    entity={entrance}
+                    isLoading={isActionLoading}
+                    onRestorePress={onRestorePress}
+                    onPermanentDeletePress={() => {
+                      setIsDeleteConfirmationPermanent(true);
+                      setIsDeleteConfirmationOpen(true);
+                    }}
+                  />
+                )}
+                <DeleteConfirmationDialog
+                  entityType={DELETED_ENTITIES.entrance}
+                  isOpen={isDeleteConfirmationOpen}
+                  isLoading={isActionLoading}
+                  isPermanent={isDeleteConfirmationPermanent}
+                  isSearchMandatory={
+                    isDeleteConfirmationPermanent &&
+                    (entrance?.entrances ?? []).length > 0
+                  }
+                  onClose={() => setIsDeleteConfirmationOpen(false)}
+                  onConfirmation={entity => {
+                    onDeletePress(entity?.id, isDeleteConfirmationPermanent);
+                  }}
                 />
-              )}
-              {!isNil(reviewer) && (
-                <AuthorAndDate
-                  author={reviewer}
-                  verb="Updated"
-                  date={dateReviewed}
-                />
-              )}
-            </>
-          }
-        />
-        {id && (
-          <Locations
-            locations={locations}
-            entranceId={id}
-            isSensitive={isSensitive}
+
+                {entrance.isSensitive && <SensitiveCaveWarning />}
+                <HalfSplitContainer>
+                  <Map positions={[entrance]} loading={isLoading} />
+
+                  <Properties entrance={entrance} />
+                </HalfSplitContainer>
+              </>
+            }
+            footer={
+              <>
+                {entrance.author && (
+                  <AuthorAndDate
+                    author={entrance.author}
+                    verb="Created"
+                    date={entrance.creationDate}
+                  />
+                )}
+                {entrance.reviewer && (
+                  <AuthorAndDate
+                    author={entrance.reviewer}
+                    verb="Updated"
+                    date={entrance.dateReviewed}
+                  />
+                )}
+              </>
+            }
           />
         )}
-        {id && (
-          <Descriptions
-            descriptions={descriptions}
-            entityType="entrance"
-            entityId={id}
-          />
+        {isLoading && (
+          <Card sx={{ padding: 3 }}>
+            <Box style={{ display: 'flex', justifyContent: 'center' }}>
+              <Skeleton height={300} width={800} /> {/* Map Skeleton */}
+            </Box>
+            <Skeleton height={80} />
+            <Skeleton height={100} />
+            <Skeleton height={150} />
+            <Skeleton height={100} />
+          </Card>
         )}
-        {id && <Riggings riggings={riggings} entranceId={id} />}
-        {id && <Documents documents={documents} entranceId={id} />}
-        {id && <Histories histories={histories} entranceId={id} />}
-        {id && <Comments comments={comments} entranceId={id} />}
-        {permissions.isAuth && (
-          <StandardDialog
-            fullWidth
-            maxWidth="md"
-            open={editPage.isOpen}
-            onClose={editPage.close}
-            scrollable
-            title={formatMessage({ id: 'Entrance edition' })}>
-            <EntranceForm
-              entranceValues={{
-                country,
-                depth,
-                id,
-                isSensitive,
-                name,
-                language,
-                latitude: propOr(undefined, 0, position),
-                length: development,
-                longitude: propOr(undefined, 1, position),
-                yearDiscovery: discoveryYear
-              }}
-              caveValues={{
-                ...cave,
-                name: cave?.names?.[0]?.name ?? cave?.name ?? name,
-                language: cave?.names?.[0]?.language ?? language,
-                massif: cave?.massif?.id,
-                temperature
-              }}
+        {error && (
+          <Card sx={{ padding: 3 }}>
+            <Alert
+              title={formatMessage({
+                id: 'Error, the entrance data you are looking for is not available.'
+              })}
+              severity="error"
             />
-          </StandardDialog>
+          </Card>
         )}
-      </Layout>
+        {entrance && (
+          <>
+            {(permissions.isAuth || entrance.locations.length > 0) && (
+              <Locations
+                locations={entrance.locations}
+                entranceId={entrance.id}
+                isSensitive={entrance.isSensitive}
+                isEditAllowed={!entrance.isDeleted}
+              />
+            )}
+            {(permissions.isAuth || entrance.descriptions.length > 0) && (
+              <Descriptions
+                descriptions={entrance.descriptions}
+                entityType="entrance"
+                entityId={entrance.id}
+                isEditAllowed={!entrance.isDeleted}
+              />
+            )}
+            {(permissions.isAuth || entrance.riggings.length > 0) && (
+              <Riggings
+                riggings={entrance.riggings}
+                entranceId={entrance.id}
+                isEditAllowed={!entrance.isDeleted}
+              />
+            )}
+            {(permissions.isAuth || entrance.documents.length > 0) && (
+              <Documents
+                documents={entrance.documents}
+                entranceId={entrance.id}
+                isEditAllowed={!entrance.isDeleted}
+              />
+            )}
+            {(permissions.isAuth || entrance.histories.length > 0) && (
+              <Histories
+                histories={entrance.histories}
+                entranceId={entrance.id}
+                isEditAllowed={!entrance.isDeleted}
+              />
+            )}
+            {(permissions.isAuth || entrance.comments.length > 0) && (
+              <Comments
+                comments={entrance.comments}
+                entranceId={entrance.id}
+                isEditAllowed={!entrance.isDeleted}
+              />
+            )}
+
+            {permissions.isAuth && (
+              <StandardDialog
+                fullWidth
+                maxWidth="md"
+                open={isEditing}
+                onClose={() => setEditing(false)}
+                scrollable
+                title={formatMessage({ id: 'Entrance edition' })}>
+                <EntranceForm
+                  entranceValues={{
+                    country: entrance.country,
+                    depth: entrance.depth,
+                    length: entrance.length,
+                    id: entrance.id,
+                    isSensitive: entrance.isSensitive,
+                    name: entrance.name,
+                    language: entrance.language,
+                    latitude: entrance?.latitude,
+                    longitude: entrance?.longitude,
+                    yearDiscovery: entrance.discoveryYear
+                  }}
+                  caveValues={{
+                    ...entrance.cave,
+                    name: entrance.cave?.name,
+                    language: entrance.cave?.language
+                  }}
+                />
+              </StandardDialog>
+            )}
+          </>
+        )}
+      </FixedLayout>
     </div>
   );
 };
 
-const HydratedEntry = ({ ...props }) => (
-  <Provider {...props}>
-    <Entry />
-  </Provider>
-);
-
-Entry.propTypes = {};
-
-HydratedEntry.propTypes = {
-  details: detailsType.isRequired,
-  comments: commentsType.isRequired,
-  descriptions: descriptionsType.isRequired,
-  documents: documentsType.isRequired,
-  histories: historiesType.isRequired,
-  locations: locationsType.isRequired,
-  riggings: riggingsType.isRequired,
-  loading: PropTypes.bool
+Entry.propTypes = {
+  isLoading: PropTypes.bool.isRequired,
+  error: PropTypes.shape({}),
+  entrance: EntrancePropTypes
 };
 
-export default HydratedEntry;
+export default Entry;
