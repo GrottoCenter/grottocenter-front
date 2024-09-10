@@ -92,8 +92,8 @@ const Application = () => {
         <Route path="/ui/api" component={Api} />
         <Route path="/ui/:type/:id/snapshots" component={SnapshotPage} />
         <Route path="/ui/entrances/:id?/move" component={MoveEntranceToCave} />
-        <Route path="/ui/entrances/:id?" component={EntryPage} />
-        <Route path="/ui/caves/:id?" component={NetworkPage} />
+        <Route path="/ui/entrances/:entranceId?" component={EntryPage} />
+        <Route path="/ui/caves/:caveId?" component={NetworkPage} />
         <Route
           path="/ui/countries/:countryId/entrances"
           component={EntrancesListPage}

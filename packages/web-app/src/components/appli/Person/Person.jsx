@@ -9,7 +9,8 @@ import subscriptionsType from '../../../types/subscriptions.type';
 import REDUCER_STATUS from '../../../reducers/ReducerStatus';
 import Layout from '../../common/Layouts/Fixed/FixedContent';
 import EntrancesList from '../../common/entrance/EntrancesList';
-import EntrancePropTypes from './propTypes';
+
+import { EntranceSimplePropTypes } from '../../../types/entrance.type';
 import Alert from '../../common/Alert';
 
 import DocumentsList from '../../common/DocumentsList/DocumentsList';
@@ -147,7 +148,7 @@ Person.propTypes = {
     groups: PropTypes.arrayOf(PropTypes.shape({})),
     organizations: PropTypes.arrayOf(PropTypes.shape({})),
     documents: PropTypes.arrayOf(PropTypes.shape({})),
-    exploredEntrances: PropTypes.arrayOf(EntrancePropTypes)
+    exploredEntrances: PropTypes.arrayOf(EntranceSimplePropTypes)
   }),
   subscriptions: subscriptionsType,
   subscriptionsStatus: PropTypes.oneOf(Object.values(REDUCER_STATUS))

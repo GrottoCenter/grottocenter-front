@@ -1,11 +1,12 @@
 import React from 'react';
-import Title from './Title';
+import { Information } from './utils';
 import idNameType from '../../../../../../types/idName.type';
 
 export const NetworkPopup = ({ network }) => (
-  <Title
-    title={network.name && network.name.toUpperCase()}
-    link={`/ui/caves/${network.id}`}
+  <Information
+    isTitle
+    value={network.name && network.name.toUpperCase()}
+    url={`/ui/caves/${network.id}`}
   />
 );
 

@@ -7,7 +7,7 @@ import { useDispatch } from 'react-redux';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import fadeOut from '../../../util/fadeOut';
 import { unsubscribeFromMassif } from '../../../actions/Subscriptions/UnsubscribeFromMassif';
-import massifType from '../../../types/massif.type';
+import { MassifSimpleTypes } from '../../../types/massif.type';
 import countryType from '../../../types/country.type';
 import { unsubscribeFromCountry } from '../../../actions/Subscriptions/UnsubscribeFromCountry';
 
@@ -43,7 +43,7 @@ const SubscriptionItem = ({ canUnsubscribe, subscription, type }) => {
 
 SubscriptionItem.propTypes = {
   canUnsubscribe: PropTypes.bool,
-  subscription: PropTypes.oneOfType([countryType, massifType]),
+  subscription: PropTypes.oneOfType([countryType, MassifSimpleTypes]),
   type: PropTypes.oneOf(['COUNTRY', 'MASSIF']).isRequired
 };
 SubscriptionItem.defaultProps = {

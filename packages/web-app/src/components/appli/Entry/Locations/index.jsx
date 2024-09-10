@@ -7,14 +7,14 @@ import AddCircleIcon from '@mui/icons-material/AddCircle';
 import CancelIcon from '@mui/icons-material/Cancel';
 
 import ScrollableContent from '../../../common/Layouts/Fixed/ScrollableContent';
-import { locationsType } from '../Provider';
+import { LocationPropTypes } from '../../../../types/entrance.type';
 import Location from './Location';
 import CreateLocationForm from '../../Form/LocationForm';
 import { postLocation } from '../../../../actions/Location/CreateLocation';
 import { usePermissions } from '../../../../hooks';
 import Alert from '../../../common/Alert';
 
-const Locations = ({ entranceId, locations, isSensitive }) => {
+const Locations = ({ entranceId, locations, isSensitive, isEditAllowed }) => {
   const { formatMessage } = useIntl();
   const permissions = usePermissions();
   const dispatch = useDispatch();
@@ -37,7 +37,8 @@ const Locations = ({ entranceId, locations, isSensitive }) => {
       dense
       title={formatMessage({ id: 'Location' })}
       icon={
-        permissions.isAuth && (
+        permissions.isAuth &&
+        isEditAllowed && (
           <Tooltip
             title={
               isFormVisible
@@ -67,7 +68,7 @@ const Locations = ({ entranceId, locations, isSensitive }) => {
             <List dense disablePadding>
               {locations.map(location => (
                 <React.Fragment key={location.id}>
-                  <Location location={location} />
+                  <Location location={location} isEditAllowed={isEditAllowed} />
                 </React.Fragment>
               ))}
             </List>
@@ -89,8 +90,9 @@ const Locations = ({ entranceId, locations, isSensitive }) => {
 
 Locations.propTypes = {
   entranceId: PropTypes.number.isRequired,
-  locations: locationsType,
-  isSensitive: PropTypes.bool
+  locations: PropTypes.arrayOf(LocationPropTypes),
+  isSensitive: PropTypes.bool,
+  isEditAllowed: PropTypes.bool
 };
 
 export default Locations;

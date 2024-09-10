@@ -2,7 +2,7 @@ import { ListItem, Box, ListItemText, ListItemIcon } from '@mui/material';
 import React, { useState, useEffect } from 'react';
 import { styled } from '@mui/material/styles';
 import { useDispatch } from 'react-redux';
-import { isEmpty } from 'ramda';
+import PropTypes from 'prop-types';
 import { usePermissions, useUserProperties } from '../../../../hooks';
 import { updateComment } from '../../../../actions/Comment/UpdateComment';
 import { deleteComment } from '../../../../actions/Comment/DeleteComment';
@@ -10,7 +10,7 @@ import { restoreComment } from '../../../../actions/Comment/RestoreComment';
 import ActionButtons from '../ActionButtons';
 import SectionTitle from '../SectionTitle';
 import CreateCommentForm from '../../Form/CommentForm/index';
-import { commentType } from '../Provider';
+import { CommentPropTypes } from '../../../../types/entrance.type';
 import Ratings from '../Ratings';
 import Contribution from '../../../common/Contribution/Contribution';
 import Duration from '../../../common/Properties/Duration';
@@ -41,7 +41,7 @@ const DurationContainer = styled('div')`
   gap: 20px;
 `;
 
-const Comment = ({ comment }) => {
+const Comment = ({ comment, isEditAllowed }) => {
   const dispatch = useDispatch();
   const permissions = usePermissions();
   const [isUpdateFormVisible, setIsUpdateFormVisible] = useState(false);
@@ -58,9 +58,9 @@ const Comment = ({ comment }) => {
         id: data.id,
         title: data.title,
         body: data.body,
-        aestheticism: data.interest,
-        caving: data.progression,
-        approach: data.access,
+        aestheticism: data.aestheticism,
+        caving: data.caving,
+        approach: data.approach,
         eTTrail: data.eTTrail,
         eTUnderground: data.eTUnderground,
         language: data.language.id
@@ -95,8 +95,8 @@ const Comment = ({ comment }) => {
           isUpdating={isUpdateFormVisible}
           setIsUpdating={setIsUpdateFormVisible}
           isDeleted={comment.isDeleted}
-          canEdit={permissions.isAuth && canEdit}
-          canDelete={permissions.isModerator}
+          canEdit={isEditAllowed && permissions.isAuth && canEdit}
+          canDelete={isEditAllowed && permissions.isModerator}
           snapshotEl={
             <SnapshotButton id={comment.id} type="comments" content={comment} />
           }
@@ -137,20 +137,20 @@ const Comment = ({ comment }) => {
           />
           <StyledListItemIcon>
             <StyledRatings
-              interest={comment.interest}
-              progression={comment.progression}
-              access={comment.access}
+              interest={comment.aestheticism}
+              progression={comment.caving}
+              access={comment.approach}
               size="small"
             />
             <DurationContainer>
-              {!!comment.eTTrail && !isEmpty(comment.eTTrail) && (
+              {!!comment.eTTrail && comment.eTTrail.length > 0 && (
                 <Duration
                   image="/images/time-to-go.svg"
                   durationStr={comment.eTTrail}
                   title="Time to go"
                 />
               )}
-              {!!comment.eTUnderground && !isEmpty(comment.eTUnderground) && (
+              {!!comment.eTUnderground && comment.eTUnderground.length > 0 && (
                 <Duration
                   image="/images/underground_time.svg"
                   durationStr={comment.eTUnderground}
@@ -166,7 +166,8 @@ const Comment = ({ comment }) => {
 };
 
 Comment.propTypes = {
-  comment: commentType
+  comment: CommentPropTypes,
+  isEditAllowed: PropTypes.bool
 };
 
 export default Comment;

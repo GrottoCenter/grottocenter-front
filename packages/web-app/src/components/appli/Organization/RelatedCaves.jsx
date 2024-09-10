@@ -5,8 +5,8 @@ import { useIntl } from 'react-intl';
 import CavesList from '../../common/cave/CavesList';
 import EntrancesList from '../../common/entrance/EntrancesList';
 import Alert from '../../common/Alert';
-
-import { EntrancePropTypes, NetworkPropTypes } from './propTypes';
+import { NetworkPropTypes } from '../../../types/grotto.type';
+import { EntranceSimplePropTypes } from '../../../types/entrance.type';
 
 const RelatedCaves = ({ exploredEntrances, exploredNetworks }) => {
   const { formatMessage } = useIntl();
@@ -42,7 +42,7 @@ const RelatedCaves = ({ exploredEntrances, exploredNetworks }) => {
 };
 
 RelatedCaves.propTypes = {
-  exploredEntrances: PropTypes.arrayOf(EntrancePropTypes),
+  exploredEntrances: PropTypes.arrayOf(EntranceSimplePropTypes),
   exploredNetworks: PropTypes.arrayOf(NetworkPropTypes)
 };
 

@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import PropTypes from 'prop-types';
 import { Box, ListItem, ListItemText } from '@mui/material';
 import { useDispatch } from 'react-redux';
 import { styled } from '@mui/material/styles';
 import { SnapshotButton } from '../Entry/Snapshots/UtilityFunction';
-import { descriptionType } from './propTypes';
+import { DescriptionPropTypes } from '../../../types/description.type';
 import CreateDescriptionForm from '../Form/DescriptionForm/index';
 import { updateDescription } from '../../../actions/Description/UpdateDescription';
 import { deleteDescription } from '../../../actions/Description/DeleteDescription';
@@ -17,7 +18,7 @@ const ListItemStyled = styled(ListItem)`
   flex-direction: column;
   border-top: 1px solid ${props => props.theme.palette.divider};
 `;
-const Description = ({ description }) => {
+const Description = ({ description, isEditAllowed }) => {
   const dispatch = useDispatch();
   const permissions = usePermissions();
   const [isUpdateFormVisible, setIsUpdateFormVisible] = useState(false);
@@ -59,8 +60,8 @@ const Description = ({ description }) => {
           isUpdating={isUpdateFormVisible}
           setIsUpdating={setIsUpdateFormVisible}
           isDeleted={description.isDeleted}
-          canEdit={permissions.isAuth}
-          canDelete={permissions.isModerator}
+          canEdit={isEditAllowed && permissions.isAuth}
+          canDelete={isEditAllowed && permissions.isModerator}
           snapshotEl={
             <SnapshotButton
               id={description.id}
@@ -108,7 +109,8 @@ const Description = ({ description }) => {
 };
 
 Description.propTypes = {
-  description: descriptionType
+  description: DescriptionPropTypes,
+  isEditAllowed: PropTypes.bool
 };
 
 export default Description;

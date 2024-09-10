@@ -7,14 +7,14 @@ import AddCircleIcon from '@mui/icons-material/AddCircle';
 import CancelIcon from '@mui/icons-material/Cancel';
 
 import ScrollableContent from '../../../common/Layouts/Fixed/ScrollableContent';
-import { historiesType } from '../Provider';
+import { HistoryPropTypes } from '../../../../types/entrance.type';
 import History from './History';
 import CreateHistoryForm from '../../Form/HistoryForm';
 import { postHistory } from '../../../../actions/History/CreateHistory';
 import { usePermissions } from '../../../../hooks';
 import Alert from '../../../common/Alert';
 
-const Histories = ({ entranceId, histories }) => {
+const Histories = ({ entranceId, histories, isEditAllowed }) => {
   const { formatMessage } = useIntl();
   const permissions = usePermissions();
   const dispatch = useDispatch();
@@ -36,7 +36,8 @@ const Histories = ({ entranceId, histories }) => {
       dense
       title={formatMessage({ id: 'History' })}
       icon={
-        permissions.isAuth && (
+        permissions.isAuth &&
+        isEditAllowed && (
           <Tooltip
             title={
               isFormVisible
@@ -65,7 +66,11 @@ const Histories = ({ entranceId, histories }) => {
           {histories.length > 0 ? (
             <List dense disablePadding>
               {histories.map(history => (
-                <History history={history} key={history.id} />
+                <History
+                  history={history}
+                  key={history.id}
+                  isEditAllowed={isEditAllowed}
+                />
               ))}
             </List>
           ) : (
@@ -84,7 +89,8 @@ const Histories = ({ entranceId, histories }) => {
 
 Histories.propTypes = {
   entranceId: PropTypes.number.isRequired,
-  histories: historiesType
+  histories: PropTypes.arrayOf(HistoryPropTypes),
+  isEditAllowed: PropTypes.bool
 };
 
 export default Histories;

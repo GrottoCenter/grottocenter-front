@@ -1,49 +1,36 @@
 import fetch from 'isomorphic-fetch';
 import { putCaveUrl } from '../../conf/apiRoutes';
-import makeErrorMessage from '../../helpers/makeErrorMessage';
+import { checkAndGetStatus } from '../utils';
 
 export const UPDATE_CAVE = 'UPDATE_CAVE';
 export const UPDATE_CAVE_SUCCESS = 'UPDATE_CAVE_SUCCESS';
 export const UPDATE_CAVE_FAILURE = 'UPDATE_CAVE_FAILURE';
 
-export const updateCaveAction = () => ({
+const updateCaveAction = () => ({
   type: UPDATE_CAVE
 });
-export const updateCaveSuccess = cave => ({
+const updateCaveSuccess = cave => ({
   cave,
   type: UPDATE_CAVE_SUCCESS
 });
-export const updateCaveFailure = (error, httpCode) => ({
+const updateCaveFailure = (error, httpCode) => ({
   type: UPDATE_CAVE_FAILURE,
   error,
   httpCode
 });
 
-export const updateCave = data => (dispatch, getState) => {
+export const updateCave = body => (dispatch, getState) => {
   dispatch(updateCaveAction());
 
   const requestOptions = {
     method: 'PUT',
-    body: JSON.stringify(data),
+    body: JSON.stringify(body),
     headers: getState().login.authorizationHeader
   };
 
-  return fetch(putCaveUrl(data.id), requestOptions)
-    .then(response => {
-      if (response.status >= 400) {
-        throw new Error(response.status);
-      }
-      return response.json();
-    })
-    .then(res => {
-      dispatch(updateCaveSuccess(res));
-    })
-    .catch(error =>
-      dispatch(
-        updateCaveFailure(
-          makeErrorMessage(error.message, `Bad request`),
-          error.message
-        )
-      )
-    );
+  return fetch(putCaveUrl(body.id), requestOptions)
+    .then(checkAndGetStatus)
+    .then(response => response.json())
+    .then(data => dispatch(updateCaveSuccess(data)))
+    .catch(error => dispatch(updateCaveFailure(error)));
 };

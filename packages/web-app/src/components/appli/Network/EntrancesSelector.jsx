@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { includes, filter, pipe, pluck, join } from 'ramda';
 import {
   Tooltip,
   FormControl,
@@ -14,8 +13,8 @@ import Skeleton from '@mui/material/Skeleton';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import { useIntl } from 'react-intl';
 
+import idNameType from '../../../types/idName.type';
 import { PropertyWrapper } from '../../common/Properties/Property';
-import { detailsType as entranceDetailsType } from '../Entry/Provider';
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -28,41 +27,41 @@ const MenuProps = {
   }
 };
 
-const isSelected = selection => n => includes(n.id, selection);
-
-const getEntrancesName = selection =>
-  pipe(filter(isSelected(selection)), pluck('name'), join(', '));
-
-const EntrancesSelection = ({
-  loading = false,
+const EntrancesSelector = ({
+  isLoading = false,
   entrances,
   onSelect,
-  selection
+  selectedEntrancesId
 }) => {
   const { formatMessage } = useIntl();
 
   const handleChange = event => {
     onSelect(event.target.value);
   };
+
   return (
     <PropertyWrapper>
       <VisibilityIcon fontSize="large" color="primary" />
       <Tooltip title={formatMessage({ id: 'Network entrances' })}>
-        {loading ? (
+        {isLoading ? (
           <Skeleton variant="text" width="100%" />
         ) : (
           <FormControl fullWidth>
             <Select
               displayEmpty
               multiple
-              value={selection}
+              value={selectedEntrancesId}
               onChange={handleChange}
               input={<Input />}
               renderValue={selected => {
                 if (selected.length === 0) {
                   return <em>{formatMessage({ id: 'Network entrances' })}</em>;
                 }
-                return getEntrancesName(selected)(entrances);
+
+                return entrances
+                  .filter(e => selected.includes(e.id))
+                  .map(e => e.name)
+                  .join(', ');
               }}
               MenuProps={MenuProps}>
               <MenuItem disabled value="">
@@ -70,7 +69,7 @@ const EntrancesSelection = ({
               </MenuItem>
               {entrances.map(({ name, id }) => (
                 <MenuItem key={name} value={id}>
-                  <Checkbox checked={includes(id, selection)} />
+                  <Checkbox checked={selectedEntrancesId.includes(id)} />
                   <ListItemText primary={name} />
                 </MenuItem>
               ))}
@@ -82,11 +81,11 @@ const EntrancesSelection = ({
   );
 };
 
-EntrancesSelection.propTypes = {
+EntrancesSelector.propTypes = {
   onSelect: PropTypes.func.isRequired,
-  selection: PropTypes.arrayOf(PropTypes.number).isRequired,
-  loading: PropTypes.bool,
-  entrances: PropTypes.arrayOf(entranceDetailsType)
+  isLoading: PropTypes.bool,
+  entrances: PropTypes.arrayOf(idNameType),
+  selectedEntrancesId: PropTypes.arrayOf(PropTypes.number)
 };
 
-export default EntrancesSelection;
+export default EntrancesSelector;
