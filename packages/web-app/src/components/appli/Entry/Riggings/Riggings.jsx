@@ -11,7 +11,7 @@ import { postRiggings } from '../../../../actions/Riggings/CreateRigging';
 import CreateRiggingsForm from '../../Form/RiggingsForm/index';
 import ScrollableContent from '../../../common/Layouts/Fixed/ScrollableContent';
 import Rigging from './Rigging';
-import { riggingsType } from '../Provider';
+import { RiggingPropTypes } from '../../../../types/entrance.type';
 import Alert from '../../../common/Alert';
 
 const DividerWithMargin = styled(Divider)`
@@ -19,7 +19,7 @@ const DividerWithMargin = styled(Divider)`
   background-color: ${props => props.theme.palette.divider};
 `;
 
-const Riggings = ({ riggings, entranceId }) => {
+const Riggings = ({ riggings, entranceId, isEditAllowed }) => {
   const { formatMessage } = useIntl();
   const dispatch = useDispatch();
   const permissions = usePermissions();
@@ -41,7 +41,8 @@ const Riggings = ({ riggings, entranceId }) => {
       dense
       title={formatMessage({ id: 'Riggings' })}
       icon={
-        permissions.isAuth && (
+        permissions.isAuth &&
+        isEditAllowed && (
           <Tooltip
             title={
               isFormVisible
@@ -76,7 +77,7 @@ const Riggings = ({ riggings, entranceId }) => {
               .map(rigging => (
                 <React.Fragment key={rigging.id}>
                   <DividerWithMargin />
-                  <Rigging rigging={rigging} />
+                  <Rigging rigging={rigging} isEditAllowed={isEditAllowed} />
                 </React.Fragment>
               ))}
           {riggings.length === 0 && (
@@ -94,8 +95,9 @@ const Riggings = ({ riggings, entranceId }) => {
 };
 
 Riggings.propTypes = {
-  riggings: riggingsType,
-  entranceId: PropTypes.number.isRequired
+  riggings: PropTypes.arrayOf(RiggingPropTypes),
+  entranceId: PropTypes.number.isRequired,
+  isEditAllowed: PropTypes.bool
 };
 
 export default Riggings;

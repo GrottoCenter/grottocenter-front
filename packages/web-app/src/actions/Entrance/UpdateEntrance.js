@@ -5,16 +5,15 @@ import {
   putEntranceUrl
 } from '../../conf/apiRoutes';
 
-import makeErrorMessage from '../../helpers/makeErrorMessage';
-import { checkStatusAndGetText } from '../utils';
+import { checkAndGetStatus } from '../utils';
 
 export const UPDATE_ENTRANCE_SUCCESS = 'UPDATE_ENTRANCE_SUCCESS';
 export const UPDATE_ENTRANCE = 'UPDATE_ENTRANCE';
 export const UPDATE_ENTRANCE_ERROR = 'UPDATE_ENTRANCE_ERROR';
-export const updateEntranceFailure = (error, httpCode) => ({
+
+const updateEntranceFailure = error => ({
   type: UPDATE_ENTRANCE_ERROR,
-  error,
-  httpCode
+  error
 });
 
 export const updateEntranceWithNewEntities =
@@ -38,7 +37,7 @@ export const updateEntranceWithNewEntities =
     };
 
     return fetch(putEntranceWithNewEntitiesUrl(entranceData.id), requestOptions)
-      .then(checkStatusAndGetText)
+      .then(checkAndGetStatus)
       .then(result => {
         dispatch({
           type: UPDATE_ENTRANCE_SUCCESS,
@@ -64,23 +63,12 @@ export const updateEntrance = entranceData => (dispatch, getState) => {
   };
 
   return fetch(putEntranceUrl(entranceData.id), requestOptions)
-    .then(response => {
-      if (response.status >= 400) {
-        throw new Error(response.status);
-      } else {
-        return response;
-      }
-    })
+    .then(checkAndGetStatus)
     .then(response => {
       dispatch({
         type: UPDATE_ENTRANCE_SUCCESS,
         httpCode: response.status
       });
     })
-    .catch(error => {
-      const errorCode = Number(error.message);
-      dispatch(
-        updateEntranceFailure(makeErrorMessage(errorCode, `Update entrance`))
-      );
-    });
+    .catch(error => dispatch(updateEntranceFailure(error)));
 };

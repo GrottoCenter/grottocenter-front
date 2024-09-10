@@ -8,7 +8,7 @@ import { styled } from '@mui/material/styles';
 import { isNil } from 'ramda';
 
 import LanguageAutoComplete from '../LanguageAutoComplete';
-import { descriptionType } from '../../Descriptions/propTypes';
+import { DescriptionPropTypes } from '../../../../types/description.type';
 
 const SpacedButton = styled(Button)`
   ${({ theme }) => `
@@ -102,11 +102,6 @@ const CreateDescriptionForm = ({
         )}
       />
 
-      {closeForm && (
-        <SpacedButton onClick={closeForm}>
-          {formatMessage({ id: 'Cancel' })}
-        </SpacedButton>
-      )}
       <SpacedButton
         color="primary"
         type="submit"
@@ -119,6 +114,11 @@ const CreateDescriptionForm = ({
       <SpacedButton variant="outlined" onClick={resetToDefault}>
         {formatMessage({ id: 'Reset' })}
       </SpacedButton>
+      {closeForm && (
+        <SpacedButton onClick={closeForm}>
+          {formatMessage({ id: 'Cancel' })}
+        </SpacedButton>
+      )}
     </Box>
   );
 };
@@ -127,7 +127,7 @@ CreateDescriptionForm.propTypes = {
   closeForm: PropTypes.func,
   isNewDescription: PropTypes.bool.isRequired,
   onSubmit: PropTypes.func.isRequired,
-  values: descriptionType
+  values: DescriptionPropTypes
 };
 
 export default CreateDescriptionForm;

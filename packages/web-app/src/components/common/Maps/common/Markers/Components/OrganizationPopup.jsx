@@ -1,26 +1,22 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { isNil } from 'ramda';
 import { GpsFixed, Public } from '@mui/icons-material';
-import Title from './Title';
-import { Property } from '../../../../Properties';
-import { makeCoordinatesValue } from './utils';
+import { Information, makeCoordinatesValue } from './utils';
 
 export const OrganizationPopup = ({ organization }) => (
   <>
-    <Title
-      title={organization.name && organization.name.toUpperCase()}
-      link={`/ui/organizations/${organization.id}`}
+    <Information
+      isTitle
+      value={organization.name && organization.name.toUpperCase()}
+      url={`/ui/organizations/${organization.id}`}
     />
-    {!isNil(organization.address) && (
-      <Property
-        secondary
+    {organization.address && (
+      <Information
         value={organization.address}
         icon={<Public color="primary" />}
       />
     )}
-    <Property
-      secondary
+    <Information
       value={makeCoordinatesValue(
         organization.latitude,
         organization.longitude

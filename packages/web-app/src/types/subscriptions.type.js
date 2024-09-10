@@ -1,10 +1,10 @@
 import { arrayOf, shape } from 'prop-types';
 import countryType from './country.type';
-import massifType from './massif.type';
+import { MassifSimpleTypes } from './massif.type';
 
 const subscriptionsType = shape({
   countries: arrayOf(countryType),
-  massifs: arrayOf(massifType)
+  massifs: arrayOf(MassifSimpleTypes)
 });
 
 export default subscriptionsType;

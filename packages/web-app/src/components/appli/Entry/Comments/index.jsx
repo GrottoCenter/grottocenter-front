@@ -7,14 +7,14 @@ import AddCircleIcon from '@mui/icons-material/AddCircle';
 import CancelIcon from '@mui/icons-material/Cancel';
 
 import ScrollableContent from '../../../common/Layouts/Fixed/ScrollableContent';
-import { commentsType } from '../Provider';
+import { CommentPropTypes } from '../../../../types/entrance.type';
 import Comment from './Comment';
 import CreateCommentForm from '../../Form/CommentForm';
 import { postComment } from '../../../../actions/Comment/CreateComment';
 import { usePermissions } from '../../../../hooks';
 import Alert from '../../../common/Alert';
 
-const Comments = ({ entranceId, comments }) => {
+const Comments = ({ entranceId, comments, isEditAllowed }) => {
   const { formatMessage } = useIntl();
   const permissions = usePermissions();
   const dispatch = useDispatch();
@@ -26,9 +26,9 @@ const Comments = ({ entranceId, comments }) => {
         entrance: entranceId,
         title: data.title,
         body: data.body,
-        aestheticism: data.interest,
-        caving: data.progression,
-        approach: data.access,
+        aestheticism: data.aestheticism,
+        caving: data.caving,
+        access: data.access,
         eTTrail: data.eTTrail,
         eTUnderground: data.eTUnderground,
         language: data.language.id
@@ -42,7 +42,8 @@ const Comments = ({ entranceId, comments }) => {
       dense
       title={formatMessage({ id: 'Comment' })}
       icon={
-        permissions.isAuth && (
+        permissions.isAuth &&
+        isEditAllowed && (
           <Tooltip
             title={
               isFormVisible
@@ -71,7 +72,11 @@ const Comments = ({ entranceId, comments }) => {
           {comments.length > 0 ? (
             <List dense disablePadding>
               {comments.map(comment => (
-                <Comment comment={comment} key={comment.id} />
+                <Comment
+                  comment={comment}
+                  key={comment.id}
+                  isEditAllowed={isEditAllowed}
+                />
               ))}
             </List>
           ) : (
@@ -89,8 +94,9 @@ const Comments = ({ entranceId, comments }) => {
 };
 
 Comments.propTypes = {
-  comments: commentsType,
-  entranceId: PropTypes.number.isRequired
+  entranceId: PropTypes.number.isRequired,
+  comments: PropTypes.arrayOf(CommentPropTypes),
+  isEditAllowed: PropTypes.bool
 };
 
 export default Comments;
