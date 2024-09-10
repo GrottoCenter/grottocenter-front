@@ -171,6 +171,7 @@ export const DeletedCard = ({
           </Tooltip>
         )}
       </Box>
+      <hr />
     </>
   );
 };
@@ -182,7 +183,8 @@ export const DeleteConfirmationDialog = ({
   isPermanent,
   onClose,
   onConfirmation,
-  hasSearch = true
+  hasSearch = true,
+  isSearchMandatory = false
 }) => {
   const { formatMessage } = useIntl();
   const dispatch = useDispatch();
@@ -233,9 +235,40 @@ export const DeleteConfirmationDialog = ({
   const entityFmt = formatMessage({ id: entityType.str });
   let actionButtonTitle = formatMessage({ id: 'Delete' });
   if (isPermanent) {
-    actionButtonTitle = selectedEntity
-      ? formatMessage({ id: 'Merge and permanently delete' })
-      : formatMessage({ id: 'Permanently delete' });
+    actionButtonTitle =
+      selectedEntity || isSearchMandatory
+        ? formatMessage({ id: 'Merge and permanently delete' })
+        : formatMessage({ id: 'Permanently delete' });
+  }
+
+  let searchTitle = '';
+  if (!isPermanent) {
+    searchTitle = formatMessage(
+      {
+        id: 'delete-confirmation-redirect',
+        defaultMessage:
+          'Optionally, select another {entityFmt} where visitors will be redirected to:'
+      },
+      { entityFmt }
+    );
+  } else {
+    searchTitle = isSearchMandatory
+      ? formatMessage(
+          {
+            id: 'delete-permanent-merge',
+            defaultMessage:
+              'Select another {entityFmt} where linked entities will be merged in:'
+          },
+          { entityFmt }
+        )
+      : formatMessage(
+          {
+            id: 'delete-permanent-merge',
+            defaultMessage:
+              'Optionally, select another {entityFmt} where linked entities will be merged in:'
+          },
+          { entityFmt }
+        );
   }
 
   return (
@@ -252,6 +285,7 @@ export const DeleteConfirmationDialog = ({
           )}
           {!isLoading && (
             <Button
+              disabled={isSearchMandatory && !selectedEntity}
               onClick={() => {
                 onConfirmation(selectedEntity);
                 onClose();
@@ -288,25 +322,7 @@ export const DeleteConfirmationDialog = ({
           <>
             <br />
             <br />
-            <Typography>
-              {isPermanent
-                ? formatMessage(
-                    {
-                      id: 'delete-permanent-merge',
-                      defaultMessage:
-                        'Optionally, select another {entityFmt} where linked entities will be merged in:'
-                    },
-                    { entityFmt }
-                  )
-                : formatMessage(
-                    {
-                      id: 'delete-confirmation-redirect',
-                      defaultMessage:
-                        'Optionally, select another {entityFmt} where visitors will be redirected to:'
-                    },
-                    { entityFmt }
-                  )}
-            </Typography>
+            <Typography>{searchTitle}</Typography>
           </>
         )}
         {hasSearch && !selectedEntity && (
@@ -383,9 +399,9 @@ DeletedCard.propTypes = {
     location: PropTypes.string
   }),
 
-  isLoading: PropTypes.bool.isRequired,
-  onRestorePress: PropTypes.func.isRequired,
-  onPermanentDeletePress: PropTypes.func.isRequired
+  isLoading: PropTypes.bool,
+  onRestorePress: PropTypes.func,
+  onPermanentDeletePress: PropTypes.func
 };
 
 Deleted.propTypes = {
@@ -400,5 +416,6 @@ DeleteConfirmationDialog.propTypes = {
   isPermanent: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
   onConfirmation: PropTypes.func.isRequired,
-  hasSearch: PropTypes.bool
+  hasSearch: PropTypes.bool,
+  isSearchMandatory: PropTypes.bool
 };
