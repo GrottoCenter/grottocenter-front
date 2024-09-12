@@ -6,7 +6,7 @@ import { reject, isNil, propOr, pathOr } from 'ramda';
 import { isMobileOnly } from 'react-device-detect';
 
 import { getUsersDocuments } from '../../actions/Document/GetDocuments';
-import { resetApiMessages } from '../../actions/Document/ResetApiMessages';
+import { resetDocumentApiErrors } from '../../actions/Document/ResetApiErrors';
 import Layout from '../../components/common/Layouts/Fixed/FixedContent';
 import StandardDialog from '../../components/common/StandardDialog';
 import { useDebounce, useUserProperties } from '../../hooks';
@@ -66,7 +66,7 @@ const ContributionsPage = () => {
   }, [debouncedRowsPerPage, debouncedOrderBy, debouncedOrder, debouncedPage]);
 
   const handleSuccessfulUpdate = () => {
-    dispatch(resetApiMessages());
+    dispatch(resetDocumentApiErrors());
     closeEditView();
     loadDocuments();
   };
