@@ -75,7 +75,13 @@ const StyledEntityIcon = styled(EntityIcon)`
 export const Deleted = ({ entityType, entity }) => (
   <Layout
     title={entity.name}
-    content={<DeletedCard entityType={entityType} entity={entity} />}
+    content={
+      <DeletedCard
+        entityType={entityType}
+        entity={entity}
+        includeSeparator={false}
+      />
+    }
   />
 );
 
@@ -84,7 +90,8 @@ export const DeletedCard = ({
   entity,
   isLoading,
   onRestorePress,
-  onPermanentDeletePress
+  onPermanentDeletePress,
+  includeSeparator = true
 }) => {
   const { formatMessage } = useIntl();
   const entityI18n = formatMessage({ id: entityType.str });
@@ -171,7 +178,7 @@ export const DeletedCard = ({
           </Tooltip>
         )}
       </Box>
-      <hr />
+      {includeSeparator && <hr />}
     </>
   );
 };
@@ -401,7 +408,8 @@ DeletedCard.propTypes = {
 
   isLoading: PropTypes.bool,
   onRestorePress: PropTypes.func,
-  onPermanentDeletePress: PropTypes.func
+  onPermanentDeletePress: PropTypes.func,
+  includeSeparator: PropTypes.bool
 };
 
 Deleted.propTypes = {

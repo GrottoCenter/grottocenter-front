@@ -87,6 +87,18 @@ export const postDocumentUrl = `${API_BASE_PATH}/documents`;
 export const processDocumentIdsUrl = `${API_BASE_PATH}/documents/validate`;
 export const putDocumentUrl = documentId =>
   `${API_BASE_PATH}/documents/${documentId}`;
+export const deleteDocumentUrl = (
+  documentId,
+  { entityId, isPermanent = false }
+) =>
+  `${API_BASE_PATH}/documents/${documentId}?${[
+    isPermanent ? 'isPermanent=1' : '',
+    entityId ? `entityId=${entityId}` : ''
+  ]
+    .filter(e => e)
+    .join('&')}`;
+export const restoreDocumentUrl = documentId =>
+  `${API_BASE_PATH}/documents/${documentId}/restore`;
 
 export const identifierTypesUrl = `${API_BASE_PATH}/documents/identifierTypes`;
 export const subjectsUrl = `${API_BASE_PATH}/documents/subjects`;
