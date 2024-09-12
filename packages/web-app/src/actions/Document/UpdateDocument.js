@@ -11,24 +11,20 @@ import {
 import { checkAndGetStatus } from '../utils';
 import { buildFormData } from './utils';
 
-// ==========
-
 export const UPDATE_DOCUMENT = 'UPDATE_DOCUMENT';
 export const UPDATE_DOCUMENT_SUCCESS = 'UPDATE_DOCUMENT_SUCCESS';
 export const UPDATE_DOCUMENT_FAILURE = 'UPDATE_DOCUMENT_FAILURE';
 
-// ==========
-
-export const updateDocumentAction = () => ({
+const updateDocumentAction = () => ({
   type: UPDATE_DOCUMENT
 });
 
-export const updateDocumentSuccess = httpCode => ({
+const updateDocumentSuccess = httpCode => ({
   type: UPDATE_DOCUMENT_SUCCESS,
   httpCode
 });
 
-export const updateDocumentFailure = (errorMessages, httpCode) => ({
+const updateDocumentFailure = (errorMessages, httpCode) => ({
   type: UPDATE_DOCUMENT_FAILURE,
   errorMessages,
   httpCode

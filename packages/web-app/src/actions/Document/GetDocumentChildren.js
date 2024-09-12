@@ -1,7 +1,6 @@
 import fetch from 'isomorphic-fetch';
-import { getDocumentChildrenUrl } from '../conf/apiRoutes';
-import makeErrorMessage from '../helpers/makeErrorMessage';
-import { checkAndGetStatus } from './utils';
+import { getDocumentChildrenUrl } from '../../conf/apiRoutes';
+import { checkAndGetStatus } from '../utils';
 
 export const FETCH_DOCUMENT_CHILDREN = 'FETCH_DOCUMENT_CHILDREN';
 export const FETCH_DOCUMENT_CHILDREN_SUCCESS =
@@ -28,12 +27,6 @@ export const fetchDocumentChildren =
         });
       })
       .catch(error =>
-        dispatch({
-          type: FETCH_DOCUMENT_CHILDREN_FAILURE,
-          error: makeErrorMessage(
-            error.message,
-            `Fetching children of document with id ${documentId}`
-          )
-        })
+        dispatch({ type: FETCH_DOCUMENT_CHILDREN_FAILURE, error })
       );
   };
