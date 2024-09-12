@@ -7,16 +7,16 @@ export const POST_DOCUMENT = 'POST_DOCUMENT';
 export const POST_DOCUMENT_SUCCESS = 'POST_DOCUMENT_SUCCESS';
 export const POST_DOCUMENT_FAILURE = 'POST_DOCUMENT_FAILURE';
 
-export const postDocumentAction = () => ({
+const postDocumentAction = () => ({
   type: POST_DOCUMENT
 });
 
-export const postDocumentSuccess = httpCode => ({
+const postDocumentSuccess = httpCode => ({
   type: POST_DOCUMENT_SUCCESS,
   httpCode
 });
 
-export const postDocumentFailure = (errorMessages, httpCode) => ({
+const postDocumentFailure = (errorMessages, httpCode) => ({
   type: POST_DOCUMENT_FAILURE,
   errorMessages,
   httpCode

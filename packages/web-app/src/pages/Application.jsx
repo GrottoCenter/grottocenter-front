@@ -7,7 +7,7 @@ import Dashboard from './Dashboard';
 import ApiDoc from './ApiDoc';
 import HomePage from './homepage';
 import AdvancedSearchPage from './AdvancedSearchPage';
-import DocumentDetailsPage from './DocumentDetails';
+import DocumentDetails from './DocumentDetails';
 import DuplicateImportHandle from './DuplicateImportHandle';
 import Faq from '../components/appli/Faq';
 import LatestBlogNewsSection from './homepage/LatestBlogNewsSection';
@@ -129,10 +129,7 @@ const Application = () => {
         <Route path="/ui/changePassword" component={ChangePassword} />
         <Route path="/ui/documents/validation" component={DocumentValidation} />
         <Route path="/ui/documents/:documentId/edit" component={DocumentEdit} />
-        <Route
-          path="/ui/documents/:documentId"
-          component={DocumentDetailsPage}
-        />
+        <Route path="/ui/documents/:documentId" component={DocumentDetails} />
         <Route path="/ui/import-csv" component={ImportContainer} />
         <Route path="/ui/duplicates" component={DuplicateImportHandle} />
         <Redirect path="/ui/*" to="/ui" />
