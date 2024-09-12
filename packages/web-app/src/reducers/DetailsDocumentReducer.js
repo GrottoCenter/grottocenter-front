@@ -2,12 +2,17 @@ import {
   FETCH_DOCUMENT_DETAILS,
   FETCH_DOCUMENT_DETAILS_FAILURE,
   FETCH_DOCUMENT_DETAILS_SUCCESS
-} from '../actions/DocumentDetails';
+} from '../actions/Document/GetDocumentDetails';
+import {
+  DELETE_DOCUMENT_SUCCESS,
+  DELETE_DOCUMENT_PERMANENT_SUCCESS
+} from '../actions/Document/DeleteDocument';
+import { RESTORE_DOCUMENT_SUCCESS } from '../actions/Document/RestoreDocument';
 
 const initialState = {
   error: null,
   isLoading: false,
-  details: {}
+  details: null
 };
 
 const reducer = (state = initialState, action) => {
@@ -24,6 +29,9 @@ const reducer = (state = initialState, action) => {
         error: action.error
       };
     case FETCH_DOCUMENT_DETAILS_SUCCESS:
+    case DELETE_DOCUMENT_SUCCESS:
+    case DELETE_DOCUMENT_PERMANENT_SUCCESS:
+    case RESTORE_DOCUMENT_SUCCESS:
       return {
         ...state,
         isLoading: false,
