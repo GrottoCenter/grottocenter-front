@@ -14,7 +14,7 @@ import Table from '../../common/Table';
 import useMakeCustomHeaderCellRenders from './customHeaderCellRender';
 import useMakeCustomCellRenders from './customCellRender';
 import TableActions from './TableActions';
-import { resetApiMessages } from '../../../actions/Document/ResetApiMessages';
+import { resetDocumentApiErrors } from '../../../actions/Document/ResetApiErrors';
 import { resetEntranceState } from '../../../actions/Entrance/ResetEntrance';
 
 const Wrapper = styled('div')`
@@ -77,7 +77,7 @@ const DuplicatesList = ({
 
   useEffect(() => {
     dispatch(resetEntranceState());
-    dispatch(resetApiMessages());
+    dispatch(resetDocumentApiErrors());
   }, [httpCodeEntry, httpCodeDocument]);
 
   useEffect(() => {

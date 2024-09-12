@@ -3,7 +3,7 @@ import {
   POST_DOCUMENT_FAILURE,
   POST_DOCUMENT_SUCCESS
 } from '../actions/Document/CreateDocument';
-import { RESET_API_MESSAGES } from '../actions/Document/ResetApiMessages';
+import { RESET_DOCUMENT_API_ERRORS } from '../actions/Document/ResetApiErrors';
 
 const initialState = {
   errorMessages: [],
@@ -34,7 +34,7 @@ const reducer = (state = initialState, action) => {
         errorMessages: action.errorMessages,
         latestHttpCode: action.httpCode
       };
-    case RESET_API_MESSAGES:
+    case RESET_DOCUMENT_API_ERRORS:
       return {
         ...state,
         errorMessages: [],

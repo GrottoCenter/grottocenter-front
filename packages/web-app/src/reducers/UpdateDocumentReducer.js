@@ -1,4 +1,4 @@
-import { RESET_API_MESSAGES } from '../actions/Document/ResetApiMessages';
+import { RESET_DOCUMENT_API_ERRORS } from '../actions/Document/ResetApiErrors';
 import {
   UPDATE_DOCUMENT,
   UPDATE_DOCUMENT_FAILURE,
@@ -34,7 +34,7 @@ const reducer = (state = initialState, action) => {
         errorMessages: action.errorMessages,
         latestHttpCode: action.httpCode
       };
-    case RESET_API_MESSAGES:
+    case RESET_DOCUMENT_API_ERRORS:
       return {
         ...state,
         errorMessages: [],

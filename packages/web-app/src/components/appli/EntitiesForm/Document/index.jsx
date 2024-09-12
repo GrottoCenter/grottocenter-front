@@ -8,7 +8,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { styled } from '@mui/material/styles';
 
 import { usePermissions, useDocumentTypes } from '../../../../hooks';
-import { resetApiMessages } from '../../../../actions/Document/ResetApiMessages';
+import { resetDocumentApiErrors } from '../../../../actions/Document/ResetApiErrors';
 import { postDocument } from '../../../../actions/Document/CreateDocument';
 import { updateDocument } from '../../../../actions/Document/UpdateDocument';
 import { displayLoginDialog } from '../../../../actions/Login';
@@ -81,12 +81,12 @@ const DocumentSubmission = () => {
   };
 
   const onSubmitAnotherDocument = () => {
-    dispatch(resetApiMessages());
+    dispatch(resetDocumentApiErrors());
     resetContext();
   };
 
   const onSubmitAnotherArticle = () => {
-    dispatch(resetApiMessages());
+    dispatch(resetDocumentApiErrors());
     resetContext();
     // Keep some values to resubmit an article
     updateAttribute('language', document.language);

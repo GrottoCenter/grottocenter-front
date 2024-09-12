@@ -1,5 +1,3 @@
-import { keys } from 'ramda';
-
 // From https://stackoverflow.com/a/42483509/16600080
 // FormData can't send null values, so we omit them.
 // eslint-disable-next-line import/prefer-default-export
@@ -10,7 +8,7 @@ export const buildFormData = (formData, data, parentKey) => {
     !(data instanceof Date) &&
     !(data instanceof File)
   ) {
-    keys(data).forEach(key => {
+    Object.keys(data).forEach(key => {
       buildFormData(
         formData,
         data[key],

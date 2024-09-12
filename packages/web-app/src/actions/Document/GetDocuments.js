@@ -1,9 +1,6 @@
 import fetch from 'isomorphic-fetch';
 import { pathOr } from 'ramda';
-import {
-  getDocumentsUrl as queryDocuments,
-  getCaversDocumentsUrl
-} from '../../conf/apiRoutes';
+import { getDocumentsUrl, getCaversDocumentsUrl } from '../../conf/apiRoutes';
 import { getTotalCount, makeUrl } from '../utils';
 import makeErrorMessage from '../../helpers/makeErrorMessage';
 
@@ -77,7 +74,7 @@ const doGet = (url, criterias) => async dispatch => {
   }
 };
 
-export const getDocuments = criteria => doGet(queryDocuments, criteria);
+export const getDocuments = criteria => doGet(getDocumentsUrl, criteria);
 
 export const getUsersDocuments = (userId, criteria) =>
   doGet(getCaversDocumentsUrl(userId), criteria);

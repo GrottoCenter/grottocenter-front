@@ -2,7 +2,7 @@ import {
   FETCH_DOCUMENT_CHILDREN,
   FETCH_DOCUMENT_CHILDREN_FAILURE,
   FETCH_DOCUMENT_CHILDREN_SUCCESS
-} from '../actions/DocumentChildren';
+} from '../actions/Document/GetDocumentChildren';
 
 const initialState = {
   error: null,
