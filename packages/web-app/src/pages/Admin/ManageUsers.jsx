@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useIntl } from 'react-intl';
-import { styled } from '@mui/material/styles';
 
-import { getAdmins, getModerators } from '../../actions/Person/GetPerson';
+import { fetchGroups } from '../../actions/Person/GetPerson';
 import { postPersonGroups } from '../../actions/Person/UpdatePersonGroups';
 
 import AuthChecker from '../../components/appli/AuthChecker';
@@ -13,33 +12,19 @@ import ManageUserGroups from '../../components/appli/ManageUserGroups';
 
 import UserList from './UserList';
 
-// ==========
-
-const MarginBottomBlock = styled('div')`
-  margin-bottom: ${({ theme }) => theme.spacing(4)};
-`;
-
-// ==========
-
 const ManageUsers = () => {
   const { formatMessage } = useIntl();
   const dispatch = useDispatch();
 
-  // State
   const [selectedUser, setSelectedUser] = useState(null);
   const [initialUser, setInitialUser] = useState(null);
 
-  // Redux store
-  const { admins, isLoading: areAdminsLoading } = useSelector(
-    state => state.admin
+  const { administrators, moderators, leaders, isLoading } = useSelector(
+    state => state.groups
   );
-  const { isLoading: areModeratorsLoading, moderators } = useSelector(
-    state => state.moderator
-  );
-  const {
-    isLoading: isCaverGroupsLoading,
-    latestHttpCode: caverUserGroupsLatestHttpCode
-  } = useSelector(state => state.updatePersonGroups);
+
+  const { isLoading: isUpdateLoading, isSuccess: isUpdateSuccess } =
+    useSelector(state => state.updatePersonGroups);
 
   const onSaveGroups = () => {
     dispatch(postPersonGroups(selectedUser.id, selectedUser.groups ?? []));
@@ -54,17 +39,15 @@ const ManageUsers = () => {
 
   useEffect(() => {
     // Check if submission is ok
-    if (caverUserGroupsLatestHttpCode === 200 && !isCaverGroupsLoading) {
+    if (isUpdateSuccess && !isUpdateLoading) {
       setInitialUser(selectedUser);
-      dispatch(getAdmins());
-      dispatch(getModerators());
+      dispatch(fetchGroups());
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isCaverGroupsLoading, caverUserGroupsLatestHttpCode]);
+  }, [isUpdateLoading, isUpdateSuccess]);
 
   useEffect(() => {
-    dispatch(getAdmins());
-    dispatch(getModerators());
+    dispatch(fetchGroups());
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -76,9 +59,6 @@ const ManageUsers = () => {
           componentToDisplay={
             <>
               <ManageUserGroups
-                areGroupsSubmittedWithSuccess={
-                  caverUserGroupsLatestHttpCode === 200 && !isCaverGroupsLoading
-                }
                 initialUser={initialUser}
                 onSaveGroups={onSaveGroups}
                 onSelection={onSelection}
@@ -88,18 +68,20 @@ const ManageUsers = () => {
 
               <hr />
 
-              <MarginBottomBlock>
-                <UserList
-                  isLoading={areAdminsLoading}
-                  userList={admins}
-                  title={formatMessage({ id: 'List of administrators' })}
-                />
-              </MarginBottomBlock>
-
               <UserList
-                isLoading={areModeratorsLoading}
+                isLoading={isLoading}
+                userList={administrators}
+                title={formatMessage({ id: 'List of administrators' })}
+              />
+              <UserList
+                isLoading={isLoading}
                 userList={moderators}
                 title={formatMessage({ id: 'List of moderators' })}
+              />
+              <UserList
+                isLoading={isLoading}
+                userList={leaders}
+                title={formatMessage({ id: 'List of leaders' })}
               />
             </>
           }

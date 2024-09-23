@@ -4,7 +4,7 @@ import { useIntl } from 'react-intl';
 
 import { useLocation } from 'react-router-dom';
 import { PASSWORD_MIN_LENGTH } from '../../conf/config';
-import { postChangePassword } from '../../actions/ChangePassword';
+import { postChangePassword } from '../../actions/Person/ChangePassword';
 import { logout } from '../../actions/Login';
 import { useNotification } from '../../hooks';
 import ChangePasswordForm from '../../pages/ChangePasswordForm';

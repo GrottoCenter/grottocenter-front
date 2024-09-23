@@ -221,9 +221,8 @@ export const restoreOrganizationUrl = organizationId =>
   `${API_BASE_PATH}/organizations/${organizationId}/restore`;
 
 // ===== Persons / cavers urls
-export const getAdminsUrl = `${API_BASE_PATH}/cavers/admins`;
+export const getGroupsUrl = `${API_BASE_PATH}/cavers/groups`;
 export const getCaverUrl = `${API_BASE_PATH}/cavers/`;
-export const getModeratorsUrl = `${API_BASE_PATH}/cavers/moderators`;
 export const postPersonUrl = `${API_BASE_PATH}/cavers`;
 export const postPersonGroupsUrl = userId =>
   `${API_BASE_PATH}/cavers/${userId}/groups`;

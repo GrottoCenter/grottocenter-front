@@ -1,42 +1,27 @@
 import fetch from 'isomorphic-fetch';
 import { putCaverUrl } from '../../conf/apiRoutes';
+import { checkAndGetStatus } from '../utils';
 
 export const UPDATE_PERSON = 'UPDATE_PERSON';
 export const UPDATE_PERSON_SUCCESS = 'UPDATE_PERSON_SUCCESS';
 export const UPDATE_PERSON_FAILURE = 'UPDATE_PERSON_FAILURE';
 
-export const updatePersonAction = () => ({
-  type: UPDATE_PERSON
-});
+const updatePersonAction = () => ({ type: UPDATE_PERSON });
+const updatePersonSuccess = person => ({ type: UPDATE_PERSON_SUCCESS, person });
+const updatePersonFailure = error => ({ type: UPDATE_PERSON_FAILURE, error });
 
-export const updatePersonSuccess = person => ({
-  type: UPDATE_PERSON_SUCCESS,
-  person
-});
-
-export const updatePersonFailure = error => ({
-  type: UPDATE_PERSON_FAILURE,
-  error
-});
-
-export const updatePerson = (personId, data) => (dispatch, getState) => {
+export const updatePerson = (personId, body) => (dispatch, getState) => {
   dispatch(updatePersonAction());
 
   const requestOptions = {
     method: 'PUT',
-    body: JSON.stringify(data),
+    body: JSON.stringify(body),
     headers: getState().login.authorizationHeader
   };
 
   return fetch(putCaverUrl(personId), requestOptions)
-    .then(response => {
-      if (response.status >= 400) {
-        throw new Error(response.status);
-      }
-      return response.text();
-    })
-    .then(text => dispatch(updatePersonSuccess(JSON.parse(text))))
-    .catch(errorMessage => {
-      dispatch(updatePersonFailure(errorMessage));
-    });
+    .then(checkAndGetStatus)
+    .then(response => response.json())
+    .then(data => dispatch(updatePersonSuccess(data)))
+    .catch(error => dispatch(updatePersonFailure(error)));
 };

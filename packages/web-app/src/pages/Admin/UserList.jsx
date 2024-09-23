@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { styled } from '@mui/material/styles';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 
@@ -8,7 +9,16 @@ import {
   createDefaultHiddenColumns
 } from '../../components/common/Table/TableHead';
 
-import useMakeCustomCellRenders from './customCellRenders';
+const MarginBottomBlock = styled('div')`
+  margin-bottom: ${({ theme }) => theme.spacing(4)};
+`;
+
+const customCellRenders = [
+  {
+    id: 'groups',
+    customRender: groups => groups.map(e => e.name ?? '').join(',')
+  }
+];
 
 const defaultHiddenColumns = ['groups'];
 
@@ -19,7 +29,6 @@ const defaultHiddenColumns = ['groups'];
  */
 const UserList = ({ isLoading, title, userList }) => {
   const { formatMessage } = useIntl();
-  const customCell = useMakeCustomCellRenders();
   const makeTranslation = id => {
     if (id === 'name') return formatMessage({ id: 'Caver.Name' });
     return formatMessage({ id: `${id[0].toUpperCase()}${id.slice(1)}` });
@@ -28,8 +37,6 @@ const UserList = ({ isLoading, title, userList }) => {
     createColumns(userList, makeTranslation)
   );
   const [hiddenColumns, setHiddenColumns] = useState(defaultHiddenColumns);
-  const [order, setOrder] = React.useState('asc');
-  const [orderBy, setOrderBy] = React.useState('id');
 
   useEffect(() => {
     setColumns(createColumns(userList, makeTranslation));
@@ -40,29 +47,20 @@ const UserList = ({ isLoading, title, userList }) => {
     setHiddenColumns(createDefaultHiddenColumns(columns, defaultHiddenColumns));
   }, [columns]);
 
-  const userListOrdered = userList.sort((u1, u2) => {
-    if (order === 'asc') {
-      return u1[orderBy] > u2[orderBy];
-    }
-    return u1[orderBy] < u2[orderBy];
-  });
-
   return (
-    <Table
-      columns={columns}
-      customCellRenders={customCell}
-      data={userListOrdered || []}
-      hiddenColumns={hiddenColumns}
-      loading={isLoading}
-      order={order}
-      orderBy={orderBy}
-      rowsCount={userListOrdered.length}
-      rowsPerPage={userListOrdered.length}
-      title={title}
-      updateHiddenColumns={setHiddenColumns}
-      updateOrder={setOrder}
-      updateOrderBy={setOrderBy}
-    />
+    <MarginBottomBlock>
+      <Table
+        columns={columns}
+        customCellRenders={customCellRenders}
+        data={userList || []}
+        hiddenColumns={hiddenColumns}
+        loading={isLoading}
+        rowsCount={userList.length}
+        rowsPerPage={userList.length}
+        title={title}
+        updateHiddenColumns={setHiddenColumns}
+      />
+    </MarginBottomBlock>
   );
 };
 

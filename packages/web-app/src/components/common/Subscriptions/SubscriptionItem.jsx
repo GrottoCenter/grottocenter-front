@@ -32,7 +32,7 @@ const SubscriptionItem = ({ canUnsubscribe, subscription, type }) => {
     <Tooltip title={formatMessage({ id: 'Click the cross to unsubscribe' })}>
       <Chip
         icon={<NotificationsIcon />}
-        label={type === 'MASSIF' ? subscription.name : subscription.nativeName}
+        label={subscription.name}
         onClick={() => history.push(url)}
         onDelete={canUnsubscribe ? handleUnsubscribe : undefined}
         color="primary"

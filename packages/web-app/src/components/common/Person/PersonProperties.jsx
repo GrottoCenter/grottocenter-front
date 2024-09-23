@@ -37,15 +37,14 @@ const PersonProperties = ({ person }) => {
   let groupsComplete = true;
   // eslint-disable-next-line no-param-reassign
   if (!person.groups) person.groups = [];
-  const { groups } = person;
-  const mappedGroups = groups.map(group => {
+  const mappedGroups = person.groups.map(group => {
     if (!group.name) {
       groupsComplete = false;
       return '';
     }
     return `${formatMessage({ id: group.name })}`;
   });
-  groupString = mappedGroups.join(', ');
+  groupString = mappedGroups.filter(e => e).join(', ');
 
   return (
     <Box style={{ display: 'flex', flexDirection: 'column' }}>
@@ -65,7 +64,7 @@ const PersonProperties = ({ person }) => {
       />
       <UserProperty
         propertyName={formatMessage({ id: 'Surname' })}
-        value={person.surname ? person.surname.toUpperCase() : person.surname}
+        value={person.surname}
       />
       <UserProperty
         propertyName={formatMessage({ id: 'Nickname' })}
@@ -77,7 +76,7 @@ const PersonProperties = ({ person }) => {
           value={person.language}
         />
       )}
-      {person.groups && groupsComplete && (
+      {person.groups.length > 0 && groupsComplete && (
         <UserProperty
           propertyName={formatMessage({ id: 'Groups' })}
           value={groupString}

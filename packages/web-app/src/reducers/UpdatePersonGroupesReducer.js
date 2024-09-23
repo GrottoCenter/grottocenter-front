@@ -5,33 +5,30 @@ import {
 } from '../actions/Person/UpdatePersonGroups';
 
 const initialState = {
-  errorMessages: [],
+  error: null,
   isLoading: false,
-  latestHttpCode: undefined
+  isSuccess: false
 };
 
 const reducer = (state = initialState, action) => {
   switch (action.type) {
     case POST_PERSON_GROUPS:
       return {
-        ...state,
         isLoading: true,
-        errorMessages: [],
-        latestHttpCode: undefined
+        isSuccess: false,
+        error: null
       };
     case POST_PERSON_GROUPS_SUCCESS:
       return {
-        ...state,
         isLoading: false,
-        errorMessages: [],
-        latestHttpCode: action.httpCode
+        isSuccess: true,
+        error: null
       };
     case POST_PERSON_GROUPS_FAILURE:
       return {
-        ...state,
         isLoading: false,
-        errorMessages: action.errorMessages,
-        latestHttpCode: action.httpCode
+        isSuccess: false,
+        error: action.error
       };
     default:
       return state;

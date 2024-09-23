@@ -1,34 +1,37 @@
 import {
-  UPDATE_PERSON,
-  UPDATE_PERSON_FAILURE,
-  UPDATE_PERSON_SUCCESS
-} from '../actions/Person/UpdatePerson';
+  FETCH_GROUPS,
+  FETCH_GROUPS_FAILURE,
+  FETCH_GROUPS_SUCCESS
+} from '../actions/Person/GetPerson';
 
 const initialState = {
-  error: null,
+  administrators: [],
+  moderators: [],
+  leaders: [],
   isLoading: false,
-  person: null
+  error: null
 };
 
 const reducer = (state = initialState, action) => {
   switch (action.type) {
-    case UPDATE_PERSON:
+    case FETCH_GROUPS:
       return {
-        ...state,
+        ...initialState,
         isLoading: true
       };
-    case UPDATE_PERSON_SUCCESS:
+    case FETCH_GROUPS_SUCCESS:
       return {
-        ...state,
+        ...initialState,
         isLoading: false,
-        person: action.person
+        ...action.groups
       };
-    case UPDATE_PERSON_FAILURE:
+    case FETCH_GROUPS_FAILURE:
       return {
-        ...state,
+        ...initialState,
         isLoading: false,
         error: action.error
       };
+
     default:
       return state;
   }

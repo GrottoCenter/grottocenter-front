@@ -1,52 +1,44 @@
 import React, { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { pathOr, isNil } from 'ramda';
 import { useDispatch, useSelector } from 'react-redux';
 import { useIntl } from 'react-intl';
 import { Skeleton } from '@mui/material';
 
-import { loadPerson } from '../../actions/Person/GetPerson';
+import { fetchPerson } from '../../actions/Person/GetPerson';
 import Layout from '../../components/common/Layouts/Fixed/FixedContent';
-import PersonEditPage from '../../components/common/PersonEditPage';
+import PersonForm from '../../components/appli/EntitiesForm/Person';
 import Alert from '../../components/common/Alert';
 import { useUserProperties, usePermissions } from '../../hooks';
 
-const computeTitle = (isFetching, person, formatMessage) => {
-  if (isFetching) return <Skeleton />;
-  if (!isNil(person))
-    return formatMessage(
-      {
-        id: 'Editing {person}',
-        defaultMessage: 'Editing {person}'
-      },
-      {
-        person: person.nickname
-      }
-    );
-  if (isNil(person)) return formatMessage({ id: 'Editing an unknown user' });
-  return '';
-};
-
 const PersonEdit = () => {
   const { formatMessage } = useIntl();
-
   const dispatch = useDispatch();
   const { person, isFetching } = useSelector(state => state.person);
-
   const { personId } = useParams();
-  const { isAdmin } = usePermissions();
-  const userId = pathOr(null, ['id'], useUserProperties());
-  const isAllowed = userId?.toString() === personId.toString() || isAdmin;
+  const { isAdmin, isModerator } = usePermissions();
+
+  const userId = useUserProperties()?.id ?? null;
+  const isOurAccount = userId?.toString() === personId.toString();
+  let isAllowed = isOurAccount || isAdmin;
+  if (isModerator && person?.type === 'AUTHOR') isAllowed = true;
 
   useEffect(() => {
-    if (personId) {
-      dispatch(loadPerson(personId));
+    if (personId && isAllowed) {
+      dispatch(fetchPerson(personId));
     }
-  }, [personId, dispatch]);
+  }, [personId, isAllowed, dispatch]);
+
+  let title = isFetching ? <Skeleton /> : '';
+  if (person) {
+    title = formatMessage(
+      { id: 'Editing {person}', defaultMessage: 'Editing {person}' },
+      { person: person.nickname }
+    );
+  }
 
   return (
     <Layout
-      title={computeTitle(isFetching, person, formatMessage)}
+      title={title}
       content={
         <>
           {isFetching && (
@@ -55,7 +47,7 @@ const PersonEdit = () => {
               <Skeleton height={500} />
             </>
           )}
-          {!isAllowed && !isNil(person) && !isFetching && (
+          {!isAllowed && (
             <Alert
               severity="error"
               content={formatMessage({
@@ -63,7 +55,7 @@ const PersonEdit = () => {
               })}
             />
           )}
-          {isNil(person) && !isFetching && (
+          {isAllowed && !person && !isFetching && (
             <Alert
               severity="error"
               content={formatMessage({
@@ -71,7 +63,9 @@ const PersonEdit = () => {
               })}
             />
           )}
-          {person && isAllowed && <PersonEditPage userValues={person} />}
+          {person && isAllowed && (
+            <PersonForm personValues={person} isOurAccount={isOurAccount} />
+          )}
         </>
       }
     />
