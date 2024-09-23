@@ -1,53 +1,83 @@
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { isNil } from 'ramda';
 import Skeleton from '@mui/material/Skeleton';
 import { useIntl } from 'react-intl';
 import { Box } from '@mui/material';
+import { useHistory } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
 
+import { useUserProperties, usePermissions } from '../../../hooks';
 import subscriptionsType from '../../../types/subscriptions.type';
+import { PersonPropTypes } from '../../../types/person.type';
 import REDUCER_STATUS from '../../../reducers/ReducerStatus';
-import Layout from '../../common/Layouts/Fixed/FixedContent';
+import FixedContent from '../../common/Layouts/Fixed/FixedContent';
 import EntrancesList from '../../common/entrance/EntrancesList';
-
-import { EntranceSimplePropTypes } from '../../../types/entrance.type';
 import Alert from '../../common/Alert';
-
 import DocumentsList from '../../common/DocumentsList/DocumentsList';
 import OrganizationsList from '../../common/Organizations/OrganizationsList';
 import PersonProperties from '../../common/Person/PersonProperties';
 import SubscriptionsList from '../../common/Subscriptions/SubscriptionsList';
+import { deletePerson } from '../../../actions/Person/DeletePerson';
+import {
+  DeleteConfirmationDialog,
+  DELETED_ENTITIES
+} from '../../common/card/Deleted';
 
 const Person = ({
-  isFetching,
+  isLoading,
   person,
-  onEdit,
-  canEdit,
+  error,
   subscriptions,
   subscriptionsStatus
 }) => {
+  const dispatch = useDispatch();
+  const history = useHistory();
   const { formatMessage } = useIntl();
 
+  const permissions = usePermissions();
+  const [isDeleteConfirmationOpen, setIsDeleteConfirmationOpen] =
+    useState(false);
+
+  const userId = useUserProperties()?.id ?? null;
+  let canEdit = false;
+  if (userId && person) {
+    canEdit =
+      userId.toString() === person?.id?.toString() || permissions.isAdmin;
+  }
+
+  let onDelete = null;
+  if (person && (permissions.isAdmin || permissions.isModerator)) {
+    onDelete = () => {
+      setIsDeleteConfirmationOpen(true);
+    };
+  }
+  const onDeletePress = (entityId, isPermanent) => {
+    dispatch(deletePerson({ id: person?.id, entityId, isPermanent }));
+    if (isPermanent) history.replace('/');
+  };
+
   let title = '';
-  if (!isNil(person)) {
+  if (person) {
+    title += `${formatMessage({ id: 'Profile page of the user' })} : `;
     if (person.name && person.surname) {
-      title += `${formatMessage({ id: 'Profile page of the user' })} : ${
-        person.name
-      } ${person.surname}`;
+      title += `${person.name} ${person.surname}`;
     } else {
-      title += `${formatMessage({ id: 'Profile page of the user' })} : ${
-        person.nickname
-      }`;
+      title += `${person.nickname}`;
     }
   }
 
   return (
-    <Layout
+    <FixedContent
       title={title}
-      onEdit={canEdit ? onEdit : undefined}
+      onEdit={
+        canEdit
+          ? () => history.push(`/ui/persons/${person?.id}/edit`)
+          : undefined
+      }
+      onDelete={onDelete}
       content={
         <>
-          {isFetching && person === undefined && (
+          {isLoading && (
             <>
               <Skeleton width={600} /> {/* Title Skeleton */}
               <Skeleton height={200} width={500} /> {/* Details Skeleton */}
@@ -57,7 +87,7 @@ const Person = ({
               <Skeleton height={100} /> {/* Entrance list Skeleton */}
             </>
           )}
-          {person === null && (
+          {!!error && (
             <Alert
               title={formatMessage({
                 id: 'Error, the person you are looking for is not available.'
@@ -65,8 +95,18 @@ const Person = ({
               severity="error"
             />
           )}
-          {!isNil(person) && (
+          {!!person && (
             <>
+              <DeleteConfirmationDialog
+                entityType={DELETED_ENTITIES.person}
+                isOpen={isDeleteConfirmationOpen}
+                isLoading={false}
+                isPermanent
+                onClose={() => setIsDeleteConfirmationOpen(false)}
+                onConfirmation={entity => {
+                  onDeletePress(entity?.id, true);
+                }}
+              />
               <Box
                 alignItems="start"
                 display="flex"
@@ -79,54 +119,24 @@ const Person = ({
                 canUnsubscribe={canEdit}
                 subscriptions={subscriptions}
                 subscriptionsStatus={subscriptionsStatus}
-                emptyMessageComponent={
-                  <Alert
-                    severity="info"
-                    title={formatMessage({
-                      id: 'This person has no subscriptions listed yet.'
-                    })}
-                  />
-                }
                 title={formatMessage({ id: 'Subscriptions' })}
               />
-              <hr />
-              <DocumentsList
-                title={formatMessage({ id: 'Documents' })}
-                documents={person.documents}
-                emptyMessageComponent={
-                  <Alert
-                    severity="info"
-                    title={formatMessage({
-                      id: 'This person has no documents listed yet.'
-                    })}
+              {person.documents.length > 0 && (
+                <>
+                  <DocumentsList
+                    title={formatMessage({ id: 'Documents' })}
+                    documents={person.documents}
                   />
-                }
-              />
-              <hr />
+                  <hr />
+                </>
+              )}
               <OrganizationsList
                 orgas={person.organizations}
-                emptyMessageComponent={
-                  <Alert
-                    severity="info"
-                    title={formatMessage({
-                      id: 'This person has no organization listed yet.'
-                    })}
-                  />
-                }
                 title={formatMessage({ id: 'Organizations' })}
               />
-              <hr />
               <EntrancesList
-                entrances={person.exploredEntrances}
-                emptyMessageComponent={
-                  <Alert
-                    severity="info"
-                    title={formatMessage({
-                      id: 'This person has no entrances listed yet.'
-                    })}
-                  />
-                }
                 title={formatMessage({ id: 'List of explored caves' })}
+                entrances={person.exploredEntrances}
               />
             </>
           )}
@@ -137,25 +147,11 @@ const Person = ({
 };
 
 Person.propTypes = {
-  canEdit: PropTypes.bool.isRequired,
-  isFetching: PropTypes.bool.isRequired,
-  onEdit: PropTypes.func.isRequired,
-  person: PropTypes.shape({
-    name: PropTypes.string,
-    surname: PropTypes.string,
-    nickname: PropTypes.string,
-    language: PropTypes.string,
-    groups: PropTypes.arrayOf(PropTypes.shape({})),
-    organizations: PropTypes.arrayOf(PropTypes.shape({})),
-    documents: PropTypes.arrayOf(PropTypes.shape({})),
-    exploredEntrances: PropTypes.arrayOf(EntranceSimplePropTypes)
-  }),
+  isLoading: PropTypes.bool.isRequired,
+  error: PropTypes.shape({}),
+  person: PersonPropTypes,
   subscriptions: subscriptionsType,
   subscriptionsStatus: PropTypes.oneOf(Object.values(REDUCER_STATUS))
-};
-
-Person.defaultProps = {
-  person: undefined
 };
 
 export default Person;
