@@ -15,14 +15,6 @@ const RelatedCaves = ({ exploredEntrances, exploredNetworks }) => {
       <EntrancesList
         entrances={exploredEntrances}
         title={formatMessage({ id: 'Explored entrances' })}
-        emptyMessageComponent={
-          <Alert
-            severity="info"
-            title={formatMessage({
-              id: 'No explored entrances found.'
-            })}
-          />
-        }
       />
       <br />
       <CavesList

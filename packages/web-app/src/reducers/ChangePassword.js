@@ -2,7 +2,7 @@ import {
   FETCH_CHANGE_PASSWORD,
   FETCH_CHANGE_PASSWORD_FAILURE,
   FETCH_CHANGE_PASSWORD_SUCCESS
-} from '../actions/ChangePassword';
+} from '../actions/Person/ChangePassword';
 
 const initialState = {
   error: null,

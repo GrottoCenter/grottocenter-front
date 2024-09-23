@@ -2,7 +2,7 @@ import {
   FETCH_CHANGE_EMAIL,
   FETCH_CHANGE_EMAIL_FAILURE,
   FETCH_CHANGE_EMAIL_SUCCESS
-} from '../actions/ChangeEmail';
+} from '../actions/Person/ChangeEmail';
 
 const initialState = {
   error: null,

@@ -1,5 +1,4 @@
 import { combineReducers } from 'redux';
-import admin from './AdminReducer';
 import advancedsearch from './AdvancedsearchReducer';
 import linkDocumentToEntrance from './LinkDocumentToEntrance';
 import unlinkDocumentToEntrance from './UnlinkDocumentToEntrance';
@@ -30,6 +29,7 @@ import entrance from './EntranceReducer';
 import error from './ErrorReducer';
 import fileFormats from './FileFormatsReducer';
 import forgotPassword from './ForgotPasswordReducer';
+import groups from './GroupsReducer';
 import identifierType from './IdentifierTypesReducer';
 import importCsv from './ImportCsvReducer';
 import intl from './IntlReducer';
@@ -40,7 +40,6 @@ import login from './LoginReducer';
 import map from './Map';
 import massif from './MassifReducer';
 import menuNotifications from './MenuNotificationsReducer';
-import moderator from './ModeratorReducer';
 import moveEntranceToCave from './MoveEntranceToCaveReducer';
 import notifications from './NotificationsReducer';
 import organization from './OrganizationReducer';
@@ -78,7 +77,6 @@ import massifEntrances from './MassifEntrancesDataQualityReducer';
 import countryEntrances from './CountryEntrancesDataQualityReducer';
 
 const GCReducer = combineReducers({
-  admin,
   advancedsearch,
   linkDocumentToEntrance,
   unlinkDocumentToEntrance,
@@ -110,6 +108,7 @@ const GCReducer = combineReducers({
   error,
   fileFormats,
   forgotPassword,
+  groups,
   identifierType,
   importCsv,
   intl,
@@ -121,7 +120,6 @@ const GCReducer = combineReducers({
   massif,
   massifEntrances,
   menuNotifications,
-  moderator,
   moveEntranceToCave,
   notifications,
   organization,

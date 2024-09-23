@@ -5,7 +5,6 @@ import PropTypes from 'prop-types';
 import { styled } from '@mui/material/styles';
 import { Button, Typography } from '@mui/material';
 import ClearIcon from '@mui/icons-material/Clear';
-import { isNil, length } from 'ramda';
 
 import {
   fetchQuicksearchResult,
@@ -21,6 +20,7 @@ import SuccessMessage from '../../common/StatusMessage/SuccessMessage';
 
 import PersonProperties from '../../common/Person/PersonProperties';
 import UserGroups from './UserGroups';
+import { PersonPropTypes } from '../../../types/person.type';
 
 const FeedbackBlock = styled('div')`
   margin-top: ${({ theme }) => theme.spacing(4)};
@@ -47,7 +47,6 @@ const SpacedTopButton = styled(Button)`
 `;
 
 const ManageUserGroups = ({
-  areGroupsSubmittedWithSuccess,
   initialUser,
   onSaveGroups,
   onSelection,
@@ -64,9 +63,12 @@ const ManageUserGroups = ({
     error: quickSearchError,
     isLoading: searchIsLoading
   } = useSelector(state => state.quicksearch);
-  const { errorMessages, isLoading, latestHttpCode } = useSelector(
-    state => state.updatePersonGroups
-  );
+  const {
+    isLoading: isUpdateLoading,
+    isSuccess: isUpdateSuccess,
+    error: updateError
+  } = useSelector(state => state.updatePersonGroups);
+  useSelector(state => state.updatePersonGroups);
 
   const getOptionLabel = option => option.name;
 
@@ -77,7 +79,7 @@ const ManageUserGroups = ({
 
   useEffect(() => {
     // Check search input value and launch / reset search
-    if (length(debouncedInput) > 2) {
+    if (debouncedInput.length > 2) {
       const criteria = {
         query: debouncedInput.trim(),
         complete: true,
@@ -88,7 +90,7 @@ const ManageUserGroups = ({
       dispatch(resetQuicksearch());
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [debouncedInput, latestHttpCode]);
+  }, [debouncedInput]);
 
   return (
     <>
@@ -106,7 +108,7 @@ const ManageUserGroups = ({
           renderOption={entityOptionForSelector}
           getOptionLabel={getOptionLabel}
           errorMessage="Unexpected error"
-          hasError={!isNil(quickSearchError)}
+          hasError={!!quickSearchError}
           isLoading={searchIsLoading}
         />
       </SearchBarBackground>
@@ -117,6 +119,14 @@ const ManageUserGroups = ({
             startIcon={<ClearIcon />}>
             {formatMessage({ id: 'Unselect user' })}
           </SpacedTopButton>
+          <SpacedTopButton
+            sx={{ marginLeft: 2 }}
+            variant="outlined"
+            onClick={() =>
+              window.open(`/ui/persons/${selectedUser?.id}`, '_blank')
+            }>
+            {formatMessage({ id: 'View detail' })}
+          </SpacedTopButton>
           <UserBlock>
             <FlexBlock style={{ flexBasis: '300px' }}>
               <PersonProperties person={selectedUser} />
@@ -124,7 +134,7 @@ const ManageUserGroups = ({
             <FlexBlock style={{ flexBasis: '200px' }}>
               <UserGroups
                 initialUser={initialUser}
-                isLoading={isLoading}
+                isLoading={isUpdateLoading}
                 onSaveGroups={onSaveGroups}
                 selectedUser={selectedUser}
                 setSelectedUser={setSelectedUser}
@@ -133,19 +143,16 @@ const ManageUserGroups = ({
           </UserBlock>
         </>
       )}
-      {(isLoading ||
-        errorMessages.length > 0 ||
-        areGroupsSubmittedWithSuccess) && (
+      {!isUpdateLoading && (
         <FeedbackBlock>
-          {errorMessages.length > 0 &&
-            errorMessages.map(error => (
-              <ErrorMessage
-                key={error}
-                message={formatMessage({ id: error })}
-              />
-            ))}
-
-          {areGroupsSubmittedWithSuccess && (
+          {!isUpdateSuccess && !!updateError && (
+            <ErrorMessage
+              message={formatMessage({
+                id: 'Error while updating the user groups'
+              })}
+            />
+          )}
+          {isUpdateSuccess && (
             <SuccessMessage
               message={formatMessage({ id: 'Groups updated with success!' })}
             />
@@ -157,11 +164,10 @@ const ManageUserGroups = ({
 };
 
 ManageUserGroups.propTypes = {
-  areGroupsSubmittedWithSuccess: PropTypes.bool.isRequired,
-  initialUser: PropTypes.shape({}),
+  initialUser: PersonPropTypes,
   onSaveGroups: PropTypes.func.isRequired,
   onSelection: PropTypes.func.isRequired,
-  selectedUser: PropTypes.shape({}),
+  selectedUser: PersonPropTypes,
   setSelectedUser: PropTypes.func.isRequired
 };
 
