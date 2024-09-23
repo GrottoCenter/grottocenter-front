@@ -228,6 +228,8 @@ export const postPersonGroupsUrl = userId =>
   `${API_BASE_PATH}/cavers/${userId}/groups`;
 export const putCaverUrl = userId => `${API_BASE_PATH}/cavers/${userId}`;
 export const getDbExportUrls = `${API_BASE_PATH}/cavers/export/db`;
+export const deletePersonUrl = (userId, entityId) =>
+  `${API_BASE_PATH}/cavers/${userId}?${entityId ? `entityId=${entityId}` : ''}`;
 
 // ===== RSS urls
 export const frenchRssUrl = `${API_URL}/api/rss/FR`;

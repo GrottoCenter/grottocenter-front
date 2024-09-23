@@ -59,6 +59,11 @@ export const DELETED_ENTITIES = {
     str: 'Network',
     url: '/ui/networks/',
     searchType: ADVANCED_SEARCH_TYPES.CAVES
+  },
+  person: {
+    str: 'Person',
+    url: '/ui/persons/',
+    searchType: 'cavers'
   }
 };
 
