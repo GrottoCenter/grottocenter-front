@@ -175,13 +175,11 @@ const Document = ({
         })
       }
       snapshot={
-        documentData
-          ? {
-              id: documentData.id,
-              entity: 'documents',
-              actualVersion: documentData
-            }
-          : null
+        !!documentData && {
+          id: documentData.id,
+          type: 'documents',
+          content: documentData
+        }
       }
       title={documentData?.title ?? ''}
       content={

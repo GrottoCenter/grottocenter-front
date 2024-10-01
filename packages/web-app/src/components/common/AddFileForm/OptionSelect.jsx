@@ -52,7 +52,7 @@ const OptionSelect = ({ label, selectedOption, updateSelectedOption }) => {
   ];
 
   return (
-    <Wrapper variant="filled">
+    <Wrapper variant="filled" required>
       {label && <InputLabel>{label}</InputLabel>}
       <Select
         value={selectedOption || ''}

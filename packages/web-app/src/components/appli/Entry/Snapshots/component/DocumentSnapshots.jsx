@@ -124,20 +124,25 @@ const DocumentSnapshots = ({ document, previous }) => {
           <Property
             key="license"
             name={formatMessage({ id: 'License' })}
-            value={pathOr(
-              formatMessage({ id: INFORMATION_NOT_FOUND }),
-              ['name'],
-              license
-            )}
-            oldValue={previous?.license?.name}
+            value={license ?? formatMessage({ id: INFORMATION_NOT_FOUND })}
+            oldValue={previous?.license}
           />
           <TableRow key="parent_document">
             <PropertyName align="right">
               {formatMessage({ id: 'Parent document' })}
             </PropertyName>
             {parent ? (
-              <TableCell numeric component="a" href={`/ui/documents/${parent}`}>
-                <HighLightsLine newText={parent} oldText={previous?.parent} />
+              <TableCell
+                numeric
+                component="a"
+                href={`/ui/documents/${parent?.id ?? parent}`}>
+                <HighLightsLine
+                  newText={parent?.id?.toString() ?? parent?.toString()}
+                  oldText={
+                    previous?.parent?.id?.toString() ??
+                    previous?.parent?.toString()
+                  }
+                />
               </TableCell>
             ) : (
               <TableCell>
@@ -160,8 +165,8 @@ DocumentSnapshots.propTypes = {
       nickname: PropTypes.string
     }),
     identifier: PropTypes.string,
-    license: licenseType,
-    parent: PropTypes.number,
+    license: PropTypes.string,
+    parent: PropTypes.oneOfType([PropTypes.number, PropTypes.shape({})]),
     description: intactDescription,
     intactDescriptions: intactDescription
   }),

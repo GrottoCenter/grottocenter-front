@@ -42,8 +42,8 @@ const PublicationDatePicker = ({ required = false }) => {
   const [dateTypes, setDateTypes] = useState(
     // Default date format type is deduced from the datePublication
     !document.datePublication
-      ? ['year', 'month', 'date']
-      : ['year', 'month', 'date'].slice(
+      ? ['year', 'month', 'day']
+      : ['year', 'month', 'day'].slice(
           0,
           document.datePublication.split('-').length
         )
@@ -58,7 +58,7 @@ const PublicationDatePicker = ({ required = false }) => {
 
   const getDisplayedDateFormat = () => {
     if (dateTypes.includes('month')) {
-      if (dateTypes.includes('date')) {
+      if (dateTypes.includes('day')) {
         return dateTypeFormats.YEAR_MONTH_DAY;
       }
       return dateTypeFormats.YEAR_MONTH;
@@ -196,7 +196,7 @@ const PublicationDatePicker = ({ required = false }) => {
           fullWidth
           variant="text"
           size="small"
-          onClick={() => handleDateTypesChanges(['year', 'month', 'date'])}>
+          onClick={() => handleDateTypesChanges(['year', 'month', 'day'])}>
           <Translate>Full Date</Translate>
         </DateButton>
       </ButtonsFlexWrapper>

@@ -40,7 +40,7 @@ const MassifFields = ({ control, errors, geoJson }) => {
         isRequired
       />
       <InputText
-        formKey="massif.description"
+        formKey="massif.descriptionBody"
         labelName="Description"
         control={control}
         isError={!!errors?.massif?.description}
@@ -63,7 +63,7 @@ const MassifFields = ({ control, errors, geoJson }) => {
           </>
         }>
         <Controller
-          name="massif.geoJson"
+          name="massif.geogPolygon"
           control={control}
           rules={{ required: true }}
           render={({ field }) => (
