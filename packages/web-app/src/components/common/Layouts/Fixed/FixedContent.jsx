@@ -19,13 +19,11 @@ import { styled } from '@mui/material/styles';
 import { useReactToPrint } from 'react-to-print';
 import CreateIcon from '@mui/icons-material/Create';
 import DeleteIcon from '@mui/icons-material/Delete';
+import TimelineIcon from '@mui/icons-material/Timeline';
 import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
 import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
 
-import {
-  SnapshotButton,
-  SnapshotPageButton
-} from '../../../appli/Entry/Snapshots/UtilityFunction';
+import { SnapshotButton } from '../../../appli/Entry/Snapshots/UtilityFunction';
 
 const isString = is(String);
 
@@ -44,9 +42,6 @@ const CardContent = styled(MuiCardContent)`
 
 const CardActions = styled(MuiCardActions)`
   display: flex;
-`;
-const CardActionsBtn = styled(SnapshotButton)`
-  margin-left: auto;
 `;
 
 const Title = styled('div')`
@@ -148,10 +143,15 @@ const FixedContent = ({
                 </Button>
               </Tooltip>
             )}
-            {snapshot?.all && (
-              <SnapshotPageButton
+            {!!snapshot && (
+              <SnapshotButton
                 id={snapshot.id}
+                type={snapshot.type}
+                content={snapshot.content}
                 isNetwork={snapshot.isNetwork}
+                getAll={snapshot.getAll}
+                startIcon={<TimelineIcon />}
+                label={formatMessage({ id: 'All Revisions' })}
               />
             )}
           </ButtonGroup>
@@ -172,23 +172,7 @@ const FixedContent = ({
         }
       />
       <CardContent>{content}</CardContent>
-      {!isNil(footer) && (
-        <CardActions disableSpacing>
-          {footer}
-          {snapshot && (
-            <CardActionsBtn
-              size="small"
-              variant="outlined"
-              color="primary"
-              id={snapshot.id}
-              type={snapshot.entity}
-              content={snapshot.actualVersion}
-              isNetwork={snapshot.isNetwork}
-              showLabel
-            />
-          )}
-        </CardActions>
-      )}
+      {!isNil(footer) && <CardActions disableSpacing>{footer}</CardActions>}
     </Card>
   );
 };
@@ -208,11 +192,10 @@ FixedContent.propTypes = {
   }),
   snapshot: PropTypes.shape({
     id: PropTypes.number.isRequired,
-    entity: PropTypes.string.isRequired,
+    type: PropTypes.string,
+    content: PropTypes.shape({}),
     isNetwork: PropTypes.bool,
-    // eslint-disable-next-line react/forbid-prop-types
-    actualVersion: PropTypes.any,
-    all: PropTypes.bool
+    getAll: PropTypes.bool
   }),
   onChangeSubscribe: PropTypes.func,
   subheader: PropTypes.node,

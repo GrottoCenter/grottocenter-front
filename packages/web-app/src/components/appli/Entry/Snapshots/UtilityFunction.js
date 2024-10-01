@@ -3,7 +3,6 @@ import { useIntl } from 'react-intl';
 import { Link } from 'react-router-dom';
 import { Tooltip, Button } from '@mui/material';
 import HistoryIcon from '@mui/icons-material/History';
-import TimelineIcon from '@mui/icons-material/Timeline';
 import PropTypes from 'prop-types';
 import {
   CommentSnapshots,
@@ -50,49 +49,46 @@ const getAccordionBodyFromType = (type, data, isNetwork, previous) => {
   }
 };
 
-const SnapshotButton = item => {
-  const { id, type, content, isNetwork, showLabel = false, ...grpProps } = item;
+const SnapshotButton = ({
+  id,
+  type,
+  content,
+  label,
+  isNetwork,
+  getAll = false,
+  startIcon = <HistoryIcon />,
+  ...grpProps
+}) => {
   const { formatMessage } = useIntl();
   return (
     <Tooltip title={formatMessage({ id: 'Access the revision history page' })}>
       <Button
         {...grpProps}
         component={Link}
-        to={`/ui/${type}/${id}/snapshots${
-          isNetwork !== undefined ? `?isNetwork=${isNetwork}` : ''
-        }`}
-        onClick={() => storeInLocalStorage(content)}
+        to={`/ui/${type}/${id}/snapshots?${[
+          isNetwork !== undefined ? `isNetwork=${isNetwork}` : '',
+          getAll ? `getAll=true` : ''
+        ]
+          .filter(e => e)
+          .join('&')}`}
+        onClick={!!content && (() => storeInLocalStorage(content))}
         target="_blank"
         rel="opener"
-        startIcon={showLabel && <HistoryIcon />}>
-        {showLabel ? formatMessage({ id: 'Revisions' }) : <HistoryIcon />}
+        startIcon={!!label && startIcon}>
+        {!label && startIcon}
+        {label}
       </Button>
     </Tooltip>
   );
 };
-
-const SnapshotPageButton = ({ id, isNetwork, ...grpProps }) => {
-  const { formatMessage } = useIntl();
-  return (
-    <Tooltip
-      title={formatMessage({
-        id: 'Page of all types of revision history for this entrance'
-      })}>
-      <Button
-        {...grpProps}
-        component={Link}
-        to={`/ui/entrances/${id}/snapshots?isNetwork=${isNetwork}&all=true`}
-        target="_blank"
-        rel="opener"
-        startIcon={<TimelineIcon />}>
-        {formatMessage({ id: 'All revisions' })}
-      </Button>
-    </Tooltip>
-  );
-};
-SnapshotPageButton.propTypes = {
+SnapshotButton.propTypes = {
   id: PropTypes.number,
-  isNetwork: PropTypes.bool
+  type: PropTypes.string,
+  content: PropTypes.shape({}),
+  label: PropTypes.string,
+  isNetwork: PropTypes.bool,
+  getAll: PropTypes.bool,
+  startIcon: PropTypes.node
 };
 
 const sortSnapshots = dataToStore => {
@@ -120,9 +116,4 @@ sortSnapshots.prototype = {
   })
 };
 
-export {
-  SnapshotButton,
-  SnapshotPageButton,
-  getAccordionBodyFromType,
-  sortSnapshots
-};
+export { SnapshotButton, getAccordionBodyFromType, sortSnapshots };

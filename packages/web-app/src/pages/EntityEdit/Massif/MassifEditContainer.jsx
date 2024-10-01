@@ -4,7 +4,6 @@ import { isNil } from 'ramda';
 import PropTypes from 'prop-types';
 import { CircularProgress } from '@mui/material';
 import MassifForm from '../../../components/appli/EntitiesForm/Massif';
-import { makeMassifValueData } from '../../../components/appli/EntitiesForm/Massif/transformers';
 import Layout from '../../../components/common/Layouts/Fixed/FixedContent';
 import Translate from '../../../components/common/Translate';
 
@@ -23,11 +22,7 @@ const MassifEditContainer = ({ isFetching, massif }) => {
     <Layout
       title={massif?.name || formatMessage({ id: 'Loading massif data...' })}
       content={
-        isFetching ? (
-          <CircularProgress />
-        ) : (
-          <MassifForm massifValues={makeMassifValueData(massif)} />
-        )
+        isFetching ? <CircularProgress /> : <MassifForm massifValues={massif} />
       }
     />
   );

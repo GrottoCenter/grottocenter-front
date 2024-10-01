@@ -1,5 +1,4 @@
-import React, { useCallback } from 'react';
-import PropTypes from 'prop-types';
+import React, { useCallback, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { useSelector, useDispatch } from 'react-redux';
 
@@ -10,22 +9,24 @@ import { postDescription } from '../../../../actions/Description/CreateDescripti
 import { updateName } from '../../../../actions/Name';
 import { FormContainer, FormActionRow } from '../utils/FormContainers';
 import LicenseBox from '../utils/LicenseBox';
+import { MassifTypes } from '../../../../types/massif.type';
 import FormProgressInfo from '../utils/FormProgressInfo';
 
 import MassifFields from './MassifFields';
-import { makeMassifPostData, makeMassifPutData } from './transformers';
 
 const defaultMassifValues = {
   name: '',
-  description: '',
-  descriptionTitle: '',
   language: '',
-  geoJson: null
+  descriptionId: null,
+  descriptionTitle: '',
+  descriptionBody: '',
+  geogPolygon: null
 };
 
 export const MassifForm = ({ massifValues }) => {
   const isNewMassif = !massifValues;
-  const isNewDescription = massifValues ? !massifValues.descriptionId : true;
+  const isNewDescription = massifValues?.descriptions?.length === 0 ?? true;
+
   const {
     error: massifError,
     loading: massifLoading,
@@ -47,6 +48,11 @@ export const MassifForm = ({ massifValues }) => {
 
   const dispatch = useDispatch();
 
+  const geoJson = useMemo(
+    () => JSON.parse(massifValues?.geogPolygon ?? ''),
+    [massifValues]
+  );
+
   const {
     handleSubmit,
     reset,
@@ -54,7 +60,17 @@ export const MassifForm = ({ massifValues }) => {
     formState: { errors, isDirty, isSubmitting, isSubmitSuccessful }
   } = useForm({
     defaultValues: {
-      massif: massifValues ?? defaultMassifValues
+      massif: massifValues
+        ? {
+            nameId: massifValues.names[0]?.id,
+            name: massifValues.names[0]?.name,
+            language: massifValues.language,
+            descriptionId: massifValues.descriptions[0]?.id,
+            descriptionTitle: massifValues.descriptions[0]?.title,
+            descriptionBody: massifValues.descriptions[0]?.body,
+            geogPolygon: massifValues.geogPolygon
+          }
+        : defaultMassifValues
     }
   });
 
@@ -64,44 +80,54 @@ export const MassifForm = ({ massifValues }) => {
 
   const onSubmit = async data => {
     if (isNewMassif) {
-      const massifToPost = makeMassifPostData(data);
-      dispatch(postMassif(massifToPost));
+      dispatch(
+        postMassif({
+          name: data.massif.name,
+          description: data.massif.descriptionBody,
+          descriptionTitle: data.massif.descriptionTitle,
+          descriptionAndNameLanguage: { id: data.massif.language },
+          geogPolygon: data.massif.geoJson
+        })
+      );
     } else {
       if (data.massif.name !== massifValues.name) {
         dispatch(
           updateName({
-            id: massifValues.nameId,
+            id: data.massif.nameId,
             name: data.massif.name
           })
         );
       }
 
       if (
-        data.massif.description !== massifValues.description ||
+        data.massif.descriptionBody !== massifValues.descriptionBody ||
         data.massif.descriptionTitle !== massifValues.descriptionTitle
       ) {
         if (isNewDescription) {
           dispatch(
             postDescription({
-              body: data.massif.description,
+              body: data.massif.descriptionBody,
               language: data.massif.language,
               title: data.massif.descriptionTitle,
-              massif: massifValues.massifId
+              massif: massifValues.id
             })
           );
         } else {
           dispatch(
             updateDescription({
               id: data.massif.descriptionId,
-              body: data.massif.description,
+              body: data.massif.descriptionBody,
               title: data.massif.descriptionTitle
             })
           );
         }
       }
 
-      const massifToUpdate = makeMassifPutData(data, massifValues);
-      dispatch(updateMassif(massifToUpdate));
+      const body = { id: massifValues.id };
+      if (JSON.stringify(data.massif.geogPolygon) !== JSON.stringify(geoJson)) {
+        body.geogPolygon = data.massif.geogPolygon;
+      }
+      dispatch(updateMassif(body));
     }
   };
 
@@ -131,9 +157,7 @@ export const MassifForm = ({ massifValues }) => {
           control={control}
           errors={errors}
           isNewDescription={isNewDescription}
-          geoJson={
-            massifValues ? massifValues.geoJson : defaultMassifValues.geoJson
-          }
+          geoJson={geoJson}
         />
         <FormActionRow
           isDirty={isDirty}
@@ -148,15 +172,7 @@ export const MassifForm = ({ massifValues }) => {
 };
 
 MassifForm.propTypes = {
-  massifValues: PropTypes.shape({
-    description: PropTypes.string,
-    descriptionId: PropTypes.number,
-    descriptionTitle: PropTypes.string,
-    massifId: PropTypes.number,
-    name: PropTypes.string,
-    nameId: PropTypes.number,
-    geoJson: PropTypes.shape({})
-  })
+  massifValues: MassifTypes
 };
 
 export default MassifForm;

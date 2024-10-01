@@ -28,6 +28,7 @@ import AuthorAndDate from '../../common/Contribution/AuthorAndDate';
 import Alert from '../../common/Alert';
 import Map from '../../common/Maps/MapMultipleMarkers';
 import { EntrancePropTypes } from '../../../types/entrance.type';
+import { SnapshotButton } from './Snapshots/UtilityFunction';
 import {
   DeletedCard,
   DeleteConfirmationDialog,
@@ -43,6 +44,10 @@ const HalfSplitContainer = styled('div')(
   }
 `
 );
+
+const SnapshotButtonStyled = styled(SnapshotButton)`
+  margin-left: auto;
+`;
 
 export const Entry = ({ isLoading, error, entrance }) => {
   const dispatch = useDispatch();
@@ -98,16 +103,9 @@ export const Entry = ({ isLoading, error, entrance }) => {
             printRef={componentRef}
             snapshot={{
               id: entrance.id,
-              entity: 'entrances',
-              actualVersion: {
-                ...entrance,
-                latitude: entrance?.latitude,
-                longitude: entrance?.longitude,
-                cave: entrance?.cave?.id,
-                caveName: entrance?.cave?.name
-              },
+              type: 'entrances',
               isNetwork: entrance.cave?.entrances.length > 1,
-              all: true
+              getAll: true
             }}
             content={
               <>
@@ -162,6 +160,22 @@ export const Entry = ({ isLoading, error, entrance }) => {
                     date={entrance.dateReviewed}
                   />
                 )}
+                <SnapshotButtonStyled
+                  size="small"
+                  variant="outlined"
+                  color="primary"
+                  id={entrance.id}
+                  type="entrances"
+                  isNetwork={entrance.cave?.entrances.length > 1}
+                  label={formatMessage({ id: 'Revisions' })}
+                  content={{
+                    ...entrance,
+                    latitude: entrance?.latitude,
+                    longitude: entrance?.longitude,
+                    cave: entrance?.cave?.id,
+                    caveName: entrance?.cave?.name
+                  }}
+                />
               </>
             }
           />

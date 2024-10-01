@@ -61,7 +61,7 @@ const SnapshotPage = () => {
     }
   }, [id, type, dispatch]);
 
-  let currentTItem;
+  let currentTItem = {};
   switch (type) {
     case 'entrances':
       currentTItem = currentEntrance;
@@ -75,7 +75,7 @@ const SnapshotPage = () => {
   const is403 = !isSuccess && latestHttpCode === 403;
   const isSensitive =
     pathOr(false, ['entrances', '0', 'isSensitive'], data) ||
-    currentTItem.isSensitive;
+    currentTItem?.isSensitive;
   return (
     <>
       {isSensitive && <SensitiveCaveWarning />}

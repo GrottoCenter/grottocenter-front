@@ -8,7 +8,6 @@ import InputText from '../utils/InputText';
 import InputLanguage from '../utils/InputLanguage';
 import FormProgressInfo from '../utils/FormProgressInfo';
 import CaveDetail from '../Entrance/CaveDetail';
-import makeNetworkData from './transformers';
 
 // A Network can't be created. It's always starting with an entrance with a cave and then,
 // entrance are being attached to the initial cave to form a network.
@@ -42,7 +41,19 @@ export const NetworkForm = ({ networkValues }) => {
   }, [defaultNetworkValue, reset]);
 
   const onSubmit = async data => {
-    dispatch(updateCave(makeNetworkData(data.cave)));
+    dispatch(
+      updateCave({
+        depth: data.cave.depth,
+        id: data.cave.id,
+        isDiving: data.cave.isDivingCave,
+        length: data.cave.length,
+        name: {
+          language: data.cave.language,
+          text: data.cave.name
+        },
+        temperature: data.cave.temperature
+      })
+    );
   };
 
   if (isSubmitSuccessful) {

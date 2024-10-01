@@ -94,7 +94,7 @@ const IdentifierEditor = () => {
               id: 'Code for designating a document in a unique way. This can be a DOI, URL, ISBN or ISSN.'
             })}
             onValueChange={handleIdentifierChange}
-            value={document.identifier}
+            value={document.identifier ?? ''}
             valueName={formatMessage({ id: 'Identifier' })}
             required={identifierType !== null}
             hasError={identifierType !== null && !isRegexpValid}

@@ -220,7 +220,7 @@ const Properties = ({ isLoading = false, entrance }) => {
             icon={<Category color="primary" />}
           />
         )}
-        {!!entrance.cave.isDiving && (
+        {!!entrance.cave?.isDiving && (
           <Property
             value={formatMessage({
               id: 'Diving cave'
