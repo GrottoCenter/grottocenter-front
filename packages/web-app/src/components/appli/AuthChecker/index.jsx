@@ -1,5 +1,5 @@
 import React from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { Button } from '@mui/material';
 import { useIntl } from 'react-intl';
@@ -35,7 +35,7 @@ const CenteredBlock = styled('div')`
  *    Component to display if the user is authenticated
  */
 const AuthChecker = ({ errorMessageComponent, componentToDisplay }) => {
-  const history = useHistory();
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const { formatMessage } = useIntl();
   const permissions = usePermissions();
@@ -58,7 +58,7 @@ const AuthChecker = ({ errorMessageComponent, componentToDisplay }) => {
           <SpacedButton onClick={onLoginClick} variant="contained">
             {formatMessage({ id: 'Log in' })}
           </SpacedButton>
-          <SpacedButton onClick={() => history.push('')} variant="contained">
+          <SpacedButton onClick={() => navigate('')} variant="contained">
             {formatMessage({ id: 'Go to home page' })}
           </SpacedButton>
         </>

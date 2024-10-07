@@ -45,7 +45,10 @@ class DocumentSearch extends React.Component {
   }
 
   getInitialState() {
-    const { publicationDateMinValue, publicationDateMaxValue } = this.props;
+    const {
+      publicationDateMinValue = 1800,
+      publicationDateMaxValue = new Date().getFullYear()
+    } = this.props;
 
     return {
       'date_publication-range': {
@@ -583,11 +586,6 @@ DocumentSearch.propTypes = {
   publicationDateMaxValue: PropTypes.number,
 
   intl: PropTypes.shape({ formatMessage: PropTypes.func }).isRequired
-};
-
-DocumentSearch.defaultProps = {
-  publicationDateMinValue: 1800,
-  publicationDateMaxValue: new Date().getFullYear()
 };
 
 export default injectIntl(withStyles(styles)(DocumentSearch));

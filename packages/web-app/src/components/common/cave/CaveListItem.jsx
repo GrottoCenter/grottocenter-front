@@ -69,8 +69,5 @@ CaveListItem.propTypes = {
     length: PropTypes.number
   })
 };
-CaveListItem.defaultProps = {
-  cave: undefined
-};
 
 export default CaveListItem;

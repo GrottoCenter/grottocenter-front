@@ -49,7 +49,7 @@ export const MassifForm = ({ massifValues }) => {
   const dispatch = useDispatch();
 
   const geoJson = useMemo(
-    () => JSON.parse(massifValues?.geogPolygon ?? ''),
+    () => JSON.parse(massifValues?.geogPolygon ?? null),
     [massifValues]
   );
 

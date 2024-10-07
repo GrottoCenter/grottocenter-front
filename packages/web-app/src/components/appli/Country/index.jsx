@@ -5,7 +5,7 @@ import { useIntl } from 'react-intl';
 import { Marker } from 'react-leaflet';
 import { Button } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import StatisticsDataDashboard from '../StatisticsDataDashboard';
 import CustomMapContainer from '../../common/Maps/common/MapContainer';
 import Layout from '../../common/Layouts/Fixed/FixedContent';
@@ -24,7 +24,7 @@ const Country = ({
   status
 }) => {
   const { formatMessage } = useIntl();
-  const history = useHistory();
+  const navigate = useNavigate();
   const isLoading = status === REDUCER_STATUS.LOADING;
 
   const {
@@ -56,7 +56,7 @@ const Country = ({
         style={{ margin: '8px' }}
         variant="outlined"
         onClick={() => {
-          history.push(`/ui/countries`);
+          navigate(`/ui/countries`);
         }}
         startIcon={<ArrowBackIcon />}
         size="small"

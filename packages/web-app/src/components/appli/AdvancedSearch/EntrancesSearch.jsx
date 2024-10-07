@@ -221,16 +221,16 @@ class EntrancesSearch extends React.Component {
       resourceType,
       resetResults,
       startAdvancedsearch,
-      aestheticismMinValue,
-      aestheticismMaxValue,
-      approachMinValue,
-      approachMaxValue,
-      caveDepthMinValue,
-      caveDepthMaxValue,
-      caveLengthMinValue,
-      caveLengthMaxValue,
-      cavingMinValue,
-      cavingMaxValue,
+      aestheticismMinValue = 0,
+      aestheticismMaxValue = 10,
+      approachMinValue = 0,
+      approachMaxValue = 10,
+      caveDepthMinValue = 0,
+      caveDepthMaxValue = 3000,
+      caveLengthMinValue = 0,
+      caveLengthMaxValue = 700000,
+      cavingMinValue = 0,
+      cavingMaxValue = 10,
       intl
     } = this.props;
 
@@ -519,20 +519,6 @@ EntrancesSearch.propTypes = {
   caveLengthMaxValue: PropTypes.number,
 
   intl: PropTypes.shape({ formatMessage: PropTypes.func }).isRequired
-};
-
-EntrancesSearch.defaultProps = {
-  aestheticismMinValue: 0,
-  aestheticismMaxValue: 10,
-  approachMinValue: 0,
-  approachMaxValue: 10,
-  cavingMinValue: 0,
-  cavingMaxValue: 10,
-
-  caveDepthMinValue: 0,
-  caveDepthMaxValue: 3000,
-  caveLengthMinValue: 0,
-  caveLengthMaxValue: 700000
 };
 
 export default injectIntl(withStyles(styles)(EntrancesSearch));

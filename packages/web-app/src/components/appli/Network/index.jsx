@@ -1,7 +1,7 @@
 import React, { useRef, useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
-import { useParams, useHistory } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import Skeleton from '@mui/material/Skeleton';
 import { Box, Card } from '@mui/material';
@@ -32,7 +32,7 @@ import {
 export const Network = ({ isLoading, error, cave }) => {
   const dispatch = useDispatch();
   const { formatMessage } = useIntl();
-  const history = useHistory();
+  const navigate = useNavigate();
   const { caveId } = useParams();
   const permissions = usePermissions();
   const componentRef = useRef();
@@ -59,7 +59,7 @@ export const Network = ({ isLoading, error, cave }) => {
   const onDeletePress = (entityId, isPermanent) => {
     setWantedDeletedState(true);
     dispatch(deleteCave({ id: caveId, entityId, isPermanent }));
-    if (isPermanent) history.replace('/');
+    if (isPermanent) navigate('/', { replace: true });
   };
   const onRestorePress = () => {
     setWantedDeletedState(false);

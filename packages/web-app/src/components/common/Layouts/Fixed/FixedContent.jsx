@@ -88,7 +88,7 @@ const FixedContent = ({
     else SubscribeIcon = <NotificationsNoneIcon />;
   }
   const handlePrint = useReactToPrint({
-    content: () => printRef.current
+    contentRef: () => printRef.current
   });
   return (
     <Card>

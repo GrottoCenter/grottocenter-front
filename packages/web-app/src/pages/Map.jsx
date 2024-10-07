@@ -1,6 +1,6 @@
 import React, { useEffect, Suspense } from 'react';
 import { includes } from 'ramda';
-import { useHistory, generatePath, useParams } from 'react-router-dom';
+import { useNavigate, generatePath, useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import PageLoader from '../components/common/PageLoader';
 
@@ -16,8 +16,8 @@ import {
 import { fetchProjections } from '../actions/Projections';
 import 'leaflet/dist/leaflet.css';
 
-const MapClusters = React.lazy(() =>
-  import('../components/common/Maps/MapClusters')
+const MapClusters = React.lazy(
+  () => import('../components/common/Maps/MapClusters')
 );
 
 const encodeMapTarget = (center, zoom) => `${center.lat},${center.lng},${zoom}`;
@@ -35,7 +35,7 @@ function decodeMapTarget(target) {
 }
 
 const Map = () => {
-  const history = useHistory();
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const params = useParams();
   const {
@@ -57,7 +57,7 @@ const Map = () => {
     const newPath = generatePath('/ui/map/:target', {
       target: encodeMapTarget(center, newZoom)
     });
-    history.replace(newPath);
+    navigate(newPath, { replace: true });
     dispatch(changeLocation(center));
     dispatch(changeZoom(zoom));
 

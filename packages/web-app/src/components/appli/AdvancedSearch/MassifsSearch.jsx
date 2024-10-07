@@ -84,6 +84,4 @@ MassifsSearch.propTypes = {
   resourceType: PropTypes.string.isRequired
 };
 
-MassifsSearch.defaultProps = {};
-
 export default withStyles(styles)(MassifsSearch);

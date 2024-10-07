@@ -51,7 +51,9 @@ class Goal extends Component {
       <div
         className={className}
         onMouseOver={event => this.handleMouseOver(event)}
-        onMouseOut={event => this.handleMouseOut(event)}>
+        onFocus={event => this.handleMouseOver(event)}
+        onMouseOut={event => this.handleMouseOut(event)}
+        onBlur={event => this.handleMouseOut(event)}>
         <span style={{ color: textColor }}>{entry.word}</span>
         <StyledSyncIcon />
         <GoalText>{entry.description}</GoalText>

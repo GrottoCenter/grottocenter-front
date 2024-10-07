@@ -4,7 +4,7 @@ import { useIntl } from 'react-intl';
 import { styled } from '@mui/material/styles';
 import { Button, FormHelperText } from '@mui/material';
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
-import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFnsV3';
 import { set as setDate } from 'date-fns';
 import Translate from '../../../../common/Translate';
 

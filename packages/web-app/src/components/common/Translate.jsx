@@ -13,8 +13,4 @@ Translate.propTypes = {
   children: PropTypes.string
 };
 
-Translate.defaultProps = {
-  children: null
-};
-
 export default Translate;

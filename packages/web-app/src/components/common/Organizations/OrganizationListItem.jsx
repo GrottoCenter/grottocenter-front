@@ -25,8 +25,5 @@ const OrganizationListItem = ({ orga }) => (
 OrganizationListItem.propTypes = {
   orga: idNameType
 };
-OrganizationListItem.defaultProps = {
-  orga: undefined
-};
 
 export default OrganizationListItem;

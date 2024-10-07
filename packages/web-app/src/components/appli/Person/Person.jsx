@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import Skeleton from '@mui/material/Skeleton';
 import { useIntl } from 'react-intl';
 import { Box } from '@mui/material';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 
 import { useUserProperties, usePermissions } from '../../../hooks';
@@ -31,7 +31,7 @@ const Person = ({
   subscriptionsStatus
 }) => {
   const dispatch = useDispatch();
-  const history = useHistory();
+  const navigate = useNavigate();
   const { formatMessage } = useIntl();
 
   const permissions = usePermissions();
@@ -53,7 +53,7 @@ const Person = ({
   }
   const onDeletePress = (entityId, isPermanent) => {
     dispatch(deletePerson({ id: person?.id, entityId, isPermanent }));
-    if (isPermanent) history.replace('/');
+    if (isPermanent) navigate('/', { replace: true });
   };
 
   let title = '';
@@ -70,9 +70,7 @@ const Person = ({
     <FixedContent
       title={title}
       onEdit={
-        canEdit
-          ? () => history.push(`/ui/persons/${person?.id}/edit`)
-          : undefined
+        canEdit ? () => navigate(`/ui/persons/${person?.id}/edit`) : undefined
       }
       onDelete={onDelete}
       content={

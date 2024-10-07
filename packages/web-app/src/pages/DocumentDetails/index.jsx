@@ -4,7 +4,7 @@ import { Chip, Skeleton } from '@mui/material';
 import { Terrain } from '@mui/icons-material';
 import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
-import { useParams, useHistory } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 
 import { loadLanguages } from '../../actions/Language';
 
@@ -47,7 +47,7 @@ const Document = ({
   documentChildren
 }) => {
   const { formatMessage } = useIntl();
-  const history = useHistory();
+  const navigate = useNavigate();
   const permissions = usePermissions();
   const dispatch = useDispatch();
   const { languages } = useSelector(state => state.language);
@@ -66,7 +66,7 @@ const Document = ({
   if (permissions.isAuth && !documentData?.isDeleted) {
     if (documentData?.isValidated) {
       onEdit = () => {
-        history.push(`/ui/documents/${documentData.id}/edit`);
+        navigate(`/ui/documents/${documentData.id}/edit`);
       };
     }
     if (permissions.isModerator) {
@@ -80,7 +80,7 @@ const Document = ({
   const onDeletePress = (entityId, isPermanent) => {
     setWantedDeletedState(true);
     dispatch(deleteDocument({ id: documentData.id, entityId, isPermanent }));
-    if (isPermanent) history.replace('/');
+    if (isPermanent) navigate('/', { replace: true });
   };
   const onRestorePress = () => {
     setWantedDeletedState(false);

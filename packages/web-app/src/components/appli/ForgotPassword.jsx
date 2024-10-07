@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useIntl } from 'react-intl';
 import { isEmpty, match } from 'ramda';
 
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { emailRegexp } from '../../conf/config';
 import { postForgotPassword } from '../../actions/ForgotPassword';
 import { useBoolean, useNotification, usePermissions } from '../../hooks';
@@ -22,13 +22,13 @@ const ForgotPassword = () => {
   const [email, setEmail] = React.useState('');
   const { onError } = useNotification();
   const permissions = usePermissions();
-  const history = useHistory();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (permissions.isAuth) {
-      history.push(``);
+      navigate(``);
     }
-  }, [history, permissions.isAuth]);
+  }, [navigate, permissions.isAuth]);
 
   const checkIfValuesAreValid = () => {
     const errors = [];

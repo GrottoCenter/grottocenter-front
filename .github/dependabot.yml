@@ -8,13 +8,13 @@ updates:
   - package-ecosystem: 'npm' # See documentation for possible values
     directory: '/'
     # Updates currently disabled: re-enable them (with the value 5) when we had tests checking everything is ok after updating the packages
-    open-pull-requests-limit: 0
+    open-pull-requests-limit: 5
     schedule:
       interval: 'monthly'
 
   - package-ecosystem: 'npm' # See documentation for possible values
     directory: '/packages/web-app/'
     # Updates currently disabled: re-enable them (with the value 5) when we had tests checking everything is ok after updating the packages
-    open-pull-requests-limit: 0
+    open-pull-requests-limit: 10
     schedule:
       interval: 'monthly'

@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import { styled } from '@mui/material/styles';
 
 import SideMenu from '../../SideMenu';
-import ErrorBoundary from '../../../appli/ErrorBoundary';
+import ErrorBoundary from '../../../appli/PageErrorBounary';
 
 const MainWrapper = styled('main')`
   flex-grow: 1;

@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { isNil, length } from 'ramda';
 import { useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useIntl } from 'react-intl';
 import AutoCompleteSearch from '../common/AutoCompleteSearch';
 import {
@@ -38,7 +38,7 @@ const QuickSearch = ({
   ...autoCompleteProps
 }) => {
   const { formatMessage } = useIntl();
-  const history = useHistory();
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const { results, errors, isLoading } = useSelector(
     state => state.quicksearch
@@ -54,27 +54,25 @@ const QuickSearch = ({
       } else {
         switch (selection.type) {
           case 'entrance':
-            history.push(`/ui/entrances/${encodeURIComponent(selection.id)}`);
+            navigate(`/ui/entrances/${encodeURIComponent(selection.id)}`);
             break;
           case 'cave':
-            history.push(`/ui/caves/${encodeURIComponent(selection.id)}`);
+            navigate(`/ui/caves/${encodeURIComponent(selection.id)}`);
             break;
           case 'caver':
-            history.push(`/ui/persons/${encodeURIComponent(selection.id)}`);
+            navigate(`/ui/persons/${encodeURIComponent(selection.id)}`);
             break;
           case 'document':
-            history.push(`/ui/documents/${encodeURIComponent(selection.id)}`);
+            navigate(`/ui/documents/${encodeURIComponent(selection.id)}`);
             break;
           case 'grotto':
-            history.push(
-              `/ui/organizations/${encodeURIComponent(selection.id)}`
-            );
+            navigate(`/ui/organizations/${encodeURIComponent(selection.id)}`);
             break;
           case 'massif':
-            history.push(`/ui/massifs/${encodeURIComponent(selection.id)}`);
+            navigate(`/ui/massifs/${encodeURIComponent(selection.id)}`);
             break;
           case 'network':
-            history.push(`/ui/networks/${encodeURIComponent(selection.id)}`);
+            navigate(`/ui/networks/${encodeURIComponent(selection.id)}`);
             break;
           default:
         }

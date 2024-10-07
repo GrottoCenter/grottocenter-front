@@ -25,8 +25,5 @@ UserListItem.propTypes = {
     nickname: PropTypes.string.isRequired
   })
 };
-UserListItem.defaultProps = {
-  user: undefined
-};
 
 export default UserListItem;

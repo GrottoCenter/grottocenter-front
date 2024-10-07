@@ -27,10 +27,10 @@ HalfWidthBox.propTypes = {
 };
 
 const SubscriptionsList = ({
+  title,
   canUnsubscribe,
-  subscriptions,
-  subscriptionsStatus,
-  title
+  subscriptions = { countries: [], massifs: [] },
+  subscriptionsStatus
 }) => {
   const { formatMessage } = useIntl();
   const { countries, massifs } = subscriptions ?? {};

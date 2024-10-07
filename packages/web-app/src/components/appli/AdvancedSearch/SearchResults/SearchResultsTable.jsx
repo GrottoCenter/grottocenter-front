@@ -2,7 +2,7 @@ import React, { createRef } from 'react';
 import PropTypes from 'prop-types';
 import { injectIntl } from 'react-intl';
 import withStyles from '@mui/styles/withStyles';
-import { withRouter } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { isMobile } from 'react-device-detect';
 import { styled } from '@mui/material/styles';
 import DescriptionIcon from '@mui/icons-material/Description';
@@ -110,7 +110,7 @@ class SearchResultsTable extends React.Component {
   // ===== Handle functions ===== //
 
   handleRowClick = docResult => {
-    const { history, onRowClick, resourceType } = this.props;
+    const { navigate, onRowClick, resourceType } = this.props;
     if (onRowClick) {
       onRowClick(docResult);
       return;
@@ -136,7 +136,7 @@ class SearchResultsTable extends React.Component {
     if (urlToRedirectTo !== '') {
       // Different behaviour if on mobile or not (better UX)
       if (isMobile) {
-        history.push(urlToRedirectTo);
+        navigate(urlToRedirectTo);
       } else {
         window.open(urlToRedirectTo, '_blank');
       }
@@ -503,13 +503,20 @@ class SearchResultsTable extends React.Component {
   }
 }
 
+function addRouter(Component) {
+  return function WrappedComponent(props) {
+    const navigate = useNavigate();
+    return <Component {...props} navigate={navigate} />;
+  };
+}
+
 SearchResultsTable.propTypes = {
   classes: PropTypes.shape({
     table: PropTypes.string,
     tableRow: PropTypes.string,
     textError: PropTypes.string
   }).isRequired,
-  history: PropTypes.shape({ push: PropTypes.func }).isRequired,
+  navigate: PropTypes.func.isRequired,
   isLoading: PropTypes.bool.isRequired,
   isLoadingFullData: PropTypes.bool.isRequired,
   results: PropTypes.arrayOf(PropTypes.shape({})),
@@ -525,9 +532,4 @@ SearchResultsTable.propTypes = {
   selectedIds: PropTypes.arrayOf(PropTypes.string.isRequired)
 };
 
-SearchResultsTable.defaultProps = {
-  results: undefined,
-  fullResults: undefined
-};
-
-export default injectIntl(withRouter(withStyles(styles)(SearchResultsTable)));
+export default injectIntl(addRouter(withStyles(styles)(SearchResultsTable)));

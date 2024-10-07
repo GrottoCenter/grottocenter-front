@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useIntl } from 'react-intl';
 import { isEmpty, match } from 'ramda';
 
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { emailRegexp, PASSWORD_MIN_LENGTH } from '../../conf/config';
 import { postSignUp } from '../../actions/SignUp';
 import { useNotification, usePermissions } from '../../hooks';
@@ -24,13 +24,13 @@ const SignUp = () => {
   const [surname, setSurname] = React.useState('');
   const { onError } = useNotification();
   const permissions = usePermissions();
-  const history = useHistory();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (permissions.isAuth) {
-      history.push(``);
+      navigate(``);
     }
-  }, [history, permissions.isAuth]);
+  }, [navigate, permissions.isAuth]);
 
   /**
    * Display error notifications if some values are incorrect.

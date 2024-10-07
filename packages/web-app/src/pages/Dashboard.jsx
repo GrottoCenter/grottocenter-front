@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useIntl } from 'react-intl';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { List, Typography, Button, ListItemButton } from '@mui/material';
 import CallMergeIcon from '@mui/icons-material/CallMerge';
 import PeopleIcon from '@mui/icons-material/People';
@@ -38,18 +38,18 @@ const DashboardBlock = styled('div')`
 
 const Dashboard = () => {
   const { formatMessage } = useIntl();
-  const history = useHistory();
+  const navigate = useNavigate();
   const permissions = usePermissions();
   const dispatch = useDispatch();
   const dbExport = useSelector(state => state.dbExport);
 
-  const handleOnListItemClick = url => history.push(url);
+  const handleOnListItemClick = url => navigate(url);
 
   useEffect(() => {
     if (!permissions.isAuth) {
-      history.push('');
+      navigate('');
     }
-  }, [permissions, history]);
+  }, [permissions, navigate]);
 
   useEffect(() => {
     if (permissions.isLeader) {

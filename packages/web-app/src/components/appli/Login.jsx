@@ -2,7 +2,7 @@ import React from 'react';
 import { Button, CircularProgress, Typography, Box } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
 import { isEmpty, match } from 'ramda';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useIntl } from 'react-intl';
 import { WarningRounded } from '@mui/icons-material';
 
@@ -24,7 +24,7 @@ const Login = () => {
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
   const [authErrorMessages, setAuthErrorMessages] = React.useState([]);
-  const history = useHistory();
+  const navigate = useNavigate();
   const { onSuccess } = useNotification();
   const { formatMessage } = useIntl();
 
@@ -74,12 +74,12 @@ const Login = () => {
   );
 
   const handleCreateAccount = () => {
-    history.push(`/ui/signup`);
+    navigate(`/ui/signup`);
     dispatch(hideLoginDialog());
   };
 
   const handleForgotPassword = () => {
-    history.push(`/ui/forgotPassword`);
+    navigate(`/ui/forgotPassword`);
     dispatch(hideLoginDialog());
   };
 

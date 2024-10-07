@@ -1,29 +1,19 @@
 import React, { Suspense } from 'react';
-import PropTypes from 'prop-types';
+import { useParams } from 'react-router-dom';
 import PageLoader from '../components/common/PageLoader';
 
 const ApiDetail = React.lazy(() => import('../components/appli/ApiDetail'));
 
-const ApiDoc = props => {
-  const {
-    match: {
-      params: { version }
-    }
-  } = props;
+const ApiDoc = () => {
+  const { version } = useParams();
 
   return (
     <Suspense fallback={<PageLoader />}>
-      <ApiDetail version={Number.parseInt(version, 10)} />
+      <ApiDetail version={Number.parseInt(version ?? 1, 10)} />
     </Suspense>
   );
 };
 
-ApiDoc.propTypes = {
-  match: PropTypes.shape({
-    params: PropTypes.shape({
-      version: PropTypes.string
-    })
-  }).isRequired
-};
+ApiDoc.propTypes = {};
 
 export default ApiDoc;

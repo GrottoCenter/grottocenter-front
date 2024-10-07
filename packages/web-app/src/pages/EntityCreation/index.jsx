@@ -1,5 +1,5 @@
 import React from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { Button } from '@mui/material';
 import { styled } from '@mui/material/styles';
@@ -17,7 +17,7 @@ const CenteredBlock = styled('div')`
 
 const EntitiesCreation = () => {
   const permissions = usePermissions();
-  const history = useHistory();
+  const navigate = useNavigate();
   const { formatMessage } = useIntl();
   const dispatch = useDispatch();
   const handleLogin = () => {
@@ -38,7 +38,7 @@ const EntitiesCreation = () => {
             <Button onClick={handleLogin} variant="contained">
               <Translate>Log in</Translate>
             </Button>
-            <Button onClick={() => history.push('')} variant="contained">
+            <Button onClick={() => navigate('')} variant="contained">
               <Translate>Go to home page</Translate>
             </Button>
           </CenteredBlock>

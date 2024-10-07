@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { useDispatch } from 'react-redux';
 import { useIntl } from 'react-intl';
-import { useParams, useHistory } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import Skeleton from '@mui/material/Skeleton';
 import FixedContent from '../../common/Layouts/Fixed/FixedContent';
 import BadgesSection from './BadgesSection';
@@ -23,7 +23,7 @@ import { restoreOrganization } from '../../../actions/Organization/RestoreOrgani
 
 const Organization = ({ error, isLoading, organization }) => {
   const { formatMessage } = useIntl();
-  const history = useHistory();
+  const navigate = useNavigate();
   const permissions = usePermissions();
   const dispatch = useDispatch();
   const { organizationId } = useParams();
@@ -41,7 +41,7 @@ const Organization = ({ error, isLoading, organization }) => {
   let onDelete = null;
   if (permissions.isAuth && !organization?.isDeleted) {
     onEdit = () => {
-      history.push(`/ui/organizations/${organizationId}/edit`);
+      navigate(`/ui/organizations/${organizationId}/edit`);
     };
     if (permissions.isModerator) {
       onDelete = () => {
@@ -54,7 +54,7 @@ const Organization = ({ error, isLoading, organization }) => {
   const onDeletePress = (entityId, isPermanent) => {
     setWantedDeletedState(true);
     dispatch(deleteOrganization({ id: organizationId, entityId, isPermanent }));
-    if (isPermanent) history.replace('/');
+    if (isPermanent) navigate('/', { replace: true });
   };
   const onRestorePress = () => {
     setWantedDeletedState(false);
@@ -100,7 +100,7 @@ const Organization = ({ error, isLoading, organization }) => {
           )
         )
       }
-      title={isLoading ? <Skeleton /> : organization?.name ?? ''}
+      title={isLoading ? <Skeleton /> : (organization?.name ?? '')}
       content={
         <>
           {isLoading && !error && (

@@ -10,7 +10,7 @@ import React from 'react';
 import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
 import { styled } from '@mui/material/styles';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useController } from 'react-hook-form';
 import CaveSelection from './CaveSelect';
 import { ENTRANCE_ONLY, ENTRANCE_AND_CAVE } from './caveType';
@@ -35,7 +35,7 @@ const EditTypeSelection = ({
   disabled = false
 }) => {
   const { formatMessage } = useIntl();
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const canMoveEntranceToExistingCave = allowMoveFromCave && entranceId;
 
@@ -79,7 +79,7 @@ const EditTypeSelection = ({
         {canMoveEntranceToExistingCave && (
           <Button
             onClick={() => {
-              history.push(`/ui/entrances/${entranceId}/move`);
+              navigate(`/ui/entrances/${entranceId}/move`);
             }}
             color="secondary">
             {formatMessage({

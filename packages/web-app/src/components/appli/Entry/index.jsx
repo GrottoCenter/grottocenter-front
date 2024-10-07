@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import { useDispatch } from 'react-redux';
-import { useParams, useHistory } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { styled } from '@mui/material/styles';
 import Skeleton from '@mui/material/Skeleton';
 import { Box, Card } from '@mui/material';
@@ -52,7 +52,7 @@ const SnapshotButtonStyled = styled(SnapshotButton)`
 export const Entry = ({ isLoading, error, entrance }) => {
   const dispatch = useDispatch();
   const { formatMessage } = useIntl();
-  const history = useHistory();
+  const navigate = useNavigate();
   const { entranceId } = useParams();
   const permissions = usePermissions();
   const componentRef = useRef();
@@ -78,7 +78,7 @@ export const Entry = ({ isLoading, error, entrance }) => {
   const onDeletePress = (entityId, isPermanent) => {
     setWantedDeletedState(true);
     dispatch(deleteEntrance({ id: entranceId, entityId, isPermanent }));
-    if (isPermanent) history.replace('/');
+    if (isPermanent) navigate.replace('/', { replace: true });
   };
   const onRestorePress = () => {
     setWantedDeletedState(false);

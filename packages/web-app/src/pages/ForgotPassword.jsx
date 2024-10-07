@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Button, CircularProgress, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { isEmpty, match } from 'ramda';
@@ -30,7 +30,7 @@ const ForgotPasswordPage = ({
   forgotPasswordRequestSucceeded
 }) => {
   const { formatMessage } = useIntl();
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const checkIfHasError = fieldName => {
     switch (fieldName) {
@@ -55,7 +55,7 @@ const ForgotPasswordPage = ({
             </Typography>
             <SpacedCenteredButton
               color="primary"
-              onClick={() => history.push('/')}
+              onClick={() => navigate('/')}
               style={{ display: 'block' }}
               variant="contained">
               {formatMessage({ id: 'Go to home page' })}

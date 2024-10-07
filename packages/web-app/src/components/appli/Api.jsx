@@ -3,7 +3,7 @@ import { Grid, Typography, Button } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { useSelector } from 'react-redux';
 import { useIntl } from 'react-intl';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 import GCLink from '../common/GCLink';
 import InternationalizedLink from '../common/InternationalizedLink';
@@ -19,7 +19,7 @@ const PaddedButton = styled(Button)`
 
 const Api = () => {
   const { formatMessage } = useIntl();
-  const history = useHistory();
+  const navigate = useNavigate();
   const { locale } = useSelector(state => state.intl);
 
   const wikiApiLink =
@@ -60,7 +60,7 @@ const Api = () => {
             </Typography>
             <PaddedButton
               variant="outlined"
-              onClick={() => history.push(`/ui/api/1`)}>
+              onClick={() => navigate(`/ui/api/1`)}>
               {' '}
               <Translate id="API documentation" />{' '}
             </PaddedButton>

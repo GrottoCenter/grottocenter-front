@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
 import PropTypes from 'prop-types';
-import { useParams, useHistory } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 
 import { useDispatch } from 'react-redux';
 import Skeleton from '@mui/material/Skeleton';
@@ -31,7 +31,7 @@ import { MassifTypes } from '../../../types/massif.type';
 const Massif = ({ isLoading, error, massif }) => {
   const dispatch = useDispatch();
   const { massifId } = useParams();
-  const history = useHistory();
+  const navigate = useNavigate();
   const permissions = usePermissions();
   const { formatMessage } = useIntl();
   const [isDeleteConfirmationOpen, setIsDeleteConfirmationOpen] =
@@ -48,7 +48,7 @@ const Massif = ({ isLoading, error, massif }) => {
   let onDelete = null;
   if (permissions.isAuth && !massif?.isDeleted) {
     onEdit = () => {
-      history.push(`/ui/massifs/${massifId}/edit`);
+      navigate(`/ui/massifs/${massifId}/edit`);
     };
     if (permissions.isModerator) {
       onDelete = () => {
@@ -61,7 +61,7 @@ const Massif = ({ isLoading, error, massif }) => {
   const onDeletePress = (entityId, isPermanent) => {
     setWantedDeletedState(true);
     dispatch(deleteMassif({ id: massifId, entityId, isPermanent }));
-    if (isPermanent) history.replace('/');
+    if (isPermanent) navigate('/', { replace: true });
   };
   const onRestorePress = () => {
     setWantedDeletedState(false);

@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { CircularProgress } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
-import { useHistory, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useIntl } from 'react-intl';
 import DocumentSubmission from '../../components/appli/EntitiesForm/Document';
 import { fetchDocumentDetails } from '../../actions/Document/GetDocumentDetails';
@@ -12,7 +12,7 @@ import Layout from '../../components/common/Layouts/Fixed/FixedContent';
 const DocumentEdit = ({ onSuccessfulUpdate, id, requireUpdate = false }) => {
   const { documentId: documentIdFromRoute } = useParams();
   const documentId = documentIdFromRoute || id;
-  const history = useHistory();
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const { formatMessage } = useIntl();
   const { isLoading, details, error } = useSelector(
@@ -36,7 +36,7 @@ const DocumentEdit = ({ onSuccessfulUpdate, id, requireUpdate = false }) => {
         onSuccessfulUpdate();
       } else {
         dispatch(resetDocumentApiErrors());
-        history.push(`/ui/documents/${documentId}`);
+        navigate(`/ui/documents/${documentId}`);
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

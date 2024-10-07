@@ -71,7 +71,7 @@ const SnapshotButton = ({
         ]
           .filter(e => e)
           .join('&')}`}
-        onClick={!!content && (() => storeInLocalStorage(content))}
+        onClick={content ? () => storeInLocalStorage(content) : null}
         target="_blank"
         rel="opener"
         startIcon={!!label && startIcon}>

@@ -1,5 +1,6 @@
 import React, { useContext, useState, useEffect } from 'react';
-import { useHistory, Prompt } from 'react-router-dom';
+// eslint-disable-next-line camelcase
+import { useNavigate, unstable_usePrompt } from 'react-router-dom';
 import { Button, Fade, Typography } from '@mui/material';
 import Alert from '@mui/material/Alert';
 import ReplayIcon from '@mui/icons-material/Replay';
@@ -58,7 +59,7 @@ const DONT_LEAVE_MESSAGE =
   'If you leave now, some data would be lost. Are you sure you want to leave this page?';
 
 const DocumentSubmission = () => {
-  const history = useHistory();
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const permissions = usePermissions();
   const { formatMessage } = useIntl();
@@ -106,6 +107,16 @@ const DocumentSubmission = () => {
     }
   }, [isDocSubmittedWithSuccess, documentState.latestHttpCode, isDocSubmitted]);
 
+  // eslint-disable-next-line camelcase
+  unstable_usePrompt({
+    message: formatMessage({ id: DONT_LEAVE_MESSAGE }),
+    when: ({ currentLocation, nextLocation }) =>
+      permissions.isAuth &&
+      !isDocSubmittedWithSuccess &&
+      documentState.isLoading &&
+      currentLocation.pathname !== nextLocation.pathname
+  });
+
   return (
     <div>
       {isDocSubmittedWithSuccess && (
@@ -146,9 +157,7 @@ const DocumentSubmission = () => {
                 variant="contained">
                 <Translate>Submit another document</Translate>
               </SpacedButton>
-              <SpacedButton
-                onClick={() => history.push('')}
-                variant="contained">
+              <SpacedButton onClick={() => navigate('')} variant="contained">
                 <Translate>Go to home page</Translate>
               </SpacedButton>
             </>
@@ -169,7 +178,7 @@ const DocumentSubmission = () => {
             variant="contained">
             <Translate>Log in</Translate>
           </SpacedButton>
-          <SpacedButton onClick={() => history.push('')} variant="contained">
+          <SpacedButton onClick={() => navigate('')} variant="contained">
             <Translate>Go to home page</Translate>
           </SpacedButton>
         </CenteredBlock>
@@ -177,11 +186,6 @@ const DocumentSubmission = () => {
       {permissions.isAuth && !isDocSubmittedWithSuccess && (
         <>
           <CreatingDocumentDialog isLoading={documentState.isLoading} />
-          <Prompt
-            when={documentState.isLoading}
-            message={formatMessage({ id: DONT_LEAVE_MESSAGE })}
-          />
-
           <hr />
           <form
             onSubmit={onFormSubmit}

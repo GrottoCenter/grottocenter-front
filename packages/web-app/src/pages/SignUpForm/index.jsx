@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import {
   Button,
   CircularProgress,
@@ -49,7 +49,7 @@ const SignUpForm = ({
 }) => {
   const [isPasswordVisible, setIsPasswordVisible] = React.useState(false);
   const { formatMessage } = useIntl();
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const toggleIsPasswordVisible = () => {
     setIsPasswordVisible(!isPasswordVisible);
@@ -89,7 +89,7 @@ const SignUpForm = ({
             </Typography>
             <SpacedCenteredButton
               color="primary"
-              onClick={() => history.push('/ui/login')}
+              onClick={() => navigate('/ui/login')}
               style={{ display: 'block' }}
               variant="contained">
               {formatMessage({ id: 'Log in' })}

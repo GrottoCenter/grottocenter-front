@@ -13,7 +13,7 @@ import PropTypes from 'prop-types';
 import ScrollableContent from '../../common/Layouts/Fixed/ScrollableContent';
 import GCLink from '../../common/GCLink';
 
-const CountryList = ({ countries }) => {
+const CountryList = ({ countries = [] }) => {
   const { formatMessage } = useIntl();
 
   return (
@@ -65,10 +65,6 @@ CountryList.propTypes = {
       native: PropTypes.string.isRequired
     })
   )
-};
-
-CountryList.defaultProps = {
-  countries: []
 };
 
 export default CountryList;

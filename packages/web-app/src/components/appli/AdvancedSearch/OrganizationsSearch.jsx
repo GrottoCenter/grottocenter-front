@@ -28,7 +28,8 @@ class OrganizationsSearch extends React.Component {
   }
 
   getInitialState() {
-    const { numberOfCaversMinValue, numberOfCaversMaxValue } = this.props;
+    const { numberOfCaversMinValue = 0, numberOfCaversMaxValue = 100 } =
+      this.props;
 
     return {
       'nb cavers-range': {
@@ -289,11 +290,6 @@ OrganizationsSearch.propTypes = {
   numberOfCaversMaxValue: PropTypes.number,
 
   intl: PropTypes.shape({ formatMessage: PropTypes.func }).isRequired
-};
-
-OrganizationsSearch.defaultProps = {
-  numberOfCaversMinValue: 0,
-  numberOfCaversMaxValue: 100
 };
 
 export default injectIntl(withStyles(styles)(OrganizationsSearch));

@@ -9,7 +9,7 @@ import {
   Skeleton
 } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 import { useIntl } from 'react-intl';
 import { styled } from '@mui/material/styles';
@@ -44,7 +44,7 @@ const createSkeletons = n =>
 
 const NotificationMenu = () => {
   const dispatch = useDispatch();
-  const history = useHistory();
+  const navigate = useNavigate();
   const { formatMessage } = useIntl();
   const { isAuth } = usePermissions();
   const { notifications, status } = useSelector(
@@ -74,7 +74,7 @@ const NotificationMenu = () => {
 
   const handleOnSeeAllLinkClick = () => {
     handleCloseMenu();
-    history.push('/ui/notifications');
+    navigate('/ui/notifications');
   };
 
   if (!isAuth) return '';

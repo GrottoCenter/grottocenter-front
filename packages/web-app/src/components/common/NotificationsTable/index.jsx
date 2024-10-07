@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useIntl } from 'react-intl';
 import { useDispatch } from 'react-redux';
 import useMakeCustomCellRenders from './customCellRenders';
@@ -30,7 +30,7 @@ const NotificationsTable = ({
   const customCell = useMakeCustomCellRenders();
   const customHeader = useMakeCustomHeaderCellRenders();
   const [hiddenColumns, setHiddenColumns] = useState(defaultHiddenColumns);
-  const history = useHistory();
+  const navigate = useNavigate();
   const makeTranslation = useCallback(
     id => formatMessage({ id: `${id[0].toUpperCase()}${id.slice(1)}` }),
     [formatMessage]
@@ -51,7 +51,7 @@ const NotificationsTable = ({
     if (!row.isRead) {
       dispatch(readNotification(row.id));
     }
-    history.push(row.link);
+    navigate(row.link);
   };
 
   return (

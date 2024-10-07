@@ -1,7 +1,7 @@
 import { Button, IconButton, Menu, MenuItem } from '@mui/material';
 import AccountCircle from '@mui/icons-material/AccountCircle';
 import React from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useIntl } from 'react-intl';
 import { useTheme } from '@mui/material/styles';
 import { isMobileOnly } from 'react-device-detect';
@@ -23,7 +23,7 @@ const UserMenu = ({
   const { formatDate, formatMessage, formatTime } = useIntl();
   const theme = useTheme();
   const userId = pathOr(null, ['id'], useUserProperties());
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const handleMenu = event => {
     setAnchorEl(event.currentTarget);
@@ -42,7 +42,7 @@ const UserMenu = ({
 
   // directs to the person page to see and modify the personnal data
   const handleMyAccountClick = () => {
-    history.push(`/ui/persons/${userId}`);
+    navigate(`/ui/persons/${userId}`);
   };
 
   const isSessionExpired = authTokenExpirationDate < Date.now();

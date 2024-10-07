@@ -53,7 +53,7 @@ const DocumentAuthorizationSelect = ({
     <Wrapper variant="filled">
       {label && <InputLabel>{label}</InputLabel>}
       <Select
-        value={isLoading ? -1 : selectedDocument ?? -1}
+        value={isLoading ? -1 : (selectedDocument ?? -1)}
         onChange={event => updateSelectedDocument(event.target.value)}>
         <MenuItem key={-1} value={-1} disabled>
           {isLoading && <CircularProgress fontSize="small" />}

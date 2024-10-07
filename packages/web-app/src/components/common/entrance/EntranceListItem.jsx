@@ -36,8 +36,5 @@ const EntranceListItem = ({ entrance }) => {
 EntranceListItem.propTypes = {
   entrance: idNameType
 };
-EntranceListItem.defaultProps = {
-  entrance: undefined
-};
 
 export default EntranceListItem;

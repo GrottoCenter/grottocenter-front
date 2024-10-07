@@ -12,7 +12,7 @@ const DateSpan = styled(Typography)`
 `;
 const AuthorAndDate = ({
   author,
-  textColor,
+  textColor = 'textPrimary',
   date,
   verb,
   withHours = false
@@ -51,10 +51,6 @@ AuthorAndDate.propTypes = {
   ]),
   verb: PropTypes.string,
   withHours: PropTypes.bool
-};
-
-AuthorAndDate.defaultProps = {
-  textColor: 'textPrimary'
 };
 
 export default AuthorAndDate;

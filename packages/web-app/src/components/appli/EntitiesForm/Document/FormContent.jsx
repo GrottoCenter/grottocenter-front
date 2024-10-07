@@ -22,8 +22,8 @@ import StringInput from '../../../common/Form/StringInput';
 import Translate from '../../../common/Translate';
 import { useDocumentTypes } from '../../../../hooks';
 
-const PublicationDatePicker = React.lazy(() =>
-  import('./formElements/PublicationDatePicker')
+const PublicationDatePicker = React.lazy(
+  () => import('./formElements/PublicationDatePicker')
 );
 
 const SubmitButton = styled(Button)`

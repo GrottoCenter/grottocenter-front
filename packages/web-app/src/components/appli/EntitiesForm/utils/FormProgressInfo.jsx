@@ -2,7 +2,7 @@ import { Box, Button, CircularProgress, Typography } from '@mui/material';
 import { React, useRef } from 'react';
 import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import Alert from '../../../common/Alert';
 
 const FormProgressInfo = ({
@@ -14,7 +14,7 @@ const FormProgressInfo = ({
   getRedirectFn
 }) => {
   const { formatMessage } = useIntl();
-  const history = useHistory();
+  const navigate = useNavigate();
   const isRedirected = useRef(false);
 
   if (isLoading) {
@@ -43,10 +43,10 @@ const FormProgressInfo = ({
     const newPath = getRedirectFn();
     if (!newPath || newPath === window.location.pathname) {
       isRedirected.current = true;
-      history.go(0); // Refresh
+      navigate(0); // Refresh
     } else {
       isRedirected.current = true;
-      history.push(newPath);
+      navigate(newPath);
     }
   }
   return <CircularProgress />;

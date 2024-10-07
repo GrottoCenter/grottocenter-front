@@ -111,8 +111,8 @@ const DocumentSnapshots = ({ document, previous }) => {
             value={
               editor?.name
                 ? `${editor.name} ${editor.surname}`
-                : editor?.nickname ??
-                  formatMessage({ id: INFORMATION_NOT_FOUND })
+                : (editor?.nickname ??
+                  formatMessage({ id: INFORMATION_NOT_FOUND }))
             }
           />
           <Property

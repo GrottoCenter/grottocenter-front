@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Chip, Tooltip } from '@mui/material';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useIntl } from 'react-intl';
 import { useDispatch } from 'react-redux';
 import NotificationsIcon from '@mui/icons-material/Notifications';
@@ -13,7 +13,7 @@ import { unsubscribeFromCountry } from '../../../actions/Subscriptions/Unsubscri
 
 const SubscriptionItem = ({ canUnsubscribe, subscription, type }) => {
   const { formatMessage } = useIntl();
-  const history = useHistory();
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const url =
     type === 'MASSIF'
@@ -33,7 +33,7 @@ const SubscriptionItem = ({ canUnsubscribe, subscription, type }) => {
       <Chip
         icon={<NotificationsIcon />}
         label={subscription.name}
-        onClick={() => history.push(url)}
+        onClick={() => navigate(url)}
         onDelete={canUnsubscribe ? handleUnsubscribe : undefined}
         color="primary"
       />
@@ -45,9 +45,6 @@ SubscriptionItem.propTypes = {
   canUnsubscribe: PropTypes.bool,
   subscription: PropTypes.oneOfType([countryType, MassifSimpleTypes]),
   type: PropTypes.oneOf(['COUNTRY', 'MASSIF']).isRequired
-};
-SubscriptionItem.defaultProps = {
-  subscription: undefined
 };
 
 export default SubscriptionItem;

@@ -131,6 +131,4 @@ AdvancedSearch.propTypes = {
   subjects: PropTypes.arrayOf(PropTypes.shape({})).isRequired
 };
 
-AdvancedSearch.defaultProps = {};
-
 export default AdvancedSearch;

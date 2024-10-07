@@ -17,37 +17,35 @@
     "e2e:run": "yarn workspace @grotto-front/web-app e2e-run",
     "e2e:open": "yarn workspace @grotto-front/web-app e2e",
     "storybook": "yarn workspace @grotto-front/web-app storybook",
-    "prepare": "husky install"
+    "prepare": "husky"
   },
   "devDependencies": {
-    "@commitlint/config-conventional": "17.6.6",
+    "@commitlint/cli": "^19.5.0",
+    "@commitlint/config-conventional": "19.5.0",
     "cross-env": "7.0.3",
-    "eslint": "8.44.0",
+    "eslint": "8.57.1",
     "eslint-config-airbnb": "19.0.4",
-    "eslint-config-prettier": "8.8.0",
-    "eslint-plugin-cypress": "^2.13.3",
-    "eslint-plugin-import": "2.27.5",
-    "eslint-plugin-jsx-a11y": "6.7.1",
-    "eslint-plugin-prettier": "5.0.0",
-    "eslint-plugin-react": "7.32.2",
-    "eslint-plugin-react-hooks": "4.6.0",
-    "eslint-plugin-storybook": "^0.6.12",
-    "husky": "^8.0.3",
-    "lint-staged": "13.2.3",
-    "prettier": "3.0.0",
-    "typescript": "5.1.6"
+    "eslint-config-prettier": "9.1.0",
+    "eslint-plugin-cypress": "^3.5.0",
+    "eslint-plugin-import": "2.31.0",
+    "eslint-plugin-jsx-a11y": "^6.10.0",
+    "eslint-plugin-prettier": "5.2.1",
+    "eslint-plugin-react": "7.37.1",
+    "eslint-plugin-react-hooks": "4.6.2",
+    "eslint-plugin-storybook": "^0.9.0",
+    "husky": "^9.1.6",
+    "lint-staged": "15.2.10",
+    "prettier": "3.3.3",
+    "typescript": "5.6.2"
   },
   "engines": {
     "node": ">=18",
-    "yarn": "3.6.2"
+    "yarn": "4.5.0"
   },
-  "packageManager": "yarn@3.6.2",
+  "packageManager": "yarn@4.5.0",
   "lint-staged": {
     "*.{js, jsx, ts, tsx}": [
       "eslint --cache --fix"
     ]
-  },
-  "dependencies": {
-    "@commitlint/cli": "^17.6.6"
   }
 }
