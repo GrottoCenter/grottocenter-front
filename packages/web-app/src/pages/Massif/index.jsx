@@ -21,10 +21,11 @@ const MassifPage = () => {
   // Initial data fetch
   useEffect(() => {
     dispatch(loadMassif(massifId));
-    if (userProperties) {
+    if (permissions.isAuth) {
       dispatch(fetchSubscriptions(userProperties.id));
     }
-  }, [massifId, userProperties, dispatch]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [massifId, dispatch]);
 
   return massif?.isDeleted && !permissions.isModerator ? (
     <Deleted entityType={DELETED_ENTITIES.massif} entity={massif} />

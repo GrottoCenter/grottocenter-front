@@ -21,10 +21,11 @@ const CountryPage = () => {
 
   useEffect(() => {
     dispatch(fetchCountry(countryId));
-    if (userProperties) {
+    if (permissions.isAuth) {
       dispatch(fetchSubscriptions(userProperties.id));
     }
-  }, [dispatch, countryId, userProperties]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dispatch, countryId]);
 
   return (
     <Country
