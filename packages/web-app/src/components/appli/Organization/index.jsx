@@ -137,7 +137,6 @@ const Organization = ({ error, isLoading, organization }) => {
                 entityType={DELETED_ENTITIES.organization}
                 isOpen={isDeleteConfirmationOpen}
                 isLoading={isActionLoading}
-                hasSearch={!isDeleteConfirmationPermanent}
                 isPermanent={isDeleteConfirmationPermanent}
                 onClose={() => setIsDeleteConfirmationOpen(false)}
                 onConfirmation={entity => {
