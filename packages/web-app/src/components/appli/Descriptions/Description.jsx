@@ -97,8 +97,8 @@ const Description = ({ description, isEditAllowed }) => {
               body={description.body}
               author={description.author}
               reviewer={description.reviewer}
-              creationDate={description.creationDate}
-              dateReviewed={description.reviewedDate}
+              dateInscription={description.dateInscription}
+              dateReviewed={description.dateReviewed}
               isDeleted={description.isDeleted}
             />
           }

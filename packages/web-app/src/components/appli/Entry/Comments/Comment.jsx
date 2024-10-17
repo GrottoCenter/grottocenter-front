@@ -128,7 +128,7 @@ const Comment = ({ comment, isEditAllowed }) => {
               <Contribution
                 author={comment.author}
                 body={comment.body}
-                creationDate={comment.creationDate}
+                dateInscription={comment.dateInscription}
                 reviewer={comment.reviewer}
                 dateReviewed={comment.dateReviewed}
                 isDeleted={comment.isDeleted}

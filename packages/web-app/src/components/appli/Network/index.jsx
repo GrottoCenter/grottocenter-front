@@ -137,7 +137,7 @@ export const Network = ({ isLoading, error, cave }) => {
                     <AuthorAndDate
                       author={cave.author}
                       verb="Created"
-                      date={cave.creationDate}
+                      date={cave.dateInscription}
                     />
                   )}
                   {cave.reviewer && (

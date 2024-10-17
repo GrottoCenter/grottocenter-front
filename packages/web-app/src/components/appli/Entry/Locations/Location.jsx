@@ -97,8 +97,8 @@ const Location = ({ location, isEditAllowed }) => {
               author={location.author}
               reviewer={location.reviewer}
               body={location.body}
-              creationDate={location.creationDate}
-              dateReviewed={location.reviewedDate}
+              dateInscription={location.dateInscription}
+              dateReviewed={location.dateReviewed}
               isDeleted={location.isDeleted}
             />
           }
