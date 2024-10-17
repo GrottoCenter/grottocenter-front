@@ -33,7 +33,7 @@ const Descriptions = ({ descriptions }) => {
                     body={description.body}
                     author={description.author}
                     reviewer={description.reviewer}
-                    creationDate={description.dateInscription}
+                    dateInscription={description.dateInscription}
                     dateReviewed={description.dateReviewed}
                   />
                 }
