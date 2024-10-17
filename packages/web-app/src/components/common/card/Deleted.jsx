@@ -195,7 +195,6 @@ export const DeleteConfirmationDialog = ({
   isPermanent,
   onClose,
   onConfirmation,
-  hasSearch = true,
   isSearchMandatory = false
 }) => {
   const { formatMessage } = useIntl();
@@ -330,14 +329,10 @@ export const DeleteConfirmationDialog = ({
                 { entityFmt }
               )}
         </Typography>
-        {hasSearch && (
-          <>
-            <br />
-            <br />
-            <Typography>{searchTitle}</Typography>
-          </>
-        )}
-        {hasSearch && !selectedEntity && (
+        <br />
+        <br />
+        <Typography>{searchTitle}</Typography>
+        {!selectedEntity && (
           <AutoCompleteSearch
             onInputChange={setInputValue}
             onSelection={handleSelection}
@@ -429,6 +424,5 @@ DeleteConfirmationDialog.propTypes = {
   isPermanent: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
   onConfirmation: PropTypes.func.isRequired,
-  hasSearch: PropTypes.bool,
   isSearchMandatory: PropTypes.bool
 };
