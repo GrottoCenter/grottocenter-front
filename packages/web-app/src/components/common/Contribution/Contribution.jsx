@@ -9,7 +9,7 @@ import authorType from '../../../types/author.type';
 const Contribution = ({
   author,
   body,
-  creationDate,
+  dateInscription,
   reviewer,
   dateReviewed,
   withHours = false,
@@ -41,7 +41,7 @@ const Contribution = ({
       {author && (
         <AuthorAndDate
           author={author}
-          date={creationDate}
+          date={dateInscription}
           withHours={withHours}
         />
       )}
@@ -63,7 +63,7 @@ const Contribution = ({
 Contribution.propTypes = {
   author: authorType,
   body: PropTypes.string,
-  creationDate: PropTypes.oneOfType([
+  dateInscription: PropTypes.oneOfType([
     PropTypes.instanceOf(Date),
     PropTypes.string
   ]),

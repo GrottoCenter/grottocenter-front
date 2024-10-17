@@ -86,7 +86,7 @@ const AccordionSnapshot = ({
       <AccordionActions>
         <Contribution
           author={author}
-          creationDate={snapshot.dateInscription}
+          dateInscription={snapshot.dateInscription}
           reviewer={reviewer}
           dateReviewed={snapshot.dateReviewed}
         />

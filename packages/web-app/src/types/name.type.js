@@ -9,6 +9,6 @@ export const NamePropTypes = PropTypes.shape({
   name: PropTypes.string,
   author: PropTypes.oneOfType([authorType, PropTypes.number]),
   reviewer: PropTypes.oneOfType([authorType, PropTypes.number]),
-  creationDate: PropTypes.string,
-  reviewedDate: PropTypes.string
+  dateInscription: PropTypes.string,
+  dateReviewed: PropTypes.string
 });

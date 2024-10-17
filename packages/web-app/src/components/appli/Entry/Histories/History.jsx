@@ -89,8 +89,8 @@ const History = ({ history, isEditAllowed }) => {
               body={history.body}
               author={history.author}
               reviewer={history.reviewer}
-              creationDate={history.creationDate}
-              dateReviewed={history.reviewedDate}
+              dateInscription={history.dateInscription}
+              dateReviewed={history.dateReviewed}
               isDeletedWithHeader={history.isDeleted}
             />
           }

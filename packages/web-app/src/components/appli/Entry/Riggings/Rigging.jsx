@@ -80,7 +80,7 @@ const Rigging = ({ rigging, isEditAllowed }) => {
           <RiggingTable {...rigging} />
           <Contribution
             author={rigging.author}
-            creationDate={rigging.date}
+            dateInscription={rigging.dateInscription}
             reviewer={rigging.reviewer}
             dateReviewed={rigging.dateReviewed}
           />

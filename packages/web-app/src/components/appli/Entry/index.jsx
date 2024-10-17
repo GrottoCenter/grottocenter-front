@@ -150,7 +150,7 @@ export const Entry = ({ isLoading, error, entrance }) => {
                   <AuthorAndDate
                     author={entrance.author}
                     verb="Created"
-                    date={entrance.creationDate}
+                    date={entrance.dateInscription}
                   />
                 )}
                 {entrance.reviewer && (

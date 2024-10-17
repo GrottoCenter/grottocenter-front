@@ -7,8 +7,8 @@ export const DescriptionPropTypes = PropTypes.shape({
   body: PropTypes.string,
   author: authorType,
   reviewer: authorType,
-  creationDate: PropTypes.string,
-  reviewedDate: PropTypes.string,
+  dateInscription: PropTypes.string,
+  dateReviewed: PropTypes.string,
   language: PropTypes.string,
   relevance: PropTypes.number
 });
