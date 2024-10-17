@@ -14,6 +14,7 @@ const DocumentsTableHead = () => {
         <TableCell>{formatMessage({ id: 'Subjects' })}</TableCell>
         <TableCell>{formatMessage({ id: 'Country or region' })}</TableCell>
         <TableCell>{formatMessage({ id: 'Authors' })}</TableCell>
+        <TableCell>{formatMessage({ id: 'Creator' })}</TableCell>
         {/* <TableCell>{formatMessage({ id: 'Date' })}</TableCell> */}
       </TableRow>
     </TableHead>

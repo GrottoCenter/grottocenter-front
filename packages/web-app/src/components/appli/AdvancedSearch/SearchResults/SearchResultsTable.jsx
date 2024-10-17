@@ -15,7 +15,6 @@ import {
   TablePagination,
   TableRow
 } from '@mui/material';
-import { pathOr } from 'ramda';
 
 import { CSVDownload } from 'react-csv';
 import Translate from '../../../common/Translate';
@@ -215,8 +214,8 @@ class SearchResultsTable extends React.Component {
         // Flatten cave and massif
         cleanedResults = fullResults.map(result => {
           const cleanedResult = result;
-          cleanedResult.cave = pathOr(null, ['cave', 'name'], result);
-          cleanedResult.massif = pathOr(null, ['massif', 'name'], result);
+          cleanedResult.cave = result?.cave?.name ?? null;
+          cleanedResult.massif = result?.massif?.name ?? null;
           delete cleanedResult.type;
           delete cleanedResult.highlights;
           return cleanedResult;
@@ -237,16 +236,23 @@ class SearchResultsTable extends React.Component {
         // Flatten regions and subjects
         cleanedResults = fullResults.map(result => {
           const cleanedResult = result;
+          cleanedResult.creator = result.creator?.nickname ?? '';
+          cleanedResult.editor = result.editor?.name ?? '';
+          cleanedResult.library = result.library?.name ?? '';
+
+          if (Array.isArray(result.iso3166))
+            cleanedResult.iso3166 = result.iso3166.join(', ');
           if (result.regions) {
             cleanedResult.regions = result.regions.map(s => s.names).join(', ');
           }
-          if (result.subjects) {
+          if (Array.isArray(result.subjects)) {
             cleanedResult.subjects = result.subjects
               .map(s => s.code)
               .join(', ');
           }
           delete cleanedResult.type;
           delete cleanedResult.highlights;
+
           return cleanedResult;
         });
         break;
@@ -329,9 +335,7 @@ class SearchResultsTable extends React.Component {
                         <TableCell>
                           {result.countryCode ? result.countryCode : '-'}
                         </TableCell>
-                        <TableCell>
-                          {pathOr('-', ['massif', 'name'], result)}
-                        </TableCell>
+                        <TableCell>{result?.massif?.name ?? '-'}</TableCell>
                         <TableCell>
                           {result.aestheticism
                             ? Number(result.aestheticism.toFixed(1))
@@ -347,9 +351,7 @@ class SearchResultsTable extends React.Component {
                             ? Number(result.approach.toFixed(1))
                             : '-'}
                         </TableCell>
-                        <TableCell>
-                          {pathOr('-', ['cave', 'name'], result)}
-                        </TableCell>
+                        <TableCell>{result?.cave?.name ?? '-'}</TableCell>
                         <TableCell>
                           {result.cave && result.cave.length
                             ? `${result.cave.length}m`
@@ -414,6 +416,9 @@ class SearchResultsTable extends React.Component {
                         <TableCell>
                           {result.authors ? result.authors : '-'}
                         </TableCell>
+                        <TableCell>
+                          {result.creator ? result.creator?.nickname : '-'}
+                        </TableCell>
                         {/* <TableCell>
                           {result.datePublication
                             ? result.datePublication
@@ -460,7 +465,6 @@ class SearchResultsTable extends React.Component {
                 startIcon={<DescriptionIcon />}>
                 <Translate>Export to CSV</Translate>
               </Button>
-
               {!isLoadingFullData &&
                 fullResults.length === totalNbResults &&
                 wantToDownloadCSV && (
