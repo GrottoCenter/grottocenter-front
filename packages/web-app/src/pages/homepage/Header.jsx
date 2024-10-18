@@ -5,7 +5,7 @@ import {
   GridRow,
   GridFullColumn
 } from '../../helpers/GridSystem';
-import { fseLinks } from '../../conf/externalLinks';
+import { fseLinks, uisLinks } from '../../conf/externalLinks';
 import InternationalizedLink from '../../components/common/InternationalizedLink';
 import Translate from '../../components/common/Translate';
 import GCLogo from '../../components/common/GCLogo';
@@ -19,7 +19,7 @@ const HeaderGridContainer = styled(GridContainer)`
   background-size: 220%;
   background-position: top;
 
-  @media (min-width: @mdMin) {
+  @media (min-width: 550px) {
     background-size: 130%;
   }
 
@@ -45,29 +45,30 @@ const Slogan = styled('span')`
   font-weight: 400;
 `;
 
-const FseInfos = styled('span')`
+const SupporterRow = styled('span')`
   display: flex;
   font-size: medium;
   font-weight: 300;
   line-height: 40px;
 
-  span:nth-of-type(2) {
+  span {
     display: none;
   }
 
-  @media (min-width: @mdMin) {
+  @media (min-width: 550px) {
     display: flex;
 
-    span:nth-of-type(2) {
+    span {
       display: flex;
+      margin: 0 0 0 10px;
     }
   }
 `;
 
-const FseImage = styled('img')`
+const SupporterLogo = styled('img')`
   width: 40px;
   height: 40px;
-  margin: 0 10px;
+  margin: 0 0 0 10px;
 `;
 
 const LogoImage = styled(GCLogo)`
@@ -94,12 +95,19 @@ const Header = () => (
       </BrandRow>
       <GridRow>
         <GridFullColumn>
-          <FseInfos>
+          <SupporterRow>
             <InternationalizedLink links={fseLinks}>
-              <FseImage src="/images/FSE.svg" alt="Logo FSE" />
+              <SupporterLogo src="/images/FSE.svg" alt="Logo FSE" />
             </InternationalizedLink>
-            <Translate>Grottocenter is supported by the FSE</Translate>
-          </FseInfos>
+            <InternationalizedLink links={uisLinks}>
+              <SupporterLogo src="/images/UIS.svg" alt="Logo UIS" />
+            </InternationalizedLink>
+            <span>
+              <Translate>
+                Grottocenter is supported by the FSE and the UIS
+              </Translate>
+            </span>
+          </SupporterRow>
         </GridFullColumn>
       </GridRow>
     </HeaderGridContainer>
