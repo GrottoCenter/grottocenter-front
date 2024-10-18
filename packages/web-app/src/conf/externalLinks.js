@@ -57,13 +57,16 @@ export const licensesODBLink = {
 };
 
 export const contactLinks = {
-  fr: 'http://fr.wikicaves.org/contact',
-  '*': 'http://en.wikicaves.org/contact'
+  fr: 'https://fr.wikicaves.org/contact',
+  '*': 'https://en.wikicaves.org/contact'
 };
 
 export const fseLinks = {
-  fr: 'http://eurospeleo.eu/fr/',
-  '*': 'http://eurospeleo.eu/en/'
+  fr: 'https://eurospeleo.eu/fr/',
+  '*': 'https://eurospeleo.eu/en/'
+};
+export const uisLinks = {
+  '*': 'https://uis-speleo.org/'
 };
 export const wikiLinks = {
   fr: 'https://wiki.grottocenter.org/wiki/GrottoCenter:Fr/Main_Page_/_Accueil',
