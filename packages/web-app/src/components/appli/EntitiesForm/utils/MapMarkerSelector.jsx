@@ -13,7 +13,7 @@ const StyledMapContainer = styled(MapContainer)`
   margin: 0 4px;
 
   .centralMarker {
-    z-index: 1000;
+    z-index: 900;
     position: absolute;
     text-align: center;
     width: 100%;
