@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import { Typography } from '@mui/material';
+import Linkify from 'linkify-react';
 import MultilinesTypography from '../MultilinesTypography';
 import AuthorAndDate from './AuthorAndDate';
 import authorType from '../../../types/author.type';
@@ -34,7 +35,7 @@ const Contribution = ({
       )}
       {body && (
         <MultilinesTypography variant="body1" component="span" sx={bodyStyle}>
-          {body}
+          <Linkify>{body}</Linkify>
         </MultilinesTypography>
       )}
       <br />

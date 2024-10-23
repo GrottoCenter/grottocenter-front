@@ -4,6 +4,7 @@ import { Box, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import EmailIcon from '@mui/icons-material/Email';
 import LocationIcon from '@mui/icons-material/LocationOn';
+import Linkify from 'linkify-react';
 
 import { FlagRounded } from '@mui/icons-material';
 import CustomMapContainer from '../../common/Maps/common/MapContainer';
@@ -62,12 +63,16 @@ const Details = ({ organization }) => {
           {organization.mail && (
             <ContentWrapper>
               <StyledEmailIcon color="primary" />
-              <Typography>{organization.mail}</Typography>
+              <Typography>
+                <Linkify>{organization.mail}</Linkify>
+              </Typography>
             </ContentWrapper>
           )}
           {organization.customMessage && (
             <ContentWrapper>
-              <Typography>{organization.customMessage}</Typography>
+              <Typography>
+                <Linkify>{organization.customMessage}</Linkify>
+              </Typography>
             </ContentWrapper>
           )}
         </Box>
