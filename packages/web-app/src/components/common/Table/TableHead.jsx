@@ -57,6 +57,8 @@ TableHead.propTypes = {
   orderBy: PropTypes.string,
   order: PropTypes.oneOf(['asc', 'desc']),
   isInitializing: PropTypes.bool,
+  isChecked: PropTypes.bool,
+  onSelection: PropTypes.func,
   customHeaderCellRenders: PropTypes.func
 };
 

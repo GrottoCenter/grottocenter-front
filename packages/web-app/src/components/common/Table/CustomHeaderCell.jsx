@@ -1,5 +1,5 @@
 import { includes, isNil, values } from 'ramda';
-import { TableCell, TableSortLabel } from '@mui/material';
+import { Checkbox, TableCell, TableSortLabel } from '@mui/material';
 import React from 'react';
 import PropTypes from 'prop-types';
 
@@ -14,7 +14,9 @@ export const CustomHeaderCell = ({
   customRenders,
   onSort,
   orderBy,
-  order
+  order,
+  isChecked,
+  onSelection
 }) => {
   const customRender =
     !isNil(customRenders) && !isNil(customRenders(id))
@@ -24,8 +26,19 @@ export const CustomHeaderCell = ({
     ? customRender(value)
     : value || '';
 
+  let padding;
+  if (id === 'selection') padding = 'checkbox';
+
   return (
-    <TableCell key={id} align="right">
+    <TableCell key={id} align="right" padding={padding}>
+      {id === 'selection' && !!onSelection && (
+        <Checkbox
+          color="default"
+          onClick={onSelection}
+          checked={isChecked}
+          inputProps={{ 'aria-label': id }}
+        />
+      )}
       {!isNil(onSort) && !includes(id, values(ActionColumnIds)) ? (
         <TableSortLabel
           active={orderBy === id}
@@ -60,7 +73,9 @@ CustomHeaderCell.propTypes = {
   customRenders: PropTypes.func,
   onSort: PropTypes.func,
   orderBy: PropTypes.string,
-  order: PropTypes.oneOf(['asc', 'desc'])
+  order: PropTypes.oneOf(['asc', 'desc']),
+  isChecked: PropTypes.bool,
+  onSelection: PropTypes.func
 };
 
 export default CustomHeaderCell;
