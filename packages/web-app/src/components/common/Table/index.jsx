@@ -95,6 +95,7 @@ const Table = ({
   const isSelected = includes(__, selection);
   const isHiddenColumn = pipe(prop('id'), includes(__, hiddenColumns));
   const [isFirstLoad, setIsFirstLoad] = useState(isEmpty(data) && loading);
+  const [isAllChecked, setIsAllChecked] = useState(false);
 
   useEffect(() => {
     setIsFirstLoad(isEmpty(data) && loading);
@@ -183,6 +184,15 @@ const Table = ({
                 ? handleSort
                 : undefined
             }
+            isChecked={isAllChecked}
+            onSelection={() => {
+              if (isAllChecked) {
+                updateSelection([]);
+              } else {
+                updateSelection(data.map(e => e.id));
+              }
+              setIsAllChecked(!isAllChecked);
+            }}
             orderBy={orderBy}
             order={order}
             isInitializing={isFirstLoad}
