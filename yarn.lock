@@ -2656,6 +2656,8 @@ __metadata:
     leaflet-draw: "npm:^1.0.4"
     leaflet.fullscreen: "npm:^3.0.2"
     leaflet.locatecontrol: "npm:^0.81.1"
+    linkify-react: "npm:^4.1.3"
+    linkifyjs: "npm:^4.1.3"
     notistack: "npm:^3.0.1"
     proj4: "npm:^2.12.1"
     prop-types: "npm:^15.8.1"
@@ -13063,6 +13065,23 @@ __metadata:
   version: 1.1.6
   resolution: "lines-and-columns@npm:1.1.6"
   checksum: 10/198a5436b1fa5cf703bae719c01c686b076f0ad7e1aafd95a58d626cabff302dc0414822126f2f80b58a8c3d66cda8a7b6da064f27130f87e1d3506d6dfd0d68
+  languageName: node
+  linkType: hard
+
+"linkify-react@npm:^4.1.3":
+  version: 4.1.3
+  resolution: "linkify-react@npm:4.1.3"
+  peerDependencies:
+    linkifyjs: ^4.0.0
+    react: ">= 15.0.0"
+  checksum: 10/e21dec51798783288c08979a74d0b8b6ee87315205d9a6ca36d8dc062c967577184791ab6456bb70f3635c2d156930040de9c278a3ca6dc940a45ea3b5d184c4
+  languageName: node
+  linkType: hard
+
+"linkifyjs@npm:^4.1.3":
+  version: 4.1.3
+  resolution: "linkifyjs@npm:4.1.3"
+  checksum: 10/7c17dac6a66fdea30e56b17d49d882a333833ec093993723738842b224c8cbd87bcddc6f51f2deac9529c868f162358d7acb0c44753b92832027ae761eceac1a
   languageName: node
   linkType: hard
 

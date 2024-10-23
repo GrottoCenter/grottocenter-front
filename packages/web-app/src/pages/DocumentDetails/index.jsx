@@ -5,6 +5,7 @@ import { Terrain } from '@mui/icons-material';
 import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams, useNavigate } from 'react-router-dom';
+import Linkify from 'linkify-react';
 
 import { loadLanguages } from '../../actions/Language';
 
@@ -233,7 +234,7 @@ const Document = ({
                 url={`/ui/documents/${documentData.parent?.id}`}
               />
               <SectionText title={formatMessage({ id: 'Summary' })}>
-                {documentData.description}
+                <Linkify>{documentData.description}</Linkify>
               </SectionText>
               <SectionDivider />
               <SectionDetails title={formatMessage({ id: 'Details' })}>

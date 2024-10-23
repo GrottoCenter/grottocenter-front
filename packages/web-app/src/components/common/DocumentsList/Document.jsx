@@ -11,6 +11,7 @@ import {
 } from '@mui/material';
 import LinkOffIcon from '@mui/icons-material/LinkOff';
 import React, { useState } from 'react';
+import Linkify from 'linkify-react';
 import { styled } from '@mui/material/styles';
 import GCLink from '../GCLink';
 import Files from './Files';
@@ -58,7 +59,9 @@ const Document = ({ document, hasSnapshotButton = false, onUnlink }) => {
           }
         />
         {document.description ? (
-          <DocumentDescription>{document.description}</DocumentDescription>
+          <DocumentDescription>
+            <Linkify> {document.description}</Linkify>
+          </DocumentDescription>
         ) : (
           false
         )}
