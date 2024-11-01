@@ -59,7 +59,7 @@
     "react-scripts": "^5.0.1",
     "react-select-country-list": "^2.2.3",
     "react-socks": "^2.2.0",
-    "react-to-print": "^3.0.1",
+    "react-to-print": "^3.0.2",
     "redux": "^5.0.1",
     "redux-debounced": "^0.5.0",
     "redux-thunk": "^3.1.0",
