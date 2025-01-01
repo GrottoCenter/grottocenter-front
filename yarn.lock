@@ -2655,7 +2655,7 @@ __metadata:
     leaflet: "npm:^1.9.4"
     leaflet-draw: "npm:^1.0.4"
     leaflet.fullscreen: "npm:^3.0.2"
-    leaflet.locatecontrol: "npm:^0.81.1"
+    leaflet.locatecontrol: "npm:^0.83.0"
     linkify-react: "npm:^4.1.3"
     linkifyjs: "npm:^4.1.3"
     notistack: "npm:^3.0.1"
@@ -13016,10 +13016,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"leaflet.locatecontrol@npm:^0.81.1":
-  version: 0.81.1
-  resolution: "leaflet.locatecontrol@npm:0.81.1"
-  checksum: 10/3f0c494e9cd718e5c44d02888abe29173a9b9f0db044547bef5d64e09a17339154adaf5935d75eac37f85735251e5fd2abb950e52e7c0aa5ab3ae02dbbb21aaa
+"leaflet.locatecontrol@npm:^0.83.0":
+  version: 0.83.0
+  resolution: "leaflet.locatecontrol@npm:0.83.0"
+  checksum: 10/8c356c4930cb4135c311d90441c71d96a36db91d833d27bba236582945347d2f7c026dbf7212d8122d4cba344db7edffa822d67a6a07ccf49d8a533d6e7b240b
   languageName: node
   linkType: hard
 
