@@ -28,7 +28,7 @@ const Comments = ({ entranceId, comments, isEditAllowed }) => {
         body: data.body,
         aestheticism: data.aestheticism,
         caving: data.caving,
-        approach: data.access,
+        approach: data.approach,
         eTTrail: data.eTTrail,
         eTUnderground: data.eTUnderground,
         language: data.language.id
