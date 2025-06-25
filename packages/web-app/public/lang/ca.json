@@ -1292,5 +1292,8 @@
   "Zaire": "Congo Kinshasa",
   "Zambia": "Zàmbia",
   "Zanzibar": "Tansània",
-  "Zimbabwe": "Zimbàbue"
+  "Zimbabwe": "Zimbàbue",
+  "oaiTooltip": "Servidor OAI-PMH",
+  "z3950Tooltip": "Servidor Z39.50"
+
 }

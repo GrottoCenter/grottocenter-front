@@ -458,5 +458,8 @@
   "Yes": "Ja",
   "YU04": "Montenegro",
   "Zambia": "Zambia",
-  "Zimbabwe": "Zimbabwe"
+  "Zimbabwe": "Zimbabwe",
+  "oaiTooltip": "OAI-PMH-server",
+  "z3950Tooltip": "Z39.50-server"
+
 }

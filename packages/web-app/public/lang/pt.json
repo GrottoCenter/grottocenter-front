@@ -461,5 +461,8 @@
   "Yes": "Sim",
   "YU04": "Montenegro",
   "Zambia": "Zâmbia",
-  "Zimbabwe": "Zimbábue"
+  "Zimbabwe": "Zimbábue",
+  "oaiTooltip": "Servidor OAI-PMH",
+  "z3950Tooltip": "Servidor Z39.50"
+
 }
