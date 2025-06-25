@@ -6,7 +6,7 @@ import {
   bloggerLinks,
   wikiBatsLinks,
   facebookLink,
-  twitterLink,
+  /* twitterLink, */
   githubLink
 } from '../../conf/externalLinks';
 
@@ -65,14 +65,14 @@ const SocialLinks = () => (
         />
       </InternationalizedLink>
     </SocialLinksListItem>
-    <SocialLinksListItem>
+    {/* <SocialLinksListItem>
       <InternationalizedLink links={twitterLink}>
         <SocialImage
           src="/images/icons8/icons8-twitter-filled-100.png"
           alt="Follow us on Twitter"
         />
       </InternationalizedLink>
-    </SocialLinksListItem>
+    </SocialLinksListItem>  */}
     <SocialLinksListItem>
       <InternationalizedLink links={githubLink}>
         <SocialImage
@@ -93,6 +93,29 @@ const SocialLinks = () => (
       <InternationalizedLink links={wikiBatsLinks}>
         <SocialImage src="/images/icons8/bats.svg" alt="Wiki page for bats" />
       </InternationalizedLink>
+    </SocialLinksListItem>
+    <SocialLinksListItem>
+      <a
+        href={process.env.REACT_APP_OAI_URL || '#'}
+        target="_blank"
+        rel="noopener noreferrer">
+        <SocialImage
+          src="/images/icons8/icons8-oai-filled-100.png"
+          alt="Serveur OAI-PMH"
+        />
+      </a>
+    </SocialLinksListItem>
+
+    <SocialLinksListItem>
+      <a
+        href={process.env.REACT_APP_Z3950_URL || '#'}
+        target="_blank"
+        rel="noopener noreferrer">
+        <SocialImage
+          src="/images/icons8/icons8-z3950-filled-100.png"
+          alt="Serveur Z39.50"
+        />
+      </a>
     </SocialLinksListItem>
   </SocialLinksList>
 );
