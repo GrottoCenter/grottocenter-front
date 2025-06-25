@@ -418,5 +418,9 @@
   "You can show your support by  joining  Grottocenter {0}": "Μπορείτε να βοηθήσετε συμμετέχοντας στο  Grottocenter",
   "YU04": "Μαυροβούνιο",
   "Zambia": "Ζάμπια",
-  "Zimbabwe": "Ζιμπάμπουε"
+  "Zimbabwe": "Ζιμπάμπουε",
+  "oaiTooltip": "Διακομιστής OAI-PMH",
+  "z3950Tooltip": "Διακομιστής Z39.50"
+
+
 }

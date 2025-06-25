@@ -455,5 +455,8 @@
   "Latitude": "Latitudine",
   "Longitude": "Longitudine",
   "Lat.": "Lat.",
-  "Long.": "Long."
+  "Long.": "Long.",
+  "oaiTooltip": "Server OAI-PMH",
+  "z3950Tooltip": "Server Z39.50"
+
 }

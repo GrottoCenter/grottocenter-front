@@ -1139,5 +1139,8 @@
   "Zaire": "Zair",
   "Zambia": "Zambia",
   "Zanzibar": "Tanzania",
-  "Zimbabwe": "Zimbabwe"
+  "Zimbabwe": "Zimbabwe",
+  "oaiTooltip": "Server OAI-PMH",
+  "z3950Tooltip": "Server Z39.50"
+
 }

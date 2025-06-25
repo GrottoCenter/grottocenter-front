@@ -76,5 +76,8 @@
   "Unless stated otherwise, all text and documents are available under the terms": "Kecuali dinyatakan lain, semua teks dan dokumen yang tersedia di bawah persyaratan",
   "Welcome to Grottocenter!": "Selamat Datang di Grottocenter!",
   "Wikicaves association": "Asosiasi Wikicaves",
-  "Year of discovery": "Tahun penemuannya"
+  "Year of discovery": "Tahun penemuannya",
+  "oaiTooltip": "Server OAI-PMH",
+  "z3950Tooltip": "Server Z39.50"
+
 }

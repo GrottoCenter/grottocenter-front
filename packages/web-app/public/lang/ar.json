@@ -349,5 +349,7 @@
   "Yemen": "اليمن",
   "YU04": "الجبل الأسود",
   "Zambia": "زامبيا",
-  "Zimbabwe": "زيمبابوي"
+  "Zimbabwe": "زيمبابوي",
+  "oaiTooltip": "خادم OAI-PMH",
+  "z3950Tooltip": "خادم Z39.50"
 }

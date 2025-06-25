@@ -1,4 +1,5 @@
 import React from 'react';
+import { useIntl } from 'react-intl';
 import { styled, keyframes } from '@mui/material/styles';
 import InternationalizedLink from '../../components/common/InternationalizedLink';
 import GCLink from '../../components/common/GCLink';
@@ -47,77 +48,88 @@ const ApiSocialImage = styled(SocialImage)`
   animation: ${rotateAnimation} 30s ease-out infinite;
 `;
 
-const SocialLinks = () => (
-  <SocialLinksList>
-    <SocialLinksListItem>
-      <InternationalizedLink links={facebookLink}>
-        <SocialImage
-          src="/images/icons8/icons8-facebook-filled-100.png"
-          alt="Follow us on Facebook"
-        />
-      </InternationalizedLink>
-    </SocialLinksListItem>
-    <SocialLinksListItem>
-      <InternationalizedLink links={bloggerLinks}>
-        <SocialImage
-          src="/images/icons8/icons8-blogger-filled-100.png"
-          alt="Grottocenter blog"
-        />
-      </InternationalizedLink>
-    </SocialLinksListItem>
-    {/* <SocialLinksListItem>
-      <InternationalizedLink links={twitterLink}>
-        <SocialImage
-          src="/images/icons8/icons8-twitter-filled-100.png"
-          alt="Follow us on Twitter"
-        />
-      </InternationalizedLink>
-    </SocialLinksListItem>  */}
-    <SocialLinksListItem>
-      <InternationalizedLink links={githubLink}>
-        <SocialImage
-          src="/images/icons8/icons8-github-filled-100.png"
-          alt="Grottocenter3 on GitHub"
-        />
-      </InternationalizedLink>
-    </SocialLinksListItem>
-    <SocialLinksListItem>
-      <GCLink internal href="/ui/api">
-        <ApiSocialImage
-          src="/images/icons8/icons8-rest-api-filled-100.png"
-          alt="Want to use our API?"
-        />
-      </GCLink>
-    </SocialLinksListItem>
-    <SocialLinksListItem>
-      <InternationalizedLink links={wikiBatsLinks}>
-        <SocialImage src="/images/icons8/bats.svg" alt="Wiki page for bats" />
-      </InternationalizedLink>
-    </SocialLinksListItem>
-    <SocialLinksListItem>
-      <a
-        href={process.env.REACT_APP_OAI_URL || '#'}
-        target="_blank"
-        rel="noopener noreferrer">
-        <SocialImage
-          src="/images/icons8/icons8-oai-filled-100.png"
-          alt="Serveur OAI-PMH"
-        />
-      </a>
-    </SocialLinksListItem>
+const SocialLinks = () => {
+  const { formatMessage } = useIntl();
 
-    <SocialLinksListItem>
-      <a
-        href={process.env.REACT_APP_Z3950_URL || '#'}
-        target="_blank"
-        rel="noopener noreferrer">
-        <SocialImage
-          src="/images/icons8/icons8-z3950-filled-100.png"
-          alt="Serveur Z39.50"
-        />
-      </a>
-    </SocialLinksListItem>
-  </SocialLinksList>
-);
+  return (
+    <SocialLinksList>
+      <SocialLinksListItem>
+        <InternationalizedLink links={facebookLink}>
+          <SocialImage
+            src="/images/icons8/icons8-facebook-filled-100.png"
+            alt="Follow us on Facebook"
+          />
+        </InternationalizedLink>
+      </SocialLinksListItem>
+      <SocialLinksListItem>
+        <InternationalizedLink links={bloggerLinks}>
+          <SocialImage
+            src="/images/icons8/icons8-blogger-filled-100.png"
+            alt="Grottocenter blog"
+          />
+        </InternationalizedLink>
+      </SocialLinksListItem>
+      {/* <SocialLinksListItem>
+        <InternationalizedLink links={twitterLink}>
+          <SocialImage
+            src="/images/icons8/icons8-twitter-filled-100.png"
+            alt="Follow us on Twitter"
+          />
+        </InternationalizedLink>
+      </SocialLinksListItem> */}
+      <SocialLinksListItem>
+        <InternationalizedLink links={githubLink}>
+          <SocialImage
+            src="/images/icons8/icons8-github-filled-100.png"
+            alt="Grottocenter3 on GitHub"
+          />
+        </InternationalizedLink>
+      </SocialLinksListItem>
+      <SocialLinksListItem>
+        <GCLink internal href="/ui/api">
+          <ApiSocialImage
+            src="/images/icons8/icons8-rest-api-filled-100.png"
+            alt="Want to use our API?"
+          />
+        </GCLink>
+      </SocialLinksListItem>
+      <SocialLinksListItem>
+        <InternationalizedLink links={wikiBatsLinks}>
+          <SocialImage src="/images/icons8/bats.svg" alt="Wiki page for bats" />
+        </InternationalizedLink>
+      </SocialLinksListItem>
+      <SocialLinksListItem>
+        <a
+          href={process.env.REACT_APP_OAI_URL || '#'}
+          title={formatMessage({
+            id: 'oaiTooltip',
+            defaultMessage: 'Serveur OAI-PMH'
+          })}
+          target="_blank"
+          rel="noopener noreferrer">
+          <SocialImage
+            src="/images/icons8/icons8-oai-filled-100.png"
+            alt="Serveur OAI-PMH"
+          />
+        </a>
+      </SocialLinksListItem>
+      <SocialLinksListItem>
+        <a
+          href={process.env.REACT_APP_Z3950_URL || '#'}
+          title={formatMessage({
+            id: 'z3950Tooltip',
+            defaultMessage: 'Serveur Z39.50'
+          })}
+          target="_blank"
+          rel="noopener noreferrer">
+          <SocialImage
+            src="/images/icons8/icons8-z3950-filled-100.png"
+            alt="Serveur Z39.50"
+          />
+        </a>
+      </SocialLinksListItem>
+    </SocialLinksList>
+  );
+};
 
 export default SocialLinks;

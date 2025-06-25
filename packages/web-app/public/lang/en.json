@@ -1614,5 +1614,8 @@
   "Zambia": "Zambia",
   "Zanzibar": "Tansania",
   "Zimbabwe": "Zimbabwe",
-  "Zip code": "Zip code"
+  "Zip code": "Zip code",
+  "oaiTooltip": "OAI-PMH server",
+  "z3950Tooltip": "Z39.50 server"
+
 }

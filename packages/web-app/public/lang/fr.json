@@ -1614,5 +1614,7 @@
   "Zambia": "Zambie",
   "Zanzibar": "Tasmanie",
   "Zimbabwe": "Zimbabwe",
-  "Zip code": "Code postal"
+  "Zip code": "Code postal",
+  "oaiTooltip": "Serveur OAI-PMH",
+  "z3950Tooltip": "Serveur Z39.50"
 }

@@ -455,5 +455,7 @@
   "Latitude": "緯度",
   "Longitude": "経度",
   "Lat.": "Lat.",
-  "Long.": "Long."
+  "Long.": "Long.",
+  "oaiTooltip": "OAI-PMHサーバー",
+  "z3950Tooltip": "Z39.50サーバー"
 }
