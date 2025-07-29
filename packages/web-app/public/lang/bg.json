@@ -1615,6 +1615,7 @@
   "Zanzibar": "Танзания",
   "Zimbabwe": "Зимбабве",
   "Zip code": "Пощенски код",
-  "oaiTooltip": "Сървър OAI-PMH",
-  "z3950Tooltip": "Сървър Z39.50"
+  "oaiTooltip": "OAI-PMH сървър",
+  "z3950Tooltip": "Z39.50 сървър"
+
 }
