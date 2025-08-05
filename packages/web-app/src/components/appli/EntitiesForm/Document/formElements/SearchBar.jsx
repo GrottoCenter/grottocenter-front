@@ -1,4 +1,5 @@
-import React, { useContext, useEffect } from 'react';
+import React, { useContext, useEffect, useCallback } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 
 import { DocumentFormContext } from '../Provider';
@@ -6,6 +7,10 @@ import { DocumentFormContext } from '../Provider';
 import { useDebounce } from '../../../../../hooks';
 import AutoCompleteSearchComponent from '../../../../common/AutoCompleteSearch';
 import { AutoCompleteSearchTypes } from '../../../../common/AutoCompleteSearch/types';
+
+import { fetchDocumentDetails } from '../../../../../actions/Document/GetDocumentDetails';
+import { fetchLicense } from '../../../../../actions/Licenses';
+import { DOCUMENT_AUTHORIZE_TO_PUBLISH } from '../../../../common/AddFileForm/OptionSelect';
 
 const SearchBar = props => {
   const {
@@ -18,6 +23,15 @@ const SearchBar = props => {
   const { document, updateAttribute } = useContext(DocumentFormContext);
   const [inputValue, setInputValue] = React.useState(defaultInputValue);
   const debouncedInput = useDebounce(inputValue);
+  const dispatch = useDispatch();
+  const { languages } = useSelector(state => state.language);
+  const { data: licenses } = useSelector(state => state.licenses);
+
+  useEffect(() => {
+    if (!licenses || licenses.length === 0) {
+      dispatch(fetchLicense());
+    }
+  }, [dispatch, licenses]);
 
   const handleInputChange = newValue => {
     if (
@@ -30,15 +44,80 @@ const SearchBar = props => {
     }
   };
 
-  const handleSelection = newValue => {
+  const getLanguageRefName = useCallback(
+    languageId => {
+      const language = languages.find(lang => lang.id === languageId);
+      return language ? language.refName : languageId;
+    },
+    [languages]
+  );
+
+  const getLicenseByName = useCallback(
+    licenseName => {
+      if (!licenses || !licenseName) return null;
+      return licenses.find(lic => lic.name === licenseName) || null;
+    },
+    [licenses]
+  );
+
+  const handleSelection = async newValue => {
     // Defensive programming because the selection is triggerred
     // when the input is emptied.
     if (newValue !== null) {
       updateAttribute(contextValueName, newValue);
-
       if (contextValueName === 'parent') {
-        updateAttribute('editor', newValue.editor ?? null);
-        updateAttribute('library', newValue.library ?? null);
+        const resultAction = await dispatch(fetchDocumentDetails(newValue.id));
+
+        if (resultAction.type === 'FETCH_DOCUMENT_DETAILS_SUCCESS') {
+          const documentDetails = resultAction.data;
+
+          if (
+            documentDetails.mainLanguage &&
+            typeof documentDetails.mainLanguage === 'string'
+          ) {
+            updateAttribute(
+              'mainLanguage',
+              documentDetails.mainLanguage || '000'
+            );
+            updateAttribute(
+              'mainLanguageName',
+              getLanguageRefName(documentDetails.mainLanguage)
+            );
+          }
+
+          if (documentDetails.license) {
+            let licenseObject = null;
+
+            if (typeof documentDetails.license === 'string') {
+              licenseObject = getLicenseByName(documentDetails.license);
+            }
+            updateAttribute('license', licenseObject);
+          }
+
+          updateAttribute('editor', documentDetails.editor ?? null);
+          updateAttribute('library', documentDetails.library ?? null);
+          updateAttribute(
+            'selectOptionAuthorizationDocument',
+            documentDetails.authorizationDocument
+              ? DOCUMENT_AUTHORIZE_TO_PUBLISH
+              : null
+          ); // before authorizationDocument to avoid the reset of authorizationDocument content
+
+          if (documentDetails.authorizationDocument) {
+            const authorizationDocumentFetch = await dispatch(
+              fetchDocumentDetails(documentDetails.authorizationDocument.id)
+            );
+            if (
+              authorizationDocumentFetch.type ===
+              'FETCH_DOCUMENT_DETAILS_SUCCESS'
+            ) {
+              updateAttribute(
+                'authorizationDocument',
+                authorizationDocumentFetch.data
+              );
+            }
+          }
+        }
       }
     }
     setInputValue('');

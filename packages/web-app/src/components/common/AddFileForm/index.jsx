@@ -5,15 +5,15 @@ import { FormControl, Button, Typography } from '@mui/material';
 
 import { styled } from '@mui/material/styles';
 import { isEmpty, isNil, remove } from 'ramda';
-import LicenseSelect from './LicenseSelect';
+import LicenseSelectAutoComplete from './AutoCompletion/LicenseSelectAutoComplete';
 import FilesList from './FilesList';
-import DocumentAuthorizationSelect from '../../appli/Form/DocumentAuthorizationSelect';
+import DocumentAuthorizationSelectAutoComplete from './AutoCompletion/DocumentAuthorizationSelectAutoComplete';
 import ErrorsList from './ErrorsList';
 import { useFileFormats } from '../../../hooks';
-import OptionSelect, { DOCUMENT_AUTHORIZE_TO_PUBLISH } from './OptionSelect';
+import { DOCUMENT_AUTHORIZE_TO_PUBLISH } from './OptionSelect';
+import OptionSelectAutoComplete from './AutoCompletion/OptionSelectAutoComplete';
 import { MAX_SIZE_OF_UPLOADED_FILES } from '../../../conf/config';
 import { IS_DELETED, IS_INTACT, IS_MODIFIED, IS_NEW } from './FileHelpers';
-import { idNameTypeExtended } from '../../../types/idName.type';
 
 const StyledButton = styled(Button)`
   margin-left: ${({ theme }) => theme.spacing(4)}%;
@@ -35,9 +35,7 @@ const AddFileForm = ({
   setFiles,
   option,
   setOption,
-  license,
   setLicense,
-  authorizationDocument,
   setAuthorizationDocument
 }) => {
   const { formatMessage } = useIntl();
@@ -184,21 +182,39 @@ const AddFileForm = ({
               undoRemove={undoRemove}
             />
           </ListWrapper>
-          <LicenseSelect
-            label={formatMessage({ id: 'License' })}
-            selected={license}
+          <LicenseSelectAutoComplete
+            contextValueName="license"
+            helperContent={formatMessage({ id: 'Select a license' })}
+            helperContentIfValueIsForced={formatMessage({
+              id: 'The license of the document has been deduced from the parent document'
+            })}
+            labelText={formatMessage({ id: 'License' })}
+            required
             updateSelected={setLicense}
           />
 
-          <OptionSelect
-            label={formatMessage({ id: 'License type' })}
-            selectedOption={option}
+          <OptionSelectAutoComplete
+            contextValueName="selectOptionAuthorizationDocument"
+            helperContent={formatMessage({
+              id: 'Select a type of authorization'
+            })}
+            helperContentIfValueIsForced={formatMessage({
+              id: 'The type of authorization of the document has been deduced from the parent document'
+            })}
+            labelText={formatMessage({ id: 'License type' })}
             updateSelectedOption={updateOption}
+            required
           />
           {showAuthDocSelect && (
-            <DocumentAuthorizationSelect
-              label={formatMessage({ id: 'Authorization from authors' })}
-              selectedDocument={authorizationDocument}
+            <DocumentAuthorizationSelectAutoComplete
+              contextValueName="authorizationDocument"
+              helperContent={formatMessage({
+                id: 'Select an authorization document'
+              })}
+              helperContentIfValueIsForced={formatMessage({
+                id: 'The authorization document of the document has been deduced from the parent document'
+              })}
+              labelText={formatMessage({ id: 'Authorization from authors' })}
               updateSelectedDocument={setAuthorizationDocument}
             />
           )}
@@ -229,11 +245,7 @@ AddFileForm.propTypes = {
   setFiles: PropTypes.func.isRequired,
   option: PropTypes.string,
   setOption: PropTypes.func.isRequired,
-  license: idNameTypeExtended({
-    text: PropTypes.string
-  }),
   setLicense: PropTypes.func.isRequired,
-  authorizationDocument: PropTypes.oneOf([PropTypes.string, PropTypes.number]),
   setAuthorizationDocument: PropTypes.func.isRequired
 };
 
