@@ -26,11 +26,12 @@ export const defaultDocAttributes = {
   issue: '',
   license: null,
   mainLanguage: '000',
+  mainLanguageName: '',
   iso3166: [],
-  option: null,
   parent: null,
   files: [],
-  authorizationDocument: null
+  authorizationDocument: null,
+  selectOptionAuthorizationDocument: null
 };
 
 export function isDocumentPagesFormatValid(pages) {
@@ -56,7 +57,10 @@ const checkFormValidation = document => {
     isValid = new RegExp(document.identifierType?.regexp).test(
       document.identifier
     );
-  if (document.files.length > 0 && (!document.license || !document.option))
+  if (
+    document.files.length > 0 &&
+    (!document.license || !document.selectOptionAuthorizationDocument)
+  )
     isValid = false;
 
   return !!isValid;
