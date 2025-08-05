@@ -20,6 +20,8 @@ import cumulatedLength from './CumulatedLengthReducer';
 import dbExport from './DBExportReducer';
 import documentChildren from './DocumentChildrenReducer';
 import documentDetails from './DetailsDocumentReducer';
+import parentDocument from './ParentDocumentReducer';
+import authorizationDocument from './AuthorizationDocumentReducer';
 import documents from './DocumentsReducer';
 import documentType from './DocumentTypeReducer';
 import duplicatesImport from './DuplicatesImportReducer';
@@ -99,11 +101,13 @@ const GCReducer = combineReducers({
   document,
   documentChildren,
   documentDetails,
+  parentDocument,
   documents,
   documentType,
   duplicatesImport,
   dynamicNumber,
   updateEntrance,
+  authorizationDocument,
   entrance,
   error,
   fileFormats,

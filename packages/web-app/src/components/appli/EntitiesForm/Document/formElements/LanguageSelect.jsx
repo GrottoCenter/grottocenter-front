@@ -28,7 +28,12 @@ const FormControlLanguage = withStyles(
   { withTheme: true }
 )(FormControl);
 
-const LanguageSelect = ({ contextValueName, labelText, required = false }) => {
+const LanguageSelect = ({
+  contextValueName,
+  contextValueNameOfTheLanguage = null,
+  labelText,
+  required = false
+}) => {
   const dispatch = useDispatch();
 
   const { document, updateAttribute } = useContext(DocumentFormContext);
@@ -48,7 +53,15 @@ const LanguageSelect = ({ contextValueName, labelText, required = false }) => {
       </InputLabel>
       <Select
         value={isLoaded ? document[contextValueName] : '000'}
-        onChange={e => updateAttribute(contextValueName, e.target.value)}>
+        onChange={e => {
+          updateAttribute(contextValueName, e.target.value.id);
+          if (contextValueNameOfTheLanguage) {
+            updateAttribute(
+              contextValueNameOfTheLanguage,
+              e.target.value.refName
+            );
+          }
+        }}>
         <MenuItem key="000" value="000">
           <i>
             <Translate>
@@ -57,7 +70,10 @@ const LanguageSelect = ({ contextValueName, labelText, required = false }) => {
           </i>
         </MenuItem>
         {languages.map(l => (
-          <MenuItem key={l.id} value={l.id} name={l.refName}>
+          <MenuItem
+            key={l.id}
+            value={{ id: l.id, refName: l.refName }}
+            name={l.refName}>
             <Translate>{l.refName}</Translate>
           </MenuItem>
         ))}
@@ -73,6 +89,7 @@ const LanguageSelect = ({ contextValueName, labelText, required = false }) => {
 
 LanguageSelect.propTypes = {
   contextValueName: PropTypes.string.isRequired,
+  contextValueNameOfTheLanguage: PropTypes.string,
   labelText: PropTypes.string.isRequired,
   required: PropTypes.bool
 };

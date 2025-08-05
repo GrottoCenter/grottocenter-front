@@ -7,7 +7,7 @@ import { useIntl } from 'react-intl';
 import { DocumentFormContext } from './Provider';
 
 import DocumentTypeSelect from './formElements/DocumentTypeSelect';
-import LanguageSelect from './formElements/LanguageSelect';
+import LanguageAutoComplete from './formElements/LanguageAutoComplete';
 import DocumentAutoComplete from './formElements/DocumentAutoComplete';
 import MultipleISORegionsSelect from './formElements/MultipleISORegionsSelect';
 import MultipleCaversSelect from './formElements/MultipleCaversSelect';
@@ -56,9 +56,17 @@ const FormContent = () => {
               required
             />
             {!isUnknown(document.type) && !isImage(document.type) && (
-              <LanguageSelect
+              <LanguageAutoComplete
                 contextValueName="mainLanguage"
+                contextValueNameOfTheLanguage="mainLanguageName"
+                helperContent={formatMessage({
+                  id: 'The main language of the document.'
+                })}
+                helperContentIfValueIsForced={formatMessage({
+                  id: 'The main language of the document has been deduced from the parent document.'
+                })}
                 labelText="Document main language"
+                required={false}
                 // required={!isOther(document.type)}
               />
             )}
@@ -241,11 +249,11 @@ const FormContent = () => {
           <AddFileForm
             files={document.files}
             setFiles={newFiles => updateAttribute('files', newFiles)}
-            option={document.option}
-            setOption={newOption => updateAttribute('option', newOption)}
-            license={document.license}
+            option={document.selectOptionAuthorizationDocument}
+            setOption={newOption =>
+              updateAttribute('selectOptionAuthorizationDocument', newOption)
+            }
             setLicense={newLicense => updateAttribute('license', newLicense)}
-            authorizationDocument={document.authorizationDocument}
             setAuthorizationDocument={newAuthorizationDocument =>
               updateAttribute('authorizationDocument', newAuthorizationDocument)
             }
