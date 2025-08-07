@@ -4,8 +4,9 @@ import { useDocumentTypes } from '../../../../hooks';
 
 import { DocumentFormContext } from './Provider';
 
-import ButtonChoice from './ButtonChoice'
-import FormContent from './FormContent'
+import ButtonChoice from './ButtonChoice';
+import FormWithAiContent from './FormWithAIContent';
+import ParentDocument from './ParentDocument';
 import DocumentTypeSelect from './formElements/DocumentTypeSelect';
 
 const ChoiceTypeOfForm = ({}) => {
@@ -43,19 +44,16 @@ const ChoiceTypeOfForm = ({}) => {
                         ]}
                     />
 
-                    {hasFileToUpload ? 
-                        <FormContent />
-                    :
-                        <Typography variant="body1" sx={{ mt: 2 }}>
-                            Vous pouvez continuer sans télécharger de fichier.
-                        </Typography>
-                    }
+                    {hasFileToUpload !== null && (
+                        hasFileToUpload ? 
+                            <FormWithAiContent />
+                        :
+                            <ParentDocument />
+                    )}
                 </Box>
             ) : (
                 <Box sx={{ textAlign: 'center', mt: 4 }}>
-                    <Typography variant="body1" color="text.secondary">
-                        Veuillez sélectionner un type de document valide (Article ou Issue).
-                    </Typography>
+                    <ParentDocument />
                 </Box>
             )}
         </Box>

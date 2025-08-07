@@ -8,7 +8,9 @@ import { useDebounce } from '../../../../../hooks';
 import AutoCompleteSearchComponent from '../../../../common/AutoCompleteSearch';
 import { AutoCompleteSearchTypes } from '../../../../common/AutoCompleteSearch/types';
 
-import { fetchDocumentDetails } from '../../../../../actions/Document/GetDocumentDetails';
+import { fetchDocumentDetails, FETCH_DOCUMENT_DETAILS_SUCCESS } from '../../../../../actions/Document/GetDocumentDetails';
+import { fetchParentDocumentDetails, FETCH_PARENT_DOCUMENT_DETAILS_SUCCESS } from '../../../../../actions/Document/GetParentDocumentDetails';
+import { fetchAuthorizationDocumentDetails, FETCH_AUTHORIZATION_DOCUMENT_DETAILS_SUCCESS } from '../../../../../actions/Document/GetAuthorizationDocumentDetails';
 import { fetchLicense } from '../../../../../actions/Licenses';
 import { DOCUMENT_AUTHORIZE_TO_PUBLISH } from '../../../../common/AddFileForm/OptionSelect';
 
@@ -66,57 +68,55 @@ const SearchBar = props => {
     if (newValue !== null) {
       updateAttribute(contextValueName, newValue);
       if (contextValueName === 'parent') {
-        const resultAction = await dispatch(fetchDocumentDetails(newValue.id));
+        try {
+          const resultAction = await dispatch(fetchParentDocumentDetails(newValue.id));
+          console.log(resultAction)
 
-        if (resultAction.type === 'FETCH_DOCUMENT_DETAILS_SUCCESS') {
-          const documentDetails = resultAction.data;
+          if (resultAction.type === FETCH_PARENT_DOCUMENT_DETAILS_SUCCESS) {
+            const documentDetails = resultAction.data;
 
-          if (
-            documentDetails.mainLanguage &&
-            typeof documentDetails.mainLanguage === 'string'
-          ) {
-            updateAttribute(
-              'mainLanguage',
-              documentDetails.mainLanguage || '000'
-            );
-            updateAttribute(
-              'mainLanguageName',
-              getLanguageRefName(documentDetails.mainLanguage)
-            );
-          }
-
-          if (documentDetails.license) {
-            let licenseObject = null;
-
-            if (typeof documentDetails.license === 'string') {
-              licenseObject = getLicenseByName(documentDetails.license);
-            }
-            updateAttribute('license', licenseObject);
-          }
-
-          updateAttribute('editor', documentDetails.editor ?? null);
-          updateAttribute('library', documentDetails.library ?? null);
-          updateAttribute(
-            'selectOptionAuthorizationDocument',
-            documentDetails.authorizationDocument
-              ? DOCUMENT_AUTHORIZE_TO_PUBLISH
-              : null
-          ); // before authorizationDocument to avoid the reset of authorizationDocument content
-
-          if (documentDetails.authorizationDocument) {
-            const authorizationDocumentFetch = await dispatch(
-              fetchDocumentDetails(documentDetails.authorizationDocument.id)
-            );
             if (
-              authorizationDocumentFetch.type ===
-              'FETCH_DOCUMENT_DETAILS_SUCCESS'
+              documentDetails.mainLanguage &&
+              typeof documentDetails.mainLanguage === 'string'
             ) {
               updateAttribute(
-                'authorizationDocument',
-                authorizationDocumentFetch.data
+                'mainLanguage',
+                documentDetails.mainLanguage || '000'
+              );
+              updateAttribute(
+                'mainLanguageName',
+                getLanguageRefName(documentDetails.mainLanguage)
               );
             }
+
+            if (documentDetails.license) {
+              let licenseObject = null;
+
+              if (typeof documentDetails.license === 'string') {
+                licenseObject = getLicenseByName(documentDetails.license);
+              }
+              updateAttribute('license', licenseObject);
+            }
+
+            updateAttribute('editor', documentDetails.editor ?? null);
+            updateAttribute('library', documentDetails.library ?? null);
+            updateAttribute(
+              'selectOptionAuthorizationDocument',
+              documentDetails.authorizationDocument
+                ? DOCUMENT_AUTHORIZE_TO_PUBLISH
+                : null
+            );
+
+            if (documentDetails.authorizationDocument) {
+              const authResponse = await dispatch(fetchAuthorizationDocumentDetails(documentDetails.authorizationDocument.id));
+              if (authResponse.type === FETCH_AUTHORIZATION_DOCUMENT_DETAILS_SUCCESS) {
+                const authDocumentDetails = authResponse.data;
+                updateAttribute('authorizationDocument', authDocumentDetails);
+              }
+            }
           }
+        } catch (error) {
+          console.error('Error fetching parent document details:', error);
         }
       }
     }

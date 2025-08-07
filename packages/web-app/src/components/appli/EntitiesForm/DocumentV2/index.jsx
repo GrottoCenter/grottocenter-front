@@ -16,7 +16,6 @@ import { displayLoginDialog } from '../../../../actions/Login';
 
 import DocumentFormProvider, { DocumentFormContext } from './Provider';
 import { defaultDocumentValuesTypes } from './types';
-import FormContent from './FormContent';
 import ChoiceTypeOfForm from './ChoiceTypeOfForm';
 import CreatingDocumentDialog from './CreatingDocumentDialog';
 import Translate from '../../../common/Translate';

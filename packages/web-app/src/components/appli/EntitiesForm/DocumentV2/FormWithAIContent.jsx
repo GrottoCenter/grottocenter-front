@@ -31,7 +31,7 @@ const SubmitButton = styled(Button)`
   margin: auto;
 `;
 
-const FormContent = () => {
+const FormWithAIContent = () => {
   const { document, isFormValid, isNewDocument, updateAttribute } =
     useContext(DocumentFormContext);
   const { formatMessage } = useIntl();
@@ -101,4 +101,4 @@ const FormContent = () => {
   );
 };
 
-export default FormContent;
+export default FormWithAIContent;
