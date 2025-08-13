@@ -1,63 +1,120 @@
+// ...existing code...
 import React from 'react';
 
-import React from 'react';
-import { Box, Typography, CircularProgress, Chip } from '@mui/material';
+import { Box, Typography, CircularProgress } from '@mui/material';
 import { CheckCircle, Cancel, AccessTime } from '@mui/icons-material';
 
-const Process = ({
-    name,
-    state, // 'pending', 'success', 'error'
-}) => {
-    
-    const getStatusConfig = () => {
-        switch (state) {
-            case 'pending':
-                return {
-                    icon: <CircularProgress size={16} />,
-                    color: 'primary',
-                    bgColor: 'primary.light',
-                    textColor: 'primary.dark'
-                };
-            case 'success':
-                return {
-                    icon: <CheckCircle sx={{ fontSize: 16 }} />,
-                    color: 'success',
-                    bgColor: 'success.light',
-                    textColor: 'success.dark'
-                };
-            case 'error':
-                return {
-                    icon: <Cancel sx={{ fontSize: 16 }} />,
-                    color: 'error',
-                    bgColor: 'error.light',
-                    textColor: 'error.dark'
-                };
-            default:
-                return {
-                    icon: <AccessTime sx={{ fontSize: 16 }} />,
-                    color: 'default',
-                    bgColor: 'grey.200',
-                    textColor: 'text.primary'
-                };
+const Process = ({ name, state }) => {
+  const getStatusConfig = () => {
+    switch (state) {
+      case 'pending':
+        return {
+          icon: <CircularProgress size={22} thickness={5} />,
+          borderColor: 'primary.main',
+          textColor: 'primary.main',
+          bg: '#ffffff'
+        };
+      case 'success':
+        return {
+          icon: <CheckCircle color="success" sx={{ fontSize: 30 }} />,
+            borderColor: 'success.light',
+          textColor: 'success.main',
+          bg: '#ffffff'
+        };
+      case 'error':
+        return {
+          icon: <Cancel color="error" sx={{ fontSize: 30 }} />,
+          borderColor: 'error.light',
+          textColor: 'error.main',
+          bg: '#ffffff'
+        };
+      default:
+        return {
+          icon: <AccessTime sx={{ fontSize: 30, color: 'text.secondary' }} />,
+          borderColor: 'grey.300',
+          textColor: 'text.secondary',
+          bg: '#ffffff'
+        };
+    }
+  };
+
+  const cfg = getStatusConfig();
+
+  return (
+    <Box
+      role="status"
+      aria-label={`${name} - ${state}`}
+      sx={{
+        width: '100%',
+        backgroundColor: cfg.bg,
+        border: '1px solid',
+        borderColor: cfg.borderColor,
+        borderRadius: 2,
+        px: 3,
+        py: 2.5,
+        mb: 2,
+        display: 'flex',
+        alignItems: 'center',
+        gap: 2,
+        boxShadow: 1,
+        transition: 'border-color .25s, box-shadow .25s',
+        '&:hover': {
+          boxShadow: 3
         }
-    };
-
-    const config = getStatusConfig();
-
-    return (
-        <Chip
-            icon={config.icon}
-            label={name}
-            variant="outlined"
-            color={config.color}
-            sx={{
-                mb: 1,
-                '& .MuiChip-label': {
-                    fontWeight: 500
-                }
-            }}
-        />
-    );
+      }}
+    >
+      <Box
+        sx={{
+          width: 46,
+          height: 46,
+          borderRadius: '50%',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          background:
+            state === 'idle'
+              ? 'linear-gradient(135deg,#f5f5f5,#fafafa)'
+              : 'linear-gradient(135deg,#ffffff,#f5f5f5)',
+          flexShrink: 0,
+          border: '1px solid',
+          borderColor: cfg.borderColor
+        }}
+      >
+        {cfg.icon}
+      </Box>
+      <Box
+        sx={{
+          flexGrow: 1,
+          textAlign: 'center'
+        }}
+      >
+        <Typography
+          variant="subtitle1"
+          sx={{
+            fontWeight: 600,
+            color: cfg.textColor,
+            letterSpacing: '.3px'
+          }}
+        >
+          {name}
+        </Typography>
+        <Typography
+          variant="caption"
+          sx={{ color: 'text.secondary', textTransform: 'uppercase' }}
+        >
+          {state === 'idle'
+            ? 'En attente'
+            : state === 'pending'
+            ? 'En cours...'
+            : state === 'success'
+            ? 'Terminé'
+            : state === 'error'
+            ? 'Échec'
+            : state}
+        </Typography>
+      </Box>
+    </Box>
+  );
 };
 
 export default Process;

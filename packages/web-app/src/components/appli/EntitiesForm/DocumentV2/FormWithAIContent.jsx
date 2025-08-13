@@ -1,6 +1,6 @@
-import React, { useContext, Suspense } from 'react';
+import React, { useContext, Suspense, useState } from 'react';
 import { styled } from '@mui/material/styles';
-import { FormControl, Button, Skeleton } from '@mui/material';
+import { FormControl, Button, Typography } from '@mui/material';
 
 import { useIntl } from 'react-intl';
 
@@ -15,6 +15,8 @@ import MultipleSubjectsSelect from './formElements/MultipleSubjectsSelect';
 import OrganizationAutoComplete from './formElements/OrganizationAutoComplete';
 import PagesEditor from './formElements/PagesEditor';
 import IdentifierEditor from './formElements/IdentifierEditor';
+import AIService from './AIService';
+import ParentDocument from './ParentDocument'
 
 import { FormContainer, FormRow } from '../utils/FormContainers';
 import AddFileForm from '../../../common/AddFileForm';
@@ -38,15 +40,22 @@ const FormWithAIContent = () => {
 
   const { isCollection, isArticle, isImage, isIssue, isUnknown } =
     useDocumentTypes();
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [displayParent, setDisplayParent] = useState(false);
+
+  const handleAIStart = async (event) => {
+    event.preventDefault();
+    if (document.files.length > 0) {
+      setIsProcessing(true);
+    }
+  };
 
   return (
     <FormContainer>
 
       {!isUnknown(document.type) && (
         <>
-
         <>
-        
         </>
 
           {(isArticle(document.type) || isIssue(document.type)) && (
@@ -81,20 +90,32 @@ const FormWithAIContent = () => {
             }
           />
 
-          <FormControl>
-            <SubmitButton
-              type="submit"
-              variant="contained"
-              color="primary"
-              size="large"
-              disabled={!isFormValid}>
-              {isNewDocument ? (
-                <Translate>Submit</Translate>
-              ) : (
-                <Translate>Update</Translate>
-              )}
-            </SubmitButton>
+          <FormControl sx={{ mt: 2 }}>
+            <Button
+              variant="outlined"
+              onClick={handleAIStart}
+              disabled={isProcessing || document.files.length === 0}
+            >
+              Lancer l'analyse IA
+            </Button>
           </FormControl>
+
+          <br />
+          <AIService
+            start={isProcessing}
+            files={document.files}
+            onDone={() => {
+              setDisplayParent(true);
+            }}
+          />
+
+          {displayParent && (
+            <>
+              <br />
+              <Typography variant="h6">Document information</Typography>
+              <ParentDocument />
+            </>
+          )}
         </>
       )}
     </FormContainer>

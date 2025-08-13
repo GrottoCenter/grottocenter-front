@@ -41,7 +41,6 @@ const { document, isFormValid, isNewDocument, updateAttribute } =
 
   return (
     <FormContainer>
-      <DocumentTypeSelect helperText="Choose from the types of documents available." />
 
       {!isUnknown(document.type) && (
         <>

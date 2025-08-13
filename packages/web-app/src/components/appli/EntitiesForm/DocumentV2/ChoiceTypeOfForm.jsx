@@ -11,8 +11,9 @@ import DocumentTypeSelect from './formElements/DocumentTypeSelect';
 
 const ChoiceTypeOfForm = ({}) => {
     const [ hasFileToUpload, setHasFileToUpload ] = useState(null)
-    const { document, updateAttribute } = useContext(DocumentFormContext);
+    const { document, updateAttribute, isNewDocument } = useContext(DocumentFormContext);
     const { isArticle, isIssue } = useDocumentTypes();
+
 
     const handleYes = () => {
         setHasFileToUpload(true);
@@ -26,7 +27,7 @@ const ChoiceTypeOfForm = ({}) => {
     return (
         <Box>
             <DocumentTypeSelect helperText="Choose the type of document you want to create." />
-            {(isArticle(document.type) || isIssue(document.type)) ? (
+            {((isArticle(document.type) || isIssue(document.type))) ? (
                 <Box>
                     <ButtonChoice 
                         text='Avez-vous un fichier à télécharger ?'
@@ -51,10 +52,11 @@ const ChoiceTypeOfForm = ({}) => {
                             <ParentDocument />
                     )}
                 </Box>
-            ) : (
+            ) : (document?.type && document?.type !== -1 && (
                 <Box sx={{ textAlign: 'center', mt: 4 }}>
                     <ParentDocument />
                 </Box>
+                )
             )}
         </Box>
     )
