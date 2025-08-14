@@ -3,8 +3,10 @@ import { getDocumentDetailsUrl } from '../../conf/apiRoutes';
 import { checkAndGetStatus } from '../utils';
 
 export const FETCH_PARENT_DOCUMENT_DETAILS = 'FETCH_PARENT_DOCUMENT_DETAILS';
-export const FETCH_PARENT_DOCUMENT_DETAILS_SUCCESS = 'FETCH_PARENT_DOCUMENT_DETAILS_SUCCESS';
-export const FETCH_PARENT_DOCUMENT_DETAILS_FAILURE = 'FETCH_PARENT_DOCUMENT_DETAILS_FAILURE';
+export const FETCH_PARENT_DOCUMENT_DETAILS_SUCCESS =
+  'FETCH_PARENT_DOCUMENT_DETAILS_SUCCESS';
+export const FETCH_PARENT_DOCUMENT_DETAILS_FAILURE =
+  'FETCH_PARENT_DOCUMENT_DETAILS_FAILURE';
 
 export const fetchParentDocumentDetails =
   (documentId, requireUpdate) => (dispatch, getState) => {
@@ -21,7 +23,9 @@ export const fetchParentDocumentDetails =
     )
       .then(checkAndGetStatus)
       .then(response => response.json())
-      .then(data => dispatch({ type: FETCH_PARENT_DOCUMENT_DETAILS_SUCCESS, data }))
+      .then(data =>
+        dispatch({ type: FETCH_PARENT_DOCUMENT_DETAILS_SUCCESS, data })
+      )
       .catch(error =>
         dispatch({ type: FETCH_PARENT_DOCUMENT_DETAILS_FAILURE, error })
       );

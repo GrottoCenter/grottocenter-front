@@ -1,5 +1,5 @@
-// ...existing code...
 import React from 'react';
+import propTypes from 'prop-types';
 
 import { Box, Typography, CircularProgress } from '@mui/material';
 import { CheckCircle, Cancel, AccessTime } from '@mui/icons-material';
@@ -17,7 +17,7 @@ const Process = ({ name, state }) => {
       case 'success':
         return {
           icon: <CheckCircle color="success" sx={{ fontSize: 30 }} />,
-            borderColor: 'success.light',
+          borderColor: 'success.light',
           textColor: 'success.main',
           bg: '#ffffff'
         };
@@ -40,6 +40,21 @@ const Process = ({ name, state }) => {
 
   const cfg = getStatusConfig();
 
+  const stateLabel = (() => {
+    switch (state) {
+      case 'idle':
+        return 'En attente';
+      case 'pending':
+        return 'En cours...';
+      case 'success':
+        return 'Terminé';
+      case 'error':
+        return 'Échec';
+      default:
+        return state;
+    }
+  })();
+
   return (
     <Box
       role="status"
@@ -61,8 +76,7 @@ const Process = ({ name, state }) => {
         '&:hover': {
           boxShadow: 3
         }
-      }}
-    >
+      }}>
       <Box
         sx={{
           width: 46,
@@ -78,43 +92,28 @@ const Process = ({ name, state }) => {
           flexShrink: 0,
           border: '1px solid',
           borderColor: cfg.borderColor
-        }}
-      >
+        }}>
         {cfg.icon}
       </Box>
-      <Box
-        sx={{
-          flexGrow: 1,
-          textAlign: 'center'
-        }}
-      >
+      <Box sx={{ flexGrow: 1, textAlign: 'center' }}>
         <Typography
           variant="subtitle1"
-          sx={{
-            fontWeight: 600,
-            color: cfg.textColor,
-            letterSpacing: '.3px'
-          }}
-        >
+          sx={{ fontWeight: 600, color: cfg.textColor, letterSpacing: '.3px' }}>
           {name}
         </Typography>
         <Typography
           variant="caption"
-          sx={{ color: 'text.secondary', textTransform: 'uppercase' }}
-        >
-          {state === 'idle'
-            ? 'En attente'
-            : state === 'pending'
-            ? 'En cours...'
-            : state === 'success'
-            ? 'Terminé'
-            : state === 'error'
-            ? 'Échec'
-            : state}
+          sx={{ color: 'text.secondary', textTransform: 'uppercase' }}>
+          {stateLabel}
         </Typography>
       </Box>
     </Box>
   );
+};
+
+Process.propTypes = {
+  name: propTypes.string.isRequired,
+  state: propTypes.oneOf(['idle', 'pending', 'success', 'error']).isRequired
 };
 
 export default Process;

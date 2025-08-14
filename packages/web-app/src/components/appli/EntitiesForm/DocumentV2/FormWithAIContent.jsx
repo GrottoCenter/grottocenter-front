@@ -1,49 +1,28 @@
-import React, { useContext, Suspense, useState } from 'react';
-import { styled } from '@mui/material/styles';
+import React, { useContext, useState } from 'react';
 import { FormControl, Button, Typography } from '@mui/material';
 
 import { useIntl } from 'react-intl';
 
 import { DocumentFormContext } from './Provider';
 
-import DocumentTypeSelect from './formElements/DocumentTypeSelect';
-import LanguageAutoComplete from './formElements/LanguageAutoComplete';
 import DocumentAutoComplete from './formElements/DocumentAutoComplete';
-import MultipleISORegionsSelect from './formElements/MultipleISORegionsSelect';
-import MultipleCaversSelect from './formElements/MultipleCaversSelect';
-import MultipleSubjectsSelect from './formElements/MultipleSubjectsSelect';
-import OrganizationAutoComplete from './formElements/OrganizationAutoComplete';
-import PagesEditor from './formElements/PagesEditor';
-import IdentifierEditor from './formElements/IdentifierEditor';
 import AIService from './AIService';
-import ParentDocument from './ParentDocument'
+import ParentDocument from './ParentDocument';
 
-import { FormContainer, FormRow } from '../utils/FormContainers';
+import { FormContainer } from '../utils/FormContainers';
 import AddFileForm from '../../../common/AddFileForm';
-import StringInput from '../../../common/Form/StringInput';
 import Translate from '../../../common/Translate';
 import { useDocumentTypes } from '../../../../hooks';
 
-const PublicationDatePicker = React.lazy(
-  () => import('./formElements/PublicationDatePicker')
-);
-
-const SubmitButton = styled(Button)`
-  display: block;
-  margin: auto;
-`;
-
 const FormWithAIContent = () => {
-  const { document, isFormValid, isNewDocument, updateAttribute } =
-    useContext(DocumentFormContext);
+  const { document, updateAttribute } = useContext(DocumentFormContext);
   const { formatMessage } = useIntl();
 
-  const { isCollection, isArticle, isImage, isIssue, isUnknown } =
-    useDocumentTypes();
+  const { isArticle, isIssue, isUnknown } = useDocumentTypes();
   const [isProcessing, setIsProcessing] = useState(false);
   const [displayParent, setDisplayParent] = useState(false);
 
-  const handleAIStart = async (event) => {
+  const handleAIStart = async event => {
     event.preventDefault();
     if (document.files.length > 0) {
       setIsProcessing(true);
@@ -52,12 +31,8 @@ const FormWithAIContent = () => {
 
   return (
     <FormContainer>
-
       {!isUnknown(document.type) && (
         <>
-        <>
-        </>
-
           {(isArticle(document.type) || isIssue(document.type)) && (
             <DocumentAutoComplete
               contextValueName="parent"
@@ -94,9 +69,8 @@ const FormWithAIContent = () => {
             <Button
               variant="outlined"
               onClick={handleAIStart}
-              disabled={isProcessing || document.files.length === 0}
-            >
-              Lancer l'analyse IA
+              disabled={isProcessing || document.files.length === 0}>
+              analyse with AI
             </Button>
           </FormControl>
 

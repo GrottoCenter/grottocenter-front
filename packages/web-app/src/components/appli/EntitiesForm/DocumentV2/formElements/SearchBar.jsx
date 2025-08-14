@@ -8,9 +8,14 @@ import { useDebounce } from '../../../../../hooks';
 import AutoCompleteSearchComponent from '../../../../common/AutoCompleteSearch';
 import { AutoCompleteSearchTypes } from '../../../../common/AutoCompleteSearch/types';
 
-import { fetchDocumentDetails, FETCH_DOCUMENT_DETAILS_SUCCESS } from '../../../../../actions/Document/GetDocumentDetails';
-import { fetchParentDocumentDetails, FETCH_PARENT_DOCUMENT_DETAILS_SUCCESS } from '../../../../../actions/Document/GetParentDocumentDetails';
-import { fetchAuthorizationDocumentDetails, FETCH_AUTHORIZATION_DOCUMENT_DETAILS_SUCCESS } from '../../../../../actions/Document/GetAuthorizationDocumentDetails';
+import {
+  fetchParentDocumentDetails,
+  FETCH_PARENT_DOCUMENT_DETAILS_SUCCESS
+} from '../../../../../actions/Document/GetParentDocumentDetails';
+import {
+  fetchAuthorizationDocumentDetails,
+  FETCH_AUTHORIZATION_DOCUMENT_DETAILS_SUCCESS
+} from '../../../../../actions/Document/GetAuthorizationDocumentDetails';
 import { fetchLicense } from '../../../../../actions/Licenses';
 import { DOCUMENT_AUTHORIZE_TO_PUBLISH } from '../../../../common/AddFileForm/OptionSelect';
 
@@ -69,8 +74,9 @@ const SearchBar = props => {
       updateAttribute(contextValueName, newValue);
       if (contextValueName === 'parent') {
         try {
-          const resultAction = await dispatch(fetchParentDocumentDetails(newValue.id));
-          console.log(resultAction)
+          const resultAction = await dispatch(
+            fetchParentDocumentDetails(newValue.id)
+          );
 
           if (resultAction.type === FETCH_PARENT_DOCUMENT_DETAILS_SUCCESS) {
             const documentDetails = resultAction.data;
@@ -108,8 +114,15 @@ const SearchBar = props => {
             );
 
             if (documentDetails.authorizationDocument) {
-              const authResponse = await dispatch(fetchAuthorizationDocumentDetails(documentDetails.authorizationDocument.id));
-              if (authResponse.type === FETCH_AUTHORIZATION_DOCUMENT_DETAILS_SUCCESS) {
+              const authResponse = await dispatch(
+                fetchAuthorizationDocumentDetails(
+                  documentDetails.authorizationDocument.id
+                )
+              );
+              if (
+                authResponse.type ===
+                FETCH_AUTHORIZATION_DOCUMENT_DETAILS_SUCCESS
+              ) {
                 const authDocumentDetails = authResponse.data;
                 updateAttribute('authorizationDocument', authDocumentDetails);
               }

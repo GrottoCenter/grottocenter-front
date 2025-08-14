@@ -2,9 +2,12 @@ import fetch from 'isomorphic-fetch';
 import { getDocumentDetailsUrl } from '../../conf/apiRoutes';
 import { checkAndGetStatus } from '../utils';
 
-export const FETCH_AUTHORIZATION_DOCUMENT_DETAILS = 'FETCH_AUTHORIZATION_DOCUMENT_DETAILS';
-export const FETCH_AUTHORIZATION_DOCUMENT_DETAILS_SUCCESS = 'FETCH_AUTHORIZATION_DOCUMENT_DETAILS_SUCCESS';
-export const FETCH_AUTHORIZATION_DOCUMENT_DETAILS_FAILURE = 'FETCH_AUTHORIZATION_DOCUMENT_DETAILS_FAILURE';
+export const FETCH_AUTHORIZATION_DOCUMENT_DETAILS =
+  'FETCH_AUTHORIZATION_DOCUMENT_DETAILS';
+export const FETCH_AUTHORIZATION_DOCUMENT_DETAILS_SUCCESS =
+  'FETCH_AUTHORIZATION_DOCUMENT_DETAILS_SUCCESS';
+export const FETCH_AUTHORIZATION_DOCUMENT_DETAILS_FAILURE =
+  'FETCH_AUTHORIZATION_DOCUMENT_DETAILS_FAILURE';
 
 export const fetchAuthorizationDocumentDetails =
   (documentId, requireUpdate) => (dispatch, getState) => {
@@ -21,7 +24,9 @@ export const fetchAuthorizationDocumentDetails =
     )
       .then(checkAndGetStatus)
       .then(response => response.json())
-      .then(data => dispatch({ type: FETCH_AUTHORIZATION_DOCUMENT_DETAILS_SUCCESS, data }))
+      .then(data =>
+        dispatch({ type: FETCH_AUTHORIZATION_DOCUMENT_DETAILS_SUCCESS, data })
+      )
       .catch(error =>
         dispatch({ type: FETCH_AUTHORIZATION_DOCUMENT_DETAILS_FAILURE, error })
       );

@@ -1,4 +1,4 @@
-import React, { useContext, Suspense} from 'react'
+import React, { useContext, Suspense } from 'react';
 import { styled } from '@mui/material/styles';
 import { FormControl, Button, Skeleton } from '@mui/material';
 
@@ -6,7 +6,6 @@ import { useIntl } from 'react-intl';
 
 import { DocumentFormContext } from './Provider';
 
-import DocumentTypeSelect from './formElements/DocumentTypeSelect';
 import LanguageAutoComplete from './formElements/LanguageAutoComplete';
 import DocumentAutoComplete from './formElements/DocumentAutoComplete';
 import MultipleISORegionsSelect from './formElements/MultipleISORegionsSelect';
@@ -17,7 +16,6 @@ import PagesEditor from './formElements/PagesEditor';
 import IdentifierEditor from './formElements/IdentifierEditor';
 
 import { FormContainer, FormRow } from '../utils/FormContainers';
-import AddFileForm from '../../../common/AddFileForm';
 import StringInput from '../../../common/Form/StringInput';
 import Translate from '../../../common/Translate';
 import { useDocumentTypes } from '../../../../hooks';
@@ -32,7 +30,7 @@ const SubmitButton = styled(Button)`
 `;
 
 const ParentDocument = () => {
-const { document, isFormValid, isNewDocument, updateAttribute } =
+  const { document, isFormValid, isNewDocument, updateAttribute } =
     useContext(DocumentFormContext);
   const { formatMessage } = useIntl();
 
@@ -41,7 +39,6 @@ const { document, isFormValid, isNewDocument, updateAttribute } =
 
   return (
     <FormContainer>
-
       {!isUnknown(document.type) && (
         <>
           <FormRow>
