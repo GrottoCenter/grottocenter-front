@@ -29,6 +29,10 @@ const FormWithAIContent = () => {
     }
   };
 
+  const handleAIServiceDone = React.useCallback(() => {
+    setDisplayParent(true);
+  }, []);
+
   return (
     <FormContainer>
       {!isUnknown(document.type) && (
@@ -78,9 +82,7 @@ const FormWithAIContent = () => {
           <AIService
             start={isProcessing}
             files={document.files}
-            onDone={() => {
-              setDisplayParent(true);
-            }}
+            onDone={handleAIServiceDone}
           />
 
           {displayParent && (

@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import PropTypes from 'prop-types';
 
-import { DocumentFormContext } from '../EntitiesForm/Document/Provider';
+import { DocumentFormContext } from '../EntitiesForm/DocumentV2/Provider';
 
 import FormAutoCompleteComponent from '../../common/Form/FormAutoComplete';
 import { FormAutoCompleteTypes } from '../../common/Form/types';
