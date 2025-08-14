@@ -25,7 +25,12 @@ const testData = {
   author: ['Auteur inconnu'],
   subject: null,
   keywords: ['Lo Bramavenc', 'Spéléo-Club de l’Aude', 'spéléologie'],
-  creator: "Club de spéléologie de l'Aube",
+  editor: {
+    id: 2317,
+    isDeleted: false,
+    language: '000',
+    name: "Spéléo Club de l'Aude"
+  },
   producer: 'Skia/PDF m137',
   creation_date: "D:20250812151804+00'00'",
   modification_date: "D:20250812151804+00'00'",
@@ -52,6 +57,7 @@ const AIService = ({ start, onDone }) => {
       if (!AIDataServer) return;
       updateAttribute('title', AIDataServer.title);
       updateAttribute('authors', AIDataServer.authors);
+      updateAttribute('editor', AIDataServer.editor);
       updateAttribute('pages', AIDataServer.pages);
       updateAttribute(
         'description',
