@@ -6,7 +6,6 @@ import { useIntl } from 'react-intl';
 
 import { DocumentFormContext } from './Provider';
 
-import DocumentTypeSelect from './formElements/DocumentTypeSelect';
 import LanguageAutoComplete from './formElements/LanguageAutoComplete';
 import DocumentAutoComplete from './formElements/DocumentAutoComplete';
 import MultipleISORegionsSelect from './formElements/MultipleISORegionsSelect';
@@ -17,7 +16,6 @@ import PagesEditor from './formElements/PagesEditor';
 import IdentifierEditor from './formElements/IdentifierEditor';
 
 import { FormContainer, FormRow } from '../utils/FormContainers';
-import AddFileForm from '../../../common/AddFileForm';
 import StringInput from '../../../common/Form/StringInput';
 import Translate from '../../../common/Translate';
 import { useDocumentTypes } from '../../../../hooks';
@@ -31,7 +29,7 @@ const SubmitButton = styled(Button)`
   margin: auto;
 `;
 
-const FormContent = () => {
+const ParentDocument = () => {
   const { document, isFormValid, isNewDocument, updateAttribute } =
     useContext(DocumentFormContext);
   const { formatMessage } = useIntl();
@@ -41,8 +39,6 @@ const FormContent = () => {
 
   return (
     <FormContainer>
-      <DocumentTypeSelect helperText="Choose from the types of documents available." />
-
       {!isUnknown(document.type) && (
         <>
           <FormRow>
@@ -246,19 +242,6 @@ const FormContent = () => {
             valueName={formatMessage({ id: 'Comment' })}
           />
 
-          <AddFileForm
-            files={document.files}
-            setFiles={newFiles => updateAttribute('files', newFiles)}
-            option={document.selectOptionAuthorizationDocument}
-            setOption={newOption =>
-              updateAttribute('selectOptionAuthorizationDocument', newOption)
-            }
-            setLicense={newLicense => updateAttribute('license', newLicense)}
-            setAuthorizationDocument={newAuthorizationDocument =>
-              updateAttribute('authorizationDocument', newAuthorizationDocument)
-            }
-          />
-
           <FormControl>
             <SubmitButton
               type="submit"
@@ -279,4 +262,4 @@ const FormContent = () => {
   );
 };
 
-export default FormContent;
+export default ParentDocument;

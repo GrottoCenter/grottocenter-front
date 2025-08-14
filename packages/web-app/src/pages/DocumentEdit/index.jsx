@@ -4,7 +4,7 @@ import { CircularProgress } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useIntl } from 'react-intl';
-import DocumentSubmission from '../../components/appli/EntitiesForm/Document';
+import DocumentSubmission from '../../components/appli/EntitiesForm/DocumentV2';
 import { fetchDocumentDetails } from '../../actions/Document/GetDocumentDetails';
 import { resetDocumentApiErrors } from '../../actions/Document/ResetApiErrors';
 import Layout from '../../components/common/Layouts/Fixed/FixedContent';

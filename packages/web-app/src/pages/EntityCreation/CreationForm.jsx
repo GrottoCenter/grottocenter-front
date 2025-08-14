@@ -13,7 +13,7 @@ import { includes, values } from 'ramda';
 import Translate from '../../components/common/Translate';
 import OrganizationForm from '../../components/appli/EntitiesForm/Organization';
 import { EntranceForm, MassifForm } from '../../components/appli/EntitiesForm';
-import DocumentSubmission from '../../components/appli/EntitiesForm/Document';
+import DocumentSubmission from '../../components/appli/EntitiesForm/DocumentV2';
 
 const StyledFormControl = styled(FormControl)`
   margin-bottom: 2em;
