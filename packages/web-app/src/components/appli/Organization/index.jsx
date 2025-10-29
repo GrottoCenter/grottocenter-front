@@ -11,12 +11,11 @@ import PersonRemoveIcon from '@mui/icons-material/PersonRemove';
 import FixedContent from '../../common/Layouts/Fixed/FixedContent';
 import BadgesSection from './BadgesSection';
 import Details from './Details';
-import RelatedCaves from './RelatedCaves';
 import { GrottoFullPropTypes } from '../../../types/grotto.type';
-import UsersList from '../../common/UsersList/UsersList';
 import Alert from '../../common/Alert';
 import { usePermissions } from '../../../hooks';
 import DocumentsList from '../../common/DocumentsList/DocumentsList';
+import EntitiesList from '../../common/entitiesList/EntitiesList';
 import {
   DeletedCard,
   DeleteConfirmationDialog,
@@ -196,49 +195,12 @@ const Organization = ({ error, isLoading, organization }) => {
               <Details organization={organization} />
 
               <hr />
-              <UsersList
-                users={organization.cavers}
-                emptyMessageComponent={
-                  <Alert
-                    severity="info"
-                    title={formatMessage({
-                      id: 'This organization has no members yet.'
-                    })}
-                  />
-                }
+              <EntitiesList
+                type="user"
+                entites={organization.cavers}
                 title={formatMessage({ id: 'Members (former members)' })}
-                onRemoveMember={permissions.isAdmin ? handleRemoveMember : null}
-                showRemoveButton={permissions.isAdmin}
-                actionButton={
-                  permissions.isAuth && (
-                    <>
-                      <Tooltip
-                        title={formatMessage({
-                          id: isMember
-                            ? 'Leave organization'
-                            : 'Join organization'
-                        })}>
-                        <Button
-                          variant="outlined"
-                          color="primary"
-                          onClick={handleJoinLeave}
-                          disabled={isJoining}
-                          startIcon={
-                            isMember ? <PersonRemoveIcon /> : <PersonAddIcon />
-                          }>
-                          {isMember
-                            ? formatMessage({ id: 'Leave organization' })
-                            : formatMessage({ id: 'Join organization' })}
-                        </Button>
-                      </Tooltip>
-                      {joinLeaveError && (
-                        <Alert severity="error" title={joinLeaveError} />
-                      )}
-                    </>
-                  )
-                }
+                hasDivider
               />
-              <hr />
               <DocumentsList
                 title={formatMessage({ id: 'Collections' })}
                 documents={organization.documents}
@@ -252,12 +214,16 @@ const Organization = ({ error, isLoading, organization }) => {
                 }
               />
               <hr />
-
-              <RelatedCaves
-                exploredEntrances={organization.exploredEntrances}
-                exploredNetworks={organization.exploredNetworks}
-                organizationId={organization.id}
-                isMember={isMember}
+              <EntitiesList
+                type="entrance"
+                entites={organization.exploredEntrances}
+                title={formatMessage({ id: 'Explored entrances' })}
+                hasDivider
+              />
+              <EntitiesList
+                type="cave"
+                entites={organization.exploredNetworks}
+                title={formatMessage({ id: 'Explored networks' })}
               />
             </>
           )}

@@ -14,7 +14,7 @@ import { unsubscribeFromMassif } from '../../../actions/Subscriptions/Unsubscrib
 import { deleteMassif } from '../../../actions/Massif/DeleteMassif';
 import { restoreMassif } from '../../../actions/Massif/RestoreMassif';
 import FixedContent from '../../common/Layouts/Fixed/FixedContent';
-import CavesList from '../../common/cave/CavesList';
+import EntitiesList from '../../common/entitiesList/EntitiesList';
 import Alert from '../../common/Alert';
 import MapMassif from './MapMassif';
 import Documents from './Documents';
@@ -189,16 +189,9 @@ const Massif = ({ isLoading, error, massif }) => {
                 massifId={massifId}
               />
               <hr />
-              <CavesList
-                caves={massif?.networks ?? []}
-                emptyMessageComponent={
-                  <Alert
-                    severity="info"
-                    title={formatMessage({
-                      id: 'This massif has no networks listed yet.'
-                    })}
-                  />
-                }
+              <EntitiesList
+                type="cave"
+                entites={massif?.networks ?? []}
                 title={formatMessage({ id: 'Networks list' })}
               />
             </>

@@ -11,10 +11,9 @@ import subscriptionsType from '../../../types/subscriptions.type';
 import { PersonPropTypes } from '../../../types/person.type';
 import REDUCER_STATUS from '../../../reducers/ReducerStatus';
 import FixedContent from '../../common/Layouts/Fixed/FixedContent';
-import EntrancesList from '../../common/entrance/EntrancesList';
 import Alert from '../../common/Alert';
 import DocumentsList from '../../common/DocumentsList/DocumentsList';
-import OrganizationsList from '../../common/Organizations/OrganizationsList';
+import EntitiesList from '../../common/entitiesList/EntitiesList';
 import PersonProperties from '../../common/Person/PersonProperties';
 import SubscriptionsList from '../../common/Subscriptions/SubscriptionsList';
 import { deletePerson } from '../../../actions/Person/DeletePerson';
@@ -131,22 +130,26 @@ const Person = ({
                 subscriptionsStatus={subscriptionsStatus}
                 title={formatMessage({ id: 'Subscriptions' })}
               />
-              <hr />
-              <DocumentsList
-                title={formatMessage({ id: 'Documents' })}
-                documents={person.documents}
-              />
-              <hr />
-              <OrganizationsList
-                orgas={person.organizations}
+              {person.documents.length > 0 && (
+                <>
+                  <DocumentsList
+                    title={formatMessage({ id: 'Documents' })}
+                    documents={person.documents}
+                  />
+                  <hr />
+                </>
+              )}
+              <EntitiesList
+                type="organization"
+                entites={person.organizations}
                 title={formatMessage({ id: 'Organizations' })}
                 onRemove={canEdit ? handleLeaveOrganization : null}
                 showRemove={canEdit}
               />
-              <hr />
-              <EntrancesList
+              <EntitiesList
+                type="entrance"
+                entites={person.exploredEntrances}
                 title={formatMessage({ id: 'List of explored caves' })}
-                entrances={person.exploredEntrances}
               />
             </>
           )}

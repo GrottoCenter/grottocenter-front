@@ -2,8 +2,14 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import { useSelector } from 'react-redux';
-import { Avatar, Box, ListItem, ListItemText, Typography, IconButton, Tooltip } from '@mui/material';
-import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
+import {
+  Avatar,
+  Box,
+  ListItemButton,
+  ListItem,
+  ListItemText,
+  Typography
+} from '@mui/material';
 import { Link } from 'react-router-dom';
 import { styled } from '@mui/material/styles';
 
@@ -20,7 +26,7 @@ const StyledListItem = styled(ListItem)`
   min-width: 250px;
 `;
 
-const CaveListItem = ({ cave, onRemove, showRemove }) => {
+export const CaveListItem = ({ cave }) => {
   const { locale } = useSelector(state => state.intl);
   const { formatMessage } = useIntl();
 
@@ -128,4 +134,24 @@ CaveListItem.propTypes = {
   showRemove: PropTypes.bool
 };
 
-export default CaveListItem;
+const StyledListItemButton = styled(ListItemButton)`
+  flex-basis: 25%;
+  min-width: 250px;
+`;
+
+export const DefaultListItem = ({ link, label, isMultiline = false }) => (
+  <StyledListItemButton to={link} component={Link}>
+    <ListItemText
+      primary={label}
+      primaryTypographyProps={
+        isMultiline ? { style: { whiteSpace: 'normal' } } : {}
+      }
+    />
+  </StyledListItemButton>
+);
+
+DefaultListItem.propTypes = {
+  link: PropTypes.string.isRequired,
+  label: PropTypes.string.isRequired,
+  isMultiline: PropTypes.bool
+};
