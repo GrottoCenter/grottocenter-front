@@ -8,6 +8,7 @@ import Linkify from 'linkify-react';
 
 import { FlagRounded } from '@mui/icons-material';
 import CustomMapContainer from '../../common/Maps/common/MapContainer';
+import MultilinesTypography from '../../common/MultilinesTypography';
 import OrganizationMarker from '../../common/Maps/common/Markers/Components/OrganizationMarker';
 import OrganizationPopup from '../../common/Maps/common/Markers/Components/OrganizationPopup';
 import { Property } from '../../common/Properties';
@@ -41,12 +42,15 @@ const Details = ({ organization }) => {
         justifyContent="space-between">
         <Box display="block">
           <ContentWrapper>
-            <StyledLocationIcon color="primary" />
+            {organization.address ||
+            organization.postalCode ||
+            organization.city ? (
+              <StyledLocationIcon color="primary" />
+            ) : null}
             <Typography>
               {organization.address && `${organization.address}`}
               {organization.postalCode && ` ${organization.postalCode}`}
               {organization.city && ` ${organization.city}`}
-              {organization.village && ` - ${organization.village}`}
               {organization.county && ` - ${organization.county}`}
               {organization.region && ` - ${organization.region}`}
             </Typography>
@@ -70,9 +74,9 @@ const Details = ({ organization }) => {
           )}
           {organization.customMessage && (
             <ContentWrapper>
-              <Typography>
+              <MultilinesTypography>
                 <Linkify>{organization.customMessage}</Linkify>
-              </Typography>
+              </MultilinesTypography>
             </ContentWrapper>
           )}
         </Box>
