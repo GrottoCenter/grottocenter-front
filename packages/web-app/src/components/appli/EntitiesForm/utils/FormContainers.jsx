@@ -49,24 +49,34 @@ export const FormActionRow = ({
   isNew,
   isSubmitting,
   onReset,
-  isResetAllowed = true
+  isResetAllowed = true,
+  isCenter = false,
+  onCancel
 }) => {
   const { formatMessage } = useIntl();
   return (
-    <Box display="flex">
+    <Box
+      sx={{
+        display: 'flex',
+        justifyContent: isCenter ? 'center' : 'flex-end'
+      }}>
       <ActionButton
         label={formatMessage({
           id: isNew ? 'Create' : 'Update'
         })}
         loading={isSubmitting}
         color="primary"
-        icon={<Icon>send</Icon>}
-        style={{ margin: '8px', marginLeft: 'auto' }}
+        style={{ margin: '8px' }}
         type="submit"
       />
       {isResetAllowed && (
         <Button variant="outlined" disabled={!isDirty} onClick={onReset}>
           {formatMessage({ id: 'Reset' })}
+        </Button>
+      )}
+      {onCancel && (
+        <Button variant="text" onClick={onCancel}>
+          {formatMessage({ id: 'Cancel' })}
         </Button>
       )}
     </Box>
@@ -77,5 +87,7 @@ FormActionRow.propTypes = {
   isNew: PropTypes.bool.isRequired,
   isSubmitting: PropTypes.bool.isRequired,
   onReset: PropTypes.func.isRequired,
-  isResetAllowed: PropTypes.bool
+  isResetAllowed: PropTypes.bool,
+  isCenter: PropTypes.bool,
+  onCancel: PropTypes.func
 };

@@ -10,7 +10,7 @@ import { deleteComment } from '../../../../actions/Comment/DeleteComment';
 import { restoreComment } from '../../../../actions/Comment/RestoreComment';
 import ActionButtons from '../ActionButtons';
 import SectionTitle from '../SectionTitle';
-import CreateCommentForm from '../../Form/CommentForm/index';
+import CreateCommentForm from '../../EntitiesForm/Comment';
 import { CommentPropTypes } from '../../../../types/entrance.type';
 import Ratings from '../Ratings';
 import Contribution from '../../../common/Contribution/Contribution';

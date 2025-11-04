@@ -4,7 +4,7 @@ import { useDispatch } from 'react-redux';
 import { styled } from '@mui/material/styles';
 import PropTypes from 'prop-types';
 import { HistoryPropTypes } from '../../../../types/entrance.type';
-import CreateHistoryForm from '../../Form/HistoryForm/index';
+import CreateHistoryForm from '../../EntitiesForm/History';
 import { updateHistory } from '../../../../actions/History/UpdateHistory';
 import { deleteHistory } from '../../../../actions/History/DeleteHistory';
 import { restoreHistory } from '../../../../actions/History/RestoreHistory';

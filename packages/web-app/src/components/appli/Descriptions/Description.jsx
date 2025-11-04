@@ -5,7 +5,7 @@ import { useDispatch } from 'react-redux';
 import { styled } from '@mui/material/styles';
 import { SnapshotButton } from '../Entry/Snapshots/UtilityFunction';
 import { DescriptionPropTypes } from '../../../types/description.type';
-import CreateDescriptionForm from '../Form/DescriptionForm/index';
+import CreateDescriptionForm from '../EntitiesForm/Description/index';
 import { updateDescription } from '../../../actions/Description/UpdateDescription';
 import { deleteDescription } from '../../../actions/Description/DeleteDescription';
 import { restoreDescription } from '../../../actions/Description/RestoreDescription';

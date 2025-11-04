@@ -7,7 +7,7 @@ import { updateRiggings } from '../../../../actions/Riggings/UpdateRigging';
 import { deleteRiggings } from '../../../../actions/Riggings/DeleteRigging';
 import { restoreRiggings } from '../../../../actions/Riggings/RestoreRigging';
 import ActionButtons from '../ActionButtons';
-import CreateRiggingsForm from '../../Form/RiggingsForm/index';
+import CreateRiggingsForm from '../../EntitiesForm/Riggings';
 import { RiggingPropTypes } from '../../../../types/entrance.type';
 import Contribution from '../../../common/Contribution/Contribution';
 import RiggingTable from './RiggingTable';

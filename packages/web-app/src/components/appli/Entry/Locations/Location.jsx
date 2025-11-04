@@ -9,7 +9,7 @@ import { restoreLocation } from '../../../../actions/Location/RestoreLocation';
 import ActionButtons from '../ActionButtons';
 import SectionTitle from '../SectionTitle';
 import { LocationPropTypes } from '../../../../types/entrance.type';
-import CreateLocationForm from '../../Form/LocationForm/index';
+import CreateLocationForm from '../../EntitiesForm/Location';
 import { usePermissions } from '../../../../hooks';
 import Contribution from '../../../common/Contribution/Contribution';
 import { SnapshotButton } from '../Snapshots/UtilityFunction';
