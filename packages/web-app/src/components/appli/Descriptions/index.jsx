@@ -9,7 +9,7 @@ import CancelIcon from '@mui/icons-material/Cancel';
 import ScrollableContent from '../../common/Layouts/Fixed/ScrollableContent';
 import { DescriptionPropTypes } from '../../../types/description.type';
 import Description from './Description';
-import CreateDescriptionForm from '../Form/DescriptionForm';
+import CreateDescriptionForm from '../EntitiesForm/Description';
 import { postDescription } from '../../../actions/Description/CreateDescription';
 import { usePermissions } from '../../../hooks';
 import Alert from '../../common/Alert';

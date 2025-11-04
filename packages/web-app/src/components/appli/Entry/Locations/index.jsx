@@ -9,7 +9,7 @@ import CancelIcon from '@mui/icons-material/Cancel';
 import ScrollableContent from '../../../common/Layouts/Fixed/ScrollableContent';
 import { LocationPropTypes } from '../../../../types/entrance.type';
 import Location from './Location';
-import CreateLocationForm from '../../Form/LocationForm';
+import CreateLocationForm from '../../EntitiesForm/Location';
 import { postLocation } from '../../../../actions/Location/CreateLocation';
 import { usePermissions } from '../../../../hooks';
 import Alert from '../../../common/Alert';

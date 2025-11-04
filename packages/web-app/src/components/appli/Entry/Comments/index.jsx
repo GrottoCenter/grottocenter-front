@@ -9,7 +9,7 @@ import CancelIcon from '@mui/icons-material/Cancel';
 import ScrollableContent from '../../../common/Layouts/Fixed/ScrollableContent';
 import { CommentPropTypes } from '../../../../types/entrance.type';
 import Comment from './Comment';
-import CreateCommentForm from '../../Form/CommentForm';
+import CreateCommentForm from '../../EntitiesForm/Comment';
 import { postComment } from '../../../../actions/Comment/CreateComment';
 import { usePermissions } from '../../../../hooks';
 import Alert from '../../../common/Alert';

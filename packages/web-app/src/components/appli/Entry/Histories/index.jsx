@@ -9,7 +9,7 @@ import CancelIcon from '@mui/icons-material/Cancel';
 import ScrollableContent from '../../../common/Layouts/Fixed/ScrollableContent';
 import { HistoryPropTypes } from '../../../../types/entrance.type';
 import History from './History';
-import CreateHistoryForm from '../../Form/HistoryForm';
+import CreateHistoryForm from '../../EntitiesForm/History';
 import { postHistory } from '../../../../actions/History/CreateHistory';
 import { usePermissions } from '../../../../hooks';
 import Alert from '../../../common/Alert';

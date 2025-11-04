@@ -8,7 +8,7 @@ import CancelIcon from '@mui/icons-material/Cancel';
 import { styled } from '@mui/material/styles';
 import { usePermissions } from '../../../../hooks';
 import { postRiggings } from '../../../../actions/Riggings/CreateRigging';
-import CreateRiggingsForm from '../../Form/RiggingsForm/index';
+import CreateRiggingsForm from '../../EntitiesForm/Riggings';
 import ScrollableContent from '../../../common/Layouts/Fixed/ScrollableContent';
 import Rigging from './Rigging';
 import { RiggingPropTypes } from '../../../../types/entrance.type';
