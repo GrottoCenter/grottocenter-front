@@ -49,7 +49,7 @@ const ValueComponent = ({ secondary, value, url }) => {
 ValueComponent.propTypes = {
   secondary: PropTypes.bool,
   url: PropTypes.string,
-  value: PropTypes.oneOfType([PropTypes.number, PropTypes.string])
+  value: PropTypes.oneOfType([PropTypes.number, PropTypes.string, PropTypes.node])
 };
 
 const Property = ({
@@ -83,7 +83,7 @@ Property.propTypes = {
   label: PropTypes.string,
   secondary: PropTypes.bool,
   url: PropTypes.string,
-  value: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+  value: PropTypes.oneOfType([PropTypes.number, PropTypes.string, PropTypes.node]),
   flexBasis: PropTypes.string
 };
 

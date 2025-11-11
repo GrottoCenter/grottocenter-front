@@ -60,12 +60,16 @@ import signUp from './SignUpReducer';
 import snapshots from './SnapshotReducer';
 import statisticsMassif from './StatisticsMassifReducer';
 import statisticsCountry from './StatisticsCountryReducer';
+import statisticsRegion from './StatisticsRegionReducer';
+import regionDetails from './RegionDetailsReducer';
 import subject from './SubjectReducer';
 import subscribeToCountry from './SubscribeToCountryReducer';
 import subscribeToMassif from './SubscribeToMassifReducer';
+import subscribeToRegion from './SubscribeToRegionReducer';
 import subscriptions from './SubscriptionsReducer';
 import unsubscribeFromCountry from './UnsubscribeFromCountryReducer';
 import unsubscribeFromMassif from './UnsubscribeFromMassifReducer';
+import unsubscribeFromRegion from './UnsubscribeFromRegionReducer';
 import updateCave from './UpdateCaveReducer';
 import updateDescription from './UpdateDescription';
 import updateDocument from './UpdateDocumentReducer';
@@ -77,6 +81,8 @@ import updateOrganization from './UpdateOrganization';
 import updatePerson from './UpdatePerson';
 import massifEntrances from './MassifEntrancesDataQualityReducer';
 import countryEntrances from './CountryEntrancesDataQualityReducer';
+import countryRegions from './CountryRegionsReducer';
+import regionEntrances from './RegionEntrancesDataQualityReducer';
 
 const GCReducer = combineReducers({
   advancedsearch,
@@ -141,12 +147,16 @@ const GCReducer = combineReducers({
   snapshots,
   statisticsMassif,
   statisticsCountry,
+  statisticsRegion,
+  regionDetails,
   subject,
   subscribeToCountry,
   subscribeToMassif,
+  subscribeToRegion,
   subscriptions,
   unsubscribeFromCountry,
   unsubscribeFromMassif,
+  unsubscribeFromRegion,
   updateCave,
   updateDescription,
   updateDocument,
@@ -157,7 +167,9 @@ const GCReducer = combineReducers({
   updateOrganization,
   updatePerson,
   updatePersonGroups,
-  countryEntrances
+  countryEntrances,
+  countryRegions,
+  regionEntrances
 });
 
 export default GCReducer;

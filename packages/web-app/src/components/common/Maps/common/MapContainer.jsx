@@ -41,7 +41,11 @@ const handleResize = map => {
   if (!map) return;
   const myObserver = new ResizeObserver(() => {
     setTimeout(() => {
-      map.invalidateSize(true);
+      try {
+          map.invalidateSize(true);
+      } catch (e) {
+          // Silently ignore errors during invalidateSize
+      }
     }, 100);
   });
   myObserver.observe(map.getContainer());

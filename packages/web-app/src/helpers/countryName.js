@@ -1,0 +1,22 @@
+/**
+ * Get the localized country name using the translation framework
+ * @param {Object} country - Country object from API
+ * @param {Function} formatMessage - React Intl formatMessage function
+ * @param {string} locale - Current locale (e.g., 'en', 'fr', 'es')
+ * @param {string} fallback - Fallback name if translation not found
+ * @returns {string} Localized country name
+ */
+const getLocalizedCountryName = (country, formatMessage, locale, fallback = '') => {
+  if (!country) return fallback;
+
+  const translationKey = country.enName && country.enName !== '?' ? country.enName : country.nativeName;
+  if (!translationKey) return fallback;
+
+  const langNameField = `${locale}Name`;
+  const langName = country[langNameField];
+  const defaultMessage = langName && langName !== '?' ? langName : country.nativeName || translationKey;
+
+  return formatMessage({ id: translationKey, defaultMessage });
+};
+
+export default getLocalizedCountryName;

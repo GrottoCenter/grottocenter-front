@@ -78,7 +78,7 @@ export const Entry = ({ isLoading, error, entrance }) => {
   const onDeletePress = (entityId, isPermanent) => {
     setWantedDeletedState(true);
     dispatch(deleteEntrance({ id: entranceId, entityId, isPermanent }));
-    if (isPermanent) navigate.replace('/', { replace: true });
+    if (isPermanent) navigate('/', { replace: true });
   };
   const onRestorePress = () => {
     setWantedDeletedState(false);

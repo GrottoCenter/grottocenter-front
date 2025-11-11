@@ -29,19 +29,17 @@ HalfWidthBox.propTypes = {
 const SubscriptionsList = ({
   title,
   canUnsubscribe,
-  subscriptions = { countries: [], massifs: [] },
+  subscriptions = { countries: [], massifs: [], regions: [] },
   subscriptionsStatus
 }) => {
   const { formatMessage } = useIntl();
-  const { countries, massifs } = subscriptions ?? {};
+  const { countries, massifs, regions } = subscriptions ?? {};
 
   if (subscriptionsStatus === REDUCER_STATUS.LOADING)
     return <CircularProgress />;
 
   if (subscriptionsStatus === REDUCER_STATUS.SUCCEEDED)
-    return subscriptions &&
-      (subscriptions.massifs.length > 0 ||
-        subscriptions.countries.length > 0) ? (
+    return (
       <>
         {title && (
           <Typography variant="h3" gutterBottom>
@@ -95,11 +93,31 @@ const SubscriptionsList = ({
               </Box>
             )}
           </HalfWidthBox>
+          <HalfWidthBox>
+            <SubscriptionName name={formatMessage({ id: 'Regions' })} />
+            {regions && regions.length > 0 ? (
+              <Box>
+                {regions
+                  .sort((a, b) => a.name.localeCompare(b.name))
+                  .map(region => (
+                    <SubscriptionListItem
+                      canUnsubscribe={canUnsubscribe}
+                      key={region.id}
+                      subscription={region}
+                      type="REGION"
+                    />
+                  ))}
+              </Box>
+            ) : (
+              <Alert
+                severity="info"
+                title={formatMessage({ id: 'No region subscriptions' })}
+              />
+            )}
+          </HalfWidthBox>
         </MainContainer>
         <hr />
       </>
-    ) : (
-      false
     );
 
   return (

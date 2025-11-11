@@ -69,6 +69,11 @@ describe('Simple pages loader to check all major pages load correctly', () => {
     cy.checkPageLoaded();
   });
 
+  it('region page', () => {
+    cy.visit('/countries/US/regions/TN');
+    cy.checkPageLoaded();
+  });
+
   it('person page', () => {
     cy.visit('/persons/1');
     cy.checkPageLoaded();
@@ -78,7 +83,10 @@ describe('Simple pages loader to check all major pages load correctly', () => {
     cy.visit('/api');
     cy.checkPageLoaded();
     cy.visit('/api/1');
-    cy.get('h2', { timeout: 15000 }) // No <h1> on this page, check <h2> instead
+    // Wait for SwaggerUI to fully load and render
+    cy.get('.swagger-ui', { timeout: 30000 }).should('be.visible');
+    // Check for the title (h1 or h2 depending on SwaggerUI version)
+    cy.get('.swagger-ui .info .title', { timeout: 15000 })
       .should('exist')
       .should('not.be.empty');
   });

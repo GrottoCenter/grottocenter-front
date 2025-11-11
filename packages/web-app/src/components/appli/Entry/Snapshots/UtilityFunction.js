@@ -94,16 +94,14 @@ SnapshotButton.propTypes = {
 const sortSnapshots = dataToStore => {
   const sortedItems = [];
 
-  Object.keys(dataToStore).map(type =>
-    dataToStore[type].map(item => sortedItems.push({ [type]: [item] }))
+  Object.keys(dataToStore).forEach(type =>
+    dataToStore[type].forEach(item => sortedItems.push({ [type]: [item] }))
   );
 
   sortedItems.sort((aObj, bObj) => {
     const a = aObj[Object.keys(aObj)[0]];
     const b = bObj[Object.keys(bObj)[0]];
-    const aDate = new Date(a[0].id);
-    const bDate = new Date(b[0].id);
-    return new Date(bDate) - new Date(aDate);
+    return new Date(b[0].id) - new Date(a[0].id);
   });
 
   return sortedItems;

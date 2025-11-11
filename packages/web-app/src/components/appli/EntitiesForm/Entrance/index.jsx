@@ -88,7 +88,7 @@ export const EntranceForm = ({ caveValues = null, entranceValues = null }) => {
   };
 
   const handleReset = useCallback(() => {
-    reset({ cave: defaultCaveValues, entrance: defaultEntranceValues });
+    reset(undefined, { keepValues: true, keepErrors: false });
   }, [reset]);
 
   const onSubmit = async data => {

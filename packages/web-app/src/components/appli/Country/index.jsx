@@ -14,6 +14,8 @@ import REDUCER_STATUS from '../../../reducers/ReducerStatus';
 import { CoordinatesMarker } from '../../common/Maps/common/Markers/Components';
 import CountryPropTypes from './propTypes';
 import { useSubscriptions } from '../../../hooks';
+import getLocalizedCountryName from '../../../helpers/countryName';
+import RegionsList from './RegionsList';
 
 const Country = ({
   canSubscribe,
@@ -23,7 +25,7 @@ const Country = ({
   onUnsubscribe,
   status
 }) => {
-  const { formatMessage } = useIntl();
+  const { formatMessage, locale } = useIntl();
   const navigate = useNavigate();
   const isLoading = status === REDUCER_STATUS.LOADING;
 
@@ -48,7 +50,9 @@ const Country = ({
 
   let title = '';
   if (isLoading) title = <Skeleton />;
-  if (status === REDUCER_STATUS.SUCCEEDED) title = country.nativeName;
+  if (status === REDUCER_STATUS.SUCCEEDED) {
+    title = getLocalizedCountryName(country, formatMessage, locale, country.nativeName);
+  }
 
   return (
     <>
@@ -94,7 +98,13 @@ const Country = ({
               </CustomMapContainer>
             )}
             <hr />
-            {country && <StatisticsDataDashboard countryId={country?.id} />}
+            {country && (
+              <>
+                <RegionsList countryId={country.id} />
+                <hr />
+                <StatisticsDataDashboard countryId={country?.id} />
+              </>
+            )}
           </>
         }
       />

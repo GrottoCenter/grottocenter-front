@@ -43,6 +43,12 @@ export const getStatisticsCountryUrl = countryId =>
   `${API_BASE_PATH}/countries/${countryId}/statistics`;
 export const getCountryEntrancesUrl = countryId =>
   `${API_BASE_PATH}/entrances/with-quality/countries/${countryId}`;
+export const getRegionUrl = (countryId, regionId) =>
+  `${API_BASE_PATH}/countries/${countryId}/regions/${regionId}`;
+export const getStatisticsRegionUrl = (countryId, regionId) =>
+  `${API_BASE_PATH}/countries/${countryId}/regions/${regionId}/statistics`;
+export const getRegionEntrancesUrl = (countryId, regionId) =>
+  `${API_BASE_PATH}/entrances/with-quality/countries/${countryId}/regions/${regionId}`;
 
 // ===== Descriptions urls
 export const postDescriptionUrl = `${API_BASE_PATH}/descriptions`;
@@ -250,6 +256,10 @@ export const subscribeToCountryUrl = countryId =>
   `${API_BASE_PATH}/countries/${countryId}/subscribe`;
 export const unsubscribeFromCountryUrl = countryId =>
   `${API_BASE_PATH}/countries/${countryId}/unsubscribe`;
+export const subscribeToRegionUrl = (countryId, regionId) =>
+  `${API_BASE_PATH}/countries/${countryId}/regions/${regionId}/subscribe`;
+export const unsubscribeFromRegionUrl = (countryId, regionId) =>
+  `${API_BASE_PATH}/countries/${countryId}/regions/${regionId}/unsubscribe`;
 
 // ===== ImportCSV urls
 export const checkRowsEntrancesUrl = `${API_BASE_PATH}/entrances/check-rows`;

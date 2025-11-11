@@ -9,7 +9,9 @@ import fadeOut from '../../../util/fadeOut';
 import { unsubscribeFromMassif } from '../../../actions/Subscriptions/UnsubscribeFromMassif';
 import { MassifSimpleTypes } from '../../../types/massif.type';
 import countryType from '../../../types/country.type';
+import regionType from '../../../types/region.type';
 import { unsubscribeFromCountry } from '../../../actions/Subscriptions/UnsubscribeFromCountry';
+import { unsubscribeFromRegion } from '../../../actions/Subscriptions/UnsubscribeFromRegion';
 
 const SubscriptionItem = ({ canUnsubscribe, subscription, type }) => {
   const { formatMessage } = useIntl();
@@ -18,12 +20,23 @@ const SubscriptionItem = ({ canUnsubscribe, subscription, type }) => {
   const url =
     type === 'MASSIF'
       ? `/ui/massifs/${subscription.id}`
+      : type === 'REGION'
+      ? (() => {
+          // Parse region ID to extract country and region parts (format: "US-AL")
+          const [countryId, regionId] = subscription.id.split('-');
+          return `/ui/countries/${countryId}/regions/${regionId}`;
+        })()
       : `/ui/countries/${subscription.id}`;
 
   const handleUnsubscribe = event => {
     const unsubscribe = () => {
       if (type === 'MASSIF') dispatch(unsubscribeFromMassif(subscription.id));
       if (type === 'COUNTRY') dispatch(unsubscribeFromCountry(subscription.id));
+      if (type === 'REGION') {
+        // Parse region ID to extract country and region parts (format: "US-AL")
+        const [countryId, regionId] = subscription.id.split('-');
+        dispatch(unsubscribeFromRegion(countryId, regionId));
+      }
     };
     fadeOut(event.currentTarget.closest('div'), unsubscribe);
   };
@@ -43,8 +56,8 @@ const SubscriptionItem = ({ canUnsubscribe, subscription, type }) => {
 
 SubscriptionItem.propTypes = {
   canUnsubscribe: PropTypes.bool,
-  subscription: PropTypes.oneOfType([countryType, MassifSimpleTypes]),
-  type: PropTypes.oneOf(['COUNTRY', 'MASSIF']).isRequired
+  subscription: PropTypes.oneOfType([countryType, MassifSimpleTypes, regionType]),
+  type: PropTypes.oneOf(['COUNTRY', 'MASSIF', 'REGION']).isRequired
 };
 
 export default SubscriptionItem;
