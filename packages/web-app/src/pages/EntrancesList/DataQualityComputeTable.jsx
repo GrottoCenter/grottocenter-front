@@ -87,12 +87,13 @@ const DataQualityComputeTable = () => {
 
   return (
     <TableContainer
+      component={Paper}
       style={{
         margin: '0 auto',
         width: 'auto',
         maxWidth: 'calc(100% - 20px)'
       }}>
-      <Table className={classes.table} size="small" component={Paper}>
+      <Table className={classes.table} size="small">
         <TableHead>
           <TableRow>
             <TableCell colSpan={1} />

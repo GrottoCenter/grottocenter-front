@@ -37,8 +37,8 @@ export const NetworkForm = ({ networkValues }) => {
   });
 
   const handleReset = useCallback(() => {
-    reset({ cave: defaultNetworkValue.current });
-  }, [defaultNetworkValue, reset]);
+    reset(undefined, { keepValues: true, keepErrors: false });
+  }, [reset]);
 
   const onSubmit = async data => {
     dispatch(

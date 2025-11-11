@@ -64,5 +64,8 @@ typings/
 !.yarn/sdks
 !.yarn/versions
 
-# Visual studio code
+# IDE
 .vscode
+.idea
+*.iml
+.amazonq

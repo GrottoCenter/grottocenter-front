@@ -8,6 +8,7 @@ import AssessmentIcon from '@mui/icons-material/Assessment';
 import { styled } from '@mui/material/styles';
 import { fetchStatisticsCountry } from '../../../actions/Country/GetStatisticsCountry';
 import { fetchStatisticsMassif } from '../../../actions/Massif/GetStatisticsMassif';
+import { fetchStatisticsRegion } from '../../../actions/Region/GetStatisticsRegion';
 import SpecificsCaves from './components/SpecificsCaves';
 import CavesData from './components/CavesData/index';
 import CavesStatistics from './components/CavesStatistics';
@@ -27,7 +28,7 @@ const TitleBox = styled(Box)`
 `;
 
 const DataBox = styled(Box)`
-  margin: 0px 2%;
+  margin: 0 2%;
   margin-top: 30px;
 `;
 
@@ -36,12 +37,12 @@ const DashboardBox = styled(Box)`
   margin: 10px 5%;
 `;
 
-const StatisticsDataDashboard = ({ countryId, massifId }) => {
+const StatisticsDataDashboard = ({ countryId, massifId, regionId }) => {
   const dispatch = useDispatch();
   const { formatMessage } = useIntl();
 
   const [data, setData] = useState({});
-  const [isCountry, setIsCountry] = useState();
+  const [entityType, setEntityType] = useState();
 
   const { dataMassif, loadingMassif, errorMassif } = useSelector(
     state => state.statisticsMassif
@@ -49,35 +50,53 @@ const StatisticsDataDashboard = ({ countryId, massifId }) => {
   const { dataCountry, loadingCountry, errorCountry } = useSelector(
     state => state.statisticsCountry
   );
+  const { statistics: dataRegion, status: statusRegion } = useSelector(
+    state => state.statisticsRegion
+  );
+  const loadingRegion = statusRegion === 'LOADING';
+  const errorRegion = statusRegion === 'FAILED';
 
   useEffect(() => {
-    if (countryId) {
+    if (regionId && countryId) {
+      dispatch(fetchStatisticsRegion(countryId, regionId));
+    } else if (countryId) {
       dispatch(fetchStatisticsCountry(countryId));
     } else {
       dispatch(fetchStatisticsMassif(massifId));
     }
-  }, [countryId, massifId, dispatch]);
+  }, [countryId, massifId, regionId, dispatch]);
 
   useEffect(() => {
     setData(dataCountry);
-    setIsCountry(true);
+    setEntityType('country');
   }, [dataCountry]);
 
   useEffect(() => {
     setData(dataMassif);
-    setIsCountry(false);
+    setEntityType('massif');
   }, [dataMassif]);
 
   useEffect(() => {
-    setIsCountry(!!countryId);
-  }, [countryId]);
+    setData(dataRegion);
+    setEntityType('region');
+  }, [dataRegion]);
+
+  useEffect(() => {
+    if (regionId) {
+      setEntityType('region');
+    } else if (countryId) {
+      setEntityType('country');
+    } else {
+      setEntityType('massif');
+    }
+  }, [countryId, regionId]);
 
   return (
     <>
       <Typography variant="h3" gutterBottom>
         {formatMessage({ id: 'More information' })}
       </Typography>
-      {(loadingCountry || loadingMassif) && (
+      {(loadingCountry || loadingMassif || loadingRegion) && (
         <Box
           style={{
             display: 'flex',
@@ -87,7 +106,7 @@ const StatisticsDataDashboard = ({ countryId, massifId }) => {
           <Skeleton height={300} width={1000} /> {/* Map Skeleton */}
         </Box>
       )}
-      {data && data.nb_caves > 0 && (
+      {data && data.nb_caves > 0 && !errorMassif && !errorCountry && !errorRegion && (
         <DashboardBox>
           <>
             <TitleBox boxShadow="1" border="1">
@@ -101,13 +120,21 @@ const StatisticsDataDashboard = ({ countryId, massifId }) => {
               />
               {/* Main Title */}
               <Title variant="h4">
-                {isCountry
-                  ? formatMessage({
+                {(() => {
+                  if (entityType === 'country') {
+                    return formatMessage({
                       id: 'Discover the numbers about this country and its massifs and caves.'
-                    })
-                  : formatMessage({
-                      id: 'Discover the numbers about this massif and its caves.'
-                    })}
+                    });
+                  }
+                  if (entityType === 'region') {
+                    return formatMessage({
+                      id: 'Discover the numbers about this region and its caves.'
+                    });
+                  }
+                  return formatMessage({
+                    id: 'Discover the numbers about this massif and its caves.'
+                  });
+                })()}
               </Title>
             </TitleBox>
 
@@ -115,23 +142,23 @@ const StatisticsDataDashboard = ({ countryId, massifId }) => {
             <DataBox>
               <CavesData
                 title={
-                  isCountry
-                    ? formatMessage({
-                        id: 'Massifs, networks and caves'
-                      })
-                    : formatMessage({
-                        id: 'Networks and caves'
-                      })
+                  entityType === 'country'
+                    ? formatMessage({ id: 'Massifs, networks and caves' })
+                    : formatMessage({ id: 'Networks and caves' })
                 }
                 nbMassifs={data.nb_massifs}
                 nbCaves={data.nb_caves}
                 nbDivingCaves={data.diving_caves}
                 nbNetworks={data.nb_networks}
-                url={
-                  isCountry
-                    ? `/ui/countries/${countryId}/entrances`
-                    : `/ui/massifs/${massifId}/entrances`
-                }
+                url={(() => {
+                  if (entityType === 'country') {
+                    return `/ui/countries/${countryId}/entrances`;
+                  }
+                  if (entityType === 'region') {
+                    return `/ui/countries/${countryId}/regions/${regionId}/entrances`;
+                  }
+                  return `/ui/massifs/${massifId}/entrances`;
+                })()}
               />
             </DataBox>
             <DataBox>
@@ -145,29 +172,41 @@ const StatisticsDataDashboard = ({ countryId, massifId }) => {
               <SpecificsCaves
                 maxDepthCave={data.cave_with_max_depth}
                 maxLengthCave={data.cave_with_max_length}
-                parentEntity={
-                  isCountry
-                    ? formatMessage({ id: 'country' })
-                    : formatMessage({ id: 'massif' })
-                }
+                parentEntity={(() => {
+                  if (entityType === 'country') {
+                    return formatMessage({ id: 'country' });
+                  }
+                  if (entityType === 'region') {
+                    return formatMessage({ id: 'region' });
+                  }
+                  return formatMessage({ id: 'massif' });
+                })()}
               />
             </DataBox>
           </>
           <hr />
         </DashboardBox>
       )}
-      {(errorMassif || errorCountry) && (
+      {(errorMassif || errorCountry || errorRegion || 
+        (data && data.nb_caves === 0) || 
+        (!loadingCountry && !loadingMassif && !loadingRegion && (!data || data.nb_caves === undefined))) && (
         <Alert
           severity="info"
-          title={
-            isCountry
-              ? formatMessage({
-                  id: 'There is currently not enough information about this country.'
-                })
-              : formatMessage({
-                  id: 'There is currently not enough information about this massif.'
-                })
-          }
+          title={(() => {
+            if (entityType === 'country') {
+              return formatMessage({
+                id: 'There is currently not enough information about this country.'
+              });
+            }
+            if (entityType === 'region') {
+              return formatMessage({
+                id: 'There is currently not enough information about this region.'
+              });
+            }
+            return formatMessage({
+              id: 'There is currently not enough information about this massif.'
+            });
+          })()}
         />
       )}
     </>
@@ -177,7 +216,8 @@ const StatisticsDataDashboard = ({ countryId, massifId }) => {
 // different type for both IDs make the component not factorizable
 StatisticsDataDashboard.propTypes = {
   countryId: PropTypes.string,
-  massifId: PropTypes.number
+  massifId: PropTypes.number,
+  regionId: PropTypes.string
 };
 
 export default StatisticsDataDashboard;

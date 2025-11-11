@@ -70,7 +70,6 @@ const Dashboard = () => {
               </Typography>
               <StyledList cols={3}>
                 <StyledListItem
-                  button
                   key="manage-users-admin-tile-key"
                   onClick={() => handleOnListItemClick('/ui/admin/users')}>
                   <PeopleIcon fontSize="large" color="primary" />
@@ -88,7 +87,6 @@ const Dashboard = () => {
               </Typography>
               <StyledList cols={3}>
                 <StyledListItem
-                  button
                   key="document-validation-admin-tile-key"
                   onClick={() =>
                     handleOnListItemClick('/ui/documents/validation')
@@ -99,7 +97,6 @@ const Dashboard = () => {
                   </Typography>
                 </StyledListItem>
                 <StyledListItem
-                  button
                   key="import-csv-user-tile-key"
                   onClick={() => handleOnListItemClick('/ui/import-csv')}>
                   <PublishIcon fontSize="large" color="primary" />
@@ -108,7 +105,6 @@ const Dashboard = () => {
                   </Typography>
                 </StyledListItem>
                 <StyledListItem
-                  button
                   key="duplicate-tool-user-tile-key"
                   onClick={() => handleOnListItemClick('/ui/duplicates')}>
                   <CallMergeIcon fontSize="large" color="primary" />
@@ -163,7 +159,6 @@ const Dashboard = () => {
               </Typography>
               <StyledList cols={6}>
                 <StyledListItem
-                  button
                   key="my-contributions-user-tile-key"
                   onClick={() => handleOnListItemClick('/ui/contributions')}>
                   <ListAltIcon fontSize="large" color="primary" />
@@ -172,7 +167,6 @@ const Dashboard = () => {
                   </Typography>
                 </StyledListItem>
                 <StyledListItem
-                  button
                   key="my-notifications-user-tile-key"
                   onClick={() => handleOnListItemClick('/ui/notifications')}>
                   <NotificationsIcon fontSize="large" color="primary" />

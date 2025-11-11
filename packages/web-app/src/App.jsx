@@ -41,6 +41,7 @@ import MassifEdit from './pages/EntityEdit/Massif/MassifEdit';
 import PersonEdit from './pages/PersonEdit';
 import OrganizationEdit from './pages/EntityEdit/Organization/OrganizationEdit';
 import CountryPage from './pages/Country';
+import RegionPage from './pages/Region';
 import NotificationsPage from './pages/Notifications';
 import SnapshotPage from './components/appli/Entry/Snapshots';
 import EntrancesListPage from './pages/EntrancesList';
@@ -64,6 +65,14 @@ const router = createBrowserRouter(
       <Route
         path="/ui/countries/:countryId/entrances"
         element={<EntrancesListPage />}
+      />
+      <Route
+        path="/ui/countries/:countryId/regions/:regionId/entrances"
+        element={<EntrancesListPage />}
+      />
+      <Route
+        path="/ui/countries/:countryId/regions/:regionId"
+        element={<RegionPage />}
       />
       <Route path="/ui/countries/:id" element={<CountryPage />} />
       <Route path="/ui/countries" element={<CountryListPage />} />

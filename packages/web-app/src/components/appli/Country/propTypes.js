@@ -8,7 +8,14 @@ const CountryPropTypes = {
   error: PropTypes.shape({}),
   status: PropTypes.oneOf(Object.values(REDUCER_STATUS)),
   onSubscribe: PropTypes.func.isRequired,
-  onUnsubscribe: PropTypes.func.isRequired
+  onUnsubscribe: PropTypes.func.isRequired,
+  regions: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+      name: PropTypes.string
+    })
+  ),
+  regionsStatus: PropTypes.oneOf(Object.values(REDUCER_STATUS))
 };
 
 export default CountryPropTypes;

@@ -22,14 +22,14 @@ const HighLightsChar = ({ oldText, newText }) => {
   }
 
   const result = diffChars(newText, oldText);
-  return result.map(change => {
+  return result.map((change, index) => {
     if (change.added) {
-      return <AddedText>{change.value}</AddedText>;
+      return <AddedText key={index}>{change.value}</AddedText>;
     }
     if (change.removed) {
-      return <RemovedText>{change.value}</RemovedText>;
+      return <RemovedText key={index}>{change.value}</RemovedText>;
     }
-    return <UnchangedText>{change.value}</UnchangedText>;
+    return <UnchangedText key={index}>{change.value}</UnchangedText>;
   });
 };
 
@@ -42,24 +42,24 @@ const HighLightsLine = ({ oldText, newText }) => {
   }
 
   const result = diffSentences(newText, oldText);
-  return result.map(change => {
+  return result.map((change, index) => {
     if (change.added) {
       return (
-        <>
+        <React.Fragment key={index}>
           <br />
           <AddedText> + {change.value}</AddedText>
-        </>
+        </React.Fragment>
       );
     }
     if (change.removed) {
       return (
-        <>
+        <React.Fragment key={index}>
           <br />
           <RemovedText> - {change.value}</RemovedText>
-        </>
+        </React.Fragment>
       );
     }
-    return <UnchangedText>{change.value}</UnchangedText>;
+    return <UnchangedText key={index}>{change.value}</UnchangedText>;
   });
 };
 

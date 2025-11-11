@@ -2,12 +2,19 @@ module.exports = {
   env: {
     browser: true
   },
-  extends: '../eslint-config/.eslintrc.js',
+  extends: ['react-app'],
   overrides: [
     {
       files: ['./src/reducers/**/*.js'],
       rules: {
         'default-param-last': 'off'
+      }
+    },
+    {
+      files: ['./cypress/**/*.js'],
+      globals: {
+        cy: 'readonly',
+        Cypress: 'readonly'
       }
     }
   ],

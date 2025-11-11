@@ -1,8 +1,5 @@
 import { AVAILABLE_LANGUAGES } from './config';
-
-function capitalize(string) {
-  return string.charAt(0).toUpperCase() + string.slice(1);
-}
+import { capitalize } from '../util/strings';
 
 function generateLinks(link, defaultLang) {
   const resultArray = {};

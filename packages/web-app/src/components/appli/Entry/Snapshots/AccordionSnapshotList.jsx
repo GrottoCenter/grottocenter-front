@@ -15,24 +15,25 @@ const AccordionSnapshotList = ({ data, type, isNetwork, actualItem }) => {
       title={<Translate>Revisions</Translate>}
       content={
         data && Object.keys(data).length > 0 ? (
-          Object.keys(data).map(snapshotType => {
-            const reversed = [...data[snapshotType]].reverse();
-            return reversed.map(snapshot => {
-              const accordionSnapshot = (
-                <AccordionSnapshot
-                  key={snapshot.id + snapshot.t_id}
-                  snapshot={snapshot}
-                  snapshotType={snapshotType}
-                  isNetwork={isNetwork}
-                  author={snapshot.author}
-                  reviewer={snapshot.reviewer}
-                  previous={previousVersion}
-                />
-              );
-              previousVersion = snapshot;
-              return accordionSnapshot;
-            });
-          })
+          Object.keys(data).map((snapshotType, _typeIndex) => (
+            <React.Fragment key={snapshotType}>
+              {[...data[snapshotType]].reverse().map((snapshot, _snapshotIndex) => {
+                const accordionSnapshot = (
+                  <AccordionSnapshot
+                    key={snapshot.id + snapshot.t_id}
+                    snapshot={snapshot}
+                    snapshotType={snapshotType}
+                    isNetwork={isNetwork}
+                    author={snapshot.author}
+                    reviewer={snapshot.reviewer}
+                    previous={previousVersion}
+                  />
+                );
+                previousVersion = snapshot;
+                return accordionSnapshot;
+              })}
+            </React.Fragment>
+          ))
         ) : (
           <Alert404 type={type} />
         )

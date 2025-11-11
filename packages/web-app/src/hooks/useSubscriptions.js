@@ -23,19 +23,31 @@ export const useSubscriptions = () => {
   const { status: countryUnsubscribeStatus } = useSelector(
     state => state.unsubscribeFromCountry
   );
+  const { status: regionSubscribeStatus } = useSelector(
+    state => state.subscribeToRegion
+  );
+  const { status: regionUnsubscribeStatus } = useSelector(
+    state => state.unsubscribeFromRegion
+  );
   const { subscriptions } = useSelector(state => state.subscriptions);
 
   const isSubscribed = useCallback(
     id => {
       let isSubscribedToCountry = false;
       let isSubscribedToMassif = false;
+      let isSubscribedToRegion = false;
       if (subscriptions && subscriptions.countries) {
         isSubscribedToCountry = subscriptions.countries.some(c => c.id === id);
       }
       if (subscriptions && subscriptions.massifs) {
         isSubscribedToMassif = subscriptions.massifs.some(m => m.id === id);
       }
-      return isSubscribedToCountry || isSubscribedToMassif;
+      if (subscriptions && subscriptions.regions) {
+        isSubscribedToRegion = subscriptions.regions.some(r => r.id === id);
+      }
+      return (
+        isSubscribedToCountry || isSubscribedToMassif || isSubscribedToRegion
+      );
     },
     [subscriptions]
   );
@@ -48,7 +60,9 @@ export const useSubscriptions = () => {
       (subscribeSucceeded(massifSubscribeStatus) ||
         subscribeSucceeded(massifUnsubscribeStatus) ||
         subscribeSucceeded(countrySubscribeStatus) ||
-        subscribeSucceeded(countryUnsubscribeStatus))
+        subscribeSucceeded(countryUnsubscribeStatus) ||
+        subscribeSucceeded(regionSubscribeStatus) ||
+        subscribeSucceeded(regionUnsubscribeStatus))
     ) {
       dispatch(fetchSubscriptions(userProperties.id));
     }
@@ -58,6 +72,8 @@ export const useSubscriptions = () => {
     dispatch,
     massifSubscribeStatus,
     massifUnsubscribeStatus,
+    regionSubscribeStatus,
+    regionUnsubscribeStatus,
     userProperties
   ]);
 
@@ -78,6 +94,14 @@ export const useSubscriptions = () => {
     countryUnsubscribeStatus,
     'You are unsubscribed from the country.'
   );
+  useReducerSuccessNotification(
+    regionSubscribeStatus,
+    'You are subscribed to the region.'
+  );
+  useReducerSuccessNotification(
+    regionUnsubscribeStatus,
+    'You are unsubscribed from the region.'
+  );
 
   return {
     subscriptions,
@@ -87,6 +111,9 @@ export const useSubscriptions = () => {
       countryUnsubscribeStatus === REDUCER_STATUS.LOADING,
     isMassifLoading:
       massifSubscribeStatus === REDUCER_STATUS.LOADING ||
-      massifUnsubscribeStatus === REDUCER_STATUS.LOADING
+      massifUnsubscribeStatus === REDUCER_STATUS.LOADING,
+    isRegionLoading:
+      regionSubscribeStatus === REDUCER_STATUS.LOADING ||
+      regionUnsubscribeStatus === REDUCER_STATUS.LOADING
   };
 };

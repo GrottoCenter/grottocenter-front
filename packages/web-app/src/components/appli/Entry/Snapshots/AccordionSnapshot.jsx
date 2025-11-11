@@ -17,6 +17,7 @@ import authorType from '../../../../types/author.type';
 import { HighLightsChar } from '../../../common/Highlights';
 import RestoreSnapshot from './component/RestoreSnapshot';
 import Translate from '../../../common/Translate';
+import { capitalize } from '../../../../util/strings';
 
 const FlexDiv50 = styled('div')`
   flex-basis: 50%;
@@ -38,9 +39,7 @@ const AccordionSnapshot = ({
         <FlexDiv50>
           {all ? (
             <strong>
-              <Translate>
-                {snapshotType.charAt(0).toUpperCase() + snapshotType.slice(1)}
-              </Translate>
+              <Translate>{capitalize(snapshotType)}</Translate>
             </strong>
           ) : (
             ''

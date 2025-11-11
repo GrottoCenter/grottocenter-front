@@ -1,8 +1,8 @@
 import { string, shape } from 'prop-types';
 
-const countryType = shape({
+const regionType = shape({
   id: string.isRequired,
   name: string
 });
 
-export default countryType;
+export default regionType;

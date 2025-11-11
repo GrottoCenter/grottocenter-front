@@ -9,8 +9,13 @@ import Alert from '../../components/common/Alert';
 import Layout from '../../components/common/Layouts/Fixed/FixedContent';
 import { fetchMassifEntrances } from '../../actions/Massif/GetEntrancesDataQuality';
 import { fetchCountryEntrances } from '../../actions/Country/GetEntrancesDataQuality';
+import { fetchRegionEntrances } from '../../actions/Region/GetEntrancesDataQuality';
+import { fetchCountry } from '../../actions/Country/GetCountry';
+import { fetchRegion } from '../../actions/Region/GetRegion';
+import { loadMassif } from '../../actions/Massif/GetMassif';
 import EntranceList from './EntranceList';
 import DataQualityComputeDetails from './DataQualityComputeDetails';
+import getLocalizedCountryName from '../../helpers/countryName';
 
 const StyledList = styled(List)({
   display: 'flex',
@@ -23,15 +28,15 @@ const sortByDataQuality = entrances =>
   entrances.sort((a, b) => b.data_quality - a.data_quality);
 
 const EntrancesListPage = () => {
-  const { countryId, massifId } = useParams();
-  const { formatMessage } = useIntl();
+  const { formatMessage, locale } = useIntl();
+  const { countryId, massifId, regionId } = useParams();
   const dispatch = useDispatch();
 
   // to store entrances even if it's massif entrances or country entrances (managed with a useEffect)
   const [entrances, setEntrances] = useState(null);
   // to store error even if it's massif entrances error or country entrances error (managed with a useEffect)
   const [error, setError] = useState(null);
-  const [isCountry, setIsCountry] = useState();
+  const [entityType, setEntityType] = useState();
 
   const { massifEntrances, massifEntrancesLoading, massifEntrancesError } =
     useSelector(state => state.massifEntrances);
@@ -39,13 +44,25 @@ const EntrancesListPage = () => {
   const { countryEntrances, countryEntrancesLoading, countryEntrancesError } =
     useSelector(state => state.countryEntrances);
 
+  const { regionEntrances, regionEntrancesLoading, regionEntrancesError } =
+    useSelector(state => state.regionEntrances);
+
+  const { country } = useSelector(state => state.country);
+  const { region } = useSelector(state => state.regionDetails);
+  const { massif } = useSelector(state => state.massif);
+
   useEffect(() => {
-    if (countryId) {
+    if (regionId && countryId) {
+      dispatch(fetchRegionEntrances(countryId, regionId));
+      dispatch(fetchRegion(countryId, regionId));
+    } else if (countryId) {
       dispatch(fetchCountryEntrances(countryId));
+      dispatch(fetchCountry(countryId));
     } else {
       dispatch(fetchMassifEntrances(massifId));
+      dispatch(loadMassif(massifId));
     }
-  }, [countryId, massifId, dispatch]);
+  }, [countryId, massifId, regionId, dispatch]);
 
   // manage entrances
   useEffect(() => {
@@ -54,7 +71,7 @@ const EntrancesListPage = () => {
         ? sortByDataQuality(countryEntrances)
         : countryEntrances
     );
-    setIsCountry(true);
+    setEntityType('country');
   }, [countryEntrances]);
 
   useEffect(() => {
@@ -63,17 +80,33 @@ const EntrancesListPage = () => {
         ? sortByDataQuality(massifEntrances)
         : massifEntrances
     );
-    setIsCountry(false);
+    setEntityType('massif');
   }, [massifEntrances]);
+
+  useEffect(() => {
+    setEntrances(
+      Array.isArray(regionEntrances)
+        ? sortByDataQuality(regionEntrances)
+        : regionEntrances
+    );
+    setEntityType('region');
+  }, [regionEntrances]);
 
   // manage error
   useEffect(() => {
-    if (isCountry && countryEntrancesError) {
+    if (entityType === 'country' && countryEntrancesError) {
       setError(countryEntrancesError);
-    } else if (!isCountry && massifEntrancesError) {
+    } else if (entityType === 'massif' && massifEntrancesError) {
       setError(massifEntrancesError);
+    } else if (entityType === 'region' && regionEntrancesError) {
+      setError(regionEntrancesError);
     }
-  }, [massifEntrancesError, countryEntrancesError, isCountry]);
+  }, [
+    massifEntrancesError,
+    countryEntrancesError,
+    regionEntrancesError,
+    entityType
+  ]);
 
   const skeletons = new Array(10).fill(0);
 
@@ -81,11 +114,20 @@ const EntrancesListPage = () => {
     if (error) {
       return '';
     }
-    if (entrances && entrances[0]) {
-      if (isCountry) {
-        return entrances[0].country_name;
-      } // else :
-      return entrances[0].massif_name;
+    if (entrances) {
+      if (entityType === 'country') {
+        const entranceWithCountry = entrances.find(e => e.country_name);
+        return getLocalizedCountryName(
+          country,
+          formatMessage,
+          locale,
+          entranceWithCountry?.country_name
+        );
+      }
+      if (entityType === 'region') {
+        return region?.name;
+      } // else massif:
+      return massif?.name;
     }
     return formatMessage({ id: 'Loading entrances...' });
   };
@@ -102,14 +144,16 @@ const EntrancesListPage = () => {
       title={getTitle()}
       content={
         <>
-          {massifEntrancesLoading ||
-            (countryEntrancesLoading && !error && (
+          {(massifEntrancesLoading ||
+            countryEntrancesLoading ||
+            regionEntrancesLoading) &&
+            !error && (
               <StyledList>
-                {skeletons.map(() => (
-                  <Skeleton height={90} width={350} />
+                {skeletons.map((_, index) => (
+                  <Skeleton key={index} height={90} width={350} />
                 ))}
               </StyledList>
-            ))}
+            )}
           {error && (
             <Alert
               title={formatMessage({

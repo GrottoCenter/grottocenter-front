@@ -5,6 +5,7 @@ import {
 } from '../actions/Subscriptions/GetSubscriptions';
 import { UNSUBSCRIBE_FROM_COUNTRY_SUCCESS } from '../actions/Subscriptions/UnsubscribeFromCountry';
 import { UNSUBSCRIBE_FROM_MASSIF_SUCCESS } from '../actions/Subscriptions/UnsubscribeFromMassif';
+import { UNSUBSCRIBE_FROM_REGION_SUCCESS } from '../actions/Subscriptions/UnsubscribeFromRegion';
 import REDUCER_STATUS from './ReducerStatus';
 
 const initialState = {
@@ -53,6 +54,18 @@ const reducer = (state = initialState, action) => {
               ...state.subscriptions,
               massifs: state.subscriptions.massifs.filter(
                 s => s.id !== action.massifId
+              )
+            }
+          : undefined
+      };
+    case UNSUBSCRIBE_FROM_REGION_SUCCESS:
+      return {
+        ...state,
+        subscriptions: state.subscriptions
+          ? {
+              ...state.subscriptions,
+              regions: state.subscriptions.regions.filter(
+                s => s.id !== action.regionId
               )
             }
           : undefined
