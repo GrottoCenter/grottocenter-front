@@ -13,6 +13,7 @@ export const makeEntranceData = (data, entityType) => ({
   isSensitive: data.entrance.isSensitive,
   longitude: data.entrance.longitude,
   latitude: data.entrance.latitude,
+  altitude: data.entrance.altitude ? Number(data.entrance.altitude) : null,
   yearDiscovery: data.entrance.yearDiscovery
     ? Number(data.entrance.yearDiscovery)
     : null
