@@ -269,6 +269,7 @@ export const Entry = ({ isLoading, error, entrance }) => {
                     language: entrance.language,
                     latitude: entrance?.latitude,
                     longitude: entrance?.longitude,
+                    altitude: entrance.altitude,
                     yearDiscovery: entrance.discoveryYear
                   }}
                   caveValues={{

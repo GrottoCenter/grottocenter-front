@@ -39,6 +39,7 @@ const defaultEntranceValues = {
   language: '',
   latitude: '',
   longitude: '',
+  altitude: '',
   yearDiscovery: ''
 };
 

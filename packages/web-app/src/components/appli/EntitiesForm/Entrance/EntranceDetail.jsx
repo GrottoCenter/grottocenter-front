@@ -112,6 +112,22 @@ const EntranceDetail = ({ control, errors, getValues }) => {
           />
         )}
         <Controller
+          name="entrance.altitude"
+          control={control}
+          rules={{ valueAsNumber: true }}
+          render={({ field: { ref, value, onChange } }) => (
+            <TextField
+              fullWidth
+              label={formatMessage({ id: 'Altitude' })}
+              type="number"
+              error={!!errors.entrance?.altitude}
+              inputRef={ref}
+              value={value}
+              onChange={onChange}
+            />
+          )}
+        />
+        <Controller
           name="entrance.yearDiscovery"
           control={control}
           rules={{ valueAsNumber: true }}
@@ -150,6 +166,7 @@ EntranceDetail.propTypes = {
       longitude: PropTypes.shape({ message: PropTypes.string }),
       language: PropTypes.shape({ message: PropTypes.string }),
       name: PropTypes.shape({ message: PropTypes.string }),
+      altitude: PropTypes.shape({ message: PropTypes.number }),
       yearDiscovery: PropTypes.shape({ message: PropTypes.number })
     })
   }),
