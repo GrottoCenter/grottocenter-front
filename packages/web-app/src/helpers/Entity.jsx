@@ -90,8 +90,9 @@ export const nomelizeSearchEntity = option => {
 
 export const entityOptionForSelector = (props, option) => {
   const { iconName, title, subtitle } = nomelizeSearchEntity(option);
+  const { key, ...otherProps } = props;
   return (
-    <li {...props}>
+    <li key={key} {...otherProps}>
       {iconName && (
         <EntityIcon src={`/images/${iconName}`} alt={`${option.type} icon`} />
       )}

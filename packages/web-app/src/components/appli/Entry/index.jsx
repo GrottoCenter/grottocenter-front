@@ -138,7 +138,9 @@ export const Entry = ({ isLoading, error, entrance }) => {
 
                 {entrance.isSensitive && <SensitiveCaveWarning />}
                 <HalfSplitContainer>
-                  <Map positions={[entrance]} loading={isLoading} />
+                  {(!entrance.isSensitive || permissions.isAdmin) && (
+                    <Map positions={[entrance]} loading={isLoading} />
+                  )}
 
                   <Properties entrance={entrance} />
                 </HalfSplitContainer>

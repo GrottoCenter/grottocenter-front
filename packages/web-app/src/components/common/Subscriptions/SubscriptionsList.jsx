@@ -8,6 +8,7 @@ import subscriptionsType from '../../../types/subscriptions.type';
 import SubscriptionListItem from './SubscriptionItem';
 import Alert from '../Alert';
 import SubscriptionName from './SubscriptionName';
+import getLocalizedCountryName from '../../../helpers/countryName';
 
 const MainContainer = styled(Box)`
   display: flex;
@@ -32,7 +33,7 @@ const SubscriptionsList = ({
   subscriptions = { countries: [], massifs: [], regions: [] },
   subscriptionsStatus
 }) => {
-  const { formatMessage } = useIntl();
+  const { formatMessage, locale } = useIntl();
   const { countries, massifs, regions } = subscriptions ?? {};
 
   if (subscriptionsStatus === REDUCER_STATUS.LOADING)
@@ -52,6 +53,10 @@ const SubscriptionsList = ({
             {countries.length > 0 ? (
               <Box>
                 {countries
+                  .map(country => ({
+                    ...country,
+                    name: getLocalizedCountryName(country, formatMessage, locale, country.name)
+                  }))
                   .sort((a, b) => a.name.localeCompare(b.name))
                   .map(country => (
                     <SubscriptionListItem
@@ -116,7 +121,6 @@ const SubscriptionsList = ({
             )}
           </HalfWidthBox>
         </MainContainer>
-        <hr />
       </>
     );
 
