@@ -35,17 +35,22 @@ const MultipleMarkers = ({ positions, zoom }) => {
   return null;
 };
 
-const MapMultipleMarkers = ({ style, zoom, ...otherProps }) => (
-  <CustomMapContainer
-    wholePage={false}
-    dragging={!isMobile} // For usability only use two fingers drag/zoom on mobile
-    viewport={null}
-    scrollWheelZoom={false}
-    style={style}
-    zoom={zoom || 14}>
-    <MultipleMarkers {...otherProps} zoom={zoom || 14} />
-  </CustomMapContainer>
-);
+const MapMultipleMarkers = ({ style, zoom, positions }) => {
+  const validPositions = filterValidPositions(positions);
+  if (validPositions.length === 0) return null;
+  
+  return (
+    <CustomMapContainer
+      wholePage={false}
+      dragging={!isMobile} // For usability only use two fingers drag/zoom on mobile
+      viewport={null}
+      scrollWheelZoom={false}
+      style={style}
+      zoom={zoom || 14}>
+      <MultipleMarkers positions={positions} zoom={zoom || 14} />
+    </CustomMapContainer>
+  );
+};
 
 // eslint-disable-next-line no-multi-assign
 MapMultipleMarkers.propTypes = MultipleMarkers.propTypes = {

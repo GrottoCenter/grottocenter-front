@@ -26,7 +26,6 @@ const OrganizationsList = ({ orgas, title }) => {
             <OrganizationListItem key={orga.id} orga={orga} />
           ))}
       </StyledList>
-      <hr />
     </>
   );
 };

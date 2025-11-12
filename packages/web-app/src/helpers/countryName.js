@@ -9,6 +9,11 @@
 const getLocalizedCountryName = (country, formatMessage, locale, fallback = '') => {
   if (!country) return fallback;
 
+  // Handle simplified country object (e.g., from subscriptions API)
+  if (country.name && !country.enName && !country.nativeName) {
+    return formatMessage({ id: country.name, defaultMessage: country.name });
+  }
+
   const translationKey = country.enName && country.enName !== '?' ? country.enName : country.nativeName;
   if (!translationKey) return fallback;
 

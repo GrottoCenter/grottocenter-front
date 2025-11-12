@@ -41,8 +41,7 @@ const Person = ({
   const userId = useUserProperties()?.id ?? null;
   let canEdit = false;
   if (userId && person) {
-    canEdit =
-      userId.toString() === person?.id?.toString() || permissions.isAdmin;
+    canEdit = userId.toString() === person?.id?.toString();
   }
 
   let onDelete = null;
@@ -119,19 +118,17 @@ const Person = ({
                 subscriptionsStatus={subscriptionsStatus}
                 title={formatMessage({ id: 'Subscriptions' })}
               />
-              {person.documents.length > 0 && (
-                <>
-                  <DocumentsList
-                    title={formatMessage({ id: 'Documents' })}
-                    documents={person.documents}
-                  />
-                  <hr />
-                </>
-              )}
+              <hr />
+              <DocumentsList
+                title={formatMessage({ id: 'Documents' })}
+                documents={person.documents}
+              />
+              <hr />
               <OrganizationsList
                 orgas={person.organizations}
                 title={formatMessage({ id: 'Organizations' })}
               />
+              <hr />
               <EntrancesList
                 title={formatMessage({ id: 'List of explored caves' })}
                 entrances={person.exploredEntrances}
