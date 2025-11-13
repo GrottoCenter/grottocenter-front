@@ -1,6 +1,7 @@
 import React, { useCallback, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { useSelector, useDispatch } from 'react-redux';
+import { useIntl } from 'react-intl';
 
 import { postMassif } from '../../../../actions/Massif/CreateMassif';
 import { updateMassif } from '../../../../actions/Massif/UpdateMassif';
@@ -24,6 +25,7 @@ const defaultMassifValues = {
 };
 
 export const MassifForm = ({ massifValues }) => {
+  const { formatMessage } = useIntl();
   const isNewMassif = !massifValues;
   const isNewDescription = massifValues?.descriptions?.length === 0 ?? true;
 
@@ -41,7 +43,7 @@ export const MassifForm = ({ massifValues }) => {
   const { locale, AVAILABLE_LANGUAGES } = useSelector(state => state.intl);
   defaultMassifValues.language = AVAILABLE_LANGUAGES[locale].id;
 
-  const { error: descriptionError, loading: descriptionLoading } = useSelector(
+  const { error: descriptionError, isLoading: descriptionLoading } = useSelector(
     state =>
       isNewDescription ? state.createDescription : state.updateDescription
   );
@@ -75,8 +77,22 @@ export const MassifForm = ({ massifValues }) => {
   });
 
   const handleReset = useCallback(() => {
-    reset({ massif: massifValues || defaultMassifValues });
-  }, [massifValues, reset]);
+    reset(undefined, { keepValues: true, keepErrors: false });
+  }, [reset]);
+
+  const handleFormSubmit = (e) => {
+    // Check if polygon is being edited before form submission
+    const editingElements = document.querySelectorAll('.leaflet-editing-icon');
+    const visibleEditingElements = Array.from(editingElements).filter(el => 
+      el.offsetParent !== null && getComputedStyle(el).display !== 'none'
+    );
+    if (visibleEditingElements.length > 0) {
+      e.preventDefault();
+      alert(formatMessage({ id: 'Please finish editing the polygon before submitting.' }));
+      return;
+    }
+    handleSubmit(onSubmit)(e);
+  };
 
   const onSubmit = async data => {
     if (isNewMassif) {
@@ -86,7 +102,7 @@ export const MassifForm = ({ massifValues }) => {
           description: data.massif.descriptionBody,
           descriptionTitle: data.massif.descriptionTitle,
           descriptionAndNameLanguage: { id: data.massif.language },
-          geogPolygon: data.massif.geoJson
+          geogPolygon: data.massif.geogPolygon
         })
       );
     } else {
@@ -135,7 +151,7 @@ export const MassifForm = ({ massifValues }) => {
     return (
       <FormProgressInfo
         isLoading={
-          massifLoading || nameLoading || descriptionLoading || !massifData
+          (massifLoading || nameLoading || descriptionLoading) && !(massifError || nameError || descriptionError)
         }
         isError={!!(massifError || nameError || descriptionError)}
         labelLoading={isNewMassif ? 'Creating massif...' : 'Updating massif...'}
@@ -145,14 +161,14 @@ export const MassifForm = ({ massifValues }) => {
             : 'An error occurred when updating a massif.'
         }
         resetFn={handleReset}
-        getRedirectFn={() => `/ui/massifs/${massifData.id}`}
+        getRedirectFn={() => massifData ? `/ui/massifs/${massifData.id}` : ''}
       />
     );
   }
 
   return (
     <FormContainer>
-      <form autoComplete="off" onSubmit={handleSubmit(onSubmit)}>
+      <form autoComplete="off" onSubmit={handleFormSubmit}>
         <MassifFields
           control={control}
           errors={errors}
