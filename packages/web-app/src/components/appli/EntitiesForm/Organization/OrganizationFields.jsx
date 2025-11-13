@@ -1,3 +1,4 @@
+import { useIntl } from 'react-intl';
 import { React } from 'react';
 // import { useWatch } from 'react-hook-form'; // To uncomment when API will accept phone number
 import PropTypes from 'prop-types';
@@ -18,32 +19,34 @@ import MapMarkerSelector from '../utils/MapMarkerSelector';
 import { FormRow, FormSectionLabel } from '../utils/FormContainers';
 // import OrganizationLogo from './OrganizationLogo';
 
-const OrganizationFields = ({ control, errors, isNewOrganization }) => (
-  /* const debouncedPhone = useDebounce(  // To uncomment when API will accept phone number
+const OrganizationFields = ({ control, errors, isNewOrganization }) => {
+  const { formatMessage } = useIntl();
+  return (
+    /* const debouncedPhone = useDebounce(  // To uncomment when API will accept phone number
     useWatch({ control, name: 'organization.phone' }),
     300
   ); */
 
-  <>
-    <FormSectionLabel label="Basic Information" />
-    <FormRow>
-      <InputText
-        formKey="organization.name"
-        labelName="Organization name"
-        control={control}
-        isError={!!errors?.organization?.name}
-        isRequired
-      />
+    <>
+      <FormSectionLabel label={formatMessage({ id: 'Basic Information' })} />
+      <FormRow>
+        <InputText
+          formKey="organization.name"
+          labelName="Organization name"
+          control={control}
+          isError={!!errors?.organization?.name}
+          isRequired
+        />
 
-      <InputLanguage
-        formKey="organization.language"
-        control={control}
-        isError={!!errors?.organization?.language}
-        disabled={!isNewOrganization}
-      />
-    </FormRow>
+        <InputLanguage
+          formKey="organization.language"
+          control={control}
+          isError={!!errors?.organization?.language}
+          disabled={!isNewOrganization}
+        />
+      </FormRow>
 
-    {/* To uncomment to use description instead of customMessage when API will be ready
+      {/* To uncomment to use description instead of customMessage when API will be ready
         <FormLabel>
           {formatMessage({ id: 'Description of the organization' })}
         </FormLabel>
@@ -63,18 +66,20 @@ const OrganizationFields = ({ control, errors, isNewOrganization }) => (
           isRequired={true}
         /> */}
 
-    <InputText
-      formKey="organization.customMessage"
-      labelName="Custom message"
-      control={control}
-      isError={!!errors?.organization?.customMessage}
-      minRows={6}
-      isRequired
-    />
+      <InputText
+        formKey="organization.customMessage"
+        labelName="Custom message"
+        control={control}
+        isError={!!errors?.organization?.customMessage}
+        minRows={6}
+        isRequired
+      />
 
-    <FormSectionLabel label="Additional information" />
-    <FormRow>
-      {/* To uncomment when API will accept phone number
+      <FormSectionLabel
+        label={formatMessage({ id: 'Additional information' })}
+      />
+      <FormRow>
+        {/* To uncomment when API will accept phone number
         <Controller
           name="organization.phone"
           control={control}
@@ -90,29 +95,29 @@ const OrganizationFields = ({ control, errors, isNewOrganization }) => (
         />
         */}
 
+        <InputText
+          formKey="organization.mail"
+          labelName="Email"
+          control={control}
+          isError={!!errors?.organization?.mail}
+          type="email"
+        />
+        <InputText
+          formKey="organization.url"
+          labelName="URL"
+          control={control}
+          isError={!!errors?.organization?.url}
+          type="url"
+        />
+      </FormRow>
       <InputText
-        formKey="organization.mail"
-        labelName="Email"
+        formKey="organization.address"
+        labelName="Address"
         control={control}
-        isError={!!errors?.organization?.mail}
-        type="email"
+        isError={!!errors?.organization?.address}
       />
-      <InputText
-        formKey="organization.url"
-        labelName="URL"
-        control={control}
-        isError={!!errors?.organization?.url}
-        type="url"
-      />
-    </FormRow>
-    <InputText
-      formKey="organization.address"
-      labelName="Address"
-      control={control}
-      isError={!!errors?.organization?.address}
-    />
 
-    {/* To uncomment when api will have addressLine2 field
+      {/* To uncomment when api will have addressLine2 field
         <Controller
           name="organization.addressLine2"
           control={control}
@@ -129,49 +134,51 @@ const OrganizationFields = ({ control, errors, isNewOrganization }) => (
         />
          */}
 
-    <FormRow>
-      <InputText
-        formKey="organization.zipCode"
-        labelName="Zip code"
-        control={control}
-        isError={!!errors?.organization?.zipCode}
-      />
-      <InputText
-        formKey="organization.city"
-        labelName="City"
-        control={control}
-        isError={!!errors?.organization?.city}
-      />
-      <InputCountry control={control} formKey="organization.country" />
-    </FormRow>
+      <FormRow>
+        <InputText
+          formKey="organization.zipCode"
+          labelName="Zip code"
+          control={control}
+          isError={!!errors?.organization?.zipCode}
+        />
+        <InputText
+          formKey="organization.city"
+          labelName="City"
+          control={control}
+          isError={!!errors?.organization?.city}
+        />
+        <InputCountry control={control} formKey="organization.country" />
+      </FormRow>
 
-    <FormRow>
-      <InputCoordinate
-        formKey="organization.latitude"
-        labelName="Latitude"
+      <FormRow>
+        <InputCoordinate
+          formKey="organization.latitude"
+          labelName="Latitude"
+          control={control}
+          validatorFn={validateLatitude}
+          isError={!!errors?.organization?.latitude}
+          helperText={errors?.organization?.latitude?.message}
+        />
+        <InputCoordinate
+          formKey="organization.longitude"
+          labelName="Longitude"
+          control={control}
+          validatorFn={validateLongitude}
+          isError={!!errors?.organization?.longitude}
+          helperText={errors?.organization?.longitude?.message}
+        />
+      </FormRow>
+      <MapMarkerSelector
         control={control}
-        validatorFn={validateLatitude}
-        isError={!!errors?.organization?.latitude}
-        helperText={errors?.organization?.latitude?.message}
+        formLatitudeKey="organization.latitude"
+        formLongitudeKey="organization.longitude"
       />
-      <InputCoordinate
-        formKey="organization.longitude"
-        labelName="Longitude"
-        control={control}
-        validatorFn={validateLongitude}
-        isError={!!errors?.organization?.longitude}
-        helperText={errors?.organization?.longitude?.message}
-      />
-    </FormRow>
-    <MapMarkerSelector
-      control={control}
-      formLatitudeKey="organization.latitude"
-      formLongitudeKey="organization.longitude"
-    />
 
-    {/* <OrganizationLogo control={control} errors={errors} /> To uncomment when api will be ready to store logo */}
-  </>
-);
+      {/* <OrganizationLogo control={control} errors={errors} /> To uncomment when api will be ready to store logo */}
+    </>
+  );
+};
+
 OrganizationFields.propTypes = {
   control: PropTypes.shape({}),
   errors: PropTypes.shape({

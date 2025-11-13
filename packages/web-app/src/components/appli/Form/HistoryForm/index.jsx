@@ -67,7 +67,7 @@ const CreateHistoryForm = ({ closeForm, onSubmit, values, isNewHistory }) => {
             helperContent={formatMessage({
               id: 'The text language'
             })}
-            labelText="Language"
+            labelText={formatMessage({ id: 'Language' })}
             onSelection={onChange}
             searchLabelText={formatMessage({ id: 'Search a language' })}
             value={value}

@@ -1,4 +1,5 @@
 import React from 'react';
+import { useIntl } from 'react-intl';
 import { Checkbox, IconButton, TableCell, TableRow } from '@mui/material';
 import { includes, isNil } from 'ramda';
 import ZoomInIcon from '@mui/icons-material/ZoomIn';
@@ -25,6 +26,7 @@ const Row = ({
   columns,
   onClick
 }) => {
+  const { formatMessage } = useIntl();
   const handleOpenDetailedView = id => () => {
     if (!isNil(onOpenDetailedView)) {
       onOpenDetailedView(id);
@@ -48,7 +50,7 @@ const Row = ({
       {!isNil(onOpenDetailedView) && (
         <TableCell padding="checkbox">
           <IconButton
-            aria-label="detailed view"
+            aria-label={formatMessage({ id: 'detailed view' })}
             onClick={handleOpenDetailedView(row.id)}
             size="small">
             <ZoomInIcon />

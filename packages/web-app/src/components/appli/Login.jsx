@@ -32,11 +32,15 @@ const Login = () => {
     event.preventDefault();
 
     const newAuthErrorMessages = [
-      ...(isEmpty(email) ? ['You must provide an email.'] : []),
-      ...(!!isEmpty(match(emailRegexp, email)) && !isEmpty(email)
-        ? ['You must provide a valid email.']
+      ...(isEmpty(email)
+        ? [formatMessage({ id: 'You must provide an email.' })]
         : []),
-      ...(isEmpty(password) ? ['You must provide a password.'] : [])
+      ...(!!isEmpty(match(emailRegexp, email)) && !isEmpty(email)
+        ? [formatMessage({ id: 'You must provide a valid email.' })]
+        : []),
+      ...(isEmpty(password)
+        ? [formatMessage({ id: 'You must provide a password.' })]
+        : [])
     ];
 
     setAuthErrorMessages(newAuthErrorMessages);

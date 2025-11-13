@@ -73,7 +73,7 @@ const LoginForm = ({
           endAdornment={
             <InputAdornment position="end">
               <IconButton
-                aria-label="toggle password visibility"
+                aria-label={formatMessage({ id: 'toggle password visibility' })}
                 onClick={toggleIsPasswordVisible}
                 onMouseDown={handleMouseDownPassword}
                 edge="end"

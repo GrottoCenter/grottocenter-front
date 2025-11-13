@@ -41,7 +41,11 @@ const FormContent = () => {
 
   return (
     <FormContainer>
-      <DocumentTypeSelect helperText="Choose from the types of documents available." />
+      <DocumentTypeSelect
+        helperText={formatMessage({
+          id: 'Choose from the types of documents available.'
+        })}
+      />
 
       {!isUnknown(document.type) && (
         <>
@@ -65,7 +69,7 @@ const FormContent = () => {
                 helperContentIfValueIsForced={formatMessage({
                   id: 'The main language of the document has been deduced from the parent document.'
                 })}
-                labelText="Document main language"
+                labelText={formatMessage({ id: 'Document main language' })}
                 required={false}
                 // required={!isOther(document.type)}
               />
@@ -108,7 +112,7 @@ const FormContent = () => {
                   parent document).
                 </Translate>
               }
-              labelText="Parent document"
+              labelText={formatMessage({ id: 'Parent document' })}
               required={isArticle(document.type) || isIssue(document.type)}
               searchLabelText={formatMessage({
                 id: 'Search for a document...'
@@ -119,7 +123,9 @@ const FormContent = () => {
           <MultipleCaversSelect
             computeHasError={() => false}
             contextValueName="authors"
-            helperText="Choose one or more authors among those already registered. If the author you are looking for does not exist in Grottocenter, it is possible to add him/her using the “+” button on the right."
+            helperText={formatMessage({
+              id: 'Choose one or more authors among those already registered. If the author you are looking for does not exist in Grottocenter, it is possible to add him/her using the “+” button on the right.'
+            })}
             labelName="Authors"
             // required={isOther(document.type) || isArticle(document.type)}
           />
@@ -141,7 +147,7 @@ const FormContent = () => {
                   The editor has been deduced from the parent document.
                 </Translate>
               }
-              labelText="Editor"
+              labelText={formatMessage({ id: 'Editor' })}
               searchLabelText={formatMessage({
                 id: 'Search for an editor...'
               })}
@@ -174,7 +180,7 @@ const FormContent = () => {
                     </Translate>
                   </>
                 }
-                labelText="Library"
+                labelText={formatMessage({ id: 'Library' })}
                 required={false}
                 searchLabelText={formatMessage({
                   id: 'Search for a library...'
@@ -186,7 +192,9 @@ const FormContent = () => {
           <MultipleISORegionsSelect
             computeHasError={() => false}
             contextValueName="iso3166"
-            helperText="If the document relates to one or more countries or regions."
+            helperText={formatMessage({
+              id: 'If the document relates to one or more countries or regions.'
+            })}
             labelName="ISO countries or regions"
             required={false}
           />
@@ -194,7 +202,9 @@ const FormContent = () => {
           <MultipleSubjectsSelect
             computeHasError={() => false}
             contextValueName="subjects"
-            helperText="Choose one or more subjects from those defined by the BBS. The list of subjects and their description is available here => https://www.ssslib.ch/bbs/wp-content/uploads/2017/03/chapter_and_geo_1_2008.pdf."
+            helperText={formatMessage({
+              id: 'Choose one or more subjects from those defined by the BBS. The list of subjects and their description is available here => https://www.ssslib.ch/bbs/wp-content/uploads/2017/03/chapter_and_geo_1_2008.pdf.'
+            })}
             labelName="BBS subjects"
             // required={isArticle(document.type)}
           />
@@ -208,7 +218,7 @@ const FormContent = () => {
                   registered in Grottocenter.
                 </Translate>
               }
-              labelText="Massif"
+              labelText={formatMessage({ id: 'Massif' })}
               required={false}
               searchLabelText={formatMessage({
                 id: 'Search for a massif...'

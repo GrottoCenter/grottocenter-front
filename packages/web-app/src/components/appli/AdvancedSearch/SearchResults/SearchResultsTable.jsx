@@ -453,6 +453,7 @@ class SearchResultsTable extends React.Component {
                     size={size}
                     onPageChange={this.handleChangePage}
                     count={totalNbResults}
+                    formatMessage={intl.formatMessage}
                   />
                 )}
               />

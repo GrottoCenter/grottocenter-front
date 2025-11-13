@@ -78,7 +78,7 @@ const DataControl = ({ updateHeatmap, updateMarkers, ...props }) => {
       <Wrapper>
         <IconButton
           className="leaflet-control-layers-toggle"
-          aria-label="data-control"
+          aria-label={formatMessage({ id: 'data-control' })}
           onMouseOver={handleOpenMenu}
           onClick={handleOpenMenu}
           onFocus={handleOpenMenu}
@@ -99,7 +99,10 @@ const DataControl = ({ updateHeatmap, updateMarkers, ...props }) => {
         <MenuItem disabled>
           {formatMessage({ id: 'heat map' }).toUpperCase()}
         </MenuItem>
-        <RadioGroup aria-label="heatmap" name="heatmap" value={selectedHeat}>
+        <RadioGroup
+          aria-label={formatMessage({ id: 'heatmap' })}
+          name="heatmap"
+          value={selectedHeat}>
           <MenuItem onClick={handleChange('heat', heatmapTypes.ENTRANCES)}>
             <FormControlLabel
               value={heatmapTypes.ENTRANCES}

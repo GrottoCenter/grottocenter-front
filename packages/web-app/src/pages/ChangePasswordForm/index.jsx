@@ -90,7 +90,9 @@ const ChangePasswordForm = ({
               endAdornment={
                 <InputAdornment position="end">
                   <IconButton
-                    aria-label="toggle password visibility"
+                    aria-label={formatMessage({
+                      id: 'toggle password visibility'
+                    })}
                     onClick={toggleIsPasswordVisible}
                     onMouseDown={handleMouseDownPassword}
                     edge="end"
@@ -123,7 +125,9 @@ const ChangePasswordForm = ({
               endAdornment={
                 <InputAdornment position="end">
                   <IconButton
-                    aria-label="toggle password visibility"
+                    aria-label={formatMessage({
+                      id: 'toggle password visibility'
+                    })}
                     onClick={toggleIsPasswordVisible}
                     onMouseDown={handleMouseDownPassword}
                     edge="end"
@@ -133,7 +137,7 @@ const ChangePasswordForm = ({
                 </InputAdornment>
               }
               hasError={checkIfHasError('passwordConfirmation')}
-              helperText="Repeat your password here."
+              helperText={formatMessage({ id: 'Repeat your password here.' })}
               fullWidth
               onValueChange={onPasswordConfirmationChange}
               required

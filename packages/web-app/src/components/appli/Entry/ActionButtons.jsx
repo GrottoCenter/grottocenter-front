@@ -44,7 +44,7 @@ const ActionButtons = ({
           <Button
             onClick={() => onRestorePress()}
             color="primary"
-            aria-label="restore">
+            aria-label={formatMessage({ id: 'restore' })}>
             <RestoreIcon />
           </Button>
         </Tooltip>
@@ -59,7 +59,7 @@ const ActionButtons = ({
           <Button
             onClick={() => onDeletePress(isDeleted)}
             color="primary"
-            aria-label="delete">
+            aria-label={formatMessage({ id: 'delete' })}>
             {isDeleted ? <DeleteForeverIcon color="error" /> : <DeleteIcon />}
           </Button>
         </Tooltip>
@@ -75,7 +75,7 @@ const ActionButtons = ({
             disabled={!canEdit}
             onClick={() => setIsUpdating(!isUpdating)}
             color="primary"
-            aria-label="edit">
+            aria-label={formatMessage({ id: 'edit' })}>
             {isUpdating ? formatMessage({ id: `Cancel` }) : <EditIcon />}
           </Button>
         </Tooltip>

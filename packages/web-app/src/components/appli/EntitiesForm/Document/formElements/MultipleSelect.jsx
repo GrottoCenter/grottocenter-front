@@ -165,7 +165,7 @@ const MultipleSelect = ({
             onClick={onSideAction}
             disabled={sideActionDisabled}
             color="secondary"
-            aria-label="new entity">
+            aria-label={formatMessage({ id: 'new entity' })}>
             {!isNil(sideActionIcon) ? (
               sideActionIcon
             ) : (

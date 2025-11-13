@@ -54,7 +54,7 @@ const EditTypeSelection = ({
           {formatMessage({ id: 'The cave is:' })}
         </FormLabel>
         <RadioGroup
-          aria-label="entityType"
+          aria-label={formatMessage({ id: 'entityType' })}
           name="entityType"
           value={entityType}
           onChange={event => {
@@ -115,7 +115,9 @@ const EditTypeSelection = ({
           {errors?.caveName && (
             <Alert severity="error" content={errors.caveName} />
           )}
-          <FormSectionLabel label="Basic Information" />
+          <FormSectionLabel
+            label={formatMessage({ id: 'Basic Information' })}
+          />
           <FormRow>
             <InputText
               formKey="entrance.name"

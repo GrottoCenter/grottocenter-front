@@ -17,6 +17,7 @@ import { getAccordionBodyFromType, sortSnapshots } from './UtilityFunction';
 import AccordionSnapshotListPage from './AccordionSnapshotListPage';
 import Translate from '../../../common/Translate';
 import { fetchEntrance } from '../../../../actions/Entrance/GetEntrance';
+import { capitalize } from '../../../../util/strings';
 
 const SnapshotPage = () => {
   const dispatch = useDispatch();
@@ -61,7 +62,7 @@ const SnapshotPage = () => {
     }
   }, [id, type, dispatch]);
 
-  let currentTItem = {};
+  let currentTItem;
   switch (type) {
     case 'entrances':
       currentTItem = currentEntrance;
@@ -79,14 +80,14 @@ const SnapshotPage = () => {
   return (
     <>
       {isSensitive && <SensitiveCaveWarning />}
-      {Object.keys(currentTItem).length > 0 && (
+      {currentTItem && Object.keys(currentTItem).length > 0 && (
         <ScrollableContent
           dense
           title={
             <Translate
               id="{type}: Revision history"
               values={{
-                type
+                type: <Translate>{capitalize(type)}</Translate>
               }}
               defaultMessage={`${type}: Revision history`}
             />

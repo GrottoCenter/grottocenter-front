@@ -82,9 +82,10 @@ const Descriptions = ({
           ) : (
             <Alert
               severity="info"
-              content={formatMessage({
-                id: `There is currently no description for this ${entityType}.`
-              })}
+              content={formatMessage(
+                { id: 'descriptions.none' },
+                { entityType: formatMessage({ id: entityType }) }
+              )}
             />
           )}
         </>

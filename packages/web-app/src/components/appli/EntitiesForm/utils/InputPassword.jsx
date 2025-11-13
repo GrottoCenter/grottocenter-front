@@ -57,7 +57,9 @@ const InputPassword = ({
             endAdornment={
               <InputAdornment position="end">
                 <IconButton
-                  aria-label="toggle password visibility"
+                  aria-label={formatMessage({
+                    id: 'toggle password visibility'
+                  })}
                   onClick={onShowPassword}
                   edge="end"
                   size="large">

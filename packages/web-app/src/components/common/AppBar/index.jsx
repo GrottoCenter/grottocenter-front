@@ -1,4 +1,5 @@
 import React from 'react';
+import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import {
@@ -87,72 +88,75 @@ const AppBar = ({
   toggleMenu,
   userNickname,
   isSideMenuOpen
-}) => (
-  <>
-    <StyledMuiAppBar>
-      <Toolbar variant="dense">
-        <IconButton
-          color="inherit"
-          aria-label="open drawer"
-          edge="start"
-          onClick={toggleMenu}
-          size="large">
-          <MenuIcon />
-        </IconButton>
-        <TitleWrapper>
-          <LogoWrapper>
-            <Typography variant="h4">
-              <StyledLink to="">
-                <LogoImage
-                  id="grottocenter-logo"
-                  src={logoGC}
-                  alt="Grottocenter"
-                />
-                <GrottoTxt>Grottocenter</GrottoTxt>
-              </StyledLink>
-            </Typography>
-          </LogoWrapper>
-        </TitleWrapper>
-        <RightWrapper>
-          {!!AutoCompleteSearch && (
-            <>
-              <SearchWrapper>
-                <AutoCompleteSearch />
-              </SearchWrapper>
-              <Fade in={!isSideMenuOpen}>
-                <LanguageWrapper>
-                  <StyledEngineProvider injectFirst>
-                    <ThemeProvider
-                      theme={theme =>
-                        createTheme({
-                          ...theme,
-                          palette: {
-                            ...theme.palette,
-                            type: 'dark'
-                          }
-                        })
-                      }>
-                      <LanguageSelector />
-                    </ThemeProvider>
-                  </StyledEngineProvider>
-                </LanguageWrapper>
-              </Fade>
-            </>
-          )}
-        </RightWrapper>
-        <NotificationMenu />
-        <UserMenu
-          authTokenExpirationDate={authTokenExpirationDate}
-          isAuth={isAuth}
-          onLoginClick={onLoginClick}
-          onLogoutClick={onLogoutClick}
-          userNickname={userNickname}
-        />
-      </Toolbar>
-    </StyledMuiAppBar>
-    <Toolbar variant="dense" />
-  </>
-);
+}) => {
+  const { formatMessage } = useIntl();
+  return (
+    <>
+      <StyledMuiAppBar>
+        <Toolbar variant="dense">
+          <IconButton
+            color="inherit"
+            aria-label={formatMessage({ id: 'open drawer' })}
+            edge="start"
+            onClick={toggleMenu}
+            size="large">
+            <MenuIcon />
+          </IconButton>
+          <TitleWrapper>
+            <LogoWrapper>
+              <Typography variant="h4">
+                <StyledLink to="">
+                  <LogoImage
+                    id="grottocenter-logo"
+                    src={logoGC}
+                    alt="Grottocenter"
+                  />
+                  <GrottoTxt>Grottocenter</GrottoTxt>
+                </StyledLink>
+              </Typography>
+            </LogoWrapper>
+          </TitleWrapper>
+          <RightWrapper>
+            {!!AutoCompleteSearch && (
+              <>
+                <SearchWrapper>
+                  <AutoCompleteSearch />
+                </SearchWrapper>
+                <Fade in={!isSideMenuOpen}>
+                  <LanguageWrapper>
+                    <StyledEngineProvider injectFirst>
+                      <ThemeProvider
+                        theme={theme =>
+                          createTheme({
+                            ...theme,
+                            palette: {
+                              ...theme.palette,
+                              type: 'dark'
+                            }
+                          })
+                        }>
+                        <LanguageSelector />
+                      </ThemeProvider>
+                    </StyledEngineProvider>
+                  </LanguageWrapper>
+                </Fade>
+              </>
+            )}
+          </RightWrapper>
+          <NotificationMenu />
+          <UserMenu
+            authTokenExpirationDate={authTokenExpirationDate}
+            isAuth={isAuth}
+            onLoginClick={onLoginClick}
+            onLogoutClick={onLogoutClick}
+            userNickname={userNickname}
+          />
+        </Toolbar>
+      </StyledMuiAppBar>
+      <Toolbar variant="dense" />
+    </>
+  );
+};
 
 AppBar.propTypes = {
   authTokenExpirationDate: PropTypes.instanceOf(Date).isRequired,

@@ -64,8 +64,18 @@ const DocumentsTable = ({
   const [hiddenColumns, setHiddenColumns] = useState(
     defaultHiddenColumns ?? documentDefaultHiddenColumns
   );
-  const makeTranslation = id =>
-    formatMessage({ id: `${id[0].toUpperCase()}${id.slice(1)}` });
+  const columnTranslations = {
+    id: 'table.column.id',
+    title: 'table.column.title',
+    type: 'table.column.type',
+    author: 'table.column.author',
+    date: 'table.column.date'
+  };
+
+  const makeTranslation = id => {
+    const translationKey = columnTranslations[id] || `table.column.${id}`;
+    return formatMessage({ id: translationKey });
+  };
   const [columns, setColumns] = useState(
     createColumns(documents, makeTranslation)
   );

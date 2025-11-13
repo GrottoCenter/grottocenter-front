@@ -47,7 +47,7 @@ const VisibleColumnsMenu = ({
   return (
     <>
       <IconButton
-        aria-label="visible columns button"
+        aria-label={formatMessage({ id: 'visible columns button' })}
         onClick={handleClick}
         size="large">
         <VisibilityOffIcon />
@@ -64,7 +64,6 @@ const VisibleColumnsMenu = ({
         {allColumns.map(column => (
           <MenuItem
             key={column.id}
-            button
             onClick={handleUpdateHiddenColumns(column.id)}>
             <ListItemIcon>
               <Checkbox

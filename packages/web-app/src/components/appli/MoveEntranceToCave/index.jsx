@@ -44,9 +44,10 @@ const MoveEntranceToCave = () => {
                 {fetchError && (
                   <Alert
                     severity="error"
-                    content={formatMessage({
-                      id: `An error occured when loading the entrance of id ${entranceId}.`
-                    })}
+                    content={formatMessage(
+                      { id: 'entrance.load.error' },
+                      { entranceId }
+                    )}
                   />
                 )}
               </>

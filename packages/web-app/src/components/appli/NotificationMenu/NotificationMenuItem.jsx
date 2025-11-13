@@ -57,11 +57,12 @@ const NotificationsMenuItem = ({ notification, onClick, width }) => {
           <span style={{ fontSize: '85%' }}>
             {formatMessage(
               {
-                id: `{entity} ${verb}`,
-                defaultMessage: `{entity} ${verb}`
+                id: 'entity.action',
+                defaultMessage: '{entity} {verb}'
               },
               {
-                entity: `(${formatMessage({ id: entityType })})`
+                entity: `(${formatMessage({ id: entityType })})`,
+                verb: formatMessage({ id: verb })
               }
             )}
             .

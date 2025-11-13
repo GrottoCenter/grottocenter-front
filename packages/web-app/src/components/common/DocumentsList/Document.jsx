@@ -62,9 +62,7 @@ const Document = ({ document, hasSnapshotButton = false, onUnlink }) => {
           <DocumentDescription>
             <Linkify> {document.description}</Linkify>
           </DocumentDescription>
-        ) : (
-          false
-        )}
+        ) : false}
         {document.files ? <Files files={document.files} /> : false}
       </StyledListItemContainer>
 
@@ -79,9 +77,7 @@ const Document = ({ document, hasSnapshotButton = false, onUnlink }) => {
                 type="documents"
                 content={document}
               />
-            ) : (
-              false
-            )}
+            ) : false}
             {onUnlink ? (
               <Tooltip
                 title={formatMessage({
@@ -90,18 +86,14 @@ const Document = ({ document, hasSnapshotButton = false, onUnlink }) => {
                 <Button
                   onClick={() => setUnlinkDialogOpen(true)}
                   color="primary"
-                  aria-label="unlink">
+                  aria-label={formatMessage({ id: 'unlink' })}>
                   <LinkOffIcon />
                 </Button>
               </Tooltip>
-            ) : (
-              false
-            )}
+            ) : false}
           </ButtonGroup>
         </ListItemIcon>
-      ) : (
-        false
-      )}
+      ) : false}
       {onUnlink ? (
         <StandardDialog
           open={isUnlinkDialogOpen}
@@ -130,9 +122,7 @@ const Document = ({ document, hasSnapshotButton = false, onUnlink }) => {
             Are you sure you want to unlink this document of this entity?
           </Translate>
         </StandardDialog>
-      ) : (
-        false
-      )}
+      ) : false}
     </StyledListItem>
   );
 };

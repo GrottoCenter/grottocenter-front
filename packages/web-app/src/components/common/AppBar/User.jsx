@@ -18,9 +18,9 @@ const UserMenu = ({
   onLoginClick,
   onLogoutClick
 }) => {
+  const { formatDate, formatMessage, formatTime } = useIntl();
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
-  const { formatDate, formatMessage, formatTime } = useIntl();
   const theme = useTheme();
   const userId = pathOr(null, ['id'], useUserProperties());
   const navigate = useNavigate();
@@ -58,7 +58,7 @@ const UserMenu = ({
   ) : (
     <>
       <IconButton
-        aria-label="account of current user"
+        aria-label={formatMessage({ id: 'account of current user' })}
         aria-controls="menu-appbar"
         aria-haspopup="true"
         onClick={handleMenu}

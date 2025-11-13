@@ -14,7 +14,7 @@ const MassifFields = ({ control, errors, geoJson }) => {
   const { formatMessage } = useIntl();
   return (
     <>
-      <FormSectionLabel label="Basic Information" />
+      <FormSectionLabel label={formatMessage({ id: 'Basic Information' })} />
       <FormRow>
         <InputText
           formKey="massif.name"
@@ -31,7 +31,9 @@ const MassifFields = ({ control, errors, geoJson }) => {
         />
       </FormRow>
 
-      <FormSectionLabel label="Description of the massif" />
+      <FormSectionLabel
+        label={formatMessage({ id: 'Description of the massif' })}
+      />
       <InputText
         formKey="massif.descriptionTitle"
         labelName="Title"
@@ -48,7 +50,7 @@ const MassifFields = ({ control, errors, geoJson }) => {
         minRows={6}
       />
 
-      <FormSectionLabel label="Massif area" />
+      <FormSectionLabel label={formatMessage({ id: 'Massif area' })} />
       <FormHelperText>
         {formatMessage({
           id: 'Draw the area covered by the massif using the tools at the right of the map.'

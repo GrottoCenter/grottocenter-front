@@ -164,7 +164,7 @@ export const DeletedCard = ({
               sx={{ marginLeft: 3 }}
               onClick={() => onRestorePress()}
               color="primary"
-              aria-label="restore">
+              aria-label={formatMessage({ id: 'restore' })}>
               <RestoreIcon />
             </Button>
           </Tooltip>
@@ -177,7 +177,7 @@ export const DeletedCard = ({
               sx={{ marginLeft: 3 }}
               onClick={() => onPermanentDeletePress()}
               color="primary"
-              aria-label="delete">
+              aria-label={formatMessage({ id: 'delete' })}>
               <DeleteForeverIcon color="error" />
             </Button>
           </Tooltip>
@@ -203,7 +203,7 @@ export const DeleteConfirmationDialog = ({
   const [selectedEntity, setSelectedEntity] = useState(null);
   const debouncedInput = useDebounce(inputValue);
   const {
-    isLoading: isQuickSearckLoading,
+    isLoading: isQuickSearchLoading,
     results: suggestions,
     error
   } = useSelector(state => state.quicksearch);
@@ -214,12 +214,12 @@ export const DeleteConfirmationDialog = ({
 
   const fetchSearchResults = useCallback(
     query => {
-      const criterias = {
+      const criteria = {
         query: query.trim(),
         complete: false,
         resourceType: entityType.searchType
       };
-      dispatch(fetchQuicksearchResult(criterias));
+      dispatch(fetchQuicksearchResult(criteria));
     },
     [dispatch, entityType]
   );
@@ -252,7 +252,7 @@ export const DeleteConfirmationDialog = ({
         : formatMessage({ id: 'Permanently delete' });
   }
 
-  let searchTitle = '';
+  let searchTitle;
   if (!isPermanent) {
     searchTitle = formatMessage(
       {
@@ -338,7 +338,7 @@ export const DeleteConfirmationDialog = ({
             onSelection={handleSelection}
             getOptionLabel={e => e?.name}
             hasError={!!error}
-            isLoading={isQuickSearckLoading}
+            isLoading={isQuickSearchLoading}
             label={formatMessage(
               {
                 id: `Search for a {entityFmt}`,
@@ -358,7 +358,7 @@ export const DeleteConfirmationDialog = ({
               <StyledEntityIcon src={`/images/${selectedEntity.iconName}`} />
             )}
             <IconButton
-              aria-label="remove"
+              aria-label={formatMessage({ id: 'remove' })}
               sx={{
                 float: 'right',
                 padding: selectedEntity?.subtitle ? 2 : 0

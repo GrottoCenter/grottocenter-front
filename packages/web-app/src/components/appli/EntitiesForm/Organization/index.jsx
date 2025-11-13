@@ -65,8 +65,8 @@ export const OrganizationForm = ({ organizationValues = null }) => {
   });
 
   const handleReset = useCallback(() => {
-    reset({ organization: organizationValues || defaultOrganizationValues });
-  }, [organizationValues, reset]);
+    reset(undefined, { keepValues: true, keepErrors: false });
+  }, [reset]);
 
   const onSubmit = async data => {
     /* eslint-disable no-param-reassign */
@@ -113,8 +113,8 @@ export const OrganizationForm = ({ organizationValues = null }) => {
         }
         labelError={
           isNewOrganization
-            ? 'An error occurred when creating a organzation.'
-            : 'An error occurred when updating a organzation.'
+            ? 'An error occurred when creating a organization.'
+            : 'An error occurred when updating a organization.'
         }
         resetFn={handleReset}
         getRedirectFn={() => `/ui/organizations/${organizationData.id}`}

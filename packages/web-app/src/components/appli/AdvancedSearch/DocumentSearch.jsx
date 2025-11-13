@@ -207,7 +207,7 @@ class DocumentSearch extends React.Component {
           <Translate>
             The BBS (&quot;Bulletin Bibliographique Spéléologique&quot; in
             french) is an annual review of the worldwide speleological
-            litterature.
+            literature.
           </Translate>
           <br />
           <InternationalizedLink links={wikiBBSLinks}>
