@@ -38,7 +38,7 @@ const StyledCardActions = withStyles({
 const StyledCard = withStyles(
   theme => ({
     root: {
-      '&:nth-child(n+1)': {
+      '&:nth-of-type(n+1)': {
         marginTop: '4%',
         [theme.breakpoints.up('550')]: {
           marginTop: '0'

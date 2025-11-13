@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import {
   Tooltip,
   FormControl,
-  Input,
   ListItemText,
   Select,
   Checkbox,
@@ -50,9 +49,9 @@ const EntrancesSelector = ({
             <Select
               displayEmpty
               multiple
+              variant="standard"
               value={selectedEntrancesId}
               onChange={handleChange}
-              input={<Input />}
               renderValue={selected => {
                 if (selected.length === 0) {
                   return <em>{formatMessage({ id: 'Network entrances' })}</em>;

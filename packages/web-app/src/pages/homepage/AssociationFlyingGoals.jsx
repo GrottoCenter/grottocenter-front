@@ -35,7 +35,7 @@ const CenteredText = styled('div')`
     display: inline-block;
     position: relative;
     top: 140px;
-    left: ~'calc((100% - 200px) / 2)';
+    left: calc((100% - 200px) / 2);
     width: 200px;
     height: 150px;
     font-size: 1.55em;
@@ -57,31 +57,31 @@ const GoalWrapper = styled(FlyingGoal)`
       text-align: center;
     }
 
-    & > span:first-child {
+    & > span:first-of-type {
       white-space: nowrap;
     }
 
-    &:nth-child(1) {
+    &:nth-of-type(1) {
       left: calc(((100% - 120px) / 2) - 100px);
       bottom: 25px;
     }
 
-    &:nth-child(2) {
+    &:nth-of-type(2) {
       left: calc(((100% - 180px) / 2) - 160px);
       bottom: 230px;
     }
 
-    &:nth-child(3) {
+    &:nth-of-type(3) {
       left: calc((100% - 120px) / 2);
       bottom: 350px;
     }
 
-    &:nth-child(4) {
+    &:nth-of-type(4) {
       left: calc(((100% - 70px) / 2) + 160px);
       bottom: 230px;
     }
 
-    &:nth-child(5) {
+    &:nth-of-type(5) {
       left: calc(((100% - 120px) / 2) + 100px);
       bottom: 25px;
     }

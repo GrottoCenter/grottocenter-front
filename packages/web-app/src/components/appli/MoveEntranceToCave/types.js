@@ -2,7 +2,8 @@ import PropTypes from 'prop-types';
 
 export const CaveType = PropTypes.shape({
   id: PropTypes.number.isRequired,
-  name: PropTypes.string.isRequired
+  name: PropTypes.string,
+  names: PropTypes.string
 });
 
 export const EntranceType = PropTypes.shape({
@@ -10,9 +11,12 @@ export const EntranceType = PropTypes.shape({
   cave: PropTypes.shape({
     id: PropTypes.number.isRequired,
     entrances: PropTypes.arrayOf(
-      PropTypes.shape({
-        id: PropTypes.number.isRequired
-      })
+      PropTypes.oneOfType([
+        PropTypes.number,
+        PropTypes.shape({
+          id: PropTypes.number.isRequired
+        })
+      ])
     ),
     name: PropTypes.string.isRequired
   }).isRequired,

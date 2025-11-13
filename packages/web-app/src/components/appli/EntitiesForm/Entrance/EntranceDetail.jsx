@@ -125,7 +125,7 @@ const EntranceDetail = ({ control, errors, getValues }) => {
               InputProps={{
                 inputProps: { max: new Date().getFullYear() }
               }}
-              value={value}
+              value={value ?? ''}
               onChange={onChange}
             />
           )}

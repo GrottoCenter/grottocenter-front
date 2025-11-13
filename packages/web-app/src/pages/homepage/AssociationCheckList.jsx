@@ -22,10 +22,8 @@ const CheckListWrapper = styled('div')`
 `;
 
 const zoomAnimation = keyframes`
-  {
-    50%  { transform: scale(1.5, 1.5); }
-    100% { transform: scale(1, 1); }
-  }
+  50%  { transform: scale(1.5, 1.5); }
+  100% { transform: scale(1, 1); }
 `;
 
 const ListIcon = styled(CheckIcon)`
@@ -58,26 +56,26 @@ const ListItem = styled('li')`
     clear: both;
   }
 
-  &:nth-child(odd) span {
+  &:nth-of-type(odd) span {
     display: block;
     margin-left: 80px;
-    margin-right: 0px;
+    margin-right: 0;
   }
 
-  &:nth-child(even) span {
+  &:nth-of-type(even) span {
     display: block;
-    margin-left: 0px;
+    margin-left: 0;
     margin-right: 80px;
     text-align: right;
   }
 
-  &:nth-child(even) svg {
+  &:nth-of-type(even) svg {
     float: right;
   }
 
   @media (max-width: 550px) {
     :last-child {
-      margin-bottom: 0px;
+      margin-bottom: 0;
     }
   }
 `;

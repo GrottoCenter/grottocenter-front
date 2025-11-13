@@ -147,7 +147,7 @@ const ChangeTable = styled('div')(
     display: grid;
     gap: 0.3em;
     grid-template-rows: auto auto;
-    & > *:nth-child(even){
+    & > *:nth-of-type(even){
       padding-bottom: 2em;
     }
 
@@ -155,10 +155,10 @@ const ChangeTable = styled('div')(
       grid-template-columns: auto 1fr;
       grid-template-rows: unset;
       gap: 1.3em 0.5em;
-      & > *:nth-child(odd){
+      & > *:nth-of-type(odd){
         justify-self: end;
       }
-      & > *:nth-child(even){
+      & > *:nth-of-type(even){
         padding-bottom: 0;
       }
     }
@@ -173,8 +173,8 @@ const RecentChangesCard = ({ changes, isFetching, fetch }) => {
   if (isFetching || !changes) return <CircularProgress />;
   return (
     <ChangeTable>
-      {changes.map(e => (
-        <ChangeItem changeInfo={e} key={e.date} />
+      {changes.map((e, index) => (
+        <ChangeItem changeInfo={e} key={`${e.date}-${index}`} />
       ))}
     </ChangeTable>
   );
