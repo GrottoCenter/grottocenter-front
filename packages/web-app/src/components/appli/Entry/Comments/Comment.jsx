@@ -2,6 +2,7 @@ import { ListItem, Box, ListItemText, ListItemIcon } from '@mui/material';
 import React, { useState, useEffect } from 'react';
 import { styled } from '@mui/material/styles';
 import { useDispatch } from 'react-redux';
+import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
 import { usePermissions, useUserProperties } from '../../../../hooks';
 import { updateComment } from '../../../../actions/Comment/UpdateComment';
@@ -43,6 +44,7 @@ const DurationContainer = styled('div')`
 
 const Comment = ({ comment, isEditAllowed }) => {
   const dispatch = useDispatch();
+  const { formatMessage } = useIntl();
   const permissions = usePermissions();
   const [isUpdateFormVisible, setIsUpdateFormVisible] = useState(false);
   const [wantedDeletedState, setWantedDeletedState] = useState(false);
@@ -147,14 +149,14 @@ const Comment = ({ comment, isEditAllowed }) => {
                 <Duration
                   image="/images/time-to-go.svg"
                   durationStr={comment.eTTrail}
-                  title="Time to go"
+                  title={formatMessage({ id: 'Time to go' })}
                 />
               )}
               {!!comment.eTUnderground && comment.eTUnderground.length > 0 && (
                 <Duration
                   image="/images/underground_time.svg"
                   durationStr={comment.eTUnderground}
-                  title="Underground time"
+                  title={formatMessage({ id: 'Underground time' })}
                 />
               )}
             </DurationContainer>

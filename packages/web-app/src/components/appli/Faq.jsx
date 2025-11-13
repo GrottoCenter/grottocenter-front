@@ -1,4 +1,5 @@
 import React from 'react';
+import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
 import withStyles from '@mui/styles/withStyles';
 import CheckIcon from '@mui/icons-material/Check';
@@ -85,6 +86,7 @@ FaqCard.propTypes = {
 };
 
 const Faq = () => {
+  const { formatMessage } = useIntl();
   const { locale } = useSelector(state => state.intl);
   const contributeLink =
     contributeLinks[locale] !== undefined
@@ -93,7 +95,10 @@ const Faq = () => {
 
   return (
     <FaqDiv>
-      <FaqCard title="I would like to share some of my work but some caves should remain protected. How are you planning to protect them?">
+      <FaqCard
+        title={formatMessage({
+          id: 'I would like to share some of my work but some caves should remain protected. How are you planning to protect them?'
+        })}>
         <Translate id="Here is the procedure that will be implemented in next version of GrottoCenter. Is that acceptable for you?" />
         <br />
         <GCLink href={pftGdLink} alt="Link to google document">
@@ -101,11 +106,17 @@ const Faq = () => {
         </GCLink>
       </FaqCard>
 
-      <FaqCard title="How can you guarantee the quality of the data on GrottoCenter?">
+      <FaqCard
+        title={formatMessage({
+          id: 'How can you guarantee the quality of the data on GrottoCenter?'
+        })}>
         <Translate id="The Wikicaves association has signed partnership with clubs and federations which provide data and which are informed of all the actions carried out. Besides we have routine softwares that regularly check the quality of the data." />
       </FaqCard>
 
-      <FaqCard title="I find your project interesting: How can I help?">
+      <FaqCard
+        title={formatMessage({
+          id: 'I find your project interesting: How can I help?'
+        })}>
         <ItemList className="listing">
           <li>
             <StyledCheckIcon />
@@ -144,7 +155,7 @@ const Faq = () => {
                   <GCLink
                     href={contributeLink}
                     alt="Link to become a developer">
-                    <Translate id="joining our team of developpers" />
+                    <Translate id="joining our team of developers" />
                   </GCLink>
                 )
               }}
@@ -166,11 +177,14 @@ const Faq = () => {
         </ItemList>
       </FaqCard>
 
-      <FaqCard title="One of my caving buddies told me I should NOT post anything at all on GrottoCenter. That sometimes makes it hard to contribute!">
+      <FaqCard
+        title={formatMessage({
+          id: 'One of my caving buddies told me I should NOT post anything at all on GrottoCenter. That sometimes makes it hard to contribute!'
+        })}>
         <Translate id="Yes, it may be very difficult!!!! But perhaps we should all be aware that the world is changing." />
       </FaqCard>
 
-      <FaqCard title="Who is behind GrottoCenter?">
+      <FaqCard title={formatMessage({ id: 'Who is behind GrottoCenter?' })}>
         <Translate id="We have our wiki: this is where you can find us." />
         <br />
         <InternationalizedLink
@@ -179,7 +193,10 @@ const Faq = () => {
         />
       </FaqCard>
 
-      <FaqCard title="I want to share my data only with fellow cavers. Is it possible on GrottoCenter?">
+      <FaqCard
+        title={formatMessage({
+          id: 'I want to share my data only with fellow cavers. Is it possible on GrottoCenter?'
+        })}>
         <Translate id="On GrottoCenter, data is placed under free licence, it is accessible to all those who may need it." />
       </FaqCard>
     </FaqDiv>

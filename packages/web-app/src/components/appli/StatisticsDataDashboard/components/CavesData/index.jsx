@@ -43,7 +43,7 @@ const CavesData = ({
                   />
                 }
                 numberData={nbMassifs}
-                text="massif(s)"
+                text={formatMessage({ id: 'massif(s)' })}
               />
               <StyledDivider />
             </>
@@ -59,7 +59,7 @@ const CavesData = ({
                 />
               }
               numberData={nbCaves}
-              text="cave(s) (1 or multiple entrances)"
+              text={formatMessage({ id: 'cave(s) (1 or multiple entrances)' })}
             />
           )}
 
@@ -70,7 +70,7 @@ const CavesData = ({
                 icon={<Waves color="primary" />}
                 alt="entry icon"
                 numberData={nbDivingCaves}
-                text="cave(s) are diveable"
+                text={formatMessage({ id: 'cave(s) are diveable' })}
               />
             </>
           )}
@@ -87,7 +87,9 @@ const CavesData = ({
                   />
                 }
                 numberData={nbNetworks}
-                text="network(s) (cave of more than 1 entrance)"
+                text={formatMessage({
+                  id: 'network(s) (cave of more than 1 entrance)'
+                })}
               />
             </>
           )}

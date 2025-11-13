@@ -97,7 +97,7 @@ const CreateRiggingsForm = ({ closeForm, onSubmit, values, isNew }) => {
             helperContent={formatMessage({
               id: 'The title and text language'
             })}
-            labelText="Language"
+            labelText={formatMessage({ id: 'Language' })}
             onSelection={onChange}
             searchLabelText={formatMessage({ id: 'Search a language' })}
             value={value}
@@ -105,7 +105,7 @@ const CreateRiggingsForm = ({ closeForm, onSubmit, values, isNew }) => {
         )}
       />
       <TableContainer>
-        <Table size="small" aria-label="riggings">
+        <Table size="small" aria-label={formatMessage({ id: 'riggings' })}>
           <TableHead>
             <TableRow>
               <TableCell align="center">
@@ -224,7 +224,7 @@ const CreateRiggingsForm = ({ closeForm, onSubmit, values, isNew }) => {
                               size="small"
                               color="primary"
                               disabled={index === 0}
-                              aria-label="edit">
+                              aria-label={formatMessage({ id: 'edit' })}>
                               <KeyboardArrowUpIcon />
                             </IconButton>
                           </span>
@@ -237,7 +237,7 @@ const CreateRiggingsForm = ({ closeForm, onSubmit, values, isNew }) => {
                               size="small"
                               color="primary"
                               disabled={index === fields.length - 1}
-                              aria-label="edit">
+                              aria-label={formatMessage({ id: 'edit' })}>
                               <KeyboardArrowDownIcon />
                             </IconButton>
                           </span>
@@ -249,7 +249,7 @@ const CreateRiggingsForm = ({ closeForm, onSubmit, values, isNew }) => {
                           onClick={() => remove(index)}
                           size="small"
                           color="inherit"
-                          aria-label="edit">
+                          aria-label={formatMessage({ id: 'edit' })}>
                           <DeleteIcon />
                         </IconButton>
                       </Tooltip>
@@ -265,7 +265,7 @@ const CreateRiggingsForm = ({ closeForm, onSubmit, values, isNew }) => {
         <Button
           onClick={() => append(getDefaultValues(languageObject).obstacles[0])}
           color="secondary"
-          aria-label="edit"
+          aria-label={formatMessage({ id: 'edit' })}
           startIcon={<PlaylistAddIcon />}>
           {formatMessage({ id: 'New line' })}
         </Button>

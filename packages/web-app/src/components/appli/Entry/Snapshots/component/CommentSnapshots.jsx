@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { styled } from '@mui/material/styles';
+import { useIntl } from 'react-intl';
 import { isEmpty, pathOr } from 'ramda';
 
 import Ratings from '../../Ratings';
@@ -29,6 +30,7 @@ const DurationContainer = styled('div')`
 `;
 
 const CommentSnapshots = ({ comment, previous }) => {
+  const { formatMessage } = useIntl();
   const {
     body,
     aestheticism,
@@ -58,7 +60,7 @@ const CommentSnapshots = ({ comment, previous }) => {
               durationStr={convertMinutes(
                 pathOr(eTTrail, ['minutes'], eTTrail)
               )}
-              title="Time to go"
+              title={formatMessage({ id: 'Time to go' })}
             />
           )}
           {!isEmpty(eTUnderground) && (
@@ -67,7 +69,7 @@ const CommentSnapshots = ({ comment, previous }) => {
               durationStr={convertMinutes(
                 pathOr(eTUnderground, ['minutes'], eTUnderground)
               )}
-              title="Underground time"
+              title={formatMessage({ id: 'Underground time' })}
             />
           )}
         </DurationContainer>

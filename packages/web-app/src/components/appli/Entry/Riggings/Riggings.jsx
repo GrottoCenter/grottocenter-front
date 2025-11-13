@@ -46,8 +46,8 @@ const Riggings = ({ riggings, entranceId, isEditAllowed }) => {
           <Tooltip
             title={
               isFormVisible
-                ? formatMessage({ id: 'Cancel adding a new riggings' })
-                : formatMessage({ id: 'Add a new riggings' })
+                ? formatMessage({ id: 'Cancel adding a new rigging' })
+                : formatMessage({ id: 'Add a new rigging' })
             }>
             <Button
               color={isFormVisible ? 'inherit' : 'secondary'}

@@ -12,9 +12,15 @@ import {
 import PropTypes from 'prop-types';
 import ScrollableContent from '../../common/Layouts/Fixed/ScrollableContent';
 import GCLink from '../../common/GCLink';
+import getLocalizedCountryName from '../../../helpers/countryName';
+import { AVAILABLE_LANGUAGES } from '../../../conf/config';
 
 const CountryList = ({ countries = [] }) => {
-  const { formatMessage } = useIntl();
+  const { formatMessage, locale } = useIntl();
+
+  const getLanguageDisplayName = () => {
+    return AVAILABLE_LANGUAGES[locale]?.refName || 'English';
+  };
 
   return (
     <ScrollableContent
@@ -27,7 +33,7 @@ const CountryList = ({ countries = [] }) => {
             <TableHead>
               <TableRow>
                 <TableCell>{formatMessage({ id: 'Native' })}</TableCell>
-                <TableCell>{formatMessage({ id: 'English' })}</TableCell>
+                <TableCell>{formatMessage({ id: getLanguageDisplayName() })}</TableCell>
                 <TableCell>{formatMessage({ id: 'ISO' })}</TableCell>
               </TableRow>
             </TableHead>
@@ -35,7 +41,7 @@ const CountryList = ({ countries = [] }) => {
               {countries.map(row => (
                 <TableRow
                   key={row.iso2}
-                  style={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+                  sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
                   <TableCell component="th" scope="row">
                     <GCLink internal href={`/ui/countries/${row.iso2}`}>
                       {row.native}
@@ -43,7 +49,12 @@ const CountryList = ({ countries = [] }) => {
                   </TableCell>
                   <TableCell component="th" scope="row">
                     <GCLink internal href={`/ui/countries/${row.iso2}`}>
-                      {row.english}
+                      {getLocalizedCountryName(
+                        { enName: row.english, nativeName: row.native },
+                        formatMessage,
+                        locale,
+                        row.english
+                      )}
                     </GCLink>
                   </TableCell>
                   <TableCell align="right">{row.iso2}</TableCell>

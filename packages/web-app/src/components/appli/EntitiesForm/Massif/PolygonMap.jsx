@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { MapContainer, FeatureGroup, ScaleControl } from 'react-leaflet';
 import { EditControl } from 'react-leaflet-draw';
 import L from 'leaflet';
+import { useIntl } from 'react-intl';
 import LayersControl from '../../../common/Maps/common/LayersControl';
 import LocateControl from '../../../common/Maps/common/LocateControl';
 
@@ -24,10 +25,52 @@ const getMultiPolygonCentroid = function (coordinates) {
 };
 
 const PolygonMap = ({ onChange, data }) => {
+  const { formatMessage } = useIntl();
   const isMounted = useRef(true);
   const displayValue = useRef(false);
   // eslint-disable-next-line no-unused-vars
   const [map, setMap] = useState();
+
+  // Configure Leaflet Draw text
+  useEffect(() => {
+    if (L.drawLocal) {
+      // Drawing tooltips
+      L.drawLocal.draw.handlers.polygon.tooltip.start = formatMessage({ id: 'Click to start drawing shape.' });
+      L.drawLocal.draw.handlers.polygon.tooltip.cont = formatMessage({ id: 'Click to continue drawing shape.' });
+      L.drawLocal.draw.handlers.polygon.tooltip.end = formatMessage({ id: 'Click first point to close this shape.' });
+      
+      // Toolbar buttons
+      L.drawLocal.draw.toolbar.buttons.polygon = formatMessage({ id: 'Draw a polygon' });
+      
+      // Edit tooltips
+      L.drawLocal.edit.handlers.edit.tooltip.text = formatMessage({ id: 'Drag handles or markers to edit features.' });
+      L.drawLocal.edit.handlers.edit.tooltip.subtext = formatMessage({ id: 'Click cancel to undo changes' });
+      
+      // Edit toolbar
+      L.drawLocal.edit.toolbar.actions.save.title = formatMessage({ id: 'Save changes' });
+      L.drawLocal.edit.toolbar.actions.save.text = formatMessage({ id: 'Save changes' });
+      L.drawLocal.edit.toolbar.actions.cancel.title = formatMessage({ id: 'Cancel editing, discards all changes' });
+      L.drawLocal.edit.toolbar.actions.cancel.text = formatMessage({ id: 'Cancel' });
+      L.drawLocal.edit.toolbar.actions.clearAll.title = formatMessage({ id: 'Clear all layers' });
+      L.drawLocal.edit.toolbar.actions.clearAll.text = formatMessage({ id: 'Clear all layers' });
+      L.drawLocal.edit.toolbar.buttons.edit = formatMessage({ id: 'Edit layers' });
+      L.drawLocal.edit.toolbar.buttons.editDisabled = formatMessage({ id: 'No layers to edit' });
+      L.drawLocal.edit.toolbar.buttons.remove = formatMessage({ id: 'Delete layers' });
+      L.drawLocal.edit.toolbar.buttons.removeDisabled = formatMessage({ id: 'No layers to delete' });
+      
+      // Drawing toolbar
+      L.drawLocal.draw.toolbar.actions.title = formatMessage({ id: 'Cancel drawing' });
+      L.drawLocal.draw.toolbar.actions.text = formatMessage({ id: 'Cancel' });
+      L.drawLocal.draw.toolbar.finish.title = formatMessage({ id: 'Finish drawing' });
+      L.drawLocal.draw.toolbar.finish.text = formatMessage({ id: 'Finish' });
+      L.drawLocal.draw.toolbar.undo.title = formatMessage({ id: 'Delete last point drawn' });
+      L.drawLocal.draw.toolbar.undo.text = formatMessage({ id: 'Delete last point' });
+      
+      // Remove handler
+      L.drawLocal.edit.handlers.remove.tooltip.text = formatMessage({ id: 'Click on a feature to remove.' });
+    }
+  }, [formatMessage]);
+
   const [mapLayers, setMapLayers] = useState([]);
   const [center] = useState(
     data

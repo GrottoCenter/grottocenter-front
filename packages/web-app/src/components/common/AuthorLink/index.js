@@ -8,13 +8,13 @@ import authorType from '../../../types/author.type';
 const AuthorLink = ({ author, verb = 'Posted' }) => {
   const { formatMessage } = useIntl();
   if (!author?.id || !author?.nickname)
-    return <span>{formatMessage({ id: `${verb} by an unknown author` })}</span>;
+    return <span>{formatMessage({ id: 'author.unknown' }, { verb: formatMessage({ id: verb }) })}</span>;
 
   return (
     <span>
       {verb && (
         <Typography variant="caption">
-          {formatMessage({ id: `${verb} by` })}&nbsp;
+          {formatMessage({ id: 'author.by' }, { verb: formatMessage({ id: verb }) })}&nbsp;
         </Typography>
       )}
       <GCLink internal href={`/ui/persons/${author?.id}`}>

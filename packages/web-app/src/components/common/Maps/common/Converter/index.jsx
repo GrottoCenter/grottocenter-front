@@ -43,7 +43,7 @@ const ConverterControl = ({
   return (
     <CustomControl position={position} {...props}>
       <Button
-        aria-label="data-control"
+        aria-label={formatMessage({ id: 'data-control' })}
         onClick={handleOpenMenu}
         startIcon={<ConvertIcon fontSize="inherit" />}
         // TODO enable on fullscreen as it's currently hidden

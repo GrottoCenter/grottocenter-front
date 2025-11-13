@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import { useIntl } from 'react-intl';
 import { styled } from '@mui/material/styles';
 import { isNil } from 'ramda';
 import {
@@ -48,34 +49,37 @@ const ScrollableContent = ({
   content,
   footer,
   dense = false
-}) => (
-  <Card>
-    <CardHeader
-      $dense={dense ? 1 : 0}
-      title={
-        <Title>
-          <Typography variant="h2" color="secondary">
-            {title}
-          </Typography>
-          {!isNil(icon) && icon}
-        </Title>
-      }
-    />
-    <CardContent>{content}</CardContent>
-    {!isNil(footer) && (
-      <CardActions disableSpacing>
-        <Footer content={footer} />
-        <IconButton
-          size="small"
-          aria-label="edit"
-          disabled={isNil(onEdit)}
-          onClick={onEdit}>
-          <CreateIcon />
-        </IconButton>
-      </CardActions>
-    )}
-  </Card>
-);
+}) => {
+  const { formatMessage } = useIntl();
+  return (
+    <Card>
+      <CardHeader
+        $dense={dense ? 1 : 0}
+        title={
+          <Title>
+            <Typography variant="h2" color="secondary">
+              {title}
+            </Typography>
+            {!isNil(icon) && icon}
+          </Title>
+        }
+      />
+      <CardContent>{content}</CardContent>
+      {!isNil(footer) && (
+        <CardActions disableSpacing>
+          <Footer content={footer} />
+          <IconButton
+            size="small"
+            aria-label={formatMessage({ id: 'edit' })}
+            disabled={isNil(onEdit)}
+            onClick={onEdit}>
+            <CreateIcon />
+          </IconButton>
+        </CardActions>
+      )}
+    </Card>
+  );
+};
 
 ScrollableContent.propTypes = {
   title: PropTypes.oneOfType([PropTypes.string, PropTypes.node]).isRequired,

@@ -113,7 +113,7 @@ const CreateCommentForm = ({ closeForm, onSubmit, values, isNewComment }) => {
             helperContent={formatMessage({
               id: 'The title and text language'
             })}
-            labelText="Language"
+            labelText={formatMessage({ id: 'Language' })}
             onSelection={onChange}
             searchLabelText={formatMessage({ id: 'Search a language' })}
             value={value}
@@ -198,7 +198,7 @@ const CreateCommentForm = ({ closeForm, onSubmit, values, isNewComment }) => {
                     onChange(null);
                   }}
                   color="primary"
-                  aria-label="clear rate"
+                  aria-label={formatMessage({ id: 'clear rate' })}
                   component="label"
                   size="small">
                   <NotInterestedIcon />
@@ -247,7 +247,7 @@ const CreateCommentForm = ({ closeForm, onSubmit, values, isNewComment }) => {
                     onChange(null);
                   }}
                   color="primary"
-                  aria-label="clear rate"
+                  aria-label={formatMessage({ id: 'clear rate' })}
                   component="label"
                   size="small">
                   <NotInterestedIcon />
@@ -296,7 +296,7 @@ const CreateCommentForm = ({ closeForm, onSubmit, values, isNewComment }) => {
                     onChange(null);
                   }}
                   color="primary"
-                  aria-label="clear rate"
+                  aria-label={formatMessage({ id: 'clear rate' })}
                   component="label"
                   size="small">
                   <NotInterestedIcon />

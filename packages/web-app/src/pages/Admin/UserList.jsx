@@ -29,9 +29,17 @@ const defaultHiddenColumns = ['groups'];
  */
 const UserList = ({ isLoading, title, userList }) => {
   const { formatMessage } = useIntl();
+  const columnTranslations = {
+    id: 'table.column.id',
+    nickname: 'table.column.nickname',
+    email: 'table.column.email',
+    groups: 'table.column.groups',
+    name: 'Caver.Name'
+  };
+
   const makeTranslation = id => {
-    if (id === 'name') return formatMessage({ id: 'Caver.Name' });
-    return formatMessage({ id: `${id[0].toUpperCase()}${id.slice(1)}` });
+    const translationKey = columnTranslations[id] || `table.column.${id}`;
+    return formatMessage({ id: translationKey });
   };
   const [columns, setColumns] = useState(
     createColumns(userList, makeTranslation)

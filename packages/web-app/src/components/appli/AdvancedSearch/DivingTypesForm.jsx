@@ -1,4 +1,5 @@
 import React from 'react';
+import { useIntl } from 'react-intl';
 import MuiToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import ToggleButton from '@mui/material/ToggleButton';
 import PropTypes from 'prop-types';
@@ -13,6 +14,7 @@ const ToggleButtonGroup = styled(MuiToggleButtonGroup)`
 `;
 
 const DivingTypesForm = ({ onChange, value }) => {
+  const { formatMessage } = useIntl();
   const handleCavity = (_event, newSelection) => {
     onChange(newSelection);
   };
@@ -23,13 +25,19 @@ const DivingTypesForm = ({ onChange, value }) => {
         <Translate>Diving cave</Translate>
       </FormLabel>
       <ToggleButtonGroup value={value} exclusive onChange={handleCavity}>
-        <ToggleButton value="true" aria-label="left aligned">
+        <ToggleButton
+          value="true"
+          aria-label={formatMessage({ id: 'left aligned' })}>
           <Translate>yes</Translate>
         </ToggleButton>
-        <ToggleButton value="false" aria-label="centered">
+        <ToggleButton
+          value="false"
+          aria-label={formatMessage({ id: 'centered' })}>
           <Translate>no</Translate>
         </ToggleButton>
-        <ToggleButton value="" aria-label="right aligned">
+        <ToggleButton
+          value=""
+          aria-label={formatMessage({ id: 'right aligned' })}>
           <Translate>all</Translate>
         </ToggleButton>
       </ToggleButtonGroup>

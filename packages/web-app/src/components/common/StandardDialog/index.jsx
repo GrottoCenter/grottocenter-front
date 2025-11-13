@@ -1,3 +1,4 @@
+import { useIntl } from 'react-intl';
 import * as React from 'react';
 import {
   Dialog,
@@ -37,26 +38,32 @@ const StandardDialog = ({
   title,
   children,
   actions
-}) => (
-  <Dialog
-    fullScreen={fullScreen}
-    fullWidth={fullWidth}
-    maxWidth={maxWidth}
-    open={open}
-    onClose={onClose}
-    PaperProps={{ style: { overflow: 'visible' } }}>
-    {onClose && (
-      <CloseButton aria-label="close" onClick={onClose} color="primary">
-        <CloseIcon />
-      </CloseButton>
-    )}
-    <CustomDialogTitle>{title}</CustomDialogTitle>
-    {children && (
-      <DialogContent $scrollable={scrollable}>{children}</DialogContent>
-    )}
-    <DialogActions>{actions || null}</DialogActions>
-  </Dialog>
-);
+}) => {
+  const { formatMessage } = useIntl();
+  return (
+    <Dialog
+      fullScreen={fullScreen}
+      fullWidth={fullWidth}
+      maxWidth={maxWidth}
+      open={open}
+      onClose={onClose}
+      PaperProps={{ style: { overflow: 'visible' } }}>
+      {onClose && (
+        <CloseButton
+          aria-label={formatMessage({ id: 'close' })}
+          onClick={onClose}
+          color="primary">
+          <CloseIcon />
+        </CloseButton>
+      )}
+      <CustomDialogTitle>{title}</CustomDialogTitle>
+      {children && (
+        <DialogContent $scrollable={scrollable}>{children}</DialogContent>
+      )}
+      <DialogActions>{actions || null}</DialogActions>
+    </Dialog>
+  );
+};
 
 export default StandardDialog;
 

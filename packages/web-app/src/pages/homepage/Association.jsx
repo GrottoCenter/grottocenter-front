@@ -44,10 +44,7 @@ const AssociationLogoImage = styled(GCLogo)`
   & > img {
     max-width: 200px;
     width: 100%;
-
-    :visible {
-      scale: 50%;
-    }
+    scale: 50%;
   }
 `;
 
@@ -125,8 +122,8 @@ const Association = props => {
           </AssociationTitle>
           <AssociationDetails>
             <Translate>
-              GrottoCenter is a comunity database for cavers based on a
-              wiki-like system Cavers fill the databes for cavers
+              GrottoCenter is a community database for cavers based on a
+              wiki-like system Cavers fill the databases for cavers
             </Translate>
             <br />
             <Translate>

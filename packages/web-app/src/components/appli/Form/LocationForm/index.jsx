@@ -85,7 +85,7 @@ const CreateLocationForm = ({ closeForm, onSubmit, values, isNewLocation }) => {
           <LanguageAutoComplete
             hasError={!!error}
             helperContent={formatMessage({ id: 'The title and text language' })}
-            labelText="Language"
+            labelText={formatMessage({ id: 'Language' })}
             onSelection={onChange}
             searchLabelText={formatMessage({ id: 'Search a language' })}
             value={value}

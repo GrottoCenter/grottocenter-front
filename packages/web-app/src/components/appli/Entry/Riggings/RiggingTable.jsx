@@ -71,7 +71,9 @@ const RiggingTable = ({ obstacles, title, previous, isDeleted }) => {
     <Box>
       {titleEl}
       <StyledTableContainer>
-        <StyledTable size="small" aria-label="riggings">
+        <StyledTable
+          size="small"
+          aria-label={formatMessage({ id: 'riggings' })}>
           <TableHead>
             <TableRow>
               <StyledTableCell $isDeleted={isDeleted}>

@@ -33,6 +33,9 @@ This project uses [Yarn](https://yarnpkg.com/) & [Yarn workspaces](https://yarnp
 - `e2e:run` Run the end to end test suite (_require a running app_)
 - `e2e:open` Open the end to end test suite browser (_require a running app_)
 - `storybook` Start storybook
+- `translations:sync-with-en` Compares a translation file with en.json to check synchronization (use: `yarn translations:sync-with-en <target-file>`)
+- `translations:update-en` Scans JSX files for translation keys and adds missing ones to `packages/web-app/public/lang/en.json` (automatically sorts the file afterwards)
+- `translations:sort` Sorts translation file keys alphabetically (case-insensitive): `node scripts/translations/sort.js <path-to-json-file>`
 
 ## CI
 
@@ -43,7 +46,7 @@ Github Actions is running 2 tasks on push and pull requests on `develop` :
 
 ## Release and publish
 
-### WIP
+### WIP
 
 ## Production deployment (Azure)
 

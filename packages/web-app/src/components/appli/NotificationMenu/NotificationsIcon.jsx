@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { useIntl } from 'react-intl';
 import { Badge, CircularProgress, IconButton } from '@mui/material';
 import MuiNotificationsIcon from '@mui/icons-material/Notifications';
 import { useDispatch, useSelector } from 'react-redux';
@@ -21,6 +22,7 @@ const getBadgeContent = (nbNotifications, status) => {
 };
 
 const NotificationsIcon = ({ onClick }) => {
+  const { formatMessage } = useIntl();
   const dispatch = useDispatch();
   const { isAuth } = usePermissions();
   const { count: nbNotifications, status } = useSelector(
@@ -34,7 +36,7 @@ const NotificationsIcon = ({ onClick }) => {
   if (!isAuth) return '';
   return (
     <IconButton
-      aria-label="notifications of current user"
+      aria-label={formatMessage({ id: 'notifications of current user' })}
       onClick={onClick}
       color="inherit"
       size="large">

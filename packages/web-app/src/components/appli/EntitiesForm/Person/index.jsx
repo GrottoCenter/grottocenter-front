@@ -44,8 +44,8 @@ export const PersonForm = ({ personValues, isOurAccount }) => {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
   const handleReset = useCallback(() => {
-    reset({ person: personValues });
-  }, [personValues, reset]);
+    reset(undefined, { keepValues: true, keepErrors: false });
+  }, [reset]);
 
   const onSubmit = async ({ person }) => {
     dispatch(
@@ -124,9 +124,9 @@ export const PersonForm = ({ personValues, isOurAccount }) => {
                 isError={!!errors?.person?.emailConfirmation}
                 isRequired={!!watch('person.email')}
                 type="email"
-                validatorFn={(value, formatMessage) => {
+                validatorFn={(value, intlFormatMessage) => {
                   if (value !== getValues()?.person?.email)
-                    return formatMessage({ id: 'The mails do not match' });
+                    return intlFormatMessage({ id: 'The mails do not match' });
                   return true;
                 }}
                 helperText={errors?.person?.emailConfirmation?.message}
@@ -141,9 +141,9 @@ export const PersonForm = ({ personValues, isOurAccount }) => {
                 onShowPassword={() => setIsPasswordVisible(!isPasswordVisible)}
                 control={control}
                 isError={!!errors?.person?.password}
-                validatorFn={(value, formatMessage) => {
+                validatorFn={(value, intlFormatMessage) => {
                   if (value && value.length < PASSWORD_MIN_LENGTH)
-                    return formatMessage({ id: 'Password too short.' });
+                    return intlFormatMessage({ id: 'Password too short.' });
                   return true;
                 }}
                 helperText={errors?.person?.password?.message}
@@ -156,9 +156,11 @@ export const PersonForm = ({ personValues, isOurAccount }) => {
                 control={control}
                 isError={!!errors?.person?.passwordConfirmation}
                 isRequired={!!watch('person.password')}
-                validatorFn={(value, formatMessage) => {
+                validatorFn={(value, intlFormatMessage) => {
                   if (value !== getValues()?.person?.password)
-                    return formatMessage({ id: 'The passwords do not match' });
+                    return intlFormatMessage({
+                      id: 'The passwords do not match'
+                    });
                   return true;
                 }}
                 helperText={errors?.person?.passwordConfirmation?.message}

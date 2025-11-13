@@ -15,7 +15,7 @@ function timeDiff(date, formatMessage) {
     (nowd.getTime() - new Date(date).getTime()) / A_DAY_MS
   );
   if (nbDayDiff === 0) return formatMessage({ id: 'Today' });
-  if (nbDayDiff === 1) return formatMessage({ id: 'Yersteday' });
+  if (nbDayDiff === 1) return formatMessage({ id: 'Yesterday' });
   return `${nbDayDiff} ${formatMessage({ id: 'Days ago' })}`;
 }
 

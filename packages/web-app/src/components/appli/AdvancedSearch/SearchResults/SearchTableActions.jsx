@@ -27,14 +27,14 @@ class TablePaginationActions extends React.Component {
   };
 
   render() {
-    const { classes, count, page, size, theme } = this.props;
+    const { classes, count, page, size, theme, formatMessage } = this.props;
 
     return (
       <div className={classes.root}>
         <IconButton
           onClick={this.handleBackButtonClick}
           disabled={page === 0}
-          aria-label="Previous Page"
+          aria-label={formatMessage({ id: 'Previous Page' })}
           size="large">
           {theme.direction === 'rtl' ? (
             <KeyboardArrowRight />
@@ -45,7 +45,7 @@ class TablePaginationActions extends React.Component {
         <IconButton
           onClick={this.handleNextButtonClick}
           disabled={page * size + size >= count}
-          aria-label="Next Page"
+          aria-label={formatMessage({ id: 'Next Page' })}
           size="large">
           {theme.direction === 'rtl' ? (
             <KeyboardArrowLeft />
@@ -61,6 +61,7 @@ class TablePaginationActions extends React.Component {
 TablePaginationActions.propTypes = {
   classes: PropTypes.shape({ root: PropTypes.string }).isRequired,
   count: PropTypes.number.isRequired,
+  formatMessage: PropTypes.func.isRequired,
   onPageChange: PropTypes.func.isRequired,
   page: PropTypes.number.isRequired,
   size: PropTypes.number.isRequired,

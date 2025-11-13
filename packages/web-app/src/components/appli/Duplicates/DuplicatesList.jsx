@@ -44,8 +44,17 @@ const DuplicatesList = ({
     state => state.createDocument
   );
 
-  const makeTranslation = id =>
-    formatMessage({ id: `${id[0].toUpperCase()}${id.slice(1)}` });
+  const columnTranslations = {
+    id: 'table.column.id',
+    title: 'table.column.title',
+    type: 'table.column.type',
+    source: 'table.column.source'
+  };
+
+  const makeTranslation = id => {
+    const translationKey = columnTranslations[id] || `table.column.${id}`;
+    return formatMessage({ id: translationKey });
+  };
   const [columns, setColumns] = useState(
     createColumns(duplicatesList, makeTranslation)
   );

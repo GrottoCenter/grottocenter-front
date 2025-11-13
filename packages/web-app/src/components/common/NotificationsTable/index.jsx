@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useNavigate } from 'react-router-dom';
 import { useIntl } from 'react-intl';
@@ -31,9 +31,22 @@ const NotificationsTable = ({
   const customHeader = useMakeCustomHeaderCellRenders();
   const [hiddenColumns, setHiddenColumns] = useState(defaultHiddenColumns);
   const navigate = useNavigate();
+  const columnTranslations = useMemo(
+    () => ({
+      id: 'table.column.id',
+      type: 'table.column.type',
+      date: 'table.column.date',
+      read: 'table.column.read'
+    }),
+    []
+  );
+
   const makeTranslation = useCallback(
-    id => formatMessage({ id: `${id[0].toUpperCase()}${id.slice(1)}` }),
-    [formatMessage]
+    id => {
+      const translationKey = columnTranslations[id] || `table.column.${id}`;
+      return formatMessage({ id: translationKey });
+    },
+    [formatMessage, columnTranslations]
   );
   const [columns, setColumns] = useState(
     createColumns(notifications, makeTranslation)

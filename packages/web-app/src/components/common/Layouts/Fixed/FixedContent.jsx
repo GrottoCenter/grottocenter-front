@@ -42,6 +42,8 @@ const CardContent = styled(MuiCardContent)`
 
 const CardActions = styled(MuiCardActions)`
   display: flex;
+  flex-direction: column;
+  align-items: flex-start;
 `;
 
 const Title = styled('div')`
@@ -110,7 +112,9 @@ const FixedContent = ({
                 title={formatMessage({
                   id: 'Edit properties'
                 })}>
-                <Button aria-label="edit" onClick={onEdit}>
+                <Button
+                  aria-label={formatMessage({ id: 'edit' })}
+                  onClick={onEdit}>
                   <CreateIcon />
                 </Button>
               </Tooltip>
@@ -120,7 +124,9 @@ const FixedContent = ({
                 title={formatMessage({
                   id: 'Delete'
                 })}>
-                <Button aria-label="delete" onClick={onDelete}>
+                <Button
+                  aria-label={formatMessage({ id: 'delete' })}
+                  onClick={onDelete}>
                   <DeleteIcon />
                 </Button>
               </Tooltip>
@@ -134,7 +140,7 @@ const FixedContent = ({
                 <Button
                   color={isSubscribed ? 'secondary' : 'primary'}
                   size="small"
-                  aria-label="edit"
+                  aria-label={formatMessage({ id: 'edit' })}
                   onClick={onChangeSubscribe}
                   startIcon={SubscribeIcon}>
                   {formatMessage({
