@@ -104,7 +104,6 @@ const GCReducer = combineReducers({
   createPerson,
   cumulatedLength,
   dbExport,
-  document,
   documentChildren,
   documentDetails,
   parentDocument,
