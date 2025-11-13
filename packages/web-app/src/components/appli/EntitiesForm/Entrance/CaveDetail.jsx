@@ -57,7 +57,7 @@ const CaveDetail = ({ control, errors, isReadonly = false }) => {
               endAdornment: <InputAdornment position="start">m</InputAdornment>
             }}
             helperText={errors.cave?.depth?.message}
-            value={value}
+            value={value ?? ''}
             onChange={onChange}
           />
         )}
@@ -77,7 +77,7 @@ const CaveDetail = ({ control, errors, isReadonly = false }) => {
               endAdornment: <InputAdornment position="start">m</InputAdornment>
             }}
             helperText={errors.cave?.length?.message}
-            value={value}
+            value={value ?? ''}
             onChange={onChange}
           />
         )}
@@ -100,7 +100,7 @@ const CaveDetail = ({ control, errors, isReadonly = false }) => {
               endAdornment: <InputAdornment position="start">°C</InputAdornment>
             }}
             helperText={errors.cave?.temperature?.message}
-            value={value}
+            value={value ?? ''}
             onChange={onChange}
           />
         )}

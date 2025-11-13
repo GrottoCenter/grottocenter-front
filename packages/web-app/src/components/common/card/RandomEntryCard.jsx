@@ -241,11 +241,11 @@ EntryInfos.propTypes = {
   timeInfo: PropTypes.shape({
     eTTrail: PropTypes.string,
     eTUnderground: PropTypes.string
-  }).isRequired,
+  }),
   cave: PropTypes.shape({
     depth: PropTypes.number,
     length: PropTypes.number
-  }).isRequired
+  })
 };
 
 const EntryInfoWrapper = styled('div')`

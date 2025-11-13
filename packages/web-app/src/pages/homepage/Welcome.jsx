@@ -36,7 +36,7 @@ const WelcomeParagraph = styled('p')`
 `;
 
 const WelcomeSection = styled(LandingSection)`
-  > div:first-child {
+  > div:first-of-type {
     text-align: center;
   }
 `;
