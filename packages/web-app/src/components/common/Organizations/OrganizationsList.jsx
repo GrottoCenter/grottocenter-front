@@ -10,8 +10,7 @@ const StyledList = styled(List)({
   width: '100%'
 });
 
-const OrganizationsList = ({ orgas, title }) => {
-  if (!orgas || orgas.length === 0) return false;
+const OrganizationsList = ({ orgas, title, onRemove, showRemove }) => {
   return (
     <>
       {title && (
@@ -19,20 +18,29 @@ const OrganizationsList = ({ orgas, title }) => {
           {title}
         </Typography>
       )}
-      <StyledList>
-        {orgas
-          .sort((a, b) => a.name.localeCompare(b.name))
-          .map(orga => (
-            <OrganizationListItem key={orga.id} orga={orga} />
-          ))}
-      </StyledList>
+      {orgas && orgas.length > 0 && (
+        <StyledList>
+          {orgas
+            .sort((a, b) => a.name.localeCompare(b.name))
+            .map(orga => (
+              <OrganizationListItem
+                key={orga.id}
+                orga={orga}
+                onRemove={onRemove}
+                showRemove={showRemove}
+              />
+            ))}
+        </StyledList>
+      )}
     </>
   );
 };
 
 OrganizationsList.propTypes = {
   orgas: PropTypes.arrayOf(PropTypes.shape({})),
-  title: PropTypes.node
+  title: PropTypes.node,
+  onRemove: PropTypes.func,
+  showRemove: PropTypes.bool
 };
 
 export default OrganizationsList;
