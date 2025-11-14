@@ -242,6 +242,18 @@ const Table = ({
             page={currentPage}
             onPageChange={handleChangePage}
             onRowsPerPageChange={handleChangeRowsPerPage}
+            sx={{
+              overflow: 'visible',
+              '.MuiTablePagination-selectLabel': {
+                margin: 0
+              },
+              '.MuiTablePagination-displayedRows': {
+                margin: 0
+              },
+              '.MuiTablePagination-select': {
+                fontSize: '1.3986rem'
+              }
+            }}
           />
         )}
       </TableFooter>

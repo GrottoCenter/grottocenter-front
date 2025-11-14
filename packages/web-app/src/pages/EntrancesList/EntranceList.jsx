@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
-import { List, Typography, Box, useTheme, Pagination } from '@mui/material';
+import { List, Typography, Box, useTheme } from '@mui/material';
 import { styled } from '@mui/material/styles';
 
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
@@ -33,12 +33,9 @@ const getFormatDate = (date, formatMessage, locale) => {
 const EntrancesList = props => {
   const { entrances, handleClickScroll } = props;
   const { formatMessage } = useIntl();
-  const nbEntrancesPerPage = 36;
   const theme = useTheme();
   const locale = useSelector(state => state.intl);
 
-  const [entrancestoDisplay, setEntrancestoDisplay] = useState([]);
-  const [page, setPage] = useState(1);
   const [dateOfUpdate, setDateOfUpdate] = useState(null);
 
   // manage format of date of update
@@ -50,16 +47,6 @@ const EntrancesList = props => {
       setDateOfUpdate(null);
     }
   }, [entrances, formatMessage, locale]);
-
-  // manage entrance list with pagination
-  useEffect(() => {
-    setEntrancestoDisplay(
-      entrances.slice(
-        (page - 1) * nbEntrancesPerPage,
-        page * nbEntrancesPerPage
-      )
-    );
-  }, [page, entrances]);
 
   return (
     <>
@@ -96,31 +83,15 @@ const EntrancesList = props => {
           )}
         </Box>
       </Box>
-      {entrancestoDisplay && entrancestoDisplay.length > 0 ? (
-        <>
-          <StyledList>
-            {entrancestoDisplay.map(entrance => (
-              <EntranceListItem
-                key={entrance.id_entrance}
-                entrance={entrance}
-              />
-            ))}
-          </StyledList>
-          {entrances.length > nbEntrancesPerPage && (
-            <Box
-              style={{
-                display: 'flex',
-                justifyContent: 'center',
-                marginTop: '10px'
-              }}>
-              <Pagination
-                count={Math.ceil(entrances.length / nbEntrancesPerPage)}
-                page={page}
-                onChange={(o, p) => setPage(p)}
-              />
-            </Box>
-          )}
-        </>
+      {entrances && entrances.length > 0 ? (
+        <StyledList>
+          {entrances.map(entrance => (
+            <EntranceListItem
+              key={entrance.id_entrance}
+              entrance={entrance}
+            />
+          ))}
+        </StyledList>
       ) : (
         <Alert
           title={formatMessage({

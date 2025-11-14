@@ -9,14 +9,14 @@ export const FETCH_MASSIF_ENTRANCES_DATA_QUALITY_LOADING =
 export const FETCH_MASSIF_ENTRANCES_DATA_QUALITY_ERROR =
   'FETCH_MASSIF_ENTRANCES_DATA_QUALITY_ERROR';
 
-export const fetchMassifEntrances = massifId => (dispatch, getState) => {
+export const fetchMassifEntrances = (massifId, { limit, offset } = {}) => (dispatch, getState) => {
   dispatch({ type: FETCH_MASSIF_ENTRANCES_DATA_QUALITY_LOADING });
   const requestOptions = {
     headers: {
       ...getState().login.authorizationHeader
     }
   };
-  return fetch(getMassifEntrancesUrl(massifId), requestOptions)
+  return fetch(getMassifEntrancesUrl(massifId, { limit, offset }), requestOptions)
     .then(response => {
         if (response.status >= 400) {
             throw new Error(response.status);

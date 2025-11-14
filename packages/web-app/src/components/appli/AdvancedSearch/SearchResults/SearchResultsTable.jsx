@@ -456,6 +456,17 @@ class SearchResultsTable extends React.Component {
                     formatMessage={intl.formatMessage}
                   />
                 )}
+                sx={{
+                  '.MuiTablePagination-selectLabel': {
+                    margin: 0
+                  },
+                  '.MuiTablePagination-displayedRows': {
+                    margin: 0
+                  },
+                  '.MuiTablePagination-select': {
+                    fontSize: '1.3986rem'
+                  }
+                }}
               />
               <Button
                 disabled={!canDownloadDataAsCSV}
