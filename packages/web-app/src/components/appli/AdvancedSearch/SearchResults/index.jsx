@@ -7,7 +7,7 @@ import {
 } from '../../../../actions/Advancedsearch';
 import SearchResultsTable from './SearchResultsTable';
 
-const SearchResults = ({ onRowClick, selectedIds }) => {
+const SearchResults = ({ onRowClick, selectedIds, hideExport }) => {
   const {
     fullResults,
     isLoading,
@@ -40,13 +40,15 @@ const SearchResults = ({ onRowClick, selectedIds }) => {
       wantToDownloadCSV={wantToDownloadCSV}
       onRowClick={onRowClick}
       selectedIds={selectedIds}
+      hideExport={hideExport}
     />
   );
 };
 
 SearchResults.propTypes = {
   onRowClick: PropTypes.func,
-  selectedIds: PropTypes.arrayOf(PropTypes.string.isRequired)
+  selectedIds: PropTypes.arrayOf(PropTypes.string.isRequired),
+  hideExport: PropTypes.bool
 };
 
 export default SearchResults;
