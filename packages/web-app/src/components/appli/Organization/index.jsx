@@ -160,7 +160,7 @@ const Organization = ({ error, isLoading, organization }) => {
               />
               <hr />
               <DocumentsList
-                title={formatMessage({ id: 'Documents' })}
+                title={formatMessage({ id: 'Collections' })}
                 documents={organization.documents}
                 emptyMessageComponent={
                   <Alert
