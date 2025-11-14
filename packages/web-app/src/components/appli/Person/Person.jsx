@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import Skeleton from '@mui/material/Skeleton';
 import { useIntl } from 'react-intl';
 import { Box } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 
 import { useUserProperties, usePermissions } from '../../../hooks';
@@ -18,6 +18,8 @@ import OrganizationsList from '../../common/Organizations/OrganizationsList';
 import PersonProperties from '../../common/Person/PersonProperties';
 import SubscriptionsList from '../../common/Subscriptions/SubscriptionsList';
 import { deletePerson } from '../../../actions/Person/DeletePerson';
+import { leaveOrganization } from '../../../actions/Organization/LeaveOrganization';
+import { fetchPerson } from '../../../actions/Person/GetPerson';
 import {
   DeleteConfirmationDialog,
   DELETED_ENTITIES
@@ -33,6 +35,7 @@ const Person = ({
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { formatMessage } = useIntl();
+  const { id: personId } = useParams();
 
   const permissions = usePermissions();
   const [isDeleteConfirmationOpen, setIsDeleteConfirmationOpen] =
@@ -43,6 +46,16 @@ const Person = ({
   if (userId && person) {
     canEdit = userId.toString() === person?.id?.toString();
   }
+
+  const handleLeaveOrganization = async organizationId => {
+    if (!person?.id) return;
+    try {
+      await dispatch(leaveOrganization(person.id, organizationId));
+      dispatch(fetchPerson(personId));
+    } catch (err) {
+      console.error('Error leaving organization:', err);
+    }
+  };
 
   let onDelete = null;
   if (person && (permissions.isAdmin || permissions.isModerator)) {
@@ -127,6 +140,8 @@ const Person = ({
               <OrganizationsList
                 orgas={person.organizations}
                 title={formatMessage({ id: 'Organizations' })}
+                onRemove={canEdit ? handleLeaveOrganization : null}
+                showRemove={canEdit}
               />
               <hr />
               <EntrancesList
