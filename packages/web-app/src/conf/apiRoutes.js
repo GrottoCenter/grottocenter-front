@@ -240,6 +240,10 @@ export const deleteOrganizationUrl = (
     .join('&')}`;
 export const restoreOrganizationUrl = organizationId =>
   `${API_BASE_PATH}/organizations/${organizationId}/restore`;
+export const joinOrganizationUrl = (caverId, organizationId) =>
+  `${API_BASE_PATH}/cavers/${caverId}/organizations/${organizationId}`;
+export const leaveOrganizationUrl = (caverId, organizationId) =>
+  `${API_BASE_PATH}/cavers/${caverId}/organizations/${organizationId}`;
 
 // ===== Persons / cavers urls
 export const getGroupsUrl = `${API_BASE_PATH}/cavers/groups`;
