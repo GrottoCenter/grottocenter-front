@@ -41,14 +41,24 @@ export const getCountryUrl = countryId =>
   `${API_BASE_PATH}/countries/${countryId}`;
 export const getStatisticsCountryUrl = countryId =>
   `${API_BASE_PATH}/countries/${countryId}/statistics`;
-export const getCountryEntrancesUrl = countryId =>
-  `${API_BASE_PATH}/entrances/with-quality/countries/${countryId}`;
+export const getCountryEntrancesUrl = (countryId, { limit, offset } = {}) => {
+  const params = new URLSearchParams();
+  if (limit !== undefined) params.append('limit', limit);
+  if (offset !== undefined) params.append('offset', offset);
+  const query = params.toString();
+  return `${API_BASE_PATH}/entrances/with-quality/countries/${countryId}${query ? `?${query}` : ''}`;
+};
 export const getRegionUrl = (countryId, regionId) =>
   `${API_BASE_PATH}/countries/${countryId}/regions/${regionId}`;
 export const getStatisticsRegionUrl = (countryId, regionId) =>
   `${API_BASE_PATH}/countries/${countryId}/regions/${regionId}/statistics`;
-export const getRegionEntrancesUrl = (countryId, regionId) =>
-  `${API_BASE_PATH}/entrances/with-quality/countries/${countryId}/regions/${regionId}`;
+export const getRegionEntrancesUrl = (countryId, regionId, { limit, offset } = {}) => {
+  const params = new URLSearchParams();
+  if (limit !== undefined) params.append('limit', limit);
+  if (offset !== undefined) params.append('offset', offset);
+  const query = params.toString();
+  return `${API_BASE_PATH}/entrances/with-quality/countries/${countryId}/regions/${regionId}${query ? `?${query}` : ''}`;
+};
 
 // ===== Descriptions urls
 export const postDescriptionUrl = `${API_BASE_PATH}/descriptions`;
@@ -190,8 +200,13 @@ export const postCreateMassifUrl = `${API_BASE_PATH}/massifs/`;
 export const putMassifUrl = massifId => `${API_BASE_PATH}/massifs/${massifId}`;
 export const getStatisticsMassifUrl = massifId =>
   `${API_BASE_PATH}/massifs/${massifId}/statistics`;
-export const getMassifEntrancesUrl = massifId =>
-  `${API_BASE_PATH}/entrances/with-quality/massifs/${massifId}`;
+export const getMassifEntrancesUrl = (massifId, { limit, offset } = {}) => {
+  const params = new URLSearchParams();
+  if (limit !== undefined) params.append('limit', limit);
+  if (offset !== undefined) params.append('offset', offset);
+  const query = params.toString();
+  return `${API_BASE_PATH}/entrances/with-quality/massifs/${massifId}${query ? `?${query}` : ''}`;
+};
 export const deleteMassifUrl = (massifId, { entityId, isPermanent = false }) =>
   `${API_BASE_PATH}/massifs/${massifId}?${[
     isPermanent ? 'isPermanent=1' : '',

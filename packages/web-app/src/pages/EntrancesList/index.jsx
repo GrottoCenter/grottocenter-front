@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useIntl } from 'react-intl';
 import { useDispatch, useSelector } from 'react-redux';
-import { List } from '@mui/material';
+import { List, Pagination, Box } from '@mui/material';
 import Skeleton from '@mui/material/Skeleton';
 import { styled } from '@mui/material/styles';
 import Alert from '../../components/common/Alert';
@@ -32,11 +32,15 @@ const EntrancesListPage = () => {
   const { countryId, massifId, regionId } = useParams();
   const dispatch = useDispatch();
 
+  const [page, setPage] = useState(1);
+  const limit = 36;
   // to store entrances even if it's massif entrances or country entrances (managed with a useEffect)
   const [entrances, setEntrances] = useState(null);
   // to store error even if it's massif entrances error or country entrances error (managed with a useEffect)
   const [error, setError] = useState(null);
   const [entityType, setEntityType] = useState();
+  const [totalPages, setTotalPages] = useState(0);
+  const [hasData, setHasData] = useState(false);
 
   const { massifEntrances, massifEntrancesLoading, massifEntrancesError } =
     useSelector(state => state.massifEntrances);
@@ -52,45 +56,73 @@ const EntrancesListPage = () => {
   const { massif } = useSelector(state => state.massif);
 
   useEffect(() => {
+    const offset = (page - 1) * limit;
     if (regionId && countryId) {
-      dispatch(fetchRegionEntrances(countryId, regionId));
+      dispatch(fetchRegionEntrances(countryId, regionId, { limit, offset }));
       dispatch(fetchRegion(countryId, regionId));
     } else if (countryId) {
-      dispatch(fetchCountryEntrances(countryId));
+      dispatch(fetchCountryEntrances(countryId, { limit, offset }));
       dispatch(fetchCountry(countryId));
     } else {
-      dispatch(fetchMassifEntrances(massifId));
+      dispatch(fetchMassifEntrances(massifId, { limit, offset }));
       dispatch(loadMassif(massifId));
     }
-  }, [countryId, massifId, regionId, dispatch]);
+  }, [countryId, massifId, regionId, page, limit, dispatch]);
+
+  const massifState = useSelector(state => state.massifEntrances);
+  const countryState = useSelector(state => state.countryEntrances);
+  const regionState = useSelector(state => state.regionEntrances);
+
+  // Reset page when entity changes
+  useEffect(() => {
+    setPage(1);
+  }, [countryId, massifId, regionId]);
 
   // manage entrances
   useEffect(() => {
-    setEntrances(
-      Array.isArray(countryEntrances)
-        ? sortByDataQuality(countryEntrances)
-        : countryEntrances
-    );
-    setEntityType('country');
-  }, [countryEntrances]);
+    if (countryEntrances) {
+      setEntrances(
+        Array.isArray(countryEntrances)
+          ? sortByDataQuality(countryEntrances)
+          : countryEntrances
+      );
+      setEntityType('country');
+      if (countryState.totalPages) {
+        setTotalPages(countryState.totalPages);
+        setHasData(true);
+      }
+    }
+  }, [countryEntrances, countryState.totalPages]);
 
   useEffect(() => {
-    setEntrances(
-      Array.isArray(massifEntrances)
-        ? sortByDataQuality(massifEntrances)
-        : massifEntrances
-    );
-    setEntityType('massif');
-  }, [massifEntrances]);
+    if (massifEntrances) {
+      setEntrances(
+        Array.isArray(massifEntrances)
+          ? sortByDataQuality(massifEntrances)
+          : massifEntrances
+      );
+      setEntityType('massif');
+      if (massifState.totalPages) {
+        setTotalPages(massifState.totalPages);
+        setHasData(true);
+      }
+    }
+  }, [massifEntrances, massifState.totalPages]);
 
   useEffect(() => {
-    setEntrances(
-      Array.isArray(regionEntrances)
-        ? sortByDataQuality(regionEntrances)
-        : regionEntrances
-    );
-    setEntityType('region');
-  }, [regionEntrances]);
+    if (regionEntrances) {
+      setEntrances(
+        Array.isArray(regionEntrances)
+          ? sortByDataQuality(regionEntrances)
+          : regionEntrances
+      );
+      setEntityType('region');
+      if (regionState.totalPages) {
+        setTotalPages(regionState.totalPages);
+        setHasData(true);
+      }
+    }
+  }, [regionEntrances, regionState.totalPages]);
 
   // manage error
   useEffect(() => {
@@ -139,6 +171,13 @@ const EntrancesListPage = () => {
     }
   };
 
+  const handlePageChange = (event, newPage) => {
+    setPage(newPage);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const shouldShowPagination = hasData && totalPages > 1;
+
   return (
     <Layout
       title={getTitle()}
@@ -168,7 +207,17 @@ const EntrancesListPage = () => {
                 entrances={entrances}
                 handleClickScroll={handleClickScroll}
               />
-
+              {shouldShowPagination && (
+                <Box mt={3} mb={3} display="flex" justifyContent="center">
+                  <Pagination
+                    count={totalPages}
+                    page={page}
+                    onChange={handlePageChange}
+                    disabled={massifEntrancesLoading || countryEntrancesLoading || regionEntrancesLoading}
+                    color="primary"
+                  />
+                </Box>
+              )}
               <DataQualityComputeDetails />
             </>
           )}
