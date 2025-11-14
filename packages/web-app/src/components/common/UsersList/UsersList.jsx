@@ -14,20 +14,31 @@ const StyledList = styled(List)({
 const UsersList = ({
   users = [],
   title,
-  emptyMessageComponent = <Translate>Empty list</Translate>
+  emptyMessageComponent = <Translate>Empty list</Translate>,
+  actionButton = null,
+  onRemoveMember = null,
+  showRemoveButton = false
 }) => (
   <>
     {title && (
-      <Typography variant="h3" gutterBottom>
-        {title}
-      </Typography>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+        <Typography variant="h3">
+          {title}
+        </Typography>
+        {actionButton}
+      </div>
     )}
     {users && users.length > 0 ? (
       <StyledList>
         {users
           .sort((a, b) => a.nickname?.localeCompare(b.nickname))
           .map(user => (
-            <UserListItem key={user.id} user={user} />
+            <UserListItem
+              key={user.id}
+              user={user}
+              onRemove={onRemoveMember}
+              showRemove={showRemoveButton}
+            />
           ))}
       </StyledList>
     ) : (
@@ -44,7 +55,10 @@ UsersList.propTypes = {
     })
   ),
   title: PropTypes.node,
-  emptyMessageComponent: PropTypes.node
+  emptyMessageComponent: PropTypes.node,
+  actionButton: PropTypes.node,
+  onRemoveMember: PropTypes.func,
+  showRemoveButton: PropTypes.bool
 };
 
 export default UsersList;

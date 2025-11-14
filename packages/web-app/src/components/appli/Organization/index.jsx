@@ -1,9 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import PropTypes from 'prop-types';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useIntl } from 'react-intl';
 import { useParams, useNavigate } from 'react-router-dom';
 import Skeleton from '@mui/material/Skeleton';
+import Button from '@mui/material/Button';
+import Tooltip from '@mui/material/Tooltip';
+import PersonAddIcon from '@mui/icons-material/PersonAdd';
+import PersonRemoveIcon from '@mui/icons-material/PersonRemove';
 import FixedContent from '../../common/Layouts/Fixed/FixedContent';
 import BadgesSection from './BadgesSection';
 import Details from './Details';
@@ -20,6 +24,9 @@ import {
 } from '../../common/card/Deleted';
 import { deleteOrganization } from '../../../actions/Organization/DeleteOrganization';
 import { restoreOrganization } from '../../../actions/Organization/RestoreOrganization';
+import { joinOrganization } from '../../../actions/Organization/JoinOrganization';
+import { leaveOrganization } from '../../../actions/Organization/LeaveOrganization';
+import { fetchOrganization } from '../../../actions/Organization/GetOrganization';
 
 const Organization = ({ error, isLoading, organization }) => {
   const { formatMessage } = useIntl();
@@ -27,11 +34,23 @@ const Organization = ({ error, isLoading, organization }) => {
   const permissions = usePermissions();
   const dispatch = useDispatch();
   const { organizationId } = useParams();
+  const authState = useSelector(state => state.login);
   const [isDeleteConfirmationOpen, setIsDeleteConfirmationOpen] =
     useState(false);
   const [isDeleteConfirmationPermanent, setIsDeleteConfirmationPermanent] =
     useState(false);
   const [wantedDeletedState, setWantedDeletedState] = useState(false);
+  const [isJoining, setIsJoining] = useState(false);
+  const [joinLeaveError, setJoinLeaveError] = useState(null);
+
+  const currentUserId = authState?.authTokenDecoded?.id;
+
+  const isMember = useMemo(
+    () =>
+      permissions.isAuth &&
+      organization?.cavers?.some(caver => caver.id === currentUserId),
+    [permissions.isAuth, organization?.cavers, currentUserId]
+  );
 
   useEffect(() => {
     if (organization) setWantedDeletedState(organization.isDeleted);
@@ -59,6 +78,37 @@ const Organization = ({ error, isLoading, organization }) => {
   const onRestorePress = () => {
     setWantedDeletedState(false);
     dispatch(restoreOrganization({ id: organizationId }));
+  };
+
+  const handleJoinLeave = async () => {
+    if (!currentUserId) return;
+    setIsJoining(true);
+    setJoinLeaveError(null);
+    try {
+      if (isMember) {
+        await dispatch(leaveOrganization(currentUserId, organizationId));
+      } else {
+        await dispatch(joinOrganization(currentUserId, organizationId));
+      }
+      // Refresh organization data
+      dispatch(fetchOrganization(organizationId));
+    } catch (err) {
+      console.error('Error joining/leaving organization:', err);
+      setJoinLeaveError(err.message || 'An error occurred');
+    } finally {
+      setIsJoining(false);
+    }
+  };
+
+  const handleRemoveMember = async userId => {
+    setJoinLeaveError(null);
+    try {
+      await dispatch(leaveOrganization(userId, organizationId));
+      dispatch(fetchOrganization(organizationId));
+    } catch (err) {
+      console.error('Error removing member:', err);
+      setJoinLeaveError(err.message || 'An error occurred');
+    }
   };
 
   const isActionLoading = wantedDeletedState !== organization?.isDeleted;
@@ -157,6 +207,36 @@ const Organization = ({ error, isLoading, organization }) => {
                   />
                 }
                 title={formatMessage({ id: 'Members (former members)' })}
+                onRemoveMember={permissions.isAdmin ? handleRemoveMember : null}
+                showRemoveButton={permissions.isAdmin}
+                actionButton={
+                  permissions.isAuth && (
+                    <>
+                      <Tooltip
+                        title={formatMessage({
+                          id: isMember
+                            ? 'Leave organization'
+                            : 'Join organization'
+                        })}>
+                        <Button
+                          variant="outlined"
+                          color="primary"
+                          onClick={handleJoinLeave}
+                          disabled={isJoining}
+                          startIcon={
+                            isMember ? <PersonRemoveIcon /> : <PersonAddIcon />
+                          }>
+                          {isMember
+                            ? formatMessage({ id: 'Leave organization' })
+                            : formatMessage({ id: 'Join organization' })}
+                        </Button>
+                      </Tooltip>
+                      {joinLeaveError && (
+                        <Alert severity="error" title={joinLeaveError} />
+                      )}
+                    </>
+                  )
+                }
               />
               <hr />
               <DocumentsList
