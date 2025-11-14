@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { TableCell, TableHead, TableRow } from '@mui/material';
 import { useIntl } from 'react-intl';
 import { styled } from '@mui/material/styles';
@@ -9,12 +10,21 @@ const HeaderIcon = styled('img')`
   width: 3.6rem;
 `;
 
-const EntrancesTableHead = () => {
+const EntrancesTableHead = ({ showCheckbox, onSelectAll, allSelected }) => {
   const { formatMessage } = useIntl();
 
   return (
     <TableHead>
       <TableRow>
+        {showCheckbox && (
+          <TableCell padding="checkbox">
+            <input
+              type="checkbox"
+              checked={allSelected}
+              onChange={onSelectAll}
+            />
+          </TableCell>
+        )}
         <TableCell color="inherit">{formatMessage({ id: 'Name' })}</TableCell>
         <TableCell>{formatMessage({ id: 'Country' })}</TableCell>
         <TableCell>{formatMessage({ id: 'Massif name' })}</TableCell>
@@ -45,6 +55,12 @@ const EntrancesTableHead = () => {
       </TableRow>
     </TableHead>
   );
+};
+
+EntrancesTableHead.propTypes = {
+  showCheckbox: PropTypes.bool,
+  onSelectAll: PropTypes.func,
+  allSelected: PropTypes.bool
 };
 
 export default EntrancesTableHead;

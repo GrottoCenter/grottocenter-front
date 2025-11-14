@@ -256,6 +256,8 @@ const Organization = ({ error, isLoading, organization }) => {
               <RelatedCaves
                 exploredEntrances={organization.exploredEntrances}
                 exploredNetworks={organization.exploredNetworks}
+                organizationId={organization.id}
+                isMember={isMember}
               />
             </>
           )}

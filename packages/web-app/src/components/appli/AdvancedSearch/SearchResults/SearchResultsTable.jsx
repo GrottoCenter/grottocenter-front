@@ -69,6 +69,7 @@ class SearchResultsTable extends React.Component {
       size: DEFAULT_SIZE
     };
     this.handleRowClick = this.handleRowClick.bind(this);
+    this.handleSelectAll = this.handleSelectAll.bind(this);
     this.loadCSVData = this.loadCSVData.bind(this);
     this.getFullResultsAsCSV = this.getFullResultsAsCSV.bind(this);
     this.containerRef = createRef();
@@ -107,6 +108,15 @@ class SearchResultsTable extends React.Component {
   }
 
   // ===== Handle functions ===== //
+
+  handleSelectAll = () => {
+    const { onRowClick, results } = this.props;
+    const { from, size } = this.state;
+    if (!onRowClick) return;
+    
+    const resultsSliced = results.slice(from, from + size);
+    resultsSliced.forEach(result => onRowClick(result));
+  };
 
   handleRowClick = docResult => {
     const { navigate, onRowClick, resourceType } = this.props;
@@ -276,7 +286,9 @@ class SearchResultsTable extends React.Component {
       isLoadingFullData,
       wantToDownloadCSV,
       fullResults,
-      intl
+      intl,
+      hideExport,
+      onRowClick
     } = this.props;
     const { from, page, size } = this.state;
 
@@ -316,7 +328,12 @@ class SearchResultsTable extends React.Component {
               className={classes.table}
               size="small"
               style={{ display: tableDisplayValueForScroll }}>
-              <ResultsTableHead resourceType={resourceType} />
+              <ResultsTableHead
+                resourceType={resourceType}
+                showCheckbox={!!onRowClick}
+                onSelectAll={this.handleSelectAll}
+                allSelected={resultsSliced.length > 0 && resultsSliced.every(r => selectedIds && selectedIds.includes(String(r.id)))}
+              />
 
               <TableBody
                 style={{
@@ -329,6 +346,15 @@ class SearchResultsTable extends React.Component {
                     selected={selectedIds && selectedIds.includes(result.id)}
                     className={classes.tableRow}
                     onClick={() => this.handleRowClick(result)}>
+                    {onRowClick && (
+                      <TableCell padding="checkbox">
+                        <input
+                          type="checkbox"
+                          checked={selectedIds && selectedIds.includes(String(result.id))}
+                          onChange={() => {}}
+                        />
+                      </TableCell>
+                    )}
                     {resourceType === ADVANCED_SEARCH_TYPES.ENTRANCES && (
                       <>
                         <TableCell>{result.name}</TableCell>
@@ -468,15 +494,17 @@ class SearchResultsTable extends React.Component {
                   }
                 }}
               />
-              <Button
-                disabled={!canDownloadDataAsCSV}
-                type="button"
-                variant="contained"
-                size="large"
-                onClick={this.loadCSVData}
-                startIcon={<DescriptionIcon />}>
-                <Translate>Export to CSV</Translate>
-              </Button>
+              {!hideExport && (
+                <Button
+                  disabled={!canDownloadDataAsCSV}
+                  type="button"
+                  variant="contained"
+                  size="large"
+                  onClick={this.loadCSVData}
+                  startIcon={<DescriptionIcon />}>
+                  <Translate>Export to CSV</Translate>
+                </Button>
+              )}
               {!isLoadingFullData &&
                 fullResults.length === totalNbResults &&
                 wantToDownloadCSV && (
@@ -545,7 +573,8 @@ SearchResultsTable.propTypes = {
   fullResults: PropTypes.arrayOf(PropTypes.shape({})),
   intl: PropTypes.shape({ formatMessage: PropTypes.func }).isRequired,
   onRowClick: PropTypes.func,
-  selectedIds: PropTypes.arrayOf(PropTypes.string.isRequired)
+  selectedIds: PropTypes.arrayOf(PropTypes.string.isRequired),
+  hideExport: PropTypes.bool
 };
 
 export default injectIntl(addRouter(withStyles(styles)(SearchResultsTable)));

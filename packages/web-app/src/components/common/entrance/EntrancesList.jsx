@@ -10,19 +10,26 @@ const StyledList = styled(List)({
   width: '100%'
 });
 
-const EntrancesList = ({ entrances, title }) => {
-  if (!entrances || entrances.length === 0) return false;
+const EntrancesList = ({ entrances, title, onRemove, showRemove }) => {
+  if (!entrances || entrances.length === 0) return null;
 
   return (
     <>
-      <Typography variant="h3" gutterBottom>
-        {title}
-      </Typography>
+      {title && (
+        <Typography variant="h3" gutterBottom>
+          {title}
+        </Typography>
+      )}
       <StyledList>
         {entrances
           .sort((a, b) => a.name.localeCompare(b.name))
           .map(entrance => (
-            <EntranceListItem key={entrance.id} entrance={entrance} />
+            <EntranceListItem
+              key={entrance.id}
+              entrance={entrance}
+              onRemove={onRemove}
+              showRemove={showRemove}
+            />
           ))}
       </StyledList>
     </>
@@ -31,7 +38,9 @@ const EntrancesList = ({ entrances, title }) => {
 
 EntrancesList.propTypes = {
   entrances: PropTypes.arrayOf(PropTypes.shape({})),
-  title: PropTypes.node
+  title: PropTypes.node,
+  onRemove: PropTypes.func,
+  showRemove: PropTypes.bool
 };
 
 export default EntrancesList;

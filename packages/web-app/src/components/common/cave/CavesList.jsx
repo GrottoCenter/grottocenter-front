@@ -16,7 +16,9 @@ const StyledList = withStyles({
 const CavesList = ({
   caves = [],
   title = <Translate>Caves list</Translate>,
-  emptyMessageComponent = <Translate>Empty list</Translate>
+  emptyMessageComponent = <Translate>Empty list</Translate>,
+  onRemove,
+  showRemove
 }) => (
   <div>
     <Typography variant="h3">{title}</Typography>
@@ -25,7 +27,12 @@ const CavesList = ({
         {caves
           .sort((a, b) => a.name.localeCompare(b.name))
           .map(cave => (
-            <CaveListItem key={cave.id} cave={cave} />
+            <CaveListItem
+              key={cave.id}
+              cave={cave}
+              onRemove={onRemove}
+              showRemove={showRemove}
+            />
           ))}
       </StyledList>
     ) : (
@@ -37,7 +44,9 @@ const CavesList = ({
 CavesList.propTypes = {
   caves: PropTypes.arrayOf(PropTypes.shape({})),
   title: PropTypes.node,
-  emptyMessageComponent: PropTypes.node
+  emptyMessageComponent: PropTypes.node,
+  onRemove: PropTypes.func,
+  showRemove: PropTypes.bool
 };
 
 export default CavesList;
