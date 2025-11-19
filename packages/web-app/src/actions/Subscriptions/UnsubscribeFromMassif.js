@@ -22,16 +22,20 @@ export const unsubscribeFromMassifActionFailure = error => ({
   error
 });
 
-export function unsubscribeFromMassif(massifId) {
+export function unsubscribeFromMassif(massifId, userId = null) {
   return (dispatch, getState) => {
     dispatch(unsubscribeFromMassifAction());
+
+    const url = userId
+      ? `${unsubscribeFromMassifUrl(massifId)}?userId=${userId}`
+      : unsubscribeFromMassifUrl(massifId);
 
     const requestOptions = {
       method: 'POST',
       headers: getState().login.authorizationHeader
     };
 
-    return fetch(unsubscribeFromMassifUrl(massifId), requestOptions).then(
+    return fetch(url, requestOptions).then(
       response => {
         if (response.status >= 400) {
           const error = `Unsubscribing you from massif with id ${massifId}`;
