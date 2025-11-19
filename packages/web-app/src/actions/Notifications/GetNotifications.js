@@ -7,17 +7,17 @@ export const FETCH_NOTIFICATIONS = 'FETCH_NOTIFICATIONS';
 export const FETCH_NOTIFICATIONS_SUCCESS = 'FETCH_NOTIFICATIONS_SUCCESS';
 export const FETCH_NOTIFICATIONS_FAILURE = 'FETCH_NOTIFICATIONS_FAILURE';
 
-export const fetchNotificationsAction = () => ({
+const fetchNotificationsAction = () => ({
   type: FETCH_NOTIFICATIONS
 });
 
-export const fetchNotificationsActionSuccess = (notifications, totalCount) => ({
+const fetchNotificationsActionSuccess = (notifications, totalCount) => ({
   type: FETCH_NOTIFICATIONS_SUCCESS,
   notifications,
   totalCount
 });
 
-export const fetchNotificationsActionFailure = error => ({
+const fetchNotificationsActionFailure = error => ({
   type: FETCH_NOTIFICATIONS_FAILURE,
   error
 });

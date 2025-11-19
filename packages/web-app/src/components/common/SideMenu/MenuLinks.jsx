@@ -1,51 +1,87 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
-import { List } from '@mui/material';
+import {
+  List,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText
+} from '@mui/material';
+import { Link } from 'react-router-dom';
 import LibraryAddIcon from '@mui/icons-material/LibraryAdd';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import MapIcon from '@mui/icons-material/Map';
 import SearchIcon from '@mui/icons-material/Search';
 import { FlagRounded } from '@mui/icons-material';
-import Item from './Items';
 
-import { usePermissions } from '../../../hooks';
+import Translate from '../Translate';
 
-const MenuLinks = () => {
+export const LinkedItem = ({ href = '', ItemIcon, label, onClick }) => (
+  <ListItemButton
+    component={React.forwardRef((props, ref) => (
+      <Link {...props} to={href} ref={ref} />
+    ))}
+    onClick={onClick}>
+    <ListItemIcon>
+      <ItemIcon />
+    </ListItemIcon>
+    <ListItemText>
+      <Translate>{label}</Translate>
+    </ListItemText>
+  </ListItemButton>
+);
+
+LinkedItem.propTypes = {
+  href: PropTypes.string,
+  ItemIcon: PropTypes.func,
+  label: PropTypes.string.isRequired,
+  onClick: PropTypes.func
+};
+
+const MenuLinks = ({ isAuth, toggle }) => {
   const { formatMessage } = useIntl();
-  const permissions = usePermissions();
   return (
     <List
       component="nav"
       aria-label={formatMessage({ id: 'main mailbox folders' })}>
-      <Item
+      <LinkedItem
         ItemIcon={() => <MapIcon color="primary" />}
         label={formatMessage({ id: 'Map' })}
         href="/ui/map"
+        onClick={() => {toggle()}}
       />
-      <Item
+      <LinkedItem
         ItemIcon={() => <SearchIcon color="primary" />}
         label={formatMessage({ id: 'Advanced search' })}
         href="/ui/search"
+        onClick={() => {toggle()}}
       />
-      <Item
+      <LinkedItem
         ItemIcon={() => <LibraryAddIcon color="primary" />}
         label={formatMessage({ id: 'Contribute' })}
         href="/ui/entity/add"
+        onClick={() => {toggle()}}
       />
-      {permissions.isAuth && (
-        <Item
+      {isAuth && (
+        <LinkedItem
           ItemIcon={() => <DashboardIcon color="primary" />}
           label={formatMessage({ id: 'Dashboard' })}
           href="/ui"
+          onClick={() => {toggle()}}
         />
       )}
-      <Item
+      <LinkedItem
         ItemIcon={() => <FlagRounded color="primary" />}
         label={formatMessage({ id: 'Countries' })}
         href="/ui/countries"
+        onClick={() => {toggle()}}
       />
     </List>
   );
+};
+MenuLinks.propTypes = {
+  isAuth: PropTypes.bool.isRequired,
+  toggle: PropTypes.func.isRequired
 };
 
 export default MenuLinks;

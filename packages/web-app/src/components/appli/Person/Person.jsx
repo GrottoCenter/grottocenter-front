@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import Skeleton from '@mui/material/Skeleton';
 import { useIntl } from 'react-intl';
 import { Box } from '@mui/material';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 
 import { useUserProperties, usePermissions } from '../../../hooks';
@@ -34,7 +34,6 @@ const Person = ({
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { formatMessage } = useIntl();
-  const { id: personId } = useParams();
 
   const permissions = usePermissions();
   const [isDeleteConfirmationOpen, setIsDeleteConfirmationOpen] =
@@ -50,7 +49,7 @@ const Person = ({
     if (!person?.id) return;
     try {
       await dispatch(leaveOrganization(person.id, organizationId));
-      dispatch(fetchPerson(personId));
+      dispatch(fetchPerson(person.id));
     } catch (err) {
       console.error('Error leaving organization:', err);
     }
@@ -143,8 +142,7 @@ const Person = ({
                 type="organization"
                 entites={person.organizations}
                 title={formatMessage({ id: 'Organizations' })}
-                onRemove={canEdit ? handleLeaveOrganization : null}
-                showRemove={canEdit}
+                onItemRemove={canEdit ? handleLeaveOrganization : null}
               />
               <EntitiesList
                 type="entrance"

@@ -1,23 +1,45 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
+import { Typography } from '@mui/material';
+import { styled } from '@mui/material/styles';
 
 import { fetchGroups } from '../../actions/Person/GetPerson';
-import { postPersonGroups } from '../../actions/Person/UpdatePersonGroups';
 
 import AuthChecker from '../../components/appli/AuthChecker';
 
 import Layout from '../../components/common/Layouts/Fixed/FixedContent';
-import ManageUserGroups from '../../components/appli/ManageUserGroups';
+import EntityTable from '../../components/common/EntityTable/EntityTable';
+import ManageUserGroups from './ManageUserGroups';
 
-import UserList from './UserList';
+const MarginBottomBlock = styled('div')`
+  margin-bottom: ${({ theme }) => theme.spacing(4)};
+`;
+
+const UserList = ({ isLoading, title, userList }) => (
+  <MarginBottomBlock>
+    <Typography variant="h6" component="div" gutterBottom>
+      {title}
+    </Typography>
+    <EntityTable
+      entityType="persons"
+      isLoading={isLoading}
+      pageRows={userList}
+      shouldHideFooter
+    />
+  </MarginBottomBlock>
+);
+
+UserList.propTypes = {
+  title: PropTypes.string.isRequired,
+  isLoading: PropTypes.bool.isRequired,
+  userList: PropTypes.arrayOf(PropTypes.shape({})).isRequired
+};
 
 const ManageUsers = () => {
   const { formatMessage } = useIntl();
   const dispatch = useDispatch();
-
-  const [selectedUser, setSelectedUser] = useState(null);
-  const [initialUser, setInitialUser] = useState(null);
 
   const { administrators, moderators, leaders, isLoading } = useSelector(
     state => state.groups
@@ -26,21 +48,9 @@ const ManageUsers = () => {
   const { isLoading: isUpdateLoading, isSuccess: isUpdateSuccess } =
     useSelector(state => state.updatePersonGroups);
 
-  const onSaveGroups = () => {
-    dispatch(postPersonGroups(selectedUser.id, selectedUser.groups ?? []));
-  };
-
-  const onSelection = selection => {
-    if (selection !== null) {
-      setSelectedUser(selection);
-      setInitialUser(selection);
-    }
-  };
-
   useEffect(() => {
     // Check if submission is ok
     if (isUpdateSuccess && !isUpdateLoading) {
-      setInitialUser(selectedUser);
       dispatch(fetchGroups());
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -58,16 +68,8 @@ const ManageUsers = () => {
         <AuthChecker
           componentToDisplay={
             <>
-              <ManageUserGroups
-                initialUser={initialUser}
-                onSaveGroups={onSaveGroups}
-                onSelection={onSelection}
-                selectedUser={selectedUser}
-                setSelectedUser={setSelectedUser}
-              />
-
+              <ManageUserGroups />
               <hr />
-
               <UserList
                 isLoading={isLoading}
                 userList={administrators}

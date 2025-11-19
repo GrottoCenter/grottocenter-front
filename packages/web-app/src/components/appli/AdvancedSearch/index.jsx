@@ -1,16 +1,20 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+import React, { useState } from 'react';
+import { useDispatch } from 'react-redux';
 import { Tab, Tabs, Card, CardContent } from '@mui/material';
 import { styled } from '@mui/material/styles';
+import { useParams } from 'react-router-dom';
+import { isMobile } from 'react-device-detect';
 
 import DocumentSearch from './DocumentSearch';
 import EntrancesSearch from './EntrancesSearch';
 import MassifsSearch from './MassifsSearch';
 import OrganizationsSearch from './OrganizationsSearch';
+import PersonSearch from './PersonSearch';
 
 import Translate from '../../common/Translate';
-import { ADVANCED_SEARCH_TYPES } from '../../../conf/config';
 import SearchResults from './SearchResults';
+
+import { resetAdvancedSearchResults } from '../../../actions/Advancedsearch';
 
 const TabIcon = styled('img')`
   height: 2rem;
@@ -19,31 +23,31 @@ const TabIcon = styled('img')`
   width: 2rem;
 `;
 
-const AdvancedSearch = ({
-  resetAdvancedSearch,
-  startAdvancedsearch,
-  getDocumentTypes,
-  documentTypes,
-  getSubjects,
-  subjects
-}) => {
-  const [selectedType, setSelectedType] = React.useState(0);
+const tabsName = {
+  entry: 0,
+  organization: 1,
+  massif: 2,
+  document: 3,
+  person: 4
+};
 
-  const handleSelectType = (_event, value) => {
-    setSelectedType(value);
-  };
+const AdvancedSearch = () => {
+  const dispatch = useDispatch();
+
+  const { tab } = useParams();
+  const [tabIndex, setTabIndex] = useState(tabsName[tab ?? ''] ?? 0);
 
   return (
     <div>
       <Tabs
-        variant="fullWidth"
-        // scrollable
-        // scrollButtons="off"
-        value={selectedType}
-        onChange={handleSelectType}
-        // indicatorColor="primary"
-        // textColor="primary"
-      >
+        value={tabIndex}
+        variant={ isMobile ? 'scrollable' : 'fullWidth'}
+        scrollButtons="auto"
+        allowScrollButtonsMobile
+        onChange={(_, value) => {
+          setTabIndex(value);
+          dispatch(resetAdvancedSearchResults());
+        }}>
         <Tab
           label={
             <>
@@ -55,8 +59,8 @@ const AdvancedSearch = ({
         <Tab
           label={
             <>
-              <TabIcon src="/images/club.svg" alt="Organization icon" />
-              <Translate>Organizations</Translate>
+              <TabIcon src="/images/bibliography.svg" alt="Bibliography icon" />
+              <Translate>Documents</Translate>
             </>
           }
         />
@@ -71,8 +75,17 @@ const AdvancedSearch = ({
         <Tab
           label={
             <>
-              <TabIcon src="/images/bibliography.svg" alt="Bibliography icon" />
-              <Translate>Documents</Translate>
+              <TabIcon src="/images/club.svg" alt="Organization icon" />
+              <Translate>Organizations</Translate>
+            </>
+          }
+        />
+
+        <Tab
+          label={
+            <>
+              <TabIcon src="/images/caver.svg" alt="Caver icon" />
+              <Translate>Persons</Translate>
             </>
           }
         />
@@ -80,55 +93,17 @@ const AdvancedSearch = ({
 
       <Card>
         <CardContent>
-          {selectedType === 0 && (
-            <EntrancesSearch
-              startAdvancedsearch={startAdvancedsearch}
-              resourceType={ADVANCED_SEARCH_TYPES.ENTRANCES}
-              resetResults={resetAdvancedSearch}
-            />
-          )}
-          {selectedType === 1 && (
-            <OrganizationsSearch
-              startAdvancedsearch={startAdvancedsearch}
-              resourceType={ADVANCED_SEARCH_TYPES.ORGANIZATIONS}
-              resetResults={resetAdvancedSearch}
-            />
-          )}
-          {selectedType === 2 && (
-            <MassifsSearch
-              startAdvancedsearch={startAdvancedsearch}
-              resourceType={ADVANCED_SEARCH_TYPES.MASSIFS}
-              resetResults={resetAdvancedSearch}
-            />
-          )}
-          {selectedType === 3 && (
-            <DocumentSearch
-              startAdvancedsearch={startAdvancedsearch}
-              resourceType={ADVANCED_SEARCH_TYPES.DOCUMENTS}
-              resetResults={resetAdvancedSearch}
-              getAllDocumentTypes={getDocumentTypes}
-              allDocumentTypes={documentTypes}
-              getAllSubjects={getSubjects}
-              allSubjects={subjects}
-            />
-          )}
-
+          {tabIndex === 0 && <EntrancesSearch />}
+          {tabIndex === 1 && <DocumentSearch />}
+          {tabIndex === 2 && <MassifsSearch />}
+          {tabIndex === 3 && <OrganizationsSearch />}
+          {tabIndex === 4 && <PersonSearch />}
           <br />
-
           <SearchResults />
         </CardContent>
       </Card>
     </div>
   );
-};
-
-AdvancedSearch.propTypes = {
-  resetAdvancedSearch: PropTypes.func.isRequired,
-  startAdvancedsearch: PropTypes.func.isRequired,
-  getDocumentTypes: PropTypes.func.isRequired,
-  documentTypes: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
-  getSubjects: PropTypes.func.isRequired,
-  subjects: PropTypes.arrayOf(PropTypes.shape({})).isRequired
 };
 
 export default AdvancedSearch;

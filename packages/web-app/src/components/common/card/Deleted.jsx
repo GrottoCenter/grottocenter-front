@@ -21,11 +21,7 @@ import AuthorAndDate from '../Contribution/AuthorAndDate';
 import Layout from '../Layouts/Fixed/FixedContent';
 import { Property } from '../Properties';
 
-import {
-  entityOptionForSelector,
-  nomelizeSearchEntity,
-  EntityIcon
-} from '../../../helpers/Entity';
+import { nomelizeSearchEntity, EntityIcon } from '../../../helpers/Entity';
 import { useDebounce } from '../../../hooks';
 import AutoCompleteSearch from '../AutoCompleteSearch';
 import {
@@ -57,13 +53,13 @@ export const DELETED_ENTITIES = {
   },
   network: {
     str: 'Network',
-    url: '/ui/networks/',
+    url: '/ui/caves/',
     searchType: ADVANCED_SEARCH_TYPES.CAVES
   },
   person: {
     str: 'Person',
     url: '/ui/persons/',
-    searchType: 'cavers'
+    searchType: 'persons'
   }
 };
 
@@ -216,8 +212,7 @@ export const DeleteConfirmationDialog = ({
     query => {
       const criteria = {
         query: query.trim(),
-        complete: false,
-        resourceType: entityType.searchType
+        entities: [entityType.searchType]
       };
       dispatch(fetchQuicksearchResult(criteria));
     },
@@ -336,7 +331,6 @@ export const DeleteConfirmationDialog = ({
           <AutoCompleteSearch
             onInputChange={setInputValue}
             onSelection={handleSelection}
-            getOptionLabel={e => e?.name}
             hasError={!!error}
             isLoading={isQuickSearchLoading}
             label={formatMessage(
@@ -346,7 +340,6 @@ export const DeleteConfirmationDialog = ({
               },
               { entityFmt }
             )}
-            renderOption={entityOptionForSelector}
             inputValue={inputValue}
             suggestions={suggestions}
           />

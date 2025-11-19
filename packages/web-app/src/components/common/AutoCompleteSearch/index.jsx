@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import PropTypes from 'prop-types';
 import Autocomplete from '@mui/material/Autocomplete';
 import {
   InputBase,
@@ -10,9 +11,10 @@ import { alpha, styled } from '@mui/material/styles';
 import SearchIcon from '@mui/icons-material/Search';
 import ErrorIcon from '@mui/icons-material/Error';
 
-import { AutoCompleteSearchTypes } from './types';
 import Translate from '../Translate';
-import DisabledTooltip from '../DisabledTooltip';
+import DisabledTooltip from './DisabledTooltip';
+
+import { entityOptionForSelector } from '../../../helpers/Entity';
 
 const StyledAutocomplete = styled(Autocomplete)`
   min-width: 200px;
@@ -134,8 +136,8 @@ const AutoCompleteSearch = ({
       onInputChange={handleInputChange}
       onChange={handleSelectionChange}
       options={suggestions}
-      getOptionLabel={getOptionLabel}
-      renderOption={renderOption}
+      getOptionLabel={getOptionLabel ?? (e => e?.name)}
+      renderOption={renderOption ?? entityOptionForSelector}
       loading={isLoading}
       PopperComponent={StyledPopper(hasFixWidth)}
       color="inherit"
@@ -176,7 +178,17 @@ const AutoCompleteSearch = ({
 };
 
 AutoCompleteSearch.propTypes = {
-  ...AutoCompleteSearchTypes
+  suggestions: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
+  onSelection: PropTypes.func.isRequired,
+  inputValue: PropTypes.string.isRequired,
+  onInputChange: PropTypes.func.isRequired,
+  renderOption: PropTypes.func,
+  getOptionLabel: PropTypes.func,
+  label: PropTypes.string,
+  hasError: PropTypes.bool,
+  isLoading: PropTypes.bool,
+  disabled: PropTypes.bool,
+  hasFixWidth: PropTypes.bool
 };
 
 export default AutoCompleteSearch;

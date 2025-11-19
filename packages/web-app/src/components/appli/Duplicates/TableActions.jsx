@@ -13,12 +13,7 @@ const Wrapper = styled('div')`
   }
 `;
 
-const TableActions = ({
-  disableSelect,
-  disableDelete,
-  onClickSelect,
-  onClickDelete
-}) => {
+const TableActions = ({ isDisabled, onClickSelect, onClickDelete }) => {
   const { formatMessage } = useIntl();
   return (
     <Wrapper>
@@ -26,13 +21,13 @@ const TableActions = ({
         label={formatMessage({ id: 'Select' })}
         color="primary"
         onClick={onClickSelect}
-        disabled={disableSelect}
+        disabled={isDisabled}
       />
       <ActionButton
         label={formatMessage({ id: 'Delete' })}
         color="primary"
         onClick={onClickDelete}
-        disabled={disableDelete}
+        disabled={isDisabled}
       />
     </Wrapper>
   );
@@ -41,8 +36,7 @@ const TableActions = ({
 export default TableActions;
 
 TableActions.propTypes = {
-  disableSelect: PropTypes.bool.isRequired,
-  disableDelete: PropTypes.bool.isRequired,
+  isDisabled: PropTypes.bool.isRequired,
   onClickSelect: PropTypes.func.isRequired,
   onClickDelete: PropTypes.func.isRequired
 };

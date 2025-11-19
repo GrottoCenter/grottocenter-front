@@ -35,7 +35,7 @@ const CenteredText = styled('div')`
     display: inline-block;
     position: relative;
     top: 140px;
-    left: calc((100% - 200px) / 2);
+    left: ~'calc((100% - 200px) / 2)';
     width: 200px;
     height: 150px;
     font-size: 1.55em;

@@ -3,7 +3,7 @@ import {
   IS_DELETED,
   IS_MODIFIED,
   IS_NEW
-} from '../../components/common/AddFileForm/FileHelpers';
+} from '../../components/appli/EntitiesForm/Document/formElements/AddFileForm/FileHelpers';
 import {
   putDocumentUrl,
   putDocumentyWithNewEntitiesUrl

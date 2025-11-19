@@ -1,28 +1,20 @@
 import React from 'react';
 import { Divider, Drawer, Typography } from '@mui/material';
 import PropTypes from 'prop-types';
-// import { styled } from '@mui/material/styles';
+import { isMobile } from 'react-device-detect';
+import { useDispatch } from 'react-redux';
 import { styled } from '@mui/material/styles';
 import Translate from '../Translate';
 import MenuLinks from './MenuLinks';
 import Footer from './Footer';
 import LanguageSelector from '../LanguageSelector';
+import { usePermissions } from '../../../hooks';
+import QuickSearch from '../../appli/QuickSearch';
 
 const Wrapper = styled('div')`
   display: flex;
   flex-direction: row;
 `;
-
-const SideMenu = ({ isOpen, toggle, isAuth = false, AutoCompleteSearch }) => (
-  <Drawer variant="persistent" anchor="left" open={isOpen} onClose={toggle}>
-    <UserInformation isAuth={isAuth} />
-    {!!AutoCompleteSearch && <AutoCompleteSearch />}
-    <Divider />
-    <MenuLinks />
-    <Footer />
-    {!!AutoCompleteSearch && <LanguageSelector />}
-  </Drawer>
-);
 
 const UserContainer = styled('div')`
   display: flex;
@@ -51,19 +43,32 @@ const UserInformation = ({ isAuth = false }) => (
   </UserContainer>
 );
 
-SideMenu.propTypes = {
-  isOpen: PropTypes.bool.isRequired,
-  toggle: PropTypes.func.isRequired,
-  isAuth: PropTypes.bool,
-  AutoCompleteSearch: PropTypes.oneOfType([
-    PropTypes.node,
-    PropTypes.element,
-    PropTypes.func
-  ])
-};
-
 UserInformation.propTypes = {
   isAuth: PropTypes.bool
+};
+
+const SideMenu = ({ isOpen, toggle }) => {
+  const permissions = usePermissions();
+  const dispatch = useDispatch();
+  return (
+    <Drawer
+      variant="persistent"
+      anchor="left"
+      open={isOpen}
+      onClose={() => dispatch(toggle())}>
+      <UserInformation isAuth={permissions.isAuth} />
+      <QuickSearch />
+      <Divider />
+      <MenuLinks isAuth={permissions.isAuth} toggle={() => isMobile ? dispatch(toggle()) : true} />
+      <Footer />
+      <LanguageSelector />
+    </Drawer>
+  );
+};
+
+SideMenu.propTypes = {
+  isOpen: PropTypes.bool.isRequired,
+  toggle: PropTypes.func.isRequired
 };
 
 export default SideMenu;

@@ -1,147 +1,73 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import { styled } from '@mui/material/styles';
+import React, { useEffect } from 'react';
+import { Typography } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
 import { useIntl } from 'react-intl';
-import { reject, isNil, propOr, pathOr } from 'ramda';
-import { isMobileOnly } from 'react-device-detect';
 
-import { getUsersDocuments } from '../../actions/Document/GetDocuments';
-import { resetDocumentApiErrors } from '../../actions/Document/ResetApiErrors';
+import { fetchAdvancedSearchResults } from '../../actions/Advancedsearch';
 import Layout from '../../components/common/Layouts/Fixed/FixedContent';
-import StandardDialog from '../../components/common/StandardDialog';
-import { useDebounce, useUserProperties } from '../../hooks';
-import Actions from './Actions';
-import DocumentDetails from '../DocumentDetails';
-import DocumentsTable from '../../components/common/DocumentsTable';
-import DocumentEdit from '../DocumentEdit';
+import { useUserProperties } from '../../hooks';
 import AuthChecker from '../../components/appli/AuthChecker';
 
-const Wrapper = styled('div')`
-  display: flex;
-  flex-direction: column;
-  padding: ${({ theme }) => theme.spacing(2)};
-`;
+import EntityTable from '../../components/common/EntityTable/EntityTable';
+import Translate from '../../components/common/Translate';
 
 const ContributionsPage = () => {
-  const userId = pathOr(null, ['id'], useUserProperties());
+  const userId = useUserProperties()?.id;
   const { formatMessage } = useIntl();
   const dispatch = useDispatch();
-  const { isLoading, data, totalCount } = useSelector(state => state.documents);
-  const { success: isActionSuccess } = useSelector(
-    state => state.processDocuments
+
+  const { queryParams, isLoading, results, totalResults } = useSelector(
+    state => state.advancedsearch
   );
-  const [selected, setSelected] = React.useState([]);
-  const [page, setPage] = React.useState(0);
-  const [order, setOrder] = React.useState('asc');
-  const [orderBy, setOrderBy] = React.useState();
-  const [rowsPerPage, setRowsPerPage] = React.useState(50);
-  const [detailedView, setDetailedView] = useState(null);
-  const [editView, setEditView] = useState(null);
-  const [refreshPage, setRefreshPage] = useState(false);
-  const debouncedOrder = useDebounce(order);
-  const debouncedPage = useDebounce(page);
-  const debouncedOrderBy = useDebounce(orderBy);
-  const debouncedRowsPerPage = useDebounce(rowsPerPage);
 
-  const closeDetailedView = () => {
-    setDetailedView(null);
-  };
-
-  const closeEditView = () => {
-    setEditView(null);
-  };
-
-  const loadDocuments = useCallback(() => {
-    setRefreshPage(false);
-    setSelected([]);
-    closeDetailedView();
-    const criteria = {
-      limit: debouncedRowsPerPage,
-      skip: debouncedPage * debouncedRowsPerPage,
-      sortBy: debouncedOrderBy,
-      orderBy: debouncedOrder
-    };
-    dispatch(getUsersDocuments(userId, reject(isNil, criteria)));
+  useEffect(() => {
+    dispatch(
+      fetchAdvancedSearchResults({
+        entity: 'documents',
+        filter: { creatorId: userId }
+      })
+    );
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [debouncedRowsPerPage, debouncedOrderBy, debouncedOrder, debouncedPage]);
-
-  const handleSuccessfulUpdate = () => {
-    dispatch(resetDocumentApiErrors());
-    closeEditView();
-    loadDocuments();
-  };
-
-  useEffect(() => {
-    loadDocuments();
-  }, [loadDocuments]);
-
-  useEffect(() => {
-    if (refreshPage) {
-      loadDocuments();
-    }
-  }, [loadDocuments, refreshPage]);
-
-  useEffect(() => {
-    if (isActionSuccess) {
-      setRefreshPage(true);
-    }
-  }, [isActionSuccess]);
+  }, []);
 
   return (
-    <>
-      <Layout
-        title={formatMessage({ id: 'My contributions' })}
-        content={
-          <AuthChecker
-            componentToDisplay={
-              <Wrapper>
-                <DocumentsTable
-                  currentPage={page}
-                  documents={propOr([], 'documents', data)}
-                  loading={isLoading}
-                  openDetailedView={setDetailedView}
-                  order={order}
-                  orderBy={orderBy || undefined}
-                  rowsCount={totalCount || 0}
-                  rowsPerPage={rowsPerPage}
-                  selected={selected}
-                  updateOrder={setOrder}
-                  updateOrderBy={setOrderBy}
-                  updatePage={setPage}
-                  updateRowsPerPage={setRowsPerPage}
-                  updateSelected={setSelected}
-                />
-                <Actions selected={selected} onEdit={setEditView} />
-              </Wrapper>
-            }
-          />
-        }
-      />
-      <StandardDialog
-        maxWidth="lg"
-        fullScreen={isMobileOnly}
-        fullWidth
-        scrollable
-        open={!isNil(detailedView)}
-        onClose={closeDetailedView}
-        title={formatMessage({ id: 'Detailed document view' })}>
-        <DocumentDetails id={detailedView} />
-      </StandardDialog>
-      <StandardDialog
-        maxWidth="lg"
-        fullScreen={isMobileOnly}
-        fullWidth
-        scrollable
-        open={!isNil(editView)}
-        onClose={closeEditView}
-        title={formatMessage({ id: 'Edit document' })}>
-        <DocumentEdit
-          onSuccessfulUpdate={handleSuccessfulUpdate}
-          id={editView}
-          resetIsValidated
+    <Layout
+      title={formatMessage({ id: 'My contributions' })}
+      content={
+        <AuthChecker
+          componentToDisplay={
+            <>
+              <Typography variant="h6" component="div" gutterBottom>
+                <Translate>Documents</Translate>
+              </Typography>
+              <EntityTable
+                entityType="documents"
+                entityColumnsModifier={columns => {
+                  const c = columns.find(e => e[1] === 'dateInscription');
+                  c[0] = true;
+                }}
+                isLoading={isLoading}
+                pageRows={results}
+                nbTotalRows={totalResults}
+                onPageChange={(pageNum, pageSize) => {
+                  if (!queryParams) return;
+                  const newQueryParams = { ...queryParams };
+                  newQueryParams.page = pageNum + 1;
+                  newQueryParams.size = pageSize;
+                  dispatch(fetchAdvancedSearchResults(newQueryParams, false));
+                }}
+                onSortChange={sort => {
+                  if (!queryParams) return;
+                  const newQueryParams = { ...queryParams };
+                  newQueryParams.sort = sort;
+                  dispatch(fetchAdvancedSearchResults(newQueryParams, false));
+                }}
+              />
+            </>
+          }
         />
-      </StandardDialog>
-    </>
+      }
+    />
   );
 };
 

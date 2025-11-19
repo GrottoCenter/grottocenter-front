@@ -36,8 +36,7 @@ const MultipleCaversSelect = ({
     dispatch(
       fetchQuicksearchResult({
         query: inputValue,
-        resourceTypes: ['cavers'],
-        complete: false
+        entities: ['persons']
       })
     );
     setDefaultNewName(inputValue);

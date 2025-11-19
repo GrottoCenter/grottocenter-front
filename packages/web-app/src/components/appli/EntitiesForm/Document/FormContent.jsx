@@ -17,7 +17,7 @@ import PagesEditor from './formElements/PagesEditor';
 import IdentifierEditor from './formElements/IdentifierEditor';
 
 import { FormContainer, FormRow } from '../utils/FormContainers';
-import AddFileForm from '../../../common/AddFileForm';
+import AddFileForm from './formElements/AddFileForm';
 import StringInput from '../../../common/Form/StringInput';
 import Translate from '../../../common/Translate';
 import { useDocumentTypes } from '../../../../hooks';

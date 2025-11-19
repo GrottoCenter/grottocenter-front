@@ -10,7 +10,7 @@ import { styled } from '@mui/material/styles';
 import { linkDocumentToEntrance } from '../../../../actions/LinkDocumentToEntrance';
 import { unlinkDocumentToEntrance } from '../../../../actions/UnlinkDocumentToEntrance';
 import ScrollableContent from '../../../common/Layouts/Fixed/ScrollableContent';
-import SearchDocumentForm from '../../Form/SearchDocumentForm';
+import SearchDocumentForm from '../../SearchDocumentForm';
 import Alert from '../../../common/Alert';
 import { usePermissions } from '../../../../hooks';
 import DocumentsList from '../../../common/DocumentsList/DocumentsList';

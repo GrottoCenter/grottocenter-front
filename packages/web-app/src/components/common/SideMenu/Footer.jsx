@@ -2,10 +2,10 @@ import React from 'react';
 import { styled } from '@mui/material/styles';
 import {
   List,
+  ListItem,
   ListItemIcon,
   ListItemSecondaryAction,
-  ListItemText,
-  Typography
+  ListItemText
 } from '@mui/material';
 import { useIntl } from 'react-intl';
 import { Launch, MenuBook } from '@mui/icons-material';
@@ -18,11 +18,11 @@ import {
 } from '../../../conf/externalLinks';
 import GCLogo from '../GCLogo';
 import Translate from '../Translate';
-import { StyledListItem } from './styles';
 
 const LogoFooter = styled(GCLogo)`
   & > img {
-    height: 30px;
+    height: 40px;
+    margin-top: 13px;
     padding-left: 10px;
     padding-right: 10px;
   }
@@ -45,13 +45,6 @@ const Spaced = styled('div')`
   flex: 1;
 `;
 
-const AlignText = styled('div')`
-  padding-top: 10px;
-  text-align: center;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-`;
 const WikiContainer = styled('div')`
   margin-top: auto;
   flex: auto;
@@ -70,7 +63,7 @@ const Footer = () => {
     <Container>
       <WikiContainer>
         <List>
-          <StyledListItem
+          <ListItem
             button
             component="a"
             href={linkUrl}
@@ -85,13 +78,12 @@ const Footer = () => {
             <ListItemSecondaryAction>
               <Launch fontSize="small" color="action" />
             </ListItemSecondaryAction>
-          </StyledListItem>
+          </ListItem>
         </List>
       </WikiContainer>
-      <AlignText>
+      <Spaced>
         <LogoFooter />
-        <Typography variant="caption"> v23.0.0 </Typography>
-      </AlignText>
+      </Spaced>
       <Spaced>
         <InternationalizedLink links={licensesODBLink}>
           <LicenceImage

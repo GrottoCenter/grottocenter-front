@@ -10,10 +10,8 @@ import {
   resetQuicksearch
 } from '../../../../../../actions/Quicksearch';
 
-import { entityOptionForSelector } from '../../../../../../helpers/Entity';
-
 import SearchBar from '../SearchBar';
-import FormAutoComplete from '../../../../Form/FormAutoComplete';
+import DocumentFormAutoComplete from '../DocumentFormAutoComplete';
 import { useBoolean } from '../../../../../../hooks';
 import CreateNewOrganization from './CreateNewOrganization';
 
@@ -54,8 +52,7 @@ const OrganizationAutoComplete = ({
   const fetchSearchResults = debouncedInput => {
     const criteria = {
       query: debouncedInput.trim(),
-      complete: false,
-      resourceType: 'grottos'
+      entities: ['organizations']
     };
     setDefaultNewOrganizationValue(debouncedInput);
     dispatch(fetchQuicksearchResult(criteria));
@@ -78,7 +75,7 @@ const OrganizationAutoComplete = ({
   };
 
   return (
-    <FormAutoComplete
+    <DocumentFormAutoComplete
       autoCompleteSearch={
         <SearchBar
           fetchSearchResults={fetchSearchResults}
@@ -87,7 +84,6 @@ const OrganizationAutoComplete = ({
           hasError={!isNil(error)}
           isLoading={isLoading}
           label={searchLabelText}
-          renderOption={entityOptionForSelector}
           resetSearchResults={resetSearchResults}
           searchLabelText={searchLabelText}
           suggestions={suggestions}
@@ -114,7 +110,7 @@ const OrganizationAutoComplete = ({
         onCreateSuccess={toggleCreateOrganization}
         defaultValue={defaultNewOrganizationValue}
       />
-    </FormAutoComplete>
+    </DocumentFormAutoComplete>
   );
 };
 

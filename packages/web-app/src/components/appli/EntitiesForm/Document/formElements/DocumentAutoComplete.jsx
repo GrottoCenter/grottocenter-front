@@ -48,14 +48,6 @@ const DocumentAutoComplete = ({
   //   - if he creates an article, he's searching for an issue
   //   - if he creates an issue, he's searching for a collection
   //   - else he's searching for any document.
-  const docSearchedTypes = [];
-  if (isArticle(document.type)) {
-    docSearchedTypes.push('document-issues');
-  } else if (isIssue(document.type)) {
-    docSearchedTypes.push('document-collections');
-  } else {
-    docSearchedTypes.push('documents');
-  }
 
   // /**
   //  * Recursive function to build the complete name of a "part" element
@@ -90,12 +82,19 @@ const DocumentAutoComplete = ({
 
   const getDocumentName = doc => `[${doc.type}] ${doc.title}`;
 
+  const searchFilter = {};
+  if (isArticle(document.type)) {
+    searchFilter.type = 'Issue';
+  } else if (isIssue(document.type)) {
+    searchFilter.type = 'Collection';
+  }
+
   const fetchSearchResults = debouncedInput =>
     dispatch(
       fetchQuicksearchResult({
         query: debouncedInput.trim(),
-        complete: false,
-        resourceTypes: docSearchedTypes
+        entities: ['documents'],
+        filter: searchFilter
       })
     );
 
