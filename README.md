@@ -1,5 +1,7 @@
 # Grottocenter-front
 
+[![Better Stack Badge](https://uptime.betterstack.com/status-badges/v2/monitor/29ko2.svg)](https://wikicaves.betteruptime.com)
+
 The web app frontend for the [GrottoCenter project](https://fr.wikicaves.org/)
 
 This project uses [Yarn](https://yarnpkg.com/) & [Yarn workspaces](https://yarnpkg.com/features/workspaces)
