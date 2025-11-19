@@ -55,17 +55,26 @@ const EntrancesListPage = () => {
   const { region } = useSelector(state => state.regionDetails);
   const { massif } = useSelector(state => state.massif);
 
+  // Fetch entity data only once when IDs change
+  useEffect(() => {
+    if (regionId && countryId) {
+      dispatch(fetchRegion(countryId, regionId));
+    } else if (countryId) {
+      dispatch(fetchCountry(countryId));
+    } else if (massifId) {
+      dispatch(loadMassif(massifId));
+    }
+  }, [countryId, massifId, regionId, dispatch]);
+
+  // Fetch entrances data when page or IDs change
   useEffect(() => {
     const offset = (page - 1) * limit;
     if (regionId && countryId) {
       dispatch(fetchRegionEntrances(countryId, regionId, { limit, offset }));
-      dispatch(fetchRegion(countryId, regionId));
     } else if (countryId) {
       dispatch(fetchCountryEntrances(countryId, { limit, offset }));
-      dispatch(fetchCountry(countryId));
-    } else {
+    } else if (massifId) {
       dispatch(fetchMassifEntrances(massifId, { limit, offset }));
-      dispatch(loadMassif(massifId));
     }
   }, [countryId, massifId, regionId, page, limit, dispatch]);
 
