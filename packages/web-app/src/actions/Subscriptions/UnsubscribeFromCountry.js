@@ -22,16 +22,20 @@ export const unsubscribeFromCountryActionFailure = error => ({
   error
 });
 
-export function unsubscribeFromCountry(countryId) {
+export function unsubscribeFromCountry(countryId, userId = null) {
   return (dispatch, getState) => {
     dispatch(unsubscribeFromCountryAction());
+
+    const url = userId
+      ? `${unsubscribeFromCountryUrl(countryId)}?userId=${userId}`
+      : unsubscribeFromCountryUrl(countryId);
 
     const requestOptions = {
       method: 'POST',
       headers: getState().login.authorizationHeader
     };
 
-    return fetch(unsubscribeFromCountryUrl(countryId), requestOptions).then(
+    return fetch(url, requestOptions).then(
       response => {
         if (response.status >= 400) {
           const error = `Unsubscribing you from country with id ${countryId}`;

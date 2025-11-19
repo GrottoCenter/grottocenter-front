@@ -22,19 +22,20 @@ export const unsubscribeFromRegionActionFailure = error => ({
   error
 });
 
-export function unsubscribeFromRegion(countryId, regionId) {
+export function unsubscribeFromRegion(countryId, regionId, userId = null) {
   return (dispatch, getState) => {
     dispatch(unsubscribeFromRegionAction());
+
+    const url = userId
+      ? `${unsubscribeFromRegionUrl(countryId, regionId)}?userId=${userId}`
+      : unsubscribeFromRegionUrl(countryId, regionId);
 
     const requestOptions = {
       method: 'POST',
       headers: getState().login.authorizationHeader
     };
 
-    return fetch(
-      unsubscribeFromRegionUrl(countryId, regionId),
-      requestOptions
-    ).then(response => {
+    return fetch(url, requestOptions).then(response => {
       if (response.status >= 400) {
         const error = `Unsubscribing you from region with id ${regionId} in country ${countryId}`;
         dispatch(

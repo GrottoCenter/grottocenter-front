@@ -31,7 +31,8 @@ const SubscriptionsList = ({
   title,
   canUnsubscribe,
   subscriptions = { countries: [], massifs: [], regions: [] },
-  subscriptionsStatus
+  subscriptionsStatus,
+  userId
 }) => {
   const { formatMessage, locale } = useIntl();
   const { countries, massifs, regions } = subscriptions ?? {};
@@ -64,6 +65,7 @@ const SubscriptionsList = ({
                       key={country.id}
                       subscription={country}
                       type="COUNTRY"
+                      userId={userId}
                     />
                   ))}
               </Box>
@@ -86,6 +88,7 @@ const SubscriptionsList = ({
                       key={massif.id}
                       subscription={massif}
                       type="MASSIF"
+                      userId={userId}
                     />
                   ))}
               </Box>
@@ -110,6 +113,7 @@ const SubscriptionsList = ({
                       key={region.id}
                       subscription={region}
                       type="REGION"
+                      userId={userId}
                     />
                   ))}
               </Box>
@@ -138,7 +142,8 @@ SubscriptionsList.propTypes = {
   canUnsubscribe: PropTypes.bool,
   subscriptions: subscriptionsType,
   subscriptionsStatus: PropTypes.oneOf(Object.values(REDUCER_STATUS)),
-  title: PropTypes.node
+  title: PropTypes.node,
+  userId: PropTypes.number
 };
 
 export default SubscriptionsList;

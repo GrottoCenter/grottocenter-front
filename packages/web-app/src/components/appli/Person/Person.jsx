@@ -44,6 +44,7 @@ const Person = ({
   if (userId && person) {
     canEdit = userId.toString() === person?.id?.toString();
   }
+  const canUnsubscribe = canEdit || permissions.isAdmin;
 
   const handleLeaveOrganization = async organizationId => {
     if (!person?.id) return;
@@ -124,10 +125,11 @@ const Person = ({
               </Box>
               <hr />
               <SubscriptionsList
-                canUnsubscribe={canEdit}
+                canUnsubscribe={canUnsubscribe}
                 subscriptions={subscriptions}
                 subscriptionsStatus={subscriptionsStatus}
                 title={formatMessage({ id: 'Subscriptions' })}
+                userId={person.id}
               />
               {person.documents.length > 0 && (
                 <>

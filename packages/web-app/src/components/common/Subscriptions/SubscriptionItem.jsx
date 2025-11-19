@@ -13,7 +13,7 @@ import regionType from '../../../types/region.type';
 import { unsubscribeFromCountry } from '../../../actions/Subscriptions/UnsubscribeFromCountry';
 import { unsubscribeFromRegion } from '../../../actions/Subscriptions/UnsubscribeFromRegion';
 
-const SubscriptionItem = ({ canUnsubscribe, subscription, type }) => {
+const SubscriptionItem = ({ canUnsubscribe, subscription, type, userId }) => {
   const { formatMessage } = useIntl();
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -30,19 +30,24 @@ const SubscriptionItem = ({ canUnsubscribe, subscription, type }) => {
 
   const handleUnsubscribe = event => {
     const unsubscribe = () => {
-      if (type === 'MASSIF') dispatch(unsubscribeFromMassif(subscription.id));
-      if (type === 'COUNTRY') dispatch(unsubscribeFromCountry(subscription.id));
+      if (type === 'MASSIF') dispatch(unsubscribeFromMassif(subscription.id, userId));
+      if (type === 'COUNTRY') dispatch(unsubscribeFromCountry(subscription.id, userId));
       if (type === 'REGION') {
         // Parse region ID to extract country and region parts (format: "US-AL")
         const [countryId, regionId] = subscription.id.split('-');
-        dispatch(unsubscribeFromRegion(countryId, regionId));
+        dispatch(unsubscribeFromRegion(countryId, regionId, userId));
       }
     };
     fadeOut(event.currentTarget.closest('div'), unsubscribe);
   };
 
   return (
-    <Tooltip title={formatMessage({ id: 'Click the cross to unsubscribe' })}>
+    <Tooltip
+      title={
+        canUnsubscribe
+          ? formatMessage({ id: 'Click the cross to unsubscribe' })
+          : ''
+      }>
       <Chip
         icon={<NotificationsIcon />}
         label={subscription.name}
@@ -57,7 +62,8 @@ const SubscriptionItem = ({ canUnsubscribe, subscription, type }) => {
 SubscriptionItem.propTypes = {
   canUnsubscribe: PropTypes.bool,
   subscription: PropTypes.oneOfType([countryType, MassifSimpleTypes, regionType]),
-  type: PropTypes.oneOf(['COUNTRY', 'MASSIF', 'REGION']).isRequired
+  type: PropTypes.oneOf(['COUNTRY', 'MASSIF', 'REGION']).isRequired,
+  userId: PropTypes.number
 };
 
 export default SubscriptionItem;
