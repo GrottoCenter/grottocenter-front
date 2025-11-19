@@ -17,6 +17,7 @@ import {
 const initialState = {
   loading: false,
   duplicatesList: [],
+  totalCount: 0,
   duplicate: null,
   error: null,
   latestHttpCodeOnFetch: null,
@@ -38,6 +39,7 @@ const reducer = (state = initialState, action) => {
         ...state,
         loading: false,
         duplicatesList: action.duplicates,
+        totalCount: action.totalCount,
         latestHttpCodeOnFetch: action.httpCode
       };
     case LOAD_DUPLICATE_SUCCESS:

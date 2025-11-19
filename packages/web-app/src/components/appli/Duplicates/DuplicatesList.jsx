@@ -1,26 +1,15 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { isEmpty } from 'ramda';
-import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
-import { styled } from '@mui/material/styles';
 import {
   deleteDuplicates,
   fetchDuplicatesList
 } from '../../../actions/DuplicatesImport';
-import { createColumns } from '../../common/Table/TableHead';
-import Table from '../../common/Table';
-import useMakeCustomHeaderCellRenders from './customHeaderCellRender';
-import useMakeCustomCellRenders from './customCellRender';
+import EntityTable from '../../common/EntityTable/EntityTable';
+
 import TableActions from './TableActions';
 import { resetDocumentApiErrors } from '../../../actions/Document/ResetApiErrors';
 import { resetEntranceState } from '../../../actions/Entrance/ResetEntrance';
-
-const Wrapper = styled('div')`
-  margin-top: 10px;
-  margin-bottom: ${({ theme }) => theme.spacing(3)};
-`;
 
 const DuplicatesList = ({
   duplicateType,
@@ -28,108 +17,89 @@ const DuplicatesList = ({
   setSelectedDuplicates,
   nextStep
 }) => {
-  const { formatMessage } = useIntl();
+  const dispatch = useDispatch();
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(50);
-  const [order, setOrder] = useState('asc');
-  const [sortBy, setSortBy] = useState('dateInscription');
-  const { loading, duplicatesList, latestHttpCodeOnDelete } = useSelector(
-    state => state.duplicatesImport
-  );
+  const [rowsPerPage, setRowsPerPage] = useState(20);
+
+  const [pageRows, setPageRows] = useState([]);
+
+  const { loading, duplicatesList, totalCount, latestHttpCodeOnDelete } =
+    useSelector(state => state.duplicatesImport);
+
   const { latestHttpCode: httpCodeEntry } = useSelector(
     state => state.entrance
   );
-
   const { latestHttpCode: httpCodeDocument } = useSelector(
     state => state.createDocument
   );
 
-  const columnTranslations = {
-    id: 'table.column.id',
-    title: 'table.column.title',
-    type: 'table.column.type',
-    source: 'table.column.source'
-  };
-
-  const makeTranslation = id => {
-    const translationKey = columnTranslations[id] || `table.column.${id}`;
-    return formatMessage({ id: translationKey });
-  };
-  const [columns, setColumns] = useState(
-    createColumns(duplicatesList, makeTranslation)
-  );
-  const [hiddenColumns, setHiddenColumns] = useState(['id']);
-  const customCell = useMakeCustomCellRenders();
-  const customHeader = useMakeCustomHeaderCellRenders();
-
-  const dispatch = useDispatch();
-
-  const deleteSelected = () => {
-    dispatch(deleteDuplicates(selectedDuplicates, duplicateType));
-  };
-
   useEffect(() => {
-    setColumns(createColumns(duplicatesList, makeTranslation));
-  }, [duplicatesList]);
+    dispatch(resetEntranceState());
+    dispatch(resetDocumentApiErrors());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [httpCodeEntry, httpCodeDocument]);
 
   useEffect(() => {
     if ([200, 204].includes(latestHttpCodeOnDelete)) {
       const criteria = {
         limit: rowsPerPage,
-        skip: page * rowsPerPage,
-        sortBy,
-        orderBy: order
+        skip: page * rowsPerPage
       };
       dispatch(fetchDuplicatesList(duplicateType, criteria));
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [latestHttpCodeOnDelete]);
-
-  useEffect(() => {
-    dispatch(resetEntranceState());
-    dispatch(resetDocumentApiErrors());
-  }, [httpCodeEntry, httpCodeDocument]);
 
   useEffect(() => {
     const criteria = {
       limit: rowsPerPage,
-      skip: page * rowsPerPage,
-      sortBy,
-      orderBy: order
+      skip: page * rowsPerPage
     };
     dispatch(fetchDuplicatesList(duplicateType, criteria));
-  }, [rowsPerPage, page, order, sortBy, duplicateType]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [rowsPerPage, page, duplicateType]);
+
+  useEffect(() => {
+    let formated = [];
+    if (duplicateType === 'entrance') {
+      formated = duplicatesList.map(e => ({
+        id: e.id,
+        docId: e.entrance,
+        name: e.content?.nameDescLoc?.name?.text
+      }));
+    } else if (duplicateType === 'document') {
+      formated = duplicatesList.map(e => ({
+        id: e.id,
+        docId: e.document,
+        name: e.content?.description?.title
+      }));
+    }
+    setPageRows(formated);
+  }, [duplicatesList, duplicateType]);
 
   return (
     <>
-      <Wrapper>
-        <Table
-          currentPage={page}
-          columns={columns}
-          customCellRenders={customCell}
-          customHeaderCellRenders={customHeader}
-          data={duplicatesList || []}
-          hiddenColumns={hiddenColumns}
-          loading={loading}
-          openDetailedView={undefined}
-          order={order}
-          orderBy={sortBy || undefined}
-          rowsCount={duplicatesList.length}
-          rowsPerPage={rowsPerPage}
-          selection={selectedDuplicates}
-          title={formatMessage({ id: 'Duplicates list' })}
-          updateCurrentPage={setPage}
-          updateHiddenColumns={setHiddenColumns}
-          updateOrder={setOrder}
-          updateOrderBy={setSortBy}
-          updateRowsPerPage={setRowsPerPage}
-          updateSelection={setSelectedDuplicates}
-        />
-      </Wrapper>
+      <br />
+      <EntityTable
+        entityType="duplicate"
+        isLoading={loading}
+        pageRows={pageRows}
+        nbTotalRows={totalCount}
+        onPageChange={(pageNum, pageSize) => {
+          setPage(pageNum);
+          setRowsPerPage(pageSize);
+        }}
+        onRowClick={() => false}
+        onSelected={ids => {
+          setSelectedDuplicates(ids);
+        }}
+      />
       <TableActions
-        disableSelect={isEmpty(selectedDuplicates)}
-        disableDelete={isEmpty(selectedDuplicates)}
+        isDisabled={selectedDuplicates.length === 0}
         onClickSelect={nextStep}
-        onClickDelete={deleteSelected}
+        onClickDelete={() => {
+          dispatch(deleteDuplicates(selectedDuplicates, duplicateType));
+        }}
       />
     </>
   );

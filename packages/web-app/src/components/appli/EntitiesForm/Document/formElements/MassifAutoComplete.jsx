@@ -11,7 +11,7 @@ import {
 import { entityOptionForSelector } from '../../../../../helpers/Entity';
 
 import SearchBar from './SearchBar';
-import FormAutoComplete from '../../../Form/FormAutoComplete';
+import DocumentFormAutoComplete from './DocumentFormAutoComplete';
 
 const resultEndAdornment = (
   <InputAdornment position="end">
@@ -39,8 +39,7 @@ const MassifAutoComplete = ({
   const fetchSearchResults = debouncedInput => {
     const criterias = {
       query: debouncedInput.trim(),
-      complete: false,
-      resourceType: 'massifs'
+      entities: ['massifs']
     };
     dispatch(fetchQuicksearchResult(criterias));
   };
@@ -50,7 +49,7 @@ const MassifAutoComplete = ({
   };
 
   return (
-    <FormAutoComplete
+    <DocumentFormAutoComplete
       autoCompleteSearch={
         <SearchBar
           fetchSearchResults={fetchSearchResults}

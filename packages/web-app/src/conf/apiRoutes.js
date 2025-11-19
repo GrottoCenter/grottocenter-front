@@ -261,8 +261,10 @@ export const frenchRssUrl = `${API_URL}/api/rss/FR`;
 export const englishRssUrl = `${API_URL}/api/rss/EN`;
 
 // ===== Search urls
-export const advancedsearchUrl = `${API_BASE_PATH}/advanced-search`;
-export const quicksearchUrl = `${API_BASE_PATH}/search`;
+export const advancedSearchUrl = `${API_BASE_PATH}/advanced-search`;
+export const advancedSearchExportUrl = `${API_BASE_PATH}/advanced-search/export`;
+export const fieldSearchUrl = `${API_BASE_PATH}/field-search`;
+export const quickSearchUrl = `${API_BASE_PATH}/search`;
 
 // ===== Subscriptions urls
 export const getSubscriptionsUrl = caverId =>
@@ -291,9 +293,6 @@ export const swaggerUrl = `${API_BASE_PATH}/swagger.yaml`;
 
 export const getProjectionsUrl = `${API_URL}/api/convert`;
 export const getForCarouselUrl = `${API_BASE_PATH}/partners/findForCarousel`;
-
-export const getCaversDocumentsUrl = caverId =>
-  `${API_BASE_PATH}/cavers/${caverId}/documents`;
 
 export const getLanguagesUrl = `${API_BASE_PATH}/languages`;
 export const regionsSearchUrl = `${API_BASE_PATH}/regions/search/logical/or`;

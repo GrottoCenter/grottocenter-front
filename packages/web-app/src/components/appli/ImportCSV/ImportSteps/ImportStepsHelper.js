@@ -1,9 +1,5 @@
-import { isNil } from 'ramda';
-
 const isStep2Valid = (stepData, importData) => {
-  if (isNil(stepData)) {
-    return false;
-  }
+  if (!stepData) return false;
 
   const { baseErrors, fileImported } = stepData;
 

@@ -9,7 +9,7 @@ import CancelIcon from '@mui/icons-material/Cancel';
 import { styled } from '@mui/material/styles';
 import { linkDocumentToMassif } from '../../../actions/LinkDocumentToMassif';
 import { unlinkDocumentToMassif } from '../../../actions/UnlinkDocumentToMassif';
-import SearchDocumentForm from '../Form/SearchDocumentForm';
+import SearchDocumentForm from '../SearchDocumentForm';
 import Alert from '../../common/Alert';
 import { usePermissions } from '../../../hooks';
 import DocumentsList from '../../common/DocumentsList/DocumentsList';

@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { isNil, anyPass, isEmpty, head, propOr } from 'ramda';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import { styled } from '@mui/material/styles';
@@ -10,7 +9,6 @@ import EditIcon from '@mui/icons-material/Edit';
 import { postProcessDocuments } from '../../actions/ProcessDocuments';
 import ActionButton from '../../components/common/ActionButton';
 import StandardDialog from '../../components/common/StandardDialog';
-import { useBoolean } from '../../hooks';
 import StringInput from '../../components/common/Form/StringInput';
 
 const ActionTypes = {
@@ -42,40 +40,25 @@ const Wrapper = styled('div')`
   }
 `;
 
-const isNilOrEmpty = anyPass([isNil, isEmpty]);
-
-const Actions = ({ selected, onEdit }) => {
+const Actions = ({ selectedIds, onEdit }) => {
   const { formatMessage } = useIntl();
   const dispatch = useDispatch();
   const { isLoading, success } = useSelector(state => state.processDocuments);
-  const confirmationDialog = useBoolean(false);
+  const [isConfirmationDialogOpen, setIsConfirmationDialogOpen] =
+    useState(false);
   const [actionType, setActionType] = useState(null);
   const [comment, setComment] = useState('');
 
-  const handleAction = () => {
-    dispatch(
-      postProcessDocuments(
-        selected,
-        actionType === ActionTypes.validate,
-        comment
-      )
-    );
-  };
+  const hasNoSelectedIds = !selectedIds || selectedIds.length === 0;
 
   const handleActionConfirmation = selectedType => () => {
     setActionType(selectedType);
-    confirmationDialog.open();
-  };
-
-  const handleEdit = () => {
-    if (!isEmpty(selected)) {
-      onEdit(head(selected));
-    }
+    setIsConfirmationDialogOpen(true);
   };
 
   useEffect(() => {
     if (success) {
-      confirmationDialog.close();
+      setIsConfirmationDialogOpen(false);
       setComment('');
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -86,20 +69,22 @@ const Actions = ({ selected, onEdit }) => {
       <Wrapper>
         <ActionButton
           label={formatMessage({ id: ActionTypes.edit.name })}
-          disabled={isNilOrEmpty(selected) || isLoading || selected.length > 1}
-          onClick={handleEdit}
+          disabled={hasNoSelectedIds || isLoading || selectedIds.length > 1}
+          onClick={() => {
+            if (selectedIds[0]) onEdit(selectedIds[0]);
+          }}
           icon={<EditIcon />}
         />
         <ActionButton
           label={formatMessage({ id: ActionTypes.validate.name })}
-          disabled={isNilOrEmpty(selected) || isLoading}
+          disabled={hasNoSelectedIds || isLoading}
           onClick={handleActionConfirmation(ActionTypes.validate)}
           icon={<SendIcon />}
         />
         <ActionButton
           label={formatMessage({ id: ActionTypes.decline.name })}
           color="secondary"
-          disabled={isNilOrEmpty(selected) || isLoading}
+          disabled={hasNoSelectedIds || isLoading}
           onClick={handleActionConfirmation(ActionTypes.decline)}
           icon={<DeclineIcon />}
         />
@@ -108,19 +93,27 @@ const Actions = ({ selected, onEdit }) => {
         maxWidth="xs"
         fullWidth
         scrollable
-        open={confirmationDialog.isOpen}
-        onClose={confirmationDialog.close}
+        open={isConfirmationDialogOpen}
+        onClose={() => setIsConfirmationDialogOpen(false)}
         title={actionType && formatMessage({ id: actionType.confirmationText })}
         actions={[
           <ActionButton
             key={0}
             label={`${formatMessage({
-              id: propOr(ActionTypes.validate.name, 'name', actionType)
-            })} ${selected.length} ${formatMessage({ id: 'document(s)' })}`}
+              id: actionType?.name ?? ActionTypes.validate.name
+            })} ${selectedIds.length} ${formatMessage({ id: 'document(s)' })}`}
             color={
               actionType === ActionTypes.validate ? 'primary' : 'secondary'
             }
-            onClick={handleAction}
+            onClick={() => {
+              dispatch(
+                postProcessDocuments(
+                  selectedIds,
+                  actionType === ActionTypes.validate,
+                  comment
+                )
+              );
+            }}
             icon={
               actionType === ActionTypes.validate ? (
                 <SendIcon />
@@ -129,12 +122,12 @@ const Actions = ({ selected, onEdit }) => {
               )
             }
             loading={isLoading}
-            disabled={actionType === ActionTypes.decline && isEmpty(comment)}
+            disabled={actionType === ActionTypes.decline && !comment}
           />
         ]}>
         <StringInput
           helperText={
-            !isNil(actionType)
+            actionType
               ? formatMessage({
                   id: actionType.helperText
                 })
@@ -154,11 +147,6 @@ const Actions = ({ selected, onEdit }) => {
 export default Actions;
 
 Actions.propTypes = {
-  selected: PropTypes.arrayOf(
-    PropTypes.oneOfType([
-      PropTypes.number.isRequired,
-      PropTypes.string.isRequired
-    ])
-  ).isRequired,
+  selectedIds: PropTypes.arrayOf(PropTypes.number.isRequired).isRequired,
   onEdit: PropTypes.func.isRequired
 };

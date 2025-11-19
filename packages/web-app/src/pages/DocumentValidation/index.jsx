@@ -2,19 +2,20 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { styled } from '@mui/material/styles';
 import { useDispatch, useSelector } from 'react-redux';
 import { useIntl } from 'react-intl';
-import { reject, isNil, propOr, isEmpty } from 'ramda';
 import { isMobileOnly } from 'react-device-detect';
+import { Typography } from '@mui/material';
 
 import { getDocuments } from '../../actions/Document/GetDocuments';
 import { resetDocumentApiErrors } from '../../actions/Document/ResetApiErrors';
 import Layout from '../../components/common/Layouts/Fixed/FixedContent';
 import StandardDialog from '../../components/common/StandardDialog';
-import { useDebounce } from '../../hooks';
 import Actions from './Actions';
 import DocumentDetails from '../DocumentDetails';
-import DocumentsTable from '../../components/common/DocumentsTable';
 import DocumentEdit from '../DocumentEdit';
 import AuthChecker from '../../components/appli/AuthChecker';
+
+import EntityTable from '../../components/common/EntityTable/EntityTable';
+import Translate from '../../components/common/Translate';
 
 const Wrapper = styled('div')`
   display: flex;
@@ -29,41 +30,30 @@ const DocumentValidationPage = () => {
   const { success: isActionSuccess } = useSelector(
     state => state.processDocuments
   );
-  const [selected, setSelected] = useState([]);
+  const [selectedIds, setSelectedIds] = useState([]);
+
   const [page, setPage] = useState(0);
-  const [order, setOrder] = useState('asc');
-  const [orderBy, setOrderBy] = useState();
-  const [rowsPerPage, setRowsPerPage] = useState(50);
+  const [rowsPerPage, setRowsPerPage] = useState(20);
+
   const [detailedView, setDetailedView] = useState(null);
   const [editView, setEditView] = useState(null);
   const [refreshPage, setRefreshPage] = useState(false);
-  const debouncedOrder = useDebounce(order);
-  const debouncedPage = useDebounce(page);
-  const debouncedOrderBy = useDebounce(orderBy);
-  const debouncedRowsPerPage = useDebounce(rowsPerPage);
 
-  const closeDetailedView = () => {
-    setDetailedView(null);
-  };
-
-  const closeEditView = () => {
-    setEditView(null);
-  };
+  const closeDetailedView = () => setDetailedView(null);
+  const closeEditView = () => setEditView(null);
 
   const loadDocuments = useCallback(() => {
     setRefreshPage(false);
-    setSelected([]);
+    setSelectedIds([]);
     closeDetailedView();
     const criteria = {
       isValidated: false,
-      limit: debouncedRowsPerPage,
-      skip: debouncedPage * debouncedRowsPerPage,
-      sortBy: debouncedOrderBy,
-      orderBy: debouncedOrder
+      limit: rowsPerPage,
+      skip: page * rowsPerPage
     };
-    dispatch(getDocuments(reject(isNil, criteria)));
+    dispatch(getDocuments(criteria));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [debouncedRowsPerPage, debouncedOrderBy, debouncedOrder, debouncedPage]);
+  }, [rowsPerPage, page]);
 
   const handleSuccessfulUpdate = () => {
     dispatch(resetDocumentApiErrors());
@@ -73,9 +63,7 @@ const DocumentValidationPage = () => {
 
   const isUpdatedDocRequired = () => {
     // We fetch the updated doc only if the doc has been modified
-    if (isNil(editView) || isEmpty(data.documents)) {
-      return false;
-    }
+    if (!editView || data.documents.length === 0) return false;
     return (
       data.documents.find(doc => doc.id === editView).modifiedDocJson !== null
     );
@@ -86,15 +74,11 @@ const DocumentValidationPage = () => {
   }, [loadDocuments]);
 
   useEffect(() => {
-    if (refreshPage) {
-      loadDocuments();
-    }
+    if (refreshPage) loadDocuments();
   }, [loadDocuments, refreshPage]);
 
   useEffect(() => {
-    if (isActionSuccess) {
-      setRefreshPage(true);
-    }
+    if (isActionSuccess) setRefreshPage(true);
   }, [isActionSuccess]);
 
   return (
@@ -105,23 +89,27 @@ const DocumentValidationPage = () => {
           <AuthChecker
             componentToDisplay={
               <Wrapper>
-                <DocumentsTable
-                  currentPage={page}
-                  documents={propOr([], 'documents', data)}
-                  loading={isLoading}
-                  openDetailedView={setDetailedView}
-                  order={order}
-                  orderBy={orderBy || undefined}
-                  rowsCount={totalCount || 0}
-                  rowsPerPage={rowsPerPage}
-                  selected={selected}
-                  updateOrder={setOrder}
-                  updateOrderBy={setOrderBy}
-                  updatePage={setPage}
-                  updateRowsPerPage={setRowsPerPage}
-                  updateSelected={setSelected}
+                <Typography variant="h6" component="div" gutterBottom>
+                  <Translate>Documents</Translate>
+                </Typography>
+                <EntityTable
+                  entityType="documents"
+                  isLoading={isLoading}
+                  pageRows={data.documents}
+                  nbTotalRows={totalCount}
+                  onPageChange={(pageNum, pageSize) => {
+                    setPage(pageNum);
+                    setRowsPerPage(pageSize);
+                  }}
+                  onRowClick={doc => {
+                    setDetailedView(doc.id);
+                    return false;
+                  }}
+                  onSelected={ids => {
+                    setSelectedIds(ids);
+                  }}
                 />
-                <Actions selected={selected} onEdit={setEditView} />
+                <Actions selectedIds={selectedIds} onEdit={setEditView} />
               </Wrapper>
             }
           />
@@ -132,7 +120,7 @@ const DocumentValidationPage = () => {
         fullScreen={isMobileOnly}
         fullWidth
         scrollable
-        open={!isNil(detailedView)}
+        open={!!detailedView}
         onClose={closeDetailedView}
         title={formatMessage({ id: 'Detailed document view' })}>
         {detailedView && <DocumentDetails id={detailedView} />}
@@ -142,7 +130,7 @@ const DocumentValidationPage = () => {
         fullScreen={isMobileOnly}
         fullWidth
         scrollable
-        open={!isNil(editView)}
+        open={!!editView}
         onClose={closeEditView}
         title={formatMessage({ id: 'Edit document' })}>
         <DocumentEdit

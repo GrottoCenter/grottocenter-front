@@ -1,5 +1,4 @@
 import React from 'react';
-import { useIntl } from 'react-intl';
 import { styled } from '@mui/material/styles';
 import {
   FilledInput,
@@ -10,7 +9,6 @@ import {
   Collapse
 } from '@mui/material';
 
-import { isNil } from 'ramda';
 import { ExpandLess, ExpandMore } from '@mui/icons-material';
 import Translate from '../Translate';
 import { FormAutoCompleteTypes } from './types';
@@ -56,7 +54,6 @@ const FormAutoComplete = ({
   isSideActionOpen = false,
   children
 }) => {
-  const { formatMessage } = useIntl();
   return (
     <FormControl
       variant="filled"
@@ -79,22 +76,16 @@ const FormAutoComplete = ({
           error={hasError}>
           <InputWrapper>
             {autoCompleteSearch}
-            {!isNil(children) && (
-              <Collapse in={isSideActionOpen}>{children}</Collapse>
-            )}
+            {children && <Collapse in={isSideActionOpen}>{children}</Collapse>}
           </InputWrapper>
-          {!isNil(onSideAction) && (
+          {onSideAction && (
             <IconButton
               size="small"
               onClick={onSideAction}
               disabled={sideActionDisabled}
               color="secondary"
-              aria-label={formatMessage({ id: 'new entity' })}>
-              {!isNil(sideActionIcon) ? (
-                sideActionIcon
-              ) : (
-                <ExpandIcon isOpen={isSideActionOpen} />
-              )}
+              aria-label="new entity">
+              {sideActionIcon || <ExpandIcon isOpen={isSideActionOpen} />}
             </IconButton>
           )}
         </StyledFormControl>

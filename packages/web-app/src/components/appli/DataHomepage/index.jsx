@@ -92,20 +92,22 @@ const DataHomepage = () => {
         <Grid container>
           <Grid item xs={12} sm={4}>
             {entrances && (
-              <DataCard
-                isColored={false}
-                icon={
-                  <img
-                    style={{ width: '70px' }}
-                    src="/images/gc-entries.svg"
-                    alt={formatMessage({ id: 'Entries icon' })}
-                  />
-                }
-                numberData={entrances.number}
-                isFetching={entrances.isFetching}
-                title={formatMessage({ id: 'caves' })}
-                globalText={formatMessage({ id: 'are accessible.' })}
-              />
+              <StyledLink internal href="/ui/search/entry">
+                <DataCard
+                  isColored={false}
+                  icon={
+                    <img
+                      style={{ width: '70px' }}
+                      src="/images/gc-entries.svg"
+                      alt={formatMessage({ id: 'Entries icon' })}
+                    />
+                  }
+                  numberData={entrances.number}
+                  isFetching={entrances.isFetching}
+                  title={formatMessage({ id: 'caves' })}
+                  globalText={formatMessage({ id: 'are accessible.' })}
+                />
+              </StyledLink>
             )}
           </Grid>
 
@@ -125,22 +127,24 @@ const DataHomepage = () => {
           </Grid>
           <Grid item xs={12} sm={4}>
             {documents && (
-              <DataCard
-                isColored={false}
-                icon={
-                  <img
-                    style={{ width: '70px' }}
-                    src="/images/bbs_logo.png"
-                    alt={formatMessage({ id: 'BBS icon' })}
-                  />
-                }
-                numberData={documents.number}
-                isFetching={documents.isFetching}
-                title={formatMessage({ id: 'documents' })}
-                globalText={formatMessage({
-                  id: 'are referenced.'
-                })}
-              />
+              <StyledLink internal href="/ui/search/document">
+                <DataCard
+                  isColored={false}
+                  icon={
+                    <img
+                      style={{ width: '70px' }}
+                      src="/images/bbs_logo.png"
+                      alt={formatMessage({ id: 'BBS icon' })}
+                    />
+                  }
+                  numberData={documents.number}
+                  isFetching={documents.isFetching}
+                  title={formatMessage({ id: 'documents' })}
+                  globalText={formatMessage({
+                    id: 'are referenced.'
+                  })}
+                />
+              </StyledLink>
             )}
           </Grid>
 
@@ -163,40 +167,47 @@ const DataHomepage = () => {
           </Grid>
           <Grid item xs={12} sm={4}>
             {cumulatedLength && (
-              <DataCard
-                isColored={false}
-                icon={
-                  <Tooltip
-                    title={`${formatMessage({ id: 'Calculated on' })} ${
-                      cumulatedLength.nb_data
-                    } ${formatMessage({ id: 'caves' })}`}
-                    placement="top">
-                    <DirectionsWalk style={{ fontSize: 50 }} color="primary" />
-                  </Tooltip>
-                }
-                numberData={Math.round(cumulatedLength.sum_length / 1000)}
-                isFetching={loadingCumulatedLength}
-                title={formatMessage({ id: 'km of caves' })}
-                globalText={formatMessage({
-                  id: 'are available.'
-                })}
-                width="32%"
-              />
+              <StyledLink internal href="/ui/search/entry">
+                <DataCard
+                  isColored={false}
+                  icon={
+                    <Tooltip
+                      title={`${formatMessage({ id: 'Calculated on' })} ${
+                        cumulatedLength.nb_data
+                      } ${formatMessage({ id: 'caves' })}`}
+                      placement="top">
+                      <DirectionsWalk
+                        style={{ fontSize: 50 }}
+                        color="primary"
+                      />
+                    </Tooltip>
+                  }
+                  numberData={Math.round(cumulatedLength.sum_length / 1000)}
+                  isFetching={loadingCumulatedLength}
+                  title={formatMessage({ id: 'km of caves' })}
+                  globalText={formatMessage({
+                    id: 'are available.'
+                  })}
+                  width="32%"
+                />
+              </StyledLink>
             )}
           </Grid>
           <Grid item xs={12} sm={4}>
             {organizations && (
-              <DataCard
-                isColored
-                icon={<BlockIcon className="icon icon-gc-expe" />}
-                numberData={organizations.number}
-                isFetching={organizations.isFetching}
-                title={formatMessage({ id: 'organizations' })}
-                globalText={formatMessage({
-                  id: 'are registered on the website.'
-                })}
-                width="40%"
-              />
+              <StyledLink internal href="/ui/search/organization">
+                <DataCard
+                  isColored
+                  icon={<BlockIcon className="icon icon-gc-expe" />}
+                  numberData={organizations.number}
+                  isFetching={organizations.isFetching}
+                  title={formatMessage({ id: 'organizations' })}
+                  globalText={formatMessage({
+                    id: 'are registered on the website.'
+                  })}
+                  width="40%"
+                />
+              </StyledLink>
             )}
           </Grid>
         </Grid>

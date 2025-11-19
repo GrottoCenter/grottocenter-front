@@ -2,15 +2,13 @@ import {
   RESET_QUICKSEARCH,
   FETCH_QUICKSEARCH_SUCCESS,
   FETCH_QUICKSEARCH_FAILURE,
-  SET_CURRENT_ENTRY,
   FETCH_LOADING
 } from '../actions/Quicksearch';
 
 const initialState = {
   results: [],
   error: null,
-  isLoading: false,
-  entry: undefined
+  isLoading: false
 };
 
 const reducer = (state = initialState, action) => {
@@ -32,12 +30,6 @@ const reducer = (state = initialState, action) => {
       return {
         ...state,
         error: action.error,
-        isLoading: false
-      };
-    case SET_CURRENT_ENTRY:
-      return {
-        ...state,
-        entry: action.entry,
         isLoading: false
       };
     default:

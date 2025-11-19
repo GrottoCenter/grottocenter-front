@@ -16,7 +16,7 @@ import Api from './components/appli/Api';
 import Dashboard from './pages/Dashboard';
 import ApiDoc from './pages/ApiDoc';
 import HomePage from './pages/homepage';
-import AdvancedSearchPage from './pages/AdvancedSearchPage';
+import AdvancedSearch from './components/appli/AdvancedSearch';
 import DocumentDetails from './pages/DocumentDetails';
 import DuplicateImportHandle from './pages/DuplicateImportHandle';
 import Faq from './components/appli/Faq';
@@ -55,7 +55,7 @@ const router = createBrowserRouter(
       <Route exact path="/" element={<HomePage />} />
       <Route exact path="/ui" element={<Dashboard />} />
       <Route path="/ui/admin/users" element={<ManageUsers />} />
-      <Route path="/ui/search" element={<AdvancedSearchPage />} />
+      <Route path="/ui/search/:tab?" element={<AdvancedSearch />} />
       <Route path="/ui/api/:version" element={<ApiDoc />} />
       <Route path="/ui/api" element={<Api />} />
       <Route path="/ui/:type/:id/snapshots" element={<SnapshotPage />} />

@@ -1,87 +1,44 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import withStyles from '@mui/styles/withStyles';
-import { TextField, Typography } from '@mui/material';
+import React, { useState } from 'react';
+import { useDispatch } from 'react-redux';
 
-import SearchBottomActionButtons from './SearchBottomActionButtons';
-import Translate from '../../common/Translate';
-import styles from './styles';
+import {
+  fetchAdvancedSearchResults,
+  resetAdvancedSearchResults
+} from '../../../actions/Advancedsearch';
+import {
+  SearchForm,
+  SearchFormContainer,
+  SearchText,
+  SearchActionButtons
+} from './SearchElements';
+import { ADVANCED_SEARCH_TYPES } from '../../../conf/config';
 
-class MassifsSearch extends React.Component {
-  /*
-    The state is created with particular key names because, these names are directly linked to
-    the names of these properties in Elasticsearch. Here we have a syntax that
-    allow us to distinguish search range parameters from others parameters.
-   */
-  constructor(props) {
-    super(props);
-    this.state = this.getInitialState();
-    this.handleValueChange = this.handleValueChange.bind(this);
-  }
+const MassifsSearch = () => {
+  const dispatch = useDispatch();
+  const [query, setQuery] = useState('');
 
-  getInitialState() {
-    return {
-      name: ''
-    };
-  }
-
-  /**
-   * keyName: String
-   * event: Event
-   * This function changes the state of the keyName property
-   * with the value of the target event.
-   */
-  handleValueChange = (keyName, event) => {
-    this.setState({
-      [keyName]: event.target.value
-    });
-  };
-
-  resetToInitialState = () => {
-    this.setState(this.getInitialState());
-  };
-
-  render() {
-    const { resourceType, resetResults, startAdvancedsearch } = this.props;
-
-    const { name } = this.state;
-
-    return (
-      <form
-        noValidate
-        autoComplete="off"
-        onSubmit={event => {
-          event.preventDefault();
-          startAdvancedsearch(this.state, resourceType);
-        }}>
-        <Typography variant="h6">
-          <Translate>Massif properties</Translate>
-        </Typography>
-
-        <TextField
-          label={
-            <span>
-              <Translate>Massif name</Translate>
-            </span>
-          }
-          onChange={event => this.handleValueChange('name', event)}
-          value={name}
-        />
-
-        <SearchBottomActionButtons
-          resetResults={resetResults}
-          resetParentState={this.resetToInitialState}
-        />
-      </form>
+  const startAdvancedsearch = () =>
+    dispatch(
+      fetchAdvancedSearchResults({
+        entity: ADVANCED_SEARCH_TYPES.MASSIFS,
+        query
+      })
     );
-  }
-}
 
-MassifsSearch.propTypes = {
-  classes: PropTypes.shape({}).isRequired,
-  startAdvancedsearch: PropTypes.func.isRequired,
-  resetResults: PropTypes.func.isRequired,
-  resourceType: PropTypes.string.isRequired
+  return (
+    <SearchForm title="Massif search" onSubmit={() => startAdvancedsearch()}>
+      <SearchFormContainer style={{ justifyContent: 'flex-start' }}>
+        <SearchText label="Query" onChange={e => setQuery(e)} value={query} />
+      </SearchFormContainer>
+
+      <SearchActionButtons
+        onReset={() => {
+          dispatch(resetAdvancedSearchResults());
+          setQuery('');
+        }}
+      />
+    </SearchForm>
+  );
 };
 
-export default withStyles(styles)(MassifsSearch);
+export default MassifsSearch;

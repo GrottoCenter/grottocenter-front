@@ -6,7 +6,6 @@ import { DocumentFormContext } from '../Provider';
 
 import { useDebounce } from '../../../../../hooks';
 import AutoCompleteSearchComponent from '../../../../common/AutoCompleteSearch';
-import { AutoCompleteSearchTypes } from '../../../../common/AutoCompleteSearch/types';
 import {
   fetchParentDocumentDetails,
   FETCH_PARENT_DOCUMENT_DETAILS_SUCCESS
@@ -16,7 +15,7 @@ import {
   FETCH_AUTHORIZATION_DOCUMENT_DETAILS_SUCCESS
 } from '../../../../../actions/Document/GetAuthorizationDocumentDetails';
 import { fetchLicense } from '../../../../../actions/Licenses';
-import { DOCUMENT_AUTHORIZE_TO_PUBLISH } from '../../../../common/AddFileForm/OptionSelect';
+import { DOCUMENT_AUTHORIZE_TO_PUBLISH } from './AddFileForm/AutoCompletion/OptionSelectAutoComplete';
 
 const SearchBar = props => {
   const {
@@ -160,18 +159,21 @@ const SearchBar = props => {
   );
 };
 
-const SearchBarInheritedProps = AutoCompleteSearchTypes;
-delete SearchBarInheritedProps.disabled;
-delete SearchBarInheritedProps.isValueForced;
-delete SearchBarInheritedProps.onInputChange;
-delete SearchBarInheritedProps.onSelection;
-
 SearchBar.propTypes = {
   contextValueName: PropTypes.string.isRequired,
   fetchSearchResults: PropTypes.func.isRequired,
   getValueName: PropTypes.func.isRequired,
   resetSearchResults: PropTypes.func.isRequired,
-  ...SearchBarInheritedProps,
+
+  suggestions: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
+
+  renderOption: PropTypes.func.isRequired,
+  getOptionLabel: PropTypes.func.isRequired,
+  label: PropTypes.string,
+  hasError: PropTypes.bool,
+  isLoading: PropTypes.bool,
+  hasFixWidth: PropTypes.bool,
+
   inputValue: PropTypes.string
 };
 

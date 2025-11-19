@@ -12,7 +12,7 @@ import {
   deleteDuplicateEntranceUrl,
   deleteDuplicateDocumentUrl
 } from '../conf/apiRoutes';
-import { checkAndGetStatus, makeUrl } from './utils';
+import { checkAndGetStatus, getTotalCount, makeUrl } from './utils';
 import makeErrorMessage from '../helpers/makeErrorMessage';
 
 export const LOAD_DUPLICATES_LIST = 'LOAD_DUPLICATES_LIST';
@@ -40,9 +40,14 @@ export const loadDuplicatesList = () => ({
   type: LOAD_DUPLICATES_LIST
 });
 
-export const loadDuplicatesListSuccess = (duplicates, statusCode) => ({
+export const loadDuplicatesListSuccess = (
+  duplicates,
+  totalCount,
+  statusCode
+) => ({
   type: LOAD_DUPLICATES_LIST_SUCCESS,
   duplicates,
+  totalCount,
   httpCode: statusCode
 });
 
@@ -111,8 +116,9 @@ export const createNewEntityDuplicateError = error => ({
   httpCode: parseInt(error.type, 10)
 });
 
-const getBody = async response => ({
+const parseResponse = async response => ({
   content: await response.json(),
+  totalCount: getTotalCount(20, await response.headers.get('Content-Range')),
   statusCode: response.status
 });
 
@@ -137,12 +143,13 @@ export const fetchDuplicatesList =
 
     return fetch(isNil(criteria) ? url : makeUrl(url, criteria), requestOptions)
       .then(checkAndGetStatus)
-      .then(getBody)
-      .then(contentAndStatus => {
+      .then(parseResponse)
+      .then(parsed => {
         dispatch(
           loadDuplicatesListSuccess(
-            contentAndStatus.content.duplicates,
-            contentAndStatus.statusCode
+            parsed.content.duplicates,
+            parsed.totalCount,
+            parsed.statusCode
           )
         );
       })
@@ -171,14 +178,9 @@ export const fetchDuplicate = (id, duplicateType) => (dispatch, getState) => {
 
   return fetch(url(id), requestOptions)
     .then(checkAndGetStatus)
-    .then(getBody)
-    .then(contentAndStatus => {
-      dispatch(
-        loadDuplicateSuccess(
-          contentAndStatus.content,
-          contentAndStatus.statusCode
-        )
-      );
+    .then(parseResponse)
+    .then(parsed => {
+      dispatch(loadDuplicateSuccess(parsed.content, parsed.statusCode));
     })
     .catch(error => {
       dispatch(loadDuplicateFailure(error.message));

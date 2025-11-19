@@ -196,10 +196,39 @@ const Organization = ({ error, isLoading, organization }) => {
 
               <hr />
               <EntitiesList
-                type="user"
+                type="person"
                 entites={organization.cavers}
                 title={formatMessage({ id: 'Members (former members)' })}
                 hasDivider
+                onItemRemove={permissions.isAdmin ? handleRemoveMember : null}
+                actionButton={
+                  permissions.isAuth && (
+                    <>
+                      <Tooltip
+                        title={formatMessage({
+                          id: isMember
+                            ? 'Leave organization'
+                            : 'Join organization'
+                        })}>
+                        <Button
+                          variant="outlined"
+                          color="primary"
+                          onClick={handleJoinLeave}
+                          disabled={isJoining}
+                          startIcon={
+                            isMember ? <PersonRemoveIcon /> : <PersonAddIcon />
+                          }>
+                          {isMember
+                            ? formatMessage({ id: 'Leave organization' })
+                            : formatMessage({ id: 'Join organization' })}
+                        </Button>
+                      </Tooltip>
+                      {joinLeaveError && (
+                        <Alert severity="error" title={joinLeaveError} />
+                      )}
+                    </>
+                  )
+                }
               />
               <DocumentsList
                 title={formatMessage({ id: 'Collections' })}

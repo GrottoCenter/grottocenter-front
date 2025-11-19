@@ -1,5 +1,5 @@
 import { styled } from '@mui/material/styles';
-import { Box, Button as MuiButton, Icon, FormLabel } from '@mui/material';
+import { Box, Button as MuiButton, FormLabel } from '@mui/material';
 import { React } from 'react';
 import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';

@@ -1,8 +1,6 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
-import { useDispatch, useSelector } from 'react-redux';
-import { isNil, length } from 'ramda';
 import { FormControl, InputAdornment, InputLabel } from '@mui/material';
 
 import {
@@ -11,14 +9,16 @@ import {
   InputWrapper
 } from '../Form/FormAutoComplete';
 import AutoCompleteSearch from '.';
-import { entityOptionForSelector } from '../../../helpers/Entity';
-import {
-  fetchQuicksearchResult,
-  resetQuicksearch
-} from '../../../actions/Quicksearch';
+import { fetchQuickSearchRaw } from '../../../actions/Quicksearch';
 import { useDebounce } from '../../../hooks';
 
-const getCaveToString = cave => cave?.name || '';
+const getCaveToString = cave => {
+  let out = [cave?.name];
+  if (cave?.depth) out.push(`↕ ${cave?.depth}m`);
+  if (cave?.length) out.push(`↔ ${cave?.length}m`);
+  out = out.filter(e => e);
+  return out.join(' ');
+};
 
 const resultEndAdornment = (
   <InputAdornment position="end">
@@ -36,66 +36,59 @@ const CaveAutoCompleteSearch = ({
   required = false,
   disabled = false
 }) => {
-  const dispatch = useDispatch();
   const { formatMessage } = useIntl();
-  const [inputValue, setInputValue] = useState('');
-  const debouncedInput = useDebounce(inputValue);
-  const {
-    isLoading,
-    results: suggestions,
-    error
-  } = useSelector(state => state.quicksearch);
-
-  const fetchSearchResults = useCallback(
-    query => {
-      const criterias = {
-        query: query.trim(),
-        complete: false,
-        resourceType: 'caves'
-      };
-      dispatch(fetchQuicksearchResult(criterias));
-    },
-    [dispatch]
-  );
-
-  const resetSearchResults = useCallback(() => {
-    dispatch(resetQuicksearch());
-  }, [dispatch]);
+  const [input, setInput] = useState('');
+  const [selected, setSelected] = useState(value);
+  const debouncedInput = useDebounce(input);
+  const [isLoading, setIsLoading] = useState(false);
+  const [suggestions, setSuggestions] = useState([]);
+  const [error, setError] = useState('');
 
   useEffect(() => {
-    if (length(debouncedInput) > 2) {
-      fetchSearchResults(debouncedInput);
-    } else {
-      resetSearchResults();
+    async function fetchData() {
+      if (!debouncedInput || debouncedInput.length < 2) {
+        setSuggestions([]);
+        return;
+      }
+      const criterias = {
+        query: debouncedInput.trim(),
+        entities: ['caves']
+      };
+      setIsLoading(true);
+      const rep = await fetchQuickSearchRaw(criterias).catch(e =>
+        setError(e.message)
+      );
+      setIsLoading(false);
+      setSuggestions(rep.results);
     }
-  }, [debouncedInput, fetchSearchResults, resetSearchResults]);
+    fetchData();
+  }, [debouncedInput]);
 
   const handleSelection = selection => {
     if (selection) {
       onSelection(selection);
+      setSelected(selection);
     }
-    setInputValue('');
+    setInput('');
   };
   return (
     <FormControl variant="filled" required={required} error={!!error} fullWidth>
       <InputLabel>{formatMessage({ id: 'Cave' })}</InputLabel>
       <StyledInput
-        value={getCaveToString(value)}
+        value={getCaveToString(selected)}
         disabled
         endAdornment={resultEndAdornment}
       />
       <StyledFormControl variant="filled" error={!!error}>
         <InputWrapper>
           <AutoCompleteSearch
-            onInputChange={setInputValue}
+            onInputChange={setInput}
+            inputValue={input}
             disabled={disabled}
             onSelection={handleSelection}
-            getOptionLabel={getCaveToString}
-            hasError={!isNil(error)}
+            hasError={!!error}
             isLoading={isLoading}
             label={formatMessage({ id: 'Search for a cave' })}
-            renderOption={entityOptionForSelector}
-            inputValue={inputValue}
             suggestions={suggestions}
           />
         </InputWrapper>

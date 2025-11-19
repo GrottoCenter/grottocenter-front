@@ -1,14 +1,6 @@
 import React from 'react';
 import { styled } from '@mui/material/styles';
 
-//
-//
-// H E L P E R - F U N C T I O N S
-//
-//
-
-export const isMappable = entity => entity.latitude && entity.longitude;
-
 export const EntityIcon = styled('img')`
   height: 30px;
   margin-right: 10px;
@@ -21,6 +13,11 @@ const EntityTitle = styled('div')`
   margin: 0;
 `;
 
+const EntityId = styled('i')`
+  font-size: 1rem;
+  color: #4f4f4ff2;
+`;
+
 const EntitySubtitle = styled('div')`
   font-size: 1.2rem;
   white-space: nowrap;
@@ -31,55 +28,51 @@ export const nomelizeSearchEntity = option => {
   let iconName;
   let title = option.name; // Default for all entities
   let subtitle = '';
-  switch (option.type) {
-    case 'caver':
+  // eslint-disable-next-line no-underscore-dangle
+  switch (option._type) {
+    case 'persons':
       if (!option.name && !option.surname) {
         title = option.nickname;
-      } else if (option.name) {
-        title = option.name;
-        if (option.surname) {
-          title += ` ${option.surname.toUpperCase()}`;
-        }
       } else {
-        title = option.surname.toUpperCase();
+        title = '';
+        if (option.name) title = option.name;
+        if (option.surname) title += ` ${option.surname}`;
+        title = title.trim();
+        if (title !== option.nickname) subtitle = option.nickname;
       }
 
       iconName = 'caver.svg';
       break;
 
-    case 'document-collection':
-    case 'document-issue':
-    case 'document': {
+    case 'documents': {
       iconName = 'bibliography.svg';
-      title = `[${option.documentType.name}] ${option.name}`;
+      title = `[${option.type}] ${option.title}`;
       const maxSubTitleLength = Math.max((title.length - 3) * 1.2, 80);
       subtitle = (option.description ?? '').slice(0, maxSubTitleLength);
       if (option.description?.length > maxSubTitleLength) subtitle += '...';
       break;
     }
 
-    case 'cave':
-    case 'entrance': {
+    case 'caves':
+    case 'entrances': {
       iconName = 'entry.svg';
       subtitle = option.region ?? '';
       const caveInfo = [];
       if (option.cave?.depth) caveInfo.push(`↕ ${option.cave?.depth}m`);
+      if (option?.depth) caveInfo.push(`↕ ${option?.depth}m`);
       if (option.cave?.length) caveInfo.push(`↔ ${option.cave?.length}m`);
+      if (option?.length) caveInfo.push(`↔ ${option?.length}m`);
       if (caveInfo.length !== 0)
         subtitle += `${subtitle.length === 0 ? '' : ', '}${caveInfo.join(' ')}`;
       break;
     }
 
-    case 'grotto':
+    case 'organizations':
       iconName = 'club.svg';
       break;
 
-    case 'massif':
+    case 'massifs':
       iconName = 'massif.svg';
-      break;
-
-    case 'language':
-      title = option.refName;
       break;
 
     default:
@@ -89,7 +82,7 @@ export const nomelizeSearchEntity = option => {
 };
 
 export const entityOptionForSelector = (props, option) => {
-  const { iconName, title, subtitle } = nomelizeSearchEntity(option);
+  const { iconName, title, subtitle, id } = nomelizeSearchEntity(option);
   const { key, ...otherProps } = props;
   return (
     <li key={key} {...otherProps}>
@@ -97,7 +90,9 @@ export const entityOptionForSelector = (props, option) => {
         <EntityIcon src={`/images/${iconName}`} alt={`${option.type} icon`} />
       )}
       <div>
-        <EntityTitle>{title}</EntityTitle>
+        <EntityTitle>
+          {title} <EntityId>{id}</EntityId>
+        </EntityTitle>
         <EntitySubtitle>{subtitle}</EntitySubtitle>
       </div>
     </li>
