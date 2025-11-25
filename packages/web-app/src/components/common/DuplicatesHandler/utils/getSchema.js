@@ -190,10 +190,11 @@ export const getDocumentSchema = () => {
       disabled: true
     },
     {
-      attribute: 'entrance',
-      label: formatMessage({ id: 'Entrance' }),
+      attribute: 'entrances',
+      label: formatMessage({ id: 'Entrances' }),
       disabled: true,
-      customRender: customRender(['name'])
+      customRender: customRender(['name']),
+      isCollection: true
     },
     {
       attribute: 'massif',
