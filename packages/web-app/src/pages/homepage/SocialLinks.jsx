@@ -7,8 +7,10 @@ import {
   bloggerLinks,
   wikiBatsLinks,
   facebookLink,
-  /* twitterLink, */
-  githubLink
+  githubLink,
+  oaiLinks,
+  z3950Links,
+  uptimeLinks
 } from '../../conf/externalLinks';
 
 const SocialLinksList = styled('ul')`
@@ -23,10 +25,10 @@ const SocialLinksList = styled('ul')`
 const SocialLinksListItem = styled('li')`
   display: inline-block;
   width: 40px;
-  margin: 0 10px;
+  margin: 0 5px;
 
   @media (min-width: 550px) {
-    margin: 0 10px;
+    margin: 0 5px;
   }
 `;
 
@@ -51,82 +53,80 @@ const ApiSocialImage = styled(SocialImage)`
 const SocialLinks = () => {
   const { formatMessage } = useIntl();
 
+  const facebookText = formatMessage({ id: 'Follow us on Facebook' });
+  const blogText = formatMessage({ id: 'Grottocenter blog' });
+  const githubText = formatMessage({ id: 'Grottocenter3 on GitHub' });
+  const apiText = formatMessage({ id: 'Want to use our API?' });
+  const batsText = formatMessage({ id: 'Wiki page for bats' });
+  const oaiText = formatMessage({ id: 'OAI-PMH Server' });
+  const z3950Text = formatMessage({ id: 'Z39.50 Server' });
+  const uptimeText = formatMessage({ id: 'Uptime status page' });
+
   return (
     <SocialLinksList>
       <SocialLinksListItem>
-        <InternationalizedLink links={facebookLink}>
+        <InternationalizedLink links={facebookLink} title={facebookText}>
           <SocialImage
             src="/images/icons8/icons8-facebook-filled-100.png"
-            alt="Follow us on Facebook"
+            alt={facebookText}
           />
         </InternationalizedLink>
       </SocialLinksListItem>
       <SocialLinksListItem>
-        <InternationalizedLink links={bloggerLinks}>
+        <InternationalizedLink links={bloggerLinks} title={blogText}>
           <SocialImage
             src="/images/icons8/icons8-blogger-filled-100.png"
-            alt="Grottocenter blog"
+            alt={blogText}
           />
         </InternationalizedLink>
       </SocialLinksListItem>
-      {/* <SocialLinksListItem>
-        <InternationalizedLink links={twitterLink}>
-          <SocialImage
-            src="/images/icons8/icons8-twitter-filled-100.png"
-            alt="Follow us on Twitter"
-          />
-        </InternationalizedLink>
-      </SocialLinksListItem> */}
       <SocialLinksListItem>
-        <InternationalizedLink links={githubLink}>
+        <InternationalizedLink links={githubLink} title={githubText}>
           <SocialImage
             src="/images/icons8/icons8-github-filled-100.png"
-            alt="Grottocenter3 on GitHub"
+            alt={githubText}
           />
         </InternationalizedLink>
       </SocialLinksListItem>
       <SocialLinksListItem>
-        <GCLink internal href="/ui/api">
+        <GCLink internal href="/ui/api" title={apiText}>
           <ApiSocialImage
             src="/images/icons8/icons8-rest-api-filled-100.png"
-            alt="Want to use our API?"
+            alt={apiText}
           />
         </GCLink>
       </SocialLinksListItem>
       <SocialLinksListItem>
-        <InternationalizedLink links={wikiBatsLinks}>
-          <SocialImage src="/images/icons8/bats.svg" alt="Wiki page for bats" />
+        <InternationalizedLink links={wikiBatsLinks} title={batsText}>
+          <SocialImage
+            src="/images/icons8/bats.svg"
+            alt={batsText}
+          />
         </InternationalizedLink>
       </SocialLinksListItem>
       <SocialLinksListItem>
-        <a
-          href={process.env.REACT_APP_OAI_URL || '#'}
-          title={formatMessage({
-            id: 'oaiTooltip',
-            defaultMessage: 'Serveur OAI-PMH'
-          })}
-          target="_blank"
-          rel="noopener noreferrer">
+        <InternationalizedLink links={oaiLinks} title={oaiText}>
           <SocialImage
             src="/images/icons8/icons8-oai-filled-100.png"
-            alt="Serveur OAI-PMH"
+            alt={oaiText}
           />
-        </a>
+        </InternationalizedLink>
       </SocialLinksListItem>
       <SocialLinksListItem>
-        <a
-          href={process.env.REACT_APP_Z3950_URL || '#'}
-          title={formatMessage({
-            id: 'z3950Tooltip',
-            defaultMessage: 'Serveur Z39.50'
-          })}
-          target="_blank"
-          rel="noopener noreferrer">
+        <InternationalizedLink links={z3950Links} title={z3950Text}>
           <SocialImage
             src="/images/icons8/icons8-z3950-filled-100.png"
-            alt="Serveur Z39.50"
+            alt={z3950Text}
           />
-        </a>
+        </InternationalizedLink>
+      </SocialLinksListItem>
+      <SocialLinksListItem>
+        <InternationalizedLink links={uptimeLinks} title={uptimeText}>
+          <SocialImage
+            src="/images/icons8/icons8-uptime-filled-100.png"
+            alt={uptimeText}
+          />
+        </InternationalizedLink>
       </SocialLinksListItem>
     </SocialLinksList>
   );
