@@ -123,23 +123,23 @@ const Person = ({
                 justifyContent="space-between">
                 <PersonProperties person={person} />
               </Box>
-              <hr />
-              <SubscriptionsList
-                canUnsubscribe={canUnsubscribe}
-                subscriptions={subscriptions}
-                subscriptionsStatus={subscriptionsStatus}
-                title={formatMessage({ id: 'Subscriptions' })}
-                userId={person.id}
-              />
-              {person.documents.length > 0 && (
+              {person.groups?.some(g => g.name === 'Leader') && (
                 <>
-                  <DocumentsList
-                    title={formatMessage({ id: 'Documents' })}
-                    documents={person.documents}
-                  />
                   <hr />
+                  <SubscriptionsList
+                    canUnsubscribe={canUnsubscribe}
+                    subscriptions={subscriptions}
+                    subscriptionsStatus={subscriptionsStatus}
+                    title={formatMessage({ id: 'Subscriptions' })}
+                    userId={person.id}
+                  />
                 </>
               )}
+              <hr />
+              <DocumentsList
+                title={formatMessage({ id: 'Documents' })}
+                documents={person.documents}
+              />
               <EntitiesList
                 type="organization"
                 entites={person.organizations}
