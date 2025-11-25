@@ -26,10 +26,6 @@ export const facebookLink = {
   '*': 'https://www.facebook.com/GrottoCenter'
 };
 
-export const twitterLink = {
-  '*': 'https://twitter.com/grottocenter'
-};
-
 export const githubLink = {
   '*': 'https://github.com/GrottoCenter'
 };
@@ -104,4 +100,16 @@ export const wikiApiLinks = {
 export const bloggerLinks = {
   fr: 'http://blog-fr.grottocenter.org/',
   '*': 'http://blog-en.grottocenter.org/'
+};
+
+export const oaiLinks = {
+  '*': process.env.REACT_APP_OAI_URL || '#'
+};
+
+export const z3950Links = {
+  '*': process.env.REACT_APP_Z3950_URL || '#'
+};
+
+export const uptimeLinks = {
+  '*': 'https://wikicaves.betteruptime.com'
 };

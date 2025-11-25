@@ -3,13 +3,13 @@ import PropTypes from 'prop-types';
 import { useSelector } from 'react-redux';
 import GCLink from './GCLink';
 
-const InternationalizedLink = ({ links, className, children }) => {
+const InternationalizedLink = ({ links, className, children, title }) => {
   const { locale } = useSelector(state => state.intl);
 
   const linkUrl = links[locale] !== undefined ? links[locale] : links['*'];
   const linkText = children || linkUrl;
   return (
-    <GCLink className={className} href={linkUrl}>
+    <GCLink className={className} href={linkUrl} title={title}>
       {linkText}
     </GCLink>
   );
@@ -19,6 +19,7 @@ InternationalizedLink.propTypes = {
   // eslint-disable-next-line react/forbid-prop-types
   links: PropTypes.any.isRequired,
   className: PropTypes.string,
+  title: PropTypes.string,
   children: PropTypes.node
 };
 

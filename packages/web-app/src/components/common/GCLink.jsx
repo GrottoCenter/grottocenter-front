@@ -21,7 +21,8 @@ const GCLink = ({
   href,
   children,
   internal,
-  rel
+  rel,
+  title
 }) => {
   const params = {};
   if (onClick) {
@@ -38,6 +39,9 @@ const GCLink = ({
   }
   if (rel) {
     params.rel = rel;
+  }
+  if (title) {
+    params.title = title;
   }
   if (!internal) {
     return (
@@ -61,6 +65,7 @@ GCLink.propTypes = {
   rel: PropTypes.string,
   style: PropTypes.string,
   onClick: PropTypes.func,
+  title: PropTypes.string,
   children: PropTypes.node.isRequired
 };
 
