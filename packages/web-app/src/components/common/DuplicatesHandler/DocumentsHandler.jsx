@@ -31,7 +31,7 @@ const DocumentsHandler = ({
   const [identifier, setIdentifier] = useState('');
   const [identifierType, setIdentifierType] = useState('');
   const [refBbs, setRefBbs] = useState('');
-  const [entrance, setEntrance] = useState('');
+  const [entrances, setEntrances] = useState([]);
   const [cave, setCave] = useState('');
   const [massif, setMassif] = useState('');
   const [editor, setEditor] = useState('');
@@ -65,8 +65,8 @@ const DocumentsHandler = ({
         return getState ? identifierType : setIdentifierType;
       case 'refBbs':
         return getState ? refBbs : setRefBbs;
-      case 'entrance':
-        return getState ? entrance : setEntrance;
+      case 'entrances':
+        return getState ? entrances : setEntrances;
       case 'pages':
         return getState ? pages : setPages;
       case 'dateInscription':
@@ -128,7 +128,7 @@ const DocumentsHandler = ({
         identifier,
         identifierType: getIdOrUndefined(identifierType),
         refBbs,
-        entrance: getIdOrUndefined(entrance),
+        entrances: entrances.map(e => e.id),
         cave: getIdOrUndefined(cave),
         massif: getIdOrUndefined(massif),
         editor: getIdOrUndefined(editor),
@@ -160,7 +160,7 @@ const DocumentsHandler = ({
       identifier,
       identifierType,
       refBbs,
-      entrance,
+      entrances,
       cave,
       massif,
       editor,

@@ -152,7 +152,7 @@ const Dashboard = () => {
               </StyledList>
             </DashboardBlock>
           )}
-          {permissions.isUser && (
+          {permissions.isAuth && (
             <DashboardBlock>
               <Typography variant="h2">
                 {formatMessage({ id: 'User' })}

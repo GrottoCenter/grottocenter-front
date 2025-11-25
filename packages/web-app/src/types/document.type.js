@@ -48,7 +48,7 @@ export const DocumentPropTypes = PropTypes.shape({
   ),
   authorizationDocument: PropTypes.string,
   cave: idNameType,
-  entrance: idNameType,
+  entrances: PropTypes.arrayOf(idNameType),
   massifs: PropTypes.arrayOf(idNameType),
   parent: DocumentSimplePropTypes,
   oldBBS: PropTypes.shape({

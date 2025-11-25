@@ -148,15 +148,17 @@ const Document = ({
           url={`/ui/caves/${documentData?.cave.id}`}
         />
       );
-    if (documentData?.entrance)
+    if (documentData?.entrances && documentData?.entrances.length > 0)
       linkedEntities.push(
-        <ListElement
-          key={documentData?.entrance.id}
-          icon={<CustomIcon type="entry" />}
-          value={documentData?.entrance.name}
-          secondary={formatMessage({ id: 'Entrance' })}
-          url={`/ui/entrances/${documentData?.entrance.id}`}
-        />
+        ...(documentData?.entrances?.map(entrance => (
+          <ListElement
+            key={entrance.id}
+            icon={<CustomIcon type="entry" />}
+            value={entrance.name}
+            secondary={formatMessage({ id: 'Entrance' })}
+            url={`/ui/entrances/${entrance.id}`}
+          />
+        )) ?? [])
       );
   }
 
