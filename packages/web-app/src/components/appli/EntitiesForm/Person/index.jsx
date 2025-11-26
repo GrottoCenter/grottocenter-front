@@ -92,14 +92,14 @@ export const PersonForm = ({ personValues, isOurAccount }) => {
         <FormRow>
           <InputText
             formKey="person.name"
-            labelName="Name"
+            labelName="First name"
             control={control}
             isError={!!errors?.person?.name}
             isRequired
           />
           <InputText
             formKey="person.surname"
-            labelName="Surname"
+            labelName="Last name"
             control={control}
             isError={!!errors?.person?.surname}
             isRequired

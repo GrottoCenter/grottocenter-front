@@ -95,8 +95,8 @@ const persons = {
   columns: [
     [true, 'id', 'Id', false],
     [true, 'nickname', 'Username', true],
-    [true, 'name', 'Name', true],
-    [true, 'surname', 'Surname', true]
+    [true, 'name', 'First name', true],
+    [true, 'surname', 'Last name', true]
   ],
   link: doc => `/ui/persons/${doc.id}`
 };

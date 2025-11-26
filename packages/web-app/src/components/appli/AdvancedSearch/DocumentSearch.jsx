@@ -254,7 +254,7 @@ const DocumentSearch = () => {
         />
       </SearchFieldset>
 
-      <SearchFieldset title="linked entities" isMultiline>
+      <SearchFieldset title="Linked entities" isMultiline>
         <SearchFormContainer>
           <SearchTextAutocomplete
             ressourceType={searchEntity}
