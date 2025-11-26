@@ -86,10 +86,10 @@ const EntityTableHead = ({
                 hideSortIcon
                 direction={order || undefined}
                 onClick={event => onRequestSort(event, headCell[1])}>
-                {headCell[2]}
+                <Translate>{headCell[2]}</Translate>
               </TableSortLabel>
             ) : (
-              headCell[2]
+              <Translate>{headCell[2]}</Translate>
             )}
           </TableCell>
         ))}
@@ -137,7 +137,7 @@ const VisibleColumnsMenu = ({ columns, setColumns }) => {
               onChange={() => {}}
               name={column[1]}
             />
-            {column[2]}
+            <Translate>{column[2]}</Translate>
           </MenuItem>
         ))}
       </Menu>
