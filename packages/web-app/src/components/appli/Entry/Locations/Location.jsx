@@ -35,7 +35,7 @@ const Location = ({ location, isEditAllowed }) => {
         id: data.id,
         title: data.title,
         body: data.body,
-        language: data.language.id
+        language: data.language
       })
     );
     setIsUpdateFormVisible(false);

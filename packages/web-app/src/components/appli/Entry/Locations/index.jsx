@@ -26,7 +26,7 @@ const Locations = ({ entranceId, locations, isSensitive, isEditAllowed }) => {
         entrance: entranceId,
         title: data.title,
         body: data.body,
-        language: data.language.id
+        language: data.language
       })
     );
     setIsFormVisible(false);

@@ -25,7 +25,7 @@ const Histories = ({ entranceId, histories, isEditAllowed }) => {
       postHistory({
         entrance: entranceId,
         body: data.body,
-        language: data.language.id
+        language: data.language
       })
     );
     setIsFormVisible(false);

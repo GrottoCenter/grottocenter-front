@@ -28,7 +28,7 @@ const Rigging = ({ rigging, isEditAllowed }) => {
     dispatch(
       updateRiggings({
         ...data,
-        language: data.language.id
+        language: data.language
       })
     );
     setIsUpdateFormVisible(false);

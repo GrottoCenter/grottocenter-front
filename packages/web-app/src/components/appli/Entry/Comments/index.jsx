@@ -31,7 +31,7 @@ const Comments = ({ entranceId, comments, isEditAllowed }) => {
         approach: data.approach,
         eTTrail: data.eTTrail,
         eTUnderground: data.eTUnderground,
-        language: data.language.id
+        language: data.language
       })
     );
     setIsFormVisible(false);

@@ -65,7 +65,7 @@ const Comment = ({ comment, isEditAllowed }) => {
         approach: data.approach,
         eTTrail: data.eTTrail,
         eTUnderground: data.eTUnderground,
-        language: data.language.id
+        language: data.language
       })
     );
     setIsUpdateFormVisible(false);
