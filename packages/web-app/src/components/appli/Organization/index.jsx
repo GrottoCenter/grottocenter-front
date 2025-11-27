@@ -16,6 +16,7 @@ import Alert from '../../common/Alert';
 import { usePermissions } from '../../../hooks';
 import DocumentsList from '../../common/DocumentsList/DocumentsList';
 import EntitiesList from '../../common/entitiesList/EntitiesList';
+import RelatedCaves from './RelatedCaves';
 import {
   DeletedCard,
   DeleteConfirmationDialog,
@@ -243,16 +244,11 @@ const Organization = ({ error, isLoading, organization }) => {
                 }
               />
               <hr />
-              <EntitiesList
-                type="entrance"
-                entites={organization.exploredEntrances}
-                title={formatMessage({ id: 'Explored entrances' })}
-                hasDivider
-              />
-              <EntitiesList
-                type="cave"
-                entites={organization.exploredNetworks}
-                title={formatMessage({ id: 'Explored networks' })}
+              <RelatedCaves
+                exploredEntrances={organization.exploredEntrances}
+                exploredNetworks={organization.exploredNetworks}
+                organizationId={organization.id}
+                isMember={isMember}
               />
             </>
           )}

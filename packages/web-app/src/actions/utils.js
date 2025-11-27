@@ -23,8 +23,15 @@ export const checkAndGetStatus = response => {
   if (response.status >= 200 && response.status <= 300) {
     return response;
   }
-  const errorMessage = new Error(response.status);
-  throw errorMessage;
+  return response.json().then(body => {
+    const errorMessage = new Error(body.message || response.status);
+    errorMessage.body = body;
+    throw errorMessage;
+  }).catch(err => {
+    if (err.body) throw err;
+    const errorMessage = new Error(response.status);
+    throw errorMessage;
+  });
 };
 
 const makeNumber = ifElse(identity, Number, always(1));

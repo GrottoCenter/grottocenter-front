@@ -245,6 +245,11 @@ export const joinOrganizationUrl = (caverId, organizationId) =>
 export const leaveOrganizationUrl = (caverId, organizationId) =>
   `${API_BASE_PATH}/cavers/${caverId}/organizations/${organizationId}`;
 
+export const linkCaveToOrganizationUrl = (caveId, organizationId) =>
+  `${API_BASE_PATH}/caves/${caveId}/organizations/${organizationId}`;
+export const unlinkCaveFromOrganizationUrl = (caveId, organizationId) =>
+  `${API_BASE_PATH}/caves/${caveId}/organizations/${organizationId}`;
+
 // ===== Persons / cavers urls
 export const getGroupsUrl = `${API_BASE_PATH}/cavers/groups`;
 export const getCaverUrl = `${API_BASE_PATH}/cavers/`;

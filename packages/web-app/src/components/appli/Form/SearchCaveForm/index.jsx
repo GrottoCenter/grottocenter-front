@@ -6,7 +6,7 @@ import { Box, Button } from '@mui/material';
 import { styled } from '@mui/material/styles';
 
 import {
-  fetchAdvancedsearchResults,
+  fetchAdvancedSearchResults,
   resetAdvancedSearchResults
 } from '../../../../actions/Advancedsearch';
 import { ADVANCED_SEARCH_TYPES } from '../../../../conf/config';
@@ -24,7 +24,7 @@ const SearchCaveForm = ({ onSubmit }) => {
   const [selectedEntrances, setSelectedEntrances] = useState([]);
 
   const startAdvancedsearch = (formValues, resourceType) => {
-    dispatch(fetchAdvancedsearchResults(formValues, resourceType));
+    dispatch(fetchAdvancedSearchResults(formValues, resourceType));
   };
 
   const resetAdvancedSearch = () => {
@@ -36,14 +36,9 @@ const SearchCaveForm = ({ onSubmit }) => {
     setSelectedEntrances([]);
   };
 
-  const handleRowClick = entranceResult => {
-    if (!selectedEntrances.includes(entranceResult)) {
-      setSelectedEntrances(previous => [...previous, entranceResult]);
-    } else {
-      setSelectedEntrances(previous =>
-        previous.filter(e => e !== entranceResult)
-      );
-    }
+  const handleSelection = (ids, results) => {
+    const selectedResults = results.filter(r => ids.includes(r.id));
+    setSelectedEntrances(selectedResults);
   };
 
   const handleOnSubmit = () => {
@@ -60,8 +55,7 @@ const SearchCaveForm = ({ onSubmit }) => {
       />
 
       <SearchResults
-        onRowClick={handleRowClick}
-        selectedIds={selectedEntrances.map(e => String(e.id))}
+        onSelected={handleSelection}
         hideExport
       />
 

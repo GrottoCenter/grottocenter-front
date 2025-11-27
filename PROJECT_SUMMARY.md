@@ -212,6 +212,10 @@ Arabic, Bulgarian, Catalan, German, Greek, English, Spanish, French, Hebrew, Ind
 1. **Redux Structure**: Feature-based reducer organization
 2. **Action Creators**: Thunk-based async actions
 3. **Naming Convention**: `VERB_ENTITY_STATUS` (e.g., `FETCH_CAVE_SUCCESS`)
+4. **CRITICAL**: Always use reducers to manage state changes - dispatch actions and handle them in reducers rather than managing state locally in components
+
+### API Integration
+1. **CRITICAL**: Never hardcode API URLs - always use route builders from `conf/apiRoutes.js`
 
 ### Routing
 1. **React Router v6**: Declarative routing
@@ -250,11 +254,25 @@ Arabic, Bulgarian, Catalan, German, Greek, English, Spanish, French, Hebrew, Ind
 
 ## Extension Points
 
+### Critical Development Rules
+1. **API Routes**: ALWAYS use route builders from `conf/apiRoutes.js`
+   - ❌ BAD: `fetch('${process.env.REACT_APP_API_URL}/api/v1/caves/${id}')`
+   - ✅ GOOD: `fetch(getCaveUrl + id)` or `fetch(putCaveUrl(id))`
+   - Add new route builders to `apiRoutes.js` if they don't exist
+
+2. **State Management**: ALWAYS use Redux reducers for state changes
+   - ❌ BAD: Managing API response data in component state
+   - ✅ GOOD: Dispatch actions, handle in reducers, connect via useSelector
+   - Create action types (VERB_ENTITY, VERB_ENTITY_SUCCESS, VERB_ENTITY_FAILURE)
+   - Handle all action types in appropriate reducers
+   - Use loading/error states from Redux, not local component state
+
 ### Adding New Features
 1. **New Pages**: Add to `src/pages/` and update routing in `App.jsx`
 2. **New Components**: Follow the `common/` vs `appli/` distinction
-3. **New API Endpoints**: Add to `conf/apiRoutes.js`
-4. **New Translations**: Use `update-translations` script
+3. **New API Endpoints**: ALWAYS add route builders to `conf/apiRoutes.js` - never hardcode URLs
+4. **New Actions**: Create action creators in `actions/` and handle them in appropriate reducers
+5. **New Translations**: Use `update-translations` script
 
 ### Customization Areas
 1. **Theme**: Modify `conf/grottoTheme.js` for visual changes
