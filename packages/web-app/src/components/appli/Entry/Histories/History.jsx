@@ -33,7 +33,7 @@ const History = ({ history, isEditAllowed }) => {
       updateHistory({
         id: data.id,
         body: data.body,
-        language: data.language.id
+        language: data.language
       })
     );
     setIsUpdateFormVisible(false);

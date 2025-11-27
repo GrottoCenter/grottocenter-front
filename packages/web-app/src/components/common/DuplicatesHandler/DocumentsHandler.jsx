@@ -114,7 +114,7 @@ const DocumentsHandler = ({
     } = retrieveFromObjectCollection(descriptions);
     const newDescriptions = newPopulatedDescriptions.map(newDesc => ({
       ...newDesc,
-      language: newDesc.language.id
+      language: newDesc.language
     }));
     handleSubmit(
       {

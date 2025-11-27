@@ -35,7 +35,7 @@ const Description = ({ description, isEditAllowed }) => {
         id: description.id,
         title: data.title,
         body: data.body,
-        language: data.language.id
+        language: data.language
       })
     );
     setIsUpdateFormVisible(false);

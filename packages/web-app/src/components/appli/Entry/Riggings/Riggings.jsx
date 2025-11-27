@@ -30,7 +30,7 @@ const Riggings = ({ riggings, entranceId, isEditAllowed }) => {
         entrance: entranceId,
         title: data.title,
         obstacles: data.obstacles,
-        language: data.language.id
+        language: data.language
       })
     );
     setIsFormVisible(false);
