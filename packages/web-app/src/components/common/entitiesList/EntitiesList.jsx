@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import { List, Typography, Tooltip, IconButton } from '@mui/material';
 import { styled } from '@mui/material/styles';
 
-import PersonRemoveIcon from '@mui/icons-material/PersonRemove';
+import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
 import { CaveListItem, DefaultListItem } from './EntitiesListItem';
 
 const StyledList = styled(List)({
@@ -23,7 +23,7 @@ const EntitiesList = ({
   hasDivider = false
 }) => {
   const { formatMessage } = useIntl();
-  if (!emptyMessage && (!entites || entites.length === 0)) return false;
+  if (!emptyMessage && (!entites || entites.length === 0)) return null;
 
   let listItemProps = () => ({});
   let compareKey = 'name';
@@ -36,14 +36,14 @@ const EntitiesList = ({
             size="small"
             onClick={() => onItemRemove(e.id)}
             color="error">
-            <PersonRemoveIcon fontSize="small" />
+            <RemoveCircleIcon fontSize="small" />
           </IconButton>
         </Tooltip>
       );
     }
   if (type === 'cave') {
     ListItemComponent = CaveListItem;
-    listItemProps = e => ({ cave: e });
+    listItemProps = e => ({ cave: e, itemActionButton: itemAction(e) });
   } else if (type === 'person') {
     compareKey = 'nickname';
     listItemProps = e => ({
@@ -55,7 +55,8 @@ const EntitiesList = ({
     listItemProps = e => ({
       link: `/ui/entrances/${e.id}`,
       label: e.name ?? <i>{formatMessage({ id: 'no name' })}</i>,
-      isMultiline: true
+      isMultiline: true,
+      itemActionButton: itemAction(e)
     });
   } else if (type === 'organization') {
     listItemProps = e => ({
@@ -69,17 +70,21 @@ const EntitiesList = ({
 
   return (
     <>
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center'
-        }}>
-        <Typography variant="h3" gutterBottom>
-          {title}
-        </Typography>
-        {actionButton}
-      </div>
+      {(title || actionButton) && (
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center'
+          }}>
+          {title && (
+            <Typography variant="h3" gutterBottom>
+              {title}
+            </Typography>
+          )}
+          {actionButton}
+        </div>
+      )}
       {entites && entites.length > 0 ? (
         <StyledList>
           {entites
@@ -99,7 +104,7 @@ const EntitiesList = ({
 EntitiesList.propTypes = {
   entites: PropTypes.arrayOf(PropTypes.shape({})),
   type: PropTypes.oneOf(['cave', 'person', 'entrance', 'organization']),
-  title: PropTypes.node.isRequired,
+  title: PropTypes.node,
   emptyMessage: PropTypes.node,
   hasDivider: PropTypes.bool,
   actionButton: PropTypes.node,

@@ -188,6 +188,10 @@ const EntityTable = ({
   };
 
   const handleRowClick = (event, doc) => {
+    if (onSelected) {
+      handleRowSelect(event, doc);
+      return;
+    }
     if (onRowClick) {
       const shouldContinue = onRowClick(doc);
       if (!shouldContinue) return;

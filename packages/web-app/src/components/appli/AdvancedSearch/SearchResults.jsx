@@ -7,7 +7,7 @@ import {
 } from '../../../actions/Advancedsearch';
 import EntityTable from '../../common/EntityTable/EntityTable';
 
-const SearchResults = ({ onSelected }) => {
+const SearchResults = ({ onSelected, hideExport }) => {
   const dispatch = useDispatch();
   const { isNewQuery, queryParams, isLoading, results, totalResults } =
     useSelector(state => state.advancedsearch);
@@ -38,16 +38,18 @@ const SearchResults = ({ onSelected }) => {
         newQueryParams.sort = sort;
         dispatch(fetchAdvancedSearchResults(newQueryParams, false));
       }}
-      onCSVDownload={(columns, columnsName) => {
+      onCSVDownload={hideExport ? null : (columns, columnsName) => {
         downloadAdvancedSearchResults({ ...queryParams, columns, columnsName });
       }}
       onSelected={!onSelected ? null : ids => onSelected(ids, results)}
+      onRowClick={onSelected ? () => false : null}
     />
   );
 };
 
 SearchResults.propTypes = {
-  onSelected: PropTypes.func
+  onSelected: PropTypes.func,
+  hideExport: PropTypes.bool
 };
 
 export default SearchResults;

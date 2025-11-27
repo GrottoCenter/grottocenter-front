@@ -1,20 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useIntl } from 'react-intl';
 import { useSelector } from 'react-redux';
-import {
-  Avatar,
-  Box,
-  ListItem,
-  ListItemText,
-  Typography,
-  Tooltip,
-  IconButton
-} from '@mui/material';
+import { Avatar, Box, ListItem, ListItemText, Typography } from '@mui/material';
 import { Link } from 'react-router-dom';
 import { styled } from '@mui/material/styles';
-
-import RemoveCircleIcon from '@mui/icons-material/PersonRemove';
 
 const SmallAvatar = styled(Avatar)`
   height: 2.5rem;
@@ -29,32 +18,19 @@ const StyledListItemCave = styled(ListItem)`
   min-width: 250px;
 `;
 
-export const CaveListItem = ({ cave, onRemove }) => {
+export const CaveListItem = ({ cave, itemActionButton }) => {
   const { locale } = useSelector(state => state.intl);
-  const { formatMessage } = useIntl();
 
   return (
     <StyledListItemCave dense>
-      <Box display="flex" alignItems="center" width="100%">
+      <Box display="flex" alignItems="center">
         <Link
           to={`/ui/caves/${cave.id}`}
           style={{ textDecoration: 'none', color: 'inherit' }}>
           <ListItemText primary={cave.name} />
-
-          {onRemove && (
-            <Tooltip title={formatMessage({ id: 'Remove from organization' })}>
-              <IconButton
-                size="small"
-                onClick={() => onRemove(cave.id)}
-                color="error">
-                <RemoveCircleIcon fontSize="small" />
-              </IconButton>
-            </Tooltip>
-          )}
         </Link>
+        {itemActionButton}
       </Box>
-
-      <ListItemText primary={cave.name} />
       {(cave.depth || cave.length) && (
         <Box display="flex" flexDirection="row" alignItems="flex-start">
           {cave.depth && (
@@ -109,7 +85,7 @@ export const DefaultListItem = ({
   isMultiline = false,
   itemActionButton
 }) => (
-  <StyledListItemDefault sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+  <StyledListItemDefault sx={{ display: 'flex', alignItems: 'center' }}>
     <Link to={link} style={{ textDecoration: 'none', color: 'inherit' }}>
       <ListItemText
         primary={label}
@@ -118,7 +94,6 @@ export const DefaultListItem = ({
         }
       />
     </Link>
-
     {itemActionButton}
   </StyledListItemDefault>
 );
