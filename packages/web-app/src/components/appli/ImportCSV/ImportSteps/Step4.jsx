@@ -10,33 +10,9 @@ import {
   resetImportState
 } from '../../../../actions/ImportCsv';
 import ActionButton from '../../../common/ActionButton';
-import {
-  DOCUMENT,
-  ENTRANCE,
-  FAILURE_IMPORT,
-  SUCCESS_IMPORT
-} from '../constants';
+import { FAILURE_IMPORT, SUCCESS_IMPORT } from '../constants';
 import Alert from '../../../common/Alert';
 import DownloadButton from '../DownloadButton';
-
-// https://formatjs.io/docs/core-concepts/icu-syntax/#select-format
-// TODO: this is causing translation error and thus, is not translated in other languages than english.
-// This needs to be rewordked & simplified.
-const translatedSingularType = `{importType, select,
-  ${DOCUMENT} {document}
-  ${ENTRANCE} {entrance}
-  other {}}`;
-
-const translatedPluralType = `{importType, select,
-  ${DOCUMENT} {documents}
-  ${ENTRANCE} {entrances}
-  other {}}`;
-
-const translatedTypePrefix = `{number, plural,
-  zero {no ${translatedPluralType}}
-  one {# ${translatedSingularType}}
-  other {# ${translatedPluralType}}
-}`;
 
 const Step4 = () => {
   const dispatch = useDispatch();
@@ -96,11 +72,11 @@ const Step4 = () => {
           title={formatMessage(
             {
               id: 'csvImport.willNotBeImported',
-              defaultMessage: `${translatedTypePrefix} {number, plural, one {is} other {are}} already present in Grottocenter and won't be imported.`
+              defaultMessage:
+                "{number} entities are already present in Grottocenter and won't be imported."
             },
             {
-              number: wontBeCreateData.length,
-              importType: selectedType
+              number: wontBeCreateData.length
             }
           )}
           content={`${formatMessage({
@@ -115,12 +91,10 @@ const Step4 = () => {
           title={formatMessage(
             {
               id: 'csvImport.willBeImported',
-              defaultMessage: `${translatedTypePrefix} will be imported.`
+              defaultMessage: '{number} entities will be imported.'
             },
             {
-              number: willBeCreatedData.length,
-              importType: selectedType,
-              translatedTypePrefix
+              number: willBeCreatedData.length
             }
           )}
         />
@@ -133,12 +107,11 @@ const Step4 = () => {
             title={formatMessage(
               {
                 id: 'csvImport.willBeImportedAsDuplicates',
-                defaultMessage: `${translatedTypePrefix} will be imported as duplicate(s).`
+                defaultMessage:
+                  '{number} entities will be imported as duplicates.'
               },
               {
-                number: willBeCreatedAsDuplicatesData.length,
-                importType: selectedType,
-                translatedTypePrefix
+                number: willBeCreatedAsDuplicatesData.length
               }
             )}
           />
@@ -161,11 +134,10 @@ const Step4 = () => {
           title={formatMessage(
             {
               id: 'csvImport.successAsDuplicatesRecap',
-              defaultMessage: `${translatedTypePrefix} {number, plural, one {was} other {were}} imported as duplicate(s).`
+              defaultMessage: '{number} entities have been imported as duplicates.'
             },
             {
-              number: resultImport.total.successfulImportAsDuplicates,
-              importType: selectedType
+              number: resultImport.total.successfulImportAsDuplicates
             }
           )}
           action={
@@ -182,11 +154,10 @@ const Step4 = () => {
           title={formatMessage(
             {
               id: 'csvImport.successRecap',
-              defaultMessage: `${translatedTypePrefix} {number, plural, one {was} other {were}} imported.`
+              defaultMessage: '{number} entities have been imported.'
             },
             {
-              number: resultImport.total.success,
-              importType: selectedType
+              number: resultImport.total.success
             }
           )}
           action={
@@ -203,11 +174,10 @@ const Step4 = () => {
           title={formatMessage(
             {
               id: 'csvImport.errorRecap',
-              defaultMessage: `${translatedTypePrefix} {number, plural, one {was} other {were}} not imported.`
+              defaultMessage: '{number} entities failed to be imported.'
             },
             {
-              number: resultImport.total.failure,
-              importType: selectedType
+              number: resultImport.total.failure
             }
           )}
           action={

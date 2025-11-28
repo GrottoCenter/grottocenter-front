@@ -51,8 +51,8 @@ const checkData = (data, selectedType, formatMessage) => {
       errors.push({
         errorMessage: formatMessage(
           {
-            id: 'The type column is incorrect, expecting {rowType}.',
-            defaultMessage: 'The type column is incorrect, expecting {rowType}.'
+            id: 'csvImport.incorrectTypeColumn',
+            defaultMessage: "The 'type' column is incorrect, expecting {rowType}."
           },
           { rowType }
         ),
@@ -72,9 +72,9 @@ const checkData = (data, selectedType, formatMessage) => {
         errors.push({
           errorMessage: formatMessage(
             {
-              id: 'column value missing',
+              id: 'csvImport.missingColumn',
               defaultMessage:
-                'The following column is missing a value : {column}.'
+                'The following column is missing a value: {column}.'
             },
             { column: requiredColumn }
           ),
