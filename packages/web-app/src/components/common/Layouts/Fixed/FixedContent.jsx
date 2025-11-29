@@ -22,6 +22,8 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import TimelineIcon from '@mui/icons-material/Timeline';
 import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
 import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 
 import { SnapshotButton } from '../../../appli/Entry/Snapshots/UtilityFunction';
 
@@ -81,13 +83,22 @@ const FixedContent = ({
   snapshot,
   onChangeSubscribe,
   isSubscribed,
-  isSubscribeLoading
+  isSubscribeLoading,
+  onToggleExplored,
+  isExplored,
+  isExploredLoading
 }) => {
   const { formatMessage } = useIntl();
-  let SubscribeIcon = <CircularProgress size="small" />;
+  let SubscribeIcon = <CircularProgress size={20} />;
   if (!isSubscribeLoading) {
     if (isSubscribed) SubscribeIcon = <NotificationsActiveIcon />;
     else SubscribeIcon = <NotificationsNoneIcon />;
+  }
+
+  let ExploredIcon = <CircularProgress size={20} />;
+  if (!isExploredLoading) {
+    if (isExplored) ExploredIcon = <CheckCircleIcon />;
+    else ExploredIcon = <CheckCircleOutlineIcon />;
   }
   const handlePrint = useReactToPrint({
     contentRef: () => printRef.current
@@ -97,6 +108,20 @@ const FixedContent = ({
       <CardHeaderStyled
         action={
           <ButtonGroup color="primary">
+            {!isNil(onToggleExplored) && (
+              <Tooltip
+                title={formatMessage({
+                  id: isExplored
+                    ? 'Remove from my explored caves'
+                    : 'Add to my explored caves'
+                })}>
+                <Button
+                  color={isExplored ? 'secondary' : 'primary'}
+                  onClick={onToggleExplored}>
+                  {ExploredIcon}
+                </Button>
+              </Tooltip>
+            )}
             {!isNil(printRef) && (
               <Button
                 style={{ verticalAlign: 'top' }}
@@ -190,6 +215,9 @@ FixedContent.propTypes = {
   icon: PropTypes.node,
   isSubscribed: PropTypes.bool,
   isSubscribeLoading: PropTypes.bool,
+  isExplored: PropTypes.bool,
+  isExploredLoading: PropTypes.bool,
+  onToggleExplored: PropTypes.func,
   onEdit: PropTypes.func,
   onDelete: PropTypes.func,
   printRef: PropTypes.shape({

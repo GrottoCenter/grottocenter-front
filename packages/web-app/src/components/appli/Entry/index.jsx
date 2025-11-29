@@ -1,7 +1,7 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useParams, useNavigate } from 'react-router-dom';
 import { styled } from '@mui/material/styles';
 import Skeleton from '@mui/material/Skeleton';
@@ -20,7 +20,9 @@ import Documents from './Documents';
 import Histories from './Histories';
 import { deleteEntrance } from '../../../actions/Entrance/DeleteEntrance';
 import { restoreEntrance } from '../../../actions/Entrance/RestoreEntrance';
-import { usePermissions } from '../../../hooks';
+import { usePermissions, useUserProperties } from '../../../hooks';
+import { linkCave } from '../../../actions/Cave/LinkCave';
+import { unlinkCave } from '../../../actions/Cave/UnlinkCave';
 import StandardDialog from '../../common/StandardDialog';
 import { EntranceForm } from '../EntitiesForm';
 import SensitiveCaveWarning from './SensitiveCaveWarning';
@@ -34,6 +36,7 @@ import {
   DeleteConfirmationDialog,
   DELETED_ENTITIES
 } from '../../common/card/Deleted';
+import { fetchPerson } from '../../../actions/Person/GetPerson';
 
 const HalfSplitContainer = styled('div')(
   ({ theme }) => `
@@ -54,7 +57,7 @@ export const Entry = ({ isLoading, error, entrance }) => {
   const { formatMessage } = useIntl();
   const navigate = useNavigate();
   const { entranceId } = useParams();
-  const permissions = usePermissions();
+  const { isAuth, isAdmin, isModerator } = usePermissions();
   const componentRef = useRef();
   const [isEditing, setEditing] = useState(false);
   const [isDeleteConfirmationOpen, setIsDeleteConfirmationOpen] =
@@ -62,13 +65,20 @@ export const Entry = ({ isLoading, error, entrance }) => {
   const [isDeleteConfirmationPermanent, setIsDeleteConfirmationPermanent] =
     useState(false);
   const [wantedDeletedState, setWantedDeletedState] = useState(false);
+  const userId = useUserProperties()?.id ?? null;
+  const [isExploredLoading, setIsExploredLoading] = useState(false);
+  const [isExplored, setIsExplored] = useState(false);
+  const { person } = useSelector(state => state.person);
+  const exploredEntrances = person?.exploredEntrances;
+  const exploredNetworks = person?.exploredNetworks;
+  const mapPositions = useMemo(() => (entrance ? [entrance] : []), [entrance]);
 
   useEffect(() => {
     if (entrance) setWantedDeletedState(entrance.isDeleted);
   }, [entrance]);
 
   let onDelete = null;
-  if (!entrance?.isDeleted && permissions.isModerator) {
+  if (!entrance?.isDeleted && isModerator) {
     onDelete = () => {
       setIsDeleteConfirmationPermanent(false);
       setIsDeleteConfirmationOpen(true);
@@ -85,6 +95,40 @@ export const Entry = ({ isLoading, error, entrance }) => {
     dispatch(restoreEntrance({ id: entranceId }));
   };
 
+  useEffect(() => {
+    if (userId && !person) {
+      dispatch(fetchPerson(userId));
+    }
+  }, [userId, person, dispatch]);
+
+  useEffect(() => {
+    if (entrance?.id && entrance?.cave?.id) {
+      const explored =
+        exploredEntrances?.some(e => e?.id === entrance.id) ||
+        exploredNetworks?.some(n => n?.id === entrance.cave.id);
+      setIsExplored(explored);
+    }
+  }, [exploredEntrances, exploredNetworks, entrance?.id, entrance?.cave?.id]);
+
+  const handleToggleExplored = async () => {
+    if (!userId || !entrance?.cave?.id) return;
+
+    setIsExploredLoading(true);
+    try {
+      if (isExplored) {
+        await dispatch(unlinkCave(entrance.cave.id, userId, false));
+      } else {
+        await dispatch(linkCave(entrance.cave.id, userId, false));
+      }
+      setIsExplored(!isExplored);
+    } catch (error) {
+      console.error('Error toggling explored status:', error);
+      setIsExplored(isExplored);
+    } finally {
+      setIsExploredLoading(false);
+    }
+  };
+
   const isActionLoading = wantedDeletedState !== entrance?.isDeleted;
 
   return (
@@ -95,11 +139,16 @@ export const Entry = ({ isLoading, error, entrance }) => {
             title={entrance.name ?? ''}
             icon={<CustomIcon type="entry" />}
             onEdit={
-              permissions.isAuth && !entrance.isDeleted
-                ? () => setEditing(true)
-                : undefined
+              isAuth && !entrance.isDeleted ? () => setEditing(true) : undefined
             }
             onDelete={onDelete}
+            isExplored={isAuth && entrance?.cave?.id ? isExplored : null}
+            isExploredLoading={isExploredLoading}
+            onToggleExplored={
+              isAuth && entrance?.cave?.id && !entrance?.isDeleted
+                ? handleToggleExplored
+                : undefined
+            }
             printRef={componentRef}
             snapshot={{
               id: entrance.id,
@@ -138,8 +187,8 @@ export const Entry = ({ isLoading, error, entrance }) => {
 
                 {entrance.isSensitive && <SensitiveCaveWarning />}
                 <HalfSplitContainer>
-                  {(!entrance.isSensitive || permissions.isAdmin) && (
-                    <Map positions={[entrance]} loading={isLoading} />
+                  {(!entrance.isSensitive || isAdmin) && (
+                    <Map positions={mapPositions} loading={isLoading} />
                   )}
 
                   <Properties entrance={entrance} />
@@ -205,7 +254,7 @@ export const Entry = ({ isLoading, error, entrance }) => {
         )}
         {entrance && (
           <>
-            {(permissions.isAuth || entrance.locations.length > 0) && (
+            {(isAuth || entrance.locations.length > 0) && (
               <Locations
                 locations={entrance.locations}
                 entranceId={entrance.id}
@@ -213,7 +262,7 @@ export const Entry = ({ isLoading, error, entrance }) => {
                 isEditAllowed={!entrance.isDeleted}
               />
             )}
-            {(permissions.isAuth || entrance.descriptions.length > 0) && (
+            {(isAuth || entrance.descriptions.length > 0) && (
               <Descriptions
                 descriptions={entrance.descriptions}
                 entityType="entrance"
@@ -221,28 +270,28 @@ export const Entry = ({ isLoading, error, entrance }) => {
                 isEditAllowed={!entrance.isDeleted}
               />
             )}
-            {(permissions.isAuth || entrance.riggings.length > 0) && (
+            {(isAuth || entrance.riggings.length > 0) && (
               <Riggings
                 riggings={entrance.riggings}
                 entranceId={entrance.id}
                 isEditAllowed={!entrance.isDeleted}
               />
             )}
-            {(permissions.isAuth || entrance.documents.length > 0) && (
+            {(isAuth || entrance.documents.length > 0) && (
               <Documents
                 documents={entrance.documents}
                 entranceId={entrance.id}
                 isEditAllowed={!entrance.isDeleted}
               />
             )}
-            {(permissions.isAuth || entrance.histories.length > 0) && (
+            {(isAuth || entrance.histories.length > 0) && (
               <Histories
                 histories={entrance.histories}
                 entranceId={entrance.id}
                 isEditAllowed={!entrance.isDeleted}
               />
             )}
-            {(permissions.isAuth || entrance.comments.length > 0) && (
+            {(isAuth || entrance.comments.length > 0) && (
               <Comments
                 comments={entrance.comments}
                 entranceId={entrance.id}
@@ -250,7 +299,7 @@ export const Entry = ({ isLoading, error, entrance }) => {
               />
             )}
 
-            {permissions.isAuth && (
+            {isAuth && (
               <StandardDialog
                 fullWidth
                 maxWidth="md"

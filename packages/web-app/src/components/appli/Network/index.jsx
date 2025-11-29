@@ -2,11 +2,13 @@ import React, { useRef, useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import Skeleton from '@mui/material/Skeleton';
 import { Box, Card } from '@mui/material';
 
-import { usePermissions } from '../../../hooks';
+import { usePermissions, useUserProperties } from '../../../hooks';
+import { linkCave } from '../../../actions/Cave/LinkCave';
+import { unlinkCave } from '../../../actions/Cave/UnlinkCave';
 import FixedLayout from '../../common/Layouts/Fixed';
 import FixedContent from '../../common/Layouts/Fixed/FixedContent';
 import CustomIcon from '../../common/CustomIcon';
@@ -28,13 +30,14 @@ import {
   DeleteConfirmationDialog,
   DELETED_ENTITIES
 } from '../../common/card/Deleted';
+import { fetchPerson } from '../../../actions/Person/GetPerson';
 
 export const Network = ({ isLoading, error, cave }) => {
   const dispatch = useDispatch();
   const { formatMessage } = useIntl();
   const navigate = useNavigate();
   const { caveId } = useParams();
-  const permissions = usePermissions();
+  const { isAuth, isModerator } = usePermissions();
   const componentRef = useRef();
   const [isEditing, setEditing] = useState(false);
   const [selectedEntrancesId, setSelectedEntrancesId] = useState([]);
@@ -43,13 +46,18 @@ export const Network = ({ isLoading, error, cave }) => {
   const [isDeleteConfirmationPermanent, setIsDeleteConfirmationPermanent] =
     useState(false);
   const [wantedDeletedState, setWantedDeletedState] = useState(false);
+  const userId = useUserProperties()?.id ?? null;
+  const [isExploredLoading, setIsExploredLoading] = useState(false);
+  const [isExplored, setIsExplored] = useState(false);
+  const { person } = useSelector(state => state.person);
+  const exploredNetworks = person?.exploredNetworks;
 
   useEffect(() => {
     if (cave) setWantedDeletedState(cave.isDeleted);
   }, [cave]);
 
   let onDelete = null;
-  if (!cave?.isDeleted && permissions.isModerator) {
+  if (!cave?.isDeleted && isModerator) {
     onDelete = () => {
       setIsDeleteConfirmationPermanent(false);
       setIsDeleteConfirmationOpen(true);
@@ -66,6 +74,39 @@ export const Network = ({ isLoading, error, cave }) => {
     dispatch(restoreCave({ id: caveId }));
   };
 
+  useEffect(() => {
+    if (userId && !person) {
+      dispatch(fetchPerson(userId));
+    }
+  }, [userId, person, dispatch]);
+
+  useEffect(() => {
+    if (cave?.id) {
+      const explored =
+        exploredNetworks?.some(n => n?.id === cave?.id);
+      setIsExplored(explored);
+    }
+  }, [exploredNetworks, cave?.id]);
+
+  const handleToggleExplored = async () => {
+    if (!userId || !caveId) return;
+
+    setIsExploredLoading(true);
+    try {
+      if (isExplored) {
+        await dispatch(unlinkCave(caveId, userId, false));
+      } else {
+        await dispatch(linkCave(caveId, userId, false));
+      }
+      setIsExplored(!isExplored);
+    } catch (error) {
+      console.error('Error toggling explored status:', error);
+      setIsExplored(isExplored);
+    } finally {
+      setIsExploredLoading(false);
+    }
+  };
+
   const isActionLoading = wantedDeletedState !== cave?.isDeleted;
 
   return (
@@ -77,11 +118,14 @@ export const Network = ({ isLoading, error, cave }) => {
               title={cave?.name ?? ''}
               icon={<CustomIcon type="cave_system" />}
               onEdit={
-                permissions.isAuth && !cave?.isDeleted
+                isAuth && !cave?.isDeleted
                   ? () => setEditing(true)
                   : undefined
               }
               onDelete={onDelete}
+              isExplored={isAuth && caveId ? isExplored : null}
+              isExploredLoading={isExploredLoading}
+              onToggleExplored={isAuth && caveId && !cave?.isDeleted ? handleToggleExplored : undefined}
               printRef={componentRef}
               content={
                 <>
@@ -184,7 +228,7 @@ export const Network = ({ isLoading, error, cave }) => {
               entityId={cave.id}
               isEditAllowed={!cave.isDeleted}
             />
-            {permissions.isAuth && (
+            {isAuth && (
               <StandardDialog
                 fullWidth
                 maxWidth="md"
