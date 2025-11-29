@@ -20,7 +20,8 @@ const EntitiesList = ({
   actionButton,
   onItemRemove,
   emptyMessage = null,
-  hasDivider = false
+  hasDivider = false,
+  toolTipTitle = 'Remove'
 }) => {
   const { formatMessage } = useIntl();
   if (!emptyMessage && (!entites || entites.length === 0)) return null;
@@ -31,7 +32,7 @@ const EntitiesList = ({
   let itemAction = () => null;
     if (onItemRemove) {
       itemAction = e => (
-        <Tooltip title={formatMessage({ id: 'Remove from organization' })}>
+        <Tooltip title={toolTipTitle}>
           <IconButton
             size="small"
             onClick={() => onItemRemove(e.id)}
@@ -107,6 +108,7 @@ EntitiesList.propTypes = {
   title: PropTypes.node,
   emptyMessage: PropTypes.node,
   hasDivider: PropTypes.bool,
+  toolTipTitle: PropTypes.string,
   actionButton: PropTypes.node,
   onItemRemove: PropTypes.func,
 };

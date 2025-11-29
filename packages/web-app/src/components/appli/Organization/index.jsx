@@ -16,7 +16,7 @@ import Alert from '../../common/Alert';
 import { usePermissions } from '../../../hooks';
 import DocumentsList from '../../common/DocumentsList/DocumentsList';
 import EntitiesList from '../../common/entitiesList/EntitiesList';
-import RelatedCaves from './RelatedCaves';
+import RelatedCaves from '../../common/RelatedCaves/RelatedCaves';
 import {
   DeletedCard,
   DeleteConfirmationDialog,
@@ -31,7 +31,7 @@ import { fetchOrganization } from '../../../actions/Organization/GetOrganization
 const Organization = ({ error, isLoading, organization }) => {
   const { formatMessage } = useIntl();
   const navigate = useNavigate();
-  const permissions = usePermissions();
+  const { isAuth, isAdmin, isModerator } = usePermissions();
   const dispatch = useDispatch();
   const { organizationId } = useParams();
   const authState = useSelector(state => state.login);
@@ -47,10 +47,11 @@ const Organization = ({ error, isLoading, organization }) => {
 
   const isMember = useMemo(
     () =>
-      permissions.isAuth &&
+      isAuth &&
       organization?.cavers?.some(caver => caver.id === currentUserId),
-    [permissions.isAuth, organization?.cavers, currentUserId]
+    [isAuth, organization?.cavers, currentUserId]
   );
+  const canManageCaves = isAdmin || isModerator || isMember;
 
   useEffect(() => {
     if (organization) setWantedDeletedState(organization.isDeleted);
@@ -58,11 +59,11 @@ const Organization = ({ error, isLoading, organization }) => {
 
   let onEdit = null;
   let onDelete = null;
-  if (permissions.isAuth && !organization?.isDeleted) {
+  if (isAuth && !organization?.isDeleted) {
     onEdit = () => {
       navigate(`/ui/organizations/${organizationId}/edit`);
     };
-    if (permissions.isModerator) {
+    if (isModerator) {
       onDelete = () => {
         setIsDeleteConfirmationPermanent(false);
         setIsDeleteConfirmationOpen(true);
@@ -201,9 +202,10 @@ const Organization = ({ error, isLoading, organization }) => {
                 entites={organization.cavers}
                 title={formatMessage({ id: 'Members (former members)' })}
                 hasDivider
-                onItemRemove={permissions.isAdmin ? handleRemoveMember : null}
+                onItemRemove={isAdmin ? handleRemoveMember : null}
+                toolTipTitle={formatMessage({ id:  'Remove from organization'})}
                 actionButton={
-                  permissions.isAuth && (
+                  isAuth && (
                     <>
                       <Tooltip
                         title={formatMessage({
@@ -247,8 +249,10 @@ const Organization = ({ error, isLoading, organization }) => {
               <RelatedCaves
                 exploredEntrances={organization.exploredEntrances}
                 exploredNetworks={organization.exploredNetworks}
-                organizationId={organization.id}
-                isMember={isMember}
+                entityId={organization.id}
+                isOrganization={true}
+                canManageCaves={canManageCaves}
+                onRefresh={() => dispatch(fetchOrganization(organizationId))}
               />
             </>
           )}

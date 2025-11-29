@@ -14,6 +14,7 @@ import FixedContent from '../../common/Layouts/Fixed/FixedContent';
 import Alert from '../../common/Alert';
 import DocumentsList from '../../common/DocumentsList/DocumentsList';
 import EntitiesList from '../../common/entitiesList/EntitiesList';
+import RelatedCaves from '../../common/RelatedCaves/RelatedCaves';
 import PersonProperties from '../../common/Person/PersonProperties';
 import SubscriptionsList from '../../common/Subscriptions/SubscriptionsList';
 import { deletePerson } from '../../../actions/Person/DeletePerson';
@@ -123,7 +124,7 @@ const Person = ({
                 justifyContent="space-between">
                 <PersonProperties person={person} />
               </Box>
-              {person.groups?.some(g => g.name === 'Leader') && (
+              {permissions.isLeader && (
                 <>
                   <hr />
                   <SubscriptionsList
@@ -140,16 +141,22 @@ const Person = ({
                 title={formatMessage({ id: 'Documents' })}
                 documents={person.documents}
               />
+              <hr />
               <EntitiesList
                 type="organization"
                 entites={person.organizations}
                 title={formatMessage({ id: 'Organizations' })}
                 onItemRemove={canEdit ? handleLeaveOrganization : null}
+                toolTipTitle={formatMessage({ id:  'Leave organization'})}
               />
-              <EntitiesList
-                type="entrance"
-                entites={person.exploredEntrances}
-                title={formatMessage({ id: 'List of explored caves' })}
+              <hr />
+              <RelatedCaves
+                exploredEntrances={person.exploredEntrances}
+                exploredNetworks={person.exploredNetworks}
+                entityId={person.id}
+                isOrganization={false}
+                canManageCaves={canEdit}
+                onRefresh={() => dispatch(fetchPerson(person.id))}
               />
             </>
           )}

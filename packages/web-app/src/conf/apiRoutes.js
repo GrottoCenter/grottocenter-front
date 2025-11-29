@@ -244,7 +244,6 @@ export const joinOrganizationUrl = (caverId, organizationId) =>
   `${API_BASE_PATH}/cavers/${caverId}/organizations/${organizationId}`;
 export const leaveOrganizationUrl = (caverId, organizationId) =>
   `${API_BASE_PATH}/cavers/${caverId}/organizations/${organizationId}`;
-
 export const linkCaveToOrganizationUrl = (caveId, organizationId) =>
   `${API_BASE_PATH}/caves/${caveId}/organizations/${organizationId}`;
 export const unlinkCaveFromOrganizationUrl = (caveId, organizationId) =>
@@ -260,6 +259,10 @@ export const putCaverUrl = userId => `${API_BASE_PATH}/cavers/${userId}`;
 export const getDbExportUrls = `${API_BASE_PATH}/cavers/export/db`;
 export const deletePersonUrl = (userId, entityId) =>
   `${API_BASE_PATH}/cavers/${userId}?${entityId ? `entityId=${entityId}` : ''}`;
+export const linkCaveToCaverUrl = (caveId, caverId) =>
+  `${API_BASE_PATH}/caves/${caveId}/cavers/${caverId}`;
+export const unlinkCaveFromCaverUrl = (caveId, caverId) =>
+  `${API_BASE_PATH}/caves/${caveId}/cavers/${caverId}`;
 
 // ===== RSS urls
 export const frenchRssUrl = `${API_URL}/api/rss/FR`;
