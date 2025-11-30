@@ -261,7 +261,7 @@ export const DeleteConfirmationDialog = ({
     searchTitle = isSearchMandatory
       ? formatMessage(
           {
-            id: 'delete-permanent-merge',
+            id: 'delete-permanent-merge-mandatory',
             defaultMessage:
               'Select another {entityFmt} where linked entities will be merged in:'
           },
@@ -269,7 +269,7 @@ export const DeleteConfirmationDialog = ({
         )
       : formatMessage(
           {
-            id: 'delete-permanent-merge',
+            id: 'delete-permanent-merge-optional',
             defaultMessage:
               'Optionally, select another {entityFmt} where linked entities will be merged in:'
           },
