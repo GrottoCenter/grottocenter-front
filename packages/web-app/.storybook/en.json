@@ -522,7 +522,7 @@
   "delete-confirmation-dialog": "delete-confirmation-dialog",
   "delete-confirmation-redirect": "delete-confirmation-redirect",
   "delete-permanent-confirmation-dialog": "delete-permanent-confirmation-dialog",
-  "delete-permanent-merge": "delete-permanent-merge",
+  "delete-permanent-merge-mandatory": "Select another {entityFmt} where linked entities will be merged in:",
   "deleted": "deleted",
   "deleted-card-go-to-related-btn": "deleted-card-go-to-related-btn",
   "deleted-card-intro-message": "deleted-card-intro-message",
