@@ -101,7 +101,7 @@ const FixedContent = ({
     else ExploredIcon = <CheckCircleOutlineIcon />;
   }
   const handlePrint = useReactToPrint({
-    contentRef: () => printRef.current
+    contentRef: printRef
   });
   return (
     <Card>
