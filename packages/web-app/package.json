@@ -46,7 +46,7 @@
     "react-device-detect": "^2.2.3",
     "react-dom": "^18.3.1",
     "react-dropzone-uploader": "^2.11.0",
-    "react-error-boundary": "^4.0.13",
+    "react-error-boundary": "^6.0.0",
     "react-hook-form": "^7.53.0",
     "react-intl": "^6.7.0",
     "react-leaflet": "^4.2.1",
