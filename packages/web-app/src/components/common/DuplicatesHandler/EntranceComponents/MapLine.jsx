@@ -1,5 +1,6 @@
 import React, { useRef, useMemo } from 'react';
-import { Grid, Fab } from '@mui/material';
+import { Fab } from '@mui/material';
+import { Grid } from '@mui/material';
 import { MapContainer, TileLayer, Marker } from 'react-leaflet';
 import { isNil } from 'ramda';
 import PropTypes from 'prop-types';
@@ -78,8 +79,7 @@ const MapLine = ({
       style={{ paddingBottom: paddingVertical, paddingTop: paddingVertical }}>
       <Grid
         container
-        item
-        xs={4}
+        size={4}
         justifyContent="flex-start"
         alignItems="center">
         <MapComponent position={position1} />
@@ -91,13 +91,13 @@ const MapLine = ({
           <ArrowForwardIosIcon />
         </Fab>
       </Grid>
-      <Grid container item xs={4} justifyContent="center" alignItems="center">
+      <Grid container size={4} justifyContent="center" alignItems="center">
         <MapComponent
           position={positionState}
           updatePosition={updatePositionState}
         />
       </Grid>
-      <Grid container item xs={4} justifyContent="flex-end" alignItems="center">
+      <Grid container size={4} justifyContent="flex-end" alignItems="center">
         <Fab
           onClick={() => onAddButtonClick(position2)}
           color="primary"
@@ -107,7 +107,7 @@ const MapLine = ({
         </Fab>
         <MapComponent position={position2} />
       </Grid>
-      <Grid container item xs={12} justifyContent="center" alignItems="center">
+      <Grid container size={12} justifyContent="center" alignItems="center">
         {formatMessage({ id: 'You can move this marker' })}
       </Grid>
     </Grid>

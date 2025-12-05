@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import CheckIcon from '@mui/icons-material/Check';
 import { styled, keyframes } from '@mui/material/styles';
-import withStyles from '@mui/styles/withStyles';
 
 const CheckList = styled('ul')`
   width: 100%;
@@ -80,14 +79,9 @@ const ListItem = styled('li')`
   }
 `;
 
-const StyledListIcon = withStyles(
-  theme => ({
-    root: {
-      fill: theme.palette.accent1Color
-    }
-  }),
-  { withTheme: true }
-)(ListIcon);
+const StyledListIcon = styled(ListIcon)(({ theme }) => ({
+  fill: theme.palette.accent1Color
+}));
 
 const AssociationCheckList = ({ title, entries }) => (
   <CheckListWrapper>

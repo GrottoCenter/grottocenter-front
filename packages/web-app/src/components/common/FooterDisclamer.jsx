@@ -1,17 +1,16 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import withTheme from '@mui/styles/withTheme';
 import { styled } from '@mui/material/styles';
 import Translate from './Translate';
 import InternationalizedLink from './InternationalizedLink';
 import { licenceLinks } from '../../conf/externalLinks';
 
-const FooterBar = withTheme(styled('div')`
-  color: ${props => props.theme.palette.fullBlack};
-  background-color: ${props => props.theme.palette.primary1Color};
-  text-align: center;
-  padding-top: 15px;
-`);
+const FooterBar = styled('div')(({ theme }) => ({
+  color: theme.palette.fullBlack,
+  backgroundColor: theme.palette.primary1Color,
+  textAlign: 'center',
+  paddingTop: '15px'
+}));
 
 // .fixFooter {
 //   position: fixed;
@@ -21,7 +20,7 @@ const FooterBar = withTheme(styled('div')`
 // }
 
 const DisclamerText = styled('p')`
-  font-size: 1.2em;
+  font-size: 1.2rem;
   font-weight: 300;
   color: white;
   display: inline-block;

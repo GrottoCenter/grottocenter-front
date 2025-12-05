@@ -11,8 +11,9 @@ import LayersControl from './LayersControl';
 import FullscreenControl from './FullscreenControl';
 import LocateControl from './LocateControl';
 
-const Wrapper = styled('div')(
-  ({ theme, $wholePage }) => `
+const Wrapper = styled('div', {
+  shouldForwardProp: (prop) => !prop.startsWith('$')
+})(({ theme, $wholePage }) => `
   width: calc(100% - 10px);
   height: 400px;
 
@@ -20,8 +21,7 @@ const Wrapper = styled('div')(
     ${!$wholePage && `margin-right: ${theme.spacing(2)};`}
   }
 ${$wholePage && `height: calc(100vh - ${theme.appBarHeight}px);`}
-`
-);
+`);
 
 // The Map, once mounted, doesn't change its center: this Centerer forces it
 // See https://github.com/PaulLeCam/react-leaflet/issues/796#issuecomment-743181396
@@ -56,7 +56,7 @@ Centerer.propTypes = {
   center: PropTypes.arrayOf(PropTypes.number)
 };
 
-const FullscreenInteraction = () => {
+const FullscreenInteraction = ({ dragging, scrollWheelZoom }) => {
   const [mapCenter, setMapCenter] = useState(null);
   const [mapZoom, setMapZoom] = useState(null);
   const map = useMapEvents({
@@ -68,11 +68,24 @@ const FullscreenInteraction = () => {
     },
     exitFullscreen() {
       map.setView(mapCenter, mapZoom, { animate: false });
-      map.dragging.disable();
-      map.scrollWheelZoom.disable();
+      if (dragging) {
+        map.dragging.enable();
+      } else {
+        map.dragging.disable();
+      }
+      if (scrollWheelZoom) {
+        map.scrollWheelZoom.enable();
+      } else {
+        map.scrollWheelZoom.disable();
+      }
     }
   });
   return <FullscreenControl forceSeparateButton="true" />;
+};
+
+FullscreenInteraction.propTypes = {
+  dragging: PropTypes.bool,
+  scrollWheelZoom: PropTypes.bool
 };
 
 const CustomMapContainer = ({
@@ -102,7 +115,7 @@ const CustomMapContainer = ({
       ref={handleResize}
       preferCanvas>
       {isFullscreenAllowed && shouldChangeControlInFullscreen && (
-        <FullscreenInteraction />
+        <FullscreenInteraction dragging={dragging} scrollWheelZoom={scrollWheelZoom} />
       )}
       {isFullscreenAllowed && !shouldChangeControlInFullscreen && (
         <FullscreenControl forceSeparateButton="true" />

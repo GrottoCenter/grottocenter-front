@@ -1,6 +1,5 @@
 import React from 'react';
 import { styled } from '@mui/material/styles';
-import withTheme from '@mui/styles/withTheme';
 import RandomEntryCardContainer from '../../containers/RandomEntryCardContainer';
 import { GridRow } from '../../helpers/GridSystem';
 import Translate from '../../components/common/Translate';
@@ -19,12 +18,12 @@ const BgRandomEntrySection = styled(RandomEntrySection)`
   margin-top: 0;
 `;
 
-const SectionTitle = withTheme(styled('h3')`
-  color: ${props => props.theme.palette.secondaryBlocTitle};
-  text-align: center;
-  padding-bottom: 50px;
-  font-size: 35px;
-`);
+const SectionTitle = styled('h3')(({ theme }) => ({
+  color: theme.palette.secondaryBlocTitle,
+  textAlign: 'center',
+  paddingBottom: '50px',
+  fontSize: '35px'
+}));
 
 const RandomEntry = () => (
   <BgRandomEntrySection>

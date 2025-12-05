@@ -1,7 +1,5 @@
 /* eslint-disable react/forbid-prop-types */
 import React from 'react';
-import withStyles from '@mui/styles/withStyles';
-import withTheme from '@mui/styles/withTheme';
 import PropTypes from 'prop-types';
 import proj4 from 'proj4';
 import Button from '@mui/material/Button';
@@ -14,90 +12,75 @@ import Divider from '@mui/material/Divider';
 import {unitsTab} from '../../../../../conf/ListGPSProj';
 import Translate from '../../../Translate';
 
-const styles = theme => ({
-    mainContainer: {
-        backgroundColor: theme.palette.primary1Color,
-        padding: '10px'
-    },
-    subContainer: {
-        backgroundColor: theme.palette.primary3Color,
-        padding: '10px',
-        margin: '20px',
-        textAlign: 'center'
-    },
-    bottomContainer: {
-        padding: '10px',
-        margin: '20px',
-        textAlign: 'center'
-    },
-    element: {
-        display: 'table'
-    },
-    subElement: {
-        display: 'table-cell',
-        verticalAlign: 'middle'
-    }
+const MainContainer = styled('div')(({ theme }) => ({
+    backgroundColor: theme.palette.primary1Color,
+    padding: '10px'
+}));
+
+const SubContainer = styled('div')(({ theme }) => ({
+    backgroundColor: theme.palette.primary3Color,
+    padding: '10px',
+    margin: '20px',
+    textAlign: 'center'
+}));
+
+const BottomContainer = styled('div')({
+    padding: '10px',
+    margin: '20px',
+    textAlign: 'center'
 });
 
-// For input of coordinates
-const StyledInput = withTheme(styled(Input)`
-    && {
-        background: ${props => props.theme.palette.backgroundButton};
-        border: 1px solid;
-        border-color: ${props => props.theme.palette.borderColor};
-        padding: 7px;
-        margin: 10px;
-        font-size: small;
-    }
-`);
+const Element = styled('div')({
+    display: 'table'
+});
 
-// For the select of coodinates system
-const StyledSelect = withTheme(styled(Select)`
-    && {
-        background: ${props => props.theme.palette.backgroundButton};
-        border: 1px solid;
-        border-color: ${props => props.theme.palette.borderColor};
-        padding: 7px;
-        margin: 10px;
-    }
-`);
+const SubElement = styled('div')({
+    display: 'table-cell',
+    verticalAlign: 'middle'
+});
 
-const MenuItemGroup = withTheme(styled(MenuItem)`
-    && {
-        font-size: larger;
-        font-weight: bold;
-    }
-`);
+const StyledInput = styled(Input)(({ theme }) => ({
+    background: theme.palette.backgroundButton,
+    border: '1px solid',
+    borderColor: theme.palette.borderColor,
+    padding: '7px',
+    margin: '10px',
+    fontSize: 'small'
+}));
 
-const StyledMenuItem = withTheme(styled(MenuItem)`
-    && {
-        font-size: small;
-        padding: 0 30px;
-    }
-`);
+const StyledSelect = styled(Select)(({ theme }) => ({
+    background: theme.palette.backgroundButton,
+    border: '1px solid',
+    borderColor: theme.palette.borderColor,
+    padding: '7px',
+    margin: '10px'
+}));
 
-//
-const ConvertButton = withTheme(styled(Button)`
-    && {
-        background: ${props => props.theme.palette.backgroundButton};
-        border: 1px solid;
-        border-color: ${props => props.theme.palette.borderColor};
-        border-radius: 4px;
-        padding: 0 20px;
-    }
+const MenuItemGroup = styled(MenuItem)({
+    fontSize: 'larger',
+    fontWeight: 'bold'
+});
 
-,
-& &: hover {
-    background: ${props => props.theme.palette.backgroundButton};
-},
-`);
+const StyledMenuItem = styled(MenuItem)({
+    fontSize: 'small',
+    padding: '0 30px'
+});
 
-const StyledDivider = withTheme(styled(Divider)`
-    && {
-        background: ${props => props.theme.palette.divider};
-        margin-bottom: 10px;
+const ConvertButton = styled(Button)(({ theme }) => ({
+    background: theme.palette.backgroundButton,
+    border: '1px solid',
+    borderColor: theme.palette.borderColor,
+    borderRadius: '4px',
+    padding: '0 20px',
+    '&:hover': {
+        background: theme.palette.backgroundButton
     }
-`);
+}));
+
+const StyledDivider = styled(Divider)(({ theme }) => ({
+    background: theme.palette.divider,
+    marginBottom: '10px'
+}));
 
 const StyledTitle = styled('h5')`
     font-weight: bold;
@@ -285,7 +268,7 @@ class Convert extends React.Component {
     }
 
     render() {
-        const {classes, formatMessage} = this.props;
+        const {formatMessage} = this.props;
         const {
             hemiInput,
             hemiOutput,
@@ -328,20 +311,20 @@ class Convert extends React.Component {
         });
 
         return (
-            <div id="convert" className={classes.mainContainer}>
+            <MainContainer id="convert">
                 {/* INPUT SECTION */}
-                <div id="input" className={classes.subContainer}>
+                <SubContainer id="input">
                     <StyledTitle>
                         <Translate>Input</Translate>
                     </StyledTitle>
                     <StyledDivider/>
 
                     {/* COORDINATES SYSTEMS SECTION */}
-                    <div id="selectInput" className={classes.element}>
-                        <div className={classes.subElement}>
+                    <Element id="selectInput">
+                        <SubElement>
                             <Translate>Coordinate system</Translate>
                             {' : '}
-                        </div>
+                        </SubElement>
                         <FormControl>
                             <StyledSelect
                                 value={keyGPSInput}
@@ -349,12 +332,12 @@ class Convert extends React.Component {
                                 {options}
                             </StyledSelect>
                         </FormControl>
-                    </div>
+                    </Element>
 
                     {/* UTM SECTION HEMISPHERE AND ZONE INPUT */}
                     {utmInput && [
-                        <div id="hemisphereInput" className={classes.element}>
-                            <div className={classes.subElement}>{' Hemisphere : '}</div>
+                        <Element id="hemisphereInput">
+                            <SubElement>{' Hemisphere : '}</SubElement>
                             <FormControl>
                                 <StyledSelect
                                     value={hemiInput}
@@ -365,7 +348,7 @@ class Convert extends React.Component {
                                     <StyledMenuItem value="South">South</StyledMenuItem>
                                 </StyledSelect>
                             </FormControl>
-                        </div>,
+                        </Element>,
                         <div id="zoneInput">
                             {' Zone : '}
                             <StyledInput
@@ -410,21 +393,21 @@ class Convert extends React.Component {
                     <ConvertButton onClick={this.handleConvert}>
                         <Translate>Convert</Translate>
                     </ConvertButton>
-                </div>
+                </SubContainer>
 
                 {/* OUTPUT SECTION */}
-                <div id="output" className={classes.subContainer}>
+                <SubContainer id="output">
                     <StyledTitle>
                         <Translate>Output</Translate>
                     </StyledTitle>
                     <StyledDivider/>
 
                     {/* COORDINATES SYSTEMS SECTION */}
-                    <div id="selectOutput" className={classes.element}>
-                        <div className={classes.subElement}>
+                    <Element id="selectOutput">
+                        <SubElement>
                             <Translate>Coordinate system</Translate>
                             {' : '}
-                        </div>
+                        </SubElement>
                         <FormControl>
                             <StyledSelect
                                 value={keyGPSOutput}
@@ -432,12 +415,12 @@ class Convert extends React.Component {
                                 {options}
                             </StyledSelect>
                         </FormControl>
-                    </div>
+                    </Element>
 
                     {/* UTM SECTION HEMISPHERE AND ZONE OUTPUT */}
                     {utmOutput && [
-                        <div id="hemisphereOutput" className={classes.element}>
-                            <div className={classes.subElement}>{' Hemisphere : '}</div>
+                        <Element id="hemisphereOutput">
+                            <SubElement>{' Hemisphere : '}</SubElement>
                             <FormControl>
                                 <StyledSelect
                                     value={hemiOutput}
@@ -448,7 +431,7 @@ class Convert extends React.Component {
                                     <StyledMenuItem value="South">South</StyledMenuItem>
                                 </StyledSelect>
                             </FormControl>
-                        </div>,
+                        </Element>,
                         <div id="zoneOutput">
                             {' Zone : '}
                             <StyledInput
@@ -480,10 +463,10 @@ class Convert extends React.Component {
                         />
                         {yUnitOutput}
                     </div>
-                </div>
+                </SubContainer>
 
                 {/* BOTTOM SECTION */}
-                <div id="bottom" className={classes.bottomContainer}>
+                <BottomContainer id="bottom">
           <span>
             Basé sur la librairie <a href="http://proj4js.org">Proj4js</a> et
             sur le projet <a href="http://trac.osgeo.org/proj">Proj.4</a>,{' '}
@@ -491,22 +474,15 @@ class Convert extends React.Component {
             ce convertisseur utilise les constantes de conversion de{' '}
               <a href="http://spatialreference.org">Spatial Reference</a>.
           </span>
-                </div>
-            </div>
+                </BottomContainer>
+            </MainContainer>
         );
     }
 }
 
 Convert.propTypes = {
-    classes: PropTypes.shape({
-        bottomContainer: PropTypes.string,
-        element: PropTypes.string,
-        mainContainer: PropTypes.string,
-        subContainer: PropTypes.string,
-        subElement: PropTypes.string
-    }).isRequired,
     formatMessage: PropTypes.func.isRequired,
     list: PropTypes.arrayOf(PropTypes.shape({})).isRequired
 };
 
-export default withStyles(styles)(Convert);
+export default Convert;

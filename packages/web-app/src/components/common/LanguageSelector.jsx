@@ -1,34 +1,26 @@
 import React from 'react';
 import { Select, MenuItem, Input, CircularProgress } from '@mui/material';
-import withStyles from '@mui/styles/withStyles';
 import LanguageIcon from '@mui/icons-material/Translate';
 import { styled } from '@mui/material/styles';
 import { isMobileOnly } from 'react-device-detect';
 import { useDispatch, useSelector } from 'react-redux';
 import { changeLocale } from '../../actions/Intl';
 
-const StyledSelect = withStyles(
-  theme => ({
-    root: {
-      paddingLeft: '10px',
-      minWidth: isMobileOnly ? 'auto' : '150px',
-      width: 'initial'
-    },
-    selectMenu: {
-      fontSize: '16px',
-      minHeight: '12px'
-    },
-    select: {
-      '&:before,&:hover,&:after,,&:focus': {
-        background: 'none'
-      }
-    },
-    icon: {
-      color: theme.palette.mode === 'dark' ? 'white' : 'inherit'
+const StyledSelect = styled(Select)(({ theme }) => ({
+  paddingLeft: '10px',
+  minWidth: isMobileOnly ? 'auto' : '150px',
+  width: 'initial',
+  '& .MuiSelect-select': {
+    fontSize: '16px',
+    minHeight: '12px',
+    '&:before, &:hover, &:after, &:focus': {
+      background: 'none'
     }
-  }),
-  { withTheme: true }
-)(Select);
+  },
+  '& .MuiSelect-icon': {
+    color: theme.palette.mode === 'dark' ? 'white' : 'inherit'
+  }
+}));
 
 const Wrapper = styled('div')`
   display: flex;

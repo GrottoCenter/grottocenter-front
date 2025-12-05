@@ -2,40 +2,36 @@ import React, { useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import CircularProgress from '@mui/material/CircularProgress';
 import { styled } from '@mui/material/styles';
-import withTheme from '@mui/styles/withTheme';
 import AliceCarousel from 'react-alice-carousel';
 import 'react-alice-carousel/lib/alice-carousel.css';
 
-const PartnerVignette = withTheme(styled('div')`
-  margin-left: 2%;
-  margin-right: 2%;
-  margin-top: 2%;
-  margin-bottom: 2%;
-  background-color: white;
-  border: 1px solid ${props => props.theme.palette.primary1Color};
-  border-radius: 2%;
-  overflow: hidden;
-  position: relative;
-  display: inline-block;
-  width: 90px;
-  height: 90px;
-  cursor: pointer;
-
-  @media (min-width: 354px) and (max-width: 515px) {
-    width: 85px;
-    height: 85px;
+const PartnerVignette = styled('div')(({ theme }) => ({
+  marginLeft: '2%',
+  marginRight: '2%',
+  marginTop: '2%',
+  marginBottom: '2%',
+  backgroundColor: 'white',
+  border: `1px solid ${theme.palette.primary1Color}`,
+  borderRadius: '2%',
+  overflow: 'hidden',
+  position: 'relative',
+  display: 'inline-block',
+  width: '90px',
+  height: '90px',
+  cursor: 'pointer',
+  '@media (min-width: 354px) and (max-width: 515px)': {
+    width: '85px',
+    height: '85px'
+  },
+  '@media (min-width: 354px)': {
+    marginRight: '1%',
+    marginLeft: '1%'
+  },
+  '@media (min-width: 708px)': {
+    width: '100px',
+    height: '100px'
   }
-
-  @media (min-width: 354px) {
-    margin-right: 1%;
-    margin-left: 1%;
-  }
-
-  @media (min-width: 708px) {
-    width: 100px;
-    height: 100px;
-  }
-`);
+}));
 
 const PartnerImage = styled('img')`
   display: block;
@@ -48,18 +44,18 @@ const PartnerImage = styled('img')`
   transform: translate(-50%, -50%);
 `;
 
-const CarouselDiv = withTheme(styled('div')`
-  text-align: center;
-  width: 100%;
-  li.alice-carousel__dots-item {
-    opacity: 50%;
-    background-color: ${props => props.theme.palette.accent1Color};
+const CarouselDiv = styled('div')(({ theme }) => ({
+  textAlign: 'center',
+  width: '100%',
+  'li.alice-carousel__dots-item': {
+    opacity: '50%',
+    backgroundColor: theme.palette.accent1Color
+  },
+  'li.alice-carousel__dots-item.__active': {
+    opacity: '100%',
+    backgroundColor: theme.palette.accent1Color
   }
-  li.alice-carousel__dots-item.__active {
-    opacity: 100%;
-    background-color: ${props => props.theme.palette.accent1Color};
-  }
-`);
+}));
 
 const PartnerItem = ({ imagePath, name, onClick }) => (
   <PartnerVignette>

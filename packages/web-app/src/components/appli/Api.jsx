@@ -1,5 +1,6 @@
 import React from 'react';
-import { Grid, Typography, Button } from '@mui/material';
+import { Typography, Button } from '@mui/material';
+import { Grid } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { useSelector } from 'react-redux';
 import { useIntl } from 'react-intl';
@@ -32,14 +33,14 @@ const Api = () => {
       title={formatMessage({ id: 'Grottocenter API' })}
       content={
         <Grid container justifyContent="center" spacing={2}>
-          <Grid item md={6} xs={12} style={{ maxWidth: '400px' }}>
+          <Grid size={{ xs: 12, md: 6 }} style={{ maxWidth: '400px' }}>
             <img
               style={{ width: '100%' }}
               src="/images/network.png"
               alt="internet network"
             />
           </Grid>
-          <Grid item md={6} xs={12} style={{ maxWidth: '600px' }}>
+          <Grid size={{ xs: 12, md: 6 }} style={{ maxWidth: '600px' }}>
             <Typography gutterBottom>
               <Translate id="You need to manipulate worldwide speleology data on your website? Trust Grottocenter to manage it for you!" />
             </Typography>
@@ -52,7 +53,7 @@ const Api = () => {
                     <GCLink
                       href={wikiApiLink}
                       alt="Link to rest API documentation">
-                      <Translate id="API" />
+                      <Translate key="api" id="API" />
                     </GCLink>
                   )
                 }}
@@ -70,7 +71,7 @@ const Api = () => {
                 values={{
                   0: (
                     <GCLink href="/ui">
-                      <Translate id="download" />
+                      <Translate key="download" id="download" />
                     </GCLink>
                   )
                 }}
@@ -85,7 +86,7 @@ const Api = () => {
                     <InternationalizedLink
                       links={contactLinks}
                       alt="Contact form">
-                      <Translate id="Contact us!" />
+                      <Translate key="contact" id="Contact us!" />
                     </InternationalizedLink>
                   )
                 }}

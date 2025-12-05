@@ -1,5 +1,4 @@
 import React from 'react';
-import withTheme from '@mui/styles/withTheme';
 import { styled } from '@mui/material/styles';
 import DonateForm from './DonateForm';
 import FooterDisclamer from '../../components/common/FooterDisclamer';
@@ -12,12 +11,12 @@ import {
   GridOneHalfColumn
 } from '../../helpers/GridSystem';
 
-const FooterWrapper = withTheme(styled('div')`
-  padding-top: 1em;
-  background-color: ${props => props.theme.palette.primary1Color};
-  color: ${props => props.theme.palette.textIconColor};
-  text-align: center;
-`);
+const FooterWrapper = styled('div')(({ theme }) => ({
+  paddingTop: '1rem',
+  backgroundColor: theme.palette.primary1Color,
+  color: theme.palette.textIconColor,
+  textAlign: 'center'
+}));
 
 const Footer = () => (
   <div>

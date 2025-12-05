@@ -3,7 +3,6 @@ import { useIntl } from 'react-intl';
 import CircularProgress from '@mui/material/CircularProgress';
 import PropTypes from 'prop-types';
 import { Chip } from '@mui/material';
-import withTheme from '@mui/styles/withTheme';
 import { styled } from '@mui/material/styles';
 import GCLink from '../GCLink';
 
@@ -61,12 +60,12 @@ function getEntityLinkUrl(type, id) {
   return `/`;
 }
 
-const GCLinkStyled = withTheme(styled(GCLink)`
-  color: #ffcfac;
-  font-size: 1.1em;
-  font-weight: bold;
-  text-decoration-thickness: 3px;
-`);
+const GCLinkStyled = styled(GCLink)({
+  color: '#ffcfac',
+  fontSize: '1.1em',
+  fontWeight: 'bold',
+  textDecorationThickness: '3px'
+});
 
 const ChangeItem = ({ changeInfo }) => {
   // There is 4 type of sentences:

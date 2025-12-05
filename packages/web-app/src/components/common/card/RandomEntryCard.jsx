@@ -68,7 +68,7 @@ const EntryName = styled('h4')`
 `;
 
 const EntryLocalizationPart = styled('h5')`
-  font-size: 2em;
+  font-size: 2rem;
   margin-bottom: 0;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -126,7 +126,7 @@ EntryStat.propTypes = {
 const StatEntry = styled('li')`
   display: inline-flex;
   width: 100%;
-  font-size: 1.5em;
+  font-size: 1.5rem;
 
   span {
     margin-right: 10px;
@@ -253,7 +253,7 @@ const EntryInfoWrapper = styled('div')`
   display: inline-flex;
   line-height: 50px;
   font-weight: 300;
-  font-size: 1.4em;
+  font-size: 1.4rem;
 `;
 
 const InfoImage = styled('img')`
@@ -263,13 +263,13 @@ const InfoImage = styled('img')`
 
 const InfoValue = styled('span')`
   margin-left: 6px;
-  font-size: 1.5em;
+  font-size: 1.5rem;
   white-space: nowrap;
 `;
 
 const InfoUnit = styled('span')`
   margin-left: 6px;
-  font-size: 1em;
+  font-size: 1rem;
   white-space: nowrap;
 `;
 

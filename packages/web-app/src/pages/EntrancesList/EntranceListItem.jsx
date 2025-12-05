@@ -76,7 +76,7 @@ const EntranceListItem = ({ entrance }) => {
 
   return (
     <StyledListItem
-      button
+      component="button"
       onClick={() =>
         window.open(`/ui/entrances/${entrance.id_entrance}`, '_blank')
       }>

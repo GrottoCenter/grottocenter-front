@@ -1,6 +1,7 @@
 import React from 'react';
 import { useIntl } from 'react-intl';
-import { Grid, Typography } from '@mui/material';
+import { Typography } from '@mui/material';
+import { Grid } from '@mui/material';
 import PropTypes from 'prop-types';
 import { styled } from '@mui/material/styles';
 import ActionButton from '../../ActionButton';
@@ -22,7 +23,7 @@ const TitleLine = ({ title1, title2, handleAllClick1, handleAllClick2 }) => {
   const { formatMessage } = useIntl();
   return (
     <StyledGrid container direction="row">
-      <Grid container item xs={4} justifyContent="flex-start">
+      <Grid container size={4} justifyContent="flex-start">
         <Title>
           {formatMessage(
             {
@@ -40,10 +41,10 @@ const TitleLine = ({ title1, title2, handleAllClick1, handleAllClick2 }) => {
           style={{ marginLeft: margin }}
         />
       </Grid>
-      <Grid container item xs={4} justifyContent="center">
+      <Grid container size={4} justifyContent="center">
         <Title>{formatMessage({ id: 'Final result' })}</Title>
       </Grid>
-      <Grid container item xs={4} justifyContent="flex-end">
+      <Grid container size={4} justifyContent="flex-end">
         <Title>
           {formatMessage(
             {

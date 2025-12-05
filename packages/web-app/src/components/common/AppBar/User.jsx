@@ -88,7 +88,7 @@ const UserMenu = ({
             },
             {
               userNickname: (
-                <span>
+                <span key="nickname">
                   &nbsp;
                   <b>{userNickname}</b>
                 </span>
@@ -116,14 +116,14 @@ const UserMenu = ({
                 },
                 {
                   expirationDate: (
-                    <span>
+                    <span key="date">
                       &nbsp;
                       {formatDate(authTokenExpirationDate)}
                       &nbsp;
                     </span>
                   ),
                   expirationHourAndMinutes: (
-                    <span>
+                    <span key="time">
                       &nbsp;
                       {formatTime(authTokenExpirationDate)}
                     </span>

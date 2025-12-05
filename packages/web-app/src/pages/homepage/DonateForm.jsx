@@ -2,7 +2,7 @@ import React from 'react';
 import GiftIcon from '@mui/icons-material/CardGiftcard';
 import Button from '@mui/material/Button';
 import { styled, keyframes } from '@mui/material/styles';
-import Typography from '@mui/material/Typography/Typography';
+import Typography from '@mui/material/Typography';
 import Translate from '../../components/common/Translate';
 
 const btEyeCatcher = keyframes`
@@ -65,7 +65,7 @@ const DonateFormWrapper = styled('div')`
   @media (max-width: 550px) {
     float: initial;
     max-width: 100%;
-    line-height: 5em;
+    line-height: 5rem;
     overflow: hidden;
   }
 `;

@@ -20,7 +20,7 @@ const AccordionSnapshotListPage = ({ data, type, isNetwork }) => (
       />
     }
     content={
-      data ? (
+      data && Array.isArray(data) ? (
         data.map(snapshotType =>
           snapshotType[Object.keys(snapshotType)[0]].map(snapshot => (
             <AccordionSnapshot

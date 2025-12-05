@@ -28,9 +28,11 @@ const useStyles = makeStyles({
   }
 });
 
-const LinearProgress = styled(MuiLinearProgress)`
-  visibility: ${({ $isLoading }) => ($isLoading ? 'visible' : 'hidden')};
-`;
+const LinearProgress = styled(MuiLinearProgress, {
+  shouldForwardProp: (prop) => !prop.startsWith('$')
+})(({ $isLoading }) => ({
+  visibility: $isLoading ? 'visible' : 'hidden'
+}));
 
 const StyledDivider = styled(Divider)`
   margin: ${({ theme }) => theme.spacing(3)};
