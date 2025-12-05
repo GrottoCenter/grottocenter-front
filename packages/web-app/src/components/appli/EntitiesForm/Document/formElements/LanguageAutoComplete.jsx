@@ -8,25 +8,20 @@ import {
   MenuItem,
   Select
 } from '@mui/material';
-import withStyles from '@mui/styles/withStyles';
+import { styled } from '@mui/material/styles';
 
 import DocumentFormAutoComplete from './DocumentFormAutoComplete';
 import { DocumentFormContext } from '../Provider';
 import { loadLanguages } from '../../../../../actions/Language';
 import Translate from '../../../../common/Translate';
 
-const FormControlLanguage = withStyles(
-  theme => ({
-    root: {
-      width: '100%',
-      minWidth: '120px',
-      [theme.breakpoints.up('sm')]: {
-        width: 'initial'
-      }
-    }
-  }),
-  { withTheme: true }
-)(FormControl);
+const FormControlLanguage = styled(FormControl)(({ theme }) => ({
+  width: '100%',
+  minWidth: '120px',
+  [theme.breakpoints.up('sm')]: {
+    width: 'initial'
+  }
+}));
 
 const LanguageSelect = ({
   contextValueName,

@@ -64,7 +64,6 @@ const Footer = () => {
       <WikiContainer>
         <List>
           <ListItem
-            button
             component="a"
             href={linkUrl}
             target="_blank"

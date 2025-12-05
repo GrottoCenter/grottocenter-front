@@ -110,13 +110,23 @@ const router = createBrowserRouter(
       <Route path="/ui/duplicates" element={<DuplicateImportHandle />} />
       <Route path="/ui/*" render={() => <Navigate to="/ui" replace />} />
     </Route>
-  )
+  ),
+  {
+    future: {
+      v7_startTransition: true,
+      v7_relativeSplatPath: true,
+      v7_fetcherPersist: true,
+      v7_normalizeFormMethod: true,
+      v7_partialHydration: true,
+      v7_skipActionErrorRevalidation: true
+    }
+  }
 );
 
 const App = () => (
   <StyledEngineProvider injectFirst>
-    <CssBaseline />
     <ThemeProvider theme={grottoTheme}>
+      <CssBaseline />
       <RouterProvider router={router} />
     </ThemeProvider>
   </StyledEngineProvider>

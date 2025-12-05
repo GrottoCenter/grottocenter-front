@@ -19,13 +19,13 @@ const ActionLine = ({
   const { formatMessage } = useIntl();
   return (
     <StyledGrid container direction="row" justifyContent="space-evenly">
-      <Grid item>
+      <Grid>
         <ActionButton
           label={formatMessage({ id: 'They are not duplicates' })}
           onClick={handleNotDuplicatesSubmit}
         />
       </Grid>
-      <Grid item>
+      <Grid>
         <ActionButton
           label={formatMessage({ id: 'Submit' })}
           onClick={handleSubmit}

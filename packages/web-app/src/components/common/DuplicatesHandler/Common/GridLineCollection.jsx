@@ -74,7 +74,7 @@ const GridLineCollection = ({
 
   return (
     <Grid container direction="row">
-      <Grid container item xs={4}>
+      <Grid container item size={4}>
         <LeftCellCollection
           label={label}
           values={value1}
@@ -85,7 +85,7 @@ const GridLineCollection = ({
           showAdornment={showAdornment}
         />
       </Grid>
-      <Grid container item xs={4}>
+      <Grid container item size={4}>
         <MiddleCellCollection
           label={label}
           values={stateValue}
@@ -94,7 +94,7 @@ const GridLineCollection = ({
           disabled={disabled}
         />
       </Grid>
-      <Grid container item xs={4}>
+      <Grid container item size={4}>
         <RightCellCollection
           label={label}
           values={value2}

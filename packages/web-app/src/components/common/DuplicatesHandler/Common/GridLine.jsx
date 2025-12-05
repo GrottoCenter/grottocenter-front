@@ -21,7 +21,7 @@ const GridLine = ({
   // The center cell can't be put in a function, or else each rerender will cause the loss of the focus on the input.
   return (
     <Grid container direction="row">
-      <Grid container item xs={4}>
+      <Grid container item size={4}>
         <LeftCell
           value={value1}
           label={label}
@@ -31,7 +31,7 @@ const GridLine = ({
           showAdornment={showAdornment(value1)}
         />
       </Grid>
-      <Grid container item xs={4}>
+      <Grid container item size={4}>
         <MiddleCell
           value={stateValue}
           updateState={updateState}
@@ -40,7 +40,7 @@ const GridLine = ({
           disabled={disabled}
         />
       </Grid>
-      <Grid container item xs={4}>
+      <Grid container item size={4}>
         <RightCell
           value={value2}
           label={label}

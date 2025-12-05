@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useMap } from 'react-leaflet';
 import * as L from 'leaflet';
 import { renderToString } from 'react-dom/server';
-import { BrowserRouter } from 'react-router-dom';
+import { StaticRouter } from 'react-router';
 import {
   ThemeProvider,
   StyledEngineProvider,
@@ -61,13 +61,13 @@ const useMarkers = ({
             // It's makes the map slower when there is a lot of markers
             // One way to optimize it would be to not use MUI for the markers
             <IntlProvider locale={locale} messages={messages[locale]}>
-              <BrowserRouter>
+              <StaticRouter location="/">
                 <StyledEngineProvider injectFirst>
                   <ThemeProvider theme={grottoTheme}>
                     {popupContent(marker)}
                   </ThemeProvider>
                 </StyledEngineProvider>
-              </BrowserRouter>
+              </StaticRouter>
             </IntlProvider>
           )
         );

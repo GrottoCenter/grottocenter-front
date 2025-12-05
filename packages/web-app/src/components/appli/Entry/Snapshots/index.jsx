@@ -87,7 +87,7 @@ const SnapshotPage = () => {
             <Translate
               id="{type}: Revision history"
               values={{
-                type: <Translate>{capitalize(type)}</Translate>
+                type: <Translate key="type-translate">{capitalize(type)}</Translate>
               }}
               defaultMessage={`${type}: Revision history`}
             />

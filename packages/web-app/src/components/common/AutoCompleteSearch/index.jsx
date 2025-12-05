@@ -136,7 +136,7 @@ const AutoCompleteSearch = ({
       onInputChange={handleInputChange}
       onChange={handleSelectionChange}
       options={suggestions}
-      getOptionLabel={getOptionLabel ?? (e => e?.name)}
+      getOptionLabel={getOptionLabel ?? (e => e?.name ?? '')}
       renderOption={renderOption ?? entityOptionForSelector}
       loading={isLoading}
       PopperComponent={StyledPopper(hasFixWidth)}

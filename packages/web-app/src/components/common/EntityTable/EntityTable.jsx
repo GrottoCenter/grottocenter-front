@@ -10,7 +10,6 @@ import {
   IconButton,
   Button,
   Checkbox,
-  CircularProgress,
   LinearProgress,
   Menu,
   MenuItem,
@@ -270,14 +269,14 @@ const EntityTable = ({
 
   if (!pageRows) return null;
 
-  let TableContent = (
-    <Box sx={{ margin: 2 }}>
-      <CircularProgress />
-    </Box>
-  );
+  let TableContent;
   if (pageRows.length === 0) {
     TableContent = (
-      <Alert severity="info" title={formatMessage({ id: 'No results' })} />
+      <TableRow>
+        <TableCell colSpan={entityColumns.filter(e => e[0]).length + (onSelected ? 1 : 0)}>
+          <Alert severity="info" title={formatMessage({ id: 'No results' })} />
+        </TableCell>
+      </TableRow>
     );
   } else {
     TableContent = pageRows.map(doc => {

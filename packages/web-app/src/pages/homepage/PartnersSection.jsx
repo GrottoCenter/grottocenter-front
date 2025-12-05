@@ -1,17 +1,16 @@
 import React from 'react';
 import { styled } from '@mui/material/styles';
-import withTheme from '@mui/styles/withTheme';
 import LandingSection from './LandingSection';
 import { GridRow, GridFullColumn } from '../../helpers/GridSystem';
 import PartnersCarouselContainer from '../../containers/PartnersCarouselContainer';
 import Translate from '../../components/common/Translate';
 
-const SectionTitle = withTheme(styled('h3')`
-  color: ${props => props.theme.palette.accent1Color};
-  text-align: center;
-  padding-bottom: 20px;
-  font-size: 35px;
-`);
+const SectionTitle = styled('h3')(({ theme }) => ({
+  color: theme.palette.accent1Color,
+  textAlign: 'center',
+  paddingBottom: '20px',
+  fontSize: '35px'
+}));
 
 const PartnersSection = () => (
   <LandingSection>

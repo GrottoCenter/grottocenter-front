@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
+import { styled } from '@mui/material/styles';
 
 import { displayLoginDialog } from '../../actions/Login';
 
@@ -15,6 +16,10 @@ import Footer from './Footer';
 
 import { usePermissions } from '../../hooks';
 import DataHomepage from '../../components/appli/DataHomepage';
+
+const HomepageWrapper = styled('div')`
+  font-family: Roboto, Helvetica, Arial, sans-serif;
+`;
 
 const HomePage = () => {
   const location = useLocation();
@@ -32,7 +37,7 @@ const HomePage = () => {
   }, []);
 
   return (
-    <>
+    <HomepageWrapper>
       <Header />
       <Welcome />
       <DataHomepage />
@@ -42,7 +47,7 @@ const HomePage = () => {
       <Association />
       <PartnersSection />
       <Footer />
-    </>
+    </HomepageWrapper>
   );
 };
 

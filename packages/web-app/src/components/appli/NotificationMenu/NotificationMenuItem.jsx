@@ -12,13 +12,13 @@ const Icon = styled('img')`
   width: ${ICON_WIDTH};
 `;
 
-const StyledMenuItem = styled(MenuItem)`
-  ${({ $isRead, theme, $width }) => `
-    background: ${!$isRead && theme.palette.secondary.veryLight};
-    white-space: normal;
-    width: ${$width}px;
-  `}
-`;
+const StyledMenuItem = styled(MenuItem, {
+  shouldForwardProp: (prop) => !prop.startsWith('$')
+})(({ $isRead, theme, $width }) => ({
+  background: !$isRead && theme.palette.secondary.veryLight,
+  whiteSpace: 'normal',
+  width: `${$width}px`
+}));
 
 const NotificationsMenuItem = ({ notification, onClick, width }) => {
   const { formatDate, formatMessage, formatTime } = useIntl();
@@ -80,7 +80,7 @@ const NotificationsMenuItem = ({ notification, onClick, width }) => {
             {
               dateDay: formatDate(dateInscription),
               dateHour: formatTime(dateInscription),
-              nickname: <b>{notifier.nickname}</b>
+              nickname: <b key="nickname">{notifier.nickname}</b>
             }
           )}
         </Typography>

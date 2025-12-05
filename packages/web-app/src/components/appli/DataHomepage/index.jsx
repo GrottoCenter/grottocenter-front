@@ -22,7 +22,7 @@ const SectionTitle = styled('h3')`
 
 const BlockIcon = styled('span')`
   margin-right: 10px;
-  font-size: 4.2em;
+  font-size: 4.2rem;
   color: ${({ theme }) => theme.palette.primary1Color};
   line-height: 1;
 
@@ -90,7 +90,7 @@ const DataHomepage = () => {
         )}
         {/* Rest of the grid */}
         <Grid container>
-          <Grid item xs={12} sm={4}>
+          <Grid size={{ xs: 12, sm: 4 }}>
             {entrances && (
               <StyledLink internal href="/ui/search/entry">
                 <DataCard
@@ -111,7 +111,7 @@ const DataHomepage = () => {
             )}
           </Grid>
 
-          <Grid item xs={12} sm={4}>
+          <Grid size={{ xs: 12, sm: 4 }}>
             {users && (
               <DataCard
                 isColored
@@ -125,7 +125,7 @@ const DataHomepage = () => {
               />
             )}
           </Grid>
-          <Grid item xs={12} sm={4}>
+          <Grid size={{ xs: 12, sm: 4 }}>
             {documents && (
               <StyledLink internal href="/ui/search/document">
                 <DataCard
@@ -148,7 +148,7 @@ const DataHomepage = () => {
             )}
           </Grid>
 
-          <Grid item xs={12} sm={4}>
+          <Grid size={{ xs: 12, sm: 4 }}>
             {countries && (
               <StyledLink internal href="/ui/countries">
                 <DataCard
@@ -165,7 +165,7 @@ const DataHomepage = () => {
               </StyledLink>
             )}
           </Grid>
-          <Grid item xs={12} sm={4}>
+          <Grid size={{ xs: 12, sm: 4 }}>
             {cumulatedLength && (
               <StyledLink internal href="/ui/search/entry">
                 <DataCard
@@ -193,7 +193,7 @@ const DataHomepage = () => {
               </StyledLink>
             )}
           </Grid>
-          <Grid item xs={12} sm={4}>
+          <Grid size={{ xs: 12, sm: 4 }}>
             {organizations && (
               <StyledLink internal href="/ui/search/organization">
                 <DataCard

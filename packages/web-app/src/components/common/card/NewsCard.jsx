@@ -11,94 +11,68 @@ import ImageLoupe from '@mui/icons-material/Loupe';
 import SyncIcon from '@mui/icons-material/Sync';
 import SyncKOIcon from '@mui/icons-material/SyncProblem';
 import Divider from '@mui/material/Divider';
-import withStyles from '@mui/styles/withStyles';
 import { styled } from '@mui/material/styles';
 import GCLink from '../GCLink';
 import { DYNAMIC_NEWS_RELOAD_INTERVAL } from '../../../conf/config';
 
-const StyledCardMedia = withStyles({
-  root: {
-    height: '150px'
-  }
-})(CardMedia);
+const StyledCardMedia = styled(CardMedia)({
+  height: '150px'
+});
 
-const StyledCardContent = withStyles({
-  root: {
-    minHeight: '150px',
-    textAlign: 'justify'
-  }
-})(CardContent);
+const StyledCardContent = styled(CardContent)({
+  minHeight: '150px',
+  textAlign: 'justify'
+});
 
-const StyledCardActions = withStyles({
-  root: {
-    justifyContent: 'flex-end'
-  }
-})(CardActions);
+const StyledCardActions = styled(CardActions)({
+  justifyContent: 'flex-end'
+});
 
-const StyledCard = withStyles(
-  theme => ({
-    root: {
-      '&:nth-of-type(n+1)': {
-        marginTop: '4%',
-        [theme.breakpoints.up('550')]: {
-          marginTop: '0'
-        }
-      }
+const StyledCard = styled(Card)(({ theme }) => ({
+  '&:nth-of-type(n+1)': {
+    marginTop: '4%',
+    [theme.breakpoints.up('550')]: {
+      marginTop: '0'
     }
-  }),
-  { withTheme: true }
-)(Card);
+  }
+}));
 
 const StyledActionCard = styled(StyledCard)`
   text-align: center !important;
 `;
 
-const StyledSyncIcon = withStyles(
-  theme => ({
-    root: {
-      '&:hover': {
-        fill: theme.palette.accent1Color
-      },
-      fill: theme.palette.primary3Color
-    }
-  }),
-  { withTheme: true }
-)(SyncIcon);
+const StyledSyncIcon = styled(SyncIcon)(({ theme }) => ({
+  '&:hover': {
+    fill: theme.palette.accent1Color
+  },
+  fill: theme.palette.primary3Color
+}));
 
-const StyledSyncKOIcon = withStyles(
-  theme => ({
-    root: {
-      '&:hover': {
-        fill: theme.palette.accent1Color
-      },
-      fill: theme.palette.primary3Color
-    }
-  }),
-  { withTheme: true }
-)(SyncKOIcon);
+const StyledSyncKOIcon = styled(SyncKOIcon)(({ theme }) => ({
+  '&:hover': {
+    fill: theme.palette.accent1Color
+  },
+  fill: theme.palette.primary3Color
+}));
 
-const StyledImageLoupe = withStyles(
-  theme => ({
-    root: {
-      fill: theme.palette.accent1Color
-    }
-  }),
-  { withTheme: true }
-)(ImageLoupe);
+const StyledImageLoupe = styled(ImageLoupe)(({ theme }) => ({
+  fill: theme.palette.accent1Color
+}));
 
-const StyledTitleTypography = withStyles({
-  root: {
-    fontSize: '24px',
-    minHeight: '60px'
-  }
-})(Typography);
+const StyledTitleTypography = styled(Typography)(({ theme }) => ({
+  '&.MuiTypography-root': {
+    fontSize: '24px'
+  },
+  minHeight: '60px'
+}));
 
-const StyledBodyTypography = withStyles({
-  root: {
+const StyledBodyTypography = styled(Typography)({
+  '&.MuiTypography-root': {
     fontSize: '14px',
-    textAlign: 'justify'
-  }
-})(Typography);
+    letterSpacing: '0.00938em'
+  },
+  textAlign: 'justify'
+});
 
 class NewsCard extends Component {
   constructor(props) {

@@ -1,7 +1,6 @@
 import React from 'react';
 import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
-import withStyles from '@mui/styles/withStyles';
 import CheckIcon from '@mui/icons-material/Check';
 import Card from '@mui/material/Card';
 import CardTitle from '@mui/material/CardHeader';
@@ -22,48 +21,28 @@ const FaqDiv = styled('div')`
   margin: 20px;
 `;
 
-const StyledCard = withStyles(
-  () => ({
-    root: {
-      marginBottom: '20px'
-    }
-  }),
-  { withTheme: true }
-)(Card);
+const StyledCard = styled(Card)({
+  marginBottom: '20px'
+});
 
-const StyledCardHeader = withStyles(
-  theme => ({
-    root: {
-      backgroundColor: theme.palette.secondary1Color
-    },
-    title: {
-      color: theme.palette.secondaryBlocTitle
-    }
-  }),
-  { withTheme: true }
-)(CardTitle);
+const StyledCardHeader = styled(CardTitle)(({ theme }) => ({
+  backgroundColor: theme.palette.secondary1Color,
+  '& .MuiCardHeader-title': {
+    color: theme.palette.secondaryBlocTitle
+  }
+}));
 
-const StyledCardText = withStyles(
-  theme => ({
-    root: {
-      backgroundColor: theme.palette.textIconColor
-    }
-  }),
-  { withTheme: true }
-)(CardText);
+const StyledCardText = styled(CardText)(({ theme }) => ({
+  backgroundColor: theme.palette.textIconColor
+}));
 
 const ItemList = styled('ul')`
   list-style-type: none;
 `;
 
-const StyledCheckIcon = withStyles(
-  theme => ({
-    root: {
-      color: theme.palette.accent1Color
-    }
-  }),
-  { withTheme: true }
-)(CheckIcon);
+const StyledCheckIcon = styled(CheckIcon)(({ theme }) => ({
+  color: theme.palette.accent1Color
+}));
 const FaqCard = ({ title, children }) => {
   const [show, setShow] = React.useState(false);
   return (
@@ -125,7 +104,7 @@ const Faq = () => {
               values={{
                 0: (
                   <GCLink href={contributeLink} alt="Link to become a member">
-                    <Translate id="as active member" />
+                    <Translate key="member" id="as active member" />
                   </GCLink>
                 )
               }}
@@ -140,7 +119,7 @@ const Faq = () => {
                   <GCLink
                     href={contributeLink}
                     alt="Link to become a translator">
-                    <Translate id="looking for translators" />
+                    <Translate key="translator" id="looking for translators" />
                   </GCLink>
                 )
               }}
@@ -155,7 +134,7 @@ const Faq = () => {
                   <GCLink
                     href={contributeLink}
                     alt="Link to become a developer">
-                    <Translate id="joining our team of developers" />
+                    <Translate key="developer" id="joining our team of developers" />
                   </GCLink>
                 )
               }}
@@ -168,7 +147,7 @@ const Faq = () => {
               values={{
                 0: (
                   <GCLink href={contributeLink} alt="Link to become a partner">
-                    <Translate id="you can be  one of our partners" />
+                    <Translate key="partner" id="you can be  one of our partners" />
                   </GCLink>
                 )
               }}

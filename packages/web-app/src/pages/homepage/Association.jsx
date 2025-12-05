@@ -1,7 +1,5 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-import { styled } from '@mui/material/styles';
-import withTheme from '@mui/styles/withTheme';
+import { styled, useTheme } from '@mui/material/styles';
 import LandingSection from './LandingSection';
 import {
   GridRow,
@@ -106,10 +104,8 @@ const listEntries = {
   ]
 };
 
-const Association = props => {
-  const {
-    theme: { palette }
-  } = props;
+const Association = () => {
+  const { palette } = useTheme();
 
   return (
     <AssociationSection
@@ -159,15 +155,4 @@ const Association = props => {
   );
 };
 
-Association.propTypes = {
-  theme: PropTypes.shape({
-    palette: PropTypes.shape({
-      accent1Color: PropTypes.string.isRequired,
-      primary1Color: PropTypes.string.isRequired,
-      primary3Color: PropTypes.string.isRequired,
-      textIconColor: PropTypes.string.isRequired
-    })
-  }).isRequired
-};
-
-export default withTheme(Association);
+export default Association;

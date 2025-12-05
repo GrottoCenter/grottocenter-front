@@ -1,6 +1,7 @@
 /* eslint-disable react/no-array-index-key */
 import React from 'react';
-import { Fab, Grid, InputAdornment, Typography, useTheme } from '@mui/material';
+import { Fab, InputAdornment, Typography, useTheme } from '@mui/material';
+import { Grid } from '@mui/material';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import RemoveIcon from '@mui/icons-material/Remove';
@@ -30,7 +31,6 @@ export const RightCellCollection = ({
     <Grid container direction="column" alignItems="flex-end">
       <Grid
         container
-        item
         direction="row"
         justifyContent="flex-end"
         alignItems="center">
@@ -95,14 +95,14 @@ export const MiddleCellCollection = ({
   render,
   disabled
 }) => (
-  <Grid container item direction="column" alignItems="center">
+  <Grid container direction="column" alignItems="center">
     <Typography variant="h5" color="primary">
       {label}
     </Typography>
     {Array.isArray(values) &&
       values.map((state, index) => (
         <Grid key={index} container direction="row" alignItems="center">
-          <Grid item xs={10}>
+          <Grid size={10}>
             <StringInput
               key={state}
               value={render(state)}
@@ -111,7 +111,7 @@ export const MiddleCellCollection = ({
               disabled={disabled}
             />
           </Grid>
-          <Grid item xs={2}>
+          <Grid size={2}>
             <MarginLeftDiv>
               <Fab
                 onClick={() => updateState(state)}
@@ -144,7 +144,6 @@ export const LeftCellCollection = ({
     <Grid container direction="column">
       <Grid
         container
-        item
         direction="row"
         justifyContent="flex-start"
         alignItems="center">
@@ -161,7 +160,7 @@ export const LeftCellCollection = ({
       </Grid>
       {Array.isArray(values) &&
         values.map((value, index) => (
-          <Grid key={index} container item direction="row" alignItems="center">
+          <Grid key={index} container direction="row" alignItems="center">
             <MarginLeftDiv>
               <StringInput
                 key={value}

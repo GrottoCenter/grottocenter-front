@@ -38,7 +38,7 @@ const CenteredText = styled('div')`
     left: ~'calc((100% - 200px) / 2)';
     width: 200px;
     height: 150px;
-    font-size: 1.55em;
+    font-size: 1.55rem;
   }
 `;
 
@@ -48,7 +48,7 @@ const GoalWrapper = styled(FlyingGoal)`
     width: 129px;
     text-align: center;
     float: left;
-    font-size: 1.9em;
+    font-size: 1.9rem;
     font-weight: 400;
 
     & > span {

@@ -36,7 +36,7 @@ const cellsRender = {
     return value;
   },
   keyArray: key => value =>
-    !value ? null : value.map(e => e[key]).join(', ') || '-',
+    !value || !Array.isArray(value) ? null : value.map(e => e[key]).join(', ') || '-',
   translate: value => (!value ? null : <Translate>{value}</Translate>),
   ellipsis: value =>
     value && value.length > 60 ? `${value.substring(0, 60)}...` : value,

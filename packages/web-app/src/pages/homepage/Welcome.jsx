@@ -1,8 +1,6 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-import { styled } from '@mui/material/styles';
+import { styled, useTheme } from '@mui/material/styles';
 import { useIntl } from 'react-intl';
-import withTheme from '@mui/styles/withTheme';
 import LandingSection from './LandingSection';
 import {
   GridRow,
@@ -41,7 +39,8 @@ const WelcomeSection = styled(LandingSection)`
   }
 `;
 
-const Welcome = ({ theme }) => {
+const Welcome = () => {
+  const theme = useTheme();
   const { formatMessage } = useIntl();
   return (
     <WelcomeSection
@@ -86,14 +85,4 @@ const Welcome = ({ theme }) => {
   );
 };
 
-Welcome.propTypes = {
-  theme: PropTypes.shape({
-    palette: PropTypes.shape({
-      secondaryBlocTitle: PropTypes.string,
-      primary1Color: PropTypes.string,
-      accent1Color: PropTypes.string
-    })
-  }).isRequired
-};
-
-export default withTheme(Welcome);
+export default Welcome;

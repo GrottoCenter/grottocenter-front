@@ -1,7 +1,8 @@
 // DataHomepage
 import React from 'react';
 import { useIntl } from 'react-intl';
-import { Box, CircularProgress, Grid, Typography } from '@mui/material';
+import { Box, CircularProgress, Typography } from '@mui/material';
+import { Grid } from '@mui/material';
 import { alpha, styled } from '@mui/material/styles';
 import PropTypes from 'prop-types';
 
@@ -31,12 +32,12 @@ const DataLine = props => {
         justifyContent="center"
         alignItems="center">
         <>
-          <Grid item xs={10} sm={4}>
+          <Grid size={{ xs: 10, sm: 4 }}>
             <Grid container direction="row" alignItems="center">
-              <Grid item xs={5} sm={4}>
+              <Grid size={{ xs: 5, sm: 4 }}>
                 {icon}
               </Grid>
-              <Grid item xs={7} sm={8}>
+              <Grid size={{ xs: 7, sm: 8 }}>
                 <Box
                   style={{
                     display: 'flex',
@@ -58,7 +59,7 @@ const DataLine = props => {
               </Grid>
             </Grid>
           </Grid>
-          <Grid item xs={10} sm={8}>
+          <Grid size={{ xs: 10, sm: 8 }}>
             <Typography
               variant="body1"
               style={{
