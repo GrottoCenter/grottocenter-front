@@ -15,10 +15,6 @@ const Convert = React.lazy(() => import('./Convert'));
 const Button = styled(MuiButton)`
   background: ${props => props.theme.palette.backgroundButton};
   color: black;
-
-  &:hover {
-    color: white;
-  }
 `;
 
 const isNilOrEmpty = anyPass([isNil, isEmpty]);
@@ -48,13 +44,14 @@ const ConverterControl = ({
         startIcon={<ConvertIcon fontSize="inherit" />}
         // TODO enable on fullscreen as it's currently hidden
         disabled={fullScreen || isNilOrEmpty(projectionsList)}>
-        {formatMessage({ id: 'Converter' })}
+        {formatMessage({ id: 'Convert' })}
       </Button>
       {!isNilOrEmpty(projectionsList) && (
         <StandardDialog
           title={formatMessage({ id: 'Converter' })}
           open={Boolean(anchorEl)}
-          onClose={handleClose}>
+          onClose={handleClose}
+          scrollable>
           <Suspense
             fallback={
               <>
@@ -63,7 +60,7 @@ const ConverterControl = ({
                 <Skeleton width={100} />
               </>
             }>
-            <Convert list={projectionsList} />
+            <Convert list={projectionsList} formatMessage={formatMessage} />
           </Suspense>
         </StandardDialog>
       )}

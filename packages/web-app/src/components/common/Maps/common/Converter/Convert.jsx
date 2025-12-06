@@ -2,6 +2,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import proj4 from 'proj4';
+import {groupBy} from 'ramda';
 import Button from '@mui/material/Button';
 import {styled} from '@mui/material/styles';
 import Input from '@mui/material/Input';
@@ -11,22 +12,21 @@ import Select from '@mui/material/Select';
 import Divider from '@mui/material/Divider';
 import {unitsTab} from '../../../../../conf/ListGPSProj';
 import Translate from '../../../Translate';
+import getLocalizedCountryName from '../../../../../helpers/countryName';
 
 const MainContainer = styled('div')(({ theme }) => ({
-    backgroundColor: theme.palette.primary1Color,
-    padding: '10px'
 }));
 
 const SubContainer = styled('div')(({ theme }) => ({
     backgroundColor: theme.palette.primary3Color,
-    padding: '10px',
-    margin: '20px',
+    padding: '5px',
+    margin: '5px',
     textAlign: 'center'
 }));
 
 const BottomContainer = styled('div')({
-    padding: '10px',
-    margin: '20px',
+    padding: '5px',
+    margin: '5px',
     textAlign: 'center'
 });
 
@@ -41,19 +41,13 @@ const SubElement = styled('div')({
 
 const StyledInput = styled(Input)(({ theme }) => ({
     background: theme.palette.backgroundButton,
-    border: '1px solid',
-    borderColor: theme.palette.borderColor,
-    padding: '7px',
-    margin: '10px',
+    padding: '5px',
+    margin: '5px',
     fontSize: 'small'
 }));
 
 const StyledSelect = styled(Select)(({ theme }) => ({
-    background: theme.palette.backgroundButton,
-    border: '1px solid',
-    borderColor: theme.palette.borderColor,
-    padding: '7px',
-    margin: '10px'
+    background: theme.palette.backgroundButton
 }));
 
 const MenuItemGroup = styled(MenuItem)({
@@ -68,13 +62,8 @@ const StyledMenuItem = styled(MenuItem)({
 
 const ConvertButton = styled(Button)(({ theme }) => ({
     background: theme.palette.backgroundButton,
-    border: '1px solid',
-    borderColor: theme.palette.borderColor,
-    borderRadius: '4px',
-    padding: '0 20px',
-    '&:hover': {
-        background: theme.palette.backgroundButton
-    }
+    color: theme.palette.text.primary,
+    padding: '0 20px'
 }));
 
 const StyledDivider = styled(Divider)(({ theme }) => ({
@@ -84,6 +73,7 @@ const StyledDivider = styled(Divider)(({ theme }) => ({
 
 const StyledTitle = styled('h5')`
     font-weight: bold;
+    margin-bottom: 5px;
 `;
 
 class Convert extends React.Component {
@@ -102,6 +92,14 @@ class Convert extends React.Component {
             [res] = tmp;
         }
         return res;
+    }
+
+    static getUTMZone(wgs84lng) {
+        return wgs84lng >= 0 ? Math.floor((wgs84lng + 180) / 6) + 1 : Math.floor(wgs84lng / 6) + 31;
+    }
+
+    static getHemisphere(wgs84Lat) {
+        return wgs84Lat >= 0 ? 'North' : 'South';
     }
 
     constructor(props) {
@@ -126,6 +124,7 @@ class Convert extends React.Component {
             hemiInput: 'North',
             hemiOutput: 'North',
             zoneInput: 31,
+            zoneOutput: 31,
             projectionsList: props.list
         };
     }
@@ -135,14 +134,18 @@ class Convert extends React.Component {
         const unitInput = this.getUnits(keyGPSInput);
         const unitOutput = this.getUnits(keyGPSOutput);
 
-        this.setState({xNameInput: unitsTab[unitInput].xName});
-        this.setState({xUnitInput: unitsTab[unitInput].xUnit});
-        this.setState({yNameInput: unitsTab[unitInput].yName});
-        this.setState({yUnitInput: unitsTab[unitInput].yUnit});
-        this.setState({xNameOutput: unitsTab[unitOutput].xName});
-        this.setState({xUnitOutput: unitsTab[unitOutput].xUnit});
-        this.setState({yNameOutput: unitsTab[unitOutput].yName});
-        this.setState({yUnitOutput: unitsTab[unitOutput].yUnit});
+        if (unitInput && unitsTab[unitInput]) {
+            this.setState({xNameInput: unitsTab[unitInput].xName});
+            this.setState({xUnitInput: unitsTab[unitInput].xUnit});
+            this.setState({yNameInput: unitsTab[unitInput].yName});
+            this.setState({yUnitInput: unitsTab[unitInput].yUnit});
+        }
+        if (unitOutput && unitsTab[unitOutput]) {
+            this.setState({xNameOutput: unitsTab[unitOutput].xName});
+            this.setState({xUnitOutput: unitsTab[unitOutput].xUnit});
+            this.setState({yNameOutput: unitsTab[unitOutput].yName});
+            this.setState({yUnitOutput: unitsTab[unitOutput].yUnit});
+        }
     }
 
     getDef(keyGps) {
@@ -172,40 +175,55 @@ class Convert extends React.Component {
     };
 
     handleChangeGPSInput = event => {
-        this.setState({keyGPSInput: event.target.value});
+        const units = this.getUnits(event.target.value);
+        const unitConfig = unitsTab[units] || unitsTab.m;
         this.setState({
-            xNameInput: unitsTab[this.getUnits(event.target.value)].xName
+            keyGPSInput: event.target.value,
+            xNameInput: unitConfig.xName,
+            xUnitInput: unitConfig.xUnit,
+            yNameInput: unitConfig.yName,
+            yUnitInput: unitConfig.yUnit,
+            utmInput: this.isUtm(event.target.value),
+            valueXInput: '',
+            valueYInput: '',
+            valueXOutput: '',
+            valueYOutput: '',
+            zoneInput: 0,
+            hemiInput: 'North',
+            zoneOutput: 0,
+            hemiOutput: 'North'
         });
-        this.setState({
-            xUnitInput: unitsTab[this.getUnits(event.target.value)].xUnit
-        });
-        this.setState({
-            yNameInput: unitsTab[this.getUnits(event.target.value)].yName
-        });
-        this.setState({
-            yUnitInput: unitsTab[this.getUnits(event.target.value)].yUnit
-        });
-        this.setState({utmInput: this.isUtm(event.target.value)});
     };
 
     handleChangeGPSOutput = event => {
-        this.setState({keyGPSOutput: event.target.value});
+        const units = this.getUnits(event.target.value);
+        const unitConfig = unitsTab[units] || unitsTab.m;
         this.setState({
-            xNameOutput: unitsTab[this.getUnits(event.target.value)].xName
+            keyGPSOutput: event.target.value,
+            xNameOutput: unitConfig.xName,
+            xUnitOutput: unitConfig.xUnit,
+            yNameOutput: unitConfig.yName,
+            yUnitOutput: unitConfig.yUnit,
+            utmOutput: this.isUtm(event.target.value)
+        }, () => {
+            if (this.state.valueXInput && this.state.valueYInput) {
+                this.handleConvert({preventDefault: () => {}});
+            }
         });
-        this.setState({
-            xUnitOutput: unitsTab[this.getUnits(event.target.value)].xUnit
-        });
-        this.setState({
-            yNameOutput: unitsTab[this.getUnits(event.target.value)].yName
-        });
-        this.setState({
-            yUnitOutput: unitsTab[this.getUnits(event.target.value)].yUnit
-        });
-        this.setState({utmOutput: this.isUtm(event.target.value)});
+    };
+
+    buildUTMProjection = (definition, zone, hemisphere) => {
+        let projection = Convert.addZone(definition, zone);
+        projection = Convert.removeSouth(projection);
+        if (hemisphere === 'South') {
+            projection += ' +south';
+        }
+        return projection;
     };
 
     handleConvert = event => {
+        event.preventDefault();
+
         const {
             keyGPSInput,
             keyGPSOutput,
@@ -213,48 +231,54 @@ class Convert extends React.Component {
             valueYInput,
             utmInput,
             zoneInput,
-            zoneOutput,
             hemiInput,
-            hemiOutput,
             utmOutput
         } = this.state;
+
+        if (!valueXInput || !valueYInput) {
+            return;
+        }
+
+        const inputUnits = this.getUnits(keyGPSInput);
+        const outputUnits = this.getUnits(keyGPSOutput);
+        
         let firstProjection = this.getDef(keyGPSInput);
         let secondProjection = this.getDef(keyGPSOutput);
-        let xValue = valueXInput;
-        let yValue = valueYInput;
-        if (this.getUnits(keyGPSInput) === 'degrees') {
-            xValue = valueYInput;
-            yValue = valueXInput;
-        }
+        
+        const xValue = inputUnits === 'degrees' ? valueYInput : valueXInput;
+        const yValue = inputUnits === 'degrees' ? valueXInput : valueYInput;
 
         if (utmInput) {
-            firstProjection = this.addZone(firstProjection, zoneInput);
-            firstProjection = this.removeSouth(firstProjection);
-            if (hemiInput === 'South') {
-                firstProjection += ' +south';
-            }
+            firstProjection = this.buildUTMProjection(firstProjection, zoneInput, hemiInput);
         }
+
+        const newState = {};
 
         if (utmOutput) {
-            secondProjection = this.addZone(secondProjection, zoneOutput);
-            secondProjection = this.removeSouth(secondProjection);
-            if (hemiOutput === 'South') {
-                secondProjection += ' +south';
-            }
+            const wgs84Def = this.getDef('WGS84');
+            const [lng, lat] = proj4(firstProjection, wgs84Def, [parseFloat(xValue), parseFloat(yValue)]);
+            const calculatedZone = Convert.getUTMZone(lng);
+            const calculatedHemi = Convert.getHemisphere(lat);
+            
+            secondProjection = this.buildUTMProjection(secondProjection, calculatedZone, calculatedHemi);
+            newState.zoneOutput = calculatedZone;
+            newState.hemiOutput = calculatedHemi;
         }
 
-        const tmp = proj4(firstProjection, secondProjection, [
-            parseInt(xValue, 10),
-            parseInt(yValue, 10)
+        const [convertedX, convertedY] = proj4(firstProjection, secondProjection, [
+            parseFloat(xValue),
+            parseFloat(yValue)
         ]);
 
-        if (this.getUnits(keyGPSOutput) === 'degrees') {
-            this.setState({valueXOutput: tmp[1], valueYOutput: tmp[0]});
+        if (outputUnits === 'degrees') {
+            newState.valueXOutput = convertedY;
+            newState.valueYOutput = convertedX;
         } else {
-            this.setState({valueXOutput: tmp[0], valueYOutput: tmp[1]});
+            newState.valueXOutput = convertedX;
+            newState.valueYOutput = convertedY;
         }
 
-        event.preventDefault();
+        this.setState(newState);
     };
 
     isUtm(keyGps) {
@@ -268,7 +292,8 @@ class Convert extends React.Component {
     }
 
     render() {
-        const {formatMessage} = this.props;
+        const {formatMessage, intl} = this.props;
+        const locale = intl?.locale || 'en';
         const {
             hemiInput,
             hemiOutput,
@@ -277,6 +302,8 @@ class Convert extends React.Component {
             projectionsList,
             utmInput,
             utmOutput,
+            valueXInput,
+            valueYInput,
             valueXOutput,
             valueYOutput,
             xNameInput,
@@ -286,28 +313,32 @@ class Convert extends React.Component {
             xUnitInput,
             xUnitOutput,
             yUnitInput,
-            yUnitOutput
+            yUnitOutput,
+            zoneOutput
         } = this.state;
         // Recover all the coodinates system for options select
+        const groupedProjections = groupBy(
+            p => getLocalizedCountryName(p, formatMessage, locale, p.en_name) || formatMessage({id: 'World'}),
+            projectionsList
+        );
         const options = [];
-        let actualCountry = 'World';
-        options.push(<MenuItemGroup disabled>World</MenuItemGroup>);
+        const worldLabel = formatMessage({id: 'World'});
 
-        projectionsList.forEach(projection => {
-            if (projection.fr_name && actualCountry !== projection.fr_name) {
-                actualCountry = projection.fr_name;
-                options.push(
-                    <MenuItemGroup key={projection.code} disabled>
-                        {actualCountry}
-                    </MenuItemGroup>
-                );
-            } else {
+        Object.entries(groupedProjections)
+            .sort(([a], [b]) => a === worldLabel ? -1 : b === worldLabel ? 1 : a.localeCompare(b))
+            .forEach(([countryName, projections]) => {
+            options.push(
+                <MenuItemGroup key={countryName} disabled>
+                    {countryName}
+                </MenuItemGroup>
+            );
+            projections.forEach(projection => {
                 options.push(
                     <StyledMenuItem key={projection.code} value={projection.code}>
                         {projection.title}
                     </StyledMenuItem>
                 );
-            }
+            });
         });
 
         return (
@@ -336,21 +367,23 @@ class Convert extends React.Component {
 
                     {/* UTM SECTION HEMISPHERE AND ZONE INPUT */}
                     {utmInput && [
-                        <Element id="hemisphereInput">
-                            <SubElement>{' Hemisphere : '}</SubElement>
-                            <FormControl>
-                                <StyledSelect
-                                    value={hemiInput}
-                                    onChange={event =>
-                                        this.handleStateChange('hemiInput', event.target.value)
-                                    }>
-                                    <StyledMenuItem value="North">North</StyledMenuItem>
-                                    <StyledMenuItem value="South">South</StyledMenuItem>
-                                </StyledSelect>
-                            </FormControl>
-                        </Element>,
-                        <div id="zoneInput">
-                            {' Zone : '}
+                        <div key="hemisphereInput" id="hemisphereInput">
+                            <Translate>Hemisphere:</Translate>
+                            <StyledSelect
+                                value={hemiInput}
+                                onChange={event =>
+                                    this.handleStateChange('hemiInput', event.target.value)
+                                }>
+                                <StyledMenuItem value="North">
+                                  <Translate>North</Translate>
+                                </StyledMenuItem>
+                                <StyledMenuItem value="South">
+                                  <Translate>South</Translate>
+                                </StyledMenuItem>
+                            </StyledSelect>
+                        </div>,
+                        <div key="zoneInput" id="zoneInput">
+                            <Translate>Zone:</Translate>
                             <StyledInput
                                 type="number"
                                 placeholder={formatMessage({id: '0'})}
@@ -367,6 +400,7 @@ class Convert extends React.Component {
                         {' : '}
                         <StyledInput
                             type="number"
+                            value={valueXInput}
                             placeholder={formatMessage({id: '0'})}
                             onChange={event =>
                                 this.handleStateChange('valueXInput', event.target.value)
@@ -380,6 +414,7 @@ class Convert extends React.Component {
                         {' : '}
                         <StyledInput
                             type="number"
+                            value={valueYInput}
                             placeholder={formatMessage({id: '0'})}
                             style={{marginLeft: '5px'}}
                             onChange={event =>
@@ -419,27 +454,25 @@ class Convert extends React.Component {
 
                     {/* UTM SECTION HEMISPHERE AND ZONE OUTPUT */}
                     {utmOutput && [
-                        <Element id="hemisphereOutput">
-                            <SubElement>{' Hemisphere : '}</SubElement>
-                            <FormControl>
-                                <StyledSelect
-                                    value={hemiOutput}
-                                    onChange={event =>
-                                        this.handleStateChange('hemiOutput', event.target.value)
-                                    }>
-                                    <StyledMenuItem value="North">North</StyledMenuItem>
-                                    <StyledMenuItem value="South">South</StyledMenuItem>
-                                </StyledSelect>
-                            </FormControl>
-                        </Element>,
-                        <div id="zoneOutput">
-                            {' Zone : '}
+                        <div key="hemisphereOutput" id="hemisphereOutput">
+                          <Translate>Hemisphere:</Translate>
+                          <StyledSelect
+                            value={hemiOutput}
+                            disabled>
+                            <StyledMenuItem value="North">
+                              <Translate>North</Translate>
+                            </StyledMenuItem>
+                            <StyledMenuItem value="South">
+                              <Translate>South</Translate>
+                            </StyledMenuItem>
+                          </StyledSelect>
+                        </div>,
+                        <div key="zoneOutput" id="zoneOutput">
+                            <Translate>Zone:</Translate>
                             <StyledInput
                                 type="number"
-                                placeholder={formatMessage({id: '0'})}
-                                onChange={event =>
-                                    this.handleStateChange('zoneOutput', event.target.value)
-                                }
+                                value={zoneOutput}
+                                disabled
                             />
                         </div>
                     ]}
@@ -468,11 +501,14 @@ class Convert extends React.Component {
                 {/* BOTTOM SECTION */}
                 <BottomContainer id="bottom">
           <span>
-            Basé sur la librairie <a href="http://proj4js.org">Proj4js</a> et
-            sur le projet <a href="http://trac.osgeo.org/proj">Proj.4</a>,{' '}
-              <br/>
-            ce convertisseur utilise les constantes de conversion de{' '}
-              <a href="http://spatialreference.org">Spatial Reference</a>.
+            <Translate
+              id="Based on the library {proj4jsLink} and the project {proj4Link}, this converter uses the conversion constants from {spatialReferenceLink}."
+              values={{
+                proj4jsLink: <a key="proj4js" href="http://proj4js.org">Proj4js</a>,
+                proj4Link: <a key="proj4" href="http://trac.osgeo.org/proj">Proj.4</a>,
+                spatialReferenceLink: <a key="spatialref" href="http://spatialreference.org">Spatial Reference</a>
+              }}
+            />
           </span>
                 </BottomContainer>
             </MainContainer>
@@ -482,6 +518,9 @@ class Convert extends React.Component {
 
 Convert.propTypes = {
     formatMessage: PropTypes.func.isRequired,
+    intl: PropTypes.shape({
+        locale: PropTypes.string
+    }).isRequired,
     list: PropTypes.arrayOf(PropTypes.shape({})).isRequired
 };
 
