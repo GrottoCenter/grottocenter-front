@@ -14,11 +14,10 @@ const getLocalizedCountryName = (country, formatMessage, locale, fallback = '') 
     return formatMessage({ id: country.name, defaultMessage: country.name });
   }
 
-  const translationKey = country.enName && country.enName !== '?' ? country.enName : country.nativeName;
+  const translationKey = country.enName && country.enName !== '?' ? country.enName : country.en_name || country.nativeName;
   if (!translationKey) return fallback;
 
-  const langNameField = `${locale}Name`;
-  const langName = country[langNameField];
+  const langName = country[`${locale}Name`] || country[`${locale}_name`];
   const defaultMessage = langName && langName !== '?' ? langName : country.nativeName || translationKey;
 
   return formatMessage({ id: translationKey, defaultMessage });
