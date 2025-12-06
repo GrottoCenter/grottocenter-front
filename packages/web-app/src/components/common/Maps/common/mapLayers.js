@@ -45,12 +45,13 @@ const layers = [
     name: 'France - IGN SCAN 25®',
     type: 'WMTS',
     attribution: 'IGN-F/Geoportail',
-    url: 'https://wxs.ign.fr/eru891fho4j0vpr2gomsjegu/geoportail/wmts?&REQUEST=GetTile&SERVICE=WMTS&VERSION=1.0.0&STYLE=normal&TILEMATRIXSET=PM&FORMAT=image/jpeg&LAYER=GEOGRAPHICALGRIDSYSTEMS.MAPS.SCAN25TOUR&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}',
+    url: 'https://data.geopf.fr/private/wmts?SERVICE=WMTS&VERSION=1.0.0&REQUEST=GetTile&STYLE=normal&TILEMATRIXSET=PM_6_16&FORMAT=image/jpeg&LAYER=GEOGRAPHICALGRIDSYSTEMS.MAPS.SCAN25TOUR&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&apikey=ign_scan_ws',
+    minZoom: 6,
     maxZoom: 22,
     maxNativeZoom: 16,
     bounds: new L.LatLngBounds(
-      new L.LatLng(-5.119629, 42.163403),
-      new L.LatLng(8.789063, 51.179343)
+      new L.LatLng(-46.5029, -178.206),
+      new L.LatLng(51.1751, 77.6492)
     )
   },
   {
