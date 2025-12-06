@@ -3,7 +3,8 @@ import { head, pluck } from 'ramda';
 import {
   LayersControl as LeafletLayersControl,
   TileLayer,
-  WMSTileLayer
+  WMSTileLayer,
+  LayerGroup
 } from 'react-leaflet';
 import PropTypes from 'prop-types';
 
@@ -26,12 +27,32 @@ const LayersControl = ({
         checked={layer.name === initialLayerChecked}
         name={layer.name}>
         {layer.type === 'WMTS' && (
-          <TileLayer
-            attribution={layer.attribution}
-            url={layer.url}
-            maxZoom={layer.maxZoom ? layer.maxZoom : 22}
-            maxNativeZoom={layer.maxNativeZoom ? layer.maxNativeZoom : 22}
-          />
+          layer.minZoom ? (
+            <LayerGroup>
+              <TileLayer
+                attribution='© OpenStreetMap contributors'
+                url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
+                maxZoom={22}
+                maxNativeZoom={18}
+              />
+              <TileLayer
+                attribution={layer.attribution}
+                url={layer.url}
+                minZoom={layer.minZoom}
+                maxZoom={layer.maxZoom ? layer.maxZoom : 22}
+                maxNativeZoom={layer.maxNativeZoom ? layer.maxNativeZoom : 22}
+              />
+            </LayerGroup>
+          ) : (
+            <TileLayer
+              attribution={layer.attribution}
+              url={layer.url}
+              minZoom={layer.minZoom}
+              maxZoom={layer.maxZoom ? layer.maxZoom : 22}
+              maxNativeZoom={layer.maxNativeZoom ? layer.maxNativeZoom : 22}
+              bounds={layer.bounds}
+            />
+          )
         )}
         {layer.type === 'WMS' && (
           <WMSTileLayer
