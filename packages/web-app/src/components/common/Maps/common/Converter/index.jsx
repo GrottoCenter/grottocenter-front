@@ -6,6 +6,7 @@ import ConvertIcon from '@mui/icons-material/Transform';
 import { useIntl } from 'react-intl';
 import { anyPass, isEmpty, isNil } from 'ramda';
 import { useFullScreen } from 'react-browser-hooks';
+import { useMap } from 'react-leaflet';
 
 import CustomControl, { customControlProps } from '../CustomControl';
 import StandardDialog from '../../../StandardDialog';
@@ -26,6 +27,7 @@ const ConverterControl = ({
 }) => {
   const { fullScreen } = useFullScreen();
   const { formatMessage } = useIntl();
+  const map = useMap();
   const [anchorEl, setAnchorEl] = useState(null);
 
   const handleOpenMenu = event => {
@@ -60,7 +62,7 @@ const ConverterControl = ({
                 <Skeleton width={100} />
               </>
             }>
-            <Convert list={projectionsList} formatMessage={formatMessage} />
+            <Convert list={projectionsList} formatMessage={formatMessage} map={map} />
           </Suspense>
         </StandardDialog>
       )}
