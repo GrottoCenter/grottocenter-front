@@ -289,6 +289,10 @@ class Convert extends React.Component {
         if (this.props.map && wgs84Coords) {
             this.props.map.setView(wgs84Coords, this.props.map.getZoom());
         }
+
+        if (this.props.onConvert) {
+            this.props.onConvert();
+        }
     };
 
     isUtm(keyGps) {
@@ -441,7 +445,7 @@ class Convert extends React.Component {
                 </SubContainer>
 
                 {/* OUTPUT SECTION */}
-                <SubContainer id="output">
+                {!this.props.hideOutput && <SubContainer id="output">
                     <StyledTitle>
                         <Translate>Output</Translate>
                     </StyledTitle>
@@ -506,7 +510,7 @@ class Convert extends React.Component {
                         />
                         {yUnitOutput}
                     </div>
-                </SubContainer>
+                </SubContainer>}
 
                 {/* BOTTOM SECTION */}
                 <BottomContainer id="bottom">
@@ -532,7 +536,9 @@ Convert.propTypes = {
         locale: PropTypes.string
     }).isRequired,
     list: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
-    map: PropTypes.object
+    map: PropTypes.object,
+    hideOutput: PropTypes.bool,
+    onConvert: PropTypes.func
 };
 
 export default Convert;

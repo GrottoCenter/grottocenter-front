@@ -23,6 +23,7 @@ const isNilOrEmpty = anyPass([isNil, isEmpty]);
 const ConverterControl = ({
   position = 'bottomleft',
   projectionsList = [],
+  hideOutput = false,
   ...props
 }) => {
   const { fullScreen } = useFullScreen();
@@ -62,7 +63,7 @@ const ConverterControl = ({
                 <Skeleton width={100} />
               </>
             }>
-            <Convert list={projectionsList} formatMessage={formatMessage} map={map} />
+            <Convert list={projectionsList} formatMessage={formatMessage} map={map} hideOutput={hideOutput} onConvert={hideOutput ? handleClose : undefined} />
           </Suspense>
         </StandardDialog>
       )}
@@ -72,7 +73,8 @@ const ConverterControl = ({
 
 ConverterControl.propTypes = {
   ...customControlProps,
-  projectionsList: PropTypes.arrayOf(PropTypes.shape({}))
+  projectionsList: PropTypes.arrayOf(PropTypes.shape({})),
+  hideOutput: PropTypes.bool
 };
 
 export default ConverterControl;
