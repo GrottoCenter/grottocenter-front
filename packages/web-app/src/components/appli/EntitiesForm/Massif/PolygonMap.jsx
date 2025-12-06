@@ -4,6 +4,7 @@ import { MapContainer, FeatureGroup, ScaleControl } from 'react-leaflet';
 import { EditControl } from 'react-leaflet-draw';
 import L from 'leaflet';
 import { useIntl } from 'react-intl';
+import useGeolocation from '../../../../hooks/useGeolocation';
 import LayersControl from '../../../common/Maps/common/LayersControl';
 import LocateControl from '../../../common/Maps/common/LocateControl';
 
@@ -28,7 +29,7 @@ const PolygonMap = ({ onChange, data }) => {
   const { formatMessage } = useIntl();
   const isMounted = useRef(true);
   const displayValue = useRef(false);
-  // eslint-disable-next-line no-unused-vars
+  const { location: geoLocation, isReady } = useGeolocation();
   const [map, setMap] = useState();
 
   // Configure Leaflet Draw text
@@ -72,15 +73,19 @@ const PolygonMap = ({ onChange, data }) => {
   }, [formatMessage]);
 
   const [mapLayers, setMapLayers] = useState([]);
-  const [center] = useState(
+  const [center, setCenter] = useState(
     data
       ? getMultiPolygonCentroid(data.coordinates[0][0])
-      : {
-          lat: 43.6,
-          lng: 3.86
-        }
+      : geoLocation
   );
   const ZOOM_LEVEL = 10;
+
+  useEffect(() => {
+    if (!data && isReady && map) {
+      map.setView(geoLocation, ZOOM_LEVEL);
+      setCenter(geoLocation);
+    }
+  }, [isReady, geoLocation, data, map, ZOOM_LEVEL]);
 
   const mapTOGeoJson = layers => {
     const geoJson = {};

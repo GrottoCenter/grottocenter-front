@@ -14,6 +14,7 @@ import {
   fetchEntrancesCoordinates
 } from '../actions/Map';
 import { fetchProjections } from '../actions/Projections';
+import useGeolocation from '../hooks/useGeolocation';
 import 'leaflet/dist/leaflet.css';
 
 const MapClusters = React.lazy(
@@ -38,6 +39,7 @@ const Map = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const params = useParams();
+  const { location: geoLocation, isReady: isGeoReady } = useGeolocation();
   const {
     location,
     zoom,
@@ -89,13 +91,26 @@ const Map = () => {
 
   useEffect(() => {
     dispatch(fetchProjections());
-    const target = decodeMapTarget(params.target);
-    if (!target) return;
-
-    dispatch(changeLocation({ lat: target.lat, lng: target.lng }));
-    dispatch(changeZoom(target.zoom));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    if (!isGeoReady) return;
+    
+    const target = decodeMapTarget(params.target);
+    if (target) {
+      dispatch(changeLocation({ lat: target.lat, lng: target.lng }));
+      dispatch(changeZoom(target.zoom));
+    } else {
+      dispatch(changeLocation(geoLocation));
+      dispatch(changeZoom(10));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isGeoReady]);
+
+  if (!isGeoReady) {
+    return <PageLoader />;
+  }
 
   return (
     <Suspense fallback={<PageLoader />}>
