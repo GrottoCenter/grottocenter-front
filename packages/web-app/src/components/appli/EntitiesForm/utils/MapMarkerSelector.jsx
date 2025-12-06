@@ -6,7 +6,7 @@ import { isMobile } from 'react-device-detect';
 import { styled } from '@mui/material/styles';
 import { useDispatch, useSelector } from 'react-redux';
 import { useDebounce } from '../../../../hooks';
-import { defaultCoord } from '../../../../conf/config';
+import useGeolocation from '../../../../hooks/useGeolocation';
 import LayersControl from '../../../common/Maps/common/LayersControl';
 import LocateControl from '../../../common/Maps/common/LocateControl';
 import ConverterControl from '../../../common/Maps/common/Converter';
@@ -74,13 +74,18 @@ const toFloat = value => {
 const MapMarkerSelector = ({ control, formLatitudeKey, formLongitudeKey }) => {
   const DEBOUNCE_TIME_MS = 300;
   const lastSetFormTs = useRef(0);
-  const [currentPosition, setCurrentPosition] = useState(defaultCoord);
+  const { location: geoLocation } = useGeolocation();
+  const [currentPosition, setCurrentPosition] = useState(geoLocation);
   const dispatch = useDispatch();
   const { projections } = useSelector(state => state.projections);
 
   useEffect(() => {
     dispatch(fetchProjections());
   }, [dispatch]);
+
+  useEffect(() => {
+    setCurrentPosition(geoLocation);
+  }, [geoLocation]);
 
   const latitude = useDebounce(
     useWatch({ control, name: formLatitudeKey }),
