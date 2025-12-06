@@ -14,8 +14,8 @@ import {unitsTab} from '../../../../../conf/ListGPSProj';
 import Translate from '../../../Translate';
 import getLocalizedCountryName from '../../../../../helpers/countryName';
 
-const MainContainer = styled('div')(({ theme }) => ({
-}));
+const MainContainer = styled('div')({
+});
 
 const SubContainer = styled('div')(({ theme }) => ({
     backgroundColor: theme.palette.primary3Color,
@@ -253,16 +253,22 @@ class Convert extends React.Component {
         }
 
         const newState = {};
+        let wgs84Coords;
 
         if (utmOutput) {
             const wgs84Def = this.getDef('WGS84');
             const [lng, lat] = proj4(firstProjection, wgs84Def, [parseFloat(xValue), parseFloat(yValue)]);
+            wgs84Coords = [lat, lng];
             const calculatedZone = Convert.getUTMZone(lng);
             const calculatedHemi = Convert.getHemisphere(lat);
             
             secondProjection = this.buildUTMProjection(secondProjection, calculatedZone, calculatedHemi);
             newState.zoneOutput = calculatedZone;
             newState.hemiOutput = calculatedHemi;
+        } else {
+            const wgs84Def = this.getDef('WGS84');
+            const [lng, lat] = proj4(firstProjection, wgs84Def, [parseFloat(xValue), parseFloat(yValue)]);
+            wgs84Coords = [lat, lng];
         }
 
         const [convertedX, convertedY] = proj4(firstProjection, secondProjection, [
@@ -279,6 +285,10 @@ class Convert extends React.Component {
         }
 
         this.setState(newState);
+
+        if (this.props.map && wgs84Coords) {
+            this.props.map.setView(wgs84Coords, this.props.map.getZoom());
+        }
     };
 
     isUtm(keyGps) {
@@ -521,7 +531,8 @@ Convert.propTypes = {
     intl: PropTypes.shape({
         locale: PropTypes.string
     }).isRequired,
-    list: PropTypes.arrayOf(PropTypes.shape({})).isRequired
+    list: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
+    map: PropTypes.object
 };
 
 export default Convert;
