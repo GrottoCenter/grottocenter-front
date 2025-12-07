@@ -10,6 +10,7 @@ import useGeolocation from '../../../../hooks/useGeolocation';
 import LayersControl from '../../../common/Maps/common/LayersControl';
 import LocateControl from '../../../common/Maps/common/LocateControl';
 import ConverterControl from '../../../common/Maps/common/Converter';
+import GeocodingControl from '../../../common/Maps/common/GeocodingControl';
 import { fetchProjections } from '../../../../actions/Projections';
 
 const StyledMapContainer = styled(MapContainer)`
@@ -127,13 +128,17 @@ const MapMarkerSelector = ({ control, formLatitudeKey, formLongitudeKey }) => {
   return (
     <StyledMapContainer
       style={{ height: '40vh', width: 'calc(100% - 8px)' }}
-      center={currentPosition}
+      center={[0, 0]}
       zoom={14}
       dragging={!isMobile} // For usability only use two fingers drag/zoom on mobile
       scrollWheelZoom="center" // To avoid losing the coordinate when only zooming
       doubleClickZoom="center"
       touchZoom="center"
       preferCanvas>
+      <GeocodingControl onLocationSelect={newLocation => {
+        setFormLatitude(newLocation.lat.toFixed(6));
+        setFormLongitude(newLocation.lng.toFixed(6));
+      }} />
       <LocateControl />
       <ScaleControl position="bottomright" />
       <LayersControl />

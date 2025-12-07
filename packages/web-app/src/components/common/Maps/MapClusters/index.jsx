@@ -5,6 +5,7 @@ import { without, pipe, append, uniq } from 'ramda';
 
 import DataControl, { heatmapTypes } from './DataControl';
 import ConverterControl from '../common/Converter';
+import GeocodingControl from '../common/GeocodingControl';
 import useHeatLayer, { HexGlobalCss } from './useHeatLayer';
 import Markers from './Markers';
 import CustomMapContainer from '../common/MapContainer';
@@ -118,6 +119,7 @@ const HydratedMap = ({
   return (
     <>
       {HexGlobalCss}
+      <GeocodingControl />
       <DataControl
         updateHeatmap={handleUpdateHeat}
         updateMarkers={handleUpdateMarkers}

@@ -7,6 +7,7 @@ import { useIntl } from 'react-intl';
 import useGeolocation from '../../../../hooks/useGeolocation';
 import LayersControl from '../../../common/Maps/common/LayersControl';
 import LocateControl from '../../../common/Maps/common/LocateControl';
+import GeocodingControl from '../../../common/Maps/common/GeocodingControl';
 
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-draw/dist/leaflet.draw.css';
@@ -223,6 +224,7 @@ const PolygonMap = ({ onChange, data }) => {
         />
       </FeatureGroup>
 
+      <GeocodingControl />
       <LocateControl />
       <ScaleControl position="bottomright" />
       <LayersControl />
