@@ -11,6 +11,7 @@ import GeocodingControl from '../../../common/Maps/common/GeocodingControl';
 
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-draw/dist/leaflet.draw.css';
+import { defaultZoom, focusZoom } from '../../../../conf/config';
 
 const getMultiPolygonCentroid = function (coordinates) {
   const result = coordinates.reduce(
@@ -30,7 +31,7 @@ const PolygonMap = ({ onChange, data }) => {
   const { formatMessage } = useIntl();
   const isMounted = useRef(true);
   const displayValue = useRef(false);
-  const { location: geoLocation, isReady } = useGeolocation();
+  const { location: geoLocation, isReady, hasError } = useGeolocation();
   const [map, setMap] = useState();
 
   // Configure Leaflet Draw text
@@ -79,12 +80,16 @@ const PolygonMap = ({ onChange, data }) => {
       ? getMultiPolygonCentroid(data.coordinates[0][0])
       : geoLocation
   );
-  const ZOOM_LEVEL = 10;
+  const ZOOM_LEVEL = !data && hasError ? defaultZoom : focusZoom;
 
   useEffect(() => {
-    if (!data && isReady && map) {
-      map.setView(geoLocation, ZOOM_LEVEL);
-      setCenter(geoLocation);
+    if (map) {
+      if (data && data.coordinates && data.coordinates[0] && data.coordinates[0][0]) {
+        map.fitBounds(data.coordinates[0][0].map(e => [e[1], e[0]]));
+      } else if (isReady) {
+        map.setView(geoLocation, ZOOM_LEVEL);
+        setCenter(geoLocation);
+      }
     }
   }, [isReady, geoLocation, data, map, ZOOM_LEVEL]);
 
