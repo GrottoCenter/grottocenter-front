@@ -16,6 +16,7 @@ import {
 import { fetchProjections } from '../actions/Projections';
 import useGeolocation from '../hooks/useGeolocation';
 import 'leaflet/dist/leaflet.css';
+import { defaultZoom, focusZoom } from '../conf/config';
 
 const MapClusters = React.lazy(
   () => import('../components/common/Maps/MapClusters')
@@ -39,7 +40,7 @@ const Map = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const params = useParams();
-  const { location: geoLocation, isReady: isGeoReady } = useGeolocation();
+  const { location: geoLocation, isReady: isGeoReady, hasError: geoHasError } = useGeolocation();
   const {
     location,
     zoom,
@@ -103,7 +104,7 @@ const Map = () => {
       dispatch(changeZoom(target.zoom));
     } else {
       dispatch(changeLocation(geoLocation));
-      dispatch(changeZoom(10));
+      dispatch(changeZoom(geoHasError ? defaultZoom : focusZoom));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isGeoReady]);

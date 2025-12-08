@@ -12,6 +12,7 @@ import LocateControl from '../../../common/Maps/common/LocateControl';
 import ConverterControl from '../../../common/Maps/common/Converter';
 import GeocodingControl from '../../../common/Maps/common/GeocodingControl';
 import { fetchProjections } from '../../../../actions/Projections';
+import { defaultZoom, focusZoom } from '../../../../conf/config';
 
 const StyledMapContainer = styled(MapContainer)`
   margin: 0 4px;
@@ -31,7 +32,7 @@ const StyledMapContainer = styled(MapContainer)`
 `;
 
 // Needed because useMap is only accessible from inside <MapContainer>
-const MapBind = ({ center, onMoveEnd }) => {
+const MapBind = ({ center, zoom, onMoveEnd }) => {
   const lastValidCenter = useRef({});
   const lastSetViewTs = useRef(0);
   const map = useMap();
@@ -55,13 +56,14 @@ const MapBind = ({ center, onMoveEnd }) => {
   useEffect(() => {
     lastValidCenter.current = center;
     lastSetViewTs.current = Date.now();
-    map.setView(center, map.getZoom(), { animate: false });
-  }, [center, map]);
+    map.setView(center, zoom, { animate: false });
+  }, [center, zoom, map]);
 
   return null;
 };
 MapBind.propTypes = {
   center: PropTypes.shape({}),
+  zoom: PropTypes.number,
   onMoveEnd: PropTypes.func
 };
 
@@ -75,18 +77,15 @@ const toFloat = value => {
 const MapMarkerSelector = ({ control, formLatitudeKey, formLongitudeKey }) => {
   const DEBOUNCE_TIME_MS = 300;
   const lastSetFormTs = useRef(0);
-  const { location: geoLocation } = useGeolocation();
+  const { location: geoLocation, hasError: geoHasError } = useGeolocation();
   const [currentPosition, setCurrentPosition] = useState(geoLocation);
+  const [shouldUpdate, setShouldUpdate] = useState(false);
   const dispatch = useDispatch();
   const { projections } = useSelector(state => state.projections);
 
   useEffect(() => {
     dispatch(fetchProjections());
   }, [dispatch]);
-
-  useEffect(() => {
-    setCurrentPosition(geoLocation);
-  }, [geoLocation]);
 
   const latitude = useDebounce(
     useWatch({ control, name: formLatitudeKey }),
@@ -110,13 +109,17 @@ const MapMarkerSelector = ({ control, formLatitudeKey, formLongitudeKey }) => {
   useEffect(() => {
     // Prevent dispatching a setCurrentPosition event triggered by a setForm below
     const timeSinceSetFormMs = Date.now() - lastSetFormTs.current;
-    const shouldUpdate =
+    const isValid =
       !Number.isNaN(validLatitude) && !Number.isNaN(validLongitude);
 
-    if (shouldUpdate && timeSinceSetFormMs > DEBOUNCE_TIME_MS + 100) {
+    if (isValid && timeSinceSetFormMs > DEBOUNCE_TIME_MS + 100) {
       setCurrentPosition({ lat: validLatitude, lng: validLongitude });
+      setShouldUpdate(true);
+    } else {
+      setCurrentPosition(geoLocation);
+      setShouldUpdate(false);
     }
-  }, [validLatitude, validLongitude]);
+  }, [validLatitude, validLongitude, geoLocation]);
 
   // Binding form <- map
   const onMoveEnd = newLocation => {
@@ -125,11 +128,13 @@ const MapMarkerSelector = ({ control, formLatitudeKey, formLongitudeKey }) => {
     setFormLongitude(newLocation.lng.toFixed(6));
   };
 
+  const ZOOM_LEVEL = shouldUpdate ? focusZoom : (geoHasError ? defaultZoom : focusZoom);
+
   return (
     <StyledMapContainer
       style={{ height: '40vh', width: 'calc(100% - 8px)' }}
-      center={[0, 0]}
-      zoom={14}
+      center={currentPosition}
+      zoom={ZOOM_LEVEL}
       dragging={!isMobile} // For usability only use two fingers drag/zoom on mobile
       scrollWheelZoom="center" // To avoid losing the coordinate when only zooming
       doubleClickZoom="center"
@@ -144,7 +149,7 @@ const MapMarkerSelector = ({ control, formLatitudeKey, formLongitudeKey }) => {
       <LayersControl />
       <ConverterControl projectionsList={projections} hideOutput />
 
-      <MapBind center={currentPosition} onMoveEnd={onMoveEnd} />
+      <MapBind center={currentPosition} zoom={ZOOM_LEVEL} onMoveEnd={onMoveEnd} />
 
       <span className="centralMarker">
         <img
