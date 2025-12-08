@@ -6,8 +6,7 @@ This files is used to config all the map layers offered.
 Concerning the bounds of a layer,
 they represent the area on the map for which the layer is available.
 
-If the layer is available for the entire map, we should set its bounds to
-" new L.LatLngBounds(new L.LatLng(-90, -200), new L.LatLng(90, 200)) "
+If the layer is available for the entire map, we should omit the bounds property.
  */
 
 const layers = [
@@ -18,8 +17,7 @@ const layers = [
       '« © <a target="_blank" href="https://www.openstreetmap.org/copyright">OpenStreetMap </a> contributors » under ODbL licence',
     url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
     maxZoom: 22,
-    maxNativeZoom: 18,
-    bounds: new L.LatLngBounds(new L.LatLng(-90, -200), new L.LatLng(90, 200))
+    maxNativeZoom: 18
   },
   {
     name: 'Esri Satellite',
@@ -28,8 +26,7 @@ const layers = [
       'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community',
     url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
     maxZoom: 22,
-    maxNativeZoom: 19,
-    bounds: new L.LatLngBounds(new L.LatLng(50, -10), new L.LatLng(60, 2))
+    maxNativeZoom: 19
   },
   {
     name: 'OpenTopoMap',
@@ -38,8 +35,7 @@ const layers = [
       'Map data: &copy; <a target="_blank" href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, <a target="_blank" href="http://viewfinderpanoramas.org">SRTM</a> | Map style: &copy; <a target="_blank" href="https://opentopomap.org">OpenTopoMap</a> (<a target="_blank" href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)',
     url: 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',
     maxZoom: 22,
-    maxNativeZoom: 17,
-    bounds: new L.LatLngBounds(new L.LatLng(50, -10), new L.LatLng(60, 2))
+    maxNativeZoom: 17
   },
   {
     name: 'France - IGN SCAN 25®',
