@@ -1,5 +1,8 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
+import { useMap } from 'react-leaflet';
 import PropTypes from 'prop-types';
+import * as L from 'leaflet';
 
 // Classes used by Leaflet to position controls.
 const POSITION_CLASSES = {
@@ -13,20 +16,56 @@ const CustomControl = ({
   position = 'topright',
   containerProps,
   children,
-  style
-}) => (
-  <div className={POSITION_CLASSES[position]} style={style}>
-    <div className="leaflet-control leaflet-bar" {...containerProps}>
-      {children}
+  style,
+  useLeafletControl = false
+}) => {
+  const controlRef = useRef(null);
+  const map = useMap();
+  const [container, setContainer] = useState(null);
+
+  useEffect(() => {
+    if (controlRef.current) {
+      L.DomEvent.disableClickPropagation(controlRef.current);
+      L.DomEvent.disableScrollPropagation(controlRef.current);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!useLeafletControl || !map) return;
+    const control = L.control({ position });
+    control.onAdd = () => {
+      const div = L.DomUtil.create('div', 'leaflet-bar leaflet-control');
+      L.DomEvent.disableClickPropagation(div);
+      L.DomEvent.disableScrollPropagation(div);
+      setContainer(div);
+      return div;
+    };
+    control.addTo(map);
+    return () => {
+      control.remove();
+    };
+  }, [map, position, useLeafletControl]);
+
+  if (useLeafletControl) {
+    if (!container) return null;
+    return createPortal(children, container);
+  }
+
+  return (
+    <div className={POSITION_CLASSES[position]} style={style}>
+      <div ref={controlRef} className="leaflet-control leaflet-bar" {...containerProps}>
+        {children}
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 export const customControlProps = {
   position: PropTypes.oneOf(Object.keys(POSITION_CLASSES)),
   containerProps: PropTypes.any,
   children: PropTypes.node,
-  style: PropTypes.object
+  style: PropTypes.object,
+  useLeafletControl: PropTypes.bool
 };
 
 CustomControl.propTypes = {
