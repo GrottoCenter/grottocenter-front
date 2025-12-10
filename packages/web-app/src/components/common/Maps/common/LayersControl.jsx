@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { head, pluck } from 'ramda';
 import {
   LayerGroup,
@@ -13,6 +13,7 @@ import { styled } from '@mui/material/styles';
 import { useIntl } from 'react-intl';
 
 import layers from './mapLayers';
+import { LAYER_ROLE } from './layerEnums';
 import CustomControl from './CustomControl';
 
 const possibleLayers = pluck('name', layers);
@@ -20,11 +21,36 @@ const localStorageBaseLayer = possibleLayers.find(
   name => name === window.localStorage.getItem('selectedBaseLayer')
 );
 const selectedBaseLayer = localStorageBaseLayer || head(possibleLayers);
+const getStoredOverlays = () => {
+  try {
+    const stored = window.localStorage.getItem('selectedOverlays');
+    return stored ? JSON.parse(stored) : [];
+  } catch {
+    return [];
+  }
+};
+const selectedOverlays = getStoredOverlays();
 const localStorageOpacity = parseFloat(window.localStorage.getItem('layerOpacity'));
 const selectedOpacity = !isNaN(localStorageOpacity) ? localStorageOpacity : 1;
 
+const usePanes = (layers) => {
+  const map = useMap();
+
+  useEffect(() => {
+    const panes = [...new Set(layers.map(l => l.pane).filter(Boolean))];
+
+    panes.forEach((paneName, index) => {
+      if (!map.getPane(paneName)) {
+        const pane = map.createPane(paneName);
+        pane.style.zIndex = 200 + index * 10;
+      }
+    });
+  }, [map, layers]);
+};
+
 const createWMTSTileLayer = (layer, opacity = 1) => (
   <TileLayer
+    pane={layer.pane}
     attribution={layer.attribution}
     url={layer.url}
     minZoom={layer.minZoom}
@@ -35,45 +61,37 @@ const createWMTSTileLayer = (layer, opacity = 1) => (
   />
 );
 
-const createWMSTileLayer = (layer, opacity = 1) => (
-  <WMSTileLayer
-    attribution={layer.attribution}
-    layers={layer.layers}
-    url={layer.url}
-    opacity={opacity}
-  />
-);
+const createWMSTileLayer = (layer, opacity = 1) => {
+  const {
+    url,
+    layers: wmsLayers,
+    styles = '',
+    format = 'image/png',
+    transparent = true,
+    version = '1.3.0'
+  } = layer;
 
-const OSM_LAYER = layers[0];
-const OSM_TILE_LAYER = createWMTSTileLayer(OSM_LAYER);
-
-const BaseMapLayer = ({ layer, opacity }) => (
-  <LayerGroup>
-    {OSM_TILE_LAYER}
-    {layer !== OSM_LAYER && (
-      <>
-        {layer.type === 'WMTS' && createWMTSTileLayer(layer, opacity)}
-        {layer.type === 'WMS' && createWMSTileLayer(layer, opacity)}
-      </>
-    )}
-  </LayerGroup>
-);
-
-BaseMapLayer.propTypes = {
-  layer: PropTypes.shape({
-    type: PropTypes.string.isRequired,
-    attribution: PropTypes.string,
-    url: PropTypes.string,
-    minZoom: PropTypes.number,
-    maxZoom: PropTypes.number,
-    maxNativeZoom: PropTypes.number,
-    bounds: PropTypes.object,
-    layers: PropTypes.string
-  }).isRequired,
-  opacity: PropTypes.number
+  return (
+    <WMSTileLayer
+      pane={layer.pane}
+      url={url}
+      layers={wmsLayers}
+      styles={styles}
+      format={format}
+      transparent={transparent}
+      version={version}
+      opacity={opacity}
+    />
+  );
 };
 
-const ControlContainer = styled('div')(({ isExpanded }) => ({
+const renderLayer = (layer, opacity) => {
+  if (layer.type === 'WMTS') return createWMTSTileLayer(layer, opacity);
+  if (layer.type === 'WMS') return createWMSTileLayer(layer, opacity);
+  return null;
+};
+
+const OpacityControlContainer = styled('div')(({ isExpanded }) => ({
   background: 'white',
   padding: '5px',
   width: isExpanded ? '200px' : 'min-content',
@@ -82,7 +100,7 @@ const ControlContainer = styled('div')(({ isExpanded }) => ({
   maxHeight: isExpanded ? '100px' : '28px'
 }));
 
-const ControlLabel = styled('label')(({ isExpanded }) => ({
+const OpacityControlLabel = styled('label')(({ isExpanded }) => ({
   fontSize: '12px',
   display: 'block',
   marginBottom: isExpanded ? '5px' : '0',
@@ -106,13 +124,13 @@ const OpacityControl = ({ position, opacity, setOpacity }) => {
 
   return (
     <CustomControl position={position} useLeafletControl>
-      <ControlContainer 
+      <OpacityControlContainer
         isExpanded={isExpanded}
         onMouseEnter={() => setIsExpanded(true)}
         onMouseLeave={() => setIsExpanded(false)}>
-        <ControlLabel isExpanded={isExpanded}>
+        <OpacityControlLabel isExpanded={isExpanded}>
           {formatMessage({ id: 'Opacity' })}
-        </ControlLabel>
+        </OpacityControlLabel>
         <OpacitySlider
           type="range"
           min="0"
@@ -121,7 +139,7 @@ const OpacityControl = ({ position, opacity, setOpacity }) => {
           onChange={(e) => setOpacity(e.target.value / 100)}
           isExpanded={isExpanded}
         />
-      </ControlContainer>
+      </OpacityControlContainer>
     </CustomControl>
   );
 };
@@ -133,45 +151,105 @@ OpacityControl.propTypes = {
 };
 
 const LayersControl = ({
-  position = 'topleft',
-  initialLayerChecked = selectedBaseLayer
-}) => {
+                         position = 'topleft',
+                         initialSelectedBaseLayer = selectedBaseLayer,
+                         initialSelectedOverlays = selectedOverlays
+                       }) => {
   const [opacity, setOpacity] = useState(selectedOpacity);
-  const [currentLayer, setCurrentLayer] = useState(initialLayerChecked);
+  const [currentBaseLayer, setCurrentBaseLayer] = useState(initialSelectedBaseLayer);
+  const [currentOverlays, setCurrentOverlays] = useState(initialSelectedOverlays);
+  const [isMapReady, setIsMapReady] = useState(false);
   const map = useMap();
+
+  useEffect(() => {
+    if (map && map.getContainer()) {
+      setIsMapReady(true);
+    }
+  }, [map]);
+
+  usePanes(layers);
 
   useEffect(() => {
     window.localStorage.setItem('layerOpacity', opacity);
   }, [opacity]);
 
+  const baseLayers = useMemo(
+    () => layers.filter(l => l.role === LAYER_ROLE.BASE),
+    []
+  );
+
+  const overlayLayers = useMemo(
+    () => layers.filter(l => l.role === LAYER_ROLE.OVERLAY),
+    []
+  );
+
   useEffect(() => {
-    const handleLayerChange = (e) => {
-      setCurrentLayer(e.name);
+    const onChange = (e) => {
+      setCurrentBaseLayer(e.name);
       window.localStorage.setItem('selectedBaseLayer', e.name);
     };
-
-    map.on('baselayerchange', handleLayerChange);
+    map.on('baselayerchange', onChange);
 
     return () => {
-      map.off('baselayerchange', handleLayerChange);
+      map.off('baselayerchange', onChange);
     };
   }, [map]);
+
+  useEffect(() => {
+    const onAdd = (e) => {
+      setCurrentOverlays(prev => {
+        const updated = Array.isArray(prev) ? [...prev, e.name] : [e.name];
+        window.localStorage.setItem('selectedOverlays', JSON.stringify(updated));
+        return updated;
+      });
+    };
+    const onRemove = (e) => {
+      setCurrentOverlays(prev => {
+        const updated = Array.isArray(prev) ? prev.filter(name => name !== e.name) : [];
+        if (updated.length > 0) {
+          window.localStorage.setItem('selectedOverlays', JSON.stringify(updated));
+        } else {
+          window.localStorage.removeItem('selectedOverlays');
+        }
+        return updated.length > 0 ? updated : null;
+      });
+    };
+    map.on('overlayadd', onAdd);
+    map.on('overlayremove', onRemove);
+
+    return () => {
+      map.off('overlayadd', onAdd);
+      map.off('overlayremove', onRemove);
+    };
+  }, [map]);
+
+  if (!isMapReady) return null;
 
   return (
     <>
       <LeafletLayersControl position={position}>
-        {layers.map(layer => (
+        {baseLayers.map(layer => (
           <LeafletLayersControl.BaseLayer
-            key={layer.name}
-            checked={layer.name === initialLayerChecked}
-            name={layer.name}>
-            <BaseMapLayer layer={layer} opacity={opacity} />
+            key={layer.id}
+            checked={layer.name === initialSelectedBaseLayer}
+            name={layer.name}
+          >
+            {renderLayer(layer, 1)}
           </LeafletLayersControl.BaseLayer>
         ))}
+        {overlayLayers.map(layer => (
+          <LeafletLayersControl.Overlay
+            key={layer.id}
+            name={layer.name}
+            checked={Array.isArray(initialSelectedOverlays) && initialSelectedOverlays.includes(layer.name)}
+          >
+            <LayerGroup>
+              {renderLayer(layer, opacity)}
+            </LayerGroup>
+          </LeafletLayersControl.Overlay>
+        ))}
       </LeafletLayersControl>
-      {currentLayer !== OSM_LAYER.name && (
-        <OpacityControl key={currentLayer} position={position} opacity={opacity} setOpacity={setOpacity} />
-      )}
+      {currentOverlays?.length > 0 && <OpacityControl key={currentBaseLayer} position={position} opacity={opacity} setOpacity={setOpacity} />}
     </>
   );
 };
@@ -183,7 +261,8 @@ LayersControl.propTypes = {
     'bottomright',
     'bottomleft'
   ]),
-  initialLayerChecked: PropTypes.oneOf(possibleLayers)
+  initialSelectedBaseLayer: PropTypes.oneOf(possibleLayers),
+  initialSelectedOverlays: PropTypes.arrayOf(PropTypes.oneOf(possibleLayers))
 };
 
 export default LayersControl;
