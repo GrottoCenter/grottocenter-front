@@ -115,7 +115,7 @@ const MapMarkerSelector = ({ control, formLatitudeKey, formLongitudeKey }) => {
     if (isValid && timeSinceSetFormMs > DEBOUNCE_TIME_MS + 100) {
       setCurrentPosition({ lat: validLatitude, lng: validLongitude });
       setShouldUpdate(true);
-    } else {
+    } else if (!isValid) {
       setCurrentPosition(geoLocation);
       setShouldUpdate(false);
     }
