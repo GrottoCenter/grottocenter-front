@@ -48,9 +48,11 @@ const MapBind = ({ center, zoom, onMoveEnd }) => {
   });
 
   useMapEvent('zoomend', () => {
-    // To avoid drift when zooming, we reset the map to the last known valid center
-    lastSetViewTs.current = Date.now();
-    map.setView(lastValidCenter.current, map.getZoom(), { animate: false });
+    if (!isMobile) {
+      // To avoid drift when zooming on desktop, we reset the map to the last known valid center
+      lastSetViewTs.current = Date.now();
+      map.setView(lastValidCenter.current, map.getZoom(), { animate: false });
+    }
   });
 
   useEffect(() => {
@@ -138,7 +140,7 @@ const MapMarkerSelector = ({ control, formLatitudeKey, formLongitudeKey }) => {
       dragging={!isMobile} // For usability only use two fingers drag/zoom on mobile
       scrollWheelZoom="center" // To avoid losing the coordinate when only zooming
       doubleClickZoom="center"
-      touchZoom="center"
+      touchZoom={true}
       preferCanvas>
       <GeocodingControl onLocationSelect={newLocation => {
         setFormLatitude(newLocation.lat.toFixed(6));
