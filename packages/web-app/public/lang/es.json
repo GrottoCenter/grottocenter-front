@@ -1254,6 +1254,7 @@
   "Page of all types of revision history for this entrance": "Página de todos los tipos de historial de revisiones para esta entrada",
   "Page where the document ends if it's part of another document (ex: an article in a magazine).": "Página donde termina el documento si es parte de otro documento (por ej., un artículo en una revista).",
   "Page where the document starts if it's part of another document (ex: an article in a magazine). Leave it blank if you just want to mention the total number of pages (ex: a book).": "Página donde empieza el documento si es parte de otro documento (ej: un artículo de una revista). Déjelo en blanco si sólo quiere mencionar el número total de páginas (ej.: un libro).",
+  "Page {start} of {title}": "Página {start} de {title}",
   "Pages": "Páginas",
   "Pages {start}-{end} of {title}": "Páginas {start}-{end} de {title}",
   "Pakistan": "Pakistán",
