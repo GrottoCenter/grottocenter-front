@@ -271,7 +271,7 @@ const Document = ({
               <SectionDetails title={formatMessage({ id: 'Details' })}>
                 <ItemString
                   label={formatMessage({ id: 'Type' })}
-                  value={<Chip color="primary" label={documentData.type} />}
+                  value={<Chip color="primary" label={formatMessage({ id: documentData.type })} />}
                 />
                 <ItemString
                   label={formatMessage({ id: 'Language' })}
