@@ -91,6 +91,18 @@ ListElement.propTypes = {
   url: PropTypes.string
 };
 
+export const FileListElement = ({ fileName, filePath }) => (
+  <ListElement
+    icon={<Description color="primary" />}
+    value={fileName}
+    url={filePath}
+  />
+);
+FileListElement.propTypes = {
+  fileName: PropTypes.string.isRequired,
+  filePath: PropTypes.string.isRequired
+};
+
 export const TextLink = ({ value, url }) =>
   url ? (
     <GCLink href={url} internal={url.startsWith('/ui')}>
@@ -208,12 +220,7 @@ export const SectionFilesPreview = ({ title, files }) => {
       <SectionTitle>{title}</SectionTitle>
       {files.map(e => (
         <Fragment key={e.completePath}>
-          <ListElement
-            key={e.completePath}
-            icon={<Description color="primary" />}
-            value={e.fileName}
-            url={e.completePath}
-          />
+          <FileListElement fileName={e.fileName} filePath={e.completePath} />
           {PREVIEW_EXTENTIONS.includes(getExtention(e.completePath)) && (
             <SectionFilesPreviewIfFrame src={e.completePath} />
           )}

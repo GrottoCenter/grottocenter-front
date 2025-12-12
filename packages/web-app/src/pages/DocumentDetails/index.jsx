@@ -1,24 +1,25 @@
 import React, { useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { Chip, Skeleton } from '@mui/material';
-import { Terrain } from '@mui/icons-material';
+import { Description, Terrain } from '@mui/icons-material';
 import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import Linkify from 'linkify-react';
 
 import { loadLanguages } from '../../actions/Language';
 
 import {
-  SectionDivider,
-  SectionText,
-  SectionDetails,
-  SectionList,
-  SectionTitleLink,
-  SectionFilesPreview,
-  ItemString,
+  FileListElement,
   ItemList,
+  ItemString,
   ListElement,
+  SectionDetails,
+  SectionDivider,
+  SectionFilesPreview,
+  SectionList,
+  SectionText,
+  SectionTitleLink,
   TextLink
 } from './Section';
 import CustomIcon from '../../components/common/CustomIcon';
@@ -30,10 +31,10 @@ import { usePermissions } from '../../hooks';
 import FixedContent from '../../components/common/Layouts/Fixed/FixedContent';
 import Alert from '../../components/common/Alert';
 import {
-  Deleted,
-  DeletedCard,
   DeleteConfirmationDialog,
-  DELETED_ENTITIES
+  Deleted,
+  DELETED_ENTITIES,
+  DeletedCard
 } from '../../components/common/card/Deleted';
 import AuthorAndDate from '../../components/common/Contribution/AuthorAndDate';
 import {
@@ -89,6 +90,7 @@ const Document = ({
   };
 
   const allAuthors = [];
+  const allFiles = [];
   const childIssues = [];
   const childArticles = [];
   const childOther = [];
@@ -98,6 +100,23 @@ const Document = ({
     // eslint-disable-next-line no-param-reassign
     if (documentData?.mainLanguage === '000') documentData.mainLanguage = null;
 
+    if (documentData?.parent?.files?.length > 0) {
+      const file = documentData.parent.files[0];
+      for (const page of documentData?.pages?.match(/(\d+)-(\d+)/g) ?? []) {
+        const [start, end] = page.split('-');
+        const path = `${file.completePath}#page=${start}`;
+        allFiles.push(
+          <FileListElement
+            key={path}
+            fileName={formatMessage(
+              { id: 'Pages {start}-{end} of {title}' },
+              { start, end, title: documentData.parent.title }
+            )}
+            filePath={path}
+          />
+        );
+      }
+    }
     for (const author of documentData?.authors ?? []) {
       allAuthors.push(
         <TextLink
@@ -330,6 +349,11 @@ const Document = ({
               <SectionList title={formatMessage({ id: 'Linked entities' })}>
                 {linkedEntities}
               </SectionList>
+              {allFiles.length > 0 && (
+                <SectionList title={formatMessage({ id: 'Files' })}>
+                  {allFiles}
+                </SectionList>
+              )}
               <SectionList title={formatMessage({ id: 'Articles' })}>
                 {childArticles?.map(doc => (
                   <ListElement
