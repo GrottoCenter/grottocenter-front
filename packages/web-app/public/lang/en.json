@@ -1254,6 +1254,7 @@
   "Page where the document ends if it's part of another document (ex: an article in a magazine).": "Page where the document ends if it's part of another document (ex: an article in a magazine).",
   "Page where the document starts if it's part of another document (ex: an article in a magazine). Leave it blank if you just want to mention the total number of pages (ex: a book).": "Page where the document starts if it's part of another document (ex: an article in a magazine). Leave it blank if you just want to mention the total number of pages (ex: a book).",
   "Pages": "Pages",
+  "Pages {start}-{end} of {title}": "Pages {start}-{end} of {title}",
   "Pakistan": "Pakistan",
   "Palau": "Palau",
   "Paleontospeleology": "Paleontospeleology",
