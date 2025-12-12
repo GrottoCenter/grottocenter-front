@@ -1253,6 +1253,7 @@
   "Page of all types of revision history for this entrance": "Page of all types of revision history for this entrance",
   "Page where the document ends if it's part of another document (ex: an article in a magazine).": "Page where the document ends if it's part of another document (ex: an article in a magazine).",
   "Page where the document starts if it's part of another document (ex: an article in a magazine). Leave it blank if you just want to mention the total number of pages (ex: a book).": "Page where the document starts if it's part of another document (ex: an article in a magazine). Leave it blank if you just want to mention the total number of pages (ex: a book).",
+  "Page {start} of {title}": "Page {start} of {title}",
   "Pages": "Pages",
   "Pages {start}-{end} of {title}": "Pages {start}-{end} of {title}",
   "Pakistan": "Pakistan",

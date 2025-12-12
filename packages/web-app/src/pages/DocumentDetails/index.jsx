@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { Chip, Skeleton } from '@mui/material';
-import { Description, Terrain } from '@mui/icons-material';
+import { Terrain } from '@mui/icons-material';
 import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -102,19 +102,29 @@ const Document = ({
 
     if (documentData?.parent?.files?.length > 0) {
       const file = documentData.parent.files[0];
-      for (const page of documentData?.pages?.match(/(\d+)-(\d+)/g) ?? []) {
-        const [start, end] = page.split('-');
-        const path = `${file.completePath}#page=${start}`;
-        allFiles.push(
-          <FileListElement
-            key={path}
-            fileName={formatMessage(
-              { id: 'Pages {start}-{end} of {title}' },
-              { start, end, title: documentData.parent.title }
-            )}
-            filePath={path}
-          />
-        );
+      const pageRegex = /^(\d+)(?:-(\d+))?$/;
+      const segments = String(documentData?.pages)
+        .split(',')
+        .map(s => s.trim())
+        .filter(s => s.length > 0);
+
+      for (const segment of segments) {
+        const match = segment.match(pageRegex);
+        if (match) {
+          const start = parseInt(match[1], 10);
+          const end = match[2] ? parseInt(match[2], 10) : null;
+          const path = `${file.completePath}#page=${start}`;
+          allFiles.push(
+            <FileListElement
+              key={path}
+              fileName={formatMessage(
+                { id: end ? 'Pages {start}-{end} of {title}' : 'Page {start} of {title}' },
+                { start, end, title: documentData.parent.title }
+              )}
+              filePath={path}
+            />
+          );
+        }
       }
     }
     for (const author of documentData?.authors ?? []) {
