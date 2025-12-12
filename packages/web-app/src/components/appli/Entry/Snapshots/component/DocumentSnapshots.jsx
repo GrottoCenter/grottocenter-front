@@ -1,12 +1,12 @@
 import * as React from 'react';
 import {
-  TableContainer,
+  styled,
   Table,
-  TableHead,
   TableBody,
-  TableRow,
   TableCell,
-  styled
+  TableContainer,
+  TableHead,
+  TableRow
 } from '@mui/material';
 import { useIntl } from 'react-intl';
 import { pathOr } from 'ramda';
@@ -68,13 +68,11 @@ const DocumentSnapshots = ({ document, previous }) => {
           <Property
             name={formatMessage({ id: 'Document type' })}
             value={formatMessage({
-              id: pathOr(
-                formatMessage({ id: INFORMATION_NOT_FOUND }),
-                ['name'],
-                type
-              )
+              id: type ?? INFORMATION_NOT_FOUND
             })}
-            oldValue={previous?.type.name}
+            oldValue={formatMessage({
+              id: previous?.type ?? INFORMATION_NOT_FOUND
+            })}
           />
           <Property
             name={formatMessage({ id: 'Title and description language' })}
