@@ -1186,7 +1186,7 @@
   "No region matches you search criteria": "Ninguna region coincide con sus criterios de búsqueda",
   "No region subscriptions": "Sin suscripciones de región",
   "No regions found": "No se encontraron regiones",
-  "No result (enter at least 3 characters)": "No existen resultados (entrar por lo menos 3 caracteres)",
+  "No result (enter at least {count} characters)": "No existen resultados (entrar por lo menos {count} caracteres)",
   "No result.": "Sin resultado.",
   "No results": "No resultados disponibles",
   "No results to display (type at least 3 characters)": "No existen resultados (entrar por lo menos 3 caracteres)",

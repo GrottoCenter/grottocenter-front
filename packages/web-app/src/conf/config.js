@@ -88,3 +88,6 @@ export const MAX_SIZE_OF_UPLOADED_FILES = 2000 * 1000000; // in bytes (2 Go)
 export const MAX_ORGANIZATION_LOGO_SIZE_IN_BYTES = 10485760; // in bytes (10MB)
 
 export const NOMINATIM_API_URL = 'https://nominatim.openstreetmap.org/search';
+
+export const AUTOCOMPLETE_DEBOUNCE_DELAY = 500; // in milliseconds
+export const AUTOCOMPLETE_MIN_CHARACTERS = 2;

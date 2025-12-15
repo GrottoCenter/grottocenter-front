@@ -58,27 +58,11 @@ const OrganizationsSearch = () => {
       <SearchFieldset title="Localization">
         <SearchTextAutocomplete
           ressourceType={searchEntity}
-          ressourceField="city"
+          ressourceField="country"
           ressourceFilter={matchAllFields ? filterState : {}}
-          label="City"
-          onChange={e => updateFilter('city', e)}
-          value={filterState.city}
-        />
-        <SearchTextAutocomplete
-          ressourceType={searchEntity}
-          ressourceField="postalCode"
-          ressourceFilter={matchAllFields ? filterState : {}}
-          label="Postal code"
-          onChange={e => updateFilter('postalCode', e)}
-          value={filterState.postalCode}
-        />
-        <SearchTextAutocomplete
-          ressourceType={searchEntity}
-          ressourceField="county"
-          ressourceFilter={matchAllFields ? filterState : {}}
-          label="County"
-          onChange={e => updateFilter('county', e)}
-          value={filterState.county}
+          label="Country"
+          onChange={e => updateFilter('country', e)}
+          value={filterState.country}
         />
         <SearchTextAutocomplete
           ressourceType={searchEntity}
@@ -90,11 +74,27 @@ const OrganizationsSearch = () => {
         />
         <SearchTextAutocomplete
           ressourceType={searchEntity}
-          ressourceField="country"
+          ressourceField="county"
           ressourceFilter={matchAllFields ? filterState : {}}
-          label="Country"
-          onChange={e => updateFilter('country', e)}
-          value={filterState.country}
+          label="County"
+          onChange={e => updateFilter('county', e)}
+          value={filterState.county}
+        />
+        <SearchTextAutocomplete
+          ressourceType={searchEntity}
+          ressourceField="postalCode"
+          ressourceFilter={matchAllFields ? filterState : {}}
+          label="Postal code"
+          onChange={e => updateFilter('postalCode', e)}
+          value={filterState.postalCode}
+        />
+        <SearchTextAutocomplete
+          ressourceType={searchEntity}
+          ressourceField="city"
+          ressourceFilter={matchAllFields ? filterState : {}}
+          label="City"
+          onChange={e => updateFilter('city', e)}
+          value={filterState.city}
         />
       </SearchFieldset>
 

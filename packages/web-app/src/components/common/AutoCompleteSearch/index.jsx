@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
+import { useIntl } from 'react-intl';
 import Autocomplete from '@mui/material/Autocomplete';
 import {
   InputBase,
@@ -11,10 +12,10 @@ import { alpha, styled } from '@mui/material/styles';
 import SearchIcon from '@mui/icons-material/Search';
 import ErrorIcon from '@mui/icons-material/Error';
 
-import Translate from '../Translate';
 import DisabledTooltip from './DisabledTooltip';
 
 import { entityOptionForSelector } from '../../../helpers/Entity';
+import { AUTOCOMPLETE_MIN_CHARACTERS } from '../../../conf/config';
 
 const StyledAutocomplete = styled(Autocomplete)`
   min-width: 200px;
@@ -99,6 +100,7 @@ const AutoCompleteSearch = ({
   disabled = false,
   hasFixWidth = true
 }) => {
+  const { formatMessage } = useIntl();
   const [isOpen, setOpen] = useState(false);
 
   const handleSelectionChange = (_event, newSelection) => {
@@ -147,9 +149,10 @@ const AutoCompleteSearch = ({
       onOpen={handleOpen}
       onClose={handleClose}
       open={isOpen}
-      noOptionsText={
-        <Translate>No result (enter at least 3 characters)</Translate>
-      }
+      noOptionsText={formatMessage(
+        { id: 'No result (enter at least {count} characters)' },
+        { count: AUTOCOMPLETE_MIN_CHARACTERS }
+      )}
       renderInput={params => (
         <DisabledTooltip disabled={disabled}>
           <InputWrapper $hasFixWidth={hasFixWidth} disabled={disabled}>

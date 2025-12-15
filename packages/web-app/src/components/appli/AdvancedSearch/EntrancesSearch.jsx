@@ -129,19 +129,11 @@ const EntrancesSearch = () => {
       <SearchFieldset title="Localization">
         <SearchTextAutocomplete
           ressourceType={searchEntity}
-          ressourceField="city"
+          ressourceField="country"
           ressourceFilter={matchAllFields ? filterState : {}}
-          label="City"
-          onChange={e => updateFilter('city', e)}
-          value={filterState.city}
-        />
-        <SearchTextAutocomplete
-          ressourceType={searchEntity}
-          ressourceField="county"
-          ressourceFilter={matchAllFields ? filterState : {}}
-          label="County"
-          onChange={e => updateFilter('county', e)}
-          value={filterState.county}
+          label="Country"
+          onChange={e => updateFilter('country', e)}
+          value={filterState.country}
         />
         <SearchTextAutocomplete
           ressourceType={searchEntity}
@@ -153,11 +145,19 @@ const EntrancesSearch = () => {
         />
         <SearchTextAutocomplete
           ressourceType={searchEntity}
-          ressourceField="country"
+          ressourceField="county"
           ressourceFilter={matchAllFields ? filterState : {}}
-          label="Country"
-          onChange={e => updateFilter('country', e)}
-          value={filterState.country}
+          label="County"
+          onChange={e => updateFilter('county', e)}
+          value={filterState.county}
+        />
+        <SearchTextAutocomplete
+          ressourceType={searchEntity}
+          ressourceField="city"
+          ressourceFilter={matchAllFields ? filterState : {}}
+          label="City"
+          onChange={e => updateFilter('city', e)}
+          value={filterState.city}
         />
       </SearchFieldset>
 
@@ -192,13 +192,13 @@ const EntrancesSearch = () => {
           label="Depth"
           helperText="In meters"
           marks={depthMarks}
-          onChange={e => updateFilter('cave.depth', e)}
+          onChange={e => updateFilter('cave.depth', Math.trunc(e))}
         />
         <SearchSlider
           label="Length"
           helperText="In meters"
           marks={lengthMarks}
-          onChange={e => updateFilter('cave.length', e)}
+          onChange={e => updateFilter('cave.length', Math.trunc(e))}
         />
       </SearchFieldset>
 

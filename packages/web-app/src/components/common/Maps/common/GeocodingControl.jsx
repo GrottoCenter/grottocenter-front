@@ -4,7 +4,11 @@ import { styled } from '@mui/material/styles';
 import { TextField, Paper, List, ListItem, ListItemText, CircularProgress, InputAdornment } from '@mui/material';
 import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
-import { NOMINATIM_API_URL } from '../../../../conf/config';
+import {
+  NOMINATIM_API_URL,
+  AUTOCOMPLETE_DEBOUNCE_DELAY,
+  AUTOCOMPLETE_MIN_CHARACTERS
+} from '../../../../conf/config';
 
 const SearchContainer = styled(Paper)`
   position: absolute;
@@ -64,7 +68,7 @@ const GeocodingControl = ({ onLocationSelect }) => {
   }, [map]);
 
   useEffect(() => {
-    if (query.length < 3) {
+    if (query.length < AUTOCOMPLETE_MIN_CHARACTERS) {
       setResults([]);
       setLoading(false);
       return;
@@ -86,7 +90,7 @@ const GeocodingControl = ({ onLocationSelect }) => {
       } finally {
         setLoading(false);
       }
-    }, 1000);
+    }, AUTOCOMPLETE_DEBOUNCE_DELAY);
 
     return () => {
       clearTimeout(timer);

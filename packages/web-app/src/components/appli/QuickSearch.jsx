@@ -9,6 +9,10 @@ import {
   resetQuicksearch
 } from '../../actions/Quicksearch';
 import { useDebounce } from '../../hooks';
+import {
+  AUTOCOMPLETE_DEBOUNCE_DELAY,
+  AUTOCOMPLETE_MIN_CHARACTERS
+} from '../../conf/config';
 
 const QuickSearch = ({ hasFixWidth }) => {
   const { formatMessage } = useIntl();
@@ -19,7 +23,7 @@ const QuickSearch = ({ hasFixWidth }) => {
   );
   const [input, setInput] = useState('');
 
-  const debouncedInput = useDebounce(input);
+  const debouncedInput = useDebounce(input, AUTOCOMPLETE_DEBOUNCE_DELAY);
 
   const handleSelection = selection => {
     if (!selection.id) return;
@@ -37,7 +41,7 @@ const QuickSearch = ({ hasFixWidth }) => {
   };
 
   useEffect(() => {
-    if (debouncedInput.length < 2) {
+    if (debouncedInput.length < AUTOCOMPLETE_MIN_CHARACTERS) {
       dispatch(resetQuicksearch());
       return;
     }
