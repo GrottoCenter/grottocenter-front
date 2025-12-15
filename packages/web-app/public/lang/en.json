@@ -1185,7 +1185,7 @@
   "No region matches you search criteria": "No region matches you search criteria",
   "No region subscriptions": "No region subscriptions",
   "No regions found": "No regions found",
-  "No result (enter at least 3 characters)": "No result (enter at least 3 characters)",
+  "No result (enter at least {count} characters)": "No result (enter at least {count} characters)",
   "No result.": "No result.",
   "No results": "No results",
   "No results to display (type at least 3 characters)": "No results to display (type at least 3 characters)",

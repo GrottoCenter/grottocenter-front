@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import PropTypes from 'prop-types';
+import { useIntl } from 'react-intl';
 
 import { styled } from '@mui/material/styles';
 import {
@@ -24,6 +25,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import ClearIcon from '@mui/icons-material/Clear';
 import { fetchFieldSearch } from '../../../actions/FieldSearch';
 import Translate from '../../common/Translate';
+import { AUTOCOMPLETE_DEBOUNCE_DELAY } from '../../../conf/config';
 
 const StyledForm = styled('form')`
   display: flex;
@@ -135,19 +137,39 @@ export const SearchTextAutocomplete = ({
   value,
   onChange
 }) => {
+  const { formatMessage } = useIntl();
   const [options, setOptions] = useState([]);
-  // TODO Add debounce ?
+  const [loading, setLoading] = useState(false);
+  const cacheRef = useRef({});
+  const debounceTimer = useRef(null);
 
   const updateOption = async query => {
+    setLoading(true);
     const filter = { ...ressourceFilter };
     if (filter[ressourceField]) delete filter[ressourceField];
+    const cacheKey = JSON.stringify({
+      entity: ressourceType,
+      field: ressourceField,
+      filter,
+      query
+    });
+
+    if (cacheRef.current[cacheKey]) {
+      setOptions(cacheRef.current[cacheKey]);
+      setLoading(false);
+      return;
+    }
+
+    setOptions([]);
     const r = await fetchFieldSearch({
       entity: ressourceType,
       field: ressourceField,
       filter,
       query
     });
+    cacheRef.current[cacheKey] = r.hits;
     setOptions(r.hits);
+    setLoading(false);
   };
 
   return (
@@ -158,14 +180,19 @@ export const SearchTextAutocomplete = ({
         maxWidth: '30rem'
       }}
       options={options}
+      loading={loading}
+      loadingText={formatMessage({ id: 'Loading ...' })}
       getOptionLabel={o => (typeof o === 'string' ? o : o[0])}
       onOpen={async () => {
         setOptions([]);
-        updateOption();
+        updateOption('');
       }}
       onInputChange={(event, newInputValue) => {
-        updateOption(newInputValue);
         onChange(newInputValue);
+        if (debounceTimer.current) clearTimeout(debounceTimer.current);
+        debounceTimer.current = setTimeout(() => {
+          updateOption(newInputValue);
+        }, AUTOCOMPLETE_DEBOUNCE_DELAY);
       }}
       inputValue={value}
       freeSolo
@@ -173,7 +200,6 @@ export const SearchTextAutocomplete = ({
       openOnFocus
       includeInputInList
       filterOptions={x => x}
-      filterSelectedOptions
       renderInput={params => (
         <StyledTextField
           {...params}
@@ -334,7 +360,7 @@ export const SearchDivingTypes = ({ onChange, value }) => (
 
 SearchDivingTypes.propTypes = {
   onChange: PropTypes.func.isRequired,
-  value: PropTypes.oneOfType([PropTypes.string, PropTypes.bool]),
+  value: PropTypes.oneOfType([PropTypes.string, PropTypes.bool])
 };
 
 export const SearchSelect = ({
