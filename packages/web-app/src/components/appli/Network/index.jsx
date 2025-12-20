@@ -49,7 +49,7 @@ export const Network = ({ isLoading, error, cave }) => {
   const userId = useUserProperties()?.id ?? null;
   const [isExploredLoading, setIsExploredLoading] = useState(false);
   const [isExplored, setIsExplored] = useState(false);
-  const { person } = useSelector(state => state.person);
+  const { person, error: personError } = useSelector(state => state.person);
   const exploredNetworks = person?.exploredNetworks;
 
   useEffect(() => {
@@ -75,10 +75,10 @@ export const Network = ({ isLoading, error, cave }) => {
   };
 
   useEffect(() => {
-    if (userId && !person) {
+    if (userId && !person && !personError) {
       dispatch(fetchPerson(userId));
     }
-  }, [userId, person, dispatch]);
+  }, [userId, person, personError, dispatch]);
 
   useEffect(() => {
     if (cave?.id) {

@@ -68,7 +68,7 @@ export const Entry = ({ isLoading, error, entrance }) => {
   const userId = useUserProperties()?.id ?? null;
   const [isExploredLoading, setIsExploredLoading] = useState(false);
   const [isExplored, setIsExplored] = useState(false);
-  const { person } = useSelector(state => state.person);
+  const { person, error: personError } = useSelector(state => state.person);
   const exploredEntrances = person?.exploredEntrances;
   const exploredNetworks = person?.exploredNetworks;
   const mapPositions = useMemo(() => (entrance ? [entrance] : []), [entrance]);
@@ -96,10 +96,10 @@ export const Entry = ({ isLoading, error, entrance }) => {
   };
 
   useEffect(() => {
-    if (userId && !person) {
+    if (userId && !person && !personError) {
       dispatch(fetchPerson(userId));
     }
-  }, [userId, person, dispatch]);
+  }, [userId, person, personError, dispatch]);
 
   useEffect(() => {
     if (entrance?.id && entrance?.cave?.id) {
