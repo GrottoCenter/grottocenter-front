@@ -81,7 +81,6 @@ const DataControl = ({ updateHeatmap, updateMarkers, ...props }) => {
           aria-label={formatMessage({ id: 'data-control' })}
           onMouseOver={handleOpenMenu}
           onClick={handleOpenMenu}
-          onFocus={handleOpenMenu}
           // TODO enable on fullscreen as it's currently hidden
           disabled={fullScreen}
           size="large">
