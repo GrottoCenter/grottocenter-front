@@ -10,8 +10,6 @@ import {
   Height,
   Public,
   Terrain,
-  Thermostat,
-  Waves,
   Place,
   Map,
   FlagRounded
@@ -19,8 +17,16 @@ import {
 import Alert from '../../common/Alert';
 import CustomIcon from '../../common/CustomIcon';
 import { Property } from '../../common/Properties';
+import InfoSection from '../../common/InfoSection';
 import Ratings from './Ratings';
 import { EntrancePropTypes } from '../../../types/entrance.type';
+import {
+  DepthProperty,
+  LengthProperty,
+  TemperatureProperty,
+  DivingProperty,
+  OrganizationProperty
+} from '../../common/CaveProperties';
 
 const GlobalWrapper = styled('div')`
   width: 100%;
@@ -85,151 +91,149 @@ const Properties = ({ isLoading = false, entrance }) => {
 
   return (
     <GlobalWrapper>
-      <Box display="flex" flexDirection="column">
-        {entrance.latitude && entrance.longitude && (
-          <FlexContainer>
-            <FlexContainerGrow>
+      <InfoSection title={formatMessage({ id: 'Cave information' })}>
+        <Box display="flex" flexDirection="column">
+          {entrance.latitude && entrance.longitude && (
+            <FlexContainer>
+              <FlexContainerGrow>
+                <Property
+                  loading={isLoading}
+                  label={`${formatMessage({ id: 'Coordinates' })} (WGS84)`}
+                  value={`${formatMessage({ id: 'Lat.' })} (N) / ${formatMessage(
+                    {
+                      id: 'Long.'
+                    }
+                  )} (E) = ${entrance.latitude.toFixed(
+                    4
+                  )}, ${entrance.longitude.toFixed(4)}`}
+                  icon={<GpsFixed fontSize="large" color="primary" />}
+                />
+              </FlexContainerGrow>
+              <div>
+                <ButtonGroup color="primary" variant="outlined" size="small">
+                  <Tooltip
+                    title={formatMessage({ id: 'Open on OpenStreetMap' })}>
+                    <Button onClick={openOSM} startIcon={<Map />}>
+                      OSM
+                    </Button>
+                  </Tooltip>
+                  <Tooltip title={formatMessage({ id: 'Open on Google Maps' })}>
+                    <Button onClick={openGM} startIcon={<Place />}>
+                      GMaps
+                    </Button>
+                  </Tooltip>
+                </ButtonGroup>
+              </div>
+            </FlexContainer>
+          )}
+          {precisionText && (
+            <Alert
+              severity={computePrecisionSeverity(entrance.precision)}
+              content={precisionText}
+            />
+          )}
+          <Box
+            display="flex"
+            flexDirection="row"
+            flexWrap="wrap"
+            justifyContent="flex-start">
+            <Property
+              loading={isLoading}
+              label={formatMessage({ id: 'Country' })}
+              value={entrance.country}
+              url={`/ui/countries/${entrance.country}`}
+              icon={<FlagRounded fontSize="large" color="primary" />}
+              secondary
+            />
+            <Property
+              flexBasis="fill"
+              loading={isLoading}
+              label={formatMessage({ id: 'Location' })}
+              value={[entrance.city, entrance.region]
+                .flatMap(f => (f ? [f] : []))
+                .join(', ')}
+              icon={<Public fontSize="large" color="primary" />}
+              secondary
+            />
+          </Box>
+          <Box
+            display="flex"
+            flexDirection="row"
+            flexWrap="wrap"
+            justifyContent="flex-start">
+            {entrance.massif && (
               <Property
-                loading={isLoading}
-                label={`${formatMessage({ id: 'Coordinates' })} (WGS84)`}
-                value={`${formatMessage({ id: 'Lat.' })} (N) / ${formatMessage({
-                  id: 'Long.'
-                })} (E) = ${entrance.latitude.toFixed(
-                  4
-                )}, ${entrance.longitude.toFixed(4)}`}
-                icon={<GpsFixed fontSize="large" color="primary" />}
+                label={formatMessage({ id: 'Massif' })}
+                value={entrance.massif.name}
+                icon={<Terrain fontSize="large" color="primary" />}
+                url={`/ui/massifs/${entrance.massif.id}`}
               />
-            </FlexContainerGrow>
-            <div>
-              <ButtonGroup color="primary" variant="outlined" size="small">
-                <Tooltip title={formatMessage({ id: 'Open on OpenStreetMap' })}>
-                  <Button onClick={openOSM} startIcon={<Map />}>
-                    OSM
-                  </Button>
-                </Tooltip>
-                <Tooltip title={formatMessage({ id: 'Open on Google Maps' })}>
-                  <Button onClick={openGM} startIcon={<Place />}>
-                    GMaps
-                  </Button>
-                </Tooltip>
-              </ButtonGroup>
-            </div>
-          </FlexContainer>
-        )}
-        {precisionText && (
-          <Alert
-            severity={computePrecisionSeverity(entrance.precision)}
-            content={precisionText}
-          />
-        )}
-        <Box
-          display="flex"
-          flexDirection="row"
-          flexWrap="wrap"
-          justifyContent="flex-start">
-          <Property
-            loading={isLoading}
-            label={formatMessage({ id: 'Country' })}
-            value={entrance.country}
-            url={`/ui/countries/${entrance.country}`}
-            icon={<FlagRounded fontSize="large" color="primary" />}
-            secondary
-          />
-          <Property
-            flexBasis="fill"
-            loading={isLoading}
-            label={formatMessage({ id: 'Location' })}
-            value={[entrance.city, entrance.region]
-              .flatMap(f => (f ? [f] : []))
-              .join(', ')}
-            icon={<Public fontSize="large" color="primary" />}
-            secondary
-          />
+            )}
+            {entrance.cave && entrance.cave.entrances.length > 1 && (
+              <Property
+                flexBasis="fit-content"
+                label={formatMessage({ id: 'Cave' })}
+                value={`${entrance.cave.name}`}
+                icon={<CustomIcon type="cave_system" />}
+                url={`/ui/caves/${entrance.cave.id}`}
+              />
+            )}
+          </Box>
         </Box>
         <Box
           display="flex"
           flexDirection="row"
           flexWrap="wrap"
           justifyContent="flex-start">
-          {entrance.massif && (
+          <DepthProperty depth={entrance.cave?.depth} isLoading={isLoading} />
+          <LengthProperty
+            length={entrance.cave?.length}
+            isLoading={isLoading}
+          />
+          {!!entrance.altitude && (
             <Property
-              label={formatMessage({ id: 'Massif' })}
-              value={entrance.massif.name}
-              icon={<Terrain fontSize="large" color="primary" />}
-              url={`/ui/massifs/${entrance.massif.id}`}
+              label={formatMessage({ id: 'Altitude' })}
+              value={`${entrance.altitude} m`}
+              icon={<Height color="primary" />}
             />
           )}
-          {entrance.cave && entrance.cave.entrances.length > 1 && (
+          <TemperatureProperty
+            temperature={entrance.cave?.temperature}
+            isLoading={isLoading}
+          />
+          {!!entrance.discoveryYear && (
             <Property
-              flexBasis="fit-content"
-              label={formatMessage({ id: 'Cave' })}
-              value={`${entrance.cave.name}`}
-              icon={<CustomIcon type="cave_system" />}
-              url={`/ui/caves/${entrance.cave.id}`}
+              label={formatMessage({ id: 'Year of discovery' })}
+              value={entrance.discoveryYear}
+              icon={<CalendarToday color="primary" />}
             />
           )}
+          {!!entrance.massif?.undergroundType && (
+            <Property
+              label={formatMessage({ id: 'Underground type' })}
+              value={entrance.undergroundType}
+              icon={<Category color="primary" />}
+            />
+          )}
+          <DivingProperty
+            isDiving={entrance.cave?.isDiving}
+            isLoading={isLoading}
+          />
         </Box>
-      </Box>
-      <Box
-        display="flex"
-        flexDirection="row"
-        flexWrap="wrap"
-        justifyContent="flex-start">
-        {!!entrance.cave?.depth && (
-          <Property
-            loading={isLoading}
-            label={formatMessage({ id: 'Depth' })}
-            value={`${entrance.cave.depth} m`}
-            icon={<CustomIcon type="depth" />}
-          />
-        )}
-        {!!entrance.cave?.length && (
-          <Property
-            loading={isLoading}
-            label={formatMessage({ id: 'Development' })}
-            value={`${entrance.cave.length} m`}
-            icon={<CustomIcon type="length" />}
-          />
-        )}
-        {!!entrance.altitude && (
-          <Property
-            label={formatMessage({ id: 'Altitude' })}
-            value={`${entrance.altitude} m`}
-            icon={<Height color="primary" />}
-          />
-        )}
-        {!!entrance.cave?.temperature && (
-          <Property
-            loading={isLoading}
-            label={formatMessage({ id: 'Temperature' })}
-            value={`${entrance.cave.temperature} °C`}
-            icon={<Thermostat fontSize="large" color="primary" />}
-          />
-        )}
-        {!!entrance.discoveryYear && (
-          <Property
-            label={formatMessage({ id: 'Year of discovery' })}
-            value={entrance.discoveryYear}
-            icon={<CalendarToday color="primary" />}
-          />
-        )}
-        {!!entrance.massif?.undergroundType && (
-          <Property
-            label={formatMessage({ id: 'Underground type' })}
-            value={entrance.undergroundType}
-            icon={<Category color="primary" />}
-          />
-        )}
-        {!!entrance.cave?.isDiving && (
-          <Property
-            value={formatMessage({
-              id: 'Diving cave'
-            })}
-            icon={<Waves color="primary" />}
-            secondary
-          />
-        )}
-      </Box>
+      </InfoSection>
+      {entrance.cave?.exploringOrganizations?.length > 0 && (
+        <InfoSection title={formatMessage({ id: 'Exploring organizations' })}>
+          <Box
+            display="flex"
+            flexDirection="row"
+            flexWrap="wrap"
+            justifyContent="flex-start">
+            {entrance.cave.exploringOrganizations.map(org => (
+              <OrganizationProperty key={org.id} organization={org} />
+            ))}
+          </Box>
+        </InfoSection>
+      )}
       {!!entrance.stats &&
         !!entrance.stats.approach &&
         !!entrance.stats.aestheticism &&
