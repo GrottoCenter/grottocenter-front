@@ -2,73 +2,62 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import { styled } from '@mui/material/styles';
-import { Terrain, Waves, Thermostat } from '@mui/icons-material';
 
-import CustomIcon from '../../common/CustomIcon';
-import { Property } from '../../common/Properties';
+import InfoSection from '../../common/InfoSection';
+import {
+  SecondaryPropertiesWrapper,
+  DepthProperty,
+  LengthProperty,
+  MassifProperty,
+  DivingProperty,
+  TemperatureProperty,
+  OrganizationProperty
+} from '../../common/CaveProperties';
 
 const Wrapper = styled('div')`
   display: flex;
   flex-direction: column;
 `;
 
-const SecondaryPropertiesWrapper = styled('div')`
-  display: flex;
-  justify-content: flex-start;
-  flex-wrap: wrap;
-`;
-
 const Properties = ({ isLoading, cave, children }) => {
   const { formatMessage } = useIntl();
 
+  const hasCaveInfo =
+    children ||
+    cave?.depth ||
+    cave?.length ||
+    cave?.massifs?.length > 0 ||
+    cave?.isDiving ||
+    cave?.temperature;
+
   return (
     <Wrapper>
-      {children}
-      {!!cave.depth && (
-        <Property
-          loading={isLoading}
-          label={formatMessage({ id: 'Depth' })}
-          value={`${cave.depth} m`}
-          icon={<CustomIcon type="depth" />}
-        />
-      )}
-      {!!cave.length && (
-        <Property
-          loading={isLoading}
-          label={formatMessage({ id: 'Development' })}
-          value={`${cave.length} m`}
-          icon={<CustomIcon type="length" />}
-        />
-      )}
-      <SecondaryPropertiesWrapper>
-        {!!cave.massifs &&
-          cave.massifs.map(massif => (
-            <Property
-              id={massif.id}
-              label={formatMessage({ id: 'Massif' })}
-              value={massif.name}
-              url={`/ui/massifs/${massif.id}`}
-              icon={<Terrain color="primary" />}
-              secondary
+      {hasCaveInfo && (
+        <InfoSection title={formatMessage({ id: 'Cave information' })}>
+          {children}
+          <DepthProperty depth={cave?.depth} isLoading={isLoading} />
+          <LengthProperty length={cave?.length} isLoading={isLoading} />
+          <SecondaryPropertiesWrapper>
+            {cave?.massifs?.map(massif => (
+              <MassifProperty key={massif.id} massif={massif} secondary />
+            ))}
+            <DivingProperty isDiving={cave?.isDiving} isLoading={isLoading} />
+            <TemperatureProperty
+              temperature={cave?.temperature}
+              isLoading={isLoading}
             />
-          ))}
-        {!!cave.isDiving && (
-          <Property
-            loading={isLoading}
-            value={formatMessage({ id: 'Diving cave' })}
-            icon={<Waves color="primary" />}
-            secondary
-          />
-        )}
-        {!!cave.temperature && (
-          <Property
-            loading={isLoading}
-            label={formatMessage({ id: 'Temperature' })}
-            value={`${cave.temperature} °C`}
-            icon={<Thermostat fontSize="large" color="primary" />}
-          />
-        )}
-      </SecondaryPropertiesWrapper>
+          </SecondaryPropertiesWrapper>
+        </InfoSection>
+      )}
+      {cave?.exploringOrganizations?.length > 0 && (
+        <InfoSection title={formatMessage({ id: 'Exploring organizations' })}>
+          <SecondaryPropertiesWrapper>
+            {cave.exploringOrganizations.map(org => (
+              <OrganizationProperty key={org.id} organization={org} />
+            ))}
+          </SecondaryPropertiesWrapper>
+        </InfoSection>
+      )}
     </Wrapper>
   );
 };
@@ -86,6 +75,13 @@ Properties.propTypes = {
       PropTypes.shape({
         id: PropTypes.number.isRequired,
         name: PropTypes.string.isRequired
+      })
+    ),
+    exploringOrganizations: PropTypes.arrayOf(
+      PropTypes.shape({
+        id: PropTypes.number.isRequired,
+        name: PropTypes.string.isRequired,
+        language: PropTypes.string
       })
     )
   })
