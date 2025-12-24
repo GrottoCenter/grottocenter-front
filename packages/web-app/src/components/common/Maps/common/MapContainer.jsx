@@ -25,11 +25,11 @@ ${$wholePage && `height: calc(100vh - ${theme.appBarHeight}px);`}
 
 // The Map, once mounted, doesn't change its center: this Centerer forces it
 // See https://github.com/PaulLeCam/react-leaflet/issues/796#issuecomment-743181396
-const Centerer = ({ center }) => {
+const Centerer = ({ center, zoom }) => {
   const map = useMap();
   useEffect(() => {
-    map.setView(center);
-  }, [center, map]);
+    map.setView(center, zoom);
+  }, [center, zoom, map]);
   return null;
 };
 
@@ -53,7 +53,8 @@ const handleResize = map => {
 };
 
 Centerer.propTypes = {
-  center: PropTypes.arrayOf(PropTypes.number)
+  center: PropTypes.arrayOf(PropTypes.number),
+  zoom: PropTypes.number
 };
 
 const FullscreenInteraction = ({ dragging, scrollWheelZoom }) => {
@@ -100,7 +101,8 @@ const CustomMapContainer = ({
   shouldChangeControlInFullscreen = true,
   style,
   children,
-  forceCentering
+  forceCentering,
+  mapRef
 }) => (
   <Wrapper $wholePage={wholePage}>
     <MapContainer
@@ -112,7 +114,10 @@ const CustomMapContainer = ({
       scrollWheelZoom={scrollWheelZoom}
       isSideMenuOpen={isSideMenuOpen}
       minZoom={1}
-      ref={handleResize}
+      ref={(ref) => {
+        handleResize(ref);
+        if (mapRef) mapRef.current = ref;
+      }}
       preferCanvas>
       {isFullscreenAllowed && shouldChangeControlInFullscreen && (
         <FullscreenInteraction dragging={dragging} scrollWheelZoom={scrollWheelZoom} />
@@ -120,7 +125,7 @@ const CustomMapContainer = ({
       {isFullscreenAllowed && !shouldChangeControlInFullscreen && (
         <FullscreenControl forceSeparateButton="true" />
       )}
-      {forceCentering && <Centerer center={center} />}
+      {forceCentering && <Centerer center={center} zoom={zoom} />}
       {isLocateControl && <LocateControl />}
       <ScaleControl position="bottomright" />
       <LayersControl />
@@ -141,7 +146,8 @@ CustomMapContainer.propTypes = {
   isFullscreenAllowed: PropTypes.bool,
   shouldChangeControlInFullscreen: PropTypes.bool,
   style: PropTypes.shape({}),
-  forceCentering: PropTypes.bool
+  forceCentering: PropTypes.bool,
+  mapRef: PropTypes.shape({ current: PropTypes.any })
 };
 
 export default CustomMapContainer;
