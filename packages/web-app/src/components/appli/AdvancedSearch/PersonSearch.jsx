@@ -11,6 +11,7 @@ import {
   SearchActionButtons
 } from './SearchElements';
 import { ADVANCED_SEARCH_TYPES } from '../../../conf/config';
+import { getStoredRowsPerPage } from '../../common/EntityTable/EntityTable';
 
 const PersonSearch = () => {
   const dispatch = useDispatch();
@@ -21,7 +22,8 @@ const PersonSearch = () => {
       fetchAdvancedSearchResults({
         entity: ADVANCED_SEARCH_TYPES.PERSONS,
         query,
-        filter: { type: 'AUTHOR' }
+        filter: { type: 'AUTHOR' },
+        size: getStoredRowsPerPage()
       })
     );
 

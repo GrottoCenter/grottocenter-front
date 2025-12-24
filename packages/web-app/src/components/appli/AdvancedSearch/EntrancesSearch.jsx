@@ -17,6 +17,7 @@ import {
   SearchActionButtons
 } from './SearchElements';
 import { ADVANCED_SEARCH_TYPES } from '../../../conf/config';
+import { getStoredRowsPerPage } from '../../common/EntityTable/EntityTable';
 
 const lengthMarks = [
   {
@@ -107,7 +108,8 @@ const EntrancesSearch = () => {
         entity: searchEntity,
         query,
         filter: filterState,
-        matchAllFields
+        matchAllFields,
+        size: getStoredRowsPerPage()
       })
     );
 
