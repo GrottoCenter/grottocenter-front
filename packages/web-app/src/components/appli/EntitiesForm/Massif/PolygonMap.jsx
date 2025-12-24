@@ -31,7 +31,7 @@ const PolygonMap = ({ onChange, data }) => {
   const { formatMessage } = useIntl();
   const isMounted = useRef(true);
   const displayValue = useRef(false);
-  const { location: geoLocation, isReady, hasError } = useGeolocation();
+  const { location: geoLocation, hasLocation } = useGeolocation();
   const [map, setMap] = useState();
 
   // Configure Leaflet Draw text
@@ -75,23 +75,20 @@ const PolygonMap = ({ onChange, data }) => {
   }, [formatMessage]);
 
   const [mapLayers, setMapLayers] = useState([]);
-  const [center, setCenter] = useState(
-    data
-      ? getMultiPolygonCentroid(data.coordinates[0][0])
-      : geoLocation
-  );
-  const ZOOM_LEVEL = !data && hasError ? defaultZoom : focusZoom;
+  const initialCenter = data
+    ? getMultiPolygonCentroid(data.coordinates[0][0])
+    : geoLocation;
+  const ZOOM_LEVEL = (data || hasLocation) ? focusZoom : defaultZoom;
 
   useEffect(() => {
     if (map) {
-      if (data && data.coordinates && data.coordinates[0] && data.coordinates[0][0]) {
+      if (data?.coordinates?.[0]?.[0]) {
         map.fitBounds(data.coordinates[0][0].map(e => [e[1], e[0]]));
-      } else if (isReady) {
+      } else if (hasLocation) {
         map.setView(geoLocation, ZOOM_LEVEL);
-        setCenter(geoLocation);
       }
     }
-  }, [isReady, geoLocation, data, map, ZOOM_LEVEL]);
+  }, [hasLocation, geoLocation, data, map, ZOOM_LEVEL]);
 
   const mapTOGeoJson = layers => {
     const geoJson = {};
@@ -198,7 +195,7 @@ const PolygonMap = ({ onChange, data }) => {
 
   return (
     <MapContainer
-      center={center}
+      center={initialCenter}
       zoom={ZOOM_LEVEL}
       ref={ref => {
         if (ref) setMap(ref);

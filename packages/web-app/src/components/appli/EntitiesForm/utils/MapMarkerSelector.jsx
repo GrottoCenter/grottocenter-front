@@ -79,7 +79,7 @@ const toFloat = value => {
 const MapMarkerSelector = ({ control, formLatitudeKey, formLongitudeKey }) => {
   const DEBOUNCE_TIME_MS = 300;
   const lastSetFormTs = useRef(0);
-  const { location: geoLocation, hasError: geoHasError } = useGeolocation();
+  const { location: geoLocation, hasLocation } = useGeolocation();
   const [currentPosition, setCurrentPosition] = useState(geoLocation);
   const [shouldUpdate, setShouldUpdate] = useState(false);
   const dispatch = useDispatch();
@@ -107,6 +107,12 @@ const MapMarkerSelector = ({ control, formLatitudeKey, formLongitudeKey }) => {
   const validLatitude = boundMinMax(-90, 90, toFloat(latitude));
   const validLongitude = boundMinMax(-180, 180, toFloat(longitude));
 
+  useEffect(() => {
+    if (hasLocation && !shouldUpdate) {
+      setCurrentPosition(geoLocation);
+    }
+  }, [hasLocation, geoLocation, shouldUpdate]);
+
   // Binding form -> map
   useEffect(() => {
     // Prevent dispatching a setCurrentPosition event triggered by a setForm below
@@ -118,10 +124,9 @@ const MapMarkerSelector = ({ control, formLatitudeKey, formLongitudeKey }) => {
       setCurrentPosition({ lat: validLatitude, lng: validLongitude });
       setShouldUpdate(true);
     } else if (!isValid) {
-      setCurrentPosition(geoLocation);
       setShouldUpdate(false);
     }
-  }, [validLatitude, validLongitude, geoLocation]);
+  }, [validLatitude, validLongitude]);
 
   // Binding form <- map
   const onMoveEnd = newLocation => {
@@ -130,7 +135,7 @@ const MapMarkerSelector = ({ control, formLatitudeKey, formLongitudeKey }) => {
     setFormLongitude(newLocation.lng.toFixed(6));
   };
 
-  const ZOOM_LEVEL = shouldUpdate ? focusZoom : (geoHasError ? defaultZoom : focusZoom);
+  const ZOOM_LEVEL = (shouldUpdate || hasLocation) ? focusZoom : defaultZoom;
 
   return (
     <StyledMapContainer

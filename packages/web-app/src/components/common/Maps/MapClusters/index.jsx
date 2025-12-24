@@ -135,13 +135,14 @@ const HydratedMap = ({
   );
 };
 
-const Index = ({ center, zoom, isSideMenuOpen, ...props }) => (
+const Index = ({ center, zoom, isSideMenuOpen, mapRef, ...props }) => (
   <CustomMapContainer
     center={center}
     zoom={zoom}
     isFullscreenAllowed={false}
     isSideMenuOpen={isSideMenuOpen}
-    isLocateControl>
+    isLocateControl
+    mapRef={mapRef}>
     <HydratedMap {...props} zoom={zoom} />
   </CustomMapContainer>
 );
@@ -167,6 +168,7 @@ HydratedMap.propTypes = {
 Index.propTypes = {
   isSideMenuOpen: PropTypes.bool,
   center: PropTypes.arrayOf(PropTypes.number),
+  mapRef: PropTypes.shape({ current: PropTypes.any }),
   ...HydratedMap.propTypes
 };
 

@@ -3,31 +3,21 @@ import { defaultCoord } from '../conf/config';
 
 const useGeolocation = () => {
   const [location, setLocation] = useState(defaultCoord);
-  const [isReady, setIsReady] = useState(false);
-  const [hasError, setHasError] = useState(false);
+  const [hasLocation, setHasLocation] = useState(false);
 
   useEffect(() => {
     if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          setLocation({
-            lat: position.coords.latitude,
-            lng: position.coords.longitude
-          });
-          setIsReady(true);
-        },
-        () => {
-          setHasError(true);
-          setIsReady(true);
-        }
-      );
-    } else {
-      setHasError(true);
-      setIsReady(true);
+      navigator.geolocation.getCurrentPosition((position) => {
+        setLocation({
+          lat: position.coords.latitude,
+          lng: position.coords.longitude
+        });
+        setHasLocation(true);
+      });
     }
   }, []);
 
-  return { location, isReady, hasError };
+  return { location, hasLocation };
 };
 
 export default useGeolocation;

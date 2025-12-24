@@ -1,4 +1,4 @@
-import React, { useEffect, Suspense } from 'react';
+import React, { useEffect, useRef, Suspense } from 'react';
 import { includes } from 'ramda';
 import { useNavigate, generatePath, useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
@@ -16,7 +16,7 @@ import {
 import { fetchProjections } from '../actions/Projections';
 import useGeolocation from '../hooks/useGeolocation';
 import 'leaflet/dist/leaflet.css';
-import { defaultZoom, focusZoom } from '../conf/config';
+import { defaultZoom, defaultCoord, focusZoom } from '../conf/config';
 
 const MapClusters = React.lazy(
   () => import('../components/common/Maps/MapClusters')
@@ -40,7 +40,8 @@ const Map = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const params = useParams();
-  const { location: geoLocation, isReady: isGeoReady, hasError: geoHasError } = useGeolocation();
+  const { location: geoLocation, hasLocation } = useGeolocation();
+  const mapRef = useRef(null);
   const {
     location,
     zoom,
@@ -92,26 +93,24 @@ const Map = () => {
 
   useEffect(() => {
     dispatch(fetchProjections());
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
-    if (!isGeoReady) return;
-    
     const target = decodeMapTarget(params.target);
     if (target) {
       dispatch(changeLocation({ lat: target.lat, lng: target.lng }));
       dispatch(changeZoom(target.zoom));
     } else {
       dispatch(changeLocation(geoLocation));
-      dispatch(changeZoom(geoHasError ? defaultZoom : focusZoom));
+      dispatch(changeZoom(defaultZoom));
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isGeoReady]);
+  }, [dispatch, params.target, geoLocation]);
 
-  if (!isGeoReady) {
-    return <PageLoader />;
-  }
+  useEffect(() => {
+    const target = decodeMapTarget(params.target);
+    const isDefaultTarget = target?.lat === defaultCoord.lat && target?.lng === defaultCoord.lng && target?.zoom === defaultZoom;
+    
+    if (hasLocation && (!params.target || isDefaultTarget) && mapRef.current) {
+      mapRef.current.setView([geoLocation.lat, geoLocation.lng], focusZoom);
+    }
+  }, [hasLocation, geoLocation, params.target]);
 
   return (
     <Suspense fallback={<PageLoader />}>
@@ -126,6 +125,7 @@ const Map = () => {
         onUpdate={handleUpdate}
         isSideMenuOpen={open}
         projectionsList={projections}
+        mapRef={mapRef}
       />
     </Suspense>
   );
