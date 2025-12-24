@@ -33,7 +33,30 @@ import { LoadingTableHead, LoadingTableBodyInner } from './LoadingTable';
 import Alert from '../Alert';
 import Translate from '../Translate';
 
+const DEFAULT_PAGE_SIZE_OPTIONS = [20, 100, 200];
 const MAX_DOCUMENTS_TO_EXPORT_IN_CSV = 10000; // This limit is also enforced server side
+
+const applyColumnVisibility = (columns, storedVisibility) => {
+  try {
+    const visibleColumns = JSON.parse(storedVisibility);
+    return columns.map(col => {
+      const newCol = [...col];
+      newCol[0] = visibleColumns.includes(col[1]);
+      return newCol;
+    });
+  } catch (e) {
+    return columns;
+  }
+};
+
+export const getStoredRowsPerPage = (pageSizeOptions = DEFAULT_PAGE_SIZE_OPTIONS) => {
+  const stored = localStorage.getItem('entityTable_rowsPerPage');
+  if (stored) {
+    const value = parseInt(stored, 10);
+    if (pageSizeOptions.includes(value)) return value;
+  }
+  return pageSizeOptions[0];
+};
 
 const StyledTablePagination = styled(TablePagination)`
   p {
@@ -105,7 +128,7 @@ EntityTableHead.propTypes = {
   rowCount: PropTypes.number.isRequired
 };
 
-const VisibleColumnsMenu = ({ columns, setColumns }) => {
+const VisibleColumnsMenu = ({ columns, setColumns, entityType }) => {
   const { formatMessage } = useIntl();
   const [anchorEl, setAnchorEl] = useState(null);
   return (
@@ -128,7 +151,13 @@ const VisibleColumnsMenu = ({ columns, setColumns }) => {
             key={column[1]}
             onClick={() => {
               column[0] = !column[0]; // eslint-disable-line no-param-reassign
-              setColumns([...columns]);
+              const newColumns = [...columns];
+              setColumns(newColumns);
+              if (entityType) {
+                const storageKey = `entityTable_${entityType}_columns`;
+                const visibleColumns = newColumns.filter(col => col[0]).map(col => col[1]);
+                localStorage.setItem(storageKey, JSON.stringify(visibleColumns));
+              }
             }}>
             <Checkbox
               size="small"
@@ -145,7 +174,8 @@ const VisibleColumnsMenu = ({ columns, setColumns }) => {
 };
 VisibleColumnsMenu.propTypes = {
   columns: PropTypes.arrayOf(PropTypes.array).isRequired,
-  setColumns: PropTypes.func.isRequired
+  setColumns: PropTypes.func.isRequired,
+  entityType: PropTypes.string
 };
 
 const EntityTable = ({
@@ -156,7 +186,7 @@ const EntityTable = ({
   pageRows,
   nbTotalRows,
   onRowClick,
-  pageSizeOptions = [20, 100, 200],
+  pageSizeOptions = DEFAULT_PAGE_SIZE_OPTIONS,
   onPageChange,
   onSortChange,
   onCSVDownload,
@@ -167,12 +197,20 @@ const EntityTable = ({
   const navigate = useNavigate();
 
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(pageSizeOptions[0]);
+  const [rowsPerPage, setRowsPerPage] = useState(() =>
+    getStoredRowsPerPage(pageSizeOptions)
+  );
   const [order, setOrder] = useState('');
   const [orderBy, setOrderBy] = useState('');
   const [selected, setSelected] = useState([]);
   const entityConfig = entitiesConfig[entityType ?? 'placeholder'];
-  const [entityColumns, setEntityColumns] = useState(entityConfig.columns);
+  const [entityColumns, setEntityColumns] = useState(() => {
+    const storageKey = `entityTable_${entityType}_columns`;
+    const stored = localStorage.getItem(storageKey);
+    return stored
+      ? applyColumnVisibility(entityConfig.columns, stored)
+      : entityConfig.columns;
+  });
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -182,9 +220,17 @@ const EntityTable = ({
   const handleChangeRowsPerPage = event => {
     const nbRowPerPage = parseInt(event.target.value, 10);
     setRowsPerPage(nbRowPerPage);
+    localStorage.setItem('entityTable_rowsPerPage', nbRowPerPage);
     setPage(0);
     if (onPageChange) onPageChange(0, nbRowPerPage);
   };
+
+  useEffect(() => {
+    if (onPageChange && rowsPerPage !== pageSizeOptions[0]) {
+      onPageChange(0, rowsPerPage);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleRowClick = (event, doc) => {
     if (onSelected) {
@@ -253,7 +299,12 @@ const EntityTable = ({
   };
 
   useEffect(() => {
-    const column = entityConfig.columns;
+    const storageKey = `entityTable_${entityType}_columns`;
+    const stored = localStorage.getItem(storageKey);
+    let column = stored
+      ? applyColumnVisibility(entityConfig.columns, stored)
+      : entityConfig.columns;
+    
     if (entityColumnsModifier) entityColumnsModifier(column);
     setEntityColumns(column);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -347,6 +398,7 @@ const EntityTable = ({
             <VisibleColumnsMenu
               columns={entityColumns}
               setColumns={setEntityColumns}
+              entityType={entityType}
             />
             {onCSVDownload && nbTotalRows <= MAX_DOCUMENTS_TO_EXPORT_IN_CSV && (
               <Button

@@ -12,6 +12,7 @@ import {
   SearchActionButtons
 } from './SearchElements';
 import { ADVANCED_SEARCH_TYPES } from '../../../conf/config';
+import { getStoredRowsPerPage } from '../../common/EntityTable/EntityTable';
 
 const MassifsSearch = () => {
   const dispatch = useDispatch();
@@ -21,7 +22,8 @@ const MassifsSearch = () => {
     dispatch(
       fetchAdvancedSearchResults({
         entity: ADVANCED_SEARCH_TYPES.MASSIFS,
-        query
+        query,
+        size: getStoredRowsPerPage()
       })
     );
 
