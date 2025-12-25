@@ -63,7 +63,7 @@ const Map = () => {
     });
     navigate(newPath, { replace: true });
     dispatch(changeLocation(center));
-    dispatch(changeZoom(zoom));
+    dispatch(changeZoom(newZoom));
 
     const criteria = {
       /* eslint-disable no-underscore-dangle */
@@ -93,6 +93,10 @@ const Map = () => {
 
   useEffect(() => {
     dispatch(fetchProjections());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
     const target = decodeMapTarget(params.target);
     if (target) {
       dispatch(changeLocation({ lat: target.lat, lng: target.lng }));

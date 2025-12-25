@@ -84,7 +84,7 @@ const HydratedMap = ({
       heat: visibleHeat === 'none' ? null : visibleHeat,
       markers: visibleMarkers,
       zoom: map.getZoom(),
-      center: map.getBounds().getCenter(),
+      center: map.getCenter(),
       bounds: map.getBounds()
     });
   };
