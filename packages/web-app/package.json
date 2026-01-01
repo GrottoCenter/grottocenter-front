@@ -16,7 +16,7 @@
     "@emotion/styled": "^11.14.1",
     "@mui/icons-material": "^7.3.5",
     "@mui/lab": "^7.0.1-beta.19",
-    "@mui/material": "^7.3.5",
+    "@mui/material": "^7.3.6",
     "@mui/styles": "^5.18.0",
     "@mui/x-date-pickers": "^8.19.0",
     "@react-leaflet/core": "3.0.0",
