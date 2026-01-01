@@ -2530,7 +2530,7 @@ __metadata:
     "@mui/styles": "npm:^5.18.0"
     "@mui/x-date-pickers": "npm:^8.19.0"
     "@react-leaflet/core": "npm:3.0.0"
-    "@storybook/addon-actions": "npm:8.6.14"
+    "@storybook/addon-actions": "npm:9.0.8"
     "@storybook/addon-essentials": "npm:8.6.14"
     "@storybook/addon-knobs": "npm:8.0.1"
     "@storybook/addon-links": "npm:8.6.14"
@@ -3571,6 +3571,13 @@ __metadata:
   peerDependencies:
     storybook: ^8.6.14
   checksum: 10/5d96c1519ffb78ce663612e8ad850523fefe6f8aae3add662ab461015dfdd4e64c62720655526d471893018efdc5049807c3ec49998fb51dfab6cfb5aed30b73
+  languageName: node
+  linkType: hard
+
+"@storybook/addon-actions@npm:9.0.8":
+  version: 9.0.8
+  resolution: "@storybook/addon-actions@npm:9.0.8"
+  checksum: 10/3c5ad1ea7cfe80064aa55ff332c6f2849269520a84ce28b0ca36263ac45710ed9a0983d6f244d562425bc8d8d33400715f61f10303b5fd5e6a6b8183066deb0d
   languageName: node
   linkType: hard
 
