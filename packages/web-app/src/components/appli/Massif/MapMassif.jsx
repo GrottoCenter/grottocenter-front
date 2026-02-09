@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo } from 'react';
 import { GeoJSON, Marker, Popup, useMap } from 'react-leaflet';
 import PropTypes from 'prop-types';
+import L from 'leaflet';
 
 import CustomMapContainer from '../../common/Maps/common/MapContainer';
 import EntranceMarker from '../../common/Maps/common/Markers/Components/EntranceMarker';
