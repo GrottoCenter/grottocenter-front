@@ -3,6 +3,7 @@ import {
   FETCH_PROJECTIONS_SUCCESS,
   FETCH_PROJECTIONS_LOADING
 } from '../actions/Projections';
+import { registerProjections } from '../helpers/coordinateTransform';
 
 const defaultState = {
   projections: null,
@@ -19,6 +20,7 @@ const reducer = (state = defaultState, action) => {
         loading: true
       };
     case FETCH_PROJECTIONS_SUCCESS:
+      registerProjections(action.data);
       return {
         ...state,
         loadings: false,

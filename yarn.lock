@@ -2580,6 +2580,8 @@ __metadata:
     redux: "npm:^5.0.1"
     redux-debounced: "npm:^0.5.0"
     redux-thunk: "npm:^3.1.0"
+    shpjs: "npm:^6.2.0"
+    simplify-js: "npm:^1.2.4"
     storybook: "npm:^8.6.15"
     storybook-react-router: "npm:1.0.8"
     swagger-ui-react: "npm:^5.30.3"
@@ -6910,6 +6912,13 @@ __metadata:
   version: 3.3.0
   resolution: "builtin-modules@npm:3.3.0"
   checksum: 10/62e063ab40c0c1efccbfa9ffa31873e4f9d57408cb396a2649981a0ecbce56aabc93c28feaccbc5658c95aab2703ad1d11980e62ec2e5e72637404e1eb60f39e
+  languageName: node
+  linkType: hard
+
+"but-unzip@npm:^0.1.4":
+  version: 0.1.7
+  resolution: "but-unzip@npm:0.1.7"
+  checksum: 10/7adebd4445cc3bf592faf3db2790798e1a4905523c58b1e34f8fae3da89a72368dff7fcd4f42d1c4613397f47263ebb9f692093eeecc3d5be34205a522bd4b73
   languageName: node
   linkType: hard
 
@@ -14516,6 +14525,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"parsedbf@npm:^2.0.0":
+  version: 2.0.0
+  resolution: "parsedbf@npm:2.0.0"
+  checksum: 10/de07d6935078d16508cb55fea53fcfc842e0bcc42ff3d23cfb94f49b55df2a3e4515966fedb97c6f3e5a4ed0d6d53b0a86c7d507d82a378e122d3a28863bebe0
+  languageName: node
+  linkType: hard
+
 "parseurl@npm:~1.3.2, parseurl@npm:~1.3.3":
   version: 1.3.3
   resolution: "parseurl@npm:1.3.3"
@@ -15664,7 +15680,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"proj4@npm:^2.20.2":
+"proj4@npm:^2.1.4, proj4@npm:^2.20.2":
   version: 2.20.2
   resolution: "proj4@npm:2.20.2"
   dependencies:
@@ -17319,6 +17335,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"shpjs@npm:^6.2.0":
+  version: 6.2.0
+  resolution: "shpjs@npm:6.2.0"
+  dependencies:
+    but-unzip: "npm:^0.1.4"
+    parsedbf: "npm:^2.0.0"
+    proj4: "npm:^2.1.4"
+  checksum: 10/1e286dce9607ffda063885ff75ad291defb699db41799134863df18918ae0faebc2d0e3389cfd9ee75b342c409826e6e9834441709aae5355e108ee72d62515a
+  languageName: node
+  linkType: hard
+
 "side-channel-list@npm:^1.0.0":
   version: 1.0.0
   resolution: "side-channel-list@npm:1.0.0"
@@ -17378,6 +17405,13 @@ __metadata:
   version: 4.1.0
   resolution: "signal-exit@npm:4.1.0"
   checksum: 10/c9fa63bbbd7431066174a48ba2dd9986dfd930c3a8b59de9c29d7b6854ec1c12a80d15310869ea5166d413b99f041bfa3dd80a7947bcd44ea8e6eb3ffeabfa1f
+  languageName: node
+  linkType: hard
+
+"simplify-js@npm:^1.2.4":
+  version: 1.2.4
+  resolution: "simplify-js@npm:1.2.4"
+  checksum: 10/d20127f999b318691665e095a82aaf3e668a094266df4f706b73cbc8ef88c4c13c1cbc4dc86344b7d380a7b56d228fbf137fd6fd09935de68f8025f095577e19
   languageName: node
   linkType: hard
 

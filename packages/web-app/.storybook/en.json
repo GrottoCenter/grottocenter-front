@@ -581,7 +581,7 @@
   "Drag and drop your logo here": "Drag and drop your logo here",
   "Drag handles or markers to edit features.": "Drag handles or markers to edit features.",
   "Draw a polygon": "Draw a polygon",
-  "Draw the area covered by the massif using the tools at the right of the map.": "Draw the area covered by the massif using the tools at the right of the map.",
+  "Draw the area covered by the massif using the tools at the right of the map, or import a GeoJSON (.geojson) or Shapefile (.zip) file.": "Draw the area covered by the massif using the tools at the right of the map, or import a GeoJSON (.geojson) or Shapefile (.zip) file.",
   "Drop CSV file here or click to upload.": "Drop CSV file here or click to upload.",
   "Duplicate from database": "Duplicate from database",
   "Duplicate from import": "Duplicate from import",
