@@ -53,7 +53,7 @@ const MassifFields = ({ control, errors, geoJson }) => {
       <FormSectionLabel label={formatMessage({ id: 'Massif area' })} />
       <FormHelperText>
         {formatMessage({
-          id: 'Draw the area covered by the massif using the tools at the right of the map.'
+          id: 'Draw the area covered by the massif using the tools at the right of the map, or import a GeoJSON (.geojson) or Shapefile (.zip) file.'
         })}
       </FormHelperText>
       <Suspense
@@ -63,7 +63,8 @@ const MassifFields = ({ control, errors, geoJson }) => {
             <Skeleton width={75} />
             <Skeleton width={100} />
           </>
-        }>
+        }
+      >
         <Controller
           name="massif.geogPolygon"
           control={control}

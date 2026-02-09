@@ -43,10 +43,10 @@ export const MassifForm = ({ massifValues }) => {
   const { locale, AVAILABLE_LANGUAGES } = useSelector(state => state.intl);
   defaultMassifValues.language = AVAILABLE_LANGUAGES[locale].id;
 
-  const { error: descriptionError, isLoading: descriptionLoading } = useSelector(
-    state =>
+  const { error: descriptionError, isLoading: descriptionLoading } =
+    useSelector(state =>
       isNewDescription ? state.createDescription : state.updateDescription
-  );
+    );
 
   const dispatch = useDispatch();
 
@@ -80,21 +80,29 @@ export const MassifForm = ({ massifValues }) => {
     reset(undefined, { keepValues: true, keepErrors: false });
   }, [reset]);
 
-  const handleFormSubmit = (e) => {
+  const handleFormSubmit = e => {
     // Check if polygon is being edited before form submission
     const editingElements = document.querySelectorAll('.leaflet-editing-icon');
-    const visibleEditingElements = Array.from(editingElements).filter(el => 
-      el.offsetParent !== null && getComputedStyle(el).display !== 'none'
+    const visibleEditingElements = Array.from(editingElements).filter(
+      el => el.offsetParent !== null && getComputedStyle(el).display !== 'none'
     );
     if (visibleEditingElements.length > 0) {
       e.preventDefault();
-      alert(formatMessage({ id: 'Please finish editing the polygon before submitting.' }));
+      alert(
+        formatMessage({
+          id: 'Please finish editing the polygon before submitting.'
+        })
+      );
       return;
     }
     handleSubmit(onSubmit)(e);
   };
 
   const onSubmit = async data => {
+    if (data.massif.geogPolygon?.coordinates?.length === 0) {
+      return;
+    }
+
     if (isNewMassif) {
       dispatch(
         postMassif({
@@ -151,7 +159,8 @@ export const MassifForm = ({ massifValues }) => {
     return (
       <FormProgressInfo
         isLoading={
-          (massifLoading || nameLoading || descriptionLoading) && !(massifError || nameError || descriptionError)
+          (massifLoading || nameLoading || descriptionLoading) &&
+          !(massifError || nameError || descriptionError)
         }
         isError={!!(massifError || nameError || descriptionError)}
         labelLoading={isNewMassif ? 'Creating massif...' : 'Updating massif...'}
@@ -161,7 +170,7 @@ export const MassifForm = ({ massifValues }) => {
             : 'An error occurred when updating a massif.'
         }
         resetFn={handleReset}
-        getRedirectFn={() => massifData ? `/ui/massifs/${massifData.id}` : ''}
+        getRedirectFn={() => (massifData ? `/ui/massifs/${massifData.id}` : '')}
       />
     );
   }
