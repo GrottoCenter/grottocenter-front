@@ -82,8 +82,11 @@ const PolygonMap = ({ onChange, data }) => {
 
   useEffect(() => {
     if (map) {
-      if (data?.coordinates?.[0]?.[0]) {
-        map.fitBounds(data.coordinates[0][0].map(e => [e[1], e[0]]));
+      if (data?.coordinates) {
+        const bounds = L.geoJSON(data).getBounds();
+        if (bounds.isValid()) {
+          map.fitBounds(bounds);
+        }
       } else if (hasLocation) {
         map.setView(geoLocation, ZOOM_LEVEL);
       }
@@ -93,21 +96,52 @@ const PolygonMap = ({ onChange, data }) => {
   const mapTOGeoJson = layers => {
     const geoJson = {};
     geoJson.type = 'MultiPolygon';
-    geoJson.coordinates = [[[]]];
-    let i = 0;
-    // eslint-disable-next-line no-restricted-syntax
-    for (const polygon of layers) {
-      // eslint-disable-next-line no-restricted-syntax
-      for (const coord of polygon.latlngs instanceof Array
-        ? polygon.latlngs
-        : polygon.latlngs[0]) {
-        geoJson.coordinates[0][i].push([coord.lng, coord.lat]);
-      }
-      geoJson.coordinates[0][i].push(geoJson.coordinates[0][i][0]);
-      i += 1;
-      geoJson.coordinates[0].push([]);
-    }
-    geoJson.coordinates[0].pop();
+    geoJson.coordinates = [];
+    
+    // Group polygons by containment relationships
+    const polygons = layers.map(layer => ({
+      coords: layer.latlngs instanceof Array ? layer.latlngs : layer.latlngs[0],
+      layer,
+      bounds: L.polygon(layer.latlngs instanceof Array ? layer.latlngs : layer.latlngs[0]).getBounds()
+    }));
+    
+    // Sort by area (largest first) to process outer polygons before inner ones
+    polygons.sort((a, b) => {
+      const areaA = (a.bounds.getEast() - a.bounds.getWest()) * (a.bounds.getNorth() - a.bounds.getSouth());
+      const areaB = (b.bounds.getEast() - b.bounds.getWest()) * (b.bounds.getNorth() - b.bounds.getSouth());
+      return areaB - areaA;
+    });
+    
+    const processed = new Set();
+    
+    polygons.forEach((outerPoly, i) => {
+      if (processed.has(i)) return;
+      
+      const outerCoords = outerPoly.coords.map(coord => [coord.lng, coord.lat]);
+      outerCoords.push(outerCoords[0]); // Close polygon
+      
+      const holes = [];
+      
+      // Check if other polygons are holes inside this one
+      polygons.forEach((innerPoly, j) => {
+        if (i === j || processed.has(j)) return;
+        
+        // Use bounding box containment as a simple approximation
+        const isHole = outerPoly.bounds.contains(innerPoly.bounds);
+        
+        if (isHole) {
+          const innerCoords = innerPoly.coords.map(coord => [coord.lng, coord.lat]);
+          innerCoords.push(innerCoords[0]); // Close hole
+          holes.push(innerCoords);
+          processed.add(j);
+        }
+      });
+      
+      // Create polygon with holes or separate polygon
+      geoJson.coordinates.push([outerCoords, ...holes]);
+      processed.add(i);
+    });
+    
     return geoJson;
   };
 
@@ -176,10 +210,18 @@ const PolygonMap = ({ onChange, data }) => {
     if (ref && !displayValue.current) {
       const editableFG = ref;
       // eslint-disable-next-line no-restricted-syntax
-      for (const polygon of data.coordinates[0]) {
-        const reverseCoords = polygon.map(coords => [coords[1], coords[0]]);
-        const leafletPolygon = L.polygon(reverseCoords, { color: 'green' });
+      for (const polygon of data.coordinates) {
+        // Add outer ring
+        const outerRing = polygon[0].map(coords => [coords[1], coords[0]]);
+        const leafletPolygon = L.polygon(outerRing, { color: 'green' });
         editableFG.addLayer(leafletPolygon);
+        
+        // Add holes as separate polygons
+        for (let i = 1; i < polygon.length; i++) {
+          const hole = polygon[i].map(coords => [coords[1], coords[0]]);
+          const leafletHole = L.polygon(hole, { color: 'green' });
+          editableFG.addLayer(leafletHole);
+        }
       }
       editableFG.eachLayer(layer => {
         const myObj = {

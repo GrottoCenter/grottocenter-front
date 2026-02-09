@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { GeoJSON, Marker, Popup, useMap } from 'react-leaflet';
 import PropTypes from 'prop-types';
 
@@ -7,20 +7,48 @@ import EntranceMarker from '../../common/Maps/common/Markers/Components/Entrance
 import EntrancePopup from '../../common/Maps/common/Markers/Components/EntrancePopup';
 
 // Needed because useMap is only accessible from inside <MapContainer>
-const MapBind = ({ positions }) => {
+const MapBind = ({ geoJson }) => {
   const map = useMap();
   useEffect(() => {
-    map.fitBounds(positions.map(e => [e[1], e[0]]));
-  }, [map, positions]);
+    const bounds = L.geoJSON(geoJson).getBounds();
+    if (bounds.isValid()) {
+      map.fitBounds(bounds);
+    }
+  }, [map, geoJson]);
 
   return null;
 };
 MapBind.propTypes = {
-  positions: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.number)).isRequired
+  geoJson: PropTypes.shape({
+    coordinates: PropTypes.arrayOf(
+      PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.number)))
+    )
+  }).isRequired
 };
 
 const MapMassif = ({ entrances, geogPolygon }) => {
   const geoJson = JSON.parse(geogPolygon);
+  
+  // Convert MultiPolygon to FeatureCollection for proper union display
+  const displayGeoJson = useMemo(() => {
+    if (geoJson.coordinates.length === 1) {
+      return geoJson; // Single polygon, no conversion needed
+    }
+    
+    // Create FeatureCollection with individual polygons
+    // Leaflet will render them as separate features, showing union behavior
+    return {
+      type: 'FeatureCollection',
+      features: geoJson.coordinates.map(coords => ({
+        type: 'Feature',
+        geometry: {
+          type: 'Polygon',
+          coordinates: coords
+        },
+        properties: {}
+      }))
+    };
+  }, [geoJson]);
 
   return (
     <CustomMapContainer
@@ -28,7 +56,7 @@ const MapMassif = ({ entrances, geogPolygon }) => {
       dragging
       viewport={null}
       scrollWheelZoom={false}>
-      <GeoJSON data={geoJson} />
+      <GeoJSON data={displayGeoJson} />
       {entrances.map(
         entrance =>
           entrance.latitude &&
@@ -43,7 +71,7 @@ const MapMassif = ({ entrances, geogPolygon }) => {
             </Marker>
           )
       )}
-      <MapBind positions={geoJson.coordinates[0][0]} />
+      <MapBind geoJson={geoJson} />
     </CustomMapContainer>
   );
 };
