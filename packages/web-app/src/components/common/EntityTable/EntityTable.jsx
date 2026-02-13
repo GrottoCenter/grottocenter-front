@@ -406,7 +406,7 @@ const EntityTable = ({
                 onClick={() => {
                   const c = entityColumns.filter(e => e[0]);
                   onCSVDownload(
-                    c.map(e => e[1]),
+                    c.map(e => e[5] || e[1]),
                     c.map(e => e[2])
                   );
                 }}
