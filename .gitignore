@@ -68,4 +68,7 @@ typings/
 .vscode
 .idea
 *.iml
+
+# AI
+AGENTS.md
 .amazonq

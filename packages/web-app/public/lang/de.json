@@ -218,6 +218,7 @@
   "Dominica": "Dominica",
   "Dominican Republic": "Dominikanische Republik",
   "Donate now": "Sofort spenden.",
+  "Download image": "Bild herunterladen",
   "E": "Spanien",
   "E01": "Spanien : Andalusien",
   "E02": "Spanien : Aragonien",
@@ -352,6 +353,7 @@
   "I would like to share some of  my work but some caves should remain protected How  are you planning to protect them ?": "Ich würde gerne einen Teil meiner Arbeit teilen, aber einige Höhlen sind besonders schützenswert. Wie wollt ihr sie schützen?",
   "Iceland": "Island",
   "If you have programming skills how about  {0}": "Falls du Programmierfähigkeiten hast, wie wärs mit {0}",
+  "Image {current} of {total}": "Bild {current} von {total}",
   "India": "Indien",
   "Indonesia": "Indonesien",
   "Input": "Eingabe",
@@ -490,6 +492,7 @@
   "New Zealand": "Neuseeland",
   "News": "Neuigkeiten.",
   "Next": "Nächster",
+  "Next image": "Nächstes Bild",
   "Nicaragua": "Nicaragua",
   "Nickname": "Pseudonym",
   "Nicobar": "Nikobaren",
@@ -511,6 +514,7 @@
   "Number of caves": "Zahl der Höhlensysteme",
   "Number of entries": "Anzahl Einträge",
   "NZ": "Neuseeland",
+  "oaiTooltip": "OAI-PMH-Server",
   "Oceania": "Ozeanien",
   "OE": "Österreich",
   "OE01": "Oberösterreich: Wien, Burgenland",
@@ -544,6 +548,7 @@
   "POR": "Portugal",
   "Portugal": "Portugal",
   "Postal code": "Postleitzahl",
+  "Previous image": "Vorheriges Bild",
   "Print": "Drucken",
   "Projection scale factor: ": "Projection Skalenfaktor:",
   "Projection: ": "Projektion:",
@@ -763,11 +768,9 @@
   "YU": "Jugoslawien",
   "YU04": "Montenegro",
   "YU05": "Serbien: Vojvodina, Kosovo",
+  "z3950Tooltip": "Z39.50-Server",
   "Zaire": "Zaire",
   "Zambia": "Sambia",
   "Zanzibar": "Tansania",
-  "Zimbabwe": "Simbabwe",
-  "oaiTooltip": "OAI-PMH-Server",
-  "z3950Tooltip": "Z39.50-Server"
-
+  "Zimbabwe": "Simbabwe"
 }

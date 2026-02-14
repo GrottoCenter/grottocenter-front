@@ -1,8 +1,10 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { List, Typography, Divider, Pagination, Box } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import Document from './Document';
+import ImageLightbox from './ImageLightbox';
+import { isImageFile } from './utils/imageUtils';
 
 const DividerStyled = styled(Divider)`
   background-color: ${props => props.theme.palette.divider};
@@ -18,6 +20,8 @@ const DocumentsList = ({
   itemsPerPage = 10
 }) => {
   const [page, setPage] = useState(1);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [lightboxIndex, setLightboxIndex] = useState(0);
 
   const paginatedDocuments = useMemo(() => {
     if (!documents || documents.length === 0) return [];
@@ -30,6 +34,28 @@ const DocumentsList = ({
     () => Math.ceil((documents?.length || 0) / itemsPerPage),
     [documents, itemsPerPage]
   );
+
+  // Collect all image files across paginated documents and compute per-document offsets
+  const { allImages, imageOffsets } = useMemo(() => {
+    const images = [];
+    const offsets = [];
+    paginatedDocuments.forEach(doc => {
+      offsets.push(images.length);
+      if (doc.files) {
+        doc.files
+          .filter(file => isImageFile(file.fileName))
+          .forEach(file => {
+            images.push({ ...file, description: doc.description });
+          });
+      }
+    });
+    return { allImages: images, imageOffsets: offsets };
+  }, [paginatedDocuments]);
+
+  const handleImageClick = useCallback(globalIndex => {
+    setLightboxIndex(globalIndex);
+    setLightboxOpen(true);
+  }, []);
 
   const handlePageChange = (event, newPage) => {
     setPage(newPage);
@@ -51,6 +77,8 @@ const DocumentsList = ({
                   document={document}
                   hasSnapshotButton={hasSnapshotButton}
                   onUnlink={onUnlink}
+                  onImageClick={handleImageClick}
+                  imageIndexOffset={imageOffsets[i]}
                 />
                 {paginatedDocuments.length - 1 !== i && (
                   <DividerStyled variant="middle" />
@@ -71,6 +99,15 @@ const DocumentsList = ({
         </>
       ) : (
         emptyMessageComponent
+      )}
+
+      {allImages.length > 0 && (
+        <ImageLightbox
+          open={lightboxOpen}
+          onClose={() => setLightboxOpen(false)}
+          images={allImages}
+          initialIndex={lightboxIndex}
+        />
       )}
     </>
   );

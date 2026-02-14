@@ -138,6 +138,7 @@
   "Dominica": "Dominica",
   "Dominican Republic": "República Dominicana",
   "Donate now": "Faça sua doação",
+  "Download image": "Baixar imagem",
   "E": "Espanha",
   "E01": "Spagna : Andalusia",
   "E02": "Spagna : Aragona",
@@ -217,6 +218,7 @@
   "Hong Kong": "Hong Kong",
   "Hungary": "Hungria",
   "Iceland": "Islândia",
+  "Image {current} of {total}": "Imagem {current} de {total}",
   "India": "India",
   "Indonesia": "Indonésia",
   "Inscription date": "Data de criação",
@@ -307,6 +309,7 @@
   "New Zealand": "Nova Zelândia",
   "News": "Notícias",
   "Next": "Seguinte",
+  "Next image": "Próxima imagem",
   "Nicaragua": "Nicarágua",
   "Nickname": "Apelido",
   "Niger": "Níger",
@@ -321,6 +324,7 @@
   "Northern Mariana Islands": "Ilhas Marianas do Norte",
   "Norway": "Noruega",
   "NZ": "Nova Zelândia",
+  "oaiTooltip": "Servidor OAI-PMH",
   "OE": "Austria",
   "Oman": "Oman",
   "Open!": "Abrir!",
@@ -343,6 +347,7 @@
   "POR": "Portugal",
   "Portugal": "Portugal",
   "Postal code": "Código postal",
+  "Previous image": "Imagem anterior",
   "Print": "Imprimir",
   "Promote the development of the speleology in the world especially through web-based collaboration.": "Promover o desenvolvimento da espeleologia no mundo, especialmente a partir de uma colaboração baseada na web.",
   "Promote!": "Promover!",
@@ -460,9 +465,7 @@
   "yes": "sim",
   "Yes": "Sim",
   "YU04": "Montenegro",
+  "z3950Tooltip": "Servidor Z39.50",
   "Zambia": "Zâmbia",
-  "Zimbabwe": "Zimbábue",
-  "oaiTooltip": "Servidor OAI-PMH",
-  "z3950Tooltip": "Servidor Z39.50"
-
+  "Zimbabwe": "Zimbábue"
 }
