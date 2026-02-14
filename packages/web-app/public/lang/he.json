@@ -11,6 +11,7 @@
   "Contact": "פרטי קשר",
   "Contributors": "תורמים",
   "Donate now": "תרום עכשיו",
+  "Download image": "הורד תמונה",
   "Ease to move": "חופש תנועה",
   "GrottoCenter is a comunity database for cavers based on a wiki-like system Cavers fill the databes for cavers": "GrottoCenter הינו מסד נתונים קהילתי המתבסס על מערכת בסגנון ויקי. מערנים ממלאים את מבסד הנתונים למען מערנים.",
   "Grottocenter is supported by the FSE": "GrottoCenter נתמך ע\"י ארגון המערנות האירופאי FSE",
@@ -18,13 +19,17 @@
   "Help!": "עזור!",
   "Highlight and help the protection of the natural caves and their surroundings": "לקדם ולסייע בשמירה על מערות ועל סביבתן.",
   "Highlight!": "הדגש!",
+  "Image {current} of {total}": "תמונה {current} מתוך {total}",
   "Interest": "עניין",
   "Legal notice": "הודעה משפטית",
   "News": "חדשות",
+  "Next image": "תמונה הבאה",
+  "oaiTooltip": "שרת OAI-PMH",
   "Open!": "פתח!",
   "organizations are registered on the site": "אירגונים הרשומים באתר",
   "organizations who take part in the project by funding, providing data, communicating on the interest and benefits of cavers to share data.": "אירגונים שלוקחים חלק בפרוייקט באמצעות מימונו, הוספת מידע ודיונים על האינטרסים והייתרונות בשיתוף מידע ע\"י מערנים.",
   "Partners": "שותפים",
+  "Previous image": "תמונה קודמת",
   "Promote!": "קדם!",
   "Published by": "פורסם ע\"י",
   "Quick search": "חיפוש מהיר",
@@ -40,7 +45,5 @@
   "Unless stated otherwise, all text and documents are available under the terms": "אלא אם צויין אחרת, כל התוכן והמסמכים זמינים תחת התנאים של ",
   "Welcome to Grottocenter!": "ברוכים הבאים ל-Grottocenter!",
   "Wikicaves association": "אגודת Wikicaves",
-  "oaiTooltip": "שרת OAI-PMH",
   "z3950Tooltip": "שרת Z39.50"
-
 }

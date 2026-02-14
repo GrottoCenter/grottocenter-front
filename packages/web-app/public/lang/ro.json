@@ -370,6 +370,7 @@
   "Dominica": "Dominica",
   "Dominican Republic": "Republica Dominicană",
   "Donate now": "Donează acum",
+  "Download image": "Descarcă imaginea",
   "Dutch": "Olandeză",
   "E": "Spania",
   "E01": "Spania: Andaluzia",
@@ -543,6 +544,7 @@
   "If the document relates to one or more regions, choose from those defined by the BBS.": "Dacă documentul se referă la una sau mai multe regiuni, alegeți dintre cele definite de BBS.",
   "If you have programming skills how about  {0}": "Dacă aveți abilități de programare, despre {0}",
   "Image": "Imagine",
+  "Image {current} of {total}": "Imaginea {current} din {total}",
   "In meters": "În metri",
   "In order to be able to do this, we need your help.": "Pentru a putea face acest lucru, avem nevoie de ajutorul dvs.",
   "India": "India",
@@ -725,6 +727,7 @@
   "New Zealand": "Noua Zeelandă",
   "News": "Noutăți",
   "Next": "Mai departe",
+  "Next image": "Imaginea următoare",
   "Nicaragua": "Nicaragua",
   "nickname": "poreclă",
   "Nickname": "Poreclă",
@@ -754,6 +757,7 @@
   "Number of entrances": "Număr de intrări",
   "Number of entries": "Număr de intrări",
   "NZ": "Noua Zeelandă",
+  "oaiTooltip": "Server OAI-PMH",
   "Oceania": "Oceania",
   "OE": "Austria",
   "OE01": "Austria: Viena, Burgenland",
@@ -802,6 +806,7 @@
   "Portugal": "Portugalia",
   "Portuguese": "Portugheză",
   "Postal code": "Cod poștal",
+  "Previous image": "Imaginea anterioară",
   "Print": "Printează",
   "Profile": "Profil",
   "Progression": "Progresie",
@@ -1136,11 +1141,9 @@
   "YU": "Jugoslavia",
   "YU04": "Muntenegru",
   "YU05": "Serbia: Voivodina, Kosovo",
+  "z3950Tooltip": "Server Z39.50",
   "Zaire": "Zair",
   "Zambia": "Zambia",
   "Zanzibar": "Tanzania",
-  "Zimbabwe": "Zimbabwe",
-  "oaiTooltip": "Server OAI-PMH",
-  "z3950Tooltip": "Server Z39.50"
-
+  "Zimbabwe": "Zimbabwe"
 }

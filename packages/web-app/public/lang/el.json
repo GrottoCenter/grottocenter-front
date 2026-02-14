@@ -114,6 +114,7 @@
   "Dominica": "Δομινίκα",
   "Dominican Republic": "Δομινικανή Δημοκρατία",
   "Donate now": "Δωρεά",
+  "Download image": "Λήψη εικόνας",
   "E": "Ισπανία",
   "Ease of move": "Ευκολία κίνησης",
   "Ease of reach": "Ευκολία προσέγγισης της εισόδου",
@@ -183,6 +184,7 @@
   "I find your project interesting:  How  can I  help ?": "Βρήκα το πρότζεκτ σας ενδιαφέρον. Πως μπορώ να βοηθήσω;",
   "I would like to share some of  my work but some caves should remain protected How  are you planning to protect them ?": "Θα ήθελα να μοιραστώ τη δουλειά μου αλλά μερικά από τα σπήλαια καλό θα ήταν να παραμείνουν οι θέσεις τους προστατευμένες. Πως προτείνεται να τα προστατέψετε;",
   "Iceland": "Ισλανδία",
+  "Image {current} of {total}": "Εικόνα {current} από {total}",
   "India": "Ινδία",
   "Indonesia": "Ινδονησία",
   "Inscription date": "Ημερομηνία δημιουργίας",
@@ -263,6 +265,7 @@
   "New Zealand": "Νέα Ζηλανδία",
   "News": "Νέα",
   "Next": "Επόμενο",
+  "Next image": "Επόμενη εικόνα",
   "Nicaragua": "Νικαράγουα",
   "Nickname": "Υποκοριστικό ",
   "Niger": "Νίγηρας",
@@ -279,6 +282,7 @@
   "Norway": "Νορβηγία",
   "Number of cavers": "Αριθμός εγγεραμμένων σπηλαιοεξερευνητών",
   "NZ": "Νέα Ζηλανδία",
+  "oaiTooltip": "Διακομιστής OAI-PMH",
   "OE": "Αυστρία",
   "Oman": "Ομάν",
   "Open!": "Άνοιξε!",
@@ -301,6 +305,7 @@
   "POR": "Πορτογαλλία",
   "Portugal": "Πορτογαλλία",
   "Postal code": "Ταχυδρομικός κωδικός",
+  "Previous image": "Προηγούμενη εικόνα",
   "Print": "Εκτύπωση",
   "Projection: ": "Προβολή:",
   "Promote the development of the speleology in the world especially through web-based collaboration.": "Προώθηση και ανάτπυξη της σπηλαιολογίας σε παγκόσμιο επίπεδο με συνεργασίες μέσω διαδυκτίου.",
@@ -417,10 +422,7 @@
   "Yes": "Ναι",
   "You can show your support by  joining  Grottocenter {0}": "Μπορείτε να βοηθήσετε συμμετέχοντας στο  Grottocenter",
   "YU04": "Μαυροβούνιο",
+  "z3950Tooltip": "Διακομιστής Z39.50",
   "Zambia": "Ζάμπια",
-  "Zimbabwe": "Ζιμπάμπουε",
-  "oaiTooltip": "Διακομιστής OAI-PMH",
-  "z3950Tooltip": "Διακομιστής Z39.50"
-
-
+  "Zimbabwe": "Ζιμπάμπουε"
 }

@@ -27,6 +27,7 @@
   "Depth": "Kedalaman",
   "Diving cave": "Menyelam dalam gua",
   "Donate now": "Donasi",
+  "Download image": "Unduh gambar",
   "Ease of move": "Mudah bergerak",
   "Ease to move": "Mudah bergerak",
   "Edit": "Edit",
@@ -38,6 +39,7 @@
   "Help!": "Bantu!",
   "Highlight and help the protection of the natural caves and their surroundings": "Membantu perlindungan gua alam dan lingkungan mereka.",
   "Highlight!": "Sorot!",
+  "Image {current} of {total}": "Gambar {current} dari {total}",
   "Inscription date": "Tanggal pembuatan",
   "Interest": "Menarik",
   "Last modification by": "Modifikasi terakhir oleh",
@@ -50,6 +52,8 @@
   "name": "Nama",
   "Name": "Nama",
   "News": "Berita",
+  "Next image": "Gambar berikutnya",
+  "oaiTooltip": "Server OAI-PMH",
   "Open!": "Terbuka!",
   "Organizations": "Organisasi",
   "organizations are registered on the site": "organisasi yang terdaftar di situs",
@@ -57,6 +61,7 @@
   "Partners": "Mitra",
   "Password": "Kata sandi",
   "Postal code": "Kode pos",
+  "Previous image": "Gambar sebelumnya",
   "Promote the development of the speleology in the world especially through web-based collaboration.": "Mempromosikan pengembangan speleologi di dunia terutama melalui kolaborasi berbasis web.",
   "Promote!": "Promosikan!",
   "Published by": "Diterbitkan oleh",
@@ -77,7 +82,5 @@
   "Welcome to Grottocenter!": "Selamat Datang di Grottocenter!",
   "Wikicaves association": "Asosiasi Wikicaves",
   "Year of discovery": "Tahun penemuannya",
-  "oaiTooltip": "Server OAI-PMH",
   "z3950Tooltip": "Server Z39.50"
-
 }

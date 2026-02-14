@@ -130,6 +130,7 @@
   "Dominica": "Dominica",
   "Dominican Republic": "Dominicaanse Republiek",
   "Donate now": "Doneer nu",
+  "Download image": "Afbeelding downloaden",
   "E": "Spanje",
   "E01": "Spanje : Andalusië",
   "E02": "Spanje : Aragón",
@@ -216,6 +217,7 @@
   "Hong Kong": "Hong Kong",
   "Hungary": "Hongarije",
   "Iceland": "IJsland",
+  "Image {current} of {total}": "Afbeelding {current} van {total}",
   "India": "Indië",
   "Indonesia": "Indonesië",
   "Inscription date": "Aanmaakdatum",
@@ -301,6 +303,7 @@
   "New Zealand": "Nieuw Zeeland",
   "News": "Nieuws",
   "Next": "Volgende",
+  "Next image": "Volgende afbeelding",
   "Nicaragua": "Nicaragua",
   "Nickname": "Pseudoniem",
   "Niger": "Niger",
@@ -316,6 +319,7 @@
   "Northern Mariana Islands": "Noordelijke Marianaeilanden",
   "Norway": "Noorwegen",
   "NZ": "Nieuw Zeeland",
+  "oaiTooltip": "OAI-PMH-server",
   "OE": "Oostenrijk",
   "Oman": "Oman",
   "Open!": "Open!",
@@ -339,6 +343,7 @@
   "POR": "Portugal",
   "Portugal": "Portugal",
   "Postal code": "Postcode",
+  "Previous image": "Vorige afbeelding",
   "Print": "Afdrukken",
   "Projection scale factor: ": "Projectie schaalfactor: ",
   "Projection: ": "Projectie: ",
@@ -457,9 +462,7 @@
   "yes": "Ja",
   "Yes": "Ja",
   "YU04": "Montenegro",
+  "z3950Tooltip": "Z39.50-server",
   "Zambia": "Zambia",
-  "Zimbabwe": "Zimbabwe",
-  "oaiTooltip": "OAI-PMH-server",
-  "z3950Tooltip": "Z39.50-server"
-
+  "Zimbabwe": "Zimbabwe"
 }
