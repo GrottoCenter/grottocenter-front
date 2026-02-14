@@ -1,0 +1,86 @@
+import React, { useState } from 'react';
+import PropTypes from 'prop-types';
+import { Card, CardActionArea, Skeleton, Box } from '@mui/material';
+import { styled } from '@mui/material/styles';
+import { Description } from '@mui/icons-material';
+
+const ThumbnailCard = styled(Card)`
+  width: 180px;
+  height: 135px;
+  cursor: pointer;
+  transition: box-shadow 0.3s ease;
+
+  &:hover {
+    box-shadow: ${({ theme }) => theme.shadows[4]};
+  }
+`;
+
+const ThumbnailImage = styled('img')`
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+`;
+
+const FallbackIconWrapper = styled(Box)`
+  width: 180px;
+  height: 135px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: ${({ theme }) => theme.palette.grey[200]};
+  border-radius: 4px;
+`;
+
+const ImageThumbnail = ({ src, alt, onClick }) => {
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+
+  const handleLoad = () => {
+    setLoading(false);
+  };
+
+  const handleError = () => {
+    setLoading(false);
+    setError(true);
+  };
+
+  if (error) {
+    return (
+      <FallbackIconWrapper>
+        <Description color="action" fontSize="large" />
+      </FallbackIconWrapper>
+    );
+  }
+
+  return (
+    <ThumbnailCard onClick={onClick}>
+      <CardActionArea>
+        {loading && (
+          <Skeleton
+            variant="rectangular"
+            width={180}
+            height={135}
+            animation="wave"
+          />
+        )}
+        <ThumbnailImage
+          src={src}
+          alt={alt}
+          loading="lazy"
+          onLoad={handleLoad}
+          onError={handleError}
+          style={{ opacity: loading ? 0 : 1, transition: 'opacity 0.3s' }}
+        />
+      </CardActionArea>
+    </ThumbnailCard>
+  );
+};
+
+ImageThumbnail.propTypes = {
+  src: PropTypes.string.isRequired,
+  alt: PropTypes.string.isRequired,
+  onClick: PropTypes.func.isRequired
+};
+
+export default ImageThumbnail;

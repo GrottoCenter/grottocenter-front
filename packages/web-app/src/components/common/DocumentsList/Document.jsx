@@ -62,8 +62,14 @@ const Document = ({ document, hasSnapshotButton = false, onUnlink }) => {
           <DocumentDescription>
             <Linkify> {document.description}</Linkify>
           </DocumentDescription>
-        ) : false}
-        {document.files ? <Files files={document.files} /> : false}
+        ) : (
+          false
+        )}
+        {document.files ? (
+          <Files files={document.files} description={document.description} />
+        ) : (
+          false
+        )}
       </StyledListItemContainer>
 
       {hasSnapshotButton || onUnlink ? (
@@ -77,23 +83,31 @@ const Document = ({ document, hasSnapshotButton = false, onUnlink }) => {
                 type="documents"
                 content={document}
               />
-            ) : false}
+            ) : (
+              false
+            )}
             {onUnlink ? (
               <Tooltip
                 title={formatMessage({
                   id: 'Unlink this document'
-                })}>
+                })}
+              >
                 <Button
                   onClick={() => setUnlinkDialogOpen(true)}
                   color="primary"
-                  aria-label={formatMessage({ id: 'unlink' })}>
+                  aria-label={formatMessage({ id: 'unlink' })}
+                >
                   <LinkOffIcon />
                 </Button>
               </Tooltip>
-            ) : false}
+            ) : (
+              false
+            )}
           </ButtonGroup>
         </ListItemIcon>
-      ) : false}
+      ) : (
+        false
+      )}
       {onUnlink ? (
         <StandardDialog
           open={isUnlinkDialogOpen}
@@ -103,7 +117,8 @@ const Document = ({ document, hasSnapshotButton = false, onUnlink }) => {
             <Button
               key="no"
               onClick={() => setUnlinkDialogOpen(false)}
-              disableElevation>
+              disableElevation
+            >
               <Translate>No</Translate>
             </Button>,
             <Button
@@ -114,15 +129,19 @@ const Document = ({ document, hasSnapshotButton = false, onUnlink }) => {
                 onUnlink(document);
               }}
               color="primary"
-              autoFocus>
+              autoFocus
+            >
               <Translate>Yes</Translate>
             </Button>
-          ]}>
+          ]}
+        >
           <Translate>
             Are you sure you want to unlink this document of this entity?
           </Translate>
         </StandardDialog>
-      ) : false}
+      ) : (
+        false
+      )}
     </StyledListItem>
   );
 };
