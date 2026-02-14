@@ -78,6 +78,8 @@
   "Wikicaves association": "Asosiasi Wikicaves",
   "Year of discovery": "Tahun penemuannya",
   "oaiTooltip": "Server OAI-PMH",
-  "z3950Tooltip": "Server Z39.50"
-
+  "z3950Tooltip": "Server Z39.50",
+  "Download image": "Unduh gambar",
+  "Next image": "Gambar berikutnya",
+  "Previous image": "Gambar sebelumnya"
 }

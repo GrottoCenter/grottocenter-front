@@ -1141,6 +1141,8 @@
   "Zanzibar": "Tanzania",
   "Zimbabwe": "Zimbabwe",
   "oaiTooltip": "Server OAI-PMH",
-  "z3950Tooltip": "Server Z39.50"
-
+  "z3950Tooltip": "Server Z39.50",
+  "Download image": "Descarcă imaginea",
+  "Next image": "Imaginea următoare",
+  "Previous image": "Imaginea anterioară"
 }

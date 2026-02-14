@@ -457,6 +457,8 @@
   "Lat.": "Lat.",
   "Long.": "Long.",
   "oaiTooltip": "Server OAI-PMH",
-  "z3950Tooltip": "Server Z39.50"
-
+  "z3950Tooltip": "Server Z39.50",
+  "Download image": "Scarica immagine",
+  "Next image": "Immagine successiva",
+  "Previous image": "Immagine precedente"
 }

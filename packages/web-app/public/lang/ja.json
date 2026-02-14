@@ -457,5 +457,8 @@
   "Lat.": "Lat.",
   "Long.": "Long.",
   "oaiTooltip": "OAI-PMHサーバー",
-  "z3950Tooltip": "Z39.50サーバー"
+  "z3950Tooltip": "Z39.50サーバー",
+  "Download image": "画像をダウンロード",
+  "Next image": "次の画像",
+  "Previous image": "前の画像"
 }

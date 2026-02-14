@@ -41,6 +41,8 @@
   "Welcome to Grottocenter!": "ברוכים הבאים ל-Grottocenter!",
   "Wikicaves association": "אגודת Wikicaves",
   "oaiTooltip": "שרת OAI-PMH",
-  "z3950Tooltip": "שרת Z39.50"
-
+  "z3950Tooltip": "שרת Z39.50",
+  "Download image": "הורד תמונה",
+  "Next image": "תמונה הבאה",
+  "Previous image": "תמונה קודמת"
 }

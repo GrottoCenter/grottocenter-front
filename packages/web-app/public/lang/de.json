@@ -768,6 +768,8 @@
   "Zanzibar": "Tansania",
   "Zimbabwe": "Simbabwe",
   "oaiTooltip": "OAI-PMH-Server",
-  "z3950Tooltip": "Z39.50-Server"
-
+  "z3950Tooltip": "Z39.50-Server",
+  "Download image": "Bild herunterladen",
+  "Next image": "Nächstes Bild",
+  "Previous image": "Vorheriges Bild"
 }

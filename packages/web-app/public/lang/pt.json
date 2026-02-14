@@ -463,6 +463,8 @@
   "Zambia": "Zâmbia",
   "Zimbabwe": "Zimbábue",
   "oaiTooltip": "Servidor OAI-PMH",
-  "z3950Tooltip": "Servidor Z39.50"
-
+  "z3950Tooltip": "Servidor Z39.50",
+  "Download image": "Baixar imagem",
+  "Next image": "Próxima imagem",
+  "Previous image": "Imagem anterior"
 }

@@ -351,5 +351,8 @@
   "Zambia": "زامبيا",
   "Zimbabwe": "زيمبابوي",
   "oaiTooltip": "خادم OAI-PMH",
-  "z3950Tooltip": "خادم Z39.50"
+  "z3950Tooltip": "خادم Z39.50",
+  "Download image": "تنزيل الصورة",
+  "Next image": "الصورة التالية",
+  "Previous image": "الصورة السابقة"
 }

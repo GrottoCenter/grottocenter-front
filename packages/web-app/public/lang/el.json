@@ -420,7 +420,8 @@
   "Zambia": "Ζάμπια",
   "Zimbabwe": "Ζιμπάμπουε",
   "oaiTooltip": "Διακομιστής OAI-PMH",
-  "z3950Tooltip": "Διακομιστής Z39.50"
-
-
+  "z3950Tooltip": "Διακομιστής Z39.50",
+  "Download image": "Λήψη εικόνας",
+  "Next image": "Επόμενη εικόνα",
+  "Previous image": "Προηγούμενη εικόνα"
 }
