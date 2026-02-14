@@ -459,6 +459,7 @@
   "oaiTooltip": "Server OAI-PMH",
   "z3950Tooltip": "Server Z39.50",
   "Download image": "Scarica immagine",
+  "Image {current} of {total}": "Immagine {current} di {total}",
   "Next image": "Immagine successiva",
   "Previous image": "Immagine precedente"
 }

@@ -543,6 +543,7 @@
   "If the document relates to one or more regions, choose from those defined by the BBS.": "Dacă documentul se referă la una sau mai multe regiuni, alegeți dintre cele definite de BBS.",
   "If you have programming skills how about  {0}": "Dacă aveți abilități de programare, despre {0}",
   "Image": "Imagine",
+  "Image {current} of {total}": "Imaginea {current} din {total}",
   "In meters": "În metri",
   "In order to be able to do this, we need your help.": "Pentru a putea face acest lucru, avem nevoie de ajutorul dvs.",
   "India": "India",

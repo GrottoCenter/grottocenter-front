@@ -353,6 +353,7 @@
   "oaiTooltip": "خادم OAI-PMH",
   "z3950Tooltip": "خادم Z39.50",
   "Download image": "تنزيل الصورة",
+  "Image {current} of {total}": "صورة {current} من {total}",
   "Next image": "الصورة التالية",
   "Previous image": "الصورة السابقة"
 }

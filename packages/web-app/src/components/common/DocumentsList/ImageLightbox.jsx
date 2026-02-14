@@ -78,12 +78,22 @@ const ImageLightbox = ({
     setCurrentIndex(prev => (prev < images.length - 1 ? prev + 1 : 0));
   }, [images.length]);
 
-  const handleWheel = e => {
+  const handleWheel = useCallback(e => {
     e.preventDefault();
     e.stopPropagation();
     const delta = e.deltaY > 0 ? -0.2 : 0.2;
     setZoom(prev => Math.min(Math.max(prev + delta, 0.5), 5));
-  };
+  }, []);
+
+  // Attach wheel with { passive: false } so preventDefault() works in React 19
+  const contentRef = useCallback(
+    node => {
+      if (node) {
+        node.addEventListener('wheel', handleWheel, { passive: false });
+      }
+    },
+    [handleWheel]
+  );
 
   const handleMouseDown = e => {
     if (zoom > 1) {
@@ -156,7 +166,7 @@ const ImageLightbox = ({
         </Button>
       }
     >
-      <LightboxContent>
+      <LightboxContent ref={contentRef}>
         {hasMultipleImages && (
           <NavigationButton
             className="previous"
@@ -171,7 +181,6 @@ const ImageLightbox = ({
         <LightboxImage
           src={currentImage.completePath}
           alt={currentImage.fileName}
-          onWheel={handleWheel}
           onMouseDown={handleMouseDown}
           onMouseMove={handleMouseMove}
           onMouseUp={handleMouseUp}

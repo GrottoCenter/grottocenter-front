@@ -896,6 +896,7 @@
   "If you leave now, some data would be lost. Are you sure you want to leave this page?": "Si sale ahora, se perderán algunos datos. Está seguro de que quiere abandonar esta página?",
   "If you made this request, click the button below.": "Si ha hecho esta solicitud, haga clic en el botón de abajo.",
   "Image": "Imagen",
+  "Image {current} of {total}": "Imagen {current} de {total}",
   "Image only": "Solo imagen",
   "Import": "Importación",
   "Import Id": "Id de importación",

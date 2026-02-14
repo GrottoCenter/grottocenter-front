@@ -422,6 +422,7 @@
   "oaiTooltip": "Διακομιστής OAI-PMH",
   "z3950Tooltip": "Διακομιστής Z39.50",
   "Download image": "Λήψη εικόνας",
+  "Image {current} of {total}": "Εικόνα {current} από {total}",
   "Next image": "Επόμενη εικόνα",
   "Previous image": "Προηγούμενη εικόνα"
 }

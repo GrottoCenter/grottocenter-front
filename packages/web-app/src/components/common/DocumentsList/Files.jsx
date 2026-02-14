@@ -43,7 +43,7 @@ const Files = ({ files = [], description }) => {
       {imageFiles.length > 0 && (
         <Grid container spacing={2} sx={{ mb: 2 }}>
           {imageFiles.map((file, index) => (
-            <Grid item key={file.fileName}>
+            <Grid key={file.fileName}>
               <ThumbnailWrapper>
                 <ImageThumbnail
                   src={file.completePath}
@@ -57,7 +57,7 @@ const Files = ({ files = [], description }) => {
                   download
                   target="_blank"
                   sx={{ textTransform: 'none' }}
-                >
+>
                   {file.fileName}
                 </Button>
               </ThumbnailWrapper>
@@ -78,7 +78,7 @@ const Files = ({ files = [], description }) => {
                 target="_blank"
                 startIcon={<Description />}
                 href={file.completePath}
-              >
+>
                 {file.fileName}
               </Button>
             }

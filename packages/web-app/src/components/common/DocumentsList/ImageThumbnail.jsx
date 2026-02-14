@@ -47,9 +47,13 @@ const ImageThumbnail = ({ src, alt, onClick }) => {
 
   if (error) {
     return (
-      <FallbackIconWrapper>
-        <Description color="action" fontSize="large" />
-      </FallbackIconWrapper>
+      <ThumbnailCard onClick={onClick}>
+        <CardActionArea sx={{ height: '100%' }}>
+          <FallbackIconWrapper>
+            <Description color="action" fontSize="large" />
+          </FallbackIconWrapper>
+        </CardActionArea>
+      </ThumbnailCard>
     );
   }
 

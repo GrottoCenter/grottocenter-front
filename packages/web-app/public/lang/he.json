@@ -43,6 +43,7 @@
   "oaiTooltip": "שרת OAI-PMH",
   "z3950Tooltip": "שרת Z39.50",
   "Download image": "הורד תמונה",
+  "Image {current} of {total}": "תמונה {current} מתוך {total}",
   "Next image": "תמונה הבאה",
   "Previous image": "תמונה קודמת"
 }

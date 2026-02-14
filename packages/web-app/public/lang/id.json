@@ -80,6 +80,7 @@
   "oaiTooltip": "Server OAI-PMH",
   "z3950Tooltip": "Server Z39.50",
   "Download image": "Unduh gambar",
+  "Image {current} of {total}": "Gambar {current} dari {total}",
   "Next image": "Gambar berikutnya",
   "Previous image": "Gambar sebelumnya"
 }

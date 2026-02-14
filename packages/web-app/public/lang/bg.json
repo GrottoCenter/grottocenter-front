@@ -754,6 +754,7 @@
   "If you leave now, some data would be lost. Are you sure you want to leave this page?": "Ако напуснете сега, някои данни ще бъдат загубени. Сигурни ли сте, че искате да напуснете тази страница?",
   "If you made this request, click the button below.": "Ако сте направили тази заявка, щракнете върху бутона по-долу.",
   "Image": "Изображение",
+  "Image {current} of {total}": "Изображение {current} от {total}",
   "Import": "Импорт",
   "In meters": "В метри",
   "In order to be able to do this, we need your help.": "За да можем да направим това, се нуждаем от вашата помощ.",

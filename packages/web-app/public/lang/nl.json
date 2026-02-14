@@ -462,6 +462,7 @@
   "oaiTooltip": "OAI-PMH-server",
   "z3950Tooltip": "Z39.50-server",
   "Download image": "Afbeelding downloaden",
+  "Image {current} of {total}": "Afbeelding {current} van {total}",
   "Next image": "Volgende afbeelding",
   "Previous image": "Vorige afbeelding"
 }

@@ -23,6 +23,6 @@ export const getFileExtension = fileName => {
  */
 export const isImageFile = fileName => {
   const extension = getFileExtension(fileName);
-  const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif'];
+  const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg'];
   return imageExtensions.includes(extension);
 };
