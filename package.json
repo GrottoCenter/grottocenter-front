@@ -16,6 +16,7 @@
     "lint:fix": "eslint --fix --ext .js,.jsx,.ts,.tsx .",
     "e2e:run": "yarn workspace @grotto-front/web-app e2e-run",
     "e2e:open": "yarn workspace @grotto-front/web-app e2e",
+    "test": "yarn workspace @grotto-front/web-app test --watchAll=false",
     "storybook": "yarn workspace @grotto-front/web-app storybook",
     "outdated": "npx npm-check-updates",
     "prepare": "husky",

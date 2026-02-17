@@ -13,7 +13,7 @@ import Contribution from '../../../common/Contribution/Contribution';
 import RiggingTable from './RiggingTable';
 import { SnapshotButton } from '../Snapshots/UtilityFunction';
 
-const Rigging = ({ rigging, isEditAllowed }) => {
+const Rigging = ({ rigging, isEditAllowed, isMoving, onMoveUp, onMoveDown, isFirst, isLast }) => {
   const dispatch = useDispatch();
   const permissions = usePermissions();
   const [isUpdateFormVisible, setIsUpdateFormVisible] = useState(false);
@@ -52,19 +52,34 @@ const Rigging = ({ rigging, isEditAllowed }) => {
           flexDirection: 'column',
           alignItems: 'flex-end'
         }}>
-        <ActionButtons
-          isLoading={isActionLoading}
-          isUpdating={isUpdateFormVisible}
-          setIsUpdating={setIsUpdateFormVisible}
-          isDeleted={rigging.isDeleted}
-          canEdit={isEditAllowed && permissions.isAuth}
-          canDelete={isEditAllowed && permissions.isModerator}
-          snapshotEl={
-            <SnapshotButton id={rigging.id} type="riggings" content={rigging} />
-          }
-          onDeletePress={onDeletePress}
-          onRestorePress={onRestorePress}
-        />
+        <Box>
+          <ActionButtons
+            isLoading={isActionLoading}
+            isUpdating={isUpdateFormVisible}
+            setIsUpdating={setIsUpdateFormVisible}
+            isDeleted={rigging.isDeleted}
+            canEdit={isEditAllowed && permissions.isAuth}
+            canDelete={isEditAllowed && permissions.isModerator}
+            snapshotEl={
+              <SnapshotButton
+                id={rigging.id}
+                type="riggings"
+                content={rigging}
+              />
+            }
+            onDeletePress={onDeletePress}
+            onRestorePress={onRestorePress}
+            {...(isEditAllowed && permissions.isAuth && !rigging.isDeleted
+              ? {
+                  onMoveUp,
+                  onMoveDown,
+                  isFirst,
+                  isLast,
+                  isMoveLoading: isMoving
+                }
+              : {})}
+          />
+        </Box>
       </Box>
       {isUpdateFormVisible && permissions.isAuth ? (
         <Box width="100%">
@@ -92,7 +107,12 @@ const Rigging = ({ rigging, isEditAllowed }) => {
 
 Rigging.propTypes = {
   rigging: RiggingPropTypes,
-  isEditAllowed: PropTypes.bool
+  isEditAllowed: PropTypes.bool,
+  isMoving: PropTypes.bool,
+  onMoveUp: PropTypes.func,
+  onMoveDown: PropTypes.func,
+  isFirst: PropTypes.bool,
+  isLast: PropTypes.bool
 };
 
 export default Rigging;

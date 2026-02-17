@@ -1,4 +1,5 @@
 import arrFindReplaceOrAdd from './utils';
+import swapRelevance from './swapRelevance';
 import {
   FETCH_ENTRANCE_SUCCESS,
   FETCH_ENTRANCE_ERROR,
@@ -55,6 +56,12 @@ import {
   DELETE_COMMENT_PERMANENT_SUCCESS
 } from '../actions/Comment/DeleteComment';
 import { RESTORE_COMMENT_SUCCESS } from '../actions/Comment/RestoreComment';
+
+import { MOVE_LOCATION_RELEVANCE_SUCCESS } from '../actions/Location/MoveRelevance';
+import { MOVE_DESCRIPTION_RELEVANCE_SUCCESS } from '../actions/Description/MoveRelevance';
+import { MOVE_COMMENT_RELEVANCE_SUCCESS } from '../actions/Comment/MoveRelevance';
+import { MOVE_RIGGING_RELEVANCE_SUCCESS } from '../actions/Riggings/MoveRelevance';
+import { MOVE_HISTORY_RELEVANCE_SUCCESS } from '../actions/History/MoveRelevance';
 
 import { POST_DESCRIPTION_SUCCESS } from '../actions/Description/CreateDescription';
 import { UPDATE_DESCRIPTION_SUCCESS } from '../actions/Description/UpdateDescription';
@@ -254,6 +261,66 @@ const reducer = (state = initialState, action) => {
         data: {
           ...state.data,
           comments: state.data.comments.filter(e => e.id !== action.comment.id)
+        }
+      };
+    case MOVE_LOCATION_RELEVANCE_SUCCESS:
+      return {
+        ...state,
+        data: {
+          ...state.data,
+          locations: swapRelevance(
+            state.data?.locations ?? [],
+            action.moved,
+            action.swapped
+          )
+        }
+      };
+    case MOVE_DESCRIPTION_RELEVANCE_SUCCESS:
+      return {
+        ...state,
+        data: {
+          ...state.data,
+          descriptions: swapRelevance(
+            state.data?.descriptions ?? [],
+            action.moved,
+            action.swapped
+          )
+        }
+      };
+    case MOVE_COMMENT_RELEVANCE_SUCCESS:
+      return {
+        ...state,
+        data: {
+          ...state.data,
+          comments: swapRelevance(
+            state.data?.comments ?? [],
+            action.moved,
+            action.swapped
+          )
+        }
+      };
+    case MOVE_RIGGING_RELEVANCE_SUCCESS:
+      return {
+        ...state,
+        data: {
+          ...state.data,
+          riggings: swapRelevance(
+            state.data?.riggings ?? [],
+            action.moved,
+            action.swapped
+          )
+        }
+      };
+    case MOVE_HISTORY_RELEVANCE_SUCCESS:
+      return {
+        ...state,
+        data: {
+          ...state.data,
+          histories: swapRelevance(
+            state.data?.histories ?? [],
+            action.moved,
+            action.swapped
+          )
         }
       };
     default:

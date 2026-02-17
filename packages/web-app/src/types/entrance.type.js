@@ -75,6 +75,7 @@ export const RiggingPropTypes = PropTypes.shape({
   reviewer: authorType,
   dateInscription: PropTypes.string,
   dateReviewed: PropTypes.string,
+  relevance: PropTypes.number,
   language: PropTypes.string
 });
 

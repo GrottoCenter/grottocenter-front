@@ -1,4 +1,5 @@
 import arrFindReplaceOrAdd from './utils';
+import swapRelevance from './swapRelevance';
 import {
   FETCH_MASSIF,
   FETCH_MASSIF_FAILURE,
@@ -11,6 +12,7 @@ import {
 import { RESTORE_MASSIF_SUCCESS } from '../actions/Massif/RestoreMassif';
 import { LINK_DOCUMENT_TO_MASSIF_SUCCESS } from '../actions/LinkDocumentToMassif';
 import { UNLINK_DOCUMENT_TO_MASSIF_SUCCESS } from '../actions/UnlinkDocumentToMassif';
+import { MOVE_DESCRIPTION_RELEVANCE_SUCCESS } from '../actions/Description/MoveRelevance';
 
 const initialState = {
   massif: undefined,
@@ -49,6 +51,18 @@ const reducer = (state = initialState, action) => {
           documents: [
             ...state.massif.documents.filter(e => e.id !== action.documentId)
           ]
+        }
+      };
+    case MOVE_DESCRIPTION_RELEVANCE_SUCCESS:
+      return {
+        ...state,
+        massif: {
+          ...state.massif,
+          descriptions: swapRelevance(
+            state.massif?.descriptions ?? [],
+            action.moved,
+            action.swapped
+          )
         }
       };
     default:

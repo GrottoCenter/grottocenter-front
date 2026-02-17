@@ -70,6 +70,8 @@ export const deleteDescriptionUrl = (descriptionId, isPermanent = false) =>
   }`;
 export const restoreDescriptionUrl = descriptionId =>
   `${API_BASE_PATH}/descriptions/${descriptionId}/restore`;
+export const moveDescriptionRelevanceUrl = descriptionId =>
+  `${API_BASE_PATH}/descriptions/${descriptionId}/move-relevance`;
 
 // ===== Comments urls
 export const postCommentUrl = `${API_BASE_PATH}/comments`;
@@ -81,6 +83,8 @@ export const deleteCommentUrl = (commentId, isPermanent = false) =>
   }`;
 export const restoreCommentUrl = commentId =>
   `${API_BASE_PATH}/comments/${commentId}/restore`;
+export const moveCommentRelevanceUrl = commentId =>
+  `${API_BASE_PATH}/comments/${commentId}/move-relevance`;
 
 // ===== Riggings urls
 export const postRiggingsUrl = `${API_BASE_PATH}/riggings`;
@@ -92,6 +96,8 @@ export const deleteRiggingsUrl = (riggingsId, isPermanent = false) =>
   }`;
 export const restoreRiggingsUrl = riggingsId =>
   `${API_BASE_PATH}/riggings/${riggingsId}/restore`;
+export const moveRiggingRelevanceUrl = riggingId =>
+  `${API_BASE_PATH}/riggings/${riggingId}/move-relevance`;
 
 // ===== Documents urls
 export const getDocumentChildrenUrl = documentId =>
@@ -177,6 +183,8 @@ export const deleteHistoryUrl = (historyId, isPermanent = false) =>
   }`;
 export const restoreHistoryUrl = historyId =>
   `${API_BASE_PATH}/histories/${historyId}/restore`;
+export const moveHistoryRelevanceUrl = historyId =>
+  `${API_BASE_PATH}/histories/${historyId}/move-relevance`;
 
 // ===== Locations urls
 export const postLocationUrl = `${API_BASE_PATH}/locations`;
@@ -188,6 +196,8 @@ export const deleteLocationUrl = (locationId, isPermanent = false) =>
   }`;
 export const restoreLocationUrl = locationId =>
   `${API_BASE_PATH}/locations/${locationId}/restore`;
+export const moveLocationRelevanceUrl = locationId =>
+  `${API_BASE_PATH}/locations/${locationId}/move-relevance`;
 // ===== Snapshots urls
 export const getSnapshotsUrl = (typeId, typeName, isNetwork, getAll) =>
   `${API_BASE_PATH}/${typeName}/${typeId}/${
