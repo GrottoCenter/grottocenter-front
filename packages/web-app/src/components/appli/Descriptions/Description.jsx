@@ -18,7 +18,15 @@ const ListItemStyled = styled(ListItem)`
   flex-direction: column;
   border-top: 1px solid ${props => props.theme.palette.divider};
 `;
-const Description = ({ description, isEditAllowed }) => {
+const Description = ({
+  description,
+  isEditAllowed,
+  isMoving,
+  onMoveUp,
+  onMoveDown,
+  isFirst,
+  isLast
+}) => {
   const dispatch = useDispatch();
   const permissions = usePermissions();
   const [isUpdateFormVisible, setIsUpdateFormVisible] = useState(false);
@@ -71,6 +79,15 @@ const Description = ({ description, isEditAllowed }) => {
           }
           onDeletePress={onDeletePress}
           onRestorePress={onRestorePress}
+          {...(isEditAllowed && permissions.isAuth && !description.isDeleted
+            ? {
+                onMoveUp,
+                onMoveDown,
+                isFirst,
+                isLast,
+                isMoveLoading: isMoving
+              }
+            : {})}
         />
       </Box>
       {isUpdateFormVisible && permissions.isAuth ? (
@@ -110,7 +127,12 @@ const Description = ({ description, isEditAllowed }) => {
 
 Description.propTypes = {
   description: DescriptionPropTypes,
-  isEditAllowed: PropTypes.bool
+  isEditAllowed: PropTypes.bool,
+  isMoving: PropTypes.bool,
+  onMoveUp: PropTypes.func,
+  onMoveDown: PropTypes.func,
+  isFirst: PropTypes.bool,
+  isLast: PropTypes.bool
 };
 
 export default Description;

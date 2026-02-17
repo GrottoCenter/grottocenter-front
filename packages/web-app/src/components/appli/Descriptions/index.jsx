@@ -11,7 +11,10 @@ import { DescriptionPropTypes } from '../../../types/description.type';
 import Description from './Description';
 import CreateDescriptionForm from '../EntitiesForm/Description';
 import { postDescription } from '../../../actions/Description/CreateDescription';
+import { moveDescriptionRelevance } from '../../../actions/Description/MoveRelevance';
 import { usePermissions } from '../../../hooks';
+import { useMoveRelevanceWithUndo } from '../../../hooks/useMoveRelevanceWithUndo';
+import { sortByRelevance } from '../../../helpers/sortByRelevance';
 import Alert from '../../common/Alert';
 
 const Descriptions = ({
@@ -24,6 +27,9 @@ const Descriptions = ({
   const permissions = usePermissions();
   const dispatch = useDispatch();
   const [isFormVisible, setIsFormVisible] = useState(false);
+  const { movingId, handleMove } = useMoveRelevanceWithUndo(
+    moveDescriptionRelevance
+  );
 
   const onSubmitForm = data => {
     dispatch(
@@ -49,12 +55,14 @@ const Descriptions = ({
               isFormVisible
                 ? formatMessage({ id: 'Cancel adding a new description' })
                 : formatMessage({ id: 'Add a new description' })
-            }>
+            }
+          >
             <Button
               color={isFormVisible ? 'inherit' : 'secondary'}
               variant="outlined"
               onClick={() => setIsFormVisible(!isFormVisible)}
-              startIcon={isFormVisible ? <CancelIcon /> : <AddCircleIcon />}>
+              startIcon={isFormVisible ? <CancelIcon /> : <AddCircleIcon />}
+            >
               {formatMessage({ id: isFormVisible ? 'Cancel' : 'New' })}
             </Button>
           </Tooltip>
@@ -71,13 +79,24 @@ const Descriptions = ({
 
           {descriptions.length > 0 ? (
             <List dense disablePadding>
-              {descriptions.map(description => (
-                <Description
-                  description={description}
-                  isEditAllowed={isEditAllowed}
-                  key={description.id}
-                />
-              ))}
+              {(() => {
+                const sorted = sortByRelevance(descriptions);
+                const activeIds = sorted
+                  .filter(d => !d.isDeleted)
+                  .map(d => d.id);
+                return sorted.map(description => (
+                  <Description
+                    description={description}
+                    isEditAllowed={isEditAllowed}
+                    isMoving={movingId === description.id}
+                    key={description.id}
+                    onMoveUp={() => handleMove(description.id, -1)}
+                    onMoveDown={() => handleMove(description.id, 1)}
+                    isFirst={description.id === activeIds[0]}
+                    isLast={description.id === activeIds[activeIds.length - 1]}
+                  />
+                ));
+              })()}
             </List>
           ) : (
             <Alert

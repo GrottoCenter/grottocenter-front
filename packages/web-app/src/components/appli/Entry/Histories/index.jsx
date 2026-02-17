@@ -11,7 +11,10 @@ import { HistoryPropTypes } from '../../../../types/entrance.type';
 import History from './History';
 import CreateHistoryForm from '../../EntitiesForm/History';
 import { postHistory } from '../../../../actions/History/CreateHistory';
+import { moveHistoryRelevance } from '../../../../actions/History/MoveRelevance';
 import { usePermissions } from '../../../../hooks';
+import { useMoveRelevanceWithUndo } from '../../../../hooks/useMoveRelevanceWithUndo';
+import { sortByRelevance } from '../../../../helpers/sortByRelevance';
 import Alert from '../../../common/Alert';
 
 const Histories = ({ entranceId, histories, isEditAllowed }) => {
@@ -19,6 +22,7 @@ const Histories = ({ entranceId, histories, isEditAllowed }) => {
   const permissions = usePermissions();
   const dispatch = useDispatch();
   const [isFormVisible, setIsFormVisible] = useState(false);
+  const { movingId, handleMove } = useMoveRelevanceWithUndo(moveHistoryRelevance);
 
   const onSubmitForm = data => {
     dispatch(
@@ -43,12 +47,14 @@ const Histories = ({ entranceId, histories, isEditAllowed }) => {
               isFormVisible
                 ? formatMessage({ id: 'Cancel adding a new history' })
                 : formatMessage({ id: 'Add a new history' })
-            }>
+            }
+          >
             <Button
               color={isFormVisible ? 'inherit' : 'secondary'}
               variant="outlined"
               onClick={() => setIsFormVisible(!isFormVisible)}
-              startIcon={isFormVisible ? <CancelIcon /> : <AddCircleIcon />}>
+              startIcon={isFormVisible ? <CancelIcon /> : <AddCircleIcon />}
+            >
               {formatMessage({ id: isFormVisible ? 'Cancel' : 'New' })}
             </Button>
           </Tooltip>
@@ -65,13 +71,25 @@ const Histories = ({ entranceId, histories, isEditAllowed }) => {
 
           {histories.length > 0 ? (
             <List dense disablePadding>
-              {histories.map(history => (
-                <History
-                  history={history}
-                  key={history.id}
-                  isEditAllowed={isEditAllowed}
-                />
-              ))}
+              {(() => {
+                const sorted = sortByRelevance(histories);
+                const activeIds = sorted
+                  .filter(h => !h.isDeleted)
+                  .map(h => h.id);
+                return sorted.map(history => (
+                  <React.Fragment key={history.id}>
+                    <History
+                      history={history}
+                      isEditAllowed={isEditAllowed}
+                      isMoving={movingId === history.id}
+                      onMoveUp={() => handleMove(history.id, -1)}
+                      onMoveDown={() => handleMove(history.id, 1)}
+                      isFirst={history.id === activeIds[0]}
+                      isLast={history.id === activeIds[activeIds.length - 1]}
+                    />
+                  </React.Fragment>
+                ));
+              })()}
             </List>
           ) : (
             <Alert

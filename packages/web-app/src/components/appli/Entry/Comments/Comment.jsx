@@ -42,7 +42,7 @@ const DurationContainer = styled('div')`
   gap: 20px;
 `;
 
-const Comment = ({ comment, isEditAllowed }) => {
+const Comment = ({ comment, isEditAllowed, isMoving, onMoveUp, onMoveDown, isFirst, isLast }) => {
   const dispatch = useDispatch();
   const { formatMessage } = useIntl();
   const permissions = usePermissions();
@@ -104,6 +104,15 @@ const Comment = ({ comment, isEditAllowed }) => {
           }
           onDeletePress={onDeletePress}
           onRestorePress={onRestorePress}
+          {...(isEditAllowed && permissions.isAuth && !comment.isDeleted
+            ? {
+                onMoveUp,
+                onMoveDown,
+                isFirst,
+                isLast,
+                isMoveLoading: isMoving
+              }
+            : {})}
         />
       </Box>
       {isUpdateFormVisible && permissions.isAuth ? (
@@ -169,7 +178,12 @@ const Comment = ({ comment, isEditAllowed }) => {
 
 Comment.propTypes = {
   comment: CommentPropTypes,
-  isEditAllowed: PropTypes.bool
+  isEditAllowed: PropTypes.bool,
+  isMoving: PropTypes.bool,
+  onMoveUp: PropTypes.func,
+  onMoveDown: PropTypes.func,
+  isFirst: PropTypes.bool,
+  isLast: PropTypes.bool
 };
 
 export default Comment;

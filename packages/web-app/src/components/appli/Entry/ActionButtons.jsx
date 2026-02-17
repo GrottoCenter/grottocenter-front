@@ -1,26 +1,28 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { ButtonGroup, Button, Tooltip } from '@mui/material';
-import LoadingButton from '@mui/lab/LoadingButton';
+import {
+  ButtonGroup,
+  Button,
+  CircularProgress,
+  Tooltip,
+  Box
+} from '@mui/material';
 import { useIntl } from 'react-intl';
 
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/DeleteOutlineRounded';
 import DeleteForeverIcon from '@mui/icons-material/RemoveCircleRounded';
 import RestoreIcon from '@mui/icons-material/RestoreFromTrashRounded';
+import ArrowUpward from '@mui/icons-material/ArrowUpward';
+import ArrowDownward from '@mui/icons-material/ArrowDownward';
 
-const LoadingActionButton = () => {
-  const { formatMessage } = useIntl();
-  return (
-    <ButtonGroup color="primary">
-      <LoadingButton
-        loading
-        loadingIndicator={formatMessage({ id: 'Loading ...' })}>
-        {formatMessage({ id: 'Loading ...' })}
-      </LoadingButton>
-    </ButtonGroup>
-  );
-};
+const LoadingActionButton = () => (
+  <ButtonGroup color="primary">
+    <Button disabled color="primary">
+      <CircularProgress size={20} />
+    </Button>
+  </ButtonGroup>
+);
 
 const ActionButtons = ({
   isLoading,
@@ -31,11 +33,18 @@ const ActionButtons = ({
   canDelete,
   snapshotEl,
   onDeletePress,
-  onRestorePress
+  onRestorePress,
+  onMoveUp,
+  onMoveDown,
+  isFirst,
+  isLast,
+  isMoveLoading
 }) => {
   const { formatMessage } = useIntl();
 
   if (isLoading) return <LoadingActionButton />;
+
+  const showReorder = onMoveUp && onMoveDown;
 
   return (
     <ButtonGroup color="primary">
@@ -71,12 +80,41 @@ const ActionButtons = ({
               ? formatMessage({ id: 'Cancel edit' })
               : formatMessage({ id: `Edit` })
           }>
+          <Box
+            component="span"
+            sx={{ display: 'inline-flex', pointerEvents: 'auto' }}>
+            <Button
+              disabled={!canEdit}
+              onClick={() => setIsUpdating(!isUpdating)}
+              color="primary"
+              aria-label={formatMessage({ id: 'edit' })}>
+              {isUpdating ? formatMessage({ id: `Cancel` }) : <EditIcon />}
+            </Button>
+          </Box>
+        </Tooltip>
+      )}
+      {showReorder && !isUpdating && isMoveLoading && (
+        <Button disabled color="primary">
+          <CircularProgress size={20} />
+        </Button>
+      )}
+      {showReorder && !isUpdating && !isMoveLoading && !isFirst && (
+        <Tooltip title={formatMessage({ id: 'Move up' })}>
           <Button
-            disabled={!canEdit}
-            onClick={() => setIsUpdating(!isUpdating)}
+            onClick={onMoveUp}
             color="primary"
-            aria-label={formatMessage({ id: 'edit' })}>
-            {isUpdating ? formatMessage({ id: `Cancel` }) : <EditIcon />}
+            aria-label={formatMessage({ id: 'Move up' })}>
+            <ArrowUpward fontSize="small" />
+          </Button>
+        </Tooltip>
+      )}
+      {showReorder && !isUpdating && !isMoveLoading && !isLast && (
+        <Tooltip title={formatMessage({ id: 'Move down' })}>
+          <Button
+            onClick={onMoveDown}
+            color="primary"
+            aria-label={formatMessage({ id: 'Move down' })}>
+            <ArrowDownward fontSize="small" />
           </Button>
         </Tooltip>
       )}
@@ -96,5 +134,10 @@ ActionButtons.propTypes = {
   canDelete: PropTypes.bool.isRequired,
   snapshotEl: PropTypes.element.isRequired,
   onDeletePress: PropTypes.func.isRequired,
-  onRestorePress: PropTypes.func.isRequired
+  onRestorePress: PropTypes.func.isRequired,
+  onMoveUp: PropTypes.func,
+  onMoveDown: PropTypes.func,
+  isFirst: PropTypes.bool,
+  isLast: PropTypes.bool,
+  isMoveLoading: PropTypes.bool
 };

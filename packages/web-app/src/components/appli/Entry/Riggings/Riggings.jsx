@@ -8,10 +8,13 @@ import CancelIcon from '@mui/icons-material/Cancel';
 import { styled } from '@mui/material/styles';
 import { usePermissions } from '../../../../hooks';
 import { postRiggings } from '../../../../actions/Riggings/CreateRigging';
+import { moveRiggingRelevance } from '../../../../actions/Riggings/MoveRelevance';
+import { useMoveRelevanceWithUndo } from '../../../../hooks/useMoveRelevanceWithUndo';
 import CreateRiggingsForm from '../../EntitiesForm/Riggings';
 import ScrollableContent from '../../../common/Layouts/Fixed/ScrollableContent';
 import Rigging from './Rigging';
 import { RiggingPropTypes } from '../../../../types/entrance.type';
+import { sortByRelevance } from '../../../../helpers/sortByRelevance';
 import Alert from '../../../common/Alert';
 
 const DividerWithMargin = styled(Divider)`
@@ -24,6 +27,7 @@ const Riggings = ({ riggings, entranceId, isEditAllowed }) => {
   const dispatch = useDispatch();
   const permissions = usePermissions();
   const [isFormVisible, setIsFormVisible] = useState(false);
+  const { movingId, handleMove } = useMoveRelevanceWithUndo(moveRiggingRelevance);
   const handleSubmitForm = data => {
     dispatch(
       postRiggings({
@@ -48,12 +52,14 @@ const Riggings = ({ riggings, entranceId, isEditAllowed }) => {
               isFormVisible
                 ? formatMessage({ id: 'Cancel adding a new rigging' })
                 : formatMessage({ id: 'Add a new rigging' })
-            }>
+            }
+          >
             <Button
               color={isFormVisible ? 'inherit' : 'secondary'}
               variant="outlined"
               onClick={() => setIsFormVisible(!isFormVisible)}
-              startIcon={isFormVisible ? <CancelIcon /> : <AddCircleIcon />}>
+              startIcon={isFormVisible ? <CancelIcon /> : <AddCircleIcon />}
+            >
               {formatMessage({ id: isFormVisible ? 'Cancel' : 'New' })}
             </Button>
           </Tooltip>
@@ -72,14 +78,24 @@ const Riggings = ({ riggings, entranceId, isEditAllowed }) => {
             </>
           )}
           {riggings.length > 0 &&
-            riggings
-              .sort((r1, r2) => r1.title.localeCompare(r2.title))
-              .map(rigging => (
+            (() => {
+              const sorted = sortByRelevance(riggings);
+              const activeIds = sorted.filter(r => !r.isDeleted).map(r => r.id);
+              return sorted.map(rigging => (
                 <React.Fragment key={rigging.id}>
                   <DividerWithMargin />
-                  <Rigging rigging={rigging} isEditAllowed={isEditAllowed} />
+                  <Rigging
+                    rigging={rigging}
+                    isEditAllowed={isEditAllowed}
+                    isMoving={movingId === rigging.id}
+                    onMoveUp={() => handleMove(rigging.id, -1)}
+                    onMoveDown={() => handleMove(rigging.id, 1)}
+                    isFirst={rigging.id === activeIds[0]}
+                    isLast={rigging.id === activeIds[activeIds.length - 1]}
+                  />
                 </React.Fragment>
-              ))}
+              ));
+            })()}
           {riggings.length === 0 && (
             <Alert
               severity="info"

@@ -17,7 +17,7 @@ const ListItemStyled = styled(ListItem)`
   flex-direction: column;
   border-top: 1px solid ${props => props.theme.palette.divider};
 `;
-const History = ({ history, isEditAllowed }) => {
+const History = ({ history, isEditAllowed, isMoving, onMoveUp, onMoveDown, isFirst, isLast }) => {
   const dispatch = useDispatch();
   const permissions = usePermissions();
   const [isUpdateFormVisible, setIsUpdateFormVisible] = useState(false);
@@ -69,6 +69,15 @@ const History = ({ history, isEditAllowed }) => {
           }
           onDeletePress={onDeletePress}
           onRestorePress={onRestorePress}
+          {...(isEditAllowed && permissions.isAuth && !history.isDeleted
+            ? {
+                onMoveUp,
+                onMoveDown,
+                isFirst,
+                isLast,
+                isMoveLoading: isMoving
+              }
+            : {})}
         />
       </Box>
       {isUpdateFormVisible && permissions.isAuth ? (
@@ -102,7 +111,12 @@ const History = ({ history, isEditAllowed }) => {
 
 History.propTypes = {
   history: HistoryPropTypes,
-  isEditAllowed: PropTypes.bool
+  isEditAllowed: PropTypes.bool,
+  isMoving: PropTypes.bool,
+  onMoveUp: PropTypes.func,
+  onMoveDown: PropTypes.func,
+  isFirst: PropTypes.bool,
+  isLast: PropTypes.bool
 };
 
 export default History;

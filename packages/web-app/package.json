@@ -86,7 +86,8 @@
   },
   "jest": {
     "transformIgnorePatterns": [
-      "/node_modules/(?!fast-check|@fast-check)"
+      "[/\\\\]node_modules[/\\\\](?!fast-check|@fast-check|pure-rand).+\\.(js|jsx|mjs|cjs|ts|tsx)$",
+      "^.+\\.module\\.(css|sass|scss)$"
     ]
   },
   "browserslist": {

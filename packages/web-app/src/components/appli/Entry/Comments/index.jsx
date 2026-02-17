@@ -11,7 +11,10 @@ import { CommentPropTypes } from '../../../../types/entrance.type';
 import Comment from './Comment';
 import CreateCommentForm from '../../EntitiesForm/Comment';
 import { postComment } from '../../../../actions/Comment/CreateComment';
+import { moveCommentRelevance } from '../../../../actions/Comment/MoveRelevance';
 import { usePermissions } from '../../../../hooks';
+import { useMoveRelevanceWithUndo } from '../../../../hooks/useMoveRelevanceWithUndo';
+import { sortByRelevance } from '../../../../helpers/sortByRelevance';
 import Alert from '../../../common/Alert';
 
 const Comments = ({ entranceId, comments, isEditAllowed }) => {
@@ -19,6 +22,7 @@ const Comments = ({ entranceId, comments, isEditAllowed }) => {
   const permissions = usePermissions();
   const dispatch = useDispatch();
   const [isFormVisible, setIsFormVisible] = useState(false);
+  const { movingId, handleMove } = useMoveRelevanceWithUndo(moveCommentRelevance);
 
   const onSubmitForm = data => {
     dispatch(
@@ -49,12 +53,14 @@ const Comments = ({ entranceId, comments, isEditAllowed }) => {
               isFormVisible
                 ? formatMessage({ id: 'Cancel adding a new comment' })
                 : formatMessage({ id: 'Add a new comment' })
-            }>
+            }
+          >
             <Button
               color={isFormVisible ? 'inherit' : 'secondary'}
               variant="outlined"
               onClick={() => setIsFormVisible(!isFormVisible)}
-              startIcon={isFormVisible ? <CancelIcon /> : <AddCircleIcon />}>
+              startIcon={isFormVisible ? <CancelIcon /> : <AddCircleIcon />}
+            >
               {formatMessage({ id: isFormVisible ? 'Cancel' : 'New' })}
             </Button>
           </Tooltip>
@@ -71,13 +77,25 @@ const Comments = ({ entranceId, comments, isEditAllowed }) => {
 
           {comments.length > 0 ? (
             <List dense disablePadding>
-              {comments.map(comment => (
-                <Comment
-                  comment={comment}
-                  key={comment.id}
-                  isEditAllowed={isEditAllowed}
-                />
-              ))}
+              {(() => {
+                const sorted = sortByRelevance(comments);
+                const activeIds = sorted
+                  .filter(c => !c.isDeleted)
+                  .map(c => c.id);
+                return sorted.map(comment => (
+                  <React.Fragment key={comment.id}>
+                    <Comment
+                      comment={comment}
+                      isEditAllowed={isEditAllowed}
+                      isMoving={movingId === comment.id}
+                      onMoveUp={() => handleMove(comment.id, -1)}
+                      onMoveDown={() => handleMove(comment.id, 1)}
+                      isFirst={comment.id === activeIds[0]}
+                      isLast={comment.id === activeIds[activeIds.length - 1]}
+                    />
+                  </React.Fragment>
+                ));
+              })()}
             </List>
           ) : (
             <Alert

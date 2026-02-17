@@ -1,4 +1,5 @@
 import arrFindReplaceOrAdd from './utils';
+import swapRelevance from './swapRelevance';
 import {
   FETCH_CAVE_SUCCESS,
   FETCH_CAVE_ERROR,
@@ -16,6 +17,7 @@ import {
   DELETE_DESCRIPTION_PERMANENT_SUCCESS
 } from '../actions/Description/DeleteDescription';
 import { RESTORE_DESCRIPTION_SUCCESS } from '../actions/Description/RestoreDescription';
+import { MOVE_DESCRIPTION_RELEVANCE_SUCCESS } from '../actions/Description/MoveRelevance';
 
 const initialState = {
   cave: undefined,
@@ -68,6 +70,18 @@ const reducer = (state = initialState, action) => {
           ...state.cave,
           descriptions: state.cave.descriptions?.filter(
             e => e.id !== action.description.id
+          )
+        }
+      };
+    case MOVE_DESCRIPTION_RELEVANCE_SUCCESS:
+      return {
+        ...state,
+        cave: {
+          ...state.cave,
+          descriptions: swapRelevance(
+            state.cave?.descriptions ?? [],
+            action.moved,
+            action.swapped
           )
         }
       };

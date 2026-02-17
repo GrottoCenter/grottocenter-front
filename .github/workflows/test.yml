@@ -12,8 +12,22 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
-    # The type of runner that the job will run on
+  unit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Use Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'yarn'
+      - name: Install dependencies
+        run: yarn
+      - name: Run unit tests
+        run: yarn test
+
+  e2e:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -22,9 +36,9 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       - name: Use Node.js ${{ matrix.node }}
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node }}
           cache: 'yarn'
