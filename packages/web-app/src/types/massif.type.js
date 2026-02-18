@@ -16,7 +16,6 @@ export const MassifTypes = PropTypes.shape({
   language: PropTypes.string,
   geogPolygon: PropTypes.string,
   descriptions: PropTypes.arrayOf(DescriptionSimpleTypes),
-  entrances: PropTypes.arrayOf(PropTypes.shape({})),
   networks: PropTypes.arrayOf(PropTypes.shape({})),
   documents: PropTypes.arrayOf(PropTypes.shape({}))
 });
