@@ -175,7 +175,11 @@ const PolygonMap = ({ onChange, data }) => {
   const [hoveredLayerId, setHoveredLayerId] = useState(null);
   const hasCoordinates = data?.coordinates?.length > 0;
   const initialCenter = hasCoordinates
-    ? getMultiPolygonCentroid(data.coordinates[0][0])
+    ? getMultiPolygonCentroid(
+        data.type === 'Polygon'
+          ? data.coordinates[0]
+          : data.coordinates[0][0]
+      )
     : geoLocation;
   const ZOOM_LEVEL = hasCoordinates || hasLocation ? focusZoom : defaultZoom;
 
@@ -452,8 +456,13 @@ const PolygonMap = ({ onChange, data }) => {
       const editableFG = ref;
       const allPolygons = [];
 
+      // Normalize: for Polygon type, wrap coordinates in an extra array
+      // so the iteration logic works the same as MultiPolygon.
+      const polygons =
+        data.type === 'Polygon' ? [data.coordinates] : data.coordinates;
+
       // eslint-disable-next-line no-restricted-syntax
-      for (const polygon of data.coordinates) {
+      for (const polygon of polygons) {
         // Add outer ring (first ring of each polygon)
         const outerRing = polygon[0].map(coords => [coords[1], coords[0]]);
         const leafletPolygon = L.polygon(outerRing, { color: 'green' });

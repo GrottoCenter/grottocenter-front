@@ -172,11 +172,11 @@ const Massif = ({ isLoading, error, massif }) => {
                   />
                 )}
               </Box>
-              {massif?.geogPolygon && massif?.entrances && (
+              {massif?.geogPolygon && (
                 <>
                   <hr />
                   <MapMassif
-                    entrances={massif?.entrances}
+                    massifId={parseInt(massifId, 10)}
                     geogPolygon={massif?.geogPolygon}
                   />
                 </>

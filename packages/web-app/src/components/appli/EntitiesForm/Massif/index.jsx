@@ -165,9 +165,12 @@ export const MassifForm = ({ massifValues }) => {
         isError={!!(massifError || nameError || descriptionError)}
         labelLoading={isNewMassif ? 'Creating massif...' : 'Updating massif...'}
         labelError={
-          isNewMassif
+          massifError?.message ||
+          nameError?.message ||
+          descriptionError?.message ||
+          (isNewMassif
             ? 'An error occurred when creating a massif.'
-            : 'An error occurred when updating a massif.'
+            : 'An error occurred when updating a massif.')
         }
         resetFn={handleReset}
         getRedirectFn={() => (massifData ? `/ui/massifs/${massifData.id}` : '')}
