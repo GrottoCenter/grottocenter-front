@@ -14,7 +14,7 @@ import {
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import { useIntl } from 'react-intl';
 import { useFullScreen } from 'react-browser-hooks';
-import { includes, without } from 'ramda';
+
 import CustomControl, { customControlProps } from '../common/CustomControl';
 
 export const heatmapTypes = {
@@ -22,7 +22,7 @@ export const heatmapTypes = {
   NETWORKS: 'networks',
   NONE: 'none'
 };
-const markerTypes = {
+export const markerTypes = {
   ORGANIZATIONS: 'organizations'
 };
 
@@ -36,12 +36,16 @@ const IconButton = styled(MuiIconButton)`
   padding: 9px;
 `;
 
-const DataControl = ({ updateHeatmap, updateMarkers, ...props }) => {
+const DataControl = ({
+  updateHeatmap,
+  selectedMarkers,
+  setSelectedMarkers,
+  ...props
+}) => {
   const { fullScreen } = useFullScreen();
   const { formatMessage } = useIntl();
   const [anchorEl, setAnchorEl] = useState(null);
   const [selectedHeat, setSelectedHeat] = useState(heatmapTypes.ENTRANCES);
-  const [selectedMarkers, setSelectedMarkers] = useState([]);
 
   const handleOpenMenu = event => {
     setAnchorEl(event.currentTarget);
@@ -51,28 +55,18 @@ const DataControl = ({ updateHeatmap, updateMarkers, ...props }) => {
     setAnchorEl(null);
   };
 
-  const handleChange = (type, selection) => () => {
-    if (type === 'heat') {
-      setSelectedHeat(selection);
-    }
-    if (type === 'markers') {
-      setSelectedMarkers(
-        includes(selection, selectedMarkers)
-          ? without(selection, selectedMarkers)
-          : [...selectedMarkers, selection]
-      );
-    }
+  const handleHeatChange = selection => () => {
+    setSelectedHeat(selection);
+  };
+
+  const handleMarkerChange = type => () => {
+    setSelectedMarkers(prev => ({ ...prev, [type]: !prev[type] }));
   };
 
   useEffect(() => {
     updateHeatmap(selectedHeat);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedHeat]);
-  useEffect(() => {
-    updateMarkers(selectedMarkers);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedMarkers]);
-
   return (
     <CustomControl {...props}>
       <Wrapper>
@@ -102,21 +96,21 @@ const DataControl = ({ updateHeatmap, updateMarkers, ...props }) => {
           aria-label={formatMessage({ id: 'heatmap' })}
           name="heatmap"
           value={selectedHeat}>
-          <MenuItem onClick={handleChange('heat', heatmapTypes.ENTRANCES)}>
+          <MenuItem onClick={handleHeatChange(heatmapTypes.ENTRANCES)}>
             <FormControlLabel
               value={heatmapTypes.ENTRANCES}
               control={<Radio size="small" />}
               label={formatMessage({ id: heatmapTypes.ENTRANCES })}
             />
           </MenuItem>
-          <MenuItem onClick={handleChange('heat', heatmapTypes.NETWORKS)}>
+          <MenuItem onClick={handleHeatChange(heatmapTypes.NETWORKS)}>
             <FormControlLabel
               value={heatmapTypes.NETWORKS}
               control={<Radio size="small" />}
               label={formatMessage({ id: heatmapTypes.NETWORKS })}
             />
           </MenuItem>
-          <MenuItem onClick={handleChange('heat', heatmapTypes.NONE)}>
+          <MenuItem onClick={handleHeatChange(heatmapTypes.NONE)}>
             <FormControlLabel
               value={heatmapTypes.NONE}
               control={<Radio size="small" />}
@@ -128,11 +122,15 @@ const DataControl = ({ updateHeatmap, updateMarkers, ...props }) => {
           {formatMessage({ id: 'markers' }).toUpperCase()}
         </MenuItem>
         <FormGroup>
-          <MenuItem
-            onChange={handleChange('markers', markerTypes.ORGANIZATIONS)}>
+          <MenuItem>
             <FormControlLabel
               control={
-                <Checkbox size="small" name={markerTypes.ORGANIZATIONS} />
+                <Checkbox
+                  size="small"
+                  name={markerTypes.ORGANIZATIONS}
+                  checked={selectedMarkers[markerTypes.ORGANIZATIONS]}
+                  onChange={handleMarkerChange(markerTypes.ORGANIZATIONS)}
+                />
               }
               label={formatMessage({ id: markerTypes.ORGANIZATIONS })}
             />
@@ -147,7 +145,8 @@ const MemoizedDataControl = React.memo(DataControl);
 
 DataControl.propTypes = {
   updateHeatmap: PropTypes.func.isRequired,
-  updateMarkers: PropTypes.func.isRequired,
+  selectedMarkers: PropTypes.objectOf(PropTypes.bool).isRequired,
+  setSelectedMarkers: PropTypes.func.isRequired,
   ...customControlProps
 };
 

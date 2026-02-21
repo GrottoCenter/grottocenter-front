@@ -58,7 +58,8 @@ const ResultsPopper = styled(Popper, {
   width: fit-content;
 
   ul.MuiAutocomplete-listbox {
-    max-height: 70vh;
+    max-height: 70vh; /* fallback for old browsers */
+    max-height: 70dvh;
   }
 
   > div {

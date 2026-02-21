@@ -139,7 +139,7 @@ const MapMarkerSelector = ({ control, formLatitudeKey, formLongitudeKey }) => {
 
   return (
     <StyledMapContainer
-      style={{ height: '40vh', width: 'calc(100% - 8px)' }}
+      style={{ height: '40dvh', width: 'calc(100% - 8px)' }}
       center={currentPosition}
       zoom={ZOOM_LEVEL}
       dragging={!isMobile} // For usability only use two fingers drag/zoom on mobile

@@ -510,10 +510,9 @@ const PolygonMap = ({ onChange, data }) => {
           }}
           position="topLeft"
           style={{
-            height: '70vh',
+            height: '70dvh',
             flex: 1
-          }}
-        >
+          }}>
           <FeatureGroup
             ref={reactFGref => {
               if (reactFGref) {
@@ -522,8 +521,7 @@ const PolygonMap = ({ onChange, data }) => {
                   onFeatureGroupReady(reactFGref);
                 }
               }
-            }}
-          >
+            }}>
             <EditControl
               position="topright"
               onCreated={onCreate}
@@ -561,8 +559,7 @@ const PolygonMap = ({ onChange, data }) => {
       <Snackbar
         open={!!importError}
         autoHideDuration={6000}
-        onClose={() => setImportError('')}
-      >
+        onClose={() => setImportError('')}>
         <Alert severity="error" onClose={() => setImportError('')}>
           {importError}
         </Alert>
@@ -571,8 +568,7 @@ const PolygonMap = ({ onChange, data }) => {
       <Snackbar
         open={importSuccess}
         autoHideDuration={3000}
-        onClose={() => setImportSuccess(false)}
-      >
+        onClose={() => setImportSuccess(false)}>
         <Alert severity="success" onClose={() => setImportSuccess(false)}>
           {formatMessage({ id: 'Shapefile imported successfully!' })}
         </Alert>

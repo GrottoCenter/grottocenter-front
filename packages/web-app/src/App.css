@@ -57,17 +57,25 @@ code {
 }
 
 
+.leaflet-popup-content {
+  margin: 10px 14px;
+  max-width: 260px;
+}
+
 .map-popup-property {
   display: flex;
   align-items: center;
   font-size: 13px;
+  gap: 6px;
 }
 
 .map-popup-property p {
-  margin: 1em 0;
+  margin: 2px 0;
 }
+
 .map-popup-property img, .map-popup-property svg {
-  margin-right: 1em;
+  margin-right: 0;
+  flex-shrink: 0;
 }
 
 .leaflet-tooltip{
