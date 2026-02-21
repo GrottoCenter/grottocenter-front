@@ -18,7 +18,7 @@ const OrganizationLogo = ({ control, errors }) => {
 
   return (
     <div>
-      <FormControl component="fieldset" style={{ width: '50vh' }}>
+      <FormControl component="fieldset" style={{ width: '50svw' }}>
         <FormLabel>{formatMessage({ id: 'Upload a logo' })}</FormLabel>
         <Controller
           name="organization.logo"

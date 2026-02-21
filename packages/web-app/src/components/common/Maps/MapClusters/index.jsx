@@ -1,9 +1,9 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useCallback, useEffect, useMemo, useState, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { useMapEvent } from 'react-leaflet';
 import { without, pipe, append, uniq } from 'ramda';
 
-import DataControl, { heatmapTypes } from './DataControl';
+import DataControl, { heatmapTypes, markerTypes } from './DataControl';
 import ConverterControl from '../common/Converter';
 import GeocodingControl from '../common/GeocodingControl';
 import useHeatLayer, { HexGlobalCss } from './useHeatLayer';
@@ -27,33 +27,59 @@ const HydratedMap = ({
   onUpdate
 }) => {
   const { updateHeatData } = useHeatLayer(entrances);
-  const [selectedHeat, setSelectedHeat] = useState('entrances');
-  const [selectedMarkers, setSelectedMarkers] = useState([]);
+  const [selectedHeat, setSelectedHeat] = useState(heatmapTypes.ENTRANCES);
+  const [selectedMarkers, setSelectedMarkers] = useState(
+    Object.fromEntries(Object.values(markerTypes).map(type => [type, false]))
+  );
+  const selectedMarkersList = useMemo(
+    () =>
+      Object.entries(selectedMarkers)
+        .filter(([, v]) => v)
+        .map(([k]) => k),
+    [selectedMarkers]
+  );
   const [visibleHeat, setVisibleHeat] = useState(selectedHeat);
-  const [visibleMarkers, setVisibleMarkers] = useState(selectedMarkers);
+  const [visibleMarkers, setVisibleMarkers] = useState([]);
   const zoomState = useRef(ZOOM_STATE.HEAT);
   const prevZoom = useRef(zoom);
+  // Refs to avoid stale closures in event handlers (zoomend, handleUpdateHeat)
+  const selectedHeatRef = useRef(selectedHeat);
+  selectedHeatRef.current = selectedHeat;
+  const selectedMarkersListRef = useRef(selectedMarkersList);
+  selectedMarkersListRef.current = selectedMarkersList;
 
-  const handleUpdateMarkers = newSelection => {
-    setSelectedMarkers(newSelection);
+  useEffect(() => {
     if (zoomState.current === ZOOM_STATE.MARKERS) {
       setVisibleMarkers(
-        pipe(append(selectedHeat), uniq, without('none'))(newSelection)
+        pipe(append(selectedHeat), uniq, without('none'))(selectedMarkersList)
       );
     } else {
-      setVisibleMarkers(newSelection);
+      setVisibleMarkers(selectedMarkersList);
     }
-  };
-  const handleUpdateHeat = newHeat => {
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedMarkers]);
+
+  const handleOrganizationSelect = useCallback(() => {
+    setSelectedMarkers(prev => ({
+      ...prev,
+      [markerTypes.ORGANIZATIONS]: true
+    }));
+  }, []);
+
+  const handleUpdateHeat = useCallback(newHeat => {
     setSelectedHeat(newHeat);
     if (zoomState.current === ZOOM_STATE.HEAT) {
       setVisibleHeat(newHeat);
     } else {
       setVisibleMarkers(
-        pipe(append(newHeat), uniq, without('none'))(selectedMarkers)
+        pipe(
+          append(newHeat),
+          uniq,
+          without('none')
+        )(selectedMarkersListRef.current)
       );
     }
-  };
+  }, []);
 
   // on zoom handle what is visible between heat & markers
   const map = useMapEvent('zoomend', () => {
@@ -64,7 +90,11 @@ const HydratedMap = ({
       // do not update visible markers if it's already displayed
       if (zoomState.current !== ZOOM_STATE.MARKERS) {
         setVisibleMarkers(
-          pipe(append(selectedHeat), uniq, without('none'))(selectedMarkers)
+          pipe(
+            append(selectedHeatRef.current),
+            uniq,
+            without('none')
+          )(selectedMarkersListRef.current)
         );
         setVisibleHeat('none');
         zoomState.current = ZOOM_STATE.MARKERS;
@@ -72,8 +102,8 @@ const HydratedMap = ({
     }
     // When too far we want to switch back to the heatmap
     if (!isZoomingIn && currentZoom < MARKERS_LIMIT) {
-      setVisibleHeat(selectedHeat);
-      setVisibleMarkers(selectedMarkers);
+      setVisibleHeat(selectedHeatRef.current);
+      setVisibleMarkers(selectedMarkersListRef.current);
       zoomState.current = ZOOM_STATE.HEAT;
     }
     prevZoom.current = currentZoom;
@@ -119,10 +149,11 @@ const HydratedMap = ({
   return (
     <>
       {HexGlobalCss}
-      <GeocodingControl />
+      <GeocodingControl onOrganizationSelect={handleOrganizationSelect} />
       <DataControl
         updateHeatmap={handleUpdateHeat}
-        updateMarkers={handleUpdateMarkers}
+        selectedMarkers={selectedMarkers}
+        setSelectedMarkers={setSelectedMarkers}
       />
       <ConverterControl projectionsList={projectionsList} />
       <Markers

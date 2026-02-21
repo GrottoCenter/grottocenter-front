@@ -31,7 +31,8 @@ CustomIcon.propTypes = {
     'depth',
     'length',
     'cave_system',
-    'bibliography'
+    'bibliography',
+    'club'
   ]).isRequired,
   size: PropTypes.number,
   margin: PropTypes.number
