@@ -3,35 +3,19 @@ import { useIntl } from 'react-intl';
 import { Box, Grid, Tooltip } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { useDispatch, useSelector } from 'react-redux';
-import { DirectionsWalk, Language } from '@mui/icons-material';
+import { FlagRounded, Handshake } from '@mui/icons-material';
 import { loadDynamicNumber } from '../../../actions/DynamicNumber';
 import { fetchCumulatedLength } from '../../../actions/CumulatedLength';
 import DataCard from './components/DataCard';
 import DataLine from './components/DataLine';
-
-import './style.css';
+import CustomIcon from '../../common/CustomIcon';
 import GCLink from '../../common/GCLink';
 
 const SectionTitle = styled('h3')`
   text-align: center;
-  padding: 40px;
-  font-size: 35px;
   padding: 20px;
+  font-size: 35px;
   color: ${({ theme }) => theme.palette.secondary.main};
-`;
-
-const BlockIcon = styled('span')`
-  margin-right: 10px;
-  font-size: 4.2rem;
-  color: ${({ theme }) => theme.palette.primary1Color};
-  line-height: 1;
-
-  :before {
-    font-family: gc-icon !important;
-    font-style: normal;
-    font-weight: normal !important;
-    vertical-align: top;
-  }
 `;
 
 const StyledLink = styled(GCLink)`
@@ -67,25 +51,17 @@ const DataHomepage = () => {
   }, [dispatch, languageObject]);
 
   return (
-    <Box style={{ margin: '10px 5%' }}>
+    <Box sx={{ margin: '10px 5%' }}>
       <SectionTitle>
         {formatMessage({ id: 'Grottocenter in numbers' })}
       </SectionTitle>
-      <div
-        style={{
-          flexGrow: 1
-        }}>
+      <div>
         {/* First line */}
         {officialPartners && (
           <DataLine
             numberData={officialPartners.number}
             isFetching={officialPartners.isFetching}
-            icon={
-              <BlockIcon
-                className="icon icon-gc-club"
-                style={{ margin: '10px' }}
-              />
-            }
+            icon={<Handshake sx={{ fontSize: 55 }} color="primary" />}
           />
         )}
         {/* Rest of the grid */}
@@ -95,13 +71,7 @@ const DataHomepage = () => {
               <StyledLink internal href="/ui/search/entry">
                 <DataCard
                   isColored={false}
-                  icon={
-                    <img
-                      style={{ width: '70px' }}
-                      src="/images/gc-entries.svg"
-                      alt={formatMessage({ id: 'Entries icon' })}
-                    />
-                  }
+                  icon={<CustomIcon type="entrance" size={55} />}
                   numberData={entrances.number}
                   isFetching={entrances.isFetching}
                   title={formatMessage({ id: 'caves' })}
@@ -115,7 +85,7 @@ const DataHomepage = () => {
             {users && (
               <DataCard
                 isColored
-                icon={<BlockIcon className="icon icon-gc-speleo" />}
+                icon={<CustomIcon type="caver" size={55} />}
                 numberData={users.number}
                 isFetching={users.isFetching}
                 title={formatMessage({ id: 'cavers' })}
@@ -130,13 +100,7 @@ const DataHomepage = () => {
               <StyledLink internal href="/ui/search/document">
                 <DataCard
                   isColored={false}
-                  icon={
-                    <img
-                      style={{ width: '70px' }}
-                      src="/images/bbs_logo.png"
-                      alt={formatMessage({ id: 'BBS icon' })}
-                    />
-                  }
+                  icon={<CustomIcon type="bibliography" size={55} />}
                   numberData={documents.number}
                   isFetching={documents.isFetching}
                   title={formatMessage({ id: 'documents' })}
@@ -153,14 +117,13 @@ const DataHomepage = () => {
               <StyledLink internal href="/ui/countries">
                 <DataCard
                   isColored
-                  icon={<Language style={{ fontSize: 55 }} color="primary" />}
+                  icon={<FlagRounded sx={{ fontSize: 55 }} color="primary" />}
                   numberData={countries.number}
                   isFetching={countries.isFetching}
                   title={formatMessage({ id: 'countries' })}
                   globalText={formatMessage({
                     id: 'are represented on this website.'
                   })}
-                  width="36%"
                 />
               </StyledLink>
             )}
@@ -176,10 +139,7 @@ const DataHomepage = () => {
                         cumulatedLength.nb_data
                       } ${formatMessage({ id: 'caves' })}`}
                       placement="top">
-                      <DirectionsWalk
-                        style={{ fontSize: 50 }}
-                        color="primary"
-                      />
+                      <CustomIcon type="length" size={55} />
                     </Tooltip>
                   }
                   numberData={Math.round(cumulatedLength.sum_length / 1000)}
@@ -188,7 +148,6 @@ const DataHomepage = () => {
                   globalText={formatMessage({
                     id: 'are available.'
                   })}
-                  width="32%"
                 />
               </StyledLink>
             )}
@@ -198,14 +157,13 @@ const DataHomepage = () => {
               <StyledLink internal href="/ui/search/organization">
                 <DataCard
                   isColored
-                  icon={<BlockIcon className="icon icon-gc-expe" />}
+                  icon={<CustomIcon type="organization" size={55} />}
                   numberData={organizations.number}
                   isFetching={organizations.isFetching}
                   title={formatMessage({ id: 'organizations' })}
                   globalText={formatMessage({
                     id: 'are registered on the website.'
                   })}
-                  width="40%"
                 />
               </StyledLink>
             )}

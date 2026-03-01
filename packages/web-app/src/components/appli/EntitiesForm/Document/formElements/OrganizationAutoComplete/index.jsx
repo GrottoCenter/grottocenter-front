@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import { isEmpty, isNil } from 'ramda';
 import { InputAdornment } from '@mui/material';
 import AddCircle from '@mui/icons-material/AddCircle';
+import { organizationIcon } from '../../../../../../assets/icons';
 
 import {
   fetchQuicksearchResult,
@@ -18,7 +19,7 @@ import CreateNewOrganization from './CreateNewOrganization';
 const resultEndAdornment = (
   <InputAdornment position="end">
     <img
-      src="/images/club.svg"
+      src={organizationIcon}
       alt="Organization icon"
       style={{ width: '40px' }}
     />

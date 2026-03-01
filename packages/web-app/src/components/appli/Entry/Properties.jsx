@@ -7,7 +7,6 @@ import {
   CalendarToday,
   Category,
   GpsFixed,
-  Height,
   Public,
   Terrain,
   Place,
@@ -174,7 +173,7 @@ const Properties = ({ isLoading = false, entrance }) => {
                 flexBasis="fit-content"
                 label={formatMessage({ id: 'Cave' })}
                 value={`${entrance.cave.name}`}
-                icon={<CustomIcon type="cave_system" />}
+                icon={<CustomIcon type="network" />}
                 url={`/ui/caves/${entrance.cave.id}`}
               />
             )}
@@ -194,7 +193,7 @@ const Properties = ({ isLoading = false, entrance }) => {
             <Property
               label={formatMessage({ id: 'Altitude' })}
               value={`${entrance.altitude} m`}
-              icon={<Height color="primary" />}
+              icon={<CustomIcon type="altitude" />}
             />
           )}
           <TemperatureProperty

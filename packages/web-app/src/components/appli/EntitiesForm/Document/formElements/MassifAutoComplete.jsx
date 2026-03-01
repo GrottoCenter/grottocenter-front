@@ -2,6 +2,7 @@ import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import { InputAdornment } from '@mui/material';
+import { massifIcon } from '../../../../../assets/icons';
 
 import {
   fetchQuicksearchResult,
@@ -15,7 +16,7 @@ import DocumentFormAutoComplete from './DocumentFormAutoComplete';
 
 const resultEndAdornment = (
   <InputAdornment position="end">
-    <img src="/images/massif.svg" alt="Massif icon" style={{ width: '40px' }} />
+    <img src={massifIcon} alt="Massif icon" style={{ width: '40px' }} />
   </InputAdornment>
 );
 

@@ -4,6 +4,13 @@ import { Tab, Tabs, Card, CardContent } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { useParams } from 'react-router-dom';
 import { isMobile } from 'react-device-detect';
+import {
+  entranceIcon,
+  bibliographyIcon,
+  massifIcon,
+  organizationIcon,
+  caverIcon
+} from '../../../assets/icons';
 
 import DocumentSearch from './DocumentSearch';
 import EntrancesSearch from './EntrancesSearch';
@@ -51,7 +58,7 @@ const AdvancedSearch = () => {
         <Tab
           label={
             <>
-              <TabIcon src="/images/entry.svg" alt="Entry icon" />
+              <TabIcon src={entranceIcon} alt="Entry icon" />
               <Translate>Entrances</Translate>
             </>
           }
@@ -59,7 +66,7 @@ const AdvancedSearch = () => {
         <Tab
           label={
             <>
-              <TabIcon src="/images/bibliography.svg" alt="Bibliography icon" />
+              <TabIcon src={bibliographyIcon} alt="Bibliography icon" />
               <Translate>Documents</Translate>
             </>
           }
@@ -67,7 +74,7 @@ const AdvancedSearch = () => {
         <Tab
           label={
             <>
-              <TabIcon src="/images/massif.svg" alt="Massif icon" />
+              <TabIcon src={massifIcon} alt="Massif icon" />
               <Translate>Massifs</Translate>
             </>
           }
@@ -75,7 +82,7 @@ const AdvancedSearch = () => {
         <Tab
           label={
             <>
-              <TabIcon src="/images/club.svg" alt="Organization icon" />
+              <TabIcon src={organizationIcon} alt="Organization icon" />
               <Translate>Organizations</Translate>
             </>
           }
@@ -84,7 +91,7 @@ const AdvancedSearch = () => {
         <Tab
           label={
             <>
-              <TabIcon src="/images/caver.svg" alt="Caver icon" />
+              <TabIcon src={caverIcon} alt="Caver icon" />
               <Translate>Persons</Translate>
             </>
           }

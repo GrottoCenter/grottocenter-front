@@ -4,6 +4,7 @@ import { styled } from '@mui/material/styles';
 import { useDispatch } from 'react-redux';
 import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
+import { timeToGoIcon, undergroundTimeIcon } from '../../../../assets/icons';
 import { usePermissions, useUserProperties } from '../../../../hooks';
 import { updateComment } from '../../../../actions/Comment/UpdateComment';
 import { deleteComment } from '../../../../actions/Comment/DeleteComment';
@@ -156,14 +157,14 @@ const Comment = ({ comment, isEditAllowed, isMoving, onMoveUp, onMoveDown, isFir
             <DurationContainer>
               {!!comment.eTTrail && comment.eTTrail.length > 0 && (
                 <Duration
-                  image="/images/time-to-go.svg"
+                  image={timeToGoIcon}
                   durationStr={comment.eTTrail}
                   title={formatMessage({ id: 'Time to go' })}
                 />
               )}
               {!!comment.eTUnderground && comment.eTUnderground.length > 0 && (
                 <Duration
-                  image="/images/underground_time.svg"
+                  image={undergroundTimeIcon}
                   durationStr={comment.eTUnderground}
                   title={formatMessage({ id: 'Underground time' })}
                 />

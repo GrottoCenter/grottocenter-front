@@ -1,0 +1,13 @@
+export { default as altitudeIcon } from './altitude.svg';
+export { default as bibliographyIcon } from './bibliography.svg';
+export { default as caverIcon } from './caver.svg';
+export { default as coordinatesIcon } from './coordinates-icon.svg';
+export { default as depthIcon } from './depth.svg';
+export { default as entranceMarkerIcon } from './entrance-marker.svg';
+export { default as entranceIcon } from './entrance.svg';
+export { default as lengthIcon } from './length.svg';
+export { default as massifIcon } from './massif.svg';
+export { default as networkIcon } from './network.svg';
+export { default as organizationIcon } from './organization.svg';
+export { default as timeToGoIcon } from './time-to-go.svg';
+export { default as undergroundTimeIcon } from './underground-time.svg';

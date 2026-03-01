@@ -1,15 +1,18 @@
+import {
+  networkIcon,
+  bibliographyIcon,
+  entranceIcon,
+  massifIcon,
+  organizationIcon
+} from '../assets/icons';
+
 const getLink = (entityType, entityId) => `/ui/${entityType}/${entityId}`;
-const caveIconPath = '/images/iconsV3/cave_system.svg';
-const documentIconPath = '/images/iconsV3/bibliography.svg';
-const entranceIconPath = '/images/entry.svg';
-const massifIconPath = '/images/massif.svg';
-const organizationIconPath = '/images/club.svg';
 
 const getRelatedCaveLinkAndIconPath = entity => {
   const caveId = entity.cave?.id;
   return {
     link: caveId ? getLink('caves', caveId) : undefined,
-    iconPath: caveId ? caveIconPath : undefined
+    iconPath: caveId ? networkIcon : undefined
   };
 };
 
@@ -17,7 +20,7 @@ const getRelatedEntranceLinkAndIconPath = entity => {
   const entranceId = entity.entrance?.id;
   return {
     link: entranceId ? getLink('entrances', entranceId) : undefined,
-    iconPath: entranceId ? entranceIconPath : undefined
+    iconPath: entranceId ? entranceIcon : undefined
   };
 };
 
@@ -25,7 +28,7 @@ const getRelatedMassifLinkAndIconPath = entity => {
   const massifId = entity.massif?.id;
   return {
     link: massifId ? getLink('massifs', massifId) : undefined,
-    iconPath: massifId ? massifIconPath : undefined
+    iconPath: massifId ? massifIcon : undefined
   };
 };
 
@@ -46,7 +49,7 @@ const getLinkAndIconPath = entity => {
     }
   } else if (entity.type === 'cave') {
     link = getLink('caves', entity.id);
-    iconPath = caveIconPath;
+    iconPath = networkIcon;
   } else if (entity.type === 'description') {
     const getters = [
       getRelatedCaveLinkAndIconPath,
@@ -59,18 +62,18 @@ const getLinkAndIconPath = entity => {
     }
   } else if (entity.type === 'document') {
     link = getLink('documents', entity.id);
-    iconPath = documentIconPath;
+    iconPath = bibliographyIcon;
   } else if (entity.type === 'entrance') {
     link = getLink('entrances', entity.id);
-    iconPath = entranceIconPath;
+    iconPath = entranceIcon;
   } else if (entity.type === 'location') {
     ({ link, iconPath } = getRelatedEntranceLinkAndIconPath(entity));
   } else if (entity.type === 'massif') {
     link = getLink('massifs', entity.id);
-    iconPath = massifIconPath;
+    iconPath = massifIcon;
   } else if (entity.type === 'organization') {
     link = getLink('organizations', entity.id);
-    iconPath = organizationIconPath;
+    iconPath = organizationIcon;
   }
 
   return { link, iconPath };

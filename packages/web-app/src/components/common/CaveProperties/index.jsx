@@ -82,13 +82,7 @@ export const OrganizationProperty = ({ organization }) => (
     key={organization.id}
     value={organization.name}
     url={`/ui/organizations/${organization.id}`}
-    icon={
-      <img
-        src="/images/club.svg"
-        alt="Organization icon"
-        style={{ width: '35px' }}
-      />
-    }
+    icon={<CustomIcon type="organization" />}
     secondary
   />
 );

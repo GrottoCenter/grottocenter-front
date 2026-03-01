@@ -16,21 +16,21 @@ const WithState = () => (
     <div>
       <Typography>Large</Typography>
       <PersonIcon color="primary" fontSize="large" />
-      <CustomIcon type="entry" />
+      <CustomIcon type="entrance" />
       <CustomIcon type="depth" />
       <CustomIcon type="length" />
     </div>
     <div>
       <Typography>Default</Typography>
       <PersonIcon color="primary" />
-      <CustomIcon type="entry" size={24} />
+      <CustomIcon type="entrance" size={24} />
       <CustomIcon type="depth" size={24} />
       <CustomIcon type="length" size={24} />
     </div>
     <div>
       <Typography>Small</Typography>
       <PersonIcon color="primary" fontSize="small" />
-      <CustomIcon type="entry" size={20} />
+      <CustomIcon type="entrance" size={20} />
       <CustomIcon type="depth" size={20} />
       <CustomIcon type="length" size={20} />
     </div>

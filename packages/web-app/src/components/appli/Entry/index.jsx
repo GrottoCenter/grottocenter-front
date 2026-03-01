@@ -137,7 +137,7 @@ export const Entry = ({ isLoading, error, entrance }) => {
         {entrance && (
           <FixedContent
             title={entrance.name ?? ''}
-            icon={<CustomIcon type="entry" />}
+            icon={<CustomIcon type="entrance" />}
             onEdit={
               isAuth && !entrance.isDeleted ? () => setEditing(true) : undefined
             }

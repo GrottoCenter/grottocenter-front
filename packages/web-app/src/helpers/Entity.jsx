@@ -1,5 +1,12 @@
 import React from 'react';
 import { styled } from '@mui/material/styles';
+import {
+  bibliographyIcon,
+  entranceIcon,
+  organizationIcon,
+  caverIcon,
+  massifIcon
+} from '../assets/icons';
 
 export const EntityIcon = styled('img')`
   height: 30px;
@@ -25,7 +32,7 @@ const EntitySubtitle = styled('div')`
 `;
 
 export const nomelizeSearchEntity = option => {
-  let iconName;
+  let iconSrc;
   let title = option.name; // Default for all entities
   let subtitle = '';
   // eslint-disable-next-line no-underscore-dangle
@@ -41,11 +48,11 @@ export const nomelizeSearchEntity = option => {
         if (title !== option.nickname) subtitle = option.nickname;
       }
 
-      iconName = 'caver.svg';
+      iconSrc = caverIcon;
       break;
 
     case 'documents': {
-      iconName = 'bibliography.svg';
+      iconSrc = bibliographyIcon;
       title = `[${option.type}] ${option.title}`;
       const maxSubTitleLength = Math.max((title.length - 3) * 1.2, 80);
       subtitle = (option.description ?? '').slice(0, maxSubTitleLength);
@@ -55,7 +62,7 @@ export const nomelizeSearchEntity = option => {
 
     case 'caves':
     case 'entrances': {
-      iconName = 'entry.svg';
+      iconSrc = entranceIcon;
       subtitle = option.region ?? '';
       const caveInfo = [];
       if (option.cave?.depth) caveInfo.push(`↕ ${option.cave?.depth}m`);
@@ -68,26 +75,26 @@ export const nomelizeSearchEntity = option => {
     }
 
     case 'organizations':
-      iconName = 'club.svg';
+      iconSrc = organizationIcon;
       break;
 
     case 'massifs':
-      iconName = 'massif.svg';
+      iconSrc = massifIcon;
       break;
 
     default:
       break;
   }
-  return { iconName, title, subtitle, id: option.id };
+  return { iconSrc, title, subtitle, id: option.id };
 };
 
 export const entityOptionForSelector = (props, option) => {
-  const { iconName, title, subtitle, id } = nomelizeSearchEntity(option);
+  const { iconSrc, title, subtitle, id } = nomelizeSearchEntity(option);
   const { key, ...otherProps } = props;
   return (
     <li key={key || `${option._type}-${id}`} {...otherProps}>
-      {iconName && (
-        <EntityIcon src={`/images/${iconName}`} alt={`${option.type} icon`} />
+      {iconSrc && (
+        <EntityIcon src={iconSrc} alt={`${option.type} icon`} />
       )}
       <div>
         <EntityTitle>

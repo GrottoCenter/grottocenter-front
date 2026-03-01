@@ -4,6 +4,7 @@ import { Tab, Tabs } from '@mui/material';
 import Translate from '../../common/Translate';
 import { ImportPageContentContext } from './Provider';
 import { DOCUMENT, ENTRANCE } from './constants';
+import { entranceIcon, bibliographyIcon } from '../../../assets/icons';
 
 const TabIcon = styled('img')`
   height: 2rem;
@@ -28,7 +29,7 @@ const ImportTabs = () => {
       <Tab
         label={
           <>
-            <TabIcon src="/images/entry.svg" alt="Entry icon" />
+            <TabIcon src={entranceIcon} alt="Entry icon" />
             <Translate>Entrances</Translate>
           </>
         }
@@ -37,7 +38,7 @@ const ImportTabs = () => {
       <Tab
         label={
           <>
-            <TabIcon src="/images/bibliography.svg" alt="Bibliography icon" />
+            <TabIcon src={bibliographyIcon} alt="Bibliography icon" />
             <Translate>Documents</Translate>
           </>
         }

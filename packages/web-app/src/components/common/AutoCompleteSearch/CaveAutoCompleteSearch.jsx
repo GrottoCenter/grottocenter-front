@@ -11,6 +11,7 @@ import {
 import AutoCompleteSearch from '.';
 import { fetchQuickSearchRaw } from '../../../actions/Quicksearch';
 import { useDebounce } from '../../../hooks';
+import { networkIcon } from '../../../assets/icons';
 
 const getCaveToString = cave => {
   let out = [cave?.name];
@@ -22,11 +23,7 @@ const getCaveToString = cave => {
 
 const resultEndAdornment = (
   <InputAdornment position="end">
-    <img
-      src="/images/iconsV3/cave_system.svg"
-      alt="Document icon"
-      style={{ width: '40px' }}
-    />
+    <img src={networkIcon} alt="Document icon" width={40} height={40} />
   </InputAdornment>
 );
 

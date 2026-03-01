@@ -171,7 +171,7 @@ const Document = ({
       linkedEntities.push(
         <ListElement
           key={documentData?.cave.id}
-          icon={<CustomIcon type="cave_system" />}
+          icon={<CustomIcon type="network" />}
           value={documentData?.cave.name}
           secondary={formatMessage({ id: 'Cave' })}
           url={`/ui/caves/${documentData?.cave.id}`}
@@ -182,7 +182,7 @@ const Document = ({
         ...(documentData?.entrances?.map(entrance => (
           <ListElement
             key={entrance.id}
-            icon={<CustomIcon type="entry" />}
+            icon={<CustomIcon type="entrance" />}
             value={entrance.name}
             secondary={formatMessage({ id: 'Entrance' })}
             url={`/ui/entrances/${entrance.id}`}

@@ -1,15 +1,8 @@
 import React from 'react';
 import { Tabs, Tab } from '@mui/material';
 import { useIntl } from 'react-intl';
-import { styled } from '@mui/material/styles';
 import PropTypes from 'prop-types';
-
-const TabIcon = styled('img')`
-  height: 2rem;
-  margin-right: 5px;
-  vertical-align: middle;
-  width: 2rem;
-`;
+import CustomIcon from '../../components/common/CustomIcon';
 
 const HeaderTabs = ({ selectedTab, setSelectedTab, disabledAllTabs }) => {
   const { formatMessage } = useIntl();
@@ -24,14 +17,12 @@ const HeaderTabs = ({ selectedTab, setSelectedTab, disabledAllTabs }) => {
       <Tab
         disabled={disabledAllTabs}
         label={formatMessage({ id: 'Entrances' })}
-        icon={<TabIcon src="/images/entry.svg" alt="Entry icon" />}
+        icon={<CustomIcon type="entrance" size={32} />}
       />
       <Tab
         disabled={disabledAllTabs}
         label={formatMessage({ id: 'Documents' })}
-        icon={
-          <TabIcon src="/images/bibliography.svg" alt="Bibliography icon" />
-        }
+        icon={<CustomIcon type="bibliography" size={32} />}
       />
     </Tabs>
   );

@@ -6,6 +6,7 @@ import { styled } from '@mui/material/styles';
 import InfoBlock from './InfoBlock';
 
 import ScrollableContent from '../../../../common/Layouts/Fixed/ScrollableContent';
+import { depthIcon, lengthIcon } from '../../../../../assets/icons';
 
 const StyledBadge = styled(Badge)`
   right: 3;
@@ -40,7 +41,7 @@ const CavesStatistics = ({ avgDepth, avgLength, totalLength }) => {
               icon={
                 <img
                   style={styledImg}
-                  src="/images/iconsV3/depth.svg"
+                  src={depthIcon}
                   alt={formatMessage({ id: 'Depth icon' })}
                 />
               }
@@ -54,7 +55,7 @@ const CavesStatistics = ({ avgDepth, avgLength, totalLength }) => {
               icon={
                 <img
                   style={styledImg}
-                  src="/images/iconsV3/length.svg"
+                  src={lengthIcon}
                   alt={formatMessage({ id: 'Length icon' })}
                 />
               }
@@ -74,7 +75,7 @@ const CavesStatistics = ({ avgDepth, avgLength, totalLength }) => {
                     max={999}>
                     <img
                       style={styledImg}
-                      src="/images/iconsV3/length.svg"
+                      src={lengthIcon}
                       alt={formatMessage({ id: 'Length icon' })}
                     />
                   </StyledBadge>

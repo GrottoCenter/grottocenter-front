@@ -2,6 +2,7 @@ import React, { useContext } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import { InputAdornment } from '@mui/material';
+import { bibliographyIcon } from '../../../../../assets/icons';
 
 import { DocumentFormContext } from '../Provider';
 
@@ -20,7 +21,7 @@ import FormAutoCompleteComponent from '../../../../common/Form/FormAutoComplete'
 const resultEndAdornment = (
   <InputAdornment position="end">
     <img
-      src="/images/bibliography.svg"
+      src={bibliographyIcon}
       alt="Document icon"
       style={{ width: '40px' }}
     />

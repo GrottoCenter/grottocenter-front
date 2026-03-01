@@ -4,6 +4,7 @@ import { Badge, Tooltip } from '@mui/material';
 import { styled } from '@mui/material/styles';
 
 import { useIntl } from 'react-intl';
+import { networkIcon, caverIcon, entranceIcon } from '../../../assets/icons';
 
 const CaverIcon = styled('img')`
   display: inline-block;
@@ -32,7 +33,7 @@ const BadgesSection = ({
     <>
       <Tooltip title={formatMessage({ id: 'Number of cavers' })}>
         <StyledBadge color="secondary" badgeContent={nbCavers} showZero>
-          <CaverIcon src="/images/caver.svg" alt="Caver icon" />
+          <CaverIcon src={caverIcon} alt="Caver icon" />
         </StyledBadge>
       </Tooltip>
 
@@ -41,7 +42,7 @@ const BadgesSection = ({
           badgeContent={nbExploredEntrances}
           color="secondary"
           showZero>
-          <EntranceIcon src="/images/iconsV3/entry.svg" alt="Entrance icon" />
+          <EntranceIcon src={entranceIcon} alt="Entrance icon" />
         </StyledBadge>
       </Tooltip>
 
@@ -50,10 +51,7 @@ const BadgesSection = ({
           badgeContent={nbExploredNetworks}
           color="secondary"
           showZero>
-          <EntranceIcon
-            src="/images/iconsV3/cave_system.svg"
-            alt="Network icon"
-          />
+          <EntranceIcon src={networkIcon} alt="Network icon" />
         </StyledBadge>
       </Tooltip>
     </>

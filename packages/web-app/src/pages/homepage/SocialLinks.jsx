@@ -98,10 +98,7 @@ const SocialLinks = () => {
       </SocialLinksListItem>
       <SocialLinksListItem>
         <InternationalizedLink links={wikiBatsLinks} title={batsText}>
-          <SocialImage
-            src="/images/icons8/bats.svg"
-            alt={batsText}
-          />
+          <SocialImage src="/images/icons8/bats.svg" alt={batsText} />
         </InternationalizedLink>
       </SocialLinksListItem>
       <SocialLinksListItem>
