@@ -3,6 +3,10 @@ import PropTypes from 'prop-types';
 import { styled } from '@mui/material/styles';
 import { useIntl } from 'react-intl';
 import { isEmpty, pathOr } from 'ramda';
+import {
+  timeToGoIcon,
+  undergroundTimeIcon
+} from '../../../../../assets/icons';
 
 import Ratings from '../../Ratings';
 import Duration from '../../../../common/Properties/Duration';
@@ -56,7 +60,7 @@ const CommentSnapshots = ({ comment, previous }) => {
         <DurationContainer>
           {!isEmpty(eTTrail) && (
             <Duration
-              image="/images/time-to-go.svg"
+              image={timeToGoIcon}
               durationStr={convertMinutes(
                 pathOr(eTTrail, ['minutes'], eTTrail)
               )}
@@ -65,7 +69,7 @@ const CommentSnapshots = ({ comment, previous }) => {
           )}
           {!isEmpty(eTUnderground) && (
             <Duration
-              image="/images/underground_time.svg"
+              image={undergroundTimeIcon}
               durationStr={convertMinutes(
                 pathOr(eTUnderground, ['minutes'], eTUnderground)
               )}

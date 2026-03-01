@@ -4,6 +4,7 @@ import { useSelector } from 'react-redux';
 import { Avatar, Box, ListItem, ListItemText, Typography } from '@mui/material';
 import { Link } from 'react-router-dom';
 import { styled } from '@mui/material/styles';
+import { depthIcon, lengthIcon } from '../../../assets/icons';
 
 const SmallAvatar = styled(Avatar)`
   height: 2.5rem;
@@ -37,7 +38,7 @@ export const CaveListItem = ({ cave, itemActionButton }) => {
             <>
               <SmallAvatar
                 alt="Cave depth icon"
-                src="/images/depth.svg"
+                src={depthIcon}
                 variant="square"
               />
               <Typography variant="caption">{`${cave.depth.toLocaleString(
@@ -50,7 +51,7 @@ export const CaveListItem = ({ cave, itemActionButton }) => {
             <>
               <SmallAvatar
                 alt="Cave length icon"
-                src="/images/length.svg"
+                src={lengthIcon}
                 variant="square"
               />
               <Typography variant="caption">{`${cave.length.toLocaleString(

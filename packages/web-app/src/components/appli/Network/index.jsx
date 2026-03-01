@@ -116,7 +116,7 @@ export const Network = ({ isLoading, error, cave }) => {
           cave && (
             <FixedContent
               title={cave?.name ?? ''}
-              icon={<CustomIcon type="cave_system" />}
+              icon={<CustomIcon type="network" />}
               onEdit={
                 isAuth && !cave?.isDeleted
                   ? () => setEditing(true)

@@ -1,41 +1,60 @@
-import { Icon as MuiIcon } from '@mui/material';
 import React from 'react';
 import PropTypes from 'prop-types';
 import { styled } from '@mui/material/styles';
+import {
+  altitudeIcon,
+  bibliographyIcon,
+  caverIcon,
+  coordinatesIcon,
+  depthIcon,
+  entranceIcon,
+  entranceMarkerIcon,
+  lengthIcon,
+  massifIcon,
+  networkIcon,
+  organizationIcon,
+  timeToGoIcon,
+  undergroundTimeIcon
+} from '../../../assets/icons';
 
-const Icon = styled(MuiIcon)`
-  text-align: center;
+const Icon = styled('span')`
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   width: ${({ size }) => size}px;
   height: ${({ size }) => size}px;
-  margin: ${({ theme, margin }) => (margin ? theme.spacing(margin) : 0)}px;
+  margin: 0px 4px 0px 0px;
 `;
 
 const Img = styled('img')`
-  padding: ${({ theme }) => theme.spacing(0)};
+  padding: 0;
 `;
 
-const CustomIcon = ({ type, size = 35, margin = '0px 4px 0px 0px' }) => (
-  <Icon color="inherit" margin={margin} size={size}>
-    <Img
-      src={`/images/iconsV3/${type}.svg`}
-      alt={type}
-      height={size}
-      width={size}
-    />
+const iconSources = {
+  altitude: altitudeIcon,
+  bibliography: bibliographyIcon,
+  caver: caverIcon,
+  coordinates: coordinatesIcon,
+  depth: depthIcon,
+  entrance: entranceIcon,
+  entrance_marker: entranceMarkerIcon,
+  length: lengthIcon,
+  massif: massifIcon,
+  network: networkIcon,
+  organization: organizationIcon,
+  time_to_go: timeToGoIcon,
+  underground_time: undergroundTimeIcon
+};
+
+const CustomIcon = ({ type, size = 35 }) => (
+  <Icon size={size}>
+    <Img src={iconSources[type]} alt={type} height={size} width={size} />
   </Icon>
 );
 
 CustomIcon.propTypes = {
-  type: PropTypes.oneOf([
-    'entry',
-    'depth',
-    'length',
-    'cave_system',
-    'bibliography',
-    'club'
-  ]).isRequired,
-  size: PropTypes.number,
-  margin: PropTypes.number
+  type: PropTypes.oneOf(Object.keys(iconSources)).isRequired,
+  size: PropTypes.number
 };
 
 export default CustomIcon;

@@ -5,6 +5,7 @@ import PropTypes from 'prop-types';
 import { isMobile } from 'react-device-detect';
 import { styled } from '@mui/material/styles';
 import { useDispatch, useSelector } from 'react-redux';
+import { entranceMarkerIcon } from '../../../../assets/icons';
 import { useDebounce } from '../../../../hooks';
 import useGeolocation from '../../../../hooks/useGeolocation';
 import LayersControl from '../../../common/Maps/common/LayersControl';
@@ -161,7 +162,7 @@ const MapMarkerSelector = ({ control, formLatitudeKey, formLongitudeKey }) => {
       <span className="centralMarker">
         <img
           alt="Entry"
-          src="../../../../../../../../images/iconsV3/map/entry.svg"
+          src={entranceMarkerIcon}
         />
       </span>
     </StyledMapContainer>

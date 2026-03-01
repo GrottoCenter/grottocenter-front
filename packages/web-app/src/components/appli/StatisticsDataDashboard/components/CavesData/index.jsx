@@ -6,6 +6,11 @@ import { Box, Typography, useTheme } from '@mui/material';
 import { Link } from 'react-router-dom';
 import InlineData from './InlineData';
 import ScrollableContent from '../../../../common/Layouts/Fixed/ScrollableContent';
+import {
+  networkIcon,
+  massifIcon,
+  entranceIcon
+} from '../../../../../assets/icons';
 
 const styledImg = { width: '100%', height: 'auto' };
 
@@ -38,7 +43,7 @@ const CavesData = ({
                 icon={
                   <img
                     style={styledImg}
-                    src="/images/massif.svg"
+                    src={massifIcon}
                     alt="entry icon"
                   />
                 }
@@ -54,7 +59,7 @@ const CavesData = ({
               icon={
                 <img
                   style={styledImg}
-                  src="/images/iconsV3/entry.svg"
+                  src={entranceIcon}
                   alt="entry icon"
                 />
               }
@@ -82,7 +87,7 @@ const CavesData = ({
                 icon={
                   <img
                     style={styledImg}
-                    src="/images/iconsV3/cave_system.svg"
+                    src={networkIcon}
                     alt="network icon"
                   />
                 }

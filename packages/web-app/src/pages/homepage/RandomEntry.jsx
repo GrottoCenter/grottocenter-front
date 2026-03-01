@@ -10,7 +10,7 @@ const RandomEntrySection = styled(LandingSection)`
 `;
 
 const BgRandomEntrySection = styled(RandomEntrySection)`
-  background-image: url('../images/caves/DSC_0420.JPG');
+  background-image: url('/images/caves/gours.jpg');
   background-size: cover;
   background-attachment: fixed;
   background-position: center;

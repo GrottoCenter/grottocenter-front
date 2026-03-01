@@ -57,7 +57,7 @@ const EntranceNetworkSnapshots = information => {
               newText={entrance.caveName}
             />
           }
-          icon={<CustomIcon type="cave_system" />}
+          icon={<CustomIcon type="network" />}
           url={`/ui/caves/${entrance.cave}`}
         />
       )}

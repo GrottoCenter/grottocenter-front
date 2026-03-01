@@ -1,23 +1,31 @@
+import {
+  entranceIcon,
+  networkIcon,
+  massifIcon,
+  organizationIcon,
+  coordinatesIcon
+} from '../assets/icons';
+
 const markers = [
   {
     name: 'Entrances',
-    url: '/images/gc-entry2.svg'
+    url: entranceIcon
   },
   {
     name: 'Caves',
-    url: '/images/entry-cluster.svg'
+    url: networkIcon
   },
   {
     name: 'Massifs',
-    url: '/images/massif.svg'
+    url: massifIcon
   },
   {
     name: 'Organizations',
-    url: '/images/club.svg'
+    url: organizationIcon
   },
   {
     name: 'Coordinates',
-    url: '/images/coordinates-icon.svg'
+    url: coordinatesIcon
   }
 ];
 

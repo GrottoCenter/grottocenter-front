@@ -2,6 +2,7 @@ import { Icon } from '@mui/material';
 import * as L from 'leaflet';
 import { renderToString } from 'react-dom/server';
 import React from 'react';
+import { entranceMarkerIcon } from '../../../../../../assets/icons';
 
 const EntranceIconMap = () => (
   <Icon
@@ -10,7 +11,7 @@ const EntranceIconMap = () => (
     <img
       alt="entranceIcon"
       style={{ height: '100%' }}
-      src="../../../../../../../../images/iconsV3/map/entry.svg"
+      src={entranceMarkerIcon}
     />
   </Icon>
 );

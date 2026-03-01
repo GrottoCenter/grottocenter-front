@@ -397,7 +397,7 @@ const GeocodingControl = ({ onLocationSelect, onOrganizationSelect }) => {
                   key={`entrance-${result.id}`}
                   onClick={() => handleSelect(result)}>
                   <ListItemAvatar>
-                    <CustomIcon type="entry" size={28} />
+                    <CustomIcon type="entrance" size={28} />
                   </ListItemAvatar>
                   <ListItemText
                     primary={result.name}
@@ -418,7 +418,7 @@ const GeocodingControl = ({ onLocationSelect, onOrganizationSelect }) => {
                   key={`network-${result.id}`}
                   onClick={() => handleSelect(result)}>
                   <ListItemAvatar>
-                    <CustomIcon type="cave_system" size={28} />
+                    <CustomIcon type="network" size={28} />
                   </ListItemAvatar>
                   <ListItemText
                     primary={result.name}
@@ -433,7 +433,7 @@ const GeocodingControl = ({ onLocationSelect, onOrganizationSelect }) => {
                   key={`organization-${result.id}`}
                   onClick={() => handleSelect(result)}>
                   <ListItemAvatar>
-                    <CustomIcon type="club" size={28} />
+                    <CustomIcon type="organization" size={28} />
                   </ListItemAvatar>
                   <ListItemText
                     primary={result.name}

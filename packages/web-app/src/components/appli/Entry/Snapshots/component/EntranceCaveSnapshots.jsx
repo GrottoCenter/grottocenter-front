@@ -64,7 +64,7 @@ const EntranceCaveSnapshots = information => {
           value={
             <HighLightsLine oldText={previous?.caveName} newText={caveName} />
           }
-          icon={<CustomIcon type="cave_system" />}
+          icon={<CustomIcon type="network" />}
           url={`/ui/caves/${caveId}`}
         />
       )}

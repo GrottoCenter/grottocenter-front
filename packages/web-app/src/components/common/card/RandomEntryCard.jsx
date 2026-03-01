@@ -9,6 +9,12 @@ import withStyles from '@mui/styles/withStyles';
 import { isNil } from 'ramda';
 import GCLink from '../GCLink';
 import Translate from '../Translate';
+import {
+  depthIcon,
+  lengthIcon,
+  timeToGoIcon,
+  undergroundTimeIcon
+} from '../../../assets/icons';
 
 const FlexWrapper = styled('div')`
   display: flex;
@@ -201,7 +207,7 @@ const EntryInfos = ({ timeInfo, cave }) => (
     {timeInfo && (
       <EntryInfoItem
         key="eiik1"
-        itemImg="time-to-go.svg"
+        itemImg={timeToGoIcon}
         itemLabel="Time to go"
         itemType="time"
         itemValue={timeInfo.eTTrail}
@@ -210,7 +216,7 @@ const EntryInfos = ({ timeInfo, cave }) => (
     {timeInfo && (
       <EntryInfoItem
         key="eiik2"
-        itemImg="underground_time.svg"
+        itemImg={undergroundTimeIcon}
         itemLabel="Underground time"
         itemType="time"
         itemValue={timeInfo.eTUnderground}
@@ -219,7 +225,7 @@ const EntryInfos = ({ timeInfo, cave }) => (
     {cave && (
       <EntryInfoItem
         key="eiik3"
-        itemImg="length.svg"
+        itemImg={lengthIcon}
         itemLabel="Length"
         itemValue={cave.length}
         itemUnit="m"
@@ -228,7 +234,7 @@ const EntryInfos = ({ timeInfo, cave }) => (
     {cave && (
       <EntryInfoItem
         key="eiik4"
-        itemImg="depth.svg"
+        itemImg={depthIcon}
         itemLabel="Depth"
         itemValue={cave.depth}
         itemUnit="m"
@@ -292,7 +298,7 @@ const EntryInfoItem = ({
 
   return (
     <EntryInfoWrapper>
-      <InfoImage src={`images/${itemImg}`} title={itemLabel} alt={itemLabel} />
+      <InfoImage src={itemImg} title={itemLabel} alt={itemLabel} />
       <InfoValue>{valueToDisplay}</InfoValue>
       <InfoUnit>{itemUnit}</InfoUnit>
     </EntryInfoWrapper>

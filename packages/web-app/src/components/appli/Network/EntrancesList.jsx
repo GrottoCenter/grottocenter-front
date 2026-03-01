@@ -47,7 +47,7 @@ const EntrancesList = ({ isLoading, entrances, selectedEntrancesId }) => {
                   key={entrance.id}
                   selected={selectedEntrancesId.includes(entrance.id)}>
                   <ListItemIcon>
-                    <CustomIcon type="entry" />
+                    <CustomIcon type="entrance" />
                   </ListItemIcon>
                   <ListItemText primary={entrance.name} />
                 </ListItemButton>

@@ -40,6 +40,9 @@ grottocenter-front/
 ```
 src/
 ├── actions/                     # Redux action creators
+├── assets/
+│   └── icons/                  # SVG icon files (webpack-bundled)
+│       └── index.js            # Central re-export — always import icons from here
 ├── components/                  # Reusable UI components
 │   ├── appli/                  # Application-specific components
 │   └── common/                 # Generic reusable components
@@ -267,6 +270,12 @@ Arabic, Bulgarian, Catalan, German, Greek, English, Spanish, French, Hebrew, Ind
    - Handle all action types in appropriate reducers
    - Use loading/error states from Redux, not local component state
 
+3. **Icons**: ALWAYS import from the central index `src/assets/icons/index.js` ; never import individual SVG files directly
+   - ❌ BAD: `import entranceIcon from '../assets/icons/entrance.svg'`
+   - ✅ GOOD: `import { entranceIcon } from '../assets/icons'`
+   - To add a new icon: add the SVG to `src/assets/icons/`, export it from `index.js`, add it to `CustomIcon`'s `iconSources` map
+   - `<CustomIcon type="entrance" size={35} />` for inline entity icons (supported types: `entrance`, `depth`, `length`, `network`, `bibliography`, `organization`, `caver`, `massif`, `altitude`, `coordinates`, `entrance_marker`, `time_to_go`, `underground_time`), can be extended
+
 ### Adding New Features
 1. **New Pages**: Add to `src/pages/` and update routing in `App.jsx`
 2. **New Components**: Follow the `common/` vs `appli/` distinction
@@ -276,7 +285,7 @@ Arabic, Bulgarian, Catalan, German, Greek, English, Spanish, French, Hebrew, Ind
 
 ### Customization Areas
 1. **Theme**: Modify `conf/grottoTheme.js` for visual changes
-2. **Maps**: Extend `MapMarkersConfig.js` for new marker types
+2. **Maps**: Extend `MapMarkersConfig.js` for new marker types — import icons from `src/assets/icons`
 3. **Forms**: Create new form components in `components/Form/`
 4. **Validation**: Add custom validators in form components
 

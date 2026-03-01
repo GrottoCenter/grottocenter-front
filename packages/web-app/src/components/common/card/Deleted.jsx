@@ -347,8 +347,8 @@ export const DeleteConfirmationDialog = ({
 
         {selectedEntity && (
           <Box sx={{ padding: 2, background: 'white' }}>
-            {selectedEntity.iconName && (
-              <StyledEntityIcon src={`/images/${selectedEntity.iconName}`} />
+            {selectedEntity.iconSrc && (
+              <StyledEntityIcon src={selectedEntity.iconSrc} />
             )}
             <IconButton
               aria-label={formatMessage({ id: 'remove' })}
