@@ -2550,7 +2550,7 @@ __metadata:
     isomorphic-fetch: "npm:^3.0.0"
     leaflet: "npm:^1.9.4"
     leaflet-draw: "npm:^1.0.4"
-    leaflet.fullscreen: "npm:^5.0.0"
+    leaflet.fullscreen: "npm:^5.3.0"
     leaflet.locatecontrol: "npm:^0.85.1"
     linkify-react: "npm:^4.3.2"
     linkifyjs: "npm:^4.3.2"
@@ -13096,12 +13096,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"leaflet.fullscreen@npm:^5.0.0":
-  version: 5.0.0
-  resolution: "leaflet.fullscreen@npm:5.0.0"
+"leaflet.fullscreen@npm:^5.3.0":
+  version: 5.3.0
+  resolution: "leaflet.fullscreen@npm:5.3.0"
   peerDependencies:
     leaflet: ^1.7.0 || >=2.0.0-alpha.1
-  checksum: 10/01275797a6654a0718cd621a7074ffd1bf9b57f004eb96afd91423b1e863a3edd256d94fad5794d508d4120c81e6d00d1ca74d2abc9a192ba78f40f6a9949e96
+  checksum: 10/79d2988aee1ad9c0c38de1573c3e29825ceb7051e33c269c0c08cc3966ae19dc1f4ed282780e5cd0faa74b28d7b43042cacb1923a7d8c717b9e686de6e011a1b
   languageName: node
   linkType: hard
 
