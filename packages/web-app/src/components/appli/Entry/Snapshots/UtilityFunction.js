@@ -67,7 +67,7 @@ const SnapshotButton = ({
         component={Link}
         to={`/ui/${type}/${id}/snapshots?${[
           isNetwork !== undefined ? `isNetwork=${isNetwork}` : '',
-          getAll ? `getAll=true` : ''
+          getAll ? `all=true` : ''
         ]
           .filter(e => e)
           .join('&')}`}
