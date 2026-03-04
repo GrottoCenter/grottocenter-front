@@ -15,8 +15,8 @@ import {
 import { Upload } from '@mui/icons-material';
 import simplify from 'simplify-js';
 import shp from 'shpjs';
-import { transformToWGS84 } from '../../../../helpers/coordinateTransform';
 import { countMultiPolygonVertices } from '../../../../helpers/vertexCount';
+import { parseGeoJsonToMultiPolygon } from '../../../../helpers/geojsonParser';
 
 // Simplify polygon using simplify-js library
 const simplifyPolygon = (multiPolygon, toleranceValue) => ({
@@ -91,40 +91,9 @@ const ShapefileImport = ({ onImport, onError }) => {
         const text = await file.text();
         const geojson = JSON.parse(text);
 
-        // Extract CRS information
-        const sourceCRS = geojson.crs?.properties?.name;
+        const multiPolygon = parseGeoJsonToMultiPolygon(geojson);
 
-        const multiPolygon = {
-          type: 'MultiPolygon',
-          coordinates: []
-        };
-
-        const addGeometry = geometry => {
-          if (geometry.type === 'Polygon') {
-            const transformed = sourceCRS
-              ? transformToWGS84([geometry.coordinates], sourceCRS, 2)[0]
-              : geometry.coordinates;
-            multiPolygon.coordinates.push(transformed);
-          } else if (geometry.type === 'MultiPolygon') {
-            const transformed = sourceCRS
-              ? transformToWGS84(geometry.coordinates, sourceCRS, 3)
-              : geometry.coordinates;
-            multiPolygon.coordinates.push(...transformed);
-          }
-        };
-
-        if (geojson.type === 'FeatureCollection' && geojson.features) {
-          geojson.features.forEach(feature => addGeometry(feature.geometry));
-        } else if (geojson.type === 'Feature' && geojson.geometry) {
-          addGeometry(geojson.geometry);
-        } else if (
-          geojson.type === 'Polygon' ||
-          geojson.type === 'MultiPolygon'
-        ) {
-          addGeometry(geojson);
-        }
-
-        if (multiPolygon.coordinates.length === 0) {
+        if (!multiPolygon) {
           onError(
             formatMessage({ id: 'No polygon geometries found in GeoJSON' })
           );
@@ -136,35 +105,9 @@ const ShapefileImport = ({ onImport, onError }) => {
         const arrayBuffer = await file.arrayBuffer();
         const geojson = await shp(arrayBuffer);
 
-        // Extract CRS from shapefile (shpjs includes it if .prj file exists)
-        const sourceCRS = geojson.crs?.properties?.name;
+        const multiPolygon = parseGeoJsonToMultiPolygon(geojson);
 
-        const multiPolygon = {
-          type: 'MultiPolygon',
-          coordinates: []
-        };
-
-        if (geojson.features) {
-          geojson.features.forEach(feature => {
-            if (feature.geometry.type === 'Polygon') {
-              const transformed = sourceCRS
-                ? transformToWGS84(
-                    [feature.geometry.coordinates],
-                    sourceCRS,
-                    2
-                  )[0]
-                : feature.geometry.coordinates;
-              multiPolygon.coordinates.push(transformed);
-            } else if (feature.geometry.type === 'MultiPolygon') {
-              const transformed = sourceCRS
-                ? transformToWGS84(feature.geometry.coordinates, sourceCRS, 3)
-                : feature.geometry.coordinates;
-              multiPolygon.coordinates.push(...transformed);
-            }
-          });
-        }
-
-        if (multiPolygon.coordinates.length === 0) {
+        if (!multiPolygon) {
           onError(
             formatMessage({ id: 'No polygon geometries found in shapefile.' })
           );
