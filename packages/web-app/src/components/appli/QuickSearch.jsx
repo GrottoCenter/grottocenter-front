@@ -14,7 +14,7 @@ import {
   AUTOCOMPLETE_MIN_CHARACTERS
 } from '../../conf/config';
 
-const QuickSearch = ({ hasFixWidth }) => {
+const QuickSearch = ({ hasFixWidth, onClose }) => {
   const { formatMessage } = useIntl();
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -38,6 +38,12 @@ const QuickSearch = ({ hasFixWidth }) => {
     else if (_type === 'massif') navigate(`/ui/massifs/${id}`);
 
     setInput('');
+    // Defer both blur and close so MUI Autocomplete's own focus-restore cycle
+    // runs first — otherwise the keyboard re-opens on mobile immediately after.
+    setTimeout(() => {
+      document.activeElement?.blur();
+      onClose?.();
+    }, 0);
   };
 
   useEffect(() => {
@@ -72,5 +78,6 @@ const QuickSearch = ({ hasFixWidth }) => {
 export default QuickSearch;
 
 QuickSearch.propTypes = {
-  hasFixWidth: PropTypes.bool
+  hasFixWidth: PropTypes.bool,
+  onClose: PropTypes.func
 };
