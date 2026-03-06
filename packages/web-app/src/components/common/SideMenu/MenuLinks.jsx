@@ -48,40 +48,40 @@ const MenuLinks = ({ isAuth, toggle }) => {
         ItemIcon={() => <MapIcon color="primary" />}
         label={formatMessage({ id: 'Map' })}
         href="/ui/map"
-        onClick={() => {toggle()}}
+        onClick={toggle}
       />
       <LinkedItem
         ItemIcon={() => <SearchIcon color="primary" />}
         label={formatMessage({ id: 'Advanced search' })}
         href="/ui/search"
-        onClick={() => {toggle()}}
+        onClick={toggle}
       />
       <LinkedItem
         ItemIcon={() => <LibraryAddIcon color="primary" />}
         label={formatMessage({ id: 'Contribute' })}
         href="/ui/entity/add"
-        onClick={() => {toggle()}}
+        onClick={toggle}
       />
       {isAuth && (
         <LinkedItem
           ItemIcon={() => <DashboardIcon color="primary" />}
           label={formatMessage({ id: 'Dashboard' })}
           href="/ui"
-          onClick={() => {toggle()}}
+          onClick={toggle}
         />
       )}
       <LinkedItem
         ItemIcon={() => <FlagRounded color="primary" />}
         label={formatMessage({ id: 'Countries' })}
         href="/ui/countries"
-        onClick={() => {toggle()}}
+        onClick={toggle}
       />
     </List>
   );
 };
 MenuLinks.propTypes = {
   isAuth: PropTypes.bool.isRequired,
-  toggle: PropTypes.func.isRequired
+  toggle: PropTypes.func
 };
 
 export default MenuLinks;

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { Divider, Drawer, Typography } from '@mui/material';
 import PropTypes from 'prop-types';
 import { isMobile } from 'react-device-detect';
@@ -50,16 +50,17 @@ UserInformation.propTypes = {
 const SideMenu = ({ isOpen, toggle }) => {
   const permissions = usePermissions();
   const dispatch = useDispatch();
+  const handleClose = useCallback(() => dispatch(toggle()), [dispatch, toggle]);
   return (
     <Drawer
-      variant="persistent"
+      variant={isMobile ? 'temporary' : 'persistent'}
       anchor="left"
       open={isOpen}
-      onClose={() => dispatch(toggle())}>
+      onClose={handleClose}>
       <UserInformation isAuth={permissions.isAuth} />
-      <QuickSearch />
+      <QuickSearch onClose={isMobile ? handleClose : undefined} />
       <Divider />
-      <MenuLinks isAuth={permissions.isAuth} toggle={() => isMobile ? dispatch(toggle()) : true} />
+      <MenuLinks isAuth={permissions.isAuth} toggle={isMobile ? handleClose : undefined} />
       <Footer />
       <LanguageSelector />
     </Drawer>
