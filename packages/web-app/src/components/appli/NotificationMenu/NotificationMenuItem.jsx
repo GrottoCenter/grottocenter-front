@@ -14,13 +14,15 @@ const Icon = styled('img')`
 
 const StyledMenuItem = styled(MenuItem, {
   shouldForwardProp: (prop) => !prop.startsWith('$')
-})(({ $isRead, theme, $width }) => ({
+})(({ $isRead, theme }) => ({
   background: !$isRead && theme.palette.secondary.veryLight,
   whiteSpace: 'normal',
-  width: `${$width}px`
+  width: '100%',
+  margin: 0,
+  borderRadius: 0
 }));
 
-const NotificationsMenuItem = ({ notification, onClick, width }) => {
+const NotificationsMenuItem = ({ notification, onClick }) => {
   const { formatDate, formatMessage, formatTime } = useIntl();
   const {
     dateInscription,
@@ -41,7 +43,6 @@ const NotificationsMenuItem = ({ notification, onClick, width }) => {
     <StyledMenuItem
       dense
       $isRead={isRead}
-      $width={width}
       component={Link}
       to={link}
       onClick={handleOnClick}>
@@ -98,8 +99,7 @@ NotificationsMenuItem.propTypes = {
   notification: PropTypes.shape({
     id: PropTypes.number.isRequired
   }).isRequired,
-  onClick: PropTypes.func,
-  width: PropTypes.number.isRequired
+  onClick: PropTypes.func
 };
 
 export default NotificationsMenuItem;
