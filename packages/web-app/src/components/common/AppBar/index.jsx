@@ -26,42 +26,42 @@ import QuickSearch from '../../appli/QuickSearch';
 
 import UserMenu from './User';
 
-const StyledMuiAppBar = styled(MuiAppBar)`
-  flex-grow: 1;
-`;
+const StyledMuiAppBar = styled(MuiAppBar)({
+  flexGrow: 1
+});
 
-const FadeWrapper = styled('div')`
-  margin-left: auto;
-  height: 56px;
-  padding: ${props => props.theme.spacing(2)};
-  ${props => props.theme.breakpoints.down('sm')} {
-    display: none;
+const NavigationGroup = styled('div')(({ theme }) => ({
+  display: 'flex',
+  alignItems: 'center',
+  gap: theme.spacing(1),
+  marginRight: theme.spacing(2),
+  [theme.breakpoints.down('sm')]: {
+    marginRight: theme.spacing(1)
   }
-  display: flex;
-  gap: 12px;
-`;
+}));
 
-const TitleWrapper = styled('div')`
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: baseline;
-`;
+const Spacer = styled('div')({
+  flexGrow: 1
+});
 
-const LogoWrapper = styled('div')`
-  display: flex;
-  align-items: baseline;
-`;
-
-const LogoImage = styled('img')(
-  ({ theme }) => `
-  padding-right: ${theme.spacing(2)};
-  height: 30px;
-  ${theme.breakpoints.down('sm')} {
-    height: 25px;
+const ToolsGroup = styled('div')(({ theme }) => ({
+  height: 56,
+  display: 'flex',
+  gap: 12,
+  alignItems: 'center',
+  padding: theme.spacing(2),
+  [theme.breakpoints.down('sm')]: {
+    display: 'none'
   }
-`
-);
+}));
+
+const LogoImage = styled('img')(({ theme }) => ({
+  height: 34,
+  marginRight: theme.spacing(2),
+  [theme.breakpoints.down('sm')]: {
+    height: 32
+  }
+}));
 
 const GrottoTxt = styled('div')(
   ({ theme }) => `
@@ -77,6 +77,15 @@ export const StyledLink = styled(Link)`
   cursor: pointer;
   display: flex;
 `;
+
+const ActionsGroup = styled('div')(({ theme }) => ({
+  display: 'flex',
+  gap: theme.spacing(1),
+  marginLeft: theme.spacing(2),
+  [theme.breakpoints.down('sm')]: {
+    marginLeft: theme.spacing(1)
+  }
+}));
 
 const AppBar = () => {
   const dispatch = useDispatch();
@@ -97,42 +106,43 @@ const AppBar = () => {
     <>
       <StyledMuiAppBar>
         <Toolbar variant="dense">
-          <IconButton
-            color="inherit"
-            aria-label="open drawer"
-            edge="start"
-            onClick={() => dispatch(toggleSideMenu())}
-            size="large">
-            <MenuIcon />
-          </IconButton>
-          <TitleWrapper>
-            <LogoWrapper>
-              <Typography variant="h4">
-                <StyledLink to="">
-                  <LogoImage
-                    id="grottocenter-logo"
-                    src={logoGC}
-                    alt="Grottocenter"
-                  />
-                  <GrottoTxt>Grottocenter</GrottoTxt>
-                </StyledLink>
-              </Typography>
-            </LogoWrapper>
-          </TitleWrapper>
+          <NavigationGroup>
+            <IconButton
+              color="inherit"
+              aria-label="open drawer"
+              edge="start"
+              onClick={() => dispatch(toggleSideMenu())}
+              size="large">
+              <MenuIcon sx={{ fontSize: 32 }} />
+            </IconButton>
+            <Typography variant="h4">
+              <StyledLink to="">
+                <LogoImage
+                  id="grottocenter-logo"
+                  src={logoGC}
+                  alt="Grottocenter"
+                />
+                <GrottoTxt>Grottocenter</GrottoTxt>
+              </StyledLink>
+            </Typography>
+          </NavigationGroup>
+          <Spacer />
           <Fade in={!isSideMenuOpen}>
-            <FadeWrapper>
+            <ToolsGroup>
               <QuickSearch hasFixWidth={false} />
               <LanguageSelector />
-            </FadeWrapper>
+            </ToolsGroup>
           </Fade>
-          <NotificationMenu />
-          <UserMenu
-            authTokenExpirationDate={authTokenExpirationDate}
-            isAuth={permissions.isAuth}
-            onLoginClick={onLoginClick}
-            onLogoutClick={() => dispatch(postLogout())}
-            userNickname={authState?.authTokenDecoded?.nickname ?? null}
-          />
+          <ActionsGroup>
+            <NotificationMenu />
+            <UserMenu
+              authTokenExpirationDate={authTokenExpirationDate}
+              isAuth={permissions.isAuth}
+              onLoginClick={onLoginClick}
+              onLogoutClick={() => dispatch(postLogout())}
+              userNickname={authState?.authTokenDecoded?.nickname ?? null}
+            />
+          </ActionsGroup>
         </Toolbar>
       </StyledMuiAppBar>
       <Toolbar variant="dense" />
