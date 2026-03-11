@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Build and Deploy Job
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           submodules: true
       - name: Build And Deploy
@@ -28,7 +28,7 @@ jobs:
           ###### Repository/Build Configurations - These values can be configured to match your app requirements. ######
           # For more information regarding Static Web App workflow configurations, please visit: https://aka.ms/swaworkflowconfig
           app_location: "." # App source code path
-          api_location: "/api" # Api source code path - optional
+          api_location: "" # No Azure Functions API in this repo
           output_location: "packages/web-app/build" # Built app content directory - optional
           ###### End of Repository/Build Configurations ######
 
