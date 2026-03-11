@@ -1,21 +1,23 @@
-<!DOCTYPE html>
+<!doctype html>
 
 <html lang="en">
   <head>
     <title>Grottocenter</title>
-    <meta http-equiv="Content-Type" content="text/xhtml; charset=UTF-8" />
-    <meta name="robots" CONTENT="noindex, nofollow">
     <meta charset="utf-8" />
-    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#000000" />
+    <meta name="theme-color" content="#5d4037" />
     <meta
       name="description"
       content="The Wiki database made by cavers for cavers."
     />
-    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
+
+    <!-- Favicons -->
+    <link rel="icon" href="%PUBLIC_URL%/logo.svg" type="image/svg+xml" />
+    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" sizes="any" />
+    <link rel="apple-touch-icon" sizes="180x180" href="%PUBLIC_URL%/apple-touch-icon.png" />
+
     <!--
-      manifest.json provides metadata used when your web app is installed on a
+      manifest.json (PWA) provides metadata used when your web app is installed on a
       user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
     -->
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
@@ -29,13 +31,41 @@
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
 
+    <meta name="robots" content="noindex, nofollow" />
+
+    <!-- Open Graph (Google, Facebook, LinkedIn previews) -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="%PUBLIC_URL%" />
+    <meta property="og:site_name" content="Grottocenter" />
+    <meta property="og:title" content="Grottocenter" />
+    <meta
+      property="og:description"
+      content="The Wiki database made by cavers for cavers."
+    />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:image" content="%PUBLIC_URL%/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Grottocenter" />
+    <meta
+      name="twitter:description"
+      content="The Wiki database made by cavers for cavers."
+    />
+    <meta name="twitter:image" content="%PUBLIC_URL%/og-image.png" />
+
+    <!-- Google Fonts: preconnect to avoid render-blocking -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       rel="stylesheet"
-      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      href="https://fonts.googleapis.com/icon?family=Material+Icons&display=optional"
     />
     <link
       rel="stylesheet"
-      href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700"
+      href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700&display=swap"
     />
 
     <style>
@@ -113,7 +143,6 @@
             fill="#9a140c"
             fill-rule="evenodd"
           />
-          <path d="" fill="none" stroke="#3f5787" stroke-width="0.5" />
           <path
             id="top"
             d="M12.473017,77.858673c0,0,12.412281,2.607693,21.010105-4.357633C50.800657,59.471645,52.624768,12.449248,96.947764,12.449248s44.968303,41.17425,59.988902,56.761663c9.324112,9.675965,26.158727,8.647762,26.158727,8.647762"
@@ -142,7 +171,9 @@
     </div>
     <script>
       // Intl management will be takeover by react once it is loaded
-      const selectedLanguage = window.localStorage.getItem('selectedLanguage') ?? navigator.language.split(/[-_]/)[0];
+      const selectedLanguage =
+        window.localStorage.getItem('selectedLanguage') ??
+        navigator.language.split(/[-_]/)[0];
       const intlBootstrap = {
         defaultLocale: 'en',
         allLanguages: [
@@ -174,16 +205,5 @@
         `/lang/${intlBootstrap.initialLocale}.json`
       ).then(r => r.json());
     </script>
-
-    <!--
-      This HTML file is a template.
-      If you open it directly in the browser, you will see an empty page.
-
-      You can add webfonts, meta tags, or analytics to this file.
-      The build step will place the bundled scripts into the <body> tag.
-
-      To begin the development, run `npm start` or `yarn start`.
-      To create a production bundle, use `npm run build` or `yarn build`.
-    -->
   </body>
 </html>
