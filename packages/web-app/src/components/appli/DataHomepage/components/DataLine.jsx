@@ -17,6 +17,7 @@ const StyledTypography = styled(Typography)`
   display: flex;
   justify-content: center;
   align-items: center;
+  text-align: center;
 `;
 
 const DataLine = props => {
@@ -33,31 +34,19 @@ const DataLine = props => {
         alignItems="center">
         <>
           <Grid size={{ xs: 10, sm: 4 }}>
-            <Grid container direction="row" alignItems="center">
-              <Grid size={{ xs: 5, sm: 4 }}>
-                {icon}
-              </Grid>
-              <Grid size={{ xs: 7, sm: 8 }}>
-                <Box
-                  style={{
-                    display: 'flex',
-                    justifyContent: 'center'
-                  }}>
-                  {isFetching ? (
-                    <CircularProgress />
-                  ) : (
-                    <StyledTypography variant="h1">
-                      {numberData && numberData.toLocaleString('fr-FR')}&nbsp;
-                    </StyledTypography>
-                  )}
-                  <StyledTypography variant="h3">
-                    {formatMessage({
-                      id: 'partners'
-                    })}
-                  </StyledTypography>
-                </Box>
-              </Grid>
-            </Grid>
+            <Box style={{ display: 'flex', justifyContent: 'center' }}>
+              {icon}
+              {isFetching ? (
+                <CircularProgress />
+              ) : (
+                <StyledTypography variant="h1">
+                  {numberData && numberData.toLocaleString('fr-FR')}
+                </StyledTypography>
+              )}
+            </Box>
+            <StyledTypography variant="h3">
+              {formatMessage({ id: 'partners' })}
+            </StyledTypography>
           </Grid>
           <Grid size={{ xs: 10, sm: 8 }}>
             <Typography
