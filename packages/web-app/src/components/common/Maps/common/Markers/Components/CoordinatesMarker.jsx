@@ -20,7 +20,7 @@ export const CoordinatesMarker = L.divIcon({
   html: renderToString(<CoordinatesIcon />),
   iconSize: new L.Point(25, 41),
   iconAnchor: [12.5, 41],
-  className: 'fade-in-markers'
+  className: ''
 });
 
 export default CoordinatesMarker;

@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
-import { GeoJSON, useMap, useMapEvents } from 'react-leaflet';
+import { GeoJSON, useMap, useMapEvent } from 'react-leaflet';
 import PropTypes from 'prop-types';
 import L from 'leaflet';
 
@@ -10,39 +10,65 @@ import useHeatLayer, {
 import useMarkers, {
   MarkerGlobalCss
 } from '../../common/Maps/common/Markers/useMarkers';
+import { EntrancePopup } from '../../common/Maps/common/Markers/Components';
 import {
-  EntranceMarker,
-  EntrancePopup
-} from '../../common/Maps/common/Markers/Components';
-import { MARKERS_LIMIT } from '../../common/Maps/MapClusters/constants';
+  MARKERS_LIMIT,
+  getEntranceCircleStyle
+} from '../../common/Maps/MapClusters/constants';
 import { makeUrl } from '../../../actions/utils';
 import {
   getMapEntrancesCoordinatesUrl,
   getMapEntrancesUrl
 } from '../../../conf/apiRoutes';
 
+const entrancePopup = entrance => <EntrancePopup entrance={entrance} />;
+const entranceTip = entrance => entrance?.name;
+
 const MapInternals = ({ geoJson, massifId }) => {
   const map = useMap();
-  const zoomRef = useRef(map.getZoom());
   const { updateHeatData } = useHeatLayer();
 
   const updateEntranceMarkers = useMarkers({
-    icon: EntranceMarker,
-    popupContent: entrance => <EntrancePopup entrance={entrance} />,
-    tooltipContent: entrance => entrance?.name
+    circleMarkerStyle: getEntranceCircleStyle,
+    popupContent: entrancePopup,
+    tooltipContent: entranceTip
   });
 
-  // Keep refs to the latest updater functions so fetchData never
-  // captures a stale closure (hexLayer may not be ready on first render).
+  // Refs to latest updaters — keeps fetchMarkers free of their unstable identities.
   const heatRef = useRef(updateHeatData);
   heatRef.current = updateHeatData;
   const markersRef = useRef(updateEntranceMarkers);
   markersRef.current = updateEntranceMarkers;
 
-  const fetchData = useCallback(() => {
-    const bounds = map.getBounds();
+  const heatCoordinatesRef = useRef([]);
+  const abortRef = useRef(null);
+
+  useEffect(
+    () => () => {
+      abortRef.current?.abort();
+    },
+    []
+  );
+
+  // Computed once; both the heat fetch and fitBounds need it.
+  const massifBounds = useMemo(() => L.geoJSON(geoJson).getBounds(), [geoJson]);
+
+  // moveend: at high zoom fetch viewport markers; at low zoom restore heatmap from cache.
+  const fetchMarkers = useCallback(() => {
     const zoom = map.getZoom();
-    zoomRef.current = zoom;
+    if (zoom < MARKERS_LIMIT) {
+      markersRef.current(null);
+      heatRef.current(heatCoordinatesRef.current);
+      return;
+    }
+
+    heatRef.current([]);
+
+    if (abortRef.current) abortRef.current.abort();
+    abortRef.current = new AbortController();
+    const { signal } = abortRef.current;
+
+    const bounds = map.getBounds();
     /* eslint-disable no-underscore-dangle */
     const criteria = {
       sw_lat: bounds._southWest.wrap().lat,
@@ -53,42 +79,69 @@ const MapInternals = ({ geoJson, massifId }) => {
     };
     /* eslint-enable no-underscore-dangle */
 
-    const isHighZoom = zoom >= MARKERS_LIMIT;
-    const url = isHighZoom
-      ? getMapEntrancesUrl
-      : getMapEntrancesCoordinatesUrl;
-
-    fetch(makeUrl(url, criteria))
-      .then(response => {
-        if (!response.ok) return [];
-        return response.json();
-      })
+    fetch(makeUrl(getMapEntrancesUrl, criteria), { signal })
+      .then(r => (r.ok ? r.json() : []))
       .then(data => {
-        if (!Array.isArray(data)) return;
-        if (isHighZoom) {
-          heatRef.current([]);
-          markersRef.current(data);
-        } else {
-          markersRef.current(null);
-          heatRef.current(data);
-        }
+        if (Array.isArray(data)) markersRef.current(data);
       })
-      .catch(() => {});
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+      .catch(err => {
+        if (err.name !== 'AbortError')
+          console.error('Failed to fetch map markers:', err); // eslint-disable-line no-console
+      });
   }, [map, massifId]);
 
-  useMapEvents({
-    zoomend: fetchData,
-    dragend: fetchData
-  });
+  // fetchMarkersRef lets effects call the latest fetchMarkers without adding it as a dep.
+  const fetchMarkersRef = useRef(null);
+  fetchMarkersRef.current = fetchMarkers;
 
+  useMapEvent('moveend', fetchMarkers);
+
+  // One-shot heat fetch for the entire massif bbox.
+  // The hexbin layer filters client-side; no re-fetch needed on pan/zoom.
+  // After storing the data, re-run the current zoom logic (via fetchMarkersRef) so the
+  // heatmap is displayed immediately if still at low zoom - avoids reading map.getZoom()
+  // asynchronously (race condition).
+  //
+  // Dep note: massifBounds is derived from geoJson via useMemo, and geoJson itself is
+  // memoized on geogPolygon (a string prop) in MapMassif. Leaflet's LatLngBounds has no
+  // referential equality, so this effect re-fires whenever massifBounds is a new object ;
+  // which only happens when geoJson changes reference. As long as geoJson stays stable
+  // (string prop → parsed once), this fires exactly once. If geoJson ever comes from
+  // Redux or a fetch, ensure its reference is stable to avoid double-fetching here.
   useEffect(() => {
-    const bounds = L.geoJSON(geoJson).getBounds();
-    if (bounds.isValid()) {
-      map.fitBounds(bounds);
+    if (!massifBounds.isValid()) return;
+    const sw = massifBounds.getSouthWest();
+    const ne = massifBounds.getNorthEast();
+    const controller = new AbortController();
+    fetch(
+      makeUrl(getMapEntrancesCoordinatesUrl, {
+        sw_lat: sw.lat,
+        sw_lng: sw.lng,
+        ne_lat: ne.lat,
+        ne_lng: ne.lng,
+        massif: massifId
+      }),
+      { signal: controller.signal }
+    )
+      .then(r => (r.ok ? r.json() : []))
+      .then(data => {
+        if (!Array.isArray(data)) return;
+        heatCoordinatesRef.current = data;
+        fetchMarkersRef.current();
+      })
+      .catch(() => {});
+    return () => controller.abort();
+  }, [massifBounds, massifId]);
+
+  // Fit the map to the massif bounds once, triggering moveend → fetchMarkers.
+  // If there's no polygon, moveend won't fire, so we call fetchMarkers manually.
+  useEffect(() => {
+    if (!massifBounds.isValid()) {
+      fetchMarkersRef.current();
+      return;
     }
-    fetchData();
-  }, [map, geoJson, fetchData]);
+    map.fitBounds(massifBounds);
+  }, [massifBounds, map]);
 
   return (
     <>

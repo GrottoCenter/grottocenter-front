@@ -20,14 +20,19 @@ jest.mock('react-leaflet', () => {
       }),
       fitBounds: jest.fn()
     }),
-    useMapEvents: () => null,
+    useMapEvent: jest.fn(),
+    useMapEvents: jest.fn(),
     GeoJSON: () => React.createElement('div', { 'data-testid': 'geojson' })
   };
 });
 
 jest.mock('leaflet', () => ({
   geoJSON: () => ({
-    getBounds: () => ({ isValid: () => true })
+    getBounds: () => ({
+      isValid: () => true,
+      getSouthWest: () => ({ lat: -10, lng: -10 }),
+      getNorthEast: () => ({ lat: 10, lng: 10 })
+    })
   })
 }));
 
@@ -153,14 +158,12 @@ describe('MapMassif', () => {
 
       render(<MapMassif massifId={42} geogPolygon={samplePolygon} />);
 
+      // At high zoom: heat coordinates are fetched first, then after the response
+      // fetchMarkers fires and fetches viewport entrance markers.
       await waitFor(() => {
-        expect(global.fetch).toHaveBeenCalled();
+        const urls = global.fetch.mock.calls.map(([url]) => url);
+        expect(urls.some(url => url.includes('/entrances?'))).toBe(true);
       });
-
-      expect(global.fetch.mock.calls[0][0]).toContain('/entrances?');
-      expect(global.fetch.mock.calls[0][0]).not.toContain(
-        'entrancesCoordinates'
-      );
     });
 
     it('calls updateEntranceMarkers with entrance objects', async () => {

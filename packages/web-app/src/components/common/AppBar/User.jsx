@@ -115,7 +115,7 @@ const UserMenu = ({
           <Typography variant="body2" color="text.primary">
             <Translate
               id="Logged as {userNickname}"
-              values={{ userNickname: <strong>{userNickname}</strong> }}
+              values={{ userNickname: <strong key="userNickname">{userNickname}</strong> }}
             />
           </Typography>
           <Typography variant="caption" color="text.secondary">

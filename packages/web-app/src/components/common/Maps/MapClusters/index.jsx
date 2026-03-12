@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState, useRef } from 'react';
 import PropTypes from 'prop-types';
-import { useMapEvent } from 'react-leaflet';
+import { useMap, useMapEvent } from 'react-leaflet';
 import { without, pipe, append, uniq } from 'ramda';
 
 import DataControl, { heatmapTypes, markerTypes } from './DataControl';
@@ -23,7 +23,6 @@ const HydratedMap = ({
   networkMarkers = [],
   organizations,
   projectionsList,
-  zoom,
   onUpdate
 }) => {
   const { updateHeatData } = useHeatLayer(entrances);
@@ -38,15 +37,31 @@ const HydratedMap = ({
         .map(([k]) => k),
     [selectedMarkers]
   );
-  const [visibleHeat, setVisibleHeat] = useState(selectedHeat);
-  const [visibleMarkers, setVisibleMarkers] = useState([]);
-  const zoomState = useRef(ZOOM_STATE.HEAT);
-  const prevZoom = useRef(zoom);
+  const map = useMap();
+  const initialZoom = useRef(map.getZoom()).current;
+  const isInitiallyZoomedIn = initialZoom >= MARKERS_LIMIT;
+  const [visibleHeat, setVisibleHeat] = useState(isInitiallyZoomedIn ? heatmapTypes.NONE : selectedHeat);
+  const [visibleMarkers, setVisibleMarkers] = useState(isInitiallyZoomedIn ? [selectedHeat] : []);
+  const zoomState = useRef(isInitiallyZoomedIn ? ZOOM_STATE.MARKERS : ZOOM_STATE.HEAT);
+  const prevZoom = useRef(initialZoom);
   // Refs to avoid stale closures in event handlers (zoomend, handleUpdateHeat)
   const selectedHeatRef = useRef(selectedHeat);
   selectedHeatRef.current = selectedHeat;
   const selectedMarkersListRef = useRef(selectedMarkersList);
   selectedMarkersListRef.current = selectedMarkersList;
+
+  // Keep onUpdate ref-stable so handleUpdate's useCallback doesn't depend on it
+  const onUpdateRef = useRef(onUpdate);
+  onUpdateRef.current = onUpdate;
+
+  const handleUpdate = useCallback(() => {
+    onUpdateRef.current({
+      markers: visibleMarkers,
+      zoom: map.getZoom(),
+      center: map.getCenter(),
+      bounds: map.getBounds()
+    });
+  }, [visibleMarkers, map]);
 
   useEffect(() => {
     if (zoomState.current === ZOOM_STATE.MARKERS) {
@@ -81,8 +96,10 @@ const HydratedMap = ({
     }
   }, []);
 
-  // on zoom handle what is visible between heat & markers
-  const map = useMapEvent('zoomend', () => {
+  // zoomend: manages heatmap ↔ markers visibility only.
+  // It does NOT call handleUpdate directly - moveend fires right after zoomend
+  // and handles that, ensuring the correct final position is always used.
+  useMapEvent('zoomend', () => {
     const currentZoom = map.getZoom();
     const isZoomingIn = prevZoom.current < currentZoom;
     // When close enough we want to display disable heatmap ans show markers
@@ -99,9 +116,8 @@ const HydratedMap = ({
         setVisibleHeat('none');
         zoomState.current = ZOOM_STATE.MARKERS;
       }
-    }
-    // When too far we want to switch back to the heatmap
-    if (!isZoomingIn && currentZoom < MARKERS_LIMIT) {
+    } else if (!isZoomingIn && currentZoom < MARKERS_LIMIT) {
+      // When too far we want to switch back to the heatmap
       setVisibleHeat(selectedHeatRef.current);
       setVisibleMarkers(selectedMarkersListRef.current);
       zoomState.current = ZOOM_STATE.HEAT;
@@ -109,27 +125,18 @@ const HydratedMap = ({
     prevZoom.current = currentZoom;
   });
 
-  const handleUpdate = () => {
-    onUpdate({
-      heat: visibleHeat === 'none' ? null : visibleHeat,
-      markers: visibleMarkers,
-      zoom: map.getZoom(),
-      center: map.getCenter(),
-      bounds: map.getBounds()
-    });
-  };
+  // moveend fires after ALL map movement has finished - including mobile inertia.
+  // Using moveend instead of dragend ensures map.getBounds() returns the final
+  // resting position, not a mid-inertia snapshot. It also covers zoom events
+  // since Leaflet fires moveend after zoomend.
+  useMapEvent('moveend', handleUpdate);
 
-  // Update data on leaflet events or user events
-  useMapEvent('zoomend', () => {
-    handleUpdate();
-  });
-  useMapEvent('dragend', () => {
-    handleUpdate();
-  });
+  // Called when visibility changes (zoom threshold crossing or DataControl change).
+  // handleUpdate is stable as long as visibleMarkers doesn't change,
+  // so this effect only re-runs when the markers to fetch actually change.
   useEffect(() => {
     handleUpdate();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [visibleMarkers, visibleHeat]);
+  }, [handleUpdate]);
 
   // Update visible heat layer
   useEffect(() => {
@@ -174,7 +181,7 @@ const Index = ({ center, zoom, isSideMenuOpen, mapRef, ...props }) => (
     isSideMenuOpen={isSideMenuOpen}
     isLocateControl
     mapRef={mapRef}>
-    <HydratedMap {...props} zoom={zoom} />
+    <HydratedMap {...props} />
   </CustomMapContainer>
 );
 
@@ -192,13 +199,13 @@ HydratedMap.propTypes = {
   networkMarkers: PropTypes.arrayOf(markerType),
   organizations: PropTypes.arrayOf(markerType),
   projectionsList: PropTypes.arrayOf(PropTypes.shape({})),
-  zoom: PropTypes.number.isRequired,
   onUpdate: PropTypes.func
 };
 
 Index.propTypes = {
   isSideMenuOpen: PropTypes.bool,
   center: PropTypes.arrayOf(PropTypes.number),
+  zoom: PropTypes.number,
   mapRef: PropTypes.shape({ current: PropTypes.any }),
   ...HydratedMap.propTypes
 };
