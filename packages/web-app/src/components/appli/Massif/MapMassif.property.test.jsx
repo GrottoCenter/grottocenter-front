@@ -20,14 +20,19 @@ jest.mock('react-leaflet', () => {
       }),
       fitBounds: jest.fn()
     }),
-    useMapEvents: () => null,
+    useMapEvent: jest.fn(),
+    useMapEvents: jest.fn(),
     GeoJSON: () => React.createElement('div', { 'data-testid': 'geojson' })
   };
 });
 
 jest.mock('leaflet', () => ({
   geoJSON: () => ({
-    getBounds: () => ({ isValid: () => true })
+    getBounds: () => ({
+      isValid: () => true,
+      getSouthWest: () => ({ lat: -10, lng: -10 }),
+      getNorthEast: () => ({ lat: 10, lng: 10 })
+    })
   })
 }));
 

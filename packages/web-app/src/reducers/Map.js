@@ -1,7 +1,5 @@
 import { lensProp, set } from 'ramda';
 import {
-  CHANGE_LOCATION,
-  CHANGE_ZOOM,
   FETCH_MAP_ENTRANCES_COORDINATES_FAILURE,
   FETCH_MAP_ENTRANCES_COORDINATES_SUCCESS,
   FETCH_MAP_ENTRANCES_FAILURE,
@@ -12,12 +10,10 @@ import {
   FETCH_MAP_NETWORKS_SUCCESS,
   FETCH_MAP_ORGANIZATIONS_FAILURE,
   FETCH_MAP_ORGANIZATIONS_SUCCESS,
-  FOCUS_ON_LOCATION,
   FETCH_MAP_START_LOADING,
   FETCH_MAP_END_LOADING,
   LOADINGS
 } from '../actions/Map';
-import { defaultCoord, defaultZoom, focusZoom } from '../conf/config';
 
 const initialState = {
   networksCoordinates: [],
@@ -25,8 +21,6 @@ const initialState = {
   entrancesCoordinates: [],
   entrances: [],
   organizations: [],
-  location: defaultCoord,
-  zoom: defaultZoom,
   error: undefined,
   loadings: {
     [LOADINGS.NETWORKS]: false,
@@ -95,12 +89,6 @@ const reducer = (state = initialState, action) => {
       };
     case FETCH_MAP_ORGANIZATIONS_FAILURE:
       return { ...state, error: action.error };
-    case CHANGE_LOCATION:
-      return { ...state, location: action.location };
-    case CHANGE_ZOOM:
-      return { ...state, zoom: action.zoom };
-    case FOCUS_ON_LOCATION:
-      return { ...state, location: action.location, zoom: focusZoom };
     default:
       return state;
   }

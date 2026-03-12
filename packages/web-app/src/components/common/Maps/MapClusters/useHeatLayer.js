@@ -25,6 +25,9 @@ import {
 export const HexGlobalCss = (
   <GlobalStyles
     styles="
+& .hexbin-grid {
+  cursor: pointer;
+}
 & .hexbin-hexagon {
   stroke: #000;
   stroke-width: .5px;
@@ -50,10 +53,20 @@ export const HexGlobalCss = (
 const useHeatLayer = (data = [], type = heatmapTypes.ENTRANCES) => {
   const { formatMessage } = useIntl();
   const [hexLayer, setHexLayer] = useState();
-  const lastMoveEndTs = useRef(0);
+  const isDraggingRef = useRef(false);
+  // Pending requestAnimationFrame id - coalesces rapid .data() calls into one frame.
+  const rafRef = useRef(null);
+  const dragEndTimerRef = useRef(null);
+  // Skip colorRange + hoverHandler re-registration when the type hasn't changed.
+  const lastTypeRef = useRef(null);
 
   // On zoom lvl, hex opacity and size can change
   const map = useMapEvent('zoomend', () => {
+    // Hide any visible tooltip - the hovered hex may disappear mid-zoom
+    // leaving no mouseout to clean it up. We hide rather than remove so the
+    // div stays alive in the hoverHandler's closure and can be reused on next hover.
+    d3.selectAll('.hexbin-tooltip').style('visibility', 'hidden');
+
     if (!isNil(hexLayer)) {
       if (map.getZoom() > HEX_DETAILS_ZOOM) {
         hexLayer
@@ -65,12 +78,20 @@ const useHeatLayer = (data = [], type = heatmapTypes.ENTRANCES) => {
     }
   });
 
+  // Reset type cache when the hexLayer is (re)initialized.
+  useEffect(() => {
+    lastTypeRef.current = null;
+  }, [hexLayer]);
+
   const updateHeatData = useCallback(
     (newData, newType = type) => {
-      if (!isNil(hexLayer)) {
+      if (isNil(hexLayer)) return;
+
+      // colorRange and hoverHandler only need updating when the type switches.
+      // Skipping the D3 event re-registration on every pan saves work.
+      if (newType !== lastTypeRef.current) {
         // Remove previous tooltip (avoid some bug)
         d3.selectAll('.hexbin-tooltip').remove();
-
         hexLayer
           .colorRange(
             newType === heatmapTypes.NETWORKS
@@ -87,21 +108,37 @@ const useHeatLayer = (data = [], type = heatmapTypes.ENTRANCES) => {
                 })
               ]
             })
-          )
-          .data(newData);
+          );
+        lastTypeRef.current = newType;
       }
+
+      // Coalesce rapid calls into a single frame - cancels any pending RAF
+      // so only the latest data update is rendered, without blocking the current frame.
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      rafRef.current = requestAnimationFrame(() => {
+        rafRef.current = null;
+        hexLayer.data(newData);
+      });
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [hexLayer]
   );
 
-  useMapEvent('moveend', () => {
-    lastMoveEndTs.current = Date.now();
+  useMapEvent('dragstart', () => {
+    isDraggingRef.current = true;
+  });
+
+  useMapEvent('dragend', () => {
+    // Defer reset past the click event that may fire synchronously on the
+    // mouseup/touchend that ends the drag, preventing a spurious flyTo.
+    dragEndTimerRef.current = setTimeout(() => {
+      dragEndTimerRef.current = null;
+      isDraggingRef.current = false;
+    }, 0);
   });
 
   const flyToHex = (_, hexPoints) => {
-    const timeSinceMapMoveMs = Date.now() - lastMoveEndTs.current;
-    if (timeSinceMapMoveMs < 20) return; // Prevent drag click
+    if (isDraggingRef.current) return;
 
     d3.selectAll('.hexbin-tooltip').attr('opacity', 0);
     const bounds = new L.LatLngBounds(
@@ -117,6 +154,8 @@ const useHeatLayer = (data = [], type = heatmapTypes.ENTRANCES) => {
     // Add hex layer to the map
     setHexLayer(L.hexbinLayer(HEX_LAYER_OPTIONS).addTo(map));
     return () => {
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      if (dragEndTimerRef.current) clearTimeout(dragEndTimerRef.current);
       // Remove tooltip
       d3.selectAll('.hexbin-tooltip').remove();
     };
@@ -125,8 +164,8 @@ const useHeatLayer = (data = [], type = heatmapTypes.ENTRANCES) => {
 
   useEffect(() => {
     if (!isNil(hexLayer)) {
-      // Initialize Hex scaling
-      hexLayer.colorScale();
+      // Initialize Hex scaling with sqrt to amplify differences at low densities
+      hexLayer.colorScale(d3.scaleSqrt());
 
       hexLayer
         .radiusRange(HEX_RADIUS_RANGE)

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { styled } from '@mui/material/styles';
 import {
   MapContainer,
@@ -36,21 +36,6 @@ const Centerer = ({ center, zoom }) => {
 
 const baseLayerChange = event => {
   window.localStorage.setItem('selectedBaseLayer', event.name);
-};
-
-const handleResize = map => {
-  if (!map) return;
-  const myObserver = new ResizeObserver(() => {
-    setTimeout(() => {
-      try {
-        map.invalidateSize(true);
-      } catch (e) {
-        // Silently ignore errors during invalidateSize
-      }
-    }, 100);
-  });
-  myObserver.observe(map.getContainer());
-  map.on('baselayerchange', baseLayerChange);
 };
 
 Centerer.propTypes = {
@@ -104,36 +89,83 @@ const CustomMapContainer = ({
   children,
   forceCentering,
   mapRef
-}) => (
-  <Wrapper $wholePage={wholePage}>
-    <MapContainer
-      style={{ height: '100%', width: '100%', ...style }}
-      wholePage={wholePage}
-      center={center}
-      zoom={zoom}
-      dragging={dragging}
-      scrollWheelZoom={scrollWheelZoom}
-      isSideMenuOpen={isSideMenuOpen}
-      minZoom={1}
-      ref={(ref) => {
-        handleResize(ref);
-        if (mapRef) mapRef.current = ref;
-      }}
-      preferCanvas>
-      {isFullscreenAllowed && shouldChangeControlInFullscreen && (
-        <FullscreenInteraction dragging={dragging} scrollWheelZoom={scrollWheelZoom} />
-      )}
-      {isFullscreenAllowed && !shouldChangeControlInFullscreen && (
-        <FullscreenControl forceSeparateButton="true" />
-      )}
-      {forceCentering && <Centerer center={center} zoom={zoom} />}
-      {isLocateControl && <LocateControl />}
-      <ScaleControl position="bottomright" />
-      <LayersControl />
-      {children}
-    </MapContainer>
-  </Wrapper>
-);
+}) => {
+  const observerRef = useRef(null);
+  const mapInstanceRef = useRef(null);
+  const pendingStabilizeRef = useRef(null);
+  const mapRefPropRef = useRef(mapRef);
+  mapRefPropRef.current = mapRef;
+
+  const mapRefCallback = useCallback((map) => {
+    if (mapRefPropRef.current) mapRefPropRef.current.current = map;
+    if (!map || map === mapInstanceRef.current) return;
+    mapInstanceRef.current = map;
+
+    // Clean up previous observer and any pending timeout
+    clearTimeout(pendingStabilizeRef.current);
+    if (observerRef.current) {
+      observerRef.current.disconnect();
+    }
+
+    const container = map.getContainer();
+
+    // Two-phase resize handling:
+    // Phase 1 (during transition): invalidateSize({ pan: false }) on every notification
+    //   → Leaflet redraws tiles for the growing container without panning,
+    //     so the map reveals more geographic area smoothly. No moveend fired.
+    // Phase 2 (after transition): one invalidateSize({ animate: false }) once size
+    //   settles → corrects the geographic center, fires moveend once.
+    const observer = new ResizeObserver(() => {
+      try { map.invalidateSize({ animate: false, pan: false }); } catch (e) { /* ignore */ }
+      clearTimeout(pendingStabilizeRef.current);
+      pendingStabilizeRef.current = setTimeout(() => {
+        pendingStabilizeRef.current = null;
+        try { map.invalidateSize({ animate: false }); } catch (e) { /* ignore */ }
+      }, 100);
+    });
+    observer.observe(container);
+    observerRef.current = observer;
+
+    map.on('baselayerchange', baseLayerChange);
+  }, []);
+
+  // Disconnect observer and remove listeners on unmount
+  useEffect(() => {
+    return () => {
+      clearTimeout(pendingStabilizeRef.current);
+      observerRef.current?.disconnect();
+      mapInstanceRef.current?.off('baselayerchange', baseLayerChange);
+    };
+  }, []);
+
+  return (
+    <Wrapper $wholePage={wholePage}>
+      <MapContainer
+        style={{ height: '100%', width: '100%', ...style }}
+        wholePage={wholePage}
+        center={center}
+        zoom={zoom}
+        dragging={dragging}
+        scrollWheelZoom={scrollWheelZoom}
+        isSideMenuOpen={isSideMenuOpen}
+        minZoom={1}
+        ref={mapRefCallback}
+        preferCanvas>
+        {isFullscreenAllowed && shouldChangeControlInFullscreen && (
+          <FullscreenInteraction dragging={dragging} scrollWheelZoom={scrollWheelZoom} />
+        )}
+        {isFullscreenAllowed && !shouldChangeControlInFullscreen && (
+          <FullscreenControl forceSeparateButton="true" />
+        )}
+        {forceCentering && <Centerer center={center} zoom={zoom} />}
+        {isLocateControl && <LocateControl />}
+        <ScaleControl position="bottomright" />
+        <LayersControl />
+        {children}
+      </MapContainer>
+    </Wrapper>
+  );
+};
 
 CustomMapContainer.propTypes = {
   wholePage: PropTypes.bool,

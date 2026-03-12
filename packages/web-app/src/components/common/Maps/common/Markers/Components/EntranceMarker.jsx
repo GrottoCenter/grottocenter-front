@@ -20,7 +20,7 @@ export const EntranceMarker = L.divIcon({
   html: renderToString(<EntranceIconMap />),
   iconSize: new L.Point(12.5, 25),
   iconAnchor: [6.25, 25],
-  className: 'fade-in-markers'
+  className: ''
 });
 
 export default EntranceMarker;

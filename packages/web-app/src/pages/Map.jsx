@@ -1,17 +1,15 @@
-import React, { useEffect, useRef, Suspense } from 'react';
+import React, { useCallback, useEffect, useRef, Suspense, useState } from 'react';
 import { includes } from 'ramda';
 import { useNavigate, generatePath, useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import PageLoader from '../components/common/PageLoader';
 
 import {
-  changeLocation,
-  changeZoom,
   fetchNetworks,
-  fetchNetworksCoordinates,
+  fetchAllNetworksCoordinates,
   fetchOrganizations,
   fetchEntrances,
-  fetchEntrancesCoordinates
+  fetchAllEntrancesCoordinates
 } from '../actions/Map';
 import { fetchProjections } from '../actions/Projections';
 import useGeolocation from '../hooks/useGeolocation';
@@ -42,29 +40,26 @@ const Map = () => {
   const params = useParams();
   const { location: geoLocation, hasLocation } = useGeolocation();
   const mapRef = useRef(null);
-  const {
-    location,
-    zoom,
-    // TODO handle loading
-    // eslint-disable-next-line no-unused-vars
-    loadings,
-    networks,
-    networksCoordinates,
-    organizations,
-    entrances,
-    entrancesCoordinates
-  } = useSelector(state => state.map);
+  const [location, setLocation] = useState(defaultCoord);
+  const [zoom, setZoom] = useState(defaultZoom);
+  const networks = useSelector(state => state.map.networks);
+  const networksCoordinates = useSelector(
+    state => state.map.networksCoordinates
+  );
+  const organizations = useSelector(state => state.map.organizations);
+  const entrances = useSelector(state => state.map.entrances);
+  const entrancesCoordinates = useSelector(
+    state => state.map.entrancesCoordinates
+  );
   const { open } = useSelector(state => state.sideMenu);
   const { projections } = useSelector(state => state.projections);
 
-  const handleUpdate = ({ heat, markers, zoom: newZoom, center, bounds }) => {
-    const newPath = generatePath('/ui/map/:target', {
-      target: encodeMapTarget(center, newZoom)
-    });
-    navigate(newPath, { replace: true });
-    dispatch(changeLocation(center));
-    dispatch(changeZoom(newZoom));
+  // urlDebounceRef: update the URL only once the user has truly settled,
+  // avoiding lagging due to URL updates.
+  // Leaflet always handles the visual movement immediately on its own.
+  const urlDebounceRef = useRef(null);
 
+  const handleUpdate = useCallback(({ markers, zoom: newZoom, center, bounds }) => {
     const criteria = {
       /* eslint-disable no-underscore-dangle */
       sw_lat: bounds._southWest.wrap().lat,
@@ -83,34 +78,55 @@ const Map = () => {
     if (includes('entrances', markers)) {
       dispatch(fetchEntrances(criteria));
     }
-    if (heat === 'networks') {
-      dispatch(fetchNetworksCoordinates(criteria));
-    }
-    if (heat === 'entrances') {
-      dispatch(fetchEntrancesCoordinates(criteria));
-    }
-  };
+
+    // Update the shareable URL after the user has settled
+    if (urlDebounceRef.current) clearTimeout(urlDebounceRef.current);
+    urlDebounceRef.current = setTimeout(() => {
+      urlDebounceRef.current = null;
+      navigate(
+        generatePath('/ui/map/:target', {
+          target: encodeMapTarget(center, newZoom)
+        }),
+        { replace: true }
+      );
+    }, 1000);
+  }, [dispatch, navigate]);
 
   useEffect(() => {
-    dispatch(fetchProjections());
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    return () => {
+      if (urlDebounceRef.current) clearTimeout(urlDebounceRef.current);
+    };
   }, []);
 
   useEffect(() => {
-    const target = decodeMapTarget(params.target);
+    dispatch(fetchProjections());
+    dispatch(fetchAllEntrancesCoordinates());
+    dispatch(fetchAllNetworksCoordinates());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Capture the URL target present when the component first mounts.
+  // The initial position only needs to be set once; after that Leaflet owns its position.
+  const initialTargetRef = useRef(params.target);
+
+  useEffect(() => {
+    const target = decodeMapTarget(initialTargetRef.current);
     if (target) {
-      dispatch(changeLocation({ lat: target.lat, lng: target.lng }));
-      dispatch(changeZoom(target.zoom));
+      setLocation({ lat: target.lat, lng: target.lng });
+      setZoom(target.zoom);
     } else {
-      dispatch(changeLocation(geoLocation));
-      dispatch(changeZoom(defaultZoom));
+      setLocation(geoLocation);
+      setZoom(defaultZoom);
     }
-  }, [dispatch, params.target, geoLocation]);
+  }, [geoLocation]);
 
   useEffect(() => {
     const target = decodeMapTarget(params.target);
-    const isDefaultTarget = target?.lat === defaultCoord.lat && target?.lng === defaultCoord.lng && target?.zoom === defaultZoom;
-    
+    const isDefaultTarget =
+      target?.lat === defaultCoord.lat &&
+      target?.lng === defaultCoord.lng &&
+      target?.zoom === defaultZoom;
+
     if (hasLocation && (!params.target || isDefaultTarget) && mapRef.current) {
       mapRef.current.setView([geoLocation.lat, geoLocation.lng], focusZoom);
     }
