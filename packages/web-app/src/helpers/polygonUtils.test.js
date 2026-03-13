@@ -86,4 +86,29 @@ describe('isNeedlePolygon', () => {
     expect(isNeedlePolygon(thinRect, 0.05)).toBe(true);
     expect(isNeedlePolygon(thinRect, 0.0001)).toBe(false);
   });
+
+  /**
+   * A stream-corridor polygon (like the Wienbach nature reserve) spans a
+   * significant geographic area but has a very high perimeter-to-area ratio
+   * because it follows a narrow river valley.
+   *
+   * isNeedlePolygon correctly rejects it. When all polygons are rejected this
+   * way, the import pipeline must surface a clear error to the user (not a
+   * silent success) so they understand why nothing appeared on the map.
+   */
+  it('classifies a stream-corridor polygon as a needle', () => {
+    // Approximate bounding box of Bachsystem des Wienbaches (Germany):
+    // lon 6.91–7.04, lat 51.68–51.78. Spans ~14 km × ~11 km but the
+    // polygon follows a narrow river valley, giving area ≈ 0.000043 deg²
+    // and perimeter ≈ 0.748 deg, so ratio ≈ 0.000077 < 0.0001 threshold.
+    // Modelled here as a very thin rectangle with the same isoperimetric
+    // ratio: lat span 0.10°, lon width 0.00003° → ratio ≈ 0.000075.
+    const streamCorridor = [
+      [51.68, 6.91],
+      [51.78, 6.91],
+      [51.78, 6.91003],
+      [51.68, 6.91003]
+    ];
+    expect(isNeedlePolygon(streamCorridor)).toBe(true);
+  });
 });

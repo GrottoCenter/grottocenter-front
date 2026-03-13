@@ -14,7 +14,6 @@ import GeocodingControl from '../../../common/Maps/common/GeocodingControl';
 import ShapefileImport from './ShapefileImport';
 import PolygonLayersList from './PolygonLayersList';
 import { isNeedlePolygon } from '../../../../helpers/polygonUtils';
-
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-draw/dist/leaflet.draw.css';
 import { defaultZoom, focusZoom } from '../../../../conf/config';
@@ -342,6 +341,7 @@ const PolygonMap = ({ onChange, data }) => {
 
     // Add imported polygons to existing layers
     const newLayers = [];
+    let skippedNeedle = 0;
     multiPolygon.coordinates.forEach(polygon => {
       const rawRing = polygon[0].map(coord => [coord[1], coord[0]]);
 
@@ -353,8 +353,12 @@ const PolygonMap = ({ onChange, data }) => {
         rawRing[0][1] === rawRing[rawRing.length - 1][1];
       const openRing = isClosed ? rawRing.slice(0, -1) : rawRing;
 
-      // Skip degenerate or needle polygons
-      if (openRing.length <= 2 || isNeedlePolygon(openRing)) return;
+      if (openRing.length <= 2) return;
+
+      if (isNeedlePolygon(openRing)) {
+        skippedNeedle += 1;
+        return;
+      }
 
       const leafletPolygon = L.polygon(openRing, { color: 'green' });
 
@@ -369,6 +373,23 @@ const PolygonMap = ({ onChange, data }) => {
         bounds: leafletPolygon.getBounds()
       });
     });
+
+    if (newLayers.length === 0) {
+      if (skippedNeedle > 0) {
+        setImportError(
+          formatMessage({
+            id: 'The geometry could not be imported: all polygons are too thin or elongated (stream corridors, narrow buffers). Try increasing the simplification tolerance or use a different file.'
+          })
+        );
+      } else {
+        setImportError(
+          formatMessage({
+            id: 'No valid polygon rings found in the imported file.'
+          })
+        );
+      }
+      return;
+    }
 
     // Detect holes automatically
     const layersWithHoles = detectHoles(newLayers);
