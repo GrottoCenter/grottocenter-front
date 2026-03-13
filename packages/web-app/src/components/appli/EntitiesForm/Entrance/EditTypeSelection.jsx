@@ -51,7 +51,7 @@ const EditTypeSelection = ({
     <>
       <FormControl component="fieldset" disabled={disabled}>
         <FormLabel component="legend">
-          {formatMessage({ id: 'The cave is:' })}
+          {formatMessage({ id: 'The entrance is:' })}
         </FormLabel>
         <RadioGroup
           aria-label={formatMessage({ id: 'entityType' })}
@@ -65,14 +65,14 @@ const EditTypeSelection = ({
             value={ENTRANCE_AND_CAVE}
             control={<Radio />}
             label={formatMessage({
-              id: 'First entrance of the cave (on Grottocenter)'
+              id: 'The first entrance of a new cave (on Grottocenter)'
             })}
           />
           <FormControlLabel
             value={ENTRANCE_ONLY}
             control={<Radio />}
             label={formatMessage({
-              id: 'Linked to an existing cave or network'
+              id: 'Linked to an existing entrance or network'
             })}
           />
         </RadioGroup>
@@ -83,7 +83,7 @@ const EditTypeSelection = ({
             }}
             color="secondary">
             {formatMessage({
-              id: 'Link to an existing cave or network'
+              id: 'Link to an existing entrance or network'
             })}
           </Button>
         )}
@@ -92,7 +92,7 @@ const EditTypeSelection = ({
         <FormRow>
           <InputText
             formKey="cave.name"
-            labelName="Cave (and entrance) name"
+            labelName="Entrance name (which is also the cave name)"
             control={control}
             isError={!!errors?.cave?.name}
             isRequired

@@ -171,7 +171,7 @@ const Properties = ({ isLoading = false, entrance }) => {
             {entrance.cave && entrance.cave.entrances.length > 1 && (
               <Property
                 flexBasis="fit-content"
-                label={formatMessage({ id: 'Cave' })}
+                label={formatMessage({ id: 'Network' })}
                 value={`${entrance.cave.name}`}
                 icon={<CustomIcon type="network" />}
                 url={`/ui/caves/${entrance.cave.id}`}
