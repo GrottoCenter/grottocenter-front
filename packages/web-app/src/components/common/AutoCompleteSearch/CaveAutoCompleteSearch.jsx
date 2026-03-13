@@ -11,7 +11,7 @@ import {
 import AutoCompleteSearch from '.';
 import { fetchQuickSearchRaw } from '../../../actions/Quicksearch';
 import { useDebounce } from '../../../hooks';
-import { networkIcon } from '../../../assets/icons';
+import { entranceIcon, networkIcon } from '../../../assets/icons';
 
 const getCaveToString = cave => {
   let out = [cave?.name];
@@ -23,7 +23,8 @@ const getCaveToString = cave => {
 
 const resultEndAdornment = (
   <InputAdornment position="end">
-    <img src={networkIcon} alt="Document icon" width={40} height={40} />
+    <img src={entranceIcon} alt="Entrance icon" width={40} height={40} />
+    <img src={networkIcon} alt="Network icon" width={40} height={40} />
   </InputAdornment>
 );
 
@@ -70,7 +71,7 @@ const CaveAutoCompleteSearch = ({
   };
   return (
     <FormControl variant="filled" required={required} error={!!error} fullWidth>
-      <InputLabel>{formatMessage({ id: 'Cave' })}</InputLabel>
+      <InputLabel>{formatMessage({ id: 'Entrance or network' })}</InputLabel>
       <StyledInput
         value={getCaveToString(selected)}
         disabled
@@ -85,7 +86,7 @@ const CaveAutoCompleteSearch = ({
             onSelection={handleSelection}
             hasError={!!error}
             isLoading={isLoading}
-            label={formatMessage({ id: 'Search for a cave' })}
+            label={formatMessage({ id: 'Search for an entrance or network' })}
             suggestions={suggestions}
           />
         </InputWrapper>

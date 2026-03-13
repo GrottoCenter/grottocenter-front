@@ -3,6 +3,7 @@ import { styled } from '@mui/material/styles';
 import {
   bibliographyIcon,
   entranceIcon,
+  networkIcon,
   organizationIcon,
   caverIcon,
   massifIcon
@@ -62,7 +63,10 @@ export const nomelizeSearchEntity = option => {
 
     case 'caves':
     case 'entrances': {
-      iconSrc = entranceIcon;
+      iconSrc =
+        option._type === 'caves' && option.entrances?.length > 1
+          ? networkIcon
+          : entranceIcon;
       subtitle = option.region ?? '';
       const caveInfo = [];
       if (option.cave?.depth) caveInfo.push(`↕ ${option.cave?.depth}m`);
