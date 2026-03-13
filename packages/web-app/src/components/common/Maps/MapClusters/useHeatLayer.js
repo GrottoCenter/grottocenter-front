@@ -142,7 +142,7 @@ const useHeatLayer = (data = [], type = heatmapTypes.ENTRANCES) => {
 
     d3.selectAll('.hexbin-tooltip').attr('opacity', 0);
     const bounds = new L.LatLngBounds(
-      hexPoints.map(point => point.o.reverse())
+      hexPoints.map(point => [point.o[1], point.o[0]])
     );
     map.flyToBounds(bounds, {
       maxZoom: MARKERS_LIMIT,
