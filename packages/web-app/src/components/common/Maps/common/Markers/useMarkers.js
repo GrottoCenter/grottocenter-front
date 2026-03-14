@@ -1,13 +1,8 @@
 import React, { useRef, useCallback, useEffect } from 'react';
 import { useMap } from 'react-leaflet';
 import * as L from 'leaflet';
-import { renderToString } from 'react-dom/server';
-import { StaticRouter } from 'react-router';
-import { ThemeProvider, StyledEngineProvider } from '@mui/material/styles';
 import { GlobalStyles } from '@mui/material';
-import { IntlProvider } from 'react-intl';
-import { useSelector } from 'react-redux';
-import grottoTheme from '../../../../../conf/grottoTheme';
+import useRenderPopup from './useRenderPopup';
 
 export const MarkerGlobalCss = (
   <GlobalStyles
@@ -29,33 +24,7 @@ const useMarkers = ({
   const map = useMap();
   // Map<id, L.Marker> for O(1) lookups during diff
   const markersRef = useRef(new Map());
-  const { locale, messages } = useSelector(state => state.intl);
-
-  // Store locale/messages in refs so renderPopupHtml never goes stale
-  // but doesn't invalidate the callback chain either
-  const localeRef = useRef(locale);
-  const messagesRef = useRef(messages);
-  localeRef.current = locale;
-  messagesRef.current = messages;
-
-  const renderPopupHtml = useCallback(
-    marker => {
-      const loc = localeRef.current;
-      const msgs = messagesRef.current;
-      return renderToString(
-        <IntlProvider locale={loc} messages={msgs[loc]}>
-          <StaticRouter location="/">
-            <StyledEngineProvider injectFirst>
-              <ThemeProvider theme={grottoTheme}>
-                {popupContent(marker)}
-              </ThemeProvider>
-            </StyledEngineProvider>
-          </StaticRouter>
-        </IntlProvider>
-      );
-    },
-    [popupContent]
-  );
+  const renderPopup = useRenderPopup();
 
   const createLeafletMarker = useCallback(
     marker => {
@@ -74,7 +43,7 @@ const useMarkers = ({
 
       // Lazy popup: content is rendered only when the popup is opened
       if (popupContent) {
-        markerEl.bindPopup(() => renderPopupHtml(marker));
+        markerEl.bindPopup(() => renderPopup(popupContent(marker)));
       }
 
       if (tooltipContent) {
@@ -86,7 +55,7 @@ const useMarkers = ({
 
       return markerEl;
     },
-    [icon, circleMarkerStyle, popupContent, renderPopupHtml, tooltipContent]
+    [icon, circleMarkerStyle, popupContent, renderPopup, tooltipContent]
   );
 
   const updateMarkers = useCallback(

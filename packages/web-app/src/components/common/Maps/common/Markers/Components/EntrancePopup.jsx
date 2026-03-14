@@ -14,7 +14,7 @@ export const EntrancePopup = ({ entrance }) => (
     {entrance.caveName && entrance.caveName !== entrance.name && (
       <Information
         value={`${entrance.caveName}`}
-        icon={<CustomIcon size={24} type="network" />}
+        icon={<CustomIcon size={25} type="network" />}
         url={`/ui/caves/${entrance.caveId}`}
       />
     )}

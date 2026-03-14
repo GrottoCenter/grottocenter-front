@@ -76,6 +76,9 @@ code {
 .map-popup-property img, .map-popup-property svg {
   margin-right: 0;
   flex-shrink: 0;
+  width: 25px;
+  height: 25px;
+  font-size: 25px;
 }
 
 .leaflet-tooltip{

@@ -6,10 +6,11 @@ import { without, pipe, append, uniq } from 'ramda';
 import DataControl, { heatmapTypes, markerTypes } from './DataControl';
 import ConverterControl from '../common/Converter';
 import GeocodingControl from '../common/GeocodingControl';
+import MeasureControl from '../common/MeasureControl';
 import useHeatLayer, { HexGlobalCss } from './useHeatLayer';
 import Markers from './Markers';
 import CustomMapContainer from '../common/MapContainer';
-import { MARKERS_LIMIT } from './constants';
+import { MARKERS_LIMIT, ENTRANCE_MARKER_FILTERS, getCaveSize, CAVE_SIZE } from './constants';
 
 const ZOOM_STATE = {
   MARKERS: 1,
@@ -30,6 +31,14 @@ const HydratedMap = ({
   const [selectedMarkers, setSelectedMarkers] = useState(
     Object.fromEntries(Object.values(markerTypes).map(type => [type, false]))
   );
+  const [activeEntranceFilters, setActiveEntranceFilters] = useState(
+    Object.fromEntries(Object.values(CAVE_SIZE).map(size => [size, true]))
+  );
+  const filteredEntranceMarkers = useMemo(
+    () => entranceMarkers.filter(e => activeEntranceFilters[getCaveSize(e)]),
+    [entranceMarkers, activeEntranceFilters]
+  );
+
   const selectedMarkersList = useMemo(
     () =>
       Object.entries(selectedMarkers)
@@ -42,6 +51,7 @@ const HydratedMap = ({
   const isInitiallyZoomedIn = initialZoom >= MARKERS_LIMIT;
   const [visibleHeat, setVisibleHeat] = useState(isInitiallyZoomedIn ? heatmapTypes.NONE : selectedHeat);
   const [visibleMarkers, setVisibleMarkers] = useState(isInitiallyZoomedIn ? [selectedHeat] : []);
+  const [isMarkersMode, setIsMarkersMode] = useState(isInitiallyZoomedIn);
   const zoomState = useRef(isInitiallyZoomedIn ? ZOOM_STATE.MARKERS : ZOOM_STATE.HEAT);
   const prevZoom = useRef(initialZoom);
   // Refs to avoid stale closures in event handlers (zoomend, handleUpdateHeat)
@@ -66,20 +76,13 @@ const HydratedMap = ({
   useEffect(() => {
     if (zoomState.current === ZOOM_STATE.MARKERS) {
       setVisibleMarkers(
-        pipe(append(selectedHeat), uniq, without('none'))(selectedMarkersList)
+        pipe(append(selectedHeat), uniq, without(['none']))(selectedMarkersList)
       );
     } else {
       setVisibleMarkers(selectedMarkersList);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedMarkers]);
-
-  const handleOrganizationSelect = useCallback(() => {
-    setSelectedMarkers(prev => ({
-      ...prev,
-      [markerTypes.ORGANIZATIONS]: true
-    }));
-  }, []);
 
   const handleUpdateHeat = useCallback(newHeat => {
     setSelectedHeat(newHeat);
@@ -90,7 +93,7 @@ const HydratedMap = ({
         pipe(
           append(newHeat),
           uniq,
-          without('none')
+          without(['none'])
         )(selectedMarkersListRef.current)
       );
     }
@@ -110,16 +113,18 @@ const HydratedMap = ({
           pipe(
             append(selectedHeatRef.current),
             uniq,
-            without('none')
+            without(['none'])
           )(selectedMarkersListRef.current)
         );
         setVisibleHeat('none');
+        setIsMarkersMode(true);
         zoomState.current = ZOOM_STATE.MARKERS;
       }
     } else if (!isZoomingIn && currentZoom < MARKERS_LIMIT) {
       // When too far we want to switch back to the heatmap
       setVisibleHeat(selectedHeatRef.current);
       setVisibleMarkers(selectedMarkersListRef.current);
+      setIsMarkersMode(false);
       zoomState.current = ZOOM_STATE.HEAT;
     }
     prevZoom.current = currentZoom;
@@ -156,18 +161,24 @@ const HydratedMap = ({
   return (
     <>
       {HexGlobalCss}
-      <GeocodingControl onOrganizationSelect={handleOrganizationSelect} />
+      <GeocodingControl />
+      <MeasureControl />
       <DataControl
         updateHeatmap={handleUpdateHeat}
         selectedMarkers={selectedMarkers}
         setSelectedMarkers={setSelectedMarkers}
+        entranceFilters={ENTRANCE_MARKER_FILTERS}
+        activeEntranceFilters={activeEntranceFilters}
+        setActiveEntranceFilters={setActiveEntranceFilters}
+        isMarkersMode={isMarkersMode}
+        useLeafletControl
       />
       <ConverterControl projectionsList={projectionsList} />
       <Markers
         visibleMarkers={visibleMarkers}
         organizations={organizations}
         networks={networkMarkers}
-        entrances={entranceMarkers}
+        entrances={filteredEntranceMarkers}
       />
     </>
   );
