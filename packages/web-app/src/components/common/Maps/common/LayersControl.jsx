@@ -58,6 +58,7 @@ const createWMTSTileLayer = (layer, opacity = 1) => (
     maxNativeZoom={layer.maxNativeZoom ?? 22}
     bounds={layer.bounds ?? new L.LatLngBounds(new L.LatLng(-90, -180), new L.LatLng(90, 180))}
     opacity={opacity}
+    referrerPolicy={layer.referrerPolicy}
   />
 );
 
