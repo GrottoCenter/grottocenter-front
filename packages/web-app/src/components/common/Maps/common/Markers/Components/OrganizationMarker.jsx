@@ -23,7 +23,7 @@ const OrganizationIcon = () => (
 export const OrganizationMarker = L.divIcon({
   html: renderToString(<OrganizationIcon />),
   iconSize: [24, 24],
-  iconAnchor: [12, 24],
+  iconAnchor: [12, 12],
   className: ''
 });
 

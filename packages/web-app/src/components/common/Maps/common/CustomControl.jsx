@@ -17,7 +17,8 @@ const CustomControl = ({
   containerProps,
   children,
   style,
-  useLeafletControl = false
+  useLeafletControl = false,
+  containerClassName
 }) => {
   const controlRef = useRef(null);
   const map = useMap();
@@ -34,7 +35,7 @@ const CustomControl = ({
     if (!useLeafletControl || !map) return;
     const control = L.control({ position });
     control.onAdd = () => {
-      const div = L.DomUtil.create('div', 'leaflet-bar leaflet-control');
+      const div = L.DomUtil.create('div', containerClassName || 'leaflet-bar leaflet-control');
       L.DomEvent.disableClickPropagation(div);
       L.DomEvent.disableScrollPropagation(div);
       setContainer(div);
@@ -44,7 +45,7 @@ const CustomControl = ({
     return () => {
       control.remove();
     };
-  }, [map, position, useLeafletControl]);
+  }, [map, position, useLeafletControl, containerClassName]);
 
   if (useLeafletControl) {
     if (!container) return null;
@@ -65,7 +66,8 @@ export const customControlProps = {
   containerProps: PropTypes.any,
   children: PropTypes.node,
   style: PropTypes.object,
-  useLeafletControl: PropTypes.bool
+  useLeafletControl: PropTypes.bool,
+  containerClassName: PropTypes.string
 };
 
 CustomControl.propTypes = {

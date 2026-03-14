@@ -89,5 +89,5 @@ export const MAX_ORGANIZATION_LOGO_SIZE_IN_BYTES = 10485760; // in bytes (10MB)
 
 export const NOMINATIM_API_URL = 'https://nominatim.openstreetmap.org/search';
 
-export const AUTOCOMPLETE_DEBOUNCE_DELAY = 500; // in milliseconds
+export const AUTOCOMPLETE_DEBOUNCE_DELAY = 300; // in milliseconds
 export const AUTOCOMPLETE_MIN_CHARACTERS = 2;

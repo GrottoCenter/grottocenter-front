@@ -19,7 +19,7 @@ const NetworkIcon = () => (
 export const NetworkMarker = L.divIcon({
   html: renderToString(<NetworkIcon />),
   iconSize: [24, 24],
-  iconAnchor: [12, 24],
+  iconAnchor: [12, 12],
   className: ''
 });
 

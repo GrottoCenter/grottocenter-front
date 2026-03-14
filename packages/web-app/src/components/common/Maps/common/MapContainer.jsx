@@ -12,8 +12,9 @@ import FullscreenControl from './FullscreenControl';
 import LocateControl from './LocateControl';
 
 const Wrapper = styled('div', {
-  shouldForwardProp: (prop) => !prop.startsWith('$')
-})(({ theme, $wholePage }) => `
+  shouldForwardProp: prop => !prop.startsWith('$')
+})(
+  ({ theme, $wholePage }) => `
   width: 100%;
   height: 400px;
 
@@ -22,7 +23,16 @@ const Wrapper = styled('div', {
   }
 ${$wholePage && `height: calc(100vh - ${theme.appBarHeight}px); /* fallback for old browsers */`}
 ${$wholePage && `height: calc(100dvh - ${theme.appBarHeight}px);`}
-`);
+
+  .leaflet-control-layers-list label {
+    font-size: 14px;
+  }
+
+  .leaflet-top.leaflet-right {
+    z-index: 1001;
+  }
+`
+);
 
 // The Map, once mounted, doesn't change its center: this Centerer forces it
 // See https://github.com/PaulLeCam/react-leaflet/issues/796#issuecomment-743181396
@@ -96,7 +106,7 @@ const CustomMapContainer = ({
   const mapRefPropRef = useRef(mapRef);
   mapRefPropRef.current = mapRef;
 
-  const mapRefCallback = useCallback((map) => {
+  const mapRefCallback = useCallback(map => {
     if (mapRefPropRef.current) mapRefPropRef.current.current = map;
     if (!map || map === mapInstanceRef.current) return;
     mapInstanceRef.current = map;
@@ -152,7 +162,10 @@ const CustomMapContainer = ({
         ref={mapRefCallback}
         preferCanvas>
         {isFullscreenAllowed && shouldChangeControlInFullscreen && (
-          <FullscreenInteraction dragging={dragging} scrollWheelZoom={scrollWheelZoom} />
+          <FullscreenInteraction
+            dragging={dragging}
+            scrollWheelZoom={scrollWheelZoom}
+          />
         )}
         {isFullscreenAllowed && !shouldChangeControlInFullscreen && (
           <FullscreenControl forceSeparateButton="true" />
@@ -160,7 +173,7 @@ const CustomMapContainer = ({
         {forceCentering && <Centerer center={center} zoom={zoom} />}
         {isLocateControl && <LocateControl />}
         <ScaleControl position="bottomright" />
-        <LayersControl />
+        <LayersControl position="topright" />
         {children}
       </MapContainer>
     </Wrapper>
