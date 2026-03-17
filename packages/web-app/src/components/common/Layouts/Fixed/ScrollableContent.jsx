@@ -88,7 +88,8 @@ const AnchorCopyButton = ({ anchorId }) => {
   }, [copied]);
 
   return (
-    <Tooltip title={copied ? '' : formatMessage({ id: 'Copy link' })}>
+    <Tooltip
+      title={formatMessage({ id: copied ? 'Link copied!' : 'Copy link' })}>
       <MuiIconButton
         className="anchor-link"
         size="small"
