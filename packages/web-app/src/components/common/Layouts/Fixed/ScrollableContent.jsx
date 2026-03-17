@@ -118,6 +118,13 @@ const ScrollableContent = ({
   anchorId
 }) => {
   const { formatMessage } = useIntl();
+
+  useEffect(() => {
+    if (anchorId && window.location.hash.slice(1) === anchorId) {
+      document.getElementById(anchorId)?.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [anchorId]);
+
   return (
     <Card id={anchorId}>
       <CardHeader

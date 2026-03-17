@@ -20,7 +20,7 @@ import Documents from './Documents';
 import Histories from './Histories';
 import { deleteEntrance } from '../../../actions/Entrance/DeleteEntrance';
 import { restoreEntrance } from '../../../actions/Entrance/RestoreEntrance';
-import { usePermissions, useUserProperties, useScrollToHash } from '../../../hooks';
+import { usePermissions, useUserProperties } from '../../../hooks';
 import { linkCave } from '../../../actions/Cave/LinkCave';
 import { unlinkCave } from '../../../actions/Cave/UnlinkCave';
 import StandardDialog from '../../common/StandardDialog';
@@ -130,8 +130,6 @@ export const Entry = ({ isLoading, error, entrance }) => {
   };
 
   const isActionLoading = wantedDeletedState !== entrance?.isDeleted;
-
-  useScrollToHash(!!entrance);
 
   return (
     <div ref={componentRef}>
