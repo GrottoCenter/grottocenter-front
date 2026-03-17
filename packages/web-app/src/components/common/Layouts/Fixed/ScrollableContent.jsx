@@ -74,8 +74,8 @@ const AnchorCopyButton = ({ anchorId }) => {
 
   const handleClick = async e => {
     e.preventDefault();
-    const url = `${window.location.origin}${window.location.pathname}#${anchorId}`;
-    await copyToClipboard(url);
+    window.history.replaceState(null, '', `#${anchorId}`);
+    await copyToClipboard(window.location.href);
     setCopied(true);
   };
 
