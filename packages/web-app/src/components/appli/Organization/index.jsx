@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
 import { useIntl } from 'react-intl';
@@ -87,6 +87,10 @@ const Organization = ({ error, isLoading, organization }) => {
     setWantedDeletedState(false);
     dispatch(restoreOrganization({ id: organizationId }));
   };
+
+  const handleRefresh = useCallback(() => {
+    dispatch(fetchOrganization(organizationId));
+  }, [dispatch, organizationId]);
 
   const handleJoinLeave = async () => {
     if (!currentUserId) return;
@@ -279,7 +283,7 @@ const Organization = ({ error, isLoading, organization }) => {
                 entityId={organization.id}
                 isOrganization={true}
                 canManageCaves={canManageCaves}
-                onRefresh={() => dispatch(fetchOrganization(organizationId))}
+                onRefresh={handleRefresh}
                 isCaveSearchVisible={isCaveSearchVisible}
                 onToggleCaveSearch={setIsCaveSearchVisible}
               />

@@ -34,6 +34,7 @@ import { MassifTypes } from '../../../types/massif.type';
 const Massif = ({ isLoading, error, massif }) => {
   const dispatch = useDispatch();
   const { massifId } = useParams();
+  const massifIdInt = parseInt(massifId, 10);
   const navigate = useNavigate();
   const permissions = usePermissions();
   const { formatMessage } = useIntl();
@@ -139,7 +140,7 @@ const Massif = ({ isLoading, error, massif }) => {
               />
               {massif?.geogPolygon && (
                 <MapMassif
-                  massifId={parseInt(massifId, 10)}
+                  massifId={massifIdInt}
                   geogPolygon={massif?.geogPolygon}
                 />
               )}
@@ -181,7 +182,7 @@ const Massif = ({ isLoading, error, massif }) => {
             title={formatMessage({ id: 'More information' })}
             content={
               <StatisticsDataDashboard
-                massifId={parseInt(massifId, 10)}
+                massifId={massifIdInt}
                 hideTitle
               />
             }

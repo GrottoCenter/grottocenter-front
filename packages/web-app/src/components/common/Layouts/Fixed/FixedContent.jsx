@@ -42,7 +42,6 @@ const Card = styled(MuiCard)`
 const CardContent = styled(MuiCardContent)`
   flex-grow: 1;
   overflow-y: auto;
-  overflow-x: hidden;
   scroll-behavior: smooth;
 `;
 
@@ -52,20 +51,14 @@ const CardActions = styled(MuiCardActions)`
   align-items: flex-start;
 `;
 
-const Title = styled('div')`
-  display: flex;
-  justify-content: flex-start;
+const Title = styled('span')`
+  display: inline-flex;
+  align-items: center;
 `;
-const TitleIcon = styled('div')(
-  ({ theme }) => `
+const TitleIcon = styled('span')`
   margin-right: 6px;
-  margin-top: 4px;
-
-  ${theme.breakpoints.up('md')} {
-    margin-top: 8px;
-  }
-`
-);
+  display: inline-flex;
+`;
 const CardHeaderStyled = styled(CardHeader)`
   ${({ theme }) => theme.breakpoints.down('lg')} {
     flex-direction: column;

@@ -6,7 +6,7 @@ import { useEffect } from 'react';
  */
 export const useAnchorScroll = anchorId => {
   useEffect(() => {
-    if (!anchorId) return undefined;
+    if (!anchorId) return;
     const scrollIfMatch = () => {
       if (window.location.hash.slice(1) === anchorId)
         document.getElementById(anchorId)?.scrollIntoView({ behavior: 'smooth' });

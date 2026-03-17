@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import Skeleton from '@mui/material/Skeleton';
 import { useIntl } from 'react-intl';
@@ -52,6 +52,10 @@ const Person = ({
     canEdit = userId.toString() === person?.id?.toString();
   }
   const canUnsubscribe = canEdit || permissions.isAdmin;
+
+  const handleRefresh = useCallback(() => {
+    dispatch(fetchPerson(person.id));
+  }, [dispatch, person?.id]);
 
   const handleLeaveOrganization = async organizationId => {
     if (!person?.id) return;
@@ -196,7 +200,7 @@ const Person = ({
                 entityId={person.id}
                 isOrganization={false}
                 canManageCaves={canEdit}
-                onRefresh={() => dispatch(fetchPerson(person.id))}
+                onRefresh={handleRefresh}
                 isCaveSearchVisible={isCaveSearchVisible}
                 onToggleCaveSearch={setIsCaveSearchVisible}
               />

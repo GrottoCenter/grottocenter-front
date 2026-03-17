@@ -51,7 +51,7 @@ const SectionTitle = ({ title, anchorId, isDeleted = false, marginBotton = 2 }) 
           display: 'inline-block',
           fontWeight: 'normal'
         }}>
-        {title}&nbsp;
+        {heading}&nbsp;
       </Typography>
     </AnchorBox>
   );

@@ -94,6 +94,8 @@ export const MassifForm = ({ massifValues }) => {
       dispatch(
         postMassif({
           name: data.massif.name,
+          description: data.massif.descriptionBody,
+          descriptionTitle: data.massif.descriptionTitle,
           descriptionAndNameLanguage: { id: data.massif.language },
           geogPolygon: data.massif.geogPolygon
         })
