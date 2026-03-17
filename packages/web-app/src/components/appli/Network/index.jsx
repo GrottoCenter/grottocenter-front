@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import Skeleton from '@mui/material/Skeleton';
 import { Box, Card } from '@mui/material';
 
-import { usePermissions, useUserProperties } from '../../../hooks';
+import { usePermissions, useUserProperties, useScrollToHash } from '../../../hooks';
 import { linkCave } from '../../../actions/Cave/LinkCave';
 import { unlinkCave } from '../../../actions/Cave/UnlinkCave';
 import FixedLayout from '../../common/Layouts/Fixed';
@@ -108,6 +108,8 @@ export const Network = ({ isLoading, error, cave }) => {
   };
 
   const isActionLoading = wantedDeletedState !== cave?.isDeleted;
+
+  useScrollToHash(!!cave);
 
   return (
     <div ref={componentRef}>
