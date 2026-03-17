@@ -10,6 +10,7 @@ const StyledBox = styled(Box)`
   display: flex;
   justify-content: center;
   flex-wrap: wrap;
+  gap: ${({ theme }) => theme.spacing(2)};
 `;
 
 const SpecificsCaves = ({ maxDepthCave, maxLengthCave, parentEntity }) => {
@@ -19,6 +20,7 @@ const SpecificsCaves = ({ maxDepthCave, maxLengthCave, parentEntity }) => {
   return (
     <ScrollableContent
       dense
+      subTitle
       title={formatMessage({ id: 'Specifics caves' })}
       content={
         <StyledBox>

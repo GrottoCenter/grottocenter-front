@@ -39,6 +39,7 @@ const Documents = ({ documents, entranceId, isEditAllowed }) => {
   return (
     <ScrollableContent
       dense
+      anchorId="documents"
       title={formatMessage({ id: 'Documents' })}
       icon={
         permissions.isAuth &&

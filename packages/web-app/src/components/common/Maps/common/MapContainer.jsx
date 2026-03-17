@@ -18,9 +18,6 @@ const Wrapper = styled('div', {
   width: 100%;
   height: 400px;
 
-  ${theme.breakpoints.up('md')} {
-    ${!$wholePage && `margin-right: ${theme.spacing(2)};`}
-  }
 ${$wholePage && `height: calc(100vh - ${theme.appBarHeight}px); /* fallback for old browsers */`}
 ${$wholePage && `height: calc(100dvh - ${theme.appBarHeight}px);`}
 

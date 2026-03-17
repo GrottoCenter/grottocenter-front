@@ -43,6 +43,7 @@ const Riggings = ({ riggings, entranceId, isEditAllowed }) => {
   return (
     <ScrollableContent
       dense
+      anchorId="rigging"
       title={formatMessage({ id: 'Riggings' })}
       icon={
         permissions.isAuth &&

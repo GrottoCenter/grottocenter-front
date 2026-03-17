@@ -106,6 +106,7 @@ const Description = ({
           primary={
             <SectionTitle
               title={description.title}
+              anchorId={`description-${description.id}`}
               isDeleted={description.isDeleted}
             />
           }

@@ -5,8 +5,6 @@ import { useIntl } from 'react-intl';
 
 import { postMassif } from '../../../../actions/Massif/CreateMassif';
 import { updateMassif } from '../../../../actions/Massif/UpdateMassif';
-import { updateDescription } from '../../../../actions/Description/UpdateDescription';
-import { postDescription } from '../../../../actions/Description/CreateDescription';
 import { updateName } from '../../../../actions/Name';
 import { FormContainer, FormActionRow } from '../utils/FormContainers';
 import LicenseBox from '../utils/LicenseBox';
@@ -18,7 +16,6 @@ import MassifFields from './MassifFields';
 const defaultMassifValues = {
   name: '',
   language: '',
-  descriptionId: null,
   descriptionTitle: '',
   descriptionBody: '',
   geogPolygon: null
@@ -27,7 +24,6 @@ const defaultMassifValues = {
 export const MassifForm = ({ massifValues }) => {
   const { formatMessage } = useIntl();
   const isNewMassif = !massifValues;
-  const isNewDescription = massifValues?.descriptions?.length === 0 ?? true;
 
   const {
     error: massifError,
@@ -42,11 +38,6 @@ export const MassifForm = ({ massifValues }) => {
 
   const { locale, AVAILABLE_LANGUAGES } = useSelector(state => state.intl);
   defaultMassifValues.language = AVAILABLE_LANGUAGES[locale].id;
-
-  const { error: descriptionError, isLoading: descriptionLoading } =
-    useSelector(state =>
-      isNewDescription ? state.createDescription : state.updateDescription
-    );
 
   const dispatch = useDispatch();
 
@@ -67,9 +58,6 @@ export const MassifForm = ({ massifValues }) => {
             nameId: massifValues.names[0]?.id,
             name: massifValues.names[0]?.name,
             language: massifValues.language,
-            descriptionId: massifValues.descriptions[0]?.id,
-            descriptionTitle: massifValues.descriptions[0]?.title,
-            descriptionBody: massifValues.descriptions[0]?.body,
             geogPolygon: massifValues.geogPolygon
           }
         : defaultMassifValues
@@ -81,7 +69,6 @@ export const MassifForm = ({ massifValues }) => {
   }, [reset]);
 
   const handleFormSubmit = e => {
-    // Check if polygon is being edited before form submission
     const editingElements = document.querySelectorAll('.leaflet-editing-icon');
     const visibleEditingElements = Array.from(editingElements).filter(
       el => el.offsetParent !== null && getComputedStyle(el).display !== 'none'
@@ -123,30 +110,6 @@ export const MassifForm = ({ massifValues }) => {
         );
       }
 
-      if (
-        data.massif.descriptionBody !== massifValues.descriptionBody ||
-        data.massif.descriptionTitle !== massifValues.descriptionTitle
-      ) {
-        if (isNewDescription) {
-          dispatch(
-            postDescription({
-              body: data.massif.descriptionBody,
-              language: data.massif.language,
-              title: data.massif.descriptionTitle,
-              massif: massifValues.id
-            })
-          );
-        } else {
-          dispatch(
-            updateDescription({
-              id: data.massif.descriptionId,
-              body: data.massif.descriptionBody,
-              title: data.massif.descriptionTitle
-            })
-          );
-        }
-      }
-
       const body = { id: massifValues.id };
       if (JSON.stringify(data.massif.geogPolygon) !== JSON.stringify(geoJson)) {
         body.geogPolygon = data.massif.geogPolygon;
@@ -159,15 +122,13 @@ export const MassifForm = ({ massifValues }) => {
     return (
       <FormProgressInfo
         isLoading={
-          (massifLoading || nameLoading || descriptionLoading) &&
-          !(massifError || nameError || descriptionError)
+          (massifLoading || nameLoading) && !(massifError || nameError)
         }
-        isError={!!(massifError || nameError || descriptionError)}
+        isError={!!(massifError || nameError)}
         labelLoading={isNewMassif ? 'Creating massif...' : 'Updating massif...'}
         labelError={
           massifError?.message ||
           nameError?.message ||
-          descriptionError?.message ||
           (isNewMassif
             ? 'An error occurred when creating a massif.'
             : 'An error occurred when updating a massif.')
@@ -184,8 +145,8 @@ export const MassifForm = ({ massifValues }) => {
         <MassifFields
           control={control}
           errors={errors}
-          isNewDescription={isNewDescription}
           geoJson={geoJson}
+          isNew={isNewMassif}
         />
         <FormActionRow
           isDirty={isDirty}

@@ -106,6 +106,7 @@ const Location = ({
           primary={
             <SectionTitle
               title={location.title}
+              anchorId={`location-${location.id}`}
               isDeleted={location.isDeleted}
             />
           }

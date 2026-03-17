@@ -28,6 +28,7 @@ const EntrancesList = ({ isLoading, entrances, selectedEntrancesId }) => {
 
   return (
     <ScrollableContent
+      anchorId="entrances"
       title={formatMessage({ id: 'Entrances' })}
       content={
         <List dense>

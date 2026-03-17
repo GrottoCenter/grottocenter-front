@@ -21,7 +21,8 @@ const Descriptions = ({
   entityType,
   entityId,
   descriptions,
-  isEditAllowed = true
+  isEditAllowed = true,
+  isAddAllowed = true
 }) => {
   const { formatMessage } = useIntl();
   const permissions = usePermissions();
@@ -46,10 +47,12 @@ const Descriptions = ({
   return (
     <ScrollableContent
       dense
+      anchorId="description"
       title={formatMessage({ id: 'Description' })}
       icon={
         permissions.isAuth &&
-        isEditAllowed && (
+        isEditAllowed &&
+        isAddAllowed && (
           <Tooltip
             title={
               isFormVisible
@@ -117,7 +120,8 @@ Descriptions.propTypes = {
   entityType: PropTypes.oneOf(['entrance', 'cave', 'massif']),
   entityId: PropTypes.number.isRequired,
   descriptions: PropTypes.arrayOf(DescriptionPropTypes),
-  isEditAllowed: PropTypes.bool
+  isEditAllowed: PropTypes.bool,
+  isAddAllowed: PropTypes.bool
 };
 
 export default Descriptions;

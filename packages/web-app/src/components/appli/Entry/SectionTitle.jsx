@@ -1,19 +1,37 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import { Typography, Box } from '@mui/material';
+import { styled } from '@mui/material/styles';
 import { useIntl } from 'react-intl';
+import AnchorCopyButton, { AnchorHeadingWrapper } from '../../common/AnchorCopyButton';
+import { useAnchorScroll } from '../../../hooks';
 
-const SectionTitle = ({ title, isDeleted = false, marginBotton = 2 }) => {
+const AnchorBox = styled(Box)`
+  scroll-margin-top: ${({ theme }) => theme.appBarHeight}px;
+`;
+
+const SectionTitle = ({ title, anchorId, isDeleted = false, marginBotton = 2 }) => {
   const { formatMessage } = useIntl();
+  useAnchorScroll(anchorId);
+
+  const heading = anchorId ? (
+    <AnchorHeadingWrapper>
+      {title}
+      <AnchorCopyButton anchorId={anchorId} />
+    </AnchorHeadingWrapper>
+  ) : (
+    title
+  );
 
   if (!isDeleted)
     return (
-      <Box mb={marginBotton}>
-        <Typography variant="h4">{title}&nbsp;</Typography>
-      </Box>
+      <AnchorBox id={anchorId} mb={marginBotton}>
+        <Typography variant="h4">{heading}&nbsp;</Typography>
+      </AnchorBox>
     );
+
   return (
-    <Box mb={2}>
+    <AnchorBox id={anchorId} mb={2}>
       <Typography
         variant="h4"
         noWrap
@@ -33,9 +51,9 @@ const SectionTitle = ({ title, isDeleted = false, marginBotton = 2 }) => {
           display: 'inline-block',
           fontWeight: 'normal'
         }}>
-        {title}&nbsp;
+        {heading}&nbsp;
       </Typography>
-    </Box>
+    </AnchorBox>
   );
 };
 
@@ -43,6 +61,7 @@ export default SectionTitle;
 
 SectionTitle.propTypes = {
   title: PropTypes.string.isRequired,
+  anchorId: PropTypes.string,
   isDeleted: PropTypes.bool,
   marginBotton: PropTypes.number
 };

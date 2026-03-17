@@ -55,12 +55,17 @@ HighligtedTableCell.propTypes = {
   oldData: PropTypes.string
 };
 
-const RiggingTable = ({ obstacles, title, previous, isDeleted }) => {
+const RiggingTable = ({ id, obstacles, title, previous, isDeleted }) => {
   const { formatMessage } = useIntl();
   const previousObstacles = previous?.obstacles;
 
   const titleEl = (
-    <SectionTitle title={title} isDeleted={isDeleted} marginBotton={3} />
+    <SectionTitle
+      title={title}
+      anchorId={`rigging-${id}`}
+      isDeleted={isDeleted}
+      marginBotton={3}
+    />
   );
 
   if (isNil(obstacles[0]) || isNil(obstacles[0].obstacle)) {
@@ -124,6 +129,7 @@ const RiggingTable = ({ obstacles, title, previous, isDeleted }) => {
 };
 
 RiggingTable.propTypes = {
+  id: PropTypes.number.isRequired,
   obstacles: PropTypes.arrayOf(ObstaclePropTypes),
   previous: PropTypes.arrayOf(ObstaclePropTypes),
   title: PropTypes.string.isRequired,

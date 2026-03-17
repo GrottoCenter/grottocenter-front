@@ -7,3 +7,5 @@ export { usePermissions } from './usePermissions';
 export { useSubscriptions } from './useSubscriptions';
 export { useUserProperties } from './useUserProperties';
 export { useMoveRelevanceWithUndo } from './useMoveRelevanceWithUndo';
+export { useAnchorScroll } from './useAnchorScroll';
+export { useScrollToHashOnLoad } from './useScrollToHashOnLoad';

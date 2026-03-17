@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React from 'react';
 import { styled } from '@mui/material/styles';
 import PropTypes from 'prop-types';
 
@@ -42,9 +42,8 @@ const ScrollableWrapper = styled('div')`
 `;
 
 const Layout = ({ children, fixedContent }) => {
-  const componentRef = useRef();
   return (
-    <Wrapper ref={componentRef} isFixedContent={!!fixedContent}>
+    <Wrapper isFixedContent={!!fixedContent}>
       {fixedContent && <FixedWrapper>{fixedContent}</FixedWrapper>}
       <ScrollableWrapper>{children}</ScrollableWrapper>
     </Wrapper>

@@ -31,7 +31,8 @@ const mockPermissions = {
   isTokenExpired: false
 };
 jest.mock('../../../../hooks', () => ({
-  usePermissions: () => mockPermissions
+  usePermissions: () => mockPermissions,
+  useAnchorScroll: () => {}
 }));
 
 jest.mock('../../../../actions/Location/CreateLocation', () => ({

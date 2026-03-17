@@ -7,9 +7,9 @@ import { useSelector } from 'react-redux';
 const StyledBox = styled(Box)`
   padding: 15px;
   border-radius: 20px;
-  margin: 0 20px;
   margin-bottom: 5px;
   cursor: pointer;
+  flex: 1 1 250px;
 `;
 
 const BoldTypography = styled(Typography)`
