@@ -20,6 +20,7 @@ import LinkIcon from '@mui/icons-material/Link';
 const Card = styled(MuiCard)`
   overflow: inherit;
   margin: ${({ theme }) => theme.spacing(2)};
+  scroll-margin-top: ${({ theme }) => theme.appBarHeight}px;
 `;
 
 const IconButton = styled(MuiIconButton)`
@@ -93,7 +94,11 @@ const AnchorCopyButton = ({ anchorId }) => {
         size="small"
         aria-label={formatMessage({ id: 'Copy link' })}
         onClick={handleClick}>
-        {copied ? <CheckIcon fontSize="inherit" /> : <LinkIcon fontSize="inherit" />}
+        {copied ? (
+          <CheckIcon fontSize="inherit" />
+        ) : (
+          <LinkIcon fontSize="inherit" />
+        )}
       </MuiIconButton>
     </Tooltip>
   );
@@ -114,12 +119,12 @@ const ScrollableContent = ({
 }) => {
   const { formatMessage } = useIntl();
   return (
-    <Card>
+    <Card id={anchorId}>
       <CardHeader
         $dense={dense ? 1 : 0}
         title={
           <Title>
-            <Typography variant="h2" color="secondary" id={anchorId}>
+            <Typography variant="h2" color="secondary">
               {anchorId ? (
                 <HeadingWrapper>
                   {title}
