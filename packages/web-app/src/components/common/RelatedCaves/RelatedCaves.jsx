@@ -2,9 +2,7 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import { useDispatch } from 'react-redux';
-import { Button, Tooltip, Divider, Typography } from '@mui/material';
-import AddCircleIcon from '@mui/icons-material/AddCircle';
-import CancelIcon from '@mui/icons-material/Cancel';
+import { Divider } from '@mui/material';
 import { styled } from '@mui/material/styles';
 
 import EntitiesList from '../entitiesList/EntitiesList';
@@ -17,13 +15,12 @@ import { unlinkCave } from '../../../actions/Cave/UnlinkCave';
 import { getEntranceUrl } from '../../../conf/apiRoutes';
 
 const DividerStyled = styled(Divider)`
-  background-color: ${props => props.theme.palette.divider}; 
+  background-color: ${props => props.theme.palette.divider};
 `;
 
-const RelatedCaves = ({ exploredEntrances, exploredNetworks, entityId, isOrganization, canManageCaves, onRefresh }) => {
+const RelatedCaves = ({ exploredEntrances, exploredNetworks, entityId, isOrganization, canManageCaves, onRefresh, isCaveSearchVisible, onToggleCaveSearch }) => {
   const { formatMessage } = useIntl();
   const dispatch = useDispatch();
-  const [isCaveSearchVisible, setIsCaveSearchVisible] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
 
   const fetchCaveIdFromEntrance = async entranceId => {
@@ -39,7 +36,7 @@ const RelatedCaves = ({ exploredEntrances, exploredNetworks, entityId, isOrganiz
     } catch (error) {
       console.error('Error unlinking cave:', error);
     }
-  }
+  };
 
   const handleUnlinkEntrance = async entranceId => {
     try {
@@ -53,14 +50,14 @@ const RelatedCaves = ({ exploredEntrances, exploredNetworks, entityId, isOrganiz
   };
 
   const onSubmitForm = async selectedEntrances => {
-    setIsCaveSearchVisible(false);
+    onToggleCaveSearch(false);
     setIsAdding(true);
-    
+
     try {
       for (const entrance of selectedEntrances) {
         const entranceId = entrance.id || entrance['@id'];
         const caveId = await fetchCaveIdFromEntrance(entranceId);
-        
+
         if (caveId) {
           try {
             await dispatch(linkCave(caveId, entityId, isOrganization));
@@ -81,7 +78,7 @@ const RelatedCaves = ({ exploredEntrances, exploredNetworks, entityId, isOrganiz
     }
   };
 
-  const toolTipTitle = formatMessage({ id:  isOrganization ? 'Remove from organization' : 'Remove from my explored caves'});
+  const toolTipTitle = formatMessage({ id: isOrganization ? 'Remove from organization' : 'Remove from my explored caves' });
 
   return (
     <>
@@ -95,34 +92,6 @@ const RelatedCaves = ({ exploredEntrances, exploredNetworks, entityId, isOrganiz
         <Alert severity="info" title={formatMessage({ id: 'Loading ...' })} />
       ) : (
         <>
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center'
-            }}>
-            <Typography variant="h3" gutterBottom>
-              {formatMessage({ id: 'Explored caves' })}
-            </Typography>
-            {canManageCaves && (
-              <Tooltip
-                title={
-                  isCaveSearchVisible
-                    ? formatMessage({ id: 'Cancel this search' })
-                    : formatMessage({ id: 'Add a cave' })
-                }>
-                <Button
-                  color={isCaveSearchVisible ? 'inherit' : 'secondary'}
-                  variant="outlined"
-                  onClick={() => setIsCaveSearchVisible(!isCaveSearchVisible)}
-                  startIcon={isCaveSearchVisible ? <CancelIcon /> : <AddCircleIcon />}>
-                  {formatMessage({
-                    id: isCaveSearchVisible ? 'Cancel' : 'Add'
-                  })}
-                </Button>
-              </Tooltip>
-            )}
-          </div>
           {exploredNetworks.length === 0 && exploredEntrances.length === 0 ? (
             <Alert severity="info" title={formatMessage({ id: 'No explored caves found.' })} />
           ) : (
@@ -153,7 +122,9 @@ RelatedCaves.propTypes = {
   entityId: PropTypes.number.isRequired,
   isOrganization: PropTypes.bool.isRequired,
   canManageCaves: PropTypes.bool.isRequired,
-  onRefresh: PropTypes.func.isRequired
+  onRefresh: PropTypes.func.isRequired,
+  isCaveSearchVisible: PropTypes.bool.isRequired,
+  onToggleCaveSearch: PropTypes.func.isRequired
 };
 
 export default RelatedCaves;
