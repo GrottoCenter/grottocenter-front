@@ -18,7 +18,8 @@ const StyledBadge = styled(Badge)`
 const StyledBox = styled(Box)`
   display: flex;
   justify-content: space-around;
-  flexwrap: wrap;
+  flex-wrap: wrap;
+  gap: ${({ theme }) => theme.spacing(2)};
 `;
 
 const styledImg = { width: '100%', height: 'auto' };
@@ -33,6 +34,7 @@ const CavesStatistics = ({ avgDepth, avgLength, totalLength }) => {
   return (
     <ScrollableContent
       dense
+      subTitle
       title={formatMessage({ id: 'Caves statistics' })}
       content={
         <StyledBox>

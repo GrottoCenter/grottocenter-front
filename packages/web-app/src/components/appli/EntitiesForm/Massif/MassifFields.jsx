@@ -10,7 +10,7 @@ import { FormRow, FormSectionLabel } from '../utils/FormContainers';
 
 const PolygonMap = React.lazy(() => import('./PolygonMap'));
 
-const MassifFields = ({ control, errors, geoJson }) => {
+const MassifFields = ({ control, errors, geoJson, isNew }) => {
   const { formatMessage } = useIntl();
   return (
     <>
@@ -31,24 +31,28 @@ const MassifFields = ({ control, errors, geoJson }) => {
         />
       </FormRow>
 
-      <FormSectionLabel
-        label={formatMessage({ id: 'Description of the massif' })}
-      />
-      <InputText
-        formKey="massif.descriptionTitle"
-        labelName="Title"
-        control={control}
-        isError={!!errors?.massif?.descriptionTitle}
-        isRequired
-      />
-      <InputText
-        formKey="massif.descriptionBody"
-        labelName="Description"
-        control={control}
-        isError={!!errors?.massif?.description}
-        isRequired
-        minRows={6}
-      />
+      {isNew && (
+        <>
+          <FormSectionLabel
+            label={formatMessage({ id: 'Description of the massif' })}
+          />
+          <InputText
+            formKey="massif.descriptionTitle"
+            labelName="Title"
+            control={control}
+            isError={!!errors?.massif?.descriptionTitle}
+            isRequired
+          />
+          <InputText
+            formKey="massif.descriptionBody"
+            labelName="Description"
+            control={control}
+            isError={!!errors?.massif?.description}
+            isRequired
+            minRows={6}
+          />
+        </>
+      )}
 
       <FormSectionLabel label={formatMessage({ id: 'Massif area' })} />
       <FormHelperText>
@@ -77,18 +81,18 @@ const MassifFields = ({ control, errors, geoJson }) => {
     </>
   );
 };
+
 MassifFields.propTypes = {
   control: PropTypes.shape({}),
   errors: PropTypes.shape({
     massif: PropTypes.shape({
-      description: PropTypes.arrayOf(PropTypes.shape({})),
-      descriptionTitle: PropTypes.arrayOf(PropTypes.shape({})),
       language: PropTypes.shape({ message: PropTypes.string }),
       name: PropTypes.shape({ message: PropTypes.string }),
       geoJson: PropTypes.shape({})
     })
   }),
-  geoJson: PropTypes.shape({})
+  geoJson: PropTypes.shape({}),
+  isNew: PropTypes.bool
 };
 
 export default MassifFields;

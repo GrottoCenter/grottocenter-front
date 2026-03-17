@@ -5,7 +5,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 
 import { useDispatch } from 'react-redux';
 import Skeleton from '@mui/material/Skeleton';
-import { Box } from '@mui/material';
+import { Box, Card } from '@mui/material';
 import { useIntl } from 'react-intl';
 
 import { usePermissions, useSubscriptions } from '../../../hooks';
@@ -13,13 +13,16 @@ import { subscribeToMassif } from '../../../actions/Subscriptions/SubscribeToMas
 import { unsubscribeFromMassif } from '../../../actions/Subscriptions/UnsubscribeFromMassif';
 import { deleteMassif } from '../../../actions/Massif/DeleteMassif';
 import { restoreMassif } from '../../../actions/Massif/RestoreMassif';
+import FixedLayout from '../../common/Layouts/Fixed';
 import FixedContent from '../../common/Layouts/Fixed/FixedContent';
+import ScrollableContent from '../../common/Layouts/Fixed/ScrollableContent';
 import EntitiesList from '../../common/entitiesList/EntitiesList';
 import Alert from '../../common/Alert';
 import MapMassif from './MapMassif';
 import Documents from './Documents';
-import Descriptions from './Descriptions';
+import Descriptions from '../Descriptions';
 import StatisticsDataDashboard from '../StatisticsDataDashboard';
+import CustomIcon from '../../common/CustomIcon';
 import {
   DeletedCard,
   DeleteConfirmationDialog,
@@ -92,46 +95,25 @@ const Massif = ({ isLoading, error, massif }) => {
   }
 
   return (
-    <FixedContent
-      onEdit={!error ? onEdit : null}
-      onDelete={!error ? onDelete : null}
-      isSubscribed={!error ? isSubscribed : null}
-      isSubscribeLoading={isSubscribeLoading}
-      onChangeSubscribe={
-        !error && permissions.isLeader && !massif?.isDeleted
-          ? handleChangeSubscribe
-          : undefined
-      }
-      title={isLoading ? <Skeleton /> : title}
-      subheader={
-        isLoading ? (
-          <Skeleton />
-        ) : (
-          massif?.names &&
-          `${formatMessage({ id: 'Language' })} : ${massif?.names[0].language}`
-        )
-      }
-      content={
-        <>
-          {isLoading && (
-            <>
-              <Box style={{ display: 'flex', justifyContent: 'center' }}>
-                <Skeleton height={300} width={800} /> {/* Map Skeleton */}
-              </Box>
-              <Skeleton height={100} /> {/* Documents Skeleton */}
-              <Skeleton height={100} /> {/* EntranceList Skeleton */}
-              <Skeleton height={100} /> {/* CavesList Skeleton */}
-            </>
-          )}
-          {error && (
-            <Alert
-              title={formatMessage({
-                id: 'Error, the massif data you are looking for is not available.'
-              })}
-              severity="error"
-            />
-          )}
-          {massif && (
+    <FixedLayout>
+      {massif && (
+        <FixedContent
+          icon={<CustomIcon type="massif" />}
+          onEdit={!error ? onEdit : null}
+          onDelete={!error ? onDelete : null}
+          isSubscribed={!error ? isSubscribed : null}
+          isSubscribeLoading={isSubscribeLoading}
+          onChangeSubscribe={
+            !error && permissions.isLeader && !massif?.isDeleted
+              ? handleChangeSubscribe
+              : undefined
+          }
+          title={isLoading ? <Skeleton /> : title}
+          subheader={
+            massif?.names &&
+            `${formatMessage({ id: 'Language' })} : ${massif?.names[0].language}`
+          }
+          content={
             <>
               {massif.isDeleted && (
                 <DeletedCard
@@ -155,50 +137,74 @@ const Massif = ({ isLoading, error, massif }) => {
                   onDeletePress(entity?.id, isDeleteConfirmationPermanent);
                 }}
               />
-
-              <Box
-                alignItems="start"
-                display="flex"
-                flexBasis="300px"
-                justifyContent="space-between">
-                {massif?.descriptions?.length > 0 ? (
-                  <Descriptions descriptions={massif.descriptions} />
-                ) : (
-                  <Alert
-                    severity="info"
-                    title={formatMessage({
-                      id: 'This massif has no descriptions listed yet.'
-                    })}
-                  />
-                )}
-              </Box>
               {massif?.geogPolygon && (
-                <>
-                  <hr />
-                  <MapMassif
-                    massifId={parseInt(massifId, 10)}
-                    geogPolygon={massif?.geogPolygon}
-                  />
-                </>
+                <MapMassif
+                  massifId={parseInt(massifId, 10)}
+                  geogPolygon={massif?.geogPolygon}
+                />
               )}
-              <hr />
-              <StatisticsDataDashboard massifId={parseInt(massifId, 10)} />
-              <hr />
-              <Documents
-                documents={massif?.documents ?? []}
-                massifId={massifId}
-              />
-              <hr />
-              <EntitiesList
-                type="cave"
-                entites={massif?.networks ?? []}
-                title={formatMessage({ id: 'Networks list' })}
-              />
             </>
+          }
+        />
+      )}
+      {isLoading && (
+        <Card sx={{ padding: 3 }}>
+          <Box style={{ display: 'flex', justifyContent: 'center' }}>
+            <Skeleton height={300} width={800} />
+          </Box>
+          <Skeleton height={100} />
+          <Skeleton height={100} />
+          <Skeleton height={100} />
+        </Card>
+      )}
+      {error && (
+        <Card sx={{ padding: 3 }}>
+          <Alert
+            title={formatMessage({
+              id: 'Error, the massif data you are looking for is not available.'
+            })}
+            severity="error"
+          />
+        </Card>
+      )}
+      {massif && (
+        <>
+          <Descriptions
+            descriptions={massif.descriptions ?? []}
+            entityType="massif"
+            entityId={massif.id}
+            isEditAllowed={!massif.isDeleted}
+            isAddAllowed={!massif.descriptions?.length}
+          />
+          <ScrollableContent
+            anchorId="statistics"
+            title={formatMessage({ id: 'More information' })}
+            content={
+              <StatisticsDataDashboard
+                massifId={parseInt(massifId, 10)}
+                hideTitle
+              />
+            }
+          />
+          <Documents
+            documents={massif?.documents ?? []}
+            massifId={massifId}
+          />
+          {massif?.networks?.length > 0 && (
+            <ScrollableContent
+              anchorId="networks"
+              title={formatMessage({ id: 'Networks list' })}
+              content={
+                <EntitiesList
+                  type="cave"
+                  entites={massif.networks}
+                />
+              }
+            />
           )}
         </>
-      }
-    />
+      )}
+    </FixedLayout>
   );
 };
 

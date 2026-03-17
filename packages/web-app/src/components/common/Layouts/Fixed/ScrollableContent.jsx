@@ -52,6 +52,7 @@ const ScrollableContent = ({
   content,
   footer,
   dense = false,
+  subTitle = false,
   anchorId
 }) => {
   const { formatMessage } = useIntl();
@@ -63,7 +64,9 @@ const ScrollableContent = ({
         $dense={dense ? 1 : 0}
         title={
           <Title>
-            <Typography variant="h2" color="secondary">
+            <Typography
+              variant={subTitle ? 'h3' : 'h2'}
+              color={subTitle ? 'textPrimary' : 'secondary'}>
               {anchorId ? (
                 <AnchorHeadingWrapper>
                   {title}
@@ -101,6 +104,7 @@ ScrollableContent.propTypes = {
   content: PropTypes.node.isRequired,
   footer: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
   dense: PropTypes.bool,
+  subTitle: PropTypes.bool,
   anchorId: PropTypes.string
 };
 

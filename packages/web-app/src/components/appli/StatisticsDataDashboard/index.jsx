@@ -25,19 +25,20 @@ const TitleBox = styled(Box)`
   color: #ffffff;
   padding: 15px 30px;
   margin-bottom: 20px;
+  display: flex;
+  align-items: center;
 `;
 
 const DataBox = styled(Box)`
-  margin: 0 2%;
   margin-top: 30px;
 `;
 
 const DashboardBox = styled(Box)`
   background-color: ${({ theme }) => theme.palette.backgroundColor};
-  margin: 10px 5%;
+  margin: 10px 0;
 `;
 
-const StatisticsDataDashboard = ({ countryId, massifId, regionId }) => {
+const StatisticsDataDashboard = ({ countryId, massifId, regionId, hideTitle = false }) => {
   const dispatch = useDispatch();
   const { formatMessage } = useIntl();
 
@@ -93,9 +94,11 @@ const StatisticsDataDashboard = ({ countryId, massifId, regionId }) => {
 
   return (
     <>
-      <Typography variant="h3" gutterBottom>
-        {formatMessage({ id: 'More information' })}
-      </Typography>
+      {!hideTitle && (
+        <Typography variant="h3" gutterBottom>
+          {formatMessage({ id: 'More information' })}
+        </Typography>
+      )}
       {(loadingCountry || loadingMassif || loadingRegion) && (
         <Box
           style={{
@@ -103,21 +106,14 @@ const StatisticsDataDashboard = ({ countryId, massifId, regionId }) => {
             justifyContent: 'center',
             marginTop: '-50px'
           }}>
-          <Skeleton height={300} width={1000} /> {/* Map Skeleton */}
+          <Skeleton height={300} width="100%" /> {/* Map Skeleton */}
         </Box>
       )}
       {data && data.nb_caves > 0 && !errorMassif && !errorCountry && !errorRegion && (
         <DashboardBox>
           <>
             <TitleBox boxShadow="1" border="1">
-              <AssessmentIcon
-                fontSize="large"
-                style={{
-                  width: '40px',
-                  display: 'inline-flex',
-                  verticalAlign: 'middle'
-                }}
-              />
+              <AssessmentIcon fontSize="large" />
               {/* Main Title */}
               <Title variant="h4">
                 {(() => {
@@ -217,7 +213,8 @@ const StatisticsDataDashboard = ({ countryId, massifId, regionId }) => {
 StatisticsDataDashboard.propTypes = {
   countryId: PropTypes.string,
   massifId: PropTypes.number,
-  regionId: PropTypes.string
+  regionId: PropTypes.string,
+  hideTitle: PropTypes.bool
 };
 
 export default StatisticsDataDashboard;

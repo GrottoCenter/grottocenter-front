@@ -11,7 +11,6 @@ const StyledIcon = styled(Box)`
 
 const StyledLine = styled(Box)`
   display: flex;
-  margin: 0px 40px;
 `;
 
 const StyledText = styled(Typography)`

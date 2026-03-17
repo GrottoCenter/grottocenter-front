@@ -15,7 +15,7 @@ import {
 const styledImg = { width: '100%', height: 'auto' };
 
 const StyledDivider = () => (
-  <Box style={{ margin: '-20px  40px' }}>
+  <Box style={{ margin: '-20px 0' }}>
     <hr />
   </Box>
 );
@@ -34,6 +34,7 @@ const CavesData = ({
   return (
     <ScrollableContent
       dense
+      subTitle
       title={title}
       content={
         <>
@@ -102,8 +103,7 @@ const CavesData = ({
           <Box
             display="flex"
             justifyContent="flex-end"
-            alignItems="flex-end"
-            marginRight="40px">
+            alignItems="flex-end">
             <Link style={{ color: theme.palette.secondary.main }} to={url}>
               <Typography fontSize="small">
                 {formatMessage({ id: 'Access entrances list' })}
