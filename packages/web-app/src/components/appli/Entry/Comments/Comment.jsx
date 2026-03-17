@@ -133,6 +133,7 @@ const Comment = ({ comment, isEditAllowed, isMoving, onMoveUp, onMoveDown, isFir
             primary={
               <SectionTitle
                 title={comment.title}
+                anchorId={`comment-${comment.id}`}
                 isDeleted={comment.isDeleted}
               />
             }

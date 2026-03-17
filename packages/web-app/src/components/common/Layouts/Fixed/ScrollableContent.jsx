@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { useIntl } from 'react-intl';
 import { styled } from '@mui/material/styles';
 import { isNil } from 'ramda';
@@ -9,13 +9,11 @@ import {
   CardContent,
   CardHeader as MuiCardHeader,
   IconButton as MuiIconButton,
-  Tooltip,
   Typography
 } from '@mui/material';
 import CreateIcon from '@mui/icons-material/Create';
-import copyToClipboard from '../../../../helpers/clipboard';
-import CheckIcon from '@mui/icons-material/Check';
-import LinkIcon from '@mui/icons-material/Link';
+import AnchorCopyButton, { AnchorHeadingWrapper } from '../../AnchorCopyButton';
+import { useAnchorScroll } from '../../../../hooks';
 
 const Card = styled(MuiCard)`
   overflow: inherit;
@@ -38,27 +36,6 @@ const CardHeader = styled(MuiCardHeader, {
   ${({ $dense }) => $dense && `padding-bottom: 0px`}
 `;
 
-const HeadingWrapper = styled('span')`
-  & .anchor-link {
-    opacity: 0;
-    margin-left: 2px;
-    padding: 2px;
-    color: inherit;
-    transition: opacity 0.15s;
-    vertical-align: middle;
-  }
-
-  &:hover .anchor-link {
-    opacity: 1;
-  }
-
-  @media (hover: none) {
-    & .anchor-link {
-      opacity: 1;
-    }
-  }
-`;
-
 const Footer = ({ content }) =>
   typeof content === 'string' ? (
     <Typography variant="caption" align="right">
@@ -67,47 +44,6 @@ const Footer = ({ content }) =>
   ) : (
     content
   );
-
-const AnchorCopyButton = ({ anchorId }) => {
-  const { formatMessage } = useIntl();
-  const [copied, setCopied] = useState(false);
-
-  const handleClick = async e => {
-    e.preventDefault();
-    window.history.replaceState(null, '', `#${anchorId}`);
-    await copyToClipboard(window.location.href);
-    setCopied(true);
-  };
-
-  useEffect(() => {
-    if (copied) {
-      const timeout = setTimeout(() => setCopied(false), 2000);
-      return () => clearTimeout(timeout);
-    }
-    return undefined;
-  }, [copied]);
-
-  return (
-    <Tooltip
-      title={formatMessage({ id: copied ? 'Link copied!' : 'Copy link' })}>
-      <MuiIconButton
-        className="anchor-link"
-        size="small"
-        aria-label={formatMessage({ id: 'Copy link' })}
-        onClick={handleClick}>
-        {copied ? (
-          <CheckIcon fontSize="inherit" />
-        ) : (
-          <LinkIcon fontSize="inherit" />
-        )}
-      </MuiIconButton>
-    </Tooltip>
-  );
-};
-
-AnchorCopyButton.propTypes = {
-  anchorId: PropTypes.string.isRequired
-};
 
 const ScrollableContent = ({
   title,
@@ -119,17 +55,7 @@ const ScrollableContent = ({
   anchorId
 }) => {
   const { formatMessage } = useIntl();
-
-  useEffect(() => {
-    if (!anchorId) return undefined;
-    const scrollIfMatch = () => {
-      if (window.location.hash.slice(1) === anchorId)
-        document.getElementById(anchorId)?.scrollIntoView({ behavior: 'smooth' });
-    };
-    scrollIfMatch();
-    window.addEventListener('hashchange', scrollIfMatch);
-    return () => window.removeEventListener('hashchange', scrollIfMatch);
-  }, [anchorId]);
+  useAnchorScroll(anchorId);
 
   return (
     <Card id={anchorId}>
@@ -139,10 +65,10 @@ const ScrollableContent = ({
           <Title>
             <Typography variant="h2" color="secondary">
               {anchorId ? (
-                <HeadingWrapper>
+                <AnchorHeadingWrapper>
                   {title}
                   <AnchorCopyButton anchorId={anchorId} />
-                </HeadingWrapper>
+                </AnchorHeadingWrapper>
               ) : (
                 title
               )}
