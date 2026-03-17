@@ -19,6 +19,7 @@ import { styled } from '@mui/material/styles';
 import { useReactToPrint } from 'react-to-print';
 import CreateIcon from '@mui/icons-material/Create';
 import DeleteIcon from '@mui/icons-material/Delete';
+import ShareIcon from '@mui/icons-material/Share';
 import TimelineIcon from '@mui/icons-material/Timeline';
 import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
 import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
@@ -26,6 +27,8 @@ import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 
 import { SnapshotButton } from '../../../appli/Entry/Snapshots/UtilityFunction';
+import { useNotification } from '../../../../hooks';
+import copyToClipboard from '../../../../helpers/clipboard';
 
 const isString = is(String);
 
@@ -89,6 +92,26 @@ const FixedContent = ({
   isExploredLoading
 }) => {
   const { formatMessage } = useIntl();
+  const { onSuccess } = useNotification();
+
+  const handleShare = async () => {
+    // We share the page URL without any query params to avoid sharing
+    // a specific revision or a specific view of the page
+    const { origin, pathname } = window.location;
+    const url = origin + pathname;
+    const shareTitle = document.title;
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: shareTitle, url });
+      } catch {
+        // user cancelled or share failed => silently ignore
+      }
+    } else {
+      await copyToClipboard(url);
+      onSuccess(formatMessage({ id: 'Link copied!' }));
+    }
+  };
+
   let SubscribeIcon = <CircularProgress size={20} />;
   if (!isSubscribeLoading) {
     if (isSubscribed) SubscribeIcon = <NotificationsActiveIcon />;
@@ -123,15 +146,21 @@ const FixedContent = ({
               </Tooltip>
             )}
             {!isNil(printRef) && (
-              <Button
-                style={{ verticalAlign: 'top' }}
-                variant="outlined"
-                aria-label={formatMessage({ id: 'Print' })}
-                color="primary"
-                onClick={handlePrint}>
-                <Print />
-              </Button>
+              <Tooltip title={formatMessage({ id: 'Print' })}>
+                <Button
+                  aria-label={formatMessage({ id: 'Print' })}
+                  onClick={handlePrint}>
+                  <Print />
+                </Button>
+              </Tooltip>
             )}
+            <Tooltip title={formatMessage({ id: 'Copy link' })}>
+              <Button
+                aria-label={formatMessage({ id: 'Copy link' })}
+                onClick={handleShare}>
+                <ShareIcon />
+              </Button>
+            </Tooltip>
             {onEdit && (
               <Tooltip
                 title={formatMessage({

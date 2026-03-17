@@ -44,6 +44,7 @@ const Comments = ({ entranceId, comments, isEditAllowed }) => {
   return (
     <ScrollableContent
       dense
+      anchorId="comments"
       title={formatMessage({ id: 'Comment' })}
       icon={
         permissions.isAuth &&

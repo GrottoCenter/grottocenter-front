@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { styled } from '@mui/material/styles';
 import { isNil } from 'ramda';
@@ -9,9 +9,13 @@ import {
   CardContent,
   CardHeader as MuiCardHeader,
   IconButton as MuiIconButton,
+  Tooltip,
   Typography
 } from '@mui/material';
 import CreateIcon from '@mui/icons-material/Create';
+import copyToClipboard from '../../../../helpers/clipboard';
+import CheckIcon from '@mui/icons-material/Check';
+import LinkIcon from '@mui/icons-material/Link';
 
 const Card = styled(MuiCard)`
   overflow: inherit;
@@ -33,6 +37,27 @@ const CardHeader = styled(MuiCardHeader, {
   ${({ $dense }) => $dense && `padding-bottom: 0px`}
 `;
 
+const HeadingWrapper = styled('span')`
+  & .anchor-link {
+    opacity: 0;
+    margin-left: 2px;
+    padding: 2px;
+    color: inherit;
+    transition: opacity 0.15s;
+    vertical-align: middle;
+  }
+
+  &:hover .anchor-link {
+    opacity: 1;
+  }
+
+  @media (hover: none) {
+    & .anchor-link {
+      opacity: 1;
+    }
+  }
+`;
+
 const Footer = ({ content }) =>
   typeof content === 'string' ? (
     <Typography variant="caption" align="right">
@@ -42,13 +67,50 @@ const Footer = ({ content }) =>
     content
   );
 
+const AnchorCopyButton = ({ anchorId }) => {
+  const { formatMessage } = useIntl();
+  const [copied, setCopied] = useState(false);
+
+  const handleClick = async e => {
+    e.preventDefault();
+    const url = `${window.location.origin}${window.location.pathname}#${anchorId}`;
+    await copyToClipboard(url);
+    setCopied(true);
+  };
+
+  useEffect(() => {
+    if (copied) {
+      const timeout = setTimeout(() => setCopied(false), 2000);
+      return () => clearTimeout(timeout);
+    }
+    return undefined;
+  }, [copied]);
+
+  return (
+    <Tooltip title={copied ? '' : formatMessage({ id: 'Copy link' })}>
+      <MuiIconButton
+        className="anchor-link"
+        size="small"
+        aria-label={formatMessage({ id: 'Copy link' })}
+        onClick={handleClick}>
+        {copied ? <CheckIcon fontSize="inherit" /> : <LinkIcon fontSize="inherit" />}
+      </MuiIconButton>
+    </Tooltip>
+  );
+};
+
+AnchorCopyButton.propTypes = {
+  anchorId: PropTypes.string.isRequired
+};
+
 const ScrollableContent = ({
   title,
   icon,
   onEdit,
   content,
   footer,
-  dense = false
+  dense = false,
+  anchorId
 }) => {
   const { formatMessage } = useIntl();
   return (
@@ -57,8 +119,15 @@ const ScrollableContent = ({
         $dense={dense ? 1 : 0}
         title={
           <Title>
-            <Typography variant="h2" color="secondary">
-              {title}
+            <Typography variant="h2" color="secondary" id={anchorId}>
+              {anchorId ? (
+                <HeadingWrapper>
+                  {title}
+                  <AnchorCopyButton anchorId={anchorId} />
+                </HeadingWrapper>
+              ) : (
+                title
+              )}
             </Typography>
             {!isNil(icon) && icon}
           </Title>
@@ -87,7 +156,8 @@ ScrollableContent.propTypes = {
   onEdit: PropTypes.func,
   content: PropTypes.node.isRequired,
   footer: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
-  dense: PropTypes.bool
+  dense: PropTypes.bool,
+  anchorId: PropTypes.string
 };
 
 Footer.propTypes = {

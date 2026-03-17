@@ -39,6 +39,7 @@ const Locations = ({ entranceId, locations, isSensitive, isEditAllowed }) => {
   return (
     <ScrollableContent
       dense
+      anchorId="location"
       title={formatMessage({ id: 'Location' })}
       icon={
         permissions.isAuth &&
