@@ -103,8 +103,11 @@ const FixedContent = ({
     if (navigator.share) {
       try {
         await navigator.share({ title: shareTitle, url });
-      } catch {
-        // user cancelled or share failed => silently ignore
+      } catch (err) {
+        if (err.name !== 'AbortError') {
+          await copyToClipboard(url);
+          onSuccess(formatMessage({ id: 'Link copied!' }));
+        }
       }
     } else {
       await copyToClipboard(url);

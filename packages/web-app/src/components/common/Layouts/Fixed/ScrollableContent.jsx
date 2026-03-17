@@ -121,9 +121,14 @@ const ScrollableContent = ({
   const { formatMessage } = useIntl();
 
   useEffect(() => {
-    if (anchorId && window.location.hash.slice(1) === anchorId) {
-      document.getElementById(anchorId)?.scrollIntoView({ behavior: 'smooth' });
-    }
+    if (!anchorId) return undefined;
+    const scrollIfMatch = () => {
+      if (window.location.hash.slice(1) === anchorId)
+        document.getElementById(anchorId)?.scrollIntoView({ behavior: 'smooth' });
+    };
+    scrollIfMatch();
+    window.addEventListener('hashchange', scrollIfMatch);
+    return () => window.removeEventListener('hashchange', scrollIfMatch);
   }, [anchorId]);
 
   return (
