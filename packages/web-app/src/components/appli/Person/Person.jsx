@@ -2,15 +2,20 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import Skeleton from '@mui/material/Skeleton';
 import { useIntl } from 'react-intl';
-import { Box } from '@mui/material';
+import { Box, Button, Card, Tooltip } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
+import AddCircleIcon from '@mui/icons-material/AddCircle';
+import CancelIcon from '@mui/icons-material/Cancel';
 
 import { useUserProperties, usePermissions } from '../../../hooks';
 import subscriptionsType from '../../../types/subscriptions.type';
 import { PersonPropTypes } from '../../../types/person.type';
 import REDUCER_STATUS from '../../../reducers/ReducerStatus';
+import FixedLayout from '../../common/Layouts/Fixed';
 import FixedContent from '../../common/Layouts/Fixed/FixedContent';
+import ScrollableContent from '../../common/Layouts/Fixed/ScrollableContent';
+import CustomIcon from '../../common/CustomIcon';
 import Alert from '../../common/Alert';
 import DocumentsList from '../../common/DocumentsList/DocumentsList';
 import EntitiesList from '../../common/entitiesList/EntitiesList';
@@ -39,6 +44,7 @@ const Person = ({
   const permissions = usePermissions();
   const [isDeleteConfirmationOpen, setIsDeleteConfirmationOpen] =
     useState(false);
+  const [isCaveSearchVisible, setIsCaveSearchVisible] = useState(false);
 
   const userId = useUserProperties()?.id ?? null;
   let canEdit = false;
@@ -79,33 +85,16 @@ const Person = ({
   }
 
   return (
-    <FixedContent
-      title={title}
-      onEdit={
-        canEdit ? () => navigate(`/ui/persons/${person?.id}/edit`) : undefined
-      }
-      onDelete={onDelete}
-      content={
-        <>
-          {isLoading && (
-            <>
-              <Skeleton width={600} /> {/* Title Skeleton */}
-              <Skeleton height={200} width={500} /> {/* Details Skeleton */}
-              <Skeleton height={100} /> {/* Subscriptions list Skeleton */}
-              <Skeleton height={100} /> {/* Documents list Skeleton */}
-              <Skeleton height={100} /> {/* Organizations list Skeleton */}
-              <Skeleton height={100} /> {/* Entrance list Skeleton */}
-            </>
-          )}
-          {!!error && (
-            <Alert
-              title={formatMessage({
-                id: 'Error, the person you are looking for is not available.'
-              })}
-              severity="error"
-            />
-          )}
-          {!!person && (
+    <FixedLayout>
+      {person && (
+        <FixedContent
+          icon={<CustomIcon type="caver" />}
+          title={title}
+          onEdit={
+            canEdit ? () => navigate(`/ui/persons/${person?.id}/edit`) : undefined
+          }
+          onDelete={onDelete}
+          content={
             <>
               <DeleteConfirmationDialog
                 entityType={DELETED_ENTITIES.person}
@@ -124,32 +113,83 @@ const Person = ({
                 justifyContent="space-between">
                 <PersonProperties person={person} />
               </Box>
-              {permissions.isLeader && (
-                <>
-                  <hr />
-                  <SubscriptionsList
-                    canUnsubscribe={canUnsubscribe}
-                    subscriptions={subscriptions}
-                    subscriptionsStatus={subscriptionsStatus}
-                    title={formatMessage({ id: 'Subscriptions' })}
-                    userId={person.id}
-                  />
-                </>
-              )}
-              <hr />
-              <DocumentsList
-                title={formatMessage({ id: 'Documents' })}
-                documents={person.documents}
-              />
-              <hr />
+            </>
+          }
+        />
+      )}
+      {isLoading && (
+        <Card sx={{ padding: 3 }}>
+          <Skeleton width={600} />
+          <Skeleton height={200} width="100%" />
+          <Skeleton height={100} />
+          <Skeleton height={100} />
+          <Skeleton height={100} />
+          <Skeleton height={100} />
+        </Card>
+      )}
+      {!!error && (
+        <Card sx={{ padding: 3 }}>
+          <Alert
+            title={formatMessage({
+              id: 'Error, the person you are looking for is not available.'
+            })}
+            severity="error"
+          />
+        </Card>
+      )}
+      {person && (
+        <>
+          {permissions.isLeader && (
+            <ScrollableContent
+              anchorId="subscriptions"
+              title={formatMessage({ id: 'Subscriptions' })}
+              content={
+                <SubscriptionsList
+                  canUnsubscribe={canUnsubscribe}
+                  subscriptions={subscriptions}
+                  subscriptionsStatus={subscriptionsStatus}
+                  userId={person.id}
+                />
+              }
+            />
+          )}
+          <ScrollableContent
+            anchorId="documents"
+            title={formatMessage({ id: 'Documents' })}
+            content={<DocumentsList documents={person.documents} />}
+          />
+          <ScrollableContent
+            anchorId="organizations"
+            title={formatMessage({ id: 'Organizations' })}
+            content={
               <EntitiesList
                 type="organization"
                 entites={person.organizations}
-                title={formatMessage({ id: 'Organizations' })}
                 onItemRemove={canEdit ? handleLeaveOrganization : null}
-                toolTipTitle={formatMessage({ id:  'Leave organization'})}
+                toolTipTitle={formatMessage({ id: 'Leave organization' })}
               />
-              <hr />
+            }
+          />
+          <ScrollableContent
+            anchorId="related-caves"
+            title={formatMessage({ id: 'Explored caves' })}
+            icon={
+              canEdit && (
+                <Tooltip
+                  title={formatMessage({
+                    id: isCaveSearchVisible ? 'Cancel this search' : 'Add a cave'
+                  })}>
+                  <Button
+                    color={isCaveSearchVisible ? 'inherit' : 'secondary'}
+                    variant="outlined"
+                    onClick={() => setIsCaveSearchVisible(v => !v)}
+                    startIcon={isCaveSearchVisible ? <CancelIcon /> : <AddCircleIcon />}>
+                    {formatMessage({ id: isCaveSearchVisible ? 'Cancel' : 'Add' })}
+                  </Button>
+                </Tooltip>
+              )
+            }
+            content={
               <RelatedCaves
                 exploredEntrances={person.exploredEntrances}
                 exploredNetworks={person.exploredNetworks}
@@ -157,12 +197,14 @@ const Person = ({
                 isOrganization={false}
                 canManageCaves={canEdit}
                 onRefresh={() => dispatch(fetchPerson(person.id))}
+                isCaveSearchVisible={isCaveSearchVisible}
+                onToggleCaveSearch={setIsCaveSearchVisible}
               />
-            </>
-          )}
+            }
+          />
         </>
-      }
-    />
+      )}
+    </FixedLayout>
   );
 };
 
