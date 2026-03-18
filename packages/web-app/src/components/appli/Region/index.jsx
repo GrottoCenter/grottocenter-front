@@ -5,6 +5,7 @@ import { Marker } from 'react-leaflet';
 import { Box, Button, Card } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 
 import StatisticsDataDashboard from '../StatisticsDataDashboard';
@@ -15,7 +16,7 @@ import ScrollableContent from '../../common/Layouts/Fixed/ScrollableContent';
 import Alert from '../../common/Alert';
 import REDUCER_STATUS from '../../../reducers/ReducerStatus';
 import { CoordinatesMarker } from '../../common/Maps/common/Markers/Components';
-import { useSubscriptions } from '../../../hooks';
+import { useSubscriptions, useScrollToHashOnLoad } from '../../../hooks';
 
 const Region = ({
   canSubscribe,
@@ -36,6 +37,9 @@ const Region = ({
     isRegionLoading: isSubscribeLoading
   } = useSubscriptions();
   const isSubscribed = region ? isSubscribedMethod(region.id) : false;
+
+  const { statistics: dataRegion } = useSelector(state => state.statisticsRegion);
+  useScrollToHashOnLoad(dataRegion);
 
   const handleChangeSubscribe = () => {
     if (!isSubscribed) {

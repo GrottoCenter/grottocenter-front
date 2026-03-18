@@ -3,12 +3,12 @@ import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { useParams, useNavigate } from 'react-router-dom';
 
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import Skeleton from '@mui/material/Skeleton';
 import { Box, Card } from '@mui/material';
 import { useIntl } from 'react-intl';
 
-import { usePermissions, useSubscriptions } from '../../../hooks';
+import { usePermissions, useSubscriptions, useScrollToHashOnLoad } from '../../../hooks';
 import { subscribeToMassif } from '../../../actions/Subscriptions/SubscribeToMassif';
 import { unsubscribeFromMassif } from '../../../actions/Subscriptions/UnsubscribeFromMassif';
 import { deleteMassif } from '../../../actions/Massif/DeleteMassif';
@@ -47,6 +47,9 @@ const Massif = ({ isLoading, error, massif }) => {
   useEffect(() => {
     if (massif) setWantedDeletedState(massif.isDeleted);
   }, [massif]);
+
+  const { dataMassif } = useSelector(state => state.statisticsMassif);
+  useScrollToHashOnLoad(dataMassif);
 
   let onEdit = null;
   let onDelete = null;
