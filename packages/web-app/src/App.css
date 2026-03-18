@@ -1,15 +1,15 @@
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu',
+    'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+  font-family:
+    source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }
 
 .App {
@@ -56,7 +56,6 @@ code {
   transition: opacity 0.5s;
 }
 
-
 .leaflet-popup-content {
   margin: 10px 14px;
   max-width: 260px;
@@ -73,7 +72,8 @@ code {
   margin: 2px 0;
 }
 
-.map-popup-property img, .map-popup-property svg {
+.map-popup-property img,
+.map-popup-property svg {
   margin-right: 0;
   flex-shrink: 0;
   width: 25px;
@@ -81,10 +81,9 @@ code {
   font-size: 25px;
 }
 
-.leaflet-tooltip{
+.leaflet-tooltip {
   font-size: 13px;
 }
-
 
 /*
 * Skeleton V2.0.4
@@ -499,4 +498,80 @@ there.
 /* Larger than Desktop HD */
 
 @media (min-width: 1200px) {
+}
+
+@media print {
+  /* Preserve backgrounds only for elements that actually need it.
+     Avoid * { print-color-adjust: exact } — it slows print rendering on
+     complex pages (maps, long lists) by forcing background output everywhere. */
+  .leaflet-container,
+  .leaflet-tile,
+  .MuiChip-root,
+  .MuiAlert-root,
+  .MuiLinearProgress-root,
+  .MuiAvatar-root {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .MuiButton-root,
+  .MuiIconButton-root,
+  .MuiFab-root,
+  .MuiDialog-root,
+  .MuiPopover-root,
+  .leaflet-control-zoom,
+  .leaflet-control-layers,
+  .leaflet-control-zoom-fullscreen,
+  .leaflet-control-locate {
+    display: none !important;
+  }
+
+  .MuiPaper-root {
+    box-shadow: none !important;
+    border: 1px solid #ccc;
+  }
+
+  /* Avoid breaking headings and card headers across pages.
+     Note: break-inside: avoid is intentionally NOT applied to .MuiCard-root /
+     .MuiPaper-root because cards taller than one page cannot honour the hint
+     and will produce blank pages or clipped content (e.g. Documents, Comments). */
+  .MuiCardHeader-root,
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    break-inside: avoid;
+  }
+
+  .MuiCardHeader-root,
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    break-after: avoid;
+  }
+
+  .MuiCardContent-root,
+  .MuiCardActionArea-root {
+    overflow: visible !important;
+  }
+
+  img {
+    opacity: 1 !important;
+  }
+
+  .MuiSkeleton-root {
+    display: none !important;
+  }
+
+  /* Avoid orphan/widow lines when breaking across pages */
+  p,
+  li {
+    orphans: 3;
+    widows: 3;
+  }
 }
