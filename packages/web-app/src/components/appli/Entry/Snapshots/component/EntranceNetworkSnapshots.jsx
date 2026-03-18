@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { Box } from '@mui/material';
-import { GpsFixed, Height } from '@mui/icons-material';
 import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
 
@@ -38,14 +37,14 @@ const EntranceNetworkSnapshots = information => {
               newText={makeCoordinatesValue([lat, long])}
             />
           }
-          icon={<GpsFixed fontSize="large" color="primary" />}
+          icon={<CustomIcon type="coordinates" />}
         />
       )}
       {entrance.altitude && (
         <Property
           label={formatMessage({ id: 'Altitude' })}
           value={`${entrance.altitude} m`}
-          icon={<Height color="primary" />}
+          icon={<CustomIcon type="altitude" />}
         />
       )}
       {entrance.cave && (

@@ -3,7 +3,7 @@ import { useIntl } from 'react-intl';
 import { Box, Grid, Tooltip } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { useDispatch, useSelector } from 'react-redux';
-import { FlagRounded, Handshake } from '@mui/icons-material';
+import { Handshake } from '@mui/icons-material';
 import { loadDynamicNumber } from '../../../actions/DynamicNumber';
 import { fetchCumulatedLength } from '../../../actions/CumulatedLength';
 import DataCard from './components/DataCard';
@@ -117,7 +117,7 @@ const DataHomepage = () => {
               <StyledLink internal href="/ui/countries">
                 <DataCard
                   isColored
-                  icon={<FlagRounded sx={{ fontSize: 55 }} color="primary" />}
+                  icon={<CustomIcon size={55} type="country" />}
                   numberData={countries.number}
                   isFetching={countries.isFetching}
                   title={formatMessage({ id: 'countries' })}

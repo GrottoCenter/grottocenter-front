@@ -3,7 +3,7 @@ import {
   networkIcon,
   massifIcon,
   organizationIcon,
-  coordinatesIcon
+  coordinatesMarkerIcon
 } from '../assets/icons';
 
 const markers = [
@@ -25,7 +25,7 @@ const markers = [
   },
   {
     name: 'Coordinates',
-    url: coordinatesIcon
+    url: coordinatesMarkerIcon
   }
 ];
 

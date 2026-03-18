@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { Chip, Skeleton } from '@mui/material';
-import { Terrain } from '@mui/icons-material';
+import CustomIcon from '../../components/common/CustomIcon';
 import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -22,7 +22,6 @@ import {
   SectionTitleLink,
   TextLink
 } from './Section';
-import CustomIcon from '../../components/common/CustomIcon';
 import { fetchDocumentDetails } from '../../actions/Document/GetDocumentDetails';
 import { fetchDocumentChildren } from '../../actions/Document/GetDocumentChildren';
 import { deleteDocument } from '../../actions/Document/DeleteDocument';
@@ -160,7 +159,7 @@ const Document = ({
         ...(documentData?.massifs?.map(e => (
           <ListElement
             key={e.id}
-            icon={<Terrain fontSize="large" color="primary" />}
+            icon={<CustomIcon type="massif" />}
             value={e.name}
             secondary={formatMessage({ id: 'Massif' })}
             url={`/ui/massifs/${e.id}`}

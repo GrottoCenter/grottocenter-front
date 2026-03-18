@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="100" height="100">
+  <defs>
+    <radialGradient xlink:href="#a" id="b"
+      cx="-1380.014" cy="14.258" fx="-1380.014" fy="14.258" r="286.189"
+      gradientTransform="matrix(-.0124 1.41624 -1.50853 -.01321 -604.363 2011.032)"
+      gradientUnits="userSpaceOnUse"/>
+    <linearGradient id="a">
+      <stop offset="0" stop-color="#666"/>
+      <stop offset="1" stop-color="#666" stop-opacity="0"/>
+    </linearGradient>
+    <filter id="c" x="-.012" width="1.024" y="-.012" height="1.024" color-interpolation-filters="sRGB">
+      <feGaussianBlur stdDeviation="2.86"/>
+    </filter>
+  </defs>
+
+  <!-- Shadow -->
+  <path d="M-853.53 340.161c-11.298-4.008-26.824-17.474-33.734-29.256l-7.657-13.057-.02-240c-.01-132 .965-243.513 2.166-247.805 3.03-10.83 18.021-27.17 31.003-33.792 10.507-5.36 18.95-5.546 252.064-5.546 265.073 0 252.019-.855 269.406 17.633 17.736 18.86 16.698 4.734 17.607 239.51.46 118.642-.303 230.206-1.695 247.92-2.317 29.504-3.24 33.099-11 42.857-4.66 5.858-14.134 13.544-21.054 17.08l-12.583 6.428-240.109-.225c-132.06-.124-242.037-.91-244.395-1.747z"
+        transform="matrix(.16042 0 0 .16155 150.64 43.625)" opacity=".93" fill="url(#b)" filter="url(#c)"/>
+
+  <!-- Card -->
+  <path d="M8.252 93.608c-1.812-.648-4.303-2.823-5.412-4.726l-1.228-2.11L1.609 48c-.002-21.324.155-39.34.347-40.033.486-1.75 2.891-4.389 4.974-5.459 1.685-.866 3.04-.896 40.435-.896 42.523 0 40.429-.138 43.218 2.849 2.845 3.047 2.679.765 2.824 38.693.074 19.166-.048 37.19-.271 40.051-.372 4.767-.52 5.347-1.765 6.924-.748.946-2.267 2.188-3.378 2.759l-2.018 1.038-38.518-.036c-21.185-.02-38.827-.147-39.205-.282z"
+        fill="#5d4037"/>
+
+  <!--
+    "Stay on trail" — simplified icon, drawn from scratch in MUI 24×24 space.
+    Concept: two curved trail rails (white) + directional arrow (orange).
+    Rails are filled bezier bands (2 units wide) converging toward the top.
+      Left rail:  M2 22 Q5 12 8 2L10 2 Q7 12 4 22Z
+      Right rail: M14 2 Q17 12 20 22L22 22 Q19 12 16 2Z
+    Arrow (upward, centered, reduced): tip at (12,5), arrowhead base at y=12, body to y=20
+      M12 5L9.5 12H11V20H13V12H14.5Z
+  -->
+
+  <!-- White: curved trail rails -->
+  <path d="M2 22 Q5 12 8 2L10 2 Q7 12 4 22ZM14 2 Q17 12 20 22L22 22 Q19 12 16 2Z"
+        transform="matrix(3.1667 0 0 3.1667 9.5 9.8)" fill="#fff"/>
+
+  <!-- Orange: directional arrow (reduced) -->
+  <path d="M12 5L9.5 12H11V20H13V12H14.5Z"
+        transform="matrix(3.1667 0 0 3.1667 9.5 9.8)" fill="#f57c00"/>
+</svg>
