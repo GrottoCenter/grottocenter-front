@@ -289,10 +289,12 @@ const PolygonMap = ({ onChange, data }) => {
     if (layerType === 'polygon') {
       const { _leaflet_id: leafletId } = layer;
       if (isMounted.current) {
+        const latlngs = layer.getLatLngs()[0];
         const newLayer = {
           id: leafletId,
-          latlngs: layer.getLatLngs()[0],
+          latlngs,
           isHole: false,
+          isNeedle: isNeedlePolygon(latlngs.map(c => [c.lat, c.lng])),
           bounds: layer.getBounds()
         };
 
@@ -312,10 +314,13 @@ const PolygonMap = ({ onChange, data }) => {
     Object.values(_layers).map(layer => {
       const { _leaflet_id: leafletId } = layer;
       if (isMounted.current) {
+        const latlngs = layer.getLatLngs()[0];
         return setMapLayers(layers =>
-          layers.map(l =>
-            l.id === leafletId ? { ...l, latlngs: layer.getLatLngs()[0] } : l
-          )
+          layers.map(l => {
+            if (l.id !== leafletId) return l;
+            const coords = latlngs.map(c => [c.lat, c.lng]);
+            return { ...l, latlngs, isNeedle: isNeedlePolygon(coords) };
+          })
         );
       }
       return null;
@@ -341,7 +346,6 @@ const PolygonMap = ({ onChange, data }) => {
 
     // Add imported polygons to existing layers
     const newLayers = [];
-    let skippedNeedle = 0;
     multiPolygon.coordinates.forEach(polygon => {
       const rawRing = polygon[0].map(coord => [coord[1], coord[0]]);
 
@@ -355,11 +359,6 @@ const PolygonMap = ({ onChange, data }) => {
 
       if (openRing.length <= 2) return;
 
-      if (isNeedlePolygon(openRing)) {
-        skippedNeedle += 1;
-        return;
-      }
-
       const leafletPolygon = L.polygon(openRing, { color: 'green' });
 
       // Add to FeatureGroup for rendering
@@ -370,24 +369,17 @@ const PolygonMap = ({ onChange, data }) => {
         id: leafletPolygon._leaflet_id,
         latlngs: openRing.map(coord => ({ lat: coord[0], lng: coord[1] })),
         isHole: false,
+        isNeedle: isNeedlePolygon(openRing),
         bounds: leafletPolygon.getBounds()
       });
     });
 
     if (newLayers.length === 0) {
-      if (skippedNeedle > 0) {
-        setImportError(
-          formatMessage({
-            id: 'The geometry could not be imported: all polygons are too thin or elongated (stream corridors, narrow buffers). Try increasing the simplification tolerance or use a different file.'
-          })
-        );
-      } else {
-        setImportError(
-          formatMessage({
-            id: 'No valid polygon rings found in the imported file.'
-          })
-        );
-      }
+      setImportError(
+        formatMessage({
+          id: 'No valid polygon rings found in the imported file.'
+        })
+      );
       return;
     }
 
@@ -488,10 +480,12 @@ const PolygonMap = ({ onChange, data }) => {
         const outerRing = polygon[0].map(coords => [coords[1], coords[0]]);
         const leafletPolygon = L.polygon(outerRing, { color: 'green' });
         editableFG.addLayer(leafletPolygon);
+        const outerLatlngs = leafletPolygon.getLatLngs()[0];
         allPolygons.push({
           id: leafletPolygon._leaflet_id,
-          latlngs: leafletPolygon.getLatLngs()[0],
-          isHole: false
+          latlngs: outerLatlngs,
+          isHole: false,
+          isNeedle: isNeedlePolygon(outerLatlngs.map(c => [c.lat, c.lng]))
         });
 
         // Add holes (second ring onwards of THIS polygon)
@@ -499,10 +493,12 @@ const PolygonMap = ({ onChange, data }) => {
           const hole = polygon[i].map(coords => [coords[1], coords[0]]);
           const leafletHole = L.polygon(hole, { color: 'green' });
           editableFG.addLayer(leafletHole);
+          const holeLatlngs = leafletHole.getLatLngs()[0];
           allPolygons.push({
             id: leafletHole._leaflet_id,
-            latlngs: leafletHole.getLatLngs()[0],
-            isHole: true
+            latlngs: holeLatlngs,
+            isHole: true,
+            isNeedle: isNeedlePolygon(holeLatlngs.map(c => [c.lat, c.lng]))
           });
         }
       }
