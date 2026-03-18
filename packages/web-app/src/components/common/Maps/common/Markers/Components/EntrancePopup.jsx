@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { GpsFixed, Public } from '@mui/icons-material';
 import CustomIcon from '../../../../CustomIcon';
 import { Information, makeCoordinatesValue } from './utils';
 
@@ -22,11 +21,11 @@ export const EntrancePopup = ({ entrance }) => (
       value={`${entrance.city && entrance.city}, ${
         entrance.region && entrance.region
       }`}
-      icon={<Public color="primary" />}
+      icon={<CustomIcon size={25} type="location" />}
     />
     <Information
       value={makeCoordinatesValue(entrance.latitude, entrance.longitude)}
-      icon={<GpsFixed color="primary" />}
+      icon={<CustomIcon size={25} type="coordinates" />}
     />
     {entrance.depth && (
       <Information

@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { GpsFixed, Public } from '@mui/icons-material';
+import CustomIcon from '../../../../CustomIcon';
 import { Information, makeCoordinatesValue } from './utils';
 
 export const OrganizationPopup = ({ organization }) => (
@@ -13,7 +13,7 @@ export const OrganizationPopup = ({ organization }) => (
     {organization.address && (
       <Information
         value={organization.address}
-        icon={<Public color="primary" />}
+        icon={<CustomIcon size={25} type="location" />}
       />
     )}
     <Information
@@ -21,7 +21,7 @@ export const OrganizationPopup = ({ organization }) => (
         organization.latitude,
         organization.longitude
       )}
-      icon={<GpsFixed color="primary" />}
+      icon={<CustomIcon size={25} type="coordinates" />}
     />
   </>
 );

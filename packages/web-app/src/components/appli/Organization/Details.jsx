@@ -6,7 +6,7 @@ import EmailIcon from '@mui/icons-material/Email';
 import LocationIcon from '@mui/icons-material/LocationOn';
 import Linkify from 'linkify-react';
 
-import { FlagRounded } from '@mui/icons-material';
+import CustomIcon from '../../common/CustomIcon';
 import CustomMapContainer from '../../common/Maps/common/MapContainer';
 import MultilinesTypography from '../../common/MultilinesTypography';
 import OrganizationMarker from '../../common/Maps/common/Markers/Components/OrganizationMarker';
@@ -60,7 +60,7 @@ const Details = ({ organization }) => {
               label=""
               value={organization.country}
               url={`/ui/countries/${organization.country}`}
-              icon={<FlagRounded fontSize="large" color="primary" />}
+              icon={<CustomIcon type="country" />}
               secondary
             />
           )}

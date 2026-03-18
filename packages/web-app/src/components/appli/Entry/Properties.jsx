@@ -4,14 +4,8 @@ import { useIntl } from 'react-intl';
 import { styled } from '@mui/material/styles';
 import { Box, Button, ButtonGroup, Tooltip } from '@mui/material';
 import {
-  CalendarToday,
-  Category,
-  GpsFixed,
-  Public,
-  Terrain,
   Place,
-  Map,
-  FlagRounded
+  Map
 } from '@mui/icons-material';
 import Alert from '../../common/Alert';
 import CustomIcon from '../../common/CustomIcon';
@@ -105,7 +99,7 @@ const Properties = ({ isLoading = false, entrance }) => {
                   )} (E) = ${entrance.latitude.toFixed(
                     4
                   )}, ${entrance.longitude.toFixed(4)}`}
-                  icon={<GpsFixed fontSize="large" color="primary" />}
+                  icon={<CustomIcon type="coordinates" />}
                 />
               </FlexContainerGrow>
               <div>
@@ -141,7 +135,7 @@ const Properties = ({ isLoading = false, entrance }) => {
               label={formatMessage({ id: 'Country' })}
               value={entrance.country}
               url={`/ui/countries/${entrance.country}`}
-              icon={<FlagRounded fontSize="large" color="primary" />}
+              icon={<CustomIcon type="country" />}
               secondary
             />
             <Property
@@ -151,7 +145,7 @@ const Properties = ({ isLoading = false, entrance }) => {
               value={[entrance.city, entrance.region]
                 .flatMap(f => (f ? [f] : []))
                 .join(', ')}
-              icon={<Public fontSize="large" color="primary" />}
+              icon={<CustomIcon type="location" />}
               secondary
             />
           </Box>
@@ -164,7 +158,7 @@ const Properties = ({ isLoading = false, entrance }) => {
               <Property
                 label={formatMessage({ id: 'Massif' })}
                 value={entrance.massif.name}
-                icon={<Terrain fontSize="large" color="primary" />}
+                icon={<CustomIcon type="massif" />}
                 url={`/ui/massifs/${entrance.massif.id}`}
               />
             )}
@@ -204,14 +198,14 @@ const Properties = ({ isLoading = false, entrance }) => {
             <Property
               label={formatMessage({ id: 'Year of discovery' })}
               value={entrance.discoveryYear}
-              icon={<CalendarToday color="primary" />}
+              icon={<CustomIcon type="discovery_date" />}
             />
           )}
           {!!entrance.massif?.undergroundType && (
             <Property
               label={formatMessage({ id: 'Underground type' })}
               value={entrance.undergroundType}
-              icon={<Category color="primary" />}
+              icon={<CustomIcon type="category" />}
             />
           )}
           <DivingProperty

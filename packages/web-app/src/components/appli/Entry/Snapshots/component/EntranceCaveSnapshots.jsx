@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { useIntl } from 'react-intl';
-import { GpsFixed, Height, Waves, Title } from '@mui/icons-material';
 import { Box } from '@mui/material';
 import PropTypes from 'prop-types';
 import { pathOr } from 'ramda';
@@ -41,7 +40,7 @@ const EntranceCaveSnapshots = information => {
               newText={makeCoordinatesValue([lat, long])}
             />
           }
-          icon={<GpsFixed fontSize="large" color="primary" />}
+          icon={<CustomIcon type="coordinates" />}
         />
       )}
       {entrance.altitude && (
@@ -55,12 +54,12 @@ const EntranceCaveSnapshots = information => {
               newText={`${entrance.altitude} m`}
             />
           }
-          icon={<Height color="primary" />}
+          icon={<CustomIcon type="altitude" />}
         />
       )}
       {cave && (
         <Property
-          label={formatMessage({ id: 'Cave' })}
+          label={formatMessage({ id: 'Network' })}
           value={
             <HighLightsLine oldText={previous?.caveName} newText={caveName} />
           }
@@ -102,7 +101,7 @@ const EntranceCaveSnapshots = information => {
               newText={`${cave.temperature} °C`}
             />
           }
-          icon={<Title fontSize="large" color="primary" />}
+          icon={<CustomIcon type="temperature" />}
         />
       )}
       {cave?.isDiving && (
@@ -110,7 +109,7 @@ const EntranceCaveSnapshots = information => {
           value={formatMessage({
             id: 'Diving cave'
           })}
-          icon={<Waves color="primary" />}
+          icon={<CustomIcon type="diving_cave" />}
           secondary
         />
       )}

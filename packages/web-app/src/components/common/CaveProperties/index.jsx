@@ -1,7 +1,6 @@
 import React from 'react';
 import { useIntl } from 'react-intl';
 import { styled } from '@mui/material/styles';
-import { Terrain, Waves, Thermostat } from '@mui/icons-material';
 import CustomIcon from '../CustomIcon';
 import { Property } from '../Properties';
 
@@ -45,7 +44,7 @@ export const MassifProperty = ({ massif, secondary = false }) => {
       label={formatMessage({ id: 'Massif' })}
       value={massif.name}
       url={`/ui/massifs/${massif.id}`}
-      icon={<Terrain color="primary" />}
+      icon={<CustomIcon type="massif" />}
       secondary={secondary}
     />
   );
@@ -58,7 +57,7 @@ export const DivingProperty = ({ isDiving, isLoading }) => {
     <Property
       loading={isLoading}
       value={formatMessage({ id: 'Diving cave' })}
-      icon={<Waves color="primary" />}
+      icon={<CustomIcon type="diving_cave" />}
       secondary
     />
   );
@@ -72,7 +71,7 @@ export const TemperatureProperty = ({ temperature, isLoading }) => {
       loading={isLoading}
       label={formatMessage({ id: 'Temperature' })}
       value={`${temperature} °C`}
-      icon={<Thermostat fontSize="large" color="primary" />}
+      icon={<CustomIcon type="temperature" />}
     />
   );
 };

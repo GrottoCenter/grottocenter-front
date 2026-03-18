@@ -1,18 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
-import { Waves } from '@mui/icons-material';
 import { Box, Typography, useTheme } from '@mui/material';
 import { Link } from 'react-router-dom';
 import InlineData from './InlineData';
 import ScrollableContent from '../../../../common/Layouts/Fixed/ScrollableContent';
-import {
-  networkIcon,
-  massifIcon,
-  entranceIcon
-} from '../../../../../assets/icons';
-
-const styledImg = { width: '100%', height: 'auto' };
+import CustomIcon from '../../../../common/CustomIcon';
 
 const StyledDivider = () => (
   <Box style={{ margin: '-20px 0' }}>
@@ -41,13 +34,7 @@ const CavesData = ({
           {nbMassifs !== undefined && nbMassifs !== null && (
             <>
               <InlineData
-                icon={
-                  <img
-                    style={styledImg}
-                    src={massifIcon}
-                    alt="entry icon"
-                  />
-                }
+                icon={<CustomIcon type="massif" size={25} />}
                 numberData={nbMassifs}
                 text={formatMessage({ id: 'massif(s)' })}
               />
@@ -57,13 +44,7 @@ const CavesData = ({
 
           {nbCaves !== undefined && nbCaves !== null && (
             <InlineData
-              icon={
-                <img
-                  style={styledImg}
-                  src={entranceIcon}
-                  alt="entry icon"
-                />
-              }
+              icon={<CustomIcon type="entrance" size={25} />}
               numberData={nbCaves}
               text={formatMessage({ id: 'cave(s) (1 or multiple entrances)' })}
             />
@@ -73,8 +54,7 @@ const CavesData = ({
             <>
               <StyledDivider />
               <InlineData
-                icon={<Waves color="primary" />}
-                alt="entry icon"
+                icon={<CustomIcon type="diving_cave" size={25} />}
                 numberData={nbDivingCaves}
                 text={formatMessage({ id: 'cave(s) are diveable' })}
               />
@@ -85,13 +65,7 @@ const CavesData = ({
             <>
               <StyledDivider />
               <InlineData
-                icon={
-                  <img
-                    style={styledImg}
-                    src={networkIcon}
-                    alt="network icon"
-                  />
-                }
+                icon={<CustomIcon type="network" size={25} />}
                 numberData={nbNetworks}
                 text={formatMessage({
                   id: 'network(s) (cave of more than 1 entrance)'
@@ -100,10 +74,7 @@ const CavesData = ({
             </>
           )}
 
-          <Box
-            display="flex"
-            justifyContent="flex-end"
-            alignItems="flex-end">
+          <Box display="flex" justifyContent="flex-end" alignItems="flex-end">
             <Link style={{ color: theme.palette.secondary.main }} to={url}>
               <Typography fontSize="small">
                 {formatMessage({ id: 'Access entrances list' })}
