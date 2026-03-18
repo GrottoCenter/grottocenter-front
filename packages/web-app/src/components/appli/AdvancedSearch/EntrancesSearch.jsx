@@ -194,13 +194,13 @@ const EntrancesSearch = () => {
           label="Depth"
           helperText="In meters"
           marks={depthMarks}
-          onChange={e => updateFilter('cave.depth', Math.trunc(e))}
+          onChange={e => updateFilter('cave.depth', e)}
         />
         <SearchSlider
           label="Length"
           helperText="In meters"
           marks={lengthMarks}
-          onChange={e => updateFilter('cave.length', Math.trunc(e))}
+          onChange={e => updateFilter('cave.length', e)}
         />
       </SearchFieldset>
 
