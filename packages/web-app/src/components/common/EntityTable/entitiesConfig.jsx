@@ -149,7 +149,7 @@ const documents = {
     [false, 'importSource', 'Import source', false],
     [false, 'importId', 'Import Id', false],
     [false, 'cave.name', 'Cave', true],
-    [false, 'entrance.name', 'Entrance', true],
+    [false, 'entrances', 'Entrances', false, cellsRender.keyArray('name')],
     [false, 'massifs', 'Massifs', false, cellsRender.keyArray('name')]
   ],
   link: doc => `/ui/documents/${doc.id}`

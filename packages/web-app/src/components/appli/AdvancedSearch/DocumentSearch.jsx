@@ -47,8 +47,8 @@ const initialFilterState = {
   issue: '',
   'parent.title': '',
   'cave.name': '',
-  'entrance.name': '',
-  'massif.name': ''
+  'entrances.name': '',
+  'massifs.name': ''
 };
 
 const SubjectEntry = ({ subject }) => {
@@ -281,14 +281,14 @@ const DocumentSearch = () => {
 
           <SearchText
             label="Entrance"
-            onChange={e => updateFilter('entrance.name', e)}
-            value={filterState['entrance.name']}
+            onChange={e => updateFilter('entrances.name', e)}
+            value={filterState['entrances.name']}
           />
 
           <SearchText
             label="Massif"
-            onChange={e => updateFilter('massif.name', e)}
-            value={filterState['massif.name']}
+            onChange={e => updateFilter('massifs.name', e)}
+            value={filterState['massifs.name']}
           />
         </SearchFormContainer>
       </SearchFieldset>
