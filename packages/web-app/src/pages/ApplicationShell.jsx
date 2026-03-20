@@ -2,15 +2,12 @@ import React, { useRef, useEffect } from 'react';
 import { Provider, useSelector, useDispatch } from 'react-redux';
 import { Outlet } from 'react-router-dom';
 import { IntlProvider } from 'react-intl';
-import createDebounce from 'redux-debounced';
 import { isMobileOnly } from 'react-device-detect';
 import { SnackbarProvider } from 'notistack';
-import { createStore, applyMiddleware, compose } from 'redux';
-import { thunk } from 'redux-thunk';
 import PropTypes from 'prop-types';
 import { styled } from '@mui/material/styles';
 
-import GCReducer from '../reducers/GCReducer';
+import gcStore from '../store';
 import { bootstrapIntl } from '../actions/Intl';
 
 import ErrorHandler from '../components/appli/ErrorHandler';
@@ -32,10 +29,6 @@ async function transitionToReact() {
     loaderEl.remove();
   }, 410);
 }
-
-const middlewares = applyMiddleware(createDebounce(), thunk);
-const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
-const gcStore = createStore(GCReducer, composeEnhancers(middlewares));
 
 const customOnIntlError = err => {
   // Custom handler for missing translation.
