@@ -13,13 +13,29 @@ describe('Simple pages loader to check all major pages load correctly', () => {
     cy.checkPageLoaded();
   });
 
-  it('advanced search page', () => {
-    cy.visit('/search');
-    cy.get('.MuiTabs-root');
-    // There is no <h1> tag on the advanced search page so just click on the search tabs
-    cy.get('.MuiTabs-flexContainer > :nth-child(2)').click();
-    cy.get('.MuiTabs-flexContainer > :nth-child(3)').click();
-    cy.get('.MuiTabs-flexContainer > :nth-child(4)').click();
+  it('entrances list page', () => {
+    cy.visit('/entrances');
+    cy.checkPageLoaded();
+  });
+
+  it('massifs list page', () => {
+    cy.visit('/massifs');
+    cy.checkPageLoaded();
+  });
+
+  it('organizations list page', () => {
+    cy.visit('/organizations');
+    cy.checkPageLoaded();
+  });
+
+  it('documents list page', () => {
+    cy.visit('/documents');
+    cy.checkPageLoaded();
+  });
+
+  it('persons list page', () => {
+    cy.visit('/persons');
+    cy.checkPageLoaded();
   });
 
   it('map page', () => {

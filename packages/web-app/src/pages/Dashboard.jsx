@@ -47,7 +47,7 @@ const Dashboard = () => {
 
   useEffect(() => {
     if (!permissions.isAuth) {
-      navigate('');
+      navigate('/');
     }
   }, [permissions, navigate]);
 

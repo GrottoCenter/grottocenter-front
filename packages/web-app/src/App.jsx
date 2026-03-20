@@ -16,7 +16,6 @@ import Api from './components/appli/Api';
 import Dashboard from './pages/Dashboard';
 import ApiDoc from './pages/ApiDoc';
 import HomePage from './pages/homepage';
-import AdvancedSearch from './components/appli/AdvancedSearch';
 import DocumentDetails from './pages/DocumentDetails';
 import DuplicateImportHandle from './pages/DuplicateImportHandle';
 import Faq from './components/appli/Faq';
@@ -46,6 +45,11 @@ import NotificationsPage from './pages/Notifications';
 import SnapshotPage from './components/appli/Entry/Snapshots';
 import EntrancesListPage from './pages/EntrancesList';
 import CountryListPage from './pages/CountryList';
+import EntrancesSearchPage from './pages/Entrances';
+import DocumentsSearchPage from './pages/Documents';
+import MassifsSearchPage from './pages/Massifs';
+import OrganizationsSearchPage from './pages/Organizations';
+import PersonsSearchPage from './pages/Persons';
 
 import './App.css';
 
@@ -53,9 +57,14 @@ const router = createBrowserRouter(
   createRoutesFromElements(
     <Route element={<ApplicationShell />}>
       <Route exact path="/" element={<HomePage />} />
-      <Route exact path="/ui" element={<Dashboard />} />
+      <Route exact path="/ui" element={<Navigate to="/" replace />} />
+      <Route path="/ui/dashboard" element={<Dashboard />} />
       <Route path="/ui/admin/users" element={<ManageUsers />} />
-      <Route path="/ui/search/:tab?" element={<AdvancedSearch />} />
+      <Route path="/ui/entrances" element={<EntrancesSearchPage />} />
+      <Route path="/ui/documents" element={<DocumentsSearchPage />} />
+      <Route path="/ui/massifs" element={<MassifsSearchPage />} />
+      <Route path="/ui/organizations" element={<OrganizationsSearchPage />} />
+      <Route path="/ui/persons" element={<PersonsSearchPage />} />
       <Route path="/ui/api/:version" element={<ApiDoc />} />
       <Route path="/ui/api" element={<Api />} />
       <Route path="/ui/:type/:id/snapshots" element={<SnapshotPage />} />
@@ -108,7 +117,7 @@ const router = createBrowserRouter(
       <Route path="/ui/documents/:documentId" element={<DocumentDetails />} />
       <Route path="/ui/import-csv" element={<ImportContainer />} />
       <Route path="/ui/duplicates" element={<DuplicateImportHandle />} />
-      <Route path="/ui/*" render={() => <Navigate to="/ui" replace />} />
+      <Route path="/ui/*" element={<Navigate to="/" replace />} />
     </Route>
   ),
   {

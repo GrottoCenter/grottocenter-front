@@ -6,12 +6,13 @@ import {
   ListItemText,
   Divider
 } from '@mui/material';
-import React, { Fragment } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import { styled } from '@mui/material/styles';
 import { Description } from '@mui/icons-material';
 
 import GCLink from '../../components/common/GCLink';
+import { decodeFileName } from '../../components/common/DocumentsList/utils/imageUtils';
 
 const Label = styled(Typography)`
   margin-right: ${({ theme }) => theme.spacing(2)};
@@ -94,7 +95,7 @@ ListElement.propTypes = {
 export const FileListElement = ({ fileName, filePath }) => (
   <ListElement
     icon={<Description color="primary" />}
-    value={fileName}
+    value={decodeFileName(fileName)}
     url={filePath}
   />
 );
@@ -113,7 +114,7 @@ export const TextLink = ({ value, url }) =>
   );
 TextLink.propTypes = {
   value: PropTypes.string.isRequired,
-  url: PropTypes.node
+  url: PropTypes.string
 };
 
 export const SectionTitle = ({ children }) => (
@@ -206,25 +207,47 @@ SectionList.propTypes = {
   children: PropTypes.node
 };
 
-const SectionFilesPreviewIfFrame = styled('iframe')`
+const PreviewObject = styled('object')`
   border: 0;
   width: 100%;
-  min-height: 500px;
+  height: 100vh;
+  display: block;
 `;
+const PreviewImg = styled('img')`
+  max-width: 100%;
+`;
+
+const getExtension = url => `.${url.split('.').pop().toLowerCase()}`;
+const PREVIEW_EXTENSIONS = ['.pdf', '.png', '.jpg', '.jpeg'];
+
+const FilePreview = ({ src }) => {
+  const ext = getExtension(src);
+  if (ext === '.pdf')
+    return (
+      <PreviewObject data={src} type="application/pdf">
+        <a href={src} target="_blank" rel="noreferrer">
+          Open PDF
+        </a>
+      </PreviewObject>
+    );
+  if (['.png', '.jpg', '.jpeg'].includes(ext))
+    return <PreviewImg src={src} alt="" />;
+  return null;
+};
+FilePreview.propTypes = { src: PropTypes.string.isRequired };
+
 export const SectionFilesPreview = ({ title, files }) => {
-  const PREVIEW_EXTENTIONS = ['.pdf', '.png', '.jpg', '.mp3', '.mp4'];
-  const getExtention = url => `.${url.split('.').pop().toLowerCase()}`;
   if (!files || files.length === 0) return false;
   return (
     <>
       <SectionTitle>{title}</SectionTitle>
       {files.map(e => (
-        <Fragment key={e.completePath}>
+        <React.Fragment key={e.completePath}>
           <FileListElement fileName={e.fileName} filePath={e.completePath} />
-          {PREVIEW_EXTENTIONS.includes(getExtention(e.completePath)) && (
-            <SectionFilesPreviewIfFrame src={e.completePath} />
+          {PREVIEW_EXTENSIONS.includes(getExtension(e.completePath)) && (
+            <FilePreview src={e.completePath} />
           )}
-        </Fragment>
+        </React.Fragment>
       ))}
     </>
   );

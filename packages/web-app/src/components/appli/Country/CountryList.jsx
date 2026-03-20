@@ -10,7 +10,7 @@ import {
   Paper
 } from '@mui/material';
 import PropTypes from 'prop-types';
-import ScrollableContent from '../../common/Layouts/Fixed/ScrollableContent';
+import FixedContent from '../../common/Layouts/Fixed/FixedContent';
 import GCLink from '../../common/GCLink';
 import getLocalizedCountryName from '../../../helpers/countryName';
 import { AVAILABLE_LANGUAGES } from '../../../conf/config';
@@ -23,12 +23,12 @@ const CountryList = ({ countries = [] }) => {
   };
 
   return (
-    <ScrollableContent
+    <FixedContent
       title={formatMessage({
         id: 'Countries : Sovereign countries and autonomous territories (ISO 3166-1)'
       })}
       content={
-        <TableContainer component={Paper} style={{ width: '500px' }}>
+        <TableContainer component={Paper} sx={{ maxWidth: 500 }}>
           <Table size="small">
             <TableHead>
               <TableRow>

@@ -4,36 +4,7 @@ import { storiesOf } from '@storybook/react';
 import { action } from '@storybook/addon-actions';
 
 import AppBar from './index';
-import AutoCompleteSearch from '../AutoCompleteSearch';
 import User from './User';
-
-const AppBarWithState = ({ isAuth }) => {
-  const getOptionLabel = option => option.name;
-  return (
-    <AppBar
-      toggleMenu={action('toggle side menu')}
-      isAuth={isAuth}
-      onLoginClick={action('click log in')}
-      onLogoutClick={action('click log out')}
-      AutoCompleteSearch={() => (
-        <AutoCompleteSearch
-          hasFixWidth={false}
-          onSelection={() => {}}
-          input=""
-          inputValue=""
-          onInputChange={() => {}}
-          suggestions={[]}
-          renderOption={() => {}}
-          getOptionLabel={getOptionLabel}
-        />
-      )}
-    />
-  );
-};
-
-AppBarWithState.propTypes = {
-  isAuth: PropTypes.bool.isRequired
-};
 
 const UserWithState = ({ isAuth }) => (
   <User
@@ -48,7 +19,6 @@ UserWithState.propTypes = {
 };
 
 storiesOf('AppBar', module)
-  .add('Logged', () => <AppBarWithState isAuth />)
-  .add('Not logged', () => <AppBarWithState isAuth={false} />)
+  .add('Default', () => <AppBar />)
   .add('User menu, logged', () => <UserWithState isAuth />)
   .add('User menu, not logged', () => <UserWithState isAuth={false} />);

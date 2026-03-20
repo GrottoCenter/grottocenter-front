@@ -136,6 +136,7 @@ export const Entry = ({ isLoading, error, entrance }) => {
       <FixedLayout>
         {entrance && (
           <FixedContent
+            displayShare
             title={entrance.name ?? ''}
             icon={<CustomIcon type="entrance" />}
             onEdit={
