@@ -32,7 +32,7 @@ export function fetchNotifications(criterias) {
     };
 
     try {
-      const response = checkAndGetStatus(
+      const response = await checkAndGetStatus(
         await fetch(makeUrl(fetchNotificationsUrl, criterias), requestOptions)
       );
 
