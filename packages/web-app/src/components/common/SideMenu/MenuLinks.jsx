@@ -2,32 +2,62 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import {
+  Divider,
   List,
   ListItemButton,
   ListItemIcon,
-  ListItemText
+  ListItemText,
+  ListSubheader
 } from '@mui/material';
+import { styled } from '@mui/material/styles';
 import { Link } from 'react-router-dom';
-import LibraryAddIcon from '@mui/icons-material/LibraryAdd';
-import DashboardIcon from '@mui/icons-material/Dashboard';
 import MapIcon from '@mui/icons-material/Map';
-import SearchIcon from '@mui/icons-material/Search';
 import { FlagRounded } from '@mui/icons-material';
+import {
+  entranceIcon,
+  bibliographyIcon,
+  massifIcon,
+  organizationIcon,
+  caverIcon
+} from '../../../assets/icons';
 
 import Translate from '../Translate';
 
+const SectionHeader = styled(ListSubheader)(({ theme }) => ({
+  fontSize: '1.15rem',
+  fontWeight: 600,
+  letterSpacing: '1px',
+  textTransform: 'uppercase',
+  color: theme.palette.text.secondary,
+  lineHeight: '2rem',
+  paddingTop: theme.spacing(1)
+}));
+
+const EntityIcon = ({ src, alt }) => (
+  <img src={src} alt={alt} style={{ height: 28, width: 28 }} />
+);
+
+EntityIcon.propTypes = {
+  src: PropTypes.string.isRequired,
+  alt: PropTypes.string.isRequired
+};
+
+const LinkBehavior = React.forwardRef(({ to, ...props }, ref) => (
+  <Link {...props} to={to} ref={ref} />
+));
+LinkBehavior.displayName = 'LinkBehavior';
+
 export const LinkedItem = ({ href = '', ItemIcon, label, onClick }) => (
   <ListItemButton
-    component={React.forwardRef((props, ref) => (
-      <Link {...props} to={href} ref={ref} />
-    ))}
+    sx={{ py: '5px' }}
+    aria-label={label}
+    component={LinkBehavior}
+    to={href}
     onClick={onClick}>
-    <ListItemIcon>
+    <ListItemIcon sx={{ minWidth: 42 }}>
       <ItemIcon />
     </ListItemIcon>
-    <ListItemText>
-      <Translate>{label}</Translate>
-    </ListItemText>
+    <ListItemText primary={label} />
   </ListItemButton>
 );
 
@@ -38,49 +68,77 @@ LinkedItem.propTypes = {
   onClick: PropTypes.func
 };
 
-const MenuLinks = ({ isAuth, toggle }) => {
+const MenuLinks = ({ toggle }) => {
   const { formatMessage } = useIntl();
   return (
-    <List
-      component="nav"
-      aria-label={formatMessage({ id: 'main mailbox folders' })}>
-      <LinkedItem
-        ItemIcon={() => <MapIcon color="primary" />}
-        label={formatMessage({ id: 'Map' })}
-        href="/ui/map"
-        onClick={toggle}
-      />
-      <LinkedItem
-        ItemIcon={() => <SearchIcon color="primary" />}
-        label={formatMessage({ id: 'Advanced search' })}
-        href="/ui/search"
-        onClick={toggle}
-      />
-      <LinkedItem
-        ItemIcon={() => <LibraryAddIcon color="primary" />}
-        label={formatMessage({ id: 'Contribute' })}
-        href="/ui/entity/add"
-        onClick={toggle}
-      />
-      {isAuth && (
+    <>
+      <List
+        component="nav"
+        subheader={
+          <SectionHeader disableSticky>
+            <Translate>Explore</Translate>
+          </SectionHeader>
+        }>
         <LinkedItem
-          ItemIcon={() => <DashboardIcon color="primary" />}
-          label={formatMessage({ id: 'Dashboard' })}
-          href="/ui"
+          ItemIcon={() => <MapIcon color="primary" sx={{ fontSize: 28 }} />}
+          label={formatMessage({ id: 'Map' })}
+          href="/ui/map"
           onClick={toggle}
         />
-      )}
-      <LinkedItem
-        ItemIcon={() => <FlagRounded color="primary" />}
-        label={formatMessage({ id: 'Countries' })}
-        href="/ui/countries"
-        onClick={toggle}
-      />
-    </List>
+        <LinkedItem
+          ItemIcon={() => <FlagRounded color="primary" sx={{ fontSize: 28 }} />}
+          label={formatMessage({ id: 'Countries' })}
+          href="/ui/countries"
+          onClick={toggle}
+        />
+      </List>
+      <Divider />
+      <List
+        component="nav"
+        sx={{ pb: 0 }}
+        subheader={
+          <SectionHeader disableSticky>
+            <Translate>Browse</Translate>
+          </SectionHeader>
+        }>
+        <LinkedItem
+          ItemIcon={() => <EntityIcon src={entranceIcon} alt="entrance" />}
+          label={formatMessage({ id: 'Entrances' })}
+          href="/ui/entrances"
+          onClick={toggle}
+        />
+        <LinkedItem
+          ItemIcon={() => <EntityIcon src={massifIcon} alt="massif" />}
+          label={formatMessage({ id: 'Massifs' })}
+          href="/ui/massifs"
+          onClick={toggle}
+        />
+        <LinkedItem
+          ItemIcon={() => <EntityIcon src={bibliographyIcon} alt="document" />}
+          label={formatMessage({ id: 'Documents' })}
+          href="/ui/documents"
+          onClick={toggle}
+        />
+        <LinkedItem
+          ItemIcon={() => (
+            <EntityIcon src={organizationIcon} alt="organization" />
+          )}
+          label={formatMessage({ id: 'Organizations' })}
+          href="/ui/organizations"
+          onClick={toggle}
+        />
+        <LinkedItem
+          ItemIcon={() => <EntityIcon src={caverIcon} alt="person" />}
+          label={formatMessage({ id: 'Persons' })}
+          href="/ui/persons"
+          onClick={toggle}
+        />
+      </List>
+    </>
   );
 };
+
 MenuLinks.propTypes = {
-  isAuth: PropTypes.bool.isRequired,
   toggle: PropTypes.func
 };
 

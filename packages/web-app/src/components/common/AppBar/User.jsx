@@ -11,6 +11,7 @@ import {
 } from '@mui/material';
 import LogoutIcon from '@mui/icons-material/Logout';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import DashboardIcon from '@mui/icons-material/Dashboard';
 import React, { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useIntl } from 'react-intl';
@@ -62,6 +63,11 @@ const UserMenu = ({
     handleClose();
     navigate(`/ui/persons/${userId}`);
   }, [handleClose, navigate, userId]);
+
+  const handleDashboardClick = useCallback(() => {
+    handleClose();
+    navigate('/ui/dashboard');
+  }, [handleClose, navigate]);
 
   return !isAuth ? (
     <Button color="inherit" onClick={onLoginClick} variant="outlined">
@@ -141,6 +147,12 @@ const UserMenu = ({
             <AccountCircleIcon />
           </ListItemIcon>
           <Translate>My Account</Translate>
+        </MenuItem>
+        <MenuItem onClick={handleDashboardClick}>
+          <ListItemIcon>
+            <DashboardIcon />
+          </ListItemIcon>
+          <Translate>Dashboard</Translate>
         </MenuItem>
 
         {/* Session expired warning */}

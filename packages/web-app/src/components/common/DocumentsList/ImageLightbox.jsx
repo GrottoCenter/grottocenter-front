@@ -5,6 +5,7 @@ import { styled } from '@mui/material/styles';
 import { NavigateBefore, NavigateNext, Download } from '@mui/icons-material';
 import { useIntl } from 'react-intl';
 import StandardDialog from '../StandardDialog';
+import { decodeFileName } from './utils/imageUtils';
 
 const LightboxContent = styled(Box)`
   display: flex;
@@ -176,7 +177,7 @@ const ImageLightbox = ({
       maxWidth="xl"
       title={
         <Typography variant="subtitle1" component="h2">
-          {currentImage.fileName}
+          {decodeFileName(currentImage.fileName)}
         </Typography>
       }
       actions={
@@ -206,7 +207,7 @@ const ImageLightbox = ({
 
         <LightboxImage
           src={currentImage.completePath}
-          alt={currentImage.fileName}
+          alt={decodeFileName(currentImage.fileName)}
           onMouseDown={handleMouseDown}
           onMouseMove={handleMouseMove}
           onMouseUp={handleMouseUp}

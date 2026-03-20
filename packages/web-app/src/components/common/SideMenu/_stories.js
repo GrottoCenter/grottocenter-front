@@ -50,7 +50,7 @@ const WithState = () => {
           </Typography>
         </Toolbar>
       </AppBar>
-      <SideMenu isOpen={isSideMenuOpen} toggle={toggleSideMenu} />
+      <SideMenu isOpen={isSideMenuOpen} />
       <MainWrapper isSideMenuOpen={isSideMenuOpen}>
         <Typography paragraph>
           Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do

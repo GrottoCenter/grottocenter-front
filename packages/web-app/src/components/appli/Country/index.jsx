@@ -51,7 +51,12 @@ const Country = ({
   let title = '';
   if (isLoading) title = <Skeleton />;
   if (status === REDUCER_STATUS.SUCCEEDED) {
-    title = getLocalizedCountryName(country, formatMessage, locale, country.nativeName);
+    title = getLocalizedCountryName(
+      country,
+      formatMessage,
+      locale,
+      country.nativeName
+    );
   }
 
   return (
@@ -70,6 +75,7 @@ const Country = ({
         })}
       </Button>
       <Layout
+        displayShare
         title={title}
         isSubscribed={isSubscribed}
         isSubscribeLoading={isSubscribeLoading}

@@ -68,6 +68,7 @@ const Region = ({
       </Box>
       {region && (
         <FixedContent
+          displayShare
           title={region.name}
           isSubscribed={isSubscribed}
           isSubscribeLoading={isSubscribeLoading}

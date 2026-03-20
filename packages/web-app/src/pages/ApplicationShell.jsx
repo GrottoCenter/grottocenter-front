@@ -12,7 +12,7 @@ import { styled } from '@mui/material/styles';
 
 import GCReducer from '../reducers/GCReducer';
 import { bootstrapIntl } from '../actions/Intl';
-import { toggleSideMenu } from '../actions/SideMenu';
+
 import ErrorHandler from '../components/appli/ErrorHandler';
 import ErrorBoundary from '../components/appli/PageErrorBounary';
 import SideMenu from '../components/common/SideMenu';
@@ -97,7 +97,7 @@ const ApplicationLayout = () => {
   return (
     <>
       <AppBar />
-      <SideMenu isOpen={isSideMenuOpen} toggle={toggleSideMenu} />
+      <SideMenu isOpen={isSideMenuOpen} />
       <MainWrapper $isSideMenuOpen={isSideMenuOpen}>
         <LoginDialog />
 

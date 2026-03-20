@@ -7,10 +7,12 @@ import {
 } from '../../../actions/Advancedsearch';
 import EntityTable from '../../common/EntityTable/EntityTable';
 
-const SearchResults = ({ onSelected, hideExport }) => {
+const SearchResults = ({ onSelected, hideExport, entityType }) => {
   const dispatch = useDispatch();
   const { isNewQuery, queryParams, isLoading, results, totalResults } =
     useSelector(state => state.advancedsearch);
+
+  if (entityType && queryParams?.entity !== entityType) return null;
 
   return (
     <EntityTable
@@ -19,25 +21,25 @@ const SearchResults = ({ onSelected, hideExport }) => {
       isNewQuery={isNewQuery}
       pageRows={results}
       nbTotalRows={totalResults}
-      onPageChange={(pageNum, pageSize) => {
-        if (!queryParams) {
-          console.error('onPageChange Missing query params');
-          return;
-        }
-        const newQueryParams = { ...queryParams };
-        newQueryParams.page = pageNum + 1;
-        newQueryParams.size = pageSize;
-        dispatch(fetchAdvancedSearchResults(newQueryParams, false));
-      }}
-      onSortChange={sort => {
-        if (!queryParams) {
-          console.error('onSortChange Missing query params');
-          return;
-        }
-        const newQueryParams = { ...queryParams };
-        newQueryParams.sort = sort;
-        dispatch(fetchAdvancedSearchResults(newQueryParams, false));
-      }}
+      onPageChange={
+        queryParams
+          ? (pageNum, pageSize) => {
+              const newQueryParams = { ...queryParams };
+              newQueryParams.page = pageNum + 1;
+              newQueryParams.size = pageSize;
+              dispatch(fetchAdvancedSearchResults(newQueryParams, false));
+            }
+          : null
+      }
+      onSortChange={
+        queryParams
+          ? sort => {
+              const newQueryParams = { ...queryParams };
+              newQueryParams.sort = sort;
+              dispatch(fetchAdvancedSearchResults(newQueryParams, false));
+            }
+          : null
+      }
       onCSVDownload={hideExport ? null : (columns, columnsName) => {
         downloadAdvancedSearchResults({ ...queryParams, columns, columnsName });
       }}
@@ -49,7 +51,8 @@ const SearchResults = ({ onSelected, hideExport }) => {
 
 SearchResults.propTypes = {
   onSelected: PropTypes.func,
-  hideExport: PropTypes.bool
+  hideExport: PropTypes.bool,
+  entityType: PropTypes.string
 };
 
 export default SearchResults;

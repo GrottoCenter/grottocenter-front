@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Select, MenuItem, Input, CircularProgress } from '@mui/material';
 import LanguageIcon from '@mui/icons-material/Translate';
 import { styled } from '@mui/material/styles';
@@ -9,9 +10,9 @@ import { changeLocale } from '../../actions/Intl';
 const StyledSelect = styled(Select)(({ theme }) => ({
   paddingLeft: '10px',
   minWidth: isMobileOnly ? 'auto' : '150px',
-  width: 'initial',
+  flexGrow: 1,
   '& .MuiSelect-select': {
-    fontSize: '16px',
+    fontSize: 'inherit',
     minHeight: '12px',
     '&:before, &:hover, &:after, &:focus': {
       background: 'none'
@@ -25,9 +26,10 @@ const StyledSelect = styled(Select)(({ theme }) => ({
 const Wrapper = styled('div')`
   display: flex;
   align-items: center;
+  width: 100%;
 `;
 
-const LanguageSelector = () => {
+const LanguageSelector = ({ iconColor = 'inherit', hideIcon = false }) => {
   const { isLoading, locale, AVAILABLE_LANGUAGES } = useSelector(
     state => state.intl
   );
@@ -49,16 +51,21 @@ const LanguageSelector = () => {
 
   return (
     <Wrapper>
-      {isLoading ? (
-        <CircularProgress size={25} color="inherit" />
-      ) : (
-        <LanguageIcon />
+      {!hideIcon && (
+        isLoading
+          ? <CircularProgress size={25} color="inherit" />
+          : <LanguageIcon color={iconColor} />
       )}
       <StyledSelect value={locale} onChange={handleChange} input={<Input />}>
         {items}
       </StyledSelect>
     </Wrapper>
   );
+};
+
+LanguageSelector.propTypes = {
+  iconColor: PropTypes.string,
+  hideIcon: PropTypes.bool
 };
 
 export default LanguageSelector;

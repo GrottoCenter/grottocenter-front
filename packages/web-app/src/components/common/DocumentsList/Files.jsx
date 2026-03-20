@@ -5,7 +5,7 @@ import { styled } from '@mui/material/styles';
 import { Description, Download } from '@mui/icons-material';
 import ImageThumbnail from './ImageThumbnail';
 import ImageLightbox from './ImageLightbox';
-import { isImageFile } from './utils/imageUtils';
+import { isImageFile, decodeFileName } from './utils/imageUtils';
 
 const FileListItem = styled(ListItem)`
   margin: 0;
@@ -58,7 +58,7 @@ const Files = ({ files = [], description, onImageClick, imageIndexOffset = 0 }) 
               <ThumbnailWrapper>
                 <ImageThumbnail
                   src={file.completePath}
-                  alt={file.fileName}
+                  alt={decodeFileName(file.fileName)}
                   onClick={() => handleThumbnailClick(index)}
                 />
                 <Button
@@ -72,8 +72,8 @@ const Files = ({ files = [], description, onImageClick, imageIndexOffset = 0 }) 
                     maxWidth: 240, // Match thumbnail width
                     minWidth: 240 // for better rendering
                   }}
-                  title={file.fileName}>
-                  <EllipsisText>{file.fileName}</EllipsisText>
+                  title={decodeFileName(file.fileName)}>
+                  <EllipsisText>{decodeFileName(file.fileName)}</EllipsisText>
                 </Button>
               </ThumbnailWrapper>
             </Grid>
@@ -93,7 +93,7 @@ const Files = ({ files = [], description, onImageClick, imageIndexOffset = 0 }) 
                 target="_blank"
                 startIcon={<Description />}
                 href={file.completePath}>
-                {file.fileName}
+                {decodeFileName(file.fileName)}
               </Button>
             }
           />

@@ -82,8 +82,7 @@ export const Network = ({ isLoading, error, cave }) => {
 
   useEffect(() => {
     if (cave?.id) {
-      const explored =
-        exploredNetworks?.some(n => n?.id === cave?.id);
+      const explored = exploredNetworks?.some(n => n?.id === cave?.id);
       setIsExplored(explored);
     }
   }, [exploredNetworks, cave?.id]);
@@ -115,17 +114,20 @@ export const Network = ({ isLoading, error, cave }) => {
         fixedContent={
           cave && (
             <FixedContent
+              displayShare
               title={cave?.name ?? ''}
               icon={<CustomIcon type="network" />}
               onEdit={
-                isAuth && !cave?.isDeleted
-                  ? () => setEditing(true)
-                  : undefined
+                isAuth && !cave?.isDeleted ? () => setEditing(true) : undefined
               }
               onDelete={onDelete}
               isExplored={isAuth && caveId ? isExplored : null}
               isExploredLoading={isExploredLoading}
-              onToggleExplored={isAuth && caveId && !cave?.isDeleted ? handleToggleExplored : undefined}
+              onToggleExplored={
+                isAuth && caveId && !cave?.isDeleted
+                  ? handleToggleExplored
+                  : undefined
+              }
               printRef={componentRef}
               content={
                 <>

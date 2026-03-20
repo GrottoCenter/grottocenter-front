@@ -102,6 +102,7 @@ const Massif = ({ isLoading, error, massif }) => {
     <FixedLayout>
       {massif && (
         <FixedContent
+          displayShare
           icon={<CustomIcon type="massif" />}
           onEdit={!error ? onEdit : null}
           onDelete={!error ? onDelete : null}

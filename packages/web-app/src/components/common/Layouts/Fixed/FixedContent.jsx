@@ -19,12 +19,13 @@ import { styled } from '@mui/material/styles';
 import { useReactToPrint } from 'react-to-print';
 import CreateIcon from '@mui/icons-material/Create';
 import DeleteIcon from '@mui/icons-material/Delete';
-import ShareIcon from '@mui/icons-material/Share';
 import TimelineIcon from '@mui/icons-material/Timeline';
 import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
 import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+
+import ShareIcon from '@mui/icons-material/Share';
 
 import { SnapshotButton } from '../../../appli/Entry/Snapshots/UtilityFunction';
 import { useNotification } from '../../../../hooks';
@@ -83,14 +84,13 @@ const FixedContent = ({
   isSubscribeLoading,
   onToggleExplored,
   isExplored,
-  isExploredLoading
+  isExploredLoading,
+  displayShare = false
 }) => {
   const { formatMessage } = useIntl();
   const { onSuccess } = useNotification();
 
   const handleShare = async () => {
-    // We share the page URL without any query params to avoid sharing
-    // a specific revision or a specific view of the page
     const { origin, pathname } = window.location;
     const url = origin + pathname;
     const shareTitle = document.title;
@@ -151,13 +151,15 @@ const FixedContent = ({
                 </Button>
               </Tooltip>
             )}
-            <Tooltip title={formatMessage({ id: 'Copy link' })}>
-              <Button
-                aria-label={formatMessage({ id: 'Copy link' })}
-                onClick={handleShare}>
-                <ShareIcon />
-              </Button>
-            </Tooltip>
+            {displayShare && (
+              <Tooltip title={formatMessage({ id: 'Copy link' })}>
+                <Button
+                  aria-label={formatMessage({ id: 'Copy link' })}
+                  onClick={handleShare}>
+                  <ShareIcon />
+                </Button>
+              </Tooltip>
+            )}
             {onEdit && (
               <Tooltip
                 title={formatMessage({
@@ -259,7 +261,8 @@ FixedContent.propTypes = {
   }),
   onChangeSubscribe: PropTypes.func,
   subheader: PropTypes.node,
-  title: PropTypes.oneOfType([PropTypes.node, PropTypes.string])
+  title: PropTypes.oneOfType([PropTypes.node, PropTypes.string]),
+  displayShare: PropTypes.bool
 };
 
 export default FixedContent;

@@ -117,7 +117,11 @@ const Document = ({
             <FileListElement
               key={path}
               fileName={formatMessage(
-                { id: end ? 'Pages {start}-{end} of {title}' : 'Page {start} of {title}' },
+                {
+                  id: end
+                    ? 'Pages {start}-{end} of {title}'
+                    : 'Page {start} of {title}'
+                },
                 { start, end, title: documentData.parent.title }
               )}
               filePath={path}
@@ -194,6 +198,7 @@ const Document = ({
 
   return (
     <FixedContent
+      displayShare
       onEdit={!error ? onEdit : null}
       onDelete={!error ? onDelete : null}
       subheader={
@@ -270,7 +275,12 @@ const Document = ({
               <SectionDetails title={formatMessage({ id: 'Details' })}>
                 <ItemString
                   label={formatMessage({ id: 'Type' })}
-                  value={<Chip color="primary" label={formatMessage({ id: documentData.type })} />}
+                  value={
+                    <Chip
+                      color="primary"
+                      label={formatMessage({ id: documentData.type })}
+                    />
+                  }
                 />
                 <ItemString
                   label={formatMessage({ id: 'Language' })}

@@ -181,10 +181,11 @@ export const overridings = {
           flexShrink: 0
         },
         paper: {
-          top: appBarHeight,
-          height: `calc(100% - ${appBarHeight}px)`,
+          top: 0,
+          height: '100%',
           width: sideMenuWidth,
-          padding: '8px'
+          display: 'flex',
+          flexDirection: 'column'
         }
       }
     },

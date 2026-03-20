@@ -70,7 +70,7 @@ const Api = () => {
                 id="A complete export of the database is also available to {0} for leader users."
                 values={{
                   0: (
-                    <GCLink href="/ui">
+                    <GCLink href="/ui/dashboard">
                       <Translate key="download" id="download" />
                     </GCLink>
                   )

@@ -67,7 +67,20 @@ export const wikiLinks = {
   '*': 'https://wiki.grottocenter.org'
 };
 export const userguideLinks = {
+  ar: 'https://wiki.grottocenter.org/wiki/GrottoCenter:Ar/User_Guide',
+  bg: 'https://wiki.grottocenter.org/wiki/GrottoCenter:Bg/User_Guide',
+  ca: 'https://wiki.grottocenter.org/wiki/GrottoCenter:Ca/User_Guide',
+  de: 'https://wiki.grottocenter.org/wiki/GrottoCenter:De/User_Guide',
+  el: 'https://wiki.grottocenter.org/wiki/GrottoCenter:El/User_Guide',
+  en: 'https://wiki.grottocenter.org/wiki/GrottoCenter:En/User_Guide',
+  es: 'https://wiki.grottocenter.org/wiki/GrottoCenter:Es/User_Guide',
   fr: 'https://wiki.grottocenter.org/wiki/GrottoCenter:Fr/User_Guide',
+  he: 'https://wiki.grottocenter.org/wiki/GrottoCenter:He/User_Guide',
+  id: 'https://wiki.grottocenter.org/wiki/GrottoCenter:Id/User_Guide',
+  it: 'https://wiki.grottocenter.org/wiki/GrottoCenter:It/User_Guide',
+  ja: 'https://wiki.grottocenter.org/wiki/GrottoCenter:Ja/User_Guide',
+  nl: 'https://wiki.grottocenter.org/wiki/GrottoCenter:Nl/User_Guide',
+  pt: 'https://wiki.grottocenter.org/wiki/GrottoCenter:Pt/User_Guide',
   '*': 'https://wiki.grottocenter.org/wiki/GrottoCenter:En/User_Guide'
 };
 export const wikiBatsLinks = generateLinks(

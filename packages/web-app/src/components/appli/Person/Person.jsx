@@ -92,6 +92,7 @@ const Person = ({
     <FixedLayout>
       {person && (
         <FixedContent
+          displayShare
           icon={<CustomIcon type="caver" />}
           title={title}
           onEdit={

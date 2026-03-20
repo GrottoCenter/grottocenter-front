@@ -128,6 +128,7 @@ const Organization = ({ error, isLoading, organization }) => {
     <FixedLayout>
       {organization && (
         <FixedContent
+          displayShare
           icon={<CustomIcon type="organization" />}
           onEdit={!error ? onEdit : null}
           onDelete={!error ? onDelete : null}
