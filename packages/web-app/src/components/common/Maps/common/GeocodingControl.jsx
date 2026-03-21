@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useMap } from 'react-leaflet';
+import * as L from 'leaflet';
 import { styled } from '@mui/material/styles';
 import {
   Autocomplete,
