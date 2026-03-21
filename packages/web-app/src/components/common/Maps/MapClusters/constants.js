@@ -83,6 +83,16 @@ export const HEX_LAYER_OPTIONS = {
   duration: 400
 };
 
+// Per-type zoom threshold above which the heatmap is replaced by another layer
+// (point markers for entrances/networks, polygons for massifs).
+export const HEAT_TYPE_CONFIG = {
+  entrances: { heatOffZoom: MARKERS_LIMIT },
+  networks: { heatOffZoom: MARKERS_LIMIT },
+  massifs: { heatOffZoom: MASSIFS_POLYGON_LIMIT }
+};
+export const getHeatOffZoom = type =>
+  HEAT_TYPE_CONFIG[type]?.heatOffZoom ?? MARKERS_LIMIT;
+
 // For visibility we changes the options on
 export const HEX_DETAILS_OPACITY = 0.85;
 export const HEX_DETAILS_ZOOM = 8;
