@@ -6,6 +6,17 @@ import { MassifPopup } from '../common/Markers/Components';
 import useRenderPopup from '../common/Markers/useRenderPopup';
 import { MASSIF_POLYGON_STYLE, MASSIF_POLYGON_HOVER_STYLE } from './constants';
 
+// Bounding-box area approximation — fast enough for sort ordering.
+const getBboxArea = geometry => {
+  const coords =
+    geometry.type === 'MultiPolygon'
+      ? geometry.coordinates.flat(2)
+      : geometry.coordinates.flat(1);
+  const lngs = coords.map(c => c[0]);
+  const lats = coords.map(c => c[1]);
+  return (Math.max(...lngs) - Math.min(...lngs)) * (Math.max(...lats) - Math.min(...lats));
+};
+
 const MassifPolygons = ({ massifs = [] }) => {
   const map = useMap();
   const renderPopup = useRenderPopup();
@@ -23,7 +34,9 @@ const MassifPolygons = ({ massifs = [] }) => {
       type: 'FeatureCollection',
       features: massifs
         .filter(m => m.geogPolygon)
-        .map(m => ({
+        .map(m => ({ m, area: getBboxArea(m.geogPolygon) }))
+        .sort((a, b) => b.area - a.area)
+        .map(({ m }) => ({
           type: 'Feature',
           geometry: m.geogPolygon,
           properties: {
