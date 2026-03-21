@@ -21,7 +21,11 @@ import {
   AUTOCOMPLETE_MIN_CHARACTERS,
   ADVANCED_SEARCH_TYPES
 } from '../../../../conf/config';
-import { advancedSearchUrl, getCaveUrl, getMassifUrl } from '../../../../conf/apiRoutes';
+import {
+  advancedSearchUrl,
+  getCaveUrl,
+  getMassifUrl
+} from '../../../../conf/apiRoutes';
 import CustomIcon from '../../CustomIcon';
 import useRenderPopup from './Markers/useRenderPopup';
 import {
@@ -93,6 +97,30 @@ const OptionText = styled(ListItemText)`
   }
 `;
 
+const EMPTY_RESULTS = {
+  location: [],
+  entrance: [],
+  network: [],
+  organization: [],
+  massif: []
+};
+
+const fetchAdvancedSearch = (query, entity, size, signal) =>
+  fetch(advancedSearchUrl, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      query,
+      entity,
+      matchAllFields: false,
+      page: 0,
+      size
+    }),
+    signal
+  })
+    .then(res => res.json())
+    .then(data => data.results || []);
+
 const ADDRESS_TYPE_PRIORITY = {
   house: 1,
   building: 2,
@@ -122,11 +150,7 @@ const GeocodingControl = ({ onLocationSelect }) => {
   const map = useMap();
   const { formatMessage, locale } = useIntl();
   const [query, setQuery] = useState('');
-  const [locationResults, setLocationResults] = useState([]);
-  const [entranceResults, setEntranceResults] = useState([]);
-  const [networkResults, setNetworkResults] = useState([]);
-  const [organizationResults, setOrganizationResults] = useState([]);
-  const [massifResults, setMassifResults] = useState([]);
+  const [results, setResults] = useState(EMPTY_RESULTS);
   const [loading, setLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const popupCleanupRef = useRef(null);
@@ -174,11 +198,7 @@ const GeocodingControl = ({ onLocationSelect }) => {
 
   useEffect(() => {
     if (query.length < AUTOCOMPLETE_MIN_CHARACTERS) {
-      setLocationResults([]);
-      setEntranceResults([]);
-      setNetworkResults([]);
-      setOrganizationResults([]);
-      setMassifResults([]);
+      setResults(EMPTY_RESULTS);
       setLoading(false);
       return undefined;
     }
@@ -193,165 +213,129 @@ const GeocodingControl = ({ onLocationSelect }) => {
         const viewbox = `${bounds.getWest()},${bounds.getNorth()},${bounds.getEast()},${bounds.getSouth()}`;
 
         // Parallel API calls
-        const [locationData, entranceData, networkData, organizationData, massifData] =
-          await Promise.all([
-            fetch(
-              `${NOMINATIM_API_URL}?format=json&q=${encodeURIComponent(query)}&limit=5&accept-language=${locale}&viewbox=${viewbox}`,
-              { signal }
+        const [
+          locationData,
+          entranceData,
+          networkData,
+          organizationData,
+          massifData
+        ] = await Promise.all([
+          fetch(
+            `${NOMINATIM_API_URL}?format=json&q=${encodeURIComponent(query)}&limit=5&accept-language=${locale}&viewbox=${viewbox}`,
+            { signal }
+          )
+            .then(res => res.json())
+            .catch(error => {
+              if (error.name !== 'AbortError')
+                console.error('Failed to fetch location data:', error);
+              return [];
+            }),
+          fetchAdvancedSearch(
+            query,
+            ADVANCED_SEARCH_TYPES.ENTRANCES,
+            5,
+            signal
+          ).catch(error => {
+            if (error.name !== 'AbortError')
+              console.error('Failed to fetch entrance data:', error);
+            return [];
+          }),
+          fetchAdvancedSearch(query, ADVANCED_SEARCH_TYPES.CAVES, 3, signal)
+            .then(caves =>
+              // Networks have no coordinates: fetch each cave detail to get the first entrance's location
+              // and filter to only keep real networks (multiple entrances).
+              // 1 search call + up to 3 detail fetches = 4 API calls for this section.
+              Promise.all(
+                caves.map(cave =>
+                  fetch(`${getCaveUrl}${cave.id}`, { signal })
+                    .then(res => res.json())
+                    .then(detail => {
+                      const entrances = detail.entrances || [];
+                      if (entrances.length < 2) return null;
+                      const entrance = entrances[0];
+                      return entrance
+                        ? {
+                            ...cave,
+                            latitude: entrance.latitude,
+                            longitude: entrance.longitude
+                          }
+                        : null;
+                    })
+                    .catch(() => null)
+                )
+              ).then(r => r.filter(Boolean))
             )
-              .then(res => res.json())
-              .catch(error => {
-                if (error.name !== 'AbortError') console.error('Failed to fetch location data:', error);
-                return [];
-              }),
-            fetch(advancedSearchUrl, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                query,
-                entity: ADVANCED_SEARCH_TYPES.ENTRANCES,
-                matchAllFields: false,
-                page: 0,
-                size: 5
-              }),
-              signal
+            .catch(error => {
+              if (error.name !== 'AbortError')
+                console.error('Failed to fetch network data:', error);
+              return [];
+            }),
+          fetchAdvancedSearch(
+            query,
+            ADVANCED_SEARCH_TYPES.ORGANIZATIONS,
+            3,
+            signal
+          ).catch(error => {
+            if (error.name !== 'AbortError')
+              console.error('Failed to fetch organization data:', error);
+            return [];
+          }),
+          fetchAdvancedSearch(query, ADVANCED_SEARCH_TYPES.MASSIFS, 3, signal)
+            .then(massifs =>
+              // Massifs have no coordinates: fetch each detail to get the polygon
+              // and derive the centroid + bounding box for map navigation.
+              Promise.all(
+                massifs.map(massif =>
+                  fetch(`${getMassifUrl}${massif.id}`, { signal })
+                    .then(res => res.json())
+                    .then(detail => {
+                      if (!detail.geogPolygon) return null;
+                      const geoJson = JSON.parse(detail.geogPolygon);
+                      const massifBounds = L.geoJSON(geoJson).getBounds();
+                      if (!massifBounds.isValid()) return null;
+                      const center = massifBounds.getCenter();
+                      const sw = massifBounds.getSouthWest();
+                      const ne = massifBounds.getNorthEast();
+                      return {
+                        ...massif,
+                        latitude: center.lat,
+                        longitude: center.lng,
+                        bounds: [
+                          [sw.lat, sw.lng],
+                          [ne.lat, ne.lng]
+                        ],
+                        networkCount: detail.networks?.length ?? 0
+                      };
+                    })
+                    .catch(() => null)
+                )
+              ).then(r => r.filter(Boolean))
+            )
+            .catch(error => {
+              if (error.name !== 'AbortError')
+                console.error('Failed to fetch massif data:', error);
+              return [];
             })
-              .then(res => res.json())
-              .then(data => data.results || [])
-              .catch(error => {
-                if (error.name !== 'AbortError') console.error('Failed to fetch entrance data:', error);
-                return [];
-              }),
-            fetch(advancedSearchUrl, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                query,
-                entity: ADVANCED_SEARCH_TYPES.CAVES,
-                matchAllFields: false,
-                page: 0,
-                size: 3
-              }),
-              signal
-            })
-              .then(res => res.json())
-              .then(data => data.results || [])
-              .then(caves =>
-                // Networks have no coordinates: fetch each cave detail to get the first entrance's location
-                // and filter to only keep real networks (multiple entrances).
-                // 1 search call + up to 3 detail fetches = 4 API calls for this section.
-                Promise.all(
-                  caves.map(cave =>
-                    fetch(`${getCaveUrl}${cave.id}`, { signal })
-                      .then(res => res.json())
-                      .then(detail => {
-                        const entrances = detail.entrances || [];
-                        if (entrances.length < 2) return null;
-                        const entrance = entrances[0];
-                        return entrance
-                          ? {
-                              ...cave,
-                              latitude: entrance.latitude,
-                              longitude: entrance.longitude
-                            }
-                          : null;
-                      })
-                      .catch(() => null)
-                  )
-                ).then(results => results.filter(Boolean))
-              )
-              .catch(error => {
-                if (error.name !== 'AbortError') console.error('Failed to fetch network data:', error);
-                return [];
-              }),
-            fetch(advancedSearchUrl, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                query,
-                entity: ADVANCED_SEARCH_TYPES.ORGANIZATIONS,
-                matchAllFields: false,
-                page: 0,
-                size: 3
-              }),
-              signal
-            })
-              .then(res => res.json())
-              .then(data => data.results || [])
-              .catch(error => {
-                if (error.name !== 'AbortError') console.error('Failed to fetch organization data:', error);
-                return [];
-              }),
-            fetch(advancedSearchUrl, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                query,
-                entity: ADVANCED_SEARCH_TYPES.MASSIFS,
-                matchAllFields: false,
-                page: 0,
-                size: 3
-              }),
-              signal
-            })
-              .then(res => res.json())
-              .then(data => data.results || [])
-              .then(massifs =>
-                // Massifs have no coordinates: fetch each detail to get the polygon
-                // and derive the centroid + bounding box for map navigation.
-                Promise.all(
-                  massifs.map(massif =>
-                    fetch(`${getMassifUrl}${massif.id}`, { signal })
-                      .then(res => res.json())
-                      .then(detail => {
-                        if (!detail.geogPolygon) return null;
-                        const geoJson = JSON.parse(detail.geogPolygon);
-                        const bounds = L.geoJSON(geoJson).getBounds();
-                        if (!bounds.isValid()) return null;
-                        const center = bounds.getCenter();
-                        const sw = bounds.getSouthWest();
-                        const ne = bounds.getNorthEast();
-                        return {
-                          ...massif,
-                          latitude: center.lat,
-                          longitude: center.lng,
-                          bounds: [[sw.lat, sw.lng], [ne.lat, ne.lng]],
-                          entranceCount: detail.entrances?.length ?? 0,
-                          networkCount: detail.networks?.length ?? 0
-                        };
-                      })
-                      .catch(() => null)
-                  )
-                ).then(results => results.filter(Boolean))
-              )
-              .catch(error => {
-                if (error.name !== 'AbortError') console.error('Failed to fetch massif data:', error);
-                return [];
-              })
-          ]);
+        ]);
 
         // Don't write stale results if this request was superseded
         if (signal.aborted) return;
 
-        const sortedLocations = locationData.sort(
-          (a, b) =>
-            (ADDRESS_TYPE_PRIORITY[a.addresstype] || 99) -
-            (ADDRESS_TYPE_PRIORITY[b.addresstype] || 99)
-        );
-
-        setLocationResults(sortedLocations);
-        setEntranceResults(entranceData);
-        setNetworkResults(networkData);
-        setOrganizationResults(organizationData);
-        setMassifResults(massifData);
+        setResults({
+          location: locationData.sort(
+            (a, b) =>
+              (ADDRESS_TYPE_PRIORITY[a.addresstype] || 99) -
+              (ADDRESS_TYPE_PRIORITY[b.addresstype] || 99)
+          ),
+          entrance: entranceData,
+          network: networkData,
+          organization: organizationData,
+          massif: massifData
+        });
       } catch (error) {
         if (signal.aborted) return;
         console.error('Search error:', error);
-        setLocationResults([]);
-        setEntranceResults([]);
-        setNetworkResults([]);
-        setOrganizationResults([]);
-        setMassifResults([]);
+        setResults(EMPTY_RESULTS);
       } finally {
         if (!signal.aborted) setLoading(false);
       }
@@ -367,11 +351,7 @@ const GeocodingControl = ({ onLocationSelect }) => {
   const handleSelect = result => {
     document.activeElement?.blur();
     setQuery('');
-    setLocationResults([]);
-    setEntranceResults([]);
-    setNetworkResults([]);
-    setOrganizationResults([]);
-    setMassifResults([]);
+    setResults(EMPTY_RESULTS);
 
     if (result.resultType === 'massif') {
       const lat = result.latitude;
@@ -434,22 +414,20 @@ const GeocodingControl = ({ onLocationSelect }) => {
 
   const allResults = useMemo(
     () => [
-      ...entranceResults
-        // Explicitly filter out entrances without coordinates to avoid showing results that can't be displayed on the map
+      // Explicitly filter out entrances without coordinates to avoid showing results that can't be displayed on the map
+      ...results.entrance
         .filter(e => e.latitude != null && e.longitude != null)
         .map(e => ({ ...e, resultType: 'entrance' })),
-      ...networkResults
+      ...results.network
         .filter(c => c.latitude != null && c.longitude != null)
         .map(c => ({ ...c, resultType: 'network' })),
-      ...massifResults
-        .filter(m => m.latitude != null && m.longitude != null)
-        .map(m => ({ ...m, resultType: 'massif' })),
-      ...organizationResults
+      ...results.massif.map(m => ({ ...m, resultType: 'massif' })),
+      ...results.organization
         .filter(o => o.latitude != null && o.longitude != null)
         .map(o => ({ ...o, resultType: 'organization' })),
-      ...locationResults.map(l => ({ ...l, resultType: 'location' }))
+      ...results.location.map(l => ({ ...l, resultType: 'location' }))
     ],
-    [entranceResults, networkResults, massifResults, organizationResults, locationResults]
+    [results]
   );
 
   const showDropdown =
@@ -527,7 +505,10 @@ const GeocodingControl = ({ onLocationSelect }) => {
           }
 
           return (
-            <OptionItem key={`${result.resultType ?? 'place'}-${result.id ?? result.place_id}`} {...optionProps} dense>
+            <OptionItem
+              key={`${result.resultType ?? 'place'}-${result.id ?? result.place_id}`}
+              {...optionProps}
+              dense>
               <OptionIcon>{icon}</OptionIcon>
               <OptionText
                 primary={primary}
