@@ -13,6 +13,7 @@ import {
   MARKERS_LIMIT,
   ENTRANCE_HEAT_COLORS,
   NETWORK_HEAT_COLORS,
+  MASSIF_HEAT_COLORS,
   HEX_FLY_TO_DURATION,
   HEX_RADIUS_RANGE,
   HEX_LAYER_OPTIONS,
@@ -93,9 +94,12 @@ const useHeatLayer = (data = [], type = heatmapTypes.ENTRANCES) => {
         // Remove previous tooltip (avoid some bug)
         d3.selectAll('.hexbin-tooltip').remove();
         hexLayer
+          // eslint-disable-next-line no-nested-ternary
           .colorRange(
             newType === heatmapTypes.NETWORKS
               ? NETWORK_HEAT_COLORS
+              : newType === heatmapTypes.MASSIFS
+              ? MASSIF_HEAT_COLORS
               : ENTRANCE_HEAT_COLORS
           )
           .hoverHandler(

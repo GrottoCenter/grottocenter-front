@@ -4,7 +4,9 @@ import {
   getMapCavesCoordinatesUrl,
   getMapEntrancesUrl,
   getMapEntrancesCoordinatesUrl,
-  getMapGrottosUrl
+  getMapGrottosUrl,
+  getMapMassifsUrl,
+  getMapMassifsCoordinatesUrl
 } from '../conf/apiRoutes';
 import makeErrorMessage from '../helpers/makeErrorMessage';
 import { makeUrl } from './utils';
@@ -27,12 +29,20 @@ export const FETCH_MAP_ORGANIZATIONS_SUCCESS =
   'FETCH_MAP_ORGANIZATIONS_SUCCESS';
 export const FETCH_MAP_ORGANIZATIONS_FAILURE =
   'FETCH_MAP_ORGANIZATIONS_FAILURE';
+export const FETCH_MAP_MASSIFS_SUCCESS = 'FETCH_MAP_MASSIFS_SUCCESS';
+export const FETCH_MAP_MASSIFS_FAILURE = 'FETCH_MAP_MASSIFS_FAILURE';
+export const FETCH_MAP_MASSIFS_COORDINATES_SUCCESS =
+  'FETCH_MAP_MASSIFS_COORDINATES_SUCCESS';
+export const FETCH_MAP_MASSIFS_COORDINATES_FAILURE =
+  'FETCH_MAP_MASSIFS_COORDINATES_FAILURE';
 export const LOADINGS = {
   NETWORKS: 'networks',
   NETWORKS_COORDINATES: 'networks_coordinates',
   ENTRANCES: 'entrances',
   ENTRANCES_COORDINATES: 'entrances_coordinates',
-  ORGANIZATIONS: 'organizations'
+  ORGANIZATIONS: 'organizations',
+  MASSIFS: 'massifs',
+  MASSIFS_COORDINATES: 'massifs_coordinates'
 };
 
 // Heatmap coordinates are fetched once at startup with world-wide bounds rather than
@@ -236,6 +246,73 @@ export const fetchOrganizations = criteria => {
     debounce: {
       time: 500,
       key: 'FETCH_MAP_ORGANIZATIONS'
+    }
+  };
+
+  return thunkToDebounce;
+};
+
+export const fetchAllMassifsCoordinates = () => dispatch => {
+  dispatch({
+    type: FETCH_MAP_START_LOADING,
+    key: LOADINGS.MASSIFS_COORDINATES
+  });
+  return fetchWithRetry(makeUrl(getMapMassifsCoordinatesUrl, MAX_BOUNDS))
+    .then(text => {
+      dispatch({
+        type: FETCH_MAP_MASSIFS_COORDINATES_SUCCESS,
+        data: JSON.parse(text)
+      });
+    })
+    .catch(error => {
+      dispatch({
+        type: FETCH_MAP_MASSIFS_COORDINATES_FAILURE,
+        error: makeErrorMessage(
+          error.message,
+          `Fetching all massifs coordinates`
+        )
+      });
+    })
+    .finally(() => {
+      dispatch({
+        type: FETCH_MAP_END_LOADING,
+        key: LOADINGS.MASSIFS_COORDINATES
+      });
+    });
+};
+
+export const fetchMassifs = criteria => {
+  const thunkToDebounce = function (dispatch) {
+    dispatch({ type: FETCH_MAP_START_LOADING, key: LOADINGS.MASSIFS });
+    const completedUrl = makeUrl(getMapMassifsUrl, criteria);
+    return fetch(completedUrl)
+      .then(response => {
+        if (response.status >= 400) {
+          throw new Error(response.status);
+        }
+        return response.text();
+      })
+      .then(text => {
+        dispatch({ type: FETCH_MAP_MASSIFS_SUCCESS, data: JSON.parse(text) });
+      })
+      .catch(error => {
+        dispatch({
+          type: FETCH_MAP_MASSIFS_FAILURE,
+          error: makeErrorMessage(error.message, `Fetching massifs`)
+        });
+      })
+      .finally(() => {
+        dispatch({
+          type: FETCH_MAP_END_LOADING,
+          key: LOADINGS.MASSIFS
+        });
+      });
+  };
+
+  thunkToDebounce.meta = {
+    debounce: {
+      time: 500,
+      key: 'FETCH_MAP_MASSIFS'
     }
   };
 

@@ -1,4 +1,4 @@
-import { blue, brown } from '@mui/material/colors';
+import { blue, brown, green } from '@mui/material/colors';
 
 export const CAVE_SIZE = {
   SMALL: 'small',
@@ -50,6 +50,8 @@ export const ENTRANCE_MARKER_FILTERS = [
 ];
 
 export const MARKERS_LIMIT = 13;
+// Zoom level at which massif polygons are fetched and displayed
+export const MASSIFS_POLYGON_LIMIT = 8;
 
 // Related to Heat map
 const HEX_MIN_RADIUS = 10;
@@ -61,6 +63,20 @@ export const HEX_RADIUS_RANGE = [HEX_MIN_RADIUS, HEX_MAX_RADIUS];
 // on light OSM tiles, especially combined with the hex opacity.
 export const ENTRANCE_HEAT_COLORS = [brown[200], brown[900]];
 export const NETWORK_HEAT_COLORS = [blue[200], blue[900]];
+export const MASSIF_HEAT_COLORS = [green[200], green[900]];
+
+// Massif polygon style for the Leaflet GeoJSON layer
+export const MASSIF_POLYGON_STYLE = {
+  color: green[700],
+  weight: 2,
+  opacity: 0.85,
+  fillColor: green[400],
+  fillOpacity: 0.25
+};
+export const MASSIF_POLYGON_HOVER_STYLE = {
+  weight: 3,
+  fillOpacity: 0.45
+};
 export const HEX_LAYER_OPTIONS = {
   radius: HEX_MAX_RADIUS,
   opacity: HEX_OPACITY,

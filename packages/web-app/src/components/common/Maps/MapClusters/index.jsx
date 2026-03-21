@@ -9,8 +9,15 @@ import GeocodingControl from '../common/GeocodingControl';
 import MeasureControl from '../common/MeasureControl';
 import useHeatLayer, { HexGlobalCss } from './useHeatLayer';
 import Markers from './Markers';
+import MassifPolygons from './MassifPolygons';
 import CustomMapContainer from '../common/MapContainer';
-import { MARKERS_LIMIT, ENTRANCE_MARKER_FILTERS, getCaveSize, CAVE_SIZE } from './constants';
+import {
+  MARKERS_LIMIT,
+  MASSIFS_POLYGON_LIMIT,
+  ENTRANCE_MARKER_FILTERS,
+  getCaveSize,
+  CAVE_SIZE
+} from './constants';
 
 const ZOOM_STATE = {
   MARKERS: 1,
@@ -23,6 +30,8 @@ const HydratedMap = ({
   networks,
   networkMarkers = [],
   organizations,
+  massifs,
+  massifPolygons = [],
   projectionsList,
   onUpdate
 }) => {
@@ -52,6 +61,9 @@ const HydratedMap = ({
   const [visibleHeat, setVisibleHeat] = useState(isInitiallyZoomedIn ? heatmapTypes.NONE : selectedHeat);
   const [visibleMarkers, setVisibleMarkers] = useState(isInitiallyZoomedIn ? [selectedHeat] : []);
   const [isMarkersMode, setIsMarkersMode] = useState(isInitiallyZoomedIn);
+  const [isMassifsAboveThreshold, setIsMassifsAboveThreshold] = useState(
+    initialZoom >= MASSIFS_POLYGON_LIMIT
+  );
   const zoomState = useRef(isInitiallyZoomedIn ? ZOOM_STATE.MARKERS : ZOOM_STATE.HEAT);
   const prevZoom = useRef(initialZoom);
   // Refs to avoid stale closures in event handlers (zoomend, handleUpdateHeat)
@@ -64,14 +76,19 @@ const HydratedMap = ({
   const onUpdateRef = useRef(onUpdate);
   onUpdateRef.current = onUpdate;
 
+  // Whether massif polygons should currently be fetched and displayed
+  const showMassifPolygons =
+    selectedHeat === heatmapTypes.MASSIFS && isMassifsAboveThreshold;
+
   const handleUpdate = useCallback(() => {
     onUpdateRef.current({
       markers: visibleMarkers,
+      showMassifPolygons,
       zoom: map.getZoom(),
       center: map.getCenter(),
       bounds: map.getBounds()
     });
-  }, [visibleMarkers, map]);
+  }, [visibleMarkers, showMassifPolygons, map]);
 
   useEffect(() => {
     if (zoomState.current === ZOOM_STATE.MARKERS) {
@@ -105,6 +122,10 @@ const HydratedMap = ({
   useMapEvent('zoomend', () => {
     const currentZoom = map.getZoom();
     const isZoomingIn = prevZoom.current < currentZoom;
+
+    // Update massifs polygon threshold state
+    setIsMassifsAboveThreshold(currentZoom >= MASSIFS_POLYGON_LIMIT);
+
     // When close enough we want to display disable heatmap ans show markers
     if (isZoomingIn && currentZoom >= MARKERS_LIMIT) {
       // do not update visible markers if it's already displayed
@@ -137,8 +158,8 @@ const HydratedMap = ({
   useMapEvent('moveend', handleUpdate);
 
   // Called when visibility changes (zoom threshold crossing or DataControl change).
-  // handleUpdate is stable as long as visibleMarkers doesn't change,
-  // so this effect only re-runs when the markers to fetch actually change.
+  // handleUpdate is stable as long as visibleMarkers/showMassifPolygons don't change,
+  // so this effect only re-runs when the data to fetch actually changes.
   useEffect(() => {
     handleUpdate();
   }, [handleUpdate]);
@@ -152,11 +173,14 @@ const HydratedMap = ({
       case heatmapTypes.NETWORKS:
         updateHeatData(networks, heatmapTypes.NETWORKS);
         break;
+      case heatmapTypes.MASSIFS:
+        updateHeatData(massifs, heatmapTypes.MASSIFS);
+        break;
       default:
         updateHeatData([]);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [visibleHeat, networks, entrances]);
+  }, [visibleHeat, networks, entrances, massifs]);
 
   return (
     <>
@@ -180,6 +204,7 @@ const HydratedMap = ({
         networks={networkMarkers}
         entrances={filteredEntranceMarkers}
       />
+      <MassifPolygons massifs={showMassifPolygons ? massifPolygons : []} />
     </>
   );
 };
@@ -209,6 +234,8 @@ HydratedMap.propTypes = {
   networks: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.number)),
   networkMarkers: PropTypes.arrayOf(markerType),
   organizations: PropTypes.arrayOf(markerType),
+  massifs: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.number)),
+  massifPolygons: PropTypes.arrayOf(PropTypes.shape({})),
   projectionsList: PropTypes.arrayOf(PropTypes.shape({})),
   onUpdate: PropTypes.func
 };

@@ -10,6 +10,10 @@ import {
   FETCH_MAP_NETWORKS_SUCCESS,
   FETCH_MAP_ORGANIZATIONS_FAILURE,
   FETCH_MAP_ORGANIZATIONS_SUCCESS,
+  FETCH_MAP_MASSIFS_FAILURE,
+  FETCH_MAP_MASSIFS_SUCCESS,
+  FETCH_MAP_MASSIFS_COORDINATES_FAILURE,
+  FETCH_MAP_MASSIFS_COORDINATES_SUCCESS,
   FETCH_MAP_START_LOADING,
   FETCH_MAP_END_LOADING,
   LOADINGS
@@ -21,13 +25,17 @@ const initialState = {
   entrancesCoordinates: [],
   entrances: [],
   organizations: [],
+  massifsCoordinates: [],
+  massifs: [],
   error: undefined,
   loadings: {
     [LOADINGS.NETWORKS]: false,
     [LOADINGS.NETWORKS_COORDINATES]: false,
     [LOADINGS.ENTRANCES]: false,
     [LOADINGS.ENTRANCES_COORDINATES]: false,
-    [LOADINGS.ORGANIZATIONS]: false
+    [LOADINGS.ORGANIZATIONS]: false,
+    [LOADINGS.MASSIFS]: false,
+    [LOADINGS.MASSIFS_COORDINATES]: false
   }
 };
 
@@ -88,6 +96,22 @@ const reducer = (state = initialState, action) => {
         organizations: action.data
       };
     case FETCH_MAP_ORGANIZATIONS_FAILURE:
+      return { ...state, error: action.error };
+    case FETCH_MAP_MASSIFS_SUCCESS:
+      return {
+        ...state,
+        error: initialState.error,
+        massifs: action.data
+      };
+    case FETCH_MAP_MASSIFS_FAILURE:
+      return { ...state, error: action.error };
+    case FETCH_MAP_MASSIFS_COORDINATES_SUCCESS:
+      return {
+        ...state,
+        error: initialState.error,
+        massifsCoordinates: action.data
+      };
+    case FETCH_MAP_MASSIFS_COORDINATES_FAILURE:
       return { ...state, error: action.error };
     default:
       return state;
