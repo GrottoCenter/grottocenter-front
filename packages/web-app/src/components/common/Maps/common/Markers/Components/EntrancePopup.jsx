@@ -7,7 +7,7 @@ export const EntrancePopup = ({ entrance }) => (
   <>
     <Information
       isTitle
-      value={`${entrance.name}`}
+      value={entrance.name}
       url={`/ui/entrances/${entrance.id}`}
     />
     {entrance.caveName && entrance.caveName !== entrance.name && (

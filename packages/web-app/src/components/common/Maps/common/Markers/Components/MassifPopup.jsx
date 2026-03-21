@@ -1,7 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
+import CustomIcon from '../../../../CustomIcon';
 import { Information } from './utils';
+
+const capitalize = s => s.charAt(0).toUpperCase() + s.slice(1);
 
 export const MassifPopup = ({ massif }) => {
   const { formatMessage } = useIntl();
@@ -9,14 +12,16 @@ export const MassifPopup = ({ massif }) => {
     <>
       <Information
         isTitle
-        value={massif.name && massif.name.toUpperCase()}
+        value={massif.name}
         url={`/ui/massifs/${massif.id}`}
       />
       <Information
-        value={`${massif.entranceCount} ${formatMessage({ id: 'entrances' })}`}
+        value={`${massif.entranceCount} ${capitalize(formatMessage({ id: 'entrances' }))}`}
+        icon={<CustomIcon size={25} type="entrance" />}
       />
       <Information
-        value={`${massif.networkCount} ${formatMessage({ id: 'networks' })}`}
+        value={`${massif.networkCount} ${capitalize(formatMessage({ id: 'networks' }))}`}
+        icon={<CustomIcon size={25} type="network" />}
       />
     </>
   );

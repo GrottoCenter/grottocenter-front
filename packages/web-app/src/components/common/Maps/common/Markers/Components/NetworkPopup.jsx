@@ -5,7 +5,7 @@ import idNameType from '../../../../../../types/idName.type';
 export const NetworkPopup = ({ network }) => (
   <Information
     isTitle
-    value={network.name && network.name.toUpperCase()}
+    value={network.name}
     url={`/ui/caves/${network.id}`}
   />
 );
