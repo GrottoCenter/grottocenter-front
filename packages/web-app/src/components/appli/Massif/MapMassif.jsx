@@ -13,6 +13,7 @@ import useMarkers, {
 import { EntrancePopup } from '../../common/Maps/common/Markers/Components';
 import {
   MARKERS_LIMIT,
+  MASSIF_POLYGON_STYLE,
   getEntranceCircleStyle
 } from '../../common/Maps/MapClusters/constants';
 import { makeUrl } from '../../../actions/utils';
@@ -187,7 +188,7 @@ const MapMassif = ({ massifId, geogPolygon }) => {
       dragging
       viewport={null}
       scrollWheelZoom={false}>
-      <GeoJSON data={displayGeoJson} />
+      <GeoJSON data={displayGeoJson} style={MASSIF_POLYGON_STYLE} />
       <MapInternals geoJson={geoJson} massifId={massifId} />
     </CustomMapContainer>
   );
