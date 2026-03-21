@@ -73,11 +73,11 @@ const HydratedMap = ({
   const onUpdateRef = useRef(onUpdate);
   onUpdateRef.current = onUpdate;
 
-  // Massif polygons are shown in HEAT mode when the massif heatmap is replaced by polygons
+  // Massif polygons replace the heatmap at zoom >= MASSIFS_POLYGON_LIMIT and remain
+  // visible beyond MARKERS_LIMIT too (they are GeoJSON layers, not point markers).
+  // visibleHeat === NONE is true in both zones (polygon zone and markers zone).
   const showMassifPolygons =
-    selectedHeat === heatmapTypes.MASSIFS &&
-    visibleHeat === heatmapTypes.NONE &&
-    !isMarkersMode;
+    selectedHeat === heatmapTypes.MASSIFS && visibleHeat === heatmapTypes.NONE;
 
   const handleUpdate = useCallback(() => {
     onUpdateRef.current({
