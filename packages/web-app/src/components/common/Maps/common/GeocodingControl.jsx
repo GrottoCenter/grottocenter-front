@@ -20,11 +20,12 @@ import {
   AUTOCOMPLETE_MIN_CHARACTERS,
   ADVANCED_SEARCH_TYPES
 } from '../../../../conf/config';
-import { advancedSearchUrl, getCaveUrl } from '../../../../conf/apiRoutes';
+import { advancedSearchUrl, getCaveUrl, getMassifUrl } from '../../../../conf/apiRoutes';
 import CustomIcon from '../../CustomIcon';
 import useRenderPopup from './Markers/useRenderPopup';
 import {
   EntrancePopup,
+  MassifPopup,
   NetworkPopup,
   OrganizationPopup
 } from './Markers/Components';
@@ -124,6 +125,7 @@ const GeocodingControl = ({ onLocationSelect }) => {
   const [entranceResults, setEntranceResults] = useState([]);
   const [networkResults, setNetworkResults] = useState([]);
   const [organizationResults, setOrganizationResults] = useState([]);
+  const [massifResults, setMassifResults] = useState([]);
   const [loading, setLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const popupCleanupRef = useRef(null);
@@ -160,6 +162,8 @@ const GeocodingControl = ({ onLocationSelect }) => {
         );
       else if (result.resultType === 'network')
         content = renderPopup(<NetworkPopup network={result} />);
+      else if (result.resultType === 'massif')
+        content = renderPopup(<MassifPopup massif={result} />);
       else content = renderPopup(<OrganizationPopup organization={result} />);
       map.openPopup(content, [lat, lng]);
     };
@@ -173,6 +177,7 @@ const GeocodingControl = ({ onLocationSelect }) => {
       setEntranceResults([]);
       setNetworkResults([]);
       setOrganizationResults([]);
+      setMassifResults([]);
       setLoading(false);
       return undefined;
     }
@@ -187,7 +192,7 @@ const GeocodingControl = ({ onLocationSelect }) => {
         const viewbox = `${bounds.getWest()},${bounds.getNorth()},${bounds.getEast()},${bounds.getSouth()}`;
 
         // Parallel API calls
-        const [locationData, entranceData, networkData, organizationData] =
+        const [locationData, entranceData, networkData, organizationData, massifData] =
           await Promise.all([
             fetch(
               `${NOMINATIM_API_URL}?format=json&q=${encodeURIComponent(query)}&limit=5&accept-language=${locale}&viewbox=${viewbox}`,
@@ -275,6 +280,52 @@ const GeocodingControl = ({ onLocationSelect }) => {
               .catch(error => {
                 if (error.name !== 'AbortError') console.error('Failed to fetch organization data:', error);
                 return [];
+              }),
+            fetch(advancedSearchUrl, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                query,
+                entity: ADVANCED_SEARCH_TYPES.MASSIFS,
+                matchAllFields: false,
+                page: 0,
+                size: 3
+              }),
+              signal
+            })
+              .then(res => res.json())
+              .then(data => data.results || [])
+              .then(massifs =>
+                // Massifs have no coordinates: fetch each detail to get the polygon
+                // and derive the centroid + bounding box for map navigation.
+                Promise.all(
+                  massifs.map(massif =>
+                    fetch(`${getMassifUrl}${massif.id}`, { signal })
+                      .then(res => res.json())
+                      .then(detail => {
+                        if (!detail.geogPolygon) return null;
+                        const geoJson = JSON.parse(detail.geogPolygon);
+                        const bounds = L.geoJSON(geoJson).getBounds();
+                        if (!bounds.isValid()) return null;
+                        const center = bounds.getCenter();
+                        const sw = bounds.getSouthWest();
+                        const ne = bounds.getNorthEast();
+                        return {
+                          ...massif,
+                          latitude: center.lat,
+                          longitude: center.lng,
+                          bounds: [[sw.lat, sw.lng], [ne.lat, ne.lng]],
+                          entranceCount: detail.entrances?.length ?? 0,
+                          networkCount: detail.networks?.length ?? 0
+                        };
+                      })
+                      .catch(() => null)
+                  )
+                ).then(results => results.filter(Boolean))
+              )
+              .catch(error => {
+                if (error.name !== 'AbortError') console.error('Failed to fetch massif data:', error);
+                return [];
               })
           ]);
 
@@ -291,6 +342,7 @@ const GeocodingControl = ({ onLocationSelect }) => {
         setEntranceResults(entranceData);
         setNetworkResults(networkData);
         setOrganizationResults(organizationData);
+        setMassifResults(massifData);
       } catch (error) {
         if (signal.aborted) return;
         console.error('Search error:', error);
@@ -298,6 +350,7 @@ const GeocodingControl = ({ onLocationSelect }) => {
         setEntranceResults([]);
         setNetworkResults([]);
         setOrganizationResults([]);
+        setMassifResults([]);
       } finally {
         if (!signal.aborted) setLoading(false);
       }
@@ -317,8 +370,17 @@ const GeocodingControl = ({ onLocationSelect }) => {
     setEntranceResults([]);
     setNetworkResults([]);
     setOrganizationResults([]);
+    setMassifResults([]);
 
-    if (
+    if (result.resultType === 'massif') {
+      const lat = result.latitude;
+      const lng = result.longitude;
+      if (onLocationSelect) onLocationSelect({ lat, lng });
+      setTimeout(() => {
+        schedulePopup(lat, lng, result);
+        map.fitBounds(result.bounds);
+      }, 150);
+    } else if (
       result.resultType === 'entrance' ||
       result.resultType === 'network' ||
       result.resultType === 'organization'
@@ -378,12 +440,15 @@ const GeocodingControl = ({ onLocationSelect }) => {
       ...networkResults
         .filter(c => c.latitude != null && c.longitude != null)
         .map(c => ({ ...c, resultType: 'network' })),
+      ...massifResults
+        .filter(m => m.latitude != null && m.longitude != null)
+        .map(m => ({ ...m, resultType: 'massif' })),
       ...organizationResults
         .filter(o => o.latitude != null && o.longitude != null)
         .map(o => ({ ...o, resultType: 'organization' })),
       ...locationResults.map(l => ({ ...l, resultType: 'location' }))
     ],
-    [entranceResults, networkResults, organizationResults, locationResults]
+    [entranceResults, networkResults, massifResults, organizationResults, locationResults]
   );
 
   const showDropdown =
@@ -443,6 +508,10 @@ const GeocodingControl = ({ onLocationSelect }) => {
             icon = <CustomIcon type="network" size={28} />;
             primary = result.name;
             secondary = formatMessage({ id: 'Network' });
+          } else if (result.resultType === 'massif') {
+            icon = <CustomIcon type="massif" size={28} />;
+            primary = result.name;
+            secondary = formatMessage({ id: 'Massif' });
           } else if (result.resultType === 'organization') {
             icon = <CustomIcon type="organization" size={28} />;
             primary = result.name;
