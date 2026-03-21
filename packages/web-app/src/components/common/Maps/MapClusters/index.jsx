@@ -101,20 +101,33 @@ const HydratedMap = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedMarkers]);
 
-  const handleUpdateHeat = useCallback(newHeat => {
-    setSelectedHeat(newHeat);
-    if (zoomState.current === ZOOM_STATE.HEAT) {
-      setVisibleHeat(newHeat);
-    } else {
-      setVisibleMarkers(
-        pipe(
-          append(newHeat),
-          uniq,
-          without(['none'])
-        )(selectedMarkersListRef.current)
-      );
-    }
-  }, []);
+  // For massifs: heatmap is replaced by polygons at zoom >= MASSIFS_POLYGON_LIMIT,
+  // so visibleHeat must be NONE above that threshold even in HEAT mode.
+  const computeVisibleHeat = useCallback(
+    (heat, zoom) =>
+      heat === heatmapTypes.MASSIFS && zoom >= MASSIFS_POLYGON_LIMIT
+        ? heatmapTypes.NONE
+        : heat,
+    []
+  );
+
+  const handleUpdateHeat = useCallback(
+    newHeat => {
+      setSelectedHeat(newHeat);
+      if (zoomState.current === ZOOM_STATE.HEAT) {
+        setVisibleHeat(computeVisibleHeat(newHeat, map.getZoom()));
+      } else {
+        setVisibleMarkers(
+          pipe(
+            append(newHeat),
+            uniq,
+            without(['none'])
+          )(selectedMarkersListRef.current)
+        );
+      }
+    },
+    [map, computeVisibleHeat]
+  );
 
   // zoomend: manages heatmap ↔ markers visibility only.
   // It does NOT call handleUpdate directly - moveend fires right after zoomend
@@ -122,32 +135,43 @@ const HydratedMap = ({
   useMapEvent('zoomend', () => {
     const currentZoom = map.getZoom();
     const isZoomingIn = prevZoom.current < currentZoom;
+    const currentHeat = selectedHeatRef.current;
 
     // Update massifs polygon threshold state
     setIsMassifsAboveThreshold(currentZoom >= MASSIFS_POLYGON_LIMIT);
 
-    // When close enough we want to display disable heatmap ans show markers
+    // --- MARKERS_LIMIT threshold: heatmap ↔ point markers ---
     if (isZoomingIn && currentZoom >= MARKERS_LIMIT) {
-      // do not update visible markers if it's already displayed
       if (zoomState.current !== ZOOM_STATE.MARKERS) {
         setVisibleMarkers(
           pipe(
-            append(selectedHeatRef.current),
+            append(currentHeat),
             uniq,
             without(['none'])
           )(selectedMarkersListRef.current)
         );
-        setVisibleHeat('none');
+        setVisibleHeat(heatmapTypes.NONE);
         setIsMarkersMode(true);
         zoomState.current = ZOOM_STATE.MARKERS;
       }
-    } else if (!isZoomingIn && currentZoom < MARKERS_LIMIT) {
-      // When too far we want to switch back to the heatmap
-      setVisibleHeat(selectedHeatRef.current);
-      setVisibleMarkers(selectedMarkersListRef.current);
-      setIsMarkersMode(false);
+    } else if (!isZoomingIn && currentZoom < MARKERS_LIMIT && zoomState.current === ZOOM_STATE.MARKERS) {
+      // Transitioning back from MARKERS to HEAT mode
       zoomState.current = ZOOM_STATE.HEAT;
+      setIsMarkersMode(false);
+      setVisibleMarkers(selectedMarkersListRef.current);
+      setVisibleHeat(computeVisibleHeat(currentHeat, currentZoom));
     }
+
+    // --- MASSIFS_POLYGON_LIMIT threshold (HEAT mode only): massif heatmap ↔ polygons ---
+    // Polygons appear at zoom >= 8 and replace the heatmap; no point markers involved.
+    if (zoomState.current === ZOOM_STATE.HEAT && currentHeat === heatmapTypes.MASSIFS) {
+      const wasPrevAbove = prevZoom.current >= MASSIFS_POLYGON_LIMIT;
+      const isCurrAbove = currentZoom >= MASSIFS_POLYGON_LIMIT;
+      if (wasPrevAbove !== isCurrAbove) {
+        setVisibleHeat(isCurrAbove ? heatmapTypes.NONE : heatmapTypes.MASSIFS);
+      }
+    }
+
     prevZoom.current = currentZoom;
   });
 

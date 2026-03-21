@@ -69,7 +69,22 @@ const useHeatLayer = (data = [], type = heatmapTypes.ENTRANCES) => {
     d3.selectAll('.hexbin-tooltip').style('visibility', 'hidden');
 
     if (!isNil(hexLayer)) {
-      if (map.getZoom() > HEX_DETAILS_ZOOM) {
+      const zoom = map.getZoom();
+
+      if (zoom >= MARKERS_LIMIT) {
+        // In markers mode the heatmap must not be visible. Calling radiusRange/opacity
+        // on the hexLayer triggers an internal redraw with cached data, which would
+        // cause stale hexagons to reappear before the RAF-scheduled hexLayer.data([])
+        // has a chance to clear them. Synchronously clearing here prevents that.
+        if (rafRef.current) {
+          cancelAnimationFrame(rafRef.current);
+          rafRef.current = null;
+        }
+        hexLayer.data([]);
+        return;
+      }
+
+      if (zoom > HEX_DETAILS_ZOOM) {
         hexLayer
           .radiusRange(HEX_DETAILS_RADIUS_RANGE)
           .opacity(HEX_DETAILS_OPACITY);
