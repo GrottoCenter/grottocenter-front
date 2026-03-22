@@ -61,10 +61,15 @@ const MassifPolygons = ({ massifs = [] }) => {
           layer.setStyle(MASSIF_POLYGON_HOVER_STYLE);
         });
         layer.on('mouseout', () => {
-          layer.setStyle(MASSIF_POLYGON_STYLE);
+          if (!layer.isPopupOpen()) {
+            layer.setStyle(MASSIF_POLYGON_STYLE);
+          }
         });
         layer.on('click', () => {
           layer.closeTooltip();
+        });
+        layer.on('popupclose', () => {
+          layer.setStyle(MASSIF_POLYGON_STYLE);
         });
       }
     }).addTo(map);
