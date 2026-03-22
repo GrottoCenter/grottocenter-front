@@ -6,7 +6,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import Skeleton from '@mui/material/Skeleton';
 import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
-import { Box, Card } from '@mui/material';
+import { Card } from '@mui/material';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import PersonRemoveIcon from '@mui/icons-material/PersonRemove';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
@@ -54,8 +54,7 @@ const Organization = ({ error, isLoading, organization }) => {
 
   const isMember = useMemo(
     () =>
-      isAuth &&
-      organization?.cavers?.some(caver => caver.id === currentUserId),
+      isAuth && organization?.cavers?.some(caver => caver.id === currentUserId),
     [isAuth, organization?.cavers, currentUserId]
   );
   const canManageCaves = isAdmin || isModerator || isMember;
@@ -135,7 +134,9 @@ const Organization = ({ error, isLoading, organization }) => {
           avatar={
             <BadgesSection
               nbCavers={(organization.cavers ?? []).length}
-              nbExploredEntrances={(organization.exploredEntrances ?? []).length}
+              nbExploredEntrances={
+                (organization.exploredEntrances ?? []).length
+              }
               nbExploredNetworks={(organization.exploredNetworks ?? []).length}
             />
           }
@@ -183,9 +184,7 @@ const Organization = ({ error, isLoading, organization }) => {
       )}
       {isLoading && (
         <Card sx={{ padding: 3 }}>
-          <Box style={{ display: 'flex', justifyContent: 'center' }}>
-            <Skeleton height={150} width={800} />
-          </Box>
+          <Skeleton height={150} width="100%" />
           <Skeleton height={100} />
           <Skeleton height={100} />
           <Skeleton height={100} />
@@ -233,7 +232,9 @@ const Organization = ({ error, isLoading, organization }) => {
                   type="person"
                   entites={organization.cavers}
                   onItemRemove={isAdmin ? handleRemoveMember : null}
-                  toolTipTitle={formatMessage({ id: 'Remove from organization' })}
+                  toolTipTitle={formatMessage({
+                    id: 'Remove from organization'
+                  })}
                 />
                 {joinLeaveError && (
                   <Alert severity="error" title={joinLeaveError} />
@@ -265,14 +266,20 @@ const Organization = ({ error, isLoading, organization }) => {
               canManageCaves && (
                 <Tooltip
                   title={formatMessage({
-                    id: isCaveSearchVisible ? 'Cancel this search' : 'Add a cave'
+                    id: isCaveSearchVisible
+                      ? 'Cancel this search'
+                      : 'Add a cave'
                   })}>
                   <Button
                     color={isCaveSearchVisible ? 'inherit' : 'secondary'}
                     variant="outlined"
                     onClick={() => setIsCaveSearchVisible(v => !v)}
-                    startIcon={isCaveSearchVisible ? <CancelIcon /> : <AddCircleIcon />}>
-                    {formatMessage({ id: isCaveSearchVisible ? 'Cancel' : 'Add' })}
+                    startIcon={
+                      isCaveSearchVisible ? <CancelIcon /> : <AddCircleIcon />
+                    }>
+                    {formatMessage({
+                      id: isCaveSearchVisible ? 'Cancel' : 'Add'
+                    })}
                   </Button>
                 </Tooltip>
               )

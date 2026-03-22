@@ -4,10 +4,10 @@ import { styled } from '@mui/material/styles';
 
 const Container = styled('div')`
   width: 100%;
-  height: 200px;
+  min-height: 200px;
   display: flex;
   justify-content: center;
-  align-items: flex-end;
+  align-items: center;
 `;
 
 const PageLoader = () => (
