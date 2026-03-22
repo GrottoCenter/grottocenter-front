@@ -24,7 +24,8 @@ import {
 import {
   advancedSearchUrl,
   getCaveUrl,
-  getMassifUrl
+  getMassifUrl,
+  getStatisticsMassifUrl
 } from '../../../../conf/apiRoutes';
 import CustomIcon from '../../CustomIcon';
 import useRenderPopup from './Markers/useRenderPopup';
@@ -286,9 +287,11 @@ const GeocodingControl = ({ onLocationSelect }) => {
               // and derive the centroid + bounding box for map navigation.
               Promise.all(
                 massifs.map(massif =>
-                  fetch(`${getMassifUrl}${massif.id}`, { signal })
-                    .then(res => res.json())
-                    .then(detail => {
+                  Promise.all([
+                    fetch(`${getMassifUrl}${massif.id}`, { signal }).then(res => res.json()),
+                    fetch(getStatisticsMassifUrl(massif.id), { signal }).then(res => res.json())
+                  ])
+                    .then(([detail, stats]) => {
                       if (!detail.geogPolygon) return null;
                       const geoJson =
                         typeof detail.geogPolygon === 'string'
@@ -307,7 +310,8 @@ const GeocodingControl = ({ onLocationSelect }) => {
                           [sw.lat, sw.lng],
                           [ne.lat, ne.lng]
                         ],
-                        networkCount: detail.networks?.length ?? 0
+                        entranceCount: stats.nb_caves ?? 0,
+                        networkCount: stats.nb_networks ?? 0
                       };
                     })
                     .catch(() => null)
