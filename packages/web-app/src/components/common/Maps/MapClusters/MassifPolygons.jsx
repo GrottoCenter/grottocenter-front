@@ -12,9 +12,14 @@ const getBboxArea = geometry => {
     geometry.type === 'MultiPolygon'
       ? geometry.coordinates.flat(2)
       : geometry.coordinates.flat(1);
-  const lngs = coords.map(c => c[0]);
-  const lats = coords.map(c => c[1]);
-  return (Math.max(...lngs) - Math.min(...lngs)) * (Math.max(...lats) - Math.min(...lats));
+  let minLng = Infinity, maxLng = -Infinity, minLat = Infinity, maxLat = -Infinity;
+  for (const [lng, lat] of coords) {
+    if (lng < minLng) minLng = lng;
+    if (lng > maxLng) maxLng = lng;
+    if (lat < minLat) minLat = lat;
+    if (lat > maxLat) maxLat = lat;
+  }
+  return (maxLng - minLng) * (maxLat - minLat);
 };
 
 const MassifPolygons = ({ massifs = [] }) => {

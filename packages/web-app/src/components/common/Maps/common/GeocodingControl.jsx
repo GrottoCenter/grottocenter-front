@@ -283,13 +283,15 @@ const GeocodingControl = ({ onLocationSelect }) => {
           }),
           fetchAdvancedSearch(query, ADVANCED_SEARCH_TYPES.MASSIFS, 3, signal)
             .then(massifs =>
-              // Massifs have no coordinates: fetch each detail to get the polygon
-              // and derive the centroid + bounding box for map navigation.
+              // Massifs have no coordinates: fetch detail (polygon → bounds) and statistics
+              // (counts) in parallel. Statistics failure is non-fatal: counts fall back to 0.
               Promise.all(
                 massifs.map(massif =>
                   Promise.all([
                     fetch(`${getMassifUrl}${massif.id}`, { signal }).then(res => res.json()),
-                    fetch(getStatisticsMassifUrl(massif.id), { signal }).then(res => res.json())
+                    fetch(getStatisticsMassifUrl(massif.id), { signal })
+                      .then(res => res.json())
+                      .catch(() => null)
                   ])
                     .then(([detail, stats]) => {
                       if (!detail.geogPolygon) return null;
@@ -310,8 +312,8 @@ const GeocodingControl = ({ onLocationSelect }) => {
                           [sw.lat, sw.lng],
                           [ne.lat, ne.lng]
                         ],
-                        entranceCount: stats.nb_caves ?? 0,
-                        networkCount: stats.nb_networks ?? 0
+                        entranceCount: stats?.nb_caves ?? 0,
+                        networkCount: stats?.nb_networks ?? 0
                       };
                     })
                     .catch(() => null)
