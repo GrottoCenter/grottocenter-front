@@ -11,9 +11,9 @@ export const MassifPopup = ({ massif }) => {
   const entranceLabel = massif.entranceCount > 0
     ? capitalize(formatMessage({ id: massif.entranceCount === 1 ? 'entrance' : 'entrances' }))
     : null;
-  const networkLabel = capitalize(
-    formatMessage({ id: massif.networkCount === 1 ? 'network' : 'networks' })
-  );
+  const networkLabel = massif.networkCount > 0
+    ? capitalize(formatMessage({ id: massif.networkCount === 1 ? 'network' : 'networks' }))
+    : null;
   return (
     <>
       <Information
@@ -27,10 +27,12 @@ export const MassifPopup = ({ massif }) => {
           icon={<CustomIcon size={25} type="entrance" />}
         />
       )}
-      <Information
-        value={`${massif.networkCount} ${networkLabel}`}
-        icon={<CustomIcon size={25} type="network" />}
-      />
+      {massif.networkCount > 0 && (
+        <Information
+          value={`${massif.networkCount} ${networkLabel}`}
+          icon={<CustomIcon size={25} type="network" />}
+        />
+      )}
     </>
   );
 };

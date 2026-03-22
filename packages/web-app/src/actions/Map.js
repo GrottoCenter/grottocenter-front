@@ -285,13 +285,7 @@ export const fetchMassifs = criteria => {
   const thunkToDebounce = function (dispatch) {
     dispatch({ type: FETCH_MAP_START_LOADING, key: LOADINGS.MASSIFS });
     const completedUrl = makeUrl(getMapMassifsUrl, criteria);
-    return fetch(completedUrl)
-      .then(response => {
-        if (response.status >= 400) {
-          throw new Error(response.status);
-        }
-        return response.text();
-      })
+    return fetchWithRetry(completedUrl)
       .then(text => {
         dispatch({ type: FETCH_MAP_MASSIFS_SUCCESS, data: JSON.parse(text) });
       })

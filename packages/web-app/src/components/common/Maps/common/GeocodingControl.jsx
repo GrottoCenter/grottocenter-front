@@ -290,7 +290,10 @@ const GeocodingControl = ({ onLocationSelect }) => {
                     .then(res => res.json())
                     .then(detail => {
                       if (!detail.geogPolygon) return null;
-                      const geoJson = JSON.parse(detail.geogPolygon);
+                      const geoJson =
+                        typeof detail.geogPolygon === 'string'
+                          ? JSON.parse(detail.geogPolygon)
+                          : detail.geogPolygon;
                       const massifBounds = L.geoJSON(geoJson).getBounds();
                       if (!massifBounds.isValid()) return null;
                       const center = massifBounds.getCenter();
