@@ -198,7 +198,7 @@ const EntrancesListPage = () => {
             !error && (
               <StyledList>
                 {skeletons.map((_, index) => (
-                  <Skeleton key={index} height={90} width={350} />
+                  <Skeleton key={index} height={90} width="100%" />
                 ))}
               </StyledList>
             )}

@@ -52,7 +52,11 @@ const FormProgressInfo = ({
     );
   }
 
-  return <CircularProgress />;
+  return (
+    <Box display="flex" justifyContent="center">
+      <CircularProgress />
+    </Box>
+  );
 };
 
 FormProgressInfo.propTypes = {

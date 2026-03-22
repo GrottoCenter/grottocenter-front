@@ -124,7 +124,7 @@ const Person = ({
       )}
       {isLoading && (
         <Card sx={{ padding: 3 }}>
-          <Skeleton width={600} />
+          <Skeleton width="100%" />
           <Skeleton height={200} width="100%" />
           <Skeleton height={100} />
           <Skeleton height={100} />

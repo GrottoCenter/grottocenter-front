@@ -5,10 +5,14 @@ import { useParams, useNavigate } from 'react-router-dom';
 
 import { useDispatch, useSelector } from 'react-redux';
 import Skeleton from '@mui/material/Skeleton';
-import { Box, Card } from '@mui/material';
+import { Card } from '@mui/material';
 import { useIntl } from 'react-intl';
 
-import { usePermissions, useSubscriptions, useScrollToHashOnLoad } from '../../../hooks';
+import {
+  usePermissions,
+  useSubscriptions,
+  useScrollToHashOnLoad
+} from '../../../hooks';
 import { subscribeToMassif } from '../../../actions/Subscriptions/SubscribeToMassif';
 import { unsubscribeFromMassif } from '../../../actions/Subscriptions/UnsubscribeFromMassif';
 import { deleteMassif } from '../../../actions/Massif/DeleteMassif';
@@ -154,9 +158,7 @@ const Massif = ({ isLoading, error, massif }) => {
       )}
       {isLoading && (
         <Card sx={{ padding: 3 }}>
-          <Box style={{ display: 'flex', justifyContent: 'center' }}>
-            <Skeleton height={300} width={800} />
-          </Box>
+          <Skeleton height={300} width="100%" />
           <Skeleton height={100} />
           <Skeleton height={100} />
           <Skeleton height={100} />
@@ -185,26 +187,15 @@ const Massif = ({ isLoading, error, massif }) => {
             anchorId="statistics"
             title={formatMessage({ id: 'More information' })}
             content={
-              <StatisticsDataDashboard
-                massifId={massifIdInt}
-                hideTitle
-              />
+              <StatisticsDataDashboard massifId={massifIdInt} hideTitle />
             }
           />
-          <Documents
-            documents={massif?.documents ?? []}
-            massifId={massifId}
-          />
+          <Documents documents={massif?.documents ?? []} massifId={massifId} />
           {massif?.networks?.length > 0 && (
             <ScrollableContent
               anchorId="networks"
               title={formatMessage({ id: 'Networks list' })}
-              content={
-                <EntitiesList
-                  type="cave"
-                  entites={massif.networks}
-                />
-              }
+              content={<EntitiesList type="cave" entites={massif.networks} />}
             />
           )}
         </>
