@@ -85,19 +85,19 @@ const MassifPolygons = ({ massifs = [] }) => {
   return null;
 };
 
+export const massifPolygonType = PropTypes.shape({
+  id: PropTypes.number.isRequired,
+  name: PropTypes.string,
+  geogPolygon: PropTypes.shape({
+    type: PropTypes.string,
+    coordinates: PropTypes.array
+  }),
+  entranceCount: PropTypes.number,
+  networkCount: PropTypes.number
+});
+
 MassifPolygons.propTypes = {
-  massifs: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.number.isRequired,
-      name: PropTypes.string,
-      geogPolygon: PropTypes.shape({
-        type: PropTypes.string,
-        coordinates: PropTypes.array
-      }),
-      entranceCount: PropTypes.number,
-      networkCount: PropTypes.number
-    })
-  )
+  massifs: PropTypes.arrayOf(massifPolygonType)
 };
 
 export default MassifPolygons;

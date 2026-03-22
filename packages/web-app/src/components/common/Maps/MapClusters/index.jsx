@@ -9,7 +9,7 @@ import GeocodingControl from '../common/GeocodingControl';
 import MeasureControl from '../common/MeasureControl';
 import useHeatLayer, { HexGlobalCss } from './useHeatLayer';
 import Markers from './Markers';
-import MassifPolygons from './MassifPolygons';
+import MassifPolygons, { massifPolygonType } from './MassifPolygons';
 import CustomMapContainer from '../common/MapContainer';
 import {
   MARKERS_LIMIT,
@@ -246,7 +246,7 @@ HydratedMap.propTypes = {
   networkMarkers: PropTypes.arrayOf(markerType),
   organizations: PropTypes.arrayOf(markerType),
   massifs: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.number)),
-  massifPolygons: PropTypes.arrayOf(PropTypes.shape({})),
+  massifPolygons: PropTypes.arrayOf(massifPolygonType),
   projectionsList: PropTypes.arrayOf(PropTypes.shape({})),
   onUpdate: PropTypes.func
 };
