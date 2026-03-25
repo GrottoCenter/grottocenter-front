@@ -73,7 +73,9 @@ const messages = {
   'Access the revision history page': 'Access the revision history page',
   'Order updated': 'Order updated',
   Undo: 'Undo',
-  'Undo successful': 'Undo successful'
+  'Undo successful': 'Undo successful',
+  'Copy link': 'Copy link',
+  'Link copied!': 'Link copied!'
 };
 
 const locations = [
