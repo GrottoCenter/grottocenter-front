@@ -12,7 +12,6 @@ import useMarkers, {
 } from '../../common/Maps/common/Markers/useMarkers';
 import { EntrancePopup } from '../../common/Maps/common/Markers/Components';
 import {
-  MARKERS_LIMIT,
   MASSIF_POLYGON_STYLE,
   getEntranceCircleStyle
 } from '../../common/Maps/MapClusters/constants';
@@ -27,7 +26,7 @@ const entranceTip = entrance => entrance?.name;
 
 const MapInternals = ({ geoJson, massifId }) => {
   const map = useMap();
-  const { updateHeatData } = useHeatLayer();
+  const { updateHeatData, heatOffZoom } = useHeatLayer();
 
   const updateEntranceMarkers = useMarkers({
     circleMarkerStyle: getEntranceCircleStyle,
@@ -57,7 +56,7 @@ const MapInternals = ({ geoJson, massifId }) => {
   // moveend: at high zoom fetch viewport markers; at low zoom restore heatmap from cache.
   const fetchMarkers = useCallback(() => {
     const zoom = map.getZoom();
-    if (zoom < MARKERS_LIMIT) {
+    if (zoom < heatOffZoom) {
       markersRef.current(null);
       heatRef.current(heatCoordinatesRef.current);
       return;

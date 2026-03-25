@@ -212,7 +212,8 @@ const useHeatLayer = (data = [], type = heatmapTypes.ENTRANCES, heatOffZoom = MA
   }, [hexLayer]);
 
   return {
-    updateHeatData
+    updateHeatData,
+    heatOffZoom
   };
 };
 
