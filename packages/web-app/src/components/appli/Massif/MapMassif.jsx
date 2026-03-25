@@ -39,6 +39,8 @@ const MapInternals = ({ geoJson, massifId }) => {
   heatRef.current = updateHeatData;
   const markersRef = useRef(updateEntranceMarkers);
   markersRef.current = updateEntranceMarkers;
+  const heatOffZoomRef = useRef(heatOffZoom);
+  heatOffZoomRef.current = heatOffZoom;
 
   const heatCoordinatesRef = useRef([]);
   const abortRef = useRef(null);
@@ -56,7 +58,7 @@ const MapInternals = ({ geoJson, massifId }) => {
   // moveend: at high zoom fetch viewport markers; at low zoom restore heatmap from cache.
   const fetchMarkers = useCallback(() => {
     const zoom = map.getZoom();
-    if (zoom < heatOffZoom) {
+    if (zoom < heatOffZoomRef.current) {
       markersRef.current(null);
       heatRef.current(heatCoordinatesRef.current);
       return;
