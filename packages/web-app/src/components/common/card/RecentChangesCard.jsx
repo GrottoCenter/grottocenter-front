@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { useIntl } from 'react-intl';
 import CircularProgress from '@mui/material/CircularProgress';
 import PropTypes from 'prop-types';
-import { Box, Chip } from '@mui/material';
+import { Chip } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import GCLink from '../GCLink';
 
@@ -169,12 +169,7 @@ const RecentChangesCard = ({ changes, isFetching, fetch }) => {
     fetch();
   }, [fetch]);
 
-  if (isFetching || !changes)
-    return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', padding: 2 }}>
-        <CircularProgress />
-      </Box>
-    );
+  if (isFetching || !changes) return <CircularProgress />;
   return (
     <ChangeTable>
       {changes.map((e, index) => (

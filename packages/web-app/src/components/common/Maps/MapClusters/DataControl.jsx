@@ -11,12 +11,14 @@ import { CAVE_SIZE_STYLE } from './constants';
 import {
   entranceIcon,
   networkIcon,
-  organizationIcon
+  organizationIcon,
+  massifIcon
 } from '../../../../assets/icons';
 
 export const heatmapTypes = {
   ENTRANCES: 'entrances',
   NETWORKS: 'networks',
+  MASSIFS: 'massifs',
   NONE: 'none'
 };
 export const markerTypes = {
@@ -100,6 +102,7 @@ CaveSizeDot.propTypes = {
 const MARKER_ICON = {
   [heatmapTypes.ENTRANCES]: entranceIcon,
   [heatmapTypes.NETWORKS]: networkIcon,
+  [heatmapTypes.MASSIFS]: massifIcon,
   [markerTypes.ORGANIZATIONS]: organizationIcon
 };
 

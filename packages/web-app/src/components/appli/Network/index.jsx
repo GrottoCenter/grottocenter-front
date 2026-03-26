@@ -4,7 +4,7 @@ import { useIntl } from 'react-intl';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import Skeleton from '@mui/material/Skeleton';
-import { Card } from '@mui/material';
+import { Box, Card } from '@mui/material';
 
 import { usePermissions, useUserProperties } from '../../../hooks';
 import { linkCave } from '../../../actions/Cave/LinkCave';
@@ -200,7 +200,9 @@ export const Network = ({ isLoading, error, cave }) => {
         }>
         {isLoading && (
           <Card sx={{ padding: 3 }}>
-            <Skeleton height={300} width="100%" /> {/* Map Skeleton */}
+            <Box style={{ display: 'flex', justifyContent: 'center' }}>
+              <Skeleton height={300} width={800} /> {/* Map Skeleton */}
+            </Box>
             <Skeleton height={100} /> {/* EntranceList Skeleton */}
             <Skeleton height={100} /> {/* Description Skeleton */}
           </Card>

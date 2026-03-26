@@ -8,7 +8,6 @@ import {
   defaultTo,
   equals
 } from 'ramda';
-import { logout } from './Login';
 
 // Remove the next line when other exports are created.
 export const makeUrl = (url, criterias) => {
@@ -20,26 +19,19 @@ export const makeUrl = (url, criterias) => {
   return url;
 };
 
-export const checkAndGetStatus = async response => {
-  if (response.status >= 200 && response.status < 300) {
+export const checkAndGetStatus = response => {
+  if (response.status >= 200 && response.status <= 300) {
     return response;
   }
-  if (response.status === 401) {
-    // eslint-disable-next-line global-require
-    const gcStore = require('../store').default;
-    gcStore.dispatch(logout());
-    return response;
-  }
-  const errorMessage = new Error(response.status);
-  try {
-    errorMessage.body = await response.json();
-    if (errorMessage.body?.message) {
-      errorMessage.message = errorMessage.body.message;
-    }
-  } catch (_) {
-    // ignore if body is not JSON
-  }
-  throw errorMessage;
+  return response.json().then(body => {
+    const errorMessage = new Error(body.message || response.status);
+    errorMessage.body = body;
+    throw errorMessage;
+  }).catch(err => {
+    if (err.body) throw err;
+    const errorMessage = new Error(response.status);
+    throw errorMessage;
+  });
 };
 
 const makeNumber = ifElse(identity, Number, always(1));

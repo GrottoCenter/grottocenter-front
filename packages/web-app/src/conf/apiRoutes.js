@@ -172,6 +172,8 @@ export const getMapCavesCoordinatesUrl = `${API_BASE_PATH}/geoloc/networksCoordi
 export const getMapEntrancesUrl = `${API_BASE_PATH}/geoloc/entrances`;
 export const getMapEntrancesCoordinatesUrl = `${API_BASE_PATH}/geoloc/entrancesCoordinates`;
 export const getMapGrottosUrl = `${API_BASE_PATH}/geoloc/organizations`;
+export const getMapMassifsUrl = `${API_BASE_PATH}/geoloc/massifs`;
+export const getMapMassifsCoordinatesUrl = `${API_BASE_PATH}/geoloc/massifsCoordinates`;
 
 // ===== Histories urls
 export const postHistoryUrl = `${API_BASE_PATH}/histories`;

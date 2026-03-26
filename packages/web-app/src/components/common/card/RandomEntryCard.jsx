@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import FullStarIcon from '@mui/icons-material/Star';
 import EmptyStarIcon from '@mui/icons-material/StarBorder';
 import HalfStarIcon from '@mui/icons-material/StarHalf';
-import { Box } from '@mui/material';
 import CircularProgress from '@mui/material/CircularProgress';
 import { styled } from '@mui/material/styles';
 import withStyles from '@mui/styles/withStyles';
@@ -358,11 +357,7 @@ const RandomEntryCard = ({ entry, isFetching, fetch }) => {
   }, [fetch]);
 
   if (isFetching) {
-    return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', padding: 2 }}>
-        <CircularProgress />
-      </Box>
-    );
+    return <CircularProgress />;
   }
 
   if (entry && entry.id) {

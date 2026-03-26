@@ -46,7 +46,7 @@ jest.mock('../../common/Maps/MapClusters/useHeatLayer', () => {
   const React = require('react');
   return {
     __esModule: true,
-    default: () => ({ updateHeatData: mockUpdateHeatData }),
+    default: () => ({ updateHeatData: mockUpdateHeatData, heatOffZoom: 13 }),
     HexGlobalCss: React.createElement('div')
   };
 });

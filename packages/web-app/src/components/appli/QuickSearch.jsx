@@ -35,7 +35,7 @@ const QuickSearch = ({ hasFixWidth, onClose }) => {
     else if (_type === 'persons') navigate(`/ui/persons/${id}`);
     else if (_type === 'documents') navigate(`/ui/documents/${id}`);
     else if (_type === 'organizations') navigate(`/ui/organizations/${id}`);
-    else if (_type === 'massif') navigate(`/ui/massifs/${id}`);
+    else if (_type === 'massifs') navigate(`/ui/massifs/${id}`);
 
     setInput('');
     // Defer both blur and close so MUI Autocomplete's own focus-restore cycle
@@ -53,7 +53,7 @@ const QuickSearch = ({ hasFixWidth, onClose }) => {
     }
     const criterias = {
       query: debouncedInput.trim(),
-      entities: ['entrances', 'documents', 'organization', 'massifs']
+      entities: ['entrances', 'documents', 'organizations', 'massifs']
     };
 
     dispatch(fetchQuicksearchResult(criterias));

@@ -13,6 +13,7 @@ import {
   MARKERS_LIMIT,
   ENTRANCE_HEAT_COLORS,
   NETWORK_HEAT_COLORS,
+  MASSIF_HEAT_COLORS,
   HEX_FLY_TO_DURATION,
   HEX_RADIUS_RANGE,
   HEX_LAYER_OPTIONS,
@@ -50,7 +51,7 @@ export const HexGlobalCss = (
 
 // For more customization see https://github.com/Asymmetrik/leaflet-d3 documentation
 
-const useHeatLayer = (data = [], type = heatmapTypes.ENTRANCES) => {
+const useHeatLayer = (data = [], type = heatmapTypes.ENTRANCES, heatOffZoom = MARKERS_LIMIT) => {
   const { formatMessage } = useIntl();
   const [hexLayer, setHexLayer] = useState();
   const isDraggingRef = useRef(false);
@@ -59,6 +60,9 @@ const useHeatLayer = (data = [], type = heatmapTypes.ENTRANCES) => {
   const dragEndTimerRef = useRef(null);
   // Skip colorRange + hoverHandler re-registration when the type hasn't changed.
   const lastTypeRef = useRef(null);
+  // Keep heatOffZoom ref-stable for the zoomend closure
+  const heatOffZoomRef = useRef(heatOffZoom);
+  heatOffZoomRef.current = heatOffZoom;
 
   // On zoom lvl, hex opacity and size can change
   const map = useMapEvent('zoomend', () => {
@@ -68,7 +72,22 @@ const useHeatLayer = (data = [], type = heatmapTypes.ENTRANCES) => {
     d3.selectAll('.hexbin-tooltip').style('visibility', 'hidden');
 
     if (!isNil(hexLayer)) {
-      if (map.getZoom() > HEX_DETAILS_ZOOM) {
+      const zoom = map.getZoom();
+
+      if (zoom >= heatOffZoomRef.current) {
+        // Above the threshold the heatmap must not be visible. Calling radiusRange/opacity
+        // on the hexLayer triggers an internal redraw with cached data, which would
+        // cause stale hexagons to reappear before the RAF-scheduled hexLayer.data([])
+        // has a chance to clear them. Synchronously clearing here prevents that.
+        if (rafRef.current) {
+          cancelAnimationFrame(rafRef.current);
+          rafRef.current = null;
+        }
+        hexLayer.data([]);
+        return;
+      }
+
+      if (zoom > HEX_DETAILS_ZOOM) {
         hexLayer
           .radiusRange(HEX_DETAILS_RADIUS_RANGE)
           .opacity(HEX_DETAILS_OPACITY);
@@ -93,9 +112,12 @@ const useHeatLayer = (data = [], type = heatmapTypes.ENTRANCES) => {
         // Remove previous tooltip (avoid some bug)
         d3.selectAll('.hexbin-tooltip').remove();
         hexLayer
+          // eslint-disable-next-line no-nested-ternary
           .colorRange(
             newType === heatmapTypes.NETWORKS
               ? NETWORK_HEAT_COLORS
+              : newType === heatmapTypes.MASSIFS
+              ? MASSIF_HEAT_COLORS
               : ENTRANCE_HEAT_COLORS
           )
           .hoverHandler(
@@ -112,8 +134,16 @@ const useHeatLayer = (data = [], type = heatmapTypes.ENTRANCES) => {
         lastTypeRef.current = newType;
       }
 
-      // Coalesce rapid calls into a single frame - cancels any pending RAF
-      // so only the latest data update is rendered, without blocking the current frame.
+      // Clear synchronously so stale hexagons cannot flash on-screen.
+      // For real data, coalesce rapid calls into a single frame.
+      if (!newData || newData.length === 0) {
+        if (rafRef.current) {
+          cancelAnimationFrame(rafRef.current);
+          rafRef.current = null;
+        }
+        hexLayer.data([]);
+        return;
+      }
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
       rafRef.current = requestAnimationFrame(() => {
         rafRef.current = null;
@@ -182,7 +212,8 @@ const useHeatLayer = (data = [], type = heatmapTypes.ENTRANCES) => {
   }, [hexLayer]);
 
   return {
-    updateHeatData
+    updateHeatData,
+    heatOffZoom
   };
 };
 

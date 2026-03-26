@@ -1,6 +1,5 @@
 import React, { useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
-import { Box } from '@mui/material';
 import CircularProgress from '@mui/material/CircularProgress';
 import { styled } from '@mui/material/styles';
 import AliceCarousel from 'react-alice-carousel';
@@ -92,11 +91,7 @@ const PartnersCarousel = ({ fetch, partners, isFetching }) => {
   }, []);
 
   if (isFetching) {
-    return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', padding: 2 }}>
-        <CircularProgress />
-      </Box>
-    );
+    return <CircularProgress />;
   }
   if (rows.length > 0) {
     return (
