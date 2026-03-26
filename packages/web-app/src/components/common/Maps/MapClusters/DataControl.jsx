@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback, useRef } from 'react';
+import React, { useEffect, useCallback, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { styled } from '@mui/material/styles';
 import VisibilityIcon from '@mui/icons-material/Visibility';
@@ -132,8 +132,15 @@ MarkerIcon.propTypes = {
   type: PropTypes.string.isRequired
 };
 
+const HEATMAP_LAYER_TYPES = [
+  heatmapTypes.ENTRANCES,
+  heatmapTypes.NETWORKS,
+  heatmapTypes.MASSIFS
+];
+
 const DataControl = ({
-  updateHeatmap,
+  activeHeatLayers,
+  setActiveHeatLayers,
   selectedMarkers,
   setSelectedMarkers,
   entranceFilters,
@@ -145,7 +152,6 @@ const DataControl = ({
   const { fullScreen } = useFullScreen();
   const { formatMessage } = useIntl();
   const wrapperRef = useRef(null);
-  const [selectedHeat, setSelectedHeat] = useState(heatmapTypes.ENTRANCES);
 
   const toggleExpanded = useCallback(expanded => {
     const container = wrapperRef.current?.closest('.leaflet-control-layers');
@@ -154,12 +160,10 @@ const DataControl = ({
     }
   }, []);
 
-  // Remove expanded class on unmount
   useEffect(() => {
     return () => toggleExpanded(false);
   }, [toggleExpanded]);
 
-  // Close panel when touching outside on mobile
   useEffect(() => {
     const handleClickOutside = e => {
       if (wrapperRef.current && !wrapperRef.current.contains(e.target)) {
@@ -171,18 +175,16 @@ const DataControl = ({
       document.removeEventListener('pointerdown', handleClickOutside);
   }, [toggleExpanded]);
 
-  const handleHeatChange = value => {
-    setSelectedHeat(value);
+  const handleHeatToggle = type => {
+    setActiveHeatLayers(prev => ({
+      ...prev,
+      [type]: !prev[type]
+    }));
   };
 
   const handleMarkerChange = type => {
     setSelectedMarkers(prev => ({ ...prev, [type]: !prev[type] }));
   };
-
-  useEffect(() => {
-    updateHeatmap(selectedHeat);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedHeat]);
 
   return (
     <CustomControl
@@ -207,14 +209,13 @@ const DataControl = ({
             <SectionTitle>
               {formatMessage({ id: 'Data display' }).toUpperCase()}
             </SectionTitle>
-            {Object.values(heatmapTypes).map(type => (
+            {HEATMAP_LAYER_TYPES.map(type => (
               <OptionLabel key={type}>
                 <input
-                  type="radio"
-                  name="heatmap"
-                  value={type}
-                  checked={selectedHeat === type}
-                  onChange={() => handleHeatChange(type)}
+                  type="checkbox"
+                  name={type}
+                  checked={activeHeatLayers[type] ?? false}
+                  onChange={() => handleHeatToggle(type)}
                 />
                 <MarkerIcon type={type} />
                 <span style={{ textTransform: 'capitalize' }}>
@@ -244,7 +245,7 @@ const DataControl = ({
               </span>
             </OptionLabel>
 
-            {selectedHeat === heatmapTypes.ENTRANCES && isMarkersMode && (
+            {activeHeatLayers[heatmapTypes.ENTRANCES] && isMarkersMode && (
               <>
                 <SectionTitle>
                   {formatMessage({ id: 'Filter by size' }).toUpperCase()}
@@ -278,7 +279,8 @@ const DataControl = ({
 const MemoizedDataControl = React.memo(DataControl);
 
 DataControl.propTypes = {
-  updateHeatmap: PropTypes.func.isRequired,
+  activeHeatLayers: PropTypes.objectOf(PropTypes.bool).isRequired,
+  setActiveHeatLayers: PropTypes.func.isRequired,
   selectedMarkers: PropTypes.objectOf(PropTypes.bool).isRequired,
   setSelectedMarkers: PropTypes.func.isRequired,
   entranceFilters: PropTypes.arrayOf(
