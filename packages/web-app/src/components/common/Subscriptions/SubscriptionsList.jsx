@@ -38,11 +38,7 @@ const SubscriptionsList = ({
   const { countries, massifs, regions } = subscriptions ?? {};
 
   if (subscriptionsStatus === REDUCER_STATUS.LOADING)
-    return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', padding: 2 }}>
-        <CircularProgress />
-      </Box>
-    );
+    return <CircularProgress />;
 
   if (subscriptionsStatus === REDUCER_STATUS.SUCCEEDED)
     return (

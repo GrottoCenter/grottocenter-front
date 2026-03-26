@@ -9,8 +9,15 @@ import GeocodingControl from '../common/GeocodingControl';
 import MeasureControl from '../common/MeasureControl';
 import useHeatLayer, { HexGlobalCss } from './useHeatLayer';
 import Markers from './Markers';
+import MassifPolygons, { massifPolygonType } from './MassifPolygons';
 import CustomMapContainer from '../common/MapContainer';
-import { MARKERS_LIMIT, ENTRANCE_MARKER_FILTERS, getCaveSize, CAVE_SIZE } from './constants';
+import {
+  MARKERS_LIMIT,
+  ENTRANCE_MARKER_FILTERS,
+  getCaveSize,
+  CAVE_SIZE,
+  getHeatOffZoom
+} from './constants';
 
 const ZOOM_STATE = {
   MARKERS: 1,
@@ -23,11 +30,13 @@ const HydratedMap = ({
   networks,
   networkMarkers = [],
   organizations,
+  massifs,
+  massifPolygons = [],
   projectionsList,
   onUpdate
 }) => {
-  const { updateHeatData } = useHeatLayer(entrances);
   const [selectedHeat, setSelectedHeat] = useState(heatmapTypes.ENTRANCES);
+  const { updateHeatData } = useHeatLayer(entrances, heatmapTypes.ENTRANCES, getHeatOffZoom(selectedHeat));
   const [selectedMarkers, setSelectedMarkers] = useState(
     Object.fromEntries(Object.values(markerTypes).map(type => [type, false]))
   );
@@ -64,14 +73,21 @@ const HydratedMap = ({
   const onUpdateRef = useRef(onUpdate);
   onUpdateRef.current = onUpdate;
 
+  // Massif polygons replace the heatmap at zoom >= MASSIFS_POLYGON_LIMIT and remain
+  // visible beyond MARKERS_LIMIT too (they are GeoJSON layers, not point markers).
+  // visibleHeat === NONE is true in both zones (polygon zone and markers zone).
+  const showMassifPolygons =
+    selectedHeat === heatmapTypes.MASSIFS && visibleHeat === heatmapTypes.NONE;
+
   const handleUpdate = useCallback(() => {
     onUpdateRef.current({
       markers: visibleMarkers,
+      showMassifPolygons,
       zoom: map.getZoom(),
       center: map.getCenter(),
       bounds: map.getBounds()
     });
-  }, [visibleMarkers, map]);
+  }, [visibleMarkers, showMassifPolygons, map]);
 
   useEffect(() => {
     if (zoomState.current === ZOOM_STATE.MARKERS) {
@@ -84,20 +100,25 @@ const HydratedMap = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedMarkers]);
 
-  const handleUpdateHeat = useCallback(newHeat => {
-    setSelectedHeat(newHeat);
-    if (zoomState.current === ZOOM_STATE.HEAT) {
-      setVisibleHeat(newHeat);
-    } else {
-      setVisibleMarkers(
-        pipe(
-          append(newHeat),
-          uniq,
-          without(['none'])
-        )(selectedMarkersListRef.current)
-      );
-    }
-  }, []);
+  const handleUpdateHeat = useCallback(
+    newHeat => {
+      setSelectedHeat(newHeat);
+      if (zoomState.current === ZOOM_STATE.HEAT) {
+        setVisibleHeat(
+          map.getZoom() >= getHeatOffZoom(newHeat) ? heatmapTypes.NONE : newHeat
+        );
+      } else {
+        setVisibleMarkers(
+          pipe(
+            append(newHeat),
+            uniq,
+            without(['none'])
+          )(selectedMarkersListRef.current)
+        );
+      }
+    },
+    [map]
+  );
 
   // zoomend: manages heatmap ↔ markers visibility only.
   // It does NOT call handleUpdate directly - moveend fires right after zoomend
@@ -105,28 +126,46 @@ const HydratedMap = ({
   useMapEvent('zoomend', () => {
     const currentZoom = map.getZoom();
     const isZoomingIn = prevZoom.current < currentZoom;
-    // When close enough we want to display disable heatmap ans show markers
+    const currentHeat = selectedHeatRef.current;
+
+    // --- MARKERS_LIMIT threshold: heatmap ↔ point markers ---
     if (isZoomingIn && currentZoom >= MARKERS_LIMIT) {
-      // do not update visible markers if it's already displayed
       if (zoomState.current !== ZOOM_STATE.MARKERS) {
         setVisibleMarkers(
           pipe(
-            append(selectedHeatRef.current),
+            append(currentHeat),
             uniq,
             without(['none'])
           )(selectedMarkersListRef.current)
         );
-        setVisibleHeat('none');
+        setVisibleHeat(heatmapTypes.NONE);
         setIsMarkersMode(true);
         zoomState.current = ZOOM_STATE.MARKERS;
       }
-    } else if (!isZoomingIn && currentZoom < MARKERS_LIMIT) {
-      // When too far we want to switch back to the heatmap
-      setVisibleHeat(selectedHeatRef.current);
-      setVisibleMarkers(selectedMarkersListRef.current);
-      setIsMarkersMode(false);
+    } else if (!isZoomingIn && currentZoom < MARKERS_LIMIT && zoomState.current === ZOOM_STATE.MARKERS) {
+      // Transitioning back from MARKERS to HEAT mode
       zoomState.current = ZOOM_STATE.HEAT;
+      setIsMarkersMode(false);
+      setVisibleMarkers(selectedMarkersListRef.current);
+      setVisibleHeat(
+        currentZoom >= getHeatOffZoom(currentHeat) ? heatmapTypes.NONE : currentHeat
+      );
     }
+
+    // --- Per-type heatOffZoom threshold (HEAT mode only): heatmap ↔ replacement layer ---
+    // For entrances/networks this equals MARKERS_LIMIT (already handled above).
+    // For massifs this is MASSIFS_POLYGON_LIMIT (polygons replace the heatmap at zoom >= 8).
+    if (zoomState.current === ZOOM_STATE.HEAT) {
+      const heatOffZoom = getHeatOffZoom(currentHeat);
+      if (heatOffZoom !== MARKERS_LIMIT) {
+        const wasPrevAbove = prevZoom.current >= heatOffZoom;
+        const isCurrAbove = currentZoom >= heatOffZoom;
+        if (wasPrevAbove !== isCurrAbove) {
+          setVisibleHeat(isCurrAbove ? heatmapTypes.NONE : currentHeat);
+        }
+      }
+    }
+
     prevZoom.current = currentZoom;
   });
 
@@ -137,26 +176,22 @@ const HydratedMap = ({
   useMapEvent('moveend', handleUpdate);
 
   // Called when visibility changes (zoom threshold crossing or DataControl change).
-  // handleUpdate is stable as long as visibleMarkers doesn't change,
-  // so this effect only re-runs when the markers to fetch actually change.
+  // handleUpdate is stable as long as visibleMarkers/showMassifPolygons don't change,
+  // so this effect only re-runs when the data to fetch actually changes.
   useEffect(() => {
     handleUpdate();
   }, [handleUpdate]);
 
   // Update visible heat layer
   useEffect(() => {
-    switch (visibleHeat) {
-      case heatmapTypes.ENTRANCES:
-        updateHeatData(entrances, heatmapTypes.ENTRANCES);
-        break;
-      case heatmapTypes.NETWORKS:
-        updateHeatData(networks, heatmapTypes.NETWORKS);
-        break;
-      default:
-        updateHeatData([]);
-    }
+    const heatDataMap = {
+      [heatmapTypes.ENTRANCES]: entrances,
+      [heatmapTypes.NETWORKS]: networks,
+      [heatmapTypes.MASSIFS]: massifs
+    };
+    updateHeatData(heatDataMap[visibleHeat] ?? [], visibleHeat);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [visibleHeat, networks, entrances]);
+  }, [visibleHeat, networks, entrances, massifs]);
 
   return (
     <>
@@ -180,6 +215,7 @@ const HydratedMap = ({
         networks={networkMarkers}
         entrances={filteredEntranceMarkers}
       />
+      <MassifPolygons massifs={showMassifPolygons ? massifPolygons : []} />
     </>
   );
 };
@@ -209,6 +245,8 @@ HydratedMap.propTypes = {
   networks: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.number)),
   networkMarkers: PropTypes.arrayOf(markerType),
   organizations: PropTypes.arrayOf(markerType),
+  massifs: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.number)),
+  massifPolygons: PropTypes.arrayOf(massifPolygonType),
   projectionsList: PropTypes.arrayOf(PropTypes.shape({})),
   onUpdate: PropTypes.func
 };

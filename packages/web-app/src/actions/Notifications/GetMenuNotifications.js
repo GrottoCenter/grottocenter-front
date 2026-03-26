@@ -37,7 +37,7 @@ export function fetchMenuNotifications(criterias) {
     };
 
     try {
-      const response = await checkAndGetStatus(
+      const response = checkAndGetStatus(
         await fetch(makeUrl(fetchNotificationsUrl, criterias), requestOptions)
       );
 

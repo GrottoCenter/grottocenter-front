@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useParams, useNavigate } from 'react-router-dom';
 import { styled } from '@mui/material/styles';
 import Skeleton from '@mui/material/Skeleton';
-import { Card } from '@mui/material';
+import { Box, Card } from '@mui/material';
 
 import FixedLayout from '../../common/Layouts/Fixed';
 import FixedContent from '../../common/Layouts/Fixed/FixedContent';
@@ -234,7 +234,9 @@ export const Entry = ({ isLoading, error, entrance }) => {
         )}
         {isLoading && (
           <Card sx={{ padding: 3 }}>
-            <Skeleton height={300} width="100%" /> {/* Map Skeleton */}
+            <Box style={{ display: 'flex', justifyContent: 'center' }}>
+              <Skeleton height={300} width={800} /> {/* Map Skeleton */}
+            </Box>
             <Skeleton height={80} />
             <Skeleton height={100} />
             <Skeleton height={150} />

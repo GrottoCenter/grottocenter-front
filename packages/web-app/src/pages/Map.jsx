@@ -9,7 +9,9 @@ import {
   fetchAllNetworksCoordinates,
   fetchOrganizations,
   fetchEntrances,
-  fetchAllEntrancesCoordinates
+  fetchAllEntrancesCoordinates,
+  fetchAllMassifsCoordinates,
+  fetchMassifs
 } from '../actions/Map';
 import { fetchProjections } from '../actions/Projections';
 import useGeolocation from '../hooks/useGeolocation';
@@ -51,6 +53,8 @@ const Map = () => {
   const entrancesCoordinates = useSelector(
     state => state.map.entrancesCoordinates
   );
+  const massifs = useSelector(state => state.map.massifs);
+  const massifsCoordinates = useSelector(state => state.map.massifsCoordinates);
   const { open } = useSelector(state => state.sideMenu);
   const { projections } = useSelector(state => state.projections);
 
@@ -59,7 +63,7 @@ const Map = () => {
   // Leaflet always handles the visual movement immediately on its own.
   const urlDebounceRef = useRef(null);
 
-  const handleUpdate = useCallback(({ markers, zoom: newZoom, center, bounds }) => {
+  const handleUpdate = useCallback(({ markers, showMassifPolygons, zoom: newZoom, center, bounds }) => {
     const criteria = {
       /* eslint-disable no-underscore-dangle */
       sw_lat: bounds._southWest.wrap().lat,
@@ -77,6 +81,9 @@ const Map = () => {
     }
     if (includes('entrances', markers)) {
       dispatch(fetchEntrances(criteria));
+    }
+    if (showMassifPolygons) {
+      dispatch(fetchMassifs(criteria));
     }
 
     // Update the shareable URL after the user has settled
@@ -102,6 +109,7 @@ const Map = () => {
     dispatch(fetchProjections());
     dispatch(fetchAllEntrancesCoordinates());
     dispatch(fetchAllNetworksCoordinates());
+    dispatch(fetchAllMassifsCoordinates());
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -142,6 +150,8 @@ const Map = () => {
         networks={networksCoordinates}
         networkMarkers={networks}
         organizations={organizations}
+        massifs={massifsCoordinates}
+        massifPolygons={massifs}
         onUpdate={handleUpdate}
         isSideMenuOpen={open}
         projectionsList={projections}

@@ -12,7 +12,7 @@ import useMarkers, {
 } from '../../common/Maps/common/Markers/useMarkers';
 import { EntrancePopup } from '../../common/Maps/common/Markers/Components';
 import {
-  MARKERS_LIMIT,
+  MASSIF_POLYGON_STYLE,
   getEntranceCircleStyle
 } from '../../common/Maps/MapClusters/constants';
 import { makeUrl } from '../../../actions/utils';
@@ -26,7 +26,7 @@ const entranceTip = entrance => entrance?.name;
 
 const MapInternals = ({ geoJson, massifId }) => {
   const map = useMap();
-  const { updateHeatData } = useHeatLayer();
+  const { updateHeatData, heatOffZoom } = useHeatLayer();
 
   const updateEntranceMarkers = useMarkers({
     circleMarkerStyle: getEntranceCircleStyle,
@@ -39,6 +39,8 @@ const MapInternals = ({ geoJson, massifId }) => {
   heatRef.current = updateHeatData;
   const markersRef = useRef(updateEntranceMarkers);
   markersRef.current = updateEntranceMarkers;
+  const heatOffZoomRef = useRef(heatOffZoom);
+  heatOffZoomRef.current = heatOffZoom;
 
   const heatCoordinatesRef = useRef([]);
   const abortRef = useRef(null);
@@ -56,7 +58,7 @@ const MapInternals = ({ geoJson, massifId }) => {
   // moveend: at high zoom fetch viewport markers; at low zoom restore heatmap from cache.
   const fetchMarkers = useCallback(() => {
     const zoom = map.getZoom();
-    if (zoom < MARKERS_LIMIT) {
+    if (zoom < heatOffZoomRef.current) {
       markersRef.current(null);
       heatRef.current(heatCoordinatesRef.current);
       return;
@@ -187,7 +189,7 @@ const MapMassif = ({ massifId, geogPolygon }) => {
       dragging
       viewport={null}
       scrollWheelZoom={false}>
-      <GeoJSON data={displayGeoJson} />
+      <GeoJSON data={displayGeoJson} style={MASSIF_POLYGON_STYLE} />
       <MapInternals geoJson={geoJson} massifId={massifId} />
     </CustomMapContainer>
   );
