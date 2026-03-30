@@ -40,6 +40,9 @@ const StyledTableCell = styled(TableCell, {
       fontSize: '10px'
     }
   })};
+  thead & {
+    text-transform: capitalize;
+  }
 `;
 
 const HighligtedTableCell = ({ data, oldData }) => (

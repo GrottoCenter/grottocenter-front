@@ -14,8 +14,7 @@ const reducer = (state = initialState, action) => {
   switch (action.type) {
     case FETCH_STATISTICS_COUNTRY_LOADING:
       return {
-        ...state,
-        errorCountry: null,
+        ...initialState,
         loadingCountry: true
       };
     case FETCH_STATISTICS_COUNTRY_SUCCESS:

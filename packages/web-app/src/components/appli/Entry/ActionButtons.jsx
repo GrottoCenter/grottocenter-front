@@ -5,7 +5,9 @@ import {
   Button,
   CircularProgress,
   Tooltip,
-  Box
+  Box,
+  useMediaQuery,
+  useTheme
 } from '@mui/material';
 import { useIntl } from 'react-intl';
 
@@ -17,7 +19,7 @@ import ArrowUpward from '@mui/icons-material/ArrowUpward';
 import ArrowDownward from '@mui/icons-material/ArrowDownward';
 
 const LoadingActionButton = () => (
-  <ButtonGroup color="primary">
+  <ButtonGroup color="primary" size="small" orientation="vertical">
     <Button disabled color="primary">
       <CircularProgress size={20} />
     </Button>
@@ -41,13 +43,15 @@ const ActionButtons = ({
   isMoveLoading
 }) => {
   const { formatMessage } = useIntl();
+  const theme = useTheme();
+  const isSmall = useMediaQuery(theme.breakpoints.down('sm'));
 
   if (isLoading) return <LoadingActionButton />;
 
   const showReorder = onMoveUp && onMoveDown;
 
   return (
-    <ButtonGroup color="primary">
+    <ButtonGroup color="primary" size="small" orientation={isSmall ? 'vertical' : 'horizontal'}>
       {!isUpdating && canDelete && isDeleted && (
         <Tooltip title={formatMessage({ id: 'Restore' })}>
           <Button

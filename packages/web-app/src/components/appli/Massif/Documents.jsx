@@ -5,7 +5,6 @@ import { Button, Divider, Tooltip } from '@mui/material';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import { useDispatch } from 'react-redux';
 import CancelIcon from '@mui/icons-material/Cancel';
-import { styled } from '@mui/material/styles';
 import { linkDocumentToMassif } from '../../../actions/LinkDocumentToMassif';
 import { unlinkDocumentToMassif } from '../../../actions/UnlinkDocumentToMassif';
 import ScrollableContent from '../../common/Layouts/Fixed/ScrollableContent';
@@ -13,10 +12,6 @@ import SearchDocumentForm from '../SearchDocumentForm';
 import Alert from '../../common/Alert';
 import { usePermissions } from '../../../hooks';
 import DocumentsList from '../../common/DocumentsList/DocumentsList';
-
-const DividerStyled = styled(Divider)`
-  background-color: ${props => props.theme.palette.divider};
-`;
 
 const Documents = ({ documents, massifId }) => {
   const { formatMessage } = useIntl();
@@ -46,6 +41,7 @@ const Documents = ({ documents, massifId }) => {
             })}>
             <Button
               color={isDocumentSearchVisible ? 'inherit' : 'secondary'}
+              size="small"
               variant="outlined"
               onClick={() => setIsDocumentSearchVisible(v => !v)}
               startIcon={
@@ -63,7 +59,7 @@ const Documents = ({ documents, massifId }) => {
           {isDocumentSearchVisible && (
             <>
               <SearchDocumentForm onSubmit={onSubmitForm} />
-              <DividerStyled />
+              <Divider />
             </>
           )}
           <DocumentsList

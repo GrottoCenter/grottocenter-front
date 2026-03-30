@@ -1,11 +1,11 @@
 import React, { useEffect, useState, useRef, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
-import { useDispatch, useSelector } from 'react-redux';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { useParams, useNavigate, Link as RouterLink } from 'react-router-dom';
 import { styled } from '@mui/material/styles';
 import Skeleton from '@mui/material/Skeleton';
-import { Box, Card } from '@mui/material';
+import { Box, Breadcrumbs, Card, Link, Typography } from '@mui/material';
 
 import FixedLayout from '../../common/Layouts/Fixed';
 import FixedContent from '../../common/Layouts/Fixed/FixedContent';
@@ -20,9 +20,7 @@ import Documents from './Documents';
 import Histories from './Histories';
 import { deleteEntrance } from '../../../actions/Entrance/DeleteEntrance';
 import { restoreEntrance } from '../../../actions/Entrance/RestoreEntrance';
-import { usePermissions, useUserProperties } from '../../../hooks';
-import { linkCave } from '../../../actions/Cave/LinkCave';
-import { unlinkCave } from '../../../actions/Cave/UnlinkCave';
+import { usePermissions, useUserProperties, useExplored } from '../../../hooks';
 import StandardDialog from '../../common/StandardDialog';
 import { EntranceForm } from '../EntitiesForm';
 import SensitiveCaveWarning from './SensitiveCaveWarning';
@@ -30,26 +28,22 @@ import AuthorAndDate from '../../common/Contribution/AuthorAndDate';
 import Alert from '../../common/Alert';
 import Map from '../../common/Maps/MapMultipleMarkers';
 import { EntrancePropTypes } from '../../../types/entrance.type';
-import { SnapshotButton } from './Snapshots/UtilityFunction';
 import {
   DeletedCard,
   DeleteConfirmationDialog,
   DELETED_ENTITIES
 } from '../../common/card/Deleted';
-import { fetchPerson } from '../../../actions/Person/GetPerson';
 
-const HalfSplitContainer = styled('div')(
-  ({ theme }) => `
+const HalfSplitContainer = styled('div')`
   display: flex;
   flex-direction: column;
-  ${theme.breakpoints.up('lg')} {
-    flex-direction: row;
-  }
-`
-);
+  gap: ${({ theme }) => theme.spacing(2)};
 
-const SnapshotButtonStyled = styled(SnapshotButton)`
-  margin-left: auto;
+  ${({ theme }) => theme.breakpoints.up('sm')} {
+    flex-direction: row;
+    align-items: stretch;
+    gap: ${({ theme }) => theme.spacing(3)};
+  }
 `;
 
 export const Entry = ({ isLoading, error, entrance }) => {
@@ -66,11 +60,11 @@ export const Entry = ({ isLoading, error, entrance }) => {
     useState(false);
   const [wantedDeletedState, setWantedDeletedState] = useState(false);
   const userId = useUserProperties()?.id ?? null;
-  const [isExploredLoading, setIsExploredLoading] = useState(false);
-  const [isExplored, setIsExplored] = useState(false);
-  const { person, error: personError } = useSelector(state => state.person);
-  const exploredEntrances = person?.exploredEntrances;
-  const exploredNetworks = person?.exploredNetworks;
+  const { isExplored, isExploredLoading, handleToggleExplored } = useExplored({
+    caveId: entrance?.cave?.id,
+    entranceId: entrance?.id,
+    userId
+  });
   const mapPositions = useMemo(() => (entrance ? [entrance] : []), [entrance]);
 
   useEffect(() => {
@@ -95,40 +89,6 @@ export const Entry = ({ isLoading, error, entrance }) => {
     dispatch(restoreEntrance({ id: entranceId }));
   };
 
-  useEffect(() => {
-    if (userId && !person && !personError) {
-      dispatch(fetchPerson(userId));
-    }
-  }, [userId, person, personError, dispatch]);
-
-  useEffect(() => {
-    if (entrance?.id && entrance?.cave?.id) {
-      const explored =
-        exploredEntrances?.some(e => e?.id === entrance.id) ||
-        exploredNetworks?.some(n => n?.id === entrance.cave.id);
-      setIsExplored(explored);
-    }
-  }, [exploredEntrances, exploredNetworks, entrance?.id, entrance?.cave?.id]);
-
-  const handleToggleExplored = async () => {
-    if (!userId || !entrance?.cave?.id) return;
-
-    setIsExploredLoading(true);
-    try {
-      if (isExplored) {
-        await dispatch(unlinkCave(entrance.cave.id, userId, false));
-      } else {
-        await dispatch(linkCave(entrance.cave.id, userId, false));
-      }
-      setIsExplored(!isExplored);
-    } catch (error) {
-      console.error('Error toggling explored status:', error);
-      setIsExplored(isExplored);
-    } finally {
-      setIsExploredLoading(false);
-    }
-  };
-
   const isActionLoading = wantedDeletedState !== entrance?.isDeleted;
 
   return (
@@ -137,6 +97,48 @@ export const Entry = ({ isLoading, error, entrance }) => {
         {entrance && (
           <FixedContent
             displayShare
+            subheader={
+              <Box display="flex" alignItems="center" justifyContent="space-between">
+                <Breadcrumbs
+                  separator="·"
+                  sx={{ fontSize: { xs: '1.2rem', md: '1.7rem' } }}>
+                  {entrance.country && (
+                    <Link
+                      component={RouterLink}
+                      to={`/ui/countries/${entrance.country}`}
+                      underline="hover"
+                      color="inherit"
+                      sx={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      <CustomIcon type="country" size={16} />
+                      {entrance.country}
+                    </Link>
+                  )}
+                  {entrance.massifs?.map(massif => (
+                    <Link
+                      key={massif.id}
+                      component={RouterLink}
+                      to={`/ui/massifs/${massif.id}`}
+                      underline="hover"
+                      color="inherit"
+                      sx={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      <CustomIcon type="massif" size={16} />
+                      {massif.name}
+                    </Link>
+                  ))}
+                  {entrance.cave?.entrances?.length > 1 && (
+                    <Link
+                      component={RouterLink}
+                      to={`/ui/caves/${entrance.cave.id}`}
+                      underline="hover"
+                      color="inherit"
+                      sx={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      <CustomIcon type="network" size={16} />
+                      {entrance.cave.name}
+                    </Link>
+                  )}
+                </Breadcrumbs>
+              </Box>
+            }
             title={entrance.name ?? ''}
             icon={<CustomIcon type="entrance" />}
             onEdit={
@@ -151,12 +153,43 @@ export const Entry = ({ isLoading, error, entrance }) => {
                 : undefined
             }
             printRef={componentRef}
+            entranceSnapshot={{
+              id: entrance.id,
+              type: 'entrances',
+              isNetwork: entrance.cave?.entrances?.length > 1
+            }}
             snapshot={{
               id: entrance.id,
               type: 'entrances',
-              isNetwork: entrance.cave?.entrances.length > 1,
+              isNetwork: entrance.cave?.entrances?.length > 1,
               getAll: true
             }}
+            footer={
+              (entrance.author || entrance.reviewer || entrance.language) && (
+                <Typography component="div" variant="caption">
+                  {entrance.author && (
+                    <AuthorAndDate
+                      author={entrance.author}
+                      verb="Created"
+                      date={entrance.dateInscription}
+                    />
+                  )}
+                  {entrance.author && entrance.reviewer && ' · '}
+                  {entrance.reviewer && (
+                    <AuthorAndDate
+                      author={entrance.reviewer}
+                      verb="Updated"
+                      date={entrance.dateReviewed}
+                    />
+                  )}
+                  {entrance.language &&
+                    (entrance.author || entrance.reviewer) &&
+                    ' · '}
+                  {entrance.language &&
+                    `${formatMessage({ id: 'Language' })} : ${entrance.language.toUpperCase()}`}
+                </Typography>
+              )
+            }
             content={
               <>
                 {entrance.isDeleted && (
@@ -176,10 +209,6 @@ export const Entry = ({ isLoading, error, entrance }) => {
                   isOpen={isDeleteConfirmationOpen}
                   isLoading={isActionLoading}
                   isPermanent={isDeleteConfirmationPermanent}
-                  isSearchMandatory={
-                    isDeleteConfirmationPermanent &&
-                    (entrance?.entrances ?? []).length > 0
-                  }
                   onClose={() => setIsDeleteConfirmationOpen(false)}
                   onConfirmation={entity => {
                     onDeletePress(entity?.id, isDeleteConfirmationPermanent);
@@ -189,45 +218,14 @@ export const Entry = ({ isLoading, error, entrance }) => {
                 {entrance.isSensitive && <SensitiveCaveWarning />}
                 <HalfSplitContainer>
                   {(!entrance.isSensitive || isAdmin) && (
-                    <Map positions={mapPositions} loading={isLoading} />
+                    <Box sx={{ flex: 1, minHeight: 200 }}>
+                      <Map positions={mapPositions} loading={isLoading} />
+                    </Box>
                   )}
-
-                  <Properties entrance={entrance} />
+                  <Box sx={{ flex: 1, overflow: 'auto' }}>
+                    <Properties entrance={entrance} dataQuality={entrance.dataQuality} />
+                  </Box>
                 </HalfSplitContainer>
-              </>
-            }
-            footer={
-              <>
-                {entrance.author && (
-                  <AuthorAndDate
-                    author={entrance.author}
-                    verb="Created"
-                    date={entrance.dateInscription}
-                  />
-                )}
-                {entrance.reviewer && (
-                  <AuthorAndDate
-                    author={entrance.reviewer}
-                    verb="Updated"
-                    date={entrance.dateReviewed}
-                  />
-                )}
-                <SnapshotButtonStyled
-                  size="small"
-                  variant="outlined"
-                  color="primary"
-                  id={entrance.id}
-                  type="entrances"
-                  isNetwork={entrance.cave?.entrances.length > 1}
-                  label={formatMessage({ id: 'Revisions' })}
-                  content={{
-                    ...entrance,
-                    latitude: entrance?.latitude,
-                    longitude: entrance?.longitude,
-                    cave: entrance?.cave?.id,
-                    caveName: entrance?.cave?.name
-                  }}
-                />
               </>
             }
           />

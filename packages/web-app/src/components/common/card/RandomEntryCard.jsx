@@ -4,6 +4,7 @@ import FullStarIcon from '@mui/icons-material/Star';
 import EmptyStarIcon from '@mui/icons-material/StarBorder';
 import HalfStarIcon from '@mui/icons-material/StarHalf';
 import CircularProgress from '@mui/material/CircularProgress';
+import Tooltip from '@mui/material/Tooltip';
 import { styled } from '@mui/material/styles';
 import withStyles from '@mui/styles/withStyles';
 import { isNil } from 'ramda';
@@ -298,7 +299,9 @@ const EntryInfoItem = ({
 
   return (
     <EntryInfoWrapper>
-      <InfoImage src={itemImg} title={itemLabel} alt={itemLabel} />
+      <Tooltip title={<Translate>{itemLabel}</Translate>}>
+        <InfoImage src={itemImg} alt={itemLabel} />
+      </Tooltip>
       <InfoValue>{valueToDisplay}</InfoValue>
       <InfoUnit>{itemUnit}</InfoUnit>
     </EntryInfoWrapper>

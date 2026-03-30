@@ -13,7 +13,7 @@ import { useAnchorScroll } from '../../../../hooks';
 
 const Card = styled(MuiCard)`
   overflow: inherit;
-  margin: ${({ theme }) => theme.spacing(2)};
+  margin: ${({ theme }) => theme.spacing(1)} ${({ theme }) => theme.spacing(2)};
   scroll-margin-top: ${({ theme }) => theme.appBarHeight}px;
 `;
 
@@ -28,13 +28,20 @@ const CardHeader = styled(MuiCardHeader, {
   ${({ $dense }) => $dense && `padding-bottom: 0px`}
 `;
 
-const ScrollableContent = ({ title, icon, content, anchorId, dense = false, subTitle = false }) => {
+const StyledCardContent = styled(CardContent)`
+  &:last-child {
+    padding-bottom: ${({ theme }) => theme.spacing(2)};
+  }
+`;
+
+const ScrollableContent = ({ title, icon, content, anchorId, dense = false, subTitle = false, subheader }) => {
   useAnchorScroll(anchorId);
 
   return (
     <Card id={anchorId}>
       <CardHeader
         $dense={dense ? 1 : 0}
+        subheader={subheader}
         title={
           <Title>
             <Typography
@@ -53,7 +60,7 @@ const ScrollableContent = ({ title, icon, content, anchorId, dense = false, subT
           </Title>
         }
       />
-      <CardContent>{content}</CardContent>
+      <StyledCardContent>{content}</StyledCardContent>
     </Card>
   );
 };
@@ -64,7 +71,8 @@ ScrollableContent.propTypes = {
   content: PropTypes.node.isRequired,
   anchorId: PropTypes.string,
   dense: PropTypes.bool,
-  subTitle: PropTypes.bool
+  subTitle: PropTypes.bool,
+  subheader: PropTypes.node
 };
 
 export default ScrollableContent;

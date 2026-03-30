@@ -52,6 +52,7 @@ const Documents = ({ documents, entranceId, isEditAllowed }) => {
             }>
             <Button
               color={isDocumentSearchVisible ? 'inherit' : 'secondary'}
+              size="small"
               variant="outlined"
               onClick={() =>
                 setIsDocumentSearchVisible(!isDocumentSearchVisible)

@@ -14,9 +14,11 @@ export const StyledTypography = styled(Typography)`
 
 export const PropertyWrapper = styled('div')`
   align-items: center;
+  box-sizing: border-box;
   display: flex;
   flex-basis: ${({ $flexBasis }) => $flexBasis};
-  padding: ${({ theme }) => theme.spacing(1)};
+  flex-shrink: 0;
+  padding: ${({ theme }) => theme.spacing(0)};
   & > svg {
     margin-right: ${({ theme }) => theme.spacing(1)};
   }
@@ -32,7 +34,7 @@ const IconWrapper = styled('div')`
 
 const ValueComponent = ({ secondary, value, url }) => {
   const valueText = (
-    <StyledTypography variant={secondary ? 'body2' : 'body1'}>
+    <StyledTypography variant={secondary ? 'body2' : 'body1'} component="div">
       {value || ''}
     </StyledTypography>
   );
@@ -49,7 +51,11 @@ const ValueComponent = ({ secondary, value, url }) => {
 ValueComponent.propTypes = {
   secondary: PropTypes.bool,
   url: PropTypes.string,
-  value: PropTypes.oneOfType([PropTypes.number, PropTypes.string, PropTypes.node])
+  value: PropTypes.oneOfType([
+    PropTypes.number,
+    PropTypes.string,
+    PropTypes.node
+  ])
 };
 
 const Property = ({
@@ -59,7 +65,7 @@ const Property = ({
   icon,
   secondary = false,
   url,
-  flexBasis = '33%'
+  flexBasis = '50%'
 }) => (
   <PropertyWrapper $flexBasis={flexBasis}>
     {!isNil(icon) && <IconWrapper display="flex">{icon}</IconWrapper>}
@@ -83,7 +89,11 @@ Property.propTypes = {
   label: PropTypes.string,
   secondary: PropTypes.bool,
   url: PropTypes.string,
-  value: PropTypes.oneOfType([PropTypes.number, PropTypes.string, PropTypes.node]),
+  value: PropTypes.oneOfType([
+    PropTypes.number,
+    PropTypes.string,
+    PropTypes.node
+  ]),
   flexBasis: PropTypes.string
 };
 

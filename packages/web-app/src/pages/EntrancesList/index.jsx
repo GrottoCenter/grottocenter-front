@@ -14,7 +14,7 @@ import { fetchCountry } from '../../actions/Country/GetCountry';
 import { fetchRegion } from '../../actions/Region/GetRegion';
 import { loadMassif } from '../../actions/Massif/GetMassif';
 import EntranceList from './EntranceList';
-import DataQualityComputeDetails from './DataQualityComputeDetails';
+
 import getLocalizedCountryName from '../../helpers/countryName';
 
 const StyledList = styled(List)({
@@ -173,13 +173,6 @@ const EntrancesListPage = () => {
     return formatMessage({ id: 'Loading entrances...' });
   };
 
-  const handleClickScroll = () => {
-    const element = document.getElementById('details');
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
-
   const handlePageChange = (event, newPage) => {
     setPage(newPage);
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -212,10 +205,7 @@ const EntrancesListPage = () => {
           )}
           {entrances && entrances.length > 0 && (
             <>
-              <EntranceList
-                entrances={entrances}
-                handleClickScroll={handleClickScroll}
-              />
+              <EntranceList entrances={entrances} />
               {shouldShowPagination && (
                 <Box mt={3} mb={3} display="flex" justifyContent="center">
                   <Pagination
@@ -227,7 +217,6 @@ const EntrancesListPage = () => {
                   />
                 </Box>
               )}
-              <DataQualityComputeDetails />
             </>
           )}
         </>

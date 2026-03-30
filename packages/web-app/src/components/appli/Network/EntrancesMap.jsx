@@ -8,7 +8,6 @@ const EntrancesMap = ({ isLoading, entrances, selectedEntrancesId = [] }) => {
   const getPositionsToDisplay = () => {
     if (selectedEntrancesId.length > 0)
       return entrances.filter(e => selectedEntrancesId.includes(e.id));
-
     return entrances;
   };
 

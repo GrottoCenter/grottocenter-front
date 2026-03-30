@@ -8,7 +8,6 @@ import { isImageFile } from './utils/imageUtils';
 
 const DividerStyled = styled(Divider)`
   background-color: ${props => props.theme.palette.divider};
-  margin: 10px 0px;
 `;
 
 const DocumentsList = ({
@@ -70,9 +69,10 @@ const DocumentsList = ({
       )}
       {documents && documents.length > 0 ? (
         <>
-          <List>
+          <List dense disablePadding>
             {paginatedDocuments.map((document, i) => (
               <div key={document.id}>
+                <DividerStyled />
                 <Document
                   document={document}
                   hasSnapshotButton={hasSnapshotButton}
@@ -80,9 +80,6 @@ const DocumentsList = ({
                   onImageClick={handleImageClick}
                   imageIndexOffset={imageOffsets[i]}
                 />
-                {paginatedDocuments.length - 1 !== i && (
-                  <DividerStyled variant="middle" />
-                )}
               </div>
             ))}
           </List>

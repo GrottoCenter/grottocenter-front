@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
+import { isMobile } from 'react-device-detect';
 import { GeoJSON, useMap, useMapEvent } from 'react-leaflet';
 import PropTypes from 'prop-types';
 import L from 'leaflet';
@@ -186,7 +187,7 @@ const MapMassif = ({ massifId, geogPolygon }) => {
   return (
     <CustomMapContainer
       wholePage={false}
-      dragging
+      dragging={!isMobile} // For usability only use two fingers drag/zoom on mobile
       viewport={null}
       scrollWheelZoom={false}>
       <GeoJSON data={displayGeoJson} style={MASSIF_POLYGON_STYLE} />

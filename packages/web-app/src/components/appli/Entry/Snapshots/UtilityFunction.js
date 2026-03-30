@@ -57,11 +57,12 @@ const SnapshotButton = ({
   isNetwork,
   getAll = false,
   startIcon = <HistoryIcon />,
+  tooltipTitle,
   ...grpProps
 }) => {
   const { formatMessage } = useIntl();
   return (
-    <Tooltip title={formatMessage({ id: 'Access the revision history page' })}>
+    <Tooltip title={tooltipTitle ?? formatMessage({ id: 'Access the revision history page' })}>
       <Button
         {...grpProps}
         component={Link}
@@ -88,7 +89,8 @@ SnapshotButton.propTypes = {
   label: PropTypes.string,
   isNetwork: PropTypes.bool,
   getAll: PropTypes.bool,
-  startIcon: PropTypes.node
+  startIcon: PropTypes.node,
+  tooltipTitle: PropTypes.string
 };
 
 const sortSnapshots = dataToStore => {

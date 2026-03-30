@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import Skeleton from '@mui/material/Skeleton';
 import { useIntl } from 'react-intl';
 import { Marker } from 'react-leaflet';
-import { Box, Button, Card } from '@mui/material';
+import { Button, Card } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
@@ -12,10 +12,11 @@ import StatisticsDataDashboard from '../StatisticsDataDashboard';
 import CustomMapContainer from '../../common/Maps/common/MapContainer';
 import FixedLayout from '../../common/Layouts/Fixed';
 import FixedContent from '../../common/Layouts/Fixed/FixedContent';
-import ScrollableContent from '../../common/Layouts/Fixed/ScrollableContent';
+
 import Alert from '../../common/Alert';
 import REDUCER_STATUS from '../../../reducers/ReducerStatus';
 import { CoordinatesMarker } from '../../common/Maps/common/Markers/Components';
+import { isMobile } from 'react-device-detect';
 import { useSubscriptions, useScrollToHashOnLoad } from '../../../hooks';
 
 const Region = ({
@@ -30,6 +31,7 @@ const Region = ({
 }) => {
   const { formatMessage } = useIntl();
   const navigate = useNavigate();
+  const componentRef = useRef();
   const isLoading = status === REDUCER_STATUS.LOADING;
 
   const {
@@ -55,29 +57,31 @@ const Region = ({
       : null;
 
   return (
+    <div ref={componentRef}>
     <FixedLayout>
-      <Box sx={{ margin: '8px' }}>
-        <Button
-          variant="outlined"
-          onClick={() => navigate(`/ui/countries/${countryId}`)}
-          startIcon={<ArrowBackIcon />}
-          size="small"
-          color="primary">
-          {formatMessage({ id: 'Back to Country' })}
-        </Button>
-      </Box>
       {region && (
         <FixedContent
           displayShare
           title={region.name}
+          printRef={componentRef}
           isSubscribed={isSubscribed}
           isSubscribeLoading={isSubscribeLoading}
           onChangeSubscribe={canSubscribe ? handleChangeSubscribe : undefined}
+          subheader={
+            <Button
+              variant="outlined"
+              onClick={() => navigate(`/ui/countries/${countryId}`)}
+              startIcon={<ArrowBackIcon />}
+              size="small"
+              color="primary">
+              {formatMessage({ id: 'Back to Country' })}
+            </Button>
+          }
           content={
             position && (
               <CustomMapContainer
                 center={position}
-                dragging
+                dragging={!isMobile} // For usability only use two fingers drag/zoom on mobile
                 forceCentering
                 scrollWheelZoom={false}
                 wholePage={false}
@@ -105,19 +109,16 @@ const Region = ({
         </Card>
       )}
       {region && (
-        <ScrollableContent
-          anchorId="statistics"
-          title={formatMessage({ id: 'More information' })}
-          content={
-            <StatisticsDataDashboard
-              regionId={regionId}
-              countryId={countryId}
-              hideTitle
-            />
-          }
+        <StatisticsDataDashboard
+          regionId={regionId}
+          countryId={countryId}
+          description={formatMessage({
+            id: 'Discover the numbers about this region and its caves.'
+          })}
         />
       )}
     </FixedLayout>
+    </div>
   );
 };
 

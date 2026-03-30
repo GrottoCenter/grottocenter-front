@@ -85,3 +85,120 @@ export const OrganizationProperty = ({ organization }) => (
     secondary
   />
 );
+
+export const HasBatProperty = ({ hasBat, isLoading }) => {
+  const { formatMessage } = useIntl();
+  if (!hasBat) return null;
+  return (
+    <Property
+      loading={isLoading}
+      value={formatMessage({ id: 'Bat habitat' })}
+      icon={<CustomIcon type="bat" />}
+      secondary
+    />
+  );
+};
+
+export const DangerFloodingProperty = ({ dangerFlooding, isLoading }) => {
+  const { formatMessage } = useIntl();
+  if (!dangerFlooding) return null;
+  return (
+    <Property
+      loading={isLoading}
+      value={formatMessage({ id: 'Flooding risk' })}
+      icon={<CustomIcon type="flooding" />}
+      secondary
+    />
+  );
+};
+
+export const DangerCO2Property = ({ dangerCO2, isLoading }) => {
+  const { formatMessage } = useIntl();
+  if (!dangerCO2) return null;
+  return (
+    <Property
+      loading={isLoading}
+      value={formatMessage({ id: 'CO2 risk' })}
+      icon={<CustomIcon type="co2" />}
+      secondary
+    />
+  );
+};
+
+export const NeedCleanGearProperty = ({ needCleanGear, isLoading }) => {
+  const { formatMessage } = useIntl();
+  if (!needCleanGear) return null;
+  return (
+    <Property
+      loading={isLoading}
+      value={formatMessage({ id: 'Clean gear required' })}
+      icon={<CustomIcon type="clean_gear" />}
+      secondary
+    />
+  );
+};
+
+export const DangerPollutionProperty = ({ dangerPollution, isLoading }) => {
+  const { formatMessage } = useIntl();
+  if (!dangerPollution) return null;
+  return (
+    <Property
+      loading={isLoading}
+      value={formatMessage({ id: 'Pollution risk' })}
+      icon={<CustomIcon type="pollution" />}
+      secondary
+    />
+  );
+};
+
+export const DangerRockfallProperty = ({ dangerRockfall, isLoading }) => {
+  const { formatMessage } = useIntl();
+  if (!dangerRockfall) return null;
+  return (
+    <Property
+      loading={isLoading}
+      value={formatMessage({ id: 'Rockfall risk' })}
+      icon={<CustomIcon type="rockfall" />}
+      secondary
+    />
+  );
+};
+
+export const HasRulesProperty = ({ hasRules, isLoading }) => {
+  const { formatMessage } = useIntl();
+  if (!hasRules) return null;
+  return (
+    <Property
+      loading={isLoading}
+      value={formatMessage({ id: 'Entry rules' })}
+      icon={<CustomIcon type="rules" />}
+      secondary
+    />
+  );
+};
+
+export const NeedStayOnTrailProperty = ({ needStayOnTrail, isLoading }) => {
+  const { formatMessage } = useIntl();
+  if (!needStayOnTrail) return null;
+  return (
+    <Property
+      loading={isLoading}
+      value={formatMessage({ id: 'Stay on trail' })}
+      icon={<CustomIcon type="stay_on_trail" />}
+      secondary
+    />
+  );
+};
+
+export const IsTouristicProperty = ({ isTouristic, isLoading }) => {
+  const { formatMessage } = useIntl();
+  if (!isTouristic) return null;
+  return (
+    <Property
+      loading={isLoading}
+      value={formatMessage({ id: 'Touristic site' })}
+      icon={<CustomIcon type="touristic" />}
+      secondary
+    />
+  );
+};

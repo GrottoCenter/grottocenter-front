@@ -1,14 +1,13 @@
 import React, { useRef, useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
-import { useParams, useNavigate } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
+import { useParams, useNavigate, Link as RouterLink } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
 import Skeleton from '@mui/material/Skeleton';
-import { Box, Card } from '@mui/material';
+import { Box, Breadcrumbs, Card, Link, Typography } from '@mui/material';
+import { styled } from '@mui/material/styles';
 
-import { usePermissions, useUserProperties } from '../../../hooks';
-import { linkCave } from '../../../actions/Cave/LinkCave';
-import { unlinkCave } from '../../../actions/Cave/UnlinkCave';
+import { usePermissions, useUserProperties, useExplored } from '../../../hooks';
 import FixedLayout from '../../common/Layouts/Fixed';
 import FixedContent from '../../common/Layouts/Fixed/FixedContent';
 import CustomIcon from '../../common/CustomIcon';
@@ -16,21 +15,30 @@ import EntrancesMap from './EntrancesMap';
 import Properties from './Properties';
 import { deleteCave } from '../../../actions/Cave/DeleteCave';
 import { restoreCave } from '../../../actions/Cave/RestoreCave';
-import EntrancesSelector from './EntrancesSelector';
 import { NetworkForm } from '../EntitiesForm';
 import StandardDialog from '../../common/StandardDialog';
 import AuthorAndDate from '../../common/Contribution/AuthorAndDate';
 import Alert from '../../common/Alert';
 import EntrancesList from './EntrancesList';
 import Descriptions from '../Descriptions';
-import { filterValidPositions } from '../../common/Maps/MapMultipleMarkers';
 import { CavePropTypes } from '../../../types/cave.type';
 import {
   DeletedCard,
   DeleteConfirmationDialog,
   DELETED_ENTITIES
 } from '../../common/card/Deleted';
-import { fetchPerson } from '../../../actions/Person/GetPerson';
+
+const HalfSplitContainer = styled('div')`
+  display: flex;
+  flex-direction: column;
+  gap: ${({ theme }) => theme.spacing(2)};
+
+  ${({ theme }) => theme.breakpoints.up('sm')} {
+    flex-direction: row;
+    align-items: stretch;
+    gap: ${({ theme }) => theme.spacing(3)};
+  }
+`;
 
 export const Network = ({ isLoading, error, cave }) => {
   const dispatch = useDispatch();
@@ -47,10 +55,10 @@ export const Network = ({ isLoading, error, cave }) => {
     useState(false);
   const [wantedDeletedState, setWantedDeletedState] = useState(false);
   const userId = useUserProperties()?.id ?? null;
-  const [isExploredLoading, setIsExploredLoading] = useState(false);
-  const [isExplored, setIsExplored] = useState(false);
-  const { person, error: personError } = useSelector(state => state.person);
-  const exploredNetworks = person?.exploredNetworks;
+  const { isExplored, isExploredLoading, handleToggleExplored } = useExplored({
+    caveId: cave?.id,
+    userId
+  });
 
   useEffect(() => {
     if (cave) setWantedDeletedState(cave.isDeleted);
@@ -74,111 +82,139 @@ export const Network = ({ isLoading, error, cave }) => {
     dispatch(restoreCave({ id: caveId }));
   };
 
-  useEffect(() => {
-    if (userId && !person && !personError) {
-      dispatch(fetchPerson(userId));
-    }
-  }, [userId, person, personError, dispatch]);
-
-  useEffect(() => {
-    if (cave?.id) {
-      const explored = exploredNetworks?.some(n => n?.id === cave?.id);
-      setIsExplored(explored);
-    }
-  }, [exploredNetworks, cave?.id]);
-
-  const handleToggleExplored = async () => {
-    if (!userId || !caveId) return;
-
-    setIsExploredLoading(true);
-    try {
-      if (isExplored) {
-        await dispatch(unlinkCave(caveId, userId, false));
-      } else {
-        await dispatch(linkCave(caveId, userId, false));
-      }
-      setIsExplored(!isExplored);
-    } catch (error) {
-      console.error('Error toggling explored status:', error);
-      setIsExplored(isExplored);
-    } finally {
-      setIsExploredLoading(false);
-    }
-  };
-
   const isActionLoading = wantedDeletedState !== cave?.isDeleted;
+  const country = cave?.entrances?.[0]?.country;
+
+  const handleToggleSelection = id => {
+    setSelectedEntrancesId(prev =>
+      prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
+    );
+  };
 
   return (
     <div ref={componentRef}>
-      <FixedLayout
-        fixedContent={
-          cave && (
-            <FixedContent
-              displayShare
-              title={cave?.name ?? ''}
-              icon={<CustomIcon type="network" />}
-              onEdit={
-                isAuth && !cave?.isDeleted ? () => setEditing(true) : undefined
-              }
-              onDelete={onDelete}
-              isExplored={isAuth && caveId ? isExplored : null}
-              isExploredLoading={isExploredLoading}
-              onToggleExplored={
-                isAuth && caveId && !cave?.isDeleted
-                  ? handleToggleExplored
-                  : undefined
-              }
-              printRef={componentRef}
-              content={
-                <>
-                  {cave.isDeleted && (
-                    <DeletedCard
-                      entityType={DELETED_ENTITIES.network}
-                      entity={cave}
-                      isLoading={isActionLoading}
-                      onRestorePress={onRestorePress}
-                      onPermanentDeletePress={() => {
-                        setIsDeleteConfirmationPermanent(true);
-                        setIsDeleteConfirmationOpen(true);
-                      }}
-                    />
-                  )}
-                  <DeleteConfirmationDialog
+      <FixedLayout>
+        {cave && (
+          <FixedContent
+            displayShare
+            subheader={
+              (country || cave.massifs?.length > 0) && (
+                <Box
+                  display="flex"
+                  alignItems="center"
+                  justifyContent="space-between">
+                  <Breadcrumbs
+                    separator="·"
+                    sx={{ fontSize: { xs: '1.2rem', md: '1.7rem' } }}>
+                    {country && (
+                      <Link
+                        component={RouterLink}
+                        to={`/ui/countries/${country}`}
+                        underline="hover"
+                        color="inherit"
+                        sx={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '4px'
+                        }}>
+                        <CustomIcon type="country" size={16} />
+                        {country}
+                      </Link>
+                    )}
+                    {cave.massifs?.map(massif => (
+                      <Link
+                        key={massif.id}
+                        component={RouterLink}
+                        to={`/ui/massifs/${massif.id}`}
+                        underline="hover"
+                        color="inherit"
+                        sx={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '4px'
+                        }}>
+                        <CustomIcon type="massif" size={16} />
+                        {massif.name}
+                      </Link>
+                    ))}
+                  </Breadcrumbs>
+                </Box>
+              )
+            }
+            title={cave?.name ?? ''}
+            icon={<CustomIcon type="network" />}
+            onEdit={
+              isAuth && !cave?.isDeleted ? () => setEditing(true) : undefined
+            }
+            onDelete={onDelete}
+            isExplored={isAuth && caveId ? isExplored : null}
+            isExploredLoading={isExploredLoading}
+            onToggleExplored={
+              isAuth && caveId && !cave?.isDeleted
+                ? handleToggleExplored
+                : undefined
+            }
+            printRef={componentRef}
+            content={
+              <>
+                {cave.isDeleted && (
+                  <DeletedCard
                     entityType={DELETED_ENTITIES.network}
-                    isOpen={isDeleteConfirmationOpen}
+                    entity={cave}
                     isLoading={isActionLoading}
-                    isPermanent={isDeleteConfirmationPermanent}
-                    isSearchMandatory={
-                      isDeleteConfirmationPermanent &&
-                      (cave?.entrances ?? []).length > 0
-                    }
-                    onClose={() => setIsDeleteConfirmationOpen(false)}
-                    onConfirmation={entity => {
-                      onDeletePress(entity?.id, isDeleteConfirmationPermanent);
+                    onRestorePress={onRestorePress}
+                    onPermanentDeletePress={() => {
+                      setIsDeleteConfirmationPermanent(true);
+                      setIsDeleteConfirmationOpen(true);
                     }}
                   />
-
-                  <EntrancesMap
-                    isLoading={isLoading ?? true}
-                    entrances={cave?.entrances ?? []}
-                    selectedEntrancesId={selectedEntrancesId}
-                  />
-                  <Properties isLoading={isLoading} cave={cave ?? {}}>
-                    {filterValidPositions(cave?.entrances ?? []).length > 1 && (
-                      <EntrancesSelector
-                        onSelect={newSelection =>
-                          setSelectedEntrancesId(newSelection)
-                        }
+                )}
+                <DeleteConfirmationDialog
+                  entityType={DELETED_ENTITIES.network}
+                  isOpen={isDeleteConfirmationOpen}
+                  isLoading={isActionLoading}
+                  isPermanent={isDeleteConfirmationPermanent}
+                  isSearchMandatory={
+                    isDeleteConfirmationPermanent &&
+                    (cave?.entrances ?? []).length > 0
+                  }
+                  onClose={() => setIsDeleteConfirmationOpen(false)}
+                  onConfirmation={entity => {
+                    onDeletePress(entity?.id, isDeleteConfirmationPermanent);
+                  }}
+                />
+                <HalfSplitContainer>
+                  <Box
+                    sx={{
+                      flex: 1,
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: 2
+                    }}>
+                    <Box sx={{ minHeight: 200 }}>
+                      <EntrancesMap
                         isLoading={isLoading}
-                        entrances={cave?.entrances}
+                        entrances={cave?.entrances ?? []}
                         selectedEntrancesId={selectedEntrancesId}
                       />
-                    )}
-                  </Properties>
-                </>
-              }
-              footer={
-                <>
+                    </Box>
+                    <Properties isLoading={isLoading} cave={cave ?? {}} />
+                  </Box>
+                  <Box sx={{ flex: 1, overflow: 'auto' }}>
+                    <EntrancesList
+                      inline
+                      isLoading={isLoading}
+                      entrances={cave?.entrances ?? []}
+                      selectedEntrancesId={selectedEntrancesId}
+                      onToggleSelection={handleToggleSelection}
+                    />
+                  </Box>
+                </HalfSplitContainer>
+              </>
+            }
+            footer={
+              (cave.author || cave.reviewer || cave.language) && (
+                <Typography component="div" variant="caption">
                   {cave.author && (
                     <AuthorAndDate
                       author={cave.author}
@@ -186,6 +222,7 @@ export const Network = ({ isLoading, error, cave }) => {
                       date={cave.dateInscription}
                     />
                   )}
+                  {cave.author && cave.reviewer && ' · '}
                   {cave.reviewer && (
                     <AuthorAndDate
                       author={cave.reviewer}
@@ -193,11 +230,14 @@ export const Network = ({ isLoading, error, cave }) => {
                       date={cave.dateReviewed}
                     />
                   )}
-                </>
-              }
-            />
-          )
-        }>
+                  {(cave.author || cave.reviewer) && cave.language && ' · '}
+                  {cave.language &&
+                    `${formatMessage({ id: 'Language' })} : ${cave.language.toUpperCase()}`}
+                </Typography>
+              )
+            }
+          />
+        )}
         {isLoading && (
           <Card sx={{ padding: 3 }}>
             <Box style={{ display: 'flex', justifyContent: 'center' }}>
@@ -219,11 +259,6 @@ export const Network = ({ isLoading, error, cave }) => {
         )}
         {cave && (
           <>
-            <EntrancesList
-              isLoading={isLoading}
-              entrances={cave.entrances}
-              selectedEntrancesId={selectedEntrancesId}
-            />
             <Descriptions
               descriptions={cave.descriptions}
               entityType="cave"

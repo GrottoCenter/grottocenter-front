@@ -102,7 +102,13 @@ export const EntrancePropTypes = PropTypes.shape({
   altitude: PropTypes.number,
   precision: PropTypes.number,
 
-  massifs: PropTypes.arrayOf(idNameType),
+  massifs: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.number.isRequired,
+      name: PropTypes.string.isRequired,
+      undergroundType: PropTypes.string,
+    })
+  ),
   documents: PropTypes.arrayOf(DocumentPropTypes),
   locations: PropTypes.arrayOf(LocationPropTypes),
   descriptions: PropTypes.arrayOf(DescriptionPropTypes),
@@ -110,6 +116,7 @@ export const EntrancePropTypes = PropTypes.shape({
   histories: PropTypes.arrayOf(HistoryPropTypes),
   comments: PropTypes.arrayOf(CommentPropTypes),
 
+  dataQuality: PropTypes.number,
   stats: PropTypes.shape({
     aestheticism: PropTypes.number,
     caving: PropTypes.number,

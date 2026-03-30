@@ -13,6 +13,7 @@ import OrganizationMarker from '../../common/Maps/common/Markers/Components/Orga
 import OrganizationPopup from '../../common/Maps/common/Markers/Components/OrganizationPopup';
 import { Property } from '../../common/Properties';
 import { GrottoFullPropTypes } from '../../../types/grotto.type';
+import linkifyOptions from '../../../helpers/linkifyOptions';
 
 const ContentWrapper = styled('div')`
   display: flex;
@@ -68,14 +69,14 @@ const Details = ({ organization }) => {
             <ContentWrapper>
               <StyledEmailIcon color="primary" />
               <Typography>
-                <Linkify>{organization.mail}</Linkify>
+                <Linkify options={linkifyOptions}>{organization.mail}</Linkify>
               </Typography>
             </ContentWrapper>
           )}
           {organization.customMessage && (
             <ContentWrapper>
               <MultilinesTypography>
-                <Linkify>{organization.customMessage}</Linkify>
+                <Linkify options={linkifyOptions}>{organization.customMessage}</Linkify>
               </MultilinesTypography>
             </ContentWrapper>
           )}

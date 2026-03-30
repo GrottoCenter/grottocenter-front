@@ -18,7 +18,7 @@ const getLocalizedCountryName = (country, formatMessage, locale, fallback = '') 
   if (!translationKey) return fallback;
 
   const langName = country[`${locale}Name`] || country[`${locale}_name`];
-  const defaultMessage = langName && langName !== '?' ? langName : country.nativeName || translationKey;
+  const defaultMessage = langName && langName !== '?' ? langName : translationKey;
 
   return formatMessage({ id: translationKey, defaultMessage });
 };

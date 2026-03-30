@@ -1,20 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
-import { List, Typography, Box, useTheme } from '@mui/material';
+import { List, Typography, Box } from '@mui/material';
 import { styled } from '@mui/material/styles';
-
-import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import { useSelector } from 'react-redux';
 import formatDistanceToNow from 'date-fns/formatDistanceToNow';
 import EntranceListItem from './EntranceListItem';
 import Alert from '../../components/common/Alert';
+import DataQualityHelpButton from '../../components/common/DataQualityBadge/DataQualityHelpButton';
 
 const StyledList = styled(List)({
-  display: 'flex',
-  flexWrap: 'wrap',
+  display: 'grid',
+  gridTemplateColumns: 'repeat(auto-fill, minmax(min(350px, 100%), 1fr))',
   width: '100%',
-  justifyContent: 'space-between'
+  gap: '10px',
+  padding: 0
 });
 
 const getFormatDate = (date, formatMessage, locale) => {
@@ -31,9 +31,8 @@ const getFormatDate = (date, formatMessage, locale) => {
 };
 
 const EntrancesList = props => {
-  const { entrances, handleClickScroll } = props;
+  const { entrances } = props;
   const { formatMessage } = useIntl();
-  const theme = useTheme();
   const locale = useSelector(state => state.intl);
 
   const [dateOfUpdate, setDateOfUpdate] = useState(null);
@@ -55,24 +54,15 @@ const EntrancesList = props => {
           display: 'flex',
           justifyContent: 'space-between'
         }}>
-        <Box style={{ display: 'flex' }}>
+        <Box style={{ display: 'flex', alignItems: 'center' }}>
           <Typography variant="h3" gutterBottom>
             {formatMessage({
               id: 'Entrance list and available data quality'
             })}
           </Typography>
-          <Box onClick={handleClickScroll}>
-            <HelpOutlineIcon
-              style={{
-                width: '15px',
-                height: '15px',
-                margin: '3px',
-                color: theme.palette.secondary.main
-              }}
-            />
-          </Box>
+          <DataQualityHelpButton />
         </Box>
-        <Box style={{ marginRight: '40px' }}>
+        <Box>
           {dateOfUpdate && (
             <>
               <Typography variant="body2">
@@ -115,7 +105,6 @@ EntrancesList.propTypes = {
       date_of_update: PropTypes.string
     })
   ),
-  handleClickScroll: PropTypes.func
 };
 
 export default EntrancesList;

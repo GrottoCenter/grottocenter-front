@@ -10,7 +10,7 @@ const AnchorBox = styled(Box)`
   scroll-margin-top: ${({ theme }) => theme.appBarHeight}px;
 `;
 
-const SectionTitle = ({ title, anchorId, isDeleted = false, marginBotton = 2 }) => {
+const SectionTitle = ({ title, anchorId, isDeleted = false, marginBottom = 2 }) => {
   const { formatMessage } = useIntl();
   useAnchorScroll(anchorId);
 
@@ -24,10 +24,12 @@ const SectionTitle = ({ title, anchorId, isDeleted = false, marginBotton = 2 }) 
   );
 
   if (!isDeleted)
-    return (
-      <AnchorBox id={anchorId} mb={marginBotton}>
-        <Typography variant="h4">{heading}&nbsp;</Typography>
+    return title ? (
+      <AnchorBox id={anchorId} mt={1} mb={marginBottom}>
+        <Typography variant="h4">{heading}</Typography>
       </AnchorBox>
+    ) : (
+      <AnchorBox id={anchorId} />
     );
 
   return (
@@ -51,7 +53,7 @@ const SectionTitle = ({ title, anchorId, isDeleted = false, marginBotton = 2 }) 
           display: 'inline-block',
           fontWeight: 'normal'
         }}>
-        {heading}&nbsp;
+        {heading}
       </Typography>
     </AnchorBox>
   );
@@ -60,8 +62,8 @@ const SectionTitle = ({ title, anchorId, isDeleted = false, marginBotton = 2 }) 
 export default SectionTitle;
 
 SectionTitle.propTypes = {
-  title: PropTypes.string.isRequired,
+  title: PropTypes.string,
   anchorId: PropTypes.string,
   isDeleted: PropTypes.bool,
-  marginBotton: PropTypes.number
+  marginBottom: PropTypes.number
 };

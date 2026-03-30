@@ -5,7 +5,6 @@ import { useDispatch } from 'react-redux';
 import React, { useState } from 'react';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import CancelIcon from '@mui/icons-material/Cancel';
-import { styled } from '@mui/material/styles';
 import { usePermissions } from '../../../../hooks';
 import { postRiggings } from '../../../../actions/Riggings/CreateRigging';
 import { moveRiggingRelevance } from '../../../../actions/Riggings/MoveRelevance';
@@ -17,10 +16,6 @@ import { RiggingPropTypes } from '../../../../types/entrance.type';
 import { sortByRelevance } from '../../../../helpers/sortByRelevance';
 import Alert from '../../../common/Alert';
 
-const DividerWithMargin = styled(Divider)`
-  margin-top: 16px;
-  background-color: ${props => props.theme.palette.divider};
-`;
 
 const Riggings = ({ riggings, entranceId, isEditAllowed }) => {
   const { formatMessage } = useIntl();
@@ -57,6 +52,7 @@ const Riggings = ({ riggings, entranceId, isEditAllowed }) => {
           >
             <Button
               color={isFormVisible ? 'inherit' : 'secondary'}
+              size="small"
               variant="outlined"
               onClick={() => setIsFormVisible(!isFormVisible)}
               startIcon={isFormVisible ? <CancelIcon /> : <AddCircleIcon />}
@@ -84,7 +80,6 @@ const Riggings = ({ riggings, entranceId, isEditAllowed }) => {
               const activeIds = sorted.filter(r => !r.isDeleted).map(r => r.id);
               return sorted.map(rigging => (
                 <React.Fragment key={rigging.id}>
-                  <DividerWithMargin />
                   <Rigging
                     rigging={rigging}
                     isEditAllowed={isEditAllowed}

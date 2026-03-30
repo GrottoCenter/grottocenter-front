@@ -15,8 +15,10 @@ import Contribution from '../../../common/Contribution/Contribution';
 import { SnapshotButton } from '../Snapshots/UtilityFunction';
 
 const ListItemStyled = styled(ListItem)`
-  flex-direction: column;
-  border-top: 1px solid ${props => props.theme.palette.divider};
+  display: flow-root;
+  border-top: 1px solid ${({ theme }) => theme.palette.divider};
+  padding-top: ${({ theme }) => theme.spacing(1)};
+  padding-bottom: ${({ theme }) => theme.spacing(1)};
 `;
 const Location = ({
   location,
@@ -61,8 +63,8 @@ const Location = ({
   const isActionLoading = wantedDeletedState !== location.isDeleted;
 
   return (
-    <ListItemStyled disableGutters alignItems="flex-start">
-      <Box style={{ alignSelf: 'flex-end' }}>
+    <ListItemStyled disableGutters>
+      <Box sx={{ float: 'right', ml: 1 }}>
         <ActionButtons
           isLoading={isActionLoading}
           isUpdating={isUpdateFormVisible}

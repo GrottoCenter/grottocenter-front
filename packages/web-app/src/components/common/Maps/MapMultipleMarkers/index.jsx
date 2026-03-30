@@ -11,7 +11,7 @@ export const filterValidPositions = positions =>
     e => typeof e.latitude === 'number' && typeof e.longitude === 'number'
   );
 
-const MultipleMarkers = ({ positions, zoom }) => {
+const MultipleMarkers = ({ validPositions }) => {
   const map = useMap();
   const updateEntranceMarkers = useMarkers({
     icon: EntranceMarker,
@@ -19,41 +19,47 @@ const MultipleMarkers = ({ positions, zoom }) => {
     shouldFitMapBound: true
   });
 
-  if (zoom) map.setZoom(zoom);
-
-  const validPositions = useMemo(
-    () => filterValidPositions(positions),
-    [positions]
-  );
-
   useEffect(() => {
     if (validPositions.length === 0) return;
     updateEntranceMarkers(validPositions);
+
+    // fitBounds (called inside updateEntranceMarkers on first load) may run
+    // before Leaflet's ResizeObserver settles the map dimensions. Re-fit once
+    // after the first resize event so all markers are guaranteed to be visible.
+    const latLngs = validPositions.map(p => [p.latitude, p.longitude]);
+    const onResize = () => {
+      map.fitBounds(latLngs, { padding: [40, 40], maxZoom: 16 });
+      map.off('resize', onResize);
+    };
+    map.on('resize', onResize);
+    return () => map.off('resize', onResize);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [validPositions]);
 
   return null;
 };
 
+MultipleMarkers.propTypes = {
+  validPositions: PropTypes.arrayOf(PropTypes.shape({})).isRequired
+};
+
 const MapMultipleMarkers = ({ style, zoom, positions }) => {
-  const validPositions = filterValidPositions(positions);
+  const validPositions = useMemo(() => filterValidPositions(positions), [positions]);
   if (validPositions.length === 0) return null;
-  
+
   return (
     <CustomMapContainer
       wholePage={false}
       dragging={!isMobile} // For usability only use two fingers drag/zoom on mobile
-      viewport={null}
       scrollWheelZoom={false}
       style={style}
       zoom={zoom || 14}>
-      <MultipleMarkers positions={positions} zoom={zoom || 14} />
+      <MultipleMarkers validPositions={validPositions} />
     </CustomMapContainer>
   );
 };
 
-// eslint-disable-next-line no-multi-assign
-MapMultipleMarkers.propTypes = MultipleMarkers.propTypes = {
+MapMultipleMarkers.propTypes = {
   positions: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   style: PropTypes.shape({}),
   zoom: PropTypes.number

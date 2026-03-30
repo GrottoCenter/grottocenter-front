@@ -5,36 +5,24 @@ import { useSelector } from 'react-redux';
 import { styled } from '@mui/material/styles';
 
 const StyledIcon = styled(Box)`
-  width: 45px;
-  height: 45px;
-`;
-
-const Block = styled(Box)`
-  display: flex;
-`;
-
-const TextBox = styled(Box)`
-  padding-left: 12px;
-`;
-
-const StyledText = styled(Typography)`
-  color: ${({ theme }) => theme.palette.secondary.main};
-  margin-bottom: 10px;
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
 `;
 
 const InfoBlock = ({ icon, numberData, text }) => {
   const locale = useSelector(state => state.intl);
 
   return (
-    <Block>
-      <StyledIcon>{icon}</StyledIcon>
-      <TextBox>
-        <StyledText variant="h4">
+    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1 }}>
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+        <StyledIcon>{icon}</StyledIcon>
+        <Typography variant="h3" color="secondary" fontWeight={700}>
           {(Math.round(numberData * 10) / 10).toLocaleString(locale)} m
-        </StyledText>
-        <Typography>{text}</Typography>
-      </TextBox>
-    </Block>
+        </Typography>
+      </Box>
+      <Typography variant="body2" textAlign="center">{text}</Typography>
+    </Box>
   );
 };
 
