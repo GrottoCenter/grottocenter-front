@@ -45,7 +45,7 @@ export const NetworkForm = ({ networkValues }) => {
       updateCave({
         depth: data.cave.depth,
         id: data.cave.id,
-        isDiving: data.cave.isDivingCave,
+        isDiving: data.cave.isDiving,
         length: data.cave.length,
         name: {
           language: data.cave.language,
@@ -109,7 +109,7 @@ NetworkForm.propTypes = {
         id: PropTypes.number.isRequired
       })
     ).isRequired,
-    isDivingCave: PropTypes.bool,
+    isDiving: PropTypes.bool,
     language: PropTypes.string.isRequired,
     length: PropTypes.number,
     name: PropTypes.string.isRequired,

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { Chip, Skeleton } from '@mui/material';
 import CustomIcon from '../../components/common/CustomIcon';
@@ -6,7 +6,6 @@ import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
 import Linkify from 'linkify-react';
-
 import { loadLanguages } from '../../actions/Language';
 
 import {
@@ -40,6 +39,7 @@ import {
   DocumentPropTypes,
   DocumentSimplePropTypes
 } from '../../types/document.type';
+import linkifyOptions from '../../helpers/linkifyOptions';
 
 const Document = ({
   isLoading = true,
@@ -88,111 +88,109 @@ const Document = ({
     dispatch(restoreDocument({ id: documentData.id }));
   };
 
-  const allAuthors = [];
-  const allFiles = [];
-  const childIssues = [];
-  const childArticles = [];
-  const childOther = [];
-  const linkedEntities = [];
+  const mainLanguage =
+    documentData?.mainLanguage === '000' ? null : documentData?.mainLanguage;
 
-  if (!isLoading) {
-    // eslint-disable-next-line no-param-reassign
-    if (documentData?.mainLanguage === '000') documentData.mainLanguage = null;
+  const allAuthors = useMemo(() => {
+    if (!documentData) return [];
+    const items = [
+      ...(documentData.authors ?? []).map(a => ({
+        id: a.id,
+        name: a.nickname,
+        url: `/ui/persons/${a.id}`
+      })),
+      ...(documentData.authorsOrganization ?? []).map(a => ({
+        id: a.id,
+        name: a.name,
+        url: `/ui/organizations/${a.id}`
+      }))
+    ];
+    return items.flatMap((a, i) =>
+      i < items.length - 1
+        ? [<TextLink key={a.id} value={a.name} url={a.url} />, ' - ']
+        : [<TextLink key={a.id} value={a.name} url={a.url} />]
+    );
+  }, [documentData]);
 
-    if (documentData?.parent?.files?.length > 0) {
-      const file = documentData.parent.files[0];
-      const pageRegex = /^(\d+)(?:-(\d+))?$/;
-      const segments = String(documentData?.pages)
-        .split(',')
-        .map(s => s.trim())
-        .filter(s => s.length > 0);
-
-      for (const segment of segments) {
+  const allFiles = useMemo(() => {
+    if (!documentData?.parent?.files?.length) return [];
+    const file = documentData.parent.files[0];
+    const pageRegex = /^(\d+)(?:-(\d+))?$/;
+    return String(documentData.pages)
+      .split(',')
+      .map(s => s.trim())
+      .filter(Boolean)
+      .flatMap(segment => {
         const match = segment.match(pageRegex);
-        if (match) {
-          const start = parseInt(match[1], 10);
-          const end = match[2] ? parseInt(match[2], 10) : null;
-          const path = `${file.completePath}#page=${start}`;
-          allFiles.push(
-            <FileListElement
-              key={path}
-              fileName={formatMessage(
-                {
-                  id: end
-                    ? 'Pages {start}-{end} of {title}'
-                    : 'Page {start} of {title}'
-                },
-                { start, end, title: documentData.parent.title }
-              )}
-              filePath={path}
-            />
-          );
-        }
-      }
-    }
-    for (const author of documentData?.authors ?? []) {
-      allAuthors.push(
-        <TextLink
-          key={author.id}
-          value={author.nickname}
-          url={`/ui/persons/${author.id}`}
-        />,
-        ' - '
-      );
-    }
-    for (const author of documentData?.authorsOrganization ?? []) {
-      allAuthors.push(
-        <TextLink
-          key={author.id}
-          value={author.name}
-          url={`/ui/organizations/${author.id}`}
-        />,
-        ' - '
-      );
-    }
-    if (allAuthors.length > 0) allAuthors.splice(allAuthors.length - 1);
-
-    for (const doc of documentChildren) {
-      if (doc.type === 'Issue') childIssues.push(doc);
-      else if (doc.type === 'Article') childArticles.push(doc);
-      else childOther.push(doc);
-    }
-
-    if (documentData?.massifs && documentData?.massifs.length > 0)
-      linkedEntities.push(
-        ...(documentData?.massifs?.map(e => (
-          <ListElement
-            key={e.id}
-            icon={<CustomIcon type="massif" />}
-            value={e.name}
-            secondary={formatMessage({ id: 'Massif' })}
-            url={`/ui/massifs/${e.id}`}
+        if (!match) return [];
+        const start = parseInt(match[1], 10);
+        const end = match[2] ? parseInt(match[2], 10) : null;
+        const path = `${file.completePath}#page=${start}`;
+        return [
+          <FileListElement
+            key={path}
+            fileName={formatMessage(
+              {
+                id: end
+                  ? 'Pages {start}-{end} of {title}'
+                  : 'Page {start} of {title}'
+              },
+              { start, end, title: documentData.parent.title }
+            )}
+            filePath={path}
           />
-        )) ?? [])
-      );
-    if (documentData?.cave)
-      linkedEntities.push(
+        ];
+      });
+  }, [documentData, formatMessage]);
+
+  const childIssues = useMemo(
+    () => (documentChildren ?? []).filter(d => d.type === 'Issue'),
+    [documentChildren]
+  );
+  const childArticles = useMemo(
+    () => (documentChildren ?? []).filter(d => d.type === 'Article'),
+    [documentChildren]
+  );
+  const childOther = useMemo(
+    () =>
+      (documentChildren ?? []).filter(
+        d => d.type !== 'Issue' && d.type !== 'Article'
+      ),
+    [documentChildren]
+  );
+
+  const linkedEntities = useMemo(() => {
+    if (!documentData) return [];
+    return [
+      ...(documentData.massifs ?? []).map(e => (
         <ListElement
-          key={documentData?.cave.id}
-          icon={<CustomIcon type="network" />}
-          value={documentData?.cave.name}
-          secondary={formatMessage({ id: 'Cave' })}
-          url={`/ui/caves/${documentData?.cave.id}`}
+          key={e.id}
+          icon={<CustomIcon type="massif" />}
+          value={e.name}
+          secondary={formatMessage({ id: 'Massif' })}
+          url={`/ui/massifs/${e.id}`}
         />
-      );
-    if (documentData?.entrances && documentData?.entrances.length > 0)
-      linkedEntities.push(
-        ...(documentData?.entrances?.map(entrance => (
-          <ListElement
-            key={entrance.id}
-            icon={<CustomIcon type="entrance" />}
-            value={entrance.name}
-            secondary={formatMessage({ id: 'Entrance' })}
-            url={`/ui/entrances/${entrance.id}`}
-          />
-        )) ?? [])
-      );
-  }
+      )),
+      documentData.cave && (
+        <ListElement
+          key={documentData.cave.id}
+          icon={<CustomIcon type="network" />}
+          value={documentData.cave.name}
+          secondary={formatMessage({ id: 'Cave' })}
+          url={`/ui/caves/${documentData.cave.id}`}
+        />
+      ),
+      ...(documentData.entrances ?? []).map(entrance => (
+        <ListElement
+          key={entrance.id}
+          icon={<CustomIcon type="entrance" />}
+          value={entrance.name}
+          secondary={formatMessage({ id: 'Entrance' })}
+          url={`/ui/entrances/${entrance.id}`}
+        />
+      ))
+    ].filter(Boolean);
+  }, [documentData, formatMessage]);
 
   const isActionLoading = wantedDeletedState !== documentData?.isDeleted;
 
@@ -269,7 +267,7 @@ const Document = ({
                 url={`/ui/documents/${documentData.parent?.id}`}
               />
               <SectionText title={formatMessage({ id: 'Summary' })}>
-                <Linkify>{documentData.description}</Linkify>
+                <Linkify options={linkifyOptions}>{documentData.description}</Linkify>
               </SectionText>
               <SectionDivider />
               <SectionDetails title={formatMessage({ id: 'Details' })}>
@@ -285,8 +283,8 @@ const Document = ({
                 <ItemString
                   label={formatMessage({ id: 'Language' })}
                   value={
-                    languages.find(e => e.id === documentData.mainLanguage)
-                      ?.refName ?? documentData.mainLanguage
+                    languages.find(e => e.id === mainLanguage)?.refName ??
+                    mainLanguage
                   }
                 />
                 <ItemString

@@ -1,13 +1,15 @@
 import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
 import {
+  Box,
   Chip,
   ListItem,
-  ListItemIcon,
   Typography,
   ButtonGroup,
   Tooltip,
-  Button
+  Button,
+  useMediaQuery,
+  useTheme
 } from '@mui/material';
 import LinkOffIcon from '@mui/icons-material/LinkOff';
 import React, { useState } from 'react';
@@ -18,6 +20,7 @@ import Files from './Files';
 import { SnapshotButton } from '../../appli/Entry/Snapshots/UtilityFunction';
 import Translate from '../Translate';
 import StandardDialog from '../StandardDialog';
+import linkifyOptions from '../../../helpers/linkifyOptions';
 
 const StyledListItemContainer = styled('div')`
   width: 100%;
@@ -47,6 +50,8 @@ const Document = ({
   imageIndexOffset = 0
 }) => {
   const { formatMessage } = useIntl();
+  const theme = useTheme();
+  const isSmall = useMediaQuery(theme.breakpoints.down('sm'));
   const [isUnlinkDialogOpen, setUnlinkDialogOpen] = useState(false);
 
   return (
@@ -66,7 +71,7 @@ const Document = ({
         />
         {document.description ? (
           <DocumentDescription>
-            <Linkify> {document.description}</Linkify>
+            <Linkify options={linkifyOptions}> {document.description}</Linkify>
           </DocumentDescription>
         ) : (
           false
@@ -83,10 +88,13 @@ const Document = ({
         )}
       </StyledListItemContainer>
 
-      {hasSnapshotButton || onUnlink ? (
-        <ListItemIcon style={{ alignSelf: 'start' }}>
-          <ButtonGroup color="primary">
-            {hasSnapshotButton ? (
+      {(hasSnapshotButton || onUnlink) && (
+        <Box style={{ flexShrink: 0, alignSelf: 'flex-start' }}>
+          <ButtonGroup
+            color="primary"
+            size="small"
+            orientation={isSmall ? 'vertical' : 'horizontal'}>
+            {hasSnapshotButton && (
               <SnapshotButton
                 color="primary"
                 variant="outlined"
@@ -94,30 +102,19 @@ const Document = ({
                 type="documents"
                 content={document}
               />
-            ) : (
-              false
             )}
-            {onUnlink ? (
-              <Tooltip
-                title={formatMessage({
-                  id: 'Unlink this document'
-                })}
-              >
+            {onUnlink && (
+              <Tooltip title={formatMessage({ id: 'Unlink this document' })}>
                 <Button
                   onClick={() => setUnlinkDialogOpen(true)}
                   color="primary"
-                  aria-label={formatMessage({ id: 'unlink' })}
-                >
+                  aria-label={formatMessage({ id: 'unlink' })}>
                   <LinkOffIcon />
                 </Button>
               </Tooltip>
-            ) : (
-              false
             )}
           </ButtonGroup>
-        </ListItemIcon>
-      ) : (
-        false
+        </Box>
       )}
       {onUnlink ? (
         <StandardDialog
@@ -128,8 +125,7 @@ const Document = ({
             <Button
               key="no"
               onClick={() => setUnlinkDialogOpen(false)}
-              disableElevation
-            >
+              disableElevation>
               <Translate>No</Translate>
             </Button>,
             <Button
@@ -140,12 +136,10 @@ const Document = ({
                 onUnlink(document);
               }}
               color="primary"
-              autoFocus
-            >
+              autoFocus>
               <Translate>Yes</Translate>
             </Button>
-          ]}
-        >
+          ]}>
           <Translate>
             Are you sure you want to unlink this document of this entity?
           </Translate>

@@ -93,7 +93,7 @@ const CreateRiggingsForm = ({ closeForm, onSubmit, values, isNew }) => {
         </FormRow>
         <TableContainer>
           <Table size="small" aria-label="riggings">
-            <TableHead>
+            <TableHead sx={{ '& th': { textTransform: 'capitalize' } }}>
               <TableRow>
                 <TableCell align="center">
                   {formatMessage({ id: 'obstacles' })}

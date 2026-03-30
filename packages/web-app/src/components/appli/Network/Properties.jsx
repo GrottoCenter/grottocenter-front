@@ -2,81 +2,87 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import { styled } from '@mui/material/styles';
+import { Box, Paper } from '@mui/material';
 
 import InfoSection from '../../common/InfoSection';
 import {
-  SecondaryPropertiesWrapper,
   DepthProperty,
   LengthProperty,
-  MassifProperty,
   DivingProperty,
   TemperatureProperty,
   OrganizationProperty
 } from '../../common/CaveProperties';
 
-const Wrapper = styled('div')`
+const GlobalWrapper = styled('div')`
+  width: 100%;
   display: flex;
   flex-direction: column;
+  gap: ${({ theme }) => theme.spacing(2)};
 `;
 
-const Properties = ({ isLoading, cave, children }) => {
+const Properties = ({ isLoading, cave }) => {
   const { formatMessage } = useIntl();
 
-  const hasCaveInfo =
-    children ||
+  const hasCharacteristics =
     cave?.depth ||
     cave?.length ||
-    cave?.massifs?.length > 0 ||
     cave?.isDiving ||
     cave?.temperature;
 
   return (
-    <Wrapper>
-      {hasCaveInfo && (
-        <InfoSection title={formatMessage({ id: 'Cave information' })}>
-          {children}
-          <DepthProperty depth={cave?.depth} isLoading={isLoading} />
-          <LengthProperty length={cave?.length} isLoading={isLoading} />
-          <SecondaryPropertiesWrapper>
-            {cave?.massifs?.map(massif => (
-              <MassifProperty key={massif.id} massif={massif} secondary />
-            ))}
-            <DivingProperty isDiving={cave?.isDiving} isLoading={isLoading} />
-            <TemperatureProperty
-              temperature={cave?.temperature}
-              isLoading={isLoading}
-            />
-          </SecondaryPropertiesWrapper>
-        </InfoSection>
+    <GlobalWrapper>
+      {hasCharacteristics && (
+        <Paper variant="outlined" sx={{ p: 2, borderRadius: 2, bgcolor: 'grey.50' }}>
+          <InfoSection title={formatMessage({ id: 'Characteristics' })}>
+            <Box
+              sx={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(2, 1fr)',
+                gap: 1
+              }}>
+              <DepthProperty depth={cave?.depth} isLoading={isLoading} />
+              <LengthProperty length={cave?.length} isLoading={isLoading} />
+              <TemperatureProperty
+                temperature={cave?.temperature}
+                isLoading={isLoading}
+              />
+              <DivingProperty isDiving={cave?.isDiving} isLoading={isLoading} />
+            </Box>
+          </InfoSection>
+        </Paper>
       )}
       {cave?.exploringOrganizations?.length > 0 && (
-        <InfoSection title={formatMessage({ id: 'Exploring organizations' })}>
-          <SecondaryPropertiesWrapper>
-            {cave.exploringOrganizations.map(org => (
-              <OrganizationProperty key={org.id} organization={org} />
-            ))}
-          </SecondaryPropertiesWrapper>
-        </InfoSection>
+        <Paper variant="outlined" sx={{ p: 2, borderRadius: 2, bgcolor: 'grey.50' }}>
+          <InfoSection title={formatMessage({ id: 'Exploring organizations' })}>
+            <Box
+              sx={{
+                display: 'grid',
+                gridTemplateColumns: {
+                  xs: '1fr',
+                  sm: 'repeat(2, 1fr)',
+                  md: 'repeat(3, 1fr)',
+                  lg: 'repeat(4, 1fr)'
+                }
+              }}>
+              {cave.exploringOrganizations.map(org => (
+                <OrganizationProperty key={org.id} organization={org} />
+              ))}
+            </Box>
+          </InfoSection>
+        </Paper>
       )}
-    </Wrapper>
+    </GlobalWrapper>
   );
 };
 
 Properties.propTypes = {
   isLoading: PropTypes.bool.isRequired,
-  children: PropTypes.node,
   cave: PropTypes.shape({
     id: PropTypes.number.isRequired,
     depth: PropTypes.number,
     length: PropTypes.number,
     temperature: PropTypes.number,
     isDiving: PropTypes.bool,
-    massifs: PropTypes.arrayOf(
-      PropTypes.shape({
-        id: PropTypes.number.isRequired,
-        name: PropTypes.string.isRequired
-      })
-    ),
     exploringOrganizations: PropTypes.arrayOf(
       PropTypes.shape({
         id: PropTypes.number.isRequired,

@@ -1,17 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
-import { Box, Typography, useTheme } from '@mui/material';
+import { Box, Button, Typography } from '@mui/material';
 import { Link } from 'react-router-dom';
-import InlineData from './InlineData';
-import ScrollableContent from '../../../../common/Layouts/Fixed/ScrollableContent';
 import CustomIcon from '../../../../common/CustomIcon';
-
-const StyledDivider = () => (
-  <Box style={{ margin: '-20px 0' }}>
-    <hr />
-  </Box>
-);
+import InlineData from './InlineData';
 
 const CavesData = ({
   title,
@@ -22,68 +15,53 @@ const CavesData = ({
   url
 }) => {
   const { formatMessage } = useIntl();
-  const theme = useTheme();
 
   return (
-    <ScrollableContent
-      dense
-      subTitle
-      title={title}
-      content={
-        <>
-          {nbMassifs !== undefined && nbMassifs !== null && (
-            <>
-              <InlineData
-                icon={<CustomIcon type="massif" size={25} />}
-                numberData={nbMassifs}
-                text={formatMessage({ id: 'massif(s)' })}
-              />
-              <StyledDivider />
-            </>
-          )}
-
-          {nbCaves !== undefined && nbCaves !== null && (
-            <InlineData
-              icon={<CustomIcon type="entrance" size={25} />}
-              numberData={nbCaves}
-              text={formatMessage({ id: 'cave(s) (1 or multiple entrances)' })}
-            />
-          )}
-
-          {nbDivingCaves !== undefined && nbDivingCaves !== null && (
-            <>
-              <StyledDivider />
-              <InlineData
-                icon={<CustomIcon type="diving_cave" size={25} />}
-                numberData={nbDivingCaves}
-                text={formatMessage({ id: 'cave(s) are diveable' })}
-              />
-            </>
-          )}
-
-          {nbNetworks !== undefined && nbNetworks !== null && (
-            <>
-              <StyledDivider />
-              <InlineData
-                icon={<CustomIcon type="network" size={25} />}
-                numberData={nbNetworks}
-                text={formatMessage({
-                  id: 'network(s) (cave of more than 1 entrance)'
-                })}
-              />
-            </>
-          )}
-
-          <Box display="flex" justifyContent="flex-end" alignItems="flex-end">
-            <Link style={{ color: theme.palette.secondary.main }} to={url}>
-              <Typography fontSize="small">
-                {formatMessage({ id: 'Access entrances list' })}
-              </Typography>
-            </Link>
-          </Box>
-        </>
-      }
-    />
+    <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+      <Typography variant="h4" textAlign="center" pb={2}>
+        {title}
+      </Typography>
+      <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 3 }}>
+        {nbMassifs !== undefined && nbMassifs !== null && (
+          <InlineData
+            icon={<CustomIcon type="massif" size={40} />}
+            numberData={nbMassifs}
+            text={formatMessage({ id: nbMassifs > 1 ? 'massifs' : 'massif' })}
+          />
+        )}
+        {nbCaves !== undefined && nbCaves !== null && (
+          <InlineData
+            icon={<CustomIcon type="entrance" size={40} />}
+            numberData={nbCaves}
+            text={formatMessage({ id: 'cave_with_entrances' }, { count: nbCaves })}
+          />
+        )}
+        {nbDivingCaves !== undefined && nbDivingCaves !== null && (
+          <InlineData
+            icon={<CustomIcon type="diving_cave" size={40} />}
+            numberData={nbDivingCaves}
+            text={formatMessage({ id: 'diveable_caves' }, { count: nbDivingCaves })}
+          />
+        )}
+        {nbNetworks !== undefined && nbNetworks !== null && (
+          <InlineData
+            icon={<CustomIcon type="network" size={40} />}
+            numberData={nbNetworks}
+            text={formatMessage({ id: 'network_count' }, { count: nbNetworks })}
+          />
+        )}
+      </Box>
+      <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+        <Button
+          variant="outlined"
+          size="small"
+          component={Link}
+          to={url}
+          sx={{ fontWeight: 700 }}>
+          {formatMessage({ id: 'Access entrances list' })}
+        </Button>
+      </Box>
+    </Box>
   );
 };
 

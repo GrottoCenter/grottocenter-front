@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { styled } from '@mui/material/styles';
 import { useIntl } from 'react-intl';
+import { Tooltip } from '@mui/material';
 
 const DurationWrapper = styled('div')`
   display: flex;
@@ -18,15 +19,12 @@ const Duration = ({ image, durationStr, title }) => {
     +splittedTime[0] > 0 ? `${+splittedTime[0]}h` : ''
   }${+splittedTime[1] > 0 ? `${splittedTime[1].padStart(2, '0')}m` : ''}`;
   return (
-    <DurationWrapper>
-      <img
-        src={image}
-        alt={formatMessage({ id: title })}
-        title={formatMessage({ id: title })}
-        height="30"
-      />
-      <span>{valueToDisplay}</span>
-    </DurationWrapper>
+    <Tooltip title={formatMessage({ id: title })}>
+      <DurationWrapper>
+        <img src={image} alt={formatMessage({ id: title })} height="30" />
+        <span>{valueToDisplay}</span>
+      </DurationWrapper>
+    </Tooltip>
   );
 };
 

@@ -52,6 +52,7 @@ const Histories = ({ entranceId, histories, isEditAllowed }) => {
           >
             <Button
               color={isFormVisible ? 'inherit' : 'secondary'}
+              size="small"
               variant="outlined"
               onClick={() => setIsFormVisible(!isFormVisible)}
               startIcon={isFormVisible ? <CancelIcon /> : <AddCircleIcon />}

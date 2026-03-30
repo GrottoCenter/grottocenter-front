@@ -6,6 +6,7 @@ import Linkify from 'linkify-react';
 import MultilinesTypography from '../MultilinesTypography';
 import AuthorAndDate from './AuthorAndDate';
 import authorType from '../../../types/author.type';
+import linkifyOptions from '../../../helpers/linkifyOptions';
 
 const Contribution = ({
   author,
@@ -15,7 +16,8 @@ const Contribution = ({
   dateReviewed,
   withHours = false,
   isDeleted = false,
-  isDeletedWithHeader = false
+  isDeletedWithHeader = false,
+  hideAttribution = false
 }) => {
   const { formatMessage } = useIntl();
 
@@ -35,27 +37,28 @@ const Contribution = ({
       )}
       {body && (
         <MultilinesTypography variant="body1" component="span" sx={bodyStyle}>
-          <Linkify>{body}</Linkify>
+          <Linkify options={linkifyOptions}>{body}</Linkify>
         </MultilinesTypography>
       )}
-      <br />
-      {author && (
-        <AuthorAndDate
-          author={author}
-          date={dateInscription}
-          withHours={withHours}
-        />
-      )}
-      {reviewer && (
-        <>
-          <br />
-          <AuthorAndDate
-            author={reviewer}
-            date={dateReviewed}
-            verb={author ? 'Updated' : ''}
-            withHours={withHours}
-          />
-        </>
+      {!hideAttribution && (author || reviewer) && (
+        <Typography component="div" variant="caption" sx={{ mt: 3 }}>
+          {author && (
+            <AuthorAndDate
+              author={author}
+              date={dateInscription}
+              withHours={withHours}
+            />
+          )}
+          {author && reviewer && ' · '}
+          {reviewer && (
+            <AuthorAndDate
+              author={reviewer}
+              date={dateReviewed}
+              verb={author ? 'Updated' : ''}
+              withHours={withHours}
+            />
+          )}
+        </Typography>
       )}
     </>
   );
@@ -75,7 +78,8 @@ Contribution.propTypes = {
   ]),
   withHours: PropTypes.bool,
   isDeleted: PropTypes.bool,
-  isDeletedWithHeader: PropTypes.bool
+  isDeletedWithHeader: PropTypes.bool,
+  hideAttribution: PropTypes.bool
 };
 
 export default Contribution;

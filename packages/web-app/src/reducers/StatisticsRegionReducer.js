@@ -16,8 +16,7 @@ const reducer = (state = initialState, action) => {
   switch (action.type) {
     case FETCH_STATISTICS_REGION:
       return {
-        ...state,
-        error: undefined,
+        ...initialState,
         status: REDUCER_STATUS.LOADING
       };
     case FETCH_STATISTICS_REGION_SUCCESS:

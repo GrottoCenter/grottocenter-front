@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { useDispatch } from 'react-redux';
 import { useIntl } from 'react-intl';
-import { Button, Divider, List, Tooltip } from '@mui/material';
+import { Box, Button, Divider, Paper, Tooltip } from '@mui/material';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import CancelIcon from '@mui/icons-material/Cancel';
 
@@ -45,7 +45,7 @@ const Comments = ({ entranceId, comments, isEditAllowed }) => {
     <ScrollableContent
       dense
       anchorId="comments"
-      title={formatMessage({ id: 'Comment' })}
+      title={formatMessage({ id: 'Comments' })}
       icon={
         permissions.isAuth &&
         isEditAllowed && (
@@ -58,6 +58,7 @@ const Comments = ({ entranceId, comments, isEditAllowed }) => {
           >
             <Button
               color={isFormVisible ? 'inherit' : 'secondary'}
+              size="small"
               variant="outlined"
               onClick={() => setIsFormVisible(!isFormVisible)}
               startIcon={isFormVisible ? <CancelIcon /> : <AddCircleIcon />}
@@ -77,14 +78,14 @@ const Comments = ({ entranceId, comments, isEditAllowed }) => {
           )}
 
           {comments.length > 0 ? (
-            <List dense disablePadding>
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
               {(() => {
                 const sorted = sortByRelevance(comments);
                 const activeIds = sorted
                   .filter(c => !c.isDeleted)
                   .map(c => c.id);
                 return sorted.map(comment => (
-                  <React.Fragment key={comment.id}>
+                  <Paper key={comment.id} variant="outlined" sx={{ p: 2, borderRadius: 2, bgcolor: 'grey.50' }}>
                     <Comment
                       comment={comment}
                       isEditAllowed={isEditAllowed}
@@ -94,10 +95,10 @@ const Comments = ({ entranceId, comments, isEditAllowed }) => {
                       isFirst={comment.id === activeIds[0]}
                       isLast={comment.id === activeIds[activeIds.length - 1]}
                     />
-                  </React.Fragment>
+                  </Paper>
                 ));
               })()}
-            </List>
+            </Box>
           ) : (
             <Alert
               severity="info"

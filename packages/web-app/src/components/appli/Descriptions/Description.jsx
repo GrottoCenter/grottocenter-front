@@ -15,8 +15,10 @@ import { usePermissions } from '../../../hooks';
 import Contribution from '../../common/Contribution/Contribution';
 
 const ListItemStyled = styled(ListItem)`
-  flex-direction: column;
-  border-top: 1px solid ${props => props.theme.palette.divider};
+  display: flow-root;
+  border-top: 1px solid ${({ theme }) => theme.palette.divider};
+  padding-top: ${({ theme }) => theme.spacing(1)};
+  padding-bottom: ${({ theme }) => theme.spacing(1)};
 `;
 const Description = ({
   description,
@@ -61,8 +63,8 @@ const Description = ({
   const isActionLoading = wantedDeletedState !== description.isDeleted;
 
   return (
-    <ListItemStyled disableGutters alignItems="flex-start">
-      <Box style={{ alignSelf: 'flex-end' }}>
+    <ListItemStyled disableGutters>
+      <Box sx={{ float: 'right', ml: 1 }}>
         <ActionButtons
           isLoading={isActionLoading}
           isUpdating={isUpdateFormVisible}

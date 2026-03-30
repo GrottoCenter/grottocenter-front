@@ -11,12 +11,11 @@ const SectionWrapper = styled(Box)`
 
 const SectionTitle = styled(Typography)`
   font-weight: 600;
-  margin-bottom: ${({ theme }) => theme.spacing(1)};
 `;
 
 const InfoSection = ({ title, children }) => (
   <SectionWrapper>
-    {title && <SectionTitle variant="subtitle1">{title}</SectionTitle>}
+    {title && <SectionTitle variant="subtitle1" component="h3">{title}</SectionTitle>}
     {children}
   </SectionWrapper>
 );

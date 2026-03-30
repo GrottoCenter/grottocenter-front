@@ -19,7 +19,7 @@ import { styled } from '@mui/material/styles';
 import { useReactToPrint } from 'react-to-print';
 import CreateIcon from '@mui/icons-material/Create';
 import DeleteIcon from '@mui/icons-material/Delete';
-import TimelineIcon from '@mui/icons-material/Timeline';
+import ManageHistoryIcon from '@mui/icons-material/ManageHistory';
 import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
 import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
@@ -27,6 +27,7 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 
 import ShareIcon from '@mui/icons-material/Share';
 
+import { isMobile } from 'react-device-detect';
 import { SnapshotButton } from '../../../appli/Entry/Snapshots/UtilityFunction';
 import { useNotification } from '../../../../hooks';
 import copyToClipboard from '../../../../helpers/clipboard';
@@ -44,12 +45,14 @@ const CardContent = styled(MuiCardContent)`
   flex-grow: 1;
   overflow-y: auto;
   scroll-behavior: smooth;
+  padding-top: 0;
 `;
 
 const CardActions = styled(MuiCardActions)`
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+  padding-left: 16px;
 `;
 
 const Title = styled('span')`
@@ -79,6 +82,7 @@ const FixedContent = ({
   onDelete,
   printRef,
   snapshot,
+  entranceSnapshot,
   onChangeSubscribe,
   isSubscribed,
   isSubscribeLoading,
@@ -89,6 +93,15 @@ const FixedContent = ({
 }) => {
   const { formatMessage } = useIntl();
   const { onSuccess } = useNotification();
+  const hasActions =
+    !isNil(onToggleExplored) ||
+    !isNil(printRef) ||
+    displayShare ||
+    !!onEdit ||
+    !!onDelete ||
+    !isNil(onChangeSubscribe) ||
+    !!entranceSnapshot ||
+    !!snapshot;
 
   const handleShare = async () => {
     const { origin, pathname } = window.location;
@@ -100,12 +113,14 @@ const FixedContent = ({
       } catch (err) {
         if (err.name !== 'AbortError') {
           await copyToClipboard(url);
-          onSuccess(formatMessage({ id: 'Link copied!' }));
+          // no toast: system clipboard notification handles feedback on mobile
         }
       }
     } else {
       await copyToClipboard(url);
-      onSuccess(formatMessage({ id: 'Link copied!' }));
+      if (!isMobile) {
+        onSuccess(formatMessage({ id: 'Link copied!' }));
+      }
     }
   };
 
@@ -126,7 +141,7 @@ const FixedContent = ({
   return (
     <Card>
       <CardHeaderStyled
-        action={
+        action={hasActions ? (
           <ButtonGroup color="primary">
             {!isNil(onToggleExplored) && (
               <Tooltip
@@ -202,6 +217,17 @@ const FixedContent = ({
                 </Button>
               </Tooltip>
             )}
+            {!!entranceSnapshot && (
+              <SnapshotButton
+                id={entranceSnapshot.id}
+                type={entranceSnapshot.type}
+                content={entranceSnapshot.content}
+                isNetwork={entranceSnapshot.isNetwork}
+                tooltipTitle={formatMessage({
+                  id: 'Access the revision history page'
+                })}
+              />
+            )}
             {!!snapshot && (
               <SnapshotButton
                 id={snapshot.id}
@@ -209,12 +235,14 @@ const FixedContent = ({
                 content={snapshot.content}
                 isNetwork={snapshot.isNetwork}
                 getAll={snapshot.getAll}
-                startIcon={<TimelineIcon />}
-                label={formatMessage({ id: 'All Revisions' })}
+                startIcon={<ManageHistoryIcon />}
+                tooltipTitle={formatMessage({
+                  id: 'Page of all types of revision history for this entrance'
+                })}
               />
             )}
           </ButtonGroup>
-        }
+        ) : undefined}
         avatar={avatar}
         subheader={subheader}
         title={
@@ -258,6 +286,12 @@ FixedContent.propTypes = {
     content: PropTypes.shape({}),
     isNetwork: PropTypes.bool,
     getAll: PropTypes.bool
+  }),
+  entranceSnapshot: PropTypes.shape({
+    id: PropTypes.number.isRequired,
+    type: PropTypes.string,
+    content: PropTypes.shape({}),
+    isNetwork: PropTypes.bool
   }),
   onChangeSubscribe: PropTypes.func,
   subheader: PropTypes.node,
