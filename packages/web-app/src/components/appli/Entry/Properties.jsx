@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import { styled } from '@mui/material/styles';
@@ -7,11 +7,20 @@ import {
   Button,
   ButtonGroup,
   Chip,
+  Collapse,
+  IconButton,
+  LinearProgress,
   Paper,
   Tooltip,
   Typography
 } from '@mui/material';
-import { Place, Map, WarningAmber } from '@mui/icons-material';
+import {
+  Place,
+  Map,
+  WarningAmber,
+  ExpandMore,
+  ExpandLess
+} from '@mui/icons-material';
 import DataQualityBadge from '../../common/DataQualityBadge';
 import DataQualityHelpButton from '../../common/DataQualityBadge/DataQualityHelpButton';
 
@@ -19,7 +28,10 @@ import CustomIcon from '../../common/CustomIcon';
 import { Property } from '../../common/Properties';
 import InfoSection from '../../common/InfoSection';
 import Ratings from './Ratings';
-import { EntrancePropTypes } from '../../../types/entrance.type';
+import {
+  EntrancePropTypes,
+  DataQualityPropTypes
+} from '../../../types/entrance.type';
 import {
   DepthProperty,
   LengthProperty,
@@ -54,9 +66,21 @@ const computePrecisionSeverity = precision => {
   return 'success';
 };
 
+const CATEGORY_KEYS = [
+  { key: 'general', label: 'General data' },
+  { key: 'location', label: 'Location' },
+  { key: 'description', label: 'Description' },
+  { key: 'document', label: 'Document' },
+  { key: 'rigging', label: 'Rigging' },
+  { key: 'history', label: 'History' },
+  { key: 'comment', label: 'Comments' }
+];
+
 const Properties = ({ isLoading = false, entrance, dataQuality }) => {
   const { formatMessage } = useIntl();
-  const massifsWithType = entrance?.massifs?.filter(m => m.undergroundType) ?? [];
+  const [categoriesOpen, setCategoriesOpen] = useState(false);
+  const massifsWithType =
+    entrance?.massifs?.filter(m => m.undergroundType) ?? [];
 
   let precisionText = '';
   if (entrance.precision === 0) {
@@ -82,71 +106,80 @@ const Properties = ({ isLoading = false, entrance, dataQuality }) => {
 
   return (
     <GlobalWrapper>
-      <Paper variant="outlined" sx={{ p: 2, borderRadius: 2, bgcolor: 'grey.50' }}>
-      <InfoSection title={formatMessage({ id: 'Location' })}>
-        <Box display="flex" flexDirection="column" gap={1}>
-          {entrance.latitude && entrance.longitude && (
-            <Property
-              loading={isLoading}
-              label={`${formatMessage({ id: 'Coordinates' })} (WGS84)`}
-              value={
-                <Box display="flex" alignItems="center" flexWrap="wrap" gap={1}>
-                  <span>{`${entrance.latitude.toFixed(4)}° N, ${entrance.longitude.toFixed(4)}° E`}</span>
-                  {precisionText && (
-                    <Chip
-                      label={precisionText}
-                      size="small"
-                      color={computePrecisionSeverity(entrance.precision)}
-                    />
-                  )}
-                  <ButtonGroup color="primary" variant="outlined" size="small">
-                    <Tooltip
-                      title={formatMessage({ id: 'Open on OpenStreetMap' })}>
-                      <Button
-                        onClick={openOSM}
-                        startIcon={<Map fontSize="small" />}>
-                        OSM
-                      </Button>
-                    </Tooltip>
-                    <Tooltip
-                      title={formatMessage({ id: 'Open on Google Maps' })}>
-                      <Button
-                        onClick={openGM}
-                        startIcon={<Place fontSize="small" />}>
-                        GMaps
-                      </Button>
-                    </Tooltip>
-                  </ButtonGroup>
-                </Box>
-              }
-              icon={<CustomIcon type="coordinates" />}
-            />
-          )}
-          <Box
-            sx={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(2, 1fr)',
-              gap: 1
-            }}>
-            <Property
-              loading={isLoading}
-              label={formatMessage({ id: 'City' })}
-              value={[entrance.city, entrance.region]
-                .flatMap(f => (f ? [f] : []))
-                .join(', ')}
-              icon={<CustomIcon type="location" />}
-              secondary
-            />
-            {!!entrance.altitude && (
+      <Paper
+        variant="outlined"
+        sx={{ p: 2, borderRadius: 2, bgcolor: 'grey.50' }}>
+        <InfoSection title={formatMessage({ id: 'Location' })}>
+          <Box display="flex" flexDirection="column" gap={1}>
+            {entrance.latitude && entrance.longitude && (
               <Property
-                label={formatMessage({ id: 'Altitude' })}
-                value={`${entrance.altitude} m`}
-                icon={<CustomIcon type="altitude" />}
+                loading={isLoading}
+                label={`${formatMessage({ id: 'Coordinates' })} (WGS84)`}
+                value={
+                  <Box
+                    display="flex"
+                    alignItems="center"
+                    flexWrap="wrap"
+                    gap={1}>
+                    <span>{`${entrance.latitude.toFixed(4)}° N, ${entrance.longitude.toFixed(4)}° E`}</span>
+                    {precisionText && (
+                      <Chip
+                        label={precisionText}
+                        size="small"
+                        color={computePrecisionSeverity(entrance.precision)}
+                      />
+                    )}
+                    <ButtonGroup
+                      color="primary"
+                      variant="outlined"
+                      size="small">
+                      <Tooltip
+                        title={formatMessage({ id: 'Open on OpenStreetMap' })}>
+                        <Button
+                          onClick={openOSM}
+                          startIcon={<Map fontSize="small" />}>
+                          OSM
+                        </Button>
+                      </Tooltip>
+                      <Tooltip
+                        title={formatMessage({ id: 'Open on Google Maps' })}>
+                        <Button
+                          onClick={openGM}
+                          startIcon={<Place fontSize="small" />}>
+                          GMaps
+                        </Button>
+                      </Tooltip>
+                    </ButtonGroup>
+                  </Box>
+                }
+                icon={<CustomIcon type="coordinates" />}
               />
             )}
+            <Box
+              sx={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(2, 1fr)',
+                gap: 1
+              }}>
+              <Property
+                loading={isLoading}
+                label={formatMessage({ id: 'City' })}
+                value={[entrance.city, entrance.region]
+                  .flatMap(f => (f ? [f] : []))
+                  .join(', ')}
+                icon={<CustomIcon type="location" />}
+                secondary
+              />
+              {!!entrance.altitude && (
+                <Property
+                  label={formatMessage({ id: 'Altitude' })}
+                  value={`${entrance.altitude} m`}
+                  icon={<CustomIcon type="altitude" />}
+                />
+              )}
+            </Box>
           </Box>
-        </Box>
-      </InfoSection>
+        </InfoSection>
       </Paper>
 
       {(entrance.cave?.depth ||
@@ -156,52 +189,57 @@ const Properties = ({ isLoading = false, entrance, dataQuality }) => {
         massifsWithType.length > 0 ||
         entrance.cave?.isDiving ||
         entrance.isTouristic) && (
-        <Paper variant="outlined" sx={{ p: 2, borderRadius: 2, bgcolor: 'grey.50' }}>
-        <InfoSection title={formatMessage({ id: 'Characteristics' })}>
-          <Box
-            sx={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(2, 1fr)',
-              gap: 1
-            }}>
-            <DepthProperty depth={entrance.cave?.depth} isLoading={isLoading} />
-            <LengthProperty
-              length={entrance.cave?.length}
-              isLoading={isLoading}
-            />
-            <TemperatureProperty
-              temperature={entrance.cave?.temperature}
-              isLoading={isLoading}
-            />
-            {!!entrance.discoveryYear && (
-              <Property
-                label={formatMessage({ id: 'Year of discovery' })}
-                value={entrance.discoveryYear}
-                icon={<CustomIcon type="discovery_date" />}
+        <Paper
+          variant="outlined"
+          sx={{ p: 2, borderRadius: 2, bgcolor: 'grey.50' }}>
+          <InfoSection title={formatMessage({ id: 'Characteristics' })}>
+            <Box
+              sx={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(2, 1fr)',
+                gap: 1
+              }}>
+              <DepthProperty
+                depth={entrance.cave?.depth}
+                isLoading={isLoading}
               />
-            )}
-            {massifsWithType.map(m => (
-              <Property
-                key={m.id}
-                label={formatMessage({ id: 'Underground type' })}
-                value={
-                  massifsWithType.length > 1
-                    ? `${m.undergroundType} (${m.name})`
-                    : m.undergroundType
-                }
-                icon={<CustomIcon type="category" />}
+              <LengthProperty
+                length={entrance.cave?.length}
+                isLoading={isLoading}
               />
-            ))}
-            <DivingProperty
-              isDiving={entrance.cave?.isDiving}
-              isLoading={isLoading}
-            />
-            <IsTouristicProperty
-              isTouristic={entrance.isTouristic}
-              isLoading={isLoading}
-            />
-          </Box>
-        </InfoSection>
+              <TemperatureProperty
+                temperature={entrance.cave?.temperature}
+                isLoading={isLoading}
+              />
+              {!!entrance.discoveryYear && (
+                <Property
+                  label={formatMessage({ id: 'Year of discovery' })}
+                  value={entrance.discoveryYear}
+                  icon={<CustomIcon type="discovery_date" />}
+                />
+              )}
+              {massifsWithType.map(m => (
+                <Property
+                  key={m.id}
+                  label={formatMessage({ id: 'Underground type' })}
+                  value={
+                    massifsWithType.length > 1
+                      ? `${m.undergroundType} (${m.name})`
+                      : m.undergroundType
+                  }
+                  icon={<CustomIcon type="category" />}
+                />
+              ))}
+              <DivingProperty
+                isDiving={entrance.cave?.isDiving}
+                isLoading={isLoading}
+              />
+              <IsTouristicProperty
+                isTouristic={entrance.isTouristic}
+                isLoading={isLoading}
+              />
+            </Box>
+          </InfoSection>
         </Paper>
       )}
 
@@ -271,7 +309,9 @@ const Properties = ({ isLoading = false, entrance, dataQuality }) => {
       )}
 
       {entrance.cave?.exploringOrganizations?.length > 0 && (
-        <Paper variant="outlined" sx={{ p: 2, borderRadius: 2, bgcolor: 'grey.50' }}>
+        <Paper
+          variant="outlined"
+          sx={{ p: 2, borderRadius: 2, bgcolor: 'grey.50' }}>
           <InfoSection title={formatMessage({ id: 'Exploring organizations' })}>
             <Box
               sx={{
@@ -290,19 +330,103 @@ const Properties = ({ isLoading = false, entrance, dataQuality }) => {
           </InfoSection>
         </Paper>
       )}
-      {dataQuality != null && (
-        <Paper variant="outlined" sx={{ p: 2, borderRadius: 2, bgcolor: 'grey.50' }}>
+      {dataQuality?.total != null && (
+        <Paper
+          variant="outlined"
+          sx={{ p: 2, borderRadius: 2, bgcolor: 'grey.50' }}>
           <InfoSection title={formatMessage({ id: 'Data quality' })}>
-            <Box display="flex" alignItems="center" gap={2}>
-              <DataQualityBadge value={dataQuality} size={32} />
-              <Typography variant="body2">
-                {dataQuality >= 70
-                  ? formatMessage({ id: 'Good' })
-                  : dataQuality >= 40
-                    ? formatMessage({ id: 'Satisfactory' })
-                    : formatMessage({ id: 'Insufficient' })}
-              </Typography>
-              <DataQualityHelpButton />
+            <Box display="flex" flexDirection="column" gap={1.5}>
+              <Box display="flex" alignItems="center" gap={2} flexWrap="wrap">
+                <DataQualityBadge value={dataQuality.total} size={32} />
+                <Typography variant="body2">
+                  {dataQuality.total >= 70
+                    ? formatMessage({ id: 'Good' })
+                    : dataQuality.total >= 40
+                      ? formatMessage({ id: 'Satisfactory' })
+                      : formatMessage({ id: 'Insufficient' })}
+                </Typography>
+                <DataQualityHelpButton />
+                {dataQuality.categories && (
+                  <Box
+                    onClick={() => setCategoriesOpen(o => !o)}
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 0.5,
+                      cursor: 'pointer',
+                      color: 'text.secondary',
+                      ml: 'auto',
+                      userSelect: 'none'
+                    }}>
+                    <Typography variant="caption">
+                      {formatMessage({ id: 'Details by category' })}
+                    </Typography>
+                    <IconButton size="small" sx={{ p: 0 }}>
+                      {categoriesOpen ? (
+                        <ExpandLess fontSize="small" />
+                      ) : (
+                        <ExpandMore fontSize="small" />
+                      )}
+                    </IconButton>
+                  </Box>
+                )}
+              </Box>
+              {dataQuality.categories && (
+                <Collapse in={categoriesOpen}>
+                  <Box
+                    sx={{
+                      display: 'grid',
+                      gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)' },
+                      columnGap: 3,
+                      rowGap: 0.5,
+                      pt: 0.5
+                    }}>
+                    {CATEGORY_KEYS.map(({ key, label }) => {
+                      const score = dataQuality.categories[key];
+                      if (score == null) return null;
+                      const color =
+                        score >= 70
+                          ? 'success'
+                          : score >= 40
+                            ? 'warning'
+                            : 'error';
+                      return (
+                        <Box
+                          key={key}
+                          display="flex"
+                          alignItems="center"
+                          gap={1}>
+                          <Typography
+                            variant="caption"
+                            noWrap
+                            sx={{
+                              minWidth: 80,
+                              flexShrink: 0,
+                              color: 'text.secondary'
+                            }}>
+                            {formatMessage({ id: label })}
+                          </Typography>
+                          <LinearProgress
+                            variant="determinate"
+                            value={score}
+                            color={color}
+                            sx={{ flex: 1, height: 6, borderRadius: 3 }}
+                          />
+                          <Typography
+                            variant="caption"
+                            sx={{
+                              minWidth: 24,
+                              textAlign: 'right',
+                              color: 'text.secondary'
+                            }}>
+                            {score}%
+                          </Typography>
+                        </Box>
+                      );
+                    })}
+                  </Box>
+                </Collapse>
+              )}
             </Box>
           </InfoSection>
         </Paper>
@@ -325,7 +449,7 @@ const Properties = ({ isLoading = false, entrance, dataQuality }) => {
 Properties.propTypes = {
   isLoading: PropTypes.bool,
   entrance: EntrancePropTypes,
-  dataQuality: PropTypes.number
+  dataQuality: DataQualityPropTypes
 };
 
 export default Properties;
