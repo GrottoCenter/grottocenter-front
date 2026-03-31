@@ -131,6 +131,7 @@ const documents = {
     [false, 'reviewer', 'Reviewer', false, cellsRender.person],
     [false, 'validator', 'Validator', false, cellsRender.person],
     [false, 'creatorComment', 'Creator comment', false],
+    [false, 'language', 'Language', true],
     [true, 'type', 'Type', true, cellsRender.translate],
     [true, 'title', 'Title', true, cellsRender.ellipsis],
     [true, 'description', 'Description', false, cellsRender.ellipsis],
@@ -146,8 +147,8 @@ const documents = {
     [false, 'license', 'License', true],
     [false, 'subjects', 'Subjects', false, cellsRender.keyArray('code')],
     [true, 'iso3166', 'Country / Region', false, cellsRender.keyArray('iso'), 'iso3166.iso'],
-    [false, 'importSource', 'Import source', false],
-    [false, 'importId', 'Import Id', false],
+    [false, 'importSource', 'Import source', true],
+    [false, 'importId', 'Import Id', true],
     [false, 'cave.name', 'Cave', true],
     [false, 'entrances', 'Entrances', false, cellsRender.keyArray('name')],
     [false, 'massifs', 'Massifs', false, cellsRender.keyArray('name')]
