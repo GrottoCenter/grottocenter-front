@@ -55,13 +55,13 @@ function createData(
 
 // Define the rows used to display the computation of the data quality in the table
 const rows = [
-  createData('General data on the cave', '-', 3, 8, 1, 3, 5, 8),
+  createData('General data', '-', 3, 8, 1, 3, 5, 8),
   createData('Location', 0, 3, 7, 1, 3, 5, 7),
   createData('Description', 0, 3, 7, 1, 3, 5, 7),
   createData('Document', 0, 3, 7, 1, 3, 5, 7),
   createData('Rigging', 0, 3, 7, 1, 3, 5, 7),
   createData('History', 0, 3, 7, 1, 3, 5, 7),
-  createData('Comment', 0, 3, 7, 1, 3, 5, 7)
+  createData('Comments', 0, 3, 7, 1, 3, 5, 7)
 ];
 
 // Compute the total values

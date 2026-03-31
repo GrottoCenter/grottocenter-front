@@ -79,6 +79,19 @@ export const RiggingPropTypes = PropTypes.shape({
   language: PropTypes.string
 });
 
+export const DataQualityPropTypes = PropTypes.shape({
+  total: PropTypes.number,
+  categories: PropTypes.shape({
+    general: PropTypes.number,
+    location: PropTypes.number,
+    description: PropTypes.number,
+    document: PropTypes.number,
+    rigging: PropTypes.number,
+    history: PropTypes.number,
+    comment: PropTypes.number
+  })
+});
+
 export const EntrancePropTypes = PropTypes.shape({
   id: PropTypes.number,
   isDeleted: PropTypes.bool,
@@ -106,7 +119,7 @@ export const EntrancePropTypes = PropTypes.shape({
     PropTypes.shape({
       id: PropTypes.number.isRequired,
       name: PropTypes.string.isRequired,
-      undergroundType: PropTypes.string,
+      undergroundType: PropTypes.string
     })
   ),
   documents: PropTypes.arrayOf(DocumentPropTypes),
@@ -115,8 +128,7 @@ export const EntrancePropTypes = PropTypes.shape({
   riggings: PropTypes.arrayOf(RiggingPropTypes),
   histories: PropTypes.arrayOf(HistoryPropTypes),
   comments: PropTypes.arrayOf(CommentPropTypes),
-
-  dataQuality: PropTypes.number,
+  dataQuality: DataQualityPropTypes,
   stats: PropTypes.shape({
     aestheticism: PropTypes.number,
     caving: PropTypes.number,
