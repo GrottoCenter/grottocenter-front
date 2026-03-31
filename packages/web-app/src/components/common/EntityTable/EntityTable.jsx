@@ -36,6 +36,15 @@ import Translate from '../Translate';
 const DEFAULT_PAGE_SIZE_OPTIONS = [20, 100, 200];
 const MAX_DOCUMENTS_TO_EXPORT_IN_CSV = 10000; // This limit is also enforced server side
 
+// Derive the whitelist of sortable fields from entitiesConfig so there is a single
+// source of truth.  col[3] is the sortable flag, col[5] ?? col[1] is the API field name.
+const ALLOWED_SORT_FIELDS = Object.fromEntries(
+  Object.entries(entitiesConfig).map(([type, config]) => [
+    type,
+    new Set(config.columns.filter(col => col[3]).map(col => col[5] ?? col[1]))
+  ])
+);
+
 const applyColumnVisibility = (columns, storedVisibility) => {
   try {
     const visibleColumns = JSON.parse(storedVisibility);
@@ -264,6 +273,13 @@ const EntityTable = ({
   };
 
   const handleRequestSort = (event, property) => {
+    const allowedFields = ALLOWED_SORT_FIELDS[entityType];
+    if (!allowedFields || !allowedFields.has(property)) {
+      // eslint-disable-next-line no-console
+      console.warn(`Sort blocked: field "${property}" is not allowed for entity type "${entityType}"`);
+      return;
+    }
+
     if (orderBy === property) {
       let newOrder = 'asc';
       if (order === 'asc') newOrder = 'desc';
