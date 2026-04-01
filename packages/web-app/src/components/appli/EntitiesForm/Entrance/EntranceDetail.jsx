@@ -3,7 +3,8 @@ import {
   FormControl,
   FormLabel,
   Switch,
-  TextField
+  TextField,
+  Typography
 } from '@mui/material';
 import React, { useRef } from 'react';
 import { Controller } from 'react-hook-form';
@@ -22,6 +23,7 @@ import {
 import Alert from '../../../common/Alert';
 import MapMarkerSelector from '../utils/MapMarkerSelector';
 import { FormRow } from '../utils/FormContainers';
+import { ENTRANCE_HAZARD_FIELDS } from '../../../../conf/entranceCharacteristics';
 
 const FormControlInline = styled(FormControl)`
   flex-wrap: wrap;
@@ -33,9 +35,51 @@ const FormControlLabelInline = styled(FormControlLabel)`
   padding-left: 10px;
 `;
 
-const EntranceDetail = ({ control, errors, getValues }) => {
+const BoolSwitch = ({ name, label, control, disabled = false, error = false }) => {
   const { formatMessage } = useIntl();
+  return (
+    <Controller
+      name={name}
+      control={control}
+      defaultValue={false}
+      render={({ field: { ref, ...field } }) => (
+        <FormControlInline margin="dense" component="fieldset" error={error}>
+          <FormLabel>
+            <Translate>{label}</Translate>
+          </FormLabel>
+          <FormControlLabelInline
+            control={
+              <Switch
+                disabled={disabled}
+                inputRef={ref}
+                {...field}
+                checked={field.value}
+                onChange={e => field.onChange(e.target.checked)}
+              />
+            }
+            label={
+              field.value
+                ? formatMessage({ id: 'Yes' })
+                : formatMessage({ id: 'No' })
+            }
+          />
+        </FormControlInline>
+      )}
+    />
+  );
+};
+
+BoolSwitch.propTypes = {
+  name: PropTypes.string.isRequired,
+  label: PropTypes.string.isRequired,
+  control: PropTypes.shape({}),
+  disabled: PropTypes.bool,
+  error: PropTypes.bool
+};
+
+const EntranceDetail = ({ control, errors, getValues }) => {
   const permissions = usePermissions();
+  const { formatMessage } = useIntl();
 
   /* useRef to track initial value.
   User can't unmark an entrance. So we need to remember the entrance was not sensitive initially
@@ -47,36 +91,12 @@ const EntranceDetail = ({ control, errors, getValues }) => {
   const isSensitiveDisabled = !permissions.isAdmin && initialIsSensitive;
   return (
     <>
-      <Controller
+      <BoolSwitch
         name="entrance.isSensitive"
+        label="Restricted access entrance"
         control={control}
-        defaultValue={false}
-        render={({ field: { ref, ...field } }) => (
-          <FormControlInline
-            margin="dense"
-            component="fieldset"
-            error={!!errors?.entrance?.isSensitive}>
-            <FormLabel>
-              <Translate>Restricted access entrance</Translate>
-            </FormLabel>
-            <FormControlLabelInline
-              control={
-                <Switch
-                  disabled={isSensitiveDisabled}
-                  inputRef={ref}
-                  {...field}
-                  checked={field.value}
-                  onChange={e => field.onChange(e.target.checked)}
-                />
-              }
-              label={
-                field.value
-                  ? formatMessage({ id: 'Yes' })
-                  : formatMessage({ id: 'No' })
-              }
-            />
-          </FormControlInline>
-        )}
+        disabled={isSensitiveDisabled}
+        error={!!errors?.entrance?.isSensitive}
       />
       <Alert
         disableMargins
@@ -87,6 +107,24 @@ const EntranceDetail = ({ control, errors, getValues }) => {
             : 'To be used for a cave requiring special protection. For more details see the User Guide. When a cave access is marked as "restricted", location of the entrance will no longer be available to Grottocenter users and visitors.'
         })}
       />
+
+      <BoolSwitch
+        name="entrance.isTouristic"
+        label="Touristic site"
+        control={control}
+      />
+
+      <Typography variant="subtitle1" sx={{ mt: 2 }}>
+        <Translate>Hazards & restrictions</Translate>
+      </Typography>
+      {ENTRANCE_HAZARD_FIELDS.map(({ field: name, label }) => (
+        <BoolSwitch
+          key={name}
+          name={`entrance.${name}`}
+          label={label}
+          control={control}
+        />
+      ))}
 
       <FormRow>
         {!isSensitiveDisabled && (

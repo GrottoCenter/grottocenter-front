@@ -98,7 +98,10 @@ export const Entry = ({ isLoading, error, entrance }) => {
           <FixedContent
             displayShare
             subheader={
-              <Box display="flex" alignItems="center" justifyContent="space-between">
+              <Box
+                display="flex"
+                alignItems="center"
+                justifyContent="space-between">
                 <Breadcrumbs
                   separator="·"
                   sx={{ fontSize: { xs: '1.2rem', md: '1.7rem' } }}>
@@ -108,7 +111,11 @@ export const Entry = ({ isLoading, error, entrance }) => {
                       to={`/ui/countries/${entrance.country}`}
                       underline="hover"
                       color="inherit"
-                      sx={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '4px'
+                      }}>
                       <CustomIcon type="country" size={16} />
                       {entrance.country}
                     </Link>
@@ -120,7 +127,11 @@ export const Entry = ({ isLoading, error, entrance }) => {
                       to={`/ui/massifs/${massif.id}`}
                       underline="hover"
                       color="inherit"
-                      sx={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '4px'
+                      }}>
                       <CustomIcon type="massif" size={16} />
                       {massif.name}
                     </Link>
@@ -131,7 +142,11 @@ export const Entry = ({ isLoading, error, entrance }) => {
                       to={`/ui/caves/${entrance.cave.id}`}
                       underline="hover"
                       color="inherit"
-                      sx={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '4px'
+                      }}>
                       <CustomIcon type="network" size={16} />
                       {entrance.cave.name}
                     </Link>
@@ -223,7 +238,10 @@ export const Entry = ({ isLoading, error, entrance }) => {
                     </Box>
                   )}
                   <Box sx={{ flex: 1, overflow: 'auto' }}>
-                    <Properties entrance={entrance} dataQuality={entrance.dataQuality} />
+                    <Properties
+                      entrance={entrance}
+                      dataQuality={entrance.dataQuality}
+                    />
                   </Box>
                 </HalfSplitContainer>
               </>
@@ -313,6 +331,15 @@ export const Entry = ({ isLoading, error, entrance }) => {
                     length: entrance.length,
                     id: entrance.id,
                     isSensitive: entrance.isSensitive,
+                    hasBat: entrance.hasBat,
+                    dangerFlooding: entrance.dangerFlooding,
+                    dangerCo2: entrance.dangerCo2,
+                    dangerRockfall: entrance.dangerRockfall,
+                    dangerPollution: entrance.dangerPollution,
+                    needCleanGear: entrance.needCleanGear,
+                    needStayOnTrail: entrance.needStayOnTrail,
+                    hasRules: entrance.hasRules,
+                    isTouristic: entrance.isTouristic,
                     name: entrance.name,
                     language: entrance.language,
                     latitude: entrance?.latitude,

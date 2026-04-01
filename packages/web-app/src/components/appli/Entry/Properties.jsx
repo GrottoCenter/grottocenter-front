@@ -245,7 +245,7 @@ const Properties = ({ isLoading = false, entrance, dataQuality }) => {
 
       {(entrance.hasBat ||
         entrance.dangerFlooding ||
-        entrance.dangerCO2 ||
+        entrance.dangerCo2 ||
         entrance.needCleanGear ||
         entrance.dangerPollution ||
         entrance.dangerRockfall ||
@@ -281,7 +281,7 @@ const Properties = ({ isLoading = false, entrance, dataQuality }) => {
               isLoading={isLoading}
             />
             <DangerCO2Property
-              dangerCO2={entrance.dangerCO2}
+              dangerCo2={entrance.dangerCo2}
               isLoading={isLoading}
             />
             <NeedCleanGearProperty
