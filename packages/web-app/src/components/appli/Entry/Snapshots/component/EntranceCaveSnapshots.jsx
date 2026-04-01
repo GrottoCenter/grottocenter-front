@@ -7,6 +7,7 @@ import { pathOr } from 'ramda';
 import { Property } from '../../../../common/Properties';
 import CustomIcon from '../../../../common/CustomIcon';
 import { HighLightsLine } from '../../../../common/Highlights';
+import { ENTRANCE_BOOLEAN_CHARACTERISTICS } from '../../../../../conf/entranceCharacteristics';
 
 const EntranceCaveSnapshots = information => {
   const { entrance, previous } = information;
@@ -113,6 +114,18 @@ const EntranceCaveSnapshots = information => {
           secondary
         />
       )}
+      {ENTRANCE_BOOLEAN_CHARACTERISTICS
+        .filter(
+          ({ field }) => entrance[field] || (previous?.[field] !== entrance[field])
+        )
+        .map(({ field, label, icon }) => (
+          <Property
+            key={field}
+            value={formatMessage({ id: label })}
+            icon={<CustomIcon type={icon} />}
+            secondary={!entrance[field]}
+          />
+        ))}
     </Box>
   );
 };

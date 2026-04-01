@@ -336,16 +336,16 @@ const SearchToggleButtonGroup = styled(ToggleButtonGroup)`
   align-items: center;
 `;
 
-export const SearchDivingTypes = ({ onChange, value }) => (
+export const SearchBooleanToggle = ({ label, onChange, value }) => (
   <FormControl sx={{ alignItems: 'center' }}>
     <FormLabel>
-      <Translate>Diving cave</Translate>
+      <Translate>{label}</Translate>
     </FormLabel>
     <SearchToggleButtonGroup
       value={value}
       exclusive
       onChange={(_event, newSelection) => onChange(newSelection)}>
-      <ToggleButton value={''}>
+      <ToggleButton value="">
         <Translate>all</Translate>
       </ToggleButton>
       <ToggleButton value>
@@ -356,6 +356,20 @@ export const SearchDivingTypes = ({ onChange, value }) => (
       </ToggleButton>
     </SearchToggleButtonGroup>
   </FormControl>
+);
+
+SearchBooleanToggle.propTypes = {
+  label: PropTypes.string.isRequired,
+  onChange: PropTypes.func.isRequired,
+  value: PropTypes.oneOfType([PropTypes.string, PropTypes.bool])
+};
+
+export const SearchDivingTypes = ({ onChange, value }) => (
+  <SearchBooleanToggle
+    label="Diving cave"
+    onChange={onChange}
+    value={value}
+  />
 );
 
 SearchDivingTypes.propTypes = {

@@ -12,6 +12,7 @@ import {
   SearchText,
   SearchTextAutocomplete,
   SearchSlider,
+  SearchBooleanToggle,
   SearchDivingTypes,
   SearchMatchAllFieldsToogle,
   SearchActionButtons
@@ -92,7 +93,9 @@ const initialFilterState = {
   'cave.name': '',
   'cave.depth': null,
   'cave.length': null,
-  'cave.isDiving': null
+  'cave.isDiving': null,
+  isTouristic: null,
+  dangerPollution: null
 };
 
 const EntrancesSearch = () => {
@@ -175,6 +178,19 @@ const EntrancesSearch = () => {
         <SearchSlider
           label="Aesthetic"
           onChange={e => updateFilter('commentsRating.aestheticism', e)}
+        />
+      </SearchFieldset>
+
+      <SearchFieldset title="Entrance properties">
+        <SearchBooleanToggle
+          label="Touristic site"
+          onChange={e => updateFilter('isTouristic', e)}
+          value={filterState.isTouristic}
+        />
+        <SearchBooleanToggle
+          label="Pollution risk"
+          onChange={e => updateFilter('dangerPollution', e)}
+          value={filterState.dangerPollution}
         />
       </SearchFieldset>
 

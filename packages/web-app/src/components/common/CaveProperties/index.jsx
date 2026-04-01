@@ -112,9 +112,9 @@ export const DangerFloodingProperty = ({ dangerFlooding, isLoading }) => {
   );
 };
 
-export const DangerCO2Property = ({ dangerCO2, isLoading }) => {
+export const DangerCO2Property = ({ dangerCo2, isLoading }) => {
   const { formatMessage } = useIntl();
-  if (!dangerCO2) return null;
+  if (!dangerCo2) return null;
   return (
     <Property
       loading={isLoading}
