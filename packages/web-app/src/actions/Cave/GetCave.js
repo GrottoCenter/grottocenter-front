@@ -1,6 +1,6 @@
 import fetch from 'isomorphic-fetch';
 import { getCaveUrl } from '../../conf/apiRoutes';
-import { checkAndGetStatus } from '../utils';
+import { checkAuthStatus } from '../utils';
 
 export const FETCH_CAVE_SUCCESS = 'FETCH_CAVE_SUCCESS';
 export const FETCH_CAVE_LOADING = 'FETCH_CAVE_LOADING';
@@ -14,8 +14,11 @@ export const fetchCave = caveId => (dispatch, getState) => {
   };
 
   return fetch(getCaveUrl + caveId, requestOptions)
-    .then(checkAndGetStatus)
+    .then(checkAuthStatus(dispatch))
     .then(response => response.json())
     .then(data => dispatch({ type: FETCH_CAVE_SUCCESS, cave: data }))
-    .catch(error => dispatch({ type: FETCH_CAVE_ERROR, error }));
+    .catch(error => {
+      if (error.isAuthError) return;
+      dispatch({ type: FETCH_CAVE_ERROR, error });
+    });
 };

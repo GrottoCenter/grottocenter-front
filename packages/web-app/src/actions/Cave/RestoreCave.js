@@ -1,6 +1,6 @@
 import fetch from 'isomorphic-fetch';
 import { restoreCaveUrl } from '../../conf/apiRoutes';
-import { checkAndGetStatus } from '../utils';
+import { checkAuthStatus } from '../utils';
 
 export const RESTORE_CAVE = 'RESTORE_CAVE';
 export const RESTORE_CAVE_SUCCESS = 'RESTORE_CAVE_SUCCESS';
@@ -31,10 +31,11 @@ export const restoreCave =
     };
 
     return fetch(restoreCaveUrl(id), requestOptions)
-      .then(checkAndGetStatus)
+      .then(checkAuthStatus(dispatch))
       .then(response => response.json())
       .then(data => dispatch(restoreCaveSuccess(data)))
-      .catch(errorMessage => {
-        dispatch(restoreCaveFailure(errorMessage));
+      .catch(error => {
+        if (error.isAuthError) return;
+        dispatch(restoreCaveFailure(error));
       });
   };

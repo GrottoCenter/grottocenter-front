@@ -1,6 +1,6 @@
 import fetch from 'isomorphic-fetch';
 import { getDbExportUrls } from '../conf/apiRoutes';
-import { checkAndGetStatus } from './utils';
+import { checkAuthStatus } from './utils';
 
 export const GET_DB_EXPORT = 'GET_DB_EXPORT';
 export const GET_DB_EXPORT_SUCCESS = 'GET_DB_EXPORT_SUCCESS';
@@ -13,7 +13,7 @@ export function fetchDBExportUrl() {
     return fetch(getDbExportUrls, {
       headers: getState().login.authorizationHeader
     })
-      .then(checkAndGetStatus)
+      .then(checkAuthStatus(dispatch))
       .then(response => response.json())
       .then(data => {
         dispatch({
@@ -24,6 +24,7 @@ export function fetchDBExportUrl() {
         });
       })
       .catch(error => {
+        if (error.isAuthError) return;
         dispatch({ type: GET_DB_EXPORT_FAILURE, error });
       });
   };

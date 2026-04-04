@@ -1,6 +1,6 @@
 import fetch from 'isomorphic-fetch';
 import { deleteCommentUrl } from '../../conf/apiRoutes';
-import { checkAndGetStatus } from '../utils';
+import { checkAuthStatus } from '../utils';
 
 export const DELETE_COMMENT = 'DELETE_COMMENT';
 export const DELETE_COMMENT_SUCCESS = 'DELETE_COMMENT_SUCCESS';
@@ -33,10 +33,11 @@ export const deleteComment =
     };
 
     return fetch(deleteCommentUrl(id, isPermanent), requestOptions)
-      .then(checkAndGetStatus)
+      .then(checkAuthStatus(dispatch))
       .then(response => response.json())
       .then(data => dispatch(deleteCommentSuccess(data, isPermanent)))
-      .catch(errorMessage => {
-        dispatch(deleteCommentFailure(errorMessage));
+      .catch(error => {
+        if (error.isAuthError) return;
+        dispatch(deleteCommentFailure(error));
       });
   };

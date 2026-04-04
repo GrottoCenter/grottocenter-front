@@ -1,6 +1,6 @@
 import fetch from 'isomorphic-fetch';
 import { postCreateCaveUrl } from '../../conf/apiRoutes';
-import { checkAndGetStatus } from '../utils';
+import { checkAuthStatus } from '../utils';
 
 export const POST_CAVE = 'POST_CAVE';
 export const POST_CAVE_SUCCESS = 'POST_CAVE_SUCCESS';
@@ -29,8 +29,11 @@ export const postCave = body => (dispatch, getState) => {
   };
 
   return fetch(postCreateCaveUrl, requestOptions)
-    .then(checkAndGetStatus)
+    .then(checkAuthStatus(dispatch))
     .then(response => response.json())
     .then(data => dispatch(postCaveSuccess(data)))
-    .catch(error => dispatch(postCaveFailure(error)));
+    .catch(error => {
+      if (error.isAuthError) return;
+      dispatch(postCaveFailure(error));
+    });
 };

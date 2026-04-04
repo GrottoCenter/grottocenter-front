@@ -1,6 +1,6 @@
 import fetch from 'isomorphic-fetch';
 import { associateDocumentToEntranceUrl } from '../conf/apiRoutes';
-import { checkAndGetStatus } from './utils';
+import { checkAuthStatus } from './utils';
 
 export const LINK_DOCUMENT_TO_ENTRANCE = 'LINK_DOCUMENT_TO_ENTRANCE';
 export const LINK_DOCUMENT_TO_ENTRANCE_SUCCESS =
@@ -36,9 +36,10 @@ export const linkDocumentToEntrance =
       associateDocumentToEntranceUrl(entranceId, document.id),
       requestOptions
     )
-      .then(checkAndGetStatus)
+      .then(checkAuthStatus(dispatch))
       .then(() => dispatch(linkDocumentToEntranceSuccess(document)))
-      .catch(errorMessage => {
-        dispatch(linkDocumentToEntranceFailure(errorMessage));
+      .catch(error => {
+        if (error.isAuthError) return;
+        dispatch(linkDocumentToEntranceFailure(error));
       });
   };

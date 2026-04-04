@@ -1,6 +1,6 @@
 import fetch from 'isomorphic-fetch';
 import { restoreDocumentUrl } from '../../conf/apiRoutes';
-import { checkAndGetStatus } from '../utils';
+import { checkAuthStatus } from '../utils';
 
 export const RESTORE_DOCUMENT = 'RESTORE_DOCUMENT';
 export const RESTORE_DOCUMENT_SUCCESS = 'RESTORE_DOCUMENT_SUCCESS';
@@ -31,10 +31,11 @@ export const restoreDocument =
     };
 
     return fetch(restoreDocumentUrl(id), requestOptions)
-      .then(checkAndGetStatus)
+      .then(checkAuthStatus(dispatch))
       .then(response => response.json())
       .then(data => dispatch(restoreDocumentSuccess(data)))
-      .catch(errorMessage => {
-        dispatch(restoreDocumentFailure(errorMessage));
+      .catch(error => {
+        if (error.isAuthError) return;
+        dispatch(restoreDocumentFailure(error));
       });
   };

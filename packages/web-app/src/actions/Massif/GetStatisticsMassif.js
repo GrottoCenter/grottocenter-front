@@ -1,6 +1,6 @@
 import fetch from 'isomorphic-fetch';
 import { getStatisticsMassifUrl } from '../../conf/apiRoutes';
-import { checkAndGetStatus } from '../utils';
+import { checkAuthStatus } from '../utils';
 
 export const FETCH_STATISTICS_MASSIF_SUCCESS =
   'FETCH_STATISTICS_MASSIF_SUCCESS';
@@ -14,15 +14,16 @@ export const fetchStatisticsMassif = massifId => (dispatch, getState) => {
     headers: getState().login.authorizationHeader
   };
   return fetch(getStatisticsMassifUrl(massifId), requestOptions)
-    .then(checkAndGetStatus)
+    .then(checkAuthStatus(dispatch))
     .then(response => response.json())
     .then(data => {
       dispatch({ type: FETCH_STATISTICS_MASSIF_SUCCESS, data });
     })
-    .catch(error =>
+    .catch(error => {
+      if (error.isAuthError) return;
       dispatch({
         type: FETCH_STATISTICS_MASSIF_ERROR,
         error
-      })
-    );
+      });
+    });
 };

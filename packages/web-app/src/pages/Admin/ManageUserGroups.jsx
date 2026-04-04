@@ -21,6 +21,7 @@ import UserGroups from './UserGroups';
 
 import { postPersonGroups } from '../../actions/Person/UpdatePersonGroups';
 import { fetchPerson } from '../../actions/Person/GetPerson';
+import { postBanCaver, postUnbanCaver } from '../../actions/Person/BanCaver';
 
 const FeedbackBlock = styled('div')`
   margin-top: ${({ theme }) => theme.spacing(4)};
@@ -42,9 +43,24 @@ const SearchBarBackground = styled('div')`
   background-color: ${({ theme }) => theme.palette.primary.veryLight};
 `;
 
+const getBanErrorMessage = (error, formatMessage) => {
+  const status = error?.status;
+  if (status === 403) {
+    return formatMessage({
+      id: 'Insufficient permissions to ban this user'
+    });
+  }
+  if (status === 404) {
+    return formatMessage({ id: 'Caver not found' });
+  }
+  return formatMessage({ id: 'Error while updating the ban status' });
+};
+
 const ManageUserGroups = () => {
   const [inputValue, setInputValue] = useState('');
   const [selectedUser, setSelectedUser] = useState(null);
+  const [didSaveGroups, setDidSaveGroups] = useState(false);
+  const [didSaveBan, setDidSaveBan] = useState(false);
 
   const dispatch = useDispatch();
   const { formatMessage } = useIntl();
@@ -64,6 +80,20 @@ const ManageUserGroups = () => {
     error: updateError
   } = useSelector(state => state.updatePersonGroups);
 
+  const {
+    isLoading: isBanLoading,
+    isSuccess: isBanSuccess,
+    error: banError
+  } = useSelector(state => state.banCaver);
+
+  const { authTokenDecoded } = useSelector(state => state.login);
+
+  const isSelfUser = !!(
+    person?.id &&
+    authTokenDecoded?.id &&
+    person.id === authTokenDecoded.id
+  );
+
   useEffect(() => {
     // Check search input value and launch / reset search
     if (debouncedInput.length >= 2) {
@@ -80,19 +110,16 @@ const ManageUserGroups = () => {
   }, [debouncedInput]);
 
   useEffect(() => {
-    // Check search input value and launch / reset search
-    if (debouncedInput.length >= 2) {
-      const criteria = {
-        query: debouncedInput.trim(),
-        filter: { type: 'CAVER' },
-        entities: ['persons']
-      };
-      dispatch(fetchQuicksearchResult(criteria));
-    } else {
-      dispatch(resetQuicksearch());
+    setDidSaveGroups(false);
+    setDidSaveBan(false);
+  }, [selectedUser]);
+
+  useEffect(() => {
+    if (selectedUser && (isUpdateSuccess || isBanSuccess)) {
+      dispatch(fetchPerson(selectedUser.id));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [debouncedInput]);
+  }, [isUpdateSuccess, isBanSuccess]);
 
   return (
     <>
@@ -139,28 +166,55 @@ const ManageUserGroups = () => {
             </FlexBlock>
             <FlexBlock style={{ flexBasis: '200px' }}>
               <UserGroups
-                isLoading={isUpdateLoading || isPersonFetching}
+                isLoading={
+                  isUpdateLoading || isBanLoading || isPersonFetching
+                }
+                onBeforeSave={({ isGroupsChanged: g, isBanChanged: b }) => {
+                  setDidSaveGroups(g);
+                  setDidSaveBan(b);
+                }}
                 onSaveGroups={groups =>
                   dispatch(postPersonGroups(selectedUser.id, groups))
                 }
+                onSaveBan={banned => {
+                  if (banned) {
+                    dispatch(postBanCaver(selectedUser.id));
+                  } else {
+                    dispatch(postUnbanCaver(selectedUser.id));
+                  }
+                }}
                 userGroups={person?.groups}
+                isBanned={person?.isBanned}
+                isSelfUser={isSelfUser}
               />
             </FlexBlock>
           </UserBlock>
         </>
       )}
-      {!isUpdateLoading && (
+      {!isUpdateLoading && !isBanLoading && (
         <FeedbackBlock>
-          {!isUpdateSuccess && !!updateError && (
+          {didSaveGroups && !isUpdateSuccess && !!updateError && (
             <ErrorMessage
               message={formatMessage({
                 id: 'Error while updating the user groups'
               })}
             />
           )}
-          {isUpdateSuccess && (
+          {didSaveGroups && isUpdateSuccess && (
             <SuccessMessage
               message={formatMessage({ id: 'Groups updated with success!' })}
+            />
+          )}
+          {didSaveBan && !isBanSuccess && !!banError && (
+            <ErrorMessage
+              message={getBanErrorMessage(banError, formatMessage)}
+            />
+          )}
+          {didSaveBan && isBanSuccess && (
+            <SuccessMessage
+              message={formatMessage({
+                id: 'Ban updated with success!'
+              })}
             />
           )}
         </FeedbackBlock>

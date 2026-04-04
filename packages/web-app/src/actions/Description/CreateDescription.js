@@ -1,7 +1,7 @@
 import fetch from 'isomorphic-fetch';
 import { postDescriptionUrl } from '../../conf/apiRoutes';
 import makeErrorMessage from '../../helpers/makeErrorMessage';
-import { checkAndGetStatus } from '../utils';
+import { checkAuthStatus } from '../utils';
 
 export const POST_DESCRIPTION = 'POST_DESCRIPTION';
 export const POST_DESCRIPTION_SUCCESS = 'POST_DESCRIPTION_SUCCESS';
@@ -33,15 +33,16 @@ export const postDescription =
     };
 
     return fetch(postDescriptionUrl, requestOptions)
-      .then(checkAndGetStatus)
+      .then(checkAuthStatus(dispatch))
       .then(response => response.json())
       .then(data => dispatch(postDescriptionSuccess(data)))
-      .catch(error =>
+      .catch(error => {
+        if (error.isAuthError) return;
         dispatch(
           postDescriptionFailure(
             makeErrorMessage(error.message, `Creating a new description`),
             error.message
           )
-        )
-      );
+        );
+      });
   };

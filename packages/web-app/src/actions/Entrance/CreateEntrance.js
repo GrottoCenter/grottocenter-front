@@ -1,7 +1,7 @@
 import fetch from 'isomorphic-fetch';
 
 import { postCreateEntranceUrl } from '../../conf/apiRoutes';
-import { checkAndGetStatus } from '../utils';
+import { checkAuthStatus } from '../utils';
 
 export const POST_ENTRANCE = 'POST_ENTRANCE';
 export const POST_ENTRANCE_SUCCESS = 'POST_ENTRANCE_SUCCESS';
@@ -34,10 +34,11 @@ export const postEntrance = data => (dispatch, getState) => {
   };
 
   return fetch(postCreateEntranceUrl, requestOptions)
-    .then(checkAndGetStatus)
+    .then(checkAuthStatus(dispatch))
     .then(response => response.json())
     .then(d => dispatch(postEntranceSuccess(d)))
-    .catch(errorMessage => {
-      dispatch(postEntranceFailure(errorMessage));
+    .catch(error => {
+      if (error.isAuthError) return;
+      dispatch(postEntranceFailure(error));
     });
 };

@@ -5,7 +5,7 @@ import {
   importRowsEntrancesUrl,
   importRowsDocumentsUrl
 } from '../conf/apiRoutes';
-import { checkAndGetStatus } from './utils';
+import { checkAuthStatus } from './utils';
 
 export const CHECK_ROWS_START = 'CHECK_ROWS_START';
 export const CHECK_ROWS_SUCCESS = 'CHECK_ROWS_SUCCESS';
@@ -72,12 +72,13 @@ export const checkRowsInBdd = (typeRow, rowsData) => (dispatch, getState) => {
 
   // eslint-disable-next-line consistent-return
   return fetch(url, requestOptions)
-    .then(checkAndGetStatus)
+    .then(checkAuthStatus(dispatch))
     .then(response => response.json())
     .then(responseJson => {
       dispatch(checkRowsSuccess(responseJson));
     })
     .catch(error => {
+      if (error.isAuthError) return;
       dispatch(checkRowsFailure(error.message));
     });
 };
@@ -109,12 +110,13 @@ export const importRows = (data, typeRow) => (dispatch, getState) => {
 
   // eslint-disable-next-line consistent-return
   return fetch(url, requestOptions)
-    .then(checkAndGetStatus)
+    .then(checkAuthStatus(dispatch))
     .then(response => response.json())
     .then(responseJson => {
       dispatch(importRowsSuccess(responseJson));
     })
     .catch(error => {
+      if (error.isAuthError) return;
       dispatch(importRowsFailure(error.message));
     });
 };

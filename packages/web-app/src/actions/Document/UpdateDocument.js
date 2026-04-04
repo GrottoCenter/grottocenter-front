@@ -8,7 +8,7 @@ import {
   putDocumentUrl,
   putDocumentyWithNewEntitiesUrl
 } from '../../conf/apiRoutes';
-import { checkAndGetStatus } from '../utils';
+import { checkAuthStatus } from '../utils';
 import { buildFormData } from './utils';
 
 export const UPDATE_DOCUMENT = 'UPDATE_DOCUMENT';
@@ -131,11 +131,12 @@ export const updateDocumentWithNewEntities =
     };
 
     return fetch(putDocumentyWithNewEntitiesUrl(id), requestOptions)
-      .then(checkAndGetStatus)
+      .then(checkAuthStatus(dispatch))
       .then(response => {
         dispatch(updateDocumentSuccess(response.status));
       })
       .catch(error => {
+        if (error.isAuthError) return;
         dispatch(
           updateDocumentFailure(
             [`Unable to update the document with id ${id}`],

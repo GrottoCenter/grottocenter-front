@@ -1,7 +1,7 @@
 import fetch from 'isomorphic-fetch';
 import makeErrorMessage from '../../helpers/makeErrorMessage';
 import { postOrganizationUrl } from '../../conf/apiRoutes';
-import { checkAndGetStatus } from '../utils';
+import { checkAuthStatus } from '../utils';
 
 export const POST_ORGANIZATION = 'POST_ORGANIZATION';
 export const POST_ORGANIZATION_SUCCESS = 'POST_ORGANIZATION_SUCCESS';
@@ -29,17 +29,18 @@ export const postOrganization = body => (dispatch, getState) => {
   };
 
   return fetch(postOrganizationUrl, requestOptions)
-    .then(checkAndGetStatus)
+    .then(checkAuthStatus(dispatch))
     .then(response => response.json())
     .then(data => {
       dispatch(postOrganizationSuccess(data));
     })
-    .catch(error =>
+    .catch(error => {
+      if (error.isAuthError) return;
       dispatch(
         postOrganizationFailure(
           makeErrorMessage(error.message, `Bad request`),
           error.message
         )
-      )
-    );
+      );
+    });
 };

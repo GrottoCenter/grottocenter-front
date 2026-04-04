@@ -1,6 +1,6 @@
 import fetch from 'isomorphic-fetch';
 import makeErrorMessage from '../helpers/makeErrorMessage';
-import { checkAndGetStatus } from './utils';
+import { checkAuthStatus } from './utils';
 
 /**
  * Factory for move-relevance Redux actions.
@@ -26,7 +26,7 @@ const createMoveRelevanceAction = (entityName, urlBuilder, label) => {
     };
 
     return fetch(urlBuilder(id), requestOptions)
-      .then(checkAndGetStatus)
+      .then(checkAuthStatus(dispatch))
       .then(response => response.json())
       .then(data =>
         dispatch({
@@ -35,12 +35,13 @@ const createMoveRelevanceAction = (entityName, urlBuilder, label) => {
           swapped: data.swapped
         })
       )
-      .catch(error =>
+      .catch(error => {
+        if (error.isAuthError) return;
         dispatch({
           type: FAILURE,
           error: makeErrorMessage(error.message, `Moving ${label} relevance`)
-        })
-      );
+        });
+      });
   };
 
   return { MOVE, SUCCESS, FAILURE, thunk };

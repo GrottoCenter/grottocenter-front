@@ -1,6 +1,6 @@
 import fetch from 'isomorphic-fetch';
 import { putCaverUrl } from '../../conf/apiRoutes';
-import { checkAndGetStatus } from '../utils';
+import { checkAuthStatus } from '../utils';
 
 export const UPDATE_PERSON = 'UPDATE_PERSON';
 export const UPDATE_PERSON_SUCCESS = 'UPDATE_PERSON_SUCCESS';
@@ -20,8 +20,11 @@ export const updatePerson = (personId, body) => (dispatch, getState) => {
   };
 
   return fetch(putCaverUrl(personId), requestOptions)
-    .then(checkAndGetStatus)
+    .then(checkAuthStatus(dispatch))
     .then(response => response.json())
     .then(data => dispatch(updatePersonSuccess(data)))
-    .catch(error => dispatch(updatePersonFailure(error)));
+    .catch(error => {
+      if (error.isAuthError) return;
+      dispatch(updatePersonFailure(error));
+    });
 };

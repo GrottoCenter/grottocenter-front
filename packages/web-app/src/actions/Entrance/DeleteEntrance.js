@@ -1,6 +1,6 @@
 import fetch from 'isomorphic-fetch';
 import { deleteEntranceUrl } from '../../conf/apiRoutes';
-import { checkAndGetStatus } from '../utils';
+import { checkAuthStatus } from '../utils';
 
 export const DELETE_ENTRANCE = 'DELETE_ENTRANCE';
 export const DELETE_ENTRANCE_SUCCESS = 'DELETE_ENTRANCE_SUCCESS';
@@ -38,10 +38,11 @@ export const deleteEntrance =
       deleteEntranceUrl(id, { entityId, isPermanent }),
       requestOptions
     )
-      .then(checkAndGetStatus)
+      .then(checkAuthStatus(dispatch))
       .then(response => response.json())
       .then(data => dispatch(deleteEntranceSuccess(data, isPermanent)))
-      .catch(errorMessage => {
-        dispatch(deleteEntranceFailure(errorMessage));
+      .catch(error => {
+        if (error.isAuthError) return;
+        dispatch(deleteEntranceFailure(error));
       });
   };

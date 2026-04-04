@@ -1,6 +1,6 @@
 import fetch from 'isomorphic-fetch';
 import { deletePersonUrl } from '../../conf/apiRoutes';
-import { checkAndGetStatus } from '../utils';
+import { checkAuthStatus } from '../utils';
 
 export const DELETE_PERSON = 'DELETE_PERSON';
 export const DELETE_PERSON_PERMANENT_SUCCESS =
@@ -22,10 +22,11 @@ export const deletePerson =
     };
 
     return fetch(deletePersonUrl(id, isPermanent), requestOptions)
-      .then(checkAndGetStatus)
+      .then(checkAuthStatus(dispatch))
       .then(response => response.json())
       .then(data => dispatch(deletePersonSuccess(data, isPermanent)))
-      .catch(errorMessage => {
-        dispatch(deletePersonFailure(errorMessage));
+      .catch(error => {
+        if (error.isAuthError) return;
+        dispatch(deletePersonFailure(error));
       });
   };

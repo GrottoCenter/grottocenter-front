@@ -5,8 +5,10 @@ import { styled } from '@mui/material/styles';
 import {
   Button,
   CircularProgress,
+  Divider,
   FormControlLabel,
   Switch,
+  Tooltip,
   Typography
 } from '@mui/material';
 
@@ -16,13 +18,26 @@ const SpacedButton = styled(Button)`
   margin: ${({ theme }) => theme.spacing(1)};
 `;
 
-const UserGroups = ({ isLoading, onSaveGroups, userGroups = [] }) => {
+const UserGroups = ({
+  isLoading,
+  onBeforeSave,
+  onSaveGroups,
+  onSaveBan,
+  userGroups = [],
+  isBanned = false,
+  isSelfUser = false
+}) => {
   const { formatMessage } = useIntl();
   const [groups, setGroups] = useState(userGroups);
+  const [banned, setBanned] = useState(isBanned);
 
   useEffect(() => {
     setGroups(userGroups);
   }, [userGroups]);
+
+  useEffect(() => {
+    setBanned(isBanned);
+  }, [isBanned]);
 
   const isGroupsChanged =
     groups
@@ -34,12 +49,32 @@ const UserGroups = ({ isLoading, onSaveGroups, userGroups = [] }) => {
       .toSorted()
       .join(',');
 
+  const isBanChanged = banned !== isBanned;
+  const isChanged = isGroupsChanged || isBanChanged;
+
   const onGroupChange = (groupId, isChecked) => {
     const newGroups = userGroups.filter(g => g.id !== groupId);
     if (isChecked === true) {
       newGroups.push({ id: groupId });
     }
     setGroups([...newGroups]);
+  };
+
+  const handleSave = () => {
+    if (onBeforeSave) {
+      onBeforeSave({ isGroupsChanged, isBanChanged });
+    }
+    if (isGroupsChanged) {
+      onSaveGroups(groups);
+    }
+    if (isBanChanged) {
+      onSaveBan(banned);
+    }
+  };
+
+  const handleReset = () => {
+    setGroups([...userGroups]);
+    setBanned(isBanned);
   };
 
   return (
@@ -56,6 +91,7 @@ const UserGroups = ({ isLoading, onSaveGroups, userGroups = [] }) => {
               onChange={event => onGroupChange(g.id, event.target.checked)}
               name={g.name}
               color="secondary"
+              disabled={isLoading}
             />
           }
           label={formatMessage({ id: g.name })}
@@ -63,10 +99,37 @@ const UserGroups = ({ isLoading, onSaveGroups, userGroups = [] }) => {
         />
       ))}
 
+      <Divider sx={{ my: 2 }} />
+
+      <Typography variant="h3" gutterBottom>
+        {formatMessage({ id: 'Banned' })}
+      </Typography>
+      <Tooltip
+        title={
+          isSelfUser ? formatMessage({ id: 'Cannot ban yourself' }) : ''
+        }
+        arrow>
+        <span>
+          <FormControlLabel
+            control={
+              <Switch
+                checked={banned}
+                onChange={event => setBanned(event.target.checked)}
+                name="Banned"
+                color="error"
+                disabled={isSelfUser || isLoading}
+              />
+            }
+            label={formatMessage({ id: 'Banned' })}
+            style={{ display: 'block' }}
+          />
+        </span>
+      </Tooltip>
+
       <SpacedButton
-        onClick={() => onSaveGroups(groups)}
+        onClick={handleSave}
         color={isLoading ? 'inherit' : 'primary'}
-        disabled={!isGroupsChanged || isLoading}>
+        disabled={!isChanged || isLoading}>
         {isLoading ? (
           <CircularProgress size={20} color="primary" />
         ) : (
@@ -76,8 +139,8 @@ const UserGroups = ({ isLoading, onSaveGroups, userGroups = [] }) => {
 
       <SpacedButton
         variant="outlined"
-        onClick={() => setGroups([...userGroups])}
-        disabled={!isGroupsChanged || isLoading}>
+        onClick={handleReset}
+        disabled={!isChanged || isLoading}>
         {formatMessage({ id: 'Reset' })}
       </SpacedButton>
     </>
@@ -86,8 +149,12 @@ const UserGroups = ({ isLoading, onSaveGroups, userGroups = [] }) => {
 
 UserGroups.propTypes = {
   isLoading: PropTypes.bool.isRequired,
+  onBeforeSave: PropTypes.func,
   onSaveGroups: PropTypes.func.isRequired,
-  userGroups: PropTypes.arrayOf(PropTypes.shape({}))
+  onSaveBan: PropTypes.func.isRequired,
+  userGroups: PropTypes.arrayOf(PropTypes.shape({})),
+  isBanned: PropTypes.bool,
+  isSelfUser: PropTypes.bool
 };
 
 export default UserGroups;

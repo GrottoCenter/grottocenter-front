@@ -1,6 +1,6 @@
 import fetch from 'isomorphic-fetch';
 import { restoreCommentUrl } from '../../conf/apiRoutes';
-import { checkAndGetStatus } from '../utils';
+import { checkAuthStatus } from '../utils';
 
 export const RESTORE_COMMENT = 'RESTORE_COMMENT';
 export const RESTORE_COMMENT_SUCCESS = 'RESTORE_COMMENT_SUCCESS';
@@ -31,10 +31,11 @@ export const restoreComment =
     };
 
     return fetch(restoreCommentUrl(id), requestOptions)
-      .then(checkAndGetStatus)
+      .then(checkAuthStatus(dispatch))
       .then(response => response.json())
       .then(data => dispatch(restoreCommentSuccess(data)))
-      .catch(errorMessage => {
-        dispatch(restoreCommentFailure(errorMessage));
+      .catch(error => {
+        if (error.isAuthError) return;
+        dispatch(restoreCommentFailure(error));
       });
   };

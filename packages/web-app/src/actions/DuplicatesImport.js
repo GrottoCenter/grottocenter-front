@@ -12,7 +12,7 @@ import {
   deleteDuplicateEntranceUrl,
   deleteDuplicateDocumentUrl
 } from '../conf/apiRoutes';
-import { checkAndGetStatus, getTotalCount, makeUrl } from './utils';
+import { checkAuthStatus, getTotalCount, makeUrl } from './utils';
 import makeErrorMessage from '../helpers/makeErrorMessage';
 
 export const LOAD_DUPLICATES_LIST = 'LOAD_DUPLICATES_LIST';
@@ -142,7 +142,7 @@ export const fetchDuplicatesList =
     };
 
     return fetch(isNil(criteria) ? url : makeUrl(url, criteria), requestOptions)
-      .then(checkAndGetStatus)
+      .then(checkAuthStatus(dispatch))
       .then(parseResponse)
       .then(parsed => {
         dispatch(
@@ -154,6 +154,7 @@ export const fetchDuplicatesList =
         );
       })
       .catch(error => {
+        if (error.isAuthError) return;
         dispatch(loadDuplicatesListFailure(error.message));
       });
   };
@@ -177,12 +178,13 @@ export const fetchDuplicate = (id, duplicateType) => (dispatch, getState) => {
   };
 
   return fetch(url(id), requestOptions)
-    .then(checkAndGetStatus)
+    .then(checkAuthStatus(dispatch))
     .then(parseResponse)
     .then(parsed => {
       dispatch(loadDuplicateSuccess(parsed.content, parsed.statusCode));
     })
     .catch(error => {
+      if (error.isAuthError) return;
       dispatch(loadDuplicateFailure(error.message));
     });
 };
@@ -215,11 +217,12 @@ export const deleteDuplicates =
     };
 
     return fetch(url, requestOptions)
-      .then(checkAndGetStatus)
+      .then(checkAuthStatus(dispatch))
       .then(response => {
         dispatch(deleteDuplicatesSuccess(response.status));
       })
       .catch(error => {
+        if (error.isAuthError) return;
         dispatch(
           deleteDuplicatesError(
             makeErrorMessage(error.message, `Deleting duplicates`)
@@ -249,11 +252,12 @@ export const deleteDuplicate = (id, duplicateType) => (dispatch, getState) => {
   };
 
   return fetch(url(id), requestOptions)
-    .then(checkAndGetStatus)
+    .then(checkAuthStatus(dispatch))
     .then(response => {
       dispatch(deleteDuplicatesSuccess(response.status));
     })
     .catch(error => {
+      if (error.isAuthError) return;
       dispatch(
         deleteDuplicatesError(
           makeErrorMessage(error.message, `Deleting duplicate`)
@@ -284,11 +288,12 @@ export const createNewEntityFromDuplicate =
     };
 
     return fetch(url(id), requestOptions)
-      .then(checkAndGetStatus)
+      .then(checkAuthStatus(dispatch))
       .then(response => {
         dispatch(createNewEntityDuplicateSuccess(response.status));
       })
       .catch(error => {
+        if (error.isAuthError) return;
         dispatch(
           createNewEntityDuplicateError(
             makeErrorMessage(

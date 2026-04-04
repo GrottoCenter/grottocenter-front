@@ -1,6 +1,6 @@
 import fetch from 'isomorphic-fetch';
 import { changeEmailUrl } from '../../conf/apiRoutes';
-import { checkAndGetStatus } from '../utils';
+import { checkAuthStatus } from '../utils';
 
 export const FETCH_CHANGE_EMAIL = 'FETCH_CHANGE_EMAIL';
 export const FETCH_CHANGE_EMAIL_SUCCESS = 'FETCH_CHANGE_EMAIL_SUCCESS';
@@ -23,7 +23,10 @@ export const postChangeEmail = email => (dispatch, getState) => {
   };
 
   return fetch(changeEmailUrl, requestOptions)
-    .then(checkAndGetStatus)
+    .then(checkAuthStatus(dispatch))
     .then(() => dispatch(fetchChangeEmailSuccess()))
-    .catch(error => dispatch(fetchChangeEmailFailure(error)));
+    .catch(error => {
+      if (error.isAuthError) return;
+      dispatch(fetchChangeEmailFailure(error));
+    });
 };

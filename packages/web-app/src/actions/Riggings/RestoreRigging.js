@@ -1,6 +1,6 @@
 import fetch from 'isomorphic-fetch';
 import { restoreRiggingsUrl } from '../../conf/apiRoutes';
-import { checkAndGetStatus } from '../utils';
+import { checkAuthStatus } from '../utils';
 
 export const RESTORE_RIGGINGS = 'RESTORE_RIGGINGS';
 export const RESTORE_RIGGINGS_SUCCESS = 'RESTORE_RIGGINGS_SUCCESS';
@@ -31,10 +31,11 @@ export const restoreRiggings =
     };
 
     return fetch(restoreRiggingsUrl(id), requestOptions)
-      .then(checkAndGetStatus)
+      .then(checkAuthStatus(dispatch))
       .then(response => response.json())
       .then(data => dispatch(restoreRiggingsSuccess(data)))
-      .catch(errorMessage => {
-        dispatch(restoreRiggingsFailure(errorMessage));
+      .catch(error => {
+        if (error.isAuthError) return;
+        dispatch(restoreRiggingsFailure(error));
       });
   };

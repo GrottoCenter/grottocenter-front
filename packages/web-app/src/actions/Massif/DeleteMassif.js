@@ -1,6 +1,6 @@
 import fetch from 'isomorphic-fetch';
 import { deleteMassifUrl } from '../../conf/apiRoutes';
-import { checkAndGetStatus } from '../utils';
+import { checkAuthStatus } from '../utils';
 
 export const DELETE_MASSIF = 'DELETE_MASSIF';
 export const DELETE_MASSIF_SUCCESS = 'DELETE_MASSIF_SUCCESS';
@@ -33,10 +33,11 @@ export const deleteMassif =
     };
 
     return fetch(deleteMassifUrl(id, { entityId, isPermanent }), requestOptions)
-      .then(checkAndGetStatus)
+      .then(checkAuthStatus(dispatch))
       .then(response => response.json())
       .then(data => dispatch(deleteMassifSuccess(data, isPermanent)))
-      .catch(errorMessage => {
-        dispatch(deleteMassifFailure(errorMessage));
+      .catch(error => {
+        if (error.isAuthError) return;
+        dispatch(deleteMassifFailure(error));
       });
   };

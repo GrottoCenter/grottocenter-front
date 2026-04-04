@@ -1,6 +1,6 @@
 import fetch from 'isomorphic-fetch';
 import { putDescriptionUrl } from '../../conf/apiRoutes';
-import { checkAndGetStatus } from '../utils';
+import { checkAuthStatus } from '../utils';
 
 export const UPDATE_DESCRIPTION = 'UPDATE_DESCRIPTION';
 export const UPDATE_DESCRIPTION_SUCCESS = 'UPDATE_DESCRIPTION_SUCCESS';
@@ -32,10 +32,11 @@ export const updateDescription =
     };
 
     return fetch(putDescriptionUrl(id), requestOptions)
-      .then(checkAndGetStatus)
+      .then(checkAuthStatus(dispatch))
       .then(response => response.json())
       .then(data => dispatch(updateDescriptionSuccess(data)))
-      .catch(errorMessage => {
-        dispatch(updateDescriptionFailure(errorMessage));
+      .catch(error => {
+        if (error.isAuthError) return;
+        dispatch(updateDescriptionFailure(error));
       });
   };

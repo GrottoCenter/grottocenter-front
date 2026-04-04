@@ -1,6 +1,6 @@
 import fetch from 'isomorphic-fetch';
 import { putHistoryUrl } from '../../conf/apiRoutes';
-import { checkAndGetStatus } from '../utils';
+import { checkAuthStatus } from '../utils';
 
 export const UPDATE_HISTORY = 'UPDATE_HISTORY';
 export const UPDATE_HISTORY_SUCCESS = 'UPDATE_HISTORY_SUCCESS';
@@ -32,10 +32,11 @@ export const updateHistory =
     };
 
     return fetch(putHistoryUrl(id), requestOptions)
-      .then(checkAndGetStatus)
+      .then(checkAuthStatus(dispatch))
       .then(response => response.json())
       .then(data => dispatch(updateHistorySuccess(data)))
-      .catch(errorMessage => {
-        dispatch(updateHistoryFailure(errorMessage));
+      .catch(error => {
+        if (error.isAuthError) return;
+        dispatch(updateHistoryFailure(error));
       });
   };

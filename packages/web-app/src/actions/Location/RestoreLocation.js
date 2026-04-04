@@ -1,6 +1,6 @@
 import fetch from 'isomorphic-fetch';
 import { restoreLocationUrl } from '../../conf/apiRoutes';
-import { checkAndGetStatus } from '../utils';
+import { checkAuthStatus } from '../utils';
 
 export const RESTORE_LOCATION = 'RESTORE_LOCATION';
 export const RESTORE_LOCATION_SUCCESS = 'RESTORE_LOCATION_SUCCESS';
@@ -31,10 +31,11 @@ export const restoreLocation =
     };
 
     return fetch(restoreLocationUrl(id), requestOptions)
-      .then(checkAndGetStatus)
+      .then(checkAuthStatus(dispatch))
       .then(response => response.json())
       .then(data => dispatch(restoreLocationSuccess(data)))
-      .catch(errorMessage => {
-        dispatch(restoreLocationFailure(errorMessage));
+      .catch(error => {
+        if (error.isAuthError) return;
+        dispatch(restoreLocationFailure(error));
       });
   };
