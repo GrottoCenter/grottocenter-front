@@ -1,6 +1,6 @@
 import fetch from 'isomorphic-fetch';
 import { restoreOrganizationUrl } from '../../conf/apiRoutes';
-import { checkAndGetStatus } from '../utils';
+import { checkAuthStatus } from '../utils';
 
 export const RESTORE_ORGANIZATION = 'RESTORE_ORGANIZATION';
 export const RESTORE_ORGANIZATION_SUCCESS = 'RESTORE_ORGANIZATION_SUCCESS';
@@ -31,10 +31,11 @@ export const restoreOrganization =
     };
 
     return fetch(restoreOrganizationUrl(id), requestOptions)
-      .then(checkAndGetStatus)
+      .then(checkAuthStatus(dispatch))
       .then(response => response.json())
       .then(data => dispatch(restoreOrganizationSuccess(data)))
-      .catch(errorMessage => {
-        dispatch(restoreOrganizationFailure(errorMessage));
+      .catch(error => {
+        if (error.isAuthError) return;
+        dispatch(restoreOrganizationFailure(error));
       });
   };

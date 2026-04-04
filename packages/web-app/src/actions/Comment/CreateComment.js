@@ -1,6 +1,6 @@
 import fetch from 'isomorphic-fetch';
 import { postCommentUrl } from '../../conf/apiRoutes';
-import { checkAndGetStatus } from '../utils';
+import { checkAuthStatus } from '../utils';
 import makeErrorMessage from '../../helpers/makeErrorMessage';
 import { minutesToDurationString } from '../../util/dateTimeDuration';
 
@@ -54,15 +54,16 @@ export const postComment =
     };
 
     return fetch(postCommentUrl, requestOptions)
-      .then(checkAndGetStatus)
+      .then(checkAuthStatus(dispatch))
       .then(response => response.json())
       .then(data => dispatch(postCommentSuccess(data)))
-      .catch(error =>
+      .catch(error => {
+        if (error.isAuthError) return;
         dispatch(
           postCommentFailure(
             makeErrorMessage(error.message, `Creating a new comment`),
             error.message
           )
-        )
-      );
+        );
+      });
   };

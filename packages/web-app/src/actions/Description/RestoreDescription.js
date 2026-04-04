@@ -1,6 +1,6 @@
 import fetch from 'isomorphic-fetch';
 import { restoreDescriptionUrl } from '../../conf/apiRoutes';
-import { checkAndGetStatus } from '../utils';
+import { checkAuthStatus } from '../utils';
 
 export const RESTORE_DESCRIPTION = 'RESTORE_DESCRIPTION';
 export const RESTORE_DESCRIPTION_SUCCESS = 'RESTORE_DESCRIPTION_SUCCESS';
@@ -31,10 +31,11 @@ export const restoreDescription =
     };
 
     return fetch(restoreDescriptionUrl(id), requestOptions)
-      .then(checkAndGetStatus)
+      .then(checkAuthStatus(dispatch))
       .then(response => response.json())
       .then(data => dispatch(restoreDescriptionSuccess(data)))
-      .catch(errorMessage => {
-        dispatch(restoreDescriptionFailure(errorMessage));
+      .catch(error => {
+        if (error.isAuthError) return;
+        dispatch(restoreDescriptionFailure(error));
       });
   };

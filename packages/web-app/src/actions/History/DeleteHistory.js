@@ -1,6 +1,6 @@
 import fetch from 'isomorphic-fetch';
 import { deleteHistoryUrl } from '../../conf/apiRoutes';
-import { checkAndGetStatus } from '../utils';
+import { checkAuthStatus } from '../utils';
 
 export const DELETE_HISTORY = 'DELETE_HISTORY';
 export const DELETE_HISTORY_SUCCESS = 'DELETE_HISTORY_SUCCESS';
@@ -33,10 +33,11 @@ export const deleteHistory =
     };
 
     return fetch(deleteHistoryUrl(id, isPermanent), requestOptions)
-      .then(checkAndGetStatus)
+      .then(checkAuthStatus(dispatch))
       .then(response => response.json())
       .then(data => dispatch(deleteHistorySuccess(data, isPermanent)))
-      .catch(errorMessage => {
-        dispatch(deleteHistoryFailure(errorMessage));
+      .catch(error => {
+        if (error.isAuthError) return;
+        dispatch(deleteHistoryFailure(error));
       });
   };

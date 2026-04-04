@@ -54,6 +54,7 @@ export const logout = () => ({
 export function postLogout() {
   return dispatch => {
     dispatch(logout());
+    window.location.href = '/';
   };
 }
 

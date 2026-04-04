@@ -1,6 +1,6 @@
 import fetch from 'isomorphic-fetch';
 import { deleteRiggingsUrl } from '../../conf/apiRoutes';
-import { checkAndGetStatus } from '../utils';
+import { checkAuthStatus } from '../utils';
 
 export const DELETE_RIGGINGS = 'DELETE_RIGGINGS';
 export const DELETE_RIGGINGS_SUCCESS = 'DELETE_RIGGINGS_SUCCESS';
@@ -35,10 +35,11 @@ export const deleteRiggings =
     };
 
     return fetch(deleteRiggingsUrl(id, isPermanent), requestOptions)
-      .then(checkAndGetStatus)
+      .then(checkAuthStatus(dispatch))
       .then(response => response.json())
       .then(data => dispatch(deleteRiggingsSuccess(data, isPermanent)))
-      .catch(errorMessage => {
-        dispatch(deleteRiggingsFailure(errorMessage));
+      .catch(error => {
+        if (error.isAuthError) return;
+        dispatch(deleteRiggingsFailure(error));
       });
   };

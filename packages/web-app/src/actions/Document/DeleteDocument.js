@@ -1,6 +1,6 @@
 import fetch from 'isomorphic-fetch';
 import { deleteDocumentUrl } from '../../conf/apiRoutes';
-import { checkAndGetStatus } from '../utils';
+import { checkAuthStatus } from '../utils';
 
 export const DELETE_DOCUMENT = 'DELETE_DOCUMENT';
 export const DELETE_DOCUMENT_SUCCESS = 'DELETE_DOCUMENT_SUCCESS';
@@ -38,10 +38,11 @@ export const deleteDocument =
       deleteDocumentUrl(id, { entityId, isPermanent }),
       requestOptions
     )
-      .then(checkAndGetStatus)
+      .then(checkAuthStatus(dispatch))
       .then(response => response.json())
       .then(data => dispatch(deleteDocumentSuccess(data, isPermanent)))
       .catch(error => {
+        if (error.isAuthError) return;
         dispatch(deleteDocumentFailure(error));
       });
   };

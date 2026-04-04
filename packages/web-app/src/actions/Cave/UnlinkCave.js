@@ -1,5 +1,5 @@
 import fetch from 'isomorphic-fetch';
-import { checkAndGetStatus } from '../utils';
+import { checkAuthStatus } from '../utils';
 import { unlinkCaveFromOrganizationUrl, unlinkCaveFromCaverUrl } from '../../conf/apiRoutes';
 
 export const UNLINK_CAVE = 'UNLINK_CAVE';
@@ -32,10 +32,11 @@ export const unlinkCave = (caveId, entityId, isOrganization) => (dispatch, getSt
     : unlinkCaveFromCaverUrl(caveId, entityId);
 
   return fetch(endpoint, requestOptions)
-    .then(checkAndGetStatus)
+    .then(checkAuthStatus(dispatch))
     .then(() => dispatch(unlinkCaveSuccess()))
-    .catch(errorMessage => {
-      dispatch(unlinkCaveFailure(errorMessage));
-      throw errorMessage;
+    .catch(error => {
+      if (error.isAuthError) return;
+      dispatch(unlinkCaveFailure(error));
+      throw error;
     });
 };

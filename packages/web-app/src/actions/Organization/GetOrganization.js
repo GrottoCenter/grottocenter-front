@@ -1,6 +1,6 @@
 import fetch from 'isomorphic-fetch';
 import { getOrganizationUrl } from '../../conf/apiRoutes';
-import { checkAndGetStatus } from '../utils';
+import { checkAuthStatus } from '../utils';
 
 export const FETCH_ORGANIZATION = 'FETCH_ORGANIZATION';
 export const FETCH_ORGANIZATION_SUCCESS = 'FETCH_ORGANIZATION_SUCCESS';
@@ -14,16 +14,17 @@ export function fetchOrganization(organizationId) {
 
     dispatch({ type: FETCH_ORGANIZATION });
     return fetch(`${getOrganizationUrl}${organizationId}`, requestOptions)
-      .then(checkAndGetStatus)
+      .then(checkAuthStatus(dispatch))
       .then(response => response.json())
       .then(data =>
         dispatch({ type: FETCH_ORGANIZATION_SUCCESS, organization: data })
       )
-      .catch(error =>
+      .catch(error => {
+        if (error.isAuthError) return;
         dispatch({
           type: FETCH_ORGANIZATION_FAILURE,
           error
-        })
-      );
+        });
+      });
   };
 }

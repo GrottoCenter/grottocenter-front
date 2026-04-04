@@ -1,6 +1,6 @@
 import fetch from 'isomorphic-fetch';
 import { putLocationUrl } from '../../conf/apiRoutes';
-import { checkAndGetStatus } from '../utils';
+import { checkAuthStatus } from '../utils';
 
 export const UPDATE_LOCATION = 'UPDATE_LOCATION';
 export const UPDATE_LOCATION_SUCCESS = 'UPDATE_LOCATION_SUCCESS';
@@ -32,10 +32,11 @@ export const updateLocation =
     };
 
     return fetch(putLocationUrl(id), requestOptions)
-      .then(checkAndGetStatus)
+      .then(checkAuthStatus(dispatch))
       .then(response => response.json())
       .then(data => dispatch(updateLocationSuccess(data)))
-      .catch(errorMessage => {
-        dispatch(updateLocationFailure(errorMessage));
+      .catch(error => {
+        if (error.isAuthError) return;
+        dispatch(updateLocationFailure(error));
       });
   };

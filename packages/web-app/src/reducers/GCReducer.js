@@ -1,5 +1,7 @@
 import { combineReducers } from 'redux';
 import advancedsearch from './AdvancedsearchReducer';
+import banCaver from './BanCaverReducer';
+import bannedCavers from './BannedCaversReducer';
 import linkDocumentToEntrance from './LinkDocumentToEntrance';
 import unlinkDocumentToEntrance from './UnlinkDocumentToEntrance';
 import cave from './CaveReducer';
@@ -86,6 +88,8 @@ import regionEntrances from './RegionEntrancesDataQualityReducer';
 
 const GCReducer = combineReducers({
   advancedsearch,
+  banCaver,
+  bannedCavers,
   linkDocumentToEntrance,
   unlinkDocumentToEntrance,
   cave,

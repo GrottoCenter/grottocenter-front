@@ -1,6 +1,6 @@
 import fetch from 'isomorphic-fetch';
 import { postRiggingsUrl } from '../../conf/apiRoutes';
-import { checkAndGetStatus } from '../utils';
+import { checkAuthStatus } from '../utils';
 
 export const POST_RIGGINGS = 'POST_RIGGINGS';
 export const POST_RIGGINGS_SUCCESS = 'POST_RIGGINGS_SUCCESS';
@@ -32,10 +32,11 @@ export const postRiggings =
     };
 
     return fetch(postRiggingsUrl, requestOptions)
-      .then(checkAndGetStatus)
+      .then(checkAuthStatus(dispatch))
       .then(response => response.json())
       .then(data => dispatch(postRiggingsSuccess(data)))
-      .catch(errorMessage => {
-        dispatch(postRiggingsFailure(errorMessage));
+      .catch(error => {
+        if (error.isAuthError) return;
+        dispatch(postRiggingsFailure(error));
       });
   };

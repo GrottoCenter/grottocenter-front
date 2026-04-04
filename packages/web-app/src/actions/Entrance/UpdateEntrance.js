@@ -5,7 +5,7 @@ import {
   putEntranceUrl
 } from '../../conf/apiRoutes';
 
-import { checkAndGetStatus } from '../utils';
+import { checkAuthStatus } from '../utils';
 
 export const UPDATE_ENTRANCE_SUCCESS = 'UPDATE_ENTRANCE_SUCCESS';
 export const UPDATE_ENTRANCE = 'UPDATE_ENTRANCE';
@@ -37,7 +37,7 @@ export const updateEntranceWithNewEntities =
     };
 
     return fetch(putEntranceWithNewEntitiesUrl(entranceData.id), requestOptions)
-      .then(checkAndGetStatus)
+      .then(checkAuthStatus(dispatch))
       .then(result => {
         dispatch({
           type: UPDATE_ENTRANCE_SUCCESS,
@@ -45,6 +45,7 @@ export const updateEntranceWithNewEntities =
         });
       })
       .catch(error => {
+        if (error.isAuthError) return;
         dispatch({
           type: UPDATE_ENTRANCE_ERROR,
           error: error.message,
@@ -63,12 +64,15 @@ export const updateEntrance = entranceData => (dispatch, getState) => {
   };
 
   return fetch(putEntranceUrl(entranceData.id), requestOptions)
-    .then(checkAndGetStatus)
+    .then(checkAuthStatus(dispatch))
     .then(response => {
       dispatch({
         type: UPDATE_ENTRANCE_SUCCESS,
         httpCode: response.status
       });
     })
-    .catch(error => dispatch(updateEntranceFailure(error)));
+    .catch(error => {
+      if (error.isAuthError) return;
+      dispatch(updateEntranceFailure(error));
+    });
 };

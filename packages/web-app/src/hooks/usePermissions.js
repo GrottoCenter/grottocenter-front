@@ -1,4 +1,5 @@
 import { useSelector } from 'react-redux';
+import { hasRole } from '../helpers/AuthHelper';
 
 const isTokenExpired = authState => {
   try {
@@ -9,12 +10,6 @@ const isTokenExpired = authState => {
   } catch (err) {
     return false;
   }
-};
-
-const hasRole = (authState, roleName) => {
-  const groups = authState?.authTokenDecoded?.groups ?? null;
-  if (groups === null) return false;
-  return groups.some(g => g.name === roleName);
 };
 
 // eslint-disable-next-line import/prefer-default-export

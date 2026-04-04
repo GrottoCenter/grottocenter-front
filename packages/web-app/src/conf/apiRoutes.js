@@ -263,12 +263,17 @@ export const unlinkCaveFromOrganizationUrl = (caveId, organizationId) =>
 
 // ===== Persons / cavers urls
 export const getGroupsUrl = `${API_BASE_PATH}/cavers/groups`;
+export const getBannedCaversUrl = `${API_BASE_PATH}/cavers/banned`;
 export const getCaverUrl = `${API_BASE_PATH}/cavers/`;
 export const postPersonUrl = `${API_BASE_PATH}/cavers`;
 export const postPersonGroupsUrl = userId =>
   `${API_BASE_PATH}/cavers/${userId}/groups`;
 export const putCaverUrl = userId => `${API_BASE_PATH}/cavers/${userId}`;
 export const getDbExportUrls = `${API_BASE_PATH}/cavers/export/db`;
+export const banCaverUrl = caverId =>
+  `${API_BASE_PATH}/cavers/${caverId}/ban`;
+export const unbanCaverUrl = caverId =>
+  `${API_BASE_PATH}/cavers/${caverId}/unban`;
 export const deletePersonUrl = (userId, entityId) =>
   `${API_BASE_PATH}/cavers/${userId}?${entityId ? `entityId=${entityId}` : ''}`;
 export const linkCaveToCaverUrl = (caveId, caverId) =>

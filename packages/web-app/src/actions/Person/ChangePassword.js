@@ -1,6 +1,6 @@
 import fetch from 'isomorphic-fetch';
 import { changePasswordUrl } from '../../conf/apiRoutes';
-import { checkAndGetStatus } from '../utils';
+import { checkAndGetStatus, checkAuthStatus } from '../utils';
 
 export const FETCH_CHANGE_PASSWORD = 'FETCH_CHANGE_PASSWORD';
 export const FETCH_CHANGE_PASSWORD_SUCCESS = 'FETCH_CHANGE_PASSWORD_SUCCESS';
@@ -20,22 +20,28 @@ export function postChangePassword(password, resetPasswordToken) {
     dispatch(fetchChangePassword());
 
     let requestOptions;
+    let statusChecker;
     if (resetPasswordToken) {
       requestOptions = {
         method: 'PATCH',
         body: JSON.stringify({ password, token: resetPasswordToken })
       };
+      statusChecker = checkAndGetStatus;
     } else {
       requestOptions = {
         method: 'PATCH',
         body: JSON.stringify({ password }),
         headers: getState().login.authorizationHeader
       };
+      statusChecker = checkAuthStatus(dispatch);
     }
 
     return fetch(changePasswordUrl, requestOptions)
-      .then(checkAndGetStatus)
+      .then(statusChecker)
       .then(() => dispatch(fetchChangePasswordSuccess()))
-      .catch(error => dispatch(fetchChangePasswordFailure(error)));
+      .catch(error => {
+        if (error.isAuthError) return;
+        dispatch(fetchChangePasswordFailure(error));
+      });
   };
 }

@@ -1,6 +1,6 @@
 import fetch from 'isomorphic-fetch';
 import { deleteCaveUrl } from '../../conf/apiRoutes';
-import { checkAndGetStatus } from '../utils';
+import { checkAuthStatus } from '../utils';
 
 export const DELETE_CAVE = 'DELETE_CAVE';
 export const DELETE_CAVE_SUCCESS = 'DELETE_CAVE_SUCCESS';
@@ -32,10 +32,11 @@ export const deleteCave =
     };
 
     return fetch(deleteCaveUrl(id, { entityId, isPermanent }), requestOptions)
-      .then(checkAndGetStatus)
+      .then(checkAuthStatus(dispatch))
       .then(response => response.json())
       .then(data => dispatch(deleteCaveSuccess(data, isPermanent)))
-      .catch(errorMessage => {
-        dispatch(deleteCaveFailure(errorMessage));
+      .catch(error => {
+        if (error.isAuthError) return;
+        dispatch(deleteCaveFailure(error));
       });
   };

@@ -1,6 +1,6 @@
 import fetch from 'isomorphic-fetch';
 import { restoreMassifUrl } from '../../conf/apiRoutes';
-import { checkAndGetStatus } from '../utils';
+import { checkAuthStatus } from '../utils';
 
 export const RESTORE_MASSIF = 'RESTORE_MASSIF';
 export const RESTORE_MASSIF_SUCCESS = 'RESTORE_MASSIF_SUCCESS';
@@ -31,10 +31,11 @@ export const restoreMassif =
     };
 
     return fetch(restoreMassifUrl(id), requestOptions)
-      .then(checkAndGetStatus)
+      .then(checkAuthStatus(dispatch))
       .then(response => response.json())
       .then(data => dispatch(restoreMassifSuccess(data)))
-      .catch(errorMessage => {
-        dispatch(restoreMassifFailure(errorMessage));
+      .catch(error => {
+        if (error.isAuthError) return;
+        dispatch(restoreMassifFailure(error));
       });
   };

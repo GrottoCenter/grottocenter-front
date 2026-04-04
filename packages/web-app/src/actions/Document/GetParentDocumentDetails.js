@@ -1,6 +1,6 @@
 import fetch from 'isomorphic-fetch';
 import { getDocumentDetailsUrl } from '../../conf/apiRoutes';
-import { checkAndGetStatus } from '../utils';
+import { checkAuthStatus } from '../utils';
 
 export const FETCH_PARENT_DOCUMENT_DETAILS = 'FETCH_PARENT_DOCUMENT_DETAILS';
 export const FETCH_PARENT_DOCUMENT_DETAILS_SUCCESS =
@@ -21,12 +21,13 @@ export const fetchParentDocumentDetails =
       getDocumentDetailsUrl + documentId + updateParam,
       requestOptions
     )
-      .then(checkAndGetStatus)
+      .then(checkAuthStatus(dispatch))
       .then(response => response.json())
       .then(data =>
         dispatch({ type: FETCH_PARENT_DOCUMENT_DETAILS_SUCCESS, data })
       )
-      .catch(error =>
-        dispatch({ type: FETCH_PARENT_DOCUMENT_DETAILS_FAILURE, error })
-      );
+      .catch(error => {
+        if (error.isAuthError) return;
+        dispatch({ type: FETCH_PARENT_DOCUMENT_DETAILS_FAILURE, error });
+      });
   };

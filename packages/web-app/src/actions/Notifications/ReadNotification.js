@@ -1,7 +1,7 @@
 import fetch from 'isomorphic-fetch';
 import { readNotificationUrl } from '../../conf/apiRoutes';
 import makeErrorMessage from '../../helpers/makeErrorMessage';
-import { checkAndGetStatus } from '../utils';
+import { checkAuthStatus } from '../utils';
 
 export const READ_NOTIFICATION = 'READ_NOTIFICATION';
 export const READ_NOTIFICATION_SUCCESS = 'READ_NOTIFICATION_SUCCESS';
@@ -30,11 +30,12 @@ export function readNotification(notificationId) {
     };
 
     return fetch(readNotificationUrl(notificationId), requestOptions)
-      .then(checkAndGetStatus)
+      .then(checkAuthStatus(dispatch))
       .then(() => {
         dispatch(readNotificationActionSuccess());
       })
-      .catch(error =>
+      .catch(error => {
+        if (error.isAuthError) return;
         dispatch(
           readNotificationActionFailure(
             makeErrorMessage(
@@ -43,7 +44,7 @@ export function readNotification(notificationId) {
             ),
             error.message
           )
-        )
-      );
+        );
+      });
   };
 }

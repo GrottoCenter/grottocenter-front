@@ -1,7 +1,7 @@
 import fetch from 'isomorphic-fetch';
 import { getSubscriptionsUrl } from '../../conf/apiRoutes';
 import makeErrorMessage from '../../helpers/makeErrorMessage';
-import { checkAndGetStatus } from '../utils';
+import { checkAuthStatus } from '../utils';
 
 export const FETCH_SUBSCRIPTIONS = 'FETCH_SUBSCRIPTIONS';
 export const FETCH_SUBSCRIPTIONS_SUCCESS = 'FETCH_SUBSCRIPTIONS_SUCCESS';
@@ -31,12 +31,13 @@ export function fetchSubscriptions(caverId) {
     };
 
     return fetch(getSubscriptionsUrl(caverId), requestOptions)
-      .then(checkAndGetStatus)
+      .then(checkAuthStatus(dispatch))
       .then(response => response.json())
       .then(data => {
         dispatch(fetchSubscriptionsActionSuccess(data.subscriptions));
       })
-      .catch(error =>
+      .catch(error => {
+        if (error.isAuthError) return;
         dispatch(
           fetchSubscriptionsActionFailure(
             makeErrorMessage(
@@ -45,7 +46,7 @@ export function fetchSubscriptions(caverId) {
             ),
             error.message
           )
-        )
-      );
+        );
+      });
   };
 }

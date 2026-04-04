@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import { styled } from '@mui/material/styles';
-import { Typography, Box } from '@mui/material';
+import { Typography, Box, Chip } from '@mui/material';
 
 const UserPropertyName = styled(Typography)`
   display: inline-block;
@@ -48,9 +48,18 @@ const PersonProperties = ({ person }) => {
 
   return (
     <Box style={{ display: 'flex', flexDirection: 'column' }}>
-      <Typography variant="h3" gutterBottom>
-        {formatMessage({ id: 'User information' })}
-      </Typography>
+      <Box display="flex" alignItems="center" gap={1} mb={1}>
+        <Typography variant="h3">
+          {formatMessage({ id: 'User information' })}
+        </Typography>
+        {person.isBanned && (
+          <Chip
+            label={formatMessage({ id: 'Banned' })}
+            color="error"
+            size="small"
+          />
+        )}
+      </Box>
       <UserProperty
         propertyName={formatMessage({ id: 'Id' })}
         value={person.id}
@@ -100,7 +109,8 @@ PersonProperties.propTypes = {
     surname: PropTypes.string,
     language: PropTypes.string,
     groups: PropTypes.arrayOf(PropTypes.shape({})),
-    mail: PropTypes.string
+    mail: PropTypes.string,
+    isBanned: PropTypes.bool
   }).isRequired
 };
 

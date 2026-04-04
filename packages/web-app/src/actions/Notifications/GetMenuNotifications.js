@@ -1,7 +1,7 @@
 import fetch from 'isomorphic-fetch';
 import { fetchNotificationsUrl } from '../../conf/apiRoutes';
 import makeErrorMessage from '../../helpers/makeErrorMessage';
-import { checkAndGetStatus, getTotalCount, makeUrl } from '../utils';
+import { checkAuthStatus, getTotalCount, makeUrl } from '../utils';
 
 export const FETCH_MENU_NOTIFICATIONS = 'FETCH_MENU_NOTIFICATIONS';
 export const FETCH_MENU_NOTIFICATIONS_SUCCESS =
@@ -37,7 +37,7 @@ export function fetchMenuNotifications(criterias) {
     };
 
     try {
-      const response = checkAndGetStatus(
+      const response = checkAuthStatus(dispatch)(
         await fetch(makeUrl(fetchNotificationsUrl, criterias), requestOptions)
       );
 
@@ -51,6 +51,7 @@ export function fetchMenuNotifications(criterias) {
         )
       );
     } catch (error) {
+      if (error.isAuthError) return;
       return dispatch(
         fetchMenuNotificationsActionFailure(
           makeErrorMessage(error.message, `Fetching menu notifications`),

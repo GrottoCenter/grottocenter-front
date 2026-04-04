@@ -5,7 +5,7 @@ import { useIntl } from 'react-intl';
 import { Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 
-import { fetchGroups } from '../../actions/Person/GetPerson';
+import { fetchGroups, fetchBannedCavers } from '../../actions/Person/GetPerson';
 
 import AuthChecker from '../../components/appli/AuthChecker';
 
@@ -45,8 +45,17 @@ const ManageUsers = () => {
     state => state.groups
   );
 
+  const {
+    bannedCavers,
+    isLoading: isBannedLoading
+  } = useSelector(state => state.bannedCavers);
+
   const { isLoading: isUpdateLoading, isSuccess: isUpdateSuccess } =
     useSelector(state => state.updatePersonGroups);
+
+  const { isLoading: isBanLoading, isSuccess: isBanSuccess } = useSelector(
+    state => state.banCaver
+  );
 
   useEffect(() => {
     // Check if submission is ok
@@ -57,7 +66,15 @@ const ManageUsers = () => {
   }, [isUpdateLoading, isUpdateSuccess]);
 
   useEffect(() => {
+    if (isBanSuccess && !isBanLoading) {
+      dispatch(fetchBannedCavers());
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isBanLoading, isBanSuccess]);
+
+  useEffect(() => {
     dispatch(fetchGroups());
+    dispatch(fetchBannedCavers());
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -84,6 +101,11 @@ const ManageUsers = () => {
                 isLoading={isLoading}
                 userList={leaders}
                 title={formatMessage({ id: 'List of leaders' })}
+              />
+              <UserList
+                isLoading={isBannedLoading}
+                userList={bannedCavers}
+                title={formatMessage({ id: 'List of banned cavers' })}
               />
             </>
           }

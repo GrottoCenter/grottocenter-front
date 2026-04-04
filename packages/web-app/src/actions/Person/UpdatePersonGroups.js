@@ -1,6 +1,6 @@
 import fetch from 'isomorphic-fetch';
 import { postPersonGroupsUrl } from '../../conf/apiRoutes';
-import { checkAndGetStatus } from '../utils';
+import { checkAuthStatus } from '../utils';
 
 export const POST_PERSON_GROUPS = 'POST_PERSON_GROUPS';
 export const POST_PERSON_GROUPS_SUCCESS = 'POST_PERSON_GROUPS_SUCCESS';
@@ -26,8 +26,11 @@ export function postPersonGroups(caverId, groups) {
     };
 
     return fetch(postPersonGroupsUrl(caverId), requestOptions)
-      .then(checkAndGetStatus)
+      .then(checkAuthStatus(dispatch))
       .then(() => dispatch(postPersonGroupsActionSuccess()))
-      .catch(error => dispatch(postPersonGroupsActionFailure(error)));
+      .catch(error => {
+        if (error.isAuthError) return;
+        dispatch(postPersonGroupsActionFailure(error));
+      });
   };
 }

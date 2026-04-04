@@ -1,6 +1,6 @@
 import fetch from 'isomorphic-fetch';
 import { associateDocumentToMassifUrl } from '../conf/apiRoutes';
-import { checkAndGetStatus } from './utils';
+import { checkAuthStatus } from './utils';
 
 export const LINK_DOCUMENT_TO_MASSIF = 'LINK_DOCUMENT_TO_MASSIF';
 export const LINK_DOCUMENT_TO_MASSIF_SUCCESS =
@@ -36,9 +36,10 @@ export const linkDocumentToMassif =
       associateDocumentToMassifUrl(massifId, document.id),
       requestOptions
     )
-      .then(checkAndGetStatus)
+      .then(checkAuthStatus(dispatch))
       .then(() => dispatch(linkDocumentToMassifSuccess(document)))
-      .catch(errorMessage => {
-        dispatch(linkDocumentToMassifFailure(errorMessage));
+      .catch(error => {
+        if (error.isAuthError) return;
+        dispatch(linkDocumentToMassifFailure(error));
       });
   };

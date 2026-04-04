@@ -1,8 +1,7 @@
 import fetch from 'isomorphic-fetch';
 import { countUnreadNotificationsUrl } from '../../conf/apiRoutes';
 import makeErrorMessage from '../../helpers/makeErrorMessage';
-import { checkAndGetStatus } from '../utils';
-import { logout } from '../Login';
+import { checkAuthStatus } from '../utils';
 
 export const COUNT_UNREAD_NOTIFICATIONS = 'COUNT_UNREAD_NOTIFICATIONS';
 export const COUNT_UNREAD_NOTIFICATIONS_SUCCESS =
@@ -34,19 +33,13 @@ export function countUnreadNotifications() {
     };
 
     return fetch(countUnreadNotificationsUrl, requestOptions)
-      .then(checkAndGetStatus)
+      .then(checkAuthStatus(dispatch))
       .then(response => response.json())
       .then(data => {
         dispatch(countUnreadNotificationsActionSuccess(data.count));
       })
       .catch(error => {
-        // When logged, countUnreadNotifications() is the first authenticated request made to the API
-        // So it is the first request that test if the JWT is really valid
-        // In case of invalid token we logout the user
-        if (error.message === '401') {
-          dispatch(logout());
-          return;
-        }
+        if (error.isAuthError) return;
 
         dispatch(
           countUnreadNotificationsActionFailure(

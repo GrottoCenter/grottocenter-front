@@ -1,6 +1,6 @@
 import fetch from 'isomorphic-fetch';
 import { postPersonUrl } from '../../conf/apiRoutes';
-import { checkAndGetStatus } from '../utils';
+import { checkAuthStatus } from '../utils';
 
 export const POST_PERSON = 'POST_PERSON';
 export const POST_PERSON_SUCCESS = 'POST_PERSON_SUCCESS';
@@ -22,8 +22,11 @@ export const postPerson =
     };
 
     return fetch(postPersonUrl, requestOptions)
-      .then(checkAndGetStatus)
+      .then(checkAuthStatus(dispatch))
       .then(response => response.json())
       .then(data => dispatch(postPersonSuccess(data)))
-      .catch(error => dispatch(postPersonFailure(error)));
+      .catch(error => {
+        if (error.isAuthError) return;
+        dispatch(postPersonFailure(error));
+      });
   };

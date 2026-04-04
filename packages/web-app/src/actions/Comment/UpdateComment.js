@@ -1,7 +1,7 @@
 import fetch from 'isomorphic-fetch';
 import { putCommentUrl } from '../../conf/apiRoutes';
 import { minutesToDurationString } from '../../util/dateTimeDuration';
-import { checkAndGetStatus } from '../utils';
+import { checkAuthStatus } from '../utils';
 
 export const UPDATE_COMMENT = 'UPDATE_COMMENT';
 export const UPDATE_COMMENT_SUCCESS = 'UPDATE_COMMENT_SUCCESS';
@@ -52,10 +52,11 @@ export const updateComment =
     };
 
     return fetch(putCommentUrl(id), requestOptions)
-      .then(checkAndGetStatus)
+      .then(checkAuthStatus(dispatch))
       .then(response => response.json())
       .then(data => dispatch(updateCommentSuccess(data)))
-      .catch(errorMessage => {
-        dispatch(updateCommentFailure(errorMessage));
+      .catch(error => {
+        if (error.isAuthError) return;
+        dispatch(updateCommentFailure(error));
       });
   };

@@ -1,6 +1,6 @@
 import fetch from 'isomorphic-fetch';
 import { postCreateMassifUrl } from '../../conf/apiRoutes';
-import { checkAndGetStatus } from '../utils';
+import { checkAuthStatus } from '../utils';
 
 export const POST_MASSIF = 'POST_MASSIF';
 export const POST_MASSIF_SUCCESS = 'POST_MASSIF_SUCCESS';
@@ -28,10 +28,11 @@ export const postMassif = body => (dispatch, getState) => {
   };
 
   return fetch(postCreateMassifUrl, requestOptions)
-    .then(checkAndGetStatus)
+    .then(checkAuthStatus(dispatch))
     .then(response => response.json())
-    .then(data => {
-      dispatch(postMassifSuccess(data));
-    })
-    .catch(error => dispatch(postMassifFailure(error)));
+    .then(data => dispatch(postMassifSuccess(data)))
+    .catch(error => {
+      if (error.isAuthError) return;
+      dispatch(postMassifFailure(error));
+    });
 };
