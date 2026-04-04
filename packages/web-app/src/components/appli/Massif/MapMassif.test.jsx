@@ -5,7 +5,7 @@ import MapMassif from './MapMassif';
 
 // --- Mocks ---
 
-const mockUpdateHeatData = jest.fn();
+const mockUpdateLayers = jest.fn();
 const mockUpdateEntranceMarkers = jest.fn();
 let mockZoom = 8;
 
@@ -46,7 +46,7 @@ jest.mock('../../common/Maps/MapClusters/useHeatLayer', () => {
   const React = require('react');
   return {
     __esModule: true,
-    default: () => ({ updateHeatData: mockUpdateHeatData, heatOffZoom: 13 }),
+    default: () => ({ updateLayers: mockUpdateLayers }),
     HexGlobalCss: React.createElement('div')
   };
 });
@@ -85,7 +85,7 @@ const samplePolygon = JSON.stringify({
 
 beforeEach(() => {
   jest.restoreAllMocks();
-  mockUpdateHeatData.mockClear();
+  mockUpdateLayers.mockClear();
   mockUpdateEntranceMarkers.mockClear();
   mockZoom = 8;
 });
@@ -96,7 +96,7 @@ afterEach(() => {
 
 describe('MapMassif', () => {
   describe('at low zoom (< MARKERS_LIMIT)', () => {
-    it('calls updateHeatData with coordinates', async () => {
+    it('calls updateLayers with coordinates for entrances', async () => {
       const coords = [[5.5, 44.1], [6.2, 43.8], [7.0, 45.0]];
       global.fetch = jest.fn().mockResolvedValue({
         ok: true,
@@ -106,7 +106,7 @@ describe('MapMassif', () => {
       render(<MapMassif massifId={42} geogPolygon={samplePolygon} />);
 
       await waitFor(() => {
-        expect(mockUpdateHeatData).toHaveBeenCalledWith(coords);
+        expect(mockUpdateLayers).toHaveBeenCalledWith({ entrances: coords }, ['entrances']);
       });
     });
 
@@ -185,7 +185,7 @@ describe('MapMassif', () => {
       });
     });
 
-    it('clears heat data when showing markers', async () => {
+    it('clears heat layers when showing markers', async () => {
       const entrances = [
         { id: 1, name: 'Cave A', latitude: 44.1, longitude: 5.5 }
       ];
@@ -197,7 +197,7 @@ describe('MapMassif', () => {
       render(<MapMassif massifId={42} geogPolygon={samplePolygon} />);
 
       await waitFor(() => {
-        expect(mockUpdateHeatData).toHaveBeenCalledWith([]);
+        expect(mockUpdateLayers).toHaveBeenCalledWith({}, []);
       });
     });
   });

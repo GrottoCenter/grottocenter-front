@@ -1,13 +1,14 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { styled } from '@mui/material/styles';
+import { Popover } from '@mui/material';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import VisibilityIcon from '@mui/icons-material/Visibility';
-import LayersClearIcon from '@mui/icons-material/LayersClear';
 import { useIntl } from 'react-intl';
 import { useFullScreen } from 'react-browser-hooks';
 
 import CustomControl, { customControlProps } from '../common/CustomControl';
-import { CAVE_SIZE_STYLE } from './constants';
+import { CAVE_SIZE, CAVE_SIZE_STYLE, CAVE_SIZE_THRESHOLDS } from './constants';
 import {
   entranceIcon,
   networkIcon,
@@ -15,15 +16,41 @@ import {
   massifIcon
 } from '../../../../assets/icons';
 
+const CAVE_SIZE_POPOVER_ROWS = [
+  {
+    id: CAVE_SIZE.SMALL,
+    labelKey: 'Small caves',
+    messageKey: 'cave size small threshold',
+    thresholds: CAVE_SIZE_THRESHOLDS.MEDIUM
+  },
+  {
+    id: CAVE_SIZE.MEDIUM,
+    labelKey: 'Medium caves',
+    messageKey: 'cave size medium threshold',
+    thresholds: CAVE_SIZE_THRESHOLDS.MEDIUM
+  },
+  {
+    id: CAVE_SIZE.LARGE,
+    labelKey: 'Large caves',
+    messageKey: 'cave size large threshold',
+    thresholds: CAVE_SIZE_THRESHOLDS.LARGE
+  }
+];
+
 export const heatmapTypes = {
   ENTRANCES: 'entrances',
   NETWORKS: 'networks',
-  MASSIFS: 'massifs',
-  NONE: 'none'
+  MASSIFS: 'massifs'
 };
 export const markerTypes = {
   ORGANIZATIONS: 'organizations'
 };
+
+const HEAT_TYPES_LIST = [
+  heatmapTypes.ENTRANCES,
+  heatmapTypes.NETWORKS,
+  heatmapTypes.MASSIFS
+];
 
 const ToggleButton = styled('button')`
   appearance: none;
@@ -54,10 +81,18 @@ const SectionTitle = styled('div')`
   font-size: 12px;
   padding: 4px 0 2px;
   color: #333;
+  display: flex;
+  align-items: center;
+  gap: 4px;
 
   &:not(:first-of-type) {
     margin-top: 6px;
   }
+`;
+
+const PopoverContent = styled('div')`
+  padding: 8px 12px;
+  font-size: 13px;
 `;
 
 const OptionLabel = styled('label')`
@@ -118,13 +153,6 @@ const MarkerIcon = ({ type }) => {
       />
     );
   }
-  if (type === heatmapTypes.NONE) {
-    return (
-      <LayersClearIcon
-        sx={{ fontSize: 20, flexShrink: 0, mr: '4px', color: '#777' }}
-      />
-    );
-  }
   return null;
 };
 
@@ -134,6 +162,7 @@ MarkerIcon.propTypes = {
 
 const DataControl = ({
   updateHeatmap,
+  selectedHeats,
   selectedMarkers,
   setSelectedMarkers,
   entranceFilters,
@@ -145,7 +174,13 @@ const DataControl = ({
   const { fullScreen } = useFullScreen();
   const { formatMessage } = useIntl();
   const wrapperRef = useRef(null);
-  const [selectedHeat, setSelectedHeat] = useState(heatmapTypes.ENTRANCES);
+  const [sizeInfoAnchor, setSizeInfoAnchor] = useState(null);
+
+  // Close the size info popover when leaving markers mode — the anchor element
+  // disappears and MUI would otherwise reopen it with a stale reference on next mount.
+  useEffect(() => {
+    if (!isMarkersMode) setSizeInfoAnchor(null);
+  }, [isMarkersMode]);
 
   const toggleExpanded = useCallback(expanded => {
     const container = wrapperRef.current?.closest('.leaflet-control-layers');
@@ -171,18 +206,13 @@ const DataControl = ({
       document.removeEventListener('pointerdown', handleClickOutside);
   }, [toggleExpanded]);
 
-  const handleHeatChange = value => {
-    setSelectedHeat(value);
+  const handleHeatToggle = type => {
+    updateHeatmap(type, !selectedHeats.has(type));
   };
 
   const handleMarkerChange = type => {
     setSelectedMarkers(prev => ({ ...prev, [type]: !prev[type] }));
   };
-
-  useEffect(() => {
-    updateHeatmap(selectedHeat);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedHeat]);
 
   return (
     <CustomControl
@@ -198,6 +228,7 @@ const DataControl = ({
           title={formatMessage({ id: 'data-control' })}
           aria-label={formatMessage({ id: 'data-control' })}
           disabled={fullScreen}
+          data-tour="data-control-toggle"
           onClick={() => toggleExpanded(true)}>
           <VisibilityIcon htmlColor="#333" />
         </ToggleButton>
@@ -207,14 +238,13 @@ const DataControl = ({
             <SectionTitle>
               {formatMessage({ id: 'Data display' }).toUpperCase()}
             </SectionTitle>
-            {Object.values(heatmapTypes).map(type => (
+            {HEAT_TYPES_LIST.map(type => (
               <OptionLabel key={type}>
                 <input
-                  type="radio"
-                  name="heatmap"
-                  value={type}
-                  checked={selectedHeat === type}
-                  onChange={() => handleHeatChange(type)}
+                  type="checkbox"
+                  name={type}
+                  checked={selectedHeats.has(type)}
+                  onChange={() => handleHeatToggle(type)}
                 />
                 <MarkerIcon type={type} />
                 <span style={{ textTransform: 'capitalize' }}>
@@ -244,11 +274,30 @@ const DataControl = ({
               </span>
             </OptionLabel>
 
-            {selectedHeat === heatmapTypes.ENTRANCES && isMarkersMode && (
+            {selectedHeats.has(heatmapTypes.ENTRANCES) && isMarkersMode && (
               <>
                 <SectionTitle>
                   {formatMessage({ id: 'Filter by size' }).toUpperCase()}
+                  <InfoOutlinedIcon
+                    sx={{ fontSize: 13, cursor: 'pointer', color: '#666' }}
+                    onClick={e => setSizeInfoAnchor(e.currentTarget)}
+                  />
                 </SectionTitle>
+                <Popover
+                  open={Boolean(sizeInfoAnchor)}
+                  anchorEl={sizeInfoAnchor}
+                  onClose={() => setSizeInfoAnchor(null)}
+                  anchorOrigin={{ vertical: 'center', horizontal: 'right' }}
+                  transformOrigin={{ vertical: 'center', horizontal: 'left' }}>
+                  <PopoverContent>
+                    {CAVE_SIZE_POPOVER_ROWS.map(({ id, labelKey, messageKey, thresholds }) => (
+                      <div key={id}>
+                        <strong>{formatMessage({ id: labelKey })}</strong>
+                        {`: ${formatMessage({ id: messageKey }, thresholds)}`}
+                      </div>
+                    ))}
+                  </PopoverContent>
+                </Popover>
                 {entranceFilters.map(filter => (
                   <OptionLabel key={filter.id}>
                     <input
@@ -279,6 +328,7 @@ const MemoizedDataControl = React.memo(DataControl);
 
 DataControl.propTypes = {
   updateHeatmap: PropTypes.func.isRequired,
+  selectedHeats: PropTypes.instanceOf(Set).isRequired,
   selectedMarkers: PropTypes.objectOf(PropTypes.bool).isRequired,
   setSelectedMarkers: PropTypes.func.isRequired,
   entranceFilters: PropTypes.arrayOf(

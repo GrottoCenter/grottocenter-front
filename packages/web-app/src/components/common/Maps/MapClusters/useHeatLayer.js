@@ -1,5 +1,5 @@
 import { useMapEvent } from 'react-leaflet';
-import React, { useCallback, useEffect, useState, useRef } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 import { isNil } from 'ramda';
 import * as d3 from 'd3';
 import * as L from 'leaflet';
@@ -20,7 +20,9 @@ import {
   HEX_DETAILS_RADIUS_RANGE,
   HEX_DETAILS_ZOOM,
   HEX_DETAILS_OPACITY,
-  HEX_OPACITY
+  HEX_OPACITY,
+  HEX_MAX_RADIUS,
+  getHeatOffZoom
 } from './constants';
 
 export const HexGlobalCss = (
@@ -51,170 +53,217 @@ export const HexGlobalCss = (
 
 // For more customization see https://github.com/Asymmetrik/leaflet-d3 documentation
 
-const useHeatLayer = (data = [], type = heatmapTypes.ENTRANCES, heatOffZoom = MARKERS_LIMIT) => {
-  const { formatMessage } = useIntl();
-  const [hexLayer, setHexLayer] = useState();
-  const isDraggingRef = useRef(false);
-  // Pending requestAnimationFrame id - coalesces rapid .data() calls into one frame.
-  const rafRef = useRef(null);
-  const dragEndTimerRef = useRef(null);
-  // Skip colorRange + hoverHandler re-registration when the type hasn't changed.
-  const lastTypeRef = useRef(null);
-  // Keep heatOffZoom ref-stable for the zoomend closure
-  const heatOffZoomRef = useRef(heatOffZoom);
-  heatOffZoomRef.current = heatOffZoom;
+const COLOR_MAP = {
+  [heatmapTypes.ENTRANCES]: ENTRANCE_HEAT_COLORS,
+  [heatmapTypes.NETWORKS]: NETWORK_HEAT_COLORS,
+  [heatmapTypes.MASSIFS]: MASSIF_HEAT_COLORS
+};
 
-  // On zoom lvl, hex opacity and size can change
+// Pixel-space SVG offsets so hex grids from different types don't perfectly overlap.
+// Half a hex radius in different directions — tune HEX_MAX_RADIUS / 2.
+const HALF_HEX = HEX_MAX_RADIUS / 2;
+const LAYER_SVG_OFFSETS = {
+  [heatmapTypes.ENTRANCES]: [0, 0],
+  [heatmapTypes.NETWORKS]: [HALF_HEX, HALF_HEX * 0.75],
+  [heatmapTypes.MASSIFS]: [-HALF_HEX, HALF_HEX * 0.75]
+};
+
+// Apply (or clear) a pixel-space translate on the layer's inner SVG <g>.
+// This shifts the rendered grid without rebinning points geographically.
+const applyLayerOffset = (layer, type, shouldOffset) => {
+  if (!layer?._container) return;
+  const g = layer._container.querySelector('g');
+  if (!g) return;
+  if (shouldOffset) {
+    const [dx, dy] = LAYER_SVG_OFFSETS[type];
+    g.style.transform = `translate(${dx}px, ${dy}px)`;
+  } else {
+    g.style.transform = '';
+  }
+};
+
+// Pane config — massifs gets the lowest z-index so it always renders below entrances/networks.
+// z-indexes between Leaflet's overlay pane (400) and shadow pane (500).
+const LAYER_PANE_CONFIG = [
+  { type: heatmapTypes.MASSIFS, pane: 'hex-massifs', z: 420 },
+  { type: heatmapTypes.ENTRANCES, pane: 'hex-entrances', z: 425 },
+  { type: heatmapTypes.NETWORKS, pane: 'hex-networks', z: 430 }
+];
+
+const LAYER_TYPES = LAYER_PANE_CONFIG.map(c => c.type);
+
+/**
+ * Manages three independent hexbin layers (massifs below, then entrances, then networks).
+ * When multiple layers are active, each layer gets a slight pixel-space SVG offset
+ * so hexagons from different types don't perfectly overlap.
+ * Each layer uses its own zoom threshold (massifs: 8, entrances/networks: 13).
+ */
+const useHeatLayer = () => {
+  const { formatMessage } = useIntl();
+  // Ref so the tooltip closure always reads the current locale without re-creating layers.
+  const formatMessageRef = useRef(formatMessage);
+  formatMessageRef.current = formatMessage;
+  const layersRef = useRef({});
+  const activeTypesRef = useRef([]);
+  const isDraggingRef = useRef(false);
+  const rafRefs = useRef({});
+  const dragEndTimerRef = useRef(null);
+
   const map = useMapEvent('zoomend', () => {
-    // Hide any visible tooltip - the hovered hex may disappear mid-zoom
-    // leaving no mouseout to clean it up. We hide rather than remove so the
-    // div stays alive in the hoverHandler's closure and can be reused on next hover.
+    // Hide any visible tooltip — the hovered hex may disappear mid-zoom,
+    // leaving no mouseout to clean it up.
     d3.selectAll('.hexbin-tooltip').style('visibility', 'hidden');
 
-    if (!isNil(hexLayer)) {
-      const zoom = map.getZoom();
+    const zoom = map.getZoom();
+    const shouldOffset = activeTypesRef.current.length > 1;
 
-      if (zoom >= heatOffZoomRef.current) {
-        // Above the threshold the heatmap must not be visible. Calling radiusRange/opacity
-        // on the hexLayer triggers an internal redraw with cached data, which would
-        // cause stale hexagons to reappear before the RAF-scheduled hexLayer.data([])
-        // has a chance to clear them. Synchronously clearing here prevents that.
-        if (rafRef.current) {
-          cancelAnimationFrame(rafRef.current);
-          rafRef.current = null;
+    LAYER_TYPES.forEach(type => {
+      const layer = layersRef.current[type];
+      if (isNil(layer)) return;
+
+      if (zoom >= getHeatOffZoom(type)) {
+        // Above the threshold: synchronously clear to prevent stale hexagons
+        // reappearing before any RAF-scheduled data update.
+        if (rafRefs.current[type]) {
+          cancelAnimationFrame(rafRefs.current[type]);
+          rafRefs.current[type] = null;
         }
-        hexLayer.data([]);
+        layer.data([]);
         return;
       }
 
       if (zoom > HEX_DETAILS_ZOOM) {
-        hexLayer
-          .radiusRange(HEX_DETAILS_RADIUS_RANGE)
-          .opacity(HEX_DETAILS_OPACITY);
+        layer.radiusRange(HEX_DETAILS_RADIUS_RANGE).opacity(HEX_DETAILS_OPACITY);
       } else {
-        hexLayer.radiusRange(HEX_RADIUS_RANGE).opacity(HEX_OPACITY);
+        layer.radiusRange(HEX_RADIUS_RANGE).opacity(HEX_OPACITY);
       }
-    }
+      applyLayerOffset(layer, type, shouldOffset);
+    });
   });
 
-  // Reset type cache when the hexLayer is (re)initialized.
-  useEffect(() => {
-    lastTypeRef.current = null;
-  }, [hexLayer]);
-
-  const updateHeatData = useCallback(
-    (newData, newType = type) => {
-      if (isNil(hexLayer)) return;
-
-      // colorRange and hoverHandler only need updating when the type switches.
-      // Skipping the D3 event re-registration on every pan saves work.
-      if (newType !== lastTypeRef.current) {
-        // Remove previous tooltip (avoid some bug)
-        d3.selectAll('.hexbin-tooltip').remove();
-        hexLayer
-          // eslint-disable-next-line no-nested-ternary
-          .colorRange(
-            newType === heatmapTypes.NETWORKS
-              ? NETWORK_HEAT_COLORS
-              : newType === heatmapTypes.MASSIFS
-              ? MASSIF_HEAT_COLORS
-              : ENTRANCE_HEAT_COLORS
-          )
-          .hoverHandler(
-            L.HexbinHoverHandler.compound({
-              handlers: [
-                L.HexbinHoverHandler.resizeFill(),
-                L.HexbinHoverHandler.tooltip({
-                  tooltipContent: nbr =>
-                    `${nbr.length} ${formatMessage({ id: newType })}`
-                })
-              ]
-            })
-          );
-        lastTypeRef.current = newType;
-      }
-
-      // Clear synchronously so stale hexagons cannot flash on-screen.
-      // For real data, coalesce rapid calls into a single frame.
-      if (!newData || newData.length === 0) {
-        if (rafRef.current) {
-          cancelAnimationFrame(rafRef.current);
-          rafRef.current = null;
-        }
-        hexLayer.data([]);
-        return;
-      }
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
-      rafRef.current = requestAnimationFrame(() => {
-        rafRef.current = null;
-        hexLayer.data(newData);
+  const flyToHex = useCallback(
+    (_, hexPoints) => {
+      if (isDraggingRef.current) return;
+      d3.selectAll('.hexbin-tooltip').attr('opacity', 0);
+      const bounds = new L.LatLngBounds(
+        hexPoints.map(point => [point.o[1], point.o[0]])
+      );
+      map.flyToBounds(bounds, {
+        maxZoom: MARKERS_LIMIT,
+        duration: HEX_FLY_TO_DURATION
       });
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [hexLayer]
+    [map]
   );
+
+  // Create all three hex layers once on mount.
+  // Panes are created first so each layer's SVG lands in its own pane with a fixed z-index,
+  // guaranteeing massifs always renders below entrances and networks regardless of redraw order.
+  useEffect(() => {
+    LAYER_PANE_CONFIG.forEach(({ pane, z }) => {
+      if (!map.getPane(pane)) map.createPane(pane).style.zIndex = z;
+    });
+
+    LAYER_PANE_CONFIG.forEach(({ type, pane }) => {
+      const layer = L.hexbinLayer({ ...HEX_LAYER_OPTIONS, pane }).addTo(map);
+
+      layer.colorScale(d3.scaleSqrt());
+      layer
+        .radiusRange(HEX_RADIUS_RANGE)
+        .lng(d => d[0])
+        .lat(d => d[1])
+        .colorValue(d => d.length)
+        .radiusValue(d => d.length)
+        .colorRange(COLOR_MAP[type])
+        .hoverHandler(
+          L.HexbinHoverHandler.compound({
+            handlers: [
+              L.HexbinHoverHandler.resizeFill(),
+              L.HexbinHoverHandler.tooltip({
+                tooltipContent: nbr =>
+                  `${nbr.length} ${formatMessageRef.current({ id: type })}`
+              })
+            ]
+          })
+        );
+
+      // flyToHex is stable (useCallback with [map], and map never changes in Leaflet),
+      // so registering it once at mount is safe — no need to re-register on re-renders.
+      layer.dispatch().on('click', flyToHex);
+      layer.data([]);
+      layersRef.current[type] = layer;
+    });
+
+    // Capture refs now — not DOM nodes so their values won't be nulled by React,
+    // but capturing satisfies the react-hooks/exhaustive-deps lint rule.
+    const rafs = rafRefs.current;
+    const layers = layersRef.current;
+    const dragTimer = dragEndTimerRef;
+    return () => {
+      LAYER_TYPES.forEach(type => {
+        if (rafs[type]) cancelAnimationFrame(rafs[type]);
+        if (layers[type]) {
+          layers[type].data([]);
+          map.removeLayer(layers[type]);
+        }
+      });
+      if (dragTimer.current) clearTimeout(dragTimer.current);
+      d3.selectAll('.hexbin-tooltip').remove();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useMapEvent('dragstart', () => {
     isDraggingRef.current = true;
   });
 
   useMapEvent('dragend', () => {
-    // Defer reset past the click event that may fire synchronously on the
-    // mouseup/touchend that ends the drag, preventing a spurious flyTo.
+    // Defer reset past the click event that fires on the mouseup ending the drag.
     dragEndTimerRef.current = setTimeout(() => {
       dragEndTimerRef.current = null;
       isDraggingRef.current = false;
     }, 0);
   });
 
-  const flyToHex = (_, hexPoints) => {
-    if (isDraggingRef.current) return;
+  /**
+   * Update which layers are visible and feed them data.
+   * @param {{ entrances, networks, massifs }} dataByType - arrays of [lng, lat] tuples
+   * @param {string[]} activeTypes - which types are currently active
+   */
+  // Empty deps: this callback only reads refs (layersRef, activeTypesRef, rafRefs),
+  // which are always up-to-date. No need to list them as dependencies.
+  const updateLayers = useCallback((dataByType, activeTypes) => {
+    activeTypesRef.current = activeTypes;
+    const shouldOffset = activeTypes.length > 1;
 
-    d3.selectAll('.hexbin-tooltip').attr('opacity', 0);
-    const bounds = new L.LatLngBounds(
-      hexPoints.map(point => [point.o[1], point.o[0]])
-    );
-    map.flyToBounds(bounds, {
-      maxZoom: MARKERS_LIMIT,
-      duration: HEX_FLY_TO_DURATION
+    LAYER_TYPES.forEach(type => {
+      const layer = layersRef.current[type];
+      if (isNil(layer)) return;
+
+      const data = activeTypes.includes(type) ? (dataByType[type] || []) : [];
+
+      layer.opacity(HEX_OPACITY);
+
+      if (data.length === 0) {
+        if (rafRefs.current[type]) {
+          cancelAnimationFrame(rafRefs.current[type]);
+          rafRefs.current[type] = null;
+        }
+        layer.data([]);
+        return;
+      }
+
+      if (rafRefs.current[type]) cancelAnimationFrame(rafRefs.current[type]);
+      rafRefs.current[type] = requestAnimationFrame(() => {
+        rafRefs.current[type] = null;
+        layer.data(data);
+        // Re-apply offset after data() triggers a full redraw.
+        applyLayerOffset(layer, type, shouldOffset);
+      });
     });
-  };
-
-  useEffect(() => {
-    // Add hex layer to the map
-    setHexLayer(L.hexbinLayer(HEX_LAYER_OPTIONS).addTo(map));
-    return () => {
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
-      if (dragEndTimerRef.current) clearTimeout(dragEndTimerRef.current);
-      // Remove tooltip
-      d3.selectAll('.hexbin-tooltip').remove();
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  useEffect(() => {
-    if (!isNil(hexLayer)) {
-      // Initialize Hex scaling with sqrt to amplify differences at low densities
-      hexLayer.colorScale(d3.scaleSqrt());
-
-      hexLayer
-        .radiusRange(HEX_RADIUS_RANGE)
-        .lng(d => d[0])
-        .lat(d => d[1])
-        .colorValue(d => d.length)
-        .radiusValue(d => d.length);
-
-      hexLayer.dispatch().on('click', flyToHex);
-
-      updateHeatData(data);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [hexLayer]);
-
-  return {
-    updateHeatData,
-    heatOffZoom
-  };
+  return { updateLayers };
 };
 
 export default useHeatLayer;

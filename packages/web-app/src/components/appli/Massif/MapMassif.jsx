@@ -14,7 +14,8 @@ import useMarkers, {
 import { EntrancePopup } from '../../common/Maps/common/Markers/Components';
 import {
   MASSIF_POLYGON_STYLE,
-  getEntranceCircleStyle
+  getEntranceCircleStyle,
+  MARKERS_LIMIT
 } from '../../common/Maps/MapClusters/constants';
 import { makeUrl } from '../../../actions/utils';
 import {
@@ -27,7 +28,7 @@ const entranceTip = entrance => entrance?.name;
 
 const MapInternals = ({ geoJson, massifId }) => {
   const map = useMap();
-  const { updateHeatData, heatOffZoom } = useHeatLayer();
+  const { updateLayers } = useHeatLayer();
 
   const updateEntranceMarkers = useMarkers({
     circleMarkerStyle: getEntranceCircleStyle,
@@ -36,12 +37,10 @@ const MapInternals = ({ geoJson, massifId }) => {
   });
 
   // Refs to latest updaters — keeps fetchMarkers free of their unstable identities.
-  const heatRef = useRef(updateHeatData);
-  heatRef.current = updateHeatData;
+  const updateLayersRef = useRef(updateLayers);
+  updateLayersRef.current = updateLayers;
   const markersRef = useRef(updateEntranceMarkers);
   markersRef.current = updateEntranceMarkers;
-  const heatOffZoomRef = useRef(heatOffZoom);
-  heatOffZoomRef.current = heatOffZoom;
 
   const heatCoordinatesRef = useRef([]);
   const abortRef = useRef(null);
@@ -59,13 +58,13 @@ const MapInternals = ({ geoJson, massifId }) => {
   // moveend: at high zoom fetch viewport markers; at low zoom restore heatmap from cache.
   const fetchMarkers = useCallback(() => {
     const zoom = map.getZoom();
-    if (zoom < heatOffZoomRef.current) {
+    if (zoom < MARKERS_LIMIT) {
       markersRef.current(null);
-      heatRef.current(heatCoordinatesRef.current);
+      updateLayersRef.current({ entrances: heatCoordinatesRef.current }, ['entrances']);
       return;
     }
 
-    heatRef.current([]);
+    updateLayersRef.current({}, []);
 
     if (abortRef.current) abortRef.current.abort();
     abortRef.current = new AbortController();

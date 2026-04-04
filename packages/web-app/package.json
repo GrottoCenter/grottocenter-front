@@ -21,6 +21,7 @@
     "@mui/styles": "^6.4.8",
     "@mui/x-date-pickers": "^8.27.2",
     "@react-leaflet/core": "3.0.0",
+    "@reactour/tour": "^3.8.0",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
     "@testing-library/user-event": "^14.6.1",
