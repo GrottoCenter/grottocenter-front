@@ -40,7 +40,7 @@ const MassifPolygons = ({ massifs = [] }) => {
       features: massifs
         .filter(m => m.geogPolygon)
         .map(m => ({ m, area: getBboxArea(m.geogPolygon) }))
-        .sort((a, b) => b.area - a.area)
+        .sort((a, b) => a.area - b.area)
         .map(({ m }) => ({
           type: 'Feature',
           geometry: m.geogPolygon,
@@ -78,6 +78,11 @@ const MassifPolygons = ({ massifs = [] }) => {
         });
       }
     }).addTo(map);
+
+    // Push all polygon paths behind entrance circles (same overlayPane SVG).
+    // Sorted smallest→largest above, so bringToBack in that order leaves
+    // the largest polygon first in the DOM = drawn behind smaller ones.
+    layerRef.current.eachLayer(l => l.bringToBack());
 
     return () => {
       if (layerRef.current) {

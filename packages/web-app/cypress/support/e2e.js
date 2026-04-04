@@ -16,5 +16,12 @@
 // Import commands.js using ES2015 syntax:
 import './commands';
 
+// Suppress guided tours across all tests.
+// Tours read localStorage on mount — pre-setting the key prevents them from auto-launching
+// and avoids overlay interference with Cypress selectors.
+beforeEach(() => {
+  localStorage.setItem('mapTourSeen_v1', 'true');
+});
+
 // Alternatively you can use CommonJS syntax:
 // require('./commands')

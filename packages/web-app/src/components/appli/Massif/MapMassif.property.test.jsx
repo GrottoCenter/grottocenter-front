@@ -6,7 +6,7 @@ import MapMassif from './MapMassif';
 
 // --- Mocks (same pattern as MapMassif.test.jsx) ---
 
-const mockUpdateHeatData = jest.fn();
+const mockUpdateLayers = jest.fn();
 const mockUpdateEntranceMarkers = jest.fn();
 
 jest.mock('react-leaflet', () => {
@@ -46,7 +46,7 @@ jest.mock('../../common/Maps/MapClusters/useHeatLayer', () => {
   const React = require('react');
   return {
     __esModule: true,
-    default: () => ({ updateHeatData: mockUpdateHeatData, heatOffZoom: 13 }),
+    default: () => ({ updateLayers: mockUpdateLayers }),
     HexGlobalCss: React.createElement('div')
   };
 });
@@ -80,7 +80,7 @@ const samplePolygon = JSON.stringify({
 });
 
 beforeEach(() => {
-  mockUpdateHeatData.mockClear();
+  mockUpdateLayers.mockClear();
   mockUpdateEntranceMarkers.mockClear();
 });
 
@@ -108,10 +108,10 @@ describe('MapMassif property tests', () => {
     )
   );
 
-  it('passes all fetched coordinates to updateHeatData', async () => {
+  it('passes all fetched coordinates to updateLayers for entrances', async () => {
     await fc.assert(
       fc.asyncProperty(coordArb, async coords => {
-        mockUpdateHeatData.mockClear();
+        mockUpdateLayers.mockClear();
         mockUpdateEntranceMarkers.mockClear();
 
         global.fetch = jest.fn().mockResolvedValue({
@@ -124,7 +124,7 @@ describe('MapMassif property tests', () => {
         );
 
         await waitFor(() => {
-          expect(mockUpdateHeatData).toHaveBeenCalledWith(coords);
+          expect(mockUpdateLayers).toHaveBeenCalledWith({ entrances: coords }, ['entrances']);
         });
 
         unmount();
