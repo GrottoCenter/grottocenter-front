@@ -36,7 +36,9 @@ const cellsRender = {
     return value;
   },
   keyArray: key => value =>
-    !value || !Array.isArray(value) ? null : value.map(e => e[key]).join(', ') || '-',
+    !value || !Array.isArray(value)
+      ? null
+      : value.map(e => e[key]).join(', ') || '-',
   translate: value => (!value ? null : <Translate>{value}</Translate>),
   ellipsis: value =>
     value && value.length > 60 ? `${value.substring(0, 60)}...` : value,
@@ -118,7 +120,8 @@ const entrances = {
     [false, 'cave.temperature', 'Temperature', true],
     [true, 'commentsRating.approach', 'Ease of reach', true],
     [true, 'commentsRating.caving', 'Ease of move', true],
-    [true, 'commentsRating.aestheticism', 'Aesthetic', true]
+    [true, 'commentsRating.aestheticism', 'Aesthetic', true],
+    [false, 'dateInscription', 'Creation date', true, cellsRender.date]
   ],
   link: doc => `/ui/entrances/${doc.id}`
 };
@@ -136,7 +139,14 @@ const documents = {
     [true, 'title', 'Title', true, cellsRender.ellipsis],
     [true, 'description', 'Description', false, cellsRender.ellipsis],
     [false, 'datePublication', 'Publication date', true],
-    [true, 'authors', 'Author', false, cellsRender.keyArray('nickname'), 'authors.nickname'],
+    [
+      true,
+      'authors',
+      'Author',
+      false,
+      cellsRender.keyArray('nickname'),
+      'authors.nickname'
+    ],
     [false, 'library.name', 'Library', true],
     [false, 'editor.name', 'Editor', true],
     [true, 'parent.title', 'Parent', true],
@@ -146,7 +156,14 @@ const documents = {
     [true, 'identifier', 'Identifier', true],
     [false, 'license', 'License', true],
     [false, 'subjects', 'Subjects', false, cellsRender.keyArray('code')],
-    [true, 'iso3166', 'Country / Region', false, cellsRender.keyArray('iso'), 'iso3166.iso'],
+    [
+      true,
+      'iso3166',
+      'Country / Region',
+      false,
+      cellsRender.keyArray('iso'),
+      'iso3166.iso'
+    ],
     [false, 'importSource', 'Import source', true],
     [false, 'importId', 'Import Id', true],
     [false, 'cave.name', 'Cave', true],

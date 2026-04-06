@@ -40,9 +40,13 @@ const SearchResults = ({ onSelected, hideExport, entityType }) => {
             }
           : null
       }
-      onCSVDownload={hideExport ? null : (columns, columnsName) => {
-        downloadAdvancedSearchResults({ ...queryParams, columns, columnsName });
-      }}
+      onCSVDownload={
+        hideExport
+          ? null
+          : (columns, columnsName) => {
+              downloadAdvancedSearchResults({ ...queryParams, columns, columnsName });
+            }
+      }
       onSelected={!onSelected ? null : ids => onSelected(ids, results)}
       onRowClick={onSelected ? () => false : null}
     />

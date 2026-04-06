@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { useDispatch } from 'react-redux';
 import { useIntl } from 'react-intl';
+import { Divider } from '@mui/material';
 import FixedContent from '../../common/Layouts/Fixed/FixedContent';
 import CustomIcon from '../../common/CustomIcon';
 import {
@@ -19,7 +20,7 @@ const ENTITY_ICON_TYPE = {
   persons: 'caver'
 };
 
-const EntitySearchPage = ({ title, entityType, children }) => {
+const EntitySearchPage = ({ title, subheader, entityType, children }) => {
   const dispatch = useDispatch();
   const { formatMessage } = useIntl();
   const iconType = ENTITY_ICON_TYPE[entityType] ?? 'entrance';
@@ -37,16 +38,13 @@ const EntitySearchPage = ({ title, entityType, children }) => {
 
   return (
     <FixedContent
-      icon={
-        <CustomIcon
-          type={iconType}
-        />
-      }
+      icon={<CustomIcon type={iconType} />}
       title={formatMessage({ id: title })}
+      subheader={subheader}
       content={
         <>
           {children}
-          <br />
+          <Divider sx={{ my: 2 }} />
           <SearchResults entityType={entityType} />
         </>
       }
@@ -56,6 +54,7 @@ const EntitySearchPage = ({ title, entityType, children }) => {
 
 EntitySearchPage.propTypes = {
   title: PropTypes.string.isRequired,
+  subheader: PropTypes.node,
   entityType: PropTypes.string.isRequired,
   children: PropTypes.node.isRequired
 };
