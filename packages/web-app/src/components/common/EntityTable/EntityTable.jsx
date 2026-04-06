@@ -7,6 +7,7 @@ import { styled } from '@mui/material/styles';
 
 import {
   Box,
+  Divider,
   IconButton,
   Button,
   Checkbox,
@@ -20,17 +21,20 @@ import {
   TableBody,
   TableSortLabel,
   TablePagination,
-  TableContainer
+  TableContainer,
+  Toolbar,
+  Tooltip,
+  Typography
 } from '@mui/material';
 
 import DescriptionIcon from '@mui/icons-material/Description';
 import ViewColumnIcon from '@mui/icons-material/ViewColumn';
 import CloseIcon from '@mui/icons-material/Close';
 import CheckIcon from '@mui/icons-material/Check';
+import SearchOffIcon from '@mui/icons-material/SearchOff';
 
 import entitiesConfig from './entitiesConfig';
 import { LoadingTableHead, LoadingTableBodyInner } from './LoadingTable';
-import Alert from '../Alert';
 import Translate from '../Translate';
 
 const DEFAULT_PAGE_SIZE_OPTIONS = [20, 100, 200];
@@ -114,7 +118,6 @@ const EntityTableHead = ({
             {onRequestSort && headCell[3] ? (
               <TableSortLabel
                 active={orderBy === headCell[1] && order}
-                hideSortIcon
                 direction={order || undefined}
                 onClick={event => onRequestSort(event, headCell[1])}>
                 <Translate>{headCell[2]}</Translate>
@@ -142,12 +145,13 @@ const VisibleColumnsMenu = ({ columns, setColumns, entityType }) => {
   const [anchorEl, setAnchorEl] = useState(null);
   return (
     <>
-      <IconButton
-        color="primary"
-        onClick={event => setAnchorEl(event.currentTarget)}
-        sx={{ marginRight: '1em' }}>
-        <ViewColumnIcon />
-      </IconButton>
+      <Tooltip title={formatMessage({ id: 'Change columns' })}>
+        <IconButton
+          color="primary"
+          onClick={event => setAnchorEl(event.currentTarget)}>
+          <ViewColumnIcon />
+        </IconButton>
+      </Tooltip>
       <Menu
         anchorEl={anchorEl}
         open={!!anchorEl}
@@ -186,6 +190,27 @@ VisibleColumnsMenu.propTypes = {
   setColumns: PropTypes.func.isRequired,
   entityType: PropTypes.string
 };
+
+const EmptyState = () => (
+  <Box
+    sx={{
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      py: 8,
+      gap: 1.5,
+      color: 'text.disabled'
+    }}>
+    <SearchOffIcon sx={{ fontSize: 56 }} />
+    <Typography variant="h6" color="text.secondary">
+      <Translate>No results</Translate>
+    </Typography>
+    <Typography variant="body2" color="text.disabled">
+      <Translate>Try adjusting your search or filters</Translate>
+    </Typography>
+  </Box>
+);
 
 const EntityTable = ({
   entityType,
@@ -336,19 +361,19 @@ const EntityTable = ({
 
   if (!pageRows) return null;
 
-  let TableContent;
-  if (pageRows.length === 0) {
-    TableContent = (
+  const visibleColumns = entityColumns.filter(e => e[0]);
+  const colSpan = visibleColumns.length + (onSelected ? 1 : 0);
+
+  const TableContent = pageRows.length === 0
+    ? (
       <TableRow>
-        <TableCell colSpan={entityColumns.filter(e => e[0]).length + (onSelected ? 1 : 0)}>
-          <Alert severity="info" title={formatMessage({ id: 'No results' })} />
+        <TableCell colSpan={colSpan} sx={{ border: 0, p: 0 }}>
+          <EmptyState />
         </TableCell>
       </TableRow>
-    );
-  } else {
-    TableContent = pageRows.map(doc => {
+    )
+    : pageRows.map(doc => {
       const isItemSelected = selected.includes(doc.id);
-
       return (
         <TableRow
           hover
@@ -367,21 +392,59 @@ const EntityTable = ({
               />
             </TableCell>
           )}
-
-          {entityColumns
-            .filter(e => e[0])
-            .map(column => (
-              <TableCell key={column[1]}>
-                {renderCell(doc, column[1], column[4])}
-              </TableCell>
-            ))}
+          {visibleColumns.map(column => (
+            <TableCell key={column[1]}>
+              {renderCell(doc, column[1], column[4])}
+            </TableCell>
+          ))}
         </TableRow>
       );
     });
-  }
 
   return (
     <Box sx={{ width: '100%' }}>
+      {!shouldHideFooter && (
+        <>
+          <Toolbar
+            disableGutters
+            variant="dense"
+            sx={{ display: 'flex', alignItems: 'center', gap: 0.5, minHeight: 48 }}>
+            {nbTotalRows != null && !isLoading && (
+              <Typography variant="body2" color="text.secondary" sx={{ mr: 'auto' }}>
+                {formatMessage({ id: 'results_count' }, { count: nbTotalRows })}
+              </Typography>
+            )}
+            <VisibleColumnsMenu
+              columns={entityColumns}
+              setColumns={setEntityColumns}
+              entityType={entityType}
+            />
+            {onCSVDownload &&
+              (nbTotalRows <= MAX_DOCUMENTS_TO_EXPORT_IN_CSV ? (
+                <Button
+                  variant="text"
+                  size="small"
+                  onClick={() => {
+                    const c = entityColumns.filter(e => e[0]);
+                    onCSVDownload(c.map(e => e[5] || e[1]), c.map(e => e[2]));
+                  }}
+                  startIcon={<DescriptionIcon />}>
+                  {!isMobile && <Translate>Export to CSV</Translate>}
+                </Button>
+              ) : (
+                <Tooltip title={formatMessage({ id: 'Export unavailable above 10000 results' })}>
+                  <span>
+                    <Button variant="text" size="small" disabled startIcon={<DescriptionIcon />}>
+                      {!isMobile && <Translate>Export to CSV</Translate>}
+                    </Button>
+                  </span>
+                </Tooltip>
+              ))}
+          </Toolbar>
+          <Divider />
+        </>
+      )}
+      {isLoading && <LinearProgress color="secondary" />}
       <TableContainer>
         <Table stickyHeader sx={{ minWidth: 750 }} size="small">
           {isLoading ? (
@@ -402,50 +465,19 @@ const EntityTable = ({
           </TableBody>
         </Table>
       </TableContainer>
-      {isLoading && <LinearProgress color="secondary" />}
-      {!shouldHideFooter && (
-        <Box
-          sx={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center'
-          }}>
-          <div>
-            <VisibleColumnsMenu
-              columns={entityColumns}
-              setColumns={setEntityColumns}
-              entityType={entityType}
-            />
-            {onCSVDownload && nbTotalRows <= MAX_DOCUMENTS_TO_EXPORT_IN_CSV && (
-              <Button
-                variant="text"
-                onClick={() => {
-                  const c = entityColumns.filter(e => e[0]);
-                  onCSVDownload(
-                    c.map(e => e[5] || e[1]),
-                    c.map(e => e[2])
-                  );
-                }}
-                startIcon={<DescriptionIcon />}>
-                <Translate>Export to CSV</Translate>
-              </Button>
-            )}
-          </div>
-          {onPageChange && (
-            <StyledTablePagination
-              rowsPerPageOptions={pageSizeOptions}
-              component="div"
-              count={nbTotalRows}
-              rowsPerPage={rowsPerPage}
-              page={page}
-              labelRowsPerPage={formatMessage({
-                id: isMobile ? 'Per page:' : 'Results per page:'
-              })}
-              onPageChange={handleChangePage}
-              onRowsPerPageChange={handleChangeRowsPerPage}
-            />
-          )}
-        </Box>
+      {!shouldHideFooter && onPageChange && (
+        <StyledTablePagination
+          rowsPerPageOptions={pageSizeOptions}
+          component="div"
+          count={nbTotalRows}
+          rowsPerPage={rowsPerPage}
+          page={page}
+          labelRowsPerPage={formatMessage({
+            id: isMobile ? 'Per page:' : 'Results per page:'
+          })}
+          onPageChange={handleChangePage}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+        />
       )}
     </Box>
   );

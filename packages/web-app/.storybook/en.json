@@ -1312,6 +1312,7 @@
   "restored": "restored",
   "Restricted access entrance": "Restricted access entrance",
   "Results per page:": "Results per page:",
+  "results_count": "{count, plural, =0 {No results} one {# result} other {# results}}",
   "Retry": "Retry",
   "Reunion": "Reunion",
   "Réunion": "Réunion",

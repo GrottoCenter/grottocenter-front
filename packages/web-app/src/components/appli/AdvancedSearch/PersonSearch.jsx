@@ -1,42 +1,44 @@
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
+import { useIntl } from 'react-intl';
+
 import {
   fetchAdvancedSearchResults,
   resetAdvancedSearchResults
 } from '../../../actions/Advancedsearch';
-import {
-  SearchForm,
-  SearchFormContainer,
-  SearchText,
-  SearchActionButtons
-} from './SearchElements';
+import { SearchForm, SearchActionButtons } from './SearchElements';
+import SearchInput from '../../common/SearchInput';
 import { ADVANCED_SEARCH_TYPES } from '../../../conf/config';
 import { getStoredRowsPerPage } from '../../common/EntityTable/EntityTable';
 
 const PersonSearch = () => {
   const dispatch = useDispatch();
+  const { formatMessage } = useIntl();
   const [query, setQuery] = useState('');
 
-  const startAdvancedsearch = () =>
+  const startAdvancedsearch = (overrideQuery) =>
     dispatch(
       fetchAdvancedSearchResults({
         entity: ADVANCED_SEARCH_TYPES.PERSONS,
-        query,
+        query: overrideQuery !== undefined ? overrideQuery : query,
         filter: { type: 'AUTHOR' },
         size: getStoredRowsPerPage()
       })
     );
 
   return (
-    <SearchForm title="Person search" onSubmit={() => startAdvancedsearch()}>
-      <SearchFormContainer style={{ justifyContent: 'flex-start' }}>
-        <SearchText label="Query" onChange={e => setQuery(e)} value={query} />
-      </SearchFormContainer>
+    <SearchForm onSubmit={() => startAdvancedsearch()}>
+      <SearchInput
+        onChange={e => setQuery(e)}
+        value={query}
+        placeholder={formatMessage({ id: 'Search for a person...' })}
+      />
 
       <SearchActionButtons
         onReset={() => {
-          dispatch(resetAdvancedSearchResults());
           setQuery('');
+          dispatch(resetAdvancedSearchResults());
+          startAdvancedsearch('');
         }}
       />
     </SearchForm>
