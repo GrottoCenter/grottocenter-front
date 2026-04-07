@@ -207,7 +207,7 @@ const EmptyState = () => (
       alignItems: 'center',
       justifyContent: 'center',
       py: 8,
-      gap: 1.5,
+      gap: '12px',
       color: 'text.disabled'
     }}>
     <SearchOffIcon sx={{ fontSize: 56 }} />
@@ -290,7 +290,8 @@ const EntityTable = ({
   onSortChange,
   onCSVDownload,
   isNewQuery = false,
-  shouldHideFooter = false
+  shouldHideFooter = false,
+  compact = false
 }) => {
   const { formatMessage } = useIntl();
   const navigate = useNavigate();
@@ -407,16 +408,24 @@ const EntityTable = ({
   };
 
   useEffect(() => {
-    const storageKey = `entityTable_${entityType}_columns`;
-    const stored = localStorage.getItem(storageKey);
-    let column = stored
-      ? applyColumnVisibility(entityConfig.columns, stored)
-      : entityConfig.columns;
+    let column;
+    if (compact) {
+      column = entityConfig.columns.map(col => ({
+        ...col,
+        visible: col.field === 'name'
+      }));
+    } else {
+      const storageKey = `entityTable_${entityType}_columns`;
+      const stored = localStorage.getItem(storageKey);
+      column = stored
+        ? applyColumnVisibility(entityConfig.columns, stored)
+        : entityConfig.columns;
+    }
 
     if (entityColumnsModifier) entityColumnsModifier(column);
     setEntityColumns(column);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [entityType]);
+  }, [entityType, compact]);
 
   useEffect(() => {
     if (!isNewQuery) return;
@@ -490,11 +499,13 @@ const EntityTable = ({
                 {formatMessage({ id: 'results_count' }, { count: nbTotalRows })}
               </Typography>
             )}
-            <VisibleColumnsMenu
-              columns={entityColumns}
-              setColumns={setEntityColumns}
-              entityType={entityType}
-            />
+            {!compact && (
+              <VisibleColumnsMenu
+                columns={entityColumns}
+                setColumns={setEntityColumns}
+                entityType={entityType}
+              />
+            )}
             {onCSVDownload &&
               (nbTotalRows <= MAX_DOCUMENTS_TO_EXPORT_IN_CSV ? (
                 <Button
@@ -531,8 +542,9 @@ const EntityTable = ({
         </>
       )}
       {isLoading && <LinearProgress color="secondary" />}
-      <TableContainer>
-        <Table stickyHeader sx={{ minWidth: 750 }} size="small">
+      <TableContainer
+        sx={compact ? { overflowX: 'auto', maxWidth: '100%' } : undefined}>
+        <Table stickyHeader sx={{ minWidth: compact ? 300 : 750 }} size="small">
           {isLoading ? (
             <LoadingTableHead />
           ) : (
@@ -600,7 +612,8 @@ EntityTable.propTypes = {
   onSortChange: PropTypes.func,
   onCSVDownload: PropTypes.func,
   isNewQuery: PropTypes.bool,
-  shouldHideFooter: PropTypes.bool
+  shouldHideFooter: PropTypes.bool,
+  compact: PropTypes.bool
 };
 
 export default EntityTable;

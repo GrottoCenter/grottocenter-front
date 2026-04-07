@@ -250,9 +250,7 @@ export const Entry = ({ isLoading, error, entrance }) => {
         )}
         {isLoading && (
           <Card sx={{ padding: 3 }}>
-            <Box style={{ display: 'flex', justifyContent: 'center' }}>
-              <Skeleton height={300} width={800} /> {/* Map Skeleton */}
-            </Box>
+            <Skeleton height={300} />
             <Skeleton height={80} />
             <Skeleton height={100} />
             <Skeleton height={150} />

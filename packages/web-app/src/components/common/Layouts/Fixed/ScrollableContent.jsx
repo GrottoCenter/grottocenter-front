@@ -6,6 +6,7 @@ import {
   Card as MuiCard,
   CardContent,
   CardHeader as MuiCardHeader,
+  Chip,
   Typography
 } from '@mui/material';
 import AnchorCopyButton, { AnchorHeadingWrapper } from '../../AnchorCopyButton';
@@ -34,7 +35,34 @@ const StyledCardContent = styled(CardContent)`
   }
 `;
 
-const ScrollableContent = ({ title, icon, content, anchorId, dense = false, subTitle = false, subheader }) => {
+const CountBadge = ({ count }) => (
+  <Chip
+    label={count}
+    size="small"
+    sx={{
+      ml: 1,
+      bgcolor: count > 0 ? 'primary.veryLight' : 'grey.200',
+      color: count > 0 ? 'primary.main' : 'text.secondary',
+      fontWeight: 600,
+      verticalAlign: 'middle'
+    }}
+  />
+);
+
+CountBadge.propTypes = {
+  count: PropTypes.number.isRequired
+};
+
+const ScrollableContent = ({
+  title,
+  count,
+  icon,
+  content,
+  anchorId,
+  dense = false,
+  subTitle = false,
+  subheader
+}) => {
   useAnchorScroll(anchorId);
 
   return (
@@ -50,10 +78,14 @@ const ScrollableContent = ({ title, icon, content, anchorId, dense = false, subT
               {anchorId ? (
                 <AnchorHeadingWrapper>
                   {title}
+                  {!isNil(count) && <CountBadge count={count} />}
                   <AnchorCopyButton anchorId={anchorId} />
                 </AnchorHeadingWrapper>
               ) : (
-                title
+                <>
+                  {title}
+                  {!isNil(count) && <CountBadge count={count} />}
+                </>
               )}
             </Typography>
             {!isNil(icon) && icon}
@@ -67,6 +99,7 @@ const ScrollableContent = ({ title, icon, content, anchorId, dense = false, subT
 
 ScrollableContent.propTypes = {
   title: PropTypes.oneOfType([PropTypes.string, PropTypes.node]).isRequired,
+  count: PropTypes.number,
   icon: PropTypes.node,
   content: PropTypes.node.isRequired,
   anchorId: PropTypes.string,

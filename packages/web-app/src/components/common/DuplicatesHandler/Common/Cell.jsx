@@ -21,10 +21,10 @@ export const RightCell = ({
   let iconColor;
   switch (severity) {
     case 'primary':
-      iconColor = theme.palette.successColor;
+      iconColor = theme.palette.success.main;
       break;
     case 'secondary':
-      iconColor = theme.palette.errorColor;
+      iconColor = theme.palette.error.main;
       break;
     default:
       iconColor = theme.palette.secondary.light;
@@ -86,10 +86,10 @@ export const LeftCell = ({
   let iconColor;
   switch (severity) {
     case 'primary':
-      iconColor = theme.palette.successColor;
+      iconColor = theme.palette.success.main;
       break;
     case 'secondary':
-      iconColor = theme.palette.errorColor;
+      iconColor = theme.palette.error.main;
       break;
     default:
       iconColor = theme.palette.secondary.light;

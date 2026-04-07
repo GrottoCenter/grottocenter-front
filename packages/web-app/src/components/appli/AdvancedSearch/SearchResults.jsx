@@ -7,7 +7,7 @@ import {
 } from '../../../actions/Advancedsearch';
 import EntityTable from '../../common/EntityTable/EntityTable';
 
-const SearchResults = ({ onSelected, hideExport, entityType }) => {
+const SearchResults = ({ onSelected, hideExport, entityType, compact }) => {
   const dispatch = useDispatch();
   const { isNewQuery, queryParams, isLoading, results, totalResults } =
     useSelector(state => state.advancedsearch);
@@ -49,6 +49,7 @@ const SearchResults = ({ onSelected, hideExport, entityType }) => {
       }
       onSelected={!onSelected ? null : ids => onSelected(ids, results)}
       onRowClick={onSelected ? () => false : null}
+      compact={compact}
     />
   );
 };
@@ -56,7 +57,8 @@ const SearchResults = ({ onSelected, hideExport, entityType }) => {
 SearchResults.propTypes = {
   onSelected: PropTypes.func,
   hideExport: PropTypes.bool,
-  entityType: PropTypes.string
+  entityType: PropTypes.string,
+  compact: PropTypes.bool
 };
 
 export default SearchResults;

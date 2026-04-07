@@ -26,7 +26,7 @@ export const RightCellCollection = ({
   const theme = useTheme();
 
   const getAdornementColor = value =>
-    value && value.id ? theme.palette.successColor : theme.palette.errorColor;
+    value && value.id ? theme.palette.success.main : theme.palette.error.main;
   return (
     <Grid container direction="column" alignItems="flex-end">
       <Grid
@@ -139,7 +139,7 @@ export const LeftCellCollection = ({
   const theme = useTheme();
 
   const getAdornementColor = value =>
-    value.id ? theme.palette.successColor : theme.palette.errorColor;
+    value.id ? theme.palette.success.main : theme.palette.error.main;
   return (
     <Grid container direction="column">
       <Grid

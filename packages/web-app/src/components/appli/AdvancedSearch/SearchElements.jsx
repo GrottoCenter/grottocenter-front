@@ -93,7 +93,7 @@ export const SearchFieldset = ({ title, children, isMultiline = false, container
       <Typography
         variant="overline"
         color="text.secondary"
-        sx={{ display: 'block', mb: 0.5, lineHeight: 1.8 }}>
+        sx={{ display: 'block', mb: '4px', lineHeight: 1.8 }}>
         <Translate>{title}</Translate>
       </Typography>
     )}
@@ -109,7 +109,7 @@ SearchFieldset.propTypes = {
 
 const StyledTextField = styled(TextField)(({ theme }) => ({
   flex: 1,
-  margin: theme.spacing(0.5),
+  margin: '4px',
   minWidth: '15rem',
   maxWidth: '30rem',
   '& .MuiOutlinedInput-root': {
@@ -505,7 +505,7 @@ export const SearchSelect = ({ label, optionDescription, options, value, onChang
       size="small"
       variant="outlined"
       sx={{
-        mx: 0.5,
+        mx: '4px',
         '& .MuiOutlinedInput-root': {
           borderRadius: 6,
           backgroundColor: 'action.hover',

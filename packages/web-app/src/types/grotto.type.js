@@ -20,6 +20,7 @@ export const GrottoFullPropTypes = PropTypes.shape({
   isDeleted: PropTypes.bool,
   address: PropTypes.string,
   mail: PropTypes.string,
+  url: PropTypes.string,
   customMessage: PropTypes.string,
   cavers: PropTypes.arrayOf(CaverPropTypes),
   city: PropTypes.string,
