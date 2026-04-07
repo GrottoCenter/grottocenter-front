@@ -1,71 +1,127 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { useSelector } from 'react-redux';
-import { Avatar, Box, ListItem, ListItemText, Typography } from '@mui/material';
+import { Box, Paper, Typography } from '@mui/material';
 import { Link } from 'react-router-dom';
-import { styled } from '@mui/material/styles';
 import { depthIcon, lengthIcon } from '../../../assets/icons';
+import CustomIcon from '../CustomIcon';
 
-const SmallAvatar = styled(Avatar)`
-  height: 2.5rem;
-  width: 2.5rem;
-`;
+const StatBadge = ({ src, alt, value }) => (
+  <Box sx={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+    <img src={src} alt={alt} style={{ height: 24, width: 24 }} />
+    <Typography variant="body2" color="text.secondary">
+      {value}
+    </Typography>
+  </Box>
+);
 
-const StyledListItemCave = styled(ListItem)`
-  align-items: flex-start;
-  display: flex;
-  flex-basis: 25%;
-  flex-direction: column;
-  min-width: 250px;
-`;
+StatBadge.propTypes = {
+  src: PropTypes.string.isRequired,
+  alt: PropTypes.string.isRequired,
+  value: PropTypes.string.isRequired
+};
 
-export const CaveListItem = ({ cave, itemActionButton }) => {
-  const { locale } = useSelector(state => state.intl);
+const CardLabel = ({ children }) => (
+  <Box sx={{ flex: 1, minWidth: 0, display: 'flex', alignItems: 'center' }}>
+    <Typography
+      variant="body1"
+      fontWeight={600}
+      sx={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+      {children}
+    </Typography>
+  </Box>
+);
 
-  return (
-    <StyledListItemCave dense>
-      <Box display="flex" alignItems="center">
-        <Link
-          to={`/ui/caves/${cave.id}`}
-          style={{ textDecoration: 'none', color: 'inherit' }}>
-          <ListItemText primary={cave.name} />
-        </Link>
-        {itemActionButton}
+CardLabel.propTypes = {
+  children: PropTypes.node.isRequired
+};
+
+// "remove-btn" is a CSS class selector used in cardPaperSx below to coordinate
+// hover visibility with the child Box in BaseCard. Renaming either breaks the reveal.
+const cardPaperSx = {
+  borderRadius: 2,
+  overflow: 'hidden',
+  bgcolor: 'grey.50',
+  transition: 'box-shadow 0.15s',
+  '@media (hover: hover)': {
+    '&:hover': { boxShadow: 3 },
+    '&:hover .remove-btn': { opacity: 1 }
+  },
+  '& .remove-btn': { opacity: 0, transition: 'opacity 0.15s' },
+  '&:focus-within .remove-btn': { opacity: 1 },
+  '@media (hover: none)': { '& .remove-btn': { opacity: 1 } }
+};
+
+const cardLinkSx = {
+  display: 'flex',
+  alignItems: 'stretch',
+  gap: '12px',
+  p: 2,
+  flex: 1,
+  minWidth: 0,
+  textDecoration: 'none',
+  color: 'inherit',
+  userSelect: 'none',
+  touchAction: 'manipulation',
+  WebkitTapHighlightColor: 'transparent'
+};
+
+const BaseCard = ({ to, icon, children, itemActionButton }) => (
+  <Paper variant="outlined" sx={cardPaperSx}>
+    <Box sx={{ display: 'flex', alignItems: 'stretch', minHeight: 72 }}>
+      <Box component={Link} to={to} sx={cardLinkSx}>
+        <Box sx={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>
+          {icon}
+        </Box>
+        {children}
       </Box>
-      {(cave.depth || cave.length) && (
-        <Box display="flex" flexDirection="row" alignItems="flex-start">
-          {cave.depth && (
-            <>
-              <SmallAvatar
-                alt="Cave depth icon"
-                src={depthIcon}
-                variant="square"
-              />
-              <Typography variant="caption">{`${cave.depth.toLocaleString(
-                locale
-              )}m`}</Typography>
-              &nbsp;
-            </>
-          )}
-          {cave.length && (
-            <>
-              <SmallAvatar
-                alt="Cave length icon"
-                src={lengthIcon}
-                variant="square"
-              />
-              <Typography variant="caption">{`${cave.length.toLocaleString(
-                locale
-              )}m`}</Typography>
-            </>
-          )}
+      {itemActionButton && (
+        <Box className="remove-btn" sx={{ display: 'flex', alignItems: 'center', pr: 1 }}>
+          {itemActionButton}
         </Box>
       )}
-    </StyledListItemCave>
+    </Box>
+  </Paper>
+);
+
+BaseCard.propTypes = {
+  to: PropTypes.string.isRequired,
+  icon: PropTypes.node.isRequired,
+  children: PropTypes.node.isRequired,
+  itemActionButton: PropTypes.node
+};
+
+export const CaveCard = ({ cave, itemActionButton }) => {
+  const locale = useSelector(state => state.intl.locale);
+
+  return (
+    <BaseCard
+      to={`/ui/caves/${cave.id}`}
+      icon={<CustomIcon type="network" size={32} />}
+      itemActionButton={itemActionButton}>
+      <Box sx={{ minWidth: 0, flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+        <Typography
+          variant="body1"
+          fontWeight={600}
+          sx={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', lineHeight: 1.3 }}>
+          {cave.name}
+        </Typography>
+        {(cave.depth || cave.length) && (
+          <Box sx={{ display: 'flex', gap: 2, mt: 1 }}>
+            {cave.depth && (
+              <StatBadge src={depthIcon} alt="depth" value={`${cave.depth.toLocaleString(locale)} m`} />
+            )}
+            {cave.length && (
+              <StatBadge src={lengthIcon} alt="length" value={`${cave.length.toLocaleString(locale)} m`} />
+            )}
+          </Box>
+        )}
+      </Box>
+    </BaseCard>
   );
 };
 
-CaveListItem.propTypes = {
+CaveCard.propTypes = {
   cave: PropTypes.shape({
     id: PropTypes.number,
     name: PropTypes.string,
@@ -75,33 +131,51 @@ CaveListItem.propTypes = {
   itemActionButton: PropTypes.node
 };
 
-const StyledListItemDefault = styled(ListItem)`
-  flex-basis: 25%;
-  min-width: 250px;
-`;
-
-export const DefaultListItem = ({
-  link,
-  label,
-  isMultiline = false,
-  itemActionButton
-}) => (
-  <StyledListItemDefault sx={{ display: 'flex', alignItems: 'center' }}>
-    <Link to={link} style={{ textDecoration: 'none', color: 'inherit' }}>
-      <ListItemText
-        primary={label}
-        primaryTypographyProps={
-          isMultiline ? { style: { whiteSpace: 'normal' } } : {}
-        }
-      />
-    </Link>
-    {itemActionButton}
-  </StyledListItemDefault>
+export const EntranceCard = ({ link, label, itemActionButton }) => (
+  <BaseCard
+    to={link}
+    icon={<CustomIcon type="entrance" size={32} />}
+    itemActionButton={itemActionButton}>
+    <CardLabel>{label}</CardLabel>
+  </BaseCard>
 );
 
-DefaultListItem.propTypes = {
+EntranceCard.propTypes = {
   link: PropTypes.string.isRequired,
-  label: PropTypes.string.isRequired,
-  isMultiline: PropTypes.bool,
+  label: PropTypes.node.isRequired,
+  itemActionButton: PropTypes.node
+};
+
+export const PersonCard = ({ person, itemActionButton }) => (
+  <BaseCard
+    to={`/ui/persons/${person.id}`}
+    icon={<CustomIcon type="caver" size={32} />}
+    itemActionButton={itemActionButton}>
+    <CardLabel>{person.nickname}</CardLabel>
+  </BaseCard>
+);
+
+PersonCard.propTypes = {
+  person: PropTypes.shape({
+    id: PropTypes.number,
+    nickname: PropTypes.string
+  }),
+  itemActionButton: PropTypes.node
+};
+
+export const OrganizationCard = ({ organization, itemActionButton }) => (
+  <BaseCard
+    to={`/ui/organizations/${organization.id}`}
+    icon={<CustomIcon type="organization" size={32} />}
+    itemActionButton={itemActionButton}>
+    <CardLabel>{organization.name}</CardLabel>
+  </BaseCard>
+);
+
+OrganizationCard.propTypes = {
+  organization: PropTypes.shape({
+    id: PropTypes.number,
+    name: PropTypes.string
+  }),
   itemActionButton: PropTypes.node
 };

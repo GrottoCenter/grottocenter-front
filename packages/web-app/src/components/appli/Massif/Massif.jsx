@@ -214,18 +214,19 @@ const Massif = ({ isLoading, error, massif }) => {
                 id: 'Discover the numbers about this massif and its caves.'
               })}
             />
-            <Documents
-              documents={massif?.documents ?? []}
-              massifId={massifId}
-            />
             {massif?.networks?.length > 0 && (
               <ScrollableContent
                 dense
                 anchorId="networks"
                 title={formatMessage({ id: 'Networks list' })}
-                content={<EntitiesList type="cave" entites={massif.networks} />}
+                count={massif.networks.length}
+                content={<EntitiesList type="cave" entities={massif.networks} />}
               />
             )}
+            <Documents
+              documents={massif?.documents ?? []}
+              massifId={massifId}
+            />
           </>
         )}
       </FixedLayout>

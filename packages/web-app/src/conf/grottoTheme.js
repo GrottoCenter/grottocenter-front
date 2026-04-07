@@ -1,9 +1,5 @@
 import { brown, blue, orange, grey } from '@mui/material/colors';
-import {
-  createTheme,
-  alpha,
-  responsiveFontSizes
-} from '@mui/material/styles';
+import { createTheme, alpha, responsiveFontSizes } from '@mui/material/styles';
 import { isMobile } from 'react-device-detect';
 
 const fontFamily = [
@@ -85,9 +81,7 @@ export const overridings = {
     fullBlack: '#000000',
     secondaryBlocTitle: '#FFFFFF',
     blackShadow: alpha('#000000', 0.117647),
-    backgroundButton: '#FFFFFF',
-    errorColor: '#ff2020',
-    successColor: '#49dd3b'
+    backgroundButton: '#FFFFFF'
   },
   shape: {
     borderRadius: '4px'

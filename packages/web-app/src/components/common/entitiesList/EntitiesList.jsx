@@ -1,116 +1,82 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
-import { List, Typography, Tooltip, IconButton } from '@mui/material';
-import { styled } from '@mui/material/styles';
+import { Box, Tooltip, IconButton } from '@mui/material';
 
 import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
-import { CaveListItem, DefaultListItem } from './EntitiesListItem';
-
-const StyledList = styled(List)({
-  display: 'flex',
-  flexWrap: 'wrap',
-  width: '100%'
-});
+import {
+  CaveCard,
+  EntranceCard,
+  OrganizationCard,
+  PersonCard
+} from './EntitiesListItem';
 
 const EntitiesList = ({
   type,
-  entites = [],
-  title,
-  actionButton,
+  entities = [],
   onItemRemove,
   emptyMessage = null,
-  hasDivider = false,
   toolTipTitle = 'Remove'
 }) => {
   const { formatMessage } = useIntl();
-  if (!emptyMessage && (!entites || entites.length === 0)) return null;
+  const compareKey = type === 'person' ? 'nickname' : 'name';
+  const sorted = useMemo(
+    () => entities.slice().sort((a, b) => (a[compareKey] ?? '').localeCompare(b[compareKey] ?? '')),
+    [entities, compareKey]
+  );
 
-  let listItemProps = () => ({});
-  let compareKey = 'name';
-  let ListItemComponent = DefaultListItem;
-  let itemAction = () => null;
-    if (onItemRemove) {
-      itemAction = e => (
-        <Tooltip title={toolTipTitle}>
+  if (!emptyMessage && entities.length === 0) return null;
+
+  const itemAction = onItemRemove
+    ? e => (
+        <Tooltip title={toolTipTitle} disableTouchListener>
           <IconButton
-            size="small"
             onClick={() => onItemRemove(e.id)}
-            color="error">
-            <RemoveCircleIcon fontSize="small" />
+            color="error"
+            sx={{ touchAction: 'manipulation' }}>
+            <RemoveCircleIcon />
           </IconButton>
         </Tooltip>
-      );
-    }
-  if (type === 'cave') {
-    ListItemComponent = CaveListItem;
-    listItemProps = e => ({ cave: e, itemActionButton: itemAction(e) });
-  } else if (type === 'person') {
-    compareKey = 'nickname';
-    listItemProps = e => ({
-      link: `/ui/persons/${e.id}`,
-      label: e.nickname,
-      itemActionButton: itemAction(e)
-    });
-  } else if (type === 'entrance') {
-    listItemProps = e => ({
-      link: `/ui/entrances/${e.id}`,
-      label: e.name ?? <i>{formatMessage({ id: 'no name' })}</i>,
-      isMultiline: true,
-      itemActionButton: itemAction(e)
-    });
-  } else if (type === 'organization') {
-    listItemProps = e => ({
-      link: `/ui/organizations/${e.id}`,
-      label: e.name,
-      isMultiline: true,
-      itemActionButton: itemAction(e)
-    });
-  }
-  // For documents use the <DocumentsList> elements
+      )
+    : () => null;
 
-  return (
-    <>
-      {(title || actionButton) && (
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center'
-          }}>
-          {title && (
-            <Typography variant="h3" gutterBottom>
-              {title}
-            </Typography>
-          )}
-          {actionButton}
-        </div>
-      )}
-      {entites && entites.length > 0 ? (
-        <StyledList>
-          {entites
-            .sort((a, b) => a[compareKey].localeCompare(b[compareKey]))
-            .map(e => (
-              <ListItemComponent key={e.id} {...listItemProps(e)} />
-            ))}
-        </StyledList>
-      ) : (
-        emptyMessage
-      )}
-      {hasDivider && <hr />}
-    </>
+  const cardConfig = {
+    cave: { Component: CaveCard, props: e => ({ cave: e, itemActionButton: itemAction(e) }) },
+    person: { Component: PersonCard, props: e => ({ person: e, itemActionButton: itemAction(e) }) },
+    entrance: {
+      Component: EntranceCard,
+      props: e => ({
+        link: `/ui/entrances/${e.id}`,
+        label: e.name ?? <i>{formatMessage({ id: 'no name' })}</i>,
+        itemActionButton: itemAction(e)
+      })
+    },
+    organization: { Component: OrganizationCard, props: e => ({ organization: e, itemActionButton: itemAction(e) }) }
+  };
+  const { Component: ListItemComponent, props: listItemProps } = cardConfig[type];
+
+  return entities.length > 0 ? (
+    <Box
+      sx={{
+        display: 'grid',
+        gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(3, 1fr)' },
+        gap: { xs: 2, md: 3 }
+      }}>
+      {sorted.map(e => (
+        <ListItemComponent key={e.id} {...listItemProps(e)} />
+      ))}
+    </Box>
+  ) : (
+    emptyMessage
   );
 };
 
 EntitiesList.propTypes = {
-  entites: PropTypes.arrayOf(PropTypes.shape({})),
+  entities: PropTypes.arrayOf(PropTypes.shape({})),
   type: PropTypes.oneOf(['cave', 'person', 'entrance', 'organization']),
-  title: PropTypes.node,
   emptyMessage: PropTypes.node,
-  hasDivider: PropTypes.bool,
   toolTipTitle: PropTypes.string,
-  actionButton: PropTypes.node,
-  onItemRemove: PropTypes.func,
+  onItemRemove: PropTypes.func
 };
 
 export default EntitiesList;

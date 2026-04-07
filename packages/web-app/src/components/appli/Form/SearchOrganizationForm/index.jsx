@@ -9,15 +9,15 @@ import {
   resetAdvancedSearchResults
 } from '../../../../actions/Advancedsearch';
 import { ADVANCED_SEARCH_TYPES } from '../../../../conf/config';
-import EntrancesSearch from '../../AdvancedSearch/EntrancesSearch';
+import OrganizationsSearch from '../../AdvancedSearch/OrganizationsSearch';
 import SearchResults from '../../AdvancedSearch/SearchResults';
 
-const SearchCaveForm = ({ onSubmit }) => {
+const SearchOrganizationForm = ({ onSubmit }) => {
   const dispatch = useDispatch();
   const { formatMessage } = useIntl();
-  const [selectedEntrances, setSelectedEntrances] = useState([]);
+  const [selectedOrganizations, setSelectedOrganizations] = useState([]);
 
-  const startAdvancedsearch = (formValues, resourceType) => {
+  const startAdvancedSearch = (formValues, resourceType) => {
     dispatch(fetchAdvancedSearchResults(formValues, resourceType));
   };
 
@@ -27,43 +27,42 @@ const SearchCaveForm = ({ onSubmit }) => {
 
   const resetForm = () => {
     resetAdvancedSearch();
-    setSelectedEntrances([]);
+    setSelectedOrganizations([]);
   };
 
   const handleSelection = (ids, results) => {
-    const selectedResults = results.filter(r => ids.includes(r.id));
-    setSelectedEntrances(selectedResults);
+    setSelectedOrganizations(results.filter(r => ids.includes(r.id)));
   };
 
   const handleOnSubmit = () => {
-    onSubmit(selectedEntrances);
+    onSubmit(selectedOrganizations);
     resetForm();
   };
 
   return (
     <Box>
-      <EntrancesSearch
-        startAdvancedsearch={startAdvancedsearch}
-        resourceType={ADVANCED_SEARCH_TYPES.ENTRANCES}
+      <OrganizationsSearch
+        startAdvancedsearch={startAdvancedSearch}
+        resourceType={ADVANCED_SEARCH_TYPES.ORGANIZATIONS}
         resetResults={resetAdvancedSearch}
       />
-      <SearchResults onSelected={handleSelection} hideExport compact entityType={ADVANCED_SEARCH_TYPES.ENTRANCES} />
+      <SearchResults onSelected={handleSelection} hideExport compact entityType={ADVANCED_SEARCH_TYPES.ORGANIZATIONS} />
       <Box sx={{ mt: 2, mb: 3, textAlign: 'center' }}>
         <Button
-          disabled={selectedEntrances.length === 0}
+          disabled={selectedOrganizations.length === 0}
           color="primary"
           variant="contained"
           type="submit"
           onClick={handleOnSubmit}>
-          {formatMessage({ id: 'Associate' })}
+          {formatMessage({ id: 'Join' })}
         </Button>
       </Box>
     </Box>
   );
 };
 
-SearchCaveForm.propTypes = {
+SearchOrganizationForm.propTypes = {
   onSubmit: PropTypes.func.isRequired
 };
 
-export default SearchCaveForm;
+export default SearchOrganizationForm;

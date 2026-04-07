@@ -241,9 +241,9 @@ const ImageLightbox = ({
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          mt: 0.25,
+          mt: '2px',
           px: 2,
-          py: 0.25,
+          py: '2px',
           minHeight: '24px'
         }}
       >

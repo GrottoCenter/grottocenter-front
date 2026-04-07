@@ -58,7 +58,7 @@ const PolygonLayersList = ({
               alignItems: 'center',
               justifyContent: 'space-between',
               lineHeight: '32px',
-              py: 0.5
+              py: '4px'
             }}
           >
             <Typography variant="caption" sx={{ fontWeight: 'bold' }}>
@@ -68,8 +68,8 @@ const PolygonLayersList = ({
               sx={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: 0.5,
-                pr: 0.5
+                gap: '4px',
+                pr: '4px'
               }}
             >
               <Typography variant="caption" sx={{ fontWeight: 'bold' }}>

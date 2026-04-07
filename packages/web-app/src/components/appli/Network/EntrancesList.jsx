@@ -118,7 +118,8 @@ const EntrancesList = ({
       <Box sx={{ height: '100%', overflow: 'auto' }}>
         <Paper variant="outlined" sx={{ p: 2, borderRadius: 2, bgcolor: 'grey.50' }}>
           <InfoSection
-            title={`${formatMessage({ id: 'Entrances' })}${entrances?.length > 0 ? ` (${entrances.length})` : ''}`}>
+            title={formatMessage({ id: 'Entrances' })}>
+
             {listContent}
           </InfoSection>
         </Paper>

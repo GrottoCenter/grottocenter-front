@@ -352,7 +352,7 @@ const Properties = ({ isLoading = false, entrance, dataQuality }) => {
                     sx={{
                       display: 'flex',
                       alignItems: 'center',
-                      gap: 0.5,
+                      gap: '4px',
                       cursor: 'pointer',
                       color: 'text.secondary',
                       ml: 'auto',
@@ -378,8 +378,8 @@ const Properties = ({ isLoading = false, entrance, dataQuality }) => {
                       display: 'grid',
                       gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)' },
                       columnGap: 3,
-                      rowGap: 0.5,
-                      pt: 0.5
+                      rowGap: '4px',
+                      pt: '4px'
                     }}>
                     {CATEGORY_KEYS.map(({ key, label }) => {
                       const score = dataQuality.categories[key];

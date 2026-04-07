@@ -24,7 +24,7 @@ const LabelAdornment = () => {
       <List dense disablePadding>
         <ListItem dense>
           <ListItemIcon>
-            <ErrorOutlineIcon style={{ color: theme.palette.successColor }} />
+            <ErrorOutlineIcon style={{ color: theme.palette.success.main }} />
           </ListItemIcon>
           <ListItemText
             primary={formatMessage({
@@ -34,7 +34,7 @@ const LabelAdornment = () => {
         </ListItem>
         <ListItem>
           <ListItemIcon>
-            <ErrorOutlineIcon style={{ color: theme.palette.errorColor }} />
+            <ErrorOutlineIcon style={{ color: theme.palette.error.main }} />
           </ListItemIcon>
           <ListItemText
             primary={formatMessage({

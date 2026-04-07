@@ -75,6 +75,7 @@ const FixedContent = ({
   avatar,
   subheader,
   title,
+  titleAdornment,
   icon,
   content,
   footer,
@@ -252,6 +253,7 @@ const FixedContent = ({
               <Typography variant="h1" color="secondary">
                 {title}
               </Typography>
+              {titleAdornment}
             </Title>
           ) : (
             <Skeleton />
@@ -296,6 +298,7 @@ FixedContent.propTypes = {
   onChangeSubscribe: PropTypes.func,
   subheader: PropTypes.node,
   title: PropTypes.oneOfType([PropTypes.node, PropTypes.string]),
+  titleAdornment: PropTypes.node,
   displayShare: PropTypes.bool
 };
 

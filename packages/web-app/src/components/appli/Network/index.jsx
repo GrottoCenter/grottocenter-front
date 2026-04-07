@@ -240,9 +240,7 @@ export const Network = ({ isLoading, error, cave }) => {
         )}
         {isLoading && (
           <Card sx={{ padding: 3 }}>
-            <Box style={{ display: 'flex', justifyContent: 'center' }}>
-              <Skeleton height={300} width={800} /> {/* Map Skeleton */}
-            </Box>
+            <Skeleton height={300} />
             <Skeleton height={100} /> {/* EntranceList Skeleton */}
             <Skeleton height={100} /> {/* Description Skeleton */}
           </Card>
