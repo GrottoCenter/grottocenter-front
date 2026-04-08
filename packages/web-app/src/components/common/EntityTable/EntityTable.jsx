@@ -22,6 +22,7 @@ import {
   TableSortLabel,
   TablePagination,
   TableContainer,
+  TextField,
   Toolbar,
   Tooltip,
   Typography
@@ -40,29 +41,33 @@ import Translate from '../Translate';
 const DEFAULT_PAGE_SIZE_OPTIONS = [20, 100, 200];
 const MAX_DOCUMENTS_TO_EXPORT_IN_CSV = 10000; // This limit is also enforced server side
 
-// Derive the whitelist of sortable fields from entitiesConfig so there is a single
-// source of truth.  col[3] is the sortable flag, col[5] ?? col[1] is the API field name.
-const ALLOWED_SORT_FIELDS = Object.fromEntries(
-  Object.entries(entitiesConfig).map(([type, config]) => [
-    type,
-    new Set(config.columns.filter(col => col[3]).map(col => col[5] ?? col[1]))
-  ])
+// Maps display field -> API sort field for sortable columns, per entity type.
+// Entity types with no sortable columns are excluded.
+const SORT_FIELD_MAP = Object.fromEntries(
+  Object.entries(entitiesConfig)
+    .map(([type, config]) => [
+      type,
+      Object.fromEntries(
+        config.columns
+          .filter(col => col.sortable)
+          .map(col => [col.field, col.apiField ?? col.field])
+      )
+    ])
+    .filter(([, map]) => Object.keys(map).length > 0)
 );
 
 const applyColumnVisibility = (columns, storedVisibility) => {
   try {
-    const visibleColumns = JSON.parse(storedVisibility);
-    return columns.map(col => {
-      const newCol = [...col];
-      newCol[0] = visibleColumns.includes(col[1]);
-      return newCol;
-    });
+    const visibleFields = JSON.parse(storedVisibility);
+    return columns.map(col => ({ ...col, visible: visibleFields.includes(col.field) }));
   } catch (e) {
     return columns;
   }
 };
 
-export const getStoredRowsPerPage = (pageSizeOptions = DEFAULT_PAGE_SIZE_OPTIONS) => {
+export const getStoredRowsPerPage = (
+  pageSizeOptions = DEFAULT_PAGE_SIZE_OPTIONS
+) => {
   const stored = localStorage.getItem('entityTable_rowsPerPage');
   if (stored) {
     const value = parseInt(stored, 10);
@@ -110,20 +115,20 @@ const EntityTableHead = ({
         </TableCell>
       )}
       {columns
-        .filter(e => e[0])
+        .filter(e => e.visible)
         .map(headCell => (
           <TableCell
-            key={headCell[1]}
-            sortDirection={orderBy === headCell[1] ? order : false}>
-            {onRequestSort && headCell[3] ? (
+            key={headCell.field}
+            sortDirection={orderBy === headCell.field ? order : false}>
+            {onRequestSort && headCell.sortable ? (
               <TableSortLabel
-                active={orderBy === headCell[1] && order}
+                active={orderBy === headCell.field && order}
                 direction={order || undefined}
-                onClick={event => onRequestSort(event, headCell[1])}>
-                <Translate>{headCell[2]}</Translate>
+                onClick={event => onRequestSort(event, headCell.field)}>
+                <Translate>{headCell.label}</Translate>
               </TableSortLabel>
             ) : (
-              <Translate>{headCell[2]}</Translate>
+              <Translate>{headCell.label}</Translate>
             )}
           </TableCell>
         ))}
@@ -131,7 +136,7 @@ const EntityTableHead = ({
   </TableHead>
 );
 EntityTableHead.propTypes = {
-  columns: PropTypes.arrayOf(PropTypes.array),
+  columns: PropTypes.arrayOf(PropTypes.shape({})),
   numSelected: PropTypes.number.isRequired,
   onRequestSort: PropTypes.func.isRequired,
   onSelectAllClick: PropTypes.func,
@@ -161,24 +166,27 @@ const VisibleColumnsMenu = ({ columns, setColumns, entityType }) => {
         </MenuItem>
         {columns.map(column => (
           <MenuItem
-            key={column[1]}
+            key={column.field}
             onClick={() => {
-              column[0] = !column[0]; // eslint-disable-line no-param-reassign
-              const newColumns = [...columns];
+              const newColumns = columns.map(c =>
+                c === column ? { ...c, visible: !c.visible } : c
+              );
               setColumns(newColumns);
               if (entityType) {
                 const storageKey = `entityTable_${entityType}_columns`;
-                const visibleColumns = newColumns.filter(col => col[0]).map(col => col[1]);
-                localStorage.setItem(storageKey, JSON.stringify(visibleColumns));
+                const visibleFields = newColumns
+                  .filter(col => col.visible)
+                  .map(col => col.field);
+                localStorage.setItem(storageKey, JSON.stringify(visibleFields));
               }
             }}>
             <Checkbox
               size="small"
-              checked={column[0]}
+              checked={column.visible}
               onChange={() => {}}
-              name={column[1]}
+              name={column.field}
             />
-            <Translate>{column[2]}</Translate>
+            <Translate>{column.label}</Translate>
           </MenuItem>
         ))}
       </Menu>
@@ -186,7 +194,7 @@ const VisibleColumnsMenu = ({ columns, setColumns, entityType }) => {
   );
 };
 VisibleColumnsMenu.propTypes = {
-  columns: PropTypes.arrayOf(PropTypes.array).isRequired,
+  columns: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   setColumns: PropTypes.func.isRequired,
   entityType: PropTypes.string
 };
@@ -212,6 +220,63 @@ const EmptyState = () => (
   </Box>
 );
 
+const JumpToPage = ({ page, count, rowsPerPage, onPageChange }) => {
+  const { formatMessage } = useIntl();
+  const totalPages = Math.max(1, Math.ceil(count / rowsPerPage));
+  const [inputValue, setInputValue] = useState(String(page + 1));
+  const [pending, setPending] = useState(false);
+
+  useEffect(() => {
+    setInputValue(String(Math.min(page + 1, totalPages)));
+    setPending(false);
+  }, [page, totalPages]);
+
+  const commit = value => {
+    if (pending) return;
+    const parsed = parseInt(value, 10);
+    if (/^\d+$/.test(value) && parsed >= 1 && parsed <= totalPages) {
+      setPending(true);
+      onPageChange(null, parsed - 1);
+    } else {
+      setInputValue(String(page + 1));
+    }
+  };
+
+  return (
+    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, px: 2 }}>
+      <Typography variant="body2" noWrap>
+        <Translate>Go to page</Translate>
+      </Typography>
+      <TextField
+        size="small"
+        disabled={pending}
+        value={inputValue}
+        onChange={e => setInputValue(e.target.value)}
+        onBlur={e => commit(e.target.value)}
+        onKeyDown={e => {
+          if (e.key === 'Enter') commit(e.target.value);
+        }}
+        slotProps={{
+          htmlInput: {
+            inputMode: 'numeric',
+            pattern: '[0-9]*',
+            style: { textAlign: 'center', padding: '2px 6px' },
+            'aria-label': formatMessage({ id: 'Go to page' })
+          }
+        }}
+        sx={{ width: 56, '& input': { fontSize: theme => theme.typography.body2.fontSize } }}
+      />
+      <Typography variant="body2">/ {totalPages}</Typography>
+    </Box>
+  );
+};
+JumpToPage.propTypes = {
+  page: PropTypes.number.isRequired,
+  count: PropTypes.number.isRequired,
+  rowsPerPage: PropTypes.number.isRequired,
+  onPageChange: PropTypes.func.isRequired
+};
+
 const EntityTable = ({
   entityType,
   entityColumnsModifier,
@@ -229,7 +294,6 @@ const EntityTable = ({
 }) => {
   const { formatMessage } = useIntl();
   const navigate = useNavigate();
-
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(() =>
     getStoredRowsPerPage(pageSizeOptions)
@@ -298,12 +362,15 @@ const EntityTable = ({
   };
 
   const handleRequestSort = (event, property) => {
-    const allowedFields = ALLOWED_SORT_FIELDS[entityType];
-    if (!allowedFields || !allowedFields.has(property)) {
+    const fieldMap = SORT_FIELD_MAP[entityType];
+    if (!fieldMap || !(property in fieldMap)) {
       // eslint-disable-next-line no-console
-      console.warn(`Sort blocked: field "${property}" is not allowed for entity type "${entityType}"`);
+      console.warn(
+        `Sort blocked: field "${property}" is not allowed for entity type "${entityType}"`
+      );
       return;
     }
+    const apiField = fieldMap[property];
 
     if (orderBy === property) {
       let newOrder = 'asc';
@@ -311,13 +378,13 @@ const EntityTable = ({
       else if (order === 'desc') newOrder = '';
       setOrder(newOrder);
       if (onSortChange) {
-        if (newOrder) onSortChange(`${orderBy}:${newOrder}`);
-        else onSortChange(``);
+        if (newOrder) onSortChange(`${apiField}:${newOrder}`);
+        else onSortChange('');
       }
     } else {
       setOrderBy(property);
       setOrder('asc');
-      if (onSortChange) onSortChange(`${property}:asc`);
+      if (onSortChange) onSortChange(`${apiField}:asc`);
     }
   };
 
@@ -345,7 +412,7 @@ const EntityTable = ({
     let column = stored
       ? applyColumnVisibility(entityConfig.columns, stored)
       : entityConfig.columns;
-    
+
     if (entityColumnsModifier) entityColumnsModifier(column);
     setEntityColumns(column);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -361,45 +428,46 @@ const EntityTable = ({
 
   if (!pageRows) return null;
 
-  const visibleColumns = entityColumns.filter(e => e[0]);
+  const visibleColumns = entityColumns.filter(e => e.visible);
   const colSpan = visibleColumns.length + (onSelected ? 1 : 0);
 
-  const TableContent = pageRows.length === 0
-    ? (
+  const TableContent =
+    pageRows.length === 0 ? (
       <TableRow>
         <TableCell colSpan={colSpan} sx={{ border: 0, p: 0 }}>
           <EmptyState />
         </TableCell>
       </TableRow>
-    )
-    : pageRows.map(doc => {
-      const isItemSelected = selected.includes(doc.id);
-      return (
-        <TableRow
-          hover
-          onClick={event => handleRowClick(event, doc)}
-          role="checkbox"
-          tabIndex={-1}
-          key={doc.id}
-          selected={isItemSelected}
-          sx={{ cursor: 'pointer' }}>
-          {onSelected && (
-            <TableCell padding="checkbox">
-              <Checkbox
-                color="primary"
-                checked={isItemSelected}
-                onClick={event => handleRowSelect(event, doc)}
-              />
-            </TableCell>
-          )}
-          {visibleColumns.map(column => (
-            <TableCell key={column[1]}>
-              {renderCell(doc, column[1], column[4])}
-            </TableCell>
-          ))}
-        </TableRow>
-      );
-    });
+    ) : (
+      pageRows.map(doc => {
+        const isItemSelected = selected.includes(doc.id);
+        return (
+          <TableRow
+            hover
+            onClick={event => handleRowClick(event, doc)}
+            role="checkbox"
+            tabIndex={-1}
+            key={doc.id}
+            selected={isItemSelected}
+            sx={{ cursor: 'pointer' }}>
+            {onSelected && (
+              <TableCell padding="checkbox">
+                <Checkbox
+                  color="primary"
+                  checked={isItemSelected}
+                  onClick={event => handleRowSelect(event, doc)}
+                />
+              </TableCell>
+            )}
+            {visibleColumns.map(column => (
+              <TableCell key={column.field}>
+                {renderCell(doc, column.field, column.render)}
+              </TableCell>
+            ))}
+          </TableRow>
+        );
+      })
+    );
 
   return (
     <Box sx={{ width: '100%' }}>
@@ -408,9 +476,17 @@ const EntityTable = ({
           <Toolbar
             disableGutters
             variant="dense"
-            sx={{ display: 'flex', alignItems: 'center', gap: 0.5, minHeight: 48 }}>
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 0.5,
+              minHeight: 48
+            }}>
             {nbTotalRows != null && !isLoading && (
-              <Typography variant="body2" color="text.secondary" sx={{ mr: 'auto' }}>
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                sx={{ mr: 'auto' }}>
                 {formatMessage({ id: 'results_count' }, { count: nbTotalRows })}
               </Typography>
             )}
@@ -425,16 +501,26 @@ const EntityTable = ({
                   variant="text"
                   size="small"
                   onClick={() => {
-                    const c = entityColumns.filter(e => e[0]);
-                    onCSVDownload(c.map(e => e[5] || e[1]), c.map(e => e[2]));
+                    const c = entityColumns.filter(e => e.visible);
+                    onCSVDownload(
+                      c.map(e => e.apiField || e.field),
+                      c.map(e => e.label)
+                    );
                   }}
                   startIcon={<DescriptionIcon />}>
                   {!isMobile && <Translate>Export to CSV</Translate>}
                 </Button>
               ) : (
-                <Tooltip title={formatMessage({ id: 'Export unavailable above 10000 results' })}>
+                <Tooltip
+                  title={formatMessage({
+                    id: 'Export unavailable above 10000 results'
+                  })}>
                   <span>
-                    <Button variant="text" size="small" disabled startIcon={<DescriptionIcon />}>
+                    <Button
+                      variant="text"
+                      size="small"
+                      disabled
+                      startIcon={<DescriptionIcon />}>
                       {!isMobile && <Translate>Export to CSV</Translate>}
                     </Button>
                   </span>
@@ -466,18 +552,36 @@ const EntityTable = ({
         </Table>
       </TableContainer>
       {!shouldHideFooter && onPageChange && (
-        <StyledTablePagination
-          rowsPerPageOptions={pageSizeOptions}
-          component="div"
-          count={nbTotalRows}
-          rowsPerPage={rowsPerPage}
-          page={page}
-          labelRowsPerPage={formatMessage({
-            id: isMobile ? 'Per page:' : 'Results per page:'
-          })}
-          onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-        />
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'flex-end',
+            flexWrap: 'wrap'
+          }}>
+          {!isMobile && (
+            <JumpToPage
+              page={page}
+              count={nbTotalRows}
+              rowsPerPage={rowsPerPage}
+              onPageChange={handleChangePage}
+            />
+          )}
+          <StyledTablePagination
+            showFirstButton
+            showLastButton
+            rowsPerPageOptions={pageSizeOptions}
+            component="div"
+            count={nbTotalRows}
+            rowsPerPage={rowsPerPage}
+            page={page}
+            labelRowsPerPage={formatMessage({
+              id: isMobile ? 'Per page:' : 'Results per page:'
+            })}
+            onPageChange={handleChangePage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+          />
+        </Box>
       )}
     </Box>
   );

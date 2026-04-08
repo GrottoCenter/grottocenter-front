@@ -46,193 +46,155 @@ const cellsRender = {
 };
 
 const placeholder = {
-  columns: [[true, 'name', 'Name', false]],
+  columns: [{ visible: true, field: 'name', label: 'Name', sortable: false }],
   link: () => false
 };
 
 const notifications = {
   columns: [
-    [true, 'dateInscription', 'Date', false],
-    [true, 'notifier', 'From', false, cellsRender.person],
-    [true, 'action', 'Action', false, cellsRender.translate],
-    [true, 'entityType', 'Type', false, cellsRender.notificationEntityType],
-    [true, 'entityName', 'Name', false],
-    [true, 'isRead', 'Read', false, cellsRender.notificationIsRead]
+    { visible: true, field: 'dateInscription', label: 'Date', sortable: false },
+    { visible: true, field: 'notifier', label: 'From', sortable: false, render: cellsRender.person },
+    { visible: true, field: 'action', label: 'Action', sortable: false, render: cellsRender.translate },
+    { visible: true, field: 'entityType', label: 'Type', sortable: false, render: cellsRender.notificationEntityType },
+    { visible: true, field: 'entityName', label: 'Name', sortable: false },
+    { visible: true, field: 'isRead', label: 'Read', sortable: false, render: cellsRender.notificationIsRead }
   ],
   link: doc => doc.link
 };
 
 const massifs = {
   columns: [
-    [false, 'id', 'Id', false],
-    [true, 'name', 'Name', true],
-    [false, 'language', 'Language', true],
-    [true, 'nbEntrances', 'Entrances', true]
+    { visible: false, field: 'id', label: 'Id', sortable: false },
+    { visible: true, field: 'name', label: 'Name', sortable: true },
+    { visible: false, field: 'language', label: 'Language', sortable: true },
+    { visible: true, field: 'nbEntrances', label: 'Entrances', sortable: true }
   ],
   link: doc => `/ui/massifs/${doc.id}`
 };
 
 const organizations = {
   columns: [
-    [false, 'id', 'Id', false],
-    [true, 'name', 'Name', true],
-    [false, 'language', 'Language', true],
-    [true, 'mail', 'Email', false],
-    [false, 'url', 'URL', false],
-    [false, 'isOfficialPartner', 'Is a partner', true],
-    [false, 'address', 'Address', false],
-    [false, 'postalCode', 'Postal code', true],
-    [true, 'city', 'City', true],
-    [true, 'county', 'County', true],
-    [true, 'region', 'Region', true],
-    [true, 'country', 'Country', true],
-    [true, 'nbCavers', 'Cavers', true],
-    [false, 'iso3166', 'ISO code', true],
-    [false, 'customMessage', 'Message', false]
+    { visible: false, field: 'id', label: 'Id', sortable: false },
+    { visible: true, field: 'name', label: 'Name', sortable: true },
+    { visible: false, field: 'language', label: 'Language', sortable: true },
+    { visible: true, field: 'mail', label: 'Email', sortable: false },
+    { visible: false, field: 'url', label: 'URL', sortable: false },
+    { visible: false, field: 'isOfficialPartner', label: 'Is a partner', sortable: true },
+    { visible: false, field: 'address', label: 'Address', sortable: false },
+    { visible: false, field: 'postalCode', label: 'Postal code', sortable: true },
+    { visible: true, field: 'city', label: 'City', sortable: true },
+    { visible: true, field: 'county', label: 'County', sortable: true },
+    { visible: true, field: 'region', label: 'Region', sortable: true },
+    { visible: true, field: 'country', label: 'Country', sortable: true },
+    { visible: true, field: 'nbCavers', label: 'Cavers', sortable: true },
+    { visible: false, field: 'iso3166', label: 'ISO code', sortable: true },
+    { visible: false, field: 'customMessage', label: 'Message', sortable: false }
   ],
   link: doc => `/ui/organizations/${doc.id}`
 };
 
 const persons = {
   columns: [
-    [true, 'id', 'Id', false],
-    [true, 'nickname', 'Username', true],
-    [true, 'name', 'First name', true],
-    [true, 'surname', 'Last name', true]
+    { visible: true, field: 'id', label: 'Id', sortable: false },
+    { visible: true, field: 'nickname', label: 'Username', sortable: true },
+    { visible: true, field: 'name', label: 'First name', sortable: true },
+    { visible: true, field: 'surname', label: 'Last name', sortable: true }
   ],
   link: doc => `/ui/persons/${doc.id}`
 };
 
 const entrances = {
   columns: [
-    [false, 'id', 'Id', false],
-    [true, 'name', 'Name', true],
-    [false, 'language', 'Language', true],
-    [true, 'city', 'City', true],
-    [false, 'county', 'County', true],
-    [false, 'region', 'Region', true],
-    [true, 'country', 'Country', true],
-    [false, 'iso3166', 'ISO code', true],
-    [false, 'cave.name', 'Network name', true],
-    [true, 'cave.depth', 'Depth', true],
-    [true, 'cave.length', 'Length', true],
-    [false, 'cave.isDiving', 'Has siphons', true],
-    [false, 'cave.temperature', 'Temperature', true],
-    [true, 'commentsRating.approach', 'Ease of reach', true],
-    [true, 'commentsRating.caving', 'Ease of move', true],
-    [true, 'commentsRating.aestheticism', 'Aesthetic', true],
-    [false, 'dateInscription', 'Creation date', true, cellsRender.date]
+    { visible: false, field: 'id', label: 'Id', sortable: true, apiField: 'numericId' },
+    { visible: true, field: 'name', label: 'Name', sortable: true },
+    { visible: false, field: 'language', label: 'Language', sortable: true },
+    { visible: true, field: 'city', label: 'City', sortable: true },
+    { visible: false, field: 'county', label: 'County', sortable: true },
+    { visible: false, field: 'region', label: 'Region', sortable: true },
+    { visible: true, field: 'country', label: 'Country', sortable: true },
+    { visible: false, field: 'iso3166', label: 'ISO code', sortable: true },
+    { visible: false, field: 'cave.name', label: 'Network name', sortable: true },
+    { visible: true, field: 'cave.depth', label: 'Depth', sortable: true },
+    { visible: true, field: 'cave.length', label: 'Length', sortable: true },
+    { visible: false, field: 'cave.isDiving', label: 'Has siphons', sortable: true },
+    { visible: false, field: 'cave.temperature', label: 'Temperature', sortable: true },
+    { visible: true, field: 'commentsRating.approach', label: 'Ease of reach', sortable: true },
+    { visible: true, field: 'commentsRating.caving', label: 'Ease of move', sortable: true },
+    { visible: true, field: 'commentsRating.aestheticism', label: 'Aesthetic', sortable: true },
+    { visible: false, field: 'dateInscription', label: 'Creation date', sortable: true, render: cellsRender.date },
+    { visible: false, field: 'dateLastModif', label: 'Last modified', sortable: true, render: cellsRender.date }
   ],
   link: doc => `/ui/entrances/${doc.id}`
 };
 
 const documents = {
   columns: [
-    [false, 'id', 'Id', false],
-    [false, 'creator', 'Creator', false, cellsRender.person],
-    [false, 'dateInscription', 'Added at', true, cellsRender.date],
-    [false, 'reviewer', 'Reviewer', false, cellsRender.person],
-    [false, 'validator', 'Validator', false, cellsRender.person],
-    [false, 'creatorComment', 'Creator comment', false],
-    [false, 'language', 'Language', true],
-    [true, 'type', 'Type', true, cellsRender.translate],
-    [true, 'title', 'Title', true, cellsRender.ellipsis],
-    [true, 'description', 'Description', false, cellsRender.ellipsis],
-    [false, 'datePublication', 'Publication date', true],
-    [
-      true,
-      'authors',
-      'Author',
-      false,
-      cellsRender.keyArray('nickname'),
-      'authors.nickname'
-    ],
-    [false, 'library.name', 'Library', true],
-    [false, 'editor.name', 'Editor', true],
-    [true, 'parent.title', 'Parent', true],
-    [false, 'issue', 'Issue', true],
-    [false, 'pages', 'Pages', true],
-    [false, 'identifierType', 'Identifier type', true],
-    [true, 'identifier', 'Identifier', true],
-    [false, 'license', 'License', true],
-    [false, 'subjects', 'Subjects', false, cellsRender.keyArray('code')],
-    [
-      true,
-      'iso3166',
-      'Country / Region',
-      false,
-      cellsRender.keyArray('iso'),
-      'iso3166.iso'
-    ],
-    [false, 'importSource', 'Import source', true],
-    [false, 'importId', 'Import Id', true],
-    [false, 'cave.name', 'Cave', true],
-    [false, 'entrances', 'Entrances', false, cellsRender.keyArray('name')],
-    [false, 'massifs', 'Massifs', false, cellsRender.keyArray('name')]
+    { visible: false, field: 'id', label: 'Id', sortable: false },
+    { visible: false, field: 'creator', label: 'Creator', sortable: false, render: cellsRender.person },
+    { visible: false, field: 'dateInscription', label: 'Added at', sortable: true, render: cellsRender.date },
+    { visible: false, field: 'reviewer', label: 'Reviewer', sortable: false, render: cellsRender.person },
+    { visible: false, field: 'validator', label: 'Validator', sortable: false, render: cellsRender.person },
+    { visible: false, field: 'creatorComment', label: 'Creator comment', sortable: false },
+    { visible: false, field: 'language', label: 'Language', sortable: true },
+    { visible: true, field: 'type', label: 'Type', sortable: true, render: cellsRender.translate },
+    { visible: true, field: 'title', label: 'Title', sortable: true, render: cellsRender.ellipsis },
+    { visible: true, field: 'description', label: 'Description', sortable: false, render: cellsRender.ellipsis },
+    { visible: false, field: 'datePublication', label: 'Publication date', sortable: true },
+    { visible: true, field: 'authors', label: 'Author', sortable: false, render: cellsRender.keyArray('nickname'), apiField: 'authors.nickname' },
+    { visible: false, field: 'library.name', label: 'Library', sortable: true },
+    { visible: false, field: 'editor.name', label: 'Editor', sortable: true },
+    { visible: true, field: 'parent.title', label: 'Parent', sortable: true },
+    { visible: false, field: 'issue', label: 'Issue', sortable: true },
+    { visible: false, field: 'pages', label: 'Pages', sortable: true },
+    { visible: false, field: 'identifierType', label: 'Identifier type', sortable: true },
+    { visible: true, field: 'identifier', label: 'Identifier', sortable: true },
+    { visible: false, field: 'license', label: 'License', sortable: true },
+    { visible: false, field: 'subjects', label: 'Subjects', sortable: false, render: cellsRender.keyArray('code') },
+    { visible: true, field: 'iso3166', label: 'Country / Region', sortable: false, render: cellsRender.keyArray('iso'), apiField: 'iso3166.iso' },
+    { visible: false, field: 'importSource', label: 'Import source', sortable: true },
+    { visible: false, field: 'importId', label: 'Import Id', sortable: true },
+    { visible: false, field: 'cave.name', label: 'Cave', sortable: true },
+    { visible: false, field: 'entrances', label: 'Entrances', sortable: false, render: cellsRender.keyArray('name') },
+    { visible: false, field: 'massifs', label: 'Massifs', sortable: false, render: cellsRender.keyArray('name') }
   ],
   link: doc => `/ui/documents/${doc.id}`
 };
 
 const commonCSVColumns = [
-  [false, CSV.ID, 'Id', false],
-  [true, CSV.DESCRIPTION_DOCUMENT_TITLE, 'Title of the document', false],
-  [false, CSV.MODIFICATION_DATE, 'Modification date', false],
-  [false, CSV.LABEL, 'Label', false],
-  [false, CSV.LABEL_LANGUAGE, 'Label language', false],
-  [false, CSV.TYPE, 'Type', false],
-  [true, CSV.LICENSE, 'License', false],
-  [false, CSV.ALTERNATE_NAME, 'Alternate name', false],
-  [false, CSV.ATTRIBUTION_NAME, 'Attribution name', false],
-  [false, CSV.ATTRIBUTION_URL, 'Attribution URL', false],
-  [false, CSV.CREATION_DATE, 'Creation date', false],
-  [false, CSV.DESCRIPTION_DOCUMENT, 'Document description', false],
-  [
-    false,
-    CSV.DESCRIPTION_DOCUMENT_CREATOR,
-    'Author of the document description',
-    false
-  ],
-  [
-    false,
-    CSV.DESCRIPTION_DOCUMENT_LANGUAGE,
-    'Language of the document description',
-    false
-  ]
+  { visible: false, field: CSV.ID, label: 'Id', sortable: false },
+  { visible: true, field: CSV.DESCRIPTION_DOCUMENT_TITLE, label: 'Title of the document', sortable: false },
+  { visible: false, field: CSV.MODIFICATION_DATE, label: 'Modification date', sortable: false },
+  { visible: false, field: CSV.LABEL, label: 'Label', sortable: false },
+  { visible: false, field: CSV.LABEL_LANGUAGE, label: 'Label language', sortable: false },
+  { visible: false, field: CSV.TYPE, label: 'Type', sortable: false },
+  { visible: true, field: CSV.LICENSE, label: 'License', sortable: false },
+  { visible: false, field: CSV.ALTERNATE_NAME, label: 'Alternate name', sortable: false },
+  { visible: false, field: CSV.ATTRIBUTION_NAME, label: 'Attribution name', sortable: false },
+  { visible: false, field: CSV.ATTRIBUTION_URL, label: 'Attribution URL', sortable: false },
+  { visible: false, field: CSV.CREATION_DATE, label: 'Creation date', sortable: false },
+  { visible: false, field: CSV.DESCRIPTION_DOCUMENT, label: 'Document description', sortable: false },
+  { visible: false, field: CSV.DESCRIPTION_DOCUMENT_CREATOR, label: 'Author of the document description', sortable: false },
+  { visible: false, field: CSV.DESCRIPTION_DOCUMENT_LANGUAGE, label: 'Language of the document description', sortable: false }
 ];
 
 const csvImportEntrances = {
   columns: [
     ...commonCSVColumns,
-    [false, CSV.CONTAINED_IN_PLACE, 'Schema: contained in place', false],
-    [true, CSV.COUNTRY_CODE, 'Country', false],
-    [false, CSV.DESCRIPTION_LOCATION, 'Location description', false],
-    [
-      true,
-      CSV.DESCRIPTION_LOCATION_TITLE,
-      'Title of the location description',
-      false
-    ],
-    [
-      false,
-      CSV.DESCRIPTION_LOCATION_CREATOR,
-      'Author of the location description',
-      false
-    ],
-    [
-      false,
-      CSV.DESCRIPTION_LOCATION_LANGUAGE,
-      'Language of the location description',
-      false
-    ],
-    [false, CSV.DISCOVERED_BY, 'Discovered by', false],
-    [true, CSV.LATITUDE, 'Latitude', false],
-    [true, CSV.LONGITUDE, 'Longitude', false],
-    [true, CSV.LENGTH, 'Length', false],
-    [true, CSV.VERTICAL_EXTEND, 'Vertical extend', false],
-    [false, CSV.EXTEND_ABOVE, 'Extend above', false],
-    [false, CSV.EXTEND_BELOW, 'Extend below', false],
-    [false, CSV.ALTITUDE, 'Altitude', false],
-    [false, CSV.PRECISION, 'Precision', false]
+    { visible: false, field: CSV.CONTAINED_IN_PLACE, label: 'Schema: contained in place', sortable: false },
+    { visible: true, field: CSV.COUNTRY_CODE, label: 'Country', sortable: false },
+    { visible: false, field: CSV.DESCRIPTION_LOCATION, label: 'Location description', sortable: false },
+    { visible: true, field: CSV.DESCRIPTION_LOCATION_TITLE, label: 'Title of the location description', sortable: false },
+    { visible: false, field: CSV.DESCRIPTION_LOCATION_CREATOR, label: 'Author of the location description', sortable: false },
+    { visible: false, field: CSV.DESCRIPTION_LOCATION_LANGUAGE, label: 'Language of the location description', sortable: false },
+    { visible: false, field: CSV.DISCOVERED_BY, label: 'Discovered by', sortable: false },
+    { visible: true, field: CSV.LATITUDE, label: 'Latitude', sortable: false },
+    { visible: true, field: CSV.LONGITUDE, label: 'Longitude', sortable: false },
+    { visible: true, field: CSV.LENGTH, label: 'Length', sortable: false },
+    { visible: true, field: CSV.VERTICAL_EXTEND, label: 'Vertical extend', sortable: false },
+    { visible: false, field: CSV.EXTEND_ABOVE, label: 'Extend above', sortable: false },
+    { visible: false, field: CSV.EXTEND_BELOW, label: 'Extend below', sortable: false },
+    { visible: false, field: CSV.ALTITUDE, label: 'Altitude', sortable: false },
+    { visible: false, field: CSV.PRECISION, label: 'Precision', sortable: false }
   ],
   link: () => false
 };
@@ -240,27 +202,27 @@ const csvImportEntrances = {
 const csvImportDocuments = {
   columns: [
     ...commonCSVColumns,
-    [true, CSV.DOCUMENT_TYPE, 'Document type', false],
-    [true, CSV.CREATOR, 'Author', false],
-    [true, CSV.DATE, 'Date', false],
-    [false, CSV.FORMAT, 'Format', false],
-    [false, CSV.IDENTIFIER, 'Identifier', false],
-    [false, CSV.IS_PART_OF, 'Document parent', false],
-    [true, CSV.LANGUAGE, 'Language', false],
-    [true, CSV.PUBLISHER, 'Publisher', false],
-    [true, CSV.REFERENCES, 'References', false],
-    [true, CSV.SOURCE, 'Source', false],
-    [true, CSV.SUBJECT, 'Subject', false],
-    [false, CSV.UNDERGROUND, 'Related to underground cavity', false]
+    { visible: true, field: CSV.DOCUMENT_TYPE, label: 'Document type', sortable: false },
+    { visible: true, field: CSV.CREATOR, label: 'Author', sortable: false },
+    { visible: true, field: CSV.DATE, label: 'Date', sortable: false },
+    { visible: false, field: CSV.FORMAT, label: 'Format', sortable: false },
+    { visible: false, field: CSV.IDENTIFIER, label: 'Identifier', sortable: false },
+    { visible: false, field: CSV.IS_PART_OF, label: 'Document parent', sortable: false },
+    { visible: true, field: CSV.LANGUAGE, label: 'Language', sortable: false },
+    { visible: true, field: CSV.PUBLISHER, label: 'Publisher', sortable: false },
+    { visible: true, field: CSV.REFERENCES, label: 'References', sortable: false },
+    { visible: true, field: CSV.SOURCE, label: 'Source', sortable: false },
+    { visible: true, field: CSV.SUBJECT, label: 'Subject', sortable: false },
+    { visible: false, field: CSV.UNDERGROUND, label: 'Related to underground cavity', sortable: false }
   ],
   link: () => false
 };
 
 const duplicate = {
   columns: [
-    [false, 'id', 'Duplicate id', false],
-    [true, 'docId', 'Id', false],
-    [true, 'name', 'Name', false]
+    { visible: false, field: 'id', label: 'Duplicate id', sortable: false },
+    { visible: true, field: 'docId', label: 'Id', sortable: false },
+    { visible: true, field: 'name', label: 'Name', sortable: false }
   ],
   link: () => false
 };
