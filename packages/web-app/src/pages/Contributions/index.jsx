@@ -43,8 +43,8 @@ const ContributionsPage = () => {
               <EntityTable
                 entityType="documents"
                 entityColumnsModifier={columns => {
-                  const c = columns.find(e => e[1] === 'dateInscription');
-                  c[0] = true;
+                  const c = columns.find(e => e.field === 'dateInscription');
+                  c.visible = true;
                 }}
                 isLoading={isLoading}
                 pageRows={results}
