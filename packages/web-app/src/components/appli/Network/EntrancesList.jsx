@@ -64,7 +64,12 @@ const EntrancesList = ({
                     <Tooltip
                       placement="left"
                       title={formatMessage({
-                        id: isSelected ? 'Hide from map' : 'Show on map'
+                        id:
+                          selectedEntrancesId.length === 1 && isSelected
+                            ? 'Show all on map'
+                            : isSelected
+                              ? 'Hide from map'
+                              : 'Show on map'
                       })}>
                       <IconButton
                         edge="end"
