@@ -2,6 +2,7 @@ import {
   FETCH_LOGIN,
   FETCH_LOGIN_FAILURE,
   FETCH_LOGIN_MUST_RESET,
+  FETCH_LOGIN_NOT_VERIFIED,
   FETCH_LOGIN_SUCCESS,
   FETCH_LOGIN_RESET_SUCCESS,
   DISPLAY_LOGIN_DIALOG,
@@ -37,7 +38,8 @@ const initialState = {
   error: null,
   isFetching: false,
   isLoginDialogDisplayed: false,
-  isMustResetMessageDisplayed: false
+  isMustResetMessageDisplayed: false,
+  isNotVerifiedMessageDisplayed: false
 };
 
 //
@@ -71,6 +73,12 @@ const reducer = (state = initialState, action) => {
         isFetching: false,
         isMustResetMessageDisplayed: true
       };
+    case FETCH_LOGIN_NOT_VERIFIED:
+      return {
+        ...state,
+        isFetching: false,
+        isNotVerifiedMessageDisplayed: true
+      };
     case FETCH_LOGIN_FAILURE:
       return {
         ...state,
@@ -86,10 +94,16 @@ const reducer = (state = initialState, action) => {
       return {
         ...state,
         isLoginDialogDisplayed: true,
-        isMustResetMessageDisplayed: false
+        isMustResetMessageDisplayed: false,
+        isNotVerifiedMessageDisplayed: false
       };
     case HIDE_LOGIN_DIALOG:
-      return { ...state, isLoginDialogDisplayed: false };
+      return {
+        ...state,
+        isLoginDialogDisplayed: false,
+        isMustResetMessageDisplayed: false,
+        isNotVerifiedMessageDisplayed: false
+      };
     case LOGOUT:
       removeTokenFromLocalStorage();
       return {
