@@ -59,6 +59,8 @@ import recentChange from './RecentChangeReducer';
 import region from './RegionReducer';
 import sideMenu from './SideMenuReducer';
 import signUp from './SignUpReducer';
+import verifyEmail from './VerifyEmailReducer';
+import resendVerificationEmail from './ResendVerificationEmailReducer';
 import snapshots from './SnapshotReducer';
 import statisticsMassif from './StatisticsMassifReducer';
 import statisticsCountry from './StatisticsCountryReducer';
@@ -147,6 +149,8 @@ const GCReducer = combineReducers({
   region,
   sideMenu,
   signUp,
+  verifyEmail,
+  resendVerificationEmail,
   snapshots,
   statisticsMassif,
   statisticsCountry,
