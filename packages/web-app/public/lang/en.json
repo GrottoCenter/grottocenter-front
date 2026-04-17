@@ -1974,5 +1974,19 @@
   "Zanzibar": "Tansania",
   "Zimbabwe": "Zimbabwe",
   "Zip code": "Zip code",
-  "Zone:": "Zone:"
+  "Zone:": "Zone:",
+  "An email has been sent to {email} to verify your account. Please click the link in the email to activate your account.": "An email has been sent to {email} to verify your account. Please click the link in the email to activate your account.",
+  "Verifying your email...": "Verifying your email...",
+  "Email successfully verified. You can now log in.": "Email successfully verified. You can now log in.",
+  "The verification link is invalid.": "The verification link is invalid.",
+  "Your email address is already verified. You can log in.": "Your email address is already verified. You can log in.",
+  "Go to login": "Go to login",
+  "Your account is not verified yet.": "Your account is not verified yet.",
+  "Please check your email to activate it.": "Please check your email to activate it.",
+  "Resend verification email": "Resend verification email",
+  "Resend in {seconds}s": "Resend in {seconds}s",
+  "Verification email sent!": "Verification email sent!",
+  "You must verify your email address before you can reset your password.": "You must verify your email address before you can reset your password.",
+  "Email Verification": "Email Verification",
+  "You can request a new verification email for:": "You can request a new verification email for:"
 }
