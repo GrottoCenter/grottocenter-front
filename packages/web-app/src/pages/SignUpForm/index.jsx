@@ -82,18 +82,11 @@ const SignUpForm = ({
             <Typography align="center">
               {formatMessage({
                 id: 'Your account has been successfully created!'
-              })}{' '}
+              })}{'\n'}
               {formatMessage({
-                id: 'You can now log in to Grottocenter using the email and password you entered.'
+                id: 'An email has been sent to verify your account. Please click the link in the email to activate your account.'
               })}
             </Typography>
-            <SpacedCenteredButton
-              color="primary"
-              onClick={() => navigate('/ui/login')}
-              style={{ display: 'block' }}
-              variant="contained">
-              {formatMessage({ id: 'Log in' })}
-            </SpacedCenteredButton>
           </>
         ) : (
           <FormWrapper onSubmit={onSignUp}>
