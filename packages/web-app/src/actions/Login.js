@@ -6,6 +6,7 @@ import makeErrorMessage from '../helpers/makeErrorMessage';
 export const FETCH_LOGIN = 'FETCH_LOGIN';
 export const FETCH_LOGIN_SUCCESS = 'FETCH_LOGIN_SUCCESS';
 export const FETCH_LOGIN_MUST_RESET = 'FETCH_LOGIN_MUST_RESET';
+export const FETCH_LOGIN_NOT_VERIFIED = 'FETCH_LOGIN_NOT_VERIFIED';
 export const FETCH_LOGIN_FAILURE = 'FETCH_LOGIN_FAILURE';
 export const FETCH_LOGIN_RESET_SUCCESS = 'FETCH_LOGIN_RESET_SUCCESS';
 
@@ -28,6 +29,10 @@ export const fetchLoginSuccess = (tokenDecoded, token) => ({
 
 export const fetchLoginMustReset = () => ({
   type: FETCH_LOGIN_MUST_RESET
+});
+
+export const fetchLoginNotVerified = () => ({
+  type: FETCH_LOGIN_NOT_VERIFIED
 });
 
 export const fetchLoginResetSuccess = () => ({
@@ -103,6 +108,11 @@ export function postLogin(email, password) {
         const json = await response.json();
         if (json?.status === 'MustReset') {
           dispatch(fetchLoginMustReset());
+          return;
+        }
+
+        if (json?.status === 'NotVerified') {
+          dispatch(fetchLoginNotVerified());
           return;
         }
 
