@@ -1965,5 +1965,14 @@
   "Zanzibar": "Tasmanie",
   "Zimbabwe": "Zimbabwe",
   "Zip code": "Code postal",
-  "Zone:": "Zone :"
+  "Zone:": "Zone :",
+  "An email has been sent to verify your account. Please click the link in the email to activate your account.": "Un email a été envoyé pour vérifier votre compte. Veuillez cliquer sur le lien dans l'email pour activer votre compte.",
+  "Verifying your email...": "Vérification de votre adresse e-mail...",
+  "Email successfully verified. You can now log in.": "Adresse e-mail vérifiée avec succès. Vous pouvez maintenant vous connecter.",
+  "The verification link is invalid or expired.": "Le lien de vérification est invalide ou expiré.",
+  "Go to login": "Aller à la page de connexion",
+  "Your account is not verified yet.": "Votre compte n'est pas encore vérifié.",
+  "Please check your email to activate it.": "Veuillez vérifier vos e-mails pour l'activer.",
+  "Resend verification email": "Renvoyer l'e-mail de vérification",
+  "Verification email sent!": "E-mail de vérification envoyé !"
 }

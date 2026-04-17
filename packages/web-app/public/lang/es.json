@@ -1960,5 +1960,14 @@
   "Zanzibar": "Tanzania",
   "Zimbabwe": "Zimbabue",
   "Zip code": "Código postal",
-  "Zone:": "Zona:"
+  "Zone:": "Zona:",
+  "An email has been sent to verify your account. Please click the link in the email to activate your account.": "Se ha enviado un correo electrónico para verificar su cuenta. Haga clic en el enlace del correo electrónico para activar su cuenta.",
+  "Verifying your email...": "Verificando su correo electrónico...",
+  "Email successfully verified. You can now log in.": "Correo electrónico verificado con éxito. Ya puede iniciar sesión.",
+  "The verification link is invalid or expired.": "El enlace de verificación no es válido o ha caducado.",
+  "Go to login": "Ir al inicio de sesión",
+  "Your account is not verified yet.": "Su cuenta aún no ha sido verificada.",
+  "Please check your email to activate it.": "Por favor, revise su correo electrónico para activarla.",
+  "Resend verification email": "Reenviar correo electrónico de verificación",
+  "Verification email sent!": "¡Correo electrónico de verificación enviado!"
 }
