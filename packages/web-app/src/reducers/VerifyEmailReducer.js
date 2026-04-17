@@ -1,41 +1,40 @@
 import {
-  FETCH_FORGOT_PASSWORD_SUCCESS,
-  FETCH_FORGOT_PASSWORD,
-  FETCH_FORGOT_PASSWORD_FAILURE,
-  RESET_FORGOT_PASSWORD
-} from '../actions/ForgotPassword';
+  VERIFY_EMAIL,
+  VERIFY_EMAIL_FAILURE,
+  VERIFY_EMAIL_SUCCESS
+} from '../actions/VerifyEmail';
 
 const initialState = {
   error: null,
   isFetching: false,
-  success: false
+  success: false,
+  message: ''
 };
 
 const reducer = (state = initialState, action) => {
   switch (action.type) {
-    case FETCH_FORGOT_PASSWORD:
+    case VERIFY_EMAIL:
       return {
         ...state,
         isFetching: true,
         error: null,
         success: false
       };
-    case FETCH_FORGOT_PASSWORD_SUCCESS:
-      return {
-        ...state,
-        error: null,
-        isFetching: false,
-        success: true
-      };
-    case FETCH_FORGOT_PASSWORD_FAILURE:
+    case VERIFY_EMAIL_SUCCESS:
       return {
         ...state,
         isFetching: false,
-        error: action.error,
-        success: false
+        success: true,
+        message: action.status,
+        error: null
       };
-    case RESET_FORGOT_PASSWORD:
-      return initialState;
+    case VERIFY_EMAIL_FAILURE:
+      return {
+        ...state,
+        isFetching: false,
+        success: false,
+        error: action.error
+      };
     default:
       return state;
   }
