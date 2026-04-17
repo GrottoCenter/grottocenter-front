@@ -21,6 +21,10 @@ export const loginUrl = `${API_BASE_PATH}/login`;
 export const logoutUrl = `${API_BASE_PATH}/logout`;
 export const signUpUrl = `${API_BASE_PATH}/signup`;
 export const forgotPasswordUrl = `${API_BASE_PATH}/forgotPassword`;
+export const verifyEmailUrl = token =>
+  `${API_BASE_PATH}/verify-email?token=${token}`;
+export const resendVerificationEmailUrl = email =>
+  `${API_BASE_PATH}/resend-verification-email?email=${email}`;
 
 // ===== Caves urls
 export const getCaveUrl = `${API_BASE_PATH}/caves/`;
