@@ -50,6 +50,7 @@ import DocumentsSearchPage from './pages/Documents';
 import MassifsSearchPage from './pages/Massifs';
 import OrganizationsSearchPage from './pages/Organizations';
 import PersonsSearchPage from './pages/Persons';
+import VerifyEmail from './components/appli/VerifyEmail';
 
 import './App.css';
 
@@ -109,6 +110,7 @@ const router = createBrowserRouter(
       <Route path="/ui/persons/:personId" element={<PersonPage />} />
       <Route path="/ui/login" element={<HomePage />} />
       <Route path="/ui/signup" element={<SignUp />} />
+      <Route path="/ui/verify-email" element={<VerifyEmail />} />
       <Route path="/ui/entity/add" element={<EntityCreation />} />
       <Route path="/ui/forgotPassword" element={<ForgotPassword />} />
       <Route path="/ui/changePassword" element={<ChangePassword />} />
