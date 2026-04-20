@@ -71,13 +71,15 @@ const reducer = (state = initialState, action) => {
       return {
         ...state,
         isFetching: false,
-        isMustResetMessageDisplayed: true
+        isMustResetMessageDisplayed: true,
+        isNotVerifiedMessageDisplayed: false
       };
     case FETCH_LOGIN_NOT_VERIFIED:
       return {
         ...state,
         isFetching: false,
-        isNotVerifiedMessageDisplayed: true
+        isNotVerifiedMessageDisplayed: true,
+        isMustResetMessageDisplayed: false
       };
     case FETCH_LOGIN_FAILURE:
       return {

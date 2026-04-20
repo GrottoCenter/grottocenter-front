@@ -1,7 +1,7 @@
 import {
-  FETCH_RESEND_VERIFICATION,
-  FETCH_RESEND_VERIFICATION_FAILURE,
-  FETCH_RESEND_VERIFICATION_SUCCESS,
+  RESEND_VERIFICATION,
+  RESEND_VERIFICATION_FAILURE,
+  RESEND_VERIFICATION_SUCCESS,
   RESET_RESEND_VERIFICATION
 } from '../actions/ResendVerificationEmail';
 
@@ -13,21 +13,21 @@ const initialState = {
 
 const reducer = (state = initialState, action) => {
   switch (action.type) {
-    case FETCH_RESEND_VERIFICATION:
+    case RESEND_VERIFICATION:
       return {
         ...state,
         isFetching: true,
         error: null,
         success: false
       };
-    case FETCH_RESEND_VERIFICATION_SUCCESS:
+    case RESEND_VERIFICATION_SUCCESS:
       return {
         ...state,
         isFetching: false,
         success: true,
         error: null
       };
-    case FETCH_RESEND_VERIFICATION_FAILURE:
+    case RESEND_VERIFICATION_FAILURE:
       return {
         ...state,
         isFetching: false,

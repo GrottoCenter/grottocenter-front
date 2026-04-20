@@ -1,7 +1,7 @@
 import {
-  FETCH_VERIFY_EMAIL,
-  FETCH_VERIFY_EMAIL_FAILURE,
-  FETCH_VERIFY_EMAIL_SUCCESS
+  VERIFY_EMAIL,
+  VERIFY_EMAIL_FAILURE,
+  VERIFY_EMAIL_SUCCESS
 } from '../actions/VerifyEmail';
 
 const initialState = {
@@ -13,22 +13,22 @@ const initialState = {
 
 const reducer = (state = initialState, action) => {
   switch (action.type) {
-    case FETCH_VERIFY_EMAIL:
+    case VERIFY_EMAIL:
       return {
         ...state,
         isFetching: true,
         error: null,
         success: false
       };
-    case FETCH_VERIFY_EMAIL_SUCCESS:
+    case VERIFY_EMAIL_SUCCESS:
       return {
         ...state,
         isFetching: false,
         success: true,
-        message: action.message,
+        message: action.status,
         error: null
       };
-    case FETCH_VERIFY_EMAIL_FAILURE:
+    case VERIFY_EMAIL_FAILURE:
       return {
         ...state,
         isFetching: false,
