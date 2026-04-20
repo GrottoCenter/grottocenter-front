@@ -12,9 +12,11 @@ const VerifyEmail = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const verifyEmailState = useSelector(state => state.verifyEmail);
+  const hasRequested = React.useRef(false);
 
   useEffect(() => {
-    if (token) {
+    if (token && !hasRequested.current) {
+      hasRequested.current = true;
       dispatch(postVerifyEmail(token));
     }
   }, [dispatch, token]);

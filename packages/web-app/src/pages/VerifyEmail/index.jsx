@@ -47,13 +47,6 @@ const VerifyEmailPage = ({ loading, success, error, onGoToLogin }) => {
           {error ||
             formatMessage({ id: 'The verification link is invalid or expired.' })}
         </Typography>
-        <SpacedCenteredButton
-          color="primary"
-          onClick={onGoToLogin}
-          style={{ display: 'block' }}
-          variant="contained">
-          {formatMessage({ id: 'Go to login' })}
-        </SpacedCenteredButton>
       </>
     );
   }
