@@ -153,11 +153,20 @@ export function postForgotPassword(email, onSuccess) {
       }
 
       const statusCode = response.status;
-      const text = await response.text();
-      errorMessage =
-        statusCode === 500
-          ? 'A server error occurred, please try again later or contact Wikicaves for more information.'
-          : text;
+      try {
+        const json = await response.json();
+        if (json?.status === 'NotVerified') {
+          dispatch(fetchLoginNotVerified());
+          return;
+        }
+        errorMessage = json.message || json.error || (await response.text());
+      } catch (e) {
+        const text = await response.text();
+        errorMessage =
+          statusCode === 500
+            ? 'A server error occurred, please try again later or contact Wikicaves for more information.'
+            : text;
+      }
     } catch (_) {
       // Other errors
     }
