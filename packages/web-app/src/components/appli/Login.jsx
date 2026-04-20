@@ -32,7 +32,7 @@ const Login = () => {
   const [password, setPassword] = React.useState('');
   const [authErrorMessages, setAuthErrorMessages] = React.useState([]);
   const navigate = useNavigate();
-  const { onSuccess } = useNotification();
+  const { onSuccess, onError } = useNotification();
   const { formatMessage } = useIntl();
 
   const onLogin = event => {
