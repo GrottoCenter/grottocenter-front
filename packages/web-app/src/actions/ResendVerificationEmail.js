@@ -1,6 +1,5 @@
 import fetch from 'isomorphic-fetch';
 import { resendVerificationEmailUrl } from '../conf/apiRoutes';
-import makeErrorMessage from '../helpers/makeErrorMessage';
 
 export const RESEND_VERIFICATION = 'RESEND_VERIFICATION';
 export const RESEND_VERIFICATION_SUCCESS = 'RESEND_VERIFICATION_SUCCESS';
