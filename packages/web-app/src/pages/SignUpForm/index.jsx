@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
-import { useNavigate } from 'react-router-dom';
 import {
   Button,
   CircularProgress,
@@ -49,7 +48,6 @@ const SignUpForm = ({
 }) => {
   const [isPasswordVisible, setIsPasswordVisible] = React.useState(false);
   const { formatMessage } = useIntl();
-  const navigate = useNavigate();
 
   const toggleIsPasswordVisible = () => {
     setIsPasswordVisible(!isPasswordVisible);
@@ -84,8 +82,8 @@ const SignUpForm = ({
                 id: 'Your account has been successfully created!'
               })}{'\n'}
               {formatMessage({
-                id: 'An email has been sent to verify your account. Please click the link in the email to activate your account.'
-              })}
+                id: 'An email has been sent to {email} to verify your account. Please click the link in the email to activate your account.'
+              }, { email })}
             </Typography>
           </>
         ) : (

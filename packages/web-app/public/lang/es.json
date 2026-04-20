@@ -1961,7 +1961,7 @@
   "Zimbabwe": "Zimbabue",
   "Zip code": "Código postal",
   "Zone:": "Zona:",
-  "An email has been sent to verify your account. Please click the link in the email to activate your account.": "Se ha enviado un correo electrónico para verificar su cuenta. Haga clic en el enlace del correo electrónico para activar su cuenta.",
+  "An email has been sent to {email} to verify your account. Please click the link in the email to activate your account.": "Se ha enviado un correo electrónico a {email} para verificar su cuenta. Haga clic en el enlace del correo electrónico para activar su cuenta.",
   "Verifying your email...": "Verificando su correo electrónico...",
   "Email successfully verified. You can now log in.": "Correo electrónico verificado con éxito. Ya puede iniciar sesión.",
   "The verification link is invalid or expired.": "El enlace de verificación no es válido o ha caducado.",

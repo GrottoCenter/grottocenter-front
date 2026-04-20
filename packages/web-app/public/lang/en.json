@@ -1959,7 +1959,7 @@
   "Zimbabwe": "Zimbabwe",
   "Zip code": "Zip code",
   "Zone:": "Zone:",
-  "An email has been sent to verify your account. Please click the link in the email to activate your account.": "An email has been sent to verify your account. Please click the link in the email to activate your account.",
+  "An email has been sent to {email} to verify your account. Please click the link in the email to activate your account.": "An email has been sent to {email} to verify your account. Please click the link in the email to activate your account.",
   "Verifying your email...": "Verifying your email...",
   "Email successfully verified. You can now log in.": "Email successfully verified. You can now log in.",
   "The verification link is invalid or expired.": "The verification link is invalid or expired.",
