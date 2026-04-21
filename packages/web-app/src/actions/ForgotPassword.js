@@ -1,6 +1,7 @@
 import fetch from 'isomorphic-fetch';
 import { forgotPasswordUrl } from '../conf/apiRoutes';
 import makeErrorMessage from '../helpers/makeErrorMessage';
+import { fetchLoginNotVerified, displayLoginDialog } from './Login';
 
 export const FETCH_FORGOT_PASSWORD = 'FETCH_FORGOT_PASSWORD';
 export const FETCH_FORGOT_PASSWORD_SUCCESS = 'FETCH_FORGOT_PASSWORD_SUCCESS';
@@ -42,19 +43,31 @@ export function postForgotPassword(data) {
           throw response;
         }
       })
-      .catch(response => {
+      .catch(async response => {
         const statusCode = response.status;
-        response.text().then(responseText => {
-          const errorMessage =
-            statusCode === 500
-              ? 'A server error occurred, please try again later or contact Wikicaves for more information.'
-              : responseText;
-          dispatch(
-            fetchForgotPasswordFailure(
-              makeErrorMessage(statusCode, `Forgot password - ${errorMessage}`)
-            )
-          );
-        });
+        let errorMessage = '';
+        try {
+          const json = await response.json();
+          if (statusCode === 401 && json?.status === 'NotVerified') {
+            dispatch(displayLoginDialog('forgotPassword'));
+            dispatch(fetchLoginNotVerified('forgotPassword', data.email));
+            dispatch(fetchForgotPasswordSuccess()); // Clear loading state on page
+            return;
+          }
+          errorMessage = json.message || json.error || (await response.text());
+        } catch (e) {
+          errorMessage = await response.text();
+        }
+
+        if (statusCode === 500) {
+          errorMessage =
+            'A server error occurred, please try again later or contact Wikicaves for more information.';
+        }
+        dispatch(
+          fetchForgotPasswordFailure(
+            makeErrorMessage(statusCode, `Forgot password - ${errorMessage}`)
+          )
+        );
       });
   };
 }
