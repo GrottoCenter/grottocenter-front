@@ -39,7 +39,9 @@ const initialState = {
   isFetching: false,
   isLoginDialogDisplayed: false,
   isMustResetMessageDisplayed: false,
-  isNotVerifiedMessageDisplayed: false
+  isNotVerifiedMessageDisplayed: false,
+  notVerifiedContext: 'login',
+  notVerifiedEmail: ''
 };
 
 //
@@ -79,6 +81,8 @@ const reducer = (state = initialState, action) => {
         ...state,
         isFetching: false,
         isNotVerifiedMessageDisplayed: true,
+        notVerifiedContext: action.context || 'login',
+        notVerifiedEmail: action.email || '',
         isMustResetMessageDisplayed: false
       };
     case FETCH_LOGIN_FAILURE:
@@ -97,14 +101,16 @@ const reducer = (state = initialState, action) => {
         ...state,
         isLoginDialogDisplayed: true,
         isMustResetMessageDisplayed: false,
-        isNotVerifiedMessageDisplayed: false
+        isNotVerifiedMessageDisplayed: false,
+        notVerifiedContext: action.notVerifiedContext || 'login'
       };
     case HIDE_LOGIN_DIALOG:
       return {
         ...state,
         isLoginDialogDisplayed: false,
         isMustResetMessageDisplayed: false,
-        isNotVerifiedMessageDisplayed: false
+        isNotVerifiedMessageDisplayed: false,
+        notVerifiedContext: 'login'
       };
     case LOGOUT:
       removeTokenFromLocalStorage();

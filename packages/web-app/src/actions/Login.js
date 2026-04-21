@@ -31,8 +31,10 @@ export const fetchLoginMustReset = () => ({
   type: FETCH_LOGIN_MUST_RESET
 });
 
-export const fetchLoginNotVerified = () => ({
-  type: FETCH_LOGIN_NOT_VERIFIED
+export const fetchLoginNotVerified = (context = 'login', email = '') => ({
+  type: FETCH_LOGIN_NOT_VERIFIED,
+  context,
+  email
 });
 
 export const fetchLoginResetSuccess = () => ({
@@ -44,8 +46,9 @@ export const fetchLoginFailure = error => ({
   error
 });
 
-export const displayLoginDialog = () => ({
-  type: DISPLAY_LOGIN_DIALOG
+export const displayLoginDialog = (notVerifiedContext = 'login') => ({
+  type: DISPLAY_LOGIN_DIALOG,
+  notVerifiedContext
 });
 
 export const hideLoginDialog = () => ({
@@ -94,6 +97,7 @@ export function postLogin(email, password) {
     try {
       const response = await fetch(loginUrl, {
         method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password })
       });
       responseStatus = response.status;
@@ -112,7 +116,7 @@ export function postLogin(email, password) {
         }
 
         if (json?.status === 'NotVerified') {
-          dispatch(fetchLoginNotVerified());
+          dispatch(fetchLoginNotVerified('login', email));
           return;
         }
 
@@ -141,6 +145,7 @@ export function postForgotPassword(email, onSuccess) {
     try {
       const response = await fetch(forgotPasswordUrl, {
         method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email })
       });
 
@@ -154,18 +159,22 @@ export function postForgotPassword(email, onSuccess) {
 
       const statusCode = response.status;
       try {
-        const json = await response.json();
-        if (json?.status === 'NotVerified') {
-          dispatch(fetchLoginNotVerified());
-          return;
-        }
-        errorMessage = json.message || json.error || (await response.text());
-      } catch (e) {
         const text = await response.text();
-        errorMessage =
-          statusCode === 500
-            ? 'A server error occurred, please try again later or contact Wikicaves for more information.'
-            : text;
+        try {
+          const json = JSON.parse(text);
+          if (json?.status === 'NotVerified') {
+            dispatch(fetchLoginNotVerified('forgotPassword', email));
+            return;
+          }
+          errorMessage = json.message || json.error || text;
+        } catch (e) {
+          errorMessage =
+            statusCode === 500
+              ? 'A server error occurred, please try again later or contact Wikicaves for more information.'
+              : text;
+        }
+      } catch (e) {
+        errorMessage = 'Unknown error';
       }
     } catch (_) {
       // Other errors
