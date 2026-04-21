@@ -261,6 +261,7 @@ export const unlinkCaveFromOrganizationUrl = (caveId, organizationId) =>
 // ===== Persons / cavers urls
 export const getGroupsUrl = `${API_BASE_PATH}/cavers/groups`;
 export const getBannedCaversUrl = `${API_BASE_PATH}/cavers/banned`;
+export const getInvalidEmailCaversUrl = `${API_BASE_PATH}/cavers/invalid-mail`;
 export const getCaverUrl = `${API_BASE_PATH}/cavers/`;
 export const postPersonUrl = `${API_BASE_PATH}/cavers`;
 export const postPersonGroupsUrl = userId =>

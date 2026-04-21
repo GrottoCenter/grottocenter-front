@@ -2,6 +2,7 @@ import fetch from 'isomorphic-fetch';
 import {
   getGroupsUrl,
   getBannedCaversUrl,
+  getInvalidEmailCaversUrl,
   getCaverUrl
 } from '../../conf/apiRoutes';
 import { checkAndGetStatus, checkAuthStatus } from '../utils';
@@ -19,6 +20,12 @@ export const FETCH_BANNED_CAVERS = 'FETCH_BANNED_CAVERS';
 export const FETCH_BANNED_CAVERS_SUCCESS = 'FETCH_BANNED_CAVERS_SUCCESS';
 export const FETCH_BANNED_CAVERS_FAILURE = 'FETCH_BANNED_CAVERS_FAILURE';
 
+export const FETCH_INVALID_EMAIL_CAVERS = 'FETCH_INVALID_EMAIL_CAVERS';
+export const FETCH_INVALID_EMAIL_CAVERS_SUCCESS =
+  'FETCH_INVALID_EMAIL_CAVERS_SUCCESS';
+export const FETCH_INVALID_EMAIL_CAVERS_FAILURE =
+  'FETCH_INVALID_EMAIL_CAVERS_FAILURE';
+
 const fetchPersonAction = () => ({ type: FETCH_PERSON });
 const fetchPersonSuccess = person => ({ type: FETCH_PERSON_SUCCESS, person });
 const fetchPersonFailure = error => ({ type: FETCH_PERSON_FAILURE, error });
@@ -34,6 +41,18 @@ const fetchBannedCaversSuccess = cavers => ({
 });
 const fetchBannedCaversFailure = error => ({
   type: FETCH_BANNED_CAVERS_FAILURE,
+  error
+});
+
+const fetchInvalidEmailCaversAction = () => ({
+  type: FETCH_INVALID_EMAIL_CAVERS
+});
+const fetchInvalidEmailCaversSuccess = cavers => ({
+  type: FETCH_INVALID_EMAIL_CAVERS_SUCCESS,
+  cavers
+});
+const fetchInvalidEmailCaversFailure = error => ({
+  type: FETCH_INVALID_EMAIL_CAVERS_FAILURE,
   error
 });
 
@@ -101,6 +120,34 @@ export function fetchBannedCavers() {
       .catch(error => {
         if (error.isAuthError) return;
         dispatch(fetchBannedCaversFailure(error));
+      });
+  };
+}
+
+export function fetchInvalidEmailCavers() {
+  return (dispatch, getState) => {
+    dispatch(fetchInvalidEmailCaversAction());
+
+    const requestOptions = {
+      method: 'GET',
+      headers: getState().login.authorizationHeader
+    };
+
+    return fetch(getInvalidEmailCaversUrl, requestOptions)
+      .then(checkAuthStatus(dispatch))
+      .then(response => response.json())
+      .then(data => {
+        if (data.cavers === undefined) {
+          // eslint-disable-next-line no-console
+          console.warn(
+            'fetchInvalidEmailCavers: unexpected API response shape — "cavers" field is missing'
+          );
+        }
+        dispatch(fetchInvalidEmailCaversSuccess(data.cavers || []));
+      })
+      .catch(error => {
+        if (error.isAuthError) return;
+        dispatch(fetchInvalidEmailCaversFailure(error));
       });
   };
 }
