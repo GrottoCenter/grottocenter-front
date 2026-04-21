@@ -50,7 +50,7 @@ import DocumentsSearchPage from './pages/Documents';
 import MassifsSearchPage from './pages/Massifs';
 import OrganizationsSearchPage from './pages/Organizations';
 import PersonsSearchPage from './pages/Persons';
-import VerifyEmail from './components/appli/VerifyEmail';
+import VerifyEmail from './containers/VerifyEmail';
 
 import './App.css';
 
