@@ -2,6 +2,7 @@ import { combineReducers } from 'redux';
 import advancedsearch from './AdvancedsearchReducer';
 import banCaver from './BanCaverReducer';
 import bannedCavers from './BannedCaversReducer';
+import invalidEmailCavers from './InvalidEmailCaversReducer';
 import linkDocumentToEntrance from './LinkDocumentToEntrance';
 import unlinkDocumentToEntrance from './UnlinkDocumentToEntrance';
 import cave from './CaveReducer';
@@ -92,6 +93,7 @@ const GCReducer = combineReducers({
   advancedsearch,
   banCaver,
   bannedCavers,
+  invalidEmailCavers,
   linkDocumentToEntrance,
   unlinkDocumentToEntrance,
   cave,
