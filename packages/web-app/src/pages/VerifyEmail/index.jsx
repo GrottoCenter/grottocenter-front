@@ -10,7 +10,14 @@ const SpacedCenteredButton = styled(Button)`
   margin: ${({ theme }) => theme.spacing(3)} auto;
 `;
 
-const VerifyEmailPage = ({ loading, success, error, onGoToLogin }) => {
+const VerifyEmailPage = ({
+  loading,
+  success,
+  alreadyVerified,
+  invalidToken,
+  error,
+  onGoToLogin
+}) => {
   const { formatMessage } = useIntl();
 
   let content;
@@ -22,6 +29,29 @@ const VerifyEmailPage = ({ loading, success, error, onGoToLogin }) => {
           {formatMessage({ id: 'Verifying your email...' })}
         </Typography>
       </div>
+    );
+  } else if (invalidToken) {
+    content = (
+      <Typography align="center" variant="h6" color="error">
+        {formatMessage({ id: 'The verification link is invalid.' })}
+      </Typography>
+    );
+  } else if (success && alreadyVerified) {
+    content = (
+      <>
+        <Typography align="center" variant="h6" color="primary">
+          {formatMessage({
+            id: 'Your email address is already verified. You can log in.'
+          })}
+        </Typography>
+        <SpacedCenteredButton
+          color="primary"
+          onClick={onGoToLogin}
+          style={{ display: 'block' }}
+          variant="contained">
+          {formatMessage({ id: 'Go to login' })}
+        </SpacedCenteredButton>
+      </>
     );
   } else if (success) {
     content = (
@@ -42,18 +72,17 @@ const VerifyEmailPage = ({ loading, success, error, onGoToLogin }) => {
     );
   } else {
     content = (
-      <>
-        <Typography align="center" variant="h6" color="error">
-          {error ||
-            formatMessage({ id: 'The verification link is invalid or expired.' })}
-        </Typography>
-      </>
+      <Typography align="center" variant="h6" color="error">
+        {error || formatMessage({ id: 'The verification link is invalid.' })}
+      </Typography>
     );
   }
 
   return (
     <Layout
-      title={formatMessage({ id: 'Email Verification' })}
+      title={formatMessage({
+        id: 'Email Verification'
+      })}
       content={content}
     />
   );
@@ -62,11 +91,15 @@ const VerifyEmailPage = ({ loading, success, error, onGoToLogin }) => {
 VerifyEmailPage.propTypes = {
   loading: PropTypes.bool.isRequired,
   success: PropTypes.bool.isRequired,
+  alreadyVerified: PropTypes.bool,
+  invalidToken: PropTypes.bool,
   error: PropTypes.string,
   onGoToLogin: PropTypes.func.isRequired
 };
 
 VerifyEmailPage.defaultProps = {
+  alreadyVerified: false,
+  invalidToken: false,
   error: null
 };
 
