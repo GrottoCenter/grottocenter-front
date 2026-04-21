@@ -20,15 +20,11 @@ export const verifyEmailFailure = error => ({
   error
 });
 
-export function postVerifyEmail(token) {
+export function getVerifyEmail(token) {
   return dispatch => {
     dispatch(verifyEmail());
 
-    const requestOptions = {
-      method: 'POST'
-    };
-
-    return fetch(verifyEmailUrl(token), requestOptions)
+    return fetch(verifyEmailUrl(token), { method: 'GET' })
       .then(response => {
         if (response.ok) {
           return response.json();
@@ -43,10 +39,15 @@ export function postVerifyEmail(token) {
           const statusCode = response.status;
           let errorMessage = '';
           try {
-            const json = await response.json();
-            errorMessage = json.message || json.error || (await response.text());
+            const text = await response.text();
+            try {
+              const json = JSON.parse(text);
+              errorMessage = json.message || json.error || text;
+            } catch (e) {
+              errorMessage = text;
+            }
           } catch (e) {
-            errorMessage = await response.text();
+            errorMessage = 'Unknown error';
           }
 
           if (statusCode === 500) {
