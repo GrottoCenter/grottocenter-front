@@ -133,19 +133,15 @@ const Login = () => {
       <Typography
         variant="h6"
         style={{ textAlign: 'center', paddingBottom: 5 }}>
-        <Translate>
-          For security reasons please create a new password.
-        </Translate>
+        <Translate>For security reasons please create a new password.</Translate>
       </Typography>
       <Typography
         variant="body2"
         style={{ textAlign: 'center', paddingBottom: 10 }}>
-        <Translate>
-          We have changed the way passwords are saved to make it more secure.
-        </Translate>
+        <Translate>We have changed the way passwords are saved to make it more secure.</Translate>
       </Typography>
       <Typography variant="body1" style={{ textAlign: 'center' }}>
-        <Translate>An email will be sent to:</Translate> <b>{email}</b>
+        <Translate>An email will be sent to:</Translate> <b>{email || authState.notVerifiedEmail}</b>
       </Typography>
     </>
   ) : authState.isNotVerifiedMessageDisplayed ? (
@@ -168,11 +164,15 @@ const Login = () => {
       <Typography
         variant="body1"
         style={{ textAlign: 'center', paddingBottom: 10 }}>
-        <Translate>Please check your email to activate it.</Translate>
+        {authState.notVerifiedContext === 'forgotPassword' ? (
+          <Translate>You must verify your email address before you can reset your password.</Translate>
+        ) : (
+          <Translate>Please check your email to activate it.</Translate>
+        )}
       </Typography>
       <Typography variant="body2" style={{ textAlign: 'center' }}>
         <Translate>You can request a new verification email for:</Translate>{' '}
-        <b>{email}</b>
+        <b>{email || authState.notVerifiedEmail}</b>
       </Typography>
     </>
   ) : (
