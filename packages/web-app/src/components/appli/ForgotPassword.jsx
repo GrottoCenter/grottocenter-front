@@ -5,7 +5,7 @@ import { isEmpty, match } from 'ramda';
 
 import { useNavigate } from 'react-router-dom';
 import { emailRegexp } from '../../conf/config';
-import { postForgotPassword } from '../../actions/ForgotPassword';
+import { postForgotPassword, resetForgotPassword } from '../../actions/ForgotPassword';
 import { useBoolean, useNotification, usePermissions } from '../../hooks';
 import ForgotPasswordPage from '../../pages/ForgotPassword';
 
@@ -13,7 +13,6 @@ const ForgotPassword = () => {
   const dispatch = useDispatch();
   const { formatMessage } = useIntl();
   const forgotPasswordState = useSelector(state => state.forgotPassword);
-  const { isTrue: isRequestSent, true: requestSent } = useBoolean();
   const {
     isTrue: isRequestSucceeded,
     true: requestSucceeded,
@@ -28,7 +27,10 @@ const ForgotPassword = () => {
     if (permissions.isAuth) {
       navigate(``);
     }
-  }, [navigate, permissions.isAuth]);
+    return () => {
+      dispatch(resetForgotPassword());
+    };
+  }, [dispatch, navigate, permissions.isAuth]);
 
   const checkIfValuesAreValid = () => {
     const errors = [];
@@ -51,7 +53,6 @@ const ForgotPassword = () => {
           email
         })
       );
-      requestSent();
     }
   };
 
