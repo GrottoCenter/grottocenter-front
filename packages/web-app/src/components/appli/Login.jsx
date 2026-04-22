@@ -31,8 +31,9 @@ const Login = () => {
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
   const [authErrorMessages, setAuthErrorMessages] = React.useState([]);
+  const [resendTimeout, setResendTimeout] = React.useState(0);
   const navigate = useNavigate();
-  const { onSuccess, onError } = useNotification();
+  const { onSuccess } = useNotification();
   const { formatMessage } = useIntl();
 
   const onLogin = event => {
@@ -60,6 +61,7 @@ const Login = () => {
         )
       );
     } else if (authState.isNotVerifiedMessageDisplayed) {
+      if (resendTimeout > 0) return;
       dispatch(postResendVerificationEmail(email));
     } else {
       dispatch(postLogin(email, password));
@@ -70,21 +72,37 @@ const Login = () => {
     if (resendVerificationState.success) {
       onSuccess(formatMessage({ id: 'Verification email sent!' }));
       dispatch(resetResendVerification());
+      setResendTimeout(60);
     }
   }, [
     resendVerificationState.success,
-    resendVerificationState.error,
     onSuccess,
-    onError,
     formatMessage,
     dispatch
   ]);
+
+  useEffect(() => {
+    let interval = null;
+    if (resendTimeout > 0) {
+      interval = setInterval(() => {
+        setResendTimeout(prev => prev - 1);
+      }, 1000);
+    } else {
+      clearInterval(interval);
+    }
+    return () => clearInterval(interval);
+  }, [resendTimeout]);
 
   const LoginButtonMessage = () => {
     if (authState.isMustResetMessageDisplayed) {
       return <Translate>Send reset email</Translate>;
     }
     if (authState.isNotVerifiedMessageDisplayed) {
+      if (resendTimeout > 0) {
+        return (
+          <Translate id="Resend in {seconds}s" values={{ seconds: resendTimeout }} />
+        );
+      }
       return <Translate>Resend verification email</Translate>;
     }
     return <Translate>Log in</Translate>;
@@ -95,6 +113,7 @@ const Login = () => {
       type="submit"
       size="large"
       onClick={onLogin}
+      disabled={resendTimeout > 0 && authState.isNotVerifiedMessageDisplayed}
       color={
         authState.isFetching || resendVerificationState.isFetching
           ? 'inherit'

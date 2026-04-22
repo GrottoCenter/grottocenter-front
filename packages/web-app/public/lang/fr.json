@@ -1974,6 +1974,7 @@
   "Your account is not verified yet.": "Votre compte n'est pas encore vérifié.",
   "Please check your email to activate it.": "Veuillez vérifier vos e-mails pour l'activer.",
   "Resend verification email": "Renvoyer l'e-mail de vérification",
+  "Resend in {seconds}s": "Renvoyer dans {seconds}s",
   "Verification email sent!": "E-mail de vérification envoyé !",
   "You must verify your email address before you can reset your password.": "Vous devez vérifier votre adresse e-mail avant de pouvoir réinitialiser votre mot de passe.",
   "Email Verification": "Vérification de l'e-mail",
