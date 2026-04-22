@@ -6,7 +6,8 @@ import {
 
 const initialState = {
   error: null,
-  isFetching: false
+  isFetching: false,
+  success: false
 };
 
 const reducer = (state = initialState, action) => {
@@ -15,20 +16,25 @@ const reducer = (state = initialState, action) => {
       return {
         ...state,
         isFetching: true,
-        error: null
+        error: null,
+        success: false
       };
     case FETCH_FORGOT_PASSWORD_SUCCESS:
       return {
         ...state,
         error: null,
-        isFetching: false
+        isFetching: false,
+        success: true
       };
     case FETCH_FORGOT_PASSWORD_FAILURE:
       return {
         ...state,
         isFetching: false,
-        error: action.error
+        error: action.error,
+        success: false
       };
+    case RESET_FORGOT_PASSWORD:
+      return initialState;
     default:
       return state;
   }

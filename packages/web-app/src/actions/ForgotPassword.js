@@ -6,6 +6,7 @@ import { fetchLoginNotVerified, displayLoginDialog } from './Login';
 export const FETCH_FORGOT_PASSWORD = 'FETCH_FORGOT_PASSWORD';
 export const FETCH_FORGOT_PASSWORD_SUCCESS = 'FETCH_FORGOT_PASSWORD_SUCCESS';
 export const FETCH_FORGOT_PASSWORD_FAILURE = 'FETCH_FORGOT_PASSWORD_FAILURE';
+export const RESET_FORGOT_PASSWORD = 'RESET_FORGOT_PASSWORD';
 
 export const fetchForgotPassword = () => ({
   type: FETCH_FORGOT_PASSWORD
@@ -18,6 +19,10 @@ export const fetchForgotPasswordSuccess = () => ({
 export const fetchForgotPasswordFailure = error => ({
   type: FETCH_FORGOT_PASSWORD_FAILURE,
   error
+});
+
+export const resetForgotPassword = () => ({
+  type: RESET_FORGOT_PASSWORD
 });
 
 /**
@@ -47,16 +52,21 @@ export function postForgotPassword(data) {
         const statusCode = response.status;
         let errorMessage = '';
         try {
-          const json = await response.json();
-          if (statusCode === 401 && json?.status === 'NotVerified') {
-            dispatch(displayLoginDialog('forgotPassword'));
-            dispatch(fetchLoginNotVerified('forgotPassword', data.email));
-            dispatch(fetchForgotPasswordSuccess()); // Clear loading state on page
-            return;
+          const text = await response.text();
+          try {
+            const json = JSON.parse(text);
+            if (statusCode === 401 && json?.status === 'NotVerified') {
+              dispatch(displayLoginDialog('forgotPassword'));
+              dispatch(fetchLoginNotVerified('forgotPassword', data.email));
+              dispatch(resetForgotPassword()); // Clear loading state on page
+              return;
+            }
+            errorMessage = json.message || json.error || text;
+          } catch (e) {
+            errorMessage = text;
           }
-          errorMessage = json.message || json.error || (await response.text());
         } catch (e) {
-          errorMessage = await response.text();
+          errorMessage = 'Unknown error';
         }
 
         if (statusCode === 500) {

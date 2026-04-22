@@ -56,17 +56,13 @@ const ForgotPassword = () => {
   };
 
   useEffect(() => {
-    if (
-      forgotPasswordState.error === null &&
-      !forgotPasswordState.isFetching &&
-      isRequestSent
-    ) {
+    if (forgotPasswordState.success) {
       requestSucceeded();
     } else {
       requestFailed();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [forgotPasswordState, isRequestSent]);
+  }, [forgotPasswordState.success]);
 
   return (
     <ForgotPasswordPage
