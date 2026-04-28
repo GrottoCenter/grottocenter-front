@@ -76,19 +76,18 @@ const ToggleButton = styled('button')`
   }
 `;
 
-const SectionTitle = styled('div')`
-  font-weight: bold;
-  font-size: 12px;
-  padding: 4px 0 2px;
-  color: #333;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-
-  &:not(:first-of-type) {
-    margin-top: 6px;
+const SectionTitle = styled('div')(({ theme }) => ({
+  fontWeight: 'bold',
+  fontSize: 12,
+  padding: '4px 0 2px',
+  color: theme.palette.text.primary,
+  display: 'flex',
+  alignItems: 'center',
+  gap: 4,
+  '&:not(:first-of-type)': {
+    marginTop: 6
   }
-`;
+}));
 
 const PopoverContent = styled('div')`
   padding: 8px 12px;
@@ -230,7 +229,7 @@ const DataControl = ({
           disabled={fullScreen}
           data-tour="data-control-toggle"
           onClick={() => toggleExpanded(true)}>
-          <VisibilityIcon htmlColor="#333" />
+          <VisibilityIcon color="action" />
         </ToggleButton>
 
         <section className="leaflet-control-layers-list">
@@ -279,7 +278,7 @@ const DataControl = ({
                 <SectionTitle>
                   {formatMessage({ id: 'Filter by size' }).toUpperCase()}
                   <InfoOutlinedIcon
-                    sx={{ fontSize: 13, cursor: 'pointer', color: '#666' }}
+                    sx={{ fontSize: 13, cursor: 'pointer', color: 'text.secondary' }}
                     onClick={e => setSizeInfoAnchor(e.currentTarget)}
                   />
                 </SectionTitle>

@@ -36,9 +36,11 @@ import MoveEntranceToCave from './pages/MoveEntranceToCave';
 import NetworkPage from './pages/Network';
 import PersonPage from './pages/Person';
 import OrganizationPage from './pages/Organization';
+import EntranceEdit from './pages/EntityEdit/Entrance/EntranceEdit';
 import MassifEdit from './pages/EntityEdit/Massif/MassifEdit';
 import PersonEdit from './pages/PersonEdit';
 import OrganizationEdit from './pages/EntityEdit/Organization/OrganizationEdit';
+import PrivateRoute from './components/appli/PrivateRoute';
 import CountryPage from './pages/Country';
 import RegionPage from './pages/Region';
 import NotificationsPage from './pages/Notifications';
@@ -92,21 +94,14 @@ const router = createBrowserRouter(
       <Route path="/ui/notifications" element={<NotificationsPage />} />
       <Route path="/ui/test" element={<LatestBlogNewsSection />} />
       <Route
-        path="/ui/organizations/:organizationId/edit"
-        element={<OrganizationEdit />}
-      />
-      <Route
         path="/ui/organizations/:organizationId"
         element={<OrganizationPage />}
       />
-
-      <Route path="/ui/massifs/:massifId/edit" element={<MassifEdit />} />
       <Route
         path="/ui/massifs/:massifId/entrances"
         element={<EntrancesListPage />}
       />
       <Route path="/ui/massifs/:massifId" element={<MassifPage />} />
-      <Route path="/ui/persons/:personId/edit" element={<PersonEdit />} />
       <Route path="/ui/persons/:personId" element={<PersonPage />} />
       <Route path="/ui/login" element={<HomePage />} />
       <Route path="/ui/signup" element={<SignUp />} />
@@ -115,10 +110,22 @@ const router = createBrowserRouter(
       <Route path="/ui/forgotPassword" element={<ForgotPassword />} />
       <Route path="/ui/changePassword" element={<ChangePassword />} />
       <Route path="/ui/documents/validation" element={<DocumentValidation />} />
-      <Route path="/ui/documents/:documentId/edit" element={<DocumentEdit />} />
       <Route path="/ui/documents/:documentId" element={<DocumentDetails />} />
       <Route path="/ui/import-csv" element={<ImportContainer />} />
       <Route path="/ui/duplicates" element={<DuplicateImportHandle />} />
+
+      {/* Routes requiring authentication */}
+      <Route element={<PrivateRoute />}>
+        <Route path="/ui/entrances/:entranceId/edit" element={<EntranceEdit />} />
+        <Route
+          path="/ui/organizations/:organizationId/edit"
+          element={<OrganizationEdit />}
+        />
+        <Route path="/ui/massifs/:massifId/edit" element={<MassifEdit />} />
+        <Route path="/ui/persons/:personId/edit" element={<PersonEdit />} />
+        <Route path="/ui/documents/:documentId/edit" element={<DocumentEdit />} />
+      </Route>
+
       <Route path="/ui/*" element={<Navigate to="/" replace />} />
     </Route>
   ),

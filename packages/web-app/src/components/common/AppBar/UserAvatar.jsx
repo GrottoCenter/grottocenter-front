@@ -24,7 +24,7 @@ const StyledAvatar = styled(Avatar)(({ theme }) => ({
   height: 32,
   cursor: 'pointer',
   backgroundColor: theme.palette.secondary.main,
-  color: '#fff',
+  color: theme.palette.common.white,
   fontSize: '1.5rem',
   fontWeight: 500
 }));

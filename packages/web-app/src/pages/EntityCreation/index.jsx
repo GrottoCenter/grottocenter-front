@@ -1,11 +1,10 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
-import { Button } from '@mui/material';
+import { Alert, Button } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { useIntl } from 'react-intl';
 import Layout from '../../components/common/Layouts/Fixed/FixedContent';
-import ErrorMessage from '../../components/common/StatusMessage/ErrorMessage';
 import Translate from '../../components/common/Translate';
 import { usePermissions } from '../../hooks';
 import { displayLoginDialog } from '../../actions/Login';
@@ -30,11 +29,11 @@ const EntitiesCreation = () => {
       content={
         !permissions.isAuth ? (
           <CenteredBlock>
-            <ErrorMessage
-              message={formatMessage({
+            <Alert severity="error" sx={{ mb: 2 }}>
+              {formatMessage({
                 id: 'You must be authenticated to submit a new entity to Grottocenter.'
               })}
-            />
+            </Alert>
             <Button onClick={handleLogin} variant="contained">
               <Translate>Log in</Translate>
             </Button>

@@ -7,15 +7,10 @@ import PropTypes from 'prop-types';
 // import { useDebounce } from '../../../../hooks'; // To uncomment when API will accept phone number
 // import 'react-phone-input-2/lib/style.css'; // To uncomment when API will accept phone number
 
-import {
-  validateLatitude,
-  validateLongitude
-} from '../../../../util/validateLatLong';
 import InputText from '../utils/InputText';
 import InputCountry from '../utils/InputCountry';
 import InputLanguage from '../utils/InputLanguage';
-import InputCoordinate from '../utils/InputCoordinate';
-import MapMarkerSelector from '../utils/MapMarkerSelector';
+import CoordinateFormSection from '../utils/CoordinateFormSection';
 import { FormRow, FormSectionLabel } from '../utils/FormContainers';
 // import OrganizationLogo from './OrganizationLogo';
 
@@ -150,28 +145,12 @@ const OrganizationFields = ({ control, errors, isNewOrganization }) => {
         <InputCountry control={control} formKey="organization.country" />
       </FormRow>
 
-      <FormRow>
-        <InputCoordinate
-          formKey="organization.latitude"
-          labelName="Latitude"
-          control={control}
-          validatorFn={validateLatitude}
-          isError={!!errors?.organization?.latitude}
-          helperText={errors?.organization?.latitude?.message}
-        />
-        <InputCoordinate
-          formKey="organization.longitude"
-          labelName="Longitude"
-          control={control}
-          validatorFn={validateLongitude}
-          isError={!!errors?.organization?.longitude}
-          helperText={errors?.organization?.longitude?.message}
-        />
-      </FormRow>
-      <MapMarkerSelector
+      <CoordinateFormSection
         control={control}
         formLatitudeKey="organization.latitude"
         formLongitudeKey="organization.longitude"
+        latitudeError={errors?.organization?.latitude?.message}
+        longitudeError={errors?.organization?.longitude?.message}
       />
 
       {/* <OrganizationLogo control={control} errors={errors} /> To uncomment when api will be ready to store logo */}

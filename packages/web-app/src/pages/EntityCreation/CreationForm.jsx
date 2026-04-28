@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
 import {
@@ -73,15 +74,17 @@ const EntityTypeSelect = ({ entity, onEntityChange }) => {
 };
 
 const EntityForm = ({ selectedEntity }) => {
+  const navigate = useNavigate();
+  const onCancel = () => navigate(-1);
   switch (selectedEntity) {
     case ENTITIES.entrance:
-      return <EntranceForm />;
+      return <EntranceForm onCancel={onCancel} />;
     case ENTITIES.document:
       return <DocumentSubmission />;
     case ENTITIES.massif:
-      return <MassifForm />;
+      return <MassifForm onCancel={onCancel} />;
     case ENTITIES.organization:
-      return <OrganizationForm />;
+      return <OrganizationForm onCancel={onCancel} />;
 
     default:
       return (

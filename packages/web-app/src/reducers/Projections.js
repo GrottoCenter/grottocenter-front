@@ -23,13 +23,13 @@ const reducer = (state = defaultState, action) => {
       registerProjections(action.data);
       return {
         ...state,
-        loadings: false,
+        loading: false,
         projections: action.data
       };
     case FETCH_PROJECTIONS_FAILURE:
       return {
         ...state,
-        loadings: false,
+        loading: false,
         error: action.error
       };
     default:

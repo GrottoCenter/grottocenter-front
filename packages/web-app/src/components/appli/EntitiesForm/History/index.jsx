@@ -19,15 +19,11 @@ const CreateHistoryForm = ({ closeForm, onSubmit, values, isNewHistory }) => {
 
   const {
     handleSubmit,
-    reset,
     control,
-    formState: { errors, isDirty, isSubmitting }
+    formState: { errors, isSubmitting }
   } = useForm({
     defaultValues: values ?? getDefaultValues(AVAILABLE_LANGUAGES[locale].id)
   });
-  const handleReset = () => {
-    reset(values ?? getDefaultValues(AVAILABLE_LANGUAGES[locale].id));
-  };
 
   return (
     <FormContainer sx={{ marginTop: 2 }}>
@@ -49,10 +45,8 @@ const CreateHistoryForm = ({ closeForm, onSubmit, values, isNewHistory }) => {
         />
 
         <FormActionRow
-          isDirty={isDirty}
           isNew={isNewHistory}
           isSubmitting={isSubmitting}
-          onReset={handleReset}
           onCancel={closeForm}
           isCenter
         />

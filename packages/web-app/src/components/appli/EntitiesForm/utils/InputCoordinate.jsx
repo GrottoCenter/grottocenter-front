@@ -39,7 +39,7 @@ const InputCoordinate = ({
           error={isError}
           inputRef={ref}
           helperText={helperText}
-          value={value}
+          value={value ?? ''}
           onChange={e => {
             const reg = /^-?\d*(\.|,)?(\d+)?$/;
             const oldV = value ?? '';

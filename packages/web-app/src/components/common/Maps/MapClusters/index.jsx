@@ -1,16 +1,45 @@
-import React, { useCallback, useEffect, useMemo, useState, useRef } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  useRef
+} from 'react';
 import PropTypes from 'prop-types';
 import { useMap, useMapEvent } from 'react-leaflet';
 import { uniq } from 'ramda';
 
 import DataControl, { heatmapTypes, markerTypes } from './DataControl';
 import MapTour from './MapTour';
-import ConverterControl from '../common/Converter';
 import GeocodingControl from '../common/GeocodingControl';
+import {
+  Box,
+  IconButton,
+  ListSubheader,
+  Menu,
+  Tooltip,
+  Typography,
+  useMediaQuery
+} from '@mui/material';
+import { ContentCopy, Tune } from '@mui/icons-material';
+import { useSelector } from 'react-redux';
+import { useIntl } from 'react-intl';
+import {
+  formatCoordinatesForCopy,
+  formatWGS84
+} from '../../../../helpers/coordinateConvert';
+import copyToClipboard from '../../../../helpers/clipboard';
+import {
+  useNotification,
+  useCoordinatePreference,
+  getCRSLabel
+} from '../../../../hooks';
+import CRSMenu from '../../CRSMenu';
 import MeasureControl from '../common/MeasureControl';
 import useHeatLayer, { HexGlobalCss } from './useHeatLayer';
 import Markers from './Markers';
 import MassifPolygons, { massifPolygonType } from './MassifPolygons';
+import PopupTargetHandler from './PopupTargetHandler';
 import CustomMapContainer from '../common/MapContainer';
 import {
   MARKERS_LIMIT,
@@ -33,10 +62,20 @@ const HydratedMap = ({
   organizations,
   massifs,
   massifPolygons = [],
-  projectionsList,
-  onUpdate
+  onUpdate,
+  popupTarget = null
 }) => {
   const map = useMap();
+  const { formatMessage } = useIntl();
+  const { onSuccess } = useNotification();
+  const projections = useSelector(
+    state => state.projections?.projections ?? []
+  );
+  const [contextCoords, setContextCoords] = useState(null);
+  const [contextMenuAnchor, setContextMenuAnchor] = useState(null);
+  const [formatMenuAnchor, setFormatMenuAnchor] = useState(null);
+  const [preferred, setPref] = useCoordinatePreference();
+  const isTouch = useMediaQuery('(pointer: coarse)');
   const { updateLayers } = useHeatLayer();
 
   const initialZoom = useRef(map.getZoom()).current;
@@ -66,7 +105,10 @@ const HydratedMap = ({
 
   const [visibleMarkers, setVisibleMarkers] = useState(
     isInitiallyZoomedIn
-      ? uniq([heatmapTypes.ENTRANCES, ...Object.keys(selectedMarkers).filter(k => selectedMarkers[k])])
+      ? uniq([
+          heatmapTypes.ENTRANCES,
+          ...Object.keys(selectedMarkers).filter(k => selectedMarkers[k])
+        ])
       : []
   );
   // Bail out if content is unchanged so React.memo on Markers stays effective.
@@ -74,8 +116,12 @@ const HydratedMap = ({
   // which would bypass memo and trigger 3 marker-layer update cycles unnecessarily.
   const setVisibleMarkersStable = useCallback(nextOrUpdater => {
     setVisibleMarkers(prev => {
-      const next = typeof nextOrUpdater === 'function' ? nextOrUpdater(prev) : nextOrUpdater;
-      if (prev.length === next.length && next.every(v => prev.includes(v))) return prev;
+      const next =
+        typeof nextOrUpdater === 'function'
+          ? nextOrUpdater(prev)
+          : nextOrUpdater;
+      if (prev.length === next.length && next.every(v => prev.includes(v)))
+        return prev;
       return next;
     });
   }, []);
@@ -83,7 +129,9 @@ const HydratedMap = ({
   const [isMassifPolygonMode, setIsMassifPolygonMode] = useState(
     initialZoom >= MASSIFS_POLYGON_LIMIT
   );
-  const zoomState = useRef(isInitiallyZoomedIn ? ZOOM_STATE.MARKERS : ZOOM_STATE.HEAT);
+  const zoomState = useRef(
+    isInitiallyZoomedIn ? ZOOM_STATE.MARKERS : ZOOM_STATE.HEAT
+  );
   const prevZoom = useRef(initialZoom);
 
   const selectedHeatsRef = useRef(selectedHeats);
@@ -94,7 +142,8 @@ const HydratedMap = ({
   const onUpdateRef = useRef(onUpdate);
   onUpdateRef.current = onUpdate;
 
-  const showMassifPolygons = selectedHeats.has(heatmapTypes.MASSIFS) && isMassifPolygonMode;
+  const showMassifPolygons =
+    selectedHeats.has(heatmapTypes.MASSIFS) && isMassifPolygonMode;
 
   const handleUpdate = useCallback(() => {
     onUpdateRef.current({
@@ -145,7 +194,10 @@ const HydratedMap = ({
     if (isZoomingIn && currentZoom >= MARKERS_LIMIT) {
       if (zoomState.current !== ZOOM_STATE.MARKERS) {
         setVisibleMarkersStable(
-          uniq([...Array.from(selectedHeatsRef.current), ...selectedMarkersListRef.current])
+          uniq([
+            ...Array.from(selectedHeatsRef.current),
+            ...selectedMarkersListRef.current
+          ])
         );
         setIsMarkersMode(true);
         zoomState.current = ZOOM_STATE.MARKERS;
@@ -168,6 +220,46 @@ const HydratedMap = ({
     }
 
     prevZoom.current = currentZoom;
+  });
+
+  const contextDisplayValue = useMemo(() => {
+    if (!contextCoords) return '';
+    try {
+      return (
+        formatCoordinatesForCopy(
+          contextCoords.lat,
+          contextCoords.lng,
+          preferred,
+          projections
+        ) ?? formatWGS84(contextCoords.lat, contextCoords.lng, 4)
+      );
+    } catch {
+      return formatWGS84(contextCoords.lat, contextCoords.lng, 4);
+    }
+  }, [contextCoords, preferred, projections]);
+
+  const handleContextCopy = useCallback(async () => {
+    if (!contextDisplayValue) return;
+    await copyToClipboard(contextDisplayValue);
+    if (!isTouch) onSuccess(formatMessage({ id: 'Coordinates copied' }));
+    setContextCoords(null);
+  }, [contextDisplayValue, isTouch, onSuccess, formatMessage]);
+
+  const handlePreferenceChange = useCallback(
+    code => {
+      setPref(code);
+      setFormatMenuAnchor(null);
+    },
+    [setPref]
+  );
+
+  useMapEvent('contextmenu', e => {
+    e.originalEvent.preventDefault();
+    setContextCoords({ lat: e.latlng.lat, lng: e.latlng.lng });
+    setContextMenuAnchor({
+      top: e.originalEvent.clientY,
+      left: e.originalEvent.clientX
+    });
   });
 
   // moveend fires after ALL map movement has finished - including mobile inertia.
@@ -195,7 +287,14 @@ const HydratedMap = ({
       activeTypes
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedHeats, entrances, networks, massifs, isMarkersMode, isMassifPolygonMode]);
+  }, [
+    selectedHeats,
+    entrances,
+    networks,
+    massifs,
+    isMarkersMode,
+    isMassifPolygonMode
+  ]);
 
   return (
     <>
@@ -213,7 +312,6 @@ const HydratedMap = ({
         isMarkersMode={isMarkersMode}
         useLeafletControl
       />
-      <ConverterControl projectionsList={projectionsList} />
       <Markers
         visibleMarkers={visibleMarkers}
         organizations={organizations}
@@ -221,6 +319,55 @@ const HydratedMap = ({
         entrances={filteredEntranceMarkers}
       />
       <MassifPolygons massifs={showMassifPolygons ? massifPolygons : []} />
+      <PopupTargetHandler popupTarget={popupTarget} />
+      <Menu
+        open={Boolean(contextCoords)}
+        onClose={() => setContextCoords(null)}
+        anchorReference="anchorPosition"
+        anchorPosition={contextMenuAnchor}
+        PaperProps={{ sx: { minWidth: 260 } }}>
+        <ListSubheader disableSticky sx={{ lineHeight: '32px', fontWeight: 'bold' }}>
+          {`${formatMessage({ id: 'Point coordinates' })} (${getCRSLabel(preferred, projections)})`}
+        </ListSubheader>
+        <Box
+          sx={{
+            pl: 3,
+            pr: 1,
+            py: 0.5,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 0.5
+          }}>
+          <Typography variant="body2" sx={{ flex: 1 }}>
+            {contextDisplayValue}
+          </Typography>
+          <Tooltip title={formatMessage({ id: 'Copy coordinates' })}>
+            <IconButton
+              size="small"
+              aria-label={formatMessage({ id: 'Copy coordinates' })}
+              onClick={handleContextCopy}
+              sx={{ color: 'text.secondary' }}>
+              <ContentCopy fontSize="small" />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title={formatMessage({ id: 'Change coordinate system' })}>
+            <IconButton
+              size="small"
+              aria-label={formatMessage({ id: 'Change coordinate system' })}
+              onClick={e => setFormatMenuAnchor(e.currentTarget)}
+              sx={{ color: 'text.secondary' }}>
+              <Tune fontSize="small" />
+            </IconButton>
+          </Tooltip>
+        </Box>
+      </Menu>
+      <CRSMenu
+        anchorEl={formatMenuAnchor}
+        onClose={() => setFormatMenuAnchor(null)}
+        preferred={preferred}
+        projections={projections}
+        onSelect={handlePreferenceChange}
+      />
     </>
   );
 };
@@ -233,7 +380,7 @@ const MAP_TOUR_SESSION_KEY = `mapTourSeenThisSession_v${MAP_TOUR_VERSION}`;
 // Set REACT_APP_DISABLE_MAP_TOUR=true in .env.local to prevent the tour from launching in dev.
 const MAP_TOUR_DISABLED = process.env.REACT_APP_DISABLE_MAP_TOUR === 'true';
 
-const Index = ({ center, zoom, isSideMenuOpen, mapRef, ...props }) => {
+const Index = ({ center, zoom, isSideMenuOpen, mapRef, popupTarget = null, ...props }) => {
   const [runTour, setRunTour] = useState(
     () =>
       !MAP_TOUR_DISABLED &&
@@ -256,7 +403,7 @@ const Index = ({ center, zoom, isSideMenuOpen, mapRef, ...props }) => {
         isSideMenuOpen={isSideMenuOpen}
         isLocateControl
         mapRef={mapRef}>
-        <HydratedMap {...props} />
+        <HydratedMap {...props} popupTarget={popupTarget} />
       </CustomMapContainer>
       <MapTour run={runTour} onEnd={handleTourEnd} />
     </>
@@ -278,7 +425,6 @@ HydratedMap.propTypes = {
   organizations: PropTypes.arrayOf(markerType),
   massifs: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.number)),
   massifPolygons: PropTypes.arrayOf(massifPolygonType),
-  projectionsList: PropTypes.arrayOf(PropTypes.shape({})),
   onUpdate: PropTypes.func
 };
 

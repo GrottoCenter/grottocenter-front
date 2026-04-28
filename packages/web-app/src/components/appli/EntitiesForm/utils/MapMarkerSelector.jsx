@@ -4,15 +4,12 @@ import { MapContainer, useMap, useMapEvent, ScaleControl } from 'react-leaflet';
 import PropTypes from 'prop-types';
 import { isMobile } from 'react-device-detect';
 import { styled } from '@mui/material/styles';
-import { useDispatch, useSelector } from 'react-redux';
 import { entranceMarkerIcon } from '../../../../assets/icons';
 import { useDebounce } from '../../../../hooks';
 import useGeolocation from '../../../../hooks/useGeolocation';
 import LayersControl from '../../../common/Maps/common/LayersControl';
 import LocateControl from '../../../common/Maps/common/LocateControl';
-import ConverterControl from '../../../common/Maps/common/Converter';
 import GeocodingControl from '../../../common/Maps/common/GeocodingControl';
-import { fetchProjections } from '../../../../actions/Projections';
 import { defaultZoom, focusZoom } from '../../../../conf/config';
 
 const StyledMapContainer = styled(MapContainer)`
@@ -83,12 +80,6 @@ const MapMarkerSelector = ({ control, formLatitudeKey, formLongitudeKey }) => {
   const { location: geoLocation, hasLocation } = useGeolocation();
   const [currentPosition, setCurrentPosition] = useState(geoLocation);
   const [shouldUpdate, setShouldUpdate] = useState(false);
-  const dispatch = useDispatch();
-  const { projections } = useSelector(state => state.projections);
-
-  useEffect(() => {
-    dispatch(fetchProjections());
-  }, [dispatch]);
 
   const latitude = useDebounce(
     useWatch({ control, name: formLatitudeKey }),
@@ -155,7 +146,6 @@ const MapMarkerSelector = ({ control, formLatitudeKey, formLongitudeKey }) => {
       <LocateControl />
       <ScaleControl position="bottomright" />
       <LayersControl />
-      <ConverterControl projectionsList={projections} hideOutput />
 
       <MapBind center={currentPosition} zoom={ZOOM_LEVEL} onMoveEnd={onMoveEnd} />
 

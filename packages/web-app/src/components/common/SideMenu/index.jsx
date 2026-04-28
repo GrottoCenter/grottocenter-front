@@ -57,7 +57,7 @@ const LogoImage = styled('img')(({ theme }) => ({
   flexShrink: 0
 }));
 
-const AppName = styled(AppTitle)({ color: '#222' });
+const AppName = styled(AppTitle)(({ theme }) => ({ color: theme.palette.primary.dark }));
 
 const Content = styled('div')`
   display: flex;

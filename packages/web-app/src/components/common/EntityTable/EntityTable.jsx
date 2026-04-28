@@ -401,8 +401,8 @@ const EntityTable = ({
   const renderCell = (doc, key, renderFn) => {
     const v = getObjectPath(doc, key);
     if (renderFn) return renderFn(v, doc);
-    if (v === true) return <CheckIcon sx={{ color: 'green' }} />;
-    if (v === false) return <CloseIcon sx={{ color: 'red' }} />;
+    if (v === true) return <CheckIcon color="success" />;
+    if (v === false) return <CloseIcon color="error" />;
     if (v) return v;
     return '-';
   };
