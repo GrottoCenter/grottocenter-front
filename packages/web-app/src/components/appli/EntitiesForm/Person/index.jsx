@@ -13,7 +13,7 @@ import FormProgressInfo from '../utils/FormProgressInfo';
 import { PASSWORD_MIN_LENGTH } from '../../../../conf/config';
 import { PersonPropTypes } from '../../../../types/person.type';
 
-export const PersonForm = ({ personValues, isOurAccount }) => {
+export const PersonForm = ({ personValues, isOurAccount, onCancel }) => {
   const {
     error: personError,
     isLoading: personIsLoading,
@@ -27,7 +27,7 @@ export const PersonForm = ({ personValues, isOurAccount }) => {
     control,
     watch,
     getValues,
-    formState: { errors, isDirty, isSubmitting, isSubmitSuccessful }
+    formState: { errors, isSubmitting, isSubmitSuccessful }
   } = useForm({
     defaultValues: {
       person: {
@@ -170,10 +170,9 @@ export const PersonForm = ({ personValues, isOurAccount }) => {
         )}
 
         <FormActionRow
-          isDirty={isDirty}
           isNew={false}
           isSubmitting={isSubmitting}
-          onReset={handleReset}
+          onCancel={onCancel}
         />
       </form>
     </FormContainer>
@@ -182,7 +181,8 @@ export const PersonForm = ({ personValues, isOurAccount }) => {
 
 PersonForm.propTypes = {
   isOurAccount: PropTypes.bool,
-  personValues: PersonPropTypes.isRequired
+  personValues: PersonPropTypes.isRequired,
+  onCancel: PropTypes.func
 };
 
 export default PersonForm;

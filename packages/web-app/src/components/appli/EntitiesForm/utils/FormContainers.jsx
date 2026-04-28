@@ -44,15 +44,7 @@ const Button = styled(MuiButton)`
   margin: ${({ theme }) => theme.spacing(2)};
 `;
 
-export const FormActionRow = ({
-  isDirty,
-  isNew,
-  isSubmitting,
-  onReset,
-  isResetAllowed = true,
-  isCenter = false,
-  onCancel
-}) => {
+export const FormActionRow = ({ isNew, isSubmitting, isCenter = false, onCancel }) => {
   const { formatMessage } = useIntl();
   return (
     <Box
@@ -61,21 +53,14 @@ export const FormActionRow = ({
         justifyContent: isCenter ? 'center' : 'flex-end'
       }}>
       <ActionButton
-        label={formatMessage({
-          id: isNew ? 'Create' : 'Update'
-        })}
+        label={formatMessage({ id: isNew ? 'Create' : 'Update' })}
         loading={isSubmitting}
         color="primary"
         style={{ margin: '8px' }}
         type="submit"
       />
-      {isResetAllowed && (
-        <Button variant="outlined" disabled={!isDirty} onClick={onReset}>
-          {formatMessage({ id: 'Reset' })}
-        </Button>
-      )}
       {onCancel && (
-        <Button variant="text" onClick={onCancel}>
+        <Button variant="outlined" onClick={onCancel}>
           {formatMessage({ id: 'Cancel' })}
         </Button>
       )}
@@ -83,11 +68,8 @@ export const FormActionRow = ({
   );
 };
 FormActionRow.propTypes = {
-  isDirty: PropTypes.bool.isRequired,
   isNew: PropTypes.bool.isRequired,
   isSubmitting: PropTypes.bool.isRequired,
-  onReset: PropTypes.func.isRequired,
-  isResetAllowed: PropTypes.bool,
   isCenter: PropTypes.bool,
   onCancel: PropTypes.func
 };

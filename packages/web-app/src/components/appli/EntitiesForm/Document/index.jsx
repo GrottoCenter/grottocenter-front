@@ -19,7 +19,6 @@ import { defaultDocumentValuesTypes } from './types';
 import FromContent from './FormContent';
 import CreatingDocumentDialog from './CreatingDocumentDialog';
 import Translate from '../../../common/Translate';
-import ErrorMessage from '../../../common/StatusMessage/ErrorMessage';
 
 import InternationalizedLink from '../../../common/InternationalizedLink';
 import { wikiBBSLinks } from '../../../../conf/externalLinks';
@@ -217,7 +216,9 @@ const DocumentSubmission = () => {
             <CenteredBlock>
               {documentState.errorMessages.map(error => (
                 <Fade in={documentState.errorMessages.length > 0} key={error}>
-                  <ErrorMessage message={formatMessage({ id: error })} />
+                  <Alert severity="error" sx={{ mt: 1 }}>
+                    {formatMessage({ id: error })}
+                  </Alert>
                 </Fade>
               ))}
             </CenteredBlock>

@@ -77,22 +77,17 @@ const ActionButtons = ({
           </Button>
         </Tooltip>
       )}
-      {!isDeleted && (
-        <Tooltip
-          title={
-            isUpdating
-              ? formatMessage({ id: 'Cancel edit' })
-              : formatMessage({ id: `Edit` })
-          }>
+      {!isDeleted && !isUpdating && (
+        <Tooltip title={formatMessage({ id: 'Edit' })}>
           <Box
             component="span"
             sx={{ display: 'inline-flex', pointerEvents: 'auto' }}>
             <Button
               disabled={!canEdit}
-              onClick={() => setIsUpdating(!isUpdating)}
+              onClick={() => setIsUpdating(true)}
               color="primary"
               aria-label={formatMessage({ id: 'edit' })}>
-              {isUpdating ? formatMessage({ id: `Cancel` }) : <EditIcon />}
+              <EditIcon />
             </Button>
           </Box>
         </Tooltip>

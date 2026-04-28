@@ -271,7 +271,10 @@ export const Network = ({ isLoading, error, cave }) => {
                 onClose={() => setEditing(false)}
                 scrollable
                 title={formatMessage({ id: 'Network edition' })}>
-                <NetworkForm networkValues={{ ...cave }} />
+                <NetworkForm
+                  networkValues={{ ...cave }}
+                  onCancel={() => setEditing(false)}
+                />
               </StandardDialog>
             )}
           </>

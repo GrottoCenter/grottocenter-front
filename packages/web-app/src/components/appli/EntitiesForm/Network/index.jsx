@@ -11,7 +11,7 @@ import CaveDetail from '../Entrance/CaveDetail';
 
 // A Network can't be created. It's always starting with an entrance with a cave and then,
 // entrance are being attached to the initial cave to form a network.
-export const NetworkForm = ({ networkValues }) => {
+export const NetworkForm = ({ networkValues, onCancel }) => {
   const {
     error: networkError,
     loading: networkLoading,
@@ -29,7 +29,7 @@ export const NetworkForm = ({ networkValues }) => {
     handleSubmit,
     reset,
     control,
-    formState: { errors, isDirty, isSubmitting, isSubmitSuccessful }
+    formState: { errors, isSubmitting, isSubmitSuccessful }
   } = useForm({
     defaultValues: {
       cave: defaultNetworkValue.current
@@ -91,10 +91,9 @@ export const NetworkForm = ({ networkValues }) => {
         <CaveDetail control={control} errors={errors} />
 
         <FormActionRow
-          isDirty={isDirty}
           isNew={false}
           isSubmitting={isSubmitting}
-          onReset={handleReset}
+          onCancel={onCancel}
         />
       </form>
     </FormContainer>
@@ -114,7 +113,8 @@ NetworkForm.propTypes = {
     length: PropTypes.number,
     name: PropTypes.string.isRequired,
     temperature: PropTypes.number
-  }).isRequired
+  }).isRequired,
+  onCancel: PropTypes.func
 };
 
 export default NetworkForm;

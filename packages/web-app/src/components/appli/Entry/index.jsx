@@ -21,8 +21,6 @@ import Histories from './Histories';
 import { deleteEntrance } from '../../../actions/Entrance/DeleteEntrance';
 import { restoreEntrance } from '../../../actions/Entrance/RestoreEntrance';
 import { usePermissions, useUserProperties, useExplored } from '../../../hooks';
-import StandardDialog from '../../common/StandardDialog';
-import { EntranceForm } from '../EntitiesForm';
 import SensitiveCaveWarning from './SensitiveCaveWarning';
 import AuthorAndDate from '../../common/Contribution/AuthorAndDate';
 import Alert from '../../common/Alert';
@@ -53,7 +51,6 @@ export const Entry = ({ isLoading, error, entrance }) => {
   const { entranceId } = useParams();
   const { isAuth, isAdmin, isModerator } = usePermissions();
   const componentRef = useRef();
-  const [isEditing, setEditing] = useState(false);
   const [isDeleteConfirmationOpen, setIsDeleteConfirmationOpen] =
     useState(false);
   const [isDeleteConfirmationPermanent, setIsDeleteConfirmationPermanent] =
@@ -157,7 +154,9 @@ export const Entry = ({ isLoading, error, entrance }) => {
             title={entrance.name ?? ''}
             icon={<CustomIcon type="entrance" />}
             onEdit={
-              isAuth && !entrance.isDeleted ? () => setEditing(true) : undefined
+              isAuth && !entrance.isDeleted
+                ? () => navigate(`/ui/entrances/${entranceId}/edit`)
+                : undefined
             }
             onDelete={onDelete}
             isExplored={isAuth && entrance?.cave?.id ? isExplored : null}
@@ -314,45 +313,6 @@ export const Entry = ({ isLoading, error, entrance }) => {
               />
             )}
 
-            {isAuth && (
-              <StandardDialog
-                fullWidth
-                maxWidth="md"
-                open={isEditing}
-                onClose={() => setEditing(false)}
-                scrollable
-                title={formatMessage({ id: 'Entrance edition' })}>
-                <EntranceForm
-                  entranceValues={{
-                    country: entrance.country,
-                    depth: entrance.depth,
-                    length: entrance.length,
-                    id: entrance.id,
-                    isSensitive: entrance.isSensitive,
-                    hasBat: entrance.hasBat,
-                    dangerFlooding: entrance.dangerFlooding,
-                    dangerCo2: entrance.dangerCo2,
-                    dangerRockfall: entrance.dangerRockfall,
-                    dangerPollution: entrance.dangerPollution,
-                    needCleanGear: entrance.needCleanGear,
-                    needStayOnTrail: entrance.needStayOnTrail,
-                    hasRules: entrance.hasRules,
-                    isTouristic: entrance.isTouristic,
-                    name: entrance.name,
-                    language: entrance.language,
-                    latitude: entrance?.latitude,
-                    longitude: entrance?.longitude,
-                    altitude: entrance.altitude,
-                    yearDiscovery: entrance.discoveryYear
-                  }}
-                  caveValues={{
-                    ...entrance.cave,
-                    name: entrance.cave?.name,
-                    language: entrance.cave?.language
-                  }}
-                />
-              </StandardDialog>
-            )}
           </>
         )}
       </FixedLayout>

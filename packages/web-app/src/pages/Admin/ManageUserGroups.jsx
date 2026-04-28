@@ -10,11 +10,9 @@ import {
   resetQuicksearch
 } from '../../actions/Quicksearch';
 
-import { useDebounce } from '../../hooks';
+import { useDebounce, useNotification } from '../../hooks';
 
 import AutoCompleteSearch from '../../components/common/AutoCompleteSearch';
-import ErrorMessage from '../../components/common/StatusMessage/ErrorMessage';
-import SuccessMessage from '../../components/common/StatusMessage/SuccessMessage';
 
 import PersonProperties from '../../components/common/Person/PersonProperties';
 import UserGroups from './UserGroups';
@@ -22,11 +20,6 @@ import UserGroups from './UserGroups';
 import { postPersonGroups } from '../../actions/Person/UpdatePersonGroups';
 import { fetchPerson } from '../../actions/Person/GetPerson';
 import { postBanCaver, postUnbanCaver } from '../../actions/Person/BanCaver';
-
-const FeedbackBlock = styled('div')`
-  margin-top: ${({ theme }) => theme.spacing(4)};
-  text-align: center;
-`;
 
 const UserBlock = styled('div')`
   display: flex;
@@ -64,6 +57,7 @@ const ManageUserGroups = () => {
 
   const dispatch = useDispatch();
   const { formatMessage } = useIntl();
+  const { onSuccess, onError } = useNotification();
   const debouncedInput = useDebounce(inputValue);
   const { person, isFetching: isPersonFetching } = useSelector(
     state => state.person
@@ -120,6 +114,28 @@ const ManageUserGroups = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isUpdateSuccess, isBanSuccess]);
+
+  useEffect(() => {
+    if (!didSaveGroups || isUpdateLoading) return;
+    if (isUpdateSuccess)
+      onSuccess(formatMessage({ id: 'Groups updated with success!' }));
+    else if (updateError)
+      onError(formatMessage({ id: 'Error while updating the user groups' }));
+    else return; // still in initial state — don't reset
+    setDidSaveGroups(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [didSaveGroups, isUpdateLoading, isUpdateSuccess, updateError]);
+
+  useEffect(() => {
+    if (!didSaveBan || isBanLoading) return;
+    if (isBanSuccess)
+      onSuccess(formatMessage({ id: 'Ban updated with success!' }));
+    else if (banError)
+      onError(getBanErrorMessage(banError, formatMessage));
+    else return; // still in initial state — don't reset
+    setDidSaveBan(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [didSaveBan, isBanLoading, isBanSuccess, banError]);
 
   return (
     <>
@@ -190,34 +206,6 @@ const ManageUserGroups = () => {
             </FlexBlock>
           </UserBlock>
         </>
-      )}
-      {!isUpdateLoading && !isBanLoading && (
-        <FeedbackBlock>
-          {didSaveGroups && !isUpdateSuccess && !!updateError && (
-            <ErrorMessage
-              message={formatMessage({
-                id: 'Error while updating the user groups'
-              })}
-            />
-          )}
-          {didSaveGroups && isUpdateSuccess && (
-            <SuccessMessage
-              message={formatMessage({ id: 'Groups updated with success!' })}
-            />
-          )}
-          {didSaveBan && !isBanSuccess && !!banError && (
-            <ErrorMessage
-              message={getBanErrorMessage(banError, formatMessage)}
-            />
-          )}
-          {didSaveBan && isBanSuccess && (
-            <SuccessMessage
-              message={formatMessage({
-                id: 'Ban updated with success!'
-              })}
-            />
-          )}
-        </FeedbackBlock>
       )}
     </>
   );

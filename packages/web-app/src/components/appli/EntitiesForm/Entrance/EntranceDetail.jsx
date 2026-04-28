@@ -12,16 +12,10 @@ import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
 import { styled } from '@mui/material/styles';
 import Translate from '../../../common/Translate';
-import InputCoordinate from '../utils/InputCoordinate';
 import { usePermissions } from '../../../../hooks';
-
 import { ENTRANCE_ONLY, ENTRANCE_AND_CAVE } from './caveType';
-import {
-  validateLatitude,
-  validateLongitude
-} from '../../../../util/validateLatLong';
 import Alert from '../../../common/Alert';
-import MapMarkerSelector from '../utils/MapMarkerSelector';
+import CoordinateFormSection from '../utils/CoordinateFormSection';
 import { FormRow } from '../utils/FormContainers';
 import { ENTRANCE_HAZARD_FIELDS } from '../../../../conf/entranceCharacteristics';
 
@@ -126,29 +120,17 @@ const EntranceDetail = ({ control, errors, getValues }) => {
         />
       ))}
 
+      {!isSensitiveDisabled && (
+        <CoordinateFormSection
+          control={control}
+          formLatitudeKey="entrance.latitude"
+          formLongitudeKey="entrance.longitude"
+          required
+          latitudeError={errors?.entrance?.latitude?.message}
+          longitudeError={errors?.entrance?.longitude?.message}
+        />
+      )}
       <FormRow>
-        {!isSensitiveDisabled && (
-          <InputCoordinate
-            formKey="entrance.latitude"
-            labelName="Latitude"
-            control={control}
-            validatorFn={validateLatitude}
-            isError={!!errors?.entrance?.latitude}
-            helperText={errors?.entrance?.latitude?.message}
-            isRequired
-          />
-        )}
-        {!isSensitiveDisabled && (
-          <InputCoordinate
-            formKey="entrance.longitude"
-            labelName="Longitude"
-            control={control}
-            validatorFn={validateLongitude}
-            isError={!!errors?.entrance?.longitude}
-            helperText={errors?.entrance?.longitude?.message}
-            isRequired
-          />
-        )}
         <Controller
           name="entrance.altitude"
           control={control}
@@ -185,13 +167,6 @@ const EntranceDetail = ({ control, errors, getValues }) => {
           )}
         />
       </FormRow>
-      {!isSensitiveDisabled && (
-        <MapMarkerSelector
-          control={control}
-          formLatitudeKey="entrance.latitude"
-          formLongitudeKey="entrance.longitude"
-        />
-      )}
     </>
   );
 };

@@ -6,8 +6,8 @@ import { useIntl } from 'react-intl';
 import { useDispatch } from 'react-redux';
 import { styled } from '@mui/material/styles';
 
+import { Alert } from '@mui/material';
 import { displayLoginDialog } from '../../../actions/Login';
-import ErrorMessage from '../../common/StatusMessage/ErrorMessage';
 import { usePermissions } from '../../../hooks';
 
 // ====================
@@ -50,11 +50,11 @@ const AuthChecker = ({ errorMessageComponent, componentToDisplay }) => {
     <CenteredBlock>
       {errorMessageComponent || (
         <>
-          <ErrorMessage
-            message={formatMessage({
+          <Alert severity="error" sx={{ mb: 2 }}>
+            {formatMessage({
               id: 'You must be authenticated in order to use this feature.'
             })}
-          />
+          </Alert>
           <SpacedButton onClick={onLoginClick} variant="contained">
             {formatMessage({ id: 'Log in' })}
           </SpacedButton>

@@ -60,12 +60,12 @@ function getEntityLinkUrl(type, id) {
   return `/`;
 }
 
-const GCLinkStyled = styled(GCLink)({
-  color: '#ffcfac',
+const GCLinkStyled = styled(GCLink)(({ theme }) => ({
+  color: theme.palette.secondary.light,
   fontSize: '1.1em',
   fontWeight: 'bold',
   textDecorationThickness: '3px'
-});
+}));
 
 const ChangeItem = ({ changeInfo }) => {
   // There is 4 type of sentences:
@@ -80,7 +80,6 @@ const ChangeItem = ({ changeInfo }) => {
   const dateEl = (
     <Chip
       color="primary"
-      sx={{ backgroundColor: '#5d4037' }}
       label={timeDiff(changeInfo.date, formatMessage)}
     />
   );

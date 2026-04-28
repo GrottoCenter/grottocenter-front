@@ -35,7 +35,7 @@ const defaultOrganizationValues = {
   logo: ''
 };
 
-export const OrganizationForm = ({ organizationValues = null }) => {
+export const OrganizationForm = ({ organizationValues = null, onCancel }) => {
   const isNewOrganization = !organizationValues;
   const {
     error: organizationError,
@@ -57,7 +57,7 @@ export const OrganizationForm = ({ organizationValues = null }) => {
     handleSubmit,
     reset,
     control,
-    formState: { errors, isDirty, isSubmitting, isSubmitSuccessful }
+    formState: { errors, isSubmitting, isSubmitSuccessful }
   } = useForm({
     defaultValues: {
       organization: organizationValues || defaultOrganizationValues
@@ -131,10 +131,9 @@ export const OrganizationForm = ({ organizationValues = null }) => {
           errors={errors}
         />
         <FormActionRow
-          isDirty={isDirty}
           isNew={isNewOrganization}
           isSubmitting={isSubmitting}
-          onReset={handleReset}
+          onCancel={onCancel}
         />
       </form>
       <LicenseBox />
@@ -143,7 +142,8 @@ export const OrganizationForm = ({ organizationValues = null }) => {
 };
 
 OrganizationForm.propTypes = {
-  organizationValues: PropTypes.shape({})
+  organizationValues: PropTypes.shape({}),
+  onCancel: PropTypes.func
 };
 
 export default OrganizationForm;

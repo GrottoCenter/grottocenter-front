@@ -55,15 +55,11 @@ const CreateRiggingsForm = ({ closeForm, onSubmit, values, isNew }) => {
 
   const {
     handleSubmit,
-    reset,
     control,
-    formState: { errors, isDirty, isSubmitting }
+    formState: { errors, isSubmitting }
   } = useForm({
     defaultValues: values ?? getDefaultValues(AVAILABLE_LANGUAGES[locale].id)
   });
-  const handleReset = () => {
-    reset(values ?? getDefaultValues(AVAILABLE_LANGUAGES[locale].id));
-  };
 
   const { formatMessage } = useIntl();
   const { fields, append, remove, swap } = useFieldArray({
@@ -267,10 +263,8 @@ const CreateRiggingsForm = ({ closeForm, onSubmit, values, isNew }) => {
         </Box>
 
         <FormActionRow
-          isDirty={isDirty}
           isNew={isNew}
           isSubmitting={isSubmitting}
-          onReset={handleReset}
           onCancel={closeForm}
           isCenter
         />

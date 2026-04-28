@@ -1,6 +1,6 @@
-import React, { useCallback, useEffect, useRef, Suspense, useState } from 'react';
+import React, { useCallback, useEffect, useRef, Suspense, useState, useMemo } from 'react';
 import { includes } from 'ramda';
-import { useNavigate, generatePath, useParams } from 'react-router-dom';
+import { useNavigate, generatePath, useParams, useSearchParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import PageLoader from '../components/common/PageLoader';
 
@@ -40,10 +40,23 @@ const Map = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const params = useParams();
+  const [searchParams] = useSearchParams();
+
+  const popupTarget = useMemo(() => {
+    const param = searchParams.get('entity');
+    if (!param) return null;
+    const [type, idStr] = param.split(':');
+    const id = parseInt(idStr, 10);
+    if (!type || Number.isNaN(id)) return null;
+    return { type, id };
+  }, [searchParams]);
   const { location: geoLocation, hasLocation } = useGeolocation();
   const mapRef = useRef(null);
-  const [location, setLocation] = useState(defaultCoord);
-  const [zoom, setZoom] = useState(defaultZoom);
+  const { current: initialTarget } = useRef(decodeMapTarget(params.target));
+  const [location, setLocation] = useState(() =>
+    initialTarget ? { lat: initialTarget.lat, lng: initialTarget.lng } : defaultCoord
+  );
+  const { current: zoom } = useRef(initialTarget?.zoom ?? defaultZoom);
   const networks = useSelector(state => state.map.networks);
   const networksCoordinates = useSelector(
     state => state.map.networksCoordinates
@@ -56,8 +69,6 @@ const Map = () => {
   const massifs = useSelector(state => state.map.massifs);
   const massifsCoordinates = useSelector(state => state.map.massifsCoordinates);
   const { open } = useSelector(state => state.sideMenu);
-  const { projections } = useSelector(state => state.projections);
-
   // urlDebounceRef: update the URL only once the user has truly settled,
   // avoiding lagging due to URL updates.
   // Leaflet always handles the visual movement immediately on its own.
@@ -113,18 +124,11 @@ const Map = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Capture the URL target present when the component first mounts.
-  // The initial position only needs to be set once; after that Leaflet owns its position.
+  // When there is no URL target, fall back to the user's geolocation once available.
   const initialTargetRef = useRef(params.target);
-
   useEffect(() => {
-    const target = decodeMapTarget(initialTargetRef.current);
-    if (target) {
-      setLocation({ lat: target.lat, lng: target.lng });
-      setZoom(target.zoom);
-    } else {
+    if (!decodeMapTarget(initialTargetRef.current) && geoLocation) {
       setLocation(geoLocation);
-      setZoom(defaultZoom);
     }
   }, [geoLocation]);
 
@@ -154,8 +158,8 @@ const Map = () => {
         massifPolygons={massifs}
         onUpdate={handleUpdate}
         isSideMenuOpen={open}
-        projectionsList={projections}
         mapRef={mapRef}
+        popupTarget={popupTarget}
       />
     </Suspense>
   );

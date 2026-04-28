@@ -28,15 +28,14 @@ const AssociationDetails = styled('h5')`
   text-align: justify;
 `;
 
-const AssociationLogo = styled('div')`
-  padding: 20px 10px;
-  min-width: 100px;
-  background-color: #e8dcd8;
-
-  @media (min-width: 750px) {
-    margin: 20px 0 20px 40px;
+const AssociationLogo = styled('div')(({ theme }) => ({
+  padding: '20px 10px',
+  minWidth: 100,
+  backgroundColor: theme.palette.primary.veryLight,
+  '@media (min-width: 750px)': {
+    margin: '20px 0 20px 40px'
   }
-`;
+}));
 
 const AssociationLogoImage = styled(GCLogo)`
   & > img {

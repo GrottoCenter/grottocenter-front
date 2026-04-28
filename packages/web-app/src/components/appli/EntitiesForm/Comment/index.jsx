@@ -142,15 +142,11 @@ const CreateCommentForm = ({ closeForm, onSubmit, values, isNewComment }) => {
 
   const {
     handleSubmit,
-    reset,
     control,
-    formState: { errors, isDirty, isSubmitting }
+    formState: { errors, isSubmitting }
   } = useForm({
     defaultValues: getDefaultValues(values, AVAILABLE_LANGUAGES[locale].id)
   });
-  const handleReset = () => {
-    reset(getDefaultValues(values, AVAILABLE_LANGUAGES[locale].id));
-  };
 
   return (
     <FormContainer sx={{ marginTop: 2 }}>
@@ -212,10 +208,8 @@ const CreateCommentForm = ({ closeForm, onSubmit, values, isNewComment }) => {
         </FormRow>
 
         <FormActionRow
-          isDirty={isDirty}
           isNew={isNewComment}
           isSubmitting={isSubmitting}
-          onReset={handleReset}
           onCancel={closeForm}
           isCenter
         />

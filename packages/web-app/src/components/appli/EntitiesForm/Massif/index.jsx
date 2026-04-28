@@ -1,4 +1,5 @@
 import React, { useCallback, useMemo } from 'react';
+import PropTypes from 'prop-types';
 import { useForm } from 'react-hook-form';
 import { useSelector, useDispatch } from 'react-redux';
 import { useIntl } from 'react-intl';
@@ -21,7 +22,7 @@ const defaultMassifValues = {
   geogPolygon: null
 };
 
-export const MassifForm = ({ massifValues }) => {
+export const MassifForm = ({ massifValues, onCancel }) => {
   const { formatMessage } = useIntl();
   const isNewMassif = !massifValues;
 
@@ -50,7 +51,7 @@ export const MassifForm = ({ massifValues }) => {
     handleSubmit,
     reset,
     control,
-    formState: { errors, isDirty, isSubmitting, isSubmitSuccessful }
+    formState: { errors, isSubmitting, isSubmitSuccessful }
   } = useForm({
     defaultValues: {
       massif: massifValues
@@ -149,10 +150,9 @@ export const MassifForm = ({ massifValues }) => {
           isNew={isNewMassif}
         />
         <FormActionRow
-          isDirty={isDirty}
           isNew={isNewMassif}
           isSubmitting={isSubmitting}
-          onReset={handleReset}
+          onCancel={onCancel}
         />
       </form>
       <LicenseBox />
@@ -161,7 +161,8 @@ export const MassifForm = ({ massifValues }) => {
 };
 
 MassifForm.propTypes = {
-  massifValues: MassifTypes
+  massifValues: MassifTypes,
+  onCancel: PropTypes.func
 };
 
 export default MassifForm;
