@@ -19,7 +19,7 @@
     "@mui/lab": "^7.0.1-beta.23",
     "@mui/material": "^7.3.9",
     "@mui/styles": "^6.4.8",
-    "@mui/x-date-pickers": "^8.27.2",
+    "@mui/x-date-pickers": "^9.0.4",
     "@react-leaflet/core": "3.0.0",
     "@reactour/tour": "^3.8.0",
     "@testing-library/jest-dom": "^6.9.1",
