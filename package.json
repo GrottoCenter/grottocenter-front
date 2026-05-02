@@ -26,8 +26,8 @@
   },
   "devDependencies": {
     "@commitlint/cli": "^20.5.0",
-    "@commitlint/config-conventional": "20.5.0",
-    "baseline-browser-mapping": "^2.10.16",
+    "@commitlint/config-conventional": "20.5.3",
+    "baseline-browser-mapping": "^2.10.24",
     "cross-env": "10.1.0",
     "eslint": "8.57.1",
     "eslint-config-airbnb": "19.0.4",
