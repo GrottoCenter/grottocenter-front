@@ -119,6 +119,7 @@ const Location = ({
               body={location.body}
               dateInscription={location.dateInscription}
               dateReviewed={location.dateReviewed}
+              language={location.language}
               isDeleted={location.isDeleted}
             />
           }

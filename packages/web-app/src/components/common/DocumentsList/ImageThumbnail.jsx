@@ -4,16 +4,18 @@ import { Card, CardActionArea, Skeleton, Box } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { Description } from '@mui/icons-material';
 
-const ThumbnailCard = styled(Card)`
-  width: 240px;
-  height: 180px;
-  cursor: pointer;
-  transition: box-shadow 0.3s ease;
-
-  &:hover {
-    box-shadow: ${({ theme }) => theme.shadows[4]};
+const ThumbnailCard = styled(Card)(({ theme }) => ({
+  width: '100%',
+  height: 180,
+  cursor: 'pointer',
+  transition: 'box-shadow 0.3s ease',
+  [theme.breakpoints.up('sm')]: {
+    width: 240
+  },
+  '&:hover': {
+    boxShadow: theme.shadows[4]
   }
-`;
+}));
 
 const ThumbnailImage = styled('img')`
   width: 100%;
@@ -23,7 +25,7 @@ const ThumbnailImage = styled('img')`
 `;
 
 const FallbackIconWrapper = styled(Box)`
-  width: 240px;
+  width: 100%;
   height: 180px;
   display: flex;
   align-items: center;
@@ -63,7 +65,7 @@ const ImageThumbnail = ({ src, alt, onClick }) => {
         {loading && (
           <Skeleton
             variant="rectangular"
-            width={240}
+            width="100%"
             height={180}
             animation="wave"
           />

@@ -7,7 +7,7 @@ import AuthorLink from '../AuthorLink/index';
 import authorType from '../../../types/author.type';
 
 const DateSpan = styled(Typography)`
-  color: ${({ theme }) => theme.palette.secondaryTextColor};
+  color: inherit;
   margin-left: 4px;
 `;
 const AuthorAndDate = ({

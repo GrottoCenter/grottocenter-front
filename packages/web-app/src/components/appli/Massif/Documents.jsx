@@ -29,6 +29,7 @@ const Documents = ({ documents, massifId }) => {
   return (
     <ScrollableContent
       dense
+      collapsible={false}
       anchorId="documents"
       title={formatMessage({ id: 'Documents' })}
       icon={
@@ -64,7 +65,6 @@ const Documents = ({ documents, massifId }) => {
           )}
           <DocumentsList
             documents={documents}
-            hasSnapshotButton
             emptyMessageComponent={
               <Alert
                 severity="info"

@@ -4,6 +4,7 @@ import { useIntl } from 'react-intl';
 import { ListItem, ListItemText } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import DataQualityBadge from '../../components/common/DataQualityBadge';
+import { useOpenLink } from '../../hooks';
 
 const StyledListItem = styled(ListItem)`
   gap: 12px;
@@ -11,13 +12,12 @@ const StyledListItem = styled(ListItem)`
 
 const EntranceListItem = ({ entrance }) => {
   const { formatMessage } = useIntl();
+  const openLink = useOpenLink();
 
   return (
     <StyledListItem
       component="button"
-      onClick={() =>
-        window.open(`/ui/entrances/${entrance.id_entrance}`, '_blank')
-      }>
+      onClick={() => openLink(`/ui/entrances/${entrance.id_entrance}`)}>
       <DataQualityBadge value={entrance.data_quality} />
       <ListItemText
         primary={

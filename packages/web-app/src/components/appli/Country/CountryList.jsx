@@ -99,7 +99,7 @@ const CountryList = ({ countries = [] }) => {
           <SearchInput value={search} onChange={setSearch} sx={{ mb: 2 }} />
           <TableContainer
             component={Paper}
-            sx={{ maxHeight: 'calc(100vh - 280px)' }}>
+            sx={{ maxHeight: theme => `calc(100vh - ${theme.appBarHeight + 184}px)` }}>
             <Table size="small" stickyHeader>
               <TableHead>
                 <TableRow>

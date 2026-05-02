@@ -12,3 +12,5 @@ export { useMoveRelevanceWithUndo } from './useMoveRelevanceWithUndo';
 export { useAnchorScroll } from './useAnchorScroll';
 export { useScrollToHashOnLoad } from './useScrollToHashOnLoad';
 export { useExplored } from './useExplored';
+export { default as useSharePage } from './useSharePage';
+export { default as useOpenLink } from './useOpenLink';

@@ -39,6 +39,7 @@ const Documents = ({ documents, entranceId, isEditAllowed }) => {
   return (
     <ScrollableContent
       dense
+      collapsible={false}
       anchorId="documents"
       title={formatMessage({ id: 'Documents' })}
       icon={
@@ -78,7 +79,7 @@ const Documents = ({ documents, entranceId, isEditAllowed }) => {
 
           <DocumentsList
             documents={documents}
-            hasSnapshotButton={isEditAllowed}
+
             emptyMessageComponent={
               <Alert
                 severity="info"

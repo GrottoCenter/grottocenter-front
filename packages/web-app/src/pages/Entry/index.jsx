@@ -22,7 +22,7 @@ const EntryPage = () => {
   return data?.isDeleted && !permissions.isModerator ? (
     <Deleted entityType={DELETED_ENTITIES.entrance} entity={data} />
   ) : (
-    <Entry isLoading={loading} error={error} entrance={data} />
+    <Entry key={entranceId} isLoading={loading} error={error} entrance={data} />
   );
 };
 

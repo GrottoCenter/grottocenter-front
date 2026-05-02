@@ -5,7 +5,7 @@ import { styled } from '@mui/material/styles';
 import { NavigateBefore, NavigateNext, Download } from '@mui/icons-material';
 import { useIntl } from 'react-intl';
 import StandardDialog from '../StandardDialog';
-import { decodeFileName } from './utils/imageUtils';
+import { decodeFileName, downloadFile } from './utils/imageUtils';
 
 const LightboxContent = styled(Box)`
   display: flex;
@@ -183,9 +183,12 @@ const ImageLightbox = ({
       actions={
         <Button
           startIcon={<Download />}
-          href={currentImage.completePath}
-          download
-          target="_blank"
+          onClick={() =>
+            downloadFile(
+              currentImage.completePath,
+              decodeFileName(currentImage.fileName)
+            )
+          }
           variant="contained"
           color="primary"
         >

@@ -22,43 +22,33 @@ const DocumentsList = ({
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
 
-  const paginatedDocuments = useMemo(() => {
-    if (!documents || documents.length === 0) return [];
-    const startIndex = (page - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
-    return documents.slice(startIndex, endIndex);
-  }, [documents, page, itemsPerPage]);
-
   const totalPages = useMemo(
     () => Math.ceil((documents?.length || 0) / itemsPerPage),
     [documents, itemsPerPage]
   );
+  const startIndex = (page - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
 
-  // Collect all image files across paginated documents and compute per-document offsets
   const { allImages, imageOffsets } = useMemo(() => {
     const images = [];
     const offsets = [];
-    paginatedDocuments.forEach(doc => {
+    (documents ?? []).forEach(doc => {
       offsets.push(images.length);
       if (doc.files) {
         doc.files
           .filter(file => isImageFile(file.fileName))
-          .forEach(file => {
-            images.push({ ...file, description: doc.description });
-          });
+          .forEach(file => images.push({ ...file, description: doc.description }));
       }
     });
     return { allImages: images, imageOffsets: offsets };
-  }, [paginatedDocuments]);
+  }, [documents]);
 
   const handleImageClick = useCallback(globalIndex => {
     setLightboxIndex(globalIndex);
     setLightboxOpen(true);
   }, []);
 
-  const handlePageChange = (event, newPage) => {
-    setPage(newPage);
-  };
+  if (!documents?.length) return emptyMessageComponent ?? null;
 
   return (
     <>
@@ -67,37 +57,39 @@ const DocumentsList = ({
           {title}
         </Typography>
       )}
-      {documents && documents.length > 0 ? (
-        <>
-          <List dense disablePadding>
-            {paginatedDocuments.map((document, i) => (
-              <div key={document.id}>
-                <DividerStyled />
-                <Document
-                  document={document}
-                  hasSnapshotButton={hasSnapshotButton}
-                  onUnlink={onUnlink}
-                  onImageClick={handleImageClick}
-                  imageIndexOffset={imageOffsets[i]}
-                />
-              </div>
-            ))}
-          </List>
-          {totalPages > 1 && (
-            <Box mt={2} display="flex" justifyContent="center">
-              <Pagination
-                count={totalPages}
-                page={page}
-                onChange={handlePageChange}
-                color="primary"
+      <List dense disablePadding>
+        {documents.map((document, i) => {
+          const isOnPage = i >= startIndex && i < endIndex;
+          return (
+            <Box
+              key={document.id}
+              sx={{ display: isOnPage ? 'block' : 'none', '@media print': { display: 'block' } }}>
+              <DividerStyled />
+              <Document
+                document={document}
+                hasSnapshotButton={hasSnapshotButton}
+                onUnlink={onUnlink}
+                onImageClick={isOnPage ? handleImageClick : undefined}
+                imageIndexOffset={imageOffsets[i]}
               />
             </Box>
-          )}
-        </>
-      ) : (
-        emptyMessageComponent
+          );
+        })}
+      </List>
+      {totalPages > 1 && (
+        <Box
+          mt={2}
+          display="flex"
+          justifyContent="center"
+          sx={{ '@media print': { display: 'none' } }}>
+          <Pagination
+            count={totalPages}
+            page={page}
+            onChange={(_, newPage) => setPage(newPage)}
+            color="primary"
+          />
+        </Box>
       )}
-
       {allImages.length > 0 && (
         <ImageLightbox
           open={lightboxOpen}

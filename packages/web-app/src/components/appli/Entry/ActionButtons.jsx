@@ -5,7 +5,6 @@ import {
   Button,
   CircularProgress,
   Tooltip,
-  Box,
   useMediaQuery,
   useTheme
 } from '@mui/material';
@@ -77,19 +76,14 @@ const ActionButtons = ({
           </Button>
         </Tooltip>
       )}
-      {!isDeleted && !isUpdating && (
+      {!isDeleted && canEdit && !isUpdating && (
         <Tooltip title={formatMessage({ id: 'Edit' })}>
-          <Box
-            component="span"
-            sx={{ display: 'inline-flex', pointerEvents: 'auto' }}>
-            <Button
-              disabled={!canEdit}
-              onClick={() => setIsUpdating(true)}
-              color="primary"
-              aria-label={formatMessage({ id: 'edit' })}>
-              <EditIcon />
-            </Button>
-          </Box>
+          <Button
+            onClick={() => setIsUpdating(true)}
+            color="primary"
+            aria-label={formatMessage({ id: 'edit' })}>
+            <EditIcon />
+          </Button>
         </Tooltip>
       )}
       {showReorder && !isUpdating && isMoveLoading && (
