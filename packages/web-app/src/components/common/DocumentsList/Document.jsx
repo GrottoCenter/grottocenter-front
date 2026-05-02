@@ -14,6 +14,7 @@ import {
 import LinkOffIcon from '@mui/icons-material/LinkOff';
 import React, { useState } from 'react';
 import Linkify from 'linkify-react';
+import { isMobile } from 'react-device-detect';
 import { styled } from '@mui/material/styles';
 import GCLink from '../GCLink';
 import Files from './Files';
@@ -22,16 +23,12 @@ import Translate from '../Translate';
 import StandardDialog from '../StandardDialog';
 import linkifyOptions from '../../../helpers/linkifyOptions';
 
-const StyledListItemContainer = styled('div')`
-  width: 100%;
-  margin: 0;
-`;
-
 const StyledChip = styled(Chip)`
   margin-left: ${({ theme }) => theme.spacing(2)};
   padding: 0 ${({ theme }) => theme.spacing(1)};
 `;
 const StyledListItem = styled(ListItem)`
+  display: flow-root;
   padding: 4px 0;
   margin: 0;
 `;
@@ -55,9 +52,37 @@ const Document = ({
   const [isUnlinkDialogOpen, setUnlinkDialogOpen] = useState(false);
 
   return (
-    <StyledListItem>
-      <StyledListItemContainer>
-        <GCLink internal={false} href={`/ui/documents/${document.id}`}>
+    <StyledListItem disableGutters>
+      {(hasSnapshotButton || onUnlink) && (
+        <Box sx={{ float: 'right', ml: 1 }}>
+          <ButtonGroup
+            color="primary"
+            size="small"
+            orientation={isSmall ? 'vertical' : 'horizontal'}>
+            {hasSnapshotButton && (
+              <SnapshotButton
+                color="primary"
+                variant="outlined"
+                id={document.id}
+                type="documents"
+                content={document}
+              />
+            )}
+            {onUnlink && (
+              <Tooltip title={formatMessage({ id: 'Unlink this document' })}>
+                <Button
+                  onClick={() => setUnlinkDialogOpen(true)}
+                  color="primary"
+                  aria-label={formatMessage({ id: 'unlink' })}>
+                  <LinkOffIcon />
+                </Button>
+              </Tooltip>
+            )}
+          </ButtonGroup>
+        </Box>
+      )}
+      <div>
+        <GCLink internal={isMobile} href={`/ui/documents/${document.id}`}>
           {document.title}
         </GCLink>
         <StyledChip
@@ -86,36 +111,7 @@ const Document = ({
         ) : (
           false
         )}
-      </StyledListItemContainer>
-
-      {(hasSnapshotButton || onUnlink) && (
-        <Box style={{ flexShrink: 0, alignSelf: 'flex-start' }}>
-          <ButtonGroup
-            color="primary"
-            size="small"
-            orientation={isSmall ? 'vertical' : 'horizontal'}>
-            {hasSnapshotButton && (
-              <SnapshotButton
-                color="primary"
-                variant="outlined"
-                id={document.id}
-                type="documents"
-                content={document}
-              />
-            )}
-            {onUnlink && (
-              <Tooltip title={formatMessage({ id: 'Unlink this document' })}>
-                <Button
-                  onClick={() => setUnlinkDialogOpen(true)}
-                  color="primary"
-                  aria-label={formatMessage({ id: 'unlink' })}>
-                  <LinkOffIcon />
-                </Button>
-              </Tooltip>
-            )}
-          </ButtonGroup>
-        </Box>
-      )}
+      </div>
       {onUnlink ? (
         <StandardDialog
           open={isUnlinkDialogOpen}

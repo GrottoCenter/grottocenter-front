@@ -48,6 +48,7 @@ const Descriptions = ({
     <ScrollableContent
       dense
       anchorId="description"
+      defaultExpanded={descriptions.length > 0}
       title={formatMessage({ id: 'Description' })}
       icon={
         permissions.isAuth &&

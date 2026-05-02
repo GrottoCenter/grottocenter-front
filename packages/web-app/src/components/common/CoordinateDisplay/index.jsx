@@ -31,7 +31,8 @@ import CRSMenu from '../CRSMenu';
 import {
   useNotification,
   useCoordinatePreference,
-  useProjections
+  useProjections,
+  useOpenLink
 } from '../../../hooks';
 
 const GROTTOCENTER_LINK_ZOOM = 16;
@@ -53,6 +54,7 @@ const CoordinateDisplay = ({
 }) => {
   const { formatMessage } = useIntl();
   const { onSuccess } = useNotification();
+  const openLink = useOpenLink();
 
   const isTouch = useMediaQuery('(pointer: coarse)');
 
@@ -100,11 +102,7 @@ const CoordinateDisplay = ({
     );
   const openGrottoMap = () => {
     const popup = entityType && entityId ? `?entity=${entityType}:${entityId}` : '';
-    window.open(
-      `${window.location.origin}/ui/map/${latitude},${longitude},${GROTTOCENTER_LINK_ZOOM}${popup}`,
-      '_blank',
-      'noopener,noreferrer'
-    );
+    openLink(`/ui/map/${latitude},${longitude},${GROTTOCENTER_LINK_ZOOM}${popup}`);
   };
 
   const precisionSeverity = computePrecisionSeverity(precision);

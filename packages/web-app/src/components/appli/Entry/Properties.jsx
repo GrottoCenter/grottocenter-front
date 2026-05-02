@@ -73,6 +73,9 @@ const Properties = ({ isLoading = false, entrance, dataQuality }) => {
   const [preferredCRS] = useCoordinatePreference();
   const massifsWithType =
     entrance?.massifs?.filter(m => m.undergroundType) ?? [];
+  const cityValue = [entrance?.city, entrance?.region]
+    .flatMap(f => (f ? [f] : []))
+    .join(', ');
 
   return (
     <GlobalWrapper>
@@ -104,15 +107,15 @@ const Properties = ({ isLoading = false, entrance, dataQuality }) => {
                 gridTemplateColumns: 'repeat(2, 1fr)',
                 gap: 1
               }}>
-              <Property
-                loading={isLoading}
-                label={formatMessage({ id: 'City' })}
-                value={[entrance.city, entrance.region]
-                  .flatMap(f => (f ? [f] : []))
-                  .join(', ')}
-                icon={<CustomIcon type="location" />}
-                secondary
-              />
+              {cityValue && (
+                <Property
+                  loading={isLoading}
+                  label={formatMessage({ id: 'City' })}
+                  value={cityValue}
+                  icon={<CustomIcon type="location" />}
+                  secondary
+                />
+              )}
               {!!entrance.altitude && (
                 <Property
                   label={formatMessage({ id: 'Altitude' })}

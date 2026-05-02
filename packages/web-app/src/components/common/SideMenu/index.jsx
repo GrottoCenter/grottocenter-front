@@ -57,7 +57,9 @@ const LogoImage = styled('img')(({ theme }) => ({
   flexShrink: 0
 }));
 
-const AppName = styled(AppTitle)(({ theme }) => ({ color: theme.palette.primary.dark }));
+const AppName = styled(AppTitle)(({ theme }) => ({
+  color: theme.palette.primary.dark
+}));
 
 const Content = styled('div')`
   display: flex;
@@ -122,7 +124,8 @@ const SideMenu = ({ isOpen }) => {
       // - disableDiscovery: disable the edge peek on iOS only, where it conflicts
       //   with the native "swipe to go back" system gesture.
       disableBackdropTransition={!isIOS}
-      disableDiscovery={isIOS}>
+      disableDiscovery={isIOS}
+      SwipeAreaProps={{ style: { top: theme.appBarHeight } }}>
       <Header>
         <HeaderLink to="/" onClick={isMobile ? handleClose : undefined}>
           <LogoImage src={logoGC} alt="Grottocenter" />

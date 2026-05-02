@@ -39,6 +39,7 @@ const Histories = ({ entranceId, histories, isEditAllowed }) => {
     <ScrollableContent
       dense
       anchorId="history"
+      defaultExpanded={histories.length > 0}
       title={formatMessage({ id: 'History' })}
       icon={
         permissions.isAuth &&

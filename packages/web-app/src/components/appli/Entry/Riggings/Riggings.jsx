@@ -39,6 +39,7 @@ const Riggings = ({ riggings, entranceId, isEditAllowed }) => {
     <ScrollableContent
       dense
       anchorId="rigging"
+      defaultExpanded={riggings.length > 0}
       title={formatMessage({ id: 'Riggings' })}
       icon={
         permissions.isAuth &&
@@ -67,7 +68,6 @@ const Riggings = ({ riggings, entranceId, isEditAllowed }) => {
           {isFormVisible && (
             <>
               <CreateRiggingsForm
-                closeForm={() => setIsFormVisible(false)}
                 isNew
                 onSubmit={handleSubmitForm}
               />

@@ -23,14 +23,24 @@ const MultipleMarkers = ({ validPositions }) => {
     if (validPositions.length === 0) return;
     updateEntranceMarkers(validPositions);
 
-    // fitBounds (called inside updateEntranceMarkers on first load) may run
-    // before Leaflet's ResizeObserver settles the map dimensions. Re-fit once
-    // after the first resize event so all markers are guaranteed to be visible.
     const latLngs = validPositions.map(p => [p.latitude, p.longitude]);
-    const onResize = () => {
+    const fitBounds = () =>
       map.fitBounds(latLngs, { padding: [40, 40], maxZoom: 16 });
-      map.off('resize', onResize);
+
+    const container = map.getContainer();
+    let wasHidden =
+      container.clientWidth === 0 || container.clientHeight === 0;
+
+    // Re-fit bounds each time the map transitions from hidden to visible.
+    // The one-shot pattern broke tab navigation: invalidateSize() fires 'resize'
+    // when returning to the tab, but the listener had already been removed.
+    const onResize = () => {
+      const { clientWidth, clientHeight } = container;
+      const isVisible = clientWidth > 0 && clientHeight > 0;
+      if (wasHidden && isVisible) fitBounds();
+      wasHidden = !isVisible;
     };
+
     map.on('resize', onResize);
     return () => map.off('resize', onResize);
     // eslint-disable-next-line react-hooks/exhaustive-deps

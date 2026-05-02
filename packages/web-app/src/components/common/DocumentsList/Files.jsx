@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { Button, ListItem, ListItemText, Grid, Box } from '@mui/material';
+import { Button, ListItem, Grid, Box } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { Description, Download } from '@mui/icons-material';
 import ImageThumbnail from './ImageThumbnail';
 import ImageLightbox from './ImageLightbox';
-import { isImageFile, decodeFileName } from './utils/imageUtils';
+import { isImageFile, decodeFileName, downloadFile } from './utils/imageUtils';
 
 const FileListItem = styled(ListItem)`
   margin: 0;
@@ -52,10 +52,10 @@ const Files = ({ files = [], description, onImageClick, imageIndexOffset = 0 }) 
     <>
       {/* Image thumbnails section */}
       {imageFiles.length > 0 && (
-        <Grid container spacing={2} sx={{ mb: 2 }}>
+        <Grid container rowSpacing={2} columnSpacing={{ xs: 0, sm: 2 }} sx={{ mb: 2 }}>
           {imageFiles.map((file, index) => (
-            <Grid key={file.fileName}>
-              <ThumbnailWrapper>
+            <Grid key={file.fileName} sx={{ width: { xs: '100%', sm: 'auto' } }}>
+              <ThumbnailWrapper sx={{ width: '100%' }}>
                 <ImageThumbnail
                   src={file.completePath}
                   alt={decodeFileName(file.fileName)}
@@ -64,13 +64,12 @@ const Files = ({ files = [], description, onImageClick, imageIndexOffset = 0 }) 
                 <Button
                   size="small"
                   startIcon={<Download />}
-                  href={file.completePath}
-                  download
-                  target="_blank"
+                  onClick={() =>
+                    downloadFile(file.completePath, decodeFileName(file.fileName))
+                  }
                   sx={{
                     textTransform: 'none',
-                    maxWidth: 240, // Match thumbnail width
-                    minWidth: 240 // for better rendering
+                    width: { xs: '100%', sm: 240 }
                   }}
                   title={decodeFileName(file.fileName)}>
                   <EllipsisText>{decodeFileName(file.fileName)}</EllipsisText>
@@ -84,19 +83,14 @@ const Files = ({ files = [], description, onImageClick, imageIndexOffset = 0 }) 
       {/* Non-image files section (existing logic) */}
       {otherFiles.map(file => (
         <FileListItem key={`${file.fileName}`} dense component="div">
-          <ListItemText
-            primaryTypographyProps={{ display: 'inline' }}
-            primary={
-              <Button
-                variant="text"
-                size="small"
-                target="_blank"
-                startIcon={<Description />}
-                href={file.completePath}>
-                {decodeFileName(file.fileName)}
-              </Button>
-            }
-          />
+          <Button
+            variant="text"
+            size="small"
+            target="_blank"
+            startIcon={<Description />}
+            href={file.completePath}>
+            {decodeFileName(file.fileName)}
+          </Button>
         </FileListItem>
       ))}
 

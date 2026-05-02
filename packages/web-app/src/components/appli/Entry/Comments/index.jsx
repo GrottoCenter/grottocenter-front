@@ -22,7 +22,8 @@ const Comments = ({ entranceId, comments, isEditAllowed }) => {
   const permissions = usePermissions();
   const dispatch = useDispatch();
   const [isFormVisible, setIsFormVisible] = useState(false);
-  const { movingId, handleMove } = useMoveRelevanceWithUndo(moveCommentRelevance);
+  const { movingId, handleMove } =
+    useMoveRelevanceWithUndo(moveCommentRelevance);
 
   const onSubmitForm = data => {
     dispatch(
@@ -43,6 +44,7 @@ const Comments = ({ entranceId, comments, isEditAllowed }) => {
 
   return (
     <ScrollableContent
+      collapsible={false}
       dense
       anchorId="comments"
       title={formatMessage({ id: 'Comments' })}
@@ -54,15 +56,13 @@ const Comments = ({ entranceId, comments, isEditAllowed }) => {
               isFormVisible
                 ? formatMessage({ id: 'Cancel adding a new comment' })
                 : formatMessage({ id: 'Add a new comment' })
-            }
-          >
+            }>
             <Button
               color={isFormVisible ? 'inherit' : 'secondary'}
               size="small"
               variant="outlined"
               onClick={() => setIsFormVisible(!isFormVisible)}
-              startIcon={isFormVisible ? <CancelIcon /> : <AddCircleIcon />}
-            >
+              startIcon={isFormVisible ? <CancelIcon /> : <AddCircleIcon />}>
               {formatMessage({ id: isFormVisible ? 'Cancel' : 'New' })}
             </Button>
           </Tooltip>
@@ -85,7 +85,10 @@ const Comments = ({ entranceId, comments, isEditAllowed }) => {
                   .filter(c => !c.isDeleted)
                   .map(c => c.id);
                 return sorted.map(comment => (
-                  <Paper key={comment.id} variant="outlined" sx={{ p: 2, borderRadius: 2, bgcolor: 'grey.50' }}>
+                  <Paper
+                    key={comment.id}
+                    variant="outlined"
+                    sx={{ p: 2, borderRadius: 2, bgcolor: 'grey.50' }}>
                     <Comment
                       comment={comment}
                       isEditAllowed={isEditAllowed}

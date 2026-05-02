@@ -18,7 +18,10 @@ jest.mock('react-leaflet', () => {
         _southWest: { wrap: () => ({ lat: -10, lng: -10 }) },
         _northEast: { wrap: () => ({ lat: 10, lng: 10 }) }
       }),
-      fitBounds: jest.fn()
+      fitBounds: jest.fn(),
+      getContainer: () => ({ offsetWidth: 100, offsetHeight: 100 }),
+      on: jest.fn(),
+      off: jest.fn()
     }),
     useMapEvent: jest.fn(),
     useMapEvents: jest.fn(),
@@ -33,7 +36,8 @@ jest.mock('leaflet', () => ({
       getSouthWest: () => ({ lat: -10, lng: -10 }),
       getNorthEast: () => ({ lat: 10, lng: 10 })
     })
-  })
+  }),
+  svg: () => ({})
 }));
 
 jest.mock('../../common/Maps/common/MapContainer', () => {

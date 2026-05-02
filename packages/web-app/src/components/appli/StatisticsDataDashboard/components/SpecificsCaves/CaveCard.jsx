@@ -2,8 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { alpha, styled } from '@mui/material/styles';
 import { Typography, Box } from '@mui/material';
-import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import { useSelector } from 'react-redux';
+import { useOpenLink } from '../../../../../hooks';
 
 const StyledBox = styled(Box)`
   padding: 12px 16px;
@@ -21,16 +21,16 @@ const StyledBox = styled(Box)`
 
 const CaveCard = ({ idCave, nameCave, numberData, text, backgroundColor }) => {
   const locale = useSelector(state => state.intl);
+  const openLink = useOpenLink();
 
   return (
     <StyledBox
       bgcolor={alpha(backgroundColor, 0.75)}
-      onClick={() => window.open(`/ui/caves/${idCave}`, '_blank')}>
+      onClick={() => openLink(`/ui/caves/${idCave}`)}>
       <Box sx={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 1 }}>
         <Typography variant="h4" fontWeight={700} noWrap>
           {numberData.toLocaleString(locale)} m
         </Typography>
-        <OpenInNewIcon sx={{ fontSize: 14, opacity: 0.7, flexShrink: 0 }} />
       </Box>
       <Typography variant="body2" fontWeight={600} noWrap>{nameCave}</Typography>
       <Typography variant="caption" sx={{ opacity: 0.85 }}>{text}</Typography>

@@ -10,7 +10,7 @@ import {
   resetQuicksearch
 } from '../../actions/Quicksearch';
 
-import { useDebounce, useNotification } from '../../hooks';
+import { useDebounce, useNotification, useOpenLink } from '../../hooks';
 
 import AutoCompleteSearch from '../../components/common/AutoCompleteSearch';
 
@@ -58,6 +58,7 @@ const ManageUserGroups = () => {
   const dispatch = useDispatch();
   const { formatMessage } = useIntl();
   const { onSuccess, onError } = useNotification();
+  const openLink = useOpenLink();
   const debouncedInput = useDebounce(inputValue);
   const { person, isFetching: isPersonFetching } = useSelector(
     state => state.person
@@ -171,9 +172,7 @@ const ManageUserGroups = () => {
           <Button
             sx={{ marginTop: 2, float: 'right' }}
             variant="outlined"
-            onClick={() =>
-              window.open(`/ui/persons/${selectedUser?.id}`, '_blank')
-            }>
+            onClick={() => openLink(`/ui/persons/${selectedUser?.id}`)}>
             {formatMessage({ id: 'View detail' })}
           </Button>
           <UserBlock>
