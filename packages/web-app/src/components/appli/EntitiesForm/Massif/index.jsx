@@ -17,8 +17,6 @@ import MassifFields from './MassifFields';
 const defaultMassifValues = {
   name: '',
   language: '',
-  descriptionTitle: '',
-  descriptionBody: '',
   geogPolygon: null
 };
 
@@ -95,8 +93,6 @@ export const MassifForm = ({ massifValues, onCancel }) => {
       dispatch(
         postMassif({
           name: data.massif.name,
-          description: data.massif.descriptionBody,
-          descriptionTitle: data.massif.descriptionTitle,
           descriptionAndNameLanguage: { id: data.massif.language },
           geogPolygon: data.massif.geogPolygon
         })
@@ -147,7 +143,6 @@ export const MassifForm = ({ massifValues, onCancel }) => {
           control={control}
           errors={errors}
           geoJson={geoJson}
-          isNew={isNewMassif}
         />
         <FormActionRow
           isNew={isNewMassif}
