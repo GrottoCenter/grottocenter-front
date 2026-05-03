@@ -10,8 +10,9 @@ import { FormRow, FormSectionLabel } from '../utils/FormContainers';
 
 const PolygonMap = React.lazy(() => import('./PolygonMap'));
 
-const MassifFields = ({ control, errors, geoJson, isNew }) => {
+const MassifFields = ({ control, errors, geoJson }) => {
   const { formatMessage } = useIntl();
+
   return (
     <>
       <FormSectionLabel label={formatMessage({ id: 'Basic Information' })} />
@@ -31,29 +32,6 @@ const MassifFields = ({ control, errors, geoJson, isNew }) => {
         />
       </FormRow>
 
-      {isNew && (
-        <>
-          <FormSectionLabel
-            label={formatMessage({ id: 'Description of the massif' })}
-          />
-          <InputText
-            formKey="massif.descriptionTitle"
-            labelName="Title"
-            control={control}
-            isError={!!errors?.massif?.descriptionTitle}
-            isRequired
-          />
-          <InputText
-            formKey="massif.descriptionBody"
-            labelName="Description"
-            control={control}
-            isError={!!errors?.massif?.description}
-            isRequired
-            minRows={6}
-          />
-        </>
-      )}
-
       <FormSectionLabel label={formatMessage({ id: 'Massif area' })} />
       <FormHelperText>
         {formatMessage({
@@ -67,8 +45,7 @@ const MassifFields = ({ control, errors, geoJson, isNew }) => {
             <Skeleton width={75} />
             <Skeleton width={100} />
           </>
-        }
-      >
+        }>
         <Controller
           name="massif.geogPolygon"
           control={control}
@@ -91,8 +68,7 @@ MassifFields.propTypes = {
       geoJson: PropTypes.shape({})
     })
   }),
-  geoJson: PropTypes.shape({}),
-  isNew: PropTypes.bool
+  geoJson: PropTypes.shape({})
 };
 
 export default MassifFields;
