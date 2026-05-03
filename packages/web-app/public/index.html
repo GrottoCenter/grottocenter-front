@@ -200,6 +200,12 @@
 
       if (!intlBootstrap.allLanguages.includes(intlBootstrap.initialLocale))
         intlBootstrap.initialLocale = intlBootstrap.defaultLocale;
+
+      // Keep in sync with AVAILABLE_LANGUAGES.direction in src/conf/config.js
+      var RTL_LOCALES = ['ar', 'he'];
+      document.documentElement.lang = intlBootstrap.initialLocale;
+      document.documentElement.dir = RTL_LOCALES.indexOf(intlBootstrap.initialLocale) !== -1 ? 'rtl' : 'ltr';
+
       // While react is still loading we start to get the initial locale strings
       intlBootstrap.initialFetchP = fetch(
         `/lang/${intlBootstrap.initialLocale}.json`

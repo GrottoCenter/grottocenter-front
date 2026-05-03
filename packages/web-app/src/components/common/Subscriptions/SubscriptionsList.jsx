@@ -56,7 +56,7 @@ const SubscriptionsList = ({
                 {countries
                   .map(country => ({
                     ...country,
-                    name: getLocalizedCountryName(country, formatMessage, locale, country.name)
+                    name: getLocalizedCountryName(country.id, locale, country.name)
                   }))
                   .sort((a, b) => a.name.localeCompare(b.name))
                   .map(country => (

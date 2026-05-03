@@ -22,7 +22,11 @@
     "prepare": "husky",
     "translations:update-en": "node scripts/translations/update-en.js && node scripts/translations/sort.js packages/web-app/public/lang/en.json",
     "translations:sort": "node scripts/translations/sort.js",
-    "translations:sync-with-en": "node scripts/translations/sync-with-en.js"
+    "translations:check-sorted": "node scripts/translations/sort.js --check",
+    "translations:check-en": "node scripts/translations/update-en.js --check",
+    "translations:sync-with-en": "node scripts/translations/sync-with-en.js",
+    "translations:find-unused": "node scripts/translations/find-unused.js",
+    "translations:report": "node scripts/translations/completeness-report.js"
   },
   "devDependencies": {
     "@commitlint/cli": "^20.5.0",
@@ -57,8 +61,11 @@
     "serialize-javascript": "^7.0.3"
   },
   "lint-staged": {
-    "*.{js, jsx, ts, tsx}": [
+    "*.{js,jsx,ts,tsx}": [
       "eslint --cache --fix"
+    ],
+    "packages/web-app/public/lang/*.json": [
+      "node scripts/translations/sort.js"
     ]
   }
 }

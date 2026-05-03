@@ -9,11 +9,16 @@ const JSX_FILES_PATTERN = 'packages/web-app/src/**/*.jsx';
 const EN_JSON_PATH = 'packages/web-app/public/lang/en.json';
 
 // Regular expressions to find translation keys
+// Group 1 captures the opening quote; group 2 captures the key content.
+// Using a backreference (\1) so we only stop at the *same* closing quote,
+// allowing the other quote types to appear freely inside the key.
+// Self-closing <Translate ... /> tags don't match because [^>]*> stops at the
+// first > (inside />) and ([\s\S]*?)<\/Translate> then fails to find a closing tag.
 const TRANSLATE_COMPONENT_REGEX = /<Translate[^>]*>([\s\S]*?)<\/Translate>/g;
 const FORMAT_MESSAGE_REGEX =
-  /formatMessage\(\s*{[\s\S]*?id:\s*['"`]([^'"`]+)['"`]/g;
+  /formatMessage\(\s*\{[\s\S]*?id:\s*(['"`])((?:(?!\1)[\s\S])*)\1/g;
 const INTL_FORMAT_MESSAGE_REGEX =
-  /intl\.formatMessage\(\s*{[\s\S]*?id:\s*['"`]([^'"`]+)['"`]/g;
+  /intl\.formatMessage\(\s*\{[\s\S]*?id:\s*(['"`])((?:(?!\1)[\s\S])*)\1/g;
 
 /**
  * Validate if a key is safe for JSON and not truncated
@@ -21,6 +26,13 @@ const INTL_FORMAT_MESSAGE_REGEX =
 function isValidTranslationKey(key) {
   if (!key || key.length === 0) return false;
   if (key.includes('{') || key.includes('$')) return false;
+  if (
+    key.includes('<') ||
+    key.includes('>') ||
+    key.includes('(') ||
+    key.includes(')')
+  )
+    return false;
 
   // Check for truncated contractions (words ending with 'n' that should be "n't")
   if (
@@ -66,7 +78,7 @@ function extractKeysFromContent(content) {
   // Extract from formatMessage({ id: 'key' })
   match = FORMAT_MESSAGE_REGEX.exec(content);
   while (match !== null) {
-    const key = match[1];
+    const key = match[2];
     if (isValidTranslationKey(key)) {
       keys.add(key);
     }
@@ -76,7 +88,7 @@ function extractKeysFromContent(content) {
   // Extract from intl.formatMessage({ id: 'key' })
   match = INTL_FORMAT_MESSAGE_REGEX.exec(content);
   while (match !== null) {
-    const key = match[1];
+    const key = match[2];
     if (isValidTranslationKey(key)) {
       keys.add(key);
     }
@@ -132,12 +144,16 @@ function loadExistingTranslations() {
 function updateTranslations(foundKeys, existingTranslations) {
   const missingKeys = foundKeys.filter(key => !(key in existingTranslations));
 
-  // Check for potential truncated versions of existing keys
+  // Check for potential truncated versions of existing keys.
+  // Only flag if the existing key continues with a word character or space after
+  // the candidate — pure punctuation suffixes (e.g. "Zone" vs "Zone:") are not truncations.
   const suspiciousKeys = missingKeys.filter(key =>
-    Object.keys(existingTranslations).some(
-      existingKey =>
-        existingKey.startsWith(key) && existingKey.length > key.length
-    )
+    Object.keys(existingTranslations).some(existingKey => {
+      if (!existingKey.startsWith(key) || existingKey.length <= key.length)
+        return false;
+      const nextChar = existingKey[key.length];
+      return /[\w\s]/.test(nextChar);
+    })
   );
 
   if (suspiciousKeys.length > 0) {
@@ -190,6 +206,7 @@ function updateTranslations(foundKeys, existingTranslations) {
  * Main function
  */
 function main() {
+  const checkMode = process.argv.includes('--check');
   console.log('Starting translation keys update...\n');
 
   // Extract all translation keys from JSX files
@@ -201,6 +218,20 @@ function main() {
   console.log(
     `Existing translations count: ${Object.keys(existingTranslations).length}`
   );
+
+  const missingKeys = foundKeys.filter(key => !(key in existingTranslations));
+
+  if (checkMode) {
+    if (missingKeys.length > 0) {
+      console.error(
+        `\n❌ ${missingKeys.length} keys found in source but missing from en.json:`
+      );
+      missingKeys.forEach(key => console.error(`  - "${key}"`));
+      process.exit(1);
+    }
+    console.log('\n✅ All source translation keys are present in en.json.');
+    return;
+  }
 
   // Update translations with missing keys
   console.log('\nUpdating translations...');
