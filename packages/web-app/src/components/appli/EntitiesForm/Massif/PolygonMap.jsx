@@ -4,7 +4,7 @@ import { MapContainer, FeatureGroup, ScaleControl } from 'react-leaflet';
 import { EditControl } from 'react-leaflet-draw';
 import L from 'leaflet';
 import { useIntl } from 'react-intl';
-import { Box } from '@mui/material';
+import { Box, useMediaQuery, useTheme } from '@mui/material';
 import { useNotification, useProjections } from '../../../../hooks';
 import useGeolocation from '../../../../hooks/useGeolocation';
 import LayersControl from '../../../common/Maps/common/LayersControl';
@@ -67,6 +67,8 @@ const detectHoles = layers => {
 
 const PolygonMap = ({ onChange, data }) => {
   const { formatMessage } = useIntl();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   useProjections();
   const isMounted = useRef(true);
   const displayValue = useRef(false);
@@ -169,6 +171,13 @@ const PolygonMap = ({ onChange, data }) => {
       )
     : geoLocation;
   const ZOOM_LEVEL = hasCoordinates || hasLocation ? focusZoom : defaultZoom;
+
+  useEffect(() => {
+    if (map) {
+      const t = setTimeout(() => map.invalidateSize(), 200);
+      return () => clearTimeout(t);
+    }
+  }, [map, isMobile]);
 
   useEffect(() => {
     if (map) {
@@ -504,7 +513,7 @@ const PolygonMap = ({ onChange, data }) => {
         />
       </Box>
 
-      <Box sx={{ display: 'flex', gap: 2 }}>
+      <Box sx={{ display: 'flex', gap: 2, flexDirection: { xs: 'column', md: 'row' } }}>
         <MapContainer
           center={initialCenter}
           zoom={ZOOM_LEVEL}
@@ -513,8 +522,8 @@ const PolygonMap = ({ onChange, data }) => {
           }}
           position="topLeft"
           style={{
-            height: '70dvh',
-            flex: 1
+            height: isMobile ? '50dvh' : '70dvh',
+            ...(isMobile ? { width: '100%' } : { flex: 1 })
           }}>
           <FeatureGroup
             ref={reactFGref => {

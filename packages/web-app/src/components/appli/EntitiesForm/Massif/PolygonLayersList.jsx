@@ -34,7 +34,7 @@ const PolygonLayersList = ({
   const hasNeedles = layers.some(l => l.isNeedle);
 
   return (
-    <Paper sx={{ width: 250, maxHeight: '70vh', overflow: 'auto' }}>
+    <Paper sx={{ width: { xs: '100%', md: 250 }, maxHeight: { xs: 300, md: '70vh' }, overflow: 'auto' }}>
       {allHoles && (
         <Alert severity="error" sx={{ py: 0 }}>
           {formatMessage({
