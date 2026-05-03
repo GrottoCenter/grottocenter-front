@@ -56,14 +56,9 @@ const CountryList = ({ countries = [] }) => {
     () =>
       countries.map(row => ({
         ...row,
-        localized: getLocalizedCountryName(
-          { enName: row.english, nativeName: row.native },
-          formatMessage,
-          locale,
-          row.english
-        )
+        localized: getLocalizedCountryName(row.iso2, locale, row.english)
       })),
-    [countries, locale, formatMessage]
+    [countries, locale]
   );
 
   const filtered = useMemo(() => {

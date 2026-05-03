@@ -60,12 +60,7 @@ const Country = ({
   let title = '';
   if (isLoading) title = undefined;
   if (status === REDUCER_STATUS.SUCCEEDED) {
-    title = getLocalizedCountryName(
-      country,
-      formatMessage,
-      locale,
-      country.nativeName
-    );
+    title = getLocalizedCountryName(country.id, locale, country.nativeName);
   }
 
   let SubscribeIcon = <CircularProgress size={20} />;

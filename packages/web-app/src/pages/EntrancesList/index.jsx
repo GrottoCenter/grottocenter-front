@@ -159,8 +159,7 @@ const EntrancesListPage = () => {
       if (entityType === 'country') {
         const entranceWithCountry = entrances.find(e => e.country_name);
         return getLocalizedCountryName(
-          country,
-          formatMessage,
+          country?.id,
           locale,
           entranceWithCountry?.country_name
         );

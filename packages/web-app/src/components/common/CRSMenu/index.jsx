@@ -33,8 +33,11 @@ const CRSMenu = ({ anchorEl = null, onClose, preferred, projections = [], onSele
       Object.entries(
         groupBy(
           p =>
-            getLocalizedCountryName(p, formatMessage, locale, p.en_name) ||
-            worldLabel,
+            getLocalizedCountryName(
+              p.iso2 || p.country_code,
+              locale,
+              p.en_name
+            ) || worldLabel,
           projections
         )
       )
@@ -45,7 +48,7 @@ const CRSMenu = ({ anchorEl = null, onClose, preferred, projections = [], onSele
         .sort(([a], [b]) =>
           a === worldLabel ? -1 : b === worldLabel ? 1 : a.localeCompare(b)
         ),
-    [projections, formatMessage, locale, worldLabel]
+    [projections, locale, worldLabel]
   );
 
   const showWGS84 =

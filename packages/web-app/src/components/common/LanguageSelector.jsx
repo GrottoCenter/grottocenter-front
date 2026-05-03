@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { Select, MenuItem, Input, CircularProgress } from '@mui/material';
 import LanguageIcon from '@mui/icons-material/Translate';
@@ -34,6 +34,12 @@ const LanguageSelector = ({ iconColor = 'inherit', hideIcon = false }) => {
     state => state.intl
   );
   const dispatch = useDispatch();
+  const localeDirection = AVAILABLE_LANGUAGES[locale]?.direction;
+
+  useEffect(() => {
+    document.documentElement.lang = locale;
+    document.documentElement.dir = localeDirection === 'rtl' ? 'rtl' : 'ltr';
+  }, [locale, localeDirection]);
 
   const handleChange = event => {
     const { value } = event.target;
