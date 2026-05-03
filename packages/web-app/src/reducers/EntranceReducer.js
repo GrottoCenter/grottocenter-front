@@ -81,6 +81,13 @@ const initialState = {
 const reducer = (state = initialState, action) => {
   switch (action.type) {
     case FETCH_ENTRANCE_LOADING:
+      return {
+        ...state,
+        data: undefined,
+        error: null,
+        loading: true,
+        latestHttpCode: null
+      };
     case UPDATE_ENTRANCE:
     case CREATE_ENTRANCE_LOADING:
       return {

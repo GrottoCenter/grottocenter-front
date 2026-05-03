@@ -31,6 +31,7 @@ const RegionPage = () => {
 
   return (
     <Region
+      key={`${countryId}-${regionId}`}
       canSubscribe={canSubscribe}
       region={region}
       error={error}
