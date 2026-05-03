@@ -21,6 +21,7 @@ const PersonPage = () => {
 
   return (
     <Person
+      key={personId}
       isLoading={isFetching || subscriptionsStatus === REDUCER_STATUS.LOADING}
       person={person}
       error={error}

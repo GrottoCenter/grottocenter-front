@@ -22,7 +22,7 @@ const NetworkPage = () => {
   return cave?.isDeleted && !permissions.isModerator ? (
     <Deleted entityType={DELETED_ENTITIES.network} entity={cave} />
   ) : (
-    <Network isLoading={loading} error={error} cave={cave} />
+    <Network key={caveId} isLoading={loading} error={error} cave={cave} />
   );
 };
 

@@ -26,6 +26,7 @@ const OrganizationPage = () => {
     <Deleted entityType={DELETED_ENTITIES.organization} entity={organization} />
   ) : (
     <Organization
+      key={organizationId}
       error={error}
       isLoading={isLoading}
       organization={organization}
