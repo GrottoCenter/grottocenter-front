@@ -111,6 +111,9 @@ const formatNotification = notification => {
     case 'UPDATE':
       verb = 'updated';
       break;
+    case 'REJECT':
+      verb = 'rejected';
+      break;
     case 'VALIDATE':
       verb = 'validated';
       break;
