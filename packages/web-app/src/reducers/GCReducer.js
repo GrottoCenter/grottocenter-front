@@ -21,6 +21,7 @@ import createOrganization from './CreateOrganization';
 import createPerson from './CreatePerson';
 import cumulatedLength from './CumulatedLengthReducer';
 import dbExport from './DBExportReducer';
+import detachEntrance from './DetachEntranceReducer';
 import documentChildren from './DocumentChildrenReducer';
 import documentDetails from './DetailsDocumentReducer';
 import parentDocument from './ParentDocumentReducer';
@@ -112,6 +113,7 @@ const GCReducer = combineReducers({
   createPerson,
   cumulatedLength,
   dbExport,
+  detachEntrance,
   documentChildren,
   documentDetails,
   parentDocument,

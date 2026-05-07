@@ -83,7 +83,7 @@ const EditTypeSelection = ({
             }}
             color="secondary">
             {formatMessage({
-              id: 'Link to an existing entrance or network'
+              id: 'Manage network association'
             })}
           </Button>
         )}
