@@ -29,13 +29,13 @@ const OperationSummary = ({ entrance, isLinkedToANetwork, newCave }) => {
       </Box>
       <Box>
         <Property
-          label={formatMessage({ id: 'New cave or network' })}
+          label={formatMessage({ id: 'New network' })}
           url={newCave?.id && `/ui/caves/${newCave.id}`}
           value={
             newCave?.name
               ? newCave.name
               : formatMessage({
-                  id: 'Select a cave or network using the search bar below.'
+                  id: 'Select an entrance or network using the search bar below.'
                 })
           }
         />

@@ -20,5 +20,6 @@ export const EntranceType = PropTypes.shape({
     ),
     name: PropTypes.string.isRequired
   }).isRequired,
+  language: PropTypes.string.isRequired,
   name: PropTypes.string.isRequired
 });

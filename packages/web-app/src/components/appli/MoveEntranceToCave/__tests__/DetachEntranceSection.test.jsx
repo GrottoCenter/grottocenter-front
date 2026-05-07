@@ -1,0 +1,176 @@
+import React from 'react';
+import { render, screen, fireEvent } from '@testing-library/react';
+import { IntlProvider } from 'react-intl';
+
+import DetachEntranceSection from '../DetachEntranceSection';
+
+// ---- Navigation mock ----
+const mockNavigate = jest.fn();
+jest.mock('react-router-dom', () => ({
+  useNavigate: () => mockNavigate
+}));
+
+// ---- Notification mock ----
+const mockOnSuccess = jest.fn();
+jest.mock('../../../../hooks/useNotification', () => ({
+  useNotification: () => ({
+    onSuccess: mockOnSuccess,
+    onError: jest.fn(),
+    onWarning: jest.fn(),
+    onInfo: jest.fn()
+  })
+}));
+
+// ---- Redux mock ----
+const mockDispatch = jest.fn();
+let mockStoreState = {};
+
+jest.mock('react-redux', () => ({
+  ...jest.requireActual('react-redux'),
+  useDispatch: () => mockDispatch,
+  useSelector: selector => selector(mockStoreState)
+}));
+
+// ---- Action mock ----
+const mockDetachEntranceToNewCave = jest.fn(() => ({
+  type: 'DETACH_ENTRANCE'
+}));
+const mockResetDetachEntrance = jest.fn(() => ({
+  type: 'DETACH_ENTRANCE_RESET'
+}));
+jest.mock('../../../../actions/Entrance/DetachEntrance', () => ({
+  detachEntranceToNewCave: (...args) => mockDetachEntranceToNewCave(...args),
+  resetDetachEntrance: (...args) => mockResetDetachEntrance(...args)
+}));
+
+const messages = {
+  'Detach entrance': 'Detach entrance',
+  'Cannot detach: this entrance is the only one of its cave.':
+    'Cannot detach: this entrance is the only one of its cave.',
+  'Entrance successfully detached.':
+    'Entrance successfully detached.',
+  'An error occurred while detaching the entrance.':
+    'An error occurred while detaching the entrance.'
+};
+
+const multiEntranceCave = {
+  id: 1,
+  name: 'Test Entrance',
+  language: 'eng',
+  cave: {
+    id: 10,
+    entrances: [{ id: 1 }, { id: 2 }],
+    name: 'Test Cave'
+  }
+};
+
+const soleEntranceCave = {
+  id: 1,
+  name: 'Test Entrance',
+  language: 'eng',
+  cave: {
+    id: 10,
+    entrances: [{ id: 1 }],
+    name: 'Test Cave'
+  }
+};
+
+const defaultDetachState = {
+  loading: false,
+  error: undefined,
+  success: false
+};
+
+const renderComponent = (entrance, detachState = defaultDetachState) => {
+  mockStoreState = { detachEntrance: detachState };
+  return render(
+    <IntlProvider locale="en" messages={messages}>
+      <DetachEntranceSection entrance={entrance} />
+    </IntlProvider>
+  );
+};
+
+beforeEach(() => {
+  mockDispatch.mockClear();
+  mockDetachEntranceToNewCave.mockClear();
+  mockNavigate.mockClear();
+  mockOnSuccess.mockClear();
+});
+
+describe('DetachEntranceSection', () => {
+  it('renders enabled button when entrance has multiple cave entrances', () => {
+    renderComponent(multiEntranceCave);
+
+    const button = screen.getByRole('button', { name: 'Detach entrance' });
+    expect(button).toBeInTheDocument();
+    expect(button).not.toBeDisabled();
+  });
+
+  it('renders disabled button with tooltip when entrance is sole entrance', () => {
+    renderComponent(soleEntranceCave);
+
+    const button = screen.getByRole('button', { name: 'Detach entrance' });
+    expect(button).toBeDisabled();
+  });
+
+  it('clicking button dispatches detachEntranceToNewCave', () => {
+    renderComponent(multiEntranceCave);
+
+    const button = screen.getByRole('button', { name: 'Detach entrance' });
+    fireEvent.click(button);
+
+    expect(mockDetachEntranceToNewCave).toHaveBeenCalledWith(multiEntranceCave);
+    expect(mockDispatch).toHaveBeenCalled();
+  });
+
+  it('shows loading spinner when loading is true', () => {
+    renderComponent(multiEntranceCave, {
+      ...defaultDetachState,
+      loading: true
+    });
+
+    const button = screen.getByRole('button');
+    expect(button).toBeDisabled();
+    expect(screen.getByRole('progressbar')).toBeInTheDocument();
+  });
+
+  it('navigates to entrance page on success', () => {
+    renderComponent(multiEntranceCave, {
+      ...defaultDetachState,
+      success: true
+    });
+
+    expect(mockNavigate).toHaveBeenCalledWith('/ui/entrances/1');
+  });
+
+  it('shows success toast notification on success', () => {
+    renderComponent(multiEntranceCave, {
+      ...defaultDetachState,
+      success: true
+    });
+
+    expect(mockOnSuccess).toHaveBeenCalledWith(
+      'Entrance successfully detached.'
+    );
+  });
+
+  it('shows error alert when error is truthy', () => {
+    renderComponent(multiEntranceCave, {
+      ...defaultDetachState,
+      error: 'Something went wrong'
+    });
+
+    expect(
+      screen.getByText('An error occurred while detaching the entrance.')
+    ).toBeInTheDocument();
+  });
+
+  it('dispatches resetDetachEntrance on unmount', () => {
+    const { unmount } = renderComponent(multiEntranceCave);
+    mockDispatch.mockClear();
+
+    unmount();
+
+    expect(mockResetDetachEntrance).toHaveBeenCalled();
+  });
+});
