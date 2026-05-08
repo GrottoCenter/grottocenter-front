@@ -1,19 +1,15 @@
-import React, { useCallback, useState } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import { useForm } from 'react-hook-form';
 import { useSelector, useDispatch } from 'react-redux';
 
 import { updatePerson } from '../../../../actions/Person/UpdatePerson';
-import { postChangePassword } from '../../../../actions/Person/ChangePassword';
-import { postChangeEmail } from '../../../../actions/Person/ChangeEmail';
 import { FormContainer, FormActionRow, FormRow } from '../utils/FormContainers';
 import InputText from '../utils/InputText';
-import InputPassword from '../utils/InputPassword';
 import FormProgressInfo from '../utils/FormProgressInfo';
-import { PASSWORD_MIN_LENGTH } from '../../../../conf/config';
 import { PersonPropTypes } from '../../../../types/person.type';
 
-export const PersonForm = ({ personValues, isOurAccount, onCancel }) => {
+export const PersonForm = ({ personValues, onCancel }) => {
   const {
     error: personError,
     isLoading: personIsLoading,
@@ -25,29 +21,18 @@ export const PersonForm = ({ personValues, isOurAccount, onCancel }) => {
     handleSubmit,
     reset,
     control,
-    watch,
-    getValues,
     formState: { errors, isSubmitting, isSubmitSuccessful }
   } = useForm({
     defaultValues: {
       person: {
         name: personValues.name ?? '',
         surname: personValues.surname ?? '',
-        nickname: personValues.nickname ?? '',
-        email: '',
-        emailConfirmation: '',
-        password: '',
-        passwordConfirmation: ''
+        nickname: personValues.nickname ?? ''
       }
     }
   });
-  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
-  const handleReset = useCallback(() => {
-    reset(undefined, { keepValues: true, keepErrors: false });
-  }, [reset]);
-
-  const onSubmit = async ({ person }) => {
+  const onSubmit = ({ person }) => {
     dispatch(
       updatePerson(personValues.id, {
         name: person.name,
@@ -55,13 +40,6 @@ export const PersonForm = ({ personValues, isOurAccount, onCancel }) => {
         nickname: person.nickname
       })
     );
-
-    if (person.email && isOurAccount) {
-      dispatch(postChangeEmail(person.email));
-    }
-    if (person.password && isOurAccount) {
-      dispatch(postChangePassword(person.password));
-    }
   };
 
   if (isSubmitSuccessful) {
@@ -71,7 +49,7 @@ export const PersonForm = ({ personValues, isOurAccount, onCancel }) => {
         isError={!!personError}
         labelLoading="Updating person..."
         labelError="'An error occurred when updating'"
-        resetFn={handleReset}
+        resetFn={() => reset(undefined, { keepValues: true, keepErrors: false })}
         getRedirectFn={() => `/ui/persons/${personData.id}`}
       />
     );
@@ -95,80 +73,14 @@ export const PersonForm = ({ personValues, isOurAccount, onCancel }) => {
             labelName="First name"
             control={control}
             isError={!!errors?.person?.name}
-            isRequired
           />
           <InputText
             formKey="person.surname"
             labelName="Last name"
             control={control}
             isError={!!errors?.person?.surname}
-            isRequired
           />
         </FormRow>
-
-        {isOurAccount && (
-          <>
-            <br />
-            <FormRow>
-              <InputText
-                formKey="person.email"
-                labelName="Change email"
-                control={control}
-                isError={!!errors?.person?.email}
-                type="email"
-              />
-              <InputText
-                formKey="person.emailConfirmation"
-                labelName="Email confirmation"
-                control={control}
-                isError={!!errors?.person?.emailConfirmation}
-                isRequired={!!watch('person.email')}
-                type="email"
-                validatorFn={(value, intlFormatMessage) => {
-                  if (value !== getValues()?.person?.email)
-                    return intlFormatMessage({ id: 'The mails do not match' });
-                  return true;
-                }}
-                helperText={errors?.person?.emailConfirmation?.message}
-              />
-            </FormRow>
-            <br />
-            <FormRow>
-              <InputPassword
-                formKey="person.password"
-                labelName="Change password"
-                isPasswordVisible={isPasswordVisible}
-                onShowPassword={() => setIsPasswordVisible(!isPasswordVisible)}
-                control={control}
-                isError={!!errors?.person?.password}
-                validatorFn={(value, intlFormatMessage) => {
-                  if (value && value.length < PASSWORD_MIN_LENGTH)
-                    return intlFormatMessage({ id: 'Password too short.' });
-                  return true;
-                }}
-                helperText={errors?.person?.password?.message}
-              />
-              <InputPassword
-                formKey="person.passwordConfirmation"
-                labelName="Password confirmation"
-                isPasswordVisible={isPasswordVisible}
-                onShowPassword={() => setIsPasswordVisible(!isPasswordVisible)}
-                control={control}
-                isError={!!errors?.person?.passwordConfirmation}
-                isRequired={!!watch('person.password')}
-                validatorFn={(value, intlFormatMessage) => {
-                  if (value !== getValues()?.person?.password)
-                    return intlFormatMessage({
-                      id: 'The passwords do not match'
-                    });
-                  return true;
-                }}
-                helperText={errors?.person?.passwordConfirmation?.message}
-              />
-            </FormRow>
-          </>
-        )}
-
         <FormActionRow
           isNew={false}
           isSubmitting={isSubmitting}
@@ -180,7 +92,6 @@ export const PersonForm = ({ personValues, isOurAccount, onCancel }) => {
 };
 
 PersonForm.propTypes = {
-  isOurAccount: PropTypes.bool,
   personValues: PersonPropTypes.isRequired,
   onCancel: PropTypes.func
 };

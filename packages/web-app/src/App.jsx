@@ -34,6 +34,7 @@ import Map from './pages/Map';
 import MassifPage from './pages/Massif';
 import MoveEntranceToCave from './pages/MoveEntranceToCave';
 import NetworkPage from './pages/Network';
+import AccountPage from './pages/Account';
 import PersonPage from './pages/Person';
 import OrganizationPage from './pages/Organization';
 import EntranceEdit from './pages/EntityEdit/Entrance/EntranceEdit';
@@ -116,6 +117,7 @@ const router = createBrowserRouter(
 
       {/* Routes requiring authentication */}
       <Route element={<PrivateRoute />}>
+        <Route path="/ui/account" element={<AccountPage />} />
         <Route path="/ui/entrances/:entranceId/edit" element={<EntranceEdit />} />
         <Route
           path="/ui/organizations/:organizationId/edit"

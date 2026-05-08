@@ -57,12 +57,10 @@ const UserMenu = ({
     onLogoutClick();
   }, [handleClose, onLogoutClick]);
 
-  // Directs to the person page to see and modify the personal data
   const handleMyAccountClick = useCallback(() => {
-    if (!userId) return;
     handleClose();
-    navigate(`/ui/persons/${userId}`);
-  }, [handleClose, navigate, userId]);
+    navigate('/ui/account');
+  }, [handleClose, navigate]);
 
   const handleDashboardClick = useCallback(() => {
     handleClose();
