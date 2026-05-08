@@ -621,7 +621,7 @@ const PreferencesSection = ({ account, onSaved }) => {
     <>
       <InfoRow>
         <InfoLabel variant="body2">
-          {formatMessage({ id: 'Language' })}
+          {formatMessage({ id: 'Preferred contact language' })}
         </InfoLabel>
         <Typography variant="body1">
           {languageName === '—' ? '—' : <Translate>{languageName}</Translate>}
