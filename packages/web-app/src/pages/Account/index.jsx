@@ -34,6 +34,7 @@ import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import TuneIcon from '@mui/icons-material/Tune';
 import { styled } from '@mui/material/styles';
 
+import { loadLanguages } from '../../actions/Language';
 import { fetchAccount } from '../../actions/Account/GetAccount';
 import { updateAccount } from '../../actions/Account/UpdateAccount';
 import { fetchPerson } from '../../actions/Person/GetPerson';
@@ -85,6 +86,7 @@ const SectionBody = styled(Box)(({ theme }) => ({
 const InfoRow = styled(Box)(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
+  gap: theme.spacing(2),
   padding: theme.spacing(1, 0),
   borderBottom: `1px solid ${theme.palette.divider}`,
   '&:last-child': { borderBottom: 'none' }
@@ -555,8 +557,12 @@ const EmailSecuritySection = ({ account, onSaved }) => {
 const PreferencesSection = ({ account, onSaved }) => {
   const dispatch = useDispatch();
   const { formatMessage } = useIntl();
-  const { languages } = useSelector(state => state.language);
+  const { languages, isLoaded: languagesLoaded } = useSelector(state => state.language);
   const [isEditing, setIsEditing] = useState(false);
+
+  useEffect(() => {
+    if (!languagesLoaded) dispatch(loadLanguages(true));
+  }, [dispatch, languagesLoaded]);
   const [isLoading, setIsLoading] = useState(false);
   const [saveError, setSaveError] = useState(null);
 
@@ -643,6 +649,8 @@ const PreferencesSection = ({ account, onSaved }) => {
           formKey="language"
           control={control}
           isError={!!errors.language}
+          label="Preferred contact language"
+          fullWidth
         />
       </FormRow>
       <Box sx={{ mt: 2 }}>
@@ -819,7 +827,9 @@ const AccountPage = () => {
     <>
       <PageHeader
         title={formatMessage({ id: 'My Account' })}
-        icon={<AccountBoxIcon fontSize="inherit" sx={{ color: 'secondary.main' }} />}
+        icon={
+          <AccountBoxIcon fontSize="inherit" sx={{ color: 'secondary.main' }} />
+        }
       />
       <PageTabs tabs={tabs}>
         {/* Tab Account */}
