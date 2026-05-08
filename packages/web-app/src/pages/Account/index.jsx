@@ -18,6 +18,7 @@ import {
   Tooltip,
   Typography
 } from '@mui/material';
+import AccountBoxIcon from '@mui/icons-material/AccountBox';
 import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
 import CancelIcon from '@mui/icons-material/Cancel';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
@@ -39,7 +40,7 @@ import { fetchPerson } from '../../actions/Person/GetPerson';
 import { joinOrganization } from '../../actions/Organization/JoinOrganization';
 import { leaveOrganization } from '../../actions/Organization/LeaveOrganization';
 import Alert from '../../components/common/Alert';
-import CustomIcon from '../../components/common/CustomIcon';
+
 import DocumentsList from '../../components/common/DocumentsList/DocumentsList';
 import EntitiesList from '../../components/common/entitiesList/EntitiesList';
 import PageHeader from '../../components/common/Layouts/PageHeader';
@@ -818,7 +819,7 @@ const AccountPage = () => {
     <>
       <PageHeader
         title={formatMessage({ id: 'My Account' })}
-        icon={<CustomIcon type="caver" />}
+        icon={<AccountBoxIcon fontSize="inherit" sx={{ color: 'secondary.main' }} />}
       />
       <PageTabs tabs={tabs}>
         {/* Tab Account */}
