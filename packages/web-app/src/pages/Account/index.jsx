@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
+import PropTypes from 'prop-types';
 import { Controller, useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { useIntl } from 'react-intl';
@@ -142,6 +143,15 @@ const SettingSection = ({
   );
 };
 
+SettingSection.propTypes = {
+  icon: PropTypes.node,
+  title: PropTypes.string.isRequired,
+  isEditing: PropTypes.bool.isRequired,
+  onEdit: PropTypes.func.isRequired,
+  viewContent: PropTypes.node.isRequired,
+  editContent: PropTypes.node.isRequired
+};
+
 // ─── Save/cancel footer used in edit forms ────────────────────────────────────
 
 const BoolValue = ({ value }) =>
@@ -150,6 +160,10 @@ const BoolValue = ({ value }) =>
   ) : (
     <CancelIcon fontSize="small" sx={{ color: 'text.disabled', ml: 1 }} />
   );
+
+BoolValue.propTypes = {
+  value: PropTypes.bool.isRequired
+};
 
 const EditActions = ({ isLoading, onCancel }) => (
   <EditFooter>
@@ -168,6 +182,11 @@ const EditActions = ({ isLoading, onCancel }) => (
     </Button>
   </EditFooter>
 );
+
+EditActions.propTypes = {
+  isLoading: PropTypes.bool.isRequired,
+  onCancel: PropTypes.func.isRequired
+};
 
 // ─── Personal info section ────────────────────────────────────────────────────
 
@@ -318,6 +337,22 @@ const PersonalInfoSection = ({ account, onSaved }) => {
       editContent={editContent}
     />
   );
+};
+
+const accountShape = PropTypes.shape({
+  id: PropTypes.number,
+  nickname: PropTypes.string,
+  name: PropTypes.string,
+  surname: PropTypes.string,
+  email: PropTypes.string,
+  mailIsValid: PropTypes.bool,
+  language: PropTypes.number,
+  sendNotificationByEmail: PropTypes.bool
+});
+
+PersonalInfoSection.propTypes = {
+  account: accountShape.isRequired,
+  onSaved: PropTypes.func.isRequired
 };
 
 // ─── Email & security section ─────────────────────────────────────────────────
@@ -552,6 +587,11 @@ const EmailSecuritySection = ({ account, onSaved }) => {
   );
 };
 
+EmailSecuritySection.propTypes = {
+  account: accountShape.isRequired,
+  onSaved: PropTypes.func.isRequired
+};
+
 // ─── Preferences section ──────────────────────────────────────────────────────
 
 const PreferencesSection = ({ account, onSaved }) => {
@@ -559,12 +599,12 @@ const PreferencesSection = ({ account, onSaved }) => {
   const { formatMessage } = useIntl();
   const { languages, isLoaded: languagesLoaded } = useSelector(state => state.language);
   const [isEditing, setIsEditing] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [saveError, setSaveError] = useState(null);
 
   useEffect(() => {
     if (!languagesLoaded) dispatch(loadLanguages(true));
   }, [dispatch, languagesLoaded]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [saveError, setSaveError] = useState(null);
 
   const {
     control,
@@ -695,6 +735,11 @@ const PreferencesSection = ({ account, onSaved }) => {
   );
 };
 
+PreferencesSection.propTypes = {
+  account: accountShape.isRequired,
+  onSaved: PropTypes.func.isRequired
+};
+
 // ─── Main page ────────────────────────────────────────────────────────────────
 
 const AccountPage = () => {
@@ -732,11 +777,15 @@ const AccountPage = () => {
   const handleJoinOrganization = useCallback(
     async organizations => {
       if (!userId || organizations.length === 0) return;
-      await Promise.all(
-        organizations.map(org => dispatch(joinOrganization(userId, org.id)))
-      );
-      dispatch(fetchPerson(userId));
-      setIsOrgSearchVisible(false);
+      try {
+        await Promise.all(
+          organizations.map(org => dispatch(joinOrganization(userId, org.id)))
+        );
+        dispatch(fetchPerson(userId));
+        setIsOrgSearchVisible(false);
+      } catch {
+        // join failed — leave the search form open so the user can retry
+      }
     },
     [dispatch, userId]
   );
@@ -755,8 +804,12 @@ const AccountPage = () => {
     if (!pendingLeaveOrg || !userId) return;
     const { id } = pendingLeaveOrg;
     setPendingLeaveOrg(null);
-    await dispatch(leaveOrganization(userId, id));
-    dispatch(fetchPerson(userId));
+    try {
+      await dispatch(leaveOrganization(userId, id));
+      dispatch(fetchPerson(userId));
+    } catch {
+      // leave failed — dialog already closed, person data unchanged
+    }
   }, [dispatch, userId, pendingLeaveOrg]);
 
   const nbOrganizations = (person?.organizations ?? []).length;

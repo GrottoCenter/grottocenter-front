@@ -61,6 +61,8 @@ const Person = ({
     canEdit = userId.toString() === person?.id?.toString();
   }
   const canUnsubscribe = canEdit || permissions.isAdmin;
+  const canAdminEdit =
+    person && !canEdit && (permissions.isAdmin || permissions.isModerator);
 
   const handleRefresh = useCallback(() => {
     dispatch(fetchPerson(person.id));
@@ -109,8 +111,12 @@ const Person = ({
           key: 'edit',
           icon: <CreateIcon />,
           label: formatMessage({ id: 'Edit properties' }),
-          onClick: canEdit ? () => navigate('/ui/account') : undefined,
-          hidden: !canEdit
+          onClick: canEdit
+            ? () => navigate('/ui/account')
+            : canAdminEdit
+              ? () => navigate(`/ui/persons/${person?.id}/edit`)
+              : undefined,
+          hidden: !canEdit && !canAdminEdit
         },
         {
           key: 'delete',

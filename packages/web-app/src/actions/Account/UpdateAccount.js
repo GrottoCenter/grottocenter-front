@@ -16,7 +16,10 @@ export const updateAccount = fields => (dispatch, getState) => {
   const requestOptions = {
     method: 'PATCH',
     body: JSON.stringify(fields),
-    headers: getState().login.authorizationHeader
+    headers: {
+      ...getState().login.authorizationHeader,
+      'Content-Type': 'application/json'
+    }
   };
 
   return fetch(accountUrl, requestOptions)
