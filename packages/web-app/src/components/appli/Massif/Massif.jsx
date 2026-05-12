@@ -230,54 +230,62 @@ const Massif = ({ isLoading, error, massif }) => {
                   onDeletePress(entity?.id, isDeleteConfirmationPermanent);
                 }}
               />
+              {massif.isSensitive && (
+                <Alert
+                  severity="warning"
+                  title={formatMessage({
+                    id: 'This massif is marked as sensitive based on applicable legislation.'
+                  })}
+                />
+              )}
               {(massif?.geogPolygon ||
                 massif?.author ||
                 massif?.reviewer ||
                 massif?.language ||
                 massif?.names?.[0]?.language) && (
-                <ScrollableContent
-                  content={
-                    <>
-                      {massif?.geogPolygon && (
-                        <MapMassif
-                          massifId={massifIdInt}
-                          geogPolygon={massif?.geogPolygon}
-                        />
-                      )}
-                      {(massif?.author ||
-                        massif?.reviewer ||
-                        massif?.language ||
-                        massif?.names?.[0]?.language) && (
-                        <Typography
-                          component="div"
-                          variant="caption"
-                          sx={{ mt: massif?.geogPolygon ? 2 : 0 }}>
-                          {massif.author && (
-                            <AuthorAndDate
-                              author={massif.author}
-                              verb="Created"
-                              date={massif.dateInscription}
-                            />
+                  <ScrollableContent
+                    content={
+                      <>
+                        {massif?.geogPolygon && (
+                          <MapMassif
+                            massifId={massifIdInt}
+                            geogPolygon={massif?.geogPolygon}
+                          />
+                        )}
+                        {(massif?.author ||
+                          massif?.reviewer ||
+                          massif?.language ||
+                          massif?.names?.[0]?.language) && (
+                            <Typography
+                              component="div"
+                              variant="caption"
+                              sx={{ mt: massif?.geogPolygon ? 2 : 0 }}>
+                              {massif.author && (
+                                <AuthorAndDate
+                                  author={massif.author}
+                                  verb="Created"
+                                  date={massif.dateInscription}
+                                />
+                              )}
+                              {massif.author && massif.reviewer && ' · '}
+                              {massif.reviewer && (
+                                <AuthorAndDate
+                                  author={massif.reviewer}
+                                  verb="Updated"
+                                  date={massif.dateReviewed}
+                                />
+                              )}
+                              {(massif.author || massif.reviewer) &&
+                                (massif.language || massif.names?.[0]?.language) &&
+                                ' · '}
+                              {(massif.language || massif.names?.[0]?.language) &&
+                                `${formatMessage({ id: 'Language' })} : ${(massif.language ?? massif.names[0].language).toUpperCase()}`}
+                            </Typography>
                           )}
-                          {massif.author && massif.reviewer && ' · '}
-                          {massif.reviewer && (
-                            <AuthorAndDate
-                              author={massif.reviewer}
-                              verb="Updated"
-                              date={massif.dateReviewed}
-                            />
-                          )}
-                          {(massif.author || massif.reviewer) &&
-                            (massif.language || massif.names?.[0]?.language) &&
-                            ' · '}
-                          {(massif.language || massif.names?.[0]?.language) &&
-                            `${formatMessage({ id: 'Language' })} : ${(massif.language ?? massif.names[0].language).toUpperCase()}`}
-                        </Typography>
-                      )}
-                    </>
-                  }
-                />
-              )}
+                      </>
+                    }
+                  />
+                )}
               <Descriptions
                 descriptions={massif.descriptions ?? []}
                 entityType="massif"

@@ -13,6 +13,9 @@ import { RESTORE_MASSIF_SUCCESS } from '../actions/Massif/RestoreMassif';
 import { LINK_DOCUMENT_TO_MASSIF_SUCCESS } from '../actions/LinkDocumentToMassif';
 import { UNLINK_DOCUMENT_TO_MASSIF_SUCCESS } from '../actions/UnlinkDocumentToMassif';
 import { MOVE_DESCRIPTION_RELEVANCE_SUCCESS } from '../actions/Description/MoveRelevance';
+import { UPDATE_MASSIF_SUCCESS } from '../actions/Massif/UpdateMassif';
+import { MARK_MASSIF_SENSITIVE_SUCCESS } from '../actions/Massif/MarkSensitiveMassif';
+import { UNMARK_MASSIF_SENSITIVE_SUCCESS } from '../actions/Massif/UnmarkSensitiveMassif';
 
 const initialState = {
   massif: undefined,
@@ -28,6 +31,9 @@ const reducer = (state = initialState, action) => {
     case DELETE_MASSIF_SUCCESS:
     case DELETE_MASSIF_PERMANENT_SUCCESS:
     case RESTORE_MASSIF_SUCCESS:
+    case UPDATE_MASSIF_SUCCESS:
+    case MARK_MASSIF_SENSITIVE_SUCCESS:
+    case UNMARK_MASSIF_SENSITIVE_SUCCESS:
       return { ...state, massif: action.massif, isFetching: false };
     case FETCH_MASSIF_FAILURE:
       return { ...state, error: action.error, isFetching: false };
