@@ -5,7 +5,7 @@ import { Box, Typography } from '@mui/material';
 import BoolIcon from './BoolIcon';
 import { checkPasswordRules, PASSWORD_MIN_LENGTH } from '../../../conf/config';
 
-const RuleItem = ({ satisfied, labelId, labelValues }) => {
+const RuleItem = ({ satisfied, labelId, labelValues = undefined }) => {
   const { formatMessage } = useIntl();
   return (
     <Box display="flex" alignItems="center" gap={1}>
@@ -25,9 +25,6 @@ RuleItem.propTypes = {
   labelValues: PropTypes.object
 };
 
-RuleItem.defaultProps = {
-  labelValues: undefined
-};
 
 const PasswordRules = ({ password }) => {
   if (!password) return null;

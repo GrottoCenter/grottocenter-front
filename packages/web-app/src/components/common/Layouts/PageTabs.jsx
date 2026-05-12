@@ -139,8 +139,6 @@ const PageTabs = ({ tabs, children }) => {
                         label={tab.count}
                         size="small"
                         sx={{
-                          bgcolor: 'grey.200',
-                          color: 'text.secondary',
                           fontWeight: 600,
                           pointerEvents: 'none'
                         }}

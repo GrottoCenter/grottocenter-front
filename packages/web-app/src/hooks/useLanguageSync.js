@@ -14,6 +14,9 @@ const useLanguageSync = () => {
   const { account } = useSelector(state => state.account);
   const { isLoaded: languagesLoaded } = useSelector(state => state.language);
   const mountedRef = useRef(false);
+  // Set to true while effect 2 is programmatically changing locale to prevent
+  // effect 3 from dispatching a redundant PATCH before fetchAccount resolves.
+  const syncingFromAccountRef = useRef(false);
 
   // On login: load account data and API language list
   useEffect(() => {
@@ -29,6 +32,7 @@ const useLanguageSync = () => {
     if (!account?.language) return;
     const targetLocale = languageIdToLocale(account.language);
     if (targetLocale && targetLocale !== locale) {
+      syncingFromAccountRef.current = true;
       window.localStorage.setItem('selectedLanguage', targetLocale);
       dispatch(changeLocale(targetLocale));
     }
@@ -39,6 +43,10 @@ const useLanguageSync = () => {
   useEffect(() => {
     if (!mountedRef.current) {
       mountedRef.current = true;
+      return;
+    }
+    if (syncingFromAccountRef.current) {
+      syncingFromAccountRef.current = false;
       return;
     }
     if (!isAuth) return;

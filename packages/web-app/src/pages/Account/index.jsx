@@ -457,24 +457,17 @@ const EmailSecuritySection = ({ account, onSaved }) => {
             <Chip
               size="small"
               variant="outlined"
+              color="success"
               icon={<CheckCircleOutlineIcon />}
               label={formatMessage({ id: 'Email verified' })}
-              sx={{
-                bgcolor: 'success.main',
-                color: '#fff',
-                '& .MuiChip-icon': { color: '#fff' }
-              }}
             />
           ) : (
             <Chip
               size="small"
+              variant="outlined"
+              color="error"
               icon={<ErrorOutlineIcon />}
               label={formatMessage({ id: 'Email not verified' })}
-              sx={{
-                bgcolor: 'error.main',
-                color: '#fff',
-                '& .MuiChip-icon': { color: '#fff' }
-              }}
             />
           ))}
       </Box>

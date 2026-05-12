@@ -153,14 +153,6 @@ export const overridings = {
         }
       }
     },
-    MuiChip: {
-      styleOverrides: {
-        root: {
-          backgroundColor: brown['500'],
-          color: '#fff'
-        }
-      }
-    },
     MuiDialog: {
       styleOverrides: {
         paper: {
