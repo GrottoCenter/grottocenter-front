@@ -11,8 +11,9 @@ const postDocumentAction = () => ({
   type: POST_DOCUMENT
 });
 
-const postDocumentSuccess = httpCode => ({
+const postDocumentSuccess = (document, httpCode) => ({
   type: POST_DOCUMENT_SUCCESS,
+  document,
   httpCode
 });
 
@@ -82,9 +83,15 @@ export function postDocument(docAttributes) {
             errorMessages
           );
         } else {
-          dispatch(postDocumentSuccess(response.status));
+          let createdDocument;
+          try {
+            createdDocument = JSON.parse(responseText)?.document;
+          } catch (_) {
+            // response body not parseable, continue without document object
+          }
+          dispatch(postDocumentSuccess(createdDocument, response.status));
+          return createdDocument;
         }
-        return response;
       })
     );
   };

@@ -28,6 +28,11 @@ import ContributionsPage from './pages/Contributions';
 import DocumentValidation from './pages/DocumentValidation';
 import DocumentEdit from './pages/DocumentEdit';
 import EntityCreation from './pages/EntityCreation';
+import EntityPicker from './pages/EntityCreation/EntityPicker';
+import AddEntrance from './pages/EntityCreation/AddEntrance';
+import AddDocument from './pages/EntityCreation/AddDocument';
+import AddMassif from './pages/EntityCreation/AddMassif';
+import AddOrganization from './pages/EntityCreation/AddOrganization';
 import EntryPage from './pages/Entry';
 import ImportContainer from './pages/ImportCSV';
 import ManageUsers from './pages/Admin/ManageUsers';
@@ -107,7 +112,13 @@ const router = createBrowserRouter(
       <Route path="/ui/login" element={<HomePage />} />
       <Route path="/ui/signup" element={<SignUp />} />
       <Route path="/ui/verify-email" element={<VerifyEmail />} />
-      <Route path="/ui/entity/add" element={<EntityCreation />} />
+      <Route path="/ui/entity/add" element={<EntityCreation />}>
+        <Route index element={<EntityPicker />} />
+        <Route path="entrance" element={<AddEntrance />} />
+        <Route path="document" element={<AddDocument />} />
+        <Route path="massif" element={<AddMassif />} />
+        <Route path="organization" element={<AddOrganization />} />
+      </Route>
       <Route path="/ui/forgotPassword" element={<ForgotPassword />} />
       <Route path="/ui/changePassword" element={<ChangePassword />} />
       <Route path="/ui/documents/validation" element={<DocumentValidation />} />

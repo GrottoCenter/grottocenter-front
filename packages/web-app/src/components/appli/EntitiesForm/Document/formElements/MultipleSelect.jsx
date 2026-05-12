@@ -3,9 +3,9 @@ import { useIntl } from 'react-intl';
 import Autocomplete from '@mui/material/Autocomplete';
 import {
   Collapse as MuiCollapse,
-  FormHelperText,
   IconButton,
-  TextField
+  TextField,
+  Typography
 } from '@mui/material';
 import { isNil } from 'ramda';
 
@@ -107,6 +107,11 @@ const MultipleSelect = ({
   const hasError = computeHasError(document[contextValueName]);
   return (
     <>
+      {helperText && (
+        <Typography variant="caption" color={hasError ? 'error' : 'text.secondary'} display="block" sx={{ mb: 0.5 }}>
+          <Translate>{helperText}</Translate>
+        </Typography>
+      )}
       <Wrapper>
         <InputWrapper>
           <Autocomplete
@@ -174,11 +179,6 @@ const MultipleSelect = ({
           </IconButton>
         )}
       </Wrapper>
-      {helperText && (
-        <FormHelperText variant="filled" error={hasError || searchError}>
-          <Translate>{helperText}</Translate>
-        </FormHelperText>
-      )}
     </>
   );
 };

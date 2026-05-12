@@ -190,20 +190,17 @@ const ImageLightbox = ({
             )
           }
           variant="contained"
-          color="primary"
-        >
-          {formatMessage({ id: 'Download image' })}
+          color="primary">
+          {formatMessage({ id: 'Download' })}
         </Button>
-      }
-    >
+      }>
       <LightboxContent ref={contentRef}>
         {hasMultipleImages && (
           <NavigationButton
             className="previous"
             onClick={handlePrevious}
             aria-label={formatMessage({ id: 'Previous image' })}
-            size="large"
-          >
+            size="large">
             <NavigateBefore fontSize="large" />
           </NavigationButton>
         )}
@@ -232,8 +229,7 @@ const ImageLightbox = ({
             className="next"
             onClick={handleNext}
             aria-label={formatMessage({ id: 'Next image' })}
-            size="large"
-          >
+            size="large">
             <NavigateNext fontSize="large" />
           </NavigationButton>
         )}
@@ -248,24 +244,19 @@ const ImageLightbox = ({
           px: 2,
           py: '2px',
           minHeight: '24px'
-        }}
-      >
+        }}>
         {(currentImage.description || description) && (
           <Typography
             variant="body2"
             sx={{
               textAlign: 'center',
               color: 'text.secondary'
-            }}
-          >
+            }}>
             {currentImage.description || description}
           </Typography>
         )}
         {hasMultipleImages && (
-          <Typography
-            variant="caption"
-            sx={{ color: 'text.secondary' }}
-          >
+          <Typography variant="caption" sx={{ color: 'text.secondary' }}>
             {formatMessage(
               { id: 'Image {current} of {total}' },
               {

@@ -20,7 +20,7 @@ const ENTITY_ICON_TYPE = {
   persons: 'caver'
 };
 
-const EntitySearchPage = ({ title, subheader, entityType, children }) => {
+const EntitySearchPage = ({ title, subheader, actions, entityType, children }) => {
   const dispatch = useDispatch();
   const { formatMessage } = useIntl();
   const iconType = ENTITY_ICON_TYPE[entityType] ?? 'entrance';
@@ -41,6 +41,7 @@ const EntitySearchPage = ({ title, subheader, entityType, children }) => {
       icon={<CustomIcon type={iconType} />}
       title={formatMessage({ id: title })}
       subheader={subheader}
+      action={actions}
       content={
         <>
           {children}
@@ -55,6 +56,7 @@ const EntitySearchPage = ({ title, subheader, entityType, children }) => {
 EntitySearchPage.propTypes = {
   title: PropTypes.string.isRequired,
   subheader: PropTypes.node,
+  actions: PropTypes.node,
   entityType: PropTypes.string.isRequired,
   children: PropTypes.node.isRequired
 };

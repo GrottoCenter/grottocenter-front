@@ -1,35 +1,98 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
-import { FormControl, Button, Typography } from '@mui/material';
+import { useDispatch, useSelector } from 'react-redux';
+import { isEmpty, remove } from 'ramda';
+import {
+  Box,
+  CircularProgress,
+  FormControl,
+  FormControlLabel,
+  FormLabel,
+  InputLabel,
+  MenuItem,
+  Radio,
+  RadioGroup,
+  Select,
+  TextField
+} from '@mui/material';
 
-import { styled } from '@mui/material/styles';
-import { isEmpty, isNil, remove } from 'ramda';
-import LicenseSelectAutoComplete from './AutoCompletion/LicenseSelectAutoComplete';
-import FilesList from './FilesList';
-import DocumentAuthorizationSelectAutoComplete from './AutoCompletion/DocumentAuthorizationSelectAutoComplete';
 import ErrorsList from './ErrorsList';
 import { useFileFormats } from '../../../../../../hooks';
-import OptionSelectAutoComplete, {
-  DOCUMENT_AUTHORIZE_TO_PUBLISH
-} from './AutoCompletion/OptionSelectAutoComplete';
-import { MAX_SIZE_OF_UPLOADED_FILES } from '../../../../../../conf/config';
-import { IS_DELETED, IS_INTACT, IS_MODIFIED, IS_NEW } from './FileHelpers';
+import {
+  IS_DELETED,
+  IS_NEW,
+  AUTHORIZATION_FROM_AUTHOR,
+  LICENSE_IN_FILE,
+  DOCUMENT_AUTHORIZE_TO_PUBLISH,
+  validateAndBuildFileEntries
+} from './FileHelpers';
+import FileSelectorInput from '../../../../../common/FileSelectorInput';
+import { fetchLicense } from '../../../../../../actions/Licenses';
+import { getDocuments } from '../../../../../../actions/Document/GetDocuments';
+import { DocumentFormContext } from '../../Provider';
+import MultipleCaversSelect from '../MultipleCaversSelect';
 
-const StyledButton = styled(Button)`
-  margin-left: ${({ theme }) => theme.spacing(4)}%;
-  margin-right: ${({ theme }) => theme.spacing(4)}%;
-`;
+const DEFAULT_LICENSE = 'CC-BY-SA';
 
-const ListWrapper = styled('div')`
-  margin-left: ${({ theme }) => theme.spacing(4)}%;
-  margin-right: ${({ theme }) => theme.spacing(4)}%;
-`;
+const AuthDocSelect = ({ value, onChange, disabled = false }) => {
+  const { formatMessage } = useIntl();
+  const dispatch = useDispatch();
+  const { data, isLoading } = useSelector(state => state.documents);
+  const authDocs = data.authorizationDocuments ?? [];
 
-const StyledTypography = styled(Typography)`
-  margin-top: ${({ theme }) => theme.spacing(2)};
-  margin-bottom: ${({ theme }) => theme.spacing(2)};
-`;
+  useEffect(() => {
+    dispatch(
+      getDocuments({
+        isValidated: true,
+        documentType: 'Authorization To Publish'
+      })
+    );
+  }, [dispatch]);
+
+  if (disabled) {
+    return (
+      <TextField
+        variant="filled"
+        fullWidth
+        disabled
+        label={formatMessage({ id: 'Authorization from authors' })}
+        value={value?.title ?? ''}
+        sx={{ mt: 1.5 }}
+      />
+    );
+  }
+
+  return (
+    <FormControl variant="filled" fullWidth required sx={{ mt: 1.5 }}>
+      <InputLabel required>
+        {formatMessage({ id: 'Authorization from authors' })}
+      </InputLabel>
+      <Select
+        value={isLoading ? -1 : (value ?? -1)}
+        onChange={e => onChange(e.target.value)}>
+        <MenuItem value={-1} disabled>
+          {isLoading ? (
+            <CircularProgress size={16} />
+          ) : (
+            <i>{formatMessage({ id: 'Select an authorization document' })}</i>
+          )}
+        </MenuItem>
+        {authDocs.map(doc => (
+          <MenuItem key={doc.id} value={doc}>
+            {doc.title}
+          </MenuItem>
+        ))}
+      </Select>
+    </FormControl>
+  );
+};
+
+AuthDocSelect.propTypes = {
+  disabled: PropTypes.bool,
+  value: PropTypes.shape({ id: PropTypes.number, title: PropTypes.string }),
+  onChange: PropTypes.func.isRequired
+};
 
 const AddFileForm = ({
   files,
@@ -37,217 +100,221 @@ const AddFileForm = ({
   option,
   setOption,
   setLicense,
-  setAuthorizationDocument
+  setAuthorizationDocument,
+  acceptConfig = null,
+  showAuthorization = true
 }) => {
   const { formatMessage } = useIntl();
+  const dispatch = useDispatch();
   const [errors, setErrors] = useState([]);
-  const { mimeTypes, extensions, loading } = useFileFormats();
-  const inputRef = useRef();
+  const {
+    mimeTypes,
+    extensions: backendExtensions,
+    loading
+  } = useFileFormats();
+  const { data: licenses, loading: licensesLoading } = useSelector(
+    state => state.licenses
+  );
+  const authTokenDecoded = useSelector(state => state.login.authTokenDecoded);
+  const { document, updateAttribute } = useContext(DocumentFormContext);
 
+  const isLicenseForced = document.parent !== null && document.license !== null;
+  const isAuthForced =
+    document.parent !== null &&
+    document.selectOptionAuthorizationDocument !== null;
+  const accept = acceptConfig?.mime ?? mimeTypes.toString();
+  const extensions =
+    acceptConfig?.extensions ??
+    backendExtensions.filter(e => e !== null).map(e => e.trim());
   const showAuthDocSelect = option === DOCUMENT_AUTHORIZE_TO_PUBLISH;
+  const visibleFiles = files.filter(f => f.state !== IS_DELETED);
+
+  useEffect(() => {
+    if (showAuthorization && !licenses && !licensesLoading)
+      dispatch(fetchLicense());
+  }, [dispatch, showAuthorization, licenses, licensesLoading]);
+
+  const documentLicenseName = document.license?.name;
+  useEffect(() => {
+    if (!showAuthorization || !licenses) return;
+    const licenseName = documentLicenseName ?? DEFAULT_LICENSE;
+    const selected = licenses.find(l => l.name === licenseName);
+    if (selected) setLicense(selected);
+    // setLicense is an inline arrow function prop — excluding it from deps is intentional
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showAuthorization, licenses, documentLicenseName]);
+
+  useEffect(() => {
+    if (!showAuthorization) return;
+    if (option === AUTHORIZATION_FROM_AUTHOR && authTokenDecoded) {
+      updateAttribute('authors', [
+        { id: authTokenDecoded.id, nickname: authTokenDecoded.nickname }
+      ]);
+    } else if (option && option !== AUTHORIZATION_FROM_AUTHOR) {
+      updateAttribute('authors', []);
+    }
+  }, [option, showAuthorization, authTokenDecoded, updateAttribute]);
 
   const updateOption = newOption => {
     setOption(newOption);
     setAuthorizationDocument(null);
+    if (newOption === LICENSE_IN_FILE) setLicense(null);
   };
 
   const updateFiles = newFiles => {
-    // newFiles is type of FileList, which is a read only class.
-    // It doesn't allow much freedom when it comes to removing or renaming
-    const filesArray = Array.from(newFiles);
-    const errorsList = [];
-
-    const newAddedFiles = filesArray
-      .filter(file => {
-        if (file.size && file.size > MAX_SIZE_OF_UPLOADED_FILES) {
-          errorsList.push(
-            formatMessage(
-              {
-                id: 'error on file size',
-                defaultMessage:
-                  'The following file is too big: {file}. Max accepted size: {maxSize}'
-              },
-              {
-                file: file.name,
-                maxSize: `${MAX_SIZE_OF_UPLOADED_FILES / 1000000} Mo`
-              }
-            )
-          );
-          return false;
-        }
-        // Refuse files whose name possesses more than 1 dot,
-        // or those which are already stored in the prop (comparison on name and extension, and only if the one in the prop is new)
-        if (file.name) {
-          const nameArray = file.name.split('.');
-          if (nameArray.length !== 2) {
-            errorsList.push(
-              formatMessage(
-                {
-                  id: 'error on file name',
-                  defaultMessage: 'The following file name is invalid : {file}.'
-                },
-                { file: file.name }
-              )
-            );
-            return false;
-          }
-          return isNil(
-            files.find(
-              fileInProp =>
-                fileInProp.name === nameArray[0] &&
-                fileInProp.extension === nameArray[1] &&
-                fileInProp.state === IS_NEW
-            )
-          );
-        }
-        return true;
-      })
-      .map(file => {
-        // file.name may not be supported (only for Opera Android)
-        const fileName = file.name ?? '';
-
-        return {
-          file,
-          fileName,
-          state: IS_NEW
-        };
-      });
-
-    if (isEmpty(errorsList)) {
-      setErrors([]);
-    } else {
-      setErrors(errorsList);
-    }
-    setFiles([...files, ...newAddedFiles]);
-    // The input value is resetted so we can still add the same file (specifically if it has been removed, it's still in the input).
-    inputRef.current.value = '';
+    const { entries, errors: errorsList } = validateAndBuildFileEntries(
+      newFiles,
+      files,
+      formatMessage
+    );
+    setErrors(isEmpty(errorsList) ? [] : errorsList);
+    setFiles([...files, ...entries]);
   };
 
-  // Files is removed if it is new (or previously new), else we change its state.
-  const removeFile = index => {
+  const removeFile = fileName => {
+    const index = files.findIndex(f => f.fileName === fileName);
+    if (index === -1) return;
     const newFiles = [...files];
-    const removedFile = newFiles[index];
-    if (removedFile.state === IS_NEW) {
+    const target = newFiles[index];
+    if (target.state === IS_NEW) {
       setFiles(remove(index, 1, newFiles));
     } else {
-      removedFile.previousState = removedFile.state;
-      removedFile.state = IS_DELETED;
+      target.previousState = target.state;
+      target.state = IS_DELETED;
       setFiles(newFiles);
     }
   };
 
-  const undoRemove = index => {
-    const newFiles = [...files];
-    const removedFile = newFiles[index];
-    removedFile.state = removedFile.previousState || IS_INTACT;
-    setFiles(newFiles);
-  };
-
-  const updateFileName = index => {
-    const newFilesState = [...files];
-    const updatedFile = newFilesState[index];
-    return newName => {
-      const extention = updatedFile.fileName.split('.').pop();
-      updatedFile.fileName = `${newName}.${extention}`;
-      if (updatedFile.state !== IS_NEW) updatedFile.state = IS_MODIFIED;
-      setFiles(newFilesState);
-    };
-  };
-
   return (
     <>
-      <FormControl variant="filled">
-        <StyledButton
-          disabled={loading}
-          color="secondary"
-          variant="contained"
-          component="label">
-          {formatMessage({ id: 'Upload files' })}
-          <input
-            ref={inputRef}
-            multiple
-            onChange={event => updateFiles(event.target.files)}
-            type="file"
-            hidden
-            accept={mimeTypes.toString()}
-          />
-        </StyledButton>
-      </FormControl>
-      {files.length > 0 && (
-        <>
-          <ListWrapper>
-            <FilesList
-              files={files}
-              updateFileName={updateFileName}
-              removeFile={removeFile}
-              undoRemove={undoRemove}
-            />
-          </ListWrapper>
-          <LicenseSelectAutoComplete
-            contextValueName="license"
-            helperContent={formatMessage({ id: 'Select a license' })}
-            helperContentIfValueIsForced={formatMessage({
-              id: 'The license of the document has been deduced from the parent document'
-            })}
-            labelText={formatMessage({ id: 'License' })}
+      <FileSelectorInput
+        files={visibleFiles}
+        onFilesAdd={updateFiles}
+        onFileRemove={removeFile}
+        accept={accept}
+        extensions={extensions}
+        disabled={loading}
+      />
+      {showAuthorization && visibleFiles.length > 0 && (
+        <Box sx={{ mt: 2 }}>
+          <FormControl
+            component="fieldset"
             required
-            updateSelected={setLicense}
-          />
+            sx={{ display: 'block', mt: 2 }}>
+            <FormLabel
+              component="legend"
+              sx={{ fontSize: '0.875rem', mb: 0.5 }}>
+              {isAuthForced
+                ? formatMessage({
+                    id: 'The licensing type of the document has been deduced from the parent document'
+                  })
+                : formatMessage({ id: 'Licensing type' })}
+            </FormLabel>
+            <RadioGroup
+              value={option ?? ''}
+              onChange={e => updateOption(e.target.value)}>
+              <FormControlLabel
+                value={AUTHORIZATION_FROM_AUTHOR}
+                disabled={isAuthForced}
+                control={<Radio size="small" />}
+                label={formatMessage({
+                  id: 'You are the author of this document (license CC-BY-SA applies).'
+                })}
+              />
+              <FormControlLabel
+                value={LICENSE_IN_FILE}
+                disabled={isAuthForced}
+                control={<Radio size="small" />}
+                label={formatMessage({
+                  id: 'The license is written in the files'
+                })}
+              />
+              <FormControlLabel
+                value={DOCUMENT_AUTHORIZE_TO_PUBLISH}
+                disabled={isAuthForced}
+                control={<Radio size="small" />}
+                label={formatMessage({
+                  id: 'There is an authorization to publish from the author on GrottoCenter'
+                })}
+              />
+            </RadioGroup>
+          </FormControl>
 
-          <OptionSelectAutoComplete
-            contextValueName="selectOptionAuthorizationDocument"
-            helperContent={formatMessage({
-              id: 'Select a type of authorization'
-            })}
-            helperContentIfValueIsForced={formatMessage({
-              id: 'The type of authorization of the document has been deduced from the parent document'
-            })}
-            labelText={formatMessage({ id: 'License type' })}
-            updateSelectedOption={updateOption}
-            required
-          />
-          {showAuthDocSelect && (
-            <DocumentAuthorizationSelectAutoComplete
-              contextValueName="authorizationDocument"
-              helperContent={formatMessage({
-                id: 'Select an authorization document'
+          {option && option !== AUTHORIZATION_FROM_AUTHOR && (
+            <MultipleCaversSelect
+              computeHasError={() => false}
+              contextValueName="authors"
+              helperText={formatMessage({
+                id: 'Choose one or more authors among those already registered. If the author you are looking for does not exist in Grottocenter, it is possible to add him/her using the + button on the right.'
               })}
-              helperContentIfValueIsForced={formatMessage({
-                id: 'The authorization document of the document has been deduced from the parent document'
-              })}
-              labelText={formatMessage({ id: 'Authorization from authors' })}
-              updateSelectedDocument={setAuthorizationDocument}
+              labelName="Authors"
             />
           )}
-        </>
+
+          {showAuthDocSelect && (
+            <AuthDocSelect
+              value={document.authorizationDocument}
+              onChange={setAuthorizationDocument}
+              disabled={isAuthForced}
+            />
+          )}
+
+          {option &&
+            option !== LICENSE_IN_FILE &&
+            option !== AUTHORIZATION_FROM_AUTHOR && (
+              <FormControl
+                variant="filled"
+                fullWidth
+                required
+                disabled={isLicenseForced}
+                sx={{ mt: 2 }}>
+                <InputLabel>
+                  {isLicenseForced
+                    ? formatMessage({
+                        id: 'The license of the document has been deduced from the parent document'
+                      })
+                    : formatMessage({ id: 'License' })}
+                </InputLabel>
+                <Select
+                  value={document.license?.name ?? ''}
+                  onChange={e =>
+                    setLicense(licenses?.find(l => l.name === e.target.value))
+                  }>
+                  {licensesLoading && (
+                    <MenuItem disabled>
+                      <CircularProgress size={16} />
+                    </MenuItem>
+                  )}
+                  {(licenses ?? [])
+                    .slice()
+                    .sort((a, b) => (a.name > b.name ? 1 : -1))
+                    .map(l => (
+                      <MenuItem key={l.id} value={l.name}>
+                        {l.name}
+                      </MenuItem>
+                    ))}
+                </Select>
+              </FormControl>
+            )}
+        </Box>
       )}
       <ErrorsList errors={errors} />
-      <StyledTypography color="textSecondary">
-        {formatMessage(
-          {
-            id: 'Accepted file formats: {extensions}',
-            defaultMessage: 'Accepted file formats: {extensions}.'
-          },
-          {
-            extensions: extensions
-              .filter(e => e !== null)
-              .map(e => e.trim())
-              .sort((e1, e2) => e1 > e2)
-              .join(', ')
-          }
-        )}
-      </StyledTypography>
     </>
   );
 };
 
 AddFileForm.propTypes = {
+  acceptConfig: PropTypes.shape({
+    extensions: PropTypes.arrayOf(PropTypes.string).isRequired,
+    mime: PropTypes.string.isRequired
+  }),
   files: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   setFiles: PropTypes.func.isRequired,
+  showAuthorization: PropTypes.bool,
   option: PropTypes.string,
-  setOption: PropTypes.func.isRequired,
-  setLicense: PropTypes.func.isRequired,
-  setAuthorizationDocument: PropTypes.func.isRequired
+  setOption: PropTypes.func,
+  setLicense: PropTypes.func,
+  setAuthorizationDocument: PropTypes.func
 };
 
 export default AddFileForm;

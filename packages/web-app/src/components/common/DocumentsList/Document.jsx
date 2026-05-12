@@ -4,40 +4,26 @@ import {
   Box,
   Chip,
   ListItem,
-  Typography,
+  Paper,
   ButtonGroup,
   Tooltip,
   Button,
+  Typography,
   useMediaQuery,
   useTheme
 } from '@mui/material';
 import LinkOffIcon from '@mui/icons-material/LinkOff';
-import React, { useState } from 'react';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+import React, { useState, useLayoutEffect, useRef } from 'react';
 import Linkify from 'linkify-react';
 import { isMobile } from 'react-device-detect';
-import { styled } from '@mui/material/styles';
 import GCLink from '../GCLink';
 import Files from './Files';
 import { SnapshotButton } from '../../appli/Entry/Snapshots/UtilityFunction';
 import Translate from '../Translate';
 import StandardDialog from '../StandardDialog';
 import linkifyOptions from '../../../helpers/linkifyOptions';
-
-const StyledChip = styled(Chip)`
-  margin-left: ${({ theme }) => theme.spacing(2)};
-  padding: 0 ${({ theme }) => theme.spacing(1)};
-`;
-const StyledListItem = styled(ListItem)`
-  display: flow-root;
-  padding: 4px 0;
-  margin: 0;
-`;
-
-const DocumentDescription = styled(Typography)`
-  margin: 0.5em 0;
-  white-space: break-spaces;
-  color: ${({ theme }) => theme.palette.text.primary};
-`;
 
 const Document = ({
   document,
@@ -48,71 +34,132 @@ const Document = ({
 }) => {
   const { formatMessage } = useIntl();
   const theme = useTheme();
-  const isSmall = useMediaQuery(theme.breakpoints.down('sm'));
+  const isMobileView = useMediaQuery(theme.breakpoints.down('sm'));
   const [isUnlinkDialogOpen, setUnlinkDialogOpen] = useState(false);
+  const [descriptionExpanded, setDescriptionExpanded] = useState(false);
+  const [isClamped, setIsClamped] = useState(false);
+  const descriptionRef = useRef(null);
+
+  useLayoutEffect(() => {
+    const el = descriptionRef.current;
+    if (!el) return;
+    setIsClamped(el.scrollHeight > el.clientHeight);
+  }, [document.description, isMobileView]);
 
   return (
-    <StyledListItem disableGutters>
-      {(hasSnapshotButton || onUnlink) && (
-        <Box sx={{ float: 'right', ml: 1 }}>
-          <ButtonGroup
-            color="primary"
-            size="small"
-            orientation={isSmall ? 'vertical' : 'horizontal'}>
-            {hasSnapshotButton && (
-              <SnapshotButton
+    <ListItem disableGutters sx={{ display: 'block', py: 0.5 }}>
+      <Paper variant="outlined" sx={{ p: 2, borderRadius: 2, bgcolor: 'grey.50' }}>
+        {/* Header row: title + chip + actions */}
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'flex-start',
+            justifyContent: 'space-between',
+            gap: 1
+          }}>
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              flexWrap: 'wrap',
+              gap: 1,
+              flex: 1,
+              minWidth: 0
+            }}>
+            <Typography variant="h4" component="span">
+              <GCLink internal={isMobile} href={`/ui/documents/${document.id}`}>
+                {document.title}
+              </GCLink>
+            </Typography>
+            <Chip
+              variant="outlined"
+              size="small"
+              color="primary"
+              label={
+                (document.type && formatMessage({ id: document.type })) ||
+                formatMessage({ id: 'unknown' })
+              }
+            />
+          </Box>
+          {(hasSnapshotButton || onUnlink) && (
+            <Box sx={{ flexShrink: 0 }}>
+              <ButtonGroup
                 color="primary"
-                variant="outlined"
-                id={document.id}
-                type="documents"
-                content={document}
-              />
-            )}
-            {onUnlink && (
-              <Tooltip title={formatMessage({ id: 'Unlink this document' })}>
-                <Button
-                  onClick={() => setUnlinkDialogOpen(true)}
-                  color="primary"
-                  aria-label={formatMessage({ id: 'unlink' })}>
-                  <LinkOffIcon />
-                </Button>
-              </Tooltip>
-            )}
-          </ButtonGroup>
+                size="small"
+                orientation={isMobileView ? 'vertical' : 'horizontal'}>
+                {hasSnapshotButton && (
+                  <SnapshotButton
+                    color="primary"
+                    variant="outlined"
+                    id={document.id}
+                    type="documents"
+                    content={document}
+                  />
+                )}
+                {onUnlink && (
+                  <Tooltip title={formatMessage({ id: 'Unlink this document' })}>
+                    <Button
+                      onClick={() => setUnlinkDialogOpen(true)}
+                      color="primary"
+                      aria-label={formatMessage({ id: 'unlink' })}>
+                      <LinkOffIcon />
+                    </Button>
+                  </Tooltip>
+                )}
+              </ButtonGroup>
+            </Box>
+          )}
         </Box>
-      )}
-      <div>
-        <GCLink internal={isMobile} href={`/ui/documents/${document.id}`}>
-          {document.title}
-        </GCLink>
-        <StyledChip
-          variant="outlined"
-          size="small"
-          color="primary"
-          label={
-            (document.type && formatMessage({ id: document.type })) ||
-            formatMessage({ id: 'unknown' })
-          }
-        />
-        {document.description ? (
-          <DocumentDescription>
-            <Linkify options={linkifyOptions}> {document.description}</Linkify>
-          </DocumentDescription>
-        ) : (
-          false
+
+        {/* Description with truncation */}
+        {document.description && (
+          <Box mt={1}>
+            <Typography
+              ref={descriptionRef}
+              variant="body2"
+              sx={{
+                whiteSpace: 'break-spaces',
+                color: 'text.primary',
+                ...(isMobileView && !descriptionExpanded && {
+                  overflow: 'hidden',
+                  display: '-webkit-box',
+                  WebkitLineClamp: 3,
+                  WebkitBoxOrient: 'vertical'
+                })
+              }}>
+              <Linkify options={linkifyOptions}>{document.description}</Linkify>
+            </Typography>
+            {isMobileView && isClamped && (
+              <Button
+                size="small"
+                variant="text"
+                endIcon={
+                  descriptionExpanded ? <ExpandLessIcon /> : <ExpandMoreIcon />
+                }
+                sx={{ p: 0, minWidth: 0, mt: 0.5, textTransform: 'none' }}
+                onClick={() => setDescriptionExpanded(e => !e)}>
+                {formatMessage({
+                  id: descriptionExpanded ? 'Show less' : 'Read more'
+                })}
+              </Button>
+            )}
+          </Box>
         )}
-        {document.files ? (
-          <Files
-            files={document.files}
-            description={document.description}
-            onImageClick={onImageClick}
-            imageIndexOffset={imageIndexOffset}
-          />
-        ) : (
-          false
+
+        {/* Files */}
+        {document.files && (
+          <Box mt={1}>
+            <Files
+              files={document.files}
+              description={document.description}
+              onImageClick={onImageClick}
+              imageIndexOffset={imageIndexOffset}
+            />
+          </Box>
         )}
-      </div>
-      {onUnlink ? (
+      </Paper>
+
+      {onUnlink && (
         <StandardDialog
           open={isUnlinkDialogOpen}
           onClose={() => setUnlinkDialogOpen(false)}
@@ -140,10 +187,8 @@ const Document = ({
             Are you sure you want to unlink this document of this entity?
           </Translate>
         </StandardDialog>
-      ) : (
-        false
       )}
-    </StyledListItem>
+    </ListItem>
   );
 };
 

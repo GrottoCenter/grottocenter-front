@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { is } from 'ramda';
 import {
+  Box,
   Typography,
   Card as MuiCard,
   CardContent as MuiCardContent,
@@ -36,21 +37,32 @@ const TitleIcon = styled('span')`
   display: inline-flex;
 `;
 
-const FixedContent = ({ subheader, title, icon, content }) => (
+const FixedContent = ({ subheader, title, icon, action, content }) => (
   <Card>
     <CardHeader
       subheader={subheader}
       title={
-        isString(title) ? (
-          <Title>
-            {icon && <TitleIcon>{icon}</TitleIcon>}
-            <Typography variant="h1" color="secondary">
-              {title}
-            </Typography>
-          </Title>
-        ) : (
-          <Skeleton />
-        )
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'flex-start',
+            justifyContent: 'space-between',
+            gap: 1
+          }}>
+          <Box sx={{ flex: 1, minWidth: 0 }}>
+            {isString(title) ? (
+              <Title>
+                {icon && <TitleIcon>{icon}</TitleIcon>}
+                <Typography variant="h1" color="secondary">
+                  {title}
+                </Typography>
+              </Title>
+            ) : (
+              <Skeleton />
+            )}
+          </Box>
+          {action && <Box sx={{ flexShrink: 0 }}>{action}</Box>}
+        </Box>
       }
     />
     <CardContent>{content}</CardContent>
@@ -58,6 +70,7 @@ const FixedContent = ({ subheader, title, icon, content }) => (
 );
 
 FixedContent.propTypes = {
+  action: PropTypes.node,
   content: PropTypes.node.isRequired,
   icon: PropTypes.node,
   subheader: PropTypes.node,

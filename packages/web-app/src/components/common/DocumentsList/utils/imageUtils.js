@@ -99,6 +99,6 @@ export const downloadFile = async (url, fileName) => {
  */
 export const isImageFile = fileName => {
   const extension = getFileExtension(fileName);
-  const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg'];
+  const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp'];
   return imageExtensions.includes(extension);
 };

@@ -14,7 +14,7 @@ import {
 } from '@mui/material';
 import { Launch, MenuBook } from '@mui/icons-material';
 import LanguageIcon from '@mui/icons-material/Translate';
-import LibraryAddIcon from '@mui/icons-material/LibraryAdd';
+import AddCircleIcon from '@mui/icons-material/AddCircle';
 import PropTypes from 'prop-types';
 import { isMobile, isIOS } from 'react-device-detect';
 import { useDispatch, useSelector } from 'react-redux';
@@ -145,8 +145,8 @@ const SideMenu = ({ isOpen }) => {
         <Divider />
         <ContributeButton
           variant="outlined"
-          color="primary"
-          startIcon={<LibraryAddIcon />}
+          color="secondary"
+          startIcon={<AddCircleIcon />}
           onClick={handleContributeClick}>
           <Translate>Contribute</Translate>
         </ContributeButton>

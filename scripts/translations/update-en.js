@@ -130,7 +130,9 @@ function extractAllTranslationKeys() {
  */
 function loadExistingTranslations() {
   try {
-    const content = fs.readFileSync(EN_JSON_PATH, 'utf8');
+    const content = fs
+      .readFileSync(EN_JSON_PATH, 'utf8')
+      .replace(/^\uFEFF/, '');
     return JSON.parse(content);
   } catch (error) {
     console.error(`Error reading ${EN_JSON_PATH}:`, error.message);
