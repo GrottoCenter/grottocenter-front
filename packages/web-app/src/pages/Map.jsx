@@ -22,6 +22,28 @@ const MapClusters = React.lazy(
   () => import('../components/common/Maps/MapClusters')
 );
 
+const MAP_POSITION_KEY = 'grottocenter_map_position';
+
+function getSavedPosition() {
+  try {
+    const saved = localStorage.getItem(MAP_POSITION_KEY);
+    if (!saved) return null;
+    const { lat, lng, zoom } = JSON.parse(saved);
+    if (typeof lat !== 'number' || typeof lng !== 'number' || typeof zoom !== 'number') return null;
+    return { lat, lng, zoom };
+  } catch {
+    return null;
+  }
+}
+
+function savePosition(center, zoom) {
+  try {
+    localStorage.setItem(MAP_POSITION_KEY, JSON.stringify({ lat: center.lat, lng: center.lng, zoom }));
+  } catch {
+    // ignore quota or private-mode errors
+  }
+}
+
 const encodeMapTarget = (center, zoom) => `${center.lat},${center.lng},${zoom}`;
 
 function decodeMapTarget(target) {
@@ -53,10 +75,13 @@ const Map = () => {
   const { location: geoLocation, hasLocation } = useGeolocation();
   const mapRef = useRef(null);
   const { current: initialTarget } = useRef(decodeMapTarget(params.target));
-  const [location, setLocation] = useState(() =>
-    initialTarget ? { lat: initialTarget.lat, lng: initialTarget.lng } : defaultCoord
-  );
-  const { current: zoom } = useRef(initialTarget?.zoom ?? defaultZoom);
+  const { current: savedPosition } = useRef(!initialTarget ? getSavedPosition() : null);
+  const [location, setLocation] = useState(() => {
+    if (initialTarget) return { lat: initialTarget.lat, lng: initialTarget.lng };
+    if (savedPosition) return { lat: savedPosition.lat, lng: savedPosition.lng };
+    return defaultCoord;
+  });
+  const { current: zoom } = useRef(initialTarget?.zoom ?? savedPosition?.zoom ?? defaultZoom);
   const networks = useSelector(state => state.map.networks);
   const networksCoordinates = useSelector(
     state => state.map.networksCoordinates
@@ -97,6 +122,10 @@ const Map = () => {
       dispatch(fetchMassifs(criteria));
     }
 
+    if (center.lat !== defaultCoord.lat || center.lng !== defaultCoord.lng) {
+      savePosition(center, newZoom);
+    }
+
     // Update the shareable URL after the user has settled
     if (urlDebounceRef.current) clearTimeout(urlDebounceRef.current);
     urlDebounceRef.current = setTimeout(() => {
@@ -124,13 +153,13 @@ const Map = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // When there is no URL target, fall back to the user's geolocation once available.
+  // When there is no URL target and no saved position, fall back to geolocation once available.
   const initialTargetRef = useRef(params.target);
   useEffect(() => {
-    if (!decodeMapTarget(initialTargetRef.current) && geoLocation) {
+    if (!decodeMapTarget(initialTargetRef.current) && !savedPosition && geoLocation) {
       setLocation(geoLocation);
     }
-  }, [geoLocation]);
+  }, [geoLocation, savedPosition]);
 
   useEffect(() => {
     const target = decodeMapTarget(params.target);
@@ -139,10 +168,10 @@ const Map = () => {
       target?.lng === defaultCoord.lng &&
       target?.zoom === defaultZoom;
 
-    if (hasLocation && (!params.target || isDefaultTarget) && mapRef.current) {
+    if (hasLocation && !savedPosition && (!params.target || isDefaultTarget) && mapRef.current) {
       mapRef.current.setView([geoLocation.lat, geoLocation.lng], focusZoom);
     }
-  }, [hasLocation, geoLocation, params.target]);
+  }, [hasLocation, geoLocation, params.target, savedPosition]);
 
   return (
     <Suspense fallback={<PageLoader />}>
