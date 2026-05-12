@@ -50,7 +50,18 @@ export const bloggerIcons = {
 
 // ===== Misc config values
 export const emailRegexp = /\S+@\S+/; // simple regexp TODO: use another one more robust
-export const PASSWORD_MIN_LENGTH = 8;
+export const PASSWORD_MIN_LENGTH = 12;
+
+export const checkPasswordRules = password => ({
+  minLength: password.length >= PASSWORD_MIN_LENGTH,
+  hasUppercase: /[A-Z]/.test(password),
+  hasLowercase: /[a-z]/.test(password),
+  hasDigit: /[0-9]/.test(password),
+  hasSpecial: /[^A-Za-z0-9]/.test(password)
+});
+
+export const isPasswordValid = password =>
+  Object.values(checkPasswordRules(password)).every(Boolean);
 
 export const DYNAMIC_NUMBER_RELOAD_INTERVAL = 900000;
 export const DYNAMIC_NEWS_RELOAD_INTERVAL = 3600000;

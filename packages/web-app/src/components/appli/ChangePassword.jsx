@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useIntl } from 'react-intl';
 
 import { useLocation } from 'react-router-dom';
-import { PASSWORD_MIN_LENGTH } from '../../conf/config';
+import { isPasswordValid } from '../../conf/config';
 import { postChangePassword } from '../../actions/Person/ChangePassword';
 import { logout } from '../../actions/Login';
 import { useNotification } from '../../hooks';
@@ -32,19 +32,8 @@ const ChangePassword = () => {
     if (password !== passwordConfirmation) {
       errors.push(formatMessage({ id: 'The passwords must match.' }));
     }
-    if (password.length < PASSWORD_MIN_LENGTH) {
-      errors.push(
-        formatMessage(
-          {
-            id: `password.length.error`,
-            defaultMessage: `Your password must be at least {passwordMinLength} characters.`,
-            description: 'Error displayed when the password is too short.'
-          },
-          {
-            passwordMinLength: PASSWORD_MIN_LENGTH
-          }
-        )
-      );
+    if (!isPasswordValid(password)) {
+      errors.push(formatMessage({ id: 'password.rules.error' }));
     }
 
     if (errors.length > 0) {

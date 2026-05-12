@@ -13,9 +13,10 @@ import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import { styled } from '@mui/material/styles';
 
-import { PASSWORD_MIN_LENGTH } from '../../conf/config';
+import { isPasswordValid } from '../../conf/config';
 import Layout from '../../components/common/Layouts/Fixed/FixedContent';
 import StringInput from '../../components/common/Form/StringInput';
+import PasswordRules from '../../components/common/Form/PasswordRules';
 
 const FormWrapper = styled('form')`
   display: flex;
@@ -52,10 +53,9 @@ const ChangePasswordForm = ({
   const checkIfHasError = fieldName => {
     switch (fieldName) {
       case 'password':
+        return !isPasswordValid(password);
       case 'passwordConfirmation':
-        return (
-          password < PASSWORD_MIN_LENGTH || password !== passwordConfirmation
-        );
+        return password !== passwordConfirmation;
 
       default:
         return false;
@@ -103,23 +103,13 @@ const ChangePasswordForm = ({
               }
               fullWidth
               hasError={checkIfHasError('password')}
-              helperText={formatMessage(
-                {
-                  id: `password.length.error`,
-                  defaultMessage: `Your password must be at least {passwordMinLength} characters.`,
-                  description:
-                    'Error displayed when the account password is too short.'
-                },
-                {
-                  passwordMinLength: PASSWORD_MIN_LENGTH
-                }
-              )}
               onValueChange={onPasswordChange}
               required
               type={isPasswordVisible ? 'text' : 'password'}
               value={password}
               valueName={formatMessage({ id: 'Password' })}
             />
+            <PasswordRules password={password} />
 
             <StringInput
               endAdornment={

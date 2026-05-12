@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { Controller, useForm } from 'react-hook-form';
+import { Controller, useForm, useWatch } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { useIntl } from 'react-intl';
 
@@ -26,7 +26,6 @@ import {
 import AccountBoxIcon from '@mui/icons-material/AccountBox';
 import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
 import CancelIcon from '@mui/icons-material/Cancel';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import EditIcon from '@mui/icons-material/Edit';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
@@ -45,6 +44,7 @@ import { fetchPerson } from '../../actions/Person/GetPerson';
 import { joinOrganization } from '../../actions/Organization/JoinOrganization';
 import { leaveOrganization } from '../../actions/Organization/LeaveOrganization';
 import Alert from '../../components/common/Alert';
+import BoolIcon from '../../components/common/Form/BoolIcon';
 
 import DocumentsList from '../../components/common/DocumentsList/DocumentsList';
 import EntitiesList from '../../components/common/entitiesList/EntitiesList';
@@ -56,11 +56,12 @@ import StandardDialog from '../../components/common/StandardDialog';
 import InputText from '../../components/appli/EntitiesForm/utils/InputText';
 import InputPassword from '../../components/appli/EntitiesForm/utils/InputPassword';
 import { FormRow } from '../../components/appli/EntitiesForm/utils/FormContainers';
+import PasswordRules from '../../components/common/Form/PasswordRules';
 import SearchOrganizationForm from '../../components/appli/Form/SearchOrganizationForm';
 import Translate from '../../components/common/Translate';
 import { useUserProperties } from '../../hooks';
 import useOpenLink from '../../hooks/useOpenLink';
-import { AVAILABLE_LANGUAGES, PASSWORD_MIN_LENGTH } from '../../conf/config';
+import { AVAILABLE_LANGUAGES, isPasswordValid } from '../../conf/config';
 import {
   languageIdToLocale,
   localeToLanguageId
@@ -161,12 +162,7 @@ SettingSection.propTypes = {
 
 // ─── Save/cancel footer used in edit forms ────────────────────────────────────
 
-const BoolValue = ({ value }) =>
-  value ? (
-    <CheckCircleIcon fontSize="small" sx={{ color: 'success.main', ml: 1 }} />
-  ) : (
-    <CancelIcon fontSize="small" sx={{ color: 'text.disabled', ml: 1 }} />
-  );
+const BoolValue = ({ value }) => <BoolIcon value={value} sx={{ ml: 1 }} />;
 
 BoolValue.propTypes = {
   value: PropTypes.bool.isRequired
@@ -392,6 +388,11 @@ const EmailSecuritySection = ({ account, onSaved }) => {
     formState: { errors: passwordErrors }
   } = useForm({ defaultValues: { password: '', passwordConfirmation: '' } });
 
+  const watchedPassword = useWatch({
+    control: passwordControl,
+    name: 'password'
+  });
+
   useEffect(() => {
     if (account) resetEmail({ email: account.mail ?? '' });
   }, [account, resetEmail]);
@@ -455,6 +456,7 @@ const EmailSecuritySection = ({ account, onSaved }) => {
           (account.mailIsValid ? (
             <Chip
               size="small"
+              variant="outlined"
               icon={<CheckCircleOutlineIcon />}
               label={formatMessage({ id: 'Email verified' })}
               sx={{
@@ -559,8 +561,8 @@ const EmailSecuritySection = ({ account, onSaved }) => {
                 isError={!!passwordErrors.password}
                 isRequired
                 validatorFn={(value, msg) => {
-                  if (value && value.length < PASSWORD_MIN_LENGTH)
-                    return msg({ id: 'Password too short.' });
+                  if (!isPasswordValid(value ?? ''))
+                    return msg({ id: 'password.rules.error' });
                   return true;
                 }}
                 helperText={passwordErrors.password?.message}
@@ -581,6 +583,7 @@ const EmailSecuritySection = ({ account, onSaved }) => {
                 helperText={passwordErrors.passwordConfirmation?.message}
               />
             </FormRow>
+            <PasswordRules password={watchedPassword ?? ''} />
             {passwordError && (
               <Alert
                 severity="error"
@@ -995,7 +998,7 @@ const AccountPage = () => {
                         isCaveSearchVisible ? (
                           <CancelIcon />
                         ) : (
-                          <CheckCircleIcon />
+                          <CheckCircleOutlineIcon />
                         )
                       }>
                       {formatMessage({
