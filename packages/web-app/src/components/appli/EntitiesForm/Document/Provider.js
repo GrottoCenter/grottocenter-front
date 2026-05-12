@@ -135,8 +135,8 @@ const Provider = ({ children, initialValues }) => {
     setIsFormValid(checkFormValidation(document));
   }, [document, setIsFormValid]);
 
-  const resetContext = useCallback(() => {
-    setDocument(defaultDocAttributes);
+  const resetContext = useCallback((overrides = {}) => {
+    setDocument({ ...defaultDocAttributes, ...overrides });
   }, [setDocument]);
 
   const contextValue = useMemo(

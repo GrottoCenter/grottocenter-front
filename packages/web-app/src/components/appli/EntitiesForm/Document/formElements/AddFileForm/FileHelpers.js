@@ -36,8 +36,8 @@ export const validateAndBuildFileEntries = (newFiles, existingFiles, formatMessa
         return false;
       }
       if (file.name) {
-        const nameArray = file.name.split('.');
-        if (nameArray.length !== 2) {
+        const dotIndex = file.name.lastIndexOf('.');
+        if (dotIndex <= 0) {
           errors.push(
             formatMessage(
               {
@@ -49,11 +49,13 @@ export const validateAndBuildFileEntries = (newFiles, existingFiles, formatMessa
           );
           return false;
         }
+        const name = file.name.slice(0, dotIndex);
+        const ext = file.name.slice(dotIndex + 1);
         return isNil(
           existingFiles.find(
             existing =>
-              existing.name === nameArray[0] &&
-              existing.extension === nameArray[1] &&
+              existing.name === name &&
+              existing.extension === ext &&
               existing.state === IS_NEW
           )
         );

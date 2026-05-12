@@ -1,4 +1,4 @@
-import React, { useContext, Suspense } from 'react';
+import React, { useCallback, useContext, Suspense } from 'react';
 import {
   Accordion,
   AccordionDetails,
@@ -70,6 +70,11 @@ const FormContent = () => {
   const simple = isSimpleMedia(docType);
   const acceptConfig = DOCUMENT_TYPE_ACCEPT[docType] ?? null;
 
+  const setLicense = useCallback(
+    newLicense => updateAttribute('license', newLicense),
+    [updateAttribute]
+  );
+
   const addFileFormProps = {
     acceptConfig,
     files: document.files,
@@ -77,7 +82,7 @@ const FormContent = () => {
     option: document.selectOptionAuthorizationDocument,
     setOption: newOption =>
       updateAttribute('selectOptionAuthorizationDocument', newOption),
-    setLicense: newLicense => updateAttribute('license', newLicense),
+    setLicense,
     setAuthorizationDocument: newDoc =>
       updateAttribute('authorizationDocument', newDoc)
   };

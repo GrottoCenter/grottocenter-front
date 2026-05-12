@@ -42,13 +42,14 @@ const AuthDocSelect = ({ value, onChange, disabled = false }) => {
   const authDocs = data.authorizationDocuments ?? [];
 
   useEffect(() => {
+    if (authDocs.length > 0 || isLoading) return;
     dispatch(
       getDocuments({
         isValidated: true,
         documentType: 'Authorization To Publish'
       })
     );
-  }, [dispatch]);
+  }, [dispatch, authDocs.length, isLoading]);
 
   if (disabled) {
     return (

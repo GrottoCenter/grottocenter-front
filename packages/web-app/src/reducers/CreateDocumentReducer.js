@@ -19,7 +19,8 @@ const reducer = (state = initialState, action) => {
         ...state,
         isLoading: true,
         errorMessages: [],
-        latestHttpCode: undefined
+        latestHttpCode: undefined,
+        createdDocument: undefined
       };
     case POST_DOCUMENT_SUCCESS:
       return {

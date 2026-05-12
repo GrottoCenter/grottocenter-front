@@ -194,8 +194,7 @@ SecondaryCard.propTypes = {
 };
 
 const DocumentTypeSelect = () => {
-  const { document, updateAttribute, resetContext } =
-    useContext(DocumentFormContext);
+  const { document, resetContext } = useContext(DocumentFormContext);
   const { formatMessage } = useIntl();
   const dispatch = useDispatch();
   const theme = useTheme();
@@ -216,11 +215,7 @@ const DocumentTypeSelect = () => {
 
   const handleSelect = newDocType => {
     const { title, mainLanguage, mainLanguageName } = document;
-    resetContext();
-    updateAttribute('type', newDocType);
-    updateAttribute('title', title);
-    updateAttribute('mainLanguage', mainLanguage);
-    updateAttribute('mainLanguageName', mainLanguageName);
+    resetContext({ type: newDocType, title, mainLanguage, mainLanguageName });
   };
 
   const featured = documentTypes.filter(dt => FEATURED_TYPES.includes(dt.name));

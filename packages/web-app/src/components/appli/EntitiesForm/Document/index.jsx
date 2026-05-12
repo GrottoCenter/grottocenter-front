@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from 'react';
+import React, { useContext, useState, useEffect, useRef } from 'react';
 // eslint-disable-next-line camelcase
 import { useNavigate, unstable_usePrompt, useSearchParams } from 'react-router-dom';
 import { Button, Fade, Typography } from '@mui/material';
@@ -61,6 +61,7 @@ const DocumentSubmission = () => {
   const [isDocSubmittedWithSuccess, setDocSubmittedWithSuccess] =
     useState(false);
   const [isDocSubmitted, setDocSubmitted] = useState(false);
+  const hasLinked = useRef(false);
 
   const documentState = useSelector(state => state.createDocument);
   const entranceState = useSelector(state => state.entrance);
@@ -114,7 +115,8 @@ const DocumentSubmission = () => {
     if (!isDocSubmitted) return;
     if (documentState.latestHttpCode === 200) {
       setDocSubmittedWithSuccess(true);
-      if (isNewDocument && linkedEntrance && documentState.createdDocument) {
+      if (isNewDocument && linkedEntrance && documentState.createdDocument && !hasLinked.current) {
+        hasLinked.current = true;
         dispatch(
           linkDocumentToEntrance({
             entranceId: linkedEntrance.id,

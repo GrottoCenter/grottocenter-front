@@ -37,6 +37,7 @@ const EntityPicker = () => {
                   outlineOffset: '2px'
                 }
               }}
+              // iOS keeps :focus style after tap; blur on touchEnd removes the stale focus ring
               onTouchEnd={e => e.currentTarget.blur()}>
               <CardContent>
                 <Box display="flex" alignItems="center" gap={2} mb={1.5}>

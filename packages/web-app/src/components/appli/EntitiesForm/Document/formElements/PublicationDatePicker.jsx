@@ -130,6 +130,7 @@ const PublicationDatePicker = ({ required = false, label = null }) => {
           exclusive
           onChange={handleGranularityChange}
           size="small"
+          aria-label={formatMessage({ id: 'Date precision' })}
           sx={{ display: 'flex', width: '100%', mb: 0, px: '4px' }}>
           {granularityOptions.map(opt => (
             <ToggleButton key={opt.value} value={opt.value} sx={{ flex: 1 }}>

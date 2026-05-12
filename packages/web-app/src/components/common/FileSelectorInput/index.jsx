@@ -128,6 +128,7 @@ const FileSelectorInput = ({
           $isDragging={isDragging}
           role="button"
           tabIndex={0}
+          aria-label={formatMessage({ id: 'Drop files here or click to select' })}
           onDragEnter={handleDragEnter}
           onDragLeave={handleDragLeave}
           onDragOver={handleDragOver}
