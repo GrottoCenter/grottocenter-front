@@ -9,18 +9,20 @@ export const useAuthNavigate = (to, { onBeforeNavigate } = {}) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const waitingForAuth = useRef(false);
+  const onBeforeNavigateRef = useRef(onBeforeNavigate);
+  onBeforeNavigateRef.current = onBeforeNavigate;
 
   useEffect(() => {
     if (isAuth && waitingForAuth.current) {
       waitingForAuth.current = false;
-      onBeforeNavigate?.();
+      onBeforeNavigateRef.current?.();
       navigate(to);
     }
-  }, [isAuth, navigate, to, onBeforeNavigate]);
+  }, [isAuth, navigate, to]);
 
   return () => {
     if (isAuth) {
-      onBeforeNavigate?.();
+      onBeforeNavigateRef.current?.();
       navigate(to);
     } else {
       waitingForAuth.current = true;

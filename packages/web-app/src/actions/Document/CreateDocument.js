@@ -1,6 +1,7 @@
 import fetch from 'isomorphic-fetch';
 
 import { postDocumentUrl } from '../../conf/apiRoutes';
+import { checkAuthStatus } from '../utils';
 import { buildFormData } from './utils';
 
 export const POST_DOCUMENT = 'POST_DOCUMENT';
@@ -46,43 +47,39 @@ export function postDocument(docAttributes) {
       }
     };
 
-    return fetch(postDocumentUrl, requestOptions).then(response =>
-      response.text().then(responseText => {
-        if (response.status >= 400) {
-          const errorMessages = [];
-          switch (response.status) {
-            case 400:
-              errorMessages.push(`Bad request: ${responseText}`);
-              break;
-            case 401:
-              errorMessages.push(
-                'You must be authenticated to post a document.'
-              );
-              break;
-            case 403:
-              errorMessages.push(
-                'You are not authorized to create a document.'
-              );
-              break;
-            case 404:
-              errorMessages.push(
-                'Server-side creation of the document is not available.'
-              );
-              break;
-            case 500:
-              errorMessages.push(
-                'A server error occurred, please try again later or contact Wikicaves for more information.'
-              );
-              break;
-            default:
-              break;
+    return fetch(postDocumentUrl, requestOptions)
+      .then(checkAuthStatus(dispatch))
+      .then(response =>
+        response.text().then(responseText => {
+          if (response.status >= 400) {
+            const errorMessages = [];
+            switch (response.status) {
+              case 400:
+                errorMessages.push(`Bad request: ${responseText}`);
+                break;
+              case 403:
+                errorMessages.push(
+                  'You are not authorized to create a document.'
+                );
+                break;
+              case 404:
+                errorMessages.push(
+                  'Server-side creation of the document is not available.'
+                );
+                break;
+              case 500:
+                errorMessages.push(
+                  'A server error occurred, please try again later or contact Wikicaves for more information.'
+                );
+                break;
+              default:
+                break;
+            }
+            dispatch(postDocumentFailure(errorMessages, response.status));
+            throw new Error(
+              `Fetching ${postDocumentUrl} status: ${response.status}`
+            );
           }
-          dispatch(postDocumentFailure(errorMessages, response.status));
-          throw new Error(
-            `Fetching ${postDocumentUrl} status: ${response.status}`,
-            errorMessages
-          );
-        } else {
           let createdDocument;
           try {
             createdDocument = JSON.parse(responseText)?.document;
@@ -91,8 +88,10 @@ export function postDocument(docAttributes) {
           }
           dispatch(postDocumentSuccess(createdDocument, response.status));
           return createdDocument;
-        }
-      })
-    );
+        })
+      )
+      .catch(err => {
+        if (!err.isAuthError) throw err;
+      });
   };
 }

@@ -39,7 +39,7 @@ import MiscellaneousServicesIcon from '@mui/icons-material/MiscellaneousServices
 import TerminalIcon from '@mui/icons-material/Terminal';
 import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
 
-import { DocumentTypes } from '../../../../../hooks/useDocumentTypes';
+import { DocumentTypes } from '../../../../../hooks/documentTypeHelpers';
 import { DocumentFormContext } from '../Provider';
 import { loadDocumentTypes } from '../../../../../actions/DocumentType';
 

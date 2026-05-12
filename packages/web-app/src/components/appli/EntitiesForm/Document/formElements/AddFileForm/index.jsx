@@ -145,6 +145,8 @@ const AddFileForm = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [showAuthorization, licenses, documentLicenseName]);
 
+  // Fires on mount too: if a parent document pre-sets option to AUTHORIZATION_FROM_AUTHOR,
+  // the logged-in user is set as author automatically. This is intentional.
   useEffect(() => {
     if (!showAuthorization) return;
     if (option === AUTHORIZATION_FROM_AUTHOR && authTokenDecoded) {

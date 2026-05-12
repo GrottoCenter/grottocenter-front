@@ -37,7 +37,7 @@ import {
 import {
   documentTypeHelpers,
   DOCUMENT_TYPE_ACCEPT
-} from '../../../../hooks/useDocumentTypes';
+} from '../../../../hooks/documentTypeHelpers';
 
 const PublicationDatePicker = React.lazy(
   () => import('./formElements/PublicationDatePicker')
@@ -72,9 +72,7 @@ const FormContent = () => {
   useEffect(() => {
     if (document.mainLanguage === '000' && userLanguageId !== '000')
       updateAttribute('mainLanguage', userLanguageId);
-    // Run once on mount — userLanguageId is stable once languages are loaded
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userLanguageId]);
+  }, [document.mainLanguage, userLanguageId, updateAttribute]);
 
   const docType = document.type;
   const simple = isSimpleMedia(docType);

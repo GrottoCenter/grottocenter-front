@@ -6,7 +6,7 @@ import React, {
   useMemo
 } from 'react';
 import PropTypes from 'prop-types';
-import { DocumentTypes } from '../../../../hooks/useDocumentTypes';
+import { DocumentTypes } from '../../../../hooks/documentTypeHelpers';
 import {
   LICENSE_IN_FILE,
   DOCUMENT_AUTHORIZE_TO_PUBLISH
@@ -153,7 +153,7 @@ const Provider = ({ children, initialValues }) => {
       linkedEntrance,
       setLinkedEntrance
     }),
-    [document, initialValues, isFormValid, updateAttribute, resetContext, linkedEntrance, setLinkedEntrance]
+    [document, initialValues, isFormValid, updateAttribute, resetContext, linkedEntrance]
   );
 
   return (

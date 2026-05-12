@@ -13,7 +13,7 @@ import {
 
 import { entityOptionForSelector } from '../../../../../helpers/Entity';
 
-import { documentTypeHelpers } from '../../../../../hooks/useDocumentTypes';
+import { documentTypeHelpers } from '../../../../../hooks/documentTypeHelpers';
 import SearchBar from './SearchBar';
 
 import FormAutoCompleteComponent from '../../../../common/Form/FormAutoComplete';
