@@ -70,8 +70,8 @@ const AuthDocSelect = ({ value, onChange, disabled = false }) => {
         {formatMessage({ id: 'Authorization from authors' })}
       </InputLabel>
       <Select
-        value={isLoading ? -1 : (value ?? -1)}
-        onChange={e => onChange(e.target.value)}>
+        value={isLoading ? -1 : (value?.id ?? -1)}
+        onChange={e => onChange(authDocs.find(d => d.id === e.target.value))}>
         <MenuItem value={-1} disabled>
           {isLoading ? (
             <CircularProgress size={16} />
@@ -80,7 +80,7 @@ const AuthDocSelect = ({ value, onChange, disabled = false }) => {
           )}
         </MenuItem>
         {authDocs.map(doc => (
-          <MenuItem key={doc.id} value={doc}>
+          <MenuItem key={doc.id} value={doc.id}>
             {doc.title}
           </MenuItem>
         ))}
@@ -151,8 +151,6 @@ const AddFileForm = ({
       updateAttribute('authors', [
         { id: authTokenDecoded.id, nickname: authTokenDecoded.nickname }
       ]);
-    } else if (option && option !== AUTHORIZATION_FROM_AUTHOR) {
-      updateAttribute('authors', []);
     }
   }, [option, showAuthorization, authTokenDecoded, updateAttribute]);
 

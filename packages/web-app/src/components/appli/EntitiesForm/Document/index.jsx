@@ -8,7 +8,8 @@ import { useIntl } from 'react-intl';
 import { useDispatch, useSelector } from 'react-redux';
 import { styled } from '@mui/material/styles';
 
-import { usePermissions, useDocumentTypes } from '../../../../hooks';
+import { usePermissions } from '../../../../hooks';
+import { documentTypeHelpers } from '../../../../hooks/useDocumentTypes';
 import { resetDocumentApiErrors } from '../../../../actions/Document/ResetApiErrors';
 import { postDocument } from '../../../../actions/Document/CreateDocument';
 import { updateDocument } from '../../../../actions/Document/UpdateDocument';
@@ -47,13 +48,12 @@ const DocumentSubmission = () => {
   const dispatch = useDispatch();
   const permissions = usePermissions();
   const { formatMessage } = useIntl();
-  const { isArticle } = useDocumentTypes();
+  const { isArticle } = documentTypeHelpers;
   const [searchParams] = useSearchParams();
   const {
     document,
     isNewDocument,
     resetContext,
-    updateAttribute,
     setLinkedEntrance,
     linkedEntrance
   } = useContext(DocumentFormContext);
@@ -94,21 +94,27 @@ const DocumentSubmission = () => {
     setDocSubmitted(true);
   };
 
-  const onSubmitAnotherDocument = () => {
+  const resetSubmissionState = () => {
     dispatch(resetDocumentApiErrors());
+    setDocSubmittedWithSuccess(false);
+    setDocSubmitted(false);
+    hasLinked.current = false;
+  };
+
+  const onSubmitAnotherDocument = () => {
+    resetSubmissionState();
     resetContext();
   };
 
   const onSubmitAnotherArticle = () => {
-    dispatch(resetDocumentApiErrors());
-    resetContext();
-    // Keep some values to resubmit an article
-    updateAttribute('language', document.language);
-    updateAttribute('type', document.type);
-    updateAttribute('editor', document.editor);
-    updateAttribute('library', document.library);
-    updateAttribute('parent', document.parent);
-    updateAttribute('datePublication', document.datePublication);
+    resetSubmissionState();
+    resetContext({
+      type: document.type,
+      editor: document.editor,
+      library: document.library,
+      parent: document.parent,
+      datePublication: document.datePublication
+    });
   };
 
   useEffect(() => {

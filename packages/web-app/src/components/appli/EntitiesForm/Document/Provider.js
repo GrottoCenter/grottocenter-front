@@ -72,7 +72,11 @@ const checkFormValidation = document => {
     isValid = false;
   if (document.type === DocumentTypes.EVENT && !document.datePublication)
     isValid = false;
-  if (document.type === DocumentTypes.ISSUE && !document.parent)
+  if (
+    (document.type === DocumentTypes.ISSUE ||
+      document.type === DocumentTypes.ARTICLE) &&
+    !document.parent
+  )
     isValid = false;
 
   if (!isDocumentPagesFormatValid(document.pages)) isValid = false;

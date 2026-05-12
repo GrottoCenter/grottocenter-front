@@ -5,9 +5,8 @@ const path = require('path');
 const glob = require('glob');
 
 const LANG_DIR = 'packages/web-app/public/lang';
-const enData = JSON.parse(
-  fs.readFileSync(path.join(LANG_DIR, 'en.json'), 'utf8')
-);
+const load = f => JSON.parse(fs.readFileSync(f, 'utf8').replace(/^\uFEFF/, ''));
+const enData = load(path.join(LANG_DIR, 'en.json'));
 const enKeys = new Set(Object.keys(enData));
 
 const files = glob.sync(`${LANG_DIR}/*.json`);
@@ -15,7 +14,7 @@ const rows = [];
 
 files.forEach(f => {
   const lang = path.basename(f, '.json');
-  const data = JSON.parse(fs.readFileSync(f, 'utf8'));
+  const data = load(f);
   const keys = Object.keys(data);
   const missing = [...enKeys].filter(k => !(k in data));
   const extra = keys.filter(k => !enKeys.has(k));

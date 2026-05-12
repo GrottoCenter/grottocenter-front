@@ -47,7 +47,7 @@ const EntityPicker = () => {
                   </Typography>
                 </Box>
                 <Typography variant="body2" color="text.secondary">
-                  {formatMessage({ id: descriptionKey })}
+                  {formatMessage(descriptionKey)}
                 </Typography>
               </CardContent>
             </Card>

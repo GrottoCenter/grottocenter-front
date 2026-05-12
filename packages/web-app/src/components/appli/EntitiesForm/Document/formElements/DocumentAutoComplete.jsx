@@ -13,7 +13,7 @@ import {
 
 import { entityOptionForSelector } from '../../../../../helpers/Entity';
 
-import { useDocumentTypes } from '../../../../../hooks';
+import { documentTypeHelpers } from '../../../../../hooks/useDocumentTypes';
 import SearchBar from './SearchBar';
 
 import FormAutoCompleteComponent from '../../../../common/Form/FormAutoComplete';
@@ -41,7 +41,7 @@ const DocumentAutoComplete = ({
     isLoading,
     results: quicksearchResult
   } = useSelector(state => state.quicksearch);
-  const { isArticle, isIssue } = useDocumentTypes();
+  const { isArticle, isIssue } = documentTypeHelpers;
 
   const { document } = useContext(DocumentFormContext);
 

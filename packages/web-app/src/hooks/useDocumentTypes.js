@@ -128,7 +128,7 @@ const isOther = docType =>
   !isIssue(docType) &&
   !isUnknown(docType);
 
-export const useDocumentTypes = () => ({
+export const documentTypeHelpers = {
   isArticle,
   isAuthorizationToPublish,
   isCollection,
@@ -139,4 +139,5 @@ export const useDocumentTypes = () => ({
   isSimpleMedia,
   isTopographicDrawing,
   isUnknown
-});
+};
+

@@ -14,7 +14,7 @@ const path = require('path');
 function loadJson(filePath) {
   let data;
   try {
-    data = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+    data = JSON.parse(fs.readFileSync(filePath, 'utf8').replace(/^\uFEFF/, ''));
   } catch (error) {
     if (error.code === 'ENOENT') {
       console.error(`Error: File '${filePath}' not found.`);

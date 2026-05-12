@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, Suspense } from 'react';
+import React, { useCallback, useContext, useEffect, Suspense } from 'react';
 import {
   Accordion,
   AccordionDetails,
@@ -30,9 +30,12 @@ import AddFileForm from './formElements/AddFileForm';
 import StringInput from '../../../common/Form/StringInput';
 import Translate from '../../../common/Translate';
 import InternationalizedLink from '../../../common/InternationalizedLink';
-import { wikiBBSLinks } from '../../../../conf/externalLinks';
 import {
-  useDocumentTypes,
+  wikiBBSLinks,
+  wikiBBSChaptersLinks
+} from '../../../../conf/externalLinks';
+import {
+  documentTypeHelpers,
   DOCUMENT_TYPE_ACCEPT
 } from '../../../../hooks/useDocumentTypes';
 
@@ -59,12 +62,19 @@ const FormContent = () => {
     isIssue,
     isSimpleMedia,
     isUnknown
-  } = useDocumentTypes();
+  } = documentTypeHelpers;
 
   const locale = useSelector(state => state.intl.locale);
   const { languages } = useSelector(state => state.language);
   const isSubmitting = useSelector(state => state.createDocument.isLoading);
   const userLanguageId = languages.find(l => l.part1 === locale)?.id ?? '000';
+
+  useEffect(() => {
+    if (document.mainLanguage === '000' && userLanguageId !== '000')
+      updateAttribute('mainLanguage', userLanguageId);
+    // Run once on mount — userLanguageId is stable once languages are loaded
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userLanguageId]);
 
   const docType = document.type;
   const simple = isSimpleMedia(docType);
@@ -422,32 +432,21 @@ const FormContent = () => {
                 color="text.secondary"
                 display="block"
                 sx={{ mt: 1, mb: 0.5 }}>
-                <Translate>
-                  The BBS is now directly integrated in Grottocenter and
-                  provides a summary of any document published on paper or
-                  online.
-                </Translate>{' '}
                 <InternationalizedLink links={wikiBBSLinks}>
                   <Translate>
-                    You can find more info about the BBS on the dedicated
-                    Grottocenter-wiki page.
+                    Speleological Abstracts (SA)/Bulletin bibliographique
+                    spéléologique (BBS) in french
                   </Translate>
                 </InternationalizedLink>
-              </Typography>
-              <Typography
-                variant="caption"
-                color="text.secondary"
-                display="block"
-                sx={{ mb: 0.5 }}>
-                {formatMessage({
-                  id: 'Choose one or more subjects from those defined by the BBS. The list of subjects and their description is available here'
-                })}{' '}
-                <a
-                  href="https://www.ssslib.ch/bbs/wp-content/uploads/2017/03/chapter_and_geo_1_2008.pdf"
-                  target="_blank"
-                  rel="noopener noreferrer">
-                  chapter_and_geo_1_2008.pdf
-                </a>
+                <Translate>
+                  which is the annual summary of worldwide speleological
+                  literature, is directly integrated in Grottocenter. Choose one
+                  or more subjects from those defined by the SA/BBS, from
+                </Translate>{' '}
+                <InternationalizedLink links={wikiBBSChaptersLinks}>
+                  <Translate>this list</Translate>
+                </InternationalizedLink>
+                .
               </Typography>
               <MultipleSubjectsSelect
                 computeHasError={() => false}

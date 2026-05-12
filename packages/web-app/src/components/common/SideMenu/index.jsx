@@ -18,11 +18,10 @@ import AddCircleIcon from '@mui/icons-material/AddCircle';
 import PropTypes from 'prop-types';
 import { isMobile, isIOS } from 'react-device-detect';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { styled, alpha } from '@mui/material/styles';
-import { displayLoginDialog } from '../../../actions/Login';
 import { openSideMenu, closeSideMenu } from '../../../actions/SideMenu';
-import { usePermissions } from '../../../hooks';
+import { useAuthNavigate } from '../../../hooks';
 import { AppTitle } from '../AppBar';
 import MenuLinks from './MenuLinks';
 import Translate from '../Translate';
@@ -82,22 +81,17 @@ const ContributeButton = styled(Button)(({ theme }) => ({
 
 const SideMenu = ({ isOpen }) => {
   const dispatch = useDispatch();
-  const navigate = useNavigate();
-  const { isAuth } = usePermissions();
   const handleClose = useCallback(() => dispatch(closeSideMenu()), [dispatch]);
   const handleOpen = useCallback(() => dispatch(openSideMenu()), [dispatch]);
   const { locale } = useSelector(state => state.intl);
   const theme = useTheme();
   const isTopbarCompact = useMediaQuery(theme.breakpoints.down('sm'));
 
-  const handleContributeClick = () => {
-    if (isMobile) handleClose();
-    if (isAuth) {
-      navigate('/ui/entity/add');
-    } else {
-      dispatch(displayLoginDialog());
-    }
-  };
+  const navigateToContribute = useAuthNavigate('/ui/entity/add', {
+    onBeforeNavigate: isMobile ? handleClose : undefined
+  });
+
+  const handleContributeClick = () => navigateToContribute();
 
   const userguideUrl =
     userguideLinks[locale] !== undefined
