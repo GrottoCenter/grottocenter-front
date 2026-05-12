@@ -225,6 +225,12 @@ export const deleteMassifUrl = (massifId, { entityId, isPermanent = false }) =>
     .join('&')}`;
 export const restoreMassifUrl = massifId =>
   `${API_BASE_PATH}/massifs/${massifId}/restore`;
+export const markMassifSensitiveUrl = massifId =>
+  `${API_BASE_PATH}/massifs/${massifId}/mark-sensitive`;
+export const unmarkMassifSensitiveUrl = massifId =>
+  `${API_BASE_PATH}/massifs/${massifId}/unmark-sensitive`;
+export const previewMassifSensitiveUrl = massifId =>
+  `${API_BASE_PATH}/massifs/${massifId}/preview-sensitive`;
 
 // ===== Notifications urls
 export const countUnreadNotificationsUrl = `${API_URL}/api/${apiVersion}/notifications/unread/count`;

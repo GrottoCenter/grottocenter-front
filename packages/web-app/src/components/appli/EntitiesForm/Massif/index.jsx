@@ -13,6 +13,7 @@ import { MassifTypes } from '../../../../types/massif.type';
 import FormProgressInfo from '../utils/FormProgressInfo';
 
 import MassifFields from './MassifFields';
+import MassifSensitivityControl from './MassifSensitivityControl';
 
 const defaultMassifValues = {
   name: '',
@@ -54,11 +55,11 @@ export const MassifForm = ({ massifValues, onCancel }) => {
     defaultValues: {
       massif: massifValues
         ? {
-            nameId: massifValues.names[0]?.id,
-            name: massifValues.names[0]?.name,
-            language: massifValues.language,
-            geogPolygon: massifValues.geogPolygon
-          }
+          nameId: massifValues.names[0]?.id,
+          name: massifValues.names[0]?.name,
+          language: massifValues.language,
+          geogPolygon: massifValues.geogPolygon
+        }
         : defaultMassifValues
     }
   });
@@ -138,6 +139,7 @@ export const MassifForm = ({ massifValues, onCancel }) => {
 
   return (
     <FormContainer>
+      {!isNewMassif && <MassifSensitivityControl massif={massifValues} />}
       <form autoComplete="off" onSubmit={handleFormSubmit}>
         <MassifFields
           control={control}
