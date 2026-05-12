@@ -73,12 +73,14 @@ export const PersonForm = ({ personValues, onCancel }) => {
             labelName="First name"
             control={control}
             isError={!!errors?.person?.name}
+            isRequired
           />
           <InputText
             formKey="person.surname"
             labelName="Last name"
             control={control}
             isError={!!errors?.person?.surname}
+            isRequired
           />
         </FormRow>
         <FormActionRow

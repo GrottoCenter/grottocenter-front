@@ -344,7 +344,7 @@ const accountShape = PropTypes.shape({
   nickname: PropTypes.string,
   name: PropTypes.string,
   surname: PropTypes.string,
-  email: PropTypes.string,
+  mail: PropTypes.string,
   mailIsValid: PropTypes.bool,
   language: PropTypes.number,
   sendNotificationByEmail: PropTypes.bool
@@ -602,10 +602,6 @@ const PreferencesSection = ({ account, onSaved }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [saveError, setSaveError] = useState(null);
 
-  useEffect(() => {
-    if (!languagesLoaded) dispatch(loadLanguages(true));
-  }, [dispatch, languagesLoaded]);
-
   const {
     control,
     handleSubmit,
@@ -617,6 +613,10 @@ const PreferencesSection = ({ account, onSaved }) => {
       sendNotificationByEmail: account?.sendNotificationByEmail ?? false
     }
   });
+
+  useEffect(() => {
+    if (!languagesLoaded) dispatch(loadLanguages(true));
+  }, [dispatch, languagesLoaded]);
 
   useEffect(() => {
     if (account) {
@@ -803,12 +803,12 @@ const AccountPage = () => {
   const handleConfirmLeaveOrg = useCallback(async () => {
     if (!pendingLeaveOrg || !userId) return;
     const { id } = pendingLeaveOrg;
-    setPendingLeaveOrg(null);
     try {
       await dispatch(leaveOrganization(userId, id));
+      setPendingLeaveOrg(null);
       dispatch(fetchPerson(userId));
     } catch {
-      // leave failed — dialog already closed, person data unchanged
+      setPendingLeaveOrg(null);
     }
   }, [dispatch, userId, pendingLeaveOrg]);
 
@@ -1009,7 +1009,7 @@ const AccountPage = () => {
               <Skeleton height={60} />
             </Card>
           )}
-          {person && (
+          {person?.id === userId && (
             <ScrollableContent
               collapsible={false}
               content={<DocumentsList documents={person.documents} />}
