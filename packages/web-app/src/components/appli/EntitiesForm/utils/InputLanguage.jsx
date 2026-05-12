@@ -13,12 +13,16 @@ import { styled } from '@mui/material/styles';
 import { loadLanguages } from '../../../../actions/Language';
 import Translate from '../../../common/Translate';
 
-const FormControlLanguage = styled(FormControl)(({ theme }) => ({
+const FormControlLanguage = styled(FormControl, {
+  shouldForwardProp: prop => prop !== 'fullWidth'
+})(({ theme, fullWidth }) => ({
   width: '100%',
   minWidth: '120px',
-  [theme.breakpoints.up('sm')]: {
-    width: 'initial'
-  }
+  ...(!fullWidth && {
+    [theme.breakpoints.up('sm')]: {
+      width: 'initial'
+    }
+  })
 }));
 
 const InputLanguage = ({
@@ -26,6 +30,8 @@ const InputLanguage = ({
   control,
   isError,
   isDisabled = false,
+  label = 'Language',
+  fullWidth = false,
   labelName = false
 }) => {
   const { languages, isLoaded } = useSelector(state => state.language);
@@ -42,9 +48,13 @@ const InputLanguage = ({
       control={control}
       rules={{ required: true }}
       render={({ field: { ref, value, onChange } }) => (
-        <FormControlLanguage required error={isError} variant="standard">
+        <FormControlLanguage
+          required
+          error={isError}
+          variant="standard"
+          fullWidth={fullWidth}>
           <InputLabel shrink>
-            <Translate>Language</Translate>
+            <Translate>{label}</Translate>
           </InputLabel>
           <Select
             disabled={isDisabled}
@@ -79,8 +89,10 @@ InputLanguage.propTypes = {
   formKey: PropTypes.string.isRequired,
   control: PropTypes.shape({}).isRequired,
   isError: PropTypes.bool.isRequired,
+  label: PropTypes.string,
   labelName: PropTypes.string,
-  isDisabled: PropTypes.bool
+  isDisabled: PropTypes.bool,
+  fullWidth: PropTypes.bool
 };
 
 export default InputLanguage;

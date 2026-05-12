@@ -23,6 +23,7 @@ import LatestBlogNewsSection from './pages/homepage/LatestBlogNewsSection';
 import ChangePassword from './components/appli/ChangePassword';
 import SignUp from './components/appli/SignUp';
 import ForgotPassword from './components/appli/ForgotPassword';
+import AccountPage from './pages/Account';
 import ContributionsPage from './pages/Contributions';
 import DocumentValidation from './pages/DocumentValidation';
 import DocumentEdit from './pages/DocumentEdit';
@@ -116,6 +117,7 @@ const router = createBrowserRouter(
 
       {/* Routes requiring authentication */}
       <Route element={<PrivateRoute />}>
+        <Route path="/ui/account" element={<AccountPage />} />
         <Route path="/ui/entrances/:entranceId/edit" element={<EntranceEdit />} />
         <Route
           path="/ui/organizations/:organizationId/edit"

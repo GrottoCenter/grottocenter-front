@@ -15,6 +15,7 @@ export const dynamicNumbersUrl = {
 export const cumulatedLengthUrl = `${API_BASE_PATH}/caves/cumulated-length`;
 
 // ===== Auth urls
+export const accountUrl = `${API_BASE_PATH}/account`;
 export const changePasswordUrl = `${API_BASE_PATH}/account/password`;
 export const changeEmailUrl = `${API_BASE_PATH}/account/email`;
 export const loginUrl = `${API_BASE_PATH}/login`;

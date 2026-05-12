@@ -1,4 +1,5 @@
 import { combineReducers } from 'redux';
+import account from './AccountReducer';
 import advancedsearch from './AdvancedsearchReducer';
 import banCaver from './BanCaverReducer';
 import bannedCavers from './BannedCaversReducer';
@@ -84,6 +85,7 @@ import updateLocation from './UpdateLocation';
 import updateMassif from './UpdateMassifReducer';
 import updateName from './UpdateNameReducer';
 import updateOrganization from './UpdateOrganization';
+import updateAccount from './UpdateAccountReducer';
 import updatePerson from './UpdatePerson';
 import massifEntrances from './MassifEntrancesDataQualityReducer';
 import countryEntrances from './CountryEntrancesDataQualityReducer';
@@ -91,6 +93,7 @@ import countryRegions from './CountryRegionsReducer';
 import regionEntrances from './RegionEntrancesDataQualityReducer';
 
 const GCReducer = combineReducers({
+  account,
   advancedsearch,
   banCaver,
   bannedCavers,
@@ -175,6 +178,7 @@ const GCReducer = combineReducers({
   updateLocation,
   updateMassif,
   updateName,
+  updateAccount,
   updateOrganization,
   updatePerson,
   updatePersonGroups,
