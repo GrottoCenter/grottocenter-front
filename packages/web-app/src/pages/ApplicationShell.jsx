@@ -13,6 +13,7 @@ import { Alert } from '@mui/material';
 
 import GCReducer from '../reducers/GCReducer';
 import { bootstrapIntl } from '../actions/Intl';
+import useLanguageSync from '../hooks/useLanguageSync';
 
 import ErrorHandler from '../components/appli/ErrorHandler';
 import ErrorBoundary from '../components/appli/PageErrorBounary';
@@ -114,6 +115,7 @@ const MainWrapper = styled('main')`
 
 const ApplicationLayout = () => {
   const isSideMenuOpen = useSelector(state => state.sideMenu.open);
+  useLanguageSync();
 
   const firstRender = useRef(true);
   useEffect(() => {

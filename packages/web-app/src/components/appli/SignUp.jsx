@@ -5,6 +5,7 @@ import { isEmpty, match } from 'ramda';
 
 import { useNavigate } from 'react-router-dom';
 import { emailRegexp, PASSWORD_MIN_LENGTH } from '../../conf/config';
+import { localeToLanguageId } from '../../utils/languageMapping';
 import { postSignUp } from '../../actions/SignUp';
 import { useNotification, usePermissions } from '../../hooks';
 import SignUpForm from '../../pages/SignUpForm';
@@ -13,6 +14,7 @@ const SignUp = () => {
   const dispatch = useDispatch();
   const { formatMessage } = useIntl();
   const signUpState = useSelector(state => state.signUp);
+  const { locale } = useSelector(state => state.intl);
   const [signUpRequestSent, setSignUpRequestSent] = React.useState(false);
   const [signUpRequestSucceeded, setSignUpRequestSucceeded] =
     React.useState(false);
@@ -72,6 +74,7 @@ const SignUp = () => {
       dispatch(
         postSignUp({
           email,
+          language: localeToLanguageId(locale),
           name,
           nickname,
           password,

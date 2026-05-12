@@ -12,8 +12,12 @@ import {
   CircularProgress,
   Collapse,
   Divider,
+  FormControl,
   FormControlLabel,
+  InputLabel,
+  MenuItem,
   Paper,
+  Select,
   Skeleton,
   Switch,
   Tooltip,
@@ -35,7 +39,6 @@ import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import TuneIcon from '@mui/icons-material/Tune';
 import { styled } from '@mui/material/styles';
 
-import { loadLanguages } from '../../actions/Language';
 import { fetchAccount } from '../../actions/Account/GetAccount';
 import { updateAccount } from '../../actions/Account/UpdateAccount';
 import { fetchPerson } from '../../actions/Person/GetPerson';
@@ -52,13 +55,16 @@ import RelatedCaves from '../../components/common/RelatedCaves/RelatedCaves';
 import StandardDialog from '../../components/common/StandardDialog';
 import InputText from '../../components/appli/EntitiesForm/utils/InputText';
 import InputPassword from '../../components/appli/EntitiesForm/utils/InputPassword';
-import InputLanguage from '../../components/appli/EntitiesForm/utils/InputLanguage';
 import { FormRow } from '../../components/appli/EntitiesForm/utils/FormContainers';
 import SearchOrganizationForm from '../../components/appli/Form/SearchOrganizationForm';
 import Translate from '../../components/common/Translate';
 import { useUserProperties } from '../../hooks';
 import useOpenLink from '../../hooks/useOpenLink';
-import { PASSWORD_MIN_LENGTH } from '../../conf/config';
+import { AVAILABLE_LANGUAGES, PASSWORD_MIN_LENGTH } from '../../conf/config';
+import {
+  languageIdToLocale,
+  localeToLanguageId
+} from '../../utils/languageMapping';
 
 // ─── Shared styled components ─────────────────────────────────────────────────
 
@@ -95,6 +101,7 @@ const InfoRow = styled(Box)(({ theme }) => ({
 
 const InfoLabel = styled(Typography)(({ theme }) => ({
   minWidth: 160,
+  [theme.breakpoints.down('sm')]: { minWidth: 100 },
   color: theme.palette.text.secondary,
   flexShrink: 0
 }));
@@ -292,6 +299,9 @@ const PersonalInfoSection = ({ account, onSaved }) => {
 
   const editContent = (
     <form onSubmit={handleSubmit(onSubmit)} autoComplete="off">
+      <Typography variant="caption" color="text.secondary">
+        <Translate>The nickname defines how other users see you.</Translate>
+      </Typography>
       <FormRow>
         <InputText
           formKey="nickname"
@@ -346,7 +356,7 @@ const accountShape = PropTypes.shape({
   surname: PropTypes.string,
   mail: PropTypes.string,
   mailIsValid: PropTypes.bool,
-  language: PropTypes.number,
+  language: PropTypes.string,
   sendNotificationByEmail: PropTypes.bool
 });
 
@@ -447,8 +457,11 @@ const EmailSecuritySection = ({ account, onSaved }) => {
               size="small"
               icon={<CheckCircleOutlineIcon />}
               label={formatMessage({ id: 'Email verified' })}
-              color="success"
-              variant="outlined"
+              sx={{
+                bgcolor: 'success.main',
+                color: '#fff',
+                '& .MuiChip-icon': { color: '#fff' }
+              }}
             />
           ) : (
             <Chip
@@ -525,7 +538,7 @@ const EmailSecuritySection = ({ account, onSaved }) => {
               </Typography>
               <Button
                 size="small"
-                variant="text"
+                variant="outlined"
                 onClick={() => setIsChangingPassword(true)}>
                 <Translate>Change password</Translate>
               </Button>
@@ -597,10 +610,11 @@ EmailSecuritySection.propTypes = {
 const PreferencesSection = ({ account, onSaved }) => {
   const dispatch = useDispatch();
   const { formatMessage } = useIntl();
-  const { languages, isLoaded: languagesLoaded } = useSelector(state => state.language);
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [saveError, setSaveError] = useState(null);
+
+  const currentLocale = languageIdToLocale(account?.language) ?? '';
 
   const {
     control,
@@ -609,19 +623,15 @@ const PreferencesSection = ({ account, onSaved }) => {
     formState: { errors }
   } = useForm({
     defaultValues: {
-      language: account?.language ?? -1,
+      language: currentLocale,
       sendNotificationByEmail: account?.sendNotificationByEmail ?? false
     }
   });
 
   useEffect(() => {
-    if (!languagesLoaded) dispatch(loadLanguages(true));
-  }, [dispatch, languagesLoaded]);
-
-  useEffect(() => {
     if (account) {
       reset({
-        language: account.language ?? -1,
+        language: languageIdToLocale(account.language) ?? '',
         sendNotificationByEmail: account.sendNotificationByEmail ?? false
       });
     }
@@ -634,7 +644,7 @@ const PreferencesSection = ({ account, onSaved }) => {
   const handleCancel = () => {
     if (account)
       reset({
-        language: account.language ?? -1,
+        language: languageIdToLocale(account.language) ?? '',
         sendNotificationByEmail: account.sendNotificationByEmail ?? false
       });
     setIsEditing(false);
@@ -647,7 +657,7 @@ const PreferencesSection = ({ account, onSaved }) => {
     try {
       await dispatch(
         updateAccount({
-          language: data.language,
+          language: localeToLanguageId(data.language),
           sendNotificationByEmail: data.sendNotificationByEmail
         })
       );
@@ -660,18 +670,17 @@ const PreferencesSection = ({ account, onSaved }) => {
     }
   };
 
-  const languageName =
-    languages?.find(l => l.id === account?.language)?.refName ?? '—';
+  const nativeName =
+    AVAILABLE_LANGUAGES[languageIdToLocale(account?.language)]?.nativeName ??
+    '—';
 
   const viewContent = (
     <>
       <InfoRow>
         <InfoLabel variant="body2">
-          {formatMessage({ id: 'Preferred contact language' })}
+          {formatMessage({ id: 'Language' })}
         </InfoLabel>
-        <Typography variant="body1">
-          {languageName === '—' ? '—' : <Translate>{languageName}</Translate>}
-        </Typography>
+        <Typography variant="body1">{nativeName}</Typography>
       </InfoRow>
       <InfoRow>
         <InfoLabel variant="body2">
@@ -685,12 +694,26 @@ const PreferencesSection = ({ account, onSaved }) => {
   const editContent = (
     <form onSubmit={handleSubmit(onSubmit)}>
       <FormRow>
-        <InputLanguage
-          formKey="language"
+        <Controller
+          name="language"
           control={control}
-          isError={!!errors.language}
-          label="Preferred contact language"
-          fullWidth
+          rules={{ required: true }}
+          render={({ field }) => (
+            <FormControl variant="standard" fullWidth error={!!errors.language}>
+              <InputLabel shrink>
+                <Translate>Language</Translate>
+              </InputLabel>
+              <Select {...field}>
+                {Object.entries(AVAILABLE_LANGUAGES).map(
+                  ([locale, { nativeName: name }]) => (
+                    <MenuItem key={locale} value={locale}>
+                      {name}
+                    </MenuItem>
+                  )
+                )}
+              </Select>
+            </FormControl>
+          )}
         />
       </FormRow>
       <Box sx={{ mt: 2 }}>
@@ -766,9 +789,7 @@ const AccountPage = () => {
     if (userId) dispatch(fetchPerson(userId));
   }, [dispatch, userId]);
 
-  const handleSaved = useCallback(() => {
-    dispatch(fetchAccount());
-  }, [dispatch]);
+  const handleSaved = useCallback(() => {}, []);
 
   const handleRefreshPerson = useCallback(() => {
     if (userId) dispatch(fetchPerson(userId));

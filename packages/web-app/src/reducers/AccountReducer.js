@@ -18,10 +18,7 @@ const reducer = (state = initialState, action) => {
         isLoading: true
       };
     case FETCH_ACCOUNT_SUCCESS:
-      return {
-        ...initialState,
-        account: action.account
-      };
+      return { ...initialState, account: action.account };
     case FETCH_ACCOUNT_FAILURE:
       return {
         ...initialState,
