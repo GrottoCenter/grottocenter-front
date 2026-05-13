@@ -17,6 +17,7 @@ const ChangePassword = () => {
     useState(false);
   const [changePasswordRequestSucceeded, setChangePasswordRequestSucceeded] =
     useState(false);
+  const [currentPassword, setCurrentPassword] = useState('');
   const [password, setPassword] = useState('');
   const [passwordConfirmation, setPasswordConfirmation] = useState('');
   const { onError } = useNotification();
@@ -29,6 +30,9 @@ const ChangePassword = () => {
    */
   const checkIfValuesAreValid = () => {
     const errors = [];
+    if (!token && !currentPassword) {
+      errors.push(formatMessage({ id: 'You must provide your current password.' }));
+    }
     if (password !== passwordConfirmation) {
       errors.push(formatMessage({ id: 'The passwords must match.' }));
     }
@@ -46,7 +50,7 @@ const ChangePassword = () => {
   const onChangePassword = event => {
     event.preventDefault();
     if (checkIfValuesAreValid()) {
-      dispatch(postChangePassword(password, token));
+      dispatch(postChangePassword(password, token, currentPassword));
       setChangePasswordRequestSent(true);
     }
   };
@@ -67,6 +71,8 @@ const ChangePassword = () => {
   return (
     <ChangePasswordForm
       loading={changePasswordState.isFetching}
+      currentPassword={token ? undefined : currentPassword}
+      onCurrentPasswordChange={token ? undefined : setCurrentPassword}
       password={password}
       passwordConfirmation={passwordConfirmation}
       onPasswordChange={setPassword}

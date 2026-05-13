@@ -168,7 +168,7 @@ BoolValue.propTypes = {
   value: PropTypes.bool.isRequired
 };
 
-const EditActions = ({ isLoading, onCancel }) => (
+const EditActions = ({ isLoading, isDisabled, onCancel }) => (
   <EditFooter>
     <Button variant="outlined" onClick={onCancel} disabled={isLoading}>
       <Translate>Cancel</Translate>
@@ -177,7 +177,7 @@ const EditActions = ({ isLoading, onCancel }) => (
       type="submit"
       variant="contained"
       color="primary"
-      disabled={isLoading}
+      disabled={isLoading || isDisabled}
       startIcon={
         isLoading ? <CircularProgress size={16} color="inherit" /> : null
       }>
@@ -187,8 +187,13 @@ const EditActions = ({ isLoading, onCancel }) => (
 );
 
 EditActions.propTypes = {
+  isDisabled: PropTypes.bool,
   isLoading: PropTypes.bool.isRequired,
   onCancel: PropTypes.func.isRequired
+};
+
+EditActions.defaultProps = {
+  isDisabled: false
 };
 
 // ─── Personal info section ────────────────────────────────────────────────────
@@ -385,8 +390,11 @@ const EmailSecuritySection = ({ account, onSaved }) => {
     handleSubmit: handlePasswordSubmit,
     reset: resetPassword,
     getValues: getPasswordValues,
-    formState: { errors: passwordErrors }
-  } = useForm({ defaultValues: { password: '', passwordConfirmation: '' } });
+    formState: { errors: passwordErrors, isValid: isPasswordFormValid }
+  } = useForm({
+    defaultValues: { currentPassword: '', password: '', passwordConfirmation: '' },
+    mode: 'onChange'
+  });
 
   const watchedPassword = useWatch({
     control: passwordControl,
@@ -422,7 +430,7 @@ const EmailSecuritySection = ({ account, onSaved }) => {
   };
 
   const handleCancelPassword = () => {
-    resetPassword({ password: '', passwordConfirmation: '' });
+    resetPassword({ currentPassword: '', password: '', passwordConfirmation: '' });
     setIsChangingPassword(false);
     setPasswordError(null);
   };
@@ -431,9 +439,14 @@ const EmailSecuritySection = ({ account, onSaved }) => {
     setIsPasswordLoading(true);
     setPasswordError(null);
     try {
-      await dispatch(updateAccount({ password: data.password }));
+      await dispatch(
+        updateAccount({
+          currentPassword: data.currentPassword,
+          password: data.password
+        })
+      );
       setIsChangingPassword(false);
-      resetPassword({ password: '', passwordConfirmation: '' });
+      resetPassword({ currentPassword: '', password: '', passwordConfirmation: '' });
     } catch {
       setPasswordError(true);
     } finally {
@@ -546,6 +559,18 @@ const EmailSecuritySection = ({ account, onSaved }) => {
             autoComplete="new-password">
             <FormRow>
               <InputPassword
+                formKey="currentPassword"
+                labelName="Current password"
+                isPasswordVisible={isPasswordVisible}
+                onShowPassword={() => setIsPasswordVisible(v => !v)}
+                control={passwordControl}
+                isError={!!passwordErrors.currentPassword}
+                isRequired
+                helperText={passwordErrors.currentPassword?.message}
+              />
+            </FormRow>
+            <FormRow>
+              <InputPassword
                 formKey="password"
                 labelName="New password"
                 isPasswordVisible={isPasswordVisible}
@@ -587,6 +612,7 @@ const EmailSecuritySection = ({ account, onSaved }) => {
             )}
             <EditActions
               isLoading={isPasswordLoading}
+              isDisabled={!isPasswordFormValid}
               onCancel={handleCancelPassword}
             />
           </form>

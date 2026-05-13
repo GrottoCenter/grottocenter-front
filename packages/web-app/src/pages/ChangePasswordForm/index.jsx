@@ -31,6 +31,8 @@ const SpacedCenteredButton = styled(Button)`
 `;
 
 const ChangePasswordForm = ({
+  currentPassword,
+  onCurrentPasswordChange,
   password,
   passwordConfirmation,
   onPasswordChange,
@@ -86,6 +88,16 @@ const ChangePasswordForm = ({
           </>
         ) : (
           <FormWrapper onSubmit={onChangePassword}>
+            {onCurrentPasswordChange !== undefined && (
+              <StringInput
+                fullWidth
+                onValueChange={onCurrentPasswordChange}
+                required
+                type="password"
+                value={currentPassword}
+                valueName={formatMessage({ id: 'Current password' })}
+              />
+            )}
             <StringInput
               endAdornment={
                 <InputAdornment position="end">
@@ -154,12 +166,19 @@ const ChangePasswordForm = ({
 
 ChangePasswordForm.propTypes = {
   changePasswordRequestSucceeded: PropTypes.bool.isRequired,
+  currentPassword: PropTypes.string,
   loading: PropTypes.bool.isRequired,
   onChangePassword: PropTypes.func.isRequired,
+  onCurrentPasswordChange: PropTypes.func,
   onPasswordChange: PropTypes.func.isRequired,
   onPasswordConfirmationChange: PropTypes.func.isRequired,
   password: PropTypes.string.isRequired,
   passwordConfirmation: PropTypes.string.isRequired
+};
+
+ChangePasswordForm.defaultProps = {
+  currentPassword: undefined,
+  onCurrentPasswordChange: undefined
 };
 
 export default ChangePasswordForm;
