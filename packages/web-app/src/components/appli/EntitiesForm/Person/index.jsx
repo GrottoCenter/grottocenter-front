@@ -49,7 +49,9 @@ export const PersonForm = ({ personValues, onCancel }) => {
         isError={!!personError}
         labelLoading="Updating person..."
         labelError="'An error occurred when updating'"
-        resetFn={() => reset(undefined, { keepValues: true, keepErrors: false })}
+        resetFn={() =>
+          reset(undefined, { keepValues: true, keepErrors: false })
+        }
         getRedirectFn={() => `/ui/persons/${personData.id}`}
       />
     );
@@ -73,14 +75,12 @@ export const PersonForm = ({ personValues, onCancel }) => {
             labelName="First name"
             control={control}
             isError={!!errors?.person?.name}
-            isRequired
           />
           <InputText
             formKey="person.surname"
             labelName="Last name"
             control={control}
             isError={!!errors?.person?.surname}
-            isRequired
           />
         </FormRow>
         <FormActionRow
