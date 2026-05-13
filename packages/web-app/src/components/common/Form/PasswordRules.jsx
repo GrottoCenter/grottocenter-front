@@ -25,7 +25,6 @@ RuleItem.propTypes = {
   labelValues: PropTypes.object
 };
 
-
 const PasswordRules = ({ password }) => {
   if (!password) return null;
 

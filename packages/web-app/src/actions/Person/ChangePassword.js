@@ -31,7 +31,10 @@ export function postChangePassword(password, resetPasswordToken, currentPassword
       requestOptions = {
         method: 'PATCH',
         body: JSON.stringify({ password, currentPassword }),
-        headers: getState().login.authorizationHeader
+        headers: {
+          ...getState().login.authorizationHeader,
+          'Content-Type': 'application/json'
+        }
       };
       statusChecker = checkAuthStatus(dispatch);
     }

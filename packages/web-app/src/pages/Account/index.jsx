@@ -168,7 +168,7 @@ BoolValue.propTypes = {
   value: PropTypes.bool.isRequired
 };
 
-const EditActions = ({ isLoading, isDisabled, onCancel }) => (
+const EditActions = ({ isLoading, isDisabled = false, onCancel }) => (
   <EditFooter>
     <Button variant="outlined" onClick={onCancel} disabled={isLoading}>
       <Translate>Cancel</Translate>
@@ -190,10 +190,6 @@ EditActions.propTypes = {
   isDisabled: PropTypes.bool,
   isLoading: PropTypes.bool.isRequired,
   onCancel: PropTypes.func.isRequired
-};
-
-EditActions.defaultProps = {
-  isDisabled: false
 };
 
 // ─── Personal info section ────────────────────────────────────────────────────

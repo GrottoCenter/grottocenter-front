@@ -31,8 +31,8 @@ const SpacedCenteredButton = styled(Button)`
 `;
 
 const ChangePasswordForm = ({
-  currentPassword,
-  onCurrentPasswordChange,
+  currentPassword = undefined,
+  onCurrentPasswordChange = undefined,
   password,
   passwordConfirmation,
   onPasswordChange,
@@ -176,9 +176,5 @@ ChangePasswordForm.propTypes = {
   passwordConfirmation: PropTypes.string.isRequired
 };
 
-ChangePasswordForm.defaultProps = {
-  currentPassword: undefined,
-  onCurrentPasswordChange: undefined
-};
 
 export default ChangePasswordForm;
