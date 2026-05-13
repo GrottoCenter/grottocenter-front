@@ -8,6 +8,7 @@ import React, {
 import PropTypes from 'prop-types';
 import { DocumentTypes } from '../../../../hooks/documentTypeHelpers';
 import {
+  IS_INTACT,
   LICENSE_IN_FILE,
   DOCUMENT_AUTHORIZE_TO_PUBLISH
 } from './formElements/AddFileForm/FileHelpers';
@@ -116,10 +117,20 @@ export const DocumentFormContext = createContext({
   setLinkedEntrance: () => {}
 });
 
+const normalizeInitialValues = values => {
+  if (!values) return {};
+  const { option, files, ...rest } = values;
+  return {
+    ...rest,
+    selectOptionAuthorizationDocument: option ?? null,
+    files: (files ?? []).map(f => ({ ...f, state: IS_INTACT }))
+  };
+};
+
 const Provider = ({ children, initialValues }) => {
   const [document, setDocument] = useState({
     ...defaultDocAttributes,
-    ...(initialValues ?? {})
+    ...normalizeInitialValues(initialValues)
   });
 
   const [isFormValid, setIsFormValid] = useState(false);

@@ -33,9 +33,8 @@ const updateDocumentFailure = (errorMessages, httpCode) => ({
 export function updateDocument(docAttributes) {
   return (dispatch, getState) => {
     dispatch(updateDocumentAction());
-    const attributes = { ...docAttributes };
-    const { files } = attributes;
-    delete attributes.files;
+    const { files, selectOptionAuthorizationDocument, ...rest } = docAttributes;
+    const attributes = { ...rest, option: selectOptionAuthorizationDocument };
 
     const formData = new FormData();
     buildFormData(formData, attributes);

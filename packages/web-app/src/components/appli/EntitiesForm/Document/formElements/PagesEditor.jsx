@@ -16,7 +16,7 @@ const PagesEditor = () => {
   const pages = document.pages ?? '';
 
   useEffect(() => {
-    isDocumentPagesFormatValid(pages);
+    setIsFormatError(!isDocumentPagesFormatValid(pages));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -36,7 +36,7 @@ const PagesEditor = () => {
           onChange={e => {
             const reg = /^(\d+-?\d*)?$/;
             const newV = e.target.value;
-            if (newV.match(reg) || !pages.match(pages)) {
+            if (newV.match(reg)) {
               updateAttribute('pages', newV);
               setIsFormatError(!isDocumentPagesFormatValid(newV));
             }

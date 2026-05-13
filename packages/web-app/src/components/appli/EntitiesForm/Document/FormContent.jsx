@@ -143,6 +143,7 @@ const FormContent = () => {
               }
               onChange={id => updateAttribute('mainLanguage', id)}
               label={formatMessage({ id: 'Document main language' })}
+              required
             />
           </FormRow>
 

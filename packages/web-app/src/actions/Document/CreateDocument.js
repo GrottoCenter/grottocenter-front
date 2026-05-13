@@ -27,9 +27,8 @@ const postDocumentFailure = (errorMessages, httpCode) => ({
 export function postDocument(docAttributes) {
   return (dispatch, getState) => {
     dispatch(postDocumentAction());
-    const attributes = { ...docAttributes };
-    const { files } = attributes;
-    delete attributes.files;
+    const { files, selectOptionAuthorizationDocument, ...rest } = docAttributes;
+    const attributes = { ...rest, option: selectOptionAuthorizationDocument };
 
     const formData = new FormData();
     buildFormData(formData, attributes);
@@ -91,7 +90,7 @@ export function postDocument(docAttributes) {
         })
       )
       .catch(err => {
-        if (!err.isAuthError) throw err;
+        if (err.isAuthError) return;
       });
   };
 }

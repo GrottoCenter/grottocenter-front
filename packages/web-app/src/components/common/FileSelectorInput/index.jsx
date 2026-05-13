@@ -53,17 +53,20 @@ const FileSelectorInput = ({
 
   const handleDragEnter = e => {
     e.preventDefault();
+    if (disabled) return;
     dragCounter.current += 1;
     setIsDragging(true);
   };
   const handleDragLeave = e => {
     e.preventDefault();
+    if (disabled) return;
     dragCounter.current -= 1;
     if (dragCounter.current === 0) setIsDragging(false);
   };
   const handleDragOver = e => e.preventDefault();
   const handleDrop = e => {
     e.preventDefault();
+    if (disabled) return;
     dragCounter.current = 0;
     setIsDragging(false);
     onFilesAdd(e.dataTransfer.files);

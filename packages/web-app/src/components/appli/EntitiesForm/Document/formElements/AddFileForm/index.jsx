@@ -218,9 +218,7 @@ const AddFileForm = ({
                 value={AUTHORIZATION_FROM_AUTHOR}
                 disabled={isAuthForced}
                 control={<Radio size="small" />}
-                label={formatMessage({
-                  id: 'You are the author of this document (license CC-BY-SA applies).'
-                })}
+                label={`${formatMessage({ id: 'You are the author of this document' })} (${formatMessage({ id: 'license CC-BY-SA applies' })})`}
               />
               <FormControlLabel
                 value={LICENSE_IN_FILE}

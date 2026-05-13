@@ -214,6 +214,7 @@ const DocumentTypeSelect = () => {
   }, [document.type]);
 
   const handleSelect = newDocType => {
+    if (newDocType === document.type) return;
     const { title, mainLanguage, mainLanguageName } = document;
     resetContext({ type: newDocType, title, mainLanguage, mainLanguageName });
   };
