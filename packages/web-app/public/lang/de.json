@@ -1,4 +1,4 @@
-{
+﻿{
   "1": "KARSTOLOGIE UND GEOSPELEOLOGIE",
   "2": "REGIONALE SPELÄOLOGIE UND KARSTOLOGIE",
   "3": "BIOSPELEOLOGIE",
@@ -659,6 +659,7 @@
   "cumulated length": "kumulierte Länge",
   "Current": "Aktuell",
   "Current password": "Aktuelles Passwort",
+  "Current password is incorrect.": "Das aktuelle Passwort ist falsch.",
   "Custom message": "Benutzerdefinierte Nachricht",
   "Cypre": "Zypern",
   "Cyprus": "Zypern",

@@ -1,4 +1,4 @@
-{
+﻿{
   "1": "KARSTOLOGIA I GEOSPELEOLOGIA",
   "2": "ESPELEOLOGIA I KARSTOLOGIA REGIONAL",
   "3": "BIOSPELEOLOGIA",
@@ -659,6 +659,7 @@
   "cumulated length": "longitud acumulada",
   "Current": "Actual",
   "Current password": "Contrasenya actual",
+  "Current password is incorrect.": "La contrasenya actual és incorrecta.",
   "Custom message": "Missatge personalitzat",
   "Cypre": "Xipre",
   "Cyprus": "Xipre",

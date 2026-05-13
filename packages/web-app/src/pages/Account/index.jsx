@@ -388,7 +388,11 @@ const EmailSecuritySection = ({ account, onSaved }) => {
     getValues: getPasswordValues,
     formState: { errors: passwordErrors, isValid: isPasswordFormValid }
   } = useForm({
-    defaultValues: { currentPassword: '', password: '', passwordConfirmation: '' },
+    defaultValues: {
+      currentPassword: '',
+      password: '',
+      passwordConfirmation: ''
+    },
     mode: 'onChange'
   });
 
@@ -426,7 +430,11 @@ const EmailSecuritySection = ({ account, onSaved }) => {
   };
 
   const handleCancelPassword = () => {
-    resetPassword({ currentPassword: '', password: '', passwordConfirmation: '' });
+    resetPassword({
+      currentPassword: '',
+      password: '',
+      passwordConfirmation: ''
+    });
     setIsChangingPassword(false);
     setPasswordError(null);
   };
@@ -442,9 +450,18 @@ const EmailSecuritySection = ({ account, onSaved }) => {
         })
       );
       setIsChangingPassword(false);
-      resetPassword({ currentPassword: '', password: '', passwordConfirmation: '' });
-    } catch {
-      setPasswordError(true);
+      resetPassword({
+        currentPassword: '',
+        password: '',
+        passwordConfirmation: ''
+      });
+    } catch (error) {
+      if (error?.status === 403)
+        setPasswordError(formatMessage({ id: 'Current password is incorrect.' }));
+      else if (error?.status === 400 && error?.message)
+        setPasswordError(error.message);
+      else
+        setPasswordError(formatMessage({ id: 'An error occurred. Please try again.' }));
     } finally {
       setIsPasswordLoading(false);
     }
@@ -599,12 +616,7 @@ const EmailSecuritySection = ({ account, onSaved }) => {
             </FormRow>
             <PasswordRules password={watchedPassword ?? ''} />
             {passwordError && (
-              <Alert
-                severity="error"
-                content={formatMessage({
-                  id: 'An error occurred. Please try again.'
-                })}
-              />
+              <Alert severity="error" content={passwordError} />
             )}
             <EditActions
               isLoading={isPasswordLoading}
@@ -628,6 +640,7 @@ EmailSecuritySection.propTypes = {
 const PreferencesSection = ({ account, onSaved }) => {
   const dispatch = useDispatch();
   const { formatMessage } = useIntl();
+
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [saveError, setSaveError] = useState(null);
