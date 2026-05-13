@@ -4,9 +4,7 @@ import { useIntl } from 'react-intl';
 import { useNavigate } from 'react-router-dom';
 import { Button, CircularProgress, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import { isEmpty, match } from 'ramda';
-
-import { emailRegexp } from '../conf/config';
+import { isValidEmail } from '../conf/config';
 import Layout from '../components/common/Layouts/Fixed/FixedContent';
 import StringInput from '../components/common/Form/StringInput';
 
@@ -35,7 +33,7 @@ const ForgotPasswordPage = ({
   const checkIfHasError = fieldName => {
     switch (fieldName) {
       case 'email':
-        return isEmpty(match(emailRegexp, email));
+        return !isValidEmail(email);
 
       default:
         return false;

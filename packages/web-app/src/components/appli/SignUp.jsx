@@ -1,10 +1,8 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useIntl } from 'react-intl';
-import { isEmpty, match } from 'ramda';
-
 import { useNavigate } from 'react-router-dom';
-import { emailRegexp, isPasswordValid } from '../../conf/config';
+import { isPasswordValid, isValidEmail } from '../../conf/config';
 import { localeToLanguageId } from '../../utils/languageMapping';
 import { postSignUp } from '../../actions/SignUp';
 import { useNotification, usePermissions } from '../../hooks';
@@ -46,7 +44,7 @@ const SignUp = () => {
     if (!isPasswordValid(password)) {
       errors.push(formatMessage({ id: 'password.rules.error' }));
     }
-    if (isEmpty(match(emailRegexp, email))) {
+    if (!isValidEmail(email)) {
       errors.push(formatMessage({ id: 'The email must be valid.' }));
     }
 

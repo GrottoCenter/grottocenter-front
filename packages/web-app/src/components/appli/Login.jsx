@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { Button, CircularProgress, Typography, Box } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
-import { isEmpty, match } from 'ramda';
+import { isEmpty } from 'ramda';
 import { useNavigate } from 'react-router-dom';
 import { useIntl } from 'react-intl';
 import { WarningRounded } from '@mui/icons-material';
@@ -16,7 +16,7 @@ import {
   resetResendVerification
 } from '../../actions/ResendVerificationEmail';
 
-import { emailRegexp } from '../../conf/config';
+import { isValidEmail } from '../../conf/config';
 import Translate from '../common/Translate';
 import StandardDialog from '../common/StandardDialog';
 import LoginForm from '../common/LoginForm';
@@ -43,7 +43,7 @@ const Login = () => {
       ...(isEmpty(email)
         ? [formatMessage({ id: 'You must provide an email.' })]
         : []),
-      ...(!!isEmpty(match(emailRegexp, email)) && !isEmpty(email)
+      ...(!isValidEmail(email) && !isEmpty(email)
         ? [formatMessage({ id: 'You must provide a valid email.' })]
         : []),
       ...(isEmpty(password)

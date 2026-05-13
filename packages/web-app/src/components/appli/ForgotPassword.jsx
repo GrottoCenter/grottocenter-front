@@ -1,10 +1,8 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useIntl } from 'react-intl';
-import { isEmpty, match } from 'ramda';
-
 import { useNavigate } from 'react-router-dom';
-import { emailRegexp } from '../../conf/config';
+import { isValidEmail } from '../../conf/config';
 import { postForgotPassword, resetForgotPassword } from '../../actions/ForgotPassword';
 import { useBoolean, useNotification, usePermissions } from '../../hooks';
 import ForgotPasswordPage from '../../pages/ForgotPassword';
@@ -34,7 +32,7 @@ const ForgotPassword = () => {
 
   const checkIfValuesAreValid = () => {
     const errors = [];
-    if (isEmpty(match(emailRegexp, email))) {
+    if (!isValidEmail(email)) {
       errors.push(formatMessage({ id: 'The email must be valid.' }));
     }
 

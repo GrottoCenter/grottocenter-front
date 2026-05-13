@@ -11,9 +11,7 @@ import {
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import { styled } from '@mui/material/styles';
-import { isEmpty, match } from 'ramda';
-
-import { emailRegexp, isPasswordValid } from '../../conf/config';
+import { isPasswordValid, isValidEmail } from '../../conf/config';
 import Layout from '../../components/common/Layouts/Fixed/FixedContent';
 import StringInput from '../../components/common/Form/StringInput';
 import PasswordRules from '../../components/common/Form/PasswordRules';
@@ -60,7 +58,7 @@ const SignUpForm = ({
   const checkIfHasError = fieldName => {
     switch (fieldName) {
       case 'email':
-        return isEmpty(match(emailRegexp, email));
+        return !isValidEmail(email);
       case 'password':
         return !isPasswordValid(password);
       case 'passwordConfirmation':

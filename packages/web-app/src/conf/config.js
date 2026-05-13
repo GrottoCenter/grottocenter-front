@@ -1,3 +1,5 @@
+import isEmail from 'validator/lib/isEmail';
+
 export const AVAILABLE_LANGUAGES = {
   ar: { nativeName: 'عربية', id: 'ara', part1: 'ar', refName: 'Arabic', direction: 'rtl' },
   bg: { nativeName: 'Български', id: 'bul', part1: 'bg', refName: 'Bulgarian' },
@@ -49,7 +51,7 @@ export const bloggerIcons = {
 };
 
 // ===== Misc config values
-export const emailRegexp = /\S+@\S+/; // simple regexp TODO: use another one more robust
+export const isValidEmail = email => isEmail(email ?? '');
 export const PASSWORD_MIN_LENGTH = 12;
 
 const SPECIAL_CHAR_REGEX = /[!@#$%^&*()_+\-=[\]{}|;:'",.<>?/~`]/;
