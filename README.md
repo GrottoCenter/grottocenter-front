@@ -55,6 +55,49 @@ Github Actions is running 2 tasks on push and pull requests on `develop` :
 
 [Full wiki article](https://github.com/GrottoCenter/grottocenter-front/wiki/Production-deployment-(Azure))
 
+## 🤖 AI Agents
+
+This project is set up for use with [Claude Code](https://claude.ai/code) and compatible AI agents.
+
+### Documentation
+
+- **[`AGENTS.md`](AGENTS.md)** — project conventions, architecture, vocabulary, git workflow, and agent checklist. Read by agents for any work in this repo.
+- **[`packages/web-app/AGENTS.md`](packages/web-app/AGENTS.md)** — web-app specifics: i18n workflow, Redux patterns, testing, env vars, UI/UX patterns. Read when working inside `packages/web-app/`.
+- **[`CONTRIBUTING.md`](CONTRIBUTING.md)** — human-oriented setup guide (IDE, browser extensions, Transifex).
+
+These files can and should be updated when conventions change, new patterns are established, or the tech stack evolves.
+
+### Skills
+
+Reusable agent workflows are defined in [`.agents/skills/`](.agents/skills/):
+
+| Skill | Invocation | Description |
+| ----- | ---------- | ----------- |
+| `code-review` | `/code-review <PR-number>` | Fetches the diff, reads project conventions, and submits a structured review to GitHub |
+| `github-workflow` | `/github-workflow` | Guides through the GrottoCenter commit/branch/PR conventions |
+
+### Syncing skills to Claude Code
+
+Claude Code loads skills from `.claude/skills/`. A project hook automatically mirrors any file saved under `.agents/skills/` into `.claude/skills/` so both stay in sync.
+
+To sync manually (e.g. after cloning or pulling new skills):
+
+```bash
+# bash/zsh
+cp -r .agents/skills/. .claude/skills/
+
+# PowerShell
+Copy-Item -Recurse -Force .agents\skills\* .claude\skills\
+```
+
+### Adding or modifying a skill
+
+1. Create or edit the `SKILL.md` in `.agents/skills/<skill-name>/`.
+2. The hook copies it to `.claude/skills/` automatically on the next agent write. If working outside Claude Code, run the manual sync above.
+3. Invoke with `/<skill-name>` in Claude Code.
+
+---
+
 ## Project organization
 
 ### Git-rules
