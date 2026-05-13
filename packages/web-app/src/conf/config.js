@@ -20,7 +20,7 @@ export const AVAILABLE_LANGUAGES = {
     refName: 'Indonesian'
   },
   it: { nativeName: 'Italiano', id: 'ita', part1: 'it', refName: 'Italian' },
-  ja: { nativeName: '日本語', id: 'jpn', part1: 'ja', refName: 'Japanse' },
+  ja: { nativeName: '日本語', id: 'jpn', part1: 'ja', refName: 'Japanese' },
   nl: { nativeName: 'Nederlands', id: 'nld', part1: 'nl', refName: 'Dutch' },
   pt: {
     nativeName: 'Português',
@@ -52,12 +52,14 @@ export const bloggerIcons = {
 export const emailRegexp = /\S+@\S+/; // simple regexp TODO: use another one more robust
 export const PASSWORD_MIN_LENGTH = 12;
 
+const SPECIAL_CHAR_REGEX = /[!@#$%^&*()_+\-=[\]{}|;:'",.<>?/~`]/;
+
 export const checkPasswordRules = password => ({
   minLength: password.length >= PASSWORD_MIN_LENGTH,
   hasUppercase: /[A-Z]/.test(password),
   hasLowercase: /[a-z]/.test(password),
   hasDigit: /[0-9]/.test(password),
-  hasSpecial: /[^A-Za-z0-9]/.test(password)
+  hasSpecial: SPECIAL_CHAR_REGEX.test(password)
 });
 
 export const isPasswordValid = password =>
