@@ -70,7 +70,6 @@ typings/
 *.iml
 
 # AI
-AGENTS.md
 .amazonq
 .kiro
 .claude
