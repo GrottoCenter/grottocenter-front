@@ -41,11 +41,12 @@ jobs:
           echo "|----------|------|------------|" >> $GITHUB_STEP_SUMMARY
           node -e "
             const fs = require('fs');
-            const enKeys = Object.keys(JSON.parse(fs.readFileSync('packages/web-app/public/lang/en.json','utf8')));
+            const load = f => JSON.parse(fs.readFileSync(f,'utf8').replace(/^﻿/,''));
+            const enKeys = Object.keys(load('packages/web-app/public/lang/en.json'));
             const files = fs.readdirSync('packages/web-app/public/lang').filter(f=>f.endsWith('.json')).sort();
             files.forEach(f=>{
               const lang = f.replace('.json','');
-              const keys = Object.keys(JSON.parse(fs.readFileSync('packages/web-app/public/lang/'+f,'utf8')));
+              const keys = Object.keys(load('packages/web-app/public/lang/'+f));
               const pct = ((keys.length/enKeys.length)*100).toFixed(1);
               console.log('| '+lang+' | '+keys.length+' | '+pct+'% |');
             });

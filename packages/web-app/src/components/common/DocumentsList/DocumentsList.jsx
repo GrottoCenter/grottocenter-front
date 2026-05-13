@@ -1,14 +1,9 @@
 import React, { useState, useMemo, useCallback } from 'react';
 import PropTypes from 'prop-types';
-import { List, Typography, Divider, Pagination, Box } from '@mui/material';
-import { styled } from '@mui/material/styles';
+import { List, Typography, Pagination, Box } from '@mui/material';
 import Document from './Document';
 import ImageLightbox from './ImageLightbox';
 import { isImageFile } from './utils/imageUtils';
-
-const DividerStyled = styled(Divider)`
-  background-color: ${props => props.theme.palette.divider};
-`;
 
 const DocumentsList = ({
   documents,
@@ -64,7 +59,6 @@ const DocumentsList = ({
             <Box
               key={document.id}
               sx={{ display: isOnPage ? 'block' : 'none', '@media print': { display: 'block' } }}>
-              <DividerStyled />
               <Document
                 document={document}
                 hasSnapshotButton={hasSnapshotButton}

@@ -87,10 +87,17 @@ export const wikiBatsLinks = generateLinks(
   'https://wiki.grottocenter.org/wiki/GrottoCenter:%s/bats',
   'en'
 );
-export const wikiBBSLinks = generateLinks(
-  'https://wiki.grottocenter.org/wiki/GrottoCenter:%s/bbs',
-  'en'
-);
+export const wikiBBSLinks = {
+  fr: 'https://wiki.grottocenter.org/wiki/GrottoCenter:Fr/bbs',
+  en: 'https://wiki.grottocenter.org/wiki/GrottoCenter:En/bbs',
+  '*': 'https://wiki.grottocenter.org/wiki/GrottoCenter:En/bbs'
+};
+
+export const wikiBBSChaptersLinks = {
+  fr: 'https://wiki.grottocenter.org/wiki/GrottoCenter:Fr/Code_for_chapters',
+  en: 'https://wiki.grottocenter.org/wiki/GrottoCenter:En/Code_for_chapters',
+  '*': 'https://wiki.grottocenter.org/wiki/GrottoCenter:En/Code_for_chapters'
+};
 export const legalLinks = generateLinks(
   'https://wiki.grottocenter.org/wiki/GrottoCenter:%s/Legal_and_Privacy_Statement',
   'en'

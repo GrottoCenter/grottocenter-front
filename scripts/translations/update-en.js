@@ -5,7 +5,7 @@ const glob = require('glob');
 const { decode } = require('html-entities');
 
 // Configuration
-const JSX_FILES_PATTERN = 'packages/web-app/src/**/*.jsx';
+const JSX_FILES_PATTERN = 'packages/web-app/src/**/*.{jsx,js}';
 const EN_JSON_PATH = 'packages/web-app/public/lang/en.json';
 
 // Regular expressions to find translation keys
@@ -95,6 +95,18 @@ function extractKeysFromContent(content) {
     match = INTL_FORMAT_MESSAGE_REGEX.exec(content);
   }
 
+  // Extract from defineMessages({ key: { id: '...' } })
+  for (const blockMatch of content.matchAll(
+    /defineMessages\(\s*\{([\s\S]*?)\}\s*\)/g
+  )) {
+    for (const idMatch of blockMatch[1].matchAll(
+      /id:\s*(['"`])((?:(?!\1)[\s\S])*?)\1/g
+    )) {
+      const key = idMatch[2];
+      if (isValidTranslationKey(key)) keys.add(key);
+    }
+  }
+
   return Array.from(keys);
 }
 
@@ -130,7 +142,9 @@ function extractAllTranslationKeys() {
  */
 function loadExistingTranslations() {
   try {
-    const content = fs.readFileSync(EN_JSON_PATH, 'utf8');
+    const content = fs
+      .readFileSync(EN_JSON_PATH, 'utf8')
+      .replace(/^\uFEFF/, '');
     return JSON.parse(content);
   } catch (error) {
     console.error(`Error reading ${EN_JSON_PATH}:`, error.message);

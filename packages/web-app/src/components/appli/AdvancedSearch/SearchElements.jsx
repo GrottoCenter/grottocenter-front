@@ -706,14 +706,6 @@ SearchFilterAccordion.propTypes = {
 export const SearchActionButtons = ({ onReset }) => (
   <CardActions sx={{ padding: 0, justifyContent: 'flex-end', width: '100%' }}>
     <Button
-      type="submit"
-      variant="contained"
-      size="medium"
-      startIcon={<SearchIcon />}>
-      <Translate>Search</Translate>
-    </Button>
-
-    <Button
       type="button"
       variant="text"
       size="medium"
@@ -722,6 +714,14 @@ export const SearchActionButtons = ({ onReset }) => (
       onClick={() => onReset()}
       sx={{ color: 'text.secondary' }}>
       <Translate>Reset</Translate>
+    </Button>
+
+    <Button
+      type="submit"
+      variant="contained"
+      size="medium"
+      startIcon={<SearchIcon />}>
+      <Translate>Search</Translate>
     </Button>
   </CardActions>
 );

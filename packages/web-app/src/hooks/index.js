@@ -2,7 +2,8 @@ export { useCoordinatePreference, getCRSLabel, WGS84_DD, DMS_CODE } from './useC
 export { default as useProjections } from './useProjections';
 export { useDebounce } from './useDebounce';
 export { useBoolean } from './useBoolean';
-export { useDocumentTypes } from './useDocumentTypes';
+export { documentTypeHelpers } from './documentTypeHelpers';
+export { useAuthNavigate } from './useAuthNavigate';
 export { useFileFormats } from './useFileFormats';
 export { useNotification } from './useNotification';
 export { usePermissions } from './usePermissions';

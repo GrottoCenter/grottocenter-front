@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
-import { Button, Divider, Tooltip } from '@mui/material';
+import { Box, Button, Divider, Tooltip } from '@mui/material';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
+import AddLinkIcon from '@mui/icons-material/AddLink';
 import { useDispatch } from 'react-redux';
-
 import CancelIcon from '@mui/icons-material/Cancel';
 import { styled } from '@mui/material/styles';
 import { linkDocumentToEntrance } from '../../../../actions/LinkDocumentToEntrance';
@@ -12,7 +12,7 @@ import { unlinkDocumentToEntrance } from '../../../../actions/UnlinkDocumentToEn
 import ScrollableContent from '../../../common/Layouts/Fixed/ScrollableContent';
 import SearchDocumentForm from '../../SearchDocumentForm';
 import Alert from '../../../common/Alert';
-import { usePermissions } from '../../../../hooks';
+import { usePermissions, useAuthNavigate } from '../../../../hooks';
 import DocumentsList from '../../../common/DocumentsList/DocumentsList';
 
 const DividerStyled = styled(Divider)`
@@ -21,6 +21,9 @@ const DividerStyled = styled(Divider)`
 const Documents = ({ documents, entranceId, isEditAllowed }) => {
   const { formatMessage } = useIntl();
   const permissions = usePermissions();
+  const navigateToNewDocument = useAuthNavigate(
+    `/ui/entity/add/document?entranceId=${entranceId}`
+  );
   const [isDocumentSearchVisible, setIsDocumentSearchVisible] = useState(false);
   const dispatch = useDispatch();
 
@@ -37,73 +40,87 @@ const Documents = ({ documents, entranceId, isEditAllowed }) => {
   };
 
   return (
-    <ScrollableContent
-      dense
-      collapsible={false}
-      anchorId="documents"
-      title={formatMessage({ id: 'Documents' })}
-      icon={
-        permissions.isAuth &&
-        isEditAllowed && (
-          <Tooltip
-            title={
-              isDocumentSearchVisible
-                ? formatMessage({ id: 'Cancel this search' })
-                : formatMessage({ id: 'Assign an existing document' })
-            }>
-            <Button
-              color={isDocumentSearchVisible ? 'inherit' : 'secondary'}
-              size="small"
-              variant="outlined"
-              onClick={() =>
-                setIsDocumentSearchVisible(!isDocumentSearchVisible)
-              }
-              startIcon={
-                isDocumentSearchVisible ? <CancelIcon /> : <AddCircleIcon />
-              }>
-              {formatMessage({
-                id: isDocumentSearchVisible ? 'Cancel' : 'Add'
-              })}
-            </Button>
-          </Tooltip>
-        )
-      }
-      content={
-        <>
-          {isDocumentSearchVisible && (
-            <>
-              <SearchDocumentForm onSubmit={onSubmitForm} />
-              <DividerStyled />
-            </>
-          )}
-
-          <DocumentsList
-            documents={documents}
-
-            emptyMessageComponent={
-              <Alert
-                severity="info"
-                content={formatMessage({
-                  id: 'There is currently no document for this entrance.'
-                })}
-              />
-            }
-            onUnlink={
-              permissions.isModerator && isEditAllowed
-                ? async document => {
-                    dispatch(
-                      unlinkDocumentToEntrance({
-                        entranceId,
-                        documentId: document.id
-                      })
-                    );
+    <>
+      <ScrollableContent
+        dense
+        collapsible={false}
+        anchorId="documents"
+        title={formatMessage({ id: 'Documents' })}
+        icon={
+          permissions.isAuth &&
+          isEditAllowed && (
+            <Box display="flex" gap={1}>
+              <Tooltip title={formatMessage({ id: 'Create a new document' })}>
+                <Button
+                  color="secondary"
+                  size="small"
+                  variant="outlined"
+                  onClick={navigateToNewDocument}
+                  startIcon={<AddCircleIcon />}>
+                  {formatMessage({ id: 'New' })}
+                </Button>
+              </Tooltip>
+              <Tooltip
+                title={
+                  isDocumentSearchVisible
+                    ? formatMessage({ id: 'Cancel this search' })
+                    : formatMessage({ id: 'Assign an existing document' })
+                }>
+                <Button
+                  color={isDocumentSearchVisible ? 'inherit' : 'secondary'}
+                  size="small"
+                  variant="outlined"
+                  onClick={() =>
+                    setIsDocumentSearchVisible(!isDocumentSearchVisible)
                   }
-                : null
-            }
-          />
-        </>
-      }
-    />
+                  startIcon={
+                    isDocumentSearchVisible ? <CancelIcon /> : <AddLinkIcon />
+                  }>
+                  {formatMessage({
+                    id: isDocumentSearchVisible ? 'Cancel' : 'Associate'
+                  })}
+                </Button>
+              </Tooltip>
+            </Box>
+          )
+        }
+        content={
+          <>
+            {isDocumentSearchVisible && (
+              <>
+                <SearchDocumentForm onSubmit={onSubmitForm} />
+                <DividerStyled />
+              </>
+            )}
+
+            <DocumentsList
+              documents={documents}
+              emptyMessageComponent={
+                <Alert
+                  severity="info"
+                  content={formatMessage({
+                    id: 'There is currently no document for this entrance.'
+                  })}
+                />
+              }
+              onUnlink={
+                permissions.isModerator && isEditAllowed
+                  ? async document => {
+                      dispatch(
+                        unlinkDocumentToEntrance({
+                          entranceId,
+                          documentId: document.id
+                        })
+                      );
+                    }
+                  : null
+              }
+            />
+          </>
+        }
+      />
+
+    </>
   );
 };
 

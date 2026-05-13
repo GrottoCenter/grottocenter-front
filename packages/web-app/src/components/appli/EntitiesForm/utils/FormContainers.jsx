@@ -44,7 +44,13 @@ const Button = styled(MuiButton)`
   margin: ${({ theme }) => theme.spacing(2)};
 `;
 
-export const FormActionRow = ({ isNew, isSubmitting, isCenter = false, onCancel }) => {
+export const FormActionRow = ({
+  isNew,
+  isSubmitting,
+  isCenter = false,
+  disabled = false,
+  onCancel
+}) => {
   const { formatMessage } = useIntl();
   return (
     <Box
@@ -52,18 +58,19 @@ export const FormActionRow = ({ isNew, isSubmitting, isCenter = false, onCancel 
         display: 'flex',
         justifyContent: isCenter ? 'center' : 'flex-end'
       }}>
-      <ActionButton
-        label={formatMessage({ id: isNew ? 'Create' : 'Update' })}
-        loading={isSubmitting}
-        color="primary"
-        style={{ margin: '8px' }}
-        type="submit"
-      />
       {onCancel && (
         <Button variant="outlined" onClick={onCancel}>
           {formatMessage({ id: 'Cancel' })}
         </Button>
       )}
+      <ActionButton
+        label={formatMessage({ id: isNew ? 'Create' : 'Update' })}
+        loading={isSubmitting}
+        disabled={disabled}
+        color="primary"
+        style={{ margin: '8px' }}
+        type="submit"
+      />
     </Box>
   );
 };
@@ -71,5 +78,6 @@ FormActionRow.propTypes = {
   isNew: PropTypes.bool.isRequired,
   isSubmitting: PropTypes.bool.isRequired,
   isCenter: PropTypes.bool,
+  disabled: PropTypes.bool,
   onCancel: PropTypes.func
 };

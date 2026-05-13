@@ -12,7 +12,8 @@ const sortComparator = (a, b) =>
   a.toLowerCase().localeCompare(b.toLowerCase()) || a.localeCompare(b);
 
 function sortFile(filePath) {
-  const data = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+  const raw = fs.readFileSync(filePath, 'utf8').replace(/^\uFEFF/, '');
+  const data = JSON.parse(raw);
   const sortedKeys = Object.keys(data).sort(sortComparator);
 
   const sortedData = {};
@@ -21,7 +22,7 @@ function sortFile(filePath) {
   });
 
   const sortedContent = `${JSON.stringify(sortedData, null, 2)}\n`;
-  const currentContent = fs.readFileSync(filePath, 'utf8');
+  const currentContent = raw;
 
   if (currentContent === sortedContent) {
     return true; // already sorted

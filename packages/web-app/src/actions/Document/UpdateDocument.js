@@ -33,9 +33,8 @@ const updateDocumentFailure = (errorMessages, httpCode) => ({
 export function updateDocument(docAttributes) {
   return (dispatch, getState) => {
     dispatch(updateDocumentAction());
-    const attributes = { ...docAttributes };
-    const { files } = attributes;
-    delete attributes.files;
+    const { files, selectOptionAuthorizationDocument, ...rest } = docAttributes;
+    const attributes = { ...rest, option: selectOptionAuthorizationDocument };
 
     const formData = new FormData();
     buildFormData(formData, attributes);
@@ -68,19 +67,15 @@ export function updateDocument(docAttributes) {
       headers: getState().login.authorizationHeader
     };
 
-    return fetch(putDocumentUrl(docAttributes.id), requestOptions).then(
-      response =>
+    return fetch(putDocumentUrl(docAttributes.id), requestOptions)
+      .then(checkAuthStatus(dispatch))
+      .then(response =>
         response.text().then(responseText => {
           if (response.status >= 400) {
             const errorMessages = [];
             switch (response.status) {
               case 400:
                 errorMessages.push(`Bad request: ${responseText}`);
-                break;
-              case 401:
-                errorMessages.push(
-                  'You must be authenticated to update a document.'
-                );
                 break;
               case 403:
                 errorMessages.push(
@@ -102,15 +97,16 @@ export function updateDocument(docAttributes) {
             }
             dispatch(updateDocumentFailure(errorMessages, response.status));
             throw new Error(
-              `Fetching ${putDocumentUrl} status: ${response.status}`,
-              errorMessages
+              `Fetching ${putDocumentUrl} status: ${response.status}`
             );
-          } else {
-            dispatch(updateDocumentSuccess(response.status));
           }
+          dispatch(updateDocumentSuccess(response.status));
           return response;
         })
-    );
+      )
+      .catch(err => {
+        if (err.isAuthError) return;
+      });
   };
 }
 

@@ -8,7 +8,8 @@ import { RESET_DOCUMENT_API_ERRORS } from '../actions/Document/ResetApiErrors';
 const initialState = {
   errorMessages: [],
   isLoading: false,
-  latestHttpCode: undefined
+  latestHttpCode: undefined,
+  createdDocument: undefined
 };
 
 const reducer = (state = initialState, action) => {
@@ -18,14 +19,16 @@ const reducer = (state = initialState, action) => {
         ...state,
         isLoading: true,
         errorMessages: [],
-        latestHttpCode: undefined
+        latestHttpCode: undefined,
+        createdDocument: undefined
       };
     case POST_DOCUMENT_SUCCESS:
       return {
         ...state,
         isLoading: false,
         errorMessages: [],
-        latestHttpCode: action.httpCode
+        latestHttpCode: action.httpCode,
+        createdDocument: action.document
       };
     case POST_DOCUMENT_FAILURE:
       return {

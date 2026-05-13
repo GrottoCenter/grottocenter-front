@@ -1,10 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {
+  Box,
   FilledInput,
   FormControl,
-  FormHelperText,
-  InputLabel
+  InputLabel,
+  Typography
 } from '@mui/material';
 
 const StringInput = ({
@@ -25,25 +26,31 @@ const StringInput = ({
   };
 
   return (
-    <FormControl
-      variant="filled"
-      fullWidth={fullWidth}
-      required={required}
-      error={(required && value === '') || hasError}>
-      <InputLabel>{valueName}</InputLabel>
-      <FilledInput
-        endAdornment={endAdornment}
-        multiline={multiline}
-        name={valueName}
-        onChange={handleValueChange}
+    <Box sx={{ display: 'flex', flexDirection: 'column', width: fullWidth ? '100%' : undefined }}>
+      {helperText && (
+        <Typography variant="caption" color="text.secondary" sx={{ mb: 0.5 }}>
+          {helperText}
+        </Typography>
+      )}
+      <FormControl
+        variant="filled"
+        fullWidth={fullWidth}
         required={required}
-        type={type}
-        value={value}
-        error={(required && value === '') || hasError}
-        {...props}
-      />
-      {helperText && <FormHelperText>{helperText}</FormHelperText>}
-    </FormControl>
+        error={hasError}>
+        <InputLabel>{valueName}</InputLabel>
+        <FilledInput
+          endAdornment={endAdornment}
+          multiline={multiline}
+          name={valueName}
+          onChange={handleValueChange}
+          required={required}
+          type={type}
+          value={value}
+          error={hasError}
+          {...props}
+        />
+      </FormControl>
+    </Box>
   );
 };
 
