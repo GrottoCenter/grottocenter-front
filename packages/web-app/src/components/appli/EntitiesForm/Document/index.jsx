@@ -22,7 +22,7 @@ import DocumentFormProvider, {
 } from './Provider';
 import { defaultDocumentValuesTypes } from './types';
 import FromContent from './FormContent';
-import CreatingDocumentDialog from './CreatingDocumentDialog';
+import DocumentSubmissionDialog from './DocumentSubmissionDialog';
 import Translate from '../../../common/Translate';
 
 const SpacedButton = styled(Button)`
@@ -63,7 +63,9 @@ const DocumentSubmission = () => {
   const [isDocSubmitted, setDocSubmitted] = useState(false);
   const hasLinked = useRef(false);
 
-  const documentState = useSelector(state => state.createDocument);
+  const createDocumentState = useSelector(state => state.createDocument);
+  const updateDocumentState = useSelector(state => state.updateDocument);
+  const documentState = isNewDocument ? createDocumentState : updateDocumentState;
   const entranceState = useSelector(state => state.entrance);
 
   const entranceIdParam = searchParams.get('entranceId')
@@ -218,7 +220,7 @@ const DocumentSubmission = () => {
       )}
       {permissions.isAuth && !isDocSubmittedWithSuccess && (
         <>
-          <CreatingDocumentDialog isLoading={documentState.isLoading} />
+          <DocumentSubmissionDialog isLoading={documentState.isLoading} isNewDocument={isNewDocument} />
           <form
             onSubmit={onFormSubmit}
             style={{ marginTop: '16px', ...(documentState.isLoading ? { opacity: '0.6' } : {}) }}>

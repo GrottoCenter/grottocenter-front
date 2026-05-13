@@ -11,12 +11,14 @@ import {
 
 import Alert from '../../../common/Alert';
 
-const CreatingDocumentDialog = ({ isLoading }) => {
+const DocumentSubmissionDialog = ({ isLoading, isNewDocument }) => {
   const { formatMessage } = useIntl();
   return (
     <Dialog aria-labelledby="doc-submission-modal" open={isLoading}>
       <DialogTitle id="doc-submission-modal-title">
-        {formatMessage({ id: 'Creating document...' })}
+        {formatMessage({
+          id: isNewDocument ? 'Creating document...' : 'Updating document...'
+        })}
         &nbsp;
         <CircularProgress size={20} />
       </DialogTitle>
@@ -25,7 +27,9 @@ const CreatingDocumentDialog = ({ isLoading }) => {
           <Alert
             severity="warning"
             title={formatMessage({
-              id: "Don't leave this page while the document is being created."
+              id: isNewDocument
+                ? "Don't leave this page while the document is being created."
+                : "Don't leave this page while the document is being updated."
             })}
           />
         </Box>
@@ -34,8 +38,9 @@ const CreatingDocumentDialog = ({ isLoading }) => {
   );
 };
 
-CreatingDocumentDialog.propTypes = {
-  isLoading: PropTypes.bool.isRequired
+DocumentSubmissionDialog.propTypes = {
+  isLoading: PropTypes.bool.isRequired,
+  isNewDocument: PropTypes.bool.isRequired
 };
 
-export default CreatingDocumentDialog;
+export default DocumentSubmissionDialog;
