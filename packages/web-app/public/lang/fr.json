@@ -1,4 +1,4 @@
-﻿{
+{
   "1": "KARSTOLOGIE ET GÉOSPÉLÉOLOGIE",
   "2": "SPÉLÉOLOGIE ET KARSTOLOGIE RÉGIONALES",
   "3": "BIOSPÉLÉOLOGIE",
@@ -774,6 +774,7 @@
   "Dominican Republic": "République Dominicaine",
   "Don't leave it too late though, this link is only available for 24 hours.": "N'attendez pas trop cependant, ce lien n'est valide que 24 heures.",
   "Don't leave this page while the document is being created.": "Ne quittez pas cette page tant que les documents ne sont pas créés.",
+  "Don't leave this page while the document is being updated.": "Ne quittez pas cette page pendant la mise à jour du document.",
   "Donate now": "Faire un don maintenant",
   "download": "téléchargement",
   "Download": "Télécharger",
@@ -1997,6 +1998,7 @@
   "Updated": "Modifié",
   "Updated by": "Mis à jour par",
   "Updating cave...": "Mise à jour de la cavité...",
+  "Updating document...": "Mise à jour du document...",
   "Updating entrance...": "Mise à jour de l'entrée...",
   "Updating massif...": "Mise à jour du massif...",
   "Updating network...": "Mise à jour du réseau...",
