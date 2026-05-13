@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { Controller, useForm } from 'react-hook-form';
+import { Controller, useForm, useWatch } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { useIntl } from 'react-intl';
 
@@ -12,8 +12,12 @@ import {
   CircularProgress,
   Collapse,
   Divider,
+  FormControl,
   FormControlLabel,
+  InputLabel,
+  MenuItem,
   Paper,
+  Select,
   Skeleton,
   Switch,
   Tooltip,
@@ -22,7 +26,6 @@ import {
 import AccountBoxIcon from '@mui/icons-material/AccountBox';
 import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
 import CancelIcon from '@mui/icons-material/Cancel';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import EditIcon from '@mui/icons-material/Edit';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
@@ -35,13 +38,13 @@ import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import TuneIcon from '@mui/icons-material/Tune';
 import { styled } from '@mui/material/styles';
 
-import { loadLanguages } from '../../actions/Language';
 import { fetchAccount } from '../../actions/Account/GetAccount';
 import { updateAccount } from '../../actions/Account/UpdateAccount';
 import { fetchPerson } from '../../actions/Person/GetPerson';
 import { joinOrganization } from '../../actions/Organization/JoinOrganization';
 import { leaveOrganization } from '../../actions/Organization/LeaveOrganization';
 import Alert from '../../components/common/Alert';
+import BoolIcon from '../../components/common/Form/BoolIcon';
 
 import DocumentsList from '../../components/common/DocumentsList/DocumentsList';
 import EntitiesList from '../../components/common/entitiesList/EntitiesList';
@@ -52,13 +55,17 @@ import RelatedCaves from '../../components/common/RelatedCaves/RelatedCaves';
 import StandardDialog from '../../components/common/StandardDialog';
 import InputText from '../../components/appli/EntitiesForm/utils/InputText';
 import InputPassword from '../../components/appli/EntitiesForm/utils/InputPassword';
-import InputLanguage from '../../components/appli/EntitiesForm/utils/InputLanguage';
 import { FormRow } from '../../components/appli/EntitiesForm/utils/FormContainers';
+import PasswordRules from '../../components/common/Form/PasswordRules';
 import SearchOrganizationForm from '../../components/appli/Form/SearchOrganizationForm';
 import Translate from '../../components/common/Translate';
 import { useUserProperties } from '../../hooks';
 import useOpenLink from '../../hooks/useOpenLink';
-import { PASSWORD_MIN_LENGTH } from '../../conf/config';
+import { AVAILABLE_LANGUAGES, isPasswordValid } from '../../conf/config';
+import {
+  languageIdToLocale,
+  localeToLanguageId
+} from '../../utils/languageMapping';
 
 // ─── Shared styled components ─────────────────────────────────────────────────
 
@@ -95,6 +102,7 @@ const InfoRow = styled(Box)(({ theme }) => ({
 
 const InfoLabel = styled(Typography)(({ theme }) => ({
   minWidth: 160,
+  [theme.breakpoints.down('sm')]: { minWidth: 100 },
   color: theme.palette.text.secondary,
   flexShrink: 0
 }));
@@ -154,18 +162,13 @@ SettingSection.propTypes = {
 
 // ─── Save/cancel footer used in edit forms ────────────────────────────────────
 
-const BoolValue = ({ value }) =>
-  value ? (
-    <CheckCircleIcon fontSize="small" sx={{ color: 'success.main', ml: 1 }} />
-  ) : (
-    <CancelIcon fontSize="small" sx={{ color: 'text.disabled', ml: 1 }} />
-  );
+const BoolValue = ({ value }) => <BoolIcon value={value} sx={{ ml: 1 }} />;
 
 BoolValue.propTypes = {
   value: PropTypes.bool.isRequired
 };
 
-const EditActions = ({ isLoading, onCancel }) => (
+const EditActions = ({ isLoading, isDisabled = false, onCancel }) => (
   <EditFooter>
     <Button variant="outlined" onClick={onCancel} disabled={isLoading}>
       <Translate>Cancel</Translate>
@@ -174,7 +177,7 @@ const EditActions = ({ isLoading, onCancel }) => (
       type="submit"
       variant="contained"
       color="primary"
-      disabled={isLoading}
+      disabled={isLoading || isDisabled}
       startIcon={
         isLoading ? <CircularProgress size={16} color="inherit" /> : null
       }>
@@ -184,6 +187,7 @@ const EditActions = ({ isLoading, onCancel }) => (
 );
 
 EditActions.propTypes = {
+  isDisabled: PropTypes.bool,
   isLoading: PropTypes.bool.isRequired,
   onCancel: PropTypes.func.isRequired
 };
@@ -292,6 +296,9 @@ const PersonalInfoSection = ({ account, onSaved }) => {
 
   const editContent = (
     <form onSubmit={handleSubmit(onSubmit)} autoComplete="off">
+      <Typography variant="caption" color="text.secondary">
+        <Translate>The nickname defines how other users see you.</Translate>
+      </Typography>
       <FormRow>
         <InputText
           formKey="nickname"
@@ -346,7 +353,7 @@ const accountShape = PropTypes.shape({
   surname: PropTypes.string,
   mail: PropTypes.string,
   mailIsValid: PropTypes.bool,
-  language: PropTypes.number,
+  language: PropTypes.string,
   sendNotificationByEmail: PropTypes.bool
 });
 
@@ -379,8 +386,16 @@ const EmailSecuritySection = ({ account, onSaved }) => {
     handleSubmit: handlePasswordSubmit,
     reset: resetPassword,
     getValues: getPasswordValues,
-    formState: { errors: passwordErrors }
-  } = useForm({ defaultValues: { password: '', passwordConfirmation: '' } });
+    formState: { errors: passwordErrors, isValid: isPasswordFormValid }
+  } = useForm({
+    defaultValues: { currentPassword: '', password: '', passwordConfirmation: '' },
+    mode: 'onChange'
+  });
+
+  const watchedPassword = useWatch({
+    control: passwordControl,
+    name: 'password'
+  });
 
   useEffect(() => {
     if (account) resetEmail({ email: account.mail ?? '' });
@@ -411,7 +426,7 @@ const EmailSecuritySection = ({ account, onSaved }) => {
   };
 
   const handleCancelPassword = () => {
-    resetPassword({ password: '', passwordConfirmation: '' });
+    resetPassword({ currentPassword: '', password: '', passwordConfirmation: '' });
     setIsChangingPassword(false);
     setPasswordError(null);
   };
@@ -420,9 +435,14 @@ const EmailSecuritySection = ({ account, onSaved }) => {
     setIsPasswordLoading(true);
     setPasswordError(null);
     try {
-      await dispatch(updateAccount({ password: data.password }));
+      await dispatch(
+        updateAccount({
+          currentPassword: data.currentPassword,
+          password: data.password
+        })
+      );
       setIsChangingPassword(false);
-      resetPassword({ password: '', passwordConfirmation: '' });
+      resetPassword({ currentPassword: '', password: '', passwordConfirmation: '' });
     } catch {
       setPasswordError(true);
     } finally {
@@ -445,21 +465,18 @@ const EmailSecuritySection = ({ account, onSaved }) => {
           (account.mailIsValid ? (
             <Chip
               size="small"
+              variant="outlined"
+              color="success"
               icon={<CheckCircleOutlineIcon />}
               label={formatMessage({ id: 'Email verified' })}
-              color="success"
-              variant="outlined"
             />
           ) : (
             <Chip
               size="small"
+              variant="outlined"
+              color="error"
               icon={<ErrorOutlineIcon />}
               label={formatMessage({ id: 'Email not verified' })}
-              sx={{
-                bgcolor: 'error.main',
-                color: '#fff',
-                '& .MuiChip-icon': { color: '#fff' }
-              }}
             />
           ))}
       </Box>
@@ -525,7 +542,7 @@ const EmailSecuritySection = ({ account, onSaved }) => {
               </Typography>
               <Button
                 size="small"
-                variant="text"
+                variant="outlined"
                 onClick={() => setIsChangingPassword(true)}>
                 <Translate>Change password</Translate>
               </Button>
@@ -538,6 +555,18 @@ const EmailSecuritySection = ({ account, onSaved }) => {
             autoComplete="new-password">
             <FormRow>
               <InputPassword
+                formKey="currentPassword"
+                labelName="Current password"
+                isPasswordVisible={isPasswordVisible}
+                onShowPassword={() => setIsPasswordVisible(v => !v)}
+                control={passwordControl}
+                isError={!!passwordErrors.currentPassword}
+                isRequired
+                helperText={passwordErrors.currentPassword?.message}
+              />
+            </FormRow>
+            <FormRow>
+              <InputPassword
                 formKey="password"
                 labelName="New password"
                 isPasswordVisible={isPasswordVisible}
@@ -546,8 +575,8 @@ const EmailSecuritySection = ({ account, onSaved }) => {
                 isError={!!passwordErrors.password}
                 isRequired
                 validatorFn={(value, msg) => {
-                  if (value && value.length < PASSWORD_MIN_LENGTH)
-                    return msg({ id: 'Password too short.' });
+                  if (!isPasswordValid(value ?? ''))
+                    return msg({ id: 'password.rules.error' });
                   return true;
                 }}
                 helperText={passwordErrors.password?.message}
@@ -568,6 +597,7 @@ const EmailSecuritySection = ({ account, onSaved }) => {
                 helperText={passwordErrors.passwordConfirmation?.message}
               />
             </FormRow>
+            <PasswordRules password={watchedPassword ?? ''} />
             {passwordError && (
               <Alert
                 severity="error"
@@ -578,6 +608,7 @@ const EmailSecuritySection = ({ account, onSaved }) => {
             )}
             <EditActions
               isLoading={isPasswordLoading}
+              isDisabled={!isPasswordFormValid}
               onCancel={handleCancelPassword}
             />
           </form>
@@ -597,10 +628,11 @@ EmailSecuritySection.propTypes = {
 const PreferencesSection = ({ account, onSaved }) => {
   const dispatch = useDispatch();
   const { formatMessage } = useIntl();
-  const { languages, isLoaded: languagesLoaded } = useSelector(state => state.language);
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [saveError, setSaveError] = useState(null);
+
+  const currentLocale = languageIdToLocale(account?.language) ?? '';
 
   const {
     control,
@@ -609,19 +641,15 @@ const PreferencesSection = ({ account, onSaved }) => {
     formState: { errors }
   } = useForm({
     defaultValues: {
-      language: account?.language ?? -1,
+      language: currentLocale,
       sendNotificationByEmail: account?.sendNotificationByEmail ?? false
     }
   });
 
   useEffect(() => {
-    if (!languagesLoaded) dispatch(loadLanguages(true));
-  }, [dispatch, languagesLoaded]);
-
-  useEffect(() => {
     if (account) {
       reset({
-        language: account.language ?? -1,
+        language: languageIdToLocale(account.language) ?? '',
         sendNotificationByEmail: account.sendNotificationByEmail ?? false
       });
     }
@@ -634,7 +662,7 @@ const PreferencesSection = ({ account, onSaved }) => {
   const handleCancel = () => {
     if (account)
       reset({
-        language: account.language ?? -1,
+        language: languageIdToLocale(account.language) ?? '',
         sendNotificationByEmail: account.sendNotificationByEmail ?? false
       });
     setIsEditing(false);
@@ -647,7 +675,7 @@ const PreferencesSection = ({ account, onSaved }) => {
     try {
       await dispatch(
         updateAccount({
-          language: data.language,
+          language: localeToLanguageId(data.language),
           sendNotificationByEmail: data.sendNotificationByEmail
         })
       );
@@ -660,18 +688,17 @@ const PreferencesSection = ({ account, onSaved }) => {
     }
   };
 
-  const languageName =
-    languages?.find(l => l.id === account?.language)?.refName ?? '—';
+  const nativeName =
+    AVAILABLE_LANGUAGES[languageIdToLocale(account?.language)]?.nativeName ??
+    '—';
 
   const viewContent = (
     <>
       <InfoRow>
         <InfoLabel variant="body2">
-          {formatMessage({ id: 'Preferred contact language' })}
+          {formatMessage({ id: 'Language' })}
         </InfoLabel>
-        <Typography variant="body1">
-          {languageName === '—' ? '—' : <Translate>{languageName}</Translate>}
-        </Typography>
+        <Typography variant="body1">{nativeName}</Typography>
       </InfoRow>
       <InfoRow>
         <InfoLabel variant="body2">
@@ -685,12 +712,26 @@ const PreferencesSection = ({ account, onSaved }) => {
   const editContent = (
     <form onSubmit={handleSubmit(onSubmit)}>
       <FormRow>
-        <InputLanguage
-          formKey="language"
+        <Controller
+          name="language"
           control={control}
-          isError={!!errors.language}
-          label="Preferred contact language"
-          fullWidth
+          rules={{ required: true }}
+          render={({ field }) => (
+            <FormControl variant="standard" fullWidth error={!!errors.language}>
+              <InputLabel shrink>
+                <Translate>Language</Translate>
+              </InputLabel>
+              <Select {...field}>
+                {Object.entries(AVAILABLE_LANGUAGES).map(
+                  ([locale, { nativeName: name }]) => (
+                    <MenuItem key={locale} value={locale}>
+                      {name}
+                    </MenuItem>
+                  )
+                )}
+              </Select>
+            </FormControl>
+          )}
         />
       </FormRow>
       <Box sx={{ mt: 2 }}>
@@ -766,9 +807,7 @@ const AccountPage = () => {
     if (userId) dispatch(fetchPerson(userId));
   }, [dispatch, userId]);
 
-  const handleSaved = useCallback(() => {
-    dispatch(fetchAccount());
-  }, [dispatch]);
+  const handleSaved = useCallback(() => {}, []);
 
   const handleRefreshPerson = useCallback(() => {
     if (userId) dispatch(fetchPerson(userId));
@@ -974,7 +1013,7 @@ const AccountPage = () => {
                         isCaveSearchVisible ? (
                           <CancelIcon />
                         ) : (
-                          <CheckCircleIcon />
+                          <CheckCircleOutlineIcon />
                         )
                       }>
                       {formatMessage({

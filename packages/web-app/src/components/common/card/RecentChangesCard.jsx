@@ -78,10 +78,7 @@ const ChangeItem = ({ changeInfo }) => {
   const { formatMessage } = useIntl();
 
   const dateEl = (
-    <Chip
-      color="primary"
-      label={timeDiff(changeInfo.date, formatMessage)}
-    />
+    <Chip color="secondary" label={timeDiff(changeInfo.date, formatMessage)} />
   );
   const authorEl = (
     <GCLinkStyled href={`/ui/persons/${changeInfo.authorId}`} internal>

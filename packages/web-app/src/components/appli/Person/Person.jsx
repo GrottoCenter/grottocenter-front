@@ -1,11 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
-import {
-  Card,
-  Chip,
-  Skeleton
-} from '@mui/material';
+import { Card, Chip, Skeleton } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import CreateIcon from '@mui/icons-material/Create';
@@ -52,7 +48,8 @@ const Person = ({
   const navigate = useNavigate();
   const { formatMessage } = useIntl();
   const permissions = usePermissions();
-  const [isDeleteConfirmationOpen, setIsDeleteConfirmationOpen] = useState(false);
+  const [isDeleteConfirmationOpen, setIsDeleteConfirmationOpen] =
+    useState(false);
   const handleShare = useSharePage();
 
   const userId = useUserProperties()?.id ?? null;
@@ -79,20 +76,22 @@ const Person = ({
 
   let title = '';
   if (person) {
-    title = person.name && person.surname
-      ? `${person.name} ${person.surname}`
-      : person.nickname ?? '';
+    title =
+      person.name && person.surname
+        ? `${person.name} ${person.surname}`
+        : (person.nickname ?? '');
   }
 
   const titleAdornment = canEdit && (
     <Chip
       label={formatMessage({ id: 'You' }).toUpperCase()}
+      color="secondary"
       sx={{
         ml: 3,
         fontSize: '1.4rem',
         letterSpacing: 1.5,
         verticalAlign: 'middle',
-        bgcolor: 'secondary.main',
+        color: '#fff',
         fontWeight: 700
       }}
     />

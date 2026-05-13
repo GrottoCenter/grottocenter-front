@@ -1,3 +1,5 @@
+import isEmail from 'validator/lib/isEmail';
+
 export const AVAILABLE_LANGUAGES = {
   ar: { nativeName: 'عربية', id: 'ara', part1: 'ar', refName: 'Arabic', direction: 'rtl' },
   bg: { nativeName: 'Български', id: 'bul', part1: 'bg', refName: 'Bulgarian' },
@@ -20,7 +22,7 @@ export const AVAILABLE_LANGUAGES = {
     refName: 'Indonesian'
   },
   it: { nativeName: 'Italiano', id: 'ita', part1: 'it', refName: 'Italian' },
-  ja: { nativeName: '日本語', id: 'jpn', part1: 'ja', refName: 'Japanse' },
+  ja: { nativeName: '日本語', id: 'jpn', part1: 'ja', refName: 'Japanese' },
   nl: { nativeName: 'Nederlands', id: 'nld', part1: 'nl', refName: 'Dutch' },
   pt: {
     nativeName: 'Português',
@@ -49,8 +51,21 @@ export const bloggerIcons = {
 };
 
 // ===== Misc config values
-export const emailRegexp = /\S+@\S+/; // simple regexp TODO: use another one more robust
-export const PASSWORD_MIN_LENGTH = 8;
+export const isValidEmail = email => isEmail(email ?? '');
+export const PASSWORD_MIN_LENGTH = 12;
+
+const SPECIAL_CHAR_REGEX = /[!@#$%^&*()_+\-=[\]{}|;:'",.<>?/~`]/;
+
+export const checkPasswordRules = password => ({
+  minLength: password.length >= PASSWORD_MIN_LENGTH,
+  hasUppercase: /[A-Z]/.test(password),
+  hasLowercase: /[a-z]/.test(password),
+  hasDigit: /[0-9]/.test(password),
+  hasSpecial: SPECIAL_CHAR_REGEX.test(password)
+});
+
+export const isPasswordValid = password =>
+  Object.values(checkPasswordRules(password)).every(Boolean);
 
 export const DYNAMIC_NUMBER_RELOAD_INTERVAL = 900000;
 export const DYNAMIC_NEWS_RELOAD_INTERVAL = 3600000;

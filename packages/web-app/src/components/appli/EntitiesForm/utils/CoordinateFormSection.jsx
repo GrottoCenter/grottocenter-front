@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useRef,
+  useMemo
+} from 'react';
 import { useController, useWatch } from 'react-hook-form';
 import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
@@ -28,7 +34,6 @@ import {
 import InputCoordinate from './InputCoordinate';
 import MapMarkerSelector from './MapMarkerSelector';
 import CRSMenu from '../../../common/CRSMenu';
-
 
 const toFloat = v => {
   if (typeof v === 'number') return v;

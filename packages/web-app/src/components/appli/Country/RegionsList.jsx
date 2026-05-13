@@ -130,8 +130,8 @@ const RegionsList = ({ countryId }) => {
               }}>
               <Chip
                 label={region.iso.split('-')[1]}
+                color="primary"
                 size="small"
-                variant="outlined"
                 sx={{ mr: 1, flexShrink: 0 }}
               />
               <Typography variant="body1">{region.name}</Typography>

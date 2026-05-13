@@ -15,7 +15,7 @@ const fetchChangePasswordFailure = error => ({
   error
 });
 
-export function postChangePassword(password, resetPasswordToken) {
+export function postChangePassword(password, resetPasswordToken, currentPassword) {
   return (dispatch, getState) => {
     dispatch(fetchChangePassword());
 
@@ -30,8 +30,11 @@ export function postChangePassword(password, resetPasswordToken) {
     } else {
       requestOptions = {
         method: 'PATCH',
-        body: JSON.stringify({ password }),
-        headers: getState().login.authorizationHeader
+        body: JSON.stringify({ password, currentPassword }),
+        headers: {
+          ...getState().login.authorizationHeader,
+          'Content-Type': 'application/json'
+        }
       };
       statusChecker = checkAuthStatus(dispatch);
     }

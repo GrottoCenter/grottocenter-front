@@ -1,6 +1,7 @@
 import fetch from 'isomorphic-fetch';
 import { accountUrl } from '../../conf/apiRoutes';
 import { checkAuthStatus } from '../utils';
+import { fetchAccount } from './GetAccount';
 
 export const UPDATE_ACCOUNT = 'UPDATE_ACCOUNT';
 export const UPDATE_ACCOUNT_SUCCESS = 'UPDATE_ACCOUNT_SUCCESS';
@@ -25,6 +26,7 @@ export const updateAccount = fields => (dispatch, getState) => {
   return fetch(accountUrl, requestOptions)
     .then(checkAuthStatus(dispatch))
     .then(() => dispatch(updateAccountSuccess()))
+    .then(() => dispatch(fetchAccount()))
     .catch(error => {
       if (error.isAuthError) return;
       dispatch(updateAccountFailure(error));

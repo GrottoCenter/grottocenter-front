@@ -37,9 +37,13 @@ import {
 
 const GROTTOCENTER_LINK_ZOOM = 16;
 
+// Precision is expressed in meters (lower = more accurate).
+// error   : unknown (null/undefined), invalid (0), or imprecise (>= 100 m)
+// warning : acceptable precision (99 m)
+// success : good precision (< 20 m)
 const computePrecisionSeverity = precision => {
-  if (precision === undefined || precision === null) return 'warning';
-  if (precision === 0) return 'error';
+  if (precision == null || precision === 0 || precision >= 100) return 'error';
+  if (precision >= 20) return 'warning';
   return 'success';
 };
 
@@ -101,8 +105,11 @@ const CoordinateDisplay = ({
       'noopener,noreferrer'
     );
   const openGrottoMap = () => {
-    const popup = entityType && entityId ? `?entity=${entityType}:${entityId}` : '';
-    openLink(`/ui/map/${latitude},${longitude},${GROTTOCENTER_LINK_ZOOM}${popup}`);
+    const popup =
+      entityType && entityId ? `?entity=${entityType}:${entityId}` : '';
+    openLink(
+      `/ui/map/${latitude},${longitude},${GROTTOCENTER_LINK_ZOOM}${popup}`
+    );
   };
 
   const precisionSeverity = computePrecisionSeverity(precision);
@@ -152,7 +159,12 @@ const CoordinateDisplay = ({
     <Box display="flex" alignItems="center" flexWrap="wrap" gap={1}>
       <Typography variant="body1">{displayValue}</Typography>
       {precisionText && (
-        <Chip label={precisionText} size="small" color={precisionSeverity} />
+        <Chip
+          label={precisionText}
+          size="small"
+          color={precisionSeverity}
+          variant="outlined"
+        />
       )}
       <Tooltip title={formatMessage({ id: 'Copy coordinates' })}>
         <IconButton

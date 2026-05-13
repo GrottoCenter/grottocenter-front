@@ -47,8 +47,6 @@ const CountBadge = ({ count }) => (
     size="small"
     sx={{
       ml: 1,
-      bgcolor: 'grey.200',
-      color: 'text.secondary',
       fontWeight: 600,
       verticalAlign: 'middle'
     }}
