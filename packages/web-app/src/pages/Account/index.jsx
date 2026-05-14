@@ -439,6 +439,14 @@ const EmailSecuritySection = ({ account, onSaved }) => {
     setPasswordError(null);
   };
 
+  const resolvePasswordError = error => {
+    if (error?.status === 403)
+      return formatMessage({ id: 'Current password is incorrect.' });
+    if (error?.status === 400 && error?.body?.message)
+      return error.body.message;
+    return formatMessage({ id: 'An error occurred. Please try again.' });
+  };
+
   const onPasswordSubmit = async data => {
     setIsPasswordLoading(true);
     setPasswordError(null);
@@ -456,12 +464,7 @@ const EmailSecuritySection = ({ account, onSaved }) => {
         passwordConfirmation: ''
       });
     } catch (error) {
-      if (error?.status === 403)
-        setPasswordError(formatMessage({ id: 'Current password is incorrect.' }));
-      else if (error?.status === 400 && error?.message)
-        setPasswordError(error.message);
-      else
-        setPasswordError(formatMessage({ id: 'An error occurred. Please try again.' }));
+      setPasswordError(resolvePasswordError(error));
     } finally {
       setIsPasswordLoading(false);
     }
