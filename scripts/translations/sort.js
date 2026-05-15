@@ -33,7 +33,7 @@ function sortFile(filePath) {
     return false;
   }
 
-  fs.writeFileSync(filePath, sortedContent);
+  fs.writeFileSync(filePath, sortedContent, 'utf8');
   console.log(`Sorted: ${filePath}`);
   return true;
 }
