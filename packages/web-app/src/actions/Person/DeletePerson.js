@@ -12,7 +12,7 @@ const deletePersonSuccess = () => ({ type: DELETE_PERSON_PERMANENT_SUCCESS });
 const deletePersonFailure = error => ({ type: DELETE_PERSON_FAILURE, error });
 
 export const deletePerson =
-  ({ id, isPermanent }) =>
+  ({ id, entityId, isPermanent }) =>
   (dispatch, getState) => {
     dispatch(deletePersonAction());
 
@@ -21,7 +21,7 @@ export const deletePerson =
       headers: getState().login.authorizationHeader
     };
 
-    return fetch(deletePersonUrl(id, isPermanent), requestOptions)
+    return fetch(deletePersonUrl(id, entityId), requestOptions)
       .then(checkAuthStatus(dispatch))
       .then(response => response.json())
       .then(data => dispatch(deletePersonSuccess(data, isPermanent)))
