@@ -4,8 +4,7 @@ import { Chip, Tooltip } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { useIntl } from 'react-intl';
 import { useDispatch } from 'react-redux';
-import NotificationsIcon from '@mui/icons-material/Notifications';
-import fadeOut from '../../../util/fadeOut';
+import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
 import { unsubscribeFromMassif } from '../../../actions/Subscriptions/UnsubscribeFromMassif';
 import { MassifSimpleTypes } from '../../../types/massif.type';
 import countryType from '../../../types/country.type';
@@ -28,17 +27,14 @@ const SubscriptionItem = ({ canUnsubscribe, subscription, type, userId }) => {
         })()
       : `/ui/countries/${subscription.id}`;
 
-  const handleUnsubscribe = event => {
-    const unsubscribe = () => {
-      if (type === 'MASSIF') dispatch(unsubscribeFromMassif(subscription.id, userId));
-      if (type === 'COUNTRY') dispatch(unsubscribeFromCountry(subscription.id, userId));
-      if (type === 'REGION') {
-        // Parse region ID to extract country and region parts (format: "US-AL")
-        const [countryId, regionId] = subscription.id.split('-');
-        dispatch(unsubscribeFromRegion(countryId, regionId, userId));
-      }
-    };
-    fadeOut(event.currentTarget.closest('div'), unsubscribe);
+  const handleUnsubscribe = () => {
+    if (type === 'MASSIF') dispatch(unsubscribeFromMassif(subscription.id, userId));
+    if (type === 'COUNTRY') dispatch(unsubscribeFromCountry(subscription.id, userId));
+    if (type === 'REGION') {
+      // Parse region ID to extract country and region parts (format: "US-AL")
+      const [countryId, regionId] = subscription.id.split('-');
+      dispatch(unsubscribeFromRegion(countryId, regionId, userId));
+    }
   };
 
   return (
@@ -49,7 +45,7 @@ const SubscriptionItem = ({ canUnsubscribe, subscription, type, userId }) => {
           : ''
       }>
       <Chip
-        icon={<NotificationsIcon />}
+        icon={<NotificationsActiveIcon />}
         label={subscription.name}
         onClick={() => navigate(url)}
         onDelete={canUnsubscribe ? handleUnsubscribe : undefined}

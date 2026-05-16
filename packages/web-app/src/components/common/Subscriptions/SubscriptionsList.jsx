@@ -2,33 +2,13 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Box, CircularProgress, Typography } from '@mui/material';
 import { useIntl } from 'react-intl';
-import { styled } from '@mui/material/styles';
 import REDUCER_STATUS from '../../../reducers/ReducerStatus';
 import subscriptionsType from '../../../types/subscriptions.type';
 import SubscriptionListItem from './SubscriptionItem';
 import Alert from '../Alert';
-import SubscriptionName from './SubscriptionName';
 import getLocalizedCountryName from '../../../helpers/countryName';
 
-const MainContainer = styled(Box)`
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  gap: 16px;
-`;
-
-const HalfWidthBox = ({ children }) => (
-  <Box width="50%" minWidth="320px" display="flex" flex={1} alignItems="center">
-    {children}
-  </Box>
-);
-HalfWidthBox.propTypes = {
-  children: PropTypes.node
-};
-
 const SubscriptionsList = ({
-  title,
   canUnsubscribe,
   subscriptions = { countries: [], massifs: [], regions: [] },
   subscriptionsStatus,
@@ -37,104 +17,70 @@ const SubscriptionsList = ({
   const { formatMessage, locale } = useIntl();
   const { countries, massifs, regions } = subscriptions ?? {};
 
-  if (subscriptionsStatus === REDUCER_STATUS.LOADING)
+  if (
+    subscriptionsStatus === REDUCER_STATUS.IDLE ||
+    subscriptionsStatus === REDUCER_STATUS.LOADING
+  )
     return <CircularProgress />;
 
-  if (subscriptionsStatus === REDUCER_STATUS.SUCCEEDED)
+  if (subscriptionsStatus !== REDUCER_STATUS.SUCCEEDED)
     return (
-      <>
-        {title && (
-          <Typography variant="h3" gutterBottom>
-            {title}
-          </Typography>
-        )}
-        <MainContainer>
-          <HalfWidthBox>
-            <SubscriptionName name={formatMessage({ id: 'Countries' })} />
-            {countries.length > 0 ? (
-              <Box>
-                {countries
-                  .map(country => ({
-                    ...country,
-                    name: getLocalizedCountryName(country.id, locale, country.name)
-                  }))
-                  .sort((a, b) => a.name.localeCompare(b.name))
-                  .map(country => (
-                    <SubscriptionListItem
-                      canUnsubscribe={canUnsubscribe}
-                      key={country.id}
-                      subscription={country}
-                      type="COUNTRY"
-                      userId={userId}
-                    />
-                  ))}
-              </Box>
-            ) : (
-              <Alert
-                severity="info"
-                title={formatMessage({ id: 'No country subscriptions' })}
-              />
-            )}
-          </HalfWidthBox>
-          <HalfWidthBox>
-            <SubscriptionName name={formatMessage({ id: 'Massifs' })} />
-            {massifs.length > 0 ? (
-              <Box>
-                {massifs
-                  .sort((a, b) => a.name.localeCompare(b.name))
-                  .map(massif => (
-                    <SubscriptionListItem
-                      canUnsubscribe={canUnsubscribe}
-                      key={massif.id}
-                      subscription={massif}
-                      type="MASSIF"
-                      userId={userId}
-                    />
-                  ))}
-              </Box>
-            ) : (
-              <Box width="100%">
-                <Alert
-                  severity="info"
-                  title={formatMessage({ id: 'No massif subscriptions' })}
-                />
-              </Box>
-            )}
-          </HalfWidthBox>
-          <HalfWidthBox>
-            <SubscriptionName name={formatMessage({ id: 'Regions' })} />
-            {regions && regions.length > 0 ? (
-              <Box>
-                {regions
-                  .sort((a, b) => a.name.localeCompare(b.name))
-                  .map(region => (
-                    <SubscriptionListItem
-                      canUnsubscribe={canUnsubscribe}
-                      key={region.id}
-                      subscription={region}
-                      type="REGION"
-                      userId={userId}
-                    />
-                  ))}
-              </Box>
-            ) : (
-              <Alert
-                severity="info"
-                title={formatMessage({ id: 'No region subscriptions' })}
-              />
-            )}
-          </HalfWidthBox>
-        </MainContainer>
-      </>
+      <Alert
+        severity="error"
+        content={formatMessage({
+          id: 'An error occurred when getting the subscriptions.'
+        })}
+      />
     );
 
+  const sections = [
+    {
+      labelId: 'Countries',
+      emptyId: 'No country subscriptions',
+      items: [...(countries ?? [])]
+        .map(c => ({ ...c, name: getLocalizedCountryName(c.id, locale, c.name) }))
+        .sort((a, b) => a.name.localeCompare(b.name)),
+      type: 'COUNTRY'
+    },
+    {
+      labelId: 'Massifs',
+      emptyId: 'No massif subscriptions',
+      items: [...(massifs ?? [])].sort((a, b) => a.name.localeCompare(b.name)),
+      type: 'MASSIF'
+    },
+    {
+      labelId: 'Regions',
+      emptyId: 'No region subscriptions',
+      items: [...(regions ?? [])].sort((a, b) => a.name.localeCompare(b.name)),
+      type: 'REGION'
+    }
+  ];
+
   return (
-    <Alert
-      severity="error"
-      content={formatMessage({
-        id: 'An error occurred when getting the subscriptions.'
-      })}
-    />
+    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+      {sections.map(({ labelId, emptyId, items, type }) => (
+        <Box key={labelId}>
+          <Typography variant="h4" gutterBottom>
+            {formatMessage({ id: labelId })}
+          </Typography>
+          {items.length > 0 ? (
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+              {items.map(item => (
+                <SubscriptionListItem
+                  canUnsubscribe={canUnsubscribe}
+                  key={item.id}
+                  subscription={item}
+                  type={type}
+                  userId={userId}
+                />
+              ))}
+            </Box>
+          ) : (
+            <Alert severity="info" content={formatMessage({ id: emptyId })} />
+          )}
+        </Box>
+      ))}
+    </Box>
   );
 };
 
@@ -142,7 +88,6 @@ SubscriptionsList.propTypes = {
   canUnsubscribe: PropTypes.bool,
   subscriptions: subscriptionsType,
   subscriptionsStatus: PropTypes.oneOf(Object.values(REDUCER_STATUS)),
-  title: PropTypes.node,
   userId: PropTypes.number
 };
 
