@@ -36,9 +36,11 @@ import TravelExploreOutlinedIcon from '@mui/icons-material/TravelExploreOutlined
 import PermMediaOutlinedIcon from '@mui/icons-material/PermMediaOutlined';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import TuneIcon from '@mui/icons-material/Tune';
+import EditNotificationsIcon from '@mui/icons-material/EditNotifications';
 import { styled } from '@mui/material/styles';
 
 import { fetchAccount } from '../../actions/Account/GetAccount';
+import { fetchSubscriptions } from '../../actions/Subscriptions/GetSubscriptions';
 import { updateAccount } from '../../actions/Account/UpdateAccount';
 import { fetchPerson } from '../../actions/Person/GetPerson';
 import { joinOrganization } from '../../actions/Organization/JoinOrganization';
@@ -47,6 +49,8 @@ import Alert from '../../components/common/Alert';
 import BoolIcon from '../../components/common/Form/BoolIcon';
 
 import DocumentsList from '../../components/common/DocumentsList/DocumentsList';
+import SubscriptionsList from '../../components/common/Subscriptions/SubscriptionsList';
+import REDUCER_STATUS from '../../reducers/ReducerStatus';
 import EntitiesList from '../../components/common/entitiesList/EntitiesList';
 import PageHeader from '../../components/common/Layouts/PageHeader';
 import PageTabs from '../../components/common/Layouts/PageTabs';
@@ -59,7 +63,7 @@ import { FormRow } from '../../components/appli/EntitiesForm/utils/FormContainer
 import PasswordRules from '../../components/common/Form/PasswordRules';
 import SearchOrganizationForm from '../../components/appli/Form/SearchOrganizationForm';
 import Translate from '../../components/common/Translate';
-import { useUserProperties } from '../../hooks';
+import { useUserProperties, usePermissions } from '../../hooks';
 import useOpenLink from '../../hooks/useOpenLink';
 import { AVAILABLE_LANGUAGES, isPasswordValid } from '../../conf/config';
 import {
@@ -804,6 +808,7 @@ const AccountPage = () => {
   const dispatch = useDispatch();
   const userProperties = useUserProperties();
   const userId = userProperties?.id ?? null;
+  const { isLeader } = usePermissions();
 
   const {
     account,
@@ -813,6 +818,9 @@ const AccountPage = () => {
   const { person, isFetching: isPersonFetching } = useSelector(
     state => state.person
   );
+  const { subscriptions, status: subscriptionsStatus } = useSelector(
+    state => state.subscriptions
+  );
 
   const [isOrgSearchVisible, setIsOrgSearchVisible] = useState(false);
   const [isCaveSearchVisible, setIsCaveSearchVisible] = useState(false);
@@ -820,7 +828,10 @@ const AccountPage = () => {
 
   useEffect(() => {
     dispatch(fetchAccount());
-    if (userId) dispatch(fetchPerson(userId));
+    if (userId) {
+      dispatch(fetchPerson(userId));
+      dispatch(fetchSubscriptions(userId));
+    }
   }, [dispatch, userId]);
 
   const handleSaved = useCallback(() => {}, []);
@@ -870,6 +881,10 @@ const AccountPage = () => {
   const nbOrganizations = (person?.organizations ?? []).length;
   const nbNetworks = (person?.exploredNetworks ?? []).length;
   const nbEntrances = (person?.exploredEntrances ?? []).length;
+  const nbSubscriptions =
+    (subscriptions?.countries?.length ?? 0) +
+    (subscriptions?.massifs?.length ?? 0) +
+    (subscriptions?.regions?.length ?? 0);
 
   const tabs = [
     {
@@ -883,6 +898,16 @@ const AccountPage = () => {
       icon: <TravelExploreOutlinedIcon fontSize="small" />,
       count: nbOrganizations + nbNetworks + nbEntrances
     },
+    ...(isLeader
+      ? [
+          {
+            id: 'subscriptions',
+            label: formatMessage({ id: 'Subscriptions' }),
+            icon: <EditNotificationsIcon fontSize="small" />,
+            count: nbSubscriptions
+          }
+        ]
+      : []),
     {
       id: 'documents',
       label: formatMessage({ id: 'Documents' }),
@@ -1054,6 +1079,25 @@ const AccountPage = () => {
             </>
           )}
         </div>
+
+        {/* Tab Subscriptions — visible uniquement si isLeader */}
+        {isLeader && (
+          <div>
+            <ScrollableContent
+              collapsible={false}
+              content={
+                <SubscriptionsList
+                  canUnsubscribe
+                  subscriptions={subscriptions}
+                  subscriptionsStatus={
+                    subscriptionsStatus ?? REDUCER_STATUS.IDLE
+                  }
+                  userId={userId}
+                />
+              }
+            />
+          </div>
+        )}
 
         {/* Tab Documents */}
         <div>

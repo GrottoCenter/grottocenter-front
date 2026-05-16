@@ -13,9 +13,7 @@ import {
   usePermissions,
   useSharePage
 } from '../../../hooks';
-import subscriptionsType from '../../../types/subscriptions.type';
 import { PersonPropTypes } from '../../../types/person.type';
-import REDUCER_STATUS from '../../../reducers/ReducerStatus';
 import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
 import TravelExploreOutlinedIcon from '@mui/icons-material/TravelExploreOutlined';
 import PermMediaOutlinedIcon from '@mui/icons-material/PermMediaOutlined';
@@ -29,7 +27,6 @@ import DocumentsList from '../../common/DocumentsList/DocumentsList';
 import EntitiesList from '../../common/entitiesList/EntitiesList';
 import RelatedCaves from '../../common/RelatedCaves/RelatedCaves';
 import PersonProperties from '../../common/Person/PersonProperties';
-import SubscriptionsList from '../../common/Subscriptions/SubscriptionsList';
 import { deletePerson } from '../../../actions/Person/DeletePerson';
 import { fetchPerson } from '../../../actions/Person/GetPerson';
 import {
@@ -37,13 +34,7 @@ import {
   DELETED_ENTITIES
 } from '../../common/card/Deleted';
 
-const Person = ({
-  isLoading,
-  person,
-  error,
-  subscriptions,
-  subscriptionsStatus
-}) => {
+const Person = ({ isLoading, person, error }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { formatMessage } = useIntl();
@@ -57,7 +48,6 @@ const Person = ({
   if (userId && person) {
     canEdit = userId.toString() === person?.id?.toString();
   }
-  const canUnsubscribe = canEdit || permissions.isAdmin;
   const canAdminEdit =
     person && !canEdit && (permissions.isAdmin || permissions.isModerator);
 
@@ -198,20 +188,6 @@ const Person = ({
               <ScrollableContent
                 content={<PersonProperties person={person} canEdit={canEdit} />}
               />
-              {permissions.isLeader && (
-                <ScrollableContent
-                  anchorId="subscriptions"
-                  title={formatMessage({ id: 'Subscriptions' })}
-                  content={
-                    <SubscriptionsList
-                      canUnsubscribe={canUnsubscribe}
-                      subscriptions={subscriptions}
-                      subscriptionsStatus={subscriptionsStatus}
-                      userId={person.id}
-                    />
-                  }
-                />
-              )}
             </>
           )}
         </div>
@@ -291,9 +267,7 @@ const Person = ({
 Person.propTypes = {
   isLoading: PropTypes.bool.isRequired,
   error: PropTypes.shape({}),
-  person: PersonPropTypes,
-  subscriptions: subscriptionsType,
-  subscriptionsStatus: PropTypes.oneOf(Object.values(REDUCER_STATUS))
+  person: PersonPropTypes
 };
 
 export default Person;
