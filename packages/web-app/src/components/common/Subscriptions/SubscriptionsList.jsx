@@ -17,7 +17,10 @@ const SubscriptionsList = ({
   const { formatMessage, locale } = useIntl();
   const { countries, massifs, regions } = subscriptions ?? {};
 
-  if (subscriptionsStatus === REDUCER_STATUS.LOADING)
+  if (
+    subscriptionsStatus === REDUCER_STATUS.IDLE ||
+    subscriptionsStatus === REDUCER_STATUS.LOADING
+  )
     return <CircularProgress />;
 
   if (subscriptionsStatus !== REDUCER_STATUS.SUCCEEDED)
@@ -34,7 +37,7 @@ const SubscriptionsList = ({
     {
       labelId: 'Countries',
       emptyId: 'No country subscriptions',
-      items: countries
+      items: [...(countries ?? [])]
         .map(c => ({ ...c, name: getLocalizedCountryName(c.id, locale, c.name) }))
         .sort((a, b) => a.name.localeCompare(b.name)),
       type: 'COUNTRY'

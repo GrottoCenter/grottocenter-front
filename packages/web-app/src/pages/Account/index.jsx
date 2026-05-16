@@ -830,9 +830,9 @@ const AccountPage = () => {
     dispatch(fetchAccount());
     if (userId) {
       dispatch(fetchPerson(userId));
-      dispatch(fetchSubscriptions(userId));
+      if (isLeader) dispatch(fetchSubscriptions(userId));
     }
-  }, [dispatch, userId]);
+  }, [dispatch, userId, isLeader]);
 
   const handleSaved = useCallback(() => {}, []);
 
