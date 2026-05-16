@@ -36,7 +36,7 @@ import TravelExploreOutlinedIcon from '@mui/icons-material/TravelExploreOutlined
 import PermMediaOutlinedIcon from '@mui/icons-material/PermMediaOutlined';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import TuneIcon from '@mui/icons-material/Tune';
-import EditNotificationsIcon from '@mui/icons-material/EditNotifications';
+import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
 import { styled } from '@mui/material/styles';
 
 import { fetchAccount } from '../../actions/Account/GetAccount';
@@ -903,7 +903,7 @@ const AccountPage = () => {
           {
             id: 'subscriptions',
             label: formatMessage({ id: 'Subscriptions' }),
-            icon: <EditNotificationsIcon fontSize="small" />,
+            icon: <NotificationsActiveIcon fontSize="small" />,
             count: nbSubscriptions
           }
         ]
