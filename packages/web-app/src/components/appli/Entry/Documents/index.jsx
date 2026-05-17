@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import { Box, Button, Divider, Tooltip } from '@mui/material';
-import AddCircleIcon from '@mui/icons-material/AddCircle';
+import { EntityIcon } from '../../../../pages/EntityCreation/entityConfig';
 import AddLinkIcon from '@mui/icons-material/AddLink';
 import { useDispatch } from 'react-redux';
 import CancelIcon from '@mui/icons-material/Cancel';
@@ -56,7 +56,7 @@ const Documents = ({ documents, entranceId, isEditAllowed }) => {
                   size="small"
                   variant="outlined"
                   onClick={navigateToNewDocument}
-                  startIcon={<AddCircleIcon />}>
+                  startIcon={<EntityIcon iconType="bibliography" size={20} />}>
                   {formatMessage({ id: 'New' })}
                 </Button>
               </Tooltip>
