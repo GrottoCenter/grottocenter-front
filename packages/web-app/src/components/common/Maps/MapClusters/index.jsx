@@ -7,6 +7,7 @@ import React, {
 } from 'react';
 import PropTypes from 'prop-types';
 import { useMap, useMapEvent } from 'react-leaflet';
+import { useNavigate } from 'react-router-dom';
 import { uniq } from 'ramda';
 
 import DataControl, { heatmapTypes, markerTypes } from './DataControl';
@@ -14,15 +15,19 @@ import MapTour from './MapTour';
 import GeocodingControl from '../common/GeocodingControl';
 import {
   Box,
+  Divider,
   IconButton,
+  ListItemIcon,
+  ListItemText,
   ListSubheader,
   Menu,
+  MenuItem,
   Tooltip,
   Typography,
   useMediaQuery
 } from '@mui/material';
 import { ContentCopy, Tune } from '@mui/icons-material';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useIntl } from 'react-intl';
 import {
   formatCoordinatesForCopy,
@@ -34,6 +39,9 @@ import {
   useCoordinatePreference,
   getCRSLabel
 } from '../../../../hooks';
+import { usePermissions } from '../../../../hooks/usePermissions';
+import { displayLoginDialog } from '../../../../actions/Login';
+import { EntityIcon } from '../../../../pages/EntityCreation/entityConfig';
 import CRSMenu from '../../CRSMenu';
 import MeasureControl from '../common/MeasureControl';
 import useHeatLayer, { HexGlobalCss } from './useHeatLayer';
@@ -68,11 +76,15 @@ const HydratedMap = ({
   const map = useMap();
   const { formatMessage } = useIntl();
   const { onSuccess } = useNotification();
+  const { isAuth } = usePermissions();
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
   const projections = useSelector(
     state => state.projections?.projections ?? []
   );
   const [contextCoords, setContextCoords] = useState(null);
   const [contextMenuAnchor, setContextMenuAnchor] = useState(null);
+  const [pendingEntranceUrl, setPendingEntranceUrl] = useState(null);
   const [formatMenuAnchor, setFormatMenuAnchor] = useState(null);
   const [preferred, setPref] = useCoordinatePreference();
   const isTouch = useMediaQuery('(pointer: coarse)');
@@ -253,6 +265,24 @@ const HydratedMap = ({
     [setPref]
   );
 
+  useEffect(() => {
+    if (isAuth && pendingEntranceUrl) {
+      navigate(pendingEntranceUrl);
+      setPendingEntranceUrl(null);
+    }
+  }, [isAuth, pendingEntranceUrl, navigate]);
+
+  const handleCreateEntrance = useCallback(() => {
+    const url = `/ui/entity/add/entrance?lat=${contextCoords.lat}&lng=${contextCoords.lng}`;
+    setContextCoords(null);
+    if (isAuth) {
+      navigate(url);
+    } else {
+      setPendingEntranceUrl(url);
+      dispatch(displayLoginDialog());
+    }
+  }, [contextCoords, isAuth, navigate, dispatch]);
+
   useMapEvent('contextmenu', e => {
     e.originalEvent.preventDefault();
     setContextCoords({ lat: e.latlng.lat, lng: e.latlng.lng });
@@ -360,6 +390,15 @@ const HydratedMap = ({
             </IconButton>
           </Tooltip>
         </Box>
+        <Divider />
+        <MenuItem onClick={handleCreateEntrance}>
+          <ListItemIcon>
+            <EntityIcon iconType="entrance" size={20} />
+          </ListItemIcon>
+          <ListItemText>
+            {formatMessage({ id: 'Create an entrance here' })}
+          </ListItemText>
+        </MenuItem>
       </Menu>
       <CRSMenu
         anchorEl={formatMenuAnchor}
