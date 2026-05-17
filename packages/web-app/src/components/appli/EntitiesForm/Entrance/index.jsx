@@ -86,6 +86,7 @@ export const EntranceForm = ({
     reset,
     control,
     getValues,
+    watch,
     formState: { errors, isSubmitting, isSubmitSuccessful }
   } = useForm({
     defaultValues: {
@@ -94,7 +95,22 @@ export const EntranceForm = ({
     }
   });
 
-  // TODO set latitude & longitude from the selected Entry
+  const [lat, lng, caveName, caveLanguage, entranceName, entranceLanguage] =
+    watch([
+      'entrance.latitude',
+      'entrance.longitude',
+      'cave.name',
+      'cave.language',
+      'entrance.name',
+      'entrance.language'
+    ]);
+
+  const isSubmitDisabled =
+    !lat ||
+    !lng ||
+    (entityType === ENTRANCE_AND_CAVE
+      ? !caveName || !caveLanguage
+      : !entranceName || !entranceLanguage);
 
   const handleUpdateEntityType = type => {
     setEntityType(type);
@@ -182,6 +198,7 @@ export const EntranceForm = ({
         <FormActionRow
           isNew={isNewEntrance}
           isSubmitting={isSubmitting}
+          disabled={isSubmitDisabled}
           onCancel={onCancel}
         />
       </form>

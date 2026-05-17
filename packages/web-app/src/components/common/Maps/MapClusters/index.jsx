@@ -37,9 +37,9 @@ import copyToClipboard from '../../../../helpers/clipboard';
 import {
   useNotification,
   useCoordinatePreference,
+  usePermissions,
   getCRSLabel
 } from '../../../../hooks';
-import { usePermissions } from '../../../../hooks/usePermissions';
 import { displayLoginDialog } from '../../../../actions/Login';
 import { EntityIcon } from '../../../../pages/EntityCreation/entityConfig';
 import CRSMenu from '../../CRSMenu';
