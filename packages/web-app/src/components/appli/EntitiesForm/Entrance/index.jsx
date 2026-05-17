@@ -89,7 +89,7 @@ export const EntranceForm = ({
     formState: { errors, isSubmitting, isSubmitSuccessful }
   } = useForm({
     defaultValues: {
-      entrance: entranceValues || defaultEntranceValues,
+      entrance: { ...defaultEntranceValues, ...(entranceValues ?? {}) },
       cave: caveValues || defaultCaveValues
     }
   });

@@ -1,4 +1,4 @@
-﻿{
+{
   "1": "ΚΑΡΣΤΟΛΟΓΙΑ ΚΑΙ ΓΕΟΣΠΗΛΑΙΟΛΟΓΙΑ",
   "2": "ΠΕΡΙΦΕΡΕΙΑΚΗ ΣΠΗΛΑΙΟΛΟΓΙΑ ΚΑΙ ΚΑΡΣΤΟΛΟΓΙΑ",
   "3": "ΒΙΟΣΠΗΛΑΙΟΛΟΓΙΑ",
@@ -628,6 +628,7 @@
   "Create a new document": "Δημιουργία νέου εγγράφου",
   "Create a new entity in Grottocenter": "Δημιουργία νέας οντότητας στο Grottocenter",
   "Create a new Entrance": "Δημιουργία νέας εισόδου",
+  "Create an entrance here": "Create an entrance here",
   "Create new entity": "Δημιουργία νέας οντότητας",
   "created": "δημιουργήθηκε",
   "Created": "Δημιουργήθηκε",
