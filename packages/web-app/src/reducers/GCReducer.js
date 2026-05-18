@@ -44,8 +44,10 @@ import login from './LoginReducer';
 import map from './Map';
 import massif from './MassifReducer';
 import menuNotifications from './MenuNotificationsReducer';
+import messaging from './MessagingReducer';
 import moveEntranceToCave from './MoveEntranceToCaveReducer';
 import notifications from './NotificationsReducer';
+import notificationPreferences from './NotificationPreferencesReducer';
 import organization from './OrganizationReducer';
 import partnersCarousel from './PartnersCarouselReducer';
 import person from './PersonReducer';
@@ -135,6 +137,8 @@ const GCReducer = combineReducers({
   massif,
   massifEntrances,
   menuNotifications,
+  messaging,
+  notificationPreferences,
   moveEntranceToCave,
   notifications,
   organization,
