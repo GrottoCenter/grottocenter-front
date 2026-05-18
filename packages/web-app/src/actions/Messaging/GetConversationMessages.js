@@ -11,10 +11,11 @@ const fetchConversationMessagesAction = () => ({
   type: FETCH_CONVERSATION_MESSAGES
 });
 
-const fetchConversationMessagesActionSuccess = (messages, totalCount) => ({
+const fetchConversationMessagesActionSuccess = (messages, totalCount, conversationId) => ({
   type: FETCH_CONVERSATION_MESSAGES_SUCCESS,
   messages,
-  totalCount
+  totalCount,
+  conversationId
 });
 
 const fetchConversationMessagesActionFailure = error => ({
@@ -47,14 +48,15 @@ export function fetchConversationMessages(conversationId, criterias) {
       return dispatch(
         fetchConversationMessagesActionSuccess(
           data.messages,
-          getTotalCount(data.messages.length, contentRangeHeader)
+          getTotalCount(data.messages.length, contentRangeHeader),
+          conversationId
         )
       );
     } catch (error) {
       if (error.isAuthError) return;
       return dispatch(
         fetchConversationMessagesActionFailure(
-          makeErrorMessage(error.message, `Fetching conversation messages`)
+          error.body || makeErrorMessage(error.message, `Fetching conversation messages`)
         )
       );
     }

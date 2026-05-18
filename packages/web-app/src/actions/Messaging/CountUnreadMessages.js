@@ -48,7 +48,7 @@ export function fetchUnreadMessageCount() {
       if (error.isAuthError) return;
       return dispatch(
         countUnreadMessagesActionFailure(
-          makeErrorMessage(error.message, `Counting unread messages`)
+          error.body || makeErrorMessage(error.message, `Counting unread messages`)
         )
       );
     }

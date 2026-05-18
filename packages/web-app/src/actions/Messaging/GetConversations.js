@@ -60,7 +60,7 @@ export function fetchConversations(criterias, isArchived = false) {
       if (error.isAuthError) return;
       return dispatch(
         fetchConversationsActionFailure(
-          makeErrorMessage(error.message, `Fetching user conversations`),
+          error.body || makeErrorMessage(error.message, `Fetching user conversations`),
           isArchived
         )
       );
