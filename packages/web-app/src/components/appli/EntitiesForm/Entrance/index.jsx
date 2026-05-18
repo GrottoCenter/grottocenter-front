@@ -105,9 +105,10 @@ export const EntranceForm = ({
       'entrance.language'
     ]);
 
+  const isEmpty = v => v === '' || v === null || v === undefined;
   const isSubmitDisabled =
-    !lat ||
-    !lng ||
+    isEmpty(lat) ||
+    isEmpty(lng) ||
     (entityType === ENTRANCE_AND_CAVE
       ? !caveName || !caveLanguage
       : !entranceName || !entranceLanguage);

@@ -265,6 +265,9 @@ const HydratedMap = ({
     [setPref]
   );
 
+  // useAuthNavigate requires a static URL at hook-call time, but the target URL
+  // depends on contextCoords captured at click time. We replicate the same pattern
+  // (store pending URL in state, navigate in a useEffect when isAuth becomes true).
   useEffect(() => {
     if (isAuth && pendingEntranceUrl) {
       navigate(pendingEntranceUrl);
