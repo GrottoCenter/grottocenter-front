@@ -12,6 +12,7 @@ import InputPassword from '../utils/InputPassword';
 import FormProgressInfo from '../utils/FormProgressInfo';
 import { PASSWORD_MIN_LENGTH } from '../../../../conf/config';
 import { PersonPropTypes } from '../../../../types/person.type';
+import NotificationPreferences from './NotificationPreferences';
 
 export const PersonForm = ({ personValues, isOurAccount }) => {
   const {
@@ -166,6 +167,8 @@ export const PersonForm = ({ personValues, isOurAccount }) => {
                 helperText={errors?.person?.passwordConfirmation?.message}
               />
             </FormRow>
+            
+            <NotificationPreferences />
           </>
         )}
 

@@ -2,13 +2,14 @@ import React, { useState, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import Skeleton from '@mui/material/Skeleton';
 import { useIntl } from 'react-intl';
-import { Button, Card, Chip, Tooltip, Typography } from '@mui/material';
+import { Button, Card, Chip, Tooltip, Typography, IconButton } from '@mui/material';
 import StandardDialog from '../../common/StandardDialog';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import CancelIcon from '@mui/icons-material/Cancel';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
+import MailIcon from '@mui/icons-material/Mail';
 
 import { useUserProperties, usePermissions } from '../../../hooks';
 import subscriptionsType from '../../../types/subscriptions.type';
@@ -131,19 +132,32 @@ const Person = ({
           icon={<CustomIcon type="caver" />}
           title={title}
           titleAdornment={
-            canEdit && (
-              <Chip
-                label={formatMessage({ id: 'You' }).toUpperCase()}
-                sx={{
-                  ml: 3,
-                  fontSize: '1.4rem',
-                  letterSpacing: 1.5,
-                  verticalAlign: 'middle',
-                  bgcolor: 'secondary.main',
-                  fontWeight: 700
-                }}
-              />
-            )
+            <>
+              {canEdit && (
+                <Chip
+                  label={formatMessage({ id: 'You' }).toUpperCase()}
+                  sx={{
+                    ml: 3,
+                    fontSize: '1.4rem',
+                    letterSpacing: 1.5,
+                    verticalAlign: 'middle',
+                    bgcolor: 'secondary.main',
+                    fontWeight: 700
+                  }}
+                />
+              )}
+              {!canEdit && userId && (
+                <Tooltip title={formatMessage({ id: 'Message this caver', defaultMessage: 'Message this caver' })}>
+                  <IconButton
+                    color="primary"
+                    sx={{ ml: 2, verticalAlign: 'middle' }}
+                    onClick={() => navigate(`/ui/messages?composeTo=${person.id}`)}
+                  >
+                    <MailIcon fontSize="large" />
+                  </IconButton>
+                </Tooltip>
+              )}
+            </>
           }
           onEdit={
             canEdit

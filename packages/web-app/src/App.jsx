@@ -42,6 +42,7 @@ import OrganizationEdit from './pages/EntityEdit/Organization/OrganizationEdit';
 import CountryPage from './pages/Country';
 import RegionPage from './pages/Region';
 import NotificationsPage from './pages/Notifications';
+import MessagesPage from './pages/Messages';
 import SnapshotPage from './components/appli/Entry/Snapshots';
 import EntrancesListPage from './pages/EntrancesList';
 import CountryListPage from './pages/CountryList';
@@ -90,6 +91,8 @@ const router = createBrowserRouter(
       <Route path="/ui/map/:target?" element={<Map />} />
       <Route path="/ui/contributions" element={<ContributionsPage />} />
       <Route path="/ui/notifications" element={<NotificationsPage />} />
+      <Route path="/ui/messages" element={<MessagesPage />} />
+      <Route path="/ui/messages/:conversationId" element={<MessagesPage />} />
       <Route path="/ui/test" element={<LatestBlogNewsSection />} />
       <Route
         path="/ui/organizations/:organizationId/edit"

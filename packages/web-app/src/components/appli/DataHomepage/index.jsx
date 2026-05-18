@@ -6,10 +6,12 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Handshake } from '@mui/icons-material';
 import { loadDynamicNumber } from '../../../actions/DynamicNumber';
 import { fetchCumulatedLength } from '../../../actions/CumulatedLength';
+import { fetchUnreadMessageCount } from '../../../actions/Messaging/CountUnreadMessages';
 import DataCard from './components/DataCard';
 import DataLine from './components/DataLine';
 import CustomIcon from '../../common/CustomIcon';
 import GCLink from '../../common/GCLink';
+import { usePermissions } from '../../../hooks';
 
 const SectionTitle = styled('h3')`
   text-align: center;
@@ -26,6 +28,7 @@ const DataHomepage = () => {
   const { formatMessage } = useIntl();
   const dispatch = useDispatch();
   const { languageObject } = useSelector(state => state.intl);
+  const { isAuth } = usePermissions();
 
   // get Object : { isFetching: bool, number: Number }
   const {
@@ -48,7 +51,11 @@ const DataHomepage = () => {
     dispatch(loadDynamicNumber('users'));
     dispatch(loadDynamicNumber('countries'));
     dispatch(fetchCumulatedLength());
-  }, [dispatch, languageObject]);
+
+    if (isAuth) {
+      dispatch(fetchUnreadMessageCount());
+    }
+  }, [dispatch, languageObject, isAuth]);
 
   return (
     <Box sx={{ margin: '10px 5%' }}>
