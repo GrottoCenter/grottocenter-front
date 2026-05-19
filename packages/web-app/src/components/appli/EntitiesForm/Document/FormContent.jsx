@@ -1,4 +1,5 @@
 import React, { useCallback, useContext, useEffect, Suspense } from 'react';
+import PropTypes from 'prop-types';
 import {
   Accordion,
   AccordionDetails,
@@ -43,7 +44,7 @@ const PublicationDatePicker = React.lazy(
   () => import('./formElements/PublicationDatePicker')
 );
 
-const FormContent = () => {
+const FormContent = ({ onCancel }) => {
   const {
     document,
     isFormValid,
@@ -108,7 +109,7 @@ const FormContent = () => {
       isNew={isNewDocument}
       isSubmitting={isSubmitting}
       disabled={!isFormValid}
-      onCancel={() => navigate(-1)}
+      onCancel={onCancel || (() => navigate(-1))}
     />
   );
 
@@ -476,3 +477,7 @@ const FormContent = () => {
 };
 
 export default FormContent;
+
+FormContent.propTypes = {
+  onCancel: PropTypes.func
+};

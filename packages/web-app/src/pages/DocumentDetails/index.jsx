@@ -51,7 +51,8 @@ const Document = ({
   isLoading = true,
   error,
   documentData,
-  documentChildren
+  documentChildren,
+  hideActions = false
 }) => {
   const { formatMessage } = useIntl();
   const navigate = useNavigate();
@@ -215,7 +216,7 @@ const Document = ({
         })
       : null;
 
-  const actions = (
+  const actions = hideActions ? null : (
     <ResponsiveActions
       items={[
         {
@@ -476,7 +477,7 @@ const Document = ({
   );
 };
 
-const DocumentDetails = ({ id }) => {
+const DocumentDetails = ({ id, hideActions = false }) => {
   const dispatch = useDispatch();
   const permissions = usePermissions();
   const { locale } = useSelector(state => state.intl);
@@ -520,6 +521,7 @@ const DocumentDetails = ({ id }) => {
       error={error ?? childrenError}
       documentData={details}
       documentChildren={children}
+      hideActions={hideActions}
     />
   );
 };
@@ -530,9 +532,11 @@ Document.propTypes = {
   isLoading: PropTypes.bool,
   error: PropTypes.shape({}),
   documentData: DocumentPropTypes,
-  documentChildren: PropTypes.arrayOf(DocumentSimplePropTypes)
+  documentChildren: PropTypes.arrayOf(DocumentSimplePropTypes),
+  hideActions: PropTypes.bool
 };
 
 DocumentDetails.propTypes = {
-  id: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+  id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  hideActions: PropTypes.bool
 };

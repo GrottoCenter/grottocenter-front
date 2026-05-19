@@ -123,7 +123,7 @@ const DocumentValidationPage = () => {
         open={!!detailedView}
         onClose={closeDetailedView}
         title={formatMessage({ id: 'Detailed document view' })}>
-        {detailedView && <DocumentDetails id={detailedView} />}
+        {detailedView && <DocumentDetails id={detailedView} hideActions />}
       </StandardDialog>
       <StandardDialog
         maxWidth="lg"
@@ -135,6 +135,7 @@ const DocumentValidationPage = () => {
         title={formatMessage({ id: 'Edit document' })}>
         <DocumentEdit
           onSuccessfulUpdate={handleSuccessfulUpdate}
+          onCancel={closeEditView}
           id={editView}
           requireUpdate={isUpdatedDocRequired()}
         />
