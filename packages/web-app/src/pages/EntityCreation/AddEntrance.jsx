@@ -12,9 +12,11 @@ const AddEntrance = () => {
   const lat = searchParams.get('lat');
   const lng = searchParams.get('lng');
 
+  const parsedLat = parseFloat(lat);
+  const parsedLng = parseFloat(lng);
   const entranceValues =
-    lat && lng
-      ? { latitude: parseFloat(lat), longitude: parseFloat(lng) }
+    Number.isFinite(parsedLat) && Number.isFinite(parsedLng)
+      ? { latitude: parsedLat, longitude: parsedLng }
       : null;
 
   return (

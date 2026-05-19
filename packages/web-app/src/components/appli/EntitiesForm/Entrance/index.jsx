@@ -31,6 +31,8 @@ const defaultCaveValues = {
   massif: ''
 };
 
+const isCoordEmpty = v => v === '' || v === null || v === undefined;
+
 const defaultEntranceValues = {
   name: '',
   description: '',
@@ -105,10 +107,9 @@ export const EntranceForm = ({
       'entrance.language'
     ]);
 
-  const isEmpty = v => v === '' || v === null || v === undefined;
   const isSubmitDisabled =
-    isEmpty(lat) ||
-    isEmpty(lng) ||
+    isCoordEmpty(lat) ||
+    isCoordEmpty(lng) ||
     (entityType === ENTRANCE_AND_CAVE
       ? !caveName || !caveLanguage
       : !entranceName || !entranceLanguage);

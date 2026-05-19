@@ -355,7 +355,7 @@ const HydratedMap = ({
       <PopupTargetHandler popupTarget={popupTarget} />
       <Menu
         open={Boolean(contextCoords)}
-        onClose={() => setContextCoords(null)}
+        onClose={() => { setContextCoords(null); setPendingEntranceUrl(null); }}
         anchorReference="anchorPosition"
         anchorPosition={contextMenuAnchor}
         PaperProps={{ sx: { minWidth: 260 } }}>
