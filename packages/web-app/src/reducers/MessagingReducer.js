@@ -120,12 +120,14 @@ const reducer = (state = initialState, action) => {
         ...state,
         activeConversationMessages: {
           ...state.activeConversationMessages,
+          items: action.skip > 0 ? state.activeConversationMessages.items : [],
           status: REDUCER_STATUS.LOADING,
           error: null
         }
       };
     case FETCH_CONVERSATION_MESSAGES_SUCCESS: {
       const convId = Number(action.conversationId);
+      const skip = action.skip || 0;
 
       const activeConv = state.activeConversations.items.find(c => c.id === convId);
       const archivedConv = state.archivedConversations.items.find(c => c.id === convId);
@@ -140,6 +142,10 @@ const reducer = (state = initialState, action) => {
         c.id === convId ? { ...c, unreadCount: 0 } : c
       );
 
+      const newItems = skip > 0
+        ? [...action.messages, ...state.activeConversationMessages.items]
+        : action.messages;
+
       return {
         ...state,
         activeConversations: {
@@ -151,7 +157,7 @@ const reducer = (state = initialState, action) => {
           items: archivedListItems
         },
         activeConversationMessages: {
-          items: action.messages,
+          items: newItems,
           totalCount: action.totalCount,
           status: REDUCER_STATUS.SUCCEEDED,
           error: null

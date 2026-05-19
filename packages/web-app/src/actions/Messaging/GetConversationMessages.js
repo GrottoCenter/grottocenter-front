@@ -7,15 +7,17 @@ export const FETCH_CONVERSATION_MESSAGES = 'FETCH_CONVERSATION_MESSAGES';
 export const FETCH_CONVERSATION_MESSAGES_SUCCESS = 'FETCH_CONVERSATION_MESSAGES_SUCCESS';
 export const FETCH_CONVERSATION_MESSAGES_FAILURE = 'FETCH_CONVERSATION_MESSAGES_FAILURE';
 
-const fetchConversationMessagesAction = () => ({
-  type: FETCH_CONVERSATION_MESSAGES
+const fetchConversationMessagesAction = (skip) => ({
+  type: FETCH_CONVERSATION_MESSAGES,
+  skip
 });
 
-const fetchConversationMessagesActionSuccess = (messages, totalCount, conversationId) => ({
+const fetchConversationMessagesActionSuccess = (messages, totalCount, conversationId, skip) => ({
   type: FETCH_CONVERSATION_MESSAGES_SUCCESS,
   messages,
   totalCount,
-  conversationId
+  conversationId,
+  skip
 });
 
 const fetchConversationMessagesActionFailure = error => ({
@@ -30,7 +32,8 @@ const fetchConversationMessagesActionFailure = error => ({
  */
 export function fetchConversationMessages(conversationId, criterias) {
   return async (dispatch, getState) => {
-    dispatch(fetchConversationMessagesAction());
+    const skip = criterias?.skip || 0;
+    dispatch(fetchConversationMessagesAction(skip));
 
     const requestOptions = {
       method: 'GET',
@@ -49,7 +52,8 @@ export function fetchConversationMessages(conversationId, criterias) {
         fetchConversationMessagesActionSuccess(
           data.messages,
           getTotalCount(data.messages.length, contentRangeHeader),
-          conversationId
+          conversationId,
+          skip
         )
       );
     } catch (error) {

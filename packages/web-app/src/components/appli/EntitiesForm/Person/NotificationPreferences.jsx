@@ -40,6 +40,16 @@ const NotificationPreferences = () => {
         <FormControlLabel
           control={
             <Switch
+              checked={!!preferences?.alert_for_news}
+              onChange={handleChange('alert_for_news')}
+              disabled={updateStatus === REDUCER_STATUS.LOADING}
+            />
+          }
+          label={formatMessage({ id: 'Alert for news', defaultMessage: 'Alert for news' })}
+        />
+        <FormControlLabel
+          control={
+            <Switch
               checked={!!preferences?.send_notification_by_email}
               onChange={handleChange('send_notification_by_email')}
               disabled={updateStatus === REDUCER_STATUS.LOADING}

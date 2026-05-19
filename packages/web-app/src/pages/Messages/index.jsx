@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useIntl, FormattedDate } from 'react-intl';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import {
   Box,
   Tabs,
@@ -33,6 +33,7 @@ import { fetchConversations } from '../../actions/Messaging/GetConversations';
 import { archiveConversation } from '../../actions/Messaging/ArchiveConversation';
 import { unarchiveConversation } from '../../actions/Messaging/UnarchiveConversation';
 import ConversationDetail from './ConversationDetail';
+import ComposeDialog from './ComposeDialog';
 
 const PAGE_SIZE = 20;
 
@@ -58,10 +59,27 @@ const MessagesPage = () => {
   const { formatMessage } = useIntl();
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const { conversationId } = useParams();
   const [tabValue, setTabValue] = useState(0); // 0 = Active, 1 = Archived
   const [page, setPage] = useState(1);
+  const [isComposeOpen, setComposeOpen] = useState(false);
+
+  const composeTo = searchParams.get('composeTo');
+
+  useEffect(() => {
+    if (composeTo) {
+      setComposeOpen(true);
+    }
+  }, [composeTo]);
+
+  const handleCloseCompose = () => {
+    setComposeOpen(false);
+    if (composeTo) {
+      setSearchParams({});
+    }
+  };
 
   const isArchived = tabValue === 1;
   const listKey = isArchived ? 'archivedConversations' : 'activeConversations';
@@ -215,7 +233,7 @@ const MessagesPage = () => {
                     size="small"
                     startIcon={<AddIcon />}
                     onClick={() => {
-                      // TODO: Open compose dialog
+                      setComposeOpen(true);
                     }}>
                     {formatMessage({ id: 'New Message' })}
                   </Button>
@@ -259,6 +277,11 @@ const MessagesPage = () => {
                 <ConversationDetail />
               </Box>
 
+              <ComposeDialog
+                open={isComposeOpen}
+                onClose={handleCloseCompose}
+                prefilledRecipientId={composeTo || undefined}
+              />
             </Box>
           }
         />

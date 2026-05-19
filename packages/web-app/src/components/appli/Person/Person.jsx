@@ -29,6 +29,7 @@ import { deletePerson } from '../../../actions/Person/DeletePerson';
 import { leaveOrganization } from '../../../actions/Organization/LeaveOrganization';
 import { joinOrganization } from '../../../actions/Organization/JoinOrganization';
 import { fetchPerson } from '../../../actions/Person/GetPerson';
+import { fetchConversations } from '../../../actions/Messaging/GetConversations';
 import SearchOrganizationForm from '../Form/SearchOrganizationForm';
 import {
   DeleteConfirmationDialog,
@@ -63,6 +64,26 @@ const Person = ({
   const handleRefresh = useCallback(() => {
     dispatch(fetchPerson(person.id));
   }, [dispatch, person?.id]);
+
+  const handleMessageClick = useCallback(async () => {
+    if (!person?.id) return;
+    try {
+      // Fetch active conversations to check if a conversation with this participant already exists
+      const action = await dispatch(fetchConversations({ limit: 50, skip: 0 }, false));
+      const conversations = action.conversations || [];
+      const existingConv = conversations.find(
+        c => Number(c.otherParticipant?.id) === Number(person.id)
+      );
+      if (existingConv) {
+        navigate(`/ui/messages/${existingConv.id}`);
+      } else {
+        navigate(`/ui/messages?composeTo=${person.id}`);
+      }
+    } catch (err) {
+      console.error('Failed to check existing conversations:', err);
+      navigate(`/ui/messages?composeTo=${person.id}`);
+    }
+  }, [dispatch, person?.id, navigate]);
 
   const handleLeaveOrganization = useCallback(async organizationId => {
     if (!person?.id) return;
@@ -151,7 +172,7 @@ const Person = ({
                   <IconButton
                     color="primary"
                     sx={{ ml: 2, verticalAlign: 'middle' }}
-                    onClick={() => navigate(`/ui/messages?composeTo=${person.id}`)}
+                    onClick={handleMessageClick}
                   >
                     <MailIcon fontSize="large" />
                   </IconButton>
