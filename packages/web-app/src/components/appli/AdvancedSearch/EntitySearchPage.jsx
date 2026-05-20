@@ -43,6 +43,8 @@ const EntitySearchPage = ({
         size: getStoredRowsPerPage()
       })
     );
+    // initialFilter is intentionally excluded: it's fixed at mount time.
+    // Consumers must use key={searchKey} to force remounting when the filter changes.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, entityType]);
 

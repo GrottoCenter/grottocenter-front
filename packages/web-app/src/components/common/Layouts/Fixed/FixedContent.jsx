@@ -48,7 +48,7 @@ const FixedContent = ({ subheader, title, icon, action, content }) => (
             gap: 1
           }}>
           <Box sx={{ flex: 1, minWidth: 0 }}>
-            {title != null ? (
+            {title !== undefined && title !== null ? (
               <Title>
                 {icon && <TitleIcon>{icon}</TitleIcon>}
                 <Typography variant="h1" color="secondary">

@@ -96,6 +96,7 @@ const MobileEntityList = ({
   columns,
   totalRows,
   isLoading,
+  isNewQuery,
   onPageChange,
   rowsPerPage,
   link,
@@ -105,6 +106,13 @@ const MobileEntityList = ({
   const [allRows, setAllRows] = useState(rows ?? []);
   const [page, setPage] = useState(0);
   const isAppending = useRef(false);
+
+  useEffect(() => {
+    if (!isNewQuery) return;
+    setAllRows([]);
+    setPage(0);
+    isAppending.current = false;
+  }, [isNewQuery]);
 
   useEffect(() => {
     if (isAppending.current) {
@@ -174,6 +182,7 @@ MobileEntityList.propTypes = {
   columns: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   totalRows: PropTypes.number,
   isLoading: PropTypes.bool,
+  isNewQuery: PropTypes.bool,
   onPageChange: PropTypes.func,
   rowsPerPage: PropTypes.number.isRequired,
   link: PropTypes.func.isRequired,

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
+import useOpenLink from '../../../hooks/useOpenLink';
 import { styled, useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 
@@ -197,6 +198,7 @@ const DesktopEntityTable = ({
   viewMode
 }) => {
   const { formatMessage } = useIntl();
+  const openLink = useOpenLink();
   const theme = useTheme();
   const isSmall = useMediaQuery(theme.breakpoints.down('md'));
   const [page, setPage] = useState(0);
@@ -240,7 +242,7 @@ const DesktopEntityTable = ({
     }
     const url = entityConfig.link(doc);
     if (!url) return;
-    window.open(url, '_blank');
+    openLink(url);
   };
 
   const handleRowSelect = (event, doc) => {
@@ -504,6 +506,7 @@ const DesktopEntityTable = ({
             component="div"
             count={nbTotalRows}
             rowsPerPage={rowsPerPage}
+            page={page}
             labelRowsPerPage={formatMessage({ id: 'Results per page:' })}
             onPageChange={handleChangePage}
             onRowsPerPageChange={handleChangeRowsPerPage}

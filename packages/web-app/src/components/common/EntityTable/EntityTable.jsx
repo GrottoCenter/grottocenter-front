@@ -142,6 +142,7 @@ const EntityTable = ({
           columns={visibleColumns}
           totalRows={nbTotalRows}
           isLoading={isLoading}
+          isNewQuery={isNewQuery}
           onPageChange={
             onPageChange
               ? (page, size) => onPageChange(page, size ?? rowsPerPage)

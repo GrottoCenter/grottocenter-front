@@ -214,12 +214,12 @@ const EntrancesSearch = ({ initialFilter = {}, lockedFilter = [] }) => {
 
         <SearchFieldset title="Rating criterias">
           <SearchSlider
-            label={`${formatMessage({ id: 'Ease of reach' })}`}
+            label={formatMessage({ id: 'Ease of reach' })}
             value={filterState['commentsRating.approach']}
             onChange={e => updateFilter('commentsRating.approach', e)}
           />
           <SearchSlider
-            label={`${formatMessage({ id: 'Ease of move' })}`}
+            label={formatMessage({ id: 'Ease of move' })}
             value={filterState['commentsRating.caving']}
             onChange={e => updateFilter('commentsRating.caving', e)}
           />

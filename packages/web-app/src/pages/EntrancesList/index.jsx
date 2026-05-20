@@ -52,6 +52,7 @@ const EntrancesListPage = () => {
 
   useEffect(() => {
     if (!regionId || !region || !country) return;
+    let cancelled = false;
     setCountyValue(undefined);
     fetchFieldSearch({
       entity: ADVANCED_SEARCH_TYPES.ENTRANCES,
@@ -59,12 +60,14 @@ const EntrancesListPage = () => {
       query: region.name,
       filter: { country: country.nativeName }
     })
-      .then(r => setCountyValue(r?.hits?.[0]?.[0] ?? null))
-      .catch(() => setCountyValue(null));
+      .then(r => { if (!cancelled) setCountyValue(r?.hits?.[0]?.[0] ?? null); })
+      .catch(() => { if (!cancelled) setCountyValue(null); });
+    return () => { cancelled = true; };
   }, [region, country, regionId]);
 
   useEffect(() => {
     if (!massifId || !massif) return;
+    let cancelled = false;
     setMassifValue(undefined);
     fetchFieldSearch({
       entity: ADVANCED_SEARCH_TYPES.ENTRANCES,
@@ -72,8 +75,9 @@ const EntrancesListPage = () => {
       query: massif.name,
       filter: {}
     })
-      .then(r => setMassifValue(r?.hits?.[0]?.[0] ?? null))
-      .catch(() => setMassifValue(null));
+      .then(r => { if (!cancelled) setMassifValue(r?.hits?.[0]?.[0] ?? null); })
+      .catch(() => { if (!cancelled) setMassifValue(null); });
+    return () => { cancelled = true; };
   }, [massif, massifId]);
 
   let initialFilter = {};
