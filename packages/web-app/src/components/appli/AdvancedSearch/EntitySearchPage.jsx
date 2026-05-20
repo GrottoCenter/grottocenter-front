@@ -9,7 +9,7 @@ import {
   fetchAdvancedSearchResults,
   resetAdvancedSearchResults
 } from '../../../actions/Advancedsearch';
-import { getStoredRowsPerPage } from '../../common/EntityTable/EntityTable';
+import { getStoredRowsPerPage } from '../../common/EntityTable';
 import SearchResults from './SearchResults';
 
 const ENTITY_ICON_TYPE = {

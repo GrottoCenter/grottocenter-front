@@ -37,7 +37,7 @@ import {
 } from './SearchElements';
 import SearchInput from '../../common/SearchInput';
 import { ADVANCED_SEARCH_TYPES } from '../../../conf/config';
-import { getStoredRowsPerPage } from '../../common/EntityTable/EntityTable';
+import { getStoredRowsPerPage } from '../../common/EntityTable';
 
 const FILTER_LABELS = {
   title: 'Title',

@@ -7,7 +7,7 @@ import {
   resetAdvancedSearchResults
 } from '../../../actions/Advancedsearch';
 import { SearchForm, SearchActionButtons } from './SearchElements';
-import { getStoredRowsPerPage } from '../../common/EntityTable/EntityTable';
+import { getStoredRowsPerPage } from '../../common/EntityTable';
 import SearchInput from '../../common/SearchInput';
 import { ADVANCED_SEARCH_TYPES } from '../../../conf/config';
 

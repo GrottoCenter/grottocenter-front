@@ -8,7 +8,7 @@ import Layout from '../../components/common/Layouts/Fixed/FixedContent';
 import { useUserProperties } from '../../hooks';
 import AuthChecker from '../../components/appli/AuthChecker';
 
-import EntityTable from '../../components/common/EntityTable/EntityTable';
+import EntityTable from '../../components/common/EntityTable';
 import Translate from '../../components/common/Translate';
 
 const ContributionsPage = () => {

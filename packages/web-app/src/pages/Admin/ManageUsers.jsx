@@ -14,7 +14,7 @@ import {
 import AuthChecker from '../../components/appli/AuthChecker';
 
 import Layout from '../../components/common/Layouts/Fixed/FixedContent';
-import EntityTable from '../../components/common/EntityTable/EntityTable';
+import EntityTable from '../../components/common/EntityTable';
 import ManageUserGroups from './ManageUserGroups';
 
 const MarginBottomBlock = styled('div')`

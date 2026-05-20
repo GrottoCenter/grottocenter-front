@@ -26,7 +26,7 @@ import {
   countActiveFilters
 } from './SearchElements';
 import { ADVANCED_SEARCH_TYPES } from '../../../conf/config';
-import { getStoredRowsPerPage } from '../../common/EntityTable/EntityTable';
+import { getStoredRowsPerPage } from '../../common/EntityTable';
 import CustomIcon from '../../common/CustomIcon';
 import DataUsageIcon from '@mui/icons-material/DataUsage';
 
