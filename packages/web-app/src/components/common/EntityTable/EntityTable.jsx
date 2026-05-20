@@ -400,7 +400,10 @@ const EntityTable = ({
 
   const renderCell = (doc, key, renderFn) => {
     const v = getObjectPath(doc, key);
-    if (renderFn) return renderFn(v, doc);
+    if (renderFn) {
+      const rendered = renderFn(v, doc);
+      return rendered != null ? rendered : '-';
+    }
     if (v === true) return <CheckIcon color="success" />;
     if (v === false) return <CloseIcon color="error" />;
     if (v) return v;

@@ -129,7 +129,7 @@ const entrances = {
       field: 'dataQuality',
       label: 'Data quality',
       sortable: true,
-      render: value => (value != null ? <DataQualityBadge value={value} size={30} /> : null)
+      render: value => (value != null ? <DataQualityBadge value={value} size={30} /> : undefined)
     }
   ],
   link: doc => `/ui/entrances/${doc.id}`
