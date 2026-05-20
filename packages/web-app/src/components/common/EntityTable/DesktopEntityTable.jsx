@@ -8,6 +8,7 @@ import {
   Button,
   Checkbox,
   Divider,
+  IconButton,
   LinearProgress,
   Table,
   TableBody,
@@ -23,8 +24,9 @@ import {
   Typography
 } from '@mui/material';
 
-import DescriptionIcon from '@mui/icons-material/Description';
+import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import SearchOffIcon from '@mui/icons-material/SearchOff';
+import ViewListIcon from '@mui/icons-material/ViewList';
 
 import entitiesConfig from './entitiesConfig';
 import { LoadingTableHead, LoadingTableBodyInner } from './LoadingTable';
@@ -157,7 +159,10 @@ const JumpToPage = ({ page, count, rowsPerPage, onPageChange }) => {
             'aria-label': formatMessage({ id: 'Go to page' })
           }
         }}
-        sx={{ width: 56, '& input': { fontSize: theme => theme.typography.body2.fontSize } }}
+        sx={{
+          width: 56,
+          '& input': { fontSize: theme => theme.typography.body2.fontSize }
+        }}
       />
       <Typography variant="body2">/ {totalPages}</Typography>
     </Box>
@@ -185,7 +190,9 @@ const DesktopEntityTable = ({
   onCSVDownload,
   isNewQuery,
   shouldHideFooter,
-  compact
+  compact,
+  onViewToggle,
+  viewMode
 }) => {
   const { formatMessage } = useIntl();
   const [page, setPage] = useState(0);
@@ -336,7 +343,12 @@ const DesktopEntityTable = ({
           <Toolbar
             disableGutters
             variant="dense"
-            sx={{ display: 'flex', alignItems: 'center', gap: 0.5, minHeight: 48 }}>
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 0.5,
+              minHeight: 48
+            }}>
             {nbTotalRows != null && !isLoading && (
               <Typography
                 variant="body2"
@@ -364,7 +376,7 @@ const DesktopEntityTable = ({
                       c.map(e => e.label)
                     );
                   }}
-                  startIcon={<DescriptionIcon />}>
+                  startIcon={<FileDownloadIcon />}>
                   <Translate>Export to CSV</Translate>
                 </Button>
               ) : (
@@ -377,12 +389,17 @@ const DesktopEntityTable = ({
                       variant="text"
                       size="small"
                       disabled
-                      startIcon={<DescriptionIcon />}>
+                      startIcon={<FileDownloadIcon />}>
                       <Translate>Export to CSV</Translate>
                     </Button>
                   </span>
                 </Tooltip>
               ))}
+            <Tooltip title={viewMode === 'table' ? 'Card view' : 'Table view'}>
+              <IconButton onClick={onViewToggle} color="primary">
+                <ViewListIcon />
+              </IconButton>
+            </Tooltip>
           </Toolbar>
           <Divider />
         </>
@@ -455,7 +472,9 @@ DesktopEntityTable.propTypes = {
   onCSVDownload: PropTypes.func,
   isNewQuery: PropTypes.bool,
   shouldHideFooter: PropTypes.bool,
-  compact: PropTypes.bool
+  compact: PropTypes.bool,
+  onViewToggle: PropTypes.func,
+  viewMode: PropTypes.string
 };
 
 export default DesktopEntityTable;

@@ -67,6 +67,9 @@ const EntityTable = ({
   const [mobileOrder, setMobileOrder] = useState('');
   const [mobileOrderBy, setMobileOrderBy] = useState('');
   const [rowsPerPage] = useState(() => getStoredRowsPerPage(pageSizeOptions));
+  const [viewMode, setViewMode] = useState(isMobile ? 'cards' : 'table');
+  const toggleViewMode = () =>
+    setViewMode(v => (v === 'cards' ? 'table' : 'cards'));
 
   useEffect(() => {
     setEntityColumns(
@@ -83,7 +86,7 @@ const EntityTable = ({
 
   if (!pageRows) return null;
 
-  if (isMobile) {
+  if (viewMode === 'cards') {
     const sortableColumns = entityColumns.filter(
       c => c.sortable && SORT_FIELD_MAP[entityType]?.[c.field]
     );
@@ -127,6 +130,8 @@ const EntityTable = ({
               entityColumns={entityColumns}
               setEntityColumns={setEntityColumns}
               entityType={entityType}
+              onViewToggle={toggleViewMode}
+              viewMode={viewMode}
             />
             <Divider />
           </>
@@ -168,6 +173,8 @@ const EntityTable = ({
       isNewQuery={isNewQuery}
       shouldHideFooter={shouldHideFooter}
       compact={compact}
+      onViewToggle={toggleViewMode}
+      viewMode={viewMode}
     />
   );
 };

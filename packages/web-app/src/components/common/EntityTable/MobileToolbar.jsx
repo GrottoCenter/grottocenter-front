@@ -4,15 +4,19 @@ import { useIntl } from 'react-intl';
 import {
   Button,
   Divider,
+  IconButton,
   ListItemIcon,
   Menu,
   MenuItem,
-  Toolbar
+  Toolbar,
+  Tooltip
 } from '@mui/material';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import CloseIcon from '@mui/icons-material/Close';
 import SwapVertIcon from '@mui/icons-material/SwapVert';
+import TableChartIcon from '@mui/icons-material/TableChart';
+import ViewListIcon from '@mui/icons-material/ViewList';
 import VisibleColumnsMenu from './VisibleColumnsMenu';
 import Translate from '../Translate';
 
@@ -114,7 +118,9 @@ const MobileToolbar = ({
   compact,
   entityColumns,
   setEntityColumns,
-  entityType
+  entityType,
+  onViewToggle,
+  viewMode
 }) => (
   <Toolbar
     disableGutters
@@ -138,6 +144,23 @@ const MobileToolbar = ({
         color="primary"
       />
     )}
+    <Tooltip title={viewMode === 'cards' ? 'Table view' : 'Card view'}>
+      <IconButton
+        size="small"
+        onClick={onViewToggle}
+        color="primary"
+        sx={{
+          border: '1px solid',
+          borderColor: 'primary.main',
+          borderRadius: 1
+        }}>
+        {viewMode === 'cards' ? (
+          <TableChartIcon fontSize="small" />
+        ) : (
+          <ViewListIcon fontSize="small" />
+        )}
+      </IconButton>
+    </Tooltip>
   </Toolbar>
 );
 
@@ -150,7 +173,9 @@ MobileToolbar.propTypes = {
   compact: PropTypes.bool.isRequired,
   entityColumns: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   setEntityColumns: PropTypes.func.isRequired,
-  entityType: PropTypes.string
+  entityType: PropTypes.string,
+  onViewToggle: PropTypes.func.isRequired,
+  viewMode: PropTypes.string.isRequired
 };
 
 export default MobileToolbar;
