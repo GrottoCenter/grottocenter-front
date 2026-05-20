@@ -6,10 +6,9 @@ import React, {
   useMemo
 } from 'react';
 import PropTypes from 'prop-types';
-import { DocumentTypes } from '../../../../hooks/documentTypeHelpers';
+import { DocumentTypes } from '../../../../utils/documentTypeHelpers';
 import {
   IS_INTACT,
-  LICENSE_IN_FILE,
   DOCUMENT_AUTHORIZE_TO_PUBLISH
 } from './formElements/AddFileForm/FileHelpers';
 import { defaultDocumentValuesTypes } from './types';
@@ -92,11 +91,7 @@ const checkFormValidation = document => {
     document.type !== DocumentTypes.AUTHORIZATION_TO_PUBLISH;
   if (requiresAuthorization && document.files.length > 0) {
     if (!document.selectOptionAuthorizationDocument) isValid = false;
-    if (
-      document.selectOptionAuthorizationDocument !== LICENSE_IN_FILE &&
-      !document.license
-    )
-      isValid = false;
+    if (!document.license) isValid = false;
     if (
       document.selectOptionAuthorizationDocument === DOCUMENT_AUTHORIZE_TO_PUBLISH &&
       !document.authorizationDocument

@@ -24,7 +24,7 @@ import MultipleSubjectsSelect from './formElements/MultipleSubjectsSelect';
 import OrganizationAutoComplete from './formElements/OrganizationAutoComplete';
 import PagesEditor from './formElements/PagesEditor';
 import IdentifierEditor from './formElements/IdentifierEditor';
-
+import AuthorsSection from './formElements/AuthorsSection';
 import { FormActionRow, FormContainer, FormRow } from '../utils/FormContainers';
 import AddFileForm from './formElements/AddFileForm';
 import StringInput from '../../../common/Form/StringInput';
@@ -37,7 +37,7 @@ import {
 import {
   documentTypeHelpers,
   DOCUMENT_TYPE_ACCEPT
-} from '../../../../hooks/documentTypeHelpers';
+} from '../../../../utils/documentTypeHelpers';
 
 const PublicationDatePicker = React.lazy(
   () => import('./formElements/PublicationDatePicker')
@@ -309,6 +309,8 @@ const FormContent = () => {
             <AddFileForm {...addFileFormProps} />
           </Box>
         )}
+
+      {!isUnknown(docType) && <AuthorsSection />}
 
       {!isUnknown(docType) &&
         !isEvent(docType) &&

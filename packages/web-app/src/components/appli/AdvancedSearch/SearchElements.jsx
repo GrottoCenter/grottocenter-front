@@ -521,7 +521,8 @@ export const SearchSelect = ({
   optionDescription,
   options,
   value,
-  onChange
+  onChange,
+  sx = {}
 }) => {
   const { formatMessage } = useIntl();
   return (
@@ -540,7 +541,8 @@ export const SearchSelect = ({
             backgroundColor: 'background.paper',
             boxShadow: theme => `0 0 0 2px ${theme.palette.primary.main}`
           }
-        }
+        },
+        ...sx
       }}>
       <Select
         value={value}
@@ -579,7 +581,8 @@ SearchSelect.propTypes = {
   value: PropTypes.string,
   optionDescription: PropTypes.string.isRequired,
   options: PropTypes.arrayOf(PropTypes.shape({})),
-  onChange: PropTypes.func.isRequired
+  onChange: PropTypes.func.isRequired,
+  sx: PropTypes.object
 };
 
 export const SearchMatchAllFieldsToogle = ({ isChecked, onChange }) => {

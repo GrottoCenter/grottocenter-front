@@ -1,13 +1,24 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
+import { Box } from '@mui/material';
 import {
   fetchAdvancedSearchResults,
   resetAdvancedSearchResults
 } from '../../../actions/Advancedsearch';
 import { loadDocumentTypes } from '../../../actions/DocumentType';
 import { loadSubjects } from '../../../actions/Subject';
+import {
+  DOCUMENT_TYPE_ICONS,
+  DOCUMENT_TYPE_FALLBACK_ICON
+} from '../../../utils/documentTypeHelpers';
+import {
+  SUBJECT_DEPTH_STYLES,
+  getSubjectCode,
+  sortSubjects
+} from '../../../utils/subjectHelpers';
+import Translate from '../../common/Translate';
 
 import useSearchFilter from '../../../hooks/useSearchFilter';
 import {
@@ -79,22 +90,19 @@ const initialFilterState = {
 
 const SubjectEntry = ({ subject }) => {
   const { formatMessage } = useIntl();
-  const isTopLevel = subject.parent === null;
-  let out = '';
-  if (!isTopLevel) out += '\u00a0\u00a0\u00a0\u00a0';
-  out += `${subject.code} - `;
-  const name = formatMessage({
-    id: subject.code,
-    defaultMessage: subject.subject
-  });
-  out += name.length > 80 ? `${name.substring(0, 80)}…` : name;
-  return isTopLevel ? <b>{out}</b> : out;
+  const code = getSubjectCode(subject);
+  const depth = code.split('.').length - 1;
+  return (
+    <Box sx={SUBJECT_DEPTH_STYLES[Math.min(depth, 3)]}>
+      {code}&nbsp;&nbsp;
+      {formatMessage({ id: code, defaultMessage: subject.subject })}
+    </Box>
+  );
 };
 SubjectEntry.propTypes = {
   subject: PropTypes.shape({
     code: PropTypes.string,
-    subject: PropTypes.string,
-    parent: PropTypes.string
+    subject: PropTypes.string
   })
 };
 
@@ -134,56 +142,92 @@ const DocumentSearch = () => {
     );
 
   const advancedFilterCount = countActiveFilters(filterState, [
+    'title', 'description', 'subjects.code',
     'identifierType', 'identifier', 'importSource', 'importId',
     'datePublication', 'iso3166.iso', 'license', 'pages',
     'authors.nickname', 'editor.name', 'library.name', 'issue',
     'parent.title', 'cave.name', 'entrances.name', 'massifs.name'
   ]);
 
+  const docTypeOptions = useMemo(
+    () =>
+      documentTypes.filter(e => e.isAvailable).map(e => {
+        const Icon = DOCUMENT_TYPE_ICONS[e.name] ?? DOCUMENT_TYPE_FALLBACK_ICON;
+        return [
+          e.name,
+          <Box
+            key={e.name}
+            sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Icon sx={{ fontSize: 18, color: 'text.secondary' }} />
+            <Translate>{e.name}</Translate>
+          </Box>
+        ];
+      }),
+    [documentTypes]
+  );
+
+  const sortedSubjectOptions = useMemo(
+    () =>
+      sortSubjects(subjects).map(e => [
+        e.code,
+        <SubjectEntry key={e.code} subject={e} />
+      ]),
+    [subjects]
+  );
+
   return (
     <SearchForm onSubmit={() => startAdvancedsearch()}>
-      <SearchInput
-        onChange={e => setQuery(e)}
-        value={query}
-        placeholder={formatMessage({ id: 'Search for a document...' })}
-      />
-
-      <SearchFieldset title="Content">
-        <SearchText
-          label="Title"
-          onChange={e => updateFilter('title', e)}
-          value={filterState.title}
-        />
-        <SearchText
-          label="Description"
-          onChange={e => updateFilter('description', e)}
-          value={filterState.description}
-        />
-        <SearchSelect
-          label="Document type"
-          optionDescription="All document types"
-          options={documentTypes
-            .filter(e => e.isAvailable)
-            .map(e => [e.name, e.name])}
-          onChange={e => updateFilter('type', e)}
-          value={filterState.type}
-        />
-        <SearchSelect
-          label="Subjects"
-          optionDescription="All subjects"
-          options={subjects.map(e => [
-            e.code,
-            <SubjectEntry subject={e} />
-          ])}
-          onChange={e => updateFilter('subjects.code', e)}
-          value={filterState['subjects.code']}
-        />
-      </SearchFieldset>
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: { xs: 'column', sm: 'row' },
+          gap: 1,
+          alignItems: { sm: 'center' },
+          width: '100%'
+        }}>
+        <Box sx={{ flex: 1 }}>
+          <SearchInput
+            onChange={e => setQuery(e)}
+            value={query}
+            placeholder={formatMessage({ id: 'Search for a document...' })}
+          />
+        </Box>
+        <Box sx={{ width: { xs: '100%', sm: 220 } }}>
+          <SearchSelect
+            label="Document type"
+            optionDescription="All document types"
+            options={docTypeOptions}
+            onChange={e => updateFilter('type', e)}
+            value={filterState.type}
+            sx={{ mx: { xs: 0, sm: '4px' } }}
+          />
+        </Box>
+      </Box>
 
       <SearchFilterAccordion
         filterCount={advancedFilterCount}
         expanded={advancedExpanded}
         onExpandedChange={setAdvancedExpanded}>
+        <SearchFieldset title="Content">
+          <SearchText
+            label="Title"
+            onChange={e => updateFilter('title', e)}
+            value={filterState.title}
+          />
+          <SearchText
+            label="Description"
+            onChange={e => updateFilter('description', e)}
+            value={filterState.description}
+          />
+          <SearchSelect
+            label="Subjects"
+            optionDescription="All subjects"
+            options={sortedSubjectOptions}
+            onChange={e => updateFilter('subjects.code', e)}
+            value={filterState['subjects.code']}
+          />
+        </SearchFieldset>
+
         <SearchFieldset title="Attributes" isMultiline>
           <SearchFormContainer>
             <SearchTextAutocomplete

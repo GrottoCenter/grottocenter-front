@@ -30,7 +30,7 @@ import {
 import {
   validateLatitude,
   validateLongitude
-} from '../../../../util/validateLatLong';
+} from '../../../../utils/validateLatLong';
 import InputCoordinate from './InputCoordinate';
 import MapMarkerSelector from './MapMarkerSelector';
 import CRSMenu from '../../../common/CRSMenu';

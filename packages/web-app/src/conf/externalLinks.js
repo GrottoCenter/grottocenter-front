@@ -1,5 +1,5 @@
 import { AVAILABLE_LANGUAGES } from './config';
-import { capitalize } from '../util/strings';
+import { capitalize } from '../utils/strings';
 
 function generateLinks(link, defaultLang) {
   const resultArray = {};
