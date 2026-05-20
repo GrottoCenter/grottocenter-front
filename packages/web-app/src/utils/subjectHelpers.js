@@ -9,8 +9,8 @@ export const getSubjectCode = option => (option.id ?? option.code ?? '').trim();
 
 export const sortSubjects = subjects =>
   [...subjects].sort((a, b) => {
-    const aParts = getSubjectCode(a).split('.').map(Number);
-    const bParts = getSubjectCode(b).split('.').map(Number);
+    const aParts = getSubjectCode(a).split('.').filter(Boolean).map(Number);
+    const bParts = getSubjectCode(b).split('.').filter(Boolean).map(Number);
     for (let i = 0; i < Math.max(aParts.length, bParts.length); i++) {
       const diff = (aParts[i] ?? -1) - (bParts[i] ?? -1);
       if (diff !== 0) return diff;
