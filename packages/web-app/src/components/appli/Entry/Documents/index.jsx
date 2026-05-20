@@ -2,13 +2,13 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import { Box, Button, Divider, Tooltip } from '@mui/material';
-import AddCircleIcon from '@mui/icons-material/AddCircle';
 import AddLinkIcon from '@mui/icons-material/AddLink';
-import { useDispatch } from 'react-redux';
 import CancelIcon from '@mui/icons-material/Cancel';
 import { styled } from '@mui/material/styles';
+import { useDispatch } from 'react-redux';
 import { linkDocumentToEntrance } from '../../../../actions/LinkDocumentToEntrance';
 import { unlinkDocumentToEntrance } from '../../../../actions/UnlinkDocumentToEntrance';
+import { EntityIcon } from '../../../../pages/EntityCreation/entityConfig';
 import ScrollableContent from '../../../common/Layouts/Fixed/ScrollableContent';
 import SearchDocumentForm from '../../SearchDocumentForm';
 import Alert from '../../../common/Alert';
@@ -56,7 +56,7 @@ const Documents = ({ documents, entranceId, isEditAllowed }) => {
                   size="small"
                   variant="outlined"
                   onClick={navigateToNewDocument}
-                  startIcon={<AddCircleIcon />}>
+                  startIcon={<EntityIcon iconType="bibliography" size={20} />}>
                   {formatMessage({ id: 'New' })}
                 </Button>
               </Tooltip>
