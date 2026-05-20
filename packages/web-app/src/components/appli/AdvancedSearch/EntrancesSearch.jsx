@@ -26,6 +26,7 @@ import {
 import { ADVANCED_SEARCH_TYPES } from '../../../conf/config';
 import { getStoredRowsPerPage } from '../../common/EntityTable/EntityTable';
 import CustomIcon from '../../common/CustomIcon';
+import DataUsageIcon from '@mui/icons-material/DataUsage';
 
 const lengthMarks = [
   { value: 0, scaledValue: 0, label: '0' },
@@ -183,17 +184,17 @@ const EntrancesSearch = () => {
 
         <SearchFieldset title="Rating criterias">
           <SearchSlider
-            label="Ease of reach"
+            label={`${formatMessage({ id: 'Ease of reach' })}`}
             value={filterState['commentsRating.approach']}
             onChange={e => updateFilter('commentsRating.approach', e)}
           />
           <SearchSlider
-            label="Ease of move"
+            label={`${formatMessage({ id: 'Ease of move' })}`}
             value={filterState['commentsRating.caving']}
             onChange={e => updateFilter('commentsRating.caving', e)}
           />
           <SearchSlider
-            label="Aesthetic"
+            label={`${formatMessage({ id: 'Aesthetic' })}`}
             value={filterState['commentsRating.aestheticism']}
             onChange={e => updateFilter('commentsRating.aestheticism', e)}
           />
@@ -203,22 +204,21 @@ const EntrancesSearch = () => {
           <SearchFormContainer>
             <SearchSlider
               icon={<CustomIcon type="depth" size={24} />}
-              label="Depth"
+              label={`${formatMessage({ id: 'Depth' })} (${formatMessage({ id: 'meters' })})`}
               value={filterState['cave.depth']}
-              helperText="In meters"
               marks={depthMarks}
               onChange={e => updateFilter('cave.depth', e)}
             />
             <SearchSlider
               icon={<CustomIcon type="length" size={24} />}
-              label="Length"
+              label={`${formatMessage({ id: 'Development' })} (${formatMessage({ id: 'meters' })})`}
               value={filterState['cave.length']}
-              helperText="In meters"
               marks={lengthMarks}
               onChange={e => updateFilter('cave.length', e)}
             />
             <SearchSlider
-              label="Data quality"
+              icon={<DataUsageIcon color="primary" sx={{ fontSize: 24 }} />}
+              label={`${formatMessage({ id: 'Data quality' })}`}
               value={filterState.dataQuality}
               min={0}
               max={100}

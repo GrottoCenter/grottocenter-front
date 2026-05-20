@@ -396,9 +396,10 @@ export const SearchSlider = ({
   return (
     <FormControl
       sx={{ flex: 1, minWidth: '200px', mx: 3, alignItems: 'center' }}>
-      <FormLabel sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+      <FormLabel
+        sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: -2 }}>
         {icon}
-        <Translate>{label}</Translate>
+        {label}
         <IconButton
           size="small"
           onClick={handleClear}
