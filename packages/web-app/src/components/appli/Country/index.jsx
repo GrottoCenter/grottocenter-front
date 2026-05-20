@@ -123,20 +123,6 @@ const Country = ({
         subheader={subheader}
         actions={actions}
       />
-      {country && (
-        <Box sx={{ mx: 2, mb: 1 }}>
-          <Button
-            fullWidth
-            variant="contained"
-            color="primary"
-            size="large"
-            startIcon={<CustomIcon type="entrance" />}
-            onClick={() => navigate(`/ui/countries/${country.id}/entrances`)}>
-            {formatMessage({ id: 'Entrances list' })}
-            {dataCountry?.nb_caves ? ` (${dataCountry.nb_caves})` : ''}
-          </Button>
-        </Box>
-      )}
       {isLoading && (
         <Card sx={{ m: 2, p: 3 }}>
           <Skeleton height={300} />
@@ -173,6 +159,18 @@ const Country = ({
               }
             />
           )}
+          <Box sx={{ mx: 2, mb: 1 }}>
+            <Button
+              fullWidth
+              variant="contained"
+              color="primary"
+              size="large"
+              startIcon={<CustomIcon type="entrance" />}
+              onClick={() => navigate(`/ui/countries/${country.id}/entrances`)}>
+              {formatMessage({ id: 'Entrances list' })}
+              {dataCountry?.nb_caves ? ` (${dataCountry.nb_caves})` : ''}
+            </Button>
+          </Box>
           <StatisticsDataDashboard
             countryId={country.id}
             description={formatMessage({
