@@ -144,6 +144,7 @@ const EntityTable = ({
           }
           rowsPerPage={rowsPerPage}
           link={entityConfig.link}
+          icon={entityConfig.icon}
           renderCellFn={renderCell}
         />
       </Box>
