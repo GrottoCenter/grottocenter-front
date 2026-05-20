@@ -51,6 +51,9 @@ const FILTER_LABELS = {
   city: 'City',
   county: 'County',
   country: 'Country',
+  // iso3166 is the ISO 3166-2 subdivision code used as a locked filter when navigating from a
+  // country/region page. It maps to the same "Region" label as the freeform `region` field.
+  iso3166: 'Region',
   'massifs.name': 'Massif',
   region: 'Region',
   'cave.name': 'Network name',
@@ -67,6 +70,9 @@ const FILTER_LABELS = {
 
 const initialFilterState = {
   country: '',
+  // iso3166 is never shown as a UI input (no SearchTextAutocomplete for it); it is only used as a
+  // locked filter injected via initialFilter when navigating from a country/region page.
+  iso3166: '',
   region: '',
   county: '',
   'massifs.name': '',
@@ -171,7 +177,11 @@ const EntrancesSearch = ({ initialFilter = {}, lockedFilter = [] }) => {
               value={filterState['massifs.name']}
             />
           )}
-          {!lockedFilter.includes('region') && !lockedFilter.includes('county') && (
+          {/* Hide the Region field when iso3166 is locked: the subdivision is already fixed via the
+              ISO code, so the freeform region autocomplete would be redundant and confusing. */}
+          {!lockedFilter.includes('region') &&
+            !lockedFilter.includes('county') &&
+            !lockedFilter.includes('iso3166') && (
             <SearchTextAutocomplete
               ressourceType={searchEntity}
               ressourceField="region"

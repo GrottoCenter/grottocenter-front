@@ -36,7 +36,6 @@ const EntrancesListPage = () => {
   const { massif, isFetching: massifFetching } = useSelector(
     state => state.massif
   );
-  const [countyValue, setCountyValue] = useState(undefined);
   const [massifValue, setMassifValue] = useState(undefined);
 
   useEffect(() => {
@@ -49,21 +48,6 @@ const EntrancesListPage = () => {
     if (massifId) dispatch(loadMassif(massifId));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [massifId]);
-
-  useEffect(() => {
-    if (!regionId || !region || !country) return;
-    let cancelled = false;
-    setCountyValue(undefined);
-    fetchFieldSearch({
-      entity: ADVANCED_SEARCH_TYPES.ENTRANCES,
-      field: 'county',
-      query: region.name,
-      filter: { country: country.nativeName }
-    })
-      .then(r => { if (!cancelled) setCountyValue(r?.hits?.[0]?.[0] ?? null); })
-      .catch(() => { if (!cancelled) setCountyValue(null); });
-    return () => { cancelled = true; };
-  }, [region, country, regionId]);
 
   useEffect(() => {
     if (!massifId || !massif) return;
@@ -84,6 +68,7 @@ const EntrancesListPage = () => {
   let lockedFilter = [];
   let searchKey = 'open';
   let pageIcon;
+  let valueLabels = {};
   const label = formatMessage({ id: 'Entrances' });
   let pageTitle = label;
 
@@ -106,23 +91,30 @@ const EntrancesListPage = () => {
       locale,
       country.nativeName
     );
+    // Typesense stores country as "ISO_CODE - native_name" (e.g. "FR - France").
+    // Using only nativeName would not match the facet value exactly.
+    const countryTypesenseValue = `${country.id} - ${country.nativeName}`;
 
-    if (
-      regionId &&
-      regionStatus === REDUCER_STATUS.SUCCEEDED &&
-      region &&
-      countyValue !== undefined
-    ) {
-      const resolvedCounty = countyValue ?? region.name;
-      initialFilter = { country: country.nativeName, county: resolvedCounty };
-      lockedFilter = ['country', 'county'];
-      searchKey = `${country.nativeName}|${resolvedCounty}`;
+    if (regionId && regionStatus === REDUCER_STATUS.SUCCEEDED && region) {
+      // region.id is the ISO 3166-2 code built by the API as "${countryId}-${regionId}"
+      // (e.g. "FR-01" for Ain, "MX-YUC" for Yucatán). This matches the `iso3166` Typesense
+      // field populated by Nominatim reverse-geocoding, regardless of the country's admin level.
+      // Using iso3166 instead of the freeform `county`/`region` fields avoids mismatches where
+      // the region entity corresponds to different admin levels across countries.
+      initialFilter = {
+        country: countryTypesenseValue,
+        iso3166: region.id
+      };
+      lockedFilter = ['country', 'iso3166'];
+      searchKey = `${countryTypesenseValue}|${region.id}`;
       pageTitle = `${label} - ${localizedCountry} - ${region.name}`;
       pageIcon = <EntranceBadgeIcon badge={flag} />;
+      // iso3166 stores the raw ISO code (e.g. "FR-01"); display the human-readable name instead.
+      valueLabels = { iso3166: region.name };
     } else if (!regionId) {
-      initialFilter = { country: country.nativeName };
+      initialFilter = { country: countryTypesenseValue };
       lockedFilter = ['country'];
-      searchKey = country.nativeName;
+      searchKey = countryTypesenseValue;
       pageTitle = `${label} - ${localizedCountry}`;
       pageIcon = <EntranceBadgeIcon badge={flag} />;
     }
@@ -140,6 +132,7 @@ const EntrancesListPage = () => {
         key={searchKey}
         initialFilter={initialFilter}
         lockedFilter={lockedFilter}
+        valueLabels={valueLabels}
       />
     </EntitySearchPage>
   );
