@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useUserProperties } from '../../../../../../hooks';
 import { isEmpty, remove } from 'ramda';
 import {
+  Autocomplete,
   Box,
   CircularProgress,
   FormControl,
@@ -51,41 +52,34 @@ const AuthDocSelect = ({ value, onChange, disabled = false }) => {
     );
   }, [dispatch, authDocs.length, isLoading]);
 
-  if (disabled) {
-    return (
-      <TextField
-        variant="filled"
-        fullWidth
-        disabled
-        label={formatMessage({ id: 'Authorization from authors' })}
-        value={value?.title ?? ''}
-        sx={{ mt: 1.5 }}
-      />
-    );
-  }
-
   return (
-    <FormControl variant="filled" fullWidth required sx={{ mt: 1.5 }}>
-      <InputLabel required>
-        {formatMessage({ id: 'Authorization from authors' })}
-      </InputLabel>
-      <Select
-        value={isLoading ? -1 : (value?.id ?? -1)}
-        onChange={e => onChange(authDocs.find(d => d.id === e.target.value))}>
-        <MenuItem value={-1} disabled>
-          {isLoading ? (
-            <CircularProgress size={16} />
-          ) : (
-            <i>{formatMessage({ id: 'Select an authorization document' })}</i>
-          )}
-        </MenuItem>
-        {authDocs.map(doc => (
-          <MenuItem key={doc.id} value={doc.id}>
-            {doc.title}
-          </MenuItem>
-        ))}
-      </Select>
-    </FormControl>
+    <Autocomplete
+      disabled={disabled}
+      loading={isLoading}
+      options={authDocs}
+      getOptionLabel={doc => doc.title ?? ''}
+      isOptionEqualToValue={(option, val) => option.id === val.id}
+      value={value ?? null}
+      onChange={(_, newValue) => onChange(newValue)}
+      renderInput={params => (
+        <TextField
+          {...params}
+          variant="filled"
+          required={!disabled}
+          label={formatMessage({ id: 'Authorization from authors' })}
+          sx={{ mt: 1.5 }}
+          InputProps={{
+            ...params.InputProps,
+            endAdornment: (
+              <>
+                {isLoading && <CircularProgress size={16} />}
+                {params.InputProps.endAdornment}
+              </>
+            )
+          }}
+        />
+      )}
+    />
   );
 };
 
@@ -148,7 +142,7 @@ const AddFileForm = ({
   const updateOption = newOption => {
     setOption(newOption);
     setAuthorizationDocument(null);
-    if (newOption === LICENSE_IN_FILE) setLicense(null);
+
 
     if (!currentUser.id) return;
     const authorsIsOnlyMe =
@@ -252,9 +246,7 @@ const AddFileForm = ({
             />
           )}
 
-          {option &&
-            option !== LICENSE_IN_FILE &&
-            option !== AUTHORIZATION_FROM_AUTHOR && (
+          {option && option !== AUTHORIZATION_FROM_AUTHOR && (
               <FormControl
                 variant="filled"
                 fullWidth

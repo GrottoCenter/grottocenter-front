@@ -92,11 +92,7 @@ const checkFormValidation = document => {
     document.type !== DocumentTypes.AUTHORIZATION_TO_PUBLISH;
   if (requiresAuthorization && document.files.length > 0) {
     if (!document.selectOptionAuthorizationDocument) isValid = false;
-    if (
-      document.selectOptionAuthorizationDocument !== LICENSE_IN_FILE &&
-      !document.license
-    )
-      isValid = false;
+    if (!document.license) isValid = false;
     if (
       document.selectOptionAuthorizationDocument === DOCUMENT_AUTHORIZE_TO_PUBLISH &&
       !document.authorizationDocument

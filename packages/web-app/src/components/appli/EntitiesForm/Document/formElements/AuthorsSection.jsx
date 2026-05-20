@@ -4,6 +4,7 @@ import { useIntl } from 'react-intl';
 import { useUserProperties } from '../../../../../hooks';
 import { DocumentFormContext } from '../Provider';
 import MultipleCaversSelect from './MultipleCaversSelect';
+import { DOCUMENT_AUTHORIZE_TO_PUBLISH } from './AddFileForm/FileHelpers';
 
 const AuthorsSection = () => {
   const { formatMessage } = useIntl();
@@ -12,7 +13,12 @@ const AuthorsSection = () => {
   const hasPrefilledRef = useRef(false);
 
   useEffect(() => {
-    if (hasPrefilledRef.current || !currentUser.id || doc.authors.length > 0)
+    if (
+      hasPrefilledRef.current ||
+      !currentUser.id ||
+      doc.authors.length > 0 ||
+      doc.selectOptionAuthorizationDocument === DOCUMENT_AUTHORIZE_TO_PUBLISH
+    )
       return;
     hasPrefilledRef.current = true;
     updateAttribute('authors', [
@@ -20,7 +26,7 @@ const AuthorsSection = () => {
     ]);
     // doc.authors and updateAttribute are stable; currentUser.id guards async hydration
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentUser.id]);
+  }, [currentUser.id, doc.selectOptionAuthorizationDocument]);
 
   return (
     <Box sx={{ mt: 2 }}>
