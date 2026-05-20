@@ -217,8 +217,6 @@ const EntrancesSearch = () => {
               marks={lengthMarks}
               onChange={e => updateFilter('cave.length', e)}
             />
-          </SearchFormContainer>
-          <SearchFormContainer>
             <SearchSlider
               label="Data quality"
               value={filterState.dataQuality}
