@@ -14,10 +14,12 @@ import {
   FETCH_CONVERSATION_MESSAGES_FAILURE
 } from '../actions/Messaging/GetConversationMessages';
 import {
-  ARCHIVE_CONVERSATION_SUCCESS
+  ARCHIVE_CONVERSATION_SUCCESS,
+  ARCHIVE_CONVERSATION_FAILURE
 } from '../actions/Messaging/ArchiveConversation';
 import {
-  UNARCHIVE_CONVERSATION_SUCCESS
+  UNARCHIVE_CONVERSATION_SUCCESS,
+  UNARCHIVE_CONVERSATION_FAILURE
 } from '../actions/Messaging/UnarchiveConversation';
 import {
   SEND_MESSAGE_SUCCESS
@@ -186,12 +188,40 @@ const reducer = (state = initialState, action) => {
         activeConversations: {
           ...state.activeConversations,
           items: state.activeConversations.items.filter(c => c.id !== action.conversationId),
-          totalCount: Math.max(0, state.activeConversations.totalCount - 1)
+          totalCount: Math.max(0, state.activeConversations.totalCount - 1),
+          error: null
         },
         unreadCounts: {
           ...state.unreadCounts,
           active: Math.max(0, state.unreadCounts.active - unreadCountToMove),
           archived: state.unreadCounts.archived + unreadCountToMove
+        }
+      };
+    }
+    case ARCHIVE_CONVERSATION_FAILURE: {
+      const { conversation, error } = action;
+      if (!conversation) {
+        return {
+          ...state,
+          activeConversations: {
+            ...state.activeConversations,
+            status: REDUCER_STATUS.FAILED,
+            error
+          }
+        };
+      }
+      return {
+        ...state,
+        activeConversations: {
+          items: [...state.activeConversations.items, conversation],
+          totalCount: state.activeConversations.totalCount + 1,
+          status: REDUCER_STATUS.FAILED,
+          error
+        },
+        unreadCounts: {
+          ...state.unreadCounts,
+          active: state.unreadCounts.active + conversation.unreadCount,
+          archived: Math.max(0, state.unreadCounts.archived - conversation.unreadCount)
         }
       };
     }
@@ -203,7 +233,8 @@ const reducer = (state = initialState, action) => {
         archivedConversations: {
           ...state.archivedConversations,
           items: state.archivedConversations.items.filter(c => c.id !== action.conversationId),
-          totalCount: Math.max(0, state.archivedConversations.totalCount - 1)
+          totalCount: Math.max(0, state.archivedConversations.totalCount - 1),
+          error: null
         },
         unreadCounts: {
           ...state.unreadCounts,
@@ -212,11 +243,49 @@ const reducer = (state = initialState, action) => {
         }
       };
     }
+    case UNARCHIVE_CONVERSATION_FAILURE: {
+      const { conversation, error } = action;
+      if (!conversation) {
+        return {
+          ...state,
+          archivedConversations: {
+            ...state.archivedConversations,
+            status: REDUCER_STATUS.FAILED,
+            error
+          }
+        };
+      }
+      return {
+        ...state,
+        archivedConversations: {
+          items: [...state.archivedConversations.items, conversation],
+          totalCount: state.archivedConversations.totalCount + 1,
+          status: REDUCER_STATUS.FAILED,
+          error
+        },
+        unreadCounts: {
+          ...state.unreadCounts,
+          archived: state.unreadCounts.archived + conversation.unreadCount,
+          active: Math.max(0, state.unreadCounts.active - conversation.unreadCount)
+        }
+      };
+    }
     case SEND_MESSAGE_SUCCESS: {
       const { message } = action;
       const convId = Number(message.conversation);
 
-      const updatedMessages = [...state.activeConversationMessages.items, message];
+      const currentConversationId = state.activeConversationMessages.items[0]?.conversation;
+      const isCurrentConversation =
+        currentConversationId !== undefined &&
+        Number(currentConversationId) === convId;
+
+      const updatedMessages = isCurrentConversation
+        ? [...state.activeConversationMessages.items, message]
+        : state.activeConversationMessages.items;
+
+      const updatedTotalCount = isCurrentConversation
+        ? state.activeConversationMessages.totalCount + 1
+        : state.activeConversationMessages.totalCount;
 
       const updateConversationItem = c => {
         if (c.id === convId) {
@@ -236,7 +305,7 @@ const reducer = (state = initialState, action) => {
         activeConversationMessages: {
           ...state.activeConversationMessages,
           items: updatedMessages,
-          totalCount: state.activeConversationMessages.totalCount + 1
+          totalCount: updatedTotalCount
         },
         activeConversations: {
           ...state.activeConversations,
