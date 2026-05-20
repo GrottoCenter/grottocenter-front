@@ -282,6 +282,16 @@ const EntrancesSearch = ({ initialFilter = {}, lockedFilter = [] }) => {
         />
       </SearchFilterAccordion>
 
+      <ActiveFilterChips
+        filterState={filterState}
+        query={query}
+        queryLabel="Entrance name"
+        onRemoveFilter={handleRemoveFilter}
+        onClearQuery={() => setQuery('')}
+        labelMap={FILTER_LABELS}
+        lockedKeys={lockedFilter}
+      />
+
       <SearchActionButtons
         showReset={query !== '' || advancedFilterCount > 0}
         onReset={() => {
@@ -294,16 +304,6 @@ const EntrancesSearch = ({ initialFilter = {}, lockedFilter = [] }) => {
           // so filterState/query/matchAllFields still hold stale values at this point.
           startAdvancedsearch('', mergedInitialState, true);
         }}
-      />
-
-      <ActiveFilterChips
-        filterState={filterState}
-        query={query}
-        queryLabel="Entrance name"
-        onRemoveFilter={handleRemoveFilter}
-        onClearQuery={() => setQuery('')}
-        labelMap={FILTER_LABELS}
-        lockedKeys={lockedFilter}
       />
     </SearchForm>
   );
