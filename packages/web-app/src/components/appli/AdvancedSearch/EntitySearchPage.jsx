@@ -22,6 +22,7 @@ const ENTITY_ICON_TYPE = {
 
 const EntitySearchPage = ({
   title,
+  icon,
   subheader,
   actions,
   entityType,
@@ -50,7 +51,7 @@ const EntitySearchPage = ({
 
   return (
     <FixedContent
-      icon={<CustomIcon type={iconType} />}
+      icon={icon ?? <CustomIcon type={iconType} />}
       title={resolvedTitle}
       subheader={subheader}
       action={actions}
@@ -67,6 +68,7 @@ const EntitySearchPage = ({
 
 EntitySearchPage.propTypes = {
   title: PropTypes.oneOfType([PropTypes.string, PropTypes.node]).isRequired,
+  icon: PropTypes.node,
   subheader: PropTypes.node,
   actions: PropTypes.node,
   entityType: PropTypes.string.isRequired,

@@ -11,6 +11,8 @@ import getLocalizedCountryName from '../../helpers/countryName';
 import REDUCER_STATUS from '../../reducers/ReducerStatus';
 import EntitySearchPage from '../../components/appli/AdvancedSearch/EntitySearchPage';
 import EntrancesSearch from '../../components/appli/AdvancedSearch/EntrancesSearch';
+import CustomIcon from '../../components/common/CustomIcon';
+import EntranceBadgeIcon from './EntranceBadgeIcon';
 import { ADVANCED_SEARCH_TYPES } from '../../conf/config';
 
 const getFlagEmoji = iso =>
@@ -25,9 +27,15 @@ const EntrancesListPage = () => {
   const dispatch = useDispatch();
   const { formatMessage, locale } = useIntl();
 
-  const { country, status: countryStatus } = useSelector(state => state.country);
-  const { region, status: regionStatus } = useSelector(state => state.regionDetails);
-  const { massif, isFetching: massifFetching } = useSelector(state => state.massif);
+  const { country, status: countryStatus } = useSelector(
+    state => state.country
+  );
+  const { region, status: regionStatus } = useSelector(
+    state => state.regionDetails
+  );
+  const { massif, isFetching: massifFetching } = useSelector(
+    state => state.massif
+  );
   const [countyValue, setCountyValue] = useState(undefined);
   const [massifValue, setMassifValue] = useState(undefined);
 
@@ -71,9 +79,9 @@ const EntrancesListPage = () => {
   let initialFilter = {};
   let lockedFilter = [];
   let searchKey = 'open';
-  let pageTitle = formatMessage({ id: 'Entrances' });
-
+  let pageIcon;
   const label = formatMessage({ id: 'Entrances' });
+  let pageTitle = label;
 
   if (massifId && massif && !massifFetching && massifValue !== undefined) {
     const resolvedMassif = massifValue ?? massif.name;
@@ -81,31 +89,49 @@ const EntrancesListPage = () => {
     lockedFilter = ['massifs'];
     searchKey = resolvedMassif;
     pageTitle = `${label} - ${massif.name}`;
+    pageIcon = (
+      <EntranceBadgeIcon badge={<CustomIcon type="massif" size={16} />} />
+    );
   }
 
   const countryReady = countryStatus === REDUCER_STATUS.SUCCEEDED && country;
   if (countryReady) {
     const flag = getFlagEmoji(country.id);
-    const localizedCountry = getLocalizedCountryName(country.id, locale, country.nativeName);
+    const localizedCountry = getLocalizedCountryName(
+      country.id,
+      locale,
+      country.nativeName
+    );
 
-    if (regionId && regionStatus === REDUCER_STATUS.SUCCEEDED && region && countyValue !== undefined) {
+    if (
+      regionId &&
+      regionStatus === REDUCER_STATUS.SUCCEEDED &&
+      region &&
+      countyValue !== undefined
+    ) {
       const resolvedCounty = countyValue ?? region.name;
       initialFilter = { country: country.nativeName, county: resolvedCounty };
       lockedFilter = ['country', 'county'];
       searchKey = `${country.nativeName}|${resolvedCounty}`;
-      pageTitle = `${flag} ${label} - ${localizedCountry} - ${region.name}`;
+      pageTitle = `${label} - ${localizedCountry} - ${region.name}`;
+      pageIcon = <EntranceBadgeIcon badge={flag} />;
     } else if (!regionId) {
       initialFilter = { country: country.nativeName };
       lockedFilter = ['country'];
       searchKey = country.nativeName;
-      pageTitle = `${flag} ${label} - ${localizedCountry}`;
+      pageTitle = `${label} - ${localizedCountry}`;
+      pageIcon = <EntranceBadgeIcon badge={flag} />;
     }
   }
 
   if (searchKey === 'open' && (countryId || massifId)) return null;
 
   return (
-    <EntitySearchPage title={pageTitle} entityType="entrances" initialFilter={initialFilter}>
+    <EntitySearchPage
+      title={pageTitle}
+      icon={pageIcon}
+      entityType="entrances"
+      initialFilter={initialFilter}>
       <EntrancesSearch
         key={searchKey}
         initialFilter={initialFilter}
