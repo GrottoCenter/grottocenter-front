@@ -13,6 +13,11 @@ import {
   DOCUMENT_TYPE_ICONS,
   DOCUMENT_TYPE_FALLBACK_ICON
 } from '../../../hooks/documentTypeHelpers';
+import {
+  SUBJECT_DEPTH_STYLES,
+  getSubjectCode,
+  sortSubjects
+} from '../../../hooks/subjectHelpers';
 import Translate from '../../common/Translate';
 
 import useSearchFilter from '../../../hooks/useSearchFilter';
@@ -85,22 +90,19 @@ const initialFilterState = {
 
 const SubjectEntry = ({ subject }) => {
   const { formatMessage } = useIntl();
-  const isTopLevel = subject.parent === null;
-  let out = '';
-  if (!isTopLevel) out += '\u00a0\u00a0\u00a0\u00a0';
-  out += `${subject.code} - `;
-  const name = formatMessage({
-    id: subject.code,
-    defaultMessage: subject.subject
-  });
-  out += name.length > 80 ? `${name.substring(0, 80)}…` : name;
-  return isTopLevel ? <b>{out}</b> : out;
+  const code = getSubjectCode(subject);
+  const depth = code.split('.').length - 1;
+  return (
+    <Box sx={SUBJECT_DEPTH_STYLES[Math.min(depth, 3)]}>
+      {code}&nbsp;&nbsp;
+      {formatMessage({ id: code, defaultMessage: subject.subject })}
+    </Box>
+  );
 };
 SubjectEntry.propTypes = {
   subject: PropTypes.shape({
     code: PropTypes.string,
-    subject: PropTypes.string,
-    parent: PropTypes.string
+    subject: PropTypes.string
   })
 };
 
@@ -189,9 +191,9 @@ const DocumentSearch = () => {
         <SearchSelect
           label="Subjects"
           optionDescription="All subjects"
-          options={subjects.map(e => [
+          options={sortSubjects(subjects).map(e => [
             e.code,
-            <SubjectEntry subject={e} />
+            <SubjectEntry key={e.code} subject={e} />
           ])}
           onChange={e => updateFilter('subjects.code', e)}
           value={filterState['subjects.code']}

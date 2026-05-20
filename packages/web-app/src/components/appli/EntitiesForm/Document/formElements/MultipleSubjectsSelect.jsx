@@ -6,17 +6,13 @@ import { Box } from '@mui/material';
 
 import Translate from '../../../../common/Translate';
 import { loadSubjects } from '../../../../../actions/Subject';
+import {
+  SUBJECT_DEPTH_STYLES,
+  getSubjectCode,
+  sortSubjects
+} from '../../../../../hooks/subjectHelpers';
 
 import MultipleSelectWithOptionsComponent from './MultipleSelectWithOptions';
-
-const DEPTH_STYLES = [
-  { fontWeight: 700, textTransform: 'uppercase', pl: 1 },
-  { fontWeight: 600, pl: 1.5 },
-  { fontWeight: 400, pl: 2 },
-  { fontWeight: 400, pl: 2.5, color: 'text.secondary' }
-];
-
-const getCode = option => (option.id ?? option.code ?? '').trim();
 
 const MultipleSubjectsSelect = ({
   computeHasError,
@@ -29,19 +25,7 @@ const MultipleSubjectsSelect = ({
   const { formatMessage } = useIntl();
   const { isFetching, subjects } = useSelector(state => state.subject);
 
-  const sortedSubjects = useMemo(
-    () =>
-      [...subjects].sort((a, b) => {
-        const aParts = getCode(a).split('.').map(Number);
-        const bParts = getCode(b).split('.').map(Number);
-        for (let i = 0; i < Math.max(aParts.length, bParts.length); i++) {
-          const diff = (aParts[i] ?? -1) - (bParts[i] ?? -1);
-          if (diff !== 0) return diff;
-        }
-        return 0;
-      }),
-    [subjects]
-  );
+  const sortedSubjects = useMemo(() => sortSubjects(subjects), [subjects]);
 
   useEffect(() => {
     dispatch(loadSubjects());
@@ -49,15 +33,15 @@ const MultipleSubjectsSelect = ({
   }, []);
 
   const getSubjectLabel = option => {
-    const code = getCode(option);
+    const code = getSubjectCode(option);
     return `${code} ${formatMessage({ id: code, defaultMessage: option.subject })}`;
   };
 
   const renderSubjectOption = (props, option) => {
-    const code = getCode(option);
+    const code = getSubjectCode(option);
     const depth = code.split('.').length - 1;
     return (
-      <Box component="li" {...props} sx={DEPTH_STYLES[Math.min(depth, 3)]}>
+      <Box component="li" {...props} sx={SUBJECT_DEPTH_STYLES[Math.min(depth, 3)]}>
         {code}&nbsp;&nbsp;{formatMessage({ id: code, defaultMessage: option.subject })}
       </Box>
     );
