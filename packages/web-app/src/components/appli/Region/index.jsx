@@ -133,7 +133,7 @@ const Region = ({
             variant="contained"
             color="primary"
             size="large"
-            startIcon={<CustomIcon type="entrance" />}
+            startIcon={<CustomIcon type="entrance" size={24} />}
             onClick={() =>
               navigate(
                 `/ui/countries/${countryId}/regions/${regionId}/entrances`

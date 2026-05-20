@@ -292,7 +292,7 @@ const Massif = ({ isLoading, error, massif }) => {
                   variant="contained"
                   color="primary"
                   size="large"
-                  startIcon={<CustomIcon type="entrance" />}
+                  startIcon={<CustomIcon type="entrance" size={24} />}
                   onClick={() => navigate(`/ui/massifs/${massifId}/entrances`)}>
                   {formatMessage({ id: 'Entrances list' })}
                   {dataMassif?.nb_caves ? ` (${dataMassif.nb_caves})` : ''}

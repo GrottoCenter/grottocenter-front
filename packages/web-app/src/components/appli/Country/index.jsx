@@ -165,7 +165,7 @@ const Country = ({
               variant="contained"
               color="primary"
               size="large"
-              startIcon={<CustomIcon type="entrance" />}
+              startIcon={<CustomIcon type="entrance" size={24} />}
               onClick={() => navigate(`/ui/countries/${country.id}/entrances`)}>
               {formatMessage({ id: 'Entrances list' })}
               {dataCountry?.nb_caves ? ` (${dataCountry.nb_caves})` : ''}
