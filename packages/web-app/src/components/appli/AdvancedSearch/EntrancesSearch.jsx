@@ -51,6 +51,7 @@ const FILTER_LABELS = {
   city: 'City',
   county: 'County',
   country: 'Country',
+  massifs: 'Massif',
   region: 'Region',
   'cave.name': 'Network name',
   'commentsRating.approach': 'Ease of reach',
@@ -68,6 +69,7 @@ const initialFilterState = {
   country: '',
   region: '',
   county: '',
+  massifs: '',
   city: '',
   // postalCode is intentionally absent: the entrances API endpoint does not support postal code filtering
   'commentsRating.approach': null,
@@ -120,6 +122,7 @@ const EntrancesSearch = ({ initialFilter = {}, lockedFilter = [] }) => {
     'country',
     'region',
     'county',
+    'massifs',
     'city',
     'cave.name',
     'commentsRating.approach',
@@ -156,6 +159,16 @@ const EntrancesSearch = ({ initialFilter = {}, lockedFilter = [] }) => {
               label="Country"
               onChange={e => updateFilter('country', e)}
               value={filterState.country}
+            />
+          )}
+          {!lockedFilter.includes('massifs') && (
+            <SearchTextAutocomplete
+              ressourceType={searchEntity}
+              ressourceField="massifs"
+              ressourceFilter={matchAllFields ? filterState : {}}
+              label="Massif"
+              onChange={e => updateFilter('massifs', e)}
+              value={filterState.massifs}
             />
           )}
           {!lockedFilter.includes('region') && !lockedFilter.includes('county') && (

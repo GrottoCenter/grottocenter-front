@@ -5,6 +5,7 @@ import { useIntl } from 'react-intl';
 
 import { fetchCountry } from '../../actions/Country/GetCountry';
 import { fetchRegion } from '../../actions/Region/GetRegion';
+import { loadMassif } from '../../actions/Massif/GetMassif';
 import { fetchFieldSearch } from '../../actions/FieldSearch';
 import getLocalizedCountryName from '../../helpers/countryName';
 import REDUCER_STATUS from '../../reducers/ReducerStatus';
@@ -20,13 +21,15 @@ const getFlagEmoji = iso =>
     : '';
 
 const EntrancesListPage = () => {
-  const { countryId, regionId } = useParams();
+  const { countryId, regionId, massifId } = useParams();
   const dispatch = useDispatch();
   const { formatMessage, locale } = useIntl();
 
   const { country, status: countryStatus } = useSelector(state => state.country);
   const { region, status: regionStatus } = useSelector(state => state.regionDetails);
-  const [countyValue, setCountyValue] = useState(null);
+  const { massif, isFetching: massifFetching } = useSelector(state => state.massif);
+  const [countyValue, setCountyValue] = useState(undefined);
+  const [massifValue, setMassifValue] = useState(undefined);
 
   useEffect(() => {
     if (countryId) dispatch(fetchCountry(countryId));
@@ -35,8 +38,13 @@ const EntrancesListPage = () => {
   }, [countryId, regionId]);
 
   useEffect(() => {
+    if (massifId) dispatch(loadMassif(massifId));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [massifId]);
+
+  useEffect(() => {
     if (!regionId || !region || !country) return;
-    setCountyValue(null);
+    setCountyValue(undefined);
     fetchFieldSearch({
       entity: ADVANCED_SEARCH_TYPES.ENTRANCES,
       field: 'county',
@@ -47,21 +55,44 @@ const EntrancesListPage = () => {
       .catch(() => setCountyValue(null));
   }, [region, country, regionId]);
 
+  useEffect(() => {
+    if (!massifId || !massif) return;
+    setMassifValue(undefined);
+    fetchFieldSearch({
+      entity: ADVANCED_SEARCH_TYPES.ENTRANCES,
+      field: 'massifs',
+      query: massif.name,
+      filter: {}
+    })
+      .then(r => setMassifValue(r?.hits?.[0]?.[0] ?? null))
+      .catch(() => setMassifValue(null));
+  }, [massif, massifId]);
+
   let initialFilter = {};
   let lockedFilter = [];
   let searchKey = 'open';
   let pageTitle = formatMessage({ id: 'Entrances' });
 
+  const label = formatMessage({ id: 'Entrances' });
+
+  if (massifId && massif && !massifFetching && massifValue !== undefined) {
+    const resolvedMassif = massifValue ?? massif.name;
+    initialFilter = { massifs: resolvedMassif };
+    lockedFilter = ['massifs'];
+    searchKey = resolvedMassif;
+    pageTitle = `${label} - ${massif.name}`;
+  }
+
   const countryReady = countryStatus === REDUCER_STATUS.SUCCEEDED && country;
   if (countryReady) {
     const flag = getFlagEmoji(country.id);
-    const label = formatMessage({ id: 'Entrances' });
     const localizedCountry = getLocalizedCountryName(country.id, locale, country.nativeName);
 
-    if (regionId && regionStatus === REDUCER_STATUS.SUCCEEDED && region && countyValue) {
-      initialFilter = { country: country.nativeName, county: countyValue };
+    if (regionId && regionStatus === REDUCER_STATUS.SUCCEEDED && region && countyValue !== undefined) {
+      const resolvedCounty = countyValue ?? region.name;
+      initialFilter = { country: country.nativeName, county: resolvedCounty };
       lockedFilter = ['country', 'county'];
-      searchKey = `${country.nativeName}|${countyValue}`;
+      searchKey = `${country.nativeName}|${resolvedCounty}`;
       pageTitle = `${flag} ${label} - ${localizedCountry} - ${region.name}`;
     } else if (!regionId) {
       initialFilter = { country: country.nativeName };
@@ -71,7 +102,7 @@ const EntrancesListPage = () => {
     }
   }
 
-  if (countryId && searchKey === 'open') return null;
+  if (searchKey === 'open' && (countryId || massifId)) return null;
 
   return (
     <EntitySearchPage title={pageTitle} entityType="entrances" initialFilter={initialFilter}>
