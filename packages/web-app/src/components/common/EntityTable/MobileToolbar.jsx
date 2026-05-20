@@ -55,7 +55,11 @@ const SortMenu = ({
         sx={{ flex: 1, minWidth: 0 }}>
         <Box
           component="span"
-          sx={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          sx={{
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap'
+          }}>
           {label}
         </Box>
       </Button>
@@ -129,47 +133,50 @@ const MobileToolbar = ({
 }) => {
   const { formatMessage } = useIntl();
   return (
-  <Toolbar
-    disableGutters
-    variant="dense"
-    sx={{ display: 'flex', alignItems: 'center', gap: 1, minHeight: 48 }}>
-    {sortableColumns.length > 0 && (
-      <SortMenu
-        sortableColumns={sortableColumns}
-        order={order}
-        orderBy={orderBy}
-        onSortFieldChange={onSortFieldChange}
-        onSortDirToggle={onSortDirToggle}
-      />
-    )}
-    {!compact && (
-      <VisibleColumnsMenu
-        columns={entityColumns}
-        setColumns={setEntityColumns}
-        entityType={entityType}
-        label="Data"
-        menuTitle="Data display"
-        sx={{ flex: 1 }}
-      />
-    )}
-    <Tooltip title={formatMessage({ id: viewMode === 'cards' ? 'Table view' : 'Card view' })}>
-      <IconButton
-        size="small"
-        onClick={onViewToggle}
-        color="primary"
-        sx={{
-          border: '1px solid',
-          borderColor: 'primary.main',
-          borderRadius: 1
-        }}>
-        {viewMode === 'cards' ? (
-          <TableChartIcon fontSize="small" />
-        ) : (
-          <ViewListIcon fontSize="small" />
-        )}
-      </IconButton>
-    </Tooltip>
-  </Toolbar>
+    <Toolbar
+      disableGutters
+      variant="dense"
+      sx={{ display: 'flex', alignItems: 'center', gap: 1, minHeight: 48 }}>
+      {sortableColumns.length > 0 && (
+        <SortMenu
+          sortableColumns={sortableColumns}
+          order={order}
+          orderBy={orderBy}
+          onSortFieldChange={onSortFieldChange}
+          onSortDirToggle={onSortDirToggle}
+        />
+      )}
+      {!compact && (
+        <VisibleColumnsMenu
+          columns={entityColumns}
+          setColumns={setEntityColumns}
+          entityType={entityType}
+          label="Data"
+          menuTitle="Data display"
+          sx={{ flex: 1 }}
+        />
+      )}
+      <Tooltip
+        title={formatMessage({
+          id: viewMode === 'cards' ? 'Table view' : 'Card view'
+        })}>
+        <IconButton
+          size="small"
+          onClick={onViewToggle}
+          color="primary"
+          sx={{
+            border: '1px solid',
+            borderColor: 'primary.main',
+            borderRadius: 1
+          }}>
+          {viewMode === 'cards' ? (
+            <TableChartIcon fontSize="small" />
+          ) : (
+            <ViewListIcon fontSize="small" />
+          )}
+        </IconButton>
+      </Tooltip>
+    </Toolbar>
   );
 };
 

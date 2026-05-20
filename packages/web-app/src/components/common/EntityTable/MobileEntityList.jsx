@@ -121,7 +121,6 @@ const MobileEntityList = ({
       setAllRows(prev => [...prev, ...(rows ?? [])]);
     } else {
       setAllRows(rows ?? []);
-      setPage(0);
     }
     isAppending.current = false;
   }, [rows]);
