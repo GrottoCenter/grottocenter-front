@@ -34,6 +34,7 @@ const MassifsSearch = () => {
       />
 
       <SearchActionButtons
+        showReset={query !== ''}
         onReset={() => {
           setQuery('');
           dispatch(resetAdvancedSearchResults());

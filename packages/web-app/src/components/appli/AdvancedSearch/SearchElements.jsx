@@ -756,18 +756,20 @@ SearchFilterAccordion.propTypes = {
   children: PropTypes.node.isRequired
 };
 
-export const SearchActionButtons = ({ onReset }) => (
+export const SearchActionButtons = ({ onReset, showReset = true }) => (
   <CardActions sx={{ padding: 0, justifyContent: 'flex-end', width: '100%' }}>
-    <Button
-      type="button"
-      variant="text"
-      size="medium"
-      color="inherit"
-      startIcon={<ClearIcon />}
-      onClick={() => onReset()}
-      sx={{ color: 'text.secondary' }}>
-      <Translate>Reset</Translate>
-    </Button>
+    {showReset && (
+      <Button
+        type="button"
+        variant="text"
+        size="medium"
+        color="inherit"
+        startIcon={<ClearIcon />}
+        onClick={() => onReset()}
+        sx={{ color: 'text.secondary' }}>
+        <Translate>Reset</Translate>
+      </Button>
+    )}
 
     <Button
       type="submit"
@@ -780,7 +782,8 @@ export const SearchActionButtons = ({ onReset }) => (
 );
 
 SearchActionButtons.propTypes = {
-  onReset: PropTypes.func.isRequired
+  onReset: PropTypes.func.isRequired,
+  showReset: PropTypes.bool
 };
 
 SearchMatchAllFieldsToogle.propTypes = {

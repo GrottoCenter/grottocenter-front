@@ -122,6 +122,7 @@ const OrganizationsSearch = () => {
       </SearchFilterAccordion>
 
       <SearchActionButtons
+        showReset={query !== '' || advancedFilterCount > 0}
         onReset={() => {
           setQuery('');
           setMatchAllFields(true);

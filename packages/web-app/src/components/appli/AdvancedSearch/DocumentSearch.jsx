@@ -360,6 +360,7 @@ const DocumentSearch = () => {
       </SearchFilterAccordion>
 
       <SearchActionButtons
+        showReset={query !== '' || countActiveFilters(filterState) > 0}
         onReset={() => {
           setQuery('');
           setMatchAllFields(true);
