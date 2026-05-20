@@ -21,7 +21,7 @@ import { styled } from '@mui/material/styles';
 import { fetchConversationMessages } from '../../actions/Messaging/GetConversationMessages';
 import { sendMessage } from '../../actions/Messaging/SendMessage';
 import REDUCER_STATUS from '../../reducers/ReducerStatus';
-import StatusMessage from '../../components/common/StatusMessage';
+import Alert from '../../components/common/Alert';
 import StandardDialog from '../../components/common/StandardDialog';
 import { useNotification } from '../../hooks';
 
@@ -192,9 +192,9 @@ const ConversationDetail = () => {
   if (status === REDUCER_STATUS.FAILED) {
     return (
       <Box sx={{ p: 3 }}>
-        <StatusMessage
-          type="error"
-          message={error?.message || formatMessage({ id: 'An error occurred while fetching messages.' })}
+        <Alert
+          severity="error"
+          title={error?.message || formatMessage({ id: 'An error occurred while fetching messages.' })}
         />
       </Box>
     );

@@ -28,7 +28,7 @@ import UnarchiveIcon from '@mui/icons-material/Unarchive';
 import { styled } from '@mui/material/styles';
 
 import AuthChecker from '../../components/appli/AuthChecker';
-import StatusMessage from '../../components/common/StatusMessage';
+import Alert from '../../components/common/Alert';
 import REDUCER_STATUS from '../../reducers/ReducerStatus';
 import { fetchConversations } from '../../actions/Messaging/GetConversations';
 import { archiveConversation } from '../../actions/Messaging/ArchiveConversation';
@@ -127,9 +127,9 @@ const MessagesPage = () => {
 
     if (status === REDUCER_STATUS.FAILED) {
       return (
-        <StatusMessage
-          type="error"
-          message={error?.message || formatMessage({ id: 'An error occurred while fetching conversations.' })}
+        <Alert
+          severity="error"
+          title={error?.message || formatMessage({ id: 'An error occurred while fetching conversations.' })}
         />
       );
     }

@@ -1,13 +1,9 @@
 import React, { useState, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
-import { Button, Card, Chip, Tooltip, Typography, IconButton } from '@mui/material';
-import StandardDialog from '../../common/StandardDialog';
+import { Card, Chip, Tooltip, IconButton, Skeleton } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
-import CancelIcon from '@mui/icons-material/Cancel';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import MailIcon from '@mui/icons-material/Mail';
 import CreateIcon from '@mui/icons-material/Create';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -35,7 +31,7 @@ import PersonProperties from '../../common/Person/PersonProperties';
 import { deletePerson } from '../../../actions/Person/DeletePerson';
 import { fetchPerson } from '../../../actions/Person/GetPerson';
 import { fetchConversations } from '../../../actions/Messaging/GetConversations';
-import SearchOrganizationForm from '../Form/SearchOrganizationForm';
+
 import {
   DeleteConfirmationDialog,
   DELETED_ENTITIES
@@ -95,40 +91,7 @@ const Person = ({ isLoading, person, error }) => {
     }
   }, [dispatch, person?.id, navigate]);
 
-  const handleLeaveOrganization = useCallback(async organizationId => {
-    if (!person?.id) return;
-    try {
-      await dispatch(leaveOrganization(person.id, organizationId));
-      dispatch(fetchPerson(person.id));
-    } catch (err) {
-      console.error('Error leaving organization:', err);
-    }
-  }, [dispatch, person?.id]);
 
-  const requestLeaveOrganization = useCallback(organizationId => {
-    const org = (person?.organizations ?? []).find(o => o.id === organizationId);
-    setPendingLeaveOrg({ id: organizationId, label: org?.name });
-  }, [person?.organizations]);
-
-  const handleConfirmLeaveOrg = useCallback(async () => {
-    if (!pendingLeaveOrg) return;
-    const { id } = pendingLeaveOrg;
-    setPendingLeaveOrg(null);
-    await handleLeaveOrganization(id);
-  }, [pendingLeaveOrg, handleLeaveOrganization]);
-
-  const handleJoinOrganization = useCallback(async organizations => {
-    if (!person?.id || organizations.length === 0) return;
-    try {
-      await Promise.all(
-        organizations.map(org => dispatch(joinOrganization(person.id, org.id)))
-      );
-      dispatch(fetchPerson(person.id));
-    } catch (err) {
-      console.error('Error joining organization:', err);
-    }
-    setIsOrgSearchVisible(false);
-  }, [dispatch, person?.id]);
 
   let onDelete = null;
   if (person && (permissions.isAdmin || permissions.isModerator)) {

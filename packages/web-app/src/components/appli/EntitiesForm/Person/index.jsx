@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { useForm } from 'react-hook-form';
 import { useSelector, useDispatch } from 'react-redux';
@@ -6,11 +6,13 @@ import { useSelector, useDispatch } from 'react-redux';
 import { updatePerson } from '../../../../actions/Person/UpdatePerson';
 import { FormContainer, FormActionRow, FormRow } from '../utils/FormContainers';
 import InputText from '../utils/InputText';
+import InputPassword from '../utils/InputPassword';
 import FormProgressInfo from '../utils/FormProgressInfo';
 import { PersonPropTypes } from '../../../../types/person.type';
 import NotificationPreferences from './NotificationPreferences';
+import { PASSWORD_MIN_LENGTH } from '../../../../conf/config';
 
-export const PersonForm = ({ personValues, onCancel }) => {
+export const PersonForm = ({ personValues, onCancel, isOurAccount }) => {
   const {
     error: personError,
     isLoading: personIsLoading,
@@ -18,10 +20,13 @@ export const PersonForm = ({ personValues, onCancel }) => {
   } = useSelector(state => state.updatePerson);
 
   const dispatch = useDispatch();
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const {
     handleSubmit,
     reset,
     control,
+    watch,
+    getValues,
     formState: { errors, isSubmitting, isSubmitSuccessful }
   } = useForm({
     defaultValues: {
@@ -162,7 +167,8 @@ export const PersonForm = ({ personValues, onCancel }) => {
 
 PersonForm.propTypes = {
   personValues: PersonPropTypes.isRequired,
-  onCancel: PropTypes.func
+  onCancel: PropTypes.func,
+  isOurAccount: PropTypes.bool
 };
 
 export default PersonForm;
