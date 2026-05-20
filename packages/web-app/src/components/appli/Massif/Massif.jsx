@@ -295,6 +295,7 @@ const Massif = ({ isLoading, error, massif }) => {
                   startIcon={<CustomIcon type="entrance" />}
                   onClick={() => navigate(`/ui/massifs/${massifId}/entrances`)}>
                   {formatMessage({ id: 'Entrances list' })}
+                  {dataMassif?.nb_caves ? ` (${dataMassif.nb_caves})` : ''}
                 </Button>
               </Box>
               <Descriptions

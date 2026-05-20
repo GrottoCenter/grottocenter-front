@@ -140,6 +140,7 @@ const Region = ({
               )
             }>
             {formatMessage({ id: 'Entrances list' })}
+            {dataRegion?.nb_caves ? ` (${dataRegion.nb_caves})` : ''}
           </Button>
         </Box>
       )}

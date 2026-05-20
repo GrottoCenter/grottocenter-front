@@ -10,6 +10,7 @@ import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
 import { Print } from '@mui/icons-material';
 import ShareIcon from '@mui/icons-material/Share';
 import { useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import { useReactToPrint } from 'react-to-print';
 import ScrollableContent from '../../common/Layouts/Fixed/ScrollableContent';
 import StatisticsDataDashboard from '../StatisticsDataDashboard';
@@ -46,6 +47,8 @@ const Country = ({
     isCountryLoading: isSubscribeLoading
   } = useSubscriptions();
   const isSubscribed = country ? isSubscribedMethod(country.id) : false;
+
+  const { dataCountry } = useSelector(state => state.statisticsCountry);
 
   const position =
     country?.latitude && country?.longitude
@@ -130,6 +133,7 @@ const Country = ({
             startIcon={<CustomIcon type="entrance" />}
             onClick={() => navigate(`/ui/countries/${country.id}/entrances`)}>
             {formatMessage({ id: 'Entrances list' })}
+            {dataCountry?.nb_caves ? ` (${dataCountry.nb_caves})` : ''}
           </Button>
         </Box>
       )}
