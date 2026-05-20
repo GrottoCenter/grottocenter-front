@@ -24,13 +24,8 @@ const EntrancesListPage = () => {
   const dispatch = useDispatch();
   const { formatMessage, locale } = useIntl();
 
-  const { country, status: countryStatus } = useSelector(
-    state => state.country
-  );
-  const { region, status: regionStatus } = useSelector(
-    state => state.regionDetails
-  );
-
+  const { country, status: countryStatus } = useSelector(state => state.country);
+  const { region, status: regionStatus } = useSelector(state => state.regionDetails);
   const [countyValue, setCountyValue] = useState(null);
 
   useEffect(() => {
@@ -48,10 +43,7 @@ const EntrancesListPage = () => {
       query: region.name,
       filter: { country: country.nativeName }
     })
-      .then(r => {
-        const hits = r?.hits ?? [];
-        setCountyValue(hits[0]?.[0] ?? null);
-      })
+      .then(r => setCountyValue(r?.hits?.[0]?.[0] ?? null))
       .catch(() => setCountyValue(null));
   }, [region, country, regionId]);
 
@@ -60,46 +52,29 @@ const EntrancesListPage = () => {
   let searchKey = 'open';
   let pageTitle = formatMessage({ id: 'Entrances' });
 
-  const entrancesLabel = formatMessage({ id: 'Entrances' });
+  const countryReady = countryStatus === REDUCER_STATUS.SUCCEEDED && country;
+  if (countryReady) {
+    const flag = getFlagEmoji(country.id);
+    const label = formatMessage({ id: 'Entrances' });
+    const localizedCountry = getLocalizedCountryName(country.id, locale, country.nativeName);
 
-  if (countryId && regionId) {
-    const ready =
-      countryStatus === REDUCER_STATUS.SUCCEEDED &&
-      regionStatus === REDUCER_STATUS.SUCCEEDED &&
-      country &&
-      region &&
-      countyValue !== null;
-    if (ready) {
+    if (regionId && regionStatus === REDUCER_STATUS.SUCCEEDED && region && countyValue) {
       initialFilter = { country: country.nativeName, county: countyValue };
       lockedFilter = ['country', 'county'];
       searchKey = `${country.nativeName}|${countyValue}`;
-      const localizedCountry = getLocalizedCountryName(
-        country.id,
-        locale,
-        country.nativeName
-      );
-      pageTitle = `${getFlagEmoji(country.id)} ${entrancesLabel} - ${localizedCountry} - ${region.name}`;
-    }
-  } else if (countryId) {
-    const ready = countryStatus === REDUCER_STATUS.SUCCEEDED && country;
-    if (ready) {
+      pageTitle = `${flag} ${label} - ${localizedCountry} - ${region.name}`;
+    } else if (!regionId) {
       initialFilter = { country: country.nativeName };
       lockedFilter = ['country'];
       searchKey = country.nativeName;
-      const localizedCountry = getLocalizedCountryName(
-        country.id,
-        locale,
-        country.nativeName
-      );
-      pageTitle = `${getFlagEmoji(country.id)} ${entrancesLabel} - ${localizedCountry}`;
+      pageTitle = `${flag} ${label} - ${localizedCountry}`;
     }
   }
 
+  if (countryId && searchKey === 'open') return null;
+
   return (
-    <EntitySearchPage
-      title={pageTitle}
-      entityType="entrances"
-      initialFilter={initialFilter}>
+    <EntitySearchPage title={pageTitle} entityType="entrances" initialFilter={initialFilter}>
       <EntrancesSearch
         key={searchKey}
         initialFilter={initialFilter}
