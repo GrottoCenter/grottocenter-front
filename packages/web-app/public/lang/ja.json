@@ -1,4 +1,4 @@
-﻿{
+{
   "1": "カルスト学と地学洞窟学",
   "2": "地域洞窟学とカルスト学",
   "3": "生物洞窟学",
@@ -500,6 +500,7 @@
   "cave_with_entrances": "{count, plural, one {洞窟（入口1つ以上）} other {洞窟（入口1つ以上）}}",
   "cave(s) (1 or multiple entrances)": "洞窟（1つまたは複数の入口）",
   "cave(s) are diveable": "洞窟（潜水可能）",
+  "Caver": "洞窟探検家",
   "Caver not found": "洞窟探検家が見つかりません",
   "Caver.Name": "名前",
   "cavers": "洞窟探検家",

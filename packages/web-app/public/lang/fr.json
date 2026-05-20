@@ -1,4 +1,4 @@
-﻿{
+{
   "1": "KARSTOLOGIE ET GÉOSPÉLÉOLOGIE",
   "2": "SPÉLÉOLOGIE ET KARSTOLOGIE RÉGIONALES",
   "3": "BIOSPÉLÉOLOGIE",
@@ -500,6 +500,7 @@
   "cave_with_entrances": "{count, plural, one {cavité (1 ou plusieurs entrées)} other {cavités (1 ou plusieurs entrées)}}",
   "cave(s) (1 or multiple entrances)": "cavité(s) (1 ou plusieurs entrées)",
   "cave(s) are diveable": "cavité(s) permettent de faire de la plongée",
+  "Caver": "Spéléologue",
   "Caver not found": "Spéléologue non trouvé",
   "Caver.Name": "Prénom",
   "cavers": "spéléos",

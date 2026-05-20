@@ -1,4 +1,4 @@
-﻿{
+{
   "1": "KARSTOLOGIE ȘI GEOSPEOLOGIE",
   "2": "SPEOLOGIE REGIONALĂ ȘI KARSTOLOGIE",
   "3": "BIOSPEOLOGIE",
@@ -500,6 +500,7 @@
   "cave_with_entrances": "{count, plural, one {peșteră (1 sau mai multe intrări)} other {peșteri (1 sau mai multe intrări)}}",
   "cave(s) (1 or multiple entrances)": "peșteră/i (1 sau mai multe intrări)",
   "cave(s) are diveable": "peșteră/i cu scufundare",
+  "Caver": "Speolog",
   "Caver not found": "Speolog negăsit",
   "Caver.Name": "Nume",
   "cavers": "speologi",

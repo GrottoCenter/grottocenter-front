@@ -136,13 +136,27 @@ const organizations = {
   link: doc => `/ui/organizations/${doc.id}`
 };
 
+const PERSON_TYPE_LABEL = { CAVER: 'Caver', AUTHOR: 'Author' };
+
 const persons = {
   icon: <CustomIcon type="caver" size={16} />,
   columns: [
     { visible: true, field: 'id', label: 'Id', sortable: false },
-    { visible: true, field: 'nickname', label: 'Username', sortable: true },
+    { visible: true, field: 'nickname', label: 'Username', sortable: true, isTitle: true },
     { visible: true, field: 'name', label: 'First name', sortable: true },
-    { visible: true, field: 'surname', label: 'Last name', sortable: true }
+    { visible: true, field: 'surname', label: 'Last name', sortable: true },
+    {
+      visible: false,
+      field: 'type',
+      label: 'Type',
+      sortable: false,
+      render: value =>
+        value && PERSON_TYPE_LABEL[value] ? (
+          <Translate>{PERSON_TYPE_LABEL[value]}</Translate>
+        ) : (
+          value || null
+        )
+    }
   ],
   link: doc => `/ui/persons/${doc.id}`
 };

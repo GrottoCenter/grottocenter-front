@@ -19,7 +19,9 @@ import Translate from '../Translate';
 const MobileEntityCard = ({ doc, columns, link, renderCellFn, icon }) => {
   const navigate = useNavigate();
   const titleCol =
-    columns.find(c => c.field === 'name' || c.field === 'title') ?? columns[0];
+    columns.find(c => c.isTitle) ??
+    columns.find(c => c.field === 'name' || c.field === 'title') ??
+    columns[0];
   const bodyColumns = columns.filter(c => c !== titleCol);
 
   return (

@@ -1,4 +1,4 @@
-﻿{
+{
   "1": "KARSTOLOGIE EN GEOSPELEOLOGIE",
   "2": "REGIONALE SPELEOLOGIE EN KARSTOLOGIE",
   "3": "BIOSPELEOLOGIE",
@@ -500,6 +500,7 @@
   "cave_with_entrances": "{count, plural, one {grot (1 of meerdere ingangen)} other {grotten (1 of meerdere ingangen)}}",
   "cave(s) (1 or multiple entrances)": "grot(ten) (1 of meerdere ingangen)",
   "cave(s) are diveable": "grot(ten) zijn duikbaar",
+  "Caver": "Grot explorer",
   "Caver not found": "Speleoloog niet gevonden",
   "Caver.Name": "Naam",
   "cavers": "speleologen",

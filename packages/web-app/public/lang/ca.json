@@ -1,4 +1,4 @@
-﻿{
+{
   "1": "KARSTOLOGIA I GEOSPELEOLOGIA",
   "2": "ESPELEOLOGIA I KARSTOLOGIA REGIONAL",
   "3": "BIOSPELEOLOGIA",
@@ -500,6 +500,7 @@
   "cave_with_entrances": "{count, plural, one {cova (1 o diverses entrades)} other {coves (1 o diverses entrades)}}",
   "cave(s) (1 or multiple entrances)": "cova/es (1 o múltiples entrades)",
   "cave(s) are diveable": "cova/es amb immersió",
+  "Caver": "Espeleòleg",
   "Caver not found": "Espeleòleg no trobat",
   "Caver.Name": "Cognom",
   "cavers": "espeleòlegs",

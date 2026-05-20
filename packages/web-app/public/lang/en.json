@@ -500,6 +500,7 @@
   "cave_with_entrances": "{count, plural, one {cave (1 or multiple entrances)} other {caves (1 or multiple entrances)}}",
   "cave(s) (1 or multiple entrances)": "cave(s) (1 or multiple entrances)",
   "cave(s) are diveable": "cave(s) are diveable",
+  "Caver": "Caver",
   "Caver not found": "Caver not found",
   "Caver.Name": "Name",
   "cavers": "cavers",

@@ -1,4 +1,4 @@
-﻿{
+{
   "1": "KARSTOLOGI DAN GEOSPELEOLOGI",
   "2": "SPELEOLOGI REGIONAL DAN KARSTOLOGI",
   "3": "BIOSPELEOLOGI",
@@ -500,6 +500,7 @@
   "cave_with_entrances": "{count, plural, one {gua (1 atau beberapa pintu masuk)} other {gua-gua (1 atau beberapa pintu masuk)}}",
   "cave(s) (1 or multiple entrances)": "gua (1 atau beberapa pintu masuk)",
   "cave(s) are diveable": "gua yang bisa diselamI",
+  "Caver": "Penelusur Gua",
   "Caver not found": "Penjelajah gua tidak ditemukan",
   "Caver.Name": "Nama",
   "cavers": "penjelajah gua",
