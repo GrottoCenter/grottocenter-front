@@ -52,8 +52,12 @@ const EntrancesListPage = () => {
       initialFilter = { country: country.nativeName, county: region.name };
       lockedFilter = ['country', 'county'];
       searchKey = `${country.nativeName}|${region.name}`;
-      const localizedCountry = getLocalizedCountryName(country.id, locale, country.nativeName);
-      pageTitle = `${getFlagEmoji(country.id)} ${entrancesLabel} - ${localizedCountry} — ${region.name}`;
+      const localizedCountry = getLocalizedCountryName(
+        country.id,
+        locale,
+        country.nativeName
+      );
+      pageTitle = `${getFlagEmoji(country.id)} ${entrancesLabel} - ${localizedCountry} - ${region.name}`;
     }
   } else if (countryId) {
     const ready = countryStatus === REDUCER_STATUS.SUCCEEDED && country;
@@ -61,8 +65,12 @@ const EntrancesListPage = () => {
       initialFilter = { country: country.nativeName };
       lockedFilter = ['country'];
       searchKey = country.nativeName;
-      const localizedCountry = getLocalizedCountryName(country.id, locale, country.nativeName);
-      pageTitle = `${getFlagEmoji(country.id)} ${entrancesLabel} — ${localizedCountry}`;
+      const localizedCountry = getLocalizedCountryName(
+        country.id,
+        locale,
+        country.nativeName
+      );
+      pageTitle = `${getFlagEmoji(country.id)} ${entrancesLabel} - ${localizedCountry}`;
     }
   }
 
