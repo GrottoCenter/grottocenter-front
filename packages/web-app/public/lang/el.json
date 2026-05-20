@@ -1,4 +1,4 @@
-{
+﻿{
   "1": "ΚΑΡΣΤΟΛΟΓΙΑ ΚΑΙ ΓΕΟΣΠΗΛΑΙΟΛΟΓΙΑ",
   "2": "ΠΕΡΙΦΕΡΕΙΑΚΗ ΣΠΗΛΑΙΟΛΟΓΙΑ ΚΑΙ ΚΑΡΣΤΟΛΟΓΙΑ",
   "3": "ΒΙΟΣΠΗΛΑΙΟΛΟΓΙΑ",
@@ -1621,6 +1621,7 @@
   "Removing sensitivity from the massif will not automatically remove the sensitivity flag from individual entrances.": "Η αφαίρεση της ευαισθησίας από τον ορεινό όγκο δεν θα αφαιρέσει αυτόματα τη σημαία ευαισθησίας από τις μεμονωμένες εισόδους.",
   "Removing sensitivity from the massif will not automatically remove the sensitivity flag from individual entrances. Those flags must be managed separately. Do you want to continue?": "Η αφαίρεση της ευαισθησίας από τον ορεινό όγκο δεν θα αφαιρέσει αυτόματα τη σημαία ευαισθησίας από τις μεμονωμένες εισόδους. Αυτές οι σημαίες πρέπει να διαχειρίζονται ξεχωριστά. Θέλετε να συνεχίσετε;",
   "Repeat your password here.": "Επαναλάβετε τον κωδικό σας εδώ.",
+  "Report": "Έκθεση",
   "Required": "Υποχρεωτικό",
   "Resend in {seconds}s": "Αποστολή ξανά σε {seconds}s",
   "Resend verification email": "Αποστείλετε ξανά το email επαλήθευσης",

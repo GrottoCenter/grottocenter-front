@@ -1,4 +1,4 @@
-{
+﻿{
   "1": "KARSTOLOGIE ȘI GEOSPEOLOGIE",
   "2": "SPEOLOGIE REGIONALĂ ȘI KARSTOLOGIE",
   "3": "BIOSPEOLOGIE",
@@ -1621,6 +1621,7 @@
   "Removing sensitivity from the massif will not automatically remove the sensitivity flag from individual entrances.": "Eliminarea sensibilității de la masiv nu va elimina automat marcajul de sensibilitate de la intrările individuale.",
   "Removing sensitivity from the massif will not automatically remove the sensitivity flag from individual entrances. Those flags must be managed separately. Do you want to continue?": "Eliminarea sensibilității de la masiv nu va elimina automat marcajul de sensibilitate de la intrările individuale. Aceste marcaje trebuie gestionate separat. Doriți să continuați?",
   "Repeat your password here.": "Repetați parola aici.",
+  "Report": "Raport",
   "Required": "Obligatoriu",
   "Resend in {seconds}s": "Retrimite în {seconds}s",
   "Resend verification email": "Retrimite email de verificare",

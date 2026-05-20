@@ -1,4 +1,4 @@
-{
+﻿{
   "1": "CARSTOLOGIA E GEOESOELEOLOGIA",
   "2": "ESPELEOLOGIA REGIONAL E CARSTOLOGIA",
   "3": "BIOESPELEOLOGIA",
@@ -1621,6 +1621,7 @@
   "Removing sensitivity from the massif will not automatically remove the sensitivity flag from individual entrances.": "A remoção da sensibilidade do maciço não removerá automaticamente a marca de sensibilidade das entradas individuais.",
   "Removing sensitivity from the massif will not automatically remove the sensitivity flag from individual entrances. Those flags must be managed separately. Do you want to continue?": "A remoção da sensibilidade do maciço não removerá automaticamente a marca de sensibilidade das entradas individuais. Essas marcas devem ser geridas separadamente. Deseja continuar?",
   "Repeat your password here.": "Repita aqui a sua palavra-passe.",
+  "Report": "Relatório",
   "Required": "Obrigatório",
   "Resend in {seconds}s": "Reenviar em {seconds}s",
   "Resend verification email": "Reenviar email de verificação",

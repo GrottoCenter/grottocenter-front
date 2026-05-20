@@ -1621,6 +1621,7 @@
   "Removing sensitivity from the massif will not automatically remove the sensitivity flag from individual entrances.": "Removing sensitivity from the massif will not automatically remove the sensitivity flag from individual entrances.",
   "Removing sensitivity from the massif will not automatically remove the sensitivity flag from individual entrances. Those flags must be managed separately. Do you want to continue?": "Removing sensitivity from the massif will not automatically remove the sensitivity flag from individual entrances. Those flags must be managed separately. Do you want to continue?",
   "Repeat your password here.": "Repeat your password here.",
+  "Report": "Report",
   "Required": "Required",
   "Resend in {seconds}s": "Resend in {seconds}s",
   "Resend verification email": "Resend verification email",

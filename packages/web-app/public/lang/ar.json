@@ -1,4 +1,4 @@
-{
+﻿{
   "1": "الكارستولوجيا والجيولوجيا الكهفية",
   "2": "علم الكهوف الإقليمي والكارستولوجيا",
   "3": "علم الأحياء الكهفي",
@@ -1621,6 +1621,7 @@
   "Removing sensitivity from the massif will not automatically remove the sensitivity flag from individual entrances.": "إزالة الحساسية عن الكتلة الجبلية لن يؤدي تلقائياً إلى إزالة علامة الحساسية عن المداخل الفردية.",
   "Removing sensitivity from the massif will not automatically remove the sensitivity flag from individual entrances. Those flags must be managed separately. Do you want to continue?": "إزالة الحساسية عن الكتلة الجبلية لن يؤدي تلقائياً إلى إزالة علامة الحساسية عن المداخل الفردية. يجب إدارة هذه العلامات بشكل منفصل. هل تريد الاستمرار؟",
   "Repeat your password here.": "أعد كتابة كلمة المرور هنا.",
+  "Report": "تقرير",
   "Required": "مطلوب",
   "Resend in {seconds}s": "إعادة إرسال في {seconds}ث",
   "Resend verification email": "إعادة إرسال بريد التحقق",

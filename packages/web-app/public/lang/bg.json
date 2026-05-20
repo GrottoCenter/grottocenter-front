@@ -1,4 +1,4 @@
-{
+﻿{
   "1": "КАРСТОЛОГИЯ И ГЕОСПЕЛЕОЛОГИЯ",
   "2": "РЕГИОНАЛНА СПЕЛЕОЛОГИЯ И КАРСТОЛОГИЯ",
   "3": "БИОСПЕЛЕОЛОГИЯ",
@@ -1621,6 +1621,7 @@
   "Removing sensitivity from the massif will not automatically remove the sensitivity flag from individual entrances.": "Премахването на чувствителността от масива няма автоматично да премахне флага за чувствителност от отделните входове.",
   "Removing sensitivity from the massif will not automatically remove the sensitivity flag from individual entrances. Those flags must be managed separately. Do you want to continue?": "Премахването на чувствителността от масива няма автоматично да премахне флага за чувствителност от отделните входове. Тези флагове трябва да се управляват отделно. Искате ли да продължите?",
   "Repeat your password here.": "Повторете паролата си тук.",
+  "Report": "Доклад",
   "Required": "Задължително",
   "Resend in {seconds}s": "Изпрати отново в {seconds}s",
   "Resend verification email": "Изпрати отново имейл за проверка",

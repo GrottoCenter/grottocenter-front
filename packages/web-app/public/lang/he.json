@@ -1,4 +1,4 @@
-{
+﻿{
   "1": "קרסטולוגיה וגאוספלאולוגיה",
   "2": "ספלאולוגיה אזורית וקרסטולוגיה",
   "3": "ביוספלאולוגיה",
@@ -1621,6 +1621,7 @@
   "Removing sensitivity from the massif will not automatically remove the sensitivity flag from individual entrances.": "הסרת הרגישות מהמאסיב לא תסיר באופן אוטומטי את דגל הרגישות מכניסות בודדות.",
   "Removing sensitivity from the massif will not automatically remove the sensitivity flag from individual entrances. Those flags must be managed separately. Do you want to continue?": "הסרת הרגישות מהמאסיב לא תסיר באופן אוטומטי את דגל הרגישות מכניסות בודדות. יש לנהל דגלים אלה בנפרד. האם ברצונך להמשיך?",
   "Repeat your password here.": "חזור על הסיסמה שלך כאן.",
+  "Report": "דוח",
   "Required": "נדרש",
   "Resend in {seconds}s": "שלח מחדש בעוד {seconds}ש'",
   "Resend verification email": "שלח מחדש את אימייל האימות",

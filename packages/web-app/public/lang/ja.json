@@ -1,4 +1,4 @@
-{
+﻿{
   "1": "カルスト学と地学洞窟学",
   "2": "地域洞窟学とカルスト学",
   "3": "生物洞窟学",
@@ -1621,6 +1621,7 @@
   "Removing sensitivity from the massif will not automatically remove the sensitivity flag from individual entrances.": "山塊から感度設定を解除しても、個々の入り口の感度フラグは自動的には削除されません。",
   "Removing sensitivity from the massif will not automatically remove the sensitivity flag from individual entrances. Those flags must be managed separately. Do you want to continue?": "山塊から感度設定を解除しても、個々の入り口の感度フラグは自動的には削除されません。これらのフラグは個別に管理する必要があります。続行しますか？",
   "Repeat your password here.": "ここにパスワードを繰り返し入力してください。",
+  "Report": "レポート",
   "Required": "必須",
   "Resend in {seconds}s": "{seconds}秒後に再送信",
   "Resend verification email": "検証メールを再送信",

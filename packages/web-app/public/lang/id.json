@@ -1,4 +1,4 @@
-{
+﻿{
   "1": "KARSTOLOGI DAN GEOSPELEOLOGI",
   "2": "SPELEOLOGI REGIONAL DAN KARSTOLOGI",
   "3": "BIOSPELEOLOGI",
@@ -1621,6 +1621,7 @@
   "Removing sensitivity from the massif will not automatically remove the sensitivity flag from individual entrances.": "Menghapus sensitivitas dari massif tidak akan secara otomatis menghapus tanda sensitivitas dari masing-masing pintu masuk.",
   "Removing sensitivity from the massif will not automatically remove the sensitivity flag from individual entrances. Those flags must be managed separately. Do you want to continue?": "Menghapus sensitivitas dari massif tidak akan secara otomatis menghapus tanda sensitivitas dari masing-masing pintu masuk. Tanda tersebut harus dikelola secara terpisah. Apakah Anda ingin melanjutkan?",
   "Repeat your password here.": "Ulangi kata sandi Anda di sini.",
+  "Report": "Laporan",
   "Required": "Wajib",
   "Resend in {seconds}s": "Kirim ulang dalam {seconds}s",
   "Resend verification email": "Kirim ulang email verifikasi",

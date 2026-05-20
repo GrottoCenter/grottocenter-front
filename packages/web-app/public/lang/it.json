@@ -1,4 +1,4 @@
-{
+﻿{
   "1": "CARSOLOGIA E GEOSPELEOLOGIA",
   "2": "SPELEOLOGIA REGIONALE E CARSOLOGIA",
   "3": "BIOSPELEOLOGIA",
@@ -1621,6 +1621,7 @@
   "Removing sensitivity from the massif will not automatically remove the sensitivity flag from individual entrances.": "La rimozione della sensibilità dal massiccio non rimuoverà automaticamente il contrassegno di sensibilità dai singoli ingressi.",
   "Removing sensitivity from the massif will not automatically remove the sensitivity flag from individual entrances. Those flags must be managed separately. Do you want to continue?": "La rimozione della sensibilità dal massiccio non rimuoverà automaticamente il contrassegno di sensibilità dai singoli ingressi. Tali contrassegni devono essere gestiti separatamente. Vuoi continuare?",
   "Repeat your password here.": "Ripeti qui la tua password.",
+  "Report": "Relazione",
   "Required": "Obbligatorio",
   "Resend in {seconds}s": "Rinvia tra {seconds}s",
   "Resend verification email": "Rinvia email di verifica",

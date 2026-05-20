@@ -2,12 +2,18 @@ import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
+import { Box } from '@mui/material';
 import {
   fetchAdvancedSearchResults,
   resetAdvancedSearchResults
 } from '../../../actions/Advancedsearch';
 import { loadDocumentTypes } from '../../../actions/DocumentType';
 import { loadSubjects } from '../../../actions/Subject';
+import {
+  DOCUMENT_TYPE_ICONS,
+  DOCUMENT_TYPE_FALLBACK_ICON
+} from '../../../hooks/documentTypeHelpers';
+import Translate from '../../common/Translate';
 
 import useSearchFilter from '../../../hooks/useSearchFilter';
 import {
@@ -164,7 +170,19 @@ const DocumentSearch = () => {
           optionDescription="All document types"
           options={documentTypes
             .filter(e => e.isAvailable)
-            .map(e => [e.name, e.name])}
+            .map(e => {
+              const Icon =
+                DOCUMENT_TYPE_ICONS[e.name] ?? DOCUMENT_TYPE_FALLBACK_ICON;
+              return [
+                e.name,
+                <Box
+                  key={e.name}
+                  sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <Icon sx={{ fontSize: 18, color: 'text.secondary' }} />
+                  <Translate>{e.name}</Translate>
+                </Box>
+              ];
+            })}
           onChange={e => updateFilter('type', e)}
           value={filterState.type}
         />
