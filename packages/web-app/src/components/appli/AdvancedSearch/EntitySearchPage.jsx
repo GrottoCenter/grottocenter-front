@@ -45,10 +45,13 @@ const EntitySearchPage = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, entityType]);
 
+  const resolvedTitle =
+    typeof title === 'string' ? formatMessage({ id: title }) : title;
+
   return (
     <FixedContent
       icon={<CustomIcon type={iconType} />}
-      title={formatMessage({ id: title })}
+      title={resolvedTitle}
       subheader={subheader}
       action={actions}
       content={
@@ -63,7 +66,7 @@ const EntitySearchPage = ({
 };
 
 EntitySearchPage.propTypes = {
-  title: PropTypes.string.isRequired,
+  title: PropTypes.oneOfType([PropTypes.string, PropTypes.node]).isRequired,
   subheader: PropTypes.node,
   actions: PropTypes.node,
   entityType: PropTypes.string.isRequired,
