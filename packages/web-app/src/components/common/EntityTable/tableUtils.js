@@ -1,6 +1,5 @@
 import React from 'react';
-import CheckIcon from '@mui/icons-material/Check';
-import CloseIcon from '@mui/icons-material/Close';
+import BoolIcon from '../BoolIcon';
 import entitiesConfig from './entitiesConfig';
 
 const DEFAULT_PAGE_SIZE_OPTIONS = [20, 100, 200];
@@ -36,8 +35,7 @@ export const renderCell = (doc, key, renderFn) => {
     const rendered = renderFn(v, doc);
     return rendered != null ? rendered : '-';
   }
-  if (v === true) return <CheckIcon color="success" />;
-  if (v === false) return <CloseIcon color="error" />;
+  if (v === true || v === false) return <BoolIcon value={v} />;
   if (v) return v;
   return '-';
 };
@@ -45,7 +43,10 @@ export const renderCell = (doc, key, renderFn) => {
 export const applyColumnVisibility = (columns, storedVisibility) => {
   try {
     const visibleFields = JSON.parse(storedVisibility);
-    return columns.map(col => ({ ...col, visible: visibleFields.includes(col.field) }));
+    return columns.map(col => ({
+      ...col,
+      visible: visibleFields.includes(col.field)
+    }));
   } catch (e) {
     return columns;
   }

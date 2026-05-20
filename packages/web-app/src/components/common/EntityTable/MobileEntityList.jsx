@@ -57,7 +57,7 @@ const MobileEntityCard = ({ doc, columns, link, renderCellFn, icon }) => {
                 return (
                   <Box
                     key={col.field}
-                    sx={{ display: 'flex', alignItems: 'baseline', gap: 1 }}>
+                    sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                     <Typography
                       variant="caption"
                       color="text.secondary"

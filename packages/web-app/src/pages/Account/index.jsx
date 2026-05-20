@@ -46,7 +46,7 @@ import { fetchPerson } from '../../actions/Person/GetPerson';
 import { joinOrganization } from '../../actions/Organization/JoinOrganization';
 import { leaveOrganization } from '../../actions/Organization/LeaveOrganization';
 import Alert from '../../components/common/Alert';
-import BoolIcon from '../../components/common/Form/BoolIcon';
+import BoolIcon from '../../components/common/BoolIcon';
 
 import DocumentsList from '../../components/common/DocumentsList/DocumentsList';
 import SubscriptionsList from '../../components/common/Subscriptions/SubscriptionsList';

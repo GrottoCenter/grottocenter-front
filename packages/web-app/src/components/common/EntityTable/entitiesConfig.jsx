@@ -182,7 +182,7 @@ const entrances = {
     {
       visible: false,
       field: 'cave.isDiving',
-      label: 'Has siphons',
+      label: 'Diving cave',
       sortable: true
     },
     {
@@ -229,7 +229,7 @@ const entrances = {
       label: 'Data quality',
       sortable: true,
       render: value =>
-        value != null ? <DataQualityBadge value={value} size={30} /> : undefined
+        value != null ? <DataQualityBadge value={value} size={24} /> : undefined
     }
   ],
   link: doc => `/ui/entrances/${doc.id}`
