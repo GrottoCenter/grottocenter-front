@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import {
+  Box,
   Button,
   Divider,
   IconButton,
@@ -51,8 +52,12 @@ const SortMenu = ({
         startIcon={startIcon}
         onClick={e => setAnchorEl(e.currentTarget)}
         color="primary"
-        sx={{ flex: 1 }}>
-        {label}
+        sx={{ flex: 1, minWidth: 0 }}>
+        <Box
+          component="span"
+          sx={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          {label}
+        </Box>
       </Button>
       <Menu
         anchorEl={anchorEl}

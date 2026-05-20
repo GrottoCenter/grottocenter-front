@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
-import { Button, Checkbox, Menu, MenuItem } from '@mui/material';
+import { Box, Button, Checkbox, Menu, MenuItem } from '@mui/material';
 import DatasetIcon from '@mui/icons-material/Dataset';
 import Translate from '../Translate';
 
@@ -25,8 +25,14 @@ const VisibleColumnsMenu = ({
         color="primary"
         startIcon={<Icon fontSize="small" />}
         onClick={event => setAnchorEl(event.currentTarget)}
-        sx={sx}>
-        {label && <Translate>{label}</Translate>}
+        sx={{ minWidth: 0, ...sx }}>
+        {label && (
+          <Box
+            component="span"
+            sx={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            <Translate>{label}</Translate>
+          </Box>
+        )}
       </Button>
       <Menu
         anchorEl={anchorEl}

@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
-import { styled } from '@mui/material/styles';
+import { styled, useTheme } from '@mui/material/styles';
+import useMediaQuery from '@mui/material/useMediaQuery';
 
 import {
   Box,
@@ -196,6 +197,8 @@ const DesktopEntityTable = ({
   viewMode
 }) => {
   const { formatMessage } = useIntl();
+  const theme = useTheme();
+  const isSmall = useMediaQuery(theme.breakpoints.down('md'));
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(() =>
     getStoredRowsPerPage(pageSizeOptions)
@@ -348,14 +351,30 @@ const DesktopEntityTable = ({
               display: 'flex',
               alignItems: 'center',
               gap: 0.5,
-              minHeight: 48
+              minHeight: 48,
+              overflow: 'hidden'
             }}>
             {nbTotalRows != null && !isLoading && (
-              <Typography variant="body2" color="text.secondary">
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                sx={{
+                  flex: 1,
+                  minWidth: 100,
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap'
+                }}>
                 {formatMessage({ id: 'results_count' }, { count: nbTotalRows })}
               </Typography>
             )}
-            <Box sx={{ ml: 'auto', display: 'flex', gap: 1, alignItems: 'center' }}>
+            <Box
+              sx={{
+                minWidth: 0,
+                display: 'flex',
+                gap: 1,
+                alignItems: 'center'
+              }}>
               {onCSVDownload &&
                 (nbTotalRows <= MAX_DOCUMENTS_TO_EXPORT_IN_CSV ? (
                   <Button
@@ -368,8 +387,18 @@ const DesktopEntityTable = ({
                         c.map(e => e.label)
                       );
                     }}
-                    startIcon={<FileDownloadIcon />}>
-                    <Translate>Export to CSV</Translate>
+                    startIcon={<FileDownloadIcon />}
+                    sx={{ minWidth: 0 }}>
+                    <Box
+                      component="span"
+                      sx={{
+                        minWidth: 0,
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap'
+                      }}>
+                      <Translate>Export to CSV</Translate>
+                    </Box>
                   </Button>
                 ) : (
                   <Tooltip
@@ -381,8 +410,22 @@ const DesktopEntityTable = ({
                         variant="outlined"
                         size="small"
                         disabled
-                        startIcon={<FileDownloadIcon />}>
-                        <Translate>Export to CSV</Translate>
+                        startIcon={<FileDownloadIcon />}
+                        sx={{ minWidth: 0 }}>
+                        <Box
+                          component="span"
+                          sx={{
+                            minWidth: 0,
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap'
+                          }}>
+                          {isSmall ? (
+                            'CSV'
+                          ) : (
+                            <Translate>Export to CSV</Translate>
+                          )}
+                        </Box>
                       </Button>
                     </span>
                   </Tooltip>
@@ -397,7 +440,10 @@ const DesktopEntityTable = ({
                   icon={ViewColumnIcon}
                 />
               )}
-              <Tooltip title={formatMessage({ id: viewMode === 'table' ? 'Card view' : 'Table view' })}>
+              <Tooltip
+                title={formatMessage({
+                  id: viewMode === 'table' ? 'Card view' : 'Table view'
+                })}>
                 <IconButton
                   size="small"
                   onClick={onViewToggle}
