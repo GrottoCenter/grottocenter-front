@@ -166,6 +166,15 @@ const DocumentSearch = () => {
     [documentTypes]
   );
 
+  const sortedSubjectOptions = useMemo(
+    () =>
+      sortSubjects(subjects).map(e => [
+        e.code,
+        <SubjectEntry key={e.code} subject={e} />
+      ]),
+    [subjects]
+  );
+
   return (
     <SearchForm onSubmit={() => startAdvancedsearch()}>
       <Box
@@ -213,10 +222,7 @@ const DocumentSearch = () => {
           <SearchSelect
             label="Subjects"
             optionDescription="All subjects"
-            options={sortSubjects(subjects).map(e => [
-              e.code,
-              <SubjectEntry key={e.code} subject={e} />
-            ])}
+            options={sortedSubjectOptions}
             onChange={e => updateFilter('subjects.code', e)}
             value={filterState['subjects.code']}
           />
