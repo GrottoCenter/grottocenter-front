@@ -141,7 +141,8 @@ const MobileToolbar = ({
         setColumns={setEntityColumns}
         entityType={entityType}
         label="Data"
-        color="primary"
+        menuTitle="Data display"
+        sx={{ flex: 1 }}
       />
     )}
     <Tooltip title={viewMode === 'cards' ? 'Table view' : 'Card view'}>

@@ -26,6 +26,7 @@ import {
 
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import SearchOffIcon from '@mui/icons-material/SearchOff';
+import ViewColumnIcon from '@mui/icons-material/ViewColumn';
 import ViewListIcon from '@mui/icons-material/ViewList';
 
 import entitiesConfig from './entitiesConfig';
@@ -350,56 +351,66 @@ const DesktopEntityTable = ({
               minHeight: 48
             }}>
             {nbTotalRows != null && !isLoading && (
-              <Typography
-                variant="body2"
-                color="text.secondary"
-                sx={{ mr: 'auto' }}>
+              <Typography variant="body2" color="text.secondary">
                 {formatMessage({ id: 'results_count' }, { count: nbTotalRows })}
               </Typography>
             )}
-            {!compact && (
-              <VisibleColumnsMenu
-                columns={entityColumns}
-                setColumns={setEntityColumns}
-                entityType={entityType}
-              />
-            )}
-            {onCSVDownload &&
-              (nbTotalRows <= MAX_DOCUMENTS_TO_EXPORT_IN_CSV ? (
-                <Button
-                  variant="text"
+            <Box sx={{ ml: 'auto', display: 'flex', gap: 1, alignItems: 'center' }}>
+              {onCSVDownload &&
+                (nbTotalRows <= MAX_DOCUMENTS_TO_EXPORT_IN_CSV ? (
+                  <Button
+                    variant="outlined"
+                    size="small"
+                    onClick={() => {
+                      const c = entityColumns.filter(e => e.visible);
+                      onCSVDownload(
+                        c.map(e => e.apiField || e.field),
+                        c.map(e => e.label)
+                      );
+                    }}
+                    startIcon={<FileDownloadIcon />}>
+                    <Translate>Export to CSV</Translate>
+                  </Button>
+                ) : (
+                  <Tooltip
+                    title={formatMessage({
+                      id: 'Export unavailable above 10000 results'
+                    })}>
+                    <span>
+                      <Button
+                        variant="outlined"
+                        size="small"
+                        disabled
+                        startIcon={<FileDownloadIcon />}>
+                        <Translate>Export to CSV</Translate>
+                      </Button>
+                    </span>
+                  </Tooltip>
+                ))}
+              {!compact && (
+                <VisibleColumnsMenu
+                  columns={entityColumns}
+                  setColumns={setEntityColumns}
+                  entityType={entityType}
+                  label="Change columns"
+                  menuTitle="Change columns"
+                  icon={ViewColumnIcon}
+                />
+              )}
+              <Tooltip title={viewMode === 'table' ? 'Card view' : 'Table view'}>
+                <IconButton
                   size="small"
-                  onClick={() => {
-                    const c = entityColumns.filter(e => e.visible);
-                    onCSVDownload(
-                      c.map(e => e.apiField || e.field),
-                      c.map(e => e.label)
-                    );
-                  }}
-                  startIcon={<FileDownloadIcon />}>
-                  <Translate>Export to CSV</Translate>
-                </Button>
-              ) : (
-                <Tooltip
-                  title={formatMessage({
-                    id: 'Export unavailable above 10000 results'
-                  })}>
-                  <span>
-                    <Button
-                      variant="text"
-                      size="small"
-                      disabled
-                      startIcon={<FileDownloadIcon />}>
-                      <Translate>Export to CSV</Translate>
-                    </Button>
-                  </span>
-                </Tooltip>
-              ))}
-            <Tooltip title={viewMode === 'table' ? 'Card view' : 'Table view'}>
-              <IconButton onClick={onViewToggle} color="primary">
-                <ViewListIcon />
-              </IconButton>
-            </Tooltip>
+                  onClick={onViewToggle}
+                  color="primary"
+                  sx={{
+                    border: '1px solid',
+                    borderColor: 'primary.main',
+                    borderRadius: 1
+                  }}>
+                  <ViewListIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
+            </Box>
           </Toolbar>
           <Divider />
         </>

@@ -1,49 +1,39 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
-import {
-  Button,
-  Checkbox,
-  IconButton,
-  Menu,
-  MenuItem,
-  Tooltip
-} from '@mui/material';
+import { Button, Checkbox, Menu, MenuItem } from '@mui/material';
 import DatasetIcon from '@mui/icons-material/Dataset';
-import ViewColumnIcon from '@mui/icons-material/ViewColumn';
 import Translate from '../Translate';
 
-const VisibleColumnsMenu = ({ columns, setColumns, entityType, label, color = 'inherit' }) => {
+const VisibleColumnsMenu = ({
+  columns,
+  setColumns,
+  entityType,
+  label,
+  menuTitle = 'Data display',
+  icon: Icon = DatasetIcon,
+  sx
+}) => {
   const { formatMessage } = useIntl();
   const [anchorEl, setAnchorEl] = useState(null);
-  const trigger = label ? (
-    <Button
-      variant="outlined"
-      size="small"
-      startIcon={<DatasetIcon fontSize="small" />}
-      onClick={event => setAnchorEl(event.currentTarget)}
-      color={color}
-      sx={{ flex: 1 }}>
-      <Translate>{label}</Translate>
-    </Button>
-  ) : (
-    <Tooltip title={formatMessage({ id: 'Change columns' })}>
-      <IconButton
-        color="primary"
-        onClick={event => setAnchorEl(event.currentTarget)}>
-        <ViewColumnIcon />
-      </IconButton>
-    </Tooltip>
-  );
+
   return (
     <>
-      {trigger}
+      <Button
+        variant="outlined"
+        size="small"
+        color="primary"
+        startIcon={<Icon fontSize="small" />}
+        onClick={event => setAnchorEl(event.currentTarget)}
+        sx={sx}>
+        {label && <Translate>{label}</Translate>}
+      </Button>
       <Menu
         anchorEl={anchorEl}
         open={!!anchorEl}
         onClose={() => setAnchorEl(null)}>
         <MenuItem key="label" disabled>
-          {formatMessage({ id: label ? 'Data display' : 'Change columns' })}
+          {formatMessage({ id: menuTitle })}
         </MenuItem>
         {columns.map(column => (
           <MenuItem
@@ -80,7 +70,9 @@ VisibleColumnsMenu.propTypes = {
   setColumns: PropTypes.func.isRequired,
   entityType: PropTypes.string,
   label: PropTypes.string,
-  color: PropTypes.string
+  menuTitle: PropTypes.string,
+  icon: PropTypes.elementType,
+  sx: PropTypes.shape({})
 };
 
 export default VisibleColumnsMenu;
