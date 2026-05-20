@@ -20,7 +20,14 @@ const ENTITY_ICON_TYPE = {
   persons: 'caver'
 };
 
-const EntitySearchPage = ({ title, subheader, actions, entityType, children }) => {
+const EntitySearchPage = ({
+  title,
+  subheader,
+  actions,
+  entityType,
+  children,
+  initialFilter = {}
+}) => {
   const dispatch = useDispatch();
   const { formatMessage } = useIntl();
   const iconType = ENTITY_ICON_TYPE[entityType] ?? 'entrance';
@@ -30,10 +37,12 @@ const EntitySearchPage = ({ title, subheader, actions, entityType, children }) =
       fetchAdvancedSearchResults({
         entity: entityType,
         query: '',
+        filter: initialFilter,
         matchAllFields: true,
         size: getStoredRowsPerPage()
       })
     );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, entityType]);
 
   return (
@@ -58,7 +67,8 @@ EntitySearchPage.propTypes = {
   subheader: PropTypes.node,
   actions: PropTypes.node,
   entityType: PropTypes.string.isRequired,
-  children: PropTypes.node.isRequired
+  children: PropTypes.node.isRequired,
+  initialFilter: PropTypes.shape({})
 };
 
 export default EntitySearchPage;

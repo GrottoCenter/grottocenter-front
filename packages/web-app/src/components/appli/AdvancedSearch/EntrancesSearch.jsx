@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useDispatch } from 'react-redux';
+import PropTypes from 'prop-types';
+
 import {
   fetchAdvancedSearchResults,
   resetAdvancedSearchResults
@@ -63,10 +65,10 @@ const FILTER_LABELS = {
 };
 
 const initialFilterState = {
-  city: '',
-  county: '',
   country: '',
   region: '',
+  county: '',
+  city: '',
   // postalCode is intentionally absent: the entrances API endpoint does not support postal code filtering
   'commentsRating.approach': null,
   'commentsRating.caving': null,
@@ -80,10 +82,17 @@ const initialFilterState = {
   dataQuality: null
 };
 
-const EntrancesSearch = () => {
+const EntrancesSearch = ({ initialFilter = {}, lockedFilter = [] }) => {
   const dispatch = useDispatch();
+
+  const mergedInitialState = useMemo(
+    () => ({ ...initialFilterState, ...initialFilter }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  );
+
   const { filterState, updateFilter, handleRemoveFilter, resetFilter } =
-    useSearchFilter(initialFilterState);
+    useSearchFilter(mergedInitialState, lockedFilter);
   const [query, setQuery] = useState('');
   const [matchAllFields, setMatchAllFields] = useState(true);
   const [advancedExpanded, setAdvancedExpanded] = useState(false);
@@ -107,7 +116,7 @@ const EntrancesSearch = () => {
 
   const { formatMessage } = useIntl();
 
-  const advancedFilterCount = countActiveFilters(filterState, [
+  const filterableKeys = [
     'country',
     'region',
     'county',
@@ -122,7 +131,9 @@ const EntrancesSearch = () => {
     'cave.depth',
     'cave.length',
     'dataQuality'
-  ]);
+  ].filter(k => !lockedFilter.includes(k));
+
+  const advancedFilterCount = countActiveFilters(filterState, filterableKeys);
 
   return (
     <SearchForm onSubmit={() => startAdvancedsearch()}>
@@ -136,31 +147,37 @@ const EntrancesSearch = () => {
         filterCount={advancedFilterCount}
         expanded={advancedExpanded}
         onExpandedChange={setAdvancedExpanded}>
-        <SearchFieldset title="Localization">
-          <SearchTextAutocomplete
-            ressourceType={searchEntity}
-            ressourceField="country"
-            ressourceFilter={matchAllFields ? filterState : {}}
-            label="Country"
-            onChange={e => updateFilter('country', e)}
-            value={filterState.country}
-          />
-          <SearchTextAutocomplete
-            ressourceType={searchEntity}
-            ressourceField="region"
-            ressourceFilter={matchAllFields ? filterState : {}}
-            label="Region"
-            onChange={e => updateFilter('region', e)}
-            value={filterState.region}
-          />
-          <SearchTextAutocomplete
-            ressourceType={searchEntity}
-            ressourceField="county"
-            ressourceFilter={matchAllFields ? filterState : {}}
-            label="County"
-            onChange={e => updateFilter('county', e)}
-            value={filterState.county}
-          />
+        <SearchFieldset title="Localization" containerSx={{ justifyContent: 'flex-start' }}>
+          {!lockedFilter.includes('country') && (
+            <SearchTextAutocomplete
+              ressourceType={searchEntity}
+              ressourceField="country"
+              ressourceFilter={matchAllFields ? filterState : {}}
+              label="Country"
+              onChange={e => updateFilter('country', e)}
+              value={filterState.country}
+            />
+          )}
+          {!lockedFilter.includes('region') && (
+            <SearchTextAutocomplete
+              ressourceType={searchEntity}
+              ressourceField="region"
+              ressourceFilter={matchAllFields ? filterState : {}}
+              label="Region"
+              onChange={e => updateFilter('region', e)}
+              value={filterState.region}
+            />
+          )}
+          {!lockedFilter.includes('county') && (
+            <SearchTextAutocomplete
+              ressourceType={searchEntity}
+              ressourceField="county"
+              ressourceFilter={matchAllFields ? filterState : {}}
+              label="County"
+              onChange={e => updateFilter('county', e)}
+              value={filterState.county}
+            />
+          )}
           <SearchTextAutocomplete
             ressourceType={searchEntity}
             ressourceField="city"
@@ -262,7 +279,7 @@ const EntrancesSearch = () => {
           dispatch(resetAdvancedSearchResults());
           // Override params are required: React state updates from the calls above are async,
           // so filterState/query/matchAllFields still hold stale values at this point.
-          startAdvancedsearch('', initialFilterState, true);
+          startAdvancedsearch('', mergedInitialState, true);
         }}
       />
 
@@ -273,9 +290,15 @@ const EntrancesSearch = () => {
         onRemoveFilter={handleRemoveFilter}
         onClearQuery={() => setQuery('')}
         labelMap={FILTER_LABELS}
+        lockedKeys={lockedFilter}
       />
     </SearchForm>
   );
+};
+
+EntrancesSearch.propTypes = {
+  initialFilter: PropTypes.shape({}),
+  lockedFilter: PropTypes.arrayOf(PropTypes.string)
 };
 
 export default EntrancesSearch;
