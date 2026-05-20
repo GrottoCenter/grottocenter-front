@@ -1,14 +1,16 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { useIntl } from 'react-intl';
 
 import { fetchCountry } from '../../actions/Country/GetCountry';
 import { fetchRegion } from '../../actions/Region/GetRegion';
+import { fetchFieldSearch } from '../../actions/FieldSearch';
 import getLocalizedCountryName from '../../helpers/countryName';
 import REDUCER_STATUS from '../../reducers/ReducerStatus';
 import EntitySearchPage from '../../components/appli/AdvancedSearch/EntitySearchPage';
 import EntrancesSearch from '../../components/appli/AdvancedSearch/EntrancesSearch';
+import { ADVANCED_SEARCH_TYPES } from '../../conf/config';
 
 const getFlagEmoji = iso =>
   typeof iso === 'string' && iso.length === 2
@@ -29,11 +31,29 @@ const EntrancesListPage = () => {
     state => state.regionDetails
   );
 
+  const [countyValue, setCountyValue] = useState(null);
+
   useEffect(() => {
     if (countryId) dispatch(fetchCountry(countryId));
     if (regionId && countryId) dispatch(fetchRegion(countryId, regionId));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [countryId, regionId]);
+
+  useEffect(() => {
+    if (!regionId || !region || !country) return;
+    setCountyValue(null);
+    fetchFieldSearch({
+      entity: ADVANCED_SEARCH_TYPES.ENTRANCES,
+      field: 'county',
+      query: region.name,
+      filter: { country: country.nativeName }
+    })
+      .then(r => {
+        const hits = r?.hits ?? [];
+        setCountyValue(hits[0]?.[0] ?? null);
+      })
+      .catch(() => setCountyValue(null));
+  }, [region?.id, country?.id]);
 
   let initialFilter = {};
   let lockedFilter = [];
@@ -47,11 +67,12 @@ const EntrancesListPage = () => {
       countryStatus === REDUCER_STATUS.SUCCEEDED &&
       regionStatus === REDUCER_STATUS.SUCCEEDED &&
       country &&
-      region;
+      region &&
+      countyValue !== null;
     if (ready) {
-      initialFilter = { country: country.nativeName, county: region.name };
+      initialFilter = { country: country.nativeName, county: countyValue };
       lockedFilter = ['country', 'county'];
-      searchKey = `${country.nativeName}|${region.name}`;
+      searchKey = `${country.nativeName}|${countyValue}`;
       const localizedCountry = getLocalizedCountryName(
         country.id,
         locale,
