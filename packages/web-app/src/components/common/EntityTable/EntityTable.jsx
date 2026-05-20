@@ -14,8 +14,6 @@ import {
   renderCell
 } from './tableUtils';
 
-export { getStoredRowsPerPage };
-
 const DEFAULT_PAGE_SIZE_OPTIONS = [20, 100, 200];
 
 const initColumns = (

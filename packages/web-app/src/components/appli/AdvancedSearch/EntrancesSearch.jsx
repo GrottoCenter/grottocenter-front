@@ -90,7 +90,7 @@ const initialFilterState = {
   dataQuality: null
 };
 
-const EntrancesSearch = ({ initialFilter = {}, lockedFilter = [] }) => {
+const EntrancesSearch = ({ initialFilter = {}, lockedFilter = [], valueLabels = {} }) => {
   const dispatch = useDispatch();
 
   const mergedInitialState = useMemo(
@@ -300,6 +300,7 @@ const EntrancesSearch = ({ initialFilter = {}, lockedFilter = [] }) => {
         onClearQuery={() => setQuery('')}
         labelMap={FILTER_LABELS}
         lockedKeys={lockedFilter}
+        valueLabels={valueLabels}
       />
 
       <SearchActionButtons
@@ -321,7 +322,8 @@ const EntrancesSearch = ({ initialFilter = {}, lockedFilter = [] }) => {
 
 EntrancesSearch.propTypes = {
   initialFilter: PropTypes.shape({}),
-  lockedFilter: PropTypes.arrayOf(PropTypes.string)
+  lockedFilter: PropTypes.arrayOf(PropTypes.string),
+  valueLabels: PropTypes.shape({})
 };
 
 export default EntrancesSearch;

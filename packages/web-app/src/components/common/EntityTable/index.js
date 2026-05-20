@@ -1,1 +1,2 @@
-export { default, getStoredRowsPerPage } from './EntityTable';
+export { default } from './EntityTable';
+export { getStoredRowsPerPage } from './tableUtils';

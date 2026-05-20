@@ -41,13 +41,11 @@ const EntrancesListPage = () => {
   useEffect(() => {
     if (countryId) dispatch(fetchCountry(countryId));
     if (regionId && countryId) dispatch(fetchRegion(countryId, regionId));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [countryId, regionId]);
+  }, [countryId, regionId, dispatch]);
 
   useEffect(() => {
     if (massifId) dispatch(loadMassif(massifId));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [massifId]);
+  }, [massifId, dispatch]);
 
   useEffect(() => {
     if (!massifId || !massif) return;
