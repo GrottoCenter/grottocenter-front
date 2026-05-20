@@ -86,6 +86,7 @@ const checkFormValidation = document => {
     isValid = new RegExp(document.identifierType?.regexp).test(
       document.identifier
     );
+  if (document.authors.length === 0) isValid = false;
   if (FILE_REQUIRED_TYPES.includes(document.type) && document.files.length === 0)
     isValid = false;
   const requiresAuthorization =

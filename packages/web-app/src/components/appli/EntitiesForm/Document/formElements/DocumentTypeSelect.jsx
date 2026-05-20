@@ -215,8 +215,8 @@ const DocumentTypeSelect = () => {
 
   const handleSelect = newDocType => {
     if (newDocType === document.type) return;
-    const { title, mainLanguage, mainLanguageName } = document;
-    resetContext({ type: newDocType, title, mainLanguage, mainLanguageName });
+    const { title, mainLanguage, mainLanguageName, authors } = document;
+    resetContext({ type: newDocType, title, mainLanguage, mainLanguageName, authors });
   };
 
   const featured = documentTypes.filter(dt => FEATURED_TYPES.includes(dt.name));

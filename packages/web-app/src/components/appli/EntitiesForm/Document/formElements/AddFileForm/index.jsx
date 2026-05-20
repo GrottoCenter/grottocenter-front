@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import { useDispatch, useSelector } from 'react-redux';
+import { useUserProperties } from '../../../../../../hooks';
 import { isEmpty, remove } from 'ramda';
 import {
   Box,
@@ -31,7 +32,6 @@ import FileSelectorInput from '../../../../../common/FileSelectorInput';
 import { fetchLicense } from '../../../../../../actions/Licenses';
 import { getDocuments } from '../../../../../../actions/Document/GetDocuments';
 import { DocumentFormContext } from '../../Provider';
-import MultipleCaversSelect from '../MultipleCaversSelect';
 
 const DEFAULT_LICENSE = 'CC-BY-SA';
 
@@ -116,7 +116,7 @@ const AddFileForm = ({
   const { data: licenses, loading: licensesLoading } = useSelector(
     state => state.licenses
   );
-  const authTokenDecoded = useSelector(state => state.login.authTokenDecoded);
+  const currentUser = useUserProperties();
   const { document, updateAttribute } = useContext(DocumentFormContext);
 
   const isLicenseForced = document.parent !== null && document.license !== null;
@@ -145,22 +145,23 @@ const AddFileForm = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [showAuthorization, licenses, documentLicenseName]);
 
-  // Fires on mount AND whenever option changes back to AUTHORIZATION_FROM_AUTHOR.
-  // Co-authors added while another option was selected are intentionally reset to
-  // just the logged-in user — by design, the "Author" option means a single author.
-  useEffect(() => {
-    if (!showAuthorization) return;
-    if (option === AUTHORIZATION_FROM_AUTHOR && authTokenDecoded) {
-      updateAttribute('authors', [
-        { id: authTokenDecoded.id, nickname: authTokenDecoded.nickname }
-      ]);
-    }
-  }, [option, showAuthorization, authTokenDecoded, updateAttribute]);
-
   const updateOption = newOption => {
     setOption(newOption);
     setAuthorizationDocument(null);
     if (newOption === LICENSE_IN_FILE) setLicense(null);
+
+    if (!currentUser.id) return;
+    const authorsIsOnlyMe =
+      document.authors.length === 1 &&
+      document.authors[0].id === currentUser.id;
+
+    if (newOption === DOCUMENT_AUTHORIZE_TO_PUBLISH) {
+      if (authorsIsOnlyMe) updateAttribute('authors', []);
+    } else if (document.authors.length === 0) {
+      updateAttribute('authors', [
+        { id: currentUser.id, nickname: currentUser.nickname }
+      ]);
+    }
   };
 
   const updateFiles = newFiles => {
@@ -219,7 +220,7 @@ const AddFileForm = ({
                 value={AUTHORIZATION_FROM_AUTHOR}
                 disabled={isAuthForced}
                 control={<Radio size="small" />}
-                label={`${formatMessage({ id: 'You are the author of this document' })} (${formatMessage({ id: 'license CC-BY-SA applies' })})`}
+                label={`${formatMessage({ id: 'I hold the publication rights for this content' })} (${formatMessage({ id: 'license CC-BY-SA applies' })})`}
               />
               <FormControlLabel
                 value={LICENSE_IN_FILE}
@@ -239,17 +240,6 @@ const AddFileForm = ({
               />
             </RadioGroup>
           </FormControl>
-
-          {option && option !== AUTHORIZATION_FROM_AUTHOR && (
-            <MultipleCaversSelect
-              computeHasError={() => false}
-              contextValueName="authors"
-              helperText={formatMessage({
-                id: 'Choose one or more authors among those already registered. If the author you are looking for does not exist in Grottocenter, it is possible to add him/her using the + button on the right.'
-              })}
-              labelName="Authors"
-            />
-          )}
 
           {showAuthDocSelect && (
             <AuthDocSelect

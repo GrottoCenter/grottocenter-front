@@ -38,6 +38,8 @@ const Collapse = styled(MuiCollapse)`
 // eslint-disable-next-line react/prop-types
 const ExpandIcon = ({ isOpen }) => (isOpen ? <ExpandLess /> : <ExpandMore />);
 
+const CHIP_SLOT_PROPS = { chip: { color: 'primary' } };
+
 const MultipleSelect = ({
   contextValueName,
   computeHasError,
@@ -108,7 +110,11 @@ const MultipleSelect = ({
   return (
     <>
       {helperText && (
-        <Typography variant="caption" color={hasError ? 'error' : 'text.secondary'} display="block" sx={{ mb: 0.5 }}>
+        <Typography
+          variant="caption"
+          color={hasError ? 'error' : 'text.secondary'}
+          display="block"
+          sx={{ mb: 0.5 }}>
           <Translate>{helperText}</Translate>
         </Typography>
       )}
@@ -127,6 +133,7 @@ const MultipleSelect = ({
             renderOption={renderOption}
             isOptionEqualToValue={getOptionSelected}
             filterSelectedOptions
+            slotProps={CHIP_SLOT_PROPS}
             filterOptions={options => options} // This fixes a bug: without it, the autocomplete hides some results...
             noOptionsText={
               inputValue.length >= nbCharactersNeededToLaunchSearch ? (

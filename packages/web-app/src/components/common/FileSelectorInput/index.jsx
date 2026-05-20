@@ -95,6 +95,7 @@ const FileSelectorInput = ({
           key={f.fileName}
           label={f.fileName}
           size="small"
+          color="primary"
           onDelete={onFileRemove ? () => onFileRemove(f.fileName) : undefined}
         />
       ))}
