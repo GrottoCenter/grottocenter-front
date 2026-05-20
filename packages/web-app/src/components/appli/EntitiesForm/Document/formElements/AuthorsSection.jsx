@@ -31,7 +31,6 @@ const AuthorsSection = () => {
           id: 'Choose one or more authors among those already registered. If the author you are looking for does not exist in Grottocenter, it is possible to add him/her using the + button on the right.'
         })}
         labelName="Authors"
-        required
       />
     </Box>
   );
