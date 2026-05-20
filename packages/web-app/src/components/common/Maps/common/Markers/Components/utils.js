@@ -2,9 +2,10 @@ import React from 'react';
 import { Typography } from '@mui/material';
 import PropTypes from 'prop-types';
 import GCLink from '../../../../GCLink';
+import { formatWGS84 } from '../../../../../../helpers/coordinateConvert';
 
 export const makeCoordinatesValue = (latitude, longitude) =>
-  `Lat: ${latitude.toFixed(4)} - Long: ${longitude.toFixed(4)}`;
+  formatWGS84(latitude, longitude, 4);
 
 export const Information = ({ icon, value, url, isTitle = false }) => (
   <div className="map-popup-property">

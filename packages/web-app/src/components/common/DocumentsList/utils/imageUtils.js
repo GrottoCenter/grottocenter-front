@@ -51,12 +51,54 @@ export const decodeFileName = str => {
 };
 
 /**
+ * Download a file from a (potentially cross-origin) URL.
+ *
+ * The HTML `download` attribute is silently ignored for cross-origin resources
+ * in all major browsers (spec §4.6.4). Files on Azure Blob Storage
+ * (grottocenter.blob.core.windows.net) are cross-origin relative to this app.
+ *
+ * Strategy:
+ *  1. fetch() the file — works only if the server returns CORS headers
+ *     (Access-Control-Allow-Origin). Without them the browser blocks the read.
+ *  2. Wrap the response in a same-origin Blob URL so `download` is honoured.
+ *  3. Fallback: window.open() if CORS is absent; the browser will display the
+ *     file instead of saving it (unavoidable without server-side cooperation).
+ *
+ * Permanent fix options (require infra / backend work):
+ *  A. Add CORS rules to the Azure Blob Storage container (GET, correct origin).
+ *  B. Add a backend proxy endpoint that re-serves files with
+ *     Content-Disposition: attachment — always works regardless of CORS.
+ *
+ * @param {string} url      URL of the file to download
+ * @param {string} fileName Suggested filename for the saved file
+ */
+export const downloadFile = async (url, fileName) => {
+  try {
+    const response = await fetch(url);
+    if (!response.ok) throw new Error(response.statusText);
+    const blob = await response.blob();
+    const blobUrl = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = blobUrl;
+    a.download = fileName;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    // Revoke asynchronously to let the browser start the download first
+    setTimeout(() => URL.revokeObjectURL(blobUrl), 10000);
+  } catch {
+    // CORS headers missing on the file server: open in new tab as last resort.
+    window.open(url, '_blank');
+  }
+};
+
+/**
  * Check if a file is an image based on its extension
  * @param {string} fileName - The name of the file
  * @returns {boolean} True if the file is an image
  */
 export const isImageFile = fileName => {
   const extension = getFileExtension(fileName);
-  const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg'];
+  const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp'];
   return imageExtensions.includes(extension);
 };

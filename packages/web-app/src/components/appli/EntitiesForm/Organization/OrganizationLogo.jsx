@@ -3,7 +3,7 @@ import { React } from 'react';
 import { Controller } from 'react-hook-form';
 import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
-import { styled } from '@mui/material/styles';
+import { styled, useTheme } from '@mui/material/styles';
 import Dropzone from 'react-dropzone-uploader';
 import { MAX_ORGANIZATION_LOGO_SIZE_IN_BYTES } from '../../../../conf/config';
 import 'react-phone-input-2/lib/style.css';
@@ -15,6 +15,7 @@ const FormControl = styled(MuiFormControl)`
 
 const OrganizationLogo = ({ control, errors }) => {
   const { formatMessage } = useIntl();
+  const theme = useTheme();
 
   return (
     <div>
@@ -42,9 +43,9 @@ const OrganizationLogo = ({ control, errors }) => {
                 }
                 styles={{
                   dropzone: { width: 400, height: 200 },
-                  dropzoneActive: { borderColor: 'green' },
+                  dropzoneActive: { borderColor: theme.palette.success.main },
                   inputLabel: (files, extra) =>
-                    extra.reject ? { color: 'red' } : {}
+                    extra.reject ? { color: theme.palette.error.main } : {}
                 }}
               />
             </FormControl>

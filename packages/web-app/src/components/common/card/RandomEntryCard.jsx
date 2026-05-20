@@ -149,22 +149,18 @@ const Stars = styled('div')`
   white-space: nowrap;
 `;
 
+const STAR_COLOR = '#ffd700';
+
 const StyledFullStarIcon = withStyles({
-  root: {
-    fill: '#ffd700'
-  }
+  root: { fill: STAR_COLOR }
 })(FullStarIcon);
 
 const StyledHalfStarIcon = withStyles({
-  root: {
-    fill: '#ffd700'
-  }
+  root: { fill: STAR_COLOR }
 })(HalfStarIcon);
 
 const StyledEmptyStarIcon = withStyles({
-  root: {
-    fill: '#ffd700'
-  }
+  root: { fill: STAR_COLOR }
 })(EmptyStarIcon);
 
 const EntryStatItem = ({ itemLabel, itemScore }) => {

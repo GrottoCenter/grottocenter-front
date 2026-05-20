@@ -29,6 +29,7 @@ const CountryPage = () => {
 
   return (
     <Country
+      key={countryId}
       canSubscribe={canSubscribe}
       country={country}
       error={error}

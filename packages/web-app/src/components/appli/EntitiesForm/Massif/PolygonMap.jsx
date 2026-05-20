@@ -1,12 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
-import { useDispatch, useSelector } from 'react-redux';
 import { MapContainer, FeatureGroup, ScaleControl } from 'react-leaflet';
 import { EditControl } from 'react-leaflet-draw';
 import L from 'leaflet';
 import { useIntl } from 'react-intl';
-import { Alert, Snackbar, Box } from '@mui/material';
-import { fetchProjections } from '../../../../actions/Projections';
+import { Box, useMediaQuery, useTheme } from '@mui/material';
+import { useNotification, useProjections } from '../../../../hooks';
 import useGeolocation from '../../../../hooks/useGeolocation';
 import LayersControl from '../../../common/Maps/common/LayersControl';
 import LocateControl from '../../../common/Maps/common/LocateControl';
@@ -68,25 +67,16 @@ const detectHoles = layers => {
 
 const PolygonMap = ({ onChange, data }) => {
   const { formatMessage } = useIntl();
-  const dispatch = useDispatch();
-  const projectionsLoaded = useSelector(
-    state => !!state.projections.projections
-  );
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  useProjections();
   const isMounted = useRef(true);
   const displayValue = useRef(false);
   const isEditingRef = useRef(false);
   const { location: geoLocation, hasLocation } = useGeolocation();
-
-  // Ensure proj4 definitions are registered for CRS transformations
-  useEffect(() => {
-    if (!projectionsLoaded) {
-      dispatch(fetchProjections());
-    }
-  }, [dispatch, projectionsLoaded]);
+  const { onError, onSuccess } = useNotification();
   const [map, setMap] = useState();
-  const [importError, setImportError] = useState('');
   const [featureGroupRef, setFeatureGroupRef] = useState(null);
-  const [importSuccess, setImportSuccess] = useState(false);
 
   // Configure Leaflet Draw text
   useEffect(() => {
@@ -181,6 +171,13 @@ const PolygonMap = ({ onChange, data }) => {
       )
     : geoLocation;
   const ZOOM_LEVEL = hasCoordinates || hasLocation ? focusZoom : defaultZoom;
+
+  useEffect(() => {
+    if (map) {
+      const t = setTimeout(() => map.invalidateSize(), 200);
+      return () => clearTimeout(t);
+    }
+  }, [map, isMobile]);
 
   useEffect(() => {
     if (map) {
@@ -375,10 +372,8 @@ const PolygonMap = ({ onChange, data }) => {
     });
 
     if (newLayers.length === 0) {
-      setImportError(
-        formatMessage({
-          id: 'No valid polygon rings found in the imported file.'
-        })
+      onError(
+        formatMessage({ id: 'No valid polygon rings found in the imported file.' })
       );
       return;
     }
@@ -399,11 +394,11 @@ const PolygonMap = ({ onChange, data }) => {
       }
     }
 
-    setImportSuccess(true);
+    onSuccess(formatMessage({ id: 'Shapefile imported successfully!' }));
   };
 
   const handleImportError = error => {
-    setImportError(error);
+    onError(error);
   };
 
   const handleDeleteLayer = layerId => {
@@ -518,7 +513,7 @@ const PolygonMap = ({ onChange, data }) => {
         />
       </Box>
 
-      <Box sx={{ display: 'flex', gap: 2 }}>
+      <Box sx={{ display: 'flex', gap: 2, flexDirection: { xs: 'column', md: 'row' } }}>
         <MapContainer
           center={initialCenter}
           zoom={ZOOM_LEVEL}
@@ -527,8 +522,8 @@ const PolygonMap = ({ onChange, data }) => {
           }}
           position="topLeft"
           style={{
-            height: '70dvh',
-            flex: 1
+            height: isMobile ? '50dvh' : '70dvh',
+            ...(isMobile ? { width: '100%' } : { flex: 1 })
           }}>
           <FeatureGroup
             ref={reactFGref => {
@@ -573,23 +568,6 @@ const PolygonMap = ({ onChange, data }) => {
         )}
       </Box>
 
-      <Snackbar
-        open={!!importError}
-        autoHideDuration={6000}
-        onClose={() => setImportError('')}>
-        <Alert severity="error" onClose={() => setImportError('')}>
-          {importError}
-        </Alert>
-      </Snackbar>
-
-      <Snackbar
-        open={importSuccess}
-        autoHideDuration={3000}
-        onClose={() => setImportSuccess(false)}>
-        <Alert severity="success" onClose={() => setImportSuccess(false)}>
-          {formatMessage({ id: 'Shapefile imported successfully!' })}
-        </Alert>
-      </Snackbar>
     </>
   );
 };

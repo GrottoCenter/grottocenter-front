@@ -137,12 +137,28 @@ const MapInternals = ({ geoJson, massifId }) => {
 
   // Fit the map to the massif bounds once, triggering moveend → fetchMarkers.
   // If there's no polygon, moveend won't fire, so we call fetchMarkers manually.
+  // Guard: if the map is hidden (tab not active), dimensions are 0×0 and fitBounds
+  // produces NaN coordinates that crash the hexbin layer. Observe the container
+  // directly and defer fitBounds until it has real dimensions. The setTimeout lets
+  // MapContainer's ResizeObserver (which calls invalidateSize) run first.
   useEffect(() => {
     if (!massifBounds.isValid()) {
       fetchMarkersRef.current();
       return;
     }
-    map.fitBounds(massifBounds);
+    const container = map.getContainer();
+    if (container.offsetWidth > 0 && container.offsetHeight > 0) {
+      map.fitBounds(massifBounds);
+      return;
+    }
+    const observer = new ResizeObserver(() => {
+      if (container.offsetWidth > 0 && container.offsetHeight > 0) {
+        observer.disconnect();
+        setTimeout(() => map.fitBounds(massifBounds), 0);
+      }
+    });
+    observer.observe(container);
+    return () => observer.disconnect();
   }, [massifBounds, map]);
 
   return (
@@ -189,7 +205,8 @@ const MapMassif = ({ massifId, geogPolygon }) => {
       dragging={!isMobile} // For usability only use two fingers drag/zoom on mobile
       viewport={null}
       scrollWheelZoom={false}>
-      <GeoJSON data={displayGeoJson} style={MASSIF_POLYGON_STYLE} />
+      {/* SVG renderer avoids a 0×0 canvas when the tab is hidden (print bug) */}
+      <GeoJSON data={displayGeoJson} style={MASSIF_POLYGON_STYLE} renderer={L.svg()} />
       <MapInternals geoJson={geoJson} massifId={massifId} />
     </CustomMapContainer>
   );

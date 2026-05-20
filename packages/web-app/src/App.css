@@ -560,6 +560,13 @@ there.
     overflow: visible !important;
   }
 
+  /* Force-expand all collapsed accordion sections when printing */
+  .MuiCollapse-root {
+    height: auto !important;
+    overflow: visible !important;
+    visibility: visible !important;
+  }
+
   img {
     opacity: 1 !important;
   }

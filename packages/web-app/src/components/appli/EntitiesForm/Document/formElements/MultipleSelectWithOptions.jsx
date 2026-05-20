@@ -2,7 +2,7 @@ import React, { useContext, useState } from 'react';
 import PropTypes from 'prop-types';
 
 import Autocomplete from '@mui/material/Autocomplete';
-import { FormHelperText, TextField } from '@mui/material';
+import { TextField, Typography } from '@mui/material';
 import { DocumentFormContext } from '../Provider';
 
 import Translate from '../../../../common/Translate';
@@ -57,6 +57,11 @@ const MultipleSelectWithOptions = ({
 
   return (
     <>
+      {helperText && (
+        <Typography variant="caption" color={hasError ? 'error' : 'text.secondary'} display="block" sx={{ mb: 0.5 }}>
+          <Translate>{helperText}</Translate>
+        </Typography>
+      )}
       <Autocomplete
         multiple
         value={document[contextValueName]}
@@ -81,11 +86,6 @@ const MultipleSelectWithOptions = ({
           />
         )}
       />
-      {helperText && (
-        <FormHelperText variant="filled" error={hasError}>
-          <Translate>{helperText}</Translate>
-        </FormHelperText>
-      )}
     </>
   );
 };

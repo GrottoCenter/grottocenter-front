@@ -1,6 +1,7 @@
 import fetch from 'isomorphic-fetch';
 
 import { postDocumentUrl } from '../../conf/apiRoutes';
+import { checkAuthStatus } from '../utils';
 import { buildFormData } from './utils';
 
 export const POST_DOCUMENT = 'POST_DOCUMENT';
@@ -11,8 +12,9 @@ const postDocumentAction = () => ({
   type: POST_DOCUMENT
 });
 
-const postDocumentSuccess = httpCode => ({
+const postDocumentSuccess = (document, httpCode) => ({
   type: POST_DOCUMENT_SUCCESS,
+  document,
   httpCode
 });
 
@@ -25,9 +27,8 @@ const postDocumentFailure = (errorMessages, httpCode) => ({
 export function postDocument(docAttributes) {
   return (dispatch, getState) => {
     dispatch(postDocumentAction());
-    const attributes = { ...docAttributes };
-    const { files } = attributes;
-    delete attributes.files;
+    const { files, selectOptionAuthorizationDocument, ...rest } = docAttributes;
+    const attributes = { ...rest, option: selectOptionAuthorizationDocument };
 
     const formData = new FormData();
     buildFormData(formData, attributes);
@@ -45,47 +46,51 @@ export function postDocument(docAttributes) {
       }
     };
 
-    return fetch(postDocumentUrl, requestOptions).then(response =>
-      response.text().then(responseText => {
-        if (response.status >= 400) {
-          const errorMessages = [];
-          switch (response.status) {
-            case 400:
-              errorMessages.push(`Bad request: ${responseText}`);
-              break;
-            case 401:
-              errorMessages.push(
-                'You must be authenticated to post a document.'
-              );
-              break;
-            case 403:
-              errorMessages.push(
-                'You are not authorized to create a document.'
-              );
-              break;
-            case 404:
-              errorMessages.push(
-                'Server-side creation of the document is not available.'
-              );
-              break;
-            case 500:
-              errorMessages.push(
-                'A server error occurred, please try again later or contact Wikicaves for more information.'
-              );
-              break;
-            default:
-              break;
+    return fetch(postDocumentUrl, requestOptions)
+      .then(checkAuthStatus(dispatch))
+      .then(response =>
+        response.text().then(responseText => {
+          if (response.status >= 400) {
+            const errorMessages = [];
+            switch (response.status) {
+              case 400:
+                errorMessages.push(`Bad request: ${responseText}`);
+                break;
+              case 403:
+                errorMessages.push(
+                  'You are not authorized to create a document.'
+                );
+                break;
+              case 404:
+                errorMessages.push(
+                  'Server-side creation of the document is not available.'
+                );
+                break;
+              case 500:
+                errorMessages.push(
+                  'A server error occurred, please try again later or contact Wikicaves for more information.'
+                );
+                break;
+              default:
+                break;
+            }
+            dispatch(postDocumentFailure(errorMessages, response.status));
+            throw new Error(
+              `Fetching ${postDocumentUrl} status: ${response.status}`
+            );
           }
-          dispatch(postDocumentFailure(errorMessages, response.status));
-          throw new Error(
-            `Fetching ${postDocumentUrl} status: ${response.status}`,
-            errorMessages
-          );
-        } else {
-          dispatch(postDocumentSuccess(response.status));
-        }
-        return response;
-      })
-    );
+          let createdDocument;
+          try {
+            createdDocument = JSON.parse(responseText)?.document;
+          } catch (_) {
+            // response body not parseable, continue without document object
+          }
+          dispatch(postDocumentSuccess(createdDocument, response.status));
+          return createdDocument;
+        })
+      )
+      .catch(err => {
+        if (err.isAuthError) return;
+      });
   };
 }

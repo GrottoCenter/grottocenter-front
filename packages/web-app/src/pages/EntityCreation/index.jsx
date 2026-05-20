@@ -1,52 +1,46 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Outlet, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
-import { Button } from '@mui/material';
-import { styled } from '@mui/material/styles';
+import { Alert, Box, Button } from '@mui/material';
 import { useIntl } from 'react-intl';
 import Layout from '../../components/common/Layouts/Fixed/FixedContent';
-import ErrorMessage from '../../components/common/StatusMessage/ErrorMessage';
-import Translate from '../../components/common/Translate';
 import { usePermissions } from '../../hooks';
 import { displayLoginDialog } from '../../actions/Login';
-import CreationForm from './CreationForm';
-
-const CenteredBlock = styled('div')`
-  text-align: center;
-`;
 
 const EntitiesCreation = () => {
   const permissions = usePermissions();
   const navigate = useNavigate();
   const { formatMessage } = useIntl();
   const dispatch = useDispatch();
-  const handleLogin = () => {
-    dispatch(displayLoginDialog());
-  };
 
-  return (
-    <Layout
-      title={formatMessage({ id: 'Create a new entity in Grottocenter' })}
-      content={
-        !permissions.isAuth ? (
-          <CenteredBlock>
-            <ErrorMessage
-              message={formatMessage({
+  if (!permissions.isAuth) {
+    return (
+      <Layout
+        title={formatMessage({ id: 'Create a new entity in Grottocenter' })}
+        content={
+          <Box sx={{ textAlign: 'center' }}>
+            <Alert severity="error" sx={{ mb: 2 }}>
+              {formatMessage({
                 id: 'You must be authenticated to submit a new entity to Grottocenter.'
               })}
-            />
-            <Button onClick={handleLogin} variant="contained">
-              <Translate>Log in</Translate>
-            </Button>
-            <Button onClick={() => navigate('')} variant="contained">
-              <Translate>Go to home page</Translate>
-            </Button>
-          </CenteredBlock>
-        ) : (
-          <CreationForm />
-        )
-      }
-    />
-  );
+            </Alert>
+            <Box sx={{ display: 'flex', justifyContent: 'center', gap: 1 }}>
+              <Button
+                onClick={() => dispatch(displayLoginDialog())}
+                variant="contained">
+                {formatMessage({ id: 'Log in' })}
+              </Button>
+              <Button onClick={() => navigate('/')} variant="outlined">
+                {formatMessage({ id: 'Go to home page' })}
+              </Button>
+            </Box>
+          </Box>
+        }
+      />
+    );
+  }
+
+  return <Outlet />;
 };
+
 export default EntitiesCreation;

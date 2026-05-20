@@ -1,12 +1,22 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
+import { Box } from '@mui/material';
 
 import Translate from '../../../../common/Translate';
 import { loadSubjects } from '../../../../../actions/Subject';
 
 import MultipleSelectWithOptionsComponent from './MultipleSelectWithOptions';
+
+const DEPTH_STYLES = [
+  { fontWeight: 700, textTransform: 'uppercase', pl: 1 },
+  { fontWeight: 600, pl: 1.5 },
+  { fontWeight: 400, pl: 2 },
+  { fontWeight: 400, pl: 2.5, color: 'text.secondary' }
+];
+
+const getCode = option => (option.id ?? option.code ?? '').trim();
 
 const MultipleSubjectsSelect = ({
   computeHasError,
@@ -19,27 +29,45 @@ const MultipleSubjectsSelect = ({
   const { formatMessage } = useIntl();
   const { isFetching, subjects } = useSelector(state => state.subject);
 
+  const sortedSubjects = useMemo(
+    () =>
+      [...subjects].sort((a, b) => {
+        const aParts = getCode(a).split('.').map(Number);
+        const bParts = getCode(b).split('.').map(Number);
+        for (let i = 0; i < Math.max(aParts.length, bParts.length); i++) {
+          const diff = (aParts[i] ?? -1) - (bParts[i] ?? -1);
+          if (diff !== 0) return diff;
+        }
+        return 0;
+      }),
+    [subjects]
+  );
+
   useEffect(() => {
     dispatch(loadSubjects());
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const getSubjectLabel = option => {
+    const code = getCode(option);
+    return `${code} ${formatMessage({ id: code, defaultMessage: option.subject })}`;
+  };
+
+  const renderSubjectOption = (props, option) => {
+    const code = getCode(option);
+    const depth = code.split('.').length - 1;
+    return (
+      <Box component="li" {...props} sx={DEPTH_STYLES[Math.min(depth, 3)]}>
+        {code}&nbsp;&nbsp;{formatMessage({ id: code, defaultMessage: option.subject })}
+      </Box>
+    );
+  };
+
   return (
     <MultipleSelectWithOptionsComponent
       computeHasError={computeHasError}
       contextValueName={contextValueName}
-      getOptionLabel={option => {
-        const subjectName = formatMessage({
-          id: option.id ?? option.code, // API return with Id but elastic search return code
-          defaultMessage: option.subject
-        });
-        let parentText = '';
-        if (option.parent) {
-          // Indent if there is a parent.
-          parentText = '\u00a0\u00a0\u00a0\u00a0';
-        }
-        return `${parentText} ${option.id ?? option.code} ${subjectName}`;
-      }}
+      getOptionLabel={getSubjectLabel}
       getOptionSelected={(optionToTest, valueToTest) =>
         (optionToTest.code && optionToTest.code === valueToTest.code) ||
         (optionToTest.id && optionToTest.id === valueToTest.id)
@@ -50,7 +78,8 @@ const MultipleSubjectsSelect = ({
       noOptionsText={
         <Translate>No subject matches you search criteria</Translate>
       }
-      options={subjects}
+      options={sortedSubjects}
+      renderOption={renderSubjectOption}
       required={required}
     />
   );

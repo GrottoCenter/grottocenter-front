@@ -15,7 +15,7 @@ import {
   FETCH_AUTHORIZATION_DOCUMENT_DETAILS_SUCCESS
 } from '../../../../../actions/Document/GetAuthorizationDocumentDetails';
 import { fetchLicense } from '../../../../../actions/Licenses';
-import { DOCUMENT_AUTHORIZE_TO_PUBLISH } from './AddFileForm/AutoCompletion/OptionSelectAutoComplete';
+import { DOCUMENT_AUTHORIZE_TO_PUBLISH } from './AddFileForm/FileHelpers';
 
 const SearchBar = props => {
   const {

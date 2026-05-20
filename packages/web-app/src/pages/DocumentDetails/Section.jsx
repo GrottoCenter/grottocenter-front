@@ -9,10 +9,9 @@ import {
 import React from 'react';
 import PropTypes from 'prop-types';
 import { styled } from '@mui/material/styles';
-import { Description } from '@mui/icons-material';
-
 import GCLink from '../../components/common/GCLink';
 import { decodeFileName } from '../../components/common/DocumentsList/utils/imageUtils';
+import { getFileIcon } from '../../components/common/DocumentsList/utils/fileIcons';
 
 const Label = styled(Typography)`
   margin-right: ${({ theme }) => theme.spacing(2)};
@@ -94,7 +93,7 @@ ListElement.propTypes = {
 
 export const FileListElement = ({ fileName, filePath }) => (
   <ListElement
-    icon={<Description color="primary" />}
+    icon={getFileIcon(fileName)}
     value={decodeFileName(fileName)}
     url={filePath}
   />

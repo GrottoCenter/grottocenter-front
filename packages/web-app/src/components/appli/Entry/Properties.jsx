@@ -4,23 +4,19 @@ import { useIntl } from 'react-intl';
 import { styled } from '@mui/material/styles';
 import {
   Box,
-  Button,
-  ButtonGroup,
-  Chip,
   Collapse,
   IconButton,
   LinearProgress,
   Paper,
-  Tooltip,
   Typography
 } from '@mui/material';
 import {
-  Place,
-  Map,
   WarningAmber,
   ExpandMore,
   ExpandLess
 } from '@mui/icons-material';
+import CoordinateDisplay from '../../common/CoordinateDisplay';
+import { useCoordinatePreference, getCRSLabel } from '../../../hooks';
 import DataQualityBadge from '../../common/DataQualityBadge';
 import DataQualityHelpButton from '../../common/DataQualityBadge/DataQualityHelpButton';
 
@@ -60,11 +56,6 @@ const StyledRatings = styled(Ratings)`
   justify-content: space-evenly;
 `;
 
-const computePrecisionSeverity = precision => {
-  if (precision === undefined || precision === null) return 'warning';
-  if (precision === 0) return 'error';
-  return 'success';
-};
 
 const CATEGORY_KEYS = [
   { key: 'general', label: 'General data' },
@@ -79,30 +70,12 @@ const CATEGORY_KEYS = [
 const Properties = ({ isLoading = false, entrance, dataQuality }) => {
   const { formatMessage } = useIntl();
   const [categoriesOpen, setCategoriesOpen] = useState(false);
+  const [preferredCRS] = useCoordinatePreference();
   const massifsWithType =
     entrance?.massifs?.filter(m => m.undergroundType) ?? [];
-
-  let precisionText = '';
-  if (entrance.precision === 0) {
-    precisionText = formatMessage({
-      id: 'Coordinates precision unavailable for restricted access entrance.'
-    });
-  } else if (entrance.precision !== undefined && entrance.precision !== null) {
-    precisionText = `±${entrance.precision}m`;
-  }
-
-  const openOSM = () =>
-    window.open(
-      `https://www.openstreetmap.org/?mlat=${entrance.latitude}&mlon=${entrance.longitude}`,
-      '_blank',
-      'noopener,noreferrer'
-    );
-  const openGM = () =>
-    window.open(
-      `https://www.google.com/maps/search/?api=1&query=${entrance.latitude},${entrance.longitude}`,
-      '_blank',
-      'noopener,noreferrer'
-    );
+  const cityValue = [entrance?.city, entrance?.region]
+    .flatMap(f => (f ? [f] : []))
+    .join(', ');
 
   return (
     <GlobalWrapper>
@@ -114,43 +87,16 @@ const Properties = ({ isLoading = false, entrance, dataQuality }) => {
             {entrance.latitude && entrance.longitude && (
               <Property
                 loading={isLoading}
-                label={`${formatMessage({ id: 'Coordinates' })} (WGS84)`}
+                label={`${formatMessage({ id: 'Coordinates' })} (${getCRSLabel(preferredCRS)})`}
                 value={
-                  <Box
-                    display="flex"
-                    alignItems="center"
-                    flexWrap="wrap"
-                    gap={1}>
-                    <span>{`${entrance.latitude.toFixed(4)}° N, ${entrance.longitude.toFixed(4)}° E`}</span>
-                    {precisionText && (
-                      <Chip
-                        label={precisionText}
-                        size="small"
-                        color={computePrecisionSeverity(entrance.precision)}
-                      />
-                    )}
-                    <ButtonGroup
-                      color="primary"
-                      variant="outlined"
-                      size="small">
-                      <Tooltip
-                        title={formatMessage({ id: 'Open on OpenStreetMap' })}>
-                        <Button
-                          onClick={openOSM}
-                          startIcon={<Map fontSize="small" />}>
-                          OSM
-                        </Button>
-                      </Tooltip>
-                      <Tooltip
-                        title={formatMessage({ id: 'Open on Google Maps' })}>
-                        <Button
-                          onClick={openGM}
-                          startIcon={<Place fontSize="small" />}>
-                          GMaps
-                        </Button>
-                      </Tooltip>
-                    </ButtonGroup>
-                  </Box>
+                  <CoordinateDisplay
+                    latitude={entrance.latitude}
+                    longitude={entrance.longitude}
+                    precision={entrance.precision}
+                    showMapLinks
+                    entityType="entrance"
+                    entityId={entrance.id}
+                  />
                 }
                 icon={<CustomIcon type="coordinates" />}
               />
@@ -161,15 +107,15 @@ const Properties = ({ isLoading = false, entrance, dataQuality }) => {
                 gridTemplateColumns: 'repeat(2, 1fr)',
                 gap: 1
               }}>
-              <Property
-                loading={isLoading}
-                label={formatMessage({ id: 'City' })}
-                value={[entrance.city, entrance.region]
-                  .flatMap(f => (f ? [f] : []))
-                  .join(', ')}
-                icon={<CustomIcon type="location" />}
-                secondary
-              />
+              {cityValue && (
+                <Property
+                  loading={isLoading}
+                  label={formatMessage({ id: 'City' })}
+                  value={cityValue}
+                  icon={<CustomIcon type="location" />}
+                  secondary
+                />
+              )}
               {!!entrance.altitude && (
                 <Property
                   label={formatMessage({ id: 'Altitude' })}

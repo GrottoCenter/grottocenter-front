@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { useIntl } from 'react-intl';
 import { Skeleton } from '@mui/material';
@@ -15,6 +15,7 @@ const PersonEdit = () => {
   const dispatch = useDispatch();
   const { person, isFetching } = useSelector(state => state.person);
   const { personId } = useParams();
+  const navigate = useNavigate();
   const { isAdmin, isModerator } = usePermissions();
 
   const userId = useUserProperties()?.id ?? null;
@@ -23,10 +24,14 @@ const PersonEdit = () => {
   if (isModerator && person?.type === 'AUTHOR') isAllowed = true;
 
   useEffect(() => {
+    if (isOurAccount) {
+      navigate('/ui/account', { replace: true });
+      return;
+    }
     if (personId && isAllowed) {
       dispatch(fetchPerson(personId));
     }
-  }, [personId, isAllowed, dispatch]);
+  }, [personId, isOurAccount, isAllowed, dispatch, navigate]);
 
   let title = isFetching ? <Skeleton /> : '';
   if (person) {
@@ -64,7 +69,10 @@ const PersonEdit = () => {
             />
           )}
           {person && isAllowed && (
-            <PersonForm personValues={person} isOurAccount={isOurAccount} />
+            <PersonForm
+              personValues={person}
+              onCancel={() => navigate(`/ui/persons/${personId}`)}
+            />
           )}
         </>
       }

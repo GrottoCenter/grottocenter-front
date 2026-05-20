@@ -5,7 +5,11 @@ import { useIntl } from 'react-intl';
 import { Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 
-import { fetchGroups, fetchBannedCavers } from '../../actions/Person/GetPerson';
+import {
+  fetchGroups,
+  fetchBannedCavers,
+  fetchInvalidEmailCavers
+} from '../../actions/Person/GetPerson';
 
 import AuthChecker from '../../components/appli/AuthChecker';
 
@@ -50,6 +54,11 @@ const ManageUsers = () => {
     isLoading: isBannedLoading
   } = useSelector(state => state.bannedCavers);
 
+  const {
+    invalidEmailCavers,
+    isLoading: isInvalidEmailLoading
+  } = useSelector(state => state.invalidEmailCavers);
+
   const { isLoading: isUpdateLoading, isSuccess: isUpdateSuccess } =
     useSelector(state => state.updatePersonGroups);
 
@@ -75,6 +84,7 @@ const ManageUsers = () => {
   useEffect(() => {
     dispatch(fetchGroups());
     dispatch(fetchBannedCavers());
+    dispatch(fetchInvalidEmailCavers());
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -106,6 +116,11 @@ const ManageUsers = () => {
                 isLoading={isBannedLoading}
                 userList={bannedCavers}
                 title={formatMessage({ id: 'List of banned cavers' })}
+              />
+              <UserList
+                isLoading={isInvalidEmailLoading}
+                userList={invalidEmailCavers}
+                title={formatMessage({ id: 'List of cavers with invalid email' })}
               />
             </>
           }

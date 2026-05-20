@@ -119,6 +119,7 @@ const Description = ({
               reviewer={description.reviewer}
               dateInscription={description.dateInscription}
               dateReviewed={description.dateReviewed}
+              language={description.language}
               isDeleted={description.isDeleted}
             />
           }

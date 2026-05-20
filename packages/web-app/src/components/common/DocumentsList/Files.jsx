@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { Button, ListItem, ListItemText, Grid, Box } from '@mui/material';
+import { Button, ListItem, Grid } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import { Description, Download } from '@mui/icons-material';
 import ImageThumbnail from './ImageThumbnail';
 import ImageLightbox from './ImageLightbox';
 import { isImageFile, decodeFileName } from './utils/imageUtils';
+import { getFileIcon } from './utils/fileIcons';
 
 const FileListItem = styled(ListItem)`
   margin: 0;
@@ -15,19 +15,7 @@ const FileListItem = styled(ListItem)`
   padding: 0;
 `;
 
-const ThumbnailWrapper = styled(Box)`
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: ${({ theme }) => theme.spacing(1)};
-`;
 
-const EllipsisText = styled('span')`
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  display: block;
-`;
 
 const Files = ({ files = [], description, onImageClick, imageIndexOffset = 0 }) => {
   const [lightboxOpen, setLightboxOpen] = useState(false);
@@ -52,30 +40,14 @@ const Files = ({ files = [], description, onImageClick, imageIndexOffset = 0 }) 
     <>
       {/* Image thumbnails section */}
       {imageFiles.length > 0 && (
-        <Grid container spacing={2} sx={{ mb: 2 }}>
+        <Grid container rowSpacing={2} columnSpacing={{ xs: 0, sm: 2 }} sx={{ mb: 2 }}>
           {imageFiles.map((file, index) => (
-            <Grid key={file.fileName}>
-              <ThumbnailWrapper>
-                <ImageThumbnail
-                  src={file.completePath}
-                  alt={decodeFileName(file.fileName)}
-                  onClick={() => handleThumbnailClick(index)}
-                />
-                <Button
-                  size="small"
-                  startIcon={<Download />}
-                  href={file.completePath}
-                  download
-                  target="_blank"
-                  sx={{
-                    textTransform: 'none',
-                    maxWidth: 240, // Match thumbnail width
-                    minWidth: 240 // for better rendering
-                  }}
-                  title={decodeFileName(file.fileName)}>
-                  <EllipsisText>{decodeFileName(file.fileName)}</EllipsisText>
-                </Button>
-              </ThumbnailWrapper>
+            <Grid key={file.fileName} sx={{ width: { xs: '100%', sm: 'auto' } }}>
+              <ImageThumbnail
+                src={file.completePath}
+                alt={decodeFileName(file.fileName)}
+                onClick={() => handleThumbnailClick(index)}
+              />
             </Grid>
           ))}
         </Grid>
@@ -84,19 +56,15 @@ const Files = ({ files = [], description, onImageClick, imageIndexOffset = 0 }) 
       {/* Non-image files section (existing logic) */}
       {otherFiles.map(file => (
         <FileListItem key={`${file.fileName}`} dense component="div">
-          <ListItemText
-            primaryTypographyProps={{ display: 'inline' }}
-            primary={
-              <Button
-                variant="text"
-                size="small"
-                target="_blank"
-                startIcon={<Description />}
-                href={file.completePath}>
-                {decodeFileName(file.fileName)}
-              </Button>
-            }
-          />
+          <Button
+            variant="text"
+            size="small"
+            target="_blank"
+            startIcon={getFileIcon(file.fileName)}
+            href={file.completePath}
+            sx={{ textTransform: 'none' }}>
+            {decodeFileName(file.fileName)}
+          </Button>
         </FileListItem>
       ))}
 

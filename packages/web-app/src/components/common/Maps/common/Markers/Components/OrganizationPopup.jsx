@@ -17,10 +17,7 @@ export const OrganizationPopup = ({ organization }) => (
       />
     )}
     <Information
-      value={makeCoordinatesValue(
-        organization.latitude,
-        organization.longitude
-      )}
+      value={makeCoordinatesValue(organization.latitude, organization.longitude)}
       icon={<CustomIcon size={25} type="coordinates" />}
     />
   </>

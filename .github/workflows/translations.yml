@@ -1,0 +1,53 @@
+name: Translations
+
+on:
+  push:
+    branches: [develop]
+  pull_request:
+    branches: [develop]
+  workflow_dispatch:
+
+jobs:
+  check-translations:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: [20]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js ${{ matrix.node }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: yarn install
+
+      - name: Check translation files are sorted
+        run: yarn translations:check-sorted
+
+      - name: Check en.json has all source keys
+        run: yarn translations:check-en
+
+      - name: Translation completeness report
+        if: always()
+        run: |
+          echo "## Translation Completeness" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Language | Keys | vs en.json |" >> $GITHUB_STEP_SUMMARY
+          echo "|----------|------|------------|" >> $GITHUB_STEP_SUMMARY
+          node -e "
+            const fs = require('fs');
+            const load = f => JSON.parse(fs.readFileSync(f,'utf8').replace(/^﻿/,''));
+            const enKeys = Object.keys(load('packages/web-app/public/lang/en.json'));
+            const files = fs.readdirSync('packages/web-app/public/lang').filter(f=>f.endsWith('.json')).sort();
+            files.forEach(f=>{
+              const lang = f.replace('.json','');
+              const keys = Object.keys(load('packages/web-app/public/lang/'+f));
+              const pct = ((keys.length/enKeys.length)*100).toFixed(1);
+              console.log('| '+lang+' | '+keys.length+' | '+pct+'% |');
+            });
+          " >> $GITHUB_STEP_SUMMARY

@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import {
+  Alert,
   FormControl,
   InputLabel,
   FilledInput,
@@ -13,8 +14,6 @@ import {
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import { styled } from '@mui/material/styles';
-
-import ErrorMessage from '../StatusMessage/ErrorMessage';
 
 const FormWrapper = styled('form')`
   display: flex;
@@ -90,7 +89,9 @@ const LoginForm = ({
         <FormControl>
           {authErrors.map(error => (
             <Fade in={authErrors.length > 0} key={error}>
-              <ErrorMessage message={formatMessage({ id: error })} />
+              <Alert severity="error" sx={{ mt: 1 }}>
+                {formatMessage({ id: error })}
+              </Alert>
             </Fade>
           ))}
         </FormControl>

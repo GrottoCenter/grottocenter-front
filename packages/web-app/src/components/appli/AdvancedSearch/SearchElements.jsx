@@ -38,7 +38,6 @@ import { fetchFieldSearch } from '../../../actions/FieldSearch';
 import Translate from '../../common/Translate';
 import { AUTOCOMPLETE_DEBOUNCE_DELAY } from '../../../conf/config';
 
-
 const StyledForm = styled('form')`
   display: flex;
   flex-wrap: wrap;
@@ -87,7 +86,12 @@ export const SearchFormContainer = styled('div')`
   }
 `;
 
-export const SearchFieldset = ({ title, children, isMultiline = false, containerSx }) => (
+export const SearchFieldset = ({
+  title,
+  children,
+  isMultiline = false,
+  containerSx
+}) => (
   <Box sx={{ width: '100%' }}>
     {title && (
       <Typography
@@ -97,7 +101,11 @@ export const SearchFieldset = ({ title, children, isMultiline = false, container
         <Translate>{title}</Translate>
       </Typography>
     )}
-    {isMultiline ? children : <SearchFormContainer sx={containerSx}>{children}</SearchFormContainer>}
+    {isMultiline ? (
+      children
+    ) : (
+      <SearchFormContainer sx={containerSx}>{children}</SearchFormContainer>
+    )}
   </Box>
 );
 SearchFieldset.propTypes = {
@@ -124,7 +132,14 @@ const StyledTextField = styled(TextField)(({ theme }) => ({
   }
 }));
 
-export const SearchText = ({ label, value, onChange, type = 'text', inputMode, startIcon }) => {
+export const SearchText = ({
+  label,
+  value,
+  onChange,
+  type = 'text',
+  inputMode,
+  startIcon
+}) => {
   const { formatMessage } = useIntl();
   const translatedLabel = formatMessage({ id: label });
   return (
@@ -139,11 +154,13 @@ export const SearchText = ({ label, value, onChange, type = 'text', inputMode, s
       slotProps={{
         input: {
           inputMode,
-          ...(startIcon ? {
-            startAdornment: (
-              <InputAdornment position="start">{startIcon}</InputAdornment>
-            )
-          } : {})
+          ...(startIcon
+            ? {
+                startAdornment: (
+                  <InputAdornment position="start">{startIcon}</InputAdornment>
+                )
+              }
+            : {})
         }
       }}
     />
@@ -179,7 +196,11 @@ export const SearchNumberText = ({ label, value, onChange, min = 0 }) => {
         input: {
           startAdornment: (
             <InputAdornment position="start">
-              <IconButton size="small" onClick={decrement} disabled={numValue === min || value === ''} edge="start">
+              <IconButton
+                size="small"
+                onClick={decrement}
+                disabled={numValue === min || value === ''}
+                edge="start">
                 <RemoveIcon fontSize="small" />
               </IconButton>
             </InputAdornment>
@@ -303,7 +324,7 @@ export const SearchTextAutocomplete = ({
         return (
           <StyledAutoCompleteItem key={key} {...optionProps}>
             <span>{option[0]}</span>
-            <Chip size="small" label={option[1]} />
+            <Chip size="small" color="primary" label={option[1]} />
           </StyledAutoCompleteItem>
         );
       }}
@@ -373,7 +394,8 @@ export const SearchSlider = ({
   };
 
   return (
-    <FormControl sx={{ flex: 1, minWidth: '200px', mx: 3, alignItems: 'center' }}>
+    <FormControl
+      sx={{ flex: 1, minWidth: '200px', mx: 3, alignItems: 'center' }}>
       <FormLabel sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
         {icon}
         <Translate>{label}</Translate>
@@ -394,11 +416,7 @@ export const SearchSlider = ({
         min={isLinearScale ? min : 0}
         max={isLinearScale ? max : 100}
         sx={{ width: '100%', marginBottom: '8px' }}
-        value={
-          isLinearScale
-            ? values
-            : values.map(e => convert(e, 'descale'))
-        }
+        value={isLinearScale ? values : values.map(e => convert(e, 'descale'))}
         scale={isLinearScale ? undefined : e => convert(e)}
         onChange={(_, newValue) => {
           const v = isLinearScale ? newValue : newValue.map(e => convert(e));
@@ -447,7 +465,8 @@ export const SearchBooleanToggle = ({ label, onChange, value, icon }) => {
   const { formatMessage } = useIntl();
   return (
     <FormControl sx={{ alignItems: 'center', mx: 2 }}>
-      <FormLabel sx={{ mb: 1, display: 'flex', alignItems: 'center', gap: 0.5 }}>
+      <FormLabel
+        sx={{ mb: 1, display: 'flex', alignItems: 'center', gap: 0.5 }}>
         {icon}
         <Translate>{label}</Translate>
       </FormLabel>
@@ -497,7 +516,13 @@ SearchDivingTypes.propTypes = {
   icon: PropTypes.node
 };
 
-export const SearchSelect = ({ label, optionDescription, options, value, onChange }) => {
+export const SearchSelect = ({
+  label,
+  optionDescription,
+  options,
+  value,
+  onChange
+}) => {
   const { formatMessage } = useIntl();
   return (
     <FormControl
@@ -529,7 +554,11 @@ export const SearchSelect = ({ label, optionDescription, options, value, onChang
               </Typography>
             );
           const found = options.find(e => e[0] === v)?.[1] ?? v;
-          return typeof found === 'string' ? <Translate>{found}</Translate> : found;
+          return typeof found === 'string' ? (
+            <Translate>{found}</Translate>
+          ) : (
+            found
+          );
         }}>
         <MenuItem key={-1} value="">
           <i>
@@ -570,7 +599,11 @@ export const SearchMatchAllFieldsToogle = ({ isChecked, onChange }) => {
             title={formatMessage({
               id: 'Specify if the search results must match all the fields you typed above (default is yes).'
             })}>
-            <InfoOutlinedIcon fontSize="small" color="action" sx={{ verticalAlign: 'middle' }} />
+            <InfoOutlinedIcon
+              fontSize="small"
+              color="action"
+              sx={{ verticalAlign: 'middle' }}
+            />
           </Tooltip>
         </Box>
       }
@@ -582,12 +615,12 @@ export const countActiveFilters = (filterState, includeKeys) => {
   const entries = includeKeys
     ? Object.entries(filterState).filter(([k]) => includeKeys.includes(k))
     : Object.entries(filterState);
-  return entries.filter(([, v]) => v !== null && v !== '' && v !== undefined).length;
+  return entries.filter(([, v]) => v !== null && v !== '' && v !== undefined)
+    .length;
 };
 
 const formatRangeValue = (key, value) => {
-  const unit =
-    key === 'cave.depth' || key === 'cave.length' ? ' m' : '';
+  const unit = key === 'cave.depth' || key === 'cave.length' ? ' m' : '';
   const fmt = v => (v >= 1000 ? `${(v / 1000).toFixed(0)}k` : v);
   return `${fmt(value[0])} – ${fmt(value[1])}${unit}`;
 };
@@ -623,7 +656,10 @@ export const ActiveFilterChips = ({
     } else if (typeof value === 'boolean') {
       formattedValue = formatMessage({ id: value ? 'yes' : 'no' });
     } else if (translatableValueFields?.has(key)) {
-      formattedValue = formatMessage({ id: String(value), defaultMessage: String(value) });
+      formattedValue = formatMessage({
+        id: String(value),
+        defaultMessage: String(value)
+      });
     } else {
       formattedValue = String(value);
     }
@@ -645,7 +681,6 @@ export const ActiveFilterChips = ({
           onDelete={chip.onDelete}
           size="small"
           color="primary"
-          variant="outlined"
         />
       ))}
     </Box>
@@ -662,7 +697,12 @@ ActiveFilterChips.propTypes = {
   translatableValueFields: PropTypes.instanceOf(Set)
 };
 
-export const SearchFilterAccordion = ({ filterCount, expanded, onExpandedChange, children }) => (
+export const SearchFilterAccordion = ({
+  filterCount,
+  expanded,
+  onExpandedChange,
+  children
+}) => (
   <Accordion
     expanded={expanded}
     onChange={(_, val) => onExpandedChange(val)}
@@ -706,14 +746,6 @@ SearchFilterAccordion.propTypes = {
 export const SearchActionButtons = ({ onReset }) => (
   <CardActions sx={{ padding: 0, justifyContent: 'flex-end', width: '100%' }}>
     <Button
-      type="submit"
-      variant="contained"
-      size="medium"
-      startIcon={<SearchIcon />}>
-      <Translate>Search</Translate>
-    </Button>
-
-    <Button
       type="button"
       variant="text"
       size="medium"
@@ -722,6 +754,14 @@ export const SearchActionButtons = ({ onReset }) => (
       onClick={() => onReset()}
       sx={{ color: 'text.secondary' }}>
       <Translate>Reset</Translate>
+    </Button>
+
+    <Button
+      type="submit"
+      variant="contained"
+      size="medium"
+      startIcon={<SearchIcon />}>
+      <Translate>Search</Translate>
     </Button>
   </CardActions>
 );

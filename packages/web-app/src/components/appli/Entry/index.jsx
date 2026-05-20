@@ -5,10 +5,32 @@ import { useDispatch } from 'react-redux';
 import { useParams, useNavigate, Link as RouterLink } from 'react-router-dom';
 import { styled } from '@mui/material/styles';
 import Skeleton from '@mui/material/Skeleton';
-import { Box, Breadcrumbs, Card, Link, Typography } from '@mui/material';
+import {
+  Box,
+  Breadcrumbs,
+  Card,
+  CircularProgress,
+  Link,
+  Typography
+} from '@mui/material';
+import { NavigateNext, Print } from '@mui/icons-material';
+import CreateIcon from '@mui/icons-material/Create';
+import DeleteIcon from '@mui/icons-material/Delete';
+import HistoryIcon from '@mui/icons-material/History';
+import ManageHistoryIcon from '@mui/icons-material/ManageHistory';
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import ShareIcon from '@mui/icons-material/Share';
+import ExploreOutlinedIcon from '@mui/icons-material/ExploreOutlined';
+import ScienceOutlinedIcon from '@mui/icons-material/ScienceOutlined';
+import ChatOutlinedIcon from '@mui/icons-material/ChatOutlined';
+import PermMediaOutlinedIcon from '@mui/icons-material/PermMediaOutlined';
+import { useReactToPrint } from 'react-to-print';
 
-import FixedLayout from '../../common/Layouts/Fixed';
-import FixedContent from '../../common/Layouts/Fixed/FixedContent';
+import PageHeader from '../../common/Layouts/PageHeader';
+import PageTabs from '../../common/Layouts/PageTabs';
+import ResponsiveActions from '../../common/Layouts/ResponsiveActions';
+import ScrollableContent from '../../common/Layouts/Fixed/ScrollableContent';
 import CustomIcon from '../../common/CustomIcon';
 
 import Properties from './Properties';
@@ -18,11 +40,15 @@ import Riggings from './Riggings/Riggings';
 import Comments from './Comments/index';
 import Documents from './Documents';
 import Histories from './Histories';
+import Science from './Science';
 import { deleteEntrance } from '../../../actions/Entrance/DeleteEntrance';
 import { restoreEntrance } from '../../../actions/Entrance/RestoreEntrance';
-import { usePermissions, useUserProperties, useExplored } from '../../../hooks';
-import StandardDialog from '../../common/StandardDialog';
-import { EntranceForm } from '../EntitiesForm';
+import {
+  usePermissions,
+  useUserProperties,
+  useExplored,
+  useSharePage
+} from '../../../hooks';
 import SensitiveCaveWarning from './SensitiveCaveWarning';
 import AuthorAndDate from '../../common/Contribution/AuthorAndDate';
 import Alert from '../../common/Alert';
@@ -53,7 +79,7 @@ export const Entry = ({ isLoading, error, entrance }) => {
   const { entranceId } = useParams();
   const { isAuth, isAdmin, isModerator } = usePermissions();
   const componentRef = useRef();
-  const [isEditing, setEditing] = useState(false);
+  const handleShare = useSharePage();
   const [isDeleteConfirmationOpen, setIsDeleteConfirmationOpen] =
     useState(false);
   const [isDeleteConfirmationPermanent, setIsDeleteConfirmationPermanent] =
@@ -71,6 +97,8 @@ export const Entry = ({ isLoading, error, entrance }) => {
     if (entrance) setWantedDeletedState(entrance.isDeleted);
   }, [entrance]);
 
+  const isActionLoading = wantedDeletedState !== entrance?.isDeleted;
+
   let onDelete = null;
   if (!entrance?.isDeleted && isModerator) {
     onDelete = () => {
@@ -84,130 +112,227 @@ export const Entry = ({ isLoading, error, entrance }) => {
     dispatch(deleteEntrance({ id: entranceId, entityId, isPermanent }));
     if (isPermanent) navigate('/', { replace: true });
   };
+
   const onRestorePress = () => {
     setWantedDeletedState(false);
     dispatch(restoreEntrance({ id: entranceId }));
   };
 
-  const isActionLoading = wantedDeletedState !== entrance?.isDeleted;
+  const handlePrint = useReactToPrint({ contentRef: componentRef });
+
+  let ExploredIcon = <CircularProgress size={20} />;
+  if (!isExploredLoading) {
+    ExploredIcon = isExplored ? (
+      <CheckCircleIcon />
+    ) : (
+      <CheckCircleOutlineIcon />
+    );
+  }
+
+  const canToggleExplored =
+    isAuth && entrance?.cave?.id && !entrance?.isDeleted;
+  const canEdit = isAuth && entrance && !entrance.isDeleted;
+
+  const snapshotUrl = entrance
+    ? `/ui/entrances/${entrance.id}/snapshots?isNetwork=${entrance.cave?.entrances?.length > 1}`
+    : null;
+
+  const actions = entrance ? (
+    <ResponsiveActions
+      items={[
+        {
+          key: 'explored',
+          icon: ExploredIcon,
+          label: formatMessage({
+            id: isExplored
+              ? 'Remove from my explored caves'
+              : 'Add to my explored caves'
+          }),
+          onClick: handleToggleExplored,
+          color: isExplored ? 'secondary' : 'primary',
+          hidden: !canToggleExplored
+        },
+        {
+          key: 'print',
+          icon: <Print />,
+          label: formatMessage({ id: 'Print' }),
+          onClick: handlePrint
+        },
+        {
+          key: 'share',
+          icon: <ShareIcon />,
+          label: formatMessage({ id: 'Copy link' }),
+          onClick: handleShare
+        },
+        {
+          key: 'edit',
+          icon: <CreateIcon />,
+          label: formatMessage({ id: 'Edit properties' }),
+          onClick: () => navigate(`/ui/entrances/${entrance.id}/edit`),
+          hidden: !canEdit
+        },
+        {
+          key: 'delete',
+          icon: <DeleteIcon />,
+          label: formatMessage({ id: 'Delete' }),
+          onClick: onDelete,
+          hidden: !onDelete
+        },
+        {
+          key: 'snapshot',
+          icon: <HistoryIcon />,
+          label: formatMessage({ id: 'History' }),
+          href: snapshotUrl,
+          target: '_blank'
+        },
+        {
+          key: 'snapshot-all',
+          icon: <ManageHistoryIcon />,
+          label: formatMessage({
+            id: 'Page history'
+          }),
+          href: `${snapshotUrl}&all=true`,
+          target: '_blank'
+        }
+      ]}
+    />
+  ) : null;
+
+  const breadcrumb = entrance ? (
+    <Breadcrumbs
+      separator={<NavigateNext sx={{ fontSize: '1.2rem' }} />}
+      sx={{
+        fontSize: { xs: '1.2rem', md: '1.7rem' },
+        '& .MuiBreadcrumbs-separator': { mx: { xs: '2px', md: '8px' } }
+      }}>
+      {entrance.country && (
+        <Link
+          component={RouterLink}
+          to={`/ui/countries/${entrance.country}`}
+          underline="hover"
+          color="inherit"
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: { xs: '2px', md: '4px' }
+          }}>
+          <CustomIcon type="country" size={16} />
+          {entrance.country}
+        </Link>
+      )}
+      {entrance.massifs?.length > 0 && (
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: { xs: '2px', md: '4px' }
+          }}>
+          {entrance.massifs.map((massif, index) => (
+            <React.Fragment key={massif.id}>
+              {index > 0 && <span>·</span>}
+              <Link
+                component={RouterLink}
+                to={`/ui/massifs/${massif.id}`}
+                underline="hover"
+                color="inherit"
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: { xs: '2px', md: '4px' }
+                }}>
+                <CustomIcon type="massif" size={16} />
+                {massif.name}
+              </Link>
+            </React.Fragment>
+          ))}
+        </Box>
+      )}
+      {entrance.cave?.entrances?.length > 1 && (
+        <Link
+          component={RouterLink}
+          to={`/ui/caves/${entrance.cave.id}`}
+          underline="hover"
+          color="inherit"
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: { xs: '2px', md: '4px' }
+          }}>
+          <CustomIcon type="network" size={16} />
+          {entrance.cave.name}
+        </Link>
+      )}
+    </Breadcrumbs>
+  ) : null;
+
+  const tabs = [
+    {
+      id: 'information',
+      label: formatMessage({ id: 'Information' }),
+      icon: <ExploreOutlinedIcon fontSize="small" />
+    },
+    {
+      id: 'documents',
+      label: formatMessage({ id: 'Documents' }),
+      icon: <PermMediaOutlinedIcon fontSize="small" />,
+      count: entrance?.documents?.length,
+      disabled: !!entrance && !isAuth && entrance.documents.length === 0
+    },
+    // FIXME: 'science' tab is admin-only until the Science API is available.
+    // Remove the isAdmin filter once the API is integrated.
+    ...(isAdmin
+      ? [
+          {
+            id: 'science',
+            label: formatMessage({ id: 'Science' }),
+            icon: <ScienceOutlinedIcon fontSize="small" />
+          }
+        ]
+      : []),
+    {
+      id: 'comments',
+      label: formatMessage({ id: 'Comments' }),
+      icon: <ChatOutlinedIcon fontSize="small" />,
+      count: entrance?.comments?.length,
+      disabled: !!entrance && !isAuth && entrance.comments.length === 0
+    }
+  ];
 
   return (
     <div ref={componentRef}>
-      <FixedLayout>
-        {entrance && (
-          <FixedContent
-            displayShare
-            subheader={
-              <Box
-                display="flex"
-                alignItems="center"
-                justifyContent="space-between">
-                <Breadcrumbs
-                  separator="·"
-                  sx={{ fontSize: { xs: '1.2rem', md: '1.7rem' } }}>
-                  {entrance.country && (
-                    <Link
-                      component={RouterLink}
-                      to={`/ui/countries/${entrance.country}`}
-                      underline="hover"
-                      color="inherit"
-                      sx={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '4px'
-                      }}>
-                      <CustomIcon type="country" size={16} />
-                      {entrance.country}
-                    </Link>
-                  )}
-                  {entrance.massifs?.map(massif => (
-                    <Link
-                      key={massif.id}
-                      component={RouterLink}
-                      to={`/ui/massifs/${massif.id}`}
-                      underline="hover"
-                      color="inherit"
-                      sx={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '4px'
-                      }}>
-                      <CustomIcon type="massif" size={16} />
-                      {massif.name}
-                    </Link>
-                  ))}
-                  {entrance.cave?.entrances?.length > 1 && (
-                    <Link
-                      component={RouterLink}
-                      to={`/ui/caves/${entrance.cave.id}`}
-                      underline="hover"
-                      color="inherit"
-                      sx={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '4px'
-                      }}>
-                      <CustomIcon type="network" size={16} />
-                      {entrance.cave.name}
-                    </Link>
-                  )}
-                </Breadcrumbs>
-              </Box>
-            }
-            title={entrance.name ?? ''}
-            icon={<CustomIcon type="entrance" />}
-            onEdit={
-              isAuth && !entrance.isDeleted ? () => setEditing(true) : undefined
-            }
-            onDelete={onDelete}
-            isExplored={isAuth && entrance?.cave?.id ? isExplored : null}
-            isExploredLoading={isExploredLoading}
-            onToggleExplored={
-              isAuth && entrance?.cave?.id && !entrance?.isDeleted
-                ? handleToggleExplored
-                : undefined
-            }
-            printRef={componentRef}
-            entranceSnapshot={{
-              id: entrance.id,
-              type: 'entrances',
-              isNetwork: entrance.cave?.entrances?.length > 1
-            }}
-            snapshot={{
-              id: entrance.id,
-              type: 'entrances',
-              isNetwork: entrance.cave?.entrances?.length > 1,
-              getAll: true
-            }}
-            footer={
-              (entrance.author || entrance.reviewer || entrance.language) && (
-                <Typography component="div" variant="caption">
-                  {entrance.author && (
-                    <AuthorAndDate
-                      author={entrance.author}
-                      verb="Created"
-                      date={entrance.dateInscription}
-                    />
-                  )}
-                  {entrance.author && entrance.reviewer && ' · '}
-                  {entrance.reviewer && (
-                    <AuthorAndDate
-                      author={entrance.reviewer}
-                      verb="Updated"
-                      date={entrance.dateReviewed}
-                    />
-                  )}
-                  {entrance.language &&
-                    (entrance.author || entrance.reviewer) &&
-                    ' · '}
-                  {entrance.language &&
-                    `${formatMessage({ id: 'Language' })} : ${entrance.language.toUpperCase()}`}
-                </Typography>
-              )
-            }
-            content={
-              <>
-                {entrance.isDeleted && (
+      <PageHeader
+        title={entrance?.name ?? (isLoading ? undefined : '')}
+        icon={<CustomIcon type="entrance" />}
+        subheader={breadcrumb}
+        actions={actions}
+      />
+
+      <PageTabs tabs={tabs}>
+        {/* Tab Information */}
+        <div>
+          {isLoading && (
+            <Card sx={{ m: 2, p: 3 }}>
+              <Skeleton height={300} />
+              <Skeleton height={80} />
+              <Skeleton height={100} />
+              <Skeleton height={150} />
+              <Skeleton height={100} />
+            </Card>
+          )}
+          {error && (
+            <Card sx={{ m: 2, p: 3 }}>
+              <Alert
+                title={formatMessage({
+                  id: 'Error, the entrance data you are looking for is not available.'
+                })}
+                severity="error"
+              />
+            </Card>
+          )}
+          {entrance && (
+            <>
+              {entrance.isDeleted && (
+                <Box sx={{ m: 2 }}>
                   <DeletedCard
                     entityType={DELETED_ENTITIES.entrance}
                     entity={entrance}
@@ -218,144 +343,142 @@ export const Entry = ({ isLoading, error, entrance }) => {
                       setIsDeleteConfirmationOpen(true);
                     }}
                   />
-                )}
-                <DeleteConfirmationDialog
-                  entityType={DELETED_ENTITIES.entrance}
-                  isOpen={isDeleteConfirmationOpen}
-                  isLoading={isActionLoading}
-                  isPermanent={isDeleteConfirmationPermanent}
-                  onClose={() => setIsDeleteConfirmationOpen(false)}
-                  onConfirmation={entity => {
-                    onDeletePress(entity?.id, isDeleteConfirmationPermanent);
-                  }}
-                />
+                </Box>
+              )}
+              <DeleteConfirmationDialog
+                entityType={DELETED_ENTITIES.entrance}
+                isOpen={isDeleteConfirmationOpen}
+                isLoading={isActionLoading}
+                isPermanent={isDeleteConfirmationPermanent}
+                onClose={() => setIsDeleteConfirmationOpen(false)}
+                onConfirmation={entity => {
+                  onDeletePress(entity?.id, isDeleteConfirmationPermanent);
+                }}
+              />
+              {entrance.isSensitive && (
+                <Box sx={{ mx: 2, mt: 2 }}>
+                  <SensitiveCaveWarning />
+                </Box>
+              )}
+              <ScrollableContent
+                content={
+                  <>
+                    <HalfSplitContainer>
+                      {(!entrance.isSensitive || isAdmin) && (
+                        <Box sx={{ flex: 1, minHeight: 200 }}>
+                          <Map positions={mapPositions} loading={isLoading} />
+                        </Box>
+                      )}
+                      <Box sx={{ flex: 1, overflow: 'auto' }}>
+                        <Properties
+                          entrance={entrance}
+                          dataQuality={entrance.dataQuality}
+                        />
+                      </Box>
+                    </HalfSplitContainer>
+                    {(entrance.author ||
+                      entrance.reviewer ||
+                      entrance.language) && (
+                      <Typography
+                        component="div"
+                        variant="caption"
+                        sx={{ mt: 2 }}>
+                        {entrance.author && (
+                          <AuthorAndDate
+                            author={entrance.author}
+                            verb="Created"
+                            date={entrance.dateInscription}
+                          />
+                        )}
+                        {entrance.author && entrance.reviewer && ' · '}
+                        {entrance.reviewer && (
+                          <AuthorAndDate
+                            author={entrance.reviewer}
+                            verb="Updated"
+                            date={entrance.dateReviewed}
+                          />
+                        )}
+                        {entrance.language &&
+                          (entrance.author || entrance.reviewer) &&
+                          ' · '}
+                        {entrance.language &&
+                          `${formatMessage({ id: 'Language' })} : ${entrance.language.toUpperCase()}`}
+                      </Typography>
+                    )}
+                  </>
+                }
+              />
 
-                {entrance.isSensitive && <SensitiveCaveWarning />}
-                <HalfSplitContainer>
-                  {(!entrance.isSensitive || isAdmin) && (
-                    <Box sx={{ flex: 1, minHeight: 200 }}>
-                      <Map positions={mapPositions} loading={isLoading} />
-                    </Box>
-                  )}
-                  <Box sx={{ flex: 1, overflow: 'auto' }}>
-                    <Properties
-                      entrance={entrance}
-                      dataQuality={entrance.dataQuality}
-                    />
-                  </Box>
-                </HalfSplitContainer>
-              </>
-            }
-          />
-        )}
-        {isLoading && (
-          <Card sx={{ padding: 3 }}>
-            <Skeleton height={300} />
-            <Skeleton height={80} />
-            <Skeleton height={100} />
-            <Skeleton height={150} />
-            <Skeleton height={100} />
-          </Card>
-        )}
-        {error && (
-          <Card sx={{ padding: 3 }}>
-            <Alert
-              title={formatMessage({
-                id: 'Error, the entrance data you are looking for is not available.'
-              })}
-              severity="error"
-            />
-          </Card>
-        )}
-        {entrance && (
-          <>
-            {(isAuth || entrance.locations.length > 0) && (
               <Locations
                 locations={entrance.locations}
                 entranceId={entrance.id}
                 isSensitive={entrance.isSensitive}
                 isEditAllowed={!entrance.isDeleted}
               />
-            )}
-            {(isAuth || entrance.descriptions.length > 0) && (
               <Descriptions
                 descriptions={entrance.descriptions}
                 entityType="entrance"
                 entityId={entrance.id}
                 isEditAllowed={!entrance.isDeleted}
               />
-            )}
-            {(isAuth || entrance.riggings.length > 0) && (
               <Riggings
                 riggings={entrance.riggings}
                 entranceId={entrance.id}
                 isEditAllowed={!entrance.isDeleted}
               />
-            )}
-            {(isAuth || entrance.documents.length > 0) && (
-              <Documents
-                documents={entrance.documents}
-                entranceId={entrance.id}
-                isEditAllowed={!entrance.isDeleted}
-              />
-            )}
-            {(isAuth || entrance.histories.length > 0) && (
               <Histories
-                histories={entrance.histories}
+                histories={entrance.histories ?? []}
                 entranceId={entrance.id}
                 isEditAllowed={!entrance.isDeleted}
               />
-            )}
-            {(isAuth || entrance.comments.length > 0) && (
-              <Comments
-                comments={entrance.comments}
-                entranceId={entrance.id}
-                isEditAllowed={!entrance.isDeleted}
-              />
-            )}
+            </>
+          )}
+        </div>
 
-            {isAuth && (
-              <StandardDialog
-                fullWidth
-                maxWidth="md"
-                open={isEditing}
-                onClose={() => setEditing(false)}
-                scrollable
-                title={formatMessage({ id: 'Entrance edition' })}>
-                <EntranceForm
-                  entranceValues={{
-                    country: entrance.country,
-                    depth: entrance.depth,
-                    length: entrance.length,
-                    id: entrance.id,
-                    isSensitive: entrance.isSensitive,
-                    hasBat: entrance.hasBat,
-                    dangerFlooding: entrance.dangerFlooding,
-                    dangerCo2: entrance.dangerCo2,
-                    dangerRockfall: entrance.dangerRockfall,
-                    dangerPollution: entrance.dangerPollution,
-                    needCleanGear: entrance.needCleanGear,
-                    needStayOnTrail: entrance.needStayOnTrail,
-                    hasRules: entrance.hasRules,
-                    isTouristic: entrance.isTouristic,
-                    name: entrance.name,
-                    language: entrance.language,
-                    latitude: entrance?.latitude,
-                    longitude: entrance?.longitude,
-                    altitude: entrance.altitude,
-                    yearDiscovery: entrance.discoveryYear
-                  }}
-                  caveValues={{
-                    ...entrance.cave,
-                    name: entrance.cave?.name,
-                    language: entrance.cave?.language
-                  }}
-                />
-              </StandardDialog>
-            )}
-          </>
-        )}
-      </FixedLayout>
+        {/* Tab 1 — Documents */}
+        <div>
+          {isLoading && (
+            <Card sx={{ m: 2, p: 3 }}>
+              <Skeleton height={40} width="100%" />
+              <Skeleton height={60} />
+              <Skeleton height={60} />
+              <Skeleton height={60} />
+            </Card>
+          )}
+          {entrance && (
+            <Documents
+              documents={entrance.documents}
+              entranceId={entrance.id}
+              isEditAllowed={!entrance.isDeleted}
+            />
+          )}
+        </div>
+
+        {/* FIXME: Science panel is admin-only until the Science API is available. */}
+        {/* WARNING: this must stay in sync with the 'science' entry in the tabs array above.
+            PageTabs matches children to tabs by position. React.Children.toArray strips `false`,
+            so `{isAdmin && <Science />}` works — but returning null or wrapping in a div would
+            silently shift all subsequent tab panels. */}
+        {isAdmin && <Science />}
+
+        {/* Tab 3 — Comments */}
+        <div>
+          {isLoading && (
+            <Card sx={{ m: 2, p: 3 }}>
+              <Skeleton height={40} width="100%" />
+              <Skeleton height={80} />
+              <Skeleton height={80} />
+            </Card>
+          )}
+          {entrance && (
+            <Comments
+              comments={entrance.comments}
+              entranceId={entrance.id}
+              isEditAllowed={!entrance.isDeleted}
+            />
+          )}
+        </div>
+      </PageTabs>
     </div>
   );
 };

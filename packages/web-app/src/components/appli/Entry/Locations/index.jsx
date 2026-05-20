@@ -40,6 +40,7 @@ const Locations = ({ entranceId, locations, isSensitive, isEditAllowed }) => {
     <ScrollableContent
       dense
       anchorId="location"
+      defaultExpanded={locations.length > 0}
       title={formatMessage({ id: 'Location' })}
       icon={
         permissions.isAuth &&

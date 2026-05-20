@@ -6,7 +6,12 @@ import React, {
   useMemo
 } from 'react';
 import PropTypes from 'prop-types';
-import { DocumentTypes } from '../../../../hooks/useDocumentTypes';
+import { DocumentTypes } from '../../../../hooks/documentTypeHelpers';
+import {
+  IS_INTACT,
+  LICENSE_IN_FILE,
+  DOCUMENT_AUTHORIZE_TO_PUBLISH
+} from './formElements/AddFileForm/FileHelpers';
 import { defaultDocumentValuesTypes } from './types';
 
 export const defaultDocAttributes = {
@@ -43,12 +48,36 @@ export function isDocumentPagesFormatValid(pages) {
   return false;
 }
 
+const DESCRIPTION_OPTIONAL_TYPES = [
+  DocumentTypes.IMAGE,
+  DocumentTypes.TOPOGRAPHIC_DRAWING,
+  DocumentTypes.EVENT,
+  DocumentTypes.AUTHORIZATION_TO_PUBLISH
+];
+
+const FILE_REQUIRED_TYPES = [
+  DocumentTypes.IMAGE,
+  DocumentTypes.TOPOGRAPHIC_DRAWING,
+  DocumentTypes.MOVING_IMAGE,
+  DocumentTypes.SOUND,
+  DocumentTypes.PHYSICAL_OBJECT,
+  DocumentTypes.MAP,
+  DocumentTypes.DATASET
+];
+
 const checkFormValidation = document => {
   let isValid = true;
 
   if (!document.title) isValid = false;
-  if (!document.description) isValid = false;
-  if (document.type === DocumentTypes.ISSUE && !document.parent)
+  if (!DESCRIPTION_OPTIONAL_TYPES.includes(document.type) && !document.description)
+    isValid = false;
+  if (document.type === DocumentTypes.EVENT && !document.datePublication)
+    isValid = false;
+  if (
+    (document.type === DocumentTypes.ISSUE ||
+      document.type === DocumentTypes.ARTICLE) &&
+    !document.parent
+  )
     isValid = false;
 
   if (!isDocumentPagesFormatValid(document.pages)) isValid = false;
@@ -57,11 +86,23 @@ const checkFormValidation = document => {
     isValid = new RegExp(document.identifierType?.regexp).test(
       document.identifier
     );
-  if (
-    document.files.length > 0 &&
-    (!document.license || !document.selectOptionAuthorizationDocument)
-  )
+  if (FILE_REQUIRED_TYPES.includes(document.type) && document.files.length === 0)
     isValid = false;
+  const requiresAuthorization =
+    document.type !== DocumentTypes.AUTHORIZATION_TO_PUBLISH;
+  if (requiresAuthorization && document.files.length > 0) {
+    if (!document.selectOptionAuthorizationDocument) isValid = false;
+    if (
+      document.selectOptionAuthorizationDocument !== LICENSE_IN_FILE &&
+      !document.license
+    )
+      isValid = false;
+    if (
+      document.selectOptionAuthorizationDocument === DOCUMENT_AUTHORIZE_TO_PUBLISH &&
+      !document.authorizationDocument
+    )
+      isValid = false;
+  }
 
   return !!isValid;
 };
@@ -71,16 +112,30 @@ export const DocumentFormContext = createContext({
   isNewDocument: true,
   isFormValid: true,
   updateAttribute: (attributeName, newValue) => {}, // eslint-disable-line no-unused-vars
-  resetContext: () => {}
+  resetContext: () => {},
+  linkedEntrance: null,
+  setLinkedEntrance: () => {}
 });
+
+const normalizeInitialValues = values => {
+  if (!values) return {};
+  const { option, files, ...rest } = values;
+  return {
+    ...rest,
+    selectOptionAuthorizationDocument: option ?? null,
+    files: (files ?? []).map(f => ({ ...f, state: IS_INTACT }))
+  };
+};
 
 const Provider = ({ children, initialValues }) => {
   const [document, setDocument] = useState({
     ...defaultDocAttributes,
-    ...(initialValues ?? {})
+    ...normalizeInitialValues(initialValues)
   });
 
   const [isFormValid, setIsFormValid] = useState(false);
+  const [linkedEntrance, setLinkedEntrance] = useState(null);
+
   const updateAttribute = useCallback(
     (attributeName, newValue) => {
       setDocument(prevState => ({
@@ -95,8 +150,8 @@ const Provider = ({ children, initialValues }) => {
     setIsFormValid(checkFormValidation(document));
   }, [document, setIsFormValid]);
 
-  const resetContext = useCallback(() => {
-    setDocument(defaultDocAttributes);
+  const resetContext = useCallback((overrides = {}) => {
+    setDocument({ ...defaultDocAttributes, ...overrides });
   }, [setDocument]);
 
   const contextValue = useMemo(
@@ -105,9 +160,11 @@ const Provider = ({ children, initialValues }) => {
       isNewDocument: !initialValues,
       isFormValid,
       updateAttribute,
-      resetContext
+      resetContext,
+      linkedEntrance,
+      setLinkedEntrance
     }),
-    [document, initialValues, isFormValid, updateAttribute, resetContext]
+    [document, initialValues, isFormValid, updateAttribute, resetContext, linkedEntrance]
   );
 
   return (

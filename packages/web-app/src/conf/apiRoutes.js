@@ -15,6 +15,7 @@ export const dynamicNumbersUrl = {
 export const cumulatedLengthUrl = `${API_BASE_PATH}/caves/cumulated-length`;
 
 // ===== Auth urls
+export const accountUrl = `${API_BASE_PATH}/account`;
 export const changePasswordUrl = `${API_BASE_PATH}/account/password`;
 export const changeEmailUrl = `${API_BASE_PATH}/account/email`;
 export const getNotificationPreferencesUrl = `${API_BASE_PATH}/account/notifications`;
@@ -227,6 +228,12 @@ export const deleteMassifUrl = (massifId, { entityId, isPermanent = false }) =>
     .join('&')}`;
 export const restoreMassifUrl = massifId =>
   `${API_BASE_PATH}/massifs/${massifId}/restore`;
+export const markMassifSensitiveUrl = massifId =>
+  `${API_BASE_PATH}/massifs/${massifId}/mark-sensitive`;
+export const unmarkMassifSensitiveUrl = massifId =>
+  `${API_BASE_PATH}/massifs/${massifId}/unmark-sensitive`;
+export const previewMassifSensitiveUrl = massifId =>
+  `${API_BASE_PATH}/massifs/${massifId}/preview-sensitive`;
 
 // ===== Notifications urls
 export const countUnreadNotificationsUrl = `${API_URL}/api/${apiVersion}/notifications/unread/count`;
@@ -275,6 +282,7 @@ export const unlinkCaveFromOrganizationUrl = (caveId, organizationId) =>
 // ===== Persons / cavers urls
 export const getGroupsUrl = `${API_BASE_PATH}/cavers/groups`;
 export const getBannedCaversUrl = `${API_BASE_PATH}/cavers/banned`;
+export const getInvalidEmailCaversUrl = `${API_BASE_PATH}/cavers/invalid-mail`;
 export const getCaverUrl = `${API_BASE_PATH}/cavers/`;
 export const postPersonUrl = `${API_BASE_PATH}/cavers`;
 export const postPersonGroupsUrl = userId =>

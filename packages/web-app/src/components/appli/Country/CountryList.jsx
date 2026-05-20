@@ -56,14 +56,9 @@ const CountryList = ({ countries = [] }) => {
     () =>
       countries.map(row => ({
         ...row,
-        localized: getLocalizedCountryName(
-          { enName: row.english, nativeName: row.native },
-          formatMessage,
-          locale,
-          row.english
-        )
+        localized: getLocalizedCountryName(row.iso2, locale, row.english)
       })),
-    [countries, locale, formatMessage]
+    [countries, locale]
   );
 
   const filtered = useMemo(() => {
@@ -99,7 +94,7 @@ const CountryList = ({ countries = [] }) => {
           <SearchInput value={search} onChange={setSearch} sx={{ mb: 2 }} />
           <TableContainer
             component={Paper}
-            sx={{ maxHeight: 'calc(100vh - 280px)' }}>
+            sx={{ maxHeight: theme => `calc(100vh - ${theme.appBarHeight + 184}px)` }}>
             <Table size="small" stickyHeader>
               <TableHead>
                 <TableRow>

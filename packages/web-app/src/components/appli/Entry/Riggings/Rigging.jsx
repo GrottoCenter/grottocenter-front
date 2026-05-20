@@ -99,6 +99,7 @@ const Rigging = ({ rigging, isEditAllowed, isMoving, onMoveUp, onMoveDown, isFir
             dateInscription={rigging.dateInscription}
             reviewer={rigging.reviewer}
             dateReviewed={rigging.dateReviewed}
+            language={rigging.language}
           />
         </Box>
       )}

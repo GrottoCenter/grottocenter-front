@@ -289,6 +289,9 @@ export const DeleteConfirmationDialog = ({
               <CircularProgress />
             </Box>
           )}
+          <Button variant="outline" onClick={onClose} disabled={isLoading}>
+            {formatMessage({ id: 'Cancel' })}
+          </Button>
           {!isLoading && (
             <Button
               disabled={isSearchMandatory && !selectedEntity}
@@ -299,9 +302,6 @@ export const DeleteConfirmationDialog = ({
               {actionButtonTitle}
             </Button>
           )}
-          <Button variant="outline" onClick={onClose} disabled={isLoading}>
-            {formatMessage({ id: 'Cancel' })}
-          </Button>
         </>
       }>
       <Box>

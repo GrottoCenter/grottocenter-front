@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, { useState } from 'react';
 import { styled } from '@mui/material/styles';
 import { isNil } from 'ramda';
 import {
@@ -7,8 +7,11 @@ import {
   CardContent,
   CardHeader as MuiCardHeader,
   Chip,
+  Collapse,
+  IconButton,
   Typography
 } from '@mui/material';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import AnchorCopyButton, { AnchorHeadingWrapper } from '../../AnchorCopyButton';
 import { useAnchorScroll } from '../../../../hooks';
 
@@ -29,7 +32,10 @@ const CardHeader = styled(MuiCardHeader, {
   ${({ $dense }) => $dense && `padding-bottom: 0px`}
 `;
 
-const StyledCardContent = styled(CardContent)`
+const StyledCardContent = styled(CardContent, {
+  shouldForwardProp: prop => prop[0] !== '$'
+})`
+  ${({ $dense, $collapsible }) => $dense && $collapsible && `padding-top: 0;`}
   &:last-child {
     padding-bottom: ${({ theme }) => theme.spacing(2)};
   }
@@ -41,8 +47,6 @@ const CountBadge = ({ count }) => (
     size="small"
     sx={{
       ml: 1,
-      bgcolor: count > 0 ? 'primary.veryLight' : 'grey.200',
-      color: count > 0 ? 'primary.main' : 'text.secondary',
       fontWeight: 600,
       verticalAlign: 'middle'
     }}
@@ -61,51 +65,94 @@ const ScrollableContent = ({
   anchorId,
   dense = false,
   subTitle = false,
-  subheader
+  subheader,
+  collapsible = true,
+  defaultExpanded = true
 }) => {
   useAnchorScroll(anchorId);
+  const [isExpanded, setIsExpanded] = useState(defaultExpanded);
 
   return (
     <Card id={anchorId}>
-      <CardHeader
-        $dense={dense ? 1 : 0}
-        subheader={subheader}
-        title={
-          <Title>
-            <Typography
-              variant={subTitle ? 'h3' : 'h2'}
-              color={subTitle ? 'textPrimary' : 'secondary'}>
-              {anchorId ? (
-                <AnchorHeadingWrapper>
-                  {title}
-                  {!isNil(count) && <CountBadge count={count} />}
-                  <AnchorCopyButton anchorId={anchorId} />
-                </AnchorHeadingWrapper>
-              ) : (
-                <>
-                  {title}
-                  {!isNil(count) && <CountBadge count={count} />}
-                </>
-              )}
-            </Typography>
-            {!isNil(icon) && icon}
-          </Title>
-        }
-      />
-      <StyledCardContent>{content}</StyledCardContent>
+      {title && (
+        <CardHeader
+          $dense={dense ? 1 : 0}
+          subheader={subheader}
+          onClick={collapsible ? () => setIsExpanded(v => !v) : undefined}
+          sx={
+            collapsible ? { cursor: 'pointer', userSelect: 'none' } : undefined
+          }
+          title={
+            <Title>
+              <Typography
+                variant={subTitle ? 'h3' : 'h2'}
+                color={subTitle ? 'textPrimary' : 'secondary'}>
+                {anchorId ? (
+                  <AnchorHeadingWrapper>
+                    {title}
+                    {!isNil(count) && <CountBadge count={count} />}
+                    <span onClick={e => e.stopPropagation()}>
+                      <AnchorCopyButton anchorId={anchorId} />
+                    </span>
+                  </AnchorHeadingWrapper>
+                ) : (
+                  <>
+                    {title}
+                    {!isNil(count) && <CountBadge count={count} />}
+                  </>
+                )}
+              </Typography>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                {!isNil(icon) && (
+                  <div
+                    onClick={e => {
+                      e.stopPropagation();
+                      if (!isExpanded) setIsExpanded(true);
+                    }}>
+                    {icon}
+                  </div>
+                )}
+                {collapsible && (
+                  <IconButton
+                    size="small"
+                    onClick={e => {
+                      e.stopPropagation();
+                      setIsExpanded(v => !v);
+                    }}
+                    sx={{
+                      transition: 'transform 200ms',
+                      transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)'
+                    }}>
+                    <ExpandMoreIcon fontSize="small" />
+                  </IconButton>
+                )}
+              </div>
+            </Title>
+          }
+        />
+      )}
+      <Collapse in={collapsible ? isExpanded : true} timeout="auto">
+        <StyledCardContent
+          $dense={dense ? 1 : 0}
+          $collapsible={collapsible ? 1 : 0}>
+          {content}
+        </StyledCardContent>
+      </Collapse>
     </Card>
   );
 };
 
 ScrollableContent.propTypes = {
-  title: PropTypes.oneOfType([PropTypes.string, PropTypes.node]).isRequired,
+  title: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
   count: PropTypes.number,
   icon: PropTypes.node,
   content: PropTypes.node.isRequired,
   anchorId: PropTypes.string,
   dense: PropTypes.bool,
   subTitle: PropTypes.bool,
-  subheader: PropTypes.node
+  subheader: PropTypes.node,
+  collapsible: PropTypes.bool,
+  defaultExpanded: PropTypes.bool
 };
 
 export default ScrollableContent;

@@ -1,6 +1,10 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { Chip, Skeleton } from '@mui/material';
+import CreateIcon from '@mui/icons-material/Create';
+import DeleteIcon from '@mui/icons-material/Delete';
+import ManageHistoryIcon from '@mui/icons-material/ManageHistory';
+import ShareIcon from '@mui/icons-material/Share';
 import CustomIcon from '../../components/common/CustomIcon';
 import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
@@ -25,8 +29,10 @@ import { fetchDocumentDetails } from '../../actions/Document/GetDocumentDetails'
 import { fetchDocumentChildren } from '../../actions/Document/GetDocumentChildren';
 import { deleteDocument } from '../../actions/Document/DeleteDocument';
 import { restoreDocument } from '../../actions/Document/RestoreDocument';
-import { usePermissions } from '../../hooks';
-import FixedContent from '../../components/common/Layouts/Fixed/FixedContent';
+import { usePermissions, useSharePage } from '../../hooks';
+import PageHeader from '../../components/common/Layouts/PageHeader';
+import ResponsiveActions from '../../components/common/Layouts/ResponsiveActions';
+import ScrollableContent from '../../components/common/Layouts/Fixed/ScrollableContent';
 import Alert from '../../components/common/Alert';
 import {
   DeleteConfirmationDialog,
@@ -57,6 +63,7 @@ const Document = ({
   const [isDeleteConfirmationPermanent, setIsDeleteConfirmationPermanent] =
     useState(false);
   const [wantedDeletedState, setWantedDeletedState] = useState(false);
+  const handleShare = useSharePage();
 
   useEffect(() => {
     if (documentData) setWantedDeletedState(documentData.isDeleted);
@@ -194,31 +201,91 @@ const Document = ({
 
   const isActionLoading = wantedDeletedState !== documentData?.isDeleted;
 
-  return (
-    <FixedContent
-      displayShare
-      onEdit={!error ? onEdit : null}
-      onDelete={!error ? onDelete : null}
-      subheader={
-        !isLoading &&
-        documentData &&
-        permissions.isAuth &&
-        !documentData?.isValidated &&
-        formatMessage({
+  const snapshotUrl = documentData
+    ? `/ui/documents/${documentData.id}/snapshots`
+    : null;
+
+  const subheader =
+    !isLoading &&
+    documentData &&
+    permissions.isAuth &&
+    !documentData?.isValidated
+      ? formatMessage({
           id: 'A moderator needs to validate the last modification before being able to edit the document again.'
         })
-      }
-      snapshot={
-        !!documentData && {
-          id: documentData.id,
-          type: 'documents',
-          content: documentData
+      : null;
+
+  const actions = (
+    <ResponsiveActions
+      items={[
+        {
+          key: 'share',
+          icon: <ShareIcon />,
+          label: formatMessage({ id: 'Copy link' }),
+          onClick: handleShare
+        },
+        {
+          key: 'edit',
+          icon: <CreateIcon />,
+          label: formatMessage({ id: 'Edit properties' }),
+          onClick: onEdit,
+          hidden: !onEdit
+        },
+        {
+          key: 'delete',
+          icon: <DeleteIcon />,
+          label: formatMessage({ id: 'Delete' }),
+          onClick: onDelete,
+          hidden: !onDelete
+        },
+        {
+          key: 'snapshot',
+          icon: <ManageHistoryIcon />,
+          label: formatMessage({ id: 'Page history' }),
+          href: snapshotUrl,
+          target: '_blank',
+          hidden: !snapshotUrl
         }
-      }
-      title={documentData?.title ?? ''}
-      content={
-        <>
-          {isLoading && (
+      ]}
+    />
+  );
+
+  return (
+    <>
+      <PageHeader
+        title={documentData?.title ?? (isLoading ? undefined : '')}
+        subheader={subheader}
+        actions={actions}
+      />
+      {documentData?.isDeleted && (
+        <ScrollableContent
+          content={
+            <DeletedCard
+              entityType={DELETED_ENTITIES.document}
+              entity={documentData}
+              isLoading={isActionLoading}
+              onRestorePress={onRestorePress}
+              onPermanentDeletePress={() => {
+                setIsDeleteConfirmationPermanent(true);
+                setIsDeleteConfirmationOpen(true);
+              }}
+            />
+          }
+        />
+      )}
+      <DeleteConfirmationDialog
+        entityType={DELETED_ENTITIES.document}
+        isOpen={isDeleteConfirmationOpen}
+        isLoading={isActionLoading}
+        isPermanent={isDeleteConfirmationPermanent}
+        onClose={() => setIsDeleteConfirmationOpen(false)}
+        onConfirmation={entity => {
+          onDeletePress(entity?.id, isDeleteConfirmationPermanent);
+        }}
+      />
+      {isLoading && (
+        <ScrollableContent
+          content={
             <>
               <Skeleton width={75} />
               <Skeleton />
@@ -227,47 +294,34 @@ const Document = ({
               <Skeleton width={125} />
               <Skeleton variant="rectangular" height={80} />
             </>
-          )}
-          {error && (
+          }
+        />
+      )}
+      {error && (
+        <ScrollableContent
+          content={
             <Alert
               title={formatMessage({
                 id: 'Error, the document data you are looking for is not available.'
               })}
               severity="error"
             />
-          )}
-          {documentData && (
+          }
+        />
+      )}
+      {documentData && (
+        <ScrollableContent
+          content={
             <>
-              {documentData.isDeleted && (
-                <DeletedCard
-                  entityType={DELETED_ENTITIES.document}
-                  entity={documentData}
-                  isLoading={isActionLoading}
-                  onRestorePress={onRestorePress}
-                  onPermanentDeletePress={() => {
-                    setIsDeleteConfirmationPermanent(true);
-                    setIsDeleteConfirmationOpen(true);
-                  }}
-                />
-              )}
-              <DeleteConfirmationDialog
-                entityType={DELETED_ENTITIES.document}
-                isOpen={isDeleteConfirmationOpen}
-                isLoading={isActionLoading}
-                isPermanent={isDeleteConfirmationPermanent}
-                onClose={() => setIsDeleteConfirmationOpen(false)}
-                onConfirmation={entity => {
-                  onDeletePress(entity?.id, isDeleteConfirmationPermanent);
-                }}
-              />
-
               <SectionTitleLink
                 title={formatMessage({ id: 'Is Part of' })}
                 value={documentData.parent?.title}
                 url={`/ui/documents/${documentData.parent?.id}`}
               />
               <SectionText title={formatMessage({ id: 'Summary' })}>
-                <Linkify options={linkifyOptions}>{documentData.description}</Linkify>
+                <Linkify options={linkifyOptions}>
+                  {documentData.description}
+                </Linkify>
               </SectionText>
               <SectionDivider />
               <SectionDetails title={formatMessage({ id: 'Details' })}>
@@ -408,7 +462,6 @@ const Document = ({
                 title={formatMessage({ id: 'Files' })}
                 files={documentData?.files}
               />
-
               <AuthorAndDate
                 author={documentData.creator}
                 textColor="textSecondary"
@@ -416,10 +469,10 @@ const Document = ({
                 verb="Created"
               />
             </>
-          )}
-        </>
-      }
-    />
+          }
+        />
+      )}
+    </>
   );
 };
 

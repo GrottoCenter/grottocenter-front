@@ -170,10 +170,10 @@ const Comment = ({ comment, isEditAllowed, isMoving, onMoveUp, onMoveDown, isFir
               )}
             </Box>
           )}
-          {(comment.author || comment.reviewer) && (
+          {(comment.author || comment.reviewer || comment.language) && (
             <Typography variant="caption" color="text.secondary" component="div">
               {comment.author && (
-                <AuthorAndDate author={comment.author} date={comment.dateInscription} />
+                <AuthorAndDate author={comment.author} date={comment.dateInscription} textColor="inherit" />
               )}
               {comment.author && comment.reviewer && ' · '}
               {comment.reviewer && (
@@ -181,8 +181,12 @@ const Comment = ({ comment, isEditAllowed, isMoving, onMoveUp, onMoveDown, isFir
                   author={comment.reviewer}
                   date={comment.dateReviewed}
                   verb={comment.author ? 'Updated' : ''}
+                  textColor="inherit"
                 />
               )}
+              {(comment.author || comment.reviewer) && comment.language && ' · '}
+              {comment.language &&
+                `${formatMessage({ id: 'Language' })} : ${comment.language.toUpperCase()}`}
             </Typography>
           )}
         </>

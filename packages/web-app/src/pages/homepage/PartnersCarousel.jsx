@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
+import { useOpenLink } from '../../hooks';
 import CircularProgress from '@mui/material/CircularProgress';
 import { styled } from '@mui/material/styles';
 import AliceCarousel from 'react-alice-carousel';
@@ -71,13 +72,14 @@ PartnerItem.propTypes = {
 
 const PartnersCarousel = ({ fetch, partners, isFetching }) => {
   const isFirstLoad = useRef(true);
+  const openLink = useOpenLink();
   const rows = partners
     ? partners.map(({ id, pictureFileName, name }) => (
         <PartnerItem
           key={`partcs-${id}`}
           imagePath={`/images/partners/${pictureFileName}`}
           alt={name}
-          onClick={() => window.open(`/ui/organizations/${id}`)}
+          onClick={() => openLink(`/ui/organizations/${id}`)}
         />
       ))
     : [];

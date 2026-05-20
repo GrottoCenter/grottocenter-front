@@ -7,7 +7,7 @@ import MassifForm from '../../../components/appli/EntitiesForm/Massif';
 import Layout from '../../../components/common/Layouts/Fixed/FixedContent';
 import Translate from '../../../components/common/Translate';
 
-const MassifEditContainer = ({ isFetching, massif }) => {
+const MassifEditContainer = ({ isFetching, massif, onCancel }) => {
   const { formatMessage } = useIntl();
 
   if (isNil(massif) && !isFetching) {
@@ -22,7 +22,7 @@ const MassifEditContainer = ({ isFetching, massif }) => {
     <Layout
       title={massif?.name || formatMessage({ id: 'Loading massif data...' })}
       content={
-        isFetching ? <CircularProgress /> : <MassifForm massifValues={massif} />
+        isFetching ? <CircularProgress /> : <MassifForm massifValues={massif} onCancel={onCancel} />
       }
     />
   );
@@ -32,7 +32,8 @@ MassifEditContainer.propTypes = {
   massif: PropTypes.shape({
     name: PropTypes.string
   }),
-  isFetching: PropTypes.bool
+  isFetching: PropTypes.bool,
+  onCancel: PropTypes.func
 };
 
 export default MassifEditContainer;

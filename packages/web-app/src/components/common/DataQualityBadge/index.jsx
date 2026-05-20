@@ -4,7 +4,6 @@ import { Box, CircularProgress, Tooltip, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { useIntl } from 'react-intl';
 
-
 const getColor = (value, theme) => {
   if (value >= 70) return theme.palette.success.main;
   if (value >= 40) return theme.palette.warning.main;
@@ -18,14 +17,17 @@ const DataQualityBadge = ({ value, size = 40 }) => {
 
   return (
     <Tooltip
-      title={formatMessage({ id: 'Data quality score: {value}/100' }, { value })}>
+      title={formatMessage(
+        { id: 'Data quality score: {value}/100' },
+        { value }
+      )}>
       <Box position="relative" display="inline-flex" sx={{ flexShrink: 0 }}>
         <Box display="flex">
           <CircularProgress
             variant="determinate"
             value={100}
             size={size}
-            sx={{ color: 'lightgrey', position: 'absolute' }}
+            sx={{ color: 'action.disabledBackground', position: 'absolute' }}
           />
           <CircularProgress
             variant="determinate"

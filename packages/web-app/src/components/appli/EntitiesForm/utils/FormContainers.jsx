@@ -45,12 +45,10 @@ const Button = styled(MuiButton)`
 `;
 
 export const FormActionRow = ({
-  isDirty,
   isNew,
   isSubmitting,
-  onReset,
-  isResetAllowed = true,
   isCenter = false,
+  disabled = false,
   onCancel
 }) => {
   const { formatMessage } = useIntl();
@@ -60,34 +58,26 @@ export const FormActionRow = ({
         display: 'flex',
         justifyContent: isCenter ? 'center' : 'flex-end'
       }}>
+      {onCancel && (
+        <Button variant="outlined" onClick={onCancel}>
+          {formatMessage({ id: 'Cancel' })}
+        </Button>
+      )}
       <ActionButton
-        label={formatMessage({
-          id: isNew ? 'Create' : 'Update'
-        })}
+        label={formatMessage({ id: isNew ? 'Create' : 'Update' })}
         loading={isSubmitting}
+        disabled={disabled}
         color="primary"
         style={{ margin: '8px' }}
         type="submit"
       />
-      {isResetAllowed && (
-        <Button variant="outlined" disabled={!isDirty} onClick={onReset}>
-          {formatMessage({ id: 'Reset' })}
-        </Button>
-      )}
-      {onCancel && (
-        <Button variant="text" onClick={onCancel}>
-          {formatMessage({ id: 'Cancel' })}
-        </Button>
-      )}
     </Box>
   );
 };
 FormActionRow.propTypes = {
-  isDirty: PropTypes.bool.isRequired,
   isNew: PropTypes.bool.isRequired,
   isSubmitting: PropTypes.bool.isRequired,
-  onReset: PropTypes.func.isRequired,
-  isResetAllowed: PropTypes.bool,
   isCenter: PropTypes.bool,
+  disabled: PropTypes.bool,
   onCancel: PropTypes.func
 };

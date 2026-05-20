@@ -102,6 +102,7 @@ const History = ({ history, isEditAllowed, isMoving, onMoveUp, onMoveDown, isFir
               reviewer={history.reviewer}
               dateInscription={history.dateInscription}
               dateReviewed={history.dateReviewed}
+              language={history.language}
               isDeletedWithHeader={history.isDeleted}
             />
           }

@@ -1,7 +1,7 @@
 import { number, string, shape, oneOf, arrayOf } from 'prop-types';
 import idNameType from './idName.type';
 
-const notificationype = shape({
+const notificationType = shape({
   id: number.isRequired,
   dateInscription: string.isRequired,
   notifier: shape({
@@ -10,7 +10,7 @@ const notificationype = shape({
   }),
   notificationType: shape({
     id: number.isRequired,
-    name: oneOf(['CREATE', 'DELETE', 'UPDATE'])
+    name: oneOf(['CREATE', 'DELETE', 'REJECT', 'UPDATE', 'VALIDATE'])
   }),
   cave: idNameType,
   description: shape({
@@ -58,4 +58,4 @@ const notificationype = shape({
   massif: idNameType
 });
 
-export default notificationype;
+export default notificationType;

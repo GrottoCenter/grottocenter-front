@@ -10,7 +10,7 @@ import {
   ListItemIcon
 } from '@mui/material';
 import LogoutIcon from '@mui/icons-material/Logout';
-import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import AccountBoxIcon from '@mui/icons-material/AccountBox';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import React, { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -57,12 +57,10 @@ const UserMenu = ({
     onLogoutClick();
   }, [handleClose, onLogoutClick]);
 
-  // Directs to the person page to see and modify the personal data
   const handleMyAccountClick = useCallback(() => {
-    if (!userId) return;
     handleClose();
-    navigate(`/ui/persons/${userId}`);
-  }, [handleClose, navigate, userId]);
+    navigate('/ui/account');
+  }, [handleClose, navigate]);
 
   const handleDashboardClick = useCallback(() => {
     handleClose();
@@ -121,7 +119,9 @@ const UserMenu = ({
           <Typography variant="body2" color="text.primary">
             <Translate
               id="Logged as {userNickname}"
-              values={{ userNickname: <strong key="userNickname">{userNickname}</strong> }}
+              values={{
+                userNickname: <strong key="userNickname">{userNickname}</strong>
+              }}
             />
           </Typography>
           <Typography variant="caption" color="text.secondary">
@@ -144,7 +144,7 @@ const UserMenu = ({
         {/* Primary actions */}
         <MenuItem disabled={!userId} onClick={handleMyAccountClick}>
           <ListItemIcon>
-            <AccountCircleIcon />
+            <AccountBoxIcon />
           </ListItemIcon>
           <Translate>My Account</Translate>
         </MenuItem>

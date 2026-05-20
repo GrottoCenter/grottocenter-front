@@ -4,7 +4,6 @@ import { styled } from '@mui/material/styles';
 import {
   Fade,
   FormControl,
-  FormHelperText,
   InputLabel,
   MenuItem,
   Select,
@@ -104,6 +103,9 @@ const IdentifierEditor = () => {
         {shouldShowIdentifierTypeInput && (
           <Fade in={shouldShowIdentifierTypeInput}>
             <IdentifierTypeContainer>
+              <Typography variant="caption" color="text.secondary" display="block" sx={{ mb: 0.5 }}>
+                <Translate>DOI, ISBN, ISSN, URL…</Translate>
+              </Typography>
               <FormControl
                 variant="filled"
                 required={document.identifier}
@@ -132,12 +134,6 @@ const IdentifierEditor = () => {
                     </MenuItem>
                   ))}
                 </Select>
-
-                <FormHelperText>
-                  {/* <Translate>
-                  Some helper text for Identifier Type.
-                  </Translate> */}
-                </FormHelperText>
               </FormControl>
             </IdentifierTypeContainer>
           </Fade>

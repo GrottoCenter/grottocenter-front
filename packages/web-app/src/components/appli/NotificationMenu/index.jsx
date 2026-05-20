@@ -119,11 +119,7 @@ const NotificationMenu = () => {
             {formatMessage({ id: 'Notifications' })}
           </Typography>
           {nbNotifications > 0 && (
-            <Chip
-              label={nbNotifications}
-              color="secondary"
-              size="small"
-            />
+            <Chip label={nbNotifications} color="secondary" size="small" />
           )}
         </Box>
 

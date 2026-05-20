@@ -28,7 +28,7 @@ const MoveEntranceToCave = () => {
 
   return (
     <Layout
-      title={formatMessage({ id: 'Moving entrance to a new cave or network' })}
+      title={formatMessage({ id: 'Entrance network association' })}
       content={
         <AuthChecker
           componentToDisplay={

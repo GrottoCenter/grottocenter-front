@@ -14,6 +14,7 @@ const Contribution = ({
   dateInscription,
   reviewer,
   dateReviewed,
+  language,
   withHours = false,
   isDeleted = false,
   isDeletedWithHeader = false,
@@ -40,12 +41,13 @@ const Contribution = ({
           <Linkify options={linkifyOptions}>{body}</Linkify>
         </MultilinesTypography>
       )}
-      {!hideAttribution && (author || reviewer) && (
-        <Typography component="div" variant="caption" sx={{ mt: 3 }}>
+      {!hideAttribution && (author || reviewer || language) && (
+        <Typography component="div" variant="caption" color="text.secondary" sx={{ mt: 3 }}>
           {author && (
             <AuthorAndDate
               author={author}
               date={dateInscription}
+              textColor="inherit"
               withHours={withHours}
             />
           )}
@@ -55,9 +57,13 @@ const Contribution = ({
               author={reviewer}
               date={dateReviewed}
               verb={author ? 'Updated' : ''}
+              textColor="inherit"
               withHours={withHours}
             />
           )}
+          {(author || reviewer) && language && ' · '}
+          {language &&
+            `${formatMessage({ id: 'Language' })} : ${language.toUpperCase()}`}
         </Typography>
       )}
     </>
@@ -76,6 +82,7 @@ Contribution.propTypes = {
     PropTypes.instanceOf(Date),
     PropTypes.string
   ]),
+  language: PropTypes.string,
   withHours: PropTypes.bool,
   isDeleted: PropTypes.bool,
   isDeletedWithHeader: PropTypes.bool,

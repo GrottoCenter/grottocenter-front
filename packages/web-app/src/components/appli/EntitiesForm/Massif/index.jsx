@@ -1,4 +1,5 @@
 import React, { useCallback, useMemo } from 'react';
+import PropTypes from 'prop-types';
 import { useForm } from 'react-hook-form';
 import { useSelector, useDispatch } from 'react-redux';
 import { useIntl } from 'react-intl';
@@ -12,16 +13,15 @@ import { MassifTypes } from '../../../../types/massif.type';
 import FormProgressInfo from '../utils/FormProgressInfo';
 
 import MassifFields from './MassifFields';
+import MassifSensitivityControl from './MassifSensitivityControl';
 
 const defaultMassifValues = {
   name: '',
   language: '',
-  descriptionTitle: '',
-  descriptionBody: '',
   geogPolygon: null
 };
 
-export const MassifForm = ({ massifValues }) => {
+export const MassifForm = ({ massifValues, onCancel }) => {
   const { formatMessage } = useIntl();
   const isNewMassif = !massifValues;
 
@@ -50,16 +50,16 @@ export const MassifForm = ({ massifValues }) => {
     handleSubmit,
     reset,
     control,
-    formState: { errors, isDirty, isSubmitting, isSubmitSuccessful }
+    formState: { errors, isSubmitting, isSubmitSuccessful }
   } = useForm({
     defaultValues: {
       massif: massifValues
         ? {
-            nameId: massifValues.names[0]?.id,
-            name: massifValues.names[0]?.name,
-            language: massifValues.language,
-            geogPolygon: massifValues.geogPolygon
-          }
+          nameId: massifValues.names[0]?.id,
+          name: massifValues.names[0]?.name,
+          language: massifValues.language,
+          geogPolygon: massifValues.geogPolygon
+        }
         : defaultMassifValues
     }
   });
@@ -94,8 +94,6 @@ export const MassifForm = ({ massifValues }) => {
       dispatch(
         postMassif({
           name: data.massif.name,
-          description: data.massif.descriptionBody,
-          descriptionTitle: data.massif.descriptionTitle,
           descriptionAndNameLanguage: { id: data.massif.language },
           geogPolygon: data.massif.geogPolygon
         })
@@ -141,18 +139,17 @@ export const MassifForm = ({ massifValues }) => {
 
   return (
     <FormContainer>
+      {!isNewMassif && <MassifSensitivityControl massif={massifValues} />}
       <form autoComplete="off" onSubmit={handleFormSubmit}>
         <MassifFields
           control={control}
           errors={errors}
           geoJson={geoJson}
-          isNew={isNewMassif}
         />
         <FormActionRow
-          isDirty={isDirty}
           isNew={isNewMassif}
           isSubmitting={isSubmitting}
-          onReset={handleReset}
+          onCancel={onCancel}
         />
       </form>
       <LicenseBox />
@@ -161,7 +158,8 @@ export const MassifForm = ({ massifValues }) => {
 };
 
 MassifForm.propTypes = {
-  massifValues: MassifTypes
+  massifValues: MassifTypes,
+  onCancel: PropTypes.func
 };
 
 export default MassifForm;

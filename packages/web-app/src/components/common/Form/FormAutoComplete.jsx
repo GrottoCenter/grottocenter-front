@@ -1,12 +1,13 @@
 import React from 'react';
 import { styled } from '@mui/material/styles';
 import {
+  Box,
   FilledInput,
   FormControl,
-  FormHelperText,
   IconButton,
   InputLabel,
-  Collapse
+  Collapse,
+  Typography
 } from '@mui/material';
 
 import { ExpandLess, ExpandMore } from '@mui/icons-material';
@@ -55,44 +56,49 @@ const FormAutoComplete = ({
   children
 }) => {
   return (
-    <FormControl
-      variant="filled"
-      required={required}
-      error={hasError}
-      fullWidth>
-      <InputLabel error={required && value === null}>
-        <Translate>{label}</Translate>
-      </InputLabel>
-      <StyledInput
-        disabled
-        value={value !== null ? getValueName(value) : ''}
-        endAdornment={resultEndAdornment}
-      />
-
-      {autoCompleteSearch && (
-        <StyledFormControl
-          variant="filled"
-          required={required}
-          error={hasError}>
-          <InputWrapper>
-            {autoCompleteSearch}
-            {children && <Collapse in={isSideActionOpen}>{children}</Collapse>}
-          </InputWrapper>
-          {onSideAction && (
-            <IconButton
-              size="small"
-              onClick={onSideAction}
-              disabled={sideActionDisabled}
-              color="secondary"
-              aria-label="new entity">
-              {sideActionIcon || <ExpandIcon isOpen={isSideActionOpen} />}
-            </IconButton>
-          )}
-        </StyledFormControl>
+    <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
+      {helperContent && (
+        <Typography variant="caption" color="text.secondary" display="block" sx={{ mb: 0.5 }}>
+          {helperContent}
+        </Typography>
       )}
+      <FormControl
+        variant="filled"
+        required={required}
+        error={hasError}
+        fullWidth>
+        <InputLabel>
+          <Translate>{label}</Translate>
+        </InputLabel>
+        <StyledInput
+          disabled
+          value={value !== null ? getValueName(value) : ''}
+          endAdornment={resultEndAdornment}
+        />
 
-      {helperContent && <FormHelperText>{helperContent}</FormHelperText>}
-    </FormControl>
+        {autoCompleteSearch && (
+          <StyledFormControl
+            variant="filled"
+            required={required}
+            error={hasError}>
+            <InputWrapper>
+              {autoCompleteSearch}
+              {children && <Collapse in={isSideActionOpen}>{children}</Collapse>}
+            </InputWrapper>
+            {onSideAction && (
+              <IconButton
+                size="small"
+                onClick={onSideAction}
+                disabled={sideActionDisabled}
+                color="secondary"
+                aria-label="new entity">
+                {sideActionIcon || <ExpandIcon isOpen={isSideActionOpen} />}
+              </IconButton>
+            )}
+          </StyledFormControl>
+        )}
+      </FormControl>
+    </Box>
   );
 };
 

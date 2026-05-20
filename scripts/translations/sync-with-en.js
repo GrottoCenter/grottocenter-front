@@ -1,18 +1,20 @@
 #!/usr/bin/env node
 /**
  * Translation synchronization utility.
- * Compares a target translation file with en.json and reports missing keys.
+ * Adds missing keys (English fallback) and removes extra keys not in en.json.
  *
- * Usage: node sync-translations-with-en.js <target-file>
+ * Usage:
+ *   node sync-with-en.js [target-file]   — sync one file or all lang files
+ *   node sync-with-en.js --check [file]  — report only, no writes
  */
 
 const fs = require('fs');
 const path = require('path');
 
 function loadJson(filePath) {
+  let data;
   try {
-    const content = fs.readFileSync(filePath, 'utf8');
-    return JSON.parse(content);
+    data = JSON.parse(fs.readFileSync(filePath, 'utf8').replace(/^\uFEFF/, ''));
   } catch (error) {
     if (error.code === 'ENOENT') {
       console.error(`Error: File '${filePath}' not found.`);
@@ -23,10 +25,10 @@ function loadJson(filePath) {
     }
     process.exit(1);
   }
-  return null;
+  return data;
 }
 
-function syncWithEnglish(targetFile) {
+function syncWithEnglish(targetFile, checkOnly) {
   const enFile = 'packages/web-app/public/lang/en.json';
 
   if (!fs.existsSync(enFile)) {
@@ -37,68 +39,81 @@ function syncWithEnglish(targetFile) {
   const enData = loadJson(enFile);
   const targetData = loadJson(targetFile);
 
-  const enKeys = new Set(Object.keys(enData));
+  const enKeys = Object.keys(enData);
   const targetKeys = new Set(Object.keys(targetData));
 
-  const missingInTarget = [...enKeys].filter(key => !targetKeys.has(key));
-  const extraInTarget = [...targetKeys].filter(key => !enKeys.has(key));
+  const missingInTarget = enKeys.filter(key => !targetKeys.has(key));
+  const extraInTarget = [...targetKeys].filter(
+    key => !Object.prototype.hasOwnProperty.call(enData, key)
+  );
 
-  console.log(`Synchronizing '${targetFile}' with English translations`);
-  console.log(`Keys in en.json: ${enKeys.size}`);
-  console.log(`Keys in ${path.basename(targetFile)}: ${targetKeys.size}`);
-  console.log();
+  console.log(
+    `${checkOnly ? 'Checking' : 'Syncing'} '${path.basename(targetFile)}'`
+  );
+
+  if (missingInTarget.length === 0 && extraInTarget.length === 0) {
+    console.log('  ✅ Already in sync.\n');
+    return true;
+  }
 
   if (missingInTarget.length > 0) {
     console.log(
-      `Keys missing in '${path.basename(targetFile)}' (${missingInTarget.length}):`
+      `  + ${missingInTarget.length} missing keys (will use English fallback)`
     );
-    missingInTarget.sort().forEach(key => {
-      console.log(`  "${key}": "${enData[key]}"`);
-    });
-    console.log();
+    if (checkOnly)
+      missingInTarget.sort().forEach(k => console.log(`      "${k}"`));
   }
-
   if (extraInTarget.length > 0) {
-    console.log(
-      `Extra keys in '${path.basename(targetFile)}' not in en.json (${extraInTarget.length}):`
-    );
-    extraInTarget.sort().forEach(key => {
-      console.log(`  "${key}": "${targetData[key]}"`);
-    });
-    console.log();
+    console.log(`  - ${extraInTarget.length} extra keys (not in en.json)`);
+    if (checkOnly)
+      extraInTarget.sort().forEach(k => console.log(`      "${k}"`));
   }
 
-  if (missingInTarget.length === 0 && extraInTarget.length === 0) {
-    console.log(
-      '✅ File is synchronized with en.json - no missing or extra keys found.'
+  if (!checkOnly) {
+    // Rebuild object following en.json key order, adding missing as English fallback
+    const synced = {};
+    for (const key of enKeys) {
+      synced[key] = targetKeys.has(key) ? targetData[key] : enData[key];
+    }
+    fs.writeFileSync(
+      targetFile,
+      `${JSON.stringify(synced, null, 2)}\n`,
+      'utf8'
     );
+    console.log('  ✅ Done.\n');
   } else {
-    console.log(
-      `❌ File is not synchronized - ${missingInTarget.length} missing, ${extraInTarget.length} extra keys.`
-    );
+    console.log('  ❌ Out of sync.\n');
   }
 
-  return missingInTarget.length + extraInTarget.length === 0;
+  return false;
 }
 
 function main() {
-  if (process.argv.length !== 3) {
-    console.log('Usage: node sync-translations-with-en.js <target-file>');
-    console.log(
-      'Example: node sync-translations-with-en.js packages/web-app/public/lang/fr.json'
-    );
+  const args = process.argv.slice(2);
+  const checkOnly = args.includes('--check');
+  const targetArg = args.find(a => !a.startsWith('--'));
+
+  const langDir = 'packages/web-app/public/lang';
+
+  const targets = targetArg
+    ? [targetArg]
+    : fs
+        .readdirSync(langDir)
+        .filter(f => f.endsWith('.json') && f !== 'en.json')
+        .map(f => path.join(langDir, f));
+
+  if (targetArg && !fs.existsSync(targetArg)) {
+    console.error(`Error: Target file '${targetArg}' does not exist.`);
     process.exit(1);
   }
 
-  const [, , targetFile] = process.argv;
-
-  if (!fs.existsSync(targetFile)) {
-    console.error(`Error: Target file '${targetFile}' does not exist.`);
-    process.exit(1);
+  let allSynchronized = true;
+  for (const targetFile of targets) {
+    const synchronized = syncWithEnglish(targetFile, checkOnly);
+    if (!synchronized) allSynchronized = false;
   }
 
-  const synchronized = syncWithEnglish(targetFile);
-  process.exit(synchronized ? 0 : 1);
+  process.exit(allSynchronized ? 0 : 1);
 }
 
 main();

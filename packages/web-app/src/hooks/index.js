@@ -1,6 +1,9 @@
+export { useCoordinatePreference, getCRSLabel, WGS84_DD, DMS_CODE } from './useCoordinatePreference';
+export { default as useProjections } from './useProjections';
 export { useDebounce } from './useDebounce';
 export { useBoolean } from './useBoolean';
-export { useDocumentTypes } from './useDocumentTypes';
+export { documentTypeHelpers } from './documentTypeHelpers';
+export { useAuthNavigate } from './useAuthNavigate';
 export { useFileFormats } from './useFileFormats';
 export { useNotification } from './useNotification';
 export { usePermissions } from './usePermissions';
@@ -10,3 +13,5 @@ export { useMoveRelevanceWithUndo } from './useMoveRelevanceWithUndo';
 export { useAnchorScroll } from './useAnchorScroll';
 export { useScrollToHashOnLoad } from './useScrollToHashOnLoad';
 export { useExplored } from './useExplored';
+export { default as useSharePage } from './useSharePage';
+export { default as useOpenLink } from './useOpenLink';

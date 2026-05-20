@@ -1,36 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useIntl } from 'react-intl';
-import { isNil, is } from 'ramda';
+import { is } from 'ramda';
 import {
+  Box,
   Typography,
   Card as MuiCard,
-  CardActions as MuiCardActions,
   CardContent as MuiCardContent,
   CardHeader,
-  CircularProgress,
-  Tooltip,
-  ButtonGroup,
-  Button,
   Skeleton
 } from '@mui/material';
-import { Print } from '@mui/icons-material';
 import { styled } from '@mui/material/styles';
-import { useReactToPrint } from 'react-to-print';
-import CreateIcon from '@mui/icons-material/Create';
-import DeleteIcon from '@mui/icons-material/Delete';
-import ManageHistoryIcon from '@mui/icons-material/ManageHistory';
-import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
-import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
-import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-
-import ShareIcon from '@mui/icons-material/Share';
-
-import { isMobile } from 'react-device-detect';
-import { SnapshotButton } from '../../../appli/Entry/Snapshots/UtilityFunction';
-import { useNotification } from '../../../../hooks';
-import copyToClipboard from '../../../../helpers/clipboard';
 
 const isString = is(String);
 
@@ -48,258 +27,54 @@ const CardContent = styled(MuiCardContent)`
   padding-top: 0;
 `;
 
-const CardActions = styled(MuiCardActions)`
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  padding-left: 16px;
-`;
-
 const Title = styled('span')`
   display: inline-flex;
   align-items: center;
 `;
+
 const TitleIcon = styled('span')`
   margin-right: 6px;
   display: inline-flex;
 `;
-const CardHeaderStyled = styled(CardHeader)`
-  ${({ theme }) => theme.breakpoints.down('lg')} {
-    flex-direction: column;
-    align-items: flex-start;
-    grid-gap: 8px;
-  }
-`;
 
-const FixedContent = ({
-  avatar,
-  subheader,
-  title,
-  titleAdornment,
-  icon,
-  content,
-  footer,
-  onEdit,
-  onDelete,
-  printRef,
-  snapshot,
-  entranceSnapshot,
-  onChangeSubscribe,
-  isSubscribed,
-  isSubscribeLoading,
-  onToggleExplored,
-  isExplored,
-  isExploredLoading,
-  displayShare = false
-}) => {
-  const { formatMessage } = useIntl();
-  const { onSuccess } = useNotification();
-  const hasActions =
-    !isNil(onToggleExplored) ||
-    !isNil(printRef) ||
-    displayShare ||
-    !!onEdit ||
-    !!onDelete ||
-    !isNil(onChangeSubscribe) ||
-    !!entranceSnapshot ||
-    !!snapshot;
-
-  const handleShare = async () => {
-    const { origin, pathname } = window.location;
-    const url = origin + pathname;
-    const shareTitle = document.title;
-    if (navigator.share) {
-      try {
-        await navigator.share({ title: shareTitle, url });
-      } catch (err) {
-        if (err.name !== 'AbortError') {
-          await copyToClipboard(url);
-          // no toast: system clipboard notification handles feedback on mobile
-        }
+const FixedContent = ({ subheader, title, icon, action, content }) => (
+  <Card>
+    <CardHeader
+      subheader={subheader}
+      title={
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'flex-start',
+            justifyContent: 'space-between',
+            gap: 1
+          }}>
+          <Box sx={{ flex: 1, minWidth: 0 }}>
+            {isString(title) ? (
+              <Title>
+                {icon && <TitleIcon>{icon}</TitleIcon>}
+                <Typography variant="h1" color="secondary">
+                  {title}
+                </Typography>
+              </Title>
+            ) : (
+              <Skeleton />
+            )}
+          </Box>
+          {action && <Box sx={{ flexShrink: 0 }}>{action}</Box>}
+        </Box>
       }
-    } else {
-      await copyToClipboard(url);
-      if (!isMobile) {
-        onSuccess(formatMessage({ id: 'Link copied!' }));
-      }
-    }
-  };
-
-  let SubscribeIcon = <CircularProgress size={20} />;
-  if (!isSubscribeLoading) {
-    if (isSubscribed) SubscribeIcon = <NotificationsActiveIcon />;
-    else SubscribeIcon = <NotificationsNoneIcon />;
-  }
-
-  let ExploredIcon = <CircularProgress size={20} />;
-  if (!isExploredLoading) {
-    if (isExplored) ExploredIcon = <CheckCircleIcon />;
-    else ExploredIcon = <CheckCircleOutlineIcon />;
-  }
-  const handlePrint = useReactToPrint({
-    contentRef: printRef
-  });
-  return (
-    <Card>
-      <CardHeaderStyled
-        action={hasActions ? (
-          <ButtonGroup color="primary">
-            {!isNil(onToggleExplored) && (
-              <Tooltip
-                title={formatMessage({
-                  id: isExplored
-                    ? 'Remove from my explored caves'
-                    : 'Add to my explored caves'
-                })}>
-                <Button
-                  color={isExplored ? 'secondary' : 'primary'}
-                  onClick={onToggleExplored}>
-                  {ExploredIcon}
-                </Button>
-              </Tooltip>
-            )}
-            {!isNil(printRef) && (
-              <Tooltip title={formatMessage({ id: 'Print' })}>
-                <Button
-                  aria-label={formatMessage({ id: 'Print' })}
-                  onClick={handlePrint}>
-                  <Print />
-                </Button>
-              </Tooltip>
-            )}
-            {displayShare && (
-              <Tooltip title={formatMessage({ id: 'Copy link' })}>
-                <Button
-                  aria-label={formatMessage({ id: 'Copy link' })}
-                  onClick={handleShare}>
-                  <ShareIcon />
-                </Button>
-              </Tooltip>
-            )}
-            {onEdit && (
-              <Tooltip
-                title={formatMessage({
-                  id: 'Edit properties'
-                })}>
-                <Button
-                  aria-label={formatMessage({ id: 'edit' })}
-                  onClick={onEdit}>
-                  <CreateIcon />
-                </Button>
-              </Tooltip>
-            )}
-            {onDelete && (
-              <Tooltip
-                title={formatMessage({
-                  id: 'Delete'
-                })}>
-                <Button
-                  aria-label={formatMessage({ id: 'delete' })}
-                  onClick={onDelete}>
-                  <DeleteIcon />
-                </Button>
-              </Tooltip>
-            )}
-
-            {!isNil(onChangeSubscribe) && (
-              <Tooltip
-                title={formatMessage({
-                  id: isSubscribed ? 'Unsubscribe' : 'Subscribe'
-                })}>
-                <Button
-                  color={isSubscribed ? 'secondary' : 'primary'}
-                  size="small"
-                  aria-label={formatMessage({ id: 'edit' })}
-                  onClick={onChangeSubscribe}
-                  startIcon={SubscribeIcon}>
-                  {formatMessage({
-                    id: isSubscribed ? 'Unsubscribe' : 'Subscribe'
-                  })}
-                </Button>
-              </Tooltip>
-            )}
-            {!!entranceSnapshot && (
-              <SnapshotButton
-                id={entranceSnapshot.id}
-                type={entranceSnapshot.type}
-                content={entranceSnapshot.content}
-                isNetwork={entranceSnapshot.isNetwork}
-                tooltipTitle={formatMessage({
-                  id: 'Access the revision history page'
-                })}
-              />
-            )}
-            {!!snapshot && (
-              <SnapshotButton
-                id={snapshot.id}
-                type={snapshot.type}
-                content={snapshot.content}
-                isNetwork={snapshot.isNetwork}
-                getAll={snapshot.getAll}
-                startIcon={<ManageHistoryIcon />}
-                tooltipTitle={formatMessage({
-                  id: 'Page of all types of revision history for this entrance'
-                })}
-              />
-            )}
-          </ButtonGroup>
-        ) : undefined}
-        avatar={avatar}
-        subheader={subheader}
-        title={
-          isString(title) ? (
-            <Title>
-              {!isNil(icon) && <TitleIcon>{icon}</TitleIcon>}
-              <Typography variant="h1" color="secondary">
-                {title}
-              </Typography>
-              {titleAdornment}
-            </Title>
-          ) : (
-            <Skeleton />
-          )
-        }
-      />
-      <CardContent>{content}</CardContent>
-      {!isNil(footer) && <CardActions disableSpacing>{footer}</CardActions>}
-    </Card>
-  );
-};
+    />
+    <CardContent>{content}</CardContent>
+  </Card>
+);
 
 FixedContent.propTypes = {
-  avatar: PropTypes.node,
+  action: PropTypes.node,
   content: PropTypes.node.isRequired,
-  footer: PropTypes.node,
   icon: PropTypes.node,
-  isSubscribed: PropTypes.bool,
-  isSubscribeLoading: PropTypes.bool,
-  isExplored: PropTypes.bool,
-  isExploredLoading: PropTypes.bool,
-  onToggleExplored: PropTypes.func,
-  onEdit: PropTypes.func,
-  onDelete: PropTypes.func,
-  printRef: PropTypes.shape({
-    // eslint-disable-next-line react/forbid-prop-types
-    current: PropTypes.any
-  }),
-  snapshot: PropTypes.shape({
-    id: PropTypes.number.isRequired,
-    type: PropTypes.string,
-    content: PropTypes.shape({}),
-    isNetwork: PropTypes.bool,
-    getAll: PropTypes.bool
-  }),
-  entranceSnapshot: PropTypes.shape({
-    id: PropTypes.number.isRequired,
-    type: PropTypes.string,
-    content: PropTypes.shape({}),
-    isNetwork: PropTypes.bool
-  }),
-  onChangeSubscribe: PropTypes.func,
   subheader: PropTypes.node,
-  title: PropTypes.oneOfType([PropTypes.node, PropTypes.string]),
-  titleAdornment: PropTypes.node,
-  displayShare: PropTypes.bool
+  title: PropTypes.oneOfType([PropTypes.node, PropTypes.string])
 };
 
 export default FixedContent;

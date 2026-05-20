@@ -1,20 +1,16 @@
-import React, { useCallback, useState } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import { useForm } from 'react-hook-form';
 import { useSelector, useDispatch } from 'react-redux';
 
 import { updatePerson } from '../../../../actions/Person/UpdatePerson';
-import { postChangePassword } from '../../../../actions/Person/ChangePassword';
-import { postChangeEmail } from '../../../../actions/Person/ChangeEmail';
 import { FormContainer, FormActionRow, FormRow } from '../utils/FormContainers';
 import InputText from '../utils/InputText';
-import InputPassword from '../utils/InputPassword';
 import FormProgressInfo from '../utils/FormProgressInfo';
-import { PASSWORD_MIN_LENGTH } from '../../../../conf/config';
 import { PersonPropTypes } from '../../../../types/person.type';
 import NotificationPreferences from './NotificationPreferences';
 
-export const PersonForm = ({ personValues, isOurAccount }) => {
+export const PersonForm = ({ personValues, onCancel }) => {
   const {
     error: personError,
     isLoading: personIsLoading,
@@ -26,29 +22,18 @@ export const PersonForm = ({ personValues, isOurAccount }) => {
     handleSubmit,
     reset,
     control,
-    watch,
-    getValues,
-    formState: { errors, isDirty, isSubmitting, isSubmitSuccessful }
+    formState: { errors, isSubmitting, isSubmitSuccessful }
   } = useForm({
     defaultValues: {
       person: {
         name: personValues.name ?? '',
         surname: personValues.surname ?? '',
-        nickname: personValues.nickname ?? '',
-        email: '',
-        emailConfirmation: '',
-        password: '',
-        passwordConfirmation: ''
+        nickname: personValues.nickname ?? ''
       }
     }
   });
-  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
-  const handleReset = useCallback(() => {
-    reset(undefined, { keepValues: true, keepErrors: false });
-  }, [reset]);
-
-  const onSubmit = async ({ person }) => {
+  const onSubmit = ({ person }) => {
     dispatch(
       updatePerson(personValues.id, {
         name: person.name,
@@ -56,13 +41,6 @@ export const PersonForm = ({ personValues, isOurAccount }) => {
         nickname: person.nickname
       })
     );
-
-    if (person.email && isOurAccount) {
-      dispatch(postChangeEmail(person.email));
-    }
-    if (person.password && isOurAccount) {
-      dispatch(postChangePassword(person.password));
-    }
   };
 
   if (isSubmitSuccessful) {
@@ -72,7 +50,9 @@ export const PersonForm = ({ personValues, isOurAccount }) => {
         isError={!!personError}
         labelLoading="Updating person..."
         labelError="'An error occurred when updating'"
-        resetFn={handleReset}
+        resetFn={() =>
+          reset(undefined, { keepValues: true, keepErrors: false })
+        }
         getRedirectFn={() => `/ui/persons/${personData.id}`}
       />
     );
@@ -96,14 +76,12 @@ export const PersonForm = ({ personValues, isOurAccount }) => {
             labelName="First name"
             control={control}
             isError={!!errors?.person?.name}
-            isRequired
           />
           <InputText
             formKey="person.surname"
             labelName="Last name"
             control={control}
             isError={!!errors?.person?.surname}
-            isRequired
           />
         </FormRow>
 
@@ -173,10 +151,9 @@ export const PersonForm = ({ personValues, isOurAccount }) => {
         )}
 
         <FormActionRow
-          isDirty={isDirty}
           isNew={false}
           isSubmitting={isSubmitting}
-          onReset={handleReset}
+          onCancel={onCancel}
         />
       </form>
     </FormContainer>
@@ -184,8 +161,8 @@ export const PersonForm = ({ personValues, isOurAccount }) => {
 };
 
 PersonForm.propTypes = {
-  isOurAccount: PropTypes.bool,
-  personValues: PersonPropTypes.isRequired
+  personValues: PersonPropTypes.isRequired,
+  onCancel: PropTypes.func
 };
 
 export default PersonForm;

@@ -1,6 +1,6 @@
-import React, { useContext, useState, useEffect } from 'react';
+import React, { useContext, useState, useEffect, useRef } from 'react';
 // eslint-disable-next-line camelcase
-import { useNavigate, unstable_usePrompt } from 'react-router-dom';
+import { useNavigate, unstable_usePrompt, useSearchParams } from 'react-router-dom';
 import { Button, Fade, Typography } from '@mui/material';
 import Alert from '@mui/material/Alert';
 import ReplayIcon from '@mui/icons-material/Replay';
@@ -8,21 +8,22 @@ import { useIntl } from 'react-intl';
 import { useDispatch, useSelector } from 'react-redux';
 import { styled } from '@mui/material/styles';
 
-import { usePermissions, useDocumentTypes } from '../../../../hooks';
+import { usePermissions } from '../../../../hooks';
+import { documentTypeHelpers } from '../../../../hooks/documentTypeHelpers';
 import { resetDocumentApiErrors } from '../../../../actions/Document/ResetApiErrors';
 import { postDocument } from '../../../../actions/Document/CreateDocument';
 import { updateDocument } from '../../../../actions/Document/UpdateDocument';
 import { displayLoginDialog } from '../../../../actions/Login';
+import { linkDocumentToEntrance } from '../../../../actions/LinkDocumentToEntrance';
+import { fetchEntrance } from '../../../../actions/Entrance/GetEntrance';
 
-import DocumentFormProvider, { DocumentFormContext } from './Provider';
+import DocumentFormProvider, {
+  DocumentFormContext
+} from './Provider';
 import { defaultDocumentValuesTypes } from './types';
 import FromContent from './FormContent';
-import CreatingDocumentDialog from './CreatingDocumentDialog';
+import DocumentSubmissionDialog from './DocumentSubmissionDialog';
 import Translate from '../../../common/Translate';
-import ErrorMessage from '../../../common/StatusMessage/ErrorMessage';
-
-import InternationalizedLink from '../../../common/InternationalizedLink';
-import { wikiBBSLinks } from '../../../../conf/externalLinks';
 
 const SpacedButton = styled(Button)`
   ${({ theme }) => `
@@ -34,26 +35,10 @@ const CenteredBlock = styled('div')`
   text-align: center;
 `;
 
-const BbsHeader = styled('div')`
-  display: flex;
-  align-items: center;
-`;
-
 const Spacer = styled('div')`
   height: 20px;
 `;
 
-const BbsIcon = styled('img')`
-  height: 60px;
-  width: 60px;
-`;
-
-const BbsInfoText = styled(Typography)`
-  flex: 1;
-  font-style: italic;
-  margin-bottom: 0;
-  margin-left: ${({ theme }) => theme.spacing(3)};
-`;
 
 const DONT_LEAVE_MESSAGE =
   'If you leave now, some data would be lost. Are you sure you want to leave this page?';
@@ -63,15 +48,45 @@ const DocumentSubmission = () => {
   const dispatch = useDispatch();
   const permissions = usePermissions();
   const { formatMessage } = useIntl();
-  const { isArticle } = useDocumentTypes();
-  const { document, isNewDocument, resetContext, updateAttribute } =
-    useContext(DocumentFormContext);
+  const { isArticle } = documentTypeHelpers;
+  const [searchParams] = useSearchParams();
+  const {
+    document,
+    isNewDocument,
+    resetContext,
+    setLinkedEntrance,
+    linkedEntrance
+  } = useContext(DocumentFormContext);
 
   const [isDocSubmittedWithSuccess, setDocSubmittedWithSuccess] =
     useState(false);
   const [isDocSubmitted, setDocSubmitted] = useState(false);
+  const hasLinked = useRef(false);
 
-  const documentState = useSelector(state => state.createDocument);
+  const createDocumentState = useSelector(state => state.createDocument);
+  const updateDocumentState = useSelector(state => state.updateDocument);
+  const documentState = isNewDocument ? createDocumentState : updateDocumentState;
+  const entranceState = useSelector(state => state.entrance);
+
+  const entranceIdParam = searchParams.get('entranceId')
+    ? parseInt(searchParams.get('entranceId'), 10)
+    : null;
+
+  useEffect(() => {
+    if (!entranceIdParam) return;
+    if (entranceState.data?.id !== entranceIdParam) {
+      dispatch(fetchEntrance(entranceIdParam));
+    }
+    // entranceIdParam is derived from stable URL params; entranceState.data is intentionally
+    // read only at mount to avoid re-triggering the fetch when data arrives
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [entranceIdParam]);
+
+  useEffect(() => {
+    if (entranceIdParam && entranceState.data?.id === entranceIdParam && !linkedEntrance) {
+      setLinkedEntrance({ id: entranceIdParam, name: entranceState.data.name });
+    }
+  }, [entranceState.data, entranceIdParam, linkedEntrance, setLinkedEntrance]);
 
   const onFormSubmit = event => {
     event.preventDefault();
@@ -81,31 +96,51 @@ const DocumentSubmission = () => {
     setDocSubmitted(true);
   };
 
-  const onSubmitAnotherDocument = () => {
+  const resetSubmissionState = () => {
     dispatch(resetDocumentApiErrors());
+    setDocSubmittedWithSuccess(false);
+    setDocSubmitted(false);
+    hasLinked.current = false;
+  };
+
+  const onSubmitAnotherDocument = () => {
+    resetSubmissionState();
     resetContext();
   };
 
   const onSubmitAnotherArticle = () => {
-    dispatch(resetDocumentApiErrors());
-    resetContext();
-    // Keep some values to resubmit an article
-    updateAttribute('language', document.language);
-    updateAttribute('type', document.type);
-    updateAttribute('editor', document.editor);
-    updateAttribute('library', document.library);
-    updateAttribute('parent', document.parent);
-    updateAttribute('datePublication', document.datePublication);
+    resetSubmissionState();
+    resetContext({
+      type: document.type,
+      editor: document.editor,
+      library: document.library,
+      parent: document.parent,
+      datePublication: document.datePublication
+    });
   };
 
   useEffect(() => {
-    // Handle Doc Submission
-    if (documentState.latestHttpCode === 200 && isDocSubmitted) {
+    if (!isDocSubmitted) return;
+    if (documentState.latestHttpCode === 200) {
       setDocSubmittedWithSuccess(true);
-    } else {
-      setDocSubmittedWithSuccess(false);
+      if (isNewDocument && linkedEntrance && documentState.createdDocument && !hasLinked.current) {
+        hasLinked.current = true;
+        dispatch(
+          linkDocumentToEntrance({
+            entranceId: linkedEntrance.id,
+            document: documentState.createdDocument
+          })
+        );
+      }
     }
-  }, [isDocSubmittedWithSuccess, documentState.latestHttpCode, isDocSubmitted]);
+  }, [
+    isDocSubmitted,
+    documentState.latestHttpCode,
+    documentState.createdDocument,
+    isNewDocument,
+    linkedEntrance,
+    dispatch
+  ]);
 
   // eslint-disable-next-line camelcase
   unstable_usePrompt({
@@ -154,11 +189,11 @@ const DocumentSubmission = () => {
             <>
               <SpacedButton
                 onClick={onSubmitAnotherDocument}
-                variant="contained">
+                variant="outlined">
                 <Translate>Submit another document</Translate>
               </SpacedButton>
-              <SpacedButton onClick={() => navigate('')} variant="contained">
-                <Translate>Go to home page</Translate>
+              <SpacedButton onClick={() => navigate(-1)} variant="contained">
+                <Translate>Go back</Translate>
               </SpacedButton>
             </>
           )}
@@ -178,46 +213,28 @@ const DocumentSubmission = () => {
             variant="contained">
             <Translate>Log in</Translate>
           </SpacedButton>
-          <SpacedButton onClick={() => navigate('')} variant="contained">
+          <SpacedButton onClick={() => navigate('/')} variant="contained">
             <Translate>Go to home page</Translate>
           </SpacedButton>
         </CenteredBlock>
       )}
       {permissions.isAuth && !isDocSubmittedWithSuccess && (
         <>
-          <CreatingDocumentDialog isLoading={documentState.isLoading} />
-          <hr />
+          <DocumentSubmissionDialog isLoading={documentState.isLoading} isNewDocument={isNewDocument} />
           <form
             onSubmit={onFormSubmit}
-            style={documentState.isLoading ? { opacity: '0.6' } : {}}>
+            style={{ marginTop: '16px', ...(documentState.isLoading ? { opacity: '0.6' } : {}) }}>
             <FromContent />
           </form>
 
-          {document.type === -1 && (
-            <BbsHeader>
-              <BbsIcon src="/images/bbs_logo.png" alt="BBS logo" />
-              <BbsInfoText variant="body1" paragraph>
-                <Translate>
-                  The BBS is now directly integrated in Grottocenter and
-                  provides a summary of any document published on paper or
-                  online.
-                </Translate>
-                <br />
-                <InternationalizedLink links={wikiBBSLinks}>
-                  <Translate>
-                    You can find more info about the BBS on the dedicated
-                    Grottocenter-wiki page.
-                  </Translate>
-                </InternationalizedLink>
-              </BbsInfoText>
-            </BbsHeader>
-          )}
 
           {documentState.errorMessages.length > 0 && (
             <CenteredBlock>
               {documentState.errorMessages.map(error => (
                 <Fade in={documentState.errorMessages.length > 0} key={error}>
-                  <ErrorMessage message={formatMessage({ id: error })} />
+                  <Alert severity="error" sx={{ mt: 1 }}>
+                    {formatMessage({ id: error })}
+                  </Alert>
                 </Fade>
               ))}
             </CenteredBlock>

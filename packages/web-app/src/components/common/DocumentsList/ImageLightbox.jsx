@@ -5,7 +5,7 @@ import { styled } from '@mui/material/styles';
 import { NavigateBefore, NavigateNext, Download } from '@mui/icons-material';
 import { useIntl } from 'react-intl';
 import StandardDialog from '../StandardDialog';
-import { decodeFileName } from './utils/imageUtils';
+import { decodeFileName, downloadFile } from './utils/imageUtils';
 
 const LightboxContent = styled(Box)`
   display: flex;
@@ -183,24 +183,24 @@ const ImageLightbox = ({
       actions={
         <Button
           startIcon={<Download />}
-          href={currentImage.completePath}
-          download
-          target="_blank"
+          onClick={() =>
+            downloadFile(
+              currentImage.completePath,
+              decodeFileName(currentImage.fileName)
+            )
+          }
           variant="contained"
-          color="primary"
-        >
-          {formatMessage({ id: 'Download image' })}
+          color="primary">
+          {formatMessage({ id: 'Download' })}
         </Button>
-      }
-    >
+      }>
       <LightboxContent ref={contentRef}>
         {hasMultipleImages && (
           <NavigationButton
             className="previous"
             onClick={handlePrevious}
             aria-label={formatMessage({ id: 'Previous image' })}
-            size="large"
-          >
+            size="large">
             <NavigateBefore fontSize="large" />
           </NavigationButton>
         )}
@@ -229,8 +229,7 @@ const ImageLightbox = ({
             className="next"
             onClick={handleNext}
             aria-label={formatMessage({ id: 'Next image' })}
-            size="large"
-          >
+            size="large">
             <NavigateNext fontSize="large" />
           </NavigationButton>
         )}
@@ -245,24 +244,19 @@ const ImageLightbox = ({
           px: 2,
           py: '2px',
           minHeight: '24px'
-        }}
-      >
+        }}>
         {(currentImage.description || description) && (
           <Typography
             variant="body2"
             sx={{
               textAlign: 'center',
               color: 'text.secondary'
-            }}
-          >
+            }}>
             {currentImage.description || description}
           </Typography>
         )}
         {hasMultipleImages && (
-          <Typography
-            variant="caption"
-            sx={{ color: 'text.secondary' }}
-          >
+          <Typography variant="caption" sx={{ color: 'text.secondary' }}>
             {formatMessage(
               { id: 'Image {current} of {total}' },
               {

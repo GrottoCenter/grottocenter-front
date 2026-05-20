@@ -25,15 +25,11 @@ const CreateDescriptionForm = ({
 
   const {
     handleSubmit,
-    reset,
     control,
-    formState: { errors, isDirty, isSubmitting }
+    formState: { errors, isSubmitting }
   } = useForm({
     defaultValues: values ?? getDefaultValues(AVAILABLE_LANGUAGES[locale].id)
   });
-  const handleReset = () => {
-    reset(values ?? getDefaultValues(AVAILABLE_LANGUAGES[locale].id));
-  };
 
   return (
     <FormContainer sx={{ marginTop: 2 }}>
@@ -63,10 +59,8 @@ const CreateDescriptionForm = ({
         />
 
         <FormActionRow
-          isDirty={isDirty}
           isNew={isNewDescription}
           isSubmitting={isSubmitting}
-          onReset={handleReset}
           onCancel={closeForm}
           isCenter
         />
