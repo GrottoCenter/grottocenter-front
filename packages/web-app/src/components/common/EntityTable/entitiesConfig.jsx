@@ -166,6 +166,13 @@ const entrances = {
     { visible: false, field: 'iso3166', label: 'ISO code', sortable: true },
     {
       visible: false,
+      field: 'massifs',
+      label: 'Massif',
+      sortable: false,
+      render: cellsRender.keyArray('name')
+    },
+    {
+      visible: false,
       field: 'cave.name',
       label: 'Network name',
       sortable: true

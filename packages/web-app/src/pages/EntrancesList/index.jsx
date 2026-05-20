@@ -68,7 +68,7 @@ const EntrancesListPage = () => {
     setMassifValue(undefined);
     fetchFieldSearch({
       entity: ADVANCED_SEARCH_TYPES.ENTRANCES,
-      field: 'massifs',
+      field: 'massifs.name',
       query: massif.name,
       filter: {}
     })
@@ -85,8 +85,8 @@ const EntrancesListPage = () => {
 
   if (massifId && massif && !massifFetching && massifValue !== undefined) {
     const resolvedMassif = massifValue ?? massif.name;
-    initialFilter = { massifs: resolvedMassif };
-    lockedFilter = ['massifs'];
+    initialFilter = { 'massifs.name': resolvedMassif };
+    lockedFilter = ['massifs.name'];
     searchKey = resolvedMassif;
     pageTitle = `${label} - ${massif.name}`;
     pageIcon = (
