@@ -32,7 +32,19 @@ When adding new UI strings, follow this exact sequence:
 yarn translations:sync-with-en
 ```
 
-**3. Translate the values** — edit each lang file and replace the English fallback with the actual translation. Use a token efficient wayt to do it
+**3. Translate the values** — edit each lang file and replace the English fallback with the actual translation. Use a token-efficient way to do it.
+
+> ⚠️ **Encoding — NEVER introduce a BOM**: lang files must be UTF-8 **without** BOM.
+>
+> - Use the **Edit** or **Write** tool (safe — no BOM).
+> - If you must use PowerShell to batch-write files, always use the BOM-free encoder:
+>
+>   ```powershell
+>   $utf8NoBom = [System.Text.UTF8Encoding]::new($false)
+>   [System.IO.File]::WriteAllText($path, $content, $utf8NoBom)
+>   ```
+>
+> - **Never** use `[System.Text.Encoding]::UTF8` or `Out-File`/`Set-Content` without `-Encoding utf8` — both produce UTF-8 with BOM, which breaks JSON parsing in some environments.
 
 **4. Sort all lang files** (mandatory — files must stay alphabetically ordered):
 
