@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useIntl, FormattedDate } from 'react-intl';
 import {
   Box,
@@ -15,6 +15,7 @@ import {
 } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
 import FlagIcon from '@mui/icons-material/Flag';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { styled } from '@mui/material/styles';
 
 import { fetchConversationMessages } from '../../actions/Messaging/GetConversationMessages';
@@ -63,7 +64,7 @@ const MessageDate = styled(Typography)(({ theme, $isMine }) => ({
   fontSize: '0.75rem',
   color: $isMine ? theme.palette.primary.contrastText : theme.palette.text.secondary,
   opacity: 0.8,
-  marginTop: theme.spacing(0.5),
+  marginTop: '4px',
   textAlign: 'right'
 }));
 
@@ -87,6 +88,7 @@ const BlankStateContainer = styled(Box)(({ theme }) => ({
 
 const ConversationDetail = () => {
   const { conversationId } = useParams();
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const { formatMessage } = useIntl();
 
@@ -249,7 +251,13 @@ Message Body: ${body}`;
 
   return (
     <DetailContainer>
-      <Box sx={{ p: 2, borderBottom: 1, borderColor: 'divider', bgcolor: 'background.paper' }}>
+      <Box sx={{ p: 2, borderBottom: 1, borderColor: 'divider', bgcolor: 'background.paper', display: 'flex', alignItems: 'center' }}>
+        <IconButton
+          sx={{ display: { xs: 'inline-flex', md: 'none' }, mr: 1 }}
+          onClick={() => navigate('/ui/messages')}
+        >
+          <ArrowBackIcon />
+        </IconButton>
         <Typography variant="h6">
           {titleText}
         </Typography>
@@ -264,35 +272,35 @@ Message Body: ${body}`;
               <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 1 }}>
                 <Box sx={{ flexGrow: 1, minWidth: 0 }}>
                   {!isMine && msg.caverSender && (
-                    <Typography variant="caption" sx={{ display: 'block', mb: 0.5, fontWeight: 'bold' }}>
-                      <a
-                        href={`/ui/persons/${msg.caverSender.id}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
+                    <Typography variant="caption" sx={{ display: 'block', mb: '4px', fontWeight: 'bold' }}>
+                      <Link
+                        to={`/ui/persons/${msg.caverSender.id}`}
                         style={{ color: 'inherit', textDecoration: 'underline' }}
                       >
                         {msg.caverSender.nickname}
-                      </a>
+                      </Link>
                     </Typography>
                   )}
                   <Typography variant="body1" sx={{ whiteSpace: 'pre-wrap' }}>{msg.body}</Typography>
                 </Box>
-                <Tooltip title={formatMessage({ id: 'Report this message', defaultMessage: 'Report this message' })}>
-                  <IconButton
-                    size="small"
-                    onClick={() => handleReportClick(msg)}
-                    sx={{
-                      color: isMine ? 'rgba(255,255,255,0.7)' : 'text.secondary',
-                      '&:hover': { color: isMine ? '#fff' : 'error.main' },
-                      padding: 0,
-                      mt: 0.5,
-                      ml: 1,
-                      flexShrink: 0
-                    }}
-                  >
-                    <FlagIcon fontSize="small" />
-                  </IconButton>
-                </Tooltip>
+                {!isMine && (
+                  <Tooltip title={formatMessage({ id: 'Report this message', defaultMessage: 'Report this message' })}>
+                    <IconButton
+                      size="small"
+                      onClick={() => handleReportClick(msg)}
+                      sx={{
+                        color: 'text.secondary',
+                        '&:hover': { color: 'error.main' },
+                        padding: 0,
+                        mt: '4px',
+                        ml: 1,
+                        flexShrink: 0
+                      }}
+                    >
+                      <FlagIcon fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
+                )}
               </Box>
               <MessageDate $isMine={isMine}>
                 <FormattedDate
@@ -329,14 +337,14 @@ Message Body: ${body}`;
           placeholder={formatMessage({ id: 'Type a message...' })}
           value={replyText}
           onChange={e => setReplyText(e.target.value)}
-          onKeyPress={e => {
+          onKeyDown={e => {
             if (e.key === 'Enter' && !e.shiftKey) {
               e.preventDefault();
               handleSend();
             }
           }}
           disabled={isSending}
-          inputProps={{ maxLength: 5100 }}
+          slotProps={{ htmlInput: { maxLength: 5100 } }}
           error={replyText.length > 5000}
           helperText={
             <Box sx={{ display: 'flex', justifyContent: 'flex-end', width: '100%', m: 0 }}>
@@ -354,7 +362,7 @@ Message Body: ${body}`;
           color="primary"
           onClick={handleSend}
           disabled={!replyText.trim() || replyText.length > 5000 || isSending}
-          sx={{ mt: 0.5 }}>
+          sx={{ mt: '4px' }}>
           {isSending ? <CircularProgress size={24} /> : <SendIcon />}
         </IconButton>
       </InputArea>

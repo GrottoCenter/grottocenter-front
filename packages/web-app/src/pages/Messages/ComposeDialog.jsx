@@ -23,7 +23,7 @@ const ComposeDialog = ({ open, onClose, prefilledRecipientId }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const { results: searchResults, isLoading: isSearchLoading, errors: searchErrors } = useSelector(
+  const { results: searchResults, isLoading: isSearchLoading, error: searchError } = useSelector(
     state => state.quicksearch
   );
 
@@ -178,7 +178,7 @@ const ComposeDialog = ({ open, onClose, prefilledRecipientId }) => {
             renderOption={renderRecipientOption}
             label={formatMessage({ id: 'Search recipient...', defaultMessage: 'Search recipient...' })}
             isLoading={isSearchLoading}
-            hasError={!!searchErrors}
+            hasError={!!searchError}
             disabled={isSending || !!prefilledRecipientId}
             hasFixWidth={true}
           />
@@ -192,7 +192,7 @@ const ComposeDialog = ({ open, onClose, prefilledRecipientId }) => {
           value={body}
           onChange={(e) => setBody(e.target.value)}
           disabled={isSending}
-          inputProps={{ maxLength: 5100 }}
+          slotProps={{ htmlInput: { maxLength: 5100 } }}
           error={body.length > 5000}
           helperText={
             <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>

@@ -69,11 +69,24 @@ const Person = ({
     if (!person?.id) return;
     try {
       // Fetch active conversations to check if a conversation with this participant already exists
-      const action = await dispatch(fetchConversations({ limit: 50, skip: 0 }, false));
-      const conversations = action.conversations || [];
-      const existingConv = conversations.find(
-        c => Number(c.otherParticipant?.id) === Number(person.id)
-      );
+      let skip = 0;
+      const limit = 50;
+      let hasMore = true;
+      let existingConv = null;
+
+      while (hasMore) {
+        const action = await dispatch(fetchConversations({ limit, skip }, false));
+        const conversations = action?.conversations || [];
+        existingConv = conversations.find(
+          c => Number(c.otherParticipant?.id) === Number(person.id)
+        );
+        if (existingConv) {
+          break;
+        }
+        skip += limit;
+        hasMore = conversations.length === limit && skip < (action?.totalCount || 0);
+      }
+
       if (existingConv) {
         navigate(`/ui/messages/${existingConv.id}`);
       } else {
@@ -167,7 +180,7 @@ const Person = ({
                   }}
                 />
               )}
-              {!canEdit && userId && (
+              {!canEdit && userId && person?.type !== 'AUTHOR' && (
                 <Tooltip title={formatMessage({ id: 'Message this caver', defaultMessage: 'Message this caver' })}>
                   <IconButton
                     color="primary"

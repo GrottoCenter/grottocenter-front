@@ -17,15 +17,16 @@ import {
   Button,
   Badge,
   IconButton,
-  Tooltip
+  Tooltip,
+  Card,
+  CardContent
 } from '@mui/material';
 import PersonIcon from '@mui/icons-material/Person';
-import AddIcon from '@mui/icons-material/Add';
+import EditIcon from '@mui/icons-material/Edit';
 import ArchiveIcon from '@mui/icons-material/Archive';
 import UnarchiveIcon from '@mui/icons-material/Unarchive';
 import { styled } from '@mui/material/styles';
 
-import Layout from '../../components/common/Layouts/Fixed/FixedContent';
 import AuthChecker from '../../components/appli/AuthChecker';
 import StatusMessage from '../../components/common/StatusMessage';
 import REDUCER_STATUS from '../../reducers/ReducerStatus';
@@ -42,7 +43,7 @@ const StyledListItem = styled(ListItem)(({ theme, $isUnread }) => ({
   '&:hover': {
     backgroundColor: theme.palette.action.hover
   },
-  ...( $isUnread && {
+  ...($isUnread && {
     '& .MuiListItemText-primary': {
       fontWeight: 'bold',
     }
@@ -54,6 +55,20 @@ const EmptyStateContainer = styled(Box)(({ theme }) => ({
   textAlign: 'center',
   color: theme.palette.text.secondary
 }));
+
+const StyledCard = styled(Card)(({ theme }) => ({
+  margin: theme.spacing(2),
+  height: '100%',
+  display: 'flex',
+  flexDirection: 'column'
+}));
+
+const StyledCardContent = styled(CardContent)({
+  flexGrow: 1,
+  overflowY: 'auto',
+  scrollBehavior: 'smooth',
+  paddingTop: 0
+});
 
 const MessagesPage = () => {
   const { formatMessage } = useIntl();
@@ -133,7 +148,7 @@ const MessagesPage = () => {
     const sortedConversations = [...conversations].sort((a, b) => {
       if (a.unreadCount > 0 && b.unreadCount === 0) return -1;
       if (a.unreadCount === 0 && b.unreadCount > 0) return 1;
-      
+
       const dateA = a.lastMessage ? new Date(a.lastMessage.dateSent) : new Date(a.dateInscription);
       const dateB = b.lastMessage ? new Date(b.lastMessage.dateSent) : new Date(b.dateInscription);
       return dateB - dateA;
@@ -206,20 +221,19 @@ const MessagesPage = () => {
   };
 
   return (
-    <Layout
-      title={formatMessage({ id: 'My messages' })}
-      content={
+    <StyledCard>
+      <StyledCardContent>
         <AuthChecker
           componentToDisplay={
             <Box sx={{ display: 'flex', height: 'calc(100vh - 120px)', width: '100%', mt: -2 }}>
-              
+
               {/* Left Pane: Conversation List */}
-              <Box sx={{ 
-                width: { xs: '100%', md: '350px' }, 
+              <Box sx={{
+                width: { xs: '100%', md: '350px' },
                 flexShrink: 0,
-                borderRight: 1, 
-                borderColor: 'divider', 
-                display: 'flex', 
+                borderRight: 1,
+                borderColor: 'divider',
+                display: { xs: conversationId ? 'none' : 'flex', md: 'flex' },
                 flexDirection: 'column',
                 bgcolor: 'background.paper'
               }}>
@@ -229,9 +243,9 @@ const MessagesPage = () => {
                   </Typography>
                   <Button
                     variant="contained"
-                    color="primary"
+                    color="secondary"
                     size="small"
-                    startIcon={<AddIcon />}
+                    startIcon={<EditIcon />}
                     onClick={() => {
                       setComposeOpen(true);
                     }}>
@@ -249,10 +263,10 @@ const MessagesPage = () => {
                   <Tab label={formatMessage({ id: 'Active' })} />
                   <Tab label={formatMessage({ id: 'Archived' })} />
                 </Tabs>
-                
+
                 <Box sx={{ flexGrow: 1, overflowY: 'auto' }}>
                   {renderContent()}
-                  
+
                   {totalCount > PAGE_SIZE && (
                     <Box sx={{ display: 'flex', justifyContent: 'center', py: 2 }}>
                       <Pagination
@@ -268,9 +282,9 @@ const MessagesPage = () => {
               </Box>
 
               {/* Right Pane: Conversation Details */}
-              <Box sx={{ 
-                flexGrow: 1, 
-                display: { xs: 'none', md: 'block' },
+              <Box sx={{
+                flexGrow: 1,
+                display: { xs: conversationId ? 'block' : 'none', md: 'block' },
                 height: '100%',
                 bgcolor: 'background.default'
               }}>
@@ -285,8 +299,8 @@ const MessagesPage = () => {
             </Box>
           }
         />
-      }
-    />
+      </StyledCardContent>
+    </StyledCard>
   );
 };
 
