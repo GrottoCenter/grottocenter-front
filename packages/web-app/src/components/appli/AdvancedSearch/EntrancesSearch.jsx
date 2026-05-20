@@ -158,7 +158,7 @@ const EntrancesSearch = ({ initialFilter = {}, lockedFilter = [] }) => {
               value={filterState.country}
             />
           )}
-          {!lockedFilter.includes('region') && (
+          {!lockedFilter.includes('region') && !lockedFilter.includes('county') && (
             <SearchTextAutocomplete
               ressourceType={searchEntity}
               ressourceField="region"
