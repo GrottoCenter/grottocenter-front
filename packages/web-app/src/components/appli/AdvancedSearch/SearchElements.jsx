@@ -647,7 +647,8 @@ export const ActiveFilterChips = ({
   onClearQuery,
   labelMap,
   translatableValueFields,
-  lockedKeys = []
+  lockedKeys = [],
+  valueLabels = {}
 }) => {
   const { formatMessage } = useIntl();
 
@@ -677,7 +678,7 @@ export const ActiveFilterChips = ({
         defaultMessage: String(value)
       });
     } else {
-      formattedValue = String(value);
+      formattedValue = valueLabels[key] ?? String(value);
     }
     chips.push({
       key,
@@ -714,7 +715,8 @@ ActiveFilterChips.propTypes = {
   onClearQuery: PropTypes.func.isRequired,
   labelMap: PropTypes.shape({}).isRequired,
   translatableValueFields: PropTypes.instanceOf(Set),
-  lockedKeys: PropTypes.arrayOf(PropTypes.string)
+  lockedKeys: PropTypes.arrayOf(PropTypes.string),
+  valueLabels: PropTypes.shape({})
 };
 
 export const SearchFilterAccordion = ({

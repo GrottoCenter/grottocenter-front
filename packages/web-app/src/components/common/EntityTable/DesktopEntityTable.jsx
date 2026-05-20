@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
-import useOpenLink from '../../../hooks/useOpenLink';
 import { styled, useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
+import useOpenLink from '../../../hooks/useOpenLink';
 
 import {
   Box,
