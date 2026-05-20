@@ -1,7 +1,7 @@
 {
   "navigationFallback": {
     "rewrite": "index.html",
-    "exclude": ["/images/*", "/static/*"]
+    "exclude": ["/images/*", "/static/*", "/.well-known/*"]
   },
   "globalHeaders": {
     "X-Content-Type-Options": "nosniff"
@@ -17,6 +17,13 @@
       "route": "/static/*",
       "headers": {
         "Cache-Control": "public, max-age=31536000, immutable"
+      }
+    },
+    {
+      "route": "/.well-known/assetlinks.json",
+      "headers": {
+        "Content-Type": "application/json",
+        "Cache-Control": "no-cache"
       }
     }
   ]
