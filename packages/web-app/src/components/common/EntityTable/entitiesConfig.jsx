@@ -4,6 +4,7 @@ import CheckIcon from '@mui/icons-material/Check';
 import UnreadNotificationIcon from '@mui/icons-material/FiberManualRecord';
 import GCLink from '../GCLink';
 import Translate from '../Translate';
+import DataQualityBadge from '../DataQualityBadge';
 
 import * as CSV from '../../appli/ImportCSV/constants';
 
@@ -122,7 +123,14 @@ const entrances = {
     { visible: true, field: 'commentsRating.caving', label: 'Ease of move', sortable: true },
     { visible: true, field: 'commentsRating.aestheticism', label: 'Aesthetic', sortable: true },
     { visible: false, field: 'dateInscription', label: 'Creation date', sortable: true, render: cellsRender.date },
-    { visible: false, field: 'dateLastModif', label: 'Last modified', sortable: true, render: cellsRender.date }
+    { visible: false, field: 'dateLastModif', label: 'Last modified', sortable: true, render: cellsRender.date },
+    {
+      visible: true,
+      field: 'dataQuality',
+      label: 'Data quality',
+      sortable: true,
+      render: value => (value != null ? <DataQualityBadge value={value} size={30} /> : null)
+    }
   ],
   link: doc => `/ui/entrances/${doc.id}`
 };

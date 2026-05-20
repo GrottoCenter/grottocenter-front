@@ -57,7 +57,8 @@ const FILTER_LABELS = {
   'cave.length': 'Length',
   'cave.isDiving': 'Diving cave',
   isTouristic: 'Touristic site',
-  dangerPollution: 'Pollution risk'
+  dangerPollution: 'Pollution risk',
+  dataQuality: 'Data quality'
 };
 
 const initialFilterState = {
@@ -74,7 +75,8 @@ const initialFilterState = {
   'cave.length': null,
   'cave.isDiving': null,
   isTouristic: null,
-  dangerPollution: null
+  dangerPollution: null,
+  dataQuality: null
 };
 
 const EntrancesSearch = () => {
@@ -117,7 +119,8 @@ const EntrancesSearch = () => {
     'dangerPollution',
     'cave.isDiving',
     'cave.depth',
-    'cave.length'
+    'cave.length',
+    'dataQuality'
   ]);
 
   return (
@@ -213,6 +216,15 @@ const EntrancesSearch = () => {
               helperText="In meters"
               marks={lengthMarks}
               onChange={e => updateFilter('cave.length', e)}
+            />
+          </SearchFormContainer>
+          <SearchFormContainer>
+            <SearchSlider
+              label="Data quality"
+              value={filterState.dataQuality}
+              min={0}
+              max={100}
+              onChange={e => updateFilter('dataQuality', e)}
             />
           </SearchFormContainer>
           <SearchFormContainer style={{ marginTop: '16px' }}>
