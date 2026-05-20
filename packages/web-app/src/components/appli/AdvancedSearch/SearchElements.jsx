@@ -415,7 +415,13 @@ export const SearchSlider = ({
       <Slider
         min={isLinearScale ? min : 0}
         max={isLinearScale ? max : 100}
-        sx={{ width: '100%', marginBottom: '8px' }}
+        sx={{
+          touchAction: 'pan-y',
+          width: '100%',
+          marginBottom: '8px',
+          pointerEvents: 'none',
+          '& .MuiSlider-thumb': { pointerEvents: 'auto' }
+        }}
         value={isLinearScale ? values : values.map(e => convert(e, 'descale'))}
         scale={isLinearScale ? undefined : e => convert(e)}
         onChange={(_, newValue) => {
@@ -601,11 +607,14 @@ export const SearchMatchAllFieldsToogle = ({ isChecked, onChange }) => {
           <Tooltip
             title={formatMessage({
               id: 'Specify if the search results must match all the fields you typed above (default is yes).'
-            })}>
+            })}
+            enterTouchDelay={0}
+            leaveTouchDelay={3000}>
             <InfoOutlinedIcon
               fontSize="small"
               color="action"
               sx={{ verticalAlign: 'middle' }}
+              onClick={e => e.preventDefault()}
             />
           </Tooltip>
         </Box>
