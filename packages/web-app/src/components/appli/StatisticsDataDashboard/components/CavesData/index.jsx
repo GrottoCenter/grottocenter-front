@@ -1,19 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
-import { Box, Button, Typography } from '@mui/material';
-import { Link } from 'react-router-dom';
+import { Box, Typography } from '@mui/material';
 import CustomIcon from '../../../../common/CustomIcon';
 import InlineData from './InlineData';
 
-const CavesData = ({
-  title,
-  nbMassifs,
-  nbCaves,
-  nbDivingCaves,
-  nbNetworks,
-  url
-}) => {
+const CavesData = ({ title, nbMassifs, nbCaves, nbDivingCaves, nbNetworks }) => {
   const { formatMessage } = useIntl();
 
   return (
@@ -51,16 +43,6 @@ const CavesData = ({
           />
         )}
       </Box>
-      <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
-        <Button
-          variant="outlined"
-          size="small"
-          component={Link}
-          to={url}
-          sx={{ fontWeight: 700 }}>
-          {formatMessage({ id: 'Access entrances list' })}
-        </Button>
-      </Box>
     </Box>
   );
 };
@@ -70,8 +52,7 @@ CavesData.propTypes = {
   nbMassifs: PropTypes.number,
   nbCaves: PropTypes.number,
   nbDivingCaves: PropTypes.number,
-  nbNetworks: PropTypes.number,
-  url: PropTypes.string
+  nbNetworks: PropTypes.number
 };
 
 export default CavesData;
