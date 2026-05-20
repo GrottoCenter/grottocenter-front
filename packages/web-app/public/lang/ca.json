@@ -1,4 +1,4 @@
-{
+﻿{
   "1": "KARSTOLOGIA I GEOSPELEOLOGIA",
   "2": "ESPELEOLOGIA I KARSTOLOGIA REGIONAL",
   "3": "BIOSPELEOLOGIA",
@@ -481,6 +481,7 @@
   "Cannot ban yourself": "No pots bannejar-te a tu mateix",
   "Cannot detach: this entrance is the only one of its cave.": "No es pot separar: aquesta entrada és l'única de la seva cavitat.",
   "Cape Verde": "Cap Verd",
+  "Card view": "Vista en targetes",
   "Cartesian scaling: ": "Redimensionament i escalat cartesià :",
   "Catalan": "català",
   "cave": "Cova",
@@ -1809,6 +1810,7 @@
   "Synthesis": "Síntesi",
   "Syria": "Síria",
   "Syrian Arab Republic": "República Àrab Siriana",
+  "Table view": "Vista en taula",
   "Taiwan": "Taiwan",
   "Tajikistan": "Tadjikistan",
   "take all": "agafar-ho tot",

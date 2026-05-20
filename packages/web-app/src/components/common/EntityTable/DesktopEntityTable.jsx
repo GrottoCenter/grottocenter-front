@@ -397,7 +397,7 @@ const DesktopEntityTable = ({
                   icon={ViewColumnIcon}
                 />
               )}
-              <Tooltip title={viewMode === 'table' ? 'Card view' : 'Table view'}>
+              <Tooltip title={formatMessage({ id: viewMode === 'table' ? 'Card view' : 'Table view' })}>
                 <IconButton
                   size="small"
                   onClick={onViewToggle}

@@ -1,4 +1,4 @@
-{
+﻿{
   "1": "カルスト学と地学洞窟学",
   "2": "地域洞窟学とカルスト学",
   "3": "生物洞窟学",
@@ -481,6 +481,7 @@
   "Cannot ban yourself": "自分自身をBANすることはできません",
   "Cannot detach: this entrance is the only one of its cave.": "切り離しできません：この入口は洞窟の唯一の入口です。",
   "Cape Verde": "カーボベルデ",
+  "Card view": "カード表示",
   "Cartesian scaling: ": "デカルトスケーリング：",
   "Catalan": "カタルーニャ語",
   "cave": "洞窟",
@@ -1809,6 +1810,7 @@
   "Synthesis": "総合",
   "Syria": "シリア",
   "Syrian Arab Republic": "シリアアラブ共和国",
+  "Table view": "テーブル表示",
   "Taiwan": "台湾",
   "Tajikistan": "タジキスタン",
   "take all": "すべて取得",

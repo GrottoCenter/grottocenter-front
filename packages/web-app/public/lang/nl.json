@@ -1,4 +1,4 @@
-{
+﻿{
   "1": "KARSTOLOGIE EN GEOSPELEOLOGIE",
   "2": "REGIONALE SPELEOLOGIE EN KARSTOLOGIE",
   "3": "BIOSPELEOLOGIE",
@@ -481,6 +481,7 @@
   "Cannot ban yourself": "Je kunt jezelf niet bannen",
   "Cannot detach: this entrance is the only one of its cave.": "Kan niet loskoppelen: deze ingang is de enige van zijn grot.",
   "Cape Verde": "Kaapverdische Eilanden",
+  "Card view": "Kaartweergave",
   "Cartesian scaling: ": "Volgens Karthesische schaal: ",
   "Catalan": "Catalaans",
   "cave": "grot",
@@ -1809,6 +1810,7 @@
   "Synthesis": "Synthese",
   "Syria": "Syrië",
   "Syrian Arab Republic": "Syriê",
+  "Table view": "Tabelweergave",
   "Taiwan": "Taiwan",
   "Tajikistan": "Tadzjikistan ",
   "take all": "alles nemen",

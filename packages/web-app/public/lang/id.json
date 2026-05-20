@@ -1,4 +1,4 @@
-{
+﻿{
   "1": "KARSTOLOGI DAN GEOSPELEOLOGI",
   "2": "SPELEOLOGI REGIONAL DAN KARSTOLOGI",
   "3": "BIOSPELEOLOGI",
@@ -481,6 +481,7 @@
   "Cannot ban yourself": "Tidak bisa memblokir diri sendiri",
   "Cannot detach: this entrance is the only one of its cave.": "Tidak dapat melepaskan: pintu masuk ini adalah satu-satunya di guanya.",
   "Cape Verde": "Tanjung Verde",
+  "Card view": "Tampilan kartu",
   "Cartesian scaling: ": "Faktor skala kartesian: ",
   "Catalan": "Katalan",
   "cave": "gua",
@@ -1809,6 +1810,7 @@
   "Synthesis": "Sintesis",
   "Syria": "Suriah",
   "Syrian Arab Republic": "Republik Arab Suriah",
+  "Table view": "Tampilan tabel",
   "Taiwan": "Taiwan",
   "Tajikistan": "Tajikistan",
   "take all": "ambil semua",

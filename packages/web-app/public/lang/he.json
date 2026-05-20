@@ -1,4 +1,4 @@
-{
+﻿{
   "1": "קרסטולוגיה וגאוספלאולוגיה",
   "2": "ספלאולוגיה אזורית וקרסטולוגיה",
   "3": "ביוספלאולוגיה",
@@ -481,6 +481,7 @@
   "Cannot ban yourself": "אינך יכול לחסום את עצמך",
   "Cannot detach: this entrance is the only one of its cave.": "לא ניתן לנתק: כניסה זו היא היחידה במערה.",
   "Cape Verde": "כף ורדה",
+  "Card view": "תצוגת כרטיסים",
   "Cartesian scaling: ": "קנה מידה קרטזי: ",
   "Catalan": "קטלאנית",
   "cave": "מערה",
@@ -1809,6 +1810,7 @@
   "Synthesis": "סינתזה",
   "Syria": "סוריה",
   "Syrian Arab Republic": "הרפובליקה הערבית הסורית",
+  "Table view": "תצוגת טבלה",
   "Taiwan": "טאיוואן",
   "Tajikistan": "טג'יקיסטן",
   "take all": "קח הכל",

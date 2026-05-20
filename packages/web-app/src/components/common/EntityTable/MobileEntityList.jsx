@@ -23,7 +23,7 @@ const MobileEntityCard = ({ doc, columns, link, renderCellFn, icon }) => {
   const bodyColumns = columns.filter(c => c !== titleCol);
 
   return (
-    <Card>
+    <Card sx={{ outline: '1px solid', outlineColor: 'primary.main' }}>
       <CardActionArea onClick={() => navigate(link(doc))}>
         <CardContent sx={{ py: 1, px: 1.5, '&:last-child': { pb: 1 } }}>
           <Box
@@ -141,7 +141,7 @@ const MobileEntityList = ({
 
   return (
     <Box>
-      <Stack spacing={1} sx={{ mb: 1 }}>
+      <Stack spacing={2} sx={{ mb: 1 }}>
         {allRows.map(doc => (
           <MobileEntityCard
             key={doc.id}

@@ -1,4 +1,4 @@
-{
+﻿{
   "1": "KARSTOLOGIE ȘI GEOSPEOLOGIE",
   "2": "SPEOLOGIE REGIONALĂ ȘI KARSTOLOGIE",
   "3": "BIOSPEOLOGIE",
@@ -481,6 +481,7 @@
   "Cannot ban yourself": "Nu te poți bana pe tine însuți",
   "Cannot detach: this entrance is the only one of its cave.": "Nu se poate detașa: această intrare este singura din peștera sa.",
   "Cape Verde": "Capul Verde",
+  "Card view": "Vizualizare carduri",
   "Cartesian scaling: ": "Scalare carteziană:",
   "Catalan": "Catalană",
   "cave": "peșteră",
@@ -1809,6 +1810,7 @@
   "Synthesis": "Sinteză",
   "Syria": "Siria",
   "Syrian Arab Republic": "Republica Arabă Siriană",
+  "Table view": "Vizualizare tabel",
   "Taiwan": "Taiwan",
   "Tajikistan": "Tadjikistan",
   "take all": "luați tot",

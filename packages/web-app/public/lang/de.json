@@ -1,4 +1,4 @@
-{
+﻿{
   "1": "KARSTOLOGIE UND GEOSPELEOLOGIE",
   "2": "REGIONALE SPELÄOLOGIE UND KARSTOLOGIE",
   "3": "BIOSPELEOLOGIE",
@@ -481,6 +481,7 @@
   "Cannot ban yourself": "Sie können sich nicht selbst sperren",
   "Cannot detach: this entrance is the only one of its cave.": "Abtrennen nicht möglich: Dieser Eingang ist der einzige seiner Höhle.",
   "Cape Verde": "Kap Verde",
+  "Card view": "Kartenansicht",
   "Cartesian scaling: ": "Kartesischen Skalierung:",
   "Catalan": "Katalanisch",
   "cave": "Höhle",
@@ -1809,6 +1810,7 @@
   "Synthesis": "Synthese",
   "Syria": "Syrien",
   "Syrian Arab Republic": "Syrien",
+  "Table view": "Tabellenansicht",
   "Taiwan": "Taiwan",
   "Tajikistan": "Tadschikistan",
   "take all": "alles nehmen",
