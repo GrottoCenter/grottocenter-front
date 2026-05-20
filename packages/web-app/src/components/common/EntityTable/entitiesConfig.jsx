@@ -149,7 +149,7 @@ const persons = {
       visible: false,
       field: 'type',
       label: 'Type',
-      sortable: false,
+      sortable: true,
       render: value =>
         value && PERSON_TYPE_LABEL[value] ? (
           <Translate>{PERSON_TYPE_LABEL[value]}</Translate>
