@@ -142,68 +142,84 @@ const DocumentSearch = () => {
     );
 
   const advancedFilterCount = countActiveFilters(filterState, [
+    'title', 'description', 'subjects.code',
     'identifierType', 'identifier', 'importSource', 'importId',
     'datePublication', 'iso3166.iso', 'license', 'pages',
     'authors.nickname', 'editor.name', 'library.name', 'issue',
     'parent.title', 'cave.name', 'entrances.name', 'massifs.name'
   ]);
 
+  const docTypeOptions = documentTypes
+    .filter(e => e.isAvailable)
+    .map(e => {
+      const Icon = DOCUMENT_TYPE_ICONS[e.name] ?? DOCUMENT_TYPE_FALLBACK_ICON;
+      return [
+        e.name,
+        <Box
+          key={e.name}
+          sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <Icon sx={{ fontSize: 18, color: 'text.secondary' }} />
+          <Translate>{e.name}</Translate>
+        </Box>
+      ];
+    });
+
   return (
     <SearchForm onSubmit={() => startAdvancedsearch()}>
-      <SearchInput
-        onChange={e => setQuery(e)}
-        value={query}
-        placeholder={formatMessage({ id: 'Search for a document...' })}
-      />
-
-      <SearchFieldset title="Content">
-        <SearchText
-          label="Title"
-          onChange={e => updateFilter('title', e)}
-          value={filterState.title}
-        />
-        <SearchText
-          label="Description"
-          onChange={e => updateFilter('description', e)}
-          value={filterState.description}
-        />
-        <SearchSelect
-          label="Document type"
-          optionDescription="All document types"
-          options={documentTypes
-            .filter(e => e.isAvailable)
-            .map(e => {
-              const Icon =
-                DOCUMENT_TYPE_ICONS[e.name] ?? DOCUMENT_TYPE_FALLBACK_ICON;
-              return [
-                e.name,
-                <Box
-                  key={e.name}
-                  sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <Icon sx={{ fontSize: 18, color: 'text.secondary' }} />
-                  <Translate>{e.name}</Translate>
-                </Box>
-              ];
-            })}
-          onChange={e => updateFilter('type', e)}
-          value={filterState.type}
-        />
-        <SearchSelect
-          label="Subjects"
-          optionDescription="All subjects"
-          options={sortSubjects(subjects).map(e => [
-            e.code,
-            <SubjectEntry key={e.code} subject={e} />
-          ])}
-          onChange={e => updateFilter('subjects.code', e)}
-          value={filterState['subjects.code']}
-        />
-      </SearchFieldset>
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: { xs: 'column', sm: 'row' },
+          gap: 1,
+          alignItems: { sm: 'center' },
+          width: '100%'
+        }}>
+        <Box sx={{ flex: 1 }}>
+          <SearchInput
+            onChange={e => setQuery(e)}
+            value={query}
+            placeholder={formatMessage({ id: 'Search for a document...' })}
+          />
+        </Box>
+        <Box sx={{ width: { xs: '100%', sm: 220 } }}>
+          <SearchSelect
+            label="Document type"
+            optionDescription="All document types"
+            options={docTypeOptions}
+            onChange={e => updateFilter('type', e)}
+            value={filterState.type}
+            sx={{ mx: { xs: 0, sm: '4px' } }}
+          />
+        </Box>
+      </Box>
 
       <SearchFilterAccordion
         filterCount={advancedFilterCount}
         expanded={advancedExpanded}
         onExpandedChange={setAdvancedExpanded}>
+        <SearchFieldset title="Content">
+          <SearchText
+            label="Title"
+            onChange={e => updateFilter('title', e)}
+            value={filterState.title}
+          />
+          <SearchText
+            label="Description"
+            onChange={e => updateFilter('description', e)}
+            value={filterState.description}
+          />
+          <SearchSelect
+            label="Subjects"
+            optionDescription="All subjects"
+            options={sortSubjects(subjects).map(e => [
+              e.code,
+              <SubjectEntry key={e.code} subject={e} />
+            ])}
+            onChange={e => updateFilter('subjects.code', e)}
+            value={filterState['subjects.code']}
+          />
+        </SearchFieldset>
+
         <SearchFieldset title="Attributes" isMultiline>
           <SearchFormContainer>
             <SearchTextAutocomplete
