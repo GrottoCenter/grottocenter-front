@@ -14,6 +14,7 @@ import {
   LinearProgress,
   Menu,
   MenuItem,
+  Select,
   Table,
   TableHead,
   TableCell,
@@ -28,6 +29,8 @@ import {
   Typography
 } from '@mui/material';
 
+import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
+import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import DescriptionIcon from '@mui/icons-material/Description';
 import ViewColumnIcon from '@mui/icons-material/ViewColumn';
 import CloseIcon from '@mui/icons-material/Close';
@@ -36,6 +39,7 @@ import SearchOffIcon from '@mui/icons-material/SearchOff';
 
 import entitiesConfig from './entitiesConfig';
 import { LoadingTableHead, LoadingTableBodyInner } from './LoadingTable';
+import MobileEntityList from './MobileEntityList';
 import Translate from '../Translate';
 
 const DEFAULT_PAGE_SIZE_OPTIONS = [20, 100, 200];
@@ -91,6 +95,18 @@ const getObjectPath = (obj, path) => {
     out = out[pathParts[i]];
   }
   return out;
+};
+
+const renderCell = (doc, key, renderFn) => {
+  const v = getObjectPath(doc, key);
+  if (renderFn) {
+    const rendered = renderFn(v, doc);
+    return rendered != null ? rendered : '-';
+  }
+  if (v === true) return <CheckIcon color="success" />;
+  if (v === false) return <CloseIcon color="error" />;
+  if (v) return v;
+  return '-';
 };
 
 const EntityTableHead = ({
@@ -398,16 +414,31 @@ const EntityTable = ({
     onSelected(newSelected);
   };
 
-  const renderCell = (doc, key, renderFn) => {
-    const v = getObjectPath(doc, key);
-    if (renderFn) {
-      const rendered = renderFn(v, doc);
-      return rendered != null ? rendered : '-';
+  const sortableColumns = entityColumns.filter(
+    c => c.sortable && SORT_FIELD_MAP[entityType]?.[c.field]
+  );
+
+  const handleMobileSortFieldChange = e => {
+    const field = e.target.value;
+    if (!field) {
+      setOrderBy('');
+      setOrder('');
+      if (onSortChange) onSortChange('');
+      return;
     }
-    if (v === true) return <CheckIcon color="success" />;
-    if (v === false) return <CloseIcon color="error" />;
-    if (v) return v;
-    return '-';
+    const apiField = SORT_FIELD_MAP[entityType]?.[field];
+    if (!apiField) return;
+    setOrderBy(field);
+    setOrder('asc');
+    if (onSortChange) onSortChange(`${apiField}:asc`);
+  };
+
+  const handleMobileSortDirToggle = () => {
+    if (!orderBy) return;
+    const apiField = SORT_FIELD_MAP[entityType]?.[orderBy] ?? orderBy;
+    const newOrder = order === 'asc' ? 'desc' : 'asc';
+    setOrder(newOrder);
+    if (onSortChange) onSortChange(`${apiField}:${newOrder}`);
   };
 
   useEffect(() => {
@@ -488,115 +519,164 @@ const EntityTable = ({
           <Toolbar
             disableGutters
             variant="dense"
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 0.5,
-              minHeight: 48
-            }}>
-            {nbTotalRows != null && !isLoading && (
-              <Typography
-                variant="body2"
-                color="text.secondary"
-                sx={{ mr: 'auto' }}>
-                {formatMessage({ id: 'results_count' }, { count: nbTotalRows })}
-              </Typography>
-            )}
-            {!compact && (
-              <VisibleColumnsMenu
-                columns={entityColumns}
-                setColumns={setEntityColumns}
-                entityType={entityType}
-              />
-            )}
-            {onCSVDownload &&
-              (nbTotalRows <= MAX_DOCUMENTS_TO_EXPORT_IN_CSV ? (
-                <Button
-                  variant="text"
-                  size="small"
-                  onClick={() => {
-                    const c = entityColumns.filter(e => e.visible);
-                    onCSVDownload(
-                      c.map(e => e.apiField || e.field),
-                      c.map(e => e.label)
-                    );
-                  }}
-                  startIcon={<DescriptionIcon />}>
-                  {!isMobile && <Translate>Export to CSV</Translate>}
-                </Button>
-              ) : (
-                <Tooltip
-                  title={formatMessage({
-                    id: 'Export unavailable above 10000 results'
-                  })}>
-                  <span>
+            sx={{ display: 'flex', alignItems: 'center', gap: 0.5, minHeight: 48 }}>
+            {isMobile ? (
+              <>
+                {onSortChange && sortableColumns.length > 0 && (
+                  <>
+                    <Select
+                      size="small"
+                      value={orderBy}
+                      onChange={handleMobileSortFieldChange}
+                      displayEmpty
+                      sx={{ minWidth: 130, fontSize: 'body2.fontSize' }}>
+                      <MenuItem value="">
+                        <em><Translate>Sort by</Translate></em>
+                      </MenuItem>
+                      {sortableColumns.map(col => (
+                        <MenuItem key={col.field} value={col.field}>
+                          <Translate>{col.label}</Translate>
+                        </MenuItem>
+                      ))}
+                    </Select>
+                    <IconButton
+                      size="small"
+                      disabled={!orderBy}
+                      onClick={handleMobileSortDirToggle}>
+                      {order === 'desc' ? (
+                        <ArrowDownwardIcon fontSize="small" />
+                      ) : (
+                        <ArrowUpwardIcon fontSize="small" />
+                      )}
+                    </IconButton>
+                  </>
+                )}
+                <Box sx={{ flex: 1 }} />
+                {!compact && (
+                  <VisibleColumnsMenu
+                    columns={entityColumns}
+                    setColumns={setEntityColumns}
+                    entityType={entityType}
+                  />
+                )}
+              </>
+            ) : (
+              <>
+                {nbTotalRows != null && !isLoading && (
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    sx={{ mr: 'auto' }}>
+                    {formatMessage({ id: 'results_count' }, { count: nbTotalRows })}
+                  </Typography>
+                )}
+                {!compact && (
+                  <VisibleColumnsMenu
+                    columns={entityColumns}
+                    setColumns={setEntityColumns}
+                    entityType={entityType}
+                  />
+                )}
+                {onCSVDownload &&
+                  (nbTotalRows <= MAX_DOCUMENTS_TO_EXPORT_IN_CSV ? (
                     <Button
                       variant="text"
                       size="small"
-                      disabled
+                      onClick={() => {
+                        const c = entityColumns.filter(e => e.visible);
+                        onCSVDownload(
+                          c.map(e => e.apiField || e.field),
+                          c.map(e => e.label)
+                        );
+                      }}
                       startIcon={<DescriptionIcon />}>
-                      {!isMobile && <Translate>Export to CSV</Translate>}
+                      <Translate>Export to CSV</Translate>
                     </Button>
-                  </span>
-                </Tooltip>
-              ))}
+                  ) : (
+                    <Tooltip
+                      title={formatMessage({
+                        id: 'Export unavailable above 10000 results'
+                      })}>
+                      <span>
+                        <Button
+                          variant="text"
+                          size="small"
+                          disabled
+                          startIcon={<DescriptionIcon />}>
+                          <Translate>Export to CSV</Translate>
+                        </Button>
+                      </span>
+                    </Tooltip>
+                  ))}
+              </>
+            )}
           </Toolbar>
           <Divider />
         </>
       )}
       {isLoading && <LinearProgress color="secondary" />}
-      <TableContainer
-        sx={compact ? { overflowX: 'auto', maxWidth: '100%' } : undefined}>
-        <Table stickyHeader sx={{ minWidth: compact ? 300 : 750 }} size="small">
-          {isLoading ? (
-            <LoadingTableHead />
-          ) : (
-            <EntityTableHead
-              columns={entityColumns}
-              numSelected={selected.length}
-              order={order}
-              orderBy={orderBy}
-              onSelectAllClick={onSelected ? handleSelectAllClick : null}
-              onRequestSort={onSortChange ? handleRequestSort : null}
-              rowCount={pageRows.length}
-            />
+      {isMobile ? (
+        <MobileEntityList
+          rows={pageRows}
+          columns={visibleColumns}
+          totalRows={nbTotalRows}
+          isLoading={isLoading}
+          onPageChange={onPageChange ? handleChangePage : null}
+          rowsPerPage={rowsPerPage}
+          link={entityConfig.link}
+          renderCellFn={renderCell}
+        />
+      ) : (
+        <>
+          <TableContainer
+            sx={compact ? { overflowX: 'auto', maxWidth: '100%' } : undefined}>
+            <Table stickyHeader sx={{ minWidth: compact ? 300 : 750 }} size="small">
+              {isLoading ? (
+                <LoadingTableHead />
+              ) : (
+                <EntityTableHead
+                  columns={entityColumns}
+                  numSelected={selected.length}
+                  order={order}
+                  orderBy={orderBy}
+                  onSelectAllClick={onSelected ? handleSelectAllClick : null}
+                  onRequestSort={onSortChange ? handleRequestSort : null}
+                  rowCount={pageRows.length}
+                />
+              )}
+              <TableBody>
+                {isLoading ? <LoadingTableBodyInner /> : TableContent}
+              </TableBody>
+            </Table>
+          </TableContainer>
+          {!shouldHideFooter && onPageChange && (
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'flex-end',
+                flexWrap: 'wrap'
+              }}>
+              <JumpToPage
+                page={page}
+                count={nbTotalRows}
+                rowsPerPage={rowsPerPage}
+                onPageChange={handleChangePage}
+              />
+              <StyledTablePagination
+                showFirstButton
+                showLastButton
+                rowsPerPageOptions={pageSizeOptions}
+                component="div"
+                count={nbTotalRows}
+                rowsPerPage={rowsPerPage}
+                labelRowsPerPage={formatMessage({ id: 'Results per page:' })}
+                onPageChange={handleChangePage}
+                onRowsPerPageChange={handleChangeRowsPerPage}
+              />
+            </Box>
           )}
-          <TableBody>
-            {isLoading ? <LoadingTableBodyInner /> : TableContent}
-          </TableBody>
-        </Table>
-      </TableContainer>
-      {!shouldHideFooter && onPageChange && (
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'flex-end',
-            flexWrap: 'wrap'
-          }}>
-          {!isMobile && (
-            <JumpToPage
-              page={page}
-              count={nbTotalRows}
-              rowsPerPage={rowsPerPage}
-              onPageChange={handleChangePage}
-            />
-          )}
-          <StyledTablePagination
-            showFirstButton
-            showLastButton
-            rowsPerPageOptions={pageSizeOptions}
-            component="div"
-            count={nbTotalRows}
-            rowsPerPage={rowsPerPage}
-            page={page}
-            labelRowsPerPage={formatMessage({
-              id: isMobile ? 'Per page:' : 'Results per page:'
-            })}
-            onPageChange={handleChangePage}
-            onRowsPerPageChange={handleChangeRowsPerPage}
-          />
-        </Box>
+        </>
       )}
     </Box>
   );
