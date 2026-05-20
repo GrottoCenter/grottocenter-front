@@ -18,7 +18,12 @@ export { getStoredRowsPerPage };
 
 const DEFAULT_PAGE_SIZE_OPTIONS = [20, 100, 200];
 
-const initColumns = (entityConfig, entityType, compact, entityColumnsModifier) => {
+const initColumns = (
+  entityConfig,
+  entityType,
+  compact,
+  entityColumnsModifier
+) => {
   let columns;
   if (compact) {
     columns = entityConfig.columns.map(col => ({
@@ -133,7 +138,9 @@ const EntityTable = ({
           totalRows={nbTotalRows}
           isLoading={isLoading}
           onPageChange={
-            onPageChange ? (page, size) => onPageChange(page, size ?? rowsPerPage) : null
+            onPageChange
+              ? (page, size) => onPageChange(page, size ?? rowsPerPage)
+              : null
           }
           rowsPerPage={rowsPerPage}
           link={entityConfig.link}
