@@ -6,7 +6,7 @@ import React, {
   useMemo
 } from 'react';
 import PropTypes from 'prop-types';
-import { DocumentTypes } from '../../../../hooks/documentTypeHelpers';
+import { DocumentTypes } from '../../../../utils/documentTypeHelpers';
 import {
   IS_INTACT,
   LICENSE_IN_FILE,

@@ -155,6 +155,9 @@ const AddFileForm = ({
       document.authors.length === 1 &&
       document.authors[0].id === currentUser.id;
 
+    // When switching to AUTHORIZE_TO_PUBLISH, remove the author only if it is
+    // solely the current user — a solo pre-fill that has no real meaning on an
+    // authorization form. Co-authors added manually are intentional and kept.
     if (newOption === DOCUMENT_AUTHORIZE_TO_PUBLISH) {
       if (authorsIsOnlyMe) updateAttribute('authors', []);
     } else if (document.authors.length === 0) {

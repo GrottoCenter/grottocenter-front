@@ -522,7 +522,7 @@ export const SearchSelect = ({
   options,
   value,
   onChange,
-  sx
+  sx = {}
 }) => {
   const { formatMessage } = useIntl();
   return (

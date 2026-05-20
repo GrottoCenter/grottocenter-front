@@ -23,7 +23,7 @@ import {
   DocumentTypes,
   DOCUMENT_TYPE_ICONS,
   DOCUMENT_TYPE_FALLBACK_ICON
-} from '../../../../../hooks/documentTypeHelpers';
+} from '../../../../../utils/documentTypeHelpers';
 import { DocumentFormContext } from '../Provider';
 import { loadDocumentTypes } from '../../../../../actions/DocumentType';
 

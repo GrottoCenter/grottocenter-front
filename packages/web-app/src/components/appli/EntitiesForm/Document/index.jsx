@@ -9,7 +9,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { styled } from '@mui/material/styles';
 
 import { usePermissions } from '../../../../hooks';
-import { documentTypeHelpers } from '../../../../hooks/documentTypeHelpers';
+import { documentTypeHelpers } from '../../../../utils/documentTypeHelpers';
 import { resetDocumentApiErrors } from '../../../../actions/Document/ResetApiErrors';
 import { postDocument } from '../../../../actions/Document/CreateDocument';
 import { updateDocument } from '../../../../actions/Document/UpdateDocument';

@@ -4,6 +4,15 @@
 
 ---
 
+## 📁 src/hooks/ vs src/utils/
+
+- **`src/hooks/`** — Custom React hooks only. Every file must export one or more functions whose name starts with `use`. No plain constants or pure utility functions.
+- **`src/utils/`** — Pure utility modules: constants, helper functions, lookup tables. No React, no hooks. Examples: `documentTypeHelpers.js`, `subjectHelpers.js`.
+
+Do not add non-hook utilities (constants, pure functions, icon maps) to `src/hooks/`.
+
+---
+
 ## 🌍 Internationalization (i18n)
 
 ### Overview

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
@@ -12,12 +12,12 @@ import { loadSubjects } from '../../../actions/Subject';
 import {
   DOCUMENT_TYPE_ICONS,
   DOCUMENT_TYPE_FALLBACK_ICON
-} from '../../../hooks/documentTypeHelpers';
+} from '../../../utils/documentTypeHelpers';
 import {
   SUBJECT_DEPTH_STYLES,
   getSubjectCode,
   sortSubjects
-} from '../../../hooks/subjectHelpers';
+} from '../../../utils/subjectHelpers';
 import Translate from '../../common/Translate';
 
 import useSearchFilter from '../../../hooks/useSearchFilter';
@@ -149,20 +149,22 @@ const DocumentSearch = () => {
     'parent.title', 'cave.name', 'entrances.name', 'massifs.name'
   ]);
 
-  const docTypeOptions = documentTypes
-    .filter(e => e.isAvailable)
-    .map(e => {
-      const Icon = DOCUMENT_TYPE_ICONS[e.name] ?? DOCUMENT_TYPE_FALLBACK_ICON;
-      return [
-        e.name,
-        <Box
-          key={e.name}
-          sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <Icon sx={{ fontSize: 18, color: 'text.secondary' }} />
-          <Translate>{e.name}</Translate>
-        </Box>
-      ];
-    });
+  const docTypeOptions = useMemo(
+    () =>
+      documentTypes.filter(e => e.isAvailable).map(e => {
+        const Icon = DOCUMENT_TYPE_ICONS[e.name] ?? DOCUMENT_TYPE_FALLBACK_ICON;
+        return [
+          e.name,
+          <Box
+            key={e.name}
+            sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Icon sx={{ fontSize: 18, color: 'text.secondary' }} />
+            <Translate>{e.name}</Translate>
+          </Box>
+        ];
+      }),
+    [documentTypes]
+  );
 
   return (
     <SearchForm onSubmit={() => startAdvancedsearch()}>

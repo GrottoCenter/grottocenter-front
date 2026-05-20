@@ -10,7 +10,7 @@ import {
   SUBJECT_DEPTH_STYLES,
   getSubjectCode,
   sortSubjects
-} from '../../../../../hooks/subjectHelpers';
+} from '../../../../../utils/subjectHelpers';
 
 import MultipleSelectWithOptionsComponent from './MultipleSelectWithOptions';
 

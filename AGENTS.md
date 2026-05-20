@@ -37,7 +37,7 @@ grottocenter-front/
 │   │   │   ├── pages/                # Page-level components (full-screen views)
 │   │   │   ├── hooks/                # Custom GrottoCenter hooks
 │   │   │   ├── helpers/              # ⚠️ DEPRECATED utilities — prefer hooks
-│   │   │   ├── util/                 # Utilities (dates, strings, validation)
+│   │   │   ├── utils/                # Utilities (dates, strings, validation)
 │   │   │   ├── conf/                 # Configuration (API routes, themes, i18n)
 │   │   │   └── types/                # PropTypes definitions
 │   │   ├── public/lang/              # i18n translation files (en.json, fr.json, …)

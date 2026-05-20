@@ -21,7 +21,7 @@ import { usePermissions, useUserProperties } from '../../../../../hooks';
 import { updateEntrance } from '../../../../../actions/Entrance/UpdateEntrance';
 import { updateCaveAndEntrance } from '../../../../../actions/CaveAndEntrance';
 import Translate from '../../../../common/Translate';
-import { durationStringToMinutes } from '../../../../../util/dateTimeDuration';
+import { durationStringToMinutes } from '../../../../../utils/dateTimeDuration';
 
 function sleep(ms) {
   // eslint-disable-next-line no-promise-executor-return

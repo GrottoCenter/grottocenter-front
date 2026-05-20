@@ -12,7 +12,6 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 import { useIntl } from 'react-intl';
 import { useSelector } from 'react-redux';
-import { useUserProperties } from '../../../../hooks';
 import { useNavigate } from 'react-router-dom';
 
 import { DocumentFormContext } from './Provider';
@@ -25,8 +24,7 @@ import MultipleSubjectsSelect from './formElements/MultipleSubjectsSelect';
 import OrganizationAutoComplete from './formElements/OrganizationAutoComplete';
 import PagesEditor from './formElements/PagesEditor';
 import IdentifierEditor from './formElements/IdentifierEditor';
-import MultipleCaversSelect from './formElements/MultipleCaversSelect';
-
+import AuthorsSection from './formElements/AuthorsSection';
 import { FormActionRow, FormContainer, FormRow } from '../utils/FormContainers';
 import AddFileForm from './formElements/AddFileForm';
 import StringInput from '../../../common/Form/StringInput';
@@ -39,41 +37,11 @@ import {
 import {
   documentTypeHelpers,
   DOCUMENT_TYPE_ACCEPT
-} from '../../../../hooks/documentTypeHelpers';
+} from '../../../../utils/documentTypeHelpers';
 
 const PublicationDatePicker = React.lazy(
   () => import('./formElements/PublicationDatePicker')
 );
-
-const AuthorsSection = () => {
-  const { formatMessage } = useIntl();
-  const { document: doc, updateAttribute } = useContext(DocumentFormContext);
-  const currentUser = useUserProperties();
-
-  useEffect(() => {
-    if (doc.authors.length === 0 && currentUser.id) {
-      updateAttribute('authors', [
-        { id: currentUser.id, nickname: currentUser.nickname }
-      ]);
-    }
-    // Pre-fill only on mount; currentUser and updateAttribute are stable
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  return (
-    <Box sx={{ mt: 2 }}>
-      <MultipleCaversSelect
-        computeHasError={() => false}
-        contextValueName="authors"
-        helperText={formatMessage({
-          id: 'Choose one or more authors among those already registered. If the author you are looking for does not exist in Grottocenter, it is possible to add him/her using the + button on the right.'
-        })}
-        labelName="Authors"
-        required
-      />
-    </Box>
-  );
-};
 
 const FormContent = () => {
   const {

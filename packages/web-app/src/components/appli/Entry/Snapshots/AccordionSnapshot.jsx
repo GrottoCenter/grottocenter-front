@@ -17,7 +17,7 @@ import authorType from '../../../../types/author.type';
 import { HighLightsChar } from '../../../common/Highlights';
 import RestoreSnapshot from './component/RestoreSnapshot';
 import Translate from '../../../common/Translate';
-import { capitalize } from '../../../../util/strings';
+import { capitalize } from '../../../../utils/strings';
 
 const FlexDiv50 = styled('div')`
   flex-basis: 50%;

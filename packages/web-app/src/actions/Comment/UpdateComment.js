@@ -1,6 +1,6 @@
 import fetch from 'isomorphic-fetch';
 import { putCommentUrl } from '../../conf/apiRoutes';
-import { minutesToDurationString } from '../../util/dateTimeDuration';
+import { minutesToDurationString } from '../../utils/dateTimeDuration';
 import { checkAuthStatus } from '../utils';
 
 export const UPDATE_COMMENT = 'UPDATE_COMMENT';
