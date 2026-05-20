@@ -5,7 +5,7 @@ import {
   fetchAdvancedSearchResults,
   downloadAdvancedSearchResults
 } from '../../../actions/Advancedsearch';
-import EntityTable from '../../common/EntityTable/EntityTable';
+import EntityTable from '../../common/EntityTable';
 
 const SearchResults = ({ onSelected, hideExport, entityType, compact }) => {
   const dispatch = useDispatch();

@@ -2,8 +2,9 @@ import React, { useRef } from 'react';
 import Skeleton from '@mui/material/Skeleton';
 import { useIntl } from 'react-intl';
 import { Marker } from 'react-leaflet';
-import { Button, Card, CircularProgress } from '@mui/material';
+import { Box, Button, Card, CircularProgress } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import CustomIcon from '../../common/CustomIcon';
 import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
 import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
 import { Print } from '@mui/icons-material';
@@ -22,7 +23,11 @@ import Alert from '../../common/Alert';
 import REDUCER_STATUS from '../../../reducers/ReducerStatus';
 import { CoordinatesMarker } from '../../common/Maps/common/Markers/Components';
 import { isMobile } from 'react-device-detect';
-import { useSubscriptions, useScrollToHashOnLoad, useSharePage } from '../../../hooks';
+import {
+  useSubscriptions,
+  useScrollToHashOnLoad,
+  useSharePage
+} from '../../../hooks';
 
 const Region = ({
   canSubscribe,
@@ -121,6 +126,24 @@ const Region = ({
         subheader={subheader}
         actions={actions}
       />
+      {region && (
+        <Box sx={{ mx: 2, mb: 1 }}>
+          <Button
+            fullWidth
+            variant="contained"
+            color="primary"
+            size="large"
+            startIcon={<CustomIcon type="entrance" size={24} />}
+            onClick={() =>
+              navigate(
+                `/ui/countries/${countryId}/regions/${regionId}/entrances`
+              )
+            }>
+            {formatMessage({ id: 'Entrances list' })}
+            {dataRegion?.nb_caves ? ` (${dataRegion.nb_caves})` : ''}
+          </Button>
+        </Box>
+      )}
       {isLoading && (
         <Card sx={{ m: 2, p: 3 }}>
           <Skeleton height={150} />

@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import { Box, Typography } from '@mui/material';
-import BoolIcon from './BoolIcon';
+import BoolIcon from '../BoolIcon';
 import { checkPasswordRules, PASSWORD_MIN_LENGTH } from '../../../conf/config';
 
 const RuleItem = ({ satisfied, labelId, labelValues = undefined }) => {

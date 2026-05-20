@@ -14,7 +14,7 @@ import DocumentDetails from '../DocumentDetails';
 import DocumentEdit from '../DocumentEdit';
 import AuthChecker from '../../components/appli/AuthChecker';
 
-import EntityTable from '../../components/common/EntityTable/EntityTable';
+import EntityTable from '../../components/common/EntityTable';
 import Translate from '../../components/common/Translate';
 
 const Wrapper = styled('div')`

@@ -32,6 +32,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import ClearIcon from '@mui/icons-material/Clear';
 import CheckIcon from '@mui/icons-material/Check';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import LockIcon from '@mui/icons-material/Lock';
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
 import { fetchFieldSearch } from '../../../actions/FieldSearch';
@@ -396,9 +397,10 @@ export const SearchSlider = ({
   return (
     <FormControl
       sx={{ flex: 1, minWidth: '200px', mx: 3, alignItems: 'center' }}>
-      <FormLabel sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+      <FormLabel
+        sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: -2 }}>
         {icon}
-        <Translate>{label}</Translate>
+        {label}
         <IconButton
           size="small"
           onClick={handleClear}
@@ -415,7 +417,13 @@ export const SearchSlider = ({
       <Slider
         min={isLinearScale ? min : 0}
         max={isLinearScale ? max : 100}
-        sx={{ width: '100%', marginBottom: '8px' }}
+        sx={{
+          touchAction: 'pan-y',
+          width: '100%',
+          marginBottom: '8px',
+          pointerEvents: 'none',
+          '& .MuiSlider-thumb': { pointerEvents: 'auto' }
+        }}
         value={isLinearScale ? values : values.map(e => convert(e, 'descale'))}
         scale={isLinearScale ? undefined : e => convert(e)}
         onChange={(_, newValue) => {
@@ -601,11 +609,14 @@ export const SearchMatchAllFieldsToogle = ({ isChecked, onChange }) => {
           <Tooltip
             title={formatMessage({
               id: 'Specify if the search results must match all the fields you typed above (default is yes).'
-            })}>
+            })}
+            enterTouchDelay={0}
+            leaveTouchDelay={3000}>
             <InfoOutlinedIcon
               fontSize="small"
               color="action"
               sx={{ verticalAlign: 'middle' }}
+              onClick={e => e.preventDefault()}
             />
           </Tooltip>
         </Box>
@@ -635,7 +646,9 @@ export const ActiveFilterChips = ({
   onRemoveFilter,
   onClearQuery,
   labelMap,
-  translatableValueFields
+  translatableValueFields,
+  lockedKeys = [],
+  valueLabels = {}
 }) => {
   const { formatMessage } = useIntl();
 
@@ -651,6 +664,7 @@ export const ActiveFilterChips = ({
 
   Object.entries(filterState).forEach(([key, value]) => {
     if (value === null || value === '' || value === undefined) return;
+    const isLocked = lockedKeys.includes(key);
     const labelId = labelMap[key] || key;
     const translatedLabel = formatMessage({ id: labelId });
     let formattedValue;
@@ -664,12 +678,13 @@ export const ActiveFilterChips = ({
         defaultMessage: String(value)
       });
     } else {
-      formattedValue = String(value);
+      formattedValue = valueLabels[key] ?? String(value);
     }
     chips.push({
       key,
       label: `${translatedLabel}: ${formattedValue}`,
-      onDelete: () => onRemoveFilter(key)
+      onDelete: isLocked ? undefined : () => onRemoveFilter(key),
+      isLocked
     });
   });
 
@@ -680,10 +695,12 @@ export const ActiveFilterChips = ({
       {chips.map(chip => (
         <Chip
           key={chip.key}
+          icon={chip.isLocked ? <LockIcon fontSize="small" /> : undefined}
           label={chip.label}
           onDelete={chip.onDelete}
           size="small"
           color="primary"
+          variant="outlined"
         />
       ))}
     </Box>
@@ -697,7 +714,9 @@ ActiveFilterChips.propTypes = {
   onRemoveFilter: PropTypes.func.isRequired,
   onClearQuery: PropTypes.func.isRequired,
   labelMap: PropTypes.shape({}).isRequired,
-  translatableValueFields: PropTypes.instanceOf(Set)
+  translatableValueFields: PropTypes.instanceOf(Set),
+  lockedKeys: PropTypes.arrayOf(PropTypes.string),
+  valueLabels: PropTypes.shape({})
 };
 
 export const SearchFilterAccordion = ({
@@ -746,18 +765,20 @@ SearchFilterAccordion.propTypes = {
   children: PropTypes.node.isRequired
 };
 
-export const SearchActionButtons = ({ onReset }) => (
+export const SearchActionButtons = ({ onReset, showReset = true }) => (
   <CardActions sx={{ padding: 0, justifyContent: 'flex-end', width: '100%' }}>
-    <Button
-      type="button"
-      variant="text"
-      size="medium"
-      color="inherit"
-      startIcon={<ClearIcon />}
-      onClick={() => onReset()}
-      sx={{ color: 'text.secondary' }}>
-      <Translate>Reset</Translate>
-    </Button>
+    {showReset && (
+      <Button
+        type="button"
+        variant="text"
+        size="medium"
+        color="inherit"
+        startIcon={<ClearIcon />}
+        onClick={() => onReset()}
+        sx={{ color: 'text.secondary' }}>
+        <Translate>Reset</Translate>
+      </Button>
+    )}
 
     <Button
       type="submit"
@@ -770,7 +791,8 @@ export const SearchActionButtons = ({ onReset }) => (
 );
 
 SearchActionButtons.propTypes = {
-  onReset: PropTypes.func.isRequired
+  onReset: PropTypes.func.isRequired,
+  showReset: PropTypes.bool
 };
 
 SearchMatchAllFieldsToogle.propTypes = {

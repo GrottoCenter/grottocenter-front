@@ -1,226 +1,138 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { useIntl } from 'react-intl';
 import { useDispatch, useSelector } from 'react-redux';
-import { List, Pagination, Box } from '@mui/material';
-import Skeleton from '@mui/material/Skeleton';
-import { styled } from '@mui/material/styles';
-import Alert from '../../components/common/Alert';
-import Layout from '../../components/common/Layouts/Fixed/FixedContent';
-import { fetchMassifEntrances } from '../../actions/Massif/GetEntrancesDataQuality';
-import { fetchCountryEntrances } from '../../actions/Country/GetEntrancesDataQuality';
-import { fetchRegionEntrances } from '../../actions/Region/GetEntrancesDataQuality';
+import { useIntl } from 'react-intl';
+
 import { fetchCountry } from '../../actions/Country/GetCountry';
 import { fetchRegion } from '../../actions/Region/GetRegion';
 import { loadMassif } from '../../actions/Massif/GetMassif';
-import EntranceList from './EntranceList';
-
+import { fetchFieldSearch } from '../../actions/FieldSearch';
 import getLocalizedCountryName from '../../helpers/countryName';
+import REDUCER_STATUS from '../../reducers/ReducerStatus';
+import EntitySearchPage from '../../components/appli/AdvancedSearch/EntitySearchPage';
+import EntrancesSearch from '../../components/appli/AdvancedSearch/EntrancesSearch';
+import CustomIcon from '../../components/common/CustomIcon';
+import EntranceBadgeIcon from './EntranceBadgeIcon';
+import { ADVANCED_SEARCH_TYPES } from '../../conf/config';
 
-const StyledList = styled(List)({
-  display: 'flex',
-  flexWrap: 'wrap',
-  width: '100%',
-  justifyContent: 'space-between'
-});
-
-const sortByDataQuality = entrances =>
-  entrances.sort((a, b) => b.data_quality - a.data_quality);
+const getFlagEmoji = iso =>
+  typeof iso === 'string' && iso.length === 2
+    ? [...iso.toUpperCase()]
+        .map(c => String.fromCodePoint(0x1f1e6 + c.charCodeAt(0) - 65))
+        .join('')
+    : '';
 
 const EntrancesListPage = () => {
-  const { formatMessage, locale } = useIntl();
-  const { countryId, massifId, regionId } = useParams();
+  const { countryId, regionId, massifId } = useParams();
   const dispatch = useDispatch();
+  const { formatMessage, locale } = useIntl();
 
-  const [page, setPage] = useState(1);
-  const limit = 36;
-  // to store entrances even if it's massif entrances or country entrances (managed with a useEffect)
-  const [entrances, setEntrances] = useState(null);
-  // to store error even if it's massif entrances error or country entrances error (managed with a useEffect)
-  const [error, setError] = useState(null);
-  const [entityType, setEntityType] = useState();
-  const [totalPages, setTotalPages] = useState(0);
-  const [hasData, setHasData] = useState(false);
-
-  const { massifEntrances, massifEntrancesLoading, massifEntrancesError } =
-    useSelector(state => state.massifEntrances);
-
-  const { countryEntrances, countryEntrancesLoading, countryEntrancesError } =
-    useSelector(state => state.countryEntrances);
-
-  const { regionEntrances, regionEntrancesLoading, regionEntrancesError } =
-    useSelector(state => state.regionEntrances);
-
-  const { country } = useSelector(state => state.country);
-  const { region } = useSelector(state => state.regionDetails);
-  const { massif } = useSelector(state => state.massif);
-
-  // Fetch entity data only once when IDs change
-  useEffect(() => {
-    if (regionId && countryId) {
-      dispatch(fetchRegion(countryId, regionId));
-    } else if (countryId) {
-      dispatch(fetchCountry(countryId));
-    } else if (massifId) {
-      dispatch(loadMassif(massifId));
-    }
-  }, [countryId, massifId, regionId, dispatch]);
-
-  // Fetch entrances data when page or IDs change
-  useEffect(() => {
-    const offset = (page - 1) * limit;
-    if (regionId && countryId) {
-      dispatch(fetchRegionEntrances(countryId, regionId, { limit, offset }));
-    } else if (countryId) {
-      dispatch(fetchCountryEntrances(countryId, { limit, offset }));
-    } else if (massifId) {
-      dispatch(fetchMassifEntrances(massifId, { limit, offset }));
-    }
-  }, [countryId, massifId, regionId, page, limit, dispatch]);
-
-  const massifState = useSelector(state => state.massifEntrances);
-  const countryState = useSelector(state => state.countryEntrances);
-  const regionState = useSelector(state => state.regionEntrances);
-
-  // Reset page when entity changes
-  useEffect(() => {
-    setPage(1);
-  }, [countryId, massifId, regionId]);
-
-  // manage entrances
-  useEffect(() => {
-    if (countryEntrances) {
-      setEntrances(
-        Array.isArray(countryEntrances)
-          ? sortByDataQuality(countryEntrances)
-          : countryEntrances
-      );
-      setEntityType('country');
-      if (countryState.totalPages) {
-        setTotalPages(countryState.totalPages);
-        setHasData(true);
-      }
-    }
-  }, [countryEntrances, countryState.totalPages]);
+  const { country, status: countryStatus } = useSelector(
+    state => state.country
+  );
+  const { region, status: regionStatus } = useSelector(
+    state => state.regionDetails
+  );
+  const { massif, isFetching: massifFetching } = useSelector(
+    state => state.massif
+  );
+  const [massifValue, setMassifValue] = useState(undefined);
 
   useEffect(() => {
-    if (massifEntrances) {
-      setEntrances(
-        Array.isArray(massifEntrances)
-          ? sortByDataQuality(massifEntrances)
-          : massifEntrances
-      );
-      setEntityType('massif');
-      if (massifState.totalPages) {
-        setTotalPages(massifState.totalPages);
-        setHasData(true);
-      }
-    }
-  }, [massifEntrances, massifState.totalPages]);
+    if (countryId) dispatch(fetchCountry(countryId));
+    if (regionId && countryId) dispatch(fetchRegion(countryId, regionId));
+  }, [countryId, regionId, dispatch]);
 
   useEffect(() => {
-    if (regionEntrances) {
-      setEntrances(
-        Array.isArray(regionEntrances)
-          ? sortByDataQuality(regionEntrances)
-          : regionEntrances
-      );
-      setEntityType('region');
-      if (regionState.totalPages) {
-        setTotalPages(regionState.totalPages);
-        setHasData(true);
-      }
-    }
-  }, [regionEntrances, regionState.totalPages]);
+    if (massifId) dispatch(loadMassif(massifId));
+  }, [massifId, dispatch]);
 
-  // manage error
   useEffect(() => {
-    if (entityType === 'country' && countryEntrancesError) {
-      setError(countryEntrancesError);
-    } else if (entityType === 'massif' && massifEntrancesError) {
-      setError(massifEntrancesError);
-    } else if (entityType === 'region' && regionEntrancesError) {
-      setError(regionEntrancesError);
+    if (!massifId || !massif) return;
+    let cancelled = false;
+    setMassifValue(undefined);
+    fetchFieldSearch({
+      entity: ADVANCED_SEARCH_TYPES.ENTRANCES,
+      field: 'massifs.name',
+      query: massif.name,
+      filter: {}
+    })
+      .then(r => { if (!cancelled) setMassifValue(r?.hits?.[0]?.[0] ?? null); })
+      .catch(() => { if (!cancelled) setMassifValue(null); });
+    return () => { cancelled = true; };
+  }, [massif, massifId]);
+
+  let initialFilter = {};
+  let lockedFilter = [];
+  let searchKey = 'open';
+  let pageIcon;
+  let valueLabels = {};
+  const label = formatMessage({ id: 'Entrances' });
+  let pageTitle = label;
+
+  if (massifId && massif && !massifFetching && massifValue !== undefined) {
+    const resolvedMassif = massifValue ?? massif.name;
+    initialFilter = { 'massifs.name': resolvedMassif };
+    lockedFilter = ['massifs.name'];
+    searchKey = resolvedMassif;
+    pageTitle = `${label} - ${massif.name}`;
+    pageIcon = (
+      <EntranceBadgeIcon badge={<CustomIcon type="massif" size={16} />} />
+    );
+  }
+
+  const countryReady = countryStatus === REDUCER_STATUS.SUCCEEDED && country;
+  if (countryReady) {
+    const flag = getFlagEmoji(country.id);
+    const localizedCountry = getLocalizedCountryName(
+      country.id,
+      locale,
+      country.nativeName
+    );
+    // Typesense stores country as "ISO_CODE - native_name" (e.g. "FR - France").
+    // Using only nativeName would not match the facet value exactly.
+    const countryTypesenseValue = `${country.id} - ${country.nativeName}`;
+
+    if (regionId && regionStatus === REDUCER_STATUS.SUCCEEDED && region) {
+      // region.id is the ISO 3166-2 code built by the API as "${countryId}-${regionId}"
+      // (e.g. "FR-01" for Ain, "MX-YUC" for Yucatán). This matches the `iso3166` Typesense
+      // field populated by Nominatim reverse-geocoding, regardless of the country's admin level.
+      // Using iso3166 instead of the freeform `county`/`region` fields avoids mismatches where
+      // the region entity corresponds to different admin levels across countries.
+      initialFilter = {
+        country: countryTypesenseValue,
+        iso3166: region.id
+      };
+      lockedFilter = ['country', 'iso3166'];
+      searchKey = `${countryTypesenseValue}|${region.id}`;
+      pageTitle = `${label} - ${localizedCountry} - ${region.name}`;
+      pageIcon = <EntranceBadgeIcon badge={flag} />;
+      // iso3166 stores the raw ISO code (e.g. "FR-01"); display the human-readable name instead.
+      valueLabels = { iso3166: region.name };
+    } else if (!regionId) {
+      initialFilter = { country: countryTypesenseValue };
+      lockedFilter = ['country'];
+      searchKey = countryTypesenseValue;
+      pageTitle = `${label} - ${localizedCountry}`;
+      pageIcon = <EntranceBadgeIcon badge={flag} />;
     }
-  }, [
-    massifEntrancesError,
-    countryEntrancesError,
-    regionEntrancesError,
-    entityType
-  ]);
+  }
 
-  const skeletons = new Array(10).fill(0);
-
-  const getTitle = () => {
-    if (error) {
-      return '';
-    }
-    if (entrances) {
-      if (entityType === 'country') {
-        const entranceWithCountry = entrances.find(e => e.country_name);
-        return getLocalizedCountryName(
-          country?.id,
-          locale,
-          entranceWithCountry?.country_name
-        );
-      }
-      if (entityType === 'region') {
-        return region?.name;
-      } // else massif:
-      return massif?.name;
-    }
-    return formatMessage({ id: 'Loading entrances...' });
-  };
-
-  const handlePageChange = (event, newPage) => {
-    setPage(newPage);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  const shouldShowPagination = hasData && totalPages > 1;
+  if (searchKey === 'open' && (countryId || massifId)) return null;
 
   return (
-    <Layout
-      title={getTitle()}
-      content={
-        <>
-          {(massifEntrancesLoading ||
-            countryEntrancesLoading ||
-            regionEntrancesLoading) &&
-            !error && (
-              <StyledList>
-                {skeletons.map((_, index) => (
-                  <Skeleton key={index} height={90} width={350} />
-                ))}
-              </StyledList>
-            )}
-          {error && (
-            <Alert
-              title={formatMessage({
-                id: 'Error, the data you are looking for is not available.'
-              })}
-              severity="error"
-            />
-          )}
-          {entrances && entrances.length > 0 && (
-            <>
-              <EntranceList entrances={entrances} />
-              {shouldShowPagination && (
-                <Box mt={3} mb={3} display="flex" justifyContent="center">
-                  <Pagination
-                    count={totalPages}
-                    page={page}
-                    onChange={handlePageChange}
-                    disabled={massifEntrancesLoading || countryEntrancesLoading || regionEntrancesLoading}
-                    color="primary"
-                  />
-                </Box>
-              )}
-            </>
-          )}
-        </>
-      }
-    />
+    <EntitySearchPage
+      title={pageTitle}
+      icon={pageIcon}
+      entityType="entrances"
+      initialFilter={initialFilter}>
+      <EntrancesSearch
+        key={searchKey}
+        initialFilter={initialFilter}
+        lockedFilter={lockedFilter}
+        valueLabels={valueLabels}
+      />
+    </EntitySearchPage>
   );
 };
 

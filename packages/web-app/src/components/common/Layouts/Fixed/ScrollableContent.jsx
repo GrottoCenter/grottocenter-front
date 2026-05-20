@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { styled } from '@mui/material/styles';
 import { isNil } from 'ramda';
 import {
@@ -71,6 +71,10 @@ const ScrollableContent = ({
 }) => {
   useAnchorScroll(anchorId);
   const [isExpanded, setIsExpanded] = useState(defaultExpanded);
+
+  useEffect(() => {
+    if (defaultExpanded) setIsExpanded(true);
+  }, [defaultExpanded]);
 
   return (
     <Card id={anchorId}>

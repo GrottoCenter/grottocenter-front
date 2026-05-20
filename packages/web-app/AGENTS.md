@@ -320,6 +320,28 @@ const MyComponent = () => {
 };
 ```
 
+### Navigation (mobile vs desktop)
+
+Use `useOpenLink` (`src/hooks/useOpenLink.js`) whenever clicking an item links to an **internal app route** (`/ui/...`). It navigates in-app on mobile and opens a new tab on desktop. Never re-implement this logic manually.
+
+> For genuine external URLs (e.g. external websites, mailto links), use `window.open` directly — `useOpenLink` is not for external links.
+
+```javascript
+import useOpenLink from '../hooks/useOpenLink';
+
+const MyComponent = ({ url }) => {
+  const openLink = useOpenLink();
+  return <button onClick={() => openLink(url)}>Open</button>;
+};
+```
+
+> ❌ Don't do this manually:
+
+```javascript
+if (isMobile) navigate(url);
+else window.open(url, '_blank');
+```
+
 ### Performance
 
 ```javascript

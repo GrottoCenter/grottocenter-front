@@ -112,13 +112,6 @@ const StatisticsDataDashboard = ({
                     nbCaves={data.nb_caves}
                     nbDivingCaves={data.diving_caves}
                     nbNetworks={data.nb_networks}
-                    url={(() => {
-                      if (entityType === 'country')
-                        return `/ui/countries/${countryId}/entrances`;
-                      if (entityType === 'region')
-                        return `/ui/countries/${countryId}/regions/${regionId}/entrances`;
-                      return `/ui/massifs/${massifId}/entrances`;
-                    })()}
                   />
                 </Paper>
                 <Paper

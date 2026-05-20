@@ -9,7 +9,7 @@ import {
   fetchAdvancedSearchResults,
   resetAdvancedSearchResults
 } from '../../../actions/Advancedsearch';
-import { getStoredRowsPerPage } from '../../common/EntityTable/EntityTable';
+import { getStoredRowsPerPage } from '../../common/EntityTable';
 import SearchResults from './SearchResults';
 
 const ENTITY_ICON_TYPE = {
@@ -20,7 +20,15 @@ const ENTITY_ICON_TYPE = {
   persons: 'caver'
 };
 
-const EntitySearchPage = ({ title, subheader, actions, entityType, children }) => {
+const EntitySearchPage = ({
+  title,
+  icon,
+  subheader,
+  actions,
+  entityType,
+  children,
+  initialFilter = {}
+}) => {
   const dispatch = useDispatch();
   const { formatMessage } = useIntl();
   const iconType = ENTITY_ICON_TYPE[entityType] ?? 'entrance';
@@ -30,16 +38,23 @@ const EntitySearchPage = ({ title, subheader, actions, entityType, children }) =
       fetchAdvancedSearchResults({
         entity: entityType,
         query: '',
+        filter: initialFilter,
         matchAllFields: true,
         size: getStoredRowsPerPage()
       })
     );
+    // initialFilter is intentionally excluded: it's fixed at mount time.
+    // Consumers must use key={searchKey} to force remounting when the filter changes.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, entityType]);
+
+  const resolvedTitle =
+    typeof title === 'string' ? formatMessage({ id: title }) : title;
 
   return (
     <FixedContent
-      icon={<CustomIcon type={iconType} />}
-      title={formatMessage({ id: title })}
+      icon={icon ?? <CustomIcon type={iconType} />}
+      title={resolvedTitle}
       subheader={subheader}
       action={actions}
       content={
@@ -54,11 +69,13 @@ const EntitySearchPage = ({ title, subheader, actions, entityType, children }) =
 };
 
 EntitySearchPage.propTypes = {
-  title: PropTypes.string.isRequired,
+  title: PropTypes.oneOfType([PropTypes.string, PropTypes.node]).isRequired,
+  icon: PropTypes.node,
   subheader: PropTypes.node,
   actions: PropTypes.node,
   entityType: PropTypes.string.isRequired,
-  children: PropTypes.node.isRequired
+  children: PropTypes.node.isRequired,
+  initialFilter: PropTypes.shape({})
 };
 
 export default EntitySearchPage;
