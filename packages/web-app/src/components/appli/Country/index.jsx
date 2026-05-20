@@ -120,6 +120,19 @@ const Country = ({
         subheader={subheader}
         actions={actions}
       />
+      {country && (
+        <Box sx={{ mx: 2, mb: 1 }}>
+          <Button
+            fullWidth
+            variant="contained"
+            color="primary"
+            size="large"
+            startIcon={<CustomIcon type="entrance" />}
+            onClick={() => navigate(`/ui/countries/${country.id}/entrances`)}>
+            {formatMessage({ id: 'Entrances list' })}
+          </Button>
+        </Box>
+      )}
       {isLoading && (
         <Card sx={{ m: 2, p: 3 }}>
           <Skeleton height={300} />
