@@ -9,7 +9,6 @@ import PropTypes from 'prop-types';
 import { DocumentTypes } from '../../../../utils/documentTypeHelpers';
 import {
   IS_INTACT,
-  LICENSE_IN_FILE,
   DOCUMENT_AUTHORIZE_TO_PUBLISH
 } from './formElements/AddFileForm/FileHelpers';
 import { defaultDocumentValuesTypes } from './types';
