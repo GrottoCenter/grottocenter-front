@@ -53,7 +53,7 @@ const EntrancesListPage = () => {
         setCountyValue(hits[0]?.[0] ?? null);
       })
       .catch(() => setCountyValue(null));
-  }, [region?.id, country?.id]);
+  }, [region, country, regionId]);
 
   let initialFilter = {};
   let lockedFilter = [];
