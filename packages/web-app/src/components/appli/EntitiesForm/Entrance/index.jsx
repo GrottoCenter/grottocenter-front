@@ -83,6 +83,15 @@ export const EntranceForm = ({
   );
   const [entityType, setEntityType] = useState(entityTypeInitialValue);
 
+  const defaultFormValues = useMemo(
+    () => ({
+      entrance: { ...defaultEntranceValues, ...(entranceValues ?? {}) },
+      cave: caveValues || defaultCaveValues
+    }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  );
+
   const {
     handleSubmit,
     reset,
@@ -90,12 +99,7 @@ export const EntranceForm = ({
     getValues,
     watch,
     formState: { errors, isSubmitting, isSubmitSuccessful }
-  } = useForm({
-    defaultValues: {
-      entrance: { ...defaultEntranceValues, ...(entranceValues ?? {}) },
-      cave: caveValues || defaultCaveValues
-    }
-  });
+  } = useForm({ defaultValues: defaultFormValues });
 
   const [lat, lng, caveName, caveLanguage, entranceName, entranceLanguage] =
     watch([

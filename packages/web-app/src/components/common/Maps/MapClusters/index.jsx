@@ -275,6 +275,11 @@ const HydratedMap = ({
     }
   }, [isAuth, pendingEntranceUrl, navigate]);
 
+  const handleContextMenuClose = useCallback(() => {
+    setContextCoords(null);
+    setPendingEntranceUrl(null);
+  }, []);
+
   const handleCreateEntrance = useCallback(() => {
     const url = `/ui/entity/add/entrance?lat=${contextCoords.lat}&lng=${contextCoords.lng}`;
     setContextCoords(null);
@@ -355,7 +360,7 @@ const HydratedMap = ({
       <PopupTargetHandler popupTarget={popupTarget} />
       <Menu
         open={Boolean(contextCoords)}
-        onClose={() => { setContextCoords(null); setPendingEntranceUrl(null); }}
+        onClose={handleContextMenuClose}
         anchorReference="anchorPosition"
         anchorPosition={contextMenuAnchor}
         PaperProps={{ sx: { minWidth: 260 } }}>
