@@ -399,7 +399,7 @@ const DesktopEntityTable = ({
                         textOverflow: 'ellipsis',
                         whiteSpace: 'nowrap'
                       }}>
-                      <Translate>Export to CSV</Translate>
+                      {isSmall ? 'CSV' : <Translate>Export to CSV</Translate>}
                     </Box>
                   </Button>
                 ) : (

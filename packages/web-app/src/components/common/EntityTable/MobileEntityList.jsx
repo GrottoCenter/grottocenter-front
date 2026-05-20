@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
-import { useNavigate } from 'react-router-dom';
+import useOpenLink from '../../../hooks/useOpenLink';
 import {
   Box,
   Button,
@@ -17,7 +17,7 @@ import SearchOffIcon from '@mui/icons-material/SearchOff';
 import Translate from '../Translate';
 
 const MobileEntityCard = ({ doc, columns, link, renderCellFn, icon }) => {
-  const navigate = useNavigate();
+  const openLink = useOpenLink();
   const titleCol =
     columns.find(c => c.isTitle) ??
     columns.find(c => c.field === 'name' || c.field === 'title') ??
@@ -26,7 +26,7 @@ const MobileEntityCard = ({ doc, columns, link, renderCellFn, icon }) => {
 
   return (
     <Card sx={{ outline: '1px solid', outlineColor: 'primary.main' }}>
-      <CardActionArea onClick={() => navigate(link(doc))}>
+      <CardActionArea onClick={() => openLink(link(doc))}>
         <CardContent sx={{ py: 1, px: 1.5, '&:last-child': { pb: 1 } }}>
           <Box
             sx={{

@@ -224,7 +224,7 @@ const EntrancesSearch = ({ initialFilter = {}, lockedFilter = [] }) => {
             onChange={e => updateFilter('commentsRating.caving', e)}
           />
           <SearchSlider
-            label={`${formatMessage({ id: 'Aesthetic' })}`}
+            label={formatMessage({ id: 'Aesthetic' })}
             value={filterState['commentsRating.aestheticism']}
             onChange={e => updateFilter('commentsRating.aestheticism', e)}
           />
@@ -248,7 +248,7 @@ const EntrancesSearch = ({ initialFilter = {}, lockedFilter = [] }) => {
             />
             <SearchSlider
               icon={<DataUsageIcon color="primary" sx={{ fontSize: 24 }} />}
-              label={`${formatMessage({ id: 'Data quality' })}`}
+              label={formatMessage({ id: 'Data quality' })}
               value={filterState.dataQuality}
               min={0}
               max={100}

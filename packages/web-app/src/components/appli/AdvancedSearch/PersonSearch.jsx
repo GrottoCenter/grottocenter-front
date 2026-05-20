@@ -19,7 +19,6 @@ import SearchInput from '../../common/SearchInput';
 import { ADVANCED_SEARCH_TYPES } from '../../../conf/config';
 import { getStoredRowsPerPage } from '../../common/EntityTable';
 
-
 const TYPE_OPTIONS = [
   { value: null, labelId: 'All' },
   { value: 'CAVER', labelId: 'Cavers' },
