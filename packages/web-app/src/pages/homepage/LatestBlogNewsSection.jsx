@@ -6,9 +6,7 @@ import { useIntl } from 'react-intl';
 import GCLink from '../../components/common/GCLink';
 import LatestBlogNews from '../../containers/LatestBlogNews';
 import { frenchRssUrl, englishRssUrl } from '../../conf/apiRoutes';
-
-const FRENCH_BLOG_URL = 'https://blog-fr.grottocenter.org/';
-const ENGLISH_BLOG_URL = 'https://blog-en.grottocenter.org/';
+import { bloggerLinks } from '../../conf/externalLinks';
 
 const Section = styled('section')(({ theme }) => ({
   backgroundColor: theme.palette.primary.veryLight,
@@ -55,7 +53,7 @@ const LatestBlogNewsSection = () => {
           url={isFrench ? frenchRssUrl : englishRssUrl}
         />
         <Box sx={{ textAlign: 'center', mt: 3 }}>
-          <GCLink href={isFrench ? FRENCH_BLOG_URL : ENGLISH_BLOG_URL}>
+          <GCLink href={isFrench ? bloggerLinks.fr : bloggerLinks['*']}>
             <Typography
               variant="body2"
               color="text.secondary"

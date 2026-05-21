@@ -3,8 +3,7 @@ import { Box, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import FeedbackIcon from '@mui/icons-material/Feedback';
 import { FormattedMessage, useIntl } from 'react-intl';
-
-const CONTACT_URL = 'https://fr.wikicaves.org/contact';
+import { contactLinks } from '../../../conf/externalLinks';
 
 const FloatingAnchor = styled('a')(({ theme }) => ({
   position: 'fixed',
@@ -35,11 +34,12 @@ const FloatingAnchor = styled('a')(({ theme }) => ({
 }));
 
 const FeedbackButton = () => {
-  const { formatMessage } = useIntl();
+  const { formatMessage, locale } = useIntl();
+  const contactUrl = contactLinks[locale] ?? contactLinks['*'];
 
   return (
     <FloatingAnchor
-      href={CONTACT_URL}
+      href={contactUrl}
       target="_blank"
       rel="noopener noreferrer"
       aria-label={formatMessage({ id: 'Give feedback' })}>

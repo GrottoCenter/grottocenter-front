@@ -92,7 +92,7 @@ const Faq = () => {
   };
 
   return (
-    <FaqRoot aria-label={formatMessage({ id: 'Frequently asked questions' })}>
+    <FaqRoot>
       <Container maxWidth="md">
         <PageHeader>
           <Typography variant="h4" component="h1" color="primary" fontWeight={600} gutterBottom>

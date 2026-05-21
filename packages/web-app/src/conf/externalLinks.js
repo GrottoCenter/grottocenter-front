@@ -118,9 +118,10 @@ export const wikiApiLinks = {
 // ===== Blogger
 
 export const bloggerLinks = {
-  fr: 'http://blog-fr.grottocenter.org/',
+  fr: 'https://blog-fr.grottocenter.org/',
   '*': 'https://blog-en.grottocenter.org/'
 };
+
 
 export const oaiLinks = {
   '*': process.env.REACT_APP_OAI_URL || '#'

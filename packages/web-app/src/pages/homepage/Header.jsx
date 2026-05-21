@@ -1,12 +1,10 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Box, Button } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import { useDispatch } from 'react-redux';
 import { useIntl } from 'react-intl';
 import { fseLinks, uisLinks } from '../../conf/externalLinks';
 import InternationalizedLink from '../../components/common/InternationalizedLink';
 import GCLogo from '../../components/common/GCLogo';
-import { loadDynamicNumber } from '../../actions/DynamicNumber';
 
 const HeaderRoot = styled(Box)({
   width: '100%',
@@ -24,7 +22,7 @@ const BrandRow = styled(Box)(({ theme }) => ({
 
 const Sitename = styled('h1')({
   fontWeight: 600,
-  fontSize: 55,
+  fontSize: 'clamp(2rem, 10vw, 55px)',
   lineHeight: 1.2,
   letterSpacing: -2,
   marginBottom: 2
@@ -72,12 +70,7 @@ const LogoImage = styled(GCLogo)({
 });
 
 const Header = () => {
-  const dispatch = useDispatch();
   const { formatMessage } = useIntl();
-
-  useEffect(() => {
-    dispatch(loadDynamicNumber('entrances'));
-  }, [dispatch]);
 
   return (
     <Box component="header">
@@ -86,7 +79,9 @@ const Header = () => {
           <LogoImage />
           <Sitename>Grottocenter</Sitename>
           <Slogan>
-            {formatMessage({ id: 'The Wiki database made by cavers for cavers' })}
+            {formatMessage({
+              id: 'The Wiki database made by cavers for cavers'
+            })}
           </Slogan>
           <CTARow>
             <Button
@@ -110,7 +105,9 @@ const Header = () => {
             <SupporterLogo src="/images/UIS.svg" alt="Logo UIS" />
           </InternationalizedLink>
           <span>
-            {formatMessage({ id: 'Grottocenter is supported by the FSE and the UIS' })}
+            {formatMessage({
+              id: 'Grottocenter is supported by the FSE and the UIS'
+            })}
           </span>
         </SupporterRow>
       </HeaderRoot>

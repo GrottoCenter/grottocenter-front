@@ -4,12 +4,17 @@ import { Box, Skeleton, Typography } from '@mui/material';
 import { HandshakeOutlined } from '@mui/icons-material';
 import { styled } from '@mui/material/styles';
 import { useIntl } from 'react-intl';
-import LandingSection from './LandingSection';
-import { GridRow, GridFullColumn } from '../../helpers/GridSystem';
 import PartnersCarouselContainer from '../../containers/PartnersCarouselContainer';
 import InternationalizedLink from '../../components/common/InternationalizedLink';
 import { fseLinks, uisLinks } from '../../conf/externalLinks';
 import { loadDynamicNumber } from '../../actions/DynamicNumber';
+
+const Section = styled('section')(({ theme }) => ({
+  padding: '32px 24px',
+  [theme.breakpoints.down('sm')]: {
+    padding: '24px 16px'
+  }
+}));
 
 const TitleRow = styled(Box)({
   display: 'flex',
@@ -18,7 +23,6 @@ const TitleRow = styled(Box)({
   gap: 10,
   paddingBottom: '4px'
 });
-
 
 const SupporterRow = styled(Box)({
   display: 'flex',
@@ -52,8 +56,8 @@ const PartnersSection = () => {
   }, [dispatch]);
 
   return (
-    <LandingSection>
-      <GridRow>
+    <Section>
+      <Box>
         <TitleRow>
           <HandshakeOutlined color="primary" sx={{ fontSize: 28 }} />
           <Typography variant="h5" component="h2" fontWeight={600} color="primary">
@@ -73,26 +77,24 @@ const PartnersSection = () => {
             id: 'take part in the project by funding, providing data, communicating on the interest and benefits of cavers to share data.'
           })}
         </Description>
-      </GridRow>
-      <GridRow>
-        <GridFullColumn>
-          <PartnersCarouselContainer />
-          <SupporterRow>
-            <InternationalizedLink links={fseLinks}>
-              <SupporterLogo src="/images/FSE.svg" alt="Logo FSE" />
-            </InternationalizedLink>
-            <InternationalizedLink links={uisLinks}>
-              <SupporterLogo src="/images/UIS.svg" alt="Logo UIS" />
-            </InternationalizedLink>
-            <Typography variant="body2" color="text.secondary">
-              {formatMessage({
-                id: 'Grottocenter is supported by the FSE and the UIS'
-              })}
-            </Typography>
-          </SupporterRow>
-        </GridFullColumn>
-      </GridRow>
-    </LandingSection>
+      </Box>
+      <Box>
+        <PartnersCarouselContainer />
+        <SupporterRow>
+          <InternationalizedLink links={fseLinks}>
+            <SupporterLogo src="/images/FSE.svg" alt="Logo FSE" />
+          </InternationalizedLink>
+          <InternationalizedLink links={uisLinks}>
+            <SupporterLogo src="/images/UIS.svg" alt="Logo UIS" />
+          </InternationalizedLink>
+          <Typography variant="body2" color="text.secondary">
+            {formatMessage({
+              id: 'Grottocenter is supported by the FSE and the UIS'
+            })}
+          </Typography>
+        </SupporterRow>
+      </Box>
+    </Section>
   );
 };
 

@@ -46,8 +46,9 @@ function subEntitygroupFmt(entities, formatMessage) {
   if (entities.length === 0) return '';
   if (entities.length === 1) return entityFmt(entities[0], formatMessage);
 
-  const lastEntity = entityFmt(entities.pop(), formatMessage);
+  const lastEntity = entityFmt(entities[entities.length - 1], formatMessage);
   const otherEntities = entities
+    .slice(0, -1)
     .map(e => entityFmt(e, formatMessage))
     .join(' ');
   return `${otherEntities} ${formatMessage({ id: 'and' })} ${lastEntity}`;
