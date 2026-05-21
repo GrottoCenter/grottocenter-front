@@ -1,12 +1,16 @@
 import React from 'react';
+import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
+  Box,
+  Container,
+  Link,
+  Typography
+} from '@mui/material';
+import { alpha, styled } from '@mui/material/styles';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { useIntl } from 'react-intl';
-import PropTypes from 'prop-types';
-import CheckIcon from '@mui/icons-material/Check';
-import Card from '@mui/material/Card';
-import CardTitle from '@mui/material/CardHeader';
-import CardText from '@mui/material/CardContent';
-import Collapse from '@mui/material/Collapse';
-import { styled } from '@mui/material/styles';
 import { useSelector } from 'react-redux';
 import GCLink from '../common/GCLink';
 import InternationalizedLink from '../common/InternationalizedLink';
@@ -15,54 +19,63 @@ import {
   contributorsLink,
   contributeLinks
 } from '../../conf/externalLinks';
-import Translate from '../common/Translate';
 
-const FaqDiv = styled('div')`
-  margin: 20px;
-`;
+const FaqRoot = styled('main')(({ theme }) => ({
+  backgroundColor: theme.palette.background.default,
+  minHeight: '60vh',
+  padding: '48px 0 64px'
+}));
 
-const StyledCard = styled(Card)({
-  marginBottom: '20px'
-});
-
-const StyledCardHeader = styled(CardTitle)(({ theme }) => ({
-  backgroundColor: theme.palette.secondary1Color,
-  '& .MuiCardHeader-title': {
-    color: theme.palette.secondaryBlocTitle
+const PageHeader = styled(Box)(({ theme }) => ({
+  textAlign: 'center',
+  marginBottom: 40,
+  [theme.breakpoints.down('sm')]: {
+    marginBottom: 24
   }
 }));
 
-const StyledCardText = styled(CardText)(({ theme }) => ({
-  backgroundColor: theme.palette.textIconColor
+const StyledAccordion = styled(Accordion)({
+  marginBottom: 8,
+  '&:before': { display: 'none' },
+  borderRadius: '8px !important',
+  boxShadow: '0 1px 4px rgba(0,0,0,0.08)',
+  overflow: 'hidden'
+});
+
+const StyledSummary = styled(AccordionSummary)(({ theme }) => ({
+  backgroundColor: alpha(theme.palette.primary.main, 0.08),
+  color: theme.palette.text.primary,
+  borderLeft: `4px solid ${theme.palette.primary.light}`,
+  '& .MuiAccordionSummary-expandIconWrapper': {
+    color: theme.palette.primary.main
+  },
+  '&.Mui-expanded': {
+    minHeight: 48,
+    backgroundColor: theme.palette.primary.main,
+    color: 'white',
+    borderLeftColor: theme.palette.primary.main,
+    '& .MuiAccordionSummary-expandIconWrapper': {
+      color: 'white'
+    }
+  }
 }));
 
-const ItemList = styled('ul')`
-  list-style-type: none;
-`;
-
-const StyledCheckIcon = styled(CheckIcon)(({ theme }) => ({
-  color: theme.palette.accent1Color
+const StyledDetails = styled(AccordionDetails)(({ theme }) => ({
+  padding: theme.spacing(3),
+  '& a': {
+    color: theme.palette.primary.main,
+    textDecoration: 'underline'
+  }
 }));
-const FaqCard = ({ title, children }) => {
-  const [show, setShow] = React.useState(false);
-  return (
-    <StyledCard>
-      <StyledCardHeader
-        title={<Translate id={title} />}
-        onClick={() => setShow(prev => !prev)}
-      />
 
-      <Collapse in={show} timeout="auto" unmountOnExit>
-        <StyledCardText>{children}</StyledCardText>
-      </Collapse>
-    </StyledCard>
-  );
-};
-
-FaqCard.propTypes = {
-  title: PropTypes.string.isRequired,
-  children: PropTypes.node.isRequired
-};
+const FAQ_ITEMS = [
+  'protection',
+  'quality',
+  'help',
+  'buddy',
+  'who',
+  'data-sharing'
+];
 
 const Faq = () => {
   const { formatMessage } = useIntl();
@@ -72,113 +85,148 @@ const Faq = () => {
       ? contributeLinks[locale]
       : contributeLinks['*'];
 
+  const [expanded, setExpanded] = React.useState(FAQ_ITEMS[0]);
+
+  const handleChange = panel => (_event, isExpanded) => {
+    setExpanded(isExpanded ? panel : false);
+  };
+
   return (
-    <FaqDiv>
-      <FaqCard
-        title={formatMessage({
-          id: 'I would like to share some of my work but some caves should remain protected. How are you planning to protect them?'
-        })}>
-        <Translate id="Here is the procedure that will be implemented in next version of GrottoCenter. Is that acceptable for you?" />
-        <br />
-        <GCLink href={pftGdLink} alt="Link to google document">
-          {pftGdLink}
-        </GCLink>
-      </FaqCard>
+    <FaqRoot aria-label={formatMessage({ id: 'Frequently asked questions' })}>
+      <Container maxWidth="md">
+        <PageHeader>
+          <Typography variant="h4" component="h1" color="primary" fontWeight={600} gutterBottom>
+            {formatMessage({ id: 'Frequently asked questions' })}
+          </Typography>
+          <Typography variant="body1" color="text.secondary">
+            {formatMessage({ id: 'Find answers to common questions about GrottoCenter' })}
+          </Typography>
+        </PageHeader>
 
-      <FaqCard
-        title={formatMessage({
-          id: 'How can you guarantee the quality of the data on GrottoCenter?'
-        })}>
-        <Translate id="The Wikicaves association has signed partnership with clubs and federations which provide data and which are informed of all the actions carried out. Besides we have routine softwares that regularly check the quality of the data." />
-      </FaqCard>
+        <Box component="section">
+          <StyledAccordion
+            expanded={expanded === 'protection'}
+            onChange={handleChange('protection')}>
+            <StyledSummary expandIcon={<ExpandMoreIcon />}>
+              <Typography component="h2" variant="subtitle1" fontWeight={500}>
+                {formatMessage({
+                  id: 'I would like to share some of my work but some caves should remain protected. How are you planning to protect them?'
+                })}
+              </Typography>
+            </StyledSummary>
+            <StyledDetails>
+              <Typography variant="body2" paragraph>
+                {formatMessage({
+                  id: 'Cave protection is a priority. A procedure has been defined for sensitive locations.'
+                })}
+              </Typography>
+              <Link href={pftGdLink} target="_blank" rel="noopener noreferrer">
+                {formatMessage({ id: 'View the protection procedure document' })}
+              </Link>
+            </StyledDetails>
+          </StyledAccordion>
 
-      <FaqCard
-        title={formatMessage({
-          id: 'I find your project interesting: How can I help?'
-        })}>
-        <ItemList className="listing">
-          <li>
-            <StyledCheckIcon />
-            <Translate
-              id="You can show your support by  joining  Grottocenter {0}"
-              values={{
-                0: (
-                  <GCLink href={contributeLink} alt="Link to become a member">
-                    <Translate key="member" id="as active member" />
-                  </GCLink>
-                )
-              }}
-            />
-          </li>
-          <li>
-            <StyledCheckIcon />
-            <Translate
-              id="Here is another way: In order to share with the greatest number, we are  always  {0}"
-              values={{
-                0: (
-                  <GCLink
-                    href={contributeLink}
-                    alt="Link to become a translator">
-                    <Translate key="translator" id="looking for translators" />
-                  </GCLink>
-                )
-              }}
-            />
-          </li>
-          <li>
-            <StyledCheckIcon />
-            <Translate
-              id="If you have programming skills how about  {0}"
-              values={{
-                0: (
-                  <GCLink
-                    href={contributeLink}
-                    alt="Link to become a developer">
-                    <Translate key="developer" id="joining our team of developers" />
-                  </GCLink>
-                )
-              }}
-            />
-          </li>
-          <li>
-            <StyledCheckIcon />
-            <Translate
-              id="As a group, a club or  federation,  {0} : The project will move on thanks to  organizations such as yours"
-              values={{
-                0: (
-                  <GCLink href={contributeLink} alt="Link to become a partner">
-                    <Translate key="partner" id="you can be  one of our partners" />
-                  </GCLink>
-                )
-              }}
-            />
-          </li>
-        </ItemList>
-      </FaqCard>
+          <StyledAccordion
+            expanded={expanded === 'quality'}
+            onChange={handleChange('quality')}>
+            <StyledSummary expandIcon={<ExpandMoreIcon />}>
+              <Typography component="h2" variant="subtitle1" fontWeight={500}>
+                {formatMessage({
+                  id: 'How can you guarantee the quality of the data on GrottoCenter?'
+                })}
+              </Typography>
+            </StyledSummary>
+            <StyledDetails>
+              <Typography variant="body2">
+                {formatMessage({
+                  id: 'The Wikicaves association collaborates with clubs and federations to validate data. Automated quality checks run regularly.'
+                })}
+              </Typography>
+            </StyledDetails>
+          </StyledAccordion>
 
-      <FaqCard
-        title={formatMessage({
-          id: 'One of my caving buddies told me I should NOT post anything at all on GrottoCenter. That sometimes makes it hard to contribute!'
-        })}>
-        <Translate id="Yes, it may be very difficult!!!! But perhaps we should all be aware that the world is changing." />
-      </FaqCard>
+          <StyledAccordion
+            expanded={expanded === 'help'}
+            onChange={handleChange('help')}>
+            <StyledSummary expandIcon={<ExpandMoreIcon />}>
+              <Typography component="h2" variant="subtitle1" fontWeight={500}>
+                {formatMessage({
+                  id: 'I find your project interesting: How can I help?'
+                })}
+              </Typography>
+            </StyledSummary>
+            <StyledDetails>
+              <Typography variant="body2" paragraph>
+                {formatMessage({
+                  id: 'You can help as an active member, translator, developer, or partner organisation.'
+                })}
+              </Typography>
+              <GCLink href={contributeLink}>
+                {formatMessage({ id: 'Contributors page' })}
+              </GCLink>
+            </StyledDetails>
+          </StyledAccordion>
 
-      <FaqCard title={formatMessage({ id: 'Who is behind GrottoCenter?' })}>
-        <Translate id="We have our wiki: this is where you can find us." />
-        <br />
-        <InternationalizedLink
-          links={contributorsLink}
-          alt="Link to contribution page"
-        />
-      </FaqCard>
+          <StyledAccordion
+            expanded={expanded === 'buddy'}
+            onChange={handleChange('buddy')}>
+            <StyledSummary expandIcon={<ExpandMoreIcon />}>
+              <Typography component="h2" variant="subtitle1" fontWeight={500}>
+                {formatMessage({
+                  id: 'One of my caving buddies told me I should NOT post anything at all on GrottoCenter. That sometimes makes it hard to contribute!'
+                })}
+              </Typography>
+            </StyledSummary>
+            <StyledDetails>
+              <Typography variant="body2">
+                {formatMessage({
+                  id: 'It can feel daunting, but the caving world is evolving. Sharing data responsibly helps the whole community.'
+                })}
+              </Typography>
+            </StyledDetails>
+          </StyledAccordion>
 
-      <FaqCard
-        title={formatMessage({
-          id: 'I want to share my data only with fellow cavers. Is it possible on GrottoCenter?'
-        })}>
-        <Translate id="On GrottoCenter, data is placed under free licence, it is accessible to all those who may need it." />
-      </FaqCard>
-    </FaqDiv>
+          <StyledAccordion
+            expanded={expanded === 'who'}
+            onChange={handleChange('who')}>
+            <StyledSummary expandIcon={<ExpandMoreIcon />}>
+              <Typography component="h2" variant="subtitle1" fontWeight={500}>
+                {formatMessage({ id: 'Who is behind GrottoCenter?' })}
+              </Typography>
+            </StyledSummary>
+            <StyledDetails>
+              <Typography variant="body2" paragraph>
+                {formatMessage({
+                  id: 'GrottoCenter is built and maintained by the Wikicaves association and a community of volunteer contributors.'
+                })}
+              </Typography>
+              <InternationalizedLink links={contributorsLink}>
+                {formatMessage({ id: 'Contributors page' })}
+              </InternationalizedLink>
+            </StyledDetails>
+          </StyledAccordion>
+
+          <StyledAccordion
+            expanded={expanded === 'data-sharing'}
+            onChange={handleChange('data-sharing')}>
+            <StyledSummary expandIcon={<ExpandMoreIcon />}>
+              <Typography component="h2" variant="subtitle1" fontWeight={500}>
+                {formatMessage({
+                  id: 'I want to share my data only with fellow cavers. Is it possible on GrottoCenter?'
+                })}
+              </Typography>
+            </StyledSummary>
+            <StyledDetails>
+              <Typography variant="body2">
+                {formatMessage({
+                  id: 'On GrottoCenter, data is published under a free licence and is accessible to anyone who needs it.'
+                })}
+              </Typography>
+            </StyledDetails>
+          </StyledAccordion>
+        </Box>
+      </Container>
+    </FaqRoot>
   );
 };
 
