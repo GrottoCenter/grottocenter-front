@@ -7,9 +7,9 @@ import GCLink from '../../components/common/GCLink';
 
 const WelcomeSection = styled(Box)(({ theme }) => ({
   backgroundColor: brown[50],
-  padding: '48px 24px',
+  padding: '40px 20px',
   [theme.breakpoints.down('sm')]: {
-    padding: '24px 16px'
+    padding: '24px 20px'
   }
 }));
 
