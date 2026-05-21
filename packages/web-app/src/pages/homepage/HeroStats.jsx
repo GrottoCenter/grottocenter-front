@@ -83,7 +83,10 @@ const HeroStats = () => {
           const stat = dynamicNumber?.[key];
           return (
             <Grid key={key} size={{ xs: 4, md: 2 }}>
-              <StatItem internal href={href}>
+              <StatItem
+                internal
+                href={href}
+                aria-label={`${stat?.number ? stat.number.toLocaleString() + ' ' : staticValue ? staticValue + ' ' : ''}${formatMessage({ id: labelId })}`}>
                 <Box
                   sx={{
                     display: 'flex',

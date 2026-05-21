@@ -56,7 +56,7 @@ const PartnersSection = () => {
       <GridRow>
         <TitleRow>
           <HandshakeOutlined color="primary" sx={{ fontSize: 28 }} />
-          <Typography variant="h5" fontWeight={600} color="primary">
+          <Typography variant="h5" component="h2" fontWeight={600} color="primary">
             {officialPartners?.isFetching ? (
               <Skeleton variant="text" width={120} />
             ) : (

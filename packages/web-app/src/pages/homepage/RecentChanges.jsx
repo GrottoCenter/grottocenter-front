@@ -5,7 +5,7 @@ import { styled } from '@mui/material/styles';
 import { useIntl } from 'react-intl';
 import RecentChangesContainer from '../../containers/RecentChangesContainer';
 
-const Section = styled(Box)(({ theme }) => ({
+const Section = styled('section')(({ theme }) => ({
   backgroundColor: theme.palette.background.default,
   padding: '32px 24px',
   [theme.breakpoints.down('sm')]: {
@@ -29,10 +29,15 @@ const Inner = styled(Box)({
 const RecentChanges = () => {
   const { formatMessage } = useIntl();
   return (
-    <Section>
+    <Section aria-labelledby="recent-changes-title">
       <TitleRow>
         <HistoryOutlined color="primary" sx={{ fontSize: 28 }} />
-        <Typography variant="h5" fontWeight={600} color="primary">
+        <Typography
+          id="recent-changes-title"
+          variant="h5"
+          component="h2"
+          fontWeight={600}
+          color="primary">
           {formatMessage({ id: 'Recent changes' })}
         </Typography>
       </TitleRow>

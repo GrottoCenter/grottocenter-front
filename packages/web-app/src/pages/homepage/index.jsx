@@ -1,26 +1,27 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, Suspense, lazy } from 'react';
+import { Box } from '@mui/material';
 import { useLocation } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { styled } from '@mui/material/styles';
 
 import { displayLoginDialog } from '../../actions/Login';
+import { usePermissions } from '../../hooks';
 
 import Header from './Header';
 import HeroStats from './HeroStats';
 import Welcome from './Welcome';
-import LatestBlogNewsSection from './LatestBlogNewsSection';
-import Association from './Association';
-import RandomEntry from './RandomEntry';
-import RecentChanges from './RecentChanges';
-import PartnersSection from './PartnersSection';
 import Footer from './Footer';
-
-import { usePermissions } from '../../hooks';
 import FeedbackButton from '../../components/common/FeedbackButton';
 
-const HomepageWrapper = styled('div')`
-  font-family: Roboto, Helvetica, Arial, sans-serif;
-`;
+const RandomEntry = lazy(() => import('./RandomEntry'));
+const RecentChanges = lazy(() => import('./RecentChanges'));
+const LatestBlogNewsSection = lazy(() => import('./LatestBlogNewsSection'));
+const Association = lazy(() => import('./Association'));
+const PartnersSection = lazy(() => import('./PartnersSection'));
+
+const HomepageWrapper = styled('div')({
+  fontFamily: 'Roboto, Helvetica, Arial, sans-serif'
+});
 
 const HomePage = () => {
   const location = useLocation();
@@ -40,13 +41,17 @@ const HomePage = () => {
   return (
     <HomepageWrapper>
       <Header />
-      <HeroStats />
-      <Welcome />
-      <RandomEntry />
-      <RecentChanges />
-      <LatestBlogNewsSection />
-      <Association />
-      <PartnersSection />
+      <Box component="main">
+        <HeroStats />
+        <Welcome />
+        <Suspense fallback={<Box sx={{ minHeight: 200 }} />}>
+          <RandomEntry />
+          <RecentChanges />
+          <LatestBlogNewsSection />
+          <Association />
+          <PartnersSection />
+        </Suspense>
+      </Box>
       <Footer />
       <FeedbackButton />
     </HomepageWrapper>

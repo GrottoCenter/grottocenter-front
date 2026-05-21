@@ -5,7 +5,7 @@ import { brown } from '@mui/material/colors';
 import { useIntl } from 'react-intl';
 import GCLink from '../../components/common/GCLink';
 
-const WelcomeSection = styled(Box)(({ theme }) => ({
+const WelcomeSection = styled('section')(({ theme }) => ({
   backgroundColor: brown[50],
   padding: '40px 20px',
   [theme.breakpoints.down('sm')]: {
@@ -50,12 +50,13 @@ const Welcome = () => {
   const { formatMessage } = useIntl();
 
   return (
-    <WelcomeSection>
+    <WelcomeSection aria-label={formatMessage({ id: 'Free access' })}>
+
       <Inner>
         <Grid container spacing={{ xs: 2, sm: 4 }}>
           {BLOCKS.map(({ titleId, textIds }) => (
             <Grid key={titleId} size={{ xs: 12, sm: 4 }}>
-              <BlockTitle variant="h6" sx={{ mb: { xs: '4px', sm: 1 } }}>
+              <BlockTitle variant="h6" component="h2" sx={{ mb: { xs: '4px', sm: 1 } }}>
                 {formatMessage({ id: titleId })}
               </BlockTitle>
               <Typography variant="body2" color="text.secondary">

@@ -7,10 +7,10 @@ import { useIntl } from 'react-intl';
 import { loadRandomEntrance } from '../../actions/RandomEntrance';
 import RandomEntryCardContainer from '../../containers/RandomEntryCardContainer';
 
-const Section = styled(Box)(({ theme }) => ({
+const Section = styled('section')(({ theme }) => ({
   backgroundColor: theme.palette.primary.main,
   padding: '32px 24px',
-  '@media (max-width: 550px)': {
+  [theme.breakpoints.down('sm')]: {
     padding: '24px 16px'
   }
 }));
@@ -32,10 +32,15 @@ const RandomEntry = () => {
   }, [dispatch]);
 
   return (
-    <Section>
+    <Section aria-labelledby="random-entry-title">
       <TitleRow>
         <ExploreOutlined sx={{ fontSize: 28, color: 'white' }} />
-        <Typography variant="h5" fontWeight={600} color="white">
+        <Typography
+          id="random-entry-title"
+          variant="h5"
+          component="h2"
+          fontWeight={600}
+          color="white">
           {formatMessage({ id: 'Discover a random cave' })}
         </Typography>
       </TitleRow>

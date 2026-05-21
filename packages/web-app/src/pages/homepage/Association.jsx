@@ -17,7 +17,7 @@ import { wikicavesLink } from '../../conf/externalLinks';
 const DONATE_URL =
   'https://www.helloasso.com/associations/wikicaves/formulaires/1';
 
-const Section = styled(Box)(({ theme }) => ({
+const Section = styled('section')(({ theme }) => ({
   backgroundColor: theme.palette.primary.main,
   padding: '32px 24px',
   [theme.breakpoints.down('sm')]: {
@@ -82,7 +82,7 @@ const Association = () => {
   const { formatMessage } = useIntl();
 
   return (
-    <Section>
+    <Section aria-labelledby="association-title">
       <Inner>
         <Box
           sx={{
@@ -105,7 +105,9 @@ const Association = () => {
             <GCLogo showLink={false} />
           </Box>
           <Typography
+            id="association-title"
             variant="h5"
+            component="h2"
             fontWeight={600}
             sx={{ color: 'secondary.main' }}>
             {formatMessage({ id: 'Wikicaves association' })}

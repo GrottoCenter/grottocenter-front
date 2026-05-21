@@ -2,7 +2,7 @@ import React from 'react';
 import { Box, Typography } from '@mui/material';
 import { FeedOutlined } from '@mui/icons-material';
 import { styled } from '@mui/material/styles';
-import { useIntl, FormattedMessage } from 'react-intl';
+import { useIntl } from 'react-intl';
 import GCLink from '../../components/common/GCLink';
 import LatestBlogNews from '../../containers/LatestBlogNews';
 import { frenchRssUrl, englishRssUrl } from '../../conf/apiRoutes';
@@ -10,7 +10,7 @@ import { frenchRssUrl, englishRssUrl } from '../../conf/apiRoutes';
 const FRENCH_BLOG_URL = 'https://blog-fr.grottocenter.org/';
 const ENGLISH_BLOG_URL = 'https://blog-en.grottocenter.org/';
 
-const Section = styled(Box)(({ theme }) => ({
+const Section = styled('section')(({ theme }) => ({
   backgroundColor: theme.palette.primary.veryLight,
   padding: '32px 24px',
   [theme.breakpoints.down('sm')]: {
@@ -32,15 +32,20 @@ const Inner = styled(Box)({
 });
 
 const LatestBlogNewsSection = () => {
-  const { locale } = useIntl();
+  const { locale, formatMessage } = useIntl();
   const isFrench = locale.startsWith('fr');
 
   return (
-    <Section>
+    <Section aria-labelledby="news-title">
       <TitleRow>
         <FeedOutlined color="primary" sx={{ fontSize: 28 }} />
-        <Typography variant="h5" fontWeight={600} color="primary">
-          <FormattedMessage id="News" />
+        <Typography
+          id="news-title"
+          variant="h5"
+          component="h2"
+          fontWeight={600}
+          color="primary">
+          {formatMessage({ id: 'News' })}
         </Typography>
       </TitleRow>
       <Inner>
@@ -58,7 +63,7 @@ const LatestBlogNewsSection = () => {
                 cursor: 'pointer',
                 '&:hover': { color: 'text.primary' }
               }}>
-              <FormattedMessage id="See all news" />
+              {formatMessage({ id: 'See all news' })}
             </Typography>
           </GCLink>
         </Box>
