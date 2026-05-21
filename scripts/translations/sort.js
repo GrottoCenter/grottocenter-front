@@ -11,8 +11,16 @@ const filePaths = process.argv.filter(a => a !== '--check').slice(2);
 const sortComparator = (a, b) =>
   a.toLowerCase().localeCompare(b.toLowerCase()) || a.localeCompare(b);
 
+// Detect the indentation used in a JSON file by looking at the first indented line.
+// Assumes flat key-value JSON with uniform indentation.
+function detectIndent(content) {
+  const match = content.match(/^(\s+)"/m);
+  return match ? match[1] : '  ';
+}
+
 function sortFile(filePath) {
   const raw = fs.readFileSync(filePath, 'utf8').replace(/^\uFEFF/, '');
+  const indent = detectIndent(raw);
   const data = JSON.parse(raw);
   const sortedKeys = Object.keys(data).sort(sortComparator);
 
@@ -21,7 +29,7 @@ function sortFile(filePath) {
     sortedData[key] = data[key];
   });
 
-  const sortedContent = `${JSON.stringify(sortedData, null, 2)}\n`;
+  const sortedContent = `${JSON.stringify(sortedData, null, indent)}\n`;
   const currentContent = raw;
 
   if (currentContent === sortedContent) {

@@ -232,7 +232,7 @@ const DesktopEntityTable = ({
   }, []);
 
   const handleRowClick = (event, doc) => {
-    if (onSelected) {
+    if (onSelected && !onRowClick) {
       handleRowSelect(event, doc);
       return;
     }

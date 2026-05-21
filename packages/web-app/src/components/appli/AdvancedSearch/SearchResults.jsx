@@ -48,7 +48,6 @@ const SearchResults = ({ onSelected, hideExport, entityType, compact }) => {
             }
       }
       onSelected={!onSelected ? null : ids => onSelected(ids, results)}
-      onRowClick={onSelected ? () => false : null}
       compact={compact}
     />
   );
