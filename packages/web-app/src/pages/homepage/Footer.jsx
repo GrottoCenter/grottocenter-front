@@ -129,10 +129,8 @@ const Footer = () => {
                 }}>
                 <GCLogo showLink={false} />
               </Box>
-              <Typography
-                variant="subtitle2"
-                sx={{ color: 'white', fontWeight: 600 }}>
-                GrottoCenter
+              <Typography variant="h6" sx={{ color: 'white', fontWeight: 600 }}>
+                Grottocenter
               </Typography>
             </Box>
             <Typography
@@ -286,7 +284,9 @@ const Footer = () => {
           <InternationalizedLink links={licenceLinks}>
             <LicenseBadge src="/images/CC-BY-SA.png" alt="CC-BY-SA licence" />
           </InternationalizedLink>
-          <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.45)', minWidth: 0 }}>
+          <Typography
+            variant="caption"
+            sx={{ color: 'rgba(255,255,255,0.45)', minWidth: 0 }}>
             {formatMessage({
               id: 'Unless stated otherwise, the CC-BY-SA license applies for documents and texts subject to copyright.'
             })}
@@ -296,7 +296,9 @@ const Footer = () => {
           <InternationalizedLink links={licensesODBLink}>
             <LicenseBadge src="/images/odbl.png" alt="ODbL licence" />
           </InternationalizedLink>
-          <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.45)', minWidth: 0 }}>
+          <Typography
+            variant="caption"
+            sx={{ color: 'rgba(255,255,255,0.45)', minWidth: 0 }}>
             {formatMessage({
               id: 'The ODBL license applies to all data that is not copyrighted.'
             })}
