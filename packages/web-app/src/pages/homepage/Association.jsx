@@ -1,156 +1,181 @@
 import React from 'react';
-import { styled, useTheme } from '@mui/material/styles';
-import LandingSection from './LandingSection';
+import { Box, Button, Grid, Typography } from '@mui/material';
 import {
-  GridRow,
-  GridOneThirdColumn,
-  GridTwoThirdColumn,
-  GridFullColumn
-} from '../../helpers/GridSystem';
-import AssociationCheckList from './AssociationCheckList';
-import AssociationFlyingGoals from './AssociationFlyingGoals';
-import Translate from '../../components/common/Translate';
+  CampaignOutlined,
+  NatureOutlined,
+  FavoriteBorder,
+  LockOpenOutlined,
+  ScienceOutlined,
+  ShareOutlined
+} from '@mui/icons-material';
+import { styled } from '@mui/material/styles';
+import { useIntl } from 'react-intl';
 import GCLogo from '../../components/common/GCLogo';
 
-const AssociationTitle = styled('h3')`
-  color: ${props => props.color};
-  text-align: center;
-  padding-bottom: 50px;
-  font-size: 35px;
+const DONATE_URL =
+  'https://www.helloasso.com/associations/wikicaves/formulaires/1';
 
-  @media (min-width: 550px) {
-    text-align: left;
-  }
-`;
-
-const AssociationDetails = styled('h5')`
-  font-size: large;
-  text-align: justify;
-`;
-
-const AssociationLogo = styled('div')(({ theme }) => ({
-  padding: '20px 10px',
-  minWidth: 100,
-  backgroundColor: theme.palette.primary.veryLight,
-  '@media (min-width: 750px)': {
-    margin: '20px 0 20px 40px'
+const Section = styled(Box)(({ theme }) => ({
+  backgroundColor: theme.palette.primary.main,
+  padding: '32px 24px',
+  [theme.breakpoints.down('sm')]: {
+    padding: '24px 16px'
   }
 }));
 
-const AssociationLogoImage = styled(GCLogo)`
-  & > img {
-    max-width: 200px;
-    width: 100%;
-    scale: 50%;
+const Inner = styled(Box)({
+  maxWidth: 900,
+  margin: '0 auto'
+});
+
+const GoalCard = styled(Box)({
+  backgroundColor: 'rgba(255,255,255,0.07)',
+  borderRadius: 8,
+  padding: '20px 16px',
+  height: '100%',
+  display: 'flex',
+  flexDirection: 'column',
+  gap: 8,
+  transition: 'background-color 0.2s',
+  '&:hover': { backgroundColor: 'rgba(255,255,255,0.12)' }
+});
+
+const GOALS = [
+  {
+    key: 'promote',
+    Icon: CampaignOutlined,
+    wordId: 'Promote!',
+    descId:
+      'Promote the development of the speleology in the world especially through web-based collaboration.'
+  },
+  {
+    key: 'share',
+    Icon: ShareOutlined,
+    wordId: 'Share!',
+    descId: 'Share and spread the data related to the speleology'
+  },
+  {
+    key: 'open',
+    Icon: LockOpenOutlined,
+    wordId: 'Open!',
+    descId:
+      'Make access to the natural caves data easier especially by using Internet'
+  },
+  {
+    key: 'highlight',
+    Icon: NatureOutlined,
+    wordId: 'Highlight!',
+    descId:
+      'Highlight and help the protection of the natural caves and their surroundings'
+  },
+  {
+    key: 'help',
+    Icon: ScienceOutlined,
+    wordId: 'Help!',
+    descId: 'Help the exploration and the scientific study of natural caves'
   }
-`;
-
-const AssociationSection = styled(LandingSection)`
-  text-align: center;
-`;
-
-const listEntries = {
-  title: (
-    <Translate>
-      The international voluntary association WikiCaves operates the
-      GrottoCenter web application WikiCaves has as goals:
-    </Translate>
-  ),
-  entries: [
-    {
-      word: <Translate>Promote!</Translate>,
-      description: (
-        <Translate>
-          Promote the development of the speleology in the world especially
-          through web-based collaboration.
-        </Translate>
-      )
-    },
-    {
-      word: <Translate>Share!</Translate>,
-      description: (
-        <Translate>
-          Share and spread the data related to the speleology
-        </Translate>
-      )
-    },
-    {
-      word: <Translate>Open!</Translate>,
-      description: (
-        <Translate>
-          Make access to the natural caves data easier especially by using
-          Internet
-        </Translate>
-      )
-    },
-    {
-      word: <Translate>Highlight!</Translate>,
-      description: (
-        <Translate>
-          Highlight and help the protection of the natural caves and their
-          surroundings
-        </Translate>
-      )
-    },
-    {
-      word: <Translate>Help!</Translate>,
-      description: (
-        <Translate>
-          Help the exploration and the scientific study of natural caves
-        </Translate>
-      )
-    }
-  ]
-};
+];
 
 const Association = () => {
-  const { palette } = useTheme();
+  const { formatMessage } = useIntl();
 
   return (
-    <AssociationSection
-      bgColor={palette.primary1Color}
-      fgColor={palette.textIconColor}>
-      <GridRow>
-        <GridTwoThirdColumn>
-          <AssociationTitle color={palette.accent1Color}>
-            <Translate>Wikicaves association</Translate>
-          </AssociationTitle>
-          <AssociationDetails>
-            <Translate>
-              GrottoCenter is a community database for cavers based on a
-              wiki-like system Cavers fill the databases for cavers
-            </Translate>
-            <br />
-            <Translate>
-              Any interesting natural cave can be added in the database!
-            </Translate>
-          </AssociationDetails>
-        </GridTwoThirdColumn>
+    <Section>
+      <Inner>
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 2,
+            mb: 3,
+            flexWrap: 'wrap'
+          }}>
+          <Box
+            sx={{
+              backgroundColor: 'rgba(255,255,255,0.92)',
+              borderRadius: 2,
+              p: '6px 10px',
+              display: 'flex',
+              alignItems: 'center',
+              '& img': { width: 56, height: 'auto' }
+            }}>
+            <GCLogo showLink={false} />
+          </Box>
+          <Typography
+            variant="h5"
+            fontWeight={600}
+            sx={{ color: 'secondary.main' }}>
+            {formatMessage({ id: 'Wikicaves association' })}
+          </Typography>
+        </Box>
 
-        <GridOneThirdColumn>
-          <AssociationLogo>
-            <AssociationLogoImage showLink={false} />
-          </AssociationLogo>
-        </GridOneThirdColumn>
-      </GridRow>
+        <Typography
+          variant="body1"
+          sx={{
+            color: 'rgba(255,255,255,0.85)',
+            textAlign: 'center',
+            mb: 4,
+            maxWidth: 640,
+            mx: 'auto'
+          }}>
+          {formatMessage({
+            id: 'The international voluntary association WikiCaves operates the GrottoCenter web application WikiCaves has as goals:'
+          })}
+        </Typography>
 
-      <GridRow>
-        <GridFullColumn>
-          <AssociationCheckList
-            title={listEntries.title}
-            entries={listEntries.entries}
-          />
+        <Grid container spacing={2} sx={{ mb: 4 }}>
+          {GOALS.map(({ key, Icon, wordId, descId }) => (
+            <Grid key={key} size={{ xs: 12, sm: 6, md: 4 }}>
+              <GoalCard>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <Icon sx={{ color: 'secondary.main', fontSize: 22 }} />
+                  <Typography
+                    variant="subtitle2"
+                    fontWeight={700}
+                    sx={{ color: 'white' }}>
+                    {formatMessage({ id: wordId })}
+                  </Typography>
+                </Box>
+                <Typography
+                  variant="body2"
+                  sx={{ color: 'rgba(255,255,255,0.7)' }}>
+                  {formatMessage({ id: descId })}
+                </Typography>
+              </GoalCard>
+            </Grid>
+          ))}
+        </Grid>
 
-          <AssociationFlyingGoals
-            title={listEntries.title}
-            entries={listEntries.entries}
-            textColor={palette.textIconColor}
-            iconColor={palette.primary3Color}
-            iconHoverColor={palette.accent1Color}
-          />
-        </GridFullColumn>
-      </GridRow>
-    </AssociationSection>
+        <Typography
+          variant="body2"
+          sx={{
+            color: 'rgba(255,255,255,0.55)',
+            textAlign: 'center',
+            mb: 4,
+            maxWidth: 680,
+            mx: 'auto'
+          }}>
+          {formatMessage({
+            id: 'In partnership with the FSE and the UIS, Wikicaves hosts the Speleological Abstracts (BBS/SA) and participates in the Karstlink initiative.'
+          })}
+        </Typography>
+
+        <Box sx={{ textAlign: 'center' }}>
+          <Button
+            variant="contained"
+            color="secondary"
+            size="large"
+            href={DONATE_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            startIcon={<FavoriteBorder />}
+            sx={{ fontWeight: 600, px: 4, textTransform: 'none' }}>
+            {formatMessage({ id: 'Donate now' })}
+          </Button>
+        </Box>
+      </Inner>
+    </Section>
   );
 };
 
