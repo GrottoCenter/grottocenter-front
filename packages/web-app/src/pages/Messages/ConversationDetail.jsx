@@ -61,9 +61,9 @@ const MessageBubble = styled(Paper)(({ theme, $isMine }) => ({
 }));
 
 const MessageDate = styled(Typography)(({ theme, $isMine }) => ({
-  fontSize: '0.75rem',
+  fontSize: '0.6rem',
   color: $isMine ? theme.palette.primary.contrastText : theme.palette.text.secondary,
-  opacity: 0.8,
+  opacity: 0.7,
   marginTop: '4px',
   textAlign: 'right'
 }));
@@ -259,7 +259,16 @@ Message Body: ${body}`;
           <ArrowBackIcon />
         </IconButton>
         <Typography variant="h6">
-          {titleText}
+          {currentConversation?.otherParticipant ? (
+            <Link
+              to={`/ui/persons/${currentConversation.otherParticipant.id}`}
+              style={{ color: 'inherit', textDecoration: 'underline' }}
+            >
+              {titleText}
+            </Link>
+          ) : (
+            titleText
+          )}
         </Typography>
       </Box>
 
@@ -271,16 +280,6 @@ Message Body: ${body}`;
             <MessageBubble key={msg.id} elevation={1} $isMine={isMine}>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 1 }}>
                 <Box sx={{ flexGrow: 1, minWidth: 0 }}>
-                  {!isMine && msg.caverSender && (
-                    <Typography variant="caption" sx={{ display: 'block', mb: '4px', fontWeight: 'bold' }}>
-                      <Link
-                        to={`/ui/persons/${msg.caverSender.id}`}
-                        style={{ color: 'inherit', textDecoration: 'underline' }}
-                      >
-                        {msg.caverSender.nickname}
-                      </Link>
-                    </Typography>
-                  )}
                   <Typography variant="body1" sx={{ whiteSpace: 'pre-wrap' }}>{msg.body}</Typography>
                 </Box>
                 {!isMine && (

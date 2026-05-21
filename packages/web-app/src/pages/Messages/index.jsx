@@ -202,14 +202,16 @@ const MessagesPage = () => {
                 primary={conv.otherParticipant?.nickname || formatMessage({ id: 'Unknown' })}
                 secondary={
                   conv.lastMessage && (
-                    <FormattedDate
-                      value={conv.lastMessage.dateSent}
-                      year="numeric"
-                      month="long"
-                      day="2-digit"
-                      hour="2-digit"
-                      minute="2-digit"
-                    />
+                    <Typography variant="body2" sx={{ fontSize: '0.7rem', opacity: 0.8 }}>
+                      <FormattedDate
+                        value={conv.lastMessage.dateSent}
+                        year="numeric"
+                        month="long"
+                        day="2-digit"
+                        hour="2-digit"
+                        minute="2-digit"
+                      />
+                    </Typography>
                   )
                 }
               />
