@@ -89,7 +89,6 @@ const DuplicatesList = ({
           setPage(pageNum);
           setRowsPerPage(pageSize);
         }}
-        onRowClick={() => false}
         onSelected={ids => {
           setSelectedDuplicates(ids);
         }}
