@@ -1,6 +1,5 @@
 import React from 'react';
 import { styled } from '@mui/material/styles';
-import DonateForm from './DonateForm';
 import FooterDisclamer from '../../components/common/FooterDisclamer';
 import Publisher from './Publisher';
 import SocialLinks from './SocialLinks';
@@ -25,10 +24,6 @@ const Footer = () => (
         <GridRow>
           <GridOneHalfColumn>
             <Publisher />
-          </GridOneHalfColumn>
-
-          <GridOneHalfColumn>
-            <DonateForm />
           </GridOneHalfColumn>
         </GridRow>
 

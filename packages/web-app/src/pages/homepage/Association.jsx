@@ -9,8 +9,10 @@ import {
   ShareOutlined
 } from '@mui/icons-material';
 import { styled } from '@mui/material/styles';
-import { useIntl } from 'react-intl';
+import { useIntl, FormattedMessage } from 'react-intl';
 import GCLogo from '../../components/common/GCLogo';
+import InternationalizedLink from '../../components/common/InternationalizedLink';
+import { wikicavesLink } from '../../conf/externalLinks';
 
 const DONATE_URL =
   'https://www.helloasso.com/associations/wikicaves/formulaires/1';
@@ -119,9 +121,25 @@ const Association = () => {
             maxWidth: 640,
             mx: 'auto'
           }}>
-          {formatMessage({
-            id: 'The international voluntary association WikiCaves operates the GrottoCenter web application WikiCaves has as goals:'
-          })}
+          <FormattedMessage
+            id="The international voluntary association WikiCaves operates the GrottoCenter web application WikiCaves has as goals:"
+            values={{
+              wikicaves: (
+                <InternationalizedLink links={wikicavesLink}>
+                  <Box
+                    component="span"
+                    sx={{
+                      color: 'rgba(255,255,255,0.9)',
+                      textDecoration: 'underline',
+                      cursor: 'pointer',
+                      '&:hover': { color: 'white' }
+                    }}>
+                    Wikicaves
+                  </Box>
+                </InternationalizedLink>
+              )
+            }}
+          />
         </Typography>
 
         <Grid container spacing={2} sx={{ mb: 4 }}>
