@@ -12,6 +12,7 @@ import {
 
 import { FormContainer, FormActionRow } from '../utils/FormContainers';
 import { normelizeCoordinate } from '../utils/InputCoordinate';
+import { usePermissions } from '../../../../hooks';
 import LicenseBox from '../utils/LicenseBox';
 import FormProgressInfo from '../utils/FormProgressInfo';
 import EditTypeSelection from './EditTypeSelection';
@@ -82,6 +83,8 @@ export const EntranceForm = ({
     [caveValues?.entrances?.length]
   );
   const [entityType, setEntityType] = useState(entityTypeInitialValue);
+  const { isAdmin } = usePermissions();
+  const isSensitiveDisabled = !isAdmin && (entranceValues?.isSensitive ?? false);
 
   const defaultFormValues = useMemo(
     () => ({
@@ -112,8 +115,7 @@ export const EntranceForm = ({
     ]);
 
   const isSubmitDisabled =
-    isCoordEmpty(lat) ||
-    isCoordEmpty(lng) ||
+    (!isSensitiveDisabled && (isCoordEmpty(lat) || isCoordEmpty(lng))) ||
     (entityType === ENTRANCE_AND_CAVE
       ? !caveName || !caveLanguage
       : !entranceName || !entranceLanguage);
