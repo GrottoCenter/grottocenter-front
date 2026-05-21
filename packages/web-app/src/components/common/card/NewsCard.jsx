@@ -1,151 +1,111 @@
-import React, { Component } from 'react';
+import React, { useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
-import { Box, Chip } from '@mui/material';
-import Card from '@mui/material/Card';
-import CardMedia from '@mui/material/CardMedia';
-import CardActions from '@mui/material/CardActions';
-import CardContent from '@mui/material/CardContent';
-import Typography from '@mui/material/Typography';
-import Button from '@mui/material/Button';
-import SyncIcon from '@mui/icons-material/Sync';
-import SyncKOIcon from '@mui/icons-material/SyncProblem';
-import Divider from '@mui/material/Divider';
+import {
+  Box,
+  Button,
+  Card,
+  CardContent,
+  CardMedia,
+  Skeleton,
+  Typography
+} from '@mui/material';
+import { SyncProblemOutlined } from '@mui/icons-material';
 import { styled } from '@mui/material/styles';
 import { FormattedMessage } from 'react-intl';
 import GCLink from '../GCLink';
 import { DYNAMIC_NEWS_RELOAD_INTERVAL } from '../../../conf/config';
 
-const StyledCardMedia = styled(CardMedia)({
-  height: '150px'
+const StyledCard = styled(Card)({
+  overflow: 'hidden'
 });
 
-const MediaWrapper = styled(Box)({
-  position: 'relative'
-});
-
-const StyledChip = styled(Chip)(({ theme }) => ({
-  position: 'absolute',
-  bottom: theme.spacing(1),
-  left: theme.spacing(1)
+const DateLabel = styled(Typography)(({ theme }) => ({
+  color: theme.palette.secondary.main,
+  fontWeight: 600,
+  textTransform: 'uppercase',
+  letterSpacing: '0.08em'
 }));
 
-const StyledCardContent = styled(CardContent)({
-  minHeight: '150px',
-  textAlign: 'justify'
-});
+const NewsCard = ({
+  showSpinner,
+  text,
+  day,
+  month,
+  title,
+  linkMore,
+  init,
+  refresh
+}) => {
+  const hasInit = useRef(false);
 
-const StyledCardActions = styled(CardActions)({
-  justifyContent: 'flex-end'
-});
-
-const StyledCard = styled(Card)(({ theme }) => ({
-  '&:nth-of-type(n+1)': {
-    marginTop: '4%',
-    [theme.breakpoints.up('550')]: {
-      marginTop: '0'
+  useEffect(() => {
+    if (!hasInit.current) {
+      hasInit.current = true;
+      init();
+      refresh();
     }
-  }
-}));
+  }, [init, refresh]);
 
-const StyledActionCard = styled(StyledCard)`
-  text-align: center !important;
-`;
+  useEffect(() => {
+    const interval = setInterval(refresh, DYNAMIC_NEWS_RELOAD_INTERVAL);
+    return () => clearInterval(interval);
+    // refresh reference is stable from connect() — run interval once on mount
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-const StyledSyncIcon = styled(SyncIcon)(({ theme }) => ({
-  '&:hover': {
-    fill: theme.palette.accent1Color
-  },
-  fill: theme.palette.primary3Color
-}));
-
-const StyledSyncKOIcon = styled(SyncKOIcon)(({ theme }) => ({
-  '&:hover': {
-    fill: theme.palette.accent1Color
-  },
-  fill: theme.palette.primary3Color
-}));
-
-const StyledTitleTypography = styled(Typography)(({ theme }) => ({
-  '&.MuiTypography-root': {
-    fontSize: '24px',
-    [theme.breakpoints.down('sm')]: {
-      fontSize: '18px'
-    }
-  },
-  minHeight: '60px'
-}));
-
-const StyledBodyTypography = styled(Typography)({
-  '&.MuiTypography-root': {
-    fontSize: '14px',
-    letterSpacing: '0.00938em'
-  },
-  textAlign: 'justify'
-});
-
-class NewsCard extends Component {
-  constructor(props) {
-    super(props);
-    props.init();
-    props.refresh();
-  }
-
-  componentDidMount() {
-    const { refresh } = this.props;
-    this.interval = setInterval(refresh, DYNAMIC_NEWS_RELOAD_INTERVAL);
-  }
-
-  componentWillUnmount() {
-    clearInterval(this.interval);
-  }
-
-  render() {
-    const { showSpinner, text, day, month, title, linkMore } = this.props;
-
-    if (showSpinner && !text) {
-      return (
-        <StyledActionCard>
-          <StyledSyncIcon />
-        </StyledActionCard>
-      );
-    }
-
-    if (!showSpinner && !text) {
-      return (
-        <StyledActionCard>
-          <StyledSyncKOIcon />
-        </StyledActionCard>
-      );
-    }
-
+  if (showSpinner && !text) {
     return (
       <StyledCard>
-        <MediaWrapper>
-          <StyledCardMedia image="images/homepage/news.jpg" />
-          {day && month && (
-            <StyledChip color="primary" label={`${day} ${month}`} />
-          )}
-        </MediaWrapper>
-        <StyledCardContent>
-          <StyledTitleTypography gutterBottom component="h3">
-            {title}
-          </StyledTitleTypography>
-          <StyledBodyTypography component="p">{text}</StyledBodyTypography>
-        </StyledCardContent>
-        <Divider />
-        {linkMore && (
-          <StyledCardActions>
-            <GCLink href={linkMore}>
-              <Button color="secondary" variant="text" size="small">
-                <FormattedMessage id="Read more" />
-              </Button>
-            </GCLink>
-          </StyledCardActions>
-        )}
+        <Skeleton variant="rectangular" height={150} />
+        <CardContent>
+          <Skeleton variant="text" width="25%" sx={{ mb: 1 }} />
+          <Skeleton variant="text" width="70%" height={32} />
+          <Skeleton variant="text" width="100%" />
+          <Skeleton variant="text" width="90%" />
+          <Skeleton variant="text" width="60%" />
+        </CardContent>
       </StyledCard>
     );
   }
-}
+
+  if (!text) {
+    return (
+      <StyledCard>
+        <CardContent sx={{ textAlign: 'center', py: 4 }}>
+          <SyncProblemOutlined color="disabled" sx={{ fontSize: 40 }} />
+        </CardContent>
+      </StyledCard>
+    );
+  }
+
+  return (
+    <StyledCard>
+      <CardMedia image="images/homepage/news.jpg" sx={{ height: 150 }} />
+      <CardContent sx={{ pt: 2 }}>
+        {day && month && (
+          <DateLabel variant="caption">
+            {day} {month}
+          </DateLabel>
+        )}
+        <Typography variant="h6" fontWeight={600} sx={{ mt: '4px', mb: 1 }}>
+          {title}
+        </Typography>
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+          {text}
+        </Typography>
+        {linkMore && (
+          <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+            <GCLink href={linkMore}>
+              <Button color="secondary" variant="outlined" size="small">
+                <FormattedMessage id="Read more" />
+              </Button>
+            </GCLink>
+          </Box>
+        )}
+      </CardContent>
+    </StyledCard>
+  );
+};
 
 NewsCard.propTypes = {
   showSpinner: PropTypes.bool,
