@@ -210,6 +210,8 @@ const MessagesPage = () => {
                         day="2-digit"
                         hour="2-digit"
                         minute="2-digit"
+                        timeZone="UTC"
+                        timeZoneName="short"
                       />
                     </Typography>
                   )
@@ -244,9 +246,8 @@ const MessagesPage = () => {
                     {formatMessage({ id: 'My messages' })}
                   </Typography>
                   <Button
-                    variant="contained"
+                    variant="outlined"
                     color="secondary"
-                    size="small"
                     startIcon={<EditIcon />}
                     onClick={() => {
                       setComposeOpen(true);

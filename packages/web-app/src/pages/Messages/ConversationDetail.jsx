@@ -309,6 +309,8 @@ Message Body: ${body}`;
                   day="2-digit"
                   hour="2-digit"
                   minute="2-digit"
+                  timeZone="UTC"
+                  timeZoneName="short"
                 />
               </MessageDate>
             </MessageBubble>
