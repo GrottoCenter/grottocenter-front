@@ -90,7 +90,9 @@ const HeroStats = () => {
                     alignItems: 'center',
                     width: '100%'
                   }}>
-                  <CustomIcon type={iconType} size={isMobile ? 32 : 48} />
+                  <Box sx={{ '& > span': { margin: 0 } }}>
+                    <CustomIcon type={iconType} size={isMobile ? 32 : 48} />
+                  </Box>
                   <Typography
                     variant="h5"
                     fontWeight="bold"
