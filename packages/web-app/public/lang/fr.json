@@ -1,4 +1,4 @@
-﻿{
+{
   "1": "KARSTOLOGIE ET GÉOSPÉLÉOLOGIE",
   "2": "SPÉLÉOLOGIE ET KARSTOLOGIE RÉGIONALES",
   "3": "BIOSPÉLÉOLOGIE",
@@ -980,6 +980,7 @@
   "Finland": "Finlande",
   "First name": "Prénom",
   "Flooding risk": "Risque de crue",
+  "Follow us": "Suivez-nous",
   "Follow us on Facebook": "Suivez-nous sur Facebook",
   "for a few weeks (during the database switching), you will not be able to add or edit the Grottocenter cave files. This maintenance delay is unfortunately necessary, we apologize for the inconvenience. We will inform you here as soon as the functions for editing cave files are available again.": "Pendant quelques semaines (durant la commutation des bases de données) il ne sera pas possible d’ajouter ou de modifier les fiches cavités de Grottocenter. Ce délai de maintenance est malheureusement indispensable, veuillez nous excuser pour le désagrément. Nous vous informerons ici même dès la reprise des fonctions d'édition des fiches cavités.",
   "For example, a magazine issue is an Issue, an article from a magazine is an Article.": "Par exemple, un numéro de magasine est un Numéro, un article tiré d'un magasin est un Article.",
@@ -1373,6 +1374,7 @@
   "Namibia": "Namibie",
   "Native": "Natif",
   "Nauru": "Nauru",
+  "Navigation": "Navigation",
   "Need support? Request access? {0}": "Besoin d'un support ? Recherche d'un accès ? {0}",
   "Nepal": "Népal",
   "Netherlands": "Pays-Bas",
@@ -1836,6 +1838,7 @@
   "take part, day after day, in improving and expanding the database.": "participent, jour après jour, à l'amélioration et à l'enrichissement de la base de données.",
   "Tanzania": "Tanzanie",
   "Tchad": "Tchad",
+  "Technical": "Technique",
   "Technical speleology": "Techniques spéléologiques",
   "Temperature": "Température",
   "Temperature must be an integer (in °C)": "La température doit être un entier (en °C)",
