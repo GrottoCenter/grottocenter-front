@@ -6,6 +6,7 @@ import { styled } from '@mui/material/styles';
 import { displayLoginDialog } from '../../actions/Login';
 
 import Header from './Header';
+import HeroStats from './HeroStats';
 import Welcome from './Welcome';
 import LatestBlogNewsSection from './LatestBlogNewsSection';
 import Association from './Association';
@@ -15,7 +16,6 @@ import PartnersSection from './PartnersSection';
 import Footer from './Footer';
 
 import { usePermissions } from '../../hooks';
-import DataHomepage from '../../components/appli/DataHomepage';
 import FeedbackButton from '../../components/common/FeedbackButton';
 
 const HomepageWrapper = styled('div')`
@@ -40,8 +40,8 @@ const HomePage = () => {
   return (
     <HomepageWrapper>
       <Header />
+      <HeroStats />
       <Welcome />
-      <DataHomepage />
       <RandomEntry />
       <RecentChanges />
       <LatestBlogNewsSection />

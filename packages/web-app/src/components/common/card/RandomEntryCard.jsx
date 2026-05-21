@@ -1,354 +1,73 @@
 import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
-import FullStarIcon from '@mui/icons-material/Star';
-import EmptyStarIcon from '@mui/icons-material/StarBorder';
-import HalfStarIcon from '@mui/icons-material/StarHalf';
-import CircularProgress from '@mui/material/CircularProgress';
-import Tooltip from '@mui/material/Tooltip';
-import { styled } from '@mui/material/styles';
-import withStyles from '@mui/styles/withStyles';
-import { isNil } from 'ramda';
-import GCLink from '../GCLink';
-import Translate from '../Translate';
 import {
-  depthIcon,
-  lengthIcon,
-  timeToGoIcon,
-  undergroundTimeIcon
-} from '../../../assets/icons';
+  Box,
+  Button,
+  Card,
+  CardContent,
+  CardMedia,
+  Chip,
+  Skeleton,
+  Typography
+} from '@mui/material';
+import { styled } from '@mui/material/styles';
+import { isNil } from 'ramda';
+import { FormattedMessage } from 'react-intl';
+import GCLink from '../GCLink';
+import { depthIcon, lengthIcon } from '../../../assets/icons';
 
-const FlexWrapper = styled('div')`
-  display: flex;
-  flex-wrap: wrap;
-`;
-
-const FlexItemWrapper = styled('div')`
-  flex: 1;
-  flex-basis: 300px;
-  margin: ${({ theme }) => theme.spacing(2)};
-  overflow: hidden;
-`;
-
-const EntryData = ({ entry }) => {
-  if (!entry) {
-    return <div />;
+const CompactCard = styled(Card)({
+  display: 'flex',
+  flexDirection: 'row',
+  '@media (max-width: 600px)': {
+    flexDirection: 'column'
   }
-  let imageElement = null;
-  const { documents, cave, stats, timeInfo } = entry;
+});
 
-  // TODO: improve get of the topo
-  // 13 is the id of the type "TopographicData"
-  const topoDoc = documents ? documents.find(d => d.type === 13) : null;
-  if (!isNil(topoDoc)) {
-    const topo = topoDoc.files.find(f => f.pathOld !== null);
-    imageElement =
-      topo && topo.pathOld ? <EntryImage src={topo.pathOld} /> : null;
+const MediaWrapper = styled(Box)({
+  width: 200,
+  minHeight: 160,
+  flexShrink: 0,
+  '@media (max-width: 600px)': {
+    width: '100%',
+    minHeight: 140
   }
+});
 
-  return (
-    <FlexWrapper>
-      <FlexItemWrapper>
-        <EntryTitle entry={entry} />
-        <EntryStat stat={stats} />
-        <EntryInfos timeInfo={timeInfo} cave={cave} />
-      </FlexItemWrapper>
-      {imageElement && <FlexItemWrapper>{imageElement}</FlexItemWrapper>}
-    </FlexWrapper>
-  );
-};
-
-EntryData.propTypes = {
-  entry: PropTypes.shape({
-    documents: PropTypes.arrayOf(PropTypes.shape({})),
-    cave: PropTypes.shape({
-      depth: PropTypes.number,
-      length: PropTypes.number
-    }),
-    stats: PropTypes.shape({}),
-    timeInfo: PropTypes.shape({})
-  }).isRequired
-};
-
-const EntryName = styled('h4')`
-  font-weight: 400;
-  margin-bottom: 0;
-`;
-
-const EntryLocalizationPart = styled('h5')`
-  font-size: 2rem;
-  margin-bottom: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-`;
-
-const EntryTitle = ({ entry }) => {
-  const { county, country, name, region } = entry;
-  return (
-    <div className="entryLocation" dir="ltr">
-      <EntryName>{name}</EntryName>
-      {county && <EntryLocalizationPart>{county}</EntryLocalizationPart>}
-      {region && <EntryLocalizationPart>{region}</EntryLocalizationPart>}
-      {country && <EntryLocalizationPart>{country}</EntryLocalizationPart>}
-    </div>
-  );
-};
-
-EntryTitle.propTypes = {
-  entry: PropTypes.shape({
-    county: PropTypes.string,
-    country: PropTypes.string,
-    name: PropTypes.string,
-    region: PropTypes.string
-  }).isRequired
-};
-
-const RatingList = styled('ul')`
-  list-style-type: none;
-`;
-
-const EntryStat = ({ stat }) => (
-  <div>
-    {!stat && (
-      <Translate>At this time, there is no comment for this entry</Translate>
-    )}
-    {stat && (
-      <RatingList>
-        <EntryStatItem itemScore={stat.aestheticism} itemLabel="Interest" />
-        <EntryStatItem itemScore={stat.caving} itemLabel="Ease to move" />
-        <EntryStatItem itemScore={stat.approach} itemLabel="Access" />
-      </RatingList>
-    )}
-  </div>
-);
-
-EntryStat.propTypes = {
-  stat: PropTypes.shape({
-    aestheticism: PropTypes.number,
-    approach: PropTypes.number,
-    caving: PropTypes.number
-  }).isRequired
-};
-
-const StatEntry = styled('li')`
-  display: inline-flex;
-  width: 100%;
-  font-size: 1.5rem;
-
-  span {
-    margin-right: 10px;
-    white-space: nowrap;
-    width: 50%;
-    overflow: hidden;
-    text-overflow: ellipsis;
+const StyledCardMedia = styled(CardMedia)({
+  height: '100%',
+  minHeight: 160,
+  '@media (max-width: 600px)': {
+    minHeight: 140
   }
-`;
+});
 
-const Stars = styled('div')`
-  display: inline;
-  white-space: nowrap;
-`;
+const ContentBox = styled(CardContent)({
+  display: 'flex',
+  flexDirection: 'column',
+  flex: 1,
+  padding: '16px !important'
+});
 
-const STAR_COLOR = '#ffd700';
+const InfoRow = styled(Box)({
+  display: 'flex',
+  alignItems: 'center',
+  gap: 6,
+  marginTop: 4
+});
 
-const StyledFullStarIcon = withStyles({
-  root: { fill: STAR_COLOR }
-})(FullStarIcon);
+const InfoImg = styled('img')({
+  height: 18,
+  width: 18
+});
 
-const StyledHalfStarIcon = withStyles({
-  root: { fill: STAR_COLOR }
-})(HalfStarIcon);
-
-const StyledEmptyStarIcon = withStyles({
-  root: { fill: STAR_COLOR }
-})(EmptyStarIcon);
-
-const EntryStatItem = ({ itemLabel, itemScore }) => {
-  if (!itemScore) {
-    return <div />;
-  }
-
-  const score = itemScore / 2;
-  const starsToDisplay = [];
-  let displayed = 0;
-
-  for (let i = 0; i < Math.floor(score); i += 1) {
-    starsToDisplay.push(<StyledFullStarIcon key={`star${i}`} />);
-    displayed += 1;
-  }
-  if (Math.floor(score) < score) {
-    starsToDisplay.push(<StyledHalfStarIcon key="starh" />);
-    displayed += 1;
-  }
-  if (displayed < 5) {
-    for (let i = displayed; i < 5; i += 1) {
-      starsToDisplay.push(<StyledEmptyStarIcon key={`star${i}`} />);
-    }
-  }
-
-  return (
-    <StatEntry>
-      <Translate>{itemLabel}</Translate>
-      <Stars>{starsToDisplay}</Stars>
-    </StatEntry>
-  );
+const getTopoImage = documents => {
+  if (!documents) return null;
+  const topoDoc = documents.find(d => d.type === 13);
+  if (isNil(topoDoc)) return null;
+  const topo = topoDoc.files?.find(f => f.pathOld !== null);
+  return topo?.pathOld || null;
 };
-
-EntryStatItem.propTypes = {
-  itemScore: PropTypes.number,
-  itemLabel: PropTypes.string.isRequired
-};
-
-const EntryInfos = ({ timeInfo, cave }) => (
-  <div className="infos">
-    {timeInfo && (
-      <EntryInfoItem
-        key="eiik1"
-        itemImg={timeToGoIcon}
-        itemLabel="Time to go"
-        itemType="time"
-        itemValue={timeInfo.eTTrail}
-      />
-    )}
-    {timeInfo && (
-      <EntryInfoItem
-        key="eiik2"
-        itemImg={undergroundTimeIcon}
-        itemLabel="Underground time"
-        itemType="time"
-        itemValue={timeInfo.eTUnderground}
-      />
-    )}
-    {cave && (
-      <EntryInfoItem
-        key="eiik3"
-        itemImg={lengthIcon}
-        itemLabel="Length"
-        itemValue={cave.length}
-        itemUnit="m"
-      />
-    )}
-    {cave && (
-      <EntryInfoItem
-        key="eiik4"
-        itemImg={depthIcon}
-        itemLabel="Depth"
-        itemValue={cave.depth}
-        itemUnit="m"
-      />
-    )}
-  </div>
-);
-
-EntryInfos.propTypes = {
-  timeInfo: PropTypes.shape({
-    eTTrail: PropTypes.string,
-    eTUnderground: PropTypes.string
-  }),
-  cave: PropTypes.shape({
-    depth: PropTypes.number,
-    length: PropTypes.number
-  })
-};
-
-const EntryInfoWrapper = styled('div')`
-  width: 50%;
-  display: inline-flex;
-  line-height: 50px;
-  font-weight: 300;
-  font-size: 1.4rem;
-`;
-
-const InfoImage = styled('img')`
-  height: 50px;
-  width: 50px;
-`;
-
-const InfoValue = styled('span')`
-  margin-left: 6px;
-  font-size: 1.5rem;
-  white-space: nowrap;
-`;
-
-const InfoUnit = styled('span')`
-  margin-left: 6px;
-  font-size: 1rem;
-  white-space: nowrap;
-`;
-
-const EntryInfoItem = ({
-  itemImg,
-  itemLabel,
-  itemType,
-  itemUnit,
-  itemValue
-}) => {
-  if (isNil(itemValue)) {
-    return <span />;
-  }
-
-  let valueToDisplay = itemValue;
-  if (itemType === 'time') {
-    const splittedTime = itemValue.split(':');
-    valueToDisplay = `${splittedTime[0]}h ${splittedTime[1]}m`;
-  }
-
-  return (
-    <EntryInfoWrapper>
-      <Tooltip title={<Translate>{itemLabel}</Translate>}>
-        <InfoImage src={itemImg} alt={itemLabel} />
-      </Tooltip>
-      <InfoValue>{valueToDisplay}</InfoValue>
-      <InfoUnit>{itemUnit}</InfoUnit>
-    </EntryInfoWrapper>
-  );
-};
-
-EntryInfoItem.propTypes = {
-  itemValue: PropTypes.any, // eslint-disable-line react/forbid-prop-types
-  itemUnit: PropTypes.string,
-  itemLabel: PropTypes.string.isRequired,
-  itemImg: PropTypes.string.isRequired,
-  itemType: PropTypes.string
-};
-
-const TopoImage = styled('img')`
-  width: 100%;
-  background-color: white;
-`;
-
-const NoImage = styled('img')`
-  font-weight: 300;
-  font-style: italic;
-`;
-
-const EntryImage = ({ src }) => (
-  <>
-    {!src && (
-      <NoImage>
-        <Translate>At this time, there is no image for this entry</Translate>
-      </NoImage>
-    )}
-    {src && <TopoImage src={src} alt="topo" />}
-  </>
-);
-
-EntryImage.propTypes = {
-  src: PropTypes.string.isRequired
-};
-
-const RandomEntryLink = styled(GCLink)`
-  text-decoration: none;
-  color: white;
-`;
-
-const EntryWrapper = styled('div')`
-  background-color: rgba(110, 110, 110, 0.5);
-  border-radius: ${({ theme }) => theme.spacing(1)};
-  color: white;
-  margin: auto;
-  padding: ${({ theme }) => theme.spacing(3)};
-`;
 
 const RandomEntryCard = ({ entry, isFetching, fetch }) => {
   useEffect(() => {
@@ -356,26 +75,91 @@ const RandomEntryCard = ({ entry, isFetching, fetch }) => {
   }, [fetch]);
 
   if (isFetching) {
-    return <CircularProgress />;
-  }
-
-  if (entry && entry.id) {
     return (
-      <RandomEntryLink href={`/ui/entrances/${entry.id}`}>
-        <EntryWrapper>
-          <EntryData entry={entry} />
-        </EntryWrapper>
-      </RandomEntryLink>
+      <CompactCard>
+        <MediaWrapper>
+          <Skeleton variant="rectangular" width="100%" height={160} />
+        </MediaWrapper>
+        <ContentBox>
+          <Skeleton variant="text" width="60%" height={32} />
+          <Skeleton variant="text" width="40%" />
+          <Skeleton variant="text" width="80%" sx={{ mt: 1 }} />
+        </ContentBox>
+      </CompactCard>
     );
   }
-  return <div />;
+
+  if (!entry?.id) return null;
+
+  const { county, region, country, cave, documents } = entry;
+  const imageSrc = getTopoImage(documents);
+  const locationParts = [county, region, country].filter(Boolean);
+
+  return (
+    <CompactCard>
+      <MediaWrapper>
+        <StyledCardMedia
+          image={imageSrc || '/images/caves/gours.jpg'}
+          title={entry.name}
+        />
+      </MediaWrapper>
+      <ContentBox>
+        <Chip
+          label={<FormattedMessage id="Random cave" />}
+          color="secondary"
+          size="small"
+          sx={{ alignSelf: 'flex-start', mb: 1 }}
+        />
+        <Typography variant="h6" gutterBottom>
+          {entry.name}
+        </Typography>
+        {locationParts.length > 0 && (
+          <Typography variant="body2" color="text.secondary">
+            {locationParts.join(' · ')}
+          </Typography>
+        )}
+        {cave && (
+          <InfoRow>
+            {cave.length && (
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                <InfoImg src={lengthIcon} alt="length" />
+                <Typography variant="caption">{cave.length} m</Typography>
+              </Box>
+            )}
+            {cave.depth && (
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                <InfoImg src={depthIcon} alt="depth" />
+                <Typography variant="caption">{cave.depth} m</Typography>
+              </Box>
+            )}
+          </InfoRow>
+        )}
+        <Box sx={{ mt: 'auto', pt: 2, textAlign: 'right' }}>
+          <GCLink href={`/ui/entrances/${entry.id}`}>
+            <Button variant="contained" color="secondary" size="small">
+              <FormattedMessage id="Discover" />
+            </Button>
+          </GCLink>
+        </Box>
+      </ContentBox>
+    </CompactCard>
+  );
 };
 
 RandomEntryCard.propTypes = {
   fetch: PropTypes.func.isRequired,
   isFetching: PropTypes.bool,
   entry: PropTypes.shape({
-    id: PropTypes.number
+    id: PropTypes.number,
+    name: PropTypes.string,
+    county: PropTypes.string,
+    region: PropTypes.string,
+    country: PropTypes.string,
+    documents: PropTypes.arrayOf(PropTypes.shape({})),
+    cave: PropTypes.shape({
+      depth: PropTypes.number,
+      length: PropTypes.number
+    })
   })
 };
 

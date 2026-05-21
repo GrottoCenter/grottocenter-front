@@ -7,24 +7,11 @@ import {
   GridOneThirdColumn,
   GridTwoThirdColumn
 } from '../../helpers/GridSystem';
-import Translate from '../../components/common/Translate';
 
 const WelcomeAvatar = styled('img')`
   border-radius: 50%;
   width: 60%;
   height: 60%;
-`;
-
-const WelcomeTitle = styled('h3')`
-  color: ${props => props.color};
-  padding-top: 30px;
-  text-align: center;
-  padding-bottom: 50px;
-  font-size: 35px;
-
-  @media (min-width: 550px) {
-    padding-top: 0;
-  }
 `;
 
 const WelcomeParagraph = styled('p')`
@@ -52,15 +39,6 @@ const Welcome = () => {
         </GridOneThirdColumn>
 
         <GridTwoThirdColumn>
-          <WelcomeTitle color={theme.palette.accent1Color}>
-            <Translate>Welcome to Grottocenter!</Translate>
-          </WelcomeTitle>
-          <WelcomeParagraph>
-            <Translate>
-              Welcome to the new version of Grottocenter, the community database
-              dedicated to caving.
-            </Translate>
-          </WelcomeParagraph>
           <WelcomeParagraph>
             {formatMessage({
               id: 'All information is freely accessible, creating an account will allow you to contribute: all together we will be able to complete and make more reliable the information on caves, documents, organizations and massifs, linked to the underground environment.'
