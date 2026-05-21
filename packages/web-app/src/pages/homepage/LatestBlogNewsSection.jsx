@@ -50,6 +50,7 @@ const LatestBlogNewsSection = () => {
       </TitleRow>
       <Inner>
         <LatestBlogNews
+          key={isFrench ? 'fr' : 'en'}
           blog={isFrench ? 'fr' : 'en'}
           url={isFrench ? frenchRssUrl : englishRssUrl}
         />
