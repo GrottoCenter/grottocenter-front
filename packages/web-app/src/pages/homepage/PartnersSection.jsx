@@ -1,12 +1,12 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Box, Skeleton, Typography } from '@mui/material';
-import { Handshake } from '@mui/icons-material';
+import { HandshakeOutlined } from '@mui/icons-material';
 import { styled } from '@mui/material/styles';
+import { useIntl } from 'react-intl';
 import LandingSection from './LandingSection';
 import { GridRow, GridFullColumn } from '../../helpers/GridSystem';
 import PartnersCarouselContainer from '../../containers/PartnersCarouselContainer';
-import Translate from '../../components/common/Translate';
 import InternationalizedLink from '../../components/common/InternationalizedLink';
 import { fseLinks, uisLinks } from '../../conf/externalLinks';
 import { loadDynamicNumber } from '../../actions/DynamicNumber';
@@ -19,22 +19,6 @@ const TitleRow = styled(Box)({
   paddingBottom: '4px'
 });
 
-const SectionTitle = styled('h3')(({ theme }) => ({
-  color: theme.palette.accent1Color,
-  margin: 0,
-  fontSize: '35px',
-  display: 'flex',
-  alignItems: 'center',
-  gap: 8,
-  '@media (max-width: 550px)': {
-    fontSize: '24px'
-  }
-}));
-
-const StyledHandshake = styled(Handshake)(({ theme }) => ({
-  color: theme.palette.accent1Color,
-  fontSize: '1em'
-}));
 
 const SupporterRow = styled(Box)({
   display: 'flex',
@@ -58,6 +42,7 @@ const Description = styled(Typography)({
 
 const PartnersSection = () => {
   const dispatch = useDispatch();
+  const { formatMessage } = useIntl();
   const officialPartners = useSelector(
     state => state.dynamicNumber?.officialPartners
   );
@@ -70,22 +55,23 @@ const PartnersSection = () => {
     <LandingSection>
       <GridRow>
         <TitleRow>
-          <SectionTitle>
-            <StyledHandshake />
+          <HandshakeOutlined color="primary" sx={{ fontSize: 28 }} />
+          <Typography variant="h5" fontWeight={600} color="primary">
             {officialPartners?.isFetching ? (
-              <Skeleton variant="text" width={40} />
+              <Skeleton variant="text" width={120} />
             ) : (
-              officialPartners?.number &&
-              `${officialPartners.number.toLocaleString()} `
+              <>
+                {officialPartners?.number &&
+                  `${officialPartners.number.toLocaleString()} `}
+                {formatMessage({ id: 'partners' })}
+              </>
             )}
-            <Translate>partners</Translate>
-          </SectionTitle>
+          </Typography>
         </TitleRow>
         <Description variant="body2" color="text.secondary">
-          <Translate>
-            take part in the project by funding, providing data, communicating
-            on the interest and benefits of cavers to share data.
-          </Translate>
+          {formatMessage({
+            id: 'take part in the project by funding, providing data, communicating on the interest and benefits of cavers to share data.'
+          })}
         </Description>
       </GridRow>
       <GridRow>
@@ -99,9 +85,9 @@ const PartnersSection = () => {
               <SupporterLogo src="/images/UIS.svg" alt="Logo UIS" />
             </InternationalizedLink>
             <Typography variant="body2" color="text.secondary">
-              <Translate>
-                Grottocenter is supported by the FSE and the UIS
-              </Translate>
+              {formatMessage({
+                id: 'Grottocenter is supported by the FSE and the UIS'
+              })}
             </Typography>
           </SupporterRow>
         </GridFullColumn>
