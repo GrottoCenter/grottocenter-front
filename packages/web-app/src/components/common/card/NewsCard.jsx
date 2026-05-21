@@ -1,23 +1,33 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Chip } from '@mui/material';
+import { Box, Chip } from '@mui/material';
 import Card from '@mui/material/Card';
 import CardMedia from '@mui/material/CardMedia';
 import CardActions from '@mui/material/CardActions';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
-import ImageLoupe from '@mui/icons-material/Loupe';
 import SyncIcon from '@mui/icons-material/Sync';
 import SyncKOIcon from '@mui/icons-material/SyncProblem';
 import Divider from '@mui/material/Divider';
 import { styled } from '@mui/material/styles';
+import { FormattedMessage } from 'react-intl';
 import GCLink from '../GCLink';
 import { DYNAMIC_NEWS_RELOAD_INTERVAL } from '../../../conf/config';
 
 const StyledCardMedia = styled(CardMedia)({
   height: '150px'
 });
+
+const MediaWrapper = styled(Box)({
+  position: 'relative'
+});
+
+const StyledChip = styled(Chip)(({ theme }) => ({
+  position: 'absolute',
+  bottom: theme.spacing(1),
+  left: theme.spacing(1)
+}));
 
 const StyledCardContent = styled(CardContent)({
   minHeight: '150px',
@@ -55,13 +65,12 @@ const StyledSyncKOIcon = styled(SyncKOIcon)(({ theme }) => ({
   fill: theme.palette.primary3Color
 }));
 
-const StyledImageLoupe = styled(ImageLoupe)(({ theme }) => ({
-  fill: theme.palette.accent1Color
-}));
-
 const StyledTitleTypography = styled(Typography)(({ theme }) => ({
   '&.MuiTypography-root': {
-    fontSize: '24px'
+    fontSize: '24px',
+    [theme.breakpoints.down('sm')]: {
+      fontSize: '18px'
+    }
   },
   minHeight: '60px'
 }));
@@ -111,8 +120,12 @@ class NewsCard extends Component {
 
     return (
       <StyledCard>
-        <StyledCardMedia image="images/homepage/news.jpg" />
-        {day && month && <Chip color="primary" label={`${day} ${month}`} />}
+        <MediaWrapper>
+          <StyledCardMedia image="images/homepage/news.jpg" />
+          {day && month && (
+            <StyledChip color="primary" label={`${day} ${month}`} />
+          )}
+        </MediaWrapper>
         <StyledCardContent>
           <StyledTitleTypography gutterBottom component="h3">
             {title}
@@ -123,8 +136,8 @@ class NewsCard extends Component {
         {linkMore && (
           <StyledCardActions>
             <GCLink href={linkMore}>
-              <Button>
-                <StyledImageLoupe />
+              <Button color="secondary" variant="text" size="small">
+                <FormattedMessage id="Read more" />
               </Button>
             </GCLink>
           </StyledCardActions>

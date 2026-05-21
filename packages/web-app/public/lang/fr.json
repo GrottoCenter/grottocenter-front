@@ -1,4 +1,4 @@
-﻿{
+{
   "1": "KARSTOLOGIE ET GÉOSPÉLÉOLOGIE",
   "2": "SPÉLÉOLOGIE ET KARSTOLOGIE RÉGIONALES",
   "3": "BIOSPÉLÉOLOGIE",
@@ -1391,7 +1391,7 @@
   "New organization": "Nouvelle organisation",
   "New password": "Nouveau mot de passe",
   "New Zealand": "Nouvelle-Zélande",
-  "News": "Nouvelles",
+  "News": "Actualités",
   "Next": "Suivant",
   "Next image": "Image suivante",
   "Next Page": "Page suivante",
@@ -1707,6 +1707,7 @@
   "Search on all fields": "Chercher sur tous les champs",
   "Search on map...": "Rechercher sur la carte...",
   "Search on specific fields": "Chercher sur des champs spécifiques",
+  "See all news": "Voir toutes les actualités",
   "See all notifications": "Voir toutes les notifications",
   "Select": "Sélectionner",
   "Select a cave or network using the search bar below.": "Sélectionner une cavité ou un réseau en utilisant la barre de recherche ci-dessous.",
