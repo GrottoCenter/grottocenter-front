@@ -1116,7 +1116,7 @@
   "Import Shapefile": "Импортиране на Shapefile",
   "Import source": "Извор на импорт",
   "In order to be able to do this, we need your help.": "За да можем да направим това, се нуждаем от вашата помощ.",
-  "In partnership with the FSE and the UIS, Wikicaves hosts the Speleological Abstracts (BBS/SA) and participates in the Karstlink initiative.": "В партньорство с FSE и UIS, Wikicaves е домакин на Speleological Abstracts (BBS/SA) и участва в инициативата Karstlink.",
+  "In partnership with the FSE and the UIS, Wikicaves hosts the Speleological Abstracts (BBS/SA) and participates in the Karstlink initiative.": "В партньорство с FSE и UIS, Wikicaves е домакин на Speleological Abstracts ({bbs}) и участва в инициативата {karstlink}.",
   "index < 40": "индекс < 40",
   "index ≥ 70": "индекс ≥ 70",
   "India": "Индия",

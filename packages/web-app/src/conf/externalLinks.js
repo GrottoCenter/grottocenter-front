@@ -133,3 +133,10 @@ export const z3950Links = {
 export const uptimeLinks = {
   '*': 'https://wikicaves.betteruptime.com'
 };
+
+export const donateLink =
+  'https://www.helloasso.com/associations/wikicaves/formulaires/1';
+
+export const karstlinkLinks = {
+  '*': 'https://ontology.uis-speleo.org/'
+};

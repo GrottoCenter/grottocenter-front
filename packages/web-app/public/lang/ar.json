@@ -1116,7 +1116,7 @@
   "Import Shapefile": "استيراد ملف الشكل",
   "Import source": "مصدر الاستيراد",
   "In order to be able to do this, we need your help.": "لنتمكن من القيام بذلك، نحن بحاجة إلى مساعدتك.",
-  "In partnership with the FSE and the UIS, Wikicaves hosts the Speleological Abstracts (BBS/SA) and participates in the Karstlink initiative.": "بالشراكة مع FSE وUIS، تستضيف Wikicaves الملخصات الكهفية (BBS/SA) وتشارك في مبادرة Karstlink.",
+  "In partnership with the FSE and the UIS, Wikicaves hosts the Speleological Abstracts (BBS/SA) and participates in the Karstlink initiative.": "بالشراكة مع FSE وUIS، تستضيف Wikicaves الملخصات الكهفية ({bbs}) وتشارك في مبادرة {karstlink}.",
   "index < 40": "المؤشر < 40",
   "index ≥ 70": "المؤشر ≥ 70",
   "India": "الهند",

@@ -12,10 +12,12 @@ import { styled } from '@mui/material/styles';
 import { useIntl, FormattedMessage } from 'react-intl';
 import GCLogo from '../../components/common/GCLogo';
 import InternationalizedLink from '../../components/common/InternationalizedLink';
-import { wikicavesLink } from '../../conf/externalLinks';
-
-const DONATE_URL =
-  'https://www.helloasso.com/associations/wikicaves/formulaires/1';
+import {
+  wikicavesLink,
+  wikiBBSLinks,
+  donateLink,
+  karstlinkLinks
+} from '../../conf/externalLinks';
 
 const Section = styled('section')(({ theme }) => ({
   backgroundColor: theme.palette.primary.main,
@@ -174,11 +176,24 @@ const Association = () => {
             textAlign: 'center',
             mb: 4,
             maxWidth: 680,
-            mx: 'auto'
+            mx: 'auto',
+            '& a': { color: 'rgba(255,255,255,0.9)', textDecoration: 'underline' }
           }}>
-          {formatMessage({
-            id: 'In partnership with the FSE and the UIS, Wikicaves hosts the Speleological Abstracts (BBS/SA) and participates in the Karstlink initiative.'
-          })}
+          <FormattedMessage
+            id="In partnership with the FSE and the UIS, Wikicaves hosts the Speleological Abstracts (BBS/SA) and participates in the Karstlink initiative."
+            values={{
+              bbs: (
+                <InternationalizedLink links={wikiBBSLinks}>
+                  BBS/SA
+                </InternationalizedLink>
+              ),
+              karstlink: (
+                <InternationalizedLink links={karstlinkLinks}>
+                  Karstlink
+                </InternationalizedLink>
+              )
+            }}
+          />
         </Typography>
 
         <Box sx={{ textAlign: 'center' }}>
@@ -186,7 +201,7 @@ const Association = () => {
             variant="contained"
             color="secondary"
             size="large"
-            href={DONATE_URL}
+            href={donateLink}
             target="_blank"
             rel="noopener noreferrer"
             startIcon={<FavoriteBorder />}
