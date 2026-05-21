@@ -35,23 +35,30 @@ const Slogan = styled('span')({
   fontWeight: 400
 });
 
-const CTARow = styled(Box)({
+const CTARow = styled(Box)(({ theme }) => ({
   display: 'flex',
   gap: 16,
   justifyContent: 'center',
-  flexWrap: 'wrap',
-  marginTop: 40
-});
+  flexDirection: 'column',
+  alignItems: 'center',
+  marginTop: 40,
+  [theme.breakpoints.up('sm')]: {
+    flexDirection: 'row'
+  }
+}));
 
 const SupporterRow = styled(Box)(({ theme }) => ({
-  display: 'none',
+  display: 'flex',
   alignItems: 'center',
   fontSize: 'small',
   fontWeight: 300,
   lineHeight: '25px',
   gap: 10,
   padding: '0 16px 12px',
-  [theme.breakpoints.up('sm')]: { display: 'flex' }
+  '& span': { display: 'none' },
+  [theme.breakpoints.up('sm')]: {
+    '& span': { display: 'flex' }
+  }
 }));
 
 const SupporterLogo = styled('img')({
