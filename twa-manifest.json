@@ -1,21 +1,27 @@
 {
-  "packageId": "org.grottocenter.app",
+  "packageId": "org.grottocenter.twa",
   "host": "grottocenter.org",
   "name": "Grottocenter",
   "launcherName": "Grottocenter",
   "display": "standalone",
-  "orientation": "default",
-  "themeColor": "#5d4037",
-  "navigationColor": "#5d4037",
-  "navigationColorDark": "#5d4037",
-  "navigationDividerColor": "#5d4037",
-  "navigationDividerColorDark": "#5d4037",
-  "backgroundColor": "#5d4037",
-  "enableNotifications": false,
+  "themeColor": "#5D4037",
+  "themeColorDark": "#000000",
+  "navigationColor": "#000000",
+  "navigationColorDark": "#000000",
+  "navigationDividerColor": "#000000",
+  "navigationDividerColorDark": "#000000",
+  "backgroundColor": "#5D4037",
+  "enableNotifications": true,
   "startUrl": "/",
   "iconUrl": "https://grottocenter.org/logo512.png",
   "maskableIconUrl": "https://grottocenter.org/logo512-maskable.png",
-  "monochromeIconUrl": "https://grottocenter.org/logo192.png",
+  "splashScreenFadeOutDuration": 300,
+  "signingKey": {
+    "path": "D:\\Paul\\Documents\\Dev\\workspace\\grottocenter-front\\android.keystore",
+    "alias": "android"
+  },
+  "appVersionName": "1",
+  "appVersionCode": 1,
   "shortcuts": [],
   "generatorApp": "bubblewrap-cli",
   "webManifestUrl": "https://grottocenter.org/manifest.json",
@@ -23,9 +29,6 @@
   "features": {
     "locationDelegation": {
       "enabled": true
-    },
-    "playBilling": {
-      "enabled": false
     }
   },
   "alphaDependencies": {
@@ -36,16 +39,13 @@
   "isMetaQuest": false,
   "fullScopeUrl": "https://grottocenter.org/",
   "minSdkVersion": 21,
-  "fingerprints": [
-    {
-      "name": "grottocenter",
-      "value": "REPLACE_WITH_YOUR_SHA256_FINGERPRINT"
-    }
-  ],
-  "signingKey": {
-    "path": "./android.keystore",
-    "alias": "grottocenter"
-  },
-  "appVersionName": "1.0.0",
-  "appVersionCode": 1
+  "orientation": "default",
+  "fingerprints": [],
+  "additionalTrustedOrigins": [],
+  "retainedBundles": [],
+  "protocolHandlers": [],
+  "fileHandlers": [],
+  "launchHandlerClientMode": "",
+  "displayOverride": [],
+  "appVersion": "1"
 }

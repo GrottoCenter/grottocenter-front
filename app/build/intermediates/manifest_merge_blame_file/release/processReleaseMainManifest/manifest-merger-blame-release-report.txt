@@ -1,0 +1,409 @@
+1<?xml version="1.0" encoding="utf-8"?>
+2<!--
+3    Copyright 2019 Google Inc. All Rights Reserved.
+4
+5     Licensed under the Apache License, Version 2.0 (the "License");
+6     you may not use this file except in compliance with the License.
+7     You may obtain a copy of the License at
+8
+9         http://www.apache.org/licenses/LICENSE-2.0
+10
+11     Unless required by applicable law or agreed to in writing, software
+12     distributed under the License is distributed on an "AS IS" BASIS,
+13     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+14     See the License for the specific language governing permissions and
+15     limitations under the License.
+16-->
+17<!--
+18 The "package" attribute is rewritten by the Gradle build with the value of applicationId.
+19     It is still required here, as it is used to derive paths, for instance when referring
+20     to an Activity by ".MyActivity" instead of the full name. If more Activities are added to the
+21     application, the package attribute will need to reflect the correct path in order to use
+22     the abbreviated format.
+23-->
+24<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+25    package="org.grottocenter.twa"
+26    android:versionCode="1"
+27    android:versionName="1" >
+28
+29    <uses-sdk
+30        android:minSdkVersion="21"
+31        android:targetSdkVersion="35" />
+32
+33    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+33-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:26:9-80
+33-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:26:26-78
+34    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+34-->[com.google.androidbrowserhelper:locationdelegation:1.1.2] C:\Users\paul_\.gradle\caches\8.11.1\transforms\6215e13210b05cc5715af15b5940fb9f\transformed\locationdelegation-1.1.2\AndroidManifest.xml:7:5-79
+34-->[com.google.androidbrowserhelper:locationdelegation:1.1.2] C:\Users\paul_\.gradle\caches\8.11.1\transforms\6215e13210b05cc5715af15b5940fb9f\transformed\locationdelegation-1.1.2\AndroidManifest.xml:7:22-76
+35    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+35-->[com.google.androidbrowserhelper:locationdelegation:1.1.2] C:\Users\paul_\.gradle\caches\8.11.1\transforms\6215e13210b05cc5715af15b5940fb9f\transformed\locationdelegation-1.1.2\AndroidManifest.xml:8:5-81
+35-->[com.google.androidbrowserhelper:locationdelegation:1.1.2] C:\Users\paul_\.gradle\caches\8.11.1\transforms\6215e13210b05cc5715af15b5940fb9f\transformed\locationdelegation-1.1.2\AndroidManifest.xml:8:22-78
+36
+37    <queries>
+37-->[com.google.androidbrowserhelper:androidbrowserhelper:2.6.2] C:\Users\paul_\.gradle\caches\8.11.1\transforms\5053e02be90783e54992393be394bb70\transformed\androidbrowserhelper-2.6.2\AndroidManifest.xml:22:5-30:15
+38        <intent>
+38-->[com.google.androidbrowserhelper:androidbrowserhelper:2.6.2] C:\Users\paul_\.gradle\caches\8.11.1\transforms\5053e02be90783e54992393be394bb70\transformed\androidbrowserhelper-2.6.2\AndroidManifest.xml:23:9-29:18
+39            <action android:name="android.intent.action.VIEW" />
+39-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:148:17-68
+39-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:148:25-66
+40
+41            <category android:name="android.intent.category.BROWSABLE" />
+41-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:150:17-77
+41-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:150:27-75
+42
+43            <data android:scheme="https" />
+43-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:151:17-154:19
+43-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:151:23-45
+44        </intent>
+45    </queries>
+46
+47    <permission
+47-->[androidx.core:core:1.13.0] C:\Users\paul_\.gradle\caches\8.11.1\transforms\a5429f7b20c607b890f08b5283ad4ec0\transformed\core-1.13.0\AndroidManifest.xml:22:5-24:47
+48        android:name="org.grottocenter.twa.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+48-->[androidx.core:core:1.13.0] C:\Users\paul_\.gradle\caches\8.11.1\transforms\a5429f7b20c607b890f08b5283ad4ec0\transformed\core-1.13.0\AndroidManifest.xml:23:9-81
+49        android:protectionLevel="signature" />
+49-->[androidx.core:core:1.13.0] C:\Users\paul_\.gradle\caches\8.11.1\transforms\a5429f7b20c607b890f08b5283ad4ec0\transformed\core-1.13.0\AndroidManifest.xml:24:9-44
+50
+51    <uses-permission android:name="org.grottocenter.twa.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
+51-->[androidx.core:core:1.13.0] C:\Users\paul_\.gradle\caches\8.11.1\transforms\a5429f7b20c607b890f08b5283ad4ec0\transformed\core-1.13.0\AndroidManifest.xml:26:5-97
+51-->[androidx.core:core:1.13.0] C:\Users\paul_\.gradle\caches\8.11.1\transforms\a5429f7b20c607b890f08b5283ad4ec0\transformed\core-1.13.0\AndroidManifest.xml:26:22-94
+52
+53    <application
+53-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:35:5-202:19
+54        android:name="org.grottocenter.twa.Application"
+54-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:36:9-35
+55        android:allowBackup="true"
+55-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:37:9-35
+56        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
+56-->[androidx.core:core:1.13.0] C:\Users\paul_\.gradle\caches\8.11.1\transforms\a5429f7b20c607b890f08b5283ad4ec0\transformed\core-1.13.0\AndroidManifest.xml:28:18-86
+57        android:extractNativeLibs="true"
+58        android:icon="@mipmap/ic_launcher"
+58-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:38:9-43
+59        android:label="@string/appName"
+59-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:39:9-40
+60        android:manageSpaceActivity="com.google.androidbrowserhelper.trusted.ManageDataLauncherActivity"
+60-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:41:9-105
+61        android:supportsRtl="true"
+61-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:43:9-35
+62        android:theme="@android:style/Theme.Translucent.NoTitleBar" >
+62-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:44:9-68
+63        <meta-data
+63-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:46:9-48:58
+64            android:name="asset_statements"
+64-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:47:13-44
+65            android:resource="@string/assetStatements" />
+65-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:48:13-55
+66        <meta-data
+66-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:51:13-53:58
+67            android:name="web_manifest_url"
+67-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:52:17-48
+68            android:value="@string/webManifestUrl" />
+68-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:53:17-55
+69        <meta-data
+69-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:56:9-58:52
+70            android:name="twa_generator"
+70-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:57:13-41
+71            android:value="@string/generatorApp" />
+71-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:58:13-49
+72
+73        <activity
+73-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:65:13-76:24
+74            android:name="com.google.androidbrowserhelper.trusted.ManageDataLauncherActivity"
+74-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:65:23-104
+75            android:enabled="true"
+75-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:67:17-39
+76            android:excludeFromRecents="true"
+76-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:68:17-50
+77            android:exported="false" >
+77-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:66:17-41
+78            <meta-data
+78-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:69:17-71:57
+79                android:name="android.support.customtabs.trusted.MANAGE_SPACE_URL"
+79-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:70:21-87
+80                android:value="@string/launchUrl" />
+80-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:71:21-54
+81
+82            <intent-filter>
+82-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:72:17-75:33
+83                <action android:name="android.intent.action.APPLICATION_PREFERENCES" />
+83-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:73:21-92
+83-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:73:29-89
+84
+85                <category android:name="android.intent.category.DEFAULT" />
+85-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:74:21-80
+85-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:74:31-77
+86            </intent-filter>
+87        </activity>
+88        <activity
+88-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:79:9-160:20
+89            android:name="org.grottocenter.twa.LauncherActivity"
+89-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:79:19-50
+90            android:alwaysRetainTaskState="true"
+90-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:80:13-49
+91            android:exported="true"
+91-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:82:13-36
+92            android:label="@string/launcherName" >
+92-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:81:13-49
+93            <meta-data
+93-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:83:13-84:53
+94                android:name="android.support.customtabs.trusted.DEFAULT_URL"
+94-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:83:24-85
+95                android:value="@string/launchUrl" />
+95-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:84:17-50
+96            <meta-data
+96-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:86:13-88:58
+97                android:name="android.support.customtabs.trusted.STATUS_BAR_COLOR"
+97-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:87:17-83
+98                android:resource="@color/colorPrimary" />
+98-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:88:17-55
+99            <meta-data
+99-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:92:13-94:62
+100                android:name="android.support.customtabs.trusted.STATUS_BAR_COLOR_DARK"
+100-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:93:17-88
+101                android:resource="@color/colorPrimaryDark" />
+101-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:94:17-59
+102            <meta-data
+102-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:96:13-98:61
+103                android:name="android.support.customtabs.trusted.NAVIGATION_BAR_COLOR"
+103-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:97:17-87
+104                android:resource="@color/navigationColor" />
+104-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:98:17-58
+105            <meta-data
+105-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:100:13-102:65
+106                android:name="android.support.customtabs.trusted.NAVIGATION_BAR_COLOR_DARK"
+106-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:101:17-92
+107                android:resource="@color/navigationColorDark" />
+107-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:102:17-62
+108            <meta-data
+108-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:104:13-106:68
+109                android:name="androix.browser.trusted.NAVIGATION_BAR_DIVIDER_COLOR"
+109-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:105:17-84
+110                android:resource="@color/navigationDividerColor" />
+110-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:106:17-65
+111            <meta-data
+111-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:108:13-110:72
+112                android:name="androix.browser.trusted.NAVIGATION_BAR_DIVIDER_COLOR_DARK"
+112-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:109:17-89
+113                android:resource="@color/navigationDividerColorDark" />
+113-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:110:17-69
+114            <meta-data
+114-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:112:13-113:54
+115                android:name="android.support.customtabs.trusted.SPLASH_IMAGE_DRAWABLE"
+115-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:112:24-95
+116                android:resource="@drawable/splash" />
+116-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:113:17-52
+117            <meta-data
+117-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:115:13-116:60
+118                android:name="android.support.customtabs.trusted.SPLASH_SCREEN_BACKGROUND_COLOR"
+118-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:115:24-104
+119                android:resource="@color/backgroundColor" />
+119-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:116:17-58
+120            <meta-data
+120-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:118:13-119:71
+121                android:name="android.support.customtabs.trusted.SPLASH_SCREEN_FADE_OUT_DURATION"
+121-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:118:24-105
+122                android:value="@integer/splashScreenFadeOutDuration" />
+122-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:119:17-69
+123            <meta-data
+123-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:121:13-122:60
+124                android:name="android.support.customtabs.trusted.FILE_PROVIDER_AUTHORITY"
+124-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:121:24-97
+125                android:value="@string/providerAuthority" />
+125-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:122:17-58
+126            <meta-data
+126-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:124:13-97
+127                android:name="android.app.shortcuts"
+127-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:124:24-60
+128                android:resource="@xml/shortcuts" />
+128-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:124:61-94
+129            <meta-data
+129-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:126:13-127:56
+130                android:name="android.support.customtabs.trusted.FALLBACK_STRATEGY"
+130-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:126:24-91
+131                android:value="@string/fallbackType" />
+131-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:127:17-53
+132            <meta-data
+132-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:133:13-134:54
+133                android:name="android.support.customtabs.trusted.SCREEN_ORIENTATION"
+133-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:133:24-92
+134                android:value="@string/orientation" />
+134-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:134:17-52
+135
+136            <intent-filter>
+136-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:142:13-145:29
+137                <action android:name="android.intent.action.MAIN" />
+137-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:143:17-69
+137-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:143:25-66
+138
+139                <category android:name="android.intent.category.LAUNCHER" />
+139-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:144:17-77
+139-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:144:27-74
+140            </intent-filter>
+141            <intent-filter android:autoVerify="true" >
+141-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:147:13-155:29
+141-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:147:28-53
+142                <action android:name="android.intent.action.VIEW" />
+142-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:148:17-68
+142-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:148:25-66
+143
+144                <category android:name="android.intent.category.DEFAULT" />
+144-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:74:21-80
+144-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:74:31-77
+145                <category android:name="android.intent.category.BROWSABLE" />
+145-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:150:17-77
+145-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:150:27-75
+146
+147                <data
+147-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:151:17-154:19
+148                    android:host="@string/hostName"
+148-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:152:21-52
+149                    android:scheme="https" />
+149-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:151:23-45
+150            </intent-filter>
+151        </activity>
+152        <activity android:name="com.google.androidbrowserhelper.trusted.FocusActivity" />
+152-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:162:9-90
+152-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:162:19-87
+153        <activity
+153-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:164:9-165:62
+154            android:name="com.google.androidbrowserhelper.trusted.WebViewFallbackActivity"
+154-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:164:19-97
+155            android:configChanges="orientation|screenSize" />
+155-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:165:13-59
+156
+157        <provider
+157-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:167:9-175:20
+158            android:name="androidx.core.content.FileProvider"
+158-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:168:13-62
+159            android:authorities="@string/providerAuthority"
+159-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:169:13-60
+160            android:exported="false"
+160-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:171:13-37
+161            android:grantUriPermissions="true" >
+161-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:170:13-47
+162            <meta-data
+162-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:172:13-174:53
+163                android:name="android.support.FILE_PROVIDER_PATHS"
+163-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:173:17-67
+164                android:resource="@xml/filepaths" />
+164-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:174:17-50
+165        </provider>
+166
+167        <service
+167-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:177:9-192:19
+168            android:name="org.grottocenter.twa.DelegationService"
+168-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:178:13-46
+169            android:enabled="@bool/enableNotification"
+169-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:179:13-55
+170            android:exported="@bool/enableNotification" >
+170-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:180:13-56
+171            <meta-data
+171-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:183:17-185:73
+172                android:name="android.support.customtabs.trusted.SMALL_ICON"
+172-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:184:21-81
+173                android:resource="@drawable/ic_notification_icon" />
+173-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:185:21-70
+174
+175            <intent-filter>
+175-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:188:13-191:29
+176                <action android:name="android.support.customtabs.trusted.TRUSTED_WEB_ACTIVITY_SERVICE" />
+176-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:189:17-105
+176-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:189:25-103
+177
+178                <category android:name="android.intent.category.DEFAULT" />
+178-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:74:21-80
+178-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:74:31-77
+179            </intent-filter>
+180        </service>
+181
+182        <activity android:name="com.google.androidbrowserhelper.trusted.NotificationPermissionRequestActivity" />
+182-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:195:13-118
+182-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:195:23-115
+183        <activity android:name="com.google.androidbrowserhelper.locationdelegation.PermissionRequestActivity" />
+183-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:199:13-200:89
+183-->D:\Paul\Documents\Dev\workspace\grottocenter-front\app\src\main\AndroidManifest.xml:199:23-123
+184        <activity
+184-->[com.google.android.gms:play-services-base:18.1.0] C:\Users\paul_\.gradle\caches\8.11.1\transforms\02e37f92c71ffadabef41ae6f5feca22\transformed\play-services-base-18.1.0\AndroidManifest.xml:20:9-22:45
+185            android:name="com.google.android.gms.common.api.GoogleApiActivity"
+185-->[com.google.android.gms:play-services-base:18.1.0] C:\Users\paul_\.gradle\caches\8.11.1\transforms\02e37f92c71ffadabef41ae6f5feca22\transformed\play-services-base-18.1.0\AndroidManifest.xml:20:19-85
+186            android:exported="false"
+186-->[com.google.android.gms:play-services-base:18.1.0] C:\Users\paul_\.gradle\caches\8.11.1\transforms\02e37f92c71ffadabef41ae6f5feca22\transformed\play-services-base-18.1.0\AndroidManifest.xml:22:19-43
+187            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+187-->[com.google.android.gms:play-services-base:18.1.0] C:\Users\paul_\.gradle\caches\8.11.1\transforms\02e37f92c71ffadabef41ae6f5feca22\transformed\play-services-base-18.1.0\AndroidManifest.xml:21:19-78
+188
+189        <meta-data
+189-->[com.google.android.gms:play-services-basement:18.1.0] C:\Users\paul_\.gradle\caches\8.11.1\transforms\d176d6696a4772b4ce2a6021c61f9202\transformed\play-services-basement-18.1.0\AndroidManifest.xml:21:9-23:69
+190            android:name="com.google.android.gms.version"
+190-->[com.google.android.gms:play-services-basement:18.1.0] C:\Users\paul_\.gradle\caches\8.11.1\transforms\d176d6696a4772b4ce2a6021c61f9202\transformed\play-services-basement-18.1.0\AndroidManifest.xml:22:13-58
+191            android:value="@integer/google_play_services_version" />
+191-->[com.google.android.gms:play-services-basement:18.1.0] C:\Users\paul_\.gradle\caches\8.11.1\transforms\d176d6696a4772b4ce2a6021c61f9202\transformed\play-services-basement-18.1.0\AndroidManifest.xml:23:13-66
+192
+193        <provider
+193-->[androidx.emoji2:emoji2:1.3.0] C:\Users\paul_\.gradle\caches\8.11.1\transforms\5cb7738f5242d8c4e38c8ffa2b265b31\transformed\emoji2-1.3.0\AndroidManifest.xml:24:9-32:20
+194            android:name="androidx.startup.InitializationProvider"
+194-->[androidx.emoji2:emoji2:1.3.0] C:\Users\paul_\.gradle\caches\8.11.1\transforms\5cb7738f5242d8c4e38c8ffa2b265b31\transformed\emoji2-1.3.0\AndroidManifest.xml:25:13-67
+195            android:authorities="org.grottocenter.twa.androidx-startup"
+195-->[androidx.emoji2:emoji2:1.3.0] C:\Users\paul_\.gradle\caches\8.11.1\transforms\5cb7738f5242d8c4e38c8ffa2b265b31\transformed\emoji2-1.3.0\AndroidManifest.xml:26:13-68
+196            android:exported="false" >
+196-->[androidx.emoji2:emoji2:1.3.0] C:\Users\paul_\.gradle\caches\8.11.1\transforms\5cb7738f5242d8c4e38c8ffa2b265b31\transformed\emoji2-1.3.0\AndroidManifest.xml:27:13-37
+197            <meta-data
+197-->[androidx.emoji2:emoji2:1.3.0] C:\Users\paul_\.gradle\caches\8.11.1\transforms\5cb7738f5242d8c4e38c8ffa2b265b31\transformed\emoji2-1.3.0\AndroidManifest.xml:29:13-31:52
+198                android:name="androidx.emoji2.text.EmojiCompatInitializer"
+198-->[androidx.emoji2:emoji2:1.3.0] C:\Users\paul_\.gradle\caches\8.11.1\transforms\5cb7738f5242d8c4e38c8ffa2b265b31\transformed\emoji2-1.3.0\AndroidManifest.xml:30:17-75
+199                android:value="androidx.startup" />
+199-->[androidx.emoji2:emoji2:1.3.0] C:\Users\paul_\.gradle\caches\8.11.1\transforms\5cb7738f5242d8c4e38c8ffa2b265b31\transformed\emoji2-1.3.0\AndroidManifest.xml:31:17-49
+200            <meta-data
+200-->[androidx.lifecycle:lifecycle-process:2.6.2] C:\Users\paul_\.gradle\caches\8.11.1\transforms\4bc52031417e9743197e36b704fe409f\transformed\lifecycle-process-2.6.2\AndroidManifest.xml:29:13-31:52
+201                android:name="androidx.lifecycle.ProcessLifecycleInitializer"
+201-->[androidx.lifecycle:lifecycle-process:2.6.2] C:\Users\paul_\.gradle\caches\8.11.1\transforms\4bc52031417e9743197e36b704fe409f\transformed\lifecycle-process-2.6.2\AndroidManifest.xml:30:17-78
+202                android:value="androidx.startup" />
+202-->[androidx.lifecycle:lifecycle-process:2.6.2] C:\Users\paul_\.gradle\caches\8.11.1\transforms\4bc52031417e9743197e36b704fe409f\transformed\lifecycle-process-2.6.2\AndroidManifest.xml:31:17-49
+203            <meta-data
+203-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\paul_\.gradle\caches\8.11.1\transforms\bb4a0d32d1b17a1dcea0cf71d2bde5e0\transformed\profileinstaller-1.3.1\AndroidManifest.xml:29:13-31:52
+204                android:name="androidx.profileinstaller.ProfileInstallerInitializer"
+204-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\paul_\.gradle\caches\8.11.1\transforms\bb4a0d32d1b17a1dcea0cf71d2bde5e0\transformed\profileinstaller-1.3.1\AndroidManifest.xml:30:17-85
+205                android:value="androidx.startup" />
+205-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\paul_\.gradle\caches\8.11.1\transforms\bb4a0d32d1b17a1dcea0cf71d2bde5e0\transformed\profileinstaller-1.3.1\AndroidManifest.xml:31:17-49
+206        </provider>
+207
+208        <receiver
+208-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\paul_\.gradle\caches\8.11.1\transforms\bb4a0d32d1b17a1dcea0cf71d2bde5e0\transformed\profileinstaller-1.3.1\AndroidManifest.xml:34:9-52:20
+209            android:name="androidx.profileinstaller.ProfileInstallReceiver"
+209-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\paul_\.gradle\caches\8.11.1\transforms\bb4a0d32d1b17a1dcea0cf71d2bde5e0\transformed\profileinstaller-1.3.1\AndroidManifest.xml:35:13-76
+210            android:directBootAware="false"
+210-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\paul_\.gradle\caches\8.11.1\transforms\bb4a0d32d1b17a1dcea0cf71d2bde5e0\transformed\profileinstaller-1.3.1\AndroidManifest.xml:36:13-44
+211            android:enabled="true"
+211-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\paul_\.gradle\caches\8.11.1\transforms\bb4a0d32d1b17a1dcea0cf71d2bde5e0\transformed\profileinstaller-1.3.1\AndroidManifest.xml:37:13-35
+212            android:exported="true"
+212-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\paul_\.gradle\caches\8.11.1\transforms\bb4a0d32d1b17a1dcea0cf71d2bde5e0\transformed\profileinstaller-1.3.1\AndroidManifest.xml:38:13-36
+213            android:permission="android.permission.DUMP" >
+213-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\paul_\.gradle\caches\8.11.1\transforms\bb4a0d32d1b17a1dcea0cf71d2bde5e0\transformed\profileinstaller-1.3.1\AndroidManifest.xml:39:13-57
+214            <intent-filter>
+214-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\paul_\.gradle\caches\8.11.1\transforms\bb4a0d32d1b17a1dcea0cf71d2bde5e0\transformed\profileinstaller-1.3.1\AndroidManifest.xml:40:13-42:29
+215                <action android:name="androidx.profileinstaller.action.INSTALL_PROFILE" />
+215-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\paul_\.gradle\caches\8.11.1\transforms\bb4a0d32d1b17a1dcea0cf71d2bde5e0\transformed\profileinstaller-1.3.1\AndroidManifest.xml:41:17-91
+215-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\paul_\.gradle\caches\8.11.1\transforms\bb4a0d32d1b17a1dcea0cf71d2bde5e0\transformed\profileinstaller-1.3.1\AndroidManifest.xml:41:25-88
+216            </intent-filter>
+217            <intent-filter>
+217-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\paul_\.gradle\caches\8.11.1\transforms\bb4a0d32d1b17a1dcea0cf71d2bde5e0\transformed\profileinstaller-1.3.1\AndroidManifest.xml:43:13-45:29
+218                <action android:name="androidx.profileinstaller.action.SKIP_FILE" />
+218-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\paul_\.gradle\caches\8.11.1\transforms\bb4a0d32d1b17a1dcea0cf71d2bde5e0\transformed\profileinstaller-1.3.1\AndroidManifest.xml:44:17-85
+218-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\paul_\.gradle\caches\8.11.1\transforms\bb4a0d32d1b17a1dcea0cf71d2bde5e0\transformed\profileinstaller-1.3.1\AndroidManifest.xml:44:25-82
+219            </intent-filter>
+220            <intent-filter>
+220-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\paul_\.gradle\caches\8.11.1\transforms\bb4a0d32d1b17a1dcea0cf71d2bde5e0\transformed\profileinstaller-1.3.1\AndroidManifest.xml:46:13-48:29
+221                <action android:name="androidx.profileinstaller.action.SAVE_PROFILE" />
+221-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\paul_\.gradle\caches\8.11.1\transforms\bb4a0d32d1b17a1dcea0cf71d2bde5e0\transformed\profileinstaller-1.3.1\AndroidManifest.xml:47:17-88
+221-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\paul_\.gradle\caches\8.11.1\transforms\bb4a0d32d1b17a1dcea0cf71d2bde5e0\transformed\profileinstaller-1.3.1\AndroidManifest.xml:47:25-85
+222            </intent-filter>
+223            <intent-filter>
+223-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\paul_\.gradle\caches\8.11.1\transforms\bb4a0d32d1b17a1dcea0cf71d2bde5e0\transformed\profileinstaller-1.3.1\AndroidManifest.xml:49:13-51:29
+224                <action android:name="androidx.profileinstaller.action.BENCHMARK_OPERATION" />
+224-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\paul_\.gradle\caches\8.11.1\transforms\bb4a0d32d1b17a1dcea0cf71d2bde5e0\transformed\profileinstaller-1.3.1\AndroidManifest.xml:50:17-95
+224-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\paul_\.gradle\caches\8.11.1\transforms\bb4a0d32d1b17a1dcea0cf71d2bde5e0\transformed\profileinstaller-1.3.1\AndroidManifest.xml:50:25-92
+225            </intent-filter>
+226        </receiver>
+227    </application>
+228
+229</manifest>
