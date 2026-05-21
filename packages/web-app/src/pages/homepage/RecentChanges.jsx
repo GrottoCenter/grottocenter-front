@@ -6,7 +6,7 @@ import { useIntl } from 'react-intl';
 import RecentChangesContainer from '../../containers/RecentChangesContainer';
 
 const Section = styled(Box)(({ theme }) => ({
-  backgroundColor: '#fff',
+  backgroundColor: theme.palette.background.default,
   padding: '32px 24px',
   [theme.breakpoints.down('sm')]: {
     padding: '24px 16px'

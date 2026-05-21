@@ -1,5 +1,6 @@
 import React, { useCallback } from 'react';
 import { Box, Typography } from '@mui/material';
+import { ExploreOutlined } from '@mui/icons-material';
 import { styled } from '@mui/material/styles';
 import { useDispatch } from 'react-redux';
 import { useIntl } from 'react-intl';
@@ -33,6 +34,7 @@ const RandomEntry = () => {
   return (
     <Section>
       <TitleRow>
+        <ExploreOutlined sx={{ fontSize: 28, color: 'white' }} />
         <Typography variant="h5" fontWeight={600} color="white">
           {formatMessage({ id: 'Discover a random cave' })}
         </Typography>

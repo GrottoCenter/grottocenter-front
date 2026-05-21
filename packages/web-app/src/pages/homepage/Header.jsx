@@ -1,153 +1,113 @@
 import React, { useEffect } from 'react';
-import { Button } from '@mui/material';
+import { Box, Button } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { useDispatch } from 'react-redux';
-import { FormattedMessage } from 'react-intl';
-import {
-  GridContainer,
-  GridRow,
-  GridFullColumn
-} from '../../helpers/GridSystem';
+import { useIntl } from 'react-intl';
 import { fseLinks, uisLinks } from '../../conf/externalLinks';
 import InternationalizedLink from '../../components/common/InternationalizedLink';
-import Translate from '../../components/common/Translate';
 import GCLogo from '../../components/common/GCLogo';
 import { loadDynamicNumber } from '../../actions/DynamicNumber';
 
-const HeaderGridContainer = styled(GridContainer)`
-  width: 100% !important;
-  max-width: 100% !important;
-  padding: 0;
-  background: url('/images/caves/topo.jpg') 0 center;
-  background-repeat: no-repeat;
-  background-size: 220%;
-  background-position: top;
+const HeaderRoot = styled(Box)({
+  width: '100%',
+  background: "url('/images/caves/topo.jpg') center top no-repeat",
+  backgroundSize: '220%',
+  '@media (min-width: 550px)': { backgroundSize: '130%' },
+  '@media (min-width: 1000px)': { backgroundSize: '100%' }
+});
 
-  @media (min-width: 550px) {
-    background-size: 130%;
-  }
+const BrandRow = styled(Box)(({ theme }) => ({
+  padding: '24px 16px 20px',
+  textAlign: 'center',
+  [theme.breakpoints.up('sm')]: { padding: '40px 40px 32px' }
+}));
 
-  @media (min-width: 1000px) {
-    background-size: 100%;
-  }
-`;
+const Sitename = styled('h1')({
+  fontWeight: 600,
+  fontSize: 55,
+  lineHeight: 1.2,
+  letterSpacing: -2,
+  marginBottom: 2
+});
 
-const BrandRow = styled(GridRow)`
-  padding: 24px 16px 20px;
-  text-align: center;
+const Slogan = styled('span')({
+  fontSize: '1.5rem',
+  fontWeight: 400
+});
 
-  @media (min-width: 550px) {
-    padding: 40px 40px 32px;
-  }
-`;
+const CTARow = styled(Box)({
+  display: 'flex',
+  gap: 16,
+  justifyContent: 'center',
+  flexWrap: 'wrap',
+  marginTop: 40
+});
 
-const Sitename = styled('h1')`
-  font-weight: 600;
-  font-size: 55px;
-  line-height: 1.2;
-  letter-spacing: -2px;
-  margin-bottom: 2px;
-`;
+const SupporterRow = styled(Box)(({ theme }) => ({
+  display: 'none',
+  alignItems: 'center',
+  fontSize: 'small',
+  fontWeight: 300,
+  lineHeight: '25px',
+  gap: 10,
+  padding: '0 16px 12px',
+  [theme.breakpoints.up('sm')]: { display: 'flex' }
+}));
 
-const Slogan = styled('span')`
-  font-size: 1.5rem;
-  font-weight: 400;
-`;
+const SupporterLogo = styled('img')({
+  width: 25,
+  height: 25
+});
 
-const CTARow = styled('div')`
-  display: flex;
-  gap: 16px;
-  justify-content: center;
-  flex-wrap: wrap;
-  margin-top: 40px;
-`;
-
-const SupporterRow = styled('span')`
-  display: flex;
-  font-size: small;
-  font-weight: 300;
-  line-height: 25px;
-
-  span {
-    display: none;
-  }
-
-  @media (min-width: 550px) {
-    display: flex;
-
-    span {
-      display: flex;
-      margin: 0 0 0 10px;
-    }
-  }
-`;
-
-const SupporterLogo = styled('img')`
-  width: 25px;
-  height: 25px;
-  margin: 0 0 0 10px;
-`;
-
-const LogoImage = styled(GCLogo)`
-  & > img {
-    width: 140px;
-
-    @media (min-width: 550px) {
-      width: 160px;
-    }
-  }
-`;
+const LogoImage = styled(GCLogo)({
+  '& > img': { width: 140 },
+  '@media (min-width: 550px)': { '& > img': { width: 160 } }
+});
 
 const Header = () => {
   const dispatch = useDispatch();
+  const { formatMessage } = useIntl();
 
   useEffect(() => {
     dispatch(loadDynamicNumber('entrances'));
   }, [dispatch]);
 
   return (
-    <header className="header">
-      <HeaderGridContainer>
+    <Box component="header">
+      <HeaderRoot>
         <BrandRow>
-          <GridFullColumn>
-            <LogoImage />
-            <Sitename>Grottocenter</Sitename>
-            <Slogan>
-              <Translate>The Wiki database made by cavers for cavers</Translate>
-            </Slogan>
-            <CTARow>
-              <Button
-                variant="contained"
-                color="secondary"
-                component="a"
-                href="/ui/map">
-                <FormattedMessage id="Explore the map" />
-              </Button>
-              <Button color="primary" component="a" href="/ui/entrances">
-                <FormattedMessage id="Find an entrance" />
-              </Button>
-            </CTARow>
-          </GridFullColumn>
+          <LogoImage />
+          <Sitename>Grottocenter</Sitename>
+          <Slogan>
+            {formatMessage({ id: 'The Wiki database made by cavers for cavers' })}
+          </Slogan>
+          <CTARow>
+            <Button
+              variant="contained"
+              color="secondary"
+              component="a"
+              href="/ui/map">
+              {formatMessage({ id: 'Explore the map' })}
+            </Button>
+            <Button color="primary" component="a" href="/ui/entrances">
+              {formatMessage({ id: 'Find an entrance' })}
+            </Button>
+          </CTARow>
         </BrandRow>
-        <GridRow>
-          <GridFullColumn>
-            <SupporterRow>
-              <InternationalizedLink links={fseLinks}>
-                <SupporterLogo src="/images/FSE.svg" alt="Logo FSE" />
-              </InternationalizedLink>
-              <InternationalizedLink links={uisLinks}>
-                <SupporterLogo src="/images/UIS.svg" alt="Logo UIS" />
-              </InternationalizedLink>
-              <span>
-                <Translate>
-                  Grottocenter is supported by the FSE and the UIS
-                </Translate>
-              </span>
-            </SupporterRow>
-          </GridFullColumn>
-        </GridRow>
-      </HeaderGridContainer>
-    </header>
+
+        <SupporterRow>
+          <InternationalizedLink links={fseLinks}>
+            <SupporterLogo src="/images/FSE.svg" alt="Logo FSE" />
+          </InternationalizedLink>
+          <InternationalizedLink links={uisLinks}>
+            <SupporterLogo src="/images/UIS.svg" alt="Logo UIS" />
+          </InternationalizedLink>
+          <span>
+            {formatMessage({ id: 'Grottocenter is supported by the FSE and the UIS' })}
+          </span>
+        </SupporterRow>
+      </HeaderRoot>
+    </Box>
   );
 };
 
