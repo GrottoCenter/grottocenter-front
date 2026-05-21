@@ -50,6 +50,7 @@ import {
   useSharePage
 } from '../../../hooks';
 import SensitiveCaveWarning from './SensitiveCaveWarning';
+import SensitiveLocationPlaceholder from './SensitiveLocationPlaceholder';
 import AuthorAndDate from '../../common/Contribution/AuthorAndDate';
 import Alert from '../../common/Alert';
 import Map from '../../common/Maps/MapMultipleMarkers';
@@ -355,7 +356,7 @@ export const Entry = ({ isLoading, error, entrance }) => {
                   onDeletePress(entity?.id, isDeleteConfirmationPermanent);
                 }}
               />
-              {entrance.isSensitive && (
+              {entrance.isSensitive && isAdmin && (
                 <Box sx={{ mx: 2, mt: 2 }}>
                   <SensitiveCaveWarning />
                 </Box>
@@ -364,11 +365,13 @@ export const Entry = ({ isLoading, error, entrance }) => {
                 content={
                   <>
                     <HalfSplitContainer>
-                      {(!entrance.isSensitive || isAdmin) && (
-                        <Box sx={{ flex: 1, minHeight: 200 }}>
+                      <Box sx={{ flex: 1, minHeight: 200, display: 'flex' }}>
+                        {!entrance.isSensitive || isAdmin ? (
                           <Map positions={mapPositions} loading={isLoading} />
-                        </Box>
-                      )}
+                        ) : (
+                          <SensitiveLocationPlaceholder />
+                        )}
+                      </Box>
                       <Box sx={{ flex: 1, overflow: 'auto' }}>
                         <Properties
                           entrance={entrance}
