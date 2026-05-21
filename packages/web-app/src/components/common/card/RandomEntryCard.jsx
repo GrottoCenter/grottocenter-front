@@ -4,62 +4,63 @@ import {
   Box,
   Button,
   Card,
-  CardContent,
   CardMedia,
-  Chip,
+  IconButton,
   Skeleton,
   Typography
 } from '@mui/material';
+import { Autorenew } from '@mui/icons-material';
+import MuiRating from '@mui/material/Rating';
+import StarBorderIcon from '@mui/icons-material/StarBorder';
 import { styled } from '@mui/material/styles';
 import { isNil } from 'ramda';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import GCLink from '../GCLink';
+import CustomIcon from '../CustomIcon';
 import { depthIcon, lengthIcon } from '../../../assets/icons';
 
-const CompactCard = styled(Card)({
-  display: 'flex',
-  flexDirection: 'row',
-  '@media (max-width: 600px)': {
-    flexDirection: 'column'
-  }
+const CARD_HEIGHT = 280;
+
+const BgCard = styled(Card)({
+  position: 'relative',
+  height: CARD_HEIGHT,
+  overflow: 'hidden'
 });
 
-const MediaWrapper = styled(Box)({
-  width: 200,
-  minHeight: 160,
-  flexShrink: 0,
-  '@media (max-width: 600px)': {
-    width: '100%',
-    minHeight: 140
-  }
+const Overlay = styled(Box)({
+  position: 'absolute',
+  inset: 0,
+  background:
+    'linear-gradient(to top, rgba(0,0,0,0.82) 0%, rgba(0,0,0,0.3) 55%, rgba(0,0,0,0.05) 100%)'
 });
 
-const StyledCardMedia = styled(CardMedia)({
-  height: '100%',
-  minHeight: 160,
-  '@media (max-width: 600px)': {
-    minHeight: 140
-  }
-});
-
-const ContentBox = styled(CardContent)({
-  display: 'flex',
-  flexDirection: 'column',
-  flex: 1,
-  padding: '16px !important'
-});
-
-const InfoRow = styled(Box)({
-  display: 'flex',
-  alignItems: 'center',
-  gap: 6,
-  marginTop: 4
+const Content = styled(Box)({
+  position: 'absolute',
+  bottom: 0,
+  left: 0,
+  right: 0,
+  padding: 16,
+  zIndex: 1
 });
 
 const InfoImg = styled('img')({
-  height: 18,
-  width: 18
+  height: 14,
+  width: 14,
+  filter: 'invert(1) brightness(2)'
 });
+
+const WhiteRating = styled(MuiRating)({
+  color: 'white',
+  fontSize: '1rem'
+});
+
+const formatTime = timeStr => {
+  if (!timeStr) return null;
+  const [h, m] = timeStr.split(':').map(Number);
+  if (h === 0) return `${m}min`;
+  if (m === 0) return `${h}h`;
+  return `${h}h${m}`;
+};
 
 const getTopoImage = documents => {
   if (!documents) return null;
@@ -69,85 +70,171 @@ const getTopoImage = documents => {
   return topo?.pathOld || null;
 };
 
-const RandomEntryCard = ({ entry, isFetching, fetch }) => {
+const RandomEntryCard = ({ entry, isFetching, fetch, onRefresh }) => {
+  const { formatMessage } = useIntl();
+
   useEffect(() => {
     fetch();
   }, [fetch]);
 
   if (isFetching) {
     return (
-      <CompactCard>
-        <MediaWrapper>
-          <Skeleton variant="rectangular" width="100%" height={160} />
-        </MediaWrapper>
-        <ContentBox>
-          <Skeleton variant="text" width="60%" height={32} />
-          <Skeleton variant="text" width="40%" />
-          <Skeleton variant="text" width="80%" sx={{ mt: 1 }} />
-        </ContentBox>
-      </CompactCard>
+      <BgCard>
+        <Skeleton variant="rectangular" width="100%" height={CARD_HEIGHT} />
+      </BgCard>
     );
   }
 
   if (!entry?.id) return null;
 
-  const { county, region, country, cave, documents } = entry;
+  const { county, region, country, cave, documents, stats, timeInfo } = entry;
   const imageSrc = getTopoImage(documents);
   const locationParts = [county, region, country].filter(Boolean);
 
   return (
-    <CompactCard>
-      <MediaWrapper>
-        <StyledCardMedia
-          image={imageSrc || '/images/caves/gours.jpg'}
-          title={entry.name}
-        />
-      </MediaWrapper>
-      <ContentBox>
-        <Chip
-          label={<FormattedMessage id="Random cave" />}
-          color="secondary"
-          size="small"
-          sx={{ alignSelf: 'flex-start', mb: 1 }}
-        />
-        <Typography variant="h6" gutterBottom>
+    <BgCard>
+      <CardMedia
+        image={imageSrc || '/images/caves/gours.jpg'}
+        sx={{ position: 'absolute', inset: 0, height: '100%' }}
+      />
+      <Overlay />
+
+      <Box
+        sx={{
+          position: 'absolute',
+          top: 12,
+          left: 12,
+          zIndex: 1,
+          '& > span': { margin: 0 }
+        }}>
+        <CustomIcon type="entrance" size={32} />
+      </Box>
+      {onRefresh && (
+        <IconButton
+          onClick={onRefresh}
+          sx={{
+            position: 'absolute',
+            top: 8,
+            right: 8,
+            zIndex: 1,
+            color: 'white',
+            '&:hover': { opacity: 1, backgroundColor: 'rgba(255,255,255,0.15)' }
+          }}>
+          <Autorenew sx={{ fontSize: 28 }} />
+        </IconButton>
+      )}
+
+      <Content>
+        <Typography variant="h6" fontWeight={600} sx={{ color: 'white' }}>
           {entry.name}
         </Typography>
         {locationParts.length > 0 && (
-          <Typography variant="body2" color="text.secondary">
+          <Typography
+            variant="caption"
+            sx={{ color: 'rgba(255,255,255,0.75)', mb: '6px' }}>
             {locationParts.join(' · ')}
           </Typography>
         )}
-        {cave && (
-          <InfoRow>
-            {cave.length && (
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                <InfoImg src={lengthIcon} alt="length" />
-                <Typography variant="caption">{cave.length} m</Typography>
+
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'flex-end',
+            justifyContent: 'space-between',
+            gap: 1,
+            mt: '4px'
+          }}>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+            {[
+              { labelId: 'Interest', value: stats?.aestheticism, time: null },
+              {
+                labelId: 'Access',
+                value: stats?.approach,
+                time: formatTime(timeInfo?.eTTrail)
+              },
+              {
+                labelId: 'Progression',
+                value: stats?.caving,
+                time: formatTime(timeInfo?.eTUnderground)
+              }
+            ].map(({ labelId, value, time }) =>
+              value > 0 ? (
+                <Box
+                  key={labelId}
+                  sx={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <Typography
+                    variant="caption"
+                    sx={{ color: 'rgba(255,255,255,0.75)', minWidth: 78 }}>
+                    {formatMessage({ id: labelId })}
+                    {time && ` (${time})`}
+                  </Typography>
+                  <WhiteRating
+                    readOnly
+                    size="small"
+                    value={value / 2}
+                    precision={0.5}
+                    emptyIcon={
+                      <StarBorderIcon
+                        fontSize="inherit"
+                        sx={{ color: 'rgba(255,255,255,0.35)' }}
+                      />
+                    }
+                  />
+                </Box>
+              ) : null
+            )}
+            {cave && (cave.depth || cave.length) && (
+              <Box sx={{ display: 'flex', gap: 2, mt: '4px' }}>
+                {cave.depth && (
+                  <Box
+                    sx={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    <InfoImg src={depthIcon} alt="depth" />
+                    <Typography
+                      variant="caption"
+                      sx={{ color: 'rgba(255,255,255,0.75)' }}>
+                      {cave.depth} m
+                    </Typography>
+                  </Box>
+                )}
+                {cave.length && (
+                  <Box
+                    sx={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    <InfoImg src={lengthIcon} alt="length" />
+                    <Typography
+                      variant="caption"
+                      sx={{ color: 'rgba(255,255,255,0.75)' }}>
+                      {cave.length} m
+                    </Typography>
+                  </Box>
+                )}
               </Box>
             )}
-            {cave.depth && (
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                <InfoImg src={depthIcon} alt="depth" />
-                <Typography variant="caption">{cave.depth} m</Typography>
-              </Box>
-            )}
-          </InfoRow>
-        )}
-        <Box sx={{ mt: 'auto', pt: 2, textAlign: 'right' }}>
+          </Box>
+
           <GCLink href={`/ui/entrances/${entry.id}`}>
-            <Button variant="contained" color="secondary" size="small">
+            <Button
+              variant="outlined"
+              size="small"
+              sx={{
+                color: 'white',
+                borderColor: 'rgba(255,255,255,0.6)',
+                '&:hover': {
+                  borderColor: 'white',
+                  backgroundColor: 'rgba(255,255,255,0.1)'
+                }
+              }}>
               <FormattedMessage id="Discover" />
             </Button>
           </GCLink>
         </Box>
-      </ContentBox>
-    </CompactCard>
+      </Content>
+    </BgCard>
   );
 };
 
 RandomEntryCard.propTypes = {
   fetch: PropTypes.func.isRequired,
+  onRefresh: PropTypes.func,
   isFetching: PropTypes.bool,
   entry: PropTypes.shape({
     id: PropTypes.number,
@@ -156,6 +243,15 @@ RandomEntryCard.propTypes = {
     region: PropTypes.string,
     country: PropTypes.string,
     documents: PropTypes.arrayOf(PropTypes.shape({})),
+    stats: PropTypes.shape({
+      aestheticism: PropTypes.number,
+      approach: PropTypes.number,
+      caving: PropTypes.number
+    }),
+    timeInfo: PropTypes.shape({
+      eTTrail: PropTypes.string,
+      eTUnderground: PropTypes.string
+    }),
     cave: PropTypes.shape({
       depth: PropTypes.number,
       length: PropTypes.number
