@@ -1,4 +1,4 @@
-{
+﻿{
   "1": "KARSTOLOGIE ET GÉOSPÉLÉOLOGIE",
   "2": "SPÉLÉOLOGIE ET KARSTOLOGIE RÉGIONALES",
   "3": "BIOSPÉLÉOLOGIE",
@@ -957,6 +957,7 @@
   "False northing: ": "Ordonnée fictive :",
   "FAQ": "FAQ",
   "Faroe Islands": "Iles Féroé",
+  "Feedback": "Retour",
   "Fiji": "Fidji",
   "File": "Fichier",
   "File input": "Ajout de fichier",
@@ -998,6 +999,7 @@
   "Germany": "Allemagne",
   "Ghana": "Ghana",
   "Gibraltar": "Gibraltar",
+  "Give feedback": "Faites vos retours",
   "Go back": "Retour",
   "Go back to user profile": "Retourner au profil de l'utilisateur",
   "Go to home page": "Retourner à l'accueil",
@@ -1758,6 +1760,7 @@
   "Somaliland": "Somalie",
   "Some helper text for Identifier Type.": "Texte d'aide pour le type d'identifiant.",
   "Some polygons are very thin or elongated. Check them before saving.": "Certains polygones sont très fins ou allongés. Vérifiez-les avant d'enregistrer.",
+  "Something broken or missing? Tell us!": "Quelque chose est cassé ou manquant ? Dites-le nous !",
   "Sorry, something went wrong...": "Désolé, quelque chose s'est mal passé....",
   "Sort by": "Trier par",
   "Sound": "Son",

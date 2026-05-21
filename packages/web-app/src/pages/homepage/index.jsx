@@ -16,6 +16,7 @@ import Footer from './Footer';
 
 import { usePermissions } from '../../hooks';
 import DataHomepage from '../../components/appli/DataHomepage';
+import FeedbackButton from '../../components/common/FeedbackButton';
 
 const HomepageWrapper = styled('div')`
   font-family: Roboto, Helvetica, Arial, sans-serif;
@@ -47,6 +48,7 @@ const HomePage = () => {
       <Association />
       <PartnersSection />
       <Footer />
+      <FeedbackButton />
     </HomepageWrapper>
   );
 };

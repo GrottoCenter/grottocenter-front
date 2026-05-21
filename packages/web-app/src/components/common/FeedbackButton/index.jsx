@@ -1,0 +1,72 @@
+import React from 'react';
+import { Box, Typography } from '@mui/material';
+import { styled } from '@mui/material/styles';
+import FeedbackIcon from '@mui/icons-material/Feedback';
+import { FormattedMessage, useIntl } from 'react-intl';
+
+const CONTACT_URL = 'https://fr.wikicaves.org/contact';
+
+const FloatingAnchor = styled('a')(({ theme }) => ({
+  position: 'fixed',
+  bottom: theme.spacing(4),
+  right: theme.spacing(4),
+  zIndex: 1200,
+  display: 'inline-flex',
+  width: 'fit-content',
+  alignItems: 'center',
+  gap: theme.spacing(2),
+  backgroundColor: theme.palette.secondary.main,
+  color: '#fff',
+  borderRadius: '50px',
+  padding: `${theme.spacing(2)} ${theme.spacing(3)}`,
+  boxShadow: '0 4px 20px rgba(0,0,0,0.35)',
+  textDecoration: 'none',
+  transition: 'box-shadow 0.2s ease, transform 0.2s ease',
+  '&:hover': {
+    backgroundColor: theme.palette.secondary.dark,
+    boxShadow: '0 8px 28px rgba(0,0,0,0.4)',
+    transform: 'translateY(-3px)'
+  },
+  [theme.breakpoints.down('sm')]: {
+    bottom: theme.spacing(2),
+    right: theme.spacing(2),
+    padding: `${theme.spacing(1.5)} ${theme.spacing(2)}`
+  }
+}));
+
+const FeedbackButton = () => {
+  const { formatMessage } = useIntl();
+
+  return (
+    <FloatingAnchor
+      href={CONTACT_URL}
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label={formatMessage({ id: 'Give feedback' })}>
+      <FeedbackIcon
+        sx={{ fontSize: 24, flexShrink: 0, alignSelf: 'center', mt: '2px' }}
+      />
+      <Box>
+        <Typography
+          variant="subtitle1"
+          fontWeight="bold"
+          lineHeight={1.3}
+          sx={{ whiteSpace: 'nowrap', color: '#fff' }}>
+          <FormattedMessage id="Give feedback" />
+        </Typography>
+        <Typography
+          variant="caption"
+          lineHeight={1.3}
+          sx={{
+            whiteSpace: 'nowrap',
+            color: 'rgba(255,255,255,0.85)',
+            display: { xs: 'none', sm: 'block' }
+          }}>
+          <FormattedMessage id="Something broken or missing? Tell us!" />
+        </Typography>
+      </Box>
+    </FloatingAnchor>
+  );
+};
+
+export default FeedbackButton;
