@@ -1,21 +1,23 @@
 import React, { useEffect } from 'react';
-import { useIntl } from 'react-intl';
-import CircularProgress from '@mui/material/CircularProgress';
+import { useIntl, FormattedRelativeTime } from 'react-intl';
 import PropTypes from 'prop-types';
-import { Chip } from '@mui/material';
+import { Box, Skeleton, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import GCLink from '../GCLink';
+import CustomIcon from '../CustomIcon';
 
-const nowd = new Date();
-const A_DAY_MS = 1000 * 60 * 60 * 24;
-
-function timeDiff(date, formatMessage) {
-  const nbDayDiff = Math.trunc(
-    (nowd.getTime() - new Date(date).getTime()) / A_DAY_MS
-  );
-  if (nbDayDiff === 0) return formatMessage({ id: 'Today' });
-  if (nbDayDiff === 1) return formatMessage({ id: 'Yesterday' });
-  return `${nbDayDiff} ${formatMessage({ id: 'Days ago' })}`;
+function getRelativeTimeProps(dateStr) {
+  const diffMs = new Date(dateStr) - Date.now();
+  const absSec = Math.abs(diffMs) / 1000;
+  if (absSec < 3600)
+    return { value: Math.round(diffMs / 60000), unit: 'minute' };
+  if (absSec < 86400)
+    return { value: Math.round(diffMs / 3600000), unit: 'hour' };
+  if (absSec < 2592000)
+    return { value: Math.round(diffMs / 86400000), unit: 'day' };
+  if (absSec < 31536000)
+    return { value: Math.round(diffMs / 2592000000), unit: 'month' };
+  return { value: Math.round(diffMs / 31536000000), unit: 'year' };
 }
 
 function actionFmt(action, formatMessage) {
@@ -44,8 +46,9 @@ function subEntitygroupFmt(entities, formatMessage) {
   if (entities.length === 0) return '';
   if (entities.length === 1) return entityFmt(entities[0], formatMessage);
 
-  const lastEntity = entityFmt(entities.pop(), formatMessage);
+  const lastEntity = entityFmt(entities[entities.length - 1], formatMessage);
   const otherEntities = entities
+    .slice(0, -1)
     .map(e => entityFmt(e, formatMessage))
     .join(' ');
   return `${otherEntities} ${formatMessage({ id: 'and' })} ${lastEntity}`;
@@ -60,122 +63,182 @@ function getEntityLinkUrl(type, id) {
   return `/`;
 }
 
-const GCLinkStyled = styled(GCLink)(({ theme }) => ({
-  color: theme.palette.secondary.light,
-  fontSize: '1.1em',
-  fontWeight: 'bold',
-  textDecorationThickness: '3px'
+function getEntityIcon(type) {
+  if (type === 'cave' || type === 'entrance') return 'entrance';
+  if (type === 'massif') return 'massif';
+  if (type === 'document') return 'bibliography';
+  if (type === 'grotto') return 'organization';
+  return 'entrance';
+}
+
+const TimelineItem = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  alignItems: 'center',
+  gap: 12,
+  padding: '6px 0',
+  '&:not(:last-child)': {
+    borderBottom: `1px solid ${theme.palette.divider}`
+  }
+}));
+
+const IconBubble = styled(Box)(({ theme }) => ({
+  width: 36,
+  height: 36,
+  borderRadius: '50%',
+  backgroundColor: theme.palette.primary.veryLight,
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  flexShrink: 0,
+  '& > span': { margin: 0 }
+}));
+
+const AuthorLink = styled(GCLink)(({ theme }) => ({
+  color: theme.palette.secondary.main,
+  fontWeight: 600,
+  textDecoration: 'none',
+  '&:hover': { textDecoration: 'underline' }
+}));
+
+const EntityLink = styled(GCLink)(({ theme }) => ({
+  color: theme.palette.primary.main,
+  fontWeight: 600,
+  textDecoration: 'none',
+  '&:hover': { textDecoration: 'underline' }
 }));
 
 const ChangeItem = ({ changeInfo }) => {
-  // There is 4 type of sentences:
-  // 1. author mainAction mainEntity
-  // 2. author mainAction mainEntity and subAction subEntityType and subEntityType
-  // 3. author subAction a subEntityType on mainEntity
-  // 4. author subAction subEntityType and subEntityType on mainEntity
-
-  // TODO Does the sentence formating work well on all languages ?
   const { formatMessage } = useIntl();
-
-  const dateEl = (
-    <Chip color="secondary" label={timeDiff(changeInfo.date, formatMessage)} />
-  );
-  const authorEl = (
-    <GCLinkStyled href={`/ui/persons/${changeInfo.authorId}`} internal>
-      {changeInfo.author}
-    </GCLinkStyled>
-  );
-  const mainEntityEl = (
-    <>
-      {entityFmt(changeInfo.mainEntityType, formatMessage)}{' '}
-      <GCLinkStyled
-        href={getEntityLinkUrl(
-          changeInfo.mainEntityType,
-          changeInfo.mainEntityId
-        )}
-        internal>
-        {changeInfo.name}
-      </GCLinkStyled>{' '}
-    </>
-  );
+  const iconType = getEntityIcon(changeInfo.mainEntityType);
+  const relTime = getRelativeTimeProps(changeInfo.date);
   const changeType = actionFmt(
     changeInfo.mainAction ?? changeInfo.subAction,
     formatMessage
   );
 
+  const authorEl = (
+    <AuthorLink href={`/ui/persons/${changeInfo.authorId}`} internal>
+      {changeInfo.author}
+    </AuthorLink>
+  );
+
+  const entityEl = (
+    <EntityLink
+      href={getEntityLinkUrl(
+        changeInfo.mainEntityType,
+        changeInfo.mainEntityId
+      )}
+      internal>
+      {changeInfo.name}
+    </EntityLink>
+  );
+
+  let sentence;
   if (changeInfo.mainAction != null) {
-    // Type 1 and 2
-    let additionalParts;
-    if (changeInfo.subAction != null)
-      additionalParts = (
-        <>
-          {' '}
-          {formatMessage({ id: 'with' })}{' '}
-          {subEntitygroupFmt(changeInfo.subEntityTypes, formatMessage)}
-        </>
-      );
-    return (
+    const subText =
+      changeInfo.subAction != null
+        ? ` ${formatMessage({ id: 'with' })} ${subEntitygroupFmt(changeInfo.subEntityTypes, formatMessage)}`
+        : '';
+    sentence = (
       <>
-        <div>{dateEl}</div>
-        <div>
-          {authorEl} {changeType} {mainEntityEl} {additionalParts ?? ''}
-        </div>
+        {authorEl} {changeType}{' '}
+        {entityFmt(changeInfo.mainEntityType, formatMessage)} {entityEl}
+        {subText && (
+          <Typography variant="body2" component="span" color="text.secondary">
+            {subText}
+          </Typography>
+        )}
+      </>
+    );
+  } else {
+    sentence = (
+      <>
+        {authorEl} {changeType}{' '}
+        <Typography variant="body2" component="span" color="text.secondary">
+          {subEntitygroupFmt(changeInfo.subEntityTypes, formatMessage)}{' '}
+          {formatMessage({ id: 'on' })}{' '}
+        </Typography>
+        {entityFmt(changeInfo.mainEntityType, formatMessage)} {entityEl}
       </>
     );
   }
 
-  // Type 3 and 4
   return (
-    <>
-      <div>{dateEl}</div>
-      <div>
-        {authorEl} {changeType}{' '}
-        {subEntitygroupFmt(changeInfo.subEntityTypes, formatMessage)}{' '}
-        {formatMessage({ id: 'on' })} {mainEntityEl}
-      </div>
-    </>
+    <TimelineItem>
+      <IconBubble>
+        <CustomIcon type={iconType} size={20} />
+      </IconBubble>
+      <Box sx={{ flex: 1, minWidth: 0 }}>
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'flex-start',
+            gap: 1,
+            flexWrap: 'wrap'
+          }}>
+          <Typography variant="body2" component="span" sx={{ flex: 1 }}>
+            {sentence}
+          </Typography>
+          <Typography
+            variant="caption"
+            color="text.secondary"
+            sx={{ flexShrink: 0, mt: '2px' }}>
+            <FormattedRelativeTime
+              value={relTime.value}
+              unit={relTime.unit}
+              numeric="auto"
+            />
+          </Typography>
+        </Box>
+      </Box>
+    </TimelineItem>
   );
 };
-
-const ChangeTable = styled('div')(
-  ({ theme }) => `
-    display: grid;
-    gap: 0.3em;
-    grid-template-rows: auto auto;
-    & > *:nth-of-type(even){
-      padding-bottom: 2em;
-    }
-
-    ${theme.breakpoints.up('sm')} {
-      grid-template-columns: auto 1fr;
-      grid-template-rows: unset;
-      gap: 1.3em 0.5em;
-      & > *:nth-of-type(odd){
-        justify-self: end;
-      }
-      & > *:nth-of-type(even){
-        padding-bottom: 0;
-      }
-    }
-    `
-);
 
 const RecentChangesCard = ({ changes, isFetching, fetch }) => {
   useEffect(() => {
     fetch();
   }, [fetch]);
 
-  if (isFetching || !changes) return <CircularProgress />;
+  if (isFetching || !changes) {
+    return (
+      <Box>
+        {[...Array(5)].map((_, i) => (
+          <Box
+            key={i}
+            sx={{
+              display: 'flex',
+              gap: '12px',
+              py: '10px',
+              borderBottom: '1px solid rgba(0,0,0,0.08)'
+            }}>
+            <Skeleton
+              variant="circular"
+              width={36}
+              height={36}
+              sx={{ flexShrink: 0 }}
+            />
+            <Box sx={{ flex: 1 }}>
+              <Skeleton variant="text" width="75%" />
+              <Skeleton variant="text" width="35%" />
+            </Box>
+          </Box>
+        ))}
+      </Box>
+    );
+  }
+
   return (
-    <ChangeTable>
+    <Box>
       {changes.map((e, index) => (
         <ChangeItem changeInfo={e} key={`${e.date}-${index}`} />
       ))}
-    </ChangeTable>
+    </Box>
   );
 };
 
-const changeInfo = PropTypes.shape({
+const changeInfoShape = PropTypes.shape({
   date: PropTypes.string,
   authorId: PropTypes.number,
   author: PropTypes.string,
@@ -187,10 +250,10 @@ const changeInfo = PropTypes.shape({
   name: PropTypes.string
 });
 
-ChangeItem.propTypes = { changeInfo };
+ChangeItem.propTypes = { changeInfo: changeInfoShape };
 RecentChangesCard.propTypes = {
   isFetching: PropTypes.bool,
-  changes: PropTypes.arrayOf(changeInfo),
+  changes: PropTypes.arrayOf(changeInfoShape),
   fetch: PropTypes.func.isRequired
 };
 

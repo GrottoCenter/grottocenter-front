@@ -103,12 +103,9 @@ export const legalLinks = generateLinks(
   'en'
 );
 
-export const pftGdLink =
-  'https://docs.google.com/document/d/1SccuusPQcxrZJI3nvWcbUc2dgGyKc4ZJXqQzSPeE9Hg/edit?usp=sharing';
-
 export const contributeLinks = {
-  fr: 'http://fr.wikicaves.org/contribute-participer',
-  '*': 'http://en.wikicaves.org/contribute-participer'
+  fr: 'https://fr.wikicaves.org/contribute-participer',
+  '*': 'https://en.wikicaves.org/contribute-participer'
 };
 
 export const wikiApiLinks = {
@@ -118,8 +115,8 @@ export const wikiApiLinks = {
 // ===== Blogger
 
 export const bloggerLinks = {
-  fr: 'http://blog-fr.grottocenter.org/',
-  '*': 'http://blog-en.grottocenter.org/'
+  fr: 'https://blog-fr.grottocenter.org/',
+  '*': 'https://blog-en.grottocenter.org/'
 };
 
 export const oaiLinks = {
@@ -132,4 +129,11 @@ export const z3950Links = {
 
 export const uptimeLinks = {
   '*': 'https://wikicaves.betteruptime.com'
+};
+
+export const donateLink =
+  'https://www.helloasso.com/associations/wikicaves/formulaires/1';
+
+export const karstlinkLinks = {
+  '*': 'https://ontology.uis-speleo.org/'
 };

@@ -1,381 +1,261 @@
 import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
-import FullStarIcon from '@mui/icons-material/Star';
-import EmptyStarIcon from '@mui/icons-material/StarBorder';
-import HalfStarIcon from '@mui/icons-material/StarHalf';
-import CircularProgress from '@mui/material/CircularProgress';
-import Tooltip from '@mui/material/Tooltip';
-import { styled } from '@mui/material/styles';
-import withStyles from '@mui/styles/withStyles';
-import { isNil } from 'ramda';
-import GCLink from '../GCLink';
-import Translate from '../Translate';
 import {
-  depthIcon,
-  lengthIcon,
-  timeToGoIcon,
-  undergroundTimeIcon
-} from '../../../assets/icons';
+  Box,
+  Button,
+  Card,
+  CardMedia,
+  IconButton,
+  Skeleton,
+  Typography
+} from '@mui/material';
+import { Autorenew } from '@mui/icons-material';
+import MuiRating from '@mui/material/Rating';
+import StarBorderIcon from '@mui/icons-material/StarBorder';
+import { styled } from '@mui/material/styles';
+import { isNil } from 'ramda';
+import { FormattedMessage, useIntl } from 'react-intl';
+import GCLink from '../GCLink';
+import CustomIcon from '../CustomIcon';
+import { depthIcon, lengthIcon } from '../../../assets/icons';
 
-const FlexWrapper = styled('div')`
-  display: flex;
-  flex-wrap: wrap;
-`;
+const CARD_HEIGHT = 280;
 
-const FlexItemWrapper = styled('div')`
-  flex: 1;
-  flex-basis: 300px;
-  margin: ${({ theme }) => theme.spacing(2)};
-  overflow: hidden;
-`;
+const BgCard = styled(Card)({
+  position: 'relative',
+  height: CARD_HEIGHT,
+  overflow: 'hidden'
+});
 
-const EntryData = ({ entry }) => {
-  if (!entry) {
-    return <div />;
-  }
-  let imageElement = null;
-  const { documents, cave, stats, timeInfo } = entry;
+const Overlay = styled(Box)({
+  position: 'absolute',
+  inset: 0,
+  background:
+    'linear-gradient(to top, rgba(0,0,0,0.82) 0%, rgba(0,0,0,0.3) 55%, rgba(0,0,0,0.05) 100%)'
+});
 
-  // TODO: improve get of the topo
-  // 13 is the id of the type "TopographicData"
-  const topoDoc = documents ? documents.find(d => d.type === 13) : null;
-  if (!isNil(topoDoc)) {
-    const topo = topoDoc.files.find(f => f.pathOld !== null);
-    imageElement =
-      topo && topo.pathOld ? <EntryImage src={topo.pathOld} /> : null;
-  }
+const Content = styled(Box)({
+  position: 'absolute',
+  bottom: 0,
+  left: 0,
+  right: 0,
+  padding: 16,
+  zIndex: 1
+});
 
-  return (
-    <FlexWrapper>
-      <FlexItemWrapper>
-        <EntryTitle entry={entry} />
-        <EntryStat stat={stats} />
-        <EntryInfos timeInfo={timeInfo} cave={cave} />
-      </FlexItemWrapper>
-      {imageElement && <FlexItemWrapper>{imageElement}</FlexItemWrapper>}
-    </FlexWrapper>
-  );
+const InfoImg = styled('img')({
+  height: 14,
+  width: 14,
+  filter: 'invert(1) brightness(2)'
+});
+
+const WhiteRating = styled(MuiRating)({
+  color: 'white',
+  fontSize: '1rem'
+});
+
+const formatTime = timeStr => {
+  if (!timeStr) return null;
+  const [h, m] = timeStr.split(':').map(Number);
+  if (h === 0) return `${m}min`;
+  if (m === 0) return `${h}h`;
+  return `${h}h${m}`;
 };
 
-EntryData.propTypes = {
-  entry: PropTypes.shape({
-    documents: PropTypes.arrayOf(PropTypes.shape({})),
-    cave: PropTypes.shape({
-      depth: PropTypes.number,
-      length: PropTypes.number
-    }),
-    stats: PropTypes.shape({}),
-    timeInfo: PropTypes.shape({})
-  }).isRequired
+const getTopoImage = documents => {
+  if (!documents) return null;
+  const topoDoc = documents.find(d => d.type === 13);
+  if (isNil(topoDoc)) return null;
+  const topo = topoDoc.files?.find(f => f.pathOld !== null);
+  return topo?.pathOld || null;
 };
 
-const EntryName = styled('h4')`
-  font-weight: 400;
-  margin-bottom: 0;
-`;
+const RandomEntryCard = ({ entry, isFetching, fetch, onRefresh }) => {
+  const { formatMessage } = useIntl();
 
-const EntryLocalizationPart = styled('h5')`
-  font-size: 2rem;
-  margin-bottom: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-`;
-
-const EntryTitle = ({ entry }) => {
-  const { county, country, name, region } = entry;
-  return (
-    <div className="entryLocation" dir="ltr">
-      <EntryName>{name}</EntryName>
-      {county && <EntryLocalizationPart>{county}</EntryLocalizationPart>}
-      {region && <EntryLocalizationPart>{region}</EntryLocalizationPart>}
-      {country && <EntryLocalizationPart>{country}</EntryLocalizationPart>}
-    </div>
-  );
-};
-
-EntryTitle.propTypes = {
-  entry: PropTypes.shape({
-    county: PropTypes.string,
-    country: PropTypes.string,
-    name: PropTypes.string,
-    region: PropTypes.string
-  }).isRequired
-};
-
-const RatingList = styled('ul')`
-  list-style-type: none;
-`;
-
-const EntryStat = ({ stat }) => (
-  <div>
-    {!stat && (
-      <Translate>At this time, there is no comment for this entry</Translate>
-    )}
-    {stat && (
-      <RatingList>
-        <EntryStatItem itemScore={stat.aestheticism} itemLabel="Interest" />
-        <EntryStatItem itemScore={stat.caving} itemLabel="Ease to move" />
-        <EntryStatItem itemScore={stat.approach} itemLabel="Access" />
-      </RatingList>
-    )}
-  </div>
-);
-
-EntryStat.propTypes = {
-  stat: PropTypes.shape({
-    aestheticism: PropTypes.number,
-    approach: PropTypes.number,
-    caving: PropTypes.number
-  }).isRequired
-};
-
-const StatEntry = styled('li')`
-  display: inline-flex;
-  width: 100%;
-  font-size: 1.5rem;
-
-  span {
-    margin-right: 10px;
-    white-space: nowrap;
-    width: 50%;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-`;
-
-const Stars = styled('div')`
-  display: inline;
-  white-space: nowrap;
-`;
-
-const STAR_COLOR = '#ffd700';
-
-const StyledFullStarIcon = withStyles({
-  root: { fill: STAR_COLOR }
-})(FullStarIcon);
-
-const StyledHalfStarIcon = withStyles({
-  root: { fill: STAR_COLOR }
-})(HalfStarIcon);
-
-const StyledEmptyStarIcon = withStyles({
-  root: { fill: STAR_COLOR }
-})(EmptyStarIcon);
-
-const EntryStatItem = ({ itemLabel, itemScore }) => {
-  if (!itemScore) {
-    return <div />;
-  }
-
-  const score = itemScore / 2;
-  const starsToDisplay = [];
-  let displayed = 0;
-
-  for (let i = 0; i < Math.floor(score); i += 1) {
-    starsToDisplay.push(<StyledFullStarIcon key={`star${i}`} />);
-    displayed += 1;
-  }
-  if (Math.floor(score) < score) {
-    starsToDisplay.push(<StyledHalfStarIcon key="starh" />);
-    displayed += 1;
-  }
-  if (displayed < 5) {
-    for (let i = displayed; i < 5; i += 1) {
-      starsToDisplay.push(<StyledEmptyStarIcon key={`star${i}`} />);
-    }
-  }
-
-  return (
-    <StatEntry>
-      <Translate>{itemLabel}</Translate>
-      <Stars>{starsToDisplay}</Stars>
-    </StatEntry>
-  );
-};
-
-EntryStatItem.propTypes = {
-  itemScore: PropTypes.number,
-  itemLabel: PropTypes.string.isRequired
-};
-
-const EntryInfos = ({ timeInfo, cave }) => (
-  <div className="infos">
-    {timeInfo && (
-      <EntryInfoItem
-        key="eiik1"
-        itemImg={timeToGoIcon}
-        itemLabel="Time to go"
-        itemType="time"
-        itemValue={timeInfo.eTTrail}
-      />
-    )}
-    {timeInfo && (
-      <EntryInfoItem
-        key="eiik2"
-        itemImg={undergroundTimeIcon}
-        itemLabel="Underground time"
-        itemType="time"
-        itemValue={timeInfo.eTUnderground}
-      />
-    )}
-    {cave && (
-      <EntryInfoItem
-        key="eiik3"
-        itemImg={lengthIcon}
-        itemLabel="Length"
-        itemValue={cave.length}
-        itemUnit="m"
-      />
-    )}
-    {cave && (
-      <EntryInfoItem
-        key="eiik4"
-        itemImg={depthIcon}
-        itemLabel="Depth"
-        itemValue={cave.depth}
-        itemUnit="m"
-      />
-    )}
-  </div>
-);
-
-EntryInfos.propTypes = {
-  timeInfo: PropTypes.shape({
-    eTTrail: PropTypes.string,
-    eTUnderground: PropTypes.string
-  }),
-  cave: PropTypes.shape({
-    depth: PropTypes.number,
-    length: PropTypes.number
-  })
-};
-
-const EntryInfoWrapper = styled('div')`
-  width: 50%;
-  display: inline-flex;
-  line-height: 50px;
-  font-weight: 300;
-  font-size: 1.4rem;
-`;
-
-const InfoImage = styled('img')`
-  height: 50px;
-  width: 50px;
-`;
-
-const InfoValue = styled('span')`
-  margin-left: 6px;
-  font-size: 1.5rem;
-  white-space: nowrap;
-`;
-
-const InfoUnit = styled('span')`
-  margin-left: 6px;
-  font-size: 1rem;
-  white-space: nowrap;
-`;
-
-const EntryInfoItem = ({
-  itemImg,
-  itemLabel,
-  itemType,
-  itemUnit,
-  itemValue
-}) => {
-  if (isNil(itemValue)) {
-    return <span />;
-  }
-
-  let valueToDisplay = itemValue;
-  if (itemType === 'time') {
-    const splittedTime = itemValue.split(':');
-    valueToDisplay = `${splittedTime[0]}h ${splittedTime[1]}m`;
-  }
-
-  return (
-    <EntryInfoWrapper>
-      <Tooltip title={<Translate>{itemLabel}</Translate>}>
-        <InfoImage src={itemImg} alt={itemLabel} />
-      </Tooltip>
-      <InfoValue>{valueToDisplay}</InfoValue>
-      <InfoUnit>{itemUnit}</InfoUnit>
-    </EntryInfoWrapper>
-  );
-};
-
-EntryInfoItem.propTypes = {
-  itemValue: PropTypes.any, // eslint-disable-line react/forbid-prop-types
-  itemUnit: PropTypes.string,
-  itemLabel: PropTypes.string.isRequired,
-  itemImg: PropTypes.string.isRequired,
-  itemType: PropTypes.string
-};
-
-const TopoImage = styled('img')`
-  width: 100%;
-  background-color: white;
-`;
-
-const NoImage = styled('img')`
-  font-weight: 300;
-  font-style: italic;
-`;
-
-const EntryImage = ({ src }) => (
-  <>
-    {!src && (
-      <NoImage>
-        <Translate>At this time, there is no image for this entry</Translate>
-      </NoImage>
-    )}
-    {src && <TopoImage src={src} alt="topo" />}
-  </>
-);
-
-EntryImage.propTypes = {
-  src: PropTypes.string.isRequired
-};
-
-const RandomEntryLink = styled(GCLink)`
-  text-decoration: none;
-  color: white;
-`;
-
-const EntryWrapper = styled('div')`
-  background-color: rgba(110, 110, 110, 0.5);
-  border-radius: ${({ theme }) => theme.spacing(1)};
-  color: white;
-  margin: auto;
-  padding: ${({ theme }) => theme.spacing(3)};
-`;
-
-const RandomEntryCard = ({ entry, isFetching, fetch }) => {
   useEffect(() => {
     fetch();
   }, [fetch]);
 
   if (isFetching) {
-    return <CircularProgress />;
-  }
-
-  if (entry && entry.id) {
     return (
-      <RandomEntryLink href={`/ui/entrances/${entry.id}`}>
-        <EntryWrapper>
-          <EntryData entry={entry} />
-        </EntryWrapper>
-      </RandomEntryLink>
+      <BgCard>
+        <Skeleton variant="rectangular" width="100%" height={CARD_HEIGHT} />
+      </BgCard>
     );
   }
-  return <div />;
+
+  if (!entry?.id) return null;
+
+  const { county, region, country, cave, documents, stats, timeInfo } = entry;
+  const imageSrc = getTopoImage(documents);
+  const locationParts = [county, region, country].filter(Boolean);
+
+  return (
+    <BgCard>
+      <CardMedia
+        image={imageSrc || '/images/caves/gours.jpg'}
+        sx={{ position: 'absolute', inset: 0, height: '100%' }}
+      />
+      <Overlay />
+
+      <Box
+        sx={{
+          position: 'absolute',
+          top: 12,
+          left: 12,
+          zIndex: 1,
+          '& > span': { margin: 0 }
+        }}>
+        <CustomIcon type="entrance" size={32} />
+      </Box>
+      {onRefresh && (
+        <IconButton
+          onClick={onRefresh}
+          sx={{
+            position: 'absolute',
+            top: 8,
+            right: 8,
+            zIndex: 1,
+            color: 'white',
+            '&:hover': { opacity: 1, backgroundColor: 'rgba(255,255,255,0.15)' }
+          }}>
+          <Autorenew sx={{ fontSize: 28 }} />
+        </IconButton>
+      )}
+
+      <Content>
+        <Typography variant="h6" fontWeight={600} sx={{ color: 'white' }}>
+          {entry.name}
+        </Typography>
+        {locationParts.length > 0 && (
+          <Typography
+            variant="caption"
+            sx={{ color: 'rgba(255,255,255,0.75)', mb: '6px' }}>
+            {locationParts.join(' · ')}
+          </Typography>
+        )}
+
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'flex-end',
+            justifyContent: 'space-between',
+            gap: 1,
+            mt: '4px'
+          }}>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+            {[
+              { labelId: 'Interest', value: stats?.aestheticism, time: null },
+              {
+                labelId: 'Access',
+                value: stats?.approach,
+                time: formatTime(timeInfo?.eTTrail)
+              },
+              {
+                labelId: 'Progression',
+                value: stats?.caving,
+                time: formatTime(timeInfo?.eTUnderground)
+              }
+            ].map(({ labelId, value, time }) =>
+              value > 0 ? (
+                <Box
+                  key={labelId}
+                  sx={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <Typography
+                    variant="caption"
+                    sx={{ color: 'rgba(255,255,255,0.75)', minWidth: 78 }}>
+                    {formatMessage({ id: labelId })}
+                    {time && ` (${time})`}
+                  </Typography>
+                  <WhiteRating
+                    readOnly
+                    size="small"
+                    value={value / 2}
+                    precision={0.5}
+                    emptyIcon={
+                      <StarBorderIcon
+                        fontSize="inherit"
+                        sx={{ color: 'rgba(255,255,255,0.35)' }}
+                      />
+                    }
+                  />
+                </Box>
+              ) : null
+            )}
+            {cave && (cave.depth || cave.length) && (
+              <Box sx={{ display: 'flex', gap: 2, mt: '4px' }}>
+                {cave.depth && (
+                  <Box
+                    sx={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    <InfoImg src={depthIcon} alt="depth" />
+                    <Typography
+                      variant="caption"
+                      sx={{ color: 'rgba(255,255,255,0.75)' }}>
+                      {cave.depth} m
+                    </Typography>
+                  </Box>
+                )}
+                {cave.length && (
+                  <Box
+                    sx={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    <InfoImg src={lengthIcon} alt="length" />
+                    <Typography
+                      variant="caption"
+                      sx={{ color: 'rgba(255,255,255,0.75)' }}>
+                      {cave.length} m
+                    </Typography>
+                  </Box>
+                )}
+              </Box>
+            )}
+          </Box>
+
+          <GCLink href={`/ui/entrances/${entry.id}`}>
+            <Button
+              variant="outlined"
+              size="small"
+              sx={{
+                color: 'white',
+                borderColor: 'rgba(255,255,255,0.6)',
+                '&:hover': {
+                  borderColor: 'white',
+                  backgroundColor: 'rgba(255,255,255,0.1)'
+                }
+              }}>
+              <FormattedMessage id="Discover" />
+            </Button>
+          </GCLink>
+        </Box>
+      </Content>
+    </BgCard>
+  );
 };
 
 RandomEntryCard.propTypes = {
   fetch: PropTypes.func.isRequired,
+  onRefresh: PropTypes.func,
   isFetching: PropTypes.bool,
   entry: PropTypes.shape({
-    id: PropTypes.number
+    id: PropTypes.number,
+    name: PropTypes.string,
+    county: PropTypes.string,
+    region: PropTypes.string,
+    country: PropTypes.string,
+    documents: PropTypes.arrayOf(PropTypes.shape({})),
+    stats: PropTypes.shape({
+      aestheticism: PropTypes.number,
+      approach: PropTypes.number,
+      caving: PropTypes.number
+    }),
+    timeInfo: PropTypes.shape({
+      eTTrail: PropTypes.string,
+      eTUnderground: PropTypes.string
+    }),
+    cave: PropTypes.shape({
+      depth: PropTypes.number,
+      length: PropTypes.number
+    })
   })
 };
 
