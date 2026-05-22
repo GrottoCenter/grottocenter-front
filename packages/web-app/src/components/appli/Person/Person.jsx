@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import { Card, Chip, Tooltip, IconButton, Skeleton } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector, useStore } from 'react-redux';
 import MailIcon from '@mui/icons-material/Mail';
 import CreateIcon from '@mui/icons-material/Create';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -39,6 +39,10 @@ import {
 
 const Person = ({ isLoading, person, error }) => {
   const dispatch = useDispatch();
+  const store = useStore();
+  const activeConversations = useSelector(
+    state => state.messaging.activeConversations.items
+  );
   const navigate = useNavigate();
   const { formatMessage } = useIntl();
   const permissions = usePermissions();
@@ -61,23 +65,21 @@ const Person = ({ isLoading, person, error }) => {
   const handleMessageClick = useCallback(async () => {
     if (!person?.id) return;
     try {
-      // Fetch active conversations to check if a conversation with this participant already exists
-      let skip = 0;
-      const limit = 50;
-      let hasMore = true;
-      let existingConv = null;
+      // First, check if the conversation already exists in our currently loaded conversations
+      let existingConv = activeConversations.find(
+        c => Number(c.otherParticipant?.id) === Number(person.id)
+      );
 
-      while (hasMore) {
-        const action = await dispatch(fetchConversations({ limit, skip }, false));
-        const conversations = action?.conversations || [];
-        existingConv = conversations.find(
+      if (!existingConv) {
+        // If not found, do a single fetch (first 50 conversations) to update the Redux store
+        await dispatch(fetchConversations({ limit: 50, skip: 0 }, false));
+        
+        // Read updated conversations from the store to avoid UI flashing from multiple page loads
+        const state = store.getState();
+        const updatedConversations = state.messaging?.activeConversations?.items || [];
+        existingConv = updatedConversations.find(
           c => Number(c.otherParticipant?.id) === Number(person.id)
         );
-        if (existingConv) {
-          break;
-        }
-        skip += limit;
-        hasMore = conversations.length === limit && skip < (action?.totalCount || 0);
       }
 
       if (existingConv) {
@@ -89,7 +91,7 @@ const Person = ({ isLoading, person, error }) => {
       console.error('Failed to check existing conversations:', err);
       navigate(`/ui/messages?composeTo=${person.id}`);
     }
-  }, [dispatch, person?.id, navigate]);
+  }, [dispatch, person?.id, navigate, activeConversations, store]);
 
 
 
@@ -126,7 +128,7 @@ const Person = ({ isLoading, person, error }) => {
           }}
         />
       )}
-      {!canEdit && userId && person?.type !== 'AUTHOR' && (
+      {!canEdit && userId && person?.type !== 'AUTHOR' && !person?.isBanned && (
         <Tooltip title={formatMessage({ id: 'Message this caver', defaultMessage: 'Message this caver' })}>
           <IconButton
             color="primary"
