@@ -23,6 +23,7 @@ export function unarchiveConversation(conversationId) {
         })
       );
     } catch (error) {
+      if (error.isAuthError) return;
       console.error('Unarchiving conversation failed:', error);
       dispatch({
         type: UNARCHIVE_CONVERSATION_FAILURE,

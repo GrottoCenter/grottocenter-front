@@ -25,7 +25,7 @@ const NotificationPreferences = () => {
   }
 
   if (status === REDUCER_STATUS.FAILED && !preferences) {
-    return <Alert severity="error">{error || 'Failed to load preferences'}</Alert>;
+    return <Alert severity="error">{error || formatMessage({ id: 'Failed to load preferences', defaultMessage: 'Failed to load preferences' })}</Alert>;
   }
 
   return (
@@ -34,7 +34,7 @@ const NotificationPreferences = () => {
         {formatMessage({ id: 'Notification Preferences', defaultMessage: 'Notification Preferences' })}
       </Typography>
       {updateStatus === REDUCER_STATUS.FAILED && (
-        <Alert severity="error" sx={{ mb: 2 }}>{updateError || 'Failed to update preferences'}</Alert>
+        <Alert severity="error" sx={{ mb: 2 }}>{updateError || formatMessage({ id: 'Failed to update preferences', defaultMessage: 'Failed to update preferences' })}</Alert>
       )}
       <FormGroup>
         <FormControlLabel

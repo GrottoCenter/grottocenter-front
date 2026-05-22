@@ -23,6 +23,7 @@ export function archiveConversation(conversationId) {
         })
       );
     } catch (error) {
+      if (error.isAuthError) return;
       console.error('Archiving conversation failed:', error);
       dispatch({
         type: ARCHIVE_CONVERSATION_FAILURE,

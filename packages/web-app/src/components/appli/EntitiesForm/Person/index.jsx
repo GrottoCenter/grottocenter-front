@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import { useForm } from 'react-hook-form';
 import { useSelector, useDispatch } from 'react-redux';
@@ -6,13 +6,10 @@ import { useSelector, useDispatch } from 'react-redux';
 import { updatePerson } from '../../../../actions/Person/UpdatePerson';
 import { FormContainer, FormActionRow, FormRow } from '../utils/FormContainers';
 import InputText from '../utils/InputText';
-import InputPassword from '../utils/InputPassword';
 import FormProgressInfo from '../utils/FormProgressInfo';
 import { PersonPropTypes } from '../../../../types/person.type';
-import NotificationPreferences from './NotificationPreferences';
-import { PASSWORD_MIN_LENGTH } from '../../../../conf/config';
 
-export const PersonForm = ({ personValues, onCancel, isOurAccount }) => {
+export const PersonForm = ({ personValues, onCancel }) => {
   const {
     error: personError,
     isLoading: personIsLoading,
@@ -20,13 +17,10 @@ export const PersonForm = ({ personValues, onCancel, isOurAccount }) => {
   } = useSelector(state => state.updatePerson);
 
   const dispatch = useDispatch();
-  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const {
     handleSubmit,
     reset,
     control,
-    watch,
-    getValues,
     formState: { errors, isSubmitting, isSubmitSuccessful }
   } = useForm({
     defaultValues: {
@@ -90,71 +84,6 @@ export const PersonForm = ({ personValues, onCancel, isOurAccount }) => {
           />
         </FormRow>
 
-        {isOurAccount && (
-          <>
-            <br />
-            <FormRow>
-              <InputText
-                formKey="person.email"
-                labelName="Change email"
-                control={control}
-                isError={!!errors?.person?.email}
-                type="email"
-              />
-              <InputText
-                formKey="person.emailConfirmation"
-                labelName="Email confirmation"
-                control={control}
-                isError={!!errors?.person?.emailConfirmation}
-                isRequired={!!watch('person.email')}
-                type="email"
-                validatorFn={(value, intlFormatMessage) => {
-                  if (value !== getValues()?.person?.email)
-                    return intlFormatMessage({ id: 'The mails do not match' });
-                  return true;
-                }}
-                helperText={errors?.person?.emailConfirmation?.message}
-              />
-            </FormRow>
-            <br />
-            <FormRow>
-              <InputPassword
-                formKey="person.password"
-                labelName="Change password"
-                isPasswordVisible={isPasswordVisible}
-                onShowPassword={() => setIsPasswordVisible(!isPasswordVisible)}
-                control={control}
-                isError={!!errors?.person?.password}
-                validatorFn={(value, intlFormatMessage) => {
-                  if (value && value.length < PASSWORD_MIN_LENGTH)
-                    return intlFormatMessage({ id: 'Password too short.' });
-                  return true;
-                }}
-                helperText={errors?.person?.password?.message}
-              />
-              <InputPassword
-                formKey="person.passwordConfirmation"
-                labelName="Password confirmation"
-                isPasswordVisible={isPasswordVisible}
-                onShowPassword={() => setIsPasswordVisible(!isPasswordVisible)}
-                control={control}
-                isError={!!errors?.person?.passwordConfirmation}
-                isRequired={!!watch('person.password')}
-                validatorFn={(value, intlFormatMessage) => {
-                  if (value !== getValues()?.person?.password)
-                    return intlFormatMessage({
-                      id: 'The passwords do not match'
-                    });
-                  return true;
-                }}
-                helperText={errors?.person?.passwordConfirmation?.message}
-              />
-            </FormRow>
-            
-            <NotificationPreferences />
-          </>
-        )}
-
         <FormActionRow
           isNew={false}
           isSubmitting={isSubmitting}
@@ -167,8 +96,7 @@ export const PersonForm = ({ personValues, onCancel, isOurAccount }) => {
 
 PersonForm.propTypes = {
   personValues: PersonPropTypes.isRequired,
-  onCancel: PropTypes.func,
-  isOurAccount: PropTypes.bool
+  onCancel: PropTypes.func
 };
 
 export default PersonForm;
