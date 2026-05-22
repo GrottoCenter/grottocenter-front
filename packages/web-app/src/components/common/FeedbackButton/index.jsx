@@ -29,7 +29,7 @@ const FloatingAnchor = styled('a')(({ theme }) => ({
   [theme.breakpoints.down('sm')]: {
     bottom: theme.spacing(2),
     right: theme.spacing(2),
-    padding: `${theme.spacing(1.5)} ${theme.spacing(2)}`
+    padding: `${theme.spacing(1)} ${theme.spacing(2)}`
   }
 }));
 

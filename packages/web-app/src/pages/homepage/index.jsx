@@ -19,9 +19,9 @@ const LatestBlogNewsSection = lazy(() => import('./LatestBlogNewsSection'));
 const Association = lazy(() => import('./Association'));
 const PartnersSection = lazy(() => import('./PartnersSection'));
 
-const HomepageWrapper = styled('div')({
-  fontFamily: 'Roboto, Helvetica, Arial, sans-serif'
-});
+const HomepageWrapper = styled('div')(({ theme }) => ({
+  fontFamily: theme.typography.fontFamily
+}));
 
 const HomePage = () => {
   const location = useLocation();
