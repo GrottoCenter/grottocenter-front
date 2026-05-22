@@ -5,8 +5,6 @@ import { HandshakeOutlined } from '@mui/icons-material';
 import { styled } from '@mui/material/styles';
 import { useIntl } from 'react-intl';
 import PartnersCarouselContainer from '../../containers/PartnersCarouselContainer';
-import InternationalizedLink from '../../components/common/InternationalizedLink';
-import { fseLinks, uisLinks } from '../../conf/externalLinks';
 import { loadDynamicNumber } from '../../actions/DynamicNumber';
 
 const Section = styled('section')(({ theme }) => ({
@@ -22,19 +20,6 @@ const TitleRow = styled(Box)({
   justifyContent: 'center',
   gap: 10,
   paddingBottom: '4px'
-});
-
-const SupporterRow = styled(Box)({
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  gap: 8,
-  marginTop: 16
-});
-
-const SupporterLogo = styled('img')({
-  width: 30,
-  height: 30
 });
 
 const Description = styled(Typography)({
@@ -80,19 +65,6 @@ const PartnersSection = () => {
       </Box>
       <Box>
         <PartnersCarouselContainer />
-        <SupporterRow>
-          <InternationalizedLink links={fseLinks}>
-            <SupporterLogo src="/images/FSE.svg" alt="Logo FSE" />
-          </InternationalizedLink>
-          <InternationalizedLink links={uisLinks}>
-            <SupporterLogo src="/images/UIS.svg" alt="Logo UIS" />
-          </InternationalizedLink>
-          <Typography variant="body2" color="text.secondary">
-            {formatMessage({
-              id: 'Grottocenter is supported by the FSE and the UIS'
-            })}
-          </Typography>
-        </SupporterRow>
       </Box>
     </Section>
   );
