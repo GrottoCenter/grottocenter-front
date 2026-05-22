@@ -5,7 +5,6 @@ import {
   AccordionSummary,
   Box,
   Container,
-  Link,
   Typography
 } from '@mui/material';
 import { alpha, styled } from '@mui/material/styles';
@@ -15,7 +14,6 @@ import { useSelector } from 'react-redux';
 import GCLink from '../common/GCLink';
 import InternationalizedLink from '../common/InternationalizedLink';
 import {
-  pftGdLink,
   contributorsLink,
   contributeLinks
 } from '../../conf/externalLinks';
@@ -115,14 +113,12 @@ const Faq = () => {
               </Typography>
             </StyledSummary>
             <StyledDetails>
-              <Typography variant="body2" paragraph>
+              <Typography variant="body2" sx={{ mb: 2 }}>
                 {formatMessage({
                   id: 'Cave protection is a priority. A procedure has been defined for sensitive locations.'
                 })}
               </Typography>
-              <Link href={pftGdLink} target="_blank" rel="noopener noreferrer">
-                {formatMessage({ id: 'View the protection procedure document' })}
-              </Link>
+
             </StyledDetails>
           </StyledAccordion>
 
@@ -156,7 +152,7 @@ const Faq = () => {
               </Typography>
             </StyledSummary>
             <StyledDetails>
-              <Typography variant="body2" paragraph>
+              <Typography variant="body2" sx={{ mb: 2 }}>
                 {formatMessage({
                   id: 'You can help as an active member, translator, developer, or partner organisation.'
                 })}
@@ -195,7 +191,7 @@ const Faq = () => {
               </Typography>
             </StyledSummary>
             <StyledDetails>
-              <Typography variant="body2" paragraph>
+              <Typography variant="body2" sx={{ mb: 2 }}>
                 {formatMessage({
                   id: 'GrottoCenter is built and maintained by the Wikicaves association and a community of volunteer contributors.'
                 })}

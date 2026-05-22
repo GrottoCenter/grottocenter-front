@@ -103,9 +103,6 @@ export const legalLinks = generateLinks(
   'en'
 );
 
-export const pftGdLink =
-  'https://docs.google.com/document/d/1SccuusPQcxrZJI3nvWcbUc2dgGyKc4ZJXqQzSPeE9Hg/edit?usp=sharing';
-
 export const contributeLinks = {
   fr: 'https://fr.wikicaves.org/contribute-participer',
   '*': 'https://en.wikicaves.org/contribute-participer'
@@ -121,7 +118,6 @@ export const bloggerLinks = {
   fr: 'https://blog-fr.grottocenter.org/',
   '*': 'https://blog-en.grottocenter.org/'
 };
-
 
 export const oaiLinks = {
   '*': process.env.REACT_APP_OAI_URL || '#'
