@@ -16,9 +16,14 @@ import {
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
+import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
+import { AREA_LIMIT_KM2 } from '../../../../utils/polygonValidation';
 
 const PolygonLayersList = ({
   layers,
+  totalAreaKm2 = 0,
+  areaExceeded = false,
+  hasInterPolygonIntersections = false,
   hoveredLayerId,
   onLayerClick,
   onLayerHover,
@@ -32,6 +37,27 @@ const PolygonLayersList = ({
 
   const allHoles = layers.every(l => l.isHole);
   const hasNeedles = layers.some(l => l.isNeedle);
+  const hasSelfIntersections = layers.some(l => l.hasSelfIntersection);
+  const hasTooFewPoints = layers.some(l => l.tooFewPoints);
+
+  const getErrorTooltip = layer => {
+    const errors = [];
+    if (layer.hasSelfIntersection) {
+      errors.push(
+        formatMessage({
+          id: 'This polygon has self-intersecting edges. Please redraw without crossings.'
+        })
+      );
+    }
+    if (layer.tooFewPoints) {
+      errors.push(
+        formatMessage({
+          id: 'This polygon needs at least 3 distinct points.'
+        })
+      );
+    }
+    return errors.join('\n');
+  };
 
   return (
     <Paper sx={{ width: { xs: '100%', md: 250 }, maxHeight: { xs: 300, md: '70vh' }, overflow: 'auto' }}>
@@ -40,6 +66,37 @@ const PolygonLayersList = ({
           {formatMessage({
             id: 'At least one polygon must not be marked as a hole.'
           })}
+        </Alert>
+      )}
+      {hasSelfIntersections && (
+        <Alert severity="error" sx={{ py: 0 }}>
+          {formatMessage({
+            id: 'One or more polygons have self-intersecting edges. Fix them before saving.'
+          })}
+        </Alert>
+      )}
+      {hasInterPolygonIntersections && (
+        <Alert severity="error" sx={{ py: 0 }}>
+          {formatMessage({
+            id: 'Polygons are crossing each other. Adjust them so they do not overlap.'
+          })}
+        </Alert>
+      )}
+      {hasTooFewPoints && (
+        <Alert severity="error" sx={{ py: 0 }}>
+          {formatMessage({
+            id: 'One or more polygons have too few points. Add more vertices before saving.'
+          })}
+        </Alert>
+      )}
+      {areaExceeded && (
+        <Alert severity="error" sx={{ py: 0 }}>
+          {formatMessage(
+            {
+              id: 'Total area ({area} km²) exceeds the {limit} km² limit. Reduce the polygon size.'
+            },
+            { area: totalAreaKm2, limit: AREA_LIMIT_KM2 }
+          )}
         </Alert>
       )}
       {hasNeedles && (
@@ -133,6 +190,18 @@ const PolygonLayersList = ({
               <ListItemText
                 primary={
                   <Box component="span" sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.5 }}>
+                    {(layer.hasSelfIntersection || layer.tooFewPoints) && (
+                      <Tooltip
+                        title={getErrorTooltip(layer)}
+                        arrow
+                      >
+                        <ErrorOutlineIcon
+                          fontSize="small"
+                          color="error"
+                          sx={{ flexShrink: 0 }}
+                        />
+                      </Tooltip>
+                    )}
                     {layer.isNeedle && (
                       <Tooltip
                         title={formatMessage({
@@ -171,9 +240,20 @@ PolygonLayersList.propTypes = {
       id: PropTypes.number.isRequired,
       latlngs: PropTypes.array.isRequired,
       isHole: PropTypes.bool,
-      isNeedle: PropTypes.bool
+      isNeedle: PropTypes.bool,
+      hasSelfIntersection: PropTypes.bool,
+      tooFewPoints: PropTypes.bool,
+      kinkPoints: PropTypes.arrayOf(
+        PropTypes.shape({
+          lat: PropTypes.number.isRequired,
+          lng: PropTypes.number.isRequired
+        })
+      )
     })
   ).isRequired,
+  totalAreaKm2: PropTypes.number,
+  areaExceeded: PropTypes.bool,
+  hasInterPolygonIntersections: PropTypes.bool,
   hoveredLayerId: PropTypes.number,
   onLayerClick: PropTypes.func.isRequired,
   onLayerHover: PropTypes.func.isRequired,

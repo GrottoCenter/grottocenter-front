@@ -58,7 +58,7 @@ const FormProgressInfo = ({
 FormProgressInfo.propTypes = {
   isLoading: PropTypes.bool.isRequired,
   isError: PropTypes.bool.isRequired,
-  labelLoading: PropTypes.string.isRequired,
+  labelLoading: PropTypes.string,
   labelError: PropTypes.string.isRequired,
   resetFn: PropTypes.func.isRequired,
   getRedirectFn: PropTypes.func.isRequired
