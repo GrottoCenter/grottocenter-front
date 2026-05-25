@@ -9,6 +9,7 @@ import {
   postCaveAndEntrance,
   updateCaveAndEntrance
 } from '../../../../actions/CaveAndEntrance';
+import { usePermissions } from '../../../../hooks';
 
 import { FormContainer, FormActionRow } from '../utils/FormContainers';
 import { normelizeCoordinate } from '../utils/InputCoordinate';
@@ -60,6 +61,7 @@ export const EntranceForm = ({
   onCancel
 }) => {
   const isNewEntrance = entranceValues === null || caveValues === null;
+  const permissions = usePermissions();
 
   const { locale, AVAILABLE_LANGUAGES } = useSelector(state => state.intl);
 
@@ -111,9 +113,11 @@ export const EntranceForm = ({
       'entrance.language'
     ]);
 
+  const coordsRequired =
+    !entranceValues?.isSensitive || permissions.isAdmin;
+
   const isSubmitDisabled =
-    isCoordEmpty(lat) ||
-    isCoordEmpty(lng) ||
+    (coordsRequired ? isCoordEmpty(lat) || isCoordEmpty(lng) : false) ||
     (entityType === ENTRANCE_AND_CAVE
       ? !caveName || !caveLanguage
       : !entranceName || !entranceLanguage);
@@ -216,6 +220,7 @@ export const EntranceForm = ({
 
 EntranceForm.propTypes = {
   entranceValues: PropTypes.shape({
+    id: PropTypes.number,
     name: PropTypes.string,
     description: PropTypes.string,
     descriptionTitle: PropTypes.string,
