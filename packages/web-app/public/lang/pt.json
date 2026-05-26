@@ -605,13 +605,10 @@
   "Contribute": "Contribuir",
   "Contributor nickname": "Apelido do contribuidor",
   "Contributors": "Colaboradores",
-<<<<<<< feat/1207-private-message-ui
+  "Contributors page": "Página de contribuidores",
   "Conversation details": "Detalhes da conversa",
   "Convert": "Convert",
   "Converter": "Converter",
-=======
-  "Contributors page": "Página de contribuidores",
->>>>>>> develop
   "Cook Islands": "Ilhas Cook",
   "Coordinate system": "Sistema de coordenadas",
   "Coordinates": "Coordenadas",
@@ -1673,11 +1670,10 @@
   "Removing sensitivity from the massif will not automatically remove the sensitivity flag from individual entrances.": "A remoção da sensibilidade do maciço não removerá automaticamente a marca de sensibilidade das entradas individuais.",
   "Removing sensitivity from the massif will not automatically remove the sensitivity flag from individual entrances. Those flags must be managed separately. Do you want to continue?": "A remoção da sensibilidade do maciço não removerá automaticamente a marca de sensibilidade das entradas individuais. Essas marcas devem ser geridas separadamente. Deseja continuar?",
   "Repeat your password here.": "Repita aqui a sua palavra-passe.",
-  "Report": "Denunciar",
+  "Report": "Relatório",
   "Report message": "Denunciar mensagem",
   "Report this message": "Denunciar esta mensagem",
   "Reporting a message opens the contact form to notify administrators. The message details (sender, content, and date) will be copied to your clipboard so you can paste them into the form.": "Denunciar uma mensagem abre o formulário de contato para notificar os administradores. Os detalhes da mensagem (remetente, conteúdo e data) serão copiados para a área de transferência para que você possa colá-los no formulário.",
-  "Report": "Relatório",
   "Required": "Obrigatório",
   "Resend in {seconds}s": "Reenviar em {seconds}s",
   "Resend verification email": "Reenviar email de verificação",
@@ -1757,12 +1753,9 @@
   "Search on all fields": "Pesquisar em todos os campos",
   "Search on map...": "Pesquisar no mapa...",
   "Search on specific fields": "Pesquisar em campos específicos",
-<<<<<<< feat/1207-private-message-ui
   "Search recipient...": "Buscar destinatário...",
   "Section under development": "Seção em desenvolvimento",
-=======
   "See all news": "Ver todas as notícias",
->>>>>>> develop
   "See all notifications": "Ver todas as notificações",
   "Select": "Selecionar",
   "Select a cave or network using the search bar below.": "Selecione uma caverna ou rede usando a barra de pesquisa abaixo.",
