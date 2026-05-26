@@ -22,11 +22,13 @@ import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import {
   DocumentTypes,
   DOCUMENT_TYPE_ICONS,
-  DOCUMENT_TYPE_FALLBACK_ICON
+  DOCUMENT_TYPE_FALLBACK_ICON,
+  documentTypeHelpers
 } from '../../../../../utils/documentTypeHelpers';
 import { DocumentFormContext } from '../Provider';
 import { loadDocumentTypes } from '../../../../../actions/DocumentType';
 
+const { isArticle, isIssue } = documentTypeHelpers;
 
 const FEATURED_TYPES = [
   DocumentTypes.IMAGE,
@@ -157,7 +159,7 @@ SecondaryCard.propTypes = {
 };
 
 const DocumentTypeSelect = () => {
-  const { document, resetContext } = useContext(DocumentFormContext);
+  const { document, updateAttribute } = useContext(DocumentFormContext);
   const { formatMessage } = useIntl();
   const dispatch = useDispatch();
   const theme = useTheme();
@@ -178,8 +180,10 @@ const DocumentTypeSelect = () => {
 
   const handleSelect = newDocType => {
     if (newDocType === document.type) return;
-    const { title, mainLanguage, mainLanguageName, authors } = document;
-    resetContext({ type: newDocType, title, mainLanguage, mainLanguageName, authors });
+    updateAttribute('type', newDocType);
+    if (!isArticle(newDocType) && !isIssue(newDocType)) {
+      updateAttribute('parent', null);
+    }
   };
 
   const featured = documentTypes.filter(dt => FEATURED_TYPES.includes(dt.name));

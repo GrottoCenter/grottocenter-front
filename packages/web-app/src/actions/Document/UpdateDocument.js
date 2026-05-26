@@ -10,6 +10,7 @@ import {
 } from '../../conf/apiRoutes';
 import { checkAuthStatus } from '../utils';
 import { buildFormData } from './utils';
+import { filterDocumentPayload } from '../../utils/documentTypeHelpers';
 
 export const UPDATE_DOCUMENT = 'UPDATE_DOCUMENT';
 export const UPDATE_DOCUMENT_SUCCESS = 'UPDATE_DOCUMENT_SUCCESS';
@@ -33,7 +34,8 @@ const updateDocumentFailure = (errorMessages, httpCode) => ({
 export function updateDocument(docAttributes) {
   return (dispatch, getState) => {
     dispatch(updateDocumentAction());
-    const { files, selectOptionAuthorizationDocument, ...rest } = docAttributes;
+    const filtered = filterDocumentPayload(docAttributes);
+    const { files = [], selectOptionAuthorizationDocument, ...rest } = filtered;
     const attributes = { ...rest, option: selectOptionAuthorizationDocument };
 
     const formData = new FormData();
@@ -114,8 +116,13 @@ export const updateDocumentWithNewEntities =
   (docAttributes, newAuthors, newDescriptions) => (dispatch, getState) => {
     dispatch(updateDocumentAction());
     const { id } = docAttributes;
+    // Note: unlike the updateDocument path (which uses buildFormData and skips nulls),
+    // JSON.stringify includes null-valued fields. filterDocumentPayload limits the set,
+    // but null fields for unused sub-types (parent, pages, issue…) will still appear in
+    // the body. The API is expected to ignore irrelevant nulls; if it ever interprets
+    // null as "clear this field", this path would need a null-stripping pass.
     const body = {
-      document: docAttributes,
+      document: filterDocumentPayload(docAttributes),
       newAuthors,
       newDescriptions
     };

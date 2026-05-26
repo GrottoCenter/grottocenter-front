@@ -188,3 +188,70 @@ export const documentTypeHelpers = {
   isTopographicDrawing,
   isUnknown
 };
+
+const BASE_PAYLOAD_FIELDS = ['id', 'type', 'title', 'authors'];
+const LANGUAGE_PAYLOAD_FIELDS = ['mainLanguage', 'mainLanguageName'];
+const FILE_PAYLOAD_FIELDS = [
+  'files',
+  'license',
+  'selectOptionAuthorizationDocument',
+  'authorizationDocument'
+];
+const ADVANCED_PAYLOAD_FIELDS = [
+  'datePublication',
+  'identifier',
+  'identifierType',
+  'editor',
+  'iso3166',
+  'subjects',
+  'creatorComment'
+];
+
+/**
+ * Strips docAttributes down to the fields relevant to the given document type.
+ * Field groups mirror the conditional rendering in FormContent.jsx — keep in sync
+ * when adding or removing form fields.
+ * UNKNOWN (-1) falls through to the else branch (full set) intentionally: the form
+ * is not submittable without a type so no filtering is needed.
+ */
+export const filterDocumentPayload = docAttributes => {
+  const { type = DocumentTypes.UNKNOWN } = docAttributes ?? {};
+  let allowedFields;
+
+  if (isEvent(type)) {
+    allowedFields = new Set([
+      ...BASE_PAYLOAD_FIELDS,
+      'description',
+      'datePublication',
+      'iso3166'
+    ]);
+  } else if (isAuthorizationToPublish(type)) {
+    // FILE_PAYLOAD_FIELDS is included for structural consistency, but FormContent.jsx
+    // renders <AddFileForm showAuthorization={false} /> for this type, so
+    // license and selectOptionAuthorizationDocument are never user-editable here —
+    // they will be null and skipped by buildFormData.
+    allowedFields = new Set([
+      ...BASE_PAYLOAD_FIELDS,
+      ...LANGUAGE_PAYLOAD_FIELDS,
+      ...FILE_PAYLOAD_FIELDS,
+      'description',
+      'datePublication'
+    ]);
+  } else {
+    allowedFields = new Set([
+      ...BASE_PAYLOAD_FIELDS,
+      ...LANGUAGE_PAYLOAD_FIELDS,
+      ...FILE_PAYLOAD_FIELDS,
+      ...ADVANCED_PAYLOAD_FIELDS,
+      'description',
+      'library',
+      'pages',
+      'parent',
+      'issue'
+    ]);
+  }
+
+  return Object.fromEntries(
+    Object.entries(docAttributes).filter(([key]) => allowedFields.has(key))
+  );
+};
