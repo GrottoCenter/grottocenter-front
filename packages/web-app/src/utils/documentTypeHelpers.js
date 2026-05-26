@@ -226,6 +226,10 @@ export const filterDocumentPayload = docAttributes => {
       'iso3166'
     ]);
   } else if (isAuthorizationToPublish(type)) {
+    // FILE_PAYLOAD_FIELDS is included for structural consistency, but FormContent.jsx
+    // renders <AddFileForm showAuthorization={false} /> for this type, so
+    // license and selectOptionAuthorizationDocument are never user-editable here —
+    // they will be null and skipped by buildFormData.
     allowedFields = new Set([
       ...BASE_PAYLOAD_FIELDS,
       ...LANGUAGE_PAYLOAD_FIELDS,

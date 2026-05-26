@@ -116,6 +116,11 @@ export const updateDocumentWithNewEntities =
   (docAttributes, newAuthors, newDescriptions) => (dispatch, getState) => {
     dispatch(updateDocumentAction());
     const { id } = docAttributes;
+    // Note: unlike the updateDocument path (which uses buildFormData and skips nulls),
+    // JSON.stringify includes null-valued fields. filterDocumentPayload limits the set,
+    // but null fields for unused sub-types (parent, pages, issue…) will still appear in
+    // the body. The API is expected to ignore irrelevant nulls; if it ever interprets
+    // null as "clear this field", this path would need a null-stripping pass.
     const body = {
       document: filterDocumentPayload(docAttributes),
       newAuthors,
