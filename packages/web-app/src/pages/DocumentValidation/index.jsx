@@ -14,7 +14,7 @@ import DocumentDetails from '../DocumentDetails';
 import DocumentEdit from '../DocumentEdit';
 import AuthChecker from '../../components/appli/AuthChecker';
 
-import EntityTable from '../../components/common/EntityTable/EntityTable';
+import EntityTable from '../../components/common/EntityTable';
 import Translate from '../../components/common/Translate';
 
 const Wrapper = styled('div')`
@@ -123,7 +123,7 @@ const DocumentValidationPage = () => {
         open={!!detailedView}
         onClose={closeDetailedView}
         title={formatMessage({ id: 'Detailed document view' })}>
-        {detailedView && <DocumentDetails id={detailedView} />}
+        {detailedView && <DocumentDetails id={detailedView} hideActions />}
       </StandardDialog>
       <StandardDialog
         maxWidth="lg"
@@ -135,6 +135,7 @@ const DocumentValidationPage = () => {
         title={formatMessage({ id: 'Edit document' })}>
         <DocumentEdit
           onSuccessfulUpdate={handleSuccessfulUpdate}
+          onCancel={closeEditView}
           id={editView}
           requireUpdate={isUpdatedDocRequired()}
         />

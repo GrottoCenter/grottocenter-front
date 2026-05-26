@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { ImportPageContentContext } from '../Provider';
 import { DOCUMENT } from '../constants';
-import EntityTable from '../../../common/EntityTable/EntityTable';
+import EntityTable from '../../../common/EntityTable';
 
 const Step3 = () => {
   const { formatMessage } = useIntl();

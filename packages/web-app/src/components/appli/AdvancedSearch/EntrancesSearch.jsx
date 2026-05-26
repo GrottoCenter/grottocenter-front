@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useDispatch } from 'react-redux';
+import PropTypes from 'prop-types';
+
 import {
   fetchAdvancedSearchResults,
   resetAdvancedSearchResults
@@ -24,8 +26,9 @@ import {
   countActiveFilters
 } from './SearchElements';
 import { ADVANCED_SEARCH_TYPES } from '../../../conf/config';
-import { getStoredRowsPerPage } from '../../common/EntityTable/EntityTable';
+import { getStoredRowsPerPage } from '../../common/EntityTable';
 import CustomIcon from '../../common/CustomIcon';
+import DataUsageIcon from '@mui/icons-material/DataUsage';
 
 const lengthMarks = [
   { value: 0, scaledValue: 0, label: '0' },
@@ -48,6 +51,10 @@ const FILTER_LABELS = {
   city: 'City',
   county: 'County',
   country: 'Country',
+  // iso3166 is the ISO 3166-2 subdivision code used as a locked filter when navigating from a
+  // country/region page. It maps to the same "Region" label as the freeform `region` field.
+  iso3166: 'Region',
+  'massifs.name': 'Massif',
   region: 'Region',
   'cave.name': 'Network name',
   'commentsRating.approach': 'Ease of reach',
@@ -57,14 +64,19 @@ const FILTER_LABELS = {
   'cave.length': 'Length',
   'cave.isDiving': 'Diving cave',
   isTouristic: 'Touristic site',
-  dangerPollution: 'Pollution risk'
+  dangerPollution: 'Pollution risk',
+  dataQuality: 'Data quality'
 };
 
 const initialFilterState = {
-  city: '',
-  county: '',
   country: '',
+  // iso3166 is never shown as a UI input (no SearchTextAutocomplete for it); it is only used as a
+  // locked filter injected via initialFilter when navigating from a country/region page.
+  iso3166: '',
   region: '',
+  county: '',
+  'massifs.name': '',
+  city: '',
   // postalCode is intentionally absent: the entrances API endpoint does not support postal code filtering
   'commentsRating.approach': null,
   'commentsRating.caving': null,
@@ -74,13 +86,21 @@ const initialFilterState = {
   'cave.length': null,
   'cave.isDiving': null,
   isTouristic: null,
-  dangerPollution: null
+  dangerPollution: null,
+  dataQuality: null
 };
 
-const EntrancesSearch = () => {
+const EntrancesSearch = ({ initialFilter = {}, lockedFilter = [], valueLabels = {} }) => {
   const dispatch = useDispatch();
+
+  const mergedInitialState = useMemo(
+    () => ({ ...initialFilterState, ...initialFilter }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  );
+
   const { filterState, updateFilter, handleRemoveFilter, resetFilter } =
-    useSearchFilter(initialFilterState);
+    useSearchFilter(mergedInitialState, lockedFilter);
   const [query, setQuery] = useState('');
   const [matchAllFields, setMatchAllFields] = useState(true);
   const [advancedExpanded, setAdvancedExpanded] = useState(false);
@@ -104,10 +124,11 @@ const EntrancesSearch = () => {
 
   const { formatMessage } = useIntl();
 
-  const advancedFilterCount = countActiveFilters(filterState, [
+  const filterableKeys = [
     'country',
     'region',
     'county',
+    'massifs.name',
     'city',
     'cave.name',
     'commentsRating.approach',
@@ -117,8 +138,11 @@ const EntrancesSearch = () => {
     'dangerPollution',
     'cave.isDiving',
     'cave.depth',
-    'cave.length'
-  ]);
+    'cave.length',
+    'dataQuality'
+  ].filter(k => !lockedFilter.includes(k));
+
+  const advancedFilterCount = countActiveFilters(filterState, filterableKeys);
 
   return (
     <SearchForm onSubmit={() => startAdvancedsearch()}>
@@ -132,31 +156,51 @@ const EntrancesSearch = () => {
         filterCount={advancedFilterCount}
         expanded={advancedExpanded}
         onExpandedChange={setAdvancedExpanded}>
-        <SearchFieldset title="Localization">
-          <SearchTextAutocomplete
-            ressourceType={searchEntity}
-            ressourceField="country"
-            ressourceFilter={matchAllFields ? filterState : {}}
-            label="Country"
-            onChange={e => updateFilter('country', e)}
-            value={filterState.country}
-          />
-          <SearchTextAutocomplete
-            ressourceType={searchEntity}
-            ressourceField="region"
-            ressourceFilter={matchAllFields ? filterState : {}}
-            label="Region"
-            onChange={e => updateFilter('region', e)}
-            value={filterState.region}
-          />
-          <SearchTextAutocomplete
-            ressourceType={searchEntity}
-            ressourceField="county"
-            ressourceFilter={matchAllFields ? filterState : {}}
-            label="County"
-            onChange={e => updateFilter('county', e)}
-            value={filterState.county}
-          />
+        <SearchFieldset title="Localization" containerSx={{ justifyContent: 'flex-start' }}>
+          {!lockedFilter.includes('country') && (
+            <SearchTextAutocomplete
+              ressourceType={searchEntity}
+              ressourceField="country"
+              ressourceFilter={matchAllFields ? filterState : {}}
+              label="Country"
+              onChange={e => updateFilter('country', e)}
+              value={filterState.country}
+            />
+          )}
+          {!lockedFilter.includes('massifs.name') && (
+            <SearchTextAutocomplete
+              ressourceType={searchEntity}
+              ressourceField="massifs.name"
+              ressourceFilter={matchAllFields ? filterState : {}}
+              label="Massif"
+              onChange={e => updateFilter('massifs.name', e)}
+              value={filterState['massifs.name']}
+            />
+          )}
+          {/* Hide the Region field when iso3166 is locked: the subdivision is already fixed via the
+              ISO code, so the freeform region autocomplete would be redundant and confusing. */}
+          {!lockedFilter.includes('region') &&
+            !lockedFilter.includes('county') &&
+            !lockedFilter.includes('iso3166') && (
+            <SearchTextAutocomplete
+              ressourceType={searchEntity}
+              ressourceField="region"
+              ressourceFilter={matchAllFields ? filterState : {}}
+              label="Region"
+              onChange={e => updateFilter('region', e)}
+              value={filterState.region}
+            />
+          )}
+          {!lockedFilter.includes('county') && (
+            <SearchTextAutocomplete
+              ressourceType={searchEntity}
+              ressourceField="county"
+              ressourceFilter={matchAllFields ? filterState : {}}
+              label="County"
+              onChange={e => updateFilter('county', e)}
+              value={filterState.county}
+            />
+          )}
           <SearchTextAutocomplete
             ressourceType={searchEntity}
             ressourceField="city"
@@ -180,17 +224,17 @@ const EntrancesSearch = () => {
 
         <SearchFieldset title="Rating criterias">
           <SearchSlider
-            label="Ease of reach"
+            label={formatMessage({ id: 'Ease of reach' })}
             value={filterState['commentsRating.approach']}
             onChange={e => updateFilter('commentsRating.approach', e)}
           />
           <SearchSlider
-            label="Ease of move"
+            label={formatMessage({ id: 'Ease of move' })}
             value={filterState['commentsRating.caving']}
             onChange={e => updateFilter('commentsRating.caving', e)}
           />
           <SearchSlider
-            label="Aesthetic"
+            label={formatMessage({ id: 'Aesthetic' })}
             value={filterState['commentsRating.aestheticism']}
             onChange={e => updateFilter('commentsRating.aestheticism', e)}
           />
@@ -200,19 +244,25 @@ const EntrancesSearch = () => {
           <SearchFormContainer>
             <SearchSlider
               icon={<CustomIcon type="depth" size={24} />}
-              label="Depth"
+              label={`${formatMessage({ id: 'Depth' })} (${formatMessage({ id: 'meters' })})`}
               value={filterState['cave.depth']}
-              helperText="In meters"
               marks={depthMarks}
               onChange={e => updateFilter('cave.depth', e)}
             />
             <SearchSlider
               icon={<CustomIcon type="length" size={24} />}
-              label="Length"
+              label={`${formatMessage({ id: 'Development' })} (${formatMessage({ id: 'meters' })})`}
               value={filterState['cave.length']}
-              helperText="In meters"
               marks={lengthMarks}
               onChange={e => updateFilter('cave.length', e)}
+            />
+            <SearchSlider
+              icon={<DataUsageIcon color="primary" sx={{ fontSize: 24 }} />}
+              label={formatMessage({ id: 'Data quality' })}
+              value={filterState.dataQuality}
+              min={0}
+              max={100}
+              onChange={e => updateFilter('dataQuality', e)}
             />
           </SearchFormContainer>
           <SearchFormContainer style={{ marginTop: '16px' }}>
@@ -242,7 +292,19 @@ const EntrancesSearch = () => {
         />
       </SearchFilterAccordion>
 
+      <ActiveFilterChips
+        filterState={filterState}
+        query={query}
+        queryLabel="Entrance name"
+        onRemoveFilter={handleRemoveFilter}
+        onClearQuery={() => setQuery('')}
+        labelMap={FILTER_LABELS}
+        lockedKeys={lockedFilter}
+        valueLabels={valueLabels}
+      />
+
       <SearchActionButtons
+        showReset={query !== '' || advancedFilterCount > 0}
         onReset={() => {
           setQuery('');
           setMatchAllFields(true);
@@ -251,20 +313,17 @@ const EntrancesSearch = () => {
           dispatch(resetAdvancedSearchResults());
           // Override params are required: React state updates from the calls above are async,
           // so filterState/query/matchAllFields still hold stale values at this point.
-          startAdvancedsearch('', initialFilterState, true);
+          startAdvancedsearch('', mergedInitialState, true);
         }}
-      />
-
-      <ActiveFilterChips
-        filterState={filterState}
-        query={query}
-        queryLabel="Entrance name"
-        onRemoveFilter={handleRemoveFilter}
-        onClearQuery={() => setQuery('')}
-        labelMap={FILTER_LABELS}
       />
     </SearchForm>
   );
+};
+
+EntrancesSearch.propTypes = {
+  initialFilter: PropTypes.shape({}),
+  lockedFilter: PropTypes.arrayOf(PropTypes.string),
+  valueLabels: PropTypes.shape({})
 };
 
 export default EntrancesSearch;

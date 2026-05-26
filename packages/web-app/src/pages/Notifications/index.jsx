@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useIntl } from 'react-intl';
 
 import Layout from '../../components/common/Layouts/Fixed/FixedContent';
-import EntityTable from '../../components/common/EntityTable/EntityTable';
+import EntityTable from '../../components/common/EntityTable';
 import AuthChecker from '../../components/appli/AuthChecker';
 import { fetchNotifications } from '../../actions/Notifications/GetNotifications';
 import { readNotification } from '../../actions/Notifications/ReadNotification';

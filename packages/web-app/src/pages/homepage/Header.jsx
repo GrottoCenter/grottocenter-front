@@ -1,117 +1,118 @@
 import React from 'react';
+import { Box, Button } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import {
-  GridContainer,
-  GridRow,
-  GridFullColumn
-} from '../../helpers/GridSystem';
+import { useIntl } from 'react-intl';
 import { fseLinks, uisLinks } from '../../conf/externalLinks';
 import InternationalizedLink from '../../components/common/InternationalizedLink';
-import Translate from '../../components/common/Translate';
 import GCLogo from '../../components/common/GCLogo';
 
-const HeaderGridContainer = styled(GridContainer)`
-  width: 100% !important;
-  max-width: 100% !important;
-  padding: 0;
-  background: url('/images/caves/topo.jpg') 0 center;
-  background-repeat: no-repeat;
-  background-size: 220%;
-  background-position: top;
+const HeaderRoot = styled(Box)({
+  width: '100%',
+  background: "url('/images/caves/topo.jpg') center top no-repeat",
+  backgroundSize: '220%',
+  '@media (min-width: 550px)': { backgroundSize: '130%' },
+  '@media (min-width: 1000px)': { backgroundSize: '100%' }
+});
 
-  @media (min-width: 550px) {
-    background-size: 130%;
+const BrandRow = styled(Box)(({ theme }) => ({
+  padding: '24px 16px 20px',
+  textAlign: 'center',
+  [theme.breakpoints.up('sm')]: { padding: '40px 40px 32px' }
+}));
+
+const Sitename = styled('h1')({
+  fontWeight: 600,
+  fontSize: 'clamp(2rem, 10vw, 55px)',
+  lineHeight: 1.2,
+  letterSpacing: -2,
+  marginBottom: 2
+});
+
+const Slogan = styled('span')({
+  fontSize: '1.5rem',
+  fontWeight: 400
+});
+
+const CTARow = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  gap: 16,
+  justifyContent: 'center',
+  flexDirection: 'column',
+  alignItems: 'center',
+  marginTop: 40,
+  [theme.breakpoints.up('sm')]: {
+    flexDirection: 'row'
   }
+}));
 
-  @media (min-width: 1000px) {
-    background-size: 100%;
+const SupporterRow = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  alignItems: 'center',
+  fontSize: 'small',
+  fontWeight: 300,
+  lineHeight: '25px',
+  gap: 10,
+  padding: '0 16px 12px',
+  '& span': { display: 'none' },
+  [theme.breakpoints.up('sm')]: {
+    '& span': { display: 'flex' }
   }
-`;
+}));
 
-const BrandRow = styled(GridRow)`
-  padding: 40px 40px;
-  text-align: center;
-`;
+const SupporterLogo = styled('img')({
+  width: 25,
+  height: 25
+});
 
-const Sitename = styled('h1')`
-  font-weight: 600;
-  font-size: 55px;
-  line-height: 1.2;
-  letter-spacing: -2px;
-`;
+const LogoImage = styled(GCLogo)({
+  '& > img': { width: 140 },
+  '@media (min-width: 550px)': { '& > img': { width: 160 } }
+});
 
-const Slogan = styled('span')`
-  font-size: large;
-  font-weight: 400;
-`;
+const Header = () => {
+  const { formatMessage } = useIntl();
 
-const SupporterRow = styled('span')`
-  display: flex;
-  font-size: medium;
-  font-weight: 300;
-  line-height: 40px;
-
-  span {
-    display: none;
-  }
-
-  @media (min-width: 550px) {
-    display: flex;
-
-    span {
-      display: flex;
-      margin: 0 0 0 10px;
-    }
-  }
-`;
-
-const SupporterLogo = styled('img')`
-  width: 40px;
-  height: 40px;
-  margin: 0 0 0 10px;
-`;
-
-const LogoImage = styled(GCLogo)`
-  & > img {
-    width: 140px;
-
-    @media (min-width: 550px) {
-      width: 160px;
-    }
-  }
-`;
-
-const Header = () => (
-  <header className="header">
-    <HeaderGridContainer>
-      <BrandRow>
-        <GridFullColumn>
+  return (
+    <Box component="header">
+      <HeaderRoot>
+        <BrandRow>
           <LogoImage />
           <Sitename>Grottocenter</Sitename>
           <Slogan>
-            <Translate>The Wiki database made by cavers for cavers</Translate>
+            {formatMessage({
+              id: 'The Wiki database made by cavers for cavers'
+            })}
           </Slogan>
-        </GridFullColumn>
-      </BrandRow>
-      <GridRow>
-        <GridFullColumn>
-          <SupporterRow>
-            <InternationalizedLink links={fseLinks}>
-              <SupporterLogo src="/images/FSE.svg" alt="Logo FSE" />
-            </InternationalizedLink>
-            <InternationalizedLink links={uisLinks}>
-              <SupporterLogo src="/images/UIS.svg" alt="Logo UIS" />
-            </InternationalizedLink>
-            <span>
-              <Translate>
-                Grottocenter is supported by the FSE and the UIS
-              </Translate>
-            </span>
-          </SupporterRow>
-        </GridFullColumn>
-      </GridRow>
-    </HeaderGridContainer>
-  </header>
-);
+          <CTARow>
+            <Button
+              variant="contained"
+              color="secondary"
+              component="a"
+              href="/ui/map">
+              {formatMessage({ id: 'Explore the map' })}
+            </Button>
+            <Button color="primary" component="a" href="/ui/entrances">
+              {formatMessage({ id: 'Find an entrance' })}
+            </Button>
+          </CTARow>
+        </BrandRow>
+
+        <SupporterRow>
+          <InternationalizedLink links={fseLinks}>
+            <SupporterLogo src="/images/FSE.svg" alt="Logo FSE" />
+          </InternationalizedLink>
+          <InternationalizedLink links={uisLinks}>
+            <SupporterLogo src="/images/UIS.svg" alt="Logo UIS" />
+          </InternationalizedLink>
+          <span>
+            {formatMessage({
+              id: 'Grottocenter is supported by the FSE and the UIS'
+            })}
+          </span>
+        </SupporterRow>
+      </HeaderRoot>
+    </Box>
+  );
+};
 
 export default Header;

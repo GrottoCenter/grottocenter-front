@@ -18,7 +18,7 @@ import { FormContainer, FormActionRow, FormRow } from '../utils/FormContainers';
 import InputText from '../utils/InputText';
 import InputLanguage from '../utils/InputLanguage';
 
-import { durationStringToMinutes } from '../../../../util/dateTimeDuration';
+import { durationStringToMinutes } from '../../../../utils/dateTimeDuration';
 import { CommentPropTypes } from '../../../../types/entrance.type';
 
 const InputMinutes = ({ control, formKey, labelName, helperText }) => {

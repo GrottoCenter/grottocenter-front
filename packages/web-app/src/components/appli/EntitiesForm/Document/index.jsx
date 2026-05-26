@@ -1,4 +1,5 @@
 import React, { useContext, useState, useEffect, useRef } from 'react';
+import PropTypes from 'prop-types';
 // eslint-disable-next-line camelcase
 import { useNavigate, unstable_usePrompt, useSearchParams } from 'react-router-dom';
 import { Button, Fade, Typography } from '@mui/material';
@@ -9,7 +10,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { styled } from '@mui/material/styles';
 
 import { usePermissions } from '../../../../hooks';
-import { documentTypeHelpers } from '../../../../hooks/documentTypeHelpers';
+import { documentTypeHelpers } from '../../../../utils/documentTypeHelpers';
 import { resetDocumentApiErrors } from '../../../../actions/Document/ResetApiErrors';
 import { postDocument } from '../../../../actions/Document/CreateDocument';
 import { updateDocument } from '../../../../actions/Document/UpdateDocument';
@@ -43,7 +44,7 @@ const Spacer = styled('div')`
 const DONT_LEAVE_MESSAGE =
   'If you leave now, some data would be lost. Are you sure you want to leave this page?';
 
-const DocumentSubmission = () => {
+const DocumentSubmission = ({ onCancel }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const permissions = usePermissions();
@@ -224,7 +225,7 @@ const DocumentSubmission = () => {
           <form
             onSubmit={onFormSubmit}
             style={{ marginTop: '16px', ...(documentState.isLoading ? { opacity: '0.6' } : {}) }}>
-            <FromContent />
+            <FromContent onCancel={onCancel} />
           </form>
 
 
@@ -245,17 +246,22 @@ const DocumentSubmission = () => {
   );
 };
 
+DocumentSubmission.propTypes = {
+  onCancel: PropTypes.func
+};
+
 // Used from:
 // - The Application to add a new document (no initialValues)
 // - DocumentEdit to edit a existing document (with initialValues)
-const HydratedDocumentSubmission = ({ initialValues }) => (
+const HydratedDocumentSubmission = ({ initialValues, onCancel }) => (
   <DocumentFormProvider initialValues={initialValues}>
-    <DocumentSubmission />
+    <DocumentSubmission onCancel={onCancel} />
   </DocumentFormProvider>
 );
 
 HydratedDocumentSubmission.propTypes = {
-  initialValues: defaultDocumentValuesTypes
+  initialValues: defaultDocumentValuesTypes,
+  onCancel: PropTypes.func
 };
 
 export default HydratedDocumentSubmission;

@@ -5,7 +5,7 @@ import {
   deleteDuplicates,
   fetchDuplicatesList
 } from '../../../actions/DuplicatesImport';
-import EntityTable from '../../common/EntityTable/EntityTable';
+import EntityTable from '../../common/EntityTable';
 
 import TableActions from './TableActions';
 import { resetDocumentApiErrors } from '../../../actions/Document/ResetApiErrors';
@@ -89,7 +89,6 @@ const DuplicatesList = ({
           setPage(pageNum);
           setRowsPerPage(pageSize);
         }}
-        onRowClick={() => false}
         onSelected={ids => {
           setSelectedDuplicates(ids);
         }}

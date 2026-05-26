@@ -31,6 +31,8 @@ const defaultCaveValues = {
   massif: ''
 };
 
+const isCoordEmpty = v => v === '' || v === null || v === undefined;
+
 const defaultEntranceValues = {
   name: '',
   description: '',
@@ -81,20 +83,40 @@ export const EntranceForm = ({
   );
   const [entityType, setEntityType] = useState(entityTypeInitialValue);
 
+  const defaultFormValues = useMemo(
+    () => ({
+      entrance: { ...defaultEntranceValues, ...(entranceValues ?? {}) },
+      cave: caveValues || defaultCaveValues
+    }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  );
+
   const {
     handleSubmit,
     reset,
     control,
     getValues,
+    watch,
     formState: { errors, isSubmitting, isSubmitSuccessful }
-  } = useForm({
-    defaultValues: {
-      entrance: entranceValues || defaultEntranceValues,
-      cave: caveValues || defaultCaveValues
-    }
-  });
+  } = useForm({ defaultValues: defaultFormValues });
 
-  // TODO set latitude & longitude from the selected Entry
+  const [lat, lng, caveName, caveLanguage, entranceName, entranceLanguage] =
+    watch([
+      'entrance.latitude',
+      'entrance.longitude',
+      'cave.name',
+      'cave.language',
+      'entrance.name',
+      'entrance.language'
+    ]);
+
+  const isSubmitDisabled =
+    isCoordEmpty(lat) ||
+    isCoordEmpty(lng) ||
+    (entityType === ENTRANCE_AND_CAVE
+      ? !caveName || !caveLanguage
+      : !entranceName || !entranceLanguage);
 
   const handleUpdateEntityType = type => {
     setEntityType(type);
@@ -182,6 +204,7 @@ export const EntranceForm = ({
         <FormActionRow
           isNew={isNewEntrance}
           isSubmitting={isSubmitting}
+          disabled={isSubmitDisabled}
           onCancel={onCancel}
         />
       </form>

@@ -15,6 +15,7 @@ import Translate from '../../../../common/Translate';
 import { DocumentFormContext } from '../Provider';
 import StringInput from '../../../../common/Form/StringInput';
 import { loadIdentifierTypes } from '../../../../../actions/IdentifierType';
+import { DocumentTypes } from '../../../../../utils/documentTypeHelpers';
 
 const InlineWrapper = styled('div')`
   display: flex;
@@ -128,11 +129,17 @@ const IdentifierEditor = () => {
                       <Translate>Select an identifier type</Translate>
                     </i>
                   </MenuItem>
-                  {allIdentifierTypes.map(idType => (
-                    <MenuItem key={idType.id} value={idType.id}>
-                      {idType.id.toUpperCase()}
-                    </MenuItem>
-                  ))}
+                  {allIdentifierTypes
+                    .filter(
+                      idType =>
+                        idType.id !== 'issn' ||
+                        document.type === DocumentTypes.COLLECTION
+                    )
+                    .map(idType => (
+                      <MenuItem key={idType.id} value={idType.id}>
+                        {idType.id.toUpperCase()}
+                      </MenuItem>
+                    ))}
                 </Select>
               </FormControl>
             </IdentifierTypeContainer>

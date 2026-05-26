@@ -50,7 +50,9 @@ Examples: `fix/entrance-decimal-validation`, `feat/cave-export`, `chore/upgrade-
 
 **1. Write the body** — read `.github/pull_request_template.md`, fill it out, save to `pr_body.md`.
 
-**2. Push and create:**
+**2. Show and confirm** — display the title and the **actual content of `pr_body.md`** to the user and **wait for explicit approval before proceeding**. Do not push or create the PR until the user confirms. The file must already exist on disk before asking for confirmation.
+
+**3. Push and create:**
 
 ```bash
 git push origin <branch-name>

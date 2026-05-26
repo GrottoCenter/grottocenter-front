@@ -53,7 +53,7 @@ jest.mock('./ManageUserGroups', () => {
   return MockManageUserGroups;
 });
 
-jest.mock('../../components/common/EntityTable/EntityTable', () => {
+jest.mock('../../components/common/EntityTable', () => {
   const MockEntityTable = ({ isLoading, pageRows }) => (
     <div data-testid="entity-table">
       {isLoading ? 'Loading...' : `${pageRows.length} rows`}

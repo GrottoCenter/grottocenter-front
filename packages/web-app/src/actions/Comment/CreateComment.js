@@ -2,7 +2,7 @@ import fetch from 'isomorphic-fetch';
 import { postCommentUrl } from '../../conf/apiRoutes';
 import { checkAuthStatus } from '../utils';
 import makeErrorMessage from '../../helpers/makeErrorMessage';
-import { minutesToDurationString } from '../../util/dateTimeDuration';
+import { minutesToDurationString } from '../../utils/dateTimeDuration';
 
 export const POST_COMMENT = 'POST_COMMENT';
 export const POST_COMMENT_SUCCESS = 'POST_COMMENT_SUCCESS';

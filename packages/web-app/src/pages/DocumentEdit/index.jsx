@@ -9,7 +9,12 @@ import { fetchDocumentDetails } from '../../actions/Document/GetDocumentDetails'
 import { resetDocumentApiErrors } from '../../actions/Document/ResetApiErrors';
 import Layout from '../../components/common/Layouts/Fixed/FixedContent';
 
-const DocumentEdit = ({ onSuccessfulUpdate, id, requireUpdate = false }) => {
+const DocumentEdit = ({
+  onSuccessfulUpdate,
+  onCancel,
+  id,
+  requireUpdate = false
+}) => {
   const { documentId: documentIdFromRoute } = useParams();
   const documentId = documentIdFromRoute || id;
   const navigate = useNavigate();
@@ -47,13 +52,14 @@ const DocumentEdit = ({ onSuccessfulUpdate, id, requireUpdate = false }) => {
   ) : (
     <Layout
       title={formatMessage({ id: 'BBS document submission form' })}
-      content={<DocumentSubmission initialValues={details} />}
+      content={<DocumentSubmission initialValues={details} onCancel={onCancel} />}
     />
   );
 };
 
 DocumentEdit.propTypes = {
   onSuccessfulUpdate: PropTypes.func,
+  onCancel: PropTypes.func,
   id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   requireUpdate: PropTypes.bool
 };

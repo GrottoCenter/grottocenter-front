@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { is } from 'ramda';
+
 import {
   Box,
   Typography,
@@ -10,8 +10,6 @@ import {
   Skeleton
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
-
-const isString = is(String);
 
 const Card = styled(MuiCard)`
   margin: ${({ theme }) => theme.spacing(2)};
@@ -50,7 +48,7 @@ const FixedContent = ({ subheader, title, icon, action, content }) => (
             gap: 1
           }}>
           <Box sx={{ flex: 1, minWidth: 0 }}>
-            {isString(title) ? (
+            {title !== undefined && title !== null ? (
               <Title>
                 {icon && <TitleIcon>{icon}</TitleIcon>}
                 <Typography variant="h1" color="secondary">

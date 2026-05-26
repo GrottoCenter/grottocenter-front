@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import Skeleton from '@mui/material/Skeleton';
-import { Box, Card, CircularProgress, Typography } from '@mui/material';
+import { Box, Button, Card, CircularProgress, Typography } from '@mui/material';
 import { useIntl } from 'react-intl';
 import { Print } from '@mui/icons-material';
 import CreateIcon from '@mui/icons-material/Create';
@@ -286,6 +286,18 @@ const Massif = ({ isLoading, error, massif }) => {
                     }
                   />
                 )}
+              <Box sx={{ mx: 2, mb: 1 }}>
+                <Button
+                  fullWidth
+                  variant="contained"
+                  color="primary"
+                  size="large"
+                  startIcon={<CustomIcon type="entrance" size={24} />}
+                  onClick={() => navigate(`/ui/massifs/${massifId}/entrances`)}>
+                  {formatMessage({ id: 'Entrances list' })}
+                  {dataMassif?.nb_caves ? ` (${dataMassif.nb_caves})` : ''}
+                </Button>
+              </Box>
               <Descriptions
                 descriptions={massif.descriptions ?? []}
                 entityType="massif"

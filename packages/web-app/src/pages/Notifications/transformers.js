@@ -1,4 +1,4 @@
-import formatNotification from '../../util/formatNotification';
+import formatNotification from '../../utils/formatNotification';
 
 const makeNotifications = notifications => {
   if (!notifications) return [];

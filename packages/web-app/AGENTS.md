@@ -4,6 +4,15 @@
 
 ---
 
+## 📁 src/hooks/ vs src/utils/
+
+- **`src/hooks/`** — Custom React hooks only. Every file must export one or more functions whose name starts with `use`. No plain constants or pure utility functions.
+- **`src/utils/`** — Pure utility modules: constants, helper functions, lookup tables. No React, no hooks. Examples: `documentTypeHelpers.js`, `subjectHelpers.js`.
+
+Do not add non-hook utilities (constants, pure functions, icon maps) to `src/hooks/`.
+
+---
+
 ## 🌍 Internationalization (i18n)
 
 ### Overview
@@ -32,7 +41,19 @@ When adding new UI strings, follow this exact sequence:
 yarn translations:sync-with-en
 ```
 
-**3. Translate the values** — edit each lang file and replace the English fallback with the actual translation. Use a token efficient wayt to do it
+**3. Translate the values** — edit each lang file and replace the English fallback with the actual translation. Use a token-efficient way to do it.
+
+> ⚠️ **Encoding — NEVER introduce a BOM**: lang files must be UTF-8 **without** BOM.
+>
+> - Use the **Edit** or **Write** tool (safe — no BOM).
+> - If you must use PowerShell to batch-write files, always use the BOM-free encoder:
+>
+>   ```powershell
+>   $utf8NoBom = [System.Text.UTF8Encoding]::new($false)
+>   [System.IO.File]::WriteAllText($path, $content, $utf8NoBom)
+>   ```
+>
+> - **Never** use `[System.Text.Encoding]::UTF8` or `Out-File`/`Set-Content` without `-Encoding utf8` — both produce UTF-8 with BOM, which breaks JSON parsing in some environments.
 
 **4. Sort all lang files** (mandatory — files must stay alphabetically ordered):
 
@@ -297,6 +318,28 @@ const MyComponent = () => {
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   return isMobile ? <MobileView /> : <DesktopView />;
 };
+```
+
+### Navigation (mobile vs desktop)
+
+Use `useOpenLink` (`src/hooks/useOpenLink.js`) whenever clicking an item links to an **internal app route** (`/ui/...`). It navigates in-app on mobile and opens a new tab on desktop. Never re-implement this logic manually.
+
+> For genuine external URLs (e.g. external websites, mailto links), use `window.open` directly — `useOpenLink` is not for external links.
+
+```javascript
+import useOpenLink from '../hooks/useOpenLink';
+
+const MyComponent = ({ url }) => {
+  const openLink = useOpenLink();
+  return <button onClick={() => openLink(url)}>Open</button>;
+};
+```
+
+> ❌ Don't do this manually:
+
+```javascript
+if (isMobile) navigate(url);
+else window.open(url, '_blank');
 ```
 
 ### Performance

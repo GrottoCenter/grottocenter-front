@@ -17,7 +17,7 @@ import { getAccordionBodyFromType, sortSnapshots } from './UtilityFunction';
 import AccordionSnapshotListPage from './AccordionSnapshotListPage';
 import Translate from '../../../common/Translate';
 import { fetchEntrance } from '../../../../actions/Entrance/GetEntrance';
-import { capitalize } from '../../../../util/strings';
+import { capitalize } from '../../../../utils/strings';
 
 const SnapshotPage = () => {
   const dispatch = useDispatch();

@@ -1,25 +1,73 @@
+import ImageIcon from '@mui/icons-material/Image';
+import DrawIcon from '@mui/icons-material/Draw';
+import ArticleIcon from '@mui/icons-material/Article';
+import MenuBookIcon from '@mui/icons-material/MenuBook';
+import NewspaperIcon from '@mui/icons-material/Newspaper';
+import BookmarksIcon from '@mui/icons-material/Bookmarks';
+import EventIcon from '@mui/icons-material/Event';
+import MapIcon from '@mui/icons-material/Map';
+import DatasetIcon from '@mui/icons-material/Dataset';
+import LayersIcon from '@mui/icons-material/Layers';
+import MovieIcon from '@mui/icons-material/Movie';
+import HeadphonesIcon from '@mui/icons-material/Headphones';
+import GavelIcon from '@mui/icons-material/Gavel';
+import DescriptionIcon from '@mui/icons-material/Description';
+import PhotoLibraryIcon from '@mui/icons-material/PhotoLibrary';
+import TouchAppIcon from '@mui/icons-material/TouchApp';
+import ViewInArIcon from '@mui/icons-material/ViewInAr';
+import MiscellaneousServicesIcon from '@mui/icons-material/MiscellaneousServices';
+import TerminalIcon from '@mui/icons-material/Terminal';
+import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
+import SummarizeIcon from '@mui/icons-material/Summarize';
+
 export const DocumentTypes = {
   UNKNOWN: -1,
+  ARTICLE: 'Article',
+  AUTHORIZATION_TO_PUBLISH: 'Authorization To Publish',
+  BOOK: 'Book',
   COLLECTION: 'Collection',
   DATASET: 'Dataset',
   EVENT: 'Event',
   IMAGE: 'Image',
   INTERACTIVE_RESOURCE: 'Interactive Resource',
+  ISSUE: 'Issue',
+  MAP: 'Map',
   MOVING_IMAGE: 'Moving Image',
   PHYSICAL_OBJECT: 'Physical Object',
+  REPORT: 'Report',
   SERVICE: 'Service',
   SOFTWARE: 'Software',
   SOUND: 'Sound',
   STILL_IMAGE: 'Still Image',
   TEXT: 'Text',
-  TOPOGRAPHIC_DRAWING: 'Topographic Drawing',
   TOPOGRAPHIC_DATA: 'Topographic Data',
-  BOOK: 'Book',
-  ISSUE: 'Issue',
-  ARTICLE: 'Article',
-  MAP: 'Map',
-  AUTHORIZATION_TO_PUBLISH: 'Authorization To Publish'
+  TOPOGRAPHIC_DRAWING: 'Topographic Drawing'
 };
+
+export const DOCUMENT_TYPE_ICONS = {
+  [DocumentTypes.IMAGE]: ImageIcon,
+  [DocumentTypes.TOPOGRAPHIC_DRAWING]: DrawIcon,
+  [DocumentTypes.ARTICLE]: ArticleIcon,
+  [DocumentTypes.BOOK]: MenuBookIcon,
+  [DocumentTypes.ISSUE]: NewspaperIcon,
+  [DocumentTypes.COLLECTION]: BookmarksIcon,
+  [DocumentTypes.EVENT]: EventIcon,
+  [DocumentTypes.MAP]: MapIcon,
+  [DocumentTypes.DATASET]: DatasetIcon,
+  [DocumentTypes.TOPOGRAPHIC_DATA]: LayersIcon,
+  [DocumentTypes.MOVING_IMAGE]: MovieIcon,
+  [DocumentTypes.SOUND]: HeadphonesIcon,
+  [DocumentTypes.AUTHORIZATION_TO_PUBLISH]: GavelIcon,
+  [DocumentTypes.TEXT]: DescriptionIcon,
+  [DocumentTypes.STILL_IMAGE]: PhotoLibraryIcon,
+  [DocumentTypes.INTERACTIVE_RESOURCE]: TouchAppIcon,
+  [DocumentTypes.PHYSICAL_OBJECT]: ViewInArIcon,
+  [DocumentTypes.SERVICE]: MiscellaneousServicesIcon,
+  [DocumentTypes.REPORT]: SummarizeIcon,
+  [DocumentTypes.SOFTWARE]: TerminalIcon
+};
+
+export const DOCUMENT_TYPE_FALLBACK_ICON = InsertDriveFileIcon;
 
 // Per-type file restrictions. null = unrestricted (backend-provided list applies).
 export const DOCUMENT_TYPE_ACCEPT = {
@@ -140,4 +188,3 @@ export const documentTypeHelpers = {
   isTopographicDrawing,
   isUnknown
 };
-

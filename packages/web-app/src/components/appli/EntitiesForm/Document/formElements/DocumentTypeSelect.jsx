@@ -18,52 +18,15 @@ import {
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
-import ImageIcon from '@mui/icons-material/Image';
-import DrawIcon from '@mui/icons-material/Draw';
-import ArticleIcon from '@mui/icons-material/Article';
-import MenuBookIcon from '@mui/icons-material/MenuBook';
-import NewspaperIcon from '@mui/icons-material/Newspaper';
-import BookmarksIcon from '@mui/icons-material/Bookmarks';
-import EventIcon from '@mui/icons-material/Event';
-import MapIcon from '@mui/icons-material/Map';
-import DatasetIcon from '@mui/icons-material/Dataset';
-import LayersIcon from '@mui/icons-material/Layers';
-import MovieIcon from '@mui/icons-material/Movie';
-import HeadphonesIcon from '@mui/icons-material/Headphones';
-import GavelIcon from '@mui/icons-material/Gavel';
-import DescriptionIcon from '@mui/icons-material/Description';
-import PhotoLibraryIcon from '@mui/icons-material/PhotoLibrary';
-import TouchAppIcon from '@mui/icons-material/TouchApp';
-import ViewInArIcon from '@mui/icons-material/ViewInAr';
-import MiscellaneousServicesIcon from '@mui/icons-material/MiscellaneousServices';
-import TerminalIcon from '@mui/icons-material/Terminal';
-import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
 
-import { DocumentTypes } from '../../../../../hooks/documentTypeHelpers';
+import {
+  DocumentTypes,
+  DOCUMENT_TYPE_ICONS,
+  DOCUMENT_TYPE_FALLBACK_ICON
+} from '../../../../../utils/documentTypeHelpers';
 import { DocumentFormContext } from '../Provider';
 import { loadDocumentTypes } from '../../../../../actions/DocumentType';
 
-const TYPE_ICONS = {
-  [DocumentTypes.IMAGE]: <ImageIcon />,
-  [DocumentTypes.TOPOGRAPHIC_DRAWING]: <DrawIcon />,
-  [DocumentTypes.ARTICLE]: <ArticleIcon />,
-  [DocumentTypes.BOOK]: <MenuBookIcon />,
-  [DocumentTypes.ISSUE]: <NewspaperIcon />,
-  [DocumentTypes.COLLECTION]: <BookmarksIcon />,
-  [DocumentTypes.EVENT]: <EventIcon />,
-  [DocumentTypes.MAP]: <MapIcon />,
-  [DocumentTypes.DATASET]: <DatasetIcon />,
-  [DocumentTypes.TOPOGRAPHIC_DATA]: <LayersIcon />,
-  [DocumentTypes.MOVING_IMAGE]: <MovieIcon />,
-  [DocumentTypes.SOUND]: <HeadphonesIcon />,
-  [DocumentTypes.AUTHORIZATION_TO_PUBLISH]: <GavelIcon />,
-  [DocumentTypes.TEXT]: <DescriptionIcon />,
-  [DocumentTypes.STILL_IMAGE]: <PhotoLibraryIcon />,
-  [DocumentTypes.INTERACTIVE_RESOURCE]: <TouchAppIcon />,
-  [DocumentTypes.PHYSICAL_OBJECT]: <ViewInArIcon />,
-  [DocumentTypes.SERVICE]: <MiscellaneousServicesIcon />,
-  [DocumentTypes.SOFTWARE]: <TerminalIcon />
-};
 
 const FEATURED_TYPES = [
   DocumentTypes.IMAGE,
@@ -79,7 +42,7 @@ const docTypePropType = PropTypes.shape({
 
 const FeaturedCard = ({ docType, selected, onClick }) => {
   const { formatMessage } = useIntl();
-  const icon = TYPE_ICONS[docType.name] ?? <InsertDriveFileIcon />;
+  const Icon = DOCUMENT_TYPE_ICONS[docType.name] ?? DOCUMENT_TYPE_FALLBACK_ICON;
 
   return (
     <Card
@@ -107,7 +70,7 @@ const FeaturedCard = ({ docType, selected, onClick }) => {
               display: 'flex',
               '& svg': { fontSize: 40 }
             }}>
-            {icon}
+            <Icon />
           </Box>
           <Typography
             variant="subtitle1"
@@ -140,7 +103,7 @@ FeaturedCard.propTypes = {
 
 const SecondaryCard = ({ docType, selected, onClick }) => {
   const { formatMessage } = useIntl();
-  const icon = TYPE_ICONS[docType.name] ?? <InsertDriveFileIcon />;
+  const Icon = DOCUMENT_TYPE_ICONS[docType.name] ?? DOCUMENT_TYPE_FALLBACK_ICON;
 
   return (
     <Tooltip
@@ -171,7 +134,7 @@ const SecondaryCard = ({ docType, selected, onClick }) => {
                 mr: 1,
                 '& svg': { fontSize: 20 }
               }}>
-              {icon}
+              <Icon />
             </Box>
             <Typography
               variant="body2"
@@ -215,13 +178,16 @@ const DocumentTypeSelect = () => {
 
   const handleSelect = newDocType => {
     if (newDocType === document.type) return;
-    const { title, mainLanguage, mainLanguageName } = document;
-    resetContext({ type: newDocType, title, mainLanguage, mainLanguageName });
+    const { title, mainLanguage, mainLanguageName, authors } = document;
+    resetContext({ type: newDocType, title, mainLanguage, mainLanguageName, authors });
   };
 
   const featured = documentTypes.filter(dt => FEATURED_TYPES.includes(dt.name));
   const others = documentTypes.filter(dt => !FEATURED_TYPES.includes(dt.name));
   const selectedOther = others.find(dt => dt.name === document.type) ?? null;
+  const SelectedOtherIcon = selectedOther
+    ? (DOCUMENT_TYPE_ICONS[selectedOther.name] ?? DOCUMENT_TYPE_FALLBACK_ICON)
+    : null;
 
   if (!isLoaded) {
     return (
@@ -283,7 +249,7 @@ const DocumentTypeSelect = () => {
                     display: 'flex',
                     '& svg': { fontSize: 20 }
                   }}>
-                  {TYPE_ICONS[selectedOther.name] ?? <InsertDriveFileIcon />}
+                  {SelectedOtherIcon && <SelectedOtherIcon />}
                 </Box>
               )}
               <Typography

@@ -5,7 +5,7 @@ import {
   fetchAdvancedSearchResults,
   downloadAdvancedSearchResults
 } from '../../../actions/Advancedsearch';
-import EntityTable from '../../common/EntityTable/EntityTable';
+import EntityTable from '../../common/EntityTable';
 
 const SearchResults = ({ onSelected, hideExport, entityType, compact }) => {
   const dispatch = useDispatch();
@@ -48,7 +48,6 @@ const SearchResults = ({ onSelected, hideExport, entityType, compact }) => {
             }
       }
       onSelected={!onSelected ? null : ids => onSelected(ids, results)}
-      onRowClick={onSelected ? () => false : null}
       compact={compact}
     />
   );
