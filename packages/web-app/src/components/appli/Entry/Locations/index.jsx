@@ -45,6 +45,7 @@ const Locations = ({ entranceId, locations, isSensitive, isEditAllowed }) => {
       defaultExpanded={locations.length > 0}
       title={formatMessage({ id: 'Location' })}
       icon={
+        // Hidden for non-admins on sensitive entrances: they cannot add locations
         permissions.isAuth &&
         isEditAllowed &&
         (!isSensitive || permissions.isAdmin) && (
