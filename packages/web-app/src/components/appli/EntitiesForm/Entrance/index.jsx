@@ -218,6 +218,7 @@ export const EntranceForm = ({
 
 EntranceForm.propTypes = {
   entranceValues: PropTypes.shape({
+    id: PropTypes.number,
     name: PropTypes.string,
     description: PropTypes.string,
     descriptionTitle: PropTypes.string,
