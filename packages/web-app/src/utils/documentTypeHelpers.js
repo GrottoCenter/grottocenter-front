@@ -207,10 +207,15 @@ const ADVANCED_PAYLOAD_FIELDS = [
   'creatorComment'
 ];
 
-// type === UNKNOWN (-1) falls through to the else branch (full field set), which is
-// intentional — the form is not submittable in that state so no filtering is needed.
+/**
+ * Strips docAttributes down to the fields relevant to the given document type.
+ * Field groups mirror the conditional rendering in FormContent.jsx — keep in sync
+ * when adding or removing form fields.
+ * UNKNOWN (-1) falls through to the else branch (full set) intentionally: the form
+ * is not submittable without a type so no filtering is needed.
+ */
 export const filterDocumentPayload = docAttributes => {
-  const { type } = docAttributes;
+  const { type = DocumentTypes.UNKNOWN } = docAttributes ?? {};
   let allowedFields;
 
   if (isEvent(type)) {

@@ -113,13 +113,13 @@ const AddFileForm = ({
   const currentUser = useUserProperties();
   const { document, updateAttribute } = useContext(DocumentFormContext);
 
-  const prevParentIdRef = useRef(document.parent?.id ?? null);
+  const parentId = document.parent?.id ?? null;
+  const prevParentIdRef = useRef(parentId);
   useEffect(() => {
-    const currentParentId = document.parent?.id ?? null;
-    if (prevParentIdRef.current === currentParentId) return;
-    prevParentIdRef.current = currentParentId;
+    if (prevParentIdRef.current === parentId) return;
+    prevParentIdRef.current = parentId;
     updateAttribute('authorizationDocument', null);
-  }, [document.parent, updateAttribute]);
+  }, [parentId, updateAttribute]);
 
   const isParentAuthForced =
     document.parent !== null && document.authorizationDocument !== null;
