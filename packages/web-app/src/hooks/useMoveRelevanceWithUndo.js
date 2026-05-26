@@ -15,7 +15,15 @@ export const useMoveRelevanceWithUndo = moveThunk => {
       setMovingId(entityId);
       dispatch(moveThunk(entityId, direction))
         .then(result => {
-          if (result?.error) return;
+          if (result?.error) {
+            enqueueSnackbar(
+              typeof result.error === 'string'
+                ? result.error
+                : formatMessage({ id: 'An error occurred. Please try again.' }),
+              { variant: 'error', autoHideDuration: 6000 }
+            );
+            return;
+          }
           enqueueSnackbar(formatMessage({ id: 'Order updated' }), {
             variant: 'success',
             autoHideDuration: 6000,
@@ -30,15 +38,20 @@ export const useMoveRelevanceWithUndo = moveThunk => {
                   setMovingId(entityId);
                   dispatch(moveThunk(entityId, direction * -1))
                     .then(undoResult => {
-                      if (undoResult?.error) return;
+                      if (undoResult?.error) {
+                        enqueueSnackbar(
+                          formatMessage({ id: 'An error occurred. Please try again.' }),
+                          { variant: 'error', autoHideDuration: 6000 }
+                        );
+                        return;
+                      }
                       enqueueSnackbar(
                         formatMessage({ id: 'Undo successful' }),
                         { variant: 'success', autoHideDuration: 3000 }
                       );
                     })
                     .finally(() => setMovingId(null));
-                }}
-              >
+                }}>
                 {formatMessage({ id: 'Undo' })}
               </Link>
             )
