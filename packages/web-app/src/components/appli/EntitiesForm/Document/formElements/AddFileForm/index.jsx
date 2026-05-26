@@ -113,11 +113,6 @@ const AddFileForm = ({
   const currentUser = useUserProperties();
   const { document, updateAttribute } = useContext(DocumentFormContext);
 
-  const isParentAuthForced =
-    document.parent !== null && document.authorizationDocument !== null;
-  const isLicenseForced = isParentAuthForced;
-  const isAuthForced = isParentAuthForced;
-
   const prevParentIdRef = useRef(document.parent?.id ?? null);
   useEffect(() => {
     const currentParentId = document.parent?.id ?? null;
@@ -125,6 +120,12 @@ const AddFileForm = ({
     prevParentIdRef.current = currentParentId;
     updateAttribute('authorizationDocument', null);
   }, [document.parent, updateAttribute]);
+
+  const isParentAuthForced =
+    document.parent !== null && document.authorizationDocument !== null;
+  const isLicenseForced = isParentAuthForced;
+  const isAuthForced = isParentAuthForced;
+
   const accept = acceptConfig?.mime ?? mimeTypes.toString();
   const extensions =
     acceptConfig?.extensions ??

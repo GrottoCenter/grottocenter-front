@@ -29,7 +29,7 @@ export function postDocument(docAttributes) {
   return (dispatch, getState) => {
     dispatch(postDocumentAction());
     const filtered = filterDocumentPayload(docAttributes);
-    const { files, selectOptionAuthorizationDocument, ...rest } = filtered;
+    const { files = [], selectOptionAuthorizationDocument, ...rest } = filtered;
     const attributes = { ...rest, option: selectOptionAuthorizationDocument };
 
     const formData = new FormData();
