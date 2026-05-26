@@ -652,6 +652,9 @@ const MfaSection = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const { reset: mfaReset } = useSelector(state => state.mfa);
+  const isMfaEnabled = useSelector(
+    state => state.account.account?.mfaEnabled ?? false
+  );
 
   const {
     control,
@@ -688,16 +691,32 @@ const MfaSection = () => {
         {formatMessage({ id: 'mfaStatus' })}
       </InfoLabel>
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-        <Chip
-          size="small"
-          variant="outlined"
-          color="success"
-          icon={<CheckCircleOutlineIcon />}
-          label={formatMessage({ id: 'mfaStatusActive' })}
-        />
-        <Button size="small" variant="outlined" color="error" onClick={handleOpen}>
-          {formatMessage({ id: 'mfaResetTitle' })}
-        </Button>
+        {isMfaEnabled ? (
+          <>
+            <Chip
+              size="small"
+              variant="outlined"
+              color="success"
+              icon={<CheckCircleOutlineIcon />}
+              label={formatMessage({ id: 'mfaStatusActive' })}
+            />
+            <Button
+              size="small"
+              variant="outlined"
+              color="error"
+              onClick={handleOpen}>
+              {formatMessage({ id: 'mfaResetTitle' })}
+            </Button>
+          </>
+        ) : (
+          <Chip
+            size="small"
+            variant="outlined"
+            color="warning"
+            icon={<ErrorOutlineIcon />}
+            label={formatMessage({ id: 'mfaStatusInactive' })}
+          />
+        )}
       </Box>
     </InfoRow>
   );
