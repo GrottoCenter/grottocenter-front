@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useRef, useContext } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import { useDispatch, useSelector } from 'react-redux';
@@ -113,10 +113,18 @@ const AddFileForm = ({
   const currentUser = useUserProperties();
   const { document, updateAttribute } = useContext(DocumentFormContext);
 
-  const isLicenseForced = document.parent !== null && document.license !== null;
-  const isAuthForced =
-    document.parent !== null &&
-    document.selectOptionAuthorizationDocument !== null;
+  const isParentAuthForced =
+    document.parent !== null && document.authorizationDocument !== null;
+  const isLicenseForced = isParentAuthForced;
+  const isAuthForced = isParentAuthForced;
+
+  const prevParentIdRef = useRef(document.parent?.id ?? null);
+  useEffect(() => {
+    const currentParentId = document.parent?.id ?? null;
+    if (prevParentIdRef.current === currentParentId) return;
+    prevParentIdRef.current = currentParentId;
+    updateAttribute('authorizationDocument', null);
+  }, [document.parent, updateAttribute]);
   const accept = acceptConfig?.mime ?? mimeTypes.toString();
   const extensions =
     acceptConfig?.extensions ??
