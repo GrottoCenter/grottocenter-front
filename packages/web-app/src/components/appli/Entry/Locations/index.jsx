@@ -22,7 +22,9 @@ const Locations = ({ entranceId, locations, isSensitive, isEditAllowed }) => {
   const permissions = usePermissions();
   const dispatch = useDispatch();
   const [isFormVisible, setIsFormVisible] = useState(false);
-  const { movingId, handleMove } = useMoveRelevanceWithUndo(moveLocationRelevance);
+  const { movingId, handleMove } = useMoveRelevanceWithUndo(
+    moveLocationRelevance
+  );
 
   const onSubmitForm = data => {
     dispatch(
@@ -43,22 +45,22 @@ const Locations = ({ entranceId, locations, isSensitive, isEditAllowed }) => {
       defaultExpanded={locations.length > 0}
       title={formatMessage({ id: 'Location' })}
       icon={
+        // Hidden for non-admins on sensitive entrances: they cannot add locations
         permissions.isAuth &&
-        isEditAllowed && (
+        isEditAllowed &&
+        (!isSensitive || permissions.isAdmin) && (
           <Tooltip
             title={
               isFormVisible
                 ? formatMessage({ id: 'Cancel adding a new location' })
                 : formatMessage({ id: 'Add a new location' })
-            }
-          >
+            }>
             <Button
               color={isFormVisible ? 'inherit' : 'secondary'}
               size="small"
               variant="outlined"
               onClick={() => setIsFormVisible(!isFormVisible)}
-              startIcon={isFormVisible ? <CancelIcon /> : <AddCircleIcon />}
-            >
+              startIcon={isFormVisible ? <CancelIcon /> : <AddCircleIcon />}>
               {formatMessage({ id: isFormVisible ? 'Cancel' : 'New' })}
             </Button>
           </Tooltip>

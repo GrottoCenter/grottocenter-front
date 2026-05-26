@@ -14,7 +14,7 @@ const sortComparator = (a, b) =>
 // Detect the indentation used in a JSON file by looking at the first indented line.
 // Assumes flat key-value JSON with uniform indentation.
 function detectIndent(content) {
-  const match = content.match(/^(\s+)"/m);
+  const match = content.match(/^([^\S\n]+)"/m);
   return match ? match[1] : '  ';
 }
 
