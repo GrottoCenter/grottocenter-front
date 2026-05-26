@@ -3,6 +3,7 @@ import fetch from 'isomorphic-fetch';
 import { postDocumentUrl } from '../../conf/apiRoutes';
 import { checkAuthStatus } from '../utils';
 import { buildFormData } from './utils';
+import { filterDocumentPayload } from '../../utils/documentTypeHelpers';
 
 export const POST_DOCUMENT = 'POST_DOCUMENT';
 export const POST_DOCUMENT_SUCCESS = 'POST_DOCUMENT_SUCCESS';
@@ -27,7 +28,8 @@ const postDocumentFailure = (errorMessages, httpCode) => ({
 export function postDocument(docAttributes) {
   return (dispatch, getState) => {
     dispatch(postDocumentAction());
-    const { files, selectOptionAuthorizationDocument, ...rest } = docAttributes;
+    const filtered = filterDocumentPayload(docAttributes);
+    const { files, selectOptionAuthorizationDocument, ...rest } = filtered;
     const attributes = { ...rest, option: selectOptionAuthorizationDocument };
 
     const formData = new FormData();

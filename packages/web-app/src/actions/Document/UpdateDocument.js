@@ -10,6 +10,7 @@ import {
 } from '../../conf/apiRoutes';
 import { checkAuthStatus } from '../utils';
 import { buildFormData } from './utils';
+import { filterDocumentPayload } from '../../utils/documentTypeHelpers';
 
 export const UPDATE_DOCUMENT = 'UPDATE_DOCUMENT';
 export const UPDATE_DOCUMENT_SUCCESS = 'UPDATE_DOCUMENT_SUCCESS';
@@ -33,7 +34,8 @@ const updateDocumentFailure = (errorMessages, httpCode) => ({
 export function updateDocument(docAttributes) {
   return (dispatch, getState) => {
     dispatch(updateDocumentAction());
-    const { files, selectOptionAuthorizationDocument, ...rest } = docAttributes;
+    const filtered = filterDocumentPayload(docAttributes);
+    const { files, selectOptionAuthorizationDocument, ...rest } = filtered;
     const attributes = { ...rest, option: selectOptionAuthorizationDocument };
 
     const formData = new FormData();
@@ -115,7 +117,7 @@ export const updateDocumentWithNewEntities =
     dispatch(updateDocumentAction());
     const { id } = docAttributes;
     const body = {
-      document: docAttributes,
+      document: filterDocumentPayload(docAttributes),
       newAuthors,
       newDescriptions
     };

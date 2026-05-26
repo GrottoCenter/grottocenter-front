@@ -188,3 +188,59 @@ export const documentTypeHelpers = {
   isTopographicDrawing,
   isUnknown
 };
+
+const BASE_PAYLOAD_FIELDS = ['id', 'type', 'title', 'authors'];
+const LANGUAGE_PAYLOAD_FIELDS = ['mainLanguage', 'mainLanguageName'];
+const FILE_PAYLOAD_FIELDS = [
+  'files',
+  'license',
+  'selectOptionAuthorizationDocument',
+  'authorizationDocument'
+];
+const ADVANCED_PAYLOAD_FIELDS = [
+  'datePublication',
+  'identifier',
+  'identifierType',
+  'editor',
+  'iso3166',
+  'subjects',
+  'creatorComment'
+];
+
+export const filterDocumentPayload = docAttributes => {
+  const { type } = docAttributes;
+  let allowedFields;
+
+  if (isEvent(type)) {
+    allowedFields = new Set([
+      ...BASE_PAYLOAD_FIELDS,
+      'description',
+      'datePublication',
+      'iso3166'
+    ]);
+  } else if (isAuthorizationToPublish(type)) {
+    allowedFields = new Set([
+      ...BASE_PAYLOAD_FIELDS,
+      ...LANGUAGE_PAYLOAD_FIELDS,
+      ...FILE_PAYLOAD_FIELDS,
+      'description',
+      'datePublication'
+    ]);
+  } else {
+    allowedFields = new Set([
+      ...BASE_PAYLOAD_FIELDS,
+      ...LANGUAGE_PAYLOAD_FIELDS,
+      ...FILE_PAYLOAD_FIELDS,
+      ...ADVANCED_PAYLOAD_FIELDS,
+      'description',
+      'library',
+      'pages',
+      'parent',
+      'issue'
+    ]);
+  }
+
+  return Object.fromEntries(
+    Object.entries(docAttributes).filter(([key]) => allowedFields.has(key))
+  );
+};
