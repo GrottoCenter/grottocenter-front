@@ -15,7 +15,15 @@ export const useMoveRelevanceWithUndo = moveThunk => {
       setMovingId(entityId);
       dispatch(moveThunk(entityId, direction))
         .then(result => {
-          if (result?.error) return;
+          if (result?.error) {
+            if (typeof result.error === 'string') {
+              enqueueSnackbar(result.error, {
+                variant: 'error',
+                autoHideDuration: 6000
+              });
+            }
+            return;
+          }
           enqueueSnackbar(formatMessage({ id: 'Order updated' }), {
             variant: 'success',
             autoHideDuration: 6000,
@@ -37,8 +45,7 @@ export const useMoveRelevanceWithUndo = moveThunk => {
                       );
                     })
                     .finally(() => setMovingId(null));
-                }}
-              >
+                }}>
                 {formatMessage({ id: 'Undo' })}
               </Link>
             )
