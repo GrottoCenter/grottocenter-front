@@ -9,8 +9,10 @@ import { WarningRounded } from '@mui/icons-material';
 import {
   hideLoginDialog,
   postLogin,
-  postForgotPassword
+  postForgotPassword,
+  displayLoginDialog
 } from '../../actions/Login';
+import { postMfaLogin } from '../../actions/Mfa';
 import {
   postResendVerificationEmail,
   resetResendVerification
@@ -20,11 +22,13 @@ import { isValidEmail } from '../../conf/config';
 import Translate from '../common/Translate';
 import StandardDialog from '../common/StandardDialog';
 import LoginForm from '../common/LoginForm';
+import MfaEnrollment from './MfaEnrollment';
 import { useNotification } from '../../hooks';
 
 const Login = () => {
   const dispatch = useDispatch();
   const authState = useSelector(state => state.login);
+  const mfaVerifyState = useSelector(state => state.mfa.verify);
   const resendVerificationState = useSelector(
     state => state.resendVerificationEmail
   );
@@ -68,6 +72,14 @@ const Login = () => {
     }
   };
 
+  const onTotpSubmit = code => {
+    dispatch(postMfaLogin(email, password, code));
+  };
+
+  const onBackToLogin = () => {
+    dispatch(displayLoginDialog());
+  };
+
   useEffect(() => {
     if (resendVerificationState.success) {
       onSuccess(formatMessage({ id: 'Verification email sent!' }));
@@ -107,6 +119,7 @@ const Login = () => {
     }
     return <Translate>Log in</Translate>;
   };
+
   const LoginButton = (
     <Button
       key={0}
@@ -136,6 +149,43 @@ const Login = () => {
     navigate(`/ui/forgotPassword`);
     dispatch(hideLoginDialog());
   };
+
+  // Step 2b: MFA enrollment wizard — rendered inside modal
+  if (authState.isMfaEnrollmentRequiredDisplayed) {
+    return (
+      <StandardDialog
+        open={authState.isLoginDialogDisplayed}
+        onClose={() => dispatch(hideLoginDialog())}
+        title={formatMessage({ id: 'mfaEnrollmentRequired' })}>
+        <MfaEnrollment onBack={onBackToLogin} />
+      </StandardDialog>
+    );
+  }
+
+  // Step 2a: TOTP code entry for admins with MFA already active
+  if (authState.isMfaRequiredDisplayed) {
+    return (
+      <StandardDialog
+        open={authState.isLoginDialogDisplayed}
+        onClose={() => dispatch(hideLoginDialog())}
+        title={formatMessage({ id: 'mfaRequired' })}>
+        <LoginForm
+          authErrors={authErrorMessages}
+          email={email}
+          isFetching={authState.isFetching}
+          onEmailChange={setEmail}
+          onLogin={onLogin}
+          onPasswordChange={setPassword}
+          password={password}
+          totpMode
+          onTotpSubmit={onTotpSubmit}
+          totpError={mfaVerifyState.error}
+          totpIsEnrollmentTokenExpired={mfaVerifyState.isEnrollmentTokenExpired}
+          onBackToLogin={onBackToLogin}
+        />
+      </StandardDialog>
+    );
+  }
 
   const DialogContent = authState.isMustResetMessageDisplayed ? (
     <>

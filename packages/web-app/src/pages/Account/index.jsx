@@ -32,6 +32,7 @@ import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import PersonOutlinedIcon from '@mui/icons-material/PersonOutlined';
+import SecurityIcon from '@mui/icons-material/Security';
 import TravelExploreOutlinedIcon from '@mui/icons-material/TravelExploreOutlined';
 import PermMediaOutlinedIcon from '@mui/icons-material/PermMediaOutlined';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
@@ -42,6 +43,7 @@ import { styled } from '@mui/material/styles';
 import { fetchAccount } from '../../actions/Account/GetAccount';
 import { fetchSubscriptions } from '../../actions/Subscriptions/GetSubscriptions';
 import { updateAccount } from '../../actions/Account/UpdateAccount';
+import { postMfaReset, clearMfaState } from '../../actions/Mfa';
 import { fetchPerson } from '../../actions/Person/GetPerson';
 import { joinOrganization } from '../../actions/Organization/JoinOrganization';
 import { leaveOrganization } from '../../actions/Organization/LeaveOrganization';
@@ -642,6 +644,134 @@ EmailSecuritySection.propTypes = {
   onSaved: PropTypes.func.isRequired
 };
 
+// ─── MFA section (admins only) ────────────────────────────────────────────────
+
+const MfaSection = () => {
+  const dispatch = useDispatch();
+  const { formatMessage } = useIntl();
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+  const { reset: mfaReset } = useSelector(state => state.mfa);
+
+  const {
+    control,
+    handleSubmit,
+    reset: resetForm,
+    formState: { errors, isValid }
+  } = useForm({ defaultValues: { password: '' }, mode: 'onChange' });
+
+  const handleOpen = () => {
+    dispatch(clearMfaState());
+    setIsDialogOpen(true);
+  };
+
+  const handleClose = () => {
+    resetForm({ password: '' });
+    setIsDialogOpen(false);
+    dispatch(clearMfaState());
+  };
+
+  useEffect(() => {
+    if (mfaReset.isSuccess) {
+      handleClose();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mfaReset.isSuccess]);
+
+  const onSubmit = async data => {
+    await dispatch(postMfaReset(data.password));
+  };
+
+  const viewContent = (
+    <InfoRow>
+      <InfoLabel variant="body2">
+        {formatMessage({ id: 'mfaStatus' })}
+      </InfoLabel>
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+        <Chip
+          size="small"
+          variant="outlined"
+          color="success"
+          icon={<CheckCircleOutlineIcon />}
+          label={formatMessage({ id: 'mfaStatusActive' })}
+        />
+        <Button size="small" variant="outlined" color="error" onClick={handleOpen}>
+          {formatMessage({ id: 'mfaResetTitle' })}
+        </Button>
+      </Box>
+    </InfoRow>
+  );
+
+  return (
+    <>
+      <SectionPaper elevation={2}>
+        <SectionHeader>
+          <SectionHeaderTitle>
+            <SecurityIcon color="action" />
+            <Typography variant="h6" fontWeight={600}>
+              {formatMessage({ id: 'mfaStatus' })}
+            </Typography>
+          </SectionHeaderTitle>
+        </SectionHeader>
+        <Divider />
+        <SectionBody>{viewContent}</SectionBody>
+      </SectionPaper>
+
+      <StandardDialog
+        open={isDialogOpen}
+        onClose={handleClose}
+        fullWidth
+        maxWidth="xs"
+        title={formatMessage({ id: 'mfaResetTitle' })}
+        actions={
+          <>
+            <Button onClick={handleClose} variant="text" disabled={mfaReset.isLoading}>
+              {formatMessage({ id: 'Cancel' })}
+            </Button>
+            <Button
+              onClick={handleSubmit(onSubmit)}
+              color="error"
+              variant="contained"
+              disabled={!isValid || mfaReset.isLoading}
+              startIcon={
+                mfaReset.isLoading ? (
+                  <CircularProgress size={16} color="inherit" />
+                ) : null
+              }>
+              {formatMessage({ id: 'mfaResetTitle' })}
+            </Button>
+          </>
+        }>
+        <Box display="flex" flexDirection="column" gap={2}>
+          <Alert
+            severity="warning"
+            content={formatMessage({ id: 'mfaResetWarning' })}
+          />
+          <form onSubmit={handleSubmit(onSubmit)} autoComplete="new-password">
+            <InputPassword
+              formKey="password"
+              labelName="mfaResetPasswordLabel"
+              isPasswordVisible={isPasswordVisible}
+              onShowPassword={() => setIsPasswordVisible(v => !v)}
+              control={control}
+              isError={!!errors.password}
+              isRequired
+            />
+          </form>
+          {mfaReset.error && (
+            <Alert
+              severity="error"
+              content={formatMessage({
+                id: 'An error occurred. Please try again.'
+              })}
+            />
+          )}
+        </Box>
+      </StandardDialog>
+    </>
+  );
+};
+
 // ─── Preferences section ──────────────────────────────────────────────────────
 
 const PreferencesSection = ({ account, onSaved }) => {
@@ -808,7 +938,7 @@ const AccountPage = () => {
   const dispatch = useDispatch();
   const userProperties = useUserProperties();
   const userId = userProperties?.id ?? null;
-  const { isLeader } = usePermissions();
+  const { isAdmin, isLeader } = usePermissions();
 
   const {
     account,
@@ -950,6 +1080,7 @@ const AccountPage = () => {
         <>
           <PersonalInfoSection account={account} onSaved={handleSaved} />
           <EmailSecuritySection account={account} onSaved={handleSaved} />
+          {isAdmin && <MfaSection />}
           <PreferencesSection account={account} onSaved={handleSaved} />
         </>
       )}

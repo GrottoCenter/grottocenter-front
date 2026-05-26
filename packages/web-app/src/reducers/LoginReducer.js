@@ -3,6 +3,8 @@ import {
   FETCH_LOGIN_FAILURE,
   FETCH_LOGIN_MUST_RESET,
   FETCH_LOGIN_NOT_VERIFIED,
+  FETCH_LOGIN_MFA_REQUIRED,
+  FETCH_LOGIN_MFA_ENROLLMENT_REQUIRED,
   FETCH_LOGIN_SUCCESS,
   FETCH_LOGIN_RESET_SUCCESS,
   DISPLAY_LOGIN_DIALOG,
@@ -35,9 +37,12 @@ const initialState = {
   authorizationHeader: {
     Authorization: `Bearer ${getRawTokenIfNotExpired()}`
   },
+  enrollmentToken: null,
   error: null,
   isFetching: false,
   isLoginDialogDisplayed: false,
+  isMfaRequiredDisplayed: false,
+  isMfaEnrollmentRequiredDisplayed: false,
   isMustResetMessageDisplayed: false,
   isNotVerifiedMessageDisplayed: false,
   notVerifiedContext: 'login',
@@ -76,6 +81,21 @@ const reducer = (state = initialState, action) => {
         isMustResetMessageDisplayed: true,
         isNotVerifiedMessageDisplayed: false
       };
+    case FETCH_LOGIN_MFA_REQUIRED:
+      return {
+        ...state,
+        isFetching: false,
+        isMfaRequiredDisplayed: true,
+        isMfaEnrollmentRequiredDisplayed: false
+      };
+    case FETCH_LOGIN_MFA_ENROLLMENT_REQUIRED:
+      return {
+        ...state,
+        isFetching: false,
+        isMfaEnrollmentRequiredDisplayed: true,
+        isMfaRequiredDisplayed: false,
+        enrollmentToken: action.enrollmentToken
+      };
     case FETCH_LOGIN_NOT_VERIFIED:
       return {
         ...state,
@@ -100,6 +120,9 @@ const reducer = (state = initialState, action) => {
       return {
         ...state,
         isLoginDialogDisplayed: true,
+        isMfaRequiredDisplayed: false,
+        isMfaEnrollmentRequiredDisplayed: false,
+        enrollmentToken: null,
         isMustResetMessageDisplayed: false,
         isNotVerifiedMessageDisplayed: false,
         notVerifiedContext: action.notVerifiedContext || 'login'
@@ -108,6 +131,9 @@ const reducer = (state = initialState, action) => {
       return {
         ...state,
         isLoginDialogDisplayed: false,
+        isMfaRequiredDisplayed: false,
+        isMfaEnrollmentRequiredDisplayed: false,
+        enrollmentToken: null,
         isMustResetMessageDisplayed: false,
         isNotVerifiedMessageDisplayed: false,
         notVerifiedContext: 'login'

@@ -40,6 +40,7 @@
     "notistack": "^3.0.2",
     "proj4": "^2.20.8",
     "prop-types": "^15.8.1",
+    "qrcode.react": "^4.2.0",
     "ramda": "^0.32.0",
     "react": "^19.2.4",
     "react-alice-carousel": "^2.9.1",

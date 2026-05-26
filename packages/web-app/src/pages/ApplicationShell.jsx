@@ -1,7 +1,7 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { Provider, useSelector, useDispatch } from 'react-redux';
 import { Outlet } from 'react-router-dom';
-import { IntlProvider } from 'react-intl';
+import { IntlProvider, useIntl } from 'react-intl';
 import createDebounce from 'redux-debounced';
 import { isMobileOnly } from 'react-device-detect';
 import { SnackbarContent, SnackbarProvider } from 'notistack';
@@ -10,6 +10,7 @@ import { thunk } from 'redux-thunk';
 import PropTypes from 'prop-types';
 import { styled } from '@mui/material/styles';
 import { Alert } from '@mui/material';
+import { usePermissions } from '../hooks';
 
 import GCReducer from '../reducers/GCReducer';
 import { bootstrapIntl } from '../actions/Intl';
@@ -113,6 +114,29 @@ const MainWrapper = styled('main')`
     !isMobileOnly && ($isSideMenuOpen ? theme.sideMenuWidth : 0)}px;
 `;
 
+const SECONDS_IN_DAY = 86400;
+
+const AdminSessionExpiryBanner = () => {
+  const { formatMessage } = useIntl();
+  const { isAdmin } = usePermissions();
+  const authTokenDecoded = useSelector(state => state.login.authTokenDecoded);
+  const [dismissed, setDismissed] = useState(false);
+
+  if (!isAdmin || dismissed || !authTokenDecoded?.exp) return null;
+
+  const secondsUntilExpiry = authTokenDecoded.exp - Date.now() / 1000;
+  if (secondsUntilExpiry >= SECONDS_IN_DAY) return null;
+
+  return (
+    <Alert
+      severity="warning"
+      onClose={() => setDismissed(true)}
+      sx={{ borderRadius: 0 }}>
+      {formatMessage({ id: 'mfaSessionExpiryWarning' })}
+    </Alert>
+  );
+};
+
 const ApplicationLayout = () => {
   const isSideMenuOpen = useSelector(state => state.sideMenu.open);
   useLanguageSync();
@@ -126,6 +150,7 @@ const ApplicationLayout = () => {
 
   return (
     <>
+      <AdminSessionExpiryBanner />
       <AppBar />
       <SideMenu isOpen={isSideMenuOpen} />
       <MainWrapper $isSideMenuOpen={isSideMenuOpen}>
