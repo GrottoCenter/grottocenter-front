@@ -72,10 +72,12 @@ export function postMfaVerify(code) {
         return;
       }
       const json = await response.json().catch(() => ({}));
+      const totpStatuses = ['InvalidTotpCode', 'TotpAlreadyUsed'];
       dispatch({
         type: FETCH_MFA_VERIFY_FAILURE,
         error: json?.status ?? 'error',
-        isEnrollmentTokenExpired: response.status === 401
+        isEnrollmentTokenExpired:
+          response.status === 401 && !totpStatuses.includes(json?.status)
       });
     } catch (_) {
       dispatch({
@@ -137,7 +139,7 @@ export function postMfaReset(password) {
         return;
       }
       const json = await response.json().catch(() => ({}));
-      dispatch({ type: FETCH_MFA_RESET_FAILURE, error: json?.message });
+      dispatch({ type: FETCH_MFA_RESET_FAILURE, error: json?.status ?? 'error' });
     } catch (_) {
       dispatch({ type: FETCH_MFA_RESET_FAILURE, error: 'network' });
     }

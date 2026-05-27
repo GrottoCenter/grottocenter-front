@@ -10,10 +10,12 @@ import {
   Fade,
   FilledInput,
   FormControl,
+  IconButton,
   InputLabel,
   Step,
   StepLabel,
   Stepper,
+  Tooltip,
   Typography
 } from '@mui/material';
 import { QRCodeSVG } from 'qrcode.react';
@@ -56,7 +58,7 @@ StepInstall.propTypes = {
 
 // ─── Step 2: Scan QR code ─────────────────────────────────────────────────────
 
-const StepScanQr = ({ otpauthUri, secret, onContinue }) => {
+const StepScanQr = ({ otpauthUri, secret, onContinue, onBack }) => {
   const { formatMessage } = useIntl();
   const { onSuccess } = useNotification();
 
@@ -81,38 +83,38 @@ const StepScanQr = ({ otpauthUri, secret, onContinue }) => {
         <QRCodeSVG value={otpauthUri} size={180} />
       </Box>
       <Box sx={{ width: '100%' }}>
-        <Typography variant="caption" color="text.secondary">
+        <Typography variant="caption" color="text.secondary" sx={{ mb: 0.5, display: 'block' }}>
           {formatMessage({ id: 'mfaSecretLabel' })}
         </Typography>
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 1,
+            bgcolor: 'action.hover',
+            borderRadius: 1,
+            px: 2,
+            py: 1
+          }}>
+          <Typography
+            variant="caption"
+            component="code"
+            sx={{ fontFamily: 'monospace', flexGrow: 1, wordBreak: 'break-all' }}>
+            {secret}
+          </Typography>
+          <Tooltip title={formatMessage({ id: 'mfaCopySecret' })}>
+            <IconButton size="small" onClick={handleCopySecret}>
+              <ContentCopyIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
+        </Box>
       </Box>
-      <Box
-        sx={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 1,
-          width: '100%',
-          bgcolor: 'action.hover',
-          borderRadius: 1,
-          px: 2,
-          py: 1
-        }}>
-        <Typography
-          variant="caption"
-          component="code"
-          sx={{ fontFamily: 'monospace', flexGrow: 1, wordBreak: 'break-all' }}>
-          {secret}
-        </Typography>
-        <Button
-          size="small"
-          startIcon={<ContentCopyIcon fontSize="small" />}
-          onClick={handleCopySecret}
-          sx={{ flexShrink: 0 }}>
-          {formatMessage({ id: 'mfaCopySecret' })}
+      <Box display="flex" justifyContent="space-between" width="100%">
+        <Button variant="text" onClick={onBack}>
+          {formatMessage({ id: 'Back' })}
         </Button>
-      </Box>
-      <Box display="flex" justifyContent="flex-end" width="100%">
         <Button variant="contained" onClick={onContinue}>
-          {formatMessage({ id: "I've scanned the code" })}
+          {formatMessage({ id: 'Continue' })}
         </Button>
       </Box>
     </Box>
@@ -122,12 +124,13 @@ const StepScanQr = ({ otpauthUri, secret, onContinue }) => {
 StepScanQr.propTypes = {
   otpauthUri: PropTypes.string.isRequired,
   secret: PropTypes.string.isRequired,
-  onContinue: PropTypes.func.isRequired
+  onContinue: PropTypes.func.isRequired,
+  onBack: PropTypes.func.isRequired
 };
 
 // ─── Step 3: Verify code ──────────────────────────────────────────────────────
 
-const StepVerify = ({ onSubmit, isLoading, error, isEnrollmentTokenExpired, onBackToLogin }) => {
+const StepVerify = ({ onSubmit, isLoading, error, isEnrollmentTokenExpired, onBack, onBackToLogin }) => {
   const { formatMessage } = useIntl();
   const [code, setCode] = React.useState('');
 
@@ -206,6 +209,13 @@ const StepVerify = ({ onSubmit, isLoading, error, isEnrollmentTokenExpired, onBa
           </Alert>
         </Fade>
       )}
+      {!isEnrollmentTokenExpired && (
+        <Box>
+          <Button variant="text" size="small" onClick={onBack} disabled={isLoading}>
+            {formatMessage({ id: 'Back' })}
+          </Button>
+        </Box>
+      )}
     </Box>
   );
 };
@@ -215,6 +225,7 @@ StepVerify.propTypes = {
   isLoading: PropTypes.bool.isRequired,
   error: PropTypes.string,
   isEnrollmentTokenExpired: PropTypes.bool,
+  onBack: PropTypes.func.isRequired,
   onBackToLogin: PropTypes.func.isRequired
 };
 
@@ -243,6 +254,10 @@ const MfaEnrollment = ({ onBack }) => {
     setActiveStep(2);
   };
 
+  const handleStepBack = () => {
+    setActiveStep(prev => prev - 1);
+  };
+
   const handleVerifySubmit = code => {
     dispatch(postMfaVerify(code));
   };
@@ -265,6 +280,7 @@ const MfaEnrollment = ({ onBack }) => {
       otpauthUri={enroll.otpauthUri ?? ''}
       secret={enroll.secret ?? ''}
       onContinue={handleScanContinue}
+      onBack={handleStepBack}
     />,
     <StepVerify
       key="verify"
@@ -272,6 +288,7 @@ const MfaEnrollment = ({ onBack }) => {
       isLoading={verify.isLoading}
       error={verify.error}
       isEnrollmentTokenExpired={verify.isEnrollmentTokenExpired}
+      onBack={handleStepBack}
       onBackToLogin={onBack}
     />
   ];

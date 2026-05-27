@@ -32,7 +32,6 @@ import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import PersonOutlinedIcon from '@mui/icons-material/PersonOutlined';
-import SecurityIcon from '@mui/icons-material/Security';
 import TravelExploreOutlinedIcon from '@mui/icons-material/TravelExploreOutlined';
 import PermMediaOutlinedIcon from '@mui/icons-material/PermMediaOutlined';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
@@ -371,7 +370,7 @@ PersonalInfoSection.propTypes = {
 
 // ─── Email & security section ─────────────────────────────────────────────────
 
-const EmailSecuritySection = ({ account, onSaved }) => {
+const EmailSecuritySection = ({ account, onSaved, isAdmin = false }) => {
   const dispatch = useDispatch();
   const { formatMessage } = useIntl();
   const [isEditingEmail, setIsEditingEmail] = useState(false);
@@ -635,6 +634,7 @@ const EmailSecuritySection = ({ account, onSaved }) => {
             />
           </form>
         </Collapse>
+        {isAdmin && <MfaSection />}
       </SectionBody>
     </SectionPaper>
   );
@@ -642,7 +642,8 @@ const EmailSecuritySection = ({ account, onSaved }) => {
 
 EmailSecuritySection.propTypes = {
   account: accountShape.isRequired,
-  onSaved: PropTypes.func.isRequired
+  onSaved: PropTypes.func.isRequired,
+  isAdmin: PropTypes.bool
 };
 
 // ─── MFA section (admins only) ────────────────────────────────────────────────
@@ -693,7 +694,7 @@ const MfaSection = () => {
       <InfoLabel variant="body2">
         {formatMessage({ id: 'mfaStatus' })}
       </InfoLabel>
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
         {isMfaEnabled ? (
           <>
             <Chip
@@ -708,7 +709,7 @@ const MfaSection = () => {
               variant="outlined"
               color="error"
               onClick={handleOpen}>
-              {formatMessage({ id: 'mfaResetTitle' })}
+              {formatMessage({ id: 'mfaResetButton' })}
             </Button>
           </>
         ) : (
@@ -726,18 +727,7 @@ const MfaSection = () => {
 
   return (
     <>
-      <SectionPaper elevation={2}>
-        <SectionHeader>
-          <SectionHeaderTitle>
-            <SecurityIcon color="action" />
-            <Typography variant="h6" fontWeight={600}>
-              {formatMessage({ id: 'mfaStatus' })}
-            </Typography>
-          </SectionHeaderTitle>
-        </SectionHeader>
-        <Divider />
-        <SectionBody>{viewContent}</SectionBody>
-      </SectionPaper>
+      {viewContent}
 
       <StandardDialog
         open={isDialogOpen}
@@ -760,7 +750,7 @@ const MfaSection = () => {
                   <CircularProgress size={16} color="inherit" />
                 ) : null
               }>
-              {formatMessage({ id: 'mfaResetTitle' })}
+              {formatMessage({ id: 'mfaResetButton' })}
             </Button>
           </>
         }>
@@ -769,7 +759,7 @@ const MfaSection = () => {
             severity="warning"
             content={formatMessage({ id: 'mfaResetWarning' })}
           />
-          <form onSubmit={handleSubmit(onSubmit)} autoComplete="new-password">
+          <form onSubmit={handleSubmit(onSubmit)} autoComplete="off">
             <InputPassword
               formKey="password"
               labelName="mfaResetPasswordLabel"
@@ -778,13 +768,17 @@ const MfaSection = () => {
               control={control}
               isError={!!errors.password}
               isRequired
+              autoComplete="current-password"
             />
           </form>
           {mfaReset.error && (
             <Alert
               severity="error"
               content={formatMessage({
-                id: 'An error occurred. Please try again.'
+                id:
+                  mfaReset.error === 'Mismatch'
+                    ? 'Current password is incorrect.'
+                    : 'An error occurred. Please try again.'
               })}
             />
           )}
@@ -1101,8 +1095,11 @@ const AccountPage = () => {
       {!isAccountLoading && account && (
         <>
           <PersonalInfoSection account={account} onSaved={handleSaved} />
-          <EmailSecuritySection account={account} onSaved={handleSaved} />
-          {isAdmin && <MfaSection />}
+          <EmailSecuritySection
+            account={account}
+            onSaved={handleSaved}
+            isAdmin={isAdmin}
+          />
           <PreferencesSection account={account} onSaved={handleSaved} />
         </>
       )}

@@ -1,5 +1,12 @@
 import React, { useEffect } from 'react';
-import { Button, CircularProgress, Typography, Box } from '@mui/material';
+import {
+  Button,
+  CircularProgress,
+  Typography,
+  Box,
+  useMediaQuery,
+  useTheme
+} from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
 import { isEmpty } from 'ramda';
 import { useNavigate } from 'react-router-dom';
@@ -27,6 +34,8 @@ import { useNotification } from '../../hooks';
 
 const Login = () => {
   const dispatch = useDispatch();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const authState = useSelector(state => state.login);
   const mfaVerifyState = useSelector(state => state.mfa.verify);
   const resendVerificationState = useSelector(
@@ -86,12 +95,7 @@ const Login = () => {
       dispatch(resetResendVerification());
       setResendTimeout(60);
     }
-  }, [
-    resendVerificationState.success,
-    onSuccess,
-    formatMessage,
-    dispatch
-  ]);
+  }, [resendVerificationState.success, onSuccess, formatMessage, dispatch]);
 
   useEffect(() => {
     let interval = null;
@@ -112,7 +116,10 @@ const Login = () => {
     if (authState.isNotVerifiedMessageDisplayed) {
       if (resendTimeout > 0) {
         return (
-          <Translate id="Resend in {seconds}s" values={{ seconds: resendTimeout }} />
+          <Translate
+            id="Resend in {seconds}s"
+            values={{ seconds: resendTimeout }}
+          />
         );
       }
       return <Translate>Resend verification email</Translate>;
@@ -156,6 +163,7 @@ const Login = () => {
       <StandardDialog
         open={authState.isLoginDialogDisplayed}
         onClose={() => dispatch(hideLoginDialog())}
+        fullScreen={isMobile}
         title={formatMessage({ id: 'mfaEnrollmentRequired' })}>
         <MfaEnrollment onBack={onBackToLogin} />
       </StandardDialog>
@@ -168,6 +176,7 @@ const Login = () => {
       <StandardDialog
         open={authState.isLoginDialogDisplayed}
         onClose={() => dispatch(hideLoginDialog())}
+        fullScreen={isMobile}
         title={formatMessage({ id: 'mfaRequired' })}>
         <LoginForm
           authErrors={authErrorMessages}
@@ -201,15 +210,20 @@ const Login = () => {
       <Typography
         variant="h6"
         style={{ textAlign: 'center', paddingBottom: 5 }}>
-        <Translate>For security reasons please create a new password.</Translate>
+        <Translate>
+          For security reasons please create a new password.
+        </Translate>
       </Typography>
       <Typography
         variant="body2"
         style={{ textAlign: 'center', paddingBottom: 10 }}>
-        <Translate>We have changed the way passwords are saved to make it more secure.</Translate>
+        <Translate>
+          We have changed the way passwords are saved to make it more secure.
+        </Translate>
       </Typography>
       <Typography variant="body1" style={{ textAlign: 'center' }}>
-        <Translate>An email will be sent to:</Translate> <b>{email || authState.notVerifiedEmail}</b>
+        <Translate>An email will be sent to:</Translate>{' '}
+        <b>{email || authState.notVerifiedEmail}</b>
       </Typography>
     </>
   ) : authState.isNotVerifiedMessageDisplayed ? (
@@ -233,7 +247,10 @@ const Login = () => {
         variant="body1"
         style={{ textAlign: 'center', paddingBottom: 10 }}>
         {authState.notVerifiedContext === 'forgotPassword' ? (
-          <Translate>You must verify your email address before you can reset your password.</Translate>
+          <Translate>
+            You must verify your email address before you can reset your
+            password.
+          </Translate>
         ) : (
           <Translate>Please check your email to activate it.</Translate>
         )}
@@ -267,6 +284,7 @@ const Login = () => {
     <StandardDialog
       open={authState.isLoginDialogDisplayed}
       onClose={() => dispatch(hideLoginDialog())}
+      // fullScreen={isMobile}
       title={<Translate>Log in</Translate>}
       actions={[LoginButton]}>
       {DialogContent}
