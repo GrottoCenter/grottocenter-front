@@ -172,15 +172,14 @@ const Login = () => {
         <LoginForm
           authErrors={authErrorMessages}
           email={email}
-          isFetching={authState.isFetching}
           onEmailChange={setEmail}
-          onLogin={onLogin}
           onPasswordChange={setPassword}
           password={password}
           totpMode
           onTotpSubmit={onTotpSubmit}
           totpError={mfaVerifyState.error}
           totpIsEnrollmentTokenExpired={mfaVerifyState.isEnrollmentTokenExpired}
+          totpIsLoading={mfaVerifyState.isLoading}
           onBackToLogin={onBackToLogin}
         />
       </StandardDialog>

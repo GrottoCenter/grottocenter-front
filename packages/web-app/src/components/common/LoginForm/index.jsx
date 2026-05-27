@@ -106,7 +106,7 @@ const TotpStep = ({
         startIcon={<ArrowBackIcon />}
         onClick={onBackToLogin}
         sx={{ alignSelf: 'flex-start' }}>
-        {formatMessage({ id: 'mfaEnrollmentTokenExpiredAction' })}
+        {formatMessage({ id: 'Cancel' })}
       </Button>
     </Box>
   );
@@ -132,6 +132,7 @@ const LoginForm = ({
   onTotpSubmit,
   totpError,
   totpIsEnrollmentTokenExpired,
+  totpIsLoading,
   onBackToLogin
 }) => {
   const [isPasswordVisible, setIsPasswordVisible] = React.useState(false);
@@ -158,7 +159,7 @@ const LoginForm = ({
         totpError={totpError}
         isEnrollmentTokenExpired={totpIsEnrollmentTokenExpired}
         onBackToLogin={onBackToLogin}
-        isLoading={false}
+        isLoading={totpIsLoading}
       />
     );
   }
@@ -228,6 +229,7 @@ LoginForm.propTypes = {
   onPasswordChange: PropTypes.func.isRequired,
   totpError: PropTypes.string,
   totpIsEnrollmentTokenExpired: PropTypes.bool,
+  totpIsLoading: PropTypes.bool,
   totpMode: PropTypes.bool
 };
 

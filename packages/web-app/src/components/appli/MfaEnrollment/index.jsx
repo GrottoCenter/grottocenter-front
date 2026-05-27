@@ -23,13 +23,18 @@ import { postMfaEnroll, postMfaVerify, clearMfaState } from '../../../actions/Mf
 
 // ─── Step 1: Install authenticator ───────────────────────────────────────────
 
-const StepInstall = ({ onContinue, isLoading }) => {
+const StepInstall = ({ onContinue, isLoading, error }) => {
   const { formatMessage } = useIntl();
   return (
     <Box display="flex" flexDirection="column" gap={3}>
       <Typography variant="body1">
         {formatMessage({ id: 'mfaEnrollmentStep1Body' })}
       </Typography>
+      {error && (
+        <Alert severity="error">
+          {formatMessage({ id: 'An error occurred. Please try again.' })}
+        </Alert>
+      )}
       <Box display="flex" justifyContent="flex-end">
         <Button
           variant="contained"
@@ -45,7 +50,8 @@ const StepInstall = ({ onContinue, isLoading }) => {
 
 StepInstall.propTypes = {
   onContinue: PropTypes.func.isRequired,
-  isLoading: PropTypes.bool.isRequired
+  isLoading: PropTypes.bool.isRequired,
+  error: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
 };
 
 // ─── Step 2: Scan QR code ─────────────────────────────────────────────────────
@@ -73,6 +79,11 @@ const StepScanQr = ({ otpauthUri, secret, onContinue }) => {
           display: 'inline-flex'
         }}>
         <QRCodeSVG value={otpauthUri} size={180} />
+      </Box>
+      <Box sx={{ width: '100%' }}>
+        <Typography variant="caption" color="text.secondary">
+          {formatMessage({ id: 'mfaSecretLabel' })}
+        </Typography>
       </Box>
       <Box
         sx={{
@@ -206,8 +217,8 @@ const MfaEnrollment = ({ onBack }) => {
   );
 
   const handleInstallContinue = () => {
-    dispatch(postMfaEnroll()).then(() => {
-      setActiveStep(1);
+    dispatch(postMfaEnroll()).then(success => {
+      if (success) setActiveStep(1);
     });
   };
 
@@ -230,6 +241,7 @@ const MfaEnrollment = ({ onBack }) => {
       key="install"
       onContinue={handleInstallContinue}
       isLoading={enroll.isLoading}
+      error={enroll.error}
     />,
     <StepScanQr
       key="scan"

@@ -40,11 +40,13 @@ export function postMfaEnroll() {
           secret: json.secret,
           otpauthUri: json.otpauthUri
         });
-        return;
+        return true;
       }
       dispatch({ type: FETCH_MFA_ENROLL_FAILURE, error: response.status });
+      return false;
     } catch (_) {
       dispatch({ type: FETCH_MFA_ENROLL_FAILURE, error: 'network' });
+      return false;
     }
   };
 }
@@ -70,13 +72,13 @@ export function postMfaVerify(code) {
       const json = await response.json().catch(() => ({}));
       dispatch({
         type: FETCH_MFA_VERIFY_FAILURE,
-        status: json?.status ?? 'error',
+        error: json?.status ?? 'error',
         isEnrollmentTokenExpired: response.status === 401
       });
     } catch (_) {
       dispatch({
         type: FETCH_MFA_VERIFY_FAILURE,
-        status: 'network',
+        error: 'network',
         isEnrollmentTokenExpired: false
       });
     }
@@ -100,13 +102,13 @@ export function postMfaLogin(email, password, code) {
       const json = await response.json().catch(() => ({}));
       dispatch({
         type: FETCH_MFA_VERIFY_FAILURE,
-        status: json?.status ?? 'error',
+        error: json?.status ?? 'error',
         isEnrollmentTokenExpired: false
       });
     } catch (_) {
       dispatch({
         type: FETCH_MFA_VERIFY_FAILURE,
-        status: 'network',
+        error: 'network',
         isEnrollmentTokenExpired: false
       });
     }

@@ -120,17 +120,24 @@ const AdminSessionExpiryBanner = () => {
   const { formatMessage } = useIntl();
   const { isAdmin } = usePermissions();
   const authTokenDecoded = useSelector(state => state.login.authTokenDecoded);
-  const [dismissed, setDismissed] = useState(false);
+  const [dismissed, setDismissed] = useState(
+    () => sessionStorage.getItem('mfaExpiryBannerDismissed') === 'true'
+  );
 
   if (!isAdmin || dismissed || !authTokenDecoded?.exp) return null;
 
   const secondsUntilExpiry = authTokenDecoded.exp - Date.now() / 1000;
   if (secondsUntilExpiry >= SECONDS_IN_DAY) return null;
 
+  const handleDismiss = () => {
+    sessionStorage.setItem('mfaExpiryBannerDismissed', 'true');
+    setDismissed(true);
+  };
+
   return (
     <Alert
       severity="warning"
-      onClose={() => setDismissed(true)}
+      onClose={handleDismiss}
       sx={{ borderRadius: 0 }}>
       {formatMessage({ id: 'mfaSessionExpiryWarning' })}
     </Alert>

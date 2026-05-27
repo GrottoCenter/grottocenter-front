@@ -16,8 +16,8 @@ const isTokenExpired = authState => {
 export function usePermissions() {
   const authState = useSelector(state => state.login);
   return {
-    isAdmin: true, //hasRole(authState, 'Administrator'),
-    isAuth: authState.authTokenDecoded !== null && !isTokenExpired(),
+    isAdmin: hasRole(authState, 'Administrator'),
+    isAuth: authState.authTokenDecoded !== null && !isTokenExpired(authState),
     isLeader: hasRole(authState, 'Leader'),
     isModerator: hasRole(authState, 'Moderator'),
     isTokenExpired: isTokenExpired(),

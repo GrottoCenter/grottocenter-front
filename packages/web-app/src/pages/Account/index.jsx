@@ -65,7 +65,7 @@ import { FormRow } from '../../components/appli/EntitiesForm/utils/FormContainer
 import PasswordRules from '../../components/common/Form/PasswordRules';
 import SearchOrganizationForm from '../../components/appli/Form/SearchOrganizationForm';
 import Translate from '../../components/common/Translate';
-import { useUserProperties, usePermissions } from '../../hooks';
+import { useUserProperties, usePermissions, useNotification } from '../../hooks';
 import useOpenLink from '../../hooks/useOpenLink';
 import { AVAILABLE_LANGUAGES, isPasswordValid } from '../../conf/config';
 import {
@@ -649,6 +649,7 @@ EmailSecuritySection.propTypes = {
 const MfaSection = () => {
   const dispatch = useDispatch();
   const { formatMessage } = useIntl();
+  const { onSuccess } = useNotification();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const { reset: mfaReset } = useSelector(state => state.mfa);
@@ -676,6 +677,8 @@ const MfaSection = () => {
 
   useEffect(() => {
     if (mfaReset.isSuccess) {
+      onSuccess(formatMessage({ id: 'mfaResetSuccess' }));
+      dispatch(fetchAccount());
       handleClose();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

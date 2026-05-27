@@ -70,8 +70,11 @@ const reducer = (state = initialState, action) => {
         ...state,
         authToken: action.token,
         authorizationHeader: { Authorization: `Bearer ${action.token}` },
+        enrollmentToken: null,
         error: null,
         isFetching: false,
+        isMfaRequiredDisplayed: false,
+        isMfaEnrollmentRequiredDisplayed: false,
         authTokenDecoded: action.tokenDecoded
       };
     case FETCH_LOGIN_MUST_RESET:

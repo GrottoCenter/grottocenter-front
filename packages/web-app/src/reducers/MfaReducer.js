@@ -69,7 +69,7 @@ const mfaReducer = (state = initialState, action) => {
         ...state,
         verify: {
           isLoading: false,
-          error: action.status,
+          error: action.error,
           isEnrollmentTokenExpired: action.isEnrollmentTokenExpired
         }
       };
