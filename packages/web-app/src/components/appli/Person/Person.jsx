@@ -71,6 +71,8 @@ const Person = ({ isLoading, person, error }) => {
       );
 
       if (!existingConv) {
+        // TODO: If the target conversation is beyond the first 50 conversations, it won't be found here.
+        // We should implement a dedicated backend endpoint to retrieve a conversation by participant ID.
         // If not found, do a single fetch (first 50 conversations) to update the Redux store
         await dispatch(fetchConversations({ limit: 50, skip: 0 }, false));
         
@@ -128,7 +130,7 @@ const Person = ({ isLoading, person, error }) => {
           }}
         />
       )}
-      {!canEdit && userId && person?.type !== 'AUTHOR' && !person?.isBanned && (
+      {!canEdit && userId && person?.type !== 'AUTHOR' && !person?.isBanned && !person?.isDeleted && (
         <Tooltip title={formatMessage({ id: 'Message this caver', defaultMessage: 'Message this caver' })}>
           <IconButton
             color="primary"

@@ -970,6 +970,7 @@
   "F/M": "フランス：アリエ県(03)；カンタル県(15)；コレーズ県(19)；クルーズ県(23)、オート＝ロワール県(43)；ピュイ＝ド＝ドーム県(63)；オート＝ヴィエンヌ県(87)",
   "F/N": "フランス：シェール県(18)；ウール＝エ＝ロワール県(28)；アンドル県(36)；アンドル＝エ＝ロワール県(37)、ロワール＝エ＝シェール県(41)；ロワレ県(45)",
   "F/P": "フランス：ドゥー県(25)；ジュラ県(39)；バ＝ラン県(67)；オー＝ラン県(68)、オート＝ソーヌ県(70)；ベルフォール県(90)",
+  "Failed to copy message details to clipboard. Please copy them manually.": "Failed to copy message details to clipboard. Please copy them manually.",
   "Failed to load notification preferences": "Failed to load notification preferences",
   "Failed to parse file": "ファイルの解析に失敗",
   "Failed to parse shapefile. Please check the file format.": "シェープファイルの解析に失敗しました。ファイル形式を確認してください。",

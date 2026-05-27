@@ -970,6 +970,7 @@
   "F/M": "צרפת: Allier(03); Cantal(15); Corrèze(19); Creuse(23), Haute Loire(43); Puy de Dôme(63); Haute Vienne(87)",
   "F/N": "צרפת: Cher(18); Eure et Loir(28); Indre(36); Indre et Loire(37), Loir et Cher(41); Loiret (45)",
   "F/P": "צרפת: Doubs (25); Jura (39); Bas Rhin (67); Haut Rhin (68), Haute Saône (70); Belfort (90)",
+  "Failed to copy message details to clipboard. Please copy them manually.": "Failed to copy message details to clipboard. Please copy them manually.",
   "Failed to load notification preferences": "Failed to load notification preferences",
   "Failed to parse file": "כשל בניתוח הקובץ",
   "Failed to parse shapefile. Please check the file format.": "כשל בניתוח ה-Shapefile. אנא בדוק את פורמט הקובץ.",

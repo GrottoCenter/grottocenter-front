@@ -970,6 +970,7 @@
   "F/M": "Франция: Аие (03); Кантал (15); Корез (19); Крюз (23), От Лоар (43); Пюи де Дом (63); От Виена (87)",
   "F/N": "Франция: Шер (18); Ур е Лоар (28); Ъндр (36); Ъндр е Лоар (37), Лоар е Шер (41); Лоарет (45)",
   "F/P": "Франция: Дубс (25); Жура (39); Ба Рън (67); О Рън (68), От Саон (70); Белфор (90)",
+  "Failed to copy message details to clipboard. Please copy them manually.": "Failed to copy message details to clipboard. Please copy them manually.",
   "Failed to load notification preferences": "Failed to load notification preferences",
   "Failed to parse file": "Неуспешен анализ на файла",
   "Failed to parse shapefile. Please check the file format.": "Неуспешен анализ на shapefile. Моля проверете формата на файла.",

@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, useNavigate, Link as RouterLink } from 'react-router-dom';
 import { useIntl, FormattedDate } from 'react-intl';
 import {
   Box,
@@ -11,7 +11,8 @@ import {
   TextField,
   IconButton,
   Tooltip,
-  Button
+  Button,
+  Link
 } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
 import FlagIcon from '@mui/icons-material/Flag';
@@ -96,7 +97,7 @@ const ConversationDetail = () => {
   const [isSending, setIsSending] = useState(false);
   const [selectedMessageToReport, setSelectedMessageToReport] = useState(null);
   const [isReportDialogOpen, setIsReportDialogOpen] = useState(false);
-  const { onSuccess } = useNotification();
+  const { onSuccess, onError } = useNotification();
 
   const { items: messages, totalCount, status, error } = useSelector(
     state => state.messaging.activeConversationMessages
@@ -242,6 +243,12 @@ Message Body: ${body}`;
       })
       .catch((err) => {
         console.error('Failed to copy text to clipboard:', err);
+        onError(
+          formatMessage({
+            id: 'Failed to copy message details to clipboard. Please copy them manually.',
+            defaultMessage: 'Failed to copy message details to clipboard. Please copy them manually.'
+          })
+        );
       });
 
     window.open('https://en.wikicaves.org/contact', '_blank', 'noopener,noreferrer');
@@ -261,8 +268,9 @@ Message Body: ${body}`;
         <Typography variant="h6">
           {currentConversation?.otherParticipant ? (
             <Link
+              component={RouterLink}
               to={`/ui/persons/${currentConversation.otherParticipant.id}`}
-              style={{ color: 'inherit', textDecoration: 'underline' }}
+              sx={{ color: 'inherit', textDecoration: 'underline' }}
             >
               {titleText}
             </Link>
