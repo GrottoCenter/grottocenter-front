@@ -37,6 +37,10 @@ const TotpStep = ({
   const { formatMessage } = useIntl();
   const [code, setCode] = React.useState('');
 
+  React.useEffect(() => {
+    if (totpError) setCode('');
+  }, [totpError]);
+
   const handleChange = event => {
     const value = event.target.value.replace(/\D/g, '').slice(0, 6);
     setCode(value);

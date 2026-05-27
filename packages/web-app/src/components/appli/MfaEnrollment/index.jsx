@@ -131,6 +131,10 @@ const StepVerify = ({ onSubmit, isLoading, error, isEnrollmentTokenExpired, onBa
   const { formatMessage } = useIntl();
   const [code, setCode] = React.useState('');
 
+  React.useEffect(() => {
+    if (error) setCode('');
+  }, [error]);
+
   const handleChange = event => {
     const value = event.target.value.replace(/\D/g, '').slice(0, 6);
     setCode(value);
