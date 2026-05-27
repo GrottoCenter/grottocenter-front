@@ -41,12 +41,25 @@ const TotpStep = ({
     if (totpError) setCode('');
   }, [totpError]);
 
+  const normalizeOtp = raw =>
+    raw
+      .replace(/[\s-]/g, '')
+      // normalize full-width digits (iOS: １２３ → 123)
+      .replace(/[０-９]/g, c => String.fromCharCode(c.charCodeAt(0) - 0xfee0))
+      .replace(/\D/g, '')
+      .slice(0, 6);
+
   const handleChange = event => {
-    const value = event.target.value.replace(/\D/g, '').slice(0, 6);
+    const value = normalizeOtp(event.target.value);
     setCode(value);
-    if (value.length === 6) {
-      onTotpSubmit(value);
-    }
+    if (value.length === 6) onTotpSubmit(value);
+  };
+
+  const handlePaste = event => {
+    event.preventDefault();
+    const value = normalizeOtp(event.clipboardData.getData('text'));
+    setCode(value);
+    if (value.length === 6) onTotpSubmit(value);
   };
 
   const errorMessage = () => {
@@ -74,6 +87,7 @@ const TotpStep = ({
           id="totp-code-input"
           value={code}
           onChange={handleChange}
+          onPaste={handlePaste}
           inputProps={{
             inputMode: 'numeric',
             maxLength: 6,

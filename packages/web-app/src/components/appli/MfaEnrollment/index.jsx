@@ -135,12 +135,24 @@ const StepVerify = ({ onSubmit, isLoading, error, isEnrollmentTokenExpired, onBa
     if (error) setCode('');
   }, [error]);
 
+  const normalizeOtp = raw =>
+    raw
+      .replace(/[\s-]/g, '')
+      .replace(/[０-９]/g, c => String.fromCharCode(c.charCodeAt(0) - 0xfee0))
+      .replace(/\D/g, '')
+      .slice(0, 6);
+
   const handleChange = event => {
-    const value = event.target.value.replace(/\D/g, '').slice(0, 6);
+    const value = normalizeOtp(event.target.value);
     setCode(value);
-    if (value.length === 6) {
-      onSubmit(value);
-    }
+    if (value.length === 6) onSubmit(value);
+  };
+
+  const handlePaste = event => {
+    event.preventDefault();
+    const value = normalizeOtp(event.clipboardData.getData('text'));
+    setCode(value);
+    if (value.length === 6) onSubmit(value);
   };
 
   const errorMessage = () => {
@@ -167,6 +179,7 @@ const StepVerify = ({ onSubmit, isLoading, error, isEnrollmentTokenExpired, onBa
           id="mfa-verify-input"
           value={code}
           onChange={handleChange}
+          onPaste={handlePaste}
           inputProps={{
             inputMode: 'numeric',
             maxLength: 6,
