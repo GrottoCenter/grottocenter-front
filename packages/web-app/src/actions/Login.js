@@ -138,7 +138,7 @@ export function postLogin(email, password) {
         }
 
         if (json?.status === 'MfaEnrollmentRequired') {
-          dispatch(fetchLoginMfaEnrollmentRequired(json.token));
+          dispatch(fetchLoginMfaEnrollmentRequired(json.enrollmentToken));
           return;
         }
 

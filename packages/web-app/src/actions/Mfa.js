@@ -4,7 +4,7 @@ import {
   mfaVerifyUrl,
   mfaResetUrl
 } from '../conf/apiRoutes';
-import { fetchLoginSuccess, decodeJWT } from './Login';
+import { fetchLoginSuccess, hideLoginDialog, decodeJWT } from './Login';
 
 export const FETCH_MFA_ENROLL = 'FETCH_MFA_ENROLL';
 export const FETCH_MFA_ENROLL_SUCCESS = 'FETCH_MFA_ENROLL_SUCCESS';
@@ -62,11 +62,13 @@ export function postMfaVerify(code) {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${enrollmentToken}`
         },
-        body: JSON.stringify({ code })
+        body: JSON.stringify({ totpCode: code })
       });
       if (response.ok) {
         const json = await response.json();
         dispatch(fetchLoginSuccess(decodeJWT(json.token), json.token));
+        dispatch(clearMfaState());
+        dispatch(hideLoginDialog());
         return;
       }
       const json = await response.json().catch(() => ({}));
@@ -97,6 +99,8 @@ export function postMfaLogin(email, password, code) {
       if (response.ok) {
         const json = await response.json();
         dispatch(fetchLoginSuccess(decodeJWT(json.token), json.token));
+        dispatch(clearMfaState());
+        dispatch(hideLoginDialog());
         return;
       }
       const json = await response.json().catch(() => ({}));

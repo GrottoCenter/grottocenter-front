@@ -44,6 +44,7 @@ import { fetchAccount } from '../../actions/Account/GetAccount';
 import { fetchSubscriptions } from '../../actions/Subscriptions/GetSubscriptions';
 import { updateAccount } from '../../actions/Account/UpdateAccount';
 import { postMfaReset, clearMfaState } from '../../actions/Mfa';
+import { postLogout } from '../../actions/Login';
 import { fetchPerson } from '../../actions/Person/GetPerson';
 import { joinOrganization } from '../../actions/Organization/JoinOrganization';
 import { leaveOrganization } from '../../actions/Organization/LeaveOrganization';
@@ -678,8 +679,7 @@ const MfaSection = () => {
   useEffect(() => {
     if (mfaReset.isSuccess) {
       onSuccess(formatMessage({ id: 'mfaResetSuccess' }));
-      dispatch(fetchAccount());
-      handleClose();
+      dispatch(postLogout());
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mfaReset.isSuccess]);
