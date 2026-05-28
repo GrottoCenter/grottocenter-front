@@ -271,7 +271,7 @@ const reducer = (state = initialState, action) => {
       };
     }
     case SEND_MESSAGE_SUCCESS: {
-      const { message } = action;
+      const { message, recipient } = action;
       const convId = Number(message.conversation);
 
       const currentConversationId = state.activeConversationMessages.items[0]?.conversation;
@@ -297,7 +297,23 @@ const reducer = (state = initialState, action) => {
         return c;
       };
 
-      const activeItems = state.activeConversations.items.map(updateConversationItem);
+      let activeItems = state.activeConversations.items.map(updateConversationItem);
+      let newTotalCount = state.activeConversations.totalCount;
+
+      const exists = state.activeConversations.items.some(c => c.id === convId);
+      if (!exists && recipient) {
+        const newConversationItem = {
+          id: convId,
+          dateInscription: message.dateSent || new Date().toISOString(),
+          lastMessage: message,
+          unreadCount: 0,
+          otherParticipant: recipient,
+          archivedAt: null
+        };
+        activeItems = [newConversationItem, ...activeItems];
+        newTotalCount += 1;
+      }
+
       const archivedItems = state.archivedConversations.items.map(updateConversationItem);
 
       return {
@@ -309,7 +325,8 @@ const reducer = (state = initialState, action) => {
         },
         activeConversations: {
           ...state.activeConversations,
-          items: activeItems
+          items: activeItems,
+          totalCount: newTotalCount
         },
         archivedConversations: {
           ...state.archivedConversations,

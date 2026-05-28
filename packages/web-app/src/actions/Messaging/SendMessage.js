@@ -4,7 +4,7 @@ import { checkAuthStatus } from '../utils';
 
 export const SEND_MESSAGE_SUCCESS = 'SEND_MESSAGE_SUCCESS';
 
-export function sendMessage({ conversationId, recipientId, body }) {
+export function sendMessage({ conversationId, recipientId, body, recipient }) {
   return async (dispatch, getState) => {
     try {
       const payload = {};
@@ -30,7 +30,7 @@ export function sendMessage({ conversationId, recipientId, body }) {
           nickname: myCaver?.nickname || 'Me'
         };
       }
-      dispatch({ type: SEND_MESSAGE_SUCCESS, message });
+      dispatch({ type: SEND_MESSAGE_SUCCESS, message, recipient });
       return message;
     } catch (error) {
       if (error.isAuthError) return;

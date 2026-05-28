@@ -155,8 +155,8 @@ const AppBar = () => {
             </Box>
           </ToolsGroup>
           <ActionsGroup>
-            <MessagesIcon />
             <NotificationMenu />
+            <MessagesIcon />
             <UserMenu
               authTokenExpirationDate={authTokenExpirationDate}
               isAuth={permissions.isAuth}

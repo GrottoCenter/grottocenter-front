@@ -62,7 +62,7 @@ const MessageBubble = styled(Paper)(({ theme, $isMine }) => ({
 }));
 
 const MessageDate = styled(Typography)(({ theme, $isMine }) => ({
-  fontSize: '0.6rem',
+  fontSize: '0.75rem',
   color: $isMine ? theme.palette.primary.contrastText : theme.palette.text.secondary,
   opacity: 0.7,
   marginTop: '4px',
@@ -80,11 +80,14 @@ const InputArea = styled(Box)(({ theme }) => ({
 
 const BlankStateContainer = styled(Box)(({ theme }) => ({
   display: 'flex',
+  flexDirection: 'column',
   alignItems: 'center',
   justifyContent: 'center',
   height: '100%',
   backgroundColor: theme.palette.action.hover,
-  color: theme.palette.text.secondary
+  color: theme.palette.text.secondary,
+  padding: theme.spacing(4),
+  textAlign: 'center'
 }));
 
 const ConversationDetail = () => {
@@ -110,8 +113,14 @@ const ConversationDetail = () => {
   const activeConv = useSelector(state => state.messaging.activeConversations.items.find(c => c.id === convIdNum));
   const archivedConv = useSelector(state => state.messaging.archivedConversations.items.find(c => c.id === convIdNum));
   const currentConversation = activeConv || archivedConv;
+  const fetchedPerson = useSelector(state => state.person.person);
 
-  const titleText = currentConversation?.otherParticipant?.nickname || formatMessage({ id: 'Conversation details' });
+  const otherParticipant =
+    currentConversation?.otherParticipant ||
+    messages.find(m => m.caverSender?.id !== myCaverId)?.caverSender ||
+    (fetchedPerson && Number(fetchedPerson.id) !== Number(myCaverId) ? { id: fetchedPerson.id, nickname: fetchedPerson.nickname } : null);
+
+  const titleText = otherParticipant?.nickname || formatMessage({ id: 'Conversation details' });
 
   const messagesEndRef = useRef(null);
   const messagesListRef = useRef(null);
@@ -175,7 +184,7 @@ const ConversationDetail = () => {
   if (!conversationId) {
     return (
       <BlankStateContainer>
-        <Typography variant="h6">
+        <Typography variant="body1" sx={{ fontWeight: 500 }}>
           {formatMessage({ id: 'Select a conversation to start messaging' })}
         </Typography>
       </BlankStateContainer>
@@ -260,16 +269,32 @@ Message Body: ${body}`;
     <DetailContainer>
       <Box sx={{ p: 2, borderBottom: 1, borderColor: 'divider', bgcolor: 'background.paper', display: 'flex', alignItems: 'center' }}>
         <IconButton
-          sx={{ display: { xs: 'inline-flex', md: 'none' }, mr: 1 }}
+          sx={{
+            display: { xs: 'inline-flex', md: 'none' },
+            mr: 2,
+            border: '1px solid',
+            borderColor: 'divider',
+            borderRadius: '8px',
+            p: '6px'
+          }}
           onClick={() => navigate('/ui/messages')}
         >
           <ArrowBackIcon />
         </IconButton>
+        <Box
+          sx={{
+            display: { xs: 'block', md: 'none' },
+            width: '1px',
+            height: '24px',
+            bgcolor: 'divider',
+            mr: 2
+          }}
+        />
         <Typography variant="h6">
-          {currentConversation?.otherParticipant ? (
+          {otherParticipant ? (
             <Link
               component={RouterLink}
-              to={`/ui/persons/${currentConversation.otherParticipant.id}`}
+              to={`/ui/persons/${otherParticipant.id}`}
               sx={{ color: 'inherit', textDecoration: 'underline' }}
             >
               {titleText}
@@ -382,7 +407,7 @@ Message Body: ${body}`;
         title={formatMessage({ id: 'Report message', defaultMessage: 'Report message' })}
         actions={
           <>
-            <Button onClick={handleCloseReportDialog}>
+            <Button onClick={handleCloseReportDialog} variant="outlined">
               {formatMessage({ id: 'Cancel', defaultMessage: 'Cancel' })}
             </Button>
             <Button onClick={handleConfirmReport} variant="contained" color="error">

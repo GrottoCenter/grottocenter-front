@@ -13,6 +13,10 @@ import IconButton from '@mui/material/IconButton';
 
 const CustomDialogTitle = styled(DialogTitle)`
   margin-top: 1rem;
+  @media (max-width: 600px) {
+    margin-top: 0.5rem;
+    padding: 16px 16px 8px;
+  }
 `;
 
 const DialogContent = styled(MuiDialogContent, {
@@ -20,6 +24,15 @@ const DialogContent = styled(MuiDialogContent, {
 })`
   && {
     overflow: ${({ $scrollable }) => ($scrollable ? 'auto' : 'visible')};
+    @media (max-width: 600px) {
+      padding: 8px 16px;
+    }
+  }
+`;
+
+const StyledDialogActions = styled(DialogActions)`
+  @media (max-width: 600px) {
+    padding: 8px 16px;
   }
 `;
 
@@ -60,7 +73,7 @@ const StandardDialog = ({
       {children && (
         <DialogContent $scrollable={scrollable}>{children}</DialogContent>
       )}
-      <DialogActions>{actions || null}</DialogActions>
+      <StyledDialogActions>{actions || null}</StyledDialogActions>
     </Dialog>
   );
 };

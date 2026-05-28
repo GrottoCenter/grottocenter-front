@@ -89,7 +89,13 @@ const ComposeDialog = ({ open, onClose, prefilledRecipientId }) => {
     setSendError(null);
 
     try {
-      const message = await dispatch(sendMessage({ recipientId: recipient.id, body: body.trim() }));
+      const message = await dispatch(
+        sendMessage({
+          recipientId: recipient.id,
+          body: body.trim(),
+          recipient: { id: recipient.id, nickname: recipient.nickname }
+        })
+      );
       setIsSending(false);
       if (message && message.conversation) {
         navigate(`/ui/messages/${message.conversation}`);
@@ -139,7 +145,7 @@ const ComposeDialog = ({ open, onClose, prefilledRecipientId }) => {
       maxWidth="sm"
       actions={
         <>
-          <Button onClick={handleClose} disabled={isSending}>
+          <Button onClick={handleClose} disabled={isSending} variant="outlined">
             {formatMessage({ id: 'Cancel', defaultMessage: 'Cancel' })}
           </Button>
           <Button
@@ -154,35 +160,39 @@ const ComposeDialog = ({ open, onClose, prefilledRecipientId }) => {
       }
     >
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: 1 }}>
-        <Typography variant="subtitle2" sx={{ mb: -1 }}>
-          {formatMessage({ id: 'To', defaultMessage: 'To' })}
-        </Typography>
-
-        {isPersonFetching && prefilledRecipientId && !recipient ? (
-          <CircularProgress size={20} />
-        ) : (
-          <AutoCompleteSearch
-            inputValue={recipientInput}
-            onInputChange={setRecipientInput}
-            suggestions={filteredSuggestions}
-            onSelection={(selection) => {
-              if (selection) {
-                setRecipient(selection);
-                setRecipientInput(`${selection.nickname} (${selection.id})`);
-              } else {
-                setRecipient(null);
-                setRecipientInput('');
-              }
-            }}
-            getOptionLabel={getOptionLabel}
-            renderOption={renderRecipientOption}
-            label={formatMessage({ id: 'Search recipient...', defaultMessage: 'Search recipient...' })}
-            isLoading={isSearchLoading}
-            hasError={!!searchError}
-            disabled={isSending || !!prefilledRecipientId}
-            hasFixWidth={true}
-          />
-        )}
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          <Typography variant="subtitle2" sx={{ minWidth: 'fit-content' }}>
+            {formatMessage({ id: 'To', defaultMessage: 'To' })}
+          </Typography>
+          <Box sx={{ flexGrow: 1 }}>
+            {isPersonFetching && prefilledRecipientId && !recipient ? (
+              <CircularProgress size={20} />
+            ) : (
+              <AutoCompleteSearch
+                inputValue={recipientInput}
+                onInputChange={setRecipientInput}
+                suggestions={filteredSuggestions}
+                onSelection={(selection) => {
+                  if (selection) {
+                    setRecipient(selection);
+                    setRecipientInput(`${selection.nickname} (${selection.id})`);
+                  } else {
+                    setRecipient(null);
+                    setRecipientInput('');
+                  }
+                }}
+                getOptionLabel={getOptionLabel}
+                renderOption={renderRecipientOption}
+                label={formatMessage({ id: 'Search recipient...', defaultMessage: 'Search recipient...' })}
+                isLoading={isSearchLoading}
+                hasError={!!searchError}
+                disabled={isSending || !!prefilledRecipientId}
+                hasFixWidth={false}
+                value={recipient}
+              />
+            )}
+          </Box>
+        </Box>
 
         <TextField
           label={formatMessage({ id: 'Message body', defaultMessage: 'Message body' })}

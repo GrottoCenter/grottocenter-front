@@ -1,7 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
-import { Card, Chip, Tooltip, IconButton, Skeleton } from '@mui/material';
+import { Card, Chip, Skeleton } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector, useStore } from 'react-redux';
 import MailIcon from '@mui/icons-material/Mail';
@@ -114,39 +114,34 @@ const Person = ({ isLoading, person, error }) => {
         : (person.nickname ?? '');
   }
 
-  const titleAdornment = (
-    <>
-      {canEdit && (
-        <Chip
-          label={formatMessage({ id: 'You' }).toUpperCase()}
-          color="secondary"
-          sx={{
-            ml: 3,
-            fontSize: '1.4rem',
-            letterSpacing: 1.5,
-            verticalAlign: 'middle',
-            color: '#fff',
-            fontWeight: 700
-          }}
-        />
-      )}
-      {!canEdit && userId && person?.type !== 'AUTHOR' && !person?.isBanned && !person?.isDeleted && (
-        <Tooltip title={formatMessage({ id: 'Message this caver', defaultMessage: 'Message this caver' })}>
-          <IconButton
-            color="primary"
-            sx={{ ml: 2, verticalAlign: 'middle' }}
-            onClick={handleMessageClick}
-          >
-            <MailIcon fontSize="large" />
-          </IconButton>
-        </Tooltip>
-      )}
-    </>
-  );
+  const canMessage =
+    !canEdit && userId && person?.type !== 'AUTHOR' && !person?.isBanned && !person?.isDeleted;
+
+  const titleAdornment = canEdit ? (
+    <Chip
+      label={formatMessage({ id: 'You' }).toUpperCase()}
+      color="secondary"
+      sx={{
+        ml: 3,
+        fontSize: '1.4rem',
+        letterSpacing: 1.5,
+        verticalAlign: 'middle',
+        color: '#fff',
+        fontWeight: 700
+      }}
+    />
+  ) : null;
 
   const actions = person ? (
     <ResponsiveActions
       items={[
+        {
+          key: 'message',
+          icon: <MailIcon />,
+          label: formatMessage({ id: 'Message this caver' }),
+          onClick: handleMessageClick,
+          hidden: !canMessage
+        },
         {
           key: 'share',
           icon: <ShareIcon />,

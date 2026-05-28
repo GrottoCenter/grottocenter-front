@@ -21,7 +21,7 @@ import {
   Card,
   CardContent
 } from '@mui/material';
-import PersonIcon from '@mui/icons-material/Person';
+
 import EditIcon from '@mui/icons-material/Edit';
 import ArchiveIcon from '@mui/icons-material/Archive';
 import UnarchiveIcon from '@mui/icons-material/Unarchive';
@@ -37,6 +37,15 @@ import ConversationDetail from './ConversationDetail';
 import ComposeDialog from './ComposeDialog';
 
 const PAGE_SIZE = 20;
+
+const getInitials = nickname => {
+  if (!nickname) return '?';
+  const parts = nickname.trim().split(/\s+/);
+  if (parts.length >= 2) {
+    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  }
+  return nickname[0].toUpperCase();
+};
 
 const StyledListItem = styled(ListItem)(({ theme, $isUnread }) => ({
   cursor: 'pointer',
@@ -58,6 +67,7 @@ const EmptyStateContainer = styled(Box)(({ theme }) => ({
 
 const StyledCard = styled(Card)(({ theme }) => ({
   margin: theme.spacing(2),
+  marginTop: theme.spacing(3),
   height: '100%',
   display: 'flex',
   flexDirection: 'column'
@@ -67,7 +77,10 @@ const StyledCardContent = styled(CardContent)({
   flexGrow: 1,
   overflowY: 'auto',
   scrollBehavior: 'smooth',
-  paddingTop: 0
+  padding: 0,
+  '&:last-child': {
+    paddingBottom: 0
+  }
 });
 
 const MessagesPage = () => {
@@ -193,8 +206,8 @@ const MessagesPage = () => {
                   color="secondary"
                   badgeContent={conv.unreadCount}
                   invisible={!isUnread}>
-                  <Avatar>
-                    <PersonIcon />
+                  <Avatar sx={{ bgcolor: 'secondary.main', color: '#fff' }}>
+                    {getInitials(conv.otherParticipant?.nickname)}
                   </Avatar>
                 </Badge>
               </ListItemAvatar>
@@ -202,7 +215,7 @@ const MessagesPage = () => {
                 primary={conv.otherParticipant?.nickname || formatMessage({ id: 'Unknown' })}
                 secondary={
                   conv.lastMessage && (
-                    <Typography variant="body2" sx={{ fontSize: '0.7rem', opacity: 0.8 }}>
+                    <Typography variant="body2" sx={{ fontSize: '0.75rem', opacity: 0.8 }}>
                       <FormattedDate
                         value={conv.lastMessage.dateSent}
                         year="numeric"
@@ -229,7 +242,7 @@ const MessagesPage = () => {
       <StyledCardContent>
         <AuthChecker
           componentToDisplay={
-            <Box sx={{ display: 'flex', height: 'calc(100vh - 120px)', width: '100%', mt: -2 }}>
+            <Box sx={{ display: 'flex', height: 'calc(100vh - 120px)', width: '100%' }}>
 
               {/* Left Pane: Conversation List */}
               <Box sx={{
@@ -243,7 +256,7 @@ const MessagesPage = () => {
               }}>
                 <Box sx={{ p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: 1, borderColor: 'divider' }}>
                   <Typography variant="h6" component="h1">
-                    {formatMessage({ id: 'My messages' })}
+                    {formatMessage({ id: 'Conversations', defaultMessage: 'Conversations' })}
                   </Typography>
                   <Button
                     variant="outlined"
