@@ -1342,6 +1342,7 @@
   "Mexico14": "メキシコ: ユカタン",
   "mfaAlreadyUsedCode": "このコードはすでに使用されています。次のコードをお待ちください。",
   "mfaCodeLabel": "6桁のコード",
+  "mfaCopyFailed": "コピーできませんでした — 手動で選択してコピーしてください。",
   "mfaCopySecret": "キーをコピー",
   "mfaEnrollmentRequired": "2要素認証の設定が必要です",
   "mfaEnrollmentStep1Body": "管理者として、2要素認証でアカウントを保護する必要があります。Google Authenticator、Aegis、またはFreeOTPなどのアプリをインストールしてください。",

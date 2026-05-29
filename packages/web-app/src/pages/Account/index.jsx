@@ -682,6 +682,7 @@ const MfaSection = () => {
     onSuccess(formatMessage({ id: 'mfaResetSuccess' }));
     const timer = setTimeout(() => dispatch(postLogout()), 1500);
     return () => clearTimeout(timer);
+    // onSuccess, formatMessage, dispatch are stable — only isSuccess matters here
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mfaReset.isSuccess]);
 

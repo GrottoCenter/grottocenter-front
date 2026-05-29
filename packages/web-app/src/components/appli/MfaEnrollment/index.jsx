@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
 import { useIntl } from 'react-intl';
 import {
-  Alert,
   Box,
   Button,
   CircularProgress,
@@ -18,6 +17,7 @@ import {
   Tooltip,
   Typography
 } from '@mui/material';
+import Alert from '../../common/Alert';
 import { QRCodeSVG } from 'qrcode.react';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import { useNotification } from '../../../hooks';
@@ -34,9 +34,11 @@ const StepInstall = ({ onContinue, isLoading, error }) => {
         {formatMessage({ id: 'mfaEnrollmentStep1Body' })}
       </Typography>
       {error && (
-        <Alert severity="error">
-          {formatMessage({ id: 'An error occurred. Please try again.' })}
-        </Alert>
+        <Alert
+          disableMargins
+          severity="error"
+          content={formatMessage({ id: 'An error occurred. Please try again.' })}
+        />
       )}
       <Box display="flex" justifyContent="flex-end">
         <Button
@@ -61,12 +63,12 @@ StepInstall.propTypes = {
 
 const StepScanQr = ({ otpauthUri, secret, onContinue, onBack }) => {
   const { formatMessage } = useIntl();
-  const { onSuccess } = useNotification();
+  const { onSuccess, onError } = useNotification();
 
   const handleCopySecret = () => {
     navigator.clipboard.writeText(secret).then(
       () => onSuccess(formatMessage({ id: 'mfaCopySecret' })),
-      () => {}
+      () => onError(formatMessage({ id: 'mfaCopyFailed' }))
     );
   };
 
@@ -192,17 +194,20 @@ const StepVerify = ({ onSubmit, isLoading, error, isEnrollmentTokenExpired, onBa
       </FormControl>
       {msg && (
         <Fade in>
-          <Alert
-            severity={isEnrollmentTokenExpired ? 'warning' : 'error'}
-            action={
-              isEnrollmentTokenExpired ? (
-                <Button color="inherit" size="small" onClick={onBackToLogin}>
-                  {formatMessage({ id: 'mfaEnrollmentTokenExpiredAction' })}
-                </Button>
-              ) : null
-            }>
-            {msg}
-          </Alert>
+          <div>
+            <Alert
+              disableMargins
+              severity={isEnrollmentTokenExpired ? 'warning' : 'error'}
+              action={
+                isEnrollmentTokenExpired ? (
+                  <Button color="inherit" size="small" onClick={onBackToLogin}>
+                    {formatMessage({ id: 'mfaEnrollmentTokenExpiredAction' })}
+                  </Button>
+                ) : null
+              }
+              content={msg}
+            />
+          </div>
         </Fade>
       )}
       {!isEnrollmentTokenExpired && (

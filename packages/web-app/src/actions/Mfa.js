@@ -90,7 +90,8 @@ export function postMfaVerify(code) {
 }
 
 // postMfaLogin re-posts to the login endpoint with totpCode added —
-// the API validates credentials + TOTP in a single request.
+// the API validates credentials + TOTP in a single unauthenticated request
+// (no bearer token; the user has not yet completed login).
 export function postMfaLogin(email, password, code) {
   return async dispatch => {
     dispatch({ type: FETCH_MFA_VERIFY });
