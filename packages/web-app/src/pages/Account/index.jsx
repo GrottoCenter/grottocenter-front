@@ -678,10 +678,10 @@ const MfaSection = () => {
   };
 
   useEffect(() => {
-    if (mfaReset.isSuccess) {
-      onSuccess(formatMessage({ id: 'mfaResetSuccess' }));
-      dispatch(postLogout());
-    }
+    if (!mfaReset.isSuccess) return undefined;
+    onSuccess(formatMessage({ id: 'mfaResetSuccess' }));
+    const timer = setTimeout(() => dispatch(postLogout()), 1500);
+    return () => clearTimeout(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mfaReset.isSuccess]);
 

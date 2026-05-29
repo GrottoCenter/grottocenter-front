@@ -18,6 +18,7 @@ import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { styled } from '@mui/material/styles';
+import { normalizeOtp } from '../../../utils/otpHelpers';
 
 const FormWrapper = styled('form')`
   display: flex;
@@ -40,14 +41,6 @@ const TotpStep = ({
   React.useEffect(() => {
     if (totpError) setCode('');
   }, [totpError]);
-
-  const normalizeOtp = raw =>
-    raw
-      .replace(/[\s-]/g, '')
-      // normalize full-width digits (iOS: １２３ → 123)
-      .replace(/[０-９]/g, c => String.fromCharCode(c.charCodeAt(0) - 0xfee0))
-      .replace(/\D/g, '')
-      .slice(0, 6);
 
   const handleChange = event => {
     const value = normalizeOtp(event.target.value);

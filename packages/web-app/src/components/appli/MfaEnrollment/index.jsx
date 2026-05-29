@@ -22,6 +22,7 @@ import { QRCodeSVG } from 'qrcode.react';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import { useNotification } from '../../../hooks';
 import { postMfaEnroll, postMfaVerify, clearMfaState } from '../../../actions/Mfa';
+import { normalizeOtp } from '../../../utils/otpHelpers';
 
 // ─── Step 1: Install authenticator ───────────────────────────────────────────
 
@@ -63,8 +64,10 @@ const StepScanQr = ({ otpauthUri, secret, onContinue, onBack }) => {
   const { onSuccess } = useNotification();
 
   const handleCopySecret = () => {
-    navigator.clipboard.writeText(secret);
-    onSuccess(formatMessage({ id: 'mfaCopySecret' }));
+    navigator.clipboard.writeText(secret).then(
+      () => onSuccess(formatMessage({ id: 'mfaCopySecret' })),
+      () => {}
+    );
   };
 
   return (
@@ -137,13 +140,6 @@ const StepVerify = ({ onSubmit, isLoading, error, isEnrollmentTokenExpired, onBa
   React.useEffect(() => {
     if (error) setCode('');
   }, [error]);
-
-  const normalizeOtp = raw =>
-    raw
-      .replace(/[\s-]/g, '')
-      .replace(/[０-９]/g, c => String.fromCharCode(c.charCodeAt(0) - 0xfee0))
-      .replace(/\D/g, '')
-      .slice(0, 6);
 
   const handleChange = event => {
     const value = normalizeOtp(event.target.value);

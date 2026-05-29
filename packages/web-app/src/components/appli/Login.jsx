@@ -43,6 +43,7 @@ const Login = () => {
   );
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
+  const lockedCredentials = React.useRef({ email: '', password: '' });
   const [authErrorMessages, setAuthErrorMessages] = React.useState([]);
   const [resendTimeout, setResendTimeout] = React.useState(0);
   const navigate = useNavigate();
@@ -77,12 +78,19 @@ const Login = () => {
       if (resendTimeout > 0) return;
       dispatch(postResendVerificationEmail(email));
     } else {
+      lockedCredentials.current = { email, password };
       dispatch(postLogin(email, password));
     }
   };
 
   const onTotpSubmit = code => {
-    dispatch(postMfaLogin(email, password, code));
+    dispatch(
+      postMfaLogin(
+        lockedCredentials.current.email,
+        lockedCredentials.current.password,
+        code
+      )
+    );
   };
 
   const onBackToLogin = () => {
@@ -284,7 +292,7 @@ const Login = () => {
     <StandardDialog
       open={authState.isLoginDialogDisplayed}
       onClose={() => dispatch(hideLoginDialog())}
-      // fullScreen={isMobile}
+      fullScreen={isMobile}
       title={<Translate>Log in</Translate>}
       actions={[LoginButton]}>
       {DialogContent}

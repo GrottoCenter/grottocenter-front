@@ -4,7 +4,7 @@ import {
   mfaVerifyUrl,
   mfaResetUrl
 } from '../conf/apiRoutes';
-import { fetchLoginSuccess, hideLoginDialog, decodeJWT } from './Login';
+import { fetchLoginSuccess, hideLoginDialog, decodeJWT, postLogout } from './Login';
 
 export const FETCH_MFA_ENROLL = 'FETCH_MFA_ENROLL';
 export const FETCH_MFA_ENROLL_SUCCESS = 'FETCH_MFA_ENROLL_SUCCESS';
@@ -89,6 +89,8 @@ export function postMfaVerify(code) {
   };
 }
 
+// postMfaLogin re-posts to the login endpoint with totpCode added —
+// the API validates credentials + TOTP in a single request.
 export function postMfaLogin(email, password, code) {
   return async dispatch => {
     dispatch({ type: FETCH_MFA_VERIFY });
@@ -139,6 +141,10 @@ export function postMfaReset(password) {
         return;
       }
       const json = await response.json().catch(() => ({}));
+      if (response.status === 401 && json?.status !== 'Mismatch') {
+        dispatch(postLogout());
+        return;
+      }
       dispatch({ type: FETCH_MFA_RESET_FAILURE, error: json?.status ?? 'error' });
     } catch (_) {
       dispatch({ type: FETCH_MFA_RESET_FAILURE, error: 'network' });

@@ -120,9 +120,23 @@ const AdminSessionExpiryBanner = () => {
   const { formatMessage } = useIntl();
   const { isAdmin } = usePermissions();
   const authTokenDecoded = useSelector(state => state.login.authTokenDecoded);
+  const userId = authTokenDecoded?.id;
+  const storageKey = userId
+    ? `mfaExpiryBannerDismissed_${userId}`
+    : 'mfaExpiryBannerDismissed';
   const [dismissed, setDismissed] = useState(
-    () => sessionStorage.getItem('mfaExpiryBannerDismissed') === 'true'
+    () => sessionStorage.getItem(storageKey) === 'true'
   );
+  const [, setTick] = useState(0);
+
+  useEffect(() => {
+    if (!isAdmin || dismissed || !authTokenDecoded?.exp) return undefined;
+    const msUntilThreshold =
+      (authTokenDecoded.exp - SECONDS_IN_DAY) * 1000 - Date.now();
+    if (msUntilThreshold <= 0) return undefined;
+    const timer = setTimeout(() => setTick(t => t + 1), msUntilThreshold);
+    return () => clearTimeout(timer);
+  }, [authTokenDecoded?.exp, isAdmin, dismissed]);
 
   if (!isAdmin || dismissed || !authTokenDecoded?.exp) return null;
 
@@ -130,7 +144,7 @@ const AdminSessionExpiryBanner = () => {
   if (secondsUntilExpiry >= SECONDS_IN_DAY) return null;
 
   const handleDismiss = () => {
-    sessionStorage.setItem('mfaExpiryBannerDismissed', 'true');
+    sessionStorage.setItem(storageKey, 'true');
     setDismissed(true);
   };
 
