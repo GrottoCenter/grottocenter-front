@@ -2215,6 +2215,7 @@
   "You can request a new verification email for:": "以下のために新しい検証メールをリクエストできます：",
   "You can show your support by  joining  Grottocenter {0}": "Grottocenter {0}に参加することでサポートを示すことができます",
   "You can't unrestrict a cave access.": "洞窟のアクセス制限を解除することはできません。",
+  "You cannot send a message to an author without an account.": "You cannot send a message to an author without an account.",
   "You have no notifications.": "通知はありません。",
   "You have probably wondered how to find data on caves?": "洞窟のデータをどうやって探すのか疑問に思ったことがあるでしょう？",
   "You must be authenticated": "認証が必要です",

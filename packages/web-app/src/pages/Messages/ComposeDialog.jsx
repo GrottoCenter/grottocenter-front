@@ -51,7 +51,8 @@ const ComposeDialog = ({ open, onClose, prefilledRecipientId }) => {
     dispatch(
       fetchQuicksearchResult({
         query: debouncedInput.trim(),
-        entities: ['persons']
+        entities: ['persons'],
+        filter: { type: 'CAVER' }
       })
     );
   }, [debouncedInput, dispatch, recipient]);
@@ -65,13 +66,25 @@ const ComposeDialog = ({ open, onClose, prefilledRecipientId }) => {
 
   useEffect(() => {
     if (open && prefilledRecipientId && fetchedPerson && String(fetchedPerson.id) === String(prefilledRecipientId)) {
-      setRecipient({
-        id: fetchedPerson.id,
-        nickname: fetchedPerson.nickname
-      });
-      setRecipientInput(`${fetchedPerson.nickname} (${fetchedPerson.id})`);
+      if (fetchedPerson.type === 'AUTHOR') {
+        setSendError(
+          formatMessage({
+            id: 'You cannot send a message to an author without an account.',
+            defaultMessage: 'You cannot send a message to an author without an account.'
+          })
+        );
+        setRecipient(null);
+        setRecipientInput('');
+      } else {
+        setRecipient({
+          id: fetchedPerson.id,
+          nickname: fetchedPerson.nickname
+        });
+        setRecipientInput(`${fetchedPerson.nickname} (${fetchedPerson.id})`);
+        setSendError(null);
+      }
     }
-  }, [fetchedPerson, prefilledRecipientId, open]);
+  }, [fetchedPerson, prefilledRecipientId, open, formatMessage]);
 
   // Reset state when closing dialog
   const handleClose = () => {
@@ -133,7 +146,7 @@ const ComposeDialog = ({ open, onClose, prefilledRecipientId }) => {
   const isFormValid = recipient && body.trim().length > 0 && body.length <= 5000;
 
   const filteredSuggestions = (searchResults || []).filter(
-    option => Number(option.id) !== Number(myCaverId)
+    option => Number(option.id) !== Number(myCaverId) && option.type !== 'AUTHOR'
   );
 
   return (
@@ -173,6 +186,7 @@ const ComposeDialog = ({ open, onClose, prefilledRecipientId }) => {
                 onInputChange={setRecipientInput}
                 suggestions={filteredSuggestions}
                 onSelection={(selection) => {
+                  setSendError(null);
                   if (selection) {
                     setRecipient(selection);
                     setRecipientInput(`${selection.nickname} (${selection.id})`);

@@ -2215,6 +2215,7 @@
   "You can request a new verification email for:": "Vous pouvez demander un nouvel e-mail de vérification pour :",
   "You can show your support by  joining  Grottocenter {0}": "Tu peux marquer ton soutien en devenant {0}",
   "You can't unrestrict a cave access.": "Vous ne pouvez pas retirer la restriction concernant la localisation de cette cavité.",
+  "You cannot send a message to an author without an account.": "Vous ne pouvez pas envoyer de message à un auteur qui n'a pas de compte.",
   "You have no notifications.": "Vous n'avez pas de notification",
   "You have probably wondered how to find data on caves?": "Vous vous êtes probablement demandé comment trouver des données sur des cavités ?",
   "You must be authenticated": "Vous devez être authentifié.",
