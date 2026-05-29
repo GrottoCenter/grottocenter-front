@@ -46,6 +46,7 @@ import licenses from './LicensesReducer';
 import login from './LoginReducer';
 import map from './Map';
 import massif from './MassifReducer';
+import mfa from './MfaReducer';
 import menuNotifications from './MenuNotificationsReducer';
 import moveEntranceToCave from './MoveEntranceToCaveReducer';
 import notifications from './NotificationsReducer';
@@ -141,6 +142,7 @@ const GCReducer = combineReducers({
   map,
   massif,
   massifEntrances,
+  mfa,
   menuNotifications,
   moveEntranceToCave,
   notifications,

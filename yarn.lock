@@ -2759,6 +2759,7 @@ __metadata:
     notistack: "npm:^3.0.2"
     proj4: "npm:^2.20.8"
     prop-types: "npm:^15.8.1"
+    qrcode.react: "npm:^4.2.0"
     ramda: "npm:^0.32.0"
     react: "npm:^19.2.4"
     react-alice-carousel: "npm:^2.9.1"
@@ -16342,6 +16343,15 @@ __metadata:
   version: 1.5.1
   resolution: "q@npm:1.5.1"
   checksum: 10/70c4a30b300277165cd855889cd3aa681929840a5940413297645c5691e00a3549a2a4153131efdf43fe8277ee8cf5a34c9636dcb649d83ad47f311a015fd380
+  languageName: node
+  linkType: hard
+
+"qrcode.react@npm:^4.2.0":
+  version: 4.2.0
+  resolution: "qrcode.react@npm:4.2.0"
+  peerDependencies:
+    react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
+  checksum: 10/665036d88b160e6d5de4e24d101bc63bd2b76712802e874bbffe56c6b6e5fe50c63f02c3cba2975b2e2b555c1f1e112cbb42987f8cb3a626ce2d17023cfde6ac
   languageName: node
   linkType: hard
 

@@ -23,7 +23,8 @@ const InputPassword = ({
   isPasswordVisible,
   onShowPassword,
   isRequired = false,
-  isDisabled = false
+  isDisabled = false,
+  autoComplete
 }) => {
   const { formatMessage } = useIntl();
 
@@ -45,7 +46,8 @@ const InputPassword = ({
           <InputLabel>{formatMessage({ id: labelName })}</InputLabel>
           <FilledInput
             inputRef={ref}
-            name={formatMessage({ id: labelName })}
+            name={formKey}
+            autoComplete={autoComplete}
             onChange={e => {
               onChange(e);
             }}
@@ -85,7 +87,8 @@ InputPassword.propTypes = {
   validatorFn: PropTypes.func,
   helperText: PropTypes.string,
   isRequired: PropTypes.bool,
-  isDisabled: PropTypes.bool
+  isDisabled: PropTypes.bool,
+  autoComplete: PropTypes.string
 };
 
 export default InputPassword;
