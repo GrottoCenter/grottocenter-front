@@ -206,7 +206,7 @@ const MessagesPage = () => {
                   color="secondary"
                   badgeContent={conv.unreadCount}
                   invisible={!isUnread}>
-                  <Avatar sx={{ bgcolor: 'secondary.main', color: '#fff' }}>
+                  <Avatar sx={{ bgcolor: 'primary.main', color: '#fff' }}>
                     {getInitials(conv.otherParticipant?.nickname)}
                   </Avatar>
                 </Badge>
