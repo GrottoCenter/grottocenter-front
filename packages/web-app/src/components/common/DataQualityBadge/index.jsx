@@ -1,6 +1,4 @@
-// Implemented as pure inline SVG (no MUI/emotion dependency) so it renders correctly
-// in both standard React trees and Leaflet popup contexts that use renderToString,
-// where emotion cannot inject CSS into the output HTML string.
+// Pure inline SVG — no MUI/emotion, safe for Leaflet renderToString contexts.
 import React from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
@@ -11,7 +9,8 @@ import {
 
 const DataQualityBadge = ({ value, size = 40 }) => {
   const { formatMessage } = useIntl();
-  const r = (size - 4) / 2;
+  const strokeWidth = size / 16;
+  const r = (size - strokeWidth * 2) / 2;
   const cx = size / 2;
   const cy = size / 2;
   const circumference = 2 * Math.PI * r;
@@ -33,7 +32,7 @@ const DataQualityBadge = ({ value, size = 40 }) => {
         r={r}
         fill="none"
         stroke={DATA_QUALITY_TRACK_COLOR}
-        strokeWidth="2.5"
+        strokeWidth={strokeWidth}
       />
       <circle
         cx={cx}
@@ -41,7 +40,7 @@ const DataQualityBadge = ({ value, size = 40 }) => {
         r={r}
         fill="none"
         stroke={color}
-        strokeWidth="2.5"
+        strokeWidth={strokeWidth}
         strokeLinecap="round"
         strokeDasharray={circumference}
         strokeDashoffset={dashoffset}
