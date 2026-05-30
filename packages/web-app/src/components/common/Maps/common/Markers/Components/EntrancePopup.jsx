@@ -27,23 +27,23 @@ export const EntrancePopup = ({ entrance }) => {
           url={`/ui/caves/${entrance.caveId}`}
         />
       )}
-      <Information
-        value={`${entrance.city && entrance.city}, ${
-          entrance.region && entrance.region
-        }`}
-        icon={<CustomIcon size={25} type="location" />}
-      />
+      {(entrance.city || entrance.region) && (
+        <Information
+          value={[entrance.city, entrance.region].filter(Boolean).join(', ')}
+          icon={<CustomIcon size={25} type="location" />}
+        />
+      )}
       <Information
         value={makeCoordinatesValue(entrance.latitude, entrance.longitude)}
         icon={<CustomIcon size={25} type="coordinates" />}
       />
-      {entrance.depth && (
+      {entrance.depth > 0 && (
         <Information
           value={`${entrance.depth} m`}
           icon={<CustomIcon size={25} type="depth" />}
         />
       )}
-      {entrance.length && (
+      {entrance.length > 0 && (
         <Information
           value={`${entrance.length} m`}
           icon={<CustomIcon size={25} type="length" />}
