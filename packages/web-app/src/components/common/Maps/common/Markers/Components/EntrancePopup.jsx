@@ -51,7 +51,7 @@ export const EntrancePopup = ({ entrance }) => {
       )}
       {dataQualityValue != null && (
         <Information
-          icon={<DataQualityBadge value={dataQualityValue} size={36} />}
+          icon={<DataQualityBadge value={dataQualityValue} size={25} />}
           value={formatMessage({ id: getDataQualityLabelKey(dataQualityValue) })}
         />
       )}
