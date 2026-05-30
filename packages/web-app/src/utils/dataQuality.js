@@ -29,7 +29,8 @@ export const getDataQualityLevel = value => {
   if (value >= DATA_QUALITY_THRESHOLDS.GOOD) return DATA_QUALITY_LEVELS.GOOD;
   if (value >= DATA_QUALITY_THRESHOLDS.SATISFACTORY)
     return DATA_QUALITY_LEVELS.SATISFACTORY;
-  // Data quality == null is handled as insufficient
+  // Any value below SATISFACTORY threshold (including 0) falls here.
+  // Callers must guard against null — use getDataQualityValue() at API boundaries.
   return DATA_QUALITY_LEVELS.INSUFFICIENT;
 };
 
