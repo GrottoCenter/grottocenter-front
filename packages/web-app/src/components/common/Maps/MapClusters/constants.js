@@ -6,28 +6,29 @@ export const CAVE_SIZE = {
   LARGE: 'large'
 };
 
-// Circle marker styles per cave size category (radius in px, colors from brown palette).
+// Circle marker styles per cave size category (radius in px).
+// White stroke ensures contrast on all tile layers (light OSM, satellite, dark).
 export const CAVE_SIZE_STYLE = {
   [CAVE_SIZE.SMALL]: {
     radius: 6,
-    color: brown[700],
+    color: '#FFFFFF',
     weight: 1,
-    fillColor: brown[400],
-    fillOpacity: 0.85
+    fillColor: '#8D6E63',
+    fillOpacity: 0.9
   },
   [CAVE_SIZE.MEDIUM]: {
     radius: 10,
-    color: brown[900],
+    color: '#FFFFFF',
     weight: 1,
-    fillColor: brown[700],
-    fillOpacity: 0.85
+    fillColor: '#E07835',
+    fillOpacity: 0.9
   },
   [CAVE_SIZE.LARGE]: {
     radius: 14,
-    color: brown[900],
+    color: '#FFFFFF',
     weight: 1,
-    fillColor: brown[900],
-    fillOpacity: 0.85
+    fillColor: '#C62828',
+    fillOpacity: 0.9
   }
 };
 
@@ -39,9 +40,15 @@ export const CAVE_SIZE_THRESHOLDS = {
 export const getCaveSize = entrance => {
   const depth = entrance.depth ?? 0;
   const length = entrance.length ?? 0;
-  if (depth >= CAVE_SIZE_THRESHOLDS.LARGE.depth || length >= CAVE_SIZE_THRESHOLDS.LARGE.length)
+  if (
+    depth >= CAVE_SIZE_THRESHOLDS.LARGE.depth ||
+    length >= CAVE_SIZE_THRESHOLDS.LARGE.length
+  )
     return CAVE_SIZE.LARGE;
-  if (depth >= CAVE_SIZE_THRESHOLDS.MEDIUM.depth || length >= CAVE_SIZE_THRESHOLDS.MEDIUM.length)
+  if (
+    depth >= CAVE_SIZE_THRESHOLDS.MEDIUM.depth ||
+    length >= CAVE_SIZE_THRESHOLDS.MEDIUM.length
+  )
     return CAVE_SIZE.MEDIUM;
   return CAVE_SIZE.SMALL;
 };
