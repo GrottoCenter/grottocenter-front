@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { styled } from '@mui/material/styles';
 import { Popover } from '@mui/material';
-import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import { useIntl } from 'react-intl';
 import { useFullScreen } from 'react-browser-hooks';
@@ -10,6 +10,7 @@ import { useFullScreen } from 'react-browser-hooks';
 import CustomControl, { customControlProps } from '../common/CustomControl';
 import { CAVE_SIZE, CAVE_SIZE_STYLE, CAVE_SIZE_THRESHOLDS, CAVE_QUALITY_BADGE_VALUE } from './constants';
 import DataQualityBadge from '../../DataQualityBadge';
+import DataQualityHelpButton from '../../DataQualityBadge/DataQualityHelpButton';
 import {
   entranceIcon,
   networkIcon,
@@ -281,8 +282,9 @@ const DataControl = ({
               <>
                 <SectionTitle>
                   {formatMessage({ id: 'Filter by size' }).toUpperCase()}
-                  <InfoOutlinedIcon
-                    sx={{ fontSize: 13, cursor: 'pointer', color: 'text.secondary' }}
+                  <HelpOutlineIcon
+                    fontSize="small"
+                    sx={{ cursor: 'pointer', color: 'text.secondary' }}
                     onClick={e => setSizeInfoAnchor(e.currentTarget)}
                   />
                 </SectionTitle>
@@ -321,6 +323,7 @@ const DataControl = ({
 
                 <SectionTitle>
                   {formatMessage({ id: 'Filter by quality' }).toUpperCase()}
+                  <DataQualityHelpButton />
                 </SectionTitle>
                 {qualityFilters.map(filter => (
                   <OptionLabel key={filter.id}>

@@ -31,7 +31,7 @@ import FilterAltIcon from '@mui/icons-material/FilterAlt';
 import SearchIcon from '@mui/icons-material/Search';
 import ClearIcon from '@mui/icons-material/Clear';
 import CheckIcon from '@mui/icons-material/Check';
-import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import LockIcon from '@mui/icons-material/Lock';
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
@@ -612,7 +612,7 @@ export const SearchMatchAllFieldsToogle = ({ isChecked, onChange }) => {
             })}
             enterTouchDelay={0}
             leaveTouchDelay={3000}>
-            <InfoOutlinedIcon
+            <HelpOutlineIcon
               fontSize="small"
               color="action"
               sx={{ verticalAlign: 'middle' }}
