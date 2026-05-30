@@ -1342,6 +1342,7 @@
   "Mexico14": "Meksiko: Yucatán",
   "mfaAlreadyUsedCode": "Kode ini sudah digunakan. Harap tunggu kode berikutnya.",
   "mfaCodeLabel": "Kode 6 digit",
+  "mfaCopyFailed": "Gagal menyalin — silakan pilih dan salin secara manual.",
   "mfaCopySecret": "Salin kunci",
   "mfaEnrollmentRequired": "Diperlukan pengaturan autentikasi dua faktor",
   "mfaEnrollmentStep1Body": "Sebagai administrator, Anda harus melindungi akun Anda dengan autentikasi dua faktor. Instal aplikasi seperti Google Authenticator, Aegis, atau FreeOTP.",

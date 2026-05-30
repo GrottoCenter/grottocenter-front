@@ -1342,6 +1342,7 @@
   "Mexico14": "Mexico: Yucatán",
   "mfaAlreadyUsedCode": "Deze code is al gebruikt. Wacht op de volgende code.",
   "mfaCodeLabel": "6-cijferige code",
+  "mfaCopyFailed": "Kopiëren mislukt — selecteer en kopieer handmatig.",
   "mfaCopySecret": "Sleutel kopiëren",
   "mfaEnrollmentRequired": "Instelling van tweefactorauthenticatie vereist",
   "mfaEnrollmentStep1Body": "Als beheerder moet u uw account beschermen met tweefactorauthenticatie. Installeer een app zoals Google Authenticator, Aegis of FreeOTP.",

@@ -1342,6 +1342,7 @@
   "Mexico14": "المكسيك: يوكاتان",
   "mfaAlreadyUsedCode": "تم استخدام هذا الرمز بالفعل. يرجى الانتظار حتى الرمز التالي.",
   "mfaCodeLabel": "رمز مكون من 6 أرقام",
+  "mfaCopyFailed": "تعذّر النسخ — يرجى التحديد والنسخ يدوياً.",
   "mfaCopySecret": "نسخ المفتاح",
   "mfaEnrollmentRequired": "مطلوب إعداد المصادقة الثنائية",
   "mfaEnrollmentStep1Body": "بصفتك مسؤولاً، يجب عليك حماية حسابك بالمصادقة الثنائية. قم بتثبيت تطبيق مثل Google Authenticator أو Aegis أو FreeOTP.",

@@ -1342,6 +1342,7 @@
   "Mexico14": "Mexico: Yucatan",
   "mfaAlreadyUsedCode": "This code has already been used. Please wait for the next code.",
   "mfaCodeLabel": "6-digit code",
+  "mfaCopyFailed": "Could not copy — please select and copy manually.",
   "mfaCopySecret": "Copy key",
   "mfaEnrollmentRequired": "Two-factor authentication setup required",
   "mfaEnrollmentStep1Body": "As an administrator, you must protect your account with two-factor authentication. Install an app such as Google Authenticator, Aegis, or FreeOTP.",

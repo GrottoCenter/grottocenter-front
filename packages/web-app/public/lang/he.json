@@ -1342,6 +1342,7 @@
   "Mexico14": "מקסיקו: יוקטן",
   "mfaAlreadyUsedCode": "קוד זה כבר שומש. אנא המתן לקוד הבא.",
   "mfaCodeLabel": "קוד בן 6 ספרות",
+  "mfaCopyFailed": "ההעתקה נכשלה — אנא בחר והעתק ידנית.",
   "mfaCopySecret": "העתק מפתח",
   "mfaEnrollmentRequired": "נדרש הגדרת אימות דו-שלבי",
   "mfaEnrollmentStep1Body": "כמנהל מערכת, עליך להגן על חסבונך באמצעות אימות דו-שלבי. התקן אפליקציה כגון Google Authenticator, Aegis או FreeOTP.",
