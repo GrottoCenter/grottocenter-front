@@ -17,9 +17,9 @@ import {
   Tooltip,
   Typography
 } from '@mui/material';
-import Alert from '../../common/Alert';
 import { QRCodeSVG } from 'qrcode.react';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import Alert from '../../common/Alert';
 import { useNotification } from '../../../hooks';
 import { postMfaEnroll, postMfaVerify, clearMfaState } from '../../../actions/Mfa';
 import { normalizeOtp } from '../../../utils/otpHelpers';
@@ -34,11 +34,16 @@ const StepInstall = ({ onContinue, isLoading, error }) => {
         {formatMessage({ id: 'mfaEnrollmentStep1Body' })}
       </Typography>
       {error && (
-        <Alert
-          disableMargins
-          severity="error"
-          content={formatMessage({ id: 'An error occurred. Please try again.' })}
-        />
+        <Fade in>
+          {/* div needed: custom Alert lacks forwardRef required by Fade */}
+          <div>
+            <Alert
+              disableMargins
+              severity="error"
+              content={formatMessage({ id: 'An error occurred. Please try again.' })}
+            />
+          </div>
+        </Fade>
       )}
       <Box display="flex" justifyContent="flex-end">
         <Button
@@ -194,6 +199,7 @@ const StepVerify = ({ onSubmit, isLoading, error, isEnrollmentTokenExpired, onBa
       </FormControl>
       {msg && (
         <Fade in>
+          {/* div needed: custom Alert lacks forwardRef required by Fade */}
           <div>
             <Alert
               disableMargins
