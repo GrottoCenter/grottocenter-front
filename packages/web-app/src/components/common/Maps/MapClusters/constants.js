@@ -14,7 +14,9 @@ export const CAVE_SIZE = {
 };
 
 // Circle marker styles per cave size category (radius in px).
-// White stroke ensures contrast on all tile layers (light OSM, satellite, dark).
+// Hardcoded hex instead of brown[] palette — the palette shades (brown[400/700/900])
+// are too close together to be distinguishable at a glance; these values span a wider
+// lightness range. White stroke ensures contrast on all tile layers (OSM, satellite, dark).
 export const CAVE_SIZE_STYLE = {
   [CAVE_SIZE.SMALL]: {
     radius: 6,
