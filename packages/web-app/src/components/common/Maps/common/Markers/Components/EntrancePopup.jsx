@@ -2,62 +2,16 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import CustomIcon from '../../../../CustomIcon';
+import DataQualityBadge from '../../../../DataQualityBadge';
+import {
+  getDataQualityValue,
+  getDataQualityLabelKey
+} from '../../../../../../utils/dataQuality';
 import { Information, makeCoordinatesValue } from './utils';
-
-// Pure inline-SVG — no emotion dependency, safe for renderToString (Leaflet popups).
-const DataQualityCircle = ({ value, size = 30 }) => {
-  const r = (size - 4) / 2;
-  const cx = size / 2;
-  const cy = size / 2;
-  const circumference = 2 * Math.PI * r;
-  const dashoffset = circumference * (1 - value / 100);
-  // eslint-disable-next-line no-nested-ternary
-  const color = value >= 70 ? '#2e7d32' : value >= 40 ? '#ed6c02' : '#d32f2f';
-  return (
-    <svg
-      width={size}
-      height={size}
-      viewBox={`0 0 ${size} ${size}`}
-      style={{ flexShrink: 0, display: 'block' }}>
-      <circle cx={cx} cy={cy} r={r} fill="none" stroke="#e0e0e0" strokeWidth="2.5" />
-      <circle
-        cx={cx}
-        cy={cy}
-        r={r}
-        fill="none"
-        stroke={color}
-        strokeWidth="2.5"
-        strokeLinecap="round"
-        strokeDasharray={circumference}
-        strokeDashoffset={dashoffset}
-        transform={`rotate(-90 ${cx} ${cy})`}
-      />
-      <text
-        x={cx}
-        y={cy}
-        textAnchor="middle"
-        dominantBaseline="central"
-        fontSize={Math.round(size * 0.38)}
-        fontWeight="700"
-        fill={color}>
-        {value}
-      </text>
-    </svg>
-  );
-};
-
-DataQualityCircle.propTypes = {
-  value: PropTypes.number.isRequired,
-  size: PropTypes.number
-};
 
 export const EntrancePopup = ({ entrance }) => {
   const { formatMessage } = useIntl();
-  // geoloc endpoint returns a flat number; detail endpoint returns { total, categories }
-  const dataQualityValue =
-    typeof entrance.dataQuality === 'number'
-      ? entrance.dataQuality
-      : entrance.dataQuality?.total;
+  const dataQualityValue = getDataQualityValue(entrance.dataQuality);
 
   return (
     <>
@@ -97,16 +51,8 @@ export const EntrancePopup = ({ entrance }) => {
       )}
       {dataQualityValue != null && (
         <Information
-          icon={<DataQualityCircle value={dataQualityValue} size={36} />}
-          value={formatMessage({
-            id:
-              // eslint-disable-next-line no-nested-ternary
-              dataQualityValue >= 70
-                ? 'Good quality'
-                : dataQualityValue >= 40
-                  ? 'Satisfactory quality'
-                  : 'Insufficient quality'
-          })}
+          icon={<DataQualityBadge value={dataQualityValue} size={36} />}
+          value={formatMessage({ id: getDataQualityLabelKey(dataQualityValue) })}
         />
       )}
     </>
