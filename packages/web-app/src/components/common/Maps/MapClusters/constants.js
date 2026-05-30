@@ -20,21 +20,21 @@ export const CAVE_SIZE_STYLE = {
     radius: 6,
     color: '#FFFFFF',
     weight: 1,
-    fillColor: '#8D6E63',
+    fillColor: '#D2691E',
     fillOpacity: 0.9
   },
   [CAVE_SIZE.MEDIUM]: {
     radius: 10,
     color: '#FFFFFF',
     weight: 1,
-    fillColor: '#E07835',
+    fillColor: '#8B4513',
     fillOpacity: 0.9
   },
   [CAVE_SIZE.LARGE]: {
     radius: 14,
     color: '#FFFFFF',
     weight: 1,
-    fillColor: '#C62828',
+    fillColor: '#2C0F00',
     fillOpacity: 0.9
   }
 };
