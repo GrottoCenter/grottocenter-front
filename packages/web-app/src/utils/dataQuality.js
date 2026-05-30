@@ -3,28 +3,41 @@ export const DATA_QUALITY_THRESHOLDS = {
   SATISFACTORY: 40
 };
 
+export const DATA_QUALITY_LEVELS = {
+  GOOD: 'good',
+  SATISFACTORY: 'satisfactory',
+  INSUFFICIENT: 'insufficient'
+};
+
 // Matches MUI v7 default theme.palette.success/warning/error.main
 export const DATA_QUALITY_COLORS = {
-  good: '#2e7d32',
-  satisfactory: '#ed6c02',
-  insufficient: '#d32f2f'
+  [DATA_QUALITY_LEVELS.GOOD]: '#2e7d32',
+  [DATA_QUALITY_LEVELS.SATISFACTORY]: '#ed6c02',
+  [DATA_QUALITY_LEVELS.INSUFFICIENT]: '#d32f2f'
 };
 
 export const DATA_QUALITY_TRACK_COLOR = '#e0e0e0';
 
-export const getDataQualityColor = value => {
-  if (value >= DATA_QUALITY_THRESHOLDS.GOOD) return DATA_QUALITY_COLORS.good;
-  if (value >= DATA_QUALITY_THRESHOLDS.SATISFACTORY)
-    return DATA_QUALITY_COLORS.satisfactory;
-  return DATA_QUALITY_COLORS.insufficient;
+export const DATA_QUALITY_LABEL_KEYS = {
+  [DATA_QUALITY_LEVELS.GOOD]: 'Good quality',
+  [DATA_QUALITY_LEVELS.SATISFACTORY]: 'Satisfactory quality',
+  [DATA_QUALITY_LEVELS.INSUFFICIENT]: 'Insufficient quality'
 };
 
-// i18n key for a standalone label (no surrounding section title)
-export const getDataQualityLabelKey = value => {
-  if (value >= DATA_QUALITY_THRESHOLDS.GOOD) return 'Good quality';
-  if (value >= DATA_QUALITY_THRESHOLDS.SATISFACTORY) return 'Satisfactory quality';
-  return 'Insufficient quality';
+// Single threshold comparison — used by all derived helpers below.
+export const getDataQualityLevel = value => {
+  if (value >= DATA_QUALITY_THRESHOLDS.GOOD) return DATA_QUALITY_LEVELS.GOOD;
+  if (value >= DATA_QUALITY_THRESHOLDS.SATISFACTORY)
+    return DATA_QUALITY_LEVELS.SATISFACTORY;
+  return DATA_QUALITY_LEVELS.INSUFFICIENT;
 };
+
+export const getDataQualityColor = value =>
+  DATA_QUALITY_COLORS[getDataQualityLevel(value)];
+
+// i18n key for a standalone label (no surrounding section title)
+export const getDataQualityLabelKey = value =>
+  DATA_QUALITY_LABEL_KEYS[getDataQualityLevel(value)];
 
 // Normalises both shapes returned by different API endpoints:
 //   - geoloc endpoint: dataQuality is a plain number

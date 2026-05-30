@@ -8,7 +8,8 @@ import { useIntl } from 'react-intl';
 import { useFullScreen } from 'react-browser-hooks';
 
 import CustomControl, { customControlProps } from '../common/CustomControl';
-import { CAVE_SIZE, CAVE_SIZE_STYLE, CAVE_SIZE_THRESHOLDS } from './constants';
+import { CAVE_SIZE, CAVE_SIZE_STYLE, CAVE_SIZE_THRESHOLDS, CAVE_QUALITY_BADGE_VALUE } from './constants';
+import DataQualityBadge from '../../DataQualityBadge';
 import {
   entranceIcon,
   networkIcon,
@@ -167,6 +168,9 @@ const DataControl = ({
   entranceFilters,
   activeEntranceFilters,
   setActiveEntranceFilters,
+  qualityFilters,
+  activeQualityFilters,
+  setActiveQualityFilters,
   isMarkersMode,
   ...props
 }) => {
@@ -314,6 +318,30 @@ const DataControl = ({
                     <span>{formatMessage({ id: filter.labelKey })}</span>
                   </OptionLabel>
                 ))}
+
+                <SectionTitle>
+                  {formatMessage({ id: 'Filter by quality' }).toUpperCase()}
+                </SectionTitle>
+                {qualityFilters.map(filter => (
+                  <OptionLabel key={filter.id}>
+                    <input
+                      type="checkbox"
+                      name={filter.id}
+                      checked={activeQualityFilters[filter.id] ?? false}
+                      onChange={() =>
+                        setActiveQualityFilters(prev => ({
+                          ...prev,
+                          [filter.id]: !prev[filter.id]
+                        }))
+                      }
+                    />
+                    <DataQualityBadge
+                      value={CAVE_QUALITY_BADGE_VALUE[filter.id]}
+                      size={20}
+                    />
+                    <span>{formatMessage({ id: filter.labelKey })}</span>
+                  </OptionLabel>
+                ))}
               </>
             )}
           </div>
@@ -338,6 +366,14 @@ DataControl.propTypes = {
   ).isRequired,
   activeEntranceFilters: PropTypes.objectOf(PropTypes.bool).isRequired,
   setActiveEntranceFilters: PropTypes.func.isRequired,
+  qualityFilters: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.string.isRequired,
+      labelKey: PropTypes.string.isRequired
+    })
+  ).isRequired,
+  activeQualityFilters: PropTypes.objectOf(PropTypes.bool).isRequired,
+  setActiveQualityFilters: PropTypes.func.isRequired,
   isMarkersMode: PropTypes.bool.isRequired,
   ...customControlProps
 };

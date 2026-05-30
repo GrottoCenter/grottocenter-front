@@ -1,4 +1,11 @@
 import { blue, brown, green } from '@mui/material/colors';
+import {
+  DATA_QUALITY_LEVELS,
+  DATA_QUALITY_LABEL_KEYS,
+  DATA_QUALITY_THRESHOLDS,
+  getDataQualityLevel,
+  getDataQualityValue
+} from '../../../../utils/dataQuality';
 
 export const CAVE_SIZE = {
   SMALL: 'small',
@@ -61,6 +68,25 @@ export const ENTRANCE_MARKER_FILTERS = [
   { id: CAVE_SIZE.MEDIUM, labelKey: 'Medium caves' },
   { id: CAVE_SIZE.LARGE, labelKey: 'Large caves' }
 ];
+
+// Alias — keeps map code readable without re-importing from utils directly.
+export const CAVE_QUALITY = DATA_QUALITY_LEVELS;
+
+export const getCaveQuality = entrance => {
+  const value = getDataQualityValue(entrance.dataQuality);
+  return value == null ? null : getDataQualityLevel(value);
+};
+
+// Minimum score for each category — shown in the filter UI dot (0 for insufficient).
+export const CAVE_QUALITY_BADGE_VALUE = {
+  [CAVE_QUALITY.GOOD]: DATA_QUALITY_THRESHOLDS.GOOD,
+  [CAVE_QUALITY.SATISFACTORY]: DATA_QUALITY_THRESHOLDS.SATISFACTORY,
+  [CAVE_QUALITY.INSUFFICIENT]: 0
+};
+
+export const ENTRANCE_QUALITY_FILTERS = Object.values(DATA_QUALITY_LEVELS).map(
+  id => ({ id, labelKey: DATA_QUALITY_LABEL_KEYS[id] })
+);
 
 export const MARKERS_LIMIT = 13;
 // Zoom level at which massif polygons are fetched and displayed
