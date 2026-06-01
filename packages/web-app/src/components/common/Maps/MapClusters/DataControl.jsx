@@ -278,8 +278,24 @@ const DataControl = ({
               </span>
             </OptionLabel>
 
-            {selectedHeats.has(heatmapTypes.ENTRANCES) && isMarkersMode && (
-              <>
+            {selectedHeats.has(heatmapTypes.ENTRANCES) && (
+              <div
+                style={
+                  !isMarkersMode
+                    ? { opacity: 0.5, pointerEvents: 'none' }
+                    : undefined
+                }>
+                {!isMarkersMode && (
+                  <div
+                    style={{
+                      fontSize: 11,
+                      fontStyle: 'italic',
+                      color: '#666',
+                      padding: '2px 0 4px'
+                    }}>
+                    {formatMessage({ id: 'Available in point view' })}
+                  </div>
+                )}
                 <SectionTitle>
                   {formatMessage({ id: 'Filter by size' }).toUpperCase()}
                   <HelpOutlineIcon
@@ -345,7 +361,7 @@ const DataControl = ({
                     <span>{formatMessage({ id: filter.labelKey })}</span>
                   </OptionLabel>
                 ))}
-              </>
+              </div>
             )}
           </div>
         </section>
