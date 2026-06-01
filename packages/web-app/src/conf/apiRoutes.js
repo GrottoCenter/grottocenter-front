@@ -181,6 +181,19 @@ export const getMapGrottosUrl = `${API_BASE_PATH}/geoloc/organizations`;
 export const getMapMassifsUrl = `${API_BASE_PATH}/geoloc/massifs`;
 export const getMapMassifsCoordinatesUrl = `${API_BASE_PATH}/geoloc/massifsCoordinates`;
 
+// ===== Guidelines urls
+export const postGuidelineUrl = `${API_BASE_PATH}/guidelines`;
+export const putGuidelineUrl = guidelineId =>
+  `${API_BASE_PATH}/guidelines/${guidelineId}`;
+export const deleteGuidelineUrl = (guidelineId, isPermanent = false) =>
+  `${API_BASE_PATH}/guidelines/${guidelineId}?${
+    isPermanent ? 'isPermanent=1' : ''
+  }`;
+export const restoreGuidelineUrl = guidelineId =>
+  `${API_BASE_PATH}/guidelines/${guidelineId}/restore`;
+export const rollbackGuidelineUrl = (guidelineId, snapshotId) =>
+  `${API_BASE_PATH}/guidelines/${guidelineId}/rollback/${snapshotId}`;
+
 // ===== Histories urls
 export const postHistoryUrl = `${API_BASE_PATH}/histories`;
 export const putHistoryUrl = historyId =>
