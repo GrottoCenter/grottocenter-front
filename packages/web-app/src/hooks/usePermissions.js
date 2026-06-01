@@ -17,10 +17,10 @@ export function usePermissions() {
   const authState = useSelector(state => state.login);
   return {
     isAdmin: hasRole(authState, 'Administrator'),
-    isAuth: authState.authTokenDecoded !== null && !isTokenExpired(),
+    isAuth: authState.authTokenDecoded !== null && !isTokenExpired(authState),
     isLeader: hasRole(authState, 'Leader'),
     isModerator: hasRole(authState, 'Moderator'),
-    isTokenExpired: isTokenExpired(),
+    isTokenExpired: isTokenExpired(authState),
     isUser: hasRole(authState, 'User')
   };
 }

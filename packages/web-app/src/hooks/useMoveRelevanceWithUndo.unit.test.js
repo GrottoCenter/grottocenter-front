@@ -177,7 +177,7 @@ describe('useMoveRelevanceWithUndo', () => {
     );
   });
 
-  it('does not show success snackbar when move fails', async () => {
+  it('shows error snackbar and no success snackbar when move fails', async () => {
     const mockThunk = createMockThunk(failureResult);
     const { result } = renderHook(() =>
       useMoveRelevanceWithUndo(mockThunk)
@@ -187,10 +187,14 @@ describe('useMoveRelevanceWithUndo', () => {
       result.current.handleMove(1, -1);
     });
 
-    expect(mockEnqueueSnackbar).not.toHaveBeenCalled();
+    expect(mockEnqueueSnackbar).toHaveBeenCalledTimes(1);
+    expect(mockEnqueueSnackbar).toHaveBeenCalledWith(
+      expect.any(String),
+      expect.objectContaining({ variant: 'error' })
+    );
   });
 
-  it('does not show undo-success snackbar when undo fails', async () => {
+  it('shows error snackbar and no undo-success snackbar when undo fails', async () => {
     const mockThunk = createMockThunk();
     const { result } = renderHook(() =>
       useMoveRelevanceWithUndo(mockThunk)
@@ -204,7 +208,6 @@ describe('useMoveRelevanceWithUndo', () => {
     const actionElement = actionFn('snackbar-1');
 
     mockEnqueueSnackbar.mockClear();
-    // Make the undo dispatch return a failure result
     mockDispatch.mockImplementation(() =>
       Promise.resolve(failureResult)
     );
@@ -213,7 +216,10 @@ describe('useMoveRelevanceWithUndo', () => {
       actionElement.props.onClick();
     });
 
-    // No success snackbar should appear — ErrorHandler handles the failure
-    expect(mockEnqueueSnackbar).not.toHaveBeenCalled();
+    expect(mockEnqueueSnackbar).toHaveBeenCalledTimes(1);
+    expect(mockEnqueueSnackbar).toHaveBeenCalledWith(
+      expect.any(String),
+      expect.objectContaining({ variant: 'error' })
+    );
   });
 });

@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useForm } from 'react-hook-form';
 import { useSelector, useDispatch } from 'react-redux';
@@ -11,6 +11,7 @@ import { FormContainer, FormActionRow } from '../utils/FormContainers';
 import LicenseBox from '../utils/LicenseBox';
 import { MassifTypes } from '../../../../types/massif.type';
 import FormProgressInfo from '../utils/FormProgressInfo';
+import { useNotification } from '../../../../hooks';
 
 import MassifFields from './MassifFields';
 import MassifSensitivityControl from './MassifSensitivityControl';
@@ -21,9 +22,27 @@ const defaultMassifValues = {
   geogPolygon: null
 };
 
+const FALLBACK_ERROR_MESSAGE =
+  'The server rejected the submission. Please review your polygon and try again.';
+
+const is4xxError = error => error?.status >= 400 && error?.status < 500;
+
+const getErrorCode = error => error?.body?.code || null;
+
+const getErrorMessage = error => {
+  if (error?.body?.message) return error.body.message;
+  if (error?.message && error.message !== String(error.status)) {
+    return error.message;
+  }
+  return null;
+};
+
 export const MassifForm = ({ massifValues, onCancel }) => {
   const { formatMessage } = useIntl();
+  const { onWarning, onError } = useNotification();
   const isNewMassif = !massifValues;
+
+  const [polygonErrors, setPolygonErrors] = useState(false);
 
   const {
     error: massifError,
@@ -68,14 +87,34 @@ export const MassifForm = ({ massifValues, onCancel }) => {
     reset(undefined, { keepValues: true, keepErrors: false });
   }, [reset]);
 
+  // Detect 4xx errors and show them as a toast notification
+  useEffect(() => {
+    const error = massifError || nameError;
+    if (error && is4xxError(error)) {
+      const code = getErrorCode(error);
+      const rawMessage = getErrorMessage(error);
+      // Use the error code as i18n key if available, fall back to raw message,
+      // then to a generic translated fallback.
+      const message = code
+        ? formatMessage({ id: code, defaultMessage: rawMessage || FALLBACK_ERROR_MESSAGE })
+        : rawMessage || formatMessage({ id: FALLBACK_ERROR_MESSAGE });
+      onError(message);
+      handleReset();
+    }
+  }, [massifError, nameError, handleReset, onError, formatMessage]);
+
   const handleFormSubmit = e => {
+    if (polygonErrors) {
+      e.preventDefault();
+      return;
+    }
     const editingElements = document.querySelectorAll('.leaflet-editing-icon');
     const visibleEditingElements = Array.from(editingElements).filter(
       el => el.offsetParent !== null && getComputedStyle(el).display !== 'none'
     );
     if (visibleEditingElements.length > 0) {
       e.preventDefault();
-      alert(
+      onWarning(
         formatMessage({
           id: 'Please finish editing the polygon before submitting.'
         })
@@ -116,14 +155,17 @@ export const MassifForm = ({ massifValues, onCancel }) => {
     }
   };
 
-  if (isSubmitSuccessful) {
+  if (
+    isSubmitSuccessful &&
+    !massifLoading &&
+    !nameLoading &&
+    !is4xxError(massifError) &&
+    !is4xxError(nameError)
+  ) {
     return (
       <FormProgressInfo
-        isLoading={
-          (massifLoading || nameLoading) && !(massifError || nameError)
-        }
+        isLoading={false}
         isError={!!(massifError || nameError)}
-        labelLoading={isNewMassif ? 'Creating massif...' : 'Updating massif...'}
         labelError={
           massifError?.message ||
           nameError?.message ||
@@ -145,10 +187,12 @@ export const MassifForm = ({ massifValues, onCancel }) => {
           control={control}
           errors={errors}
           geoJson={geoJson}
+          onValidationChange={setPolygonErrors}
         />
         <FormActionRow
           isNew={isNewMassif}
-          isSubmitting={isSubmitting}
+          isSubmitting={isSubmitting || massifLoading || nameLoading}
+          disabled={polygonErrors}
           onCancel={onCancel}
         />
       </form>

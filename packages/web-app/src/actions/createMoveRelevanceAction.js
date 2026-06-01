@@ -29,18 +29,15 @@ const createMoveRelevanceAction = (entityName, urlBuilder, label) => {
       .then(checkAuthStatus(dispatch))
       .then(response => response.json())
       .then(data =>
-        dispatch({
-          type: SUCCESS,
-          moved: data.moved,
-          swapped: data.swapped
-        })
+        dispatch({ type: SUCCESS, moved: data.moved, swapped: data.swapped })
       )
       .catch(error => {
-        if (error.isAuthError) return;
+        if (error.isAuthError) return { error: true };
         dispatch({
           type: FAILURE,
           error: makeErrorMessage(error.message, `Moving ${label} relevance`)
         });
+        return { error: error.message };
       });
   };
 

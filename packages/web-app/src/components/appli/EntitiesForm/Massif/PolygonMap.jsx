@@ -1,10 +1,21 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
-import { MapContainer, FeatureGroup, ScaleControl } from 'react-leaflet';
+import {
+  FeatureGroup,
+  MapContainer,
+  Marker,
+  ScaleControl
+} from 'react-leaflet';
 import { EditControl } from 'react-leaflet-draw';
 import L from 'leaflet';
 import { useIntl } from 'react-intl';
-import { Box, useMediaQuery, useTheme } from '@mui/material';
+import {
+  Box,
+  CircularProgress,
+  Typography,
+  useMediaQuery,
+  useTheme
+} from '@mui/material';
 import { useNotification, useProjections } from '../../../../hooks';
 import useGeolocation from '../../../../hooks/useGeolocation';
 import LayersControl from '../../../common/Maps/common/LayersControl';
@@ -13,9 +24,25 @@ import GeocodingControl from '../../../common/Maps/common/GeocodingControl';
 import ShapefileImport from './ShapefileImport';
 import PolygonLayersList from './PolygonLayersList';
 import { isNeedlePolygon } from '../../../../helpers/polygonUtils';
+import {
+  AREA_LIMIT_KM2,
+  checkInterPolygonIntersections,
+  computeTotalArea,
+  normalizeWinding,
+  validatePolygon
+} from '../../../../utils/polygonValidation';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-draw/dist/leaflet.draw.css';
 import { defaultZoom, focusZoom } from '../../../../conf/config';
+
+// SVG from MUI ErrorOutline icon, rendered as a Leaflet DivIcon
+const KINK_ICON_SIZE = 24;
+const kinkIcon = L.divIcon({
+  className: '',
+  html: `<svg xmlns="http://www.w3.org/2000/svg" width="${KINK_ICON_SIZE}" height="${KINK_ICON_SIZE}" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="rgba(255,255,255,0.6)"/><path d="M11 15h2v2h-2zm0-8h2v6h-2zm.99-5C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z" fill="#d32f2f"/></svg>`,
+  iconSize: [KINK_ICON_SIZE, KINK_ICON_SIZE],
+  iconAnchor: [KINK_ICON_SIZE / 2, KINK_ICON_SIZE / 2]
+});
 
 const getMultiPolygonCentroid = function (coordinates) {
   const result = coordinates.reduce(
@@ -65,7 +92,7 @@ const detectHoles = layers => {
   return layersWithBounds;
 };
 
-const PolygonMap = ({ onChange, data }) => {
+const PolygonMap = ({ onChange, onValidationChange, data }) => {
   const { formatMessage } = useIntl();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
@@ -73,6 +100,10 @@ const PolygonMap = ({ onChange, data }) => {
   const isMounted = useRef(true);
   const displayValue = useRef(false);
   const isEditingRef = useRef(false);
+  // Ref-stabilize onValidationChange so the effect only re-fires when
+  // hasBlockingErrors changes, not when the parent passes a new reference.
+  const onValidationChangeRef = useRef(onValidationChange);
+  onValidationChangeRef.current = onValidationChange;
   const { location: geoLocation, hasLocation } = useGeolocation();
   const { onError, onSuccess } = useNotification();
   const [map, setMap] = useState();
@@ -162,12 +193,42 @@ const PolygonMap = ({ onChange, data }) => {
 
   const [mapLayers, setMapLayers] = useState([]);
   const [hoveredLayerId, setHoveredLayerId] = useState(null);
+  const [validating, setValidating] = useState(false);
+
+  // Derived validation state
+  const totalAreaKm2 = useMemo(() => computeTotalArea(mapLayers), [mapLayers]);
+  const areaExceeded = totalAreaKm2 > AREA_LIMIT_KM2;
+  const interPolygonKinks = useMemo(
+    () => checkInterPolygonIntersections(mapLayers),
+    [mapLayers]
+  );
+  const hasInterPolygonIntersections = interPolygonKinks.length > 0;
+  const hasBlockingErrors =
+    mapLayers.some(l => l.hasSelfIntersection || l.tooFewPoints) ||
+    areaExceeded ||
+    hasInterPolygonIntersections ||
+    (mapLayers.length > 0 && mapLayers.every(l => l.isHole));
+
+  // Collect all kink points across all layers for rendering on the map
+  const allKinkPoints = useMemo(
+    () => [
+      ...mapLayers.flatMap(l => l.kinkPoints || []),
+      ...interPolygonKinks
+    ],
+    [mapLayers, interPolygonKinks]
+  );
+
+  // Notify parent of validation state changes
+  useEffect(() => {
+    if (onValidationChangeRef.current) {
+      onValidationChangeRef.current(hasBlockingErrors);
+    }
+  }, [hasBlockingErrors]);
+
   const hasCoordinates = data?.coordinates?.length > 0;
   const initialCenter = hasCoordinates
     ? getMultiPolygonCentroid(
-        data.type === 'Polygon'
-          ? data.coordinates[0]
-          : data.coordinates[0][0]
+        data.type === 'Polygon' ? data.coordinates[0] : data.coordinates[0][0]
       )
     : geoLocation;
   const ZOOM_LEVEL = hasCoordinates || hasLocation ? focusZoom : defaultZoom;
@@ -178,6 +239,17 @@ const PolygonMap = ({ onChange, data }) => {
       return () => clearTimeout(t);
     }
   }, [map, isMobile]);
+
+  // Create a custom pane for kink markers so they persist during edit mode.
+  // z-index 650 places them above Leaflet Draw edit handles (markerPane=600)
+  // while pointerEvents='none' ensures they don't block vertex dragging.
+  useEffect(() => {
+    if (map && !map.getPane('kinkPane')) {
+      const pane = map.createPane('kinkPane');
+      pane.style.zIndex = 650;
+      pane.style.pointerEvents = 'none';
+    }
+  }, [map]);
 
   useEffect(() => {
     if (map) {
@@ -286,12 +358,22 @@ const PolygonMap = ({ onChange, data }) => {
     if (layerType === 'polygon') {
       const { _leaflet_id: leafletId } = layer;
       if (isMounted.current) {
-        const latlngs = layer.getLatLngs()[0];
+        // Convert Leaflet LatLng instances to plain {lat, lng} objects
+        const latlngs = layer
+          .getLatLngs()[0]
+          .map(({ lat, lng }) => ({ lat, lng }));
+        const normalizedLatlngs = normalizeWinding(latlngs, false);
+        const coords = normalizedLatlngs.map(c => [c.lat, c.lng]);
+        const { hasSelfIntersection, tooFewPoints, kinkPoints } =
+          validatePolygon(normalizedLatlngs);
         const newLayer = {
           id: leafletId,
-          latlngs,
+          latlngs: normalizedLatlngs,
           isHole: false,
-          isNeedle: isNeedlePolygon(latlngs.map(c => [c.lat, c.lng])),
+          isNeedle: isNeedlePolygon(coords),
+          hasSelfIntersection,
+          tooFewPoints,
+          kinkPoints,
           bounds: layer.getBounds()
         };
 
@@ -308,19 +390,31 @@ const PolygonMap = ({ onChange, data }) => {
       layers: { _layers }
     } = e;
 
-    Object.values(_layers).map(layer => {
+    Object.values(_layers).forEach(layer => {
       const { _leaflet_id: leafletId } = layer;
       if (isMounted.current) {
-        const latlngs = layer.getLatLngs()[0];
-        return setMapLayers(layers =>
+        // Convert Leaflet LatLng instances to plain {lat, lng} objects
+        const latlngs = layer
+          .getLatLngs()[0]
+          .map(({ lat, lng }) => ({ lat, lng }));
+        setMapLayers(layers =>
           layers.map(l => {
             if (l.id !== leafletId) return l;
-            const coords = latlngs.map(c => [c.lat, c.lng]);
-            return { ...l, latlngs, isNeedle: isNeedlePolygon(coords) };
+            const normalizedLatlngs = normalizeWinding(latlngs, l.isHole);
+            const coords = normalizedLatlngs.map(c => [c.lat, c.lng]);
+            const { hasSelfIntersection, tooFewPoints, kinkPoints } =
+              validatePolygon(normalizedLatlngs);
+            return {
+              ...l,
+              latlngs: normalizedLatlngs,
+              isNeedle: isNeedlePolygon(coords),
+              hasSelfIntersection,
+              tooFewPoints,
+              kinkPoints
+            };
           })
         );
       }
-      return null;
     });
   };
 
@@ -329,72 +423,101 @@ const PolygonMap = ({ onChange, data }) => {
       layers: { _layers }
     } = e;
 
-    Object.values(_layers).map(layer => {
+    Object.values(_layers).forEach(layer => {
       const { _leaflet_id: leafletId } = layer;
       if (isMounted.current) {
-        return setMapLayers(layers => layers.filter(l => l.id !== leafletId));
+        setMapLayers(layers => layers.filter(l => l.id !== leafletId));
       }
-      return null;
     });
   };
 
   const handleShapefileImport = multiPolygon => {
     if (!featureGroupRef) return;
 
-    // Add imported polygons to existing layers
-    const newLayers = [];
-    multiPolygon.coordinates.forEach(polygon => {
-      const rawRing = polygon[0].map(coord => [coord[1], coord[0]]);
+    setValidating(true);
+    // setTimeout(0) yields to the browser so the overlay paints before we
+    // block the main thread with the heavy polygon processing.
+    setTimeout(() => {
+      // Add imported polygons to existing layers.
+      // GeoJSON/Shapefile ring structure is authoritative: polygon[0] is the
+      // outer ring, polygon[1..n] are holes. No bounding-box heuristic needed.
+      const newLayers = [];
 
-      // Strip closing vertex first so every downstream check works on
-      // unique vertices only (mapToGeoJson re-closes it later).
-      const isClosed =
-        rawRing.length >= 2 &&
-        rawRing[0][0] === rawRing[rawRing.length - 1][0] &&
-        rawRing[0][1] === rawRing[rawRing.length - 1][1];
-      const openRing = isClosed ? rawRing.slice(0, -1) : rawRing;
+      const processRing = (rawRing, isHole) => {
+        // Strip closing vertex first so every downstream check works on
+        // unique vertices only (mapToGeoJson re-closes it later).
+        const isClosed =
+          rawRing.length >= 2 &&
+          rawRing[0][0] === rawRing[rawRing.length - 1][0] &&
+          rawRing[0][1] === rawRing[rawRing.length - 1][1];
+        const openRing = isClosed ? rawRing.slice(0, -1) : rawRing;
 
-      if (openRing.length <= 2) return;
+        if (openRing.length <= 2) return;
 
-      const leafletPolygon = L.polygon(openRing, { color: 'green' });
+        const latlngs = openRing.map(coord => ({
+          lat: coord[0],
+          lng: coord[1]
+        }));
+        const normalizedLatlngs = normalizeWinding(latlngs, isHole);
+        const coords = normalizedLatlngs.map(c => [c.lat, c.lng]);
+        const { hasSelfIntersection, tooFewPoints, kinkPoints } =
+          validatePolygon(normalizedLatlngs);
 
-      // Add to FeatureGroup for rendering
-      featureGroupRef.addLayer(leafletPolygon);
+        const leafletPolygon = L.polygon(
+          normalizedLatlngs.map(c => [c.lat, c.lng]),
+          { color: 'green' }
+        );
 
-      // Add to state for form handling
-      newLayers.push({
-        id: leafletPolygon._leaflet_id,
-        latlngs: openRing.map(coord => ({ lat: coord[0], lng: coord[1] })),
-        isHole: false,
-        isNeedle: isNeedlePolygon(openRing),
-        bounds: leafletPolygon.getBounds()
+        // Add to FeatureGroup for rendering
+        featureGroupRef.addLayer(leafletPolygon);
+
+        // Add to state for form handling
+        newLayers.push({
+          id: leafletPolygon._leaflet_id,
+          latlngs: normalizedLatlngs,
+          isHole,
+          isNeedle: isNeedlePolygon(coords),
+          hasSelfIntersection,
+          tooFewPoints,
+          kinkPoints
+        });
+      };
+
+      multiPolygon.coordinates.forEach(polygon => {
+        // Outer ring
+        const outerRing = polygon[0].map(coord => [coord[1], coord[0]]);
+        processRing(outerRing, false);
+
+        // Inner rings (holes)
+        for (let i = 1; i < polygon.length; i++) {
+          const holeRing = polygon[i].map(coord => [coord[1], coord[0]]);
+          processRing(holeRing, true);
+        }
       });
-    });
 
-    if (newLayers.length === 0) {
-      onError(
-        formatMessage({ id: 'No valid polygon rings found in the imported file.' })
-      );
-      return;
-    }
-
-    // Detect holes automatically
-    const layersWithHoles = detectHoles(newLayers);
-
-    setMapLayers(layers => [
-      ...layers,
-      ...layersWithHoles.map(({ bounds, ...rest }) => rest)
-    ]);
-
-    // Fit map to imported geometry
-    if (map) {
-      const bounds = L.geoJSON(multiPolygon).getBounds();
-      if (bounds.isValid()) {
-        map.fitBounds(bounds);
+      if (newLayers.length === 0) {
+        onError(
+          formatMessage({
+            id: 'No valid polygon rings found in the imported file.'
+          })
+        );
+        setValidating(false);
+        return;
       }
-    }
 
-    onSuccess(formatMessage({ id: 'Shapefile imported successfully!' }));
+      setMapLayers(layers => [...layers, ...newLayers]);
+
+      // Fit map to imported geometry
+      if (map) {
+        const bounds = L.geoJSON(multiPolygon).getBounds();
+        if (bounds.isValid()) {
+          map.fitBounds(bounds);
+        }
+      }
+
+      setValidating(false);
+      onSuccess(formatMessage({ id: 'Shapefile imported successfully!' }));
+    }, 0);
   };
 
   const handleImportError = error => {
@@ -455,7 +578,15 @@ const PolygonMap = ({ onChange, data }) => {
 
   const handleLayerHoleToggle = layerId => {
     setMapLayers(layers =>
-      layers.map(l => (l.id === layerId ? { ...l, isHole: !l.isHole } : l))
+      layers.map(l => {
+        if (l.id !== layerId) return l;
+        const newIsHole = !l.isHole;
+        // Re-normalize winding for the new role (exterior=CCW, hole=CW).
+        // Validation is not re-run because self-intersections and point count
+        // are winding-independent — only the vertex order changes.
+        const normalizedLatlngs = normalizeWinding(l.latlngs, newIsHole);
+        return { ...l, isHole: newIsHole, latlngs: normalizedLatlngs };
+      })
     );
   };
 
@@ -473,27 +604,47 @@ const PolygonMap = ({ onChange, data }) => {
       for (const polygon of polygons) {
         // Add outer ring (first ring of each polygon)
         const outerRing = polygon[0].map(coords => [coords[1], coords[0]]);
-        const leafletPolygon = L.polygon(outerRing, { color: 'green' });
+        const outerLatlngs = outerRing.map(([lat, lng]) => ({ lat, lng }));
+        const normalizedOuter = normalizeWinding(outerLatlngs, false);
+        const outerCoords = normalizedOuter.map(c => [c.lat, c.lng]);
+        const outerValidation = validatePolygon(normalizedOuter);
+
+        const leafletPolygon = L.polygon(
+          normalizedOuter.map(c => [c.lat, c.lng]),
+          { color: 'green' }
+        );
         editableFG.addLayer(leafletPolygon);
-        const outerLatlngs = leafletPolygon.getLatLngs()[0];
         allPolygons.push({
           id: leafletPolygon._leaflet_id,
-          latlngs: outerLatlngs,
+          latlngs: normalizedOuter,
           isHole: false,
-          isNeedle: isNeedlePolygon(outerLatlngs.map(c => [c.lat, c.lng]))
+          isNeedle: isNeedlePolygon(outerCoords),
+          hasSelfIntersection: outerValidation.hasSelfIntersection,
+          tooFewPoints: outerValidation.tooFewPoints,
+          kinkPoints: outerValidation.kinkPoints
         });
 
         // Add holes (second ring onwards of THIS polygon)
         for (let i = 1; i < polygon.length; i++) {
           const hole = polygon[i].map(coords => [coords[1], coords[0]]);
-          const leafletHole = L.polygon(hole, { color: 'green' });
+          const holeLatlngs = hole.map(([lat, lng]) => ({ lat, lng }));
+          const normalizedHole = normalizeWinding(holeLatlngs, true);
+          const holeCoords = normalizedHole.map(c => [c.lat, c.lng]);
+          const holeValidation = validatePolygon(normalizedHole);
+
+          const leafletHole = L.polygon(
+            normalizedHole.map(c => [c.lat, c.lng]),
+            { color: 'green' }
+          );
           editableFG.addLayer(leafletHole);
-          const holeLatlngs = leafletHole.getLatLngs()[0];
           allPolygons.push({
             id: leafletHole._leaflet_id,
-            latlngs: holeLatlngs,
+            latlngs: normalizedHole,
             isHole: true,
-            isNeedle: isNeedlePolygon(holeLatlngs.map(c => [c.lat, c.lng]))
+            isNeedle: isNeedlePolygon(holeCoords),
+            hasSelfIntersection: holeValidation.hasSelfIntersection,
+            tooFewPoints: holeValidation.tooFewPoints,
+            kinkPoints: holeValidation.kinkPoints
           });
         }
       }
@@ -513,51 +664,103 @@ const PolygonMap = ({ onChange, data }) => {
         />
       </Box>
 
-      <Box sx={{ display: 'flex', gap: 2, flexDirection: { xs: 'column', md: 'row' } }}>
-        <MapContainer
-          center={initialCenter}
-          zoom={ZOOM_LEVEL}
-          ref={ref => {
-            if (ref) setMap(ref);
-          }}
-          position="topLeft"
-          style={{
-            height: isMobile ? '50dvh' : '70dvh',
+      <Box
+        sx={{
+          display: 'flex',
+          gap: 2,
+          flexDirection: { xs: 'column', md: 'row' }
+        }}>
+        <Box
+          sx={{
+            position: 'relative',
             ...(isMobile ? { width: '100%' } : { flex: 1 })
           }}>
-          <FeatureGroup
-            ref={reactFGref => {
-              if (reactFGref) {
-                setFeatureGroupRef(reactFGref);
-                if (data) {
-                  onFeatureGroupReady(reactFGref);
-                }
-              }
+          {/* Spinner is always mounted (hidden via visibility:hidden) so
+             its CSS animation keeps running in the background. When
+             validating becomes true, switching to display:flex reveals an
+             already-animated spinner instantly, avoiding the thin-arc
+             appearance caused by the animation starting from frame 0 while
+             the main thread is blocked. */}
+          <Box
+            sx={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: 'rgba(255, 255, 255, 0.7)',
+              zIndex: 1000,
+              borderRadius: 1,
+              ...(validating
+                ? { display: 'flex' }
+                : { visibility: 'hidden' })
             }}>
-            <EditControl
-              position="topright"
-              onCreated={onCreate}
-              onEdited={onEdited}
-              onDeleted={onDeleted}
-              draw={{
-                rectangle: false,
-                polyline: false,
-                circle: false,
-                circlemarker: false,
-                marker: false
-              }}
-            />
-          </FeatureGroup>
+            <CircularProgress size={40} />
+            <Typography variant="body2" sx={{ mt: 1 }}>
+              {formatMessage({ id: 'Validating polygons...' })}
+            </Typography>
+          </Box>
+          <MapContainer
+            center={initialCenter}
+            zoom={ZOOM_LEVEL}
+            ref={ref => {
+              if (ref) setMap(ref);
+            }}
+            position="topLeft"
+            style={{
+              height: isMobile ? '50dvh' : '70dvh',
+              ...(isMobile ? { width: '100%' } : { flex: 1 })
+            }}>
+            <FeatureGroup
+              ref={reactFGref => {
+                if (reactFGref) {
+                  setFeatureGroupRef(reactFGref);
+                  if (data) {
+                    onFeatureGroupReady(reactFGref);
+                  }
+                }
+              }}>
+              <EditControl
+                position="topright"
+                onCreated={onCreate}
+                onEdited={onEdited}
+                onDeleted={onDeleted}
+                draw={{
+                  rectangle: false,
+                  polyline: false,
+                  circle: false,
+                  circlemarker: false,
+                  marker: false
+                }}
+              />
+            </FeatureGroup>
 
-          <GeocodingControl />
-          <LocateControl />
-          <ScaleControl position="bottomright" />
-          <LayersControl />
-        </MapContainer>
+            <GeocodingControl />
+            <LocateControl />
+            <ScaleControl position="bottomright" />
+            <LayersControl />
+
+            {allKinkPoints.map((point, idx) => (
+              <Marker
+                key={`kink-${point.lat}-${point.lng}-${idx}`}
+                position={[point.lat, point.lng]}
+                icon={kinkIcon}
+                interactive={false}
+                pane="kinkPane"
+              />
+            ))}
+          </MapContainer>
+        </Box>
 
         {mapLayers.length > 0 && (
           <PolygonLayersList
             layers={mapLayers}
+            totalAreaKm2={totalAreaKm2}
+            areaExceeded={areaExceeded}
+            hasInterPolygonIntersections={hasInterPolygonIntersections}
             hoveredLayerId={hoveredLayerId}
             onLayerClick={handleLayerClick}
             onLayerHover={handleLayerHover}
@@ -567,14 +770,15 @@ const PolygonMap = ({ onChange, data }) => {
           />
         )}
       </Box>
-
     </>
   );
 };
 
 PolygonMap.propTypes = {
   onChange: PropTypes.func,
+  onValidationChange: PropTypes.func,
   data: PropTypes.shape({
+    type: PropTypes.string,
     coordinates: PropTypes.arrayOf(
       PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.number)))
     )

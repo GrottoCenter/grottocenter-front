@@ -10,7 +10,7 @@ import { FormRow, FormSectionLabel } from '../utils/FormContainers';
 
 const PolygonMap = React.lazy(() => import('./PolygonMap'));
 
-const MassifFields = ({ control, errors, geoJson }) => {
+const MassifFields = ({ control, errors, geoJson, onValidationChange }) => {
   const { formatMessage } = useIntl();
 
   return (
@@ -51,7 +51,11 @@ const MassifFields = ({ control, errors, geoJson }) => {
           control={control}
           rules={{ required: true }}
           render={({ field }) => (
-            <PolygonMap data={geoJson} onChange={field.onChange} />
+            <PolygonMap
+              data={geoJson}
+              onChange={field.onChange}
+              onValidationChange={onValidationChange}
+            />
           )}
         />
       </Suspense>
@@ -68,7 +72,8 @@ MassifFields.propTypes = {
       geoJson: PropTypes.shape({})
     })
   }),
-  geoJson: PropTypes.shape({})
+  geoJson: PropTypes.shape({}),
+  onValidationChange: PropTypes.func
 };
 
 export default MassifFields;

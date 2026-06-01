@@ -1,5 +1,12 @@
 import React, { useEffect } from 'react';
-import { Button, CircularProgress, Typography, Box } from '@mui/material';
+import {
+  Button,
+  CircularProgress,
+  Typography,
+  Box,
+  useMediaQuery,
+  useTheme
+} from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
 import { isEmpty } from 'ramda';
 import { useNavigate } from 'react-router-dom';
@@ -9,8 +16,10 @@ import { WarningRounded } from '@mui/icons-material';
 import {
   hideLoginDialog,
   postLogin,
-  postForgotPassword
+  postForgotPassword,
+  displayLoginDialog
 } from '../../actions/Login';
+import { postMfaLogin } from '../../actions/Mfa';
 import {
   postResendVerificationEmail,
   resetResendVerification
@@ -20,16 +29,21 @@ import { isValidEmail } from '../../conf/config';
 import Translate from '../common/Translate';
 import StandardDialog from '../common/StandardDialog';
 import LoginForm from '../common/LoginForm';
+import MfaEnrollment from './MfaEnrollment';
 import { useNotification } from '../../hooks';
 
 const Login = () => {
   const dispatch = useDispatch();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const authState = useSelector(state => state.login);
+  const mfaVerifyState = useSelector(state => state.mfa.verify);
   const resendVerificationState = useSelector(
     state => state.resendVerificationEmail
   );
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
+  const lockedCredentials = React.useRef({ email: '', password: '' });
   const [authErrorMessages, setAuthErrorMessages] = React.useState([]);
   const [resendTimeout, setResendTimeout] = React.useState(0);
   const navigate = useNavigate();
@@ -64,8 +78,23 @@ const Login = () => {
       if (resendTimeout > 0) return;
       dispatch(postResendVerificationEmail(email));
     } else {
+      lockedCredentials.current = { email, password };
       dispatch(postLogin(email, password));
     }
+  };
+
+  const onTotpSubmit = code => {
+    dispatch(
+      postMfaLogin(
+        lockedCredentials.current.email,
+        lockedCredentials.current.password,
+        code
+      )
+    );
+  };
+
+  const onBackToLogin = () => {
+    dispatch(displayLoginDialog());
   };
 
   useEffect(() => {
@@ -74,12 +103,7 @@ const Login = () => {
       dispatch(resetResendVerification());
       setResendTimeout(60);
     }
-  }, [
-    resendVerificationState.success,
-    onSuccess,
-    formatMessage,
-    dispatch
-  ]);
+  }, [resendVerificationState.success, onSuccess, formatMessage, dispatch]);
 
   useEffect(() => {
     let interval = null;
@@ -100,13 +124,17 @@ const Login = () => {
     if (authState.isNotVerifiedMessageDisplayed) {
       if (resendTimeout > 0) {
         return (
-          <Translate id="Resend in {seconds}s" values={{ seconds: resendTimeout }} />
+          <Translate
+            id="Resend in {seconds}s"
+            values={{ seconds: resendTimeout }}
+          />
         );
       }
       return <Translate>Resend verification email</Translate>;
     }
     return <Translate>Log in</Translate>;
   };
+
   const LoginButton = (
     <Button
       key={0}
@@ -137,6 +165,44 @@ const Login = () => {
     dispatch(hideLoginDialog());
   };
 
+  // Step 2b: MFA enrollment wizard — rendered inside modal
+  if (authState.isMfaEnrollmentRequiredDisplayed) {
+    return (
+      <StandardDialog
+        open={authState.isLoginDialogDisplayed}
+        onClose={() => dispatch(hideLoginDialog())}
+        fullScreen={isMobile}
+        title={formatMessage({ id: 'mfaEnrollmentRequired' })}>
+        <MfaEnrollment onBack={onBackToLogin} />
+      </StandardDialog>
+    );
+  }
+
+  // Step 2a: TOTP code entry for admins with MFA already active
+  if (authState.isMfaRequiredDisplayed) {
+    return (
+      <StandardDialog
+        open={authState.isLoginDialogDisplayed}
+        onClose={() => dispatch(hideLoginDialog())}
+        fullScreen={isMobile}
+        title={formatMessage({ id: 'mfaRequired' })}>
+        <LoginForm
+          authErrors={authErrorMessages}
+          email={email}
+          onEmailChange={setEmail}
+          onPasswordChange={setPassword}
+          password={password}
+          totpMode
+          onTotpSubmit={onTotpSubmit}
+          totpError={mfaVerifyState.error}
+          totpIsEnrollmentTokenExpired={mfaVerifyState.isEnrollmentTokenExpired}
+          totpIsLoading={mfaVerifyState.isLoading}
+          onBackToLogin={onBackToLogin}
+        />
+      </StandardDialog>
+    );
+  }
+
   const DialogContent = authState.isMustResetMessageDisplayed ? (
     <>
       <Box
@@ -152,15 +218,20 @@ const Login = () => {
       <Typography
         variant="h6"
         style={{ textAlign: 'center', paddingBottom: 5 }}>
-        <Translate>For security reasons please create a new password.</Translate>
+        <Translate>
+          For security reasons please create a new password.
+        </Translate>
       </Typography>
       <Typography
         variant="body2"
         style={{ textAlign: 'center', paddingBottom: 10 }}>
-        <Translate>We have changed the way passwords are saved to make it more secure.</Translate>
+        <Translate>
+          We have changed the way passwords are saved to make it more secure.
+        </Translate>
       </Typography>
       <Typography variant="body1" style={{ textAlign: 'center' }}>
-        <Translate>An email will be sent to:</Translate> <b>{email || authState.notVerifiedEmail}</b>
+        <Translate>An email will be sent to:</Translate>{' '}
+        <b>{email || authState.notVerifiedEmail}</b>
       </Typography>
     </>
   ) : authState.isNotVerifiedMessageDisplayed ? (
@@ -184,7 +255,10 @@ const Login = () => {
         variant="body1"
         style={{ textAlign: 'center', paddingBottom: 10 }}>
         {authState.notVerifiedContext === 'forgotPassword' ? (
-          <Translate>You must verify your email address before you can reset your password.</Translate>
+          <Translate>
+            You must verify your email address before you can reset your
+            password.
+          </Translate>
         ) : (
           <Translate>Please check your email to activate it.</Translate>
         )}
@@ -218,6 +292,7 @@ const Login = () => {
     <StandardDialog
       open={authState.isLoginDialogDisplayed}
       onClose={() => dispatch(hideLoginDialog())}
+      fullScreen={isMobile}
       title={<Translate>Log in</Translate>}
       actions={[LoginButton]}>
       {DialogContent}

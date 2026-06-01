@@ -25,6 +25,11 @@
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
     "@testing-library/user-event": "^14.6.1",
+    "@turf/area": "^7.3.5",
+    "@turf/helpers": "^7.3.5",
+    "@turf/kinks": "^7.3.5",
+    "@turf/line-intersect": "^7.3.5",
+    "@turf/rewind": "^7.3.5",
     "cypress": "^15.13.0",
     "d3": "^7.9.0",
     "d3-hexbin": "^0.2.2",
@@ -40,6 +45,7 @@
     "notistack": "^3.0.2",
     "proj4": "^2.20.8",
     "prop-types": "^15.8.1",
+    "qrcode.react": "^4.2.0",
     "ramda": "^0.32.0",
     "react": "^19.2.4",
     "react-alice-carousel": "^2.9.1",
@@ -91,7 +97,7 @@
   },
   "jest": {
     "transformIgnorePatterns": [
-      "[/\\\\]node_modules[/\\\\](?!fast-check|@fast-check|pure-rand|react-intl|@formatjs|intl-messageformat).+\\.(js|jsx|mjs|cjs|ts|tsx)$",
+      "[/\\\\]node_modules[/\\\\](?!fast-check|@fast-check|pure-rand|react-intl|@formatjs|intl-messageformat|@turf).+\\.(js|jsx|mjs|cjs|ts|tsx)$",
       "^.+\\.module\\.(css|sass|scss)$"
     ]
   },

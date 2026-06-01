@@ -206,7 +206,8 @@ const MapMassif = ({ massifId, geogPolygon }) => {
       viewport={null}
       scrollWheelZoom={false}>
       {/* SVG renderer avoids a 0×0 canvas when the tab is hidden (print bug) */}
-      <GeoJSON data={displayGeoJson} style={MASSIF_POLYGON_STYLE} renderer={L.svg()} />
+      {/* interactive: false lets clicks pass through to entrance markers */}
+      <GeoJSON data={displayGeoJson} style={MASSIF_POLYGON_STYLE} interactive={false} renderer={L.svg()} />
       <MapInternals geoJson={geoJson} massifId={massifId} />
     </CustomMapContainer>
   );

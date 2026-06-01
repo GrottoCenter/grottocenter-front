@@ -7,6 +7,9 @@ export const FETCH_LOGIN = 'FETCH_LOGIN';
 export const FETCH_LOGIN_SUCCESS = 'FETCH_LOGIN_SUCCESS';
 export const FETCH_LOGIN_MUST_RESET = 'FETCH_LOGIN_MUST_RESET';
 export const FETCH_LOGIN_NOT_VERIFIED = 'FETCH_LOGIN_NOT_VERIFIED';
+export const FETCH_LOGIN_MFA_REQUIRED = 'FETCH_LOGIN_MFA_REQUIRED';
+export const FETCH_LOGIN_MFA_ENROLLMENT_REQUIRED =
+  'FETCH_LOGIN_MFA_ENROLLMENT_REQUIRED';
 export const FETCH_LOGIN_FAILURE = 'FETCH_LOGIN_FAILURE';
 export const FETCH_LOGIN_RESET_SUCCESS = 'FETCH_LOGIN_RESET_SUCCESS';
 
@@ -35,6 +38,15 @@ export const fetchLoginNotVerified = (context = 'login', email = '') => ({
   type: FETCH_LOGIN_NOT_VERIFIED,
   context,
   email
+});
+
+export const fetchLoginMfaRequired = () => ({
+  type: FETCH_LOGIN_MFA_REQUIRED
+});
+
+export const fetchLoginMfaEnrollmentRequired = enrollmentToken => ({
+  type: FETCH_LOGIN_MFA_ENROLLMENT_REQUIRED,
+  enrollmentToken
 });
 
 export const fetchLoginResetSuccess = () => ({
@@ -117,6 +129,16 @@ export function postLogin(email, password) {
 
         if (json?.status === 'NotVerified') {
           dispatch(fetchLoginNotVerified('login', email));
+          return;
+        }
+
+        if (json?.status === 'MfaRequired') {
+          dispatch(fetchLoginMfaRequired());
+          return;
+        }
+
+        if (json?.status === 'MfaEnrollmentRequired') {
+          dispatch(fetchLoginMfaEnrollmentRequired(json.enrollmentToken));
           return;
         }
 
