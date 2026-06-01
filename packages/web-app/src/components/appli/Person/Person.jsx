@@ -114,6 +114,9 @@ const Person = ({ isLoading, person, error }) => {
         : (person.nickname ?? '');
   }
 
+  // The API consistently returns "type": "CAVER" or "type": "AUTHOR" on person responses,
+  // even though the field is not documented in the Swagger specification. Checking
+  // `person?.type !== 'AUTHOR'` correctly prevents showing the messaging action for authors.
   const canMessage =
     !canEdit && userId && person?.type !== 'AUTHOR' && !person?.isBanned && !person?.isDeleted;
 

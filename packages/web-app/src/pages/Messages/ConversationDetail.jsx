@@ -234,7 +234,7 @@ const ConversationDetail = () => {
     setSelectedMessageToReport(null);
   };
 
-  const handleConfirmReport = () => {
+  const handleConfirmReport = async () => {
     if (!selectedMessageToReport) return;
 
     const senderName = selectedMessageToReport.caverSender?.nickname || 'Unknown';
@@ -246,21 +246,19 @@ Sender: ${senderName} (ID: ${selectedMessageToReport.caverSender?.id || 'Unknown
 Date: ${date}
 Message Body: ${body}`;
 
-    navigator.clipboard.writeText(textToCopy)
-      .then(() => {
-        onSuccess(formatMessage({ id: 'Message details copied to clipboard.', defaultMessage: 'Message details copied to clipboard.' }));
-      })
-      .catch((err) => {
-        console.error('Failed to copy text to clipboard:', err);
-        onError(
-          formatMessage({
-            id: 'Failed to copy message details to clipboard. Please copy them manually.',
-            defaultMessage: 'Failed to copy message details to clipboard. Please copy them manually.'
-          })
-        );
-      });
-
-    window.open('https://en.wikicaves.org/contact', '_blank', 'noopener,noreferrer');
+    try {
+      await navigator.clipboard.writeText(textToCopy);
+      onSuccess(formatMessage({ id: 'Message details copied to clipboard.', defaultMessage: 'Message details copied to clipboard.' }));
+      window.open('https://en.wikicaves.org/contact', '_blank', 'noopener,noreferrer');
+    } catch (err) {
+      console.error('Failed to copy text to clipboard:', err);
+      onError(
+        formatMessage({
+          id: 'Failed to copy message details to clipboard. Please copy them manually.',
+          defaultMessage: 'Failed to copy message details to clipboard. Please copy them manually.'
+        })
+      );
+    }
 
     handleCloseReportDialog();
   };
