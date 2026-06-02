@@ -56,7 +56,7 @@
     "react-dropzone-uploader": "^2.11.0",
     "react-error-boundary": "^6.1.1",
     "react-hook-form": "^7.74.0",
-    "react-intl": "^8.1.4",
+    "react-intl": "^10.1.11",
     "react-leaflet": "^5.0.0",
     "react-leaflet-draw": "^0.21.0",
     "react-papaparse": "^4.4.0",
