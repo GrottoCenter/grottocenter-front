@@ -35,6 +35,7 @@ import AddMassif from './pages/EntityCreation/AddMassif';
 import AddOrganization from './pages/EntityCreation/AddOrganization';
 import EntryPage from './pages/Entry';
 import ImportContainer from './pages/ImportCSV';
+import ImportObservationsCsv from './components/appli/ImportObservationsCsv';
 import ManageUsers from './pages/Admin/ManageUsers';
 import Map from './pages/Map';
 import MassifPage from './pages/Massif';
@@ -127,6 +128,7 @@ const router = createBrowserRouter(
       <Route path="/ui/documents/validation" element={<DocumentValidation />} />
       <Route path="/ui/documents/:documentId" element={<DocumentDetails />} />
       <Route path="/ui/import-csv" element={<ImportContainer />} />
+      <Route path="/ui/import-observations" element={<ImportObservationsCsv />} />
       <Route path="/ui/duplicates" element={<DuplicateImportHandle />} />
 
       {/* Routes requiring authentication */}
