@@ -1,5 +1,10 @@
 import arrFindReplaceOrAdd from './utils';
 import swapRelevance from './swapRelevance';
+import { POST_GUIDELINE_SUCCESS } from '../actions/Guideline/CreateGuideline';
+import { PUT_GUIDELINE_SUCCESS } from '../actions/Guideline/UpdateGuideline';
+import { DELETE_GUIDELINE_SUCCESS } from '../actions/Guideline/DeleteGuideline';
+import { RESTORE_GUIDELINE_SUCCESS } from '../actions/Guideline/RestoreGuideline';
+import { ROLLBACK_GUIDELINE_SUCCESS } from '../actions/Guideline/RollbackGuideline';
 import {
   FETCH_MASSIF,
   FETCH_MASSIF_FAILURE,
@@ -71,6 +76,47 @@ const reducer = (state = initialState, action) => {
           )
         }
       };
+    case POST_GUIDELINE_SUCCESS: {
+      if (
+        !state.massif ||
+        action.guideline.entityType !== 'massif' ||
+        String(action.guideline.entityId) !== String(state.massif.id)
+      ) {
+        return state;
+      }
+      const guidelines = state.massif.guidelines || [];
+      if (guidelines.some(g => g.id === action.guideline.id)) {
+        return state;
+      }
+      return {
+        ...state,
+        massif: {
+          ...state.massif,
+          guidelines: [...guidelines, action.guideline]
+        }
+      };
+    }
+    case PUT_GUIDELINE_SUCCESS:
+    case DELETE_GUIDELINE_SUCCESS:
+    case RESTORE_GUIDELINE_SUCCESS:
+    case ROLLBACK_GUIDELINE_SUCCESS: {
+      if (
+        !state.massif ||
+        action.guideline.entityType !== 'massif' ||
+        String(action.guideline.entityId) !== String(state.massif.id)
+      ) {
+        return state;
+      }
+      return {
+        ...state,
+        massif: {
+          ...state.massif,
+          guidelines: (state.massif.guidelines || []).map(g =>
+            g.id === action.guideline.id ? action.guideline : g
+          )
+        }
+      };
+    }
     default:
       return state;
   }

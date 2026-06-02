@@ -3,6 +3,11 @@ import {
   FETCH_COUNTRY_FAILURE,
   FETCH_COUNTRY_SUCCESS
 } from '../actions/Country/GetCountry';
+import { POST_GUIDELINE_SUCCESS } from '../actions/Guideline/CreateGuideline';
+import { PUT_GUIDELINE_SUCCESS } from '../actions/Guideline/UpdateGuideline';
+import { DELETE_GUIDELINE_SUCCESS } from '../actions/Guideline/DeleteGuideline';
+import { RESTORE_GUIDELINE_SUCCESS } from '../actions/Guideline/RestoreGuideline';
+import { ROLLBACK_GUIDELINE_SUCCESS } from '../actions/Guideline/RollbackGuideline';
 
 import REDUCER_STATUS from './ReducerStatus';
 
@@ -32,6 +37,48 @@ const reducer = (state = initialState, action) => {
         error: action.error,
         status: REDUCER_STATUS.FAILED
       };
+
+    case POST_GUIDELINE_SUCCESS: {
+      if (
+        !state.country ||
+        action.guideline.entityType !== 'country' ||
+        String(action.guideline.entityId) !== String(state.country.id)
+      ) {
+        return state;
+      }
+      const guidelines = state.country.guidelines || [];
+      if (guidelines.some(g => g.id === action.guideline.id)) {
+        return state;
+      }
+      return {
+        ...state,
+        country: {
+          ...state.country,
+          guidelines: [...guidelines, action.guideline]
+        }
+      };
+    }
+    case PUT_GUIDELINE_SUCCESS:
+    case DELETE_GUIDELINE_SUCCESS:
+    case RESTORE_GUIDELINE_SUCCESS:
+    case ROLLBACK_GUIDELINE_SUCCESS: {
+      if (
+        !state.country ||
+        action.guideline.entityType !== 'country' ||
+        String(action.guideline.entityId) !== String(state.country.id)
+      ) {
+        return state;
+      }
+      return {
+        ...state,
+        country: {
+          ...state.country,
+          guidelines: (state.country.guidelines || []).map(g =>
+            g.id === action.guideline.id ? action.guideline : g
+          )
+        }
+      };
+    }
 
     default:
       return state;

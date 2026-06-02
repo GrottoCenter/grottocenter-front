@@ -7,21 +7,27 @@ import { HighLightsLine } from '../../../../common/Highlights';
 
 const INFORMATION_NOT_FOUND = 'unknown';
 
-const GenericSnapshots = ({ data, previous }) => (
-  <MultilinesTypography variant="body1" component="div">
-    {data.body ? (
-      <HighLightsLine oldText={previous?.body} newText={data.body} />
-    ) : (
-      <Translate>{INFORMATION_NOT_FOUND}</Translate>
-    )}
-  </MultilinesTypography>
-);
+const GenericSnapshots = ({ data, previous }) => {
+  const newText = data.body ?? data.description;
+  const oldText = previous?.body ?? previous?.description;
+  return (
+    <MultilinesTypography variant="body1" component="div">
+      {newText ? (
+        <HighLightsLine oldText={oldText} newText={newText} />
+      ) : (
+        <Translate>{INFORMATION_NOT_FOUND}</Translate>
+      )}
+    </MultilinesTypography>
+  );
+};
 GenericSnapshots.propTypes = {
   data: PropTypes.shape({
-    body: PropTypes.string
+    body: PropTypes.string,
+    description: PropTypes.string
   }),
   previous: PropTypes.shape({
-    body: PropTypes.string
+    body: PropTypes.string,
+    description: PropTypes.string
   })
 };
 export default GenericSnapshots;
