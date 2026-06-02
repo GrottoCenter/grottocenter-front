@@ -87,7 +87,7 @@
     "@storybook/react-webpack5": "8.6.14",
     "@testing-library/dom": "^10.4.1",
     "@types/validator": "^13",
-    "fast-check": "4.5.3",
+    "fast-check": "4.8.0",
     "sharp": "^0.34.5",
     "storybook": "^8.6.18",
     "storybook-react-router": "1.0.8"
