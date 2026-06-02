@@ -33,7 +33,7 @@
     "cypress": "^15.13.0",
     "d3": "^7.9.0",
     "d3-hexbin": "^0.2.2",
-    "date-fns": "^4.1.0",
+    "date-fns": "^4.4.0",
     "diff": "^8.0.4",
     "isomorphic-fetch": "^3.0.0",
     "leaflet": "^1.9.4",
