@@ -34,6 +34,7 @@ import ScrollableContent from '../../common/Layouts/Fixed/ScrollableContent';
 import CustomIcon from '../../common/CustomIcon';
 
 import Properties from './Properties';
+import GuidelinesGrouped from '../Guidelines/GuidelinesGrouped';
 import Descriptions from '../Descriptions';
 import Locations from './Locations';
 import Riggings from './Riggings/Riggings';
@@ -424,6 +425,9 @@ export const Entry = ({ isLoading, error, entrance }) => {
                 entityId={entrance.id}
                 isEditAllowed={!entrance.isDeleted}
               />
+              {entrance.guidelines && (
+                <GuidelinesGrouped guidelines={entrance.guidelines} />
+              )}
               <Riggings
                 riggings={entrance.riggings}
                 entranceId={entrance.id}

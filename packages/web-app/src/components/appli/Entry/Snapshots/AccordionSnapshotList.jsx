@@ -27,6 +27,7 @@ const AccordionSnapshotList = ({ data, type, isNetwork, actualItem }) => {
                     author={snapshot.author}
                     reviewer={snapshot.reviewer}
                     previous={previousVersion}
+                    actualItem={actualItem}
                   />
                 );
                 previousVersion = snapshot;

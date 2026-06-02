@@ -19,6 +19,7 @@ import PageHeader from '../../common/Layouts/PageHeader';
 import ResponsiveActions from '../../common/Layouts/ResponsiveActions';
 import ScrollableContent from '../../common/Layouts/Fixed/ScrollableContent';
 import CustomIcon from '../../common/CustomIcon';
+import GuidelinesGrouped from '../Guidelines/GuidelinesGrouped';
 import EntrancesMap from './EntrancesMap';
 import Properties from './Properties';
 import { deleteCave } from '../../../actions/Cave/DeleteCave';
@@ -311,6 +312,9 @@ export const Network = ({ isLoading, error, cave }) => {
             entityId={cave.id}
             isEditAllowed={!cave.isDeleted}
           />
+          {cave.guidelines && (
+            <GuidelinesGrouped guidelines={cave.guidelines} />
+          )}
           {isAuth && (
             <StandardDialog
               fullWidth

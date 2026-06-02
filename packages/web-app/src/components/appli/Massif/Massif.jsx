@@ -33,6 +33,7 @@ import EntitiesList from '../../common/entitiesList/EntitiesList';
 import Alert from '../../common/Alert';
 import MapMassif from './MapMassif';
 import Documents from './Documents';
+import Guidelines from '../Guidelines';
 import Descriptions from '../Descriptions';
 import StatisticsDataDashboard from '../StatisticsDataDashboard';
 import CustomIcon from '../../common/CustomIcon';
@@ -311,6 +312,13 @@ const Massif = ({ isLoading, error, massif }) => {
                   id: 'Discover the numbers about this massif and its caves.'
                 })}
               />
+              {(massif.guidelines?.length > 0 || permissions.isAuth) && (
+                <Guidelines
+                  entityType="massifs"
+                  entityId={massif.id}
+                  guidelines={massif.guidelines}
+                />
+              )}
               {massif?.networks?.length > 0 && (
                 <ScrollableContent
                   dense
