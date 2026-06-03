@@ -4,7 +4,7 @@ import {
   FETCH_COUNTRY_SUCCESS
 } from '../actions/Country/GetCountry';
 import { POST_GUIDELINE_SUCCESS } from '../actions/Guideline/CreateGuideline';
-import { PUT_GUIDELINE_SUCCESS } from '../actions/Guideline/UpdateGuideline';
+import { PATCH_GUIDELINE_SUCCESS } from '../actions/Guideline/UpdateGuideline';
 import { DELETE_GUIDELINE_SUCCESS } from '../actions/Guideline/DeleteGuideline';
 import { RESTORE_GUIDELINE_SUCCESS } from '../actions/Guideline/RestoreGuideline';
 import { ROLLBACK_GUIDELINE_SUCCESS } from '../actions/Guideline/RollbackGuideline';
@@ -58,7 +58,7 @@ const reducer = (state = initialState, action) => {
         }
       };
     }
-    case PUT_GUIDELINE_SUCCESS:
+    case PATCH_GUIDELINE_SUCCESS:
     case DELETE_GUIDELINE_SUCCESS:
     case RESTORE_GUIDELINE_SUCCESS:
     case ROLLBACK_GUIDELINE_SUCCESS: {

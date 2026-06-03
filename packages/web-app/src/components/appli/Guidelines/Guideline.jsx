@@ -6,7 +6,7 @@ import { styled } from '@mui/material/styles';
 import { SnapshotButton } from '../Entry/Snapshots/UtilityFunction';
 import GuidelinePropTypes from '../../../types/guideline.type';
 import GuidelineForm from '../EntitiesForm/Guideline/index';
-import { putGuideline } from '../../../actions/Guideline/UpdateGuideline';
+import { patchGuideline } from '../../../actions/Guideline/UpdateGuideline';
 import { deleteGuideline } from '../../../actions/Guideline/DeleteGuideline';
 import { restoreGuideline } from '../../../actions/Guideline/RestoreGuideline';
 import ActionButtons from '../Entry/ActionButtons';
@@ -37,7 +37,7 @@ const Guideline = ({
 
   const onSubmitForm = data => {
     dispatch(
-      putGuideline({
+      patchGuideline({
         id: guideline.id,
         title: data.title,
         description: data.description,

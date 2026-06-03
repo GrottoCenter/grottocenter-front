@@ -22,7 +22,7 @@ export const deleteGuidelineFailure = error => ({
 });
 
 export const deleteGuideline =
-  ({ id }) =>
+  ({ id, isPermanent }) =>
   (dispatch, getState) => {
     dispatch(deleteGuidelineAction());
 
@@ -31,7 +31,7 @@ export const deleteGuideline =
       headers: getState().login.authorizationHeader
     };
 
-    return fetch(deleteGuidelineUrl(id), requestOptions)
+    return fetch(deleteGuidelineUrl(id, isPermanent), requestOptions)
       .then(checkAuthStatus(dispatch))
       .then(response => response.json())
       .then(data => dispatch(deleteGuidelineSuccess(data)))

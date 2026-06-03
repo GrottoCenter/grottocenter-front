@@ -1,30 +1,30 @@
 import fetch from 'isomorphic-fetch';
-import { putGuidelineUrl } from '../../conf/apiRoutes';
+import { patchGuidelineUrl } from '../../conf/apiRoutes';
 import makeErrorMessage from '../../helpers/makeErrorMessage';
 import { checkAuthStatus } from '../utils';
 
-export const PUT_GUIDELINE = 'PUT_GUIDELINE';
-export const PUT_GUIDELINE_SUCCESS = 'PUT_GUIDELINE_SUCCESS';
-export const PUT_GUIDELINE_FAILURE = 'PUT_GUIDELINE_FAILURE';
+export const PATCH_GUIDELINE = 'PATCH_GUIDELINE';
+export const PATCH_GUIDELINE_SUCCESS = 'PATCH_GUIDELINE_SUCCESS';
+export const PATCH_GUIDELINE_FAILURE = 'PATCH_GUIDELINE_FAILURE';
 
-export const putGuidelineAction = () => ({
-  type: PUT_GUIDELINE
+export const patchGuidelineAction = () => ({
+  type: PATCH_GUIDELINE
 });
 
-export const putGuidelineSuccess = guideline => ({
-  type: PUT_GUIDELINE_SUCCESS,
+export const patchGuidelineSuccess = guideline => ({
+  type: PATCH_GUIDELINE_SUCCESS,
   guideline
 });
 
-export const putGuidelineFailure = error => ({
-  type: PUT_GUIDELINE_FAILURE,
+export const patchGuidelineFailure = error => ({
+  type: PATCH_GUIDELINE_FAILURE,
   error
 });
 
-export const putGuideline =
+export const patchGuideline =
   ({ id, title, description, language }) =>
   (dispatch, getState) => {
-    dispatch(putGuidelineAction());
+    dispatch(patchGuidelineAction());
 
     const requestOptions = {
       method: 'PATCH',
@@ -35,14 +35,14 @@ export const putGuideline =
       }
     };
 
-    return fetch(putGuidelineUrl(id), requestOptions)
+    return fetch(patchGuidelineUrl(id), requestOptions)
       .then(checkAuthStatus(dispatch))
       .then(response => response.json())
-      .then(data => dispatch(putGuidelineSuccess(data)))
+      .then(data => dispatch(patchGuidelineSuccess(data)))
       .catch(error => {
         if (error.isAuthError) return;
         dispatch(
-          putGuidelineFailure(
+          patchGuidelineFailure(
             makeErrorMessage(error.message, `Updating guideline`),
             error.message
           )
