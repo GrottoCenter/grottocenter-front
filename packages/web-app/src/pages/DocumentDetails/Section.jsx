@@ -273,11 +273,17 @@ export const FilesSection = ({ files }) => {
 
       {pdfs.map(file => (
         <Box key={file.completePath}>
-          <Box sx={{ mb: 1 }}>
-            <FileListElement
-              fileName={file.fileName}
-              filePath={file.completePath}
-            />
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 1,
+              mb: 1
+            }}>
+            {getFileIcon(file.fileName)}
+            <GCLink href={file.completePath}>
+              {decodeFileName(file.fileName)}
+            </GCLink>
           </Box>
           <PdfPreview data={file.completePath} type="application/pdf">
             <Typography variant="body2">
