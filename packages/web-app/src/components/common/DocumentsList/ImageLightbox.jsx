@@ -1,63 +1,93 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import PropTypes from 'prop-types';
-import { IconButton, Box, Typography, Button } from '@mui/material';
+import { Dialog, IconButton, Box, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import { NavigateBefore, NavigateNext, Download } from '@mui/icons-material';
+import {
+  NavigateBefore,
+  NavigateNext,
+  Close,
+  Download
+} from '@mui/icons-material';
 import { useIntl } from 'react-intl';
-import StandardDialog from '../StandardDialog';
 import { decodeFileName, downloadFile } from './utils/imageUtils';
 
-const LightboxContent = styled(Box)`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: calc(100vh - 190px); /* fallback for old browsers */
-  height: calc(100dvh - 190px);
-  position: relative;
-  overflow: hidden;
+const LightboxDialog = styled(Dialog)`
+  .MuiDialog-paper {
+    background-color: rgba(0, 0, 0, 0.95);
+    margin: 0;
+    max-width: 100%;
+    max-height: 100%;
+    width: 100%;
+    height: 100%;
+    border-radius: 0;
+  }
 `;
 
-const NavigationButton = styled(IconButton)`
-  position: absolute;
-  background-color: rgba(0, 0, 0, 0.3);
+const OverlayButton = styled(IconButton)`
   color: white;
-  z-index: 1;
+  background-color: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(4px);
 
   &:hover,
-  &:active,
   &:focus-visible {
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: rgba(0, 0, 0, 0.65);
   }
+`;
+
+const NavButton = styled(OverlayButton)`
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 2;
 
   &.previous {
-    left: 0;
+    left: 12px;
   }
-
   &.next {
-    right: 0;
+    right: 12px;
   }
 
   @media (min-width: 600px) {
     &.previous {
-      left: 20px;
+      left: 24px;
     }
-
     &.next {
-      right: 20px;
-    }
-  }
-
-  @media (hover: hover) {
-    &:hover {
-      background-color: rgba(0, 0, 0, 0.7);
+      right: 24px;
     }
   }
 `;
 
+const TopBar = styled(Box)`
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: flex;
+  gap: 8px;
+  padding: 12px;
+  z-index: 3;
+`;
+
+const BottomBar = styled(Box)`
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 12px 16px;
+  gap: 2px;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.7));
+  z-index: 2;
+  pointer-events: none;
+`;
+
 const LightboxImage = styled('img')`
-  max-width: 90%;
-  max-height: 90%;
+  width: 100%;
+  height: 100%;
   object-fit: contain;
+  display: block;
+  user-select: none;
 `;
 
 const ImageLightbox = ({
@@ -71,17 +101,18 @@ const ImageLightbox = ({
   const [zoom, setZoom] = useState(1);
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
+  const [isTouchPanning, setIsTouchPanning] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const touchStartDistance = useRef(null);
+  const zoomAtPinchStart = useRef(1);
+  const touchPanStart = useRef(null);
+  const lastTapTime = useRef(0);
   const { formatMessage } = useIntl();
 
-  // Reset index when opening or when initialIndex changes
   useEffect(() => {
-    if (open) {
-      setCurrentIndex(initialIndex);
-    }
+    if (open) setCurrentIndex(initialIndex);
   }, [open, initialIndex]);
 
-  // Reset zoom and position when image changes or lightbox closes
   useEffect(() => {
     setZoom(1);
     setPosition({ x: 0, y: 0 });
@@ -105,53 +136,98 @@ const ImageLightbox = ({
     setZoom(prev => Math.min(Math.max(prev + delta, 0.5), 5));
   }, []);
 
-  // Attach wheel with { passive: false } so preventDefault() works in React 19.
-  // Uses a callback ref so the listener is added as soon as the dialog mounts
-  // the node, and removed when it unmounts or the ref changes.
+  const handleTouchMove = useCallback(e => {
+    if (e.touches.length === 2) {
+      e.preventDefault();
+      if (touchStartDistance.current === null) return;
+      const dx = e.touches[0].clientX - e.touches[1].clientX;
+      const dy = e.touches[0].clientY - e.touches[1].clientY;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      setZoom(
+        Math.min(Math.max(zoomAtPinchStart.current * (dist / touchStartDistance.current), 0.5), 5)
+      );
+    } else if (e.touches.length === 1 && touchPanStart.current !== null) {
+      e.preventDefault();
+      const dx = e.touches[0].clientX - touchPanStart.current.x;
+      const dy = e.touches[0].clientY - touchPanStart.current.y;
+      touchPanStart.current = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+      setIsTouchPanning(true);
+      setPosition(prev => ({ x: prev.x + dx, y: prev.y + dy }));
+    }
+  }, []);
+
+  // Attach wheel + touchmove with { passive: false } so preventDefault() works in React 19
   const wheelNodeRef = useRef(null);
   const contentRef = useCallback(
     node => {
       if (wheelNodeRef.current) {
         wheelNodeRef.current.removeEventListener('wheel', handleWheel);
+        wheelNodeRef.current.removeEventListener('touchmove', handleTouchMove);
       }
       wheelNodeRef.current = node;
       if (node) {
         node.addEventListener('wheel', handleWheel, { passive: false });
+        node.addEventListener('touchmove', handleTouchMove, { passive: false });
       }
     },
-    [handleWheel]
+    [handleWheel, handleTouchMove]
   );
 
   const handleMouseDown = e => {
     if (zoom > 1) {
       e.preventDefault();
       setIsDragging(true);
-      setDragStart({
-        x: e.clientX - position.x,
-        y: e.clientY - position.y
-      });
+      setDragStart({ x: e.clientX - position.x, y: e.clientY - position.y });
     }
   };
 
   const handleMouseMove = e => {
     if (isDragging) {
       e.preventDefault();
-      setPosition({
-        x: e.clientX - dragStart.x,
-        y: e.clientY - dragStart.y
-      });
+      setPosition({ x: e.clientX - dragStart.x, y: e.clientY - dragStart.y });
     }
   };
 
-  const handleMouseUp = () => {
-    setIsDragging(false);
+  const handleMouseUp = () => setIsDragging(false);
+
+  const handleTouchStart = e => {
+    if (e.touches.length === 2) {
+      const dx = e.touches[0].clientX - e.touches[1].clientX;
+      const dy = e.touches[0].clientY - e.touches[1].clientY;
+      touchStartDistance.current = Math.sqrt(dx * dx + dy * dy);
+      zoomAtPinchStart.current = zoom;
+      touchPanStart.current = null;
+    } else if (e.touches.length === 1 && zoom > 1) {
+      touchStartDistance.current = null;
+      touchPanStart.current = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+    } else {
+      touchStartDistance.current = null;
+      touchPanStart.current = null;
+    }
   };
 
-  // Keyboard navigation
+  const handleTouchEnd = e => {
+    const wasPinch = touchStartDistance.current !== null;
+    touchStartDistance.current = null;
+    touchPanStart.current = null;
+    setIsTouchPanning(false);
+
+    // Double-tap to zoom — skip if ending a pinch gesture
+    if (!wasPinch && e.changedTouches.length === 1) {
+      const now = Date.now();
+      if (now - lastTapTime.current < 300) {
+        setZoom(prev => (prev > 1 ? 1 : 2.5));
+        setPosition({ x: 0, y: 0 });
+        lastTapTime.current = 0;
+      } else {
+        lastTapTime.current = now;
+      }
+    }
+  };
+
   useEffect(() => {
     const handleKeyDown = e => {
       if (!open) return;
-
       if (e.key === 'ArrowLeft') {
         e.preventDefault();
         handlePrevious();
@@ -160,114 +236,114 @@ const ImageLightbox = ({
         handleNext();
       }
     };
-
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [open, currentIndex, images.length, handlePrevious, handleNext]);
+  }, [open, handlePrevious, handleNext]);
 
-  if (!currentImage) {
-    return null;
-  }
+  if (!currentImage) return null;
 
   return (
-    <StandardDialog
+    <LightboxDialog
       open={open}
       onClose={onClose}
       fullScreen
-      maxWidth="xl"
-      title={
-        <Typography variant="subtitle1" component="h2">
-          {decodeFileName(currentImage.fileName)}
-        </Typography>
-      }
-      actions={
-        <Button
-          startIcon={<Download />}
-          onClick={() =>
-            downloadFile(
-              currentImage.completePath,
-              decodeFileName(currentImage.fileName)
-            )
-          }
-          variant="contained"
-          color="primary">
-          {formatMessage({ id: 'Download' })}
-        </Button>
-      }>
-      <LightboxContent ref={contentRef}>
-        {hasMultipleImages && (
-          <NavigationButton
-            className="previous"
-            onClick={handlePrevious}
-            aria-label={formatMessage({ id: 'Previous image' })}
-            size="large">
-            <NavigateBefore fontSize="large" />
-          </NavigationButton>
-        )}
-
+      aria-label={decodeFileName(currentImage.fileName)}>
+      <Box
+        ref={contentRef}
+        sx={{
+          position: 'relative',
+          width: '100%',
+          height: '100%',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          overflow: 'hidden',
+          touchAction: 'none'
+        }}
+        onMouseDown={handleMouseDown}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+        onMouseLeave={handleMouseUp}
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}>
         <LightboxImage
           src={currentImage.completePath}
           alt={decodeFileName(currentImage.fileName)}
-          onMouseDown={handleMouseDown}
-          onMouseMove={handleMouseMove}
-          onMouseUp={handleMouseUp}
-          onMouseLeave={handleMouseUp}
           draggable={false}
           style={{
             transform: `scale(${zoom}) translate(${position.x / zoom}px, ${
               position.y / zoom
             }px)`,
-            transition: isDragging ? 'none' : 'transform 0.2s',
+            transition: isDragging || isTouchPanning ? 'none' : 'transform 0.2s',
             transformOrigin: 'center',
-            cursor: zoom > 1 ? (isDragging ? 'grabbing' : 'grab') : 'default',
-            userSelect: 'none'
+            cursor:
+              zoom > 1 ? (isDragging ? 'grabbing' : 'grab') : 'default'
           }}
         />
 
-        {hasMultipleImages && (
-          <NavigationButton
-            className="next"
-            onClick={handleNext}
-            aria-label={formatMessage({ id: 'Next image' })}
-            size="large">
-            <NavigateNext fontSize="large" />
-          </NavigationButton>
-        )}
-      </LightboxContent>
+        <TopBar>
+          <OverlayButton
+            onClick={() =>
+              downloadFile(
+                currentImage.completePath,
+                decodeFileName(currentImage.fileName)
+              )
+            }
+            aria-label={formatMessage({ id: 'Download' })}>
+            <Download />
+          </OverlayButton>
+          <OverlayButton
+            onClick={onClose}
+            aria-label={formatMessage({ id: 'Close' })}>
+            <Close />
+          </OverlayButton>
+        </TopBar>
 
-      <Box
-        sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          mt: '2px',
-          px: 2,
-          py: '2px',
-          minHeight: '24px'
-        }}>
-        {(currentImage.description || description) && (
-          <Typography
-            variant="body2"
-            sx={{
-              textAlign: 'center',
-              color: 'text.secondary'
-            }}>
-            {currentImage.description || description}
-          </Typography>
-        )}
         {hasMultipleImages && (
-          <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-            {formatMessage(
-              { id: 'Image {current} of {total}' },
-              {
-                current: currentIndex + 1,
-                total: images.length
-              }
-            )}
-          </Typography>
+          <>
+            <NavButton
+              className="previous"
+              onClick={handlePrevious}
+              aria-label={formatMessage({ id: 'Previous image' })}
+              size="large">
+              <NavigateBefore fontSize="large" />
+            </NavButton>
+            <NavButton
+              className="next"
+              onClick={handleNext}
+              aria-label={formatMessage({ id: 'Next image' })}
+              size="large">
+              <NavigateNext fontSize="large" />
+            </NavButton>
+          </>
         )}
+
+        <BottomBar>
+          <Typography
+            variant="caption"
+            sx={{ color: 'rgba(255,255,255,0.6)', textAlign: 'center' }}>
+            {decodeFileName(currentImage.fileName)}
+          </Typography>
+          {(currentImage.description || description) && (
+            <Typography
+              variant="body2"
+              sx={{ color: 'white', textAlign: 'center' }}>
+              {currentImage.description || description}
+            </Typography>
+          )}
+          {hasMultipleImages && (
+            <Typography
+              variant="caption"
+              sx={{ color: 'rgba(255,255,255,0.45)' }}>
+              {formatMessage(
+                { id: 'Image {current} of {total}' },
+                { current: currentIndex + 1, total: images.length }
+              )}
+            </Typography>
+          )}
+        </BottomBar>
       </Box>
-    </StandardDialog>
+    </LightboxDialog>
   );
 };
 
