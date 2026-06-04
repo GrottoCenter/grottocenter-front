@@ -18,6 +18,7 @@ import { PersonPropTypes } from '../../../types/person.type';
 import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
 import TravelExploreOutlinedIcon from '@mui/icons-material/TravelExploreOutlined';
 import PermMediaOutlinedIcon from '@mui/icons-material/PermMediaOutlined';
+import PageContainer from '../../common/Layouts/PageContainer';
 import PageHeader from '../../common/Layouts/PageHeader';
 import PageTabs from '../../common/Layouts/PageTabs';
 import ResponsiveActions from '../../common/Layouts/ResponsiveActions';
@@ -200,7 +201,7 @@ const Person = ({ isLoading, person, error }) => {
   ];
 
   return (
-    <>
+    <PageContainer>
       <PageHeader
         title={isLoading ? undefined : title}
         icon={<CustomIcon type="caver" />}
@@ -315,7 +316,7 @@ const Person = ({ isLoading, person, error }) => {
           )}
         </div>
       </PageTabs>
-    </>
+    </PageContainer>
   );
 };
 

@@ -11,6 +11,8 @@ import {
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 
+import PageContainer from '../PageContainer';
+
 const Card = styled(MuiCard)`
   margin: ${({ theme }) => theme.spacing(2)};
   height: 100%;
@@ -36,6 +38,7 @@ const TitleIcon = styled('span')`
 `;
 
 const FixedContent = ({ subheader, title, icon, action, content }) => (
+  <PageContainer>
   <Card>
     <CardHeader
       subheader={subheader}
@@ -65,6 +68,7 @@ const FixedContent = ({ subheader, title, icon, action, content }) => (
     />
     <CardContent>{content}</CardContent>
   </Card>
+  </PageContainer>
 );
 
 FixedContent.propTypes = {

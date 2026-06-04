@@ -25,6 +25,7 @@ import { deleteMassif } from '../../../actions/Massif/DeleteMassif';
 import { restoreMassif } from '../../../actions/Massif/RestoreMassif';
 import ExploreOutlinedIcon from '@mui/icons-material/ExploreOutlined';
 import PermMediaOutlinedIcon from '@mui/icons-material/PermMediaOutlined';
+import PageContainer from '../../common/Layouts/PageContainer';
 import PageHeader from '../../common/Layouts/PageHeader';
 import PageTabs from '../../common/Layouts/PageTabs';
 import ResponsiveActions from '../../common/Layouts/ResponsiveActions';
@@ -177,6 +178,7 @@ const Massif = ({ isLoading, error, massif }) => {
   ];
 
   return (
+    <PageContainer>
     <div ref={componentRef}>
       <PageHeader
         title={massif?.name ?? (isLoading ? undefined : '')}
@@ -342,6 +344,7 @@ const Massif = ({ isLoading, error, massif }) => {
         </div>
       </PageTabs>
     </div>
+    </PageContainer>
   );
 };
 

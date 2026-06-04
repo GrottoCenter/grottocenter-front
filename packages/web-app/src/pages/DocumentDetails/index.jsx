@@ -33,6 +33,7 @@ import { deleteDocument } from '../../actions/Document/DeleteDocument';
 import { restoreDocument } from '../../actions/Document/RestoreDocument';
 import { loadLanguages } from '../../actions/Language';
 import { usePermissions, useSharePage } from '../../hooks';
+import PageContainer from '../../components/common/Layouts/PageContainer';
 import PageHeader from '../../components/common/Layouts/PageHeader';
 import ResponsiveActions from '../../components/common/Layouts/ResponsiveActions';
 import ScrollableContent from '../../components/common/Layouts/Fixed/ScrollableContent';
@@ -322,7 +323,7 @@ const Document = ({
   );
 
   return (
-    <>
+    <PageContainer>
       <PageHeader
         title={documentData?.title ?? (isLoading ? undefined : '')}
         icon={<CustomIcon type="bibliography" />}
@@ -628,7 +629,7 @@ const Document = ({
           )}
         </>
       )}
-    </>
+    </PageContainer>
   );
 };
 
