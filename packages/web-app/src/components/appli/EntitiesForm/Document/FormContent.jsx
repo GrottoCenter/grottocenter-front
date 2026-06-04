@@ -162,14 +162,25 @@ const FormContent = ({ onCancel }) => {
       )}
 
       {!isUnknown(docType) && isEvent(docType) && (
-        /* Event layout: Title, Description (optional), Event date, ISO location */
+        /* Event layout: Title, Language, Description (optional), Event date, ISO location */
         <Box sx={{ mt: 2 }}>
-          <StringInput
-            onValueChange={value => updateAttribute('title', value)}
-            value={document.title}
-            valueName={formatMessage({ id: 'Title' })}
-            required
-          />
+          <FormRow>
+            <StringInput
+              onValueChange={value => updateAttribute('title', value)}
+              value={document.title}
+              valueName={formatMessage({ id: 'Title' })}
+              required
+            />
+            <LanguageSelect
+              value={
+                document.mainLanguage === '000'
+                  ? userLanguageId
+                  : document.mainLanguage
+              }
+              onChange={id => updateAttribute('mainLanguage', id)}
+              label={formatMessage({ id: 'Document main language' })}
+            />
+          </FormRow>
           <StringInput
             multiline
             minRows={4}

@@ -221,6 +221,7 @@ export const filterDocumentPayload = docAttributes => {
   if (isEvent(type)) {
     allowedFields = new Set([
       ...BASE_PAYLOAD_FIELDS,
+      ...LANGUAGE_PAYLOAD_FIELDS,
       'description',
       'datePublication',
       'iso3166'
