@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { Container } from '@mui/material';
 
 const PageContainer = ({ children }) => (
-  <Container maxWidth="xl" disableGutters sx={{ pb: 1 }}>
+  <Container maxWidth={false} disableGutters sx={{ pb: 1 }}>
     {children}
   </Container>
 );
