@@ -57,6 +57,28 @@ const NavButton = styled(OverlayButton)`
   }
 `;
 
+const ZoomIndicator = styled(Box)`
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 3;
+  background-color: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(4px);
+  color: white;
+  height: 40px;
+  min-width: 40px;
+  padding: 0 12px;
+  border-radius: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.875rem;
+  font-weight: 500;
+  pointer-events: none;
+  user-select: none;
+  transition: opacity 0.2s;
+`;
+
 const TopBar = styled(Box)`
   position: absolute;
   top: 0;
@@ -280,6 +302,10 @@ const ImageLightbox = ({
               zoom > 1 ? (isDragging ? 'grabbing' : 'grab') : 'default'
           }}
         />
+
+        {zoom !== 1 && (
+          <ZoomIndicator>{Math.round(zoom * 100)}%</ZoomIndicator>
+        )}
 
         <TopBar>
           <OverlayButton
