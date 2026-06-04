@@ -306,8 +306,12 @@ const FormContent = ({ onCancel }) => {
 
             {isArticle(docType) && <PagesEditor />}
 
-            {filesIntro}
-            <AddFileForm {...addFileFormProps} />
+            {!isCollection(docType) && (
+              <>
+                {filesIntro}
+                <AddFileForm {...addFileFormProps} />
+              </>
+            )}
           </Box>
         )}
 

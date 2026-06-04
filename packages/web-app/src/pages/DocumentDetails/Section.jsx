@@ -12,7 +12,7 @@ import {
   Typography
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import { InsertDriveFile } from '@mui/icons-material';
+import { EventAvailable, InsertDriveFile } from '@mui/icons-material';
 
 import GCLink from '../../components/common/GCLink';
 import Property from '../../components/common/Properties/Property';
@@ -229,7 +229,7 @@ const FileRow = styled(Box)(({ theme }) => ({
   borderRadius: theme.spacing(1)
 }));
 
-const EmptyFiles = ({ message }) => (
+export const EmptySection = ({ icon, message }) => (
   <Paper
     variant="outlined"
     sx={{
@@ -244,11 +244,40 @@ const EmptyFiles = ({ message }) => (
       gap: 1,
       color: 'text.secondary'
     }}>
-    <InsertDriveFile fontSize="large" color="disabled" />
+    {icon ?? <InsertDriveFile fontSize="large" color="disabled" />}
     <Typography variant="body2">{message}</Typography>
   </Paper>
 );
-EmptyFiles.propTypes = { message: PropTypes.string.isRequired };
+EmptySection.propTypes = {
+  icon: PropTypes.node,
+  message: PropTypes.string.isRequired
+};
+
+export const EventDateSection = ({ date }) => {
+  const { formatMessage } = useIntl();
+  if (!date) return null;
+  return (
+    <Paper
+      variant="outlined"
+      sx={{
+        p: 2,
+        borderRadius: 2,
+        bgcolor: 'grey.50',
+        display: 'flex',
+        alignItems: 'center',
+        gap: 2
+      }}>
+      <EventAvailable sx={{ fontSize: 40, color: 'text.secondary' }} />
+      <Box>
+        <Typography variant="caption" color="text.secondary" display="block">
+          {formatMessage({ id: 'Event date' })}
+        </Typography>
+        <Typography variant="h5">{date}</Typography>
+      </Box>
+    </Paper>
+  );
+};
+EventDateSection.propTypes = { date: PropTypes.string };
 
 const ImageGallery = styled(Box)(({ theme }) => ({
   display: 'flex',
@@ -292,7 +321,7 @@ export const FilesSection = ({ files }) => {
 
   if (fileList.length === 0) {
     return (
-      <EmptyFiles
+      <EmptySection
         message={formatMessage({ id: 'No files attached to this document.' })}
       />
     );

@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { Box, Breadcrumbs, Link, Skeleton } from '@mui/material';
+import { Box, Breadcrumbs, Link, Skeleton, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { Link as RouterLink, useNavigate, useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
@@ -9,6 +9,7 @@ import Linkify from 'linkify-react';
 import CreateIcon from '@mui/icons-material/Create';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ManageHistoryIcon from '@mui/icons-material/ManageHistory';
+import NewspaperIcon from '@mui/icons-material/Newspaper';
 import ShareIcon from '@mui/icons-material/Share';
 import { NavigateNext } from '@mui/icons-material';
 
@@ -16,12 +17,15 @@ import CustomIcon from '../../components/common/CustomIcon';
 import DocumentTypeChip from '../../components/common/DocumentTypeChip';
 import {
   DOCUMENT_TYPE_ICONS,
-  DOCUMENT_TYPE_FALLBACK_ICON
+  DOCUMENT_TYPE_FALLBACK_ICON,
+  documentTypeHelpers
 } from '../../utils/documentTypeHelpers';
 import {
   DetailItem,
   DetailsList,
+  EmptySection,
   EntitiesList,
+  EventDateSection,
   FilesSection,
   ListElement,
   SummaryText,
@@ -234,6 +238,9 @@ const Document = ({
     ].filter(Boolean);
   }, [documentData, formatMessage]);
 
+  const { isCollection, isEvent } = documentTypeHelpers;
+  const docType = documentData?.type;
+
   const isActionLoading = wantedDeletedState !== documentData?.isDeleted;
 
   const snapshotUrl = documentData
@@ -393,7 +400,39 @@ const Document = ({
                         {documentData.description}
                       </Linkify>
                     </SummaryText>
-                    <FilesSection files={allFiles} />
+                    {isCollection(docType) ? (
+                      <Box>
+                        <Typography variant="h5" gutterBottom>
+                          {formatMessage({ id: 'Issues' })}
+                        </Typography>
+                        {childIssues.length > 0 ? (
+                          <EntitiesList>
+                            {childIssues.map(doc => (
+                              <ListElement
+                                key={doc.id}
+                                icon={<CustomIcon type="bibliography" />}
+                                value={doc.title}
+                                secondary={doc.description}
+                                url={`/ui/documents/${doc.id}`}
+                              />
+                            ))}
+                          </EntitiesList>
+                        ) : (
+                          <EmptySection
+                            icon={
+                              <NewspaperIcon fontSize="large" color="disabled" />
+                            }
+                            message={formatMessage({
+                              id: 'No issues in this collection.'
+                            })}
+                          />
+                        )}
+                      </Box>
+                    ) : isEvent(docType) ? (
+                      <EventDateSection date={documentData.datePublication} />
+                    ) : (
+                      <FilesSection files={allFiles} />
+                    )}
                   </MainColumn>
                   <SideColumn>
                     <DetailsList>
@@ -580,7 +619,7 @@ const Document = ({
             />
           )}
 
-          {childIssues.length > 0 && (
+          {!isCollection(docType) && childIssues.length > 0 && (
             <ScrollableContent
               dense
               title={formatMessage({ id: 'Issues' })}

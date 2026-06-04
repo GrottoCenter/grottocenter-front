@@ -225,6 +225,14 @@ export const filterDocumentPayload = docAttributes => {
       'datePublication',
       'iso3166'
     ]);
+  } else if (isCollection(type)) {
+    allowedFields = new Set([
+      ...BASE_PAYLOAD_FIELDS,
+      ...LANGUAGE_PAYLOAD_FIELDS,
+      ...ADVANCED_PAYLOAD_FIELDS,
+      'description',
+      'library'
+    ]);
   } else if (isAuthorizationToPublish(type)) {
     // FILE_PAYLOAD_FIELDS is included for structural consistency, but FormContent.jsx
     // renders <AddFileForm showAuthorization={false} /> for this type, so
