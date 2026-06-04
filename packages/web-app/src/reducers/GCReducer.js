@@ -1,16 +1,16 @@
 import { combineReducers } from 'redux';
 import account from './AccountReducer';
 import advancedsearch from './AdvancedsearchReducer';
+import authorizationDocument from './AuthorizationDocumentReducer';
 import banCaver from './BanCaverReducer';
 import bannedCavers from './BannedCaversReducer';
-import invalidEmailCavers from './InvalidEmailCaversReducer';
-import linkDocumentToEntrance from './LinkDocumentToEntrance';
-import unlinkDocumentToEntrance from './UnlinkDocumentToEntrance';
 import cave from './CaveReducer';
-import changePassword from './ChangePassword';
 import changeEmail from './ChangeEmail';
-import country from './CountryReducer';
+import changePassword from './ChangePassword';
 import countUnreadNotifications from './CountUnreadNotificationsReducer';
+import country from './CountryReducer';
+import countryEntrances from './CountryEntrancesDataQualityReducer';
+import countryRegions from './CountryRegionsReducer';
 import createCave from './CreateCaveReducer';
 import createDescription from './CreateDescription';
 import createDocument from './CreateDocumentReducer';
@@ -25,13 +25,10 @@ import dbExport from './DBExportReducer';
 import detachEntrance from './DetachEntranceReducer';
 import documentChildren from './DocumentChildrenReducer';
 import documentDetails from './DetailsDocumentReducer';
-import parentDocument from './ParentDocumentReducer';
-import authorizationDocument from './AuthorizationDocumentReducer';
 import documents from './DocumentsReducer';
 import documentType from './DocumentTypeReducer';
 import duplicatesImport from './DuplicatesImportReducer';
 import dynamicNumber from './DynamicNumberReducer';
-import updateEntrance from './UpdateEntranceReducer';
 import entrance from './EntranceReducer';
 import error from './ErrorReducer';
 import fileFormats from './FileFormatsReducer';
@@ -40,20 +37,24 @@ import groups from './GroupsReducer';
 import identifierType from './IdentifierTypesReducer';
 import importCsv from './ImportCsvReducer';
 import intl from './IntlReducer';
+import invalidEmailCavers from './InvalidEmailCaversReducer';
 import language from './LanguageReducer';
 import latestBlogNews from './LatestBlogNewsReducer';
 import licenses from './LicensesReducer';
+import linkDocumentToEntrance from './LinkDocumentToEntrance';
 import login from './LoginReducer';
 import map from './Map';
 import massif from './MassifReducer';
+import massifEntrances from './MassifEntrancesDataQualityReducer';
 import mfa from './MfaReducer';
 import menuNotifications from './MenuNotificationsReducer';
+import messaging from './MessagingReducer';
 import moveEntranceToCave from './MoveEntranceToCaveReducer';
 import notifications from './NotificationsReducer';
 import organization from './OrganizationReducer';
+import parentDocument from './ParentDocumentReducer';
 import partnersCarousel from './PartnersCarouselReducer';
 import person from './PersonReducer';
-import updatePersonGroups from './UpdatePersonGroupesReducer';
 import processDocuments from './ProcessDocumentsReducer';
 import projections from './Projections';
 import quicksearch from './QuicksearchReducer';
@@ -61,51 +62,51 @@ import randomEntrance from './RandomEntranceReducer';
 import readNotification from './ReadNotificationReducer';
 import recentChange from './RecentChangeReducer';
 import region from './RegionReducer';
+import regionDetails from './RegionDetailsReducer';
+import regionEntrances from './RegionEntrancesDataQualityReducer';
+import resendVerificationEmail from './ResendVerificationEmailReducer';
 import sideMenu from './SideMenuReducer';
 import signUp from './SignUpReducer';
-import verifyEmail from './VerifyEmailReducer';
-import resendVerificationEmail from './ResendVerificationEmailReducer';
 import snapshots from './SnapshotReducer';
-import statisticsMassif from './StatisticsMassifReducer';
 import statisticsCountry from './StatisticsCountryReducer';
+import statisticsMassif from './StatisticsMassifReducer';
 import statisticsRegion from './StatisticsRegionReducer';
-import regionDetails from './RegionDetailsReducer';
 import subject from './SubjectReducer';
 import subscribeToCountry from './SubscribeToCountryReducer';
 import subscribeToMassif from './SubscribeToMassifReducer';
 import subscribeToRegion from './SubscribeToRegionReducer';
 import subscriptions from './SubscriptionsReducer';
+import unlinkDocumentToEntrance from './UnlinkDocumentToEntrance';
 import unsubscribeFromCountry from './UnsubscribeFromCountryReducer';
 import unsubscribeFromMassif from './UnsubscribeFromMassifReducer';
 import unsubscribeFromRegion from './UnsubscribeFromRegionReducer';
+import updateAccount from './UpdateAccountReducer';
 import updateCave from './UpdateCaveReducer';
 import updateDescription from './UpdateDescription';
 import updateDocument from './UpdateDocumentReducer';
+import updateEntrance from './UpdateEntranceReducer';
 import updateHistory from './UpdateHistory';
 import updateLocation from './UpdateLocation';
 import updateMassif from './UpdateMassifReducer';
 import updateName from './UpdateNameReducer';
 import updateOrganization from './UpdateOrganization';
-import updateAccount from './UpdateAccountReducer';
 import updatePerson from './UpdatePerson';
-import massifEntrances from './MassifEntrancesDataQualityReducer';
-import countryEntrances from './CountryEntrancesDataQualityReducer';
-import countryRegions from './CountryRegionsReducer';
-import regionEntrances from './RegionEntrancesDataQualityReducer';
+import updatePersonGroups from './UpdatePersonGroupesReducer';
+import verifyEmail from './VerifyEmailReducer';
 
 const GCReducer = combineReducers({
   account,
   advancedsearch,
+  authorizationDocument,
   banCaver,
   bannedCavers,
-  invalidEmailCavers,
-  linkDocumentToEntrance,
-  unlinkDocumentToEntrance,
   cave,
-  changePassword,
   changeEmail,
-  country,
+  changePassword,
   countUnreadNotifications,
+  country,
+  countryEntrances,
+  countryRegions,
   createCave,
   createDescription,
   createDocument,
@@ -120,13 +121,10 @@ const GCReducer = combineReducers({
   detachEntrance,
   documentChildren,
   documentDetails,
-  parentDocument,
   documents,
   documentType,
   duplicatesImport,
   dynamicNumber,
-  updateEntrance,
-  authorizationDocument,
   entrance,
   error,
   fileFormats,
@@ -135,18 +133,22 @@ const GCReducer = combineReducers({
   identifierType,
   importCsv,
   intl,
+  invalidEmailCavers,
   language,
   latestBlogNews,
   licenses,
+  linkDocumentToEntrance,
   login,
   map,
   massif,
   massifEntrances,
   mfa,
   menuNotifications,
+  messaging,
   moveEntranceToCave,
   notifications,
   organization,
+  parentDocument,
   partnersCarousel,
   person,
   processDocuments,
@@ -156,37 +158,37 @@ const GCReducer = combineReducers({
   readNotification,
   recentChange,
   region,
+  regionDetails,
+  regionEntrances,
+  resendVerificationEmail,
   sideMenu,
   signUp,
-  verifyEmail,
-  resendVerificationEmail,
   snapshots,
-  statisticsMassif,
   statisticsCountry,
+  statisticsMassif,
   statisticsRegion,
-  regionDetails,
   subject,
   subscribeToCountry,
   subscribeToMassif,
   subscribeToRegion,
   subscriptions,
+  unlinkDocumentToEntrance,
   unsubscribeFromCountry,
   unsubscribeFromMassif,
   unsubscribeFromRegion,
+  updateAccount,
   updateCave,
   updateDescription,
   updateDocument,
+  updateEntrance,
   updateHistory,
   updateLocation,
   updateMassif,
   updateName,
-  updateAccount,
   updateOrganization,
   updatePerson,
   updatePersonGroups,
-  countryEntrances,
-  countryRegions,
-  regionEntrances
+  verifyEmail
 });
 
 export default GCReducer;

@@ -22,6 +22,7 @@ import { logoGC } from '../../../conf/config';
 
 import LanguageSelector from '../LanguageSelector';
 import NotificationMenu from '../../appli/NotificationMenu';
+import MessagesIcon from './MessagesIcon';
 import QuickSearch from '../../appli/QuickSearch';
 
 import UserMenu from './User';
@@ -155,6 +156,7 @@ const AppBar = () => {
           </ToolsGroup>
           <ActionsGroup>
             <NotificationMenu />
+            <MessagesIcon />
             <UserMenu
               authTokenExpirationDate={authTokenExpirationDate}
               isAuth={permissions.isAuth}

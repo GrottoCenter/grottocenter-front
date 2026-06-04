@@ -83,6 +83,7 @@ export const PersonForm = ({ personValues, onCancel }) => {
             isError={!!errors?.person?.surname}
           />
         </FormRow>
+
         <FormActionRow
           isNew={false}
           isSubmitting={isSubmitting}

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Controller, useForm, useWatch } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
@@ -39,9 +39,11 @@ import TuneIcon from '@mui/icons-material/Tune';
 import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
 import { styled } from '@mui/material/styles';
 
+import fetch from 'isomorphic-fetch';
 import { fetchAccount } from '../../actions/Account/GetAccount';
 import { fetchSubscriptions } from '../../actions/Subscriptions/GetSubscriptions';
 import { updateAccount } from '../../actions/Account/UpdateAccount';
+import { checkAuthStatus } from '../../actions/utils';
 import { postMfaReset, clearMfaState } from '../../actions/Mfa';
 import { postLogout } from '../../actions/Login';
 import { fetchPerson } from '../../actions/Person/GetPerson';
@@ -72,6 +74,7 @@ import {
   languageIdToLocale,
   localeToLanguageId
 } from '../../utils/languageMapping';
+import { notificationPreferencesUrl } from '../../conf/apiRoutes';
 
 // ─── Shared styled components ─────────────────────────────────────────────────
 
@@ -791,13 +794,26 @@ const MfaSection = () => {
 
 // ─── Preferences section ──────────────────────────────────────────────────────
 
+const NOTIF_DEFAULTS = {
+  alert_for_news: false,
+  send_notification_by_email: false,
+  send_message_notification_by_email: false
+};
+
 const PreferencesSection = ({ account, onSaved }) => {
   const dispatch = useDispatch();
   const { formatMessage } = useIntl();
+  const authHeader = useSelector(state => state.login.authorizationHeader);
 
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [saveError, setSaveError] = useState(null);
+
+  // Notification preferences from GET /account/notifications
+  const [notifPrefs, setNotifPrefs] = useState(NOTIF_DEFAULTS);
+  const [isNotifLoading, setIsNotifLoading] = useState(true);
+  const [notifError, setNotifError] = useState(null);
+  const hasFetched = useRef(false);
 
   const currentLocale = languageIdToLocale(account?.language) ?? '';
 
@@ -809,29 +825,69 @@ const PreferencesSection = ({ account, onSaved }) => {
   } = useForm({
     defaultValues: {
       language: currentLocale,
-      sendNotificationByEmail: account?.sendNotificationByEmail ?? false
+      ...NOTIF_DEFAULTS
     }
   });
 
+  // Fetch notification preferences on mount
+  useEffect(() => {
+    if (!authHeader || hasFetched.current) return;
+    hasFetched.current = true;
+
+    const loadPrefs = async () => {
+      setIsNotifLoading(true);
+      setNotifError(null);
+      try {
+        const response = await checkAuthStatus(dispatch)(
+          await fetch(notificationPreferencesUrl, {
+            method: 'GET',
+            headers: authHeader
+          })
+        );
+        const data = await response.json();
+        const prefs = {
+          alert_for_news: data.alert_for_news ?? false,
+          send_notification_by_email:
+            data.send_notification_by_email ?? false,
+          send_message_notification_by_email:
+            data.send_message_notification_by_email ?? false
+        };
+        setNotifPrefs(prefs);
+        reset({
+          language: languageIdToLocale(account?.language) ?? '',
+          ...prefs
+        });
+      } catch (err) {
+        if (err.isAuthError) return;
+        setNotifError(true);
+      } finally {
+        setIsNotifLoading(false);
+      }
+    };
+
+    loadPrefs();
+  }, [authHeader, dispatch, account, reset]);
+
+  // Sync language and notification preferences when account or notifPrefs changes
   useEffect(() => {
     if (account) {
       reset({
         language: languageIdToLocale(account.language) ?? '',
-        sendNotificationByEmail: account.sendNotificationByEmail ?? false
+        ...notifPrefs
       });
     }
-  }, [account, reset]);
+  }, [account, notifPrefs, reset]);
 
   const handleEdit = () => {
     setSaveError(null);
     setIsEditing(true);
   };
+
   const handleCancel = () => {
-    if (account)
-      reset({
-        language: languageIdToLocale(account.language) ?? '',
-        sendNotificationByEmail: account.sendNotificationByEmail ?? false
-      });
+    reset({
+      language: languageIdToLocale(account?.language) ?? '',
+      ...notifPrefs
+    });
     setIsEditing(false);
     setSaveError(null);
   };
@@ -840,15 +896,32 @@ const PreferencesSection = ({ account, onSaved }) => {
     setIsLoading(true);
     setSaveError(null);
     try {
+      // Save language via the account endpoint
       await dispatch(
-        updateAccount({
-          language: localeToLanguageId(data.language),
-          sendNotificationByEmail: data.sendNotificationByEmail
+        updateAccount({ language: localeToLanguageId(data.language) })
+      );
+
+      // Save notification preferences via the dedicated endpoint
+      const prefs = {
+        alert_for_news: data.alert_for_news,
+        send_notification_by_email: data.send_notification_by_email,
+        send_message_notification_by_email:
+          data.send_message_notification_by_email
+      };
+      await checkAuthStatus(dispatch)(
+        await fetch(notificationPreferencesUrl, {
+          method: 'PATCH',
+          headers: { ...authHeader, 'Content-Type': 'application/json' },
+          body: JSON.stringify(prefs)
         })
       );
+
+      setNotifPrefs(prefs);
       setIsEditing(false);
+      dispatch(fetchAccount());
       onSaved();
-    } catch {
+    } catch (err) {
+      if (err.isAuthError) return;
       setSaveError(true);
     } finally {
       setIsLoading(false);
@@ -867,12 +940,47 @@ const PreferencesSection = ({ account, onSaved }) => {
         </InfoLabel>
         <Typography variant="body1">{nativeName}</Typography>
       </InfoRow>
-      <InfoRow>
-        <InfoLabel variant="body2">
-          {formatMessage({ id: 'Receive notifications by email' })}
-        </InfoLabel>
-        <BoolValue value={account?.sendNotificationByEmail ?? false} />
-      </InfoRow>
+      {isNotifLoading ? (
+        <InfoRow>
+          <CircularProgress size={20} />
+        </InfoRow>
+      ) : notifError ? (
+        <Alert
+          severity="warning"
+          content={formatMessage({
+            id: 'Failed to load notification preferences'
+          })}
+        />
+      ) : (
+        <>
+          <InfoRow>
+            <InfoLabel variant="body2">
+              {formatMessage({
+                id: 'Email notifications for subscriptions'
+              })}
+            </InfoLabel>
+            <BoolValue
+              value={notifPrefs.send_notification_by_email}
+            />
+          </InfoRow>
+          <InfoRow>
+            <InfoLabel variant="body2">
+              {formatMessage({
+                id: 'Email notifications for messages'
+              })}
+            </InfoLabel>
+            <BoolValue
+              value={notifPrefs.send_message_notification_by_email}
+            />
+          </InfoRow>
+          <InfoRow>
+            <InfoLabel variant="body2">
+              {formatMessage({ id: 'Alert for news' })}
+            </InfoLabel>
+            <BoolValue value={notifPrefs.alert_for_news} />
+          </InfoRow>
+        </>
+      )}
     </>
   );
 
@@ -902,8 +1010,14 @@ const PreferencesSection = ({ account, onSaved }) => {
         />
       </FormRow>
       <Box sx={{ mt: 2 }}>
+        <Typography
+          variant="subtitle2"
+          color="text.secondary"
+          sx={{ mb: 1 }}>
+          {formatMessage({ id: 'Notification Preferences' })}
+        </Typography>
         <Controller
-          name="sendNotificationByEmail"
+          name="send_notification_by_email"
           control={control}
           render={({ field: { value, onChange } }) => (
             <FormControlLabel
@@ -914,7 +1028,43 @@ const PreferencesSection = ({ account, onSaved }) => {
                   color="primary"
                 />
               }
-              label={<Translate>Receive notifications by email</Translate>}
+              label={
+                <Translate>Email notifications for subscriptions</Translate>
+              }
+            />
+          )}
+        />
+        <Controller
+          name="send_message_notification_by_email"
+          control={control}
+          render={({ field: { value, onChange } }) => (
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={value}
+                  onChange={e => onChange(e.target.checked)}
+                  color="primary"
+                />
+              }
+              label={
+                <Translate>Email notifications for messages</Translate>
+              }
+            />
+          )}
+        />
+        <Controller
+          name="alert_for_news"
+          control={control}
+          render={({ field: { value, onChange } }) => (
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={value}
+                  onChange={e => onChange(e.target.checked)}
+                  color="primary"
+                />
+              }
+              label={<Translate>Alert for news</Translate>}
             />
           )}
         />
