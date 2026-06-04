@@ -1,12 +1,36 @@
 import React, { useState, useMemo, useCallback } from 'react';
 import PropTypes from 'prop-types';
-import { List, Typography, Pagination, Box } from '@mui/material';
+import {
+  List,
+  Typography,
+  Pagination,
+  Box,
+  ListItem,
+  Paper,
+  Skeleton
+} from '@mui/material';
 import Document from './Document';
 import ImageLightbox from './ImageLightbox';
 import { isImageFile } from './utils/imageUtils';
 
+const DocumentSkeleton = () => (
+  <ListItem disableGutters sx={{ display: 'block', py: 0.5 }}>
+    <Paper
+      variant="outlined"
+      sx={{ p: 2, borderRadius: 2, bgcolor: 'grey.50' }}>
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+        <Skeleton variant="text" width="55%" height={28} />
+        <Skeleton variant="rounded" width={90} height={24} />
+      </Box>
+      <Skeleton variant="text" width="90%" />
+      <Skeleton variant="text" width="70%" />
+    </Paper>
+  </ListItem>
+);
+
 const DocumentsList = ({
   documents,
+  isLoading = false,
   title,
   emptyMessageComponent,
   hasSnapshotButton = false,
@@ -32,7 +56,9 @@ const DocumentsList = ({
       if (doc.files) {
         doc.files
           .filter(file => isImageFile(file.fileName))
-          .forEach(file => images.push({ ...file, description: doc.description }));
+          .forEach(file =>
+            images.push({ ...file, description: doc.description })
+          );
       }
     });
     return { allImages: images, imageOffsets: offsets };
@@ -42,6 +68,16 @@ const DocumentsList = ({
     setLightboxIndex(globalIndex);
     setLightboxOpen(true);
   }, []);
+
+  if (isLoading) {
+    return (
+      <List dense disablePadding>
+        {[0, 1, 2].map(i => (
+          <DocumentSkeleton key={i} />
+        ))}
+      </List>
+    );
+  }
 
   if (!documents?.length) return emptyMessageComponent ?? null;
 
@@ -58,7 +94,10 @@ const DocumentsList = ({
           return (
             <Box
               key={document.id}
-              sx={{ display: isOnPage ? 'block' : 'none', '@media print': { display: 'block' } }}>
+              sx={{
+                display: isOnPage ? 'block' : 'none',
+                '@media print': { display: 'block' }
+              }}>
               <Document
                 document={document}
                 hasSnapshotButton={hasSnapshotButton}
@@ -98,6 +137,7 @@ const DocumentsList = ({
 
 DocumentsList.propTypes = {
   documents: PropTypes.arrayOf(PropTypes.shape(Document.propTypes)),
+  isLoading: PropTypes.bool,
   title: PropTypes.node,
   emptyMessageComponent: PropTypes.node,
   hasSnapshotButton: PropTypes.bool,
