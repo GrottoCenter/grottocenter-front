@@ -53,8 +53,11 @@ import {
   MARKERS_LIMIT,
   MASSIFS_POLYGON_LIMIT,
   ENTRANCE_MARKER_FILTERS,
+  ENTRANCE_QUALITY_FILTERS,
   getCaveSize,
-  CAVE_SIZE
+  getCaveQuality,
+  CAVE_SIZE,
+  CAVE_QUALITY
 } from './constants';
 
 const ZOOM_STATE = {
@@ -102,9 +105,19 @@ const HydratedMap = ({
   const [activeEntranceFilters, setActiveEntranceFilters] = useState(
     Object.fromEntries(Object.values(CAVE_SIZE).map(size => [size, true]))
   );
+  const [activeQualityFilters, setActiveQualityFilters] = useState(
+    Object.fromEntries(Object.values(CAVE_QUALITY).map(q => [q, true]))
+  );
   const filteredEntranceMarkers = useMemo(
-    () => entranceMarkers.filter(e => activeEntranceFilters[getCaveSize(e)]),
-    [entranceMarkers, activeEntranceFilters]
+    () =>
+      entranceMarkers.filter(e => {
+        if (!activeEntranceFilters[getCaveSize(e)]) return false;
+        const quality = getCaveQuality(e);
+        // Entrances without quality data are always shown
+        if (quality === null) return true;
+        return activeQualityFilters[quality];
+      }),
+    [entranceMarkers, activeEntranceFilters, activeQualityFilters]
   );
 
   const selectedMarkersList = useMemo(
@@ -347,6 +360,9 @@ const HydratedMap = ({
         entranceFilters={ENTRANCE_MARKER_FILTERS}
         activeEntranceFilters={activeEntranceFilters}
         setActiveEntranceFilters={setActiveEntranceFilters}
+        qualityFilters={ENTRANCE_QUALITY_FILTERS}
+        activeQualityFilters={activeQualityFilters}
+        setActiveQualityFilters={setActiveQualityFilters}
         isMarkersMode={isMarkersMode}
         useLeafletControl
       />
