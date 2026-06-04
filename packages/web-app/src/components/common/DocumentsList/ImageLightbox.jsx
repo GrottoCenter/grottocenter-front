@@ -212,23 +212,26 @@ const ImageLightbox = ({
 
   const handleMouseUp = () => setIsDragging(false);
 
-  const handleTouchStart = e => {
-    if (e.touches.length === 2) {
-      const dx = e.touches[0].clientX - e.touches[1].clientX;
-      const dy = e.touches[0].clientY - e.touches[1].clientY;
-      touchStartDistance.current = Math.sqrt(dx * dx + dy * dy);
-      zoomAtPinchStart.current = zoom;
-      touchPanStart.current = null;
-    } else if (e.touches.length === 1 && zoom > 1) {
-      touchStartDistance.current = null;
-      touchPanStart.current = { x: e.touches[0].clientX, y: e.touches[0].clientY };
-    } else {
-      touchStartDistance.current = null;
-      touchPanStart.current = null;
-    }
-  };
+  const handleTouchStart = useCallback(
+    e => {
+      if (e.touches.length === 2) {
+        const dx = e.touches[0].clientX - e.touches[1].clientX;
+        const dy = e.touches[0].clientY - e.touches[1].clientY;
+        touchStartDistance.current = Math.sqrt(dx * dx + dy * dy);
+        zoomAtPinchStart.current = zoom;
+        touchPanStart.current = null;
+      } else if (e.touches.length === 1 && zoom > 1) {
+        touchStartDistance.current = null;
+        touchPanStart.current = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+      } else {
+        touchStartDistance.current = null;
+        touchPanStart.current = null;
+      }
+    },
+    [zoom]
+  );
 
-  const handleTouchEnd = e => {
+  const handleTouchEnd = useCallback(e => {
     const wasPinch = touchStartDistance.current !== null;
     touchStartDistance.current = null;
     touchPanStart.current = null;
@@ -245,7 +248,7 @@ const ImageLightbox = ({
         lastTapTime.current = now;
       }
     }
-  };
+  }, []);
 
   useEffect(() => {
     const handleKeyDown = e => {
