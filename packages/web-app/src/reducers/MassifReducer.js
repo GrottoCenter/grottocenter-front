@@ -79,8 +79,9 @@ const reducer = (state = initialState, action) => {
     case POST_GUIDELINE_SUCCESS: {
       if (
         !state.massif ||
-        action.guideline.entityType !== 'massif' ||
-        String(action.guideline.entityId) !== String(state.massif.id)
+        !action.guideline.massifs?.some(
+          m => m?.id === state.massif.id || Number(m) === state.massif.id
+        )
       ) {
         return state;
       }
@@ -102,18 +103,21 @@ const reducer = (state = initialState, action) => {
     case ROLLBACK_GUIDELINE_SUCCESS: {
       if (
         !state.massif ||
-        action.guideline.entityType !== 'massif' ||
-        String(action.guideline.entityId) !== String(state.massif.id)
+        !action.guideline.massifs?.some(
+          m => m?.id === state.massif.id || Number(m) === state.massif.id
+        )
       ) {
         return state;
       }
+      const guidelines = state.massif.guidelines || [];
+      const exists = guidelines.some(g => g.id === action.guideline.id);
       return {
         ...state,
         massif: {
           ...state.massif,
-          guidelines: (state.massif.guidelines || []).map(g =>
-            g.id === action.guideline.id ? action.guideline : g
-          )
+          guidelines: exists
+            ? guidelines.map(g => (g.id === action.guideline.id ? action.guideline : g))
+            : [...guidelines, action.guideline]
         }
       };
     }

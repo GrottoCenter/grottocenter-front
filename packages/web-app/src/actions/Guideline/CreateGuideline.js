@@ -22,22 +22,16 @@ export const postGuidelineFailure = error => ({
 });
 
 export const postGuideline =
-  ({ entityType, entityId, title, description, language }) =>
+  ({ countries, regions, massifs, title, description, language }) =>
   (dispatch, getState) => {
     dispatch(postGuidelineAction());
-
-    const mappedEntityType =
-      {
-        countries: 'country',
-        regions: 'region',
-        massifs: 'massif'
-      }[entityType] || entityType;
 
     const requestOptions = {
       method: 'POST',
       body: JSON.stringify({
-        entityType: mappedEntityType,
-        entityId,
+        countries,
+        regions,
+        massifs,
         title,
         description,
         language

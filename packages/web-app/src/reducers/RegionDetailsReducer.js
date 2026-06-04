@@ -41,8 +41,9 @@ const reducer = (state = initialState, action) => {
     case POST_GUIDELINE_SUCCESS: {
       if (
         !state.region ||
-        action.guideline.entityType !== 'region' ||
-        String(action.guideline.entityId) !== String(state.region.id)
+        !action.guideline.regions?.some(
+          r => String(r) === String(state.region.id)
+        )
       ) {
         return state;
       }
@@ -64,18 +65,21 @@ const reducer = (state = initialState, action) => {
     case ROLLBACK_GUIDELINE_SUCCESS: {
       if (
         !state.region ||
-        action.guideline.entityType !== 'region' ||
-        String(action.guideline.entityId) !== String(state.region.id)
+        !action.guideline.regions?.some(
+          r => String(r) === String(state.region.id)
+        )
       ) {
         return state;
       }
+      const guidelines = state.region.guidelines || [];
+      const exists = guidelines.some(g => g.id === action.guideline.id);
       return {
         ...state,
         region: {
           ...state.region,
-          guidelines: (state.region.guidelines || []).map(g =>
-            g.id === action.guideline.id ? action.guideline : g
-          )
+          guidelines: exists
+            ? guidelines.map(g => (g.id === action.guideline.id ? action.guideline : g))
+            : [...guidelines, action.guideline]
         }
       };
     }

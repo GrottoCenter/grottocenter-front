@@ -23,7 +23,6 @@ const GuidelinesGrouped = ({ guidelines }) => {
     <ScrollableContent
       title={<FormattedMessage id="Guidelines" />}
       anchorId="guidelines"
-      id="guidelines"
     >
       <Box p={2}>
         {groups.map((group, index) => (
