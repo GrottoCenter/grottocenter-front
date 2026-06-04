@@ -56,6 +56,7 @@ import DocumentsList from '../../components/common/DocumentsList/DocumentsList';
 import SubscriptionsList from '../../components/common/Subscriptions/SubscriptionsList';
 import REDUCER_STATUS from '../../reducers/ReducerStatus';
 import EntitiesList from '../../components/common/entitiesList/EntitiesList';
+import PageContainer from '../../components/common/Layouts/PageContainer';
 import PageHeader from '../../components/common/Layouts/PageHeader';
 import PageTabs from '../../components/common/Layouts/PageTabs';
 import ScrollableContent from '../../components/common/Layouts/Fixed/ScrollableContent';
@@ -1258,7 +1259,7 @@ const AccountPage = () => {
   );
 
   return (
-    <>
+    <PageContainer>
       <PageHeader
         title={formatMessage({ id: 'My Account' })}
         icon={
@@ -1445,7 +1446,7 @@ const AccountPage = () => {
           }
         )}
       </StandardDialog>
-    </>
+    </PageContainer>
   );
 };
 

@@ -15,6 +15,7 @@ import { useReactToPrint } from 'react-to-print';
 import ScrollableContent from '../../common/Layouts/Fixed/ScrollableContent';
 import StatisticsDataDashboard from '../StatisticsDataDashboard';
 import CustomMapContainer from '../../common/Maps/common/MapContainer';
+import PageContainer from '../../common/Layouts/PageContainer';
 import PageHeader from '../../common/Layouts/PageHeader';
 import ResponsiveActions from '../../common/Layouts/ResponsiveActions';
 import Alert from '../../common/Alert';
@@ -116,6 +117,7 @@ const Country = ({
   );
 
   return (
+    <PageContainer>
     <div ref={componentRef}>
       <PageHeader
         title={title}
@@ -185,6 +187,7 @@ const Country = ({
         </>
       )}
     </div>
+    </PageContainer>
   );
 };
 

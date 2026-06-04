@@ -16,6 +16,7 @@ import { useReactToPrint } from 'react-to-print';
 
 import StatisticsDataDashboard from '../StatisticsDataDashboard';
 import CustomMapContainer from '../../common/Maps/common/MapContainer';
+import PageContainer from '../../common/Layouts/PageContainer';
 import PageHeader from '../../common/Layouts/PageHeader';
 import ResponsiveActions from '../../common/Layouts/ResponsiveActions';
 import ScrollableContent from '../../common/Layouts/Fixed/ScrollableContent';
@@ -120,6 +121,7 @@ const Region = ({
   );
 
   return (
+    <PageContainer>
     <div ref={componentRef}>
       <PageHeader
         title={region?.name ?? (isLoading ? undefined : '')}
@@ -187,6 +189,7 @@ const Region = ({
         </>
       )}
     </div>
+    </PageContainer>
   );
 };
 

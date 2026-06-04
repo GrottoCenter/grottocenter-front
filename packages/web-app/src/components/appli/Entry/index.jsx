@@ -27,6 +27,7 @@ import ChatOutlinedIcon from '@mui/icons-material/ChatOutlined';
 import PermMediaOutlinedIcon from '@mui/icons-material/PermMediaOutlined';
 import { useReactToPrint } from 'react-to-print';
 
+import PageContainer from '../../common/Layouts/PageContainer';
 import PageHeader from '../../common/Layouts/PageHeader';
 import PageTabs from '../../common/Layouts/PageTabs';
 import ResponsiveActions from '../../common/Layouts/ResponsiveActions';
@@ -300,6 +301,7 @@ export const Entry = ({ isLoading, error, entrance }) => {
   ];
 
   return (
+    <PageContainer>
     <div ref={componentRef}>
       <PageHeader
         title={entrance?.name ?? (isLoading ? undefined : '')}
@@ -483,6 +485,7 @@ export const Entry = ({ isLoading, error, entrance }) => {
         </div>
       </PageTabs>
     </div>
+    </PageContainer>
   );
 };
 
