@@ -250,7 +250,8 @@ const Document = ({
       : null;
 
   const ParentTypeIcon =
-    (documentData?.parent?.type && DOCUMENT_TYPE_ICONS[documentData.parent.type]) ||
+    (documentData?.parent?.type &&
+      DOCUMENT_TYPE_ICONS[documentData.parent.type]) ||
     DOCUMENT_TYPE_FALLBACK_ICON;
   const breadcrumb = documentData?.parent ? (
     <Breadcrumbs
@@ -389,169 +390,174 @@ const Document = ({
         <>
           <ScrollableContent
             content={
-              <HalfSplitContainer>
-                <MainColumn>
-                  <SummaryText>
-                    <Linkify options={linkifyOptions}>
-                      {documentData.description}
-                    </Linkify>
-                  </SummaryText>
-                  <FilesSection files={documentData.files} />
-                  {pageFiles.length > 0 && (
-                    <EntitiesList>{pageFiles}</EntitiesList>
-                  )}
+              <>
+                <HalfSplitContainer>
+                  <MainColumn>
+                    <SummaryText>
+                      <Linkify options={linkifyOptions}>
+                        {documentData.description}
+                      </Linkify>
+                    </SummaryText>
+                    <FilesSection files={documentData.files} />
+                    {pageFiles.length > 0 && (
+                      <EntitiesList>{pageFiles}</EntitiesList>
+                    )}
+                  </MainColumn>
+                  <SideColumn>
+                    <DetailsList>
+                      <DetailItem
+                        label={formatMessage({ id: 'Type' })}
+                        value={
+                          documentData.type ? (
+                            <DocumentTypeChip type={documentData.type} />
+                          ) : null
+                        }
+                      />
+                      <DetailItem
+                        label={formatMessage({ id: 'Language' })}
+                        value={
+                          languages.find(e => e.id === mainLanguage)?.refName ??
+                          mainLanguage
+                        }
+                      />
+                      <DetailItem
+                        label={formatMessage({ id: 'Publication date' })}
+                        value={documentData.datePublication}
+                      />
+                      <DetailItem
+                        label={formatMessage({ id: 'Pages' })}
+                        value={documentData.pages}
+                      />
+                      <DetailItem
+                        label={formatMessage({ id: 'Issue' })}
+                        value={documentData.issue}
+                      />
+                      <DetailItem
+                        label={formatMessage({ id: 'License' })}
+                        value={documentData.license}
+                      />
+                      <DetailItem
+                        fullWidth
+                        label={formatMessage({ id: 'Parent document' })}
+                        value={documentData.parent?.title}
+                        url={
+                          documentData.parent
+                            ? `/ui/documents/${documentData.parent.id}`
+                            : undefined
+                        }
+                      />
+                      <DetailItem
+                        fullWidth
+                        label={formatMessage({ id: 'Authors' })}
+                        value={allAuthors}
+                      />
+                      <DetailItem
+                        fullWidth
+                        label={formatMessage({ id: 'Editor' })}
+                        value={documentData.editor?.name}
+                        url={
+                          documentData.editor
+                            ? `/ui/organizations/${documentData.editor.id}`
+                            : undefined
+                        }
+                      />
+                      <DetailItem
+                        fullWidth
+                        label={formatMessage({ id: 'Library' })}
+                        value={documentData.library?.name}
+                        url={
+                          documentData.library
+                            ? `/ui/organizations/${documentData.library.id}`
+                            : undefined
+                        }
+                      />
+                      <DetailItem
+                        fullWidth
+                        label={documentData.identifierType?.toUpperCase()}
+                        value={documentData.identifier}
+                        url={
+                          documentData.identifierType === 'url'
+                            ? documentData.identifier
+                            : undefined
+                        }
+                      />
+                      <DetailItem
+                        fullWidth
+                        label={formatMessage({
+                          id: 'Publication (BBS legacy)'
+                        })}
+                        value={documentData?.oldBBS?.publicationOther}
+                      />
+                      <DetailItem
+                        fullWidth
+                        label={formatMessage({
+                          id: 'Publication number (BBS legacy)'
+                        })}
+                        value={documentData?.oldBBS?.publicationFascicule}
+                      />
+                      <DetailItem
+                        fullWidth
+                        label={formatMessage({ id: 'Subjects' })}
+                        value={
+                          documentData.subjects?.length
+                            ? documentData.subjects
+                                .map(
+                                  s =>
+                                    `${s.id} ${formatMessage({
+                                      id: s.id,
+                                      defaultMessage: s.subject
+                                    })}`
+                                )
+                                .join(' · ')
+                            : null
+                        }
+                      />
+                      <DetailItem
+                        fullWidth
+                        label={formatMessage({ id: 'Regions' })}
+                        value={
+                          documentData.iso3166?.length
+                            ? documentData.iso3166
+                                .map(e => `${e.name} (${e.iso})`)
+                                .join(' · ')
+                            : null
+                        }
+                      />
+                      {permissions.isModerator && (
+                        <DetailItem
+                          fullWidth
+                          label={formatMessage({ id: 'Authorization' })}
+                          value={documentData?.authorizationDocument?.title}
+                          url={
+                            documentData?.authorizationDocument
+                              ? `/ui/documents/${documentData.authorizationDocument.id}`
+                              : undefined
+                          }
+                        />
+                      )}
+                      <DetailItem
+                        fullWidth
+                        label={formatMessage({ id: 'Source' })}
+                        value={
+                          documentData.importSource
+                            ? `${documentData.importId}#${documentData.importSource}`
+                            : null
+                        }
+                      />
+                    </DetailsList>
+                  </SideColumn>
+                </HalfSplitContainer>
+                <Box sx={{ mt: 1, mb: -2 }}>
                   <AuthorAndDate
                     author={documentData.creator}
                     textColor="textSecondary"
                     date={documentData.dateInscription}
                     verb="Created"
                   />
-                </MainColumn>
-                <SideColumn>
-                  <DetailsList>
-                    <DetailItem
-                      label={formatMessage({ id: 'Type' })}
-                      value={
-                        documentData.type ? (
-                          <DocumentTypeChip type={documentData.type} />
-                        ) : null
-                      }
-                    />
-                    <DetailItem
-                      label={formatMessage({ id: 'Language' })}
-                      value={
-                        languages.find(e => e.id === mainLanguage)?.refName ??
-                        mainLanguage
-                      }
-                    />
-                    <DetailItem
-                      label={formatMessage({ id: 'Publication date' })}
-                      value={documentData.datePublication}
-                    />
-                    <DetailItem
-                      label={formatMessage({ id: 'Pages' })}
-                      value={documentData.pages}
-                    />
-                    <DetailItem
-                      label={formatMessage({ id: 'Issue' })}
-                      value={documentData.issue}
-                    />
-                    <DetailItem
-                      label={formatMessage({ id: 'License' })}
-                      value={documentData.license}
-                    />
-                    <DetailItem
-                      fullWidth
-                      label={formatMessage({ id: 'Parent document' })}
-                      value={documentData.parent?.title}
-                      url={
-                        documentData.parent
-                          ? `/ui/documents/${documentData.parent.id}`
-                          : undefined
-                      }
-                    />
-                    <DetailItem
-                      fullWidth
-                      label={formatMessage({ id: 'Authors' })}
-                      value={allAuthors}
-                    />
-                    <DetailItem
-                      fullWidth
-                      label={formatMessage({ id: 'Editor' })}
-                      value={documentData.editor?.name}
-                      url={
-                        documentData.editor
-                          ? `/ui/organizations/${documentData.editor.id}`
-                          : undefined
-                      }
-                    />
-                    <DetailItem
-                      fullWidth
-                      label={formatMessage({ id: 'Library' })}
-                      value={documentData.library?.name}
-                      url={
-                        documentData.library
-                          ? `/ui/organizations/${documentData.library.id}`
-                          : undefined
-                      }
-                    />
-                    <DetailItem
-                      fullWidth
-                      label={documentData.identifierType?.toUpperCase()}
-                      value={documentData.identifier}
-                      url={
-                        documentData.identifierType === 'url'
-                          ? documentData.identifier
-                          : undefined
-                      }
-                    />
-                    <DetailItem
-                      fullWidth
-                      label={formatMessage({ id: 'Publication (BBS legacy)' })}
-                      value={documentData?.oldBBS?.publicationOther}
-                    />
-                    <DetailItem
-                      fullWidth
-                      label={formatMessage({
-                        id: 'Publication number (BBS legacy)'
-                      })}
-                      value={documentData?.oldBBS?.publicationFascicule}
-                    />
-                    <DetailItem
-                      fullWidth
-                      label={formatMessage({ id: 'Subjects' })}
-                      value={
-                        documentData.subjects?.length
-                          ? documentData.subjects
-                              .map(
-                                s =>
-                                  `${s.id} ${formatMessage({
-                                    id: s.id,
-                                    defaultMessage: s.subject
-                                  })}`
-                              )
-                              .join(' · ')
-                          : null
-                      }
-                    />
-                    <DetailItem
-                      fullWidth
-                      label={formatMessage({ id: 'Regions' })}
-                      value={
-                        documentData.iso3166?.length
-                          ? documentData.iso3166
-                              .map(e => `${e.name} (${e.iso})`)
-                              .join(' · ')
-                          : null
-                      }
-                    />
-                    {permissions.isModerator && (
-                      <DetailItem
-                        fullWidth
-                        label={formatMessage({ id: 'Authorization' })}
-                        value={documentData?.authorizationDocument?.title}
-                        url={
-                          documentData?.authorizationDocument
-                            ? `/ui/documents/${documentData.authorizationDocument.id}`
-                            : undefined
-                        }
-                      />
-                    )}
-                    <DetailItem
-                      fullWidth
-                      label={formatMessage({ id: 'Source' })}
-                      value={
-                        documentData.importSource
-                          ? `${documentData.importId}#${documentData.importSource}`
-                          : null
-                      }
-                    />
-                  </DetailsList>
-                </SideColumn>
-              </HalfSplitContainer>
+                </Box>
+              </>
             }
           />
-
 
           {linkedEntities.length > 0 && (
             <ScrollableContent

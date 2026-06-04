@@ -98,10 +98,7 @@ EntitiesList.propTypes = { children: PropTypes.node };
 export const SummaryText = ({ children }) => {
   if (!children) return null;
   return (
-    <Typography
-      component="div"
-      variant="body1"
-      sx={{ whiteSpace: 'pre-wrap' }}>
+    <Typography component="div" variant="body1" sx={{ whiteSpace: 'pre-wrap' }}>
       {children}
     </Typography>
   );
@@ -202,19 +199,23 @@ const FileRow = styled(Box)(({ theme }) => ({
 }));
 
 const EmptyFiles = ({ message }) => (
-  <Box
+  <Paper
+    variant="outlined"
     sx={{
+      p: 2,
+      borderRadius: 2,
+      bgcolor: 'grey.50',
+      minHeight: { xs: 100, sm: 200 },
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
       justifyContent: 'center',
       gap: 1,
-      p: 4,
       color: 'text.secondary'
     }}>
     <InsertDriveFile fontSize="large" color="disabled" />
     <Typography variant="body2">{message}</Typography>
-  </Box>
+  </Paper>
 );
 EmptyFiles.propTypes = { message: PropTypes.string.isRequired };
 
@@ -235,15 +236,13 @@ export const FilesSection = ({ files }) => {
     [fileList]
   );
   const pdfs = useMemo(
-    () =>
-      fileList.filter(f => getFileExtension(f.fileName) === '.pdf'),
+    () => fileList.filter(f => getFileExtension(f.fileName) === '.pdf'),
     [fileList]
   );
   const others = useMemo(
     () =>
       fileList.filter(
-        f =>
-          !isImageFile(f.fileName) && getFileExtension(f.fileName) !== '.pdf'
+        f => !isImageFile(f.fileName) && getFileExtension(f.fileName) !== '.pdf'
       ),
     [fileList]
   );
@@ -330,4 +329,3 @@ FilesSection.propTypes = {
     })
   )
 };
-
