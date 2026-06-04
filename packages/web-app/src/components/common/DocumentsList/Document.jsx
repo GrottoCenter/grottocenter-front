@@ -2,6 +2,7 @@ import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
 import {
   Box,
+  Chip,
   ListItem,
   Paper,
   ButtonGroup,
@@ -12,6 +13,7 @@ import {
   useTheme
 } from '@mui/material';
 import DocumentTypeChip from '../DocumentTypeChip';
+import HourglassEmptyIcon from '@mui/icons-material/HourglassEmpty';
 import LinkOffIcon from '@mui/icons-material/LinkOff';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
@@ -48,7 +50,9 @@ const Document = ({
 
   return (
     <ListItem disableGutters sx={{ display: 'block', py: 0.5 }}>
-      <Paper variant="outlined" sx={{ p: 2, borderRadius: 2, bgcolor: 'grey.50' }}>
+      <Paper
+        variant="outlined"
+        sx={{ p: 2, borderRadius: 2, bgcolor: 'grey.50' }}>
         {/* Header row: title + chip + actions */}
         <Box
           sx={{
@@ -72,6 +76,15 @@ const Document = ({
               </GCLink>
             </Typography>
             <DocumentTypeChip type={document.type} />
+            {document.isValidated === false && (
+              <Chip
+                variant="outlined"
+                color="warning"
+                size="small"
+                icon={<HourglassEmptyIcon />}
+                label={formatMessage({ id: 'Waiting for validation' })}
+              />
+            )}
           </Box>
           {(hasSnapshotButton || onUnlink) && (
             <Box sx={{ flexShrink: 0 }}>
@@ -89,7 +102,8 @@ const Document = ({
                   />
                 )}
                 {onUnlink && (
-                  <Tooltip title={formatMessage({ id: 'Unlink this document' })}>
+                  <Tooltip
+                    title={formatMessage({ id: 'Unlink this document' })}>
                     <Button
                       onClick={() => setUnlinkDialogOpen(true)}
                       color="primary"
@@ -112,12 +126,13 @@ const Document = ({
               sx={{
                 whiteSpace: 'break-spaces',
                 color: 'text.primary',
-                ...(isMobileView && !descriptionExpanded && {
-                  overflow: 'hidden',
-                  display: '-webkit-box',
-                  WebkitLineClamp: 3,
-                  WebkitBoxOrient: 'vertical'
-                })
+                ...(isMobileView &&
+                  !descriptionExpanded && {
+                    overflow: 'hidden',
+                    display: '-webkit-box',
+                    WebkitLineClamp: 3,
+                    WebkitBoxOrient: 'vertical'
+                  })
               }}>
               <Linkify options={linkifyOptions}>{document.description}</Linkify>
             </Typography>
@@ -193,6 +208,7 @@ Document.propTypes = {
     id: PropTypes.number,
     title: PropTypes.string,
     type: PropTypes.string,
+    isValidated: PropTypes.bool,
     description: PropTypes.string,
     files: Files.propTypes.files
   })

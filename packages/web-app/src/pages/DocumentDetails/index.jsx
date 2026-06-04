@@ -240,15 +240,11 @@ const Document = ({
     ? `/ui/documents/${documentData.id}/snapshots`
     : null;
 
-  const subheaderMessage =
+  const needsValidation =
     !isLoading &&
     documentData &&
     permissions.isAuth &&
-    !documentData?.isValidated
-      ? formatMessage({
-          id: 'A moderator needs to validate the last modification before being able to edit the document again.'
-        })
-      : null;
+    !documentData?.isValidated;
 
   const ParentTypeIcon =
     (documentData?.parent?.type &&
@@ -276,16 +272,6 @@ const Document = ({
       </Link>
     </Breadcrumbs>
   ) : null;
-
-  const subheader =
-    breadcrumb || subheaderMessage ? (
-      <>
-        {breadcrumb}
-        {subheaderMessage && (
-          <Box sx={{ mt: breadcrumb ? 0.5 : 0 }}>{subheaderMessage}</Box>
-        )}
-      </>
-    ) : null;
 
   const actions = hideActions ? null : (
     <ResponsiveActions
@@ -327,7 +313,7 @@ const Document = ({
       <PageHeader
         title={documentData?.title ?? (isLoading ? undefined : '')}
         icon={<CustomIcon type="bibliography" />}
-        subheader={subheader}
+        subheader={breadcrumb}
         actions={actions}
       />
 
@@ -394,6 +380,14 @@ const Document = ({
               <>
                 <HalfSplitContainer>
                   <MainColumn>
+                    {needsValidation && (
+                      <Alert
+                        severity="warning"
+                        content={formatMessage({
+                          id: 'A moderator needs to validate the last modification before being able to edit the document again.'
+                        })}
+                      />
+                    )}
                     <SummaryText>
                       <Linkify options={linkifyOptions}>
                         {documentData.description}
