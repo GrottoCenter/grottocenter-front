@@ -22,7 +22,6 @@ import {
   DetailItem,
   DetailsList,
   EntitiesList,
-  FileListElement,
   FilesSection,
   ListElement,
   SummaryText,
@@ -156,6 +155,7 @@ const Document = ({
   const pageFiles = useMemo(() => {
     if (!documentData?.parent?.files?.length) return [];
     const file = documentData.parent.files[0];
+    const parentExt = file.fileName?.match(/\.[^.]+$/)?.[0] ?? '';
     const pageRegex = /^(\d+)(?:-(\d+))?$/;
     return String(documentData.pages ?? '')
       .split(',')
@@ -166,23 +166,23 @@ const Document = ({
         if (!match) return [];
         const start = parseInt(match[1], 10);
         const end = match[2] ? parseInt(match[2], 10) : null;
-        const path = `${file.completePath}#page=${start}`;
-        return [
-          <FileListElement
-            key={path}
-            fileName={formatMessage(
-              {
-                id: end
-                  ? 'Pages {start}-{end} of {title}'
-                  : 'Page {start} of {title}'
-              },
-              { start, end, title: documentData.parent.title }
-            )}
-            filePath={path}
-          />
-        ];
+        const completePath = `${file.completePath}#page=${start}`;
+        const label = formatMessage(
+          {
+            id: end
+              ? 'Pages {start}-{end} of {title}'
+              : 'Page {start} of {title}'
+          },
+          { start, end, title: documentData.parent.title }
+        );
+        return [{ fileName: `${label}${parentExt}`, completePath }];
       });
   }, [documentData, formatMessage]);
+
+  const allFiles = useMemo(
+    () => [...(documentData?.files ?? []), ...pageFiles],
+    [documentData, pageFiles]
+  );
 
   const childIssues = useMemo(
     () => (documentChildren ?? []).filter(d => d.type === 'Issue'),
@@ -398,10 +398,7 @@ const Document = ({
                         {documentData.description}
                       </Linkify>
                     </SummaryText>
-                    <FilesSection files={documentData.files} />
-                    {pageFiles.length > 0 && (
-                      <EntitiesList>{pageFiles}</EntitiesList>
-                    )}
+                    <FilesSection files={allFiles} />
                   </MainColumn>
                   <SideColumn>
                     <DetailsList>
