@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { Box, Breadcrumbs, Link, Skeleton, Typography } from '@mui/material';
+import { Box, Breadcrumbs, Chip, Link, Skeleton, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { Link as RouterLink, useNavigate, useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
@@ -404,6 +404,11 @@ const Document = ({
                       <Box>
                         <Typography variant="h5" gutterBottom>
                           {formatMessage({ id: 'Issues' })}
+                          <Chip
+                            label={childIssues.length}
+                            size="small"
+                            sx={{ ml: 1, fontWeight: 600, verticalAlign: 'middle' }}
+                          />
                         </Typography>
                         {childIssues.length > 0 ? (
                           <EntitiesList>
