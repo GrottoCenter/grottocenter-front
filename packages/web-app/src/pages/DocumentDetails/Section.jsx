@@ -189,6 +189,37 @@ const PdfPreview = styled('object')(({ theme }) => ({
   [theme.breakpoints.up('md')]: { height: 600 }
 }));
 
+const VideoPreview = styled('video')(({ theme }) => ({
+  width: '100%',
+  maxHeight: 320,
+  display: 'block',
+  background: theme.palette.common.black,
+  borderRadius: theme.spacing(1),
+  [theme.breakpoints.up('sm')]: { maxHeight: 480 },
+  [theme.breakpoints.up('md')]: { maxHeight: 600 }
+}));
+
+const AudioPreview = styled('audio')`
+  width: 100%;
+  display: block;
+`;
+
+const VIDEO_EXTENSIONS = new Set(['.mp4', '.webm', '.ogv']);
+const AUDIO_EXTENSIONS = new Set([
+  '.mp3',
+  '.ogg',
+  '.wav',
+  '.m4a',
+  '.flac',
+  '.aac',
+  '.opus'
+]);
+
+const isVideoFile = fileName =>
+  VIDEO_EXTENSIONS.has(getFileExtension(fileName));
+const isAudioFile = fileName =>
+  AUDIO_EXTENSIONS.has(getFileExtension(fileName));
+
 const FileRow = styled(Box)(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
@@ -239,10 +270,22 @@ export const FilesSection = ({ files }) => {
     () => fileList.filter(f => getFileExtension(f.fileName) === '.pdf'),
     [fileList]
   );
+  const videos = useMemo(
+    () => fileList.filter(f => isVideoFile(f.fileName)),
+    [fileList]
+  );
+  const audios = useMemo(
+    () => fileList.filter(f => isAudioFile(f.fileName)),
+    [fileList]
+  );
   const others = useMemo(
     () =>
       fileList.filter(
-        f => !isImageFile(f.fileName) && getFileExtension(f.fileName) !== '.pdf'
+        f =>
+          !isImageFile(f.fileName) &&
+          !isVideoFile(f.fileName) &&
+          !isAudioFile(f.fileName) &&
+          getFileExtension(f.fileName) !== '.pdf'
       ),
     [fileList]
   );
@@ -291,6 +334,46 @@ export const FilesSection = ({ files }) => {
               </GCLink>
             </Typography>
           </PdfPreview>
+        </Box>
+      ))}
+
+      {videos.map(file => (
+        <Box key={file.completePath}>
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 1,
+              mb: 1
+            }}>
+            {getFileIcon(file.fileName)}
+            <GCLink href={file.completePath}>
+              {decodeFileName(file.fileName)}
+            </GCLink>
+          </Box>
+          <VideoPreview
+            controls
+            preload="metadata"
+            src={file.completePath}
+          />
+        </Box>
+      ))}
+
+      {audios.map(file => (
+        <Box key={file.completePath}>
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 1,
+              mb: 1
+            }}>
+            {getFileIcon(file.fileName)}
+            <GCLink href={file.completePath}>
+              {decodeFileName(file.fileName)}
+            </GCLink>
+          </Box>
+          <AudioPreview controls preload="metadata" src={file.completePath} />
         </Box>
       ))}
 
