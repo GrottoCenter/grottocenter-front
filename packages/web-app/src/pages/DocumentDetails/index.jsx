@@ -1,13 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
-import {
-  Box,
-  Breadcrumbs,
-  Chip,
-  Link,
-  Skeleton,
-  Typography
-} from '@mui/material';
+import { Box, Breadcrumbs, Link, Skeleton } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { Link as RouterLink, useNavigate, useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
@@ -20,6 +13,11 @@ import ShareIcon from '@mui/icons-material/Share';
 import { NavigateNext } from '@mui/icons-material';
 
 import CustomIcon from '../../components/common/CustomIcon';
+import DocumentTypeChip from '../../components/common/DocumentTypeChip';
+import {
+  DOCUMENT_TYPE_ICONS,
+  DOCUMENT_TYPE_FALLBACK_ICON
+} from '../../utils/documentTypeHelpers';
 import {
   DetailItem,
   DetailsList,
@@ -27,7 +25,6 @@ import {
   FileListElement,
   FilesSection,
   ListElement,
-  ParentDocumentBlock,
   SummaryText,
   TextLink
 } from './Section';
@@ -252,22 +249,29 @@ const Document = ({
         })
       : null;
 
+  const ParentTypeIcon =
+    (documentData?.parent?.type && DOCUMENT_TYPE_ICONS[documentData.parent.type]) ||
+    DOCUMENT_TYPE_FALLBACK_ICON;
   const breadcrumb = documentData?.parent ? (
     <Breadcrumbs
-      separator={<NavigateNext sx={{ fontSize: '1rem' }} />}
-      sx={{ fontSize: { xs: '0.85rem', md: '0.95rem' } }}>
+      separator={<NavigateNext sx={{ fontSize: '1.2rem' }} />}
+      sx={{
+        fontSize: { xs: '1.2rem', md: '1.7rem' },
+        '& .MuiBreadcrumbs-separator': { mx: { xs: '2px', md: '8px' } }
+      }}>
       <Link
         component={RouterLink}
         to={`/ui/documents/${documentData.parent.id}`}
         underline="hover"
         color="inherit"
-        sx={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-        <CustomIcon type="bibliography" size={14} />
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: { xs: '4px', md: '6px' }
+        }}>
+        <ParentTypeIcon sx={{ fontSize: 'inherit' }} />
         {documentData.parent.title}
       </Link>
-      <Typography variant="inherit" color="text.secondary">
-        {documentData.title}
-      </Typography>
     </Breadcrumbs>
   ) : null;
 
@@ -392,7 +396,10 @@ const Document = ({
                       {documentData.description}
                     </Linkify>
                   </SummaryText>
-                  <ParentDocumentBlock parent={documentData.parent} />
+                  <FilesSection files={documentData.files} />
+                  {pageFiles.length > 0 && (
+                    <EntitiesList>{pageFiles}</EntitiesList>
+                  )}
                   <AuthorAndDate
                     author={documentData.creator}
                     textColor="textSecondary"
@@ -406,11 +413,7 @@ const Document = ({
                       label={formatMessage({ id: 'Type' })}
                       value={
                         documentData.type ? (
-                          <Chip
-                            color="primary"
-                            size="small"
-                            label={formatMessage({ id: documentData.type })}
-                          />
+                          <DocumentTypeChip type={documentData.type} />
                         ) : null
                       }
                     />
@@ -422,49 +425,8 @@ const Document = ({
                       }
                     />
                     <DetailItem
-                      label={documentData.identifierType?.toUpperCase()}
-                      value={documentData.identifier}
-                      url={
-                        documentData.identifierType === 'url'
-                          ? documentData.identifier
-                          : undefined
-                      }
-                    />
-                    <DetailItem
-                      label={formatMessage({ id: 'Authors' })}
-                      value={allAuthors}
-                    />
-                    <DetailItem
-                      label={formatMessage({ id: 'Editor' })}
-                      value={documentData.editor?.name}
-                      url={
-                        documentData.editor
-                          ? `/ui/organizations/${documentData.editor.id}`
-                          : undefined
-                      }
-                    />
-                    <DetailItem
-                      label={formatMessage({ id: 'Library' })}
-                      value={documentData.library?.name}
-                      url={
-                        documentData.library
-                          ? `/ui/organizations/${documentData.library.id}`
-                          : undefined
-                      }
-                    />
-                    <DetailItem
                       label={formatMessage({ id: 'Publication date' })}
                       value={documentData.datePublication}
-                    />
-                    <DetailItem
-                      label={formatMessage({ id: 'Publication (BBS legacy)' })}
-                      value={documentData?.oldBBS?.publicationOther}
-                    />
-                    <DetailItem
-                      label={formatMessage({
-                        id: 'Publication number (BBS legacy)'
-                      })}
-                      value={documentData?.oldBBS?.publicationFascicule}
                     />
                     <DetailItem
                       label={formatMessage({ id: 'Pages' })}
@@ -475,6 +437,68 @@ const Document = ({
                       value={documentData.issue}
                     />
                     <DetailItem
+                      label={formatMessage({ id: 'License' })}
+                      value={documentData.license}
+                    />
+                    <DetailItem
+                      fullWidth
+                      label={formatMessage({ id: 'Parent document' })}
+                      value={documentData.parent?.title}
+                      url={
+                        documentData.parent
+                          ? `/ui/documents/${documentData.parent.id}`
+                          : undefined
+                      }
+                    />
+                    <DetailItem
+                      fullWidth
+                      label={formatMessage({ id: 'Authors' })}
+                      value={allAuthors}
+                    />
+                    <DetailItem
+                      fullWidth
+                      label={formatMessage({ id: 'Editor' })}
+                      value={documentData.editor?.name}
+                      url={
+                        documentData.editor
+                          ? `/ui/organizations/${documentData.editor.id}`
+                          : undefined
+                      }
+                    />
+                    <DetailItem
+                      fullWidth
+                      label={formatMessage({ id: 'Library' })}
+                      value={documentData.library?.name}
+                      url={
+                        documentData.library
+                          ? `/ui/organizations/${documentData.library.id}`
+                          : undefined
+                      }
+                    />
+                    <DetailItem
+                      fullWidth
+                      label={documentData.identifierType?.toUpperCase()}
+                      value={documentData.identifier}
+                      url={
+                        documentData.identifierType === 'url'
+                          ? documentData.identifier
+                          : undefined
+                      }
+                    />
+                    <DetailItem
+                      fullWidth
+                      label={formatMessage({ id: 'Publication (BBS legacy)' })}
+                      value={documentData?.oldBBS?.publicationOther}
+                    />
+                    <DetailItem
+                      fullWidth
+                      label={formatMessage({
+                        id: 'Publication number (BBS legacy)'
+                      })}
+                      value={documentData?.oldBBS?.publicationFascicule}
+                    />
+                    <DetailItem
+                      fullWidth
                       label={formatMessage({ id: 'Subjects' })}
                       value={
                         documentData.subjects?.length
@@ -491,6 +515,7 @@ const Document = ({
                       }
                     />
                     <DetailItem
+                      fullWidth
                       label={formatMessage({ id: 'Regions' })}
                       value={
                         documentData.iso3166?.length
@@ -502,6 +527,7 @@ const Document = ({
                     />
                     {permissions.isModerator && (
                       <DetailItem
+                        fullWidth
                         label={formatMessage({ id: 'Authorization' })}
                         value={documentData?.authorizationDocument?.title}
                         url={
@@ -512,6 +538,7 @@ const Document = ({
                       />
                     )}
                     <DetailItem
+                      fullWidth
                       label={formatMessage({ id: 'Source' })}
                       value={
                         documentData.importSource
@@ -519,30 +546,16 @@ const Document = ({
                           : null
                       }
                     />
-                    <DetailItem
-                      label={formatMessage({ id: 'License' })}
-                      value={documentData.license}
-                    />
                   </DetailsList>
                 </SideColumn>
               </HalfSplitContainer>
             }
           />
 
-          <ScrollableContent
-            title={formatMessage({ id: 'Files' })}
-            content={<FilesSection files={documentData.files} />}
-          />
-
-          {pageFiles.length > 0 && (
-            <ScrollableContent
-              title={formatMessage({ id: 'Pages of parent document' })}
-              content={<EntitiesList>{pageFiles}</EntitiesList>}
-            />
-          )}
 
           {linkedEntities.length > 0 && (
             <ScrollableContent
+              dense
               title={formatMessage({ id: 'Linked entities' })}
               content={<EntitiesList>{linkedEntities}</EntitiesList>}
             />
@@ -550,6 +563,7 @@ const Document = ({
 
           {childArticles.length > 0 && (
             <ScrollableContent
+              dense
               title={formatMessage({ id: 'Articles' })}
               count={childArticles.length}
               content={
@@ -570,6 +584,7 @@ const Document = ({
 
           {childIssues.length > 0 && (
             <ScrollableContent
+              dense
               title={formatMessage({ id: 'Issues' })}
               count={childIssues.length}
               content={
@@ -590,6 +605,7 @@ const Document = ({
 
           {childOther.length > 0 && (
             <ScrollableContent
+              dense
               title={formatMessage({ id: 'Child documents' })}
               count={childOther.length}
               content={

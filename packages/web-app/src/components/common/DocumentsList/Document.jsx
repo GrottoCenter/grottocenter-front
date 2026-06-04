@@ -2,7 +2,6 @@ import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
 import {
   Box,
-  Chip,
   ListItem,
   Paper,
   ButtonGroup,
@@ -12,6 +11,7 @@ import {
   useMediaQuery,
   useTheme
 } from '@mui/material';
+import DocumentTypeChip from '../DocumentTypeChip';
 import LinkOffIcon from '@mui/icons-material/LinkOff';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
@@ -71,15 +71,7 @@ const Document = ({
                 {document.title}
               </GCLink>
             </Typography>
-            <Chip
-              variant="outlined"
-              size="small"
-              color="primary"
-              label={
-                (document.type && formatMessage({ id: document.type })) ||
-                formatMessage({ id: 'unknown' })
-              }
-            />
+            <DocumentTypeChip type={document.type} />
           </Box>
           {(hasSnapshotButton || onUnlink) && (
             <Box sx={{ flexShrink: 0 }}>

@@ -57,21 +57,36 @@ ListElement.propTypes = {
   url: PropTypes.string
 };
 
-const HorizontalList = styled(List)`
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  justify-content: flex-start;
-  padding: 0;
+const HorizontalList = styled(List)(({ theme }) => ({
+  display: 'flex',
+  flexDirection: 'row',
+  flexWrap: 'wrap',
+  justifyContent: 'flex-start',
+  paddingTop: 0,
+  paddingBottom: 0,
+  marginTop: theme.spacing(-1),
+  gap: theme.spacing(0.5),
 
-  & .MuiListItem-root {
-    width: initial;
-  }
+  '& .MuiListItem-root': {
+    width: 'initial',
+    paddingTop: theme.spacing(0.5),
+    paddingBottom: theme.spacing(0.5)
+  },
 
-  & .MuiListItemText-secondary {
-    white-space: pre-wrap;
+  '& .MuiListItemIcon-root': {
+    minWidth: 0,
+    marginRight: theme.spacing(1.5)
+  },
+
+  '& .MuiListItemText-root': {
+    marginTop: 0,
+    marginBottom: 0
+  },
+
+  '& .MuiListItemText-secondary': {
+    whiteSpace: 'pre-wrap'
   }
-`;
+}));
 
 export const EntitiesList = ({ children }) => {
   const items = React.Children.toArray(children).filter(Boolean);
@@ -95,9 +110,16 @@ SummaryText.propTypes = { children: PropTypes.node };
 
 const PropertiesGrid = styled(Box)(({ theme }) => ({
   display: 'grid',
-  gridTemplateColumns: '1fr',
-  rowGap: theme.spacing(1.5),
+  gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+  rowGap: theme.spacing(1.25),
   columnGap: theme.spacing(2)
+}));
+
+const PropertyCell = styled('div', {
+  shouldForwardProp: prop => prop !== 'fullWidth'
+})(({ fullWidth }) => ({
+  gridColumn: fullWidth ? '1 / -1' : 'auto',
+  minWidth: 0
 }));
 
 export const DetailsList = ({ children }) => {
@@ -113,17 +135,26 @@ export const DetailsList = ({ children }) => {
 };
 DetailsList.propTypes = { children: PropTypes.node };
 
-export const DetailItem = ({ icon, label, value, url, secondary = false }) => {
+export const DetailItem = ({
+  icon,
+  label,
+  value,
+  url,
+  secondary = false,
+  fullWidth = false
+}) => {
   if (value === null || value === undefined || value === '') return null;
   return (
-    <Property
-      icon={icon}
-      label={label}
-      value={value}
-      url={url}
-      secondary={secondary}
-      flexBasis="100%"
-    />
+    <PropertyCell fullWidth={fullWidth}>
+      <Property
+        icon={icon}
+        label={label}
+        value={value}
+        url={url}
+        secondary={secondary}
+        flexBasis="100%"
+      />
+    </PropertyCell>
   );
 };
 DetailItem.propTypes = {
@@ -135,7 +166,8 @@ DetailItem.propTypes = {
     PropTypes.node
   ]),
   url: PropTypes.string,
-  secondary: PropTypes.bool
+  secondary: PropTypes.bool,
+  fullWidth: PropTypes.bool
 };
 
 export const FileListElement = ({ fileName, filePath }) => (
@@ -150,13 +182,15 @@ FileListElement.propTypes = {
   filePath: PropTypes.string.isRequired
 };
 
-const PdfPreview = styled('object')`
-  border: 0;
-  width: 100%;
-  height: 600px;
-  display: block;
-  background: ${({ theme }) => theme.palette.grey[100]};
-`;
+const PdfPreview = styled('object')(({ theme }) => ({
+  border: 0,
+  width: '100%',
+  height: 320,
+  display: 'block',
+  background: theme.palette.grey[100],
+  [theme.breakpoints.up('sm')]: { height: 480 },
+  [theme.breakpoints.up('md')]: { height: 600 }
+}));
 
 const FileRow = styled(Box)(({ theme }) => ({
   display: 'flex',
@@ -291,36 +325,3 @@ FilesSection.propTypes = {
   )
 };
 
-export const ParentDocumentBlock = ({ parent }) => {
-  const { formatMessage } = useIntl();
-  if (!parent) return null;
-  const hasRichContent =
-    !!parent.description || (parent.files && parent.files.length > 0);
-  if (!hasRichContent) return null;
-
-  return (
-    <Paper
-      variant="outlined"
-      sx={{ p: 2, borderRadius: 2, bgcolor: 'grey.50' }}>
-      <Typography variant="caption" color="textSecondary">
-        {formatMessage({ id: 'Parent document' })}
-      </Typography>
-      <Box sx={{ mt: 0.5, mb: 1 }}>
-        <TextLink value={parent.title} url={`/ui/documents/${parent.id}`} />
-      </Box>
-      {parent.description && (
-        <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap' }}>
-          {parent.description}
-        </Typography>
-      )}
-    </Paper>
-  );
-};
-ParentDocumentBlock.propTypes = {
-  parent: PropTypes.shape({
-    id: PropTypes.number,
-    title: PropTypes.string,
-    description: PropTypes.string,
-    files: PropTypes.arrayOf(PropTypes.shape({}))
-  })
-};
