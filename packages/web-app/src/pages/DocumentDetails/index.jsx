@@ -1,34 +1,41 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { Chip, Skeleton } from '@mui/material';
+import {
+  Box,
+  Breadcrumbs,
+  Chip,
+  Link,
+  Skeleton,
+  Typography
+} from '@mui/material';
+import { styled } from '@mui/material/styles';
+import { Link as RouterLink, useNavigate, useParams } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import PropTypes from 'prop-types';
+import Linkify from 'linkify-react';
 import CreateIcon from '@mui/icons-material/Create';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ManageHistoryIcon from '@mui/icons-material/ManageHistory';
 import ShareIcon from '@mui/icons-material/Share';
-import CustomIcon from '../../components/common/CustomIcon';
-import PropTypes from 'prop-types';
-import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate, useParams } from 'react-router-dom';
-import Linkify from 'linkify-react';
-import { loadLanguages } from '../../actions/Language';
+import { NavigateNext } from '@mui/icons-material';
 
+import CustomIcon from '../../components/common/CustomIcon';
 import {
+  DetailItem,
+  DetailsList,
+  EntitiesList,
   FileListElement,
-  ItemList,
-  ItemString,
+  FilesSection,
   ListElement,
-  SectionDetails,
-  SectionDivider,
-  SectionFilesPreview,
-  SectionList,
-  SectionText,
-  SectionTitleLink,
+  ParentDocumentBlock,
+  SummaryText,
   TextLink
 } from './Section';
 import { fetchDocumentDetails } from '../../actions/Document/GetDocumentDetails';
 import { fetchDocumentChildren } from '../../actions/Document/GetDocumentChildren';
 import { deleteDocument } from '../../actions/Document/DeleteDocument';
 import { restoreDocument } from '../../actions/Document/RestoreDocument';
+import { loadLanguages } from '../../actions/Language';
 import { usePermissions, useSharePage } from '../../hooks';
 import PageHeader from '../../components/common/Layouts/PageHeader';
 import ResponsiveActions from '../../components/common/Layouts/ResponsiveActions';
@@ -46,6 +53,34 @@ import {
   DocumentSimplePropTypes
 } from '../../types/document.type';
 import linkifyOptions from '../../helpers/linkifyOptions';
+
+const HalfSplitContainer = styled('div')`
+  display: flex;
+  flex-direction: column;
+  gap: ${({ theme }) => theme.spacing(2)};
+
+  ${({ theme }) => theme.breakpoints.up('md')} {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: ${({ theme }) => theme.spacing(3)};
+  }
+`;
+
+const MainColumn = styled('div')`
+  flex: 2;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: ${({ theme }) => theme.spacing(2)};
+`;
+
+const SideColumn = styled('div')`
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: ${({ theme }) => theme.spacing(2)};
+`;
 
 const Document = ({
   isLoading = true,
@@ -100,31 +135,32 @@ const Document = ({
     documentData?.mainLanguage === '000' ? null : documentData?.mainLanguage;
 
   const allAuthors = useMemo(() => {
-    if (!documentData) return [];
+    if (!documentData) return null;
     const items = [
       ...(documentData.authors ?? []).map(a => ({
-        id: a.id,
+        id: `caver-${a.id}`,
         name: a.nickname,
         url: `/ui/persons/${a.id}`
       })),
       ...(documentData.authorsOrganization ?? []).map(a => ({
-        id: a.id,
+        id: `org-${a.id}`,
         name: a.name,
         url: `/ui/organizations/${a.id}`
       }))
     ];
+    if (items.length === 0) return null;
     return items.flatMap((a, i) =>
       i < items.length - 1
-        ? [<TextLink key={a.id} value={a.name} url={a.url} />, ' - ']
+        ? [<TextLink key={a.id} value={a.name} url={a.url} />, ' · ']
         : [<TextLink key={a.id} value={a.name} url={a.url} />]
     );
   }, [documentData]);
 
-  const allFiles = useMemo(() => {
+  const pageFiles = useMemo(() => {
     if (!documentData?.parent?.files?.length) return [];
     const file = documentData.parent.files[0];
     const pageRegex = /^(\d+)(?:-(\d+))?$/;
-    return String(documentData.pages)
+    return String(documentData.pages ?? '')
       .split(',')
       .map(s => s.trim())
       .filter(Boolean)
@@ -172,7 +208,7 @@ const Document = ({
     return [
       ...(documentData.massifs ?? []).map(e => (
         <ListElement
-          key={e.id}
+          key={`massif-${e.id}`}
           icon={<CustomIcon type="massif" />}
           value={e.name}
           secondary={formatMessage({ id: 'Massif' })}
@@ -181,7 +217,7 @@ const Document = ({
       )),
       documentData.cave && (
         <ListElement
-          key={documentData.cave.id}
+          key={`cave-${documentData.cave.id}`}
           icon={<CustomIcon type="network" />}
           value={documentData.cave.name}
           secondary={formatMessage({ id: 'Cave' })}
@@ -190,7 +226,7 @@ const Document = ({
       ),
       ...(documentData.entrances ?? []).map(entrance => (
         <ListElement
-          key={entrance.id}
+          key={`entrance-${entrance.id}`}
           icon={<CustomIcon type="entrance" />}
           value={entrance.name}
           secondary={formatMessage({ id: 'Entrance' })}
@@ -206,7 +242,7 @@ const Document = ({
     ? `/ui/documents/${documentData.id}/snapshots`
     : null;
 
-  const subheader =
+  const subheaderMessage =
     !isLoading &&
     documentData &&
     permissions.isAuth &&
@@ -215,6 +251,35 @@ const Document = ({
           id: 'A moderator needs to validate the last modification before being able to edit the document again.'
         })
       : null;
+
+  const breadcrumb = documentData?.parent ? (
+    <Breadcrumbs
+      separator={<NavigateNext sx={{ fontSize: '1rem' }} />}
+      sx={{ fontSize: { xs: '0.85rem', md: '0.95rem' } }}>
+      <Link
+        component={RouterLink}
+        to={`/ui/documents/${documentData.parent.id}`}
+        underline="hover"
+        color="inherit"
+        sx={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+        <CustomIcon type="bibliography" size={14} />
+        {documentData.parent.title}
+      </Link>
+      <Typography variant="inherit" color="text.secondary">
+        {documentData.title}
+      </Typography>
+    </Breadcrumbs>
+  ) : null;
+
+  const subheader =
+    breadcrumb || subheaderMessage ? (
+      <>
+        {breadcrumb}
+        {subheaderMessage && (
+          <Box sx={{ mt: breadcrumb ? 0.5 : 0 }}>{subheaderMessage}</Box>
+        )}
+      </>
+    ) : null;
 
   const actions = hideActions ? null : (
     <ResponsiveActions
@@ -255,9 +320,11 @@ const Document = ({
     <>
       <PageHeader
         title={documentData?.title ?? (isLoading ? undefined : '')}
+        icon={<CustomIcon type="bibliography" />}
         subheader={subheader}
         actions={actions}
       />
+
       {documentData?.isDeleted && (
         <ScrollableContent
           content={
@@ -274,6 +341,7 @@ const Document = ({
           }
         />
       )}
+
       <DeleteConfirmationDialog
         entityType={DELETED_ENTITIES.document}
         isOpen={isDeleteConfirmationOpen}
@@ -284,6 +352,7 @@ const Document = ({
           onDeletePress(entity?.id, isDeleteConfirmationPermanent);
         }}
       />
+
       {isLoading && (
         <ScrollableContent
           content={
@@ -298,6 +367,7 @@ const Document = ({
           }
         />
       )}
+
       {error && (
         <ScrollableContent
           content={
@@ -310,168 +380,234 @@ const Document = ({
           }
         />
       )}
+
       {documentData && (
-        <ScrollableContent
-          content={
-            <>
-              <SectionTitleLink
-                title={formatMessage({ id: 'Is Part of' })}
-                value={documentData.parent?.title}
-                url={`/ui/documents/${documentData.parent?.id}`}
-              />
-              <SectionText title={formatMessage({ id: 'Summary' })}>
-                <Linkify options={linkifyOptions}>
-                  {documentData.description}
-                </Linkify>
-              </SectionText>
-              <SectionDivider />
-              <SectionDetails title={formatMessage({ id: 'Details' })}>
-                <ItemString
-                  label={formatMessage({ id: 'Type' })}
-                  value={
-                    <Chip
-                      color="primary"
-                      label={formatMessage({ id: documentData.type })}
+        <>
+          <ScrollableContent
+            content={
+              <HalfSplitContainer>
+                <MainColumn>
+                  <SummaryText>
+                    <Linkify options={linkifyOptions}>
+                      {documentData.description}
+                    </Linkify>
+                  </SummaryText>
+                  <ParentDocumentBlock parent={documentData.parent} />
+                  <AuthorAndDate
+                    author={documentData.creator}
+                    textColor="textSecondary"
+                    date={documentData.dateInscription}
+                    verb="Created"
+                  />
+                </MainColumn>
+                <SideColumn>
+                  <DetailsList>
+                    <DetailItem
+                      label={formatMessage({ id: 'Type' })}
+                      value={
+                        documentData.type ? (
+                          <Chip
+                            color="primary"
+                            size="small"
+                            label={formatMessage({ id: documentData.type })}
+                          />
+                        ) : null
+                      }
                     />
-                  }
-                />
-                <ItemString
-                  label={formatMessage({ id: 'Language' })}
-                  value={
-                    languages.find(e => e.id === mainLanguage)?.refName ??
-                    mainLanguage
-                  }
-                />
-                <ItemString
-                  label={documentData.identifierType?.toUpperCase()}
-                  value={documentData.identifier}
-                  url={
-                    documentData.identifierType === 'url'
-                      ? documentData.identifier
-                      : undefined
-                  }
-                />
-                <ItemList label={formatMessage({ id: 'Authors' })}>
-                  {allAuthors}
-                </ItemList>
-                <ItemString
-                  label={formatMessage({ id: 'Editor' })}
-                  value={documentData.editor?.name}
-                  url={`/ui/organizations/${documentData.editor?.id}`}
-                />
-                <ItemString
-                  label={formatMessage({ id: 'Library' })}
-                  value={documentData.library?.name}
-                  url={`/ui/organizations/${documentData.library?.id}`}
-                />
-                <ItemString
-                  label={formatMessage({ id: 'Publication date' })}
-                  value={documentData.datePublication}
-                />
-                <ItemString
-                  label={formatMessage({ id: 'Publication (BBS legacy)' })}
-                  value={documentData?.oldBBS?.publicationOther}
-                />
-                <ItemString
-                  label={formatMessage({
-                    id: 'Publication number (BBS legacy)'
-                  })}
-                  value={documentData?.oldBBS?.publicationFascicule}
-                />
-                <ItemString
-                  label={formatMessage({ id: 'Pages' })}
-                  value={documentData.pages}
-                />
-                <ItemString
-                  label={formatMessage({ id: 'Issue' })}
-                  value={documentData.issue}
-                />
-                <ItemList label={formatMessage({ id: 'Subjects' })}>
-                  {documentData.subjects?.map(
-                    s =>
-                      `${s.id} ${formatMessage({
-                        id: s.id,
-                        defaultMessage: s.subject
-                      })}`
-                  )}
-                </ItemList>
-                <ItemList label={formatMessage({ id: 'Regions' })}>
-                  {documentData.iso3166?.map(e => `${e.name} (${e.iso})`)}
-                </ItemList>
-                {permissions.isModerator && (
-                  <ItemString
-                    label={formatMessage({ id: 'Authorization' })}
-                    value={documentData?.authorizationDocument?.title}
-                    url={`/ui/documents/${documentData.authorizationDocument?.id}`}
-                  />
-                )}
-                <ItemString
-                  label={formatMessage({ id: 'Source' })}
-                  value={
-                    documentData.importSource
-                      ? `${documentData.importId}#${documentData.importSource}`
-                      : null
-                  }
-                />
-                <ItemString
-                  label={formatMessage({ id: 'License' })}
-                  value={documentData.license}
-                />
-              </SectionDetails>
-              <SectionList title={formatMessage({ id: 'Linked entities' })}>
-                {linkedEntities}
-              </SectionList>
-              {allFiles.length > 0 && (
-                <SectionList title={formatMessage({ id: 'Files' })}>
-                  {allFiles}
-                </SectionList>
-              )}
-              <SectionList title={formatMessage({ id: 'Articles' })}>
-                {childArticles?.map(doc => (
-                  <ListElement
-                    key={doc.id}
-                    icon={<CustomIcon type="bibliography" />}
-                    value={doc.title}
-                    secondary={doc.description}
-                    url={`/ui/documents/${doc.id}`}
-                  />
-                ))}
-              </SectionList>
-              <SectionList title={formatMessage({ id: 'Issues' })}>
-                {childIssues?.map(doc => (
-                  <ListElement
-                    key={doc.id}
-                    icon={<CustomIcon type="bibliography" />}
-                    value={doc.title}
-                    secondary={doc.description}
-                    url={`/ui/documents/${doc.id}`}
-                  />
-                ))}
-              </SectionList>
-              <SectionList title={formatMessage({ id: 'Child documents' })}>
-                {childOther?.map(doc => (
-                  <ListElement
-                    key={doc.id}
-                    icon={<CustomIcon type="bibliography" />}
-                    value={doc.title}
-                    secondary={doc.description}
-                    url={`/ui/documents/${doc.id}`}
-                  />
-                ))}
-              </SectionList>
-              <SectionFilesPreview
-                title={formatMessage({ id: 'Files' })}
-                files={documentData?.files}
-              />
-              <AuthorAndDate
-                author={documentData.creator}
-                textColor="textSecondary"
-                date={documentData.dateInscription}
-                verb="Created"
-              />
-            </>
-          }
-        />
+                    <DetailItem
+                      label={formatMessage({ id: 'Language' })}
+                      value={
+                        languages.find(e => e.id === mainLanguage)?.refName ??
+                        mainLanguage
+                      }
+                    />
+                    <DetailItem
+                      label={documentData.identifierType?.toUpperCase()}
+                      value={documentData.identifier}
+                      url={
+                        documentData.identifierType === 'url'
+                          ? documentData.identifier
+                          : undefined
+                      }
+                    />
+                    <DetailItem
+                      label={formatMessage({ id: 'Authors' })}
+                      value={allAuthors}
+                    />
+                    <DetailItem
+                      label={formatMessage({ id: 'Editor' })}
+                      value={documentData.editor?.name}
+                      url={
+                        documentData.editor
+                          ? `/ui/organizations/${documentData.editor.id}`
+                          : undefined
+                      }
+                    />
+                    <DetailItem
+                      label={formatMessage({ id: 'Library' })}
+                      value={documentData.library?.name}
+                      url={
+                        documentData.library
+                          ? `/ui/organizations/${documentData.library.id}`
+                          : undefined
+                      }
+                    />
+                    <DetailItem
+                      label={formatMessage({ id: 'Publication date' })}
+                      value={documentData.datePublication}
+                    />
+                    <DetailItem
+                      label={formatMessage({ id: 'Publication (BBS legacy)' })}
+                      value={documentData?.oldBBS?.publicationOther}
+                    />
+                    <DetailItem
+                      label={formatMessage({
+                        id: 'Publication number (BBS legacy)'
+                      })}
+                      value={documentData?.oldBBS?.publicationFascicule}
+                    />
+                    <DetailItem
+                      label={formatMessage({ id: 'Pages' })}
+                      value={documentData.pages}
+                    />
+                    <DetailItem
+                      label={formatMessage({ id: 'Issue' })}
+                      value={documentData.issue}
+                    />
+                    <DetailItem
+                      label={formatMessage({ id: 'Subjects' })}
+                      value={
+                        documentData.subjects?.length
+                          ? documentData.subjects
+                              .map(
+                                s =>
+                                  `${s.id} ${formatMessage({
+                                    id: s.id,
+                                    defaultMessage: s.subject
+                                  })}`
+                              )
+                              .join(' · ')
+                          : null
+                      }
+                    />
+                    <DetailItem
+                      label={formatMessage({ id: 'Regions' })}
+                      value={
+                        documentData.iso3166?.length
+                          ? documentData.iso3166
+                              .map(e => `${e.name} (${e.iso})`)
+                              .join(' · ')
+                          : null
+                      }
+                    />
+                    {permissions.isModerator && (
+                      <DetailItem
+                        label={formatMessage({ id: 'Authorization' })}
+                        value={documentData?.authorizationDocument?.title}
+                        url={
+                          documentData?.authorizationDocument
+                            ? `/ui/documents/${documentData.authorizationDocument.id}`
+                            : undefined
+                        }
+                      />
+                    )}
+                    <DetailItem
+                      label={formatMessage({ id: 'Source' })}
+                      value={
+                        documentData.importSource
+                          ? `${documentData.importId}#${documentData.importSource}`
+                          : null
+                      }
+                    />
+                    <DetailItem
+                      label={formatMessage({ id: 'License' })}
+                      value={documentData.license}
+                    />
+                  </DetailsList>
+                </SideColumn>
+              </HalfSplitContainer>
+            }
+          />
+
+          <ScrollableContent
+            title={formatMessage({ id: 'Files' })}
+            content={<FilesSection files={documentData.files} />}
+          />
+
+          {pageFiles.length > 0 && (
+            <ScrollableContent
+              title={formatMessage({ id: 'Pages of parent document' })}
+              content={<EntitiesList>{pageFiles}</EntitiesList>}
+            />
+          )}
+
+          {linkedEntities.length > 0 && (
+            <ScrollableContent
+              title={formatMessage({ id: 'Linked entities' })}
+              content={<EntitiesList>{linkedEntities}</EntitiesList>}
+            />
+          )}
+
+          {childArticles.length > 0 && (
+            <ScrollableContent
+              title={formatMessage({ id: 'Articles' })}
+              count={childArticles.length}
+              content={
+                <EntitiesList>
+                  {childArticles.map(doc => (
+                    <ListElement
+                      key={doc.id}
+                      icon={<CustomIcon type="bibliography" />}
+                      value={doc.title}
+                      secondary={doc.description}
+                      url={`/ui/documents/${doc.id}`}
+                    />
+                  ))}
+                </EntitiesList>
+              }
+            />
+          )}
+
+          {childIssues.length > 0 && (
+            <ScrollableContent
+              title={formatMessage({ id: 'Issues' })}
+              count={childIssues.length}
+              content={
+                <EntitiesList>
+                  {childIssues.map(doc => (
+                    <ListElement
+                      key={doc.id}
+                      icon={<CustomIcon type="bibliography" />}
+                      value={doc.title}
+                      secondary={doc.description}
+                      url={`/ui/documents/${doc.id}`}
+                    />
+                  ))}
+                </EntitiesList>
+              }
+            />
+          )}
+
+          {childOther.length > 0 && (
+            <ScrollableContent
+              title={formatMessage({ id: 'Child documents' })}
+              count={childOther.length}
+              content={
+                <EntitiesList>
+                  {childOther.map(doc => (
+                    <ListElement
+                      key={doc.id}
+                      icon={<CustomIcon type="bibliography" />}
+                      value={doc.title}
+                      secondary={doc.description}
+                      url={`/ui/documents/${doc.id}`}
+                    />
+                  ))}
+                </EntitiesList>
+              }
+            />
+          )}
+        </>
       )}
     </>
   );
