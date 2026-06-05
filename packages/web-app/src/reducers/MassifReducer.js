@@ -13,6 +13,13 @@ import { RESTORE_MASSIF_SUCCESS } from '../actions/Massif/RestoreMassif';
 import { LINK_DOCUMENT_TO_MASSIF_SUCCESS } from '../actions/LinkDocumentToMassif';
 import { UNLINK_DOCUMENT_TO_MASSIF_SUCCESS } from '../actions/UnlinkDocumentToMassif';
 import { MOVE_DESCRIPTION_RELEVANCE_SUCCESS } from '../actions/Description/MoveRelevance';
+import { POST_DESCRIPTION_SUCCESS } from '../actions/Description/CreateDescription';
+import { UPDATE_DESCRIPTION_SUCCESS } from '../actions/Description/UpdateDescription';
+import {
+  DELETE_DESCRIPTION_SUCCESS,
+  DELETE_DESCRIPTION_PERMANENT_SUCCESS
+} from '../actions/Description/DeleteDescription';
+import { RESTORE_DESCRIPTION_SUCCESS } from '../actions/Description/RestoreDescription';
 import { UPDATE_MASSIF_SUCCESS } from '../actions/Massif/UpdateMassif';
 import { MARK_MASSIF_SENSITIVE_SUCCESS } from '../actions/Massif/MarkSensitiveMassif';
 import { UNMARK_MASSIF_SENSITIVE_SUCCESS } from '../actions/Massif/UnmarkSensitiveMassif';
@@ -57,6 +64,31 @@ const reducer = (state = initialState, action) => {
           documents: [
             ...state.massif.documents.filter(e => e.id !== action.documentId)
           ]
+        }
+      };
+    case POST_DESCRIPTION_SUCCESS:
+    case UPDATE_DESCRIPTION_SUCCESS:
+    case DELETE_DESCRIPTION_SUCCESS:
+    case RESTORE_DESCRIPTION_SUCCESS:
+      return {
+        ...initialState,
+        massif: {
+          ...state.massif,
+          descriptions: arrFindReplaceOrAdd(
+            state.massif?.descriptions ?? [],
+            e => e.id === action.description.id,
+            action.description
+          )
+        }
+      };
+    case DELETE_DESCRIPTION_PERMANENT_SUCCESS:
+      return {
+        ...initialState,
+        massif: {
+          ...state.massif,
+          descriptions: state.massif?.descriptions?.filter(
+            e => e.id !== action.description.id
+          )
         }
       };
     case MOVE_DESCRIPTION_RELEVANCE_SUCCESS:
