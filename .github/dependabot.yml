@@ -7,9 +7,14 @@ updates:
     schedule:
       interval: 'monthly'
     groups:
-      all-root-dependencies:
+      root-minor-patch:
         patterns:
           - '*'
+        update-types: ['minor', 'patch']
+      root-major:
+        patterns:
+          - '*'
+        update-types: ['major']
     ignore:
       # Pinned at v8 — eslint-config-airbnb does not support ESLint v9+ flat config
       - dependency-name: 'eslint'
@@ -29,9 +34,14 @@ updates:
     schedule:
       interval: 'monthly'
     groups:
-      all-webapp-dependencies:
+      webapp-minor-patch:
         patterns:
           - '*'
+        update-types: ['minor', 'patch']
+      webapp-major:
+        patterns:
+          - '*'
+        update-types: ['major']
     ignore:
       # Requires coordinated ecosystem upgrade (separate PR)
       - dependency-name: '@storybook/*'
