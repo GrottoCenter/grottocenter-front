@@ -16,6 +16,7 @@ import CancelIcon from '@mui/icons-material/Cancel';
 import HandshakeIcon from '@mui/icons-material/Handshake';
 import ShareIcon from '@mui/icons-material/Share';
 import StandardDialog from '../../common/StandardDialog';
+import PageContainer from '../../common/Layouts/PageContainer';
 import PageHeader from '../../common/Layouts/PageHeader';
 import ResponsiveActions from '../../common/Layouts/ResponsiveActions';
 import ScrollableContent from '../../common/Layouts/Fixed/ScrollableContent';
@@ -217,7 +218,7 @@ const Organization = ({ error, isLoading, organization }) => {
     ) : null;
 
   return (
-    <>
+    <PageContainer>
       <PageHeader
         title={organization?.name ?? (isLoading ? undefined : '')}
         icon={<CustomIcon type="organization" />}
@@ -412,7 +413,7 @@ const Organization = ({ error, isLoading, organization }) => {
           }
         )}
       </StandardDialog>
-    </>
+    </PageContainer>
   );
 };
 

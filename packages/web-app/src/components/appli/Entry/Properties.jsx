@@ -19,6 +19,7 @@ import CoordinateDisplay from '../../common/CoordinateDisplay';
 import { useCoordinatePreference, getCRSLabel } from '../../../hooks';
 import DataQualityBadge from '../../common/DataQualityBadge';
 import DataQualityHelpButton from '../../common/DataQualityBadge/DataQualityHelpButton';
+import { getDataQualityLabelKey } from '../../../utils/dataQuality';
 
 import CustomIcon from '../../common/CustomIcon';
 import { Property } from '../../common/Properties';
@@ -285,11 +286,7 @@ const Properties = ({ isLoading = false, entrance, dataQuality }) => {
               <Box display="flex" alignItems="center" gap={2} flexWrap="wrap">
                 <DataQualityBadge value={dataQuality.total} size={32} />
                 <Typography variant="body2">
-                  {dataQuality.total >= 70
-                    ? formatMessage({ id: 'Good' })
-                    : dataQuality.total >= 40
-                      ? formatMessage({ id: 'Satisfactory' })
-                      : formatMessage({ id: 'Insufficient' })}
+                  {formatMessage({ id: getDataQualityLabelKey(dataQuality.total) })}
                 </Typography>
                 <DataQualityHelpButton />
                 {dataQuality.categories && (

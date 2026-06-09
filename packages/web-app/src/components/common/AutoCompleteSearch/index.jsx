@@ -26,8 +26,8 @@ const InputWrapper = styled('div', {
   shouldForwardProp: prop => prop[0] !== '$'
 })`
   display: flex;
-  margin-left: auto;
-  width: ${({ $hasFixWidth }) => ($hasFixWidth ? 100 : 80)}%;
+  margin-left: ${({ $hasFixWidth }) => ($hasFixWidth ? 'auto' : '0')};
+  width: 100%;
   border-radius: ${({ theme }) => theme.shape.borderRadius};
   background-color: ${({ theme }) => alpha(theme.palette.common.white, 0.15)};
   transition: 0.5s;
@@ -99,7 +99,8 @@ const AutoCompleteSearch = ({
   hasError = false,
   isLoading = false,
   disabled = false,
-  hasFixWidth = true
+  hasFixWidth = true,
+  value
 }) => {
   const { formatMessage } = useIntl();
   const [isOpen, setOpen] = useState(false);
@@ -119,16 +120,16 @@ const AutoCompleteSearch = ({
     setOpen(false);
   };
   const handleOpen = () => {
-    if (inputValue !== '') setOpen(true);
+    if (!disabled && inputValue !== '') setOpen(true);
   };
 
   useEffect(() => {
-    if (inputValue === '') {
+    if (disabled || inputValue === '') {
       setOpen(false);
     } else {
       setOpen(true);
     }
-  }, [inputValue]);
+  }, [inputValue, disabled]);
 
   return (
     <StyledAutocomplete
@@ -149,11 +150,19 @@ const AutoCompleteSearch = ({
       filterOptions={x => x}
       onOpen={handleOpen}
       onClose={handleClose}
-      open={isOpen}
+      open={disabled ? false : isOpen}
       noOptionsText={formatMessage(
         { id: 'No result (enter at least {count} characters)' },
         { count: AUTOCOMPLETE_MIN_CHARACTERS }
       )}
+      value={value}
+      isOptionEqualToValue={(option, val) => {
+        if (!option || !val) return false;
+        if (option.id !== undefined && val.id !== undefined) {
+          return String(option.id) === String(val.id);
+        }
+        return option === val;
+      }}
       renderInput={params => (
         <DisabledTooltip disabled={disabled}>
           <InputWrapper $hasFixWidth={hasFixWidth} disabled={disabled}>
@@ -192,7 +201,8 @@ AutoCompleteSearch.propTypes = {
   hasError: PropTypes.bool,
   isLoading: PropTypes.bool,
   disabled: PropTypes.bool,
-  hasFixWidth: PropTypes.bool
+  hasFixWidth: PropTypes.bool,
+  value: PropTypes.any
 };
 
 export default AutoCompleteSearch;

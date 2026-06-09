@@ -18,6 +18,7 @@ export const cumulatedLengthUrl = `${API_BASE_PATH}/caves/cumulated-length`;
 export const accountUrl = `${API_BASE_PATH}/account`;
 export const changePasswordUrl = `${API_BASE_PATH}/account/password`;
 export const changeEmailUrl = `${API_BASE_PATH}/account/email`;
+export const notificationPreferencesUrl = `${API_BASE_PATH}/account/notifications`;
 export const loginUrl = `${API_BASE_PATH}/login`;
 export const logoutUrl = `${API_BASE_PATH}/logout`;
 export const signUpUrl = `${API_BASE_PATH}/signup`;
@@ -257,6 +258,18 @@ export const countUnreadNotificationsUrl = `${API_URL}/api/${apiVersion}/notific
 export const fetchNotificationsUrl = `${API_URL}/api/${apiVersion}/notifications`;
 export const readNotificationUrl = notificationId =>
   `${API_URL}/api/${apiVersion}/notifications/${notificationId}/read`;
+
+// ===== Messaging urls
+export const postMessageUrl = `${API_BASE_PATH}/messages`;
+export const getConversationsUrl = `${API_BASE_PATH}/messages/conversations`;
+export const getArchivedConversationsUrl = `${API_BASE_PATH}/messages/conversations/archived`;
+export const getConversationMessagesUrl = id =>
+  `${API_BASE_PATH}/messages/conversations/${id}`;
+export const archiveConversationUrl = id =>
+  `${API_BASE_PATH}/messages/conversations/${id}/archive`;
+export const unarchiveConversationUrl = id =>
+  `${API_BASE_PATH}/messages/conversations/${id}/unarchive`;
+export const countUnreadMessagesUrl = `${API_BASE_PATH}/messages/unread/count`;
 
 // ===== Organizations urls
 export const getOrganizationUrl = `${API_BASE_PATH}/organizations/`;

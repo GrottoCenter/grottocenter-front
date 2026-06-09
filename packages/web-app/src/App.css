@@ -72,8 +72,8 @@ code {
   margin: 2px 0;
 }
 
-.map-popup-property img,
-.map-popup-property svg {
+.map-popup-property > img,
+.map-popup-property > svg {
   margin-right: 0;
   flex-shrink: 0;
   width: 25px;

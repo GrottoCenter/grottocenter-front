@@ -5,6 +5,7 @@ import { isMobile } from 'react-device-detect';
 import CustomMapContainer from '../common/MapContainer';
 import useMarkers from '../common/Markers/useMarkers';
 import { EntranceMarker } from '../common/Markers/Components';
+import MeasureControl from '../common/MeasureControl';
 
 export const filterValidPositions = positions =>
   (positions ?? []).filter(
@@ -65,6 +66,7 @@ const MapMultipleMarkers = ({ style, zoom, positions }) => {
       style={style}
       zoom={zoom || 14}>
       <MultipleMarkers validPositions={validPositions} />
+      <MeasureControl />
     </CustomMapContainer>
   );
 };

@@ -6,11 +6,13 @@ import { Description } from '@mui/icons-material';
 
 const ThumbnailCard = styled(Card)(({ theme }) => ({
   width: '100%',
-  height: 180,
+  aspectRatio: '4 / 3',
   cursor: 'pointer',
   transition: 'box-shadow 0.3s ease',
   [theme.breakpoints.up('sm')]: {
-    width: 240
+    width: 240,
+    height: 180,
+    aspectRatio: 'auto'
   },
   '&:hover': {
     boxShadow: theme.shadows[4]
@@ -26,7 +28,7 @@ const ThumbnailImage = styled('img')`
 
 const FallbackIconWrapper = styled(Box)`
   width: 100%;
-  height: 180px;
+  height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -61,13 +63,14 @@ const ImageThumbnail = ({ src, alt, onClick }) => {
 
   return (
     <ThumbnailCard onClick={onClick}>
-      <CardActionArea>
+      <CardActionArea sx={{ height: '100%' }}>
         {loading && (
           <Skeleton
             variant="rectangular"
             width="100%"
-            height={180}
+            height="100%"
             animation="wave"
+            sx={{ position: 'absolute', inset: 0 }}
           />
         )}
         <ThumbnailImage

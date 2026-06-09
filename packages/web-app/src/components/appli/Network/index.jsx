@@ -15,6 +15,7 @@ import ShareIcon from '@mui/icons-material/Share';
 import { useReactToPrint } from 'react-to-print';
 
 import { usePermissions, useUserProperties, useExplored, useSharePage } from '../../../hooks';
+import PageContainer from '../../common/Layouts/PageContainer';
 import PageHeader from '../../common/Layouts/PageHeader';
 import ResponsiveActions from '../../common/Layouts/ResponsiveActions';
 import ScrollableContent from '../../common/Layouts/Fixed/ScrollableContent';
@@ -196,6 +197,7 @@ export const Network = ({ isLoading, error, cave }) => {
     ) : null;
 
   return (
+    <PageContainer>
     <div ref={componentRef}>
       <PageHeader
         title={cave?.name ?? (isLoading ? undefined : '')}
@@ -329,6 +331,7 @@ export const Network = ({ isLoading, error, cave }) => {
         </>
       )}
     </div>
+    </PageContainer>
   );
 };
 
