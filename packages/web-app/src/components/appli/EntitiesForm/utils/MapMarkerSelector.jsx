@@ -1,6 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useWatch, useController } from 'react-hook-form';
-import { Circle, MapContainer, useMap, useMapEvent, ScaleControl } from 'react-leaflet';
+import {
+  Circle,
+  MapContainer,
+  useMap,
+  useMapEvent,
+  ScaleControl
+} from 'react-leaflet';
 import PropTypes from 'prop-types';
 import { isMobile } from 'react-device-detect';
 import { styled } from '@mui/material/styles';
@@ -75,7 +81,12 @@ const toFloat = value => {
 
 const LOCATE_ZOOM = 18;
 const hasGeolocation = Boolean(navigator.geolocation);
-const ACCURACY_CIRCLE_STYLE = { color: '#1976d2', fillColor: '#1976d2', fillOpacity: 0.1, weight: 1 };
+const ACCURACY_CIRCLE_STYLE = {
+  color: '#1976d2',
+  fillColor: '#1976d2',
+  fillOpacity: 0.1,
+  weight: 1
+};
 
 const MapMarkerSelector = ({ control, formLatitudeKey, formLongitudeKey }) => {
   const [locating, setLocating] = useState(false);
@@ -100,7 +111,11 @@ const MapMarkerSelector = ({ control, formLatitudeKey, formLongitudeKey }) => {
 
   // One-time initialization from pre-filled form values (edit form)
   useEffect(() => {
-    if (!initialized && !Number.isNaN(validLatitude) && !Number.isNaN(validLongitude)) {
+    if (
+      !initialized &&
+      !Number.isNaN(validLatitude) &&
+      !Number.isNaN(validLongitude)
+    ) {
       setCurrentPosition({ lat: validLatitude, lng: validLongitude });
       setZoomLevel(focusZoom);
       setInitialized(true);
@@ -130,7 +145,7 @@ const MapMarkerSelector = ({ control, formLatitudeKey, formLongitudeKey }) => {
         setLocateError(err.code);
         setLocating(false);
       },
-      { timeout: 10000, maximumAge: 60000 }
+      { timeout: 10000, maximumAge: 30000 } // 30s cache
     );
   };
 
@@ -144,17 +159,23 @@ const MapMarkerSelector = ({ control, formLatitudeKey, formLongitudeKey }) => {
       doubleClickZoom="center"
       touchZoom={true}
       preferCanvas>
-      <GeocodingControl onLocationSelect={newLocation => {
-        setFormLatitude(newLocation.lat.toFixed(6));
-        setFormLongitude(newLocation.lng.toFixed(6));
-        setCurrentPosition({ lat: newLocation.lat, lng: newLocation.lng });
-        setZoomLevel(focusZoom);
-      }} />
+      <GeocodingControl
+        onLocationSelect={newLocation => {
+          setFormLatitude(newLocation.lat.toFixed(6));
+          setFormLongitude(newLocation.lng.toFixed(6));
+          setCurrentPosition({ lat: newLocation.lat, lng: newLocation.lng });
+          setZoomLevel(focusZoom);
+        }}
+      />
       <FullscreenControl forceSeparateButton="true" />
       <ScaleControl position="bottomright" />
       <LayersControl />
 
-      <MapBind center={currentPosition} zoom={zoomLevel} onMoveEnd={onMoveEnd} />
+      <MapBind
+        center={currentPosition}
+        zoom={zoomLevel}
+        onMoveEnd={onMoveEnd}
+      />
 
       {locationAccuracy && (
         <Circle
@@ -173,10 +194,7 @@ const MapMarkerSelector = ({ control, formLatitudeKey, formLongitudeKey }) => {
       )}
 
       <span className="centralMarker">
-        <img
-          alt="Entry"
-          src={entranceMarkerIcon}
-        />
+        <img alt="Entry" src={entranceMarkerIcon} />
       </span>
     </StyledMapContainer>
   );
