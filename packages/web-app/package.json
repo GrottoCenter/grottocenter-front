@@ -78,13 +78,13 @@
     "web-vitals": "^5.2.0"
   },
   "devDependencies": {
-    "@storybook/addon-actions": "8.6.14",
+    "@storybook/addon-actions": "8.6.18",
     "@storybook/addon-essentials": "8.6.14",
     "@storybook/addon-knobs": "8.0.1",
-    "@storybook/addon-links": "8.6.14",
-    "@storybook/addon-viewport": "8.6.14",
-    "@storybook/react": "8.6.14",
-    "@storybook/react-webpack5": "8.6.14",
+    "@storybook/addon-links": "8.6.18",
+    "@storybook/addon-viewport": "8.6.18",
+    "@storybook/react": "8.6.18",
+    "@storybook/react-webpack5": "8.6.18",
     "@testing-library/dom": "^10.4.1",
     "@types/validator": "^13",
     "fast-check": "4.5.3",
