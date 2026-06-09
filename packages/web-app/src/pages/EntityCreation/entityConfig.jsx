@@ -41,10 +41,10 @@ export const ENTITIES = [
   }
 ];
 
-export const EntityIcon = ({ iconType, size = 35 }) => (
+export const EntityIcon = ({ iconType, size = 35, BadgeIcon = AddCircleIcon }) => (
   <Box sx={{ position: 'relative', display: 'inline-flex' }}>
     <CustomIcon type={iconType} size={size} />
-    <AddCircleIcon
+    <BadgeIcon
       sx={{
         position: 'absolute',
         top: -4,
@@ -59,6 +59,7 @@ export const EntityIcon = ({ iconType, size = 35 }) => (
 );
 
 EntityIcon.propTypes = {
+  BadgeIcon: PropTypes.elementType,
   iconType: PropTypes.string.isRequired,
   size: PropTypes.number
 };
