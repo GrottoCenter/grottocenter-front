@@ -10,6 +10,7 @@ import useGeolocation from '../../../../hooks/useGeolocation';
 import LayersControl from '../../../common/Maps/common/LayersControl';
 import LocateControl from '../../../common/Maps/common/LocateControl';
 import GeocodingControl from '../../../common/Maps/common/GeocodingControl';
+import FullscreenControl from '../../../common/Maps/common/FullscreenControl';
 import { defaultZoom, focusZoom } from '../../../../conf/config';
 
 const StyledMapContainer = styled(MapContainer)`
@@ -144,6 +145,7 @@ const MapMarkerSelector = ({ control, formLatitudeKey, formLongitudeKey }) => {
         setFormLongitude(newLocation.lng.toFixed(6));
       }} />
       <LocateControl />
+      <FullscreenControl forceSeparateButton="true" />
       <ScaleControl position="bottomright" />
       <LayersControl />
 
