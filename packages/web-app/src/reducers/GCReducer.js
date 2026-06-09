@@ -169,7 +169,6 @@ const GCReducer = combineReducers({
   region,
   regionDetails,
   regionEntrances,
-  resendVerificationEmail,
   sideMenu,
   signUp,
   verifyEmail,
