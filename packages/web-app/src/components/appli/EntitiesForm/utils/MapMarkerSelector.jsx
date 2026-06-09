@@ -145,7 +145,7 @@ const MapMarkerSelector = ({ control, formLatitudeKey, formLongitudeKey }) => {
         setLocateError(err.code);
         setLocating(false);
       },
-      { enableHighAccuracy: true, timeout: 10000, maximumAge: 30000 }
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 10000 }
     );
   };
 
