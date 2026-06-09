@@ -39,9 +39,9 @@ const GuidelineForm = ({
     defaultValues: normalizedValues ?? getDefaultValues(AVAILABLE_LANGUAGES[locale].id)
   });
 
-  const titleValidator = value => !value || value.length <= 150;
+  const titleLengthValidator = value => !value || value.length <= 150;
 
-  const descriptionValidator = value => !value || value.length <= 500;
+  const descriptionLengthValidator = value => !value || value.length <= 500;
 
   return (
     <FormContainer sx={{ marginTop: 2 }}>
@@ -53,7 +53,7 @@ const GuidelineForm = ({
             control={control}
             isError={!!errors?.title}
             isRequired
-            validatorFn={titleValidator}
+            validatorFn={titleLengthValidator}
             helperText={errors?.title ? formatMessage({ id: 'Title must be less than 150 characters.' }) : undefined}
           />
 
@@ -69,7 +69,7 @@ const GuidelineForm = ({
           minRows={3}
           control={control}
           isError={!!errors?.description}
-          validatorFn={descriptionValidator}
+          validatorFn={descriptionLengthValidator}
           helperText={errors?.description ? formatMessage({ id: 'Description must be less than 500 characters.' }) : undefined}
         />
 

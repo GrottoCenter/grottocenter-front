@@ -42,7 +42,7 @@ const reducer = (state = initialState, action) => {
       if (
         !state.country ||
         !action.guideline.countries?.some(
-          c => String(c) === String(state.country.id)
+          c => String(c.id || c) === String(state.country.id)
         )
       ) {
         return state;
@@ -66,7 +66,7 @@ const reducer = (state = initialState, action) => {
       if (
         !state.country ||
         !action.guideline.countries?.some(
-          c => String(c) === String(state.country.id)
+          c => String(c.id || c) === String(state.country.id)
         )
       ) {
         return state;

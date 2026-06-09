@@ -187,8 +187,8 @@ export const postGuidelineUrl = `${API_BASE_PATH}/guidelines`;
 export const patchGuidelineUrl = guidelineId =>
   `${API_BASE_PATH}/guidelines/${guidelineId}`;
 export const deleteGuidelineUrl = (guidelineId, isPermanent = false) =>
-  `${API_BASE_PATH}/guidelines/${guidelineId}?${
-    isPermanent ? 'isPermanent=1' : ''
+  `${API_BASE_PATH}/guidelines/${guidelineId}${
+    isPermanent ? '?isPermanent=1' : ''
   }`;
 export const restoreGuidelineUrl = guidelineId =>
   `${API_BASE_PATH}/guidelines/${guidelineId}/restore`;
