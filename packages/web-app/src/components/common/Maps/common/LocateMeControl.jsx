@@ -11,7 +11,7 @@ const LOCATE_ERRORS = {
   3: 'Location request timed out. Please try again.'
 };
 
-const LocateMeControl = ({ onClick, loading, error }) => {
+const LocateMeControl = ({ onClick, loading = false, error = null }) => {
   const { formatMessage } = useIntl();
 
   return (

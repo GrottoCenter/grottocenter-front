@@ -80,7 +80,7 @@ const toFloat = value => {
 };
 
 const LOCATE_ZOOM = 18;
-const hasGeolocation = Boolean(navigator.geolocation);
+const hasGeolocation = typeof navigator !== 'undefined' && Boolean(navigator.geolocation);
 const ACCURACY_CIRCLE_STYLE = {
   color: '#1976d2',
   fillColor: '#1976d2',
@@ -145,7 +145,7 @@ const MapMarkerSelector = ({ control, formLatitudeKey, formLongitudeKey }) => {
         setLocateError(err.code);
         setLocating(false);
       },
-      { timeout: 10000, maximumAge: 30000 } // 30s cache
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 30000 }
     );
   };
 
