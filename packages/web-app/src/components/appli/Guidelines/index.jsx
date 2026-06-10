@@ -6,8 +6,7 @@ import {
   Typography,
   List,
   ButtonGroup,
-  CircularProgress,
-  Paper
+  CircularProgress
 } from '@mui/material';
 import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
