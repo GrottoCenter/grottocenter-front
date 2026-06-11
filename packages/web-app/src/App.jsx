@@ -35,6 +35,7 @@ import AddMassif from './pages/EntityCreation/AddMassif';
 import AddOrganization from './pages/EntityCreation/AddOrganization';
 import EntryPage from './pages/Entry';
 import ImportContainer from './pages/ImportCSV';
+import ImportObservationsPage from './pages/ImportObservationsPage';
 import ManageUsers from './pages/Admin/ManageUsers';
 import Map from './pages/Map';
 import MassifPage from './pages/Massif';
@@ -132,6 +133,10 @@ const router = createBrowserRouter(
       {/* Routes requiring authentication */}
       <Route element={<PrivateRoute />}>
         <Route path="/ui/account" element={<AccountPage />} />
+        <Route
+          path="/ui/observations/import"
+          element={<ImportObservationsPage />}
+        />
         <Route path="/ui/entrances/:entranceId/edit" element={<EntranceEdit />} />
         <Route
           path="/ui/organizations/:organizationId/edit"

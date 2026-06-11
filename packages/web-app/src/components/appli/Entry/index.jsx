@@ -462,7 +462,7 @@ export const Entry = ({ isLoading, error, entrance }) => {
             PageTabs matches children to tabs by position. React.Children.toArray strips `false`,
             so `{isAdmin && <Science />}` works — but returning null or wrapping in a div would
             silently shift all subsequent tab panels. */}
-        {isAdmin && <Science />}
+        {isAdmin && <Science caveId={entrance?.cave?.id} />}
 
         {/* Tab 3 — Comments */}
         <div>

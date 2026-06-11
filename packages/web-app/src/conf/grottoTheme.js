@@ -69,6 +69,8 @@ export const overridings = {
     primary3Color: brown['100'],
     secondary1Color: blue['500'],
     secondary2Color: blue['700'],
+    // Custom legacy palette keys used by domain-specific components
+    // (e.g. MapColumnsStep uses secondary3Color for timestamp column highlights)
     secondary3Color: blue['100'],
     secondary4Color: blue['300'],
     accent1Color: orange['500'],

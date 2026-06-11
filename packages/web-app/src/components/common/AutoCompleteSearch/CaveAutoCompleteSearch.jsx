@@ -42,6 +42,11 @@ const CaveAutoCompleteSearch = ({
   const [suggestions, setSuggestions] = useState([]);
   const [error, setError] = useState('');
 
+  // Sync internal selected state with prop changes (e.g. clear from parent)
+  useEffect(() => {
+    setSelected(value);
+  }, [value]);
+
   useEffect(() => {
     async function fetchData() {
       if (!debouncedInput || debouncedInput.length < 2) {
