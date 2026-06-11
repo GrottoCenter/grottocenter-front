@@ -36,6 +36,7 @@ import forgotPassword from './ForgotPasswordReducer';
 import groups from './GroupsReducer';
 import identifierType from './IdentifierTypesReducer';
 import importCsv from './ImportCsvReducer';
+import importWizard from './ImportWizardReducer';
 import intl from './IntlReducer';
 import invalidEmailCavers from './InvalidEmailCaversReducer';
 import language from './LanguageReducer';
@@ -132,6 +133,7 @@ const GCReducer = combineReducers({
   groups,
   identifierType,
   importCsv,
+  importWizard,
   intl,
   invalidEmailCavers,
   language,
