@@ -619,7 +619,7 @@
   "Coordinates precision unavailable for restricted access entrance.": "דיוק הקואורדינטות אינו זמין למכניסה עם גישה מוגבלת.",
   "Coordinates precision unknown.": "דיוק הקואורדינטות אינו ידוע.",
   "Coordinates precision: ±{precision}m": "דיוק קואורדינטות: ±{precision}מ",
-  "coordinates.format.DMS": "Degrees, minutes, seconds",
+  "coordinates.format.DMS": "מעלות, דקות, שניות",
   "coordinates.format.Lambert 93": "Lambert 93",
   "coordinates.format.Lambert III carto": "Lambert III carto",
   "coordinates.format.WGS84": "WGS84",

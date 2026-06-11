@@ -619,7 +619,7 @@
   "Coordinates precision unavailable for restricted access entrance.": "Precisió de coordenades no disponible per a entrada d'accés restringit.",
   "Coordinates precision unknown.": "Precisió de coordenades desconeguda.",
   "Coordinates precision: ±{precision}m": "Precisió de coordenades: ±{precision}m",
-  "coordinates.format.DMS": "Degrees, minutes, seconds",
+  "coordinates.format.DMS": "Graus, minuts, segons",
   "coordinates.format.Lambert 93": "Lambert 93",
   "coordinates.format.Lambert III carto": "Lambert III carto",
   "coordinates.format.WGS84": "WGS84",

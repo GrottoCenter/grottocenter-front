@@ -619,7 +619,7 @@
   "Coordinates precision unavailable for restricted access entrance.": "アクセス制限された入口では座標精度が利用できません。",
   "Coordinates precision unknown.": "座標精度不明。",
   "Coordinates precision: ±{precision}m": "座標精度: ±{precision}m",
-  "coordinates.format.DMS": "Degrees, minutes, seconds",
+  "coordinates.format.DMS": "度、分、秒",
   "coordinates.format.Lambert 93": "Lambert 93",
   "coordinates.format.Lambert III carto": "Lambert III carto",
   "coordinates.format.WGS84": "WGS84",

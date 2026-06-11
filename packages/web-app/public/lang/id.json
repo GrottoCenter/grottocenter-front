@@ -619,7 +619,7 @@
   "Coordinates precision unavailable for restricted access entrance.": "Presisi koordinat tidak tersedia untuk pintu masuk akses terbatas.",
   "Coordinates precision unknown.": "Presisi koordinat tidak diketahui.",
   "Coordinates precision: ±{precision}m": "Presisi koordinat: ±{precision}m",
-  "coordinates.format.DMS": "Degrees, minutes, seconds",
+  "coordinates.format.DMS": "Derajat, menit, detik",
   "coordinates.format.Lambert 93": "Lambert 93",
   "coordinates.format.Lambert III carto": "Lambert III carto",
   "coordinates.format.WGS84": "WGS84",
