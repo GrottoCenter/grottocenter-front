@@ -1,4 +1,5 @@
 import proj4 from 'proj4';
+import Coordinates from 'coordinate-parser';
 
 // --- DMS conversions ---
 
@@ -130,6 +131,91 @@ export const formatWGS84 = (lat, lng, decimals = 4) => {
   const latDir = lat >= 0 ? 'N' : 'S';
   const lngDir = lng >= 0 ? 'E' : 'W';
   return `${Math.abs(lat).toFixed(decimals)}° ${latDir}, ${Math.abs(lng).toFixed(decimals)}° ${lngDir}`;
+};
+
+// --- Coordinate string parsing ---
+
+const tryProjectedConversion = (easting, northing, projection, format) => {
+  if (!projection) return null;
+  try {
+    const result = convertProjectionToWGS84(easting, northing, projection);
+    if (result.lat >= -90 && result.lat <= 90 && result.lng >= -180 && result.lng <= 180)
+      return { lat: result.lat, lng: result.lng, format };
+    return null;
+  } catch {
+    return null;
+  }
+};
+
+// Heuristic ranges for projected CRSes — never overlap with WGS84 decimal values (max ±180),
+// so safe to check before coordinate-parser which would misinterpret e.g. "843000" as DMS 84°30'00".
+const PROJECTED_CRS_RANGES = [
+  {
+    code: 'EPSG:2154',
+    name: 'Lambert 93',
+    // geographic extent: W=-9.86° E=10.38° S=41.15° N=51.56° → X_max ≈ 1 317 000 m
+    easting: [50_000, 1_320_000],
+    northing: [6_000_000, 7_220_000]
+  },
+  {
+    code: 'EPSG:27573',
+    name: 'Lambert III carto',
+    // geographic extent: south France 42°-45.5°N → X: ~260k–1 150k m, Y: ~3 050k–3 460k m
+    easting: [50_000, 1_200_000],
+    northing: [3_000_000, 3_500_000]
+  }
+];
+
+const inRange = (v, [min, max]) => v >= min && v <= max;
+
+const detectProjectedPair = (a, b) => {
+  for (const crs of PROJECTED_CRS_RANGES) {
+    if (inRange(a, crs.easting) && inRange(b, crs.northing))
+      return { easting: a, northing: b, crs };
+    if (inRange(a, crs.northing) && inRange(b, crs.easting))
+      return { easting: b, northing: a, crs };
+  }
+  return null;
+};
+
+// Parses a free-form coordinate string into { lat, lng, format } or null.
+// Supported formats: WGS84 decimal, DMS, DDM (via coordinate-parser),
+// and projected CRSes listed in PROJECTED_CRS_RANGES (via heuristic range detection).
+// projections: array of projection objects from the store — same shape as formatCoordinatesForCopy.
+export const parseCoordinateString = (input, projections = []) => {
+  if (!input || typeof input !== 'string') return null;
+
+  const nums = input.match(/-?\d[\d.,]*/g);
+  if (nums && nums.length === 2) {
+    const a = parseFloat(nums[0].replace(',', '.'));
+    const b = parseFloat(nums[1].replace(',', '.'));
+    const detected = detectProjectedPair(a, b);
+
+    if (detected) {
+      const projection = projections.find(p => p.code === detected.crs.code) ?? null;
+      return tryProjectedConversion(detected.easting, detected.northing, projection, detected.crs.name);
+    }
+  }
+
+  // Normalize separators so coordinate-parser handles them cleanly
+  const cleaned = input
+    .trim()
+    .replace(/[;/]/g, ',')
+    .replace(/\s{2,}/g, ' ');
+
+  try {
+    const coords = new Coordinates(cleaned);
+    const lat = coords.getLatitude();
+    const lng = coords.getLongitude();
+    if (lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180) {
+      const hasDMS = /[°'"dms]|[NSEWnsew]/i.test(input);
+      return { lat, lng, format: hasDMS ? 'DMS' : 'WGS84' };
+    }
+  } catch {
+    return null;
+  }
+
+  return null;
 };
 
 // --- Formatting for clipboard ---
