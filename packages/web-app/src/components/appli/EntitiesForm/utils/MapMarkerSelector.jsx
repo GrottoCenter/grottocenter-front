@@ -130,7 +130,6 @@ const MapMarkerSelector = ({ control, formLatitudeKey, formLongitudeKey }) => {
   // `initialized` is intentionally omitted from deps: we read its current value
   // as a guard but only want this effect to fire on coordinate changes, not on
   // the initialization transition (which is already handled by the effect above).
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (!initialized) return;
     const isValid =
@@ -138,6 +137,7 @@ const MapMarkerSelector = ({ control, formLatitudeKey, formLongitudeKey }) => {
     if (isValid && Date.now() - lastSetFormTs.current > MAP_WRITE_GUARD_MS) {
       setCurrentPosition({ lat: validLatitude, lng: validLongitude });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [validLatitude, validLongitude]);
 
   // map → form (only direction after initialization)
