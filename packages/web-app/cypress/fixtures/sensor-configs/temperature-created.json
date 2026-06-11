@@ -1,0 +1,11 @@
+{
+  "id": 101,
+  "device": 1,
+  "quantityKind": { "id": 1, "code": "Temperature" },
+  "unit": { "id": 1, "symbol": "°C" },
+  "precisionUpper": null,
+  "precisionLower": null,
+  "resolution": null,
+  "detectionLimitMin": null,
+  "detectionLimitMax": null
+}
