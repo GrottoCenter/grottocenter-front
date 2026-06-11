@@ -34,8 +34,8 @@ const Guideline = ({
     setWantedDeletedState(guideline.isDeleted);
   }, [guideline.isDeleted]);
 
-  const onSubmitForm = data => {
-    dispatch(
+  const onSubmitForm = async data => {
+    const result = await dispatch(
       patchGuideline({
         id: guideline.id,
         title: data.title,
@@ -43,7 +43,7 @@ const Guideline = ({
         language: data.language
       })
     );
-    setIsUpdateFormVisible(false);
+    if (result) setIsUpdateFormVisible(false);
   };
 
   const onDeletePress = isPermanent => {
