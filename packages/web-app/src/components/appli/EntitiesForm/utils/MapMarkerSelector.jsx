@@ -80,6 +80,9 @@ const toFloat = value => {
 };
 
 const LOCATE_ZOOM = 18;
+// How long after the map writes to the form before we allow form→map updates.
+// Prevents the map pan → form update → map recenter loop.
+const MAP_WRITE_GUARD_MS = 400;
 const hasGeolocation = typeof navigator !== 'undefined' && Boolean(navigator.geolocation);
 const ACCURACY_CIRCLE_STYLE = {
   color: '#1976d2',
@@ -95,6 +98,7 @@ const MapMarkerSelector = ({ control, formLatitudeKey, formLongitudeKey }) => {
   const [currentPosition, setCurrentPosition] = useState(defaultCoord);
   const [zoomLevel, setZoomLevel] = useState(defaultZoom);
   const [locationAccuracy, setLocationAccuracy] = useState(null);
+  const lastSetFormTs = useRef(0);
 
   const rawLatitude = useWatch({ control, name: formLatitudeKey });
   const rawLongitude = useWatch({ control, name: formLongitudeKey });
@@ -122,8 +126,23 @@ const MapMarkerSelector = ({ control, formLatitudeKey, formLongitudeKey }) => {
     }
   }, [initialized, validLatitude, validLongitude]);
 
+  // form → map: recentre when user edits lat/lng fields manually.
+  // `initialized` is intentionally omitted from deps: we read its current value
+  // as a guard but only want this effect to fire on coordinate changes, not on
+  // the initialization transition (which is already handled by the effect above).
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    if (!initialized) return;
+    const isValid =
+      !Number.isNaN(validLatitude) && !Number.isNaN(validLongitude);
+    if (isValid && Date.now() - lastSetFormTs.current > MAP_WRITE_GUARD_MS) {
+      setCurrentPosition({ lat: validLatitude, lng: validLongitude });
+    }
+  }, [validLatitude, validLongitude]);
+
   // map → form (only direction after initialization)
   const onMoveEnd = newLocation => {
+    lastSetFormTs.current = Date.now();
     setFormLatitude(newLocation.lat.toFixed(6));
     setFormLongitude(newLocation.lng.toFixed(6));
   };
