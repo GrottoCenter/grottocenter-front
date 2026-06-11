@@ -46,7 +46,10 @@ const CoordinateFormSection = ({
   formLongitudeKey,
   required = false,
   latitudeError,
-  longitudeError
+  longitudeError,
+  additionalPositions = [],
+  markerIcon,
+  mapHeight
 }) => {
   const { formatMessage } = useIntl();
   const projections = useProjections();
@@ -400,6 +403,9 @@ const CoordinateFormSection = ({
         control={control}
         formLatitudeKey={formLatitudeKey}
         formLongitudeKey={formLongitudeKey}
+        additionalPositions={additionalPositions}
+        markerIcon={markerIcon}
+        mapHeight={mapHeight}
       />
     </>
   );
@@ -411,7 +417,10 @@ CoordinateFormSection.propTypes = {
   formLongitudeKey: PropTypes.string.isRequired,
   required: PropTypes.bool,
   latitudeError: PropTypes.string,
-  longitudeError: PropTypes.string
+  longitudeError: PropTypes.string,
+  additionalPositions: PropTypes.arrayOf(PropTypes.shape({})),
+  markerIcon: PropTypes.string,
+  mapHeight: PropTypes.string
 };
 
 export default CoordinateFormSection;

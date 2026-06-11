@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { defineMessages } from 'react-intl';
 import { Box } from '@mui/material';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
+import UploadFileIcon from '@mui/icons-material/UploadFile';
 import CustomIcon from '../../components/common/CustomIcon';
 
 const descriptions = defineMessages({
@@ -11,7 +12,10 @@ const descriptions = defineMessages({
     id: 'Add an image, topographic drawing, book, dataset, bibliography reference, etc.'
   },
   massif: { id: 'Add a massif with its geographical boundaries' },
-  organization: { id: 'Add a caving club or scientific organization' }
+  organization: { id: 'Add a caving club or scientific organization' },
+  importObservations: {
+    id: 'Import scientific observations from a CSV file produced by a data logger'
+  }
 });
 
 export const ENTITIES = [
@@ -38,12 +42,22 @@ export const ENTITIES = [
     iconType: 'organization',
     titleKey: 'Organization',
     descriptionKey: descriptions.organization
+  },
+  {
+    path: '/ui/observations/import',
+    iconType: 'importObservations',
+    titleKey: 'Import observations',
+    descriptionKey: descriptions.importObservations
   }
 ];
 
 export const EntityIcon = ({ iconType, size = 35, BadgeIcon = AddCircleIcon }) => (
   <Box sx={{ position: 'relative', display: 'inline-flex' }}>
-    <CustomIcon type={iconType} size={size} />
+    {iconType === 'importObservations' ? (
+      <UploadFileIcon sx={{ fontSize: size, color: 'action.active' }} />
+    ) : (
+      <CustomIcon type={iconType} size={size} />
+    )}
     <BadgeIcon
       sx={{
         position: 'absolute',
