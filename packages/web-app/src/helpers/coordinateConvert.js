@@ -168,7 +168,9 @@ const PROJECTED_CRS_RANGES = [
 
 const inRange = (v, [min, max]) => v >= min && v <= max;
 
-const DMS_INDICATOR_RE = /[°'"]|[dms]|[NSEWnsew]/;
+// Matches arcminutes/arcseconds indicators only — not ° or cardinals alone,
+// which appear in plain decimal-degree notation like "43.4659° N, 3.5835° E".
+const DMS_INDICATOR_RE = /['"]|[ms]/;
 
 const detectProjectedPair = (a, b) => {
   for (const crs of PROJECTED_CRS_RANGES) {

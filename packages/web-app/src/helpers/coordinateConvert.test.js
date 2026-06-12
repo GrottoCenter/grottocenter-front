@@ -60,7 +60,7 @@ describe('parseCoordinateString', () => {
       expect(result).not.toBeNull();
       expect(result.lat).toBeCloseTo(45.1179);
       expect(result.lng).toBeCloseTo(5.4786);
-      expect(result.format).toBe('DMS');
+      expect(result.format).toBe('WGS84');
     });
   });
 
@@ -78,7 +78,7 @@ describe('parseCoordinateString', () => {
       const result = parseCoordinateString('N 45° 07.066 E 005° 28.717');
       expect(result).not.toBeNull();
       expect(result.lat).toBeCloseTo(45.1178, 2);
-      expect(result.format).toBe('DMS');
+      expect(result.format).toBe('WGS84');
     });
   });
 
