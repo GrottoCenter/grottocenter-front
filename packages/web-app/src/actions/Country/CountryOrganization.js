@@ -23,7 +23,10 @@ export const setCountryOrganization = (countryId, organizationId, organizationNa
   const requestOptions = {
     method: 'PUT',
     body: JSON.stringify(body),
-    headers: getState().login.authorizationHeader
+    headers: {
+      ...getState().login.authorizationHeader,
+      'Content-Type': 'application/json'
+    }
   };
 
   return fetch(putCountryOrganizationUrl(countryId), requestOptions)
@@ -47,7 +50,10 @@ export const removeCountryOrganization = (countryId, organizationId) => (dispatc
   const requestOptions = {
     method: 'DELETE',
     body: JSON.stringify({ id: organizationId }),
-    headers: getState().login.authorizationHeader
+    headers: {
+      ...getState().login.authorizationHeader,
+      'Content-Type': 'application/json'
+    }
   };
 
   return fetch(deleteCountryOrganizationUrl(countryId), requestOptions)

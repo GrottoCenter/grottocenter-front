@@ -54,9 +54,17 @@ const ManagedEntitiesSection = ({ organization }) => {
             {formatMessage({ id: 'Regions' })}
           </Typography>
           {renderList(sortedRegions, region => {
-            const parts = region.id.split('-');
+            // Region IDs generally follow the 'COUNTRY-REGION' format (e.g., 'FR-12').
+            // If the ID does not contain a hyphen, the API is expected to provide `region.countryId`.
+            // Without `countryId`, we fallback to the countries list to prevent broken links on 'undefined'.
+            const parts = String(region.id).split('-');
             const countryId = parts.length > 1 ? parts[0] : region.countryId;
             const regionId = parts.length > 1 ? parts[1] : region.id;
+
+            if (!countryId) {
+              return '/ui/countries';
+            }
+
             return `/ui/countries/${countryId}/regions/${regionId}`;
           })}
         </Box>

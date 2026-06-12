@@ -37,20 +37,26 @@ const AssociationSection = ({
 
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [orgToRemove, setOrgToRemove] = useState(null);
+  const [isPending, setIsPending] = useState(false);
 
   // Refresh entity data when association is updated successfully
   useEffect(() => {
-    if (status === REDUCER_STATUS.SUCCEEDED) {
+    if (isPending && status === REDUCER_STATUS.SUCCEEDED) {
       if (entityType === 'country') dispatch(fetchCountry(entityId));
       else if (entityType === 'region') dispatch(fetchRegion(parentEntityId, entityId));
       else if (entityType === 'massif') dispatch(loadMassif(entityId));
       
       setOrgToRemove(null);
+      setIsPending(false);
+    } else if (isPending && status === REDUCER_STATUS.FAILED) {
+      setIsPending(false);
     }
+    // Only trigger on status change; other deps are stable and would cause unwanted refetches
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [status]);
 
   const handleSet = (orgData) => {
+    setIsPending(true);
     if (entityType === 'country') {
       dispatch(setCountryOrganization(entityId, orgData.id, orgData.name));
     } else if (entityType === 'region') {
@@ -62,6 +68,7 @@ const AssociationSection = ({
 
   const handleRemove = () => {
     if (!orgToRemove) return;
+    setIsPending(true);
     if (entityType === 'country') {
       dispatch(removeCountryOrganization(entityId, orgToRemove.id));
     } else if (entityType === 'region') {
@@ -80,7 +87,7 @@ const AssociationSection = ({
   return (
     <Box sx={{ my: 2 }}>
       {isEmpty ? (
-        entityType !== 'massif' && (
+        entityType === 'massif' ? null : (
           <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
             {formatMessage({
               id: entityType === 'country'
@@ -157,7 +164,7 @@ const AssociationSection = ({
           open={isFormOpen}
           onClose={() => setIsFormOpen(false)}
           onSubmit={handleSet}
-          status={status}
+          status={isPending ? status : undefined}
           error={error}
         />
       )}
@@ -168,14 +175,14 @@ const AssociationSection = ({
         title={formatMessage({ id: 'Remove association' })}
         actions={
           <>
-            <Button onClick={() => setOrgToRemove(null)} disabled={status === REDUCER_STATUS.LOADING}>
+            <Button onClick={() => setOrgToRemove(null)} disabled={isPending && status === REDUCER_STATUS.LOADING}>
               {formatMessage({ id: 'Cancel' })}
             </Button>
             <Button
               color="error"
               variant="contained"
               onClick={handleRemove}
-              disabled={status === REDUCER_STATUS.LOADING}
+              disabled={isPending && status === REDUCER_STATUS.LOADING}
             >
               {formatMessage({ id: 'Remove' })}
             </Button>

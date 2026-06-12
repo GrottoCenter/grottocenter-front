@@ -322,6 +322,7 @@ const Massif = ({ isLoading, error, massif }) => {
                     <AssociationSection
                       organizations={massif.organizations}
                       entityType="massif"
+                      entityId={massif.id}
                       isLoading={isLoading}
                     />
                   }

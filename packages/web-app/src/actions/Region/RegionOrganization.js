@@ -23,7 +23,10 @@ export const setRegionOrganization = (countryId, regionId, organizationId, organ
   const requestOptions = {
     method: 'PUT',
     body: JSON.stringify(body),
-    headers: getState().login.authorizationHeader
+    headers: {
+      ...getState().login.authorizationHeader,
+      'Content-Type': 'application/json'
+    }
   };
 
   return fetch(putRegionOrganizationUrl(countryId, regionId), requestOptions)
@@ -47,7 +50,10 @@ export const removeRegionOrganization = (countryId, regionId, organizationId) =>
   const requestOptions = {
     method: 'DELETE',
     body: JSON.stringify({ id: organizationId }),
-    headers: getState().login.authorizationHeader
+    headers: {
+      ...getState().login.authorizationHeader,
+      'Content-Type': 'application/json'
+    }
   };
 
   return fetch(deleteRegionOrganizationUrl(countryId, regionId), requestOptions)

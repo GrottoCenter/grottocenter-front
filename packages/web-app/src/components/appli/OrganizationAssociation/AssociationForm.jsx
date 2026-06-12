@@ -43,6 +43,10 @@ const AssociationForm = ({
       return undefined;
     }
 
+    if (selectedOrg && selectedOrg.name === debouncedInput.trim()) {
+      return undefined;
+    }
+
     setIsSearching(true);
 
     const fetchOptions = async () => {
@@ -72,7 +76,7 @@ const AssociationForm = ({
     return () => {
       active = false;
     };
-  }, [debouncedInput]);
+  }, [debouncedInput, selectedOrg]);
 
   const handleClose = React.useCallback(() => {
     setInputValue('');
