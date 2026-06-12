@@ -2754,6 +2754,7 @@ __metadata:
     "@turf/line-intersect": "npm:^7.3.5"
     "@turf/rewind": "npm:^7.3.5"
     "@types/validator": "npm:^13"
+    coordinate-parser: "npm:^1.0.7"
     cypress: "npm:^15.16.0"
     d3: "npm:^7.9.0"
     d3-hexbin: "npm:^0.2.2"
@@ -8444,6 +8445,13 @@ __metadata:
   version: 1.1.1
   resolution: "cookie@npm:1.1.1"
   checksum: 10/85538153054791155cf4d38d2e807e3b9382d71bf71d92fc46fca348515ea574049d0d9ef8eb84d2d54a681ad1d7a7316b1989b901dace50a6c0f4c3858dbdb2
+  languageName: node
+  linkType: hard
+
+"coordinate-parser@npm:^1.0.7":
+  version: 1.0.7
+  resolution: "coordinate-parser@npm:1.0.7"
+  checksum: 10/19527fc68925f573fa0c047eacbd72118e4dd7e1951bc14de46a75f5bc77aff7c29cbe7d2e4e294ebd1aadd7f2aac75ae3de2693d2cd922395424188e16fbbce
   languageName: node
   linkType: hard
 

@@ -11,7 +11,7 @@ import {
   ListItemIcon,
   ListItemText
 } from '@mui/material';
-import { LocationOn } from '@mui/icons-material';
+import { LocationOn, MyLocation } from '@mui/icons-material';
 import SearchIcon from '@mui/icons-material/Search';
 import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
@@ -30,6 +30,12 @@ import {
 import CustomIcon from '../../CustomIcon';
 import useRenderPopup from './Markers/useRenderPopup';
 import {
+  parseCoordinateString,
+  formatWGS84
+} from '../../../../helpers/coordinateConvert';
+import useProjections from '../../../../hooks/useProjections';
+import {
+  CoordinatesMarker,
   EntrancePopup,
   MassifPopup,
   NetworkPopup,
@@ -152,15 +158,19 @@ const GeocodingControl = ({ onLocationSelect }) => {
   const { formatMessage, locale } = useIntl();
   const [query, setQuery] = useState('');
   const [results, setResults] = useState(EMPTY_RESULTS);
+  const [coordinateResult, setCoordinateResult] = useState(null);
   const [loading, setLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const popupCleanupRef = useRef(null);
+  const markerCleanupRef = useRef(null);
   const renderPopup = useRenderPopup();
+  const projections = useProjections();
 
-  // Cleanup any pending popup operation on unmount
+  // Cleanup any pending popup/marker operation on unmount
   useEffect(
     () => () => {
       popupCleanupRef.current?.();
+      markerCleanupRef.current?.();
     },
     []
   );
@@ -198,6 +208,15 @@ const GeocodingControl = ({ onLocationSelect }) => {
   };
 
   useEffect(() => {
+    const parsed = parseCoordinateString(query, projections);
+    if (parsed) {
+      setResults(EMPTY_RESULTS);
+      setCoordinateResult(parsed);
+      setLoading(false);
+      return undefined;
+    }
+    setCoordinateResult(null);
+
     if (query.length < AUTOCOMPLETE_MIN_CHARACTERS) {
       setResults(EMPTY_RESULTS);
       setLoading(false);
@@ -355,12 +374,39 @@ const GeocodingControl = ({ onLocationSelect }) => {
       controller.abort();
       setLoading(false);
     };
-  }, [query, locale, map]);
+  }, [query, locale, map, projections]);
 
   const handleSelect = result => {
     document.activeElement?.blur();
     setQuery('');
     setResults(EMPTY_RESULTS);
+    setCoordinateResult(null);
+
+    if (result.resultType === 'coordinates') {
+      const { latitude: lat, longitude: lng } = result;
+      if (onLocationSelect) onLocationSelect({ lat, lng });
+      markerCleanupRef.current?.();
+      const handle = setTimeout(() => {
+        map.setView([lat, lng], 16);
+        const marker = L.marker([lat, lng], {
+          icon: CoordinatesMarker
+        }).addTo(map);
+        const timer = setTimeout(() => {
+          marker.remove();
+          markerCleanupRef.current = null;
+        }, 4000);
+        markerCleanupRef.current = () => {
+          clearTimeout(timer);
+          marker.remove();
+          markerCleanupRef.current = null;
+        };
+      }, 150);
+      markerCleanupRef.current = () => {
+        clearTimeout(handle);
+        markerCleanupRef.current = null;
+      };
+      return;
+    }
 
     if (result.resultType === 'massif') {
       const lat = result.latitude;
@@ -423,6 +469,18 @@ const GeocodingControl = ({ onLocationSelect }) => {
 
   const allResults = useMemo(
     () => [
+      ...(coordinateResult
+        ? [
+            {
+              resultType: 'coordinates',
+              latitude: coordinateResult.lat,
+              longitude: coordinateResult.lng,
+              format: coordinateResult.format,
+              id: 'coords-result',
+              name: formatWGS84(coordinateResult.lat, coordinateResult.lng, 4)
+            }
+          ]
+        : []),
       // Explicitly filter out entrances without coordinates to avoid showing results that can't be displayed on the map
       ...results.entrance
         .filter(e => e.latitude != null && e.longitude != null)
@@ -436,7 +494,7 @@ const GeocodingControl = ({ onLocationSelect }) => {
         .map(o => ({ ...o, resultType: 'organization' })),
       ...results.location.map(l => ({ ...l, resultType: 'location' }))
     ],
-    [results]
+    [results, coordinateResult]
   );
 
   const showDropdown =
@@ -476,7 +534,14 @@ const GeocodingControl = ({ onLocationSelect }) => {
           let primary;
           let secondary;
 
-          if (result.resultType === 'entrance') {
+          if (result.resultType === 'coordinates') {
+            icon = <MyLocation color="action" sx={{ fontSize: 28 }} />;
+            primary = formatWGS84(result.latitude, result.longitude, 4);
+            secondary = formatMessage({
+              id: `coordinates.format.${result.format}`,
+              defaultMessage: result.format
+            });
+          } else if (result.resultType === 'entrance') {
             icon = <CustomIcon type="entrance" size={28} />;
             primary = result.name;
             secondary = [

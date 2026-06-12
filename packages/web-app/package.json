@@ -30,6 +30,7 @@
     "@turf/kinks": "^7.3.5",
     "@turf/line-intersect": "^7.3.5",
     "@turf/rewind": "^7.3.5",
+    "coordinate-parser": "^1.0.7",
     "cypress": "^15.16.0",
     "d3": "^7.9.0",
     "d3-hexbin": "^0.2.2",
