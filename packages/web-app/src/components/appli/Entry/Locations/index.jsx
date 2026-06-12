@@ -86,6 +86,7 @@ const Locations = ({ entranceId, locations, isSensitive, isEditAllowed }) => {
                   <React.Fragment key={location.id}>
                     <Location
                       location={location}
+                      entranceId={entranceId}
                       isEditAllowed={isEditAllowed}
                       isMoving={movingId === location.id}
                       onMoveUp={() => handleMove(location.id, -1)}

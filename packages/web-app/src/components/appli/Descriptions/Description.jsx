@@ -27,7 +27,9 @@ const Description = ({
   onMoveUp,
   onMoveDown,
   isFirst,
-  isLast
+  isLast,
+  parentId,
+  parentType
 }) => {
   const dispatch = useDispatch();
   const permissions = usePermissions();
@@ -76,7 +78,8 @@ const Description = ({
             <SnapshotButton
               id={description.id}
               type="descriptions"
-              content={description}
+              parentId={parentId}
+              parentType={`${parentType}s`}
             />
           }
           onDeletePress={onDeletePress}
@@ -136,7 +139,9 @@ Description.propTypes = {
   onMoveUp: PropTypes.func,
   onMoveDown: PropTypes.func,
   isFirst: PropTypes.bool,
-  isLast: PropTypes.bool
+  isLast: PropTypes.bool,
+  parentId: PropTypes.number,
+  parentType: PropTypes.string
 };
 
 export default Description;

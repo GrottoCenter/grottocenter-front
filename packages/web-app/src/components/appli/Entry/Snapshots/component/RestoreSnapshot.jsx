@@ -1,4 +1,5 @@
 import * as React from 'react';
+import PropTypes from 'prop-types';
 import { useDispatch } from 'react-redux';
 import {
   Button,
@@ -76,7 +77,7 @@ const RestoreSnapshot = item => {
             language: content.names[0].language,
             text: content.name
           },
-          cave: content.cave.id ?? content.cave,
+          cave: content.cave?.id ?? content.cave,
           country: content.country,
           isSensitive: content.isSensitive,
           longitude: content.longitude,
@@ -99,7 +100,7 @@ const RestoreSnapshot = item => {
             longitude: content.cave.longitude,
             latitude: content.cave.latitude,
             temperature: Number(content.cave.temperature),
-            id: content.cave.id
+            id: content.cave?.id
           };
           dispatch(updateCaveAndEntrance(updatedCave, updatedEntrance));
         }
@@ -187,6 +188,12 @@ const RestoreSnapshot = item => {
       </>
     )
   );
+};
+
+RestoreSnapshot.propTypes = {
+  snapshot: PropTypes.shape({}).isRequired,
+  snapshotType: PropTypes.string.isRequired,
+  isNetwork: PropTypes.bool
 };
 
 export default RestoreSnapshot;

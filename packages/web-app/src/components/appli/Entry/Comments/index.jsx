@@ -91,6 +91,7 @@ const Comments = ({ entranceId, comments, isEditAllowed }) => {
                     sx={{ p: 2, borderRadius: 2, bgcolor: 'grey.50' }}>
                     <Comment
                       comment={comment}
+                      entranceId={entranceId}
                       isEditAllowed={isEditAllowed}
                       isMoving={movingId === comment.id}
                       onMoveUp={() => handleMove(comment.id, -1)}

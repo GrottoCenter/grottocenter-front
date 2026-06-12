@@ -13,9 +13,6 @@ import {
   RiggingSnapshots
 } from './component/SnapshotComponents';
 
-const storeInLocalStorage = item =>
-  localStorage.setItem('t_item', JSON.stringify(item));
-
 const getAccordionBodyFromType = (type, data, isNetwork, previous) => {
   switch (type) {
     case 'riggings':
@@ -52,10 +49,11 @@ const getAccordionBodyFromType = (type, data, isNetwork, previous) => {
 const SnapshotButton = ({
   id,
   type,
-  content,
   label,
   isNetwork,
   getAll = false,
+  parentId,
+  parentType,
   startIcon = <HistoryIcon />,
   tooltipTitle,
   ...grpProps
@@ -68,13 +66,14 @@ const SnapshotButton = ({
         component={Link}
         to={`/ui/${type}/${id}/snapshots?${[
           isNetwork !== undefined ? `isNetwork=${isNetwork}` : '',
-          getAll ? `all=true` : ''
+          getAll ? `all=true` : '',
+          parentId !== undefined ? `parentId=${parentId}` : '',
+          parentType ? `parentType=${parentType}` : ''
         ]
           .filter(e => e)
           .join('&')}`}
-        onClick={content ? () => storeInLocalStorage(content) : null}
         target="_blank"
-        rel="opener"
+        rel="noopener noreferrer"
         startIcon={!!label && startIcon}>
         {!label && startIcon}
         {label}
@@ -85,10 +84,11 @@ const SnapshotButton = ({
 SnapshotButton.propTypes = {
   id: PropTypes.number,
   type: PropTypes.string,
-  content: PropTypes.shape({}),
   label: PropTypes.string,
   isNetwork: PropTypes.bool,
   getAll: PropTypes.bool,
+  parentId: PropTypes.number,
+  parentType: PropTypes.string,
   startIcon: PropTypes.node,
   tooltipTitle: PropTypes.string
 };
@@ -103,17 +103,12 @@ const sortSnapshots = dataToStore => {
   sortedItems.sort((aObj, bObj) => {
     const a = aObj[Object.keys(aObj)[0]];
     const b = bObj[Object.keys(bObj)[0]];
-    return new Date(b[0].id) - new Date(a[0].id);
+    const dateA = a[0]?.id ? new Date(a[0].id) : new Date(0);
+    const dateB = b[0]?.id ? new Date(b[0].id) : new Date(0);
+    return dateB - dateA;
   });
 
   return sortedItems;
-};
-
-sortSnapshots.prototype = {
-  type: PropTypes.shape({
-    id: PropTypes.string,
-    t_id: PropTypes.string
-  })
 };
 
 export { SnapshotButton, getAccordionBodyFromType, sortSnapshots };
