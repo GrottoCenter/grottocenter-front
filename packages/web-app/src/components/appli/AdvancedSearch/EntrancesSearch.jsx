@@ -54,6 +54,7 @@ const FILTER_LABELS = {
   // iso3166 is the ISO 3166-2 subdivision code used as a locked filter when navigating from a
   // country/region page. It maps to the same "Region" label as the freeform `region` field.
   iso3166: 'Region',
+  'massifs.id': 'Massif',
   'massifs.name': 'Massif',
   region: 'Region',
   'cave.name': 'Network name',
@@ -75,6 +76,7 @@ const initialFilterState = {
   iso3166: '',
   region: '',
   county: '',
+  'massifs.id': null,
   'massifs.name': '',
   city: '',
   // postalCode is intentionally absent: the entrances API endpoint does not support postal code filtering
@@ -167,7 +169,7 @@ const EntrancesSearch = ({ initialFilter = {}, lockedFilter = [], valueLabels = 
               value={filterState.country}
             />
           )}
-          {!lockedFilter.includes('massifs.name') && (
+          {!lockedFilter.includes('massifs.name') && !lockedFilter.includes('massifs.id') && (
             <SearchTextAutocomplete
               ressourceType={searchEntity}
               ressourceField="massifs.name"
