@@ -69,9 +69,14 @@ const SnapshotPage = () => {
       massifs: pId => dispatch(loadMassif(pId))
     };
     if (isSubEntityType) {
-      if (parentId) (fetchParentByType[parentType] ?? fetchParentByType.entrances)(parentId);
-    } else {
-      fetchByType[type]?.();
+      if (parentId) {
+        const fetchParent = Object.hasOwn(fetchParentByType, parentType)
+          ? fetchParentByType[parentType]
+          : fetchParentByType.entrances;
+        fetchParent(parentId);
+      }
+    } else if (Object.hasOwn(fetchByType, type)) {
+      fetchByType[type]();
     }
   }, [id, type, parentId, parentType, isSubEntityType, dispatch]);
 
