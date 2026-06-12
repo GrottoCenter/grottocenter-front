@@ -25,6 +25,8 @@ import { sortSnapshots } from './UtilityFunction';
 import AccordionSnapshotListPage from './AccordionSnapshotListPage';
 import { capitalize } from '../../../../utils/strings';
 
+const SUB_ENTITY_TYPES = ['descriptions', 'locations', 'histories', 'riggings', 'comments'];
+
 const SnapshotPage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -52,7 +54,6 @@ const SnapshotPage = () => {
     dispatch(fetchSnapshot(id, type, isNetwork, getAll));
   }, [id, type, isNetwork, getAll, dispatch]);
 
-  const SUB_ENTITY_TYPES = ['descriptions', 'locations', 'histories', 'riggings', 'comments'];
   const isSubEntityType = SUB_ENTITY_TYPES.includes(type);
 
   useEffect(() => {

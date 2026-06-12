@@ -73,7 +73,7 @@ const SnapshotButton = ({
           .filter(e => e)
           .join('&')}`}
         target="_blank"
-        rel="noopener noreferrer"
+        rel="opener"
         startIcon={!!label && startIcon}>
         {!label && startIcon}
         {label}

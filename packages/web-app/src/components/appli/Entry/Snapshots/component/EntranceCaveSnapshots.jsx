@@ -7,8 +7,7 @@ import CustomIcon from '../../../../common/CustomIcon';
 import { HighLightsLine } from '../../../../common/Highlights';
 import { ENTRANCE_BOOLEAN_CHARACTERISTICS } from '../../../../../conf/entranceCharacteristics';
 
-const EntranceCaveSnapshots = information => {
-  const { entrance, previous } = information;
+const EntranceCaveSnapshots = ({ entrance, previous }) => {
   const { cave } = entrance;
 
   const { formatMessage } = useIntl();

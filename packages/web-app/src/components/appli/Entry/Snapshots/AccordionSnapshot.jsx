@@ -165,7 +165,7 @@ AccordionSnapshot.propTypes = {
   author: authorType,
   reviewer: authorType,
   previous: PropTypes.shape({
-    id: PropTypes.number,
+    id: PropTypes.string,
     title: PropTypes.string,
     name: PropTypes.string,
     date: PropTypes.string,

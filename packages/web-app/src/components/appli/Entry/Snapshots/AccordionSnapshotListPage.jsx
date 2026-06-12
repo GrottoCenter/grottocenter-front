@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import { Box, Skeleton } from '@mui/material';
@@ -24,7 +24,7 @@ const AccordionSnapshotListPage = ({
   // sortSnapshots flattens data: each element is { [type]: [singleSnapshot] }.
   // Group all snapshots per (snapshotType, t_id) to compute `previous` and
   // find the most recent snapshot per entity (used as `previous` for current items).
-  const { previousMap, latestByGroup } = (() => {
+  const { previousMap, latestByGroup } = useMemo(() => {
     if (!hasData) return { previousMap: {}, latestByGroup: {} };
     const groups = {};
     data.forEach(snapshotGroup => {
@@ -45,11 +45,11 @@ const AccordionSnapshotListPage = ({
       latest[key] = group[group.length - 1];
     });
     return { previousMap: prevMap, latestByGroup: latest };
-  })();
+  }, [data, hasData]);
 
   // Build a unified sorted timeline: current items + snapshots interleaved by date.
   // Each entry: { date: Date, element: ReactElement }
-  const timelineItems = (() => {
+  const timelineItems = useMemo(() => {
     const items = [];
 
     // Current items
@@ -112,7 +112,7 @@ const AccordionSnapshotListPage = ({
 
     items.sort((a, b) => b.date - a.date);
     return items;
-  })();
+  }, [data, hasData, currentTItem, isCurrentItemLoading, type, isNetwork, latestByGroup, previousMap]);
 
   const hasItems = timelineItems.length > 0;
 
