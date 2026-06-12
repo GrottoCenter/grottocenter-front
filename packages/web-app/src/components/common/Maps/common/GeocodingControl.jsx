@@ -35,6 +35,7 @@ import {
 } from '../../../../helpers/coordinateConvert';
 import useProjections from '../../../../hooks/useProjections';
 import {
+  CoordinatesMarker,
   EntrancePopup,
   MassifPopup,
   NetworkPopup,
@@ -161,13 +162,15 @@ const GeocodingControl = ({ onLocationSelect }) => {
   const [loading, setLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const popupCleanupRef = useRef(null);
+  const markerCleanupRef = useRef(null);
   const renderPopup = useRenderPopup();
   const projections = useProjections();
 
-  // Cleanup any pending popup operation on unmount
+  // Cleanup any pending popup/marker operation on unmount
   useEffect(
     () => () => {
       popupCleanupRef.current?.();
+      markerCleanupRef.current?.();
     },
     []
   );
@@ -382,8 +385,21 @@ const GeocodingControl = ({ onLocationSelect }) => {
     if (result.resultType === 'coordinates') {
       const { latitude: lat, longitude: lng } = result;
       if (onLocationSelect) onLocationSelect({ lat, lng });
+      markerCleanupRef.current?.();
       setTimeout(() => {
         map.setView([lat, lng], 16);
+        const marker = L.marker([lat, lng], {
+          icon: CoordinatesMarker
+        }).addTo(map);
+        const timer = setTimeout(() => {
+          marker.remove();
+          markerCleanupRef.current = null;
+        }, 4000);
+        markerCleanupRef.current = () => {
+          clearTimeout(timer);
+          marker.remove();
+          markerCleanupRef.current = null;
+        };
       }, 150);
       return;
     }
