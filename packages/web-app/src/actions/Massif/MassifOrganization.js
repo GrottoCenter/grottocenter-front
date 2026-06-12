@@ -23,7 +23,10 @@ export const setMassifOrganization = (massifId, organizationId, organizationName
   const requestOptions = {
     method: 'PUT',
     body: JSON.stringify(body),
-    headers: getState().login.authorizationHeader
+    headers: {
+      ...getState().login.authorizationHeader,
+      'Content-Type': 'application/json'
+    }
   };
 
   return fetch(putMassifOrganizationUrl(massifId), requestOptions)
@@ -47,7 +50,10 @@ export const removeMassifOrganization = (massifId, organizationId) => (dispatch,
   const requestOptions = {
     method: 'DELETE',
     body: JSON.stringify({ id: organizationId }),
-    headers: getState().login.authorizationHeader
+    headers: {
+      ...getState().login.authorizationHeader,
+      'Content-Type': 'application/json'
+    }
   };
 
   return fetch(deleteMassifOrganizationUrl(massifId), requestOptions)
