@@ -168,6 +168,8 @@ const PROJECTED_CRS_RANGES = [
 
 const inRange = (v, [min, max]) => v >= min && v <= max;
 
+const DMS_INDICATOR_RE = /[°'"]|[dms]|[NSEWnsew]/;
+
 const detectProjectedPair = (a, b) => {
   for (const crs of PROJECTED_CRS_RANGES) {
     if (inRange(a, crs.easting) && inRange(b, crs.northing))
@@ -195,6 +197,12 @@ export const parseCoordinateString = (input, projections = []) => {
       const projection = projections.find(p => p.code === detected.crs.code) ?? null;
       return tryProjectedConversion(detected.easting, detected.northing, projection, detected.crs.name);
     }
+
+    // Two plain numbers in WGS84 range with no DMS indicators — return directly.
+    // Handles comma-as-decimal-separator ("45,1179 5,4786") which coordinate-parser cannot parse.
+    if (!DMS_INDICATOR_RE.test(input) && a >= -90 && a <= 90 && b >= -180 && b <= 180) {
+      return { lat: a, lng: b, format: 'WGS84' };
+    }
   }
 
   // Normalize separators so coordinate-parser handles them cleanly
@@ -208,7 +216,7 @@ export const parseCoordinateString = (input, projections = []) => {
     const lat = coords.getLatitude();
     const lng = coords.getLongitude();
     if (lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180) {
-      const hasDMS = /[°'"dms]|[NSEWnsew]/i.test(input);
+      const hasDMS = DMS_INDICATOR_RE.test(input);
       return { lat, lng, format: hasDMS ? 'DMS' : 'WGS84' };
     }
   } catch {

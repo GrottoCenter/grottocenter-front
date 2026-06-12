@@ -36,6 +36,22 @@ describe('parseCoordinateString', () => {
       expect(result.lng).toBeCloseTo(5.4786);
       expect(result.format).toBe('WGS84');
     });
+
+    it('parses negative coordinates (southern/western hemisphere)', () => {
+      const result = parseCoordinateString('-33.8688, 151.2093');
+      expect(result).not.toBeNull();
+      expect(result.lat).toBeCloseTo(-33.8688);
+      expect(result.lng).toBeCloseTo(151.2093);
+      expect(result.format).toBe('WGS84');
+    });
+
+    it('parses decimal comma separator (French locale)', () => {
+      const result = parseCoordinateString('45,1179 5,4786');
+      expect(result).not.toBeNull();
+      expect(result.lat).toBeCloseTo(45.1179);
+      expect(result.lng).toBeCloseTo(5.4786);
+      expect(result.format).toBe('WGS84');
+    });
   });
 
   describe('WGS84 decimal cardinal', () => {

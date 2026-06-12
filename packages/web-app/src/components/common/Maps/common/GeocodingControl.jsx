@@ -386,7 +386,7 @@ const GeocodingControl = ({ onLocationSelect }) => {
       const { latitude: lat, longitude: lng } = result;
       if (onLocationSelect) onLocationSelect({ lat, lng });
       markerCleanupRef.current?.();
-      setTimeout(() => {
+      const handle = setTimeout(() => {
         map.setView([lat, lng], 16);
         const marker = L.marker([lat, lng], {
           icon: CoordinatesMarker
@@ -401,6 +401,10 @@ const GeocodingControl = ({ onLocationSelect }) => {
           markerCleanupRef.current = null;
         };
       }, 150);
+      markerCleanupRef.current = () => {
+        clearTimeout(handle);
+        markerCleanupRef.current = null;
+      };
       return;
     }
 
