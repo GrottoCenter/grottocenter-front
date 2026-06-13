@@ -1617,6 +1617,7 @@
   "Perform an advanced search on all the fields. Results displayed will have at least one field matching your request.": "أجرِ بحثاً متقدماً في جميع الحقول. ستحتوي النتائج المعروضة على حقل واحد على الأقل يطابق طلبك.",
   "Periodical issue": "عدد دوري",
   "Permanently delete": "حذف نهائي",
+  "permanently_deleted": "تم الحذف نهائيًا",
   "Person": "شخص",
   "Personal information": "المعلومات الشخصية",
   "Persons": "أشخاص",

@@ -1617,6 +1617,7 @@
   "Perform an advanced search on all the fields. Results displayed will have at least one field matching your request.": "בצע חיפוש מתקדם בכל השדות. התוצאות המוצגות יכללו לפחות שדה אחד התואם לבקשתך.",
   "Periodical issue": "גיליון תקופתי",
   "Permanently delete": "מחק לצמיתות",
+  "permanently_deleted": "נמחק לצמיתות",
   "Person": "אדם",
   "Personal information": "מידע אישי",
   "Persons": "אנשים",

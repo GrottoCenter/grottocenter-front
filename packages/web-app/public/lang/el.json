@@ -1617,6 +1617,7 @@
   "Perform an advanced search on all the fields. Results displayed will have at least one field matching your request.": "Εκτελέστε μια προχωρημένη αναζήτηση σε όλα τα πεδία. Τα αποτελέσματα που εμφανίζονται θα έχουν τουλάχιστον ένα πεδίο που ταιριάζει με το αίτημά σας.",
   "Periodical issue": "Περιοδικό τεύχος",
   "Permanently delete": "Μόνιμη διαγραφή",
+  "permanently_deleted": "διαγράφηκε οριστικά",
   "Person": "Άτομο",
   "Personal information": "Προσωπικές πληροφορίες",
   "Persons": "Πρόσωπα",

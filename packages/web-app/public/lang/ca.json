@@ -1617,6 +1617,7 @@
   "Perform an advanced search on all the fields. Results displayed will have at least one field matching your request.": "Fes una cerca avançada a tots els camps. Els resultats que es mostrin tindran com a mínim un camp que coincideixi amb la teva sol·licitud.",
   "Periodical issue": "Número periòdic",
   "Permanently delete": "Eliminar permanentment",
+  "permanently_deleted": "eliminat permanentment",
   "Person": "Persona",
   "Personal information": "Informació personal",
   "Persons": "Persones",
