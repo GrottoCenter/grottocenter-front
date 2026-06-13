@@ -214,7 +214,7 @@ export const parseCoordinateString = (input, projections = []) => {
     // Handles comma-as-decimal-separator ("45,1179 5,4786") which coordinate-parser cannot parse.
     // Strings with cardinals fall through to coordinate-parser, which pairs each cardinal with
     // its adjacent number and handles both "lat S, lng W" and "lng W, lat S" orderings correctly.
-    if (!hasDMS && !/[NSEWnsew]/i.test(normalized)) {
+    if (!hasDMS && !/[NSEWnsew]/.test(normalized)) {
       if (a >= -90 && a <= 90 && b >= -180 && b <= 180) {
         return { lat: a, lng: b, format: 'WGS84' };
       }
