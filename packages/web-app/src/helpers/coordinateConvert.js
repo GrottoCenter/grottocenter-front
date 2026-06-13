@@ -19,6 +19,9 @@ export const decimalToDMS = (decimal, isLatitude) => {
   return `${deg}°${min}'${sec}"${direction}`;
 };
 
+// 'O' = Ouest (West) — French notation, same sign as 'W'.
+const isNegativeDir = (sign, dir) => sign === '-' || (dir && /^[SWOswo]$/.test(dir));
+
 // Accepts DMS: "48°31'24.2"N", "48 31 24.2 N", "48d31m24.2sN"
 // Accepts DDM: "48°31.402'N"
 // Returns NaN for plain decimals — callers handle the WGS84 decimal case separately.
@@ -26,22 +29,22 @@ export const parseDMS = str => {
   if (!str) return NaN;
   const cleaned = str.trim();
   const dmsMatch = cleaned.match(
-    /^(-?)(\d+)\s*[°d]\s*(\d+)\s*[m']\s*(\d+(?:[.,]\d+)?)\s*[s"]?\s*([NSEWnsew])?$/
+    /^(-?)(\d+)\s*[°d]\s*(\d+)\s*[m']\s*(\d+(?:[.,]\d+)?)\s*[s"]?\s*([NSEWOnsewo])?$/
   );
   if (dmsMatch) {
     const [, sign, d, m, s, dir] = dmsMatch;
     let decimal = +d + +m / 60 + parseFloat(s.replace(',', '.')) / 3600;
-    if (sign === '-' || (dir && /^[SWsw]$/.test(dir))) decimal = -decimal;
+    if (isNegativeDir(sign, dir)) decimal = -decimal;
     return decimal;
   }
   // DDM: "48°31.402'N" — degrees + decimal minutes
   const ddmMatch = cleaned.match(
-    /^(-?)(\d+)\s*[°d]\s*(\d+(?:[.,]\d+)?)\s*[m']\s*([NSEWnsew])?$/
+    /^(-?)(\d+)\s*[°d]\s*(\d+(?:[.,]\d+)?)\s*[m']\s*([NSEWOnsewo])?$/
   );
   if (ddmMatch) {
     const [, sign, d, m, dir] = ddmMatch;
     let decimal = +d + parseFloat(m.replace(',', '.')) / 60;
-    if (sign === '-' || (dir && /^[SWsw]$/.test(dir))) decimal = -decimal;
+    if (isNegativeDir(sign, dir)) decimal = -decimal;
     return decimal;
   }
   return NaN;
@@ -172,6 +175,9 @@ const inRange = (v, [min, max]) => v >= min && v <= max;
 // which appear in plain decimal-degree notation like "43.4659° N, 3.5835° E".
 const DMS_INDICATOR_RE = /['"]|[ms]/;
 
+// Replaces standalone 'O' (Ouest) with 'W' so all parsing paths see standard cardinals.
+const normalizeWest = input => input.replace(/(^|[^a-z0-9])[Oo](?![a-z0-9])/gi, '$1W');
+
 const detectProjectedPair = (a, b) => {
   for (const crs of PROJECTED_CRS_RANGES) {
     if (inRange(a, crs.easting) && inRange(b, crs.northing))
@@ -189,7 +195,11 @@ const detectProjectedPair = (a, b) => {
 export const parseCoordinateString = (input, projections = []) => {
   if (!input || typeof input !== 'string') return null;
 
-  const nums = input.match(/-?\d[\d.,]*/g);
+  // Normalize standalone 'O' (Ouest) to 'W' once so all subsequent paths see standard cardinals.
+  const normalized = normalizeWest(input.trim());
+  const hasDMS = DMS_INDICATOR_RE.test(normalized);
+
+  const nums = normalized.match(/-?\d[\d.,]*/g);
   if (nums && nums.length === 2) {
     const a = parseFloat(nums[0].replace(',', '.'));
     const b = parseFloat(nums[1].replace(',', '.'));
@@ -200,25 +210,24 @@ export const parseCoordinateString = (input, projections = []) => {
       return tryProjectedConversion(detected.easting, detected.northing, projection, detected.crs.name);
     }
 
-    // Two plain numbers in WGS84 range with no DMS indicators — return directly.
+    // Fast path: two plain numbers with no DMS indicators AND no cardinal letters.
     // Handles comma-as-decimal-separator ("45,1179 5,4786") which coordinate-parser cannot parse.
-    if (!DMS_INDICATOR_RE.test(input) && a >= -90 && a <= 90 && b >= -180 && b <= 180) {
-      return { lat: a, lng: b, format: 'WGS84' };
+    // Strings with cardinals fall through to coordinate-parser, which pairs each cardinal with
+    // its adjacent number and handles both "lat S, lng W" and "lng W, lat S" orderings correctly.
+    if (!hasDMS && !/[NSEWnsew]/i.test(normalized)) {
+      if (a >= -90 && a <= 90 && b >= -180 && b <= 180) {
+        return { lat: a, lng: b, format: 'WGS84' };
+      }
     }
   }
 
-  // Normalize separators so coordinate-parser handles them cleanly
-  const cleaned = input
-    .trim()
-    .replace(/[;/]/g, ',')
-    .replace(/\s{2,}/g, ' ');
+  const cleaned = normalized.replace(/[;/]/g, ',').replace(/\s{2,}/g, ' ');
 
   try {
     const coords = new Coordinates(cleaned);
     const lat = coords.getLatitude();
     const lng = coords.getLongitude();
     if (lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180) {
-      const hasDMS = DMS_INDICATOR_RE.test(input);
       return { lat, lng, format: hasDMS ? 'DMS' : 'WGS84' };
     }
   } catch {

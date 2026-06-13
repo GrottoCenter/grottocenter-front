@@ -2,6 +2,8 @@ import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchProjections } from '../actions/Projections';
 
+const EMPTY = [];
+
 const useProjections = () => {
   const dispatch = useDispatch();
   const rawProjections = useSelector(
@@ -16,7 +18,7 @@ const useProjections = () => {
     if (rawProjections === null && !isLoading) dispatch(fetchProjections());
   }, [dispatch, rawProjections, isLoading]);
 
-  return rawProjections ?? [];
+  return rawProjections ?? EMPTY;
 };
 
 export default useProjections;

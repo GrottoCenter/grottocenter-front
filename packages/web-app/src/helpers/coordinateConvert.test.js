@@ -62,6 +62,30 @@ describe('parseCoordinateString', () => {
       expect(result.lng).toBeCloseTo(5.4786);
       expect(result.format).toBe('WGS84');
     });
+
+    it('applies negative sign for south and west cardinals', () => {
+      const result = parseCoordinateString('22.9179° S, 64.5117° W');
+      expect(result).not.toBeNull();
+      expect(result.lat).toBeCloseTo(-22.9179);
+      expect(result.lng).toBeCloseTo(-64.5117);
+      expect(result.format).toBe('WGS84');
+    });
+
+    it('treats "O" (Ouest) as west', () => {
+      const result = parseCoordinateString('22.9179° S, 64.5117° O');
+      expect(result).not.toBeNull();
+      expect(result.lat).toBeCloseTo(-22.9179);
+      expect(result.lng).toBeCloseTo(-64.5117);
+      expect(result.format).toBe('WGS84');
+    });
+
+    it('parses DMS with "O" (Ouest) as west', () => {
+      const result = parseCoordinateString("22° 55' 4.4\" S, 64° 30' 42.1\" O");
+      expect(result).not.toBeNull();
+      expect(result.lat).toBeCloseTo(-22.9179, 2);
+      expect(result.lng).toBeCloseTo(-64.5117, 2);
+      expect(result.format).toBe('DMS');
+    });
   });
 
   describe('DMS', () => {
