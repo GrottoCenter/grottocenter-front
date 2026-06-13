@@ -113,6 +113,9 @@ const SensorConfigList = ({ deviceId }) => {
             <ListItemText
               primary={
                 <Typography variant="body2">
+                  {config.label
+                    ? `${config.label} — `
+                    : ''}
                   {formatMessage({ id: `quantityKind.${config.quantityKindCode}` })} — {config.unitSymbol || ''}
                 </Typography>
               }

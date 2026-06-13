@@ -197,9 +197,14 @@ const DeviceSelector = ({ disabled, onCreateNew, onSelect }) => {
                       {option.brandName}
                     </Typography>
                   )}
+                  {option.serialNumber && (
+                    <Typography variant="caption" color="text.secondary">
+                      {option.brandName ? '·' : ''} S/N: {option.serialNumber}
+                    </Typography>
+                  )}
                   {option.author && option.author.nickname && (
                     <Typography variant="caption" color="text.secondary">
-                      {option.brandName ? '·' : ''}{' '}
+                      {option.brandName || option.serialNumber ? '·' : ''}{' '}
                       {formatMessage(
                         {
                           id: 'ImportObservationsWizard.DeviceSensorsStep.deviceAuthor'
@@ -257,6 +262,7 @@ const DeviceCreator = ({ onCancel, onSuccess }) => {
   const [form, setForm] = useState({
     name: '',
     brandName: '',
+    serialNumber: '',
     productUrl: '',
     manufacturerUrl: ''
   });
@@ -323,6 +329,16 @@ const DeviceCreator = ({ onCancel, onSuccess }) => {
           size="small"
           inputProps={{ maxLength: 200 }}
           data-testid="new-device-brand"
+        />
+        <TextField
+          label={formatMessage({
+            id: 'ImportObservationsWizard.DeviceSensorsStep.deviceSerialNumber'
+          })}
+          value={form.serialNumber}
+          onChange={setField('serialNumber')}
+          size="small"
+          inputProps={{ maxLength: 200 }}
+          data-testid="new-device-serial-number"
         />
         <TextField
           label={formatMessage({
@@ -406,6 +422,15 @@ const SelectedDeviceCard = ({ device, onChangeDevice }) => {
               {device.brandName}
             </Typography>
           )}
+          {device.serialNumber && (
+            <Typography variant="body2" color="text.secondary">
+              {formatMessage({
+                id: 'ImportObservationsWizard.DeviceSensorsStep.deviceSerialNumber'
+              })}
+              {': '}
+              {device.serialNumber}
+            </Typography>
+          )}
         </Box>
         <Button
           variant="outlined"
@@ -426,7 +451,8 @@ SelectedDeviceCard.propTypes = {
   device: PropTypes.shape({
     id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
     name: PropTypes.string.isRequired,
-    brandName: PropTypes.string
+    brandName: PropTypes.string,
+    serialNumber: PropTypes.string
   }).isRequired,
   onChangeDevice: PropTypes.func.isRequired
 };
