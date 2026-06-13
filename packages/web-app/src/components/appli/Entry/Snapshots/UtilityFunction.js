@@ -1,9 +1,9 @@
 import React from 'react';
 import { useIntl } from 'react-intl';
-import { Link } from 'react-router-dom';
 import { Tooltip, Button } from '@mui/material';
 import HistoryIcon from '@mui/icons-material/History';
 import PropTypes from 'prop-types';
+import useOpenLink from '../../../../hooks/useOpenLink';
 import {
   CommentSnapshots,
   DocumentSnapshots,
@@ -59,21 +59,22 @@ const SnapshotButton = ({
   ...grpProps
 }) => {
   const { formatMessage } = useIntl();
+  const openLink = useOpenLink();
+
+  const url = `/ui/${type}/${id}/snapshots?${[
+    isNetwork !== undefined ? `isNetwork=${isNetwork}` : '',
+    getAll ? `all=true` : '',
+    parentId !== undefined ? `parentId=${parentId}` : '',
+    parentType ? `parentType=${parentType}` : ''
+  ]
+    .filter(e => e)
+    .join('&')}`;
+
   return (
     <Tooltip title={tooltipTitle ?? formatMessage({ id: 'Access the revision history page' })}>
       <Button
         {...grpProps}
-        component={Link}
-        to={`/ui/${type}/${id}/snapshots?${[
-          isNetwork !== undefined ? `isNetwork=${isNetwork}` : '',
-          getAll ? `all=true` : '',
-          parentId !== undefined ? `parentId=${parentId}` : '',
-          parentType ? `parentType=${parentType}` : ''
-        ]
-          .filter(e => e)
-          .join('&')}`}
-        target="_blank"
-        rel="opener"
+        onClick={() => openLink(url)}
         startIcon={!!label && startIcon}>
         {!label && startIcon}
         {label}
