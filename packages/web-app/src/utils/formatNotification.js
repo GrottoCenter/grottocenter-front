@@ -124,6 +124,10 @@ const formatNotification = notification => {
       verb = 'validated';
       break;
     default:
+      // Warn so unhandled types surface during development
+      console.warn(
+        `[formatNotification] Unknown notificationType: ${notificationType.name}`
+      );
       verb = notificationType.name
         ? notificationType.name.toLowerCase()
         : '';
