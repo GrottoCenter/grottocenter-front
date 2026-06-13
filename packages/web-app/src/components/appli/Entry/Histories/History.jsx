@@ -14,12 +14,15 @@ import Contribution from '../../../common/Contribution/Contribution';
 import { SnapshotButton } from '../Snapshots/UtilityFunction';
 
 const ListItemStyled = styled(ListItem)`
-  display: flow-root;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
   border-top: 1px solid ${({ theme }) => theme.palette.divider};
   padding-top: ${({ theme }) => theme.spacing(1)};
   padding-bottom: ${({ theme }) => theme.spacing(1)};
 `;
-const History = ({ history, isEditAllowed, isMoving, onMoveUp, onMoveDown, isFirst, isLast }) => {
+
+const History = ({ history, entranceId, isEditAllowed, isMoving, onMoveUp, onMoveDown, isFirst, isLast }) => {
   const dispatch = useDispatch();
   const permissions = usePermissions();
   const [isUpdateFormVisible, setIsUpdateFormVisible] = useState(false);
@@ -27,8 +30,7 @@ const History = ({ history, isEditAllowed, isMoving, onMoveUp, onMoveDown, isFir
 
   useEffect(() => {
     setWantedDeletedState(history.isDeleted);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [history.isDeleted]);
 
   const onSubmitForm = data => {
     dispatch(
@@ -54,7 +56,33 @@ const History = ({ history, isEditAllowed, isMoving, onMoveUp, onMoveDown, isFir
 
   return (
     <ListItemStyled disableGutters>
-      <Box sx={{ float: 'right', ml: 1 }}>
+      <Box sx={{ flex: 1, minWidth: 0 }}>
+        {isUpdateFormVisible && permissions.isAuth ? (
+          <CreateHistoryForm
+            closeForm={() => setIsUpdateFormVisible(false)}
+            isNewHistory={false}
+            onSubmit={onSubmitForm}
+            values={history}
+          />
+        ) : (
+          <ListItemText
+            style={{ margin: 0 }}
+            disableTypography
+            secondary={
+              <Contribution
+                body={history.body}
+                author={history.author}
+                reviewer={history.reviewer}
+                dateInscription={history.dateInscription}
+                dateReviewed={history.dateReviewed}
+                language={history.language}
+                isDeletedWithHeader={history.isDeleted}
+              />
+            }
+          />
+        )}
+      </Box>
+      <Box sx={{ flexShrink: 0, ml: 1 }}>
         <ActionButtons
           isLoading={isActionLoading}
           isUpdating={isUpdateFormVisible}
@@ -66,7 +94,8 @@ const History = ({ history, isEditAllowed, isMoving, onMoveUp, onMoveDown, isFir
             <SnapshotButton
               id={history.id}
               type="histories"
-              content={history}
+              parentId={entranceId}
+              parentType="entrances"
             />
           }
           onDeletePress={onDeletePress}
@@ -82,38 +111,13 @@ const History = ({ history, isEditAllowed, isMoving, onMoveUp, onMoveDown, isFir
             : {})}
         />
       </Box>
-      {isUpdateFormVisible && permissions.isAuth ? (
-        <Box width="100%">
-          <CreateHistoryForm
-            closeForm={() => setIsUpdateFormVisible(false)}
-            isNewHistory={false}
-            onSubmit={onSubmitForm}
-            values={history}
-          />
-        </Box>
-      ) : (
-        <ListItemText
-          style={{ margin: 0 }}
-          disableTypography
-          secondary={
-            <Contribution
-              body={history.body}
-              author={history.author}
-              reviewer={history.reviewer}
-              dateInscription={history.dateInscription}
-              dateReviewed={history.dateReviewed}
-              language={history.language}
-              isDeletedWithHeader={history.isDeleted}
-            />
-          }
-        />
-      )}
     </ListItemStyled>
   );
 };
 
 History.propTypes = {
   history: HistoryPropTypes,
+  entranceId: PropTypes.number,
   isEditAllowed: PropTypes.bool,
   isMoving: PropTypes.bool,
   onMoveUp: PropTypes.func,

@@ -1,15 +1,21 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { diffChars, diffSentences } from 'diff';
+import { diffWords, diffSentences } from 'diff';
 import { styled } from '@mui/material/styles';
 import { isNil } from 'ramda';
 
 const AddedText = styled('span')`
   background-color: rgb(70, 149, 74, 0.4);
+  border-radius: 3px;
+  padding: 0 2px;
+  margin: 0 1px;
 `;
 
 const RemovedText = styled('span')`
   background-color: rgb(229, 83, 74, 0.4);
+  border-radius: 3px;
+  padding: 0 2px;
+  margin: 0 1px;
 `;
 const UnchangedText = styled('span')``;
 
@@ -21,7 +27,7 @@ const HighLightsChar = ({ oldText, newText }) => {
     return <UnchangedText>{oldText}</UnchangedText>;
   }
 
-  const result = diffChars(newText, oldText);
+  const result = diffWords(oldText, newText);
   return result.map((change, index) => {
     if (change.added) {
       return <AddedText key={index}>{change.value}</AddedText>;
@@ -41,7 +47,7 @@ const HighLightsLine = ({ oldText, newText }) => {
     return <UnchangedText>{oldText}</UnchangedText>;
   }
 
-  const result = diffSentences(newText, oldText);
+  const result = diffSentences(oldText, newText);
   return result.map((change, index) => {
     if (change.added) {
       return (

@@ -1,136 +1,211 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, useLocation } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { Typography, Skeleton } from '@mui/material';
+import { useIntl } from 'react-intl';
+import { Button, Card, CardContent, Skeleton } from '@mui/material';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import HistoryIcon from '@mui/icons-material/History';
+import ManageHistoryIcon from '@mui/icons-material/ManageHistory';
 
-import { pathOr } from 'ramda';
-
-import Contribution from '../../../common/Contribution/Contribution';
+import PageContainer from '../../../common/Layouts/PageContainer';
+import PageHeader from '../../../common/Layouts/PageHeader';
 import { fetchSnapshot } from '../../../../actions/Snapshot/GetSnapshots';
+import { fetchEntrance } from '../../../../actions/Entrance/GetEntrance';
+import { fetchCave } from '../../../../actions/Cave/GetCave';
+import { fetchDocumentDetails } from '../../../../actions/Document/GetDocumentDetails';
+import { loadMassif } from '../../../../actions/Massif/GetMassif';
+import { fetchPerson } from '../../../../actions/Person/GetPerson';
+import { fetchOrganization } from '../../../../actions/Organization/GetOrganization';
 import REDUCER_STATUS from '../../../../reducers/ReducerStatus';
-import ScrollableContent from '../../../common/Layouts/Fixed/ScrollableContent';
 import SensitiveCaveWarning from '../SensitiveCaveWarning';
 import AccordionSnapshotList from './AccordionSnapshotList';
 import Alert403 from './error/403Alert';
 import Alert404 from './error/404Alert';
-import { getAccordionBodyFromType, sortSnapshots } from './UtilityFunction';
+import { sortSnapshots } from './UtilityFunction';
 import AccordionSnapshotListPage from './AccordionSnapshotListPage';
-import Translate from '../../../common/Translate';
-import { fetchEntrance } from '../../../../actions/Entrance/GetEntrance';
 import { capitalize } from '../../../../utils/strings';
+
+const SUB_ENTITY_TYPES = ['descriptions', 'locations', 'histories', 'riggings', 'comments'];
 
 const SnapshotPage = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { formatMessage } = useIntl();
   const location = useLocation();
   const queryParameters = new URLSearchParams(location.search);
   const isNetwork = queryParameters.get('isNetwork') === 'true';
   const getAll = queryParameters.get('all') === 'true';
-  const [actualTItem, setActualTItem] = useState({});
-
-  useEffect(() => {
-    /*
-    LocalStorage is used to pass data from one tab to another
-    SessionStorage is used to keep data inside a tab (When refreshing a page for instance)
-    */
-    const jsonSessionStorage = sessionStorage.getItem('t_item');
-    const json = jsonSessionStorage ?? localStorage.getItem('t_item');
-    const items = json !== 'undefined' ? JSON.parse(json) : undefined;
-    if (items) {
-      setActualTItem(items);
-    }
-    if (!jsonSessionStorage) {
-      sessionStorage.setItem('t_item', json);
-    }
-    return localStorage.removeItem('t_item');
-  }, []);
+  const parentId = queryParameters.get('parentId');
+  const parentType = queryParameters.get('parentType');
 
   const { id, type } = useParams();
 
-  const { data, status, latestHttpCode } = useSelector(
-    state => state.snapshots
-  );
+  // All entity selectors declared unconditionally (rules of hooks)
+  const { data: currentEntrance, loading: isEntranceLoading } = useSelector(s => s.entrance);
+  const { cave: currentCave, loading: isCaveLoading } = useSelector(s => s.cave);
+  const { details: currentDocument, isLoading: isDocumentLoading } = useSelector(s => s.documentDetails);
+  const { massif: currentMassif, isFetching: isMassifLoading } = useSelector(s => s.massif);
+  const { person: currentPerson, isFetching: isPersonLoading } = useSelector(s => s.person);
+  const { organization: currentOrganization, isLoading: isOrganizationLoading } = useSelector(s => s.organization);
 
-  const { data: currentEntrance } = useSelector(state => state.entrance);
+  const { data, status, latestHttpCode } = useSelector(state => state.snapshots);
 
   useEffect(() => {
     dispatch(fetchSnapshot(id, type, isNetwork, getAll));
   }, [id, type, isNetwork, getAll, dispatch]);
 
-  useEffect(() => {
-    if (type === 'entrances') {
-      dispatch(fetchEntrance(id));
-    }
-  }, [id, type, dispatch]);
+  const isSubEntityType = SUB_ENTITY_TYPES.includes(type);
 
-  let currentTItem;
-  switch (type) {
-    case 'entrances':
-      currentTItem = currentEntrance;
-      break;
-    default:
-      currentTItem = actualTItem;
-  }
+  useEffect(() => {
+    const fetchByType = {
+      entrances: () => dispatch(fetchEntrance(id)),
+      caves: () => dispatch(fetchCave(id)),
+      documents: () => dispatch(fetchDocumentDetails(id)),
+      massifs: () => dispatch(loadMassif(id)),
+      persons: () => dispatch(fetchPerson(id)),
+      organizations: () => dispatch(fetchOrganization(id))
+    };
+    const fetchParentByType = {
+      entrances: pId => dispatch(fetchEntrance(pId)),
+      massifs: pId => dispatch(loadMassif(pId))
+    };
+    if (isSubEntityType) {
+      if (parentId) {
+        const fetchParent = Object.hasOwn(fetchParentByType, parentType)
+          ? fetchParentByType[parentType]
+          : fetchParentByType.entrances;
+        fetchParent(parentId);
+      }
+    } else if (Object.hasOwn(fetchByType, type)) {
+      fetchByType[type]();
+    }
+  }, [id, type, parentId, parentType, isSubEntityType, dispatch]);
+
+  const parentDataByType = {
+    entrances: currentEntrance,
+    massifs: currentMassif
+  };
+  const parentData = parentDataByType[parentType] ?? currentEntrance;
+  const isParentLoading = parentType === 'massifs' ? isMassifLoading : isEntranceLoading;
+
+  const currentSubEntity = isSubEntityType && parentData
+    ? (parentData[type] ?? []).find(item => String(item.id) === id) ?? null
+    : null;
+
+  const entityByType = {
+    entrances: [currentEntrance, isEntranceLoading],
+    caves: [currentCave, isCaveLoading],
+    documents: [currentDocument, isDocumentLoading],
+    massifs: [currentMassif, isMassifLoading],
+    persons: [currentPerson, isPersonLoading],
+    organizations: [currentOrganization, isOrganizationLoading],
+    descriptions: [currentSubEntity, isParentLoading],
+    locations: [currentSubEntity, isParentLoading],
+    histories: [currentSubEntity, isParentLoading],
+    riggings: [currentSubEntity, isParentLoading],
+    comments: [currentSubEntity, isParentLoading]
+  };
+  const [currentTItem, isCurrentItemLoading] = entityByType[type] ?? [null, false];
+
   const isLoading = status === REDUCER_STATUS.LOADING;
   const isSuccess = status === REDUCER_STATUS.SUCCEEDED;
   const is404 = !isSuccess && latestHttpCode === 404;
   const is403 = !isSuccess && latestHttpCode === 403;
-  const isSensitive =
-    pathOr(false, ['entrances', '0', 'isSensitive'], data) ||
-    currentTItem?.isSensitive;
+  const isSensitive = currentTItem?.isSensitive ?? false;
+
+  const TYPE_SINGULAR = {
+    entrances: 'Entrance',
+    caves: 'Cave',
+    documents: 'Document',
+    massifs: 'Massif',
+    persons: 'Person',
+    organizations: 'Organization',
+    descriptions: 'Description',
+    locations: 'Location',
+    histories: 'History',
+    riggings: 'Rigging',
+    comments: 'Comment'
+  };
+
+  const TYPE_PAGE_TITLE = {
+    ...TYPE_SINGULAR,
+    entrances: 'Information'
+  };
+
+  const entityName = currentTItem?.title ?? currentTItem?.name;
+  const pageTitle = isCurrentItemLoading
+    ? undefined
+    : formatMessage(
+        { id: 'Revision history: {type}' },
+        {
+          type:
+            getAll && entityName
+              ? entityName
+              : formatMessage({
+                  id: TYPE_PAGE_TITLE[type] ?? capitalize(type)
+                })
+        }
+      );
+
+  const backTarget = parentId && parentType
+    ? `/ui/${parentType}/${parentId}`
+    : `/ui/${type}/${id}`;
+  const backLabel = formatMessage(
+    { id: 'Back to {type}' },
+    {
+      type: formatMessage({
+        id: TYPE_SINGULAR[parentType ?? type] ?? capitalize(parentType ?? type)
+      })
+    }
+  );
+
+  const backLink = (
+    <Button
+      variant="outlined"
+      size="small"
+      color="primary"
+      startIcon={<ArrowBackIcon />}
+      onClick={() => navigate(backTarget)}>
+      {backLabel}
+    </Button>
+  );
+
   return (
-    <>
+    <PageContainer>
+      <PageHeader
+        title={pageTitle}
+        icon={getAll ? <ManageHistoryIcon fontSize="inherit" /> : <HistoryIcon fontSize="inherit" />}
+        subheader={backLink}
+      />
       {isSensitive && <SensitiveCaveWarning />}
-      {currentTItem && Object.keys(currentTItem).length > 0 && (
-        <ScrollableContent
-          dense
-          title={
-            <Translate
-              id="{type}: Revision history"
-              values={{
-                type: <Translate key="type-translate">{capitalize(type)}</Translate>
-              }}
-              defaultMessage={`${type}: Revision history`}
-            />
-          }
-          content={
-            <>
-              <Typography variant="h3">
-                <Translate>Current</Translate>
-              </Typography>
-              {type !== 'riggings' && (
-                <Typography variant="h4">
-                  {currentTItem.title ?? currentTItem.name}
-                </Typography>
-              )}
-              {getAccordionBodyFromType(type, currentTItem, isNetwork ?? false)}
-              <Contribution
-                reviewer={currentTItem.reviewer}
-                dateReviewed={currentTItem.reviewedDate}
-                withHours
+
+      <Card sx={{ mx: 2, mt: 1 }}>
+        <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
+          {is403 && <Alert403 type={type} />}
+          {is404 && <Alert404 type={type} />}
+          {isLoading && <Skeleton height={300} />}
+          {isSuccess &&
+            (getAll ? (
+              <AccordionSnapshotListPage
+                data={sortSnapshots(data)}
+                type={type}
+                isNetwork={isNetwork}
+                currentTItem={currentTItem}
+                isCurrentItemLoading={isCurrentItemLoading}
               />
-            </>
-          }
-        />
-      )}
-      {is403 && <Alert403 type={type} />}
-      {is404 && <Alert404 type={type} />}
-      {isLoading && <Skeleton height={300} />}
-      {isSuccess &&
-        (getAll ? (
-          <AccordionSnapshotListPage
-            data={sortSnapshots(data)}
-            type={type}
-            isNetwork={isNetwork}
-          />
-        ) : (
-          <AccordionSnapshotList
-            data={data}
-            type={type}
-            isNetwork={isNetwork}
-            actualItem={currentTItem}
-          />
-        ))}
-    </>
+            ) : (
+              <AccordionSnapshotList
+                data={data}
+                type={type}
+                isNetwork={isNetwork}
+                currentItem={currentTItem}
+                isCurrentItemLoading={isCurrentItemLoading}
+              />
+            ))}
+        </CardContent>
+      </Card>
+    </PageContainer>
   );
 };
+
 export default SnapshotPage;

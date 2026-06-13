@@ -190,9 +190,7 @@ export const Entry = ({ isLoading, error, entrance }) => {
         {
           key: 'snapshot-all',
           icon: <ManageHistoryIcon />,
-          label: formatMessage({
-            id: 'Page history'
-          }),
+          label: formatMessage({ id: 'Page history' }),
           href: `${snapshotUrl}&all=true`,
           target: '_blank'
         }

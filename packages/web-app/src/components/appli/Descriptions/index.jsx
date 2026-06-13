@@ -99,6 +99,8 @@ const Descriptions = ({
                     onMoveDown={() => handleMove(description.id, 1)}
                     isFirst={description.id === activeIds[0]}
                     isLast={description.id === activeIds[activeIds.length - 1]}
+                    parentId={entityId}
+                    parentType={entityType}
                   />
                 ));
               })()}

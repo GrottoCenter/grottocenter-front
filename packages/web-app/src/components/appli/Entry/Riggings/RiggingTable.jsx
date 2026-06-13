@@ -45,15 +45,19 @@ const StyledTableCell = styled(TableCell, {
   }
 `;
 
-const HighligtedTableCell = ({ data, oldData }) => (
+const HighlightedTableCell = ({ data, oldData }) => (
   <StyledTableCell component="th" scope="row">
     <span style={{ whiteSpace: 'pre-line' }}>
-      {oldData ? <HighLightsLine newText={data} oldText={oldData} /> : data}
+      {oldData !== undefined ? (
+        <HighLightsLine newText={data} oldText={oldData} />
+      ) : (
+        data
+      )}
     </span>
   </StyledTableCell>
 );
 
-HighligtedTableCell.propTypes = {
+HighlightedTableCell.propTypes = {
   data: PropTypes.string.isRequired,
   oldData: PropTypes.string
 };
@@ -101,24 +105,29 @@ const RiggingTable = ({ id, obstacles, title, previous, isDeleted }) => {
           <TableBody>
             {obstacles?.map(
               ({ obstacle, rope, anchor, observation }, index) => {
-                const oldData = previousObstacles
+                const oldRow = previousObstacles
                   ? previousObstacles[index]
                   : undefined;
+                const isAdded =
+                  previousObstacles !== undefined && oldRow === undefined;
                 return (
                   // eslint-disable-next-line react/no-array-index-key
                   <StyledTableRow key={`${obstacle}${rope}${anchor}${index}`}>
-                    <HighligtedTableCell
+                    <HighlightedTableCell
                       data={obstacle}
-                      oldData={oldData?.obstacle}
+                      oldData={isAdded ? '' : oldRow?.obstacle}
                     />
-                    <HighligtedTableCell data={rope} oldData={oldData?.rope} />
-                    <HighligtedTableCell
+                    <HighlightedTableCell
+                      data={rope}
+                      oldData={isAdded ? '' : oldRow?.rope}
+                    />
+                    <HighlightedTableCell
                       data={anchor}
-                      oldData={oldData?.anchor}
+                      oldData={isAdded ? '' : oldRow?.anchor}
                     />
-                    <HighligtedTableCell
+                    <HighlightedTableCell
                       data={observation}
-                      oldData={oldData?.observation}
+                      oldData={isAdded ? '' : oldRow?.observation}
                     />
                   </StyledTableRow>
                 );
@@ -134,7 +143,9 @@ const RiggingTable = ({ id, obstacles, title, previous, isDeleted }) => {
 RiggingTable.propTypes = {
   id: PropTypes.number.isRequired,
   obstacles: PropTypes.arrayOf(ObstaclePropTypes),
-  previous: PropTypes.arrayOf(ObstaclePropTypes),
+  previous: PropTypes.shape({
+    obstacles: PropTypes.arrayOf(ObstaclePropTypes)
+  }),
   title: PropTypes.string.isRequired,
   isDeleted: PropTypes.bool
 };

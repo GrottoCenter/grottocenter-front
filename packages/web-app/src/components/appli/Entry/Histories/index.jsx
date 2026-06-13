@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { useDispatch } from 'react-redux';
 import { useIntl } from 'react-intl';
@@ -34,6 +34,27 @@ const Histories = ({ entranceId, histories, isEditAllowed }) => {
     );
     setIsFormVisible(false);
   };
+
+  const sortedHistoryItems = useMemo(() => {
+    const sorted = sortByRelevance(histories);
+    const activeIds = sorted
+      .filter(h => !h.isDeleted)
+      .map(h => h.id);
+    return sorted.map(history => (
+      <React.Fragment key={history.id}>
+        <History
+          history={history}
+          entranceId={entranceId}
+          isEditAllowed={isEditAllowed}
+          isMoving={movingId === history.id}
+          onMoveUp={() => handleMove(history.id, -1)}
+          onMoveDown={() => handleMove(history.id, 1)}
+          isFirst={history.id === activeIds[0]}
+          isLast={history.id === activeIds[activeIds.length - 1]}
+        />
+      </React.Fragment>
+    ));
+  }, [histories, entranceId, isEditAllowed, movingId, handleMove]);
 
   return (
     <ScrollableContent
@@ -74,25 +95,7 @@ const Histories = ({ entranceId, histories, isEditAllowed }) => {
 
           {histories.length > 0 ? (
             <List dense disablePadding>
-              {(() => {
-                const sorted = sortByRelevance(histories);
-                const activeIds = sorted
-                  .filter(h => !h.isDeleted)
-                  .map(h => h.id);
-                return sorted.map(history => (
-                  <React.Fragment key={history.id}>
-                    <History
-                      history={history}
-                      isEditAllowed={isEditAllowed}
-                      isMoving={movingId === history.id}
-                      onMoveUp={() => handleMove(history.id, -1)}
-                      onMoveDown={() => handleMove(history.id, 1)}
-                      isFirst={history.id === activeIds[0]}
-                      isLast={history.id === activeIds[activeIds.length - 1]}
-                    />
-                  </React.Fragment>
-                ));
-              })()}
+              {sortedHistoryItems}
             </List>
           ) : (
             <Alert
