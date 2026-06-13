@@ -185,4 +185,3 @@ Report back to the user that the review was submitted, including the PR URL.
 - **Be thorough but respectful.** Critique the code, not the author. Use phrases like "Consider..." or "This might..." rather than "You should..." or "This is wrong."
 - **Reference specific files and line numbers** whenever possible so the author can locate issues quickly.
 - **Check steering files first** — don't flag something as a convention violation unless it actually violates the project's documented conventions.
-- If the diff exceeds 500 added/deleted lines, focus on the most critical files first (business logic, security-sensitive code, public API surfaces) and note this in the review.
