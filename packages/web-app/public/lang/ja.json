@@ -1617,6 +1617,7 @@
   "Perform an advanced search on all the fields. Results displayed will have at least one field matching your request.": "すべてのフィールドで詳細検索を実行します。表示された結果には、リクエストに一致するフィールドが少なくとも1つあります。",
   "Periodical issue": "定期刊行物号",
   "Permanently delete": "完全に削除",
+  "permanently_deleted": "完全に削除されました",
   "Person": "人物",
   "Personal information": "個人情報",
   "Persons": "人物",

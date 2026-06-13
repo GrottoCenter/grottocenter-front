@@ -1617,6 +1617,7 @@
   "Perform an advanced search on all the fields. Results displayed will have at least one field matching your request.": "Lakukan pencarian lanjutan di semua bidang. Hasil yang ditampilkan akan memiliki setidaknya satu bidang yang cocok dengan permintaan Anda.",
   "Periodical issue": "Edisi berkala",
   "Permanently delete": "Hapus permanen",
+  "permanently_deleted": "dihapus secara permanen",
   "Person": "Orang",
   "Personal information": "Informasi pribadi",
   "Persons": "Orang",

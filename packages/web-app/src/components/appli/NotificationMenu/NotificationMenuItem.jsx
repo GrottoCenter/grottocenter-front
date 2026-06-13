@@ -62,8 +62,12 @@ const NotificationsMenuItem = ({ notification, onClick }) => {
                 defaultMessage: '{entity} {verb}'
               },
               {
-                entity: `(${formatMessage({ id: entityType })})`,
-                verb: formatMessage({ id: verb })
+                entity: entityType
+                  ? `(${formatMessage({ id: entityType, defaultMessage: entityType })})`
+                  : '',
+                verb: verb
+                  ? formatMessage({ id: verb, defaultMessage: verb })
+                  : ''
               }
             )}
             .

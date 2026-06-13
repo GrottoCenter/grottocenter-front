@@ -1617,6 +1617,7 @@
   "Perform an advanced search on all the fields. Results displayed will have at least one field matching your request.": "Exécuter la recherche avancée sur tous les champs. Les résultats affichés auront au moins un champ correspondant à votre requête.",
   "Periodical issue": "Numéro du périodique",
   "Permanently delete": "Supprimer définitivement",
+  "permanently_deleted": "supprimé définitivement",
   "Person": "Personne",
   "Personal information": "Informations personnelles",
   "Persons": "Personnes",

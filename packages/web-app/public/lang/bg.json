@@ -1617,6 +1617,7 @@
   "Perform an advanced search on all the fields. Results displayed will have at least one field matching your request.": "Извършете разширено търсене във всички полета. В показваните резултати ще имат поне едно поле, отговарящо на вашата заявка.",
   "Periodical issue": "Периодично издание",
   "Permanently delete": "Изтрий окончателно",
+  "permanently_deleted": "окончателно изтрито",
   "Person": "Личност",
   "Personal information": "Лична информация",
   "Persons": "Лица",
