@@ -23,6 +23,7 @@ import { UNITS } from '../constants/units';
 import { QUANTITY_KIND_UNITS_MAP } from '../constants/quantityKindUnitsMap';
 
 const initialFormState = {
+  label: '',
   quantityKindId: '',
   unitId: '',
   precisionUpper: '',
@@ -123,6 +124,7 @@ const SensorConfigForm = ({ deviceId }) => {
 
     const configData = {
       deviceId,
+      label: form.label.trim() || undefined,
       quantityKindId: Number(form.quantityKindId),
       unitId: Number(form.unitId),
       precisionUpper:
@@ -182,6 +184,18 @@ const SensorConfigForm = ({ deviceId }) => {
       )}
 
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, maxWidth: 480 }}>
+        {/* Label — optional human-readable name */}
+        <TextField
+          label={formatMessage({
+            id: 'ImportObservationsWizard.DeviceSensorsStep.sensorConfigLabel'
+          })}
+          value={form.label}
+          onChange={handleFieldChange('label')}
+          size="small"
+          inputProps={{ maxLength: 300 }}
+          data-testid="sensor-config-label"
+        />
+
         {/* Quantity Kind and Unit dropdowns — side by side */}
         <Box sx={{ display: 'flex', gap: 2 }}>
           <TextField

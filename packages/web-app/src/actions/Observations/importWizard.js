@@ -67,6 +67,7 @@ export const SUBMIT_OBSERVATIONS_IMPORT_FAILURE =
 const normalizeSensorConfig = config => ({
   id: config.id,
   deviceId: config.device,
+  label: config.label || null,
   quantityKindId: config.quantityKind.id,
   quantityKindCode: config.quantityKind.code,
   unitId: config.unit.id,
@@ -95,6 +96,7 @@ const normalizeSearchDevice = device => ({
   id: device.id != null ? Number(device.id) : null,
   name: device.name || null,
   brandName: device.brandName || null,
+  serialNumber: device.serialNumber || null,
   author: device.author || null
 });
 
@@ -106,6 +108,7 @@ const normalizeDevice = device => ({
   id: device.id,
   name: device.name,
   brandName: device.brandName || null,
+  serialNumber: device.serialNumber || null,
   author: device.author || null
 });
 
@@ -164,6 +167,7 @@ export const createDevice = deviceData => (dispatch, getState) => {
   const body = {
     name: deviceData.name,
     brandName: deviceData.brandName || undefined,
+    serialNumber: deviceData.serialNumber || undefined,
     productUrl: deviceData.productUrl || undefined,
     manufacturerUrl: deviceData.manufacturerUrl || undefined
   };
@@ -213,6 +217,7 @@ export const fetchSensorConfigs = deviceId => (dispatch, getState) => {
           id: data.id,
           name: data.name,
           brandName: data.brandName || null,
+          serialNumber: data.serialNumber || null,
           author: data.author || null
         },
         sensorConfigs
@@ -232,6 +237,7 @@ export const createSensorConfig = configData => (dispatch, getState) => {
   const { authorizationHeader } = getState().login;
 
   const body = {
+    label: configData.label || undefined,
     quantityKind: configData.quantityKindId,
     unit: configData.unitId,
     precisionUpper: configData.precisionUpper ?? null,
