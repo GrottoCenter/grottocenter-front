@@ -2183,6 +2183,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@date-fns/utc@npm:^2.1.1":
+  version: 2.1.1
+  resolution: "@date-fns/utc@npm:2.1.1"
+  checksum: 10/80db3b4afbe261ed441f4c0fe688a5979ab7377fafa8100920b46bfd5f3dcf2f0ded9e63869fdbbedad0f5fc05e411e88bab1e3374e5173a822052666f01550a
+  languageName: node
+  linkType: hard
+
 "@emnapi/runtime@npm:^1.7.0":
   version: 1.9.2
   resolution: "@emnapi/runtime@npm:1.9.2"
@@ -2728,6 +2735,7 @@ __metadata:
   resolution: "@grotto-front/web-app@workspace:packages/web-app"
   dependencies:
     "@asymmetrik/leaflet-d3": "npm:^6.0.1"
+    "@date-fns/utc": "npm:^2.1.1"
     "@emotion/react": "npm:^11.14.0"
     "@emotion/styled": "npm:^11.14.1"
     "@mui/icons-material": "npm:^7.3.9"
@@ -2755,7 +2763,7 @@ __metadata:
     "@turf/rewind": "npm:^7.3.5"
     "@types/validator": "npm:^13"
     coordinate-parser: "npm:^1.0.7"
-    cypress: "npm:^15.16.0"
+    cypress: "npm:^15.17.0"
     d3: "npm:^7.9.0"
     d3-hexbin: "npm:^0.2.2"
     date-fns: "npm:^4.4.0"
@@ -8889,9 +8897,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"cypress@npm:^15.16.0":
-  version: 15.16.0
-  resolution: "cypress@npm:15.16.0"
+"cypress@npm:^15.17.0":
+  version: 15.17.0
+  resolution: "cypress@npm:15.17.0"
   dependencies:
     "@cypress/request": "npm:^4.0.0"
     "@cypress/xvfb": "npm:^1.2.4"
@@ -8934,7 +8942,7 @@ __metadata:
     yauzl: "npm:^3.3.1"
   bin:
     cypress: bin/cypress
-  checksum: 10/a485b4ce2e535d5fb33cbfeb01e51a310b081f89150d56f7c49a0bd9105264f04f74add517811002c8617b640110e8d6940700aa6acc006b1fb313aee9650b78
+  checksum: 10/b4d01d3cebbe9f2525a486cc41af8e14f78dd5a9e9330e53d4ff68148332cc96a82b36016f32424bfc116a04802e0079d59a7908af87a84df6d9247369ae35fb
   languageName: node
   linkType: hard
 
