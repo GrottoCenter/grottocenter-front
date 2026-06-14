@@ -73,7 +73,9 @@ export const exportProfile = state => {
       && !Number.isNaN(Number(context.longitude))
       ? Number(context.longitude)
       : null,
-    authorId: context.authorId != null ? Number(context.authorId) : null,
+    authorIds: Array.isArray(context.authorIds)
+      ? context.authorIds.map(Number)
+      : [],
     licenseId: context.licenseId,
     documentTitle: context.documentTitle,
     documentLanguage: state.documentLanguage,
@@ -145,7 +147,9 @@ export const importProfile = json => {
         pointLabel: json.pointLabel,
         latitude: json.latitude,
         longitude: json.longitude,
-        authorId: json.authorId,
+        authorIds: Array.isArray(json.authorIds) && json.authorIds.length > 0
+          ? json.authorIds
+          : (json.authorId != null ? [json.authorId] : []),
         licenseId: json.licenseId,
         documentTitle: json.documentTitle,
         observationName: json.observationName,

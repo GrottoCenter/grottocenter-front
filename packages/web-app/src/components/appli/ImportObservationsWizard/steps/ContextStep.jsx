@@ -4,9 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useIntl } from 'react-intl';
 import { useForm, useWatch } from 'react-hook-form';
 import {
-  Autocomplete,
   Box,
-  CircularProgress,
   FormControl,
   FormHelperText,
   IconButton,
@@ -30,13 +28,9 @@ import {
   fetchCaverById
 } from '../../../../actions/Observations/importWizard';
 import { fetchLicense } from '../../../../actions/Licenses';
-import {
-  fetchQuicksearchResult,
-  resetQuicksearch
-} from '../../../../actions/Quicksearch';
-import { entityOptionForSelector } from '../../../../helpers/Entity';
 import { useUserProperties } from '../../../../hooks';
 import CaveAutoCompleteSearch from '../../../common/AutoCompleteSearch/CaveAutoCompleteSearch';
+import AuthorsSelect from '../../../common/AuthorsSelect';
 import LanguageSelect from '../../../common/LanguageSelect';
 
 // ===== Constants =====
@@ -66,18 +60,11 @@ const ContextStep = ({ initialCaveId, caveIdLocked }) => {
     state => state.licenses
   );
 
-  // Quicksearch for cavers
-  const {
-    isLoading: caversLoading,
-    results: caversResults
-  } = useSelector(state => state.quicksearch);
-
   // Current user
   const currentUser = useUserProperties();
 
-  // Local state for author Autocomplete
-  const [caverInputValue, setCaverInputValue] = useState('');
-  const [selectedAuthor, setSelectedAuthor] = useState(null);
+  // Local state for authors (synced with Redux context.authorIds)
+  const [selectedAuthors, setSelectedAuthors] = useState([]);
 
   // Local state for cave (to display the name after selection or profile import)
   const [selectedCave, setSelectedCave] = useState(null);
@@ -90,7 +77,7 @@ const ContextStep = ({ initialCaveId, caveIdLocked }) => {
     samplingIntervalSeconds !== null ? String(samplingIntervalSeconds) : ''
   );
 
-  // Track whether we pre-filled the author once
+  // Track whether we pre-filled the authors once
   const hasPrefilledAuthorRef = useRef(false);
 
   // Local react-hook-form for CoordinateFormSection integration
@@ -177,16 +164,16 @@ const ContextStep = ({ initialCaveId, caveIdLocked }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [caveIdLocked, initialCaveId]);
 
-  // Pre-fill author with authenticated user (once)
+  // Pre-fill authors with authenticated user (once)
   useEffect(() => {
     if (hasPrefilledAuthorRef.current) return;
     if (!currentUser.id) return;
-    if (context.authorId !== null) return;
+    if (context.authorIds.length > 0) return;
     hasPrefilledAuthorRef.current = true;
     const author = { id: currentUser.id, nickname: currentUser.nickname };
-    setSelectedAuthor(author);
-    dispatch({ type: SET_CONTEXT, context: { authorId: currentUser.id } });
-    // Excluding dispatch, context.authorId, currentUser.nickname —
+    setSelectedAuthors([author]);
+    dispatch({ type: SET_CONTEXT, context: { authorIds: [currentUser.id] } });
+    // Excluding dispatch, context.authorIds, currentUser.nickname —
     // hasPrefilledAuthorRef guards against multiple runs; we only pre-fill once.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentUser.id]);
@@ -257,23 +244,35 @@ const ContextStep = ({ initialCaveId, caveIdLocked }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [context.caveId]);
 
-  // Restore author from context.authorId when selectedAuthor is null (e.g. from profile import)
+  // Restore authors from context.authorIds when selectedAuthors is empty (e.g. from profile import)
   useEffect(() => {
-    if (!context.authorId || selectedAuthor) return undefined;
+    if (!context.authorIds || context.authorIds.length === 0 || selectedAuthors.length > 0)
+      return undefined;
 
     const abortController = new AbortController();
+    let cancelled = false;
 
-    dispatch(fetchCaverById(context.authorId, { signal: abortController.signal }))
-      .then(data => {
-        if (data) setSelectedAuthor({ id: data.id, nickname: data.nickname });
-      });
+    Promise.all(
+      context.authorIds.map(id =>
+        dispatch(fetchCaverById(id, { signal: abortController.signal }))
+      )
+    ).then(results => {
+      if (cancelled) return;
+      const authors = results
+        .filter(Boolean)
+        .map(data => ({ id: data.id, nickname: data.nickname }));
+      if (authors.length > 0) setSelectedAuthors(authors);
+    });
 
-    return () => abortController.abort();
-    // Excluding selectedAuthor — this restores author
-    // display only when authorId changes (e.g. profile import) and no author
-    // is already selected locally.
+    return () => {
+      cancelled = true;
+      abortController.abort();
+    };
+    // Excluding selectedAuthors — this restores authors
+    // display only when authorIds changes (e.g. profile import) and no authors
+    // are already selected locally.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [context.authorId]);
+  }, [context.authorIds]);
 
   // Filtered licenses (no Creative Commons)
   const allowedLicenses = allLicenses
@@ -340,23 +339,12 @@ const ContextStep = ({ initialCaveId, caveIdLocked }) => {
     dispatch({ type: SET_CONTEXT, context: { caveId: null } });
   };
 
-  const handleAuthorChange = (_event, newValue) => {
-    setSelectedAuthor(newValue);
+  const handleAuthorsChange = newAuthors => {
+    setSelectedAuthors(newAuthors);
     dispatch({
       type: SET_CONTEXT,
-      context: { authorId: newValue ? newValue.id : null }
+      context: { authorIds: newAuthors.map(a => a.id) }
     });
-  };
-
-  const handleAuthorInputChange = (_event, newInputValue) => {
-    setCaverInputValue(newInputValue);
-    if (newInputValue.length >= 3) {
-      dispatch(
-        fetchQuicksearchResult({ query: newInputValue, entities: ['persons'] })
-      );
-    } else {
-      dispatch(resetQuicksearch());
-    }
   };
 
   const handleSamplingIntervalChange = e => {
@@ -405,6 +393,7 @@ const ContextStep = ({ initialCaveId, caveIdLocked }) => {
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
         <TextField
           required
+          variant="filled"
           label={formatMessage({ id: 'ImportObservationsWizard.ContextStep.pointLabel' })}
           placeholder={formatMessage({
             id: 'ImportObservationsWizard.ContextStep.pointLabelPlaceholder'
@@ -428,6 +417,7 @@ const ContextStep = ({ initialCaveId, caveIdLocked }) => {
       {/* Observation name + language */}
       <Box sx={{ display: 'flex', gap: 2, maxWidth: 480, alignItems: 'flex-start' }}>
         <TextField
+          variant="filled"
           label={formatMessage({
             id: 'ImportObservationsWizard.ContextStep.observationName'
           })}
@@ -451,36 +441,12 @@ const ContextStep = ({ initialCaveId, caveIdLocked }) => {
 
       {/* Authors */}
       <Box sx={{ maxWidth: 480 }}>
-        <Autocomplete
-          options={caversResults || []}
-          getOptionLabel={option => option.nickname || ''}
-          isOptionEqualToValue={(option, value) => option.id === value.id}
-          value={selectedAuthor}
-          inputValue={caverInputValue}
-          loading={caversLoading}
-          onChange={handleAuthorChange}
-          onInputChange={handleAuthorInputChange}
-          filterOptions={x => x}
-          renderOption={(props, option) => entityOptionForSelector(props, option)}
-          renderInput={params => (
-            <TextField
-              {...params}
-              label={formatMessage({ id: 'ImportObservationsWizard.ContextStep.authorLabel' })}
-              size="small"
-              InputProps={{
-                ...params.InputProps,
-                endAdornment: (
-                  <>
-                    {caversLoading && <CircularProgress size={16} />}
-                    {params.InputProps.endAdornment}
-                  </>
-                )
-              }}
-            />
-          )}
-          data-testid="author-autocomplete"
+        <AuthorsSelect
+          value={selectedAuthors}
+          onChange={handleAuthorsChange}
+          label={formatMessage({ id: 'ImportObservationsWizard.ContextStep.authorsLabel' })}
           noOptionsText={formatMessage({
-            id: 'ImportObservationsWizard.ContextStep.authorNoOptions'
+            id: 'ImportObservationsWizard.ContextStep.authorsNoOptions'
           })}
         />
       </Box>
@@ -513,6 +479,7 @@ const ContextStep = ({ initialCaveId, caveIdLocked }) => {
       {/* Sampling interval — with tooltip */}
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
         <TextField
+          variant="filled"
           label={formatMessage({
             id: 'ImportObservationsWizard.ContextStep.samplingIntervalLabel'
           })}

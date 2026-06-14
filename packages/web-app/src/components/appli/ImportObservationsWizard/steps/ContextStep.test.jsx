@@ -83,8 +83,14 @@ const messages = {
   'ImportObservationsWizard.ContextStep.caveIdHelper': 'Enter the numeric ID of the cave',
   'ImportObservationsWizard.ContextStep.pointLabel': 'Point label',
   'ImportObservationsWizard.ContextStep.pointLabelPlaceholder': 'e.g. Main gallery - sensor A',
-  'ImportObservationsWizard.ContextStep.authorLabel': 'Author',
-  'ImportObservationsWizard.ContextStep.authorNoOptions': 'No caver matches your search (type at least 3 characters)',
+  'ImportObservationsWizard.ContextStep.authorsLabel': 'Authors',
+  'ImportObservationsWizard.ContextStep.authorsNoOptions': 'No caver matches your search (type at least 3 characters)',
+  'Type at least {nbOfChars} character(s)': 'Type at least {nbOfChars} character(s)',
+  'Choose one or more authors among those already registered. If the author you are looking for does not exist in Grottocenter, it is possible to add him/her using the + button on the right.': 'Choose one or more authors among those already registered. If the author you are looking for does not exist in Grottocenter, it is possible to add him/her using the + button on the right.',
+  'new entity': 'new entity',
+  'Surname': 'Surname',
+  'Caver.Name': 'Name',
+  'create': 'Create',
   'ImportObservationsWizard.ContextStep.licenseLabel': 'License',
   'ImportObservationsWizard.ContextStep.loadingLicenses': 'Loading licenses…',
   'ImportObservationsWizard.ContextStep.samplingIntervalLabel': 'Sampling interval (seconds)',
@@ -124,7 +130,7 @@ const defaultImportWizardState = {
     caveId: null,
     caveIdLocked: false,
     pointLabel: '',
-    authorId: null,
+    authorIds: [],
     licenseId: null,
     latitude: null,
     longitude: null,
@@ -157,6 +163,11 @@ const buildState = (overrides = {}) => ({
   quicksearch: {
     results: [],
     isLoading: false,
+    error: null
+  },
+  createPerson: {
+    isLoading: false,
+    caver: null,
     error: null
   },
   language: {

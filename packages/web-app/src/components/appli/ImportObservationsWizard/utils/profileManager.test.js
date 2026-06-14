@@ -36,7 +36,7 @@ describe('exportProfile', () => {
         pointLabel: 'Salle du Chaos',
         latitude: '43.123',
         longitude: '2.987',
-        authorId: 7,
+        authorIds: [7],
         licenseId: 1,
         documentTitle: 'Temp Jan 2024',
         observationName: 'Campaign Jan 2024',
@@ -58,7 +58,7 @@ describe('exportProfile', () => {
     expect(profile.pointLabel).toBe('Salle du Chaos');
     expect(profile.latitude).toBe(43.123);
     expect(profile.longitude).toBe(2.987);
-    expect(profile.authorId).toBe(7);
+    expect(profile.authorIds).toEqual([7]);
     expect(profile.licenseId).toBe(1);
     expect(profile.documentTitle).toBe('Temp Jan 2024');
     expect(profile.observationName).toBe('Campaign Jan 2024');
@@ -154,7 +154,7 @@ describe('importProfile', () => {
       pointLabel: 'Point A',
       latitude: '45.0',
       longitude: '3.0',
-      authorId: 5,
+      authorIds: [5],
       licenseId: 2,
       documentTitle: 'My Doc',
       observationName: 'Obs 1',

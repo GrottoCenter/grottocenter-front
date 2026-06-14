@@ -53,7 +53,7 @@ export const initialState = {
     caveId: null,
     caveIdLocked: false,
     pointLabel: '',
-    authorId: null,
+    authorIds: [],
     licenseId: null,
     latitude: null,
     longitude: null,
