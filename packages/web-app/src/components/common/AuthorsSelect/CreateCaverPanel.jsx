@@ -1,14 +1,13 @@
-import React, { useContext, useEffect, useRef, useState } from 'react';
-import { isEmpty, isNil } from 'ramda';
+import React, { useEffect, useRef, useState } from 'react';
+import { isEmpty } from 'ramda';
 import { TextField } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { useIntl } from 'react-intl';
 import AddIcon from '@mui/icons-material/Add';
 import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
-import { postPerson } from '../../../../../../actions/Person/CreatePerson';
-import ActionButton from '../../../../../common/ActionButton';
-import { DocumentFormContext } from '../../Provider';
+import { postPerson } from '../../../actions/Person/CreatePerson';
+import ActionButton from '../ActionButton';
 
 const Wrapper = styled('div')`
   display: flex;
@@ -17,20 +16,19 @@ const Wrapper = styled('div')`
   width: 100%;
 `;
 
-const CreateNewCaver = ({
+const CreateCaverPanel = ({
   defaultName = '',
   defaultSurname = '',
   enabled,
-  onCreateSuccess,
-  contextValueName
+  onCreateSuccess
 }) => {
   const dispatch = useDispatch();
   const { isLoading, caver } = useSelector(state => state.createPerson);
-  const { document, updateAttribute } = useContext(DocumentFormContext);
   const { formatMessage } = useIntl();
   const inputRef = useRef(null);
   const [name, setName] = useState(defaultName);
   const [surname, setSurname] = useState(defaultSurname);
+
   const handleChangeName = event => {
     setName(event.target.value);
   };
@@ -57,9 +55,8 @@ const CreateNewCaver = ({
   }, [enabled, inputRef]);
 
   useEffect(() => {
-    if (!isNil(caver) && !isEmpty(name) && !isEmpty(surname)) {
-      updateAttribute(contextValueName, [...document[contextValueName], caver]);
-      onCreateSuccess();
+    if (caver && !isEmpty(name) && !isEmpty(surname)) {
+      onCreateSuccess(caver);
       setName('');
       setSurname('');
     }
@@ -100,12 +97,11 @@ const CreateNewCaver = ({
   );
 };
 
-CreateNewCaver.propTypes = {
+CreateCaverPanel.propTypes = {
   defaultName: PropTypes.string,
   defaultSurname: PropTypes.string,
   enabled: PropTypes.bool,
-  onCreateSuccess: PropTypes.func,
-  contextValueName: PropTypes.string.isRequired
+  onCreateSuccess: PropTypes.func.isRequired
 };
 
-export default CreateNewCaver;
+export default CreateCaverPanel;

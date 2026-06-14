@@ -76,10 +76,23 @@ Cypress.Commands.add('checkPageLoaded', ({ timeout = 15000 } = {}) => {
 });
 
 /**
- * Intercept all /api/v1/** calls with a 200 empty response.
+ * Intercept all API calls with a 200 empty response.
  * Prevents unexpected 401s from triggering the app's logout flow.
  * Call this BEFORE more specific intercepts (Cypress matches last-registered first).
+ *
+ * Covers:
+ * - /api/v1/** (most endpoints)
+ * - /api/convert (projections)
+ * - /api/rss/** (RSS feeds)
  */
 Cypress.Commands.add('mockApiCatchAll', () => {
   cy.intercept({ pathname: '/api/v1/**' }, { statusCode: 200, body: {} });
+  cy.intercept(
+    { method: 'GET', pathname: '/api/convert' },
+    { statusCode: 200, body: [] }
+  );
+  cy.intercept(
+    { method: 'GET', pathname: '/api/rss/**' },
+    { statusCode: 200, body: '' }
+  );
 });

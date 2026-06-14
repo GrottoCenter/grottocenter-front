@@ -78,7 +78,7 @@ const wizardStateArbitrary = fc.record({
   context: fc.record({
     caveId: fc.option(fc.nat(), { nil: null }),
     pointLabel: fc.string(),
-    authorId: fc.option(fc.nat(), { nil: null }),
+    authorIds: fc.array(fc.nat(), { minLength: 0, maxLength: 5 }),
     licenseId: fc.option(fc.nat(), { nil: null }),
     latitude: fc.option(fc.string(), { nil: null }),
     longitude: fc.option(fc.string(), { nil: null }),
@@ -137,7 +137,7 @@ describe('Property 9: Profile export/import round-trip', () => {
         // Context fields
         expect(restored.context.caveId).toEqual(state.context.caveId);
         expect(restored.context.pointLabel).toEqual(state.context.pointLabel);
-        expect(restored.context.authorId).toEqual(state.context.authorId);
+        expect(restored.context.authorIds).toEqual(state.context.authorIds);
         expect(restored.context.licenseId).toEqual(state.context.licenseId);
 
         // lat/lng are coerced to numbers in export (empty/non-numeric string → null)
