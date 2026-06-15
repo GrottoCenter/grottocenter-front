@@ -1078,6 +1078,7 @@
   "guidelines.create_new_description": "Rédigez une nouvelle directive et associez-la à cette entité.",
   "guidelines.create_success": "Directive créée et associée avec succès",
   "guidelines.description": "Description",
+  "guidelines.fetch_error": "Failed to load guidelines",
   "guidelines.no_results": "Aucune directive correspondante trouvée",
   "guidelines.none": "Aucune directive associée à ce {entityType}.",
   "guidelines.search_placeholder": "Filtrer par titre ou description…",
