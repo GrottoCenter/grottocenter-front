@@ -203,7 +203,10 @@ const RestoreSnapshot = item => {
 RestoreSnapshot.propTypes = {
   snapshot: PropTypes.shape({}).isRequired,
   snapshotType: PropTypes.string.isRequired,
-  isNetwork: PropTypes.bool
+  isNetwork: PropTypes.bool,
+  actualItem: PropTypes.shape({
+    isDeleted: PropTypes.bool
+  })
 };
 
 export default RestoreSnapshot;
