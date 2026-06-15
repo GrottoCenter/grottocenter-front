@@ -44,17 +44,32 @@ const Guidelines = ({ entityType, entityId, guidelines }) => {
   const [searchValue, setSearchValue] = useState('');
   const [attachFetchTrigger, setAttachFetchTrigger] = useState(0);
 
+  const entityLabel = formatMessage({
+    id:
+      entityType === 'countries'
+        ? 'country'
+        : entityType === 'regions'
+        ? 'region'
+        : 'massif'
+  });
+
   useEffect(() => {
-    if (mode === MODE_ATTACH) {
-      setIsLoadingGuidelines(true);
-      fetch(getGuidelinesUrl)
-        .then(checkAndGetStatus)
-        .then(response => response.json())
-        .then(data => {
+    if (mode !== MODE_ATTACH) return;
+
+    let cancelled = false;
+    setIsLoadingGuidelines(true);
+
+    fetch(getGuidelinesUrl)
+      .then(checkAndGetStatus)
+      .then(response => response.json())
+      .then(data => {
+        if (!cancelled) {
           setAllGuidelines(data || []);
           setIsLoadingGuidelines(false);
-        })
-        .catch(err => {
+        }
+      })
+      .catch(err => {
+        if (!cancelled) {
           console.error(err);
           onError(
             formatMessage({
@@ -63,8 +78,12 @@ const Guidelines = ({ entityType, entityId, guidelines }) => {
             })
           );
           setIsLoadingGuidelines(false);
-        });
-    }
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
   }, [mode, formatMessage, onError, attachFetchTrigger]);
 
   const closeForm = () => {
@@ -110,7 +129,7 @@ const Guidelines = ({ entityType, entityId, guidelines }) => {
     }
 
     setIsSubmitting(true);
-    await dispatch(
+    const result = await dispatch(
       patchGuideline({
         id: selectedGuideline.id,
         countries,
@@ -119,7 +138,7 @@ const Guidelines = ({ entityType, entityId, guidelines }) => {
       })
     );
     setIsSubmitting(false);
-    closeForm();
+    if (result) closeForm();
   };
 
   const availableGuidelines = allGuidelines.filter(g => {
@@ -369,7 +388,7 @@ const Guidelines = ({ entityType, entityId, guidelines }) => {
             <Typography variant="body2" color="textSecondary">
               <FormattedMessage
                 id="guidelines.none"
-                values={{ entityType }}
+                values={{ entityType: entityLabel }}
               />
             </Typography>
           )

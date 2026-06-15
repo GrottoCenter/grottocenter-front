@@ -47,5 +47,6 @@ export const patchGuideline =
             error.message
           )
         );
+        return null;
       });
   };

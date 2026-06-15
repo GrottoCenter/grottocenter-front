@@ -54,5 +54,6 @@ export const postGuideline =
             error.message
           )
         );
+        return null;
       });
   };

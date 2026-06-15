@@ -69,11 +69,7 @@ const Guideline = ({
             canEdit={isEditAllowed && permissions.isAuth}
             canDelete={isEditAllowed && permissions.isModerator}
             snapshotEl={
-              <SnapshotButton
-                id={guideline.id}
-                type="guidelines"
-                content={guideline}
-              />
+              <SnapshotButton id={guideline.id} type="guidelines" />
             }
             onDeletePress={onDeletePress}
             onRestorePress={onRestorePress}
