@@ -82,6 +82,7 @@ const Riggings = ({ riggings, entranceId, isEditAllowed }) => {
                 <React.Fragment key={rigging.id}>
                   <Rigging
                     rigging={rigging}
+                    entranceId={entranceId}
                     isEditAllowed={isEditAllowed}
                     isMoving={movingId === rigging.id}
                     onMoveUp={() => handleMove(rigging.id, -1)}

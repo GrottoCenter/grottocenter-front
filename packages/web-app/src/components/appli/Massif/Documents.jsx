@@ -2,11 +2,12 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import { Button, Divider, Tooltip } from '@mui/material';
-import AddLinkIcon from '@mui/icons-material/AddLink';
+import LinkIcon from '@mui/icons-material/Link';
 import { useDispatch } from 'react-redux';
 import CancelIcon from '@mui/icons-material/Cancel';
 import { linkDocumentToMassif } from '../../../actions/LinkDocumentToMassif';
 import { unlinkDocumentToMassif } from '../../../actions/UnlinkDocumentToMassif';
+import { EntityIcon } from '../../../pages/EntityCreation/entityConfig';
 import ScrollableContent from '../../common/Layouts/Fixed/ScrollableContent';
 import SearchDocumentForm from '../SearchDocumentForm';
 import Alert from '../../common/Alert';
@@ -46,7 +47,15 @@ const Documents = ({ documents, massifId }) => {
               variant="outlined"
               onClick={() => setIsDocumentSearchVisible(v => !v)}
               startIcon={
-                isDocumentSearchVisible ? <CancelIcon /> : <AddLinkIcon />
+                isDocumentSearchVisible ? (
+                  <CancelIcon />
+                ) : (
+                  <EntityIcon
+                    iconType="bibliography"
+                    size={20}
+                    BadgeIcon={LinkIcon}
+                  />
+                )
               }>
               {formatMessage({
                 id: isDocumentSearchVisible ? 'Cancel' : 'Associate'

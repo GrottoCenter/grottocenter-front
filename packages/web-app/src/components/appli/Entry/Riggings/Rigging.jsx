@@ -13,7 +13,7 @@ import Contribution from '../../../common/Contribution/Contribution';
 import RiggingTable from './RiggingTable';
 import { SnapshotButton } from '../Snapshots/UtilityFunction';
 
-const Rigging = ({ rigging, isEditAllowed, isMoving, onMoveUp, onMoveDown, isFirst, isLast }) => {
+const Rigging = ({ rigging, entranceId, isEditAllowed, isMoving, onMoveUp, onMoveDown, isFirst, isLast }) => {
   const dispatch = useDispatch();
   const permissions = usePermissions();
   const [isUpdateFormVisible, setIsUpdateFormVisible] = useState(false);
@@ -66,7 +66,8 @@ const Rigging = ({ rigging, isEditAllowed, isMoving, onMoveUp, onMoveDown, isFir
             <SnapshotButton
               id={rigging.id}
               type="riggings"
-              content={rigging}
+              parentId={entranceId}
+              parentType="entrances"
             />
           }
           onDeletePress={onDeletePress}
@@ -109,6 +110,7 @@ const Rigging = ({ rigging, isEditAllowed, isMoving, onMoveUp, onMoveDown, isFir
 
 Rigging.propTypes = {
   rigging: RiggingPropTypes,
+  entranceId: PropTypes.number,
   isEditAllowed: PropTypes.bool,
   isMoving: PropTypes.bool,
   onMoveUp: PropTypes.func,

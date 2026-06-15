@@ -13,6 +13,7 @@ import NewspaperIcon from '@mui/icons-material/Newspaper';
 import ShareIcon from '@mui/icons-material/Share';
 import { NavigateNext } from '@mui/icons-material';
 
+import useOpenLink from '../../hooks/useOpenLink';
 import CustomIcon from '../../components/common/CustomIcon';
 import DocumentTypeChip from '../../components/common/DocumentTypeChip';
 import {
@@ -91,6 +92,7 @@ const Document = ({
   hideActions = false
 }) => {
   const { formatMessage } = useIntl();
+  const openLink = useOpenLink();
   const navigate = useNavigate();
   const permissions = usePermissions();
   const dispatch = useDispatch();
@@ -307,8 +309,7 @@ const Document = ({
           key: 'snapshot',
           icon: <ManageHistoryIcon />,
           label: formatMessage({ id: 'Page history' }),
-          href: snapshotUrl,
-          target: '_blank',
+          onClick: snapshotUrl ? () => openLink(snapshotUrl) : undefined,
           hidden: !snapshotUrl
         }
       ]}

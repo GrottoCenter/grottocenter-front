@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 
 import MultilinesTypography from '../../../../common/MultilinesTypography';
 import Translate from '../../../../common/Translate';
-import { HighLightsLine } from '../../../../common/Highlights';
+import { HighLightsChar } from '../../../../common/Highlights';
 
 const INFORMATION_NOT_FOUND = 'unknown';
 
@@ -13,7 +13,7 @@ const GenericSnapshots = ({ data, previous }) => {
   return (
     <MultilinesTypography variant="body1" component="div">
       {newText ? (
-        <HighLightsLine oldText={oldText} newText={newText} />
+        <HighLightsChar oldText={oldText} newText={newText} />
       ) : (
         <Translate>{INFORMATION_NOT_FOUND}</Translate>
       )}

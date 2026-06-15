@@ -22,6 +22,7 @@ const ListItemStyled = styled(ListItem)`
 `;
 const Location = ({
   location,
+  entranceId,
   isEditAllowed,
   isMoving,
   onMoveUp,
@@ -76,7 +77,8 @@ const Location = ({
             <SnapshotButton
               id={location.id}
               type="locations"
-              content={location}
+              parentId={entranceId}
+              parentType="entrances"
             />
           }
           onDeletePress={onDeletePress}
@@ -131,6 +133,7 @@ const Location = ({
 
 Location.propTypes = {
   location: LocationPropTypes,
+  entranceId: PropTypes.number,
   isEditAllowed: PropTypes.bool,
   isMoving: PropTypes.bool,
   onMoveUp: PropTypes.func,

@@ -1,9 +1,9 @@
 import React from 'react';
 import { useIntl } from 'react-intl';
-import { Link } from 'react-router-dom';
 import { Tooltip, Button } from '@mui/material';
 import HistoryIcon from '@mui/icons-material/History';
 import PropTypes from 'prop-types';
+import useOpenLink from '../../../../hooks/useOpenLink';
 import {
   CommentSnapshots,
   DocumentSnapshots,
@@ -12,9 +12,6 @@ import {
   GenericSnapshots,
   RiggingSnapshots
 } from './component/SnapshotComponents';
-
-const storeInLocalStorage = item =>
-  localStorage.setItem('t_item', JSON.stringify(item));
 
 const getAccordionBodyFromType = (type, data, isNetwork, previous) => {
   switch (type) {
@@ -52,29 +49,32 @@ const getAccordionBodyFromType = (type, data, isNetwork, previous) => {
 const SnapshotButton = ({
   id,
   type,
-  content,
   label,
   isNetwork,
   getAll = false,
+  parentId,
+  parentType,
   startIcon = <HistoryIcon />,
   tooltipTitle,
   ...grpProps
 }) => {
   const { formatMessage } = useIntl();
+  const openLink = useOpenLink();
+
+  const url = `/ui/${type}/${id}/snapshots?${[
+    isNetwork !== undefined ? `isNetwork=${isNetwork}` : '',
+    getAll ? `all=true` : '',
+    parentId !== undefined ? `parentId=${parentId}` : '',
+    parentType ? `parentType=${parentType}` : ''
+  ]
+    .filter(e => e)
+    .join('&')}`;
+
   return (
     <Tooltip title={tooltipTitle ?? formatMessage({ id: 'Access the revision history page' })}>
       <Button
         {...grpProps}
-        component={Link}
-        to={`/ui/${type}/${id}/snapshots?${[
-          isNetwork !== undefined ? `isNetwork=${isNetwork}` : '',
-          getAll ? `all=true` : ''
-        ]
-          .filter(e => e)
-          .join('&')}`}
-        onClick={content ? () => storeInLocalStorage(content) : null}
-        target="_blank"
-        rel="opener"
+        onClick={() => openLink(url)}
         startIcon={!!label && startIcon}>
         {!label && startIcon}
         {label}
@@ -85,10 +85,11 @@ const SnapshotButton = ({
 SnapshotButton.propTypes = {
   id: PropTypes.number,
   type: PropTypes.string,
-  content: PropTypes.shape({}),
   label: PropTypes.string,
   isNetwork: PropTypes.bool,
   getAll: PropTypes.bool,
+  parentId: PropTypes.number,
+  parentType: PropTypes.string,
   startIcon: PropTypes.node,
   tooltipTitle: PropTypes.string
 };
@@ -103,17 +104,12 @@ const sortSnapshots = dataToStore => {
   sortedItems.sort((aObj, bObj) => {
     const a = aObj[Object.keys(aObj)[0]];
     const b = bObj[Object.keys(bObj)[0]];
-    return new Date(b[0].id) - new Date(a[0].id);
+    const dateA = a[0]?.id ? new Date(a[0].id) : new Date(0);
+    const dateB = b[0]?.id ? new Date(b[0].id) : new Date(0);
+    return dateB - dateA;
   });
 
   return sortedItems;
-};
-
-sortSnapshots.prototype = {
-  type: PropTypes.shape({
-    id: PropTypes.string,
-    t_id: PropTypes.string
-  })
 };
 
 export { SnapshotButton, getAccordionBodyFromType, sortSnapshots };

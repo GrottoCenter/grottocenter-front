@@ -1,4 +1,5 @@
 import proj4 from 'proj4';
+import Coordinates from 'coordinate-parser';
 
 // --- DMS conversions ---
 
@@ -18,6 +19,9 @@ export const decimalToDMS = (decimal, isLatitude) => {
   return `${deg}°${min}'${sec}"${direction}`;
 };
 
+// 'O' = Ouest (West) — French notation, same sign as 'W'.
+const isNegativeDir = (sign, dir) => sign === '-' || (dir && /^[SWOswo]$/.test(dir));
+
 // Accepts DMS: "48°31'24.2"N", "48 31 24.2 N", "48d31m24.2sN"
 // Accepts DDM: "48°31.402'N"
 // Returns NaN for plain decimals — callers handle the WGS84 decimal case separately.
@@ -25,22 +29,22 @@ export const parseDMS = str => {
   if (!str) return NaN;
   const cleaned = str.trim();
   const dmsMatch = cleaned.match(
-    /^(-?)(\d+)\s*[°d]\s*(\d+)\s*[m']\s*(\d+(?:[.,]\d+)?)\s*[s"]?\s*([NSEWnsew])?$/
+    /^(-?)(\d+)\s*[°d]\s*(\d+)\s*[m']\s*(\d+(?:[.,]\d+)?)\s*[s"]?\s*([NSEWOnsewo])?$/
   );
   if (dmsMatch) {
     const [, sign, d, m, s, dir] = dmsMatch;
     let decimal = +d + +m / 60 + parseFloat(s.replace(',', '.')) / 3600;
-    if (sign === '-' || (dir && /^[SWsw]$/.test(dir))) decimal = -decimal;
+    if (isNegativeDir(sign, dir)) decimal = -decimal;
     return decimal;
   }
   // DDM: "48°31.402'N" — degrees + decimal minutes
   const ddmMatch = cleaned.match(
-    /^(-?)(\d+)\s*[°d]\s*(\d+(?:[.,]\d+)?)\s*[m']\s*([NSEWnsew])?$/
+    /^(-?)(\d+)\s*[°d]\s*(\d+(?:[.,]\d+)?)\s*[m']\s*([NSEWOnsewo])?$/
   );
   if (ddmMatch) {
     const [, sign, d, m, dir] = ddmMatch;
     let decimal = +d + parseFloat(m.replace(',', '.')) / 60;
-    if (sign === '-' || (dir && /^[SWsw]$/.test(dir))) decimal = -decimal;
+    if (isNegativeDir(sign, dir)) decimal = -decimal;
     return decimal;
   }
   return NaN;
@@ -130,6 +134,107 @@ export const formatWGS84 = (lat, lng, decimals = 4) => {
   const latDir = lat >= 0 ? 'N' : 'S';
   const lngDir = lng >= 0 ? 'E' : 'W';
   return `${Math.abs(lat).toFixed(decimals)}° ${latDir}, ${Math.abs(lng).toFixed(decimals)}° ${lngDir}`;
+};
+
+// --- Coordinate string parsing ---
+
+const tryProjectedConversion = (easting, northing, projection, format) => {
+  if (!projection) return null;
+  try {
+    const result = convertProjectionToWGS84(easting, northing, projection);
+    if (result.lat >= -90 && result.lat <= 90 && result.lng >= -180 && result.lng <= 180)
+      return { lat: result.lat, lng: result.lng, format };
+    return null;
+  } catch {
+    return null;
+  }
+};
+
+// Heuristic ranges for projected CRSes — never overlap with WGS84 decimal values (max ±180),
+// so safe to check before coordinate-parser which would misinterpret e.g. "843000" as DMS 84°30'00".
+const PROJECTED_CRS_RANGES = [
+  {
+    code: 'EPSG:2154',
+    name: 'Lambert 93',
+    // geographic extent: W=-9.86° E=10.38° S=41.15° N=51.56° → X_max ≈ 1 317 000 m
+    easting: [50_000, 1_320_000],
+    northing: [6_000_000, 7_220_000]
+  },
+  {
+    code: 'EPSG:27573',
+    name: 'Lambert III carto',
+    // geographic extent: south France 42°-45.5°N → X: ~260k–1 150k m, Y: ~3 050k–3 460k m
+    easting: [50_000, 1_200_000],
+    northing: [3_000_000, 3_500_000]
+  }
+];
+
+const inRange = (v, [min, max]) => v >= min && v <= max;
+
+// Matches arcminutes/arcseconds indicators only — not ° or cardinals alone,
+// which appear in plain decimal-degree notation like "43.4659° N, 3.5835° E".
+const DMS_INDICATOR_RE = /['"]|[ms]/;
+
+// Replaces standalone 'O' (Ouest) with 'W' so all parsing paths see standard cardinals.
+const normalizeWest = input => input.replace(/(^|[^a-z0-9])[Oo](?![a-z0-9])/gi, '$1W');
+
+const detectProjectedPair = (a, b) => {
+  for (const crs of PROJECTED_CRS_RANGES) {
+    if (inRange(a, crs.easting) && inRange(b, crs.northing))
+      return { easting: a, northing: b, crs };
+    if (inRange(a, crs.northing) && inRange(b, crs.easting))
+      return { easting: b, northing: a, crs };
+  }
+  return null;
+};
+
+// Parses a free-form coordinate string into { lat, lng, format } or null.
+// Supported formats: WGS84 decimal, DMS, DDM (via coordinate-parser),
+// and projected CRSes listed in PROJECTED_CRS_RANGES (via heuristic range detection).
+// projections: array of projection objects from the store — same shape as formatCoordinatesForCopy.
+export const parseCoordinateString = (input, projections = []) => {
+  if (!input || typeof input !== 'string') return null;
+
+  // Normalize standalone 'O' (Ouest) to 'W' once so all subsequent paths see standard cardinals.
+  const normalized = normalizeWest(input.trim());
+  const hasDMS = DMS_INDICATOR_RE.test(normalized);
+
+  const nums = normalized.match(/-?\d[\d.,]*/g);
+  if (nums && nums.length === 2) {
+    const a = parseFloat(nums[0].replace(',', '.'));
+    const b = parseFloat(nums[1].replace(',', '.'));
+    const detected = detectProjectedPair(a, b);
+
+    if (detected) {
+      const projection = projections.find(p => p.code === detected.crs.code) ?? null;
+      return tryProjectedConversion(detected.easting, detected.northing, projection, detected.crs.name);
+    }
+
+    // Fast path: two plain numbers with no DMS indicators AND no cardinal letters.
+    // Handles comma-as-decimal-separator ("45,1179 5,4786") which coordinate-parser cannot parse.
+    // Strings with cardinals fall through to coordinate-parser, which pairs each cardinal with
+    // its adjacent number and handles both "lat S, lng W" and "lng W, lat S" orderings correctly.
+    if (!hasDMS && !/[NSEWnsew]/.test(normalized)) {
+      if (a >= -90 && a <= 90 && b >= -180 && b <= 180) {
+        return { lat: a, lng: b, format: 'WGS84' };
+      }
+    }
+  }
+
+  const cleaned = normalized.replace(/[;/]/g, ',').replace(/\s{2,}/g, ' ');
+
+  try {
+    const coords = new Coordinates(cleaned);
+    const lat = coords.getLatitude();
+    const lng = coords.getLongitude();
+    if (lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180) {
+      return { lat, lng, format: hasDMS ? 'DMS' : 'WGS84' };
+    }
+  } catch {
+    return null;
+  }
+
+  return null;
 };
 
 // --- Formatting for clipboard ---

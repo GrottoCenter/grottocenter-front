@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import { Box, Button, Divider, Tooltip } from '@mui/material';
-import AddLinkIcon from '@mui/icons-material/AddLink';
+import LinkIcon from '@mui/icons-material/Link';
 import CancelIcon from '@mui/icons-material/Cancel';
 import { styled } from '@mui/material/styles';
 import { useDispatch } from 'react-redux';
@@ -74,7 +74,15 @@ const Documents = ({ documents, entranceId, isEditAllowed }) => {
                     setIsDocumentSearchVisible(!isDocumentSearchVisible)
                   }
                   startIcon={
-                    isDocumentSearchVisible ? <CancelIcon /> : <AddLinkIcon />
+                    isDocumentSearchVisible ? (
+                      <CancelIcon />
+                    ) : (
+                      <EntityIcon
+                        iconType="bibliography"
+                        size={20}
+                        BadgeIcon={LinkIcon}
+                      />
+                    )
                   }>
                   {formatMessage({
                     id: isDocumentSearchVisible ? 'Cancel' : 'Associate'

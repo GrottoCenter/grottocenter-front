@@ -20,13 +20,20 @@ export const fetchSnapshot =
       requestOptions
     )
       .then(response => {
+        if (response.status === 404) {
+          // No snapshots yet — not an error, just empty history
+          dispatch({ type: FETCH_SNAPSHOT_SUCCESS, data: {} });
+          return undefined;
+        }
         if (response.status >= 400) {
           throw new Error(response.status);
         }
         return response.json();
       })
       .then(data => {
-        dispatch({ type: FETCH_SNAPSHOT_SUCCESS, data });
+        if (data !== undefined) {
+          dispatch({ type: FETCH_SNAPSHOT_SUCCESS, data });
+        }
       })
       .catch(error => {
         dispatch({

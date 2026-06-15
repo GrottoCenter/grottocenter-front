@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { useIntl } from 'react-intl';
@@ -6,14 +6,12 @@ import { useIntl } from 'react-intl';
 import { fetchCountry } from '../../actions/Country/GetCountry';
 import { fetchRegion } from '../../actions/Region/GetRegion';
 import { loadMassif } from '../../actions/Massif/GetMassif';
-import { fetchFieldSearch } from '../../actions/FieldSearch';
 import getLocalizedCountryName from '../../helpers/countryName';
 import REDUCER_STATUS from '../../reducers/ReducerStatus';
 import EntitySearchPage from '../../components/appli/AdvancedSearch/EntitySearchPage';
 import EntrancesSearch from '../../components/appli/AdvancedSearch/EntrancesSearch';
 import CustomIcon from '../../components/common/CustomIcon';
 import EntranceBadgeIcon from './EntranceBadgeIcon';
-import { ADVANCED_SEARCH_TYPES } from '../../conf/config';
 
 const getFlagEmoji = iso =>
   typeof iso === 'string' && iso.length === 2
@@ -36,7 +34,6 @@ const EntrancesListPage = () => {
   const { massif, isFetching: massifFetching } = useSelector(
     state => state.massif
   );
-  const [massifValue, setMassifValue] = useState(undefined);
 
   useEffect(() => {
     if (countryId) dispatch(fetchCountry(countryId));
@@ -47,21 +44,6 @@ const EntrancesListPage = () => {
     if (massifId) dispatch(loadMassif(massifId));
   }, [massifId, dispatch]);
 
-  useEffect(() => {
-    if (!massifId || !massif) return;
-    let cancelled = false;
-    setMassifValue(undefined);
-    fetchFieldSearch({
-      entity: ADVANCED_SEARCH_TYPES.ENTRANCES,
-      field: 'massifs.name',
-      query: massif.name,
-      filter: {}
-    })
-      .then(r => { if (!cancelled) setMassifValue(r?.hits?.[0]?.[0] ?? null); })
-      .catch(() => { if (!cancelled) setMassifValue(null); });
-    return () => { cancelled = true; };
-  }, [massif, massifId]);
-
   let initialFilter = {};
   let lockedFilter = [];
   let searchKey = 'open';
@@ -70,11 +52,11 @@ const EntrancesListPage = () => {
   const label = formatMessage({ id: 'Entrances' });
   let pageTitle = label;
 
-  if (massifId && massif && !massifFetching && massifValue !== undefined) {
-    const resolvedMassif = massifValue ?? massif.name;
-    initialFilter = { 'massifs.name': resolvedMassif };
-    lockedFilter = ['massifs.name'];
-    searchKey = resolvedMassif;
+  if (massifId && massif && !massifFetching) {
+    initialFilter = { 'massifs.id': parseInt(massifId, 10) };
+    lockedFilter = ['massifs.id'];
+    searchKey = massifId;
+    valueLabels = { 'massifs.id': massif.name };
     pageTitle = `${label} - ${massif.name}`;
     pageIcon = (
       <EntranceBadgeIcon badge={<CustomIcon type="massif" size={16} />} />

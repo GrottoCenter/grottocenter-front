@@ -62,8 +62,14 @@ const NotificationsMenuItem = ({ notification, onClick }) => {
                 defaultMessage: '{entity} {verb}'
               },
               {
-                entity: `(${formatMessage({ id: entityType })})`,
-                verb: formatMessage({ id: verb })
+                // Guard: entityType is always truthy from formatNotification today,
+                // but we keep the check as defense against future regressions.
+                entity: entityType
+                  ? `(${formatMessage({ id: entityType, defaultMessage: entityType })})`
+                  : '',
+                verb: verb
+                  ? formatMessage({ id: verb, defaultMessage: verb })
+                  : ''
               }
             )}
             .

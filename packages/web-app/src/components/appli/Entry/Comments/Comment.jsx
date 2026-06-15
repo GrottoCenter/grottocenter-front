@@ -32,7 +32,7 @@ const StyledRatings = styled(Ratings)`
   gap: ${({ theme }) => theme.spacing(2)};
 `;
 
-const Comment = ({ comment, isEditAllowed, isMoving, onMoveUp, onMoveDown, isFirst, isLast }) => {
+const Comment = ({ comment, entranceId, isEditAllowed, isMoving, onMoveUp, onMoveDown, isFirst, isLast }) => {
   const dispatch = useDispatch();
   const { formatMessage } = useIntl();
   const permissions = usePermissions();
@@ -90,7 +90,7 @@ const Comment = ({ comment, isEditAllowed, isMoving, onMoveUp, onMoveDown, isFir
           canEdit={isEditAllowed && permissions.isAuth && canEdit}
           canDelete={isEditAllowed && permissions.isModerator}
           snapshotEl={
-            <SnapshotButton id={comment.id} type="comments" content={comment} />
+            <SnapshotButton id={comment.id} type="comments" parentId={entranceId} parentType="entrances" />
           }
           onDeletePress={onDeletePress}
           onRestorePress={onRestorePress}
@@ -197,6 +197,7 @@ const Comment = ({ comment, isEditAllowed, isMoving, onMoveUp, onMoveDown, isFir
 
 Comment.propTypes = {
   comment: CommentPropTypes,
+  entranceId: PropTypes.number,
   isEditAllowed: PropTypes.bool,
   isMoving: PropTypes.bool,
   onMoveUp: PropTypes.func,

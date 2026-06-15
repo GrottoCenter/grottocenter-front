@@ -108,6 +108,12 @@ const formatNotification = notification => {
     case 'DELETE':
       verb = 'deleted';
       break;
+    case 'PERMANENT_DELETE':
+      verb = 'permanently_deleted';
+      break;
+    case 'RESTORE':
+      verb = 'restored';
+      break;
     case 'UPDATE':
       verb = 'updated';
       break;
@@ -118,6 +124,13 @@ const formatNotification = notification => {
       verb = 'validated';
       break;
     default:
+      // Warn so unhandled types surface during development
+      console.warn(
+        `[formatNotification] Unknown notificationType: ${notificationType.name}`
+      );
+      verb = notificationType.name
+        ? notificationType.name.toLowerCase()
+        : '';
   }
 
   // Entity data
