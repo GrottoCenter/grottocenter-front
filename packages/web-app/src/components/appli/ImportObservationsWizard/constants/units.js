@@ -29,5 +29,6 @@ export const UNITS = [
   { id: 25, code: 'lux', symbol: 'lx' },
   { id: 26, code: 'becquerel_per_cubic_meter', symbol: 'Bq/m³' },
   { id: 27, code: 'meter_per_second', symbol: 'm/s' },
-  { id: 28, code: 'decibel', symbol: 'dB' }
+  { id: 28, code: 'decibel', symbol: 'dB' },
+  { id: 29, code: 'per_mil', symbol: '‰' }
 ];

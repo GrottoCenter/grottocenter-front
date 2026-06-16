@@ -1892,6 +1892,7 @@
   "quantityKind.Conductivity": "Conductividad",
   "quantityKind.DewPointTemperature": "Temperatura del punto de rocío",
   "quantityKind.DissolvedOxygen": "Oxígeno disuelto",
+  "quantityKind.IsotopeDelta": "Delta isotópico (δ)",
   "quantityKind.LightIntensity": "Intensidad luminosa",
   "quantityKind.NitrateConcentration": "Concentración de nitrato",
   "quantityKind.NitriteConcentration": "Concentración de nitrito",

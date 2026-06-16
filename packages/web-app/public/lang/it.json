@@ -1892,6 +1892,7 @@
   "quantityKind.Conductivity": "Conducibilità",
   "quantityKind.DewPointTemperature": "Temperatura del punto di rugiada",
   "quantityKind.DissolvedOxygen": "Ossigeno disciolto",
+  "quantityKind.IsotopeDelta": "Delta isotopico (δ)",
   "quantityKind.LightIntensity": "Intensità luminosa",
   "quantityKind.NitrateConcentration": "Concentrazione di nitrato",
   "quantityKind.NitriteConcentration": "Concentrazione di nitrito",

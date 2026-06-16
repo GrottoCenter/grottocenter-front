@@ -1892,6 +1892,7 @@
   "quantityKind.Conductivity": "الموصلية",
   "quantityKind.DewPointTemperature": "درجة حرارة نقطة الندى",
   "quantityKind.DissolvedOxygen": "الأكسجين المذاب",
+  "quantityKind.IsotopeDelta": "دلتا النظائر (δ)",
   "quantityKind.LightIntensity": "شدة الإضاءة",
   "quantityKind.NitrateConcentration": "تركيز النترات",
   "quantityKind.NitriteConcentration": "تركيز النتريت",

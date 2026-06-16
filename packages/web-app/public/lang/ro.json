@@ -1892,6 +1892,7 @@
   "quantityKind.Conductivity": "Conductivitate",
   "quantityKind.DewPointTemperature": "Temperatura punctului de rouă",
   "quantityKind.DissolvedOxygen": "Oxigen dizolvat",
+  "quantityKind.IsotopeDelta": "Delta izotopic (δ)",
   "quantityKind.LightIntensity": "Intensitate luminoasă",
   "quantityKind.NitrateConcentration": "Concentrație de nitrați",
   "quantityKind.NitriteConcentration": "Concentrație de nitriți",
