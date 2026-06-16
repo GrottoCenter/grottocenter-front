@@ -57,9 +57,11 @@ const ManagedEntitiesSection = ({ organization }) => {
             // Region IDs generally follow the 'COUNTRY-REGION' format (e.g., 'FR-12').
             // If the ID does not contain a hyphen, the API is expected to provide `region.countryId`.
             // Without `countryId`, we fallback to the countries list to prevent broken links on 'undefined'.
-            const parts = String(region.id).split('-');
-            const countryId = parts.length > 1 ? parts[0] : region.countryId;
-            const regionId = parts.length > 1 ? parts[1] : region.id;
+            const regionIdStr = String(region.id);
+            const firstHyphenIndex = regionIdStr.indexOf('-');
+            
+            const countryId = firstHyphenIndex !== -1 ? regionIdStr.substring(0, firstHyphenIndex) : region.countryId;
+            const regionId = firstHyphenIndex !== -1 ? regionIdStr.substring(firstHyphenIndex + 1) : region.id;
 
             if (!countryId) {
               return '/ui/countries';

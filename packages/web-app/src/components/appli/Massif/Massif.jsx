@@ -320,7 +320,7 @@ const Massif = ({ isLoading, error, massif }) => {
                   title={formatMessage({ id: 'Organizations' })}
                   content={
                     <AssociationSection
-                      organizations={massif.organizations}
+                      organizations={massif?.organizations}
                       entityType="massif"
                       entityId={massif.id}
                       isLoading={isLoading}

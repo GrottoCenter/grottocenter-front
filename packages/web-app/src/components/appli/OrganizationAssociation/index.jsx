@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import { useDispatch, useSelector } from 'react-redux';
+import { usePermissions } from '../../../hooks';
 import { Link as RouterLink } from 'react-router-dom';
 import { Skeleton, Box, Typography, Link, Chip, Button, IconButton } from '@mui/material';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
@@ -27,8 +28,8 @@ const AssociationSection = ({
   const { formatMessage } = useIntl();
   const dispatch = useDispatch();
 
-  const authState = useSelector(state => state.login);
-  const isAuth = !!authState?.authTokenDecoded;
+  const { isAuth, isLeader, isModerator, isAdmin } = usePermissions();
+  const canManageAssociations = isAuth && (isLeader || isModerator || isAdmin);
 
   const reducerKey = `${entityType}Organization`;
   const reducerState = useSelector(state => state[reducerKey]);
@@ -38,25 +39,27 @@ const AssociationSection = ({
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [orgToRemove, setOrgToRemove] = useState(null);
   const [isPending, setIsPending] = useState(false);
+  const pendingOperationRef = useRef(false);
 
   // Refresh entity data when association is updated successfully
   useEffect(() => {
-    if (isPending && status === REDUCER_STATUS.SUCCEEDED) {
+    if (pendingOperationRef.current && status === REDUCER_STATUS.SUCCEEDED) {
       if (entityType === 'country') dispatch(fetchCountry(entityId));
       else if (entityType === 'region') dispatch(fetchRegion(parentEntityId, entityId));
       else if (entityType === 'massif') dispatch(loadMassif(entityId));
       
       setOrgToRemove(null);
       setIsPending(false);
-    } else if (isPending && status === REDUCER_STATUS.FAILED) {
+      pendingOperationRef.current = false;
+    } else if (pendingOperationRef.current && status === REDUCER_STATUS.FAILED) {
       setIsPending(false);
+      pendingOperationRef.current = false;
     }
-    // Only trigger on status change; other deps are stable and would cause unwanted refetches
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [status]);
+  }, [status, dispatch, entityType, entityId, parentEntityId]);
 
   const handleSet = (orgData) => {
     setIsPending(true);
+    pendingOperationRef.current = true;
     if (entityType === 'country') {
       dispatch(setCountryOrganization(entityId, orgData.id, orgData.name));
     } else if (entityType === 'region') {
@@ -69,6 +72,7 @@ const AssociationSection = ({
   const handleRemove = () => {
     if (!orgToRemove) return;
     setIsPending(true);
+    pendingOperationRef.current = true;
     if (entityType === 'country') {
       dispatch(removeCountryOrganization(entityId, orgToRemove.id));
     } else if (entityType === 'region') {
@@ -112,7 +116,7 @@ const AssociationSection = ({
                     </Link>
                   </Typography>
                 )}
-                {isAuth && (
+                {canManageAssociations && (
                   <IconButton
                     size="small"
                     color="error"
@@ -131,7 +135,7 @@ const AssociationSection = ({
               <Link component={RouterLink} to={`/ui/organizations/${org.id}`} sx={{ mr: 1 }}>
                 {org.name}
               </Link>
-              {isAuth && (
+              {canManageAssociations && (
                 <IconButton
                   size="small"
                   color="error"
@@ -146,7 +150,7 @@ const AssociationSection = ({
         })
       )}
 
-      {isAuth && (
+      {canManageAssociations && (
         <Box sx={{ mt: 2 }}>
           <Button
             size="small"
