@@ -5,11 +5,15 @@ import { useIntl } from 'react-intl';
 import { useForm, useWatch } from 'react-hook-form';
 import {
   Box,
+  Checkbox,
   FormControl,
+  FormControlLabel,
   FormHelperText,
   IconButton,
   InputLabel,
   MenuItem,
+  Radio,
+  RadioGroup,
   Select,
   TextField,
   Tooltip,
@@ -222,6 +226,7 @@ const ContextStep = ({ initialCaveId, caveIdLocked }) => {
         setCaveEntrances(eligibleEntrances);
 
         if (
+          !context.unknownCoordinates &&
           context.latitude == null &&
           context.longitude == null &&
           eligibleEntrances.length > 0
@@ -281,6 +286,41 @@ const ContextStep = ({ initialCaveId, caveIdLocked }) => {
 
   // ===== Handlers =====
 
+  const handleLocationModeChange = e => {
+    const newMode = e.target.value;
+    const updates = { locationMode: newMode };
+
+    // Clear values for hidden sections
+    if (newMode === 'caveOnly') {
+      updates.pointLabel = '';
+      updates.latitude = null;
+      updates.longitude = null;
+      updates.unknownCoordinates = false;
+      setCoordValue('latitude', '', { shouldValidate: false });
+      setCoordValue('longitude', '', { shouldValidate: false });
+    } else if (newMode === 'pointOnly') {
+      updates.caveId = null;
+      setSelectedCave(null);
+      setCaveEntrances([]);
+    }
+
+    dispatch({ type: SET_CONTEXT, context: updates });
+  };
+
+  const handleUnknownCoordinatesChange = e => {
+    const checked = e.target.checked;
+    const updates = { unknownCoordinates: checked };
+
+    if (checked) {
+      updates.latitude = null;
+      updates.longitude = null;
+      setCoordValue('latitude', '', { shouldValidate: false });
+      setCoordValue('longitude', '', { shouldValidate: false });
+    }
+
+    dispatch({ type: SET_CONTEXT, context: updates });
+  };
+
   const handleFieldChange = (field, value) => {
     dispatch({ type: SET_CONTEXT, context: { [field]: value } });
   };
@@ -319,7 +359,7 @@ const ContextStep = ({ initialCaveId, caveIdLocked }) => {
           setCaveEntrances(eligibleEntrances);
 
           const entrance = eligibleEntrances[0];
-          if (entrance) {
+          if (entrance && !context.unknownCoordinates) {
             dispatch({
               type: SET_CONTEXT,
               context: {
@@ -357,62 +397,122 @@ const ContextStep = ({ initialCaveId, caveIdLocked }) => {
 
   // ===== Render =====
 
+  const showPoint = context.locationMode !== 'caveOnly';
+  const showCave = context.locationMode !== 'pointOnly';
+  const showCoordinates = showPoint && !context.unknownCoordinates;
+
   return (
     <Box
       sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}
       data-testid="context-step">
 
-      {/* Cave selection */}
-      <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
-        <Box sx={{ flex: 1, maxWidth: 480 }}>
-          <Typography variant="subtitle2" gutterBottom>
-            {formatMessage({ id: 'ImportObservationsWizard.ContextStep.caveLabel' })}
-          </Typography>
-          <CaveAutoCompleteSearch
-            key={selectedCave ? selectedCave.id : 'empty'}
-            onSelection={handleCaveSelection}
-            value={selectedCave}
-            disabled={caveIdLocked}
+      {/* Location mode toggle */}
+      <Box>
+        <Typography variant="subtitle2" gutterBottom>
+          {formatMessage({
+            id: 'ImportObservationsWizard.ContextStep.locationModeLabel'
+          })}
+        </Typography>
+        <RadioGroup
+          row
+          value={context.locationMode || 'pointAndCave'}
+          onChange={handleLocationModeChange}
+          data-testid="location-mode-radio">
+          <FormControlLabel
+            value="pointAndCave"
+            control={<Radio size="small" />}
+            label={formatMessage({
+              id: 'ImportObservationsWizard.ContextStep.locationMode.pointAndCave'
+            })}
           />
-        </Box>
-        {context.caveId && !caveIdLocked && (
-          <IconButton
-            onClick={handleClearCave}
-            size="small"
-            sx={{ mt: 4 }}
-            data-testid="clear-cave-button"
-            aria-label={formatMessage({
-              id: 'ImportObservationsWizard.ContextStep.clearCave'
-            })}>
-            <ClearIcon />
-          </IconButton>
-        )}
+          <FormControlLabel
+            value="pointOnly"
+            control={<Radio size="small" />}
+            disabled={caveIdLocked}
+            label={formatMessage({
+              id: 'ImportObservationsWizard.ContextStep.locationMode.pointOnly'
+            })}
+          />
+          <FormControlLabel
+            value="caveOnly"
+            control={<Radio size="small" />}
+            label={formatMessage({
+              id: 'ImportObservationsWizard.ContextStep.locationMode.caveOnly'
+            })}
+          />
+        </RadioGroup>
       </Box>
 
+      {/* Cave selection */}
+      {showCave && (
+        <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
+          <Box sx={{ flex: 1, maxWidth: 480 }}>
+            <Typography variant="subtitle2" gutterBottom>
+              {formatMessage({ id: 'ImportObservationsWizard.ContextStep.caveLabel' })}
+            </Typography>
+            <CaveAutoCompleteSearch
+              key={selectedCave ? selectedCave.id : 'empty'}
+              onSelection={handleCaveSelection}
+              value={selectedCave}
+              disabled={caveIdLocked}
+            />
+          </Box>
+          {context.caveId && !caveIdLocked && (
+            <IconButton
+              onClick={handleClearCave}
+              size="small"
+              sx={{ mt: 4 }}
+              data-testid="clear-cave-button"
+              aria-label={formatMessage({
+                id: 'ImportObservationsWizard.ContextStep.clearCave'
+              })}>
+              <ClearIcon />
+            </IconButton>
+          )}
+        </Box>
+      )}
+
       {/* Point label + location */}
-      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-        <TextField
-          required
-          variant="filled"
-          label={formatMessage({ id: 'ImportObservationsWizard.ContextStep.pointLabel' })}
-          placeholder={formatMessage({
-            id: 'ImportObservationsWizard.ContextStep.pointLabelPlaceholder'
-          })}
-          value={context.pointLabel || ''}
-          onChange={e => handleFieldChange('pointLabel', e.target.value)}
-          size="small"
-          sx={{ minWidth: 200, maxWidth: 280 }}
-          data-testid="point-label-field"
-        />
-        <CoordinateFormSection
-          control={coordControl}
-          formLatitudeKey="latitude"
-          formLongitudeKey="longitude"
-          additionalPositions={caveEntrances}
-          markerIcon={coordinatesMarkerIcon}
-          mapHeight="50dvh"
-        />
-      </Box>
+      {showPoint && (
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+          <TextField
+            required
+            variant="filled"
+            label={formatMessage({ id: 'ImportObservationsWizard.ContextStep.pointLabel' })}
+            placeholder={formatMessage({
+              id: 'ImportObservationsWizard.ContextStep.pointLabelPlaceholder'
+            })}
+            value={context.pointLabel || ''}
+            onChange={e => handleFieldChange('pointLabel', e.target.value)}
+            size="small"
+            sx={{ minWidth: 200, maxWidth: 280 }}
+            data-testid="point-label-field"
+          />
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={!!context.unknownCoordinates}
+                onChange={handleUnknownCoordinatesChange}
+                size="small"
+                data-testid="unknown-coordinates-checkbox"
+              />
+            }
+            label={formatMessage({
+              id: 'ImportObservationsWizard.ContextStep.unknownCoordinates'
+            })}
+          />
+          {showCoordinates && (
+            <CoordinateFormSection
+              control={coordControl}
+              formLatitudeKey="latitude"
+              formLongitudeKey="longitude"
+              additionalPositions={caveEntrances}
+              markerIcon={coordinatesMarkerIcon}
+              mapHeight="50dvh"
+            />
+          )}
+        </Box>
+      )}
 
       {/* Observation name + language */}
       <Box sx={{ display: 'flex', gap: 2, maxWidth: 480, alignItems: 'flex-start' }}>
