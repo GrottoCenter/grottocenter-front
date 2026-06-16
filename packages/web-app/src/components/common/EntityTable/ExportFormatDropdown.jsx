@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
-import { Box, Button, Menu, MenuItem, Tooltip } from '@mui/material';
+import { Box, Button, IconButton, Menu, MenuItem, Tooltip } from '@mui/material';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 
 import { EXPORT_FORMATS } from '../../../conf/exportFormats';
 
-const ExportFormatDropdown = ({ disabled, onExport }) => {
+const ExportFormatDropdown = ({ disabled, onExport, iconOnly = false }) => {
   const { formatMessage } = useIntl();
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
@@ -25,7 +25,20 @@ const ExportFormatDropdown = ({ disabled, onExport }) => {
     onExport(value);
   };
 
-  const button = (
+  const button = iconOnly ? (
+    <IconButton
+      size="small"
+      color="primary"
+      disabled={disabled}
+      onClick={handleClick}
+      sx={{
+        border: '1px solid',
+        borderColor: disabled ? 'action.disabled' : 'primary.main',
+        borderRadius: 1
+      }}>
+      <FileDownloadIcon fontSize="small" />
+    </IconButton>
+  ) : (
     <Button
       variant="outlined"
       size="small"
@@ -58,9 +71,17 @@ const ExportFormatDropdown = ({ disabled, onExport }) => {
     );
   }
 
+  const trigger = iconOnly ? (
+    <Tooltip title={formatMessage({ id: 'Export' })}>
+      <span>{button}</span>
+    </Tooltip>
+  ) : (
+    button
+  );
+
   return (
     <>
-      {button}
+      {trigger}
       <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
         {EXPORT_FORMATS.map(({ value, label }) => (
           <MenuItem key={value} onClick={() => handleSelect(value)}>
@@ -74,7 +95,8 @@ const ExportFormatDropdown = ({ disabled, onExport }) => {
 
 ExportFormatDropdown.propTypes = {
   disabled: PropTypes.bool.isRequired,
-  onExport: PropTypes.func.isRequired
+  onExport: PropTypes.func.isRequired,
+  iconOnly: PropTypes.bool
 };
 
 export default ExportFormatDropdown;
