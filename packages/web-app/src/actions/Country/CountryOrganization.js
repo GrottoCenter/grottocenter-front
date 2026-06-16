@@ -35,7 +35,14 @@ export const setCountryOrganization = (countryId, organizationId, organizationNa
     .then(data => dispatch(setCountryOrganizationSuccess(data)))
     .catch(error => {
       if (error.isAuthError) return;
-      dispatch(setCountryOrganizationFailure(error));
+      dispatch(
+        setCountryOrganizationFailure({
+          code: error.body?.code,
+          message: error.body?.message,
+          details: error.body?.details,
+          status: error.status
+        })
+      );
     });
 };
 
@@ -67,6 +74,13 @@ export const removeCountryOrganization = (countryId, organizationId) => (dispatc
     .then(data => dispatch(removeCountryOrganizationSuccess(data)))
     .catch(error => {
       if (error.isAuthError) return;
-      dispatch(removeCountryOrganizationFailure(error));
+      dispatch(
+        removeCountryOrganizationFailure({
+          code: error.body?.code,
+          message: error.body?.message,
+          details: error.body?.details,
+          status: error.status
+        })
+      );
     });
 };

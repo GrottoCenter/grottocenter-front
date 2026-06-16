@@ -35,7 +35,14 @@ export const setMassifOrganization = (massifId, organizationId, organizationName
     .then(data => dispatch(setMassifOrganizationSuccess(data)))
     .catch(error => {
       if (error.isAuthError) return;
-      dispatch(setMassifOrganizationFailure(error));
+      dispatch(
+        setMassifOrganizationFailure({
+          code: error.body?.code,
+          message: error.body?.message,
+          details: error.body?.details,
+          status: error.status
+        })
+      );
     });
 };
 
@@ -67,6 +74,13 @@ export const removeMassifOrganization = (massifId, organizationId) => (dispatch,
     .then(data => dispatch(removeMassifOrganizationSuccess(data)))
     .catch(error => {
       if (error.isAuthError) return;
-      dispatch(removeMassifOrganizationFailure(error));
+      dispatch(
+        removeMassifOrganizationFailure({
+          code: error.body?.code,
+          message: error.body?.message,
+          details: error.body?.details,
+          status: error.status
+        })
+      );
     });
 };
