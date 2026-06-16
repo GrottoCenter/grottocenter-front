@@ -19,14 +19,10 @@ export const QUANTITY_KIND_UNITS_MAP = {
   14: [19], // Turbidity → NTU
   15: [22], // RedoxPotential → mV
   16: [20], // Resistivity → Ω·cm
-  17: [16, 18], // NitrateConcentration → mg/L, µM
-  18: [16, 18], // NitriteConcentration → mg/L, µM
-  19: [16, 18], // AmmoniumConcentration → mg/L, µM
-  20: [16, 18], // PhosphateConcentration → mg/L, µM
-  21: [16, 18], // SilicateConcentration → mg/L, µM
-  22: [25], // LightIntensity → lx
-  23: [27], // AirVelocity → m/s
-  24: [27], // WaterVelocity → m/s
-  25: [26], // RadonConcentration → Bq/m³
-  26: [29] // IsotopeDelta → ‰
+  17: [16, 18], // Concentration → mg/L, µM
+  18: [25], // LightIntensity → lx
+  19: [27], // AirVelocity → m/s
+  20: [27], // WaterVelocity → m/s
+  21: [26], // RadonConcentration → Bq/m³
+  22: [29] // IsotopeDelta → ‰
 };

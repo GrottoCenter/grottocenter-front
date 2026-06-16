@@ -18,14 +18,10 @@ export const QUANTITY_KINDS = [
   { id: 14, code: 'Turbidity', symbolSi: 'NTU' },
   { id: 15, code: 'RedoxPotential', symbolSi: 'V' },
   { id: 16, code: 'Resistivity', symbolSi: 'Ω·m' },
-  { id: 17, code: 'NitrateConcentration', symbolSi: 'mol/L' },
-  { id: 18, code: 'NitriteConcentration', symbolSi: 'mol/L' },
-  { id: 19, code: 'AmmoniumConcentration', symbolSi: 'mol/L' },
-  { id: 20, code: 'PhosphateConcentration', symbolSi: 'mol/L' },
-  { id: 21, code: 'SilicateConcentration', symbolSi: 'mol/L' },
-  { id: 22, code: 'LightIntensity', symbolSi: 'lx' },
-  { id: 23, code: 'AirVelocity', symbolSi: 'm/s' },
-  { id: 24, code: 'WaterVelocity', symbolSi: 'm/s' },
-  { id: 25, code: 'RadonConcentration', symbolSi: 'Bq/m³' },
-  { id: 26, code: 'IsotopeDelta', symbolSi: '‰' }
+  { id: 17, code: 'Concentration', symbolSi: 'mol/L' },
+  { id: 18, code: 'LightIntensity', symbolSi: 'lx' },
+  { id: 19, code: 'AirVelocity', symbolSi: 'm/s' },
+  { id: 20, code: 'WaterVelocity', symbolSi: 'm/s' },
+  { id: 21, code: 'RadonConcentration', symbolSi: 'Bq/m³' },
+  { id: 22, code: 'IsotopeDelta', symbolSi: '‰' }
 ];

@@ -32,8 +32,13 @@ const messages = {
     'Add sensor configuration',
   'ImportObservationsWizard.DeviceSensorsStep.addSensorConfig':
     'Add configuration',
+  'ImportObservationsWizard.DeviceSensorsStep.sensorConfigLabel':
+    'Label',
   'ImportObservationsWizard.DeviceSensorsStep.quantityKind': 'Quantity kind',
   'ImportObservationsWizard.DeviceSensorsStep.unit': 'Unit',
+  'ImportObservationsWizard.DeviceSensorsStep.substance': 'Substance',
+  'ImportObservationsWizard.DeviceSensorsStep.substancePlaceholder':
+    'e.g. NO₃⁻, δ¹⁸O',
   'ImportObservationsWizard.DeviceSensorsStep.advancedFields':
     'Advanced fields',
   'ImportObservationsWizard.DeviceSensorsStep.precisionUpper':
@@ -54,24 +59,21 @@ const messages = {
   'ImportObservationsWizard.DeviceSensorsStep.sensorConfigCreated':
     'Sensor configuration saved successfully.',
   'quantityKind.AirVelocity': 'Air velocity',
-  'quantityKind.AmmoniumConcentration': 'Ammonium concentration',
   'quantityKind.AtmosphericPressure': 'Atmospheric pressure',
   'quantityKind.CO2Concentration': 'CO₂ concentration',
+  'quantityKind.Concentration': 'Concentration',
   'quantityKind.Conductivity': 'Conductivity',
   'quantityKind.DewPointTemperature': 'Dew point temperature',
   'quantityKind.DissolvedOxygen': 'Dissolved oxygen',
+  'quantityKind.IsotopeDelta': 'Isotope delta',
   'quantityKind.LightIntensity': 'Light intensity',
-  'quantityKind.NitrateConcentration': 'Nitrate concentration',
-  'quantityKind.NitriteConcentration': 'Nitrite concentration',
   'quantityKind.pH': 'pH',
-  'quantityKind.PhosphateConcentration': 'Phosphate concentration',
   'quantityKind.Precipitation': 'Precipitation',
   'quantityKind.RadonConcentration': 'Radon concentration',
   'quantityKind.RedoxPotential': 'Redox potential',
   'quantityKind.RelativeHumidity': 'Relative humidity',
   'quantityKind.Resistivity': 'Resistivity',
   'quantityKind.Salinity': 'Salinity',
-  'quantityKind.SilicateConcentration': 'Silicate concentration',
   'quantityKind.Temperature': 'Temperature',
   'quantityKind.TotalDissolvedSolids': 'Total dissolved solids',
   'quantityKind.Turbidity': 'Turbidity',
@@ -320,6 +322,250 @@ describe('SensorConfigForm', () => {
             'Failed to create sensor configuration.'
           )
         ).toBeInTheDocument();
+      });
+    });
+  });
+
+  describe('substance field behavior', () => {
+    const selectQuantityKind = label => {
+      const qkSelect = screen
+        .getByTestId('sensor-config-quantity-kind')
+        .querySelector('[role="combobox"]');
+      fireEvent.mouseDown(qkSelect);
+      fireEvent.click(screen.getByText(label));
+    };
+
+    it('shows substance field when Concentration (id 17) is selected', () => {
+      renderComponent();
+      selectQuantityKind('Concentration');
+
+      expect(
+        screen.getByTestId('sensor-config-substance')
+      ).toBeInTheDocument();
+    });
+
+    it('hides substance field when Temperature (id 1) is selected', () => {
+      renderComponent();
+      selectQuantityKind('Temperature');
+
+      expect(
+        screen.queryByTestId('sensor-config-substance')
+      ).not.toBeInTheDocument();
+    });
+
+    it('clears substance when changing from Concentration to Temperature', () => {
+      renderComponent();
+
+      // Select Concentration
+      selectQuantityKind('Concentration');
+
+      // Type a substance
+      const substanceInput = screen
+        .getByTestId('sensor-config-substance')
+        .querySelector('input');
+      fireEvent.change(substanceInput, { target: { value: 'NO₃⁻' } });
+      expect(substanceInput.value).toBe('NO₃⁻');
+
+      // Switch to Temperature
+      selectQuantityKind('Temperature');
+
+      // Substance field should be gone
+      expect(
+        screen.queryByTestId('sensor-config-substance')
+      ).not.toBeInTheDocument();
+
+      // Switch back to Concentration — substance should be empty
+      selectQuantityKind('Concentration');
+      const newSubstanceInput = screen
+        .getByTestId('sensor-config-substance')
+        .querySelector('input');
+      expect(newSubstanceInput.value).toBe('');
+    });
+
+    it('preserves substance when switching between Concentration and IsotopeDelta', () => {
+      renderComponent();
+
+      // Select Concentration
+      selectQuantityKind('Concentration');
+
+      // Type a substance
+      const substanceInput = screen
+        .getByTestId('sensor-config-substance')
+        .querySelector('input');
+      fireEvent.change(substanceInput, { target: { value: 'δ¹⁸O' } });
+      expect(substanceInput.value).toBe('δ¹⁸O');
+
+      // Switch to IsotopeDelta — substance should be preserved
+      selectQuantityKind('Isotope delta');
+      const preservedInput = screen
+        .getByTestId('sensor-config-substance')
+        .querySelector('input');
+      expect(preservedInput.value).toBe('δ¹⁸O');
+    });
+
+    it('has maxLength of 100 on substance input', () => {
+      renderComponent();
+      selectQuantityKind('Concentration');
+
+      const substanceInput = screen
+        .getByTestId('sensor-config-substance')
+        .querySelector('input');
+      expect(substanceInput).toHaveAttribute('maxLength', '100');
+    });
+
+    it('disables submit when substance is empty with substance-requiring QK', () => {
+      renderComponent();
+      selectQuantityKind('Concentration');
+
+      const submitButton = screen.getByTestId('sensor-config-submit');
+      expect(submitButton).toBeDisabled();
+    });
+
+    it('disables submit when substance is whitespace-only with substance-requiring QK', () => {
+      renderComponent();
+      selectQuantityKind('Concentration');
+
+      const substanceInput = screen
+        .getByTestId('sensor-config-substance')
+        .querySelector('input');
+      fireEvent.change(substanceInput, { target: { value: '   ' } });
+
+      const submitButton = screen.getByTestId('sensor-config-submit');
+      expect(submitButton).toBeDisabled();
+    });
+
+    it('enables submit when substance has non-whitespace content', () => {
+      renderComponent();
+      selectQuantityKind('Concentration');
+
+      const substanceInput = screen
+        .getByTestId('sensor-config-substance')
+        .querySelector('input');
+      fireEvent.change(substanceInput, { target: { value: 'NO₃⁻' } });
+
+      const submitButton = screen.getByTestId('sensor-config-submit');
+      expect(submitButton).not.toBeDisabled();
+    });
+  });
+
+  describe('error handling', () => {
+    const selectQuantityKind = label => {
+      const qkSelect = screen
+        .getByTestId('sensor-config-quantity-kind')
+        .querySelector('[role="combobox"]');
+      fireEvent.mouseDown(qkSelect);
+      fireEvent.click(screen.getByText(label));
+    };
+
+    it('clears error when any field changes', async () => {
+      // Make the first submit fail with generic error
+      mockDispatch.mockRejectedValueOnce(new Error('Server error'));
+
+      renderComponent();
+      selectQuantityKind('Temperature');
+
+      // Submit to trigger error
+      fireEvent.click(screen.getByTestId('sensor-config-submit'));
+
+      await waitFor(() => {
+        expect(
+          screen.getByTestId('sensor-config-form-error')
+        ).toBeInTheDocument();
+      });
+
+      // Change a field — error should clear
+      selectQuantityKind('Atmospheric pressure');
+
+      expect(
+        screen.queryByTestId('sensor-config-form-error')
+      ).not.toBeInTheDocument();
+    });
+
+    it('displays API 400 error message verbatim', async () => {
+      const apiError = new Error('Validation failed');
+      apiError.status = 400;
+      apiError.body = { message: 'Substance is required for Concentration' };
+      mockDispatch.mockRejectedValueOnce(apiError);
+
+      renderComponent();
+      selectQuantityKind('Concentration');
+
+      // Fill in substance so submit is enabled
+      const substanceInput = screen
+        .getByTestId('sensor-config-substance')
+        .querySelector('input');
+      fireEvent.change(substanceInput, { target: { value: 'NO₃⁻' } });
+
+      // Submit
+      fireEvent.click(screen.getByTestId('sensor-config-submit'));
+
+      await waitFor(() => {
+        expect(
+          screen.getByTestId('sensor-config-form-error')
+        ).toBeInTheDocument();
+        expect(
+          screen.getByText('Substance is required for Concentration')
+        ).toBeInTheDocument();
+      });
+    });
+
+    it('displays generic localized message for 5xx errors', async () => {
+      const serverError = new Error('Internal server error');
+      serverError.status = 500;
+      serverError.body = { message: 'internal crash details' };
+      mockDispatch.mockRejectedValueOnce(serverError);
+
+      renderComponent();
+      selectQuantityKind('Temperature');
+
+      // Submit
+      fireEvent.click(screen.getByTestId('sensor-config-submit'));
+
+      await waitFor(() => {
+        expect(
+          screen.getByTestId('sensor-config-form-error')
+        ).toBeInTheDocument();
+        expect(
+          screen.getByText('Failed to create sensor configuration.')
+        ).toBeInTheDocument();
+      });
+    });
+
+    it('clears error after successful submit following a failed one', async () => {
+      // First submit fails
+      const apiError = new Error('Validation failed');
+      apiError.status = 400;
+      apiError.body = { message: 'Substance too long' };
+      mockDispatch.mockRejectedValueOnce(apiError);
+
+      renderComponent();
+      selectQuantityKind('Temperature');
+
+      // Submit — should fail
+      fireEvent.click(screen.getByTestId('sensor-config-submit'));
+
+      await waitFor(() => {
+        expect(
+          screen.getByTestId('sensor-config-form-error')
+        ).toBeInTheDocument();
+      });
+
+      // Change field to clear error, then submit again successfully
+      selectQuantityKind('Atmospheric pressure');
+
+      expect(
+        screen.queryByTestId('sensor-config-form-error')
+      ).not.toBeInTheDocument();
+
+      // Successful submit
+      mockDispatch.mockResolvedValueOnce({ id: 1 });
+      mockCreateSensorConfig.mockReturnValueOnce({ id: 1 });
+      fireEvent.click(screen.getByTestId('sensor-config-submit'));
+
+      await waitFor(() => {
+        expect(
+          screen.queryByTestId('sensor-config-form-error')
+        ).not.toBeInTheDocument();
       });
     });
   });

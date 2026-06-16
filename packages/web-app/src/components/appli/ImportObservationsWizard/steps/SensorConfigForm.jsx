@@ -21,11 +21,13 @@ import { createSensorConfig } from '../../../../actions/Observations/importWizar
 import { QUANTITY_KINDS } from '../constants/quantityKinds';
 import { UNITS } from '../constants/units';
 import { QUANTITY_KIND_UNITS_MAP } from '../constants/quantityKindUnitsMap';
+import { isSubstanceRequired } from '../constants/substanceUtils';
 
 const initialFormState = {
   label: '',
   quantityKindId: '',
   unitId: '',
+  substance: '',
   precisionUpper: '',
   precisionLower: '',
   resolution: '',
@@ -59,6 +61,14 @@ const SensorConfigForm = ({ deviceId }) => {
     return UNITS.filter(u => unitIds.includes(u.id));
   }, [form.quantityKindId]);
 
+  const selectedQuantityKindCode = useMemo(() => {
+    if (!form.quantityKindId) return '';
+    const qk = QUANTITY_KINDS.find(q => q.id === Number(form.quantityKindId));
+    return qk ? qk.code : '';
+  }, [form.quantityKindId]);
+
+  const substanceRequired = isSubstanceRequired(selectedQuantityKindCode);
+
   const selectedUnit = useMemo(
     () => UNITS.find(u => u.id === Number(form.unitId)) || null,
     [form.unitId]
@@ -76,9 +86,17 @@ const SensorConfigForm = ({ deviceId }) => {
           const unitIds = QUANTITY_KIND_UNITS_MAP[value] || [];
           const firstUnit = UNITS.find(u => unitIds.includes(u.id));
           next.unitId = firstUnit ? firstUnit.id : '';
+          // Clear substance if new QK does not require it
+          const qk = QUANTITY_KINDS.find(q => q.id === Number(value));
+          const code = qk ? qk.code : '';
+          if (!isSubstanceRequired(code)) {
+            next.substance = '';
+          }
         }
         return next;
       });
+      // Clear submit error on any field change
+      setSubmitError(null);
       // Clear validation errors on change
       setValidationErrors(prev => {
         const next = { ...prev };
@@ -110,7 +128,10 @@ const SensorConfigForm = ({ deviceId }) => {
   }, [form, formatMessage]);
 
   const canSubmit =
-    form.quantityKindId !== '' && form.unitId !== '' && !isSubmitting;
+    form.quantityKindId !== '' &&
+    form.unitId !== '' &&
+    (!substanceRequired || form.substance.trim() !== '') &&
+    !isSubmitting;
 
   const handleSubmit = useCallback(async () => {
     const errors = validate();
@@ -127,6 +148,7 @@ const SensorConfigForm = ({ deviceId }) => {
       label: form.label.trim() || undefined,
       quantityKindId: Number(form.quantityKindId),
       unitId: Number(form.unitId),
+      substance: substanceRequired ? form.substance.trim() : null,
       precisionUpper:
         form.precisionUpper !== '' ? Number(form.precisionUpper) : null,
       precisionLower:
@@ -151,16 +173,20 @@ const SensorConfigForm = ({ deviceId }) => {
           id: 'ImportObservationsWizard.DeviceSensorsStep.sensorConfigCreated'
         })
       );
-    } catch {
-      setSubmitError(
-        formatMessage({
-          id: 'ImportObservationsWizard.DeviceSensorsStep.createSensorConfigError'
-        })
-      );
+    } catch (error) {
+      if (error.status === 400 && error.body?.message) {
+        setSubmitError(error.body.message);
+      } else {
+        setSubmitError(
+          formatMessage({
+            id: 'ImportObservationsWizard.DeviceSensorsStep.createSensorConfigError'
+          })
+        );
+      }
     } finally {
       setIsSubmitting(false);
     }
-  }, [form, validate, dispatch, deviceId, formatMessage, onSuccess]);
+  }, [form, substanceRequired, validate, dispatch, deviceId, formatMessage, onSuccess]);
 
   const endAdornment = unitSymbol
     ? { endAdornment: <InputAdornment position="end">{unitSymbol}</InputAdornment> }
@@ -234,6 +260,27 @@ const SensorConfigForm = ({ deviceId }) => {
             ))}
           </TextField>
         </Box>
+
+        {/* Substance — visible only for Concentration / IsotopeDelta */}
+        {substanceRequired && (
+          <TextField
+            label={formatMessage({
+              id: 'ImportObservationsWizard.DeviceSensorsStep.substance'
+            })}
+            value={form.substance}
+            onChange={handleFieldChange('substance')}
+            size="small"
+            inputProps={{ maxLength: 100 }}
+            slotProps={{
+              input: {
+                placeholder: formatMessage({
+                  id: 'ImportObservationsWizard.DeviceSensorsStep.substancePlaceholder'
+                })
+              }
+            }}
+            data-testid="sensor-config-substance"
+          />
+        )}
 
         {/* Advanced fields */}
         <Accordion
