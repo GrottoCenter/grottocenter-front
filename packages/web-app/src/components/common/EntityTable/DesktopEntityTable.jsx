@@ -32,6 +32,7 @@ import ViewColumnIcon from '@mui/icons-material/ViewColumn';
 import ViewListIcon from '@mui/icons-material/ViewList';
 
 import entitiesConfig from './entitiesConfig';
+import ExportFormatDropdown from './ExportFormatDropdown';
 import { LoadingTableHead, LoadingTableBodyInner } from './LoadingTable';
 import VisibleColumnsMenu from './VisibleColumnsMenu';
 import { SORT_FIELD_MAP, getStoredRowsPerPage, renderCell } from './tableUtils';
@@ -211,6 +212,10 @@ const DesktopEntityTable = ({
 
   const entityConfig = entitiesConfig[entityType ?? 'placeholder'];
 
+  const visibleColumns = entityColumns.filter(e => e.visible);
+  const exportColumns = visibleColumns.map(e => e.apiField || e.field);
+  const exportColumnLabels = visibleColumns.map(e => e.label);
+
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
     if (onPageChange) onPageChange(newPage, rowsPerPage);
@@ -301,7 +306,6 @@ const DesktopEntityTable = ({
     setSelected([]);
   }, [isNewQuery]);
 
-  const visibleColumns = entityColumns.filter(e => e.visible);
   const colSpan = visibleColumns.length + (onSelected ? 1 : 0);
 
   const TableContent =
@@ -378,15 +382,28 @@ const DesktopEntityTable = ({
                 alignItems: 'center'
               }}>
               {onCSVDownload &&
+                entityType === 'entrances' && (
+                  <ExportFormatDropdown
+                    disabled={nbTotalRows > MAX_DOCUMENTS_TO_EXPORT_IN_CSV}
+                    onExport={format => {
+                      onCSVDownload(
+                        exportColumns,
+                        exportColumnLabels,
+                        format
+                      );
+                    }}
+                  />
+                )}
+              {onCSVDownload &&
+                entityType !== 'entrances' &&
                 (nbTotalRows <= MAX_DOCUMENTS_TO_EXPORT_IN_CSV ? (
                   <Button
                     variant="outlined"
                     size="small"
                     onClick={() => {
-                      const c = entityColumns.filter(e => e.visible);
                       onCSVDownload(
-                        c.map(e => e.apiField || e.field),
-                        c.map(e => e.label)
+                        exportColumns,
+                        exportColumnLabels
                       );
                     }}
                     startIcon={<FileDownloadIcon />}
