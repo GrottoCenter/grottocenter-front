@@ -133,6 +133,10 @@ describe('Import Observations Wizard', () => {
       // Step 4: Context
       cy.get('[data-testid="context-step"]').should('be.visible');
 
+      // Select "Point only" mode (no cave in this flow)
+      cy.get('[data-testid="location-mode-radio"]')
+        .find('input[value="pointOnly"]').click({ force: true });
+
       // Requirement 13.6: Fill context fields
       cy.get('[data-testid="point-label-field"]').find('input').type(
         'Salle du Chaos - T1'
@@ -193,11 +197,8 @@ describe('Import Observations Wizard', () => {
       cy.get('[data-testid="start-over-button"]').click();
 
       // Wizard should be back at step 0 with no file loaded
-      cy.get('[data-testid="file-info"]').should('not.exist');
-      cy.get('[data-testid="file-preview-table"]').should('not.exist');
-
-      // The file picker button should be visible (indicating step 0)
       cy.get('[data-testid="file-picker-button"]').should('be.visible');
+      cy.get('[data-testid="file-info"]').should('not.exist');
 
       // Back button should be disabled (step 0)
       cy.get('[data-testid="back-button"]').should('be.disabled');
@@ -265,6 +266,9 @@ describe('Import Observations Wizard', () => {
       cy.get('[data-testid="next-button"]').click();
 
       // Step 4: Context — fill fields and export profile
+      cy.get('[data-testid="location-mode-radio"]')
+        .find('input[value="pointOnly"]').click({ force: true });
+
       cy.get('[data-testid="point-label-field"]').find('input').type(
         'Salle du Chaos'
       );
