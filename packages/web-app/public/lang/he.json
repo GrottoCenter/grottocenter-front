@@ -1892,6 +1892,7 @@
   "quantityKind.Conductivity": "מוליכות",
   "quantityKind.DewPointTemperature": "טמפרטורת נקודת הטל",
   "quantityKind.DissolvedOxygen": "חמצן מומס",
+  "quantityKind.IsotopeDelta": "דלתא איזוטופית (δ)",
   "quantityKind.LightIntensity": "עוצמת אור",
   "quantityKind.NitrateConcentration": "ריכוז ניטראט",
   "quantityKind.NitriteConcentration": "ריכוז ניטריט",

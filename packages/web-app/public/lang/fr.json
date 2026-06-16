@@ -1892,6 +1892,7 @@
   "quantityKind.Conductivity": "Conductivité",
   "quantityKind.DewPointTemperature": "Température du point de rosée",
   "quantityKind.DissolvedOxygen": "Oxygène dissous",
+  "quantityKind.IsotopeDelta": "Delta isotopique (δ)",
   "quantityKind.LightIntensity": "Intensité lumineuse",
   "quantityKind.NitrateConcentration": "Concentration en nitrate",
   "quantityKind.NitriteConcentration": "Concentration en nitrite",

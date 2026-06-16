@@ -1892,6 +1892,7 @@
   "quantityKind.Conductivity": "Αγωγιμότητα",
   "quantityKind.DewPointTemperature": "Θερμοκρασία σημείου δρόσου",
   "quantityKind.DissolvedOxygen": "Διαλυμένο οξυγόνο",
+  "quantityKind.IsotopeDelta": "Ισοτοπική δέλτα (δ)",
   "quantityKind.LightIntensity": "Ένταση φωτός",
   "quantityKind.NitrateConcentration": "Συγκέντρωση νιτρικών",
   "quantityKind.NitriteConcentration": "Συγκέντρωση νιτρωδών",

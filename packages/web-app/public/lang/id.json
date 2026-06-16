@@ -1892,6 +1892,7 @@
   "quantityKind.Conductivity": "Konduktivitas",
   "quantityKind.DewPointTemperature": "Suhu titik embun",
   "quantityKind.DissolvedOxygen": "Oksigen terlarut",
+  "quantityKind.IsotopeDelta": "Delta isotop (δ)",
   "quantityKind.LightIntensity": "Intensitas cahaya",
   "quantityKind.NitrateConcentration": "Konsentrasi nitrat",
   "quantityKind.NitriteConcentration": "Konsentrasi nitrit",

@@ -1892,6 +1892,7 @@
   "quantityKind.Conductivity": "導電率",
   "quantityKind.DewPointTemperature": "露点温度",
   "quantityKind.DissolvedOxygen": "溶存酸素",
+  "quantityKind.IsotopeDelta": "同位体デルタ (δ)",
   "quantityKind.LightIntensity": "光度",
   "quantityKind.NitrateConcentration": "硝酸塩濃度",
   "quantityKind.NitriteConcentration": "亜硝酸塩濃度",

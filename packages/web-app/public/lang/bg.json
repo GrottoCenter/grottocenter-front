@@ -1892,6 +1892,7 @@
   "quantityKind.Conductivity": "Проводимост",
   "quantityKind.DewPointTemperature": "Температура на точката на оросяване",
   "quantityKind.DissolvedOxygen": "Разтворен кислород",
+  "quantityKind.IsotopeDelta": "Изотопна делта (δ)",
   "quantityKind.LightIntensity": "Интензитет на светлината",
   "quantityKind.NitrateConcentration": "Концентрация на нитрати",
   "quantityKind.NitriteConcentration": "Концентрация на нитрити",

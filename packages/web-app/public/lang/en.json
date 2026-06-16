@@ -1892,6 +1892,7 @@
   "quantityKind.Conductivity": "Conductivity",
   "quantityKind.DewPointTemperature": "Dew point temperature",
   "quantityKind.DissolvedOxygen": "Dissolved oxygen",
+  "quantityKind.IsotopeDelta": "Isotope delta (δ)",
   "quantityKind.LightIntensity": "Light intensity",
   "quantityKind.NitrateConcentration": "Nitrate concentration",
   "quantityKind.NitriteConcentration": "Nitrite concentration",

@@ -1892,6 +1892,7 @@
   "quantityKind.Conductivity": "Leitfähigkeit",
   "quantityKind.DewPointTemperature": "Taupunkttemperatur",
   "quantityKind.DissolvedOxygen": "Gelöster Sauerstoff",
+  "quantityKind.IsotopeDelta": "Isotopendelta (δ)",
   "quantityKind.LightIntensity": "Lichtintensität",
   "quantityKind.NitrateConcentration": "Nitratkonzentration",
   "quantityKind.NitriteConcentration": "Nitritkonzentration",

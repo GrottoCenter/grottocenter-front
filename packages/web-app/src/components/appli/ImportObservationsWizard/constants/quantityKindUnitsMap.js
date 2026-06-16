@@ -27,5 +27,6 @@ export const QUANTITY_KIND_UNITS_MAP = {
   22: [25], // LightIntensity → lx
   23: [27], // AirVelocity → m/s
   24: [27], // WaterVelocity → m/s
-  25: [26] // RadonConcentration → Bq/m³
+  25: [26], // RadonConcentration → Bq/m³
+  26: [29] // IsotopeDelta → ‰
 };

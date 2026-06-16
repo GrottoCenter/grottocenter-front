@@ -26,5 +26,6 @@ export const QUANTITY_KINDS = [
   { id: 22, code: 'LightIntensity', symbolSi: 'lx' },
   { id: 23, code: 'AirVelocity', symbolSi: 'm/s' },
   { id: 24, code: 'WaterVelocity', symbolSi: 'm/s' },
-  { id: 25, code: 'RadonConcentration', symbolSi: 'Bq/m³' }
+  { id: 25, code: 'RadonConcentration', symbolSi: 'Bq/m³' },
+  { id: 26, code: 'IsotopeDelta', symbolSi: '‰' }
 ];

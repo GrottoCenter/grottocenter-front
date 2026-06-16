@@ -1892,6 +1892,7 @@
   "quantityKind.Conductivity": "Condutividade",
   "quantityKind.DewPointTemperature": "Temperatura do ponto de orvalho",
   "quantityKind.DissolvedOxygen": "Oxigênio dissolvido",
+  "quantityKind.IsotopeDelta": "Delta isotópico (δ)",
   "quantityKind.LightIntensity": "Intensidade luminosa",
   "quantityKind.NitrateConcentration": "Concentração de nitrato",
   "quantityKind.NitriteConcentration": "Concentração de nitrito",

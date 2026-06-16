@@ -1892,6 +1892,7 @@
   "quantityKind.Conductivity": "Geleidbaarheid",
   "quantityKind.DewPointTemperature": "Dauwpunttemperatuur",
   "quantityKind.DissolvedOxygen": "Opgeloste zuurstof",
+  "quantityKind.IsotopeDelta": "Isotopendelta (δ)",
   "quantityKind.LightIntensity": "Lichtintensiteit",
   "quantityKind.NitrateConcentration": "Nitraatconcentratie",
   "quantityKind.NitriteConcentration": "Nitrietconcentratie",
