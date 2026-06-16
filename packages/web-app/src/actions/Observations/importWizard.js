@@ -72,6 +72,7 @@ const normalizeSensorConfig = config => ({
   quantityKindCode: config.quantityKind.code,
   unitId: config.unit.id,
   unitSymbol: config.unit.symbol,
+  substance: config.substance ?? null,
   precisionUpper:
     config.precisionUpper != null ? Number(config.precisionUpper) : null,
   precisionLower:
@@ -240,6 +241,7 @@ export const createSensorConfig = configData => (dispatch, getState) => {
     label: configData.label || undefined,
     quantityKind: configData.quantityKindId,
     unit: configData.unitId,
+    substance: configData.substance ?? null,
     precisionUpper: configData.precisionUpper ?? null,
     precisionLower: configData.precisionLower ?? null,
     resolution: configData.resolution ?? null,
