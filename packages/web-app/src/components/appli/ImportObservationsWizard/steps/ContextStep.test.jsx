@@ -81,6 +81,11 @@ const messages = {
   'ImportObservationsWizard.ContextStep.caveLabel': 'Cave',
   'ImportObservationsWizard.ContextStep.caveId': 'Cave ID',
   'ImportObservationsWizard.ContextStep.caveIdHelper': 'Enter the numeric ID of the cave',
+  'ImportObservationsWizard.ContextStep.locationModeLabel': 'Location data available',
+  'ImportObservationsWizard.ContextStep.locationMode.pointAndCave': 'Point and cave',
+  'ImportObservationsWizard.ContextStep.locationMode.pointOnly': 'Point only',
+  'ImportObservationsWizard.ContextStep.locationMode.caveOnly': 'Cave only',
+  'ImportObservationsWizard.ContextStep.unknownCoordinates': 'Unknown coordinates',
   'ImportObservationsWizard.ContextStep.pointLabel': 'Point label',
   'ImportObservationsWizard.ContextStep.pointLabelPlaceholder': 'e.g. Main gallery - sensor A',
   'ImportObservationsWizard.ContextStep.authorsLabel': 'Authors',
@@ -127,6 +132,8 @@ const defaultImportWizardState = {
   validationResult: null,
   samplingIntervalSeconds: null,
   context: {
+    locationMode: 'pointAndCave',
+    unknownCoordinates: false,
     caveId: null,
     caveIdLocked: false,
     pointLabel: '',
@@ -337,6 +344,155 @@ describe('ContextStep', () => {
       expect(input).toHaveAttribute(
         'placeholder',
         'e.g. Main gallery - sensor A'
+      );
+    });
+  });
+
+  describe('location mode radio group', () => {
+    it('should render the location mode radio group', () => {
+      renderComponent();
+
+      expect(screen.getByTestId('location-mode-radio')).toBeInTheDocument();
+      expect(screen.getByLabelText('Point and cave')).toBeInTheDocument();
+      expect(screen.getByLabelText('Point only')).toBeInTheDocument();
+      expect(screen.getByLabelText('Cave only')).toBeInTheDocument();
+    });
+
+    it('should default to pointAndCave mode showing both sections', () => {
+      renderComponent();
+
+      expect(screen.getByTestId('point-label-field')).toBeInTheDocument();
+      expect(screen.getByTestId('cave-autocomplete-search')).toBeInTheDocument();
+    });
+
+    it('should hide cave section when pointOnly is selected', () => {
+      renderComponent({}, {
+        context: { ...defaultImportWizardState.context, locationMode: 'pointOnly' }
+      });
+
+      expect(screen.getByTestId('point-label-field')).toBeInTheDocument();
+      expect(screen.queryByTestId('cave-autocomplete-search')).not.toBeInTheDocument();
+    });
+
+    it('should hide point section when caveOnly is selected', () => {
+      renderComponent({}, {
+        context: { ...defaultImportWizardState.context, locationMode: 'caveOnly' }
+      });
+
+      expect(screen.queryByTestId('point-label-field')).not.toBeInTheDocument();
+      expect(screen.getByTestId('cave-autocomplete-search')).toBeInTheDocument();
+    });
+
+    it('should dispatch SET_CONTEXT clearing point fields when switching to caveOnly', () => {
+      renderComponent({}, {
+        context: {
+          ...defaultImportWizardState.context,
+          locationMode: 'pointAndCave',
+          pointLabel: 'Some point'
+        }
+      });
+
+      const caveOnlyRadio = screen.getByLabelText('Cave only');
+      fireEvent.click(caveOnlyRadio);
+
+      expect(mockDispatch).toHaveBeenCalledWith(
+        expect.objectContaining({
+          type: 'SET_CONTEXT',
+          context: expect.objectContaining({
+            locationMode: 'caveOnly',
+            pointLabel: '',
+            latitude: null,
+            longitude: null,
+            unknownCoordinates: false
+          })
+        })
+      );
+    });
+
+    it('should dispatch SET_CONTEXT clearing caveId when switching to pointOnly', () => {
+      renderComponent({}, {
+        context: {
+          ...defaultImportWizardState.context,
+          locationMode: 'pointAndCave',
+          caveId: 42
+        }
+      });
+
+      const pointOnlyRadio = screen.getByLabelText('Point only');
+      fireEvent.click(pointOnlyRadio);
+
+      expect(mockDispatch).toHaveBeenCalledWith(
+        expect.objectContaining({
+          type: 'SET_CONTEXT',
+          context: expect.objectContaining({
+            locationMode: 'pointOnly',
+            caveId: null
+          })
+        })
+      );
+    });
+
+    it('should disable pointOnly radio when caveIdLocked is true', () => {
+      renderComponent({ caveIdLocked: true, initialCaveId: 42 });
+
+      const pointOnlyRadio = screen.getByLabelText('Point only');
+      expect(pointOnlyRadio.closest('label')).toHaveClass('Mui-disabled');
+    });
+  });
+
+  describe('unknown coordinates checkbox', () => {
+    it('should render the unknown coordinates checkbox when point is shown', () => {
+      renderComponent();
+
+      expect(screen.getByTestId('unknown-coordinates-checkbox')).toBeInTheDocument();
+    });
+
+    it('should not render the checkbox when locationMode is caveOnly', () => {
+      renderComponent({}, {
+        context: { ...defaultImportWizardState.context, locationMode: 'caveOnly' }
+      });
+
+      expect(screen.queryByTestId('unknown-coordinates-checkbox')).not.toBeInTheDocument();
+    });
+
+    it('should hide coordinate form section when unknownCoordinates is checked', () => {
+      renderComponent({}, {
+        context: { ...defaultImportWizardState.context, unknownCoordinates: true }
+      });
+
+      expect(screen.queryByTestId('coordinate-form-section')).not.toBeInTheDocument();
+    });
+
+    it('should show coordinate form section when unknownCoordinates is unchecked', () => {
+      renderComponent({}, {
+        context: { ...defaultImportWizardState.context, unknownCoordinates: false }
+      });
+
+      expect(screen.getByTestId('coordinate-form-section')).toBeInTheDocument();
+    });
+
+    it('should dispatch SET_CONTEXT clearing coordinates when checked', () => {
+      renderComponent({}, {
+        context: {
+          ...defaultImportWizardState.context,
+          unknownCoordinates: false,
+          latitude: 45.5,
+          longitude: 6.2
+        }
+      });
+
+      const checkbox = screen.getByTestId('unknown-coordinates-checkbox');
+      fireEvent.click(checkbox);
+
+      expect(mockDispatch).toHaveBeenCalledWith(
+        expect.objectContaining({
+          type: 'SET_CONTEXT',
+          context: expect.objectContaining({
+            unknownCoordinates: true,
+            latitude: null,
+            longitude: null
+          })
+        })
       );
     });
   });

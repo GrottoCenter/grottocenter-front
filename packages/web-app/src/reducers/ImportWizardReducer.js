@@ -50,6 +50,8 @@ export const initialState = {
   validationResult: null,
   samplingIntervalSeconds: null,
   context: {
+    locationMode: 'pointAndCave',
+    unknownCoordinates: false,
     caveId: null,
     caveIdLocked: false,
     pointLabel: '',

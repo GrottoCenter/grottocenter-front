@@ -61,8 +61,18 @@ const isStep3NextDisabled = validationResult =>
   validationResult.blockingErrors.length > 0;
 
 const isStep4NextDisabled = context => {
-  const { pointLabel, licenseId } = context;
-  return !pointLabel || !licenseId;
+  const { locationMode, pointLabel, caveId, licenseId } = context;
+  if (!licenseId) return true;
+  switch (locationMode) {
+    case 'pointAndCave':
+      return !pointLabel || !caveId;
+    case 'pointOnly':
+      return !pointLabel;
+    case 'caveOnly':
+      return !caveId;
+    default:
+      return true;
+  }
 };
 
 // Step 5 (Submit) — Next is always disabled (last step)
