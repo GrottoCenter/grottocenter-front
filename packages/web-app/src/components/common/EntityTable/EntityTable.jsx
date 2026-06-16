@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { isMobile } from 'react-device-detect';
-import { Box, Divider, LinearProgress } from '@mui/material';
+import { Box, Divider, IconButton, LinearProgress, Tooltip } from '@mui/material';
+import FileDownloadIcon from '@mui/icons-material/FileDownload';
+import { useIntl } from 'react-intl';
 
 import entitiesConfig from './entitiesConfig';
 import DesktopEntityTable from './DesktopEntityTable';
+import ExportFormatDropdown from './ExportFormatDropdown';
 import MobileEntityList from './MobileEntityList';
 import MobileToolbar from './MobileToolbar';
 import {
@@ -39,6 +42,8 @@ const initColumns = (
   return columns;
 };
 
+const MAX_EXPORT_ROWS = 10000;
+
 const EntityTable = ({
   entityType,
   entityColumnsModifier,
@@ -55,6 +60,7 @@ const EntityTable = ({
   shouldHideFooter = false,
   compact = false
 }) => {
+  const { formatMessage } = useIntl();
   const entityConfig = entitiesConfig[entityType ?? 'placeholder'];
 
   const [entityColumns, setEntityColumns] = useState(() =>
@@ -130,6 +136,46 @@ const EntityTable = ({
               entityType={entityType}
               onViewToggle={toggleViewMode}
               viewMode={viewMode}
+              exportSlot={(() => {
+                if (!onCSVDownload) return undefined;
+                const exportDisabled =
+                  nbTotalRows != null && nbTotalRows > MAX_EXPORT_ROWS;
+                const exportCols = visibleColumns.map(
+                  c => c.apiField || c.field
+                );
+                const exportLabels = visibleColumns.map(c => c.label);
+                if (entityType === 'entrances') {
+                  return (
+                    <ExportFormatDropdown
+                      disabled={exportDisabled}
+                      onExport={format =>
+                        onCSVDownload(exportCols, exportLabels, format)
+                      }
+                      iconOnly
+                    />
+                  );
+                }
+                return (
+                  <Tooltip title={formatMessage({ id: 'Export' })}>
+                    <span>
+                      <IconButton
+                        size="small"
+                        color="primary"
+                        disabled={exportDisabled}
+                        onClick={() => onCSVDownload(exportCols, exportLabels)}
+                        sx={{
+                          border: '1px solid',
+                          borderColor: exportDisabled
+                            ? 'action.disabled'
+                            : 'primary.main',
+                          borderRadius: 1
+                        }}>
+                        <FileDownloadIcon fontSize="small" />
+                      </IconButton>
+                    </span>
+                  </Tooltip>
+                );
+              })()}
             />
             <Divider />
           </>

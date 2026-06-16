@@ -129,9 +129,11 @@ const MobileToolbar = ({
   setEntityColumns,
   entityType,
   onViewToggle,
-  viewMode
+  viewMode,
+  exportSlot
 }) => {
   const { formatMessage } = useIntl();
+
   return (
     <Toolbar
       disableGutters
@@ -156,6 +158,7 @@ const MobileToolbar = ({
           sx={{ flex: 1 }}
         />
       )}
+      {exportSlot}
       <Tooltip
         title={formatMessage({
           id: viewMode === 'cards' ? 'Table view' : 'Card view'
@@ -191,7 +194,8 @@ MobileToolbar.propTypes = {
   setEntityColumns: PropTypes.func.isRequired,
   entityType: PropTypes.string,
   onViewToggle: PropTypes.func.isRequired,
-  viewMode: PropTypes.string.isRequired
+  viewMode: PropTypes.string.isRequired,
+  exportSlot: PropTypes.node
 };
 
 export default MobileToolbar;
