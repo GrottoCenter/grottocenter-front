@@ -44,6 +44,8 @@ const ALLOWED_LICENSE_NAMES = ['ODbL', 'ODC-BY', 'Licence Ouverte'];
 
 const DATA_QUALITY_OPTIONS = ['raw', 'validated'];
 
+const TEXT_FIELD_MAX_LENGTH = 200;
+
 // ===== ContextStep component =====
 
 const ContextStep = ({ initialCaveId, caveIdLocked }) => {
@@ -486,6 +488,7 @@ const ContextStep = ({ initialCaveId, caveIdLocked }) => {
             onChange={e => handleFieldChange('pointLabel', e.target.value)}
             size="small"
             sx={{ minWidth: 200, maxWidth: 280 }}
+            slotProps={{ htmlInput: { maxLength: TEXT_FIELD_MAX_LENGTH } }}
             data-testid="point-label-field"
           />
           <FormControlLabel
@@ -528,6 +531,7 @@ const ContextStep = ({ initialCaveId, caveIdLocked }) => {
           onChange={handleObservationNameChange}
           size="small"
           sx={{ flex: 1 }}
+          slotProps={{ htmlInput: { maxLength: TEXT_FIELD_MAX_LENGTH } }}
           data-testid="observation-name-field"
         />
         <Box sx={{ minWidth: 160 }}>
