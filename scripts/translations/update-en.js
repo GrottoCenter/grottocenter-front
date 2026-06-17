@@ -25,7 +25,7 @@ const INTL_FORMAT_MESSAGE_REGEX =
  */
 function isValidTranslationKey(key) {
   if (!key || key.length === 0) return false;
-  if (key.includes('{') || key.includes('$')) return false;
+  if (key.includes('$')) return false;
   if (key.includes('<') || key.includes('>')) return false;
 
   // Check for truncated contractions (words ending with 'n' that should be "n't")
