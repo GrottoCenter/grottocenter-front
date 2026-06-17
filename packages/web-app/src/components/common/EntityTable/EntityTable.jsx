@@ -120,6 +120,48 @@ const EntityTable = ({
       if (onSortChange) onSortChange(`${apiField}:${newOrder}`);
     };
 
+    const exportDisabled = nbTotalRows != null && nbTotalRows > MAX_EXPORT_ROWS;
+    const exportCols = visibleColumns.map(c => c.apiField || c.field);
+    const exportLabels = visibleColumns.map(c => c.label);
+    let exportSlot;
+    if (onExport) {
+      if (entityType === 'entrances') {
+        exportSlot = (
+          <ExportFormatDropdown
+            disabled={exportDisabled}
+            onExport={format => onExport(exportCols, exportLabels, format)}
+            iconOnly
+          />
+        );
+      } else {
+        exportSlot = (
+          <Tooltip
+            title={formatMessage({
+              id: exportDisabled
+                ? 'Export unavailable above 10000 results'
+                : 'Export'
+            })}>
+            <span>
+              <IconButton
+                size="small"
+                color="primary"
+                disabled={exportDisabled}
+                onClick={() => onExport(exportCols, exportLabels)}
+                sx={{
+                  border: '1px solid',
+                  borderColor: exportDisabled
+                    ? 'action.disabled'
+                    : 'primary.main',
+                  borderRadius: 1
+                }}>
+                <FileDownloadIcon fontSize="small" />
+              </IconButton>
+            </span>
+          </Tooltip>
+        );
+      }
+    }
+
     return (
       <Box sx={{ width: '100%' }}>
         {!shouldHideFooter && (
@@ -136,46 +178,7 @@ const EntityTable = ({
               entityType={entityType}
               onViewToggle={toggleViewMode}
               viewMode={viewMode}
-              exportSlot={(() => {
-                if (!onExport) return undefined;
-                const exportDisabled =
-                  nbTotalRows != null && nbTotalRows > MAX_EXPORT_ROWS;
-                const exportCols = visibleColumns.map(
-                  c => c.apiField || c.field
-                );
-                const exportLabels = visibleColumns.map(c => c.label);
-                if (entityType === 'entrances') {
-                  return (
-                    <ExportFormatDropdown
-                      disabled={exportDisabled}
-                      onExport={format =>
-                        onExport(exportCols, exportLabels, format)
-                      }
-                      iconOnly
-                    />
-                  );
-                }
-                return (
-                  <Tooltip title={formatMessage({ id: 'Export' })}>
-                    <span>
-                      <IconButton
-                        size="small"
-                        color="primary"
-                        disabled={exportDisabled}
-                        onClick={() => onExport(exportCols, exportLabels)}
-                        sx={{
-                          border: '1px solid',
-                          borderColor: exportDisabled
-                            ? 'action.disabled'
-                            : 'primary.main',
-                          borderRadius: 1
-                        }}>
-                        <FileDownloadIcon fontSize="small" />
-                      </IconButton>
-                    </span>
-                  </Tooltip>
-                );
-              })()}
+              exportSlot={exportSlot}
             />
             <Divider />
           </>

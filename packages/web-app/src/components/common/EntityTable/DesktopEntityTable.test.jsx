@@ -113,7 +113,9 @@ describe('DesktopEntityTable - Export controls', () => {
       onExport: undefined
     });
 
-    expect(screen.queryByRole('combobox')).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: /Export/i })
+    ).not.toBeInTheDocument();
     expect(screen.queryByText('Export to CSV')).not.toBeInTheDocument();
   });
 });
