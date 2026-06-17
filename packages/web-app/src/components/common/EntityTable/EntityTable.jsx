@@ -55,7 +55,7 @@ const EntityTable = ({
   pageSizeOptions = DEFAULT_PAGE_SIZE_OPTIONS,
   onPageChange,
   onSortChange,
-  onCSVDownload,
+  onExport,
   isNewQuery = false,
   shouldHideFooter = false,
   compact = false
@@ -137,7 +137,7 @@ const EntityTable = ({
               onViewToggle={toggleViewMode}
               viewMode={viewMode}
               exportSlot={(() => {
-                if (!onCSVDownload) return undefined;
+                if (!onExport) return undefined;
                 const exportDisabled =
                   nbTotalRows != null && nbTotalRows > MAX_EXPORT_ROWS;
                 const exportCols = visibleColumns.map(
@@ -149,7 +149,7 @@ const EntityTable = ({
                     <ExportFormatDropdown
                       disabled={exportDisabled}
                       onExport={format =>
-                        onCSVDownload(exportCols, exportLabels, format)
+                        onExport(exportCols, exportLabels, format)
                       }
                       iconOnly
                     />
@@ -162,7 +162,7 @@ const EntityTable = ({
                         size="small"
                         color="primary"
                         disabled={exportDisabled}
-                        onClick={() => onCSVDownload(exportCols, exportLabels)}
+                        onClick={() => onExport(exportCols, exportLabels)}
                         sx={{
                           border: '1px solid',
                           borderColor: exportDisabled
@@ -214,7 +214,7 @@ const EntityTable = ({
       pageSizeOptions={pageSizeOptions}
       onPageChange={onPageChange}
       onSortChange={onSortChange}
-      onCSVDownload={onCSVDownload}
+      onExport={onExport}
       isNewQuery={isNewQuery}
       shouldHideFooter={shouldHideFooter}
       compact={compact}
@@ -235,7 +235,7 @@ EntityTable.propTypes = {
   pageSizeOptions: PropTypes.arrayOf(PropTypes.number),
   onPageChange: PropTypes.func,
   onSortChange: PropTypes.func,
-  onCSVDownload: PropTypes.func,
+  onExport: PropTypes.func,
   isNewQuery: PropTypes.bool,
   shouldHideFooter: PropTypes.bool,
   compact: PropTypes.bool
