@@ -28,6 +28,9 @@ function isValidTranslationKey(key) {
   if (key.includes('$')) return false;
   if (key.includes('<') || key.includes('>')) return false;
 
+  // Ignore dynamic JS expressions in JSX like {value} or {col.label}
+  if (key.startsWith('{') && key.endsWith('}')) return false;
+
   // Check for truncated contractions (words ending with 'n' that should be "n't")
   if (
     key.match(/\b\w+n$/) &&
