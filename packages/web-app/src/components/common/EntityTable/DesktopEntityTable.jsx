@@ -191,7 +191,7 @@ const DesktopEntityTable = ({
   pageSizeOptions,
   onPageChange,
   onSortChange,
-  onCSVDownload,
+  onExport,
   isNewQuery,
   shouldHideFooter,
   compact,
@@ -381,12 +381,12 @@ const DesktopEntityTable = ({
                 gap: 1,
                 alignItems: 'center'
               }}>
-              {onCSVDownload &&
+              {onExport &&
                 entityType === 'entrances' && (
                   <ExportFormatDropdown
                     disabled={nbTotalRows > MAX_DOCUMENTS_TO_EXPORT_IN_CSV}
                     onExport={format => {
-                      onCSVDownload(
+                      onExport(
                         exportColumns,
                         exportColumnLabels,
                         format
@@ -394,14 +394,14 @@ const DesktopEntityTable = ({
                     }}
                   />
                 )}
-              {onCSVDownload &&
+              {onExport &&
                 entityType !== 'entrances' &&
                 (nbTotalRows <= MAX_DOCUMENTS_TO_EXPORT_IN_CSV ? (
                   <Button
                     variant="outlined"
                     size="small"
                     onClick={() => {
-                      onCSVDownload(
+                      onExport(
                         exportColumns,
                         exportColumnLabels
                       );
@@ -546,7 +546,7 @@ DesktopEntityTable.propTypes = {
   pageSizeOptions: PropTypes.arrayOf(PropTypes.number).isRequired,
   onPageChange: PropTypes.func,
   onSortChange: PropTypes.func,
-  onCSVDownload: PropTypes.func,
+  onExport: PropTypes.func,
   isNewQuery: PropTypes.bool,
   shouldHideFooter: PropTypes.bool,
   compact: PropTypes.bool,

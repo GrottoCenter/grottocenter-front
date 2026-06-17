@@ -40,7 +40,7 @@ const SearchResults = ({ onSelected, hideExport, entityType, compact }) => {
             }
           : null
       }
-      onCSVDownload={
+      onExport={
         hideExport
           ? null
           : (columns, columnsName, format) => {

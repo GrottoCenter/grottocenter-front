@@ -55,10 +55,10 @@ const renderTable = (props = {}) =>
   );
 
 describe('DesktopEntityTable - Export controls', () => {
-  it('renders ExportFormatDropdown for entrances when onCSVDownload is provided', () => {
+  it('renders ExportFormatDropdown for entrances when onExport is provided', () => {
     renderTable({
       entityType: 'entrances',
-      onCSVDownload: jest.fn()
+      onExport: jest.fn()
     });
 
     // The dropdown renders a button with "Export" text
@@ -72,17 +72,17 @@ describe('DesktopEntityTable - Export controls', () => {
   it('renders CSV button for non-entrance entity types', () => {
     renderTable({
       entityType: 'documents',
-      onCSVDownload: jest.fn()
+      onExport: jest.fn()
     });
 
     expect(screen.getByText('Export to CSV')).toBeInTheDocument();
   });
 
-  it('passes format in onCSVDownload callback when a format is selected', () => {
-    const onCSVDownload = jest.fn();
+  it('passes format in onExport callback when a format is selected', () => {
+    const onExport = jest.fn();
     renderTable({
       entityType: 'entrances',
-      onCSVDownload
+      onExport
     });
 
     const exportButton = screen.getByRole('button', { name: /Export/i });
@@ -91,17 +91,26 @@ describe('DesktopEntityTable - Export controls', () => {
     const gpxOption = screen.getByRole('menuitem', { name: 'GPX' });
     fireEvent.click(gpxOption);
 
-    expect(onCSVDownload).toHaveBeenCalledWith(
+    expect(onExport).toHaveBeenCalledWith(
       expect.any(Array),
       expect.any(Array),
       'gpx'
     );
   });
 
-  it('does not render any export control when onCSVDownload is not provided', () => {
+  it('renders ExportFormatDropdown as disabled when nbTotalRows exceeds limit', () => {
     renderTable({
       entityType: 'entrances',
-      onCSVDownload: undefined
+      onExport: jest.fn(),
+      nbTotalRows: 10001
+    });
+    expect(screen.getByRole('button', { name: /Export/i })).toBeDisabled();
+  });
+
+  it('does not render any export control when onExport is not provided', () => {
+    renderTable({
+      entityType: 'entrances',
+      onExport: undefined
     });
 
     expect(screen.queryByRole('combobox')).not.toBeInTheDocument();

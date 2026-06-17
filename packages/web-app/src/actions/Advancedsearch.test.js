@@ -10,11 +10,6 @@ jest.mock('../conf/apiRoutes', () => ({
   advancedSearchExportUrl: 'http://api/advanced-search/export'
 }));
 
-// Mock exportFormats — use the real values
-jest.mock('../conf/exportFormats', () => ({
-  VALID_EXPORT_FORMATS: new Set(['csv', 'geojson', 'gpx', 'kml'])
-}));
-
 // Mock utils
 jest.mock('./utils', () => ({
   checkAndGetStatus: response => response
@@ -149,11 +144,6 @@ describe('downloadAdvancedSearchResults', () => {
     );
   });
 
-  /**
-   * Property: For any supported format, the fetch URL contains the format
-   * and the download filename uses the matching extension.
-   * Encodes: format validation + extension derivation are consistent.
-   */
   it('should produce correct URL and filename for any supported format', async () => {
     const formatArb = fc.constantFrom('csv', 'geojson', 'gpx', 'kml');
 
@@ -179,11 +169,6 @@ describe('downloadAdvancedSearchResults', () => {
     );
   });
 
-  /**
-   * Property: For any unsupported format string, the function falls back
-   * to csv for both URL and filename.
-   * Encodes: invalid formats never reach the API or appear in filenames.
-   */
   it('should fall back to csv for any unsupported format string', async () => {
     const unsupportedArb = fc
       .string({ minLength: 1, maxLength: 20 })
