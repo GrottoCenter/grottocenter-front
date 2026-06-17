@@ -4,7 +4,8 @@ import {
   SET_COUNTRY_ORGANIZATION_FAILURE,
   REMOVE_COUNTRY_ORGANIZATION,
   REMOVE_COUNTRY_ORGANIZATION_SUCCESS,
-  REMOVE_COUNTRY_ORGANIZATION_FAILURE
+  REMOVE_COUNTRY_ORGANIZATION_FAILURE,
+  RESET_COUNTRY_ORGANIZATION
 } from '../actions/Country/CountryOrganization';
 import REDUCER_STATUS from './ReducerStatus';
 
@@ -36,6 +37,8 @@ const reducer = (state = initialState, action) => {
         error: action.error,
         status: REDUCER_STATUS.FAILED
       };
+    case RESET_COUNTRY_ORGANIZATION:
+      return initialState;
     default:
       return state;
   }

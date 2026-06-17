@@ -4,7 +4,8 @@ import {
   SET_REGION_ORGANIZATION_FAILURE,
   REMOVE_REGION_ORGANIZATION,
   REMOVE_REGION_ORGANIZATION_SUCCESS,
-  REMOVE_REGION_ORGANIZATION_FAILURE
+  REMOVE_REGION_ORGANIZATION_FAILURE,
+  RESET_REGION_ORGANIZATION
 } from '../actions/Region/RegionOrganization';
 import REDUCER_STATUS from './ReducerStatus';
 
@@ -36,6 +37,8 @@ const reducer = (state = initialState, action) => {
         error: action.error,
         status: REDUCER_STATUS.FAILED
       };
+    case RESET_REGION_ORGANIZATION:
+      return initialState;
     default:
       return state;
   }

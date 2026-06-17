@@ -10,6 +10,9 @@ export const REMOVE_COUNTRY_ORGANIZATION = 'REMOVE_COUNTRY_ORGANIZATION';
 export const REMOVE_COUNTRY_ORGANIZATION_SUCCESS = 'REMOVE_COUNTRY_ORGANIZATION_SUCCESS';
 export const REMOVE_COUNTRY_ORGANIZATION_FAILURE = 'REMOVE_COUNTRY_ORGANIZATION_FAILURE';
 
+export const RESET_COUNTRY_ORGANIZATION = 'RESET_COUNTRY_ORGANIZATION';
+export const resetCountryOrganization = () => ({ type: RESET_COUNTRY_ORGANIZATION });
+
 // Set Actions
 const setCountryOrganizationAction = () => ({ type: SET_COUNTRY_ORGANIZATION });
 const setCountryOrganizationSuccess = payload => ({ type: SET_COUNTRY_ORGANIZATION_SUCCESS, payload });

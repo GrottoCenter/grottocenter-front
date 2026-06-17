@@ -10,6 +10,9 @@ export const REMOVE_REGION_ORGANIZATION = 'REMOVE_REGION_ORGANIZATION';
 export const REMOVE_REGION_ORGANIZATION_SUCCESS = 'REMOVE_REGION_ORGANIZATION_SUCCESS';
 export const REMOVE_REGION_ORGANIZATION_FAILURE = 'REMOVE_REGION_ORGANIZATION_FAILURE';
 
+export const RESET_REGION_ORGANIZATION = 'RESET_REGION_ORGANIZATION';
+export const resetRegionOrganization = () => ({ type: RESET_REGION_ORGANIZATION });
+
 // Set Actions
 const setRegionOrganizationAction = () => ({ type: SET_REGION_ORGANIZATION });
 const setRegionOrganizationSuccess = payload => ({ type: SET_REGION_ORGANIZATION_SUCCESS, payload });
