@@ -314,20 +314,18 @@ const Massif = ({ isLoading, error, massif }) => {
                   id: 'Discover the numbers about this massif and its caves.'
                 })}
               />
-              {(massif?.organizations?.length > 0 || isLoading) && (
-                <ScrollableContent
-                  anchorId="organizations"
-                  title={formatMessage({ id: 'Organizations' })}
-                  content={
-                    <AssociationSection
-                      organizations={massif?.organizations}
-                      entityType="massif"
-                      entityId={massif.id}
-                      isLoading={isLoading}
-                    />
-                  }
-                />
-              )}
+              <ScrollableContent
+                anchorId="organizations"
+                title={formatMessage({ id: 'Organizations' })}
+                content={
+                  <AssociationSection
+                    organizations={massif?.organizations}
+                    entityType="massif"
+                    entityId={massif.id}
+                    isLoading={isLoading}
+                  />
+                }
+              />
               {massif?.networks?.length > 0 && (
                 <ScrollableContent
                   dense

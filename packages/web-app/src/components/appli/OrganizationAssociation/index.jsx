@@ -10,9 +10,9 @@ import CancelIcon from '@mui/icons-material/Cancel';
 
 import AssociationForm from './AssociationForm';
 import StandardDialog from '../../common/StandardDialog';
-import { setCountryOrganization, removeCountryOrganization } from '../../../actions/Country/CountryOrganization';
-import { setRegionOrganization, removeRegionOrganization } from '../../../actions/Region/RegionOrganization';
-import { setMassifOrganization, removeMassifOrganization } from '../../../actions/Massif/MassifOrganization';
+import { setCountryOrganization, removeCountryOrganization, resetCountryOrganization } from '../../../actions/Country/CountryOrganization';
+import { setRegionOrganization, removeRegionOrganization, resetRegionOrganization } from '../../../actions/Region/RegionOrganization';
+import { setMassifOrganization, removeMassifOrganization, resetMassifOrganization } from '../../../actions/Massif/MassifOrganization';
 import { fetchCountry } from '../../../actions/Country/GetCountry';
 import { fetchRegion } from '../../../actions/Region/GetRegion';
 import { loadMassif } from '../../../actions/Massif/GetMassif';
@@ -28,8 +28,8 @@ const AssociationSection = ({
   const { formatMessage } = useIntl();
   const dispatch = useDispatch();
 
-  const { isAuth, isLeader, isModerator, isAdmin } = usePermissions();
-  const canManageAssociations = isAuth && (isLeader || isModerator || isAdmin);
+  const { isAuth } = usePermissions();
+  const canManageAssociations = isAuth;
 
   const reducerKey = `${entityType}Organization`;
   const reducerState = useSelector(state => state[reducerKey]);
@@ -44,9 +44,16 @@ const AssociationSection = ({
   // Refresh entity data when association is updated successfully
   useEffect(() => {
     if (pendingOperationRef.current && status === REDUCER_STATUS.SUCCEEDED) {
-      if (entityType === 'country') dispatch(fetchCountry(entityId));
-      else if (entityType === 'region') dispatch(fetchRegion(parentEntityId, entityId));
-      else if (entityType === 'massif') dispatch(loadMassif(entityId));
+      if (entityType === 'country') {
+        dispatch(fetchCountry(entityId));
+        dispatch(resetCountryOrganization());
+      } else if (entityType === 'region') {
+        dispatch(fetchRegion(parentEntityId, entityId));
+        dispatch(resetRegionOrganization());
+      } else if (entityType === 'massif') {
+        dispatch(loadMassif(entityId));
+        dispatch(resetMassifOrganization());
+      }
       
       setOrgToRemove(null);
       setIsPending(false);
@@ -56,6 +63,15 @@ const AssociationSection = ({
       pendingOperationRef.current = false;
     }
   }, [status, dispatch, entityType, entityId, parentEntityId]);
+
+  useEffect(() => {
+    return () => {
+      // Clean up reducer state on unmount to prevent stale status affecting other instances
+      if (entityType === 'country') dispatch(resetCountryOrganization());
+      else if (entityType === 'region') dispatch(resetRegionOrganization());
+      else if (entityType === 'massif') dispatch(resetMassifOrganization());
+    };
+  }, [dispatch, entityType]);
 
   const handleSet = (orgData) => {
     setIsPending(true);
@@ -90,17 +106,17 @@ const AssociationSection = ({
 
   return (
     <Box sx={{ my: 2 }}>
-      {isEmpty ? (
-        entityType === 'massif' ? null : (
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-            {formatMessage({
-              id: entityType === 'country'
-                ? 'No organization is currently associated with this country.'
-                : 'No organization is currently associated with this region.'
-            })}
-          </Typography>
-        )
-      ) : (
+      {isEmpty && entityType !== 'massif' && (
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+          {formatMessage({
+            id: entityType === 'country'
+              ? 'No organization is currently associated with this country.'
+              : 'No organization is currently associated with this region.'
+          })}
+        </Typography>
+      )}
+
+      {!isEmpty &&
         organizations.map(org => {
           if (org.isDeleted) {
             return (
@@ -148,7 +164,7 @@ const AssociationSection = ({
             </Box>
           );
         })
-      )}
+      }
 
       {canManageAssociations && (
         <Box sx={{ mt: 2 }}>

@@ -180,20 +180,18 @@ const Country = ({
               id: 'Discover the numbers about this country and its massifs and caves.'
             })}
           />
-          {(country?.organizations?.length > 0 || isLoading) && (
-            <ScrollableContent
-              anchorId="organizations"
-              title={formatMessage({ id: 'Organizations' })}
-              content={
-                <AssociationSection
-                  organizations={country?.organizations}
-                  entityType="country"
-                  entityId={country?.id}
-                  isLoading={isLoading}
-                />
-              }
-            />
-          )}
+          <ScrollableContent
+            anchorId="organizations"
+            title={formatMessage({ id: 'Organizations' })}
+            content={
+              <AssociationSection
+                organizations={country?.organizations}
+                entityType="country"
+                entityId={country?.id}
+                isLoading={isLoading}
+              />
+            }
+          />
           <ScrollableContent
             anchorId="regions"
             title={formatMessage({ id: 'Regions' })}

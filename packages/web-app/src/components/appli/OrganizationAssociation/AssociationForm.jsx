@@ -123,8 +123,11 @@ const AssociationForm = ({
             }
           }}
           inputValue={inputValue}
-          onInputChange={(event, newInputValue) => {
+          onInputChange={(event, newInputValue, reason) => {
             setInputValue(newInputValue);
+            if (reason === 'input') {
+              setSelectedOrg(null);
+            }
           }}
           renderInput={params => (
             <TextField
