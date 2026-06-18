@@ -121,15 +121,12 @@ const messages = {
   'quantityKind.Temperature': 'Temperature',
   'quantityKind.RelativeHumidity': 'Relative Humidity',
   'quantityKind.AtmosphericPressure': 'Atmospheric Pressure',
-  'quantityKind.CO2Concentration': 'CO₂ Concentration',
   'quantityKind.WaterLevel': 'Water Level',
   'quantityKind.WaterFlow': 'Water Flow',
   'quantityKind.Conductivity': 'Conductivity',
   'quantityKind.pH': 'pH',
   'quantityKind.Precipitation': 'Precipitation',
   'quantityKind.DewPointTemperature': 'Dew Point Temperature',
-  'quantityKind.DissolvedOxygen': 'Dissolved Oxygen',
-  'quantityKind.TotalDissolvedSolids': 'Total Dissolved Solids',
   'quantityKind.Salinity': 'Salinity',
   'quantityKind.Turbidity': 'Turbidity',
   'quantityKind.RedoxPotential': 'Redox Potential',
@@ -138,7 +135,6 @@ const messages = {
   'quantityKind.LightIntensity': 'Light Intensity',
   'quantityKind.AirVelocity': 'Air Velocity',
   'quantityKind.WaterVelocity': 'Water Velocity',
-  'quantityKind.RadonConcentration': 'Radon Concentration',
   'quantityKind.IsotopeDelta': 'Isotope Delta'
 };
 
