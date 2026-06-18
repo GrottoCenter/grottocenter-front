@@ -330,6 +330,11 @@ export const subscribeToRegionUrl = (countryId, regionId) =>
 export const unsubscribeFromRegionUrl = (countryId, regionId) =>
   `${API_BASE_PATH}/countries/${countryId}/regions/${regionId}/unsubscribe`;
 
+// ===== Substances urls
+export const substancesUrl = `${API_BASE_PATH}/substances`;
+export const substancesSearchUrl = search =>
+  `${API_BASE_PATH}/substances?search=${encodeURIComponent(search)}`;
+
 // ===== Observations urls
 export const observationsImportUrl = `${API_BASE_PATH}/observations/import`;
 

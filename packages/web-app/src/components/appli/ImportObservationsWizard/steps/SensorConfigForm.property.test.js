@@ -2,7 +2,7 @@ import * as fc from 'fast-check';
 import { SUBSTANCE_REQUIRING_CODES } from '../constants/substanceUtils';
 
 /**
- * Feature: sensor-substance-field
+ * Feature: substance-reference-table
  *
  * Property-based tests for the SensorConfigForm logic.
  * Tests pure formulas extracted from the component to avoid heavy DOM rendering.
@@ -18,20 +18,14 @@ import { SUBSTANCE_REQUIRING_CODES } from '../constants/substanceUtils';
 const computeCanSubmit = ({
   quantityKindId,
   unitId,
-  substance,
+  selectedSubstance,
   substanceRequired,
   isSubmitting
 }) =>
   quantityKindId !== '' &&
   unitId !== '' &&
-  (!substanceRequired || substance.trim() !== '') &&
+  (!substanceRequired || selectedSubstance !== null) &&
   !isSubmitting;
-
-/**
- * Substance value included in configData on submit.
- */
-const computeSubmittedSubstance = ({ substance, substanceRequired }) =>
-  substanceRequired ? substance.trim() : null;
 
 /**
  * Error display logic from the catch block.
@@ -44,37 +38,35 @@ const computeDisplayedError = (error, genericMessage) => {
 };
 
 // ---------------------------------------------------------------------------
-// Property 1: Whitespace-only substance disables submit
+// Property 1: Submit disabled without substance selection
 //
-// For any whitespace-only string, when the quantity kind requires substance,
-// canSubmit must be false.
+// For any state where the quantity kind is a Substance_Requiring_Quantity_Kind
+// and selectedSubstance is null, the form submit button SHALL be disabled.
 //
-// Encodes: empty or whitespace-only substance is not a valid entry.
-// Covers: all possible whitespace combinations.
+// Encodes: null substance selection disables submit for substance-requiring QKs.
+// Covers: all substance-requiring codes with null substance.
 //
-// Validates: Requirements 2.6
+// Validates: Requirements 8.1
 // ---------------------------------------------------------------------------
-describe('Feature: sensor-substance-field, Property 1: Whitespace-only substance disables submit', () => {
-  // Only characters that JavaScript's String.prototype.trim() removes.
-  // Note: \u200B (zero-width space) is NOT trimmed by .trim() so is excluded.
-  const whitespaceArb = fc.stringMatching(
-    /^[ \t\n\r\u00A0]*$/
-  );
-
+describe('Feature: substance-reference-table, Property 1: Submit disabled without substance selection', () => {
   const substanceRequiringCodeArb = fc.constantFrom(
     ...SUBSTANCE_REQUIRING_CODES
   );
 
-  it('canSubmit is false when substance is whitespace-only and QK requires substance', () => {
+  const quantityKindIdArb = fc.constantFrom('17', '22');
+  const unitIdArb = fc.constantFrom('16', '18', '29');
+
+  it('canSubmit is false when selectedSubstance is null and QK requires substance', () => {
     fc.assert(
       fc.property(
-        whitespaceArb,
+        quantityKindIdArb,
+        unitIdArb,
         substanceRequiringCodeArb,
-        (whitespaceSubstance, _code) => {
+        (quantityKindId, unitId, _code) => {
           const result = computeCanSubmit({
-            quantityKindId: '17',
-            unitId: '16',
-            substance: whitespaceSubstance,
+            quantityKindId,
+            unitId,
+            selectedSubstance: null,
             substanceRequired: true,
             isSubmitting: false
           });
@@ -84,37 +76,29 @@ describe('Feature: sensor-substance-field, Property 1: Whitespace-only substance
       { numRuns: 100 }
     );
   });
-});
 
-// ---------------------------------------------------------------------------
-// Property 2: Submitted substance is trimmed
-//
-// For any string with leading/trailing whitespace surrounding non-whitespace
-// content, the submitted substance equals input.trim().
-//
-// Encodes: substance is always trimmed before submission.
-// Covers: arbitrary padding around non-empty core content.
-//
-// Validates: Requirements 2.7
-// ---------------------------------------------------------------------------
-describe('Feature: sensor-substance-field, Property 2: Submitted substance is trimmed', () => {
-  const paddedSubstanceArb = fc.tuple(
-    fc.stringMatching(/^[ \t]{0,5}$/),
-    fc.string({ minLength: 1, maxLength: 90 }).filter(
-      s => s.trim().length > 0
-    ),
-    fc.stringMatching(/^[ \t]{0,5}$/)
-  ).map(([left, core, right]) => left + core + right);
+  it('canSubmit is true when selectedSubstance is non-null and QK requires substance', () => {
+    const substanceObjectArb = fc.record({
+      id: fc.integer({ min: 1, max: 10000 }),
+      name: fc.string({ minLength: 1, maxLength: 200 })
+    });
 
-  it('submitted substance equals input.trim() for substance-requiring QKs', () => {
     fc.assert(
-      fc.property(paddedSubstanceArb, substance => {
-        const result = computeSubmittedSubstance({
-          substance,
-          substanceRequired: true
-        });
-        expect(result).toBe(substance.trim());
-      }),
+      fc.property(
+        quantityKindIdArb,
+        unitIdArb,
+        substanceObjectArb,
+        (quantityKindId, unitId, substance) => {
+          const result = computeCanSubmit({
+            quantityKindId,
+            unitId,
+            selectedSubstance: substance,
+            substanceRequired: true,
+            isSubmitting: false
+          });
+          expect(result).toBe(true);
+        }
+      ),
       { numRuns: 100 }
     );
   });
@@ -129,9 +113,9 @@ describe('Feature: sensor-substance-field, Property 2: Submitted substance is tr
 // Encodes: API validation messages are shown as-is to the user.
 // Covers: arbitrary non-empty message strings.
 //
-// Validates: Requirements 4.1
+// Validates: Requirements 8.3
 // ---------------------------------------------------------------------------
-describe('Feature: sensor-substance-field, Property 4: API 400 error messages displayed verbatim', () => {
+describe('Feature: substance-reference-table, Property 4: API 400 error messages displayed verbatim', () => {
   const errorMessageArb = fc.string({ minLength: 1, maxLength: 200 });
 
   it('displays exact API message for 400 errors', () => {
@@ -142,6 +126,20 @@ describe('Feature: sensor-substance-field, Property 4: API 400 error messages di
           'An error occurred while creating the sensor configuration.';
         const displayed = computeDisplayedError(error, genericMessage);
         expect(displayed).toBe(message);
+      }),
+      { numRuns: 100 }
+    );
+  });
+
+  it('displays generic message for non-400 errors', () => {
+    const statusArb = fc.constantFrom(500, 502, 503, 504);
+
+    fc.assert(
+      fc.property(statusArb, errorMessageArb, (status, message) => {
+        const error = { status, body: { message } };
+        const genericMessage = 'Failed to create sensor configuration.';
+        const displayed = computeDisplayedError(error, genericMessage);
+        expect(displayed).toBe(genericMessage);
       }),
       { numRuns: 100 }
     );

@@ -116,7 +116,9 @@ const SensorConfigList = ({ deviceId }) => {
                   {config.label
                     ? `${config.label} — `
                     : ''}
-                  {formatMessage({ id: `quantityKind.${config.quantityKindCode}` })} — {config.unitSymbol || ''}
+                  {config.substanceName
+                    ? `${formatMessage({ id: `quantityKind.${config.quantityKindCode}` })} [${config.substanceName}] (${config.unitSymbol || ''})`
+                    : `${formatMessage({ id: `quantityKind.${config.quantityKindCode}` })} (${config.unitSymbol || ''})`}
                 </Typography>
               }
               secondary={

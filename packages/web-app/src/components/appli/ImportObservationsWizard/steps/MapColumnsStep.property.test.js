@@ -1,7 +1,7 @@
 import * as fc from 'fast-check';
 
 /**
- * Feature: sensor-substance-field
+ * Feature: substance-reference-table
  *
  * Property-based tests for the sensor config label format logic
  * in MapColumnsStep. Tests the pure label formula to avoid React/intl deps.
@@ -16,29 +16,28 @@ import * as fc from 'fast-check';
  * Uses a mock formatMessage that returns the quantityKindCode as-is
  * (since we're testing the format logic, not the i18n lookup).
  */
-const computeLabel = ({ quantityKindCode, substance, unitSymbol }) => {
+const computeLabel = ({ quantityKindCode, substanceName, unitSymbol }) => {
   const quantityKindName = quantityKindCode;
-  return substance
-    ? `${quantityKindName} [${substance}] (${unitSymbol})`
+  return substanceName
+    ? `${quantityKindName} [${substanceName}] (${unitSymbol})`
     : `${quantityKindName} (${unitSymbol})`;
 };
 
 // ---------------------------------------------------------------------------
-// Property 5: Sensor config label format
+// Property 6: Column label format with substanceName
 //
-// For any normalized sensor configuration object with a quantityKindCode,
-// unitSymbol, and substance (string or null), the rendered label matches
-// the pattern "{quantityKindName} [{substance}] ({unitSymbol})" when
-// substance is non-null, or "{quantityKindName} ({unitSymbol})" when
-// substance is null.
+// For any normalized sensor configuration, the rendered label matches
+// "{quantityKindName} [{substanceName}] ({unitSymbol})" when substanceName
+// is non-null, or "{quantityKindName} ({unitSymbol})" when substanceName
+// is null.
 //
-// Encodes: label format includes substance in brackets only when present.
-// Covers: all quantity kind codes, arbitrary substance strings, arbitrary
+// Encodes: label format includes substance name in brackets only when present.
+// Covers: all quantity kind codes, arbitrary substance names, arbitrary
 //         unit symbols.
 //
-// Validates: Requirements 5.1, 5.2
+// Validates: Requirements 6.1, 6.2
 // ---------------------------------------------------------------------------
-describe('Feature: sensor-substance-field, Property 5: Sensor config label format', () => {
+describe('Feature: substance-reference-table, Property 6: Column label format with substanceName', () => {
   const sensorConfigArb = fc.record({
     quantityKindCode: fc.constantFrom(
       'Temperature',
@@ -46,19 +45,19 @@ describe('Feature: sensor-substance-field, Property 5: Sensor config label forma
       'IsotopeDelta',
       'pH'
     ),
-    substance: fc.option(fc.string({ minLength: 1, maxLength: 100 }), {
+    substanceName: fc.option(fc.string({ minLength: 1, maxLength: 200 }), {
       nil: null
     }),
     unitSymbol: fc.string({ minLength: 1, maxLength: 20 })
   });
 
-  it('label matches expected format with substance in brackets when non-null', () => {
+  it('label matches expected format with substanceName in brackets when non-null', () => {
     fc.assert(
       fc.property(sensorConfigArb, sc => {
         const label = computeLabel(sc);
 
-        if (sc.substance !== null) {
-          const expected = `${sc.quantityKindCode} [${sc.substance}] (${sc.unitSymbol})`;
+        if (sc.substanceName !== null) {
+          const expected = `${sc.quantityKindCode} [${sc.substanceName}] (${sc.unitSymbol})`;
           expect(label).toBe(expected);
         } else {
           const expected = `${sc.quantityKindCode} (${sc.unitSymbol})`;

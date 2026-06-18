@@ -37,9 +37,29 @@ jest.mock('../../../../actions/Observations/importWizard', () => ({
     })
   ),
   fetchSensorConfigs: jest.fn(() => () => Promise.resolve([])),
+  createSensorConfig: jest.fn(() => () => Promise.resolve()),
   SET_CONFIRMED_DEVICE: 'SET_CONFIRMED_DEVICE',
   CLEAR_CONFIRMED_DEVICE: 'CLEAR_CONFIRMED_DEVICE'
 }));
+
+jest.mock('../../../../actions/Substance', () => ({
+  searchSubstances: () => () => Promise.resolve([]),
+  createSubstance: () => () => Promise.resolve({ id: 1, name: 'Nitrate' })
+}));
+
+jest.mock('../components/SubstanceAutocomplete', () => {
+  const React = require('react');
+  return {
+    __esModule: true,
+    default: ({ value, onChange }) =>
+      React.createElement('div', { 'data-testid': 'sensor-config-substance' },
+        React.createElement('button', {
+          'data-testid': 'substance-select-button',
+          onClick: () => onChange({ id: 1, name: 'Nitrate', formula: 'NO₃⁻', casNumber: null, externalId: '943', externalSource: 'PubChem' })
+        }, value ? value.name : 'Select substance')
+      )
+  };
+});
 
 // ---- i18n messages used by DeviceSensorsStep ----
 const messages = {
@@ -83,7 +103,19 @@ const messages = {
     'Precision (upper)',
   'ImportObservationsWizard.DeviceSensorsStep.quantityKind': 'Quantity kind',
   'ImportObservationsWizard.DeviceSensorsStep.resolution': 'Resolution',
+  'ImportObservationsWizard.DeviceSensorsStep.sensorConfigLabel': 'Label',
+  'ImportObservationsWizard.DeviceSensorsStep.substance': 'Substance',
+  'ImportObservationsWizard.DeviceSensorsStep.substancePlaceholder':
+    'Search substance...',
+  'ImportObservationsWizard.DeviceSensorsStep.substanceNoResults':
+    'No results',
+  'ImportObservationsWizard.DeviceSensorsStep.substanceViaPubChem':
+    'via PubChem',
+  'ImportObservationsWizard.DeviceSensorsStep.substanceSearchHint':
+    'Type at least 2 characters',
   'ImportObservationsWizard.DeviceSensorsStep.unit': 'Unit',
+  'ImportObservationsWizard.DeviceSensorsStep.deviceSerialNumber':
+    'Serial number',
   'ImportObservationsWizard.cancel': 'Cancel',
   // Quantity kind labels
   'quantityKind.Temperature': 'Temperature',
@@ -102,15 +134,12 @@ const messages = {
   'quantityKind.Turbidity': 'Turbidity',
   'quantityKind.RedoxPotential': 'Redox Potential',
   'quantityKind.Resistivity': 'Resistivity',
-  'quantityKind.NitrateConcentration': 'Nitrate Concentration',
-  'quantityKind.NitriteConcentration': 'Nitrite Concentration',
-  'quantityKind.AmmoniumConcentration': 'Ammonium Concentration',
-  'quantityKind.PhosphateConcentration': 'Phosphate Concentration',
-  'quantityKind.SilicateConcentration': 'Silicate Concentration',
+  'quantityKind.Concentration': 'Concentration',
   'quantityKind.LightIntensity': 'Light Intensity',
   'quantityKind.AirVelocity': 'Air Velocity',
   'quantityKind.WaterVelocity': 'Water Velocity',
-  'quantityKind.RadonConcentration': 'Radon Concentration'
+  'quantityKind.RadonConcentration': 'Radon Concentration',
+  'quantityKind.IsotopeDelta': 'Isotope Delta'
 };
 
 const defaultState = {
