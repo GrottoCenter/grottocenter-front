@@ -33,6 +33,7 @@ describe('exportProfile', () => {
       ],
       context: {
         caveId: 42,
+        locationMode: 'pointAndCave',
         pointLabel: 'Salle du Chaos',
         latitude: '43.123',
         longitude: '2.987',
@@ -55,6 +56,7 @@ describe('exportProfile', () => {
     expect(profile.timezone).toBe('Europe/Paris');
     expect(profile.dateFormat).toBe('DD/MM/YYYY HH:mm:ss');
     expect(profile.caveId).toBe(42);
+    expect(profile.locationMode).toBe('pointAndCave');
     expect(profile.pointLabel).toBe('Salle du Chaos');
     expect(profile.latitude).toBe(43.123);
     expect(profile.longitude).toBe(2.987);
@@ -150,6 +152,7 @@ describe('importProfile', () => {
     ]);
     expect(result.state.deviceId).toBe('d1');
     expect(result.state.context).toEqual({
+      locationMode: 'pointAndCave',
       caveId: 10,
       pointLabel: 'Point A',
       latitude: '45.0',

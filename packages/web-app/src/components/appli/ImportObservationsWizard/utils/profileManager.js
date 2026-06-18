@@ -64,6 +64,7 @@ export const exportProfile = state => {
     columnMappings: profileColumnMappings,
     deviceId: state.confirmedDevice ? state.confirmedDevice.id : null,
     caveId: context.caveId != null ? Number(context.caveId) : null,
+    locationMode: context.locationMode || 'pointAndCave',
     pointLabel: context.pointLabel,
     latitude: context.latitude != null && context.latitude !== ''
       && !Number.isNaN(Number(context.latitude))
@@ -143,6 +144,7 @@ export const importProfile = json => {
         ? json.deviceId
         : (json.confirmedDevice && json.confirmedDevice.id) || null,
       context: {
+        locationMode: json.locationMode || 'pointAndCave',
         caveId: json.caveId,
         pointLabel: json.pointLabel,
         latitude: json.latitude,

@@ -76,6 +76,7 @@ const wizardStateArbitrary = fc.record({
     { nil: null }
   ),
   context: fc.record({
+    locationMode: fc.constantFrom('pointAndCave', 'pointOnly', 'caveOnly'),
     caveId: fc.option(fc.nat(), { nil: null }),
     pointLabel: fc.string(),
     authorIds: fc.array(fc.nat(), { minLength: 0, maxLength: 5 }),
@@ -135,6 +136,7 @@ describe('Property 9: Profile export/import round-trip', () => {
         );
 
         // Context fields
+        expect(restored.context.locationMode).toEqual(state.context.locationMode);
         expect(restored.context.caveId).toEqual(state.context.caveId);
         expect(restored.context.pointLabel).toEqual(state.context.pointLabel);
         expect(restored.context.authorIds).toEqual(state.context.authorIds);
