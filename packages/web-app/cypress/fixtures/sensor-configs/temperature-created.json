@@ -3,6 +3,7 @@
   "device": 1,
   "quantityKind": { "id": 1, "code": "Temperature" },
   "unit": { "id": 1, "symbol": "°C" },
+  "substance": null,
   "precisionUpper": null,
   "precisionLower": null,
   "resolution": null,
