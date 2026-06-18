@@ -10,6 +10,9 @@ export const REMOVE_MASSIF_ORGANIZATION = 'REMOVE_MASSIF_ORGANIZATION';
 export const REMOVE_MASSIF_ORGANIZATION_SUCCESS = 'REMOVE_MASSIF_ORGANIZATION_SUCCESS';
 export const REMOVE_MASSIF_ORGANIZATION_FAILURE = 'REMOVE_MASSIF_ORGANIZATION_FAILURE';
 
+export const RESET_MASSIF_ORGANIZATION = 'RESET_MASSIF_ORGANIZATION';
+export const resetMassifOrganization = () => ({ type: RESET_MASSIF_ORGANIZATION });
+
 // Set Actions
 const setMassifOrganizationAction = () => ({ type: SET_MASSIF_ORGANIZATION });
 const setMassifOrganizationSuccess = payload => ({ type: SET_MASSIF_ORGANIZATION_SUCCESS, payload });

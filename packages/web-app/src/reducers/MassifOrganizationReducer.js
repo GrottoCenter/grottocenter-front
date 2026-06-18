@@ -4,7 +4,8 @@ import {
   SET_MASSIF_ORGANIZATION_FAILURE,
   REMOVE_MASSIF_ORGANIZATION,
   REMOVE_MASSIF_ORGANIZATION_SUCCESS,
-  REMOVE_MASSIF_ORGANIZATION_FAILURE
+  REMOVE_MASSIF_ORGANIZATION_FAILURE,
+  RESET_MASSIF_ORGANIZATION
 } from '../actions/Massif/MassifOrganization';
 import REDUCER_STATUS from './ReducerStatus';
 
@@ -36,6 +37,8 @@ const reducer = (state = initialState, action) => {
         error: action.error,
         status: REDUCER_STATUS.FAILED
       };
+    case RESET_MASSIF_ORGANIZATION:
+      return initialState;
     default:
       return state;
   }
