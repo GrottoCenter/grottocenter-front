@@ -228,6 +228,7 @@ const ContextStep = ({ initialCaveId, caveIdLocked }) => {
         setCaveEntrances(eligibleEntrances);
 
         if (
+          context.locationMode === 'pointAndCave' &&
           !context.unknownCoordinates &&
           context.latitude == null &&
           context.longitude == null &&
@@ -348,7 +349,7 @@ const ContextStep = ({ initialCaveId, caveIdLocked }) => {
     dispatch({ type: SET_CONTEXT, context: { caveId: cave ? cave.id : null } });
 
     if (cave) {
-      // Fetch cave details to pre-fill coordinates from first eligible entrance
+      // Fetch cave details and populate entrances for map display
       dispatch(fetchCaveById(cave.id))
         .then(data => {
           if (!data || !data.entrances) return;
@@ -360,8 +361,13 @@ const ContextStep = ({ initialCaveId, caveIdLocked }) => {
           );
           setCaveEntrances(eligibleEntrances);
 
+          // Pre-fill coordinates only in "pointAndCave" mode
           const entrance = eligibleEntrances[0];
-          if (entrance && !context.unknownCoordinates) {
+          if (
+            entrance &&
+            context.locationMode === 'pointAndCave' &&
+            !context.unknownCoordinates
+          ) {
             dispatch({
               type: SET_CONTEXT,
               context: {
