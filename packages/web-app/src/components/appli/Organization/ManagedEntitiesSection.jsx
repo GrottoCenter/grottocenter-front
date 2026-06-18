@@ -67,6 +67,12 @@ const ManagedEntitiesSection = ({ organization }) => {
             const regionId = firstHyphenIndex !== -1 ? regionIdStr.substring(firstHyphenIndex + 1) : region.id;
 
             if (!countryId) {
+              if (process.env.NODE_ENV !== 'production') {
+                console.warn(
+                  `ManagedEntitiesSection: could not determine countryId for region "${region.name}" (id: ${region.id}). ` +
+                    'Expected an ISO 3166-2 "COUNTRY-REGION" id or a region.countryId field. Falling back to the countries list.'
+                );
+              }
               return '/ui/countries';
             }
 

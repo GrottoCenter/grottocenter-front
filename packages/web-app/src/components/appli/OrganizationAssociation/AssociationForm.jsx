@@ -20,6 +20,9 @@ import {
   AUTOCOMPLETE_MIN_CHARACTERS
 } from '../../../conf/config';
 
+// Max length for an inline-created organization name (Requirement 7 AC3).
+const ORGANIZATION_NAME_MAX_LENGTH = 200;
+
 const AssociationForm = ({
   open,
   onClose,
@@ -134,6 +137,10 @@ const AssociationForm = ({
               {...params}
               label={formatMessage({ id: 'Search or create organization' })}
               margin="normal"
+              inputProps={{
+                ...params.inputProps,
+                maxLength: ORGANIZATION_NAME_MAX_LENGTH
+              }}
               InputProps={{
                 ...params.InputProps,
                 endAdornment: (

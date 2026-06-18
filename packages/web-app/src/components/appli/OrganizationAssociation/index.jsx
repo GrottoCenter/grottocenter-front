@@ -18,6 +18,13 @@ import { fetchRegion } from '../../../actions/Region/GetRegion';
 import { loadMassif } from '../../../actions/Massif/GetMassif';
 import REDUCER_STATUS from '../../../reducers/ReducerStatus';
 
+// Maps an entityType to its Redux reducer key registered in GCReducer.
+const ORGANIZATION_REDUCER_KEYS = {
+  country: 'countryOrganization',
+  region: 'regionOrganization',
+  massif: 'massifOrganization'
+};
+
 const AssociationSection = ({
   organizations = [],
   entityType,
@@ -31,13 +38,17 @@ const AssociationSection = ({
   const { isAuth } = usePermissions();
   const canManageAssociations = isAuth;
 
-  const reducerKey = `${entityType}Organization`;
+  const reducerKey = ORGANIZATION_REDUCER_KEYS[entityType];
   const reducerState = useSelector(state => state[reducerKey]);
   const status = reducerState?.status;
   const error = reducerState?.error;
 
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [orgToRemove, setOrgToRemove] = useState(null);
+  // Both track an in-flight set/remove operation, but serve different purposes:
+  // - isPending is React state, driving re-renders to disable buttons / show progress.
+  // - pendingOperationRef is a ref read inside the status effect to tell "our" status
+  //   transitions apart from unrelated ones (e.g. another instance) without re-triggering it.
   const [isPending, setIsPending] = useState(false);
   const pendingOperationRef = useRef(false);
 
