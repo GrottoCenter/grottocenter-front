@@ -18,16 +18,18 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 import { useNotification } from '../../../../hooks';
 import { createSensorConfig } from '../../../../actions/Observations/importWizard';
+import { createSubstance } from '../../../../actions/Substance';
 import { QUANTITY_KINDS } from '../constants/quantityKinds';
 import { UNITS } from '../constants/units';
 import { QUANTITY_KIND_UNITS_MAP } from '../constants/quantityKindUnitsMap';
 import { isSubstanceRequired } from '../constants/substanceUtils';
+import SubstanceAutocomplete from '../components/SubstanceAutocomplete';
 
 const initialFormState = {
   label: '',
   quantityKindId: '',
   unitId: '',
-  substance: '',
+  selectedSubstance: null,
   precisionUpper: '',
   precisionLower: '',
   resolution: '',
@@ -90,7 +92,7 @@ const SensorConfigForm = ({ deviceId }) => {
           const qk = QUANTITY_KINDS.find(q => q.id === Number(value));
           const code = qk ? qk.code : '';
           if (!isSubstanceRequired(code)) {
-            next.substance = '';
+            next.selectedSubstance = null;
           }
         }
         return next;
@@ -130,7 +132,7 @@ const SensorConfigForm = ({ deviceId }) => {
   const canSubmit =
     form.quantityKindId !== '' &&
     form.unitId !== '' &&
-    (!substanceRequired || form.substance.trim() !== '') &&
+    (!substanceRequired || form.selectedSubstance !== null) &&
     !isSubmitting;
 
   const handleSubmit = useCallback(async () => {
@@ -143,28 +145,49 @@ const SensorConfigForm = ({ deviceId }) => {
     setIsSubmitting(true);
     setSubmitError(null);
 
-    const configData = {
-      deviceId,
-      label: form.label.trim() || undefined,
-      quantityKindId: Number(form.quantityKindId),
-      unitId: Number(form.unitId),
-      substance: substanceRequired ? form.substance.trim() : null,
-      precisionUpper:
-        form.precisionUpper !== '' ? Number(form.precisionUpper) : null,
-      precisionLower:
-        form.precisionLower !== '' ? Number(form.precisionLower) : null,
-      resolution: form.resolution !== '' ? Number(form.resolution) : null,
-      detectionLimitMin:
-        form.detectionLimitMin !== ''
-          ? Number(form.detectionLimitMin)
-          : null,
-      detectionLimitMax:
-        form.detectionLimitMax !== ''
-          ? Number(form.detectionLimitMax)
-          : null
-    };
-
     try {
+      let idSubstance;
+
+      if (substanceRequired && form.selectedSubstance) {
+        if (form.selectedSubstance.id === null) {
+          // PubChem result — persist first
+          const persisted = await dispatch(
+            createSubstance({
+              name: form.selectedSubstance.name,
+              formula: form.selectedSubstance.formula || undefined,
+              casNumber: form.selectedSubstance.casNumber || undefined,
+              externalId: form.selectedSubstance.externalId || undefined,
+              externalSource:
+                form.selectedSubstance.externalSource || undefined
+            })
+          );
+          idSubstance = persisted.id;
+        } else {
+          idSubstance = form.selectedSubstance.id;
+        }
+      }
+
+      const configData = {
+        deviceId,
+        label: form.label.trim() || undefined,
+        quantityKindId: Number(form.quantityKindId),
+        unitId: Number(form.unitId),
+        ...(idSubstance != null && { idSubstance }),
+        precisionUpper:
+          form.precisionUpper !== '' ? Number(form.precisionUpper) : null,
+        precisionLower:
+          form.precisionLower !== '' ? Number(form.precisionLower) : null,
+        resolution: form.resolution !== '' ? Number(form.resolution) : null,
+        detectionLimitMin:
+          form.detectionLimitMin !== ''
+            ? Number(form.detectionLimitMin)
+            : null,
+        detectionLimitMax:
+          form.detectionLimitMax !== ''
+            ? Number(form.detectionLimitMax)
+            : null
+      };
+
       await dispatch(createSensorConfig(configData));
       setForm(initialFormState);
       setValidationErrors({});
@@ -263,22 +286,12 @@ const SensorConfigForm = ({ deviceId }) => {
 
         {/* Substance — visible only for Concentration / IsotopeDelta */}
         {substanceRequired && (
-          <TextField
-            label={formatMessage({
-              id: 'ImportObservationsWizard.DeviceSensorsStep.substance'
-            })}
-            value={form.substance}
-            onChange={handleFieldChange('substance')}
-            size="small"
-            inputProps={{ maxLength: 100 }}
-            slotProps={{
-              input: {
-                placeholder: formatMessage({
-                  id: 'ImportObservationsWizard.DeviceSensorsStep.substancePlaceholder'
-                })
-              }
+          <SubstanceAutocomplete
+            value={form.selectedSubstance}
+            onChange={newValue => {
+              setForm(prev => ({ ...prev, selectedSubstance: newValue }));
+              setSubmitError(null);
             }}
-            data-testid="sensor-config-substance"
           />
         )}
 

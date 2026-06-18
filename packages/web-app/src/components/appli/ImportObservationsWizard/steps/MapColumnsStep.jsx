@@ -285,8 +285,8 @@ const MeasurementConfig = ({ mapping, sensorConfigs, onUpdate }) => {
           </MenuItem>
           {sensorConfigs.map(sc => (
             <MenuItem key={sc.id} value={sc.id}>
-              {sc.substance
-                ? `${formatMessage({ id: `quantityKind.${sc.quantityKindCode}` })} [${sc.substance}] (${sc.unitSymbol})`
+              {sc.substanceName
+                ? `${formatMessage({ id: `quantityKind.${sc.quantityKindCode}` })} [${sc.substanceName}] (${sc.unitSymbol})`
                 : `${formatMessage({ id: `quantityKind.${sc.quantityKindCode}` })} (${sc.unitSymbol})`}
             </MenuItem>
           ))}

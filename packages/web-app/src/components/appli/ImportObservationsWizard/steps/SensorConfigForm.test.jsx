@@ -27,6 +27,28 @@ jest.mock('../../../../actions/Observations/importWizard', () => ({
   createSensorConfig: (...args) => mockCreateSensorConfig(...args)
 }));
 
+const mockCreateSubstance = jest.fn();
+jest.mock('../../../../actions/Substance', () => ({
+  searchSubstances: () => () => Promise.resolve([]),
+  createSubstance: (...args) => mockCreateSubstance(...args)
+}));
+
+// ---- SubstanceAutocomplete mock ----
+// Renders a button that simulates selecting a substance when clicked
+jest.mock('../components/SubstanceAutocomplete', () => {
+  const React = require('react');
+  return {
+    __esModule: true,
+    default: ({ value, onChange }) =>
+      React.createElement('div', { 'data-testid': 'sensor-config-substance' },
+        React.createElement('button', {
+          'data-testid': 'substance-select-button',
+          onClick: () => onChange({ id: 1, name: 'Nitrate', formula: 'NO₃⁻', casNumber: null, externalId: '943', externalSource: 'PubChem' })
+        }, value ? value.name : 'Select substance')
+      )
+  };
+});
+
 const messages = {
   'ImportObservationsWizard.DeviceSensorsStep.addSensorTitle':
     'Add sensor configuration',
@@ -38,7 +60,13 @@ const messages = {
   'ImportObservationsWizard.DeviceSensorsStep.unit': 'Unit',
   'ImportObservationsWizard.DeviceSensorsStep.substance': 'Substance',
   'ImportObservationsWizard.DeviceSensorsStep.substancePlaceholder':
-    'e.g. NO₃⁻, δ¹⁸O',
+    'Search substance...',
+  'ImportObservationsWizard.DeviceSensorsStep.substanceNoResults':
+    'No results',
+  'ImportObservationsWizard.DeviceSensorsStep.substanceViaPubChem':
+    'via PubChem',
+  'ImportObservationsWizard.DeviceSensorsStep.substanceSearchHint':
+    'Type at least 2 characters',
   'ImportObservationsWizard.DeviceSensorsStep.advancedFields':
     'Advanced fields',
   'ImportObservationsWizard.DeviceSensorsStep.precisionUpper':
@@ -359,12 +387,9 @@ describe('SensorConfigForm', () => {
       // Select Concentration
       selectQuantityKind('Concentration');
 
-      // Type a substance
-      const substanceInput = screen
-        .getByTestId('sensor-config-substance')
-        .querySelector('input');
-      fireEvent.change(substanceInput, { target: { value: 'NO₃⁻' } });
-      expect(substanceInput.value).toBe('NO₃⁻');
+      // Select a substance via the mock
+      fireEvent.click(screen.getByTestId('substance-select-button'));
+      expect(screen.getByText('Nitrate')).toBeInTheDocument();
 
       // Switch to Temperature
       selectQuantityKind('Temperature');
@@ -374,12 +399,9 @@ describe('SensorConfigForm', () => {
         screen.queryByTestId('sensor-config-substance')
       ).not.toBeInTheDocument();
 
-      // Switch back to Concentration — substance should be empty
+      // Switch back to Concentration — substance should be cleared
       selectQuantityKind('Concentration');
-      const newSubstanceInput = screen
-        .getByTestId('sensor-config-substance')
-        .querySelector('input');
-      expect(newSubstanceInput.value).toBe('');
+      expect(screen.getByText('Select substance')).toBeInTheDocument();
     });
 
     it('preserves substance when switching between Concentration and IsotopeDelta', () => {
@@ -388,63 +410,21 @@ describe('SensorConfigForm', () => {
       // Select Concentration
       selectQuantityKind('Concentration');
 
-      // Type a substance
-      const substanceInput = screen
-        .getByTestId('sensor-config-substance')
-        .querySelector('input');
-      fireEvent.change(substanceInput, { target: { value: 'δ¹⁸O' } });
-      expect(substanceInput.value).toBe('δ¹⁸O');
+      // Select a substance via the mock
+      fireEvent.click(screen.getByTestId('substance-select-button'));
+      expect(screen.getByText('Nitrate')).toBeInTheDocument();
 
       // Switch to IsotopeDelta — substance should be preserved
       selectQuantityKind('Isotope delta');
-      const preservedInput = screen
-        .getByTestId('sensor-config-substance')
-        .querySelector('input');
-      expect(preservedInput.value).toBe('δ¹⁸O');
+      expect(screen.getByText('Nitrate')).toBeInTheDocument();
     });
 
-    it('has maxLength of 100 on substance input', () => {
-      renderComponent();
-      selectQuantityKind('Concentration');
-
-      const substanceInput = screen
-        .getByTestId('sensor-config-substance')
-        .querySelector('input');
-      expect(substanceInput).toHaveAttribute('maxLength', '100');
-    });
-
-    it('disables submit when substance is empty with substance-requiring QK', () => {
+    it('disables submit when no substance selected with substance-requiring QK', () => {
       renderComponent();
       selectQuantityKind('Concentration');
 
       const submitButton = screen.getByTestId('sensor-config-submit');
       expect(submitButton).toBeDisabled();
-    });
-
-    it('disables submit when substance is whitespace-only with substance-requiring QK', () => {
-      renderComponent();
-      selectQuantityKind('Concentration');
-
-      const substanceInput = screen
-        .getByTestId('sensor-config-substance')
-        .querySelector('input');
-      fireEvent.change(substanceInput, { target: { value: '   ' } });
-
-      const submitButton = screen.getByTestId('sensor-config-submit');
-      expect(submitButton).toBeDisabled();
-    });
-
-    it('enables submit when substance has non-whitespace content', () => {
-      renderComponent();
-      selectQuantityKind('Concentration');
-
-      const substanceInput = screen
-        .getByTestId('sensor-config-substance')
-        .querySelector('input');
-      fireEvent.change(substanceInput, { target: { value: 'NO₃⁻' } });
-
-      const submitButton = screen.getByTestId('sensor-config-submit');
-      expect(submitButton).not.toBeDisabled();
     });
   });
 
@@ -490,11 +470,8 @@ describe('SensorConfigForm', () => {
       renderComponent();
       selectQuantityKind('Concentration');
 
-      // Fill in substance so submit is enabled
-      const substanceInput = screen
-        .getByTestId('sensor-config-substance')
-        .querySelector('input');
-      fireEvent.change(substanceInput, { target: { value: 'NO₃⁻' } });
+      // Select a substance so submit is enabled
+      fireEvent.click(screen.getByTestId('substance-select-button'));
 
       // Submit
       fireEvent.click(screen.getByTestId('sensor-config-submit'));

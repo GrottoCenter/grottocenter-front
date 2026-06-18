@@ -3,10 +3,12 @@ import { action } from '@storybook/addon-actions';
 
 import ExportFormatDropdown from './ExportFormatDropdown';
 
-export default {
+const meta = {
   title: 'Common/ExportFormatDropdown',
   component: ExportFormatDropdown
 };
+
+export default meta;
 
 export const Default = () => (
   <ExportFormatDropdown disabled={false} onExport={action('onExport')} />

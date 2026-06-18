@@ -81,6 +81,7 @@ const messages = {
   'ImportObservationsWizard.ContextStep.caveLabel': 'Cave',
   'ImportObservationsWizard.ContextStep.caveId': 'Cave ID',
   'ImportObservationsWizard.ContextStep.caveIdHelper': 'Enter the numeric ID of the cave',
+  'ImportObservationsWizard.ContextStep.clearCave': 'Clear cave selection',
   'ImportObservationsWizard.ContextStep.locationModeLabel': 'Location data available',
   'ImportObservationsWizard.ContextStep.locationMode.pointAndCave': 'Point and cave',
   'ImportObservationsWizard.ContextStep.locationMode.pointOnly': 'Point only',

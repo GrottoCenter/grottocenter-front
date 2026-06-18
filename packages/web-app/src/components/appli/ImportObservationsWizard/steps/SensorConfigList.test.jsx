@@ -132,7 +132,7 @@ describe('SensorConfigList', () => {
     expect(screen.getByTestId('sensor-config-list')).toBeInTheDocument();
     const items = screen.getAllByTestId('sensor-config-item');
     expect(items).toHaveLength(2);
-    expect(screen.getByText('Temperature — °C')).toBeInTheDocument();
-    expect(screen.getByText('Relative humidity — %')).toBeInTheDocument();
+    expect(screen.getByText('Temperature (°C)')).toBeInTheDocument();
+    expect(screen.getByText('Relative humidity (%)')).toBeInTheDocument();
   });
 });
