@@ -257,7 +257,13 @@ describe('deriveProfileFileName', () => {
     expect(deriveProfileFileName(undefined)).toBe('_profile.json');
   });
 
-  it('strips unicode and accented characters', () => {
-    expect(deriveProfileFileName('Grotte été')).toBe('Grottet_profile.json');
+  it('transliterates accented characters', () => {
+    expect(deriveProfileFileName('Grotte été')).toBe('Grotteete_profile.json');
+  });
+
+  it('transliterates French accented characters', () => {
+    expect(deriveProfileFileName('Salle des Échos')).toBe(
+      'SalledesEchos_profile.json'
+    );
   });
 });
