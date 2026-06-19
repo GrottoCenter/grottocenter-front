@@ -414,8 +414,9 @@ const ContextStep = ({ initialCaveId, caveIdLocked }) => {
 
   const showPoint = context.locationMode !== 'caveOnly';
   const showCave = context.locationMode !== 'pointOnly';
-  const showCoordinates = showPoint && !context.unknownCoordinates;
   const coordinatesRequired = context.locationMode === 'pointOnly';
+  const showCoordinates = showPoint &&
+    (coordinatesRequired || !context.unknownCoordinates);
 
   return (
     <Box

@@ -516,6 +516,14 @@ describe('ContextStep', () => {
       expect(screen.getByTestId('coordinate-form-section')).toBeInTheDocument();
     });
 
+    it('should show coordinate form section in pointOnly mode even when unknownCoordinates is true (profile import)', () => {
+      renderComponent({}, {
+        context: { ...defaultImportWizardState.context, locationMode: 'pointOnly', unknownCoordinates: true }
+      });
+
+      expect(screen.getByTestId('coordinate-form-section')).toBeInTheDocument();
+    });
+
     it('should dispatch SET_CONTEXT clearing coordinates when checked', () => {
       renderComponent({}, {
         context: {
