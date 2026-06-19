@@ -40,7 +40,7 @@ describe('ImportWizardReducer', () => {
       samplingIntervalSeconds: null,
       context: {
         locationMode: 'pointAndCave',
-        unknownCoordinates: false,
+        unknownCoordinates: true,
         caveId: null,
         caveIdLocked: false,
         pointLabel: '',

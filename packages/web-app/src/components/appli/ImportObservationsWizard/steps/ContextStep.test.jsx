@@ -134,7 +134,7 @@ const defaultImportWizardState = {
   samplingIntervalSeconds: null,
   context: {
     locationMode: 'pointAndCave',
-    unknownCoordinates: false,
+    unknownCoordinates: true,
     caveId: null,
     caveIdLocked: false,
     pointLabel: '',
@@ -427,6 +427,7 @@ describe('ContextStep', () => {
           type: 'SET_CONTEXT',
           context: expect.objectContaining({
             locationMode: 'pointOnly',
+            unknownCoordinates: false,
             caveId: null
           })
         })
@@ -439,10 +440,37 @@ describe('ContextStep', () => {
       const pointOnlyRadio = screen.getByLabelText('Point only');
       expect(pointOnlyRadio.closest('label')).toHaveClass('Mui-disabled');
     });
+
+    it('should dispatch SET_CONTEXT with unknownCoordinates true when switching to pointAndCave', () => {
+      renderComponent({}, {
+        context: {
+          ...defaultImportWizardState.context,
+          locationMode: 'pointOnly',
+          unknownCoordinates: false,
+          latitude: 45.5,
+          longitude: 6.2
+        }
+      });
+
+      const pointAndCaveRadio = screen.getByLabelText('Point and cave');
+      fireEvent.click(pointAndCaveRadio);
+
+      expect(mockDispatch).toHaveBeenCalledWith(
+        expect.objectContaining({
+          type: 'SET_CONTEXT',
+          context: expect.objectContaining({
+            locationMode: 'pointAndCave',
+            unknownCoordinates: true,
+            latitude: null,
+            longitude: null
+          })
+        })
+      );
+    });
   });
 
   describe('unknown coordinates checkbox', () => {
-    it('should render the unknown coordinates checkbox when point is shown', () => {
+    it('should render the unknown coordinates checkbox when locationMode is pointAndCave', () => {
       renderComponent();
 
       expect(screen.getByTestId('unknown-coordinates-checkbox')).toBeInTheDocument();
@@ -451,6 +479,14 @@ describe('ContextStep', () => {
     it('should not render the checkbox when locationMode is caveOnly', () => {
       renderComponent({}, {
         context: { ...defaultImportWizardState.context, locationMode: 'caveOnly' }
+      });
+
+      expect(screen.queryByTestId('unknown-coordinates-checkbox')).not.toBeInTheDocument();
+    });
+
+    it('should not render the checkbox when locationMode is pointOnly', () => {
+      renderComponent({}, {
+        context: { ...defaultImportWizardState.context, locationMode: 'pointOnly', unknownCoordinates: false }
       });
 
       expect(screen.queryByTestId('unknown-coordinates-checkbox')).not.toBeInTheDocument();
@@ -467,6 +503,14 @@ describe('ContextStep', () => {
     it('should show coordinate form section when unknownCoordinates is unchecked', () => {
       renderComponent({}, {
         context: { ...defaultImportWizardState.context, unknownCoordinates: false }
+      });
+
+      expect(screen.getByTestId('coordinate-form-section')).toBeInTheDocument();
+    });
+
+    it('should always show coordinate form section in pointOnly mode', () => {
+      renderComponent({}, {
+        context: { ...defaultImportWizardState.context, locationMode: 'pointOnly', unknownCoordinates: false }
       });
 
       expect(screen.getByTestId('coordinate-form-section')).toBeInTheDocument();
