@@ -8,7 +8,7 @@ import { checkAuthStatus } from './utils';
  * @param {string} searchTerm - Minimum 2 characters
  * @returns {Promise<Array<{id, name, formula, casNumber, externalId, externalSource}>>}
  */
-export const searchSubstances = searchTerm => (_dispatch, getState) => {
+export const searchSubstances = searchTerm => (dispatch, getState) => {
   const { authorizationHeader } = getState().login;
 
   const requestOptions = {
@@ -17,7 +17,7 @@ export const searchSubstances = searchTerm => (_dispatch, getState) => {
   };
 
   return fetch(substancesSearchUrl(searchTerm), requestOptions)
-    .then(checkAuthStatus(_dispatch))
+    .then(checkAuthStatus(dispatch))
     .then(response => response.json())
     .catch(error => {
       if (error.isAuthError) return [];
@@ -33,7 +33,7 @@ export const searchSubstances = searchTerm => (_dispatch, getState) => {
  * @param {{name, formula?, casNumber?, externalId?, externalSource?}} data
  * @returns {Promise<{id, name, formula, casNumber, externalId, externalSource}>}
  */
-export const createSubstance = data => (_dispatch, getState) => {
+export const createSubstance = data => (dispatch, getState) => {
   const { authorizationHeader } = getState().login;
 
   const requestOptions = {
@@ -46,7 +46,7 @@ export const createSubstance = data => (_dispatch, getState) => {
   };
 
   return fetch(substancesUrl, requestOptions)
-    .then(checkAuthStatus(_dispatch))
+    .then(checkAuthStatus(dispatch))
     .then(response => response.json())
     .catch(error => {
       if (error.isAuthError) return undefined;

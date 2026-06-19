@@ -175,12 +175,16 @@ export const importProfile = json => {
 
 /**
  * Derives a safe file name from the point label.
- * Strips characters outside [A-Za-z0-9\-_] and appends _profile.json.
+ * Strips characters outside word characters, hyphens, and underscores,
+ * transliterating common accented Latin chars first.
  *
  * @param {string} pointLabel
- * @returns {string} e.g. "SalleduChaos_profile.json"
+ * @returns {string} e.g. "SalleDesEchos_profile.json"
  */
 export const deriveProfileFileName = pointLabel => {
-  const sanitized = (pointLabel || '').replace(/[^A-Za-z0-9\-_]/g, '');
+  const transliterated = (pointLabel || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '');
+  const sanitized = transliterated.replace(/[^A-Za-z0-9\-_]/g, '');
   return `${sanitized}_profile.json`;
 };

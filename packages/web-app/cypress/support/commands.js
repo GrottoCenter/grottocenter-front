@@ -48,20 +48,8 @@ Cypress.Commands.add(
  * @param {object} [authOptions] - Options passed to loginAs
  */
 Cypress.Commands.add('visitAuthenticated', (url, authOptions = {}) => {
-  cy.visit(url, {
-    onBeforeLoad(win) {
-      const token = createFakeJwt({
-        id: authOptions.id || 1,
-        groups: (authOptions.groups || ['User']).map((name, idx) => ({
-          id: idx + 1,
-          name
-        })),
-        nickname: authOptions.nickname || 'TestCaver',
-        exp: Math.floor(Date.now() / 1000) + 86400 * 30
-      });
-      win.localStorage.setItem('grottocenter_token', token);
-    }
-  });
+  cy.loginAs(authOptions);
+  cy.visit(url);
 });
 
 /**

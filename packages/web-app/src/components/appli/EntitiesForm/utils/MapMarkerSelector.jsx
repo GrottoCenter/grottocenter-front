@@ -94,7 +94,7 @@ const AdditionalMarkers = ({ positions }) => {
   return null;
 };
 AdditionalMarkers.propTypes = {
-  positions: PropTypes.arrayOf(PropTypes.shape({}))
+  positions: PropTypes.arrayOf(PropTypes.shape({})).isRequired
 };
 
 const LOCATE_ZOOM = 18;
