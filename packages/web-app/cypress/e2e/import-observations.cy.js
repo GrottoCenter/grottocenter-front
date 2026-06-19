@@ -146,6 +146,12 @@ describe('Import Observations Wizard', () => {
         'Salle du Chaos - T1'
       );
 
+      // Fill coordinates (required in pointOnly mode)
+      cy.get('[data-testid="context-step"]').within(() => {
+        cy.get('label').contains('Latitude').parent().find('input').type('43.123');
+        cy.get('label').contains('Longitude').parent().find('input').type('2.987');
+      });
+
       // Select license
       cy.get('[data-testid="license-select"]').click();
       cy.get('.MuiMenu-paper').last().within(() => {

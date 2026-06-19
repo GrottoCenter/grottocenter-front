@@ -303,8 +303,15 @@ const ContextStep = ({ initialCaveId, caveIdLocked }) => {
       setCoordValue('longitude', '', { shouldValidate: false });
     } else if (newMode === 'pointOnly') {
       updates.caveId = null;
+      updates.unknownCoordinates = false;
       setSelectedCave(null);
       setCaveEntrances([]);
+    } else if (newMode === 'pointAndCave') {
+      updates.unknownCoordinates = true;
+      updates.latitude = null;
+      updates.longitude = null;
+      setCoordValue('latitude', '', { shouldValidate: false });
+      setCoordValue('longitude', '', { shouldValidate: false });
     }
 
     dispatch({ type: SET_CONTEXT, context: updates });
@@ -408,6 +415,7 @@ const ContextStep = ({ initialCaveId, caveIdLocked }) => {
   const showPoint = context.locationMode !== 'caveOnly';
   const showCave = context.locationMode !== 'pointOnly';
   const showCoordinates = showPoint && !context.unknownCoordinates;
+  const coordinatesRequired = context.locationMode === 'pointOnly';
 
   return (
     <Box
@@ -497,24 +505,27 @@ const ContextStep = ({ initialCaveId, caveIdLocked }) => {
             slotProps={{ htmlInput: { maxLength: TEXT_FIELD_MAX_LENGTH } }}
             data-testid="point-label-field"
           />
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={!!context.unknownCoordinates}
-                onChange={handleUnknownCoordinatesChange}
-                size="small"
-                data-testid="unknown-coordinates-checkbox"
-              />
-            }
-            label={formatMessage({
-              id: 'ImportObservationsWizard.ContextStep.unknownCoordinates'
-            })}
-          />
+          {!coordinatesRequired && (
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={!!context.unknownCoordinates}
+                  onChange={handleUnknownCoordinatesChange}
+                  size="small"
+                  data-testid="unknown-coordinates-checkbox"
+                />
+              }
+              label={formatMessage({
+                id: 'ImportObservationsWizard.ContextStep.unknownCoordinates'
+              })}
+            />
+          )}
           {showCoordinates && (
             <CoordinateFormSection
               control={coordControl}
               formLatitudeKey="latitude"
               formLongitudeKey="longitude"
+              required={coordinatesRequired}
               additionalPositions={caveEntrances}
               markerIcon={coordinatesMarkerIcon}
               mapHeight="50dvh"

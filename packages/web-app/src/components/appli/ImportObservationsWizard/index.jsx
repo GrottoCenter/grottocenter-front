@@ -61,13 +61,14 @@ const isStep3NextDisabled = validationResult =>
   validationResult.blockingErrors.length > 0;
 
 const isStep4NextDisabled = context => {
-  const { locationMode, pointLabel, caveId, licenseId } = context;
+  const { locationMode, pointLabel, caveId, licenseId, latitude, longitude } =
+    context;
   if (!licenseId) return true;
   switch (locationMode) {
     case 'pointAndCave':
       return !pointLabel || !caveId;
     case 'pointOnly':
-      return !pointLabel;
+      return !pointLabel || latitude == null || longitude == null;
     case 'caveOnly':
       return !caveId;
     default:
