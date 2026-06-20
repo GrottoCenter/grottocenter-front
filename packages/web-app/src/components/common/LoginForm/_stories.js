@@ -20,7 +20,6 @@ const DefaultLoginForm = () => {
       onEmailChange={setEmail}
       password={password}
       onPasswordChange={setPassword}
-      onSubmit={action('onSubmit')}
     />
   );
 };
@@ -111,7 +110,6 @@ const DialogLoginForm = ({
         onEmailChange={setEmail}
         password={password}
         onPasswordChange={setPassword}
-        onSubmit={action('onSubmit')}
         emailError={hasErrors ? 'You must provide a valid email.' : ''}
         passwordError={hasErrors ? 'You must provide a password.' : ''}
         serverError={hasErrors ? serverError : ''}

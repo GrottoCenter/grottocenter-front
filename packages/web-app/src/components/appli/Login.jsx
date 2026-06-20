@@ -92,7 +92,7 @@ const Login = () => {
     if (authState.isFetching || resendVerificationState.isFetching) return;
 
     const newFieldErrors = {
-      email: validateEmail(),
+      email: isPlainLogin ? validateEmail() : '',
       password:
         isPlainLogin && isEmpty(password)
           ? formatMessage({ id: 'You must provide a password.' })
@@ -252,7 +252,7 @@ const Login = () => {
   }
 
   const DialogContent = authState.isMustResetMessageDisplayed ? (
-    <form id="login-form" onSubmit={onLogin}>
+    <>
       <Box
         display="flex"
         height={60}
@@ -282,9 +282,9 @@ const Login = () => {
         <b>{email || authState.notVerifiedEmail}</b>
       </Typography>
       {LoginButton}
-    </form>
+    </>
   ) : authState.isNotVerifiedMessageDisplayed ? (
-    <form id="login-form" onSubmit={onLogin}>
+    <>
       <Box
         display="flex"
         height={60}
@@ -317,7 +317,7 @@ const Login = () => {
         <b>{email || authState.notVerifiedEmail}</b>
       </Typography>
       {LoginButton}
-    </form>
+    </>
   ) : (
     <>
       <LoginForm
@@ -328,10 +328,10 @@ const Login = () => {
         emailError={fieldErrors.email}
         passwordError={fieldErrors.password}
         serverError={serverError}
-        onSubmit={onLogin}
       />
       <Box display="flex" justifyContent="flex-end" mt={0.5}>
         <Button
+          type="button"
           size="small"
           variant="text"
           onClick={handleForgotPassword}
@@ -346,6 +346,7 @@ const Login = () => {
           <Translate>No account yet?</Translate>
         </Typography>
         <Button
+          type="button"
           fullWidth
           variant="outlined"
           color="primary"
@@ -368,7 +369,9 @@ const Login = () => {
           <Translate>Log in</Translate>
         </Typography>
       }>
-      {DialogContent}
+      <form id="login-form" onSubmit={onLogin} noValidate>
+        {DialogContent}
+      </form>
     </StandardDialog>
   );
 };

@@ -21,7 +21,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { styled } from '@mui/material/styles';
 import { normalizeOtp } from '../../../utils/otpHelpers';
 
-const FormWrapper = styled('form')`
+const FieldsWrapper = styled('div')`
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -143,7 +143,6 @@ const LoginForm = ({
   emailError = '',
   passwordError = '',
   serverError = '',
-  onSubmit = () => {},
   totpMode,
   onTotpSubmit,
   totpError,
@@ -181,7 +180,7 @@ const LoginForm = ({
   }
 
   return (
-    <FormWrapper id="login-form" onSubmit={onSubmit} noValidate>
+    <FieldsWrapper>
       <FormControl variant="filled" error={!!emailError}>
         <InputLabel htmlFor="login-email">
           {formatMessage({ id: 'Email' })}
@@ -195,7 +194,9 @@ const LoginForm = ({
           type="email"
           autoComplete="email"
           autoFocus
-          inputProps={{ 'aria-describedby': 'login-email-error' }}
+          inputProps={
+            emailError ? { 'aria-describedby': 'login-email-error' } : undefined
+          }
         />
         {emailError && (
           <FormHelperText id="login-email-error">{emailError}</FormHelperText>
@@ -213,7 +214,11 @@ const LoginForm = ({
           value={password}
           onChange={handlePasswordChange}
           autoComplete="current-password"
-          inputProps={{ 'aria-describedby': 'login-password-error' }}
+          inputProps={
+            passwordError
+              ? { 'aria-describedby': 'login-password-error' }
+              : undefined
+          }
           endAdornment={
             <InputAdornment position="end">
               <IconButton
@@ -242,7 +247,7 @@ const LoginForm = ({
           </Alert>
         </Fade>
       )}
-    </FormWrapper>
+    </FieldsWrapper>
   );
 };
 
@@ -254,7 +259,6 @@ LoginForm.propTypes = {
   emailError: PropTypes.string,
   passwordError: PropTypes.string,
   serverError: PropTypes.string,
-  onSubmit: PropTypes.func,
   onBackToLogin: PropTypes.func,
   onTotpSubmit: PropTypes.func,
   totpError: PropTypes.string,
