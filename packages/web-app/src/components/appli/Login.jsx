@@ -327,7 +327,7 @@ const Login = () => {
         passwordError={fieldErrors.password}
         serverError={serverError}
       />
-      <Box display="flex" justifyContent="flex-end" mt={0.5}>
+      <Box display="flex" justifyContent="flex-end" mt={1}>
         <Button
           type="button"
           size="small"
