@@ -26,6 +26,10 @@ const DialogContent = styled(MuiDialogContent, {
     overflow: ${({ $scrollable }) => ($scrollable ? 'auto' : 'visible')};
     @media (max-width: 600px) {
       padding: 8px 16px;
+      ${({ $centerMobile }) =>
+        $centerMobile
+          ? 'display: flex; flex-direction: column; justify-content: center;'
+          : ''}
     }
   }
 `;
@@ -38,13 +42,16 @@ const StyledDialogActions = styled(DialogActions)`
 
 const CloseButton = styled(IconButton)`
   position: absolute;
-  right: 0;
+  top: 4px;
+  right: 4px;
+  z-index: 1;
 `;
 
 const StandardDialog = ({
   fullScreen = false,
   fullWidth = false,
   scrollable = false,
+  centerContentMobile = false,
   maxWidth = 'sm',
   open = false,
   onClose = () => {},
@@ -71,9 +78,11 @@ const StandardDialog = ({
       )}
       <CustomDialogTitle>{title}</CustomDialogTitle>
       {children && (
-        <DialogContent $scrollable={scrollable}>{children}</DialogContent>
+        <DialogContent $scrollable={scrollable} $centerMobile={centerContentMobile}>
+          {children}
+        </DialogContent>
       )}
-      <StyledDialogActions>{actions || null}</StyledDialogActions>
+      {actions && <StyledDialogActions>{actions}</StyledDialogActions>}
     </Dialog>
   );
 };
@@ -85,6 +94,7 @@ StandardDialog.propTypes = {
     PropTypes.node,
     PropTypes.arrayOf(PropTypes.node)
   ]),
+  centerContentMobile: PropTypes.bool,
   children: PropTypes.node,
   fullScreen: PropTypes.bool,
   fullWidth: PropTypes.bool,

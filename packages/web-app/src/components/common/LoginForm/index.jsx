@@ -6,6 +6,7 @@ import {
   Box,
   Button,
   FormControl,
+  FormHelperText,
   InputLabel,
   FilledInput,
   InputAdornment,
@@ -23,6 +24,7 @@ import { normalizeOtp } from '../../../utils/otpHelpers';
 const FormWrapper = styled('form')`
   display: flex;
   flex-direction: column;
+  gap: 12px;
   margin-bottom: 0;
 `;
 
@@ -138,7 +140,10 @@ const LoginForm = ({
   onEmailChange,
   password,
   onPasswordChange,
-  authErrors,
+  emailError = '',
+  passwordError = '',
+  serverError = '',
+  onSubmit = () => {},
   totpMode,
   onTotpSubmit,
   totpError,
@@ -176,29 +181,39 @@ const LoginForm = ({
   }
 
   return (
-    <FormWrapper>
-      <FormControl variant="filled">
-        <InputLabel htmlFor="input-with-icon-adornment">
+    <FormWrapper id="login-form" onSubmit={onSubmit} noValidate>
+      <FormControl variant="filled" error={!!emailError}>
+        <InputLabel htmlFor="login-email">
           {formatMessage({ id: 'Email' })}
         </InputLabel>
         <FilledInput
+          id="login-email"
           name="email"
           value={email}
           onChange={handleEmailChange}
           required
           type="email"
+          autoComplete="email"
+          autoFocus
+          inputProps={{ 'aria-describedby': 'login-email-error' }}
         />
+        {emailError && (
+          <FormHelperText id="login-email-error">{emailError}</FormHelperText>
+        )}
       </FormControl>
 
-      <FormControl variant="filled">
-        <InputLabel htmlFor="filled-adornment-password">
+      <FormControl variant="filled" error={!!passwordError}>
+        <InputLabel htmlFor="login-password">
           {formatMessage({ id: 'Password' })}
         </InputLabel>
         <FilledInput
+          id="login-password"
           name="password"
           type={isPasswordVisible ? 'text' : 'password'}
           value={password}
           onChange={handlePasswordChange}
+          autoComplete="current-password"
+          inputProps={{ 'aria-describedby': 'login-password-error' }}
           endAdornment={
             <InputAdornment position="end">
               <IconButton
@@ -213,31 +228,35 @@ const LoginForm = ({
           }
           required
         />
+        {passwordError && (
+          <FormHelperText id="login-password-error">
+            {passwordError}
+          </FormHelperText>
+        )}
       </FormControl>
 
-      {authErrors.length > 0 && (
-        <FormControl>
-          {authErrors.map(error => (
-            <Fade in={authErrors.length > 0} key={error}>
-              <Alert severity="error" sx={{ mt: 1 }}>
-                {formatMessage({ id: error })}
-              </Alert>
-            </Fade>
-          ))}
-        </FormControl>
+      {serverError && (
+        <Fade in>
+          <Alert severity="error" sx={{ mt: 1 }}>
+            {serverError}
+          </Alert>
+        </Fade>
       )}
     </FormWrapper>
   );
 };
 
 LoginForm.propTypes = {
-  authErrors: PropTypes.arrayOf(PropTypes.string).isRequired,
   email: PropTypes.string.isRequired,
   onEmailChange: PropTypes.func.isRequired,
-  onBackToLogin: PropTypes.func,
-  onTotpSubmit: PropTypes.func,
   password: PropTypes.string.isRequired,
   onPasswordChange: PropTypes.func.isRequired,
+  emailError: PropTypes.string,
+  passwordError: PropTypes.string,
+  serverError: PropTypes.string,
+  onSubmit: PropTypes.func,
+  onBackToLogin: PropTypes.func,
+  onTotpSubmit: PropTypes.func,
   totpError: PropTypes.string,
   totpIsEnrollmentTokenExpired: PropTypes.bool,
   totpIsLoading: PropTypes.bool,

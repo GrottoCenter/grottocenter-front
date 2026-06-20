@@ -20,8 +20,7 @@ const DefaultLoginForm = () => {
       onEmailChange={setEmail}
       password={password}
       onPasswordChange={setPassword}
-      onLogin={action('onLogin')}
-      authErrors={[]}
+      onSubmit={action('onSubmit')}
     />
   );
 };
@@ -56,7 +55,7 @@ const Title = () => (
 
 const DialogLoginForm = ({
   isOpen = true,
-  authErrors = [],
+  serverError = '',
   initialEmail = '',
   initialPassword = ''
 }) => {
@@ -74,6 +73,7 @@ const DialogLoginForm = ({
       actions={[
         <Button
           type="submit"
+          form="login-form"
           size="large"
           onClick={action('onLogin')}
           color={isLoading ? 'inherit' : 'primary'}
@@ -111,14 +111,17 @@ const DialogLoginForm = ({
         onEmailChange={setEmail}
         password={password}
         onPasswordChange={setPassword}
-        authErrors={hasErrors ? authErrors : []}
+        onSubmit={action('onSubmit')}
+        emailError={hasErrors ? 'You must provide a valid email.' : ''}
+        passwordError={hasErrors ? 'You must provide a password.' : ''}
+        serverError={hasErrors ? serverError : ''}
       />
     </StandardDialog>
   );
 };
 
 DialogLoginForm.propTypes = {
-  authErrors: PropTypes.arrayOf(PropTypes.string),
+  serverError: PropTypes.string,
   initialEmail: PropTypes.string,
   initialPassword: PropTypes.string,
   isOpen: PropTypes.bool
@@ -127,11 +130,5 @@ DialogLoginForm.propTypes = {
 storiesOf('Login', module)
   .add('Default', () => <DefaultLoginForm />)
   .add('In Dialog', () => (
-    <DialogLoginForm
-      authErrors={[
-        'You must provide an email.',
-        'You must provide a valid email.',
-        'You must provide a password.'
-      ]}
-    />
+    <DialogLoginForm serverError="Invalid email or password." />
   ));
