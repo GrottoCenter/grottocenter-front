@@ -66,17 +66,13 @@ const Login = () => {
         })
       : '';
 
-  const handleEmailChange = value => {
-    setEmail(value);
-    setFieldErrors(prev => ({ ...prev, email: '' }));
+  const makeFieldChangeHandler = (field, setValue) => value => {
+    setValue(value);
+    setFieldErrors(prev => ({ ...prev, [field]: '' }));
     setIsServerErrorHidden(true);
   };
-
-  const handlePasswordChange = value => {
-    setPassword(value);
-    setFieldErrors(prev => ({ ...prev, password: '' }));
-    setIsServerErrorHidden(true);
-  };
+  const handleEmailChange = makeFieldChangeHandler('email', setEmail);
+  const handlePasswordChange = makeFieldChangeHandler('password', setPassword);
 
   const validateEmail = () => {
     if (isEmpty(email))
@@ -86,6 +82,11 @@ const Login = () => {
     return '';
   };
 
+  const validatePassword = () =>
+    isEmpty(password)
+      ? formatMessage({ id: 'You must provide a password.' })
+      : '';
+
   const onLogin = event => {
     event.preventDefault();
 
@@ -93,10 +94,7 @@ const Login = () => {
 
     const newFieldErrors = {
       email: isPlainLogin ? validateEmail() : '',
-      password:
-        isPlainLogin && isEmpty(password)
-          ? formatMessage({ id: 'You must provide a password.' })
-          : ''
+      password: isPlainLogin ? validatePassword() : ''
     };
 
     setFieldErrors(newFieldErrors);
