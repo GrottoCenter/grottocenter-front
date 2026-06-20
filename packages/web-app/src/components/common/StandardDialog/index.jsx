@@ -78,7 +78,9 @@ const StandardDialog = ({
       )}
       <CustomDialogTitle>{title}</CustomDialogTitle>
       {children && (
-        <DialogContent $scrollable={scrollable} $centerMobile={centerContentMobile}>
+        <DialogContent
+          $scrollable={scrollable}
+          $centerMobile={centerContentMobile}>
           {children}
         </DialogContent>
       )}

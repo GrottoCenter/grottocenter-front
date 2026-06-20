@@ -62,7 +62,10 @@ const Login = () => {
 
   const serverError =
     !isServerErrorHidden && authState.error?.message
-      ? formatMessage({ id: authState.error.message })
+      ? formatMessage({
+          id: authState.error.message,
+          defaultMessage: authState.error.message
+        })
       : '';
 
   const makeFieldChangeHandler = (field, setValue) => value => {
@@ -159,7 +162,7 @@ const Login = () => {
     return () => clearInterval(interval);
   }, [resendTimeout]);
 
-  const LoginButtonMessage = () => {
+  const getLoginButtonLabel = () => {
     if (authState.isMustResetMessageDisplayed) {
       return <Translate>Send reset email</Translate>;
     }
@@ -194,7 +197,7 @@ const Login = () => {
       {isSubmitting ? (
         <CircularProgress size="2.8rem" color="inherit" />
       ) : (
-        <LoginButtonMessage />
+        getLoginButtonLabel()
       )}
     </Button>
   );
