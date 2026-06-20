@@ -71,8 +71,7 @@ const DialogLoginForm = ({
       title={<Title />}
       actions={[
         <Button
-          type="submit"
-          form="login-form"
+          type="button"
           size="large"
           onClick={action('onLogin')}
           color={isLoading ? 'inherit' : 'primary'}

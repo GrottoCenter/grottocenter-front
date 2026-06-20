@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import {
+  Alert,
   Button,
   CircularProgress,
   Divider,
@@ -61,9 +62,7 @@ const Login = () => {
 
   const serverError =
     !isServerErrorHidden && authState.error?.message
-      ? formatMessage({
-          id: authState.error.message.replace(/^(Login|Forgot password) - /, '')
-        })
+      ? formatMessage({ id: authState.error.message })
       : '';
 
   const makeFieldChangeHandler = (field, setValue) => value => {
@@ -183,9 +182,7 @@ const Login = () => {
 
   const LoginButton = (
     <Button
-      key={0}
       type="submit"
-      form="login-form"
       fullWidth
       size="large"
       variant="contained"
@@ -279,6 +276,11 @@ const Login = () => {
         <Translate>An email will be sent to:</Translate>{' '}
         <b>{email || authState.notVerifiedEmail}</b>
       </Typography>
+      {serverError && (
+        <Alert severity="error" sx={{ mt: 2 }}>
+          {serverError}
+        </Alert>
+      )}
       {LoginButton}
     </>
   ) : authState.isNotVerifiedMessageDisplayed ? (
@@ -314,6 +316,11 @@ const Login = () => {
         <Translate>You can request a new verification email for:</Translate>{' '}
         <b>{email || authState.notVerifiedEmail}</b>
       </Typography>
+      {serverError && (
+        <Alert severity="error" sx={{ mt: 2 }}>
+          {serverError}
+        </Alert>
+      )}
       {LoginButton}
     </>
   ) : (
@@ -367,7 +374,7 @@ const Login = () => {
           <Translate>Log in</Translate>
         </Typography>
       }>
-      <form id="login-form" onSubmit={onLogin} noValidate>
+      <form onSubmit={onLogin} noValidate>
         {DialogContent}
       </form>
     </StandardDialog>
