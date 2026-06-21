@@ -93,6 +93,8 @@ MobileEntityCard.propTypes = {
   icon: PropTypes.node
 };
 
+const MAX_ACCUMULATED_ROWS = 600;
+
 const MobileEntityList = ({
   rows,
   columns,
@@ -118,7 +120,12 @@ const MobileEntityList = ({
 
   useEffect(() => {
     if (isAppending.current) {
-      setAllRows(prev => [...prev, ...(rows ?? [])]);
+      setAllRows(prev => {
+        const next = [...prev, ...(rows ?? [])];
+        return next.length > MAX_ACCUMULATED_ROWS
+          ? next.slice(0, MAX_ACCUMULATED_ROWS)
+          : next;
+      });
     } else {
       setAllRows(rows ?? []);
     }
@@ -132,7 +139,10 @@ const MobileEntityList = ({
     if (onPageChange) onPageChange(nextPage, rowsPerPage);
   };
 
-  const hasMore = totalRows != null && allRows.length < totalRows;
+  const hasMore =
+    totalRows != null &&
+    allRows.length < totalRows &&
+    allRows.length < MAX_ACCUMULATED_ROWS;
 
   if (allRows.length === 0 && !isLoading) {
     return (
