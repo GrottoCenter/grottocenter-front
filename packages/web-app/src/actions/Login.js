@@ -151,11 +151,7 @@ export function postLogin(email, password) {
       // Other errors
     }
 
-    dispatch(
-      fetchLoginFailure(
-        makeErrorMessage(responseStatus, `Login - ${errorMessage}`)
-      )
-    );
+    dispatch(fetchLoginFailure(makeErrorMessage(responseStatus, errorMessage)));
   };
 }
 
@@ -202,10 +198,6 @@ export function postForgotPassword(email, onSuccess) {
       // Other errors
     }
 
-    dispatch(
-      fetchLoginFailure(
-        makeErrorMessage(responseStatus, `Forgot password - ${errorMessage}`)
-      )
-    );
+    dispatch(fetchLoginFailure(makeErrorMessage(responseStatus, errorMessage)));
   };
 }
