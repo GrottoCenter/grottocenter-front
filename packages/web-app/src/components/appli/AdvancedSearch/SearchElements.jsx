@@ -241,7 +241,7 @@ export const SearchTextAutocomplete = ({
   const { formatMessage } = useIntl();
   const [options, setOptions] = useState([]);
   const [loading, setLoading] = useState(false);
-  const cacheRef = useRef({});
+  const cacheRef = useRef(new Map());
   const debounceTimer = useRef(null);
 
   useEffect(() => () => clearTimeout(debounceTimer.current), []);
@@ -257,8 +257,8 @@ export const SearchTextAutocomplete = ({
       query
     });
 
-    if (cacheRef.current[cacheKey]) {
-      setOptions(cacheRef.current[cacheKey]);
+    if (cacheRef.current.has(cacheKey)) {
+      setOptions(cacheRef.current.get(cacheKey));
       setLoading(false);
       return;
     }
@@ -272,11 +272,10 @@ export const SearchTextAutocomplete = ({
         query
       });
       const hits = r?.hits ?? [];
-      if (Object.keys(cacheRef.current).length >= 50) {
-        const oldest = Object.keys(cacheRef.current)[0];
-        delete cacheRef.current[oldest];
+      if (cacheRef.current.size >= 50) {
+        cacheRef.current.delete(cacheRef.current.keys().next().value);
       }
-      cacheRef.current[cacheKey] = hits;
+      cacheRef.current.set(cacheKey, hits);
       setOptions(hits);
     } catch (_) {
       setOptions([]);

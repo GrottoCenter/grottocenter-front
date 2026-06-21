@@ -18,6 +18,9 @@ const EntranceEdit = () => {
   const entranceDataId = useSelector(state => state.entrance.data?.id);
 
   useEffect(() => {
+    // Skip fetch if Redux already holds fresh data for this entrance.
+    // Trade-off: data could be stale if another session edited it concurrently,
+    // but this is acceptable — the entry view page will refetch after save anyway.
     if (String(entranceDataId) !== String(entranceId)) {
       dispatch(fetchEntrance(entranceId));
     }

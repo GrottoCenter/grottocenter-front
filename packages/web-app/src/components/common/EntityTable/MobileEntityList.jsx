@@ -93,6 +93,7 @@ MobileEntityCard.propTypes = {
   icon: PropTypes.node
 };
 
+// ~600 cards ≈ 30 "Load more" clicks × 20 rows/page, capped to prevent DOM bloat on mobile.
 const MAX_ACCUMULATED_ROWS = 600;
 
 const MobileEntityList = ({

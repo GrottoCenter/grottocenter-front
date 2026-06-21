@@ -177,14 +177,15 @@ export const EntranceForm = ({
         Boolean(entranceDataFmt.needStayOnTrail) === Boolean(entranceValues.needStayOnTrail) &&
         Boolean(entranceDataFmt.hasRules) === Boolean(entranceValues.hasRules) &&
         Boolean(entranceDataFmt.isTouristic) === Boolean(entranceValues.isTouristic) &&
-        (entranceDataFmt.altitude ?? null) === (entranceValues.altitude ? Number(entranceValues.altitude) : null) &&
-        (entranceDataFmt.yearDiscovery ?? null) === (entranceValues.yearDiscovery ? Number(entranceValues.yearDiscovery) : null) &&
+        (entranceDataFmt.altitude ?? null) === (entranceValues.altitude != null ? Number(entranceValues.altitude) : null) &&
+        (entranceDataFmt.yearDiscovery ?? null) === (entranceValues.yearDiscovery != null ? Number(entranceValues.yearDiscovery) : null) &&
         (entranceDataFmt.longitude === undefined || String(entranceDataFmt.longitude) === String(entranceValues.longitude ?? '')) &&
         (entranceDataFmt.latitude === undefined || String(entranceDataFmt.latitude) === String(entranceValues.latitude ?? ''));
 
-      if (caveUnchanged && entranceUnchanged) {
-        // nothing to save
-      } else if (entityType === ENTRANCE_AND_CAVE && !caveUnchanged) {
+      // No dispatch when nothing changed — onSubmit resolves successfully,
+      // FormProgressInfo sees isLoading=false/isError=false and redirects immediately.
+      if (caveUnchanged && entranceUnchanged) return;
+      if (entityType === ENTRANCE_AND_CAVE && !caveUnchanged) {
         dispatch(updateCaveAndEntrance(caveData, entranceDataFmt));
       } else {
         dispatch(updateEntrance(entranceDataFmt));
