@@ -15,10 +15,13 @@ const EntranceEdit = () => {
   const { formatMessage } = useIntl();
 
   const { data: entrance, error } = useSelector(state => state.entrance);
+  const entranceDataId = useSelector(state => state.entrance.data?.id);
 
   useEffect(() => {
-    dispatch(fetchEntrance(entranceId));
-  }, [entranceId, dispatch]);
+    if (String(entranceDataId) !== String(entranceId)) {
+      dispatch(fetchEntrance(entranceId));
+    }
+  }, [entranceId, dispatch, entranceDataId]);
 
   const isStale = entrance && String(entrance.id) !== String(entranceId);
 
