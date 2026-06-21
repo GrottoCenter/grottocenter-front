@@ -272,6 +272,10 @@ export const SearchTextAutocomplete = ({
         query
       });
       const hits = r?.hits ?? [];
+      if (Object.keys(cacheRef.current).length >= 50) {
+        const oldest = Object.keys(cacheRef.current)[0];
+        delete cacheRef.current[oldest];
+      }
       cacheRef.current[cacheKey] = hits;
       setOptions(hits);
     } catch (_) {
