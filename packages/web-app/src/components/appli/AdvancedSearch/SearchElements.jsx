@@ -244,6 +244,8 @@ export const SearchTextAutocomplete = ({
   const cacheRef = useRef({});
   const debounceTimer = useRef(null);
 
+  useEffect(() => () => clearTimeout(debounceTimer.current), []);
+
   const updateOption = async query => {
     setLoading(true);
     const filter = { ...ressourceFilter };
