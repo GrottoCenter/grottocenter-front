@@ -12,13 +12,19 @@ import {
 
 import { FormContainer, FormActionRow } from '../utils/FormContainers';
 import { normelizeCoordinate } from '../utils/InputCoordinate';
-import { usePermissions } from '../../../../hooks';
+import { useIntl } from 'react-intl';
+import { usePermissions, useNotification } from '../../../../hooks';
 import LicenseBox from '../utils/LicenseBox';
 import FormProgressInfo from '../utils/FormProgressInfo';
 import EditTypeSelection from './EditTypeSelection';
 import EntranceDetail from './EntranceDetail';
 import CaveDetail from './CaveDetail';
-import { makeCaveData, makeEntranceData } from './transformers';
+import {
+  makeCaveData,
+  makeEntranceData,
+  hasCaveChanged,
+  hasEntranceChanged
+} from './transformers';
 import { ENTRANCE_ONLY, ENTRANCE_AND_CAVE } from './caveType';
 
 const defaultCaveValues = {
@@ -77,6 +83,8 @@ export const EntranceForm = ({
     isNewEntrance ? state.createCave : state.updateCave
   );
   const dispatch = useDispatch();
+  const { formatMessage } = useIntl();
+  const { onInfo } = useNotification();
   const entityTypeInitialValue = useMemo(
     () =>
       caveValues?.entrances?.length > 1 ? ENTRANCE_ONLY : ENTRANCE_AND_CAVE,
@@ -152,10 +160,22 @@ export const EntranceForm = ({
       } else {
         dispatch(postEntrance(entranceDataFmt));
       }
-    } else if (entityType === ENTRANCE_AND_CAVE) {
-      dispatch(updateCaveAndEntrance(caveData, entranceDataFmt));
     } else {
-      dispatch(updateEntrance(entranceDataFmt));
+      const caveUnchanged =
+        entityType !== ENTRANCE_AND_CAVE ||
+        !hasCaveChanged(caveData, caveValues);
+
+      const entranceUnchanged = !hasEntranceChanged(entranceDataFmt, entranceValues);
+
+      if (caveUnchanged && entranceUnchanged) {
+        onInfo(formatMessage({ id: 'No changes detected' }));
+        return;
+      }
+      if (entityType === ENTRANCE_AND_CAVE && !caveUnchanged) {
+        dispatch(updateCaveAndEntrance(caveData, entranceDataFmt));
+      } else {
+        dispatch(updateEntrance(entranceDataFmt));
+      }
     }
   };
 

@@ -93,6 +93,9 @@ MobileEntityCard.propTypes = {
   icon: PropTypes.node
 };
 
+// ~600 cards ≈ 30 "Load more" clicks × 20 rows/page, capped to prevent DOM bloat on mobile.
+const MAX_ACCUMULATED_ROWS = 600;
+
 const MobileEntityList = ({
   rows,
   columns,
@@ -118,7 +121,12 @@ const MobileEntityList = ({
 
   useEffect(() => {
     if (isAppending.current) {
-      setAllRows(prev => [...prev, ...(rows ?? [])]);
+      setAllRows(prev => {
+        const next = [...prev, ...(rows ?? [])];
+        return next.length > MAX_ACCUMULATED_ROWS
+          ? next.slice(0, MAX_ACCUMULATED_ROWS)
+          : next;
+      });
     } else {
       setAllRows(rows ?? []);
     }
@@ -132,7 +140,10 @@ const MobileEntityList = ({
     if (onPageChange) onPageChange(nextPage, rowsPerPage);
   };
 
-  const hasMore = totalRows != null && allRows.length < totalRows;
+  const hasMore =
+    totalRows != null &&
+    allRows.length < totalRows &&
+    allRows.length < MAX_ACCUMULATED_ROWS;
 
   if (allRows.length === 0 && !isLoading) {
     return (
@@ -173,6 +184,14 @@ const MobileEntityList = ({
             </Button>
           )}
         </Box>
+      )}
+      {!hasMore && allRows.length >= MAX_ACCUMULATED_ROWS && (
+        <Typography
+          variant="caption"
+          color="text.secondary"
+          sx={{ display: 'block', textAlign: 'center', py: 1 }}>
+          <Translate>Refine your search to see more results</Translate>
+        </Typography>
       )}
     </Box>
   );

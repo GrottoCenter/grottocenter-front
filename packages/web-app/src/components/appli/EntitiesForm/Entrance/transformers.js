@@ -43,6 +43,45 @@ export const makeEntranceData = (data, entityType) => {
   return entranceData;
 };
 
+export const hasCaveChanged = (caveData, originalCaveValues) => {
+  if (!originalCaveValues) return true;
+  return (
+    caveData.name.text !== originalCaveValues.name ||
+    caveData.name.language !== originalCaveValues.language ||
+    (caveData.depth || 0) !== (Number(originalCaveValues.depth) || 0) ||
+    (caveData.length || 0) !== (Number(originalCaveValues.length) || 0) ||
+    (caveData.temperature || 0) !== (Number(originalCaveValues.temperature) || 0) ||
+    Boolean(caveData.isDiving) !== Boolean(originalCaveValues.isDiving)
+  );
+};
+
+// IMPORTANT: keep in sync with the entranceValues prop shape in EntranceEdit.jsx.
+// Adding a field to the form without updating this function causes the optimisation
+// to silently skip the PUT for that field.
+export const hasEntranceChanged = (entranceDataFmt, originalEntranceValues) => {
+  if (!originalEntranceValues) return true;
+  return (
+    entranceDataFmt.name.text !== originalEntranceValues.name ||
+    entranceDataFmt.name.language !== originalEntranceValues.language ||
+    Boolean(entranceDataFmt.isSensitive) !== Boolean(originalEntranceValues.isSensitive) ||
+    Boolean(entranceDataFmt.hasBat) !== Boolean(originalEntranceValues.hasBat) ||
+    Boolean(entranceDataFmt.dangerFlooding) !== Boolean(originalEntranceValues.dangerFlooding) ||
+    Boolean(entranceDataFmt.dangerCo2) !== Boolean(originalEntranceValues.dangerCo2) ||
+    Boolean(entranceDataFmt.dangerRockfall) !== Boolean(originalEntranceValues.dangerRockfall) ||
+    Boolean(entranceDataFmt.dangerPollution) !== Boolean(originalEntranceValues.dangerPollution) ||
+    Boolean(entranceDataFmt.needCleanGear) !== Boolean(originalEntranceValues.needCleanGear) ||
+    Boolean(entranceDataFmt.needStayOnTrail) !== Boolean(originalEntranceValues.needStayOnTrail) ||
+    Boolean(entranceDataFmt.hasRules) !== Boolean(originalEntranceValues.hasRules) ||
+    Boolean(entranceDataFmt.isTouristic) !== Boolean(originalEntranceValues.isTouristic) ||
+    (entranceDataFmt.altitude ?? null) !== (originalEntranceValues.altitude != null ? Number(originalEntranceValues.altitude) : null) ||
+    (entranceDataFmt.yearDiscovery ?? null) !== (originalEntranceValues.yearDiscovery != null ? Number(originalEntranceValues.yearDiscovery) : null) ||
+    // Coordinates are omitted from entranceDataFmt when the entrance is sensitive
+    // and the user is non-admin, so treat undefined as "no change intended".
+    (entranceDataFmt.longitude !== undefined && String(entranceDataFmt.longitude) !== String(originalEntranceValues.longitude ?? '')) ||
+    (entranceDataFmt.latitude !== undefined && String(entranceDataFmt.latitude) !== String(originalEntranceValues.latitude ?? ''))
+  );
+};
+
 export const makeCaveData = data => ({
   name: {
     language: data.cave.language,
