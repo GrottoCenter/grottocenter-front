@@ -18,7 +18,12 @@ import FormProgressInfo from '../utils/FormProgressInfo';
 import EditTypeSelection from './EditTypeSelection';
 import EntranceDetail from './EntranceDetail';
 import CaveDetail from './CaveDetail';
-import { makeCaveData, makeEntranceData } from './transformers';
+import {
+  makeCaveData,
+  makeEntranceData,
+  hasCaveChanged,
+  hasEntranceChanged
+} from './transformers';
 import { ENTRANCE_ONLY, ENTRANCE_AND_CAVE } from './caveType';
 
 const defaultCaveValues = {
@@ -155,32 +160,9 @@ export const EntranceForm = ({
     } else {
       const caveUnchanged =
         entityType !== ENTRANCE_AND_CAVE ||
-        (!!caveValues &&
-          caveData.name.text === caveValues.name &&
-          caveData.name.language === caveValues.language &&
-          (caveData.depth || 0) === (Number(caveValues.depth) || 0) &&
-          (caveData.length || 0) === (Number(caveValues.length) || 0) &&
-          (caveData.temperature || 0) === (Number(caveValues.temperature) || 0) &&
-          Boolean(caveData.isDiving) === Boolean(caveValues.isDiving));
+        !hasCaveChanged(caveData, caveValues);
 
-      const entranceUnchanged =
-        !!entranceValues &&
-        entranceDataFmt.name.text === entranceValues.name &&
-        entranceDataFmt.name.language === entranceValues.language &&
-        Boolean(entranceDataFmt.isSensitive) === Boolean(entranceValues.isSensitive) &&
-        Boolean(entranceDataFmt.hasBat) === Boolean(entranceValues.hasBat) &&
-        Boolean(entranceDataFmt.dangerFlooding) === Boolean(entranceValues.dangerFlooding) &&
-        Boolean(entranceDataFmt.dangerCo2) === Boolean(entranceValues.dangerCo2) &&
-        Boolean(entranceDataFmt.dangerRockfall) === Boolean(entranceValues.dangerRockfall) &&
-        Boolean(entranceDataFmt.dangerPollution) === Boolean(entranceValues.dangerPollution) &&
-        Boolean(entranceDataFmt.needCleanGear) === Boolean(entranceValues.needCleanGear) &&
-        Boolean(entranceDataFmt.needStayOnTrail) === Boolean(entranceValues.needStayOnTrail) &&
-        Boolean(entranceDataFmt.hasRules) === Boolean(entranceValues.hasRules) &&
-        Boolean(entranceDataFmt.isTouristic) === Boolean(entranceValues.isTouristic) &&
-        (entranceDataFmt.altitude ?? null) === (entranceValues.altitude != null ? Number(entranceValues.altitude) : null) &&
-        (entranceDataFmt.yearDiscovery ?? null) === (entranceValues.yearDiscovery != null ? Number(entranceValues.yearDiscovery) : null) &&
-        (entranceDataFmt.longitude === undefined || String(entranceDataFmt.longitude) === String(entranceValues.longitude ?? '')) &&
-        (entranceDataFmt.latitude === undefined || String(entranceDataFmt.latitude) === String(entranceValues.latitude ?? ''));
+      const entranceUnchanged = !hasEntranceChanged(entranceDataFmt, entranceValues);
 
       // No dispatch when nothing changed — onSubmit resolves successfully,
       // FormProgressInfo sees isLoading=false/isError=false and redirects immediately.

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useIntl } from 'react-intl';
 import { CircularProgress } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
@@ -16,14 +16,18 @@ const EntranceEdit = () => {
 
   const { data: entrance, error } = useSelector(state => state.entrance);
   const entranceDataId = useSelector(state => state.entrance.data?.id);
+  const fetchedForRef = useRef(null);
 
   useEffect(() => {
     // Skip fetch if Redux already holds fresh data for this entrance.
     // Trade-off: data could be stale if another session edited it concurrently,
-    // but this is acceptable — the entry view page will refetch after save anyway.
-    if (String(entranceDataId) !== String(entranceId)) {
-      dispatch(fetchEntrance(entranceId));
-    }
+    // but this is acceptable — the entrance view page will refetch after save anyway.
+    // fetchedForRef guards against a double-dispatch: FETCH_ENTRANCE_LOADING sets
+    // data=undefined, which would re-trigger this effect via entranceDataId changing.
+    if (String(entranceDataId) === String(entranceId)) return;
+    if (fetchedForRef.current === entranceId) return;
+    fetchedForRef.current = entranceId;
+    dispatch(fetchEntrance(entranceId));
   }, [entranceId, dispatch, entranceDataId]);
 
   const isStale = entrance && String(entrance.id) !== String(entranceId);
