@@ -3,9 +3,12 @@
   <defs>
     <mask id="statsCutout">
       <rect x="4" y="4" width="92" height="88" rx="20" fill="#ffffff"/>
-      <rect x="24" y="50" width="14" height="22" rx="2" fill="#000000"/>
-      <rect x="43" y="40" width="14" height="32" rx="2" fill="#000000"/>
-      <rect x="62" y="28" width="14" height="44" rx="2" fill="#000000"/>
+      <!-- left bar: 70% height -->
+      <rect x="18" y="39" width="16" height="35" rx="2" fill="#000000"/>
+      <!-- center bar: 100% height (tallest) -->
+      <rect x="42" y="24" width="16" height="50" rx="2" fill="#000000"/>
+      <!-- right bar: 40% height -->
+      <rect x="66" y="54" width="16" height="20" rx="2" fill="#000000"/>
     </mask>
   </defs>
   <rect x="4" y="4" width="92" height="88" rx="20" fill="#D7CCC8" mask="url(#statsCutout)"/>
