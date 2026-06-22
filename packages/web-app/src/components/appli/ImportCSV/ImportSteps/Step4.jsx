@@ -1,5 +1,5 @@
 import React, { useContext, useEffect } from 'react';
-import { Box, Typography } from '@mui/material';
+import { Box, Link, Typography } from '@mui/material';
 import PublishIcon from '@mui/icons-material/Publish';
 import { useDispatch, useSelector } from 'react-redux';
 import { useIntl } from 'react-intl';
@@ -13,12 +13,12 @@ import ActionButton from '../../../common/ActionButton';
 import { FAILURE_IMPORT, SUCCESS_IMPORT } from '../constants';
 import Alert from '../../../common/Alert';
 import DownloadButton from '../DownloadButton';
-import InternationalizedLink from '../../../common/InternationalizedLink';
-import { biLinks } from '../../../../conf/externalLinks';
+import { useOpenBi } from '../../../../hooks';
 
 const Step4 = () => {
   const dispatch = useDispatch();
   const { formatMessage } = useIntl();
+  const { openBi, isOpening } = useOpenBi();
   const importCsv = useSelector(state => state.importCsv);
   const { importData, selectedType } = useContext(ImportPageContentContext);
 
@@ -194,11 +194,16 @@ const Step4 = () => {
         (resultImport.total.success > 0 ||
           resultImport.total.successfulImportAsDuplicates > 0) && (
           <Typography sx={{ mt: 2 }}>
-            <InternationalizedLink links={biLinks}>
+            <Link
+              component="button"
+              type="button"
+              onClick={openBi}
+              disabled={isOpening}
+              sx={{ opacity: isOpening ? 0.5 : 1 }}>
               {formatMessage({
                 id: 'View your imported data on the statistics dashboard'
               })}
-            </InternationalizedLink>
+            </Link>
           </Typography>
         )}
     </>

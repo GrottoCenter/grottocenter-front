@@ -92,7 +92,7 @@ export const caveConservationLinks = generateLinks(
   'en'
 );
 export const biLinks = {
-  '*': 'https://bi.grottocenter.org'
+  '*': process.env.REACT_APP_BI_URL || 'https://bi.grottocenter.org'
 };
 export const wikiBBSLinks = {
   fr: 'https://wiki.grottocenter.org/wiki/GrottoCenter:Fr/bbs',

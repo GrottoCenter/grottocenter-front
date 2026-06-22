@@ -20,9 +20,9 @@ import {
   githubLink,
   oaiLinks,
   z3950Links,
-  uptimeLinks,
-  biLinks
+  uptimeLinks
 } from '../../conf/externalLinks';
+import { useOpenBi } from '../../hooks';
 
 const FooterRoot = styled('footer')(({ theme }) => ({
   backgroundColor: theme.palette.primary.main,
@@ -108,8 +108,20 @@ const ApiImg = styled(SocialImg)({
   animation: `${rotateAnimation} 30s ease-out infinite`
 });
 
+const PlainButton = styled('button')({
+  border: 'none',
+  background: 'none',
+  padding: 0,
+  margin: 0,
+  width: '100%',
+  cursor: 'pointer',
+  display: 'block',
+  '&:disabled': { opacity: 0.5, cursor: 'default' }
+});
+
 const Footer = () => {
   const { formatMessage } = useIntl();
+  const { openBi, isOpening } = useOpenBi();
 
   return (
     <FooterRoot>
@@ -284,14 +296,17 @@ const Footer = () => {
                 </InternationalizedLink>
               </IconItem>
               <IconItem>
-                <InternationalizedLink
-                  links={biLinks}
-                  title={formatMessage({ id: 'Statistics' })}>
+                <PlainButton
+                  type="button"
+                  onClick={openBi}
+                  disabled={isOpening}
+                  title={formatMessage({ id: 'Statistics' })}
+                  aria-label={formatMessage({ id: 'Statistics' })}>
                   <SocialImg
                     src="/images/icons8/statistics.svg"
                     alt={formatMessage({ id: 'Statistics' })}
                   />
-                </InternationalizedLink>
+                </PlainButton>
               </IconItem>
             </IconList>
           </Grid>
