@@ -87,6 +87,13 @@ export const wikiBatsLinks = generateLinks(
   'https://wiki.grottocenter.org/wiki/GrottoCenter:%s/bats',
   'en'
 );
+export const caveConservationLinks = generateLinks(
+  'https://wiki.grottocenter.org/wiki/GrottoCenter:%s/Cave_conservation',
+  'en'
+);
+export const biLinks = {
+  '*': 'https://bi.grottocenter.org'
+};
 export const wikiBBSLinks = {
   fr: 'https://wiki.grottocenter.org/wiki/GrottoCenter:Fr/bbs',
   en: 'https://wiki.grottocenter.org/wiki/GrottoCenter:En/bbs',

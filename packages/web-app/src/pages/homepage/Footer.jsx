@@ -15,11 +15,13 @@ import {
   licensesODBLink,
   bloggerLinks,
   wikiBatsLinks,
+  caveConservationLinks,
   facebookLink,
   githubLink,
   oaiLinks,
   z3950Links,
-  uptimeLinks
+  uptimeLinks,
+  biLinks
 } from '../../conf/externalLinks';
 
 const FooterRoot = styled('footer')(({ theme }) => ({
@@ -114,7 +116,7 @@ const Footer = () => {
       <MainSection>
         <Grid container spacing={4}>
           {/* Column 1 — Brand + Licenses */}
-          <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+          <Grid size={{ xs: 12, sm: 6, md: 4 }}>
             <Box
               sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1.5 }}>
               <Box
@@ -153,7 +155,7 @@ const Footer = () => {
           </Grid>
 
           {/* Column 2 — Navigation */}
-          <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+          <Grid size={{ xs: 12, sm: 6, md: 2 }}>
             <ColumnLabel variant="overline">
               {formatMessage({ id: 'Navigation' })}
             </ColumnLabel>
@@ -178,8 +180,25 @@ const Footer = () => {
             </NavList>
           </Grid>
 
-          {/* Column 3 — Follow us */}
-          <Grid size={{ xs: 6, sm: 6, md: 3 }}>
+          {/* Column 3 — Good practices */}
+          <Grid size={{ xs: 12, sm: 6, md: 2 }}>
+            <ColumnLabel variant="overline">
+              {formatMessage({ id: 'Best practices' })}
+            </ColumnLabel>
+            <NavList
+              component="nav"
+              aria-label={formatMessage({ id: 'Best practices' })}>
+              <InternationalizedLink links={wikiBatsLinks}>
+                {formatMessage({ id: 'Bats protection' })}
+              </InternationalizedLink>
+              <InternationalizedLink links={caveConservationLinks}>
+                {formatMessage({ id: 'Cave conservation' })}
+              </InternationalizedLink>
+            </NavList>
+          </Grid>
+
+          {/* Column 4 — Follow us */}
+          <Grid size={{ xs: 6, sm: 6, md: 2 }}>
             <ColumnLabel variant="overline">
               {formatMessage({ id: 'Follow us' })}
             </ColumnLabel>
@@ -207,8 +226,8 @@ const Footer = () => {
             </IconList>
           </Grid>
 
-          {/* Column 4 — Technical */}
-          <Grid size={{ xs: 6, sm: 6, md: 3 }}>
+          {/* Column 5 — Technical */}
+          <Grid size={{ xs: 6, sm: 6, md: 2 }}>
             <ColumnLabel variant="overline">
               {formatMessage({ id: 'Technical' })}
             </ColumnLabel>
@@ -266,11 +285,11 @@ const Footer = () => {
               </IconItem>
               <IconItem>
                 <InternationalizedLink
-                  links={wikiBatsLinks}
-                  title={formatMessage({ id: 'Wiki page for bats' })}>
+                  links={biLinks}
+                  title={formatMessage({ id: 'Statistics' })}>
                   <SocialImg
-                    src="/images/icons8/bats.svg"
-                    alt={formatMessage({ id: 'Wiki page for bats' })}
+                    src="/images/icons8/statistics.svg"
+                    alt={formatMessage({ id: 'Statistics' })}
                   />
                 </InternationalizedLink>
               </IconItem>
