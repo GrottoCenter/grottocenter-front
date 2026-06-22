@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect } from 'react';
 import { useIntl } from 'react-intl';
 import { CircularProgress } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
@@ -15,20 +15,17 @@ const EntranceEdit = () => {
   const { formatMessage } = useIntl();
 
   const { data: entrance, error } = useSelector(state => state.entrance);
-  const entranceDataId = useSelector(state => state.entrance.data?.id);
-  const fetchedForRef = useRef(null);
 
   useEffect(() => {
-    // Skip fetch if Redux already holds fresh data for this entrance.
-    // Trade-off: data could be stale if another session edited it concurrently,
-    // but this is acceptable — the entrance view page will refetch after save anyway.
-    // fetchedForRef guards against a double-dispatch: FETCH_ENTRANCE_LOADING sets
-    // data=undefined, which would re-trigger this effect via entranceDataId changing.
-    if (String(entranceDataId) === String(entranceId)) return;
-    if (fetchedForRef.current === entranceId) return;
-    fetchedForRef.current = entranceId;
+    // Skip fetch if Redux already holds fresh data for this entrance (navigating
+    // from the entrance view). Trade-off: data could be stale if another session
+    // edited it concurrently, but the entrance view page will refetch after save.
+    // entrance is intentionally excluded from deps — we only want to run when
+    // entranceId changes, not when Redux state updates mid-flight.
+    if (String(entrance?.id) === String(entranceId)) return;
     dispatch(fetchEntrance(entranceId));
-  }, [entranceId, dispatch, entranceDataId]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [entranceId, dispatch]);
 
   const isStale = entrance && String(entrance.id) !== String(entranceId);
 

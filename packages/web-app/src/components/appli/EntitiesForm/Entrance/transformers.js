@@ -55,6 +55,9 @@ export const hasCaveChanged = (caveData, originalCaveValues) => {
   );
 };
 
+// IMPORTANT: keep in sync with the entranceValues prop shape in EntranceEdit.jsx.
+// Adding a field to the form without updating this function causes the optimisation
+// to silently skip the PUT for that field.
 export const hasEntranceChanged = (entranceDataFmt, originalEntranceValues) => {
   if (!originalEntranceValues) return true;
   return (

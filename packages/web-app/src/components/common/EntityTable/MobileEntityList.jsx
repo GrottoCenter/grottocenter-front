@@ -185,6 +185,14 @@ const MobileEntityList = ({
           )}
         </Box>
       )}
+      {!hasMore && allRows.length >= MAX_ACCUMULATED_ROWS && (
+        <Typography
+          variant="caption"
+          color="text.secondary"
+          sx={{ display: 'block', textAlign: 'center', py: 1 }}>
+          <Translate>Refine your search to see more results</Translate>
+        </Typography>
+      )}
     </Box>
   );
 };
