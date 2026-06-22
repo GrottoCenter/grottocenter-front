@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import { defineMessages } from 'react-intl';
 import { Box } from '@mui/material';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
-import UploadFileIcon from '@mui/icons-material/UploadFile';
 import CustomIcon from '../../components/common/CustomIcon';
 
 const descriptions = defineMessages({
@@ -45,19 +44,15 @@ export const ENTITIES = [
   },
   {
     path: '/ui/observations/import',
-    iconType: 'importObservations',
-    titleKey: 'Import observations',
+    iconType: 'scientific_observation',
+    titleKey: 'Scientific observations',
     descriptionKey: descriptions.importObservations
   }
 ];
 
 export const EntityIcon = ({ iconType, size = 35, BadgeIcon = AddCircleIcon }) => (
   <Box sx={{ position: 'relative', display: 'inline-flex' }}>
-    {iconType === 'importObservations' ? (
-      <UploadFileIcon sx={{ fontSize: size, color: 'action.active' }} />
-    ) : (
-      <CustomIcon type={iconType} size={size} />
-    )}
+    <CustomIcon type={iconType} size={size} />
     <BadgeIcon
       sx={{
         position: 'absolute',

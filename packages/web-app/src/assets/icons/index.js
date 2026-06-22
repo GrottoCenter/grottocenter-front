@@ -26,4 +26,5 @@ export { default as stayOnTrailIcon } from './stay-on-trail.svg';
 export { default as temperatureIcon } from './temperature.svg';
 export { default as timeToGoIcon } from './time-to-go.svg';
 export { default as touristicIcon } from './touristic.svg';
+export { default as scientificObservationIcon } from './scientific-observation.svg';
 export { default as undergroundTimeIcon } from './underground-time.svg';
