@@ -43,6 +43,8 @@ yarn translations:sync-with-en
 
 **3. Translate the values** — edit each lang file and replace the English fallback with the actual translation. Use a token-efficient way to do it.
 
+> ⚠️ **CRITICAL: Always translate in the target language.** Never leave English text in non-English language files. Every key in `fr.json` must have a French value, every key in `es.json` must have a Spanish value, etc. Using the English string as a placeholder in other languages is NOT acceptable — translate every value into the proper language for that file.
+
 > ⚠️ **Encoding — NEVER introduce a BOM**: lang files must be UTF-8 **without** BOM.
 >
 > - Use the **Edit** or **Write** tool (safe — no BOM).
@@ -109,7 +111,15 @@ export const fetchCave = id => async dispatch => {
     const data = await response.json();
     dispatch({ type: FETCH_CAVE_SUCCESS, payload: data });
   } catch (error) {
-    dispatch({ type: FETCH_CAVE_FAILURE, error: error.message });
+    dispatch({
+      type: FETCH_CAVE_FAILURE,
+      error: {
+        code: error.body?.code || null,
+        message: error.body?.message || error.message,
+        details: error.body?.metadata?.details || [],
+        status: error.status || null
+      }
+    });
   }
 };
 ```
@@ -206,6 +216,79 @@ const CaveView = ({ id }) => {
 
 // ❌ Deprecated: connect()
 export default connect(mapStateToProps, mapDispatchToProps)(CaveView);
+```
+
+---
+
+## ⚠️ Error Handling (API Errors)
+
+### Error Object Shape
+
+`checkAndGetStatus` (in `src/actions/utils.js`) attaches the parsed response body and HTTP status to thrown errors:
+
+```javascript
+error.message  // body.message || status code
+error.body     // full parsed JSON response (code, message, metadata, reference_id)
+error.status   // HTTP status code (400, 404, 409, 500, etc.)
+```
+
+### Dispatching Structured Errors
+
+Always preserve the error structure in failure actions:
+
+```javascript
+.catch(error => {
+  if (error.isAuthError) return;
+  dispatch({
+    type: ACTION_FAILURE,
+    error: {
+      code: error.body?.code || null,
+      message: error.body?.message || error.message,
+      details: error.body?.metadata?.details || [],
+      status: error.status || null
+    }
+  });
+});
+```
+
+### Displaying Errors to Users
+
+Use `useNotification()` (notistack toasts) — the preferred pattern:
+
+```javascript
+import { useNotification } from '../../hooks';
+
+const { onError } = useNotification();
+
+useEffect(() => {
+  if (!error) return;
+  const { code, message } = error;
+  const toastMessage = code
+    ? formatMessage({ id: code, defaultMessage: message || fallbackMessage })
+    : message || formatMessage({ id: 'unexpected error' });
+  onError(toastMessage);
+}, [error]);
+```
+
+**Rules:**
+
+- Use the error **code** as the `formatMessage` id (allows localized error messages)
+- Fall back to the raw API **message** via `defaultMessage`
+- When `details[]` is present (field-level validation), show inline with `<Alert>` + `<List>` (toasts can't display lists)
+- For 500 errors, show a generic "server error" toast — never expose internal details
+- Add i18n keys for each error code (e.g., `"IMPORT_VALIDATION_ERROR": "Profile validation failed."`) to all lang files
+
+### Anti-Patterns
+
+```javascript
+// ❌ Discards structured error — loses code and details
+dispatch({ type: FAILURE, error: error.message });
+
+// ❌ Showing raw API message without i18n fallback
+<Alert>{error.message}</Alert>
+
+// ❌ Exposing 500 error internals to the user
+onError(error.body?.message); // might contain stack traces
 ```
 
 ---

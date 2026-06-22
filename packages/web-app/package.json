@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@asymmetrik/leaflet-d3": "^6.0.1",
+    "@date-fns/utc": "^2.1.1",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
     "@mui/icons-material": "^7.3.9",
@@ -31,7 +32,7 @@
     "@turf/line-intersect": "^7.3.5",
     "@turf/rewind": "^7.3.5",
     "coordinate-parser": "^1.0.7",
-    "cypress": "^15.16.0",
+    "cypress": "^15.17.0",
     "d3": "^7.9.0",
     "d3-hexbin": "^0.2.2",
     "date-fns": "^4.4.0",

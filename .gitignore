@@ -74,3 +74,9 @@ CLAUDE.md
 .amazonq
 .kiro
 .claude
+
+# Cypress
+packages/web-app/cypress/downloads/
+packages/web-app/cypress/screenshots/
+packages/web-app/cypress/videos/
+packages/web-app/cypress/fixtures/test-profile.json

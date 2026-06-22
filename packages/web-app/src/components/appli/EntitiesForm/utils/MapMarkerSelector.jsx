@@ -11,6 +11,8 @@ import PropTypes from 'prop-types';
 import { isMobile } from 'react-device-detect';
 import { styled } from '@mui/material/styles';
 import { entranceMarkerIcon } from '../../../../assets/icons';
+import useMarkers from '../../../common/Maps/common/Markers/useMarkers';
+import { EntranceMarker } from '../../../common/Maps/common/Markers/Components';
 import LayersControl from '../../../common/Maps/common/LayersControl';
 import LocateMeControl from '../../../common/Maps/common/LocateMeControl';
 import GeocodingControl from '../../../common/Maps/common/GeocodingControl';
@@ -79,6 +81,22 @@ const toFloat = value => {
   return parseFloat(v);
 };
 
+const AdditionalMarkers = ({ positions }) => {
+  const updateMarkers = useMarkers({
+    icon: EntranceMarker,
+    tooltipContent: entrance => entrance.name
+  });
+
+  useEffect(() => {
+    updateMarkers(positions);
+  }, [positions, updateMarkers]);
+
+  return null;
+};
+AdditionalMarkers.propTypes = {
+  positions: PropTypes.arrayOf(PropTypes.shape({})).isRequired
+};
+
 const LOCATE_ZOOM = 18;
 // How long after the map writes to the form before we allow form→map updates.
 // Prevents the map pan → form update → map recenter loop.
@@ -91,7 +109,7 @@ const ACCURACY_CIRCLE_STYLE = {
   weight: 1
 };
 
-const MapMarkerSelector = ({ control, formLatitudeKey, formLongitudeKey }) => {
+const MapMarkerSelector = ({ control, formLatitudeKey, formLongitudeKey, additionalPositions = [], markerIcon, mapHeight = '40dvh' }) => {
   const [locating, setLocating] = useState(false);
   const [locateError, setLocateError] = useState(null);
   const [initialized, setInitialized] = useState(false);
@@ -170,7 +188,7 @@ const MapMarkerSelector = ({ control, formLatitudeKey, formLongitudeKey }) => {
 
   return (
     <StyledMapContainer
-      style={{ height: '40dvh', width: 'calc(100% - 8px)' }}
+      style={{ height: mapHeight, width: 'calc(100% - 8px)' }}
       center={currentPosition}
       zoom={zoomLevel}
       dragging={!isMobile} // For usability only use two fingers drag/zoom on mobile
@@ -212,8 +230,15 @@ const MapMarkerSelector = ({ control, formLatitudeKey, formLongitudeKey }) => {
         />
       )}
 
+      {additionalPositions.length > 0 && (
+        <AdditionalMarkers positions={additionalPositions} />
+      )}
+
       <span className="centralMarker">
-        <img alt="Entry" src={entranceMarkerIcon} />
+        <img
+          alt="Entry"
+          src={markerIcon || entranceMarkerIcon}
+        />
       </span>
     </StyledMapContainer>
   );
@@ -222,7 +247,10 @@ const MapMarkerSelector = ({ control, formLatitudeKey, formLongitudeKey }) => {
 MapMarkerSelector.propTypes = {
   control: PropTypes.shape({}),
   formLatitudeKey: PropTypes.string,
-  formLongitudeKey: PropTypes.string
+  formLongitudeKey: PropTypes.string,
+  additionalPositions: PropTypes.arrayOf(PropTypes.shape({})),
+  markerIcon: PropTypes.string,
+  mapHeight: PropTypes.string
 };
 
 export default MapMarkerSelector;

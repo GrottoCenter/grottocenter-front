@@ -57,6 +57,8 @@ const SignUpForm = ({
 
   const checkIfHasError = fieldName => {
     switch (fieldName) {
+      case 'nickname':
+        return nickname.trim() === '';
       case 'email':
         return !isValidEmail(email);
       case 'password':
@@ -88,6 +90,7 @@ const SignUpForm = ({
           <FormWrapper onSubmit={onSignUp}>
             <StringInput
               fullWidth
+              hasError={checkIfHasError('nickname')}
               helperText={formatMessage({
                 id: 'The nickname defines how other users see you.'
               })}

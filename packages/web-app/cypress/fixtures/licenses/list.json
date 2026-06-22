@@ -1,0 +1,6 @@
+{
+  "licenses": [
+    { "id": 1, "name": "ODbL", "text": "Open Database License" },
+    { "id": 2, "name": "ODC-BY", "text": "Open Data Commons Attribution" }
+  ]
+}

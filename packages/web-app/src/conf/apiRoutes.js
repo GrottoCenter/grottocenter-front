@@ -344,6 +344,22 @@ export const subscribeToRegionUrl = (countryId, regionId) =>
 export const unsubscribeFromRegionUrl = (countryId, regionId) =>
   `${API_BASE_PATH}/countries/${countryId}/regions/${regionId}/unsubscribe`;
 
+// ===== Substances urls
+export const substancesUrl = `${API_BASE_PATH}/substances`;
+export const substancesSearchUrl = search =>
+  `${API_BASE_PATH}/substances?search=${encodeURIComponent(search)}`;
+
+// ===== Observations urls
+export const observationsImportUrl = `${API_BASE_PATH}/observations/import`;
+
+// ===== Devices urls
+export const devicesUrl = `${API_BASE_PATH}/devices`;
+export const devicesSearchUrl = `${API_BASE_PATH}/devices/search`;
+export const getDeviceUrl = deviceId =>
+  `${API_BASE_PATH}/devices/${deviceId}`;
+export const deviceConfigurationsUrl = deviceId =>
+  `${API_BASE_PATH}/devices/${deviceId}/configurations`;
+
 // ===== ImportCSV urls
 export const checkRowsEntrancesUrl = `${API_BASE_PATH}/entrances/check-rows`;
 export const checkRowsDocumentsUrl = `${API_BASE_PATH}/documents/check-rows`;

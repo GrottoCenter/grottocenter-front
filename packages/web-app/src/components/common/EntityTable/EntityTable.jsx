@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { isMobile } from 'react-device-detect';
-import { Box, Divider, LinearProgress } from '@mui/material';
+import { Box, Divider, IconButton, LinearProgress, Tooltip } from '@mui/material';
+import FileDownloadIcon from '@mui/icons-material/FileDownload';
+import { useIntl } from 'react-intl';
 
 import entitiesConfig from './entitiesConfig';
 import DesktopEntityTable from './DesktopEntityTable';
+import ExportFormatDropdown from './ExportFormatDropdown';
 import MobileEntityList from './MobileEntityList';
 import MobileToolbar from './MobileToolbar';
 import {
@@ -39,6 +42,8 @@ const initColumns = (
   return columns;
 };
 
+const MAX_EXPORT_ROWS = 10000;
+
 const EntityTable = ({
   entityType,
   entityColumnsModifier,
@@ -50,11 +55,12 @@ const EntityTable = ({
   pageSizeOptions = DEFAULT_PAGE_SIZE_OPTIONS,
   onPageChange,
   onSortChange,
-  onCSVDownload,
+  onExport,
   isNewQuery = false,
   shouldHideFooter = false,
   compact = false
 }) => {
+  const { formatMessage } = useIntl();
   const entityConfig = entitiesConfig[entityType ?? 'placeholder'];
 
   const [entityColumns, setEntityColumns] = useState(() =>
@@ -114,6 +120,48 @@ const EntityTable = ({
       if (onSortChange) onSortChange(`${apiField}:${newOrder}`);
     };
 
+    const exportDisabled = nbTotalRows != null && nbTotalRows > MAX_EXPORT_ROWS;
+    const exportCols = visibleColumns.map(c => c.apiField || c.field);
+    const exportLabels = visibleColumns.map(c => c.label);
+    let exportSlot;
+    if (onExport) {
+      if (entityType === 'entrances') {
+        exportSlot = (
+          <ExportFormatDropdown
+            disabled={exportDisabled}
+            onExport={format => onExport(exportCols, exportLabels, format)}
+            iconOnly
+          />
+        );
+      } else {
+        exportSlot = (
+          <Tooltip
+            title={formatMessage({
+              id: exportDisabled
+                ? 'Export unavailable above 10000 results'
+                : 'Export'
+            })}>
+            <span>
+              <IconButton
+                size="small"
+                color="primary"
+                disabled={exportDisabled}
+                onClick={() => onExport(exportCols, exportLabels)}
+                sx={{
+                  border: '1px solid',
+                  borderColor: exportDisabled
+                    ? 'action.disabled'
+                    : 'primary.main',
+                  borderRadius: 1
+                }}>
+                <FileDownloadIcon fontSize="small" />
+              </IconButton>
+            </span>
+          </Tooltip>
+        );
+      }
+    }
+
     return (
       <Box sx={{ width: '100%' }}>
         {!shouldHideFooter && (
@@ -130,6 +178,7 @@ const EntityTable = ({
               entityType={entityType}
               onViewToggle={toggleViewMode}
               viewMode={viewMode}
+              exportSlot={exportSlot}
             />
             <Divider />
           </>
@@ -168,7 +217,7 @@ const EntityTable = ({
       pageSizeOptions={pageSizeOptions}
       onPageChange={onPageChange}
       onSortChange={onSortChange}
-      onCSVDownload={onCSVDownload}
+      onExport={onExport}
       isNewQuery={isNewQuery}
       shouldHideFooter={shouldHideFooter}
       compact={compact}
@@ -189,7 +238,7 @@ EntityTable.propTypes = {
   pageSizeOptions: PropTypes.arrayOf(PropTypes.number),
   onPageChange: PropTypes.func,
   onSortChange: PropTypes.func,
-  onCSVDownload: PropTypes.func,
+  onExport: PropTypes.func,
   isNewQuery: PropTypes.bool,
   shouldHideFooter: PropTypes.bool,
   compact: PropTypes.bool

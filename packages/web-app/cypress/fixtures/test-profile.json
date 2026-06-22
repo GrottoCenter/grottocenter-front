@@ -1,0 +1,28 @@
+{
+  "encoding": "UTF-8",
+  "headerRow": 1,
+  "skipFirstRows": 0,
+  "skipLastRows": 0,
+  "numberLocale": "en",
+  "timezone": "UTC",
+  "dateFormat": "YYYY-MM-DD HH:mm:ss",
+  "dateOnlyFormat": null,
+  "timeOnlyFormat": null,
+  "columnMappings": [
+    { "columnIndex": 0, "role": "timestamp", "timestampType": "datetime" },
+    { "columnIndex": 1, "role": "measurement", "sensorConfigurationId": 101, "mediumId": null }
+  ],
+  "deviceId": 1,
+  "caveId": 42,
+  "locationMode": "pointAndCave",
+  "pointLabel": "Salle du Chaos - T1",
+  "latitude": null,
+  "longitude": null,
+  "authorIds": [1],
+  "licenseId": 1,
+  "documentTitle": null,
+  "documentLanguage": "eng",
+  "observationName": null,
+  "dataQuality": "raw",
+  "samplingIntervalSeconds": 900
+}

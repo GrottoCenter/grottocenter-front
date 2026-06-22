@@ -1,5 +1,6 @@
 import fetch from 'isomorphic-fetch';
 import { advancedSearchUrl, advancedSearchExportUrl } from '../conf/apiRoutes';
+import { VALID_EXPORT_FORMATS } from '../conf/exportFormats';
 import { checkAndGetStatus } from './utils';
 
 export const FETCH_ADVANCEDSEARCH = 'FETCH_ADVANCEDSEARCH';
@@ -58,8 +59,10 @@ export const downloadAdvancedSearchResults = async ({
   filter,
   matchAllFields = true,
   columns,
-  columnsName
+  columnsName,
+  format = 'csv'
 }) => {
+  const safeFormat = VALID_EXPORT_FORMATS.has(format) ? format : 'csv';
   const data = {
     query,
     entity,
@@ -74,7 +77,9 @@ export const downloadAdvancedSearchResults = async ({
     body: JSON.stringify(data)
   };
 
-  const blob = await fetch(advancedSearchExportUrl, requestOptions)
+  const exportUrl = `${advancedSearchExportUrl}?format=${encodeURIComponent(safeFormat)}`;
+
+  const blob = await fetch(exportUrl, requestOptions)
     .then(checkAndGetStatus)
     .then(response => response.blob())
     .catch(errorMessage => {
@@ -86,7 +91,7 @@ export const downloadAdvancedSearchResults = async ({
   const url = window.URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = `Grottocenter_search_export_${Math.trunc(Date.now() / 1000)}.csv`;
+  a.download = `Grottocenter_search_export_${Math.trunc(Date.now() / 1000)}.${safeFormat}`;
   document.body.appendChild(a);
   a.click();
 

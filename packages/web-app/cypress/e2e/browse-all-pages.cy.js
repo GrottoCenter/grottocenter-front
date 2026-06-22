@@ -1,13 +1,4 @@
 describe('Simple pages loader to check all major pages load correctly', () => {
-  Cypress.Commands.add('checkPageLoaded', () => {
-    // Very simple check to know if the app crashed (blank page) or not
-    // Generally, if an error occurs, the h1 tag is not populated and a blank page is displayed.
-
-    // Increase timeout because some pages can take a long time to load
-    // TODO: make these pages quicker to load and reduce this timeout
-    cy.get('h1', { timeout: 15000 }).should('exist').should('not.be.empty');
-  });
-
   it('home page', () => {
     cy.visit('/');
     cy.checkPageLoaded();
@@ -77,7 +68,7 @@ describe('Simple pages loader to check all major pages load correctly', () => {
   it('organization page', () => {
     cy.visit('/organizations/2');
     // TODO: make these pages quicker to load and reduce this timeout
-    cy.get('h1', { timeout: 35000 }).should('exist').should('not.be.empty');
+    cy.checkPageLoaded({ timeout: 35000 });
   });
 
   it('country page', () => {

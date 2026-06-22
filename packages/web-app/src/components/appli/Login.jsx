@@ -1,7 +1,9 @@
 import React, { useEffect } from 'react';
 import {
+  Alert,
   Button,
   CircularProgress,
+  Divider,
   Typography,
   Box,
   useMediaQuery,
@@ -44,29 +46,63 @@ const Login = () => {
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
   const lockedCredentials = React.useRef({ email: '', password: '' });
-  const [authErrorMessages, setAuthErrorMessages] = React.useState([]);
+  const [fieldErrors, setFieldErrors] = React.useState({
+    email: '',
+    password: ''
+  });
+  const [isServerErrorHidden, setIsServerErrorHidden] = React.useState(true);
   const [resendTimeout, setResendTimeout] = React.useState(0);
   const navigate = useNavigate();
   const { onSuccess } = useNotification();
   const { formatMessage } = useIntl();
 
+  const isPlainLogin =
+    !authState.isMustResetMessageDisplayed &&
+    !authState.isNotVerifiedMessageDisplayed;
+
+  const serverError =
+    !isServerErrorHidden && authState.error?.message
+      ? formatMessage({
+          id: authState.error.message,
+          defaultMessage: authState.error.message
+        })
+      : '';
+
+  const makeFieldChangeHandler = (field, setValue) => value => {
+    setValue(value);
+    setFieldErrors(prev => ({ ...prev, [field]: '' }));
+    setIsServerErrorHidden(true);
+  };
+  const handleEmailChange = makeFieldChangeHandler('email', setEmail);
+  const handlePasswordChange = makeFieldChangeHandler('password', setPassword);
+
+  const validateEmail = () => {
+    if (isEmpty(email))
+      return formatMessage({ id: 'You must provide an email.' });
+    if (!isValidEmail(email))
+      return formatMessage({ id: 'You must provide a valid email.' });
+    return '';
+  };
+
+  const validatePassword = () =>
+    isEmpty(password)
+      ? formatMessage({ id: 'You must provide a password.' })
+      : '';
+
   const onLogin = event => {
     event.preventDefault();
 
-    const newAuthErrorMessages = [
-      ...(isEmpty(email)
-        ? [formatMessage({ id: 'You must provide an email.' })]
-        : []),
-      ...(!isValidEmail(email) && !isEmpty(email)
-        ? [formatMessage({ id: 'You must provide a valid email.' })]
-        : []),
-      ...(isEmpty(password)
-        ? [formatMessage({ id: 'You must provide a password.' })]
-        : [])
-    ];
+    if (authState.isFetching || resendVerificationState.isFetching) return;
 
-    setAuthErrorMessages(newAuthErrorMessages);
-    if (newAuthErrorMessages.length !== 0) return;
+    const newFieldErrors = {
+      email: isPlainLogin ? validateEmail() : '',
+      password: isPlainLogin ? validatePassword() : ''
+    };
+
+    setFieldErrors(newFieldErrors);
+    if (newFieldErrors.email || newFieldErrors.password) return;
+
+    setIsServerErrorHidden(false);
 
     if (authState.isMustResetMessageDisplayed) {
       dispatch(
@@ -97,6 +133,15 @@ const Login = () => {
     dispatch(displayLoginDialog());
   };
 
+  // Reset transient errors whenever the dialog (re)opens so a stale server
+  // error from a previous attempt is never shown on a fresh open.
+  useEffect(() => {
+    if (authState.isLoginDialogDisplayed) {
+      setFieldErrors({ email: '', password: '' });
+      setIsServerErrorHidden(true);
+    }
+  }, [authState.isLoginDialogDisplayed]);
+
   useEffect(() => {
     if (resendVerificationState.success) {
       onSuccess(formatMessage({ id: 'Verification email sent!' }));
@@ -117,7 +162,7 @@ const Login = () => {
     return () => clearInterval(interval);
   }, [resendTimeout]);
 
-  const LoginButtonMessage = () => {
+  const getLoginButtonLabel = () => {
     if (authState.isMustResetMessageDisplayed) {
       return <Translate>Send reset email</Translate>;
     }
@@ -135,22 +180,24 @@ const Login = () => {
     return <Translate>Log in</Translate>;
   };
 
+  const isSubmitting =
+    authState.isFetching || resendVerificationState.isFetching;
+
   const LoginButton = (
     <Button
-      key={0}
       type="submit"
+      fullWidth
       size="large"
-      onClick={onLogin}
-      disabled={resendTimeout > 0 && authState.isNotVerifiedMessageDisplayed}
-      color={
-        authState.isFetching || resendVerificationState.isFetching
-          ? 'inherit'
-          : 'primary'
-      }>
-      {authState.isFetching || resendVerificationState.isFetching ? (
-        <CircularProgress size="2.8rem" />
+      variant="contained"
+      disabled={
+        isSubmitting ||
+        (resendTimeout > 0 && authState.isNotVerifiedMessageDisplayed)
+      }
+      sx={{ mt: 2 }}>
+      {isSubmitting ? (
+        <CircularProgress size="2.8rem" color="inherit" />
       ) : (
-        <LoginButtonMessage />
+        getLoginButtonLabel()
       )}
     </Button>
   );
@@ -187,7 +234,6 @@ const Login = () => {
         fullScreen={isMobile}
         title={formatMessage({ id: 'mfaRequired' })}>
         <LoginForm
-          authErrors={authErrorMessages}
           email={email}
           onEmailChange={setEmail}
           onPasswordChange={setPassword}
@@ -233,6 +279,12 @@ const Login = () => {
         <Translate>An email will be sent to:</Translate>{' '}
         <b>{email || authState.notVerifiedEmail}</b>
       </Typography>
+      {serverError && (
+        <Alert severity="error" sx={{ mt: 2 }}>
+          {serverError}
+        </Alert>
+      )}
+      {LoginButton}
     </>
   ) : authState.isNotVerifiedMessageDisplayed ? (
     <>
@@ -267,24 +319,50 @@ const Login = () => {
         <Translate>You can request a new verification email for:</Translate>{' '}
         <b>{email || authState.notVerifiedEmail}</b>
       </Typography>
+      {serverError && (
+        <Alert severity="error" sx={{ mt: 2 }}>
+          {serverError}
+        </Alert>
+      )}
+      {LoginButton}
     </>
   ) : (
     <>
       <LoginForm
-        authErrors={authErrorMessages}
         email={email}
-        isFetching={authState.isFetching}
-        onEmailChange={setEmail}
-        onLogin={onLogin}
-        onPasswordChange={setPassword}
+        onEmailChange={handleEmailChange}
+        onPasswordChange={handlePasswordChange}
         password={password}
+        emailError={fieldErrors.email}
+        passwordError={fieldErrors.password}
+        serverError={serverError}
       />
-      <Button size="small" variant="text" onClick={handleCreateAccount}>
-        <Translate>No account yet?</Translate>
-      </Button>
-      <Button size="small" variant="text" onClick={handleForgotPassword}>
-        <Translate>Forgot password?</Translate>
-      </Button>
+      <Box display="flex" justifyContent="flex-end" mt={1}>
+        <Button
+          type="button"
+          size="small"
+          variant="text"
+          onClick={handleForgotPassword}
+          sx={{ textTransform: 'none' }}>
+          <Translate>Forgot password?</Translate>
+        </Button>
+      </Box>
+      {LoginButton}
+      <Divider sx={{ my: 2 }} />
+      <Box display="flex" flexDirection="column" alignItems="center" gap={1}>
+        <Typography variant="body2" color="text.secondary">
+          <Translate>No account yet?</Translate>
+        </Typography>
+        <Button
+          type="button"
+          fullWidth
+          variant="outlined"
+          color="primary"
+          size="large"
+          onClick={handleCreateAccount}>
+          <Translate>Sign up</Translate>
+        </Button>
+      </Box>
     </>
   );
 
@@ -293,9 +371,15 @@ const Login = () => {
       open={authState.isLoginDialogDisplayed}
       onClose={() => dispatch(hideLoginDialog())}
       fullScreen={isMobile}
-      title={<Translate>Log in</Translate>}
-      actions={[LoginButton]}>
-      {DialogContent}
+      centerContentMobile={isMobile}
+      title={
+        <Typography variant="h5" component="span" fontWeight={600}>
+          <Translate>Log in</Translate>
+        </Typography>
+      }>
+      <form onSubmit={onLogin} noValidate>
+        {DialogContent}
+      </form>
     </StandardDialog>
   );
 };

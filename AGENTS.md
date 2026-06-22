@@ -222,7 +222,15 @@ export const fetchCave = id => async dispatch => {
     const data = await fetch(`/api/caves/${id}`).then(r => r.json());
     dispatch({ type: FETCH_CAVE_SUCCESS, payload: data });
   } catch (error) {
-    dispatch({ type: FETCH_CAVE_FAILURE, error: error.message });
+    dispatch({
+      type: FETCH_CAVE_FAILURE,
+      error: {
+        code: error.body?.code || null,
+        message: error.body?.message || error.message,
+        details: error.body?.metadata?.details || [],
+        status: error.status || null
+      }
+    });
   }
 };
 ```

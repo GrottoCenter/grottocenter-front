@@ -12,17 +12,21 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ShareIcon from '@mui/icons-material/Share';
+import ExploreOutlinedIcon from '@mui/icons-material/ExploreOutlined';
+import ScienceOutlinedIcon from '@mui/icons-material/ScienceOutlined';
 import { useReactToPrint } from 'react-to-print';
 
 import { usePermissions, useUserProperties, useExplored, useSharePage } from '../../../hooks';
 import PageContainer from '../../common/Layouts/PageContainer';
 import PageHeader from '../../common/Layouts/PageHeader';
+import PageTabs from '../../common/Layouts/PageTabs';
 import ResponsiveActions from '../../common/Layouts/ResponsiveActions';
 import ScrollableContent from '../../common/Layouts/Fixed/ScrollableContent';
 import CustomIcon from '../../common/CustomIcon';
 import GuidelinesGrouped from '../Guidelines/GuidelinesGrouped';
 import EntrancesMap from './EntrancesMap';
 import Properties from './Properties';
+import Science from './Science';
 import { deleteCave } from '../../../actions/Cave/DeleteCave';
 import { restoreCave } from '../../../actions/Cave/RestoreCave';
 import { NetworkForm } from '../EntitiesForm';
@@ -55,7 +59,7 @@ export const Network = ({ isLoading, error, cave }) => {
   const { formatMessage } = useIntl();
   const navigate = useNavigate();
   const { caveId } = useParams();
-  const { isAuth, isModerator } = usePermissions();
+  const { isAuth, isAdmin, isModerator } = usePermissions();
   const componentRef = useRef();
   const [isEditing, setEditing] = useState(false);
   const [selectedEntrancesId, setSelectedEntrancesId] = useState([]);
@@ -196,6 +200,25 @@ export const Network = ({ isLoading, error, cave }) => {
       </Breadcrumbs>
     ) : null;
 
+  const tabs = [
+    {
+      id: 'information',
+      label: formatMessage({ id: 'Information' }),
+      icon: <ExploreOutlinedIcon fontSize="small" />
+    },
+    // FIXME: 'science' tab is admin-only until the Science API is available.
+    // Remove the isAdmin filter once the API is integrated.
+    ...(isAdmin
+      ? [
+          {
+            id: 'science',
+            label: formatMessage({ id: 'Science' }),
+            icon: <ScienceOutlinedIcon fontSize="small" />
+          }
+        ]
+      : [])
+  ];
+
   return (
     <PageContainer>
     <div ref={componentRef}>
@@ -205,131 +228,144 @@ export const Network = ({ isLoading, error, cave }) => {
         subheader={breadcrumb}
         actions={actions}
       />
-      {isLoading && (
-        <Card sx={{ m: 2, p: 3 }}>
-          <Skeleton height={300} />
-          <Skeleton height={100} />
-          <Skeleton height={100} />
-          <Skeleton height={100} />
-        </Card>
-      )}
-      {error && (
-        <Card sx={{ m: 2, p: 3 }}>
-          <Alert
-            title={formatMessage({
-              id: 'Error, the network data you are looking for is not available.'
-            })}
-            severity="error"
-          />
-        </Card>
-      )}
-      {cave && (
-        <>
-          {cave.isDeleted && (
-            <Box sx={{ m: 2 }}>
-              <DeletedCard
+
+      <PageTabs tabs={tabs}>
+        {/* Tab 0 — Information */}
+        <div>
+          {isLoading && (
+            <Card sx={{ m: 2, p: 3 }}>
+              <Skeleton height={300} />
+              <Skeleton height={100} />
+              <Skeleton height={100} />
+              <Skeleton height={100} />
+            </Card>
+          )}
+          {error && (
+            <Card sx={{ m: 2, p: 3 }}>
+              <Alert
+                title={formatMessage({
+                  id: 'Error, the network data you are looking for is not available.'
+                })}
+                severity="error"
+              />
+            </Card>
+          )}
+          {cave && (
+            <>
+              {cave.isDeleted && (
+                <Box sx={{ m: 2 }}>
+                  <DeletedCard
+                    entityType={DELETED_ENTITIES.network}
+                    entity={cave}
+                    isLoading={isActionLoading}
+                    onRestorePress={onRestorePress}
+                    onPermanentDeletePress={() => {
+                      setIsDeleteConfirmationPermanent(true);
+                      setIsDeleteConfirmationOpen(true);
+                    }}
+                  />
+                </Box>
+              )}
+              <DeleteConfirmationDialog
                 entityType={DELETED_ENTITIES.network}
-                entity={cave}
+                isOpen={isDeleteConfirmationOpen}
                 isLoading={isActionLoading}
-                onRestorePress={onRestorePress}
-                onPermanentDeletePress={() => {
-                  setIsDeleteConfirmationPermanent(true);
-                  setIsDeleteConfirmationOpen(true);
+                isPermanent={isDeleteConfirmationPermanent}
+                isSearchMandatory={
+                  isDeleteConfirmationPermanent &&
+                  (cave?.entrances ?? []).length > 0
+                }
+                onClose={() => setIsDeleteConfirmationOpen(false)}
+                onConfirmation={entity => {
+                  onDeletePress(entity?.id, isDeleteConfirmationPermanent);
                 }}
               />
-            </Box>
-          )}
-          <DeleteConfirmationDialog
-            entityType={DELETED_ENTITIES.network}
-            isOpen={isDeleteConfirmationOpen}
-            isLoading={isActionLoading}
-            isPermanent={isDeleteConfirmationPermanent}
-            isSearchMandatory={
-              isDeleteConfirmationPermanent &&
-              (cave?.entrances ?? []).length > 0
-            }
-            onClose={() => setIsDeleteConfirmationOpen(false)}
-            onConfirmation={entity => {
-              onDeletePress(entity?.id, isDeleteConfirmationPermanent);
-            }}
-          />
-          <ScrollableContent
-            content={
-              <>
-                <HalfSplitContainer>
-                  <Box
-                    sx={{
-                      flex: 1,
-                      display: 'flex',
-                      flexDirection: 'column',
-                      gap: 2
-                    }}>
-                    <Box sx={{ minHeight: 200 }}>
-                      <EntrancesMap
-                        isLoading={isLoading}
-                        entrances={cave?.entrances ?? []}
-                        selectedEntrancesId={selectedEntrancesId}
-                      />
-                    </Box>
-                    <Properties isLoading={isLoading} cave={cave ?? {}} />
-                  </Box>
-                  <Box sx={{ flex: 1, overflow: 'auto' }}>
-                    <EntrancesList
-                      inline
-                      isLoading={isLoading}
-                      entrances={cave?.entrances ?? []}
-                      selectedEntrancesId={selectedEntrancesId}
-                      onToggleSelection={handleToggleSelection}
-                    />
-                  </Box>
-                </HalfSplitContainer>
-                {(cave.author || cave.reviewer || cave.language) && (
-                  <Typography component="div" variant="body2" sx={{ mt: 2 }}>
-                    {cave.author && (
-                      <AuthorAndDate
-                        author={cave.author}
-                        verb="Created"
-                        date={cave.dateInscription}
-                      />
+              <ScrollableContent
+                content={
+                  <>
+                    <HalfSplitContainer>
+                      <Box
+                        sx={{
+                          flex: 1,
+                          display: 'flex',
+                          flexDirection: 'column',
+                          gap: 2
+                        }}>
+                        <Box sx={{ minHeight: 200 }}>
+                          <EntrancesMap
+                            isLoading={isLoading}
+                            entrances={cave?.entrances ?? []}
+                            selectedEntrancesId={selectedEntrancesId}
+                          />
+                        </Box>
+                        <Properties isLoading={isLoading} cave={cave ?? {}} />
+                      </Box>
+                      <Box sx={{ flex: 1, overflow: 'auto' }}>
+                        <EntrancesList
+                          inline
+                          isLoading={isLoading}
+                          entrances={cave?.entrances ?? []}
+                          selectedEntrancesId={selectedEntrancesId}
+                          onToggleSelection={handleToggleSelection}
+                        />
+                      </Box>
+                    </HalfSplitContainer>
+                    {(cave.author || cave.reviewer || cave.language) && (
+                      <Typography component="div" variant="body2" sx={{ mt: 2 }}>
+                        {cave.author && (
+                          <AuthorAndDate
+                            author={cave.author}
+                            verb="Created"
+                            date={cave.dateInscription}
+                          />
+                        )}
+                        {cave.author && cave.reviewer && ' · '}
+                        {cave.reviewer && (
+                          <AuthorAndDate
+                            author={cave.reviewer}
+                            verb="Updated"
+                            date={cave.dateReviewed}
+                          />
+                        )}
+                        {(cave.author || cave.reviewer) && cave.language && ' · '}
+                        {cave.language &&
+                          `${formatMessage({ id: 'Language' })} : ${cave.language.toUpperCase()}`}
+                      </Typography>
                     )}
-                    {cave.author && cave.reviewer && ' · '}
-                    {cave.reviewer && (
-                      <AuthorAndDate
-                        author={cave.reviewer}
-                        verb="Updated"
-                        date={cave.dateReviewed}
-                      />
-                    )}
-                    {(cave.author || cave.reviewer) && cave.language && ' · '}
-                    {cave.language &&
-                      `${formatMessage({ id: 'Language' })} : ${cave.language.toUpperCase()}`}
-                  </Typography>
-                )}
-              </>
-            }
-          />
-          <Descriptions
-            descriptions={cave.descriptions}
-            entityType="cave"
-            entityId={cave.id}
-            isEditAllowed={!cave.isDeleted}
-          />
-          {cave.guidelines && (
-            <GuidelinesGrouped guidelines={cave.guidelines} />
+                  </>
+                }
+              />
+              <Descriptions
+                descriptions={cave.descriptions}
+                entityType="cave"
+                entityId={cave.id}
+                isEditAllowed={!cave.isDeleted}
+              />
+              {cave.guidelines && (
+                <GuidelinesGrouped guidelines={cave.guidelines} />
+              )}
+              {isAuth && (
+                <StandardDialog
+                  fullWidth
+                  maxWidth="md"
+                  open={isEditing}
+                  onClose={() => setEditing(false)}
+                  scrollable
+                  title={formatMessage({ id: 'Network edition' })}>
+                  <NetworkForm networkValues={{ ...cave }} />
+                </StandardDialog>
+              )}
+            </>
           )}
-          {isAuth && (
-            <StandardDialog
-              fullWidth
-              maxWidth="md"
-              open={isEditing}
-              onClose={() => setEditing(false)}
-              scrollable
-              title={formatMessage({ id: 'Network edition' })}>
-              <NetworkForm networkValues={{ ...cave }} />
-            </StandardDialog>
-          )}
-        </>
-      )}
+        </div>
+
+        {/* FIXME: Science panel is admin-only until the Science API is available. */}
+        {/* WARNING: this must stay in sync with the 'science' entry in the tabs array above.
+            PageTabs matches children to tabs by position. React.Children.toArray strips `false`,
+            so `{isAdmin && <Science />}` works — but returning null or wrapping in a div would
+            silently shift all subsequent tab panels. */}
+        {isAdmin && <Science caveId={caveId} />}
+      </PageTabs>
     </div>
     </PageContainer>
   );

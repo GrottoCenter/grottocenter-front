@@ -32,6 +32,7 @@ import ViewColumnIcon from '@mui/icons-material/ViewColumn';
 import ViewListIcon from '@mui/icons-material/ViewList';
 
 import entitiesConfig from './entitiesConfig';
+import ExportFormatDropdown from './ExportFormatDropdown';
 import { LoadingTableHead, LoadingTableBodyInner } from './LoadingTable';
 import VisibleColumnsMenu from './VisibleColumnsMenu';
 import { SORT_FIELD_MAP, getStoredRowsPerPage, renderCell } from './tableUtils';
@@ -190,7 +191,7 @@ const DesktopEntityTable = ({
   pageSizeOptions,
   onPageChange,
   onSortChange,
-  onCSVDownload,
+  onExport,
   isNewQuery,
   shouldHideFooter,
   compact,
@@ -210,6 +211,10 @@ const DesktopEntityTable = ({
   const [selected, setSelected] = useState([]);
 
   const entityConfig = entitiesConfig[entityType ?? 'placeholder'];
+
+  const visibleColumns = entityColumns.filter(e => e.visible);
+  const exportColumns = visibleColumns.map(e => e.apiField || e.field);
+  const exportColumnLabels = visibleColumns.map(e => e.label);
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -301,7 +306,6 @@ const DesktopEntityTable = ({
     setSelected([]);
   }, [isNewQuery]);
 
-  const visibleColumns = entityColumns.filter(e => e.visible);
   const colSpan = visibleColumns.length + (onSelected ? 1 : 0);
 
   const TableContent =
@@ -377,16 +381,29 @@ const DesktopEntityTable = ({
                 gap: 1,
                 alignItems: 'center'
               }}>
-              {onCSVDownload &&
+              {onExport &&
+                entityType === 'entrances' && (
+                  <ExportFormatDropdown
+                    disabled={nbTotalRows > MAX_DOCUMENTS_TO_EXPORT_IN_CSV}
+                    onExport={format => {
+                      onExport(
+                        exportColumns,
+                        exportColumnLabels,
+                        format
+                      );
+                    }}
+                  />
+                )}
+              {onExport &&
+                entityType !== 'entrances' &&
                 (nbTotalRows <= MAX_DOCUMENTS_TO_EXPORT_IN_CSV ? (
                   <Button
                     variant="outlined"
                     size="small"
                     onClick={() => {
-                      const c = entityColumns.filter(e => e.visible);
-                      onCSVDownload(
-                        c.map(e => e.apiField || e.field),
-                        c.map(e => e.label)
+                      onExport(
+                        exportColumns,
+                        exportColumnLabels
                       );
                     }}
                     startIcon={<FileDownloadIcon />}
@@ -529,7 +546,7 @@ DesktopEntityTable.propTypes = {
   pageSizeOptions: PropTypes.arrayOf(PropTypes.number).isRequired,
   onPageChange: PropTypes.func,
   onSortChange: PropTypes.func,
-  onCSVDownload: PropTypes.func,
+  onExport: PropTypes.func,
   isNewQuery: PropTypes.bool,
   shouldHideFooter: PropTypes.bool,
   compact: PropTypes.bool,
