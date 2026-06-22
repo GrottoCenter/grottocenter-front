@@ -13,6 +13,8 @@ import ActionButton from '../../../common/ActionButton';
 import { FAILURE_IMPORT, SUCCESS_IMPORT } from '../constants';
 import Alert from '../../../common/Alert';
 import DownloadButton from '../DownloadButton';
+import InternationalizedLink from '../../../common/InternationalizedLink';
+import { biLinks } from '../../../../conf/externalLinks';
 
 const Step4 = () => {
   const dispatch = useDispatch();
@@ -188,6 +190,17 @@ const Step4 = () => {
           }
         />
       )}
+      {resultImport &&
+        (resultImport.total.success > 0 ||
+          resultImport.total.successfulImportAsDuplicates > 0) && (
+          <Typography sx={{ mt: 2 }}>
+            <InternationalizedLink links={biLinks}>
+              {formatMessage({
+                id: 'View your imported data on the statistics dashboard'
+              })}
+            </InternationalizedLink>
+          </Typography>
+        )}
     </>
   );
 };
