@@ -1143,6 +1143,7 @@
   "Import": "استيراد",
   "Import geometry": "استيراد الهندسة",
   "Import Id": "معرف الاستيراد",
+  "Import observations": "استيراد الملاحظات",
   "Import scientific observations from a CSV file produced by a data logger": "استيراد الملاحظات العلمية من ملف CSV أنتجه جهاز تسجيل بيانات",
   "Import Shapefile": "استيراد ملف الشكل",
   "Import source": "مصدر الاستيراد",

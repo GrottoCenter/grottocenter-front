@@ -1143,6 +1143,7 @@
   "Import": "Importieren",
   "Import geometry": "Geometrie importieren",
   "Import Id": "Import-ID",
+  "Import observations": "Beobachtungen importieren",
   "Import scientific observations from a CSV file produced by a data logger": "Wissenschaftliche Beobachtungen aus einer CSV-Datei eines Datenloggers importieren",
   "Import Shapefile": "Shapefile importieren",
   "Import source": "Importquelle",

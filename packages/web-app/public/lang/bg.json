@@ -1143,6 +1143,7 @@
   "Import": "Импорт",
   "Import geometry": "Импортиране на геометрия",
   "Import Id": "ИД на импортиране",
+  "Import observations": "Импортиране на наблюдения",
   "Import scientific observations from a CSV file produced by a data logger": "Импортиране на научни наблюдения от CSV файл, създаден от устройство за записване на данни",
   "Import Shapefile": "Импортиране на Shapefile",
   "Import source": "Извор на импорт",

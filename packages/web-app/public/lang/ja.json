@@ -1143,6 +1143,7 @@
   "Import": "インポート",
   "Import geometry": "ジオメトリをインポート",
   "Import Id": "インポートID",
+  "Import observations": "観測データのインポート",
   "Import scientific observations from a CSV file produced by a data logger": "データロガーが生成したCSVファイルから科学的観測データをインポート",
   "Import Shapefile": "シェープファイルをインポート",
   "Import source": "インポートソース",
