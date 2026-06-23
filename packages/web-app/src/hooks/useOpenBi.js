@@ -4,12 +4,12 @@ import { useIntl } from 'react-intl';
 import { usePermissions } from './usePermissions';
 import { useNotification } from './useNotification';
 import { displayLoginDialog } from '../actions/Login';
+import { checkAuthStatus } from '../actions/utils';
 import { ssoAuthTokenUrl } from '../conf/apiRoutes';
+import { biLinks } from '../conf/externalLinks';
 
 const SSO_PRODUCT = 'superset';
 const BI_TAB_NAME = 'gcBiTab';
-const BI_BASE_URL =
-  process.env.REACT_APP_BI_URL || 'https://bi.grottocenter.org';
 
 /**
  * Opens the Superset BI site in a new tab with seamless SSO authentication.
@@ -37,7 +37,7 @@ export const useOpenBi = () => {
   const submitSsoForm = useCallback((token, targetWindow) => {
     const form = document.createElement('form');
     form.method = 'POST';
-    form.action = `${BI_BASE_URL}/login/sso`;
+    form.action = `${biLinks['*']}/login/sso`;
     form.target = targetWindow?.name || '_blank';
 
     const input = document.createElement('input');
@@ -52,16 +52,17 @@ export const useOpenBi = () => {
   }, []);
 
   const openBi = useCallback(async () => {
-    // Open the tab synchronously, inside the user gesture, so the browser does
-    // not block it once we resume after the async token fetch.
-    const biTab = window.open('', BI_TAB_NAME);
-
+    // Not logged in: prompt login first, then auto-resume (see effect below).
+    // No tab is opened here, to avoid flashing a blank window for anonymous users.
     if (!isAuth) {
-      biTab?.close();
       waitingForAuth.current = true;
       dispatch(displayLoginDialog());
       return;
     }
+
+    // Open the tab synchronously, inside the user gesture, so the browser does
+    // not block it once we resume after the async token fetch.
+    const biTab = window.open('', BI_TAB_NAME);
 
     setIsOpening(true);
     try {
@@ -74,16 +75,18 @@ export const useOpenBi = () => {
         body: JSON.stringify({ product: SSO_PRODUCT })
       });
 
-      if (!response.ok) {
-        throw new Error(`SSO token request failed (${response.status})`);
-      }
+      // checkAuthStatus triggers the global logout/redirect flow on a 401
+      // (expired token) and throws for any other non-2xx response.
+      await checkAuthStatus(dispatch)(response);
 
       const { token } = await response.json();
       submitSsoForm(token, biTab);
     } catch (error) {
+      biTab?.close();
+      // On a 401 the user is being logged out and redirected; no toast needed.
+      if (error.isAuthError) return;
       // eslint-disable-next-line no-console
       console.error('BI SSO failed:', error);
-      biTab?.close();
       onError(
         formatMessage({
           id: 'Unable to open the statistics dashboard. Please try again.'

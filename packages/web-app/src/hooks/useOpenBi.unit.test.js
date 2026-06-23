@@ -14,9 +14,9 @@ jest.mock('react-intl', () => ({
   useIntl: () => ({ formatMessage: ({ id }) => id })
 }));
 
-const mockEnqueueSnackbar = jest.fn();
-jest.mock('notistack', () => ({
-  useSnackbar: () => ({ enqueueSnackbar: mockEnqueueSnackbar })
+const mockOnError = jest.fn();
+jest.mock('./useNotification', () => ({
+  useNotification: () => ({ onError: mockOnError })
 }));
 
 let mockIsAuth = true;
@@ -26,6 +26,21 @@ jest.mock('./usePermissions', () => ({
 
 jest.mock('../actions/Login', () => ({
   displayLoginDialog: () => ({ type: 'DISPLAY_LOGIN_DIALOG' })
+}));
+
+// Use the real checkAuthStatus, but it lazy-requires ./Login on a 401 only.
+jest.mock('../actions/utils', () => ({
+  checkAuthStatus: () => response => {
+    if (response.status === 401) {
+      const err = new Error('Unauthorized');
+      err.isAuthError = true;
+      throw err;
+    }
+    if (!response.ok) {
+      throw new Error(`status ${response.status}`);
+    }
+    return response;
+  }
 }));
 
 const mockWindow = { name: 'gcBiTab', close: jest.fn() };
@@ -46,7 +61,7 @@ afterEach(() => {
 });
 
 describe('useOpenBi', () => {
-  it('prompts login and does not call the API when logged out', async () => {
+  it('prompts login without opening a tab or calling the API when logged out', async () => {
     mockIsAuth = false;
     const { result } = renderHook(() => useOpenBi());
 
@@ -55,8 +70,8 @@ describe('useOpenBi', () => {
     });
 
     expect(global.fetch).not.toHaveBeenCalled();
+    expect(window.open).not.toHaveBeenCalled();
     expect(mockDispatch).toHaveBeenCalledWith({ type: 'DISPLAY_LOGIN_DIALOG' });
-    expect(mockWindow.close).toHaveBeenCalled();
   });
 
   it('requests an SSO token and submits the form when logged in', async () => {
@@ -106,7 +121,11 @@ describe('useOpenBi', () => {
   });
 
   it('shows an error toast and closes the tab when the API fails', async () => {
-    global.fetch.mockResolvedValue({ ok: false, status: 500 });
+    global.fetch.mockResolvedValue({
+      ok: false,
+      status: 500,
+      json: async () => ({ message: 'server error' })
+    });
     const { result } = renderHook(() => useOpenBi());
 
     await act(async () => {
@@ -115,9 +134,25 @@ describe('useOpenBi', () => {
 
     expect(submitSpy).not.toHaveBeenCalled();
     expect(mockWindow.close).toHaveBeenCalled();
-    expect(mockEnqueueSnackbar).toHaveBeenCalledWith(
-      'Unable to open the statistics dashboard. Please try again.',
-      { variant: 'error' }
+    expect(mockOnError).toHaveBeenCalledWith(
+      'Unable to open the statistics dashboard. Please try again.'
     );
+  });
+
+  it('skips the error toast on a 401 (auth error triggers logout)', async () => {
+    global.fetch.mockResolvedValue({
+      ok: false,
+      status: 401,
+      json: async () => ({ message: 'unauthorized' })
+    });
+    const { result } = renderHook(() => useOpenBi());
+
+    await act(async () => {
+      await result.current.openBi();
+    });
+
+    expect(submitSpy).not.toHaveBeenCalled();
+    expect(mockWindow.close).toHaveBeenCalled();
+    expect(mockOnError).not.toHaveBeenCalled();
   });
 });

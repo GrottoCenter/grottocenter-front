@@ -199,7 +199,10 @@ const Step4 = () => {
               type="button"
               onClick={openBi}
               disabled={isOpening}
-              sx={{ opacity: isOpening ? 0.5 : 1 }}>
+              sx={{
+                opacity: isOpening ? 0.5 : 1,
+                pointerEvents: isOpening ? 'none' : 'auto'
+              }}>
               {formatMessage({
                 id: 'View your imported data on the statistics dashboard'
               })}
