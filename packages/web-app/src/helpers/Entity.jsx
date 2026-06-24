@@ -64,7 +64,7 @@ export const nomelizeSearchEntity = option => {
     case 'caves':
     case 'entrances': {
       iconSrc =
-        option._type === 'caves' && option.entrances?.length > 1
+        option._type === 'caves' && option.nbEntrances > 1
           ? networkIcon
           : entranceIcon;
       subtitle = option.region ?? '';
