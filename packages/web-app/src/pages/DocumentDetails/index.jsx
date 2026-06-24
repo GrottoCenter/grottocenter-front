@@ -469,10 +469,13 @@ const Document = ({
                         label={formatMessage({ id: 'Issue' })}
                         value={documentData.issue}
                       />
-                      <DetailItem
-                        label={formatMessage({ id: 'License' })}
-                        value={documentData.license}
-                      />
+                      {/* License only applies to attached files, not to the paper document itself */}
+                      {allFiles.length > 0 && (
+                        <DetailItem
+                          label={formatMessage({ id: 'License' })}
+                          value={documentData.license}
+                        />
+                      )}
                       <DetailItem
                         fullWidth
                         label={formatMessage({ id: 'Parent document' })}
