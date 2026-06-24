@@ -1651,6 +1651,8 @@
   "Network name": "Nama jaringan",
   "Network properties": "Properti jaringan",
   "network_count": "jumlah jaringan",
+  "network.descriptions.callout": "Pintu masuk ini adalah bagian dari {networkLink} yang juga memiliki {descriptionsLink}.",
+  "network.descriptions.count": "{count, plural, one {satu deskripsi} other {# deskripsi}}",
   "networks": "jaringan",
   "Networks": "Jaringan",
   "Networks and caves": "Jaringan dan gua",

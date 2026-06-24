@@ -1,10 +1,19 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { useDispatch } from 'react-redux';
-import { useIntl } from 'react-intl';
-import { Button, Divider, List, Tooltip } from '@mui/material';
+import { FormattedMessage, useIntl } from 'react-intl';
+import {
+  Box,
+  Button,
+  Divider,
+  Link as MuiLink,
+  List,
+  Tooltip,
+  Typography
+} from '@mui/material';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import CancelIcon from '@mui/icons-material/Cancel';
+import CustomIcon from '../../common/CustomIcon';
 
 import ScrollableContent from '../../common/Layouts/Fixed/ScrollableContent';
 import { DescriptionPropTypes } from '../../../types/description.type';
@@ -13,6 +22,7 @@ import CreateDescriptionForm from '../EntitiesForm/Description';
 import { postDescription } from '../../../actions/Description/CreateDescription';
 import { moveDescriptionRelevance } from '../../../actions/Description/MoveRelevance';
 import { usePermissions } from '../../../hooks';
+import useOpenLink from '../../../hooks/useOpenLink';
 import { useMoveRelevanceWithUndo } from '../../../hooks/useMoveRelevanceWithUndo';
 import { sortByRelevance } from '../../../helpers/sortByRelevance';
 import Alert from '../../common/Alert';
@@ -22,11 +32,16 @@ const Descriptions = ({
   entityId,
   descriptions,
   isEditAllowed = true,
-  isAddAllowed = true
+  isAddAllowed = true,
+  networkId = undefined,
+  networkName = undefined,
+  networkDescriptionsCount = 0
 }) => {
   const { formatMessage } = useIntl();
   const permissions = usePermissions();
+  const hasNetworkDescriptions = !!networkId && !!networkName && networkDescriptionsCount > 0;
   const dispatch = useDispatch();
+  const openLink = useOpenLink();
   const [isFormVisible, setIsFormVisible] = useState(false);
   const { movingId, handleMove } = useMoveRelevanceWithUndo(
     moveDescriptionRelevance
@@ -48,7 +63,7 @@ const Descriptions = ({
     <ScrollableContent
       dense
       anchorId="description"
-      defaultExpanded={descriptions.length > 0}
+      defaultExpanded={descriptions.length > 0 || hasNetworkDescriptions}
       title={formatMessage({ id: 'Description' })}
       icon={
         permissions.isAuth &&
@@ -59,15 +74,13 @@ const Descriptions = ({
               isFormVisible
                 ? formatMessage({ id: 'Cancel adding a new description' })
                 : formatMessage({ id: 'Add a new description' })
-            }
-          >
+            }>
             <Button
               color={isFormVisible ? 'inherit' : 'secondary'}
               size="small"
               variant="outlined"
               onClick={() => setIsFormVisible(!isFormVisible)}
-              startIcon={isFormVisible ? <CancelIcon /> : <AddCircleIcon />}
-            >
+              startIcon={isFormVisible ? <CancelIcon /> : <AddCircleIcon />}>
               {formatMessage({ id: isFormVisible ? 'Cancel' : 'New' })}
             </Button>
           </Tooltip>
@@ -75,6 +88,51 @@ const Descriptions = ({
       }
       content={
         <>
+          {hasNetworkDescriptions && (
+            <>
+              <Divider sx={{ mb: 1 }} />
+              <Typography variant="body1" color="text.secondary" sx={{ mb: 1 }}>
+                <FormattedMessage
+                  id="network.descriptions.callout"
+                  values={{
+                    networkLink: (
+                      <MuiLink
+                        component="button"
+                        variant="body1"
+                        onClick={() => openLink(`/ui/caves/${networkId}`)}
+                        sx={{ display: 'inline', verticalAlign: 'baseline' }}>
+                        <Box
+                          component="span"
+                          sx={{
+                            display: 'inline-block',
+                            verticalAlign: 'middle',
+                            mr: '2px'
+                          }}>
+                          <CustomIcon type="network" size={18} />
+                        </Box>
+                        {networkName}
+                      </MuiLink>
+                    ),
+                    descriptionsLink: (
+                      <MuiLink
+                        component="button"
+                        variant="body1"
+                        onClick={() =>
+                          openLink(`/ui/caves/${networkId}#description`)
+                        }
+                        sx={{ display: 'inline', verticalAlign: 'baseline' }}>
+                        {formatMessage(
+                          { id: 'network.descriptions.count' },
+                          { count: networkDescriptionsCount }
+                        )}
+                      </MuiLink>
+                    )
+                  }}
+                />
+              </Typography>
+            </>
+          )}
+
           {isFormVisible && (
             <>
               <CreateDescriptionForm isNewDescription onSubmit={onSubmitForm} />
@@ -125,7 +183,10 @@ Descriptions.propTypes = {
   entityId: PropTypes.number.isRequired,
   descriptions: PropTypes.arrayOf(DescriptionPropTypes),
   isEditAllowed: PropTypes.bool,
-  isAddAllowed: PropTypes.bool
+  isAddAllowed: PropTypes.bool,
+  networkId: PropTypes.number,
+  networkName: PropTypes.string,
+  networkDescriptionsCount: PropTypes.number
 };
 
 export default Descriptions;

@@ -1651,6 +1651,8 @@
   "Network name": "Nom du réseau",
   "Network properties": "Propriétés du réseau",
   "network_count": "{count, plural, one {réseau (cavité avec plus d'une entrée)} other {réseaux (cavité avec plus d'une entrée)}}",
+  "network.descriptions.callout": "Cette entrée fait partie de {networkLink} qui possède également {descriptionsLink}.",
+  "network.descriptions.count": "{count, plural, one {une description} other {# descriptions}}",
   "networks": "réseaux",
   "Networks": "Réseaux",
   "Networks and caves": "Réseaux et cavités",

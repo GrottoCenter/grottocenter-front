@@ -1651,6 +1651,8 @@
   "Network name": "Όνομα δικτύου",
   "Network properties": "Ιδιότητες δικτύου",
   "network_count": "αριθμός δικτύων",
+  "network.descriptions.callout": "Αυτή η είσοδος ανήκει στο {networkLink} που έχει επίσης {descriptionsLink}.",
+  "network.descriptions.count": "{count, plural, one {μία περιγραφή} other {# περιγραφές}}",
   "networks": "Δίκτυα",
   "Networks": "Δίκτυα",
   "Networks and caves": "Δίκτυα και σπήλαια",

@@ -1651,6 +1651,8 @@
   "Network name": "Network name",
   "Network properties": "Network properties",
   "network_count": "{count, plural, one {network (cave of more than 1 entrance)} other {networks (cave of more than 1 entrance)}}",
+  "network.descriptions.callout": "This entrance is part of {networkLink} which also has {descriptionsLink}.",
+  "network.descriptions.count": "{count, plural, one {one description} other {# descriptions}}",
   "networks": "networks",
   "Networks": "Networks",
   "Networks and caves": "Networks and caves",

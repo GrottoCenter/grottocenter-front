@@ -1651,6 +1651,8 @@
   "Network name": "Nome da rede",
   "Network properties": "Propriedades da rede",
   "network_count": "número de redes",
+  "network.descriptions.callout": "Esta entrada faz parte de {networkLink} que também tem {descriptionsLink}.",
+  "network.descriptions.count": "{count, plural, one {uma descrição} other {# descrições}}",
   "networks": "redes",
   "Networks": "Redes",
   "Networks and caves": "Redes e cavernas",

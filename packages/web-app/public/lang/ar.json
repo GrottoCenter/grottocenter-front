@@ -1651,6 +1651,8 @@
   "Network name": "اسم الشبكة",
   "Network properties": "خصائص الشبكة",
   "network_count": "عدد الشبكات",
+  "network.descriptions.callout": "هذه المدخل جزء من {networkLink} التي تحتوي أيضاً على {descriptionsLink}.",
+  "network.descriptions.count": "{count, plural, one {وصف واحد} other {# أوصاف}}",
   "networks": "شبكات",
   "Networks": "الشبكات",
   "Networks and caves": "الشبكات والكهوف",

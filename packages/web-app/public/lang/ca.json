@@ -1651,6 +1651,8 @@
   "Network name": "Nom del sistema de coves",
   "Network properties": "Propietats del sistema de coves",
   "network_count": "nombre de xarxes",
+  "network.descriptions.callout": "Aquesta entrada forma part de {networkLink} que també té {descriptionsLink}.",
+  "network.descriptions.count": "{count, plural, one {una descripció} other {# descripcions}}",
   "networks": "xarxes",
   "Networks": "Xarxes",
   "Networks and caves": "Xarxes i coves",

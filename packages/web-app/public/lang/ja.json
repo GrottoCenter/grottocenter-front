@@ -1651,6 +1651,8 @@
   "Network name": "ネットワーク",
   "Network properties": "財産",
   "network_count": "ネットワーク数",
+  "network.descriptions.callout": "このエントランスは {networkLink} の一部であり、{descriptionsLink} もあります。",
+  "network.descriptions.count": "{count, plural, one {説明1件} other {#件の説明}}",
   "networks": "ネットワーク",
   "Networks": "ネットワーク",
   "Networks and caves": "ネットワークと洞窟",

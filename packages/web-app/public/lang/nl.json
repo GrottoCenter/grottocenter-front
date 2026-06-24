@@ -1651,6 +1651,8 @@
   "Network name": "Grot naam",
   "Network properties": "Grot eigenschappen",
   "network_count": "aantal netwerken",
+  "network.descriptions.callout": "Deze ingang maakt deel uit van {networkLink} dat ook {descriptionsLink} heeft.",
+  "network.descriptions.count": "{count, plural, one {een beschrijving} other {# beschrijvingen}}",
   "networks": "netwerken",
   "Networks": "Netwerken",
   "Networks and caves": "Netwerken en grotten",

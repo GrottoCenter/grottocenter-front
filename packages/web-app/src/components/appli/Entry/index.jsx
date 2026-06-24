@@ -74,7 +74,7 @@ const HalfSplitContainer = styled('div')`
   }
 `;
 
-export const Entry = ({ isLoading, error, entrance }) => {
+export const Entry = ({ isLoading, error, entrance, networkDescriptionsCount = 0 }) => {
   const dispatch = useDispatch();
   const { formatMessage } = useIntl();
   const navigate = useNavigate();
@@ -135,8 +135,10 @@ export const Entry = ({ isLoading, error, entrance }) => {
     isAuth && entrance?.cave?.id && !entrance?.isDeleted;
   const canEdit = isAuth && entrance && !entrance.isDeleted;
 
+  const isNetwork = entrance?.cave?.entrances?.length > 1;
+
   const snapshotUrl = entrance
-    ? `/ui/entrances/${entrance.id}/snapshots?isNetwork=${entrance.cave?.entrances?.length > 1}`
+    ? `/ui/entrances/${entrance.id}/snapshots?isNetwork=${isNetwork}`
     : null;
 
   const actions = entrance ? (
@@ -247,7 +249,7 @@ export const Entry = ({ isLoading, error, entrance }) => {
           ))}
         </Box>
       )}
-      {entrance.cave?.entrances?.length > 1 && (
+      {isNetwork && (
         <Link
           component={RouterLink}
           to={`/ui/caves/${entrance.cave.id}`}
@@ -423,6 +425,9 @@ export const Entry = ({ isLoading, error, entrance }) => {
                 entityType="entrance"
                 entityId={entrance.id}
                 isEditAllowed={!entrance.isDeleted}
+                networkId={isNetwork ? entrance.cave.id : undefined}
+                networkName={isNetwork ? entrance.cave.name : undefined}
+                networkDescriptionsCount={networkDescriptionsCount}
               />
               <Riggings
                 riggings={entrance.riggings}
@@ -490,7 +495,8 @@ export const Entry = ({ isLoading, error, entrance }) => {
 Entry.propTypes = {
   isLoading: PropTypes.bool.isRequired,
   error: PropTypes.shape({}),
-  entrance: EntrancePropTypes
+  entrance: EntrancePropTypes,
+  networkDescriptionsCount: PropTypes.number
 };
 
 export default Entry;
