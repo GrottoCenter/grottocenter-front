@@ -135,8 +135,10 @@ export const Entry = ({ isLoading, error, entrance, networkDescriptionsCount = 0
     isAuth && entrance?.cave?.id && !entrance?.isDeleted;
   const canEdit = isAuth && entrance && !entrance.isDeleted;
 
+  const isNetwork = entrance?.cave?.entrances?.length > 1;
+
   const snapshotUrl = entrance
-    ? `/ui/entrances/${entrance.id}/snapshots?isNetwork=${entrance.cave?.entrances?.length > 1}`
+    ? `/ui/entrances/${entrance.id}/snapshots?isNetwork=${isNetwork}`
     : null;
 
   const actions = entrance ? (
@@ -247,7 +249,7 @@ export const Entry = ({ isLoading, error, entrance, networkDescriptionsCount = 0
           ))}
         </Box>
       )}
-      {entrance.cave?.entrances?.length > 1 && (
+      {isNetwork && (
         <Link
           component={RouterLink}
           to={`/ui/caves/${entrance.cave.id}`}
@@ -423,8 +425,8 @@ export const Entry = ({ isLoading, error, entrance, networkDescriptionsCount = 0
                 entityType="entrance"
                 entityId={entrance.id}
                 isEditAllowed={!entrance.isDeleted}
-                networkId={entrance.cave?.entrances?.length > 1 ? entrance.cave?.id : undefined}
-                networkName={entrance.cave?.entrances?.length > 1 ? entrance.cave?.name : undefined}
+                networkId={isNetwork ? entrance.cave.id : undefined}
+                networkName={isNetwork ? entrance.cave.name : undefined}
                 networkDescriptionsCount={networkDescriptionsCount}
               />
               <Riggings
