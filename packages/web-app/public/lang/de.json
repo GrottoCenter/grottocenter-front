@@ -1651,6 +1651,8 @@
   "Network name": "Systemname",
   "Network properties": "Systemeigenschaften",
   "network_count": "Netzwerkanzahl",
+  "network.descriptions.callout": "Dieser Eingang ist Teil von {networkLink}, das auch {descriptionsLink} hat.",
+  "network.descriptions.count": "{count, plural, one {eine Beschreibung} other {# Beschreibungen}}",
   "networks": "Netzwerke",
   "Networks": "Netzwerke",
   "Networks and caves": "Netzwerke und Höhlen",

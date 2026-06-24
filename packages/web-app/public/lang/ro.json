@@ -1651,6 +1651,8 @@
   "Network name": "Numele rețelei",
   "Network properties": "Caracteristicele rețelei",
   "network_count": "număr de rețele",
+  "network.descriptions.callout": "Această intrare face parte din {networkLink} care are și {descriptionsLink}.",
+  "network.descriptions.count": "{count, plural, one {o descriere} other {# descrieri}}",
   "networks": "rețele",
   "Networks": "Rețele",
   "Networks and caves": "Rețele și peșteri",

@@ -74,7 +74,7 @@ const HalfSplitContainer = styled('div')`
   }
 `;
 
-export const Entry = ({ isLoading, error, entrance }) => {
+export const Entry = ({ isLoading, error, entrance, networkDescriptionsCount = 0 }) => {
   const dispatch = useDispatch();
   const { formatMessage } = useIntl();
   const navigate = useNavigate();
@@ -423,6 +423,9 @@ export const Entry = ({ isLoading, error, entrance }) => {
                 entityType="entrance"
                 entityId={entrance.id}
                 isEditAllowed={!entrance.isDeleted}
+                networkId={entrance.cave?.entrances?.length > 1 ? entrance.cave?.id : undefined}
+                networkName={entrance.cave?.entrances?.length > 1 ? entrance.cave?.name : undefined}
+                networkDescriptionsCount={networkDescriptionsCount}
               />
               <Riggings
                 riggings={entrance.riggings}
@@ -490,7 +493,8 @@ export const Entry = ({ isLoading, error, entrance }) => {
 Entry.propTypes = {
   isLoading: PropTypes.bool.isRequired,
   error: PropTypes.shape({}),
-  entrance: EntrancePropTypes
+  entrance: EntrancePropTypes,
+  networkDescriptionsCount: PropTypes.number
 };
 
 export default Entry;

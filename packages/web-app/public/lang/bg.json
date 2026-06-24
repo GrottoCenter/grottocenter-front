@@ -1651,6 +1651,8 @@
   "Network name": "Пещерна система",
   "Network properties": "име на Пещерна система",
   "network_count": "брой мрежи",
+  "network.descriptions.callout": "Този вход е част от {networkLink}, която също има {descriptionsLink}.",
+  "network.descriptions.count": "{count, plural, one {едно описание} other {# описания}}",
   "networks": "мрежи",
   "Networks": "Мрежи",
   "Networks and caves": "Мрежи и пещери",

@@ -1651,6 +1651,8 @@
   "Network name": "שם הרשת",
   "Network properties": "מאפייני הרשת",
   "network_count": "מספר רשתות",
+  "network.descriptions.callout": "כניסה זו היא חלק מ-{networkLink} שיש לה גם {descriptionsLink}.",
+  "network.descriptions.count": "{count, plural, one {תיאור אחד} other {# תיאורים}}",
   "networks": "רשתות",
   "Networks": "רשתות",
   "Networks and caves": "רשתות ומערות",
