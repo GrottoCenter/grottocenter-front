@@ -14,3 +14,4 @@ export { useScrollToHashOnLoad } from './useScrollToHashOnLoad';
 export { useExplored } from './useExplored';
 export { default as useSharePage } from './useSharePage';
 export { default as useOpenLink } from './useOpenLink';
+export { useOpenBi } from './useOpenBi';

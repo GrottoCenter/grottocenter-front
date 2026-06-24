@@ -27,6 +27,9 @@ export const verifyEmailUrl = token =>
   `${API_BASE_PATH}/verify-email?token=${token}`;
 export const resendVerificationEmailUrl = `${API_BASE_PATH}/resend-verification-email`;
 
+// ===== SSO urls
+export const ssoAuthTokenUrl = `${API_BASE_PATH}/sso/auth-token`;
+
 // ===== MFA urls
 export const mfaEnrollUrl = `${API_BASE_PATH}/mfa/enroll`;
 export const mfaVerifyUrl = `${API_BASE_PATH}/mfa/verify`;

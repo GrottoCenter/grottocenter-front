@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100">
+  <defs>
+    <mask id="statsCutout">
+      <rect x="4" y="4" width="92" height="88" rx="20" fill="#ffffff"/>
+      <!-- left bar: 70% height -->
+      <rect x="18" y="39" width="16" height="35" rx="2" fill="#000000"/>
+      <!-- center bar: 100% height (tallest) -->
+      <rect x="42" y="24" width="16" height="50" rx="2" fill="#000000"/>
+      <!-- right bar: 40% height -->
+      <rect x="66" y="54" width="16" height="20" rx="2" fill="#000000"/>
+    </mask>
+  </defs>
+  <rect x="4" y="4" width="92" height="88" rx="20" fill="#D7CCC8" mask="url(#statsCutout)"/>
+</svg>

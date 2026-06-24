@@ -22,7 +22,7 @@ import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ShareIcon from '@mui/icons-material/Share';
 import ExploreOutlinedIcon from '@mui/icons-material/ExploreOutlined';
-import ScienceOutlinedIcon from '@mui/icons-material/ScienceOutlined';
+import BiotechIcon from '@mui/icons-material/Biotech';
 import ChatOutlinedIcon from '@mui/icons-material/ChatOutlined';
 import PermMediaOutlinedIcon from '@mui/icons-material/PermMediaOutlined';
 import { useReactToPrint } from 'react-to-print';
@@ -285,7 +285,7 @@ export const Entry = ({ isLoading, error, entrance }) => {
           {
             id: 'science',
             label: formatMessage({ id: 'Science' }),
-            icon: <ScienceOutlinedIcon fontSize="small" />
+            icon: <BiotechIcon fontSize="small" />
           }
         ]
       : []),

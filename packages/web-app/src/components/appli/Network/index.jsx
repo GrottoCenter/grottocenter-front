@@ -13,7 +13,7 @@ import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ShareIcon from '@mui/icons-material/Share';
 import ExploreOutlinedIcon from '@mui/icons-material/ExploreOutlined';
-import ScienceOutlinedIcon from '@mui/icons-material/ScienceOutlined';
+import BiotechIcon from '@mui/icons-material/Biotech';
 import { useReactToPrint } from 'react-to-print';
 
 import { usePermissions, useUserProperties, useExplored, useSharePage } from '../../../hooks';
@@ -212,7 +212,7 @@ export const Network = ({ isLoading, error, cave }) => {
           {
             id: 'science',
             label: formatMessage({ id: 'Science' }),
-            icon: <ScienceOutlinedIcon fontSize="small" />
+            icon: <BiotechIcon fontSize="small" />
           }
         ]
       : [])
