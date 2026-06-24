@@ -3,7 +3,10 @@ import { useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import Entry from '../../components/appli/Entry';
 import { fetchEntrance } from '../../actions/Entrance/GetEntrance';
-import { fetchNetworkCaveDescriptionsCount } from '../../actions/Cave/GetNetworkCaveDescriptionsCount';
+import {
+  fetchNetworkCaveDescriptionsCount,
+  resetNetworkCaveDescriptionsCount
+} from '../../actions/Cave/GetNetworkCaveDescriptionsCount';
 import { usePermissions } from '../../hooks';
 import {
   Deleted,
@@ -21,6 +24,7 @@ const EntryPage = () => {
 
   useEffect(() => {
     dispatch(fetchEntrance(entranceId));
+    dispatch(resetNetworkCaveDescriptionsCount());
   }, [entranceId, dispatch]);
 
   const networkCaveId = data?.cave?.entrances?.length > 1 ? data?.cave?.id : undefined;

@@ -22,5 +22,12 @@ export const fetchNetworkCaveDescriptionsCount =
       )
       .catch(error => {
         if (error.isAuthError) return;
+        // eslint-disable-next-line no-console
+        console.error('Failed to fetch network descriptions count', error);
       });
   };
+
+export const resetNetworkCaveDescriptionsCount = () => ({
+  type: FETCH_NETWORK_CAVE_DESCRIPTIONS_COUNT_SUCCESS,
+  count: 0
+});
