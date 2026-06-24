@@ -150,22 +150,22 @@ const PolygonMap = ({ onChange, onValidationChange, data }) => {
         id: 'Cancel'
       });
       L.drawLocal.edit.toolbar.actions.clearAll.title = formatMessage({
-        id: 'Clear all layers'
+        id: 'Clear all polygons'
       });
       L.drawLocal.edit.toolbar.actions.clearAll.text = formatMessage({
-        id: 'Clear all layers'
+        id: 'Clear all polygons'
       });
       L.drawLocal.edit.toolbar.buttons.edit = formatMessage({
-        id: 'Edit layers'
+        id: 'Edit polygons'
       });
       L.drawLocal.edit.toolbar.buttons.editDisabled = formatMessage({
-        id: 'No layers to edit'
+        id: 'No polygons to edit'
       });
       L.drawLocal.edit.toolbar.buttons.remove = formatMessage({
-        id: 'Delete layers'
+        id: 'Delete polygons'
       });
       L.drawLocal.edit.toolbar.buttons.removeDisabled = formatMessage({
-        id: 'No layers to delete'
+        id: 'No polygons to delete'
       });
 
       // Drawing toolbar
