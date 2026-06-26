@@ -17,6 +17,7 @@ import {
   organizationIcon,
   massifIcon
 } from '../../../../assets/icons';
+import { EXPLORED_PIN_PATH } from './ExploredOverlay';
 
 const CAVE_SIZE_POPOVER_ROWS = [
   {
@@ -113,14 +114,19 @@ const OptionLabel = styled('label')`
 
 const ExploredBadgeIcon = () => (
   <svg
-    width="16"
-    height="16"
-    viewBox="0 0 16 16"
+    width="14"
+    height="20"
+    viewBox="0 0 20 28"
     style={{ flexShrink: 0, marginRight: 4 }}>
-    <circle cx="8" cy="8" r="7.5" fill="#2e7d32" stroke="#fff" strokeWidth="1" />
+    <path
+      d={EXPLORED_PIN_PATH}
+      fill="#2e7d32"
+      stroke="#fff"
+      strokeWidth="1.5"
+    />
     <text
-      x="8"
-      y="12"
+      x="10"
+      y="11.5"
       textAnchor="middle"
       fill="#fff"
       fontSize="9"
