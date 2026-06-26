@@ -78,11 +78,13 @@ BoundsFitter.propTypes = {
 const ExploredOverlay = ({ points = [], shouldFitMapBound = false }) => {
   const openLink = useOpenLink();
 
-  const tooltipContent = useCallback(
-    m =>
-      `<span style="display:flex;align-items:center;gap:6px"><img src="${entranceIcon}" width="16" height="16">${m.name ?? '—'}</span>`,
-    []
-  );
+  const tooltipContent = useCallback(m => {
+    const safeName = (m.name ?? '—')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+    return `<span style="display:flex;align-items:center;gap:6px"><img src="${entranceIcon}" width="16" height="16">${safeName}</span>`;
+  }, []);
 
   const onMarkerClick = useCallback(m => openLink(m.url), [openLink]);
 

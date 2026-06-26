@@ -24,8 +24,8 @@ const RelatedCaves = ({
   isOrganization,
   canManageCaves,
   onRefresh,
-  isCaveSearchVisible,
-  onToggleCaveSearch,
+  isCaveSearchVisible = false,
+  onToggleCaveSearch = () => {},
   userId = null
 }) => {
   const { formatMessage } = useIntl();
@@ -249,8 +249,8 @@ RelatedCaves.propTypes = {
   isOrganization: PropTypes.bool.isRequired,
   canManageCaves: PropTypes.bool.isRequired,
   onRefresh: PropTypes.func.isRequired,
-  isCaveSearchVisible: PropTypes.bool.isRequired,
-  onToggleCaveSearch: PropTypes.func.isRequired,
+  isCaveSearchVisible: PropTypes.bool,
+  onToggleCaveSearch: PropTypes.func,
   userId: PropTypes.number
 };
 

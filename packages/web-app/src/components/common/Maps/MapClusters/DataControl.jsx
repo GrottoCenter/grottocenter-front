@@ -454,7 +454,7 @@ DataControl.propTypes = {
   isAuth: PropTypes.bool,
   showExplored: PropTypes.bool,
   setShowExplored: PropTypes.func,
-  hasExploredData: PropTypes.bool,
+  hasExploredData: PropTypes.oneOf([true, false, null]),
   ...customControlProps
 };
 

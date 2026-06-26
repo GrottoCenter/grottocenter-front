@@ -182,7 +182,9 @@ const MobileEntityList = ({
     isAppending.current = false;
   }, [rows]);
 
-  // Notify parent only when selection actually changes, not on mount
+  // Notify parent only when selection actually changes, not on mount.
+  // onSelectedRef is a ref — intentionally excluded from deps to keep the effect
+  // stable and avoid triggering on every parent re-render that recreates the callback.
   useEffect(() => {
     if (!hasInteracted.current) return;
     if (onSelectedRef.current) onSelectedRef.current(selectedIds);
