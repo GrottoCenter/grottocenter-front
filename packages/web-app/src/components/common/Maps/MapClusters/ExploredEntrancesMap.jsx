@@ -4,24 +4,24 @@ import { Box, Skeleton } from '@mui/material';
 import { isMobile } from 'react-device-detect';
 import CustomMapContainer from '../common/MapContainer';
 import ExploredOverlay from './ExploredOverlay';
-import useExploredCaves from './useExploredCaves';
+import useExploredEntrances from './useExploredEntrances';
 
-const ExploredCavesMapInner = ({ points }) => (
+const ExploredEntrancesMapInner = ({ points }) => (
   <ExploredOverlay points={points} shouldFitMapBound />
 );
 
-ExploredCavesMapInner.propTypes = {
+ExploredEntrancesMapInner.propTypes = {
   points: PropTypes.array.isRequired
 };
 
 /**
- * Standalone map showing a user's explored caves as green pins.
+ * Standalone map showing a user's explored entrances as green pins.
  * Reusable on any page with a userId (Account, Person profile, …).
  * Auto-fits bounds to the explored points on first load.
- * Renders nothing if the user has no explored caves.
+ * Renders nothing if the user has no explored entrances.
  */
-const ExploredCavesMap = ({ userId }) => {
-  const { points, hasExploredData } = useExploredCaves({
+const ExploredEntrancesMap = ({ userId }) => {
+  const { points, hasExploredData } = useExploredEntrances({
     userId,
     enabled: true
   });
@@ -44,14 +44,14 @@ const ExploredCavesMap = ({ userId }) => {
         wholePage={false}
         dragging={!isMobile}
         scrollWheelZoom={false}>
-        <ExploredCavesMapInner points={points} />
+        <ExploredEntrancesMapInner points={points} />
       </CustomMapContainer>
     </Box>
   );
 };
 
-ExploredCavesMap.propTypes = {
+ExploredEntrancesMap.propTypes = {
   userId: PropTypes.number
 };
 
-export default ExploredCavesMap;
+export default ExploredEntrancesMap;

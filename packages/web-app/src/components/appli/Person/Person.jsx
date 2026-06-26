@@ -28,7 +28,7 @@ import Alert from '../../common/Alert';
 import DocumentsList from '../../common/DocumentsList/DocumentsList';
 import EntitiesList from '../../common/entitiesList/EntitiesList';
 import RelatedCaves from '../../common/RelatedCaves/RelatedCaves';
-import ExploredCavesMap from '../../common/Maps/MapClusters/ExploredCavesMap';
+import ExploredEntrancesMap from '../../common/Maps/MapClusters/ExploredEntrancesMap';
 import PersonProperties from '../../common/Person/PersonProperties';
 import { deletePerson } from '../../../actions/Person/DeletePerson';
 import { fetchPerson } from '../../../actions/Person/GetPerson';
@@ -280,20 +280,18 @@ const Person = ({ isLoading, person, error }) => {
               />
               <ScrollableContent
                 anchorId="related-caves"
-                title={formatMessage({ id: 'Explored caves' })}
+                title={formatMessage({ id: 'Explored entrances' })}
                 defaultExpanded={nbEntrances > 0}
                 count={nbEntrances}
                 content={
-                  <>
-                    <ExploredCavesMap userId={person.id} />
-                    <RelatedCaves
-                      exploredEntrances={person.exploredEntrances}
-                      entityId={person.id}
-                      isOrganization={false}
-                      canManageCaves={false}
-                      onRefresh={handleRefresh}
-                    />
-                  </>
+                  <RelatedCaves
+                    exploredEntrances={person.exploredEntrances}
+                    entityId={person.id}
+                    isOrganization={false}
+                    canManageCaves={false}
+                    onRefresh={handleRefresh}
+                    mapContent={<ExploredEntrancesMap userId={person.id} />}
+                  />
                 }
               />
             </>

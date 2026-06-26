@@ -49,7 +49,7 @@ import useHeatLayer, { HexGlobalCss } from './useHeatLayer';
 import Markers from './Markers';
 import MassifPolygons, { massifPolygonType } from './MassifPolygons';
 import ExploredOverlay from './ExploredOverlay';
-import useExploredCaves from './useExploredCaves';
+import useExploredEntrances from './useExploredEntrances';
 import PopupTargetHandler from './PopupTargetHandler';
 import CustomMapContainer from '../common/MapContainer';
 import {
@@ -103,7 +103,7 @@ const HydratedMap = ({
     { serialize: v => String(v), deserialize: v => v === 'true' }
   );
 
-  const { points: exploredPoints, hasExploredData } = useExploredCaves({
+  const { points: exploredPoints, hasExploredData } = useExploredEntrances({
     userId,
     enabled: showExplored && isAuth
   });

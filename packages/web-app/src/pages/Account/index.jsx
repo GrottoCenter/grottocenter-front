@@ -61,7 +61,7 @@ import PageHeader from '../../components/common/Layouts/PageHeader';
 import PageTabs from '../../components/common/Layouts/PageTabs';
 import ScrollableContent from '../../components/common/Layouts/Fixed/ScrollableContent';
 import RelatedCaves from '../../components/common/RelatedCaves/RelatedCaves';
-import ExploredCavesMap from '../../components/common/Maps/MapClusters/ExploredCavesMap';
+import ExploredEntrancesMap from '../../components/common/Maps/MapClusters/ExploredEntrancesMap';
 import StandardDialog from '../../components/common/StandardDialog';
 import InputText from '../../components/appli/EntitiesForm/utils/InputText';
 import InputPassword from '../../components/appli/EntitiesForm/utils/InputPassword';
@@ -1338,7 +1338,7 @@ const AccountPage = () => {
               />
               <ScrollableContent
                 anchorId="related-caves"
-                title={formatMessage({ id: 'Explored caves' })}
+                title={formatMessage({ id: 'Explored entrances' })}
                 defaultExpanded={nbEntrances > 0}
                 count={nbEntrances}
                 icon={
@@ -1346,7 +1346,7 @@ const AccountPage = () => {
                     title={formatMessage({
                       id: isCaveSearchVisible
                         ? 'Cancel this search'
-                        : 'Add a cave'
+                        : 'Add an entrance'
                     })}>
                     <Button
                       color={isCaveSearchVisible ? 'inherit' : 'secondary'}
@@ -1366,18 +1366,16 @@ const AccountPage = () => {
                   </Tooltip>
                 }
                 content={
-                  <>
-                    <ExploredCavesMap userId={userId} />
-                    <RelatedCaves
-                      exploredEntrances={person?.exploredEntrances}
-                      entityId={person?.id}
-                      isOrganization={false}
-                      canManageCaves
-                      onRefresh={handleRefreshPerson}
-                      isCaveSearchVisible={isCaveSearchVisible}
-                      onToggleCaveSearch={setIsCaveSearchVisible}
-                    />
-                  </>
+                  <RelatedCaves
+                    exploredEntrances={person?.exploredEntrances}
+                    entityId={person?.id}
+                    isOrganization={false}
+                    canManageCaves
+                    onRefresh={handleRefreshPerson}
+                    isCaveSearchVisible={isCaveSearchVisible}
+                    onToggleCaveSearch={setIsCaveSearchVisible}
+                    mapContent={<ExploredEntrancesMap userId={userId} />}
+                  />
                 }
               />
             </>

@@ -319,7 +319,7 @@ const DataControl = ({
                     onChange={() => setShowExplored(prev => !prev)}
                   />
                   <ExploredBadgeIcon />
-                  <span>{formatMessage({ id: 'My explored caves' })}</span>
+                  <span>{formatMessage({ id: 'My explored entrances' })}</span>
                 </OptionLabel>
                 {hasExploredData === false && (
                   <div
@@ -329,7 +329,7 @@ const DataControl = ({
                       color: '#666',
                       padding: '2px 0 4px'
                     }}>
-                    {formatMessage({ id: 'No explored caves yet' })}
+                    {formatMessage({ id: 'No explored entrances yet' })}
                   </div>
                 )}
               </div>

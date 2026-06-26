@@ -18,7 +18,7 @@ import { fetchPerson } from '../../../../actions/Person/GetPerson';
  * @param {boolean}     params.enabled - Whether the overlay is active.
  * @returns {{ points: Array, hasExploredData: boolean|null }}
  */
-const useExploredCaves = ({ userId, enabled = true }) => {
+const useExploredEntrances = ({ userId, enabled = true }) => {
   const dispatch = useDispatch();
   const { person, isFetching, error } = useSelector(state => state.person);
 
@@ -53,4 +53,4 @@ const useExploredCaves = ({ userId, enabled = true }) => {
   return { points, hasExploredData };
 };
 
-export default useExploredCaves;
+export default useExploredEntrances;

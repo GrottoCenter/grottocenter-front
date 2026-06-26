@@ -148,8 +148,8 @@ export const Entry = ({ isLoading, error, entrance, networkDescriptionsCount = 0
           icon: ExploredIcon,
           label: formatMessage({
             id: isExplored
-              ? 'Remove from my explored caves'
-              : 'Add to my explored caves'
+              ? 'Remove from my explored entrances'
+              : 'Add to my explored entrances'
           }),
           onClick: handleToggleExplored,
           color: isExplored ? 'success' : 'primary',

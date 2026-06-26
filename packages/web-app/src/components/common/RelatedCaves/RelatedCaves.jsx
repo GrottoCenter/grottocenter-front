@@ -24,7 +24,8 @@ const RelatedCaves = ({
   canManageCaves,
   onRefresh,
   isCaveSearchVisible,
-  onToggleCaveSearch
+  onToggleCaveSearch,
+  mapContent = null
 }) => {
   const { formatMessage } = useIntl();
   const dispatch = useDispatch();
@@ -138,7 +139,7 @@ const RelatedCaves = ({
   const toolTipTitle = formatMessage({
     id: isOrganization
       ? 'Remove from organization'
-      : 'Remove from my explored caves'
+      : 'Remove from my explored entrances'
   });
 
   const isEmpty = isOrganization
@@ -149,12 +150,17 @@ const RelatedCaves = ({
   return (
     <>
       {isCaveSearchVisible && <SearchCaveForm onSubmit={onSubmitForm} />}
+      {mapContent}
       {isAdding ? (
         <Alert severity="info" title={formatMessage({ id: 'Loading ...' })} />
       ) : isEmpty && !isCaveSearchVisible ? (
         <Alert
           severity="info"
-          title={formatMessage({ id: 'No explored caves found.' })}
+          title={formatMessage({
+            id: isOrganization
+              ? 'No explored caves found.'
+              : 'No explored entrances found.'
+          })}
         />
       ) : (
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
@@ -208,7 +214,8 @@ RelatedCaves.propTypes = {
   canManageCaves: PropTypes.bool.isRequired,
   onRefresh: PropTypes.func.isRequired,
   isCaveSearchVisible: PropTypes.bool.isRequired,
-  onToggleCaveSearch: PropTypes.func.isRequired
+  onToggleCaveSearch: PropTypes.func.isRequired,
+  mapContent: PropTypes.node
 };
 
 export default RelatedCaves;
