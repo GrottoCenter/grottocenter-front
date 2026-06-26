@@ -1,46 +1,49 @@
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchPerson } from '../actions/Person/GetPerson';
-import { linkCave } from '../actions/Cave/LinkCave';
-import { unlinkCave } from '../actions/Cave/UnlinkCave';
+import { linkExploredEntrance } from '../actions/Entrance/LinkExploredEntrance';
+import { unlinkExploredEntrance } from '../actions/Entrance/UnlinkExploredEntrance';
 
 /**
- * Manages the "explored" toggle state for a cave/network.
+ * Manages the "explored" toggle state for an entrance.
  *
- * @param {number|null} caveId    - The cave ID to check and toggle.
- * @param {number|null} entranceId - Optional entrance ID for additional check (entrance page only).
- * @param {number|null} userId    - The current user ID, or null if not logged in.
+ * Exploration is tracked per-entrance: a caver explores specific entrances,
+ * not abstract cave entities.
+ *
+ * @param {number|null} entranceId - The entrance ID to check and toggle.
+ * @param {number|null} userId     - The current user ID, or null if not logged in.
  */
-const useExplored = ({ caveId, entranceId = null, userId }) => {
+const useExplored = ({ entranceId, userId }) => {
   const dispatch = useDispatch();
   const [isExplored, setIsExplored] = useState(false);
   const [isExploredLoading, setIsExploredLoading] = useState(false);
   const { person, error: personError } = useSelector(state => state.person);
 
+  // Guard against a stale person from another profile page sharing the reducer.
+  const isPersonCurrent = Boolean(userId) && person?.id === userId;
+
   useEffect(() => {
-    if (userId && !person && !personError) {
+    if (userId && !isPersonCurrent && !personError) {
       dispatch(fetchPerson(userId));
     }
-  }, [userId, person, personError, dispatch]);
+  }, [userId, isPersonCurrent, personError, dispatch]);
 
   useEffect(() => {
-    if (!caveId) return;
-    if (userId && !person) return; // wait for person data before setting explored state
-    const inNetworks = person?.exploredNetworks?.some(n => n?.id === caveId);
-    const inEntrances = entranceId
-      ? person?.exploredEntrances?.some(e => e?.id === entranceId)
-      : false;
-    setIsExplored(!!(inNetworks || inEntrances));
-  }, [person, caveId, entranceId, userId]);
+    if (!entranceId) return;
+    if (userId && !isPersonCurrent) return; // wait for the current person's data
+    setIsExplored(
+      !!person?.exploredEntrances?.some(e => e?.id === entranceId)
+    );
+  }, [person, entranceId, userId, isPersonCurrent]);
 
   const handleToggleExplored = async () => {
-    if (!userId || !caveId) return;
+    if (!userId || !entranceId) return;
     setIsExploredLoading(true);
     try {
       if (isExplored) {
-        await dispatch(unlinkCave(caveId, userId, false));
+        await dispatch(unlinkExploredEntrance(entranceId, userId));
       } else {
-        await dispatch(linkCave(caveId, userId, false));
+        await dispatch(linkExploredEntrance(entranceId, userId));
       }
       setIsExplored(prev => !prev);
       dispatch(fetchPerson(userId));

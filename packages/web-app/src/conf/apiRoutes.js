@@ -302,10 +302,10 @@ export const unbanCaverUrl = caverId =>
   `${API_BASE_PATH}/cavers/${caverId}/unban`;
 export const deletePersonUrl = (userId, entityId) =>
   `${API_BASE_PATH}/cavers/${userId}?${entityId ? `entityId=${entityId}` : ''}`;
-export const linkCaveToCaverUrl = (caveId, caverId) =>
-  `${API_BASE_PATH}/caves/${caveId}/cavers/${caverId}`;
-export const unlinkCaveFromCaverUrl = (caveId, caverId) =>
-  `${API_BASE_PATH}/caves/${caveId}/cavers/${caverId}`;
+export const linkExploredEntranceUrl = (entranceId, caverId) =>
+  `${API_BASE_PATH}/entrances/${entranceId}/cavers/${caverId}`;
+export const unlinkExploredEntranceUrl = (entranceId, caverId) =>
+  `${API_BASE_PATH}/entrances/${entranceId}/cavers/${caverId}`;
 
 // ===== RSS urls
 export const frenchRssUrl = `${API_URL}/api/rss/FR`;
