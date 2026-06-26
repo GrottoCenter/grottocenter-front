@@ -43,6 +43,7 @@ const useExplored = ({ caveId, entranceId = null, userId }) => {
         await dispatch(linkCave(caveId, userId, false));
       }
       setIsExplored(prev => !prev);
+      dispatch(fetchPerson(userId));
     } catch (err) {
       console.error('Error toggling explored status:', err);
     } finally {

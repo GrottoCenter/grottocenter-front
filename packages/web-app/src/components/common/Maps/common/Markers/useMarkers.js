@@ -19,7 +19,8 @@ const useMarkers = ({
   circleMarkerStyle,
   popupContent = null,
   tooltipContent = null,
-  shouldFitMapBound = false
+  shouldFitMapBound = false,
+  markerOptions = null
 }) => {
   const map = useMap();
   // Map<id, L.Marker> for O(1) lookups during diff
@@ -38,7 +39,7 @@ const useMarkers = ({
             : circleMarkerStyle;
         markerEl = L.circleMarker([latitude, longitude], style);
       } else {
-        markerEl = L.marker([latitude, longitude], { icon });
+        markerEl = L.marker([latitude, longitude], { icon, ...markerOptions });
       }
 
       // Lazy popup: content is rendered only when the popup is opened
@@ -55,7 +56,7 @@ const useMarkers = ({
 
       return markerEl;
     },
-    [icon, circleMarkerStyle, popupContent, renderPopup, tooltipContent]
+    [icon, circleMarkerStyle, popupContent, renderPopup, tooltipContent, markerOptions]
   );
 
   const updateMarkers = useCallback(
