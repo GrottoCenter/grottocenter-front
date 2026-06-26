@@ -4,19 +4,17 @@ import { useIntl } from 'react-intl';
 import { useParams, useNavigate, Link as RouterLink } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import Skeleton from '@mui/material/Skeleton';
-import { Box, Breadcrumbs, Card, CircularProgress, Link, Typography } from '@mui/material';
+import { Box, Breadcrumbs, Card, Link, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { NavigateNext, Print } from '@mui/icons-material';
 import CreateIcon from '@mui/icons-material/Create';
 import DeleteIcon from '@mui/icons-material/Delete';
-import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ShareIcon from '@mui/icons-material/Share';
 import ExploreOutlinedIcon from '@mui/icons-material/ExploreOutlined';
 import BiotechIcon from '@mui/icons-material/Biotech';
 import { useReactToPrint } from 'react-to-print';
 
-import { usePermissions, useUserProperties, useExplored, useSharePage } from '../../../hooks';
+import { usePermissions, useSharePage } from '../../../hooks';
 import PageContainer from '../../common/Layouts/PageContainer';
 import PageHeader from '../../common/Layouts/PageHeader';
 import PageTabs from '../../common/Layouts/PageTabs';
@@ -67,11 +65,6 @@ export const Network = ({ isLoading, error, cave }) => {
   const [isDeleteConfirmationPermanent, setIsDeleteConfirmationPermanent] =
     useState(false);
   const [wantedDeletedState, setWantedDeletedState] = useState(false);
-  const userId = useUserProperties()?.id ?? null;
-  const { isExplored, isExploredLoading, handleToggleExplored } = useExplored({
-    caveId: cave?.id,
-    userId
-  });
   const handleShare = useSharePage();
   const handlePrint = useReactToPrint({ contentRef: componentRef });
 
@@ -106,29 +99,11 @@ export const Network = ({ isLoading, error, cave }) => {
     );
   };
 
-  let ExploredIcon = <CircularProgress size={20} />;
-  if (!isExploredLoading) {
-    ExploredIcon = isExplored ? <CheckCircleIcon /> : <CheckCircleOutlineIcon />;
-  }
-
-  const canToggleExplored = isAuth && caveId && !cave?.isDeleted;
   const canEdit = isAuth && cave && !cave.isDeleted;
 
   const actions = cave ? (
     <ResponsiveActions
       items={[
-        {
-          key: 'explored',
-          icon: ExploredIcon,
-          label: formatMessage({
-            id: isExplored
-              ? 'Remove from my explored caves'
-              : 'Add to my explored caves'
-          }),
-          onClick: handleToggleExplored,
-          color: isExplored ? 'success' : 'primary',
-          hidden: !canToggleExplored
-        },
         {
           key: 'print',
           icon: <Print />,

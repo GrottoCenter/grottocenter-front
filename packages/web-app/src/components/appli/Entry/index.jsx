@@ -89,7 +89,6 @@ export const Entry = ({ isLoading, error, entrance, networkDescriptionsCount = 0
   const [wantedDeletedState, setWantedDeletedState] = useState(false);
   const userId = useUserProperties()?.id ?? null;
   const { isExplored, isExploredLoading, handleToggleExplored } = useExplored({
-    caveId: entrance?.cave?.id,
     entranceId: entrance?.id,
     userId
   });

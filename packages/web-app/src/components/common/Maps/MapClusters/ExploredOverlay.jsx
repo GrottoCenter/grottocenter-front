@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 import * as L from 'leaflet';
 import { GlobalStyles } from '@mui/material';
 import useMarkers from '../common/Markers/useMarkers';
-import { entranceIcon, networkIcon } from '../../../../assets/icons';
+import { entranceIcon } from '../../../../assets/icons';
 
 export const ExploredGlobalCss = (
   <GlobalStyles
@@ -80,7 +80,7 @@ const ExploredOverlay = ({ points = [], shouldFitMapBound = false }) => {
 
   const tooltipContent = useCallback(
     m =>
-      `<span style="display:flex;align-items:center;gap:6px"><img src="${m.isNetwork ? networkIcon : entranceIcon}" width="16" height="16">${m.name ?? '—'}</span>`,
+      `<span style="display:flex;align-items:center;gap:6px"><img src="${entranceIcon}" width="16" height="16">${m.name ?? '—'}</span>`,
     []
   );
 
@@ -112,8 +112,7 @@ ExploredOverlay.propTypes = {
       latitude: PropTypes.number.isRequired,
       longitude: PropTypes.number.isRequired,
       name: PropTypes.string,
-      url: PropTypes.string,
-      isNetwork: PropTypes.bool
+      url: PropTypes.string
     })
   ),
   shouldFitMapBound: PropTypes.bool
