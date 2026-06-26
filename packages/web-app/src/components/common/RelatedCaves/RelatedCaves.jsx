@@ -17,6 +17,8 @@ import { unlinkExploredEntrance } from '../../../actions/Entrance/UnlinkExplored
 import { getEntranceUrl } from '../../../conf/apiRoutes';
 import ExploredEntrancesMap from '../Maps/MapClusters/ExploredEntrancesMap';
 
+const noop = () => {};
+
 const RelatedCaves = ({
   exploredEntrances,
   exploredNetworks,
@@ -25,7 +27,7 @@ const RelatedCaves = ({
   canManageCaves,
   onRefresh,
   isCaveSearchVisible = false,
-  onToggleCaveSearch = () => {},
+  onToggleCaveSearch = noop,
   userId = null
 }) => {
   const { formatMessage } = useIntl();
