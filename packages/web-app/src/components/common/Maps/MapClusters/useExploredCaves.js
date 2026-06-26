@@ -65,31 +65,39 @@ const useExploredCaves = ({ userId, enabled = true }) => {
     const controller = new AbortController();
     abortRef.current = controller;
 
-    Promise.allSettled(
-      unresolved.map(n =>
-        fetch(`${getCaveUrl}${n.id}`, { signal: controller.signal })
-          .then(r => r.json())
-          .then(cave => {
-            const entrances = (cave.entrances ?? [])
-              .filter(e => Number.isFinite(e.latitude) && Number.isFinite(e.longitude))
-              .map(e => ({ id: e.id, latitude: e.latitude, longitude: e.longitude, name: n.name }));
-            networkEntrancesCache.set(n.id, entrances);
-          })
-          .catch(err => {
-            // Don't cache abort errors — let the next enable attempt retry.
-            if (err.name !== 'AbortError') networkEntrancesCache.set(n.id, []);
-          })
-      )
-    ).then(() => {
-      if (controller.signal.aborted) return;
-      setNetworkEntrances(
-        Object.fromEntries(
-          networks
-            .filter(n => networkEntrancesCache.has(n.id))
-            .map(n => [n.id, networkEntrancesCache.get(n.id)])
-        )
-      );
-    });
+    const fetchOne = n =>
+      fetch(`${getCaveUrl}${n.id}`, { signal: controller.signal })
+        .then(r => r.json())
+        .then(cave => {
+          const entrances = (cave.entrances ?? [])
+            .filter(e => Number.isFinite(e.latitude) && Number.isFinite(e.longitude))
+            .map(e => ({ id: e.id, latitude: e.latitude, longitude: e.longitude, name: n.name }));
+          networkEntrancesCache.set(n.id, entrances);
+        })
+        .catch(err => {
+          // Don't cache abort errors — let the next enable attempt retry.
+          if (err.name !== 'AbortError') networkEntrancesCache.set(n.id, []);
+        });
+
+    const fetchBatched = async () => {
+      const BATCH = 3;
+      for (let i = 0; i < unresolved.length; i += BATCH) {
+        if (controller.signal.aborted) break;
+        // eslint-disable-next-line no-await-in-loop
+        await Promise.allSettled(unresolved.slice(i, i + BATCH).map(fetchOne));
+        if (!controller.signal.aborted) {
+          setNetworkEntrances(
+            Object.fromEntries(
+              networks
+                .filter(n => networkEntrancesCache.has(n.id))
+                .map(n => [n.id, networkEntrancesCache.get(n.id)])
+            )
+          );
+        }
+      }
+    };
+
+    fetchBatched();
 
     // eslint-disable-next-line consistent-return
     return () => {
