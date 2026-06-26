@@ -28,6 +28,7 @@ import Alert from '../../common/Alert';
 import DocumentsList from '../../common/DocumentsList/DocumentsList';
 import EntitiesList from '../../common/entitiesList/EntitiesList';
 import RelatedCaves from '../../common/RelatedCaves/RelatedCaves';
+import ExploredCavesMap from '../../common/Maps/MapClusters/ExploredCavesMap';
 import PersonProperties from '../../common/Person/PersonProperties';
 import { deletePerson } from '../../../actions/Person/DeletePerson';
 import { fetchPerson } from '../../../actions/Person/GetPerson';
@@ -284,14 +285,17 @@ const Person = ({ isLoading, person, error }) => {
                 defaultExpanded={nbNetworks + nbEntrances > 0}
                 count={nbNetworks + nbEntrances}
                 content={
-                  <RelatedCaves
-                    exploredEntrances={person.exploredEntrances}
-                    exploredNetworks={person.exploredNetworks}
-                    entityId={person.id}
-                    isOrganization={false}
-                    canManageCaves={false}
-                    onRefresh={handleRefresh}
-                  />
+                  <>
+                    <ExploredCavesMap userId={person.id} />
+                    <RelatedCaves
+                      exploredEntrances={person.exploredEntrances}
+                      exploredNetworks={person.exploredNetworks}
+                      entityId={person.id}
+                      isOrganization={false}
+                      canManageCaves={false}
+                      onRefresh={handleRefresh}
+                    />
+                  </>
                 }
               />
             </>
