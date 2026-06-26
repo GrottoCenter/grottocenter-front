@@ -40,6 +40,7 @@ import {
   usePermissions,
   getCRSLabel
 } from '../../../../hooks';
+import useLocalStorage from '../../../../hooks/useLocalStorage';
 import { displayLoginDialog } from '../../../../actions/Login';
 import { EntityIcon } from '../../../../pages/EntityCreation/entityConfig';
 import CRSMenu from '../../CRSMenu';
@@ -96,18 +97,11 @@ const HydratedMap = ({
   const isTouch = useMediaQuery('(pointer: coarse)');
   const { updateLayers } = useHeatLayer();
 
-  const [showExplored, setShowExploredRaw] = useState(
-    () => localStorage.getItem('grottocenter_showExploredCaves') === 'true'
+  const [showExplored, setShowExplored] = useLocalStorage(
+    'grottocenter_showExploredCaves',
+    false,
+    { serialize: v => String(v), deserialize: v => v === 'true' }
   );
-  const setShowExplored = useCallback(next => {
-    setShowExploredRaw(prev => {
-      const value = typeof next === 'function' ? next(prev) : next;
-      try {
-        localStorage.setItem('grottocenter_showExploredCaves', String(value));
-      } catch { /* noop */ }
-      return value;
-    });
-  }, []);
 
   const { points: exploredPoints, hasExploredData } = useExploredCaves({
     userId,
@@ -117,18 +111,30 @@ const HydratedMap = ({
   const initialZoom = useRef(map.getZoom()).current;
   const isInitiallyZoomedIn = initialZoom >= MARKERS_LIMIT;
 
-  const [selectedHeats, setSelectedHeats] = useState(
-    () => new Set([heatmapTypes.ENTRANCES])
+  const [selectedHeats, setSelectedHeats] = useLocalStorage(
+    'grottocenter_selectedHeats',
+    new Set([heatmapTypes.ENTRANCES]),
+    {
+      serialize: v => JSON.stringify([...v]),
+      deserialize: v => new Set(JSON.parse(v))
+    }
   );
-  const [selectedMarkers, setSelectedMarkers] = useState(
-    Object.fromEntries(Object.values(markerTypes).map(type => [type, false]))
+  const [selectedMarkers, setSelectedMarkers] = useLocalStorage(
+    'grottocenter_selectedMarkers',
+    Object.fromEntries(Object.values(markerTypes).map(type => [type, false])),
+    { merge: true }
   );
-  const [activeEntranceFilters, setActiveEntranceFilters] = useState(
-    Object.fromEntries(Object.values(CAVE_SIZE).map(size => [size, true]))
+  const [activeEntranceFilters, setActiveEntranceFilters] = useLocalStorage(
+    'grottocenter_activeEntranceFilters',
+    Object.fromEntries(Object.values(CAVE_SIZE).map(size => [size, true])),
+    { merge: true }
   );
-  const [activeQualityFilters, setActiveQualityFilters] = useState(
-    Object.fromEntries(Object.values(CAVE_QUALITY).map(q => [q, true]))
+  const [activeQualityFilters, setActiveQualityFilters] = useLocalStorage(
+    'grottocenter_activeQualityFilters',
+    Object.fromEntries(Object.values(CAVE_QUALITY).map(q => [q, true])),
+    { merge: true }
   );
+
   const filteredEntranceMarkers = useMemo(
     () =>
       entranceMarkers.filter(e => {
@@ -226,7 +232,7 @@ const HydratedMap = ({
         );
       }
     },
-    [setVisibleMarkersStable]
+    [setSelectedHeats, setVisibleMarkersStable]
   );
 
   // zoomend: manages heatmap ↔ markers visibility only.
