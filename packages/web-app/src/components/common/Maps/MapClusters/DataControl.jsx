@@ -310,13 +310,6 @@ const DataControl = ({
 
             {isAuth && (
               <div style={hasExploredData === false ? { opacity: 0.5 } : undefined}>
-                <hr
-                  style={{
-                    margin: '6px 0',
-                    border: 'none',
-                    borderTop: '1px solid #ddd'
-                  }}
-                />
                 <OptionLabel>
                   <input
                     type="checkbox"
