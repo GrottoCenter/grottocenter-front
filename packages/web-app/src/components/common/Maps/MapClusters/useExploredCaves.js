@@ -107,6 +107,7 @@ const useExploredCaves = ({ userId, enabled = true }) => {
         latitude: e.latitude,
         longitude: e.longitude,
         name: e.name,
+        url: `/ui/entrances/${e.id}`,
         isNetwork: false
       }));
 
@@ -116,6 +117,7 @@ const useExploredCaves = ({ userId, enabled = true }) => {
         latitude: e.latitude,
         longitude: e.longitude,
         name: e.name,
+        url: `/ui/entrances/${e.id}`,
         isNetwork: true
       }))
     );

@@ -19,6 +19,7 @@ const useMarkers = ({
   circleMarkerStyle,
   popupContent = null,
   tooltipContent = null,
+  onMarkerClick = null,
   shouldFitMapBound = false,
   markerOptions = null
 }) => {
@@ -51,12 +52,15 @@ const useMarkers = ({
         markerEl.bindTooltip(`${tooltipContent(marker)}`, {});
         // On touch devices a tap fires both tooltip and popup; hide tooltip on click
         // (fires before popupopen, works reliably for both L.marker and L.circleMarker)
-        markerEl.on('click', () => markerEl.closeTooltip());
+        markerEl.on('click', () => {
+          markerEl.closeTooltip();
+          if (onMarkerClick) onMarkerClick(marker);
+        });
       }
 
       return markerEl;
     },
-    [icon, circleMarkerStyle, popupContent, renderPopup, tooltipContent, markerOptions]
+    [icon, circleMarkerStyle, popupContent, renderPopup, tooltipContent, onMarkerClick, markerOptions]
   );
 
   const updateMarkers = useCallback(
