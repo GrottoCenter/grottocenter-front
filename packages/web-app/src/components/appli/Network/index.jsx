@@ -126,7 +126,7 @@ export const Network = ({ isLoading, error, cave }) => {
               : 'Add to my explored caves'
           }),
           onClick: handleToggleExplored,
-          color: isExplored ? 'secondary' : 'primary',
+          color: isExplored ? 'success' : 'primary',
           hidden: !canToggleExplored
         },
         {

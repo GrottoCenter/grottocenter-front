@@ -74,7 +74,9 @@ const ResponsiveActions = ({ items }) => {
                 if (item.divider) return <Divider key={`d-${index}`} />;
                 const { key, icon, label, onClick, href, target, color } = item;
                 const colorSx =
-                  color === 'secondary' ? { color: 'secondary.main' } : {};
+                  color === 'secondary' || color === 'success'
+                    ? { color: `${color}.main` }
+                    : {};
                 return (
                   <MenuItem
                     key={key}

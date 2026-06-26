@@ -153,7 +153,7 @@ export const Entry = ({ isLoading, error, entrance, networkDescriptionsCount = 0
               : 'Add to my explored caves'
           }),
           onClick: handleToggleExplored,
-          color: isExplored ? 'secondary' : 'primary',
+          color: isExplored ? 'success' : 'primary',
           hidden: !canToggleExplored
         },
         {
