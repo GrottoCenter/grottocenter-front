@@ -61,6 +61,7 @@ import PageHeader from '../../components/common/Layouts/PageHeader';
 import PageTabs from '../../components/common/Layouts/PageTabs';
 import ScrollableContent from '../../components/common/Layouts/Fixed/ScrollableContent';
 import RelatedCaves from '../../components/common/RelatedCaves/RelatedCaves';
+import ExploredCavesMap from '../../components/common/Maps/MapClusters/ExploredCavesMap';
 import StandardDialog from '../../components/common/StandardDialog';
 import InputText from '../../components/appli/EntitiesForm/utils/InputText';
 import InputPassword from '../../components/appli/EntitiesForm/utils/InputPassword';
@@ -1366,16 +1367,19 @@ const AccountPage = () => {
                   </Tooltip>
                 }
                 content={
-                  <RelatedCaves
-                    exploredEntrances={person?.exploredEntrances}
-                    exploredNetworks={person?.exploredNetworks}
-                    entityId={person?.id}
-                    isOrganization={false}
-                    canManageCaves
-                    onRefresh={handleRefreshPerson}
-                    isCaveSearchVisible={isCaveSearchVisible}
-                    onToggleCaveSearch={setIsCaveSearchVisible}
-                  />
+                  <>
+                    <ExploredCavesMap userId={userId} />
+                    <RelatedCaves
+                      exploredEntrances={person?.exploredEntrances}
+                      exploredNetworks={person?.exploredNetworks}
+                      entityId={person?.id}
+                      isOrganization={false}
+                      canManageCaves
+                      onRefresh={handleRefreshPerson}
+                      isCaveSearchVisible={isCaveSearchVisible}
+                      onToggleCaveSearch={setIsCaveSearchVisible}
+                    />
+                  </>
                 }
               />
             </>

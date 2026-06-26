@@ -45,7 +45,7 @@ const BADGE_MARKER_OPTIONS = { zIndexOffset: 1000, keyboard: false };
  * Reusable: accepts any array of resolved points — works on the main map
  * (via HydratedMap) and on profile-page maps.
  */
-const ExploredOverlay = ({ points = [] }) => {
+const ExploredOverlay = ({ points = [], shouldFitMapBound = false }) => {
   const openLink = useOpenLink();
 
   const tooltipContent = useCallback(
@@ -60,6 +60,7 @@ const ExploredOverlay = ({ points = [] }) => {
     icon: exploredBadgeIcon,
     tooltipContent,
     onMarkerClick,
+    shouldFitMapBound,
     markerOptions: BADGE_MARKER_OPTIONS
   });
 
@@ -80,7 +81,8 @@ ExploredOverlay.propTypes = {
       url: PropTypes.string,
       isNetwork: PropTypes.bool
     })
-  )
+  ),
+  shouldFitMapBound: PropTypes.bool
 };
 
 export default ExploredOverlay;
