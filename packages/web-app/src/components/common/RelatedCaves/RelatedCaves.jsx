@@ -15,6 +15,7 @@ import { unlinkCave } from '../../../actions/Cave/UnlinkCave';
 import { linkExploredEntrance } from '../../../actions/Entrance/LinkExploredEntrance';
 import { unlinkExploredEntrance } from '../../../actions/Entrance/UnlinkExploredEntrance';
 import { getEntranceUrl } from '../../../conf/apiRoutes';
+import ExploredEntrancesMap from '../Maps/MapClusters/ExploredEntrancesMap';
 
 const RelatedCaves = ({
   exploredEntrances,
@@ -25,7 +26,7 @@ const RelatedCaves = ({
   onRefresh,
   isCaveSearchVisible,
   onToggleCaveSearch,
-  mapContent = null
+  userId = null
 }) => {
   const { formatMessage } = useIntl();
   const dispatch = useDispatch();
@@ -39,40 +40,53 @@ const RelatedCaves = ({
   }, []);
 
   // Organizations still link whole caves; cavers link individual entrances.
-  const handleUnlinkCave = useCallback(async caveId => {
-    try {
-      await dispatch(unlinkCave(caveId, entityId));
-      onRefresh();
-    } catch (error) {
-      console.error('Error unlinking cave:', error);
-    }
-  }, [dispatch, entityId, onRefresh]);
-
-  const handleUnlinkOrganizationEntrance = useCallback(async entranceId => {
-    try {
-      const caveId = await fetchCaveIdFromEntrance(entranceId);
-      if (caveId) {
-        await handleUnlinkCave(caveId);
+  const handleUnlinkCave = useCallback(
+    async caveId => {
+      try {
+        await dispatch(unlinkCave(caveId, entityId));
+        onRefresh();
+      } catch (error) {
+        console.error('Error unlinking cave:', error);
       }
-    } catch (error) {
-      console.error('Error unlinking entrance:', error);
-    }
-  }, [fetchCaveIdFromEntrance, handleUnlinkCave]);
+    },
+    [dispatch, entityId, onRefresh]
+  );
 
-  const handleUnlinkExploredEntrance = useCallback(async entranceId => {
-    try {
-      await dispatch(unlinkExploredEntrance(entranceId, entityId));
-      onRefresh();
-    } catch (error) {
-      console.error('Error unlinking entrance:', error);
-    }
-  }, [dispatch, entityId, onRefresh]);
+  const handleUnlinkOrganizationEntrance = useCallback(
+    async entranceId => {
+      try {
+        const caveId = await fetchCaveIdFromEntrance(entranceId);
+        if (caveId) {
+          await handleUnlinkCave(caveId);
+        }
+      } catch (error) {
+        console.error('Error unlinking entrance:', error);
+      }
+    },
+    [fetchCaveIdFromEntrance, handleUnlinkCave]
+  );
 
-  const requestUnlink = useCallback((id, type) => {
-    const list = type === 'cave' ? (exploredNetworks ?? []) : (exploredEntrances ?? []);
-    const item = list.find(e => e.id === id);
-    setPendingRemove({ id, type, label: item?.name });
-  }, [exploredNetworks, exploredEntrances]);
+  const handleUnlinkExploredEntrance = useCallback(
+    async entranceId => {
+      try {
+        await dispatch(unlinkExploredEntrance(entranceId, entityId));
+        onRefresh();
+      } catch (error) {
+        console.error('Error unlinking entrance:', error);
+      }
+    },
+    [dispatch, entityId, onRefresh]
+  );
+
+  const requestUnlink = useCallback(
+    (id, type) => {
+      const list =
+        type === 'cave' ? (exploredNetworks ?? []) : (exploredEntrances ?? []);
+      const item = list.find(e => e.id === id);
+      setPendingRemove({ id, type, label: item?.name });
+    },
+    [exploredNetworks, exploredEntrances]
+  );
 
   const handleConfirmRemove = useCallback(async () => {
     if (!pendingRemove) return;
@@ -97,44 +111,47 @@ const RelatedCaves = ({
     setPendingRemove(null);
   }, []);
 
-  const onSubmitForm = useCallback(async selectedEntrances => {
-    onToggleCaveSearch(false);
-    setIsAdding(true);
+  const onSubmitForm = useCallback(
+    async selectedEntrances => {
+      onToggleCaveSearch(false);
+      setIsAdding(true);
 
-    try {
-      for (const entrance of selectedEntrances) {
-        const entranceId = entrance.id || entrance['@id'];
-        try {
-          if (isOrganization) {
-            const caveId = await fetchCaveIdFromEntrance(entranceId);
-            if (caveId) await dispatch(linkCave(caveId, entityId));
-          } else {
-            await dispatch(linkExploredEntrance(entranceId, entityId));
-          }
-        } catch (error) {
-          if (error.body?.message?.includes('already')) {
-            console.warn(
-              `Entrance ${entranceId} is already linked to entity ${entityId}`
-            );
-          } else {
-            console.error(`Error linking entrance ${entranceId}:`, error);
+      try {
+        for (const entrance of selectedEntrances) {
+          const entranceId = entrance.id || entrance['@id'];
+          try {
+            if (isOrganization) {
+              const caveId = await fetchCaveIdFromEntrance(entranceId);
+              if (caveId) await dispatch(linkCave(caveId, entityId));
+            } else {
+              await dispatch(linkExploredEntrance(entranceId, entityId));
+            }
+          } catch (error) {
+            if (error.body?.message?.includes('already')) {
+              console.warn(
+                `Entrance ${entranceId} is already linked to entity ${entityId}`
+              );
+            } else {
+              console.error(`Error linking entrance ${entranceId}:`, error);
+            }
           }
         }
+        onRefresh();
+      } catch (error) {
+        console.error('Error linking entrance:', error);
+      } finally {
+        setIsAdding(false);
       }
-      onRefresh();
-    } catch (error) {
-      console.error('Error linking entrance:', error);
-    } finally {
-      setIsAdding(false);
-    }
-  }, [
-    dispatch,
-    entityId,
-    isOrganization,
-    fetchCaveIdFromEntrance,
-    onRefresh,
-    onToggleCaveSearch
-  ]);
+    },
+    [
+      dispatch,
+      entityId,
+      isOrganization,
+      fetchCaveIdFromEntrance,
+      onRefresh,
+      onToggleCaveSearch
+    ]
+  );
 
   const toolTipTitle = formatMessage({
     id: isOrganization
@@ -149,8 +166,17 @@ const RelatedCaves = ({
 
   return (
     <>
-      {isCaveSearchVisible && <SearchCaveForm onSubmit={onSubmitForm} />}
-      {mapContent}
+      {isCaveSearchVisible && (
+        <SearchCaveForm
+          onSubmit={onSubmitForm}
+          submitLabel={formatMessage({ id: 'Mark as explored' })}
+        />
+      )}
+      {!isOrganization && userId && (
+        <Box sx={{ mt: isCaveSearchVisible ? 0 : -3 }}>
+          <ExploredEntrancesMap userId={userId} />
+        </Box>
+      )}
       {isAdding ? (
         <Alert severity="info" title={formatMessage({ id: 'Loading ...' })} />
       ) : isEmpty && !isCaveSearchVisible ? (
@@ -168,14 +194,18 @@ const RelatedCaves = ({
             <EntitiesList
               type="cave"
               entities={exploredNetworks}
-              onItemRemove={canManageCaves ? id => requestUnlink(id, 'cave') : null}
+              onItemRemove={
+                canManageCaves ? id => requestUnlink(id, 'cave') : null
+              }
               toolTipTitle={toolTipTitle}
             />
           )}
           <EntitiesList
             type="entrance"
             entities={exploredEntrances}
-            onItemRemove={canManageCaves ? id => requestUnlink(id, 'entrance') : null}
+            onItemRemove={
+              canManageCaves ? id => requestUnlink(id, 'entrance') : null
+            }
             toolTipTitle={toolTipTitle}
           />
         </Box>
@@ -199,7 +229,13 @@ const RelatedCaves = ({
         }>
         {formatMessage(
           { id: 'Are you sure you want to unlink {name}?' },
-          { name: <Typography component="span" fontWeight={700}>{pendingRemove?.label ?? '?'}</Typography> }
+          {
+            name: (
+              <Typography component="span" fontWeight={700}>
+                {pendingRemove?.label ?? '?'}
+              </Typography>
+            )
+          }
         )}
       </StandardDialog>
     </>
@@ -215,7 +251,7 @@ RelatedCaves.propTypes = {
   onRefresh: PropTypes.func.isRequired,
   isCaveSearchVisible: PropTypes.bool.isRequired,
   onToggleCaveSearch: PropTypes.func.isRequired,
-  mapContent: PropTypes.node
+  userId: PropTypes.number
 };
 
 export default RelatedCaves;

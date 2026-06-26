@@ -61,7 +61,6 @@ import PageHeader from '../../components/common/Layouts/PageHeader';
 import PageTabs from '../../components/common/Layouts/PageTabs';
 import ScrollableContent from '../../components/common/Layouts/Fixed/ScrollableContent';
 import RelatedCaves from '../../components/common/RelatedCaves/RelatedCaves';
-import ExploredEntrancesMap from '../../components/common/Maps/MapClusters/ExploredEntrancesMap';
 import StandardDialog from '../../components/common/StandardDialog';
 import InputText from '../../components/appli/EntitiesForm/utils/InputText';
 import InputPassword from '../../components/appli/EntitiesForm/utils/InputPassword';
@@ -1374,7 +1373,7 @@ const AccountPage = () => {
                     onRefresh={handleRefreshPerson}
                     isCaveSearchVisible={isCaveSearchVisible}
                     onToggleCaveSearch={setIsCaveSearchVisible}
-                    mapContent={<ExploredEntrancesMap userId={userId} />}
+                    userId={userId}
                   />
                 }
               />

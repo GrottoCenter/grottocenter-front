@@ -28,7 +28,6 @@ import Alert from '../../common/Alert';
 import DocumentsList from '../../common/DocumentsList/DocumentsList';
 import EntitiesList from '../../common/entitiesList/EntitiesList';
 import RelatedCaves from '../../common/RelatedCaves/RelatedCaves';
-import ExploredEntrancesMap from '../../common/Maps/MapClusters/ExploredEntrancesMap';
 import PersonProperties from '../../common/Person/PersonProperties';
 import { deletePerson } from '../../../actions/Person/DeletePerson';
 import { fetchPerson } from '../../../actions/Person/GetPerson';
@@ -290,7 +289,7 @@ const Person = ({ isLoading, person, error }) => {
                     isOrganization={false}
                     canManageCaves={false}
                     onRefresh={handleRefresh}
-                    mapContent={<ExploredEntrancesMap userId={person.id} />}
+                    userId={person.id}
                   />
                 }
               />
