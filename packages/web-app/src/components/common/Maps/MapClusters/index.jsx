@@ -47,6 +47,8 @@ import MeasureControl from '../common/MeasureControl';
 import useHeatLayer, { HexGlobalCss } from './useHeatLayer';
 import Markers from './Markers';
 import MassifPolygons, { massifPolygonType } from './MassifPolygons';
+import ExploredOverlay from './ExploredOverlay';
+import useExploredCaves from './useExploredCaves';
 import PopupTargetHandler from './PopupTargetHandler';
 import CustomMapContainer from '../common/MapContainer';
 import {
@@ -85,6 +87,7 @@ const HydratedMap = ({
   const projections = useSelector(
     state => state.projections?.projections ?? []
   );
+  const userId = useSelector(state => state.login.authTokenDecoded?.id ?? null);
   const [contextCoords, setContextCoords] = useState(null);
   const [contextMenuAnchor, setContextMenuAnchor] = useState(null);
   const [pendingEntranceUrl, setPendingEntranceUrl] = useState(null);
@@ -92,6 +95,24 @@ const HydratedMap = ({
   const [preferred, setPref] = useCoordinatePreference();
   const isTouch = useMediaQuery('(pointer: coarse)');
   const { updateLayers } = useHeatLayer();
+
+  const [showExplored, setShowExploredRaw] = useState(
+    () => localStorage.getItem('grottocenter_showExploredCaves') === 'true'
+  );
+  const setShowExplored = useCallback(next => {
+    setShowExploredRaw(prev => {
+      const value = typeof next === 'function' ? next(prev) : next;
+      try {
+        localStorage.setItem('grottocenter_showExploredCaves', String(value));
+      } catch { /* noop */ }
+      return value;
+    });
+  }, []);
+
+  const { points: exploredPoints, hasExploredData } = useExploredCaves({
+    userId,
+    enabled: showExplored && isAuth
+  });
 
   const initialZoom = useRef(map.getZoom()).current;
   const isInitiallyZoomedIn = initialZoom >= MARKERS_LIMIT;
@@ -364,8 +385,13 @@ const HydratedMap = ({
         activeQualityFilters={activeQualityFilters}
         setActiveQualityFilters={setActiveQualityFilters}
         isMarkersMode={isMarkersMode}
+        isAuth={isAuth}
+        showExplored={showExplored}
+        setShowExplored={setShowExplored}
+        hasExploredData={hasExploredData}
         useLeafletControl
       />
+      <ExploredOverlay points={showExplored && isAuth ? exploredPoints : []} />
       <Markers
         visibleMarkers={visibleMarkers}
         organizations={organizations}

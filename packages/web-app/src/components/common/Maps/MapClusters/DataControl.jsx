@@ -111,6 +111,26 @@ const OptionLabel = styled('label')`
   }
 `;
 
+const ExploredBadgeIcon = () => (
+  <svg
+    width="16"
+    height="16"
+    viewBox="0 0 16 16"
+    style={{ flexShrink: 0, marginRight: 4 }}>
+    <circle cx="8" cy="8" r="7.5" fill="#2e7d32" stroke="#fff" strokeWidth="1" />
+    <text
+      x="8"
+      y="12"
+      textAnchor="middle"
+      fill="#fff"
+      fontSize="9"
+      fontWeight="bold"
+      fontFamily="sans-serif">
+      ✓
+    </text>
+  </svg>
+);
+
 const CaveSizeDot = ({ caveSize }) => {
   const { radius, fillColor, color, weight } = CAVE_SIZE_STYLE[caveSize];
   return (
@@ -173,6 +193,10 @@ const DataControl = ({
   activeQualityFilters,
   setActiveQualityFilters,
   isMarkersMode,
+  isAuth,
+  showExplored,
+  setShowExplored,
+  hasExploredData,
   ...props
 }) => {
   const { fullScreen } = useFullScreen();
@@ -277,6 +301,40 @@ const DataControl = ({
                 {formatMessage({ id: markerTypes.ORGANIZATIONS })}
               </span>
             </OptionLabel>
+
+            {isAuth && (
+              <div style={hasExploredData === false ? { opacity: 0.5 } : undefined}>
+                <hr
+                  style={{
+                    margin: '6px 0',
+                    border: 'none',
+                    borderTop: '1px solid #ddd'
+                  }}
+                />
+                <OptionLabel>
+                  <input
+                    type="checkbox"
+                    name="exploredCaves"
+                    disabled={hasExploredData === false}
+                    checked={showExplored && hasExploredData !== false}
+                    onChange={() => setShowExplored(prev => !prev)}
+                  />
+                  <ExploredBadgeIcon />
+                  <span>{formatMessage({ id: 'My explored caves' })}</span>
+                </OptionLabel>
+                {hasExploredData === false && (
+                  <div
+                    style={{
+                      fontSize: 11,
+                      fontStyle: 'italic',
+                      color: '#666',
+                      padding: '2px 0 4px'
+                    }}>
+                    {formatMessage({ id: 'No explored caves yet' })}
+                  </div>
+                )}
+              </div>
+            )}
 
             {selectedHeats.has(heatmapTypes.ENTRANCES) && (
               <div
@@ -394,6 +452,10 @@ DataControl.propTypes = {
   activeQualityFilters: PropTypes.objectOf(PropTypes.bool).isRequired,
   setActiveQualityFilters: PropTypes.func.isRequired,
   isMarkersMode: PropTypes.bool.isRequired,
+  isAuth: PropTypes.bool,
+  showExplored: PropTypes.bool,
+  setShowExplored: PropTypes.func,
+  hasExploredData: PropTypes.bool,
   ...customControlProps
 };
 
