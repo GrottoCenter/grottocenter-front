@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 import { isMobile } from 'react-device-detect';
 import { Box, Divider, IconButton, LinearProgress, Tooltip } from '@mui/material';
@@ -88,13 +88,17 @@ const EntityTable = ({
     setMobileOrderBy('');
   }, [isNewQuery]);
 
+  const visibleColumns = useMemo(
+    () => entityColumns.filter(e => e.visible),
+    [entityColumns]
+  );
+
   if (!pageRows) return null;
 
   if (viewMode === 'cards') {
     const sortableColumns = entityColumns.filter(
       c => c.sortable && SORT_FIELD_MAP[entityType]?.[c.field]
     );
-    const visibleColumns = entityColumns.filter(e => e.visible);
 
     const handleMobileSortFieldChange = e => {
       const field = e.target.value;
@@ -199,6 +203,7 @@ const EntityTable = ({
           link={entityConfig.link}
           icon={entityConfig.icon}
           renderCellFn={renderCell}
+          onSelected={onSelected}
         />
       </Box>
     );

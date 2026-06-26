@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import useOpenLink from '../../../hooks/useOpenLink';
 import {
@@ -7,6 +7,7 @@ import {
   Card,
   CardActionArea,
   CardContent,
+  Checkbox,
   CircularProgress,
   Divider,
   Stack,
@@ -16,72 +17,110 @@ import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import SearchOffIcon from '@mui/icons-material/SearchOff';
 import Translate from '../Translate';
 
-const MobileEntityCard = ({ doc, columns, link, renderCellFn, icon }) => {
-  const openLink = useOpenLink();
-  const titleCol =
-    columns.find(c => c.isTitle) ??
-    columns.find(c => c.field === 'name' || c.field === 'title') ??
-    columns[0];
-  const bodyColumns = columns.filter(c => c !== titleCol);
+const MobileEntityCard = React.memo(
+  ({
+    doc,
+    columns,
+    link,
+    renderCellFn,
+    icon,
+    selected = false,
+    onToggle = null
+  }) => {
+    const openLink = useOpenLink();
+    const titleCol =
+      columns.find(c => c.isTitle) ??
+      columns.find(c => c.field === 'name' || c.field === 'title') ??
+      columns[0];
+    const bodyColumns = columns.filter(c => c !== titleCol);
 
-  return (
-    <Card sx={{ outline: '1px solid', outlineColor: 'primary.main' }}>
-      <CardActionArea onClick={() => openLink(link(doc))}>
-        <CardContent sx={{ py: 1, px: 1.5, '&:last-child': { pb: 1 } }}>
-          <Box
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              mb: 0.5
-            }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-              {icon}
-              <Typography
-                variant="subtitle1"
-                color="secondary"
-                fontWeight="bold"
-                sx={{ fontSize: '1.5rem', lineHeight: 1.3 }}>
-                {renderCellFn(doc, titleCol.field, titleCol.render)}
-              </Typography>
+    const handleClick = () => {
+      if (onToggle) {
+        onToggle(doc.id);
+      } else {
+        openLink(link(doc));
+      }
+    };
+
+    return (
+      <Card
+        sx={{
+          outline: '1px solid',
+          outlineColor: 'primary.main',
+          bgcolor: selected ? 'action.selected' : 'background.paper',
+          transition: 'background-color 0.15s'
+        }}>
+        <CardActionArea onClick={handleClick}>
+          <CardContent sx={{ py: 1, px: 1.5, '&:last-child': { pb: 1 } }}>
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                mb: 0.5
+              }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                {onToggle && (
+                  <Checkbox
+                    checked={selected}
+                    size="small"
+                    color="primary"
+                    onClick={e => e.stopPropagation()}
+                    onChange={() => onToggle(doc.id)}
+                    sx={{ p: 0, mr: 0.5, flexShrink: 0 }}
+                  />
+                )}
+                {icon}
+                <Typography
+                  variant="subtitle1"
+                  color="secondary"
+                  fontWeight="bold"
+                  sx={{ fontSize: '1.5rem', lineHeight: 1.3 }}>
+                  {renderCellFn(doc, titleCol.field, titleCol.render)}
+                </Typography>
+              </Box>
+              {!onToggle && (
+                <ChevronRightIcon
+                  fontSize="small"
+                  sx={{ color: 'text.disabled', flexShrink: 0, ml: 0.5 }}
+                />
+              )}
             </Box>
-            <ChevronRightIcon
-              fontSize="small"
-              sx={{ color: 'text.disabled', flexShrink: 0, ml: 0.5 }}
-            />
-          </Box>
-          <Divider sx={{ mb: 0.5 }} />
-          {bodyColumns.length > 0 && (
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.25 }}>
-              {bodyColumns.map(col => {
-                const value = renderCellFn(doc, col.field, col.render);
-                const isMissing = value === '-';
-                return (
-                  <Box
-                    key={col.field}
-                    sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <Typography
-                      variant="caption"
-                      color="text.secondary"
-                      sx={{ minWidth: '35%', flexShrink: 0 }}>
-                      <Translate>{col.label}</Translate>
-                    </Typography>
-                    <Typography
-                      variant="body2"
-                      fontWeight={isMissing ? 'normal' : 500}
-                      color={isMissing ? 'text.disabled' : 'text.primary'}>
-                      {value}
-                    </Typography>
-                  </Box>
-                );
-              })}
-            </Box>
-          )}
-        </CardContent>
-      </CardActionArea>
-    </Card>
-  );
-};
+            <Divider sx={{ mb: 0.5 }} />
+            {bodyColumns.length > 0 && (
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.25 }}>
+                {bodyColumns.map(col => {
+                  const value = renderCellFn(doc, col.field, col.render);
+                  const isMissing = value === '-';
+                  return (
+                    <Box
+                      key={col.field}
+                      sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <Typography
+                        variant="caption"
+                        color="text.secondary"
+                        sx={{ minWidth: '35%', flexShrink: 0 }}>
+                        <Translate>{col.label}</Translate>
+                      </Typography>
+                      <Typography
+                        variant="body2"
+                        fontWeight={isMissing ? 'normal' : 500}
+                        color={isMissing ? 'text.disabled' : 'text.primary'}>
+                        {value}
+                      </Typography>
+                    </Box>
+                  );
+                })}
+              </Box>
+            )}
+          </CardContent>
+        </CardActionArea>
+      </Card>
+    );
+  }
+);
+
+MobileEntityCard.displayName = 'MobileEntityCard';
 
 MobileEntityCard.propTypes = {
   doc: PropTypes.shape({
@@ -90,7 +129,9 @@ MobileEntityCard.propTypes = {
   columns: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   link: PropTypes.func.isRequired,
   renderCellFn: PropTypes.func.isRequired,
-  icon: PropTypes.node
+  icon: PropTypes.node,
+  selected: PropTypes.bool,
+  onToggle: PropTypes.func
 };
 
 // ~600 cards ≈ 30 "Load more" clicks × 20 rows/page, capped to prevent DOM bloat on mobile.
@@ -106,16 +147,24 @@ const MobileEntityList = ({
   rowsPerPage,
   link,
   icon,
-  renderCellFn
+  renderCellFn,
+  onSelected = null
 }) => {
   const [allRows, setAllRows] = useState(rows ?? []);
   const [page, setPage] = useState(0);
+  const [selectedIds, setSelectedIds] = useState([]);
   const isAppending = useRef(false);
+  const hasInteracted = useRef(false);
+  // Keep a stable ref to the callback so handleToggle never changes reference
+  const onSelectedRef = useRef(onSelected);
+  onSelectedRef.current = onSelected;
 
   useEffect(() => {
     if (!isNewQuery) return;
     setAllRows([]);
     setPage(0);
+    setSelectedIds([]);
+    hasInteracted.current = false;
     isAppending.current = false;
   }, [isNewQuery]);
 
@@ -132,6 +181,21 @@ const MobileEntityList = ({
     }
     isAppending.current = false;
   }, [rows]);
+
+  // Notify parent only when selection actually changes, not on mount
+  useEffect(() => {
+    if (!hasInteracted.current) return;
+    if (onSelectedRef.current) onSelectedRef.current(selectedIds);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedIds]);
+
+  // Stable reference — does not depend on onSelected directly
+  const handleToggle = useCallback(id => {
+    hasInteracted.current = true;
+    setSelectedIds(prev =>
+      prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]
+    );
+  }, []);
 
   const handleLoadMore = () => {
     isAppending.current = true;
@@ -170,6 +234,8 @@ const MobileEntityList = ({
             link={link}
             icon={icon}
             renderCellFn={renderCellFn}
+            selected={onSelected ? selectedIds.includes(doc.id) : false}
+            onToggle={onSelected ? handleToggle : null}
           />
         ))}
       </Stack>
@@ -207,7 +273,8 @@ MobileEntityList.propTypes = {
   rowsPerPage: PropTypes.number.isRequired,
   link: PropTypes.func.isRequired,
   icon: PropTypes.node,
-  renderCellFn: PropTypes.func.isRequired
+  renderCellFn: PropTypes.func.isRequired,
+  onSelected: PropTypes.func
 };
 
 export default MobileEntityList;
