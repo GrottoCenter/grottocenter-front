@@ -1,4 +1,5 @@
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
+import { useMap } from 'react-leaflet';
 import useOpenLink from '../../../../hooks/useOpenLink';
 import PropTypes from 'prop-types';
 import * as L from 'leaflet';
@@ -38,6 +39,35 @@ const exploredBadgeIcon = L.divIcon({
 // Module-level: stable reference so useMarkers's useCallback deps don't change.
 const BADGE_MARKER_OPTIONS = { zIndexOffset: 1000, keyboard: false };
 
+// Fits the map to the explored points, debounced so progressive batches settle first.
+const BoundsFitter = ({ points }) => {
+  const map = useMap();
+  const hasFittedRef = useRef(false);
+
+  useEffect(() => {
+    if (hasFittedRef.current || points.length === 0) return;
+    const timer = setTimeout(() => {
+      hasFittedRef.current = true;
+      map.fitBounds(
+        points.map(p => [p.latitude, p.longitude]),
+        { padding: [40, 40], maxZoom: 16 }
+      );
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [map, points]);
+
+  return null;
+};
+
+BoundsFitter.propTypes = {
+  points: PropTypes.arrayOf(
+    PropTypes.shape({
+      latitude: PropTypes.number.isRequired,
+      longitude: PropTypes.number.isRequired
+    })
+  ).isRequired
+};
+
 /**
  * Renders a ✓ badge for each explored cave on the Leaflet map.
  * Visible at all zoom levels (independent of viewport fetching).
@@ -60,7 +90,6 @@ const ExploredOverlay = ({ points = [], shouldFitMapBound = false }) => {
     icon: exploredBadgeIcon,
     tooltipContent,
     onMarkerClick,
-    shouldFitMapBound,
     markerOptions: BADGE_MARKER_OPTIONS
   });
 
@@ -68,7 +97,12 @@ const ExploredOverlay = ({ points = [], shouldFitMapBound = false }) => {
     update(points.length > 0 ? points : null);
   }, [points, update]);
 
-  return ExploredGlobalCss;
+  return (
+    <>
+      {ExploredGlobalCss}
+      {shouldFitMapBound && <BoundsFitter points={points} />}
+    </>
+  );
 };
 
 ExploredOverlay.propTypes = {
