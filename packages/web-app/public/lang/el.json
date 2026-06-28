@@ -1092,6 +1092,7 @@
   "guidelines.create_new_description": "Write a new guideline from scratch and attach it to this entity.",
   "guidelines.create_success": "Guideline created and attached successfully",
   "guidelines.description": "Description",
+  "guidelines.fetch_error": "Failed to load guidelines",
   "guidelines.no_results": "No matching guidelines found",
   "guidelines.none": "No guidelines attached to this {entityType}.",
   "guidelines.search_placeholder": "Type to filter by title or description…",
