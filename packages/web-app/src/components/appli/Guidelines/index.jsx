@@ -10,19 +10,18 @@ import {
 } from '@mui/material';
 import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
-import AddIcon from '@mui/icons-material/Add';
 import LinkIcon from '@mui/icons-material/Link';
 import CreateIcon from '@mui/icons-material/Create';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { useDispatch } from 'react-redux';
-import { usePermissions } from '../../../hooks';
+import { usePermissions, useNotification } from '../../../hooks';
 import GuidelinePropTypes from '../../../types/guideline.type';
 import GuidelineForm from '../EntitiesForm/Guideline/index';
 import Guideline from './Guideline';
 import { postGuideline } from '../../../actions/Guideline/CreateGuideline';
 import { patchGuideline } from '../../../actions/Guideline/UpdateGuideline';
 import { getGuidelinesUrl } from '../../../conf/apiRoutes';
-import { checkAuthStatus } from '../../../actions/utils';
+import { checkAndGetStatus } from '../../../actions/utils';
 import ScrollableContent from '../../common/Layouts/Fixed/ScrollableContent';
 import ActionButton from '../../common/ActionButton';
 
@@ -32,6 +31,7 @@ const MODE_ATTACH = 'attach';
 
 const Guidelines = ({ entityType, entityId, guidelines }) => {
   const permissions = usePermissions();
+  const { onError } = useNotification();
   const dispatch = useDispatch();
   const { formatMessage } = useIntl();
   const [mode, setMode] = useState(MODE_NONE);
@@ -42,12 +42,13 @@ const Guidelines = ({ entityType, entityId, guidelines }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
   const [searchValue, setSearchValue] = useState('');
+  const [attachFetchTrigger, setAttachFetchTrigger] = useState(0);
 
   useEffect(() => {
     if (mode === MODE_ATTACH) {
       setIsLoadingGuidelines(true);
       fetch(getGuidelinesUrl)
-        .then(checkAuthStatus(dispatch))
+        .then(checkAndGetStatus)
         .then(response => response.json())
         .then(data => {
           setAllGuidelines(data || []);
@@ -55,10 +56,16 @@ const Guidelines = ({ entityType, entityId, guidelines }) => {
         })
         .catch(err => {
           console.error(err);
+          onError(
+            formatMessage({
+              id: 'guidelines.fetch_error',
+              defaultMessage: 'Failed to load guidelines'
+            })
+          );
           setIsLoadingGuidelines(false);
         });
     }
-  }, [mode, dispatch]);
+  }, [mode, formatMessage, onError, attachFetchTrigger]);
 
   const closeForm = () => {
     setMode(MODE_NONE);
@@ -152,6 +159,7 @@ const Guidelines = ({ entityType, entityId, guidelines }) => {
                 onClick={() => {
                   setMode(MODE_ATTACH);
                   setSelectedGuideline(null);
+                  setAttachFetchTrigger(prev => prev + 1);
                 }}
               >
                 <FormattedMessage id="guidelines.attach_existing" />
@@ -329,13 +337,16 @@ const Guidelines = ({ entityType, entityId, guidelines }) => {
             size="small"
             color="primary"
             variant="outlined"
-            onClick={() => setMode(MODE_ATTACH)}
-            startIcon={<AddIcon />}
+            onClick={() => {
+              setMode(MODE_ATTACH);
+              setAttachFetchTrigger(prev => prev + 1);
+            }}
+            startIcon={<LinkIcon />}
             data-testid="add-guideline-btn"
           >
             <FormattedMessage
-              id="guidelines.add"
-              defaultMessage="Add a new guideline"
+              id="guidelines.attach_existing"
+              defaultMessage="Attach an existing guideline"
             />
           </Button>
         )

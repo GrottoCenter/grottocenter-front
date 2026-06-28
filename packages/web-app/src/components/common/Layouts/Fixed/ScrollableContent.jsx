@@ -151,7 +151,12 @@ ScrollableContent.propTypes = {
   title: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
   count: PropTypes.number,
   icon: PropTypes.node,
-  content: PropTypes.node,
+  content: (props, propName, componentName) => {
+    if (!props.content && !props.children) {
+      return new Error(`${componentName} requires either 'content' or 'children' prop.`);
+    }
+    return null;
+  },
   children: PropTypes.node,
   anchorId: PropTypes.string,
   dense: PropTypes.bool,
