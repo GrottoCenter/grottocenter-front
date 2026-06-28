@@ -9,9 +9,9 @@ import CancelIcon from '@mui/icons-material/Cancel';
 
 import AssociationForm from './AssociationForm';
 import StandardDialog from '../../common/StandardDialog';
-import { setCountryOrganization, removeCountryOrganization } from '../../../actions/Country/countryOrganization';
-import { setRegionOrganization, removeRegionOrganization } from '../../../actions/Region/regionOrganization';
-import { setMassifOrganization, removeMassifOrganization } from '../../../actions/Massif/massifOrganization';
+import { setCountryOrganization, removeCountryOrganization } from '../../../actions/Country/CountryOrganization';
+import { setRegionOrganization, removeRegionOrganization } from '../../../actions/Region/RegionOrganization';
+import { setMassifOrganization, removeMassifOrganization } from '../../../actions/Massif/MassifOrganization';
 import { fetchCountry } from '../../../actions/Country/GetCountry';
 import { fetchRegion } from '../../../actions/Region/GetRegion';
 import { loadMassif } from '../../../actions/Massif/GetMassif';
