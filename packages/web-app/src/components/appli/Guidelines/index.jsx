@@ -35,7 +35,7 @@ const Guidelines = ({ entityType, entityId, guidelines }) => {
       title={<FormattedMessage id="Guidelines" />}
       anchorId="guidelines"
       id="guidelines"
-      actionElement={
+      icon={
         permissions.isAuth &&
         !isFormVisible && (
           <Button

@@ -36,7 +36,6 @@ import error from './ErrorReducer';
 import fileFormats from './FileFormatsReducer';
 import forgotPassword from './ForgotPasswordReducer';
 import groups from './GroupsReducer';
-import guidelineSnapshots from './GuidelineSnapshotsReducer';
 import identifierType from './IdentifierTypesReducer';
 import importCsv from './ImportCsvReducer';
 import importWizard from './ImportWizardReducer';
@@ -138,7 +137,6 @@ const GCReducer = combineReducers({
   fileFormats,
   forgotPassword,
   groups,
-  guidelineSnapshots,
   identifierType,
   importCsv,
   importWizard,

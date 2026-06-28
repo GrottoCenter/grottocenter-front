@@ -187,7 +187,7 @@ export const getMapMassifsCoordinatesUrl = `${API_BASE_PATH}/geoloc/massifsCoord
 
 // ===== Guidelines urls
 export const postGuidelineUrl = `${API_BASE_PATH}/guidelines`;
-export const putGuidelineUrl = guidelineId =>
+export const patchGuidelineUrl = guidelineId =>
   `${API_BASE_PATH}/guidelines/${guidelineId}`;
 export const deleteGuidelineUrl = (guidelineId, isPermanent = false) =>
   `${API_BASE_PATH}/guidelines/${guidelineId}?${
