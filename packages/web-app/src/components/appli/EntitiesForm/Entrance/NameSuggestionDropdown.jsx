@@ -77,7 +77,11 @@ const NameSuggestionDropdown = ({ control, formKey, enabled, children }) => {
       <ClickAwayListener onClickAway={closeDropdown}>
         <Box
           ref={anchorRef}
-          sx={{ position: 'relative', flex: 1, minWidth: 0, width: '100%' }}
+          // Wraps the name field; must size like the bare field it replaced so
+          // it shares the flex row with the language selector. `flex: 1` here
+          // sets flex-basis:0 and, next to a width:100% sibling, collapsed the
+          // field to min-content (~24px) — i.e. the name input "disappeared".
+          sx={{ position: 'relative', minWidth: 0, width: '100%' }}
           onFocus={() => setIsFocused(true)}
           onInput={() => setIsFocused(true)}
           onKeyDown={e => {
@@ -93,6 +97,7 @@ const NameSuggestionDropdown = ({ control, formKey, enabled, children }) => {
             style={{ zIndex: 1300, width: anchorRef.current?.clientWidth }}>
             <Paper
               elevation={3}
+              aria-live="polite"
               sx={{ mt: 0.5, maxHeight: 320, overflow: 'auto' }}>
               {isLoading ? (
                 <Box
@@ -117,12 +122,19 @@ const NameSuggestionDropdown = ({ control, formKey, enabled, children }) => {
                       id: 'Existing entrances with a similar name:'
                     })}
                   </Typography>
-                  <List dense disablePadding>
+                  <List
+                    dense
+                    disablePadding
+                    role="listbox"
+                    aria-label={formatMessage({
+                      id: 'Existing entrances with a similar name:'
+                    })}>
                     {suggestions.map(entrance => {
                       const location = getLocationContext(entrance);
                       return (
                         <ListItemButton
                           key={entrance.id}
+                          role="option"
                           onClick={() => openConfirmation(entrance)}>
                           <ListItemText
                             primary={entrance.name}
