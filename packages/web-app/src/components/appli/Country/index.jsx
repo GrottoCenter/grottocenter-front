@@ -23,9 +23,10 @@ import REDUCER_STATUS from '../../../reducers/ReducerStatus';
 import { CoordinatesMarker } from '../../common/Maps/common/Markers/Components';
 import CountryPropTypes from './propTypes';
 import { isMobile } from 'react-device-detect';
-import { useSubscriptions, useSharePage } from '../../../hooks';
+import { usePermissions, useSubscriptions, useSharePage } from '../../../hooks';
 import getLocalizedCountryName from '../../../helpers/countryName';
 import CustomIcon from '../../common/CustomIcon';
+import Guidelines from '../Guidelines';
 import RegionsList from './RegionsList';
 
 const Country = ({
@@ -40,6 +41,7 @@ const Country = ({
   const navigate = useNavigate();
   const componentRef = useRef();
   const isLoading = status === REDUCER_STATUS.LOADING;
+  const permissions = usePermissions();
   const handleShare = useSharePage();
   const handlePrint = useReactToPrint({ contentRef: componentRef });
 
@@ -179,6 +181,13 @@ const Country = ({
               id: 'Discover the numbers about this country and its massifs and caves.'
             })}
           />
+          {(country.guidelines?.length > 0 || permissions.isAuth) && (
+            <Guidelines
+              entityType="countries"
+              entityId={country.id}
+              guidelines={country.guidelines}
+            />
+          )}
           <ScrollableContent
             anchorId="regions"
             title={formatMessage({ id: 'Regions' })}

@@ -18,6 +18,7 @@ import { updateHistory } from '../../../../../actions/History/UpdateHistory';
 import { updateRiggings } from '../../../../../actions/Riggings/UpdateRigging';
 import { updateLocation } from '../../../../../actions/Location/UpdateLocation';
 import { updateComment } from '../../../../../actions/Comment/UpdateComment';
+import { rollbackGuideline } from '../../../../../actions/Guideline/RollbackGuideline';
 import { usePermissions, useUserProperties } from '../../../../../hooks';
 import { updateEntrance } from '../../../../../actions/Entrance/UpdateEntrance';
 import { updateCaveAndEntrance } from '../../../../../actions/CaveAndEntrance';
@@ -30,7 +31,7 @@ function sleep(ms) {
 }
 const RestoreSnapshot = item => {
   const dispatch = useDispatch();
-  const { snapshot, snapshotType, isNetwork } = item;
+  const { snapshot, snapshotType, isNetwork, actualItem } = item;
   const userId = pathOr(null, ['id'], useUserProperties());
   const permissions = usePermissions();
   const { formatMessage } = useIntl();
@@ -129,6 +130,14 @@ const RestoreSnapshot = item => {
           })
         );
         break;
+      case 'guidelines':
+        dispatch(
+          rollbackGuideline({
+            id: content.id,
+            snapshotId: content.t_id
+          })
+        );
+        break;
       default:
         break;
     }
@@ -137,7 +146,8 @@ const RestoreSnapshot = item => {
     sleep(10000).then(() => window.close());
   };
   return (
-    permissions.isAuth && (
+    permissions.isAuth &&
+    !actualItem?.isDeleted && (
       <>
         <Tooltip title={formatMessage({ id: 'Restore this version' })}>
           <Button

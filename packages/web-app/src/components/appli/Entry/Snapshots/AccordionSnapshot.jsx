@@ -34,7 +34,8 @@ const AccordionSnapshot = ({
   reviewer,
   previous,
   all,
-  isCurrent
+  isCurrent,
+  actualItem
 }) => {
   const { formatMessage } = useIntl();
   const [open, setOpen] = useState(isCurrent ?? false);
@@ -141,6 +142,7 @@ const AccordionSnapshot = ({
                   snapshot={snapshot}
                   snapshotType={snapshotType}
                   isNetwork={isNetwork}
+                  actualItem={actualItem}
                 />
               </Box>
             )}
@@ -170,6 +172,9 @@ AccordionSnapshot.propTypes = {
     name: PropTypes.string,
     date: PropTypes.string,
     dateReviewed: PropTypes.string
+  }),
+  actualItem: PropTypes.shape({
+    isDeleted: PropTypes.bool
   }),
   all: PropTypes.bool,
   isCurrent: PropTypes.bool
