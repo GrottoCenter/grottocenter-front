@@ -96,7 +96,6 @@ import updateName from './UpdateNameReducer';
 import updateOrganization from './UpdateOrganization';
 import updatePerson from './UpdatePerson';
 import updatePersonGroups from './UpdatePersonGroupesReducer';
-import verifyEmail from './VerifyEmailReducer';
 
 const GCReducer = combineReducers({
   account,
@@ -195,8 +194,7 @@ const GCReducer = combineReducers({
   updateName,
   updateOrganization,
   updatePerson,
-  updatePersonGroups,
-  verifyEmail
+  updatePersonGroups
 });
 
 export default GCReducer;
