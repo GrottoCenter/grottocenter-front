@@ -26,10 +26,26 @@ export const postGuideline =
   (dispatch, getState) => {
     dispatch(postGuidelineAction());
 
+    const mappedEntityType =
+      {
+        countries: 'country',
+        regions: 'region',
+        massifs: 'massif'
+      }[entityType] || entityType;
+
     const requestOptions = {
       method: 'POST',
-      body: JSON.stringify({ entityType, entityId, title, description, language }),
-      headers: getState().login.authorizationHeader
+      body: JSON.stringify({
+        entityType: mappedEntityType,
+        entityId,
+        title,
+        description,
+        language
+      }),
+      headers: {
+        ...getState().login.authorizationHeader,
+        'Content-Type': 'application/json'
+      }
     };
 
     return fetch(postGuidelineUrl, requestOptions)

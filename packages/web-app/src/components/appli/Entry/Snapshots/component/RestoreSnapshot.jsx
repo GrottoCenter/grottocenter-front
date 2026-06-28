@@ -48,12 +48,12 @@ const RestoreSnapshot = item => {
   const handleClose = () => {
     setOpen(false);
   };
-  const restoreSnapshot = (typeItem, content) => {
+  const restoreSnapshot = async (typeItem, content) => {
     setOpen(false);
     switch (typeItem) {
       case 'comments':
         if (canEditComment) {
-          dispatch(
+          await dispatch(
             updateComment({
               ...content,
               id: content.t_id,
@@ -64,7 +64,7 @@ const RestoreSnapshot = item => {
         }
         break;
       case 'descriptions':
-        dispatch(
+        await dispatch(
           updateDescription({
             ...content,
             id: content.t_id
@@ -88,7 +88,7 @@ const RestoreSnapshot = item => {
           id: content.t_id
         };
         if (isNetwork) {
-          dispatch(updateEntrance(updatedEntrance));
+          await dispatch(updateEntrance(updatedEntrance));
         } else {
           const updatedCave = {
             name: {
@@ -103,11 +103,11 @@ const RestoreSnapshot = item => {
             temperature: Number(content.cave.temperature),
             id: content.cave?.id
           };
-          dispatch(updateCaveAndEntrance(updatedCave, updatedEntrance));
+          await dispatch(updateCaveAndEntrance(updatedCave, updatedEntrance));
         }
         break;
       case 'histories':
-        dispatch(
+        await dispatch(
           updateHistory({
             ...content,
             id: content.t_id
@@ -115,7 +115,7 @@ const RestoreSnapshot = item => {
         );
         break;
       case 'locations':
-        dispatch(
+        await dispatch(
           updateLocation({
             ...content,
             id: content.t_id
@@ -123,7 +123,7 @@ const RestoreSnapshot = item => {
         );
         break;
       case 'riggings':
-        dispatch(
+        await dispatch(
           updateRiggings({
             ...content,
             id: content.t_id
@@ -131,10 +131,10 @@ const RestoreSnapshot = item => {
         );
         break;
       case 'guidelines':
-        dispatch(
+        await dispatch(
           rollbackGuideline({
-            id: content.id,
-            snapshotId: content.t_id
+            id: content.t_id,
+            snapshotId: content.id
           })
         );
         break;

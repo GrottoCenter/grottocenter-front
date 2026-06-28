@@ -85,7 +85,7 @@ const Guidelines = ({ entityType, entityId, guidelines }) => {
 
 Guidelines.propTypes = {
   entityType: PropTypes.string.isRequired,
-  entityId: PropTypes.number.isRequired,
+  entityId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
   guidelines: PropTypes.arrayOf(GuidelinePropTypes)
 };
 

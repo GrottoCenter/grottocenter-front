@@ -25,12 +25,18 @@ const GuidelineForm = ({
   const { locale, AVAILABLE_LANGUAGES } = useSelector(state => state.intl);
   const { formatMessage } = useIntl();
 
+  // When editing, normalize the language field to its ID since the API returns
+  // a full language object but the backend expects just the language ID string.
+  const normalizedValues = values
+    ? { ...values, language: values.language?.id ?? values.language }
+    : undefined;
+
   const {
     handleSubmit,
     control,
     formState: { errors, isSubmitting }
   } = useForm({
-    defaultValues: values ?? getDefaultValues(AVAILABLE_LANGUAGES[locale].id)
+    defaultValues: normalizedValues ?? getDefaultValues(AVAILABLE_LANGUAGES[locale].id)
   });
 
   const titleValidator = value => {

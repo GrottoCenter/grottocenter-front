@@ -27,9 +27,12 @@ export const putGuideline =
     dispatch(putGuidelineAction());
 
     const requestOptions = {
-      method: 'PUT',
+      method: 'PATCH',
       body: JSON.stringify({ title, description, language }),
-      headers: getState().login.authorizationHeader
+      headers: {
+        ...getState().login.authorizationHeader,
+        'Content-Type': 'application/json'
+      }
     };
 
     return fetch(putGuidelineUrl(id), requestOptions)
