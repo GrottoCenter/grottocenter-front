@@ -67,7 +67,6 @@ import recentChange from './RecentChangeReducer';
 import region from './RegionReducer';
 import regionDetails from './RegionDetailsReducer';
 import regionEntrances from './RegionEntrancesDataQualityReducer';
-import resendVerificationEmail from './ResendVerificationEmailReducer';
 import restoreGuideline from './RestoreGuidelineReducer';
 import sideMenu from './SideMenuReducer';
 import signUp from './SignUpReducer';
