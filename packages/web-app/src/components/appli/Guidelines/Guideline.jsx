@@ -28,12 +28,11 @@ const Guideline = ({
   const dispatch = useDispatch();
   const permissions = usePermissions();
   const [isUpdateFormVisible, setIsUpdateFormVisible] = useState(false);
-  const [wantedDeletedState, setWantedDeletedState] = useState(false);
+  const [wantedDeletedState, setWantedDeletedState] = useState(guideline.isDeleted);
 
   useEffect(() => {
     setWantedDeletedState(guideline.isDeleted);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [guideline.isDeleted]);
 
   const onSubmitForm = data => {
     dispatch(

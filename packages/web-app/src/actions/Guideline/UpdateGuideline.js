@@ -22,13 +22,13 @@ export const patchGuidelineFailure = error => ({
 });
 
 export const patchGuideline =
-  ({ id, title, description, language }) =>
+  ({ id, title, description, language, countries, regions, massifs }) =>
   (dispatch, getState) => {
     dispatch(patchGuidelineAction());
 
     const requestOptions = {
       method: 'PATCH',
-      body: JSON.stringify({ title, description, language }),
+      body: JSON.stringify({ title, description, language, countries, regions, massifs }),
       headers: {
         ...getState().login.authorizationHeader,
         'Content-Type': 'application/json'

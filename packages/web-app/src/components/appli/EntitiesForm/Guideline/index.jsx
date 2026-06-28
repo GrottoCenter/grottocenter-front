@@ -39,15 +39,9 @@ const GuidelineForm = ({
     defaultValues: normalizedValues ?? getDefaultValues(AVAILABLE_LANGUAGES[locale].id)
   });
 
-  const titleValidator = value => {
-    if (value && value.length > 150) return false;
-    return true;
-  };
+  const titleValidator = value => !value || value.length <= 150;
 
-  const descriptionValidator = value => {
-    if (value && value.length > 500) return false;
-    return true;
-  };
+  const descriptionValidator = value => !value || value.length <= 500;
 
   return (
     <FormContainer sx={{ marginTop: 2 }}>

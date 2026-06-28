@@ -41,8 +41,9 @@ const reducer = (state = initialState, action) => {
     case POST_GUIDELINE_SUCCESS: {
       if (
         !state.country ||
-        action.guideline.entityType !== 'country' ||
-        String(action.guideline.entityId) !== String(state.country.id)
+        !action.guideline.countries?.some(
+          c => String(c) === String(state.country.id)
+        )
       ) {
         return state;
       }
@@ -64,18 +65,21 @@ const reducer = (state = initialState, action) => {
     case ROLLBACK_GUIDELINE_SUCCESS: {
       if (
         !state.country ||
-        action.guideline.entityType !== 'country' ||
-        String(action.guideline.entityId) !== String(state.country.id)
+        !action.guideline.countries?.some(
+          c => String(c) === String(state.country.id)
+        )
       ) {
         return state;
       }
+      const guidelines = state.country.guidelines || [];
+      const exists = guidelines.some(g => g.id === action.guideline.id);
       return {
         ...state,
         country: {
           ...state.country,
-          guidelines: (state.country.guidelines || []).map(g =>
-            g.id === action.guideline.id ? action.guideline : g
-          )
+          guidelines: exists
+            ? guidelines.map(g => (g.id === action.guideline.id ? action.guideline : g))
+            : [...guidelines, action.guideline]
         }
       };
     }
