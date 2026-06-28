@@ -98,14 +98,14 @@ const NameSuggestionDropdown = ({ control, formKey, enabled, children }) => {
             <Paper
               elevation={3}
               aria-live="polite"
-              sx={{ mt: 0.5, maxHeight: 320, overflow: 'auto' }}>
+              sx={{ mt: '4px', maxHeight: 320, overflow: 'auto' }}>
               {isLoading ? (
                 <Box
                   sx={{
                     display: 'flex',
                     alignItems: 'center',
                     gap: 1,
-                    p: 1.5
+                    p: '12px'
                   }}>
                   <CircularProgress size={18} />
                   <Typography variant="body2" color="text.secondary">
@@ -117,7 +117,7 @@ const NameSuggestionDropdown = ({ control, formKey, enabled, children }) => {
                   <Typography
                     variant="caption"
                     color="text.secondary"
-                    sx={{ display: 'block', px: 1.5, pt: 1 }}>
+                    sx={{ display: 'block', px: '12px', pt: 1 }}>
                     {formatMessage({
                       id: 'Existing entrances with a similar name:'
                     })}
@@ -185,7 +185,7 @@ const NameSuggestionDropdown = ({ control, formKey, enabled, children }) => {
                 sx={{
                   display: 'inline-flex',
                   alignItems: 'center',
-                  gap: 0.5,
+                  gap: '4px',
                   mt: 1
                 }}>
                 {formatMessage({ id: 'View full details' })}

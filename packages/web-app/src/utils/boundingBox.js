@@ -37,5 +37,3 @@ export const computeBoundingBox = (lat, lng, radiusKm = 1) => {
     ne_lng: clamp(-180, 180, lngNum + lngOffset)
   };
 };
-
-export default computeBoundingBox;

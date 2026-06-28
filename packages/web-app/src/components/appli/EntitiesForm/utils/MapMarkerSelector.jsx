@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useWatch, useController } from 'react-hook-form';
 import {
   Circle,
@@ -83,14 +83,20 @@ MapBind.propTypes = {
 // zoom via setView, which reliably emits `moveend`. Also emits the initial zoom.
 const ZoomReporter = ({ onZoomChange }) => {
   const map = useMap();
-  // Listens to `moveend` (not just `zoomend`) because programmatic re-centring
-  // on coordinate entry changes the view via setView, which emits `moveend`.
-  // Also emits the initial zoom on mount.
-  useMapEvent('moveend', () => onZoomChange(map.getZoom()));
-  useMapEvent('zoomend', () => onZoomChange(map.getZoom()));
+  // Keep the latest callback in a ref so the listeners and mount effect below
+  // depend only on `map`, never on the callback's identity. A parent passing an
+  // inline arrow would otherwise re-subscribe the listeners on every render and
+  // re-run the mount effect — looping if that callback sets state. `report` is
+  // memoised on `map` alone, so it stays stable across the parent's renders.
+  const onZoomChangeRef = useRef(onZoomChange);
+  onZoomChangeRef.current = onZoomChange;
+
+  const report = useCallback(() => onZoomChangeRef.current(map.getZoom()), [map]);
+  useMapEvent('moveend', report);
+  useMapEvent('zoomend', report);
   useEffect(() => {
-    onZoomChange(map.getZoom());
-  }, [map, onZoomChange]);
+    report(); // Emit the initial zoom on mount.
+  }, [report]);
   return null;
 };
 ZoomReporter.propTypes = {
@@ -283,9 +289,9 @@ const MapMarkerSelector = ({ control, formLatitudeKey, formLongitudeKey, additio
             zIndex: 1000,
             display: 'flex',
             alignItems: 'center',
-            gap: 0.75,
+            gap: '6px',
             px: 1,
-            py: 0.5,
+            py: '4px',
             borderRadius: 1,
             boxShadow: 1,
             fontSize: 12,
