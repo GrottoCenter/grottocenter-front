@@ -11,12 +11,18 @@ import useExploredEntrances from './useExploredEntrances';
 // (never a hardcoded region). BoundsFitter then refines the exact zoom/padding.
 const getInitialCenter = points => {
   if (points.length === 0) return [20, 0]; // defensive; map renders only with data
-  const lats = points.map(p => p.latitude);
-  const lngs = points.map(p => p.longitude);
-  return [
-    (Math.min(...lats) + Math.max(...lats)) / 2,
-    (Math.min(...lngs) + Math.max(...lngs)) / 2
-  ];
+  // Single pass — avoids spreading a potentially large array onto the call stack.
+  let minLat = Infinity;
+  let maxLat = -Infinity;
+  let minLng = Infinity;
+  let maxLng = -Infinity;
+  points.forEach(({ latitude, longitude }) => {
+    if (latitude < minLat) minLat = latitude;
+    if (latitude > maxLat) maxLat = latitude;
+    if (longitude < minLng) minLng = longitude;
+    if (longitude > maxLng) maxLng = longitude;
+  });
+  return [(minLat + maxLat) / 2, (minLng + maxLng) / 2];
 };
 
 const ExploredEntrancesMapInner = ({ points }) => (
@@ -58,7 +64,7 @@ const ExploredEntrancesMap = ({ userId }) => {
       <CustomMapContainer
         wholePage={false}
         center={initialCenter}
-        zoom={5}
+        zoom={5} // placeholder until BoundsFitter fits to the points
         dragging={!isMobile}
         scrollWheelZoom={false}>
         <ExploredEntrancesMapInner points={points} />
