@@ -17,5 +17,3 @@ export const fetchNearbyEntrances = bounds =>
   fetch(makeUrl(getMapEntrancesUrl, bounds))
     .then(checkAndGetStatus)
     .then(response => response.json());
-
-export default fetchNearbyEntrances;

@@ -10,6 +10,7 @@ import {
 import PropTypes from 'prop-types';
 import { isMobile } from 'react-device-detect';
 import { styled } from '@mui/material/styles';
+import { Box } from '@mui/material';
 import { entranceMarkerIcon } from '../../../../assets/icons';
 import useMarkers from '../../../common/Maps/common/Markers/useMarkers';
 import { EntrancePopup } from '../../../common/Maps/common/Markers/Components';
@@ -76,6 +77,26 @@ MapBind.propTypes = {
   onMoveEnd: PropTypes.func
 };
 
+// Reports the map zoom upward so the parent can hide the duplicate-detection
+// markers when the map is zoomed out too far. Listens to `moveend` (not just
+// `zoomend`) because programmatic re-centring on coordinate entry changes the
+// zoom via setView, which reliably emits `moveend`. Also emits the initial zoom.
+const ZoomReporter = ({ onZoomChange }) => {
+  const map = useMap();
+  // Listens to `moveend` (not just `zoomend`) because programmatic re-centring
+  // on coordinate entry changes the view via setView, which emits `moveend`.
+  // Also emits the initial zoom on mount.
+  useMapEvent('moveend', () => onZoomChange(map.getZoom()));
+  useMapEvent('zoomend', () => onZoomChange(map.getZoom()));
+  useEffect(() => {
+    onZoomChange(map.getZoom());
+  }, [map, onZoomChange]);
+  return null;
+};
+ZoomReporter.propTypes = {
+  onZoomChange: PropTypes.func.isRequired
+};
+
 const boundMinMax = (min, max, value) => Math.max(min, Math.min(max, value));
 const toFloat = value => {
   let v = value ?? '';
@@ -122,7 +143,7 @@ const ACCURACY_CIRCLE_STYLE = {
   weight: 1
 };
 
-const MapMarkerSelector = ({ control, formLatitudeKey, formLongitudeKey, additionalPositions = [], markerIcon, mapHeight = '40dvh' }) => {
+const MapMarkerSelector = ({ control, formLatitudeKey, formLongitudeKey, additionalPositions = [], additionalMarkersLabel, onZoomChange, markerIcon, mapHeight = '40dvh' }) => {
   const [locating, setLocating] = useState(false);
   const [locateError, setLocateError] = useState(null);
   const [initialized, setInitialized] = useState(false);
@@ -199,61 +220,94 @@ const MapMarkerSelector = ({ control, formLatitudeKey, formLongitudeKey, additio
     );
   };
 
-  return (
-    <StyledMapContainer
-      style={{ height: mapHeight, width: 'calc(100% - 8px)' }}
-      center={currentPosition}
-      zoom={zoomLevel}
-      dragging={!isMobile} // For usability only use two fingers drag/zoom on mobile
-      scrollWheelZoom="center" // To avoid losing the coordinate when only zooming
-      doubleClickZoom="center"
-      touchZoom={true}
-      preferCanvas>
-      <GeocodingControl
-        onLocationSelect={newLocation => {
-          setFormLatitude(newLocation.lat.toFixed(6));
-          setFormLongitude(newLocation.lng.toFixed(6));
-          setCurrentPosition({ lat: newLocation.lat, lng: newLocation.lng });
-          setZoomLevel(focusZoom);
-        }}
-      />
-      <FullscreenControl forceSeparateButton="true" />
-      <ScaleControl position="bottomright" />
-      <LayersControl />
+  const showLegend = additionalMarkersLabel && additionalPositions.length > 0;
 
-      <MapBind
+  return (
+    <Box sx={{ position: 'relative' }}>
+      <StyledMapContainer
+        style={{ height: mapHeight, width: 'calc(100% - 8px)' }}
         center={currentPosition}
         zoom={zoomLevel}
-        onMoveEnd={onMoveEnd}
-      />
-
-      {locationAccuracy && (
-        <Circle
-          center={currentPosition}
-          radius={locationAccuracy}
-          pathOptions={ACCURACY_CIRCLE_STYLE}
+        dragging={!isMobile} // For usability only use two fingers drag/zoom on mobile
+        scrollWheelZoom="center" // To avoid losing the coordinate when only zooming
+        doubleClickZoom="center"
+        touchZoom={true}
+        preferCanvas>
+        <GeocodingControl
+          onLocationSelect={newLocation => {
+            setFormLatitude(newLocation.lat.toFixed(6));
+            setFormLongitude(newLocation.lng.toFixed(6));
+            setCurrentPosition({ lat: newLocation.lat, lng: newLocation.lng });
+            setZoomLevel(focusZoom);
+          }}
         />
-      )}
+        <FullscreenControl forceSeparateButton="true" />
+        <ScaleControl position="bottomright" />
+        <LayersControl />
 
-      {hasGeolocation && (
-        <LocateMeControl
-          onClick={handleLocateMe}
-          loading={locating}
-          error={locateError}
-        />
-      )}
+        <MapBind center={currentPosition} zoom={zoomLevel} onMoveEnd={onMoveEnd} />
 
-      {additionalPositions.length > 0 && (
-        <AdditionalMarkers positions={additionalPositions} />
-      )}
+        {onZoomChange && <ZoomReporter onZoomChange={onZoomChange} />}
 
-      <span className="centralMarker">
-        <img
-          alt="Entry"
-          src={markerIcon || entranceMarkerIcon}
-        />
-      </span>
-    </StyledMapContainer>
+        {locationAccuracy && (
+          <Circle
+            center={currentPosition}
+            radius={locationAccuracy}
+            pathOptions={ACCURACY_CIRCLE_STYLE}
+          />
+        )}
+
+        {hasGeolocation && (
+          <LocateMeControl
+            onClick={handleLocateMe}
+            loading={locating}
+            error={locateError}
+          />
+        )}
+
+        {additionalPositions.length > 0 && (
+          <AdditionalMarkers positions={additionalPositions} />
+        )}
+
+        <span className="centralMarker">
+          <img alt="Entry" src={markerIcon || entranceMarkerIcon} />
+        </span>
+      </StyledMapContainer>
+
+      {showLegend && (
+        <Box
+          sx={{
+            position: 'absolute',
+            bottom: 10,
+            left: 12,
+            zIndex: 1000,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 0.75,
+            px: 1,
+            py: 0.5,
+            borderRadius: 1,
+            boxShadow: 1,
+            fontSize: 12,
+            color: 'text.primary',
+            bgcolor: 'rgba(255, 255, 255, 0.9)',
+            pointerEvents: 'none'
+          }}>
+          <Box
+            component="span"
+            sx={{
+              width: 10,
+              height: 10,
+              flexShrink: 0,
+              borderRadius: '50%',
+              border: `2px solid ${NEARBY_ENTRANCE_MARKER_STYLE.color}`,
+              bgcolor: NEARBY_ENTRANCE_MARKER_STYLE.fillColor
+            }}
+          />
+          {additionalMarkersLabel}
+        </Box>
+      )}
+    </Box>
   );
 };
 
@@ -262,6 +316,8 @@ MapMarkerSelector.propTypes = {
   formLatitudeKey: PropTypes.string,
   formLongitudeKey: PropTypes.string,
   additionalPositions: PropTypes.arrayOf(PropTypes.shape({})),
+  additionalMarkersLabel: PropTypes.string,
+  onZoomChange: PropTypes.func,
   markerIcon: PropTypes.string,
   mapHeight: PropTypes.string
 };

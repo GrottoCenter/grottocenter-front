@@ -219,8 +219,6 @@ export const EntranceForm = ({
           errors={errors}
           getValues={getValues}
           isNewEntrance={isNewEntrance}
-          latitude={lat}
-          longitude={lng}
         />
         <CaveDetail
           control={control}

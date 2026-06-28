@@ -48,6 +48,8 @@ const CoordinateFormSection = ({
   latitudeError,
   longitudeError,
   additionalPositions = [],
+  additionalMarkersLabel,
+  onZoomChange,
   markerIcon,
   mapHeight
 }) => {
@@ -404,6 +406,8 @@ const CoordinateFormSection = ({
         formLatitudeKey={formLatitudeKey}
         formLongitudeKey={formLongitudeKey}
         additionalPositions={additionalPositions}
+        additionalMarkersLabel={additionalMarkersLabel}
+        onZoomChange={onZoomChange}
         markerIcon={markerIcon}
         mapHeight={mapHeight}
       />
@@ -419,6 +423,8 @@ CoordinateFormSection.propTypes = {
   latitudeError: PropTypes.string,
   longitudeError: PropTypes.string,
   additionalPositions: PropTypes.arrayOf(PropTypes.shape({})),
+  additionalMarkersLabel: PropTypes.string,
+  onZoomChange: PropTypes.func,
   markerIcon: PropTypes.string,
   mapHeight: PropTypes.string
 };

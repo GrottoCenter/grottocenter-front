@@ -6,8 +6,8 @@ import {
   TextField,
   Typography
 } from '@mui/material';
-import React, { useRef } from 'react';
-import { Controller } from 'react-hook-form';
+import React, { useRef, useState } from 'react';
+import { Controller, useWatch } from 'react-hook-form';
 import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
 import { styled } from '@mui/material/styles';
@@ -75,19 +75,22 @@ const EntranceDetail = ({
   control,
   errors,
   getValues,
-  isNewEntrance = false,
-  latitude,
-  longitude
+  isNewEntrance = false
 }) => {
   const permissions = usePermissions();
   const { formatMessage } = useIntl();
 
   // Informational only: show existing entrances near the entered coordinates
   // so the user can spot a duplicate before creating one (creation mode only).
+  // The map reports its zoom so the hint can be hidden when zoomed out too far.
+  const latitude = useWatch({ control, name: 'entrance.latitude' });
+  const longitude = useWatch({ control, name: 'entrance.longitude' });
+  const [mapZoom, setMapZoom] = useState(null);
   const nearbyEntrances = useNearbyEntrances(
     latitude,
     longitude,
-    isNewEntrance
+    isNewEntrance,
+    mapZoom
   );
 
   /* useRef to track initial value.
@@ -144,6 +147,10 @@ const EntranceDetail = ({
           latitudeError={errors?.entrance?.latitude?.message}
           longitudeError={errors?.entrance?.longitude?.message}
           additionalPositions={nearbyEntrances}
+          additionalMarkersLabel={formatMessage({
+            id: 'Existing nearby entrances'
+          })}
+          onZoomChange={setMapZoom}
         />
       )}
       <FormRow>
@@ -202,8 +209,6 @@ EntranceDetail.propTypes = {
   control: PropTypes.shape({}),
   getValues: PropTypes.func.isRequired, // React-hook-form getValues() function
   isNewEntrance: PropTypes.bool,
-  latitude: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-  longitude: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   allLanguages: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.string.isRequired,
