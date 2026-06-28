@@ -16,7 +16,8 @@ const Wrapper = styled('div', {
 })(
   ({ theme, $wholePage }) => `
   width: 100%;
-  height: 400px;
+  height: 100%;
+  min-height: 400px;
 
 ${$wholePage && `height: calc(100vh - ${theme.appBarHeight}px); /* fallback for old browsers */`}
 ${$wholePage && `height: calc(100dvh - ${theme.appBarHeight}px);`}
