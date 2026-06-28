@@ -72,6 +72,14 @@ export const getRegionEntrancesUrl = (countryId, regionId, { limit, offset } = {
   const query = params.toString();
   return `${API_BASE_PATH}/entrances/with-quality/countries/${countryId}/regions/${regionId}${query ? `?${query}` : ''}`;
 };
+export const putCountryOrganizationUrl = countryId =>
+  `${API_BASE_PATH}/countries/${countryId}/organization`;
+export const deleteCountryOrganizationUrl = countryId =>
+  `${API_BASE_PATH}/countries/${countryId}/organization`;
+export const putRegionOrganizationUrl = (countryId, regionId) =>
+  `${API_BASE_PATH}/countries/${countryId}/regions/${regionId}/organization`;
+export const deleteRegionOrganizationUrl = (countryId, regionId) =>
+  `${API_BASE_PATH}/countries/${countryId}/regions/${regionId}/organization`;
 
 // ===== Descriptions urls
 export const postDescriptionUrl = `${API_BASE_PATH}/descriptions`;
@@ -241,6 +249,11 @@ export const unmarkMassifSensitiveUrl = massifId =>
   `${API_BASE_PATH}/massifs/${massifId}/unmark-sensitive`;
 export const previewMassifSensitiveUrl = massifId =>
   `${API_BASE_PATH}/massifs/${massifId}/preview-sensitive`;
+
+export const putMassifOrganizationUrl = massifId =>
+  `${API_BASE_PATH}/massifs/${massifId}/organization`;
+export const deleteMassifOrganizationUrl = massifId =>
+  `${API_BASE_PATH}/massifs/${massifId}/organization`;
 
 // ===== Notifications urls
 export const countUnreadNotificationsUrl = `${API_URL}/api/${apiVersion}/notifications/unread/count`;
