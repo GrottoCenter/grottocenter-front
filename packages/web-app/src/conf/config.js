@@ -103,3 +103,8 @@ export const NOMINATIM_API_URL = 'https://nominatim.openstreetmap.org/search';
 
 export const AUTOCOMPLETE_DEBOUNCE_DELAY = 300; // in milliseconds
 export const AUTOCOMPLETE_MIN_CHARACTERS = 2;
+
+// Radius (in kilometres) used to look for existing entrances near the
+// coordinates entered in the entrance creation form, to warn about potential
+// duplicates. Change this single value to widen/narrow the detection area.
+export const DUPLICATE_DETECTION_RADIUS_KM = 1;
