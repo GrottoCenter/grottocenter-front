@@ -92,6 +92,9 @@ import updateMassif from './UpdateMassifReducer';
 import updateName from './UpdateNameReducer';
 import updateOrganization from './UpdateOrganization';
 import updatePerson from './UpdatePerson';
+import countryOrganization from './CountryOrganizationReducer';
+import massifOrganization from './MassifOrganizationReducer';
+import regionOrganization from './RegionOrganizationReducer';
 import updatePersonGroups from './UpdatePersonGroupesReducer';
 import verifyEmail from './VerifyEmailReducer';
 
@@ -107,6 +110,7 @@ const GCReducer = combineReducers({
   countUnreadNotifications,
   country,
   countryEntrances,
+  countryOrganization,
   countryRegions,
   createCave,
   createDescription,
@@ -144,6 +148,7 @@ const GCReducer = combineReducers({
   map,
   massif,
   massifEntrances,
+  massifOrganization,
   mfa,
   menuNotifications,
   messaging,
@@ -162,6 +167,7 @@ const GCReducer = combineReducers({
   region,
   regionDetails,
   regionEntrances,
+  regionOrganization,
   resendVerificationEmail,
   sideMenu,
   signUp,

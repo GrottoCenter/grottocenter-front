@@ -5,7 +5,7 @@ import {
   REMOVE_REGION_ORGANIZATION,
   REMOVE_REGION_ORGANIZATION_SUCCESS,
   REMOVE_REGION_ORGANIZATION_FAILURE
-} from '../actions/Region/regionOrganization';
+} from '../actions/Region/RegionOrganization';
 import REDUCER_STATUS from './ReducerStatus';
 
 const initialState = {

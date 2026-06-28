@@ -5,7 +5,7 @@ import {
   REMOVE_MASSIF_ORGANIZATION,
   REMOVE_MASSIF_ORGANIZATION_SUCCESS,
   REMOVE_MASSIF_ORGANIZATION_FAILURE
-} from '../actions/Massif/massifOrganization';
+} from '../actions/Massif/MassifOrganization';
 import REDUCER_STATUS from './ReducerStatus';
 
 const initialState = {

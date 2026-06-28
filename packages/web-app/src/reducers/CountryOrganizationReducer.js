@@ -5,7 +5,7 @@ import {
   REMOVE_COUNTRY_ORGANIZATION,
   REMOVE_COUNTRY_ORGANIZATION_SUCCESS,
   REMOVE_COUNTRY_ORGANIZATION_FAILURE
-} from '../actions/Country/countryOrganization';
+} from '../actions/Country/CountryOrganization';
 import REDUCER_STATUS from './ReducerStatus';
 
 const initialState = {
