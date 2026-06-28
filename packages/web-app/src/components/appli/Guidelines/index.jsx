@@ -23,6 +23,7 @@ import Guideline from './Guideline';
 import { postGuideline } from '../../../actions/Guideline/CreateGuideline';
 import { patchGuideline } from '../../../actions/Guideline/UpdateGuideline';
 import { getGuidelinesUrl } from '../../../conf/apiRoutes';
+import { checkAuthStatus } from '../../../actions/utils';
 import ScrollableContent from '../../common/Layouts/Fixed/ScrollableContent';
 import ActionButton from '../../common/ActionButton';
 
@@ -93,9 +94,10 @@ const Guidelines = ({ entityType, entityId, guidelines }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
-    if (mode === MODE_ATTACH && allGuidelines.length === 0) {
+    if (mode === MODE_ATTACH) {
       setIsLoadingGuidelines(true);
       fetch(getGuidelinesUrl)
+        .then(checkAuthStatus(dispatch))
         .then(response => response.json())
         .then(data => {
           setAllGuidelines(data || []);
@@ -106,20 +108,20 @@ const Guidelines = ({ entityType, entityId, guidelines }) => {
           setIsLoadingGuidelines(false);
         });
     }
-  }, [mode, allGuidelines.length]);
+  }, [mode, dispatch]);
 
   const closeForm = () => {
     setMode(MODE_NONE);
     setSelectedGuideline(null);
   };
 
-  const onSubmitCreateForm = data => {
+  const onSubmitCreateForm = async data => {
     const entities = { countries: [], regions: [], massifs: [] };
     if (entityType === 'countries') entities.countries = [entityId];
     else if (entityType === 'regions') entities.regions = [entityId];
     else if (entityType === 'massifs') entities.massifs = [entityId];
 
-    dispatch(
+    const result = await dispatch(
       postGuideline({
         ...entities,
         title: data.title,
@@ -127,7 +129,7 @@ const Guidelines = ({ entityType, entityId, guidelines }) => {
         language: data.language
       })
     );
-    closeForm();
+    if (result) closeForm();
   };
 
   const handleAttachGuideline = async e => {
