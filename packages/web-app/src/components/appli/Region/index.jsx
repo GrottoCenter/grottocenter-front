@@ -29,6 +29,7 @@ import {
   useScrollToHashOnLoad,
   useSharePage
 } from '../../../hooks';
+import AssociationSection from '../OrganizationAssociation';
 
 const Region = ({
   canSubscribe,
@@ -185,6 +186,17 @@ const Region = ({
             description={formatMessage({
               id: 'Discover the numbers about this region and its caves.'
             })}
+          />
+          <ScrollableContent
+            anchorId="organizations"
+            title={formatMessage({ id: 'Organizations' })}
+            content={
+              <AssociationSection
+                organizations={region.organizations}
+                entityType="region"
+                isLoading={isLoading}
+              />
+            }
           />
         </>
       )}
