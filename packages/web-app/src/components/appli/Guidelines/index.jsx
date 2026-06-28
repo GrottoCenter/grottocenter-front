@@ -28,59 +28,8 @@ import ScrollableContent from '../../common/Layouts/Fixed/ScrollableContent';
 import ActionButton from '../../common/ActionButton';
 
 const MODE_NONE = 'none';
-const MODE_CHOOSE = 'choose';
 const MODE_CREATE = 'create';
 const MODE_ATTACH = 'attach';
-
-const ChoiceButton = ({ icon, label, description, onClick, testId }) => (
-  <Paper
-    variant="outlined"
-    onClick={onClick}
-    data-testid={testId}
-    sx={{
-      flex: 1,
-      p: 2,
-      cursor: 'pointer',
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      gap: 1,
-      transition: 'all 0.15s ease',
-      '&:hover': {
-        borderColor: 'primary.main',
-        bgcolor: 'action.hover'
-      }
-    }}
-  >
-    <Box
-      sx={{
-        p: 1,
-        borderRadius: '50%',
-        bgcolor: 'primary.main',
-        color: 'primary.contrastText',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center'
-      }}
-    >
-      {icon}
-    </Box>
-    <Typography variant="subtitle2" align="center">
-      {label}
-    </Typography>
-    <Typography variant="caption" color="text.secondary" align="center">
-      {description}
-    </Typography>
-  </Paper>
-);
-
-ChoiceButton.propTypes = {
-  icon: PropTypes.node.isRequired,
-  label: PropTypes.string.isRequired,
-  description: PropTypes.string.isRequired,
-  onClick: PropTypes.func.isRequired,
-  testId: PropTypes.string
-};
 
 const Guidelines = ({ entityType, entityId, guidelines }) => {
   const permissions = usePermissions();
@@ -92,6 +41,8 @@ const Guidelines = ({ entityType, entityId, guidelines }) => {
   const [isLoadingGuidelines, setIsLoadingGuidelines] = useState(false);
   const [selectedGuideline, setSelectedGuideline] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [hasSearched, setHasSearched] = useState(false);
+  const [searchValue, setSearchValue] = useState('');
 
   useEffect(() => {
     if (mode === MODE_ATTACH) {
@@ -113,6 +64,8 @@ const Guidelines = ({ entityType, entityId, guidelines }) => {
   const closeForm = () => {
     setMode(MODE_NONE);
     setSelectedGuideline(null);
+    setSearchValue('');
+    setHasSearched(false);
   };
 
   const onSubmitCreateForm = async data => {
@@ -186,46 +139,6 @@ const Guidelines = ({ entityType, entityId, guidelines }) => {
 
   const renderModeContent = () => {
     switch (mode) {
-      case MODE_CHOOSE:
-        return (
-          <Box mb={2}>
-            <Box
-              sx={{
-                display: 'flex',
-                gap: 2,
-                mb: 2,
-                flexDirection: { xs: 'column', sm: 'row' }
-              }}
-            >
-              <ChoiceButton
-                icon={<CreateIcon />}
-                label={formatMessage({ id: 'guidelines.create_new' })}
-                description={formatMessage({
-                  id: 'guidelines.create_new_description'
-                })}
-                onClick={() => setMode(MODE_CREATE)}
-                testId="choose-create-guideline"
-              />
-              <ChoiceButton
-                icon={<LinkIcon />}
-                label={formatMessage({
-                  id: 'guidelines.attach_existing'
-                })}
-                description={formatMessage({
-                  id: 'guidelines.attach_existing_description'
-                })}
-                onClick={() => setMode(MODE_ATTACH)}
-                testId="choose-attach-guideline"
-              />
-            </Box>
-            <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-              <Button variant="text" onClick={closeForm}>
-                <FormattedMessage id="Cancel" />
-              </Button>
-            </Box>
-          </Box>
-        );
-
       case MODE_CREATE:
         return (
           <Box mb={2}>
@@ -235,12 +148,6 @@ const Guidelines = ({ entityType, entityId, guidelines }) => {
               data-testid="guideline-mode-toggle"
             >
               <Button
-                variant="contained"
-                startIcon={<CreateIcon />}
-              >
-                <FormattedMessage id="guidelines.create_new" />
-              </Button>
-              <Button
                 variant="outlined"
                 startIcon={<LinkIcon />}
                 onClick={() => {
@@ -249,6 +156,12 @@ const Guidelines = ({ entityType, entityId, guidelines }) => {
                 }}
               >
                 <FormattedMessage id="guidelines.attach_existing" />
+              </Button>
+              <Button
+                variant="contained"
+                startIcon={<CreateIcon />}
+              >
+                <FormattedMessage id="guidelines.create_new" />
               </Button>
             </ButtonGroup>
             <GuidelineForm
@@ -268,20 +181,21 @@ const Guidelines = ({ entityType, entityId, guidelines }) => {
               data-testid="guideline-mode-toggle"
             >
               <Button
+                variant="contained"
+                startIcon={<LinkIcon />}
+              >
+                <FormattedMessage id="guidelines.attach_existing" />
+              </Button>
+              <Button
                 variant="outlined"
                 startIcon={<CreateIcon />}
+                disabled={!hasSearched}
                 onClick={() => {
                   setMode(MODE_CREATE);
                   setSelectedGuideline(null);
                 }}
               >
                 <FormattedMessage id="guidelines.create_new" />
-              </Button>
-              <Button
-                variant="contained"
-                startIcon={<LinkIcon />}
-              >
-                <FormattedMessage id="guidelines.attach_existing" />
               </Button>
             </ButtonGroup>
 
@@ -299,6 +213,13 @@ const Guidelines = ({ entityType, entityId, guidelines }) => {
               ) : (
                 <Autocomplete
                   value={selectedGuideline}
+                  inputValue={searchValue}
+                  onInputChange={(event, newInputValue) => {
+                    setSearchValue(newInputValue);
+                    if (newInputValue.trim().length > 0) {
+                      setHasSearched(true);
+                    }
+                  }}
                   onChange={(_event, newValue) =>
                     setSelectedGuideline(newValue)
                   }
@@ -409,7 +330,7 @@ const Guidelines = ({ entityType, entityId, guidelines }) => {
             size="small"
             color="primary"
             variant="outlined"
-            onClick={() => setMode(MODE_CHOOSE)}
+            onClick={() => setMode(MODE_ATTACH)}
             startIcon={<AddIcon />}
             data-testid="add-guideline-btn"
           >
