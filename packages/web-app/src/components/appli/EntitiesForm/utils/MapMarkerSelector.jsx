@@ -12,7 +12,7 @@ import { isMobile } from 'react-device-detect';
 import { styled } from '@mui/material/styles';
 import { entranceMarkerIcon } from '../../../../assets/icons';
 import useMarkers from '../../../common/Maps/common/Markers/useMarkers';
-import { EntranceMarker } from '../../../common/Maps/common/Markers/Components';
+import { EntrancePopup } from '../../../common/Maps/common/Markers/Components';
 import LayersControl from '../../../common/Maps/common/LayersControl';
 import LocateMeControl from '../../../common/Maps/common/LocateMeControl';
 import GeocodingControl from '../../../common/Maps/common/GeocodingControl';
@@ -29,6 +29,8 @@ const StyledMapContainer = styled(MapContainer)`
     width: 100%;
     height: 100%;
     top: calc(50% - 60px);
+    /* Purely decorative center pin: let hover/click reach the markers below. */
+    pointer-events: none;
   }
 
   .centralMarker img {
@@ -81,10 +83,21 @@ const toFloat = value => {
   return parseFloat(v);
 };
 
+// Existing nearby entrances are drawn as distinctly-coloured circles so they
+// are not mistaken for the user's new entrance (the large central pin).
+const NEARBY_ENTRANCE_MARKER_STYLE = {
+  radius: 8,
+  color: '#FFFFFF',
+  weight: 2,
+  fillColor: '#D32F2F',
+  fillOpacity: 0.9
+};
+
 const AdditionalMarkers = ({ positions }) => {
   const updateMarkers = useMarkers({
-    icon: EntranceMarker,
-    tooltipContent: entrance => entrance.name
+    circleMarkerStyle: NEARBY_ENTRANCE_MARKER_STYLE,
+    tooltipContent: entrance => entrance?.name,
+    popupContent: entrance => <EntrancePopup entrance={entrance} />
   });
 
   useEffect(() => {

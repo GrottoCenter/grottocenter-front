@@ -12,7 +12,7 @@ import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
 import { styled } from '@mui/material/styles';
 import Translate from '../../../common/Translate';
-import { usePermissions } from '../../../../hooks';
+import { usePermissions, useNearbyEntrances } from '../../../../hooks';
 import { ENTRANCE_ONLY, ENTRANCE_AND_CAVE } from './caveType';
 import Alert from '../../../common/Alert';
 import CoordinateFormSection from '../utils/CoordinateFormSection';
@@ -71,9 +71,24 @@ BoolSwitch.propTypes = {
   error: PropTypes.bool
 };
 
-const EntranceDetail = ({ control, errors, getValues }) => {
+const EntranceDetail = ({
+  control,
+  errors,
+  getValues,
+  isNewEntrance = false,
+  latitude,
+  longitude
+}) => {
   const permissions = usePermissions();
   const { formatMessage } = useIntl();
+
+  // Informational only: show existing entrances near the entered coordinates
+  // so the user can spot a duplicate before creating one (creation mode only).
+  const nearbyEntrances = useNearbyEntrances(
+    latitude,
+    longitude,
+    isNewEntrance
+  );
 
   /* useRef to track initial value.
   User can't unmark an entrance. So we need to remember the entrance was not sensitive initially
@@ -128,6 +143,7 @@ const EntranceDetail = ({ control, errors, getValues }) => {
           required
           latitudeError={errors?.entrance?.latitude?.message}
           longitudeError={errors?.entrance?.longitude?.message}
+          additionalPositions={nearbyEntrances}
         />
       )}
       <FormRow>
@@ -185,6 +201,9 @@ EntranceDetail.propTypes = {
   }),
   control: PropTypes.shape({}),
   getValues: PropTypes.func.isRequired, // React-hook-form getValues() function
+  isNewEntrance: PropTypes.bool,
+  latitude: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  longitude: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   allLanguages: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.string.isRequired,
