@@ -15,6 +15,7 @@ import createCave from './CreateCaveReducer';
 import createDescription from './CreateDescription';
 import createDocument from './CreateDocumentReducer';
 import createEntrance from './CreateEntranceReducer';
+import createGuideline from './CreateGuidelineReducer';
 import createHistory from './CreateHistory';
 import createLocation from './CreateLocation';
 import createMassif from './CreateMassifReducer';
@@ -22,6 +23,7 @@ import createOrganization from './CreateOrganization';
 import createPerson from './CreatePerson';
 import cumulatedLength from './CumulatedLengthReducer';
 import dbExport from './DBExportReducer';
+import deleteGuideline from './DeleteGuidelineReducer';
 import detachEntrance from './DetachEntranceReducer';
 import documentChildren from './DocumentChildrenReducer';
 import documentDetails from './DetailsDocumentReducer';
@@ -34,6 +36,7 @@ import error from './ErrorReducer';
 import fileFormats from './FileFormatsReducer';
 import forgotPassword from './ForgotPasswordReducer';
 import groups from './GroupsReducer';
+import guidelineSnapshots from './GuidelineSnapshotsReducer';
 import identifierType from './IdentifierTypesReducer';
 import importCsv from './ImportCsvReducer';
 import importWizard from './ImportWizardReducer';
@@ -66,6 +69,7 @@ import region from './RegionReducer';
 import regionDetails from './RegionDetailsReducer';
 import regionEntrances from './RegionEntrancesDataQualityReducer';
 import resendVerificationEmail from './ResendVerificationEmailReducer';
+import restoreGuideline from './RestoreGuidelineReducer';
 import sideMenu from './SideMenuReducer';
 import signUp from './SignUpReducer';
 import snapshots from './SnapshotReducer';
@@ -86,6 +90,7 @@ import updateCave from './UpdateCaveReducer';
 import updateDescription from './UpdateDescription';
 import updateDocument from './UpdateDocumentReducer';
 import updateEntrance from './UpdateEntranceReducer';
+import updateGuideline from './UpdateGuidelineReducer';
 import updateHistory from './UpdateHistory';
 import updateLocation from './UpdateLocation';
 import updateMassif from './UpdateMassifReducer';
@@ -112,6 +117,7 @@ const GCReducer = combineReducers({
   createDescription,
   createDocument,
   createEntrance,
+  createGuideline,
   createHistory,
   createLocation,
   createMassif,
@@ -119,6 +125,7 @@ const GCReducer = combineReducers({
   createPerson,
   cumulatedLength,
   dbExport,
+  deleteGuideline,
   detachEntrance,
   documentChildren,
   documentDetails,
@@ -131,6 +138,7 @@ const GCReducer = combineReducers({
   fileFormats,
   forgotPassword,
   groups,
+  guidelineSnapshots,
   identifierType,
   importCsv,
   importWizard,
@@ -165,6 +173,7 @@ const GCReducer = combineReducers({
   resendVerificationEmail,
   sideMenu,
   signUp,
+  restoreGuideline,
   snapshots,
   statisticsCountry,
   statisticsMassif,
@@ -183,6 +192,7 @@ const GCReducer = combineReducers({
   updateDescription,
   updateDocument,
   updateEntrance,
+  updateGuideline,
   updateHistory,
   updateLocation,
   updateMassif,
