@@ -204,6 +204,7 @@ const EntityTable = ({
           icon={entityConfig.icon}
           renderCellFn={renderCell}
           onSelected={onSelected}
+          onRowClick={onRowClick}
         />
       </Box>
     );

@@ -5,6 +5,7 @@ const API_BASE_PATH = `${API_URL}/api/${apiVersion}`;
 export const dynamicNumbersUrl = {
   documents: `${API_BASE_PATH}/documents/count`,
   entrances: `${API_BASE_PATH}/entrances/count`,
+  massifs: `${API_BASE_PATH}/massifs/count`,
   officialPartners: `${API_BASE_PATH}/partners/count`,
   organizations: `${API_BASE_PATH}/organizations/count`,
   publicEntrances: `${API_BASE_PATH}/entrances/publicCount`,
@@ -247,6 +248,7 @@ export const countUnreadNotificationsUrl = `${API_URL}/api/${apiVersion}/notific
 export const fetchNotificationsUrl = `${API_URL}/api/${apiVersion}/notifications`;
 export const readNotificationUrl = notificationId =>
   `${API_URL}/api/${apiVersion}/notifications/${notificationId}/read`;
+export const readAllNotificationsUrl = `${API_URL}/api/${apiVersion}/notifications/read`;
 
 // ===== Messaging urls
 export const postMessageUrl = `${API_BASE_PATH}/messages`;

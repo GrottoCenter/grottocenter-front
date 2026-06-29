@@ -41,8 +41,7 @@ const STATS = [
     key: 'massifs',
     iconType: 'massif',
     labelId: 'massifs',
-    href: '/ui/massifs',
-    staticValue: '>4700'
+    href: '/ui/massifs'
   },
   { key: 'users', iconType: 'caver', labelId: 'cavers', href: '/ui/persons' },
   {
