@@ -5,6 +5,7 @@ const API_BASE_PATH = `${API_URL}/api/${apiVersion}`;
 export const dynamicNumbersUrl = {
   documents: `${API_BASE_PATH}/documents/count`,
   entrances: `${API_BASE_PATH}/entrances/count`,
+  massifs: `${API_BASE_PATH}/massifs/count`,
   officialPartners: `${API_BASE_PATH}/partners/count`,
   organizations: `${API_BASE_PATH}/organizations/count`,
   publicEntrances: `${API_BASE_PATH}/entrances/publicCount`,
