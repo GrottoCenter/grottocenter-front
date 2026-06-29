@@ -62,13 +62,16 @@ const NotificationsPage = () => {
     prevReadAllStatus.current = readAllStatus;
   }, [dispatch, readAllStatus]);
 
+  const prevReadAllError = useRef(readAllError);
   useEffect(() => {
-    if (!readAllError) return;
-    onError(
-      formatMessage({
-        id: 'An error occurred while marking all notifications as read'
-      })
-    );
+    if (readAllError && readAllError !== prevReadAllError.current) {
+      onError(
+        formatMessage({
+          id: 'An error occurred while marking all notifications as read'
+        })
+      );
+    }
+    prevReadAllError.current = readAllError;
   }, [readAllError, formatMessage, onError]);
 
   const isReadAllLoading = readAllStatus === REDUCER_STATUS.LOADING;

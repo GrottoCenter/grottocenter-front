@@ -10,6 +10,7 @@ import DataQualityBadge from '../DataQualityBadge';
 import CustomIcon from '../CustomIcon';
 import * as CSV from '../../appli/ImportCSV/constants';
 
+// React component (uses useIntl hook) — must be rendered as JSX, not called as a function
 const DateTimeCell = ({ value }) => {
   const { formatDate, formatMessage, formatTime } = useIntl();
   if (!value) return null;
@@ -72,7 +73,13 @@ const placeholder = {
 
 const notifications = {
   columns: [
-    { visible: true, field: 'entityName', label: 'Name', sortable: false, isTitle: true },
+    {
+      visible: true,
+      field: 'entityName',
+      label: 'Name',
+      sortable: false,
+      isTitle: true
+    },
     {
       visible: true,
       field: 'entityType',
@@ -94,7 +101,13 @@ const notifications = {
       sortable: false,
       render: cellsRender.person
     },
-    { visible: true, field: 'dateInscription', label: 'Date', sortable: false, render: cellsRender.dateTime },
+    {
+      visible: true,
+      field: 'dateInscription',
+      label: 'Date',
+      sortable: false,
+      render: cellsRender.dateTime
+    },
     {
       visible: true,
       field: 'isRead',

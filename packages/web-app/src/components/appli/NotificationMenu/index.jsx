@@ -158,7 +158,12 @@ const NotificationMenu = () => {
             {nbNotifications > 0 && (
               <Chip label={nbNotifications} color="secondary" size="small" />
             )}
-            <Tooltip title={formatMessage({ id: 'Mark all as read' })}>
+            <Tooltip
+              title={formatMessage({
+                id: nbNotifications
+                  ? 'Mark all as read'
+                  : 'No unread notifications'
+              })}>
               <span>
                 <IconButton
                   color="secondary"
