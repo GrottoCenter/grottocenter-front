@@ -102,8 +102,8 @@ const NotificationMenu = () => {
         open={open}
         onClose={handleClose}
         slotProps={{
-          list: { disablePadding: true },
-          paper: { sx: { mt: '4px', minWidth: NOTIFICATION_WIDTH } }
+          list: { disablePadding: true, sx: { display: 'flex', flexDirection: 'column' } },
+          paper: { sx: { mt: '4px', minWidth: NOTIFICATION_WIDTH, maxHeight: 'none', display: 'flex', flexDirection: 'column' } }
         }}>
         {/* Header */}
         <Box
@@ -113,7 +113,8 @@ const NotificationMenu = () => {
             bgcolor: 'action.hover',
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'space-between'
+            justifyContent: 'space-between',
+            flexShrink: 0
           }}>
           <Typography variant="body2" color="text.primary">
             {formatMessage({ id: 'Notifications' })}
@@ -123,53 +124,49 @@ const NotificationMenu = () => {
           )}
         </Box>
 
-        {(status === REDUCER_STATUS.LOADING || notifications !== null) && (
-          <Divider />
-        )}
+        <Divider sx={{ flexShrink: 0 }} />
 
-        {/* Notifications list */}
-        {status === REDUCER_STATUS.LOADING &&
-          !notifications &&
-          // Arbitrary number (3) of notifications if real number is not available
-          createSkeletons(Math.min(nbNotifications, 100) || 3)}
-        {notifications &&
-          notifications.length > 0 &&
-          notifications
-            .slice(0, NUMBER_OF_NOTIFICATIONS)
-            .map((notification, idx) => (
-              <div key={notification.id}>
-                <NotificationsMenuItem
-                  notification={notification}
-                  onClick={handleNotificationClick}
-                />
-                {idx !== notifications.length - 1 && <Divider />}
-              </div>
-            ))}
+        {/* Scrollable notifications list */}
+        <Box sx={{ overflowY: 'auto', maxHeight: 400 }}>
+          {status === REDUCER_STATUS.LOADING &&
+            !notifications &&
+            createSkeletons(Math.min(nbNotifications, 100) || 3)}
+          {notifications &&
+            notifications.length > 0 &&
+            notifications
+              .slice(0, NUMBER_OF_NOTIFICATIONS)
+              .map((notification, idx) => (
+                <div key={notification.id}>
+                  <NotificationsMenuItem
+                    notification={notification}
+                    onClick={handleNotificationClick}
+                  />
+                  {idx !== notifications.length - 1 && <Divider />}
+                </div>
+              ))}
 
-        {/* Empty state */}
-        {notifications && notifications.length === 0 && (
-          <Box
-            sx={{
-              px: 2,
-              py: 3,
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              gap: 1,
-              color: 'action.active'
-            }}>
-            <NotificationsOffIcon />
-            <Typography variant="body2">
-              {formatMessage({ id: 'You have no notifications.' })}
-            </Typography>
-          </Box>
-        )}
+          {/* Empty state */}
+          {notifications && notifications.length === 0 && (
+            <Box
+              sx={{
+                px: 2,
+                py: 3,
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: 1,
+                color: 'action.active'
+              }}>
+              <NotificationsOffIcon />
+              <Typography variant="body2">
+                {formatMessage({ id: 'You have no notifications.' })}
+              </Typography>
+            </Box>
+          )}
+        </Box>
 
-        {(status === REDUCER_STATUS.LOADING || notifications !== null) && (
-          <Divider />
-        )}
-
-        {/* Footer action */}
+        {/* Sticky footer */}
+        <Divider sx={{ flexShrink: 0 }} />
         <SeeAllMenuItem onClick={handleSeeAllClick}>
           {formatMessage({ id: 'See all notifications' })}
         </SeeAllMenuItem>
