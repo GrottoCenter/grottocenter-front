@@ -1,5 +1,5 @@
 import fetch from 'isomorphic-fetch';
-import { putRegionOrganizationUrl, deleteRegionOrganizationUrl } from '../../conf/apiRoutes';
+import { putRegionOrganizationUrl, deleteRegionOrganizationUrl, postOrganizationUrl } from '../../conf/apiRoutes';
 import { checkAuthStatus } from '../utils';
 
 export const SET_REGION_ORGANIZATION = 'SET_REGION_ORGANIZATION';
@@ -21,18 +21,36 @@ const setRegionOrganizationFailure = error => ({ type: SET_REGION_ORGANIZATION_F
 export const setRegionOrganization = (countryId, regionId, organizationId, organizationName) => (dispatch, getState) => {
   dispatch(setRegionOrganizationAction());
 
-  const body = organizationId ? { id: organizationId } : { name: organizationName };
-
-  const requestOptions = {
-    method: 'PUT',
-    body: JSON.stringify(body),
-    headers: {
-      ...getState().login.authorizationHeader,
-      'Content-Type': 'application/json'
-    }
+  const authHeaders = {
+    ...getState().login.authorizationHeader,
+    'Content-Type': 'application/json'
   };
 
-  return fetch(putRegionOrganizationUrl(countryId, regionId), requestOptions)
+  let getOrgIdPromise = Promise.resolve(organizationId);
+
+  if (!organizationId && organizationName) {
+    const createReqOptions = {
+      method: 'POST',
+      body: JSON.stringify({ name: { text: organizationName, language: 'en' } }),
+      headers: authHeaders
+    };
+    getOrgIdPromise = fetch(postOrganizationUrl, createReqOptions)
+      .then(checkAuthStatus(dispatch))
+      .then(response => response.json())
+      .then(data => data.id);
+  }
+
+  return getOrgIdPromise
+    .then(finalOrgId => {
+      if (!finalOrgId) {
+        throw new Error('Organization ID is missing');
+      }
+      const requestOptions = {
+        method: 'PUT',
+        headers: authHeaders
+      };
+      return fetch(putRegionOrganizationUrl(countryId, regionId, finalOrgId), requestOptions);
+    })
     .then(checkAuthStatus(dispatch))
     .then(response => response.json())
     .then(data => dispatch(setRegionOrganizationSuccess(data)))
@@ -59,14 +77,13 @@ export const removeRegionOrganization = (countryId, regionId, organizationId) =>
 
   const requestOptions = {
     method: 'DELETE',
-    body: JSON.stringify({ id: organizationId }),
     headers: {
       ...getState().login.authorizationHeader,
       'Content-Type': 'application/json'
     }
   };
 
-  return fetch(deleteRegionOrganizationUrl(countryId, regionId), requestOptions)
+  return fetch(deleteRegionOrganizationUrl(countryId, regionId, organizationId), requestOptions)
     .then(checkAuthStatus(dispatch))
     .then(response => {
       if (response.status === 204 || response.status === 200) {

@@ -1,5 +1,5 @@
 import fetch from 'isomorphic-fetch';
-import { putMassifOrganizationUrl, deleteMassifOrganizationUrl } from '../../conf/apiRoutes';
+import { putMassifOrganizationUrl, deleteMassifOrganizationUrl, postOrganizationUrl } from '../../conf/apiRoutes';
 import { checkAuthStatus } from '../utils';
 
 export const SET_MASSIF_ORGANIZATION = 'SET_MASSIF_ORGANIZATION';
@@ -21,18 +21,36 @@ const setMassifOrganizationFailure = error => ({ type: SET_MASSIF_ORGANIZATION_F
 export const setMassifOrganization = (massifId, organizationId, organizationName) => (dispatch, getState) => {
   dispatch(setMassifOrganizationAction());
 
-  const body = organizationId ? { id: organizationId } : { name: organizationName };
-
-  const requestOptions = {
-    method: 'PUT',
-    body: JSON.stringify(body),
-    headers: {
-      ...getState().login.authorizationHeader,
-      'Content-Type': 'application/json'
-    }
+  const authHeaders = {
+    ...getState().login.authorizationHeader,
+    'Content-Type': 'application/json'
   };
 
-  return fetch(putMassifOrganizationUrl(massifId), requestOptions)
+  let getOrgIdPromise = Promise.resolve(organizationId);
+
+  if (!organizationId && organizationName) {
+    const createReqOptions = {
+      method: 'POST',
+      body: JSON.stringify({ name: { text: organizationName, language: 'en' } }),
+      headers: authHeaders
+    };
+    getOrgIdPromise = fetch(postOrganizationUrl, createReqOptions)
+      .then(checkAuthStatus(dispatch))
+      .then(response => response.json())
+      .then(data => data.id);
+  }
+
+  return getOrgIdPromise
+    .then(finalOrgId => {
+      if (!finalOrgId) {
+        throw new Error('Organization ID is missing');
+      }
+      const requestOptions = {
+        method: 'PUT',
+        headers: authHeaders
+      };
+      return fetch(putMassifOrganizationUrl(massifId, finalOrgId), requestOptions);
+    })
     .then(checkAuthStatus(dispatch))
     .then(response => response.json())
     .then(data => dispatch(setMassifOrganizationSuccess(data)))
@@ -59,14 +77,13 @@ export const removeMassifOrganization = (massifId, organizationId) => (dispatch,
 
   const requestOptions = {
     method: 'DELETE',
-    body: JSON.stringify({ id: organizationId }),
     headers: {
       ...getState().login.authorizationHeader,
       'Content-Type': 'application/json'
     }
   };
 
-  return fetch(deleteMassifOrganizationUrl(massifId), requestOptions)
+  return fetch(deleteMassifOrganizationUrl(massifId, organizationId), requestOptions)
     .then(checkAuthStatus(dispatch))
     .then(response => {
       if (response.status === 204 || response.status === 200) {

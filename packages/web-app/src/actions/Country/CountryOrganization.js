@@ -1,5 +1,5 @@
 import fetch from 'isomorphic-fetch';
-import { putCountryOrganizationUrl, deleteCountryOrganizationUrl } from '../../conf/apiRoutes';
+import { putCountryOrganizationUrl, deleteCountryOrganizationUrl, postOrganizationUrl } from '../../conf/apiRoutes';
 import { checkAuthStatus } from '../utils';
 
 export const SET_COUNTRY_ORGANIZATION = 'SET_COUNTRY_ORGANIZATION';
@@ -21,18 +21,36 @@ const setCountryOrganizationFailure = error => ({ type: SET_COUNTRY_ORGANIZATION
 export const setCountryOrganization = (countryId, organizationId, organizationName) => (dispatch, getState) => {
   dispatch(setCountryOrganizationAction());
 
-  const body = organizationId ? { id: organizationId } : { name: organizationName };
-
-  const requestOptions = {
-    method: 'PUT',
-    body: JSON.stringify(body),
-    headers: {
-      ...getState().login.authorizationHeader,
-      'Content-Type': 'application/json'
-    }
+  const authHeaders = {
+    ...getState().login.authorizationHeader,
+    'Content-Type': 'application/json'
   };
 
-  return fetch(putCountryOrganizationUrl(countryId), requestOptions)
+  let getOrgIdPromise = Promise.resolve(organizationId);
+
+  if (!organizationId && organizationName) {
+    const createReqOptions = {
+      method: 'POST',
+      body: JSON.stringify({ name: { text: organizationName, language: 'en' } }),
+      headers: authHeaders
+    };
+    getOrgIdPromise = fetch(postOrganizationUrl, createReqOptions)
+      .then(checkAuthStatus(dispatch))
+      .then(response => response.json())
+      .then(data => data.id);
+  }
+
+  return getOrgIdPromise
+    .then(finalOrgId => {
+      if (!finalOrgId) {
+        throw new Error('Organization ID is missing');
+      }
+      const requestOptions = {
+        method: 'PUT',
+        headers: authHeaders
+      };
+      return fetch(putCountryOrganizationUrl(countryId, finalOrgId), requestOptions);
+    })
     .then(checkAuthStatus(dispatch))
     .then(response => response.json())
     .then(data => dispatch(setCountryOrganizationSuccess(data)))
@@ -59,14 +77,13 @@ export const removeCountryOrganization = (countryId, organizationId) => (dispatc
 
   const requestOptions = {
     method: 'DELETE',
-    body: JSON.stringify({ id: organizationId }),
     headers: {
       ...getState().login.authorizationHeader,
       'Content-Type': 'application/json'
     }
   };
 
-  return fetch(deleteCountryOrganizationUrl(countryId), requestOptions)
+  return fetch(deleteCountryOrganizationUrl(countryId, organizationId), requestOptions)
     .then(checkAuthStatus(dispatch))
     .then(response => {
       if (response.status === 204 || response.status === 200) {
