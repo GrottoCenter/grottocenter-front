@@ -15,6 +15,8 @@ const Wrapper = styled('div', {
   shouldForwardProp: prop => !prop.startsWith('$')
 })(
   ({ theme, $wholePage }) => `
+  display: flex;
+  flex-direction: column;
   width: 100%;
   height: 100%;
   min-height: 400px;
@@ -149,7 +151,7 @@ const CustomMapContainer = ({
   return (
     <Wrapper $wholePage={wholePage}>
       <MapContainer
-        style={{ height: '100%', width: '100%', ...style }}
+        style={{ flex: '1 1 auto', minHeight: 0, width: '100%', ...style }}
         wholePage={wholePage}
         center={center}
         zoom={zoom}
