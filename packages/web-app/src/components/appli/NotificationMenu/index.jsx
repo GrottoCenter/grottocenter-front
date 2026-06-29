@@ -1,11 +1,14 @@
 import React, { useState, useCallback } from 'react';
 import NotificationsOffIcon from '@mui/icons-material/NotificationsOff';
+import DoneAllIcon from '@mui/icons-material/DoneAll';
 import {
   Box,
   Chip,
   Divider,
+  IconButton,
   Menu,
   MenuItem,
+  Tooltip,
   Typography,
   Skeleton
 } from '@mui/material';
@@ -19,6 +22,7 @@ import { fetchMenuNotifications } from '../../../actions/Notifications/GetMenuNo
 import REDUCER_STATUS from '../../../reducers/ReducerStatus';
 import NotificationsMenuItem from './NotificationMenuItem';
 import { readNotification } from '../../../actions/Notifications/ReadNotification';
+import { readAllNotifications } from '../../../actions/Notifications/ReadAllNotifications';
 import { countUnreadNotifications } from '../../../actions/Notifications/CountUnreadNotifications';
 
 const NOTIFICATION_WIDTH = 320;
@@ -83,6 +87,10 @@ const NotificationMenu = () => {
     navigate('/ui/notifications');
   }, [handleClose, navigate]);
 
+  const handleReadAll = useCallback(() => {
+    dispatch(readAllNotifications());
+  }, [dispatch]);
+
   if (!isAuth) return '';
   return (
     <>
@@ -102,8 +110,19 @@ const NotificationMenu = () => {
         open={open}
         onClose={handleClose}
         slotProps={{
-          list: { disablePadding: true, sx: { display: 'flex', flexDirection: 'column' } },
-          paper: { sx: { mt: '4px', minWidth: NOTIFICATION_WIDTH, maxHeight: 'none', display: 'flex', flexDirection: 'column' } }
+          list: {
+            disablePadding: true,
+            sx: { display: 'flex', flexDirection: 'column' }
+          },
+          paper: {
+            sx: {
+              mt: '4px',
+              minWidth: NOTIFICATION_WIDTH,
+              maxHeight: 'none',
+              display: 'flex',
+              flexDirection: 'column'
+            }
+          }
         }}>
         {/* Header */}
         <Box
@@ -119,9 +138,22 @@ const NotificationMenu = () => {
           <Typography variant="body2" color="text.primary">
             {formatMessage({ id: 'Notifications' })}
           </Typography>
-          {nbNotifications > 0 && (
-            <Chip label={nbNotifications} color="secondary" size="small" />
-          )}
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            {nbNotifications > 0 && (
+              <Chip label={nbNotifications} color="secondary" size="small" />
+            )}
+            <Tooltip title={formatMessage({ id: 'Mark all as read' })}>
+              <span>
+                <IconButton
+                  color="secondary"
+                  size="small"
+                  disabled={!nbNotifications}
+                  onClick={handleReadAll}>
+                  <DoneAllIcon fontSize="small" />
+                </IconButton>
+              </span>
+            </Tooltip>
+          </Box>
         </Box>
 
         <Divider sx={{ flexShrink: 0 }} />
