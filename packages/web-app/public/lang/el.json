@@ -14,6 +14,7 @@
   "{0} hour": "{0} ώρα",
   "{0} hours": "{0} ώρες",
   "{0} min": "{0} λεπτ.",
+  "{dateDay} at {dateHour}": "{dateDay} στις {dateHour}",
   "{dateDay} at {dateHour} by {nickname}": "{dateDay} στις {dateHour} από {nickname}",
   "{entity} created": "{entity} δημιουργήθηκε",
   "{entity} deleted": "{entity} διαγράφηκε",

@@ -2,12 +2,24 @@ import React from 'react';
 import { Box } from '@mui/material';
 import CheckIcon from '@mui/icons-material/Check';
 import UnreadNotificationIcon from '@mui/icons-material/FiberManualRecord';
+import { useIntl } from 'react-intl';
 import GCLink from '../GCLink';
 import Translate from '../Translate';
 import DataQualityBadge from '../DataQualityBadge';
 import CustomIcon from '../CustomIcon';
-
 import * as CSV from '../../appli/ImportCSV/constants';
+
+const DateTimeCell = ({ value }) => {
+  const { formatDate, formatMessage, formatTime } = useIntl();
+  if (!value) return null;
+  return formatMessage(
+    { id: '{dateDay} at {dateHour}' },
+    {
+      dateDay: formatDate(value),
+      dateHour: formatTime(value, { hour: '2-digit', minute: '2-digit' })
+    }
+  );
+};
 
 const cellsRender = {
   notificationIsRead: value =>
@@ -44,7 +56,8 @@ const cellsRender = {
   translate: value => (!value ? null : <Translate>{value}</Translate>),
   ellipsis: value =>
     value && value.length > 60 ? `${value.substring(0, 60)}...` : value,
-  date: value => (!value ? null : new Date(value).toLocaleDateString())
+  date: value => (!value ? null : new Date(value).toLocaleDateString()),
+  dateTime: value => (!value ? null : <DateTimeCell value={value} />)
 };
 
 const placeholder = {
@@ -54,13 +67,13 @@ const placeholder = {
 
 const notifications = {
   columns: [
-    { visible: true, field: 'dateInscription', label: 'Date', sortable: false },
+    { visible: true, field: 'entityName', label: 'Name', sortable: false, isTitle: true },
     {
       visible: true,
-      field: 'notifier',
-      label: 'From',
+      field: 'entityType',
+      label: 'Type',
       sortable: false,
-      render: cellsRender.person
+      render: cellsRender.notificationEntityType
     },
     {
       visible: true,
@@ -71,12 +84,12 @@ const notifications = {
     },
     {
       visible: true,
-      field: 'entityType',
-      label: 'Type',
+      field: 'notifier',
+      label: 'From',
       sortable: false,
-      render: cellsRender.notificationEntityType
+      render: cellsRender.person
     },
-    { visible: true, field: 'entityName', label: 'Name', sortable: false },
+    { visible: true, field: 'dateInscription', label: 'Date', sortable: false, render: cellsRender.dateTime },
     {
       visible: true,
       field: 'isRead',

@@ -14,6 +14,7 @@
   "{0} hour": "{0} שעה",
   "{0} hours": "{0} שעות",
   "{0} min": "{0} דק",
+  "{dateDay} at {dateHour}": "{dateDay} ב-{dateHour}",
   "{dateDay} at {dateHour} by {nickname}": "{dateDay} בשעה {dateHour} על ידי {nickname}",
   "{entity} created": "{entity} נוצר",
   "{entity} deleted": "{entity} נמחק",

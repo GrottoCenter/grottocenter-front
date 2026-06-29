@@ -14,6 +14,7 @@
   "{0} hour": "{0} uur",
   "{0} hours": "{0} uur",
   "{0} min": "{0} min",
+  "{dateDay} at {dateHour}": "{dateDay} om {dateHour}",
   "{dateDay} at {dateHour} by {nickname}": "{dateDay} om {dateHour} door {nickname}",
   "{entity} created": "{entity} aangemaakt",
   "{entity} deleted": "{entity} verwijderd",

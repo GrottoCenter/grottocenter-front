@@ -14,6 +14,7 @@
   "{0} hour": "{0}時間",
   "{0} hours": "{0}時間",
   "{0} min": "{0}分",
+  "{dateDay} at {dateHour}": "{dateDay} {dateHour}",
   "{dateDay} at {dateHour} by {nickname}": "{nickname}による{dateDay} {dateHour}",
   "{entity} created": "{entity}が作成されました",
   "{entity} deleted": "{entity}が削除されました",

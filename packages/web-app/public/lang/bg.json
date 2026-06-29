@@ -14,6 +14,7 @@
   "{0} hour": "{0} час",
   "{0} hours": "{0} часа",
   "{0} min": "{0} мин.",
+  "{dateDay} at {dateHour}": "{dateDay} в {dateHour}",
   "{dateDay} at {dateHour} by {nickname}": "{dateDay} в {dateHour} от {nickname}",
   "{entity} created": "{entity} създадено",
   "{entity} deleted": "{entity} изтрито",

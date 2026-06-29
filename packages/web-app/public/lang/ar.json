@@ -14,6 +14,7 @@
   "{0} hour": "{0} ساعة",
   "{0} hours": "{0} ساعات",
   "{0} min": "{0} دق",
+  "{dateDay} at {dateHour}": "{dateDay} في {dateHour}",
   "{dateDay} at {dateHour} by {nickname}": "{dateDay} الساعة {dateHour} بواسطة {nickname}",
   "{entity} created": "تم إنشاء {entity}",
   "{entity} deleted": "تم حذف {entity}",

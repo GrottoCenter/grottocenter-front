@@ -14,6 +14,7 @@
   "{0} hour": "{0} hour",
   "{0} hours": "{0} hours",
   "{0} min": "{0} min",
+  "{dateDay} at {dateHour}": "{dateDay} at {dateHour}",
   "{dateDay} at {dateHour} by {nickname}": "{dateDay} at {dateHour} by {nickname}",
   "{entity} created": "{entity} created",
   "{entity} deleted": "{entity} deleted",
