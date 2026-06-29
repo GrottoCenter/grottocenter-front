@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import { useDispatch, useSelector } from 'react-redux';
-import { usePermissions } from '../../../hooks';
+import { usePermissions, useNotification } from '../../../hooks';
 import { Link as RouterLink } from 'react-router-dom';
 import { Skeleton, Box, Typography, Link, Chip, Button, IconButton } from '@mui/material';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
@@ -34,6 +34,7 @@ const AssociationSection = ({
 }) => {
   const { formatMessage } = useIntl();
   const dispatch = useDispatch();
+  const { onError } = useNotification();
 
   const { isAuth } = usePermissions();
   const canManageAssociations = isAuth;
@@ -70,10 +71,26 @@ const AssociationSection = ({
       setIsPending(false);
       pendingOperationRef.current = false;
     } else if (pendingOperationRef.current && status === REDUCER_STATUS.FAILED) {
+      // Surface the failure: without this, a rejected set/remove just silently
+      // re-enables the buttons (the in-form Alert is masked once isPending
+      // clears below), so the user gets no feedback. Covers both flows.
+      onError(
+        error?.message ||
+          formatMessage({ id: 'An error occurred while saving.' })
+      );
       setIsPending(false);
       pendingOperationRef.current = false;
     }
-  }, [status, dispatch, entityType, entityId, parentEntityId]);
+  }, [
+    status,
+    error,
+    dispatch,
+    entityType,
+    entityId,
+    parentEntityId,
+    onError,
+    formatMessage
+  ]);
 
   useEffect(() => {
     return () => {
