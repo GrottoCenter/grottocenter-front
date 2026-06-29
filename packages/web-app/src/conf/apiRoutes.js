@@ -247,6 +247,7 @@ export const countUnreadNotificationsUrl = `${API_URL}/api/${apiVersion}/notific
 export const fetchNotificationsUrl = `${API_URL}/api/${apiVersion}/notifications`;
 export const readNotificationUrl = notificationId =>
   `${API_URL}/api/${apiVersion}/notifications/${notificationId}/read`;
+export const readAllNotificationsUrl = `${API_URL}/api/${apiVersion}/notifications/read`;
 
 // ===== Messaging urls
 export const postMessageUrl = `${API_BASE_PATH}/messages`;

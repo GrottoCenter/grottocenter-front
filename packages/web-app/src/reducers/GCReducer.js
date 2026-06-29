@@ -60,6 +60,7 @@ import processDocuments from './ProcessDocumentsReducer';
 import projections from './Projections';
 import quicksearch from './QuicksearchReducer';
 import randomEntrance from './RandomEntranceReducer';
+import readAllNotifications from './ReadAllNotificationsReducer';
 import readNotification from './ReadNotificationReducer';
 import recentChange from './RecentChangeReducer';
 import region from './RegionReducer';
@@ -157,6 +158,7 @@ const GCReducer = combineReducers({
   projections,
   quicksearch,
   randomEntrance,
+  readAllNotifications,
   readNotification,
   recentChange,
   region,
