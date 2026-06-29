@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import NotificationsOffIcon from '@mui/icons-material/NotificationsOff';
 import DoneAllIcon from '@mui/icons-material/DoneAll';
 import {
@@ -55,6 +55,22 @@ const NotificationMenu = () => {
   const { count: nbNotifications } = useSelector(
     state => state.countUnreadNotifications
   );
+  const { status: readAllStatus } = useSelector(
+    state => state.readAllNotifications
+  );
+
+  const prevReadAllStatus = useRef(readAllStatus);
+
+  useEffect(() => {
+    if (
+      readAllStatus === REDUCER_STATUS.SUCCEEDED &&
+      prevReadAllStatus.current !== REDUCER_STATUS.SUCCEEDED
+    ) {
+      dispatch(fetchMenuNotifications({ size: NUMBER_OF_NOTIFICATIONS }));
+      dispatch(countUnreadNotifications());
+    }
+    prevReadAllStatus.current = readAllStatus;
+  }, [dispatch, readAllStatus]);
 
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);

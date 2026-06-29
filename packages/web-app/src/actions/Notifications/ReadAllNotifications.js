@@ -38,8 +38,7 @@ export function readAllNotifications() {
         if (error.isAuthError) return;
         dispatch(
           readAllNotificationsActionFailure(
-            makeErrorMessage(error.message, 'Reading all notifications'),
-            error.message
+            makeErrorMessage(error.message, 'Reading all notifications')
           )
         );
       });

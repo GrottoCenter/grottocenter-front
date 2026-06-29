@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useIntl } from 'react-intl';
 import { Box, Button, Tooltip } from '@mui/material';
@@ -36,6 +36,7 @@ const NotificationsPage = () => {
 
   const [notifications, setNotifications] = useState([]);
   const [totalCount, setTotalCount] = useState(0);
+  const prevReadAllStatus = useRef(readAllStatus);
 
   useEffect(() => {
     dispatch(fetchNotifications({ limit: 50, skip: 0 }));
@@ -51,9 +52,14 @@ const NotificationsPage = () => {
   }, [totalCountRaw]);
 
   useEffect(() => {
-    if (readAllStatus !== REDUCER_STATUS.SUCCEEDED) return;
-    dispatch(fetchNotifications({ limit: 50, skip: 0 }));
-    dispatch(countUnreadNotifications());
+    if (
+      readAllStatus === REDUCER_STATUS.SUCCEEDED &&
+      prevReadAllStatus.current !== REDUCER_STATUS.SUCCEEDED
+    ) {
+      dispatch(fetchNotifications({ limit: 50, skip: 0 }));
+      dispatch(countUnreadNotifications());
+    }
+    prevReadAllStatus.current = readAllStatus;
   }, [dispatch, readAllStatus]);
 
   useEffect(() => {

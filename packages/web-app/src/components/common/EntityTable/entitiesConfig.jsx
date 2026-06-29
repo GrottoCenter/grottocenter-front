@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Box } from '@mui/material';
 import CheckIcon from '@mui/icons-material/Check';
 import UnreadNotificationIcon from '@mui/icons-material/FiberManualRecord';
@@ -19,6 +20,10 @@ const DateTimeCell = ({ value }) => {
       dateHour: formatTime(value, { hour: '2-digit', minute: '2-digit' })
     }
   );
+};
+
+DateTimeCell.propTypes = {
+  value: PropTypes.string
 };
 
 const cellsRender = {
