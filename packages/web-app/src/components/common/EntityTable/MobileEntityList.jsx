@@ -25,7 +25,8 @@ const MobileEntityCard = React.memo(
     renderCellFn,
     icon,
     selected = false,
-    onToggle = null
+    onToggle = null,
+    onRowClick = null
   }) => {
     const openLink = useOpenLink();
     const titleCol =
@@ -38,6 +39,7 @@ const MobileEntityCard = React.memo(
       if (onToggle) {
         onToggle(doc.id);
       } else {
+        if (onRowClick) onRowClick(doc);
         openLink(link(doc));
       }
     };
@@ -131,7 +133,8 @@ MobileEntityCard.propTypes = {
   renderCellFn: PropTypes.func.isRequired,
   icon: PropTypes.node,
   selected: PropTypes.bool,
-  onToggle: PropTypes.func
+  onToggle: PropTypes.func,
+  onRowClick: PropTypes.func
 };
 
 // ~600 cards ≈ 30 "Load more" clicks × 20 rows/page, capped to prevent DOM bloat on mobile.
@@ -148,7 +151,8 @@ const MobileEntityList = ({
   link,
   icon,
   renderCellFn,
-  onSelected = null
+  onSelected = null,
+  onRowClick = null
 }) => {
   const [allRows, setAllRows] = useState(rows ?? []);
   const [page, setPage] = useState(0);
@@ -238,6 +242,7 @@ const MobileEntityList = ({
             renderCellFn={renderCellFn}
             selected={onSelected ? selectedIds.includes(doc.id) : false}
             onToggle={onSelected ? handleToggle : null}
+            onRowClick={onRowClick}
           />
         ))}
       </Stack>
@@ -276,7 +281,8 @@ MobileEntityList.propTypes = {
   link: PropTypes.func.isRequired,
   icon: PropTypes.node,
   renderCellFn: PropTypes.func.isRequired,
-  onSelected: PropTypes.func
+  onSelected: PropTypes.func,
+  onRowClick: PropTypes.func
 };
 
 export default MobileEntityList;
