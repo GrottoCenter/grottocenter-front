@@ -83,10 +83,17 @@ export const userguideLinks = {
   pt: 'https://wiki.grottocenter.org/wiki/GrottoCenter:Pt/User_Guide',
   '*': 'https://wiki.grottocenter.org/wiki/GrottoCenter:En/User_Guide'
 };
-export const wikiBatsLinks = generateLinks(
-  'https://wiki.grottocenter.org/wiki/GrottoCenter:%s/bats',
-  'en'
-);
+export const wikiBatsLinks = {
+  fr: 'https://wiki.grottocenter.org/wiki/GrottoCenter:Fr/bats',
+  '*': 'https://wiki.grottocenter.org/wiki/GrottoCenter:En/bats'
+};
+export const caveConservationLinks = {
+  fr: 'https://wiki.grottocenter.org/wiki/GrottoCenter:Fr/Cave_conservation',
+  '*': 'https://wiki.grottocenter.org/wiki/GrottoCenter:En/Cave_conservation'
+};
+export const biLinks = {
+  '*': process.env.REACT_APP_BI_URL || 'https://bi.grottocenter.org'
+};
 export const wikiBBSLinks = {
   fr: 'https://wiki.grottocenter.org/wiki/GrottoCenter:Fr/bbs',
   en: 'https://wiki.grottocenter.org/wiki/GrottoCenter:En/bbs',

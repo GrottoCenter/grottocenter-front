@@ -17,6 +17,7 @@ import {
   organizationIcon,
   massifIcon
 } from '../../../../assets/icons';
+import { EXPLORED_PIN_PATH } from './ExploredOverlay';
 
 const CAVE_SIZE_POPOVER_ROWS = [
   {
@@ -111,6 +112,31 @@ const OptionLabel = styled('label')`
   }
 `;
 
+const ExploredBadgeIcon = () => (
+  <svg
+    width="14"
+    height="20"
+    viewBox="0 0 20 28"
+    style={{ flexShrink: 0, marginRight: 4 }}>
+    <path
+      d={EXPLORED_PIN_PATH}
+      fill="#2e7d32"
+      stroke="#fff"
+      strokeWidth="1.5"
+    />
+    <text
+      x="10"
+      y="11.5"
+      textAnchor="middle"
+      fill="#fff"
+      fontSize="9"
+      fontWeight="bold"
+      fontFamily="sans-serif">
+      ✓
+    </text>
+  </svg>
+);
+
 const CaveSizeDot = ({ caveSize }) => {
   const { radius, fillColor, color, weight } = CAVE_SIZE_STYLE[caveSize];
   return (
@@ -173,6 +199,10 @@ const DataControl = ({
   activeQualityFilters,
   setActiveQualityFilters,
   isMarkersMode,
+  isAuth,
+  showExplored,
+  setShowExplored,
+  hasExploredData,
   ...props
 }) => {
   const { fullScreen } = useFullScreen();
@@ -277,6 +307,33 @@ const DataControl = ({
                 {formatMessage({ id: markerTypes.ORGANIZATIONS })}
               </span>
             </OptionLabel>
+
+            {isAuth && (
+              <div style={hasExploredData === false ? { opacity: 0.5 } : undefined}>
+                <OptionLabel>
+                  <input
+                    type="checkbox"
+                    name="exploredCaves"
+                    disabled={hasExploredData === false}
+                    checked={showExplored && hasExploredData !== false}
+                    onChange={() => setShowExplored(prev => !prev)}
+                  />
+                  <ExploredBadgeIcon />
+                  <span>{formatMessage({ id: 'My explored entrances' })}</span>
+                </OptionLabel>
+                {hasExploredData === false && (
+                  <div
+                    style={{
+                      fontSize: 11,
+                      fontStyle: 'italic',
+                      color: '#666',
+                      padding: '2px 0 4px'
+                    }}>
+                    {formatMessage({ id: 'No explored entrances yet' })}
+                  </div>
+                )}
+              </div>
+            )}
 
             {selectedHeats.has(heatmapTypes.ENTRANCES) && (
               <div
@@ -394,6 +451,10 @@ DataControl.propTypes = {
   activeQualityFilters: PropTypes.objectOf(PropTypes.bool).isRequired,
   setActiveQualityFilters: PropTypes.func.isRequired,
   isMarkersMode: PropTypes.bool.isRequired,
+  isAuth: PropTypes.bool,
+  showExplored: PropTypes.bool,
+  setShowExplored: PropTypes.func,
+  hasExploredData: PropTypes.oneOf([true, false, null]),
   ...customControlProps
 };
 

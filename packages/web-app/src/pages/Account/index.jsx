@@ -1177,7 +1177,6 @@ const AccountPage = () => {
   }, [dispatch, userId, pendingLeaveOrg]);
 
   const nbOrganizations = (person?.organizations ?? []).length;
-  const nbNetworks = (person?.exploredNetworks ?? []).length;
   const nbEntrances = (person?.exploredEntrances ?? []).length;
   const nbSubscriptions =
     (subscriptions?.countries?.length ?? 0) +
@@ -1194,7 +1193,7 @@ const AccountPage = () => {
       id: 'activities',
       label: formatMessage({ id: 'Activities' }),
       icon: <TravelExploreOutlinedIcon fontSize="small" />,
-      count: nbOrganizations + nbNetworks + nbEntrances
+      count: nbOrganizations + nbEntrances
     },
     ...(isLeader
       ? [
@@ -1338,15 +1337,15 @@ const AccountPage = () => {
               />
               <ScrollableContent
                 anchorId="related-caves"
-                title={formatMessage({ id: 'Explored caves' })}
-                defaultExpanded={nbNetworks + nbEntrances > 0}
-                count={nbNetworks + nbEntrances}
+                title={formatMessage({ id: 'Explored entrances' })}
+                defaultExpanded={nbEntrances > 0}
+                count={nbEntrances}
                 icon={
                   <Tooltip
                     title={formatMessage({
                       id: isCaveSearchVisible
                         ? 'Cancel this search'
-                        : 'Add a cave'
+                        : 'Add an entrance'
                     })}>
                     <Button
                       color={isCaveSearchVisible ? 'inherit' : 'secondary'}
@@ -1368,13 +1367,13 @@ const AccountPage = () => {
                 content={
                   <RelatedCaves
                     exploredEntrances={person?.exploredEntrances}
-                    exploredNetworks={person?.exploredNetworks}
                     entityId={person?.id}
                     isOrganization={false}
                     canManageCaves
                     onRefresh={handleRefreshPerson}
                     isCaveSearchVisible={isCaveSearchVisible}
                     onToggleCaveSearch={setIsCaveSearchVisible}
+                    userId={userId}
                   />
                 }
               />

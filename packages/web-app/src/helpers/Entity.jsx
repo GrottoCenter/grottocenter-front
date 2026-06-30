@@ -64,7 +64,7 @@ export const nomelizeSearchEntity = option => {
     case 'caves':
     case 'entrances': {
       iconSrc =
-        option._type === 'caves' && option.entrances?.length > 1
+        option._type === 'caves' && (option.nbEntrances ?? 0) > 1
           ? networkIcon
           : entranceIcon;
       subtitle = option.region ?? '';
@@ -97,9 +97,7 @@ export const entityOptionForSelector = (props, option) => {
   const { key, ...otherProps } = props;
   return (
     <li key={key || `${option._type}-${id}`} {...otherProps}>
-      {iconSrc && (
-        <EntityIcon src={iconSrc} alt={`${option.type} icon`} />
-      )}
+      {iconSrc && <EntityIcon src={iconSrc} alt={`${option.type} icon`} />}
       <div>
         <EntityTitle>
           {title} <EntityId>{id}</EntityId>

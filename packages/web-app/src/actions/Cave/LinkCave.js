@@ -1,6 +1,6 @@
 import fetch from 'isomorphic-fetch';
 import { checkAuthStatus } from '../utils';
-import { linkCaveToOrganizationUrl, linkCaveToCaverUrl } from '../../conf/apiRoutes';
+import { linkCaveToOrganizationUrl } from '../../conf/apiRoutes';
 
 export const LINK_CAVE = 'LINK_CAVE';
 export const LINK_CAVE_SUCCESS = 'LINK_CAVE_SUCCESS';
@@ -19,7 +19,7 @@ export const linkCaveFailure = error => ({
   error
 });
 
-export const linkCave = (caveId, entityId, isOrganization) => (dispatch, getState) => {
+export const linkCave = (caveId, organizationId) => (dispatch, getState) => {
   dispatch(linkCaveAction());
 
   const requestOptions = {
@@ -27,11 +27,7 @@ export const linkCave = (caveId, entityId, isOrganization) => (dispatch, getStat
     headers: getState().login.authorizationHeader
   };
 
-  const endpoint = isOrganization
-    ? linkCaveToOrganizationUrl(caveId, entityId)
-    : linkCaveToCaverUrl(caveId, entityId);
-
-  return fetch(endpoint, requestOptions)
+  return fetch(linkCaveToOrganizationUrl(caveId, organizationId), requestOptions)
     .then(checkAuthStatus(dispatch))
     .then(() => dispatch(linkCaveSuccess()))
     .catch(error => {

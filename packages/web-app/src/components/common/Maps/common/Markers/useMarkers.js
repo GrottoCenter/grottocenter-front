@@ -19,7 +19,9 @@ const useMarkers = ({
   circleMarkerStyle,
   popupContent = null,
   tooltipContent = null,
-  shouldFitMapBound = false
+  onMarkerClick = null,
+  shouldFitMapBound = false,
+  markerOptions = null
 }) => {
   const map = useMap();
   // Map<id, L.Marker> for O(1) lookups during diff
@@ -38,7 +40,7 @@ const useMarkers = ({
             : circleMarkerStyle;
         markerEl = L.circleMarker([latitude, longitude], style);
       } else {
-        markerEl = L.marker([latitude, longitude], { icon });
+        markerEl = L.marker([latitude, longitude], { icon, ...markerOptions });
       }
 
       // Lazy popup: content is rendered only when the popup is opened
@@ -50,12 +52,15 @@ const useMarkers = ({
         markerEl.bindTooltip(`${tooltipContent(marker)}`, {});
         // On touch devices a tap fires both tooltip and popup; hide tooltip on click
         // (fires before popupopen, works reliably for both L.marker and L.circleMarker)
-        markerEl.on('click', () => markerEl.closeTooltip());
+        markerEl.on('click', () => {
+          markerEl.closeTooltip();
+          if (onMarkerClick) onMarkerClick(marker);
+        });
       }
 
       return markerEl;
     },
-    [icon, circleMarkerStyle, popupContent, renderPopup, tooltipContent]
+    [icon, circleMarkerStyle, popupContent, renderPopup, tooltipContent, onMarkerClick, markerOptions]
   );
 
   const updateMarkers = useCallback(

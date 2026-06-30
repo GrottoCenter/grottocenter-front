@@ -5,6 +5,7 @@ import {
   FETCH_CAVE_ERROR,
   FETCH_CAVE_LOADING
 } from '../actions/Cave/GetCave';
+import { FETCH_NETWORK_CAVE_DESCRIPTIONS_COUNT_SUCCESS } from '../actions/Cave/GetNetworkCaveDescriptionsCount';
 import {
   DELETE_CAVE_SUCCESS,
   DELETE_CAVE_PERMANENT_SUCCESS
@@ -21,6 +22,7 @@ import { MOVE_DESCRIPTION_RELEVANCE_SUCCESS } from '../actions/Description/MoveR
 
 const initialState = {
   cave: undefined,
+  networkDescriptionsCount: 0,
   loading: false,
   error: null
 };
@@ -47,6 +49,9 @@ const reducer = (state = initialState, action) => {
         loading: false,
         error: action.error
       };
+
+    case FETCH_NETWORK_CAVE_DESCRIPTIONS_COUNT_SUCCESS:
+      return { ...state, networkDescriptionsCount: action.count };
 
     case POST_DESCRIPTION_SUCCESS:
     case UPDATE_DESCRIPTION_SUCCESS:

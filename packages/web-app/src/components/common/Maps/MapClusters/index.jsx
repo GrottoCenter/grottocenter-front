@@ -40,6 +40,7 @@ import {
   usePermissions,
   getCRSLabel
 } from '../../../../hooks';
+import useLocalStorage from '../../../../hooks/useLocalStorage';
 import { displayLoginDialog } from '../../../../actions/Login';
 import { EntityIcon } from '../../../../pages/EntityCreation/entityConfig';
 import CRSMenu from '../../CRSMenu';
@@ -47,6 +48,8 @@ import MeasureControl from '../common/MeasureControl';
 import useHeatLayer, { HexGlobalCss } from './useHeatLayer';
 import Markers from './Markers';
 import MassifPolygons, { massifPolygonType } from './MassifPolygons';
+import ExploredOverlay from './ExploredOverlay';
+import useExploredEntrances from './useExploredEntrances';
 import PopupTargetHandler from './PopupTargetHandler';
 import CustomMapContainer from '../common/MapContainer';
 import {
@@ -85,6 +88,7 @@ const HydratedMap = ({
   const projections = useSelector(
     state => state.projections?.projections ?? []
   );
+  const userId = useSelector(state => state.login.authTokenDecoded?.id ?? null);
   const [contextCoords, setContextCoords] = useState(null);
   const [contextMenuAnchor, setContextMenuAnchor] = useState(null);
   const [pendingEntranceUrl, setPendingEntranceUrl] = useState(null);
@@ -93,21 +97,44 @@ const HydratedMap = ({
   const isTouch = useMediaQuery('(pointer: coarse)');
   const { updateLayers } = useHeatLayer();
 
+  const [showExplored, setShowExplored] = useLocalStorage(
+    'grottocenter_showExploredCaves',
+    false,
+    { serialize: v => String(v), deserialize: v => v === 'true' }
+  );
+
+  const { points: exploredPoints, hasExploredData } = useExploredEntrances({
+    userId,
+    enabled: showExplored && isAuth
+  });
+
   const initialZoom = useRef(map.getZoom()).current;
   const isInitiallyZoomedIn = initialZoom >= MARKERS_LIMIT;
 
-  const [selectedHeats, setSelectedHeats] = useState(
-    () => new Set([heatmapTypes.ENTRANCES])
+  const [selectedHeats, setSelectedHeats] = useLocalStorage(
+    'grottocenter_selectedHeats',
+    new Set([heatmapTypes.ENTRANCES]),
+    {
+      serialize: v => JSON.stringify([...v]),
+      deserialize: v => new Set(JSON.parse(v))
+    }
   );
-  const [selectedMarkers, setSelectedMarkers] = useState(
-    Object.fromEntries(Object.values(markerTypes).map(type => [type, false]))
+  const [selectedMarkers, setSelectedMarkers] = useLocalStorage(
+    'grottocenter_selectedMarkers',
+    Object.fromEntries(Object.values(markerTypes).map(type => [type, false])),
+    { merge: true }
   );
-  const [activeEntranceFilters, setActiveEntranceFilters] = useState(
-    Object.fromEntries(Object.values(CAVE_SIZE).map(size => [size, true]))
+  const [activeEntranceFilters, setActiveEntranceFilters] = useLocalStorage(
+    'grottocenter_activeEntranceFilters',
+    Object.fromEntries(Object.values(CAVE_SIZE).map(size => [size, true])),
+    { merge: true }
   );
-  const [activeQualityFilters, setActiveQualityFilters] = useState(
-    Object.fromEntries(Object.values(CAVE_QUALITY).map(q => [q, true]))
+  const [activeQualityFilters, setActiveQualityFilters] = useLocalStorage(
+    'grottocenter_activeQualityFilters',
+    Object.fromEntries(Object.values(CAVE_QUALITY).map(q => [q, true])),
+    { merge: true }
   );
+
   const filteredEntranceMarkers = useMemo(
     () =>
       entranceMarkers.filter(e => {
@@ -205,7 +232,7 @@ const HydratedMap = ({
         );
       }
     },
-    [setVisibleMarkersStable]
+    [setSelectedHeats, setVisibleMarkersStable]
   );
 
   // zoomend: manages heatmap ↔ markers visibility only.
@@ -364,8 +391,13 @@ const HydratedMap = ({
         activeQualityFilters={activeQualityFilters}
         setActiveQualityFilters={setActiveQualityFilters}
         isMarkersMode={isMarkersMode}
+        isAuth={isAuth}
+        showExplored={showExplored}
+        setShowExplored={setShowExplored}
+        hasExploredData={hasExploredData}
         useLeafletControl
       />
+      <ExploredOverlay points={showExplored && isAuth ? exploredPoints : []} />
       <Markers
         visibleMarkers={visibleMarkers}
         organizations={organizations}

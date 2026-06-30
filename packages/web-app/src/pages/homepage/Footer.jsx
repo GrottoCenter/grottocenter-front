@@ -15,12 +15,14 @@ import {
   licensesODBLink,
   bloggerLinks,
   wikiBatsLinks,
+  caveConservationLinks,
   facebookLink,
   githubLink,
   oaiLinks,
   z3950Links,
   uptimeLinks
 } from '../../conf/externalLinks';
+import { useOpenBi } from '../../hooks';
 
 const FooterRoot = styled('footer')(({ theme }) => ({
   backgroundColor: theme.palette.primary.main,
@@ -106,15 +108,27 @@ const ApiImg = styled(SocialImg)({
   animation: `${rotateAnimation} 30s ease-out infinite`
 });
 
+const PlainButton = styled('button')({
+  border: 'none',
+  background: 'none',
+  padding: 0,
+  margin: 0,
+  width: '100%',
+  cursor: 'pointer',
+  display: 'block',
+  '&:disabled': { opacity: 0.5, cursor: 'default' }
+});
+
 const Footer = () => {
   const { formatMessage } = useIntl();
+  const { openBi, isOpening } = useOpenBi();
 
   return (
     <FooterRoot>
       <MainSection>
         <Grid container spacing={4}>
           {/* Column 1 — Brand + Licenses */}
-          <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+          <Grid size={{ xs: 12, sm: 6, md: 4 }}>
             <Box
               sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1.5 }}>
               <Box
@@ -153,7 +167,7 @@ const Footer = () => {
           </Grid>
 
           {/* Column 2 — Navigation */}
-          <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+          <Grid size={{ xs: 12, sm: 6, md: 2 }}>
             <ColumnLabel variant="overline">
               {formatMessage({ id: 'Navigation' })}
             </ColumnLabel>
@@ -178,8 +192,25 @@ const Footer = () => {
             </NavList>
           </Grid>
 
-          {/* Column 3 — Follow us */}
-          <Grid size={{ xs: 6, sm: 6, md: 3 }}>
+          {/* Column 3 — Good practices */}
+          <Grid size={{ xs: 12, sm: 6, md: 2 }}>
+            <ColumnLabel variant="overline">
+              {formatMessage({ id: 'Best practices' })}
+            </ColumnLabel>
+            <NavList
+              component="nav"
+              aria-label={formatMessage({ id: 'Best practices' })}>
+              <InternationalizedLink links={wikiBatsLinks}>
+                {formatMessage({ id: 'Bats protection' })}
+              </InternationalizedLink>
+              <InternationalizedLink links={caveConservationLinks}>
+                {formatMessage({ id: 'Cave conservation' })}
+              </InternationalizedLink>
+            </NavList>
+          </Grid>
+
+          {/* Column 4 — Follow us */}
+          <Grid size={{ xs: 6, sm: 6, md: 2 }}>
             <ColumnLabel variant="overline">
               {formatMessage({ id: 'Follow us' })}
             </ColumnLabel>
@@ -207,8 +238,8 @@ const Footer = () => {
             </IconList>
           </Grid>
 
-          {/* Column 4 — Technical */}
-          <Grid size={{ xs: 6, sm: 6, md: 3 }}>
+          {/* Column 5 — Technical */}
+          <Grid size={{ xs: 6, sm: 6, md: 2 }}>
             <ColumnLabel variant="overline">
               {formatMessage({ id: 'Technical' })}
             </ColumnLabel>
@@ -265,14 +296,17 @@ const Footer = () => {
                 </InternationalizedLink>
               </IconItem>
               <IconItem>
-                <InternationalizedLink
-                  links={wikiBatsLinks}
-                  title={formatMessage({ id: 'Wiki page for bats' })}>
+                <PlainButton
+                  type="button"
+                  onClick={openBi}
+                  disabled={isOpening}
+                  title={formatMessage({ id: 'Statistics' })}
+                  aria-label={formatMessage({ id: 'Statistics' })}>
                   <SocialImg
-                    src="/images/icons8/bats.svg"
-                    alt={formatMessage({ id: 'Wiki page for bats' })}
+                    src="/images/icons8/statistics.svg"
+                    alt={formatMessage({ id: 'Statistics' })}
                   />
-                </InternationalizedLink>
+                </PlainButton>
               </IconItem>
             </IconList>
           </Grid>

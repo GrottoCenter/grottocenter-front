@@ -35,7 +35,8 @@ const AccordionSnapshot = ({
   previous,
   actualItem,
   all,
-  isCurrent
+  isCurrent,
+  actualItem
 }) => {
   const { formatMessage } = useIntl();
   const [open, setOpen] = useState(isCurrent ?? false);

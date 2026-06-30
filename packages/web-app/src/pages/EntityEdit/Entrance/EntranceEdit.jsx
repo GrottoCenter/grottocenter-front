@@ -17,7 +17,14 @@ const EntranceEdit = () => {
   const { data: entrance, error } = useSelector(state => state.entrance);
 
   useEffect(() => {
+    // Skip fetch if Redux already holds fresh data for this entrance (navigating
+    // from the entrance view). Trade-off: data could be stale if another session
+    // edited it concurrently, but the entrance view page will refetch after save.
+    // entrance is intentionally excluded from deps — we only want to run when
+    // entranceId changes, not when Redux state updates mid-flight.
+    if (String(entrance?.id) === String(entranceId)) return;
     dispatch(fetchEntrance(entranceId));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [entranceId, dispatch]);
 
   const isStale = entrance && String(entrance.id) !== String(entranceId);

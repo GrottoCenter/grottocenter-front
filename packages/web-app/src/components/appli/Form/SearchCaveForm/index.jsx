@@ -12,7 +12,7 @@ import { ADVANCED_SEARCH_TYPES } from '../../../../conf/config';
 import EntrancesSearch from '../../AdvancedSearch/EntrancesSearch';
 import SearchResults from '../../AdvancedSearch/SearchResults';
 
-const SearchCaveForm = ({ onSubmit }) => {
+const SearchCaveForm = ({ onSubmit, submitLabel = null }) => {
   const dispatch = useDispatch();
   const { formatMessage } = useIntl();
   const [selectedEntrances, setSelectedEntrances] = useState([]);
@@ -55,7 +55,7 @@ const SearchCaveForm = ({ onSubmit }) => {
           variant="contained"
           type="submit"
           onClick={handleOnSubmit}>
-          {formatMessage({ id: 'Associate' })}
+          {submitLabel ?? formatMessage({ id: 'Associate' })}
         </Button>
       </Box>
     </Box>
@@ -63,7 +63,8 @@ const SearchCaveForm = ({ onSubmit }) => {
 };
 
 SearchCaveForm.propTypes = {
-  onSubmit: PropTypes.func.isRequired
+  onSubmit: PropTypes.func.isRequired,
+  submitLabel: PropTypes.string
 };
 
 export default SearchCaveForm;

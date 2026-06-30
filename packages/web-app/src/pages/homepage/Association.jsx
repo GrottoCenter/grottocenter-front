@@ -5,9 +5,9 @@ import {
   NatureOutlined,
   FavoriteBorder,
   LockOpenOutlined,
-  ScienceOutlined,
   ShareOutlined
 } from '@mui/icons-material';
+import BiotechIcon from '@mui/icons-material/Biotech';
 import { styled } from '@mui/material/styles';
 import { useIntl, FormattedMessage } from 'react-intl';
 import GCLogo from '../../components/common/GCLogo';
@@ -74,7 +74,7 @@ const GOALS = [
   },
   {
     key: 'help',
-    Icon: ScienceOutlined,
+    Icon: BiotechIcon,
     wordId: 'Help!',
     descId: 'Help the exploration and the scientific study of natural caves'
   }

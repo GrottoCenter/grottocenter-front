@@ -22,7 +22,7 @@ import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ShareIcon from '@mui/icons-material/Share';
 import ExploreOutlinedIcon from '@mui/icons-material/ExploreOutlined';
-import ScienceOutlinedIcon from '@mui/icons-material/ScienceOutlined';
+import BiotechIcon from '@mui/icons-material/Biotech';
 import ChatOutlinedIcon from '@mui/icons-material/ChatOutlined';
 import PermMediaOutlinedIcon from '@mui/icons-material/PermMediaOutlined';
 import { useReactToPrint } from 'react-to-print';
@@ -75,7 +75,7 @@ const HalfSplitContainer = styled('div')`
   }
 `;
 
-export const Entry = ({ isLoading, error, entrance }) => {
+export const Entry = ({ isLoading, error, entrance, networkDescriptionsCount = 0 }) => {
   const dispatch = useDispatch();
   const { formatMessage } = useIntl();
   const navigate = useNavigate();
@@ -90,7 +90,6 @@ export const Entry = ({ isLoading, error, entrance }) => {
   const [wantedDeletedState, setWantedDeletedState] = useState(false);
   const userId = useUserProperties()?.id ?? null;
   const { isExplored, isExploredLoading, handleToggleExplored } = useExplored({
-    caveId: entrance?.cave?.id,
     entranceId: entrance?.id,
     userId
   });
@@ -136,8 +135,10 @@ export const Entry = ({ isLoading, error, entrance }) => {
     isAuth && entrance?.cave?.id && !entrance?.isDeleted;
   const canEdit = isAuth && entrance && !entrance.isDeleted;
 
+  const isNetwork = entrance?.cave?.entrances?.length > 1;
+
   const snapshotUrl = entrance
-    ? `/ui/entrances/${entrance.id}/snapshots?isNetwork=${entrance.cave?.entrances?.length > 1}`
+    ? `/ui/entrances/${entrance.id}/snapshots?isNetwork=${isNetwork}`
     : null;
 
   const actions = entrance ? (
@@ -148,11 +149,11 @@ export const Entry = ({ isLoading, error, entrance }) => {
           icon: ExploredIcon,
           label: formatMessage({
             id: isExplored
-              ? 'Remove from my explored caves'
-              : 'Add to my explored caves'
+              ? 'Remove from my explored entrances'
+              : 'Add to my explored entrances'
           }),
           onClick: handleToggleExplored,
-          color: isExplored ? 'secondary' : 'primary',
+          color: isExplored ? 'success' : 'primary',
           hidden: !canToggleExplored
         },
         {
@@ -248,7 +249,7 @@ export const Entry = ({ isLoading, error, entrance }) => {
           ))}
         </Box>
       )}
-      {entrance.cave?.entrances?.length > 1 && (
+      {isNetwork && (
         <Link
           component={RouterLink}
           to={`/ui/caves/${entrance.cave.id}`}
@@ -286,7 +287,7 @@ export const Entry = ({ isLoading, error, entrance }) => {
           {
             id: 'science',
             label: formatMessage({ id: 'Science' }),
-            icon: <ScienceOutlinedIcon fontSize="small" />
+            icon: <BiotechIcon fontSize="small" />
           }
         ]
       : []),
@@ -424,6 +425,9 @@ export const Entry = ({ isLoading, error, entrance }) => {
                 entityType="entrance"
                 entityId={entrance.id}
                 isEditAllowed={!entrance.isDeleted}
+                networkId={isNetwork ? entrance.cave.id : undefined}
+                networkName={isNetwork ? entrance.cave.name : undefined}
+                networkDescriptionsCount={networkDescriptionsCount}
               />
               {entrance.guidelines && (
                 <GuidelinesGrouped guidelines={entrance.guidelines} />
@@ -494,7 +498,8 @@ export const Entry = ({ isLoading, error, entrance }) => {
 Entry.propTypes = {
   isLoading: PropTypes.bool.isRequired,
   error: PropTypes.shape({}),
-  entrance: EntrancePropTypes
+  entrance: EntrancePropTypes,
+  networkDescriptionsCount: PropTypes.number
 };
 
 export default Entry;

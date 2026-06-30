@@ -27,6 +27,9 @@ export const verifyEmailUrl = token =>
   `${API_BASE_PATH}/verify-email?token=${token}`;
 export const resendVerificationEmailUrl = `${API_BASE_PATH}/resend-verification-email`;
 
+// ===== SSO urls
+export const ssoAuthTokenUrl = `${API_BASE_PATH}/sso/auth-token`;
+
 // ===== MFA urls
 export const mfaEnrollUrl = `${API_BASE_PATH}/mfa/enroll`;
 export const mfaVerifyUrl = `${API_BASE_PATH}/mfa/verify`;
@@ -313,10 +316,10 @@ export const unbanCaverUrl = caverId =>
   `${API_BASE_PATH}/cavers/${caverId}/unban`;
 export const deletePersonUrl = (userId, entityId) =>
   `${API_BASE_PATH}/cavers/${userId}?${entityId ? `entityId=${entityId}` : ''}`;
-export const linkCaveToCaverUrl = (caveId, caverId) =>
-  `${API_BASE_PATH}/caves/${caveId}/cavers/${caverId}`;
-export const unlinkCaveFromCaverUrl = (caveId, caverId) =>
-  `${API_BASE_PATH}/caves/${caveId}/cavers/${caverId}`;
+export const linkExploredEntranceUrl = (entranceId, caverId) =>
+  `${API_BASE_PATH}/entrances/${entranceId}/cavers/${caverId}`;
+export const unlinkExploredEntranceUrl = (entranceId, caverId) =>
+  `${API_BASE_PATH}/entrances/${entranceId}/cavers/${caverId}`;
 
 // ===== RSS urls
 export const frenchRssUrl = `${API_URL}/api/rss/FR`;

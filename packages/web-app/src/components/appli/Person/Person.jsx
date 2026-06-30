@@ -175,7 +175,6 @@ const Person = ({ isLoading, person, error }) => {
   ) : null;
 
   const nbOrganizations = (person?.organizations ?? []).length;
-  const nbNetworks = (person?.exploredNetworks ?? []).length;
   const nbEntrances = (person?.exploredEntrances ?? []).length;
 
   const tabs = [
@@ -188,8 +187,8 @@ const Person = ({ isLoading, person, error }) => {
       id: 'activities',
       label: formatMessage({ id: 'Activities' }),
       icon: <TravelExploreOutlinedIcon fontSize="small" />,
-      count: nbOrganizations + nbNetworks + nbEntrances,
-      disabled: !!person && nbOrganizations + nbNetworks + nbEntrances === 0
+      count: nbOrganizations + nbEntrances,
+      disabled: !!person && nbOrganizations + nbEntrances === 0
     },
     {
       id: 'documents',
@@ -280,17 +279,17 @@ const Person = ({ isLoading, person, error }) => {
               />
               <ScrollableContent
                 anchorId="related-caves"
-                title={formatMessage({ id: 'Explored caves' })}
-                defaultExpanded={nbNetworks + nbEntrances > 0}
-                count={nbNetworks + nbEntrances}
+                title={formatMessage({ id: 'Explored entrances' })}
+                defaultExpanded={nbEntrances > 0}
+                count={nbEntrances}
                 content={
                   <RelatedCaves
                     exploredEntrances={person.exploredEntrances}
-                    exploredNetworks={person.exploredNetworks}
                     entityId={person.id}
                     isOrganization={false}
                     canManageCaves={false}
                     onRefresh={handleRefresh}
+                    userId={person.id}
                   />
                 }
               />
