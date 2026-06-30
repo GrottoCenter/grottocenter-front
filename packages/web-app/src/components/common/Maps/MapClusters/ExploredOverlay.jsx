@@ -39,21 +39,47 @@ const exploredBadgeIcon = L.divIcon({
 // Module-level: stable reference so useMarkers's useCallback deps don't change.
 const BADGE_MARKER_OPTIONS = { zIndexOffset: 1000, keyboard: false };
 
-// Fits the map to the explored points, debounced so progressive batches settle first.
+// Fits the map to the explored points.
+//
+// The map often mounts inside a tab or a collapsible whose Leaflet container is
+// still zero-sized or mid-animation. fitBounds against such a stale viewport lands
+// on wrong coordinates (≈0,0, open ocean) — and a one-shot fit would stay there
+// until a full page reload. So we fit only once the container has a real size, and
+// re-fit on every Leaflet `resize` (CustomMapContainer emits these via invalidateSize
+// as the container settles to its final size) until the user takes over.
 const BoundsFitter = ({ points }) => {
   const map = useMap();
-  const hasFittedRef = useRef(false);
+  const isProgrammaticRef = useRef(false);
 
   useEffect(() => {
-    if (hasFittedRef.current || points.length === 0) return;
-    const timer = setTimeout(() => {
-      hasFittedRef.current = true;
-      map.fitBounds(
-        points.map(p => [p.latitude, p.longitude]),
-        { padding: [40, 40], maxZoom: 16 }
-      );
-    }, 300);
-    return () => clearTimeout(timer);
+    if (points.length === 0) return undefined;
+
+    const bounds = points.map(p => [p.latitude, p.longitude]);
+
+    const fit = () => {
+      const { x, y } = map.getSize();
+      if (x === 0 || y === 0) return; // container not laid out yet
+      isProgrammaticRef.current = true;
+      map.fitBounds(bounds, { padding: [40, 40], maxZoom: 16, animate: false });
+      isProgrammaticRef.current = false;
+    };
+
+    // Stop auto-fitting once the user interacts — but ignore the move events our
+    // own fitBounds emits (synchronous thanks to animate: false, so the guard holds).
+    const stopAutoFit = () => {
+      if (isProgrammaticRef.current) return;
+      map.off('resize', fit);
+      map.off('dragstart zoomstart', stopAutoFit);
+    };
+
+    fit(); // immediate, in case the container is already sized
+    map.on('resize', fit);
+    map.on('dragstart zoomstart', stopAutoFit);
+
+    return () => {
+      map.off('resize', fit);
+      map.off('dragstart zoomstart', stopAutoFit);
+    };
   }, [map, points]);
 
   return null;
