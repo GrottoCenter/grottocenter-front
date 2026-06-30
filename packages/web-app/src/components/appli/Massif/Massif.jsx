@@ -45,6 +45,7 @@ import {
   DELETED_ENTITIES
 } from '../../common/card/Deleted';
 import { MassifTypes } from '../../../types/massif.type';
+import AssociationSection from '../OrganizationAssociation';
 
 const Massif = ({ isLoading, error, massif }) => {
   const dispatch = useDispatch();
@@ -321,6 +322,18 @@ const Massif = ({ isLoading, error, massif }) => {
                   guidelines={massif.guidelines}
                 />
               )}
+              <ScrollableContent
+                anchorId="organizations"
+                title={formatMessage({ id: 'Organizations' })}
+                content={
+                  <AssociationSection
+                    organizations={massif?.organizations}
+                    entityType="massif"
+                    entityId={massif.id}
+                    isLoading={isLoading}
+                  />
+                }
+              />
               {massif?.networks?.length > 0 && (
                 <ScrollableContent
                   dense

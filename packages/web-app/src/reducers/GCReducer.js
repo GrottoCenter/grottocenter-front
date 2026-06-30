@@ -62,6 +62,7 @@ import processDocuments from './ProcessDocumentsReducer';
 import projections from './Projections';
 import quicksearch from './QuicksearchReducer';
 import randomEntrance from './RandomEntranceReducer';
+import readAllNotifications from './ReadAllNotificationsReducer';
 import readNotification from './ReadNotificationReducer';
 import recentChange from './RecentChangeReducer';
 import region from './RegionReducer';
@@ -98,6 +99,9 @@ import updateMassif from './UpdateMassifReducer';
 import updateName from './UpdateNameReducer';
 import updateOrganization from './UpdateOrganization';
 import updatePerson from './UpdatePerson';
+import countryOrganization from './CountryOrganizationReducer';
+import massifOrganization from './MassifOrganizationReducer';
+import regionOrganization from './RegionOrganizationReducer';
 import updatePersonGroups from './UpdatePersonGroupesReducer';
 
 const GCReducer = combineReducers({
@@ -112,6 +116,7 @@ const GCReducer = combineReducers({
   countUnreadNotifications,
   country,
   countryEntrances,
+  countryOrganization,
   countryRegions,
   createCave,
   createDescription,
@@ -151,6 +156,7 @@ const GCReducer = combineReducers({
   map,
   massif,
   massifEntrances,
+  massifOrganization,
   mfa,
   menuNotifications,
   messaging,
@@ -164,11 +170,13 @@ const GCReducer = combineReducers({
   projections,
   quicksearch,
   randomEntrance,
+  readAllNotifications,
   readNotification,
   recentChange,
   region,
   regionDetails,
   regionEntrances,
+  regionOrganization,
   sideMenu,
   signUp,
   verifyEmail,

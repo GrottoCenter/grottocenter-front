@@ -4,6 +4,7 @@ import {
   COUNT_UNREAD_NOTIFICATIONS_SUCCESS
 } from '../actions/Notifications/CountUnreadNotifications';
 import { READ_NOTIFICATION_SUCCESS } from '../actions/Notifications/ReadNotification';
+import { READ_ALL_NOTIFICATIONS_SUCCESS } from '../actions/Notifications/ReadAllNotifications';
 import REDUCER_STATUS from './ReducerStatus';
 
 const initialState = {
@@ -38,6 +39,11 @@ const reducer = (state = initialState, action) => {
       return {
         ...state,
         count: state.count - 1
+      };
+    case READ_ALL_NOTIFICATIONS_SUCCESS:
+      return {
+        ...state,
+        count: 0
       };
     default:
       return state;

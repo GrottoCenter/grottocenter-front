@@ -11,8 +11,9 @@ export const readNotificationAction = () => ({
   type: READ_NOTIFICATION
 });
 
-export const readNotificationActionSuccess = () => ({
-  type: READ_NOTIFICATION_SUCCESS
+export const readNotificationActionSuccess = notificationId => ({
+  type: READ_NOTIFICATION_SUCCESS,
+  notificationId
 });
 
 export const readNotificationActionFailure = error => ({
@@ -32,7 +33,7 @@ export function readNotification(notificationId) {
     return fetch(readNotificationUrl(notificationId), requestOptions)
       .then(checkAuthStatus(dispatch))
       .then(() => {
-        dispatch(readNotificationActionSuccess());
+        dispatch(readNotificationActionSuccess(notificationId));
       })
       .catch(error => {
         if (error.isAuthError) return;
@@ -41,8 +42,7 @@ export function readNotification(notificationId) {
             makeErrorMessage(
               error.message,
               `Reading notification with id ${notificationId}`
-            ),
-            error.message
+            )
           )
         );
       });

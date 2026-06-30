@@ -5,6 +5,7 @@ const API_BASE_PATH = `${API_URL}/api/${apiVersion}`;
 export const dynamicNumbersUrl = {
   documents: `${API_BASE_PATH}/documents/count`,
   entrances: `${API_BASE_PATH}/entrances/count`,
+  massifs: `${API_BASE_PATH}/massifs/count`,
   officialPartners: `${API_BASE_PATH}/partners/count`,
   organizations: `${API_BASE_PATH}/organizations/count`,
   publicEntrances: `${API_BASE_PATH}/entrances/publicCount`,
@@ -72,6 +73,14 @@ export const getRegionEntrancesUrl = (countryId, regionId, { limit, offset } = {
   const query = params.toString();
   return `${API_BASE_PATH}/entrances/with-quality/countries/${countryId}/regions/${regionId}${query ? `?${query}` : ''}`;
 };
+export const putCountryOrganizationUrl = (countryId, organizationId) =>
+  `${API_BASE_PATH}/countries/${countryId}/organizations/${organizationId}`;
+export const deleteCountryOrganizationUrl = (countryId, organizationId) =>
+  `${API_BASE_PATH}/countries/${countryId}/organizations/${organizationId}`;
+export const putRegionOrganizationUrl = (countryId, regionId, organizationId) =>
+  `${API_BASE_PATH}/countries/${countryId}/regions/${regionId}/organizations/${organizationId}`;
+export const deleteRegionOrganizationUrl = (countryId, regionId, organizationId) =>
+  `${API_BASE_PATH}/countries/${countryId}/regions/${regionId}/organizations/${organizationId}`;
 
 // ===== Descriptions urls
 export const postDescriptionUrl = `${API_BASE_PATH}/descriptions`;
@@ -256,11 +265,17 @@ export const unmarkMassifSensitiveUrl = massifId =>
 export const previewMassifSensitiveUrl = massifId =>
   `${API_BASE_PATH}/massifs/${massifId}/preview-sensitive`;
 
+export const putMassifOrganizationUrl = (massifId, organizationId) =>
+  `${API_BASE_PATH}/massifs/${massifId}/organizations/${organizationId}`;
+export const deleteMassifOrganizationUrl = (massifId, organizationId) =>
+  `${API_BASE_PATH}/massifs/${massifId}/organizations/${organizationId}`;
+
 // ===== Notifications urls
 export const countUnreadNotificationsUrl = `${API_URL}/api/${apiVersion}/notifications/unread/count`;
 export const fetchNotificationsUrl = `${API_URL}/api/${apiVersion}/notifications`;
 export const readNotificationUrl = notificationId =>
   `${API_URL}/api/${apiVersion}/notifications/${notificationId}/read`;
+export const readAllNotificationsUrl = `${API_URL}/api/${apiVersion}/notifications/read`;
 
 // ===== Messaging urls
 export const postMessageUrl = `${API_BASE_PATH}/messages`;

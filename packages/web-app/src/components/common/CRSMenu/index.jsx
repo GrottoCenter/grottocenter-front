@@ -18,8 +18,16 @@ import SearchInput from '../SearchInput';
 import Translate from '../Translate';
 import { WGS84_DD, DMS_CODE } from '../../../hooks';
 
+import { defineMessages } from 'react-intl';
+
 const WGS84_LABEL = 'Decimal degrees (WGS84)';
 const DMS_LABEL = 'Degrees Minutes Seconds';
+
+defineMessages({
+  wgs84: { id: 'Decimal degrees (WGS84)' },
+  dms: { id: 'Degrees Minutes Seconds' }
+});
+
 
 const CRSMenu = ({ anchorEl = null, onClose, preferred, projections = [], onSelect }) => {
   const { formatMessage, locale } = useIntl();
