@@ -1,11 +1,14 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import NotificationsOffIcon from '@mui/icons-material/NotificationsOff';
+import DoneAllIcon from '@mui/icons-material/DoneAll';
 import {
   Box,
   Chip,
   Divider,
+  IconButton,
   Menu,
   MenuItem,
+  Tooltip,
   Typography,
   Skeleton
 } from '@mui/material';
@@ -19,6 +22,7 @@ import { fetchMenuNotifications } from '../../../actions/Notifications/GetMenuNo
 import REDUCER_STATUS from '../../../reducers/ReducerStatus';
 import NotificationsMenuItem from './NotificationMenuItem';
 import { readNotification } from '../../../actions/Notifications/ReadNotification';
+import { readAllNotifications } from '../../../actions/Notifications/ReadAllNotifications';
 import { countUnreadNotifications } from '../../../actions/Notifications/CountUnreadNotifications';
 
 const NOTIFICATION_WIDTH = 320;
@@ -51,6 +55,22 @@ const NotificationMenu = () => {
   const { count: nbNotifications } = useSelector(
     state => state.countUnreadNotifications
   );
+  const { status: readAllStatus } = useSelector(
+    state => state.readAllNotifications
+  );
+
+  const prevReadAllStatus = useRef(readAllStatus);
+
+  useEffect(() => {
+    if (
+      readAllStatus === REDUCER_STATUS.SUCCEEDED &&
+      prevReadAllStatus.current !== REDUCER_STATUS.SUCCEEDED
+    ) {
+      dispatch(fetchMenuNotifications({ size: NUMBER_OF_NOTIFICATIONS }));
+      dispatch(countUnreadNotifications());
+    }
+    prevReadAllStatus.current = readAllStatus;
+  }, [dispatch, readAllStatus]);
 
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
@@ -83,6 +103,10 @@ const NotificationMenu = () => {
     navigate('/ui/notifications');
   }, [handleClose, navigate]);
 
+  const handleReadAll = useCallback(() => {
+    dispatch(readAllNotifications());
+  }, [dispatch]);
+
   if (!isAuth) return '';
   return (
     <>
@@ -102,8 +126,19 @@ const NotificationMenu = () => {
         open={open}
         onClose={handleClose}
         slotProps={{
-          list: { disablePadding: true },
-          paper: { sx: { mt: '4px', minWidth: NOTIFICATION_WIDTH } }
+          list: {
+            disablePadding: true,
+            sx: { display: 'flex', flexDirection: 'column' }
+          },
+          paper: {
+            sx: {
+              mt: '4px',
+              minWidth: NOTIFICATION_WIDTH,
+              maxHeight: 'none',
+              display: 'flex',
+              flexDirection: 'column'
+            }
+          }
         }}>
         {/* Header */}
         <Box
@@ -113,63 +148,78 @@ const NotificationMenu = () => {
             bgcolor: 'action.hover',
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'space-between'
+            justifyContent: 'space-between',
+            flexShrink: 0
           }}>
           <Typography variant="body2" color="text.primary">
             {formatMessage({ id: 'Notifications' })}
           </Typography>
-          {nbNotifications > 0 && (
-            <Chip label={nbNotifications} color="secondary" size="small" />
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            {nbNotifications > 0 && (
+              <Chip label={nbNotifications} color="secondary" size="small" />
+            )}
+            <Tooltip
+              title={formatMessage({
+                id: nbNotifications
+                  ? 'Mark all as read'
+                  : 'No unread notifications'
+              })}>
+              <span>
+                <IconButton
+                  color="secondary"
+                  size="small"
+                  disabled={!nbNotifications}
+                  onClick={handleReadAll}>
+                  <DoneAllIcon fontSize="small" />
+                </IconButton>
+              </span>
+            </Tooltip>
+          </Box>
+        </Box>
+
+        <Divider sx={{ flexShrink: 0 }} />
+
+        {/* Scrollable notifications list */}
+        <Box sx={{ overflowY: 'auto', maxHeight: 400 }}>
+          {status === REDUCER_STATUS.LOADING &&
+            !notifications &&
+            createSkeletons(Math.min(nbNotifications, 100) || 3)}
+          {notifications &&
+            notifications.length > 0 &&
+            notifications
+              .slice(0, NUMBER_OF_NOTIFICATIONS)
+              .map((notification, idx) => (
+                <div key={notification.id}>
+                  <NotificationsMenuItem
+                    notification={notification}
+                    onClick={handleNotificationClick}
+                  />
+                  {idx !== notifications.length - 1 && <Divider />}
+                </div>
+              ))}
+
+          {/* Empty state */}
+          {notifications && notifications.length === 0 && (
+            <Box
+              sx={{
+                px: 2,
+                py: 3,
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: 1,
+                color: 'action.active'
+              }}>
+              <NotificationsOffIcon />
+              <Typography variant="body2">
+                {formatMessage({ id: 'You have no notifications.' })}
+              </Typography>
+            </Box>
           )}
         </Box>
 
-        {(status === REDUCER_STATUS.LOADING || notifications !== null) && (
-          <Divider />
-        )}
-
-        {/* Notifications list */}
-        {status === REDUCER_STATUS.LOADING &&
-          !notifications &&
-          // Arbitrary number (3) of notifications if real number is not available
-          createSkeletons(Math.min(nbNotifications, 100) || 3)}
-        {notifications &&
-          notifications.length > 0 &&
-          notifications
-            .slice(0, NUMBER_OF_NOTIFICATIONS)
-            .map((notification, idx) => (
-              <div key={notification.id}>
-                <NotificationsMenuItem
-                  notification={notification}
-                  onClick={handleNotificationClick}
-                />
-                {idx !== notifications.length - 1 && <Divider />}
-              </div>
-            ))}
-
-        {/* Empty state */}
-        {notifications && notifications.length === 0 && (
-          <Box
-            sx={{
-              px: 2,
-              py: 3,
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              gap: 1,
-              color: 'action.active'
-            }}>
-            <NotificationsOffIcon />
-            <Typography variant="body2">
-              {formatMessage({ id: 'You have no notifications.' })}
-            </Typography>
-          </Box>
-        )}
-
-        {(status === REDUCER_STATUS.LOADING || notifications !== null) && (
-          <Divider />
-        )}
-
-        {/* Footer action */}
+        {/* Sticky footer */}
+        <Divider sx={{ flexShrink: 0 }} />
         <SeeAllMenuItem onClick={handleSeeAllClick}>
           {formatMessage({ id: 'See all notifications' })}
         </SeeAllMenuItem>

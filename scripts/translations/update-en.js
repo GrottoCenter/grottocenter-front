@@ -16,23 +16,20 @@ const EN_JSON_PATH = 'packages/web-app/public/lang/en.json';
 // first > (inside />) and ([\s\S]*?)<\/Translate> then fails to find a closing tag.
 const TRANSLATE_COMPONENT_REGEX = /<Translate[^>]*>([\s\S]*?)<\/Translate>/g;
 const FORMAT_MESSAGE_REGEX =
-  /formatMessage\(\s*\{[\s\S]*?id:\s*(['"`])((?:(?!\1)[\s\S])*)\1/g;
+  /formatMessage\(\s*\{[\s\S]*?id:\s*(['"`])((?:\\.|(?!\1)[^\\])*)\1/g;
 const INTL_FORMAT_MESSAGE_REGEX =
-  /intl\.formatMessage\(\s*\{[\s\S]*?id:\s*(['"`])((?:(?!\1)[\s\S])*)\1/g;
+  /intl\.formatMessage\(\s*\{[\s\S]*?id:\s*(['"`])((?:\\.|(?!\1)[^\\])*)\1/g;
 
 /**
  * Validate if a key is safe for JSON and not truncated
  */
 function isValidTranslationKey(key) {
   if (!key || key.length === 0) return false;
-  if (key.includes('{') || key.includes('$')) return false;
-  if (
-    key.includes('<') ||
-    key.includes('>') ||
-    key.includes('(') ||
-    key.includes(')')
-  )
-    return false;
+  if (key.includes('$')) return false;
+  if (key.includes('<') || key.includes('>')) return false;
+
+  // Ignore dynamic JS expressions in JSX like {value} or {col.label}
+  if (key.startsWith('{') && key.endsWith('}')) return false;
 
   // Check for truncated contractions (words ending with 'n' that should be "n't")
   if (
@@ -100,7 +97,7 @@ function extractKeysFromContent(content) {
     /defineMessages\(\s*\{([\s\S]*?)\}\s*\)/g
   )) {
     for (const idMatch of blockMatch[1].matchAll(
-      /id:\s*(['"`])((?:(?!\1)[\s\S])*?)\1/g
+      /id:\s*(['"`])((?:\\.|(?!\1)[^\\])*?)\1/g
     )) {
       const key = idMatch[2];
       if (isValidTranslationKey(key)) keys.add(key);

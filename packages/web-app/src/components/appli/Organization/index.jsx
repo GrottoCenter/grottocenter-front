@@ -22,6 +22,7 @@ import ResponsiveActions from '../../common/Layouts/ResponsiveActions';
 import ScrollableContent from '../../common/Layouts/Fixed/ScrollableContent';
 import CustomIcon from '../../common/CustomIcon';
 import Details from './Details';
+import ManagedEntitiesSection from './ManagedEntitiesSection';
 import { GrottoFullPropTypes } from '../../../types/grotto.type';
 import Alert from '../../common/Alert';
 import { usePermissions, useSharePage } from '../../../hooks';
@@ -270,6 +271,15 @@ const Organization = ({ error, isLoading, organization }) => {
             }}
           />
           <ScrollableContent content={<Details organization={organization} />} />
+          {(organization?.countries?.length > 0 || organization?.regions?.length > 0 || organization?.massifs?.length > 0) && (
+            <ScrollableContent
+              anchorId="managed-entities"
+              title={formatMessage({ id: 'Managed entities' })}
+              defaultExpanded
+              count={(organization?.countries?.length || 0) + (organization?.regions?.length || 0) + (organization?.massifs?.length || 0)}
+              content={<ManagedEntitiesSection organization={organization} />}
+            />
+          )}
           <ScrollableContent
             anchorId="members"
             title={formatMessage({ id: 'Members or former members' })}

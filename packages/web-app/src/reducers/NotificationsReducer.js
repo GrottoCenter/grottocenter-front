@@ -3,6 +3,7 @@ import {
   FETCH_NOTIFICATIONS_FAILURE,
   FETCH_NOTIFICATIONS_SUCCESS
 } from '../actions/Notifications/GetNotifications';
+import { READ_NOTIFICATION_SUCCESS } from '../actions/Notifications/ReadNotification';
 
 const initialState = {
   error: undefined,
@@ -28,6 +29,16 @@ const reducer = (state = initialState, action) => {
       return {
         ...initialState,
         error: action.error
+      };
+    case READ_NOTIFICATION_SUCCESS:
+      if (!state.notifications) return state;
+      return {
+        ...state,
+        notifications: state.notifications.map(n =>
+          n.id === action.notificationId
+            ? { ...n, dateReadAt: new Date().toISOString() }
+            : n
+        )
       };
     default:
       return state;
