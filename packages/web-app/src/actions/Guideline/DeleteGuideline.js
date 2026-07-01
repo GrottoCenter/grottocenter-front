@@ -5,14 +5,18 @@ import { checkAuthStatus } from '../utils';
 
 export const DELETE_GUIDELINE = 'DELETE_GUIDELINE';
 export const DELETE_GUIDELINE_SUCCESS = 'DELETE_GUIDELINE_SUCCESS';
+export const DELETE_GUIDELINE_PERMANENT_SUCCESS =
+  'DELETE_GUIDELINE_PERMANENT_SUCCESS';
 export const DELETE_GUIDELINE_FAILURE = 'DELETE_GUIDELINE_FAILURE';
 
 export const deleteGuidelineAction = () => ({
   type: DELETE_GUIDELINE
 });
 
-export const deleteGuidelineSuccess = guideline => ({
-  type: DELETE_GUIDELINE_SUCCESS,
+export const deleteGuidelineSuccess = (guideline, isPermanent) => ({
+  type: isPermanent
+    ? DELETE_GUIDELINE_PERMANENT_SUCCESS
+    : DELETE_GUIDELINE_SUCCESS,
   guideline
 });
 
@@ -34,7 +38,7 @@ export const deleteGuideline =
     return fetch(deleteGuidelineUrl(id, isPermanent), requestOptions)
       .then(checkAuthStatus(dispatch))
       .then(response => response.json())
-      .then(data => dispatch(deleteGuidelineSuccess(data)))
+      .then(data => dispatch(deleteGuidelineSuccess(data, isPermanent)))
       .catch(error => {
         if (error.isAuthError) return;
         dispatch(

@@ -68,6 +68,9 @@ const Guideline = ({
             isDeleted={guideline.isDeleted}
             canEdit={isEditAllowed && permissions.isAuth}
             canDelete={isEditAllowed && permissions.isModerator}
+            // Permanent deletion of a guideline is admin-only on the API
+            // (guideline/delete.js), unlike its soft-delete which moderators may do.
+            canPermanentlyDelete={isEditAllowed && permissions.isAdmin}
             snapshotEl={
               <SnapshotButton id={guideline.id} type="guidelines" />
             }

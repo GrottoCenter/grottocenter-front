@@ -32,6 +32,11 @@ const ActionButtons = ({
   isDeleted,
   canEdit,
   canDelete,
+  // Permission to hard-delete an already soft-deleted entity. Defaults to
+  // `canDelete` so existing callers keep their behaviour; callers whose API
+  // restricts permanent deletion further (e.g. guidelines: admin-only) pass a
+  // narrower value.
+  canPermanentlyDelete = canDelete,
   snapshotEl,
   onDeletePress,
   onRestorePress,
@@ -61,7 +66,7 @@ const ActionButtons = ({
           </Button>
         </Tooltip>
       )}
-      {!isUpdating && canDelete && (
+      {!isUpdating && (isDeleted ? canPermanentlyDelete : canDelete) && (
         <Tooltip
           title={
             isDeleted
@@ -125,6 +130,7 @@ ActionButtons.propTypes = {
   isDeleted: PropTypes.bool.isRequired,
   canEdit: PropTypes.bool.isRequired,
   canDelete: PropTypes.bool.isRequired,
+  canPermanentlyDelete: PropTypes.bool,
   snapshotEl: PropTypes.element.isRequired,
   onDeletePress: PropTypes.func.isRequired,
   onRestorePress: PropTypes.func.isRequired,

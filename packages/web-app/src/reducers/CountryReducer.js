@@ -5,7 +5,10 @@ import {
 } from '../actions/Country/GetCountry';
 import { POST_GUIDELINE_SUCCESS } from '../actions/Guideline/CreateGuideline';
 import { PATCH_GUIDELINE_SUCCESS } from '../actions/Guideline/UpdateGuideline';
-import { DELETE_GUIDELINE_SUCCESS } from '../actions/Guideline/DeleteGuideline';
+import {
+  DELETE_GUIDELINE_SUCCESS,
+  DELETE_GUIDELINE_PERMANENT_SUCCESS
+} from '../actions/Guideline/DeleteGuideline';
 import { RESTORE_GUIDELINE_SUCCESS } from '../actions/Guideline/RestoreGuideline';
 import { ROLLBACK_GUIDELINE_SUCCESS } from '../actions/Guideline/RollbackGuideline';
 
@@ -80,6 +83,23 @@ const reducer = (state = initialState, action) => {
           guidelines: exists
             ? guidelines.map(g => (g.id === action.guideline.id ? action.guideline : g))
             : [...guidelines, action.guideline]
+        }
+      };
+    }
+
+    // Hard delete: drop the guideline from the list entirely. Removal by id is
+    // idempotent, so we don't gate on the response carrying `countries`.
+    case DELETE_GUIDELINE_PERMANENT_SUCCESS: {
+      if (!state.country) {
+        return state;
+      }
+      return {
+        ...state,
+        country: {
+          ...state.country,
+          guidelines: (state.country.guidelines || []).filter(
+            g => g.id !== action.guideline.id
+          )
         }
       };
     }
