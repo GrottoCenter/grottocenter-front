@@ -90,7 +90,7 @@
     "@testing-library/dom": "^10.4.1",
     "@types/validator": "^13",
     "fast-check": "4.5.3",
-    "sharp": "^0.34.5",
+    "sharp": "^0.35.2",
     "storybook": "^8.6.18",
     "storybook-react-router": "1.0.8"
   },
