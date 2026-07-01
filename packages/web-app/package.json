@@ -101,7 +101,10 @@
     "transformIgnorePatterns": [
       "[/\\\\]node_modules[/\\\\](?!fast-check|@fast-check|pure-rand|react-intl|@formatjs|intl-messageformat|@turf).+\\.(js|jsx|mjs|cjs|ts|tsx)$",
       "^.+\\.module\\.(css|sass|scss)$"
-    ]
+    ],
+    "moduleNameMapper": {
+      "^pure-rand/(.*)$": "pure-rand/lib/$1.js"
+    }
   },
   "browserslist": {
     "production": [
