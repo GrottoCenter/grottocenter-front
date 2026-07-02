@@ -37,8 +37,17 @@ export const deleteGuideline =
 
     return fetch(deleteGuidelineUrl(id, isPermanent), requestOptions)
       .then(checkAuthStatus(dispatch))
-      .then(response => response.json())
-      .then(data => dispatch(deleteGuidelineSuccess(data, isPermanent)))
+      // Tolerate an empty body (e.g. 204 No Content): calling response.json()
+      // on it would throw and route us into the failure branch even though the
+      // deletion succeeded, leaving the view stale.
+      .then(response =>
+        response.status === 204 ? null : response.json().catch(() => null)
+      )
+      // Always carry the known id so the reducers can drop/update the guideline
+      // even when the response doesn't echo it back.
+      .then(data =>
+        dispatch(deleteGuidelineSuccess({ ...(data || {}), id }, isPermanent))
+      )
       .catch(error => {
         if (error.isAuthError) return;
         dispatch(
