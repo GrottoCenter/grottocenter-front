@@ -2822,7 +2822,7 @@ __metadata:
     react-papaparse: "npm:^4.4.0"
     react-phone-input-2: "npm:^2.15.1"
     react-redux: "npm:^9.3.0"
-    react-router: "npm:^7.17.0"
+    react-router: "npm:^7.18.1"
     react-router-dom: "npm:^7.18.1"
     react-scripts: "npm:^5.0.1"
     react-select-country-list: "npm:^2.2.3"
@@ -17147,7 +17147,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-router@npm:7.18.1":
+"react-router@npm:7.18.1, react-router@npm:^7.18.1":
   version: 7.18.1
   resolution: "react-router@npm:7.18.1"
   dependencies:
@@ -17160,22 +17160,6 @@ __metadata:
     react-dom:
       optional: true
   checksum: 10/f507876822281499759abc53b3230375f706aa45c66b9ba271308f7420501ff1e5430443c560028299210efe1797141d2297c3bb6d09f3ef175220c1ae67a368
-  languageName: node
-  linkType: hard
-
-"react-router@npm:^7.17.0":
-  version: 7.17.0
-  resolution: "react-router@npm:7.17.0"
-  dependencies:
-    cookie: "npm:^1.0.1"
-    set-cookie-parser: "npm:^2.6.0"
-  peerDependencies:
-    react: ">=18"
-    react-dom: ">=18"
-  peerDependenciesMeta:
-    react-dom:
-      optional: true
-  checksum: 10/0f1303150cd607682f911c32b3584cb88bd6312004553032b4db36a7917eae1eba08ba527d42647cb3842e76c313b2ad67fafa1cbfe554c14e6e87c13535b8a1
   languageName: node
   linkType: hard
 
