@@ -57,6 +57,12 @@ export const useNameDuplicateSuggestions = (name, enabled = true) => {
         setSuggestions([]);
         setIsLoading(false);
       });
+
+    // On unmount (or before the next run) bump the id so the in-flight response
+    // is treated as stale and never calls setState on an unmounted component.
+    return () => {
+      requestIdRef.current += 1;
+    };
   }, [debouncedQuery, enabled]);
 
   return { suggestions, isLoading };
