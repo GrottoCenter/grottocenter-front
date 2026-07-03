@@ -10,7 +10,15 @@ export const makeCoordinatesValue = (latitude, longitude) =>
 export const Information = ({ icon, value, url, isTitle = false }) => (
   <div className="map-popup-property">
     {icon}
-    <Typography variant={isTitle ? 'h5' : 'body2'}>
+    {/*
+      Popup title kept to a compact card size rather than an h-heading. Styled via
+      the global `.map-popup-title` class (in App.css), not sx: popups are serialized
+      with renderToString into a detached HTML string where emotion's hashed sx
+      classes aren't injected — global classes always are. See sibling .map-popup-property.
+    */}
+    <Typography
+      variant={isTitle ? 'subtitle1' : 'body2'}
+      className={isTitle ? 'map-popup-title' : undefined}>
       {!url && value}
       {url && (
         <GCLink internal href={url}>

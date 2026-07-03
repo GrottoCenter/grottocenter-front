@@ -1,8 +1,9 @@
-import React, { useEffect } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 import { includes, values } from 'ramda';
 import PropTypes from 'prop-types';
 import { heatmapTypes } from './DataControl';
 import useMarkers, { MarkerGlobalCss } from '../common/Markers/useMarkers';
+import useNetworkHighlight from './useNetworkHighlight';
 import { getEntranceCircleStyle } from './constants';
 import {
   OrganizationMarker,
@@ -36,6 +37,30 @@ const Markers = ({
   entrances = [],
   networks = []
 }) => {
+  const { showHighlight, hideHighlight } = useNetworkHighlight();
+  // Keep the highlight visible while a network popup is open (touch devices have
+  // no hover), and only hide on mouseout when nothing is pinned.
+  const pinnedNetworkRef = useRef(null);
+
+  const handleNetworkOver = useCallback(
+    network => showHighlight(network),
+    [showHighlight]
+  );
+  const handleNetworkOut = useCallback(() => {
+    if (pinnedNetworkRef.current == null) hideHighlight();
+  }, [hideHighlight]);
+  const handleNetworkPopupOpen = useCallback(
+    network => {
+      pinnedNetworkRef.current = network.id;
+      showHighlight(network);
+    },
+    [showHighlight]
+  );
+  const handleNetworkPopupClose = useCallback(() => {
+    pinnedNetworkRef.current = null;
+    hideHighlight();
+  }, [hideHighlight]);
+
   const updateEntranceMarkers = useMarkers({
     circleMarkerStyle: getEntranceCircleStyle,
     popupContent: entrancePopup,
@@ -44,7 +69,11 @@ const Markers = ({
   const updateNetworkMarkers = useMarkers({
     icon: NetworkMarker,
     popupContent: networkPopup,
-    tooltipContent: networkTip
+    tooltipContent: networkTip,
+    onMarkerOver: handleNetworkOver,
+    onMarkerOut: handleNetworkOut,
+    onPopupOpen: handleNetworkPopupOpen,
+    onPopupClose: handleNetworkPopupClose
   });
   const updateOrganizationMarkers = useMarkers({
     icon: OrganizationMarker,
@@ -57,8 +86,14 @@ const Markers = ({
   }, [entrances, visibleMarkers, updateEntranceMarkers]);
 
   useEffect(() => {
-    updateNetworkMarkers(isNetworks(visibleMarkers) ? networks : null);
-  }, [networks, visibleMarkers, updateNetworkMarkers]);
+    const networksVisible = isNetworks(visibleMarkers);
+    updateNetworkMarkers(networksVisible ? networks : null);
+    // Drop any lingering highlight when the network layer is hidden.
+    if (!networksVisible) {
+      pinnedNetworkRef.current = null;
+      hideHighlight();
+    }
+  }, [networks, visibleMarkers, updateNetworkMarkers, hideHighlight]);
 
   useEffect(() => {
     updateOrganizationMarkers(
