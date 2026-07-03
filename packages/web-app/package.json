@@ -20,7 +20,7 @@
     "@mui/lab": "^7.0.1-beta.25",
     "@mui/material": "^7.3.9",
     "@mui/styles": "^6.4.8",
-    "@mui/x-date-pickers": "^9.4.0",
+    "@mui/x-date-pickers": "^9.7.0",
     "@react-leaflet/core": "3.0.0",
     "@reactour/tour": "^3.8.0",
     "@testing-library/jest-dom": "^6.9.1",
@@ -32,7 +32,7 @@
     "@turf/line-intersect": "^7.3.5",
     "@turf/rewind": "^7.3.5",
     "coordinate-parser": "^1.0.7",
-    "cypress": "^15.17.0",
+    "cypress": "^15.18.0",
     "d3": "^7.9.0",
     "d3-hexbin": "^0.2.2",
     "date-fns": "^4.4.0",
@@ -40,7 +40,7 @@
     "isomorphic-fetch": "^3.0.0",
     "leaflet": "^1.9.4",
     "leaflet-draw": "^1.0.4",
-    "leaflet.fullscreen": "^5.3.1",
+    "leaflet.fullscreen": "^5.3.3",
     "leaflet.locatecontrol": "^0.90.0",
     "linkify-react": "^4.3.3",
     "linkifyjs": "^4.3.3",
@@ -57,15 +57,15 @@
     "react-dom": "^19.2.7",
     "react-dropzone-uploader": "^2.11.0",
     "react-error-boundary": "^6.1.2",
-    "react-hook-form": "^7.78.0",
+    "react-hook-form": "^7.80.0",
     "react-intl": "^8.1.4",
     "react-leaflet": "^5.0.0",
     "react-leaflet-draw": "^0.21.0",
     "react-papaparse": "^4.4.0",
     "react-phone-input-2": "^2.15.1",
     "react-redux": "^9.3.0",
-    "react-router": "^7.17.0",
-    "react-router-dom": "^7.17.0",
+    "react-router": "^7.18.1",
+    "react-router-dom": "^7.18.1",
     "react-scripts": "^5.0.1",
     "react-select-country-list": "^2.2.3",
     "react-socks": "^2.2.0",
@@ -75,7 +75,7 @@
     "redux-thunk": "^3.1.0",
     "shpjs": "^6.2.0",
     "simplify-js": "^1.2.4",
-    "swagger-ui-react": "^5.32.6",
+    "swagger-ui-react": "^5.32.8",
     "validator": "^13.15.35",
     "web-vitals": "^5.3.0"
   },
@@ -89,8 +89,8 @@
     "@storybook/react-webpack5": "8.6.18",
     "@testing-library/dom": "^10.4.1",
     "@types/validator": "^13",
-    "fast-check": "4.5.3",
-    "sharp": "^0.34.5",
+    "fast-check": "4.8.0",
+    "sharp": "^0.35.2",
     "storybook": "^8.6.18",
     "storybook-react-router": "1.0.8"
   },
@@ -101,7 +101,10 @@
     "transformIgnorePatterns": [
       "[/\\\\]node_modules[/\\\\](?!fast-check|@fast-check|pure-rand|react-intl|@formatjs|intl-messageformat|@turf).+\\.(js|jsx|mjs|cjs|ts|tsx)$",
       "^.+\\.module\\.(css|sass|scss)$"
-    ]
+    ],
+    "moduleNameMapper": {
+      "^pure-rand/(.*)$": "pure-rand/lib/$1.js"
+    }
   },
   "browserslist": {
     "production": [

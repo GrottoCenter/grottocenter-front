@@ -212,11 +212,13 @@ export const EntranceForm = ({
           entranceId={entranceValues?.id}
           reset={handleReset}
           disabled={!isNewEntrance}
+          isNewEntrance={isNewEntrance}
         />
         <EntranceDetail
           control={control}
           errors={errors}
           getValues={getValues}
+          isNewEntrance={isNewEntrance}
         />
         <CaveDetail
           control={control}
