@@ -15,3 +15,5 @@ export { useExplored } from './useExplored';
 export { default as useSharePage } from './useSharePage';
 export { default as useOpenLink } from './useOpenLink';
 export { useOpenBi } from './useOpenBi';
+export { useNameDuplicateSuggestions } from './useNameDuplicateSuggestions';
+export { useNearbyEntrances } from './useNearbyEntrances';

@@ -19,6 +19,7 @@ import Alert from '../../../common/Alert';
 import { FormRow, FormSectionLabel } from '../utils/FormContainers';
 import InputLanguage from '../utils/InputLanguage';
 import InputText from '../utils/InputText';
+import NameSuggestionDropdown from './NameSuggestionDropdown';
 
 const FormControl = styled(MuiFormControl)`
   padding-bottom: ${({ theme }) => theme.spacing(4)};
@@ -32,7 +33,8 @@ const EditTypeSelection = ({
   allowMoveFromCave,
   entranceId,
   reset,
-  disabled = false
+  disabled = false,
+  isNewEntrance = false
 }) => {
   const { formatMessage } = useIntl();
   const navigate = useNavigate();
@@ -90,14 +92,19 @@ const EditTypeSelection = ({
       </FormControl>
       {entityType === ENTRANCE_AND_CAVE ? (
         <FormRow>
-          <InputText
-            formKey="cave.name"
-            labelName="Entrance name (which is also the cave name)"
+          <NameSuggestionDropdown
             control={control}
-            isError={!!errors?.cave?.name}
-            isRequired
-            onChangeAdditionalFn={onNameChange}
-          />
+            formKey="cave.name"
+            enabled={isNewEntrance}>
+            <InputText
+              formKey="cave.name"
+              labelName="Entrance name (which is also the cave name)"
+              control={control}
+              isError={!!errors?.cave?.name}
+              isRequired
+              onChangeAdditionalFn={onNameChange}
+            />
+          </NameSuggestionDropdown>
           <InputLanguage
             formKey="cave.language"
             labelName="Cave name language"
@@ -119,13 +126,18 @@ const EditTypeSelection = ({
             label={formatMessage({ id: 'Basic Information' })}
           />
           <FormRow>
-            <InputText
-              formKey="entrance.name"
-              labelName="Entrance name"
+            <NameSuggestionDropdown
               control={control}
-              isError={!!errors?.entrance?.name}
-              isRequired
-            />
+              formKey="entrance.name"
+              enabled={isNewEntrance}>
+              <InputText
+                formKey="entrance.name"
+                labelName="Entrance name"
+                control={control}
+                isError={!!errors?.entrance?.name}
+                isRequired
+              />
+            </NameSuggestionDropdown>
             <InputLanguage
               formKey="entrance.language"
               labelName="Entrance name language"
@@ -157,7 +169,8 @@ EditTypeSelection.propTypes = {
   allowMoveFromCave: PropTypes.bool.isRequired,
   entranceId: PropTypes.number,
   disabled: PropTypes.bool,
-  reset: PropTypes.func
+  reset: PropTypes.func,
+  isNewEntrance: PropTypes.bool
 };
 
 export default EditTypeSelection;
