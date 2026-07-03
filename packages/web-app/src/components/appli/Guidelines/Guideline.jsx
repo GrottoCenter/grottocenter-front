@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { Box, ListItem, ListItemText } from '@mui/material';
 import { useDispatch } from 'react-redux';
+import { useIntl } from 'react-intl';
 import { styled } from '@mui/material/styles';
 import { SnapshotButton } from '../Entry/Snapshots/UtilityFunction';
 import GuidelinePropTypes from '../../../types/guideline.type';
@@ -11,7 +12,7 @@ import { deleteGuideline } from '../../../actions/Guideline/DeleteGuideline';
 import { restoreGuideline } from '../../../actions/Guideline/RestoreGuideline';
 import ActionButtons from '../Entry/ActionButtons';
 import SectionTitle from '../Entry/SectionTitle';
-import { usePermissions } from '../../../hooks';
+import { usePermissions, useNotification } from '../../../hooks';
 import Contribution from '../../common/Contribution/Contribution';
 
 const ListItemStyled = styled(ListItem)`
@@ -27,6 +28,8 @@ const Guideline = ({
 }) => {
   const dispatch = useDispatch();
   const permissions = usePermissions();
+  const { formatMessage } = useIntl();
+  const { onError } = useNotification();
   const [isUpdateFormVisible, setIsUpdateFormVisible] = useState(false);
   const [wantedDeletedState, setWantedDeletedState] = useState(guideline.isDeleted);
 
@@ -46,13 +49,34 @@ const Guideline = ({
     if (result) setIsUpdateFormVisible(false);
   };
 
-  const onDeletePress = isPermanent => {
+  const onDeletePress = async isPermanent => {
     setWantedDeletedState(true);
-    dispatch(deleteGuideline({ id: guideline.id, isPermanent }));
+    // On success the reducer removes/updates the guideline in place. On failure
+    // the request errored (e.g. a non-2xx response): surface it instead of
+    // leaving the view silently stale, and revert the optimistic loading state.
+    const ok = await dispatch(deleteGuideline({ id: guideline.id, isPermanent }));
+    if (!ok) {
+      setWantedDeletedState(guideline.isDeleted);
+      onError(
+        formatMessage({
+          id: 'guidelines.delete_error',
+          defaultMessage: 'Failed to delete the guideline'
+        })
+      );
+    }
   };
-  const onRestorePress = () => {
+  const onRestorePress = async () => {
     setWantedDeletedState(false);
-    dispatch(restoreGuideline({ id: guideline.id }));
+    const ok = await dispatch(restoreGuideline({ id: guideline.id }));
+    if (!ok) {
+      setWantedDeletedState(guideline.isDeleted);
+      onError(
+        formatMessage({
+          id: 'guidelines.restore_error',
+          defaultMessage: 'Failed to restore the guideline'
+        })
+      );
+    }
   };
 
   const isActionLoading = wantedDeletedState !== guideline.isDeleted;

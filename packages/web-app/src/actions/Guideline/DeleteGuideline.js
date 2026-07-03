@@ -45,16 +45,21 @@ export const deleteGuideline =
       )
       // Always carry the known id so the reducers can drop/update the guideline
       // even when the response doesn't echo it back.
-      .then(data =>
-        dispatch(deleteGuidelineSuccess({ ...(data || {}), id }, isPermanent))
-      )
+      .then(data => {
+        dispatch(deleteGuidelineSuccess({ ...(data || {}), id }, isPermanent));
+        return true;
+      })
+      // Report success/failure to the caller (truthy = success) so the UI can
+      // surface a message instead of silently leaving the view stale when the
+      // request fails.
       .catch(error => {
-        if (error.isAuthError) return;
+        if (error.isAuthError) return false;
         dispatch(
           deleteGuidelineFailure(
             makeErrorMessage(error.message, `Deleting guideline`),
             error.message
           )
         );
+        return false;
       });
   };

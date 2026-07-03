@@ -37,6 +37,7 @@ const SnapshotPage = () => {
   const getAll = queryParameters.get('all') === 'true';
   const parentId = queryParameters.get('parentId');
   const parentType = queryParameters.get('parentType');
+  const backTo = queryParameters.get('backTo');
 
   const { id, type } = useParams();
 
@@ -147,9 +148,13 @@ const SnapshotPage = () => {
         }
       );
 
-  const backTarget = parentId && parentType
-    ? `/ui/${parentType}/${parentId}`
-    : `/ui/${type}/${id}`;
+  // Prefer the exact page the history was opened from (passed as `backTo`).
+  // Fall back to a rebuilt URL for older links that predate the param.
+  const backTarget =
+    backTo ||
+    (parentId && parentType
+      ? `/ui/${parentType}/${parentId}`
+      : `/ui/${type}/${id}`);
   const backLabel = formatMessage(
     { id: 'Back to {type}' },
     {

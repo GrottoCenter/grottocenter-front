@@ -1,4 +1,5 @@
 import React from 'react';
+import { useLocation } from 'react-router-dom';
 import { useIntl } from 'react-intl';
 import { Tooltip, Button } from '@mui/material';
 import HistoryIcon from '@mui/icons-material/History';
@@ -60,12 +61,20 @@ const SnapshotButton = ({
 }) => {
   const { formatMessage } = useIntl();
   const openLink = useOpenLink();
+  const location = useLocation();
+
+  // Remember the page the history was opened from so the snapshot page's "back"
+  // button returns here. Some entities (e.g. guidelines) have no standalone
+  // route of their own, and others (regions) live under nested URLs, so we can't
+  // reliably rebuild the origin URL from `type`/`id` alone.
+  const backTo = encodeURIComponent(`${location.pathname}${location.search}`);
 
   const url = `/ui/${type}/${id}/snapshots?${[
     isNetwork !== undefined ? `isNetwork=${isNetwork}` : '',
     getAll ? `all=true` : '',
     parentId !== undefined ? `parentId=${parentId}` : '',
-    parentType ? `parentType=${parentType}` : ''
+    parentType ? `parentType=${parentType}` : '',
+    `backTo=${backTo}`
   ]
     .filter(e => e)
     .join('&')}`;
