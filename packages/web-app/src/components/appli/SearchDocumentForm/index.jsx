@@ -76,16 +76,15 @@ const SearchDocumentForm = ({ closeForm, onSubmit }) => {
             {formatMessage({ id: 'Cancel' })}
           </SpacedButton>
         )}
+        <SpacedButton variant="outlined" onClick={resetForm}>
+          {formatMessage({ id: 'Reset' })}
+        </SpacedButton>
         <SpacedButton
           disabled={selectedDocuments.length === 0}
           color="primary"
           type="submit"
-          onClick={handleOnSubmit}
-          style={{ mx: 1 }}>
+          onClick={handleOnSubmit}>
           {associateMessage}
-        </SpacedButton>
-        <SpacedButton variant="outlined" onClick={resetForm}>
-          {formatMessage({ id: 'Reset' })}
         </SpacedButton>
       </Box>
     </Box>

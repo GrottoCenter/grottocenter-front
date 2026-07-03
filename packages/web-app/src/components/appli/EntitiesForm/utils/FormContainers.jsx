@@ -21,6 +21,7 @@ export const FormRow = styled('div')(
     display: flex;
     justify-content: space-between;
     flex-wrap: wrap;
+    gap: ${theme.spacing(2)};
 
     ${theme.breakpoints.up('sm')} {
       flex-wrap: nowrap;
@@ -40,10 +41,6 @@ export const FormSectionLabel = ({ label }) => {
 };
 FormSectionLabel.propTypes = { label: PropTypes.string.isRequired };
 
-const Button = styled(MuiButton)`
-  margin: ${({ theme }) => theme.spacing(2)};
-`;
-
 export const FormActionRow = ({
   isNew,
   isSubmitting,
@@ -56,19 +53,20 @@ export const FormActionRow = ({
     <Box
       sx={{
         display: 'flex',
-        justifyContent: isCenter ? 'center' : 'flex-end'
+        justifyContent: isCenter ? 'center' : 'flex-end',
+        gap: 2,
+        mt: 3
       }}>
       {onCancel && (
-        <Button variant="outlined" onClick={onCancel}>
+        <MuiButton variant="outlined" onClick={onCancel}>
           {formatMessage({ id: 'Cancel' })}
-        </Button>
+        </MuiButton>
       )}
       <ActionButton
         label={formatMessage({ id: isNew ? 'Create' : 'Update' })}
         loading={isSubmitting}
         disabled={disabled}
         color="primary"
-        style={{ margin: '8px' }}
         type="submit"
       />
     </Box>

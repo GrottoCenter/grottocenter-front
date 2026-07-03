@@ -128,6 +128,8 @@ const AssociationSection = ({
     }
   };
 
+  const isEmpty = !organizations || organizations.length === 0;
+
   const associateButton = canManageAssociations && (
     <Button
       size="small"
@@ -150,6 +152,7 @@ const AssociationSection = ({
         id: 'Organizations in charge of managing this geographic entity and its caves.'
       })}
       count={organizations.length}
+      defaultExpanded={!isEmpty}
       icon={associateButton}
       content={
         isLoading ? (

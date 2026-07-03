@@ -74,7 +74,7 @@ const StatisticsDataDashboard = ({
   return (
     <ScrollableContent
       anchorId="statistics"
-      defaultExpanded={isLoading || hasData}
+      defaultExpanded={hasData}
       title={formatMessage({ id: 'More information' })}
       subheader={description}
       content={
