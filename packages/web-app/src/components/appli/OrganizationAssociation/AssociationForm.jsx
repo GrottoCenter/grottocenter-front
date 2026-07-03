@@ -23,16 +23,13 @@ import {
 // Max length for an inline-created organization name (Requirement 7 AC3).
 const ORGANIZATION_NAME_MAX_LENGTH = 200;
 
-const AssociationForm = ({
-  open,
-  onClose,
-  onSubmit,
-  status,
-  error
-}) => {
+const AssociationForm = ({ open, onClose, onSubmit, status, error }) => {
   const { formatMessage } = useIntl();
   const [inputValue, setInputValue] = useState('');
   const [options, setOptions] = useState([]);
+  // Holds ONLY an existing organization picked from the list (it always has an
+  // `id`). Free text is never stored here — the "create" path is derived from
+  // the input alone. This keeps the submit decision unambiguous.
   const [selectedOrg, setSelectedOrg] = useState(null);
   const [isSearching, setIsSearching] = useState(false);
 
@@ -40,13 +37,15 @@ const AssociationForm = ({
 
   useEffect(() => {
     let active = true;
+    const trimmed = debouncedInput.trim();
 
-    if (debouncedInput.length < AUTOCOMPLETE_MIN_CHARACTERS) {
+    if (trimmed.length < AUTOCOMPLETE_MIN_CHARACTERS) {
       setOptions([]);
       return undefined;
     }
 
-    if (selectedOrg && selectedOrg.name === debouncedInput.trim()) {
+    // The input already matches the selected organization: nothing to search.
+    if (selectedOrg && selectedOrg.name === trimmed) {
       return undefined;
     }
 
@@ -55,12 +54,13 @@ const AssociationForm = ({
     const fetchOptions = async () => {
       try {
         const data = await fetchQuickSearchRaw({
-          query: debouncedInput.trim(),
+          query: trimmed,
           entities: ['organizations']
         });
 
         if (active) {
-          const results = data.results?.filter(r => r._type === 'organizations') || [];
+          const results =
+            data.results?.filter(r => r._type === 'organizations') || [];
           setOptions(results);
         }
       } catch (err) {
@@ -102,28 +102,33 @@ const AssociationForm = ({
     }
   };
 
-  const isSubmitDisabled = (!selectedOrg && !inputValue.trim()) || status === REDUCER_STATUS.LOADING;
+  const isSubmitDisabled =
+    (!selectedOrg && !inputValue.trim()) || status === REDUCER_STATUS.LOADING;
 
   return (
     <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm">
-      <DialogTitle>{formatMessage({ id: 'Set organization' })}</DialogTitle>
+      <DialogTitle>
+        {formatMessage({ id: 'Create or associate an organization' })}
+      </DialogTitle>
       <DialogContent>
         {status === REDUCER_STATUS.FAILED && (
           <Alert severity="error" sx={{ mb: 2 }}>
-            {error?.message || formatMessage({ id: 'An error occurred while saving.' })}
+            {error?.message ||
+              formatMessage({ id: 'An error occurred while saving.' })}
           </Alert>
         )}
         <Autocomplete
           freeSolo
           options={options}
-          getOptionLabel={option => (typeof option === 'string' ? option : option.name || '')}
+          getOptionLabel={option =>
+            typeof option === 'string' ? option : option.name || ''
+          }
           value={selectedOrg}
           onChange={(event, newValue) => {
-            if (typeof newValue === 'string') {
-              setSelectedOrg({ name: newValue });
-            } else {
-              setSelectedOrg(newValue);
-            }
+            // Only an object option is an existing organization. A freeSolo
+            // string is left unstored: it will be handled as a creation from
+            // the input on submit.
+            setSelectedOrg(typeof newValue === 'string' ? null : newValue);
           }}
           inputValue={inputValue}
           onInputChange={(event, newInputValue, reason) => {
@@ -145,7 +150,9 @@ const AssociationForm = ({
                 ...params.InputProps,
                 endAdornment: (
                   <React.Fragment>
-                    {isSearching ? <CircularProgress color="inherit" size={20} /> : null}
+                    {isSearching ? (
+                      <CircularProgress color="inherit" size={20} />
+                    ) : null}
                     {params.InputProps.endAdornment}
                   </React.Fragment>
                 )
@@ -156,14 +163,19 @@ const AssociationForm = ({
         {!selectedOrg && inputValue.trim().length > 0 && options.length === 0 && !isSearching && (
           <Alert severity="info" sx={{ mt: 2 }}>
             {formatMessage(
-              { id: 'No existing organization found. A new one named "{name}" will be created.' },
+              {
+                id: 'Select an existing organization from the list, or a new one named "{name}" will be created.'
+              },
               { name: inputValue.trim() }
             )}
           </Alert>
         )}
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleClose} disabled={status === REDUCER_STATUS.LOADING}>
+        <Button
+          variant="outlined"
+          onClick={handleClose}
+          disabled={status === REDUCER_STATUS.LOADING}>
           {formatMessage({ id: 'Cancel' })}
         </Button>
         <Button
@@ -171,9 +183,12 @@ const AssociationForm = ({
           color="primary"
           variant="contained"
           disabled={isSubmitDisabled}
-          startIcon={status === REDUCER_STATUS.LOADING ? <CircularProgress size={20} /> : null}
-        >
-          {formatMessage({ id: 'Save' })}
+          startIcon={
+            status === REDUCER_STATUS.LOADING ? (
+              <CircularProgress size={20} />
+            ) : null
+          }>
+          {formatMessage({ id: 'Associate' })}
         </Button>
       </DialogActions>
     </Dialog>
