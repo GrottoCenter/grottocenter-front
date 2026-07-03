@@ -314,17 +314,11 @@ const Massif = ({ isLoading, error, massif }) => {
                   id: 'Discover the numbers about this massif and its caves.'
                 })}
               />
-              <ScrollableContent
-                anchorId="organizations"
-                title={formatMessage({ id: 'Organizations' })}
-                content={
-                  <AssociationSection
-                    organizations={massif?.organizations}
-                    entityType="massif"
-                    entityId={massif.id}
-                    isLoading={isLoading}
-                  />
-                }
+              <AssociationSection
+                organizations={massif?.organizations}
+                entityType="massif"
+                entityId={massif.id}
+                isLoading={isLoading}
               />
               {massif?.networks?.length > 0 && (
                 <ScrollableContent

@@ -1,7 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { useIntl } from 'react-intl';
 import { useSelector } from 'react-redux';
-import { Box, Paper, Typography } from '@mui/material';
+import { Box, Chip, Paper, Typography } from '@mui/material';
 import { Link } from 'react-router-dom';
 import { depthIcon, lengthIcon } from '../../../assets/icons';
 import CustomIcon from '../CustomIcon';
@@ -163,19 +164,50 @@ PersonCard.propTypes = {
   itemActionButton: PropTypes.node
 };
 
-export const OrganizationCard = ({ organization, itemActionButton }) => (
-  <BaseCard
-    to={`/ui/organizations/${organization.id}`}
-    icon={<CustomIcon type="organization" size={32} />}
-    itemActionButton={itemActionButton}>
-    <CardLabel>{organization.name}</CardLabel>
-  </BaseCard>
-);
+export const OrganizationCard = ({ organization, itemActionButton }) => {
+  const { formatMessage } = useIntl();
+
+  if (organization.isDeleted) {
+    // A deleted organization links to its successor when one exists, otherwise
+    // it stays on its own (tombstone) page.
+    const to = organization.redirectTo
+      ? `/ui/organizations/${organization.redirectTo}`
+      : `/ui/organizations/${organization.id}`;
+    return (
+      <BaseCard
+        to={to}
+        icon={<CustomIcon type="organization" size={32} />}
+        itemActionButton={itemActionButton}>
+        <Box sx={{ flex: 1, minWidth: 0, display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
+          <Typography
+            variant="body1"
+            fontWeight={600}
+            color="text.disabled"
+            sx={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textDecoration: 'line-through' }}>
+            {organization.name}
+          </Typography>
+          <Chip size="small" color="warning" label={formatMessage({ id: 'Deleted' })} />
+        </Box>
+      </BaseCard>
+    );
+  }
+
+  return (
+    <BaseCard
+      to={`/ui/organizations/${organization.id}`}
+      icon={<CustomIcon type="organization" size={32} />}
+      itemActionButton={itemActionButton}>
+      <CardLabel>{organization.name}</CardLabel>
+    </BaseCard>
+  );
+};
 
 OrganizationCard.propTypes = {
   organization: PropTypes.shape({
-    id: PropTypes.number,
-    name: PropTypes.string
+    id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    name: PropTypes.string,
+    isDeleted: PropTypes.bool,
+    redirectTo: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
   }),
   itemActionButton: PropTypes.node
 };

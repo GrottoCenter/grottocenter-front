@@ -187,18 +187,12 @@ const Region = ({
               id: 'Discover the numbers about this region and its caves.'
             })}
           />
-          <ScrollableContent
-            anchorId="organizations"
-            title={formatMessage({ id: 'Organizations' })}
-            content={
-              <AssociationSection
-                organizations={region?.organizations}
-                entityType="region"
-                entityId={regionId}
-                parentEntityId={countryId}
-                isLoading={isLoading}
-              />
-            }
+          <AssociationSection
+            organizations={region?.organizations}
+            entityType="region"
+            entityId={regionId}
+            parentEntityId={countryId}
+            isLoading={isLoading}
           />
         </>
       )}
