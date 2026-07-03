@@ -62,6 +62,10 @@ const useMarkers = ({
         });
       }
 
+      // Listeners are cleaned up by Leaflet when markerEl.remove() is called.
+      // This relies on callbacks being stable references (useCallback with stable
+      // deps in Markers.jsx). If deps ever change identity, existing markers won't
+      // get updated listeners — updateMarkers only adds/removes, never replaces.
       if (onMarkerOver) markerEl.on('mouseover', () => onMarkerOver(marker));
       if (onMarkerOut) markerEl.on('mouseout', () => onMarkerOut(marker));
       if (onPopupOpen) markerEl.on('popupopen', () => onPopupOpen(marker));

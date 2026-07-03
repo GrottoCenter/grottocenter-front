@@ -42,10 +42,7 @@ const Markers = ({
   // no hover), and only hide on mouseout when nothing is pinned.
   const pinnedNetworkRef = useRef(null);
 
-  const handleNetworkOver = useCallback(
-    network => showHighlight(network),
-    [showHighlight]
-  );
+  const handleNetworkOver = showHighlight;
   const handleNetworkOut = useCallback(() => {
     if (pinnedNetworkRef.current == null) hideHighlight();
   }, [hideHighlight]);

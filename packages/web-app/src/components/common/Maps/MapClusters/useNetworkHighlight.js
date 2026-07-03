@@ -40,6 +40,11 @@ const useNetworkHighlight = () => {
       const entrances = (network?.entrances ?? []).filter(hasCoords);
       if (entrances.length === 0) return;
 
+      if (
+        typeof network.latitude !== 'number' ||
+        typeof network.longitude !== 'number'
+      )
+        return;
       const center = [network.latitude, network.longitude];
 
       // Convex hull needs at least 3 points. d3 works on planar [x, y];

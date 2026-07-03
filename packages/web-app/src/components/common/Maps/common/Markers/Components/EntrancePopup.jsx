@@ -61,8 +61,6 @@ EntrancePopup.propTypes = {
     name: PropTypes.string,
     region: PropTypes.string,
     city: PropTypes.string,
-    longitude: PropTypes.number,
-    latitude: PropTypes.number,
     caveName: PropTypes.string,
     caveId: PropTypes.number,
     depth: PropTypes.number,
