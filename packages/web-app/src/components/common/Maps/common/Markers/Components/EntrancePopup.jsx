@@ -7,7 +7,7 @@ import {
   getDataQualityValue,
   getDataQualityLabelKey
 } from '../../../../../../utils/dataQuality';
-import { Information, makeCoordinatesValue } from './utils';
+import { Information } from './utils';
 
 export const EntrancePopup = ({ entrance }) => {
   const { formatMessage } = useIntl();
@@ -33,10 +33,6 @@ export const EntrancePopup = ({ entrance }) => {
           icon={<CustomIcon size={25} type="location" />}
         />
       )}
-      <Information
-        value={makeCoordinatesValue(entrance.latitude, entrance.longitude)}
-        icon={<CustomIcon size={25} type="coordinates" />}
-      />
       {entrance.depth > 0 && (
         <Information
           value={`${entrance.depth} m`}
