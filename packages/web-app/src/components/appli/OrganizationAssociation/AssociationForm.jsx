@@ -160,7 +160,7 @@ const AssociationForm = ({ open, onClose, onSubmit, status, error }) => {
             />
           )}
         />
-        {!selectedOrg && inputValue.trim().length > 0 && (
+        {!selectedOrg && inputValue.trim().length > 0 && options.length === 0 && !isSearching && (
           <Alert severity="info" sx={{ mt: 2 }}>
             {formatMessage(
               {
