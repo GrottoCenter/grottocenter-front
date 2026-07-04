@@ -9,6 +9,7 @@ import PropTypes from 'prop-types';
 import { DocumentTypes } from '../../../../utils/documentTypeHelpers';
 import {
   IS_INTACT,
+  IS_DELETED,
   DOCUMENT_AUTHORIZE_TO_PUBLISH
 } from './formElements/AddFileForm/FileHelpers';
 import { defaultDocumentValuesTypes } from './types';
@@ -54,16 +55,6 @@ const DESCRIPTION_OPTIONAL_TYPES = [
   DocumentTypes.AUTHORIZATION_TO_PUBLISH
 ];
 
-const FILE_REQUIRED_TYPES = [
-  DocumentTypes.IMAGE,
-  DocumentTypes.TOPOGRAPHIC_DRAWING,
-  DocumentTypes.MOVING_IMAGE,
-  DocumentTypes.SOUND,
-  DocumentTypes.PHYSICAL_OBJECT,
-  DocumentTypes.MAP,
-  DocumentTypes.DATASET
-];
-
 const checkFormValidation = document => {
   let isValid = true;
 
@@ -85,11 +76,13 @@ const checkFormValidation = document => {
     isValid = new RegExp(document.identifierType?.regexp).test(
       document.identifier
     );
-  if (FILE_REQUIRED_TYPES.includes(document.type) && document.files.length === 0)
-    isValid = false;
+  // Files flagged as deleted still remain in the array but are no longer
+  // visible, so the licensing/authorization fields are only required when at
+  // least one file is actually kept.
+  const hasVisibleFile = document.files.some(f => f.state !== IS_DELETED);
   const requiresAuthorization =
     document.type !== DocumentTypes.AUTHORIZATION_TO_PUBLISH;
-  if (requiresAuthorization && document.files.length > 0) {
+  if (requiresAuthorization && hasVisibleFile) {
     if (!document.selectOptionAuthorizationDocument) isValid = false;
     if (!document.license) isValid = false;
     if (

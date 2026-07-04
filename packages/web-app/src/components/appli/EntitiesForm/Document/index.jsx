@@ -2,7 +2,15 @@ import React, { useContext, useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 // eslint-disable-next-line camelcase
 import { useNavigate, unstable_usePrompt, useSearchParams } from 'react-router-dom';
-import { Button, Fade, Typography } from '@mui/material';
+import {
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Fade,
+  Typography
+} from '@mui/material';
 import Alert from '@mui/material/Alert';
 import ReplayIcon from '@mui/icons-material/Replay';
 import { useIntl } from 'react-intl';
@@ -24,6 +32,7 @@ import DocumentFormProvider, {
 import { defaultDocumentValuesTypes } from './types';
 import FromContent from './FormContent';
 import DocumentSubmissionDialog from './DocumentSubmissionDialog';
+import { IS_DELETED } from './formElements/AddFileForm/FileHelpers';
 import Translate from '../../../common/Translate';
 
 const SpacedButton = styled(Button)`
@@ -49,7 +58,7 @@ const DocumentSubmission = ({ onCancel }) => {
   const dispatch = useDispatch();
   const permissions = usePermissions();
   const { formatMessage } = useIntl();
-  const { isArticle } = documentTypeHelpers;
+  const { isArticle, isFileExpected } = documentTypeHelpers;
   const [searchParams] = useSearchParams();
   const {
     document,
@@ -62,6 +71,7 @@ const DocumentSubmission = ({ onCancel }) => {
   const [isDocSubmittedWithSuccess, setDocSubmittedWithSuccess] =
     useState(false);
   const [isDocSubmitted, setDocSubmitted] = useState(false);
+  const [isMissingFileDialogOpen, setMissingFileDialogOpen] = useState(false);
   const hasLinked = useRef(false);
 
   const createDocumentState = useSelector(state => state.createDocument);
@@ -89,12 +99,30 @@ const DocumentSubmission = ({ onCancel }) => {
     }
   }, [entranceState.data, entranceIdParam, linkedEntrance, setLinkedEntrance]);
 
-  const onFormSubmit = event => {
-    event.preventDefault();
-
+  const submitDocument = () => {
     if (isNewDocument) dispatch(postDocument(document));
     else dispatch(updateDocument(document));
     setDocSubmitted(true);
+  };
+
+  const onFormSubmit = event => {
+    event.preventDefault();
+
+    // A file is expected for this type but none is attached: ask for
+    // confirmation so the user does not forget (they cannot add a file after
+    // submission until a moderator validates the document). Files flagged as
+    // deleted still remain in the array, so they must be excluded from the count.
+    const hasFile = document.files.some(f => f.state !== IS_DELETED);
+    if (isFileExpected(document.type) && !hasFile) {
+      setMissingFileDialogOpen(true);
+      return;
+    }
+    submitDocument();
+  };
+
+  const onConfirmMissingFile = () => {
+    setMissingFileDialogOpen(false);
+    submitDocument();
   };
 
   const resetSubmissionState = () => {
@@ -228,6 +256,31 @@ const DocumentSubmission = ({ onCancel }) => {
             <FromContent onCancel={onCancel} />
           </form>
 
+          <Dialog
+            aria-describedby="missing-file-warning"
+            open={isMissingFileDialogOpen}
+            onClose={() => setMissingFileDialogOpen(false)}>
+            <DialogTitle>
+              {formatMessage({ id: 'Submit without a file?' })}
+            </DialogTitle>
+            <DialogContent>
+              <Alert id="missing-file-warning" severity="warning">
+                {formatMessage({
+                  id: 'No file attached — please check that it is not an oversight.'
+                })}
+              </Alert>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={onConfirmMissingFile} variant="outlined">
+                {formatMessage({ id: 'Submit anyway' })}
+              </Button>
+              <Button
+                onClick={() => setMissingFileDialogOpen(false)}
+                variant="contained">
+                {formatMessage({ id: 'Cancel' })}
+              </Button>
+            </DialogActions>
+          </Dialog>
 
           {documentState.errorMessages.length > 0 && (
             <CenteredBlock>
