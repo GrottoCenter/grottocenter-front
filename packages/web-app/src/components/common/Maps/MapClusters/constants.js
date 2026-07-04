@@ -106,6 +106,47 @@ export const ENTRANCE_HEAT_COLORS = [brown[200], brown[900]];
 export const NETWORK_HEAT_COLORS = [blue[200], blue[900]];
 export const MASSIF_HEAT_COLORS = [green[200], green[900]];
 
+// Network highlight overlay — revealed on hover/tap of a network marker to show
+// which entrances belong to it, even when the entrances layer is hidden.
+//
+// Visual hierarchy (strongest → faintest): highlighted entrances > spokes > hull.
+// Blue is the network semantic in this app (networks heatmap), so the surfaced
+// entrances read as "this network's entrances" and stand out from brown caves.
+export const NETWORK_HIGHLIGHT_ACCENT = blue[700];
+// Blue hull recedes to the background — it only conveys rough footprint.
+export const NETWORK_HULL_STYLE = {
+  color: NETWORK_HIGHLIGHT_ACCENT,
+  weight: 1,
+  opacity: 0.6,
+  fillColor: NETWORK_HIGHLIGHT_ACCENT,
+  fillOpacity: 0.06,
+  dashArray: '4 4',
+  interactive: false
+};
+export const NETWORK_SPOKE_STYLE = {
+  color: NETWORK_HIGHLIGHT_ACCENT,
+  weight: 1.5,
+  opacity: 0.65,
+  interactive: false
+};
+// Ghost entrances are drawn as two stacked circles: a translucent halo for the
+// "glow", then a solid white-ringed core so they pop against brown/orange caves.
+export const NETWORK_ENTRANCE_HALO_STYLE = {
+  radius: 9,
+  stroke: false,
+  fillColor: NETWORK_HIGHLIGHT_ACCENT,
+  fillOpacity: 0.25,
+  interactive: false
+};
+export const NETWORK_ENTRANCE_GHOST_STYLE = {
+  radius: 5,
+  color: '#FFFFFF',
+  weight: 2,
+  fillColor: NETWORK_HIGHLIGHT_ACCENT,
+  fillOpacity: 1,
+  interactive: false
+};
+
 // Massif polygon style for the Leaflet GeoJSON layer
 export const MASSIF_POLYGON_STYLE = {
   color: green[700],

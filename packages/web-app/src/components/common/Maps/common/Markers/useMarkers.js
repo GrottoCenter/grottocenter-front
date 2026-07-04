@@ -20,6 +20,10 @@ const useMarkers = ({
   popupContent = null,
   tooltipContent = null,
   onMarkerClick = null,
+  onMarkerOver = null,
+  onMarkerOut = null,
+  onPopupOpen = null,
+  onPopupClose = null,
   shouldFitMapBound = false,
   markerOptions = null
 }) => {
@@ -58,9 +62,30 @@ const useMarkers = ({
         });
       }
 
+      // Listeners are cleaned up by Leaflet when markerEl.remove() is called.
+      // This relies on callbacks being stable references (useCallback with stable
+      // deps in Markers.jsx). If deps ever change identity, existing markers won't
+      // get updated listeners — updateMarkers only adds/removes, never replaces.
+      if (onMarkerOver) markerEl.on('mouseover', () => onMarkerOver(marker));
+      if (onMarkerOut) markerEl.on('mouseout', () => onMarkerOut(marker));
+      if (onPopupOpen) markerEl.on('popupopen', () => onPopupOpen(marker));
+      if (onPopupClose) markerEl.on('popupclose', () => onPopupClose(marker));
+
       return markerEl;
     },
-    [icon, circleMarkerStyle, popupContent, renderPopup, tooltipContent, onMarkerClick, markerOptions]
+    [
+      icon,
+      circleMarkerStyle,
+      popupContent,
+      renderPopup,
+      tooltipContent,
+      onMarkerClick,
+      onMarkerOver,
+      onMarkerOut,
+      onPopupOpen,
+      onPopupClose,
+      markerOptions
+    ]
   );
 
   const updateMarkers = useCallback(
