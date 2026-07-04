@@ -257,13 +257,14 @@ const DocumentSubmission = ({ onCancel }) => {
           </form>
 
           <Dialog
+            aria-describedby="missing-file-warning"
             open={isMissingFileDialogOpen}
             onClose={() => setMissingFileDialogOpen(false)}>
             <DialogTitle>
               {formatMessage({ id: 'Submit without a file?' })}
             </DialogTitle>
             <DialogContent>
-              <Alert severity="warning">
+              <Alert id="missing-file-warning" severity="warning">
                 {formatMessage({
                   id: 'No file attached — please check that it is not an oversight.'
                 })}
@@ -280,7 +281,6 @@ const DocumentSubmission = ({ onCancel }) => {
               </Button>
             </DialogActions>
           </Dialog>
-
 
           {documentState.errorMessages.length > 0 && (
             <CenteredBlock>

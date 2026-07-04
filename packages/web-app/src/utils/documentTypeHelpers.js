@@ -128,6 +128,7 @@ export const DOCUMENT_TYPE_ACCEPT = {
       'dxf',
       'eps',
       'gif',
+      'gpx',
       'gz',
       'jpeg',
       'jpg',

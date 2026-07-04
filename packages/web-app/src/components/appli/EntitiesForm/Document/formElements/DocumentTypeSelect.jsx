@@ -214,7 +214,7 @@ const DocumentTypeSelect = () => {
         component="p"
         sx={{ mb: 1, color: 'text.secondary' }}>
         {formatMessage({ id: 'Document type' })}
-        <Box component="span" sx={{ color: 'error.main', ml: 0.5 }}>
+        <Box component="span" sx={{ color: 'error.main', ml: '4px' }}>
           *
         </Box>
       </Typography>
