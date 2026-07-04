@@ -209,6 +209,15 @@ const DocumentTypeSelect = () => {
 
   return (
     <Box sx={{ mt: 2 }}>
+      <Typography
+        variant="subtitle2"
+        component="p"
+        sx={{ mb: 1, color: 'text.secondary' }}>
+        {formatMessage({ id: 'Document type' })}
+        <Box component="span" sx={{ color: 'error.main', ml: 0.5 }}>
+          *
+        </Box>
+      </Typography>
       <Grid container spacing={2} alignItems="stretch">
         {featured.map(dt => (
           <Grid size={4} key={dt.id}>

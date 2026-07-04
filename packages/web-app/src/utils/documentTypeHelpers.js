@@ -170,6 +170,19 @@ const SIMPLE_MEDIA_TYPES = new Set([
   DocumentTypes.TOPOGRAPHIC_DATA
 ]);
 const isSimpleMedia = docType => SIMPLE_MEDIA_TYPES.has(docType);
+// Types for which a file is expected (but no longer mandatory): warn the user
+// when none is attached so they don't forget — they can't add one after the
+// document is submitted and before it is validated by a moderator.
+const FILE_EXPECTED_TYPES = new Set([
+  DocumentTypes.IMAGE,
+  DocumentTypes.TOPOGRAPHIC_DRAWING,
+  DocumentTypes.MOVING_IMAGE,
+  DocumentTypes.SOUND,
+  DocumentTypes.PHYSICAL_OBJECT,
+  DocumentTypes.MAP,
+  DocumentTypes.DATASET
+]);
+const isFileExpected = docType => FILE_EXPECTED_TYPES.has(docType);
 const isOther = docType =>
   !isArticle(docType) &&
   !isCollection(docType) &&
@@ -181,6 +194,7 @@ export const documentTypeHelpers = {
   isAuthorizationToPublish,
   isCollection,
   isEvent,
+  isFileExpected,
   isIssue,
   isImage,
   isOther,
