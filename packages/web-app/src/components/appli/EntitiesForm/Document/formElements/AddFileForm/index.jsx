@@ -126,10 +126,18 @@ const AddFileForm = ({
   const isLicenseForced = isParentAuthForced;
   const isAuthForced = isParentAuthForced;
 
-  const accept = acceptConfig?.mime ?? mimeTypes.toString();
   const extensions =
     acceptConfig?.extensions ??
     backendExtensions.filter(e => e !== null).map(e => e.trim());
+  // Build the accept attribute from both MIME types and file extensions. Some
+  // supported formats have MIME types the browser cannot resolve to a picker
+  // filter (e.g. application/gpx+xml, or the application/octet-stream Therion
+  // formats th/th2/thconfig/lox/xvi…), so listing the extensions explicitly is
+  // what actually makes those files selectable.
+  const dottedExtensions = extensions.map(e => `.${e}`);
+  const accept = [acceptConfig?.mime ?? mimeTypes.toString(), ...dottedExtensions]
+    .filter(Boolean)
+    .join(',');
   const showAuthDocSelect = option === DOCUMENT_AUTHORIZE_TO_PUBLISH;
   const visibleFiles = files.filter(f => f.state !== IS_DELETED);
 
