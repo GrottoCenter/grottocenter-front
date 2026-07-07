@@ -4,8 +4,13 @@ import { Button, ListItem, Grid } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import ImageThumbnail from './ImageThumbnail';
 import ImageLightbox from './ImageLightbox';
-import { isImageFile, decodeFileName } from './utils/imageUtils';
+import {
+  isImageFile,
+  decodeFileName,
+  getThumbnailSources
+} from './utils/imageUtils';
 import { getFileIcon } from './utils/fileIcons';
+import { ThumbnailsPropTypes } from '../../../types/document.type';
 
 const FileListItem = styled(ListItem)`
   margin: 0;
@@ -41,15 +46,19 @@ const Files = ({ files = [], description, onImageClick, imageIndexOffset = 0 }) 
       {/* Image thumbnails section */}
       {imageFiles.length > 0 && (
         <Grid container rowSpacing={2} columnSpacing={{ xs: 0, sm: 2 }} sx={{ mb: 2 }}>
-          {imageFiles.map((file, index) => (
-            <Grid key={file.fileName} sx={{ width: { xs: '100%', sm: 'auto' } }}>
-              <ImageThumbnail
-                src={file.completePath}
-                alt={decodeFileName(file.fileName)}
-                onClick={() => handleThumbnailClick(index)}
-              />
-            </Grid>
-          ))}
+          {imageFiles.map((file, index) => {
+            const { src, srcSet } = getThumbnailSources(file);
+            return (
+              <Grid key={file.fileName} sx={{ width: { xs: '100%', sm: 'auto' } }}>
+                <ImageThumbnail
+                  src={src}
+                  srcSet={srcSet}
+                  alt={decodeFileName(file.fileName)}
+                  onClick={() => handleThumbnailClick(index)}
+                />
+              </Grid>
+            );
+          })}
         </Grid>
       )}
 
@@ -100,7 +109,8 @@ Files.propTypes = {
   files: PropTypes.arrayOf(
     PropTypes.shape({
       fileName: PropTypes.string.isRequired,
-      completePath: PropTypes.string.isRequired
+      completePath: PropTypes.string.isRequired,
+      thumbnails: ThumbnailsPropTypes
     })
   ),
   description: PropTypes.string,

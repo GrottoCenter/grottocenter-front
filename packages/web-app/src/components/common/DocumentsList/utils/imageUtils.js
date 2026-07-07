@@ -102,3 +102,40 @@ export const isImageFile = fileName => {
   const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp'];
   return imageExtensions.includes(extension);
 };
+
+/**
+ * Build `src`/`srcSet` for a responsive thumbnail card, falling back to
+ * `completePath` when `thumbnails` (or a given variant) is null - e.g.
+ * non-image files, failed generation, or uploads predating the backfill.
+ * @param {object} file - File object with `completePath` and optional `thumbnails`
+ * @returns {{src: string, srcSet: string|undefined}}
+ */
+export const getThumbnailSources = file => {
+  const { completePath, thumbnails } = file;
+
+  if (!thumbnails) {
+    return { src: completePath, srcSet: undefined };
+  }
+
+  const { small, medium, large } = thumbnails;
+  const srcSet = [
+    small && `${small} 480w`,
+    medium && `${medium} 1280w`,
+    large && `${large} 1920w`
+  ]
+    .filter(Boolean)
+    .join(', ');
+
+  return {
+    src: small || medium || large || completePath,
+    srcSet: srcSet || undefined
+  };
+};
+
+/**
+ * Pick the best image source for a full-screen lightbox view: the `large`
+ * thumbnail variant, falling back to `completePath` when unavailable.
+ * @param {object} file - File object with `completePath` and optional `thumbnails`
+ * @returns {string}
+ */
+export const getLightboxSrc = file => file.thumbnails?.large || file.completePath;
