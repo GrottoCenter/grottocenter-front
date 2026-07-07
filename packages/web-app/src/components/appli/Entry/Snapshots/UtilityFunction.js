@@ -55,6 +55,7 @@ const SnapshotButton = ({
   getAll = false,
   parentId,
   parentType,
+  isDeleted,
   startIcon = <HistoryIcon />,
   tooltipTitle,
   ...grpProps
@@ -74,6 +75,10 @@ const SnapshotButton = ({
     getAll ? `all=true` : '',
     parentId !== undefined ? `parentId=${parentId}` : '',
     parentType ? `parentType=${parentType}` : '',
+    // Entities without a standalone route (e.g. guidelines) can't be re-fetched
+    // by the snapshot page, so carry the current soft-delete state along to gate
+    // the rollback button (a deleted item must be restored before rolling back).
+    isDeleted !== undefined ? `isDeleted=${isDeleted}` : '',
     `backTo=${backTo}`
   ]
     .filter(e => e)
@@ -99,6 +104,7 @@ SnapshotButton.propTypes = {
   getAll: PropTypes.bool,
   parentId: PropTypes.number,
   parentType: PropTypes.string,
+  isDeleted: PropTypes.bool,
   startIcon: PropTypes.node,
   tooltipTitle: PropTypes.string
 };

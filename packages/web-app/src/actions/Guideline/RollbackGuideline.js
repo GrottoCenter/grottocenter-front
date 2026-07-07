@@ -36,12 +36,13 @@ export const rollbackGuideline =
       .then(response => response.json())
       .then(data => dispatch(rollbackGuidelineSuccess(data)))
       .catch(error => {
-        if (error.isAuthError) return;
+        if (error.isAuthError) return null;
         dispatch(
           rollbackGuidelineFailure(
             makeErrorMessage(error.message, `Rolling back guideline`),
             error.message
           )
         );
+        return null;
       });
   };

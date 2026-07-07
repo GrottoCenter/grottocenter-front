@@ -25,7 +25,10 @@ const AccordionSnapshotList = ({
 }) => {
   const { formatMessage } = useIntl();
 
-  const hasCurrentItem = currentItem && Object.keys(currentItem).length > 0;
+  // A real current version is renderable (has an id). Some entities pass an
+  // id-less marker carrying only isDeleted to gate the rollback button (see
+  // SnapshotPage), which must not render an empty "current version" card.
+  const hasCurrentItem = currentItem?.id != null;
 
   // Filter out the current version from snapshot list if the API included it
   const currentTimestamp = hasCurrentItem

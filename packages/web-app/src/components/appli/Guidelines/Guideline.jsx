@@ -96,7 +96,11 @@ const Guideline = ({
             // (guideline/delete.js), unlike its soft-delete which moderators may do.
             canPermanentlyDelete={isEditAllowed && permissions.isAdmin}
             snapshotEl={
-              <SnapshotButton id={guideline.id} type="guidelines" />
+              <SnapshotButton
+                id={guideline.id}
+                type="guidelines"
+                isDeleted={guideline.isDeleted}
+              />
             }
             onDeletePress={onDeletePress}
             onRestorePress={onRestorePress}
