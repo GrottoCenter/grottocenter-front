@@ -43,8 +43,19 @@ jest.mock('../../../../actions/Entrance/DetachEntrance', () => ({
   resetDetachEntrance: (...args) => mockResetDetachEntrance(...args)
 }));
 
+// The before → after preview is covered by its own suite; keep this one focused
+// on the detach button/behaviour (and avoid its internal button-role links).
+jest.mock(
+  '../OperationSummary',
+  () =>
+    function MockOperationSummary() {
+      return null;
+    }
+);
+
 const messages = {
   'Detach entrance': 'Detach entrance',
+  Cancel: 'Cancel',
   'Cannot detach: this entrance is the only one of its cave.':
     'Cannot detach: this entrance is the only one of its cave.',
   'Entrance successfully detached.':
@@ -129,7 +140,7 @@ describe('DetachEntranceSection', () => {
       loading: true
     });
 
-    const button = screen.getByRole('button');
+    const button = screen.getByRole('button', { name: 'Detach entrance' });
     expect(button).toBeDisabled();
     expect(screen.getByRole('progressbar')).toBeInTheDocument();
   });

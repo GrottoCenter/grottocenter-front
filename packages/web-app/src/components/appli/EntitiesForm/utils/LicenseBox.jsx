@@ -1,50 +1,48 @@
-import { FormLabel } from '@mui/material';
+import { Typography } from '@mui/material';
 import { React } from 'react';
 import { useIntl } from 'react-intl';
 import { styled } from '@mui/material/styles';
 import InternationalizedLink from '../../../common/InternationalizedLink';
 import { licenceLinks, licensesODBLink } from '../../../../conf/externalLinks';
 
-const LicenceBoxStyle = styled('div')`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin: 10px 0;
-`;
+// Discreet, single-line license notice shown at the bottom of contribution
+// forms. Purposely low-key (small muted caption + inline text links) so it
+// informs without competing with the form itself.
+const LicenceBoxStyle = styled(Typography)`
+  margin-top: ${({ theme }) => theme.spacing(2)};
+  text-align: center;
+  color: ${({ theme }) => theme.palette.text.secondary};
 
-const LicenceImage = styled('img')`
-  width: 100px;
-  margin-left: 10px;
+  a {
+    color: inherit;
+    text-decoration: underline;
+  }
 `;
 
 const LicenceBox = () => {
   const { formatMessage } = useIntl();
 
   return (
-    <LicenceBoxStyle>
-      <FormLabel>
-        {formatMessage({
-          id: 'The following licenses will apply to your contribution:'
+    <LicenceBoxStyle variant="caption" component="p">
+      {formatMessage({
+        id: 'The following licenses will apply to your contribution:'
+      })}{' '}
+      <InternationalizedLink
+        links={licensesODBLink}
+        title={formatMessage({
+          id: 'The ODBL license applies to all data that is not copyrighted.'
         })}
-      </FormLabel>
-
-      <InternationalizedLink links={licensesODBLink}>
-        <LicenceImage
-          src="/images/odbl.png"
-          alt="ODBL license"
-          title={formatMessage({
-            id: 'The ODBL license applies to all data that is not copyrighted.'
-          })}
-        />
+      >
+        ODBL
       </InternationalizedLink>
-      <InternationalizedLink links={licenceLinks}>
-        <LicenceImage
-          src="/images/CC-BY-SA.png"
-          alt="CC-BY-SA licence"
-          title={formatMessage({
-            id: 'Unless stated otherwise, the CC-BY-SA license applies for documents and texts subject to copyright.'
-          })}
-        />
+      {' · '}
+      <InternationalizedLink
+        links={licenceLinks}
+        title={formatMessage({
+          id: 'Unless stated otherwise, the CC-BY-SA license applies for documents and texts subject to copyright.'
+        })}
+      >
+        CC-BY-SA
       </InternationalizedLink>
     </LicenceBoxStyle>
   );

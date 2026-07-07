@@ -21,8 +21,6 @@ import FullscreenControl from '../../../common/Maps/common/FullscreenControl';
 import { defaultCoord, defaultZoom, focusZoom } from '../../../../conf/config';
 
 const StyledMapContainer = styled(MapContainer)`
-  margin: 0 4px;
-
   .centralMarker {
     z-index: 900;
     position: absolute;
@@ -40,15 +38,30 @@ const StyledMapContainer = styled(MapContainer)`
 `;
 
 // Needed because useMap is only accessible from inside <MapContainer>
+// How long after a container resize we ignore the ensuing `moveend`. When the
+// map is sized in viewport units, a resize (mobile toolbar show/hide on scroll,
+// orientation change, virtual keyboard) changes its height. Leaflet keeps the
+// same center but re-projects it, and the pixel rounding makes getCenter() drift
+// slightly — writing that back would silently move the coordinates. The default
+// height uses `svh` (stable across toolbar show/hide) to avoid the scroll case.
+const RESIZE_GUARD_MS = 500;
+
 const MapBind = ({ center, zoom, onMoveEnd }) => {
   const lastValidCenter = useRef({});
   const lastSetViewTs = useRef(0);
+  const lastResizeTs = useRef(0);
   const map = useMap();
 
+  useMapEvent('resize', () => {
+    lastResizeTs.current = Date.now();
+  });
+
   useMapEvent('moveend', () => {
-    // Prevent dispatching a onMoveEnd event triggered by setView below
+    // Ignore moveend events not initiated by the user: those triggered by the
+    // programmatic setView below, and those triggered by a container resize.
     const timeSinceSetViewMs = Date.now() - lastSetViewTs.current;
-    if (timeSinceSetViewMs > 50) {
+    const timeSinceResizeMs = Date.now() - lastResizeTs.current;
+    if (timeSinceSetViewMs > 50 && timeSinceResizeMs > RESIZE_GUARD_MS) {
       const mapCenter = map.getCenter();
       lastValidCenter.current = { lat: mapCenter.lat, lng: mapCenter.lng };
       onMoveEnd(mapCenter);
@@ -149,7 +162,7 @@ const ACCURACY_CIRCLE_STYLE = {
   weight: 1
 };
 
-const MapMarkerSelector = ({ control, formLatitudeKey, formLongitudeKey, additionalPositions = [], additionalMarkersLabel, onZoomChange, markerIcon, mapHeight = '40dvh' }) => {
+const MapMarkerSelector = ({ control, formLatitudeKey, formLongitudeKey, additionalPositions = [], additionalMarkersLabel, onZoomChange, markerIcon, mapHeight = '40svh' }) => {
   const [locating, setLocating] = useState(false);
   const [locateError, setLocateError] = useState(null);
   const [initialized, setInitialized] = useState(false);
@@ -231,7 +244,7 @@ const MapMarkerSelector = ({ control, formLatitudeKey, formLongitudeKey, additio
   return (
     <Box sx={{ position: 'relative' }}>
       <StyledMapContainer
-        style={{ height: mapHeight, width: 'calc(100% - 8px)' }}
+        style={{ height: mapHeight, width: '100%' }}
         center={currentPosition}
         zoom={zoomLevel}
         dragging={!isMobile} // For usability only use two fingers drag/zoom on mobile
@@ -278,41 +291,43 @@ const MapMarkerSelector = ({ control, formLatitudeKey, formLongitudeKey, additio
         <span className="centralMarker">
           <img alt="Entry" src={markerIcon || entranceMarkerIcon} />
         </span>
-      </StyledMapContainer>
 
-      {showLegend && (
-        <Box
-          sx={{
-            position: 'absolute',
-            bottom: 10,
-            left: 12,
-            zIndex: 1000,
-            display: 'flex',
-            alignItems: 'center',
-            gap: '6px',
-            px: 1,
-            py: '4px',
-            borderRadius: 1,
-            boxShadow: 1,
-            fontSize: 12,
-            color: 'text.primary',
-            bgcolor: 'rgba(255, 255, 255, 0.9)',
-            pointerEvents: 'none'
-          }}>
+        {/* Rendered inside the map container so it stays visible in fullscreen
+            mode (only the map element enters fullscreen). */}
+        {showLegend && (
           <Box
-            component="span"
             sx={{
-              width: 10,
-              height: 10,
-              flexShrink: 0,
-              borderRadius: '50%',
-              border: `2px solid ${NEARBY_ENTRANCE_MARKER_STYLE.color}`,
-              bgcolor: NEARBY_ENTRANCE_MARKER_STYLE.fillColor
-            }}
-          />
-          {additionalMarkersLabel}
-        </Box>
-      )}
+              position: 'absolute',
+              bottom: 10,
+              left: 12,
+              zIndex: 1000,
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              px: 1,
+              py: '4px',
+              borderRadius: 1,
+              boxShadow: 1,
+              fontSize: 12,
+              color: 'text.primary',
+              bgcolor: 'rgba(255, 255, 255, 0.9)',
+              pointerEvents: 'none'
+            }}>
+            <Box
+              component="span"
+              sx={{
+                width: 10,
+                height: 10,
+                flexShrink: 0,
+                borderRadius: '50%',
+                border: `2px solid ${NEARBY_ENTRANCE_MARKER_STYLE.color}`,
+                bgcolor: NEARBY_ENTRANCE_MARKER_STYLE.fillColor
+              }}
+            />
+            {additionalMarkersLabel}
+          </Box>
+        )}
+      </StyledMapContainer>
     </Box>
   );
 };
