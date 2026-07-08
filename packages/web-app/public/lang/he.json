@@ -2234,7 +2234,7 @@
   "the entrance": "הכניסה",
   "The entrance is the only one of the cave. Moving it to another existing cave or network will result in deleting it and losing its cave data (depth, discovery year, length, temperature, locations etc.): be careful!": "כניסה זו היא היחידה של המערה. העברתה למערה קיימת אחרת תגרום למחיקתה ואובדן נתוני המערה (עומק, שנת גילוי, אורך, טמפרטורה, מיקומים וכו'): היה זהיר!",
   "The following file is too big: {file}. Max accepted size: {maxSize}": "הקובץ הבא גדול מדי: {file}. גודל מקסימלי מקובל: {maxSize}",
-  "The following licenses will apply to your contribution:": "הרישיונות הבאים יחולו על תרומתך:",
+  "The following license will apply to your contribution:": "הרישיון הבא יחול על התרומה שלך:",
   "The functionality to check for duplicates has not been fully implemented.": "הפונקציונליות לבדיקת כפילויות לא יושמה במלואה.",
   "The identifier must match the identifier type format.": "המזהה חייב להתאים לפורמט של סוג המזהה.",
   "The international voluntary association WikiCaves operates the GrottoCenter web application WikiCaves has as goals:": "אגודה התנדבותית בין-לאומית {wikicaves} מפעילה את הישום האינטרנטי של GrottoCenter. המטרות של WikiCaves הינן:",

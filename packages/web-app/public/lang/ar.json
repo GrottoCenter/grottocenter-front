@@ -2234,7 +2234,7 @@
   "the entrance": "المدخل",
   "The entrance is the only one of the cave. Moving it to another existing cave or network will result in deleting it and losing its cave data (depth, discovery year, length, temperature, locations etc.): be careful!": "هذا المدخل هو الوحيد للكهف. نقله إلى كهف أو شبكة أخرى سيؤدي إلى حذفه وفقدان بيانات الكهف (العمق، سنة الاكتشاف، الطول، درجة الحرارة، المواقع، إلخ): كن حذراً!",
   "The following file is too big: {file}. Max accepted size: {maxSize}": "الملف التالي كبير جداً: {file}. الحجم الأقصى المقبول: {maxSize}",
-  "The following licenses will apply to your contribution:": "ستنطبق الرخص التالية على مساهمتك:",
+  "The following license will apply to your contribution:": "ينطبق الترخيص التالي على مساهمتك:",
   "The functionality to check for duplicates has not been fully implemented.": "لم يتم تنفيذ وظيفة التحقق من التكرارات بالكامل.",
   "The identifier must match the identifier type format.": "يجب أن يطابق المعرف تنسيق نوع المعرف.",
   "The international voluntary association WikiCaves operates the GrottoCenter web application WikiCaves has as goals:": "الجمعية الدولية التطوعية {wikicaves} تدير تطبيق الأنترنيت مركز المغارات GrottoCenter. ويكي مغارات WikiCaves لديها كأهداف:",

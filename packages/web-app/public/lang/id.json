@@ -2234,7 +2234,7 @@
   "the entrance": "pintu masuk",
   "The entrance is the only one of the cave. Moving it to another existing cave or network will result in deleting it and losing its cave data (depth, discovery year, length, temperature, locations etc.): be careful!": "Pintu masuk ini adalah satu-satunya dari gua. Memindahkannya ke gua atau jaringan yang sudah ada akan mengakibatkan penghapusannya dan kehilangan data gua (kedalaman, tahun penemuan, panjang, suhu, lokasi dll.): berhati-hatilah!",
   "The following file is too big: {file}. Max accepted size: {maxSize}": "File berikut terlalu besar: {file}. Ukuran maksimal yang diterima: {maxSize}",
-  "The following licenses will apply to your contribution:": "Lisensi berikut akan berlaku untuk kontribusi Anda:",
+  "The following license will apply to your contribution:": "Lisensi berikut berlaku untuk kontribusi Anda:",
   "The functionality to check for duplicates has not been fully implemented.": "Fungsionalitas untuk memeriksa duplikat belum diimplementasikan sepenuhnya.",
   "The identifier must match the identifier type format.": "Pengidentifikasi harus sesuai dengan format jenis pengidentifikasi.",
   "The international voluntary association WikiCaves operates the GrottoCenter web application WikiCaves has as goals:": "Asosiasi relawan internasional {wikicaves} yang mengoperasikan aplikasi web GrottoCenter. WikiCaves memiliki tujuan:",

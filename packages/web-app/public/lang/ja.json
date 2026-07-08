@@ -2234,7 +2234,7 @@
   "the entrance": "入口",
   "The entrance is the only one of the cave. Moving it to another existing cave or network will result in deleting it and losing its cave data (depth, discovery year, length, temperature, locations etc.): be careful!": "この入口は洞窟で唯一のものです。別の洞窟またはネットワークに移動すると、削除され、洞窟データ（深度、発見年、長さ、温度、場所など）が失われます：注意してください！",
   "The following file is too big: {file}. Max accepted size: {maxSize}": "次のファイルが大きすぎます: {file}。最大許容サイズ: {maxSize}",
-  "The following licenses will apply to your contribution:": "次のライセンスがあなたの貢献に適用されます：",
+  "The following license will apply to your contribution:": "以下のライセンスがあなたの投稿に適用されます:",
   "The functionality to check for duplicates has not been fully implemented.": "重複チェック機能は完全には実装されていません。",
   "The identifier must match the identifier type format.": "識別子は識別子タイプのフォーマットと一致する必要があります。",
   "The international voluntary association WikiCaves operates the GrottoCenter web application WikiCaves has as goals:": "国際ボランティア協会{wikicaves}はGrottoCenterウェブアプリケーションを運営しています。WikiCavesの目標は以下の通りです：",

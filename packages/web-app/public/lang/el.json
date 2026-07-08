@@ -2234,7 +2234,7 @@
   "the entrance": "η είσοδος",
   "The entrance is the only one of the cave. Moving it to another existing cave or network will result in deleting it and losing its cave data (depth, discovery year, length, temperature, locations etc.): be careful!": "Αυτή η είσοδος είναι η μόνη του σπηλαίου. Η μετακίνησή της σε άλλο σπήλαιο ή δίκτυο θα έχει ως αποτέλεσμα τη διαγραφή της και την απώλεια δεδομένων (βάθος, έτος ανακάλυψης, μήκος, θερμοκρασία, τοποθεσίες κ.λπ.): προσοχή!",
   "The following file is too big: {file}. Max accepted size: {maxSize}": "Το παρακάτω αρχείο είναι πολύ μεγάλο: {file}. Μέγιστο αποδεκτό μέγεθος: {maxSize}",
-  "The following licenses will apply to your contribution:": "Οι ακόλουθες άδειες θα ισχύουν για την συνεισφορά σας:",
+  "The following license will apply to your contribution:": "Η ακόλουθη άδεια ισχύει για τη συνεισφορά σας:",
   "The functionality to check for duplicates has not been fully implemented.": "Η λειτουργία ελέγχου για διπλότυπα δεν έχει πλήρως υλοποιηθεί.",
   "The identifier must match the identifier type format.": "Το αναγνωριστικό πρέπει να ταιριάζει με τη μορφή του τύπου αναγνωριστικού.",
   "The international voluntary association WikiCaves operates the GrottoCenter web application WikiCaves has as goals:": "Ο διεθνής εθελοντικός οργανισμός {wikicaves} λειτουργεί την εφαρμογή Grottocenter. Το WikiCaves έχει τους παρακάτω σκοπούς:",

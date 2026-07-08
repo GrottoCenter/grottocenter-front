@@ -2234,7 +2234,7 @@
   "the entrance": "der Eingang",
   "The entrance is the only one of the cave. Moving it to another existing cave or network will result in deleting it and losing its cave data (depth, discovery year, length, temperature, locations etc.): be careful!": "Dieser Eingang ist der einzige der Höhle. Das Verschieben in eine andere Höhle oder ein Netzwerk führt zu seiner Löschung und dem Verlust seiner Höhlendaten (Tiefe, Entdeckungsjahr, Länge, Temperatur, Standorte usw.): Seien Sie vorsichtig!",
   "The following file is too big: {file}. Max accepted size: {maxSize}": "Die folgende Datei ist zu groß: {file}. Maximal akzeptierte Größe: {maxSize}",
-  "The following licenses will apply to your contribution:": "Die folgenden Lizenzen gelten für Ihren Beitrag:",
+  "The following license will apply to your contribution:": "Die folgende Lizenz gilt für Ihren Beitrag:",
   "The functionality to check for duplicates has not been fully implemented.": "Die Funktion zur Duplikatprüfung wurde noch nicht vollständig implementiert.",
   "The identifier must match the identifier type format.": "Der Identifikator muss dem Format des Identifikatortyps entsprechen.",
   "The international voluntary association WikiCaves operates the GrottoCenter web application WikiCaves has as goals:": "Die Webseite wird von dem Verei \\\"{wikicaves}\\\" veröffentlicht mit dem Ziel:",

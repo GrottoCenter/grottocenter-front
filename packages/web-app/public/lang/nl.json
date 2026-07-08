@@ -2234,7 +2234,7 @@
   "the entrance": "de ingang",
   "The entrance is the only one of the cave. Moving it to another existing cave or network will result in deleting it and losing its cave data (depth, discovery year, length, temperature, locations etc.): be careful!": "Deze ingang is de enige van de grot. Het verplaatsen naar een andere grot of netwerk zal resulteren in het verwijderen ervan en het verliezen van zijn grotgegevens (diepte, ontdekkingsjaar, lengte, temperatuur, locaties, enz.): wees voorzichtig!",
   "The following file is too big: {file}. Max accepted size: {maxSize}": "Het volgende bestand is te groot: {file}. Maximaal geaccepteerde grootte: {maxSize}",
-  "The following licenses will apply to your contribution:": "De volgende licenties zijn van toepassing op uw bijdrage:",
+  "The following license will apply to your contribution:": "De volgende licentie is van toepassing op je bijdrage:",
   "The functionality to check for duplicates has not been fully implemented.": "De functionaliteit om te controleren op duplicaten is nog niet volledig geïmplementeerd.",
   "The identifier must match the identifier type format.": "De identificator moet overeenkomen met het formaat van het identificatortype.",
   "The international voluntary association WikiCaves operates the GrottoCenter web application WikiCaves has as goals:": "De internationale vrijwillgers organisatie {wikicaves} voert de GrottoCenter web appicatie uit. WikiCaves heeft als doelstellingen:",

@@ -3,7 +3,7 @@ import { React } from 'react';
 import { useIntl } from 'react-intl';
 import { styled } from '@mui/material/styles';
 import InternationalizedLink from '../../../common/InternationalizedLink';
-import { licenceLinks, licensesODBLink } from '../../../../conf/externalLinks';
+import { licensesODBLink } from '../../../../conf/externalLinks';
 
 // Discreet, single-line license notice shown at the bottom of contribution
 // forms. Purposely low-key (small muted caption + inline text links) so it
@@ -25,7 +25,7 @@ const LicenceBox = () => {
   return (
     <LicenceBoxStyle variant="caption" component="p">
       {formatMessage({
-        id: 'The following licenses will apply to your contribution:'
+        id: 'The following license will apply to your contribution:'
       })}{' '}
       <InternationalizedLink
         links={licensesODBLink}
@@ -34,15 +34,6 @@ const LicenceBox = () => {
         })}
       >
         ODBL
-      </InternationalizedLink>
-      {' · '}
-      <InternationalizedLink
-        links={licenceLinks}
-        title={formatMessage({
-          id: 'Unless stated otherwise, the CC-BY-SA license applies for documents and texts subject to copyright.'
-        })}
-      >
-        CC-BY-SA
       </InternationalizedLink>
     </LicenceBoxStyle>
   );

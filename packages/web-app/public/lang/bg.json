@@ -2234,7 +2234,7 @@
   "the entrance": "вход",
   "The entrance is the only one of the cave. Moving it to another existing cave or network will result in deleting it and losing its cave data (depth, discovery year, length, temperature, locations etc.): be careful!": "Входът е единственият на пещерата. Преместването му в друга пещера или мрежа ще доведе до изтриването му и загубата на данните (дълбочина, година на откритие, дължина, температура, местоположения и др.): бъдете внимателни!",
   "The following file is too big: {file}. Max accepted size: {maxSize}": "Следният файл е твърде голям: {file}. Максимално допустим размер: {maxSize}",
-  "The following licenses will apply to your contribution:": "Следните лицензи ще се прилагат към вашия принос:",
+  "The following license will apply to your contribution:": "Следният лиценз ще се прилага за вашия принос:",
   "The functionality to check for duplicates has not been fully implemented.": "Функцията за проверка на дубликати не е напълно реализирана.",
   "The identifier must match the identifier type format.": "Идентификаторът трябва да съвпада с формата на типа идентификатор.",
   "The international voluntary association WikiCaves operates the GrottoCenter web application WikiCaves has as goals:": "Международното доброволно сдружение {wikicaves} управлява уеб приложението GrottoCenter. WikiCaves има за цел:",
