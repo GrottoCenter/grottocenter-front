@@ -35,6 +35,11 @@ export const useOtherEntranceName = (caveId, currentEntranceId, enabled) => {
       .catch(() => {
         if (requestId === requestIdRef.current) setName(null);
       });
+    // Invalidate the in-flight request on unmount so its .then() doesn't
+    // setName() on an unmounted component (stale-on-unmount).
+    return () => {
+      requestIdRef.current += 1;
+    };
   }, [caveId, currentEntranceId, enabled, authorizationHeader]);
 
   return name;

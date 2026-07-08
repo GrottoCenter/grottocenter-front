@@ -26,7 +26,7 @@ const BoolToggleChip = ({ name, label, icon, control, disabled = false }) => (
           textTransform: 'none',
           gap: 1,
           borderRadius: 2,
-          px: 1.5,
+          px: '12px',
           color: 'text.secondary',
           borderColor: 'divider',
           '&.Mui-selected': {

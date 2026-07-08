@@ -1,5 +1,5 @@
 import { Alert, Box } from '@mui/material';
-import React from 'react';
+import React, { useCallback } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
 
@@ -18,28 +18,34 @@ const CaveDetail = ({
 }) => {
   const { formatMessage } = useIntl();
 
-  const validateTemperature = value => {
-    const numberValue = Number(value);
-    if (Number.isNaN(numberValue) || !Number.isInteger(numberValue)) {
-      return formatMessage({ id: 'Temperature must be an integer (in °C)' });
-    }
-    if (numberValue > 100 || numberValue < -100) {
-      return formatMessage({
-        id: 'Temperature must be between -100 and 100 °C'
-      });
-    }
-    return true;
-  };
-  const validateDistance = value => {
-    const numberValue = Number(value);
-    if (Number.isNaN(numberValue) || !Number.isInteger(numberValue)) {
-      return formatMessage({ id: 'Distance must be an integer (in m)' });
-    }
-    if (numberValue < 0) {
-      return formatMessage({ id: 'Distance must be superior or equal to 0' });
-    }
-    return true;
-  };
+  const validateTemperature = useCallback(
+    value => {
+      const numberValue = Number(value);
+      if (Number.isNaN(numberValue) || !Number.isInteger(numberValue)) {
+        return formatMessage({ id: 'Temperature must be an integer (in °C)' });
+      }
+      if (numberValue > 100 || numberValue < -100) {
+        return formatMessage({
+          id: 'Temperature must be between -100 and 100 °C'
+        });
+      }
+      return true;
+    },
+    [formatMessage]
+  );
+  const validateDistance = useCallback(
+    value => {
+      const numberValue = Number(value);
+      if (Number.isNaN(numberValue) || !Number.isInteger(numberValue)) {
+        return formatMessage({ id: 'Distance must be an integer (in m)' });
+      }
+      if (numberValue < 0) {
+        return formatMessage({ id: 'Distance must be superior or equal to 0' });
+      }
+      return true;
+    },
+    [formatMessage]
+  );
 
   return (
     <FormSection title="Characteristics">

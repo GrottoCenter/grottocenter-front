@@ -24,7 +24,6 @@ const NetworkLinkSection = ({
   errors,
   entityType,
   updateEntityType,
-  reset,
   selectedCave,
   onSelectedCaveChange
 }) => {
@@ -34,10 +33,12 @@ const NetworkLinkSection = ({
 
   const handleLinkToggle = event => {
     const isLinked = event.target.checked;
+    // updateEntityType (parent's handleUpdateEntityType) already resets the
+    // form — clearing the linked cave fields and, by default, the errors — so
+    // no separate reset is needed here.
     updateEntityType(isLinked ? ENTRANCE_ONLY : ENTRANCE_AND_CAVE);
     onSelectedCaveChange(null);
     setSelectedNbEntrances(null);
-    reset();
   };
 
   return (
@@ -88,7 +89,6 @@ NetworkLinkSection.propTypes = {
   }),
   entityType: PropTypes.oneOf([ENTRANCE_ONLY, ENTRANCE_AND_CAVE]),
   updateEntityType: PropTypes.func.isRequired,
-  reset: PropTypes.func.isRequired,
   selectedCave: PropTypes.shape({
     id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
     name: PropTypes.string

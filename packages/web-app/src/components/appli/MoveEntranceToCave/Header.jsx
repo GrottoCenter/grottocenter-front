@@ -1,20 +1,31 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Box, Typography } from '@mui/material';
+import { useIntl } from 'react-intl';
 
 import CustomIcon from '../../common/CustomIcon';
 import GCLink from '../../common/GCLink';
 
 // Compact subject line: which entrance the operation is about, as a link back to
 // its page. The page title already carries the action verb, so no extra label.
-const Header = ({ entrance }) => (
-  <GCLink href={`/ui/entrances/${entrance.id}`} internal>
-    <Box sx={{ display: 'flex', alignItems: 'center', minWidth: 0 }}>
-      <CustomIcon type="entrance" size={18} />
-      <Typography variant="body1">{entrance.name}</Typography>
-    </Box>
-  </GCLink>
-);
+const Header = ({ entrance }) => {
+  const { formatMessage } = useIntl();
+  return (
+    <GCLink
+      href={`/ui/entrances/${entrance.id}`}
+      internal
+      title={formatMessage(
+        { id: 'Move entrance: {name}' },
+        { name: entrance.name }
+      )}
+    >
+      <Box sx={{ display: 'flex', alignItems: 'center', minWidth: 0 }}>
+        <CustomIcon type="entrance" size={18} />
+        <Typography variant="body1">{entrance.name}</Typography>
+      </Box>
+    </GCLink>
+  );
+};
 
 Header.propTypes = {
   entrance: PropTypes.shape({

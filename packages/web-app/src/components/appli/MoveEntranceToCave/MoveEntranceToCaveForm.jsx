@@ -39,6 +39,9 @@ const MoveEntranceToCaveForm = ({ entrance }) => {
 
   useEffect(() => {
     if (hasSubmitted && !loading && !apiError) {
+      // Consume the submission so a later upstream error-clear can't retrigger
+      // the success navigation without a fresh submit.
+      setHasSubmitted(false);
       onSuccess(formatMessage({ id: 'Entrance successfully moved.' }));
       navigate(`/ui/entrances/${entrance?.id}`);
     }

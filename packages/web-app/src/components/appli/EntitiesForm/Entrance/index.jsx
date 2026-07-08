@@ -256,7 +256,6 @@ export const EntranceForm = ({
             errors={errors}
             entityType={entityType}
             updateEntityType={handleUpdateEntityType}
-            reset={handleReset}
             selectedCave={selectedCave}
             onSelectedCaveChange={setSelectedCave}
           />
