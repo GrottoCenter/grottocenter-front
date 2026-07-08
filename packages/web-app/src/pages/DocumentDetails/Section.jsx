@@ -25,6 +25,7 @@ import {
   isImageFile
 } from '../../components/common/DocumentsList/utils/imageUtils';
 import { getFileIcon } from '../../components/common/DocumentsList/utils/fileIcons';
+import { ThumbnailsPropTypes } from '../../types/document.type';
 
 export const TextLink = ({ value, url }) =>
   url ? (
@@ -442,7 +443,8 @@ FilesSection.propTypes = {
     PropTypes.shape({
       fileName: PropTypes.string,
       completePath: PropTypes.string,
-      description: PropTypes.string
+      description: PropTypes.string,
+      thumbnails: ThumbnailsPropTypes
     })
   )
 };
