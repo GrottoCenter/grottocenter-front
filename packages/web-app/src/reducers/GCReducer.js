@@ -68,12 +68,11 @@ import recentChange from './RecentChangeReducer';
 import region from './RegionReducer';
 import regionDetails from './RegionDetailsReducer';
 import regionEntrances from './RegionEntrancesDataQualityReducer';
-import sideMenu from './SideMenuReducer';
-import signUp from './SignUpReducer';
-import verifyEmail from './VerifyEmailReducer';
 import resendVerificationEmail from './ResendVerificationEmailReducer';
 import restoreGuideline from './RestoreGuidelineReducer';
 import rollbackGuideline from './RollbackGuidelineReducer';
+import sideMenu from './SideMenuReducer';
+import signUp from './SignUpReducer';
 import snapshots from './SnapshotReducer';
 import statisticsCountry from './StatisticsCountryReducer';
 import statisticsMassif from './StatisticsMassifReducer';
@@ -103,6 +102,7 @@ import countryOrganization from './CountryOrganizationReducer';
 import massifOrganization from './MassifOrganizationReducer';
 import regionOrganization from './RegionOrganizationReducer';
 import updatePersonGroups from './UpdatePersonGroupesReducer';
+import verifyEmail from './VerifyEmailReducer';
 
 const GCReducer = combineReducers({
   account,
@@ -177,12 +177,11 @@ const GCReducer = combineReducers({
   regionDetails,
   regionEntrances,
   regionOrganization,
-  sideMenu,
-  signUp,
-  verifyEmail,
   resendVerificationEmail,
   restoreGuideline,
   rollbackGuideline,
+  sideMenu,
+  signUp,
   snapshots,
   statisticsCountry,
   statisticsMassif,
@@ -208,7 +207,8 @@ const GCReducer = combineReducers({
   updateName,
   updateOrganization,
   updatePerson,
-  updatePersonGroups
+  updatePersonGroups,
+  verifyEmail
 });
 
 export default GCReducer;
