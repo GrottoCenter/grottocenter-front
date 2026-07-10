@@ -29,6 +29,7 @@ const AccordionSnapshot = ({
   reviewer,
   previous,
   actualItem,
+  newName,
   all,
   isCurrent
 }) => {
@@ -122,7 +123,7 @@ const AccordionSnapshot = ({
                 </Typography>
                 {isNameChange ? (
                   <AuthorAndDate
-                    author={reviewer}
+                    author={reviewer ?? author}
                     verb="Updated"
                     textColor="inherit"
                   />
@@ -154,6 +155,16 @@ const AccordionSnapshot = ({
                   component="span"
                   fontWeight={isCurrent ? 'bold' : 'regular'}>
                   {isCurrent ? (
+                    snapshotTitle
+                  ) : isNameChange ? (
+                    // Rename snapshot: the name IS the change — show old → new.
+                    // snapshotTitle holds the OLD name (raw h_name value);
+                    // newName is resolved from the next real snapshot.
+                    <HighLightsChar oldText={snapshotTitle} newText={newName} />
+                  ) : isEntranceType ? (
+                    // Regular entrance snapshot: name/caveName are contextual
+                    // labels resolved across tables, not diffable fields. Renames
+                    // are surfaced by the dedicated rename snapshot above.
                     snapshotTitle
                   ) : (
                     <HighLightsChar
@@ -252,6 +263,7 @@ AccordionSnapshot.propTypes = {
   isNetwork: PropTypes.bool,
   author: authorType,
   reviewer: authorType,
+  newName: PropTypes.string,
   previous: PropTypes.shape({
     id: PropTypes.string,
     title: PropTypes.string,

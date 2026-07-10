@@ -53,12 +53,9 @@ const EntranceNetworkSnapshots = information => {
       {entrance.cave && (
         <Property
           label={formatMessage({ id: 'Network' })}
-          value={
-            <HighLightsLine
-              oldText={previous?.caveName}
-              newText={entrance.caveName}
-            />
-          }
+          // caveName is a contextual label (resolved across tables), not a
+          // diffable field: network renames are surfaced by rename snapshots.
+          value={entrance.caveName}
           icon={<CustomIcon type="network" />}
           url={`/ui/caves/${entrance.cave}`}
         />
