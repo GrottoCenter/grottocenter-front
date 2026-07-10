@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import { Box, TextField } from '@mui/material';
 import { Controller } from 'react-hook-form';
 import AnchorToolbar from './AnchorToolbar';
+import ObstacleToolbar from './ObstacleToolbar';
 
 const LABEL_KEYS = {
   obstacle: 'Obstacle',
@@ -73,14 +74,23 @@ const ObstacleField = ({
           />
         );
 
-        if (!isAnchor) return textField;
+        if (isObstacle)
+          return (
+            <Box sx={{ position: 'relative' }}>
+              {textField}
+              <ObstacleToolbar />
+            </Box>
+          );
 
-        return (
-          <Box sx={{ position: 'relative' }}>
-            {textField}
-            <AnchorToolbar onInsert={handleInsertChar} />
-          </Box>
-        );
+        if (isAnchor)
+          return (
+            <Box sx={{ position: 'relative' }}>
+              {textField}
+              <AnchorToolbar onInsert={handleInsertChar} />
+            </Box>
+          );
+
+        return textField;
       }}
     />
   );

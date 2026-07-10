@@ -17,6 +17,24 @@ import { ObstaclePropTypes } from '../../../../types/entrance.type';
 import { HighLightsLine } from '../../../common/Highlights';
 import SectionTitle from '../SectionTitle';
 import RiggingSummary from './RiggingSummary';
+import ColumnLegend from './ColumnLegend';
+
+const OBSTACLE_LEGEND = [
+  { abbrevKey: 'obstacle.abbrev.pit', labelKey: 'obstacle.label.pit' },
+  { abbrevKey: 'obstacle.abbrev.step', labelKey: 'obstacle.label.step' },
+  { abbrevKey: 'obstacle.abbrev.climb', labelKey: 'obstacle.label.climb' },
+  { abbrevKey: 'obstacle.abbrev.waterfall', labelKey: 'obstacle.label.waterfall' }
+];
+
+const ANCHOR_LEGEND = [
+  { abbrevKey: 'anchor.abbrev.spit', labelKey: 'anchor.label.spit' },
+  { abbrevKey: 'anchor.abbrev.bolt', labelKey: 'anchor.label.bolt' },
+  { abbrevKey: 'anchor.abbrev.piton', labelKey: 'anchor.label.piton' },
+  { abbrevKey: 'anchor.abbrev.natural', labelKey: 'anchor.label.natural' },
+  { abbrevKey: 'anchor.abbrev.soft', labelKey: 'anchor.label.soft' },
+  { abbrevKey: 'anchor.abbrev.drilled', labelKey: 'anchor.label.drilled' },
+  { abbrevKey: 'anchor.abbrev.redirect', labelKey: 'anchor.label.redirect' }
+];
 
 const StyledTable = styled(Table)`
   border-left: 1px solid ${props => props.theme.palette.primary.veryLight};
@@ -101,12 +119,14 @@ const RiggingTable = ({ id, obstacles, title, previous, isDeleted }) => {
             <TableRow>
               <StyledTableCell $isDeleted={isDeleted} width="25%">
                 {formatMessage({ id: 'obstacles' })}
+                <ColumnLegend titleKey="Obstacle notation legend" items={OBSTACLE_LEGEND} />
               </StyledTableCell>
               <StyledTableCell $isDeleted={isDeleted} width="10%">
                 {formatMessage({ id: 'ropes' })}
               </StyledTableCell>
               <StyledTableCell $isDeleted={isDeleted} width="20%">
                 {formatMessage({ id: 'anchors' })}
+                <ColumnLegend titleKey="Anchor notation legend" items={ANCHOR_LEGEND} />
               </StyledTableCell>
               <StyledTableCell $isDeleted={isDeleted}>
                 {formatMessage({ id: 'observations' })}
