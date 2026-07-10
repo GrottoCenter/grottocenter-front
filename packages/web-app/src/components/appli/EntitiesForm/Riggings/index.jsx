@@ -87,6 +87,10 @@ const CreateRiggingsForm = ({
     if (onDirtyChange) onDirtyChange(isDirty);
   }, [isDirty, onDirtyChange]);
 
+  useEffect(() => {
+    if (focusIndex >= 0) setFocusIndex(-1);
+  }, [fields.length, focusIndex]);
+
   const handleAppend = () => {
     setFocusIndex(fields.length);
     append(getDefaultObstacle());

@@ -3,6 +3,7 @@ import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
 import {
   Box,
+  Divider,
   IconButton,
   Popover,
   Table,
@@ -25,7 +26,12 @@ const ColumnLegend = ({ titleKey, items }) => {
           size="small"
           onClick={e => setAnchorEl(e.currentTarget)}
           aria-label={formatMessage({ id: titleKey })}
-          sx={{ ml: 1, color: 'inherit', opacity: 0.8, verticalAlign: 'middle' }}>
+          sx={{
+            ml: 1,
+            color: 'inherit',
+            opacity: 0.8,
+            verticalAlign: 'middle'
+          }}>
           <InfoOutlinedIcon fontSize="small" />
         </IconButton>
       </Tooltip>
@@ -36,16 +42,20 @@ const ColumnLegend = ({ titleKey, items }) => {
         onClose={() => setAnchorEl(null)}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
         transformOrigin={{ vertical: 'top', horizontal: 'left' }}>
-        <Box sx={{ pt: 1.5, px: 2, pb: 1, minWidth: 160 }}>
-          <Typography variant="caption" color="text.secondary" display="block" sx={{ mb: 0.5 }}>
+        <Box sx={{ pt: 2, px: 2, pb: 2, minWidth: 160 }}>
+          <Typography variant="subtitle2" fontWeight="bold" sx={{ mb: 1 }}>
             {formatMessage({ id: titleKey })}
           </Typography>
-          <Table size="small">
+          <Divider sx={{ mb: 1 }} />
+          <Table size="small" sx={{ mb: 0 }}>
             <TableBody>
               {items.map(({ abbrevKey, labelKey }) => (
                 <TableRow key={abbrevKey}>
                   <TableCell sx={{ border: 0, py: 0.5, pr: 2 }}>
-                    <Typography variant="body2" fontWeight="bold" component="span">
+                    <Typography
+                      variant="body2"
+                      fontWeight="bold"
+                      component="span">
                       {formatMessage({ id: abbrevKey })}
                     </Typography>
                   </TableCell>

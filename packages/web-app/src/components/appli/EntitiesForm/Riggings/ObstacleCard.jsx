@@ -25,7 +25,7 @@ const ObstacleCard = ({
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          mb: 0.1
+          mb: 0
         }}>
         <Typography variant="caption" fontWeight="medium">
           {`${formatMessage({ id: 'Obstacle' })} ${index + 1}`}
@@ -39,21 +39,25 @@ const ObstacleCard = ({
           orientation="horizontal"
         />
       </Box>
-      <Stack spacing={0.75}>
+      <Stack spacing={0}>
         <Box sx={{ display: 'flex', gap: 1 }}>
-          <ObstacleField
-            control={control}
-            index={index}
-            field="obstacle"
-            showLabel
-            autoFocus={autoFocus}
-          />
-          <ObstacleField
-            control={control}
-            index={index}
-            field="rope"
-            showLabel
-          />
+          <Box sx={{ flex: 1, minWidth: 0 }}>
+            <ObstacleField
+              control={control}
+              index={index}
+              field="obstacle"
+              showLabel
+              autoFocus={autoFocus}
+            />
+          </Box>
+          <Box sx={{ flex: 1, minWidth: 0 }}>
+            <ObstacleField
+              control={control}
+              index={index}
+              field="rope"
+              showLabel
+            />
+          </Box>
         </Box>
         <ObstacleField
           control={control}

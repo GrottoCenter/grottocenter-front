@@ -66,7 +66,7 @@ const AnchorToolbar = ({ onInsert }) => {
         onClose={() => setAnchorEl(null)}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
         transformOrigin={{ vertical: 'top', horizontal: 'right' }}>
-        <Box sx={{ pt: 2, px: 2, pb: 0.5, minWidth: 200 }}>
+        <Box sx={{ pt: 2, px: 2, pb: 2, minWidth: 200 }}>
           <Typography variant="caption" color="text.secondary" display="block" sx={{ mb: 1 }}>
             {formatMessage({ id: 'Click to insert' })}
           </Typography>
@@ -95,11 +95,12 @@ const AnchorToolbar = ({ onInsert }) => {
               </Tooltip>
             ))}
           </Box>
-          <Divider sx={{ mb: 1.5 }} />
-          <Typography variant="caption" color="text.secondary" display="block" sx={{ mb: 0.5 }}>
+          <Divider sx={{ mb: '12px' }} />
+          <Typography variant="subtitle2" fontWeight="bold" sx={{ mb: 1 }}>
             {formatMessage({ id: 'Anchor notation legend' })}
           </Typography>
-          <Table size="small">
+          <Divider sx={{ mb: 1 }} />
+          <Table size="small" sx={{ mb: 0 }}>
             <TableBody>
               {LEGEND_ITEMS.map(({ abbrevKey, labelKey }) => (
                 <TableRow key={abbrevKey}>

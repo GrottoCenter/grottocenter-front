@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useIntl } from 'react-intl';
 import {
   Box,
+  Divider,
   IconButton,
   Popover,
   Table,
@@ -59,11 +60,12 @@ const ObstacleToolbar = () => {
         onClose={() => setAnchorEl(null)}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
         transformOrigin={{ vertical: 'top', horizontal: 'right' }}>
-        <Box sx={{ pt: 1.5, px: 2, pb: 1, minWidth: 180 }}>
-          <Typography variant="caption" color="text.secondary" display="block" sx={{ mb: 0.5 }}>
+        <Box sx={{ pt: 2, px: 2, pb: 2, minWidth: 180 }}>
+          <Typography variant="subtitle2" fontWeight="bold" sx={{ mb: 1 }}>
             {formatMessage({ id: 'Obstacle notation legend' })}
           </Typography>
-          <Table size="small">
+          <Divider sx={{ mb: 1 }} />
+          <Table size="small" sx={{ mb: 0 }}>
             <TableBody>
               {LEGEND_ITEMS.map(({ abbrevKey, labelKey }) => (
                 <TableRow key={abbrevKey}>

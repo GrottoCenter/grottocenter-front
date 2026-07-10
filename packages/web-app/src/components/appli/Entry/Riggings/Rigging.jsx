@@ -107,11 +107,13 @@ const Rigging = ({ rigging, entranceId, isEditAllowed, isMoving, onMoveUp, onMov
             onDirtyChange={setIsFormDirty}
             values={rigging}
           />
-          <DiscardChangesDialog
-            open={isDiscardDialogOpen}
-            onKeepEditing={() => setIsDiscardDialogOpen(false)}
-            onDiscard={closeForm}
-          />
+          {isDiscardDialogOpen && (
+            <DiscardChangesDialog
+              open={isDiscardDialogOpen}
+              onKeepEditing={() => setIsDiscardDialogOpen(false)}
+              onDiscard={closeForm}
+            />
+          )}
         </Box>
       ) : (
         <Box>

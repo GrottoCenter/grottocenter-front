@@ -92,11 +92,13 @@ const Riggings = ({ riggings, entranceId, isEditAllowed }) => {
               <Divider />
             </>
           )}
-          <DiscardChangesDialog
-            open={isDiscardDialogOpen}
-            onKeepEditing={() => setIsDiscardDialogOpen(false)}
-            onDiscard={closeForm}
-          />
+          {isDiscardDialogOpen && (
+            <DiscardChangesDialog
+              open={isDiscardDialogOpen}
+              onKeepEditing={() => setIsDiscardDialogOpen(false)}
+              onDiscard={closeForm}
+            />
+          )}
           {riggings.length > 0 &&
             (() => {
               const sorted = sortByRelevance(riggings);
