@@ -26,8 +26,9 @@ const QuickSearch = ({ hasFixWidth, onClose }) => {
   const debouncedInput = useDebounce(input, AUTOCOMPLETE_DEBOUNCE_DELAY);
 
   // A single-entrance cavity would appear twice (once as its cave, once as its
-  // entrance). Keep only networks (caves with 2+ entrances) and entrances so the
-  // list shows networks or entrances, never a cave redundant with its entrance.
+  // entrance). Keep only networks (caves with 2+ entrances) and all other entity
+  // types (entrances, organizations, massifs) so the list never shows a cave
+  // redundant with its entrance.
   const filteredResults = useMemo(
     () =>
       results.filter(
