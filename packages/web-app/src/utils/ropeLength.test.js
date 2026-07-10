@@ -38,6 +38,15 @@ describe('parseRopeLength', () => {
     expect(parseRopeLength('C12,5')).toBe(12.5);
     expect(parseRopeLength('C12.5')).toBe(12.5);
   });
+
+  it('handles multiplicity notation', () => {
+    expect(parseRopeLength('2xC30')).toBe(60);
+    expect(parseRopeLength('2 x C30')).toBe(60);
+    expect(parseRopeLength('2 C30')).toBe(60);
+    expect(parseRopeLength('2XC30')).toBe(60);
+    expect(parseRopeLength('3xC20 + C10')).toBe(70);
+    expect(parseRopeLength('2 C30 + 2 C10')).toBe(80);
+  });
 });
 
 describe('parseRopeLengths', () => {
