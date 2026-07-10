@@ -10,6 +10,8 @@ const ROPE_PATTERN =
 // "unparsable" — they must not trigger the estimate marker.
 const NO_ROPE_PATTERN = /^[\s\-–—/.]*$/;
 
+// Note: returns 0 for inputs like "C0". Callers that check `total > 0`
+// will silently hide the rope chip — acceptable for an edge case.
 export const parseRopeLength = ropeText => {
   if (typeof ropeText !== 'string') return null;
   const matches = [...ropeText.matchAll(ROPE_PATTERN)];

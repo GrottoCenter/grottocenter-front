@@ -48,7 +48,7 @@ const EmptyCellMark = styled('span')`
   color: ${props => props.theme.palette.text.disabled};
 `;
 
-const HighlightedTableCell = ({ data, oldData }) => {
+const HighlightedTableCell = ({ data = '', oldData }) => {
   // In diff (snapshot) mode HighLightsLine must receive the raw strings;
   // the em dash placeholder is only for the regular display.
   let content;

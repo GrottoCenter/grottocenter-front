@@ -164,7 +164,6 @@ const CreateRiggingsForm = ({
                             control={control}
                             index={index}
                             field={field}
-                            showLabel
                             autoFocus={
                               index === focusIndex && field === 'obstacle'
                             }

@@ -40,6 +40,12 @@ const AnchorToolbar = ({ onInsert }) => {
             e.preventDefault();
             setAnchorEl(e.currentTarget);
           }}
+          onKeyDown={e => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              setAnchorEl(e.currentTarget);
+            }
+          }}
           aria-label={formatMessage({ id: 'Anchor notation legend' })}
           sx={{
             position: 'absolute',
@@ -66,7 +72,7 @@ const AnchorToolbar = ({ onInsert }) => {
           </Typography>
           <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
             {ARROWS.map(arrow => (
-              <Tooltip key={arrow} title={`${formatMessage({ id: 'Click to insert' })} ${arrow}`} placement="top">
+              <Tooltip key={arrow} title={`${formatMessage({ id: 'Click to insert' })} ${arrow}`}>
                 <IconButton
                   onClick={() => {
                     onInsert(arrow);

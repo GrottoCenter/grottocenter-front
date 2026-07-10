@@ -19,7 +19,7 @@ const ObstacleCard = ({
   const { formatMessage } = useIntl();
 
   return (
-    <Card variant="outlined" sx={{ px: 1, py: 0 }}>
+    <Card variant="outlined" sx={{ px: 1, py: 0.5 }}>
       <Box
         sx={{
           display: 'flex',

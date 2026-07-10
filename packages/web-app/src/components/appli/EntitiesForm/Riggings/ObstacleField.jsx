@@ -50,7 +50,7 @@ const ObstacleField = ({
           }
         };
 
-        const field = (
+        const textField = (
           <TextField
             {...rhfField}
             multiline
@@ -73,11 +73,11 @@ const ObstacleField = ({
           />
         );
 
-        if (!isAnchor) return field;
+        if (!isAnchor) return textField;
 
         return (
           <Box sx={{ position: 'relative' }}>
-            {field}
+            {textField}
             <AnchorToolbar onInsert={handleInsertChar} />
           </Box>
         );
