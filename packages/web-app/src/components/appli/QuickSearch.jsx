@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import { useNavigate } from 'react-router-dom';
@@ -24,6 +24,17 @@ const QuickSearch = ({ hasFixWidth, onClose }) => {
   const [input, setInput] = useState('');
 
   const debouncedInput = useDebounce(input, AUTOCOMPLETE_DEBOUNCE_DELAY);
+
+  // A single-entrance cavity would appear twice (once as its cave, once as its
+  // entrance). Keep only networks (caves with 2+ entrances) and entrances so the
+  // list shows networks or entrances, never a cave redundant with its entrance.
+  const filteredResults = useMemo(
+    () =>
+      results.filter(
+        ({ _type, nbEntrances }) => _type !== 'caves' || (nbEntrances ?? 0) > 1
+      ),
+    [results]
+  );
 
   const handleSelection = selection => {
     if (!selection.id) return;
@@ -66,7 +77,7 @@ const QuickSearch = ({ hasFixWidth, onClose }) => {
       onInputChange={setInput}
       inputValue={input}
       label={formatMessage({ id: 'Quick search' })}
-      suggestions={results}
+      suggestions={filteredResults}
       onSelection={handleSelection}
       hasError={!!errors}
       isLoading={isLoading}
