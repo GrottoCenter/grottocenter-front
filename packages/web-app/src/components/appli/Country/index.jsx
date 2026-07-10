@@ -189,17 +189,11 @@ const Country = ({
               guidelines={country.guidelines}
             />
           )}
-          <ScrollableContent
-            anchorId="organizations"
-            title={formatMessage({ id: 'Organizations' })}
-            content={
-              <AssociationSection
-                organizations={country?.organizations}
-                entityType="country"
-                entityId={country?.id}
-                isLoading={isLoading}
-              />
-            }
+          <AssociationSection
+            organizations={country?.organizations}
+            entityType="country"
+            entityId={country?.id}
+            isLoading={isLoading}
           />
           <ScrollableContent
             anchorId="regions"

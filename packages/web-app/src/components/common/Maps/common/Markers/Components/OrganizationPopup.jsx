@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import CustomIcon from '../../../../CustomIcon';
-import { Information, makeCoordinatesValue } from './utils';
+import { Information } from './utils';
 
 export const OrganizationPopup = ({ organization }) => (
   <>
@@ -16,10 +16,6 @@ export const OrganizationPopup = ({ organization }) => (
         icon={<CustomIcon size={25} type="location" />}
       />
     )}
-    <Information
-      value={makeCoordinatesValue(organization.latitude, organization.longitude)}
-      icon={<CustomIcon size={25} type="coordinates" />}
-    />
   </>
 );
 
@@ -27,9 +23,7 @@ OrganizationPopup.propTypes = {
   organization: PropTypes.shape({
     name: PropTypes.string,
     id: PropTypes.number,
-    address: PropTypes.string,
-    latitude: PropTypes.number,
-    longitude: PropTypes.number
+    address: PropTypes.string
   }).isRequired
 };
 

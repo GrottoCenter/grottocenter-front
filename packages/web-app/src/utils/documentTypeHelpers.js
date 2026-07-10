@@ -108,13 +108,16 @@ export const DOCUMENT_TYPE_ACCEPT = {
     mime: 'application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain,image/*',
     extensions: ['pdf', 'doc', 'docx', 'odt', 'txt', 'jpg', 'jpeg', 'png']
   },
+  // Only the formats actually present in the backend file-formats table are
+  // advertised — a broad 'audio/*' / 'video/*' would let users pick formats the
+  // server rejects on upload (aac, flac, wav, mkv, mov, webm, wmv…).
   [DocumentTypes.SOUND]: {
-    mime: 'audio/*',
-    extensions: ['aac', 'aiff', 'flac', 'm4a', 'mp3', 'ogg', 'opus', 'wav', 'wma']
+    mime: 'audio/mpeg,audio/basic,audio/x-gsm',
+    extensions: ['au', 'gsm', 'mp3']
   },
   [DocumentTypes.MOVING_IMAGE]: {
-    mime: 'video/*,image/gif',
-    extensions: ['avi', 'gif', 'mkv', 'mov', 'mp4', 'ogv', 'webm', 'wmv']
+    mime: 'video/mp4,video/x-msvideo,video/mpeg,image/gif',
+    extensions: ['avi', 'gif', 'mp4', 'mpeg']
   },
   [DocumentTypes.TOPOGRAPHIC_DATA]: {
     mime: 'image/*,application/pdf,.th,.th2,.thconfig,.lox,.dxf,.cxf,.dpt,.xyz,.xvi,.zip,.gz',
@@ -125,6 +128,7 @@ export const DOCUMENT_TYPE_ACCEPT = {
       'dxf',
       'eps',
       'gif',
+      'gpx',
       'gz',
       'jpeg',
       'jpg',
@@ -170,6 +174,19 @@ const SIMPLE_MEDIA_TYPES = new Set([
   DocumentTypes.TOPOGRAPHIC_DATA
 ]);
 const isSimpleMedia = docType => SIMPLE_MEDIA_TYPES.has(docType);
+// Types for which a file is expected (but no longer mandatory): warn the user
+// when none is attached so they don't forget — they can't add one after the
+// document is submitted and before it is validated by a moderator.
+const FILE_EXPECTED_TYPES = new Set([
+  DocumentTypes.IMAGE,
+  DocumentTypes.TOPOGRAPHIC_DRAWING,
+  DocumentTypes.MOVING_IMAGE,
+  DocumentTypes.SOUND,
+  DocumentTypes.PHYSICAL_OBJECT,
+  DocumentTypes.MAP,
+  DocumentTypes.DATASET
+]);
+const isFileExpected = docType => FILE_EXPECTED_TYPES.has(docType);
 const isOther = docType =>
   !isArticle(docType) &&
   !isCollection(docType) &&
@@ -181,6 +198,7 @@ export const documentTypeHelpers = {
   isAuthorizationToPublish,
   isCollection,
   isEvent,
+  isFileExpected,
   isIssue,
   isImage,
   isOther,

@@ -162,6 +162,17 @@ export const overridings = {
         }
       }
     },
+    MuiDialogActions: {
+      styleOverrides: {
+        root: {
+          // Match the horizontal gutter of DialogContent (paddingUnit * 3 =
+          // 24px) so the action buttons line up with the dialog content, and
+          // add bottom breathing room. MUI defaults DialogActions to 8px,
+          // which misaligns them.
+          padding: `${paddingUnit}px ${paddingUnit * 3}px ${paddingUnit * 2}px`
+        }
+      }
+    },
     MuiDrawer: {
       styleOverrides: {
         root: {
@@ -194,7 +205,10 @@ export const overridings = {
     MuiFormControl: {
       styleOverrides: {
         root: {
-          padding: '4px'
+          // Vertical only: keeps the breathing room between stacked fields
+          // without adding a horizontal inset, which would otherwise offset
+          // every field from its container gutter (breaking alignment).
+          padding: '4px 0'
         }
       }
     },

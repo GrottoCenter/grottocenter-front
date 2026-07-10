@@ -53,7 +53,7 @@ const QuickSearch = ({ hasFixWidth, onClose }) => {
     }
     const criterias = {
       query: debouncedInput.trim(),
-      entities: ['entrances', 'documents', 'organizations', 'massifs']
+      entities: ['entrances', 'caves', 'organizations', 'massifs']
     };
 
     dispatch(fetchQuicksearchResult(criterias));

@@ -3,13 +3,15 @@ import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import { useDispatch, useSelector } from 'react-redux';
 import { usePermissions, useNotification } from '../../../hooks';
-import { Link as RouterLink } from 'react-router-dom';
-import { Skeleton, Box, Typography, Link, Chip, Button, IconButton } from '@mui/material';
-import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
-import CancelIcon from '@mui/icons-material/Cancel';
+import { Skeleton, Box, Button, Typography } from '@mui/material';
+import LinkIcon from '@mui/icons-material/Link';
 
 import AssociationForm from './AssociationForm';
+import EntitiesList from '../../common/entitiesList/EntitiesList';
+import Alert from '../../common/Alert';
+import { EntityIcon } from '../../../pages/EntityCreation/entityConfig';
 import StandardDialog from '../../common/StandardDialog';
+import ScrollableContent from '../../common/Layouts/Fixed/ScrollableContent';
 import { setCountryOrganization, removeCountryOrganization, resetCountryOrganization } from '../../../actions/Country/CountryOrganization';
 import { setRegionOrganization, removeRegionOrganization, resetRegionOrganization } from '../../../actions/Region/RegionOrganization';
 import { setMassifOrganization, removeMassifOrganization, resetMassifOrganization } from '../../../actions/Massif/MassifOrganization';
@@ -126,125 +128,103 @@ const AssociationSection = ({
     }
   };
 
-  if (isLoading) {
-    return <Skeleton variant="rectangular" height={60} sx={{ my: 1, borderRadius: 1 }} />;
-  }
-
   const isEmpty = !organizations || organizations.length === 0;
 
-  return (
-    <Box sx={{ my: 2 }}>
-      {isEmpty && entityType !== 'massif' && (
-        <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-          {formatMessage({
-            id: entityType === 'country'
-              ? 'No organization is currently associated with this country.'
-              : 'No organization is currently associated with this region.'
-          })}
-        </Typography>
-      )}
-
-      {!isEmpty &&
-        organizations.map(org => {
-          if (org.isDeleted) {
-            return (
-              <Box key={org.id} sx={{ mb: 1, display: 'flex', alignItems: 'center' }}>
-                <Typography variant="body1" component="span" sx={{ textDecoration: 'line-through', mr: 1, color: 'text.disabled' }}>
-                  {org.name}
-                </Typography>
-                <Chip size="small" color="warning" label={formatMessage({ id: 'Deleted' })} sx={{ mr: 1 }} />
-                {org.redirectTo && (
-                  <Typography variant="body2">
-                    <Link component={RouterLink} to={`/ui/organizations/${org.redirectTo}`}>
-                      {formatMessage({ id: 'View successor organization' })}
-                    </Link>
-                  </Typography>
-                )}
-                {canManageAssociations && (
-                  <IconButton
-                    size="small"
-                    color="error"
-                    title={formatMessage({ id: 'Remove association' })}
-                    onClick={() => setOrgToRemove(org)}
-                  >
-                    <CancelIcon fontSize="small" />
-                  </IconButton>
-                )}
-              </Box>
-            );
-          }
-
-          return (
-            <Box key={org.id} sx={{ mb: 1, display: 'flex', alignItems: 'center' }}>
-              <Link component={RouterLink} to={`/ui/organizations/${org.id}`} sx={{ mr: 1 }}>
-                {org.name}
-              </Link>
-              {canManageAssociations && (
-                <IconButton
-                  size="small"
-                  color="error"
-                  title={formatMessage({ id: 'Remove association' })}
-                  onClick={() => setOrgToRemove(org)}
-                >
-                  <CancelIcon fontSize="small" />
-                </IconButton>
-              )}
-            </Box>
-          );
-        })
+  const associateButton = canManageAssociations && (
+    <Button
+      size="small"
+      color="secondary"
+      variant="outlined"
+      onClick={() => setIsFormOpen(true)}
+      startIcon={
+        <EntityIcon iconType="organization" size={20} BadgeIcon={LinkIcon} />
       }
+    >
+      {formatMessage({ id: 'Associate' })}
+    </Button>
+  );
 
-      {canManageAssociations && (
-        <Box sx={{ mt: 2 }}>
-          <Button
-            size="small"
-            variant="outlined"
-            startIcon={<AddCircleOutlineIcon />}
-            onClick={() => setIsFormOpen(true)}
-          >
-            {formatMessage({ id: 'Add/Edit organization' })}
-          </Button>
-        </Box>
-      )}
+  return (
+    <ScrollableContent
+      anchorId="organizations"
+      title={formatMessage({ id: 'Responsible organizations' })}
+      subheader={formatMessage({
+        id: 'Organizations in charge of managing this geographic entity and its caves.'
+      })}
+      count={organizations.length}
+      defaultExpanded={!isEmpty}
+      icon={associateButton}
+      content={
+        isLoading ? (
+          <Skeleton variant="rectangular" height={60} sx={{ my: 1, borderRadius: 1 }} />
+        ) : (
+          <Box sx={{ my: 1 }}>
+            <EntitiesList
+              type="organization"
+              entities={organizations}
+              onItemRemove={
+                canManageAssociations
+                  ? id =>
+                      setOrgToRemove(organizations.find(o => o.id === id) || null)
+                  : undefined
+              }
+              toolTipTitle={formatMessage({ id: 'Remove association' })}
+              emptyMessage={
+                <Alert
+                  severity="info"
+                  disableMargins
+                  title={formatMessage({
+                    id: 'No organization is currently responsible for this geographic entity.'
+                  })}
+                />
+              }
+            />
 
-      {isFormOpen && (
-        <AssociationForm
-          open={isFormOpen}
-          onClose={() => setIsFormOpen(false)}
-          onSubmit={handleSet}
-          status={isPending ? status : undefined}
-          error={error}
-        />
-      )}
+            {isFormOpen && (
+              <AssociationForm
+                open={isFormOpen}
+                onClose={() => setIsFormOpen(false)}
+                onSubmit={handleSet}
+                status={isPending ? status : undefined}
+                error={error}
+              />
+            )}
 
-      <StandardDialog
-        open={!!orgToRemove}
-        onClose={() => setOrgToRemove(null)}
-        title={formatMessage({ id: 'Remove association' })}
-        actions={
-          <>
-            <Button onClick={() => setOrgToRemove(null)} disabled={isPending && status === REDUCER_STATUS.LOADING}>
-              {formatMessage({ id: 'Cancel' })}
-            </Button>
-            <Button
-              color="error"
-              variant="contained"
-              onClick={handleRemove}
-              disabled={isPending && status === REDUCER_STATUS.LOADING}
+            <StandardDialog
+              open={!!orgToRemove}
+              onClose={() => setOrgToRemove(null)}
+              title={formatMessage({ id: 'Remove association' })}
+              actions={
+                <>
+                  <Button
+                    variant="outlined"
+                    onClick={() => setOrgToRemove(null)}
+                    disabled={isPending && status === REDUCER_STATUS.LOADING}
+                  >
+                    {formatMessage({ id: 'Cancel' })}
+                  </Button>
+                  <Button
+                    color="error"
+                    variant="contained"
+                    onClick={handleRemove}
+                    disabled={isPending && status === REDUCER_STATUS.LOADING}
+                  >
+                    {formatMessage({ id: 'Remove' })}
+                  </Button>
+                </>
+              }
             >
-              {formatMessage({ id: 'Remove' })}
-            </Button>
-          </>
-        }
-      >
-        <Typography>
-          {formatMessage(
-            { id: 'Are you sure you want to remove the association with "{name}"?' },
-            { name: orgToRemove?.name || '' }
-          )}
-        </Typography>
-      </StandardDialog>
-    </Box>
+              <Typography>
+                {formatMessage(
+                  { id: 'Are you sure you want to remove the association with "{name}"?' },
+                  { name: orgToRemove?.name || '' }
+                )}
+              </Typography>
+            </StandardDialog>
+          </Box>
+        )
+      }
+    />
   );
 };
 
