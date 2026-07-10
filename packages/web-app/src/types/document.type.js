@@ -3,6 +3,12 @@ import PropTypes from 'prop-types';
 import authorType from './author.type';
 import idNameType from './idName.type';
 
+export const ThumbnailsPropTypes = PropTypes.shape({
+  small: PropTypes.string,
+  medium: PropTypes.string,
+  large: PropTypes.string
+});
+
 export const DocumentSimplePropTypes = PropTypes.shape({
   id: PropTypes.number.isRequired,
   title: PropTypes.string,
@@ -58,7 +64,8 @@ export const DocumentPropTypes = PropTypes.shape({
   files: PropTypes.arrayOf(
     PropTypes.shape({
       fileName: PropTypes.string,
-      completePath: PropTypes.string
+      completePath: PropTypes.string,
+      thumbnails: ThumbnailsPropTypes
     })
   )
 });
