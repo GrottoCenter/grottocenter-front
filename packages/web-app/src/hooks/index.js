@@ -1,4 +1,9 @@
-export { useCoordinatePreference, getCRSLabel, WGS84_DD, DMS_CODE } from './useCoordinatePreference';
+export {
+  useCoordinatePreference,
+  getCRSLabel,
+  WGS84_DD,
+  DMS_CODE
+} from './useCoordinatePreference';
 export { default as useProjections } from './useProjections';
 export { useDebounce } from './useDebounce';
 export { useBoolean } from './useBoolean';
@@ -17,3 +22,5 @@ export { default as useOpenLink } from './useOpenLink';
 export { useOpenBi } from './useOpenBi';
 export { useNameDuplicateSuggestions } from './useNameDuplicateSuggestions';
 export { useNearbyEntrances } from './useNearbyEntrances';
+export { useEntitySearch } from './useEntitySearch';
+export { useOtherEntranceName } from './useOtherEntranceName';

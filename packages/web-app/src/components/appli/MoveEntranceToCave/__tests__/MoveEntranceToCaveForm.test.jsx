@@ -1,5 +1,11 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
+import {
+  render,
+  screen,
+  fireEvent,
+  waitFor,
+  act
+} from '@testing-library/react';
 import { IntlProvider } from 'react-intl';
 
 import MoveEntranceToCaveForm from '../MoveEntranceToCaveForm';
@@ -8,10 +14,7 @@ import MoveEntranceToCaveForm from '../MoveEntranceToCaveForm';
 const mockNavigate = jest.fn();
 jest.mock('react-router-dom', () => ({
   useNavigate: () => mockNavigate,
-  // eslint-disable-next-line react/prop-types
-  Link: function MockLink({ children, to }) {
-    return require('react').createElement('a', { href: to }, children);
-  }
+  useSearchParams: () => [new URLSearchParams(''), jest.fn()]
 }));
 
 // ---- Notification mock ----
@@ -44,66 +47,70 @@ jest.mock('../../../../actions/MoveEntranceToCave', () => ({
   })
 }));
 
-jest.mock('../../../../actions/Entrance/DetachEntrance', () => ({
-  detachEntranceToNewCave: jest.fn(() => ({ type: 'DETACH_ENTRANCE' })),
-  resetDetachEntrance: jest.fn(() => ({ type: 'DETACH_ENTRANCE_RESET' }))
-}));
-
-// ---- Mock child components that are not relevant to this test ----
+// ---- Mock child components not relevant to this test ----
 jest.mock(
   '../../../common/AutoCompleteSearch/CaveAutoCompleteSearch',
   () =>
     function MockCaveAutoCompleteSearch({ onSelection }) {
       return (
         <button
+          type="button"
           data-testid="mock-cave-search"
-          onClick={() =>
-            onSelection({ id: '42', name: 'Destination Cave' })
-          }>
+          onClick={() => onSelection({ id: '42', name: 'Destination Cave' })}
+        >
           Select Cave
         </button>
       );
     }
 );
 
-jest.mock('../Header', () =>
-  function MockHeader() {
-    return <div data-testid="mock-header">Header</div>;
-  }
+jest.mock(
+  '../Header',
+  () =>
+    function MockHeader() {
+      return <div data-testid="mock-header">Header</div>;
+    }
 );
 
-jest.mock('../OperationSummary', () =>
-  function MockOperationSummary() {
-    return <div data-testid="mock-operation-summary">OperationSummary</div>;
-  }
+jest.mock(
+  '../OperationSummary',
+  () =>
+    function MockOperationSummary() {
+      return <div data-testid="mock-operation-summary">OperationSummary</div>;
+    }
 );
 
-jest.mock('../FormActions', () =>
-  function MockFormActions({ loading, newCave }) {
-    return (
-      <div data-testid="mock-form-actions">
-        <button type="submit" disabled={loading || !newCave}>
-          Move
+jest.mock(
+  '../DetachEntranceSection',
+  () =>
+    function MockDetachEntranceSection() {
+      return <div data-testid="mock-detach-section">DetachSection</div>;
+    }
+);
+
+jest.mock(
+  '../FormActions',
+  () =>
+    function MockFormActions({ onConfirm, disabled }) {
+      return (
+        <button
+          type="button"
+          data-testid="validate"
+          disabled={disabled}
+          onClick={onConfirm}
+        >
+          Validate
         </button>
-      </div>
-    );
-  }
-);
-
-jest.mock('../DetachEntranceSection', () =>
-  function MockDetachEntranceSection() {
-    return <div data-testid="mock-detach-section">DetachSection</div>;
-  }
+      );
+    }
 );
 
 const messages = {
-  'Entrance successfully moved.':
-    'Entrance successfully moved.',
-  'What do you want to do?': 'What do you want to do?',
-  'Link to another network': 'Link to another network',
-  'Detach from current network': 'Detach from current network',
-  'The entrance is the only one of the cave. Moving it to another existing cave or network will result in deleting it and losing its cave data (depth, discovery year, length, temperature, locations etc.): be careful!':
-    'Warning about sole entrance'
+  'Entrance successfully moved.': 'Entrance successfully moved.',
+  'Link to an existing entrance or network': 'Link to an entrance or network',
+  Validate: 'Validate',
+  Cancel: 'Cancel',
+  'Rather detach the entrance?': 'Rather detach the entrance?'
 };
 
 const entrance = {
@@ -117,20 +124,9 @@ const entrance = {
   }
 };
 
-const defaultMoveState = {
-  loading: false,
-  error: undefined
-};
-
-const defaultDetachState = {
-  loading: false,
-  error: undefined,
-  success: false
-};
-
 const renderComponent = (
-  moveState = defaultMoveState,
-  detachState = defaultDetachState
+  moveState = { loading: false, error: undefined },
+  detachState = { loading: false, error: undefined, success: false }
 ) => {
   mockStoreState = {
     moveEntranceToCave: moveState,
@@ -143,6 +139,15 @@ const renderComponent = (
   );
 };
 
+const selectAndValidate = async () => {
+  await act(async () => {
+    fireEvent.click(screen.getByTestId('mock-cave-search'));
+  });
+  await act(async () => {
+    fireEvent.click(screen.getByTestId('validate'));
+  });
+};
+
 beforeEach(() => {
   mockDispatch.mockClear();
   mockNavigate.mockClear();
@@ -150,41 +155,27 @@ beforeEach(() => {
 });
 
 describe('MoveEntranceToCaveForm - navigation and toast on success', () => {
+  it('dispatches the move when validating', async () => {
+    renderComponent();
+    await selectAndValidate();
+    expect(mockDispatch).toHaveBeenCalledWith({
+      type: 'MOVE_ENTRANCE_TO_CAVE',
+      entranceId: 123,
+      caveId: 42
+    });
+  });
+
   it('navigates to entrance page after successful move', async () => {
-    const { container } = renderComponent();
-
-    // Select a cave — this triggers onNewCaveChange via react-hook-form
-    await act(async () => {
-      fireEvent.click(screen.getByTestId('mock-cave-search'));
-    });
-
-    // Submit the form — newCave should be set after re-render
-    const form = container.querySelector('form');
-    await act(async () => {
-      fireEvent.submit(form);
-    });
-
-    // The useEffect triggers when isSubmitSuccessful && !loading && !apiError
+    renderComponent();
+    await selectAndValidate();
     await waitFor(() => {
       expect(mockNavigate).toHaveBeenCalledWith('/ui/entrances/123');
     });
   });
 
-  it('shows success toast with cave name after successful move', async () => {
-    const { container } = renderComponent();
-
-    // Select a cave
-    await act(async () => {
-      fireEvent.click(screen.getByTestId('mock-cave-search'));
-    });
-
-    // Submit the form
-    const form = container.querySelector('form');
-    await act(async () => {
-      fireEvent.submit(form);
-    });
-
-    // The useEffect triggers when isSubmitSuccessful && !loading && !apiError
+  it('shows success toast after successful move', async () => {
+    renderComponent();
+    await selectAndValidate();
     await waitFor(() => {
       expect(mockOnSuccess).toHaveBeenCalledWith(
         'Entrance successfully moved.'

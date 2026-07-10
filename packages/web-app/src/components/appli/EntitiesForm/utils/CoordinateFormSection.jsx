@@ -265,7 +265,18 @@ const CoordinateFormSection = ({
 
   return (
     <>
-      {/* CRS selector + coordinate fields on the same row */}
+      <MapMarkerSelector
+        control={control}
+        formLatitudeKey={formLatitudeKey}
+        formLongitudeKey={formLongitudeKey}
+        additionalPositions={additionalPositions}
+        additionalMarkersLabel={additionalMarkersLabel}
+        onZoomChange={onZoomChange}
+        markerIcon={markerIcon}
+        mapHeight={mapHeight}
+      />
+
+      {/* CRS selector + coordinate fields, below the map */}
       <Box display="flex" alignItems="flex-start" gap={1} mt={1} mb={1}>
         <Tooltip title={formatMessage({ id: 'Change coordinate system' })}>
           <Button
@@ -278,8 +289,14 @@ const CoordinateFormSection = ({
               borderColor: 'divider',
               whiteSpace: 'nowrap',
               flexShrink: 0,
-              alignSelf: 'stretch'
-            }}>
+              alignSelf: 'stretch',
+              // Each field is a MuiFormControl with 4px vertical padding (theme),
+              // insetting its grey box. Matching that margin makes the stretched
+              // button line up exactly with the fields — on desktop (one field's
+              // height) and on mobile (spanning both stacked lat/lng fields).
+              my: '4px'
+            }}
+          >
             {crsButtonLabel}
           </Button>
         </Tooltip>
@@ -291,7 +308,8 @@ const CoordinateFormSection = ({
             display: 'flex',
             flexDirection: { xs: 'column', sm: 'row' },
             gap: 1
-          }}>
+          }}
+        >
           {isWGS84 ? (
             <>
               <Box sx={{ flex: 1, minWidth: 0 }}>
@@ -367,7 +385,8 @@ const CoordinateFormSection = ({
             value={utmHemisphere}
             onChange={e => setUtmHemisphere(e.target.value)}
             SelectProps={{ native: true }}
-            sx={{ width: 140 }}>
+            sx={{ width: 140 }}
+          >
             <option value="North">{formatMessage({ id: 'North' })}</option>
             <option value="South">{formatMessage({ id: 'South' })}</option>
           </TextField>
@@ -399,17 +418,6 @@ const CoordinateFormSection = ({
         preferred={selectedCRS.code}
         projections={projections}
         onSelect={handleCRSSelect}
-      />
-
-      <MapMarkerSelector
-        control={control}
-        formLatitudeKey={formLatitudeKey}
-        formLongitudeKey={formLongitudeKey}
-        additionalPositions={additionalPositions}
-        additionalMarkersLabel={additionalMarkersLabel}
-        onZoomChange={onZoomChange}
-        markerIcon={markerIcon}
-        mapHeight={mapHeight}
       />
     </>
   );

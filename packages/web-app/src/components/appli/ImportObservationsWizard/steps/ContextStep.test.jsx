@@ -14,10 +14,17 @@ jest.mock('react-redux', () => ({
   useSelector: selector => selector(mockStoreState)
 }));
 
-// ---- useUserProperties mock ----
+// ---- hooks mock ----
 jest.mock('../../../../hooks', () => ({
   useUserProperties: () => ({ id: 1, nickname: 'testuser' }),
-  useDebounce: value => value
+  useDebounce: value => value,
+  useEntitySearch: () => ({
+    inputValue: '',
+    setInputValue: jest.fn(),
+    results: [],
+    isLoading: false,
+    hasError: false
+  })
 }));
 
 // ---- CaveAutoCompleteSearch mock ----

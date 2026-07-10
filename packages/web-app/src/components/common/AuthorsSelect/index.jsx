@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { useDispatch, useSelector } from 'react-redux';
 import { useIntl } from 'react-intl';
 import {
   Autocomplete,
@@ -13,12 +12,8 @@ import {
 import AddCircle from '@mui/icons-material/AddCircle';
 import Cancel from '@mui/icons-material/Cancel';
 import { styled } from '@mui/material/styles';
-import {
-  fetchQuicksearchResult,
-  resetQuicksearch
-} from '../../../actions/Quicksearch';
 import { entityOptionForSelector } from '../../../helpers/Entity';
-import { useDebounce } from '../../../hooks';
+import { useEntitySearch } from '../../../hooks';
 import CreateCaverPanel from './CreateCaverPanel';
 
 const Wrapper = styled('div')`
@@ -36,6 +31,7 @@ const InputWrapper = styled('div')`
 
 const CHIP_SLOT_PROPS = { chip: { color: 'primary' } };
 const MIN_SEARCH_LENGTH = 3;
+const PERSON_ENTITIES = ['persons'];
 
 const HELPER_TEXT_KEY =
   'Choose one or more authors among those already registered. If the author you are looking for does not exist in Grottocenter, it is possible to add him/her using the + button on the right.';
@@ -48,34 +44,12 @@ const AuthorsSelect = ({
   noOptionsText
 }) => {
   const { formatMessage } = useIntl();
-  const dispatch = useDispatch();
 
-  const {
-    error: searchError,
-    isLoading,
-    results: searchResults
-  } = useSelector(state => state.quicksearch);
+  const { inputValue, setInputValue, results, isLoading, hasError } =
+    useEntitySearch(PERSON_ENTITIES, { minChars: MIN_SEARCH_LENGTH });
 
-  const [inputValue, setInputValue] = useState('');
-  const debouncedInput = useDebounce(inputValue);
   const [isCreateOpen, setCreateOpen] = useState(false);
   const [sideActionEnabled, setSideActionEnabled] = useState(false);
-  const [defaultNewSurname, setDefaultNewSurname] = useState('');
-
-  useEffect(() => {
-    if (debouncedInput.length >= MIN_SEARCH_LENGTH) {
-      dispatch(
-        fetchQuicksearchResult({
-          query: debouncedInput.trim(),
-          entities: ['persons']
-        })
-      );
-      setDefaultNewSurname(debouncedInput.trim());
-    } else {
-      dispatch(resetQuicksearch());
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [debouncedInput]);
 
   useEffect(() => {
     if (isLoading) {
@@ -104,10 +78,13 @@ const AuthorsSelect = ({
     setCreateOpen(false);
   };
 
-  const resolvedNoOptions = noOptionsText || formatMessage({
-    id: 'AuthorsSelect.noOptions',
-    defaultMessage: 'No caver matches your search (type at least 3 characters)'
-  });
+  const resolvedNoOptions =
+    noOptionsText ||
+    formatMessage({
+      id: 'AuthorsSelect.noOptions',
+      defaultMessage:
+        'No caver matches your search (type at least 3 characters)'
+    });
 
   return (
     <>
@@ -115,7 +92,8 @@ const AuthorsSelect = ({
         variant="caption"
         color="text.secondary"
         display="block"
-        sx={{ mb: 0.5 }}>
+        sx={{ mb: 0.5 }}
+      >
         {formatMessage({ id: HELPER_TEXT_KEY })}
       </Typography>
       <Wrapper>
@@ -123,7 +101,7 @@ const AuthorsSelect = ({
           <Autocomplete
             multiple
             value={value}
-            options={searchResults || []}
+            options={results}
             onChange={handleChange}
             onInputChange={handleInputChange}
             inputValue={inputValue}
@@ -146,7 +124,9 @@ const AuthorsSelect = ({
                       id: 'Type at least {nbOfChars} character(s)',
                       defaultMessage: 'Type at least {nbOfChars} character(s)'
                     },
-                    { nbOfChars: <span key="minChars">{MIN_SEARCH_LENGTH}</span> }
+                    {
+                      nbOfChars: <span key="minChars">{MIN_SEARCH_LENGTH}</span>
+                    }
                   )}
                 </span>
               )
@@ -158,7 +138,7 @@ const AuthorsSelect = ({
                 variant="filled"
                 label={label}
                 required={required}
-                error={!!searchError}
+                error={hasError}
                 InputProps={{
                   ...params.InputProps,
                   endAdornment: (
@@ -176,7 +156,7 @@ const AuthorsSelect = ({
               enabled={isCreateOpen}
               onCreateSuccess={handleCreateSuccess}
               defaultName=""
-              defaultSurname={defaultNewSurname}
+              defaultSurname={inputValue.trim()}
             />
           </Collapse>
         </InputWrapper>
@@ -185,7 +165,8 @@ const AuthorsSelect = ({
           onClick={handleToggleCreate}
           disabled={!sideActionEnabled}
           color="secondary"
-          aria-label={formatMessage({ id: 'new entity' })}>
+          aria-label={formatMessage({ id: 'new entity' })}
+        >
           {isCreateOpen ? (
             <Cancel fontSize="large" />
           ) : (

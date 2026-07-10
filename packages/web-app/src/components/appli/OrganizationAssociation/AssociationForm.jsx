@@ -12,81 +12,31 @@ import {
   DialogActions,
   Alert
 } from '@mui/material';
-import { fetchQuickSearchRaw } from '../../../actions/Quicksearch';
-import { useDebounce } from '../../../hooks';
+import { useEntitySearch } from '../../../hooks';
 import REDUCER_STATUS from '../../../reducers/ReducerStatus';
-import {
-  AUTOCOMPLETE_DEBOUNCE_DELAY,
-  AUTOCOMPLETE_MIN_CHARACTERS
-} from '../../../conf/config';
 
 // Max length for an inline-created organization name (Requirement 7 AC3).
 const ORGANIZATION_NAME_MAX_LENGTH = 200;
+const ORGANIZATION_ENTITIES = ['organizations'];
 
 const AssociationForm = ({ open, onClose, onSubmit, status, error }) => {
   const { formatMessage } = useIntl();
-  const [inputValue, setInputValue] = useState('');
-  const [options, setOptions] = useState([]);
   // Holds ONLY an existing organization picked from the list (it always has an
   // `id`). Free text is never stored here — the "create" path is derived from
   // the input alone. This keeps the submit decision unambiguous.
   const [selectedOrg, setSelectedOrg] = useState(null);
-  const [isSearching, setIsSearching] = useState(false);
-
-  const debouncedInput = useDebounce(inputValue, AUTOCOMPLETE_DEBOUNCE_DELAY);
-
-  useEffect(() => {
-    let active = true;
-    const trimmed = debouncedInput.trim();
-
-    if (trimmed.length < AUTOCOMPLETE_MIN_CHARACTERS) {
-      setOptions([]);
-      return undefined;
-    }
-
-    // The input already matches the selected organization: nothing to search.
-    if (selectedOrg && selectedOrg.name === trimmed) {
-      return undefined;
-    }
-
-    setIsSearching(true);
-
-    const fetchOptions = async () => {
-      try {
-        const data = await fetchQuickSearchRaw({
-          query: trimmed,
-          entities: ['organizations']
-        });
-
-        if (active) {
-          const results =
-            data.results?.filter(r => r._type === 'organizations') || [];
-          setOptions(results);
-        }
-      } catch (err) {
-        if (active) {
-          setOptions([]);
-        }
-      } finally {
-        if (active) {
-          setIsSearching(false);
-        }
-      }
-    };
-
-    fetchOptions();
-
-    return () => {
-      active = false;
-    };
-  }, [debouncedInput, selectedOrg]);
+  // Selecting an option makes the field show the org name; skip searching for
+  // that exact name (it just re-fetches the already selected organization).
+  const { inputValue, setInputValue, results, isLoading } = useEntitySearch(
+    ORGANIZATION_ENTITIES,
+    { skipQuery: selectedOrg?.name }
+  );
 
   const handleClose = React.useCallback(() => {
     setInputValue('');
     setSelectedOrg(null);
-    setOptions([]);
     onClose();
-  }, [onClose]);
+  }, [onClose, setInputValue]);
 
   useEffect(() => {
     if (status === REDUCER_STATUS.SUCCEEDED && open) {
@@ -119,7 +69,7 @@ const AssociationForm = ({ open, onClose, onSubmit, status, error }) => {
         )}
         <Autocomplete
           freeSolo
-          options={options}
+          options={results}
           getOptionLabel={option =>
             typeof option === 'string' ? option : option.name || ''
           }
@@ -150,7 +100,7 @@ const AssociationForm = ({ open, onClose, onSubmit, status, error }) => {
                 ...params.InputProps,
                 endAdornment: (
                   <React.Fragment>
-                    {isSearching ? (
+                    {isLoading ? (
                       <CircularProgress color="inherit" size={20} />
                     ) : null}
                     {params.InputProps.endAdornment}
@@ -160,22 +110,26 @@ const AssociationForm = ({ open, onClose, onSubmit, status, error }) => {
             />
           )}
         />
-        {!selectedOrg && inputValue.trim().length > 0 && options.length === 0 && !isSearching && (
-          <Alert severity="info" sx={{ mt: 2 }}>
-            {formatMessage(
-              {
-                id: 'Select an existing organization from the list, or a new one named "{name}" will be created.'
-              },
-              { name: inputValue.trim() }
-            )}
-          </Alert>
-        )}
+        {!selectedOrg &&
+          inputValue.trim().length > 0 &&
+          results.length === 0 &&
+          !isLoading && (
+            <Alert severity="info" sx={{ mt: 2 }}>
+              {formatMessage(
+                {
+                  id: 'Select an existing organization from the list, or a new one named "{name}" will be created.'
+                },
+                { name: inputValue.trim() }
+              )}
+            </Alert>
+          )}
       </DialogContent>
       <DialogActions>
         <Button
           variant="outlined"
           onClick={handleClose}
-          disabled={status === REDUCER_STATUS.LOADING}>
+          disabled={status === REDUCER_STATUS.LOADING}
+        >
           {formatMessage({ id: 'Cancel' })}
         </Button>
         <Button
@@ -187,7 +141,8 @@ const AssociationForm = ({ open, onClose, onSubmit, status, error }) => {
             status === REDUCER_STATUS.LOADING ? (
               <CircularProgress size={20} />
             ) : null
-          }>
+          }
+        >
           {formatMessage({ id: 'Associate' })}
         </Button>
       </DialogActions>

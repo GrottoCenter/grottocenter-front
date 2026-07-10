@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useIntl } from 'react-intl';
 import Skeleton from '@mui/material/Skeleton';
 
-import { useParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 import { isEmpty } from 'ramda';
 import { Divider } from '@mui/material';
 import Layout from '../../common/Layouts/Fixed/FixedContent';
@@ -15,6 +15,9 @@ import AuthChecker from '../AuthChecker';
 const MoveEntranceToCave = () => {
   const { formatMessage } = useIntl();
   const { id: entranceId } = useParams();
+  const [searchParams] = useSearchParams();
+  // The page title reflects the chosen action (deep-linked via ?mode=).
+  const isDetach = searchParams.get('mode') === 'detach';
   const dispatch = useDispatch();
   const {
     loading: fetchLoading,
@@ -28,7 +31,9 @@ const MoveEntranceToCave = () => {
 
   return (
     <Layout
-      title={formatMessage({ id: 'Entrance network association' })}
+      title={formatMessage({
+        id: isDetach ? 'Detach the entrance' : 'Attach the entrance'
+      })}
       content={
         <AuthChecker
           componentToDisplay={
