@@ -15,6 +15,7 @@ import Rigging from './Rigging';
 import { RiggingPropTypes } from '../../../../types/entrance.type';
 import { sortByRelevance } from '../../../../helpers/sortByRelevance';
 import Alert from '../../../common/Alert';
+import DiscardChangesDialog from '../../../common/DiscardChangesDialog';
 
 
 const Riggings = ({ riggings, entranceId, isEditAllowed }) => {
@@ -22,7 +23,23 @@ const Riggings = ({ riggings, entranceId, isEditAllowed }) => {
   const dispatch = useDispatch();
   const permissions = usePermissions();
   const [isFormVisible, setIsFormVisible] = useState(false);
+  const [isFormDirty, setIsFormDirty] = useState(false);
+  const [isDiscardDialogOpen, setIsDiscardDialogOpen] = useState(false);
   const { movingId, handleMove } = useMoveRelevanceWithUndo(moveRiggingRelevance);
+
+  const closeForm = () => {
+    setIsFormVisible(false);
+    setIsFormDirty(false);
+    setIsDiscardDialogOpen(false);
+  };
+  const handleToggleForm = () => {
+    if (isFormVisible && isFormDirty) {
+      setIsDiscardDialogOpen(true);
+      return;
+    }
+    if (isFormVisible) closeForm();
+    else setIsFormVisible(true);
+  };
   const handleSubmitForm = data => {
     dispatch(
       postRiggings({
@@ -32,7 +49,7 @@ const Riggings = ({ riggings, entranceId, isEditAllowed }) => {
         language: data.language
       })
     );
-    setIsFormVisible(false);
+    closeForm();
   };
 
   return (
@@ -55,7 +72,7 @@ const Riggings = ({ riggings, entranceId, isEditAllowed }) => {
               color={isFormVisible ? 'inherit' : 'secondary'}
               size="small"
               variant="outlined"
-              onClick={() => setIsFormVisible(!isFormVisible)}
+              onClick={handleToggleForm}
               startIcon={isFormVisible ? <CancelIcon /> : <AddCircleIcon />}
             >
               {formatMessage({ id: isFormVisible ? 'Cancel' : 'New' })}
@@ -70,10 +87,16 @@ const Riggings = ({ riggings, entranceId, isEditAllowed }) => {
               <CreateRiggingsForm
                 isNew
                 onSubmit={handleSubmitForm}
+                onDirtyChange={setIsFormDirty}
               />
               <Divider />
             </>
           )}
+          <DiscardChangesDialog
+            open={isDiscardDialogOpen}
+            onKeepEditing={() => setIsDiscardDialogOpen(false)}
+            onDiscard={closeForm}
+          />
           {riggings.length > 0 &&
             (() => {
               const sorted = sortByRelevance(riggings);

@@ -12,11 +12,14 @@ import { RiggingPropTypes } from '../../../../types/entrance.type';
 import Contribution from '../../../common/Contribution/Contribution';
 import RiggingTable from './RiggingTable';
 import { SnapshotButton } from '../Snapshots/UtilityFunction';
+import DiscardChangesDialog from '../../../common/DiscardChangesDialog';
 
 const Rigging = ({ rigging, entranceId, isEditAllowed, isMoving, onMoveUp, onMoveDown, isFirst, isLast }) => {
   const dispatch = useDispatch();
   const permissions = usePermissions();
   const [isUpdateFormVisible, setIsUpdateFormVisible] = useState(false);
+  const [isFormDirty, setIsFormDirty] = useState(false);
+  const [isDiscardDialogOpen, setIsDiscardDialogOpen] = useState(false);
   const [wantedDeletedState, setWantedDeletedState] = useState(false);
 
   useEffect(() => {
@@ -24,6 +27,18 @@ const Rigging = ({ rigging, entranceId, isEditAllowed, isMoving, onMoveUp, onMov
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const closeForm = () => {
+    setIsUpdateFormVisible(false);
+    setIsFormDirty(false);
+    setIsDiscardDialogOpen(false);
+  };
+  const handleCancel = () => {
+    if (isFormDirty) {
+      setIsDiscardDialogOpen(true);
+    } else {
+      closeForm();
+    }
+  };
   const onSubmitUpdateForm = data => {
     dispatch(
       updateRiggings({
@@ -31,7 +46,7 @@ const Rigging = ({ rigging, entranceId, isEditAllowed, isMoving, onMoveUp, onMov
         language: data.language
       })
     );
-    setIsUpdateFormVisible(false);
+    closeForm();
   };
   const onDeletePress = isPermanent => {
     setWantedDeletedState(true);
@@ -86,10 +101,16 @@ const Rigging = ({ rigging, entranceId, isEditAllowed, isMoving, onMoveUp, onMov
       {isUpdateFormVisible && permissions.isAuth ? (
         <Box width="100%">
           <CreateRiggingsForm
-            closeForm={() => setIsUpdateFormVisible(false)}
             isNew={false}
             onSubmit={onSubmitUpdateForm}
+            onCancel={handleCancel}
+            onDirtyChange={setIsFormDirty}
             values={rigging}
+          />
+          <DiscardChangesDialog
+            open={isDiscardDialogOpen}
+            onKeepEditing={() => setIsDiscardDialogOpen(false)}
+            onDiscard={closeForm}
           />
         </Box>
       ) : (

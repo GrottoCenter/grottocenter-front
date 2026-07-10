@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Box, Link as MuiLink } from '@mui/material';
-import CustomIcon from './CustomIcon';
+import { Link as MuiLink } from '@mui/material';
+import { networkIcon } from '../../assets/icons';
 import { useOpenLink } from '../../hooks';
 
 // An inline "network" link (icon + name) meant to be dropped into a
@@ -27,18 +27,16 @@ const NetworkInlineLink = ({ caveId, label, size = 16, variant = 'body2' }) => {
           goToCave();
         }
       }}
-      sx={{ cursor: 'pointer', verticalAlign: 'baseline' }}
+      sx={{ cursor: 'pointer', verticalAlign: 'baseline', display: 'inline' }}
     >
-      <Box
-        component="span"
-        sx={{
-          display: 'inline-block',
-          verticalAlign: 'middle',
-          mr: '2px'
-        }}
-      >
-        <CustomIcon type="network" size={size} />
-      </Box>
+      <img
+        src={networkIcon}
+        alt=""
+        aria-hidden="true"
+        width={size}
+        height={size}
+        style={{ verticalAlign: 'middle', marginRight: '2px' }}
+      />
       {label}
     </MuiLink>
   );
