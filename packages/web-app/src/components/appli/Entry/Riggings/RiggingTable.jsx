@@ -16,13 +16,34 @@ import { ObstaclePropTypes } from '../../../../types/entrance.type';
 
 import { HighLightsLine } from '../../../common/Highlights';
 import SectionTitle from '../SectionTitle';
+import RiggingSummary from './RiggingSummary';
+import ColumnLegend from './ColumnLegend';
+
+const OBSTACLE_LEGEND = [
+  { abbrevKey: 'obstacle.abbrev.pit', labelKey: 'obstacle.label.pit' },
+  { abbrevKey: 'obstacle.abbrev.step', labelKey: 'obstacle.label.step' },
+  { abbrevKey: 'obstacle.abbrev.climb', labelKey: 'obstacle.label.climb' },
+  { abbrevKey: 'obstacle.abbrev.waterfall', labelKey: 'obstacle.label.waterfall' }
+];
+
+const ANCHOR_LEGEND = [
+  { abbrevKey: 'anchor.abbrev.spit', labelKey: 'anchor.label.spit' },
+  { abbrevKey: 'anchor.abbrev.bolt', labelKey: 'anchor.label.bolt' },
+  { abbrevKey: 'anchor.abbrev.piton', labelKey: 'anchor.label.piton' },
+  { abbrevKey: 'anchor.abbrev.natural', labelKey: 'anchor.label.natural' },
+  { abbrevKey: 'anchor.abbrev.soft', labelKey: 'anchor.label.soft' },
+  { abbrevKey: 'anchor.abbrev.drilled', labelKey: 'anchor.label.drilled' },
+  { abbrevKey: 'anchor.abbrev.redirect', labelKey: 'anchor.label.redirect' }
+];
 
 const StyledTable = styled(Table)`
   border-left: 1px solid ${props => props.theme.palette.primary.veryLight};
   margin-bottom: 0;
 `;
 const StyledTableRow = styled(TableRow)`
-  background-color: ${props => props.theme.palette.action.hover};
+  &:nth-of-type(odd) {
+    background-color: ${props => props.theme.palette.action.hover};
+  }
 `;
 const StyledTableContainer = styled(TableContainer)`
   overflow-wrap: anywhere;
@@ -35,30 +56,36 @@ const StyledTableCell = styled(TableCell, {
   border: 1px solid ${props => props.theme.palette.primary.veryLight};
   padding: 6px !important;
   min-width: 40px;
-  ${props => ({
-    [props.theme.breakpoints.down('md')]: {
-      fontSize: '10px'
-    }
-  })};
   thead & {
     text-transform: capitalize;
+    white-space: nowrap;
   }
 `;
 
-const HighlightedTableCell = ({ data, oldData }) => (
-  <StyledTableCell component="th" scope="row">
-    <span style={{ whiteSpace: 'pre-line' }}>
-      {oldData !== undefined ? (
-        <HighLightsLine newText={data} oldText={oldData} />
-      ) : (
-        data
-      )}
-    </span>
-  </StyledTableCell>
-);
+const EmptyCellMark = styled('span')`
+  color: ${props => props.theme.palette.text.disabled};
+`;
+
+const HighlightedTableCell = ({ data = '', oldData }) => {
+  // In diff (snapshot) mode HighLightsLine must receive the raw strings;
+  // the em dash placeholder is only for the regular display.
+  let content;
+  if (oldData !== undefined) {
+    content = <HighLightsLine newText={data} oldText={oldData} />;
+  } else if (!data || data.trim() === '') {
+    content = <EmptyCellMark>—</EmptyCellMark>;
+  } else {
+    content = data;
+  }
+  return (
+    <StyledTableCell component="th" scope="row">
+      <span style={{ whiteSpace: 'pre-line' }}>{content}</span>
+    </StyledTableCell>
+  );
+};
 
 HighlightedTableCell.propTypes = {
-  data: PropTypes.string.isRequired,
+  data: PropTypes.string,
   oldData: PropTypes.string
 };
 
@@ -71,7 +98,6 @@ const RiggingTable = ({ id, obstacles, title, previous, isDeleted }) => {
       title={title}
       anchorId={`rigging-${id}`}
       isDeleted={isDeleted}
-      marginBotton={3}
     />
   );
 
@@ -81,21 +107,26 @@ const RiggingTable = ({ id, obstacles, title, previous, isDeleted }) => {
 
   return (
     <Box>
-      {titleEl}
+      <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 1, mb: 1 }}>
+        {titleEl}
+        {previous === undefined && <RiggingSummary obstacles={obstacles} />}
+      </Box>
       <StyledTableContainer>
         <StyledTable
           size="small"
           aria-label={formatMessage({ id: 'riggings' })}>
           <TableHead>
             <TableRow>
-              <StyledTableCell $isDeleted={isDeleted}>
+              <StyledTableCell $isDeleted={isDeleted} width="25%">
                 {formatMessage({ id: 'obstacles' })}
+                <ColumnLegend titleKey="Obstacle notation legend" items={OBSTACLE_LEGEND} />
               </StyledTableCell>
-              <StyledTableCell $isDeleted={isDeleted}>
+              <StyledTableCell $isDeleted={isDeleted} width="10%">
                 {formatMessage({ id: 'ropes' })}
               </StyledTableCell>
-              <StyledTableCell $isDeleted={isDeleted}>
+              <StyledTableCell $isDeleted={isDeleted} width="20%">
                 {formatMessage({ id: 'anchors' })}
+                <ColumnLegend titleKey="Anchor notation legend" items={ANCHOR_LEGEND} />
               </StyledTableCell>
               <StyledTableCell $isDeleted={isDeleted}>
                 {formatMessage({ id: 'observations' })}

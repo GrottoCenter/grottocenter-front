@@ -21,6 +21,7 @@ export { default as networkIcon } from './network.svg';
 export { default as organizationIcon } from './organization.svg';
 export { default as pollutionIcon } from './pollution.svg';
 export { default as rockfallIcon } from './rockfall.svg';
+export { default as ropeIcon } from './rope.svg';
 export { default as rulesIcon } from './rules.svg';
 export { default as scientificObservationIcon } from './scientific-observation.svg';
 export { default as stayOnTrailIcon } from './stay-on-trail.svg';
