@@ -62,6 +62,7 @@ const ScrollableContent = ({
   count,
   icon,
   content,
+  children,
   anchorId,
   dense = false,
   subTitle = false,
@@ -139,7 +140,7 @@ const ScrollableContent = ({
         <StyledCardContent
           $dense={dense ? 1 : 0}
           $collapsible={collapsible ? 1 : 0}>
-          {content}
+          {content ?? children}
         </StyledCardContent>
       </Collapse>
     </Card>
@@ -150,7 +151,13 @@ ScrollableContent.propTypes = {
   title: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
   count: PropTypes.number,
   icon: PropTypes.node,
-  content: PropTypes.node.isRequired,
+  content: (props, propName, componentName) => {
+    if (!props.content && !props.children) {
+      return new Error(`${componentName} requires either 'content' or 'children' prop.`);
+    }
+    return null;
+  },
+  children: PropTypes.node,
   anchorId: PropTypes.string,
   dense: PropTypes.bool,
   subTitle: PropTypes.bool,

@@ -35,6 +35,7 @@ import ScrollableContent from '../../common/Layouts/Fixed/ScrollableContent';
 import CustomIcon from '../../common/CustomIcon';
 
 import Properties from './Properties';
+import GuidelinesGrouped from '../Guidelines/GuidelinesGrouped';
 import Descriptions from '../Descriptions';
 import Locations from './Locations';
 import Riggings from './Riggings/Riggings';
@@ -428,6 +429,9 @@ export const Entry = ({ isLoading, error, entrance, networkDescriptionsCount = 0
                 networkName={isNetwork ? entrance.cave.name : undefined}
                 networkDescriptionsCount={networkDescriptionsCount}
               />
+              {entrance.guidelines && (
+                <GuidelinesGrouped guidelines={entrance.guidelines} />
+              )}
               <Riggings
                 riggings={entrance.riggings}
                 entranceId={entrance.id}

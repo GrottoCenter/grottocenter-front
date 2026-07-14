@@ -33,6 +33,7 @@ const AccordionSnapshot = ({
   author,
   reviewer,
   previous,
+  actualItem,
   all,
   isCurrent
 }) => {
@@ -141,6 +142,7 @@ const AccordionSnapshot = ({
                   snapshot={snapshot}
                   snapshotType={snapshotType}
                   isNetwork={isNetwork}
+                  actualItem={actualItem}
                 />
               </Box>
             )}
@@ -170,6 +172,9 @@ AccordionSnapshot.propTypes = {
     name: PropTypes.string,
     date: PropTypes.string,
     dateReviewed: PropTypes.string
+  }),
+  actualItem: PropTypes.shape({
+    isDeleted: PropTypes.bool
   }),
   all: PropTypes.bool,
   isCurrent: PropTypes.bool

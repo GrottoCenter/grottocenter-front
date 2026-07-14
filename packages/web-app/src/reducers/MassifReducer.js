@@ -1,5 +1,13 @@
 import arrFindReplaceOrAdd from './utils';
 import swapRelevance from './swapRelevance';
+import { POST_GUIDELINE_SUCCESS } from '../actions/Guideline/CreateGuideline';
+import { PATCH_GUIDELINE_SUCCESS } from '../actions/Guideline/UpdateGuideline';
+import {
+  DELETE_GUIDELINE_SUCCESS,
+  DELETE_GUIDELINE_PERMANENT_SUCCESS
+} from '../actions/Guideline/DeleteGuideline';
+import { RESTORE_GUIDELINE_SUCCESS } from '../actions/Guideline/RestoreGuideline';
+import { ROLLBACK_GUIDELINE_SUCCESS } from '../actions/Guideline/RollbackGuideline';
 import {
   FETCH_MASSIF,
   FETCH_MASSIF_FAILURE,
@@ -103,6 +111,68 @@ const reducer = (state = initialState, action) => {
           )
         }
       };
+    case POST_GUIDELINE_SUCCESS: {
+      if (
+        !state.massif ||
+        !action.guideline.massifs?.some(
+          m => m?.id === state.massif.id || Number(m) === state.massif.id
+        )
+      ) {
+        return state;
+      }
+      const guidelines = state.massif.guidelines || [];
+      if (guidelines.some(g => g.id === action.guideline.id)) {
+        return state;
+      }
+      return {
+        ...state,
+        massif: {
+          ...state.massif,
+          guidelines: [...guidelines, action.guideline]
+        }
+      };
+    }
+    case PATCH_GUIDELINE_SUCCESS:
+    case DELETE_GUIDELINE_SUCCESS:
+    case RESTORE_GUIDELINE_SUCCESS:
+    case ROLLBACK_GUIDELINE_SUCCESS: {
+      if (
+        !state.massif ||
+        !action.guideline.massifs?.some(
+          m => m?.id === state.massif.id || Number(m) === state.massif.id
+        )
+      ) {
+        return state;
+      }
+      const guidelines = state.massif.guidelines || [];
+      const exists = guidelines.some(g => g.id === action.guideline.id);
+      return {
+        ...state,
+        massif: {
+          ...state.massif,
+          guidelines: exists
+            ? guidelines.map(g => (g.id === action.guideline.id ? action.guideline : g))
+            : [...guidelines, action.guideline]
+        }
+      };
+    }
+
+    // Hard delete: drop the guideline from the list entirely. Removal by id is
+    // idempotent, so we don't gate on the response carrying `massifs`.
+    case DELETE_GUIDELINE_PERMANENT_SUCCESS: {
+      if (!state.massif) {
+        return state;
+      }
+      return {
+        ...state,
+        massif: {
+          ...state.massif,
+          guidelines: (state.massif.guidelines || []).filter(
+            g => g.id !== action.guideline.id
+          )
+        }
+      };
+    }
     default:
       return state;
   }

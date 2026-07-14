@@ -80,6 +80,7 @@ const AccordionSnapshotListPage = ({
                 previous={mostRecentSnapshot}
                 isCurrent
                 all
+                actualItem={currentTItem}
               />
             )
           });
@@ -104,6 +105,7 @@ const AccordionSnapshotListPage = ({
               reviewer={snapshot.reviewer}
               previous={previousMap[`${snapshot.id}_${snapshot.t_id}`]}
               all
+              actualItem={currentTItem}
             />
           )
         });

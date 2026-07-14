@@ -18,6 +18,7 @@ import { updateHistory } from '../../../../../actions/History/UpdateHistory';
 import { updateRiggings } from '../../../../../actions/Riggings/UpdateRigging';
 import { updateLocation } from '../../../../../actions/Location/UpdateLocation';
 import { updateComment } from '../../../../../actions/Comment/UpdateComment';
+import { rollbackGuideline } from '../../../../../actions/Guideline/RollbackGuideline';
 import { usePermissions, useUserProperties } from '../../../../../hooks';
 import { updateEntrance } from '../../../../../actions/Entrance/UpdateEntrance';
 import { updateCaveAndEntrance } from '../../../../../actions/CaveAndEntrance';
@@ -30,7 +31,7 @@ function sleep(ms) {
 }
 const RestoreSnapshot = item => {
   const dispatch = useDispatch();
-  const { snapshot, snapshotType, isNetwork } = item;
+  const { snapshot, snapshotType, isNetwork, actualItem } = item;
   const userId = pathOr(null, ['id'], useUserProperties());
   const permissions = usePermissions();
   const { formatMessage } = useIntl();
@@ -47,12 +48,12 @@ const RestoreSnapshot = item => {
   const handleClose = () => {
     setOpen(false);
   };
-  const restoreSnapshot = (typeItem, content) => {
+  const restoreSnapshot = async (typeItem, content) => {
     setOpen(false);
     switch (typeItem) {
       case 'comments':
         if (canEditComment) {
-          dispatch(
+          await dispatch(
             updateComment({
               ...content,
               id: content.t_id,
@@ -63,7 +64,7 @@ const RestoreSnapshot = item => {
         }
         break;
       case 'descriptions':
-        dispatch(
+        await dispatch(
           updateDescription({
             ...content,
             id: content.t_id
@@ -87,7 +88,7 @@ const RestoreSnapshot = item => {
           id: content.t_id
         };
         if (isNetwork) {
-          dispatch(updateEntrance(updatedEntrance));
+          await dispatch(updateEntrance(updatedEntrance));
         } else {
           const updatedCave = {
             name: {
@@ -102,11 +103,11 @@ const RestoreSnapshot = item => {
             temperature: Number(content.cave.temperature),
             id: content.cave?.id
           };
-          dispatch(updateCaveAndEntrance(updatedCave, updatedEntrance));
+          await dispatch(updateCaveAndEntrance(updatedCave, updatedEntrance));
         }
         break;
       case 'histories':
-        dispatch(
+        await dispatch(
           updateHistory({
             ...content,
             id: content.t_id
@@ -114,7 +115,7 @@ const RestoreSnapshot = item => {
         );
         break;
       case 'locations':
-        dispatch(
+        await dispatch(
           updateLocation({
             ...content,
             id: content.t_id
@@ -122,10 +123,18 @@ const RestoreSnapshot = item => {
         );
         break;
       case 'riggings':
-        dispatch(
+        await dispatch(
           updateRiggings({
             ...content,
             id: content.t_id
+          })
+        );
+        break;
+      case 'guidelines':
+        await dispatch(
+          rollbackGuideline({
+            id: content.t_id,
+            snapshotId: content.id
           })
         );
         break;
@@ -137,7 +146,8 @@ const RestoreSnapshot = item => {
     sleep(10000).then(() => window.close());
   };
   return (
-    permissions.isAuth && (
+    permissions.isAuth &&
+    !actualItem?.isDeleted && (
       <>
         <Tooltip title={formatMessage({ id: 'Restore this version' })}>
           <Button
@@ -193,7 +203,10 @@ const RestoreSnapshot = item => {
 RestoreSnapshot.propTypes = {
   snapshot: PropTypes.shape({}).isRequired,
   snapshotType: PropTypes.string.isRequired,
-  isNetwork: PropTypes.bool
+  isNetwork: PropTypes.bool,
+  actualItem: PropTypes.shape({
+    isDeleted: PropTypes.bool
+  })
 };
 
 export default RestoreSnapshot;

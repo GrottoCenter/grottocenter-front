@@ -4,7 +4,8 @@ import {
   FeatureGroup,
   MapContainer,
   Marker,
-  ScaleControl
+  ScaleControl,
+  useMap
 } from 'react-leaflet';
 import { EditControl } from 'react-leaflet-draw';
 import L from 'leaflet';
@@ -43,6 +44,18 @@ const kinkIcon = L.divIcon({
   iconSize: [KINK_ICON_SIZE, KINK_ICON_SIZE],
   iconAnchor: [KINK_ICON_SIZE / 2, KINK_ICON_SIZE / 2]
 });
+
+// Creates the kink markers' pane during render, before they mount — a parent
+// effect races (child marker effects run first) and crashes on a missing pane.
+const KinkPane = () => {
+  const map = useMap();
+  if (!map.getPane('kinkPane')) {
+    const pane = map.createPane('kinkPane');
+    pane.style.zIndex = 650;
+    pane.style.pointerEvents = 'none';
+  }
+  return null;
+};
 
 const getMultiPolygonCentroid = function (coordinates) {
   const result = coordinates.reduce(
@@ -239,17 +252,6 @@ const PolygonMap = ({ onChange, onValidationChange, data }) => {
       return () => clearTimeout(t);
     }
   }, [map, isMobile]);
-
-  // Create a custom pane for kink markers so they persist during edit mode.
-  // z-index 650 places them above Leaflet Draw edit handles (markerPane=600)
-  // while pointerEvents='none' ensures they don't block vertex dragging.
-  useEffect(() => {
-    if (map && !map.getPane('kinkPane')) {
-      const pane = map.createPane('kinkPane');
-      pane.style.zIndex = 650;
-      pane.style.pointerEvents = 'none';
-    }
-  }, [map]);
 
   useEffect(() => {
     if (map) {
@@ -743,6 +745,7 @@ const PolygonMap = ({ onChange, onValidationChange, data }) => {
             <ScaleControl position="bottomright" />
             <LayersControl />
 
+            <KinkPane />
             {allKinkPoints.map((point, idx) => (
               <Marker
                 key={`kink-${point.lat}-${point.lng}-${idx}`}

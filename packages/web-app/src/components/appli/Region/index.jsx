@@ -14,6 +14,7 @@ import { useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import { useReactToPrint } from 'react-to-print';
 
+import Guidelines from '../Guidelines';
 import StatisticsDataDashboard from '../StatisticsDataDashboard';
 import CustomMapContainer from '../../common/Maps/common/MapContainer';
 import PageContainer from '../../common/Layouts/PageContainer';
@@ -25,6 +26,7 @@ import REDUCER_STATUS from '../../../reducers/ReducerStatus';
 import { CoordinatesMarker } from '../../common/Maps/common/Markers/Components';
 import { isMobile } from 'react-device-detect';
 import {
+  usePermissions,
   useSubscriptions,
   useScrollToHashOnLoad,
   useSharePage
@@ -44,6 +46,7 @@ const Region = ({
   const { formatMessage } = useIntl();
   const navigate = useNavigate();
   const componentRef = useRef();
+  const permissions = usePermissions();
   const isLoading = status === REDUCER_STATUS.LOADING;
   const handleShare = useSharePage();
   const handlePrint = useReactToPrint({ contentRef: componentRef });
@@ -187,6 +190,13 @@ const Region = ({
               id: 'Discover the numbers about this region and its caves.'
             })}
           />
+          {(region.guidelines?.length > 0 || permissions.isAuth) && (
+            <Guidelines
+              entityType="regions"
+              entityId={region.id}
+              guidelines={region.guidelines}
+            />
+          )}
           <AssociationSection
             organizations={region?.organizations}
             entityType="region"
@@ -207,7 +217,8 @@ Region.propTypes = {
     id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     name: PropTypes.string,
     latitude: PropTypes.number,
-    longitude: PropTypes.number
+    longitude: PropTypes.number,
+    guidelines: PropTypes.array
   }),
   error: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
   onSubscribe: PropTypes.func,

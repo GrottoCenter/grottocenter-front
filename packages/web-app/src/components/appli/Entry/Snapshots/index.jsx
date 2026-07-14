@@ -37,6 +37,11 @@ const SnapshotPage = () => {
   const getAll = queryParameters.get('all') === 'true';
   const parentId = queryParameters.get('parentId');
   const parentType = queryParameters.get('parentType');
+  const backTo = queryParameters.get('backTo');
+  // Some entities (e.g. guidelines) have no standalone route to re-fetch the
+  // current item from, so their soft-delete state travels in the URL instead.
+  const hasIsDeletedParam = queryParameters.has('isDeleted');
+  const isDeletedParam = queryParameters.get('isDeleted') === 'true';
 
   const { id, type } = useParams();
 
@@ -99,6 +104,9 @@ const SnapshotPage = () => {
     massifs: [currentMassif, isMassifLoading],
     persons: [currentPerson, isPersonLoading],
     organizations: [currentOrganization, isOrganizationLoading],
+    // Guidelines have no route to fetch from; the marker only carries isDeleted
+    // to gate the rollback button and intentionally renders no "current" card.
+    guidelines: [hasIsDeletedParam ? { isDeleted: isDeletedParam } : null, false],
     descriptions: [currentSubEntity, isParentLoading],
     locations: [currentSubEntity, isParentLoading],
     histories: [currentSubEntity, isParentLoading],
@@ -147,9 +155,13 @@ const SnapshotPage = () => {
         }
       );
 
-  const backTarget = parentId && parentType
-    ? `/ui/${parentType}/${parentId}`
-    : `/ui/${type}/${id}`;
+  // Prefer the exact page the history was opened from (passed as `backTo`).
+  // Fall back to a rebuilt URL for older links that predate the param.
+  const backTarget =
+    backTo ||
+    (parentId && parentType
+      ? `/ui/${parentType}/${parentId}`
+      : `/ui/${type}/${id}`);
   const backLabel = formatMessage(
     { id: 'Back to {type}' },
     {
