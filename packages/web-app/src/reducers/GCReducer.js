@@ -90,8 +90,8 @@ import updateAccount from './UpdateAccountReducer';
 import updateCave from './UpdateCaveReducer';
 import updateDescription from './UpdateDescription';
 import updateDocument from './UpdateDocumentReducer';
-import updateGuideline from './UpdateGuidelineReducer';
 import updateEntrance from './UpdateEntranceReducer';
+import updateGuideline from './UpdateGuidelineReducer';
 import updateHistory from './UpdateHistory';
 import updateLocation from './UpdateLocation';
 import updateMassif from './UpdateMassifReducer';
@@ -199,8 +199,8 @@ const GCReducer = combineReducers({
   updateCave,
   updateDescription,
   updateDocument,
-  updateGuideline,
   updateEntrance,
+  updateGuideline,
   updateHistory,
   updateLocation,
   updateMassif,

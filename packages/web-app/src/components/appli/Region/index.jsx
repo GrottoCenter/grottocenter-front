@@ -217,7 +217,8 @@ Region.propTypes = {
     id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     name: PropTypes.string,
     latitude: PropTypes.number,
-    longitude: PropTypes.number
+    longitude: PropTypes.number,
+    guidelines: PropTypes.array
   }),
   error: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
   onSubscribe: PropTypes.func,
