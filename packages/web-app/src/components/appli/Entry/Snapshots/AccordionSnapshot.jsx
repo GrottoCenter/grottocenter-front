@@ -37,15 +37,15 @@ const AccordionSnapshot = ({
   const [open, setOpen] = useState(isCurrent ?? false);
 
   const isNameChange = !!snapshot.isNameChangeSnapshot;
-  const isEntranceType = snapshotType === 'entrances';
+  const isEntranceSnapshot = snapshotType === 'entrances';
 
-  // For entrance snapshots, prioritize the cave/network name over the entrance
-  // name: it's the value most relevant to disambiguate renamed entrances and
-  // networks, and it still matches the entrance name for single-entrance caves.
-  const snapshotTitle = isEntranceType
+  // For entrance snapshots, use the entrance name directly (falling back to
+  // title/description title); cave/network renames are surfaced by dedicated
+  // rename snapshots, so this stays a plain contextual label, not a diff.
+  const snapshotTitle = isEntranceSnapshot
     ? (snapshot.name ?? snapshot.title ?? snapshot.description?.title ?? '')
     : (snapshot.title ?? snapshot.name ?? snapshot.description?.title ?? '');
-  const previousVersionTitle = isEntranceType
+  const previousVersionTitle = isEntranceSnapshot
     ? (previous?.name ??
       previous?.title ??
       previous?.description?.title ??
@@ -161,7 +161,7 @@ const AccordionSnapshot = ({
                     // snapshotTitle holds the OLD name (raw h_name value);
                     // newName is resolved from the next real snapshot.
                     <HighLightsChar oldText={snapshotTitle} newText={newName} />
-                  ) : isEntranceType ? (
+                  ) : isEntranceSnapshot ? (
                     // Regular entrance snapshot: name/caveName are contextual
                     // labels resolved across tables, not diffable fields. Renames
                     // are surfaced by the dedicated rename snapshot above.
