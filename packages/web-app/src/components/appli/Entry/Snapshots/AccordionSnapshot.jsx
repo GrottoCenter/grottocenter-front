@@ -42,15 +42,10 @@ const AccordionSnapshot = ({
   // name: it's the value most relevant to disambiguate renamed entrances and
   // networks, and it still matches the entrance name for single-entrance caves.
   const snapshotTitle = isEntranceType
-    ? (snapshot.caveName ??
-      snapshot.name ??
-      snapshot.title ??
-      snapshot.description?.title ??
-      '')
+    ? (snapshot.name ?? snapshot.title ?? snapshot.description?.title ?? '')
     : (snapshot.title ?? snapshot.name ?? snapshot.description?.title ?? '');
   const previousVersionTitle = isEntranceType
-    ? (previous?.caveName ??
-      previous?.name ??
+    ? (previous?.name ??
       previous?.title ??
       previous?.description?.title ??
       undefined)
