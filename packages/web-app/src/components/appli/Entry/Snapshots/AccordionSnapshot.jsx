@@ -120,7 +120,13 @@ const AccordionSnapshot = ({
                     ? `${displayDate.toLocaleDateString()} - ${displayDate.toLocaleTimeString()}`
                     : ''}
                 </Typography>
-                {reviewer ? (
+                {isNameChange ? (
+                  <AuthorAndDate
+                    author={reviewer}
+                    verb="Updated"
+                    textColor="inherit"
+                  />
+                ) : reviewer ? (
                   <AuthorAndDate
                     author={reviewer}
                     verb="Updated"
