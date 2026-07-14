@@ -1,11 +1,5 @@
 import React, { useState } from 'react';
-import {
-  Box,
-  Chip,
-  Collapse,
-  IconButton,
-  Typography
-} from '@mui/material';
+import { Box, Chip, Collapse, IconButton, Typography } from '@mui/material';
 import {
   TimelineItem,
   TimelineSeparator,
@@ -15,6 +9,7 @@ import {
 } from '@mui/lab';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import DriveFileRenameOutlineIcon from '@mui/icons-material/DriveFileRenameOutline';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 
@@ -40,8 +35,26 @@ const AccordionSnapshot = ({
   const { formatMessage } = useIntl();
   const [open, setOpen] = useState(isCurrent ?? false);
 
-  const snapshotTitle = snapshot.title ?? snapshot.name ?? snapshot.description?.title ?? '';
-  const previousVersionTitle = previous?.title ?? previous?.name ?? previous?.description?.title ?? undefined;
+  const isNameChange = snapshot.isNameChangeSnapshot === true;
+  const isEntranceType = snapshotType === 'entrances';
+
+  const snapshotTitle = isEntranceType
+    ? (snapshot.caveName ??
+      snapshot.name ??
+      snapshot.title ??
+      snapshot.description?.title ??
+      '')
+    : (snapshot.title ?? snapshot.name ?? snapshot.description?.title ?? '');
+  const previousVersionTitle = isEntranceType
+    ? (previous?.caveName ??
+      previous?.name ??
+      previous?.title ??
+      previous?.description?.title ??
+      undefined)
+    : (previous?.title ??
+      previous?.name ??
+      previous?.description?.title ??
+      undefined);
   const rawDate = isCurrent
     ? (snapshot.dateReviewed ?? snapshot.dateInscription)
     : snapshot.id;
@@ -51,13 +64,13 @@ const AccordionSnapshot = ({
     <TimelineItem sx={{ '&::before': { flex: 0, padding: 0 } }}>
       <TimelineSeparator>
         <TimelineDot
-          color={isCurrent ? 'primary' : 'grey'}
+          color={isNameChange ? 'secondary' : isCurrent ? 'primary' : 'grey'}
           variant={isCurrent ? 'filled' : 'outlined'}
           sx={{ mt: '10px' }}
         />
         <TimelineConnector />
       </TimelineSeparator>
-      <TimelineContent sx={{ pb: 2, pt: 0 }}>
+      <TimelineContent sx={{ pb: 2, pt: 0, pr: 0 }}>
         <Box
           sx={{
             borderRadius: 1,
@@ -77,58 +90,121 @@ const AccordionSnapshot = ({
               py: 1,
               '&:hover': { bgcolor: 'action.hover' }
             }}>
-            <Box sx={{ flex: '0 0 auto' }}>
-              {all && (
-                <Typography variant="caption" color="text.secondary" display="block">
-                  <Translate>{snapshotType === 'entrances' ? 'Information' : capitalize(snapshotType)}</Translate>
+            <Box
+              sx={{
+                flex: 1,
+                minWidth: 0,
+                display: 'flex',
+                flexDirection: { xs: 'column', sm: 'row' },
+                alignItems: { xs: 'stretch', sm: 'flex-start' },
+                gap: 1
+              }}>
+              <Box sx={{ flex: '0 0 auto' }}>
+                {all && (
+                  <Typography
+                    variant="caption"
+                    color="text.secondary"
+                    display="block">
+                    <Translate>
+                      {snapshotType === 'entrances'
+                        ? 'Information'
+                        : capitalize(snapshotType)}
+                    </Translate>
+                  </Typography>
+                )}
+                <Typography
+                  variant="caption"
+                  color="text.secondary"
+                  display="block">
+                  {displayDate
+                    ? `${displayDate.toLocaleDateString()} - ${displayDate.toLocaleTimeString()}`
+                    : ''}
                 </Typography>
-              )}
-              <Typography variant="caption" color="text.secondary" display="block">
-                {displayDate
-                  ? `${displayDate.toLocaleDateString()} - ${displayDate.toLocaleTimeString()}`
-                  : ''}
-              </Typography>
-              {reviewer ? (
-                <AuthorAndDate author={reviewer} verb="Updated" textColor="inherit" />
-              ) : author ? (
-                <AuthorAndDate author={author} verb="Created" textColor="inherit" />
-              ) : null}
-            </Box>
-            <Box sx={{ flex: 1, minWidth: 0, display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
-              <Typography variant="body2" component="span" fontWeight={isCurrent ? 'bold' : 'regular'}>
-                {isCurrent ? (
-                  snapshotTitle
-                ) : (
-                  <HighLightsChar
-                    oldText={previousVersionTitle}
-                    newText={snapshotTitle}
+                {reviewer ? (
+                  <AuthorAndDate
+                    author={reviewer}
+                    verb="Updated"
+                    textColor="inherit"
+                  />
+                ) : author ? (
+                  <AuthorAndDate
+                    author={author}
+                    verb="Created"
+                    textColor="inherit"
+                  />
+                ) : null}
+              </Box>
+              <Box
+                sx={{
+                  flex: 1,
+                  minWidth: 0,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 1,
+                  flexWrap: 'wrap'
+                }}>
+                <Typography
+                  variant="body2"
+                  component="span"
+                  fontWeight={isCurrent ? 'bold' : 'regular'}>
+                  {isCurrent ? (
+                    snapshotTitle
+                  ) : (
+                    <HighLightsChar
+                      oldText={previousVersionTitle}
+                      newText={snapshotTitle}
+                    />
+                  )}
+                </Typography>
+                {isCurrent && (
+                  <Chip
+                    label={formatMessage({ id: 'Current version' })}
+                    color="primary"
+                    size="small"
+                    sx={{ flexShrink: 0 }}
                   />
                 )}
-              </Typography>
-              {isCurrent && (
-                <Chip
-                  label={formatMessage({ id: 'Current version' })}
-                  color="primary"
-                  size="small"
-                  sx={{ flexShrink: 0 }}
-                />
-              )}
-              {!previous && (
-                <Chip
-                  label={formatMessage({ id: 'Initial version' })}
-                  color="primary"
-                  variant="outlined"
-                  size="small"
-                  sx={{ flexShrink: 0 }}
-                />
-              )}
+                {!previous && (
+                  <Chip
+                    label={formatMessage({ id: 'Initial version' })}
+                    color="primary"
+                    variant="outlined"
+                    size="small"
+                    sx={{ flexShrink: 0 }}
+                  />
+                )}
+                {isNameChange && (
+                  <Chip
+                    icon={<DriveFileRenameOutlineIcon />}
+                    label={formatMessage({ id: 'Renamed' })}
+                    color="secondary"
+                    variant="outlined"
+                    size="small"
+                    sx={{ flexShrink: 0 }}
+                  />
+                )}
+              </Box>
             </Box>
-            <IconButton size="small" color="action" sx={{ flexShrink: 0, mt: '-2px' }}>
-              {open ? <ExpandLessIcon fontSize="small" /> : <ExpandMoreIcon fontSize="small" />}
+            <IconButton
+              size="small"
+              color="action"
+              sx={{ flexShrink: 0, mt: '-2px' }}>
+              {open ? (
+                <ExpandLessIcon fontSize="small" />
+              ) : (
+                <ExpandMoreIcon fontSize="small" />
+              )}
             </IconButton>
           </Box>
           <Collapse in={open}>
-            <Box sx={{ px: 2, pt: 1, pb: 1, borderTop: '1px solid', borderColor: 'grey.200' }}>
+            <Box
+              sx={{
+                px: 2,
+                pt: 1,
+                pb: 1,
+                borderTop: '1px solid',
+                borderColor: 'grey.200'
+              }}>
               {getAccordionBodyFromType(
                 snapshotType,
                 snapshot,
@@ -158,6 +234,8 @@ AccordionSnapshot.propTypes = {
     id: PropTypes.string,
     title: PropTypes.string,
     name: PropTypes.string,
+    caveName: PropTypes.string,
+    isNameChangeSnapshot: PropTypes.bool,
     description: PropTypes.shape({ title: PropTypes.string }),
     dateInscription: PropTypes.string,
     dateReviewed: PropTypes.string
@@ -170,6 +248,7 @@ AccordionSnapshot.propTypes = {
     id: PropTypes.string,
     title: PropTypes.string,
     name: PropTypes.string,
+    caveName: PropTypes.string,
     date: PropTypes.string,
     dateReviewed: PropTypes.string
   }),

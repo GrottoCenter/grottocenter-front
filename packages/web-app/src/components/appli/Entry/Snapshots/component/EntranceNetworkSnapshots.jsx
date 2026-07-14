@@ -49,7 +49,7 @@ const EntranceNetworkSnapshots = information => {
       )}
       {entrance.cave && (
         <Property
-          label={formatMessage({ id: 'Cave' })}
+          label={formatMessage({ id: 'Network' })}
           value={
             <HighLightsLine
               oldText={previous?.caveName}

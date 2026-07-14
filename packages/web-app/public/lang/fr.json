@@ -2040,6 +2040,7 @@
   "Remove sensitivity": "Supprimer la sensibilité",
   "Removing sensitivity from the massif will not automatically remove the sensitivity flag from individual entrances.": "La suppression de la sensibilité du massif ne supprimera pas automatiquement le marquage de sensibilité des entrées individuelles.",
   "Removing sensitivity from the massif will not automatically remove the sensitivity flag from individual entrances. Those flags must be managed separately. Do you want to continue?": "La suppression de la sensibilité du massif ne supprimera pas automatiquement le marquage de sensibilité des entrées individuelles. Ces marquages doivent être gérés séparément. Voulez-vous continuer ?",
+  "Renamed": "Renommé",
   "Repeat your password here.": "Saisissez de nouveau votre mot de passe ici.",
   "Report": "Rapport",
   "Report message": "Signaler un message",
