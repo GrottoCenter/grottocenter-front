@@ -51,7 +51,13 @@ const AccordionSnapshotList = ({
     if (!hasRevisions) return null;
     const firstType = Object.keys(filteredData)[0];
     const items = filteredData[firstType];
-    return items?.length > 0 ? items[items.length - 1] : null;
+    if (!items?.length) return null;
+    // Skip rename snapshots: they only carry the renaming and no other data, so
+    // they must not be used as the previous version to diff the current item.
+    for (let i = items.length - 1; i >= 0; i -= 1) {
+      if (!items[i].isNameChangeSnapshot) return items[i];
+    }
+    return null;
   })();
 
   const snapshotElements = hasRevisions
@@ -72,7 +78,10 @@ const AccordionSnapshotList = ({
                 actualItem={currentItem}
               />
             ],
-            prev: snapshot
+            // Rename snapshots are ignored in the history chain: they carry no
+            // data beyond the renaming, so they must not become the previous
+            // version used to diff the next real snapshot.
+            prev: snapshot.isNameChangeSnapshot ? prev : snapshot
           }),
           { items: [], prev: null }
         );

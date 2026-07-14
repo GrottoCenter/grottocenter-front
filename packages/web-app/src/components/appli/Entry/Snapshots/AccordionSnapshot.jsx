@@ -78,15 +78,17 @@ const AccordionSnapshot = ({
             overflow: 'hidden'
           }}>
           <Box
-            onClick={() => setOpen(prev => !prev)}
+            onClick={isNameChange ? undefined : () => setOpen(prev => !prev)}
             sx={{
-              cursor: 'pointer',
+              cursor: isNameChange ? 'default' : 'pointer',
               display: 'flex',
               alignItems: 'flex-start',
               gap: 1,
               px: 1,
               py: 1,
-              '&:hover': { bgcolor: 'action.hover' }
+              ...(isNameChange
+                ? {}
+                : { '&:hover': { bgcolor: 'action.hover' } })
             }}>
             <Box
               sx={{
@@ -183,18 +185,20 @@ const AccordionSnapshot = ({
                 )}
               </Box>
             </Box>
-            <IconButton
-              size="small"
-              color="action"
-              sx={{ flexShrink: 0, mt: '-2px' }}>
-              {open ? (
-                <ExpandLessIcon fontSize="small" />
-              ) : (
-                <ExpandMoreIcon fontSize="small" />
-              )}
-            </IconButton>
+            {!isNameChange && (
+              <IconButton
+                size="small"
+                color="action"
+                sx={{ flexShrink: 0, mt: '-2px' }}>
+                {open ? (
+                  <ExpandLessIcon fontSize="small" />
+                ) : (
+                  <ExpandMoreIcon fontSize="small" />
+                )}
+              </IconButton>
+            )}
           </Box>
-          <Collapse in={open}>
+          <Collapse in={open && !isNameChange}>
             <Box
               sx={{
                 px: 2,
