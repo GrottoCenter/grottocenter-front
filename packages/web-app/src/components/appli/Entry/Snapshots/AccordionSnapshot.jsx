@@ -35,9 +35,12 @@ const AccordionSnapshot = ({
   const { formatMessage } = useIntl();
   const [open, setOpen] = useState(isCurrent ?? false);
 
-  const isNameChange = snapshot.isNameChangeSnapshot === true;
+  const isNameChange = !!snapshot.isNameChangeSnapshot;
   const isEntranceType = snapshotType === 'entrances';
 
+  // For entrance snapshots, prioritize the cave/network name over the entrance
+  // name: it's the value most relevant to disambiguate renamed entrances and
+  // networks, and it still matches the entrance name for single-entrance caves.
   const snapshotTitle = isEntranceType
     ? (snapshot.caveName ??
       snapshot.name ??
@@ -212,7 +215,7 @@ const AccordionSnapshot = ({
                 previous
               )}
             </Box>
-            {!isCurrent && snapshotType !== 'documents' && (
+            {!isCurrent && snapshotType !== 'documents' && !isNameChange && (
               <Box sx={{ px: 2, pb: 2 }}>
                 <RestoreSnapshot
                   snapshot={snapshot}

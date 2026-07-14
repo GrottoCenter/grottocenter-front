@@ -11,6 +11,9 @@ const EntranceCaveSnapshots = ({ entrance, previous }) => {
   const { cave } = entrance;
 
   const { formatMessage } = useIntl();
+  const hasCoordinates = entrance.latitude != null && entrance.longitude != null;
+  const hasPreviousCoordinates =
+    previous?.latitude != null && previous?.longitude != null;
   const lat = Number(entrance.latitude);
   const long = Number(entrance.longitude);
   const previousLat = Number(previous?.latitude);
@@ -28,13 +31,13 @@ const EntranceCaveSnapshots = ({ entrance, previous }) => {
         gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' },
         width: '100%'
       }}>
-      {!(Number.isNaN(lat) && Number.isNaN(long)) && (
+      {hasCoordinates && (
         <Property
           label={`${formatMessage({ id: 'Coordinates' })} (WGS84)`}
           value={
             <HighLightsLine
               oldText={
-                !(Number.isNaN(previousLat) && Number.isNaN(previousLong))
+                hasPreviousCoordinates
                   ? makeCoordinatesValue([previousLat, previousLong])
                   : undefined
               }

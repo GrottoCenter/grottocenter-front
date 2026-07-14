@@ -9,6 +9,9 @@ import { HighLightsLine } from '../../../../common/Highlights';
 
 const EntranceNetworkSnapshots = information => {
   const { entrance, previous } = information;
+  const hasCoordinates = entrance.latitude != null && entrance.longitude != null;
+  const hasPreviousCoordinates =
+    previous?.latitude != null && previous?.longitude != null;
   const lat = Number(entrance.latitude);
   const long = Number(entrance.longitude);
   const previousLat = Number(previous?.latitude);
@@ -24,13 +27,13 @@ const EntranceNetworkSnapshots = information => {
 
   return (
     <Box display="flex" flexDirection="column" width="100%">
-      {!(Number.isNaN(lat) && Number.isNaN(long)) && (
+      {hasCoordinates && (
         <Property
           label={`${formatMessage({ id: 'Coordinates' })} (WGS84)`}
           value={
             <HighLightsLine
               oldText={
-                !(Number.isNaN(previousLat) && Number.isNaN(previousLong))
+                hasPreviousCoordinates
                   ? makeCoordinatesValue([previousLat, previousLong])
                   : undefined
               }
