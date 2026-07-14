@@ -36,7 +36,10 @@ const FallbackIconWrapper = styled(Box)`
   border-radius: 4px;
 `;
 
-const ImageThumbnail = ({ src, alt, onClick }) => {
+// Mirrors ThumbnailCard's breakpoint above: full width below `sm`, fixed 240px from `sm` up.
+const DEFAULT_SIZES = '(max-width: 599px) 100vw, 240px';
+
+const ImageThumbnail = ({ src, srcSet, sizes = DEFAULT_SIZES, alt, onClick }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
 
@@ -75,6 +78,8 @@ const ImageThumbnail = ({ src, alt, onClick }) => {
         )}
         <ThumbnailImage
           src={src}
+          srcSet={srcSet}
+          sizes={sizes}
           alt={alt}
           loading="lazy"
           onLoad={handleLoad}
@@ -88,6 +93,8 @@ const ImageThumbnail = ({ src, alt, onClick }) => {
 
 ImageThumbnail.propTypes = {
   src: PropTypes.string.isRequired,
+  srcSet: PropTypes.string,
+  sizes: PropTypes.string,
   alt: PropTypes.string.isRequired,
   onClick: PropTypes.func.isRequired
 };

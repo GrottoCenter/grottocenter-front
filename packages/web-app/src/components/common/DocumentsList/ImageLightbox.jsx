@@ -9,7 +9,8 @@ import {
   Download
 } from '@mui/icons-material';
 import { useIntl } from 'react-intl';
-import { decodeFileName, downloadFile } from './utils/imageUtils';
+import { decodeFileName, downloadFile, getLightboxSrc } from './utils/imageUtils';
+import { ThumbnailsPropTypes } from '../../../types/document.type';
 
 const LightboxDialog = styled(Dialog)`
   .MuiDialog-paper {
@@ -292,7 +293,7 @@ const ImageLightbox = ({
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}>
         <LightboxImage
-          src={currentImage.completePath}
+          src={getLightboxSrc(currentImage)}
           alt={decodeFileName(currentImage.fileName)}
           draggable={false}
           style={{
@@ -383,6 +384,7 @@ ImageLightbox.propTypes = {
     PropTypes.shape({
       fileName: PropTypes.string.isRequired,
       completePath: PropTypes.string.isRequired,
+      thumbnails: ThumbnailsPropTypes,
       description: PropTypes.string
     })
   ).isRequired,

@@ -1,70 +1,73 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Box, Button, CircularProgress } from '@mui/material';
+import { Box, Button, CircularProgress, Tooltip } from '@mui/material';
 import { useIntl } from 'react-intl';
-import { styled } from '@mui/material/styles';
 
-import Alert from '../../common/Alert';
-import { CaveType, EntranceType } from './types';
-
-const SpacedButton = styled(Button)`
-  ${({ theme }) => `
-  margin: 0 ${theme.spacing(1)};`}
-`;
-
-const FormActions = ({ apiError, entrance, loading, newCave, onReset }) => {
+// Shared action bar for the move page: a secondary "Cancel" and a primary
+// confirm action (attach / detach). Right-aligned on desktop (primary rightmost),
+// stacked full-width on mobile with the primary on top.
+const FormActions = ({
+  confirmLabel,
+  onConfirm,
+  onCancel,
+  loading = false,
+  disabled = false,
+  confirmTooltip = ''
+}) => {
   const { formatMessage } = useIntl();
-  const isSameCave =
-    newCave && entrance.cave && Number(newCave.id) === entrance.cave.id;
+
+  const confirmButton = (
+    <Button
+      variant="contained"
+      color="primary"
+      disabled={disabled || loading}
+      onClick={onConfirm}
+      startIcon={loading ? <CircularProgress size={18} color="inherit" /> : null}
+      sx={{ width: { xs: '100%', sm: 'auto' } }}
+    >
+      {confirmLabel}
+    </Button>
+  );
 
   return (
-    <>
-      {isSameCave && (
-        <Alert
-          severity="error"
-          content={formatMessage({
-            id: 'You must select a different cave than the initial one.'
-          })}
-        />
+    <Box
+      mt={4}
+      sx={{
+        display: 'flex',
+        flexDirection: { xs: 'column-reverse', sm: 'row' },
+        justifyContent: { sm: 'flex-end' },
+        gap: 2
+      }}
+    >
+      <Button
+        variant="outlined"
+        onClick={onCancel}
+        disabled={loading}
+        sx={{ width: { xs: '100%', sm: 'auto' } }}
+      >
+        {formatMessage({ id: 'Cancel' })}
+      </Button>
+
+      {confirmTooltip ? (
+        <Tooltip title={confirmTooltip}>
+          <Box component="span" sx={{ width: { xs: '100%', sm: 'auto' } }}>
+            {confirmButton}
+          </Box>
+        </Tooltip>
+      ) : (
+        confirmButton
       )}
-
-      <Box mt={4} align="center">
-        {loading && <CircularProgress />}
-        {apiError && (
-          <Alert
-            severity="error"
-            content={formatMessage({ id: apiError.message })}
-          />
-        )}
-
-        {!loading && (
-          <>
-            <SpacedButton
-              disabled={!newCave || isSameCave}
-              color="primary"
-              type="submit">
-              {formatMessage({ id: 'Validate' })}
-            </SpacedButton>
-            <SpacedButton
-              variant="outlined"
-              disabled={!newCave}
-              onClick={onReset}>
-              {formatMessage({ id: 'Reset' })}
-            </SpacedButton>
-          </>
-        )}
-      </Box>
-    </>
+    </Box>
   );
 };
 
 FormActions.propTypes = {
-  apiError: PropTypes.shape({
-    message: PropTypes.string.isRequired
-  }),
-  entrance: EntranceType,
-  loading: PropTypes.bool.isRequired,
-  onReset: PropTypes.func.isRequired,
-  newCave: CaveType
+  confirmLabel: PropTypes.node.isRequired,
+  onConfirm: PropTypes.func.isRequired,
+  onCancel: PropTypes.func.isRequired,
+  loading: PropTypes.bool,
+  disabled: PropTypes.bool,
+  confirmTooltip: PropTypes.node
 };
+
 export default FormActions;

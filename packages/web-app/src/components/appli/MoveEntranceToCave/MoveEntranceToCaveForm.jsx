@@ -1,17 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import {
-  Box,
-  Divider,
-  FormControl,
-  FormControlLabel,
-  FormLabel,
-  Radio,
-  RadioGroup
-} from '@mui/material';
+import { Box, Link } from '@mui/material';
 import { useIntl } from 'react-intl';
-import { useController, useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
 import Alert from '../../common/Alert';
 import CaveAutoCompleteSearch from '../../common/AutoCompleteSearch/CaveAutoCompleteSearch';
@@ -29,23 +20,14 @@ const MODE_DETACH = 'detach';
 const marginBetweenComponents = 4;
 
 const MoveEntranceToCaveForm = ({ entrance }) => {
-  const [mode, setMode] = useState(MODE_MOVE);
-  const {
-    handleSubmit,
-    reset,
-    control,
-    formState: { isSubmitSuccessful }
-  } = useForm({
-    defaultValues: {
-      newCave: null
-    }
-  });
-  const {
-    field: { onChange: onNewCaveChange, value: newCave }
-  } = useController({
-    control,
-    name: 'newCave'
-  });
+  const [searchParams, setSearchParams] = useSearchParams();
+  // Single-action page: the mode comes from the entry point (the two buttons in
+  // the edit page deep-link with ?mode=). No redundant in-page mode picker.
+  const mode =
+    searchParams.get('mode') === MODE_DETACH ? MODE_DETACH : MODE_MOVE;
+
+  const [newCave, setNewCave] = useState(null);
+  const [hasSubmitted, setHasSubmitted] = useState(false);
 
   const dispatch = useDispatch();
   const { formatMessage } = useIntl();
@@ -56,25 +38,48 @@ const MoveEntranceToCaveForm = ({ entrance }) => {
   );
 
   useEffect(() => {
-    if (isSubmitSuccessful && !loading && !apiError) {
-      onSuccess(
-        formatMessage({ id: 'Entrance successfully moved.' })
-      );
-      navigate(`/ui/entrances/${entrance.id}`);
+    if (hasSubmitted && !loading && !apiError) {
+      // Consume the submission so a later upstream error-clear can't retrigger
+      // the success navigation without a fresh submit.
+      setHasSubmitted(false);
+      onSuccess(formatMessage({ id: 'Entrance successfully moved.' }));
+      navigate(`/ui/entrances/${entrance?.id}`);
     }
-  }, [isSubmitSuccessful, loading, apiError, navigate, entrance.id, onSuccess, formatMessage, newCave]);
+  }, [
+    hasSubmitted,
+    loading,
+    apiError,
+    navigate,
+    entrance?.id,
+    onSuccess,
+    formatMessage
+  ]);
 
   if (!entrance) return null;
 
-  const isLinkedToANetwork = entrance.cave?.entrances?.length > 1;
+  const sourceInNetwork = entrance.cave?.entrances?.length > 1;
+  const isSameCave = newCave && Number(newCave.id) === entrance.cave?.id;
+  // The outcome preview is meaningless when the target is the current cave;
+  // only the "pick a different cave" error should show then.
+  const targetNbEntrances =
+    !isSameCave && typeof newCave?.nbEntrances === 'number'
+      ? newCave.nbEntrances
+      : null;
 
-  const handleOnSelection = selectedCave => {
-    onNewCaveChange({ ...selectedCave, id: Number(selectedCave.id) });
+  const handleSelection = selectedCave => {
+    setNewCave(
+      selectedCave ? { ...selectedCave, id: Number(selectedCave.id) } : null
+    );
   };
-  const handleResetCave = () => reset();
 
-  const onSubmitMoveCave = () => {
-    if (!newCave) return;
+  const switchMode = target => {
+    setNewCave(null);
+    setSearchParams({ mode: target });
+  };
+
+  const handleValidate = () => {
+    if (!newCave || isSameCave) return;
+    setHasSubmitted(true);
     dispatch(moveEntranceToCave(entrance.id, newCave.id));
   };
 
@@ -82,41 +87,49 @@ const MoveEntranceToCaveForm = ({ entrance }) => {
     <Box>
       <Box mb={marginBetweenComponents}>
         <Header entrance={entrance} />
+
+        {/* Discreet switch to the other operation, offered right under the
+            subject. Detaching only makes sense for a networked entrance. */}
+        {(mode === MODE_DETACH || sourceInNetwork) && (
+          <Box mt={1}>
+            <Link
+              component="button"
+              type="button"
+              variant="body2"
+              onClick={() =>
+                switchMode(mode === MODE_DETACH ? MODE_MOVE : MODE_DETACH)
+              }
+            >
+              {formatMessage({
+                id:
+                  mode === MODE_DETACH
+                    ? 'Rather link to an entrance or network?'
+                    : 'Rather detach the entrance?'
+              })}
+            </Link>
+          </Box>
+        )}
       </Box>
 
-      <Divider />
-
-      <FormControl component="fieldset" sx={{ mb: marginBetweenComponents, mt: marginBetweenComponents }}>
-        <FormLabel component="legend">
-          {formatMessage({ id: 'What do you want to do?' })}
-        </FormLabel>
-        <RadioGroup
-          value={mode}
-          onChange={e => setMode(e.target.value)}>
-          <FormControlLabel
-            value={MODE_MOVE}
-            control={<Radio />}
-            label={formatMessage({ id: 'Link to another network' })}
+      {mode === MODE_MOVE ? (
+        <Box>
+          <CaveAutoCompleteSearch
+            onSelection={handleSelection}
+            value={newCave}
+            label={formatMessage({ id: 'Entrance or network to attach to' })}
           />
-          <FormControlLabel
-            value={MODE_DETACH}
-            control={<Radio />}
-            label={formatMessage({ id: 'Detach from current network' })}
-          />
-        </RadioGroup>
-      </FormControl>
 
-      {mode === MODE_MOVE && (
-        <>
-          <Box mb={marginBetweenComponents}>
+          <Box mt={marginBetweenComponents}>
             <OperationSummary
               entrance={entrance}
               newCave={newCave}
-              isLinkedToANetwork={isLinkedToANetwork}
+              variant="link"
             />
           </Box>
 
-          {!isLinkedToANetwork && (
+          {/* Solo entrance: moving it deletes its cave (irreversible) — warn
+              on screen since it isn't part of the before → after preview. */}
+          {targetNbEntrances !== null && !sourceInNetwork && (
             <Alert
               severity="warning"
               content={formatMessage({
@@ -125,22 +138,31 @@ const MoveEntranceToCaveForm = ({ entrance }) => {
             />
           )}
 
-          <form autoComplete="off" onSubmit={handleSubmit(onSubmitMoveCave)}>
-            <CaveAutoCompleteSearch
-              onSelection={handleOnSelection}
-              value={newCave}
+          {isSameCave && (
+            <Alert
+              severity="error"
+              content={formatMessage({
+                id: 'You must select a different cave than the initial one.'
+              })}
             />
-            <FormActions
-              entrance={entrance}
-              loading={loading}
-              newCave={newCave}
-              onReset={handleResetCave}
-            />
-          </form>
-        </>
-      )}
+          )}
 
-      {mode === MODE_DETACH && (
+          {apiError && (
+            <Alert
+              severity="error"
+              content={formatMessage({ id: apiError.message })}
+            />
+          )}
+
+          <FormActions
+            confirmLabel={formatMessage({ id: 'Attach the entrance' })}
+            onConfirm={handleValidate}
+            onCancel={() => navigate(`/ui/entrances/${entrance.id}`)}
+            loading={loading}
+            disabled={!newCave || isSameCave}
+          />
+        </Box>
+      ) : (
         <DetachEntranceSection entrance={entrance} />
       )}
     </Box>

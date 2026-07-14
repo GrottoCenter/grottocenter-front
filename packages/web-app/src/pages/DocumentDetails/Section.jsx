@@ -21,9 +21,11 @@ import ImageThumbnail from '../../components/common/DocumentsList/ImageThumbnail
 import {
   decodeFileName,
   getFileExtension,
+  getThumbnailSources,
   isImageFile
 } from '../../components/common/DocumentsList/utils/imageUtils';
 import { getFileIcon } from '../../components/common/DocumentsList/utils/fileIcons';
+import { ThumbnailsPropTypes } from '../../types/document.type';
 
 export const TextLink = ({ value, url }) =>
   url ? (
@@ -331,14 +333,18 @@ export const FilesSection = ({ files }) => {
     <Stack spacing={3}>
       {images.length > 0 && (
         <ImageGallery>
-          {images.map((file, idx) => (
-            <ImageThumbnail
-              key={file.completePath}
-              src={file.completePath}
-              alt={decodeFileName(file.fileName)}
-              onClick={() => setLightboxIndex(idx)}
-            />
-          ))}
+          {images.map((file, idx) => {
+            const { src, srcSet } = getThumbnailSources(file);
+            return (
+              <ImageThumbnail
+                key={file.completePath}
+                src={src}
+                srcSet={srcSet}
+                alt={decodeFileName(file.fileName)}
+                onClick={() => setLightboxIndex(idx)}
+              />
+            );
+          })}
         </ImageGallery>
       )}
 
@@ -437,7 +443,8 @@ FilesSection.propTypes = {
     PropTypes.shape({
       fileName: PropTypes.string,
       completePath: PropTypes.string,
-      description: PropTypes.string
+      description: PropTypes.string,
+      thumbnails: ThumbnailsPropTypes
     })
   )
 };

@@ -14,11 +14,14 @@ import { FormContainer, FormActionRow } from '../utils/FormContainers';
 import { normelizeCoordinate } from '../utils/InputCoordinate';
 import { useIntl } from 'react-intl';
 import { usePermissions, useNotification } from '../../../../hooks';
-import LicenseBox from '../utils/LicenseBox';
 import FormProgressInfo from '../utils/FormProgressInfo';
+import LicenseBox from '../utils/LicenseBox';
 import EditTypeSelection from './EditTypeSelection';
 import EntranceDetail from './EntranceDetail';
 import CaveDetail from './CaveDetail';
+import EntranceAttributes from './EntranceAttributes';
+import NetworkLinkSection from './NetworkLinkSection';
+import NetworkMembershipSection from './NetworkMembershipSection';
 import {
   makeCaveData,
   makeEntranceData,
@@ -91,8 +94,13 @@ export const EntranceForm = ({
     [caveValues?.entrances?.length]
   );
   const [entityType, setEntityType] = useState(entityTypeInitialValue);
+  // The name of the cave/network selected via search in create mode (edit
+  // mode already knows it statically from caveValues). Not a form value: used
+  // only to render a named link to that network in CaveDetail.
+  const [selectedCave, setSelectedCave] = useState(null);
   const { isAdmin } = usePermissions();
-  const isSensitiveDisabled = !isAdmin && (entranceValues?.isSensitive ?? false);
+  const isSensitiveDisabled =
+    !isAdmin && (entranceValues?.isSensitive ?? false);
 
   const defaultFormValues = useMemo(
     () => ({
@@ -112,25 +120,49 @@ export const EntranceForm = ({
     formState: { errors, isSubmitting, isSubmitSuccessful }
   } = useForm({ defaultValues: defaultFormValues });
 
-  const [lat, lng, caveName, caveLanguage, entranceName, entranceLanguage] =
-    watch([
-      'entrance.latitude',
-      'entrance.longitude',
-      'cave.name',
-      'cave.language',
-      'entrance.name',
-      'entrance.language'
-    ]);
+  const [
+    lat,
+    lng,
+    caveName,
+    caveLanguage,
+    entranceName,
+    entranceLanguage,
+    caveId
+  ] = watch([
+    'entrance.latitude',
+    'entrance.longitude',
+    'cave.name',
+    'cave.language',
+    'entrance.name',
+    'entrance.language',
+    'cave.id'
+  ]);
 
   const isSubmitDisabled =
     (!isSensitiveDisabled && (isCoordEmpty(lat) || isCoordEmpty(lng))) ||
     (entityType === ENTRANCE_AND_CAVE
       ? !caveName || !caveLanguage
-      : !entranceName || !entranceLanguage);
+      : !caveId || !entranceName || !entranceLanguage);
 
   const handleUpdateEntityType = type => {
     setEntityType(type);
-    reset({ ...getValues() });
+    const values = getValues();
+    // Clear any previously linked network's data on every toggle (both
+    // directions): otherwise cave.id/depth/length/... from an earlier search
+    // selection lingers in the form even after the search box is cleared or
+    // the checkbox is unchecked and rechecked, showing a stale "shared
+    // network" link/values for a network that's no longer actually selected.
+    reset({
+      ...values,
+      cave: {
+        ...values.cave,
+        id: null,
+        depth: null,
+        length: null,
+        temperature: null,
+        isDiving: false
+      }
+    });
   };
 
   const handleReset = useCallback(() => {
@@ -165,7 +197,10 @@ export const EntranceForm = ({
         entityType !== ENTRANCE_AND_CAVE ||
         !hasCaveChanged(caveData, caveValues);
 
-      const entranceUnchanged = !hasEntranceChanged(entranceDataFmt, entranceValues);
+      const entranceUnchanged = !hasEntranceChanged(
+        entranceDataFmt,
+        entranceValues
+      );
 
       if (caveUnchanged && entranceUnchanged) {
         onInfo(formatMessage({ id: 'No changes detected' }));
@@ -207,11 +242,6 @@ export const EntranceForm = ({
           control={control}
           errors={errors}
           entityType={entityType}
-          updateEntityType={handleUpdateEntityType}
-          allowMoveFromCave={!isNewEntrance}
-          entranceId={entranceValues?.id}
-          reset={handleReset}
-          disabled={!isNewEntrance}
           isNewEntrance={isNewEntrance}
         />
         <EntranceDetail
@@ -220,11 +250,33 @@ export const EntranceForm = ({
           getValues={getValues}
           isNewEntrance={isNewEntrance}
         />
+        {isNewEntrance ? (
+          <NetworkLinkSection
+            control={control}
+            errors={errors}
+            entityType={entityType}
+            updateEntityType={handleUpdateEntityType}
+            selectedCave={selectedCave}
+            onSelectedCaveChange={setSelectedCave}
+          />
+        ) : (
+          <NetworkMembershipSection
+            entranceId={entranceValues?.id}
+            isNetwork={entityType === ENTRANCE_ONLY}
+            networkSize={caveValues?.entrances?.length}
+            caveId={caveValues?.id}
+            caveName={caveValues?.name}
+          />
+        )}
         <CaveDetail
           control={control}
           errors={errors}
-          isReadonly={!isNewEntrance && entityType === ENTRANCE_ONLY}
+          isReadonly={entityType === ENTRANCE_ONLY}
+          isShared={entityType === ENTRANCE_ONLY}
+          caveId={caveId}
+          caveName={isNewEntrance ? selectedCave?.name : caveValues?.name}
         />
+        <EntranceAttributes control={control} />
         <FormActionRow
           isNew={isNewEntrance}
           isSubmitting={isSubmitting}
@@ -232,7 +284,6 @@ export const EntranceForm = ({
           onCancel={onCancel}
         />
       </form>
-
       <LicenseBox />
     </FormContainer>
   );

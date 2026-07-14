@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import { useDispatch } from 'react-redux';
 import { FormattedMessage, useIntl } from 'react-intl';
 import {
-  Box,
   Button,
   Divider,
   Link as MuiLink,
@@ -13,7 +12,7 @@ import {
 } from '@mui/material';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import CancelIcon from '@mui/icons-material/Cancel';
-import CustomIcon from '../../common/CustomIcon';
+import NetworkInlineLink from '../../common/NetworkInlineLink';
 
 import ScrollableContent from '../../common/Layouts/Fixed/ScrollableContent';
 import { DescriptionPropTypes } from '../../../types/description.type';
@@ -39,7 +38,8 @@ const Descriptions = ({
 }) => {
   const { formatMessage } = useIntl();
   const permissions = usePermissions();
-  const hasNetworkDescriptions = !!networkId && !!networkName && networkDescriptionsCount > 0;
+  const hasNetworkDescriptions =
+    !!networkId && !!networkName && networkDescriptionsCount > 0;
   const dispatch = useDispatch();
   const openLink = useOpenLink();
   const [isFormVisible, setIsFormVisible] = useState(false);
@@ -74,13 +74,15 @@ const Descriptions = ({
               isFormVisible
                 ? formatMessage({ id: 'Cancel adding a new description' })
                 : formatMessage({ id: 'Add a new description' })
-            }>
+            }
+          >
             <Button
               color={isFormVisible ? 'inherit' : 'secondary'}
               size="small"
               variant="outlined"
               onClick={() => setIsFormVisible(!isFormVisible)}
-              startIcon={isFormVisible ? <CancelIcon /> : <AddCircleIcon />}>
+              startIcon={isFormVisible ? <CancelIcon /> : <AddCircleIcon />}
+            >
               {formatMessage({ id: isFormVisible ? 'Cancel' : 'New' })}
             </Button>
           </Tooltip>
@@ -96,22 +98,12 @@ const Descriptions = ({
                   id="network.descriptions.callout"
                   values={{
                     networkLink: (
-                      <MuiLink
-                        component="button"
+                      <NetworkInlineLink
+                        caveId={networkId}
+                        label={networkName}
+                        size={18}
                         variant="body1"
-                        onClick={() => openLink(`/ui/caves/${networkId}`)}
-                        sx={{ display: 'inline', verticalAlign: 'baseline' }}>
-                        <Box
-                          component="span"
-                          sx={{
-                            display: 'inline-block',
-                            verticalAlign: 'middle',
-                            mr: '2px'
-                          }}>
-                          <CustomIcon type="network" size={18} />
-                        </Box>
-                        {networkName}
-                      </MuiLink>
+                      />
                     ),
                     descriptionsLink: (
                       <MuiLink
@@ -120,7 +112,8 @@ const Descriptions = ({
                         onClick={() =>
                           openLink(`/ui/caves/${networkId}#description`)
                         }
-                        sx={{ display: 'inline', verticalAlign: 'baseline' }}>
+                        sx={{ display: 'inline', verticalAlign: 'baseline' }}
+                      >
                         {formatMessage(
                           { id: 'network.descriptions.count' },
                           { count: networkDescriptionsCount }
