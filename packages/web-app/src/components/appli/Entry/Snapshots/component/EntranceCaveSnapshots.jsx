@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 import { Property } from '../../../../common/Properties';
 import CustomIcon from '../../../../common/CustomIcon';
 import { HighLightsLine } from '../../../../common/Highlights';
-import { ENTRANCE_BOOLEAN_CHARACTERISTICS } from '../../../../../conf/entranceCharacteristics';
+import EntranceCharacteristicsSnapshot from './EntranceCharacteristicsSnapshot';
 
 const EntranceCaveSnapshots = ({ entrance, previous }) => {
   const { cave } = entrance;
@@ -107,32 +107,7 @@ const EntranceCaveSnapshots = ({ entrance, previous }) => {
           secondary
         />
       )}
-      {ENTRANCE_BOOLEAN_CHARACTERISTICS
-        .filter(({ field }) => {
-          if (previous == null) return !!entrance[field];
-          return !!entrance[field] || previous[field] !== entrance[field];
-        })
-        .map(({ field, label, icon }) => {
-          const isAdded = previous != null && !!entrance[field] && !previous[field];
-          const isRemoved = previous != null && !entrance[field] && !!previous[field];
-          return (
-            <Box
-              key={field}
-              sx={
-                isAdded
-                  ? { bgcolor: 'rgba(70, 149, 74, 0.2)', borderRadius: 1, px: 0.5 }
-                  : isRemoved
-                  ? { bgcolor: 'rgba(229, 83, 74, 0.2)', borderRadius: 1, px: 0.5 }
-                  : undefined
-              }>
-              <Property
-                value={formatMessage({ id: label })}
-                icon={<CustomIcon type={icon} />}
-                secondary={!entrance[field]}
-              />
-            </Box>
-          );
-        })}
+      <EntranceCharacteristicsSnapshot entrance={entrance} previous={previous} />
     </Box>
   );
 };
