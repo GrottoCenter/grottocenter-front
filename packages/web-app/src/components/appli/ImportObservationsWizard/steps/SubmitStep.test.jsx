@@ -3,37 +3,38 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { IntlProvider } from 'react-intl';
 
 import SubmitStep from './SubmitStep';
+import { submitObservationsImport } from '../../../../actions/Observations/importWizard';
+import {
+  exportProfile,
+  deriveProfileFileName
+} from '../utils/profileManager';
 
 // ---- React Router mock ----
-const mockNavigate = jest.fn();
-jest.mock('react-router-dom', () => ({
+const mockNavigate = vi.fn();
+vi.mock('react-router-dom', () => ({
   useNavigate: () => mockNavigate
 }));
 
 // ---- Redux mock ----
-const mockDispatch = jest.fn();
+const mockDispatch = vi.fn();
 let mockStoreState = {};
 
-jest.mock('react-redux', () => ({
-  ...jest.requireActual('react-redux'),
+vi.mock('react-redux', async () => ({
+  ...(await vi.importActual('react-redux')),
   useDispatch: () => mockDispatch,
   useSelector: selector => selector(mockStoreState)
 }));
 
 // ---- Action mock ----
-jest.mock('../../../../actions/Observations/importWizard', () => ({
-  submitObservationsImport: jest.fn()
+vi.mock('../../../../actions/Observations/importWizard', () => ({
+  submitObservationsImport: vi.fn()
 }));
 
 // ---- Profile manager mock ----
-jest.mock('../utils/profileManager', () => ({
-  exportProfile: jest.fn(() => ({ mock: 'profile' })),
-  deriveProfileFileName: jest.fn(() => 'test_profile.json')
+vi.mock('../utils/profileManager', () => ({
+  exportProfile: vi.fn(() => ({ mock: 'profile' })),
+  deriveProfileFileName: vi.fn(() => 'test_profile.json')
 }));
-
-const { submitObservationsImport } = require('../../../../actions/Observations/importWizard');
-const { exportProfile, deriveProfileFileName } = require('../utils/profileManager');
-
 
 // ---- i18n messages used by SubmitStep ----
 const messages = {
@@ -272,11 +273,11 @@ describe('SubmitStep', () => {
     let anchorClickSpy;
 
     beforeEach(() => {
-      createObjectURLMock = jest.fn(() => 'blob:mock-url');
-      revokeObjectURLMock = jest.fn();
+      createObjectURLMock = vi.fn(() => 'blob:mock-url');
+      revokeObjectURLMock = vi.fn();
       global.URL.createObjectURL = createObjectURLMock;
       global.URL.revokeObjectURL = revokeObjectURLMock;
-      anchorClickSpy = jest.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {});
+      anchorClickSpy = vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {});
     });
 
     afterEach(() => {

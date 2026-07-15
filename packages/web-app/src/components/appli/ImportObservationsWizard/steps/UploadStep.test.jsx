@@ -5,10 +5,10 @@ import { IntlProvider } from 'react-intl';
 import UploadStep from './UploadStep';
 
 // ---- Notification mock ----
-const mockOnError = jest.fn();
-const mockOnSuccess = jest.fn();
-jest.mock('../../../../hooks', () => ({
-  ...jest.requireActual('../../../../hooks'),
+const mockOnError = vi.fn();
+const mockOnSuccess = vi.fn();
+vi.mock('../../../../hooks', async () => ({
+  ...(await vi.importActual('../../../../hooks')),
   useNotification: () => ({
     onError: mockOnError,
     onSuccess: mockOnSuccess
@@ -16,19 +16,19 @@ jest.mock('../../../../hooks', () => ({
 }));
 
 // ---- Redux mock ----
-const mockDispatch = jest.fn(() => Promise.resolve());
+const mockDispatch = vi.fn(() => Promise.resolve());
 let mockStoreState = {};
 
-jest.mock('react-redux', () => ({
-  ...jest.requireActual('react-redux'),
+vi.mock('react-redux', async () => ({
+  ...(await vi.importActual('react-redux')),
   useDispatch: () => mockDispatch,
   useSelector: selector => selector(mockStoreState)
 }));
 
 // ---- Action mocks ----
-const mockParseAndSetFile = jest.fn(() => ({ type: 'PARSE_AND_SET_FILE' }));
+const mockParseAndSetFile = vi.fn(() => ({ type: 'PARSE_AND_SET_FILE' }));
 
-jest.mock('../../../../actions/Observations/importWizard', () => ({
+vi.mock('../../../../actions/Observations/importWizard', () => ({
   parseAndSetFile: (...args) => mockParseAndSetFile(...args),
   SET_COLUMN_MAPPINGS: 'SET_COLUMN_MAPPINGS',
   SET_CONFIRMED_DEVICE: 'SET_CONFIRMED_DEVICE',
@@ -44,8 +44,8 @@ jest.mock('../../../../actions/Observations/importWizard', () => ({
 }));
 
 // ---- Profile manager mock ----
-jest.mock('../utils/profileManager', () => ({
-  importProfile: jest.fn(() => ({ ok: true, state: {} }))
+vi.mock('../utils/profileManager', () => ({
+  importProfile: vi.fn(() => ({ ok: true, state: {} }))
 }));
 
 // ---- i18n messages used by UploadStep ----

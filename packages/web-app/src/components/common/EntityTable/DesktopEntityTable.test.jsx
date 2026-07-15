@@ -5,14 +5,14 @@ import { IntlProvider } from 'react-intl';
 import DesktopEntityTable from './DesktopEntityTable';
 
 // Mock sub-components that are not under test
-jest.mock('./VisibleColumnsMenu', () => {
+vi.mock('./VisibleColumnsMenu', () => {
   const MockVisibleColumnsMenu = () => (
     <div data-testid="visible-columns-menu" />
   );
-  return MockVisibleColumnsMenu;
+  return { default: MockVisibleColumnsMenu };
 });
 
-jest.mock('../../../hooks/useOpenLink', () => () => jest.fn());
+vi.mock('../../../hooks/useOpenLink', () => ({ default: () => vi.fn() }));
 
 const messages = {
   Export: 'Export',
@@ -35,7 +35,7 @@ const baseColumns = [
 
 const defaultProps = {
   entityColumns: baseColumns,
-  setEntityColumns: jest.fn(),
+  setEntityColumns: vi.fn(),
   pageRows: [{ id: 1, name: 'Cave A' }],
   nbTotalRows: 1,
   pageSizeOptions: [20, 100],
@@ -43,7 +43,7 @@ const defaultProps = {
   isNewQuery: false,
   shouldHideFooter: false,
   compact: false,
-  onViewToggle: jest.fn(),
+  onViewToggle: vi.fn(),
   viewMode: 'table'
 };
 
@@ -58,7 +58,7 @@ describe('DesktopEntityTable - Export controls', () => {
   it('renders ExportFormatDropdown for entrances when onExport is provided', () => {
     renderTable({
       entityType: 'entrances',
-      onExport: jest.fn()
+      onExport: vi.fn()
     });
 
     // The dropdown renders a button with "Export" text
@@ -72,14 +72,14 @@ describe('DesktopEntityTable - Export controls', () => {
   it('renders CSV button for non-entrance entity types', () => {
     renderTable({
       entityType: 'documents',
-      onExport: jest.fn()
+      onExport: vi.fn()
     });
 
     expect(screen.getByText('Export to CSV')).toBeInTheDocument();
   });
 
   it('passes format in onExport callback when a format is selected', () => {
-    const onExport = jest.fn();
+    const onExport = vi.fn();
     renderTable({
       entityType: 'entrances',
       onExport
@@ -101,7 +101,7 @@ describe('DesktopEntityTable - Export controls', () => {
   it('renders ExportFormatDropdown as disabled when nbTotalRows exceeds limit', () => {
     renderTable({
       entityType: 'entrances',
-      onExport: jest.fn(),
+      onExport: vi.fn(),
       nbTotalRows: 10001
     });
     expect(screen.getByRole('button', { name: /Export/i })).toBeDisabled();

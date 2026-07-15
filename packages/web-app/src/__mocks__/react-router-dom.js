@@ -1,12 +1,11 @@
-const mockNavigate = jest.fn();
+import React from 'react';
+import { vi } from 'vitest';
 
-module.exports = {
-  useNavigate: () => mockNavigate,
-  useLocation: () => ({ pathname: '/', search: '', hash: '' }),
-  useParams: () => ({}),
-  MemoryRouter: ({ children }) => children,
-  Link: ({ children, to }) => {
-    const React = require('react');
-    return React.createElement('a', { href: to }, children);
-  }
-};
+const mockNavigate = vi.fn();
+
+export const useNavigate = () => mockNavigate;
+export const useLocation = () => ({ pathname: '/', search: '', hash: '' });
+export const useParams = () => ({});
+export const MemoryRouter = ({ children }) => children;
+export const Link = ({ children, to }) =>
+  React.createElement('a', { href: to }, children);

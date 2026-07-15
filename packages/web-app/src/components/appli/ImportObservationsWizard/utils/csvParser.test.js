@@ -1,7 +1,7 @@
 import Papa from 'papaparse';
 import { parseFile } from './csvParser';
 
-jest.mock('papaparse');
+vi.mock('papaparse');
 
 describe('parseFile', () => {
   beforeEach(() => {

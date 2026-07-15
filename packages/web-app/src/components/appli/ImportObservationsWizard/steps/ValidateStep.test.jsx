@@ -3,32 +3,31 @@ import { render, screen, waitFor } from '@testing-library/react';
 import { IntlProvider } from 'react-intl';
 
 import ValidateStep from './ValidateStep';
+import { buildTimestamp } from '../utils/timestampBuilder';
+import { normalizeNumber } from '../utils/numberNormalizer';
 
 // ---- Redux mock ----
-const mockDispatch = jest.fn();
+const mockDispatch = vi.fn();
 let mockStoreState = {};
 
-jest.mock('react-redux', () => ({
-  ...jest.requireActual('react-redux'),
+vi.mock('react-redux', async () => ({
+  ...(await vi.importActual('react-redux')),
   useDispatch: () => mockDispatch,
   useSelector: selector => selector(mockStoreState)
 }));
 
 // ---- Utility mocks ----
-jest.mock('../utils/timestampBuilder', () => ({
-  buildTimestamp: jest.fn()
+vi.mock('../utils/timestampBuilder', () => ({
+  buildTimestamp: vi.fn()
 }));
 
-jest.mock('../utils/numberNormalizer', () => ({
-  normalizeNumber: jest.fn()
+vi.mock('../utils/numberNormalizer', () => ({
+  normalizeNumber: vi.fn()
 }));
 
-jest.mock('../utils/samplingIntervalDetector', () => ({
-  detectSamplingInterval: jest.fn(() => null)
+vi.mock('../utils/samplingIntervalDetector', () => ({
+  detectSamplingInterval: vi.fn(() => null)
 }));
-
-const { buildTimestamp } = require('../utils/timestampBuilder');
-const { normalizeNumber } = require('../utils/numberNormalizer');
 
 // ---- i18n messages used by ValidateStep ----
 const messages = {
