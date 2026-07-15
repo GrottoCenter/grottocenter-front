@@ -11,12 +11,20 @@ const MIN_DELTA_DEG = 2;
 // no sensor) and surface an 'unavailable' error instead of silently doing nothing.
 const NO_DATA_TIMEOUT_MS = 2500;
 
-// We show the button whenever the browser exposes the API. Desktops expose it
-// but never fire an event: that case is handled gracefully by the no-data
-// timeout below (it surfaces an 'unavailable' error instead of doing nothing),
-// which also keeps the feature testable via the DevTools "Sensors" panel.
-const detectSupport = () =>
-  typeof window !== 'undefined' && 'DeviceOrientationEvent' in window;
+// The compass only makes sense on a device with an orientation sensor: a phone
+// or tablet. Desktops expose DeviceOrientationEvent but never fire it, so we
+// gate on a touch / coarse pointer. DevTools device emulation sets these too,
+// so the button stays visible (and testable via the Sensors panel) there.
+const detectSupport = () => {
+  if (typeof window === 'undefined' || !('DeviceOrientationEvent' in window)) {
+    return false;
+  }
+  return (
+    (typeof navigator !== 'undefined' && navigator.maxTouchPoints > 0) ||
+    (typeof window.matchMedia === 'function' &&
+      window.matchMedia('(pointer: coarse)').matches)
+  );
+};
 
 // iOS 13+ gates the Device Orientation API behind an explicit user-gesture
 // permission prompt exposed as DeviceOrientationEvent.requestPermission().
