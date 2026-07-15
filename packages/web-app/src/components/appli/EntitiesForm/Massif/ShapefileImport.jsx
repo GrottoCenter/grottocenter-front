@@ -20,11 +20,15 @@ import {
   countMultiPolygonVertices
 } from '../../../../helpers/vertexCount';
 import { parseGeoJsonToMultiPolygon } from '../../../../helpers/geojsonParser';
+import FileSelectorInput from '../../../common/FileSelectorInput';
 
 const INITIAL_TOLERANCE = 0.0;
 const DANGER_VERTICES = 2000;
 const WARN_VERTICES = 1000;
 const INFO_VERTICES = 500;
+
+const ACCEPTED_EXTENSIONS = ['.geojson', '.json', '.zip'];
+const ACCEPTED_MIME = '.geojson,.json,.zip';
 
 // Simplify polygon using simplify-js library
 const simplifyPolygon = (multiPolygon, toleranceValue) => ({
@@ -163,11 +167,12 @@ const analyzeSimplificationCurve = (multiPolygon, rawVertexCount) => {
 
 const ShapefileImport = ({ onImport, onError }) => {
   const { formatMessage } = useIntl();
-  const fileInputRef = useRef(null);
   const cancelRef = useRef(null);
   const [open, setOpen] = useState(false);
   const [tolerance, setTolerance] = useState(INITIAL_TOLERANCE);
   const [rawData, setRawData] = useState(null);
+  const [fileName, setFileName] = useState(null);
+  const [parseError, setParseError] = useState(null);
 
   const rawVertexCount = useMemo(() => {
     if (!rawData) return 0;
@@ -282,53 +287,45 @@ const ShapefileImport = ({ onImport, onError }) => {
     return null;
   };
 
-  const handleFileSelect = async event => {
-    const file = event.target.files[0];
+  const handleFilesAdd = async fileList => {
+    const file = fileList[0];
     if (!file) return;
 
-    const fileName = file.name.toLowerCase();
+    setParseError(null);
 
-    // Reset input to allow re-selecting the same file
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
-    }
+    const name = file.name.toLowerCase();
 
     try {
-      if (fileName.endsWith('.geojson') || fileName.endsWith('.json')) {
+      if (name.endsWith('.geojson') || name.endsWith('.json')) {
         const text = await file.text();
         const geojson = JSON.parse(text);
-
         const multiPolygon = parseGeoJsonToMultiPolygon(geojson);
-
         if (!multiPolygon) {
-          onError(
+          setParseError(
             formatMessage({ id: 'No polygon geometries found in GeoJSON' })
           );
           return;
         }
-
+        setFileName(file.name);
         setRawData(multiPolygon);
-      } else if (fileName.endsWith('.zip')) {
+      } else if (name.endsWith('.zip')) {
         const arrayBuffer = await file.arrayBuffer();
         const geojson = await shp(arrayBuffer);
-
         const multiPolygon = parseGeoJsonToMultiPolygon(geojson);
-
         if (!multiPolygon) {
-          onError(
+          setParseError(
             formatMessage({ id: 'No polygon geometries found in shapefile.' })
           );
           return;
         }
-
+        setFileName(file.name);
         setRawData(multiPolygon);
       } else {
-        onError(
+        setParseError(
           formatMessage({
             id: 'Please select a GeoJSON (.geojson) or Shapefile ZIP (.zip) file'
           })
         );
-        return;
       }
     } catch (error) {
       console.error('File parsing error:', error);
@@ -336,8 +333,17 @@ const ShapefileImport = ({ onImport, onError }) => {
         typeof error === 'string'
           ? error
           : error?.message || error?.toString() || 'Unknown error';
-      onError(formatMessage({ id: 'Failed to parse file' }) + `: ${errorMsg}`);
+      setParseError(
+        `${formatMessage({ id: 'Failed to parse file' })}: ${errorMsg}`
+      );
     }
+  };
+
+  const handleFileRemove = () => {
+    setRawData(null);
+    setFileName(null);
+    setParseError(null);
+    setTolerance(INITIAL_TOLERANCE);
   };
 
   const handleImport = () => {
@@ -345,6 +351,8 @@ const ShapefileImport = ({ onImport, onError }) => {
       const data = simplifiedData;
       setOpen(false);
       setRawData(null);
+      setFileName(null);
+      setParseError(null);
       setTolerance(INITIAL_TOLERANCE);
       // Defer the heavy onImport so the dialog closes first
       requestAnimationFrame(() => {
@@ -356,6 +364,8 @@ const ShapefileImport = ({ onImport, onError }) => {
   const handleClose = () => {
     setOpen(false);
     setRawData(null);
+    setFileName(null);
+    setParseError(null);
     setTolerance(INITIAL_TOLERANCE);
   };
 
@@ -367,8 +377,7 @@ const ShapefileImport = ({ onImport, onError }) => {
         variant="outlined"
         startIcon={<Upload />}
         onClick={() => setOpen(true)}
-        size="small"
-      >
+        size="small">
         {formatMessage({ id: 'Import geometry' })}
       </Button>
 
@@ -380,40 +389,40 @@ const ShapefileImport = ({ onImport, onError }) => {
               display: 'flex',
               flexDirection: 'column',
               gap: 2,
-              paddingTop: '8px'
-            }}
-          >
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept=".geojson,.json,.zip"
-              onChange={handleFileSelect}
-              style={{ display: 'none' }}
+              pt: 1,
+              minHeight: 220
+            }}>
+            {parseError && (
+              <Alert severity="error" onClose={() => setParseError(null)}>
+                {parseError}
+              </Alert>
+            )}
+
+            <FileSelectorInput
+              multiple={false}
+              accept={ACCEPTED_MIME}
+              extensions={ACCEPTED_EXTENSIONS}
+              files={fileName ? [{ fileName }] : []}
+              onFilesAdd={handleFilesAdd}
+              onFileRemove={handleFileRemove}
+              disabled={analyzing}
             />
-            <Button
-              variant="contained"
-              startIcon={<Upload />}
-              onClick={() => fileInputRef.current?.click()}
-            >
-              {formatMessage({ id: 'Upload File (.geojson, .json, .zip)' })}
-            </Button>
 
             {/* Spinner is always mounted (hidden via visibility:hidden +
-               position:absolute) so its CSS animation keeps running in the
-               background. When analyzing becomes true, switching to
-               display:flex reveals an already-animated spinner instantly,
-               avoiding the thin-arc appearance caused by the animation
-               starting from frame 0 while the main thread is blocked. */}
+                position:absolute) so its CSS animation keeps running in the
+                background. When analyzing becomes true, switching to
+                display:flex reveals an already-animated spinner instantly,
+                avoiding the thin-arc appearance caused by the animation
+                starting from frame 0 while the main thread is blocked. */}
             <Box
               sx={{
                 alignItems: 'center',
                 gap: 1,
-                py: 2,
+                py: 1,
                 ...(analyzing
                   ? { display: 'flex' }
                   : { position: 'absolute', visibility: 'hidden' })
-              }}
-            >
+              }}>
               <CircularProgress size={20} />
               <Typography variant="body2" color="text.secondary">
                 {formatMessage({ id: 'Analyzing geometry...' })}
@@ -434,6 +443,14 @@ const ShapefileImport = ({ onImport, onError }) => {
                     max={maxTolerance}
                     step={step}
                   />
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <Typography variant="caption" color="text.secondary">
+                      {formatMessage({ id: 'Precise' })}
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      {formatMessage({ id: 'Simplified' })}
+                    </Typography>
+                  </Box>
                 </Box>
                 <Box>
                   <Typography variant="body2" color="text.secondary">
@@ -450,15 +467,14 @@ const ShapefileImport = ({ onImport, onError }) => {
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose}>
+          <Button onClick={handleClose} variant="outlined">
             {formatMessage({ id: 'Cancel' })}
           </Button>
           <Button
             onClick={handleImport}
-            disabled={analyzing}
-            variant="contained"
-          >
-            {formatMessage({ id: 'Add to Map' })}
+            disabled={analyzing || !rawData}
+            variant="contained">
+            {formatMessage({ id: 'Import' })}
           </Button>
         </DialogActions>
       </Dialog>

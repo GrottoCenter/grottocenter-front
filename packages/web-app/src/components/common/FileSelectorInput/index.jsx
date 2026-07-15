@@ -37,7 +37,8 @@ const FileSelectorInput = ({
   onFileRemove,
   accept,
   extensions,
-  disabled = false
+  disabled = false,
+  multiple = true
 }) => {
   const { formatMessage } = useIntl();
   const theme = useTheme();
@@ -45,6 +46,9 @@ const FileSelectorInput = ({
   const inputRef = useRef(null);
   const dragCounter = useRef(0);
   const [isDragging, setIsDragging] = useState(false);
+
+  const t = (pluralId, singularId) =>
+    formatMessage({ id: multiple ? pluralId : singularId });
 
   const handleFileChange = e => {
     onFilesAdd(e.target.files);
@@ -108,7 +112,7 @@ const FileSelectorInput = ({
         ref={inputRef}
         type="file"
         hidden
-        multiple
+        multiple={multiple}
         accept={accept}
         onChange={handleFileChange}
         disabled={disabled}
@@ -122,7 +126,7 @@ const FileSelectorInput = ({
             startIcon={<CloudUploadIcon />}
             disabled={disabled}
             onClick={() => inputRef.current?.click()}>
-            {formatMessage({ id: 'Upload files' })}
+            {t('Upload files', 'Upload a file')}
           </Button>
           {extensionsLabel}
           {fileChips}
@@ -132,7 +136,7 @@ const FileSelectorInput = ({
           $isDragging={isDragging}
           role="button"
           tabIndex={0}
-          aria-label={formatMessage({ id: 'Drop files here or click to select' })}
+          aria-label={t('Drop files here or click to select', 'Drop a file here or click to select')}
           onDragEnter={handleDragEnter}
           onDragLeave={handleDragLeave}
           onDragOver={handleDragOver}
@@ -153,7 +157,7 @@ const FileSelectorInput = ({
             variant="body2"
             color={isDragging ? 'primary' : 'text.secondary'}
             fontWeight={500}>
-            {formatMessage({ id: 'Drag and drop files here' })}
+            {t('Drag and drop files here', 'Drag and drop a file here')}
           </Typography>
           <Typography
             variant="caption"
@@ -169,7 +173,7 @@ const FileSelectorInput = ({
             aria-hidden="true"
             tabIndex={-1}
             sx={{ mt: 1, pointerEvents: 'none' }}>
-            {formatMessage({ id: 'Choose files' })}
+            {t('Choose files', 'Choose a file')}
           </Button>
           {extensionsLabel}
           {fileChips}
@@ -187,7 +191,8 @@ FileSelectorInput.propTypes = {
   onFilesAdd: PropTypes.func.isRequired,
   onFileRemove: PropTypes.func,
   accept: PropTypes.string,
-  disabled: PropTypes.bool
+  disabled: PropTypes.bool,
+  multiple: PropTypes.bool
 };
 
 export default FileSelectorInput;
