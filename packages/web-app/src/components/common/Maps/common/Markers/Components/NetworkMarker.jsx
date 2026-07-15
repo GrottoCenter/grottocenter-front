@@ -25,7 +25,7 @@ const NetworkIcon = () => (
       points="53.33,3.33 96.63,28.33 96.63,78.33 53.33,103.33 10.03,78.33 10.03,28.33"
       fill={blue[700]}
       stroke="#fff"
-      strokeWidth="5"
+      strokeWidth="4"
       strokeLinejoin="round"
     />
     <g transform="translate(20 21) scale(.66)">

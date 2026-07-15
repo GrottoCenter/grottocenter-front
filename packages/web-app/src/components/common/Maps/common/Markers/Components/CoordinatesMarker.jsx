@@ -9,7 +9,7 @@ const CoordinatesIcon = () => (
     color="inherit"
     style={{ textAlign: 'center', height: '100%', width: '100%' }}>
     <img
-      alt="networkIcon"
+      alt="coordinatesIcon"
       style={{ height: '100%' }}
       src={markers.find(m => m.name === 'Coordinates').url}
     />
