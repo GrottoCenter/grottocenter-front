@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import { IconButton, Tooltip } from '@mui/material';
 import ExploreIcon from '@mui/icons-material/Explore';
@@ -10,6 +11,27 @@ import CustomControl from './CustomControl';
 // leaflet-rotate's bearing is the clockwise angle applied to the map, so the
 // map must be turned by the opposite of the compass heading.
 const headingToBearing = heading => -heading;
+
+// Two-tone compass needle: the red tip points to true North. It is rotated by
+// the current map bearing so it keeps indicating North on the rotated map.
+const CompassNeedle = ({ bearing }) => (
+  <svg
+    width="36"
+    height="36"
+    viewBox="0 0 24 24"
+    aria-hidden="true"
+    style={{
+      transform: `rotate(${bearing}deg)`,
+      transition: 'transform 0.15s linear'
+    }}>
+    <polygon points="12,1 17,12 7,12" fill="#e53935" />
+    <polygon points="12,23 17,12 7,12" fill="#9e9e9e" />
+  </svg>
+);
+
+CompassNeedle.propTypes = {
+  bearing: PropTypes.number.isRequired
+};
 
 const ERROR_MESSAGES = {
   denied: 'Compass access denied. Enable it in your browser settings.',
@@ -58,6 +80,8 @@ const CompassControl = () => {
     tooltipId = 'Reset to north';
   }
 
+  const isFollowing = active && !error && heading !== null;
+
   return (
     <CustomControl position="bottomright" useLeafletControl>
       <Tooltip
@@ -74,20 +98,17 @@ const CompassControl = () => {
             sx={{
               bgcolor: error ? 'error.main' : 'background.paper',
               borderRadius: '4px',
-              color: error ? 'white' : 'text.primary',
-              height: 36,
-              width: 36,
+              height: 44,
+              width: 44,
               '&:hover': { bgcolor: error ? 'error.dark' : '#f4f4f4' }
             }}>
-            <ExploreIcon
-              sx={{
-                fontSize: 24,
-                color: active && !error ? 'primary.main' : 'inherit',
-                transform:
-                  active && heading !== null ? `rotate(${heading}deg)` : 'none',
-                transition: 'transform 0.2s ease-out'
-              }}
-            />
+            {isFollowing ? (
+              <CompassNeedle bearing={headingToBearing(heading)} />
+            ) : (
+              <ExploreIcon
+                sx={{ fontSize: 28, color: error ? 'white' : 'action.active' }}
+              />
+            )}
           </IconButton>
         </span>
       </Tooltip>
