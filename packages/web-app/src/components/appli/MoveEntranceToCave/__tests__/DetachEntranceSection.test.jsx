@@ -45,13 +45,11 @@ vi.mock('../../../../actions/Entrance/DetachEntrance', () => ({
 
 // The before → after preview is covered by its own suite; keep this one focused
 // on the detach button/behaviour (and avoid its internal button-role links).
-jest.mock(
-  '../OperationSummary',
-  () =>
-    function MockOperationSummary() {
-      return null;
-    }
-);
+vi.mock('../OperationSummary', () => ({
+  default: function MockOperationSummary() {
+    return null;
+  }
+}));
 
 const messages = {
   'Detach entrance': 'Detach entrance',

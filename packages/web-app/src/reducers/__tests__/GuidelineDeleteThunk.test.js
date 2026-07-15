@@ -4,7 +4,7 @@ import fetch from 'isomorphic-fetch';
 import massif from '../MassifReducer';
 import { deleteGuideline } from '../../actions/Guideline/DeleteGuideline';
 
-jest.mock('isomorphic-fetch', () => jest.fn());
+vi.mock('isomorphic-fetch', () => ({ default: vi.fn() }));
 
 // Minimal login reducer so getState().login.authorizationHeader exists
 const login = (state = { authorizationHeader: {} }) => state;
@@ -44,7 +44,7 @@ const mockFetch = ({ status, body }) => {
 };
 
 afterEach(() => {
-  jest.clearAllMocks();
+  vi.clearAllMocks();
 });
 
 describe('permanent delete thunk -> store', () => {

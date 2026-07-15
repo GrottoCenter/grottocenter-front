@@ -14,7 +14,7 @@ import MoveEntranceToCaveForm from '../MoveEntranceToCaveForm';
 const mockNavigate = vi.fn();
 vi.mock('react-router-dom', () => ({
   useNavigate: () => mockNavigate,
-  useSearchParams: () => [new URLSearchParams(''), jest.fn()]
+  useSearchParams: () => [new URLSearchParams(''), vi.fn()]
 }));
 
 // ---- Notification mock ----

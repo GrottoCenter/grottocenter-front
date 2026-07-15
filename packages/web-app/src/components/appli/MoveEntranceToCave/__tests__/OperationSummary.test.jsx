@@ -5,15 +5,14 @@ import { IntlProvider } from 'react-intl';
 import OperationSummary from '../OperationSummary';
 
 // NetworkInlineLink relies on router/media hooks; render just its label as text.
-jest.mock('../../../common/NetworkInlineLink', () => {
-  const R = require('react');
-  return function MockNetworkInlineLink({ label }) {
-    return R.createElement('span', null, label);
-  };
-});
+vi.mock('../../../common/NetworkInlineLink', () => ({
+  default: function MockNetworkInlineLink({ label }) {
+    return React.createElement('span', null, label);
+  }
+}));
 
 // The sibling-name lookup hits Redux + the network; stub it (null → fallback).
-jest.mock('../../../../hooks', () => ({
+vi.mock('../../../../hooks', () => ({
   useOtherEntranceName: () => null
 }));
 
