@@ -42,6 +42,7 @@ const RestoreSnapshot = item => {
     permissions.isModerator;
   const [open, setOpen] = React.useState(false);
   const [openSuccess, setOpenSuccess] = React.useState(false);
+  const [hasOpener, setHasOpener] = React.useState(false);
   const handleClickOpen = () => {
     setOpen(true);
   };
@@ -141,9 +142,17 @@ const RestoreSnapshot = item => {
       default:
         break;
     }
-    window.opener.location.reload();
-    setOpenSuccess(true);
-    sleep(10000).then(() => window.close());
+    // window.opener is null when the user navigated directly to this URL
+    // instead of arriving via window.open() (e.g. popup blocked by browser).
+    if (window.opener) {
+      setHasOpener(true);
+      window.opener.location.reload();
+      setOpenSuccess(true);
+      sleep(10000).then(() => window.close());
+    } else {
+      setHasOpener(false);
+      setOpenSuccess(true);
+    }
   };
   return (
     permissions.isAuth &&
@@ -188,12 +197,26 @@ const RestoreSnapshot = item => {
           </DialogTitle>
           <DialogContent>
             <DialogContentText>
-              <Translate>
-                This window will be closed shortly and your origin page
-                refreshed...
-              </Translate>
+              {hasOpener ? (
+                <Translate>
+                  This window will be closed shortly and your origin page
+                  refreshed...
+                </Translate>
+              ) : (
+                <Translate>
+                  The revision has been restored. You can close this tab and
+                  reload the page to see the changes.
+                </Translate>
+              )}
             </DialogContentText>
           </DialogContent>
+          {!hasOpener && (
+            <DialogActions>
+              <Button onClick={() => setOpenSuccess(false)}>
+                <Translate>Close</Translate>
+              </Button>
+            </DialogActions>
+          )}
         </Dialog>
       </>
     )
