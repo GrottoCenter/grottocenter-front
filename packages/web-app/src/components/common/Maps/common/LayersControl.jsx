@@ -38,10 +38,16 @@ const usePanes = (layers) => {
 
   useEffect(() => {
     const panes = [...new Set(layers.map(l => l.pane).filter(Boolean))];
+    // When the map is rotatable (leaflet-rotate), custom tile panes must be
+    // created inside the rotatePane. Otherwise Leaflet attaches them to the
+    // mapPane — a sibling of the rotatePane — so their tiles stay north-up
+    // while overlays/markers rotate. Falls back to the default parent when the
+    // map has no rotation enabled.
+    const rotatePane = map.getPane('rotatePane');
 
     panes.forEach((paneName, index) => {
       if (!map.getPane(paneName)) {
-        const pane = map.createPane(paneName);
+        const pane = map.createPane(paneName, rotatePane || undefined);
         pane.style.zIndex = 200 + index * 10;
       }
     });

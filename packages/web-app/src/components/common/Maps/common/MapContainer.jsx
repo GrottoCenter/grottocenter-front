@@ -7,9 +7,12 @@ import {
   ScaleControl
 } from 'react-leaflet';
 import PropTypes from 'prop-types';
+// Side-effect import: patches L.Map with rotation support (setBearing, rotate option).
+import 'leaflet-rotate';
 import LayersControl from './LayersControl';
 import FullscreenControl from './FullscreenControl';
 import LocateControl from './LocateControl';
+import CompassControl from './CompassControl';
 
 const Wrapper = styled('div', {
   shouldForwardProp: prop => !prop.startsWith('$')
@@ -93,6 +96,7 @@ const CustomMapContainer = ({
   scrollWheelZoom = true,
   isSideMenuOpen = false,
   isLocateControl = false,
+  isCompassControl = false,
   isFullscreenAllowed = true,
   shouldChangeControlInFullscreen = true,
   style,
@@ -159,6 +163,11 @@ const CustomMapContainer = ({
         scrollWheelZoom={scrollWheelZoom}
         isSideMenuOpen={isSideMenuOpen}
         minZoom={1}
+        rotate
+        bearing={0}
+        rotateControl={false}
+        touchRotate={false}
+        shiftKeyRotate={false}
         ref={mapRefCallback}
         preferCanvas>
         {isFullscreenAllowed && shouldChangeControlInFullscreen && (
@@ -173,6 +182,9 @@ const CustomMapContainer = ({
         {forceCentering && <Centerer center={center} zoom={zoom} />}
         {isLocateControl && <LocateControl />}
         <ScaleControl position="bottomright" />
+        {/* Added after ScaleControl so Leaflet stacks it just above the scale
+            legend in the bottom-right corner. */}
+        {isCompassControl && <CompassControl />}
         <LayersControl position="topright" />
         {children}
       </MapContainer>
@@ -189,6 +201,7 @@ CustomMapContainer.propTypes = {
   children: PropTypes.node,
   isSideMenuOpen: PropTypes.bool,
   isLocateControl: PropTypes.bool,
+  isCompassControl: PropTypes.bool,
   isFullscreenAllowed: PropTypes.bool,
   shouldChangeControlInFullscreen: PropTypes.bool,
   style: PropTypes.shape({}),
