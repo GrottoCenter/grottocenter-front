@@ -6,13 +6,23 @@ import PropTypes from 'prop-types';
 import { Property } from '../../../../common/Properties';
 import CustomIcon from '../../../../common/CustomIcon';
 import { HighLightsLine } from '../../../../common/Highlights';
+import EntranceCharacteristicsSnapshot from './EntranceCharacteristicsSnapshot';
 
 const EntranceNetworkSnapshots = information => {
   const { entrance, previous } = information;
+  const hasCoordinates = entrance.latitude != null && entrance.longitude != null;
+  const hasPreviousCoordinates =
+    previous?.latitude != null && previous?.longitude != null;
   const lat = Number(entrance.latitude);
   const long = Number(entrance.longitude);
   const previousLat = Number(previous?.latitude);
   const previousLong = Number(previous?.longitude);
+
+  // The network reference has two shapes: on snapshots `cave` is the id and
+  // `caveName` the resolved name; on the current entrance `cave` is an object
+  // carrying both id and name. Normalize so both render (and the link works).
+  const caveId = entrance.cave?.id ?? entrance.cave;
+  const caveName = entrance.caveName ?? entrance.cave?.name;
 
   const { formatMessage } = useIntl();
 
@@ -24,13 +34,13 @@ const EntranceNetworkSnapshots = information => {
 
   return (
     <Box display="flex" flexDirection="column" width="100%">
-      {!(Number.isNaN(lat) && Number.isNaN(long)) && (
+      {hasCoordinates && (
         <Property
           label={`${formatMessage({ id: 'Coordinates' })} (WGS84)`}
           value={
             <HighLightsLine
               oldText={
-                !(Number.isNaN(previousLat) && Number.isNaN(previousLong))
+                hasPreviousCoordinates
                   ? makeCoordinatesValue([previousLat, previousLong])
                   : undefined
               }
@@ -47,19 +57,17 @@ const EntranceNetworkSnapshots = information => {
           icon={<CustomIcon type="altitude" />}
         />
       )}
-      {entrance.cave && (
+      {caveId && (
         <Property
-          label={formatMessage({ id: 'Cave' })}
-          value={
-            <HighLightsLine
-              oldText={previous?.caveName}
-              newText={entrance.caveName}
-            />
-          }
+          label={formatMessage({ id: 'Network' })}
+          // caveName is a contextual label (resolved across tables), not a
+          // diffable field: network renames are surfaced by rename snapshots.
+          value={caveName}
           icon={<CustomIcon type="network" />}
-          url={`/ui/caves/${entrance.cave}`}
+          url={`/ui/caves/${caveId}`}
         />
       )}
+      <EntranceCharacteristicsSnapshot entrance={entrance} previous={previous} />
     </Box>
   );
 };

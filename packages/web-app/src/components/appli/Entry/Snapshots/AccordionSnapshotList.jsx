@@ -51,31 +51,54 @@ const AccordionSnapshotList = ({
     if (!hasRevisions) return null;
     const firstType = Object.keys(filteredData)[0];
     const items = filteredData[firstType];
-    return items?.length > 0 ? items[items.length - 1] : null;
+    if (!items?.length) return null;
+    // Skip rename snapshots: they only carry the renaming and no other data, so
+    // they must not be used as the previous version to diff the current item.
+    for (let i = items.length - 1; i >= 0; i -= 1) {
+      if (!items[i].isNameChangeSnapshot) return items[i];
+    }
+    return null;
   })();
 
   const snapshotElements = hasRevisions
     ? Object.keys(filteredData).map(snapshotType => {
         const snapshotItems = filteredData[snapshotType];
-        const { items } = snapshotItems.reduce(
-          ({ items: acc, prev }, snapshot) => ({
-            items: [
-              ...acc,
-              <AccordionSnapshot
-                key={snapshot.id + snapshot.t_id}
-                snapshot={snapshot}
-                snapshotType={snapshotType}
-                isNetwork={isNetwork}
-                author={snapshot.author}
-                reviewer={snapshot.reviewer}
-                previous={prev}
-                actualItem={currentItem}
-              />
-            ],
-            prev: snapshot
-          }),
-          { items: [], prev: null }
-        );
+
+        // Rename snapshots come from h_name: they only carry the OLD name and
+        // have no reviewer. The NEW name and the actual reviewer live on the
+        // next real (non-rename) snapshot — resolve them here.
+        const nextRealSnapshot = index => {
+          for (let j = index + 1; j < snapshotItems.length; j += 1) {
+            if (!snapshotItems[j].isNameChangeSnapshot) return snapshotItems[j];
+          }
+          return null;
+        };
+
+        let prev = null;
+        const items = snapshotItems.map((snapshot, index) => {
+          const isRename = !!snapshot.isNameChangeSnapshot;
+          const nextReal = isRename ? nextRealSnapshot(index) : null;
+          const element = (
+            <AccordionSnapshot
+              key={snapshot.id + snapshot.t_id}
+              snapshot={snapshot}
+              snapshotType={snapshotType}
+              isNetwork={isNetwork}
+              author={snapshot.author}
+              reviewer={snapshot.reviewer ?? nextReal?.reviewer}
+              previous={prev}
+              actualItem={currentItem}
+              newName={
+                isRename ? (nextReal?.name ?? nextReal?.caveName) : undefined
+              }
+            />
+          );
+          // Rename snapshots are ignored in the history chain: they carry no
+          // data beyond the renaming, so they must not become the previous
+          // version used to diff the next real snapshot.
+          if (!isRename) prev = snapshot;
+          return element;
+        });
         return [...items].reverse();
       })
     : null;

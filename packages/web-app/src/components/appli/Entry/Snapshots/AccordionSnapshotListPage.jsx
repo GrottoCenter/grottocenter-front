@@ -24,8 +24,9 @@ const AccordionSnapshotListPage = ({
   // sortSnapshots flattens data: each element is { [type]: [singleSnapshot] }.
   // Group all snapshots per (snapshotType, t_id) to compute `previous` and
   // find the most recent snapshot per entity (used as `previous` for current items).
-  const { previousMap, latestByGroup } = useMemo(() => {
-    if (!hasData) return { previousMap: {}, latestByGroup: {} };
+  const { previousMap, latestByGroup, renameInfoMap } = useMemo(() => {
+    if (!hasData)
+      return { previousMap: {}, latestByGroup: {}, renameInfoMap: {} };
     const groups = {};
     data.forEach(snapshotGroup => {
       const snapshotType = Object.keys(snapshotGroup)[0];
@@ -36,15 +37,40 @@ const AccordionSnapshotListPage = ({
     });
     const prevMap = {};
     const latest = {};
+    const renameInfo = {};
     Object.entries(groups).forEach(([key, group]) => {
       group.sort((a, b) => new Date(a.id) - new Date(b.id));
+      // Rename snapshots come from h_name: they only carry the OLD name and have
+      // no reviewer, and they carry no other data. So they must not become the
+      // `previous` used to diff the next real snapshot, and their NEW name and
+      // reviewer are resolved from the next real (non-rename) snapshot.
+      const nextRealSnapshot = index => {
+        for (let j = index + 1; j < group.length; j += 1) {
+          if (!group[j].isNameChangeSnapshot) return group[j];
+        }
+        return null;
+      };
+      let prev = null;
       group.forEach((snapshot, index) => {
-        prevMap[`${snapshot.id}_${snapshot.t_id}`] =
-          index > 0 ? group[index - 1] : null;
+        const snapKey = `${snapshot.id}_${snapshot.t_id}`;
+        prevMap[snapKey] = prev;
+        if (snapshot.isNameChangeSnapshot) {
+          const nextReal = nextRealSnapshot(index);
+          renameInfo[snapKey] = {
+            newName: nextReal?.name ?? nextReal?.caveName,
+            reviewer: nextReal?.reviewer
+          };
+        } else {
+          prev = snapshot;
+          latest[key] = snapshot;
+        }
       });
-      latest[key] = group[group.length - 1];
     });
-    return { previousMap: prevMap, latestByGroup: latest };
+    return {
+      previousMap: prevMap,
+      latestByGroup: latest,
+      renameInfoMap: renameInfo
+    };
   }, [data, hasData]);
 
   // Build a unified sorted timeline: current items + snapshots interleaved by date.
@@ -93,6 +119,7 @@ const AccordionSnapshotListPage = ({
       data.forEach(snapshotGroup => {
         const snapshotType = Object.keys(snapshotGroup)[0];
         const snapshot = snapshotGroup[snapshotType][0];
+        const rename = renameInfoMap[`${snapshot.id}_${snapshot.t_id}`];
         items.push({
           date: snapshot.id ? new Date(snapshot.id) : new Date(0),
           element: (
@@ -102,8 +129,9 @@ const AccordionSnapshotListPage = ({
               snapshotType={snapshotType}
               isNetwork={isNetwork}
               author={snapshot.author ?? snapshot.creator}
-              reviewer={snapshot.reviewer}
+              reviewer={snapshot.reviewer ?? rename?.reviewer}
               previous={previousMap[`${snapshot.id}_${snapshot.t_id}`]}
+              newName={rename?.newName}
               all
               actualItem={currentTItem}
             />
@@ -114,7 +142,7 @@ const AccordionSnapshotListPage = ({
 
     items.sort((a, b) => b.date - a.date);
     return items;
-  }, [data, hasData, currentTItem, isCurrentItemLoading, type, isNetwork, latestByGroup, previousMap]);
+  }, [data, hasData, currentTItem, isCurrentItemLoading, type, isNetwork, latestByGroup, previousMap, renameInfoMap]);
 
   const hasItems = timelineItems.length > 0;
 
