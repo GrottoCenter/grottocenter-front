@@ -259,8 +259,12 @@ const PersonalInfoSection = ({ account, onSaved }) => {
       );
       setIsEditing(false);
       onSaved();
-    } catch {
-      setSaveError(true);
+    } catch (error) {
+      setSaveError(
+        error?.status === 409
+          ? formatMessage({ id: 'This nickname is already taken.' })
+          : formatMessage({ id: 'An error occurred. Please try again.' })
+      );
     } finally {
       setIsLoading(false);
     }
@@ -332,14 +336,7 @@ const PersonalInfoSection = ({ account, onSaved }) => {
           isError={!!errors.surname}
         />
       </FormRow>
-      {saveError && (
-        <Alert
-          severity="error"
-          content={formatMessage({
-            id: 'An error occurred. Please try again.'
-          })}
-        />
-      )}
+      {saveError && <Alert severity="error" content={saveError} />}
       <EditActions isLoading={isLoading} onCancel={handleCancel} />
     </form>
   );
