@@ -86,9 +86,11 @@ export const CAVE_QUALITY_BADGE_VALUE = {
   [CAVE_QUALITY.INSUFFICIENT]: 0
 };
 
-export const ENTRANCE_QUALITY_FILTERS = Object.values(DATA_QUALITY_LEVELS).map(
-  id => ({ id, labelKey: DATA_QUALITY_LABEL_KEYS[id] })
-);
+export const ENTRANCE_QUALITY_FILTERS = [
+  DATA_QUALITY_LEVELS.INSUFFICIENT,
+  DATA_QUALITY_LEVELS.SATISFACTORY,
+  DATA_QUALITY_LEVELS.GOOD
+].map(id => ({ id, labelKey: DATA_QUALITY_LABEL_KEYS[id] }));
 
 export const MARKERS_LIMIT = 13;
 // Zoom level at which massif polygons are fetched and displayed
