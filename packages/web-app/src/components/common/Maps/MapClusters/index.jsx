@@ -101,7 +101,11 @@ const HydratedMap = ({
   // hide them during compass-follow (a field-navigation mode). CompassControl
   // announces the follow state through this custom map event.
   const [isCompassFollowing, setIsCompassFollowing] = useState(false);
-  useMapEvent('compassfollowchange', e => setIsCompassFollowing(!!e.following));
+  const handleCompassFollowChange = useCallback(
+    e => setIsCompassFollowing(!!e.following),
+    []
+  );
+  useMapEvent('compassfollowchange', handleCompassFollowChange);
 
   const [showExplored, setShowExplored] = useLocalStorage(
     'grottocenter_showExploredCaves',

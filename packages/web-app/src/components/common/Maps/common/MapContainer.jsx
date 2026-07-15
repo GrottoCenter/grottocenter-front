@@ -7,7 +7,9 @@ import {
   ScaleControl
 } from 'react-leaflet';
 import PropTypes from 'prop-types';
-// Side-effect import: patches L.Map with rotation support (setBearing, rotate option).
+// Ensure window.L is set before the plugin loads, then side-effect import that
+// patches L.Map with rotation support (setBearing, rotate option). Order matters.
+import './setupLeafletRotate';
 import 'leaflet-rotate';
 import LayersControl from './LayersControl';
 import FullscreenControl from './FullscreenControl';

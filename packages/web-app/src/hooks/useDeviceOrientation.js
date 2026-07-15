@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { computeHeading } from '../utils/compass';
 
 // Hard rate limit (ms) between two heading updates, plus the minimum angular
 // change (degrees) required to emit a new value. The sensor fires at ~60Hz;
@@ -26,24 +27,22 @@ const detectSupport = () => {
   );
 };
 
+// Angle (deg) the browser viewport is rotated relative to the device's natural
+// orientation. Needed to convert a device-relative heading into a screen-relative
+// one, otherwise the compass is off by 90° in landscape.
+const getScreenAngle = () => {
+  if (typeof window === 'undefined') return 0;
+  const orientation = window.screen && window.screen.orientation;
+  if (orientation && typeof orientation.angle === 'number') return orientation.angle;
+  if (typeof window.orientation === 'number') return window.orientation;
+  return 0;
+};
+
 // iOS 13+ gates the Device Orientation API behind an explicit user-gesture
 // permission prompt exposed as DeviceOrientationEvent.requestPermission().
 const needsPermissionRequest = () =>
   typeof DeviceOrientationEvent !== 'undefined' &&
   typeof DeviceOrientationEvent.requestPermission === 'function';
-
-// Derive a compass heading (0 = North, clockwise) from a device orientation event.
-// iOS exposes the ready-to-use webkitCompassHeading; elsewhere we rely on the
-// absolute alpha angle (alpha increases counter-clockwise, hence 360 - alpha).
-const getHeadingFromEvent = event => {
-  if (typeof event.webkitCompassHeading === 'number') {
-    return event.webkitCompassHeading;
-  }
-  if (event.absolute && typeof event.alpha === 'number') {
-    return 360 - event.alpha;
-  }
-  return null;
-};
 
 const useDeviceOrientation = () => {
   const [isSupported] = useState(detectSupport);
@@ -54,6 +53,7 @@ const useDeviceOrientation = () => {
   const lastEmitRef = useRef(0);
   const lastHeadingRef = useRef(null);
   const noDataTimerRef = useRef(null);
+  const mountedRef = useRef(true);
 
   const clearNoDataTimer = useCallback(() => {
     if (noDataTimerRef.current) {
@@ -64,7 +64,7 @@ const useDeviceOrientation = () => {
 
   const handleOrientation = useCallback(
     event => {
-      const nextHeading = getHeadingFromEvent(event);
+      const nextHeading = computeHeading(event, getScreenAngle());
       if (nextHeading === null) return;
 
       // First real reading: the device has a working compass.
@@ -118,6 +118,8 @@ const useDeviceOrientation = () => {
         return false;
       }
     }
+    // The component may have unmounted while awaiting the permission prompt.
+    if (!mountedRef.current) return false;
     window.addEventListener('deviceorientationabsolute', handleOrientation, true);
     window.addEventListener('deviceorientation', handleOrientation, true);
     // Surface a clear error if no reading ever comes (device without a sensor).
@@ -130,13 +132,16 @@ const useDeviceOrientation = () => {
   }, [isSupported, handleOrientation, clearNoDataTimer, removeListeners]);
 
   // Safety net: always detach listeners / timers when the consumer unmounts.
-  useEffect(
-    () => () => {
+  // Set mountedRef true in the effect body so StrictMode's mount→cleanup→mount
+  // cycle (dev) restores it — otherwise start() would think we are unmounted.
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
       clearNoDataTimer();
       removeListeners();
-    },
-    [clearNoDataTimer, removeListeners]
-  );
+    };
+  }, [clearNoDataTimer, removeListeners]);
 
   return { heading, isSupported, error, start, stop };
 };
