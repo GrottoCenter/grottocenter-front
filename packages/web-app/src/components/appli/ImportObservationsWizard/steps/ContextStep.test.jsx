@@ -5,22 +5,22 @@ import { IntlProvider } from 'react-intl';
 import ContextStep from './ContextStep';
 
 // ---- Redux mock ----
-const mockDispatch = jest.fn(() => Promise.resolve());
+const mockDispatch = vi.fn(() => Promise.resolve());
 let mockStoreState = {};
 
-jest.mock('react-redux', () => ({
-  ...jest.requireActual('react-redux'),
+vi.mock('react-redux', async () => ({
+  ...(await vi.importActual('react-redux')),
   useDispatch: () => mockDispatch,
   useSelector: selector => selector(mockStoreState)
 }));
 
-// ---- hooks mock ----
-jest.mock('../../../../hooks', () => ({
+// ---- useUserProperties mock ----
+vi.mock('../../../../hooks', () => ({
   useUserProperties: () => ({ id: 1, nickname: 'testuser' }),
   useDebounce: value => value,
   useEntitySearch: () => ({
     inputValue: '',
-    setInputValue: jest.fn(),
+    setInputValue: vi.fn(),
     results: [],
     isLoading: false,
     hasError: false
@@ -28,7 +28,7 @@ jest.mock('../../../../hooks', () => ({
 }));
 
 // ---- CaveAutoCompleteSearch mock ----
-jest.mock('../../../common/AutoCompleteSearch/CaveAutoCompleteSearch', () => {
+vi.mock('../../../common/AutoCompleteSearch/CaveAutoCompleteSearch', () => {
   const React = require('react');
   return {
     __esModule: true,
@@ -44,37 +44,37 @@ jest.mock('../../../common/AutoCompleteSearch/CaveAutoCompleteSearch', () => {
 });
 
 // ---- License action mock ----
-jest.mock('../../../../actions/Licenses', () => ({
-  fetchLicense: jest.fn(() => ({ type: 'FETCH_LICENSES_LOAD' }))
+vi.mock('../../../../actions/Licenses', () => ({
+  fetchLicense: vi.fn(() => ({ type: 'FETCH_LICENSES_LOAD' }))
 }));
 
 // ---- Quicksearch action mock ----
-jest.mock('../../../../actions/Quicksearch', () => ({
-  fetchQuicksearchResult: jest.fn(() => ({ type: 'FETCH_QUICKSEARCH' })),
-  resetQuicksearch: jest.fn(() => ({ type: 'RESET_QUICKSEARCH' }))
+vi.mock('../../../../actions/Quicksearch', () => ({
+  fetchQuicksearchResult: vi.fn(() => ({ type: 'FETCH_QUICKSEARCH' })),
+  resetQuicksearch: vi.fn(() => ({ type: 'RESET_QUICKSEARCH' }))
 }));
 
 // ---- Import wizard action mock ----
-jest.mock('../../../../actions/Observations/importWizard', () => ({
+vi.mock('../../../../actions/Observations/importWizard', () => ({
   SET_CONTEXT: 'SET_CONTEXT',
   SET_DOCUMENT_LANGUAGE: 'SET_DOCUMENT_LANGUAGE',
   SET_SAMPLING_INTERVAL: 'SET_SAMPLING_INTERVAL',
-  fetchCaveById: jest.fn(() => () => Promise.resolve(undefined)),
-  fetchCaverById: jest.fn(() => () => Promise.resolve(undefined))
+  fetchCaveById: vi.fn(() => () => Promise.resolve(undefined)),
+  fetchCaverById: vi.fn(() => () => Promise.resolve(undefined))
 }));
 
 // ---- Entity helper mock ----
-jest.mock('../../../../helpers/Entity', () => {
+vi.mock('../../../../helpers/Entity', () => {
   const React = require('react');
   return {
-    entityOptionForSelector: jest.fn((props, option) =>
+    entityOptionForSelector: vi.fn((props, option) =>
       React.createElement('li', props, option.nickname || option.name || '')
     )
   };
 });
 
 // ---- CoordinateFormSection mock ----
-jest.mock('../../EntitiesForm/utils/CoordinateFormSection', () => {
+vi.mock('../../EntitiesForm/utils/CoordinateFormSection', () => {
   const React = require('react');
   return {
     __esModule: true,

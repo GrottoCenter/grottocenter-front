@@ -2,12 +2,12 @@ import { searchSubstances, createSubstance } from './Substance';
 import fetch from 'isomorphic-fetch';
 
 // Mock the Login module to prevent issues with checkAuthStatus
-jest.mock('./Login', () => ({
+vi.mock('./Login', () => ({
   postLogout: () => () => {}
 }));
 
-// Mock isomorphic-fetch
-jest.mock('isomorphic-fetch', () => jest.fn());
+// Mock isomorphic-fetch (default import)
+vi.mock('isomorphic-fetch', () => ({ default: vi.fn() }));
 
 const mockGetState = () => ({
   login: {
@@ -15,7 +15,7 @@ const mockGetState = () => ({
   }
 });
 
-const mockDispatch = jest.fn(action => {
+const mockDispatch = vi.fn(action => {
   if (typeof action === 'function') {
     return action(mockDispatch, mockGetState);
   }
@@ -23,8 +23,8 @@ const mockDispatch = jest.fn(action => {
 });
 
 beforeEach(() => {
-  jest.clearAllMocks();
-  jest.spyOn(console, 'error').mockImplementation(() => {});
+  vi.clearAllMocks();
+  vi.spyOn(console, 'error').mockImplementation(() => {});
 });
 
 afterEach(() => {

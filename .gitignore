@@ -55,6 +55,17 @@ typings/
 # next.js build output
 .next
 
+# Vite
+packages/web-app/dist/
+packages/web-app/.vite/
+*.local
+
+# Storybook build
+packages/web-app/storybook-static/
+
+# CRA legacy (no longer used, kept for safety during transition)
+packages/web-app/build/
+
 .DS_Store
 #yarn
 .yarn/*

@@ -43,7 +43,8 @@ export const postCaveAndEntrance =
       );
   };
 
-export const updateCaveAndEntrance = (caveData, entranceData) => dispatch => {
-  dispatch(updateCave(caveData));
-  dispatch(updateEntrance(entranceData));
-};
+export const updateCaveAndEntrance = (caveData, entranceData) => dispatch =>
+  Promise.all([
+    dispatch(updateCave(caveData)),
+    dispatch(updateEntrance(entranceData))
+  ]);

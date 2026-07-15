@@ -53,7 +53,7 @@ const UserGroups = ({
   const isChanged = isGroupsChanged || isBanChanged;
 
   const onGroupChange = (groupId, isChecked) => {
-    const newGroups = userGroups.filter(g => g.id !== groupId);
+    const newGroups = groups.filter(g => g.id !== groupId);
     if (isChecked === true) {
       newGroups.push({ id: groupId });
     }

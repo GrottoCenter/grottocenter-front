@@ -38,5 +38,6 @@ export const updateDescription =
       .catch(error => {
         if (error.isAuthError) return;
         dispatch(updateDescriptionFailure(error));
+        throw error;
       });
   };

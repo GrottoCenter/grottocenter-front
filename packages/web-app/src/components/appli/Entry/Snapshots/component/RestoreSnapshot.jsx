@@ -42,6 +42,7 @@ const RestoreSnapshot = item => {
     permissions.isModerator;
   const [open, setOpen] = React.useState(false);
   const [openSuccess, setOpenSuccess] = React.useState(false);
+  const [hasOpener, setHasOpener] = React.useState(false);
   const handleClickOpen = () => {
     setOpen(true);
   };
@@ -50,100 +51,113 @@ const RestoreSnapshot = item => {
   };
   const restoreSnapshot = async (typeItem, content) => {
     setOpen(false);
-    switch (typeItem) {
-      case 'comments':
-        if (canEditComment) {
+    try {
+      switch (typeItem) {
+        case 'comments':
+          if (canEditComment) {
+            await dispatch(
+              updateComment({
+                ...content,
+                id: content.t_id,
+                eTTrail: durationStringToMinutes(content.eTTrail),
+                eTUnderground: durationStringToMinutes(content.eTUnderground)
+              })
+            );
+          }
+          break;
+        case 'descriptions':
           await dispatch(
-            updateComment({
+            updateDescription({
               ...content,
-              id: content.t_id,
-              eTTrail: durationStringToMinutes(content.eTTrail),
-              eTUnderground: durationStringToMinutes(content.eTUnderground)
+              id: content.t_id
             })
           );
-        }
-        break;
-      case 'descriptions':
-        await dispatch(
-          updateDescription({
-            ...content,
-            id: content.t_id
-          })
-        );
-        break;
-      case 'entrances':
-        // eslint-disable-next-line no-case-declarations
-        const updatedEntrance = {
-          name: {
-            language: content.names[0].language,
-            text: content.name
-          },
-          cave: content.cave?.id ?? content.cave,
-          country: content.country,
-          isSensitive: content.isSensitive,
-          longitude: content.longitude,
-          latitude: content.latitude,
-          yearDiscovery: content.yearDiscovery,
-          geology: content.geology,
-          id: content.t_id
-        };
-        if (isNetwork) {
-          await dispatch(updateEntrance(updatedEntrance));
-        } else {
-          const updatedCave = {
+          break;
+        case 'entrances': {
+          const updatedEntrance = {
             name: {
-              language: content.languageName,
-              text: content.caveName
+              language: content.names[0].language,
+              text: content.name
             },
-            depth: Number(content.cave.depth),
-            isDiving: content.cave.isDiving,
-            length: Number(content.cave.length),
-            longitude: content.cave.longitude,
-            latitude: content.cave.latitude,
-            temperature: Number(content.cave.temperature),
-            id: content.cave?.id
+            cave: content.cave?.id ?? content.cave,
+            country: content.country,
+            isSensitive: content.isSensitive,
+            longitude: content.longitude,
+            latitude: content.latitude,
+            yearDiscovery: content.yearDiscovery,
+            geology: content.geology,
+            id: content.t_id
           };
-          await dispatch(updateCaveAndEntrance(updatedCave, updatedEntrance));
+          if (isNetwork) {
+            await dispatch(updateEntrance(updatedEntrance));
+          } else {
+            const updatedCave = {
+              name: {
+                language: content.languageName,
+                text: content.caveName
+              },
+              depth: Number(content.cave.depth),
+              isDiving: content.cave.isDiving,
+              length: Number(content.cave.length),
+              longitude: content.cave.longitude,
+              latitude: content.cave.latitude,
+              temperature: Number(content.cave.temperature),
+              id: content.cave?.id
+            };
+            await dispatch(updateCaveAndEntrance(updatedCave, updatedEntrance));
+          }
+          break;
         }
-        break;
-      case 'histories':
-        await dispatch(
-          updateHistory({
-            ...content,
-            id: content.t_id
-          })
-        );
-        break;
-      case 'locations':
-        await dispatch(
-          updateLocation({
-            ...content,
-            id: content.t_id
-          })
-        );
-        break;
-      case 'riggings':
-        await dispatch(
-          updateRiggings({
-            ...content,
-            id: content.t_id
-          })
-        );
-        break;
-      case 'guidelines':
-        await dispatch(
-          rollbackGuideline({
-            id: content.t_id,
-            snapshotId: content.id
-          })
-        );
-        break;
-      default:
-        break;
+        case 'histories':
+          await dispatch(
+            updateHistory({
+              ...content,
+              id: content.t_id
+            })
+          );
+          break;
+        case 'locations':
+          await dispatch(
+            updateLocation({
+              ...content,
+              id: content.t_id
+            })
+          );
+          break;
+        case 'riggings':
+          await dispatch(
+            updateRiggings({
+              ...content,
+              id: content.t_id
+            })
+          );
+          break;
+        case 'guidelines':
+          await dispatch(
+            rollbackGuideline({
+              id: content.t_id,
+              snapshotId: content.id
+            })
+          );
+          break;
+        default:
+          break;
+      }
+      // window.opener is null when the user navigated directly to this URL
+      // instead of arriving via window.open() (e.g. popup blocked by browser).
+      if (window.opener) {
+        setHasOpener(true);
+        window.opener.location.reload();
+        setOpenSuccess(true);
+        sleep(10000).then(() => window.close());
+      } else {
+        setHasOpener(false);
+        setOpenSuccess(true);
+      }
+    } catch {
+      // Action dispatched UPDATE_X_FAILURE — ErrorHandler shows the error toast.
+      // Do not show the success dialog.
     }
-    window.opener.location.reload();
-    setOpenSuccess(true);
-    sleep(10000).then(() => window.close());
   };
   return (
     permissions.isAuth &&
@@ -188,12 +202,26 @@ const RestoreSnapshot = item => {
           </DialogTitle>
           <DialogContent>
             <DialogContentText>
-              <Translate>
-                This window will be closed shortly and your origin page
-                refreshed...
-              </Translate>
+              {hasOpener ? (
+                <Translate>
+                  This window will be closed shortly and your origin page
+                  refreshed...
+                </Translate>
+              ) : (
+                <Translate>
+                  The revision has been restored. You can close this tab and
+                  reload the page to see the changes.
+                </Translate>
+              )}
             </DialogContentText>
           </DialogContent>
+          {!hasOpener && (
+            <DialogActions>
+              <Button onClick={() => setOpenSuccess(false)}>
+                <Translate>Close</Translate>
+              </Button>
+            </DialogActions>
+          )}
         </Dialog>
       </>
     )

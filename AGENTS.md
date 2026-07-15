@@ -180,6 +180,21 @@ return state;
 4. Types and constants
 5. Styles
 
+### Path Aliases
+
+The `@` alias resolves to `packages/web-app/src/`. **All new code must use it** for imports that would otherwise require two or more `../` segments.
+
+```javascript
+// ✅ New code
+import { fetchCave } from '@/actions/Cave';
+import CaveForm from '@/components/appli/CaveForm';
+
+// ❌ Legacy — do not reproduce
+import { fetchCave } from '../../../actions/Cave';
+```
+
+Existing `../` imports are left in place and migrated progressively (dedicated `tech/path-aliases` PR). Do not mix alias migration with feature or fix PRs.
+
 ### Naming Conventions
 
 | Type                  | Convention                   | Examples                   |
@@ -316,13 +331,14 @@ Use the `.github/pull_request_template.md`. Create PRs targeting `develop`.
 ## 📦 NPM Scripts
 
 ```bash
-yarn start                              # Dev server (port 3000)
-yarn build                              # Production build
+yarn start                              # Vite dev server (port 3000)
+yarn build                              # Vite production build (outputs to dist/)
+yarn test                               # Vitest (unit tests)
 yarn lint                               # ESLint check
 yarn lint:fix                           # Auto-fix
 yarn e2e:open                           # Cypress interactive
 yarn e2e:run                            # Cypress headless
-yarn storybook                          # Storybook (port 6006)
+yarn storybook                          # Storybook on Vite (port 6007)
 yarn translations:update-en             # Scan JSX and update en.json
 yarn translations:sort                  # Sort one or several translation file alphabetically
 yarn translations:sync-with-en         # Do or check sync with en.json

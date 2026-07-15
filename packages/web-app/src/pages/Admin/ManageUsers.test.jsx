@@ -5,61 +5,61 @@ import { IntlProvider } from 'react-intl';
 import ManageUsers from './ManageUsers';
 
 // ---- Redux mock ----
-const mockDispatch = jest.fn();
+const mockDispatch = vi.fn();
 let mockStoreState = {};
 
-jest.mock('react-redux', () => ({
-  ...jest.requireActual('react-redux'),
+vi.mock('react-redux', async () => ({
+  ...(await vi.importActual('react-redux')),
   useDispatch: () => mockDispatch,
   useSelector: selector =>
     selector(mockStoreState)
 }));
 
 // ---- Action mocks ----
-const mockFetchGroups = jest.fn(() => ({ type: 'FETCH_GROUPS' }));
-const mockFetchBannedCavers = jest.fn(() => ({ type: 'FETCH_BANNED_CAVERS' }));
-const mockFetchInvalidEmailCavers = jest.fn(() => ({
+const mockFetchGroups = vi.fn(() => ({ type: 'FETCH_GROUPS' }));
+const mockFetchBannedCavers = vi.fn(() => ({ type: 'FETCH_BANNED_CAVERS' }));
+const mockFetchInvalidEmailCavers = vi.fn(() => ({
   type: 'FETCH_INVALID_EMAIL_CAVERS'
 }));
 
-jest.mock('../../actions/Person/GetPerson', () => ({
+vi.mock('../../actions/Person/GetPerson', () => ({
   fetchGroups: (...args) => mockFetchGroups(...args),
   fetchBannedCavers: (...args) => mockFetchBannedCavers(...args),
   fetchInvalidEmailCavers: (...args) => mockFetchInvalidEmailCavers(...args)
 }));
 
 // ---- Component mocks ----
-jest.mock('../../components/appli/AuthChecker', () => {
+vi.mock('../../components/appli/AuthChecker', () => {
   const MockAuthChecker = ({ componentToDisplay }) => (
     <div data-testid="auth-checker">{componentToDisplay}</div>
   );
-  return MockAuthChecker;
+  return { default: MockAuthChecker };
 });
 
-jest.mock('../../components/common/Layouts/Fixed/FixedContent', () => {
+vi.mock('../../components/common/Layouts/Fixed/FixedContent', () => {
   const MockLayout = ({ title, content }) => (
     <div data-testid="layout">
       <h1>{title}</h1>
       {content}
     </div>
   );
-  return MockLayout;
+  return { default: MockLayout };
 });
 
-jest.mock('./ManageUserGroups', () => {
+vi.mock('./ManageUserGroups', () => {
   const MockManageUserGroups = () => (
     <div data-testid="manage-user-groups">ManageUserGroups</div>
   );
-  return MockManageUserGroups;
+  return { default: MockManageUserGroups };
 });
 
-jest.mock('../../components/common/EntityTable', () => {
+vi.mock('../../components/common/EntityTable', () => {
   const MockEntityTable = ({ isLoading, pageRows }) => (
     <div data-testid="entity-table">
       {isLoading ? 'Loading...' : `${pageRows.length} rows`}
     </div>
   );
-  return MockEntityTable;
+  return { default: MockEntityTable };
 });
 
 const messages = {

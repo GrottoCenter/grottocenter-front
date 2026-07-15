@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { storiesOf } from '@storybook/react';
 import { FormControlLabel, Paper, Switch, Typography } from '@mui/material';
 import ChangePasswordForm from './index';
 
@@ -41,6 +40,14 @@ const HydratedChangePasswordForm = () => {
   );
 };
 
-storiesOf('Sign up form', module).add('Form (without error management)', () => (
-  <HydratedChangePasswordForm />
-));
+const meta = {
+  title: 'Change password form',
+  component: ChangePasswordForm
+};
+
+export default meta;
+
+export const FormWithoutErrorManagement = {
+  name: 'Form (without error management)',
+  render: () => <HydratedChangePasswordForm />
+};

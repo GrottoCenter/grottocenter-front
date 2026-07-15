@@ -35,5 +35,6 @@ export const updateCave = body => (dispatch, getState) => {
     .catch(error => {
       if (error.isAuthError) return;
       dispatch(updateCaveFailure(error));
+      throw error;
     });
 };

@@ -5,37 +5,37 @@ import { IntlProvider } from 'react-intl';
 import SensorConfigForm from './SensorConfigForm';
 
 // ---- Redux mock ----
-const mockDispatch = jest.fn(() => Promise.resolve());
+const mockDispatch = vi.fn(() => Promise.resolve());
 
-jest.mock('react-redux', () => ({
-  ...jest.requireActual('react-redux'),
+vi.mock('react-redux', async () => ({
+  ...(await vi.importActual('react-redux')),
   useDispatch: () => mockDispatch
 }));
 
 // ---- Notification mock ----
-const mockEnqueueSnackbar = jest.fn();
-jest.mock('notistack', () => ({
+const mockEnqueueSnackbar = vi.fn();
+vi.mock('notistack', () => ({
   useSnackbar: () => ({
     enqueueSnackbar: mockEnqueueSnackbar,
-    closeSnackbar: jest.fn()
+    closeSnackbar: vi.fn()
   })
 }));
 
 // ---- Actions mock ----
-const mockCreateSensorConfig = jest.fn();
-jest.mock('../../../../actions/Observations/importWizard', () => ({
+const mockCreateSensorConfig = vi.fn();
+vi.mock('../../../../actions/Observations/importWizard', () => ({
   createSensorConfig: (...args) => mockCreateSensorConfig(...args)
 }));
 
-const mockCreateSubstance = jest.fn();
-jest.mock('../../../../actions/Substance', () => ({
+const mockCreateSubstance = vi.fn();
+vi.mock('../../../../actions/Substance', () => ({
   searchSubstances: () => () => Promise.resolve([]),
   createSubstance: (...args) => mockCreateSubstance(...args)
 }));
 
 // ---- SubstanceAutocomplete mock ----
 // Renders a button that simulates selecting a substance when clicked
-jest.mock('../components/SubstanceAutocomplete', () => {
+vi.mock('../components/SubstanceAutocomplete', () => {
   const React = require('react');
   return {
     __esModule: true,
@@ -114,8 +114,12 @@ const renderComponent = () =>
   );
 
 beforeEach(() => {
-  mockDispatch.mockClear();
-  mockCreateSensorConfig.mockClear();
+  // mockReset (not mockClear) so a persistent implementation or queued
+  // mock*Value(Once) from a previous test does not leak into the next one
+  // (e.g. a test that makes createSensorConfig throw).
+  mockDispatch.mockReset();
+  mockCreateSensorConfig.mockReset();
+  mockCreateSubstance.mockReset();
   mockEnqueueSnackbar.mockClear();
   mockDispatch.mockImplementation(() => Promise.resolve());
 });

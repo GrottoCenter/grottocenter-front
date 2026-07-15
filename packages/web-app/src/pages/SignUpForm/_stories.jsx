@@ -1,5 +1,4 @@
 import React from 'react';
-import { storiesOf } from '@storybook/react';
 import { FormControlLabel, Paper, Switch, Typography } from '@mui/material';
 import SignUpForm from './index';
 
@@ -53,6 +52,14 @@ const HydratedSignUpForm = () => {
   );
 };
 
-storiesOf('Sign up form', module).add('Form (without error management)', () => (
-  <HydratedSignUpForm />
-));
+const meta = {
+  title: 'Sign up form',
+  component: SignUpForm
+};
+
+export default meta;
+
+export const FormWithoutErrorManagement = {
+  name: 'Form (without error management)',
+  render: () => <HydratedSignUpForm />
+};

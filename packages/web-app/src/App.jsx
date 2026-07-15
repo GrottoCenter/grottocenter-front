@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { lazy } from 'react';
 import { ThemeProvider, StyledEngineProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import {
@@ -10,59 +10,76 @@ import {
 } from 'react-router-dom';
 
 import grottoTheme from './conf/grottoTheme';
+
+// Eagerly loaded: root layout, the landing page (first paint) and the auth
+// guard. Everything else is route-split via React.lazy and rendered inside the
+// <Suspense> boundary declared in ApplicationShell.
 import ApplicationShell from './pages/ApplicationShell';
-
-import Api from './components/appli/Api';
-import Dashboard from './pages/Dashboard';
-import ApiDoc from './pages/ApiDoc';
 import HomePage from './pages/homepage';
-import DocumentDetails from './pages/DocumentDetails';
-import DuplicateImportHandle from './pages/DuplicateImportHandle';
-import Faq from './components/appli/Faq';
-import LatestBlogNewsSection from './pages/homepage/LatestBlogNewsSection';
-import ChangePassword from './components/appli/ChangePassword';
-import SignUp from './components/appli/SignUp';
-import ForgotPassword from './components/appli/ForgotPassword';
-import AccountPage from './pages/Account';
-import ContributionsPage from './pages/Contributions';
-import DocumentValidation from './pages/DocumentValidation';
-import DocumentEdit from './pages/DocumentEdit';
-import EntityCreation from './pages/EntityCreation';
-import EntityPicker from './pages/EntityCreation/EntityPicker';
-import AddEntrance from './pages/EntityCreation/AddEntrance';
-import AddDocument from './pages/EntityCreation/AddDocument';
-import AddMassif from './pages/EntityCreation/AddMassif';
-import AddOrganization from './pages/EntityCreation/AddOrganization';
-import EntryPage from './pages/Entry';
-import ImportContainer from './pages/ImportCSV';
-import ImportObservationsPage from './pages/ImportObservationsPage';
-import ManageUsers from './pages/Admin/ManageUsers';
-import Map from './pages/Map';
-import MassifPage from './pages/Massif';
-import MoveEntranceToCave from './pages/MoveEntranceToCave';
-import NetworkPage from './pages/Network';
-import PersonPage from './pages/Person';
-import OrganizationPage from './pages/Organization';
-import EntranceEdit from './pages/EntityEdit/Entrance/EntranceEdit';
-import MassifEdit from './pages/EntityEdit/Massif/MassifEdit';
-import PersonEdit from './pages/PersonEdit';
-import OrganizationEdit from './pages/EntityEdit/Organization/OrganizationEdit';
 import PrivateRoute from './components/appli/PrivateRoute';
-import CountryPage from './pages/Country';
-import RegionPage from './pages/Region';
-import NotificationsPage from './pages/Notifications';
-import MessagesPage from './pages/Messages';
-import SnapshotPage from './components/appli/Entry/Snapshots';
-import EntrancesListPage from './pages/EntrancesList';
-import CountryListPage from './pages/CountryList';
-import EntrancesSearchPage from './pages/Entrances';
-import DocumentsSearchPage from './pages/Documents';
-import MassifsSearchPage from './pages/Massifs';
-import OrganizationsSearchPage from './pages/Organizations';
-import PersonsSearchPage from './pages/Persons';
-import VerifyEmail from './containers/VerifyEmail';
 
+import 'leaflet/dist/leaflet.css';
 import './App.css';
+
+const Api = lazy(() => import('./components/appli/Api'));
+const Dashboard = lazy(() => import('./pages/Dashboard'));
+const ApiDoc = lazy(() => import('./pages/ApiDoc'));
+const DocumentDetails = lazy(() => import('./pages/DocumentDetails'));
+const DuplicateImportHandle = lazy(() =>
+  import('./pages/DuplicateImportHandle')
+);
+const Faq = lazy(() => import('./components/appli/Faq'));
+const LatestBlogNewsSection = lazy(() =>
+  import('./pages/homepage/LatestBlogNewsSection')
+);
+const ChangePassword = lazy(() => import('./components/appli/ChangePassword'));
+const SignUp = lazy(() => import('./components/appli/SignUp'));
+const ForgotPassword = lazy(() => import('./components/appli/ForgotPassword'));
+const AccountPage = lazy(() => import('./pages/Account'));
+const ContributionsPage = lazy(() => import('./pages/Contributions'));
+const DocumentValidation = lazy(() => import('./pages/DocumentValidation'));
+const DocumentEdit = lazy(() => import('./pages/DocumentEdit'));
+const EntityCreation = lazy(() => import('./pages/EntityCreation'));
+const EntityPicker = lazy(() => import('./pages/EntityCreation/EntityPicker'));
+const AddEntrance = lazy(() => import('./pages/EntityCreation/AddEntrance'));
+const AddDocument = lazy(() => import('./pages/EntityCreation/AddDocument'));
+const AddMassif = lazy(() => import('./pages/EntityCreation/AddMassif'));
+const AddOrganization = lazy(() =>
+  import('./pages/EntityCreation/AddOrganization')
+);
+const EntryPage = lazy(() => import('./pages/Entry'));
+const ImportContainer = lazy(() => import('./pages/ImportCSV'));
+const ImportObservationsPage = lazy(() =>
+  import('./pages/ImportObservationsPage')
+);
+const ManageUsers = lazy(() => import('./pages/Admin/ManageUsers'));
+const Map = lazy(() => import('./pages/Map'));
+const MassifPage = lazy(() => import('./pages/Massif'));
+const MoveEntranceToCave = lazy(() => import('./pages/MoveEntranceToCave'));
+const NetworkPage = lazy(() => import('./pages/Network'));
+const PersonPage = lazy(() => import('./pages/Person'));
+const OrganizationPage = lazy(() => import('./pages/Organization'));
+const EntranceEdit = lazy(() =>
+  import('./pages/EntityEdit/Entrance/EntranceEdit')
+);
+const MassifEdit = lazy(() => import('./pages/EntityEdit/Massif/MassifEdit'));
+const PersonEdit = lazy(() => import('./pages/PersonEdit'));
+const OrganizationEdit = lazy(() =>
+  import('./pages/EntityEdit/Organization/OrganizationEdit')
+);
+const CountryPage = lazy(() => import('./pages/Country'));
+const RegionPage = lazy(() => import('./pages/Region'));
+const NotificationsPage = lazy(() => import('./pages/Notifications'));
+const MessagesPage = lazy(() => import('./pages/Messages'));
+const SnapshotPage = lazy(() => import('./components/appli/Entry/Snapshots'));
+const EntrancesListPage = lazy(() => import('./pages/EntrancesList'));
+const CountryListPage = lazy(() => import('./pages/CountryList'));
+const EntrancesSearchPage = lazy(() => import('./pages/Entrances'));
+const DocumentsSearchPage = lazy(() => import('./pages/Documents'));
+const MassifsSearchPage = lazy(() => import('./pages/Massifs'));
+const OrganizationsSearchPage = lazy(() => import('./pages/Organizations'));
+const PersonsSearchPage = lazy(() => import('./pages/Persons'));
+const VerifyEmail = lazy(() => import('./containers/VerifyEmail'));
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -151,6 +168,9 @@ const router = createBrowserRouter(
     </Route>
   ),
   {
+    // Opt into React Router v7 behaviour ahead of the v8 migration.
+    // These flags eliminate the deprecation warnings that would otherwise fire
+    // when upgrading, and let us test v7 semantics incrementally.
     future: {
       v7_startTransition: true,
       v7_relativeSplatPath: true,

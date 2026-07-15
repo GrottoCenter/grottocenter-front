@@ -44,7 +44,7 @@ const renderComponent = (props = {}) => {
     timestampType: 'datetime',
     sampleValues: [],
     currentFormat: '',
-    onChange: jest.fn()
+    onChange: vi.fn()
   };
   const merged = { ...defaultProps, ...props };
   return render(
@@ -89,7 +89,7 @@ describe('TimestampFormatInput', () => {
 
   describe('onChange callback', () => {
     it('calls onChange when user types in the input', () => {
-      const onChange = jest.fn();
+      const onChange = vi.fn();
       renderComponent({ onChange });
 
       const input = screen.getByTestId('format-input').querySelector('input');

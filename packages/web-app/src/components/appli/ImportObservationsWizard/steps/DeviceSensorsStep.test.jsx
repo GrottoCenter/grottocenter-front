@@ -3,32 +3,33 @@ import { render, screen, fireEvent, act } from '@testing-library/react';
 import { IntlProvider } from 'react-intl';
 
 import DeviceSensorsStep from './DeviceSensorsStep';
+import { fetchSensorConfigs } from '../../../../actions/Observations/importWizard';
 
 // ---- Redux mock ----
-const mockDispatch = jest.fn(() => Promise.resolve());
+const mockDispatch = vi.fn(() => Promise.resolve());
 let mockStoreState = {};
 
-jest.mock('react-redux', () => ({
-  ...jest.requireActual('react-redux'),
+vi.mock('react-redux', async () => ({
+  ...(await vi.importActual('react-redux')),
   useDispatch: () => mockDispatch,
   useSelector: selector => selector(mockStoreState)
 }));
 
 // ---- useDebounce mock (returns value immediately) ----
-jest.mock('../../../../hooks', () => ({
+vi.mock('../../../../hooks', () => ({
   useDebounce: value => value,
   useNotification: () => ({
-    onSuccess: jest.fn(),
-    onError: jest.fn(),
-    onWarning: jest.fn(),
-    onInfo: jest.fn()
+    onSuccess: vi.fn(),
+    onError: vi.fn(),
+    onWarning: vi.fn(),
+    onInfo: vi.fn()
   })
 }));
 
 // ---- Actions mock ----
-jest.mock('../../../../actions/Observations/importWizard', () => ({
-  searchDevices: jest.fn(() => () => Promise.resolve([])),
-  createDevice: jest.fn(data => () =>
+vi.mock('../../../../actions/Observations/importWizard', () => ({
+  searchDevices: vi.fn(() => () => Promise.resolve([])),
+  createDevice: vi.fn(data => () =>
     Promise.resolve({
       id: 1,
       name: data.name,
@@ -36,18 +37,18 @@ jest.mock('../../../../actions/Observations/importWizard', () => ({
       author: null
     })
   ),
-  fetchSensorConfigs: jest.fn(() => () => Promise.resolve([])),
-  createSensorConfig: jest.fn(() => () => Promise.resolve()),
+  fetchSensorConfigs: vi.fn(() => () => Promise.resolve([])),
+  createSensorConfig: vi.fn(() => () => Promise.resolve()),
   SET_CONFIRMED_DEVICE: 'SET_CONFIRMED_DEVICE',
   CLEAR_CONFIRMED_DEVICE: 'CLEAR_CONFIRMED_DEVICE'
 }));
 
-jest.mock('../../../../actions/Substance', () => ({
+vi.mock('../../../../actions/Substance', () => ({
   searchSubstances: () => () => Promise.resolve([]),
   createSubstance: () => () => Promise.resolve({ id: 1, name: 'Nitrate' })
 }));
 
-jest.mock('../components/SubstanceAutocomplete', () => {
+vi.mock('../components/SubstanceAutocomplete', () => {
   const React = require('react');
   return {
     __esModule: true,
@@ -423,9 +424,7 @@ describe('DeviceSensorsStep', () => {
 
   describe('fetchSensorConfigs on device confirmation', () => {
     it('dispatches fetchSensorConfigs when confirmedDevice is set', async () => {
-      const {
-        fetchSensorConfigs: mockFetch
-      } = require('../../../../actions/Observations/importWizard');
+      const mockFetch = fetchSensorConfigs;
 
       await renderComponent({
         confirmedDevice: {

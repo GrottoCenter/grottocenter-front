@@ -58,6 +58,9 @@ const personArb = isBanned =>
     })
     .map(p => ({ ...p, isBanned }));
 
+// fast-check runs many render iterations — needs more than Vitest's 5s default.
+vi.setConfig({ testTimeout: 30000 });
+
 /**
  * Property 6: Ban indicator visibility matches ban status
  *

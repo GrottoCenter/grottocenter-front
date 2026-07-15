@@ -1,11 +1,13 @@
 import * as fc from 'fast-check';
-import { parseGeoJsonToMultiPolygon } from './geojsonParser';
+import parseGeoJsonToMultiPolygonDefault, {
+  parseGeoJsonToMultiPolygon
+} from './geojsonParser';
 import { transformToWGS84 } from './coordinateTransform';
 
 // Mock coordinateTransform — identity transform so we can test parsing
 // logic in isolation (reprojection has its own tests).
-jest.mock('./coordinateTransform', () => ({
-  transformToWGS84: jest.fn()
+vi.mock('./coordinateTransform', () => ({
+  transformToWGS84: vi.fn()
 }));
 
 beforeEach(() => {
@@ -386,9 +388,7 @@ describe('parseGeoJsonToMultiPolygon — review scenarios', () => {
    * Covers: import ergonomics for consumers using default import.
    */
   it('should export parseGeoJsonToMultiPolygon as the default export', () => {
-    // eslint-disable-next-line global-require
-    const defaultExport = require('./geojsonParser').default;
-    expect(defaultExport).toBe(parseGeoJsonToMultiPolygon);
+    expect(parseGeoJsonToMultiPolygonDefault).toBe(parseGeoJsonToMultiPolygon);
   });
 
   /**

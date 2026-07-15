@@ -2,9 +2,11 @@ import { useMapEvent } from 'react-leaflet';
 import React, { useCallback, useEffect, useRef } from 'react';
 import { isNil } from 'ramda';
 import * as d3 from 'd3';
-import * as L from 'leaflet';
+// Default import (not `* as L`) so that @asymmetrik/leaflet-d3 augments the
+// same mutable object — the ESM namespace is frozen and L.hexbinLayer would
+// never appear on it in the production Rolldown build.
+import L from 'leaflet';
 import 'd3-hexbin';
-// after L import
 import '@asymmetrik/leaflet-d3';
 import { GlobalStyles } from '@mui/material';
 import { useIntl } from 'react-intl';

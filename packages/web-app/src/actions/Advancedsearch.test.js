@@ -1,39 +1,38 @@
 import fc from 'fast-check';
+import { downloadAdvancedSearchResults } from './Advancedsearch';
 
-// Mock isomorphic-fetch
-const mockFetch = jest.fn();
-jest.mock('isomorphic-fetch', () => mockFetch);
+// Mock isomorphic-fetch (hoisted so it can be referenced in the hoisted vi.mock)
+const { mockFetch } = vi.hoisted(() => ({ mockFetch: vi.fn() }));
+vi.mock('isomorphic-fetch', () => ({ default: mockFetch }));
 
 // Mock apiRoutes
-jest.mock('../conf/apiRoutes', () => ({
+vi.mock('../conf/apiRoutes', () => ({
   advancedSearchUrl: 'http://api/advanced-search',
   advancedSearchExportUrl: 'http://api/advanced-search/export'
 }));
 
 // Mock utils
-jest.mock('./utils', () => ({
+vi.mock('./utils', () => ({
   checkAndGetStatus: response => response
 }));
-
-const { downloadAdvancedSearchResults } = require('./Advancedsearch');
 
 describe('downloadAdvancedSearchResults', () => {
   let anchorElement;
 
   beforeEach(() => {
-    jest.clearAllMocks();
-    window.URL.createObjectURL = jest
+    vi.clearAllMocks();
+    window.URL.createObjectURL = vi
       .fn()
       .mockReturnValue('blob:http://localhost/fake');
-    window.URL.revokeObjectURL = jest.fn();
+    window.URL.revokeObjectURL = vi.fn();
 
     anchorElement = document.createElement('a');
-    jest.spyOn(anchorElement, 'click').mockImplementation(() => {});
-    jest.spyOn(document, 'createElement').mockReturnValue(anchorElement);
+    vi.spyOn(anchorElement, 'click').mockImplementation(() => {});
+    vi.spyOn(document, 'createElement').mockReturnValue(anchorElement);
   });
 
   afterEach(() => {
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
   });
 
   const setupFetchBlob = () => {

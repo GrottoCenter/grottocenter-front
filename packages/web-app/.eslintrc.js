@@ -16,6 +16,21 @@ module.exports = {
         cy: 'readonly',
         Cypress: 'readonly'
       }
+    },
+    {
+      files: ['**/*.test.{js,jsx}', '**/*.spec.{js,jsx}', '**/setupTests.js'],
+      globals: {
+        describe: 'readonly',
+        it: 'readonly',
+        test: 'readonly',
+        expect: 'readonly',
+        beforeEach: 'readonly',
+        afterEach: 'readonly',
+        beforeAll: 'readonly',
+        afterAll: 'readonly',
+        vi: 'readonly',
+        vitest: 'readonly'
+      }
     }
   ],
   globals: {

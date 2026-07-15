@@ -5,11 +5,11 @@ import { IntlProvider } from 'react-intl';
 import MapColumnsStep from './MapColumnsStep';
 
 // ---- Redux mock ----
-const mockDispatch = jest.fn();
+const mockDispatch = vi.fn();
 let mockStoreState = {};
 
-jest.mock('react-redux', () => ({
-  ...jest.requireActual('react-redux'),
+vi.mock('react-redux', async () => ({
+  ...(await vi.importActual('react-redux')),
   useDispatch: () => mockDispatch,
   useSelector: selector => selector(mockStoreState)
 }));
@@ -18,8 +18,8 @@ jest.mock('react-redux', () => ({
 // The component reads theme.palette.secondary3Color and theme.palette.secondary.veryLight
 // secondary3Color = blue[100] = '#BBDEFB'
 // secondary.veryLight = orange[50] = '#FFF3E0'
-jest.mock('@mui/material/styles', () => ({
-  ...jest.requireActual('@mui/material/styles'),
+vi.mock('@mui/material/styles', async () => ({
+  ...(await vi.importActual('@mui/material/styles')),
   useTheme: () => ({
     palette: {
       secondary3Color: '#BBDEFB',
@@ -33,7 +33,7 @@ jest.mock('@mui/material/styles', () => ({
 // ---- TimestampFormatInput mock ----
 // We mock TimestampFormatInput to isolate integration tests for MapColumnsStep.
 // The mock renders a testable element exposing received props and a trigger for onChange.
-jest.mock('./TimestampFormatInput', () => {
+vi.mock('./TimestampFormatInput', () => {
   const MockTimestampFormatInput = props => (
     <div
       data-testid="mock-format-pill-builder"
@@ -49,7 +49,7 @@ jest.mock('./TimestampFormatInput', () => {
     </div>
   );
   MockTimestampFormatInput.displayName = 'MockTimestampFormatInput';
-  return MockTimestampFormatInput;
+  return { default: MockTimestampFormatInput };
 });
 
 // ---- i18n messages used by MapColumnsStep ----
@@ -273,7 +273,11 @@ describe('MapColumnsStep', () => {
       });
 
       const row = screen.getByTestId('column-row-0');
-      expect(row).toHaveStyle({ backgroundColor: 'inherit' });
+      // An excluded row keeps the inherited (non-special) background. jsdom's
+      // getComputedStyle omits `background-color: inherit`, so assert the
+      // absence of the timestamp/measurement backgrounds instead.
+      expect(row).not.toHaveStyle({ backgroundColor: '#BBDEFB' });
+      expect(row).not.toHaveStyle({ backgroundColor: '#FFF3E0' });
     });
   });
 

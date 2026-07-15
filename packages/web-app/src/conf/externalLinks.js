@@ -92,7 +92,7 @@ export const caveConservationLinks = {
   '*': 'https://wiki.grottocenter.org/wiki/GrottoCenter:En/Cave_conservation'
 };
 export const biLinks = {
-  '*': process.env.REACT_APP_BI_URL || 'https://bi.grottocenter.org'
+  '*': import.meta.env.VITE_BI_URL || 'https://bi.grottocenter.org'
 };
 export const wikiBBSLinks = {
   fr: 'https://wiki.grottocenter.org/wiki/GrottoCenter:Fr/bbs',
@@ -127,11 +127,11 @@ export const bloggerLinks = {
 };
 
 export const oaiLinks = {
-  '*': process.env.REACT_APP_OAI_URL || '#'
+  '*': import.meta.env.VITE_OAI_URL || '#'
 };
 
 export const z3950Links = {
-  '*': process.env.REACT_APP_Z3950_URL || '#'
+  '*': import.meta.env.VITE_Z3950_URL || '#'
 };
 
 export const uptimeLinks = {

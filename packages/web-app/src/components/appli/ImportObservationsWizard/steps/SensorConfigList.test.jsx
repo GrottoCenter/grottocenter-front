@@ -3,20 +3,21 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { IntlProvider } from 'react-intl';
 
 import SensorConfigList from './SensorConfigList';
+import { fetchSensorConfigs } from '../../../../actions/Observations/importWizard';
 
 // ---- Redux mock ----
-const mockDispatch = jest.fn(() => Promise.resolve());
+const mockDispatch = vi.fn(() => Promise.resolve());
 let mockStoreState = {};
 
-jest.mock('react-redux', () => ({
-  ...jest.requireActual('react-redux'),
+vi.mock('react-redux', async () => ({
+  ...(await vi.importActual('react-redux')),
   useDispatch: () => mockDispatch,
   useSelector: selector => selector(mockStoreState)
 }));
 
 // ---- Actions mock ----
-jest.mock('../../../../actions/Observations/importWizard', () => ({
-  fetchSensorConfigs: jest.fn(id => ({
+vi.mock('../../../../actions/Observations/importWizard', () => ({
+  fetchSensorConfigs: vi.fn(id => ({
     type: 'FETCH_SENSOR_CONFIGS',
     deviceId: id
   }))
@@ -81,7 +82,6 @@ describe('SensorConfigList', () => {
   });
 
   it('dispatches fetchSensorConfigs on retry click', () => {
-    const { fetchSensorConfigs } = require('../../../../actions/Observations/importWizard');
     renderComponent({ sensorConfigsError: 'Network error' });
 
     fireEvent.click(screen.getByTestId('sensor-config-retry-button'));

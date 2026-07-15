@@ -1,8 +1,6 @@
 import React from 'react';
-import { storiesOf } from '@storybook/react';
 import { Card as MuiCard, Paper } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import { select } from '@storybook/addon-knobs';
 import * as d3 from 'd3';
 
 import MultipleMarkers from './MapMultipleMarkers';
@@ -92,14 +90,35 @@ const ClustersMap = () => {
   );
 };
 
-storiesOf('Maps', module)
-  .add('Main with heatmap', () => <ClustersMap />)
-  .add('Multiple markers', () => (
-    <MultipleMarkersMap
-      selection={select('Entrance markers', positions, [[43.35266, 5.81689]])}
-    />
-  ))
-  .add('Popup Entrance', () => (
+const meta = {
+  title: 'Maps'
+};
+
+export default meta;
+
+export const MainWithHeatmap = {
+  name: 'Main with heatmap',
+  render: () => <ClustersMap />
+};
+
+export const MultipleMarkersStory = {
+  name: 'Multiple markers',
+  args: {
+    selection: positions['1 marker']
+  },
+  argTypes: {
+    selection: {
+      control: 'select',
+      options: Object.keys(positions),
+      mapping: positions
+    }
+  },
+  render: ({ selection }) => <MultipleMarkersMap selection={selection} />
+};
+
+export const PopupEntrance = {
+  name: 'Popup Entrance',
+  render: () => (
     <Paper>
       <EntrancePopup
         entrance={{
@@ -117,8 +136,12 @@ storiesOf('Maps', module)
         }}
       />
     </Paper>
-  ))
-  .add('Popup Network', () => (
+  )
+};
+
+export const PopupNetwork = {
+  name: 'Popup Network',
+  render: () => (
     <Paper>
       <NetworkPopup
         network={{
@@ -127,8 +150,12 @@ storiesOf('Maps', module)
         }}
       />
     </Paper>
-  ))
-  .add('Popup Organization', () => (
+  )
+};
+
+export const PopupOrganization = {
+  name: 'Popup Organization',
+  render: () => (
     <Paper>
       <OrganizationPopup
         organization={{
@@ -141,4 +168,5 @@ storiesOf('Maps', module)
         }}
       />
     </Paper>
-  ));
+  )
+};

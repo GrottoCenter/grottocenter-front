@@ -1,5 +1,4 @@
 import React from 'react';
-import { storiesOf } from '@storybook/react';
 import { Button, Paper, Typography } from '@mui/material';
 import { createStore } from 'redux';
 import { Provider, useDispatch } from 'react-redux';
@@ -25,8 +24,16 @@ const FakeAuthControls = () => {
   );
 };
 
-storiesOf('AuthChecker', module)
-  .add('Default error component', () => (
+const meta = {
+  title: 'AuthChecker',
+  component: AuthChecker
+};
+
+export default meta;
+
+export const DefaultErrorComponent = {
+  name: 'Default error component',
+  render: () => (
     <Provider store={store}>
       <FakeAuthControls />
       <Paper style={{ margin: '2rem', padding: '2rem', width: '400px' }}>
@@ -41,8 +48,12 @@ storiesOf('AuthChecker', module)
         />
       </Paper>
     </Provider>
-  ))
-  .add('Custom error component', () => (
+  )
+};
+
+export const CustomErrorComponent = {
+  name: 'Custom error component',
+  render: () => (
     <Provider store={store}>
       <FakeAuthControls />
       <Paper style={{ margin: '2rem', padding: '2rem', width: '400px' }}>
@@ -65,4 +76,5 @@ storiesOf('AuthChecker', module)
         />
       </Paper>
     </Provider>
-  ));
+  )
+};

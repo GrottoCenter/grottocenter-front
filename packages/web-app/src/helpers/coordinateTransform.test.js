@@ -1,7 +1,8 @@
+import proj4 from 'proj4';
 import { transformToWGS84, registerProjections } from './coordinateTransform';
 
 // Mock proj4 so we don't need real projection definitions
-jest.mock('proj4', () => {
+vi.mock('proj4', () => {
   const registeredDefs = {};
 
   const proj4Mock = (source, target, coord) => {
@@ -21,7 +22,7 @@ jest.mock('proj4', () => {
     return registeredDefs[code] || null;
   };
 
-  return proj4Mock;
+  return { default: proj4Mock };
 });
 
 beforeEach(() => {
@@ -31,7 +32,6 @@ beforeEach(() => {
 
 describe('registerProjections', () => {
   it('registers valid projections', () => {
-    const proj4 = require('proj4');
     registerProjections([
       { code: 'EPSG:2154', definition: '+proj=lcc +lat_1=49 ...' }
     ]);
@@ -39,7 +39,6 @@ describe('registerProjections', () => {
   });
 
   it('skips entries missing code or definition', () => {
-    const proj4 = require('proj4');
     registerProjections([
       { code: 'EPSG:9999' },
       { definition: '+proj=merc' },

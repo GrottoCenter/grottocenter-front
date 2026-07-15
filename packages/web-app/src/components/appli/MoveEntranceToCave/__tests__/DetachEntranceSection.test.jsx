@@ -5,53 +5,51 @@ import { IntlProvider } from 'react-intl';
 import DetachEntranceSection from '../DetachEntranceSection';
 
 // ---- Navigation mock ----
-const mockNavigate = jest.fn();
-jest.mock('react-router-dom', () => ({
+const mockNavigate = vi.fn();
+vi.mock('react-router-dom', () => ({
   useNavigate: () => mockNavigate
 }));
 
 // ---- Notification mock ----
-const mockOnSuccess = jest.fn();
-jest.mock('../../../../hooks/useNotification', () => ({
+const mockOnSuccess = vi.fn();
+vi.mock('../../../../hooks/useNotification', () => ({
   useNotification: () => ({
     onSuccess: mockOnSuccess,
-    onError: jest.fn(),
-    onWarning: jest.fn(),
-    onInfo: jest.fn()
+    onError: vi.fn(),
+    onWarning: vi.fn(),
+    onInfo: vi.fn()
   })
 }));
 
 // ---- Redux mock ----
-const mockDispatch = jest.fn();
+const mockDispatch = vi.fn();
 let mockStoreState = {};
 
-jest.mock('react-redux', () => ({
-  ...jest.requireActual('react-redux'),
+vi.mock('react-redux', async () => ({
+  ...(await vi.importActual('react-redux')),
   useDispatch: () => mockDispatch,
   useSelector: selector => selector(mockStoreState)
 }));
 
 // ---- Action mock ----
-const mockDetachEntranceToNewCave = jest.fn(() => ({
+const mockDetachEntranceToNewCave = vi.fn(() => ({
   type: 'DETACH_ENTRANCE'
 }));
-const mockResetDetachEntrance = jest.fn(() => ({
+const mockResetDetachEntrance = vi.fn(() => ({
   type: 'DETACH_ENTRANCE_RESET'
 }));
-jest.mock('../../../../actions/Entrance/DetachEntrance', () => ({
+vi.mock('../../../../actions/Entrance/DetachEntrance', () => ({
   detachEntranceToNewCave: (...args) => mockDetachEntranceToNewCave(...args),
   resetDetachEntrance: (...args) => mockResetDetachEntrance(...args)
 }));
 
 // The before → after preview is covered by its own suite; keep this one focused
 // on the detach button/behaviour (and avoid its internal button-role links).
-jest.mock(
-  '../OperationSummary',
-  () =>
-    function MockOperationSummary() {
-      return null;
-    }
-);
+vi.mock('../OperationSummary', () => ({
+  default: function MockOperationSummary() {
+    return null;
+  }
+}));
 
 const messages = {
   'Detach entrance': 'Detach entrance',

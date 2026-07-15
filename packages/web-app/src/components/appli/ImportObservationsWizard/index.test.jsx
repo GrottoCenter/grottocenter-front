@@ -5,29 +5,31 @@ import { IntlProvider } from 'react-intl';
 import ImportObservationsWizard from './index';
 
 // ---- Mock step components to isolate wizard logic ----
-jest.mock('./steps/UploadStep', () => () => <div data-testid="upload-step" />);
-jest.mock('./steps/DeviceSensorsStep', () => () => (
-  <div data-testid="device-sensors-step" />
-));
-jest.mock('./steps/MapColumnsStep', () => () => (
-  <div data-testid="map-columns-step" />
-));
-jest.mock('./steps/ValidateStep', () => () => (
-  <div data-testid="validate-step" />
-));
-jest.mock('./steps/ContextStep', () => () => (
-  <div data-testid="context-step" />
-));
-jest.mock('./steps/SubmitStep', () => () => (
-  <div data-testid="submit-step" />
-));
+vi.mock('./steps/UploadStep', () => ({
+  default: () => <div data-testid="upload-step" />
+}));
+vi.mock('./steps/DeviceSensorsStep', () => ({
+  default: () => <div data-testid="device-sensors-step" />
+}));
+vi.mock('./steps/MapColumnsStep', () => ({
+  default: () => <div data-testid="map-columns-step" />
+}));
+vi.mock('./steps/ValidateStep', () => ({
+  default: () => <div data-testid="validate-step" />
+}));
+vi.mock('./steps/ContextStep', () => ({
+  default: () => <div data-testid="context-step" />
+}));
+vi.mock('./steps/SubmitStep', () => ({
+  default: () => <div data-testid="submit-step" />
+}));
 
 // ---- Redux mock ----
-const mockDispatch = jest.fn();
+const mockDispatch = vi.fn();
 let mockStoreState = {};
 
-jest.mock('react-redux', () => ({
-  ...jest.requireActual('react-redux'),
+vi.mock('react-redux', async () => ({
+  ...(await vi.importActual('react-redux')),
   useDispatch: () => mockDispatch,
   useSelector: selector => selector(mockStoreState)
 }));

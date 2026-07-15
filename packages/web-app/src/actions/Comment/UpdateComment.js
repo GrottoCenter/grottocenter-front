@@ -58,5 +58,6 @@ export const updateComment =
       .catch(error => {
         if (error.isAuthError) return;
         dispatch(updateCommentFailure(error));
+        throw error;
       });
   };

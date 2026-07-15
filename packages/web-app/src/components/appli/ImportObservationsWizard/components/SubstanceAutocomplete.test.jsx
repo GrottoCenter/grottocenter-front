@@ -6,8 +6,8 @@ import { Provider } from 'react-redux';
 import SubstanceAutocomplete from './SubstanceAutocomplete';
 
 // Mock the Substance actions
-const mockSearchResults = jest.fn();
-jest.mock('../../../../actions/Substance', () => ({
+const mockSearchResults = vi.fn();
+vi.mock('../../../../actions/Substance', () => ({
   searchSubstances: query => dispatch => {
     mockSearchResults(query);
     return mockSearchResults.__resolveWith
@@ -17,8 +17,8 @@ jest.mock('../../../../actions/Substance', () => ({
 }));
 
 // Mock useDebounce to return immediately for testing
-jest.mock('../../../../hooks', () => ({
-  ...jest.requireActual('../../../../hooks'),
+vi.mock('../../../../hooks', async () => ({
+  ...(await vi.importActual('../../../../hooks')),
   useDebounce: value => value
 }));
 
@@ -38,8 +38,8 @@ const mockStore = {
   getState: () => ({
     login: { authorizationHeader: { Authorization: 'Bearer token' } }
   }),
-  dispatch: jest.fn(),
-  subscribe: jest.fn()
+  dispatch: vi.fn(),
+  subscribe: vi.fn()
 };
 
 // Make dispatch handle thunks (like redux-thunk middleware)
@@ -56,7 +56,7 @@ const renderComponent = (props = {}) =>
       <IntlProvider locale="en" messages={messages}>
         <SubstanceAutocomplete
           value={null}
-          onChange={jest.fn()}
+          onChange={vi.fn()}
           {...props}
         />
       </IntlProvider>
@@ -73,7 +73,7 @@ describe('SubstanceAutocomplete', () => {
       return action;
     });
     // Suppress React act() warnings from async effect cleanup
-    jest.spyOn(console, 'error').mockImplementation(msg => {
+    vi.spyOn(console, 'error').mockImplementation(msg => {
       if (typeof msg === 'string' && msg.includes('not wrapped in act')) return;
       // eslint-disable-next-line no-console
       console.warn(msg);
@@ -171,7 +171,7 @@ describe('SubstanceAutocomplete', () => {
   });
 
   it('calls onChange when user selects an option', async () => {
-    const onChange = jest.fn();
+    const onChange = vi.fn();
     const substance = { id: 1, name: 'Nitrate', formula: 'NO₃⁻', casNumber: null, externalId: '943', externalSource: 'PubChem' };
     mockSearchResults.__resolveWith = [substance];
 

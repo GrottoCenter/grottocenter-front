@@ -16,7 +16,7 @@
     "lint:fix": "eslint --fix --ext .js,.jsx,.ts,.tsx .",
     "e2e:run": "yarn workspace @grotto-front/web-app e2e-run",
     "e2e:open": "yarn workspace @grotto-front/web-app e2e",
-    "test": "yarn workspace @grotto-front/web-app test --watchAll=false",
+    "test": "yarn workspace @grotto-front/web-app test",
     "storybook": "yarn workspace @grotto-front/web-app storybook",
     "outdated": "npx npm-check-updates",
     "prepare": "husky",
@@ -51,7 +51,7 @@
     "typescript": "5.9.3"
   },
   "engines": {
-    "node": ">=18",
+    "node": ">=20.19",
     "yarn": "4.5.0"
   },
   "packageManager": "yarn@4.5.0",

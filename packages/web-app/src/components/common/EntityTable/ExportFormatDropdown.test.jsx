@@ -16,7 +16,7 @@ const renderDropdown = (props = {}) =>
     <IntlProvider locale="en" messages={messages}>
       <ExportFormatDropdown
         disabled={false}
-        onExport={jest.fn()}
+        onExport={vi.fn()}
         {...props}
       />
     </IntlProvider>
@@ -37,7 +37,7 @@ describe('ExportFormatDropdown', () => {
   });
 
   it('calls onExport with the selected format value', () => {
-    const onExport = jest.fn();
+    const onExport = vi.fn();
     renderDropdown({ onExport });
 
     const button = screen.getByRole('button', { name: /Export/i });
@@ -58,7 +58,7 @@ describe('ExportFormatDropdown', () => {
   });
 
   it('menu closes after selection', () => {
-    const onExport = jest.fn();
+    const onExport = vi.fn();
     renderDropdown({ onExport });
 
     const button = screen.getByRole('button', { name: /Export/i });
@@ -87,7 +87,7 @@ describe('ExportFormatDropdown', () => {
 
     fc.assert(
       fc.property(formatArb, format => {
-        const onExport = jest.fn();
+        const onExport = vi.fn();
         const { unmount } = renderDropdown({ onExport });
 
         const button = screen.getByRole('button', { name: /Export/i });

@@ -4,7 +4,7 @@ import { checkAuthStatus } from './utils';
 // Mock the Login module's postLogout thunk.
 // The real postLogout dispatches LOGOUT and redirects; here we only
 // verify that checkAuthStatus delegates to it on 401.
-jest.mock('./Login', () => ({
+vi.mock('./Login', () => ({
   postLogout: () => mockPostLogoutThunk
 }));
 
