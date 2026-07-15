@@ -15,7 +15,7 @@ const LocateMeControl = ({ onClick, loading = false, error = null }) => {
   const { formatMessage } = useIntl();
 
   return (
-    <CustomControl position="topleft" useLeafletControl>
+    <CustomControl position="bottomright" useLeafletControl>
       <Tooltip
         title={
           error
@@ -23,25 +23,24 @@ const LocateMeControl = ({ onClick, loading = false, error = null }) => {
             : formatMessage({ id: 'Use my location' })
         }
         open={error ? true : undefined}
-        placement="right"
+        placement="left"
         arrow>
         <span>
           <IconButton
-            size="small"
             onClick={onClick}
             disabled={loading}
             sx={{
               bgcolor: error ? 'error.main' : 'background.paper',
               borderRadius: '4px',
-              color: error ? 'white' : 'text.primary',
-              height: 30,
-              width: 30,
+              color: error ? 'white' : 'mapControlIcon',
+              height: 44,
+              width: 44,
               '&:hover': { bgcolor: error ? 'error.dark' : '#f4f4f4' },
               '&.Mui-disabled': { bgcolor: 'background.paper', opacity: 0.6 }
             }}>
             {loading
-              ? <CircularProgress size={14} color="inherit" />
-              : <MyLocationIcon sx={{ fontSize: 16 }} />}
+              ? <CircularProgress size={20} color="inherit" />
+              : <MyLocationIcon sx={{ fontSize: 28 }} />}
           </IconButton>
         </span>
       </Tooltip>

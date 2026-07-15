@@ -4,6 +4,7 @@ import {
   CompassMarker
 } from 'leaflet.locatecontrol';
 import 'leaflet.locatecontrol/dist/L.Control.Locate.min.css';
+import './LocateControl.css';
 
 // leaflet-rotate keeps marker icons screen-fixed unless `rotateWithView` is set,
 // so leaflet.locatecontrol's heading arrow ignores the map bearing and stays
@@ -21,8 +22,14 @@ const RotatingCompassMarker = CompassMarker.extend({
   }
 });
 
+// Default to the bottom-right corner (mobile locate-button convention, thumb
+// zone), stacked above the compass. Callers can still override via `position`.
 const LocateControl = createControlComponent(
   props =>
-    new LeafletLocateControl({ compassClass: RotatingCompassMarker, ...props })
+    new LeafletLocateControl({
+      position: 'bottomright',
+      compassClass: RotatingCompassMarker,
+      ...props
+    })
 );
 export default LocateControl;

@@ -1,0 +1,43 @@
+/*
+ * Align leaflet.locatecontrol's button with the CompassControl button so the
+ * bottom-right stack looks uniform:
+ *  - glyph: the standard "my location" crosshair (Material icon) instead of the
+ *    default tilted navigation arrow. Only the mask shape is overridden, so the
+ *    plugin keeps driving the colour via background-color (default / active /
+ *    following states stay intact).
+ *  - size: 44x44 like the compass IconButton (default Leaflet bar is 30x30).
+ *  - colour: resting glyph in Leaflet's native bar-button colour (#333), the
+ *    same as the zoom / layers controls and the compass, so every map button
+ *    matches; background stays paper white.
+ * Imported after the plugin CSS in LocateControl.jsx, so it wins at equal
+ * specificity.
+ */
+.leaflet-control-locate {
+  /* Single source of truth: --gc-map-control-icon is injected from
+     theme.palette.mapControlIcon by the <GlobalStyles> bridge in App.jsx.*/
+  --locate-control-icon-color: var(--gc-map-control-icon);
+}
+
+/* Higher specificity than Leaflet's `.leaflet-touch .leaflet-bar a { width:30px }`
+   (0,2,1), otherwise the button stays 30px and the 28px glyph overflows it. The
+   container carries both `leaflet-bar` and `leaflet-control-locate` classes. */
+.leaflet-bar.leaflet-control-locate a,
+.leaflet-touch .leaflet-bar.leaflet-control-locate a {
+  width: 44px;
+  height: 44px;
+  line-height: 44px;
+}
+
+.leaflet-control-locate a .leaflet-control-locate-location-arrow,
+.leaflet-control-locate a .leaflet-control-locate-spinner {
+  width: 28px;
+  height: 28px;
+  margin: 8px;
+}
+
+.leaflet-control-locate a .leaflet-control-locate-location-arrow {
+  -webkit-mask-image: url('./myLocation.svg');
+  mask-image: url('./myLocation.svg');
+  -webkit-mask-size: contain;
+  mask-size: contain;
+}

@@ -251,6 +251,7 @@ const MapMarkerSelector = ({ control, formLatitudeKey, formLongitudeKey, additio
         scrollWheelZoom="center" // To avoid losing the coordinate when only zooming
         doubleClickZoom="center"
         touchZoom={true}
+        rotateControl={false}
         preferCanvas>
         <GeocodingControl
           onLocationSelect={newLocation => {
@@ -262,7 +263,7 @@ const MapMarkerSelector = ({ control, formLatitudeKey, formLongitudeKey, additio
         />
         <FullscreenControl forceSeparateButton="true" />
         <ScaleControl position="bottomright" />
-        <LayersControl />
+        <LayersControl position="topright" />
 
         <MapBind center={currentPosition} zoom={zoomLevel} onMoveEnd={onMoveEnd} />
 

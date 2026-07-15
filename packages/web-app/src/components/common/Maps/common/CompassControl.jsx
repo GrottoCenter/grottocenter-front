@@ -5,7 +5,10 @@ import { CircularProgress, IconButton, Tooltip, useTheme } from '@mui/material';
 import ExploreIcon from '@mui/icons-material/Explore';
 import { useMap } from 'react-leaflet';
 import useDeviceOrientation from '../../../../hooks/useDeviceOrientation';
-import { headingToBearing, shortestAngleDelta } from '../../../../utils/compass';
+import {
+  headingToBearing,
+  shortestAngleDelta
+} from '../../../../utils/compass';
 import CustomControl from './CustomControl';
 
 // Two-tone compass needle: the red tip points to true North. It is rotated by
@@ -144,11 +147,16 @@ const CompassControl = () => {
       />
     );
   } else if (isActivating) {
-    icon = <CircularProgress size={20} sx={{ color: 'action.active' }} />;
+    icon = (
+      <CircularProgress size={20} sx={{ color: theme.palette.mapControlIcon }} />
+    );
   } else {
     icon = (
       <ExploreIcon
-        sx={{ fontSize: 28, color: error ? 'white' : 'action.active' }}
+        sx={{
+          fontSize: 28,
+          color: error ? 'white' : theme.palette.mapControlIcon
+        }}
       />
     );
   }

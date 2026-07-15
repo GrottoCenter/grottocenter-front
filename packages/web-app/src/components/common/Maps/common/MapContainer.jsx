@@ -19,7 +19,7 @@ import CompassControl from './CompassControl';
 const Wrapper = styled('div', {
   shouldForwardProp: prop => !prop.startsWith('$')
 })(
-  ({ theme, $wholePage, $fullscreenLocate }) => `
+  ({ theme, $wholePage }) => `
   display: flex;
   flex-direction: column;
   width: 100%;
@@ -36,12 +36,6 @@ ${$wholePage && `height: calc(100dvh - ${theme.appBarHeight}px);`}
   .leaflet-top.leaflet-right {
     z-index: 1001;
   }
-
-${
-  $fullscreenLocate
-    ? `.leaflet-container:not(.gc-fullscreen-controls) .leaflet-control-locate { display: none; }`
-    : ''
-}
 `
 );
 
@@ -113,17 +107,16 @@ const FullscreenOnlyControls = ({ isLocateControl, isCompassControl }) => {
     }
   });
 
-  // Toggle a container class so the (always-mounted) locate control is revealed
-  // by CSS only in fullscreen — see the Wrapper rule. Keeping it mounted means
-  // Leaflet stacks it above the later-mounted measure button, no DOM reordering.
-  useEffect(() => {
-    map.getContainer().classList.toggle('gc-fullscreen-controls', isFullscreen);
-  }, [isFullscreen, map]);
-
+  // Both are field-navigation helpers, shown only in fullscreen. Mounting them
+  // together on enter (rather than keeping locate always-mounted and hidden by
+  // CSS) guarantees a stable bottom-right stack: the compass mounts first, so
+  // Leaflet inserts the locate button above it — the same order as the other
+  // maps (bottom controls are inserted before the current first child).
+  if (!isFullscreen) return null;
   return (
     <>
+      {isCompassControl && <CompassControl />}
       {isLocateControl && <LocateControl />}
-      {isCompassControl && isFullscreen && <CompassControl />}
     </>
   );
 };
@@ -200,9 +193,7 @@ const CustomMapContainer = ({
   }, []);
 
   return (
-    <Wrapper
-      $wholePage={wholePage}
-      $fullscreenLocate={isLocateControlInFullscreen}>
+    <Wrapper $wholePage={wholePage}>
       <MapContainer
         style={{ flex: '1 1 auto', minHeight: 0, width: '100%', ...style }}
         wholePage={wholePage}
@@ -229,11 +220,12 @@ const CustomMapContainer = ({
           <FullscreenControl forceSeparateButton="true" />
         )}
         {forceCentering && <Centerer center={center} zoom={zoom} />}
-        {isLocateControl && <LocateControl />}
+        {/* Bottom-right stack. Leaflet inserts each new bottom control above the
+            previous one, so mount order bottom→top is: Scale, Compass, Locate.
+            That keeps the locate button on top, above the compass when present. */}
         <ScaleControl position="bottomright" />
-        {/* Added after ScaleControl so Leaflet stacks it just above the scale
-            legend in the bottom-right corner. */}
         {isCompassControl && <CompassControl />}
+        {isLocateControl && <LocateControl />}
         {(isLocateControlInFullscreen || isCompassControlInFullscreen) && (
           <FullscreenOnlyControls
             isLocateControl={isLocateControlInFullscreen}

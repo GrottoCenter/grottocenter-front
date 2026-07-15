@@ -8,7 +8,12 @@ import { useIntl } from 'react-intl';
 import { useFullScreen } from 'react-browser-hooks';
 
 import CustomControl, { customControlProps } from '../common/CustomControl';
-import { CAVE_SIZE, CAVE_SIZE_STYLE, CAVE_SIZE_THRESHOLDS, CAVE_QUALITY_BADGE_VALUE } from './constants';
+import {
+  CAVE_SIZE,
+  CAVE_SIZE_STYLE,
+  CAVE_SIZE_THRESHOLDS,
+  CAVE_QUALITY_BADGE_VALUE
+} from './constants';
 import DataQualityBadge from '../../DataQualityBadge';
 import DataQualityHelpButton from '../../DataQualityBadge/DataQualityHelpButton';
 import {
@@ -264,7 +269,7 @@ const DataControl = ({
           disabled={fullScreen}
           data-tour="data-control-toggle"
           onClick={() => toggleExpanded(true)}>
-          <VisibilityIcon color="action" />
+          <VisibilityIcon sx={{ color: theme => theme.palette.mapControlIcon }} />
         </ToggleButton>
 
         <section className="leaflet-control-layers-list">
@@ -309,7 +314,10 @@ const DataControl = ({
             </OptionLabel>
 
             {isAuth && (
-              <div style={hasExploredData === false ? { opacity: 0.5 } : undefined}>
+              <div
+                style={
+                  hasExploredData === false ? { opacity: 0.5 } : undefined
+                }>
                 <OptionLabel>
                   <input
                     type="checkbox"
@@ -368,12 +376,14 @@ const DataControl = ({
                   anchorOrigin={{ vertical: 'center', horizontal: 'right' }}
                   transformOrigin={{ vertical: 'center', horizontal: 'left' }}>
                   <PopoverContent>
-                    {CAVE_SIZE_POPOVER_ROWS.map(({ id, labelKey, messageKey, thresholds }) => (
-                      <div key={id}>
-                        <strong>{formatMessage({ id: labelKey })}</strong>
-                        {`: ${formatMessage({ id: messageKey }, thresholds)}`}
-                      </div>
-                    ))}
+                    {CAVE_SIZE_POPOVER_ROWS.map(
+                      ({ id, labelKey, messageKey, thresholds }) => (
+                        <div key={id}>
+                          <strong>{formatMessage({ id: labelKey })}</strong>
+                          {`: ${formatMessage({ id: messageKey }, thresholds)}`}
+                        </div>
+                      )
+                    )}
                   </PopoverContent>
                 </Popover>
                 {entranceFilters.map(filter => (
