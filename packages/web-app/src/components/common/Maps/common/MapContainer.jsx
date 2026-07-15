@@ -163,7 +163,7 @@ const CustomMapContainer = ({
         scrollWheelZoom={scrollWheelZoom}
         isSideMenuOpen={isSideMenuOpen}
         minZoom={1}
-        rotate
+        rotate={isCompassControl}
         bearing={0}
         rotateControl={false}
         touchRotate={false}

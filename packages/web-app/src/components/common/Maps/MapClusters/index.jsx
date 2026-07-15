@@ -97,6 +97,12 @@ const HydratedMap = ({
   const isTouch = useMediaQuery('(pointer: coarse)');
   const { updateLayers } = useHeatLayer();
 
+  // Heatmaps are the heaviest layers to re-project while the map rotates, so we
+  // hide them during compass-follow (a field-navigation mode). CompassControl
+  // announces the follow state through this custom map event.
+  const [isCompassFollowing, setIsCompassFollowing] = useState(false);
+  useMapEvent('compassfollowchange', e => setIsCompassFollowing(!!e.following));
+
   const [showExplored, setShowExplored] = useLocalStorage(
     'grottocenter_showExploredCaves',
     false,
@@ -351,10 +357,13 @@ const HydratedMap = ({
   // isMarkersMode/isMassifPolygonMode are included so zooming back out re-triggers this
   // and re-populates the hex layers.
   useEffect(() => {
-    const activeTypes = Array.from(selectedHeats).filter(t => {
-      if (t === heatmapTypes.MASSIFS) return !isMassifPolygonMode;
-      return !isMarkersMode;
-    });
+    // While following the compass, hide every hex layer to keep rotation smooth.
+    const activeTypes = isCompassFollowing
+      ? []
+      : Array.from(selectedHeats).filter(t => {
+          if (t === heatmapTypes.MASSIFS) return !isMassifPolygonMode;
+          return !isMarkersMode;
+        });
 
     updateLayers(
       {
@@ -371,7 +380,8 @@ const HydratedMap = ({
     networks,
     massifs,
     isMarkersMode,
-    isMassifPolygonMode
+    isMassifPolygonMode,
+    isCompassFollowing
   ]);
 
   return (

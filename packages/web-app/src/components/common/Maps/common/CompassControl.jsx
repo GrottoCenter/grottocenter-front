@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import { IconButton, Tooltip } from '@mui/material';
@@ -53,36 +53,86 @@ const CompassControl = () => {
   const [needleBearing, setNeedleBearing] = useState(0);
   const needleBearingRef = useRef(0);
 
-  // Follow the compass heading while active.
-  useEffect(() => {
-    if (!active || heading === null) return;
-    map.setBearing(headingToBearing(heading));
-  }, [active, heading, map]);
+  // Bearing application is coalesced to at most one map.setBearing per animation
+  // frame and suspended during zoom animations, so following the compass never
+  // floods the (CPU-bound) rotated redraws nor fights the zoom animation.
+  const targetBearingRef = useRef(0);
+  const rafRef = useRef(null);
+  const zoomingRef = useRef(false);
 
-  // Keep the needle pointing to North, accumulating the shortest delta so it
-  // never animates a full turn across the 0°/360° wrap.
-  useEffect(() => {
-    if (!active || error || heading === null) {
-      needleBearingRef.current = 0;
-      setNeedleBearing(0);
-      return;
-    }
-    const target = headingToBearing(heading);
+  const applyBearing = useCallback(() => {
+    rafRef.current = null;
+    if (zoomingRef.current) return;
+    const target = targetBearingRef.current;
+    map.setBearing(target);
     const next =
       needleBearingRef.current +
       shortestAngleDelta(needleBearingRef.current, target);
     needleBearingRef.current = next;
     setNeedleBearing(next);
-  }, [active, error, heading]);
+  }, [map]);
 
-  // Any error (permission denied or no sensor) cancels the follow mode and
-  // restores a north-up map.
+  const scheduleBearing = useCallback(() => {
+    if (rafRef.current !== null || zoomingRef.current) return;
+    rafRef.current = requestAnimationFrame(applyBearing);
+  }, [applyBearing]);
+
+  const resetNorth = useCallback(() => {
+    if (rafRef.current !== null) {
+      cancelAnimationFrame(rafRef.current);
+      rafRef.current = null;
+    }
+    targetBearingRef.current = 0;
+    needleBearingRef.current = 0;
+    setNeedleBearing(0);
+    map.setBearing(0);
+  }, [map]);
+
+  // Queue the latest heading; the rAF loop applies it at most once per frame.
+  useEffect(() => {
+    if (!active || heading === null) return;
+    targetBearingRef.current = headingToBearing(heading);
+    scheduleBearing();
+  }, [active, heading, scheduleBearing]);
+
+  // Suspend bearing updates while a zoom animation runs; apply the latest on end.
+  useEffect(() => {
+    const onZoomStart = () => {
+      zoomingRef.current = true;
+    };
+    const onZoomEnd = () => {
+      zoomingRef.current = false;
+      if (active) scheduleBearing();
+    };
+    map.on('zoomstart', onZoomStart);
+    map.on('zoomend', onZoomEnd);
+    return () => {
+      map.off('zoomstart', onZoomStart);
+      map.off('zoomend', onZoomEnd);
+    };
+  }, [map, active, scheduleBearing]);
+
+  // Let the rest of the map (e.g. heatmaps) react to the follow state so heavy
+  // layers can be hidden while the map is continuously rotating.
+  useEffect(() => {
+    map.fire('compassfollowchange', { following: active && !error });
+  }, [map, active, error]);
+
+  // Any error (permission denied or no sensor) cancels the follow mode.
   useEffect(() => {
     if (error && active) {
       setActive(false);
-      map.setBearing(0);
+      resetNorth();
     }
-  }, [error, active, map]);
+  }, [error, active, resetNorth]);
+
+  // Cancel any pending frame on unmount.
+  useEffect(
+    () => () => {
+      if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
+    },
+    []
+  );
 
   // Device without an orientation sensor (typically desktop): hide the button.
   if (!isSupported) return null;
@@ -91,7 +141,7 @@ const CompassControl = () => {
     if (active) {
       stop();
       setActive(false);
-      map.setBearing(0);
+      resetNorth();
       return;
     }
     const started = await start();

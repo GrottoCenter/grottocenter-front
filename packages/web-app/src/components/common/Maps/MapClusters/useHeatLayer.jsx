@@ -162,8 +162,16 @@ const useHeatLayer = () => {
   // Panes are created first so each layer's SVG lands in its own pane with a fixed z-index,
   // guaranteeing massifs always renders below entrances and networks regardless of redraw order.
   useEffect(() => {
+    // Create the hex panes inside the rotatePane (when leaflet-rotate is active)
+    // so the d3 SVG rotates with the map. Otherwise Leaflet attaches them to the
+    // mapPane — a sibling of the rotatePane — and the hexagons stay in the
+    // unrotated frame, ending up misplaced once the map is turned. Falls back to
+    // the default parent when the map has no rotation enabled.
+    const rotatePane = map.getPane('rotatePane');
     LAYER_PANE_CONFIG.forEach(({ pane, z }) => {
-      if (!map.getPane(pane)) map.createPane(pane).style.zIndex = z;
+      if (!map.getPane(pane)) {
+        map.createPane(pane, rotatePane || undefined).style.zIndex = z;
+      }
     });
 
     LAYER_PANE_CONFIG.forEach(({ type, pane }) => {

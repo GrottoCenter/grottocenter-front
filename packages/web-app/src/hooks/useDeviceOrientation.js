@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-// Minimum interval (ms) between two heading updates and minimum angular change
-// (degrees) required to emit a new value. Together they smooth out the ~60Hz
-// sensor stream and avoid unnecessary re-renders / map jitter.
-const THROTTLE_MS = 100;
+// Hard rate limit (ms) between two heading updates, plus the minimum angular
+// change (degrees) required to emit a new value. The sensor fires at ~60Hz;
+// each emitted value triggers a full map rotation redraw, so we cap the rate
+// AND drop sub-threshold jitter to keep the map responsive.
+const THROTTLE_MS = 120;
 const MIN_DELTA_DEG = 2;
 // If no valid heading is received within this delay after starting, we consider
 // the device has no usable compass (e.g. a desktop that exposes the API but has
@@ -61,14 +62,18 @@ const useDeviceOrientation = () => {
       // First real reading: the device has a working compass.
       clearNoDataTimer();
 
+      // Hard rate cap first: never emit more than once per THROTTLE_MS,
+      // whatever the sensor frequency.
       const now = Date.now();
+      if (now - lastEmitRef.current < THROTTLE_MS) return;
+
+      // Then drop sub-threshold jitter to avoid needless redraws.
       const previous = lastHeadingRef.current;
       const delta =
         previous === null
           ? MIN_DELTA_DEG
           : Math.abs(((nextHeading - previous + 540) % 360) - 180);
-
-      if (now - lastEmitRef.current < THROTTLE_MS && delta < MIN_DELTA_DEG) return;
+      if (delta < MIN_DELTA_DEG) return;
 
       lastEmitRef.current = now;
       lastHeadingRef.current = nextHeading;
