@@ -4,6 +4,24 @@
 
 ---
 
+## 🗂️ Path Aliases
+
+The `@` alias is configured in `vite.config.mjs` and points to `src/`. Use it in all new files for any import that would require two or more `../` hops.
+
+```javascript
+// ✅
+import { fetchCave } from '@/actions/Cave';
+import grottoTheme from '@/conf/grottoTheme';
+import ActionButton from '@/components/common/ActionButton';
+
+// ❌ Do not write new relative deep imports
+import { fetchCave } from '../../../actions/Cave';
+```
+
+The alias also works in `vite.config.mjs` test configuration (Vitest resolves it via the same config). Existing `../` imports are migrated progressively in a dedicated `tech/path-aliases` PR — do not mix with feature or fix work.
+
+---
+
 ## 📁 src/hooks/ vs src/utils/
 
 - **`src/hooks/`** — Custom React hooks only. Every file must export one or more functions whose name starts with `use`. No plain constants or pure utility functions.
@@ -322,13 +340,19 @@ describe('Cave page', () => {
 });
 ```
 
-### Unit — React Testing Library
+### Unit — Vitest + React Testing Library
+
+Tests run on **Vitest** (`yarn test`, jsdom env, globals enabled — `describe`,
+`it`, `expect`, `vi` need no import). Use `vi.*` instead of `jest.*`. When a
+factory mocks a module imported as `default`, return `{ default: ... }`. Prefer
+top-level ESM `import` over `require()` inside tests (`vi.mock` is hoisted, so the
+import already receives the mock).
 
 ```javascript
 import { render, screen, fireEvent } from '@testing-library/react';
 
 it('calls onClick when clicked', () => {
-  const handleClick = jest.fn();
+  const handleClick = vi.fn();
   render(<ActionButton label="Click me" onClick={handleClick} />);
   fireEvent.click(screen.getByText('Click me'));
   expect(handleClick).toHaveBeenCalledTimes(1);
@@ -337,26 +361,31 @@ it('calls onClick when clicked', () => {
 
 ### Storybook
 
+Storybook runs on the **Vite builder** (`@storybook/react-vite`, Storybook 9+) and
+reuses the project `vite.config.mjs`. Stories use the **CSF3** format (object
+exports), not the legacy `storiesOf` API.
+
 ```bash
-yarn storybook    # port 6006
+yarn storybook    # port 6007
 ```
 
-Create a story for every new reusable component:
+Create a story for every new reusable component (named default export to satisfy
+`import/no-anonymous-default-export`):
 
 ```javascript
-// ActionButton.stories.js
-export default { title: 'Common/ActionButton', component: ActionButton };
+// ActionButton.stories.jsx  (or _stories.jsx)
+import ActionButton from './index';
 
-export const Default = () => (
-  <ActionButton label="Click me" onClick={() => {}} />
-);
-export const Loading = () => (
-  <ActionButton label="Loading..." loading onClick={() => {}} />
-);
-export const Disabled = () => (
-  <ActionButton label="Disabled" disabled onClick={() => {}} />
-);
+const meta = { title: 'Common/ActionButton', component: ActionButton };
+export default meta;
+
+export const Default = { args: { label: 'Click me', onClick: () => {} } };
+export const Loading = { args: { label: 'Loading...', loading: true } };
+export const Disabled = { args: { label: 'Disabled', disabled: true } };
 ```
+
+Controls replace the removed `addon-knobs`; use `args` + `argTypes`. Actions come
+from `storybook/actions` (`import { action } from 'storybook/actions'`).
 
 ---
 
@@ -364,17 +393,22 @@ export const Disabled = () => (
 
 File: `packages/web-app/.env`
 
+Vite only exposes variables prefixed with `VITE_`, read via `import.meta.env` (not
+`process.env`).
+
 ```bash
-REACT_APP_API_URL=https://api.grottocenter.org
-REACT_APP_OAI_URL=https://oai.grottocenter.org
-REACT_APP_Z3950_URL=https://z3950.grottocenter.org
+VITE_API_URL=https://api.grottocenter.org
+VITE_OAI_URL=https://oai.grottocenter.org
+VITE_Z3950_URL=https://z3950.grottocenter.org
 ```
 
 For local development:
 
 ```bash
-REACT_APP_API_URL=http://localhost:3001
+VITE_API_URL=http://localhost:3001
 ```
+
+In code: `import.meta.env.VITE_API_URL`. Types are declared in `src/vite-env.d.ts`.
 
 ---
 
@@ -559,7 +593,8 @@ src/components/common/Maps/MapClusters/
 
 ## 🚀 Azure Deployment
 
-The app (`packages/web-app`) is deployed on **Azure Static Web Apps** from the `build/` folder.
+The app (`packages/web-app`) is built by **Vite** and deployed on **Azure Static
+Web Apps** from the `dist/` folder.
 
 - **Auto-deploy**: every push to `develop`
 - **PR staging**: up to 3 PRs get a preview URL automatically
@@ -567,7 +602,7 @@ The app (`packages/web-app`) is deployed on **Azure Static Web Apps** from the `
 To test the production build locally:
 
 ```bash
-npm install -g serve
 cd packages/web-app
-serve -s build
+yarn build           # outputs to dist/
+yarn preview         # serves dist/ on a local Vite preview server
 ```

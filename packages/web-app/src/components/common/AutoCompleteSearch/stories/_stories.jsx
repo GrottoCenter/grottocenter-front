@@ -1,6 +1,5 @@
 import React from 'react';
-import { storiesOf } from '@storybook/react';
-import { action } from '@storybook/addon-actions';
+import { action } from 'storybook/actions';
 import { styled } from '@mui/material/styles';
 import {
   Typography,
@@ -151,4 +150,13 @@ const WithState = () => {
   );
 };
 
-storiesOf('AutoCompleteSearch', module).add('Default', () => <WithState />);
+const meta = {
+  title: 'AutoCompleteSearch',
+  component: AutoCompleteSearch
+};
+
+export default meta;
+
+export const Default = {
+  render: () => <WithState />
+};

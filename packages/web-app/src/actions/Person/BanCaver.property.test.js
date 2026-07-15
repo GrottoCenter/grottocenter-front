@@ -1,11 +1,12 @@
 import fc from 'fast-check';
+import fetch from 'isomorphic-fetch';
 import { postBanCaver, postUnbanCaver } from './BanCaver';
 
 // Mock isomorphic-fetch
-jest.mock('isomorphic-fetch');
+vi.mock('isomorphic-fetch', () => ({ default: vi.fn() }));
 
 // Mock the Login module
-jest.mock('../Login', () => ({
+vi.mock('../Login', () => ({
   postLogout: () => mockPostLogoutThunk
 }));
 
@@ -34,7 +35,7 @@ describe('Property 7: Ban/Unban action creator dispatch sequence', () => {
   });
 
   afterEach(() => {
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
   });
 
   const caverIdArb = fc.oneof(
@@ -49,7 +50,6 @@ describe('Property 7: Ban/Unban action creator dispatch sequence', () => {
   it('postBanCaver dispatches loading then success on 200', async () => {
     await fc.assert(
       fc.asyncProperty(caverIdArb, async caverId => {
-        const fetch = require('isomorphic-fetch');
         fetch.mockResolvedValue({ status: 200 });
 
         const dispatched = [];
@@ -72,7 +72,6 @@ describe('Property 7: Ban/Unban action creator dispatch sequence', () => {
   it('postBanCaver dispatches loading then failure on non-401 error', async () => {
     await fc.assert(
       fc.asyncProperty(caverIdArb, async caverId => {
-        const fetch = require('isomorphic-fetch');
         fetch.mockResolvedValue({
           status: 403,
           json: () => Promise.resolve({ message: 'Forbidden' })
@@ -99,7 +98,6 @@ describe('Property 7: Ban/Unban action creator dispatch sequence', () => {
   it('postBanCaver skips failure dispatch on 401 auth error', async () => {
     await fc.assert(
       fc.asyncProperty(caverIdArb, async caverId => {
-        const fetch = require('isomorphic-fetch');
         fetch.mockResolvedValue({ status: 401 });
 
         const dispatched = [];
@@ -125,7 +123,6 @@ describe('Property 7: Ban/Unban action creator dispatch sequence', () => {
   it('postUnbanCaver dispatches loading then success on 200', async () => {
     await fc.assert(
       fc.asyncProperty(caverIdArb, async caverId => {
-        const fetch = require('isomorphic-fetch');
         fetch.mockResolvedValue({ status: 200 });
 
         const dispatched = [];
@@ -148,7 +145,6 @@ describe('Property 7: Ban/Unban action creator dispatch sequence', () => {
   it('postUnbanCaver dispatches loading then failure on non-401 error', async () => {
     await fc.assert(
       fc.asyncProperty(caverIdArb, async caverId => {
-        const fetch = require('isomorphic-fetch');
         fetch.mockResolvedValue({
           status: 404,
           json: () => Promise.resolve({ message: 'Not Found' })
@@ -175,7 +171,6 @@ describe('Property 7: Ban/Unban action creator dispatch sequence', () => {
   it('postUnbanCaver skips failure dispatch on 401 auth error', async () => {
     await fc.assert(
       fc.asyncProperty(caverIdArb, async caverId => {
-        const fetch = require('isomorphic-fetch');
         fetch.mockResolvedValue({ status: 401 });
 
         const dispatched = [];

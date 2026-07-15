@@ -21,13 +21,13 @@ const messages = {
 const baseProps = {
   isLoading: false,
   isUpdating: false,
-  setIsUpdating: jest.fn(),
+  setIsUpdating: vi.fn(),
   isDeleted: false,
   canEdit: true,
   canDelete: true,
   snapshotEl: <button type="button">Snapshot</button>,
-  onDeletePress: jest.fn(),
-  onRestorePress: jest.fn()
+  onDeletePress: vi.fn(),
+  onRestorePress: vi.fn()
 };
 
 const renderActionButtons = (props = {}) =>
@@ -44,8 +44,8 @@ const renderActionButtons = (props = {}) =>
 describe('ActionButtons reorder integration', () => {
   it('renders arrows inside ButtonGroup when reorder props are provided', () => {
     renderActionButtons({
-      onMoveUp: jest.fn(),
-      onMoveDown: jest.fn(),
+      onMoveUp: vi.fn(),
+      onMoveDown: vi.fn(),
       isFirst: false,
       isLast: false,
       isMoveLoading: false
@@ -57,8 +57,8 @@ describe('ActionButtons reorder integration', () => {
 
   it('hides up arrow when isFirst is true', () => {
     renderActionButtons({
-      onMoveUp: jest.fn(),
-      onMoveDown: jest.fn(),
+      onMoveUp: vi.fn(),
+      onMoveDown: vi.fn(),
       isFirst: true,
       isLast: false,
       isMoveLoading: false
@@ -70,8 +70,8 @@ describe('ActionButtons reorder integration', () => {
 
   it('hides down arrow when isLast is true', () => {
     renderActionButtons({
-      onMoveUp: jest.fn(),
-      onMoveDown: jest.fn(),
+      onMoveUp: vi.fn(),
+      onMoveDown: vi.fn(),
       isFirst: false,
       isLast: true,
       isMoveLoading: false
@@ -83,8 +83,8 @@ describe('ActionButtons reorder integration', () => {
 
   it('shows spinner instead of arrows when isMoveLoading is true', () => {
     renderActionButtons({
-      onMoveUp: jest.fn(),
-      onMoveDown: jest.fn(),
+      onMoveUp: vi.fn(),
+      onMoveDown: vi.fn(),
       isFirst: false,
       isLast: false,
       isMoveLoading: true
@@ -103,10 +103,10 @@ describe('ActionButtons reorder integration', () => {
   });
 
   it('calls onMoveUp when up arrow is clicked', () => {
-    const onMoveUp = jest.fn();
+    const onMoveUp = vi.fn();
     renderActionButtons({
       onMoveUp,
-      onMoveDown: jest.fn(),
+      onMoveDown: vi.fn(),
       isFirst: false,
       isLast: false,
       isMoveLoading: false
@@ -117,9 +117,9 @@ describe('ActionButtons reorder integration', () => {
   });
 
   it('calls onMoveDown when down arrow is clicked', () => {
-    const onMoveDown = jest.fn();
+    const onMoveDown = vi.fn();
     renderActionButtons({
-      onMoveUp: jest.fn(),
+      onMoveUp: vi.fn(),
       onMoveDown,
       isFirst: false,
       isLast: false,

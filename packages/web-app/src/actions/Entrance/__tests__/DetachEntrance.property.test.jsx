@@ -1,15 +1,15 @@
 import fc from 'fast-check';
 import { postCreateCaveUrl } from '../../../conf/apiRoutes';
+// vi.mock is hoisted above these imports, so detachEntranceToNewCave already
+// receives the mocked isomorphic-fetch.
+import { detachEntranceToNewCave } from '../DetachEntrance';
 
 // Mock isomorphic-fetch at the module level
-const mockFetch = jest.fn();
-jest.mock('isomorphic-fetch', () => ({
+const mockFetch = vi.fn();
+vi.mock('isomorphic-fetch', () => ({
   __esModule: true,
   default: (...args) => mockFetch(...args)
 }));
-
-// Import after mock setup
-const { detachEntranceToNewCave } = require('../DetachEntrance');
 
 /**
  * Shared arbitraries for entrance data.

@@ -1,7 +1,5 @@
 import React from 'react';
-import { storiesOf } from '@storybook/react';
-import { action } from '@storybook/addon-actions';
-import { boolean } from '@storybook/addon-knobs';
+import { action } from 'storybook/actions';
 import PropTypes from 'prop-types';
 import DuplicatesHandler from './index';
 
@@ -180,11 +178,23 @@ const HydratedDuplicatesHandler = ({ isEntrance }) => {
 
   return <DuplicatesHandler {...params} />;
 };
-boolean('Entrances', true);
-storiesOf('Duplicates handler', module).add('Default', () => (
-  <HydratedDuplicatesHandler isEntrance={boolean('Handle entrance', false)} />
-));
 
 HydratedDuplicatesHandler.propTypes = {
   isEntrance: PropTypes.bool.isRequired
+};
+
+const meta = {
+  title: 'Duplicates handler',
+  component: DuplicatesHandler
+};
+
+export default meta;
+
+export const Default = {
+  args: {
+    isEntrance: false
+  },
+  render: ({ isEntrance }) => (
+    <HydratedDuplicatesHandler isEntrance={isEntrance} />
+  )
 };

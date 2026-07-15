@@ -1,7 +1,5 @@
 import React from 'react';
 import { styled } from '@mui/material/styles';
-import { storiesOf } from '@storybook/react';
-// import { action } from '@storybook/addon-actions';
 import { isMobileOnly } from 'react-device-detect';
 
 import { AppBar, Toolbar, Typography, IconButton } from '@mui/material';
@@ -86,4 +84,13 @@ const WithState = () => {
   );
 };
 
-storiesOf('SideMenu', module).add('Default', () => <WithState />);
+const meta = {
+  title: 'SideMenu',
+  component: SideMenu
+};
+
+export default meta;
+
+export const Default = {
+  render: () => <WithState />
+};

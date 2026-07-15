@@ -20,14 +20,14 @@ import { LOGOUT, FETCH_LOGIN_SUCCESS } from '../actions/Login';
 const localStorageMock = (() => {
   let store = {};
   return {
-    getItem: jest.fn(key => store[key] ?? null),
-    setItem: jest.fn((key, value) => {
+    getItem: vi.fn(key => store[key] ?? null),
+    setItem: vi.fn((key, value) => {
       store[key] = String(value);
     }),
-    removeItem: jest.fn(key => {
+    removeItem: vi.fn(key => {
       delete store[key];
     }),
-    clear: jest.fn(() => {
+    clear: vi.fn(() => {
       store = {};
     })
   };
@@ -37,13 +37,14 @@ Object.defineProperty(window, 'localStorage', {
   value: localStorageMock
 });
 
-// Import reducer after localStorage mock is in place
-const reducer = require('./LoginReducer').default;
+// Import reducer after localStorage mock is in place (top-level await keeps
+// the import order so getRawTokenIfNotExpired() sees the mocked localStorage).
+const reducer = (await import('./LoginReducer')).default;
 
 describe('Property 9: Logout clears auth state', () => {
   beforeEach(() => {
     localStorageMock.clear();
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   const tokenArb = fc

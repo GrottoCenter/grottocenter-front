@@ -8,8 +8,8 @@
 </style>
 <link
   rel="stylesheet"
-  href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
-  integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+  href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
   crossorigin=""
 />
 <script>
@@ -38,4 +38,6 @@
     initialLocale: selectedLanguage,
     initialFetchP: null
   };
+  // Expose on window so the ESM Storybook preview bundle can read it.
+  window.intlBootstrap = intlBootstrap;
 </script>

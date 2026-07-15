@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState, Suspense } from 'react';
 import { Provider, useSelector, useDispatch } from 'react-redux';
 import { Outlet } from 'react-router-dom';
 import { IntlProvider, useIntl } from 'react-intl';
@@ -9,7 +9,7 @@ import { createStore, applyMiddleware, compose } from 'redux';
 import { thunk } from 'redux-thunk';
 import PropTypes from 'prop-types';
 import { styled } from '@mui/material/styles';
-import { Alert } from '@mui/material';
+import { Alert, Box, CircularProgress } from '@mui/material';
 import { usePermissions } from '../hooks';
 
 import GCReducer from '../reducers/GCReducer';
@@ -177,8 +177,22 @@ const ApplicationLayout = () => {
       <MainWrapper $isSideMenuOpen={isSideMenuOpen}>
         <LoginDialog />
 
-        {/* Where the individual routes will be rendered */}
-        <Outlet />
+        {/* Where the individual routes will be rendered.
+            Suspense covers the lazily-loaded route components (code-splitting). */}
+        <Suspense
+          fallback={
+            <Box
+              sx={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                flex: 1
+              }}>
+              <CircularProgress />
+            </Box>
+          }>
+          <Outlet />
+        </Suspense>
       </MainWrapper>
     </>
   );

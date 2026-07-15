@@ -2,8 +2,8 @@ import { isNeedlePolygon } from './polygonUtils';
 
 // d3-polygon ships ESM which Jest can't parse without extra config.
 // Mock it with a simple shoelace implementation so we test our logic,
-// not d3's math. Jest hoists jest.mock() above imports automatically.
-jest.mock('d3-polygon', () => ({
+// not d3's math. Jest hoists vi.mock() above imports automatically.
+vi.mock('d3-polygon', () => ({
   polygonArea: coords => {
     let area = 0;
     for (let i = 0; i < coords.length; i++) {

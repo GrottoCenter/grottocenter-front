@@ -472,8 +472,8 @@ const HydratedMap = ({
 const MAP_TOUR_VERSION = 1;
 const MAP_TOUR_SEEN_KEY = `mapTourSeen_v${MAP_TOUR_VERSION}`;
 const MAP_TOUR_SESSION_KEY = `mapTourSeenThisSession_v${MAP_TOUR_VERSION}`;
-// Set REACT_APP_DISABLE_MAP_TOUR=true in .env.local to prevent the tour from launching in dev.
-const MAP_TOUR_DISABLED = process.env.REACT_APP_DISABLE_MAP_TOUR === 'true';
+// Set VITE_DISABLE_MAP_TOUR=true in .env.local to prevent the tour from launching in dev.
+const MAP_TOUR_DISABLED = import.meta.env.VITE_DISABLE_MAP_TOUR === 'true';
 
 const Index = ({ center, zoom, isSideMenuOpen, mapRef, popupTarget = null, ...props }) => {
   const [runTour, setRunTour] = useState(

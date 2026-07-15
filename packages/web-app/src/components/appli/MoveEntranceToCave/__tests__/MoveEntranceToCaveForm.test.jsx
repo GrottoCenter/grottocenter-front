@@ -11,35 +11,35 @@ import { IntlProvider } from 'react-intl';
 import MoveEntranceToCaveForm from '../MoveEntranceToCaveForm';
 
 // ---- Navigation mock ----
-const mockNavigate = jest.fn();
-jest.mock('react-router-dom', () => ({
+const mockNavigate = vi.fn();
+vi.mock('react-router-dom', () => ({
   useNavigate: () => mockNavigate,
   useSearchParams: () => [new URLSearchParams(''), jest.fn()]
 }));
 
 // ---- Notification mock ----
-const mockOnSuccess = jest.fn();
-jest.mock('../../../../hooks/useNotification', () => ({
+const mockOnSuccess = vi.fn();
+vi.mock('../../../../hooks/useNotification', () => ({
   useNotification: () => ({
     onSuccess: mockOnSuccess,
-    onError: jest.fn(),
-    onWarning: jest.fn(),
-    onInfo: jest.fn()
+    onError: vi.fn(),
+    onWarning: vi.fn(),
+    onInfo: vi.fn()
   })
 }));
 
 // ---- Redux mock ----
-const mockDispatch = jest.fn(() => Promise.resolve());
+const mockDispatch = vi.fn(() => Promise.resolve());
 let mockStoreState = {};
 
-jest.mock('react-redux', () => ({
-  ...jest.requireActual('react-redux'),
+vi.mock('react-redux', async () => ({
+  ...(await vi.importActual('react-redux')),
   useDispatch: () => mockDispatch,
   useSelector: selector => selector(mockStoreState)
 }));
 
 // ---- Action mocks ----
-jest.mock('../../../../actions/MoveEntranceToCave', () => ({
+vi.mock('../../../../actions/MoveEntranceToCave', () => ({
   moveEntranceToCave: (entranceId, caveId) => ({
     type: 'MOVE_ENTRANCE_TO_CAVE',
     entranceId,
@@ -47,63 +47,58 @@ jest.mock('../../../../actions/MoveEntranceToCave', () => ({
   })
 }));
 
+vi.mock('../../../../actions/Entrance/DetachEntrance', () => ({
+  detachEntranceToNewCave: vi.fn(() => ({ type: 'DETACH_ENTRANCE' })),
+  resetDetachEntrance: vi.fn(() => ({ type: 'DETACH_ENTRANCE_RESET' }))
+}));
+
 // ---- Mock child components not relevant to this test ----
-jest.mock(
-  '../../../common/AutoCompleteSearch/CaveAutoCompleteSearch',
-  () =>
-    function MockCaveAutoCompleteSearch({ onSelection }) {
-      return (
-        <button
-          type="button"
-          data-testid="mock-cave-search"
-          onClick={() => onSelection({ id: '42', name: 'Destination Cave' })}
-        >
-          Select Cave
-        </button>
-      );
-    }
-);
+vi.mock('../../../common/AutoCompleteSearch/CaveAutoCompleteSearch', () => ({
+  default: function MockCaveAutoCompleteSearch({ onSelection }) {
+    return (
+      <button
+        type="button"
+        data-testid="mock-cave-search"
+        onClick={() => onSelection({ id: '42', name: 'Destination Cave' })}
+      >
+        Select Cave
+      </button>
+    );
+  }
+}));
 
-jest.mock(
-  '../Header',
-  () =>
-    function MockHeader() {
-      return <div data-testid="mock-header">Header</div>;
-    }
-);
+vi.mock('../Header', () => ({
+  default: function MockHeader() {
+    return <div data-testid="mock-header">Header</div>;
+  }
+}));
 
-jest.mock(
-  '../OperationSummary',
-  () =>
-    function MockOperationSummary() {
-      return <div data-testid="mock-operation-summary">OperationSummary</div>;
-    }
-);
+vi.mock('../OperationSummary', () => ({
+  default: function MockOperationSummary() {
+    return <div data-testid="mock-operation-summary">OperationSummary</div>;
+  }
+}));
 
-jest.mock(
-  '../DetachEntranceSection',
-  () =>
-    function MockDetachEntranceSection() {
-      return <div data-testid="mock-detach-section">DetachSection</div>;
-    }
-);
+vi.mock('../DetachEntranceSection', () => ({
+  default: function MockDetachEntranceSection() {
+    return <div data-testid="mock-detach-section">DetachSection</div>;
+  }
+}));
 
-jest.mock(
-  '../FormActions',
-  () =>
-    function MockFormActions({ onConfirm, disabled }) {
-      return (
-        <button
-          type="button"
-          data-testid="validate"
-          disabled={disabled}
-          onClick={onConfirm}
-        >
-          Validate
-        </button>
-      );
-    }
-);
+vi.mock('../FormActions', () => ({
+  default: function MockFormActions({ onConfirm, disabled }) {
+    return (
+      <button
+        type="button"
+        data-testid="validate"
+        disabled={disabled}
+        onClick={onConfirm}
+      >
+        Validate
+      </button>
+    );
+  }
+}));
 
 const messages = {
   'Entrance successfully moved.': 'Entrance successfully moved.',

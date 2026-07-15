@@ -1,6 +1,5 @@
 import React from 'react';
-import { storiesOf } from '@storybook/react';
-import { action } from '@storybook/addon-actions';
+import { action } from 'storybook/actions';
 import { Button, CircularProgress, Divider, Switch } from '@mui/material';
 import FaceIcon from '@mui/icons-material/Face';
 import { styled } from '@mui/material/styles';
@@ -124,8 +123,18 @@ DialogLoginForm.propTypes = {
   isOpen: PropTypes.bool
 };
 
-storiesOf('Login', module)
-  .add('Default', () => <DefaultLoginForm />)
-  .add('In Dialog', () => (
-    <DialogLoginForm serverError="Invalid email or password." />
-  ));
+const meta = {
+  title: 'Login',
+  component: LoginForm
+};
+
+export default meta;
+
+export const Default = {
+  render: () => <DefaultLoginForm />
+};
+
+export const InDialog = {
+  name: 'In Dialog',
+  render: () => <DialogLoginForm serverError="Invalid email or password." />
+};

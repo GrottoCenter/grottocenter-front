@@ -5,11 +5,11 @@ import MapMassif from './MapMassif';
 
 // --- Mocks ---
 
-const mockUpdateLayers = jest.fn();
-const mockUpdateEntranceMarkers = jest.fn();
+const mockUpdateLayers = vi.fn();
+const mockUpdateEntranceMarkers = vi.fn();
 let mockZoom = 8;
 
-jest.mock('react-leaflet', () => {
+vi.mock('react-leaflet', () => {
   const React = require('react');
   return {
     useMap: () => ({
@@ -18,35 +18,39 @@ jest.mock('react-leaflet', () => {
         _southWest: { wrap: () => ({ lat: -10, lng: -10 }) },
         _northEast: { wrap: () => ({ lat: 10, lng: 10 }) }
       }),
-      fitBounds: jest.fn(),
+      fitBounds: vi.fn(),
       getContainer: () => ({ offsetWidth: 100, offsetHeight: 100 }),
-      on: jest.fn(),
-      off: jest.fn()
+      on: vi.fn(),
+      off: vi.fn()
     }),
-    useMapEvent: jest.fn(),
-    useMapEvents: jest.fn(),
+    useMapEvent: vi.fn(),
+    useMapEvents: vi.fn(),
     GeoJSON: () => React.createElement('div', { 'data-testid': 'geojson' })
   };
 });
 
-jest.mock('leaflet', () => ({
-  geoJSON: () => ({
-    getBounds: () => ({
-      isValid: () => true,
-      getSouthWest: () => ({ lat: -10, lng: -10 }),
-      getNorthEast: () => ({ lat: 10, lng: 10 })
-    })
-  }),
-  svg: () => ({})
-}));
-
-jest.mock('../../common/Maps/common/MapContainer', () => {
-  const React = require('react');
-  return ({ children }) =>
-    React.createElement('div', { 'data-testid': 'map-container' }, children);
+vi.mock('leaflet', () => {
+  const leafletMock = {
+    geoJSON: () => ({
+      getBounds: () => ({
+        isValid: () => true,
+        getSouthWest: () => ({ lat: -10, lng: -10 }),
+        getNorthEast: () => ({ lat: 10, lng: 10 })
+      })
+    }),
+    svg: () => ({})
+  };
+  return { __esModule: true, default: leafletMock, ...leafletMock };
 });
 
-jest.mock('../../common/Maps/MapClusters/useHeatLayer', () => {
+vi.mock('../../common/Maps/common/MapContainer', () => {
+  const React = require('react');
+  const MockMapContainer = ({ children }) =>
+    React.createElement('div', { 'data-testid': 'map-container' }, children);
+  return { __esModule: true, default: MockMapContainer };
+});
+
+vi.mock('../../common/Maps/MapClusters/useHeatLayer', () => {
   const React = require('react');
   return {
     __esModule: true,
@@ -55,7 +59,7 @@ jest.mock('../../common/Maps/MapClusters/useHeatLayer', () => {
   };
 });
 
-jest.mock('../../common/Maps/common/Markers/useMarkers', () => {
+vi.mock('../../common/Maps/common/Markers/useMarkers', () => {
   const React = require('react');
   return {
     __esModule: true,
@@ -64,16 +68,17 @@ jest.mock('../../common/Maps/common/Markers/useMarkers', () => {
   };
 });
 
-jest.mock('../../common/Maps/common/Markers/Components', () => ({
+vi.mock('../../common/Maps/common/Markers/Components', () => ({
   EntranceMarker: 'entrance-marker',
   EntrancePopup: () => null
 }));
 
-jest.mock('../../common/Maps/MapClusters/constants', () => ({
+vi.mock('../../common/Maps/MapClusters/constants', async importOriginal => ({
+  ...(await importOriginal()),
   MARKERS_LIMIT: 13
 }));
 
-jest.mock('../../../conf/apiRoutes', () => ({
+vi.mock('../../../conf/apiRoutes', () => ({
   getMapEntrancesCoordinatesUrl: '/api/v1/geoloc/entrancesCoordinates',
   getMapEntrancesUrl: '/api/v1/geoloc/entrances'
 }));
@@ -88,7 +93,7 @@ const samplePolygon = JSON.stringify({
 // --- Tests ---
 
 beforeEach(() => {
-  jest.restoreAllMocks();
+  vi.restoreAllMocks();
   mockUpdateLayers.mockClear();
   mockUpdateEntranceMarkers.mockClear();
   mockZoom = 8;
@@ -102,7 +107,7 @@ describe('MapMassif', () => {
   describe('at low zoom (< MARKERS_LIMIT)', () => {
     it('calls updateLayers with coordinates for entrances', async () => {
       const coords = [[5.5, 44.1], [6.2, 43.8], [7.0, 45.0]];
-      global.fetch = jest.fn().mockResolvedValue({
+      global.fetch = vi.fn().mockResolvedValue({
         ok: true,
         json: () => Promise.resolve(coords)
       });
@@ -116,7 +121,7 @@ describe('MapMassif', () => {
 
     it('clears markers when receiving coordinates', async () => {
       const coords = [[5.5, 44.1]];
-      global.fetch = jest.fn().mockResolvedValue({
+      global.fetch = vi.fn().mockResolvedValue({
         ok: true,
         json: () => Promise.resolve(coords)
       });
@@ -129,7 +134,7 @@ describe('MapMassif', () => {
     });
 
     it('fetches from entrancesCoordinates endpoint', async () => {
-      global.fetch = jest.fn().mockResolvedValue({
+      global.fetch = vi.fn().mockResolvedValue({
         ok: true,
         json: () => Promise.resolve([])
       });
@@ -155,7 +160,7 @@ describe('MapMassif', () => {
       const entrances = [
         { id: 1, name: 'Cave A', latitude: 44.1, longitude: 5.5 }
       ];
-      global.fetch = jest.fn().mockResolvedValue({
+      global.fetch = vi.fn().mockResolvedValue({
         ok: true,
         json: () => Promise.resolve(entrances)
       });
@@ -175,7 +180,7 @@ describe('MapMassif', () => {
         { id: 1, name: 'Cave A', latitude: 44.1, longitude: 5.5 },
         { id: 2, name: 'Cave B', latitude: 45.0, longitude: 6.2 }
       ];
-      global.fetch = jest.fn().mockResolvedValue({
+      global.fetch = vi.fn().mockResolvedValue({
         ok: true,
         json: () => Promise.resolve(entrances)
       });
@@ -193,7 +198,7 @@ describe('MapMassif', () => {
       const entrances = [
         { id: 1, name: 'Cave A', latitude: 44.1, longitude: 5.5 }
       ];
-      global.fetch = jest.fn().mockResolvedValue({
+      global.fetch = vi.fn().mockResolvedValue({
         ok: true,
         json: () => Promise.resolve(entrances)
       });
@@ -208,7 +213,7 @@ describe('MapMassif', () => {
 
   describe('error handling', () => {
     it('renders polygon when fetch returns empty array', async () => {
-      global.fetch = jest.fn().mockResolvedValue({
+      global.fetch = vi.fn().mockResolvedValue({
         ok: true,
         json: () => Promise.resolve([])
       });
@@ -223,7 +228,7 @@ describe('MapMassif', () => {
     });
 
     it('renders polygon when fetch returns 404', async () => {
-      global.fetch = jest.fn().mockResolvedValue({
+      global.fetch = vi.fn().mockResolvedValue({
         ok: false,
         status: 404,
         json: () => Promise.resolve({ message: 'Not found' })
@@ -239,7 +244,7 @@ describe('MapMassif', () => {
     });
 
     it('renders polygon when fetch returns 500', async () => {
-      global.fetch = jest.fn().mockResolvedValue({
+      global.fetch = vi.fn().mockResolvedValue({
         ok: false,
         status: 500,
         json: () => Promise.resolve({ message: 'Server error' })

@@ -1,19 +1,15 @@
-module.exports = {
-  stories: ['../src/**/*.stories.@(jsx|js)', '../src/**/_stories.@(jsx|js)'],
-  addons: [
-    '@storybook/addon-links',
-    '@storybook/addon-essentials',
-    '@storybook/addon-knobs',
-    '@storybook/addon-actions',
-    '@storybook/addon-viewport'
-  ],
-  framework: '@storybook/react-webpack5',
-  staticDirs: ['../public'],
-  docs: { autodocs: true },
-  features: {
-    storyStoreV7: false
+/** @type { import('@storybook/react-vite').StorybookConfig } */
+const config = {
+  stories: ['../src/**/*.stories.@(js|jsx)', '../src/**/_stories.@(js|jsx)'],
+  addons: ['@storybook/addon-links'],
+  framework: {
+    name: '@storybook/react-vite',
+    options: {}
   },
+  staticDirs: ['../public'],
   core: {
     disableTelemetry: true
   }
 };
+
+export default config;

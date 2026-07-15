@@ -1,11 +1,12 @@
 import fc from 'fast-check';
+import fetch from 'isomorphic-fetch';
 import { fetchInvalidEmailCavers } from './GetPerson';
 
 // Mock isomorphic-fetch
-jest.mock('isomorphic-fetch');
+vi.mock('isomorphic-fetch', () => ({ default: vi.fn() }));
 
 // Mock the Login module
-jest.mock('../Login', () => ({
+vi.mock('../Login', () => ({
   postLogout: () => mockPostLogoutThunk
 }));
 
@@ -60,13 +61,12 @@ const makeDispatchSpy = () => {
  */
 describe('Feature: invalid-email-cavers, Property 1: Action creator extracts cavers field', () => {
   afterEach(() => {
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
   });
 
   it('dispatches success with the exact cavers array from the API response', async () => {
     await fc.assert(
       fc.asyncProperty(caversArrayArb, async cavers => {
-        const fetch = require('isomorphic-fetch');
         fetch.mockResolvedValue({
           status: 200,
           json: () => Promise.resolve({ cavers })
@@ -102,7 +102,7 @@ describe('Feature: invalid-email-cavers, Property 1: Action creator extracts cav
  */
 describe('Feature: invalid-email-cavers, Property 2: Missing cavers field falls back to empty array', () => {
   afterEach(() => {
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
   });
 
   const responseWithoutCaversArb = fc
@@ -112,11 +112,10 @@ describe('Feature: invalid-email-cavers, Property 2: Missing cavers field falls 
     );
 
   it('dispatches success with an empty array when cavers field is missing', async () => {
-    const consoleSpy = jest.spyOn(console, 'warn').mockImplementation();
+    const consoleSpy = vi.spyOn(console, 'warn').mockImplementation();
 
     await fc.assert(
       fc.asyncProperty(responseWithoutCaversArb, async body => {
-        const fetch = require('isomorphic-fetch');
         fetch.mockResolvedValue({
           status: 200,
           json: () => Promise.resolve(body)
@@ -156,7 +155,7 @@ describe('Feature: invalid-email-cavers, Property 2: Missing cavers field falls 
  */
 describe('Feature: invalid-email-cavers, Property 3: Non-auth errors dispatch failure action', () => {
   afterEach(() => {
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
   });
 
   const errorMessageArb = fc.string({ minLength: 1, maxLength: 50 });
@@ -165,7 +164,6 @@ describe('Feature: invalid-email-cavers, Property 3: Non-auth errors dispatch fa
     await fc.assert(
       fc.asyncProperty(errorMessageArb, async msg => {
         const error = new Error(msg);
-        const fetch = require('isomorphic-fetch');
         fetch.mockRejectedValue(error);
 
         const { dispatch, dispatched } = makeDispatchSpy();
@@ -199,11 +197,10 @@ describe('Feature: invalid-email-cavers, Property 3: Non-auth errors dispatch fa
  */
 describe('Feature: invalid-email-cavers, Property 4: Auth errors skip failure dispatch', () => {
   afterEach(() => {
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
   });
 
   it('does not dispatch failure when the API returns 401', async () => {
-    const fetch = require('isomorphic-fetch');
     fetch.mockResolvedValue({ status: 401 });
 
     const { dispatch, dispatched } = makeDispatchSpy();

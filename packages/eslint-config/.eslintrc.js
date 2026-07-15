@@ -25,7 +25,15 @@ module.exports = {
     'import/no-extraneous-dependencies': [
       'error',
       {
-        devDependencies: ['.storybook/**', 'stories/**', '**/*stories.js']
+        devDependencies: [
+          '**/*.test.{js,jsx}',
+          '**/*.spec.{js,jsx}',
+          '**/setupTests.js',
+          '**/vite.config.{js,mjs}',
+          '**/.storybook/**',
+          '**/_stories.{js,jsx}',
+          '**/*.stories.{js,jsx}'
+        ]
       }
     ],
     'no-console': [

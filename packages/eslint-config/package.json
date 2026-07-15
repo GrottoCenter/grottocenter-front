@@ -13,7 +13,6 @@
     "eslint-plugin-prettier": ">=5",
     "eslint-plugin-react": ">=7",
     "eslint-plugin-react-hooks": ">=4",
-    "eslint-plugin-storybook": ">=0",
     "prettier": ">=3"
   }
 }

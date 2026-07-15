@@ -2,27 +2,27 @@ import { renderHook, act } from '@testing-library/react';
 import { useMoveRelevanceWithUndo } from './useMoveRelevanceWithUndo';
 
 // Mock dependencies
-const mockDispatch = jest.fn();
-jest.mock('react-redux', () => ({
+const mockDispatch = vi.fn();
+vi.mock('react-redux', () => ({
   useDispatch: () => mockDispatch
 }));
 
-const mockEnqueueSnackbar = jest.fn();
-const mockCloseSnackbar = jest.fn();
-jest.mock('notistack', () => ({
+const mockEnqueueSnackbar = vi.fn();
+const mockCloseSnackbar = vi.fn();
+vi.mock('notistack', () => ({
   useSnackbar: () => ({
     enqueueSnackbar: mockEnqueueSnackbar,
     closeSnackbar: mockCloseSnackbar
   })
 }));
 
-jest.mock('react-intl', () => ({
+vi.mock('react-intl', () => ({
   useIntl: () => ({
     formatMessage: ({ id }) => id
   })
 }));
 
-jest.mock('@mui/material', () => ({
+vi.mock('@mui/material', () => ({
   Link: ({ children, onClick }) => (
     <a href="#undo" onClick={onClick}>
       {children}
@@ -40,12 +40,12 @@ const failureResult = {
 };
 
 const createMockThunk = (result = successResult) => {
-  const thunk = jest.fn((id, direction) => () => Promise.resolve(result));
+  const thunk = vi.fn((id, direction) => () => Promise.resolve(result));
   return thunk;
 };
 
 beforeEach(() => {
-  jest.clearAllMocks();
+  vi.clearAllMocks();
   mockDispatch.mockImplementation(thunkFn => {
     if (typeof thunkFn === 'function') {
       return thunkFn();

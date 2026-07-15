@@ -8,6 +8,10 @@ import {
   defaultTo,
   equals
 } from 'ramda';
+// Static import is safe: Login.js does not import utils.js, so no circular dep.
+// (Was a lazy require() to guard against circularity; replaced with a static
+// import because Vitest's vi.mock hoisting cannot intercept runtime require().)
+import { postLogout } from './Login';
 
 // Remove the next line when other exports are created.
 export const makeUrl = (url, criterias) => {
@@ -53,11 +57,6 @@ export const convertKmIntoMiles = km => km * 0.621371;
 
 export const checkAuthStatus = dispatch => response => {
   if (response.status === 401) {
-    // Lazy import to avoid potential circular dependency between
-    // utils.js and Login.js (Login.js does not currently import
-    // utils.js, but this keeps the modules decoupled).
-    // eslint-disable-next-line global-require
-    const { postLogout } = require('./Login');
     dispatch(postLogout());
     const err = new Error('Unauthorized');
     err.isAuthError = true;

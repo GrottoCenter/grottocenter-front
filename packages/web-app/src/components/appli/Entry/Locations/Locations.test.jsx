@@ -4,20 +4,20 @@ import { IntlProvider } from 'react-intl';
 import Locations from './index';
 
 // Mock react-redux with a controllable dispatch
-const mockDispatch = jest.fn(() => Promise.resolve());
-jest.mock('react-redux', () => ({
-  ...jest.requireActual('react-redux'),
+const mockDispatch = vi.fn(() => Promise.resolve());
+vi.mock('react-redux', async () => ({
+  ...(await vi.importActual('react-redux')),
   useDispatch: () => mockDispatch,
   useSelector: () => ({})
 }));
 
 // Mock the moveLocationRelevance action creator
-const mockMoveLocationRelevance = jest.fn((id, direction) => ({
+const mockMoveLocationRelevance = vi.fn((id, direction) => ({
   type: 'MOVE_LOCATION_RELEVANCE',
   id,
   direction
 }));
-jest.mock('../../../../actions/Location/MoveRelevance', () => ({
+vi.mock('../../../../actions/Location/MoveRelevance', () => ({
   moveLocationRelevance: (...args) => mockMoveLocationRelevance(...args)
 }));
 
@@ -30,21 +30,21 @@ const mockPermissions = {
   isUser: false,
   isTokenExpired: false
 };
-jest.mock('../../../../hooks', () => ({
+vi.mock('../../../../hooks', () => ({
   usePermissions: () => mockPermissions,
   useAnchorScroll: () => {}
 }));
 
-jest.mock('../../../../actions/Location/CreateLocation', () => ({
-  postLocation: jest.fn(() => ({ type: 'POST_LOCATION' }))
+vi.mock('../../../../actions/Location/CreateLocation', () => ({
+  postLocation: vi.fn(() => ({ type: 'POST_LOCATION' }))
 }));
 
-jest.mock('../../../common/Contribution/Contribution', () => {
+vi.mock('../../../common/Contribution/Contribution', () => {
   const MockContribution = () => <span>contribution</span>;
-  return MockContribution;
+  return { default: MockContribution };
 });
 
-jest.mock('../Snapshots/UtilityFunction', () => ({
+vi.mock('../Snapshots/UtilityFunction', () => ({
   SnapshotButton: () => <button type="button">Snapshot</button>
 }));
 

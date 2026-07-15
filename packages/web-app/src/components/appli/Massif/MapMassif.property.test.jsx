@@ -6,10 +6,10 @@ import MapMassif from './MapMassif';
 
 // --- Mocks (same pattern as MapMassif.test.jsx) ---
 
-const mockUpdateLayers = jest.fn();
-const mockUpdateEntranceMarkers = jest.fn();
+const mockUpdateLayers = vi.fn();
+const mockUpdateEntranceMarkers = vi.fn();
 
-jest.mock('react-leaflet', () => {
+vi.mock('react-leaflet', () => {
   const React = require('react');
   return {
     useMap: () => ({
@@ -18,35 +18,39 @@ jest.mock('react-leaflet', () => {
         _southWest: { wrap: () => ({ lat: -10, lng: -10 }) },
         _northEast: { wrap: () => ({ lat: 10, lng: 10 }) }
       }),
-      fitBounds: jest.fn(),
+      fitBounds: vi.fn(),
       getContainer: () => ({ offsetWidth: 100, offsetHeight: 100 }),
-      on: jest.fn(),
-      off: jest.fn()
+      on: vi.fn(),
+      off: vi.fn()
     }),
-    useMapEvent: jest.fn(),
-    useMapEvents: jest.fn(),
+    useMapEvent: vi.fn(),
+    useMapEvents: vi.fn(),
     GeoJSON: () => React.createElement('div', { 'data-testid': 'geojson' })
   };
 });
 
-jest.mock('leaflet', () => ({
-  geoJSON: () => ({
-    getBounds: () => ({
-      isValid: () => true,
-      getSouthWest: () => ({ lat: -10, lng: -10 }),
-      getNorthEast: () => ({ lat: 10, lng: 10 })
-    })
-  }),
-  svg: () => ({})
-}));
-
-jest.mock('../../common/Maps/common/MapContainer', () => {
-  const React = require('react');
-  return ({ children }) =>
-    React.createElement('div', { 'data-testid': 'map-container' }, children);
+vi.mock('leaflet', () => {
+  const leafletMock = {
+    geoJSON: () => ({
+      getBounds: () => ({
+        isValid: () => true,
+        getSouthWest: () => ({ lat: -10, lng: -10 }),
+        getNorthEast: () => ({ lat: 10, lng: 10 })
+      })
+    }),
+    svg: () => ({})
+  };
+  return { __esModule: true, default: leafletMock, ...leafletMock };
 });
 
-jest.mock('../../common/Maps/MapClusters/useHeatLayer', () => {
+vi.mock('../../common/Maps/common/MapContainer', () => {
+  const React = require('react');
+  const MockMapContainer = ({ children }) =>
+    React.createElement('div', { 'data-testid': 'map-container' }, children);
+  return { __esModule: true, default: MockMapContainer };
+});
+
+vi.mock('../../common/Maps/MapClusters/useHeatLayer', () => {
   const React = require('react');
   return {
     __esModule: true,
@@ -55,7 +59,7 @@ jest.mock('../../common/Maps/MapClusters/useHeatLayer', () => {
   };
 });
 
-jest.mock('../../common/Maps/common/Markers/useMarkers', () => {
+vi.mock('../../common/Maps/common/Markers/useMarkers', () => {
   const React = require('react');
   return {
     __esModule: true,
@@ -64,16 +68,17 @@ jest.mock('../../common/Maps/common/Markers/useMarkers', () => {
   };
 });
 
-jest.mock('../../common/Maps/common/Markers/Components', () => ({
+vi.mock('../../common/Maps/common/Markers/Components', () => ({
   EntranceMarker: 'entrance-marker',
   EntrancePopup: () => null
 }));
 
-jest.mock('../../common/Maps/MapClusters/constants', () => ({
+vi.mock('../../common/Maps/MapClusters/constants', async importOriginal => ({
+  ...(await importOriginal()),
   MARKERS_LIMIT: 13
 }));
 
-jest.mock('../../../conf/apiRoutes', () => ({
+vi.mock('../../../conf/apiRoutes', () => ({
   getMapEntrancesCoordinatesUrl: '/api/v1/geoloc/entrancesCoordinates',
   getMapEntrancesUrl: '/api/v1/geoloc/entrances'
 }));
@@ -103,7 +108,7 @@ afterEach(() => {
  * Validates: Requirements 2.3, 2.4
  */
 describe('MapMassif property tests', () => {
-  jest.setTimeout(30000);
+  vi.setConfig({ testTimeout: 30000 });
 
   const coordArb = fc.array(
     fc.tuple(
@@ -118,7 +123,7 @@ describe('MapMassif property tests', () => {
         mockUpdateLayers.mockClear();
         mockUpdateEntranceMarkers.mockClear();
 
-        global.fetch = jest.fn().mockResolvedValue({
+        global.fetch = vi.fn().mockResolvedValue({
           ok: true,
           json: () => Promise.resolve(coords)
         });

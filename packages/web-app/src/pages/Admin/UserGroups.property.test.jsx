@@ -18,8 +18,8 @@ const messages = {
 
 const defaultProps = {
   isLoading: false,
-  onSaveGroups: jest.fn(),
-  onSaveBan: jest.fn(),
+  onSaveGroups: vi.fn(),
+  onSaveBan: vi.fn(),
   userGroups: [],
   isBanned: false,
   isSelfUser: false
@@ -97,8 +97,8 @@ describe('Property 3: Save button enabled on dirty state', () => {
         groupsArb,
         fc.boolean(),
         (initialGroups, initialBanned, targetGroups, targetBanned) => {
-          const onSaveGroups = jest.fn();
-          const onSaveBan = jest.fn();
+          const onSaveGroups = vi.fn();
+          const onSaveBan = vi.fn();
 
           const { unmount } = renderUserGroups({
             userGroups: initialGroups,
@@ -170,8 +170,8 @@ describe('Property 4: No ban API call when ban state unchanged', () => {
         fc.boolean(),
         groupsArb,
         (initialGroups, isBanned, targetGroups) => {
-          const onSaveGroups = jest.fn();
-          const onSaveBan = jest.fn();
+          const onSaveGroups = vi.fn();
+          const onSaveBan = vi.fn();
 
           const { unmount } = renderUserGroups({
             userGroups: initialGroups,

@@ -2,6 +2,7 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { IntlProvider } from 'react-intl';
+import { MemoryRouter } from 'react-router-dom';
 import FormProgressInfo from '../utils/FormProgressInfo';
 
 // --- Helpers ---
@@ -16,9 +17,11 @@ const messages = {
 
 const renderWithIntl = (ui) =>
   render(
-    <IntlProvider locale="en" messages={messages}>
-      {ui}
-    </IntlProvider>
+    <MemoryRouter>
+      <IntlProvider locale="en" messages={messages}>
+        {ui}
+      </IntlProvider>
+    </MemoryRouter>
   );
 
 // --- Tests ---
@@ -31,7 +34,7 @@ describe('MassifForm area validation error display', () => {
         isError={true}
         labelLoading="Creating massif..."
         labelError={areaErrorMessage}
-        resetFn={jest.fn()}
+        resetFn={vi.fn()}
         getRedirectFn={() => ''}
       />
     );
@@ -40,7 +43,7 @@ describe('MassifForm area validation error display', () => {
   });
 
   it('allows retry after an area validation error', async () => {
-    const resetFn = jest.fn();
+    const resetFn = vi.fn();
     const user = userEvent.setup();
 
     renderWithIntl(
