@@ -8,7 +8,7 @@ import { ThemeProvider, StyledEngineProvider } from '@mui/material/styles';
 
 import GCReducer from '../src/reducers/GCReducer';
 import grottoTheme from '../src/conf/grottoTheme';
-import messages from './en.json';
+import messages from '../public/lang/en.json';
 
 const store = createStore(GCReducer);
 

@@ -59,9 +59,6 @@ export default defineConfig({
     environment: 'jsdom',
     globals: true,
     setupFiles: './src/setupTests.js',
-    css: true,
-    // Property-based tests (fast-check) run many render iterations and can
-    // exceed the 5s default in CI.
-    testTimeout: 30000
+    css: true
   }
 });

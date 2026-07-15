@@ -38,5 +38,6 @@ export const updateHistory =
       .catch(error => {
         if (error.isAuthError) return;
         dispatch(updateHistoryFailure(error));
+        throw error;
       });
   };

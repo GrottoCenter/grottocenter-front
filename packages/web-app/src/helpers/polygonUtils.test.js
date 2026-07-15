@@ -1,8 +1,8 @@
 import { isNeedlePolygon } from './polygonUtils';
 
-// d3-polygon ships ESM which Jest can't parse without extra config.
+// d3-polygon ships ESM which needs special config to work in Vitest.
 // Mock it with a simple shoelace implementation so we test our logic,
-// not d3's math. Jest hoists vi.mock() above imports automatically.
+// not d3's math. Vitest hoists vi.mock() above imports automatically.
 vi.mock('d3-polygon', () => ({
   polygonArea: coords => {
     let area = 0;

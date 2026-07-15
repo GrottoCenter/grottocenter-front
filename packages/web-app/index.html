@@ -196,7 +196,7 @@
       window.intlBootstrap = intlBootstrap;
 
       // Keep in sync with AVAILABLE_LANGUAGES.direction in src/conf/config.js
-      var RTL_LOCALES = ['ar', 'he'];
+      const RTL_LOCALES = ['ar', 'he'];
       document.documentElement.lang = intlBootstrap.initialLocale;
       document.documentElement.dir = RTL_LOCALES.indexOf(intlBootstrap.initialLocale) !== -1 ? 'rtl' : 'ltr';
 

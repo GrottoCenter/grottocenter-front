@@ -38,5 +38,6 @@ export const updateLocation =
       .catch(error => {
         if (error.isAuthError) return;
         dispatch(updateLocationFailure(error));
+        throw error;
       });
   };

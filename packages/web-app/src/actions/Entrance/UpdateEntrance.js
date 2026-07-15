@@ -74,5 +74,6 @@ export const updateEntrance = entranceData => (dispatch, getState) => {
     .catch(error => {
       if (error.isAuthError) return;
       dispatch(updateEntranceFailure(error));
+      throw error;
     });
 };

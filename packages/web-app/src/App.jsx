@@ -168,6 +168,9 @@ const router = createBrowserRouter(
     </Route>
   ),
   {
+    // Opt into React Router v7 behaviour ahead of the v8 migration.
+    // These flags eliminate the deprecation warnings that would otherwise fire
+    // when upgrading, and let us test v7 semantics incrementally.
     future: {
       v7_startTransition: true,
       v7_relativeSplatPath: true,

@@ -38,5 +38,6 @@ export const updateRiggings =
       .catch(error => {
         if (error.isAuthError) return;
         dispatch(updateRiggingsFailure(error));
+        throw error;
       });
   };

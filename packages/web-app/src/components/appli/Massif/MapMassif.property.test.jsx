@@ -108,6 +108,7 @@ afterEach(() => {
  * Validates: Requirements 2.3, 2.4
  */
 describe('MapMassif property tests', () => {
+  // fast-check runs many render iterations — needs more than Vitest's 5s default.
   vi.setConfig({ testTimeout: 30000 });
 
   const coordArb = fc.array(
