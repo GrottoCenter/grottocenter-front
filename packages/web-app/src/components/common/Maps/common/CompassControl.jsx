@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import { IconButton, Tooltip } from '@mui/material';
@@ -11,6 +11,12 @@ import CustomControl from './CustomControl';
 // leaflet-rotate's bearing is the clockwise angle applied to the map, so the
 // map must be turned by the opposite of the compass heading.
 const headingToBearing = heading => -heading;
+
+// Shortest signed angular difference (in ]-180, 180]) from `from` to `to`.
+// Used to accumulate a continuous rotation so the needle never spins the long
+// way around when the heading crosses the 0°/360° boundary.
+const shortestAngleDelta = (from, to) =>
+  ((((to - from) % 360) + 540) % 360) - 180;
 
 // Two-tone compass needle: the red tip points to true North. It is rotated by
 // the current map bearing so it keeps indicating North on the rotated map.
@@ -43,12 +49,31 @@ const CompassControl = () => {
   const map = useMap();
   const { heading, isSupported, error, start, stop } = useDeviceOrientation();
   const [active, setActive] = useState(false);
+  // Continuous (unwrapped) needle rotation for shortest-path animation.
+  const [needleBearing, setNeedleBearing] = useState(0);
+  const needleBearingRef = useRef(0);
 
   // Follow the compass heading while active.
   useEffect(() => {
     if (!active || heading === null) return;
     map.setBearing(headingToBearing(heading));
   }, [active, heading, map]);
+
+  // Keep the needle pointing to North, accumulating the shortest delta so it
+  // never animates a full turn across the 0°/360° wrap.
+  useEffect(() => {
+    if (!active || error || heading === null) {
+      needleBearingRef.current = 0;
+      setNeedleBearing(0);
+      return;
+    }
+    const target = headingToBearing(heading);
+    const next =
+      needleBearingRef.current +
+      shortestAngleDelta(needleBearingRef.current, target);
+    needleBearingRef.current = next;
+    setNeedleBearing(next);
+  }, [active, error, heading]);
 
   // Any error (permission denied or no sensor) cancels the follow mode and
   // restores a north-up map.
@@ -103,7 +128,7 @@ const CompassControl = () => {
               '&:hover': { bgcolor: error ? 'error.dark' : '#f4f4f4' }
             }}>
             {isFollowing ? (
-              <CompassNeedle bearing={headingToBearing(heading)} />
+              <CompassNeedle bearing={needleBearing} />
             ) : (
               <ExploreIcon
                 sx={{ fontSize: 28, color: error ? 'white' : 'action.active' }}
