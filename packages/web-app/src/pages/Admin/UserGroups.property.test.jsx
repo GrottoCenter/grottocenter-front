@@ -55,6 +55,9 @@ const groupsArb = fc
  *
  * Validates: Requirements 2.2, 2.3
  */
+// fast-check runs many render iterations — needs more than Vitest's 5s default.
+vi.setConfig({ testTimeout: 30000 });
+
 describe('Property 2: Ban switch reflects server ban status', () => {
   it('switch checked state matches isBanned prop on initial render', () => {
     fc.assert(
