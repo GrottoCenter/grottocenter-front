@@ -19,7 +19,7 @@ import CompassControl from './CompassControl';
 const Wrapper = styled('div', {
   shouldForwardProp: prop => !prop.startsWith('$')
 })(
-  ({ theme, $wholePage }) => `
+  ({ theme, $wholePage, $fullscreenLocate }) => `
   display: flex;
   flex-direction: column;
   width: 100%;
@@ -36,6 +36,12 @@ ${$wholePage && `height: calc(100dvh - ${theme.appBarHeight}px);`}
   .leaflet-top.leaflet-right {
     z-index: 1001;
   }
+
+${
+  $fullscreenLocate
+    ? `.leaflet-container:not(.gc-fullscreen-controls) .leaflet-control-locate { display: none; }`
+    : ''
+}
 `
 );
 
@@ -106,11 +112,18 @@ const FullscreenOnlyControls = ({ isLocateControl, isCompassControl }) => {
       if (typeof map.setBearing === 'function') map.setBearing(0);
     }
   });
-  if (!isFullscreen) return null;
+
+  // Toggle a container class so the (always-mounted) locate control is revealed
+  // by CSS only in fullscreen — see the Wrapper rule. Keeping it mounted means
+  // Leaflet stacks it above the later-mounted measure button, no DOM reordering.
+  useEffect(() => {
+    map.getContainer().classList.toggle('gc-fullscreen-controls', isFullscreen);
+  }, [isFullscreen, map]);
+
   return (
     <>
       {isLocateControl && <LocateControl />}
-      {isCompassControl && <CompassControl />}
+      {isCompassControl && isFullscreen && <CompassControl />}
     </>
   );
 };
@@ -187,7 +200,9 @@ const CustomMapContainer = ({
   }, []);
 
   return (
-    <Wrapper $wholePage={wholePage}>
+    <Wrapper
+      $wholePage={wholePage}
+      $fullscreenLocate={isLocateControlInFullscreen}>
       <MapContainer
         style={{ flex: '1 1 auto', minHeight: 0, width: '100%', ...style }}
         wholePage={wholePage}
