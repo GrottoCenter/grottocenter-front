@@ -92,7 +92,7 @@ export const caveConservationLinks = {
   '*': 'https://wiki.grottocenter.org/wiki/GrottoCenter:En/Cave_conservation'
 };
 export const biLinks = {
-  '*': process.env.VITE_BI_URL || 'https://bi.grottocenter.org'
+  '*': import.meta.env.VITE_BI_URL || 'https://bi.grottocenter.org'
 };
 export const wikiBBSLinks = {
   fr: 'https://wiki.grottocenter.org/wiki/GrottoCenter:Fr/bbs',
