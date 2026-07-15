@@ -79,6 +79,7 @@ export const SearchFormContainer = styled('div')`
   justify-content: space-evenly;
   align-items: center;
   width: 100%;
+  gap: ${({ theme }) => theme.spacing(2)};
 
   @media (min-width: 550px) {
     > * {
