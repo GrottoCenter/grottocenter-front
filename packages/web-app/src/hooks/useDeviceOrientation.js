@@ -101,6 +101,8 @@ const useDeviceOrientation = () => {
     setError(null);
     setHeading(null);
     lastHeadingRef.current = null;
+    // Reset the throttle clock so a quick off→on toggle isn't rate-limited.
+    lastEmitRef.current = 0;
   }, [clearNoDataTimer, removeListeners]);
 
   const start = useCallback(async () => {

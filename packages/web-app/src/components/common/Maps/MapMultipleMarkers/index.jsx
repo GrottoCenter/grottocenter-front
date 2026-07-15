@@ -64,7 +64,11 @@ const MapMultipleMarkers = ({ style, zoom, positions }) => {
       dragging={!isMobile} // For usability only use two fingers drag/zoom on mobile
       scrollWheelZoom={false}
       style={style}
-      zoom={zoom || 14}>
+      zoom={zoom || 14}
+      // Field-navigation helpers, only in fullscreen. The compass button
+      // self-hides on non-touch devices, so it stays mobile-only.
+      isLocateControlInFullscreen
+      isCompassControlInFullscreen>
       <MultipleMarkers validPositions={validPositions} />
       <MeasureControl />
     </CustomMapContainer>

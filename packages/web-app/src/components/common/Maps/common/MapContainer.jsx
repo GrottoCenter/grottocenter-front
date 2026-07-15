@@ -90,6 +90,36 @@ FullscreenInteraction.propTypes = {
   scrollWheelZoom: PropTypes.bool
 };
 
+// Locate / compass controls that only appear while the map is in fullscreen
+// (the field-navigation context — e.g. entrance maps on mobile). The compass
+// button self-hides on non-touch devices, so it stays mobile-only.
+const FullscreenOnlyControls = ({ isLocateControl, isCompassControl }) => {
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const map = useMapEvents({
+    enterFullscreen() {
+      setIsFullscreen(true);
+    },
+    exitFullscreen() {
+      setIsFullscreen(false);
+      // Leaving fullscreen unmounts the compass button; restore north-up so the
+      // map isn't left rotated with no control to reset it.
+      if (typeof map.setBearing === 'function') map.setBearing(0);
+    }
+  });
+  if (!isFullscreen) return null;
+  return (
+    <>
+      {isLocateControl && <LocateControl />}
+      {isCompassControl && <CompassControl />}
+    </>
+  );
+};
+
+FullscreenOnlyControls.propTypes = {
+  isLocateControl: PropTypes.bool,
+  isCompassControl: PropTypes.bool
+};
+
 const CustomMapContainer = ({
   wholePage = true,
   center,
@@ -99,6 +129,8 @@ const CustomMapContainer = ({
   isSideMenuOpen = false,
   isLocateControl = false,
   isCompassControl = false,
+  isLocateControlInFullscreen = false,
+  isCompassControlInFullscreen = false,
   isFullscreenAllowed = true,
   shouldChangeControlInFullscreen = true,
   style,
@@ -165,7 +197,7 @@ const CustomMapContainer = ({
         scrollWheelZoom={scrollWheelZoom}
         isSideMenuOpen={isSideMenuOpen}
         minZoom={1}
-        rotate={isCompassControl}
+        rotate={isCompassControl || isCompassControlInFullscreen}
         bearing={0}
         rotateControl={false}
         touchRotate={false}
@@ -187,6 +219,12 @@ const CustomMapContainer = ({
         {/* Added after ScaleControl so Leaflet stacks it just above the scale
             legend in the bottom-right corner. */}
         {isCompassControl && <CompassControl />}
+        {(isLocateControlInFullscreen || isCompassControlInFullscreen) && (
+          <FullscreenOnlyControls
+            isLocateControl={isLocateControlInFullscreen}
+            isCompassControl={isCompassControlInFullscreen}
+          />
+        )}
         <LayersControl position="topright" />
         {children}
       </MapContainer>
@@ -204,6 +242,8 @@ CustomMapContainer.propTypes = {
   isSideMenuOpen: PropTypes.bool,
   isLocateControl: PropTypes.bool,
   isCompassControl: PropTypes.bool,
+  isLocateControlInFullscreen: PropTypes.bool,
+  isCompassControlInFullscreen: PropTypes.bool,
   isFullscreenAllowed: PropTypes.bool,
   shouldChangeControlInFullscreen: PropTypes.bool,
   style: PropTypes.shape({}),
