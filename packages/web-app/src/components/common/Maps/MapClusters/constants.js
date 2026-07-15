@@ -19,21 +19,21 @@ export const CAVE_SIZE = {
 // lightness range. White stroke ensures contrast on all tile layers (OSM, satellite, dark).
 export const CAVE_SIZE_STYLE = {
   [CAVE_SIZE.SMALL]: {
-    radius: 6,
+    radius: 8,
     color: '#FFFFFF',
     weight: 1,
     fillColor: '#D2691E',
     fillOpacity: 0.9
   },
   [CAVE_SIZE.MEDIUM]: {
-    radius: 10,
+    radius: 11,
     color: '#FFFFFF',
     weight: 1,
     fillColor: '#8B4513',
     fillOpacity: 0.9
   },
   [CAVE_SIZE.LARGE]: {
-    radius: 14,
+    radius: 15,
     color: '#FFFFFF',
     weight: 1,
     fillColor: '#2C0F00',
