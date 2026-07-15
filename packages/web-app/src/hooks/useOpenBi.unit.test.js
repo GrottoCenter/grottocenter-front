@@ -1,35 +1,36 @@
 import { renderHook, act } from '@testing-library/react';
+import { vi } from 'vitest';
 import { useOpenBi } from './useOpenBi';
 
-const mockDispatch = jest.fn();
+const mockDispatch = vi.fn();
 const mockAuthState = {
   login: { authorizationHeader: { Authorization: 'Bearer test-token' } }
 };
-jest.mock('react-redux', () => ({
+vi.mock('react-redux', () => ({
   useDispatch: () => mockDispatch,
   useSelector: selector => selector(mockAuthState)
 }));
 
-jest.mock('react-intl', () => ({
+vi.mock('react-intl', () => ({
   useIntl: () => ({ formatMessage: ({ id }) => id })
 }));
 
-const mockOnError = jest.fn();
-jest.mock('./useNotification', () => ({
+const mockOnError = vi.fn();
+vi.mock('./useNotification', () => ({
   useNotification: () => ({ onError: mockOnError })
 }));
 
 let mockIsAuth = true;
-jest.mock('./usePermissions', () => ({
+vi.mock('./usePermissions', () => ({
   usePermissions: () => ({ isAuth: mockIsAuth })
 }));
 
-jest.mock('../actions/Login', () => ({
+vi.mock('../actions/Login', () => ({
   displayLoginDialog: () => ({ type: 'DISPLAY_LOGIN_DIALOG' })
 }));
 
 // Use the real checkAuthStatus, but it lazy-requires ./Login on a 401 only.
-jest.mock('../actions/utils', () => ({
+vi.mock('../actions/utils', () => ({
   checkAuthStatus: () => response => {
     if (response.status === 401) {
       const err = new Error('Unauthorized');
@@ -43,17 +44,17 @@ jest.mock('../actions/utils', () => ({
   }
 }));
 
-const mockWindow = { name: 'gcBiTab', close: jest.fn() };
+const mockWindow = { name: 'gcBiTab', close: vi.fn() };
 let submitSpy;
 
 beforeEach(() => {
-  jest.clearAllMocks();
+  vi.clearAllMocks();
   mockIsAuth = true;
-  window.open = jest.fn(() => mockWindow);
-  submitSpy = jest
+  window.open = vi.fn(() => mockWindow);
+  submitSpy = vi
     .spyOn(HTMLFormElement.prototype, 'submit')
     .mockImplementation(() => {});
-  global.fetch = jest.fn();
+  global.fetch = vi.fn();
 });
 
 afterEach(() => {
