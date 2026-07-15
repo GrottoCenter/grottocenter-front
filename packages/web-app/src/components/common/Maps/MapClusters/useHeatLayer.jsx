@@ -223,6 +223,18 @@ const useHeatLayer = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // While the compass rotates the map continuously, hide the hex panes to keep
+  // rotation smooth. We toggle pane visibility only (not the data), so the normal
+  // zoom/data-driven population keeps working and hexagons reappear intact once
+  // the compass is turned off.
+  useMapEvent('compassfollowchange', e => {
+    const display = e.following ? 'none' : '';
+    LAYER_PANE_CONFIG.forEach(({ pane }) => {
+      const p = map.getPane(pane);
+      if (p) p.style.display = display;
+    });
+  });
+
   useMapEvent('dragstart', () => {
     isDraggingRef.current = true;
   });
