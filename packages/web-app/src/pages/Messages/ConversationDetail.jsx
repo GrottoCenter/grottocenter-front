@@ -381,15 +381,13 @@ Message Body: ${body}`;
             }
           }}
           disabled={isSending}
-          // helperText holds a flex Box: FormHelperText renders a <p> by
-          // default, which cannot legally contain a <div>.
-          slotProps={{
-            htmlInput: { maxLength: 5100 },
-            formHelperText: { component: 'div' }
-          }}
+          slotProps={{ htmlInput: { maxLength: 5100 } }}
           error={replyText.length > 5000}
           helperText={
-            <Box sx={{ display: 'flex', justifyContent: 'flex-end', width: '100%', m: 0 }}>
+            // FormHelperText renders a <p>, which cannot contain a <div>.
+            <Box
+              component="span"
+              sx={{ display: 'flex', justifyContent: 'flex-end', width: '100%', m: 0 }}>
               <span style={{ color: replyText.length > 5000 ? 'red' : 'inherit' }}>
                 {replyText.length > 5000
                   ? formatMessage({ id: 'Message exceeds 5000 characters limit.', defaultMessage: 'Message exceeds 5000 characters limit.' }) + ' '

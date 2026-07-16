@@ -219,7 +219,10 @@ const ComposeDialog = ({ open, onClose, prefilledRecipientId }) => {
           slotProps={{ htmlInput: { maxLength: 5100 } }}
           error={body.length > 5000}
           helperText={
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
+            // FormHelperText renders a <p>, which cannot contain a <div>.
+            <Box
+              component="span"
+              sx={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
               <span style={{ color: body.length > 5000 ? 'red' : 'inherit' }}>
                 {body.length > 5000
                   ? formatMessage({ id: 'Message exceeds 5000 characters limit.', defaultMessage: 'Message exceeds 5000 characters limit.' })
