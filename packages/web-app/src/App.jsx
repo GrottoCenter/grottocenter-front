@@ -1,6 +1,7 @@
 import React, { lazy } from 'react';
 import { ThemeProvider, StyledEngineProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
+import { GlobalStyles } from '@mui/material';
 import {
   Navigate,
   Route,
@@ -186,6 +187,14 @@ const App = () => (
   <StyledEngineProvider injectFirst>
     <ThemeProvider theme={grottoTheme}>
       <CssBaseline />
+      {/* Bridge theme colours that plain (non-React) stylesheets need — e.g.
+          the leaflet.locatecontrol override in LocateControl.css — into CSS
+          custom properties, so there is a single source of truth. */}
+      <GlobalStyles
+        styles={theme => ({
+          ':root': { '--gc-map-control-icon': theme.palette.mapControlIcon }
+        })}
+      />
       <RouterProvider router={router} />
     </ThemeProvider>
   </StyledEngineProvider>

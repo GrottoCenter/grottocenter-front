@@ -497,6 +497,7 @@ const Index = ({ center, zoom, isSideMenuOpen, mapRef, popupTarget = null, ...pr
         isFullscreenAllowed={false}
         isSideMenuOpen={isSideMenuOpen}
         isLocateControl
+        isCompassControl
         mapRef={mapRef}>
         <HydratedMap {...props} popupTarget={popupTarget} />
       </CustomMapContainer>

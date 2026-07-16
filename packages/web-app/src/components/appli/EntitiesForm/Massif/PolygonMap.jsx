@@ -20,8 +20,8 @@ import {
 import { useNotification, useProjections } from '../../../../hooks';
 import useGeolocation from '../../../../hooks/useGeolocation';
 import LayersControl from '../../../common/Maps/common/LayersControl';
-import LocateControl from '../../../common/Maps/common/LocateControl';
 import GeocodingControl from '../../../common/Maps/common/GeocodingControl';
+import FullscreenControl from '../../../common/Maps/common/FullscreenControl';
 import ShapefileImport from './ShapefileImport';
 import PolygonLayersList from './PolygonLayersList';
 import { isNeedlePolygon } from '../../../../helpers/polygonUtils';
@@ -712,6 +712,7 @@ const PolygonMap = ({ onChange, onValidationChange, data }) => {
               if (ref) setMap(ref);
             }}
             position="topLeft"
+            rotateControl={false}
             style={{
               height: isMobile ? '50dvh' : '70dvh',
               ...(isMobile ? { width: '100%' } : { flex: 1 })
@@ -741,9 +742,9 @@ const PolygonMap = ({ onChange, onValidationChange, data }) => {
             </FeatureGroup>
 
             <GeocodingControl />
-            <LocateControl />
+            <FullscreenControl forceSeparateButton="true" />
             <ScaleControl position="bottomright" />
-            <LayersControl />
+            <LayersControl position="topright" />
 
             <KinkPane />
             {allKinkPoints.map((point, idx) => (

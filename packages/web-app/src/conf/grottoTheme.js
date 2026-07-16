@@ -83,7 +83,11 @@ export const overridings = {
     fullBlack: '#000000',
     secondaryBlocTitle: '#FFFFFF',
     blackShadow: alpha('#000000', 0.117647),
-    backgroundButton: '#FFFFFF'
+    backgroundButton: '#FFFFFF',
+    // Icon colour for map controls (locate, compass, data toggle). Matches
+    // Leaflet's built-in control icons (zoom, layers) so every map button looks
+    // uniform. Keep in sync with the CSS fallback in LocateControl.css.
+    mapControlIcon: '#333333'
   },
   shape: {
     borderRadius: '4px'

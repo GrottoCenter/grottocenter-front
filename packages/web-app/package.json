@@ -39,6 +39,7 @@
     "isomorphic-fetch": "^3.0.0",
     "leaflet": "^1.9.4",
     "leaflet-draw": "^1.0.4",
+    "leaflet-rotate": "^0.2.8",
     "leaflet.fullscreen": "^5.3.3",
     "leaflet.locatecontrol": "^0.90.0",
     "linkify-react": "^4.3.3",

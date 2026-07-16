@@ -32,6 +32,10 @@ export default defineConfig({
   },
   server: {
     port: 3000,
+    // Listen on all interfaces (not just localhost) so the dev server is
+    // reachable from other devices on the LAN (e.g. a phone testing geolocation
+    // / compass). CRA exposed the network by default; Vite does not.
+    host: true,
     warmup: {
       // Pre-transform all page and appli components at startup so that
       // first navigation to a lazy route hits the cache instead of waiting

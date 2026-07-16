@@ -24,3 +24,4 @@ export { useNameDuplicateSuggestions } from './useNameDuplicateSuggestions';
 export { useNearbyEntrances } from './useNearbyEntrances';
 export { useEntitySearch } from './useEntitySearch';
 export { useOtherEntranceName } from './useOtherEntranceName';
+export { default as useDeviceOrientation } from './useDeviceOrientation';
