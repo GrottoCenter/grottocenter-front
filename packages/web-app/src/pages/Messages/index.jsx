@@ -27,6 +27,7 @@ import ArchiveIcon from '@mui/icons-material/Archive';
 import UnarchiveIcon from '@mui/icons-material/Unarchive';
 import { styled } from '@mui/material/styles';
 
+import PageContainer from '@/components/common/Layouts/PageContainer';
 import AuthChecker from '../../components/appli/AuthChecker';
 import Alert from '../../components/common/Alert';
 import REDUCER_STATUS from '../../reducers/ReducerStatus';
@@ -69,16 +70,39 @@ const EmptyStateContainer = styled(Box)(({ theme }) => ({
   color: theme.palette.text.secondary
 }));
 
-const StyledCard = styled(Card)(({ theme }) => ({
-  margin: theme.spacing(2),
-  marginTop: theme.spacing(3),
-  height: '100%',
-  display: 'flex',
-  flexDirection: 'column'
-}));
+// Master-detail inbox: no card chrome and full-screen on mobile (like any mail
+// client), standard page card on desktop.
+//
+// The height fills the viewport minus everything around the card. Each term is
+// derived from the theme rather than hardcoded: theme.spacing is an array here
+// (see grottoTheme), so spacing(2) is 8px and spacing(1) is 4px — not the MUI
+// defaults. `containerPb` must stay in sync with PageContainer's own `pb: 1`.
+const StyledCard = styled(Card)(({ theme }) => {
+  const containerPb = theme.spacing(1);
+  const chromeXs = containerPb;
+  const chromeMd = `${theme.spacing(2)} * 2 + ${containerPb}`; // margins + pb
+  return `
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  border-radius: 0;
+  box-shadow: none;
+  height: calc(100vh - ${theme.appBarHeight}px - (${chromeXs})); /* fallback */
+  height: calc(100dvh - ${theme.appBarHeight}px - (${chromeXs}));
+
+  ${theme.breakpoints.up('md')} {
+    margin: ${theme.spacing(2)};
+    border-radius: ${theme.shape.borderRadius};
+    box-shadow: ${theme.shadows[1]};
+    height: calc(100vh - ${theme.appBarHeight}px - (${chromeMd}));
+    height: calc(100dvh - ${theme.appBarHeight}px - (${chromeMd}));
+  }
+`;
+});
 
 const StyledCardContent = styled(CardContent)({
   flexGrow: 1,
+  minHeight: 0,
   overflowY: 'auto',
   scrollBehavior: 'smooth',
   padding: 0,
@@ -242,85 +266,86 @@ const MessagesPage = () => {
   };
 
   return (
-    <StyledCard>
-      <StyledCardContent>
-        <AuthChecker
-          componentToDisplay={
-            <Box sx={{ display: 'flex', height: 'calc(100vh - 120px)', width: '100%' }}>
+    <PageContainer>
+      <StyledCard>
+        <StyledCardContent>
+          <AuthChecker
+            componentToDisplay={
+              <Box sx={{ display: 'flex', height: '100%', width: '100%' }}>
+                {/* Left Pane: Conversation List */}
+                <Box sx={{
+                  width: { xs: '100%', md: '350px' },
+                  flexShrink: 0,
+                  borderRight: 1,
+                  borderColor: 'divider',
+                  display: { xs: conversationId ? 'none' : 'flex', md: 'flex' },
+                  flexDirection: 'column',
+                  bgcolor: 'background.paper'
+                }}>
+                  <Box sx={{ p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: 1, borderColor: 'divider' }}>
+                    <Typography variant="h6" component="h1">
+                      {formatMessage({ id: 'Conversations', defaultMessage: 'Conversations' })}
+                    </Typography>
+                    <Button
+                      variant="outlined"
+                      color="secondary"
+                      startIcon={<EditIcon />}
+                      onClick={() => {
+                        setComposeOpen(true);
+                      }}>
+                      {formatMessage({ id: 'New Message' })}
+                    </Button>
+                  </Box>
 
-              {/* Left Pane: Conversation List */}
-              <Box sx={{
-                width: { xs: '100%', md: '350px' },
-                flexShrink: 0,
-                borderRight: 1,
-                borderColor: 'divider',
-                display: { xs: conversationId ? 'none' : 'flex', md: 'flex' },
-                flexDirection: 'column',
-                bgcolor: 'background.paper'
-              }}>
-                <Box sx={{ p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: 1, borderColor: 'divider' }}>
-                  <Typography variant="h6" component="h1">
-                    {formatMessage({ id: 'Conversations', defaultMessage: 'Conversations' })}
-                  </Typography>
-                  <Button
-                    variant="outlined"
-                    color="secondary"
-                    startIcon={<EditIcon />}
-                    onClick={() => {
-                      setComposeOpen(true);
-                    }}>
-                    {formatMessage({ id: 'New Message' })}
-                  </Button>
+                  <Tabs
+                    value={tabValue}
+                    onChange={handleTabChange}
+                    indicatorColor="primary"
+                    textColor="primary"
+                    variant="fullWidth"
+                    sx={{ borderBottom: 1, borderColor: 'divider' }}>
+                    <Tab label={formatMessage({ id: 'Active' })} />
+                    <Tab label={formatMessage({ id: 'Archived' })} />
+                  </Tabs>
+
+                  <Box sx={{ flexGrow: 1, overflowY: 'auto' }}>
+                    {renderContent()}
+
+                    {totalCount > PAGE_SIZE && (
+                      <Box sx={{ display: 'flex', justifyContent: 'center', py: 2 }}>
+                        <Pagination
+                          count={Math.ceil(totalCount / PAGE_SIZE)}
+                          page={page}
+                          onChange={handlePageChange}
+                          color="primary"
+                          size="small"
+                        />
+                      </Box>
+                    )}
+                  </Box>
                 </Box>
 
-                <Tabs
-                  value={tabValue}
-                  onChange={handleTabChange}
-                  indicatorColor="primary"
-                  textColor="primary"
-                  variant="fullWidth"
-                  sx={{ borderBottom: 1, borderColor: 'divider' }}>
-                  <Tab label={formatMessage({ id: 'Active' })} />
-                  <Tab label={formatMessage({ id: 'Archived' })} />
-                </Tabs>
-
-                <Box sx={{ flexGrow: 1, overflowY: 'auto' }}>
-                  {renderContent()}
-
-                  {totalCount > PAGE_SIZE && (
-                    <Box sx={{ display: 'flex', justifyContent: 'center', py: 2 }}>
-                      <Pagination
-                        count={Math.ceil(totalCount / PAGE_SIZE)}
-                        page={page}
-                        onChange={handlePageChange}
-                        color="primary"
-                        size="small"
-                      />
-                    </Box>
-                  )}
+                {/* Right Pane: Conversation Details */}
+                <Box sx={{
+                  flexGrow: 1,
+                  display: { xs: conversationId ? 'block' : 'none', md: 'block' },
+                  height: '100%',
+                  bgcolor: 'background.default'
+                }}>
+                  <ConversationDetail />
                 </Box>
-              </Box>
 
-              {/* Right Pane: Conversation Details */}
-              <Box sx={{
-                flexGrow: 1,
-                display: { xs: conversationId ? 'block' : 'none', md: 'block' },
-                height: '100%',
-                bgcolor: 'background.default'
-              }}>
-                <ConversationDetail />
+                <ComposeDialog
+                  open={isComposeOpen}
+                  onClose={handleCloseCompose}
+                  prefilledRecipientId={composeTo || undefined}
+                />
               </Box>
-
-              <ComposeDialog
-                open={isComposeOpen}
-                onClose={handleCloseCompose}
-                prefilledRecipientId={composeTo || undefined}
-              />
-            </Box>
-          }
-        />
-      </StyledCardContent>
-    </StyledCard>
+            }
+          />
+        </StyledCardContent>
+      </StyledCard>
+    </PageContainer>
   );
 };
 
