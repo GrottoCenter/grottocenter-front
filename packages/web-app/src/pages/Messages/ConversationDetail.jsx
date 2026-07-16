@@ -45,7 +45,10 @@ const MessagesList = styled(List)(({ theme }) => ({
   flexDirection: 'column-reverse' // Shows latest at the bottom
 }));
 
-const MessageBubble = styled(Paper)(({ theme, $isMine }) => ({
+// See StyledListItem in ./index.jsx: $-props must not reach the DOM.
+const MessageBubble = styled(Paper, {
+  shouldForwardProp: prop => !prop.startsWith('$')
+})(({ theme, $isMine }) => ({
   padding: theme.spacing(1, 2),
   maxWidth: '75%',
   minWidth: 0,
@@ -61,7 +64,9 @@ const MessageBubble = styled(Paper)(({ theme, $isMine }) => ({
   overflowWrap: 'anywhere'
 }));
 
-const MessageDate = styled(Typography)(({ theme, $isMine }) => ({
+const MessageDate = styled(Typography, {
+  shouldForwardProp: prop => !prop.startsWith('$')
+})(({ theme, $isMine }) => ({
   fontSize: '0.75rem',
   color: $isMine ? theme.palette.primary.contrastText : theme.palette.text.secondary,
   opacity: 0.7,
@@ -376,7 +381,12 @@ Message Body: ${body}`;
             }
           }}
           disabled={isSending}
-          slotProps={{ htmlInput: { maxLength: 5100 } }}
+          // helperText holds a flex Box: FormHelperText renders a <p> by
+          // default, which cannot legally contain a <div>.
+          slotProps={{
+            htmlInput: { maxLength: 5100 },
+            formHelperText: { component: 'div' }
+          }}
           error={replyText.length > 5000}
           helperText={
             <Box sx={{ display: 'flex', justifyContent: 'flex-end', width: '100%', m: 0 }}>

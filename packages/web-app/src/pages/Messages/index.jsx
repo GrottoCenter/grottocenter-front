@@ -47,7 +47,11 @@ const getInitials = nickname => {
   return nickname[0].toUpperCase();
 };
 
-const StyledListItem = styled(ListItem)(({ theme, $isUnread }) => ({
+// $-prefixed props are an emotion convention, not a MUI one: styled() forwards
+// every prop to ListItem, which spreads it onto the DOM. Filter them out.
+const StyledListItem = styled(ListItem, {
+  shouldForwardProp: prop => !prop.startsWith('$')
+})(({ theme, $isUnread }) => ({
   cursor: 'pointer',
   '&:hover': {
     backgroundColor: theme.palette.action.hover
