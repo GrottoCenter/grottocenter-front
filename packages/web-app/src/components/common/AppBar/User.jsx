@@ -20,7 +20,7 @@ import { pathOr } from 'ramda';
 
 import Translate from '../Translate';
 import { useUserProperties } from '../../../hooks';
-import UserAvatar from './UserAvatar';
+import UserAvatar from '@/components/common/UserAvatar';
 
 // Constants
 const MENU_MIN_WIDTH = 250;

@@ -10,7 +10,6 @@ import {
   ListItem,
   ListItemText,
   ListItemAvatar,
-  Avatar,
   Typography,
   Pagination,
   CircularProgress,
@@ -28,6 +27,7 @@ import UnarchiveIcon from '@mui/icons-material/Unarchive';
 import { styled } from '@mui/material/styles';
 
 import PageContainer from '@/components/common/Layouts/PageContainer';
+import UserAvatar from '@/components/common/UserAvatar';
 import AuthChecker from '../../components/appli/AuthChecker';
 import Alert from '../../components/common/Alert';
 import REDUCER_STATUS from '../../reducers/ReducerStatus';
@@ -38,15 +38,6 @@ import ConversationDetail from './ConversationDetail';
 import ComposeDialog from './ComposeDialog';
 
 const PAGE_SIZE = 20;
-
-const getInitials = nickname => {
-  if (!nickname) return '?';
-  const parts = nickname.trim().split(/\s+/);
-  if (parts.length >= 2) {
-    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
-  }
-  return nickname[0].toUpperCase();
-};
 
 // $-prefixed props are an emotion convention, not a MUI one: styled() forwards
 // every prop to ListItem, which spreads it onto the DOM. Filter them out.
@@ -234,9 +225,11 @@ const MessagesPage = () => {
                   color="secondary"
                   badgeContent={conv.unreadCount}
                   invisible={!isUnread}>
-                  <Avatar sx={{ bgcolor: 'primary.main', color: '#fff' }}>
-                    {getInitials(conv.otherParticipant?.nickname)}
-                  </Avatar>
+                  <UserAvatar
+                    username={conv.otherParticipant?.nickname}
+                    color="primary"
+                    sx={{ width: 40, height: 40 }}
+                  />
                 </Badge>
               </ListItemAvatar>
               <ListItemText
