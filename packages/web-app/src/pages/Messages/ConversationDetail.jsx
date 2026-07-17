@@ -451,7 +451,6 @@ Message Body: ${body}`;
               handleSend();
             }
           }}
-          disabled={isSending}
           slotProps={{
             htmlInput: {
               maxLength: 5100,
