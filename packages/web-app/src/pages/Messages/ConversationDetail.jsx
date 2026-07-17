@@ -426,6 +426,9 @@ Message Body: ${body}`;
         <IconButton
           color="primary"
           onClick={handleSend}
+          // Pressing a button moves focus to it, which closes the virtual
+          // keyboard. Suppressing the default keeps focus in the input.
+          onMouseDown={e => e.preventDefault()}
           disabled={!replyText.trim() || replyText.length > 5000 || isSending}
           sx={{ mt: '4px' }}>
           {isSending ? <CircularProgress size={24} /> : <SendIcon />}
