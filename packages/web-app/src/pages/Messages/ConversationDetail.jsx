@@ -12,7 +12,8 @@ import {
   IconButton,
   Tooltip,
   Button,
-  Link
+  Link,
+  useMediaQuery
 } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
 import FlagIcon from '@mui/icons-material/Flag';
@@ -100,6 +101,12 @@ const ConversationDetail = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { formatMessage } = useIntl();
+
+  // Virtual keyboards have no usable Shift+Enter, so Enter must insert a line
+  // break there and sending goes through the button only — as in every mobile
+  // messaging app. Keyed on pointer type, not screen width: a narrow desktop
+  // window still has a physical keyboard.
+  const hasVirtualKeyboard = useMediaQuery('(pointer: coarse)');
 
   const [replyText, setReplyText] = useState('');
   const [isSending, setIsSending] = useState(false);
@@ -387,14 +394,19 @@ Message Body: ${body}`;
           value={replyText}
           onChange={e => setReplyText(e.target.value)}
           onKeyDown={e => {
-            if (e.key === 'Enter' && !e.shiftKey) {
+            if (e.key === 'Enter' && !e.shiftKey && !hasVirtualKeyboard) {
               e.preventDefault();
               handleSend();
             }
           }}
           disabled={isSending}
           inputRef={replyInputRef}
-          slotProps={{ htmlInput: { maxLength: 5100 } }}
+          slotProps={{
+            htmlInput: {
+              maxLength: 5100,
+              enterKeyHint: hasVirtualKeyboard ? 'enter' : 'send'
+            }
+          }}
           error={replyText.length > 5000}
           helperText={
             // FormHelperText renders a <p>, which cannot contain a <div>.
