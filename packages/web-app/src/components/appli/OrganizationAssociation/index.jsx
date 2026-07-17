@@ -173,7 +173,7 @@ const AssociationSection = ({
                 <Alert
                   severity="info"
                   disableMargins
-                  title={formatMessage({
+                  content={formatMessage({
                     id: 'No organization is currently responsible for this geographic entity.'
                   })}
                 />

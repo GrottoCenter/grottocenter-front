@@ -23,7 +23,8 @@ import { patchGuideline } from '../../../actions/Guideline/UpdateGuideline';
 import { getGuidelinesUrl } from '../../../conf/apiRoutes';
 import { checkAndGetStatus } from '../../../actions/utils';
 import ScrollableContent from '../../common/Layouts/Fixed/ScrollableContent';
-import ActionButton from '../../common/ActionButton';
+import { FormActionRow } from '../EntitiesForm/utils/FormContainers';
+import Alert from '../../common/Alert';
 
 const MODE_NONE = 'none';
 const MODE_CREATE = 'create';
@@ -49,8 +50,8 @@ const Guidelines = ({ entityType, entityId, guidelines }) => {
       entityType === 'countries'
         ? 'country'
         : entityType === 'regions'
-        ? 'region'
-        : 'massif'
+          ? 'region'
+          : 'massif'
   });
 
   useEffect(() => {
@@ -114,9 +115,7 @@ const Guidelines = ({ entityType, entityId, guidelines }) => {
     if (e) e.preventDefault();
     if (!selectedGuideline) return;
 
-    const countries = (selectedGuideline.countries || []).map(
-      c => c.id || c
-    );
+    const countries = (selectedGuideline.countries || []).map(c => c.id || c);
     const regions = (selectedGuideline.regions || []).map(r => r.id || r);
     const massifs = (selectedGuideline.massifs || []).map(m => m.id || m);
 
@@ -143,19 +142,13 @@ const Guidelines = ({ entityType, entityId, guidelines }) => {
 
   const availableGuidelines = allGuidelines.filter(g => {
     if (entityType === 'countries') {
-      return !g.countries?.some(
-        c => String(c.id || c) === String(entityId)
-      );
+      return !g.countries?.some(c => String(c.id || c) === String(entityId));
     }
     if (entityType === 'regions') {
-      return !g.regions?.some(
-        r => String(r.id || r) === String(entityId)
-      );
+      return !g.regions?.some(r => String(r.id || r) === String(entityId));
     }
     if (entityType === 'massifs') {
-      return !g.massifs?.some(
-        m => String(m.id || m) === String(entityId)
-      );
+      return !g.massifs?.some(m => String(m.id || m) === String(entityId));
     }
     return true;
   });
@@ -170,8 +163,7 @@ const Guidelines = ({ entityType, entityId, guidelines }) => {
             <ButtonGroup
               size="small"
               sx={{ mb: 2 }}
-              data-testid="guideline-mode-toggle"
-            >
+              data-testid="guideline-mode-toggle">
               <Button
                 variant="outlined"
                 startIcon={<LinkIcon />}
@@ -179,14 +171,10 @@ const Guidelines = ({ entityType, entityId, guidelines }) => {
                   setMode(MODE_ATTACH);
                   setSelectedGuideline(null);
                   setAttachFetchTrigger(prev => prev + 1);
-                }}
-              >
+                }}>
                 <FormattedMessage id="guidelines.attach_existing" />
               </Button>
-              <Button
-                variant="contained"
-                startIcon={<CreateIcon />}
-              >
+              <Button variant="contained" startIcon={<CreateIcon />}>
                 <FormattedMessage id="guidelines.create_new" />
               </Button>
             </ButtonGroup>
@@ -204,12 +192,8 @@ const Guidelines = ({ entityType, entityId, guidelines }) => {
             <ButtonGroup
               size="small"
               sx={{ mb: 2 }}
-              data-testid="guideline-mode-toggle"
-            >
-              <Button
-                variant="contained"
-                startIcon={<LinkIcon />}
-              >
+              data-testid="guideline-mode-toggle">
+              <Button variant="contained" startIcon={<LinkIcon />}>
                 <FormattedMessage id="guidelines.attach_existing" />
               </Button>
               <Button
@@ -219,8 +203,7 @@ const Guidelines = ({ entityType, entityId, guidelines }) => {
                 onClick={() => {
                   setMode(MODE_CREATE);
                   setSelectedGuideline(null);
-                }}
-              >
+                }}>
                 <FormattedMessage id="guidelines.create_new" />
               </Button>
             </ButtonGroup>
@@ -232,8 +215,7 @@ const Guidelines = ({ entityType, entityId, guidelines }) => {
                     display: 'flex',
                     justifyContent: 'center',
                     py: 3
-                  }}
-                >
+                  }}>
                   <CircularProgress size={28} />
                 </Box>
               ) : (
@@ -258,12 +240,8 @@ const Guidelines = ({ entityType, entityId, guidelines }) => {
                     const term = inputValue.toLowerCase();
                     return options.filter(
                       o =>
-                        (o.title || '')
-                          .toLowerCase()
-                          .includes(term) ||
-                        (o.description || '')
-                          .toLowerCase()
-                          .includes(term)
+                        (o.title || '').toLowerCase().includes(term) ||
+                        (o.description || '').toLowerCase().includes(term)
                     );
                   }}
                   noOptionsText={formatMessage({
@@ -286,8 +264,7 @@ const Guidelines = ({ entityType, entityId, guidelines }) => {
                                 WebkitLineClamp: 2,
                                 WebkitBoxOrient: 'vertical',
                                 overflow: 'hidden'
-                              }}
-                            >
+                              }}>
                               {option.description}
                             </Typography>
                           )}
@@ -311,31 +288,13 @@ const Guidelines = ({ entityType, entityId, guidelines }) => {
                 />
               )}
 
-              <Box
-                sx={{
-                  display: 'flex',
-                  justifyContent: 'center',
-                  mt: 2
-                }}
-              >
-                <Button
-                  variant="outlined"
-                  onClick={closeForm}
-                  sx={{ m: 1 }}
-                >
-                  <FormattedMessage id="Cancel" />
-                </Button>
-                <ActionButton
-                  label={formatMessage({
-                    id: 'guidelines.btn_attach'
-                  })}
-                  loading={isSubmitting}
-                  disabled={!selectedGuideline}
-                  color="primary"
-                  style={{ margin: '8px' }}
-                  type="submit"
-                />
-              </Box>
+              <FormActionRow
+                isCenter
+                isSubmitting={isSubmitting}
+                disabled={!selectedGuideline}
+                onCancel={closeForm}
+                submitLabel={formatMessage({ id: 'guidelines.btn_attach' })}
+              />
             </form>
           </Box>
         );
@@ -347,22 +306,24 @@ const Guidelines = ({ entityType, entityId, guidelines }) => {
 
   return (
     <ScrollableContent
+      dense
       title={<FormattedMessage id="Guidelines" />}
       anchorId="guidelines"
+      count={guidelines?.length ?? 0}
+      defaultExpanded={guidelines?.length > 0}
       icon={
         permissions.isAuth &&
         mode === MODE_NONE && (
           <Button
             size="small"
-            color="primary"
+            color="secondary"
             variant="outlined"
             onClick={() => {
               setMode(MODE_ATTACH);
               setAttachFetchTrigger(prev => prev + 1);
             }}
             startIcon={<LinkIcon />}
-            data-testid="add-guideline-btn"
-          >
+            data-testid="add-guideline-btn">
             <FormattedMessage
               id="guidelines.attach_existing"
               defaultMessage="Attach an existing guideline"
@@ -370,31 +331,33 @@ const Guidelines = ({ entityType, entityId, guidelines }) => {
           </Button>
         )
       }
-    >
-      <Box p={2}>
-        {renderModeContent()}
-        {guidelines && guidelines.length > 0 ? (
-          <List disablePadding>
-            {guidelines.map(guideline => (
-              <Guideline
-                key={guideline.id}
-                guideline={guideline}
-                isEditAllowed
+      content={
+        <>
+          {renderModeContent()}
+          {guidelines && guidelines.length > 0 ? (
+            <List dense disablePadding>
+              {guidelines.map(guideline => (
+                <Guideline
+                  key={guideline.id}
+                  guideline={guideline}
+                  isEditAllowed
+                />
+              ))}
+            </List>
+          ) : (
+            mode === MODE_NONE && (
+              <Alert
+                severity="info"
+                content={formatMessage(
+                  { id: 'guidelines.none' },
+                  { entityType: entityLabel }
+                )}
               />
-            ))}
-          </List>
-        ) : (
-          mode === MODE_NONE && (
-            <Typography variant="body2" color="textSecondary">
-              <FormattedMessage
-                id="guidelines.none"
-                values={{ entityType: entityLabel }}
-              />
-            </Typography>
-          )
-        )}
-      </Box>
-    </ScrollableContent>
+            )
+          )}
+        </>
+      }
+    />
   );
 };
 
