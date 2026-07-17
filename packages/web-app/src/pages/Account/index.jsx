@@ -69,7 +69,7 @@ import PasswordRules from '../../components/common/Form/PasswordRules';
 import SearchOrganizationForm from '../../components/appli/Form/SearchOrganizationForm';
 import Translate from '../../components/common/Translate';
 import { useUserProperties, usePermissions, useNotification } from '../../hooks';
-import useOpenLink from '../../hooks/useOpenLink';
+import AppLink from '../../components/common/AppLink';
 import { AVAILABLE_LANGUAGES, isPasswordValid } from '../../conf/config';
 import {
   languageIdToLocale,
@@ -207,7 +207,6 @@ EditActions.propTypes = {
 const PersonalInfoSection = ({ account, onSaved }) => {
   const dispatch = useDispatch();
   const { formatMessage } = useIntl();
-  const openLink = useOpenLink();
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [saveError, setSaveError] = useState(null);
@@ -281,7 +280,9 @@ const PersonalInfoSection = ({ account, onSaved }) => {
               size="small"
               variant="outlined"
               endIcon={<OpenInNewIcon fontSize="small" />}
-              onClick={() => openLink(`/ui/persons/${account.id}`)}>
+              component={AppLink}
+              to={`/ui/persons/${account.id}`}
+              openInNewTabDesktop>
               {formatMessage({ id: 'My public page' })}
             </Button>
           )}

@@ -92,7 +92,7 @@ code {
 }
 
 /*
- * Popup links (GCLink renders a bare <a> with no app styling, so in the
+ * Popup links (AppLink renders a bare <a> with no app styling, so in the
  * detached popup HTML it falls back to the browser-default blue). Align with
  * the app convention: MUI <Link> defaults to palette.primary.main (brown[700]).
  * Also avoids clashing with blue, which now means "network highlight".

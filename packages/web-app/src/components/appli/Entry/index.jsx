@@ -51,6 +51,7 @@ import {
   useExplored,
   useSharePage
 } from '../../../hooks';
+import useOpenLink from '../../../hooks/useOpenLink';
 import SensitiveCaveWarning from './SensitiveCaveWarning';
 import SensitiveLocationPlaceholder from './SensitiveLocationPlaceholder';
 import AuthorAndDate from '../../common/Contribution/AuthorAndDate';
@@ -79,6 +80,7 @@ export const Entry = ({ isLoading, error, entrance, networkDescriptionsCount = 0
   const dispatch = useDispatch();
   const { formatMessage } = useIntl();
   const navigate = useNavigate();
+  const openLink = useOpenLink();
   const { entranceId } = useParams();
   const { isAuth, isAdmin, isModerator } = usePermissions();
   const componentRef = useRef();
@@ -186,15 +188,13 @@ export const Entry = ({ isLoading, error, entrance, networkDescriptionsCount = 0
           key: 'snapshot',
           icon: <HistoryIcon />,
           label: formatMessage({ id: 'History' }),
-          href: snapshotUrl,
-          target: '_blank'
+          onClick: () => openLink(snapshotUrl)
         },
         {
           key: 'snapshot-all',
           icon: <ManageHistoryIcon />,
           label: formatMessage({ id: 'Page history' }),
-          href: `${snapshotUrl}&all=true`,
-          target: '_blank'
+          onClick: () => openLink(`${snapshotUrl}&all=true`)
         }
       ]}
     />

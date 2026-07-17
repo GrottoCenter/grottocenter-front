@@ -1,14 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import GCLink from './GCLink';
+import AppLink from './AppLink';
 import { logoGC } from '../../conf/config';
 
 const GCLogo = ({ className, showLink = true }) => {
   if (showLink) {
     return (
-      <GCLink blank={false} href="/" className={className}>
+      <AppLink to="/" className={className}>
         <img src={logoGC} alt="GrottoCenter" />
-      </GCLink>
+      </AppLink>
     );
   }
   return (

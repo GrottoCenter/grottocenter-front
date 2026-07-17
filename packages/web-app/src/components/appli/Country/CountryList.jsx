@@ -15,7 +15,7 @@ import {
 import PropTypes from 'prop-types';
 import SearchInput from '../../common/SearchInput';
 import FixedContent from '../../common/Layouts/Fixed/FixedContent';
-import GCLink from '../../common/GCLink';
+import AppLink from '../../common/AppLink';
 import CustomIcon from '../../common/CustomIcon';
 import getLocalizedCountryName from '../../../helpers/countryName';
 import { AVAILABLE_LANGUAGES } from '../../../conf/config';
@@ -128,14 +128,14 @@ const CountryList = ({ countries = [] }) => {
                       <FlagImage iso2={row.iso2} alt={row.localized} />
                     </TableCell>
                     <TableCell component="th" scope="row">
-                      <GCLink internal href={`/ui/countries/${row.iso2}`}>
+                      <AppLink to={`/ui/countries/${row.iso2}`}>
                         {row.native}
-                      </GCLink>
+                      </AppLink>
                     </TableCell>
                     <TableCell>
-                      <GCLink internal href={`/ui/countries/${row.iso2}`}>
+                      <AppLink to={`/ui/countries/${row.iso2}`}>
                         {row.localized}
-                      </GCLink>
+                      </AppLink>
                     </TableCell>
                     <TableCell>{row.iso2}</TableCell>
                   </TableRow>

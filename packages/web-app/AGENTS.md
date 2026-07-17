@@ -439,20 +439,47 @@ const MyComponent = () => {
 
 ### Navigation (mobile vs desktop)
 
-Use `useOpenLink` (`src/hooks/useOpenLink.js`) whenever clicking an item links to an **internal app route** (`/ui/...`). It navigates in-app on mobile and opens a new tab on desktop. Never re-implement this logic manually.
+`AppLink` (`src/components/common/AppLink.jsx`) is the single link component for the whole app. Default choice whenever you render something that looks/behaves like a link — text links, buttons, cards, list items. It renders a real `<a>` / React Router `<Link>`, so keyboard focus, Enter, ctrl/middle-click and right-click "open in new tab" all work for free. Never build a link out of a `<span role="button">` or a plain `onClick`.
 
-> For genuine external URLs (e.g. external websites, mailto links), use `window.open` directly — `useOpenLink` is not for external links.
+Contract — the prop you pass is the signal:
+
+- `to="/ui/..."` → internal route. Always in-app on mobile. On desktop it stays in the **same tab** unless you pass `openInNewTabDesktop`.
+- `href="https://..."` → external URL. Always opens in a **new tab**.
+
+```javascript
+import AppLink from '../common/AppLink';
+
+// Internal, same tab on desktop (default)
+<AppLink to={`/ui/entrances/${id}`}>{name}</AppLink>
+
+// Internal, explicit new tab on desktop (e.g. "open in new tab" affordance)
+<AppLink to={url} openInNewTabDesktop>{label}</AppLink>
+
+// External
+<AppLink href="https://example.org">{label}</AppLink>
+```
+
+Use it directly for links, or via `component=` on any polymorphic MUI component (`Button`, `MenuItem`, `ListItem`, `CardActionArea`, `Link`) instead of an `onClick` handler:
+
+```javascript
+// ✅
+<Button component={AppLink} to={`/ui/entrances/${id}`}>Discover</Button>
+
+// ❌ Don't wire navigation through onClick when the element could be a real link
+<Button onClick={() => navigate(`/ui/entrances/${id}`)}>Discover</Button>
+```
+
+`useOpenLink` (`src/hooks/useOpenLink.js`) is the **imperative** fallback — a callback that navigates in-app on mobile and opens a new tab on desktop. Reach for it only when the target genuinely can't be an anchor: table rows (`<tr>` can't render as `<a>`), a `MenuItem`/action list mixing navigation with non-navigation actions (edit, delete), or a Leaflet marker rendered outside React's tree. If the clickable element can be an `AppLink` (or `component={AppLink}`), prefer that.
 
 ```javascript
 import useOpenLink from '../hooks/useOpenLink';
 
-const MyComponent = ({ url }) => {
-  const openLink = useOpenLink();
-  return <button onClick={() => openLink(url)}>Open</button>;
-};
+// Only for non-anchor-able elements (e.g. a whole <TableRow>)
+const openLink = useOpenLink();
+<TableRow onClick={() => openLink(url)}>...</TableRow>;
 ```
 
-> ❌ Don't do this manually:
+> ❌ Don't do this manually, whether with `AppLink` or `useOpenLink` available:
 
 ```javascript
 if (isMobile) navigate(url);

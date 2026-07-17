@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { useSelector } from 'react-redux';
-import GCLink from './GCLink';
+import AppLink from './AppLink';
 
 const InternationalizedLink = ({ links, className, children, title }) => {
   const { locale } = useSelector(state => state.intl);
@@ -9,9 +9,9 @@ const InternationalizedLink = ({ links, className, children, title }) => {
   const linkUrl = links[locale] !== undefined ? links[locale] : links['*'];
   const linkText = children || linkUrl;
   return (
-    <GCLink className={className} href={linkUrl} title={title}>
+    <AppLink className={className} href={linkUrl} title={title}>
       {linkText}
-    </GCLink>
+    </AppLink>
   );
 };
 

@@ -21,10 +21,10 @@ import CreateDescriptionForm from '../EntitiesForm/Description';
 import { postDescription } from '../../../actions/Description/CreateDescription';
 import { moveDescriptionRelevance } from '../../../actions/Description/MoveRelevance';
 import { usePermissions } from '../../../hooks';
-import useOpenLink from '../../../hooks/useOpenLink';
 import { useMoveRelevanceWithUndo } from '../../../hooks/useMoveRelevanceWithUndo';
 import { sortByRelevance } from '../../../helpers/sortByRelevance';
 import Alert from '../../common/Alert';
+import AppLink from '../../common/AppLink';
 
 const Descriptions = ({
   entityType,
@@ -41,7 +41,6 @@ const Descriptions = ({
   const hasNetworkDescriptions =
     !!networkId && !!networkName && networkDescriptionsCount > 0;
   const dispatch = useDispatch();
-  const openLink = useOpenLink();
   const [isFormVisible, setIsFormVisible] = useState(false);
   const { movingId, handleMove } = useMoveRelevanceWithUndo(
     moveDescriptionRelevance
@@ -107,11 +106,10 @@ const Descriptions = ({
                     ),
                     descriptionsLink: (
                       <MuiLink
-                        component="button"
+                        component={AppLink}
+                        to={`/ui/caves/${networkId}#description`}
+                        openInNewTabDesktop
                         variant="body1"
-                        onClick={() =>
-                          openLink(`/ui/caves/${networkId}#description`)
-                        }
                         sx={{ display: 'inline', verticalAlign: 'baseline' }}
                       >
                         {formatMessage(

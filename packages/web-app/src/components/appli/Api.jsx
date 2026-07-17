@@ -6,7 +6,7 @@ import { useSelector } from 'react-redux';
 import { useIntl } from 'react-intl';
 import { useNavigate } from 'react-router-dom';
 
-import GCLink from '../common/GCLink';
+import AppLink from '../common/AppLink';
 import InternationalizedLink from '../common/InternationalizedLink';
 import { wikiApiLinks, contactLinks } from '../../conf/externalLinks';
 import Translate from '../common/Translate';
@@ -50,11 +50,9 @@ const Api = () => {
                 id="We provide an {0} to easily access the data of Grottocenter"
                 values={{
                   0: (
-                    <GCLink
-                      href={wikiApiLink}
-                      alt="Link to rest API documentation">
+                    <AppLink href={wikiApiLink}>
                       <Translate key="api" id="API" />
-                    </GCLink>
+                    </AppLink>
                   )
                 }}
               />
@@ -70,9 +68,9 @@ const Api = () => {
                 id="A complete export of the database is also available to {0} for leader users."
                 values={{
                   0: (
-                    <GCLink href="/ui/dashboard">
+                    <AppLink to="/ui/dashboard">
                       <Translate key="download" id="download" />
-                    </GCLink>
+                    </AppLink>
                   )
                 }}
               />

@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
-import useOpenLink from '../../../hooks/useOpenLink';
+import AppLink from '../AppLink';
 import {
   Box,
   Button,
@@ -28,20 +28,18 @@ const MobileEntityCard = React.memo(
     onToggle = null,
     onRowClick = null
   }) => {
-    const openLink = useOpenLink();
     const titleCol =
       columns.find(c => c.isTitle) ??
       columns.find(c => c.field === 'name' || c.field === 'title') ??
       columns[0];
     const bodyColumns = columns.filter(c => c !== titleCol);
 
+    // In selection mode (onToggle set) the card toggles selection, not
+    // navigation, so it can't be a real link. Otherwise it's a genuine
+    // navigation target: rendered as an AppLink for keyboard/middle-click support.
     const handleClick = () => {
-      if (onToggle) {
-        onToggle(doc.id);
-      } else {
-        if (onRowClick) onRowClick(doc);
-        openLink(link(doc));
-      }
+      if (onToggle) onToggle(doc.id);
+      else if (onRowClick) onRowClick(doc);
     };
 
     return (
@@ -52,7 +50,11 @@ const MobileEntityCard = React.memo(
           bgcolor: selected ? 'action.selected' : 'background.paper',
           transition: 'background-color 0.15s'
         }}>
-        <CardActionArea onClick={handleClick}>
+        <CardActionArea
+          onClick={handleClick}
+          {...(!onToggle
+            ? { component: AppLink, to: link(doc), openInNewTabDesktop: true }
+            : {})}>
           <CardContent sx={{ py: 1, px: 1.5, '&:last-child': { pb: 1 } }}>
             <Box
               sx={{

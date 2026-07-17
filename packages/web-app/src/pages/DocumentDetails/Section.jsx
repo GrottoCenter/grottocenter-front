@@ -14,7 +14,7 @@ import {
 import { styled } from '@mui/material/styles';
 import { EventAvailable, InsertDriveFile } from '@mui/icons-material';
 
-import GCLink from '../../components/common/GCLink';
+import AppLink from '../../components/common/AppLink';
 import Property from '../../components/common/Properties/Property';
 import ImageLightbox from '../../components/common/DocumentsList/ImageLightbox';
 import ImageThumbnail from '../../components/common/DocumentsList/ImageThumbnail';
@@ -27,14 +27,16 @@ import {
 import { getFileIcon } from '../../components/common/DocumentsList/utils/fileIcons';
 import { ThumbnailsPropTypes } from '../../types/document.type';
 
-export const TextLink = ({ value, url }) =>
-  url ? (
-    <GCLink href={url} internal={url.startsWith('/ui')}>
-      {value}
-    </GCLink>
+export const TextLink = ({ value, url }) => {
+  if (!url) return <Typography component="span">{value}</Typography>;
+  return url.startsWith('/ui') ? (
+    <AppLink to={url}>{value}</AppLink>
   ) : (
-    <Typography component="span">{value}</Typography>
+    <AppLink href={url}>
+      {value}
+    </AppLink>
   );
+};
 TextLink.propTypes = {
   value: PropTypes.oneOfType([PropTypes.string, PropTypes.node]).isRequired,
   url: PropTypes.string
@@ -358,15 +360,15 @@ export const FilesSection = ({ files }) => {
               mb: 1
             }}>
             {getFileIcon(file.fileName)}
-            <GCLink href={file.completePath}>
+            <AppLink href={file.completePath}>
               {decodeFileName(file.fileName)}
-            </GCLink>
+            </AppLink>
           </Box>
           <PdfPreview data={file.completePath} type="application/pdf">
             <Typography variant="body2">
-              <GCLink href={file.completePath}>
+              <AppLink href={file.completePath}>
                 {formatMessage({ id: 'Open PDF' })}
-              </GCLink>
+              </AppLink>
             </Typography>
           </PdfPreview>
         </Box>
@@ -382,9 +384,9 @@ export const FilesSection = ({ files }) => {
               mb: 1
             }}>
             {getFileIcon(file.fileName)}
-            <GCLink href={file.completePath}>
+            <AppLink href={file.completePath}>
               {decodeFileName(file.fileName)}
-            </GCLink>
+            </AppLink>
           </Box>
           <VideoPreview
             controls
@@ -404,9 +406,9 @@ export const FilesSection = ({ files }) => {
               mb: 1
             }}>
             {getFileIcon(file.fileName)}
-            <GCLink href={file.completePath}>
+            <AppLink href={file.completePath}>
               {decodeFileName(file.fileName)}
-            </GCLink>
+            </AppLink>
           </Box>
           <AudioPreview controls preload="metadata" src={file.completePath} />
         </Box>
@@ -418,9 +420,9 @@ export const FilesSection = ({ files }) => {
             <FileRow key={file.completePath}>
               {getFileIcon(file.fileName)}
               <Box sx={{ flex: 1, minWidth: 0, wordBreak: 'break-word' }}>
-                <GCLink href={file.completePath}>
+                <AppLink href={file.completePath}>
                   {decodeFileName(file.fileName)}
-                </GCLink>
+                </AppLink>
               </Box>
             </FileRow>
           ))}

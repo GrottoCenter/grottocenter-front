@@ -4,7 +4,7 @@ import { Box } from '@mui/material';
 import CheckIcon from '@mui/icons-material/Check';
 import UnreadNotificationIcon from '@mui/icons-material/FiberManualRecord';
 import { useIntl } from 'react-intl';
-import GCLink from '../GCLink';
+import AppLink from '../AppLink';
 import Translate from '../Translate';
 import DataQualityBadge from '../DataQualityBadge';
 import CustomIcon from '../CustomIcon';
@@ -27,6 +27,22 @@ DateTimeCell.propTypes = {
   value: PropTypes.string
 };
 
+// React component so it can render AppLink; stops row click propagation.
+const PersonLinkCell = ({ person }) => (
+  <AppLink
+    to={`/ui/persons/${person.id}`}
+    onClick={e => e.stopPropagation()}>
+    {person.nickname}
+  </AppLink>
+);
+
+PersonLinkCell.propTypes = {
+  person: PropTypes.shape({
+    id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+    nickname: PropTypes.string
+  }).isRequired
+};
+
 const cellsRender = {
   notificationIsRead: value =>
     value ? (
@@ -45,13 +61,7 @@ const cellsRender = {
   person: value => {
     if (!value) return false;
     if (value.id && value.nickname) {
-      return (
-        <GCLink
-          href={`/ui/persons/${value.id}`}
-          onClick={e => e.stopPropagation()}>
-          {value.nickname}
-        </GCLink>
-      );
+      return <PersonLinkCell person={value} />;
     }
     return value;
   },

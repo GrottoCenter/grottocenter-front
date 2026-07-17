@@ -9,7 +9,7 @@ import { fetchCumulatedLength } from '../../../actions/CumulatedLength';
 import DataCard from './components/DataCard';
 import DataLine from './components/DataLine';
 import CustomIcon from '../../common/CustomIcon';
-import GCLink from '../../common/GCLink';
+import AppLink from '../../common/AppLink';
 
 const SectionTitle = styled('h3')`
   text-align: center;
@@ -18,7 +18,7 @@ const SectionTitle = styled('h3')`
   color: ${({ theme }) => theme.palette.secondary.main};
 `;
 
-const StyledLink = styled(GCLink)`
+const StyledLink = styled(AppLink)`
   text-decoration: none;
 `;
 
@@ -68,7 +68,7 @@ const DataHomepage = () => {
         <Grid container>
           <Grid size={{ xs: 12, sm: 4 }}>
             {entrances && (
-              <StyledLink internal href="/ui/entrances">
+              <StyledLink to="/ui/entrances">
                 <DataCard
                   isColored={false}
                   icon={<CustomIcon type="entrance" size={55} />}
@@ -83,7 +83,7 @@ const DataHomepage = () => {
 
           <Grid size={{ xs: 12, sm: 4 }}>
             {users && (
-              <StyledLink internal href="/ui/persons">
+              <StyledLink to="/ui/persons">
                 <DataCard
                   isColored
                   icon={<CustomIcon type="caver" size={55} />}
@@ -99,7 +99,7 @@ const DataHomepage = () => {
           </Grid>
           <Grid size={{ xs: 12, sm: 4 }}>
             {documents && (
-              <StyledLink internal href="/ui/documents">
+              <StyledLink to="/ui/documents">
                 <DataCard
                   isColored={false}
                   icon={<CustomIcon type="bibliography" size={55} />}
@@ -116,7 +116,7 @@ const DataHomepage = () => {
 
           <Grid size={{ xs: 12, sm: 4 }}>
             {countries && (
-              <StyledLink internal href="/ui/countries">
+              <StyledLink to="/ui/countries">
                 <DataCard
                   isColored
                   icon={<CustomIcon size={55} type="country" />}
@@ -132,7 +132,7 @@ const DataHomepage = () => {
           </Grid>
           <Grid size={{ xs: 12, sm: 4 }}>
             {cumulatedLength && (
-              <StyledLink internal href="/ui/entrances">
+              <StyledLink to="/ui/entrances">
                 <DataCard
                   isColored={false}
                   icon={
@@ -156,7 +156,7 @@ const DataHomepage = () => {
           </Grid>
           <Grid size={{ xs: 12, sm: 4 }}>
             {organizations && (
-              <StyledLink internal href="/ui/organizations">
+              <StyledLink to="/ui/organizations">
                 <DataCard
                   isColored
                   icon={<CustomIcon type="organization" size={55} />}

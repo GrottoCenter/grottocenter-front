@@ -3,9 +3,9 @@ import PropTypes from 'prop-types';
 import { alpha, styled } from '@mui/material/styles';
 import { Typography, Box } from '@mui/material';
 import { useSelector } from 'react-redux';
-import { useOpenLink } from '../../../../../hooks';
+import AppLink from '../../../../common/AppLink';
 
-const StyledBox = styled(Box)`
+const StyledBox = styled(AppLink)`
   padding: 12px 16px;
   border-radius: 10px;
   cursor: pointer;
@@ -21,12 +21,12 @@ const StyledBox = styled(Box)`
 
 const CaveCard = ({ idCave, nameCave, numberData, text, backgroundColor }) => {
   const locale = useSelector(state => state.intl);
-  const openLink = useOpenLink();
 
   return (
     <StyledBox
       bgcolor={alpha(backgroundColor, 0.75)}
-      onClick={() => openLink(`/ui/caves/${idCave}`)}>
+      to={`/ui/caves/${idCave}`}
+      openInNewTabDesktop>
       <Box sx={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 1 }}>
         <Typography variant="h4" fontWeight={700} noWrap>
           {numberData.toLocaleString(locale)} m

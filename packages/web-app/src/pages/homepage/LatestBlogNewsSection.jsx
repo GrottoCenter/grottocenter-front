@@ -3,7 +3,7 @@ import { Box, Typography } from '@mui/material';
 import { FeedOutlined } from '@mui/icons-material';
 import { styled } from '@mui/material/styles';
 import { useIntl } from 'react-intl';
-import GCLink from '../../components/common/GCLink';
+import AppLink from '../../components/common/AppLink';
 import LatestBlogNews from '../../containers/LatestBlogNews';
 import { frenchRssUrl, englishRssUrl } from '../../conf/apiRoutes';
 import { bloggerLinks } from '../../conf/externalLinks';
@@ -53,7 +53,7 @@ const LatestBlogNewsSection = () => {
           url={isFrench ? frenchRssUrl : englishRssUrl}
         />
         <Box sx={{ textAlign: 'center', mt: 3 }}>
-          <GCLink href={isFrench ? bloggerLinks.fr : bloggerLinks['*']}>
+          <AppLink href={isFrench ? bloggerLinks.fr : bloggerLinks['*']}>
             <Typography
               variant="body2"
               color="text.secondary"
@@ -64,7 +64,7 @@ const LatestBlogNewsSection = () => {
               }}>
               {formatMessage({ id: 'See all news' })}
             </Typography>
-          </GCLink>
+          </AppLink>
         </Box>
       </Inner>
     </Section>

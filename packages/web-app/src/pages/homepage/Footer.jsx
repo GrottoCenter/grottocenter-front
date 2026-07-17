@@ -3,7 +3,7 @@ import { Box, Grid, Typography } from '@mui/material';
 import { keyframes, styled } from '@mui/material/styles';
 import { useIntl } from 'react-intl';
 import GCLogo from '../../components/common/GCLogo';
-import GCLink from '../../components/common/GCLink';
+import AppLink from '../../components/common/AppLink';
 import InternationalizedLink from '../../components/common/InternationalizedLink';
 import {
   wikicavesLink,
@@ -174,9 +174,9 @@ const Footer = () => {
             <NavList
               component="nav"
               aria-label={formatMessage({ id: 'Navigation' })}>
-              <GCLink internal href="/ui/faq">
+              <AppLink to="/ui/faq">
                 {formatMessage({ id: 'FAQ' })}
-              </GCLink>
+              </AppLink>
               <InternationalizedLink links={wikiLinks}>
                 {formatMessage({ id: 'Wiki' })}
               </InternationalizedLink>
@@ -255,15 +255,14 @@ const Footer = () => {
                 </InternationalizedLink>
               </IconItem>
               <IconItem>
-                <GCLink
-                  internal
-                  href="/ui/api"
+                <AppLink
+                  to="/ui/api"
                   title={formatMessage({ id: 'Want to use our API?' })}>
                   <ApiImg
                     src="/images/icons8/icons8-rest-api-filled-100.png"
                     alt={formatMessage({ id: 'Want to use our API?' })}
                   />
-                </GCLink>
+                </AppLink>
               </IconItem>
               <IconItem>
                 <InternationalizedLink

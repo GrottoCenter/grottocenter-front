@@ -3,7 +3,7 @@ import { Box, Button, Grid, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { brown } from '@mui/material/colors';
 import { useIntl } from 'react-intl';
-import GCLink from '../../components/common/GCLink';
+import AppLink from '../../components/common/AppLink';
 
 const WelcomeSection = styled('section')(({ theme }) => ({
   backgroundColor: brown[50],
@@ -66,11 +66,11 @@ const Welcome = () => {
           ))}
         </Grid>
         <Box sx={{ textAlign: 'center', mt: { xs: 4, sm: 5 } }}>
-          <GCLink internal href="/ui/signup">
+          <AppLink to="/ui/signup">
             <Button variant="outlined" color="primary">
               {formatMessage({ id: 'Create an account' })}
             </Button>
-          </GCLink>
+          </AppLink>
         </Box>
       </Inner>
     </WelcomeSection>

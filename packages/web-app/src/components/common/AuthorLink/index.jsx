@@ -2,7 +2,7 @@ import React from 'react';
 import { useIntl, defineMessages } from 'react-intl';
 import PropTypes from 'prop-types';
 import { Typography } from '@mui/material';
-import GCLink from '../GCLink';
+import AppLink from '../AppLink';
 import authorType from '../../../types/author.type';
 
 const verbMessages = defineMessages({
@@ -27,9 +27,9 @@ const AuthorLink = ({ author, verb = 'Posted' }) => {
           {formatMessage({ id: 'author.by' }, { verb: verbLabel })}&nbsp;
         </Typography>
       )}
-      <GCLink internal href={`/ui/persons/${author?.id}`}>
+      <AppLink to={`/ui/persons/${author?.id}`}>
         {author.nickname}
-      </GCLink>
+      </AppLink>
     </span>
   );
 };

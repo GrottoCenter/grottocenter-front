@@ -12,7 +12,7 @@ import {
 import { SyncProblemOutlined } from '@mui/icons-material';
 import { styled } from '@mui/material/styles';
 import { FormattedMessage } from 'react-intl';
-import GCLink from '../GCLink';
+import AppLink from '../AppLink';
 import { DYNAMIC_NEWS_RELOAD_INTERVAL } from '../../../conf/config';
 
 const StyledCard = styled(Card)({
@@ -95,11 +95,11 @@ const NewsCard = ({
         </Typography>
         {linkMore && (
           <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-            <GCLink href={linkMore}>
+            <AppLink href={linkMore}>
               <Button color="secondary" variant="outlined" size="small">
                 <FormattedMessage id="Read more" />
               </Button>
-            </GCLink>
+            </AppLink>
           </Box>
         )}
       </CardContent>
