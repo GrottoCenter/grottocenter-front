@@ -19,6 +19,7 @@ const SectionTitle = styled('h3')`
 `;
 
 const StyledLink = styled(AppLink)`
+  color: inherit;
   text-decoration: none;
 `;
 

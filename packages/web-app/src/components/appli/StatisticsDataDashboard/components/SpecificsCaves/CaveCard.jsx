@@ -13,6 +13,8 @@ const StyledBox = styled(AppLink)`
   display: flex;
   flex-direction: column;
   gap: 4px;
+  color: inherit;
+  text-decoration: none;
   transition: filter 0.15s ease;
   &:hover {
     filter: brightness(0.93);
@@ -24,7 +26,7 @@ const CaveCard = ({ idCave, nameCave, numberData, text, backgroundColor }) => {
 
   return (
     <StyledBox
-      bgcolor={alpha(backgroundColor, 0.75)}
+      style={{ backgroundColor: alpha(backgroundColor, 0.75) }}
       to={`/ui/caves/${idCave}`}
       openInNewTabDesktop>
       <Box sx={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 1 }}>

@@ -21,6 +21,7 @@ const StatItem = styled(AppLink)(({ theme }) => ({
   justifyContent: 'center',
   textAlign: 'center',
   margin: '0 8px',
+  color: 'inherit',
   textDecoration: 'none',
   borderRadius: 8,
   padding: '4px 8px',
