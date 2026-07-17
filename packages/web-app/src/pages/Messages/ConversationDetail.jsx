@@ -55,8 +55,12 @@ const MessageBubble = styled(Paper, {
   minWidth: 0,
   width: 'fit-content',
   alignSelf: $isMine ? 'flex-end' : 'flex-start',
-  backgroundColor: $isMine ? theme.palette.primary.light : theme.palette.grey[200],
-  color: $isMine ? theme.palette.primary.contrastText : theme.palette.text.primary,
+  backgroundColor: $isMine
+    ? theme.palette.primary.light
+    : theme.palette.grey[200],
+  color: $isMine
+    ? theme.palette.primary.contrastText
+    : theme.palette.text.primary,
   marginBottom: theme.spacing(1),
   borderRadius: 16,
   borderBottomRightRadius: $isMine ? 4 : 16,
@@ -69,7 +73,9 @@ const MessageDate = styled(Typography, {
   shouldForwardProp: prop => !prop.startsWith('$')
 })(({ theme, $isMine }) => ({
   fontSize: '0.75rem',
-  color: $isMine ? theme.palette.primary.contrastText : theme.palette.text.secondary,
+  color: $isMine
+    ? theme.palette.primary.contrastText
+    : theme.palette.text.secondary,
   opacity: 0.7,
   marginTop: '4px',
   textAlign: 'right'
@@ -114,31 +120,39 @@ const ConversationDetail = () => {
   const [isReportDialogOpen, setIsReportDialogOpen] = useState(false);
   const { onSuccess, onError } = useNotification();
 
-  const { items: messages, totalCount, status, error } = useSelector(
-    state => state.messaging.activeConversationMessages
-  );
+  const {
+    items: messages,
+    totalCount,
+    status,
+    error
+  } = useSelector(state => state.messaging.activeConversationMessages);
 
   const authState = useSelector(state => state.login);
   const myCaverId = authState?.authTokenDecoded?.id;
 
   const convIdNum = Number(conversationId);
-  const activeConv = useSelector(state => state.messaging.activeConversations.items.find(c => c.id === convIdNum));
-  const archivedConv = useSelector(state => state.messaging.archivedConversations.items.find(c => c.id === convIdNum));
+  const activeConv = useSelector(state =>
+    state.messaging.activeConversations.items.find(c => c.id === convIdNum)
+  );
+  const archivedConv = useSelector(state =>
+    state.messaging.archivedConversations.items.find(c => c.id === convIdNum)
+  );
   const currentConversation = activeConv || archivedConv;
   const fetchedPerson = useSelector(state => state.person.person);
 
   const otherParticipant =
     currentConversation?.otherParticipant ||
     messages.find(m => m.caverSender?.id !== myCaverId)?.caverSender ||
-    (fetchedPerson && Number(fetchedPerson.id) !== Number(myCaverId) ? { id: fetchedPerson.id, nickname: fetchedPerson.nickname } : null);
+    (fetchedPerson && Number(fetchedPerson.id) !== Number(myCaverId)
+      ? { id: fetchedPerson.id, nickname: fetchedPerson.nickname }
+      : null);
 
-  const titleText = otherParticipant?.nickname || formatMessage({ id: 'Conversation details' });
+  const titleText =
+    otherParticipant?.nickname || formatMessage({ id: 'Conversation details' });
 
   const messagesEndRef = useRef(null);
   const messagesListRef = useRef(null);
   const sentinelRef = useRef(null);
-  const replyInputRef = useRef(null);
-  const wasSending = useRef(false);
   const isFirstLoad = useRef(true);
 
   const hasMore = messages.length < totalCount;
@@ -149,7 +163,12 @@ const ConversationDetail = () => {
 
   useEffect(() => {
     if (conversationId) {
-      dispatch(fetchConversationMessages(conversationId, { limit: MESSAGES_PAGE_SIZE, skip: 0 }));
+      dispatch(
+        fetchConversationMessages(conversationId, {
+          limit: MESSAGES_PAGE_SIZE,
+          skip: 0
+        })
+      );
     }
   }, [dispatch, conversationId]);
 
@@ -162,17 +181,19 @@ const ConversationDetail = () => {
 
   const loadMore = useCallback(() => {
     if (status === REDUCER_STATUS.LOADING || !hasMore) return;
-    dispatch(fetchConversationMessages(conversationId, {
-      limit: MESSAGES_PAGE_SIZE,
-      skip: messages.length
-    }));
+    dispatch(
+      fetchConversationMessages(conversationId, {
+        limit: MESSAGES_PAGE_SIZE,
+        skip: messages.length
+      })
+    );
   }, [dispatch, conversationId, hasMore, messages.length, status]);
 
   useEffect(() => {
     if (!hasMore || status === REDUCER_STATUS.LOADING) return;
 
     const observer = new IntersectionObserver(
-      (entries) => {
+      entries => {
         if (entries[0].isIntersecting) {
           loadMore();
         }
@@ -195,16 +216,6 @@ const ConversationDetail = () => {
     };
   }, [hasMore, status, loadMore]);
 
-  // The TextField is disabled while sending, which drops DOM focus.
-  // Restore it once re-enabled so the user can keep typing without re-clicking,
-  // but skip the initial mount to avoid stealing focus on page load.
-  useEffect(() => {
-    if (wasSending.current && !isSending) {
-      replyInputRef.current?.focus();
-    }
-    wasSending.current = isSending;
-  }, [isSending]);
-
   if (!conversationId) {
     return (
       <BlankStateContainer>
@@ -217,7 +228,13 @@ const ConversationDetail = () => {
 
   if (status === REDUCER_STATUS.LOADING && messages.length === 0) {
     return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '100%'
+        }}>
         <CircularProgress />
       </Box>
     );
@@ -228,12 +245,14 @@ const ConversationDetail = () => {
       <Box sx={{ p: 3 }}>
         <Alert
           severity="error"
-          title={error?.message || formatMessage({ id: 'An error occurred while fetching messages.' })}
+          title={
+            error?.message ||
+            formatMessage({ id: 'An error occurred while fetching messages.' })
+          }
         />
       </Box>
     );
   }
-
 
   const handleSend = async () => {
     if (!replyText.trim() || replyText.length > 5000) return;
@@ -248,7 +267,7 @@ const ConversationDetail = () => {
     }
   };
 
-  const handleReportClick = (msg) => {
+  const handleReportClick = msg => {
     setSelectedMessageToReport(msg);
     setIsReportDialogOpen(true);
   };
@@ -261,7 +280,8 @@ const ConversationDetail = () => {
   const handleConfirmReport = async () => {
     if (!selectedMessageToReport) return;
 
-    const senderName = selectedMessageToReport.caverSender?.nickname || 'Unknown';
+    const senderName =
+      selectedMessageToReport.caverSender?.nickname || 'Unknown';
     const body = selectedMessageToReport.body || '';
     const date = new Date(selectedMessageToReport.dateSent).toLocaleString();
 
@@ -272,14 +292,24 @@ Message Body: ${body}`;
 
     try {
       await navigator.clipboard.writeText(textToCopy);
-      onSuccess(formatMessage({ id: 'Message details copied to clipboard.', defaultMessage: 'Message details copied to clipboard.' }));
-      window.open('https://en.wikicaves.org/contact', '_blank', 'noopener,noreferrer');
+      onSuccess(
+        formatMessage({
+          id: 'Message details copied to clipboard.',
+          defaultMessage: 'Message details copied to clipboard.'
+        })
+      );
+      window.open(
+        'https://en.wikicaves.org/contact',
+        '_blank',
+        'noopener,noreferrer'
+      );
     } catch (err) {
       console.error('Failed to copy text to clipboard:', err);
       onError(
         formatMessage({
           id: 'Failed to copy message details to clipboard. Please copy them manually.',
-          defaultMessage: 'Failed to copy message details to clipboard. Please copy them manually.'
+          defaultMessage:
+            'Failed to copy message details to clipboard. Please copy them manually.'
         })
       );
     }
@@ -289,7 +319,15 @@ Message Body: ${body}`;
 
   return (
     <DetailContainer>
-      <Box sx={{ p: 2, borderBottom: 1, borderColor: 'divider', bgcolor: 'background.paper', display: 'flex', alignItems: 'center' }}>
+      <Box
+        sx={{
+          p: 2,
+          borderBottom: 1,
+          borderColor: 'divider',
+          bgcolor: 'background.paper',
+          display: 'flex',
+          alignItems: 'center'
+        }}>
         <IconButton
           sx={{
             display: { xs: 'inline-flex', md: 'none' },
@@ -299,8 +337,7 @@ Message Body: ${body}`;
             borderRadius: '8px',
             p: '6px'
           }}
-          onClick={() => navigate('/ui/messages')}
-        >
+          onClick={() => navigate('/ui/messages')}>
           <ArrowBackIcon />
         </IconButton>
         <Box
@@ -317,8 +354,7 @@ Message Body: ${body}`;
             <Link
               component={RouterLink}
               to={`/ui/persons/${otherParticipant.id}`}
-              sx={{ color: 'inherit', textDecoration: 'underline' }}
-            >
+              sx={{ color: 'inherit', textDecoration: 'underline' }}>
               {titleText}
             </Link>
           ) : (
@@ -333,12 +369,24 @@ Message Body: ${body}`;
           const isMine = msg.caverSender?.id === myCaverId;
           return (
             <MessageBubble key={msg.id} elevation={1} $isMine={isMine}>
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 1 }}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'flex-start',
+                  gap: 1
+                }}>
                 <Box sx={{ flexGrow: 1, minWidth: 0 }}>
-                  <Typography variant="body1" sx={{ whiteSpace: 'pre-wrap' }}>{msg.body}</Typography>
+                  <Typography variant="body1" sx={{ whiteSpace: 'pre-wrap' }}>
+                    {msg.body}
+                  </Typography>
                 </Box>
                 {!isMine && (
-                  <Tooltip title={formatMessage({ id: 'Report this message', defaultMessage: 'Report this message' })}>
+                  <Tooltip
+                    title={formatMessage({
+                      id: 'Report this message',
+                      defaultMessage: 'Report this message'
+                    })}>
                     <IconButton
                       size="small"
                       onClick={() => handleReportClick(msg)}
@@ -349,8 +397,7 @@ Message Body: ${body}`;
                         mt: '4px',
                         ml: 1,
                         flexShrink: 0
-                      }}
-                    >
+                      }}>
                       <FlagIcon fontSize="small" />
                     </IconButton>
                   </Tooltip>
@@ -372,12 +419,17 @@ Message Body: ${body}`;
           );
         })}
         {hasMore && (
-          <Box ref={sentinelRef} sx={{ display: 'flex', justifyContent: 'center', py: 1 }}>
+          <Box
+            ref={sentinelRef}
+            sx={{ display: 'flex', justifyContent: 'center', py: 1 }}>
             {status === REDUCER_STATUS.LOADING ? (
               <CircularProgress size={24} />
             ) : (
               <Button onClick={loadMore} size="small">
-                {formatMessage({ id: 'Load more', defaultMessage: 'Load more' })}
+                {formatMessage({
+                  id: 'Load more',
+                  defaultMessage: 'Load more'
+                })}
               </Button>
             )}
           </Box>
@@ -400,7 +452,6 @@ Message Body: ${body}`;
             }
           }}
           disabled={isSending}
-          inputRef={replyInputRef}
           slotProps={{
             htmlInput: {
               maxLength: 5100,
@@ -412,10 +463,19 @@ Message Body: ${body}`;
             // FormHelperText renders a <p>, which cannot contain a <div>.
             <Box
               component="span"
-              sx={{ display: 'flex', justifyContent: 'flex-end', width: '100%', m: 0 }}>
-              <span style={{ color: replyText.length > 5000 ? 'red' : 'inherit' }}>
+              sx={{
+                display: 'flex',
+                justifyContent: 'flex-end',
+                width: '100%',
+                m: 0
+              }}>
+              <span
+                style={{ color: replyText.length > 5000 ? 'red' : 'inherit' }}>
                 {replyText.length > 5000
-                  ? formatMessage({ id: 'Message exceeds 5000 characters limit.', defaultMessage: 'Message exceeds 5000 characters limit.' }) + ' '
+                  ? formatMessage({
+                      id: 'Message exceeds 5000 characters limit.',
+                      defaultMessage: 'Message exceeds 5000 characters limit.'
+                    }) + ' '
                   : ''}
                 {replyText.length} / 5000
               </span>
@@ -438,22 +498,31 @@ Message Body: ${body}`;
       <StandardDialog
         open={isReportDialogOpen}
         onClose={handleCloseReportDialog}
-        title={formatMessage({ id: 'Report message', defaultMessage: 'Report message' })}
+        title={formatMessage({
+          id: 'Report message',
+          defaultMessage: 'Report message'
+        })}
         actions={
           <>
             <Button onClick={handleCloseReportDialog} variant="outlined">
               {formatMessage({ id: 'Cancel', defaultMessage: 'Cancel' })}
             </Button>
-            <Button onClick={handleConfirmReport} variant="contained" color="error">
-              {formatMessage({ id: 'Copy details & Report', defaultMessage: 'Copy details & Report' })}
+            <Button
+              onClick={handleConfirmReport}
+              variant="contained"
+              color="error">
+              {formatMessage({
+                id: 'Copy details & Report',
+                defaultMessage: 'Copy details & Report'
+              })}
             </Button>
           </>
-        }
-      >
+        }>
         <Typography variant="body1">
           {formatMessage({
             id: 'Reporting a message opens the contact form to notify administrators. The message details (sender, content, and date) will be copied to your clipboard so you can paste them into the form.',
-            defaultMessage: 'Reporting a message opens the contact form to notify administrators. The message details (sender, content, and date) will be copied to your clipboard so you can paste them into the form.'
+            defaultMessage:
+              'Reporting a message opens the contact form to notify administrators. The message details (sender, content, and date) will be copied to your clipboard so you can paste them into the form.'
           })}
         </Typography>
       </StandardDialog>
