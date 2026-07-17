@@ -76,7 +76,12 @@ const HalfSplitContainer = styled('div')`
   }
 `;
 
-export const Entry = ({ isLoading, error, entrance, networkDescriptionsCount = 0 }) => {
+export const Entry = ({
+  isLoading,
+  error,
+  entrance,
+  networkDescriptionsCount = 0
+}) => {
   const dispatch = useDispatch();
   const { formatMessage } = useIntl();
   const navigate = useNavigate();
@@ -302,195 +307,200 @@ export const Entry = ({ isLoading, error, entrance, networkDescriptionsCount = 0
 
   return (
     <PageContainer>
-    <div ref={componentRef}>
-      <PageHeader
-        title={entrance?.name ?? (isLoading ? undefined : '')}
-        icon={<CustomIcon type="entrance" />}
-        subheader={breadcrumb}
-        actions={actions}
-      />
+      <div ref={componentRef}>
+        <PageHeader
+          title={entrance?.name ?? (isLoading ? undefined : '')}
+          icon={<CustomIcon type="entrance" />}
+          subheader={breadcrumb}
+          actions={actions}
+        />
 
-      <PageTabs tabs={tabs}>
-        {/* Tab Information */}
-        <div>
-          {isLoading && (
-            <Card sx={{ m: 2, p: 3 }}>
-              <Skeleton height={300} />
-              <Skeleton height={80} />
-              <Skeleton height={100} />
-              <Skeleton height={150} />
-              <Skeleton height={100} />
-            </Card>
-          )}
-          {error && (
-            <Card sx={{ m: 2, p: 3 }}>
-              <Alert
-                title={formatMessage({
-                  id: 'Error, the entrance data you are looking for is not available.'
-                })}
-                severity="error"
-              />
-            </Card>
-          )}
-          {entrance && (
-            <>
-              {entrance.isDeleted && (
-                <Box sx={{ m: 2 }}>
-                  <DeletedCard
-                    entityType={DELETED_ENTITIES.entrance}
-                    entity={entrance}
-                    isLoading={isActionLoading}
-                    onRestorePress={onRestorePress}
-                    onPermanentDeletePress={() => {
-                      setIsDeleteConfirmationPermanent(true);
-                      setIsDeleteConfirmationOpen(true);
-                    }}
-                  />
-                </Box>
-              )}
-              <DeleteConfirmationDialog
-                entityType={DELETED_ENTITIES.entrance}
-                isOpen={isDeleteConfirmationOpen}
-                isLoading={isActionLoading}
-                isPermanent={isDeleteConfirmationPermanent}
-                onClose={() => setIsDeleteConfirmationOpen(false)}
-                onConfirmation={entity => {
-                  onDeletePress(entity?.id, isDeleteConfirmationPermanent);
-                }}
-              />
-              {entrance.isSensitive && isAdmin && (
-                <Box sx={{ mx: 2, mt: 2 }}>
-                  <SensitiveCaveWarning />
-                </Box>
-              )}
-              <ScrollableContent
-                content={
-                  <>
-                    <HalfSplitContainer>
-                      <Box sx={{ flex: 1, minHeight: 200, display: 'flex' }}>
-                        {!entrance.isSensitive || isAdmin ? (
-                          <Map positions={mapPositions} loading={isLoading} />
-                        ) : (
-                          <SensitiveLocationPlaceholder />
-                        )}
-                      </Box>
-                      <Box sx={{ flex: 1, overflow: 'auto' }}>
-                        <Properties
-                          entrance={entrance}
-                          dataQuality={entrance.dataQuality}
-                        />
-                      </Box>
-                    </HalfSplitContainer>
-                    {(entrance.author ||
-                      entrance.reviewer ||
-                      entrance.language) && (
-                      <Typography
-                        component="div"
-                        variant="caption"
-                        sx={{ mt: 2 }}>
-                        {entrance.author && (
-                          <AuthorAndDate
-                            author={entrance.author}
-                            verb="Created"
-                            date={entrance.dateInscription}
+        <PageTabs tabs={tabs}>
+          {/* Tab Information */}
+          <div>
+            {isLoading && (
+              <Card sx={{ m: 2, p: 3 }}>
+                <Skeleton height={300} />
+                <Skeleton height={80} />
+                <Skeleton height={100} />
+                <Skeleton height={150} />
+                <Skeleton height={100} />
+              </Card>
+            )}
+            {error && (
+              <Card sx={{ m: 2, p: 3 }}>
+                <Alert
+                  title={formatMessage({
+                    id: 'Error, the entrance data you are looking for is not available.'
+                  })}
+                  severity="error"
+                />
+              </Card>
+            )}
+            {entrance && (
+              <>
+                {entrance.isDeleted && (
+                  <Box sx={{ m: 2 }}>
+                    <DeletedCard
+                      entityType={DELETED_ENTITIES.entrance}
+                      entity={entrance}
+                      isLoading={isActionLoading}
+                      onRestorePress={onRestorePress}
+                      onPermanentDeletePress={() => {
+                        setIsDeleteConfirmationPermanent(true);
+                        setIsDeleteConfirmationOpen(true);
+                      }}
+                    />
+                  </Box>
+                )}
+                <DeleteConfirmationDialog
+                  entityType={DELETED_ENTITIES.entrance}
+                  isOpen={isDeleteConfirmationOpen}
+                  isLoading={isActionLoading}
+                  isPermanent={isDeleteConfirmationPermanent}
+                  onClose={() => setIsDeleteConfirmationOpen(false)}
+                  onConfirmation={entity => {
+                    onDeletePress(entity?.id, isDeleteConfirmationPermanent);
+                  }}
+                />
+                {entrance.isSensitive && isAdmin && (
+                  <Box sx={{ mx: 2, mt: 2 }}>
+                    <SensitiveCaveWarning />
+                  </Box>
+                )}
+                <ScrollableContent
+                  content={
+                    <>
+                      <HalfSplitContainer>
+                        <Box sx={{ flex: 1, minHeight: 200, display: 'flex' }}>
+                          {!entrance.isSensitive || isAdmin ? (
+                            <Map positions={mapPositions} loading={isLoading} />
+                          ) : (
+                            <SensitiveLocationPlaceholder />
+                          )}
+                        </Box>
+                        <Box sx={{ flex: 1, overflow: 'auto' }}>
+                          <Properties
+                            entrance={entrance}
+                            dataQuality={entrance.dataQuality}
                           />
-                        )}
-                        {entrance.author && entrance.reviewer && ' · '}
-                        {entrance.reviewer && (
-                          <AuthorAndDate
-                            author={entrance.reviewer}
-                            verb="Updated"
-                            date={entrance.dateReviewed}
-                          />
-                        )}
-                        {entrance.language &&
-                          (entrance.author || entrance.reviewer) &&
-                          ' · '}
-                        {entrance.language &&
-                          `${formatMessage({ id: 'Language' })} : ${entrance.language.toUpperCase()}`}
-                      </Typography>
-                    )}
-                  </>
-                }
-              />
+                        </Box>
+                      </HalfSplitContainer>
+                      {(entrance.author ||
+                        entrance.reviewer ||
+                        entrance.language) && (
+                        <Typography
+                          component="div"
+                          variant="caption"
+                          color="text.secondary"
+                          sx={{ mt: 2 }}>
+                          {entrance.author && (
+                            <AuthorAndDate
+                              author={entrance.author}
+                              verb="Created"
+                              date={entrance.dateInscription}
+                              textColor="inherit"
+                            />
+                          )}
+                          {entrance.author && entrance.reviewer && ' · '}
+                          {entrance.reviewer && (
+                            <AuthorAndDate
+                              author={entrance.reviewer}
+                              verb="Updated"
+                              date={entrance.dateReviewed}
+                              textColor="inherit"
+                            />
+                          )}
+                          {entrance.language &&
+                            (entrance.author || entrance.reviewer) &&
+                            ' · '}
+                          {entrance.language &&
+                            `${formatMessage({ id: 'Language' })} : ${entrance.language.toUpperCase()}`}
+                        </Typography>
+                      )}
+                    </>
+                  }
+                />
 
-              <Locations
-                locations={entrance.locations}
-                entranceId={entrance.id}
-                isSensitive={entrance.isSensitive}
-                isEditAllowed={!entrance.isDeleted}
-              />
-              <Descriptions
-                descriptions={entrance.descriptions}
-                entityType="entrance"
-                entityId={entrance.id}
-                isEditAllowed={!entrance.isDeleted}
-                networkId={isNetwork ? entrance.cave.id : undefined}
-                networkName={isNetwork ? entrance.cave.name : undefined}
-                networkDescriptionsCount={networkDescriptionsCount}
-              />
-              {entrance.guidelines && (
-                <GuidelinesGrouped guidelines={entrance.guidelines} />
-              )}
-              <Riggings
-                riggings={entrance.riggings}
-                entranceId={entrance.id}
-                isEditAllowed={!entrance.isDeleted}
-              />
-              <Histories
-                histories={entrance.histories ?? []}
-                entranceId={entrance.id}
-                isEditAllowed={!entrance.isDeleted}
-              />
-            </>
-          )}
-        </div>
+                <Locations
+                  locations={entrance.locations}
+                  entranceId={entrance.id}
+                  isSensitive={entrance.isSensitive}
+                  isEditAllowed={!entrance.isDeleted}
+                />
+                <Descriptions
+                  descriptions={entrance.descriptions}
+                  entityType="entrance"
+                  entityId={entrance.id}
+                  isEditAllowed={!entrance.isDeleted}
+                  networkId={isNetwork ? entrance.cave.id : undefined}
+                  networkName={isNetwork ? entrance.cave.name : undefined}
+                  networkDescriptionsCount={networkDescriptionsCount}
+                />
+                {entrance.guidelines && (
+                  <GuidelinesGrouped guidelines={entrance.guidelines} />
+                )}
+                <Riggings
+                  riggings={entrance.riggings}
+                  entranceId={entrance.id}
+                  isEditAllowed={!entrance.isDeleted}
+                />
+                <Histories
+                  histories={entrance.histories ?? []}
+                  entranceId={entrance.id}
+                  isEditAllowed={!entrance.isDeleted}
+                />
+              </>
+            )}
+          </div>
 
-        {/* Tab 1 — Documents */}
-        <div>
-          {isLoading && (
-            <Card sx={{ m: 2, p: 3 }}>
-              <Skeleton height={40} width="100%" />
-              <Skeleton height={60} />
-              <Skeleton height={60} />
-              <Skeleton height={60} />
-            </Card>
-          )}
-          {entrance && (
-            <Documents
-              documents={entrance.documents}
-              entranceId={entrance.id}
-              isEditAllowed={!entrance.isDeleted}
-            />
-          )}
-        </div>
+          {/* Tab 1 — Documents */}
+          <div>
+            {isLoading && (
+              <Card sx={{ m: 2, p: 3 }}>
+                <Skeleton height={40} width="100%" />
+                <Skeleton height={60} />
+                <Skeleton height={60} />
+                <Skeleton height={60} />
+              </Card>
+            )}
+            {entrance && (
+              <Documents
+                documents={entrance.documents}
+                entranceId={entrance.id}
+                isEditAllowed={!entrance.isDeleted}
+              />
+            )}
+          </div>
 
-        {/* FIXME: Science panel is admin-only until the Science API is available. */}
-        {/* WARNING: this must stay in sync with the 'science' entry in the tabs array above.
+          {/* FIXME: Science panel is admin-only until the Science API is available. */}
+          {/* WARNING: this must stay in sync with the 'science' entry in the tabs array above.
             PageTabs matches children to tabs by position. React.Children.toArray strips `false`,
             so `{isAdmin && <Science />}` works — but returning null or wrapping in a div would
             silently shift all subsequent tab panels. */}
-        {isAdmin && entrance?.cave?.id && <Science caveId={entrance.cave.id} />}
+          {isAdmin && entrance?.cave?.id && (
+            <Science caveId={entrance.cave.id} />
+          )}
 
-        {/* Tab 3 — Comments */}
-        <div>
-          {isLoading && (
-            <Card sx={{ m: 2, p: 3 }}>
-              <Skeleton height={40} width="100%" />
-              <Skeleton height={80} />
-              <Skeleton height={80} />
-            </Card>
-          )}
-          {entrance && (
-            <Comments
-              comments={entrance.comments}
-              entranceId={entrance.id}
-              isEditAllowed={!entrance.isDeleted}
-            />
-          )}
-        </div>
-      </PageTabs>
-    </div>
+          {/* Tab 3 — Comments */}
+          <div>
+            {isLoading && (
+              <Card sx={{ m: 2, p: 3 }}>
+                <Skeleton height={40} width="100%" />
+                <Skeleton height={80} />
+                <Skeleton height={80} />
+              </Card>
+            )}
+            {entrance && (
+              <Comments
+                comments={entrance.comments}
+                entranceId={entrance.id}
+                isEditAllowed={!entrance.isDeleted}
+              />
+            )}
+          </div>
+        </PageTabs>
+      </div>
     </PageContainer>
   );
 };

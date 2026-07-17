@@ -18,7 +18,11 @@ const AuthorLink = ({ author, verb = 'Posted' }) => {
     ? formatMessage(verbMessages[verb] ?? { id: verb })
     : '';
   if (!author?.id || !author?.nickname)
-    return <span>{formatMessage({ id: 'author.unknown' }, { verb: verbLabel })}</span>;
+    return (
+      <span>
+        {formatMessage({ id: 'author.unknown' }, { verb: verbLabel })}
+      </span>
+    );
 
   return (
     <span>
@@ -27,9 +31,7 @@ const AuthorLink = ({ author, verb = 'Posted' }) => {
           {formatMessage({ id: 'author.by' }, { verb: verbLabel })}&nbsp;
         </Typography>
       )}
-      <AppLink to={`/ui/persons/${author?.id}`}>
-        {author.nickname}
-      </AppLink>
+      <AppLink to={`/ui/persons/${author?.id}`}>{author.nickname}</AppLink>
     </span>
   );
 };

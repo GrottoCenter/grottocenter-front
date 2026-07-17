@@ -270,12 +270,14 @@ const Massif = ({ isLoading, error, massif }) => {
                           <Typography
                             component="div"
                             variant="caption"
+                            color="text.secondary"
                             sx={{ mt: massif?.geogPolygon ? 2 : 0 }}>
                             {massif.author && (
                               <AuthorAndDate
                                 author={massif.author}
                                 verb="Created"
                                 date={massif.dateInscription}
+                                textColor="inherit"
                               />
                             )}
                             {massif.author && massif.reviewer && ' · '}
@@ -284,6 +286,7 @@ const Massif = ({ isLoading, error, massif }) => {
                                 author={massif.reviewer}
                                 verb="Updated"
                                 date={massif.dateReviewed}
+                                textColor="inherit"
                               />
                             )}
                             {(massif.author || massif.reviewer) &&
