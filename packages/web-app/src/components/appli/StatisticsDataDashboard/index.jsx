@@ -58,13 +58,17 @@ const StatisticsDataDashboard = ({
   }
 
   const isLoading =
-    entityType === 'region' ? loadingRegion
-    : entityType === 'country' ? loadingCountry
-    : loadingMassif;
+    entityType === 'region'
+      ? loadingRegion
+      : entityType === 'country'
+        ? loadingCountry
+        : loadingMassif;
   const hasError =
-    entityType === 'region' ? errorRegion
-    : entityType === 'country' ? errorCountry
-    : errorMassif;
+    entityType === 'region'
+      ? errorRegion
+      : entityType === 'country'
+        ? errorCountry
+        : errorMassif;
   const hasData = data && data.nb_caves > 0 && !hasError;
   const isEmpty =
     !isLoading &&
@@ -135,7 +139,7 @@ const StatisticsDataDashboard = ({
           {(hasError || isEmpty) && (
             <Alert
               severity="info"
-              title={(() => {
+              content={(() => {
                 if (entityType === 'country')
                   return formatMessage({
                     id: 'There is currently not enough information about this country.'
