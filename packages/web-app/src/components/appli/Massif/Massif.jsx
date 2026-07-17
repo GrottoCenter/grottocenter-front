@@ -8,6 +8,7 @@ import { useIntl } from 'react-intl';
 import { Print } from '@mui/icons-material';
 import CreateIcon from '@mui/icons-material/Create';
 import DeleteIcon from '@mui/icons-material/Delete';
+import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
 import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
 import ShareIcon from '@mui/icons-material/Share';
@@ -175,81 +176,87 @@ const Massif = ({ isLoading, error, massif }) => {
       label: formatMessage({ id: 'Documents' }),
       icon: <PermMediaOutlinedIcon fontSize="small" />,
       count: massif?.documents?.length,
-      disabled: !!massif && !permissions.isAuth && (massif.documents?.length ?? 0) === 0
+      disabled:
+        !!massif && !permissions.isAuth && (massif.documents?.length ?? 0) === 0
     }
   ];
 
   return (
     <PageContainer>
-    <div ref={componentRef}>
-      <PageHeader
-        title={massif?.name ?? (isLoading ? undefined : '')}
-        icon={<CustomIcon type="massif" />}
-        actions={actions}
-      />
-      <PageTabs tabs={tabs}>
-        {/* Tab Information */}
-        <div>
-          {isLoading && (
-            <Card sx={{ m: 2, p: 3 }}>
-              <Skeleton height={300} width="100%" />
-              <Skeleton height={100} />
-              <Skeleton height={100} />
-              <Skeleton height={100} />
-            </Card>
-          )}
-          {error && (
-            <Card sx={{ m: 2, p: 3 }}>
-              <Alert
-                title={formatMessage({
-                  id: 'Error, the massif data you are looking for is not available.'
-                })}
-                severity="error"
-              />
-            </Card>
-          )}
-          {massif && (
-            <>
-              {massif.isDeleted && (
-                <Box sx={{ m: 2 }}>
-                  <DeletedCard
-                    entityType={DELETED_ENTITIES.massif}
-                    entity={massif}
-                    isLoading={isActionLoading}
-                    onRestorePress={onRestorePress}
-                    onPermanentDeletePress={() => {
-                      setIsDeleteConfirmationPermanent(true);
-                      setIsDeleteConfirmationOpen(true);
-                    }}
-                  />
-                </Box>
-              )}
-              <DeleteConfirmationDialog
-                entityType={DELETED_ENTITIES.massif}
-                isOpen={isDeleteConfirmationOpen}
-                isLoading={isActionLoading}
-                isPermanent={isDeleteConfirmationPermanent}
-                onClose={() => setIsDeleteConfirmationOpen(false)}
-                onConfirmation={entity => {
-                  onDeletePress(entity?.id, isDeleteConfirmationPermanent);
-                }}
-              />
-              {massif.isSensitive && (
+      <div ref={componentRef}>
+        <PageHeader
+          title={massif?.name ?? (isLoading ? undefined : '')}
+          icon={<CustomIcon type="massif" />}
+          actions={actions}
+        />
+        <PageTabs tabs={tabs}>
+          {/* Tab Information */}
+          <div>
+            {isLoading && (
+              <Card sx={{ m: 2, p: 3 }}>
+                <Skeleton height={300} width="100%" />
+                <Skeleton height={100} />
+                <Skeleton height={100} />
+                <Skeleton height={100} />
+              </Card>
+            )}
+            {error && (
+              <Card sx={{ m: 2, p: 3 }}>
                 <Alert
-                  severity="warning"
                   title={formatMessage({
-                    id: 'This massif is marked as sensitive based on applicable legislation.'
+                    id: 'Error, the massif data you are looking for is not available.'
                   })}
+                  severity="error"
                 />
-              )}
-              {(massif?.geogPolygon ||
-                massif?.author ||
-                massif?.reviewer ||
-                massif?.language ||
-                massif?.names?.[0]?.language) && (
+              </Card>
+            )}
+            {massif && (
+              <>
+                {massif.isDeleted && (
+                  <Box sx={{ m: 2 }}>
+                    <DeletedCard
+                      entityType={DELETED_ENTITIES.massif}
+                      entity={massif}
+                      isLoading={isActionLoading}
+                      onRestorePress={onRestorePress}
+                      onPermanentDeletePress={() => {
+                        setIsDeleteConfirmationPermanent(true);
+                        setIsDeleteConfirmationOpen(true);
+                      }}
+                    />
+                  </Box>
+                )}
+                <DeleteConfirmationDialog
+                  entityType={DELETED_ENTITIES.massif}
+                  isOpen={isDeleteConfirmationOpen}
+                  isLoading={isActionLoading}
+                  isPermanent={isDeleteConfirmationPermanent}
+                  onClose={() => setIsDeleteConfirmationOpen(false)}
+                  onConfirmation={entity => {
+                    onDeletePress(entity?.id, isDeleteConfirmationPermanent);
+                  }}
+                />
+                {(massif?.geogPolygon ||
+                  massif?.author ||
+                  massif?.reviewer ||
+                  massif?.language ||
+                  massif?.names?.[0]?.language) && (
                   <ScrollableContent
                     content={
                       <>
+                        {massif.isSensitive && (
+                          <Alert
+                            icon={
+                              <LockOutlinedIcon
+                                sx={{ color: 'secondary.main' }}
+                              />
+                            }
+                            severity="warning"
+                            content={formatMessage({
+                              id: 'This massif is marked as sensitive based on applicable legislation.'
+                            })}
+                          />
+                        )}
                         {massif?.geogPolygon && (
                           <MapMassif
                             massifId={massifIdInt}
@@ -260,105 +267,111 @@ const Massif = ({ isLoading, error, massif }) => {
                           massif?.reviewer ||
                           massif?.language ||
                           massif?.names?.[0]?.language) && (
-                            <Typography
-                              component="div"
-                              variant="caption"
-                              sx={{ mt: massif?.geogPolygon ? 2 : 0 }}>
-                              {massif.author && (
-                                <AuthorAndDate
-                                  author={massif.author}
-                                  verb="Created"
-                                  date={massif.dateInscription}
-                                />
-                              )}
-                              {massif.author && massif.reviewer && ' · '}
-                              {massif.reviewer && (
-                                <AuthorAndDate
-                                  author={massif.reviewer}
-                                  verb="Updated"
-                                  date={massif.dateReviewed}
-                                />
-                              )}
-                              {(massif.author || massif.reviewer) &&
-                                (massif.language || massif.names?.[0]?.language) &&
-                                ' · '}
-                              {(massif.language || massif.names?.[0]?.language) &&
-                                `${formatMessage({ id: 'Language' })} : ${(massif.language ?? massif.names[0].language).toUpperCase()}`}
-                            </Typography>
-                          )}
+                          <Typography
+                            component="div"
+                            variant="caption"
+                            sx={{ mt: massif?.geogPolygon ? 2 : 0 }}>
+                            {massif.author && (
+                              <AuthorAndDate
+                                author={massif.author}
+                                verb="Created"
+                                date={massif.dateInscription}
+                              />
+                            )}
+                            {massif.author && massif.reviewer && ' · '}
+                            {massif.reviewer && (
+                              <AuthorAndDate
+                                author={massif.reviewer}
+                                verb="Updated"
+                                date={massif.dateReviewed}
+                              />
+                            )}
+                            {(massif.author || massif.reviewer) &&
+                              (massif.language ||
+                                massif.names?.[0]?.language) &&
+                              ' · '}
+                            {(massif.language || massif.names?.[0]?.language) &&
+                              `${formatMessage({ id: 'Language' })} : ${(massif.language ?? massif.names[0].language).toUpperCase()}`}
+                          </Typography>
+                        )}
                       </>
                     }
                   />
                 )}
-              <Box sx={{ mx: 2, mb: 1 }}>
-                <Button
-                  fullWidth
-                  variant="contained"
-                  color="primary"
-                  size="large"
-                  startIcon={<CustomIcon type="entrance" size={24} />}
-                  onClick={() => navigate(`/ui/massifs/${massifId}/entrances`)}>
-                  {formatMessage({ id: 'Entrances list' })}
-                  {dataMassif?.nb_caves ? ` (${dataMassif.nb_caves})` : ''}
-                </Button>
-              </Box>
-              <Descriptions
-                descriptions={massif.descriptions ?? []}
-                entityType="massif"
-                entityId={massif.id}
-                isEditAllowed={!massif.isDeleted}
-                isAddAllowed={!massif.descriptions?.length}
-              />
-              <StatisticsDataDashboard
-                massifId={massifIdInt}
-                description={formatMessage({
-                  id: 'Discover the numbers about this massif and its caves.'
-                })}
-              />
-              {(massif.guidelines?.length > 0 || permissions.isAuth) && (
-                <Guidelines
-                  entityType="massifs"
+                <Box sx={{ mx: 2, mb: 1 }}>
+                  <Button
+                    fullWidth
+                    variant="contained"
+                    color="primary"
+                    size="large"
+                    startIcon={<CustomIcon type="entrance" size={24} />}
+                    onClick={() =>
+                      navigate(`/ui/massifs/${massifId}/entrances`)
+                    }>
+                    {formatMessage({ id: 'Entrances list' })}
+                    {dataMassif?.nb_caves ? ` (${dataMassif.nb_caves})` : ''}
+                  </Button>
+                </Box>
+                <Descriptions
+                  descriptions={massif.descriptions ?? []}
+                  entityType="massif"
                   entityId={massif.id}
-                  guidelines={massif.guidelines}
+                  isEditAllowed={!massif.isDeleted}
+                  isAddAllowed={!massif.descriptions?.length}
                 />
-              )}
-              <AssociationSection
-                organizations={massif?.organizations}
-                entityType="massif"
-                entityId={massif.id}
-                isLoading={isLoading}
-              />
-              {massif?.networks?.length > 0 && (
-                <ScrollableContent
-                  dense
-                  anchorId="networks"
-                  title={formatMessage({ id: 'Networks list' })}
-                  count={massif.networks.length}
-                  content={
-                    <EntitiesList type="cave" entities={massif.networks} />
-                  }
+                <StatisticsDataDashboard
+                  massifId={massifIdInt}
+                  description={formatMessage({
+                    id: 'Discover the numbers about this massif and its caves.'
+                  })}
                 />
-              )}
-            </>
-          )}
-        </div>
+                {(massif.guidelines?.length > 0 || permissions.isAuth) && (
+                  <Guidelines
+                    entityType="massifs"
+                    entityId={massif.id}
+                    guidelines={massif.guidelines}
+                  />
+                )}
+                <AssociationSection
+                  organizations={massif?.organizations}
+                  entityType="massif"
+                  entityId={massif.id}
+                  isLoading={isLoading}
+                />
+                {massif?.networks?.length > 0 && (
+                  <ScrollableContent
+                    dense
+                    anchorId="networks"
+                    title={formatMessage({ id: 'Networks list' })}
+                    count={massif.networks.length}
+                    content={
+                      <EntitiesList type="cave" entities={massif.networks} />
+                    }
+                  />
+                )}
+              </>
+            )}
+          </div>
 
-        {/* Tab Documents */}
-        <div>
-          {isLoading && (
-            <Card sx={{ m: 2, p: 3 }}>
-              <Skeleton height={40} width="100%" />
-              <Skeleton height={60} />
-              <Skeleton height={60} />
-              <Skeleton height={60} />
-            </Card>
-          )}
-          {massif && (
-            <Documents documents={massif.documents ?? []} massifId={massifId} />
-          )}
-        </div>
-      </PageTabs>
-    </div>
+          {/* Tab Documents */}
+          <div>
+            {isLoading && (
+              <Card sx={{ m: 2, p: 3 }}>
+                <Skeleton height={40} width="100%" />
+                <Skeleton height={60} />
+                <Skeleton height={60} />
+                <Skeleton height={60} />
+              </Card>
+            )}
+            {massif && (
+              <Documents
+                documents={massif.documents ?? []}
+                massifId={massifId}
+              />
+            )}
+          </div>
+        </PageTabs>
+      </div>
     </PageContainer>
   );
 };
