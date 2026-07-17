@@ -130,6 +130,8 @@ const ConversationDetail = () => {
   const messagesEndRef = useRef(null);
   const messagesListRef = useRef(null);
   const sentinelRef = useRef(null);
+  const replyInputRef = useRef(null);
+  const wasSending = useRef(false);
   const isFirstLoad = useRef(true);
 
   const hasMore = messages.length < totalCount;
@@ -185,6 +187,16 @@ const ConversationDetail = () => {
       }
     };
   }, [hasMore, status, loadMore]);
+
+  // The TextField is disabled while sending, which drops DOM focus.
+  // Restore it once re-enabled so the user can keep typing without re-clicking,
+  // but skip the initial mount to avoid stealing focus on page load.
+  useEffect(() => {
+    if (wasSending.current && !isSending) {
+      replyInputRef.current?.focus();
+    }
+    wasSending.current = isSending;
+  }, [isSending]);
 
   if (!conversationId) {
     return (
@@ -381,6 +393,7 @@ Message Body: ${body}`;
             }
           }}
           disabled={isSending}
+          inputRef={replyInputRef}
           slotProps={{ htmlInput: { maxLength: 5100 } }}
           error={replyText.length > 5000}
           helperText={
