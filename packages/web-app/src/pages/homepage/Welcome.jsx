@@ -2,8 +2,10 @@ import React from 'react';
 import { Box, Button, Grid, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { brown } from '@mui/material/colors';
+import AccountBoxIcon from '@mui/icons-material/AccountBox';
 import { useIntl } from 'react-intl';
 import AppLink from '../../components/common/AppLink';
+import { usePermissions } from '../../hooks';
 
 const WelcomeSection = styled('section')(({ theme }) => ({
   backgroundColor: brown[50],
@@ -48,15 +50,18 @@ const BLOCKS = [
 
 const Welcome = () => {
   const { formatMessage } = useIntl();
+  const { isAuth } = usePermissions();
 
   return (
     <WelcomeSection aria-label={formatMessage({ id: 'Free access' })}>
-
       <Inner>
         <Grid container spacing={{ xs: 2, sm: 4 }}>
           {BLOCKS.map(({ titleId, textIds }) => (
             <Grid key={titleId} size={{ xs: 12, sm: 4 }}>
-              <BlockTitle variant="h6" component="h2" sx={{ mb: { xs: '4px', sm: 1 } }}>
+              <BlockTitle
+                variant="h6"
+                component="h2"
+                sx={{ mb: { xs: '4px', sm: 1 } }}>
                 {formatMessage({ id: titleId })}
               </BlockTitle>
               <Typography variant="body2" color="text.secondary">
@@ -65,13 +70,23 @@ const Welcome = () => {
             </Grid>
           ))}
         </Grid>
-        <Box sx={{ textAlign: 'center', mt: { xs: 4, sm: 5 } }}>
-          <AppLink to="/ui/signup">
-            <Button variant="outlined" color="primary">
-              {formatMessage({ id: 'Create an account' })}
-            </Button>
-          </AppLink>
-        </Box>
+        {!isAuth && (
+          <Box sx={{ textAlign: 'center', mt: { xs: 4, sm: 5 } }}>
+            <AppLink to="/ui/signup">
+              <Button
+                color="secondary"
+                startIcon={<AccountBoxIcon />}
+                sx={{
+                  px: 6,
+                  py: '16px',
+                  fontSize: '1.4rem',
+                  fontWeight: 600
+                }}>
+                {formatMessage({ id: 'Create an account' })}
+              </Button>
+            </AppLink>
+          </Box>
+        )}
       </Inner>
     </WelcomeSection>
   );
