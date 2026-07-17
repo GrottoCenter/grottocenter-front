@@ -76,7 +76,6 @@ SearchForm.propTypes = {
 export const SearchFormContainer = styled('div')`
   display: flex;
   flex-wrap: wrap;
-  justify-content: space-evenly;
   align-items: center;
   width: 100%;
   gap: ${({ theme }) => theme.spacing(2)};
@@ -119,7 +118,6 @@ SearchFieldset.propTypes = {
 
 const StyledTextField = styled(TextField)(({ theme }) => ({
   flex: 1,
-  margin: '4px',
   minWidth: '15rem',
   maxWidth: '30rem',
   '& .MuiOutlinedInput-root': {
