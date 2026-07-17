@@ -18,8 +18,8 @@ const ARCH_PATH =
 const NetworkIcon = () => (
   <svg
     viewBox="0 0 106.667 106.667"
-    width="44"
-    height="44"
+    width="38"
+    height="38"
     xmlns="http://www.w3.org/2000/svg">
     <polygon
       points="53.33,3.33 96.63,28.33 96.63,78.33 53.33,103.33 10.03,78.33 10.03,28.33"
@@ -90,8 +90,8 @@ const NetworkIcon = () => (
 
 export const NetworkMarker = L.divIcon({
   html: renderToString(<NetworkIcon />),
-  iconSize: [44, 44],
-  iconAnchor: [22, 22],
+  iconSize: [38, 38],
+  iconAnchor: [19, 19],
   className: ''
 });
 
