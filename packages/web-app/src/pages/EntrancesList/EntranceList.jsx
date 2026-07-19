@@ -84,7 +84,7 @@ const EntrancesList = props => {
         </StyledList>
       ) : (
         <Alert
-          title={formatMessage({
+          content={formatMessage({
             id: 'There is no entrance in this massif.'
           })}
           severity="warning"

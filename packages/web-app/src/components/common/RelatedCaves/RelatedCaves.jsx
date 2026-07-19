@@ -184,7 +184,7 @@ const RelatedCaves = ({
       ) : isEmpty && !isCaveSearchVisible ? (
         <Alert
           severity="info"
-          title={formatMessage({
+          content={formatMessage({
             id: isOrganization
               ? 'No explored caves found.'
               : 'No explored entrances found.'

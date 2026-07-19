@@ -105,7 +105,7 @@ const EntrancesList = ({
       ) : (
         <Alert
           severity="info"
-          title={formatMessage({
+          content={formatMessage({
             id: 'There is currently no entrance for this network.'
           })}
         />

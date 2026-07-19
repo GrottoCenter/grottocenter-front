@@ -77,7 +77,7 @@ const Documents = ({ documents, massifId }) => {
             emptyMessageComponent={
               <Alert
                 severity="info"
-                title={formatMessage({
+                content={formatMessage({
                   id: 'There is currently no document for this massif.'
                 })}
               />

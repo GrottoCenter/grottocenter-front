@@ -1323,7 +1323,7 @@ const AccountPage = () => {
                         !isOrgSearchVisible && (
                           <Alert
                             severity="info"
-                            title={formatMessage({
+                            content={formatMessage({
                               id: 'This person is not a member of any organization yet.'
                             })}
                           />
