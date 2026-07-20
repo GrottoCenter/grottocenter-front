@@ -3,8 +3,8 @@ import PropTypes from 'prop-types';
 import { Marker, Popup } from 'react-leaflet';
 import { Box, Paper, Tooltip, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import EmailIcon from '@mui/icons-material/Email';
-import LocationIcon from '@mui/icons-material/LocationOn';
+import AlternateEmailIcon from '@mui/icons-material/AlternateEmail';
+import LocationCityIcon from '@mui/icons-material/LocationCity';
 import LanguageIcon from '@mui/icons-material/Language';
 import Linkify from 'linkify-react';
 import { useIntl } from 'react-intl';
@@ -169,7 +169,7 @@ const Details = ({ organization }) => {
             <InfoSection title={formatMessage({ id: 'Contact' })}>
               {hasAddress && (
                 <InfoRow>
-                  <LocationIcon
+                  <LocationCityIcon
                     color="primary"
                     sx={{ fontSize: 24, flexShrink: 0 }}
                   />
@@ -178,7 +178,7 @@ const Details = ({ organization }) => {
               )}
               {organization.mail && (
                 <InfoRow>
-                  <EmailIcon
+                  <AlternateEmailIcon
                     color="primary"
                     sx={{ fontSize: 24, flexShrink: 0 }}
                   />
