@@ -53,6 +53,7 @@ const FILTER_LABELS = {
   license: 'License',
   pages: 'Pages',
   'authors.nickname': 'Author',
+  'authorsOrganization.name': 'Organization author',
   'editor.name': 'Editor',
   'library.name': 'Library',
   issue: 'Issue',
@@ -79,6 +80,7 @@ const initialFilterState = {
   license: '',
   pages: '',
   'authors.nickname': '',
+  'authorsOrganization.name': '',
   'editor.name': '',
   'library.name': '',
   issue: '',
@@ -145,7 +147,7 @@ const DocumentSearch = () => {
     'title', 'description', 'subjects.code',
     'identifierType', 'identifier', 'importSource', 'importId',
     'datePublication', 'iso3166.iso', 'license', 'pages',
-    'authors.nickname', 'editor.name', 'library.name', 'issue',
+    'authors.nickname', 'authorsOrganization.name', 'editor.name', 'library.name', 'issue',
     'parent.title', 'cave.name', 'entrances.name', 'massifs.name'
   ]);
 
@@ -299,6 +301,14 @@ const DocumentSearch = () => {
             label="Author"
             onChange={e => updateFilter('authors.nickname', e)}
             value={filterState['authors.nickname']}
+          />
+          <SearchTextAutocomplete
+            ressourceType={searchEntity}
+            ressourceField="authorsOrganization.name"
+            ressourceFilter={matchAllFields ? filterState : {}}
+            label="Organization author"
+            onChange={e => updateFilter('authorsOrganization.name', e)}
+            value={filterState['authorsOrganization.name']}
           />
           <SearchTextAutocomplete
             ressourceType={searchEntity}

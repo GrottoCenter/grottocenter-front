@@ -264,6 +264,13 @@ export const getDocumentSchema = () => {
       isCollection: true
     },
     {
+      attribute: 'authorsOrganization',
+      label: formatMessage({ id: 'Organization authors' }),
+      customRender: customRender(['name']),
+      disabled: true,
+      isCollection: true
+    },
+    {
       attribute: 'subjects',
       label: formatMessage({ id: 'Subjects' }),
       customRender: customRender(['subject']),
