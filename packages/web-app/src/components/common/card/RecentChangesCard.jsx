@@ -3,6 +3,7 @@ import { useIntl, FormattedRelativeTime } from 'react-intl';
 import PropTypes from 'prop-types';
 import { Box, Skeleton, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
+import QuestionMarkIcon from '@mui/icons-material/QuestionMark';
 import AppLink from '../AppLink';
 import CustomIcon from '../CustomIcon';
 
@@ -68,7 +69,7 @@ function getEntityIcon(type) {
   if (type === 'massif') return 'massif';
   if (type === 'document') return 'bibliography';
   if (type === 'grotto') return 'organization';
-  return 'entrance';
+  return null;
 }
 
 const TimelineItem = styled(Box)(({ theme }) => ({
@@ -124,10 +125,7 @@ const ChangeItem = ({ changeInfo }) => {
 
   const entityEl = (
     <EntityLink
-      to={getEntityLinkUrl(
-        changeInfo.mainEntityType,
-        changeInfo.mainEntityId
-      )}>
+      to={getEntityLinkUrl(changeInfo.mainEntityType, changeInfo.mainEntityId)}>
       {changeInfo.name}
     </EntityLink>
   );
@@ -165,7 +163,11 @@ const ChangeItem = ({ changeInfo }) => {
   return (
     <TimelineItem>
       <IconBubble>
-        <CustomIcon type={iconType} size={20} />
+        {iconType ? (
+          <CustomIcon type={iconType} size={20} />
+        ) : (
+          <QuestionMarkIcon sx={{ fontSize: 20 }} color="primary" />
+        )}
       </IconBubble>
       <Box sx={{ flex: 1, minWidth: 0 }}>
         <Box
