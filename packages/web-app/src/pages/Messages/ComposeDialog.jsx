@@ -12,6 +12,7 @@ import {
   useMediaQuery,
   useTheme
 } from '@mui/material';
+import SendIcon from '@mui/icons-material/Send';
 import StandardDialog from '../../components/common/StandardDialog';
 import AutoCompleteSearch from '../../components/common/AutoCompleteSearch';
 import { fetchQuicksearchResult, resetQuicksearch } from '../../actions/Quicksearch';
@@ -171,8 +172,11 @@ const ComposeDialog = ({ open, onClose, prefilledRecipientId }) => {
             variant="contained"
             color="primary"
             disabled={!isFormValid || isSending}
+            startIcon={
+              isSending ? <CircularProgress size={20} color="inherit" /> : <SendIcon />
+            }
           >
-            {isSending ? <CircularProgress size={24} /> : formatMessage({ id: 'Send', defaultMessage: 'Send' })}
+            {formatMessage({ id: 'Send', defaultMessage: 'Send' })}
           </Button>
         </>
       }
