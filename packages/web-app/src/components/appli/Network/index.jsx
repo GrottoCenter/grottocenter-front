@@ -149,13 +149,22 @@ export const Network = ({ isLoading, error, cave }) => {
             to={`/ui/countries/${country}`}
             underline="hover"
             color="inherit"
-            sx={{ display: 'flex', alignItems: 'center', gap: { xs: '2px', md: '4px' } }}>
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: { xs: '2px', md: '4px' }
+            }}>
             <CustomIcon type="country" size={16} />
             {country}
           </Link>
         )}
         {(cave?.massifs?.length ?? 0) > 0 && (
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: '2px', md: '4px' } }}>
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: { xs: '2px', md: '4px' }
+            }}>
             {cave.massifs.map((massif, index) => (
               <React.Fragment key={massif.id}>
                 {index > 0 && <span>·</span>}
@@ -164,7 +173,11 @@ export const Network = ({ isLoading, error, cave }) => {
                   to={`/ui/massifs/${massif.id}`}
                   underline="hover"
                   color="inherit"
-                  sx={{ display: 'flex', alignItems: 'center', gap: { xs: '2px', md: '4px' } }}>
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: { xs: '2px', md: '4px' }
+                  }}>
                   <CustomIcon type="massif" size={16} />
                   {massif.name}
                 </Link>
@@ -196,152 +209,160 @@ export const Network = ({ isLoading, error, cave }) => {
 
   return (
     <PageContainer>
-    <div ref={componentRef}>
-      <PageHeader
-        title={cave?.name ?? (isLoading ? undefined : '')}
-        icon={<CustomIcon type="network" />}
-        subheader={breadcrumb}
-        actions={actions}
-      />
+      <div ref={componentRef}>
+        <PageHeader
+          title={cave?.name ?? (isLoading ? undefined : '')}
+          icon={<CustomIcon type="network" />}
+          subheader={breadcrumb}
+          actions={actions}
+        />
 
-      <PageTabs tabs={tabs}>
-        {/* Tab 0 — Information */}
-        <div>
-          {isLoading && (
-            <Card sx={{ m: 2, p: 3 }}>
-              <Skeleton height={300} />
-              <Skeleton height={100} />
-              <Skeleton height={100} />
-              <Skeleton height={100} />
-            </Card>
-          )}
-          {error && (
-            <Card sx={{ m: 2, p: 3 }}>
-              <Alert
-                title={formatMessage({
-                  id: 'Error, the network data you are looking for is not available.'
-                })}
-                severity="error"
-              />
-            </Card>
-          )}
-          {cave && (
-            <>
-              {cave.isDeleted && (
-                <Box sx={{ m: 2 }}>
-                  <DeletedCard
-                    entityType={DELETED_ENTITIES.network}
-                    entity={cave}
-                    isLoading={isActionLoading}
-                    onRestorePress={onRestorePress}
-                    onPermanentDeletePress={() => {
-                      setIsDeleteConfirmationPermanent(true);
-                      setIsDeleteConfirmationOpen(true);
-                    }}
-                  />
-                </Box>
-              )}
-              <DeleteConfirmationDialog
-                entityType={DELETED_ENTITIES.network}
-                isOpen={isDeleteConfirmationOpen}
-                isLoading={isActionLoading}
-                isPermanent={isDeleteConfirmationPermanent}
-                isSearchMandatory={
-                  isDeleteConfirmationPermanent &&
-                  (cave?.entrances ?? []).length > 0
-                }
-                onClose={() => setIsDeleteConfirmationOpen(false)}
-                onConfirmation={entity => {
-                  onDeletePress(entity?.id, isDeleteConfirmationPermanent);
-                }}
-              />
-              <ScrollableContent
-                content={
-                  <>
-                    <HalfSplitContainer>
-                      <Box
-                        sx={{
-                          flex: 1,
-                          display: 'flex',
-                          flexDirection: 'column',
-                          gap: 2
-                        }}>
-                        <Box sx={{ minHeight: 200 }}>
-                          <EntrancesMap
+        <PageTabs tabs={tabs}>
+          {/* Tab 0 — Information */}
+          <div>
+            {isLoading && (
+              <Card sx={{ m: 2, p: 3 }}>
+                <Skeleton height={300} />
+                <Skeleton height={100} />
+                <Skeleton height={100} />
+                <Skeleton height={100} />
+              </Card>
+            )}
+            {error && (
+              <Card sx={{ m: 2, p: 3 }}>
+                <Alert
+                  title={formatMessage({
+                    id: 'Error, the network data you are looking for is not available.'
+                  })}
+                  severity="error"
+                />
+              </Card>
+            )}
+            {cave && (
+              <>
+                {cave.isDeleted && (
+                  <Box sx={{ m: 2 }}>
+                    <DeletedCard
+                      entityType={DELETED_ENTITIES.network}
+                      entity={cave}
+                      isLoading={isActionLoading}
+                      onRestorePress={onRestorePress}
+                      onPermanentDeletePress={() => {
+                        setIsDeleteConfirmationPermanent(true);
+                        setIsDeleteConfirmationOpen(true);
+                      }}
+                    />
+                  </Box>
+                )}
+                <DeleteConfirmationDialog
+                  entityType={DELETED_ENTITIES.network}
+                  isOpen={isDeleteConfirmationOpen}
+                  isLoading={isActionLoading}
+                  isPermanent={isDeleteConfirmationPermanent}
+                  isSearchMandatory={
+                    isDeleteConfirmationPermanent &&
+                    (cave?.entrances ?? []).length > 0
+                  }
+                  onClose={() => setIsDeleteConfirmationOpen(false)}
+                  onConfirmation={entity => {
+                    onDeletePress(entity?.id, isDeleteConfirmationPermanent);
+                  }}
+                />
+                <ScrollableContent
+                  content={
+                    <>
+                      <HalfSplitContainer>
+                        <Box
+                          sx={{
+                            flex: 1,
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: 2
+                          }}>
+                          <Box sx={{ minHeight: 200 }}>
+                            <EntrancesMap
+                              isLoading={isLoading}
+                              entrances={cave?.entrances ?? []}
+                              selectedEntrancesId={selectedEntrancesId}
+                            />
+                          </Box>
+                          <Properties isLoading={isLoading} cave={cave ?? {}} />
+                        </Box>
+                        <Box sx={{ flex: 1, overflow: 'auto' }}>
+                          <EntrancesList
+                            inline
                             isLoading={isLoading}
                             entrances={cave?.entrances ?? []}
                             selectedEntrancesId={selectedEntrancesId}
+                            onToggleSelection={handleToggleSelection}
                           />
                         </Box>
-                        <Properties isLoading={isLoading} cave={cave ?? {}} />
-                      </Box>
-                      <Box sx={{ flex: 1, overflow: 'auto' }}>
-                        <EntrancesList
-                          inline
-                          isLoading={isLoading}
-                          entrances={cave?.entrances ?? []}
-                          selectedEntrancesId={selectedEntrancesId}
-                          onToggleSelection={handleToggleSelection}
-                        />
-                      </Box>
-                    </HalfSplitContainer>
-                    {(cave.author || cave.reviewer || cave.language) && (
-                      <Typography component="div" variant="body2" sx={{ mt: 2 }}>
-                        {cave.author && (
-                          <AuthorAndDate
-                            author={cave.author}
-                            verb="Created"
-                            date={cave.dateInscription}
-                          />
-                        )}
-                        {cave.author && cave.reviewer && ' · '}
-                        {cave.reviewer && (
-                          <AuthorAndDate
-                            author={cave.reviewer}
-                            verb="Updated"
-                            date={cave.dateReviewed}
-                          />
-                        )}
-                        {(cave.author || cave.reviewer) && cave.language && ' · '}
-                        {cave.language &&
-                          `${formatMessage({ id: 'Language' })} : ${cave.language.toUpperCase()}`}
-                      </Typography>
-                    )}
-                  </>
-                }
-              />
-              <Descriptions
-                descriptions={cave.descriptions}
-                entityType="cave"
-                entityId={cave.id}
-                isEditAllowed={!cave.isDeleted}
-              />
-              {cave.guidelines && (
-                <GuidelinesGrouped guidelines={cave.guidelines} />
-              )}
-              {isAuth && (
-                <StandardDialog
-                  fullWidth
-                  maxWidth="md"
-                  open={isEditing}
-                  onClose={() => setEditing(false)}
-                  scrollable
-                  title={formatMessage({ id: 'Network edition' })}>
-                  <NetworkForm networkValues={{ ...cave }} />
-                </StandardDialog>
-              )}
-            </>
-          )}
-        </div>
+                      </HalfSplitContainer>
+                      {(cave.author || cave.reviewer || cave.language) && (
+                        <Typography
+                          component="div"
+                          variant="caption"
+                          color="text.secondary"
+                          sx={{ mt: 2 }}>
+                          {cave.author && (
+                            <AuthorAndDate
+                              author={cave.author}
+                              verb="Created"
+                              date={cave.dateInscription}
+                              textColor="inherit"
+                            />
+                          )}
+                          {cave.author && cave.reviewer && ' · '}
+                          {cave.reviewer && (
+                            <AuthorAndDate
+                              author={cave.reviewer}
+                              verb="Updated"
+                              date={cave.dateReviewed}
+                              textColor="inherit"
+                            />
+                          )}
+                          {(cave.author || cave.reviewer) &&
+                            cave.language &&
+                            ' · '}
+                          {cave.language &&
+                            `${formatMessage({ id: 'Language' })} : ${cave.language.toUpperCase()}`}
+                        </Typography>
+                      )}
+                    </>
+                  }
+                />
+                <Descriptions
+                  descriptions={cave.descriptions}
+                  entityType="cave"
+                  entityId={cave.id}
+                  isEditAllowed={!cave.isDeleted}
+                />
+                {cave.guidelines && (
+                  <GuidelinesGrouped guidelines={cave.guidelines} />
+                )}
+                {isAuth && (
+                  <StandardDialog
+                    fullWidth
+                    maxWidth="md"
+                    open={isEditing}
+                    onClose={() => setEditing(false)}
+                    scrollable
+                    title={formatMessage({ id: 'Network edition' })}>
+                    <NetworkForm networkValues={{ ...cave }} />
+                  </StandardDialog>
+                )}
+              </>
+            )}
+          </div>
 
-        {/* FIXME: Science panel is admin-only until the Science API is available. */}
-        {/* WARNING: this must stay in sync with the 'science' entry in the tabs array above.
+          {/* FIXME: Science panel is admin-only until the Science API is available. */}
+          {/* WARNING: this must stay in sync with the 'science' entry in the tabs array above.
             PageTabs matches children to tabs by position. React.Children.toArray strips `false`,
             so `{isAdmin && <Science />}` works — but returning null or wrapping in a div would
             silently shift all subsequent tab panels. */}
-        {isAdmin && <Science caveId={caveId} />}
-      </PageTabs>
-    </div>
+          {isAdmin && <Science caveId={caveId} />}
+        </PageTabs>
+      </div>
     </PageContainer>
   );
 };

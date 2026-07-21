@@ -22,11 +22,19 @@
         fill="#5d4037"/>
 
   <!--
-    MUI LocationCity icon — source viewBox 0 0 24 24
-    transform="matrix(3.6 0 0 3.6 4.3 4.6)" maps (12,12) → (47.5,47.8) card center
+    MUI LocationOn icon — source viewBox 0 0 24 24
+    transform="matrix(3.1667 0 0 3.1667 9.5 9.8)" maps (12,12) → (47.5,47.8) card center
+
+    Original path split into 2 subpaths:
+      1. M12 2 … z         pin body (teardrop)   → white
+      2. m0 9.5 … z        → M(12+0, 2+9.5) = M12 11.5 … z   inner circle → orange
   -->
 
-  <!-- White: city icon -->
-  <path d="M15 11V5l-3-3-3 3v2H3v14h18V11h-6zm-8 8H5v-2h2v2zm0-4H5v-2h2v2zm0-4H5V9h2v2zm6 8h-2v-2h2v2zm0-4h-2v-2h2v2zm0-4h-2V9h2v2zm0-4h-2V5h2v2zm6 12h-2v-2h2v2zm0-4h-2v-2h2v2z"
-        transform="matrix(3.6 0 0 3.6 4.3 4.6)" fill="#fff"/>
+  <!-- White: pin body -->
+  <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"
+        transform="matrix(3.1667 0 0 3.1667 9.5 9.8)" fill="#fff"/>
+
+  <!-- Orange: inner circle -->
+  <path d="M12 11.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"
+        transform="matrix(3.1667 0 0 3.1667 9.5 9.8)" fill="#5d4037"/>
 </svg>

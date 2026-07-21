@@ -1,12 +1,12 @@
 import React, { useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
-import { useOpenLink } from '../../hooks';
 import CircularProgress from '@mui/material/CircularProgress';
 import { styled } from '@mui/material/styles';
 import AliceCarousel from 'react-alice-carousel';
 import 'react-alice-carousel/lib/alice-carousel.css';
+import AppLink from '../../components/common/AppLink';
 
-const PartnerVignette = styled('div')(({ theme }) => ({
+const PartnerVignette = styled(AppLink)(({ theme }) => ({
   marginLeft: '2%',
   marginRight: '2%',
   marginTop: '2%',
@@ -58,28 +58,27 @@ const CarouselDiv = styled('div')(({ theme }) => ({
   }
 }));
 
-const PartnerItem = ({ imagePath, name, onClick }) => (
-  <PartnerVignette>
-    <PartnerImage src={imagePath} alt={name} onClick={onClick} />
+const PartnerItem = ({ imagePath, name, to }) => (
+  <PartnerVignette to={to} openInNewTabDesktop>
+    <PartnerImage src={imagePath} alt={name} />
   </PartnerVignette>
 );
 
 PartnerItem.propTypes = {
   imagePath: PropTypes.string,
-  name: PropTypes.string,
-  onClick: PropTypes.func
+  name: PropTypes.string.isRequired,
+  to: PropTypes.string.isRequired
 };
 
 const PartnersCarousel = ({ fetch, partners, isFetching }) => {
   const isFirstLoad = useRef(true);
-  const openLink = useOpenLink();
   const rows = partners
     ? partners.map(({ id, pictureFileName, name }) => (
         <PartnerItem
           key={`partcs-${id}`}
           imagePath={`/images/partners/${pictureFileName}`}
-          alt={name}
-          onClick={() => openLink(`/ui/organizations/${id}`)}
+          name={name}
+          to={`/ui/organizations/${id}`}
         />
       ))
     : [];

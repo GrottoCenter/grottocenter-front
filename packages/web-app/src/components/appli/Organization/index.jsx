@@ -323,7 +323,7 @@ const Organization = ({ error, isLoading, organization }) => {
                   emptyMessage={
                     <Alert
                       severity="info"
-                      title={formatMessage({
+                      content={formatMessage({
                         id: 'This organization has no members yet.'
                       })}
                     />
@@ -346,7 +346,7 @@ const Organization = ({ error, isLoading, organization }) => {
                 emptyMessageComponent={
                   <Alert
                     severity="info"
-                    title={formatMessage({
+                    content={formatMessage({
                       id: 'This organization has no documents listed yet.'
                     })}
                   />

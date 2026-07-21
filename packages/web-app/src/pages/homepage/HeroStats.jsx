@@ -5,7 +5,7 @@ import { useMediaQuery } from '@mui/material';
 import { useSelector, useDispatch } from 'react-redux';
 import { useIntl } from 'react-intl';
 import CustomIcon from '../../components/common/CustomIcon';
-import GCLink from '../../components/common/GCLink';
+import AppLink from '../../components/common/AppLink';
 import { loadDynamicNumber } from '../../actions/DynamicNumber';
 
 const StatsStrip = styled(Box)(({ theme }) => ({
@@ -16,11 +16,12 @@ const StatsStrip = styled(Box)(({ theme }) => ({
   }
 }));
 
-const StatItem = styled(GCLink)(({ theme }) => ({
+const StatItem = styled(AppLink)(({ theme }) => ({
   display: 'flex',
   justifyContent: 'center',
   textAlign: 'center',
   margin: '0 8px',
+  color: 'inherit',
   textDecoration: 'none',
   borderRadius: 8,
   padding: '4px 8px',
@@ -83,8 +84,7 @@ const HeroStats = () => {
           return (
             <Grid key={key} size={{ xs: 4, md: 2 }}>
               <StatItem
-                internal
-                href={href}
+                to={href}
                 aria-label={`${stat?.number ? stat.number.toLocaleString() + ' ' : staticValue ? staticValue + ' ' : ''}${formatMessage({ id: labelId })}`}>
                 <Box
                   sx={{

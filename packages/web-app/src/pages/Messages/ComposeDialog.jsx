@@ -8,7 +8,9 @@ import {
   TextField,
   Typography,
   Button,
-  CircularProgress
+  CircularProgress,
+  useMediaQuery,
+  useTheme
 } from '@mui/material';
 import StandardDialog from '../../components/common/StandardDialog';
 import AutoCompleteSearch from '../../components/common/AutoCompleteSearch';
@@ -22,6 +24,8 @@ const ComposeDialog = ({ open, onClose, prefilledRecipientId }) => {
   const { formatMessage } = useIntl();
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   const { results: searchResults, isLoading: isSearchLoading, error: searchError } = useSelector(
     state => state.quicksearch
@@ -154,6 +158,7 @@ const ComposeDialog = ({ open, onClose, prefilledRecipientId }) => {
       open={open}
       onClose={isSending ? undefined : handleClose}
       title={formatMessage({ id: 'New Message', defaultMessage: 'New Message' })}
+      fullScreen={isMobile}
       fullWidth
       maxWidth="sm"
       actions={
@@ -172,7 +177,14 @@ const ComposeDialog = ({ open, onClose, prefilledRecipientId }) => {
         </>
       }
     >
-      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: 1 }}>
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 2,
+          pt: 1,
+          height: isMobile ? '100%' : 'auto'
+        }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
           <Typography variant="subtitle2" sx={{ minWidth: 'fit-content' }}>
             {formatMessage({ id: 'To', defaultMessage: 'To' })}
@@ -211,15 +223,31 @@ const ComposeDialog = ({ open, onClose, prefilledRecipientId }) => {
         <TextField
           label={formatMessage({ id: 'Message body', defaultMessage: 'Message body' })}
           multiline
-          rows={6}
+          rows={isMobile ? undefined : 6}
           fullWidth
           value={body}
           onChange={(e) => setBody(e.target.value)}
           disabled={isSending}
+          // On mobile the dialog is fullscreen: let the textarea eat the
+          // leftover height instead of leaving a gap above the actions.
+          sx={
+            isMobile
+              ? {
+                  flexGrow: 1,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  '& .MuiInputBase-root': { flexGrow: 1, alignItems: 'stretch' },
+                  '& .MuiInputBase-inputMultiline': { height: '100% !important' }
+                }
+              : undefined
+          }
           slotProps={{ htmlInput: { maxLength: 5100 } }}
           error={body.length > 5000}
           helperText={
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
+            // FormHelperText renders a <p>, which cannot contain a <div>.
+            <Box
+              component="span"
+              sx={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
               <span style={{ color: body.length > 5000 ? 'red' : 'inherit' }}>
                 {body.length > 5000
                   ? formatMessage({ id: 'Message exceeds 5000 characters limit.', defaultMessage: 'Message exceeds 5000 characters limit.' })

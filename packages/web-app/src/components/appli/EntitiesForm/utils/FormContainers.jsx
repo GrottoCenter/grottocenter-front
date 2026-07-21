@@ -74,7 +74,8 @@ export const FormActionRow = ({
   isSubmitting,
   isCenter = false,
   disabled = false,
-  onCancel
+  onCancel,
+  submitLabel
 }) => {
   const { formatMessage } = useIntl();
   return (
@@ -95,7 +96,7 @@ export const FormActionRow = ({
         </MuiButton>
       )}
       <ActionButton
-        label={formatMessage({ id: isNew ? 'Create' : 'Update' })}
+        label={submitLabel ?? formatMessage({ id: isNew ? 'Create' : 'Update' })}
         loading={isSubmitting}
         disabled={disabled}
         color="primary"
@@ -106,9 +107,10 @@ export const FormActionRow = ({
   );
 };
 FormActionRow.propTypes = {
-  isNew: PropTypes.bool.isRequired,
+  isNew: PropTypes.bool,
   isSubmitting: PropTypes.bool.isRequired,
   isCenter: PropTypes.bool,
   disabled: PropTypes.bool,
-  onCancel: PropTypes.func
+  onCancel: PropTypes.func,
+  submitLabel: PropTypes.string
 };

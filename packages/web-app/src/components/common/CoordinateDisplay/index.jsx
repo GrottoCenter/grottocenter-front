@@ -27,12 +27,12 @@ import {
 } from '@mui/icons-material';
 import copyToClipboard from '../../../helpers/clipboard';
 import CRSMenu from '../CRSMenu';
+import AppLink from '../AppLink';
 
 import {
   useNotification,
   useCoordinatePreference,
-  useProjections,
-  useOpenLink
+  useProjections
 } from '../../../hooks';
 
 const GROTTOCENTER_LINK_ZOOM = 16;
@@ -58,7 +58,6 @@ const CoordinateDisplay = ({
 }) => {
   const { formatMessage } = useIntl();
   const { onSuccess } = useNotification();
-  const openLink = useOpenLink();
 
   const isTouch = useMediaQuery('(pointer: coarse)');
 
@@ -104,13 +103,9 @@ const CoordinateDisplay = ({
       '_blank',
       'noopener,noreferrer'
     );
-  const openGrottoMap = () => {
-    const popup =
-      entityType && entityId ? `?entity=${entityType}:${entityId}` : '';
-    openLink(
-      `/ui/map/${latitude},${longitude},${GROTTOCENTER_LINK_ZOOM}${popup}`
-    );
-  };
+  const grottoMapPopup =
+    entityType && entityId ? `?entity=${entityType}:${entityId}` : '';
+  const grottoMapUrl = `/ui/map/${latitude},${longitude},${GROTTOCENTER_LINK_ZOOM}${grottoMapPopup}`;
 
   const precisionSeverity = computePrecisionSeverity(precision);
   const precisionText =
@@ -200,10 +195,10 @@ const CoordinateDisplay = ({
             open={Boolean(mapLinksMenuAnchor)}
             onClose={() => setMapLinksMenuAnchor(null)}>
             <MenuItem
-              onClick={() => {
-                openGrottoMap();
-                setMapLinksMenuAnchor(null);
-              }}>
+              component={AppLink}
+              to={grottoMapUrl}
+              openInNewTabDesktop
+              onClick={() => setMapLinksMenuAnchor(null)}>
               <ListItemIcon>
                 <MapIcon />
               </ListItemIcon>

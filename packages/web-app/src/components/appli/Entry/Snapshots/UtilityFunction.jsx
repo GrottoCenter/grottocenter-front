@@ -4,7 +4,7 @@ import { useIntl } from 'react-intl';
 import { Tooltip, Button } from '@mui/material';
 import HistoryIcon from '@mui/icons-material/History';
 import PropTypes from 'prop-types';
-import useOpenLink from '../../../../hooks/useOpenLink';
+import AppLink from '../../../common/AppLink';
 import {
   CommentSnapshots,
   DocumentSnapshots,
@@ -61,7 +61,6 @@ const SnapshotButton = ({
   ...grpProps
 }) => {
   const { formatMessage } = useIntl();
-  const openLink = useOpenLink();
   const location = useLocation();
 
   // Remember the page the history was opened from so the snapshot page's "back"
@@ -85,10 +84,15 @@ const SnapshotButton = ({
     .join('&')}`;
 
   return (
-    <Tooltip title={tooltipTitle ?? formatMessage({ id: 'Access the revision history page' })}>
+    <Tooltip
+      title={
+        tooltipTitle ??
+        formatMessage({ id: 'Access the revision history page' })
+      }>
       <Button
         {...grpProps}
-        onClick={() => openLink(url)}
+        component={AppLink}
+        to={url}
         startIcon={!!label && startIcon}>
         {!label && startIcon}
         {label}

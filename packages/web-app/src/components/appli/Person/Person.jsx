@@ -269,7 +269,7 @@ const Person = ({ isLoading, person, error }) => {
                     emptyMessage={
                       <Alert
                         severity="info"
-                        title={formatMessage({
+                        content={formatMessage({
                           id: 'This person is not a member of any organization yet.'
                         })}
                       />

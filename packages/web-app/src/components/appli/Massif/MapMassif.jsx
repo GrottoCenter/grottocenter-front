@@ -26,6 +26,21 @@ import {
 const entrancePopup = entrance => <EntrancePopup entrance={entrance} />;
 const entranceTip = entrance => entrance?.name;
 
+// Creates a pane below overlayPane (z=400) so the massif polygon never covers
+// the entrance circle markers that live in the default overlayPane.
+const MASSIF_POLYGON_PANE = 'massifPolygonPane';
+const MassifPolygonPane = () => {
+  const map = useMap();
+  useEffect(() => {
+    if (!map.getPane(MASSIF_POLYGON_PANE)) {
+      const pane = map.createPane(MASSIF_POLYGON_PANE);
+      pane.style.zIndex = 350;
+      pane.style.pointerEvents = 'none';
+    }
+  }, [map]);
+  return null;
+};
+
 const MapInternals = ({ geoJson, massifId }) => {
   const map = useMap();
   const { updateLayers } = useHeatLayer();
@@ -205,9 +220,19 @@ const MapMassif = ({ massifId, geogPolygon }) => {
       dragging={!isMobile} // For usability only use two fingers drag/zoom on mobile
       viewport={null}
       scrollWheelZoom={false}>
-      {/* SVG renderer avoids a 0×0 canvas when the tab is hidden (print bug) */}
-      {/* interactive: false lets clicks pass through to entrance markers */}
-      <GeoJSON data={displayGeoJson} style={MASSIF_POLYGON_STYLE} interactive={false} renderer={L.svg()} />
+      {/* MassifPolygonPane must render before GeoJSON so its useEffect (pane
+          creation) runs first and the pane exists when the layer is added. */}
+      <MassifPolygonPane />
+      {/* pane zIndex 350 keeps the polygon below overlayPane (400) where
+          entrance circle markers live — fixes polygon covering entrances.
+          SVG renderer in the same pane avoids the 0×0 canvas tab-hidden bug. */}
+      <GeoJSON
+        data={displayGeoJson}
+        style={MASSIF_POLYGON_STYLE}
+        interactive={false}
+        pane={MASSIF_POLYGON_PANE}
+        renderer={L.svg({ pane: MASSIF_POLYGON_PANE })}
+      />
       <MapInternals geoJson={geoJson} massifId={massifId} />
     </CustomMapContainer>
   );

@@ -19,8 +19,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import React, { useState, useLayoutEffect, useRef } from 'react';
 import Linkify from 'linkify-react';
-import { isMobile } from 'react-device-detect';
-import GCLink from '../GCLink';
+import AppLink from '../AppLink';
 import Files from './Files';
 import { SnapshotButton } from '../../appli/Entry/Snapshots/UtilityFunction';
 import Translate from '../Translate';
@@ -71,9 +70,9 @@ const Document = ({
               minWidth: 0
             }}>
             <Typography variant="h4" component="span">
-              <GCLink internal={isMobile} href={`/ui/documents/${document.id}`}>
+              <AppLink openInNewTabDesktop to={`/ui/documents/${document.id}`}>
                 {document.title}
-              </GCLink>
+              </AppLink>
             </Typography>
             <DocumentTypeChip type={document.type} />
             {document.isValidated === false && (

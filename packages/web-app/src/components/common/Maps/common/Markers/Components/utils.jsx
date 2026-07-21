@@ -1,7 +1,7 @@
 import React from 'react';
 import { Typography } from '@mui/material';
 import PropTypes from 'prop-types';
-import GCLink from '../../../../GCLink';
+import AppLink from '../../../../AppLink';
 import { formatWGS84 } from '../../../../../../helpers/coordinateConvert';
 
 export const makeCoordinatesValue = (latitude, longitude) =>
@@ -21,9 +21,9 @@ export const Information = ({ icon, value, url, isTitle = false }) => (
       className={isTitle ? 'map-popup-title' : undefined}>
       {!url && value}
       {url && (
-        <GCLink internal href={url}>
+        <AppLink to={url}>
           {value}
-        </GCLink>
+        </AppLink>
       )}
     </Typography>
   </div>

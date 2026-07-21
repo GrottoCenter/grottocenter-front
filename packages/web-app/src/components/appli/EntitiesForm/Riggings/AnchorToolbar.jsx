@@ -14,18 +14,9 @@ import {
   Typography
 } from '@mui/material';
 import EditNoteIcon from '@mui/icons-material/EditNote';
+import { ANCHOR_LEGEND } from '@/utils/riggingLegends';
 
 const ARROWS = ['↑', '↓', '←', '→'];
-
-const LEGEND_ITEMS = [
-  { abbrevKey: 'anchor.abbrev.spit', labelKey: 'anchor.label.spit' },
-  { abbrevKey: 'anchor.abbrev.bolt', labelKey: 'anchor.label.bolt' },
-  { abbrevKey: 'anchor.abbrev.piton', labelKey: 'anchor.label.piton' },
-  { abbrevKey: 'anchor.abbrev.natural', labelKey: 'anchor.label.natural' },
-  { abbrevKey: 'anchor.abbrev.soft', labelKey: 'anchor.label.soft' },
-  { abbrevKey: 'anchor.abbrev.drilled', labelKey: 'anchor.label.drilled' },
-  { abbrevKey: 'anchor.abbrev.redirect', labelKey: 'anchor.label.redirect' }
-];
 
 const AnchorToolbar = ({ onInsert }) => {
   const { formatMessage } = useIntl();
@@ -102,7 +93,7 @@ const AnchorToolbar = ({ onInsert }) => {
           <Divider sx={{ mb: 1 }} />
           <Table size="small" sx={{ mb: 0 }}>
             <TableBody>
-              {LEGEND_ITEMS.map(({ abbrevKey, labelKey }) => (
+              {ANCHOR_LEGEND.map(({ abbrevKey, labelKey }) => (
                 <TableRow key={abbrevKey}>
                   <TableCell sx={{ border: 0, py: 0.5, pr: 2 }}>
                     <Typography variant="body2" fontWeight="bold" component="span">

@@ -19,21 +19,21 @@ export const CAVE_SIZE = {
 // lightness range. White stroke ensures contrast on all tile layers (OSM, satellite, dark).
 export const CAVE_SIZE_STYLE = {
   [CAVE_SIZE.SMALL]: {
-    radius: 6,
+    radius: 8,
     color: '#FFFFFF',
     weight: 1,
     fillColor: '#D2691E',
     fillOpacity: 0.9
   },
   [CAVE_SIZE.MEDIUM]: {
-    radius: 10,
+    radius: 11,
     color: '#FFFFFF',
     weight: 1,
     fillColor: '#8B4513',
     fillOpacity: 0.9
   },
   [CAVE_SIZE.LARGE]: {
-    radius: 14,
+    radius: 15,
     color: '#FFFFFF',
     weight: 1,
     fillColor: '#2C0F00',
@@ -86,9 +86,11 @@ export const CAVE_QUALITY_BADGE_VALUE = {
   [CAVE_QUALITY.INSUFFICIENT]: 0
 };
 
-export const ENTRANCE_QUALITY_FILTERS = Object.values(DATA_QUALITY_LEVELS).map(
-  id => ({ id, labelKey: DATA_QUALITY_LABEL_KEYS[id] })
-);
+export const ENTRANCE_QUALITY_FILTERS = [
+  DATA_QUALITY_LEVELS.INSUFFICIENT,
+  DATA_QUALITY_LEVELS.SATISFACTORY,
+  DATA_QUALITY_LEVELS.GOOD
+].map(id => ({ id, labelKey: DATA_QUALITY_LABEL_KEYS[id] }));
 
 export const MARKERS_LIMIT = 13;
 // Zoom level at which massif polygons are fetched and displayed

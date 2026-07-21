@@ -11,7 +11,7 @@ import { alpha, styled } from '@mui/material/styles';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { useIntl } from 'react-intl';
 import { useSelector } from 'react-redux';
-import GCLink from '../common/GCLink';
+import AppLink from '../common/AppLink';
 import InternationalizedLink from '../common/InternationalizedLink';
 import {
   contributorsLink,
@@ -157,9 +157,9 @@ const Faq = () => {
                   id: 'You can help as an active member, translator, developer, or partner organisation.'
                 })}
               </Typography>
-              <GCLink href={contributeLink}>
+              <AppLink href={contributeLink}>
                 {formatMessage({ id: 'Contributors page' })}
-              </GCLink>
+              </AppLink>
             </StyledDetails>
           </StyledAccordion>
 

@@ -6,6 +6,9 @@ import { isMobile } from 'react-device-detect';
  * Returns a stable callback that navigates in-app on mobile and opens a new
  * tab on desktop.
  *
+ * Use this for imperative navigation (button/list-item onClick handlers). For
+ * declarative links, prefer the `AppLink` component.
+ *
  * @returns {(url: string) => void}
  *
  * @example

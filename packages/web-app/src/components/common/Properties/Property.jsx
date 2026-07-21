@@ -5,7 +5,7 @@ import React from 'react';
 import { styled } from '@mui/material/styles';
 import PropTypes from 'prop-types';
 
-import GCLink from '../GCLink';
+import AppLink from '../AppLink';
 
 export const StyledTypography = styled(Typography)`
   margin-left: ${({ theme, variant }) =>
@@ -40,9 +40,9 @@ const ValueComponent = ({ secondary, value, url }) => {
   );
   if (url) {
     return (
-      <GCLink internal href={url}>
+      <AppLink to={url}>
         {valueText}
-      </GCLink>
+      </AppLink>
     );
   }
   return valueText;

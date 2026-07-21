@@ -13,13 +13,7 @@ import {
   Typography
 } from '@mui/material';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
-
-const LEGEND_ITEMS = [
-  { abbrevKey: 'obstacle.abbrev.pit', labelKey: 'obstacle.label.pit' },
-  { abbrevKey: 'obstacle.abbrev.step', labelKey: 'obstacle.label.step' },
-  { abbrevKey: 'obstacle.abbrev.climb', labelKey: 'obstacle.label.climb' },
-  { abbrevKey: 'obstacle.abbrev.waterfall', labelKey: 'obstacle.label.waterfall' }
-];
+import { OBSTACLE_LEGEND } from '@/utils/riggingLegends';
 
 const ObstacleToolbar = () => {
   const { formatMessage } = useIntl();
@@ -67,7 +61,7 @@ const ObstacleToolbar = () => {
           <Divider sx={{ mb: 1 }} />
           <Table size="small" sx={{ mb: 0 }}>
             <TableBody>
-              {LEGEND_ITEMS.map(({ abbrevKey, labelKey }) => (
+              {OBSTACLE_LEGEND.map(({ abbrevKey, labelKey }) => (
                 <TableRow key={abbrevKey}>
                   <TableCell sx={{ border: 0, py: 0.5, pr: 2 }}>
                     <Typography variant="body2" fontWeight="bold" component="span">

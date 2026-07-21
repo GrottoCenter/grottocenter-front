@@ -22,6 +22,7 @@ import {
 } from '@mui/material';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import { useNameDuplicateSuggestions } from '../../../../hooks';
+import useOpenLink from '../../../../hooks/useOpenLink';
 
 const entranceDetailPath = id => `/ui/entrances/${id}`;
 
@@ -49,6 +50,7 @@ const getLocationContext = entrance => {
 const NameSuggestionDropdown = ({ control, formKey, enabled, children }) => {
   const { formatMessage } = useIntl();
   const navigate = useNavigate();
+  const openLink = useOpenLink();
   const anchorRef = useRef(null);
   const [isFocused, setIsFocused] = useState(false);
   // The entrance the user is asked to confirm as a duplicate (drives the dialog).
@@ -85,8 +87,7 @@ const NameSuggestionDropdown = ({ control, formKey, enabled, children }) => {
           onInput={() => setIsFocused(true)}
           onKeyDown={e => {
             if (e.key === 'Escape') closeDropdown();
-          }}
-        >
+          }}>
           {children}
 
           <Popper
@@ -94,13 +95,11 @@ const NameSuggestionDropdown = ({ control, formKey, enabled, children }) => {
             anchorEl={anchorRef.current}
             placement="bottom-start"
             disablePortal
-            style={{ zIndex: 1300, width: anchorRef.current?.clientWidth }}
-          >
+            style={{ zIndex: 1300, width: anchorRef.current?.clientWidth }}>
             <Paper
               elevation={3}
               aria-live="polite"
-              sx={{ maxHeight: 320, overflow: 'auto' }}
-            >
+              sx={{ maxHeight: 320, overflow: 'auto' }}>
               {isLoading ? (
                 <Box
                   sx={{
@@ -108,8 +107,7 @@ const NameSuggestionDropdown = ({ control, formKey, enabled, children }) => {
                     alignItems: 'center',
                     gap: 1,
                     p: '12px'
-                  }}
-                >
+                  }}>
                   <CircularProgress size={18} />
                   <Typography variant="body2" color="text.secondary">
                     {formatMessage({ id: 'Searching for similar entrances…' })}
@@ -120,8 +118,7 @@ const NameSuggestionDropdown = ({ control, formKey, enabled, children }) => {
                   <Typography
                     variant="caption"
                     color="text.secondary"
-                    sx={{ display: 'block', px: '12px', pt: 1 }}
-                  >
+                    sx={{ display: 'block', px: '12px', pt: 1 }}>
                     {formatMessage({
                       id: 'Existing entrances with a similar name:'
                     })}
@@ -132,16 +129,14 @@ const NameSuggestionDropdown = ({ control, formKey, enabled, children }) => {
                     role="listbox"
                     aria-label={formatMessage({
                       id: 'Existing entrances with a similar name:'
-                    })}
-                  >
+                    })}>
                     {suggestions.map(entrance => {
                       const location = getLocationContext(entrance);
                       return (
                         <ListItemButton
                           key={entrance.id}
                           role="option"
-                          onClick={() => openConfirmation(entrance)}
-                        >
+                          onClick={() => openConfirmation(entrance)}>
                           <ListItemText
                             primary={entrance.name}
                             secondary={location || undefined}
@@ -166,8 +161,7 @@ const NameSuggestionDropdown = ({ control, formKey, enabled, children }) => {
         open={!!candidate}
         onClose={dismissConfirmation}
         maxWidth="xs"
-        fullWidth
-      >
+        fullWidth>
         <DialogTitle>
           {formatMessage({ id: 'Is this the same cave?' })}
         </DialogTitle>
@@ -186,16 +180,15 @@ const NameSuggestionDropdown = ({ control, formKey, enabled, children }) => {
                 </Typography>
               )}
               <Link
-                href={entranceDetailPath(candidate.id)}
-                target="_blank"
-                rel="noopener"
+                component="button"
+                type="button"
+                onClick={() => openLink(entranceDetailPath(candidate.id))}
                 sx={{
                   display: 'inline-flex',
                   alignItems: 'center',
                   gap: '4px',
                   mt: 1
-                }}
-              >
+                }}>
                 {formatMessage({ id: 'View full details' })}
                 <OpenInNewIcon fontSize="inherit" />
               </Link>

@@ -3,7 +3,7 @@ import { useIntl, FormattedRelativeTime } from 'react-intl';
 import PropTypes from 'prop-types';
 import { Box, Skeleton, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import GCLink from '../GCLink';
+import AppLink from '../AppLink';
 import CustomIcon from '../CustomIcon';
 
 function getRelativeTimeProps(dateStr) {
@@ -93,14 +93,14 @@ const IconBubble = styled(Box)(({ theme }) => ({
   '& > span': { margin: 0 }
 }));
 
-const AuthorLink = styled(GCLink)(({ theme }) => ({
+const AuthorLink = styled(AppLink)(({ theme }) => ({
   color: theme.palette.secondary.main,
   fontWeight: 600,
   textDecoration: 'none',
   '&:hover': { textDecoration: 'underline' }
 }));
 
-const EntityLink = styled(GCLink)(({ theme }) => ({
+const EntityLink = styled(AppLink)(({ theme }) => ({
   color: theme.palette.primary.main,
   fontWeight: 600,
   textDecoration: 'none',
@@ -117,18 +117,17 @@ const ChangeItem = ({ changeInfo }) => {
   );
 
   const authorEl = (
-    <AuthorLink href={`/ui/persons/${changeInfo.authorId}`} internal>
+    <AuthorLink to={`/ui/persons/${changeInfo.authorId}`}>
       {changeInfo.author}
     </AuthorLink>
   );
 
   const entityEl = (
     <EntityLink
-      href={getEntityLinkUrl(
+      to={getEntityLinkUrl(
         changeInfo.mainEntityType,
         changeInfo.mainEntityId
-      )}
-      internal>
+      )}>
       {changeInfo.name}
     </EntityLink>
   );

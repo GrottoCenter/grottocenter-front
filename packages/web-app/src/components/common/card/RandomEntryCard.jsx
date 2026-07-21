@@ -15,8 +15,8 @@ import StarBorderIcon from '@mui/icons-material/StarBorder';
 import { styled } from '@mui/material/styles';
 import { isNil } from 'ramda';
 import { FormattedMessage, useIntl } from 'react-intl';
-import GCLink from '../GCLink';
 import CustomIcon from '../CustomIcon';
+import AppLink from '../AppLink';
 import { depthIcon, lengthIcon } from '../../../assets/icons';
 
 const CARD_HEIGHT = 280;
@@ -211,21 +211,21 @@ const RandomEntryCard = ({ entry, isFetching, fetch, onRefresh }) => {
             )}
           </Box>
 
-          <GCLink href={`/ui/entrances/${entry.id}`}>
-            <Button
-              variant="outlined"
-              size="small"
-              sx={{
-                color: 'white',
-                borderColor: 'rgba(255,255,255,0.6)',
-                '&:hover': {
-                  borderColor: 'white',
-                  backgroundColor: 'rgba(255,255,255,0.1)'
-                }
-              }}>
-              <FormattedMessage id="Discover" />
-            </Button>
-          </GCLink>
+          <Button
+            variant="outlined"
+            size="small"
+            component={AppLink}
+            to={`/ui/entrances/${entry.id}`}
+            sx={{
+              color: 'white',
+              borderColor: 'rgba(255,255,255,0.6)',
+              '&:hover': {
+                borderColor: 'white',
+                backgroundColor: 'rgba(255,255,255,0.1)'
+              }
+            }}>
+            <FormattedMessage id="Discover" />
+          </Button>
         </Box>
       </Content>
     </BgCard>
