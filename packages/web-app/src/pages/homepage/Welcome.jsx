@@ -72,19 +72,19 @@ const Welcome = () => {
         </Grid>
         {!isAuth && (
           <Box sx={{ textAlign: 'center', mt: { xs: 4, sm: 5 } }}>
-            <AppLink to="/ui/signup">
-              <Button
-                color="secondary"
-                startIcon={<AccountBoxIcon />}
-                sx={{
-                  px: 6,
-                  py: '16px',
-                  fontSize: '1.4rem',
-                  fontWeight: 600
-                }}>
-                {formatMessage({ id: 'Create an account' })}
-              </Button>
-            </AppLink>
+            <Button
+              component={AppLink}
+              to="/ui/signup"
+              color="secondary"
+              startIcon={<AccountBoxIcon />}
+              sx={{
+                px: 6,
+                py: '16px',
+                fontSize: '1.4rem',
+                fontWeight: 600
+              }}>
+              {formatMessage({ id: 'Create an account' })}
+            </Button>
           </Box>
         )}
       </Inner>

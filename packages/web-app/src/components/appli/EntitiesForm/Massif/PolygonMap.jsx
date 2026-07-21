@@ -522,10 +522,6 @@ const PolygonMap = ({ onChange, onValidationChange, data }) => {
     }, 0);
   };
 
-  const handleImportError = error => {
-    onError(error);
-  };
-
   const handleDeleteLayer = layerId => {
     if (!featureGroupRef) return;
 
@@ -660,10 +656,7 @@ const PolygonMap = ({ onChange, onValidationChange, data }) => {
   return (
     <>
       <Box sx={{ mb: 2 }}>
-        <ShapefileImport
-          onImport={handleShapefileImport}
-          onError={handleImportError}
-        />
+        <ShapefileImport onImport={handleShapefileImport} />
       </Box>
 
       <Box

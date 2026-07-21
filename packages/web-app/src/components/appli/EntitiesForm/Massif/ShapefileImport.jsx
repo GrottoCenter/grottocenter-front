@@ -165,7 +165,7 @@ const analyzeSimplificationCurve = (multiPolygon, rawVertexCount) => {
   return { maxTolerance, step, minAchievableCount: minCount };
 };
 
-const ShapefileImport = ({ onImport, onError }) => {
+const ShapefileImport = ({ onImport }) => {
   const { formatMessage } = useIntl();
   const cancelRef = useRef(null);
   const [open, setOpen] = useState(false);
@@ -483,8 +483,7 @@ const ShapefileImport = ({ onImport, onError }) => {
 };
 
 ShapefileImport.propTypes = {
-  onImport: PropTypes.func.isRequired,
-  onError: PropTypes.func.isRequired
+  onImport: PropTypes.func.isRequired
 };
 
 export default ShapefileImport;

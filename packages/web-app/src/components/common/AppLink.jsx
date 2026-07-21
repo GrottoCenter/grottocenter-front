@@ -33,6 +33,16 @@ const AppLink = React.forwardRef(
       );
     }
 
+    // Neither prop passed: render inert children rather than a
+    // <RouterLink to={null}>, which would navigate to the current page.
+    if (to == null) {
+      return (
+        <span ref={ref} {...rest}>
+          {children}
+        </span>
+      );
+    }
+
     if (openInNewTabDesktop && !isMobile) {
       return (
         <a
@@ -56,11 +66,30 @@ const AppLink = React.forwardRef(
 
 AppLink.displayName = 'AppLink';
 
+// At least one of `to` / `href` must be provided — otherwise the link has no
+// destination. Both are strings; this validator adds the "one is required" rule.
+const linkTarget = (props, propName, componentName) => {
+  const { to, href } = props;
+  if (to == null && href == null) {
+    return new Error(
+      `One of \`to\` or \`href\` is required in \`${componentName}\`.`
+    );
+  }
+  if (props[propName] != null && typeof props[propName] !== 'string') {
+    return new Error(
+      `Invalid prop \`${propName}\` of type \`${typeof props[
+        propName
+      ]}\` supplied to \`${componentName}\`, expected \`string\`.`
+    );
+  }
+  return null;
+};
+
 AppLink.propTypes = {
   // Internal app route (e.g. '/ui/entrances/42'). Mutually exclusive with href.
-  to: PropTypes.string,
+  to: linkTarget,
   // External URL. Always rendered as a new-tab anchor.
-  href: PropTypes.string,
+  href: linkTarget,
   // For internal links only: open a new tab on desktop instead of same-tab nav.
   openInNewTabDesktop: PropTypes.bool,
   children: PropTypes.node.isRequired

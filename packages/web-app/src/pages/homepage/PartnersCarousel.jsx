@@ -66,7 +66,7 @@ const PartnerItem = ({ imagePath, name, to }) => (
 
 PartnerItem.propTypes = {
   imagePath: PropTypes.string,
-  name: PropTypes.string,
+  name: PropTypes.string.isRequired,
   to: PropTypes.string.isRequired
 };
 
@@ -77,7 +77,7 @@ const PartnersCarousel = ({ fetch, partners, isFetching }) => {
         <PartnerItem
           key={`partcs-${id}`}
           imagePath={`/images/partners/${pictureFileName}`}
-          alt={name}
+          name={name}
           to={`/ui/organizations/${id}`}
         />
       ))
