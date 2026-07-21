@@ -115,7 +115,7 @@ const OperationSummary = ({ entrance, newCave, variant = 'link' }) => {
   const renderItem = (item, index) => (
     <Box
       key={`${item.icon}-${item.name ?? ''}-${index}`}
-      sx={{ p: 1, borderRadius: 1, bgcolor: 'action.hover', minWidth: 0 }}
+      sx={{ p: 0.5, borderRadius: 1, bgcolor: 'action.hover', minWidth: 0 }}
     >
       {item.icon === 'network' ? (
         <Box
@@ -161,7 +161,7 @@ const OperationSummary = ({ entrance, newCave, variant = 'link' }) => {
           variant="caption"
           color="text.secondary"
           display="block"
-          sx={{ mt: 0.5 }}
+          sx={{}}
         >
           {item.note}
         </Typography>
@@ -175,12 +175,12 @@ const OperationSummary = ({ entrance, newCave, variant = 'link' }) => {
         variant="overline"
         color="text.secondary"
         display="block"
-        sx={{ mb: 1 }}
+        sx={{ mb: 0.5 }}
       >
         {label}
       </Typography>
       {items.length > 0 ? (
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
           {items.map(renderItem)}
         </Box>
       ) : (
@@ -197,11 +197,10 @@ const OperationSummary = ({ entrance, newCave, variant = 'link' }) => {
         display: 'flex',
         flexDirection: { xs: 'column', sm: 'row' },
         alignItems: { xs: 'stretch', sm: 'center' },
-        gap: 2
+        gap: 1
       }}
     >
       {column(formatMessage({ id: 'Now' }), before)}
-
       <KeyboardArrowRightIcon
         fontSize="large"
         sx={{
@@ -210,7 +209,6 @@ const OperationSummary = ({ entrance, newCave, variant = 'link' }) => {
           transform: { xs: 'rotate(90deg)', sm: 'none' }
         }}
       />
-
       {column(formatMessage({ id: 'After' }), after)}
     </Box>
   );

@@ -29,7 +29,7 @@ import { normalizeOtp } from '../../../utils/otpHelpers';
 const StepInstall = ({ onContinue, isLoading, error }) => {
   const { formatMessage } = useIntl();
   return (
-    <Box display="flex" flexDirection="column" gap={3}>
+    <Box display="flex" flexDirection="column" gap={2}>
       <Typography variant="body1">
         {formatMessage({ id: 'mfaEnrollmentStep1Body' })}
       </Typography>
@@ -78,13 +78,13 @@ const StepScanQr = ({ otpauthUri, secret, onContinue, onBack }) => {
   };
 
   return (
-    <Box display="flex" flexDirection="column" gap={3} alignItems="center">
+    <Box display="flex" flexDirection="column" gap={2} alignItems="center">
       <Typography variant="body2" color="text.secondary" textAlign="center">
         {formatMessage({ id: 'mfaEnrollmentStep2Body' })}
       </Typography>
       <Box
         sx={{
-          p: 2,
+          p: 1,
           border: '1px solid',
           borderColor: 'divider',
           borderRadius: 1,
@@ -93,18 +93,20 @@ const StepScanQr = ({ otpauthUri, secret, onContinue, onBack }) => {
         <QRCodeSVG value={otpauthUri} size={180} />
       </Box>
       <Box sx={{ width: '100%' }}>
-        <Typography variant="caption" color="text.secondary" sx={{ mb: 0.5, display: 'block' }}>
+        <Typography variant="caption" color="text.secondary" sx={{
+          display: 'block'
+        }}>
           {formatMessage({ id: 'mfaSecretLabel' })}
         </Typography>
         <Box
           sx={{
             display: 'flex',
             alignItems: 'center',
-            gap: 1,
+            gap: 0.5,
             bgcolor: 'action.hover',
             borderRadius: 1,
-            px: 2,
-            py: 1
+            px: 1,
+            py: 0.5
           }}>
           <Typography
             variant="caption"
@@ -173,7 +175,7 @@ const StepVerify = ({ onSubmit, isLoading, error, isEnrollmentTokenExpired, onBa
   const msg = errorMessage();
 
   return (
-    <Box display="flex" flexDirection="column" gap={2}>
+    <Box display="flex" flexDirection="column" gap={1}>
       <Typography variant="body2" color="text.secondary">
         {formatMessage({ id: 'mfaEnrollmentStep3Body' })}
       </Typography>
@@ -301,7 +303,7 @@ const MfaEnrollment = ({ onBack }) => {
   ];
 
   return (
-    <Box display="flex" flexDirection="column" gap={3}>
+    <Box display="flex" flexDirection="column" gap={2}>
       <Stepper activeStep={activeStep} alternativeLabel>
         {steps.map(label => (
           <Step key={label}>

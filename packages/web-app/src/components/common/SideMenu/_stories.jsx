@@ -9,7 +9,7 @@ import SideMenu from './index';
 
 const MainWrapper = styled('main')`
   flex-grow: 1;
-  padding: ${({ theme }) => theme.spacing(3)};
+  padding: ${({ theme }) => theme.spacing(2)};
   transition: ${({ theme, isSideMenuOpen }) =>
     !isMobileOnly &&
     theme.transitions.create('margin', {

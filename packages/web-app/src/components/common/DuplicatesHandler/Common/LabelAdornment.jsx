@@ -11,8 +11,8 @@ import { useIntl } from 'react-intl';
 import { styled } from '@mui/material/styles';
 
 const Wrapper = styled('div')`
-  margin-top: ${({ theme }) => theme.spacing(1)};
-  margin-bot: ${({ theme }) => theme.spacing(1)};
+  margin-top: ${({ theme }) => theme.spacing(0.5)};
+  margin-bot: ${({ theme }) => theme.spacing(0.5)};
 `;
 
 const LabelAdornment = () => {

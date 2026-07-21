@@ -35,7 +35,7 @@ const LinearProgress = styled(MuiLinearProgress, {
 }));
 
 const StyledDivider = styled(Divider)`
-  margin: ${({ theme }) => theme.spacing(3)};
+  margin: ${({ theme }) => theme.spacing(2)};
 `;
 
 const ImportContainer = () => {

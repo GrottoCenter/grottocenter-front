@@ -156,9 +156,9 @@ const AssociationSection = ({
       icon={associateButton}
       content={
         isLoading ? (
-          <Skeleton variant="rectangular" height={60} sx={{ my: 1, borderRadius: 1 }} />
+          <Skeleton variant="rectangular" height={60} sx={{ my: 0.5, borderRadius: 1 }} />
         ) : (
-          <Box sx={{ my: 1 }}>
+          <Box sx={{ my: 0.5 }}>
             <EntitiesList
               type="organization"
               entities={organizations}

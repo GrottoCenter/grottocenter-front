@@ -8,7 +8,7 @@ import CaveCard from './CaveCard';
 const StyledBox = styled(Box)`
   display: flex;
   flex-direction: column;
-  gap: ${({ theme }) => theme.spacing(2)};
+  gap: ${({ theme }) => theme.spacing(1)};
 `;
 
 const SpecificsCaves = ({ maxDepthCave, maxLengthCave, parentEntity }) => {
@@ -17,7 +17,7 @@ const SpecificsCaves = ({ maxDepthCave, maxLengthCave, parentEntity }) => {
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-      <Typography variant="h4" textAlign="center" pb={2}>
+      <Typography variant="h4" textAlign="center" pb={1}>
         {formatMessage({ id: 'Specifics caves' })}
       </Typography>
       <StyledBox>

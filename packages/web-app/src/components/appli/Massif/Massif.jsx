@@ -193,7 +193,7 @@ const Massif = ({ isLoading, error, massif }) => {
           {/* Tab Information */}
           <div>
             {isLoading && (
-              <Card sx={{ m: 2, p: 3 }}>
+              <Card sx={{ m: 1, p: 2 }}>
                 <Skeleton height={300} width="100%" />
                 <Skeleton height={100} />
                 <Skeleton height={100} />
@@ -201,7 +201,7 @@ const Massif = ({ isLoading, error, massif }) => {
               </Card>
             )}
             {error && (
-              <Card sx={{ m: 2, p: 3 }}>
+              <Card sx={{ m: 1, p: 2 }}>
                 <Alert
                   title={formatMessage({
                     id: 'Error, the massif data you are looking for is not available.'
@@ -213,7 +213,7 @@ const Massif = ({ isLoading, error, massif }) => {
             {massif && (
               <>
                 {massif.isDeleted && (
-                  <Box sx={{ m: 2 }}>
+                  <Box sx={{ m: 1 }}>
                     <DeletedCard
                       entityType={DELETED_ENTITIES.massif}
                       entity={massif}
@@ -271,7 +271,7 @@ const Massif = ({ isLoading, error, massif }) => {
                             component="div"
                             variant="caption"
                             color="text.secondary"
-                            sx={{ mt: massif?.geogPolygon ? 2 : 0 }}>
+                            sx={{ mt: massif?.geogPolygon ? 1 : 0.25 }}>
                             {massif.author && (
                               <AuthorAndDate
                                 author={massif.author}
@@ -301,7 +301,7 @@ const Massif = ({ isLoading, error, massif }) => {
                     }
                   />
                 )}
-                <Box sx={{ mx: 2, mb: 1 }}>
+                <Box sx={{ mx: 1, mb: 0.5 }}>
                   <Button
                     fullWidth
                     variant="contained"
@@ -359,7 +359,7 @@ const Massif = ({ isLoading, error, massif }) => {
           {/* Tab Documents */}
           <div>
             {isLoading && (
-              <Card sx={{ m: 2, p: 3 }}>
+              <Card sx={{ m: 1, p: 2 }}>
                 <Skeleton height={40} width="100%" />
                 <Skeleton height={60} />
                 <Skeleton height={60} />

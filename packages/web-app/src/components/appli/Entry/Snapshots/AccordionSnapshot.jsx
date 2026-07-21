@@ -60,7 +60,7 @@ const AccordionSnapshot = ({
   const displayDate = rawDate ? new Date(rawDate) : null;
 
   return (
-    <TimelineItem sx={{ '&::before': { flex: 0, padding: 0 } }}>
+    <TimelineItem sx={{ '&::before': { flex: 0, padding: 0.25 } }}>
       <TimelineSeparator>
         <TimelineDot
           color={isNameChange ? 'secondary' : isCurrent ? 'primary' : 'grey'}
@@ -69,7 +69,7 @@ const AccordionSnapshot = ({
         />
         <TimelineConnector />
       </TimelineSeparator>
-      <TimelineContent sx={{ pb: 2, pt: 0, pr: 0 }}>
+      <TimelineContent sx={{ pb: 1, pt: 0.25, pr: 0.25 }}>
         <Box
           sx={{
             borderRadius: 1,
@@ -84,9 +84,9 @@ const AccordionSnapshot = ({
               cursor: isNameChange ? 'default' : 'pointer',
               display: 'flex',
               alignItems: 'flex-start',
-              gap: 1,
-              px: 1,
-              py: 1,
+              gap: 0.5,
+              px: 0.5,
+              py: 0.5,
               ...(isNameChange
                 ? {}
                 : { '&:hover': { bgcolor: 'action.hover' } })
@@ -98,7 +98,7 @@ const AccordionSnapshot = ({
                 display: 'flex',
                 flexDirection: { xs: 'column', sm: 'row' },
                 alignItems: { xs: 'stretch', sm: 'flex-start' },
-                gap: 1
+                gap: 0.5
               }}>
               <Box sx={{ flex: '0 0 auto' }}>
                 {all && (
@@ -147,7 +147,7 @@ const AccordionSnapshot = ({
                   minWidth: 0,
                   display: 'flex',
                   alignItems: 'center',
-                  gap: 1,
+                  gap: 0.5,
                   flexWrap: 'wrap'
                 }}>
                 <Typography
@@ -160,7 +160,7 @@ const AccordionSnapshot = ({
                     // Rename snapshot: the name IS the change — show old → new.
                     // snapshotTitle holds the OLD name (raw h_name value);
                     // newName is resolved from the next real snapshot.
-                    <HighLightsChar oldText={snapshotTitle} newText={newName} />
+                    (<HighLightsChar oldText={snapshotTitle} newText={newName} />)
                   ) : isEntranceSnapshot ? (
                     // Regular entrance snapshot: name/caveName are contextual
                     // labels resolved across tables, not diffable fields. Renames
@@ -218,9 +218,9 @@ const AccordionSnapshot = ({
           <Collapse in={open && !isNameChange}>
             <Box
               sx={{
-                px: 2,
-                pt: 1,
-                pb: 1,
+                px: 1,
+                pt: 0.5,
+                pb: 0.5,
                 borderTop: '1px solid',
                 borderColor: 'grey.200'
               }}>
@@ -232,7 +232,7 @@ const AccordionSnapshot = ({
               )}
             </Box>
             {!isCurrent && snapshotType !== 'documents' && !isNameChange && (
-              <Box sx={{ px: 2, pb: 2 }}>
+              <Box sx={{ px: 1, pb: 1 }}>
                 <RestoreSnapshot
                   snapshot={snapshot}
                   snapshotType={snapshotType}

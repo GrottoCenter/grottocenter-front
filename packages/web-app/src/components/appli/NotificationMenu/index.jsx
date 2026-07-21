@@ -32,16 +32,16 @@ const SeeAllMenuItem = styled(MenuItem)(({ theme }) => ({
   color: theme.palette.primary.main,
   fontWeight: 'bold',
   justifyContent: 'center',
-  padding: theme.spacing(2)
+  padding: theme.spacing(1)
 }));
 
 const createSkeletons = n =>
   [...Array(n)].map((e, i) => (
     // Dummy skeletons which will disappear: we can ignore the eslint rule
     // eslint-disable-next-line react/no-array-index-key
-    <MenuItem key={i} style={{ width: NOTIFICATION_WIDTH }}>
+    (<MenuItem key={i} style={{ width: NOTIFICATION_WIDTH }}>
       <Skeleton width={NOTIFICATION_WIDTH} />
-    </MenuItem>
+    </MenuItem>)
   ));
 
 const NotificationMenu = () => {
@@ -143,8 +143,8 @@ const NotificationMenu = () => {
         {/* Header */}
         <Box
           sx={{
-            px: 2,
-            py: 2,
+            px: 1,
+            py: 1,
             bgcolor: 'action.hover',
             display: 'flex',
             alignItems: 'center',
@@ -154,7 +154,7 @@ const NotificationMenu = () => {
           <Typography variant="body2" color="text.primary">
             {formatMessage({ id: 'Notifications' })}
           </Typography>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
             {nbNotifications > 0 && (
               <Chip label={nbNotifications} color="secondary" size="small" />
             )}
@@ -202,12 +202,12 @@ const NotificationMenu = () => {
           {notifications && notifications.length === 0 && (
             <Box
               sx={{
-                px: 2,
-                py: 3,
+                px: 1,
+                py: 2,
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
-                gap: 1,
+                gap: 0.5,
                 color: 'action.active'
               }}>
               <NotificationsOffIcon />

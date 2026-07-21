@@ -305,7 +305,7 @@ const MapMarkerSelector = ({ control, formLatitudeKey, formLongitudeKey, additio
               display: 'flex',
               alignItems: 'center',
               gap: '6px',
-              px: 1,
+              px: 0.5,
               py: '4px',
               borderRadius: 1,
               boxShadow: 1,

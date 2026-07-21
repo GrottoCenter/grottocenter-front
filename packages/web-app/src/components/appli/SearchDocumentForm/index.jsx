@@ -12,7 +12,7 @@ import Alert from '../../common/Alert';
 
 const SpacedButton = styled(Button)`
   ${({ theme }) => `
-  margin: 0 ${theme.spacing(1)};`}
+  margin: 0 ${theme.spacing(0.5)};`}
 `;
 
 const SearchDocumentForm = ({ closeForm, onSubmit }) => {
@@ -60,7 +60,6 @@ const SearchDocumentForm = ({ closeForm, onSubmit }) => {
           ]);
         }}
       />
-
       {selectedDocuments.length === 0 && (
         <Alert
           severity="info"
@@ -69,8 +68,7 @@ const SearchDocumentForm = ({ closeForm, onSubmit }) => {
           })}
         />
       )}
-
-      <Box my={4}>
+      <Box my={3}>
         {closeForm && (
           <SpacedButton onClick={closeForm}>
             {formatMessage({ id: 'Cancel' })}

@@ -83,7 +83,7 @@ const FilePreviewTable = ({ rawRows, headerRow, skipFirstRows, skipLastRows }) =
 
   if (dataRows.length === 0) {
     return (
-      <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+      <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
         {formatMessage({
           id: 'ImportObservationsWizard.UploadStep.noDataRows'
         })}
@@ -92,7 +92,7 @@ const FilePreviewTable = ({ rawRows, headerRow, skipFirstRows, skipLastRows }) =
   }
 
   return (
-    <Box sx={{ overflowX: 'auto', mt: 2 }}>
+    <Box sx={{ overflowX: 'auto', mt: 1 }}>
       <Table
         size="small"
         data-testid="file-preview-table"
@@ -376,7 +376,7 @@ const UploadStep = () => {
   }));
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
       {/* File picker */}
       <Box>
         <Typography variant="subtitle1" gutterBottom>
@@ -398,7 +398,7 @@ const UploadStep = () => {
           data-testid="profile-input"
           onChange={handleProfileFileChange}
         />
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <Button
             variant="outlined"
             startIcon={<UploadFileIcon />}
@@ -424,7 +424,7 @@ const UploadStep = () => {
             </Typography>
           )}
         </Box>
-        <Box sx={{ mt: 1, display: 'flex', alignItems: 'center', gap: 2 }}>
+        <Box sx={{ mt: 0.5, display: 'flex', alignItems: 'center', gap: 1 }}>
           <Button
             variant="outlined"
             startIcon={<FileOpenIcon />}
@@ -445,11 +445,10 @@ const UploadStep = () => {
           )}
         </Box>
       </Box>
-
       {rawRows.length > 0 && (
         <>
           {/* Encoding + Number format (side by side) */}
-          <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+          <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
             <FormControl size="small" sx={{ minWidth: 200 }}>
               <InputLabel id="encoding-label">
                 {formatMessage({
@@ -501,7 +500,7 @@ const UploadStep = () => {
           </Box>
 
           {/* Header row + Skip first rows + Skip last rows (side by side) */}
-          <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+          <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
             <FormControl size="small" sx={{ minWidth: 300, maxWidth: 400 }}>
               <InputLabel id="header-row-label">
                 {formatMessage({
@@ -575,7 +574,6 @@ const UploadStep = () => {
           </Box>
         </>
       )}
-
       {/* File preview table */}
       {rawRows.length > 0 && (
         <Box>

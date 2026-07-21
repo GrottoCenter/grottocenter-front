@@ -10,7 +10,7 @@ import { depthIcon, lengthIcon } from '../../../../../assets/icons';
 const StyledBox = styled(Box)(({ theme }) => ({
   display: 'grid',
   alignItems: 'center',
-  gap: theme.spacing(2),
+  gap: theme.spacing(1),
   [theme.breakpoints.down('sm')]: {
     gridTemplateColumns: '1fr !important',
     '& hr': { display: 'none' },
@@ -62,7 +62,7 @@ const CavesStatistics = ({ avgDepth, avgLength, totalLength }) => {
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-      <Typography variant="h4" textAlign="center" pb={2}>
+      <Typography variant="h4" textAlign="center" pb={1}>
         {formatMessage({ id: 'Caves statistics' })}
       </Typography>
       <StyledBox sx={{ gridTemplateColumns: cols.join(' ') }}>

@@ -42,7 +42,7 @@ const Contribution = ({
         </MultilinesTypography>
       )}
       {!hideAttribution && (author || reviewer || language) && (
-        <Typography component="div" variant="caption" color="text.secondary" sx={{ mt: 3 }}>
+        <Typography component="div" variant="caption" color="text.secondary" sx={{ mt: 2 }}>
           {author && (
             <AuthorAndDate
               author={author}

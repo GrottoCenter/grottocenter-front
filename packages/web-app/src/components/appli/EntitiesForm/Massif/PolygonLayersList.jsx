@@ -62,35 +62,35 @@ const PolygonLayersList = ({
   return (
     <Paper sx={{ width: { xs: '100%', md: 250 }, maxHeight: { xs: 300, md: '70vh' }, overflow: 'auto' }}>
       {allHoles && (
-        <Alert severity="error" sx={{ py: 0 }}>
+        <Alert severity="error" sx={{ py: 0.25 }}>
           {formatMessage({
             id: 'At least one polygon must not be marked as a hole.'
           })}
         </Alert>
       )}
       {hasSelfIntersections && (
-        <Alert severity="error" sx={{ py: 0 }}>
+        <Alert severity="error" sx={{ py: 0.25 }}>
           {formatMessage({
             id: 'One or more polygons have self-intersecting edges. Fix them before saving.'
           })}
         </Alert>
       )}
       {hasInterPolygonIntersections && (
-        <Alert severity="error" sx={{ py: 0 }}>
+        <Alert severity="error" sx={{ py: 0.25 }}>
           {formatMessage({
             id: 'Polygons are crossing each other. Adjust them so they do not overlap.'
           })}
         </Alert>
       )}
       {hasTooFewPoints && (
-        <Alert severity="error" sx={{ py: 0 }}>
+        <Alert severity="error" sx={{ py: 0.25 }}>
           {formatMessage({
             id: 'One or more polygons have too few points. Add more vertices before saving.'
           })}
         </Alert>
       )}
       {areaExceeded && (
-        <Alert severity="error" sx={{ py: 0 }}>
+        <Alert severity="error" sx={{ py: 0.25 }}>
           {formatMessage(
             {
               id: 'Total area ({area} km²) exceeds the {limit} km² limit. Reduce the polygon size.'
@@ -100,7 +100,7 @@ const PolygonLayersList = ({
         </Alert>
       )}
       {hasNeedles && (
-        <Alert severity="warning" sx={{ py: 0 }}>
+        <Alert severity="warning" sx={{ py: 0.25 }}>
           {formatMessage({
             id: 'Some polygons are very thin or elongated. Check them before saving.'
           })}
@@ -151,7 +151,10 @@ const PolygonLayersList = ({
                 cursor: 'pointer'
               }}
               secondaryAction={
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                <Box sx={{
+                  display: 'flex',
+                  alignItems: 'center'
+                }}>
                   <Tooltip
                     title={formatMessage({
                       id: 'Mark this polygon as a hole (inner ring) within another polygon'
@@ -165,7 +168,7 @@ const PolygonLayersList = ({
                         onLayerHoleToggle(layer.id);
                       }}
                       size="small"
-                      sx={{ p: 0 }}
+                      sx={{ p: 0.25 }}
                       inputProps={{
                         'aria-label': formatMessage({
                           id: 'Mark this polygon as a hole (inner ring) within another polygon'
@@ -189,7 +192,10 @@ const PolygonLayersList = ({
             >
               <ListItemText
                 primary={
-                  <Box component="span" sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.5 }}>
+                  <Box component="span" sx={{
+                    display: 'inline-flex',
+                    alignItems: 'center'
+                  }}>
                     {(layer.hasSelfIntersection || layer.tooFewPoints) && (
                       <Tooltip
                         title={getErrorTooltip(layer)}

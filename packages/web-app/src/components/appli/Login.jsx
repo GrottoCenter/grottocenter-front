@@ -193,7 +193,7 @@ const Login = () => {
         isSubmitting ||
         (resendTimeout > 0 && authState.isNotVerifiedMessageDisplayed)
       }
-      sx={{ mt: 2 }}>
+      sx={{ mt: 1 }}>
       {isSubmitting ? (
         <CircularProgress size="2.8rem" color="inherit" />
       ) : (
@@ -280,7 +280,7 @@ const Login = () => {
         <b>{email || authState.notVerifiedEmail}</b>
       </Typography>
       {serverError && (
-        <Alert severity="error" sx={{ mt: 2 }}>
+        <Alert severity="error" sx={{ mt: 1 }}>
           {serverError}
         </Alert>
       )}
@@ -320,7 +320,7 @@ const Login = () => {
         <b>{email || authState.notVerifiedEmail}</b>
       </Typography>
       {serverError && (
-        <Alert severity="error" sx={{ mt: 2 }}>
+        <Alert severity="error" sx={{ mt: 1 }}>
           {serverError}
         </Alert>
       )}
@@ -337,7 +337,7 @@ const Login = () => {
         passwordError={fieldErrors.password}
         serverError={serverError}
       />
-      <Box display="flex" justifyContent="flex-end" mt={1}>
+      <Box display="flex" justifyContent="flex-end" mt={0.5}>
         <Button
           type="button"
           size="small"
@@ -348,8 +348,8 @@ const Login = () => {
         </Button>
       </Box>
       {LoginButton}
-      <Divider sx={{ my: 2 }} />
-      <Box display="flex" flexDirection="column" alignItems="center" gap={1}>
+      <Divider sx={{ my: 1 }} />
+      <Box display="flex" flexDirection="column" alignItems="center" gap={0.5}>
         <Typography variant="body2" color="text.secondary">
           <Translate>No account yet?</Translate>
         </Typography>

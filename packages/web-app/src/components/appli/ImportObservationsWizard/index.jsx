@@ -181,11 +181,11 @@ const ImportObservationsWizard = ({ initialCaveId, caveIdLocked }) => {
   return (
     <Card sx={{ minWidth: 275 }}>
       <CardContent>
-        <Typography color="secondary" variant="h1" sx={{ mb: 2 }}>
+        <Typography color="secondary" variant="h1" sx={{ mb: 1 }}>
           {formatMessage({ id: 'Import observations' })}
         </Typography>
 
-        <Stepper activeStep={currentStep} sx={{ mb: 4 }}>
+        <Stepper activeStep={currentStep} sx={{ mb: 3 }}>
           {stepLabels.map(label => (
             <Step key={label}>
               <StepLabel>{label}</StepLabel>
@@ -193,11 +193,11 @@ const ImportObservationsWizard = ({ initialCaveId, caveIdLocked }) => {
           ))}
         </Stepper>
 
-        <Box sx={{ mb: 4 }}>
+        <Box sx={{ mb: 3 }}>
           {renderStep(currentStep, initialCaveId, caveIdLocked)}
         </Box>
 
-        <Box sx={{ display: 'flex', gap: 2 }}>
+        <Box sx={{ display: 'flex', gap: 1 }}>
           <Button
             data-testid="back-button"
             disabled={isBackDisabled}

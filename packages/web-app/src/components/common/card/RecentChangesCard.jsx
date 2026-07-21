@@ -173,7 +173,7 @@ const ChangeItem = ({ changeInfo }) => {
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'flex-start',
-            gap: 1,
+            gap: 0.5,
             flexWrap: 'wrap'
           }}>
           <Typography variant="body2" component="span" sx={{ flex: 1 }}>

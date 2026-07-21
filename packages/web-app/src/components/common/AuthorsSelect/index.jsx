@@ -92,7 +92,7 @@ const AuthorsSelect = ({
         variant="caption"
         color="text.secondary"
         display="block"
-        sx={{ mb: 0.5 }}
+        sx={{}}
       >
         {formatMessage({ id: HELPER_TEXT_KEY })}
       </Typography>
@@ -151,7 +151,7 @@ const AuthorsSelect = ({
               />
             )}
           />
-          <Collapse in={isCreateOpen} sx={{ p: 1 }}>
+          <Collapse in={isCreateOpen} sx={{ p: 0.5 }}>
             <CreateCaverPanel
               enabled={isCreateOpen}
               onCreateSuccess={handleCreateSuccess}

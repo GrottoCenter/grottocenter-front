@@ -55,15 +55,21 @@ const MobileEntityCard = React.memo(
           {...(!onToggle
             ? { component: AppLink, to: link(doc), openInNewTabDesktop: true }
             : {})}>
-          <CardContent sx={{ py: 1, px: 1.5, '&:last-child': { pb: 1 } }}>
+          <CardContent
+            sx={{
+              py: 0.5,
+              '&:last-child': { pb: 1 }
+            }}>
             <Box
               sx={{
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'space-between',
-                mb: 0.5
+                justifyContent: 'space-between'
               }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+              <Box sx={{
+                display: 'flex',
+                alignItems: 'center'
+              }}>
                 {onToggle && (
                   <Checkbox
                     checked={selected}
@@ -71,7 +77,10 @@ const MobileEntityCard = React.memo(
                     color="primary"
                     onClick={e => e.stopPropagation()}
                     onChange={() => onToggle(doc.id)}
-                    sx={{ p: 0, mr: 0.5, flexShrink: 0 }}
+                    sx={{
+                      p: 0.25,
+                      flexShrink: 0
+                    }}
                   />
                 )}
                 {icon}
@@ -86,20 +95,26 @@ const MobileEntityCard = React.memo(
               {!onToggle && (
                 <ChevronRightIcon
                   fontSize="small"
-                  sx={{ color: 'text.disabled', flexShrink: 0, ml: 0.5 }}
+                  sx={{
+                    color: 'text.disabled',
+                    flexShrink: 0
+                  }}
                 />
               )}
             </Box>
-            <Divider sx={{ mb: 0.5 }} />
+            <Divider sx={{}} />
             {bodyColumns.length > 0 && (
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.25 }}>
+              <Box sx={{
+                display: 'flex',
+                flexDirection: 'column'
+              }}>
                 {bodyColumns.map(col => {
                   const value = renderCellFn(doc, col.field, col.render);
                   const isMissing = value === '-';
                   return (
                     <Box
                       key={col.field}
-                      sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                       <Typography
                         variant="caption"
                         color="text.secondary"
@@ -219,8 +234,8 @@ const MobileEntityList = ({
 
   if (allRows.length === 0 && !isLoading) {
     return (
-      <Box sx={{ py: 4, textAlign: 'center', color: 'text.disabled' }}>
-        <SearchOffIcon sx={{ fontSize: 48, mb: 1 }} />
+      <Box sx={{ py: 3, textAlign: 'center', color: 'text.disabled' }}>
+        <SearchOffIcon sx={{ fontSize: 48, mb: 0.5 }} />
         <Typography variant="body2" color="text.secondary">
           <Translate>No results</Translate>
         </Typography>
@@ -233,7 +248,7 @@ const MobileEntityList = ({
 
   return (
     <Box>
-      <Stack spacing={2} sx={{ mb: 1 }}>
+      <Stack spacing={1} sx={{ mb: 0.5 }}>
         {allRows.map(doc => (
           <MobileEntityCard
             key={doc.id}
@@ -249,7 +264,7 @@ const MobileEntityList = ({
         ))}
       </Stack>
       {(hasMore || isLoading) && (
-        <Box sx={{ display: 'flex', justifyContent: 'center', py: 2 }}>
+        <Box sx={{ display: 'flex', justifyContent: 'center', py: 1 }}>
           {isLoading ? (
             <CircularProgress size={24} color="secondary" />
           ) : (
@@ -264,7 +279,7 @@ const MobileEntityList = ({
         <Typography
           variant="caption"
           color="text.secondary"
-          sx={{ display: 'block', textAlign: 'center', py: 1 }}>
+          sx={{ display: 'block', textAlign: 'center', py: 0.5 }}>
           <Translate>Refine your search to see more results</Translate>
         </Typography>
       )}

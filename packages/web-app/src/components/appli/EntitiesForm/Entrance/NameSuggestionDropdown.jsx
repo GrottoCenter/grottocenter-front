@@ -105,7 +105,7 @@ const NameSuggestionDropdown = ({ control, formKey, enabled, children }) => {
                   sx={{
                     display: 'flex',
                     alignItems: 'center',
-                    gap: 1,
+                    gap: 0.5,
                     p: '12px'
                   }}>
                   <CircularProgress size={18} />
@@ -118,7 +118,7 @@ const NameSuggestionDropdown = ({ control, formKey, enabled, children }) => {
                   <Typography
                     variant="caption"
                     color="text.secondary"
-                    sx={{ display: 'block', px: '12px', pt: 1 }}>
+                    sx={{ display: 'block', px: '12px', pt: 0.5 }}>
                     {formatMessage({
                       id: 'Existing entrances with a similar name:'
                     })}
@@ -144,7 +144,7 @@ const NameSuggestionDropdown = ({ control, formKey, enabled, children }) => {
                           <OpenInNewIcon
                             fontSize="small"
                             color="action"
-                            sx={{ ml: 1 }}
+                            sx={{ ml: 0.5 }}
                           />
                         </ListItemButton>
                       );
@@ -156,7 +156,6 @@ const NameSuggestionDropdown = ({ control, formKey, enabled, children }) => {
           </Popper>
         </Box>
       </ClickAwayListener>
-
       <Dialog
         open={!!candidate}
         onClose={dismissConfirmation}
@@ -166,7 +165,7 @@ const NameSuggestionDropdown = ({ control, formKey, enabled, children }) => {
           {formatMessage({ id: 'Is this the same cave?' })}
         </DialogTitle>
         <DialogContent>
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
             {formatMessage({
               id: 'An entrance with a similar name already exists. Please check whether it is the same cave before creating a new one.'
             })}
@@ -187,7 +186,7 @@ const NameSuggestionDropdown = ({ control, formKey, enabled, children }) => {
                   display: 'inline-flex',
                   alignItems: 'center',
                   gap: '4px',
-                  mt: 1
+                  mt: 0.5
                 }}>
                 {formatMessage({ id: 'View full details' })}
                 <OpenInNewIcon fontSize="inherit" />

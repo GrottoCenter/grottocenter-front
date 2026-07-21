@@ -24,9 +24,9 @@ const GuidelinesGrouped = ({ guidelines }) => {
       title={<FormattedMessage id="Guidelines" />}
       anchorId="guidelines"
     >
-      <Box p={2}>
+      <Box p={1}>
         {groups.map((group, index) => (
-          <Box key={group.key} mt={index > 0 ? 3 : 0}>
+          <Box key={group.key} mt={index > 0 ? 2 : 0.25}>
             <Typography variant="h6" gutterBottom>
               <FormattedMessage id={group.titleId} />
             </Typography>

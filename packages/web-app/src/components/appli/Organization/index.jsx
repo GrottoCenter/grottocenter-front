@@ -180,7 +180,7 @@ const Organization = ({ error, isLoading, organization }) => {
       <Stack
         direction="row"
         divider={
-          <Typography component="span" color="text.secondary" sx={{ mx: 1 }}>
+          <Typography component="span" color="text.secondary" sx={{ mx: 0.5 }}>
             ·
           </Typography>
         }
@@ -227,7 +227,7 @@ const Organization = ({ error, isLoading, organization }) => {
         actions={actions}
       />
       {isLoading && (
-        <Card sx={{ m: 2, p: 3 }}>
+        <Card sx={{ m: 1, p: 2 }}>
           <Skeleton height={150} />
           <Skeleton height={100} />
           <Skeleton height={100} />
@@ -235,7 +235,7 @@ const Organization = ({ error, isLoading, organization }) => {
         </Card>
       )}
       {error && (
-        <Card sx={{ m: 2, p: 3 }}>
+        <Card sx={{ m: 1, p: 2 }}>
           <Alert
             title={formatMessage({
               id: 'Error, the organization data you are looking for is not available.'
@@ -247,7 +247,7 @@ const Organization = ({ error, isLoading, organization }) => {
       {organization && (
         <>
           {organization.isDeleted && (
-            <Box sx={{ m: 2 }}>
+            <Box sx={{ m: 1 }}>
               <DeletedCard
                 entityType={DELETED_ENTITIES.organization}
                 entity={organization}

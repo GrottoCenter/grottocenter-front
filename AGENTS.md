@@ -394,12 +394,15 @@ cy.get('.MuiButton-root').click();
 // ✅
 cy.get('[data-testid="save-btn"]').click();
 
-// ❌ Non-integer values with theme.spacing (array-type spacing only accepts integer indices)
-sx={{ mt: theme.spacing(1.5), p: theme.spacing(0.5) }}
-// ✅ Use integer multiples only
-sx={{ mt: theme.spacing(1), p: theme.spacing(2) }}
-// ✅ Or use raw pixel values for non-standard spacing
+// ❌ Raw pixel values for ordinary spacing (bypasses the theme scale)
 sx={{ mt: '12px', p: '4px' }}
+// ✅ Use theme.spacing() factors — the theme uses the standard MUI scale
+// (spacing: 8), so theme.spacing(factor) = factor * 8px. Fractional factors
+// (0.25, 0.5, 1.5, ...) are valid and resolve correctly.
+sx={{ mt: theme.spacing(1.5), p: theme.spacing(0.5) }}
+// ✅ Shorthand props go through the same scale — prefer them over theme.spacing()
+// when there's no other computation involved
+sx={{ mt: 1.5, p: 0.5 }}
 ```
 
 ---

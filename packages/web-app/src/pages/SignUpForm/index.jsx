@@ -25,7 +25,7 @@ const FormWrapper = styled('form')`
 `;
 
 const SpacedCenteredButton = styled(Button)`
-  margin: ${({ theme }) => theme.spacing(1)} auto;
+  margin: ${({ theme }) => theme.spacing(0.5)} auto;
 `;
 
 const SignUpForm = ({

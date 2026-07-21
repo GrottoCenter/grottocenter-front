@@ -66,10 +66,10 @@ const Rigging = ({ rigging, entranceId, isEditAllowed, isMoving, onMoveUp, onMov
         display: 'flow-root',
         borderTop: '1px solid',
         borderColor: 'divider',
-        pt: 1,
-        pb: 1
+        pt: 0.5,
+        pb: 0.5
       }}>
-      <Box sx={{ float: 'right', ml: 1 }}>
+      <Box sx={{ float: 'right', ml: 0.5 }}>
         <ActionButtons
           isLoading={isActionLoading}
           isUpdating={isUpdateFormVisible}

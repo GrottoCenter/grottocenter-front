@@ -15,7 +15,7 @@ import {
 import GROUPS from '../../helpers/GroupHelper';
 
 const SpacedButton = styled(Button)`
-  margin: ${({ theme }) => theme.spacing(1)};
+  margin: ${({ theme }) => theme.spacing(0.5)};
 `;
 
 const UserGroups = ({
@@ -98,9 +98,7 @@ const UserGroups = ({
           style={{ display: 'block' }}
         />
       ))}
-
-      <Divider sx={{ my: 2 }} />
-
+      <Divider sx={{ my: 1 }} />
       <Typography variant="h3" gutterBottom>
         {formatMessage({ id: 'Banned' })}
       </Typography>
@@ -125,7 +123,6 @@ const UserGroups = ({
           />
         </span>
       </Tooltip>
-
       <SpacedButton
         onClick={handleSave}
         color={isLoading ? 'inherit' : 'primary'}
@@ -136,7 +133,6 @@ const UserGroups = ({
           formatMessage({ id: 'Save' })
         )}
       </SpacedButton>
-
       <SpacedButton
         variant="outlined"
         onClick={handleReset}

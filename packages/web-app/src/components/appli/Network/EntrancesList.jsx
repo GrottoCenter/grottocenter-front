@@ -44,7 +44,7 @@ const EntrancesList = ({
       dense
       disablePadding
       sx={{
-        '& .MuiListItemButton-root': { py: 0, pl: 0, minHeight: 0 },
+        '& .MuiListItemButton-root': { py: 0.25, pl: 0.25, minHeight: 0 },
         '& .MuiListItemIcon-root': { minWidth: 32 }
       }}>
       {isLoading && <LoadingList />}
@@ -116,7 +116,7 @@ const EntrancesList = ({
   if (inline) {
     return (
       <Box sx={{ height: '100%', overflow: 'auto' }}>
-        <Paper variant="outlined" sx={{ p: 2, borderRadius: 2, bgcolor: 'grey.50' }}>
+        <Paper variant="outlined" sx={{ p: 1, borderRadius: 2, bgcolor: 'grey.50' }}>
           <InfoSection
             title={formatMessage({ id: 'Entrances' })}>
 

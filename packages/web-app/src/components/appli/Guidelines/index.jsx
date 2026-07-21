@@ -159,10 +159,10 @@ const Guidelines = ({ entityType, entityId, guidelines }) => {
     switch (mode) {
       case MODE_CREATE:
         return (
-          <Box mb={2}>
+          <Box mb={1}>
             <ButtonGroup
               size="small"
-              sx={{ mb: 2 }}
+              sx={{ mb: 1 }}
               data-testid="guideline-mode-toggle">
               <Button
                 variant="outlined"
@@ -188,10 +188,10 @@ const Guidelines = ({ entityType, entityId, guidelines }) => {
 
       case MODE_ATTACH:
         return (
-          <Box mb={2}>
+          <Box mb={1}>
             <ButtonGroup
               size="small"
-              sx={{ mb: 2 }}
+              sx={{ mb: 1 }}
               data-testid="guideline-mode-toggle">
               <Button variant="contained" startIcon={<LinkIcon />}>
                 <FormattedMessage id="guidelines.attach_existing" />
@@ -207,14 +207,13 @@ const Guidelines = ({ entityType, entityId, guidelines }) => {
                 <FormattedMessage id="guidelines.create_new" />
               </Button>
             </ButtonGroup>
-
             <form autoComplete="off" onSubmit={handleAttachGuideline}>
               {isLoadingGuidelines ? (
                 <Box
                   sx={{
                     display: 'flex',
                     justifyContent: 'center',
-                    py: 3
+                    py: 2
                   }}>
                   <CircularProgress size={28} />
                 </Box>

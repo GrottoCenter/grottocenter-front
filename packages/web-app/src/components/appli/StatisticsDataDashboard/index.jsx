@@ -85,11 +85,11 @@ const StatisticsDataDashboard = ({
         <>
           {isLoading && <Skeleton height={200} width="100%" />}
           {hasData && (
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
               {/* KPI banner: 3 key metrics full width */}
               <Paper
                 variant="outlined"
-                sx={{ p: 2, borderRadius: 2, bgcolor: 'grey.50' }}>
+                sx={{ p: 1, borderRadius: 2, bgcolor: 'grey.50' }}>
                 <CavesStatistics
                   avgDepth={data.avg.avg_depth}
                   avgLength={data.avg.avg_length}
@@ -101,11 +101,11 @@ const StatisticsDataDashboard = ({
                 sx={{
                   display: 'grid',
                   gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' },
-                  gap: 2
+                  gap: 1
                 }}>
                 <Paper
                   variant="outlined"
-                  sx={{ p: 1, px: 4, borderRadius: 2, bgcolor: 'grey.50' }}>
+                  sx={{ p: 0.5, px: 3, borderRadius: 2, bgcolor: 'grey.50' }}>
                   <CavesData
                     title={
                       entityType === 'country'
@@ -120,7 +120,7 @@ const StatisticsDataDashboard = ({
                 </Paper>
                 <Paper
                   variant="outlined"
-                  sx={{ p: 2, borderRadius: 2, bgcolor: 'grey.50' }}>
+                  sx={{ p: 1, borderRadius: 2, bgcolor: 'grey.50' }}>
                   <SpecificsCaves
                     maxDepthCave={data.cave_with_max_depth}
                     maxLengthCave={data.cave_with_max_length}

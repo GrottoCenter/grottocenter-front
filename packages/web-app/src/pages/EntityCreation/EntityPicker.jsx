@@ -16,8 +16,8 @@ const EntityPicker = () => {
           sx={{
             display: 'grid',
             gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' },
-            gap: 3,
-            mt: 1
+            gap: 2,
+            mt: 0.5
           }}>
           {ENTITIES.map(({ path, iconType, titleKey, descriptionKey }) => (
             <Card
@@ -40,7 +40,7 @@ const EntityPicker = () => {
               // iOS keeps :focus style after tap; blur on touchEnd removes the stale focus ring
               onTouchEnd={e => e.currentTarget.blur()}>
               <CardContent>
-                <Box display="flex" alignItems="center" gap={2} mb={1.5}>
+                <Box display="flex" alignItems="center" gap={1}>
                   <EntityIcon iconType={iconType} />
                   <Typography variant="h6" fontWeight={600}>
                     {formatMessage({ id: titleKey })}

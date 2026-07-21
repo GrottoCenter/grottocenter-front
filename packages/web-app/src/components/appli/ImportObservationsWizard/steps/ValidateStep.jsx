@@ -36,7 +36,7 @@ const InvalidRowsTable = ({ invalidRowDetails }) => {
   const rows = invalidRowDetails.slice(0, MAX_INVALID_ROWS_DISPLAY);
 
   return (
-    <Box sx={{ overflowX: 'auto', mt: 1 }} data-testid="invalid-rows-table">
+    <Box sx={{ overflowX: 'auto', mt: 0.5 }} data-testid="invalid-rows-table">
       <Table size="small">
         <TableHead>
           <TableRow>
@@ -299,7 +299,7 @@ const ValidateStep = () => {
   if (isValidating || !validationResult) {
     return (
       <Box
-        sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}
+        sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}
         data-testid="validate-step-loading">
         <Typography variant="body2" color="text.secondary">
           {formatMessage({
@@ -321,7 +321,7 @@ const ValidateStep = () => {
 
   return (
     <Box
-      sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}
+      sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}
       data-testid="validate-step">
       {/* Blocking errors */}
       {blockingErrors.map((error, idx) => (
@@ -333,11 +333,10 @@ const ValidateStep = () => {
           {error}
         </Alert>
       ))}
-
       {/* Warning: some rows are invalid but no blocking errors */}
       {blockingErrors.length === 0 && invalidRows > 0 && (
         <Box data-testid="invalid-rows-warning">
-          <Alert severity="warning" sx={{ mb: 1 }}>
+          <Alert severity="warning" sx={{ mb: 0.5 }}>
             {formatMessage(
               {
                 id: 'ImportObservationsWizard.ValidateStep.invalidRowsWarning'
@@ -348,7 +347,6 @@ const ValidateStep = () => {
           <InvalidRowsTable invalidRowDetails={invalidRowDetails} />
         </Box>
       )}
-
       {/* Success: all rows valid */}
       {blockingErrors.length === 0 && invalidRows === 0 && (
         <Alert severity="success" data-testid="validation-success">
@@ -358,7 +356,6 @@ const ValidateStep = () => {
           )}
         </Alert>
       )}
-
       {/* Summary when there are blocking errors — still show row counts if we
           have rows at all so the user has some context */}
       {blockingErrors.length > 0 && totalRows > 0 && (

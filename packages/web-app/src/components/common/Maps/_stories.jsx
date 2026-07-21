@@ -12,7 +12,7 @@ import {
 } from './common/Markers/Components';
 
 const Card = styled(MuiCard)`
-  margin: ${({ theme }) => theme.spacing(2)};
+  margin: ${({ theme }) => theme.spacing(1)};
 `;
 
 const positions = {

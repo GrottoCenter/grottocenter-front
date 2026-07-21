@@ -22,15 +22,10 @@ const paddingUnit = 8;
 
 export const overridings = {
   name: 'Main theme',
-  spacing: [
-    paddingUnit / 4,
-    paddingUnit / 2,
-    paddingUnit,
-    paddingUnit * 2,
-    paddingUnit * 3,
-    paddingUnit * 4,
-    paddingUnit * 8
-  ],
+  // Standard MUI spacing: theme.spacing(factor) = factor * 8px.
+  // Use fractional factors (0.25, 0.5, 1.5, ...) freely — unlike the previous
+  // custom array-based scale, they resolve correctly instead of being dropped.
+  spacing: paddingUnit,
   sideMenuWidth,
   appBarHeight,
   breadcrumpHeight,

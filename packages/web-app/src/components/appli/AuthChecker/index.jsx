@@ -14,7 +14,7 @@ import { usePermissions } from '../../../hooks';
 
 const SpacedButton = styled(Button)`
   ${({ theme }) => `
-    margin: ${theme.spacing(1)};
+    margin: ${theme.spacing(0.5)};
 `}
 `;
 
@@ -50,7 +50,7 @@ const AuthChecker = ({ errorMessageComponent, componentToDisplay }) => {
     <CenteredBlock>
       {errorMessageComponent || (
         <>
-          <Alert severity="error" sx={{ mb: 2 }}>
+          <Alert severity="error" sx={{ mb: 1 }}>
             {formatMessage({
               id: 'You must be authenticated in order to use this feature.'
             })}

@@ -39,10 +39,9 @@ const DetachEntranceSection = ({ entrance }) => {
 
   return (
     <Box>
-      <Box mb={4}>
+      <Box mb={3}>
         <OperationSummary entrance={entrance} variant="detach" />
       </Box>
-
       {error && (
         <Alert
           severity="error"
@@ -51,7 +50,6 @@ const DetachEntranceSection = ({ entrance }) => {
           })}
         />
       )}
-
       <FormActions
         confirmLabel={formatMessage({ id: 'Detach entrance' })}
         onConfirm={handleDetach}

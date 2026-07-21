@@ -110,7 +110,7 @@ const MassifSensitivityControl = ({ massif }) => {
   }
 
   return (
-    <Box sx={{ mt: 3, mb: 3, p: 2, border: 1, borderColor: 'divider', borderRadius: 1 }}>
+    <Box sx={{ mt: 2, mb: 2, p: 1, border: 1, borderColor: 'divider', borderRadius: 1 }}>
       <Typography variant="h6" gutterBottom>
         {formatMessage({ id: 'Sensitivity Management' })}
       </Typography>
@@ -131,9 +131,7 @@ const MassifSensitivityControl = ({ massif }) => {
             : 'Enabling sensitivity will cascade to all entrances within the massif polygon. The designation must be based on applicable legislation.'
         })}
       </Typography>
-
-      {isPreviewLoading && <CircularProgress size={24} sx={{ ml: 2 }} />}
-
+      {isPreviewLoading && <CircularProgress size={24} sx={{ ml: 1 }} />}
       <StandardDialog
         open={isConfirmOpen}
         onClose={handleCancel}

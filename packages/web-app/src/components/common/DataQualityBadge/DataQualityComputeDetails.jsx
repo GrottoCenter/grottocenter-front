@@ -9,13 +9,12 @@ const DataQualityComputeDetails = () => {
   const theme = useTheme();
 
   return (
-    <Box display="flex" flexDirection="column" gap={2} p={2}>
+    <Box display="flex" flexDirection="column" gap={1} p={1}>
       <Typography variant="body2">
         {formatMessage({
           id: 'The quality of the data is calculated from the information available on the cave, the number of people who provided information and the date of the last contributions. This allows us to build a value between 3 and 100.'
         })}
       </Typography>
-
       <Box>
         <Typography variant="body2" gutterBottom>
           {formatMessage({ id: 'The chosen color code is as follows:' })}
@@ -37,7 +36,6 @@ const DataQualityComputeDetails = () => {
           {` — ${formatMessage({ id: 'The data provided is of high quality, a verification would guarantee the quality level of this data.' })}`}
         </Typography>
       </Box>
-
       <Box sx={{ overflowX: 'auto' }}>
         <DataQualityComputeTable />
       </Box>

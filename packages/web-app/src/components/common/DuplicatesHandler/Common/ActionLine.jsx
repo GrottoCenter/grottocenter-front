@@ -7,8 +7,8 @@ import PublishIcon from '@mui/icons-material/Publish';
 import ActionButton from '../../ActionButton';
 
 const StyledGrid = styled(Grid)`
-  margin-top: ${({ theme }) => theme.spacing(2)};
-  margin-bottom: ${({ theme }) => theme.spacing(2)};
+  margin-top: ${({ theme }) => theme.spacing(1)};
+  margin-bottom: ${({ theme }) => theme.spacing(1)};
 `;
 
 const ActionLine = ({

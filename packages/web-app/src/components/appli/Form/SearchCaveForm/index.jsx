@@ -48,7 +48,7 @@ const SearchCaveForm = ({ onSubmit, submitLabel = null }) => {
         resetResults={resetAdvancedSearch}
       />
       <SearchResults onSelected={handleSelection} hideExport compact entityType={ADVANCED_SEARCH_TYPES.ENTRANCES} />
-      <Box sx={{ mt: 2, mb: 3, textAlign: 'center' }}>
+      <Box sx={{ mt: 1, mb: 2, textAlign: 'center' }}>
         <Button
           disabled={selectedEntrances.length === 0}
           color="primary"

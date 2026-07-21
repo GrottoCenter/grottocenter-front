@@ -59,14 +59,13 @@ const EntranceDetail = ({
           onZoomChange={setMapZoom}
         />
       )}
-
       <Box
         sx={{
           display: 'flex',
           flexWrap: 'wrap',
           alignItems: 'center',
-          gap: 2,
-          mt: 2
+          gap: 1,
+          mt: 1
         }}
       >
         <NumberField

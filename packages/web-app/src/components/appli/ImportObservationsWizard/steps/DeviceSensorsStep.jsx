@@ -144,7 +144,7 @@ const DeviceSelector = ({ disabled, onCreateNew, onSelect }) => {
   );
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
       <FormControlLabel
         control={
           <Checkbox
@@ -179,7 +179,7 @@ const DeviceSelector = ({ disabled, onCreateNew, onSelect }) => {
           if (option.__isCreateNew) {
             return (
               <li key="create-new" {...rest}>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                   <AddIcon fontSize="small" color="primary" />
                   <Typography color="primary">{option.name}</Typography>
                 </Box>
@@ -191,7 +191,7 @@ const DeviceSelector = ({ disabled, onCreateNew, onSelect }) => {
               <Box>
                 <Typography variant="body2">{option.name}</Typography>
                 <Box
-                  sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+                  sx={{ display: 'flex', gap: 0.5, alignItems: 'center' }}>
                   {option.brandName && (
                     <Typography variant="caption" color="text.secondary">
                       {option.brandName}
@@ -300,15 +300,14 @@ const DeviceCreator = ({ onCancel, onSuccess }) => {
   return (
     <Paper
       variant="outlined"
-      sx={{ p: 2, mt: 2 }}
+      sx={{ p: 1, mt: 1 }}
       data-testid="create-device-form">
-      <Typography variant="subtitle2" sx={{ mb: 2 }}>
+      <Typography variant="subtitle2" sx={{ mb: 1 }}>
         {formatMessage({
           id: 'ImportObservationsWizard.DeviceSensorsStep.newDeviceTitle'
         })}
       </Typography>
-
-      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
         <TextField
           label={formatMessage({
             id: 'ImportObservationsWizard.DeviceSensorsStep.deviceName'
@@ -363,14 +362,12 @@ const DeviceCreator = ({ onCancel, onSuccess }) => {
           data-testid="new-device-manufacturer-url"
         />
       </Box>
-
       {createError && (
-        <Alert severity="error" sx={{ mt: 2 }} data-testid="create-device-error">
+        <Alert severity="error" sx={{ mt: 1 }} data-testid="create-device-error">
           {createError}
         </Alert>
       )}
-
-      <Box sx={{ display: 'flex', gap: 1, mt: 2 }}>
+      <Box sx={{ display: 'flex', gap: 0.5, mt: 1 }}>
         <Button
           variant="contained"
           onClick={handleSubmit}
@@ -529,20 +526,18 @@ const DeviceSensorsStep = () => {
 
   return (
     <Box
-      sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}
+      sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}
       data-testid="device-sensors-step">
       <Typography variant="h6">
         {formatMessage({
           id: 'ImportObservationsWizard.DeviceSensorsStep.title'
         })}
       </Typography>
-
       <Typography variant="body2" color="text.secondary">
         {formatMessage({
           id: 'ImportObservationsWizard.DeviceSensorsStep.description'
         })}
       </Typography>
-
       {/* Phase 1: Device selection/creation */}
       <Box data-testid="device-phase">
         {confirmedDevice ? (
@@ -566,17 +561,16 @@ const DeviceSensorsStep = () => {
           </>
         )}
       </Box>
-
       {/* Phase 2: Sensor configurations (only when device is confirmed) */}
       {confirmedDevice && (
         <Box data-testid="sensor-config-phase">
-          <Typography variant="subtitle1" sx={{ mb: 2 }}>
+          <Typography variant="subtitle1" sx={{ mb: 1 }}>
             {formatMessage({
               id: 'ImportObservationsWizard.DeviceSensorsStep.sensorConfigPhaseTitle'
             })}
           </Typography>
           <SensorConfigList deviceId={confirmedDevice.id} />
-          <Box sx={{ mt: 2 }}>
+          <Box sx={{ mt: 1 }}>
             <SensorConfigForm deviceId={confirmedDevice.id} />
           </Box>
         </Box>

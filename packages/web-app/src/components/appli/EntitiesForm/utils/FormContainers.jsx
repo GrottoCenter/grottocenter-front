@@ -28,7 +28,7 @@ export const FormRow = styled('div')(
     display: flex;
     justify-content: space-between;
     flex-wrap: wrap;
-    gap: ${theme.spacing(2)};
+    gap: ${theme.spacing(1)};
 
     ${theme.breakpoints.up('sm')} {
       flex-wrap: nowrap;
@@ -38,8 +38,8 @@ export const FormRow = styled('div')(
 
 const StyledFormLabel = styled(FormLabel)`
   display: block;
-  padding-top: ${({ theme }) => theme.spacing(4)};
-  padding-bottom: ${({ theme }) => theme.spacing(1)};
+  padding-top: ${({ theme }) => theme.spacing(3)};
+  padding-bottom: ${({ theme }) => theme.spacing(0.5)};
 `;
 
 export const FormSectionLabel = ({ label }) => {
@@ -52,13 +52,15 @@ FormSectionLabel.propTypes = { label: PropTypes.string.isRequired };
 // creation form a clear visual hierarchy. Responsive: lighter top margin on
 // mobile.
 export const FormSection = ({ title, children }) => (
-  <Box component="section" sx={{ mt: { xs: 3, sm: 4 } }}>
+  <Box component="section" sx={{ mt: { xs: 2, sm: 3 } }}>
     {title && (
       <>
         <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
           <Translate>{title}</Translate>
         </Typography>
-        <Divider sx={{ mt: 0.5, mb: 2 }} />
+        <Divider sx={{
+          mb: 2
+        }} />
       </>
     )}
     {children}
@@ -84,8 +86,8 @@ export const FormActionRow = ({
         display: 'flex',
         flexDirection: { xs: 'column-reverse', sm: 'row' },
         justifyContent: isCenter ? 'center' : 'flex-end',
-        gap: 2,
-        mt: 3
+        gap: 1,
+        mt: 2
       }}>
       {onCancel && (
         <MuiButton

@@ -9,7 +9,7 @@ import { ENTRANCE_HAZARD_FIELDS } from '../../../../conf/entranceCharacteristics
 // chips. Selected = the point of attention applies to this entrance.
 const EntranceAttributes = ({ control }) => (
   <FormSection title="Hazards & restrictions">
-    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
       {ENTRANCE_HAZARD_FIELDS.map(({ field, label, icon }) => (
         <BoolToggleChip
           key={field}

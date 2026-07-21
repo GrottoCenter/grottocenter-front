@@ -175,7 +175,7 @@ const RelatedCaves = ({
         />
       )}
       {!isOrganization && userId && (
-        <Box sx={{ mt: isCaveSearchVisible ? 0 : -3 }}>
+        <Box sx={{ mt: isCaveSearchVisible ? 0.25 : -2 }}>
           <ExploredEntrancesMap userId={userId} />
         </Box>
       )}
@@ -191,7 +191,7 @@ const RelatedCaves = ({
           })}
         />
       ) : (
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
           {isOrganization && (
             <EntitiesList
               type="cave"
@@ -212,7 +212,6 @@ const RelatedCaves = ({
           />
         </Box>
       )}
-
       <StandardDialog
         open={!!pendingRemove}
         onClose={handleCancelRemove}

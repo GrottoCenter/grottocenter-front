@@ -68,18 +68,14 @@ const HorizontalList = styled(List)(({ theme }) => ({
   justifyContent: 'flex-start',
   paddingTop: 0,
   paddingBottom: 0,
-  marginTop: theme.spacing(-1),
-  gap: theme.spacing(0.5),
+  marginTop: theme.spacing(-0.5),
 
   '& .MuiListItem-root': {
-    width: 'initial',
-    paddingTop: theme.spacing(0.5),
-    paddingBottom: theme.spacing(0.5)
+    width: 'initial'
   },
 
   '& .MuiListItemIcon-root': {
-    minWidth: 0,
-    marginRight: theme.spacing(1.5)
+    minWidth: 0
   },
 
   '& .MuiListItemText-root': {
@@ -112,8 +108,7 @@ SummaryText.propTypes = { children: PropTypes.node };
 const PropertiesGrid = styled(Box)(({ theme }) => ({
   display: 'grid',
   gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
-  rowGap: theme.spacing(1.25),
-  columnGap: theme.spacing(2)
+  columnGap: theme.spacing(1)
 }));
 
 const PropertyCell = styled('div', {
@@ -129,7 +124,7 @@ export const DetailsList = ({ children }) => {
   return (
     <Paper
       variant="outlined"
-      sx={{ p: 2, borderRadius: 2, bgcolor: 'grey.50' }}>
+      sx={{ p: 1, borderRadius: 2, bgcolor: 'grey.50' }}>
       <PropertiesGrid>{items}</PropertiesGrid>
     </Paper>
   );
@@ -198,7 +193,7 @@ const VideoPreview = styled('video')(({ theme }) => ({
   maxHeight: 320,
   display: 'block',
   background: theme.palette.common.black,
-  borderRadius: theme.spacing(1),
+  borderRadius: theme.spacing(0.5),
   [theme.breakpoints.up('sm')]: { maxHeight: 480 },
   [theme.breakpoints.up('md')]: { maxHeight: 600 }
 }));
@@ -227,17 +222,16 @@ const isAudioFile = fileName =>
 const FileRow = styled(Box)(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
-  gap: theme.spacing(1.5),
-  padding: theme.spacing(1),
+  padding: theme.spacing(0.5),
   border: `1px solid ${theme.palette.divider}`,
-  borderRadius: theme.spacing(1)
+  borderRadius: theme.spacing(0.5)
 }));
 
 export const EmptySection = ({ icon, message }) => (
   <Paper
     variant="outlined"
     sx={{
-      p: 2,
+      p: 1,
       borderRadius: 2,
       bgcolor: 'grey.50',
       minHeight: { xs: 100, sm: 200 },
@@ -245,7 +239,7 @@ export const EmptySection = ({ icon, message }) => (
       flexDirection: 'column',
       alignItems: 'center',
       justifyContent: 'center',
-      gap: 1,
+      gap: 0.5,
       color: 'text.secondary'
     }}>
     {icon ?? <InsertDriveFile fontSize="large" color="disabled" />}
@@ -264,12 +258,12 @@ export const EventDateSection = ({ date }) => {
     <Paper
       variant="outlined"
       sx={{
-        p: 2,
+        p: 1,
         borderRadius: 2,
         bgcolor: 'grey.50',
         display: 'flex',
         alignItems: 'center',
-        gap: 2
+        gap: 1
       }}>
       <EventAvailable sx={{ fontSize: 40, color: 'text.secondary' }} />
       <Box>
@@ -286,7 +280,7 @@ EventDateSection.propTypes = { date: PropTypes.string };
 const ImageGallery = styled(Box)(({ theme }) => ({
   display: 'flex',
   flexWrap: 'wrap',
-  gap: theme.spacing(2)
+  gap: theme.spacing(1)
 }));
 
 export const FilesSection = ({ files }) => {
@@ -332,7 +326,7 @@ export const FilesSection = ({ files }) => {
   }
 
   return (
-    <Stack spacing={3}>
+    <Stack spacing={2}>
       {images.length > 0 && (
         <ImageGallery>
           {images.map((file, idx) => {
@@ -349,15 +343,14 @@ export const FilesSection = ({ files }) => {
           })}
         </ImageGallery>
       )}
-
       {pdfs.map(file => (
         <Box key={file.completePath}>
           <Box
             sx={{
               display: 'flex',
               alignItems: 'center',
-              gap: 1,
-              mb: 1
+              gap: 0.5,
+              mb: 0.5
             }}>
             {getFileIcon(file.fileName)}
             <AppLink href={file.completePath}>
@@ -373,15 +366,14 @@ export const FilesSection = ({ files }) => {
           </PdfPreview>
         </Box>
       ))}
-
       {videos.map(file => (
         <Box key={file.completePath}>
           <Box
             sx={{
               display: 'flex',
               alignItems: 'center',
-              gap: 1,
-              mb: 1
+              gap: 0.5,
+              mb: 0.5
             }}>
             {getFileIcon(file.fileName)}
             <AppLink href={file.completePath}>
@@ -395,15 +387,14 @@ export const FilesSection = ({ files }) => {
           />
         </Box>
       ))}
-
       {audios.map(file => (
         <Box key={file.completePath}>
           <Box
             sx={{
               display: 'flex',
               alignItems: 'center',
-              gap: 1,
-              mb: 1
+              gap: 0.5,
+              mb: 0.5
             }}>
             {getFileIcon(file.fileName)}
             <AppLink href={file.completePath}>
@@ -413,9 +404,8 @@ export const FilesSection = ({ files }) => {
           <AudioPreview controls preload="metadata" src={file.completePath} />
         </Box>
       ))}
-
       {others.length > 0 && (
-        <Stack spacing={1}>
+        <Stack spacing={0.5}>
           {others.map(file => (
             <FileRow key={file.completePath}>
               {getFileIcon(file.fileName)}
@@ -428,7 +418,6 @@ export const FilesSection = ({ files }) => {
           ))}
         </Stack>
       )}
-
       {lightboxIndex !== null && (
         <ImageLightbox
           open={lightboxIndex !== null}

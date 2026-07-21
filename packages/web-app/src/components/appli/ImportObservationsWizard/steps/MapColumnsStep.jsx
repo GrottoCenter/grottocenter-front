@@ -184,7 +184,7 @@ const TimestampConfig = ({ mapping, columnMappings, sampleValues, onUpdate }) =>
 
   return (
     <Box
-      sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, py: 1 }}
+      sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, py: 0.5 }}
       data-testid={`timestamp-config-${mapping.columnIndex}`}>
       {/* Timestamp type selector */}
       <FormControl size="small" sx={{ minWidth: 160 }}>
@@ -210,7 +210,6 @@ const TimestampConfig = ({ mapping, columnMappings, sampleValues, onUpdate }) =>
           ))}
         </Select>
       </FormControl>
-
       {/* TimestampFormatInput for datetime/dateOnly/timeOnly */}
       {showPillBuilder && (
         <TimestampFormatInput
@@ -220,7 +219,6 @@ const TimestampConfig = ({ mapping, columnMappings, sampleValues, onUpdate }) =>
           onChange={handleFormatChange}
         />
       )}
-
     </Box>
   );
 };
@@ -260,7 +258,7 @@ const MeasurementConfig = ({ mapping, sensorConfigs, onUpdate }) => {
 
   return (
     <Box
-      sx={{ pl: 4, py: 1, display: 'flex', gap: 2, flexWrap: 'wrap' }}
+      sx={{ pl: 3, py: 0.5, display: 'flex', gap: 1, flexWrap: 'wrap' }}
       data-testid={`measurement-config-${mapping.columnIndex}`}>
       <FormControl size="small" sx={{ minWidth: 300 }}>
         <InputLabel id={`sensor-label-${mapping.columnIndex}`}>
@@ -292,7 +290,6 @@ const MeasurementConfig = ({ mapping, sensorConfigs, onUpdate }) => {
           ))}
         </Select>
       </FormControl>
-
       <FormControl size="small" sx={{ minWidth: 160 }}>
         <InputLabel id={`medium-label-${mapping.columnIndex}`}>
           {formatMessage({
@@ -462,7 +459,7 @@ const ColumnRoleTable = ({
                     </Tooltip>
                   </TableCell>
                   <TableCell>
-                    <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1, flexWrap: 'wrap' }}>
+                    <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 0.5, flexWrap: 'wrap' }}>
                       <FormControl size="small" sx={{ minWidth: 140 }}>
                         <Select
                           value={mapping.role || ''}
@@ -528,23 +525,21 @@ const ColumnRoleTable = ({
                     {decimalPartError && (
                       <Alert
                         severity="error"
-                        sx={{ mt: 1, py: 0, px: 1 }}
+                        sx={{ mt: 0.5, py: 0.25, px: 0.5 }}
                         data-testid={`decimal-part-error-${colIndex}`}>
                         {decimalPartError}
                       </Alert>
                     )}
                   </TableCell>
                 </TableRow>
-
               </React.Fragment>
             );
           })}
         </TableBody>
       </Table>
-
       {/* Timezone selector — shown once when any column has timestamp role */}
       {columnMappings.some(m => m.role === 'timestamp') && (
-        <Box sx={{ mt: 2, maxWidth: 320 }}>
+        <Box sx={{ mt: 1, maxWidth: 320 }}>
           <Autocomplete
             size="small"
             options={sortedTimezones}
@@ -824,20 +819,18 @@ const MapColumnsStep = () => {
 
   return (
     <Box
-      sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}
+      sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}
       data-testid="map-columns-step">
       <Typography variant="h6">
         {formatMessage({
           id: 'ImportObservationsWizard.MapColumnsStep.title'
         })}
       </Typography>
-
       <Typography variant="body2" color="text.secondary">
         {formatMessage({
           id: 'ImportObservationsWizard.MapColumnsStep.description'
         })}
       </Typography>
-
       {columnHeaders.length > 0 && (
         <ColumnRoleTable
           columnHeaders={columnHeaders}
@@ -847,7 +840,6 @@ const MapColumnsStep = () => {
           onUpdateMapping={handleUpdateMapping}
         />
       )}
-
       {columnHeaders.length === 0 && (
         <Alert severity="info" data-testid="no-columns-alert">
           {formatMessage({

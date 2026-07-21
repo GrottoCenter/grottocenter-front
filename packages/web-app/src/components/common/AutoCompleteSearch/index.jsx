@@ -41,14 +41,14 @@ const InputWrapper = styled('div', {
 `;
 
 const SearchIconWrapper = styled('div')`
-  padding: ${({ theme }) => theme.spacing(1)};
+  padding: ${({ theme }) => theme.spacing(0.5)};
   display: flex;
   align-items: center;
   justify-content: center;
 `;
 
 const StyledInputBase = styled(InputBase)`
-  padding: ${({ theme }) => theme.spacing(1, 1, 1, 0)};
+  padding: ${({ theme }) => theme.spacing(0.5, 0.5, 0.5, 0.25)};
   width: 100%;
 `;
 
@@ -79,7 +79,7 @@ const InputAdornments = ({ isLoading, hasError }) =>
   ) : null;
 
 const StyledPopper = hasFixWidth =>
-  function (props) {
+  (function(props) {
     return (
       <ResultsPopper
         {...props}
@@ -87,7 +87,7 @@ const StyledPopper = hasFixWidth =>
         placement="bottom-end"
       />
     );
-  };
+  });
 const AutoCompleteSearch = ({
   suggestions,
   renderOption,

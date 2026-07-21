@@ -7,9 +7,9 @@ const StyledAlert = styled(MuiAlert, {
   shouldForwardProp: prop => prop[0] !== '$'
 })`
   margin-top: ${({ theme, $disablemargins }) =>
-    !$disablemargins && theme.spacing(2)};
+    !$disablemargins && theme.spacing(1)};
   margin-bottom: ${({ theme, $disablemargins }) =>
-    !$disablemargins && theme.spacing(2)};
+    !$disablemargins && theme.spacing(1)};
 `;
 
 const Alert = ({

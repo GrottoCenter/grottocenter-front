@@ -105,7 +105,6 @@ const EmptyState = () => (
       flexDirection: 'column',
       alignItems: 'center',
       justifyContent: 'center',
-      py: 8,
       gap: '12px',
       color: 'text.disabled'
     }}>
@@ -142,7 +141,7 @@ const JumpToPage = ({ page, count, rowsPerPage, onPageChange }) => {
   };
 
   return (
-    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, px: 2 }}>
+    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, px: 1 }}>
       <Typography variant="body2" noWrap>
         <Translate>Go to page</Translate>
       </Typography>
@@ -311,7 +310,7 @@ const DesktopEntityTable = ({
   const TableContent =
     pageRows.length === 0 ? (
       <TableRow>
-        <TableCell colSpan={colSpan} sx={{ border: 0, p: 0 }}>
+        <TableCell colSpan={colSpan} sx={{ border: 0, p: 0.25 }}>
           <EmptyState />
         </TableCell>
       </TableRow>
@@ -356,7 +355,6 @@ const DesktopEntityTable = ({
             sx={{
               display: 'flex',
               alignItems: 'center',
-              gap: 0.5,
               minHeight: 48,
               overflow: 'hidden'
             }}>
@@ -378,7 +376,7 @@ const DesktopEntityTable = ({
               sx={{
                 minWidth: 0,
                 display: 'flex',
-                gap: 1,
+                gap: 0.5,
                 alignItems: 'center'
               }}>
               {onExport &&

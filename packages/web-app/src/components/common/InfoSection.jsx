@@ -6,7 +6,7 @@ import { Box, Typography } from '@mui/material';
 const SectionWrapper = styled(Box)`
   display: flex;
   flex-direction: column;
-  gap: ${({ theme }) => theme.spacing(1)};
+  gap: ${({ theme }) => theme.spacing(0.5)};
 `;
 
 const SectionTitle = styled(Typography)`

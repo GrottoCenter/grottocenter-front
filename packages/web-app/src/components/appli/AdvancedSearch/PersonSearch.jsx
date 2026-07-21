@@ -57,13 +57,14 @@ const PersonSearch = () => {
         value={query}
         placeholder={formatMessage({ id: 'Search for a person...' })}
       />
-
       <SearchFilterAccordion
         filterCount={countActiveFilters({ personType }, ['personType'])}
         expanded={advancedExpanded}
         onExpandedChange={setAdvancedExpanded}>
         <SearchFieldset title="Type">
-          <Box sx={{ display: 'flex', gap: 0.75 }}>
+          <Box sx={{
+            display: 'flex'
+          }}>
             {TYPE_OPTIONS.map(opt => (
               <Chip
                 key={String(opt.value)}
@@ -79,7 +80,6 @@ const PersonSearch = () => {
           </Box>
         </SearchFieldset>
       </SearchFilterAccordion>
-
       <SearchActionButtons
         showReset={query !== '' || personType !== null}
         onReset={() => {

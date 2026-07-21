@@ -24,9 +24,15 @@ const EntranceCharacteristicsSnapshot = ({ entrance, previous }) => {
         key={field}
         sx={
           isAdded
-            ? { bgcolor: 'rgba(70, 149, 74, 0.2)', borderRadius: 1, px: 0.5 }
+            ? {
+            bgcolor: 'rgba(70, 149, 74, 0.2)',
+            borderRadius: 1
+          }
             : isRemoved
-            ? { bgcolor: 'rgba(229, 83, 74, 0.2)', borderRadius: 1, px: 0.5 }
+            ? {
+            bgcolor: 'rgba(229, 83, 74, 0.2)',
+            borderRadius: 1
+          }
             : undefined
         }>
         <Property

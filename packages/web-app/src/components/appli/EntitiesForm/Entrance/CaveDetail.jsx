@@ -50,7 +50,7 @@ const CaveDetail = ({
   return (
     <FormSection title="Characteristics">
       {isShared && caveId && (
-        <Alert severity="info" sx={{ mb: 2 }}>
+        <Alert severity="info" sx={{ mb: 1 }}>
           <FormattedMessage
             id="Some of these characteristics are locked here because they belong to the network {networkLink} and are shared by all its entrances."
             values={{
@@ -64,7 +64,7 @@ const CaveDetail = ({
           />
         </Alert>
       )}
-      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
+      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
         <NumberField
           name="cave.depth"
           control={control}
@@ -107,7 +107,7 @@ const CaveDetail = ({
           inputProps={{ max: new Date().getFullYear() }}
         />
       </Box>
-      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mt: 2 }}>
+      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mt: 1 }}>
         {/* Diving belongs to the cave (locked when shared); touristic site is
             an entrance-level attribute (always editable). */}
         <BoolToggleChip

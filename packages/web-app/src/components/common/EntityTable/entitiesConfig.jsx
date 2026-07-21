@@ -51,7 +51,7 @@ const cellsRender = {
       <UnreadNotificationIcon color="secondary" fontSize="small" />
     ),
   notificationEntityType: (value, doc) => (
-    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
       <img src={doc.iconPath} alt="icon" style={{ width: '24px' }} />
       <span>
         <Translate>{value}</Translate>

@@ -11,7 +11,7 @@ const RiggingSummary = ({ obstacles }) => {
   const { total, unparsedCount } = parseRopeLengths(obstacles.map(o => o.rope));
 
   return (
-    <Stack direction="row" spacing={1}>
+    <Stack direction="row" spacing={0.5}>
       <Chip
         size="small"
         variant="outlined"

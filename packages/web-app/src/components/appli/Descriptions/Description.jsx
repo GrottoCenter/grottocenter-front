@@ -17,8 +17,8 @@ import Contribution from '../../common/Contribution/Contribution';
 const ListItemStyled = styled(ListItem)`
   display: flow-root;
   border-top: 1px solid ${({ theme }) => theme.palette.divider};
-  padding-top: ${({ theme }) => theme.spacing(1)};
-  padding-bottom: ${({ theme }) => theme.spacing(1)};
+  padding-top: ${({ theme }) => theme.spacing(0.5)};
+  padding-bottom: ${({ theme }) => theme.spacing(0.5)};
 `;
 const Description = ({
   description,
@@ -66,7 +66,7 @@ const Description = ({
 
   return (
     <ListItemStyled disableGutters>
-      <Box sx={{ float: 'right', ml: 1 }}>
+      <Box sx={{ float: 'right', ml: 0.5 }}>
         <ActionButtons
           isLoading={isActionLoading}
           isUpdating={isUpdateFormVisible}

@@ -26,7 +26,7 @@ const StickyTabsBar = styled(Card, {
   transition: 'margin 150ms ease, border-radius 150ms ease',
   ...(isStuck
     ? { margin: 0, borderRadius: 0 }
-    : { margin: theme.spacing(1, 2, 0) }),
+    : { margin: theme.spacing(0.5, 1, 0.25) }),
   '@media print': { display: 'none' }
 }));
 
@@ -106,7 +106,7 @@ const PageTabs = ({ tabs, children }) => {
             fontSize: '1rem',
             minWidth: 18,
             height: 18,
-            padding: 0
+            padding: 0.25
           }
         }}>
         {tab.icon}
@@ -132,7 +132,7 @@ const PageTabs = ({ tabs, children }) => {
                 id={`page-tab-${i}`}
                 aria-controls={`page-tabpanel-${i}`}
                 label={
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                     {tab.label}
                     {tab.count != null && (
                       <Chip
@@ -150,7 +150,9 @@ const PageTabs = ({ tabs, children }) => {
                 icon={tab.icon}
                 disabled={tab.disabled}
                 iconPosition="start"
-                sx={{ minHeight: 36, py: 0.5 }}
+                sx={{
+                  minHeight: 36
+                }}
               />
             ))}
           </Tabs>
@@ -166,7 +168,7 @@ const PageTabs = ({ tabs, children }) => {
             display: activeTab !== i ? 'none' : 'block',
             pb: isMobile
               ? `calc(${BOTTOM_NAV_HEIGHT}px + env(safe-area-inset-bottom) + 8px)`
-              : 1
+              : 0.5
           }}>
           {child}
         </TabPanel>

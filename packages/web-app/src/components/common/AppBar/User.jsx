@@ -110,8 +110,8 @@ const UserMenu = ({
         {/* Primary content: User info */}
         <Box
           sx={{
-            px: 2,
-            py: 2,
+            px: 1,
+            py: 1,
             bgcolor: 'action.hover',
             display: 'flex',
             flexDirection: 'column'
@@ -157,7 +157,7 @@ const UserMenu = ({
 
         {/* Session expired warning */}
         {isSessionExpired && (
-          <Box sx={{ px: 2, py: '12px' }}>
+          <Box sx={{ px: 1, py: '12px' }}>
             <Alert severity="error">
               {formatMessage({
                 id: 'Your session has expired: please log in again.'

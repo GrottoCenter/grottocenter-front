@@ -7,17 +7,17 @@ import { contactLinks } from '../../../conf/externalLinks';
 
 const FloatingAnchor = styled('a')(({ theme }) => ({
   position: 'fixed',
-  bottom: theme.spacing(4),
-  right: theme.spacing(4),
+  bottom: theme.spacing(3),
+  right: theme.spacing(3),
   zIndex: 1200,
   display: 'inline-flex',
   width: 'fit-content',
   alignItems: 'center',
-  gap: theme.spacing(2),
+  gap: theme.spacing(1),
   backgroundColor: theme.palette.secondary.main,
   color: '#fff',
   borderRadius: '50px',
-  padding: `${theme.spacing(2)} ${theme.spacing(3)}`,
+  padding: `${theme.spacing(1)} ${theme.spacing(2)}`,
   boxShadow: '0 4px 20px rgba(0,0,0,0.35)',
   textDecoration: 'none',
   transition: 'box-shadow 0.2s ease, transform 0.2s ease',
@@ -27,9 +27,9 @@ const FloatingAnchor = styled('a')(({ theme }) => ({
     transform: 'translateY(-3px)'
   },
   [theme.breakpoints.down('sm')]: {
-    bottom: theme.spacing(2),
-    right: theme.spacing(2),
-    padding: `${theme.spacing(1)} ${theme.spacing(2)}`
+    bottom: theme.spacing(1),
+    right: theme.spacing(1),
+    padding: `${theme.spacing(0.5)} ${theme.spacing(1)}`
   }
 }));
 

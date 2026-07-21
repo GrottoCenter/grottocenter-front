@@ -52,8 +52,8 @@ const NetworkMembershipSection = ({
         sx={{
           display: 'flex',
           flexDirection: { xs: 'column', sm: 'row' },
-          gap: 2,
-          mt: 2
+          gap: 1,
+          mt: 1
         }}
       >
         <Button variant="outlined" onClick={() => navigate(movePath)}>

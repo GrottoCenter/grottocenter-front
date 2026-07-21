@@ -11,7 +11,7 @@ const Wrapper = styled('div')`
   display: flex;
   flex-direction: column;
   text-align: center;
-  padding: ${({ theme }) => theme.spacing(1)};
+  padding: ${({ theme }) => theme.spacing(0.5)};
 `;
 
 const Rating = ({ value, label, size }) => (

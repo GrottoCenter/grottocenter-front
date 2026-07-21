@@ -56,7 +56,7 @@ const DocumentSnapshots = ({ document, previous }) => {
         display: 'grid',
         gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' },
         width: '100%',
-        rowGap: 1
+        rowGap: 0.5
       }}>
       {isValidated != null && (
         <Box sx={{ gridColumn: '1 / -1' }}>
@@ -69,21 +69,18 @@ const DocumentSnapshots = ({ document, previous }) => {
           />
         </Box>
       )}
-
       {show(creatorLabel, null) && (
         <Property
           label={formatMessage({ id: 'Created by' })}
           value={creatorLabel}
         />
       )}
-
       {show(validatorLabel, null) && (
         <Property
           label={formatMessage({ id: 'Validator' })}
           value={validatorLabel}
         />
       )}
-
       {show(type, previous?.type) && (
         <Property
           label={formatMessage({ id: 'Document type' })}
@@ -97,7 +94,6 @@ const DocumentSnapshots = ({ document, previous }) => {
           }
         />
       )}
-
       {show(license, previous?.license) && (
         <Property
           label={formatMessage({ id: 'License' })}
@@ -109,7 +105,6 @@ const DocumentSnapshots = ({ document, previous }) => {
           }
         />
       )}
-
       {show(desc.language?.refName, prevDesc.language?.refName) && (
         <Property
           label={formatMessage({ id: 'Title and description language' })}
@@ -121,14 +116,12 @@ const DocumentSnapshots = ({ document, previous }) => {
           }
         />
       )}
-
       {dateInscription && (
         <Property
           label={formatMessage({ id: 'Creation date' })}
           value={`${new Date(dateInscription).toLocaleDateString()} - ${new Date(dateInscription).toLocaleTimeString()}`}
         />
       )}
-
       {show(dateValidation, previous?.dateValidation) && (
         <Property
           label={formatMessage({ id: 'Validation date' })}
@@ -148,7 +141,6 @@ const DocumentSnapshots = ({ document, previous }) => {
           }
         />
       )}
-
       {show(datePublication, previous?.datePublication) && (
         <Property
           label={formatMessage({ id: 'Publication Date' })}
@@ -160,7 +152,6 @@ const DocumentSnapshots = ({ document, previous }) => {
           }
         />
       )}
-
       {show(editorLabel, prevEditorLabel) && (
         <Property
           label={formatMessage({ id: 'Editor' })}
@@ -172,7 +163,6 @@ const DocumentSnapshots = ({ document, previous }) => {
           }
         />
       )}
-
       {show(identifier, previous?.identifier) && (
         <Property
           label={formatMessage({ id: 'Identifier' })}
@@ -184,7 +174,6 @@ const DocumentSnapshots = ({ document, previous }) => {
           }
         />
       )}
-
       {show(desc.title, prevDesc.title) && (
         <Property
           flexBasis="100%"
@@ -197,7 +186,6 @@ const DocumentSnapshots = ({ document, previous }) => {
           }
         />
       )}
-
       {show(desc.body ?? desc.text, prevDesc.body ?? prevDesc.text) && (
         <Property
           flexBasis="100%"
@@ -210,7 +198,6 @@ const DocumentSnapshots = ({ document, previous }) => {
           }
         />
       )}
-
       {show(parentId, prevParentId) && (
         <Property
           flexBasis="100%"
@@ -232,7 +219,6 @@ const DocumentSnapshots = ({ document, previous }) => {
           }
         />
       )}
-
       {show(validatorComment, previous?.validatorComment) && (
         <Property
           flexBasis="100%"

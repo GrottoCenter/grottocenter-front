@@ -18,14 +18,14 @@ const TitleIcon = styled('span')`
 `;
 
 const PageHeader = ({ title, icon, titleAdornment, subheader, actions }) => (
-  <Card sx={{ mx: 2, mt: 1, mb: 1, p: { xs: 2, md: 3 } }}>
+  <Card sx={{ mx: 1, mt: 0.5, mb: 0.5, p: { xs: 1, md: 2 } }}>
     <Box>
       <Box
         sx={{
           display: 'flex',
           alignItems: 'flex-start',
           justifyContent: 'space-between',
-          gap: 1
+          gap: 0.5
         }}>
         <Box sx={{ flex: 1, minWidth: 0 }}>
           {isString(title) ? (
@@ -42,7 +42,7 @@ const PageHeader = ({ title, icon, titleAdornment, subheader, actions }) => (
         </Box>
         {actions && <Box sx={{ flexShrink: 0 }}>{actions}</Box>}
       </Box>
-      {subheader && <Box sx={{ mt: 0.75 }}>{subheader}</Box>}
+      {subheader && <Box sx={{}}>{subheader}</Box>}
     </Box>
   </Card>
 );

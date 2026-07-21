@@ -19,12 +19,12 @@ const EntitiesCreation = () => {
         title={formatMessage({ id: 'Create a new entity in Grottocenter' })}
         content={
           <Box sx={{ textAlign: 'center' }}>
-            <Alert severity="error" sx={{ mb: 2 }}>
+            <Alert severity="error" sx={{ mb: 1 }}>
               {formatMessage({
                 id: 'You must be authenticated to submit a new entity to Grottocenter.'
               })}
             </Alert>
-            <Box sx={{ display: 'flex', justifyContent: 'center', gap: 1 }}>
+            <Box sx={{ display: 'flex', justifyContent: 'center', gap: 0.5 }}>
               <Button
                 onClick={() => dispatch(displayLoginDialog())}
                 variant="contained">

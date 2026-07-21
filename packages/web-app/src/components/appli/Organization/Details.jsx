@@ -27,24 +27,24 @@ import {
 const HalfSplitContainer = styled('div')`
   display: flex;
   flex-direction: column;
-  gap: ${({ theme }) => theme.spacing(2)};
+  gap: ${({ theme }) => theme.spacing(1)};
 
   ${({ theme }) => theme.breakpoints.up('sm')} {
     flex-direction: row;
     align-items: stretch;
-    gap: ${({ theme }) => theme.spacing(3)};
+    gap: ${({ theme }) => theme.spacing(2)};
   }
 `;
 
 const InfoRow = styled('div')`
   display: flex;
   align-items: flex-start;
-  gap: ${({ theme }) => theme.spacing(1)};
+  gap: ${({ theme }) => theme.spacing(0.5)};
 `;
 
 const SectionPaper = styled(Paper)`
-  padding: ${({ theme }) => theme.spacing(2)};
-  border-radius: ${({ theme }) => theme.spacing(1)};
+  padding: ${({ theme }) => theme.spacing(1)};
+  border-radius: ${({ theme }) => theme.spacing(0.5)};
   background-color: ${({ theme }) => theme.palette.grey[50]};
 `;
 
@@ -123,7 +123,6 @@ const Details = ({ organization }) => {
           </CustomMapContainer>
         </Box>
       )}
-
       {/* RIGHT: Stats + Info Papers */}
       <Box
         sx={{
@@ -131,7 +130,7 @@ const Details = ({ organization }) => {
           minWidth: 0,
           display: 'flex',
           flexDirection: 'column',
-          gap: 2
+          gap: 1
         }}>
         {/* Stats — prominent */}
         <SectionPaper variant="outlined">

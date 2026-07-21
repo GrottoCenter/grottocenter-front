@@ -55,13 +55,13 @@ const Welcome = () => {
   return (
     <WelcomeSection aria-label={formatMessage({ id: 'Free access' })}>
       <Inner>
-        <Grid container spacing={{ xs: 2, sm: 4 }}>
+        <Grid container spacing={{ xs: 1, sm: 3 }}>
           {BLOCKS.map(({ titleId, textIds }) => (
             <Grid key={titleId} size={{ xs: 12, sm: 4 }}>
               <BlockTitle
                 variant="h6"
                 component="h2"
-                sx={{ mb: { xs: '4px', sm: 1 } }}>
+                sx={{ mb: { xs: '4px', sm: 0.5 } }}>
                 {formatMessage({ id: titleId })}
               </BlockTitle>
               <Typography variant="body2" color="text.secondary">

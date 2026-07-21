@@ -58,7 +58,7 @@ const NewsCard = ({
       <StyledCard>
         <Skeleton variant="rectangular" height={150} />
         <CardContent>
-          <Skeleton variant="text" width="25%" sx={{ mb: 1 }} />
+          <Skeleton variant="text" width="25%" sx={{ mb: 0.5 }} />
           <Skeleton variant="text" width="70%" height={32} />
           <Skeleton variant="text" width="100%" />
           <Skeleton variant="text" width="90%" />
@@ -71,7 +71,7 @@ const NewsCard = ({
   if (!text) {
     return (
       <StyledCard>
-        <CardContent sx={{ textAlign: 'center', py: 4 }}>
+        <CardContent sx={{ textAlign: 'center', py: 3 }}>
           <SyncProblemOutlined color="disabled" sx={{ fontSize: 40 }} />
         </CardContent>
       </StyledCard>
@@ -81,16 +81,16 @@ const NewsCard = ({
   return (
     <StyledCard>
       <CardMedia image="images/homepage/news.jpg" sx={{ height: 150 }} />
-      <CardContent sx={{ pt: 2 }}>
+      <CardContent sx={{ pt: 1 }}>
         {day && month && (
           <DateLabel variant="caption">
             {day} {month}
           </DateLabel>
         )}
-        <Typography variant="h6" fontWeight={600} sx={{ mt: '4px', mb: 1 }}>
+        <Typography variant="h6" fontWeight={600} sx={{ mt: '4px', mb: 0.5 }}>
           {title}
         </Typography>
-        <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
           {text}
         </Typography>
         {linkMore && (

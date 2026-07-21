@@ -17,7 +17,7 @@ import { useAnchorScroll } from '../../../../hooks';
 
 const Card = styled(MuiCard)`
   overflow: inherit;
-  margin: ${({ theme }) => theme.spacing(1)} ${({ theme }) => theme.spacing(2)};
+  margin: ${({ theme }) => theme.spacing(0.5)} ${({ theme }) => theme.spacing(1)};
   scroll-margin-top: ${({ theme }) => theme.appBarHeight}px;
 `;
 
@@ -37,7 +37,7 @@ const StyledCardContent = styled(CardContent, {
 })`
   ${({ $dense, $collapsible }) => $dense && $collapsible && `padding-top: 0;`}
   &:last-child {
-    padding-bottom: ${({ theme }) => theme.spacing(2)};
+    padding-bottom: ${({ theme }) => theme.spacing(1)};
   }
 `;
 
@@ -46,7 +46,7 @@ const CountBadge = ({ count }) => (
     label={count}
     size="small"
     sx={{
-      ml: 1,
+      ml: 0.5,
       fontWeight: 600,
       verticalAlign: 'middle'
     }}

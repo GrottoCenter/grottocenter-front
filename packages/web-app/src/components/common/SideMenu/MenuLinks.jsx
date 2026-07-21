@@ -30,7 +30,7 @@ const SectionHeader = styled(ListSubheader)(({ theme }) => ({
   textTransform: 'uppercase',
   color: theme.palette.text.secondary,
   lineHeight: '2rem',
-  paddingTop: theme.spacing(1)
+  paddingTop: theme.spacing(0.5)
 }));
 
 const EntityIcon = ({ src, alt }) => (
@@ -95,7 +95,7 @@ const MenuLinks = ({ toggle }) => {
       <Divider />
       <List
         component="nav"
-        sx={{ pb: 0 }}
+        sx={{ pb: 0.25 }}
         subheader={
           <SectionHeader disableSticky>
             <Translate>Browse</Translate>
