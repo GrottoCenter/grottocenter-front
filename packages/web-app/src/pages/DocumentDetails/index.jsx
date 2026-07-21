@@ -341,6 +341,7 @@ const Document = ({
               entityType={DELETED_ENTITIES.document}
               entity={documentData}
               isLoading={isActionLoading}
+              standalone={false}
               onRestorePress={onRestorePress}
               onPermanentDeletePress={() => {
                 setIsDeleteConfirmationPermanent(true);

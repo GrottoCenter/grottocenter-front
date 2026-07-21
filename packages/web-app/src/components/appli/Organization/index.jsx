@@ -247,18 +247,16 @@ const Organization = ({ error, isLoading, organization }) => {
       {organization && (
         <>
           {organization.isDeleted && (
-            <Box sx={{ m: 1 }}>
-              <DeletedCard
-                entityType={DELETED_ENTITIES.organization}
-                entity={organization}
-                isLoading={isActionLoading}
-                onRestorePress={onRestorePress}
-                onPermanentDeletePress={() => {
-                  setIsDeleteConfirmationPermanent(true);
-                  setIsDeleteConfirmationOpen(true);
-                }}
-              />
-            </Box>
+            <DeletedCard
+              entityType={DELETED_ENTITIES.organization}
+              entity={organization}
+              isLoading={isActionLoading}
+              onRestorePress={onRestorePress}
+              onPermanentDeletePress={() => {
+                setIsDeleteConfirmationPermanent(true);
+                setIsDeleteConfirmationOpen(true);
+              }}
+            />
           )}
           <DeleteConfirmationDialog
             entityType={DELETED_ENTITIES.organization}

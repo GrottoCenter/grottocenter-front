@@ -241,18 +241,16 @@ export const Network = ({ isLoading, error, cave }) => {
             {cave && (
               <>
                 {cave.isDeleted && (
-                  <Box sx={{ m: 1 }}>
-                    <DeletedCard
-                      entityType={DELETED_ENTITIES.network}
-                      entity={cave}
-                      isLoading={isActionLoading}
-                      onRestorePress={onRestorePress}
-                      onPermanentDeletePress={() => {
-                        setIsDeleteConfirmationPermanent(true);
-                        setIsDeleteConfirmationOpen(true);
-                      }}
-                    />
-                  </Box>
+                  <DeletedCard
+                    entityType={DELETED_ENTITIES.network}
+                    entity={cave}
+                    isLoading={isActionLoading}
+                    onRestorePress={onRestorePress}
+                    onPermanentDeletePress={() => {
+                      setIsDeleteConfirmationPermanent(true);
+                      setIsDeleteConfirmationOpen(true);
+                    }}
+                  />
                 )}
                 <DeleteConfirmationDialog
                   entityType={DELETED_ENTITIES.network}
