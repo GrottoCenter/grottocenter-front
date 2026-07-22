@@ -2402,6 +2402,7 @@
   "This person has no entrances listed yet.": "この人にはまだ入口が登録されていません。",
   "This person has no organization listed yet.": "この人にはまだ組織が登録されていません。",
   "This person has no subscriptions listed yet.": "この人にはまだサブスクリプションが登録されていません。",
+  "This person is a reference used to attribute documents. It is not a caver account.": "この人物は、ドキュメントを帰属させるために使用される参照です。洞窟探検家のアカウントではありません。",
   "This person is not a member of any organization yet.": "この人はまだどの組織にも所属していません。",
   "This polygon has self-intersecting edges. Please redraw without crossings.": "このポリゴンには自己交差する辺があります。交差なしで描き直してください。",
   "This polygon is very thin or elongated (needle shape). It may represent a stream corridor or narrow buffer. Verify it is intentional.": "このポリゴンは非常に細いまたは細長い（針の形）。小川の回廊や狭いバッファを表している可能性があります。意図的なものか確認してください。",

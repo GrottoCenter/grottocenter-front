@@ -2402,6 +2402,7 @@
   "This person has no entrances listed yet.": "Aquesta persona no té cap entrada llistada encara.",
   "This person has no organization listed yet.": "Aquesta persona no té cap organització llistada encara.",
   "This person has no subscriptions listed yet.": "Aquesta persona no té cap subscripció llistada encara.",
+  "This person is a reference used to attribute documents. It is not a caver account.": "Aquesta persona és una referència utilitzada per atribuir documents. No és un compte d'espeleòleg.",
   "This person is not a member of any organization yet.": "Aquesta persona encara no és membre de cap organització.",
   "This polygon has self-intersecting edges. Please redraw without crossings.": "Aquest polígon té arestes que s'entrecreuen. Torneu a dibuixar-lo sense encreuaments.",
   "This polygon is very thin or elongated (needle shape). It may represent a stream corridor or narrow buffer. Verify it is intentional.": "Aquest polígon és molt prim o allargat (forma d'agulla). Pot representar un corredor de rierol o un buffer estret. Verifiqueu si és intencional.",

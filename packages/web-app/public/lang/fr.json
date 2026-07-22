@@ -2402,6 +2402,7 @@
   "This person has no entrances listed yet.": "Pour l'instant cette personne n'est associée à aucune entrée de cavité.",
   "This person has no organization listed yet.": "Pour l'instant cette personne n'est associée à aucune organisation.",
   "This person has no subscriptions listed yet.": "Cette personne n'a pas d'abonnement pour l'instant",
+  "This person is a reference used to attribute documents. It is not a caver account.": "Cette personne est une référence utilisée pour attribuer des documents. Ce n'est pas un compte spéléo.",
   "This person is not a member of any organization yet.": "Cette personne n'est membre d'aucune organisation pour le moment.",
   "This polygon has self-intersecting edges. Please redraw without crossings.": "Ce polygone a des arêtes qui se croisent. Veuillez le redessiner sans croisements.",
   "This polygon is very thin or elongated (needle shape). It may represent a stream corridor or narrow buffer. Verify it is intentional.": "Ce polygone est très fin ou allongé (forme en aiguille). Il peut représenter un corridor de cours d'eau ou une zone tampon étroite. Vérifiez que c'est intentionnel.",

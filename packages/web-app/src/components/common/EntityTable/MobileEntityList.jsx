@@ -83,7 +83,7 @@ const MobileEntityCard = React.memo(
                     }}
                   />
                 )}
-                {icon}
+                {typeof icon === 'function' ? icon(doc) : icon}
                 <Typography
                   variant="subtitle1"
                   color="secondary"
@@ -148,7 +148,7 @@ MobileEntityCard.propTypes = {
   columns: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   link: PropTypes.func.isRequired,
   renderCellFn: PropTypes.func.isRequired,
-  icon: PropTypes.node,
+  icon: PropTypes.oneOfType([PropTypes.node, PropTypes.func]),
   selected: PropTypes.bool,
   onToggle: PropTypes.func,
   onRowClick: PropTypes.func
@@ -296,7 +296,7 @@ MobileEntityList.propTypes = {
   onPageChange: PropTypes.func,
   rowsPerPage: PropTypes.number.isRequired,
   link: PropTypes.func.isRequired,
-  icon: PropTypes.node,
+  icon: PropTypes.oneOfType([PropTypes.node, PropTypes.func]),
   renderCellFn: PropTypes.func.isRequired,
   onSelected: PropTypes.func,
   onRowClick: PropTypes.func

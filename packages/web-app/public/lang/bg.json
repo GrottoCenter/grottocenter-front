@@ -2402,6 +2402,7 @@
   "This person has no entrances listed yet.": "Тази личност няма въведени входове все още.",
   "This person has no organization listed yet.": "Този човек все още няма посочена организация.",
   "This person has no subscriptions listed yet.": "Този човек все още няма посочени абонаменти.",
+  "This person is a reference used to attribute documents. It is not a caver account.": "Това лице е референция, използвана за приписване на документи. Не е акаунт на спелеолог.",
   "This person is not a member of any organization yet.": "Този човек все още не е член на никоя организация.",
   "This polygon has self-intersecting edges. Please redraw without crossings.": "Този полигон има самопресичащи се ръбове. Моля, начертайте го отново без пресичания.",
   "This polygon is very thin or elongated (needle shape). It may represent a stream corridor or narrow buffer. Verify it is intentional.": "Този многоъгълник е много тънък или удължен (форма на игла). Може да представлява коридор на поток или тесен буфер. Проверете дали е умишлено.",

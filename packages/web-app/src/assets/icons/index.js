@@ -1,4 +1,5 @@
 export { default as altitudeIcon } from './altitude.svg';
+export { default as authorIcon } from './author.svg';
 export { default as batIcon } from './bat.svg';
 export { default as bibliographyIcon } from './bibliography.svg';
 export { default as categoryIcon } from './category.svg';

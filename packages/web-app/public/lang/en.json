@@ -2402,6 +2402,7 @@
   "This person has no entrances listed yet.": "This person has no entrances listed yet.",
   "This person has no organization listed yet.": "This person has no organization listed yet.",
   "This person has no subscriptions listed yet.": "This person has no subscriptions listed yet.",
+  "This person is a reference used to attribute documents. It is not a caver account.": "This person is a reference used to attribute documents. It is not a caver account.",
   "This person is not a member of any organization yet.": "This person is not a member of any organization yet.",
   "This polygon has self-intersecting edges. Please redraw without crossings.": "This polygon has self-intersecting edges. Please redraw without crossings.",
   "This polygon is very thin or elongated (needle shape). It may represent a stream corridor or narrow buffer. Verify it is intentional.": "This polygon is very thin or elongated (needle shape). It may represent a stream corridor or narrow buffer. Verify it is intentional.",

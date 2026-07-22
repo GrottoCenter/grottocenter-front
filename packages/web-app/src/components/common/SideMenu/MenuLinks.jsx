@@ -129,7 +129,7 @@ const MenuLinks = ({ toggle }) => {
         />
         <LinkedItem
           ItemIcon={() => <EntityIcon src={caverIcon} alt="person" />}
-          label={formatMessage({ id: 'Persons' })}
+          label={formatMessage({ id: 'Cavers' })}
           href="/ui/persons"
           onClick={toggle}
         />
