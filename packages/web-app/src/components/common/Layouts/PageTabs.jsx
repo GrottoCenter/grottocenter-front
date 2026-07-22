@@ -177,7 +177,7 @@ const PageTabs = ({ tabs, children }) => {
             // Mobile keeps clearance for the fixed bottom nav; desktop adds
             // nothing — PageContainer's frame already provides the bottom gutter.
             pb: isMobile
-              ? `calc(${BOTTOM_NAV_HEIGHT}px + env(safe-area-inset-bottom) + 8px)`
+              ? `calc(${BOTTOM_NAV_HEIGHT}px + env(safe-area-inset-bottom) + 4px)`
               : 0
           }}>
           {child}
