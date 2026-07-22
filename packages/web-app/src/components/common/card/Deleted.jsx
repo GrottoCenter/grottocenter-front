@@ -190,7 +190,7 @@ export const DeletedCard = ({
 
   if (!standalone) return content;
 
-  return <Card sx={{ m: 2, p: 2 }}>{content}</Card>;
+  return <Card sx={{ p: 2 }}>{content}</Card>;
 };
 
 export const DeleteConfirmationDialog = ({
