@@ -311,9 +311,7 @@ const AddFileForm = ({
                 </InputLabel>
                 <Select
                   value={document.license?.name ?? ''}
-                  renderValue={() => (
-                    <LicenseTag license={document.license} withDescription />
-                  )}
+                  renderValue={() => <LicenseTag license={document.license} />}
                   onChange={e =>
                     setLicense(licenses?.find(l => l.name === e.target.value))
                   }>
@@ -329,7 +327,6 @@ const AddFileForm = ({
                       <MenuItem key={l.id} value={l.name}>
                         <LicenseTag
                           license={l}
-                          withDescription
                           recommended={l.name === DEFAULT_LICENSE}
                         />
                       </MenuItem>

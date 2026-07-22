@@ -16,7 +16,7 @@ import { NavigateNext } from '@mui/icons-material';
 import useOpenLink from '../../hooks/useOpenLink';
 import CustomIcon from '../../components/common/CustomIcon';
 import DocumentTypeChip from '../../components/common/DocumentTypeChip';
-import LicenseTag from '@/components/common/LicenseTag';
+import { LicenseBadge } from '@/components/common/LicenseTag';
 import { fetchLicense } from '@/actions/Licenses';
 import {
   DOCUMENT_TYPE_ICONS,
@@ -493,7 +493,7 @@ const Document = ({
                         <DetailItem
                           label={formatMessage({ id: 'License' })}
                           value={
-                            <LicenseTag
+                            <LicenseBadge
                               license={licenseObject}
                               linkToDeed
                               size={40}

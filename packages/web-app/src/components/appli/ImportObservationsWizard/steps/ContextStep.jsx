@@ -580,15 +580,12 @@ const ContextStep = ({ initialCaveId, caveIdLocked }) => {
           onChange={e => handleFieldChange('licenseId', e.target.value)}
           disabled={licensesLoading}
           renderValue={id => (
-            <LicenseTag
-              license={allowedLicenses.find(l => l.id === id)}
-              withDescription
-            />
+            <LicenseTag license={allowedLicenses.find(l => l.id === id)} />
           )}
           data-testid="license-select">
           {allowedLicenses.map(license => (
             <MenuItem key={license.id} value={license.id}>
-              <LicenseTag license={license} withDescription />
+              <LicenseTag license={license} />
             </MenuItem>
           ))}
         </Select>
