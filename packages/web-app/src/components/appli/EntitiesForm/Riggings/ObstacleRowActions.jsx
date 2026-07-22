@@ -54,7 +54,7 @@ const ObstacleRowActions = ({
         <IconButton
           onClick={onDelete}
           size="small"
-          color="inherit"
+          color="error"
           aria-label={formatMessage({ id: 'Delete this line' })}>
           <DeleteIcon />
         </IconButton>

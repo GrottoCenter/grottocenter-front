@@ -15,7 +15,7 @@ import {
   useMediaQuery
 } from '@mui/material';
 import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd';
-import { useForm, useFieldArray } from 'react-hook-form';
+import { useForm, useFieldArray, useWatch } from 'react-hook-form';
 import { useTheme } from '@mui/material/styles';
 
 import { FormContainer, FormActionRow, FormRow } from '../utils/FormContainers';
@@ -24,8 +24,10 @@ import InputLanguage from '../utils/InputLanguage';
 import ObstacleField from './ObstacleField';
 import ObstacleRowActions from './ObstacleRowActions';
 import ObstacleCard from './ObstacleCard';
+import ColumnLegend from '../../Entry/Riggings/ColumnLegend';
 
 import { RiggingPropTypes } from '../../../../types/entrance.type';
+import { OBSTACLE_LEGEND, ANCHOR_LEGEND } from '@/utils/riggingLegends';
 
 const FIELDS = ['obstacle', 'rope', 'anchor', 'observation'];
 const COLUMN_WIDTHS = {
@@ -40,6 +42,11 @@ const HEADER_KEYS = {
   anchor: 'anchors',
   observation: 'observations'
 };
+const HEADER_LEGENDS = {
+  obstacle: { titleKey: 'Obstacle notation legend', items: OBSTACLE_LEGEND },
+  anchor: { titleKey: 'Anchor notation legend', items: ANCHOR_LEGEND }
+};
+const LEGEND_SECTIONS = [HEADER_LEGENDS.obstacle, HEADER_LEGENDS.anchor];
 
 const getDefaultObstacle = () => ({
   obstacle: '',
@@ -79,6 +86,16 @@ const CreateRiggingsForm = ({
     control,
     name: 'obstacles'
   });
+
+  // Live values, so the submit button reflects validity as the user types.
+  // The title is always required. Zero rows is valid (a title-only rigging is
+  // allowed); a rigging is only invalid when an existing row has an empty
+  // obstacle (the only required cell) — matching the inline field-level error.
+  const watchedTitle = useWatch({ control, name: 'title' });
+  const watchedObstacles = useWatch({ control, name: 'obstacles' });
+  const isFormInvalid =
+    !watchedTitle?.trim() ||
+    (watchedObstacles ?? []).some(row => !row?.obstacle?.trim());
 
   // Index of the last appended row, so its obstacle field gets focused.
   const [focusIndex, setFocusIndex] = useState(-1);
@@ -139,6 +156,7 @@ const CreateRiggingsForm = ({
                   onMoveDown={() => swap(index, index + 1)}
                   onDelete={() => remove(index)}
                   autoFocus={index === focusIndex}
+                  legendSections={LEGEND_SECTIONS}
                 />
               ))}
             </Stack>
@@ -146,12 +164,19 @@ const CreateRiggingsForm = ({
             <TableContainer sx={{ mt: 1 }}>
               <Table
                 size="small"
-                aria-label={formatMessage({ id: 'riggings' })}>
+                aria-label={formatMessage({ id: 'riggings' })}
+                sx={{ mb: 0 }}>
                 <TableHead sx={{ '& th': { textTransform: 'capitalize' } }}>
                   <TableRow>
                     {FIELDS.map(field => (
                       <TableCell key={field} width={COLUMN_WIDTHS[field]}>
                         {formatMessage({ id: HEADER_KEYS[field] })}
+                        {HEADER_LEGENDS[field] && (
+                          <ColumnLegend
+                            titleKey={HEADER_LEGENDS[field].titleKey}
+                            items={HEADER_LEGENDS[field].items}
+                          />
+                        )}
                       </TableCell>
                     ))}
                     <TableCell width="70px" />
@@ -176,7 +201,7 @@ const CreateRiggingsForm = ({
                       ))}
                       <TableCell
                         padding="none"
-                        sx={{ verticalAlign: 'middle' }}>
+                        sx={{ verticalAlign: 'top', pt: '6px' }}>
                         {rowActions(index)}
                       </TableCell>
                     </TableRow>
@@ -185,16 +210,14 @@ const CreateRiggingsForm = ({
               </Table>
             </TableContainer>
           ))}
-        <Box sx={{
-          mb: 1
-        }}>
+        <Box sx={{ mt: 1, mb: 1 }}>
           <Button
             onClick={handleAppend}
             color="secondary"
             variant="outlined"
             sx={{ width: { xs: '100%', sm: 'auto' } }}
             startIcon={<PlaylistAddIcon />}>
-            {formatMessage({ id: 'New line' })}
+            {formatMessage({ id: 'Add an obstacle' })}
           </Button>
         </Box>
 
@@ -202,6 +225,7 @@ const CreateRiggingsForm = ({
           isNew={isNew}
           isSubmitting={isSubmitting}
           onCancel={onCancel}
+          disabled={isFormInvalid}
         />
       </form>
     </FormContainer>

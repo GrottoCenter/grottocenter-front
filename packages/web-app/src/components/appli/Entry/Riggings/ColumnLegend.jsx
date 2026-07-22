@@ -6,6 +6,7 @@ import {
   Divider,
   IconButton,
   Popover,
+  Stack,
   Table,
   TableBody,
   TableCell,
@@ -15,17 +16,67 @@ import {
 } from '@mui/material';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 
-const ColumnLegend = ({ titleKey, items }) => {
+const LegendItemsShape = PropTypes.arrayOf(
+  PropTypes.shape({
+    abbrevKey: PropTypes.string.isRequired,
+    labelKey: PropTypes.string.isRequired
+  })
+);
+
+const LegendSection = ({ titleKey, items }) => {
+  const { formatMessage } = useIntl();
+  return (
+    <Box>
+      <Typography variant="subtitle2" fontWeight="bold" sx={{ mb: 0.5 }}>
+        {formatMessage({ id: titleKey })}
+      </Typography>
+      <Divider sx={{ mb: 0.5 }} />
+      <Table size="small" sx={{ mb: 0.25 }}>
+        <TableBody>
+          {items.map(({ abbrevKey, labelKey }) => (
+            <TableRow key={abbrevKey}>
+              <TableCell sx={{
+                border: 0,
+                pr: 2
+              }}>
+                <Typography variant="body2" fontWeight="bold" component="span">
+                  {formatMessage({ id: abbrevKey })}
+                </Typography>
+              </TableCell>
+              <TableCell sx={{
+                border: 0
+              }}>
+                <Typography variant="body2" component="span">
+                  {formatMessage({ id: labelKey })}
+                </Typography>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </Box>
+  );
+};
+
+LegendSection.propTypes = {
+  titleKey: PropTypes.string.isRequired,
+  items: LegendItemsShape.isRequired
+};
+
+const ColumnLegend = ({ titleKey, items, sections, label }) => {
   const { formatMessage } = useIntl();
   const [anchorEl, setAnchorEl] = useState(null);
 
+  const resolvedSections = sections ?? [{ titleKey, items }];
+  const triggerLabel = formatMessage({ id: label ?? titleKey });
+
   return (
     <>
-      <Tooltip title={formatMessage({ id: titleKey })}>
+      <Tooltip title={triggerLabel}>
         <IconButton
           size="small"
           onClick={e => setAnchorEl(e.currentTarget)}
-          aria-label={formatMessage({ id: titleKey })}
+          aria-label={triggerLabel}
           sx={{
             ml: 0.5,
             color: 'inherit',
@@ -42,36 +93,15 @@ const ColumnLegend = ({ titleKey, items }) => {
         anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
         transformOrigin={{ vertical: 'top', horizontal: 'left' }}>
         <Box sx={{ pt: 1, px: 1, pb: 1, minWidth: 160 }}>
-          <Typography variant="subtitle2" fontWeight="bold" sx={{ mb: 0.5 }}>
-            {formatMessage({ id: titleKey })}
-          </Typography>
-          <Divider sx={{ mb: 0.5 }} />
-          <Table size="small" sx={{ mb: 0.25 }}>
-            <TableBody>
-              {items.map(({ abbrevKey, labelKey }) => (
-                <TableRow key={abbrevKey}>
-                  <TableCell sx={{
-                    border: 0,
-                    pr: 2
-                  }}>
-                    <Typography
-                      variant="body2"
-                      fontWeight="bold"
-                      component="span">
-                      {formatMessage({ id: abbrevKey })}
-                    </Typography>
-                  </TableCell>
-                  <TableCell sx={{
-                    border: 0
-                  }}>
-                    <Typography variant="body2" component="span">
-                      {formatMessage({ id: labelKey })}
-                    </Typography>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+          <Stack spacing={1}>
+            {resolvedSections.map(section => (
+              <LegendSection
+                key={section.titleKey}
+                titleKey={section.titleKey}
+                items={section.items}
+              />
+            ))}
+          </Stack>
         </Box>
       </Popover>
     </>
@@ -79,13 +109,15 @@ const ColumnLegend = ({ titleKey, items }) => {
 };
 
 ColumnLegend.propTypes = {
-  titleKey: PropTypes.string.isRequired,
-  items: PropTypes.arrayOf(
+  titleKey: PropTypes.string,
+  items: LegendItemsShape,
+  sections: PropTypes.arrayOf(
     PropTypes.shape({
-      abbrevKey: PropTypes.string.isRequired,
-      labelKey: PropTypes.string.isRequired
+      titleKey: PropTypes.string.isRequired,
+      items: LegendItemsShape.isRequired
     })
-  ).isRequired
+  ),
+  label: PropTypes.string
 };
 
 export default ColumnLegend;
