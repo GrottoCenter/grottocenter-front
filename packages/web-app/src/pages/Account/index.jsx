@@ -1428,10 +1428,16 @@ const AccountPage = () => {
         title={formatMessage({ id: 'Leave organization' })}
         actions={
           <>
-            <Button onClick={() => setPendingLeaveOrg(null)} variant="text">
+            <Button
+              onClick={() => setPendingLeaveOrg(null)}
+              variant="outlined">
               {formatMessage({ id: 'Cancel' })}
             </Button>
-            <Button onClick={handleConfirmLeaveOrg} color="error" autoFocus>
+            <Button
+              onClick={handleConfirmLeaveOrg}
+              variant="contained"
+              color="error"
+              autoFocus>
               {formatMessage({ id: 'Leave' })}
             </Button>
           </>

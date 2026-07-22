@@ -179,6 +179,7 @@ const Document = ({
             <Button
               key="no"
               onClick={() => setUnlinkDialogOpen(false)}
+              variant="outlined"
               disableElevation>
               <Translate>No</Translate>
             </Button>,
@@ -189,7 +190,8 @@ const Document = ({
                 setUnlinkDialogOpen(false);
                 onUnlink(document);
               }}
-              color="primary"
+              variant="contained"
+              color="error"
               autoFocus>
               <Translate>Yes</Translate>
             </Button>

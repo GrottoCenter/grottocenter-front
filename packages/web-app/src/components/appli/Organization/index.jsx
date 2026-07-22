@@ -405,10 +405,16 @@ const Organization = ({ error, isLoading, organization }) => {
         title={formatMessage({ id: 'Remove member' })}
         actions={
           <>
-            <Button onClick={() => setPendingRemoveMember(null)} variant="text">
+            <Button
+              onClick={() => setPendingRemoveMember(null)}
+              variant="outlined">
               {formatMessage({ id: 'Cancel' })}
             </Button>
-            <Button onClick={handleConfirmRemoveMember} color="error" autoFocus>
+            <Button
+              onClick={handleConfirmRemoveMember}
+              variant="contained"
+              color="error"
+              autoFocus>
               {formatMessage({ id: 'Remove' })}
             </Button>
           </>
