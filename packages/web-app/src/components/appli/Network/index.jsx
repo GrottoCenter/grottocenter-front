@@ -18,6 +18,7 @@ import { usePermissions, useSharePage } from '../../../hooks';
 import PageContainer from '../../common/Layouts/PageContainer';
 import PageHeader from '../../common/Layouts/PageHeader';
 import PageTabs from '../../common/Layouts/PageTabs';
+import SectionStack from '../../common/Layouts/SectionStack';
 import ResponsiveActions from '../../common/Layouts/ResponsiveActions';
 import ScrollableContent from '../../common/Layouts/Fixed/ScrollableContent';
 import CustomIcon from '../../common/CustomIcon';
@@ -221,25 +222,29 @@ export const Network = ({ isLoading, error, cave }) => {
           {/* Tab 0 — Information */}
           <div>
             {isLoading && (
-              <Card sx={{ m: 1, p: 2 }}>
-                <Skeleton height={300} />
-                <Skeleton height={100} />
-                <Skeleton height={100} />
-                <Skeleton height={100} />
-              </Card>
+              <SectionStack>
+                <Card sx={{ p: 2 }}>
+                  <Skeleton height={300} />
+                  <Skeleton height={100} />
+                  <Skeleton height={100} />
+                  <Skeleton height={100} />
+                </Card>
+              </SectionStack>
             )}
             {error && (
-              <Card sx={{ m: 1, p: 2 }}>
-                <Alert
-                  title={formatMessage({
-                    id: 'Error, the network data you are looking for is not available.'
-                  })}
-                  severity="error"
-                />
-              </Card>
+              <SectionStack>
+                <Card sx={{ p: 2 }}>
+                  <Alert
+                    title={formatMessage({
+                      id: 'Error, the network data you are looking for is not available.'
+                    })}
+                    severity="error"
+                  />
+                </Card>
+              </SectionStack>
             )}
             {cave && (
-              <>
+              <SectionStack>
                 {cave.isDeleted && (
                   <DeletedCard
                     entityType={DELETED_ENTITIES.network}
@@ -349,7 +354,7 @@ export const Network = ({ isLoading, error, cave }) => {
                     <NetworkForm networkValues={{ ...cave }} />
                   </StandardDialog>
                 )}
-              </>
+              </SectionStack>
             )}
           </div>
 
@@ -358,7 +363,11 @@ export const Network = ({ isLoading, error, cave }) => {
             PageTabs matches children to tabs by position. React.Children.toArray strips `false`,
             so `{isAdmin && <Science />}` works — but returning null or wrapping in a div would
             silently shift all subsequent tab panels. */}
-          {isAdmin && <Science caveId={caveId} />}
+          {isAdmin && (
+            <SectionStack>
+              <Science caveId={caveId} />
+            </SectionStack>
+          )}
         </PageTabs>
       </div>
     </PageContainer>

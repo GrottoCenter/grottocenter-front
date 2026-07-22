@@ -15,9 +15,11 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import AnchorCopyButton, { AnchorHeadingWrapper } from '../../AnchorCopyButton';
 import { useAnchorScroll } from '../../../../hooks';
 
+// No self-margin: spacing between sections is owned by the parent stack
+// (see SectionStack), not by each card — margins between siblings collapse
+// unpredictably and stack unpredictably with a parent's own padding/gap.
 const Card = styled(MuiCard)`
   overflow: inherit;
-  margin: ${({ theme }) => theme.spacing(0.5)} ${({ theme }) => theme.spacing(1)};
   scroll-margin-top: ${({ theme }) => theme.appBarHeight}px;
 `;
 

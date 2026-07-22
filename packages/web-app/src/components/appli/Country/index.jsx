@@ -17,6 +17,7 @@ import StatisticsDataDashboard from '../StatisticsDataDashboard';
 import CustomMapContainer from '../../common/Maps/common/MapContainer';
 import PageContainer from '../../common/Layouts/PageContainer';
 import PageHeader from '../../common/Layouts/PageHeader';
+import SectionStack from '../../common/Layouts/SectionStack';
 import ResponsiveActions from '../../common/Layouts/ResponsiveActions';
 import Alert from '../../common/Alert';
 import REDUCER_STATUS from '../../../reducers/ReducerStatus';
@@ -129,23 +130,27 @@ const Country = ({
           actions={actions}
         />
         {isLoading && (
-          <Card sx={{ m: 1, p: 2 }}>
-            <Skeleton height={300} />
-            <Skeleton height={100} />
-          </Card>
+          <SectionStack>
+            <Card sx={{ p: 2 }}>
+              <Skeleton height={300} />
+              <Skeleton height={100} />
+            </Card>
+          </SectionStack>
         )}
         {error && (
-          <Card sx={{ m: 1, p: 2 }}>
-            <Alert
-              title={formatMessage({
-                id: 'Error, the country data you are looking for is not available.'
-              })}
-              severity="error"
-            />
-          </Card>
+          <SectionStack>
+            <Card sx={{ p: 2 }}>
+              <Alert
+                title={formatMessage({
+                  id: 'Error, the country data you are looking for is not available.'
+                })}
+                severity="error"
+              />
+            </Card>
+          </SectionStack>
         )}
         {country && (
-          <>
+          <SectionStack>
             {!isEmpty(position) && (
               <ScrollableContent
                 content={
@@ -164,18 +169,16 @@ const Country = ({
                 }
               />
             )}
-            <Box sx={{ mx: 1, mb: 0.5 }}>
-              <Button
-                fullWidth
-                variant="contained"
-                color="primary"
-                size="large"
-                startIcon={<CustomIcon type="entrance" size={24} />}
-                onClick={() => navigate(`/ui/countries/${country.id}/entrances`)}>
-                {formatMessage({ id: 'Entrances list' })}
-                {dataCountry?.nb_caves ? ` (${dataCountry.nb_caves})` : ''}
-              </Button>
-            </Box>
+            <Button
+              fullWidth
+              variant="contained"
+              color="primary"
+              size="large"
+              startIcon={<CustomIcon type="entrance" size={24} />}
+              onClick={() => navigate(`/ui/countries/${country.id}/entrances`)}>
+              {formatMessage({ id: 'Entrances list' })}
+              {dataCountry?.nb_caves ? ` (${dataCountry.nb_caves})` : ''}
+            </Button>
             <StatisticsDataDashboard
               countryId={country.id}
               description={formatMessage({
@@ -200,7 +203,7 @@ const Country = ({
               title={formatMessage({ id: 'Regions' })}
               content={<RegionsList countryId={country.id} />}
             />
-          </>
+          </SectionStack>
         )}
       </div>
     </PageContainer>

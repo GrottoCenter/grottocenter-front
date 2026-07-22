@@ -17,8 +17,10 @@ const TitleIcon = styled('span')`
   margin-bottom: 2px;
 `;
 
+// mb only: horizontal + top gutter come from PageContainer's frame; this just
+// adds the 8px gap before the next block (tabs bar or first section).
 const PageHeader = ({ title, icon, titleAdornment, subheader, actions }) => (
-  <Card sx={{ mx: 1, mt: 0.5, mb: 0.5, p: { xs: 1, md: 2 } }}>
+  <Card sx={{ mb: 1, p: { xs: 1, md: 2 } }}>
     <Box>
       <Box
         sx={{

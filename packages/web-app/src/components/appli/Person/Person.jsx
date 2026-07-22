@@ -21,6 +21,7 @@ import PermMediaOutlinedIcon from '@mui/icons-material/PermMediaOutlined';
 import PageContainer from '../../common/Layouts/PageContainer';
 import PageHeader from '../../common/Layouts/PageHeader';
 import PageTabs from '../../common/Layouts/PageTabs';
+import SectionStack from '../../common/Layouts/SectionStack';
 import ResponsiveActions from '../../common/Layouts/ResponsiveActions';
 import ScrollableContent from '../../common/Layouts/Fixed/ScrollableContent';
 import CustomIcon from '../../common/CustomIcon';
@@ -211,27 +212,31 @@ const Person = ({ isLoading, person, error }) => {
         {/* Tab Profil */}
         <div>
           {isLoading && (
-            <Card sx={{ m: 1, p: 2 }}>
-              <Skeleton />
-              <Skeleton height={200} />
-              <Skeleton height={100} />
-              <Skeleton height={100} />
-              <Skeleton height={100} />
-              <Skeleton height={100} />
-            </Card>
+            <SectionStack>
+              <Card sx={{ p: 2 }}>
+                <Skeleton />
+                <Skeleton height={200} />
+                <Skeleton height={100} />
+                <Skeleton height={100} />
+                <Skeleton height={100} />
+                <Skeleton height={100} />
+              </Card>
+            </SectionStack>
           )}
           {!!error && (
-            <Card sx={{ m: 1, p: 2 }}>
-              <Alert
-                title={formatMessage({
-                  id: 'Error, the person you are looking for is not available.'
-                })}
-                severity="error"
-              />
-            </Card>
+            <SectionStack>
+              <Card sx={{ p: 2 }}>
+                <Alert
+                  title={formatMessage({
+                    id: 'Error, the person you are looking for is not available.'
+                  })}
+                  severity="error"
+                />
+              </Card>
+            </SectionStack>
           )}
           {person && (
-            <>
+            <SectionStack>
               <DeleteConfirmationDialog
                 entityType={DELETED_ENTITIES.person}
                 isOpen={isDeleteConfirmationOpen}
@@ -243,20 +248,22 @@ const Person = ({ isLoading, person, error }) => {
               <ScrollableContent
                 content={<PersonProperties person={person} canEdit={canEdit} />}
               />
-            </>
+            </SectionStack>
           )}
         </div>
 
         {/* Tab Activités */}
         <div>
           {isLoading && (
-            <Card sx={{ m: 1, p: 2 }}>
-              <Skeleton height={100} />
-              <Skeleton height={100} />
-            </Card>
+            <SectionStack>
+              <Card sx={{ p: 2 }}>
+                <Skeleton height={100} />
+                <Skeleton height={100} />
+              </Card>
+            </SectionStack>
           )}
           {person && (
-            <>
+            <SectionStack>
               <ScrollableContent
                 anchorId="organizations"
                 title={formatMessage({ id: 'Organizations' })}
@@ -293,25 +300,29 @@ const Person = ({ isLoading, person, error }) => {
                   />
                 }
               />
-            </>
+            </SectionStack>
           )}
         </div>
 
         {/* Tab Documents */}
         <div>
           {isLoading && (
-            <Card sx={{ m: 1, p: 2 }}>
-              <Skeleton height={40} width="100%" />
-              <Skeleton height={60} />
-              <Skeleton height={60} />
-              <Skeleton height={60} />
-            </Card>
+            <SectionStack>
+              <Card sx={{ p: 2 }}>
+                <Skeleton height={40} width="100%" />
+                <Skeleton height={60} />
+                <Skeleton height={60} />
+                <Skeleton height={60} />
+              </Card>
+            </SectionStack>
           )}
           {person && (
-            <ScrollableContent
-              collapsible={false}
-              content={<DocumentsList documents={person.documents} />}
-            />
+            <SectionStack>
+              <ScrollableContent
+                collapsible={false}
+                content={<DocumentsList documents={person.documents} />}
+              />
+            </SectionStack>
           )}
         </div>
       </PageTabs>

@@ -42,6 +42,7 @@ import { loadLanguages } from '../../actions/Language';
 import { usePermissions, useSharePage } from '../../hooks';
 import PageContainer from '../../components/common/Layouts/PageContainer';
 import PageHeader from '../../components/common/Layouts/PageHeader';
+import SectionStack from '../../components/common/Layouts/SectionStack';
 import ResponsiveActions from '../../components/common/Layouts/ResponsiveActions';
 import ScrollableContent from '../../components/common/Layouts/Fixed/ScrollableContent';
 import Alert from '../../components/common/Alert';
@@ -347,23 +348,6 @@ const Document = ({
         subheader={breadcrumb}
         actions={actions}
       />
-      {documentData?.isDeleted && (
-        <ScrollableContent
-          content={
-            <DeletedCard
-              entityType={DELETED_ENTITIES.document}
-              entity={documentData}
-              isLoading={isActionLoading}
-              standalone={false}
-              onRestorePress={onRestorePress}
-              onPermanentDeletePress={() => {
-                setIsDeleteConfirmationPermanent(true);
-                setIsDeleteConfirmationOpen(true);
-              }}
-            />
-          }
-        />
-      )}
       <DeleteConfirmationDialog
         entityType={DELETED_ENTITIES.document}
         isOpen={isDeleteConfirmationOpen}
@@ -374,34 +358,57 @@ const Document = ({
           onDeletePress(entity?.id, isDeleteConfirmationPermanent);
         }}
       />
+      {documentData?.isDeleted && (
+        <SectionStack>
+          <ScrollableContent
+            content={
+              <DeletedCard
+                entityType={DELETED_ENTITIES.document}
+                entity={documentData}
+                isLoading={isActionLoading}
+                standalone={false}
+                onRestorePress={onRestorePress}
+                onPermanentDeletePress={() => {
+                  setIsDeleteConfirmationPermanent(true);
+                  setIsDeleteConfirmationOpen(true);
+                }}
+              />
+            }
+          />
+        </SectionStack>
+      )}
       {isLoading && (
-        <ScrollableContent
-          content={
-            <>
-              <Skeleton width={75} />
-              <Skeleton />
-              <Skeleton width={100} />
-              <Skeleton variant="rectangular" height={150} />
-              <Skeleton width={125} />
-              <Skeleton variant="rectangular" height={80} />
-            </>
-          }
-        />
+        <SectionStack>
+          <ScrollableContent
+            content={
+              <>
+                <Skeleton width={75} />
+                <Skeleton />
+                <Skeleton width={100} />
+                <Skeleton variant="rectangular" height={150} />
+                <Skeleton width={125} />
+                <Skeleton variant="rectangular" height={80} />
+              </>
+            }
+          />
+        </SectionStack>
       )}
       {error && (
-        <ScrollableContent
-          content={
-            <Alert
-              title={formatMessage({
-                id: 'Error, the document data you are looking for is not available.'
-              })}
-              severity="error"
-            />
-          }
-        />
+        <SectionStack>
+          <ScrollableContent
+            content={
+              <Alert
+                title={formatMessage({
+                  id: 'Error, the document data you are looking for is not available.'
+                })}
+                severity="error"
+              />
+            }
+          />
+        </SectionStack>
       )}
       {documentData && (
-        <>
+        <SectionStack>
           <ScrollableContent
             content={
               <>
@@ -694,7 +701,7 @@ const Document = ({
               }
             />
           )}
-        </>
+        </SectionStack>
       )}
     </PageContainer>
   );

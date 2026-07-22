@@ -38,7 +38,7 @@ const TitleIcon = styled('span')`
 `;
 
 const FixedContent = ({ subheader, title, icon, action, content }) => (
-  <PageContainer>
+  <PageContainer fullHeight>
   <Card>
     <CardHeader
       subheader={subheader}

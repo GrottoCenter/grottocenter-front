@@ -2,7 +2,7 @@ import React, { useRef } from 'react';
 import Skeleton from '@mui/material/Skeleton';
 import { useIntl } from 'react-intl';
 import { Marker } from 'react-leaflet';
-import { Box, Button, Card, CircularProgress } from '@mui/material';
+import { Button, Card, CircularProgress } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import CustomIcon from '../../common/CustomIcon';
 import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
@@ -19,6 +19,7 @@ import StatisticsDataDashboard from '../StatisticsDataDashboard';
 import CustomMapContainer from '../../common/Maps/common/MapContainer';
 import PageContainer from '../../common/Layouts/PageContainer';
 import PageHeader from '../../common/Layouts/PageHeader';
+import SectionStack from '../../common/Layouts/SectionStack';
 import ResponsiveActions from '../../common/Layouts/ResponsiveActions';
 import ScrollableContent from '../../common/Layouts/Fixed/ScrollableContent';
 import Alert from '../../common/Alert';
@@ -132,8 +133,27 @@ const Region = ({
           subheader={subheader}
           actions={actions}
         />
+        {isLoading && (
+          <SectionStack>
+            <Card sx={{ p: 2 }}>
+              <Skeleton height={150} />
+            </Card>
+          </SectionStack>
+        )}
+        {error && (
+          <SectionStack>
+            <Card sx={{ p: 2 }}>
+              <Alert
+                title={formatMessage({
+                  id: 'Error, the region data you are looking for is not available.'
+                })}
+                severity="error"
+              />
+            </Card>
+          </SectionStack>
+        )}
         {region && (
-          <Box sx={{ mx: 1, mb: 0.5 }}>
+          <SectionStack>
             <Button
               fullWidth
               variant="contained"
@@ -148,25 +168,6 @@ const Region = ({
               {formatMessage({ id: 'Entrances list' })}
               {dataRegion?.nb_caves ? ` (${dataRegion.nb_caves})` : ''}
             </Button>
-          </Box>
-        )}
-        {isLoading && (
-          <Card sx={{ m: 1, p: 2 }}>
-            <Skeleton height={150} />
-          </Card>
-        )}
-        {error && (
-          <Card sx={{ m: 1, p: 2 }}>
-            <Alert
-              title={formatMessage({
-                id: 'Error, the region data you are looking for is not available.'
-              })}
-              severity="error"
-            />
-          </Card>
-        )}
-        {region && (
-          <>
             {position && (
               <ScrollableContent
                 content={
@@ -204,7 +205,7 @@ const Region = ({
               parentEntityId={countryId}
               isLoading={isLoading}
             />
-          </>
+          </SectionStack>
         )}
       </div>
     </PageContainer>

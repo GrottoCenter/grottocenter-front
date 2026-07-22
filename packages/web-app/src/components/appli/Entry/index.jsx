@@ -30,6 +30,7 @@ import { useReactToPrint } from 'react-to-print';
 import PageContainer from '../../common/Layouts/PageContainer';
 import PageHeader from '../../common/Layouts/PageHeader';
 import PageTabs from '../../common/Layouts/PageTabs';
+import SectionStack from '../../common/Layouts/SectionStack';
 import ResponsiveActions from '../../common/Layouts/ResponsiveActions';
 import ScrollableContent from '../../common/Layouts/Fixed/ScrollableContent';
 import CustomIcon from '../../common/CustomIcon';
@@ -319,26 +320,30 @@ export const Entry = ({
           {/* Tab Information */}
           <div>
             {isLoading && (
-              <Card sx={{ m: 1, p: 2 }}>
-                <Skeleton height={300} />
-                <Skeleton height={80} />
-                <Skeleton height={100} />
-                <Skeleton height={150} />
-                <Skeleton height={100} />
-              </Card>
+              <SectionStack>
+                <Card sx={{ p: 2 }}>
+                  <Skeleton height={300} />
+                  <Skeleton height={80} />
+                  <Skeleton height={100} />
+                  <Skeleton height={150} />
+                  <Skeleton height={100} />
+                </Card>
+              </SectionStack>
             )}
             {error && (
-              <Card sx={{ m: 1, p: 2 }}>
-                <Alert
-                  title={formatMessage({
-                    id: 'Error, the entrance data you are looking for is not available.'
-                  })}
-                  severity="error"
-                />
-              </Card>
+              <SectionStack>
+                <Card sx={{ p: 2 }}>
+                  <Alert
+                    title={formatMessage({
+                      id: 'Error, the entrance data you are looking for is not available.'
+                    })}
+                    severity="error"
+                  />
+                </Card>
+              </SectionStack>
             )}
             {entrance && (
-              <>
+              <SectionStack>
                 {entrance.isDeleted && (
                   <DeletedCard
                     entityType={DELETED_ENTITIES.entrance}
@@ -361,11 +366,7 @@ export const Entry = ({
                     onDeletePress(entity?.id, isDeleteConfirmationPermanent);
                   }}
                 />
-                {entrance.isSensitive && isAdmin && (
-                  <Box sx={{ mx: 1, mt: 1 }}>
-                    <SensitiveCaveWarning />
-                  </Box>
-                )}
+                {entrance.isSensitive && isAdmin && <SensitiveCaveWarning />}
                 <ScrollableContent
                   content={
                     <>
@@ -448,26 +449,30 @@ export const Entry = ({
                   entranceId={entrance.id}
                   isEditAllowed={!entrance.isDeleted}
                 />
-              </>
+              </SectionStack>
             )}
           </div>
 
           {/* Tab 1 — Documents */}
           <div>
             {isLoading && (
-              <Card sx={{ m: 1, p: 2 }}>
-                <Skeleton height={40} width="100%" />
-                <Skeleton height={60} />
-                <Skeleton height={60} />
-                <Skeleton height={60} />
-              </Card>
+              <SectionStack>
+                <Card sx={{ p: 2 }}>
+                  <Skeleton height={40} width="100%" />
+                  <Skeleton height={60} />
+                  <Skeleton height={60} />
+                  <Skeleton height={60} />
+                </Card>
+              </SectionStack>
             )}
             {entrance && (
-              <Documents
-                documents={entrance.documents}
-                entranceId={entrance.id}
-                isEditAllowed={!entrance.isDeleted}
-              />
+              <SectionStack>
+                <Documents
+                  documents={entrance.documents}
+                  entranceId={entrance.id}
+                  isEditAllowed={!entrance.isDeleted}
+                />
+              </SectionStack>
             )}
           </div>
 
@@ -477,24 +482,30 @@ export const Entry = ({
             so `{isAdmin && <Science />}` works — but returning null or wrapping in a div would
             silently shift all subsequent tab panels. */}
           {isAdmin && entrance?.cave?.id && (
-            <Science caveId={entrance.cave.id} />
+            <SectionStack>
+              <Science caveId={entrance.cave.id} />
+            </SectionStack>
           )}
 
           {/* Tab 3 — Comments */}
           <div>
             {isLoading && (
-              <Card sx={{ m: 1, p: 2 }}>
-                <Skeleton height={40} width="100%" />
-                <Skeleton height={80} />
-                <Skeleton height={80} />
-              </Card>
+              <SectionStack>
+                <Card sx={{ p: 2 }}>
+                  <Skeleton height={40} width="100%" />
+                  <Skeleton height={80} />
+                  <Skeleton height={80} />
+                </Card>
+              </SectionStack>
             )}
             {entrance && (
-              <Comments
-                comments={entrance.comments}
-                entranceId={entrance.id}
-                isEditAllowed={!entrance.isDeleted}
-              />
+              <SectionStack>
+                <Comments
+                  comments={entrance.comments}
+                  entranceId={entrance.id}
+                  isEditAllowed={!entrance.isDeleted}
+                />
+              </SectionStack>
             )}
           </div>
         </PageTabs>

@@ -18,6 +18,7 @@ import ShareIcon from '@mui/icons-material/Share';
 import StandardDialog from '../../common/StandardDialog';
 import PageContainer from '../../common/Layouts/PageContainer';
 import PageHeader from '../../common/Layouts/PageHeader';
+import SectionStack from '../../common/Layouts/SectionStack';
 import ResponsiveActions from '../../common/Layouts/ResponsiveActions';
 import ScrollableContent from '../../common/Layouts/Fixed/ScrollableContent';
 import CustomIcon from '../../common/CustomIcon';
@@ -227,25 +228,29 @@ const Organization = ({ error, isLoading, organization }) => {
         actions={actions}
       />
       {isLoading && (
-        <Card sx={{ m: 1, p: 2 }}>
-          <Skeleton height={150} />
-          <Skeleton height={100} />
-          <Skeleton height={100} />
-          <Skeleton height={100} />
-        </Card>
+        <SectionStack>
+          <Card sx={{ p: 2 }}>
+            <Skeleton height={150} />
+            <Skeleton height={100} />
+            <Skeleton height={100} />
+            <Skeleton height={100} />
+          </Card>
+        </SectionStack>
       )}
       {error && (
-        <Card sx={{ m: 1, p: 2 }}>
-          <Alert
-            title={formatMessage({
-              id: 'Error, the organization data you are looking for is not available.'
-            })}
-            severity="error"
-          />
-        </Card>
+        <SectionStack>
+          <Card sx={{ p: 2 }}>
+            <Alert
+              title={formatMessage({
+                id: 'Error, the organization data you are looking for is not available.'
+              })}
+              severity="error"
+            />
+          </Card>
+        </SectionStack>
       )}
       {organization && (
-        <>
+        <SectionStack>
           {organization.isDeleted && (
             <DeletedCard
               entityType={DELETED_ENTITIES.organization}
@@ -390,7 +395,7 @@ const Organization = ({ error, isLoading, organization }) => {
               />
             }
           />
-        </>
+        </SectionStack>
       )}
       <StandardDialog
         open={!!pendingRemoveMember}

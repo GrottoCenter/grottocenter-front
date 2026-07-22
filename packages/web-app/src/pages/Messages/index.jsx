@@ -64,13 +64,13 @@ const EmptyStateContainer = styled(Box)(({ theme }) => ({
 // Master-detail inbox: no card chrome and full-screen on mobile (like any mail
 // client), standard page card on desktop.
 //
-// The height fills the viewport minus everything around the card. Each term is
-// derived from the theme rather than hardcoded. `containerPb` must stay in sync
-// with PageContainer's own `pb: 1`.
+// The height fills the viewport minus everything around the card. The page is
+// rendered inside <PageContainer fullHeight>, which adds no padding of its own,
+// so the only chrome to subtract is the card's own margin: none on xs (the card
+// is edge to edge), and spacing(1) top + bottom on md and up.
 const StyledCard = styled(Card)(({ theme }) => {
-  const containerPb = theme.spacing(0.5);
-  const chromeXs = containerPb;
-  const chromeMd = `${theme.spacing(1)} * 2 + ${containerPb}`; // margins + pb
+  const chromeXs = '0px';
+  const chromeMd = `${theme.spacing(1)} * 2`; // top + bottom margins
   return `
   display: flex;
   flex-direction: column;
@@ -258,7 +258,7 @@ const MessagesPage = () => {
   };
 
   return (
-    <PageContainer>
+    <PageContainer fullHeight>
       <StyledCard>
         <StyledCardContent>
           <AuthChecker

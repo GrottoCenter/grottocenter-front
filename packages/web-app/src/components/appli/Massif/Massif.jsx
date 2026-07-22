@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import Skeleton from '@mui/material/Skeleton';
-import { Box, Button, Card, CircularProgress, Typography } from '@mui/material';
+import { Button, Card, CircularProgress, Typography } from '@mui/material';
 import { useIntl } from 'react-intl';
 import { Print } from '@mui/icons-material';
 import CreateIcon from '@mui/icons-material/Create';
@@ -29,6 +29,7 @@ import PermMediaOutlinedIcon from '@mui/icons-material/PermMediaOutlined';
 import PageContainer from '../../common/Layouts/PageContainer';
 import PageHeader from '../../common/Layouts/PageHeader';
 import PageTabs from '../../common/Layouts/PageTabs';
+import SectionStack from '../../common/Layouts/SectionStack';
 import ResponsiveActions from '../../common/Layouts/ResponsiveActions';
 import ScrollableContent from '../../common/Layouts/Fixed/ScrollableContent';
 import EntitiesList from '../../common/entitiesList/EntitiesList';
@@ -193,25 +194,29 @@ const Massif = ({ isLoading, error, massif }) => {
           {/* Tab Information */}
           <div>
             {isLoading && (
-              <Card sx={{ m: 1, p: 2 }}>
-                <Skeleton height={300} width="100%" />
-                <Skeleton height={100} />
-                <Skeleton height={100} />
-                <Skeleton height={100} />
-              </Card>
+              <SectionStack>
+                <Card sx={{ p: 2 }}>
+                  <Skeleton height={300} width="100%" />
+                  <Skeleton height={100} />
+                  <Skeleton height={100} />
+                  <Skeleton height={100} />
+                </Card>
+              </SectionStack>
             )}
             {error && (
-              <Card sx={{ m: 1, p: 2 }}>
-                <Alert
-                  title={formatMessage({
-                    id: 'Error, the massif data you are looking for is not available.'
-                  })}
-                  severity="error"
-                />
-              </Card>
+              <SectionStack>
+                <Card sx={{ p: 2 }}>
+                  <Alert
+                    title={formatMessage({
+                      id: 'Error, the massif data you are looking for is not available.'
+                    })}
+                    severity="error"
+                  />
+                </Card>
+              </SectionStack>
             )}
             {massif && (
-              <>
+              <SectionStack>
                 {massif.isDeleted && (
                   <DeletedCard
                     entityType={DELETED_ENTITIES.massif}
@@ -299,20 +304,16 @@ const Massif = ({ isLoading, error, massif }) => {
                     }
                   />
                 )}
-                <Box sx={{ mx: 1, mb: 0.5 }}>
-                  <Button
-                    fullWidth
-                    variant="contained"
-                    color="primary"
-                    size="large"
-                    startIcon={<CustomIcon type="entrance" size={24} />}
-                    onClick={() =>
-                      navigate(`/ui/massifs/${massifId}/entrances`)
-                    }>
-                    {formatMessage({ id: 'Entrances list' })}
-                    {dataMassif?.nb_caves ? ` (${dataMassif.nb_caves})` : ''}
-                  </Button>
-                </Box>
+                <Button
+                  fullWidth
+                  variant="contained"
+                  color="primary"
+                  size="large"
+                  startIcon={<CustomIcon type="entrance" size={24} />}
+                  onClick={() => navigate(`/ui/massifs/${massifId}/entrances`)}>
+                  {formatMessage({ id: 'Entrances list' })}
+                  {dataMassif?.nb_caves ? ` (${dataMassif.nb_caves})` : ''}
+                </Button>
                 <Descriptions
                   descriptions={massif.descriptions ?? []}
                   entityType="massif"
@@ -350,25 +351,29 @@ const Massif = ({ isLoading, error, massif }) => {
                     }
                   />
                 )}
-              </>
+              </SectionStack>
             )}
           </div>
 
           {/* Tab Documents */}
           <div>
             {isLoading && (
-              <Card sx={{ m: 1, p: 2 }}>
-                <Skeleton height={40} width="100%" />
-                <Skeleton height={60} />
-                <Skeleton height={60} />
-                <Skeleton height={60} />
-              </Card>
+              <SectionStack>
+                <Card sx={{ p: 2 }}>
+                  <Skeleton height={40} width="100%" />
+                  <Skeleton height={60} />
+                  <Skeleton height={60} />
+                  <Skeleton height={60} />
+                </Card>
+              </SectionStack>
             )}
             {massif && (
-              <Documents
-                documents={massif.documents ?? []}
-                massifId={massifId}
-              />
+              <SectionStack>
+                <Documents
+                  documents={massif.documents ?? []}
+                  massifId={massifId}
+                />
+              </SectionStack>
             )}
           </div>
         </PageTabs>
