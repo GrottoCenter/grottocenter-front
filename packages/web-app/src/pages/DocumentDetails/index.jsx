@@ -322,18 +322,18 @@ const Document = ({
           hidden: !onEdit
         },
         {
-          key: 'delete',
-          icon: <DeleteIcon />,
-          label: formatMessage({ id: 'Delete' }),
-          onClick: onDelete,
-          hidden: !onDelete
-        },
-        {
           key: 'snapshot',
           icon: <ManageHistoryIcon />,
           label: formatMessage({ id: 'Page history' }),
           onClick: snapshotUrl ? () => openLink(snapshotUrl) : undefined,
           hidden: !snapshotUrl
+        },
+        {
+          key: 'delete',
+          icon: <DeleteIcon />,
+          label: formatMessage({ id: 'Delete' }),
+          onClick: onDelete,
+          hidden: !onDelete
         }
       ]}
     />
