@@ -13,16 +13,34 @@ import { styled } from '@mui/material/styles';
 
 import PageContainer from '../PageContainer';
 
-const Card = styled(MuiCard)`
-  margin: ${({ theme }) => theme.spacing(1)};
-  height: 100%;
+// height:100% would rely on every ancestor having an explicit height to
+// resolve against (percentage heights are otherwise ignored) — fragile, and
+// combined with the card's own margin it silently overflows its container by
+// 2x that margin, clipping the bottom edge wherever an ancestor happens to
+// clip overflow. Compute the height directly from the viewport instead, minus
+// the app bar and this card's own margin (rendered inside
+// <PageContainer fullHeight>, which adds no padding of its own) — the same
+// proven approach as Messages' StyledCard.
+const Card = styled(MuiCard)(({ theme }) => {
+  const margin = theme.spacing(1);
+  const chrome = `${margin} * 2`; // top + bottom margins
+  return `
+  margin: ${margin};
   display: flex;
   flex-direction: column;
+  height: calc(100vh - ${theme.appBarHeight}px - (${chrome})); /* fallback */
+  height: calc(100dvh - ${theme.appBarHeight}px - (${chrome}));
 `;
+});
 
+// Single scroll container for the page body, on BOTH axes. It owns the vertical
+// scroll (bounded height via the flex column above) and the horizontal scroll
+// for wide tables — the inner TableContainer deliberately does NOT scroll, so
+// that sticky table headers resolve against THIS element (the same scroller the
+// results toolbar sticks to) instead of being trapped in a nested scroll box.
 const CardContent = styled(MuiCardContent)`
   flex-grow: 1;
-  overflow-y: auto;
+  overflow: auto;
   scroll-behavior: smooth;
   padding-top: 0;
 `;
