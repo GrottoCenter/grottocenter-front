@@ -57,7 +57,14 @@ export const overridings = {
       main: grey['100']
     },
     action: {},
-    backgroundColor: grey['100'],
+    // Page vs. surface separation. `default` tints the app background a light
+    // grey (applied to <body> by CssBaseline) so that white cards/Paper — which
+    // use `paper` — visibly float instead of blending into a white-on-white
+    // page. Reuses the existing grey scale rather than introducing new colours.
+    background: {
+      default: grey['100'],
+      paper: '#fff'
+    },
     contrastThreshold: 3,
     primary1Color: brown['500'],
     primary2Color: brown['700'],
