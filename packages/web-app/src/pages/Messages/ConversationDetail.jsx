@@ -14,7 +14,9 @@ import {
   Button,
   useMediaQuery
 } from '@mui/material';
+import Linkify from 'linkify-react';
 import AppLink from '../../components/common/AppLink';
+import linkifyOptions from '../../helpers/linkifyOptions';
 import SendIcon from '@mui/icons-material/Send';
 import FlagIcon from '@mui/icons-material/Flag';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -66,7 +68,11 @@ const MessageBubble = styled(Paper, {
   borderBottomRightRadius: $isMine ? 4 : 16,
   borderBottomLeftRadius: $isMine ? 16 : 4,
   wordBreak: 'break-word',
-  overflowWrap: 'anywhere'
+  overflowWrap: 'anywhere',
+  '& a': {
+    color: $isMine ? theme.palette.primary.contrastText : undefined,
+    textDecoration: 'underline'
+  }
 }));
 
 const MessageDate = styled(Typography, {
@@ -376,7 +382,7 @@ Message Body: ${body}`;
                 }}>
                 <Box sx={{ flexGrow: 1, minWidth: 0 }}>
                   <Typography variant="body1" sx={{ whiteSpace: 'pre-wrap' }}>
-                    {msg.body}
+                    <Linkify options={linkifyOptions}>{msg.body}</Linkify>
                   </Typography>
                 </Box>
                 {!isMine && (
