@@ -143,20 +143,30 @@ const Document = ({
       ...(documentData.authors ?? []).map(a => ({
         id: `caver-${a.id}`,
         name: a.nickname,
+        iconType: 'caver',
         url: `/ui/persons/${a.id}`
       })),
       ...(documentData.authorsOrganization ?? []).map(a => ({
         id: `org-${a.id}`,
         name: a.name,
+        iconType: 'organization',
         url: `/ui/organizations/${a.id}`
       }))
     ];
     if (items.length === 0) return null;
-    return items.flatMap((a, i) =>
-      i < items.length - 1
-        ? [<TextLink key={a.id} value={a.name} url={a.url} />, ' · ']
-        : [<TextLink key={a.id} value={a.name} url={a.url} />]
-    );
+    return items.flatMap((a, i) => {
+      const entry = (
+        <Box
+          component="span"
+          key={a.id}
+          sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.25 }}
+        >
+          <CustomIcon type={a.iconType} size={18} />
+          <TextLink value={a.name} url={a.url} />
+        </Box>
+      );
+      return i < items.length - 1 ? [entry, ' · '] : [entry];
+    });
   }, [documentData]);
 
   const pageFiles = useMemo(() => {

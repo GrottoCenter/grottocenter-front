@@ -41,6 +41,7 @@ const DocumentsHandler = ({
   const [parent, setParent] = useState('');
   const [license, setLicense] = useState('');
   const [authors, setAuthors] = useState([]);
+  const [authorsOrganization, setAuthorsOrganization] = useState([]);
   const [subjects, setSubjects] = useState([]);
   const [titles, setTitles] = useState([]);
   const [descriptions, setDescriptions] = useState([]);
@@ -91,6 +92,8 @@ const DocumentsHandler = ({
         return getState ? license : setLicense;
       case 'authors':
         return getState ? authors : setAuthors;
+      case 'authorsOrganization':
+        return getState ? authorsOrganization : setAuthorsOrganization;
       case 'subjects':
         return getState ? subjects : setSubjects;
       case 'titles':
@@ -107,6 +110,12 @@ const DocumentsHandler = ({
   const onSubmit = () => {
     const { newItems: newAuthors, previousItems: previousAuthors } =
       retrieveFromObjectCollection(authors);
+
+    // Organizations-as-authors have no atomic "create + attach" endpoint yet
+    // (backend follow-up), so only pre-existing organizations (with an id)
+    // can come out of the merge — new items are never produced here.
+    const { previousItems: previousAuthorsGrotto } =
+      retrieveFromObjectCollection(authorsOrganization);
 
     const {
       newItems: newPopulatedDescriptions,
@@ -138,6 +147,7 @@ const DocumentsHandler = ({
         parent: getIdOrUndefined(parent),
         license: license.id,
         authors: previousAuthors,
+        authorsGrotto: previousAuthorsGrotto,
         subjects: subjects.map(sub => sub.code),
         descriptions: previousDescriptions,
         languages: languages.map(lang => lang.id)
@@ -170,6 +180,7 @@ const DocumentsHandler = ({
       parent,
       license,
       authors,
+      authorsOrganization,
       subjects,
       titles,
       descriptions,

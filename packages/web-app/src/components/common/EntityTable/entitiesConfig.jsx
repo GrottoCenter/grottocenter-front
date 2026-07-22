@@ -69,6 +69,16 @@ const cellsRender = {
     !value || !Array.isArray(value)
       ? null
       : value.map(e => e[key]).join(', ') || '-',
+  // Documents can be authored by persons (`authors`) and/or organizations
+  // (`authorsOrganization`) — merge both into a single column, same as the
+  // "Authors" field on the document details page.
+  documentAuthors: (_value, doc) => {
+    const names = [
+      ...(doc.authors ?? []).map(a => a.nickname),
+      ...(doc.authorsOrganization ?? []).map(o => o.name)
+    ];
+    return names.length ? names.join(', ') : null;
+  },
   translate: value => (!value ? null : <Translate>{value}</Translate>),
   ellipsis: value =>
     value && value.length > 60 ? `${value.substring(0, 60)}...` : value,
@@ -361,7 +371,7 @@ const documents = {
       field: 'authors',
       label: 'Author',
       sortable: false,
-      render: cellsRender.keyArray('nickname'),
+      render: cellsRender.documentAuthors,
       apiField: 'authors.nickname'
     },
     { visible: false, field: 'library.name', label: 'Library', sortable: true },

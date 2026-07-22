@@ -22,7 +22,7 @@ const CreateNewOrganization = ({
   defaultValue = '',
   enabled,
   onCreateSuccess,
-  contextValueName
+  contextValueName = null
 }) => {
   const dispatch = useDispatch();
   const {
@@ -60,12 +60,14 @@ const CreateNewOrganization = ({
 
   useEffect(() => {
     if (!isNil(organization) && !isEmpty(organizationName)) {
-      updateAttribute(contextValueName, organization);
-      if (contextValueName === 'partOf') {
-        updateAttribute('editor', organization.editor ?? null);
-        updateAttribute('library', organization.library ?? null);
+      if (contextValueName) {
+        updateAttribute(contextValueName, organization);
+        if (contextValueName === 'partOf') {
+          updateAttribute('editor', organization.editor ?? null);
+          updateAttribute('library', organization.library ?? null);
+        }
       }
-      onCreateSuccess();
+      onCreateSuccess(organization);
       setOrganizationName('');
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -99,7 +101,7 @@ CreateNewOrganization.propTypes = {
   defaultValue: PropTypes.string,
   enabled: PropTypes.bool,
   onCreateSuccess: PropTypes.func,
-  contextValueName: PropTypes.string.isRequired
+  contextValueName: PropTypes.string
 };
 
 export default CreateNewOrganization;
