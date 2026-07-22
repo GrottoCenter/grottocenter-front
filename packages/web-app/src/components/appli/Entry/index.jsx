@@ -183,13 +183,6 @@ export const Entry = ({
           hidden: !canEdit
         },
         {
-          key: 'delete',
-          icon: <DeleteIcon />,
-          label: formatMessage({ id: 'Delete' }),
-          onClick: onDelete,
-          hidden: !onDelete
-        },
-        {
           key: 'snapshot',
           icon: <HistoryIcon />,
           label: formatMessage({ id: 'History' }),
@@ -200,6 +193,13 @@ export const Entry = ({
           icon: <ManageHistoryIcon />,
           label: formatMessage({ id: 'Page history' }),
           onClick: () => openLink(`${snapshotUrl}&all=true`)
+        },
+        {
+          key: 'delete',
+          icon: <DeleteIcon />,
+          label: formatMessage({ id: 'Delete' }),
+          onClick: onDelete,
+          hidden: !onDelete
         }
       ]}
     />
