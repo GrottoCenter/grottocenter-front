@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import { useDispatch } from 'react-redux';
-import { useParams, useNavigate, Link as RouterLink } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { styled } from '@mui/material/styles';
 import Skeleton from '@mui/material/Skeleton';
 import {
@@ -10,9 +10,9 @@ import {
   Breadcrumbs,
   Card,
   CircularProgress,
-  Link,
   Typography
 } from '@mui/material';
+import AppLink from '../../common/AppLink';
 import { NavigateNext, Print } from '@mui/icons-material';
 import CreateIcon from '@mui/icons-material/Create';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -214,8 +214,7 @@ export const Entry = ({
         '& .MuiBreadcrumbs-separator': { mx: { xs: '2px', md: '8px' } }
       }}>
       {entrance.country && (
-        <Link
-          component={RouterLink}
+        <AppLink
           to={`/ui/countries/${entrance.country}`}
           underline="hover"
           color="inherit"
@@ -226,7 +225,7 @@ export const Entry = ({
           }}>
           <CustomIcon type="country" size={16} />
           {entrance.country}
-        </Link>
+        </AppLink>
       )}
       {entrance.massifs?.length > 0 && (
         <Box
@@ -238,8 +237,7 @@ export const Entry = ({
           {entrance.massifs.map((massif, index) => (
             <React.Fragment key={massif.id}>
               {index > 0 && <span>·</span>}
-              <Link
-                component={RouterLink}
+              <AppLink
                 to={`/ui/massifs/${massif.id}`}
                 underline="hover"
                 color="inherit"
@@ -250,14 +248,13 @@ export const Entry = ({
                 }}>
                 <CustomIcon type="massif" size={16} />
                 {massif.name}
-              </Link>
+              </AppLink>
             </React.Fragment>
           ))}
         </Box>
       )}
       {isNetwork && (
-        <Link
-          component={RouterLink}
+        <AppLink
           to={`/ui/caves/${entrance.cave.id}`}
           underline="hover"
           color="inherit"
@@ -268,7 +265,7 @@ export const Entry = ({
           }}>
           <CustomIcon type="network" size={16} />
           {entrance.cave.name}
-        </Link>
+        </AppLink>
       )}
     </Breadcrumbs>
   ) : null;

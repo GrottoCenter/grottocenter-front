@@ -1,10 +1,11 @@
 import React, { useRef, useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
-import { useParams, useNavigate, Link as RouterLink } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import Skeleton from '@mui/material/Skeleton';
-import { Box, Breadcrumbs, Card, Link, Typography } from '@mui/material';
+import { Box, Breadcrumbs, Card, Typography } from '@mui/material';
+import AppLink from '../../common/AppLink';
 import { styled } from '@mui/material/styles';
 import { NavigateNext, Print } from '@mui/icons-material';
 import CreateIcon from '@mui/icons-material/Create';
@@ -145,8 +146,7 @@ export const Network = ({ isLoading, error, cave }) => {
           '& .MuiBreadcrumbs-separator': { mx: { xs: '2px', md: '8px' } }
         }}>
         {country && (
-          <Link
-            component={RouterLink}
+          <AppLink
             to={`/ui/countries/${country}`}
             underline="hover"
             color="inherit"
@@ -157,7 +157,7 @@ export const Network = ({ isLoading, error, cave }) => {
             }}>
             <CustomIcon type="country" size={16} />
             {country}
-          </Link>
+          </AppLink>
         )}
         {(cave?.massifs?.length ?? 0) > 0 && (
           <Box
@@ -169,8 +169,7 @@ export const Network = ({ isLoading, error, cave }) => {
             {cave.massifs.map((massif, index) => (
               <React.Fragment key={massif.id}>
                 {index > 0 && <span>·</span>}
-                <Link
-                  component={RouterLink}
+                <AppLink
                   to={`/ui/massifs/${massif.id}`}
                   underline="hover"
                   color="inherit"
@@ -181,7 +180,7 @@ export const Network = ({ isLoading, error, cave }) => {
                   }}>
                   <CustomIcon type="massif" size={16} />
                   {massif.name}
-                </Link>
+                </AppLink>
               </React.Fragment>
             ))}
           </Box>

@@ -18,10 +18,9 @@ const SectionTitle = styled('h3')`
   color: ${({ theme }) => theme.palette.secondary.main};
 `;
 
-const StyledLink = styled(AppLink)`
-  color: inherit;
-  text-decoration: none;
-`;
+const StyledLink = props => (
+  <AppLink color="inherit" underline="none" {...props} />
+);
 
 const DataHomepage = () => {
   const { formatMessage } = useIntl();

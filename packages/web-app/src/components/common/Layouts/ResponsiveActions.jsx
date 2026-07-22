@@ -16,7 +16,7 @@ import {
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
-import { Link } from 'react-router-dom';
+import AppLink from '../AppLink';
 
 const ResponsiveActions = ({ items }) => {
   const theme = useTheme();
@@ -33,7 +33,7 @@ const ResponsiveActions = ({ items }) => {
       <Button
         color={color || 'primary'}
         onClick={onClick}
-        {...(href ? { component: Link, to: href, target, rel: 'noopener noreferrer' } : {})}>
+        {...(href ? { component: AppLink, to: href, target, rel: 'noopener noreferrer' } : {})}>
         {icon}
       </Button>
     </Tooltip>
@@ -86,7 +86,7 @@ const ResponsiveActions = ({ items }) => {
                     }}
                     sx={colorSx}
                     {...(href
-                      ? { component: Link, to: href, target, rel: 'noopener noreferrer' }
+                      ? { component: AppLink, to: href, target, rel: 'noopener noreferrer' }
                       : {})}>
                     <ListItemIcon sx={colorSx}>{icon}</ListItemIcon>
                     <ListItemText>{label}</ListItemText>

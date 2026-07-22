@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Link as RouterLink } from 'react-router-dom';
 import { isMobile } from 'react-device-detect';
+import MuiLink from '@mui/material/Link';
 
 /**
  * Single link component for the whole app.
@@ -12,24 +13,38 @@ import { isMobile } from 'react-device-detect';
  *    tab instead (explicit, per-usage control).
  *  - `href` → external URL. Always opens in a new tab.
  *
- * It renders a bare anchor / React Router `<Link>` (no MUI styling) so callers
- * keep controlling the look through `className` — including `styled(AppLink)`.
+ * Renders MUI's `<Link>` so links pick up the theme's palette (no more
+ * browser-default blue). Callers can still refine the look via `className` —
+ * including `styled(AppLink)`.
  *
  * For imperative navigation (non-anchor elements) use the `useOpenLink` hook
  * instead.
  */
+// `display: inline` cancels the theme's global MuiLink `display: flex`, which
+// would otherwise break inline usage inside text (author names, "read more"…).
+// Merged as an sx array so caller-provided sx composes instead of overriding.
+const inlineSx = { display: 'inline' };
+const mergeSx = callerSx =>
+  callerSx == null
+    ? inlineSx
+    : [inlineSx, ...(Array.isArray(callerSx) ? callerSx : [callerSx])];
+
 const AppLink = React.forwardRef(
-  ({ to = null, href = null, openInNewTabDesktop = false, children, ...rest }, ref) => {
+  (
+    { to = null, href = null, openInNewTabDesktop = false, sx, children, ...rest },
+    ref
+  ) => {
     if (href != null) {
       return (
-        <a
+        <MuiLink
           ref={ref}
           href={href}
           target="_blank"
           rel="noopener noreferrer"
+          sx={mergeSx(sx)}
           {...rest}>
           {children}
-        </a>
+        </MuiLink>
       );
     }
 
@@ -45,21 +60,27 @@ const AppLink = React.forwardRef(
 
     if (openInNewTabDesktop && !isMobile) {
       return (
-        <a
+        <MuiLink
           ref={ref}
           href={to}
           target="_blank"
           rel="noopener noreferrer"
+          sx={mergeSx(sx)}
           {...rest}>
           {children}
-        </a>
+        </MuiLink>
       );
     }
 
     return (
-      <RouterLink ref={ref} to={to} {...rest}>
+      <MuiLink
+        ref={ref}
+        component={RouterLink}
+        to={to}
+        sx={mergeSx(sx)}
+        {...rest}>
         {children}
-      </RouterLink>
+      </MuiLink>
     );
   }
 );

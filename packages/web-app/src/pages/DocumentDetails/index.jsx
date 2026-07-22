@@ -1,8 +1,9 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { Box, Breadcrumbs, Chip, Link, Skeleton, Typography } from '@mui/material';
+import { Box, Breadcrumbs, Chip, Skeleton, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import { Link as RouterLink, useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
+import AppLink from '../../components/common/AppLink';
 import { useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import Linkify from 'linkify-react';
@@ -290,8 +291,7 @@ const Document = ({
         fontSize: { xs: '1.2rem', md: '1.7rem' },
         '& .MuiBreadcrumbs-separator': { mx: { xs: '2px', md: '8px' } }
       }}>
-      <Link
-        component={RouterLink}
+      <AppLink
         to={`/ui/documents/${documentData.parent.id}`}
         underline="hover"
         color="inherit"
@@ -302,7 +302,7 @@ const Document = ({
         }}>
         <ParentTypeIcon sx={{ fontSize: 'inherit' }} />
         {documentData.parent.title}
-      </Link>
+      </AppLink>
     </Breadcrumbs>
   ) : null;
 

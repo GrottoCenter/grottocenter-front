@@ -18,8 +18,8 @@ import AddCircleIcon from '@mui/icons-material/AddCircle';
 import PropTypes from 'prop-types';
 import { isMobile, isIOS } from 'react-device-detect';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link } from 'react-router-dom';
 import { styled, alpha } from '@mui/material/styles';
+import AppLink from '../AppLink';
 import { openSideMenu, closeSideMenu } from '../../../actions/SideMenu';
 import { useAuthNavigate } from '../../../hooks';
 import { AppTitle } from '../AppBar';
@@ -41,7 +41,7 @@ const Header = styled('div')(({ theme }) => ({
   boxShadow: `0 1px 0 ${theme.palette.divider}`
 }));
 
-const HeaderLink = styled(Link)(({ theme }) => ({
+const HeaderLink = styled(AppLink)(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
   gap: theme.spacing(2),
@@ -149,10 +149,8 @@ const SideMenu = ({ isOpen }) => {
           <List>
             <ListItemButton
               sx={{ py: '5px' }}
-              component="a"
-              href={userguideUrl}
-              target="_blank"
-              rel="noreferrer">
+              component={AppLink}
+              href={userguideUrl}>
               <ListItemIcon sx={{ minWidth: 42 }}>
                 <MenuBook color="primary" sx={{ fontSize: 28 }} />
               </ListItemIcon>

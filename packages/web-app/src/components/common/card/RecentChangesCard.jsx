@@ -94,20 +94,6 @@ const IconBubble = styled(Box)(({ theme }) => ({
   '& > span': { margin: 0 }
 }));
 
-const AuthorLink = styled(AppLink)(({ theme }) => ({
-  color: theme.palette.secondary.main,
-  fontWeight: 600,
-  textDecoration: 'none',
-  '&:hover': { textDecoration: 'underline' }
-}));
-
-const EntityLink = styled(AppLink)(({ theme }) => ({
-  color: theme.palette.primary.main,
-  fontWeight: 600,
-  textDecoration: 'none',
-  '&:hover': { textDecoration: 'underline' }
-}));
-
 const ChangeItem = ({ changeInfo }) => {
   const { formatMessage } = useIntl();
   const iconType = getEntityIcon(changeInfo.mainEntityType);
@@ -118,16 +104,22 @@ const ChangeItem = ({ changeInfo }) => {
   );
 
   const authorEl = (
-    <AuthorLink to={`/ui/persons/${changeInfo.authorId}`}>
+    <AppLink
+      to={`/ui/persons/${changeInfo.authorId}`}
+      color="secondary"
+      underline="hover"
+      sx={{ fontWeight: 600 }}>
       {changeInfo.author}
-    </AuthorLink>
+    </AppLink>
   );
 
   const entityEl = (
-    <EntityLink
-      to={getEntityLinkUrl(changeInfo.mainEntityType, changeInfo.mainEntityId)}>
+    <AppLink
+      to={getEntityLinkUrl(changeInfo.mainEntityType, changeInfo.mainEntityId)}
+      underline="hover"
+      sx={{ fontWeight: 600 }}>
       {changeInfo.name}
-    </EntityLink>
+    </AppLink>
   );
 
   let sentence;

@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useParams, useNavigate, Link as RouterLink } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useIntl, FormattedDate } from 'react-intl';
 import {
   Box,
@@ -12,9 +12,9 @@ import {
   IconButton,
   Tooltip,
   Button,
-  Link,
   useMediaQuery
 } from '@mui/material';
+import AppLink from '../../components/common/AppLink';
 import SendIcon from '@mui/icons-material/Send';
 import FlagIcon from '@mui/icons-material/Flag';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -351,12 +351,11 @@ Message Body: ${body}`;
         />
         <Typography variant="h6">
           {otherParticipant ? (
-            <Link
-              component={RouterLink}
+            <AppLink
               to={`/ui/persons/${otherParticipant.id}`}
               sx={{ color: 'inherit', textDecoration: 'underline' }}>
               {titleText}
-            </Link>
+            </AppLink>
           ) : (
             titleText
           )}

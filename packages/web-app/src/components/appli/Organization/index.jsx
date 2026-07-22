@@ -2,11 +2,12 @@ import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
 import { useIntl } from 'react-intl';
-import { useParams, useNavigate, Link as RouterLink } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import Skeleton from '@mui/material/Skeleton';
 import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
-import { Box, Card, Link, Stack, Typography } from '@mui/material';
+import { Box, Card, Stack, Typography } from '@mui/material';
+import AppLink from '../../common/AppLink';
 import CreateIcon from '@mui/icons-material/Create';
 import DeleteIcon from '@mui/icons-material/Delete';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
@@ -189,15 +190,14 @@ const Organization = ({ error, isLoading, organization }) => {
         flexWrap="wrap"
         sx={{ fontSize: { xs: '1.2rem', md: '1.7rem' } }}>
         {organization.country && (
-          <Link
-            component={RouterLink}
+          <AppLink
             to={`/ui/countries/${organization.country}`}
             underline="hover"
             color="inherit"
             sx={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
             <CustomIcon type="country" size={16} />
             {organization.country}
-          </Link>
+          </AppLink>
         )}
         {organization.yearBirth && (
           <Typography

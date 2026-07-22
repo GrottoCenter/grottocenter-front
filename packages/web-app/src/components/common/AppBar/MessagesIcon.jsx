@@ -3,8 +3,8 @@ import { useIntl } from 'react-intl';
 import { Badge, CircularProgress, IconButton } from '@mui/material';
 import MailIcon from '@mui/icons-material/Mail';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link } from 'react-router-dom';
 import { usePermissions } from '../../../hooks';
+import AppLink from '../AppLink';
 import REDUCER_STATUS from '../../../reducers/ReducerStatus';
 import { fetchUnreadMessageCount } from '../../../actions/Messaging/CountUnreadMessages';
 
@@ -44,7 +44,7 @@ const MessagesIcon = () => {
   return (
     <IconButton
       aria-label={formatMessage({ id: 'My messages' })}
-      component={Link}
+      component={AppLink}
       to="/ui/messages"
       color="inherit"
       size="large">
