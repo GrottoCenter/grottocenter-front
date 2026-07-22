@@ -363,14 +363,28 @@ export const Entry = ({
                     onDeletePress(entity?.id, isDeleteConfirmationPermanent);
                   }}
                 />
-                {entrance.isSensitive && isAdmin && <SensitiveCaveWarning />}
                 <ScrollableContent
                   content={
                     <>
                       <HalfSplitContainer>
-                        <Box sx={{ flex: 1, minHeight: 200, display: 'flex' }}>
+                        <Box
+                          sx={{
+                            flex: 1,
+                            minHeight: 200,
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: 1
+                          }}>
+                          {entrance.isSensitive && isAdmin && (
+                            <SensitiveCaveWarning />
+                          )}
                           {!entrance.isSensitive || isAdmin ? (
-                            <Map positions={mapPositions} loading={isLoading} />
+                            <Box sx={{ flex: 1, display: 'flex' }}>
+                              <Map
+                                positions={mapPositions}
+                                loading={isLoading}
+                              />
+                            </Box>
                           ) : (
                             <SensitiveLocationPlaceholder />
                           )}
