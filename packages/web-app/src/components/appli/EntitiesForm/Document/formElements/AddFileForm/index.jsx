@@ -67,7 +67,6 @@ const AuthDocSelect = ({ value, onChange, disabled = false }) => {
           variant="filled"
           required={!disabled}
           label={formatMessage({ id: 'Authorization from authors' })}
-          sx={{}}
           InputProps={{
             ...params.InputProps,
             endAdornment: (

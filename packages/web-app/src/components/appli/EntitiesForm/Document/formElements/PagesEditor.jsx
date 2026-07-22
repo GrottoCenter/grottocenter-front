@@ -22,7 +22,7 @@ const PagesEditor = () => {
 
   return (
     <>
-      <Typography variant="caption" color="text.secondary" display="block" sx={{}}>
+      <Typography variant="caption" color="text.secondary" display="block">
         <Translate>
           The page or the pages interval (using format: start-end, e.g: 10-12)
           where the article is.

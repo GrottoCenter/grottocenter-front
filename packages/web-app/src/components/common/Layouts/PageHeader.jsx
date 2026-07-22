@@ -42,7 +42,7 @@ const PageHeader = ({ title, icon, titleAdornment, subheader, actions }) => (
         </Box>
         {actions && <Box sx={{ flexShrink: 0 }}>{actions}</Box>}
       </Box>
-      {subheader && <Box sx={{}}>{subheader}</Box>}
+      {subheader && <Box>{subheader}</Box>}
     </Box>
   </Card>
 );

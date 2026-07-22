@@ -160,7 +160,7 @@ const AccordionSnapshot = ({
                     // Rename snapshot: the name IS the change — show old → new.
                     // snapshotTitle holds the OLD name (raw h_name value);
                     // newName is resolved from the next real snapshot.
-                    (<HighLightsChar oldText={snapshotTitle} newText={newName} />)
+                    <HighLightsChar oldText={snapshotTitle} newText={newName} />
                   ) : isEntranceSnapshot ? (
                     // Regular entrance snapshot: name/caveName are contextual
                     // labels resolved across tables, not diffable fields. Renames

@@ -74,10 +74,10 @@ const Property = ({
     ) : (
       // Using div instead of Box for performance purpose on the marker's popup on the map.
       // https://github.com/mui/material-ui/issues/21657#issuecomment-707140999
-      (<div style={{ display: 'flex', flexDirection: 'column' }}>
+      <div style={{ display: 'flex', flexDirection: 'column' }}>
         <Title variant="caption">{label}</Title>
         <ValueComponent secondary={secondary} url={url} value={value} />
-      </div>)
+      </div>
     )}
   </PropertyWrapper>
 );

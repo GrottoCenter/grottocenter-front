@@ -104,7 +104,7 @@ const IdentifierEditor = () => {
         {shouldShowIdentifierTypeInput && (
           <Fade in={shouldShowIdentifierTypeInput}>
             <IdentifierTypeContainer>
-              <Typography variant="caption" color="text.secondary" display="block" sx={{}}>
+              <Typography variant="caption" color="text.secondary" display="block">
                 <Translate>DOI, ISBN, ISSN, URL…</Translate>
               </Typography>
               <FormControl

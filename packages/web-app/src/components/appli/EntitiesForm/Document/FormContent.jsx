@@ -126,7 +126,7 @@ const FormContent = ({ onCancel }) => {
       <DocumentTypeSelect />
       {!isUnknown(docType) && simple && (
         /* Simplified layout for Image / Topographic Drawing — no sections */
-        (<Box sx={{ mt: 1 }}>
+        <Box sx={{ mt: 1 }}>
           <FormRow>
             <StringInput
               onValueChange={value => updateAttribute('title', value)}
@@ -154,11 +154,11 @@ const FormContent = ({ onCancel }) => {
           />
           {filesIntro}
           <AddFileForm {...addFileFormProps} />
-        </Box>)
+        </Box>
       )}
       {!isUnknown(docType) && isEvent(docType) && (
         /* Event layout: Title, Language, Description (optional), Event date, ISO location */
-        (<Box sx={{ mt: 1 }}>
+        <Box sx={{ mt: 1 }}>
           <FormRow>
             <StringInput
               onValueChange={value => updateAttribute('title', value)}
@@ -204,11 +204,11 @@ const FormContent = ({ onCancel }) => {
             labelName="ISO countries or regions"
             required={false}
           />
-        </Box>)
+        </Box>
       )}
       {!isUnknown(docType) && isAuthorizationToPublish(docType) && (
         /* Authorization To Publish layout: Title, Language, Description (optional), Date, Files (no license) */
-        (<Box sx={{ mt: 1 }}>
+        <Box sx={{ mt: 1 }}>
           <FormRow>
             <StringInput
               onValueChange={value => updateAttribute('title', value)}
@@ -246,7 +246,7 @@ const FormContent = ({ onCancel }) => {
           </Suspense>
           {filesIntro}
           <AddFileForm {...addFileFormProps} showAuthorization={false} />
-        </Box>)
+        </Box>
       )}
       {!isUnknown(docType) &&
         !simple &&

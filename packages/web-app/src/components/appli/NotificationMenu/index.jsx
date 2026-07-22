@@ -39,9 +39,9 @@ const createSkeletons = n =>
   [...Array(n)].map((e, i) => (
     // Dummy skeletons which will disappear: we can ignore the eslint rule
     // eslint-disable-next-line react/no-array-index-key
-    (<MenuItem key={i} style={{ width: NOTIFICATION_WIDTH }}>
+    <MenuItem key={i} style={{ width: NOTIFICATION_WIDTH }}>
       <Skeleton width={NOTIFICATION_WIDTH} />
-    </MenuItem>)
+    </MenuItem>
   ));
 
 const NotificationMenu = () => {

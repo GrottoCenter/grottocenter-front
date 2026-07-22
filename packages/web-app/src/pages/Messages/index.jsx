@@ -65,9 +65,8 @@ const EmptyStateContainer = styled(Box)(({ theme }) => ({
 // client), standard page card on desktop.
 //
 // The height fills the viewport minus everything around the card. Each term is
-// derived from the theme rather than hardcoded: theme.spacing is an array here
-// (see grottoTheme), so spacing(2) is 8px and spacing(1) is 4px — not the MUI
-// defaults. `containerPb` must stay in sync with PageContainer's own `pb: 1`.
+// derived from the theme rather than hardcoded. `containerPb` must stay in sync
+// with PageContainer's own `pb: 1`.
 const StyledCard = styled(Card)(({ theme }) => {
   const containerPb = theme.spacing(0.5);
   const chromeXs = containerPb;

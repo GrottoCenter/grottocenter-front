@@ -161,7 +161,6 @@ const OperationSummary = ({ entrance, newCave, variant = 'link' }) => {
           variant="caption"
           color="text.secondary"
           display="block"
-          sx={{}}
         >
           {item.note}
         </Typography>

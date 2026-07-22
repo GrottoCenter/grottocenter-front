@@ -92,7 +92,6 @@ const AuthorsSelect = ({
         variant="caption"
         color="text.secondary"
         display="block"
-        sx={{}}
       >
         {formatMessage({ id: HELPER_TEXT_KEY })}
       </Typography>

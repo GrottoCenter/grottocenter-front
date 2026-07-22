@@ -102,7 +102,7 @@ const MobileEntityCard = React.memo(
                 />
               )}
             </Box>
-            <Divider sx={{}} />
+            <Divider />
             {bodyColumns.length > 0 && (
               <Box sx={{
                 display: 'flex',

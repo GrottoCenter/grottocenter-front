@@ -123,7 +123,7 @@ const ParsedPreview = ({ sampleValue, parsedDate, timestampType }) => {
         display: 'block'
       }}
       data-testid="parsed-preview">
-      {sampleValue}→ {formatted}
+      {sampleValue} → {formatted}
     </Typography>
   );
 };
@@ -180,7 +180,7 @@ const TokenReferenceContent = ({ tokens }) => {
               }}>
                 {token}
               </TableCell>
-              <TableCell sx={{}}>
+              <TableCell>
                 {formatMessage({
                   id: `ImportObservationsWizard.FormatInput.token.${token}`
                 })}

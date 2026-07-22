@@ -28,7 +28,7 @@ const StringInput = ({
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', width: fullWidth ? '100%' : undefined }}>
       {helperText && (
-        <Typography variant="caption" color="text.secondary" sx={{}}>
+        <Typography variant="caption" color="text.secondary">
           {helperText}
         </Typography>
       )}
