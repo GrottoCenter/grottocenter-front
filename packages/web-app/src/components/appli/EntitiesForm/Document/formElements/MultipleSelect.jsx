@@ -32,7 +32,7 @@ const Wrapper = styled('div')`
 `;
 
 const Collapse = styled(MuiCollapse)`
-  padding: ${({ theme }) => theme.spacing(1)};
+  padding: ${({ theme }) => theme.spacing(0.5)};
 `;
 
 // eslint-disable-next-line react/prop-types
@@ -113,8 +113,7 @@ const MultipleSelect = ({
         <Typography
           variant="caption"
           color={hasError ? 'error' : 'text.secondary'}
-          display="block"
-          sx={{ mb: 0.5 }}>
+          display="block">
           <Translate>{helperText}</Translate>
         </Typography>
       )}

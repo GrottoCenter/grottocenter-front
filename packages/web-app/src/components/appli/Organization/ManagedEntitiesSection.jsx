@@ -24,7 +24,9 @@ const ManagedEntitiesSection = ({ organization }) => {
   const renderList = (items, getLink) => (
     <List dense disablePadding>
       {items.map(item => (
-        <ListItem key={item.id} sx={{ px: 0, py: 0.5 }}>
+        <ListItem key={item.id} sx={{
+          px: 0.25
+        }}>
           <ListItemText
             primary={
               <Link component={RouterLink} to={getLink(item)}>
@@ -38,19 +40,18 @@ const ManagedEntitiesSection = ({ organization }) => {
   );
 
   return (
-    <Box sx={{ my: 2 }}>
+    <Box sx={{ my: 1 }}>
       {sortedCountries.length > 0 && (
-        <Box sx={{ mb: 2 }}>
-          <Typography variant="subtitle2" color="text.secondary" sx={{ textTransform: 'uppercase', mb: 1 }}>
+        <Box sx={{ mb: 1 }}>
+          <Typography variant="subtitle2" color="text.secondary" sx={{ textTransform: 'uppercase', mb: 0.5 }}>
             {formatMessage({ id: 'Countries' })}
           </Typography>
           {renderList(sortedCountries, country => `/ui/countries/${country.id}`)}
         </Box>
       )}
-
       {sortedRegions.length > 0 && (
-        <Box sx={{ mb: 2 }}>
-          <Typography variant="subtitle2" color="text.secondary" sx={{ textTransform: 'uppercase', mb: 1 }}>
+        <Box sx={{ mb: 1 }}>
+          <Typography variant="subtitle2" color="text.secondary" sx={{ textTransform: 'uppercase', mb: 0.5 }}>
             {formatMessage({ id: 'Regions' })}
           </Typography>
           {renderList(sortedRegions, region => {
@@ -80,10 +81,9 @@ const ManagedEntitiesSection = ({ organization }) => {
           })}
         </Box>
       )}
-
       {sortedMassifs.length > 0 && (
-        <Box sx={{ mb: 2 }}>
-          <Typography variant="subtitle2" color="text.secondary" sx={{ textTransform: 'uppercase', mb: 1 }}>
+        <Box sx={{ mb: 1 }}>
+          <Typography variant="subtitle2" color="text.secondary" sx={{ textTransform: 'uppercase', mb: 0.5 }}>
             {formatMessage({ id: 'Massifs' })}
           </Typography>
           {renderList(sortedMassifs, massif => `/ui/massifs/${massif.id}`)}

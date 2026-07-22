@@ -65,7 +65,7 @@ const Science = ({ caveId }) => {
             })}
           />
 
-          <Box sx={{ mt: 2, display: 'flex', gap: 1 }}>
+          <Box sx={{ mt: 1, display: 'flex', gap: 0.5 }}>
             <Button
               variant="outlined"
               color="secondary"
@@ -76,11 +76,11 @@ const Science = ({ caveId }) => {
             </Button>
           </Box>
 
-          <Box sx={{ mt: 2 }}>
+          <Box sx={{ mt: 1 }}>
             <Typography
               variant="subtitle1"
               fontWeight="bold"
-              sx={{ px: 1, mb: 1, display: 'flex', alignItems: 'center', gap: 1 }}
+              sx={{ px: 0.5, mb: 0.5, display: 'flex', alignItems: 'center', gap: 0.5 }}
             >
               <PestControlIcon fontSize="small" />
               {formatMessage({ id: 'Bat counting' })}

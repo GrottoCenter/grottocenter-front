@@ -98,14 +98,13 @@ const RandomEntryCard = ({ entry, isFetching, fetch, onRefresh }) => {
         sx={{ position: 'absolute', inset: 0, height: '100%' }}
       />
       <Overlay />
-
       <Box
         sx={{
           position: 'absolute',
           top: 12,
           left: 12,
           zIndex: 1,
-          '& > span': { margin: 0 }
+          '& > span': { margin: 0.25 }
         }}>
         <CustomIcon type="entrance" size={32} />
       </Box>
@@ -123,7 +122,6 @@ const RandomEntryCard = ({ entry, isFetching, fetch, onRefresh }) => {
           <Autorenew sx={{ fontSize: 28 }} />
         </IconButton>
       )}
-
       <Content>
         <Typography variant="h6" fontWeight={600} sx={{ color: 'white' }}>
           {entry.name}
@@ -141,7 +139,7 @@ const RandomEntryCard = ({ entry, isFetching, fetch, onRefresh }) => {
             display: 'flex',
             alignItems: 'flex-end',
             justifyContent: 'space-between',
-            gap: 1,
+            gap: 0.5,
             mt: '4px'
           }}>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
@@ -184,7 +182,7 @@ const RandomEntryCard = ({ entry, isFetching, fetch, onRefresh }) => {
               ) : null
             )}
             {cave && (cave.depth || cave.length) && (
-              <Box sx={{ display: 'flex', gap: 2, mt: '4px' }}>
+              <Box sx={{ display: 'flex', gap: 1, mt: '4px' }}>
                 {cave.depth && (
                   <Box
                     sx={{ display: 'flex', alignItems: 'center', gap: '4px' }}>

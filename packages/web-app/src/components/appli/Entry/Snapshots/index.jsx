@@ -190,9 +190,8 @@ const SnapshotPage = () => {
         subheader={backLink}
       />
       {isSensitive && <SensitiveCaveWarning />}
-
-      <Card sx={{ mx: 2, mt: 1 }}>
-        <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
+      <Card sx={{ mx: 1, mt: 0.5 }}>
+        <CardContent sx={{ p: 0.25, '&:last-child': { pb: 0.25 } }}>
           {is403 && <Alert403 type={type} />}
           {is404 && <Alert404 type={type} />}
           {isLoading && <Skeleton height={300} />}

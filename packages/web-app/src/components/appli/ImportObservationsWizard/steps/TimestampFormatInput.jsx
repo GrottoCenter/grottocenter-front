@@ -119,7 +119,9 @@ const ParsedPreview = ({ sampleValue, parsedDate, timestampType }) => {
     <Typography
       variant="caption"
       color="text.secondary"
-      sx={{ mt: 0.5, display: 'block' }}
+      sx={{
+        display: 'block'
+      }}
       data-testid="parsed-preview">
       {sampleValue} → {formatted}
     </Typography>
@@ -138,8 +140,8 @@ const TokenReferenceContent = ({ tokens }) => {
   const { formatMessage } = useIntl();
 
   return (
-    <Box sx={{ p: 1, minWidth: 420 }} data-testid="token-reference-popover">
-      <Typography variant="subtitle2" sx={{ mb: 1 }}>
+    <Box sx={{ p: 0.5, minWidth: 420 }} data-testid="token-reference-popover">
+      <Typography variant="subtitle2" sx={{ mb: 0.5 }}>
         {formatMessage({
           id: 'ImportObservationsWizard.FormatInput.tokensTitle'
         })}
@@ -147,17 +149,23 @@ const TokenReferenceContent = ({ tokens }) => {
       <Table size="small">
         <TableHead>
           <TableRow>
-            <TableCell sx={{ fontWeight: 'bold', py: 0.5 }}>
+            <TableCell sx={{
+              fontWeight: 'bold'
+            }}>
               {formatMessage({
                 id: 'ImportObservationsWizard.FormatInput.tokenColumn'
               })}
             </TableCell>
-            <TableCell sx={{ fontWeight: 'bold', py: 0.5 }}>
+            <TableCell sx={{
+              fontWeight: 'bold'
+            }}>
               {formatMessage({
                 id: 'ImportObservationsWizard.FormatInput.meaningColumn'
               })}
             </TableCell>
-            <TableCell sx={{ fontWeight: 'bold', py: 0.5 }}>
+            <TableCell sx={{
+              fontWeight: 'bold'
+            }}>
               {formatMessage({
                 id: 'ImportObservationsWizard.FormatInput.exampleColumn'
               })}
@@ -167,15 +175,19 @@ const TokenReferenceContent = ({ tokens }) => {
         <TableBody>
           {tokens.map(token => (
             <TableRow key={token}>
-              <TableCell sx={{ fontFamily: 'monospace', py: 0.5 }}>
+              <TableCell sx={{
+                fontFamily: 'monospace'
+              }}>
                 {token}
               </TableCell>
-              <TableCell sx={{ py: 0.5 }}>
+              <TableCell>
                 {formatMessage({
                   id: `ImportObservationsWizard.FormatInput.token.${token}`
                 })}
               </TableCell>
-              <TableCell sx={{ fontFamily: 'monospace', py: 0.5 }}>
+              <TableCell sx={{
+                fontFamily: 'monospace'
+              }}>
                 {TOKEN_DESCRIPTIONS[token]?.example || ''}
               </TableCell>
             </TableRow>
@@ -185,7 +197,7 @@ const TokenReferenceContent = ({ tokens }) => {
       <Typography
         variant="caption"
         color="text.secondary"
-        sx={{ mt: 1, display: 'block' }}>
+        sx={{ mt: 0.5, display: 'block' }}>
         {formatMessage(
           { id: 'ImportObservationsWizard.FormatInput.separatorsHint' },
           {
@@ -240,7 +252,7 @@ const TimestampFormatInput = ({
 
   return (
     <Box data-testid="format-pill-builder">
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
         <TextField
           size="small"
           value={currentFormat}

@@ -62,7 +62,7 @@ const AssociationForm = ({ open, onClose, onSubmit, status, error }) => {
       </DialogTitle>
       <DialogContent>
         {status === REDUCER_STATUS.FAILED && (
-          <Alert severity="error" sx={{ mb: 2 }}>
+          <Alert severity="error" sx={{ mb: 1 }}>
             {error?.message ||
               formatMessage({ id: 'An error occurred while saving.' })}
           </Alert>
@@ -114,7 +114,7 @@ const AssociationForm = ({ open, onClose, onSubmit, status, error }) => {
           inputValue.trim().length > 0 &&
           results.length === 0 &&
           !isLoading && (
-            <Alert severity="info" sx={{ mt: 2 }}>
+            <Alert severity="info" sx={{ mt: 1 }}>
               {formatMessage(
                 {
                   id: 'Select an existing organization from the list, or a new one named "{name}" will be created.'

@@ -91,7 +91,7 @@ const MoveEntranceToCaveForm = ({ entrance }) => {
         {/* Discreet switch to the other operation, offered right under the
             subject. Detaching only makes sense for a networked entrance. */}
         {(mode === MODE_DETACH || sourceInNetwork) && (
-          <Box mt={1}>
+          <Box mt={0.5}>
             <Link
               component="button"
               type="button"
@@ -110,7 +110,6 @@ const MoveEntranceToCaveForm = ({ entrance }) => {
           </Box>
         )}
       </Box>
-
       {mode === MODE_MOVE ? (
         <Box>
           <CaveAutoCompleteSearch

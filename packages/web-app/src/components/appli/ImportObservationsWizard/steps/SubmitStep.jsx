@@ -99,7 +99,7 @@ const SubmitStep = () => {
 
   return (
     <Box
-      sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}
+      sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}
       data-testid="submit-step">
       {/* Summary section */}
       <Box>
@@ -113,11 +113,11 @@ const SubmitStep = () => {
           sx={{
             display: 'flex',
             flexDirection: 'column',
-            gap: 1,
-            pl: 1
+            gap: 0.5,
+            pl: 0.5
           }}>
           {/* File name */}
-          <Box sx={{ display: 'flex', gap: 1 }}>
+          <Box sx={{ display: 'flex', gap: 0.5 }}>
             <Typography
               variant="body2"
               color="text.secondary"
@@ -132,7 +132,7 @@ const SubmitStep = () => {
           </Box>
 
           {/* Cave ID */}
-          <Box sx={{ display: 'flex', gap: 1 }}>
+          <Box sx={{ display: 'flex', gap: 0.5 }}>
             <Typography
               variant="body2"
               color="text.secondary"
@@ -151,7 +151,7 @@ const SubmitStep = () => {
           </Box>
 
           {/* Point label */}
-          <Box sx={{ display: 'flex', gap: 1 }}>
+          <Box sx={{ display: 'flex', gap: 0.5 }}>
             <Typography
               variant="body2"
               color="text.secondary"
@@ -169,7 +169,7 @@ const SubmitStep = () => {
           </Box>
 
           {/* Sensor configs count */}
-          <Box sx={{ display: 'flex', gap: 1 }}>
+          <Box sx={{ display: 'flex', gap: 0.5 }}>
             <Typography
               variant="body2"
               color="text.secondary"
@@ -185,7 +185,7 @@ const SubmitStep = () => {
 
           {/* Valid row count */}
           {validRowCount !== null && (
-            <Box sx={{ display: 'flex', gap: 1 }}>
+            <Box sx={{ display: 'flex', gap: 0.5 }}>
               <Typography
                 variant="body2"
                 color="text.secondary"
@@ -201,9 +201,7 @@ const SubmitStep = () => {
           )}
         </Box>
       </Box>
-
       <Divider />
-
       {/* Error display — inline message and details */}
       {isFailed && submission.error && (
         <Alert severity="error" data-testid="submit-error-details">
@@ -223,12 +221,12 @@ const SubmitStep = () => {
                   <Typography
                     variant="body2"
                     fontWeight="bold"
-                    sx={{ mb: showRaw || errorDetails.length > 0 ? 1 : 0 }}>
+                    sx={{ mb: showRaw || errorDetails.length > 0 ? 0.5 : 0.25 }}>
                     {translatedMessage}
                   </Typography>
                 )}
                 {showRaw && (
-                  <Typography variant="body2" sx={{ mb: errorDetails.length > 0 ? 1 : 0 }}>
+                  <Typography variant="body2" sx={{ mb: errorDetails.length > 0 ? 0.5 : 0.25 }}>
                     {rawMessage}
                   </Typography>
                 )}
@@ -240,7 +238,7 @@ const SubmitStep = () => {
               {/* Error details have no stable unique ID — field may repeat */}
               {/* eslint-disable-next-line react/no-array-index-key */}
               {errorDetails.map((detail, index) => (
-                <ListItem key={detail.field ? `${detail.field}-${index}` : index} disableGutters sx={{ py: 0 }}>
+                <ListItem key={detail.field ? `${detail.field}-${index}` : index} disableGutters sx={{ py: 0.25 }}>
                   <ListItemText
                     primary={
                       detail.field
@@ -264,7 +262,7 @@ const SubmitStep = () => {
             <Typography
               variant="caption"
               color="text.secondary"
-              sx={{ mt: 1, display: 'block' }}>
+              sx={{ mt: 0.5, display: 'block' }}>
               {formatMessage(
                 { id: 'ImportObservationsWizard.SubmitStep.referenceId' },
                 { id: submission.error.referenceId }
@@ -273,9 +271,8 @@ const SubmitStep = () => {
           )}
         </Alert>
       )}
-
       {/* Action buttons */}
-      <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+      <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
         <Button
           variant="contained"
           color="primary"

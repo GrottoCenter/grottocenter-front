@@ -65,8 +65,8 @@ export const DELETED_ENTITIES = {
 
 const StyledAuthor = styled('div')`
   display: inline-grid;
-  padding-top: ${({ theme }) => theme.spacing(3)};
-  padding-left: ${({ theme }) => theme.spacing(1)};
+  padding-top: ${({ theme }) => theme.spacing(2)};
+  padding-left: ${({ theme }) => theme.spacing(0.5)};
 `;
 
 const StyledEntityIcon = styled(EntityIcon)`
@@ -135,7 +135,7 @@ export const DeletedCard = ({
           </>
         }
       />
-      <Box variant="outlined" sx={{ marginTop: 3 }}>
+      <Box variant="outlined" sx={{ marginTop: 2 }}>
         {!!redirectToUrl && (
           <Button variant="contained" color="secondary" href={redirectToUrl}>
             {formatMessage(
@@ -148,7 +148,7 @@ export const DeletedCard = ({
           </Button>
         )}
         {isLoading && (
-          <Box sx={{ margin: 2 }}>
+          <Box sx={{ margin: 1 }}>
             <CircularProgress />
           </Box>
         )}
@@ -157,7 +157,7 @@ export const DeletedCard = ({
           <Tooltip title={formatMessage({ id: 'Restore' })}>
             <Button
               variant="outlined"
-              sx={{ marginLeft: 3 }}
+              sx={{ marginLeft: 2 }}
               onClick={() => onRestorePress()}
               color="primary"
               aria-label={formatMessage({ id: 'restore' })}>
@@ -170,7 +170,7 @@ export const DeletedCard = ({
           <Tooltip title={formatMessage({ id: 'Permanently delete' })}>
             <Button
               variant="outlined"
-              sx={{ marginLeft: 3 }}
+              sx={{ marginLeft: 2 }}
               onClick={() => onPermanentDeletePress()}
               color="primary"
               aria-label={formatMessage({ id: 'delete' })}>
@@ -285,7 +285,7 @@ export const DeleteConfirmationDialog = ({
       actions={
         <>
           {isLoading && (
-            <Box sx={{ margin: 2 }}>
+            <Box sx={{ margin: 1 }}>
               <CircularProgress />
             </Box>
           )}
@@ -346,7 +346,7 @@ export const DeleteConfirmationDialog = ({
         )}
 
         {selectedEntity && (
-          <Box sx={{ padding: 2, background: 'white' }}>
+          <Box sx={{ padding: 1, background: 'white' }}>
             {selectedEntity.iconSrc && (
               <StyledEntityIcon src={selectedEntity.iconSrc} />
             )}
@@ -354,7 +354,7 @@ export const DeleteConfirmationDialog = ({
               aria-label={formatMessage({ id: 'remove' })}
               sx={{
                 float: 'right',
-                padding: selectedEntity?.subtitle ? 2 : 0
+                padding: selectedEntity?.subtitle ? 1 : 0.25
               }}
               onClick={() => {
                 setSelectedEntity(null);

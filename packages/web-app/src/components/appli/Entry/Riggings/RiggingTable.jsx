@@ -91,7 +91,7 @@ const RiggingTable = ({ id, obstacles, title, previous, isDeleted }) => {
 
   return (
     <Box>
-      <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 1, mb: 1 }}>
+      <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 0.5, mb: 0.5 }}>
         {titleEl}
         {previous === undefined && <RiggingSummary obstacles={obstacles} />}
       </Box>

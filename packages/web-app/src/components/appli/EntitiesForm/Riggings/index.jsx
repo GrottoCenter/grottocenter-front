@@ -108,7 +108,7 @@ const CreateRiggingsForm = ({
   );
 
   return (
-    <FormContainer sx={{ marginTop: 2 }}>
+    <FormContainer sx={{ marginTop: 1 }}>
       <form autoComplete="off" onSubmit={handleSubmit(onSubmit)}>
         <FormRow>
           <InputText
@@ -127,7 +127,7 @@ const CreateRiggingsForm = ({
         </FormRow>
         {fields.length > 0 &&
           (isMobile ? (
-            <Stack spacing={2} sx={{ mt: 2 }}>
+            <Stack spacing={1} sx={{ mt: 1 }}>
               {fields.map((item, index) => (
                 <ObstacleCard
                   key={item.id}
@@ -143,7 +143,7 @@ const CreateRiggingsForm = ({
               ))}
             </Stack>
           ) : (
-            <TableContainer sx={{ mt: 2 }}>
+            <TableContainer sx={{ mt: 1 }}>
               <Table
                 size="small"
                 aria-label={formatMessage({ id: 'riggings' })}>
@@ -185,7 +185,9 @@ const CreateRiggingsForm = ({
               </Table>
             </TableContainer>
           ))}
-        <Box sx={{ mt: 0.5, mb: 1 }}>
+        <Box sx={{
+          mb: 1
+        }}>
           <Button
             onClick={handleAppend}
             color="secondary"

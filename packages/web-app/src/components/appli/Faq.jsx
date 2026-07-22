@@ -59,7 +59,7 @@ const StyledSummary = styled(AccordionSummary)(({ theme }) => ({
 }));
 
 const StyledDetails = styled(AccordionDetails)(({ theme }) => ({
-  padding: theme.spacing(3),
+  padding: theme.spacing(2),
   '& a': {
     color: theme.palette.primary.main,
     textDecoration: 'underline'
@@ -113,7 +113,7 @@ const Faq = () => {
               </Typography>
             </StyledSummary>
             <StyledDetails>
-              <Typography variant="body2" sx={{ mb: 2 }}>
+              <Typography variant="body2" sx={{ mb: 1 }}>
                 {formatMessage({
                   id: 'Cave protection is a priority. A procedure has been defined for sensitive locations.'
                 })}
@@ -152,7 +152,7 @@ const Faq = () => {
               </Typography>
             </StyledSummary>
             <StyledDetails>
-              <Typography variant="body2" sx={{ mb: 2 }}>
+              <Typography variant="body2" sx={{ mb: 1 }}>
                 {formatMessage({
                   id: 'You can help as an active member, translator, developer, or partner organisation.'
                 })}
@@ -191,7 +191,7 @@ const Faq = () => {
               </Typography>
             </StyledSummary>
             <StyledDetails>
-              <Typography variant="body2" sx={{ mb: 2 }}>
+              <Typography variant="body2" sx={{ mb: 1 }}>
                 {formatMessage({
                   id: 'GrottoCenter is built and maintained by the Wikicaves association and a community of volunteer contributors.'
                 })}

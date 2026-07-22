@@ -44,7 +44,7 @@ const GuidelineForm = ({
   const isDescriptionLengthValid = value => !value || value.length <= 500;
 
   return (
-    <FormContainer sx={{ marginTop: 2 }}>
+    <FormContainer sx={{ marginTop: 1 }}>
       <form autoComplete="off" onSubmit={handleSubmit(onSubmit)}>
         <FormRow>
           <InputText

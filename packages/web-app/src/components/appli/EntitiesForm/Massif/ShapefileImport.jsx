@@ -380,7 +380,6 @@ const ShapefileImport = ({ onImport }) => {
         size="small">
         {formatMessage({ id: 'Import geometry' })}
       </Button>
-
       <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
         <DialogTitle>{formatMessage({ id: 'Import geometry' })}</DialogTitle>
         <DialogContent>
@@ -388,8 +387,8 @@ const ShapefileImport = ({ onImport }) => {
             sx={{
               display: 'flex',
               flexDirection: 'column',
-              gap: 2,
-              pt: 1,
+              gap: 1,
+              pt: 0.5,
               minHeight: 220
             }}>
             {parseError && (
@@ -417,8 +416,8 @@ const ShapefileImport = ({ onImport }) => {
             <Box
               sx={{
                 alignItems: 'center',
-                gap: 1,
-                py: 1,
+                gap: 0.5,
+                py: 0.5,
                 ...(analyzing
                   ? { display: 'flex' }
                   : { position: 'absolute', visibility: 'hidden' })
@@ -457,7 +456,7 @@ const ShapefileImport = ({ onImport }) => {
                     {formatMessage({ id: 'Vertex count' })}: {vertexCount}
                   </Typography>
                   {vertexWarning && (
-                    <Alert severity={vertexWarning.severity} sx={{ mt: 1 }}>
+                    <Alert severity={vertexWarning.severity} sx={{ mt: 0.5 }}>
                       {vertexWarning.message}
                     </Alert>
                   )}

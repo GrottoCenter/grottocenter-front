@@ -275,9 +275,8 @@ const CoordinateFormSection = ({
         markerIcon={markerIcon}
         mapHeight={mapHeight}
       />
-
       {/* CRS selector + coordinate fields, below the map */}
-      <Box display="flex" alignItems="flex-start" gap={1} mt={1} mb={1}>
+      <Box display="flex" alignItems="flex-start" gap={0.5} mt={0.5} mb={0.5}>
         <Tooltip title={formatMessage({ id: 'Change coordinate system' })}>
           <Button
             variant="outlined"
@@ -307,7 +306,7 @@ const CoordinateFormSection = ({
             minWidth: 0,
             display: 'flex',
             flexDirection: { xs: 'column', sm: 'row' },
-            gap: 1
+            gap: 0.5
           }}
         >
           {isWGS84 ? (
@@ -365,10 +364,9 @@ const CoordinateFormSection = ({
           )}
         </Box>
       </Box>
-
       {/* UTM zone/hemisphere — separate row, only when needed */}
       {!isWGS84 && isUTM && (
-        <Box display="flex" gap={1} mb={1}>
+        <Box display="flex" gap={0.5} mb={0.5}>
           <TextField
             label={formatMessage({ id: 'Zone' })}
             type="number"
@@ -392,14 +390,13 @@ const CoordinateFormSection = ({
           </TextField>
         </Box>
       )}
-
       {!isWGS84 && conversionError && (
-        <Alert severity="error" sx={{ mb: 1 }}>
+        <Alert severity="error" sx={{ mb: 0.5 }}>
           {formatMessage({ id: 'Invalid coordinates' })}
         </Alert>
       )}
       {!isWGS84 && preview && (
-        <Box display="flex" alignItems="center" gap={1} mb={1}>
+        <Box display="flex" alignItems="center" gap={0.5} mb={0.5}>
           <Typography variant="caption" color="text.secondary">
             ≈ WGS84 :
           </Typography>
@@ -411,7 +408,6 @@ const CoordinateFormSection = ({
           />
         </Box>
       )}
-
       <CRSMenu
         anchorEl={crsMenuAnchor}
         onClose={() => setCrsMenuAnchor(null)}

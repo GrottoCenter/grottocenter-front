@@ -147,15 +147,15 @@ const AccordionSnapshotListPage = ({
   const hasItems = timelineItems.length > 0;
 
   return (
-    <Box sx={{ px: 2 }}>
+    <Box sx={{ px: 1 }}>
       {isCurrentItemLoading && (
-        <Skeleton height={80} variant="rectangular" sx={{ borderRadius: 1, mb: 1 }} />
+        <Skeleton height={80} variant="rectangular" sx={{ borderRadius: 1, mb: 0.5 }} />
       )}
       {hasItems ? (
         <Timeline
           sx={{
-            p: 0,
-            m: 0,
+            p: 0.25,
+            m: 0.25,
             '& .MuiTimelineItem-root:last-child .MuiTimelineConnector-root': {
               display: 'none'
             }

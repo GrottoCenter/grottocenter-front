@@ -417,12 +417,10 @@ const HydratedMap = ({
         </ListSubheader>
         <Box
           sx={{
-            pl: 3,
-            pr: 1,
-            py: 0.5,
+            pl: 2,
+            pr: 0.5,
             display: 'flex',
-            alignItems: 'center',
-            gap: 0.5
+            alignItems: 'center'
           }}>
           <Typography variant="body2" sx={{ flex: 1 }}>
             {contextDisplayValue}

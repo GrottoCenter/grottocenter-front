@@ -53,14 +53,14 @@ const ExploredEntrancesMap = ({ userId }) => {
       <Skeleton
         variant="rectangular"
         height={400}
-        sx={{ mb: 3, borderRadius: 1 }}
+        sx={{ mb: 2, borderRadius: 1 }}
       />
     );
   }
   if (hasExploredData === false) return null;
 
   return (
-    <Box sx={{ mb: 3 }}>
+    <Box sx={{ mb: 2 }}>
       <CustomMapContainer
         wholePage={false}
         center={initialCenter}

@@ -91,7 +91,7 @@ const CountryList = ({ countries = [] }) => {
       }
       content={
         <Box sx={{ maxWidth: 680 }}>
-          <SearchInput value={search} onChange={setSearch} sx={{ mb: 2 }} />
+          <SearchInput value={search} onChange={setSearch} sx={{ mb: 1 }} />
           <TableContainer
             component={Paper}
             sx={{ maxHeight: theme => `calc(100vh - ${theme.appBarHeight + 184}px)` }}>
@@ -124,7 +124,7 @@ const CountryList = ({ countries = [] }) => {
                     sx={{
                       '&:last-of-type td, &:last-of-type th': { border: 0 }
                     }}>
-                    <TableCell sx={{ pr: 0, width: 40 }}>
+                    <TableCell sx={{ pr: 0.25, width: 40 }}>
                       <FlagImage iso2={row.iso2} alt={row.localized} />
                     </TableCell>
                     <TableCell component="th" scope="row">

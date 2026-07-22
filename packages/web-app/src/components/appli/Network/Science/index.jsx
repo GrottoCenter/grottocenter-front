@@ -31,7 +31,7 @@ const Science = ({ caveId }) => {
             })}
           />
 
-          <Box sx={{ mt: 2, display: 'flex', gap: 1 }}>
+          <Box sx={{ mt: 1, display: 'flex', gap: 0.5 }}>
             <Button
               variant="outlined"
               color="secondary"

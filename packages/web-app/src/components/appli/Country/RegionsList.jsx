@@ -102,16 +102,16 @@ const RegionsList = ({ countryId }) => {
   }
 
   return (
-    <Box sx={{ mt: -2 }}>
+    <Box sx={{ mt: -1 }}>
       {regions.length > 10 && (
-        <SearchInput value={search} onChange={setSearch} sx={{ mb: 1 }} />
+        <SearchInput value={search} onChange={setSearch} sx={{ mb: 0.5 }} />
       )}
       {filtered.length === 0 ? (
         <Typography variant="body2" color="text.secondary">
           {formatMessage({ id: 'No results' })}
         </Typography>
       ) : (
-        <Box sx={{ columnCount: { xs: 1, sm: 2, md: 3 }, columnGap: 6 }}>
+        <Box sx={{ columnCount: { xs: 1, sm: 2, md: 3 }, columnGap: 8 }}>
           {filtered.map(region => (
             <Box
               key={region.iso}
@@ -120,8 +120,8 @@ const RegionsList = ({ countryId }) => {
               sx={{
                 display: 'flex',
                 alignItems: 'center',
-                py: 1,
-                px: 1,
+                py: 0.5,
+                px: 0.5,
                 borderRadius: 1,
                 textDecoration: 'none',
                 color: 'text.primary',
@@ -132,7 +132,7 @@ const RegionsList = ({ countryId }) => {
                 label={region.iso.split('-')[1]}
                 color="primary"
                 size="small"
-                sx={{ mr: 1, flexShrink: 0 }}
+                sx={{ mr: 0.5, flexShrink: 0 }}
               />
               <Typography variant="body1">{region.name}</Typography>
             </Box>

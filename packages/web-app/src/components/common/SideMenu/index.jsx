@@ -34,7 +34,7 @@ const Header = styled('div')(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  padding: theme.spacing(0, 2),
+  padding: theme.spacing(0.25, 1),
   ...theme.mixins.toolbar,
   backgroundColor: alpha(theme.palette.primary.main, 0.06),
   flexShrink: 0,
@@ -44,7 +44,7 @@ const Header = styled('div')(({ theme }) => ({
 const HeaderLink = styled(Link)(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
-  gap: theme.spacing(3),
+  gap: theme.spacing(2),
   color: theme.palette.primary.dark,
   textDecoration: 'none',
   transition: theme.transitions.create('opacity'),
@@ -75,8 +75,8 @@ const Footer = styled('div')`
 `;
 
 const ContributeButton = styled(Button)(({ theme }) => ({
-  margin: theme.spacing(2, 1),
-  width: `calc(100% - ${theme.spacing(2)})`
+  margin: theme.spacing(1, 0.5),
+  width: `calc(100% - ${theme.spacing(1)})`
 }));
 
 const SideMenu = ({ isOpen }) => {
@@ -129,7 +129,7 @@ const SideMenu = ({ isOpen }) => {
       <Content>
         {isTopbarCompact && (
           <>
-            <Box sx={{ py: 1 }}>
+            <Box sx={{ py: 0.5 }}>
               <QuickSearch onClose={handleClose} />
             </Box>
             <Divider />

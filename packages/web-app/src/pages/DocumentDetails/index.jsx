@@ -59,12 +59,12 @@ import linkifyOptions from '../../helpers/linkifyOptions';
 const HalfSplitContainer = styled('div')`
   display: flex;
   flex-direction: column;
-  gap: ${({ theme }) => theme.spacing(2)};
+  gap: ${({ theme }) => theme.spacing(1)};
 
   ${({ theme }) => theme.breakpoints.up('md')} {
     flex-direction: row;
     align-items: flex-start;
-    gap: ${({ theme }) => theme.spacing(3)};
+    gap: ${({ theme }) => theme.spacing(2)};
   }
 `;
 
@@ -73,7 +73,7 @@ const MainColumn = styled('div')`
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: ${({ theme }) => theme.spacing(2)};
+  gap: ${({ theme }) => theme.spacing(1)};
 `;
 
 const SideColumn = styled('div')`
@@ -81,7 +81,7 @@ const SideColumn = styled('div')`
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: ${({ theme }) => theme.spacing(2)};
+  gap: ${({ theme }) => theme.spacing(1)};
 `;
 
 const Document = ({
@@ -334,7 +334,6 @@ const Document = ({
         subheader={breadcrumb}
         actions={actions}
       />
-
       {documentData?.isDeleted && (
         <ScrollableContent
           content={
@@ -351,7 +350,6 @@ const Document = ({
           }
         />
       )}
-
       <DeleteConfirmationDialog
         entityType={DELETED_ENTITIES.document}
         isOpen={isDeleteConfirmationOpen}
@@ -362,7 +360,6 @@ const Document = ({
           onDeletePress(entity?.id, isDeleteConfirmationPermanent);
         }}
       />
-
       {isLoading && (
         <ScrollableContent
           content={
@@ -377,7 +374,6 @@ const Document = ({
           }
         />
       )}
-
       {error && (
         <ScrollableContent
           content={
@@ -390,7 +386,6 @@ const Document = ({
           }
         />
       )}
-
       {documentData && (
         <>
           <ScrollableContent
@@ -418,7 +413,7 @@ const Document = ({
                           <Chip
                             label={childIssues.length}
                             size="small"
-                            sx={{ ml: 1, fontWeight: 600, verticalAlign: 'middle' }}
+                            sx={{ ml: 0.5, fontWeight: 600, verticalAlign: 'middle' }}
                           />
                         </Typography>
                         {childIssues.length > 0 ? (
@@ -597,7 +592,7 @@ const Document = ({
                     </DetailsList>
                   </SideColumn>
                 </HalfSplitContainer>
-                <Box sx={{ mt: 1, mb: -2 }}>
+                <Box sx={{ mt: 0.5, mb: -1 }}>
                   <AuthorAndDate
                     author={documentData.creator}
                     textColor="textSecondary"

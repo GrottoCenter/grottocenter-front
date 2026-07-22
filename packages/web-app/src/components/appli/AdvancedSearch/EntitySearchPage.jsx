@@ -60,7 +60,7 @@ const EntitySearchPage = ({
       content={
         <>
           {children}
-          <Divider sx={{ my: 2 }} />
+          <Divider sx={{ my: 1 }} />
           <SearchResults entityType={entityType} />
         </>
       }

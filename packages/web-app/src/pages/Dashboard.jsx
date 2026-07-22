@@ -25,7 +25,7 @@ const StyledListItem = styled(ListItemButton)`
   border: 1px solid ${props => props.theme.palette.primary1Color};
   flex: 0 0 220px;
   flex-direction: column;
-  margin: ${props => props.theme.spacing(2)};
+  margin: ${props => props.theme.spacing(1)};
 `;
 
 const StyledListItemDBExport = styled(StyledListItem)`
@@ -33,7 +33,7 @@ const StyledListItemDBExport = styled(StyledListItem)`
 `;
 
 const DashboardBlock = styled('div')`
-  margin-bottom: ${props => props.theme.spacing(4)};
+  margin-bottom: ${props => props.theme.spacing(3)};
 `;
 
 const Dashboard = () => {

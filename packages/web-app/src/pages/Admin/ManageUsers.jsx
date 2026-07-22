@@ -18,7 +18,7 @@ import EntityTable from '../../components/common/EntityTable';
 import ManageUserGroups from './ManageUserGroups';
 
 const MarginBottomBlock = styled('div')`
-  margin-bottom: ${({ theme }) => theme.spacing(4)};
+  margin-bottom: ${({ theme }) => theme.spacing(3)};
 `;
 
 const UserList = ({ isLoading, title, userList }) => (

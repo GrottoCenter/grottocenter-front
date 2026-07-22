@@ -30,7 +30,7 @@ const UserBlock = styled('div')`
 
 const FlexBlock = styled('div')`
   flex: 1;
-  margin: ${({ theme }) => theme.spacing(3)};
+  margin: ${({ theme }) => theme.spacing(2)};
 `;
 
 const SearchBarBackground = styled('div')`
@@ -165,12 +165,12 @@ const ManageUserGroups = () => {
       {selectedUser && (
         <>
           <IconButton
-            sx={{ marginTop: 2 }}
+            sx={{ marginTop: 1 }}
             onClick={() => setSelectedUser(null)}>
             <ClearIcon />
           </IconButton>
           <Button
-            sx={{ marginTop: 2, float: 'right' }}
+            sx={{ marginTop: 1, float: 'right' }}
             variant="outlined"
             component={AppLink}
             to={`/ui/persons/${selectedUser?.id}`}

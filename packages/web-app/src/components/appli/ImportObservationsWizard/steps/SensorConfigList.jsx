@@ -34,8 +34,8 @@ const SensorConfigList = ({ deviceId }) => {
   if (loading) {
     return (
       <Box data-testid="sensor-config-list-loading">
-        <Skeleton variant="rectangular" height={48} sx={{ mb: 1 }} />
-        <Skeleton variant="rectangular" height={48} sx={{ mb: 1 }} />
+        <Skeleton variant="rectangular" height={48} sx={{ mb: 0.5 }} />
+        <Skeleton variant="rectangular" height={48} sx={{ mb: 0.5 }} />
         <Skeleton variant="rectangular" height={48} />
       </Box>
     );

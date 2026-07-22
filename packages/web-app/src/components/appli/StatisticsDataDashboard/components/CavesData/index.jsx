@@ -10,10 +10,10 @@ const CavesData = ({ title, nbMassifs, nbCaves, nbDivingCaves, nbNetworks }) => 
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-      <Typography variant="h4" textAlign="center" pb={2}>
+      <Typography variant="h4" textAlign="center" pb={1}>
         {title}
       </Typography>
-      <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 3 }}>
+      <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
         {nbMassifs !== undefined && nbMassifs !== null && (
           <InlineData
             icon={<CustomIcon type="massif" size={40} />}

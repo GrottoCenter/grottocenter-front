@@ -31,12 +31,12 @@ const FormActions = ({
 
   return (
     <Box
-      mt={4}
+      mt={3}
       sx={{
         display: 'flex',
         flexDirection: { xs: 'column-reverse', sm: 'row' },
         justifyContent: { sm: 'flex-end' },
-        gap: 2
+        gap: 1
       }}
     >
       <Button
@@ -47,7 +47,6 @@ const FormActions = ({
       >
         {formatMessage({ id: 'Cancel' })}
       </Button>
-
       {confirmTooltip ? (
         <Tooltip title={confirmTooltip}>
           <Box component="span" sx={{ width: { xs: '100%', sm: 'auto' } }}>

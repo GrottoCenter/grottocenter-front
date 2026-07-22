@@ -41,7 +41,7 @@ const MessagesList = styled(List)(({ theme }) => ({
   overflowY: 'auto',
   overflowX: 'hidden',
   minWidth: 0,
-  padding: theme.spacing(2),
+  padding: theme.spacing(1),
   display: 'flex',
   flexDirection: 'column-reverse' // Shows latest at the bottom
 }));
@@ -50,7 +50,7 @@ const MessagesList = styled(List)(({ theme }) => ({
 const MessageBubble = styled(Paper, {
   shouldForwardProp: prop => !prop.startsWith('$')
 })(({ theme, $isMine }) => ({
-  padding: theme.spacing(1, 2),
+  padding: theme.spacing(0.5, 1),
   maxWidth: '75%',
   minWidth: 0,
   width: 'fit-content',
@@ -61,7 +61,7 @@ const MessageBubble = styled(Paper, {
   color: $isMine
     ? theme.palette.primary.contrastText
     : theme.palette.text.primary,
-  marginBottom: theme.spacing(1),
+  marginBottom: theme.spacing(0.5),
   borderRadius: 16,
   borderBottomRightRadius: $isMine ? 4 : 16,
   borderBottomLeftRadius: $isMine ? 16 : 4,
@@ -82,10 +82,10 @@ const MessageDate = styled(Typography, {
 }));
 
 const InputArea = styled(Box)(({ theme }) => ({
-  padding: theme.spacing(2),
+  padding: theme.spacing(1),
   backgroundColor: theme.palette.background.paper,
   display: 'flex',
-  gap: theme.spacing(1),
+  gap: theme.spacing(0.5),
   alignItems: 'flex-start',
   borderTop: `1px solid ${theme.palette.divider}`
 }));
@@ -98,7 +98,7 @@ const BlankStateContainer = styled(Box)(({ theme }) => ({
   height: '100%',
   backgroundColor: theme.palette.action.hover,
   color: theme.palette.text.secondary,
-  padding: theme.spacing(4),
+  padding: theme.spacing(3),
   textAlign: 'center'
 }));
 
@@ -242,7 +242,7 @@ const ConversationDetail = () => {
 
   if (status === REDUCER_STATUS.FAILED) {
     return (
-      <Box sx={{ p: 3 }}>
+      <Box sx={{ p: 2 }}>
         <Alert
           severity="error"
           title={
@@ -321,7 +321,7 @@ Message Body: ${body}`;
     <DetailContainer>
       <Box
         sx={{
-          p: 2,
+          p: 1,
           borderBottom: 1,
           borderColor: 'divider',
           bgcolor: 'background.paper',
@@ -331,7 +331,7 @@ Message Body: ${body}`;
         <IconButton
           sx={{
             display: { xs: 'inline-flex', md: 'none' },
-            mr: 2,
+            mr: 1,
             border: '1px solid',
             borderColor: 'divider',
             borderRadius: '8px',
@@ -346,7 +346,7 @@ Message Body: ${body}`;
             width: '1px',
             height: '24px',
             bgcolor: 'divider',
-            mr: 2
+            mr: 1
           }}
         />
         <Typography variant="h6">
@@ -362,7 +362,6 @@ Message Body: ${body}`;
           )}
         </Typography>
       </Box>
-
       <MessagesList ref={messagesListRef}>
         <div ref={messagesEndRef} />
         {[...messages].reverse().map(msg => {
@@ -374,7 +373,7 @@ Message Body: ${body}`;
                   display: 'flex',
                   justifyContent: 'space-between',
                   alignItems: 'flex-start',
-                  gap: 1
+                  gap: 0.5
                 }}>
                 <Box sx={{ flexGrow: 1, minWidth: 0 }}>
                   <Typography variant="body1" sx={{ whiteSpace: 'pre-wrap' }}>
@@ -393,9 +392,9 @@ Message Body: ${body}`;
                       sx={{
                         color: 'text.secondary',
                         '&:hover': { color: 'error.main' },
-                        padding: 0,
+                        padding: 0.25,
                         mt: '4px',
-                        ml: 1,
+                        ml: 0.5,
                         flexShrink: 0
                       }}>
                       <FlagIcon fontSize="small" />
@@ -421,7 +420,7 @@ Message Body: ${body}`;
         {hasMore && (
           <Box
             ref={sentinelRef}
-            sx={{ display: 'flex', justifyContent: 'center', py: 1 }}>
+            sx={{ display: 'flex', justifyContent: 'center', py: 0.5 }}>
             {status === REDUCER_STATUS.LOADING ? (
               <CircularProgress size={24} />
             ) : (
@@ -435,7 +434,6 @@ Message Body: ${body}`;
           </Box>
         )}
       </MessagesList>
-
       <InputArea>
         <TextField
           fullWidth
@@ -466,7 +464,7 @@ Message Body: ${body}`;
                 display: 'flex',
                 justifyContent: 'flex-end',
                 width: '100%',
-                m: 0
+                m: 0.25
               }}>
               <span
                 style={{ color: replyText.length > 5000 ? 'red' : 'inherit' }}>
@@ -493,7 +491,6 @@ Message Body: ${body}`;
           {isSending ? <CircularProgress size={24} /> : <SendIcon />}
         </IconButton>
       </InputArea>
-
       <StandardDialog
         open={isReportDialogOpen}
         onClose={handleCloseReportDialog}

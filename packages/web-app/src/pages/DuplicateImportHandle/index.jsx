@@ -16,8 +16,8 @@ const DOCUMENT_TAB = 'document';
 const TABS = [ENTRANCE_TAB, DOCUMENT_TAB];
 
 const StyledActionButton = styled(ActionButton)`
-  margin-top: ${({ theme }) => theme.spacing(1)};
-  margin-bottom: ${({ theme }) => theme.spacing(1)};
+  margin-top: ${({ theme }) => theme.spacing(0.5)};
+  margin-bottom: ${({ theme }) => theme.spacing(0.5)};
 `;
 
 const DuplicateImportHandle = () => {

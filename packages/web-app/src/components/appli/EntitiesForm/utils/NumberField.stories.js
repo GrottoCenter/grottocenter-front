@@ -23,7 +23,7 @@ const NumberFieldsGroup = ({ disabled = false }) => {
     defaultValues: Object.fromEntries(FIELDS.map(({ name }) => [name, '']))
   });
   return (
-    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
+    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
       {FIELDS.map(({ name, label, icon, unit }) => (
         <NumberField
           key={name}

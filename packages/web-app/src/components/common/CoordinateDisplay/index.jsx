@@ -119,7 +119,7 @@ const CoordinateDisplay = ({
 
   if (compact) {
     return (
-      <Box display="flex" alignItems="center" gap={0.5}>
+      <Box display="flex" alignItems="center">
         <Typography variant="body2">{displayValue}</Typography>
         <Tooltip title={formatMessage({ id: 'Copy coordinates' })}>
           <IconButton
@@ -151,7 +151,7 @@ const CoordinateDisplay = ({
   }
 
   return (
-    <Box display="flex" alignItems="center" flexWrap="wrap" gap={1}>
+    <Box display="flex" alignItems="center" flexWrap="wrap" gap={0.5}>
       <Typography variant="body1">{displayValue}</Typography>
       {precisionText && (
         <Chip

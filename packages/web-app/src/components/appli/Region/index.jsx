@@ -126,87 +126,87 @@ const Region = ({
 
   return (
     <PageContainer>
-    <div ref={componentRef}>
-      <PageHeader
-        title={region?.name ?? (isLoading ? undefined : '')}
-        subheader={subheader}
-        actions={actions}
-      />
-      {region && (
-        <Box sx={{ mx: 2, mb: 1 }}>
-          <Button
-            fullWidth
-            variant="contained"
-            color="primary"
-            size="large"
-            startIcon={<CustomIcon type="entrance" size={24} />}
-            onClick={() =>
-              navigate(
-                `/ui/countries/${countryId}/regions/${regionId}/entrances`
-              )
-            }>
-            {formatMessage({ id: 'Entrances list' })}
-            {dataRegion?.nb_caves ? ` (${dataRegion.nb_caves})` : ''}
-          </Button>
-        </Box>
-      )}
-      {isLoading && (
-        <Card sx={{ m: 2, p: 3 }}>
-          <Skeleton height={150} />
-        </Card>
-      )}
-      {error && (
-        <Card sx={{ m: 2, p: 3 }}>
-          <Alert
-            title={formatMessage({
-              id: 'Error, the region data you are looking for is not available.'
-            })}
-            severity="error"
-          />
-        </Card>
-      )}
-      {region && (
-        <>
-          {position && (
-            <ScrollableContent
-              content={
-                <CustomMapContainer
-                  center={position}
-                  dragging={!isMobile}
-                  forceCentering
-                  scrollWheelZoom={false}
-                  wholePage={false}
-                  shouldChangeControlInFullscreen={false}
-                  zoom={6}>
-                  <Marker icon={CoordinatesMarker} position={position} />
-                </CustomMapContainer>
-              }
+      <div ref={componentRef}>
+        <PageHeader
+          title={region?.name ?? (isLoading ? undefined : '')}
+          subheader={subheader}
+          actions={actions}
+        />
+        {region && (
+          <Box sx={{ mx: 1, mb: 0.5 }}>
+            <Button
+              fullWidth
+              variant="contained"
+              color="primary"
+              size="large"
+              startIcon={<CustomIcon type="entrance" size={24} />}
+              onClick={() =>
+                navigate(
+                  `/ui/countries/${countryId}/regions/${regionId}/entrances`
+                )
+              }>
+              {formatMessage({ id: 'Entrances list' })}
+              {dataRegion?.nb_caves ? ` (${dataRegion.nb_caves})` : ''}
+            </Button>
+          </Box>
+        )}
+        {isLoading && (
+          <Card sx={{ m: 1, p: 2 }}>
+            <Skeleton height={150} />
+          </Card>
+        )}
+        {error && (
+          <Card sx={{ m: 1, p: 2 }}>
+            <Alert
+              title={formatMessage({
+                id: 'Error, the region data you are looking for is not available.'
+              })}
+              severity="error"
             />
-          )}
-          <StatisticsDataDashboard
-            regionId={regionId}
-            countryId={countryId}
-            description={formatMessage({
-              id: 'Discover the numbers about this region and its caves.'
-            })}
-          />
-          {(region.guidelines?.length > 0 || permissions.isAuth) && (
-            <Guidelines
-              entityType="regions"
-              entityId={region.id}
-              guidelines={region.guidelines}
+          </Card>
+        )}
+        {region && (
+          <>
+            {position && (
+              <ScrollableContent
+                content={
+                  <CustomMapContainer
+                    center={position}
+                    dragging={!isMobile}
+                    forceCentering
+                    scrollWheelZoom={false}
+                    wholePage={false}
+                    shouldChangeControlInFullscreen={false}
+                    zoom={6}>
+                    <Marker icon={CoordinatesMarker} position={position} />
+                  </CustomMapContainer>
+                }
+              />
+            )}
+            <StatisticsDataDashboard
+              regionId={regionId}
+              countryId={countryId}
+              description={formatMessage({
+                id: 'Discover the numbers about this region and its caves.'
+              })}
             />
-          )}
-          <AssociationSection
-            organizations={region?.organizations}
-            entityType="region"
-            entityId={regionId}
-            parentEntityId={countryId}
-            isLoading={isLoading}
-          />
-        </>
-      )}
-    </div>
+            {(region.guidelines?.length > 0 || permissions.isAuth) && (
+              <Guidelines
+                entityType="regions"
+                entityId={region.id}
+                guidelines={region.guidelines}
+              />
+            )}
+            <AssociationSection
+              organizations={region?.organizations}
+              entityType="region"
+              entityId={regionId}
+              parentEntityId={countryId}
+              isLoading={isLoading}
+            />
+          </>
+        )}
+      </div>
     </PageContainer>
   );
 };

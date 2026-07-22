@@ -45,7 +45,7 @@ const Files = ({ files = [], description, onImageClick, imageIndexOffset = 0 }) 
     <>
       {/* Image thumbnails section */}
       {imageFiles.length > 0 && (
-        <Grid container rowSpacing={2} columnSpacing={{ xs: 0, sm: 2 }} sx={{ mb: 2 }}>
+        <Grid container rowSpacing={1} columnSpacing={{ xs: 0.25, sm: 1 }} sx={{ mb: 1 }}>
           {imageFiles.map((file, index) => {
             const { src, srcSet } = getThumbnailSources(file);
             return (
@@ -61,7 +61,6 @@ const Files = ({ files = [], description, onImageClick, imageIndexOffset = 0 }) 
           })}
         </Grid>
       )}
-
       {/* Non-image files section (existing logic) */}
       {otherFiles.map(file => (
         <FileListItem key={`${file.fileName}`} dense component="div">
@@ -76,7 +75,6 @@ const Files = ({ files = [], description, onImageClick, imageIndexOffset = 0 }) 
           </Button>
         </FileListItem>
       ))}
-
       {/*
         Fallback lightbox when not managed by a parent component.
 

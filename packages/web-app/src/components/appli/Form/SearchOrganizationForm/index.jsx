@@ -47,7 +47,7 @@ const SearchOrganizationForm = ({ onSubmit }) => {
         resetResults={resetAdvancedSearch}
       />
       <SearchResults onSelected={handleSelection} hideExport compact entityType={ADVANCED_SEARCH_TYPES.ORGANIZATIONS} />
-      <Box sx={{ mt: 2, mb: 3, textAlign: 'center' }}>
+      <Box sx={{ mt: 1, mb: 2, textAlign: 'center' }}>
         <Button
           disabled={selectedOrganizations.length === 0}
           color="primary"

@@ -20,7 +20,7 @@ const DropZone = styled(Box, {
     $isDragging ? theme.palette.primary.main : theme.palette.divider
   }`,
   borderRadius: theme.shape.borderRadius * 2,
-  padding: theme.spacing(4, 2),
+  padding: theme.spacing(3, 1),
   textAlign: 'center',
   cursor: 'pointer',
   background: $isDragging ? theme.palette.action.hover : 'transparent',
@@ -81,7 +81,6 @@ const FileSelectorInput = ({
       variant="caption"
       color="text.disabled"
       display="block"
-      mt={1.5}
       onClick={e => e.stopPropagation()}>
       {[...extensions].sort().join(', ')}
     </Typography>
@@ -91,8 +90,8 @@ const FileSelectorInput = ({
     <Box
       display="flex"
       flexWrap="wrap"
-      gap={1}
-      mt={2}
+      gap={0.5}
+      mt={1}
       onClick={e => e.stopPropagation()}>
       {files.map(f => (
         <Chip
@@ -118,7 +117,7 @@ const FileSelectorInput = ({
         disabled={disabled}
       />
       {isMobile ? (
-        <Stack spacing={1.5}>
+        <Stack>
           <Button
             variant="contained"
             color="primary"
@@ -150,7 +149,7 @@ const FileSelectorInput = ({
             sx={{
               fontSize: 40,
               color: isDragging ? 'primary.main' : 'text.disabled',
-              mb: 1
+              mb: 0.5
             }}
           />
           <Typography
@@ -159,11 +158,7 @@ const FileSelectorInput = ({
             fontWeight={500}>
             {t('Drag and drop files here', 'Drag and drop a file here')}
           </Typography>
-          <Typography
-            variant="caption"
-            color="text.disabled"
-            mt={0.5}
-            display="block">
+          <Typography variant="caption" color="text.disabled" display="block">
             {formatMessage({ id: 'or' })}
           </Typography>
           <Button
@@ -172,7 +167,7 @@ const FileSelectorInput = ({
             disabled={disabled}
             aria-hidden="true"
             tabIndex={-1}
-            sx={{ mt: 1, pointerEvents: 'none' }}>
+            sx={{ mt: 0.5, pointerEvents: 'none' }}>
             {t('Choose files', 'Choose a file')}
           </Button>
           {extensionsLabel}

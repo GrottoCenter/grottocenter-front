@@ -106,9 +106,9 @@ const AccordionSnapshotList = ({
   const hasItems = hasCurrentItem || hasRevisions;
 
   return (
-    <Box sx={{ px: 2 }}>
+    <Box sx={{ px: 1 }}>
       {isCurrentItemLoading && (
-        <Skeleton height={80} variant="rectangular" sx={{ borderRadius: 1, mb: 1 }} />
+        <Skeleton height={80} variant="rectangular" sx={{ borderRadius: 1, mb: 0.5 }} />
       )}
       {hasItems ? (
         <>

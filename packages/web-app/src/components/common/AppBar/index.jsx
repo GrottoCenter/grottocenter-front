@@ -50,10 +50,10 @@ const StyledMuiAppBar = styled(MuiAppBar, {
 const NavigationGroup = styled('div')(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
-  gap: theme.spacing(1),
-  marginRight: theme.spacing(2),
+  gap: theme.spacing(0.5),
+  marginRight: theme.spacing(1),
   [theme.breakpoints.down('sm')]: {
-    marginRight: theme.spacing(1)
+    marginRight: theme.spacing(0.5)
   }
 }));
 
@@ -67,7 +67,7 @@ const ToolsGroup = styled('div')(({ theme }) => ({
   flexGrow: 1,
   gap: 12,
   alignItems: 'center',
-  padding: theme.spacing(2),
+  padding: theme.spacing(1),
   [theme.breakpoints.down('sm')]: {
     display: 'none'
   }
@@ -75,7 +75,7 @@ const ToolsGroup = styled('div')(({ theme }) => ({
 
 const LogoImage = styled('img')(({ theme }) => ({
   height: 34,
-  marginRight: theme.spacing(2),
+  marginRight: theme.spacing(1),
   [theme.breakpoints.down('sm')]: {
     height: 32
   }
@@ -99,10 +99,10 @@ export const StyledLink = styled(Link)`
 
 const ActionsGroup = styled('div')(({ theme }) => ({
   display: 'flex',
-  gap: theme.spacing(1),
-  marginLeft: theme.spacing(2),
+  gap: theme.spacing(0.5),
+  marginLeft: theme.spacing(1),
   [theme.breakpoints.down('sm')]: {
-    marginLeft: theme.spacing(1)
+    marginLeft: theme.spacing(0.5)
   }
 }));
 

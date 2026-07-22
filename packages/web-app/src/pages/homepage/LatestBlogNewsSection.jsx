@@ -52,7 +52,7 @@ const LatestBlogNewsSection = () => {
           blog={isFrench ? 'fr' : 'en'}
           url={isFrench ? frenchRssUrl : englishRssUrl}
         />
-        <Box sx={{ textAlign: 'center', mt: 3 }}>
+        <Box sx={{ textAlign: 'center', mt: 2 }}>
           <AppLink href={isFrench ? bloggerLinks.fr : bloggerLinks['*']}>
             <Typography
               variant="body2"

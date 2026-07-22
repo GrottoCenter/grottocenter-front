@@ -93,7 +93,7 @@ const HeroStats = () => {
                     alignItems: 'center',
                     width: '100%'
                   }}>
-                  <Box sx={{ '& > span': { margin: 0 } }}>
+                  <Box sx={{ '& > span': { margin: 0.25 } }}>
                     <CustomIcon type={iconType} size={isMobile ? 32 : 48} />
                   </Box>
                   <Typography
@@ -101,7 +101,7 @@ const HeroStats = () => {
                     fontWeight="bold"
                     color={theme.palette.primary.main}
                     sx={{
-                      mt: 1,
+                      mt: 0.5,
                       [theme.breakpoints.down('sm')]: {
                         fontSize: '1.5rem',
                         mt: '0px'

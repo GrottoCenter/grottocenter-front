@@ -50,7 +50,7 @@ const GlobalWrapper = styled('div')`
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: ${({ theme }) => theme.spacing(2)};
+  gap: ${({ theme }) => theme.spacing(1)};
 `;
 
 const StyledRatings = styled(Ratings)`
@@ -82,9 +82,9 @@ const Properties = ({ isLoading = false, entrance, dataQuality }) => {
     <GlobalWrapper>
       <Paper
         variant="outlined"
-        sx={{ p: 2, borderRadius: 2, bgcolor: 'grey.50' }}>
+        sx={{ p: 1, borderRadius: 2, bgcolor: 'grey.50' }}>
         <InfoSection title={formatMessage({ id: 'Location' })}>
-          <Box display="flex" flexDirection="column" gap={1}>
+          <Box display="flex" flexDirection="column" gap={0.5}>
             {entrance.latitude && entrance.longitude && (
               <Property
                 loading={isLoading}
@@ -106,7 +106,7 @@ const Properties = ({ isLoading = false, entrance, dataQuality }) => {
               sx={{
                 display: 'grid',
                 gridTemplateColumns: 'repeat(2, 1fr)',
-                gap: 1
+                gap: 0.5
               }}>
               {cityValue && (
                 <Property
@@ -128,7 +128,6 @@ const Properties = ({ isLoading = false, entrance, dataQuality }) => {
           </Box>
         </InfoSection>
       </Paper>
-
       {(entrance.cave?.depth ||
         entrance.cave?.length ||
         entrance.cave?.temperature ||
@@ -138,13 +137,13 @@ const Properties = ({ isLoading = false, entrance, dataQuality }) => {
         entrance.isTouristic) && (
         <Paper
           variant="outlined"
-          sx={{ p: 2, borderRadius: 2, bgcolor: 'grey.50' }}>
+          sx={{ p: 1, borderRadius: 2, bgcolor: 'grey.50' }}>
           <InfoSection title={formatMessage({ id: 'Characteristics' })}>
             <Box
               sx={{
                 display: 'grid',
                 gridTemplateColumns: 'repeat(2, 1fr)',
-                gap: 1
+                gap: 0.5
               }}>
               <DepthProperty
                 depth={entrance.cave?.depth}
@@ -189,7 +188,6 @@ const Properties = ({ isLoading = false, entrance, dataQuality }) => {
           </InfoSection>
         </Paper>
       )}
-
       {(entrance.hasBat ||
         entrance.dangerFlooding ||
         entrance.dangerCo2 ||
@@ -201,12 +199,12 @@ const Properties = ({ isLoading = false, entrance, dataQuality }) => {
         <Paper
           variant="outlined"
           sx={{
-            p: 2,
+            p: 1,
             borderRadius: 2,
             bgcolor: 'secondary.veryLight',
             borderColor: 'secondary.light'
           }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 0.5 }}>
             <WarningAmber sx={{ color: 'secondary.main', fontSize: 20 }} />
             <Typography
               variant="subtitle1"
@@ -220,7 +218,7 @@ const Properties = ({ isLoading = false, entrance, dataQuality }) => {
             sx={{
               display: 'grid',
               gridTemplateColumns: 'repeat(2, 1fr)',
-              gap: 1
+              gap: 0.5
             }}>
             <HasBatProperty hasBat={entrance.hasBat} isLoading={isLoading} />
             <DangerFloodingProperty
@@ -254,11 +252,10 @@ const Properties = ({ isLoading = false, entrance, dataQuality }) => {
           </Box>
         </Paper>
       )}
-
       {entrance.cave?.exploringOrganizations?.length > 0 && (
         <Paper
           variant="outlined"
-          sx={{ p: 2, borderRadius: 2, bgcolor: 'grey.50' }}>
+          sx={{ p: 1, borderRadius: 2, bgcolor: 'grey.50' }}>
           <InfoSection title={formatMessage({ id: 'Exploring organizations' })}>
             <Box
               sx={{
@@ -280,10 +277,10 @@ const Properties = ({ isLoading = false, entrance, dataQuality }) => {
       {dataQuality?.total != null && (
         <Paper
           variant="outlined"
-          sx={{ p: 2, borderRadius: 2, bgcolor: 'grey.50' }}>
+          sx={{ p: 1, borderRadius: 2, bgcolor: 'grey.50' }}>
           <InfoSection title={formatMessage({ id: 'Data quality' })}>
-            <Box display="flex" flexDirection="column" gap={1.5}>
-              <Box display="flex" alignItems="center" gap={2} flexWrap="wrap">
+            <Box display="flex" flexDirection="column">
+              <Box display="flex" alignItems="center" gap={1} flexWrap="wrap">
                 <DataQualityBadge value={dataQuality.total} size={32} />
                 <Typography variant="body2">
                   {formatMessage({ id: getDataQualityLabelKey(dataQuality.total) })}
@@ -304,7 +301,7 @@ const Properties = ({ isLoading = false, entrance, dataQuality }) => {
                     <Typography variant="caption">
                       {formatMessage({ id: 'Details by category' })}
                     </Typography>
-                    <IconButton size="small" sx={{ p: 0 }}>
+                    <IconButton size="small" sx={{ p: 0.25 }}>
                       {categoriesOpen ? (
                         <ExpandLess fontSize="small" />
                       ) : (
@@ -320,7 +317,7 @@ const Properties = ({ isLoading = false, entrance, dataQuality }) => {
                     sx={{
                       display: 'grid',
                       gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)' },
-                      columnGap: 3,
+                      columnGap: 2,
                       rowGap: '4px',
                       pt: '4px'
                     }}>
@@ -338,7 +335,7 @@ const Properties = ({ isLoading = false, entrance, dataQuality }) => {
                           key={key}
                           display="flex"
                           alignItems="center"
-                          gap={1}>
+                          gap={0.5}>
                           <Typography
                             variant="caption"
                             noWrap

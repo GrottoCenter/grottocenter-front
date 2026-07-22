@@ -91,8 +91,8 @@ const Descriptions = ({
         <>
           {hasNetworkDescriptions && (
             <>
-              <Divider sx={{ mb: 1 }} />
-              <Typography variant="body1" color="text.secondary" sx={{ mb: 1 }}>
+              <Divider sx={{ mb: 0.5 }} />
+              <Typography variant="body1" color="text.secondary" sx={{ mb: 0.5 }}>
                 <FormattedMessage
                   id="network.descriptions.callout"
                   values={{

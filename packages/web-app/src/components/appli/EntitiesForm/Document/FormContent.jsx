@@ -97,7 +97,7 @@ const FormContent = ({ onCancel }) => {
   };
 
   const filesIntro = (
-    <Typography variant="body2" color="text.secondary" sx={{ mt: 2, mb: 1 }}>
+    <Typography variant="body2" color="text.secondary" sx={{ mt: 1, mb: 0.5 }}>
       {formatMessage({
         id: 'You can create a document that contains one or several files at once.'
       })}
@@ -116,19 +116,17 @@ const FormContent = ({ onCancel }) => {
   return (
     <FormContainer>
       {linkedEntrance && (
-        <Alert severity="info" sx={{ mb: 3 }}>
+        <Alert severity="info" sx={{ mb: 2 }}>
           {formatMessage(
             { id: 'This document will be linked to entrance: {name}' },
             { name: <strong>{linkedEntrance.name}</strong> }
           )}
         </Alert>
       )}
-
       <DocumentTypeSelect />
-
       {!isUnknown(docType) && simple && (
         /* Simplified layout for Image / Topographic Drawing — no sections */
-        <Box sx={{ mt: 2 }}>
+        <Box sx={{ mt: 1 }}>
           <FormRow>
             <StringInput
               onValueChange={value => updateAttribute('title', value)}
@@ -147,7 +145,6 @@ const FormContent = ({ onCancel }) => {
               required
             />
           </FormRow>
-
           <StringInput
             multiline
             minRows={4}
@@ -155,15 +152,13 @@ const FormContent = ({ onCancel }) => {
             value={document.description}
             valueName={formatMessage({ id: 'Description' })}
           />
-
           {filesIntro}
           <AddFileForm {...addFileFormProps} />
         </Box>
       )}
-
       {!isUnknown(docType) && isEvent(docType) && (
         /* Event layout: Title, Language, Description (optional), Event date, ISO location */
-        <Box sx={{ mt: 2 }}>
+        <Box sx={{ mt: 1 }}>
           <FormRow>
             <StringInput
               onValueChange={value => updateAttribute('title', value)}
@@ -211,10 +206,9 @@ const FormContent = ({ onCancel }) => {
           />
         </Box>
       )}
-
       {!isUnknown(docType) && isAuthorizationToPublish(docType) && (
         /* Authorization To Publish layout: Title, Language, Description (optional), Date, Files (no license) */
-        <Box sx={{ mt: 2 }}>
+        <Box sx={{ mt: 1 }}>
           <FormRow>
             <StringInput
               onValueChange={value => updateAttribute('title', value)}
@@ -232,7 +226,6 @@ const FormContent = ({ onCancel }) => {
               label={formatMessage({ id: 'Document main language' })}
             />
           </FormRow>
-
           <StringInput
             multiline
             minRows={4}
@@ -240,7 +233,6 @@ const FormContent = ({ onCancel }) => {
             value={document.description}
             valueName={formatMessage({ id: 'Description' })}
           />
-
           <Suspense
             fallback={
               <>
@@ -252,17 +244,15 @@ const FormContent = ({ onCancel }) => {
               label={formatMessage({ id: 'Authorization date' })}
             />
           </Suspense>
-
           {filesIntro}
           <AddFileForm {...addFileFormProps} showAuthorization={false} />
         </Box>
       )}
-
       {!isUnknown(docType) &&
         !simple &&
         !isEvent(docType) &&
         !isAuthorizationToPublish(docType) && (
-          <Box sx={{ mt: 2 }}>
+          <Box sx={{ mt: 1 }}>
             <FormRow>
               <StringInput
                 helperText={formatMessage({
@@ -325,9 +315,7 @@ const FormContent = ({ onCancel }) => {
             )}
           </Box>
         )}
-
       {!isUnknown(docType) && <AuthorsSection />}
-
       {!isUnknown(docType) &&
         !isEvent(docType) &&
         !isAuthorizationToPublish(docType) && (
@@ -335,7 +323,7 @@ const FormContent = ({ onCancel }) => {
             disableGutters
             elevation={0}
             sx={{
-              mt: 3,
+              mt: 2,
               border: '1px solid',
               borderColor: 'divider',
               borderRadius: 1,
@@ -346,7 +334,7 @@ const FormContent = ({ onCancel }) => {
                 {formatMessage({ id: 'Advanced metadata' })}
               </Typography>
             </AccordionSummary>
-            <AccordionDetails sx={{ pt: 0 }}>
+            <AccordionDetails sx={{ pt: 0.25 }}>
               {!isCollection(docType) && (
                 <Suspense
                   fallback={
@@ -448,7 +436,9 @@ const FormContent = ({ onCancel }) => {
                 variant="caption"
                 color="text.secondary"
                 display="block"
-                sx={{ mt: 1, mb: 0.5 }}>
+                sx={{
+                  mt: 0.5
+                }}>
                 <InternationalizedLink links={wikiBBSLinks}>
                   <Translate>
                     Speleological Abstracts (SA)/Bulletin bibliographique
@@ -485,7 +475,6 @@ const FormContent = ({ onCancel }) => {
             </AccordionDetails>
           </Accordion>
         )}
-
       {actionRow}
     </FormContainer>
   );

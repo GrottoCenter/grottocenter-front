@@ -217,22 +217,20 @@ const SensorConfigForm = ({ deviceId }) => {
 
   return (
     <Box data-testid="sensor-config-form">
-      <Typography variant="subtitle2" sx={{ mb: 2 }}>
+      <Typography variant="subtitle2" sx={{ mb: 1 }}>
         {formatMessage({
           id: 'ImportObservationsWizard.DeviceSensorsStep.addSensorTitle'
         })}
       </Typography>
-
       {submitError && (
         <Alert
           severity="error"
-          sx={{ mb: 2 }}
+          sx={{ mb: 1 }}
           data-testid="sensor-config-form-error">
           {submitError}
         </Alert>
       )}
-
-      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, maxWidth: 480 }}>
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, maxWidth: 480 }}>
         {/* Label — optional human-readable name */}
         <TextField
           label={formatMessage({
@@ -246,7 +244,7 @@ const SensorConfigForm = ({ deviceId }) => {
         />
 
         {/* Quantity Kind and Unit dropdowns — side by side */}
-        <Box sx={{ display: 'flex', gap: 2 }}>
+        <Box sx={{ display: 'flex', gap: 1 }}>
           <TextField
             select
             label={formatMessage({
@@ -308,9 +306,9 @@ const SensorConfigForm = ({ deviceId }) => {
           </AccordionSummary>
           <AccordionDetails>
             <Box
-              sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+              sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
               {/* Precision: lower first, side by side */}
-              <Box sx={{ display: 'flex', gap: 2 }}>
+              <Box sx={{ display: 'flex', gap: 1 }}>
                 <TextField
                   label={formatMessage({
                     id: 'ImportObservationsWizard.DeviceSensorsStep.precisionLower'
@@ -354,7 +352,7 @@ const SensorConfigForm = ({ deviceId }) => {
                 />
               </Box>
               {/* Detection limits: min first, side by side */}
-              <Box sx={{ display: 'flex', gap: 2 }}>
+              <Box sx={{ display: 'flex', gap: 1 }}>
                 <TextField
                   label={formatMessage({
                     id: 'ImportObservationsWizard.DeviceSensorsStep.detectionLimitMin'

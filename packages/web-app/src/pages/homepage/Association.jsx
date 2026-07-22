@@ -91,8 +91,8 @@ const Association = () => {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            gap: 2,
-            mb: 3,
+            gap: 1,
+            mb: 2,
             flexWrap: 'wrap'
           }}>
           <Box
@@ -121,7 +121,7 @@ const Association = () => {
           sx={{
             color: 'rgba(255,255,255,0.85)',
             textAlign: 'center',
-            mb: 4,
+            mb: 3,
             maxWidth: 640,
             mx: 'auto'
           }}>
@@ -146,11 +146,11 @@ const Association = () => {
           />
         </Typography>
 
-        <Grid container spacing={2} sx={{ mb: 4 }}>
+        <Grid container spacing={1} sx={{ mb: 3 }}>
           {GOALS.map(({ key, Icon, wordId, descId }) => (
             <Grid key={key} size={{ xs: 12, sm: 6, md: 4 }}>
               <GoalCard>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                   <Icon sx={{ color: 'secondary.main', fontSize: 22 }} />
                   <Typography
                     variant="subtitle2"
@@ -174,7 +174,7 @@ const Association = () => {
           sx={{
             color: 'rgba(255,255,255,0.55)',
             textAlign: 'center',
-            mb: 4,
+            mb: 3,
             maxWidth: 680,
             mx: 'auto',
             '& a': { color: 'rgba(255,255,255,0.9)', textDecoration: 'underline' }
@@ -205,7 +205,7 @@ const Association = () => {
             target="_blank"
             rel="noopener noreferrer"
             startIcon={<FavoriteBorder />}
-            sx={{ fontWeight: 600, px: 4, textTransform: 'none' }}>
+            sx={{ fontWeight: 600, px: 3, textTransform: 'none' }}>
             {formatMessage({ id: 'Donate now' })}
           </Button>
         </Box>

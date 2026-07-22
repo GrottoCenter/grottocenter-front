@@ -14,11 +14,13 @@ import ImageLightbox from './ImageLightbox';
 import { isImageFile } from './utils/imageUtils';
 
 const DocumentSkeleton = () => (
-  <ListItem disableGutters sx={{ display: 'block', py: 0.5 }}>
+  <ListItem disableGutters sx={{
+    display: 'block'
+  }}>
     <Paper
       variant="outlined"
-      sx={{ p: 2, borderRadius: 2, bgcolor: 'grey.50' }}>
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+      sx={{ p: 1, borderRadius: 2, bgcolor: 'grey.50' }}>
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 0.5 }}>
         <Skeleton variant="text" width="55%" height={28} />
         <Skeleton variant="rounded" width={90} height={24} />
       </Box>
@@ -111,7 +113,7 @@ const DocumentsList = ({
       </List>
       {totalPages > 1 && (
         <Box
-          mt={2}
+          mt={1}
           display="flex"
           justifyContent="center"
           sx={{ '@media print': { display: 'none' } }}>

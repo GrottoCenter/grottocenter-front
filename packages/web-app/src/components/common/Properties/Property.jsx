@@ -9,7 +9,7 @@ import AppLink from '../AppLink';
 
 export const StyledTypography = styled(Typography)`
   margin-left: ${({ theme, variant }) =>
-    variant === 'caption' && theme.spacing(2)};
+    variant === 'caption' && theme.spacing(1)};
 `;
 
 export const PropertyWrapper = styled('div')`
@@ -18,9 +18,9 @@ export const PropertyWrapper = styled('div')`
   display: flex;
   flex-basis: ${({ $flexBasis }) => $flexBasis};
   flex-shrink: 0;
-  padding: ${({ theme }) => theme.spacing(0)};
+  padding: ${({ theme }) => theme.spacing(0.25)};
   & > svg {
-    margin-right: ${({ theme }) => theme.spacing(1)};
+    margin-right: ${({ theme }) => theme.spacing(0.5)};
   }
 `;
 
@@ -29,7 +29,7 @@ const Title = styled(Typography)`
 `;
 
 const IconWrapper = styled('div')`
-  margin-right: ${({ theme }) => theme.spacing(1)};
+  margin-right: ${({ theme }) => theme.spacing(0.5)};
 `;
 
 const ValueComponent = ({ secondary, value, url }) => {

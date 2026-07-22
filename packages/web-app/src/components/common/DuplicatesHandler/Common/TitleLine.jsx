@@ -15,8 +15,8 @@ const Title = ({ children }) => (
 );
 
 const StyledGrid = styled(Grid)`
-  margin-top: ${({ theme }) => theme.spacing(2)};
-  margin-bottom: ${({ theme }) => theme.spacing(2)};
+  margin-top: ${({ theme }) => theme.spacing(1)};
+  margin-bottom: ${({ theme }) => theme.spacing(1)};
 `;
 
 const TitleLine = ({ title1, title2, handleAllClick1, handleAllClick2 }) => {

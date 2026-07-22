@@ -48,24 +48,26 @@ const Document = ({
   }, [document.description, isMobileView]);
 
   return (
-    <ListItem disableGutters sx={{ display: 'block', py: 0.5 }}>
+    <ListItem disableGutters sx={{
+      display: 'block'
+    }}>
       <Paper
         variant="outlined"
-        sx={{ p: 2, borderRadius: 2, bgcolor: 'grey.50' }}>
+        sx={{ p: 1, borderRadius: 2, bgcolor: 'grey.50' }}>
         {/* Header row: title + chip + actions */}
         <Box
           sx={{
             display: 'flex',
             alignItems: 'flex-start',
             justifyContent: 'space-between',
-            gap: 1
+            gap: 0.5
           }}>
           <Box
             sx={{
               display: 'flex',
               alignItems: 'center',
               flexWrap: 'wrap',
-              gap: 1,
+              gap: 0.5,
               flex: 1,
               minWidth: 0
             }}>
@@ -118,7 +120,7 @@ const Document = ({
 
         {/* Description with truncation */}
         {document.description && (
-          <Box mt={1}>
+          <Box mt={0.5}>
             <Typography
               ref={descriptionRef}
               variant="body2"
@@ -142,7 +144,11 @@ const Document = ({
                 endIcon={
                   descriptionExpanded ? <ExpandLessIcon /> : <ExpandMoreIcon />
                 }
-                sx={{ p: 0, minWidth: 0, mt: 0.5, textTransform: 'none' }}
+                sx={{
+                  p: 0.25,
+                  minWidth: 0,
+                  textTransform: 'none'
+                }}
                 onClick={() => setDescriptionExpanded(e => !e)}>
                 {formatMessage({
                   id: descriptionExpanded ? 'Show less' : 'Read more'
@@ -154,7 +160,7 @@ const Document = ({
 
         {/* Files */}
         {document.files && (
-          <Box mt={1}>
+          <Box mt={0.5}>
             <Files
               files={document.files}
               description={document.description}
@@ -164,7 +170,6 @@ const Document = ({
           </Box>
         )}
       </Paper>
-
       {onUnlink && (
         <StandardDialog
           open={isUnlinkDialogOpen}

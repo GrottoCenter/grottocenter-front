@@ -9,7 +9,7 @@ import { licensesODBLink } from '../../../../conf/externalLinks';
 // forms. Purposely low-key (small muted caption + inline text links) so it
 // informs without competing with the form itself.
 const LicenceBoxStyle = styled(Typography)`
-  margin-top: ${({ theme }) => theme.spacing(2)};
+  margin-top: ${({ theme }) => theme.spacing(1)};
   text-align: center;
   color: ${({ theme }) => theme.palette.text.secondary};
 

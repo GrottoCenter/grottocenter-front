@@ -101,10 +101,10 @@ const CRSMenu = ({ anchorEl = null, onClose, preferred, projections = [], onSele
           overflow: 'hidden'
         }
       }}>
-      <Box sx={{ p: 1, borderBottom: 1, borderColor: 'divider' }}>
+      <Box sx={{ p: 0.5, borderBottom: 1, borderColor: 'divider' }}>
         <ListSubheader
           disableSticky
-          sx={{ lineHeight: '28px', fontWeight: 'bold', px: 0 }}>
+          sx={{ lineHeight: '28px', fontWeight: 'bold', px: 0.25 }}>
           <Translate>Coordinate system</Translate>
         </ListSubheader>
         <SearchInput
@@ -113,10 +113,13 @@ const CRSMenu = ({ anchorEl = null, onClose, preferred, projections = [], onSele
           sx={{ '& input': { fontSize: '1.4rem' } }}
         />
       </Box>
-
       <MenuList
         dense
-        sx={{ overflowY: 'auto', overflowX: 'hidden', flex: 1, py: 0.5 }}>
+        sx={{
+          overflowY: 'auto',
+          overflowX: 'hidden',
+          flex: 1
+        }}>
         {showWGS84 && (
           <MenuItem onClick={() => onSelect(WGS84_DD)}>
             <ListItemIcon>

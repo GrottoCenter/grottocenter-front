@@ -56,7 +56,7 @@ const StyledListItem = styled(ListItem, {
 }));
 
 const EmptyStateContainer = styled(Box)(({ theme }) => ({
-  padding: theme.spacing(4),
+  padding: theme.spacing(3),
   textAlign: 'center',
   color: theme.palette.text.secondary
 }));
@@ -65,13 +65,12 @@ const EmptyStateContainer = styled(Box)(({ theme }) => ({
 // client), standard page card on desktop.
 //
 // The height fills the viewport minus everything around the card. Each term is
-// derived from the theme rather than hardcoded: theme.spacing is an array here
-// (see grottoTheme), so spacing(2) is 8px and spacing(1) is 4px — not the MUI
-// defaults. `containerPb` must stay in sync with PageContainer's own `pb: 1`.
+// derived from the theme rather than hardcoded. `containerPb` must stay in sync
+// with PageContainer's own `pb: 1`.
 const StyledCard = styled(Card)(({ theme }) => {
-  const containerPb = theme.spacing(1);
+  const containerPb = theme.spacing(0.5);
   const chromeXs = containerPb;
-  const chromeMd = `${theme.spacing(2)} * 2 + ${containerPb}`; // margins + pb
+  const chromeMd = `${theme.spacing(1)} * 2 + ${containerPb}`; // margins + pb
   return `
   display: flex;
   flex-direction: column;
@@ -82,7 +81,7 @@ const StyledCard = styled(Card)(({ theme }) => {
   height: calc(100dvh - ${theme.appBarHeight}px - (${chromeXs}));
 
   ${theme.breakpoints.up('md')} {
-    margin: ${theme.spacing(2)};
+    margin: ${theme.spacing(1)};
     border-radius: ${theme.shape.borderRadius};
     box-shadow: ${theme.shadows[1]};
     height: calc(100vh - ${theme.appBarHeight}px - (${chromeMd}));
@@ -151,7 +150,7 @@ const MessagesPage = () => {
   const renderContent = () => {
     if (status === REDUCER_STATUS.LOADING && conversations.length === 0) {
       return (
-        <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
+        <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
           <CircularProgress />
         </Box>
       );
@@ -275,7 +274,7 @@ const MessagesPage = () => {
                   flexDirection: 'column',
                   bgcolor: 'background.paper'
                 }}>
-                  <Box sx={{ p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: 1, borderColor: 'divider' }}>
+                  <Box sx={{ p: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: 1, borderColor: 'divider' }}>
                     <Typography variant="h6" component="h1">
                       {formatMessage({ id: 'Conversations', defaultMessage: 'Conversations' })}
                     </Typography>
@@ -305,7 +304,7 @@ const MessagesPage = () => {
                     {renderContent()}
 
                     {totalCount > PAGE_SIZE && (
-                      <Box sx={{ display: 'flex', justifyContent: 'center', py: 2 }}>
+                      <Box sx={{ display: 'flex', justifyContent: 'center', py: 1 }}>
                         <Pagination
                           count={Math.ceil(totalCount / PAGE_SIZE)}
                           page={page}

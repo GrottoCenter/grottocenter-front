@@ -15,8 +15,8 @@ const SensitiveLocationPlaceholder = () => {
         flex: 1,
         bgcolor: 'secondary.veryLight',
         borderRadius: 1,
-        p: 3,
-        gap: 1
+        p: 2,
+        gap: 0.5
       }}>
       <LockOutlinedIcon sx={{ fontSize: 48, color: 'secondary.main' }} />
       <Typography variant="h6" color="secondary.main">

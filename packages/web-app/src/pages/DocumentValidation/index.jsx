@@ -20,7 +20,7 @@ import Translate from '../../components/common/Translate';
 const Wrapper = styled('div')`
   display: flex;
   flex-direction: column;
-  padding: ${({ theme }) => theme.spacing(2)};
+  padding: ${({ theme }) => theme.spacing(1)};
 `;
 
 const DocumentValidationPage = () => {

@@ -14,7 +14,7 @@ import { styled } from '@mui/material/styles';
 import PageContainer from '../PageContainer';
 
 const Card = styled(MuiCard)`
-  margin: ${({ theme }) => theme.spacing(2)};
+  margin: ${({ theme }) => theme.spacing(1)};
   height: 100%;
   display: flex;
   flex-direction: column;
@@ -48,7 +48,7 @@ const FixedContent = ({ subheader, title, icon, action, content }) => (
             display: 'flex',
             alignItems: 'flex-start',
             justifyContent: 'space-between',
-            gap: 1
+            gap: 0.5
           }}>
           <Box sx={{ flex: 1, minWidth: 0 }}>
             {title !== undefined && title !== null ? (

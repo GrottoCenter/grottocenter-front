@@ -67,12 +67,12 @@ import {
 const HalfSplitContainer = styled('div')`
   display: flex;
   flex-direction: column;
-  gap: ${({ theme }) => theme.spacing(2)};
+  gap: ${({ theme }) => theme.spacing(1)};
 
   ${({ theme }) => theme.breakpoints.up('sm')} {
     flex-direction: row;
     align-items: stretch;
-    gap: ${({ theme }) => theme.spacing(3)};
+    gap: ${({ theme }) => theme.spacing(2)};
   }
 `;
 
@@ -319,7 +319,7 @@ export const Entry = ({
           {/* Tab Information */}
           <div>
             {isLoading && (
-              <Card sx={{ m: 2, p: 3 }}>
+              <Card sx={{ m: 1, p: 2 }}>
                 <Skeleton height={300} />
                 <Skeleton height={80} />
                 <Skeleton height={100} />
@@ -328,7 +328,7 @@ export const Entry = ({
               </Card>
             )}
             {error && (
-              <Card sx={{ m: 2, p: 3 }}>
+              <Card sx={{ m: 1, p: 2 }}>
                 <Alert
                   title={formatMessage({
                     id: 'Error, the entrance data you are looking for is not available.'
@@ -340,7 +340,7 @@ export const Entry = ({
             {entrance && (
               <>
                 {entrance.isDeleted && (
-                  <Box sx={{ m: 2 }}>
+                  <Box sx={{ m: 1 }}>
                     <DeletedCard
                       entityType={DELETED_ENTITIES.entrance}
                       entity={entrance}
@@ -364,7 +364,7 @@ export const Entry = ({
                   }}
                 />
                 {entrance.isSensitive && isAdmin && (
-                  <Box sx={{ mx: 2, mt: 2 }}>
+                  <Box sx={{ mx: 1, mt: 1 }}>
                     <SensitiveCaveWarning />
                   </Box>
                 )}
@@ -393,7 +393,7 @@ export const Entry = ({
                           component="div"
                           variant="caption"
                           color="text.secondary"
-                          sx={{ mt: 2 }}>
+                          sx={{ mt: 1 }}>
                           {entrance.author && (
                             <AuthorAndDate
                               author={entrance.author}
@@ -457,7 +457,7 @@ export const Entry = ({
           {/* Tab 1 — Documents */}
           <div>
             {isLoading && (
-              <Card sx={{ m: 2, p: 3 }}>
+              <Card sx={{ m: 1, p: 2 }}>
                 <Skeleton height={40} width="100%" />
                 <Skeleton height={60} />
                 <Skeleton height={60} />
@@ -485,7 +485,7 @@ export const Entry = ({
           {/* Tab 3 — Comments */}
           <div>
             {isLoading && (
-              <Card sx={{ m: 2, p: 3 }}>
+              <Card sx={{ m: 1, p: 2 }}>
                 <Skeleton height={40} width="100%" />
                 <Skeleton height={80} />
                 <Skeleton height={80} />

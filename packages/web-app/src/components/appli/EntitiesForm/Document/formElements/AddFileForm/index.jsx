@@ -67,7 +67,6 @@ const AuthDocSelect = ({ value, onChange, disabled = false }) => {
           variant="filled"
           required={!disabled}
           label={formatMessage({ id: 'Authorization from authors' })}
-          sx={{ mt: 1.5 }}
           InputProps={{
             ...params.InputProps,
             endAdornment: (
@@ -213,14 +212,16 @@ const AddFileForm = ({
         disabled={loading}
       />
       {showAuthorization && visibleFiles.length > 0 && (
-        <Box sx={{ mt: 2 }}>
+        <Box sx={{ mt: 1 }}>
           <FormControl
             component="fieldset"
             required
-            sx={{ display: 'block', mt: 2 }}>
+            sx={{ display: 'block', mt: 1 }}>
             <FormLabel
               component="legend"
-              sx={{ fontSize: '0.875rem', mb: 0.5 }}>
+              sx={{
+                fontSize: '0.875rem'
+              }}>
               {isAuthForced
                 ? formatMessage({
                     id: 'The licensing type of the document has been deduced from the parent document'
@@ -269,7 +270,7 @@ const AddFileForm = ({
                 fullWidth
                 required
                 disabled={isLicenseForced}
-                sx={{ mt: 2 }}>
+                sx={{ mt: 1 }}>
                 <InputLabel>
                   {isLicenseForced
                     ? formatMessage({

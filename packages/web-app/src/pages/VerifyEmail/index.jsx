@@ -7,7 +7,7 @@ import { styled } from '@mui/material/styles';
 import Layout from '../../components/common/Layouts/Fixed/FixedContent';
 
 const SpacedCenteredButton = styled(Button)`
-  margin: ${({ theme }) => theme.spacing(3)} auto;
+  margin: ${({ theme }) => theme.spacing(2)} auto;
 `;
 
 const VerifyEmailPage = ({

@@ -18,8 +18,8 @@ const ListItemStyled = styled(ListItem)`
   flex-direction: row;
   align-items: flex-start;
   border-top: 1px solid ${({ theme }) => theme.palette.divider};
-  padding-top: ${({ theme }) => theme.spacing(1)};
-  padding-bottom: ${({ theme }) => theme.spacing(1)};
+  padding-top: ${({ theme }) => theme.spacing(0.5)};
+  padding-bottom: ${({ theme }) => theme.spacing(0.5)};
 `;
 
 const History = ({ history, entranceId, isEditAllowed, isMoving, onMoveUp, onMoveDown, isFirst, isLast }) => {
@@ -82,7 +82,7 @@ const History = ({ history, entranceId, isEditAllowed, isMoving, onMoveUp, onMov
           />
         )}
       </Box>
-      <Box sx={{ flexShrink: 0, ml: 1 }}>
+      <Box sx={{ flexShrink: 0, ml: 0.5 }}>
         <ActionButtons
           isLoading={isActionLoading}
           isUpdating={isUpdateFormVisible}

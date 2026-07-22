@@ -18,9 +18,9 @@ const ActionTypes = {
 const Wrapper = styled('div')`
   display: flex;
   flex-direction: row;
-  margin-top: ${({ theme }) => theme.spacing(3)};
+  margin-top: ${({ theme }) => theme.spacing(2)};
   & > button {
-    margin-right: ${({ theme }) => theme.spacing(2)};
+    margin-right: ${({ theme }) => theme.spacing(1)};
   }
 `;
 

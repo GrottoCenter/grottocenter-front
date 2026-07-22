@@ -57,14 +57,14 @@ const SubscriptionsList = ({
   ];
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
       {sections.map(({ labelId, emptyId, items, type }) => (
         <Box key={labelId}>
           <Typography variant="h4" gutterBottom>
             {formatMessage({ id: labelId })}
           </Typography>
           {items.length > 0 ? (
-            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
               {items.map(item => (
                 <SubscriptionListItem
                   canUnsubscribe={canUnsubscribe}

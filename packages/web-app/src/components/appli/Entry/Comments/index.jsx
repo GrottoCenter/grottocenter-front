@@ -78,7 +78,7 @@ const Comments = ({ entranceId, comments, isEditAllowed }) => {
           )}
 
           {comments.length > 0 ? (
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
               {(() => {
                 const sorted = sortByRelevance(comments);
                 const activeIds = sorted
@@ -88,7 +88,7 @@ const Comments = ({ entranceId, comments, isEditAllowed }) => {
                   <Paper
                     key={comment.id}
                     variant="outlined"
-                    sx={{ p: 2, borderRadius: 2, bgcolor: 'grey.50' }}>
+                    sx={{ p: 1, borderRadius: 2, bgcolor: 'grey.50' }}>
                     <Comment
                       comment={comment}
                       entranceId={entranceId}

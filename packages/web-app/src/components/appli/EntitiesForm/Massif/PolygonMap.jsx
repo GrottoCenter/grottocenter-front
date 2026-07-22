@@ -224,10 +224,7 @@ const PolygonMap = ({ onChange, onValidationChange, data }) => {
 
   // Collect all kink points across all layers for rendering on the map
   const allKinkPoints = useMemo(
-    () => [
-      ...mapLayers.flatMap(l => l.kinkPoints || []),
-      ...interPolygonKinks
-    ],
+    () => [...mapLayers.flatMap(l => l.kinkPoints || []), ...interPolygonKinks],
     [mapLayers, interPolygonKinks]
   );
 
@@ -655,14 +652,13 @@ const PolygonMap = ({ onChange, onValidationChange, data }) => {
 
   return (
     <>
-      <Box sx={{ mb: 2 }}>
+      <Box sx={{ mb: 1 }}>
         <ShapefileImport onImport={handleShapefileImport} />
       </Box>
-
       <Box
         sx={{
           display: 'flex',
-          gap: 2,
+          gap: 1,
           flexDirection: { xs: 'column', md: 'row' }
         }}>
         <Box
@@ -689,12 +685,10 @@ const PolygonMap = ({ onChange, onValidationChange, data }) => {
               backgroundColor: 'rgba(255, 255, 255, 0.7)',
               zIndex: 1000,
               borderRadius: 1,
-              ...(validating
-                ? { display: 'flex' }
-                : { visibility: 'hidden' })
+              ...(validating ? { display: 'flex' } : { visibility: 'hidden' })
             }}>
             <CircularProgress size={40} />
-            <Typography variant="body2" sx={{ mt: 1 }}>
+            <Typography variant="body2" sx={{ mt: 0.5 }}>
               {formatMessage({ id: 'Validating polygons...' })}
             </Typography>
           </Box>

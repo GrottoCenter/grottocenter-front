@@ -181,11 +181,11 @@ const ComposeDialog = ({ open, onClose, prefilledRecipientId }) => {
         sx={{
           display: 'flex',
           flexDirection: 'column',
-          gap: 2,
-          pt: 1,
+          gap: 1,
+          pt: 0.5,
           height: isMobile ? '100%' : 'auto'
         }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <Typography variant="subtitle2" sx={{ minWidth: 'fit-content' }}>
             {formatMessage({ id: 'To', defaultMessage: 'To' })}
           </Typography>
@@ -259,7 +259,7 @@ const ComposeDialog = ({ open, onClose, prefilledRecipientId }) => {
         />
 
         {sendError && (
-          <Typography color="error" variant="body2" sx={{ mt: 1 }}>
+          <Typography color="error" variant="body2" sx={{ mt: 0.5 }}>
             {sendError}
           </Typography>
         )}

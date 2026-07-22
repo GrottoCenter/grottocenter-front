@@ -24,20 +24,22 @@ const TourTooltip = ({ currentStep, steps, setCurrentStep, setIsOpen }) => {
 
   return (
     <Card sx={{ maxWidth: 320 }} elevation={8}>
-      <CardContent sx={{ pb: 1 }}>
+      <CardContent sx={{ pb: 0.5 }}>
         <Box
           sx={{
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'flex-start',
-            mb: 1
+            mb: 0.5
           }}>
           <Typography variant="subtitle2">{step.title}</Typography>
           <IconButton
             size="small"
             onClick={() => setIsOpen(false)}
             aria-label={formatMessage({ id: 'Tour - Skip' })}
-            sx={{ ml: 1, mt: -0.5 }}>
+            sx={{
+              ml: 0.5
+            }}>
             <CloseIcon fontSize="small" />
           </IconButton>
         </Box>
@@ -46,7 +48,7 @@ const TourTooltip = ({ currentStep, steps, setCurrentStep, setIsOpen }) => {
         </Typography>
         {isLastStep && (
           <FormControlLabel
-            sx={{ mt: 1 }}
+            sx={{ mt: 0.5 }}
             control={
               <Checkbox
                 size="small"
@@ -62,7 +64,7 @@ const TourTooltip = ({ currentStep, steps, setCurrentStep, setIsOpen }) => {
           />
         )}
       </CardContent>
-      <CardActions sx={{ justifyContent: 'flex-end', pt: 0 }}>
+      <CardActions sx={{ justifyContent: 'flex-end', pt: 0.25 }}>
         {currentStep > 0 && (
           <Button size="small" onClick={() => setCurrentStep(s => s - 1)}>
             {formatMessage({ id: 'Tour - Back' })}

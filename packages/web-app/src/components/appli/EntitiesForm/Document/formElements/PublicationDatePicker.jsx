@@ -108,8 +108,8 @@ const PublicationDatePicker = ({ required = false, label = null }) => {
   ];
 
   return (
-    <Box sx={{ mt: 2 }}>
-      <Box sx={{ mb: 1 }}>
+    <Box sx={{ mt: 1 }}>
+      <Box sx={{ mb: 0.5 }}>
         <Typography variant="body2" color="text.secondary">
           {label ?? (
             <Translate>
@@ -118,7 +118,9 @@ const PublicationDatePicker = ({ required = false, label = null }) => {
             </Translate>
           )}
           {required && (
-            <Box component="span" aria-hidden sx={{ color: 'error.main', ml: 0.3 }}>
+            <Box component="span" aria-hidden sx={{
+              color: 'error.main'
+            }}>
               {'*'}
             </Box>
           )}
@@ -131,7 +133,7 @@ const PublicationDatePicker = ({ required = false, label = null }) => {
           onChange={handleGranularityChange}
           size="small"
           aria-label={formatMessage({ id: 'Date precision' })}
-          sx={{ display: 'flex', width: '100%', mb: 0 }}>
+          sx={{ display: 'flex', width: '100%', mb: 0.25 }}>
           {granularityOptions.map(opt => (
             <ToggleButton key={opt.value} value={opt.value} sx={{ flex: 1 }}>
               {opt.label}

@@ -13,7 +13,7 @@ const ChipsGroup = () => {
     )
   });
   return (
-    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
       {ENTRANCE_BOOLEAN_CHARACTERISTICS.map(({ field, label, icon }) => (
         <BoolToggleChip
           key={field}

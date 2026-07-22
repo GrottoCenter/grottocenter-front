@@ -32,7 +32,7 @@ const Api = () => {
     <Layout
       title={formatMessage({ id: 'Grottocenter API' })}
       content={
-        <Grid container justifyContent="center" spacing={2}>
+        <Grid container justifyContent="center" spacing={1}>
           <Grid size={{ xs: 12, md: 6 }} style={{ maxWidth: '400px' }}>
             <img
               style={{ width: '100%' }}

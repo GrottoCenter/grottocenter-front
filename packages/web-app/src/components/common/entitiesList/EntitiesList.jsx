@@ -60,7 +60,7 @@ const EntitiesList = ({
       sx={{
         display: 'grid',
         gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(3, 1fr)' },
-        gap: { xs: 2, md: 3 }
+        gap: { xs: 1, md: 2 }
       }}>
       {sorted.map(e => (
         <ListItemComponent key={e.id} {...listItemProps(e)} />

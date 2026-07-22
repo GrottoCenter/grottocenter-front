@@ -24,7 +24,7 @@ const BoolToggleChip = ({ name, label, icon, control, disabled = false }) => (
         onChange={() => onChange(!value)}
         sx={{
           textTransform: 'none',
-          gap: 1,
+          gap: 0.5,
           borderRadius: 2,
           px: '12px',
           color: 'text.secondary',

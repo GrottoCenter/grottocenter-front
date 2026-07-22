@@ -49,7 +49,7 @@ const Documents = ({ documents, entranceId, isEditAllowed }) => {
         icon={
           permissions.isAuth &&
           isEditAllowed && (
-            <Box display="flex" gap={1}>
+            <Box display="flex" gap={0.5}>
               <Tooltip title={formatMessage({ id: 'Create a new document' })}>
                 <Button
                   color="secondary"
@@ -127,7 +127,6 @@ const Documents = ({ documents, entranceId, isEditAllowed }) => {
           </>
         }
       />
-
     </>
   );
 };

@@ -420,9 +420,8 @@ const ContextStep = ({ initialCaveId, caveIdLocked }) => {
 
   return (
     <Box
-      sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}
+      sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}
       data-testid="context-step">
-
       {/* Location mode toggle */}
       <Box>
         <Typography variant="subtitle2" gutterBottom>
@@ -459,10 +458,9 @@ const ContextStep = ({ initialCaveId, caveIdLocked }) => {
           />
         </RadioGroup>
       </Box>
-
       {/* Cave selection */}
       {showCave && (
-        <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
+        <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 0.5 }}>
           <Box sx={{ flex: 1, maxWidth: 480 }}>
             <Typography variant="subtitle2" gutterBottom>
               {formatMessage({ id: 'ImportObservationsWizard.ContextStep.caveLabel' })}
@@ -478,7 +476,7 @@ const ContextStep = ({ initialCaveId, caveIdLocked }) => {
             <IconButton
               onClick={handleClearCave}
               size="small"
-              sx={{ mt: 4 }}
+              sx={{ mt: 3 }}
               data-testid="clear-cave-button"
               aria-label={formatMessage({
                 id: 'ImportObservationsWizard.ContextStep.clearCave'
@@ -488,10 +486,9 @@ const ContextStep = ({ initialCaveId, caveIdLocked }) => {
           )}
         </Box>
       )}
-
       {/* Point label + location */}
       {showPoint && (
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
           <TextField
             required
             variant="filled"
@@ -534,9 +531,8 @@ const ContextStep = ({ initialCaveId, caveIdLocked }) => {
           )}
         </Box>
       )}
-
       {/* Observation name + language */}
-      <Box sx={{ display: 'flex', gap: 2, maxWidth: 480, alignItems: 'flex-start' }}>
+      <Box sx={{ display: 'flex', gap: 1, maxWidth: 480, alignItems: 'flex-start' }}>
         <TextField
           variant="filled"
           label={formatMessage({
@@ -560,7 +556,6 @@ const ContextStep = ({ initialCaveId, caveIdLocked }) => {
           />
         </Box>
       </Box>
-
       {/* Authors */}
       <Box sx={{ maxWidth: 480 }}>
         <AuthorsSelect
@@ -572,7 +567,6 @@ const ContextStep = ({ initialCaveId, caveIdLocked }) => {
           })}
         />
       </Box>
-
       {/* License selector */}
       <FormControl size="small" sx={{ minWidth: 240, maxWidth: 320 }} required>
         <InputLabel id="license-label">
@@ -597,9 +591,8 @@ const ContextStep = ({ initialCaveId, caveIdLocked }) => {
           </FormHelperText>
         )}
       </FormControl>
-
       {/* Sampling interval — with tooltip */}
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
         <TextField
           variant="filled"
           label={formatMessage({
@@ -621,14 +614,13 @@ const ContextStep = ({ initialCaveId, caveIdLocked }) => {
           <HelpOutlineIcon fontSize="small" color="action" />
         </Tooltip>
       </Box>
-
       {/* Optional fields */}
       <Box>
         <Typography variant="subtitle2" gutterBottom>
           {formatMessage({ id: 'ImportObservationsWizard.ContextStep.optionalFieldsTitle' })}
         </Typography>
 
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, maxWidth: 480 }}>
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, maxWidth: 480 }}>
           {/* Data quality */}
           <FormControl size="small" sx={{ minWidth: 200, maxWidth: 240 }}>
             <InputLabel id="data-quality-label">

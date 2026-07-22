@@ -126,11 +126,15 @@ const Footer = () => {
   return (
     <FooterRoot>
       <MainSection>
-        <Grid container spacing={4}>
+        <Grid container spacing={3}>
           {/* Column 1 — Brand + Licenses */}
           <Grid size={{ xs: 12, sm: 6, md: 4 }}>
             <Box
-              sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1.5 }}>
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 1
+              }}>
               <Box
                 sx={{
                   backgroundColor: 'rgba(255,255,255,0.92)',
@@ -149,7 +153,10 @@ const Footer = () => {
             </Box>
             <Typography
               variant="body2"
-              sx={{ color: 'rgba(255,255,255,0.5)', lineHeight: 1.7, mb: 1.5 }}>
+              sx={{
+                color: 'rgba(255,255,255,0.5)',
+                lineHeight: 1.7
+              }}>
               {formatMessage({ id: 'Published by' })}{' '}
               <InternationalizedLink links={wikicavesLink}>
                 <Box
@@ -311,7 +318,6 @@ const Footer = () => {
           </Grid>
         </Grid>
       </MainSection>
-
       <LicenseBar>
         <LicenseLine>
           <InternationalizedLink links={licenceLinks}>
@@ -325,7 +331,7 @@ const Footer = () => {
             })}
           </Typography>
         </LicenseLine>
-        <LicenseLine sx={{ mb: 0 }}>
+        <LicenseLine sx={{ mb: 0.25 }}>
           <InternationalizedLink links={licensesODBLink}>
             <LicenseBadge src="/images/odbl.png" alt="ODbL licence" />
           </InternationalizedLink>

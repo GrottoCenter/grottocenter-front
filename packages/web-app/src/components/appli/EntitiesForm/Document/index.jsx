@@ -37,7 +37,7 @@ import Translate from '../../../common/Translate';
 
 const SpacedButton = styled(Button)`
   ${({ theme }) => `
-    margin: ${theme.spacing(1)};
+    margin: ${theme.spacing(0.5)};
 `}
 `;
 
@@ -286,7 +286,7 @@ const DocumentSubmission = ({ onCancel }) => {
             <CenteredBlock>
               {documentState.errorMessages.map(error => (
                 <Fade in={documentState.errorMessages.length > 0} key={error}>
-                  <Alert severity="error" sx={{ mt: 1 }}>
+                  <Alert severity="error" sx={{ mt: 0.5 }}>
                     {formatMessage({ id: error })}
                   </Alert>
                 </Fade>

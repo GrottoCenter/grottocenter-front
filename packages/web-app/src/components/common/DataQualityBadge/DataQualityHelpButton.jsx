@@ -22,7 +22,7 @@ const DataQualityHelpButton = () => {
         onClose={() => setAnchor(null)}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
         slotProps={{ paper: { sx: { maxWidth: 700, width: '90vw' } } }}>
-        <Box px={2} pt={2}>
+        <Box px={1} pt={1}>
           <Typography variant="h6">
             {formatMessage({ id: 'Data quality computation' })}
           </Typography>

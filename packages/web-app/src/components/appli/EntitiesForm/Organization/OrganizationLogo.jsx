@@ -10,7 +10,7 @@ import 'react-phone-input-2/lib/style.css';
 import 'react-dropzone-uploader/dist/styles.css';
 
 const FormControl = styled(MuiFormControl)`
-  padding-bottom: ${({ theme }) => theme.spacing(4)};
+  padding-bottom: ${({ theme }) => theme.spacing(3)};
 `;
 
 const OrganizationLogo = ({ control, errors }) => {

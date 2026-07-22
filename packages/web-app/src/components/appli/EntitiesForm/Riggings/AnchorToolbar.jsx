@@ -50,18 +50,17 @@ const AnchorToolbar = ({ onInsert }) => {
           <EditNoteIcon fontSize="small" />
         </IconButton>
       </Tooltip>
-
       <Popover
         open={Boolean(anchorEl)}
         anchorEl={anchorEl}
         onClose={() => setAnchorEl(null)}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
         transformOrigin={{ vertical: 'top', horizontal: 'right' }}>
-        <Box sx={{ pt: 2, px: 2, pb: 2, minWidth: 200 }}>
-          <Typography variant="caption" color="text.secondary" display="block" sx={{ mb: 1 }}>
+        <Box sx={{ pt: 1, px: 1, pb: 1, minWidth: 200 }}>
+          <Typography variant="caption" color="text.secondary" display="block" sx={{ mb: 0.5 }}>
             {formatMessage({ id: 'Click to insert' })}
           </Typography>
-          <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
+          <Box sx={{ display: 'flex', gap: 0.5, mb: 1 }}>
             {ARROWS.map(arrow => (
               <Tooltip key={arrow} title={`${formatMessage({ id: 'Click to insert' })} ${arrow}`}>
                 <IconButton
@@ -87,20 +86,25 @@ const AnchorToolbar = ({ onInsert }) => {
             ))}
           </Box>
           <Divider sx={{ mb: '12px' }} />
-          <Typography variant="subtitle2" fontWeight="bold" sx={{ mb: 1 }}>
+          <Typography variant="subtitle2" fontWeight="bold" sx={{ mb: 0.5 }}>
             {formatMessage({ id: 'Anchor notation legend' })}
           </Typography>
-          <Divider sx={{ mb: 1 }} />
-          <Table size="small" sx={{ mb: 0 }}>
+          <Divider sx={{ mb: 0.5 }} />
+          <Table size="small" sx={{ mb: 0.25 }}>
             <TableBody>
               {ANCHOR_LEGEND.map(({ abbrevKey, labelKey }) => (
                 <TableRow key={abbrevKey}>
-                  <TableCell sx={{ border: 0, py: 0.5, pr: 2 }}>
+                  <TableCell sx={{
+                    border: 0,
+                    pr: 2
+                  }}>
                     <Typography variant="body2" fontWeight="bold" component="span">
                       {formatMessage({ id: abbrevKey })}
                     </Typography>
                   </TableCell>
-                  <TableCell sx={{ border: 0, py: 0.5 }}>
+                  <TableCell sx={{
+                    border: 0
+                  }}>
                     <Typography variant="body2" component="span">
                       {formatMessage({ id: labelKey })}
                     </Typography>

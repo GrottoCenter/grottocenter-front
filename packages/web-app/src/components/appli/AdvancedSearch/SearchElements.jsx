@@ -43,7 +43,7 @@ const StyledForm = styled('form')`
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
-  gap: ${({ theme }) => theme.spacing(2)};
+  gap: ${({ theme }) => theme.spacing(1)};
   margin-bottom: 0;
 `;
 
@@ -60,7 +60,7 @@ export const SearchForm = ({ children, onSubmit, title }) => (
       <Typography
         variant="overline"
         color="text.secondary"
-        sx={{ width: '100%', display: 'block', mb: -1 }}>
+        sx={{ width: '100%', display: 'block', mb: -0.5 }}>
         <Translate>{title}</Translate>
       </Typography>
     )}
@@ -78,7 +78,7 @@ export const SearchFormContainer = styled('div')`
   flex-wrap: wrap;
   align-items: center;
   width: 100%;
-  gap: ${({ theme }) => theme.spacing(2)};
+  gap: ${({ theme }) => theme.spacing(1)};
 
   @media (min-width: 550px) {
     > * {
@@ -400,16 +400,20 @@ export const SearchSlider = ({
 
   return (
     <FormControl
-      sx={{ flex: 1, minWidth: '200px', mx: 3, alignItems: 'center' }}>
+      sx={{ flex: 1, minWidth: '200px', mx: 2, alignItems: 'center' }}>
       <FormLabel
-        sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: -2 }}>
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          mb: -2
+        }}>
         {icon}
         {label}
         <IconButton
           size="small"
           onClick={handleClear}
           aria-label={formatMessage({ id: 'clear filter' })}
-          sx={{ visibility: isDirty ? 'visible' : 'hidden', p: 0 }}>
+          sx={{ visibility: isDirty ? 'visible' : 'hidden', p: 0.25 }}>
           <ClearIcon fontSize="small" />
         </IconButton>
       </FormLabel>
@@ -476,13 +480,19 @@ SearchSlider.propTypes = {
 export const SearchBooleanToggle = ({ label, onChange, value, icon }) => {
   const { formatMessage } = useIntl();
   return (
-    <FormControl sx={{ alignItems: 'center', mx: 2 }}>
+    <FormControl sx={{ alignItems: 'center', mx: 1 }}>
       <FormLabel
-        sx={{ mb: 1, display: 'flex', alignItems: 'center', gap: 0.5 }}>
+        sx={{
+          mb: 0.5,
+          display: 'flex',
+          alignItems: 'center'
+        }}>
         {icon}
         <Translate>{label}</Translate>
       </FormLabel>
-      <Box sx={{ display: 'flex', gap: 0.75 }}>
+      <Box sx={{
+        display: 'flex'
+      }}>
         <Chip
           label={formatMessage({ id: 'Yes' })}
           size="small"
@@ -608,7 +618,10 @@ export const SearchMatchAllFieldsToogle = ({ isChecked, onChange }) => {
         />
       }
       label={
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+        <Box sx={{
+          display: 'flex',
+          alignItems: 'center'
+        }}>
           <Translate>Matching all fields</Translate>
           <Tooltip
             title={formatMessage({
@@ -695,7 +708,7 @@ export const ActiveFilterChips = ({
   if (chips.length === 0) return null;
 
   return (
-    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mt: 1, mb: 1 }}>
+    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mt: 0.5, mb: 0.5 }}>
       {chips.map(chip => (
         <Chip
           key={chip.key}
@@ -742,7 +755,7 @@ export const SearchFilterAccordion = ({
       '&:before': { display: 'none' }
     }}>
     <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
         <FilterAltIcon color="primary" />
         <Typography variant="body1">
           <Translate>Advanced filters</Translate>
@@ -757,7 +770,7 @@ export const SearchFilterAccordion = ({
         )}
       </Box>
     </AccordionSummary>
-    <AccordionDetails sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+    <AccordionDetails sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
       {children}
     </AccordionDetails>
   </Accordion>
@@ -770,7 +783,7 @@ SearchFilterAccordion.propTypes = {
 };
 
 export const SearchActionButtons = ({ onReset, showReset = true }) => (
-  <CardActions sx={{ padding: 0, justifyContent: 'flex-end', width: '100%' }}>
+  <CardActions sx={{ padding: 0.25, justifyContent: 'flex-end', width: '100%' }}>
     {showReset && (
       <Button
         type="button"

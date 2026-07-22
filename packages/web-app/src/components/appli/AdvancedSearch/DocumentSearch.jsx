@@ -159,7 +159,7 @@ const DocumentSearch = () => {
           e.name,
           <Box
             key={e.name}
-            sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
             <Icon sx={{ fontSize: 18, color: 'text.secondary' }} />
             <Translate>{e.name}</Translate>
           </Box>
@@ -183,7 +183,7 @@ const DocumentSearch = () => {
         sx={{
           display: 'flex',
           flexDirection: { xs: 'column', sm: 'row' },
-          gap: 1,
+          gap: 0.5,
           alignItems: { sm: 'center' },
           width: '100%'
         }}>
@@ -201,11 +201,10 @@ const DocumentSearch = () => {
             options={docTypeOptions}
             onChange={e => updateFilter('type', e)}
             value={filterState.type}
-            sx={{ mx: { xs: 0, sm: '4px' } }}
+            sx={{ mx: { xs: 0.25, sm: '4px' } }}
           />
         </Box>
       </Box>
-
       <SearchFilterAccordion
         filterCount={advancedFilterCount}
         expanded={advancedExpanded}
@@ -368,7 +367,6 @@ const DocumentSearch = () => {
           onChange={e => setMatchAllFields(e)}
         />
       </SearchFilterAccordion>
-
       <SearchActionButtons
         showReset={query !== '' || countActiveFilters(filterState) > 0}
         onReset={() => {
@@ -382,7 +380,6 @@ const DocumentSearch = () => {
           startAdvancedsearch('', initialFilterState, true);
         }}
       />
-
       <ActiveFilterChips
         filterState={filterState}
         query={query}

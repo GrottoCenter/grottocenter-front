@@ -20,7 +20,7 @@ const EntranceIcon = styled('img')`
 `;
 
 const StyledBadge = styled(Badge)`
-  margin: ${({ theme }) => theme.spacing(1)};
+  margin: ${({ theme }) => theme.spacing(0.5)};
 `;
 
 const BadgesSection = ({

@@ -77,7 +77,7 @@ const BaseCard = ({ to, icon, children, itemActionButton }) => (
         {children}
       </Box>
       {itemActionButton && (
-        <Box className="remove-btn" sx={{ display: 'flex', alignItems: 'center', pr: 1 }}>
+        <Box className="remove-btn" sx={{ display: 'flex', alignItems: 'center', pr: 0.5 }}>
           {itemActionButton}
         </Box>
       )}
@@ -108,7 +108,7 @@ export const CaveCard = ({ cave, itemActionButton }) => {
           {cave.name}
         </Typography>
         {(cave.depth || cave.length) && (
-          <Box sx={{ display: 'flex', gap: 2, mt: 1 }}>
+          <Box sx={{ display: 'flex', gap: 1, mt: 0.5 }}>
             {cave.depth && (
               <StatBadge src={depthIcon} alt="depth" value={`${cave.depth.toLocaleString(locale)} m`} />
             )}
@@ -178,7 +178,7 @@ export const OrganizationCard = ({ organization, itemActionButton }) => {
         to={to}
         icon={<CustomIcon type="organization" size={32} />}
         itemActionButton={itemActionButton}>
-        <Box sx={{ flex: 1, minWidth: 0, display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
+        <Box sx={{ flex: 1, minWidth: 0, display: 'flex', alignItems: 'center', gap: 0.5, flexWrap: 'wrap' }}>
           <Typography
             variant="body1"
             fontWeight={600}

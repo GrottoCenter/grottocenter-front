@@ -19,13 +19,15 @@ const ObstacleCard = ({
   const { formatMessage } = useIntl();
 
   return (
-    <Card variant="outlined" sx={{ px: 1, py: 0.5 }}>
+    <Card variant="outlined" sx={{
+      px: 0.5
+    }}>
       <Box
         sx={{
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          mb: 0
+          mb: 0.25
         }}>
         <Typography variant="caption" fontWeight="medium">
           {`${formatMessage({ id: 'Obstacle' })} ${index + 1}`}
@@ -39,8 +41,8 @@ const ObstacleCard = ({
           orientation="horizontal"
         />
       </Box>
-      <Stack spacing={0}>
-        <Box sx={{ display: 'flex', gap: 1 }}>
+      <Stack spacing={0.25}>
+        <Box sx={{ display: 'flex', gap: 0.5 }}>
           <Box sx={{ flex: 1, minWidth: 0 }}>
             <ObstacleField
               control={control}

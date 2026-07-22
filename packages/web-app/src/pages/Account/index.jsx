@@ -80,7 +80,7 @@ import { notificationPreferencesUrl } from '../../conf/apiRoutes';
 // ─── Shared styled components ─────────────────────────────────────────────────
 
 const SectionPaper = styled(Paper)(({ theme }) => ({
-  marginBottom: theme.spacing(2),
+  marginBottom: theme.spacing(1),
   overflow: 'hidden'
 }));
 
@@ -88,7 +88,7 @@ const SectionHeader = styled(Box)(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'space-between',
-  padding: theme.spacing(2, 3)
+  padding: theme.spacing(1, 2)
 }));
 
 const SectionHeaderTitle = styled(Box)(() => ({
@@ -98,14 +98,14 @@ const SectionHeaderTitle = styled(Box)(() => ({
 }));
 
 const SectionBody = styled(Box)(({ theme }) => ({
-  padding: theme.spacing(2, 3, 3)
+  padding: theme.spacing(1, 2, 2)
 }));
 
 const InfoRow = styled(Box)(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
-  gap: theme.spacing(2),
-  padding: theme.spacing(1, 0),
+  gap: theme.spacing(1),
+  padding: theme.spacing(0.5, 0.25),
   borderBottom: `1px solid ${theme.palette.divider}`,
   '&:last-child': { borderBottom: 'none' }
 }));
@@ -121,8 +121,8 @@ const EditFooter = styled(Box)(({ theme }) => ({
   display: 'flex',
   justifyContent: 'flex-end',
   alignItems: 'center',
-  gap: theme.spacing(1),
-  marginTop: theme.spacing(3)
+  gap: theme.spacing(0.5),
+  marginTop: theme.spacing(2)
 }));
 
 // ─── Generic section shell ────────────────────────────────────────────────────
@@ -172,7 +172,7 @@ SettingSection.propTypes = {
 
 // ─── Save/cancel footer used in edit forms ────────────────────────────────────
 
-const BoolValue = ({ value }) => <BoolIcon value={value} sx={{ ml: 1 }} />;
+const BoolValue = ({ value }) => <BoolIcon value={value} sx={{ ml: 0.5 }} />;
 
 BoolValue.propTypes = {
   value: PropTypes.bool.isRequired
@@ -273,7 +273,7 @@ const PersonalInfoSection = ({ account, onSaved }) => {
     <>
       <InfoRow>
         <InfoLabel variant="body2">{formatMessage({ id: 'Id' })}</InfoLabel>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
           <Typography variant="body1">{account?.id ?? '—'}</Typography>
           {account?.id && (
             <Button
@@ -485,7 +485,7 @@ const EmailSecuritySection = ({ account, onSaved, isAdmin = false }) => {
         sx={{
           display: 'flex',
           alignItems: 'center',
-          gap: 1,
+          gap: 0.5,
           flexWrap: 'wrap'
         }}>
         <Typography variant="body1">{account?.mail || '—'}</Typography>
@@ -564,7 +564,7 @@ const EmailSecuritySection = ({ account, onSaved, isAdmin = false }) => {
             {formatMessage({ id: 'Password' })}
           </InfoLabel>
           {!isChangingPassword ? (
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
               <Typography variant="body1" sx={{ letterSpacing: 3 }}>
                 ••••••••
               </Typography>
@@ -697,7 +697,7 @@ const MfaSection = () => {
       <InfoLabel variant="body2">
         {formatMessage({ id: 'mfaStatus' })}
       </InfoLabel>
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, flexWrap: 'wrap' }}>
         {isMfaEnabled ? (
           <>
             <Chip
@@ -731,7 +731,6 @@ const MfaSection = () => {
   return (
     <>
       {viewContent}
-
       <StandardDialog
         open={isDialogOpen}
         onClose={handleClose}
@@ -757,7 +756,7 @@ const MfaSection = () => {
             </Button>
           </>
         }>
-        <Box display="flex" flexDirection="column" gap={2}>
+        <Box display="flex" flexDirection="column" gap={1}>
           <Alert
             severity="warning"
             content={formatMessage({ id: 'mfaResetWarning' })}
@@ -1008,11 +1007,11 @@ const PreferencesSection = ({ account, onSaved }) => {
           )}
         />
       </FormRow>
-      <Box sx={{ mt: 2 }}>
+      <Box sx={{ mt: 1 }}>
         <Typography
           variant="subtitle2"
           color="text.secondary"
-          sx={{ mb: 1 }}>
+          sx={{ mb: 0.5 }}>
           {formatMessage({ id: 'Notification Preferences' })}
         </Typography>
         <Controller
@@ -1213,23 +1212,23 @@ const AccountPage = () => {
   ];
 
   const settingsContent = (
-    <Box sx={{ p: { xs: 1, sm: 2 } }}>
+    <Box sx={{ p: { xs: 0.5, sm: 1 } }}>
       {isAccountLoading && (
         <>
           <Skeleton
             variant="rectangular"
             height={130}
-            sx={{ mb: 2, borderRadius: 1 }}
+            sx={{ mb: 1, borderRadius: 1 }}
           />
           <Skeleton
             variant="rectangular"
             height={160}
-            sx={{ mb: 2, borderRadius: 1 }}
+            sx={{ mb: 1, borderRadius: 1 }}
           />
           <Skeleton
             variant="rectangular"
             height={130}
-            sx={{ mb: 2, borderRadius: 1 }}
+            sx={{ mb: 1, borderRadius: 1 }}
           />
         </>
       )}
@@ -1270,11 +1269,11 @@ const AccountPage = () => {
         {/* Tab Activités */}
         <div>
           {isPersonFetching ? (
-            <Box sx={{ px: 2 }}>
+            <Box sx={{ px: 1 }}>
               <Skeleton
                 variant="rectangular"
                 height={100}
-                sx={{ mb: 2, borderRadius: 1 }}
+                sx={{ mb: 1, borderRadius: 1 }}
               />
               <Skeleton
                 variant="rectangular"
@@ -1401,7 +1400,7 @@ const AccountPage = () => {
         {/* Tab Documents */}
         <div>
           {isPersonFetching && (
-            <Card sx={{ m: 2, p: 3 }}>
+            <Card sx={{ m: 1, p: 2 }}>
               <Skeleton height={40} width="100%" />
               <Skeleton height={60} />
               <Skeleton height={60} />
@@ -1415,7 +1414,6 @@ const AccountPage = () => {
           )}
         </div>
       </PageTabs>
-
       <StandardDialog
         open={!!pendingLeaveOrg}
         onClose={() => setPendingLeaveOrg(null)}

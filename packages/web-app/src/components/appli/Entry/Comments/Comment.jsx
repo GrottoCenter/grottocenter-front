@@ -29,7 +29,7 @@ const StyledListItemText = styled(ListItemText)`
 `;
 
 const StyledRatings = styled(Ratings)`
-  gap: ${({ theme }) => theme.spacing(2)};
+  gap: ${({ theme }) => theme.spacing(1)};
 `;
 
 const Comment = ({ comment, entranceId, isEditAllowed, isMoving, onMoveUp, onMoveDown, isFirst, isLast }) => {
@@ -81,7 +81,7 @@ const Comment = ({ comment, entranceId, isEditAllowed, isMoving, onMoveUp, onMov
 
   return (
     <ListItemStyled disableGutters>
-      <Box sx={{ float: 'right', ml: 1 }}>
+      <Box sx={{ float: 'right', ml: 0.5 }}>
         <ActionButtons
           isLoading={isActionLoading}
           isUpdating={isUpdateFormVisible}
@@ -141,9 +141,9 @@ const Comment = ({ comment, entranceId, isEditAllowed, isMoving, onMoveUp, onMov
           {(comment.aestheticism || comment.caving || comment.approach ||
             comment.eTTrail?.length > 0 ||
             comment.eTUnderground?.length > 0) && (
-            <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 1, pt: 1 }}>
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 0.5, pt: 0.5 }}>
               {(comment.eTTrail?.length > 0 || comment.eTUnderground?.length > 0) && (
-                <Box sx={{ display: 'flex', gap: 2 }}>
+                <Box sx={{ display: 'flex', gap: 1 }}>
                   {comment.eTTrail?.length > 0 && (
                     <Duration
                       image={timeToGoIcon}

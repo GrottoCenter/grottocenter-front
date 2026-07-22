@@ -43,12 +43,12 @@ import {
 const HalfSplitContainer = styled('div')`
   display: flex;
   flex-direction: column;
-  gap: ${({ theme }) => theme.spacing(2)};
+  gap: ${({ theme }) => theme.spacing(1)};
 
   ${({ theme }) => theme.breakpoints.up('sm')} {
     flex-direction: row;
     align-items: stretch;
-    gap: ${({ theme }) => theme.spacing(3)};
+    gap: ${({ theme }) => theme.spacing(2)};
   }
 `;
 
@@ -221,7 +221,7 @@ export const Network = ({ isLoading, error, cave }) => {
           {/* Tab 0 — Information */}
           <div>
             {isLoading && (
-              <Card sx={{ m: 2, p: 3 }}>
+              <Card sx={{ m: 1, p: 2 }}>
                 <Skeleton height={300} />
                 <Skeleton height={100} />
                 <Skeleton height={100} />
@@ -229,7 +229,7 @@ export const Network = ({ isLoading, error, cave }) => {
               </Card>
             )}
             {error && (
-              <Card sx={{ m: 2, p: 3 }}>
+              <Card sx={{ m: 1, p: 2 }}>
                 <Alert
                   title={formatMessage({
                     id: 'Error, the network data you are looking for is not available.'
@@ -241,7 +241,7 @@ export const Network = ({ isLoading, error, cave }) => {
             {cave && (
               <>
                 {cave.isDeleted && (
-                  <Box sx={{ m: 2 }}>
+                  <Box sx={{ m: 1 }}>
                     <DeletedCard
                       entityType={DELETED_ENTITIES.network}
                       entity={cave}
@@ -277,7 +277,7 @@ export const Network = ({ isLoading, error, cave }) => {
                             flex: 1,
                             display: 'flex',
                             flexDirection: 'column',
-                            gap: 2
+                            gap: 1
                           }}>
                           <Box sx={{ minHeight: 200 }}>
                             <EntrancesMap
@@ -303,7 +303,7 @@ export const Network = ({ isLoading, error, cave }) => {
                           component="div"
                           variant="caption"
                           color="text.secondary"
-                          sx={{ mt: 2 }}>
+                          sx={{ mt: 1 }}>
                           {cave.author && (
                             <AuthorAndDate
                               author={cave.author}

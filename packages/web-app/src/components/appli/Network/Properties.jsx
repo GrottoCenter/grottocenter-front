@@ -17,7 +17,7 @@ const GlobalWrapper = styled('div')`
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: ${({ theme }) => theme.spacing(2)};
+  gap: ${({ theme }) => theme.spacing(1)};
 `;
 
 const Properties = ({ isLoading, cave }) => {
@@ -32,13 +32,13 @@ const Properties = ({ isLoading, cave }) => {
   return (
     <GlobalWrapper>
       {hasCharacteristics && (
-        <Paper variant="outlined" sx={{ p: 2, borderRadius: 2, bgcolor: 'grey.50' }}>
+        <Paper variant="outlined" sx={{ p: 1, borderRadius: 2, bgcolor: 'grey.50' }}>
           <InfoSection title={formatMessage({ id: 'Characteristics' })}>
             <Box
               sx={{
                 display: 'grid',
                 gridTemplateColumns: 'repeat(2, 1fr)',
-                gap: 1
+                gap: 0.5
               }}>
               <DepthProperty depth={cave?.depth} isLoading={isLoading} />
               <LengthProperty length={cave?.length} isLoading={isLoading} />
@@ -52,7 +52,7 @@ const Properties = ({ isLoading, cave }) => {
         </Paper>
       )}
       {cave?.exploringOrganizations?.length > 0 && (
-        <Paper variant="outlined" sx={{ p: 2, borderRadius: 2, bgcolor: 'grey.50' }}>
+        <Paper variant="outlined" sx={{ p: 1, borderRadius: 2, bgcolor: 'grey.50' }}>
           <InfoSection title={formatMessage({ id: 'Exploring organizations' })}>
             <Box
               sx={{

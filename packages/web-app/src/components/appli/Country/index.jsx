@@ -121,88 +121,88 @@ const Country = ({
 
   return (
     <PageContainer>
-    <div ref={componentRef}>
-      <PageHeader
-        title={title}
-        icon={<CustomIcon type="country" />}
-        subheader={subheader}
-        actions={actions}
-      />
-      {isLoading && (
-        <Card sx={{ m: 2, p: 3 }}>
-          <Skeleton height={300} />
-          <Skeleton height={100} />
-        </Card>
-      )}
-      {error && (
-        <Card sx={{ m: 2, p: 3 }}>
-          <Alert
-            title={formatMessage({
-              id: 'Error, the country data you are looking for is not available.'
-            })}
-            severity="error"
-          />
-        </Card>
-      )}
-      {country && (
-        <>
-          {!isEmpty(position) && (
+      <div ref={componentRef}>
+        <PageHeader
+          title={title}
+          icon={<CustomIcon type="country" />}
+          subheader={subheader}
+          actions={actions}
+        />
+        {isLoading && (
+          <Card sx={{ m: 1, p: 2 }}>
+            <Skeleton height={300} />
+            <Skeleton height={100} />
+          </Card>
+        )}
+        {error && (
+          <Card sx={{ m: 1, p: 2 }}>
+            <Alert
+              title={formatMessage({
+                id: 'Error, the country data you are looking for is not available.'
+              })}
+              severity="error"
+            />
+          </Card>
+        )}
+        {country && (
+          <>
+            {!isEmpty(position) && (
+              <ScrollableContent
+                content={
+                  <Box sx={{ minHeight: 200 }}>
+                    <CustomMapContainer
+                      center={position}
+                      dragging={!isMobile}
+                      forceCentering
+                      scrollWheelZoom={false}
+                      wholePage={false}
+                      shouldChangeControlInFullscreen={false}
+                      zoom={4}>
+                      <Marker icon={CoordinatesMarker} position={position} />
+                    </CustomMapContainer>
+                  </Box>
+                }
+              />
+            )}
+            <Box sx={{ mx: 1, mb: 0.5 }}>
+              <Button
+                fullWidth
+                variant="contained"
+                color="primary"
+                size="large"
+                startIcon={<CustomIcon type="entrance" size={24} />}
+                onClick={() => navigate(`/ui/countries/${country.id}/entrances`)}>
+                {formatMessage({ id: 'Entrances list' })}
+                {dataCountry?.nb_caves ? ` (${dataCountry.nb_caves})` : ''}
+              </Button>
+            </Box>
+            <StatisticsDataDashboard
+              countryId={country.id}
+              description={formatMessage({
+                id: 'Discover the numbers about this country and its massifs and caves.'
+              })}
+            />
+            {(country.guidelines?.length > 0 || permissions.isAuth) && (
+              <Guidelines
+                entityType="countries"
+                entityId={country.id}
+                guidelines={country.guidelines}
+              />
+            )}
+            <AssociationSection
+              organizations={country?.organizations}
+              entityType="country"
+              entityId={country?.id}
+              isLoading={isLoading}
+            />
             <ScrollableContent
-              content={
-                <Box sx={{ minHeight: 200 }}>
-                  <CustomMapContainer
-                    center={position}
-                    dragging={!isMobile}
-                    forceCentering
-                    scrollWheelZoom={false}
-                    wholePage={false}
-                    shouldChangeControlInFullscreen={false}
-                    zoom={4}>
-                    <Marker icon={CoordinatesMarker} position={position} />
-                  </CustomMapContainer>
-                </Box>
-              }
+              anchorId="regions"
+              title={formatMessage({ id: 'Regions' })}
+              content={<RegionsList countryId={country.id} />}
             />
-          )}
-          <Box sx={{ mx: 2, mb: 1 }}>
-            <Button
-              fullWidth
-              variant="contained"
-              color="primary"
-              size="large"
-              startIcon={<CustomIcon type="entrance" size={24} />}
-              onClick={() => navigate(`/ui/countries/${country.id}/entrances`)}>
-              {formatMessage({ id: 'Entrances list' })}
-              {dataCountry?.nb_caves ? ` (${dataCountry.nb_caves})` : ''}
-            </Button>
-          </Box>
-          <StatisticsDataDashboard
-            countryId={country.id}
-            description={formatMessage({
-              id: 'Discover the numbers about this country and its massifs and caves.'
-            })}
-          />
-          {(country.guidelines?.length > 0 || permissions.isAuth) && (
-            <Guidelines
-              entityType="countries"
-              entityId={country.id}
-              guidelines={country.guidelines}
-            />
-          )}
-          <AssociationSection
-            organizations={country?.organizations}
-            entityType="country"
-            entityId={country?.id}
-            isLoading={isLoading}
-          />
-          <ScrollableContent
-            anchorId="regions"
-            title={formatMessage({ id: 'Regions' })}
-            content={<RegionsList countryId={country.id} />}
-          />
-        </>
-      )}
-    </div>
+          </>
+        )}
+      </div>
     </PageContainer>
   );
 };

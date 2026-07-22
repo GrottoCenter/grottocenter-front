@@ -138,7 +138,7 @@ const MobileToolbar = ({
     <Toolbar
       disableGutters
       variant="dense"
-      sx={{ display: 'flex', alignItems: 'center', gap: 1, minHeight: 48 }}>
+      sx={{ display: 'flex', alignItems: 'center', gap: 0.5, minHeight: 48 }}>
       {sortableColumns.length > 0 && (
         <SortMenu
           sortableColumns={sortableColumns}

@@ -126,7 +126,7 @@ const Person = ({ isLoading, person, error }) => {
       label={formatMessage({ id: 'You' }).toUpperCase()}
       color="secondary"
       sx={{
-        ml: 3,
+        ml: 2,
         fontSize: '1.4rem',
         letterSpacing: 1.5,
         verticalAlign: 'middle',
@@ -211,7 +211,7 @@ const Person = ({ isLoading, person, error }) => {
         {/* Tab Profil */}
         <div>
           {isLoading && (
-            <Card sx={{ m: 2, p: 3 }}>
+            <Card sx={{ m: 1, p: 2 }}>
               <Skeleton />
               <Skeleton height={200} />
               <Skeleton height={100} />
@@ -221,7 +221,7 @@ const Person = ({ isLoading, person, error }) => {
             </Card>
           )}
           {!!error && (
-            <Card sx={{ m: 2, p: 3 }}>
+            <Card sx={{ m: 1, p: 2 }}>
               <Alert
                 title={formatMessage({
                   id: 'Error, the person you are looking for is not available.'
@@ -250,7 +250,7 @@ const Person = ({ isLoading, person, error }) => {
         {/* Tab Activités */}
         <div>
           {isLoading && (
-            <Card sx={{ m: 2, p: 3 }}>
+            <Card sx={{ m: 1, p: 2 }}>
               <Skeleton height={100} />
               <Skeleton height={100} />
             </Card>
@@ -300,7 +300,7 @@ const Person = ({ isLoading, person, error }) => {
         {/* Tab Documents */}
         <div>
           {isLoading && (
-            <Card sx={{ m: 2, p: 3 }}>
+            <Card sx={{ m: 1, p: 2 }}>
               <Skeleton height={40} width="100%" />
               <Skeleton height={60} />
               <Skeleton height={60} />

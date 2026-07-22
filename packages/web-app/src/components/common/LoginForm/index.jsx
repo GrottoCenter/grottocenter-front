@@ -69,11 +69,10 @@ const TotpStep = ({
   const msg = errorMessage();
 
   return (
-    <Box display="flex" flexDirection="column" gap={2}>
+    <Box display="flex" flexDirection="column" gap={1}>
       <Typography variant="body2" color="text.secondary" textAlign="center">
         {formatMessage({ id: 'mfaEnrollmentStep3Body' })}
       </Typography>
-
       <FormControl variant="filled">
         <InputLabel htmlFor="totp-code-input">
           {formatMessage({ id: 'mfaCodeLabel' })}
@@ -93,7 +92,6 @@ const TotpStep = ({
           disabled={isLoading}
         />
       </FormControl>
-
       {msg && (
         <Fade in>
           <Alert
@@ -112,7 +110,6 @@ const TotpStep = ({
           </Alert>
         </Fade>
       )}
-
       <Button
         size="small"
         variant="text"
@@ -202,7 +199,6 @@ const LoginForm = ({
           <FormHelperText id="login-email-error">{emailError}</FormHelperText>
         )}
       </FormControl>
-
       <FormControl variant="filled" error={!!passwordError}>
         <InputLabel htmlFor="login-password">
           {formatMessage({ id: 'Password' })}
@@ -239,10 +235,9 @@ const LoginForm = ({
           </FormHelperText>
         )}
       </FormControl>
-
       {serverError && (
         <Fade in>
-          <Alert severity="error" sx={{ mt: 1 }}>
+          <Alert severity="error" sx={{ mt: 0.5 }}>
             {serverError}
           </Alert>
         </Fade>
