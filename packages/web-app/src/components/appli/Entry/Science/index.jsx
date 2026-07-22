@@ -10,11 +10,12 @@ import {
   List,
   ListItem,
   ListItemText,
+  Tooltip,
   Typography
 } from '@mui/material';
 import PestControlIcon from '@mui/icons-material/PestControl';
-import FileUploadIcon from '@mui/icons-material/FileUpload';
 
+import { EntityIcon } from '../../../../pages/EntityCreation/entityConfig';
 import ScrollableContent from '../../../common/Layouts/Fixed/ScrollableContent';
 import Alert from '../../../common/Alert';
 
@@ -56,6 +57,23 @@ const Science = ({ caveId }) => {
       anchorId="science"
       defaultExpanded
       title={formatMessage({ id: 'Science' })}
+      icon={
+        <Box display="flex" gap={0.5}>
+          <Tooltip title={formatMessage({ id: 'Import observations' })}>
+            <Button
+              color="secondary"
+              size="small"
+              variant="outlined"
+              onClick={handleImportObservations}
+              startIcon={
+                <EntityIcon iconType="scientific_observation" size={20} />
+              }
+              data-testid="import-observations-btn">
+              {formatMessage({ id: 'New' })}
+            </Button>
+          </Tooltip>
+        </Box>
+      }
       content={
         <>
           <Alert
@@ -64,17 +82,6 @@ const Science = ({ caveId }) => {
               id: 'Science data integration in progress.'
             })}
           />
-
-          <Box sx={{ mt: 1, display: 'flex', gap: 0.5 }}>
-            <Button
-              variant="outlined"
-              color="secondary"
-              startIcon={<FileUploadIcon />}
-              onClick={handleImportObservations}
-              data-testid="import-observations-btn">
-              {formatMessage({ id: 'Import observations' })}
-            </Button>
-          </Box>
 
           <Box sx={{ mt: 1 }}>
             <Typography
