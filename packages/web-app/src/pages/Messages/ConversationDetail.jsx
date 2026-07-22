@@ -1,4 +1,5 @@
-import React, { useEffect, useState, useRef, useCallback } from 'react';
+import React, { useEffect, useState, useRef, useCallback, useMemo } from 'react';
+import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useIntl, FormattedDate } from 'react-intl';
@@ -16,11 +17,12 @@ import {
 } from '@mui/material';
 import Linkify from 'linkify-react';
 import AppLink from '../../components/common/AppLink';
+import UserAvatar from '../../components/common/UserAvatar';
 import linkifyOptions from '../../helpers/linkifyOptions';
 import SendIcon from '@mui/icons-material/Send';
 import FlagIcon from '@mui/icons-material/Flag';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { styled } from '@mui/material/styles';
+import { styled, alpha } from '@mui/material/styles';
 
 import { fetchConversationMessages } from '../../actions/Messaging/GetConversationMessages';
 import { sendMessage } from '../../actions/Messaging/SendMessage';
@@ -30,6 +32,7 @@ import StandardDialog from '../../components/common/StandardDialog';
 import { useNotification } from '../../hooks';
 
 const MESSAGES_PAGE_SIZE = 20;
+const GROUP_GAP_MS = 5 * 60 * 1000; // Consecutive messages within 5 min are grouped
 
 const DetailContainer = styled(Box)(({ theme }) => ({
   display: 'flex',
@@ -43,58 +46,207 @@ const MessagesList = styled(List)(({ theme }) => ({
   overflowY: 'auto',
   overflowX: 'hidden',
   minWidth: 0,
-  padding: theme.spacing(1),
+  padding: theme.spacing(1, 1.5),
   display: 'flex',
-  flexDirection: 'column-reverse' // Shows latest at the bottom
+  flexDirection: 'column-reverse', // Shows latest at the bottom
+  backgroundColor: theme.palette.background.paper
 }));
 
 // See StyledListItem in ./index.jsx: $-props must not reach the DOM.
 const MessageBubble = styled(Paper, {
   shouldForwardProp: prop => !prop.startsWith('$')
-})(({ theme, $isMine }) => ({
-  padding: theme.spacing(0.5, 1),
-  maxWidth: '75%',
-  minWidth: 0,
-  width: 'fit-content',
-  alignSelf: $isMine ? 'flex-end' : 'flex-start',
-  backgroundColor: $isMine
-    ? theme.palette.primary.light
-    : theme.palette.grey[200],
-  color: $isMine
-    ? theme.palette.primary.contrastText
-    : theme.palette.text.primary,
-  marginBottom: theme.spacing(0.5),
-  borderRadius: 16,
-  borderBottomRightRadius: $isMine ? 4 : 16,
-  borderBottomLeftRadius: $isMine ? 16 : 4,
-  wordBreak: 'break-word',
-  overflowWrap: 'anywhere',
-  '& a': {
-    color: $isMine ? theme.palette.primary.contrastText : undefined,
-    textDecoration: 'underline'
-  }
+})(({ theme, $isMine, $isFirstOfGroup, $isLastOfGroup }) => {
+  const softMineBg = alpha(theme.palette.primary.main, 0.28);
+  const theirsBg =
+    theme.palette.mode === 'dark'
+      ? theme.palette.grey[800]
+      : theme.palette.grey[200];
+  return {
+    padding: theme.spacing(0.75, 1.25),
+    maxWidth: '85%',
+    minWidth: 0,
+    width: 'fit-content',
+    alignSelf: $isMine ? 'flex-end' : 'flex-start',
+    backgroundColor: $isMine ? softMineBg : theirsBg,
+    color: theme.palette.text.primary,
+    marginBottom: theme.spacing($isLastOfGroup ? 1.5 : 0.25),
+    marginTop: $isFirstOfGroup ? theme.spacing(0.25) : 0,
+    borderRadius: 16,
+    // Tail on last of group, on sender's side
+    borderBottomRightRadius: $isMine && $isLastOfGroup ? 4 : 16,
+    borderBottomLeftRadius: !$isMine && $isLastOfGroup ? 4 : 16,
+    boxShadow: `0 1px 0.5px ${alpha(theme.palette.common.black, 0.08)}`,
+    wordBreak: 'break-word',
+    overflowWrap: 'anywhere',
+    '& a': {
+      color: theme.palette.primary.main,
+      textDecoration: 'underline'
+    },
+    [theme.breakpoints.up('sm')]: {
+      maxWidth: '75%'
+    }
+  };
+});
+
+const MessageDate = styled(Box)(({ theme }) => ({
+  fontSize: '1.1rem',
+  color: theme.palette.text.secondary,
+  opacity: 0.7,
+  marginTop: '2px',
+  textAlign: 'right',
 }));
 
-const MessageDate = styled(Typography, {
-  shouldForwardProp: prop => !prop.startsWith('$')
-})(({ theme, $isMine }) => ({
-  fontSize: '0.75rem',
-  color: $isMine
-    ? theme.palette.primary.contrastText
-    : theme.palette.text.secondary,
-  opacity: 0.7,
-  marginTop: '4px',
-  textAlign: 'right'
+const DaySeparatorContainer = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  justifyContent: 'center',
+  margin: theme.spacing(1.5, 0, 1)
+}));
+
+const DaySeparatorChip = styled(Typography)(({ theme }) => ({
+  fontSize: '0.8rem',
+  fontWeight: 500,
+  color: theme.palette.text.secondary,
+  backgroundColor: alpha(theme.palette.background.paper, 0.9),
+  padding: theme.spacing(0.25, 1.25),
+  borderRadius: 12,
+  border: `1px solid ${theme.palette.divider}`,
+  textTransform: 'capitalize',
+  [theme.breakpoints.down('sm')]: {
+    fontSize: '1.1rem'
+  }
 }));
 
 const InputArea = styled(Box)(({ theme }) => ({
   padding: theme.spacing(1),
+  paddingBottom: `max(${theme.spacing(1)}, env(safe-area-inset-bottom))`,
   backgroundColor: theme.palette.background.paper,
   display: 'flex',
-  gap: theme.spacing(0.5),
-  alignItems: 'flex-start',
-  borderTop: `1px solid ${theme.palette.divider}`
+  flexDirection: 'column',
+  gap: theme.spacing(0.25)
 }));
+
+const InputRow = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  alignItems: 'flex-end',
+  gap: theme.spacing(1),
+  padding: theme.spacing(0.5)
+}));
+
+const RoundInput = styled(TextField)(({ theme }) => ({
+  // The theme applies `padding: 4px 0` to every MuiFormControl for form
+  // spacing — we don't want that here, it breaks alignment with the send
+  // button.
+  padding: 0,
+  '& .MuiOutlinedInput-root': {
+    borderRadius: '22px',
+    backgroundColor: theme.palette.background.default,
+    minHeight: 40,
+    [theme.breakpoints.down('sm')]: {
+      minHeight: 44
+    }
+  }
+}));
+
+const SendButton = styled(IconButton)(({ theme }) => ({
+  width: 40,
+  height: 40,
+  flexShrink: 0,
+  backgroundColor: theme.palette.primary.main,
+  color: theme.palette.primary.contrastText,
+  '&:hover': { backgroundColor: theme.palette.primary.dark },
+  '&.Mui-disabled': {
+    backgroundColor: theme.palette.action.disabledBackground,
+    color: theme.palette.action.disabled
+  },
+  [theme.breakpoints.down('sm')]: {
+    width: 44,
+    height: 44
+  }
+}));
+
+const startOfDay = value => {
+  const d = new Date(value);
+  d.setHours(0, 0, 0, 0);
+  return d;
+};
+
+const buildRenderedItems = (msgs, myCaverId) => {
+  const items = [];
+  let prevMsg = null;
+  let prevDayKey = null;
+
+  msgs.forEach(msg => {
+    const dayKey = startOfDay(msg.dateSent).toISOString();
+    if (dayKey !== prevDayKey) {
+      items.push({ type: 'separator', key: `sep-${dayKey}`, date: msg.dateSent });
+      prevDayKey = dayKey;
+      prevMsg = null;
+    }
+    const sameAuthor =
+      prevMsg && prevMsg.caverSender?.id === msg.caverSender?.id;
+    const timeGap = prevMsg
+      ? new Date(msg.dateSent) - new Date(prevMsg.dateSent)
+      : Infinity;
+    const isFirstOfGroup = !sameAuthor || timeGap > GROUP_GAP_MS;
+    items.push({
+      type: 'message',
+      key: msg.id,
+      msg,
+      isMine: msg.caverSender?.id === myCaverId,
+      isFirstOfGroup,
+      isLastOfGroup: false
+    });
+    prevMsg = msg;
+  });
+
+  for (let i = 0; i < items.length; i += 1) {
+    if (items[i].type !== 'message') continue;
+    const next = items[i + 1];
+    if (!next || next.type === 'separator') {
+      items[i].isLastOfGroup = true;
+    } else {
+      const sameAuthor =
+        items[i].msg.caverSender?.id === next.msg.caverSender?.id;
+      const timeGap =
+        new Date(next.msg.dateSent) - new Date(items[i].msg.dateSent);
+      items[i].isLastOfGroup = !sameAuthor || timeGap > GROUP_GAP_MS;
+    }
+  }
+  return items;
+};
+
+const DaySeparator = ({ date }) => {
+  const { formatMessage } = useIntl();
+  const msgDay = startOfDay(date);
+  const today = startOfDay(new Date());
+  const diffDays = Math.round((msgDay - today) / 86400000);
+
+  let content;
+  if (diffDays === 0) {
+    content = formatMessage({ id: 'Today', defaultMessage: 'Today' });
+  } else if (diffDays === -1) {
+    content = formatMessage({ id: 'Yesterday', defaultMessage: 'Yesterday' });
+  } else {
+    content = (
+      <FormattedDate
+        value={date}
+        year="numeric"
+        month="long"
+        day="2-digit"
+      />
+    );
+  }
+  return (
+    <DaySeparatorContainer>
+      <DaySeparatorChip variant="caption">{content}</DaySeparatorChip>
+    </DaySeparatorContainer>
+  );
+};
+
+DaySeparator.propTypes = {
+  date: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(Date)])
+    .isRequired
+};
 
 const BlankStateContainer = styled(Box)(({ theme }) => ({
   display: 'flex',
@@ -135,6 +287,11 @@ const ConversationDetail = () => {
 
   const authState = useSelector(state => state.login);
   const myCaverId = authState?.authTokenDecoded?.id;
+
+  const renderedItems = useMemo(
+    () => buildRenderedItems(messages, myCaverId),
+    [messages, myCaverId]
+  );
 
   const convIdNum = Number(conversationId);
   const activeConv = useSelector(state =>
@@ -328,16 +485,16 @@ Message Body: ${body}`;
       <Box
         sx={{
           p: 1,
-          borderBottom: 1,
-          borderColor: 'divider',
           bgcolor: 'background.paper',
+          boxShadow: '0 2px 4px rgba(0,0,0,0.06)',
+          zIndex: 1,
           display: 'flex',
-          alignItems: 'center'
+          alignItems: 'center',
+          gap: 1
         }}>
         <IconButton
           sx={{
             display: { xs: 'inline-flex', md: 'none' },
-            mr: 1,
             border: '1px solid',
             borderColor: 'divider',
             borderRadius: '8px',
@@ -346,15 +503,17 @@ Message Body: ${body}`;
           onClick={() => navigate('/ui/messages')}>
           <ArrowBackIcon />
         </IconButton>
-        <Box
-          sx={{
-            display: { xs: 'block', md: 'none' },
-            width: '1px',
-            height: '24px',
-            bgcolor: 'divider',
-            mr: 1
-          }}
-        />
+        {otherParticipant && (
+          <UserAvatar
+            username={otherParticipant.nickname}
+            color="primary"
+            sx={{
+              display: { xs: 'inline-flex', md: 'none' },
+              width: 36,
+              height: 36,
+            }}
+          />
+        )}
         <Typography variant="h6">
           {otherParticipant ? (
             <AppLink
@@ -369,10 +528,18 @@ Message Body: ${body}`;
       </Box>
       <MessagesList ref={messagesListRef}>
         <div ref={messagesEndRef} />
-        {[...messages].reverse().map(msg => {
-          const isMine = msg.caverSender?.id === myCaverId;
+        {[...renderedItems].reverse().map(item => {
+          if (item.type === 'separator') {
+            return <DaySeparator key={item.key} date={item.date} />;
+          }
+          const { msg, isMine, isFirstOfGroup, isLastOfGroup } = item;
           return (
-            <MessageBubble key={msg.id} elevation={1} $isMine={isMine}>
+            <MessageBubble
+              key={item.key}
+              elevation={0}
+              $isMine={isMine}
+              $isFirstOfGroup={isFirstOfGroup}
+              $isLastOfGroup={isLastOfGroup}>
               <Box
                 sx={{
                   display: 'flex',
@@ -407,16 +574,11 @@ Message Body: ${body}`;
                   </Tooltip>
                 )}
               </Box>
-              <MessageDate $isMine={isMine}>
+              <MessageDate>
                 <FormattedDate
                   value={msg.dateSent}
-                  year="numeric"
-                  month="short"
-                  day="2-digit"
                   hour="2-digit"
                   minute="2-digit"
-                  timeZone="UTC"
-                  timeZoneName="short"
                 />
               </MessageDate>
             </MessageBubble>
@@ -440,61 +602,60 @@ Message Body: ${body}`;
         )}
       </MessagesList>
       <InputArea>
-        <TextField
-          fullWidth
-          multiline
-          maxRows={4}
-          variant="outlined"
-          placeholder={formatMessage({ id: 'Type a message...' })}
-          value={replyText}
-          onChange={e => setReplyText(e.target.value)}
-          onKeyDown={e => {
-            if (e.key === 'Enter' && !e.shiftKey && !hasVirtualKeyboard) {
-              e.preventDefault();
-              handleSend();
-            }
-          }}
-          slotProps={{
-            htmlInput: {
-              maxLength: 5100,
-              enterKeyHint: hasVirtualKeyboard ? 'enter' : 'send'
-            }
-          }}
-          error={replyText.length > 5000}
-          helperText={
-            // FormHelperText renders a <p>, which cannot contain a <div>.
-            <Box
-              component="span"
-              sx={{
-                display: 'flex',
-                justifyContent: 'flex-end',
-                width: '100%',
-                m: 0.25
-              }}>
-              <span
-                style={{ color: replyText.length > 5000 ? 'red' : 'inherit' }}>
-                {replyText.length > 5000
-                  ? formatMessage({
-                      id: 'Message exceeds 5000 characters limit.',
-                      defaultMessage: 'Message exceeds 5000 characters limit.'
-                    }) + ' '
-                  : ''}
-                {replyText.length} / 5000
-              </span>
-            </Box>
-          }
-          size="small"
-        />
-        <IconButton
-          color="primary"
-          onClick={handleSend}
-          // Pressing a button moves focus to it, which closes the virtual
-          // keyboard. Suppressing the default keeps focus in the input.
-          onMouseDown={e => e.preventDefault()}
-          disabled={!replyText.trim() || replyText.length > 5000 || isSending}
-          sx={{ mt: '4px' }}>
-          {isSending ? <CircularProgress size={24} /> : <SendIcon />}
-        </IconButton>
+        <InputRow>
+          <RoundInput
+            fullWidth
+            multiline
+            maxRows={4}
+            variant="outlined"
+            placeholder={formatMessage({ id: 'Type a message...' })}
+            value={replyText}
+            onChange={e => setReplyText(e.target.value)}
+            onKeyDown={e => {
+              if (e.key === 'Enter' && !e.shiftKey && !hasVirtualKeyboard) {
+                e.preventDefault();
+                handleSend();
+              }
+            }}
+            slotProps={{
+              htmlInput: {
+                maxLength: 5100,
+                enterKeyHint: hasVirtualKeyboard ? 'enter' : 'send'
+              }
+            }}
+            error={replyText.length > 5000}
+            size="small"
+          />
+          <SendButton
+            onClick={handleSend}
+            // Pressing a button moves focus to it, which closes the virtual
+            // keyboard. Suppressing the default keeps focus in the input.
+            onMouseDown={e => e.preventDefault()}
+            disabled={!replyText.trim() || replyText.length > 5000 || isSending}>
+            {isSending ? (
+              <CircularProgress size={20} color="inherit" />
+            ) : (
+              <SendIcon fontSize="small" />
+            )}
+          </SendButton>
+        </InputRow>
+        {replyText.length >= 4000 && (
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'flex-end',
+              px: 1,
+              color: replyText.length > 5000 ? 'error.main' : 'text.secondary',
+              fontSize: '0.75rem'
+            }}>
+            {replyText.length > 5000 &&
+              formatMessage({
+                id: 'Message exceeds 5000 characters limit.',
+                defaultMessage: 'Message exceeds 5000 characters limit.'
+              }) + ' '}
+            {replyText.length} / 5000
+          </Box>
+        )}
       </InputArea>
       <StandardDialog
         open={isReportDialogOpen}
