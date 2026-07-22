@@ -16,6 +16,8 @@ import { NavigateNext } from '@mui/icons-material';
 import useOpenLink from '../../hooks/useOpenLink';
 import CustomIcon from '../../components/common/CustomIcon';
 import DocumentTypeChip from '../../components/common/DocumentTypeChip';
+import LicenseTag from '@/components/common/LicenseTag';
+import { fetchLicense } from '@/actions/Licenses';
 import {
   DOCUMENT_TYPE_ICONS,
   DOCUMENT_TYPE_FALLBACK_ICON,
@@ -97,6 +99,8 @@ const Document = ({
   const permissions = usePermissions();
   const dispatch = useDispatch();
   const { languages } = useSelector(state => state.language);
+  const licenses = useSelector(state => state.licenses.data);
+  const licensesLoading = useSelector(state => state.licenses.loading);
   const [isDeleteConfirmationOpen, setIsDeleteConfirmationOpen] =
     useState(false);
   const [isDeleteConfirmationPermanent, setIsDeleteConfirmationPermanent] =
@@ -107,6 +111,15 @@ const Document = ({
   useEffect(() => {
     if (documentData) setWantedDeletedState(documentData.isDeleted);
   }, [documentData]);
+
+  // The document detail only carries the license name; resolve the full license
+  // object (for its deed URL) from the licenses list.
+  useEffect(() => {
+    if (!licenses && !licensesLoading) dispatch(fetchLicense());
+  }, [dispatch, licenses, licensesLoading]);
+  const licenseObject =
+    (licenses ?? []).find(l => l.name === documentData?.license) ??
+    documentData?.license;
 
   let onEdit = null;
   let onDelete = null;
@@ -476,10 +489,16 @@ const Document = ({
                         value={documentData.issue}
                       />
                       {/* License only applies to attached files, not to the paper document itself */}
-                      {allFiles.length > 0 && (
+                      {allFiles.length > 0 && documentData.license && (
                         <DetailItem
                           label={formatMessage({ id: 'License' })}
-                          value={documentData.license}
+                          value={
+                            <LicenseTag
+                              license={licenseObject}
+                              linkToDeed
+                              size={40}
+                            />
+                          }
                         />
                       )}
                       <DetailItem

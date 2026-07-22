@@ -23,6 +23,7 @@ import {
   uptimeLinks
 } from '../../conf/externalLinks';
 import { useOpenBi } from '../../hooks';
+import ccBySaBadge from '@/assets/icons/cc/cc-by-sa.svg';
 
 const FooterRoot = styled('footer')(({ theme }) => ({
   backgroundColor: theme.palette.primary.main,
@@ -321,7 +322,7 @@ const Footer = () => {
       <LicenseBar>
         <LicenseLine>
           <InternationalizedLink links={licenceLinks}>
-            <LicenseBadge src="/images/CC-BY-SA.png" alt="CC-BY-SA licence" />
+            <LicenseBadge src={ccBySaBadge} alt="CC-BY-SA licence" />
           </InternationalizedLink>
           <Typography
             variant="caption"

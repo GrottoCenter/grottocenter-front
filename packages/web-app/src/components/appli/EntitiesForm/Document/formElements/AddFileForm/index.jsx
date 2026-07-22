@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useContext } from 'react';
 import PropTypes from 'prop-types';
-import { useIntl } from 'react-intl';
+import { useIntl, FormattedMessage } from 'react-intl';
 import { useDispatch, useSelector } from 'react-redux';
 import { useUserProperties } from '../../../../../../hooks';
 import { isEmpty, remove } from 'ramda';
@@ -12,6 +12,7 @@ import {
   FormControlLabel,
   FormLabel,
   InputLabel,
+  Link,
   MenuItem,
   Radio,
   RadioGroup,
@@ -19,6 +20,7 @@ import {
   TextField
 } from '@mui/material';
 
+import { styled } from '@mui/material/styles';
 import ErrorsList from './ErrorsList';
 import { useFileFormats } from '../../../../../../hooks';
 import {
@@ -30,11 +32,19 @@ import {
   validateAndBuildFileEntries
 } from './FileHelpers';
 import FileSelectorInput from '../../../../../common/FileSelectorInput';
+import LicenseTag from '@/components/common/LicenseTag';
+import AppLink from '@/components/common/AppLink';
+import InternationalizedLink from '@/components/common/InternationalizedLink';
+import { licenceLinks } from '@/conf/externalLinks';
 import { fetchLicense } from '../../../../../../actions/Licenses';
 import { getDocuments } from '../../../../../../actions/Document/GetDocuments';
 import { DocumentFormContext } from '../../Provider';
 
 const DEFAULT_LICENSE = 'CC-BY-SA';
+
+const LicenseLink = styled(InternationalizedLink)(({ theme }) => ({
+  color: theme.palette.primary.main
+}));
 
 const AuthDocSelect = ({ value, onChange, disabled = false }) => {
   const { formatMessage } = useIntl();
@@ -134,7 +144,10 @@ const AddFileForm = ({
   // formats th/th2/thconfig/lox/xvi…), so listing the extensions explicitly is
   // what actually makes those files selectable.
   const dottedExtensions = extensions.map(e => `.${e}`);
-  const accept = [acceptConfig?.mime ?? mimeTypes.toString(), ...dottedExtensions]
+  const accept = [
+    acceptConfig?.mime ?? mimeTypes.toString(),
+    ...dottedExtensions
+  ]
     .filter(Boolean)
     .join(',');
   const showAuthDocSelect = option === DOCUMENT_AUTHORIZE_TO_PUBLISH;
@@ -158,7 +171,6 @@ const AddFileForm = ({
   const updateOption = newOption => {
     setOption(newOption);
     setAuthorizationDocument(null);
-
 
     if (!currentUser.id) return;
     const authorsIsOnlyMe =
@@ -235,7 +247,25 @@ const AddFileForm = ({
                 value={AUTHORIZATION_FROM_AUTHOR}
                 disabled={isAuthForced}
                 control={<Radio size="small" />}
-                label={`${formatMessage({ id: 'I hold the publication rights for this content' })} (${formatMessage({ id: 'license CC-BY-SA applies' })})`}
+                label={
+                  <>
+                    {formatMessage({
+                      id: 'I hold the publication rights for this content'
+                    })}
+                    {' ('}
+                    <FormattedMessage
+                      id="license {license} applies"
+                      values={{
+                        license: (
+                          <LicenseLink links={licenceLinks}>
+                            CC-BY-SA
+                          </LicenseLink>
+                        )
+                      }}
+                    />
+                    {')'}
+                  </>
+                }
               />
               <FormControlLabel
                 value={LICENSE_IN_FILE}
@@ -265,6 +295,7 @@ const AddFileForm = ({
           )}
 
           {option && option !== AUTHORIZATION_FROM_AUTHOR && (
+            <>
               <FormControl
                 variant="filled"
                 fullWidth
@@ -280,6 +311,9 @@ const AddFileForm = ({
                 </InputLabel>
                 <Select
                   value={document.license?.name ?? ''}
+                  renderValue={() => (
+                    <LicenseTag license={document.license} withDescription />
+                  )}
                   onChange={e =>
                     setLicense(licenses?.find(l => l.name === e.target.value))
                   }>
@@ -293,12 +327,27 @@ const AddFileForm = ({
                     .sort((a, b) => (a.name > b.name ? 1 : -1))
                     .map(l => (
                       <MenuItem key={l.id} value={l.name}>
-                        {l.name}
+                        <LicenseTag
+                          license={l}
+                          withDescription
+                          recommended={l.name === DEFAULT_LICENSE}
+                        />
                       </MenuItem>
                     ))}
                 </Select>
               </FormControl>
-            )}
+              {document.license?.url && (
+                <Link
+                  component={AppLink}
+                  href={document.license.url}
+                  variant="caption"
+                  color="primary"
+                  sx={{ display: 'inline-block', mt: 0.5 }}>
+                  {formatMessage({ id: 'See the full license' })}
+                </Link>
+              )}
+            </>
+          )}
         </Box>
       )}
       <ErrorsList errors={errors} />
