@@ -6,6 +6,7 @@ import {
   Box,
   Tabs,
   Tab,
+  Fab,
   List,
   ListItem,
   ListItemText,
@@ -21,7 +22,7 @@ import {
   CardContent
 } from '@mui/material';
 
-import EditIcon from '@mui/icons-material/Edit';
+import RateReviewIcon from '@mui/icons-material/RateReview';
 import ArchiveIcon from '@mui/icons-material/Archive';
 import UnarchiveIcon from '@mui/icons-material/Unarchive';
 import { styled } from '@mui/material/styles';
@@ -227,7 +228,7 @@ const MessagesPage = () => {
                   <UserAvatar
                     username={conv.otherParticipant?.nickname}
                     color="primary"
-                    sx={{ width: 40, height: 40 }}
+                    sx={{ width: 40, height: 40  }}
                   />
                 </Badge>
               </ListItemAvatar>
@@ -272,19 +273,31 @@ const MessagesPage = () => {
                   borderColor: 'divider',
                   display: { xs: conversationId ? 'none' : 'flex', md: 'flex' },
                   flexDirection: 'column',
-                  bgcolor: 'background.paper'
+                  bgcolor: 'background.paper',
+                  position: 'relative'
                 }}>
-                  <Box sx={{ p: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: 1, borderColor: 'divider' }}>
-                    <Typography variant="h6" component="h1">
+                  <Box sx={{
+                    p: 1,
+                    display: 'flex',
+                    justifyContent: { xs: 'center', md: 'space-between' },
+                    alignItems: 'center',
+                    borderBottom: 1,
+                    borderColor: 'divider'
+                  }}>
+                    <Typography
+                      variant="h5"
+                      component="h1"
+                      sx={{ fontSize: { xs: '2rem', md: '2.2rem' } }}>
                       {formatMessage({ id: 'Conversations', defaultMessage: 'Conversations' })}
                     </Typography>
                     <Button
                       variant="outlined"
                       color="secondary"
-                      startIcon={<EditIcon />}
+                      startIcon={<RateReviewIcon />}
                       onClick={() => {
                         setComposeOpen(true);
-                      }}>
+                      }}
+                      sx={{ display: { xs: 'none', md: 'inline-flex' } }}>
                       {formatMessage({ id: 'New Message' })}
                     </Button>
                   </Box>
@@ -315,6 +328,20 @@ const MessagesPage = () => {
                       </Box>
                     )}
                   </Box>
+                  <Fab
+                    aria-label={formatMessage({ id: 'New Message' })}
+                    onClick={() => setComposeOpen(true)}
+                    sx={{
+                      display: { xs: 'inline-flex', md: 'none' },
+                      position: 'absolute',
+                      right: 20,
+                      bottom: `max(30px, calc(env(safe-area-inset-bottom) + 16px))`,
+                      bgcolor: 'secondary.main',
+                      color: '#fff',
+                      '&:hover': { bgcolor: 'secondary.dark' }
+                    }}>
+                    <RateReviewIcon />
+                  </Fab>
                 </Box>
 
                 {/* Right Pane: Conversation Details */}

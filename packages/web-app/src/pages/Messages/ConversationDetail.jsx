@@ -9,9 +9,12 @@ import {
   Paper,
   CircularProgress,
   List,
+  ListItemIcon,
+  ListItemText,
+  Menu,
+  MenuItem,
   TextField,
   IconButton,
-  Tooltip,
   Button,
   useMediaQuery
 } from '@mui/material';
@@ -21,6 +24,7 @@ import UserAvatar from '../../components/common/UserAvatar';
 import linkifyOptions from '../../helpers/linkifyOptions';
 import SendIcon from '@mui/icons-material/Send';
 import FlagIcon from '@mui/icons-material/Flag';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { styled, alpha } from '@mui/material/styles';
 
@@ -29,7 +33,7 @@ import { sendMessage } from '../../actions/Messaging/SendMessage';
 import REDUCER_STATUS from '../../reducers/ReducerStatus';
 import Alert from '../../components/common/Alert';
 import StandardDialog from '../../components/common/StandardDialog';
-import { useNotification } from '../../hooks';
+import { useNotification, useLongPress } from '../../hooks';
 
 const MESSAGES_PAGE_SIZE = 20;
 const GROUP_GAP_MS = 5 * 60 * 1000; // Consecutive messages within 5 min are grouped
@@ -78,9 +82,30 @@ const MessageBubble = styled(Paper, {
     boxShadow: `0 1px 0.5px ${alpha(theme.palette.common.black, 0.08)}`,
     wordBreak: 'break-word',
     overflowWrap: 'anywhere',
+    position: 'relative',
     '& a': {
       color: theme.palette.primary.main,
       textDecoration: 'underline'
+    },
+    '& .message-actions-trigger': {
+      opacity: 0,
+      transition: 'opacity 0.15s ease'
+    },
+    '@media (hover: hover)': {
+      '&:hover .message-actions-trigger, & .message-actions-trigger:focus-visible':
+        {
+          opacity: 1
+        }
+    },
+    // On touch devices the reveal-on-hover trick doesn't work; the long-press
+    // gesture is the only way to open the menu, so hide the button entirely.
+    // We also suppress iOS Safari's native text-selection callout, which would
+    // otherwise pop up on the same long-press and compete with our own menu.
+    '@media (hover: none)': {
+      '& .message-actions-trigger': { display: 'none' },
+      userSelect: 'none',
+      WebkitUserSelect: 'none',
+      WebkitTouchCallout: 'none'
     },
     [theme.breakpoints.up('sm')]: {
       maxWidth: '75%'
@@ -248,6 +273,86 @@ DaySeparator.propTypes = {
     .isRequired
 };
 
+const MESSAGE_ACTIONS_MENU_ID = 'message-actions-menu';
+
+const MessageItem = ({ item, isMenuOpen, onOpenMenu }) => {
+  const { formatMessage } = useIntl();
+  const { msg, isMine, isFirstOfGroup, isLastOfGroup } = item;
+
+  const handleLongPress = useCallback(
+    ({ x, y }) => {
+      onOpenMenu(msg, { position: { top: y, left: x } });
+    },
+    [onOpenMenu, msg]
+  );
+
+  // Long-press is the only way to open the menu on touch devices; the ⋮
+  // button is hidden by CSS there (see MessageBubble styles).
+  const longPress = useLongPress(handleLongPress);
+
+  return (
+    <MessageBubble
+      elevation={0}
+      $isMine={isMine}
+      $isFirstOfGroup={isFirstOfGroup}
+      $isLastOfGroup={isLastOfGroup}
+      {...(isMine ? {} : longPress)}>
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'flex-start',
+          gap: 0.5
+        }}>
+        <Box sx={{ flexGrow: 1, minWidth: 0 }}>
+          <Typography variant="body1" sx={{ whiteSpace: 'pre-wrap' }}>
+            <Linkify options={linkifyOptions}>{msg.body}</Linkify>
+          </Typography>
+        </Box>
+        {!isMine && (
+          <IconButton
+            className="message-actions-trigger"
+            size="small"
+            aria-label={formatMessage({
+              id: 'Message actions',
+              defaultMessage: 'Message actions'
+            })}
+            aria-haspopup="menu"
+            aria-expanded={isMenuOpen}
+            aria-controls={isMenuOpen ? MESSAGE_ACTIONS_MENU_ID : undefined}
+            onClick={e => onOpenMenu(msg, { anchor: e.currentTarget })}
+            sx={{
+              color: 'text.secondary',
+              padding: 0.25,
+              mt: '2px',
+              flexShrink: 0
+            }}>
+            <MoreVertIcon fontSize="small" />
+          </IconButton>
+        )}
+      </Box>
+      <MessageDate>
+        <FormattedDate
+          value={msg.dateSent}
+          hour="2-digit"
+          minute="2-digit"
+        />
+      </MessageDate>
+    </MessageBubble>
+  );
+};
+
+MessageItem.propTypes = {
+  item: PropTypes.shape({
+    msg: PropTypes.object.isRequired,
+    isMine: PropTypes.bool.isRequired,
+    isFirstOfGroup: PropTypes.bool.isRequired,
+    isLastOfGroup: PropTypes.bool.isRequired
+  }).isRequired,
+  isMenuOpen: PropTypes.bool.isRequired,
+  onOpenMenu: PropTypes.func.isRequired
+};
+
 const BlankStateContainer = styled(Box)(({ theme }) => ({
   display: 'flex',
   flexDirection: 'column',
@@ -292,6 +397,14 @@ const ConversationDetail = () => {
     () => buildRenderedItems(messages, myCaverId),
     [messages, myCaverId]
   );
+
+  // Single active menu across the whole conversation: opening the menu on
+  // one message replaces any previously open menu, avoiding stacked menus.
+  const [actionsMenu, setActionsMenu] = useState(null);
+  const handleOpenActionsMenu = useCallback((msg, { anchor, position }) => {
+    setActionsMenu({ msg, anchor: anchor || null, position: position || null });
+  }, []);
+  const handleCloseActionsMenu = useCallback(() => setActionsMenu(null), []);
 
   const convIdNum = Number(conversationId);
   const activeConv = useSelector(state =>
@@ -532,56 +645,13 @@ Message Body: ${body}`;
           if (item.type === 'separator') {
             return <DaySeparator key={item.key} date={item.date} />;
           }
-          const { msg, isMine, isFirstOfGroup, isLastOfGroup } = item;
           return (
-            <MessageBubble
+            <MessageItem
               key={item.key}
-              elevation={0}
-              $isMine={isMine}
-              $isFirstOfGroup={isFirstOfGroup}
-              $isLastOfGroup={isLastOfGroup}>
-              <Box
-                sx={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'flex-start',
-                  gap: 0.5
-                }}>
-                <Box sx={{ flexGrow: 1, minWidth: 0 }}>
-                  <Typography variant="body1" sx={{ whiteSpace: 'pre-wrap' }}>
-                    <Linkify options={linkifyOptions}>{msg.body}</Linkify>
-                  </Typography>
-                </Box>
-                {!isMine && (
-                  <Tooltip
-                    title={formatMessage({
-                      id: 'Report this message',
-                      defaultMessage: 'Report this message'
-                    })}>
-                    <IconButton
-                      size="small"
-                      onClick={() => handleReportClick(msg)}
-                      sx={{
-                        color: 'text.secondary',
-                        '&:hover': { color: 'error.main' },
-                        padding: 0.25,
-                        mt: '4px',
-                        ml: 0.5,
-                        flexShrink: 0
-                      }}>
-                      <FlagIcon fontSize="small" />
-                    </IconButton>
-                  </Tooltip>
-                )}
-              </Box>
-              <MessageDate>
-                <FormattedDate
-                  value={msg.dateSent}
-                  hour="2-digit"
-                  minute="2-digit"
-                />
-              </MessageDate>
-            </MessageBubble>
+              item={item}
+              isMenuOpen={actionsMenu?.msg.id === item.msg.id}
+              onOpenMenu={handleOpenActionsMenu}
+            />
           );
         })}
         {hasMore && (
@@ -646,7 +716,8 @@ Message Body: ${body}`;
               justifyContent: 'flex-end',
               px: 1,
               color: replyText.length > 5000 ? 'error.main' : 'text.secondary',
-              fontSize: '0.75rem'
+              fontSize: '1rem'
+              
             }}>
             {replyText.length > 5000 &&
               formatMessage({
@@ -657,6 +728,30 @@ Message Body: ${body}`;
           </Box>
         )}
       </InputArea>
+      <Menu
+        id={MESSAGE_ACTIONS_MENU_ID}
+        open={Boolean(actionsMenu)}
+        anchorEl={actionsMenu?.anchor || null}
+        anchorReference={actionsMenu?.position ? 'anchorPosition' : 'anchorEl'}
+        anchorPosition={actionsMenu?.position || undefined}
+        onClose={handleCloseActionsMenu}>
+        <MenuItem
+          onClick={() => {
+            const msg = actionsMenu?.msg;
+            handleCloseActionsMenu();
+            if (msg) handleReportClick(msg);
+          }}>
+          <ListItemIcon>
+            <FlagIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>
+            {formatMessage({
+              id: 'Report this message',
+              defaultMessage: 'Report this message'
+            })}
+          </ListItemText>
+        </MenuItem>
+      </Menu>
       <StandardDialog
         open={isReportDialogOpen}
         onClose={handleCloseReportDialog}
