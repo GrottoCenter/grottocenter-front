@@ -150,9 +150,22 @@ android {
 
         
     }
+    signingConfigs {
+        release {
+            // Passwords and path come from env vars: Gradle passes them straight to
+            // the Java signing API (no shell command is built), so special
+            // characters in the password are safe — unlike Bubblewrap's apksigner
+            // invocation, which mangles them via shell quoting.
+            storeFile file(System.getenv("KEYSTORE_FILE") ?: "android.keystore")
+            storePassword System.getenv("KEYSTORE_PASSWORD")
+            keyAlias System.getenv("KEY_ALIAS")
+            keyPassword System.getenv("KEY_PASSWORD")
+        }
+    }
     buildTypes {
         release {
             minifyEnabled true
+            signingConfig signingConfigs.release
         }
     }
     compileOptions {
