@@ -47,7 +47,9 @@ const Stepper = ({
   completedSteps,
   handleStepBack,
   handleStepNext,
-  isNextStepButtonDisabled
+  isNextStepButtonDisabled,
+  showBackButton = true,
+  showNextButton = true
 }) => (
   <>
     <MuiStepper activeStep={currentFormStepId.id - 1} alternativeLabel>
@@ -64,15 +66,19 @@ const Stepper = ({
     </MuiStepper>
 
     <ChangeStepWrapper>
-      <PreviousStepButton
-        disabled={currentFormStepId === 1}
-        onClick={handleStepBack}
-      />
-      <NextStepButton
-        disabled={isNextStepButtonDisabled}
-        onClick={handleStepNext}
-        style={{ float: 'right' }}
-      />
+      {showBackButton && (
+        <PreviousStepButton
+          disabled={currentFormStepId === 1}
+          onClick={handleStepBack}
+        />
+      )}
+      {showNextButton && (
+        <NextStepButton
+          disabled={isNextStepButtonDisabled}
+          onClick={handleStepNext}
+          style={{ float: 'right' }}
+        />
+      )}
     </ChangeStepWrapper>
   </>
 );
@@ -83,7 +89,11 @@ Stepper.propTypes = {
   completedSteps: PropTypes.arrayOf(PropTypes.number).isRequired,
   handleStepBack: PropTypes.func.isRequired,
   handleStepNext: PropTypes.func.isRequired,
-  isNextStepButtonDisabled: PropTypes.bool.isRequired
+  isNextStepButtonDisabled: PropTypes.bool.isRequired,
+  // Steps 4 (confirm) and 5 (import) drive their own actions instead of the
+  // generic Next/Back, so the container can hide either button per step.
+  showBackButton: PropTypes.bool,
+  showNextButton: PropTypes.bool
 };
 
 export default Stepper;
