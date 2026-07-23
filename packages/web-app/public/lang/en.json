@@ -1665,6 +1665,7 @@
   "mfaResetWarning": "Disabling MFA reduces the security of your administrator account.",
   "mfaSecretLabel": "Manual entry key",
   "mfaSessionExpiryWarning": "Your session expires in less than 24 hours. Log out and back in to renew it.",
+  "offlineBanner": "You are offline. Some data may be unavailable or out of date.",
   "mfaStatus": "Two-factor authentication",
   "mfaStatusActive": "Active",
   "mfaStatusInactive": "Not configured",
