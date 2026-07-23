@@ -19,14 +19,16 @@ const Alert = ({
   icon,
   variant,
   action,
-  disableMargins = false
+  disableMargins = false,
+  ...rest
 }) => (
   <StyledAlert
     $disablemargins={disableMargins ? 1 : 0}
     severity={severity}
     icon={icon}
     variant={variant}
-    action={action}>
+    action={action}
+    {...rest}>
     {title && <AlertTitle style={{ fontWeight: 'bold' }}>{title}</AlertTitle>}
     {content}
   </StyledAlert>

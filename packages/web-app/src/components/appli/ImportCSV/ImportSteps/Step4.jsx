@@ -100,7 +100,9 @@ const Step4 = () => {
       )}
 
       {isEntranceImport && isPolling && progress && (
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+        <Box
+          data-testid="csv-import-progress"
+          sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
           <Typography variant="body2" color="text.secondary">
             {formatMessage(
               {
@@ -113,7 +115,11 @@ const Step4 = () => {
               }
             )}
           </Typography>
-          <LinearProgress variant="determinate" value={progressValue} />
+          <LinearProgress
+            variant="determinate"
+            value={progressValue}
+            data-testid="csv-import-progress-bar"
+          />
         </Box>
       )}
 
@@ -121,6 +127,7 @@ const Step4 = () => {
 
       {status === 'failed' && progress && (
         <Alert
+          data-testid="csv-import-failed-alert"
           severity="error"
           title={formatMessage(
             {
@@ -187,6 +194,7 @@ const Step4 = () => {
       {somethingWillBeCreated && !batchId && !resultImport && (
         <Box textAlign="center">
           <ActionButton
+            data-testid="csv-import-submit-button"
             label={formatMessage({ id: 'Import' })}
             onClick={handleOnClick}
             loading={importCsv.isLoading}
@@ -269,6 +277,7 @@ const Step4 = () => {
         <>
           {resultImport.summary.duplicates > 0 && (
             <Alert
+              data-testid="csv-import-duplicates-alert"
               severity="warning"
               title={formatMessage(
                 {
@@ -283,7 +292,8 @@ const Step4 = () => {
                   <Link
                     href={resultImport.reportUrls.duplicates}
                     target="_blank"
-                    rel="noopener noreferrer">
+                    rel="noopener noreferrer"
+                    data-testid="csv-import-download-duplicates">
                     {formatMessage({ id: 'csvImport.downloadDuplicates' })}
                   </Link>
                 )
@@ -292,6 +302,7 @@ const Step4 = () => {
           )}
           {resultImport.summary.successes > 0 && (
             <Alert
+              data-testid="csv-import-success-alert"
               severity="success"
               title={formatMessage(
                 {
@@ -305,7 +316,8 @@ const Step4 = () => {
                   <Link
                     href={resultImport.reportUrls.success}
                     target="_blank"
-                    rel="noopener noreferrer">
+                    rel="noopener noreferrer"
+                    data-testid="csv-import-download-success">
                     {formatMessage({ id: 'csvImport.downloadSuccess' })}
                   </Link>
                 )
@@ -314,6 +326,7 @@ const Step4 = () => {
           )}
           {resultImport.summary.failures > 0 && (
             <Alert
+              data-testid="csv-import-failures-alert"
               severity="error"
               title={formatMessage(
                 {
@@ -327,7 +340,8 @@ const Step4 = () => {
                   <Link
                     href={resultImport.reportUrls.failures}
                     target="_blank"
-                    rel="noopener noreferrer">
+                    rel="noopener noreferrer"
+                    data-testid="csv-import-download-failures">
                     {formatMessage({ id: 'csvImport.downloadFailures' })}
                   </Link>
                 )
