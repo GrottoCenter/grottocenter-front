@@ -526,11 +526,23 @@ const Document = ({
                       <DetailItem
                         fullWidth
                         label={formatMessage({ id: 'Editor' })}
-                        value={documentData.editor?.name}
-                        url={
-                          documentData.editor
-                            ? `/ui/organizations/${documentData.editor.id}`
-                            : undefined
+                        value={
+                          documentData.editor ? (
+                            <Box
+                              component="span"
+                              sx={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: 0.25
+                              }}
+                            >
+                              <CustomIcon type="organization" size={18} />
+                              <TextLink
+                                value={documentData.editor.name}
+                                url={`/ui/organizations/${documentData.editor.id}`}
+                              />
+                            </Box>
+                          ) : null
                         }
                       />
                       <DetailItem
