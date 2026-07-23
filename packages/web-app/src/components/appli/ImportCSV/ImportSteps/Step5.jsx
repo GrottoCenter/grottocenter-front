@@ -114,11 +114,12 @@ const Step5 = () => {
         />
       )}
 
-      {/* Documents import stayed synchronous: resultImport keeps its legacy
-          shape (total.*, successfulImport, failureImport, ...) and the
-          in-memory CSV download buttons still apply. */}
-      {!isEntranceImport &&
-        resultImport &&
+      {/* Synchronous result shape (`total.*`, successfulImport, ...): documents,
+          and — until the async job API ships — legacy entrance imports too. The
+          shape (presence of `total`), not the entity type, drives the rendering,
+          so both flows work during the transition. In-memory CSV downloads. */}
+      {resultImport &&
+        resultImport.total &&
         resultImport.total.successfulImportAsDuplicates > 0 && (
           <Alert
             severity="warning"
@@ -140,7 +141,7 @@ const Step5 = () => {
             }
           />
         )}
-      {!isEntranceImport && resultImport && resultImport.total.success > 0 && (
+      {resultImport && resultImport.total && resultImport.total.success > 0 && (
         <Alert
           severity="success"
           title={formatMessage(
@@ -160,7 +161,7 @@ const Step5 = () => {
           }
         />
       )}
-      {!isEntranceImport && resultImport && resultImport.total.failure > 0 && (
+      {resultImport && resultImport.total && resultImport.total.failure > 0 && (
         <Alert
           severity="error"
           title={formatMessage(
@@ -181,10 +182,11 @@ const Step5 = () => {
         />
       )}
 
-      {/* Entrance import: async job result — summary counts + links to the
-          signed report URLs instead of in-memory CSV downloads. Each report
-          URL is null when its category is empty. */}
-      {isEntranceImport && status === 'completed' && resultImport && (
+      {/* Async job result shape (`summary` + `reportUrls`): summary counts +
+          links to the signed report URLs instead of in-memory CSV downloads.
+          Each report URL is null when its category is empty. Shape-based so a
+          legacy synchronous entrance result falls through to the block above. */}
+      {resultImport && resultImport.summary && status === 'completed' && (
         <>
           {resultImport.summary.duplicates > 0 && (
             <Alert

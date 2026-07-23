@@ -195,8 +195,18 @@ export const importEntranceRows = data => (dispatch, getState) => {
   return fetch(importRowsEntrancesUrl, requestOptions)
     .then(checkAuthStatus(dispatch))
     .then(response => response.json())
-    .then(({ batchId, totalRows, totalChunks }) => {
-      dispatch(importRowsSubmitted({ batchId, totalRows, totalChunks }));
+    .then(result => {
+      // The entrance import is being migrated to an async job queue. Until that
+      // API is deployed it still answers synchronously (the documents shape:
+      // `total`, `successfulImport`, ...) with no `batchId`. Detect that and
+      // treat it as an immediate result — otherwise we'd enter a phantom
+      // polling state that never resolves, since useJobPolling bails without a
+      // batchId and isPolling would stay true forever.
+      if (result.batchId) {
+        dispatch(importRowsSubmitted(result));
+      } else {
+        dispatch(importRowsSuccess({ result }));
+      }
     })
     .catch(error => {
       if (error.isAuthError) return;
