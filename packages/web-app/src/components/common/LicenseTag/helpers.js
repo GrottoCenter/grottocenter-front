@@ -42,6 +42,14 @@ export const NON_CC_DESCRIPTIONS = {
   'Licence Ouverte': 'French State open license'
 };
 
+// Non-CC licenses that also have an official badge image. Anything not listed
+// here falls back to the Balance icon + name in LicenseBadge. Paths point to
+// `public/` assets and stay as plain URLs (no import) so the map remains a
+// pure data structure the tests can assert against without bundling assets.
+export const NON_CC_BADGES = {
+  ODBL: '/images/odbl.png'
+};
+
 const getLicenseName = license =>
   typeof license === 'string' ? license : (license?.name ?? '');
 
@@ -67,12 +75,13 @@ export const getLicenseParts = license => {
   const name = getLicenseName(license);
   const clauses = name ? parseCcClauses(name) : null;
   const isCc = clauses !== null;
+  const ccBadge = isCc ? CC_BADGES[clauses.join('-')] : undefined;
   return {
     name,
     text: obj?.text,
     url: obj?.url,
     isCc,
     clauses,
-    badgeSrc: isCc ? CC_BADGES[clauses.join('-')] : undefined
+    badgeSrc: ccBadge ?? NON_CC_BADGES[name]
   };
 };

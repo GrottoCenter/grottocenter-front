@@ -51,14 +51,20 @@ describe('getLicenseParts', () => {
 
   it('accepts a full license object and exposes text/url', () => {
     const parts = getLicenseParts({
-      name: 'ODBL',
-      text: 'Open Database License',
-      url: 'https://opendatacommons.org/licenses/odbl/'
+      name: 'ODC-BY',
+      text: 'Open Data Commons Attribution',
+      url: 'https://opendatacommons.org/licenses/by/'
     });
     expect(parts.isCc).toBe(false);
     expect(parts.badgeSrc).toBeUndefined();
-    expect(parts.text).toBe('Open Database License');
-    expect(parts.url).toBe('https://opendatacommons.org/licenses/odbl/');
+    expect(parts.text).toBe('Open Data Commons Attribution');
+    expect(parts.url).toBe('https://opendatacommons.org/licenses/by/');
+  });
+
+  it('exposes the ODbL badge for non-CC licenses that have one', () => {
+    const parts = getLicenseParts('ODBL');
+    expect(parts.isCc).toBe(false);
+    expect(parts.badgeSrc).toBe('/images/odbl.png');
   });
 
   // Identity assertions (not just truthy): a copy-paste swap in CC_BADGES —
