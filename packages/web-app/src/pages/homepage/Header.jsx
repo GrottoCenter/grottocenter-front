@@ -1,6 +1,8 @@
 import React from 'react';
 import { Box, Button } from '@mui/material';
 import { styled } from '@mui/material/styles';
+import MapIcon from '@mui/icons-material/Map';
+import SearchIcon from '@mui/icons-material/Search';
 import { useIntl } from 'react-intl';
 import { fseLinks, uisLinks } from '../../conf/externalLinks';
 import InternationalizedLink from '../../components/common/InternationalizedLink';
@@ -35,13 +37,17 @@ const Slogan = styled('span')({
 
 const CTARow = styled(Box)(({ theme }) => ({
   display: 'flex',
-  gap: 16,
-  justifyContent: 'center',
+  gap: 8,
   flexDirection: 'column',
   alignItems: 'center',
   marginTop: 40,
   [theme.breakpoints.up('sm')]: {
-    flexDirection: 'row'
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 16
+  },
+  '& > .MuiButton-root': {
+    minWidth: 220
   }
 }));
 
@@ -88,10 +94,17 @@ const Header = () => {
               variant="contained"
               color="secondary"
               component="a"
-              href="/ui/map">
+              href="/ui/map"
+              startIcon={<MapIcon />}
+              sx={{ fontWeight: 600 }}>
               {formatMessage({ id: 'Explore the map' })}
             </Button>
-            <Button color="primary" component="a" href="/ui/entrances">
+            <Button
+              color="primary"
+              component="a"
+              href="/ui/entrances"
+              startIcon={<SearchIcon />}
+              sx={{ fontWeight: 600 }}>
               {formatMessage({ id: 'Find an entrance' })}
             </Button>
           </CTARow>

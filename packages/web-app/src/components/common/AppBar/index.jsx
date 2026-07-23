@@ -102,6 +102,7 @@ const ActionsGroup = styled('div')(({ theme }) => ({
   gap: theme.spacing(0.5),
   marginLeft: theme.spacing(1),
   [theme.breakpoints.down('sm')]: {
+    gap: theme.spacing(0),
     marginLeft: theme.spacing(0.5)
   }
 }));
