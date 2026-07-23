@@ -4,6 +4,7 @@ import { useIntl } from 'react-intl';
 import { useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import {
+  Autocomplete,
   Box,
   TextField,
   Typography,
@@ -14,12 +15,13 @@ import {
 } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
 import StandardDialog from '../../components/common/StandardDialog';
-import AutoCompleteSearch from '../../components/common/AutoCompleteSearch';
-import { fetchQuicksearchResult, resetQuicksearch } from '../../actions/Quicksearch';
 import { sendMessage } from '../../actions/Messaging/SendMessage';
 import { fetchPerson } from '../../actions/Person/GetPerson';
-import { useDebounce } from '../../hooks';
-import { AUTOCOMPLETE_DEBOUNCE_DELAY, AUTOCOMPLETE_MIN_CHARACTERS } from '../../conf/config';
+import { useEntitySearch } from '../../hooks';
+import { AUTOCOMPLETE_MIN_CHARACTERS } from '../../conf/config';
+
+const PERSON_ENTITIES = ['persons'];
+const CAVER_FILTER = { type: 'CAVER' };
 
 const ComposeDialog = ({ open, onClose, prefilledRecipientId }) => {
   const { formatMessage } = useIntl();
@@ -28,39 +30,28 @@ const ComposeDialog = ({ open, onClose, prefilledRecipientId }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
-  const { results: searchResults, isLoading: isSearchLoading, error: searchError } = useSelector(
-    state => state.quicksearch
+  const { person: fetchedPerson, isFetching: isPersonFetching } = useSelector(
+    state => state.person
   );
-
-  const { person: fetchedPerson, isFetching: isPersonFetching } = useSelector(state => state.person);
   const myCaverId = useSelector(state => state.login.authTokenDecoded?.id);
 
   const [recipient, setRecipient] = useState(null);
-  const [recipientInput, setRecipientInput] = useState('');
   const [body, setBody] = useState('');
   const [isSending, setIsSending] = useState(false);
   const [sendError, setSendError] = useState(null);
 
-  const debouncedInput = useDebounce(recipientInput, AUTOCOMPLETE_DEBOUNCE_DELAY);
-
-  // Debounced recipient search
-  useEffect(() => {
-    if (debouncedInput.length < AUTOCOMPLETE_MIN_CHARACTERS) {
-      dispatch(resetQuicksearch());
-      return;
-    }
-    // Avoid re-searching if selected recipient matches exactly
-    if (recipient && `${recipient.nickname} (${recipient.id})` === debouncedInput) {
-      return;
-    }
-    dispatch(
-      fetchQuicksearchResult({
-        query: debouncedInput.trim(),
-        entities: ['persons'],
-        filter: { type: 'CAVER' }
-      })
-    );
-  }, [debouncedInput, dispatch, recipient]);
+  const {
+    inputValue: recipientInput,
+    setInputValue: setRecipientInput,
+    results: searchResults,
+    isLoading: isSearchLoading,
+    hasError: searchError
+  } = useEntitySearch(PERSON_ENTITIES, {
+    filter: CAVER_FILTER,
+    // Selected recipients already fill the input with their label; skip the
+    // extra request that would just return the same match.
+    skipQuery: recipient ? `${recipient.nickname} (${recipient.id})` : undefined
+  });
 
   // Load prefilled recipient if prefilledRecipientId changes
   useEffect(() => {
@@ -80,7 +71,8 @@ const ComposeDialog = ({ open, onClose, prefilledRecipientId }) => {
       setSendError(
         formatMessage({
           id: 'You cannot send a message to an author without an account.',
-          defaultMessage: 'You cannot send a message to an author without an account.'
+          defaultMessage:
+            'You cannot send a message to an author without an account.'
         })
       );
       setRecipient(null);
@@ -93,7 +85,7 @@ const ComposeDialog = ({ open, onClose, prefilledRecipientId }) => {
       setRecipientInput(`${fetchedPerson.nickname} (${fetchedPerson.id})`);
       setSendError(null);
     }
-  }, [fetchedPerson, prefilledRecipientId, formatMessage]);
+  }, [fetchedPerson, prefilledRecipientId, formatMessage, setRecipientInput]);
 
   // Reset state when closing dialog
   const handleClose = () => {
@@ -101,7 +93,6 @@ const ComposeDialog = ({ open, onClose, prefilledRecipientId }) => {
     setRecipientInput('');
     setBody('');
     setSendError(null);
-    dispatch(resetQuicksearch());
     onClose();
   };
 
@@ -127,7 +118,9 @@ const ComposeDialog = ({ open, onClose, prefilledRecipientId }) => {
       handleClose();
     } catch (err) {
       setIsSending(false);
-      setSendError(err.message || formatMessage({ id: 'Failed to send message.' }));
+      setSendError(
+        err.message || formatMessage({ id: 'Failed to send message.' })
+      );
     }
   };
 
@@ -152,17 +145,25 @@ const ComposeDialog = ({ open, onClose, prefilledRecipientId }) => {
     return option?.nickname ? `${option.nickname} (${option.id})` : '';
   };
 
-  const isFormValid = recipient && body.trim().length > 0 && body.length <= 5000;
+  const isFormValid =
+    recipient && body.trim().length > 0 && body.length <= 5000;
 
+  // Exclude the current user and author-only accounts from the suggestions.
   const filteredSuggestions = (searchResults || []).filter(
-    option => Number(option.id) !== Number(myCaverId) && option.type !== 'AUTHOR'
+    option =>
+      Number(option.id) !== Number(myCaverId) && option.type !== 'AUTHOR'
   );
+
+  const isRecipientDisabled = isSending || !!prefilledRecipientId;
 
   return (
     <StandardDialog
       open={open}
       onClose={isSending ? undefined : handleClose}
-      title={formatMessage({ id: 'New Message', defaultMessage: 'New Message' })}
+      title={formatMessage({
+        id: 'New Message',
+        defaultMessage: 'New Message'
+      })}
       fullScreen={isMobile}
       fullWidth
       maxWidth="sm"
@@ -177,14 +178,16 @@ const ComposeDialog = ({ open, onClose, prefilledRecipientId }) => {
             color="primary"
             disabled={!isFormValid || isSending}
             startIcon={
-              isSending ? <CircularProgress size={20} color="inherit" /> : <SendIcon />
-            }
-          >
+              isSending ? (
+                <CircularProgress size={20} color="inherit" />
+              ) : (
+                <SendIcon />
+              )
+            }>
             {formatMessage({ id: 'Send', defaultMessage: 'Send' })}
           </Button>
         </>
-      }
-    >
+      }>
       <Box
         sx={{
           display: 'flex',
@@ -193,48 +196,75 @@ const ComposeDialog = ({ open, onClose, prefilledRecipientId }) => {
           pt: 0.5,
           height: isMobile ? '100%' : 'auto'
         }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <Typography variant="subtitle2" sx={{ minWidth: 'fit-content' }}>
-            {formatMessage({ id: 'To', defaultMessage: 'To' })}
-          </Typography>
-          <Box sx={{ flexGrow: 1 }}>
-            {isPersonFetching && prefilledRecipientId && !recipient ? (
-              <CircularProgress size={20} />
-            ) : (
-              <AutoCompleteSearch
-                inputValue={recipientInput}
-                onInputChange={setRecipientInput}
-                suggestions={filteredSuggestions}
-                onSelection={(selection) => {
-                  setSendError(null);
-                  if (selection) {
-                    setRecipient(selection);
-                    setRecipientInput(`${selection.nickname} (${selection.id})`);
-                  } else {
-                    setRecipient(null);
-                    setRecipientInput('');
-                  }
+        {isPersonFetching && prefilledRecipientId && !recipient ? (
+          <CircularProgress size={20} />
+        ) : (
+          <Autocomplete
+            value={recipient}
+            inputValue={recipientInput}
+            onChange={(_event, selection) => {
+              setSendError(null);
+              if (selection && typeof selection !== 'string') {
+                setRecipient(selection);
+                setRecipientInput(`${selection.nickname} (${selection.id})`);
+              } else {
+                setRecipient(null);
+                setRecipientInput('');
+              }
+            }}
+            onInputChange={(_event, newValue, reason) => {
+              if (reason === 'reset' || reason === 'clear') {
+                setRecipientInput(reason === 'clear' ? '' : newValue);
+              } else {
+                setRecipientInput(newValue);
+              }
+            }}
+            options={filteredSuggestions}
+            filterOptions={x => x}
+            getOptionLabel={getOptionLabel}
+            renderOption={renderRecipientOption}
+            isOptionEqualToValue={(option, val) =>
+              option && val && String(option.id) === String(val.id)
+            }
+            loading={isSearchLoading}
+            disabled={isRecipientDisabled}
+            noOptionsText={formatMessage(
+              { id: 'No result (enter at least {count} characters)' },
+              { count: AUTOCOMPLETE_MIN_CHARACTERS }
+            )}
+            renderInput={params => (
+              <TextField
+                {...params}
+                variant="filled"
+                label={formatMessage({
+                  id: 'To',
+                  defaultMessage: 'To'
+                })}
+                error={!!searchError}
+                InputProps={{
+                  ...params.InputProps,
+                  endAdornment: (
+                    <>
+                      {isSearchLoading && <CircularProgress size={16} />}
+                      {params.InputProps.endAdornment}
+                    </>
+                  )
                 }}
-                getOptionLabel={getOptionLabel}
-                renderOption={renderRecipientOption}
-                label={formatMessage({ id: 'Search recipient...', defaultMessage: 'Search recipient...' })}
-                isLoading={isSearchLoading}
-                hasError={!!searchError}
-                disabled={isSending || !!prefilledRecipientId}
-                hasFixWidth={false}
-                value={recipient}
               />
             )}
-          </Box>
-        </Box>
+          />
+        )}
 
         <TextField
-          label={formatMessage({ id: 'Message body', defaultMessage: 'Message body' })}
+          label={formatMessage({
+            id: 'Message body',
+            defaultMessage: 'Message body'
+          })}
           multiline
           rows={isMobile ? undefined : 6}
           fullWidth
           value={body}
-          onChange={(e) => setBody(e.target.value)}
+          onChange={e => setBody(e.target.value)}
           disabled={isSending}
           // On mobile the dialog is fullscreen: let the textarea eat the
           // leftover height instead of leaving a gap above the actions.
@@ -244,7 +274,10 @@ const ComposeDialog = ({ open, onClose, prefilledRecipientId }) => {
                   flexGrow: 1,
                   display: 'flex',
                   flexDirection: 'column',
-                  '& .MuiInputBase-root': { flexGrow: 1, alignItems: 'stretch' },
+                  '& .MuiInputBase-root': {
+                    flexGrow: 1,
+                    alignItems: 'stretch'
+                  },
                   '& .MuiInputBase-inputMultiline': { height: '100% !important' }
                 }
               : undefined
@@ -255,10 +288,17 @@ const ComposeDialog = ({ open, onClose, prefilledRecipientId }) => {
             // FormHelperText renders a <p>, which cannot contain a <div>.
             <Box
               component="span"
-              sx={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
+              sx={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                width: '100%'
+              }}>
               <span style={{ color: body.length > 5000 ? 'red' : 'inherit' }}>
                 {body.length > 5000
-                  ? formatMessage({ id: 'Message exceeds 5000 characters limit.', defaultMessage: 'Message exceeds 5000 characters limit.' })
+                  ? formatMessage({
+                      id: 'Message exceeds 5000 characters limit.',
+                      defaultMessage: 'Message exceeds 5000 characters limit.'
+                    })
                   : ''}
               </span>
               <span>{body.length} / 5000</span>
