@@ -35,7 +35,10 @@ const PreviousStepButton = props => (
 );
 
 const ChangeStepWrapper = styled(FormControl)`
-  display: block;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: 100%;
 `;
 
 // ===================================
@@ -74,7 +77,7 @@ const Stepper = ({
         <NextStepButton
           disabled={isNextStepButtonDisabled}
           onClick={handleStepNext}
-          style={{ float: 'right' }}
+          sx={{ ml: 'auto' }}
         />
       )}
     </ChangeStepWrapper>
