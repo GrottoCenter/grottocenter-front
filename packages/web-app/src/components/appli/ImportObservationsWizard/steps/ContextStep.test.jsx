@@ -267,24 +267,25 @@ describe('ContextStep', () => {
         licenseSelect.querySelector('[role="combobox"]') || licenseSelect
       );
 
-      // Verify allowed licenses are present
-      expect(screen.getByRole('option', { name: 'ODbL' })).toBeInTheDocument();
+      // Verify allowed licenses are present (the option also renders the
+      // license description via LicenseTag, so match on the name portion)
+      expect(screen.getByRole('option', { name: /ODbL/ })).toBeInTheDocument();
       expect(
-        screen.getByRole('option', { name: 'ODC-BY' })
+        screen.getByRole('option', { name: /ODC-BY/ })
       ).toBeInTheDocument();
       expect(
-        screen.getByRole('option', { name: 'Licence Ouverte' })
+        screen.getByRole('option', { name: /Licence Ouverte/ })
       ).toBeInTheDocument();
 
       // Verify Creative Commons licenses are NOT present
       expect(
-        screen.queryByRole('option', { name: 'CC BY-SA' })
+        screen.queryByRole('option', { name: /CC BY-SA/ })
       ).not.toBeInTheDocument();
       expect(
-        screen.queryByRole('option', { name: 'CC BY' })
+        screen.queryByRole('option', { name: /CC BY/ })
       ).not.toBeInTheDocument();
       expect(
-        screen.queryByRole('option', { name: 'CC BY-NC' })
+        screen.queryByRole('option', { name: /CC BY-NC/ })
       ).not.toBeInTheDocument();
     });
 
