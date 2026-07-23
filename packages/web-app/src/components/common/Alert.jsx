@@ -20,7 +20,7 @@ const Alert = ({
   variant,
   action,
   disableMargins = false,
-  ...rest
+  'data-testid': dataTestId
 }) => (
   <StyledAlert
     $disablemargins={disableMargins ? 1 : 0}
@@ -28,7 +28,7 @@ const Alert = ({
     icon={icon}
     variant={variant}
     action={action}
-    {...rest}>
+    data-testid={dataTestId}>
     {title && <AlertTitle style={{ fontWeight: 'bold' }}>{title}</AlertTitle>}
     {content}
   </StyledAlert>
@@ -41,7 +41,8 @@ Alert.propTypes = {
   severity: PropTypes.oneOf(['error', 'success', 'info', 'warning']),
   icon: PropTypes.element,
   variant: PropTypes.oneOf(['filled', 'outlined', 'standard', 'string']),
-  action: PropTypes.element
+  action: PropTypes.element,
+  'data-testid': PropTypes.string
 };
 
 export default Alert;

@@ -21,6 +21,11 @@ export const IMPORT_ROWS_POLL_FAILURE = 'IMPORT_ROWS_POLL_FAILURE';
 
 export const RESET_IMPORT_STATE = 'RESET_IMPORT_STATE';
 
+// i18n keys used as the `error` payload of the async entrance flow so the
+// message is localized in the component instead of hardcoded English here.
+export const JOB_FAILED_ERROR = 'csvImport.jobFailedError';
+export const POLL_FAILED_ERROR = 'csvImport.pollFailedError';
+
 export const checkRowsStart = () => ({
   type: CHECK_ROWS_START
 });
@@ -140,8 +145,13 @@ export const importDocumentRows = data => (dispatch, getState) => {
     });
 };
 
-// Single poll tick: resolves (never rejects) so callers can await it to know
-// when it is safe to schedule the next tick without overlapping requests.
+// Single poll tick. Resolves (never rejects) with an outcome the polling hook
+// uses to decide whether to keep going:
+//   'terminal' — the job reached a final state (or auth failed): stop polling.
+//   'pending'  — the job is still running: schedule another tick.
+//   'error'    — this single tick failed (network blip, malformed body): the
+//                hook retries a few times before giving up, so one bad tick
+//                does not kill the whole polling loop.
 export const pollJobStatus = batchId => (dispatch, getState) => {
   const requestOptions = {
     method: 'GET',
@@ -154,15 +164,21 @@ export const pollJobStatus = batchId => (dispatch, getState) => {
     .then(({ status, progress, result }) => {
       if (status === 'completed') {
         dispatch(importRowsSuccess({ status, progress, result }));
-      } else if (status === 'failed') {
-        dispatch(importRowsFailure('The import job failed.', progress));
-      } else {
-        dispatch(importRowsProgress({ status, progress }));
+        return 'terminal';
       }
+      if (status === 'failed') {
+        dispatch(importRowsFailure(JOB_FAILED_ERROR, progress));
+        return 'terminal';
+      }
+      dispatch(importRowsProgress({ status, progress }));
+      return 'pending';
     })
     .catch(error => {
-      if (error.isAuthError) return;
-      dispatch(importRowsPollFailure(error.message));
+      // Auth failures are already handled by checkAuthStatus (redirect): stop
+      // quietly. Any other error is transient from this tick's point of view —
+      // let the hook decide whether repeated failures warrant giving up.
+      if (error.isAuthError) return 'terminal';
+      return 'error';
     });
 };
 

@@ -92,6 +92,15 @@ const Step4 = () => {
       {isEntranceImport && importCsv.isLoading && (
         <Typography>
           {formatMessage({
+            id: 'csvImport.submitting',
+            defaultMessage: 'Submitting your import...'
+          })}
+        </Typography>
+      )}
+
+      {isEntranceImport && isPolling && (
+        <Typography>
+          {formatMessage({
             id: 'csvImport.submitted',
             defaultMessage:
               'Your import has been submitted and is being processed.'
@@ -123,7 +132,19 @@ const Step4 = () => {
         </Box>
       )}
 
-      {importCsv.error && <Typography>{importCsv.error}</Typography>}
+      {/* Localize the error: the async flow dispatches i18n keys (jobFailed /
+          poll lost), while the synchronous documents flow still dispatches a
+          raw API message — formatMessage falls back to it via defaultMessage.
+          Suppressed for a failed job batch: the detailed alert below already
+          reports the failure with its row count. */}
+      {importCsv.error && !(status === 'failed' && progress) && (
+        <Typography>
+          {formatMessage({
+            id: importCsv.error,
+            defaultMessage: importCsv.error
+          })}
+        </Typography>
+      )}
 
       {status === 'failed' && progress && (
         <Alert
