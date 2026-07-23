@@ -47,7 +47,9 @@ export default defineConfig({
         ]
       },
       workbox: {
-        globPatterns: ['**/*.{js,css,html,svg,png,ico,woff2}'],
+        // Precache lang/*.json too — otherwise the initial locale fetch in
+        // index.html fails offline and blocks the loader from clearing.
+        globPatterns: ['**/*.{js,css,html,svg,png,ico,woff2,json}'],
         // stats.html is the bundle-analysis report (visualizer), ~8 MB — never
         // precache it. Also keep the gzip/brotli copies out of the precache.
         globIgnores: ['**/stats.html', '**/*.{gz,br}'],
@@ -90,6 +92,17 @@ export default defineConfig({
             options: {
               cacheName: 'google-fonts',
               expiration: { maxEntries: 20 }
+            }
+          },
+          {
+            // /lang/*.json — also covered by precache, but the runtime rule
+            // lets new translations reach the app without a SW rebuild.
+            urlPattern: ({ url, sameOrigin }) =>
+              sameOrigin && /^\/lang\/[^/]+\.json$/.test(url.pathname),
+            handler: 'StaleWhileRevalidate',
+            options: {
+              cacheName: 'lang',
+              expiration: { maxEntries: 30 }
             }
           }
         ]
