@@ -15,9 +15,9 @@ import {
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import Skeleton from '@mui/material/Skeleton';
+import { Link as RouterLink } from 'react-router-dom';
 
 import InfoSection from '../../common/InfoSection';
-import AppLink from '../../common/AppLink';
 import ScrollableContent from '../../common/Layouts/Fixed/ScrollableContent';
 import CustomIcon from '../../common/CustomIcon';
 import Alert from '../../common/Alert';
@@ -86,7 +86,7 @@ const EntrancesList = ({
                   )
                 }>
                 <ListItemButton
-                  component={AppLink}
+                  component={RouterLink}
                   to={`/ui/entrances/${entrance.id}`}
                   selected={selectedEntrancesId.includes(entrance.id)}>
                   <ListItemIcon>

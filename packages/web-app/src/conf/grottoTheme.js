@@ -235,13 +235,6 @@ export const overridings = {
         }
       }
     },
-    MuiLink: {
-      styleOverrides: {
-        root: {
-          display: 'flex'
-        }
-      }
-    },
     MuiTableCell: {
       styleOverrides: {
         root: {

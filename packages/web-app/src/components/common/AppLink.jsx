@@ -20,29 +20,19 @@ import MuiLink from '@mui/material/Link';
  * For imperative navigation (non-anchor elements) use the `useOpenLink` hook
  * instead.
  */
-// `display: inline` cancels the theme's global MuiLink `display: flex`, which
-// would otherwise break inline usage inside text (author names, "read more"…).
-// Merged as an sx array so caller-provided sx composes instead of overriding.
-const inlineSx = { display: 'inline' };
-const mergeSx = callerSx =>
-  callerSx == null
-    ? inlineSx
-    : [inlineSx, ...(Array.isArray(callerSx) ? callerSx : [callerSx])];
-
+// `target` and `rel` are placed AFTER `...rest` on purpose: callers must not
+// be able to weaken the new-tab security defaults (`noopener noreferrer`) by
+// accident.
 const AppLink = React.forwardRef(
-  (
-    { to = null, href = null, openInNewTabDesktop = false, sx, children, ...rest },
-    ref
-  ) => {
+  ({ to = null, href = null, openInNewTabDesktop = false, children, ...rest }, ref) => {
     if (href != null) {
       return (
         <MuiLink
           ref={ref}
           href={href}
+          {...rest}
           target="_blank"
-          rel="noopener noreferrer"
-          sx={mergeSx(sx)}
-          {...rest}>
+          rel="noopener noreferrer">
           {children}
         </MuiLink>
       );
@@ -63,22 +53,16 @@ const AppLink = React.forwardRef(
         <MuiLink
           ref={ref}
           href={to}
+          {...rest}
           target="_blank"
-          rel="noopener noreferrer"
-          sx={mergeSx(sx)}
-          {...rest}>
+          rel="noopener noreferrer">
           {children}
         </MuiLink>
       );
     }
 
     return (
-      <MuiLink
-        ref={ref}
-        component={RouterLink}
-        to={to}
-        sx={mergeSx(sx)}
-        {...rest}>
+      <MuiLink ref={ref} component={RouterLink} to={to} {...rest}>
         {children}
       </MuiLink>
     );
