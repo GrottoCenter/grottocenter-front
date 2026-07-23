@@ -131,7 +131,11 @@ export default defineConfig(({ mode }) => {
                       maxEntries: 200,
                       maxAgeSeconds: 60 * 60 * 24 * 7
                     },
-                    cacheableResponse: { statuses: [0, 200] }
+                    cacheableResponse: { statuses: [0, 200] },
+                    // Ignore Vary headers (API sends Vary: Accept-Encoding).
+                    // Prevents a rare cache-miss when the browser negotiates a
+                    // different encoding offline vs online.
+                    matchOptions: { ignoreVary: true }
                   }
                 }
               ]
