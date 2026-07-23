@@ -34,7 +34,7 @@ ActionButton.propTypes = {
   onClick: PropTypes.func,
   loading: PropTypes.bool,
   disabled: PropTypes.bool,
-  color: PropTypes.oneOf(['primary', 'secondary', 'error']),
+  color: PropTypes.oneOf(['primary', 'secondary', 'error', 'success']),
   icon: PropTypes.element
 };
 

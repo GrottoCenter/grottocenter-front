@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import { styled } from '@mui/material/styles';
 import { useDispatch, useSelector } from 'react-redux';
-import SendIcon from '@mui/icons-material/Send';
+import VerifiedIcon from '@mui/icons-material/Verified';
 import DeclineIcon from '@mui/icons-material/NotInterested';
 import EditIcon from '@mui/icons-material/Edit';
 import { postProcessDocuments } from '../../actions/ProcessDocuments';
@@ -68,7 +68,16 @@ const Actions = ({ selectedIds, onEdit }) => {
     <>
       <Wrapper>
         <ActionButton
+          label={formatMessage({ id: ActionTypes.validate.name })}
+          color="success"
+          disabled={hasNoSelectedIds || isLoading}
+          onClick={handleActionConfirmation(ActionTypes.validate)}
+          icon={<VerifiedIcon />}
+        />
+        <ActionButton
           label={formatMessage({ id: ActionTypes.edit.name })}
+          variant="outlined"
+          color="secondary"
           disabled={hasNoSelectedIds || isLoading || selectedIds.length > 1}
           onClick={() => {
             if (selectedIds[0]) onEdit(selectedIds[0]);
@@ -76,14 +85,8 @@ const Actions = ({ selectedIds, onEdit }) => {
           icon={<EditIcon />}
         />
         <ActionButton
-          label={formatMessage({ id: ActionTypes.validate.name })}
-          disabled={hasNoSelectedIds || isLoading}
-          onClick={handleActionConfirmation(ActionTypes.validate)}
-          icon={<SendIcon />}
-        />
-        <ActionButton
           label={formatMessage({ id: ActionTypes.decline.name })}
-          color="secondary"
+          color="error"
           disabled={hasNoSelectedIds || isLoading}
           onClick={handleActionConfirmation(ActionTypes.decline)}
           icon={<DeclineIcon />}
@@ -102,9 +105,7 @@ const Actions = ({ selectedIds, onEdit }) => {
             label={`${formatMessage({
               id: actionType?.name ?? ActionTypes.validate.name
             })} ${selectedIds.length} ${formatMessage({ id: 'document(s)' })}`}
-            color={
-              actionType === ActionTypes.validate ? 'primary' : 'secondary'
-            }
+            color={actionType === ActionTypes.validate ? 'success' : 'error'}
             onClick={() => {
               dispatch(
                 postProcessDocuments(
@@ -116,7 +117,7 @@ const Actions = ({ selectedIds, onEdit }) => {
             }}
             icon={
               actionType === ActionTypes.validate ? (
-                <SendIcon />
+                <VerifiedIcon />
               ) : (
                 <DeclineIcon />
               )
