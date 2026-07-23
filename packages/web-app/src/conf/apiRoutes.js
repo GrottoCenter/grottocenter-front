@@ -383,6 +383,7 @@ export const checkRowsEntrancesUrl = `${API_BASE_PATH}/entrances/check-rows`;
 export const checkRowsDocumentsUrl = `${API_BASE_PATH}/documents/check-rows`;
 export const importRowsEntrancesUrl = `${API_BASE_PATH}/entrances/import-rows`;
 export const importRowsDocumentsUrl = `${API_BASE_PATH}/documents/import-rows`;
+export const jobStatusUrl = batchId => `${API_BASE_PATH}/jobs/${batchId}`;
 
 // ===== Misc urls
 export const swaggerUrl = `${API_BASE_PATH}/swagger.yaml`;

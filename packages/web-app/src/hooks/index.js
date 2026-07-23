@@ -27,3 +27,4 @@ export { useOtherEntranceName } from './useOtherEntranceName';
 export { default as useDeviceOrientation } from './useDeviceOrientation';
 export { useMeasuredHeight } from './useMeasuredHeight';
 export { useLongPress } from './useLongPress';
+export { useJobPolling } from './useJobPolling';

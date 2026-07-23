@@ -1,16 +1,17 @@
-import React, { useContext, useEffect } from 'react';
-import { Box, Typography } from '@mui/material';
+import React, { useContext, useEffect, useRef } from 'react';
+import { Box, Link, LinearProgress, Typography } from '@mui/material';
 import PublishIcon from '@mui/icons-material/Publish';
 import { useDispatch, useSelector } from 'react-redux';
 import { useIntl } from 'react-intl';
 import { ImportPageContentContext } from '../Provider';
 import {
   checkRowsInBdd,
-  importRows,
-  resetImportState
+  importDocumentRows,
+  importEntranceRows
 } from '../../../../actions/ImportCsv';
+import { useJobPolling } from '../../../../hooks';
 import ActionButton from '../../../common/ActionButton';
-import { FAILURE_IMPORT, SUCCESS_IMPORT } from '../constants';
+import { ENTRANCE, FAILURE_IMPORT, SUCCESS_IMPORT } from '../constants';
 import Alert from '../../../common/Alert';
 import DownloadButton from '../DownloadButton';
 
@@ -25,27 +26,51 @@ const Step4 = () => {
     willBeCreatedAsDuplicates: willBeCreatedAsDuplicatesData,
     wontBeCreated: wontBeCreateData
   } = importCsv.resultCheck;
-  const { resultImport } = importCsv;
+  const { batchId, isPolling, progress, resultImport, status } = importCsv;
+
+  const isEntranceImport = selectedType === ENTRANCE;
+
+  useJobPolling(batchId, isPolling);
 
   const handleOnClick = () => {
-    dispatch(
-      importRows(
-        [...willBeCreatedData, ...willBeCreatedAsDuplicatesData],
-        selectedType
-      )
-    );
+    const rows = [...willBeCreatedData, ...willBeCreatedAsDuplicatesData];
+    if (isEntranceImport) {
+      dispatch(importEntranceRows(rows));
+    } else {
+      dispatch(importDocumentRows(rows));
+    }
   };
 
+  // Only trigger the check-rows dry-run when landing on this step fresh. If
+  // an import is already ongoing or completed (batchId/resultImport set —
+  // e.g. the user navigated away mid-polling and came back), re-running it
+  // here would fire another check-rows POST for thousands of rows on top of
+  // the ongoing polling. Captured once so the guard doesn't flip after
+  // IMPORT_ROWS_SUBMITTED updates the store.
+  const skipInitialCheck = useRef(
+    importCsv.batchId !== null || importCsv.resultImport !== null
+  );
+
   useEffect(() => {
-    dispatch(checkRowsInBdd(selectedType, importData));
-    return () => {
-      dispatch(resetImportState());
-    };
+    if (!skipInitialCheck.current) {
+      dispatch(checkRowsInBdd(selectedType, importData));
+    }
   }, [dispatch, selectedType, importData]);
 
   const somethingWillBeCreated =
     (willBeCreatedData && willBeCreatedData.length > 0) ||
     (willBeCreatedAsDuplicatesData && willBeCreatedAsDuplicatesData.length > 0);
+
+  // The batch can reach completedChunks === totalChunks while
+  // processedRows < totalRows when some chunks failed (processedRows only
+  // counts fully successful chunks) — force 100% on any terminal status so
+  // the bar doesn't stall.
+  const isTerminal = status === 'completed' || status === 'failed';
+  const progressPercent =
+    progress && progress.totalRows > 0
+      ? Math.round((progress.processedRows / progress.totalRows) * 100)
+      : 0;
+  const progressValue = isTerminal ? 100 : progressPercent;
 
   return (
     <>
@@ -58,13 +83,55 @@ const Step4 = () => {
           id: 'Please be careful not to import any documents or entrances which are already present in Grottocenter.'
         })}
       </Typography>
-      {importCsv.isLoading && (
+      {importCsv.isLoading && !isEntranceImport && (
         <Typography>
           {formatMessage({ id: 'Processing, this may take some time...' })}
         </Typography>
       )}
 
+      {isEntranceImport && importCsv.isLoading && (
+        <Typography>
+          {formatMessage({
+            id: 'csvImport.submitted',
+            defaultMessage:
+              'Your import has been submitted and is being processed.'
+          })}
+        </Typography>
+      )}
+
+      {isEntranceImport && isPolling && progress && (
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+          <Typography variant="body2" color="text.secondary">
+            {formatMessage(
+              {
+                id: 'csvImport.processing',
+                defaultMessage: 'Processing: {processed}/{total} rows'
+              },
+              {
+                processed: progress.processedRows,
+                total: progress.totalRows
+              }
+            )}
+          </Typography>
+          <LinearProgress variant="determinate" value={progressValue} />
+        </Box>
+      )}
+
       {importCsv.error && <Typography>{importCsv.error}</Typography>}
+
+      {status === 'failed' && progress && (
+        <Alert
+          severity="error"
+          title={formatMessage(
+            {
+              id: 'csvImport.jobFailed',
+              defaultMessage:
+                'The import failed. {number} rows could not be imported.'
+            },
+            { number: progress.failures }
+          )}
+        />
+      )}
 
       {wontBeCreateData && wontBeCreateData.length > 0 && (
         <Alert
@@ -117,7 +184,7 @@ const Step4 = () => {
           />
         )}
 
-      {somethingWillBeCreated && (
+      {somethingWillBeCreated && !batchId && !resultImport && (
         <Box textAlign="center">
           <ActionButton
             label={formatMessage({ id: 'Import' })}
@@ -128,27 +195,33 @@ const Step4 = () => {
         </Box>
       )}
 
-      {resultImport && resultImport.total.successfulImportAsDuplicates > 0 && (
-        <Alert
-          severity="warning"
-          title={formatMessage(
-            {
-              id: 'csvImport.successAsDuplicatesRecap',
-              defaultMessage: '{number} entities have been imported as duplicates.'
-            },
-            {
-              number: resultImport.total.successfulImportAsDuplicates
+      {/* Documents import stayed synchronous: resultImport keeps its legacy
+          shape (total.*, successfulImport, failureImport, ...) and the
+          in-memory CSV download buttons still apply. */}
+      {!isEntranceImport &&
+        resultImport &&
+        resultImport.total.successfulImportAsDuplicates > 0 && (
+          <Alert
+            severity="warning"
+            title={formatMessage(
+              {
+                id: 'csvImport.successAsDuplicatesRecap',
+                defaultMessage:
+                  '{number} entities have been imported as duplicates.'
+              },
+              {
+                number: resultImport.total.successfulImportAsDuplicates
+              }
+            )}
+            action={
+              <DownloadButton
+                data={resultImport.successfulImportAsDuplicates}
+                filename={SUCCESS_IMPORT}
+              />
             }
-          )}
-          action={
-            <DownloadButton
-              data={resultImport.successfulImportAsDuplicates}
-              filename={SUCCESS_IMPORT}
-            />
-          }
-        />
-      )}
-      {resultImport && resultImport.total.success > 0 && (
+          />
+        )}
+      {!isEntranceImport && resultImport && resultImport.total.success > 0 && (
         <Alert
           severity="success"
           title={formatMessage(
@@ -168,7 +241,7 @@ const Step4 = () => {
           }
         />
       )}
-      {resultImport && resultImport.total.failure > 0 && (
+      {!isEntranceImport && resultImport && resultImport.total.failure > 0 && (
         <Alert
           severity="error"
           title={formatMessage(
@@ -187,6 +260,87 @@ const Step4 = () => {
             />
           }
         />
+      )}
+
+      {/* Entrance import: async job result — summary counts + links to the
+          signed report URLs instead of in-memory CSV downloads. Each report
+          URL is null when its category is empty. */}
+      {isEntranceImport && status === 'completed' && resultImport && (
+        <>
+          {resultImport.summary.duplicates > 0 && (
+            <Alert
+              severity="warning"
+              title={formatMessage(
+                {
+                  id: 'csvImport.successAsDuplicatesRecap',
+                  defaultMessage:
+                    '{number} entities have been imported as duplicates.'
+                },
+                { number: resultImport.summary.duplicates }
+              )}
+              action={
+                resultImport.reportUrls.duplicates && (
+                  <Link
+                    href={resultImport.reportUrls.duplicates}
+                    target="_blank"
+                    rel="noopener noreferrer">
+                    {formatMessage({ id: 'csvImport.downloadDuplicates' })}
+                  </Link>
+                )
+              }
+            />
+          )}
+          {resultImport.summary.successes > 0 && (
+            <Alert
+              severity="success"
+              title={formatMessage(
+                {
+                  id: 'csvImport.successRecap',
+                  defaultMessage: '{number} entities have been imported.'
+                },
+                { number: resultImport.summary.successes }
+              )}
+              action={
+                resultImport.reportUrls.success && (
+                  <Link
+                    href={resultImport.reportUrls.success}
+                    target="_blank"
+                    rel="noopener noreferrer">
+                    {formatMessage({ id: 'csvImport.downloadSuccess' })}
+                  </Link>
+                )
+              }
+            />
+          )}
+          {resultImport.summary.failures > 0 && (
+            <Alert
+              severity="error"
+              title={formatMessage(
+                {
+                  id: 'csvImport.errorRecap',
+                  defaultMessage: '{number} entities failed to be imported.'
+                },
+                { number: resultImport.summary.failures }
+              )}
+              action={
+                resultImport.reportUrls.failures && (
+                  <Link
+                    href={resultImport.reportUrls.failures}
+                    target="_blank"
+                    rel="noopener noreferrer">
+                    {formatMessage({ id: 'csvImport.downloadFailures' })}
+                  </Link>
+                )
+              }
+            />
+          )}
+          <Typography variant="caption" color="text.secondary">
+            {formatMessage({
+              id: 'csvImport.reportExpiry',
+              defaultMessage: 'Report links expire after 7 days.'
+            })}
+          </Typography>
+        </>
       )}
     </>
   );
