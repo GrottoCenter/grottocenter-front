@@ -15,6 +15,7 @@ export { default as divingCaveIcon } from './diving-cave.svg';
 export { default as entranceMarkerIcon } from './entrance-marker.svg';
 export { default as entranceIcon } from './entrance.svg';
 export { default as floodingIcon } from './flooding.svg';
+export { default as guidelinesIcon } from './guidelines.svg';
 export { default as lengthIcon } from './length.svg';
 export { default as locationIcon } from './location.svg';
 export { default as massifIcon } from './massif.svg';
