@@ -119,9 +119,14 @@ const Document = ({
   useEffect(() => {
     if (!licenses && !licensesLoading) dispatch(fetchLicense());
   }, [dispatch, licenses, licensesLoading]);
-  const licenseObject =
-    (licenses ?? []).find(l => l.name === documentData?.license) ??
-    documentData?.license;
+  // Stay `undefined` until the licenses list is loaded — otherwise the badge
+  // renders once with the bare name string (no deed URL), then re-renders as
+  // an object once the list arrives, causing a visible flicker where the
+  // link suddenly materialises.
+  const licenseObject = licenses
+    ? ((licenses.find(l => l.name === documentData?.license) ??
+        documentData?.license) || undefined)
+    : undefined;
 
   let onEdit = null;
   let onDelete = null;

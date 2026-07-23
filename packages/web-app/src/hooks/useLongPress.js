@@ -9,6 +9,11 @@ export const useLongPress = (
 ) => {
   const timerRef = useRef(null);
   const startPosRef = useRef({ x: 0, y: 0 });
+  // Cleared on unmount. Checked inside the timer callback because a timer
+  // that already elapsed but whose callback is queued for the next tick is
+  // not stopped by `clearTimeout` — so the ref, not the timer id, is what
+  // actually prevents `onLongPress` from firing against a torn-down consumer.
+  const isMountedRef = useRef(true);
 
   const cancel = useCallback(() => {
     if (timerRef.current) {
@@ -17,9 +22,13 @@ export const useLongPress = (
     }
   }, []);
 
-  // Cancel any pending timer if the consumer unmounts before it fires,
-  // to avoid onLongPress being called against an unmounted component.
-  useEffect(() => cancel, [cancel]);
+  useEffect(
+    () => () => {
+      isMountedRef.current = false;
+      cancel();
+    },
+    [cancel]
+  );
 
   const onTouchStart = useCallback(
     e => {
@@ -27,8 +36,9 @@ export const useLongPress = (
       startPosRef.current = { x: touch.clientX, y: touch.clientY };
       cancel();
       timerRef.current = setTimeout(() => {
-        onLongPress({ x: touch.clientX, y: touch.clientY });
         timerRef.current = null;
+        if (!isMountedRef.current) return;
+        onLongPress({ x: touch.clientX, y: touch.clientY });
       }, delay);
     },
     [onLongPress, delay, cancel]

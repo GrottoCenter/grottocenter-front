@@ -436,7 +436,16 @@ const ConversationDetail = () => {
   const sentinelRef = useRef(null);
   const isFirstLoad = useRef(true);
 
-  const hasMore = messages.length < totalCount;
+  // `hasMore` is derived from the two Redux slices. Between navigating to a
+  // new conversation and its first response landing, `items` has been reset
+  // to [] by the reducer but `totalCount` still holds the previous
+  // conversation's value — so a naive `messages.length < totalCount` reads
+  // `true`, the sentinel mounts, the IntersectionObserver fires, and
+  // `loadMore` dispatches a second `skip:0` fetch that races the initial one.
+  // Gate on the request status: no "more" until the first response for this
+  // conversation has succeeded.
+  const hasMore =
+    status === REDUCER_STATUS.SUCCEEDED && messages.length < totalCount;
 
   useEffect(() => {
     isFirstLoad.current = true;
