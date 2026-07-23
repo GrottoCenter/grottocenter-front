@@ -109,15 +109,16 @@ jobs:
           grep -E "versionCode|versionName" app/build.gradle
 
       - name: Build AAB with Bubblewrap
-        # `printf 'n\n'` answers "no" to any residual "apply manifest changes?"
-        # prompt, so the build never blocks and never regenerates over the version
-        # we just set. With manifest and checksum committed in sync this prompt
-        # should not appear at all — this is a non-interactive safety net.
+        # Bubblewrap has NO password CLI flags — it reads the keystore/key passwords
+        # only from these env vars (both must be set). `printf 'n\n'` answers "no" to
+        # any residual "apply manifest changes?" prompt so the build never blocks and
+        # never regenerates over the version we just set. With manifest and checksum
+        # committed in sync, no prompt appears at all.
+        env:
+          BUBBLEWRAP_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          BUBBLEWRAP_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
         run: |
-          printf 'n\n' | bubblewrap build \
-            --skipPwaValidation \
-            --key-store-password "${{ secrets.ANDROID_KEYSTORE_PASSWORD }}" \
-            --key-password "${{ secrets.ANDROID_KEY_PASSWORD }}"
+          printf 'n\n' | bubblewrap build --skipPwaValidation
 
       - name: Upload AAB and APK artifacts
         uses: actions/upload-artifact@v4
