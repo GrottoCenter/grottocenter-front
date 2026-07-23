@@ -11,10 +11,10 @@ import ActionButton from '../../components/common/ActionButton';
 import StandardDialog from '../../components/common/StandardDialog';
 import StringInput from '../../components/common/Form/StringInput';
 
+// `edit` has no confirmation dialog (the Edit button calls `onEdit` directly),
+// so it only needs a name for the button label — no confirmationText/helperText.
 const ActionTypes = {
   edit: {
-    confirmationText: '',
-    helperText: '',
     name: 'Edit'
   },
   decline: {

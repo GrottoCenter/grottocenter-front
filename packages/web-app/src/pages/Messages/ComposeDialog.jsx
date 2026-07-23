@@ -69,27 +69,31 @@ const ComposeDialog = ({ open, onClose, prefilledRecipientId }) => {
     }
   }, [open, prefilledRecipientId, dispatch]);
 
+  // Prefill the recipient when the fetched person matches the id we asked
+  // for. `open` is deliberately NOT in the deps: it would re-trigger the
+  // prefill (overwriting a manually edited recipient) if the store's
+  // `state.person.person` happens to change while this dialog stays open.
   useEffect(() => {
-    if (open && prefilledRecipientId && fetchedPerson && String(fetchedPerson.id) === String(prefilledRecipientId)) {
-      if (fetchedPerson.type === 'AUTHOR') {
-        setSendError(
-          formatMessage({
-            id: 'You cannot send a message to an author without an account.',
-            defaultMessage: 'You cannot send a message to an author without an account.'
-          })
-        );
-        setRecipient(null);
-        setRecipientInput('');
-      } else {
-        setRecipient({
-          id: fetchedPerson.id,
-          nickname: fetchedPerson.nickname
-        });
-        setRecipientInput(`${fetchedPerson.nickname} (${fetchedPerson.id})`);
-        setSendError(null);
-      }
+    if (!prefilledRecipientId || !fetchedPerson) return;
+    if (String(fetchedPerson.id) !== String(prefilledRecipientId)) return;
+    if (fetchedPerson.type === 'AUTHOR') {
+      setSendError(
+        formatMessage({
+          id: 'You cannot send a message to an author without an account.',
+          defaultMessage: 'You cannot send a message to an author without an account.'
+        })
+      );
+      setRecipient(null);
+      setRecipientInput('');
+    } else {
+      setRecipient({
+        id: fetchedPerson.id,
+        nickname: fetchedPerson.nickname
+      });
+      setRecipientInput(`${fetchedPerson.nickname} (${fetchedPerson.id})`);
+      setSendError(null);
     }
-  }, [fetchedPerson, prefilledRecipientId, open, formatMessage]);
+  }, [fetchedPerson, prefilledRecipientId, formatMessage]);
 
   // Reset state when closing dialog
   const handleClose = () => {

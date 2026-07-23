@@ -393,8 +393,12 @@ const ConversationDetail = () => {
   const authState = useSelector(state => state.login);
   const myCaverId = authState?.authTokenDecoded?.id;
 
+  // The list is rendered inside a `flex-direction: column-reverse` container,
+  // so we feed it the items in reverse order (latest at the bottom). Reversing
+  // here keeps the useMemo useful — a per-render `[...items].reverse()` at the
+  // call site would defeat it.
   const renderedItems = useMemo(
-    () => buildRenderedItems(messages, myCaverId),
+    () => buildRenderedItems(messages, myCaverId).reverse(),
     [messages, myCaverId]
   );
 
@@ -414,14 +418,15 @@ const ConversationDetail = () => {
     state.messaging.archivedConversations.items.find(c => c.id === convIdNum)
   );
   const currentConversation = activeConv || archivedConv;
-  const fetchedPerson = useSelector(state => state.person.person);
 
+  // Do NOT fall back on `state.person.person` (fetchedPerson): it holds the
+  // last profile the user visited and has no guaranteed link to this
+  // conversation. Using it would render the wrong nickname and, worse, link
+  // the header to an unrelated user's profile (misattribution / data leak).
   const otherParticipant =
     currentConversation?.otherParticipant ||
     messages.find(m => m.caverSender?.id !== myCaverId)?.caverSender ||
-    (fetchedPerson && Number(fetchedPerson.id) !== Number(myCaverId)
-      ? { id: fetchedPerson.id, nickname: fetchedPerson.nickname }
-      : null);
+    null;
 
   const titleText =
     otherParticipant?.nickname || formatMessage({ id: 'Conversation details' });
@@ -502,6 +507,24 @@ const ConversationDetail = () => {
     );
   }
 
+  // Without `myCaverId`, `isMine` collapses to false for every message (own
+  // bubbles rendered on the wrong side, long-press wired to them) and
+  // `otherParticipant` may resolve to the current user. Wait for the token
+  // to decode before rendering anything derived from it.
+  if (!myCaverId) {
+    return (
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '100%'
+        }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
+
   if (status === REDUCER_STATUS.LOADING && messages.length === 0) {
     return (
       <Box
@@ -538,6 +561,7 @@ const ConversationDetail = () => {
       setReplyText('');
     } catch (err) {
       console.error('Failed to send reply:', err);
+      onError(formatMessage({ id: 'Failed to send message.' }));
     } finally {
       setIsSending(false);
     }
@@ -641,7 +665,7 @@ Message Body: ${body}`;
       </Box>
       <MessagesList ref={messagesListRef}>
         <div ref={messagesEndRef} />
-        {[...renderedItems].reverse().map(item => {
+        {renderedItems.map(item => {
           if (item.type === 'separator') {
             return <DaySeparator key={item.key} date={item.date} />;
           }

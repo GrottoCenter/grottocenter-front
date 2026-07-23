@@ -363,6 +363,7 @@ export const Entry = ({
                     onDeletePress(entity?.id, isDeleteConfirmationPermanent);
                   }}
                 />
+                {entrance.isSensitive && isAdmin && <SensitiveCaveWarning />}
                 <ScrollableContent
                   content={
                     <>
@@ -375,9 +376,6 @@ export const Entry = ({
                             flexDirection: 'column',
                             gap: 1
                           }}>
-                          {entrance.isSensitive && isAdmin && (
-                            <SensitiveCaveWarning />
-                          )}
                           {!entrance.isSensitive || isAdmin ? (
                             <Box sx={{ flex: 1, display: 'flex' }}>
                               <Map

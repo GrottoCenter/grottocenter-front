@@ -186,7 +186,11 @@ const Person = ({ isLoading, person, error }) => {
 
   return (
     <PageContainer>
-      {!error && (
+      {/* Keep the header whenever we have a person to describe (even if a
+          subsequent fetch errored on a stale entity) or while loading — so
+          the user retains title, chip and actions. Only hide it when there's
+          nothing to show: an error with no person in the store. */}
+      {(isLoading || person) && (
         <PageHeader
           title={isLoading ? undefined : title}
           icon={<CustomIcon type={isAuthor ? 'author' : 'caver'} />}

@@ -31,21 +31,26 @@ export const CC_CLAUSE_DESCRIPTIONS = {
 };
 
 // Plain-language description for the non-CC licenses. Falls back to the license
-// `text` from the API for anything not listed here. Keyed by license name;
-// values are i18n message ids.
+// `text` from the API for anything not listed here. Keyed by license name.
+// Values are the English descriptions AND the i18n message ids at the same
+// time — every value here must exist as a key in the language JSON files,
+// otherwise the fallback renders the raw English literal even when the rest
+// of the UI is translated.
 export const NON_CC_DESCRIPTIONS = {
   ODBL: 'Open database, share alike',
   'ODC-BY': 'Open database, attribution required',
   'Licence Ouverte': 'French State open license'
 };
 
-export const getLicenseName = license =>
+const getLicenseName = license =>
   typeof license === 'string' ? license : (license?.name ?? '');
 
 // Returns the ordered list of CC clause tokens for a license name, or null when
-// the license is not a Creative Commons one. Tolerant to both spellings the API
-// uses ("CC-BY-SA" and "CC BY NC").
+// the license is not a Creative Commons one (including empty / nullish input —
+// callers can hand off unvalidated API values without extra guards). Tolerant
+// to both spellings the API uses ("CC-BY-SA" and "CC BY NC").
 export const parseCcClauses = name => {
+  if (typeof name !== 'string' || !name) return null;
   const tokens = name.toUpperCase().split(/[\s-]+/).filter(Boolean);
   const first = tokens[0];
   if (first !== 'CC' && first !== 'CC0') return null;
