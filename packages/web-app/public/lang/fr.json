@@ -1695,6 +1695,7 @@
   "mfaResetWarning": "La désactivation de la double authentification réduit la sécurité de votre compte administrateur.",
   "mfaSecretLabel": "Clé de saisie manuelle",
   "mfaSessionExpiryWarning": "Votre session expire dans moins de 24 heures. Déconnectez-vous puis reconnectez-vous pour la renouveler.",
+  "offlineBanner": "Vous êtes hors-ligne. Certaines données peuvent être indisponibles ou obsolètes.",
   "mfaStatus": "Authentification à deux facteurs",
   "mfaStatusActive": "Active",
   "mfaStatusInactive": "Non configurée",
