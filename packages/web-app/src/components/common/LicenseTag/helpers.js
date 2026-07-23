@@ -47,7 +47,8 @@ export const NON_CC_DESCRIPTIONS = {
 // `public/` assets and stay as plain URLs (no import) so the map remains a
 // pure data structure the tests can assert against without bundling assets.
 export const NON_CC_BADGES = {
-  ODBL: '/images/odbl.png'
+  ODBL: '/images/odbl.png',
+  'Licence Ouverte': '/images/licence-ouverte.svg'
 };
 
 const getLicenseName = license =>

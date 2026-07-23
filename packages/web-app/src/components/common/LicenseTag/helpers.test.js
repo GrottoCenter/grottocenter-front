@@ -61,10 +61,13 @@ describe('getLicenseParts', () => {
     expect(parts.url).toBe('https://opendatacommons.org/licenses/by/');
   });
 
-  it('exposes the ODbL badge for non-CC licenses that have one', () => {
-    const parts = getLicenseParts('ODBL');
+  it.each([
+    ['ODBL', '/images/odbl.png'],
+    ['Licence Ouverte', '/images/licence-ouverte.svg']
+  ])('exposes the badge for non-CC license %s', (name, expected) => {
+    const parts = getLicenseParts(name);
     expect(parts.isCc).toBe(false);
-    expect(parts.badgeSrc).toBe('/images/odbl.png');
+    expect(parts.badgeSrc).toBe(expected);
   });
 
   // Identity assertions (not just truthy): a copy-paste swap in CC_BADGES —
