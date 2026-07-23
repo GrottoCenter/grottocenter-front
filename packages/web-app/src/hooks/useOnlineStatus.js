@@ -16,5 +16,5 @@ export function useOnlineStatus() {
     };
   }, []);
 
-  return false;
+  return isOnline;
 }
