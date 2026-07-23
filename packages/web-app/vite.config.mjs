@@ -11,6 +11,14 @@ export default defineConfig(({ mode }) => {
   // matches whichever backend this build targets (prod, staging, local).
   const env = loadEnv(mode, process.cwd(), '');
   const apiOrigin = env.VITE_API_URL ? new URL(env.VITE_API_URL).origin : null;
+  // Build a RegExp for the runtimeCaching urlPattern. A closure over apiOrigin
+  // would NOT work: vite-plugin-pwa serialises the function via .toString(),
+  // so the free variable becomes `undefined` in the SW runtime and the rule
+  // silently never matches. A RegExp serialises cleanly.
+  const escapeRegex = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const apiPattern = apiOrigin
+    ? new RegExp(`^${escapeRegex(apiOrigin)}/api/`)
+    : null;
 
   return {
   plugins: [
@@ -111,18 +119,15 @@ export default defineConfig(({ mode }) => {
               expiration: { maxEntries: 30 }
             }
           },
-          // Backend API (GET only). NetworkFirst so users see fresh data
-          // when online but still get the last-known response offline.
-          // networkTimeoutSeconds keeps a bad connection from stalling the UI
-          // — after 5s we fall back to the cache. Skipped entirely if
-          // VITE_API_URL isn't set at build time (e.g. some CI setups).
-          ...(apiOrigin
+          // Backend API (GET only — workbox defaults runtimeCaching to GET).
+          // NetworkFirst so users see fresh data when online but still get the
+          // last-known response offline. networkTimeoutSeconds keeps a bad
+          // connection from stalling the UI — after 5s we fall back to cache.
+          // Skipped entirely if VITE_API_URL isn't set at build time.
+          ...(apiPattern
             ? [
                 {
-                  urlPattern: ({ url, request }) =>
-                    url.origin === apiOrigin &&
-                    url.pathname.startsWith('/api/') &&
-                    request.method === 'GET',
+                  urlPattern: apiPattern,
                   handler: 'NetworkFirst',
                   options: {
                     cacheName: 'api-get',
