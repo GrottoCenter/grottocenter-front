@@ -15,7 +15,13 @@ import ImportPageContent from './ImportPageContent';
 import FixedContent from '../../common/Layouts/Fixed/FixedContent';
 import Translate from '../../common/Translate';
 import { useBoolean } from '../../../hooks';
-import { ENTRANCE, DOCUMENT, STEP_CONFIRM, STEP_IMPORT } from './constants';
+import {
+  ENTRANCE,
+  DOCUMENT,
+  STEP_GENERAL,
+  STEP_CONFIRM,
+  STEP_IMPORT
+} from './constants';
 
 const useStyles = makeStyles({
   stepper: {
@@ -92,7 +98,8 @@ const ImportContainer = () => {
   // terminal — no Back (it must not re-run the dry-run or undo an import) and
   // no Next. The result step offers its own "New import" reset instead.
   const showNextButton = currentFormStep < STEP_CONFIRM;
-  const showBackButton = currentFormStep !== STEP_IMPORT;
+  const showBackButton =
+    currentFormStep !== STEP_GENERAL && currentFormStep !== STEP_IMPORT;
 
   return (
     <FixedContent
@@ -106,7 +113,6 @@ const ImportContainer = () => {
             <Stepper
               className={classes.stepper}
               currentFormStepId={currentFormStep}
-              completedSteps={validatedSteps}
               formSteps={formSteps}
               isNextStepButtonDisabled={isNextStepDisabled}
               handleStepBack={handleStepBack}

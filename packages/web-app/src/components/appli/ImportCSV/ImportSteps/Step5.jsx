@@ -1,12 +1,14 @@
 import React, { useContext } from 'react';
 import { Box, Link, LinearProgress, Typography } from '@mui/material';
 import ReplayIcon from '@mui/icons-material/Replay';
+import HomeIcon from '@mui/icons-material/Home';
 import { useDispatch, useSelector } from 'react-redux';
 import { useIntl } from 'react-intl';
 import { ImportPageContentContext } from '../Provider';
 import { resetImportState } from '../../../../actions/ImportCsv';
 import { useJobPolling } from '../../../../hooks';
 import ActionButton from '../../../common/ActionButton';
+import AppLink from '../../../common/AppLink';
 import { ENTRANCE, FAILURE_IMPORT, SUCCESS_IMPORT } from '../constants';
 import Alert from '../../../common/Alert';
 import DownloadButton from '../DownloadButton';
@@ -271,15 +273,30 @@ const Step5 = () => {
       )}
 
       {isDone && (
-        <Box textAlign="center" sx={{ mt: 2 }}>
+        <Box
+          sx={{
+            mt: 2,
+            display: 'flex',
+            justifyContent: 'center',
+            gap: 2
+          }}>
           <ActionButton
             data-testid="csv-import-new-import-button"
+            variant="outlined"
             label={formatMessage({
               id: 'csvImport.newImport',
               defaultMessage: 'Start a new import'
             })}
             onClick={handleNewImport}
             icon={<ReplayIcon />}
+          />
+          <ActionButton
+            data-testid="csv-import-home-button"
+            component={AppLink}
+            to="/"
+            variant="contained"
+            label={formatMessage({ id: 'Go to home page' })}
+            icon={<HomeIcon />}
           />
         </Box>
       )}
