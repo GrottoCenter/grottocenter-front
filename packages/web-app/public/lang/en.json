@@ -2646,6 +2646,8 @@
   "You are not authorized": "You are not authorized",
   "You are not authorized to create a document.": "You are not authorized to create a document.",
   "You are not authorized to edit this person.": "You are not authorized to edit this person.",
+  "You are not authorized to import documents via CSV.": "You are not authorized to import documents via CSV.",
+  "You are not authorized to import entrances via CSV.": "You are not authorized to import entrances via CSV.",
   "You are not logged in.": "You are not logged in.",
   "You are subscribed to the country.": "You are subscribed to the country.",
   "You are subscribed to the massif.": "You are subscribed to the massif.",

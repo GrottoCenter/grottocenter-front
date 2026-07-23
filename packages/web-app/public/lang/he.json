@@ -2646,6 +2646,8 @@
   "You are not authorized": "אינך מורשה",
   "You are not authorized to create a document.": "אינך מורשה ליצור מסמך.",
   "You are not authorized to edit this person.": "אינך מורשה לערוך אדם זה.",
+  "You are not authorized to import documents via CSV.": "אינך מורשה לייבא מסמכים באמצעות CSV.",
+  "You are not authorized to import entrances via CSV.": "אינך מורשה לייבא כניסות באמצעות CSV.",
   "You are not logged in.": "אינך מחובר.",
   "You are subscribed to the country.": "אתה מנוי למדינה.",
   "You are subscribed to the massif.": "אתה מנוי למסיף.",

@@ -2646,6 +2646,8 @@
   "You are not authorized": "Δεν είστε εξουσιοδοτημένος",
   "You are not authorized to create a document.": "Δεν είστε εξουσιοδοτημένος να δημιουργήσετε έγγραφο.",
   "You are not authorized to edit this person.": "Δεν είστε εξουσιοδοτημένος να επεξεργαστείτε αυτό το άτομο.",
+  "You are not authorized to import documents via CSV.": "Δεν έχετε εξουσιοδότηση για εισαγωγή εγγράφων μέσω CSV.",
+  "You are not authorized to import entrances via CSV.": "Δεν έχετε εξουσιοδότηση για εισαγωγή εισόδων μέσω CSV.",
   "You are not logged in.": "Δεν έχετε συνδεθεί.",
   "You are subscribed to the country.": "Έχετε εγγραφεί στη χώρα.",
   "You are subscribed to the massif.": "Έχετε εγγραφεί στον ογκόλιθο.",

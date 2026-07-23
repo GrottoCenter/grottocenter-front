@@ -2646,6 +2646,8 @@
   "You are not authorized": "権限がありません",
   "You are not authorized to create a document.": "文書を作成する権限がありません。",
   "You are not authorized to edit this person.": "この人物を編集する権限がありません。",
+  "You are not authorized to import documents via CSV.": "CSV で文書をインポートする権限がありません。",
+  "You are not authorized to import entrances via CSV.": "CSV で入口をインポートする権限がありません。",
   "You are not logged in.": "ログインしていません。",
   "You are subscribed to the country.": "国を購読しています。",
   "You are subscribed to the massif.": "マッシーフを購読しています。",

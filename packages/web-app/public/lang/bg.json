@@ -2646,6 +2646,8 @@
   "You are not authorized": "Не сте упълномощен",
   "You are not authorized to create a document.": "Не сте упълномощен да създавате документ.",
   "You are not authorized to edit this person.": "Нямате разрешение да редактирате това лице.",
+  "You are not authorized to import documents via CSV.": "Нямате права да импортирате документи чрез CSV.",
+  "You are not authorized to import entrances via CSV.": "Нямате права да импортирате входове чрез CSV.",
   "You are not logged in.": "Не сте си влезли в акаунта.",
   "You are subscribed to the country.": "Вие сте абонирани за страната.",
   "You are subscribed to the massif.": "Вие сте абонирани за масива.",

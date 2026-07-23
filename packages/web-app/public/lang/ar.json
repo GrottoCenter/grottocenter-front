@@ -2646,6 +2646,8 @@
   "You are not authorized": "غير مصرح لك",
   "You are not authorized to create a document.": "غير مصرح لك بإنشاء مستند.",
   "You are not authorized to edit this person.": "غير مصرح لك بتعديل هذا الشخص.",
+  "You are not authorized to import documents via CSV.": "غير مصرّح لك باستيراد الوثائق عبر ملف CSV.",
+  "You are not authorized to import entrances via CSV.": "غير مصرّح لك باستيراد المداخل عبر ملف CSV.",
   "You are not logged in.": "أنت لست مسجل الدخول.",
   "You are subscribed to the country.": "أنت مشترك في البلد.",
   "You are subscribed to the massif.": "أنت مشترك في الكتلة الجبلية.",

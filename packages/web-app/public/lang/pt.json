@@ -2646,6 +2646,8 @@
   "You are not authorized": "Não está autorizado",
   "You are not authorized to create a document.": "Não está autorizado a criar um documento.",
   "You are not authorized to edit this person.": "Não está autorizado a editar esta pessoa.",
+  "You are not authorized to import documents via CSV.": "Não tem autorização para importar documentos via CSV.",
+  "You are not authorized to import entrances via CSV.": "Não tem autorização para importar entradas via CSV.",
   "You are not logged in.": "Não está ligado.",
   "You are subscribed to the country.": "Está subscrito ao país.",
   "You are subscribed to the massif.": "Está subscrito ao maciço.",

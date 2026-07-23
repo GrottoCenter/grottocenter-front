@@ -2646,6 +2646,8 @@
   "You are not authorized": "Nu sunteți autorizat",
   "You are not authorized to create a document.": "Nu sunteți autorizat să creați un document.",
   "You are not authorized to edit this person.": "Nu ești autorizat să editezi această persoană.",
+  "You are not authorized to import documents via CSV.": "Nu aveți autorizația de a importa documente prin CSV.",
+  "You are not authorized to import entrances via CSV.": "Nu aveți autorizația de a importa intrări prin CSV.",
   "You are not logged in.": "Nu ești logat/ autentificat.",
   "You are subscribed to the country.": "Ești abonat la țară.",
   "You are subscribed to the massif.": "Ești abonat la masiv.",

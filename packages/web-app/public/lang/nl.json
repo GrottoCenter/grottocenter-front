@@ -2646,6 +2646,8 @@
   "You are not authorized": "U bent niet geautoriseerd",
   "You are not authorized to create a document.": "U bent niet gemachtigd een document te maken.",
   "You are not authorized to edit this person.": "U bent niet bevoegd om deze persoon te bewerken.",
+  "You are not authorized to import documents via CSV.": "U bent niet gemachtigd om documenten via CSV te importeren.",
+  "You are not authorized to import entrances via CSV.": "U bent niet gemachtigd om ingangen via CSV te importeren.",
   "You are not logged in.": "U bent niet ingelogd.",
   "You are subscribed to the country.": "U bent geabonneerd op het land.",
   "You are subscribed to the massif.": "U bent geabonneerd op het massief.",

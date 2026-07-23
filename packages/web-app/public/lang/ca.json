@@ -2646,6 +2646,8 @@
   "You are not authorized": "No esteu autoritzat",
   "You are not authorized to create a document.": "No esteu autoritzat a crear un document.",
   "You are not authorized to edit this person.": "No esteu autoritzat a editar aquesta persona.",
+  "You are not authorized to import documents via CSV.": "No teniu autorització per importar documents mitjançant CSV.",
+  "You are not authorized to import entrances via CSV.": "No teniu autorització per importar entrades mitjançant CSV.",
   "You are not logged in.": "No has iniciat la sessió.",
   "You are subscribed to the country.": "Esteu subscrit al país.",
   "You are subscribed to the massif.": "Esteu subscrit al massís.",

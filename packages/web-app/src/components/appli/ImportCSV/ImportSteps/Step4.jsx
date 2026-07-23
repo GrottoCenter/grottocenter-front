@@ -132,20 +132,6 @@ const Step4 = () => {
         </Box>
       )}
 
-      {/* Localize the error: the async flow dispatches i18n keys (jobFailed /
-          poll lost), while the synchronous documents flow still dispatches a
-          raw API message — formatMessage falls back to it via defaultMessage.
-          Suppressed for a failed job batch: the detailed alert below already
-          reports the failure with its row count. */}
-      {importCsv.error && !(status === 'failed' && progress) && (
-        <Typography>
-          {formatMessage({
-            id: importCsv.error,
-            defaultMessage: importCsv.error
-          })}
-        </Typography>
-      )}
-
       {status === 'failed' && progress && (
         <Alert
           data-testid="csv-import-failed-alert"
@@ -211,6 +197,25 @@ const Step4 = () => {
             )}
           />
         )}
+
+      {/* Localize the error: the async flow dispatches i18n keys (jobFailed /
+          poll lost), while the check/submit requests dispatch the raw API
+          message (e.g. the 403 "not authorized" body). GrottoCenter uses the
+          English string itself as the translation key, so formatMessage
+          localizes known messages and falls back to the raw text otherwise.
+          Suppressed for a failed job batch: the detailed alert above already
+          reports the failure with its row count. Placed right above the Import
+          button so a submit rejection shows next to the action that triggered it. */}
+      {importCsv.error && !(status === 'failed' && progress) && (
+        <Alert
+          data-testid="csv-import-error-alert"
+          severity="error"
+          title={formatMessage({
+            id: importCsv.error,
+            defaultMessage: importCsv.error
+          })}
+        />
+      )}
 
       {somethingWillBeCreated && !batchId && !resultImport && (
         <Box textAlign="center">

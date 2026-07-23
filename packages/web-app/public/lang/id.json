@@ -2646,6 +2646,8 @@
   "You are not authorized": "Anda tidak diotorisasi",
   "You are not authorized to create a document.": "Anda tidak diotorisasi untuk membuat dokumen.",
   "You are not authorized to edit this person.": "Anda tidak diizinkan untuk mengedit orang ini.",
+  "You are not authorized to import documents via CSV.": "Anda tidak berwenang mengimpor dokumen melalui CSV.",
+  "You are not authorized to import entrances via CSV.": "Anda tidak berwenang mengimpor pintu masuk melalui CSV.",
   "You are not logged in.": "Anda belum masuk.",
   "You are subscribed to the country.": "Anda berlangganan ke negara.",
   "You are subscribed to the massif.": "Anda berlangganan ke massif.",
