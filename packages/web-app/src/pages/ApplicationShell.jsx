@@ -189,9 +189,12 @@ const ApplicationLayout = () => {
 
   return (
     <>
+      {/* AppBar is position:fixed and renders its own toolbar spacer, so any
+          banner rendered BEFORE it would be visually hidden behind it. Keep
+          banners after <AppBar /> so they sit right below the toolbar. */}
+      <AppBar />
       <OfflineBanner />
       <AdminSessionExpiryBanner />
-      <AppBar />
       <SideMenu isOpen={isSideMenuOpen} />
       <MainWrapper $isSideMenuOpen={isSideMenuOpen}>
         <LoginDialog />
