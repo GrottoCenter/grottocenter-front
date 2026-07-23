@@ -1,6 +1,5 @@
 import { brown, blue, orange, grey } from '@mui/material/colors';
 import { createTheme, alpha, responsiveFontSizes } from '@mui/material/styles';
-import { isMobile } from 'react-device-detect';
 
 const fontFamily = [
   '-apple-system',
@@ -149,16 +148,22 @@ export const overridings = {
     },
     MuiCardContent: {
       styleOverrides: {
-        root: {
-          padding: isMobile ? paddingUnit : paddingUnit * 2
-        }
+        root: ({ theme }) => ({
+          padding: theme.spacing(1),
+          [theme.breakpoints.up('md')]: {
+            padding: theme.spacing(2)
+          }
+        })
       }
     },
     MuiCardHeader: {
       styleOverrides: {
-        root: {
-          padding: isMobile ? paddingUnit : paddingUnit * 2
-        }
+        root: ({ theme }) => ({
+          padding: theme.spacing(1),
+          [theme.breakpoints.up('md')]: {
+            padding: theme.spacing(2)
+          }
+        })
       }
     },
     MuiDialog: {
