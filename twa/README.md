@@ -35,10 +35,11 @@ installed APK.
 | `packages/web-app/vite.config.mjs`                    | `VitePWA` plugin: service worker + web manifest         | ✅                |
 | `packages/web-app/public/.well-known/assetlinks.json` | Digital Asset Links (ownership proof)                   | ✅ (placeholders) |
 | `staticwebapp.config.json`                            | Azure headers/routing for `sw.js` and `assetlinks.json` | ✅                |
-| `twa/twa-manifest.json`                               | Bubblewrap config for the Android app                   | ✅                |
+| `twa/twa-manifest.json`                               | Bubblewrap config (source for regenerating the project) | ✅                |
+| `twa/app/`, `twa/build.gradle`, `twa/gradlew`, `twa/gradle/`, … | Generated Gradle project — committed so CI can build it | ✅                |
 | `.github/workflows/twa-build.yml`                     | CI that builds the signed `.aab`                        | ✅                |
-| `android.keystore`                                    | **Upload signing key — SECRET**                         | ❌ (gitignored)   |
-| `*.aab` / `*.apk`, `.gradle/`, `app/build/`           | Build artifacts                                         | ❌ (gitignored)   |
+| `twa/android.keystore`                                | **Upload signing key — SECRET**                         | ❌ (gitignored)   |
+| `twa/app-release*`, `twa/app/build/`, `twa/.gradle/`, `twa/local.properties` | Build outputs & caches                                  | ❌ (gitignored)   |
 
 ---
 
@@ -74,10 +75,13 @@ fingerprints:
 
 ## Step-by-step setup
 
-> The whole Bubblewrap project lives in **`twa/`** (`twa/twa-manifest.json` is the
-> only committed file; the generated Android project is gitignored). Run all
-> `bubblewrap` and `keytool` commands so that `android.keystore` ends up in `twa/`,
-> next to the manifest (its `signingKey.path` is `./android.keystore`).
+> The whole Bubblewrap project lives in **`twa/`**. The generated Gradle project
+> (`twa/app/`, `twa/build.gradle`, `twa/gradlew`, `twa/gradle/`, …) **is committed**
+> so CI can build it directly — `bubblewrap build` and Gradle require an existing
+> project, they do **not** regenerate it. Only build outputs and caches
+> (`twa/app/build/`, `twa/.gradle/`, `twa/app-release*`, `twa/local.properties`) are
+> gitignored. Run all `bubblewrap` and `keytool` commands so that `android.keystore`
+> ends up in `twa/`, next to the manifest (its `signingKey.path` is `./android.keystore`).
 
 ### 1. Generate the upload keystore (do this **once**, keep it forever)
 
@@ -87,12 +91,17 @@ The alias **must** be `grottocenter` (it is referenced in `twa/twa-manifest.json
 keytool -genkeypair -v -keystore twa/android.keystore -alias grottocenter -keyalg RSA -keysize 2048 -validity 9125
 ```
 
+`keytool` then asks for the certificate's distinguished name. The values used for
+GrottoCenter (the answers don't affect signing, but keep them consistent):
+
+```text
 Quels sont vos nom et prénom ? Grottocenter Admin
 Quel est le nom de votre unité organisationnelle ? Wikicaves
 Quel est le nom de votre entreprise ? Wikicaves
 Quel est le nom de votre ville de résidence ? Bernex
 Quel est le nom de votre état ou province ? Haute-Savoie
 Quel est le code pays à deux lettres pour cette unité ? FR
+```
 
 > 🔒 Losing this file means you can no longer sign updates with your upload key.
 > Back it up in **at least two** secure places and share it only via a secrets
@@ -132,10 +141,24 @@ Make sure the PWA is already deployed and valid at `https://grottocenter.org`
   `version_name` in strict semver `X.Y.Z` (e.g. `1.0.0`).
 - **By pushing a tag** `vX.Y.Z` — the version name is derived from the tag.
 
-The Android `versionCode` is **derived deterministically from the semver**
-(`major*10000 + minor*100 + patch`, e.g. `1.2.3` → `10203`), so it is identical for
-both triggers and always increases with the released version. A non-semver value
-fails the build early. To ship a new build, bump the version.
+Version handling **decouples the two Android version fields**, which is the standard
+Play Store practice:
+
+- **`versionName`** (the human-facing version) = the semver above. A non-semver value
+  fails the build early.
+- **`versionCode`** (the integer Play compares) = **`github.run_number`**, a
+  CI-managed counter that GitHub increments on every run. This guarantees it is
+  **strictly increasing** for each build regardless of the version name — a hard Play
+  Store requirement — without depending on semver discipline (re-releasing the same
+  version, or a backwards bump, would break a semver-derived code).
+
+The CI writes both values into `twa/app/build.gradle` before building; it does not
+touch `twa-manifest.json`, so Bubblewrap sees no manifest change and stays
+non-interactive.
+
+> If a previous upload to the Play Console already used a higher `versionCode` than
+> the current `run_number`, add a fixed offset in the workflow so the code stays above
+> it (Play rejects a code ≤ any previously uploaded one).
 
 The workflow signs with your upload key, then:
 
@@ -199,9 +222,9 @@ commands run **from the `twa/` folder**.
 ```bash
 cd twa
 
-# Optional: bump the version before building (must be semver X.Y.Z).
-# The CI derives versionCode = major*10000 + minor*100 + patch — do the same by hand
-# if you want a monotonic code, or just edit twa-manifest.json.
+# Optional: bump the version before building. Locally, edit versionName /
+# versionCode directly in twa/app/build.gradle (the values Gradle actually uses).
+# The CI sets them for you (versionName = semver, versionCode = run number).
 
 bubblewrap build --skipPwaValidation
 ```
@@ -226,16 +249,30 @@ bubblewrap install   # installs app-release-signed.apk via adb on a plugged-in d
 Then launch it and confirm there is **no Chrome URL bar** (see
 [Verifying the TWA](#verifying-the-twa)).
 
-### Regenerate the Android project from scratch
+### Regenerate the Android project (and commit it)
 
-The generated Gradle project (`twa/app/`) is gitignored. If it is missing or stale,
-recreate it from the committed manifest before building:
+The Gradle project under `twa/` **is committed**, so day-to-day builds never
+regenerate it. You only regenerate when you change something in
+`twa/twa-manifest.json` that affects the native app (icon, colors, `packageId`,
+`host`, `minSdkVersion`, shortcuts, …):
 
 ```bash
 cd twa
-bubblewrap update   # regenerates the Android project from twa-manifest.json
+bubblewrap update            # apply twa-manifest.json changes to the project
 bubblewrap build --skipPwaValidation
 ```
+
+Then **commit the regenerated project** so CI builds the updated app:
+
+```bash
+git add twa/app twa/build.gradle twa/settings.gradle twa/gradle.properties \
+        twa/gradle twa/gradlew twa/gradlew.bat twa/twa-manifest.json
+git update-index --chmod=+x twa/gradlew   # keep the wrapper executable on Linux CI
+```
+
+> First-time generation (no project yet) is done with
+> `bubblewrap init --manifest https://grottocenter.org/manifest.json`, which creates
+> the project from the deployed web manifest. Commit the result the same way.
 
 ---
 
@@ -246,7 +283,7 @@ The AAB is a shell; the content is served from the web.
 | Change                                                                          | Action                                                                                           |
 | ------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
 | Content, features, UI fixes, data, translations…                                | **Deploy the website** (push to `develop`). Users get it immediately, **no Play Store release**. |
-| App icon, name, `packageId`, chrome colors, `minSdkVersion`, native permissions | **Rebuild the AAB** (run the workflow with a higher `version_code`) and republish.               |
+| App icon, name, `packageId`, chrome colors, `minSdkVersion`, native permissions | **Regenerate + commit** the project (see above), then run the workflow (tag or dispatch) and republish. |
 | Keystore rotation                                                               | Rebuild the AAB **and** update `assetlinks.json` fingerprints, then redeploy the web.            |
 
 > In practice, after the first release the AAB is rebuilt **rarely**. That is the
