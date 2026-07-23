@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { Box, Link, LinearProgress, Typography } from '@mui/material';
+import { Box, LinearProgress, Typography } from '@mui/material';
 import ReplayIcon from '@mui/icons-material/Replay';
 import HomeIcon from '@mui/icons-material/Home';
 import { useDispatch, useSelector } from 'react-redux';
@@ -12,6 +12,7 @@ import AppLink from '../../../common/AppLink';
 import { ENTRANCE, FAILURE_IMPORT, SUCCESS_IMPORT } from '../constants';
 import Alert from '../../../common/Alert';
 import DownloadButton from '../DownloadButton';
+import ImportResultRecap from '../ImportResultRecap';
 
 // Step 5 — Import: runs the async job polling, shows live progress, then the
 // terminal result (success/failure recaps + report links). This step is
@@ -47,6 +48,12 @@ const Step5 = () => {
   // "Done" once we have a result (either flow) or a terminal failure — used to
   // reveal the "New import" reset.
   const isDone = !!resultImport || status === 'failed' || !!importCsv.error;
+
+  // Async job recap: rendered on any terminal state that carries job `progress`,
+  // except the synchronous result shape (`resultImport.total` — documents and
+  // legacy entrance imports) which keeps its own alerts below.
+  const showRecap =
+    isTerminal && progress && !(resultImport && resultImport.total);
 
   return (
     <>
@@ -86,25 +93,21 @@ const Step5 = () => {
         </Box>
       )}
 
-      {status === 'failed' && progress && (
-        <Alert
-          data-testid="csv-import-failed-alert"
-          severity="error"
-          title={formatMessage(
-            {
-              id: 'csvImport.jobFailed',
-              defaultMessage:
-                'The import failed. {number} rows could not be imported.'
-            },
-            { number: progress.failures }
-          )}
+      {/* Unified async-job recap (success, duplicates, failures) built from the
+          job `progress` counts — the single source of truth available on both
+          terminal states — plus the report download links when the completed
+          flow provides them. */}
+      {showRecap && (
+        <ImportResultRecap
+          progress={progress}
+          status={status}
+          reportUrls={resultImport?.summary ? resultImport.reportUrls : null}
         />
       )}
 
-      {/* Poll failure or any error without the detailed failed-batch alert
-          above. GrottoCenter uses the English string itself as the translation
-          key, so formatMessage localizes known messages / keys and falls back
-          to the raw text otherwise. */}
+      {/* Poll failure or any error without the detailed recap above. GrottoCenter
+          uses the English string itself as the translation key, so formatMessage
+          localizes known messages / keys and falls back to the raw text. */}
       {importCsv.error && !(status === 'failed' && progress) && (
         <Alert
           data-testid="csv-import-error-alert"
@@ -182,94 +185,6 @@ const Step5 = () => {
             />
           }
         />
-      )}
-
-      {/* Async job result shape (`summary` + `reportUrls`): summary counts +
-          links to the signed report URLs instead of in-memory CSV downloads.
-          Each report URL is null when its category is empty. Shape-based so a
-          legacy synchronous entrance result falls through to the block above. */}
-      {resultImport && resultImport.summary && status === 'completed' && (
-        <>
-          {resultImport.summary.duplicates > 0 && (
-            <Alert
-              data-testid="csv-import-duplicates-alert"
-              severity="warning"
-              title={formatMessage(
-                {
-                  id: 'csvImport.successAsDuplicatesRecap',
-                  defaultMessage:
-                    '{number} entities have been imported as duplicates.'
-                },
-                { number: resultImport.summary.duplicates }
-              )}
-              action={
-                resultImport.reportUrls.duplicates && (
-                  <Link
-                    href={resultImport.reportUrls.duplicates}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    data-testid="csv-import-download-duplicates">
-                    {formatMessage({ id: 'csvImport.downloadDuplicates' })}
-                  </Link>
-                )
-              }
-            />
-          )}
-          {resultImport.summary.successes > 0 && (
-            <Alert
-              data-testid="csv-import-success-alert"
-              severity="success"
-              title={formatMessage(
-                {
-                  id: 'csvImport.successRecap',
-                  defaultMessage: '{number} entities have been imported.'
-                },
-                { number: resultImport.summary.successes }
-              )}
-              action={
-                resultImport.reportUrls.success && (
-                  <Link
-                    href={resultImport.reportUrls.success}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    data-testid="csv-import-download-success">
-                    {formatMessage({ id: 'csvImport.downloadSuccess' })}
-                  </Link>
-                )
-              }
-            />
-          )}
-          {resultImport.summary.failures > 0 && (
-            <Alert
-              data-testid="csv-import-failures-alert"
-              severity="error"
-              title={formatMessage(
-                {
-                  id: 'csvImport.errorRecap',
-                  defaultMessage: '{number} entities failed to be imported.'
-                },
-                { number: resultImport.summary.failures }
-              )}
-              action={
-                resultImport.reportUrls.failures && (
-                  <Link
-                    href={resultImport.reportUrls.failures}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    data-testid="csv-import-download-failures">
-                    {formatMessage({ id: 'csvImport.downloadFailures' })}
-                  </Link>
-                )
-              }
-            />
-          )}
-          <Typography variant="caption" color="text.secondary">
-            {formatMessage({
-              id: 'csvImport.reportExpiry',
-              defaultMessage: 'Report links expire after 7 days.'
-            })}
-          </Typography>
-        </>
       )}
 
       {isDone && (
