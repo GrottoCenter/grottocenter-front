@@ -15,9 +15,16 @@ export default defineConfig(({ mode }) => {
   // would NOT work: vite-plugin-pwa serialises the function via .toString(),
   // so the free variable becomes `undefined` in the SW runtime and the rule
   // silently never matches. A RegExp serialises cleanly.
+  //
+  // Negative lookahead excludes map viewport queries (?sw_lat=…&ne_lat=…),
+  // whose URLs are unique per pan/zoom position — caching them fills the LRU
+  // in minutes with entries no one will ever revisit, evicting the actually
+  // useful responses (/account, /notifications, /entrances/{id}, …). Skipping
+  // them here means map endpoints just hit the network (no offline value lost:
+  // the exact viewport is never reproduced offline anyway).
   const escapeRegex = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   const apiPattern = apiOrigin
-    ? new RegExp(`^${escapeRegex(apiOrigin)}/api/`)
+    ? new RegExp(`^${escapeRegex(apiOrigin)}/api/(?!.*[?&]sw_lat=)`)
     : null;
 
   return {
@@ -76,25 +83,54 @@ export default defineConfig(({ mode }) => {
         runtimeCaching: [
           {
             // OpenStreetMap basemap tiles (default Leaflet layer).
+            // Leaflet rotates between a/b/c.tile.openstreetmap.org for parallel
+            // downloads → without normalization, the same (z,x,y) tile ends up
+            // cached up to 3 times under 3 different hostnames. The
+            // cacheKeyWillBeUsed hook strips the subdomain so all three hit
+            // the same cache entry.
             urlPattern: ({ url }) => /tile\.openstreetmap\.org/.test(url.href),
             handler: 'CacheFirst',
             options: {
               cacheName: 'osm-tiles',
               expiration: { maxEntries: 500, maxAgeSeconds: 60 * 60 * 24 * 30 },
-              cacheableResponse: { statuses: [0, 200] }
+              cacheableResponse: { statuses: [0, 200] },
+              plugins: [
+                {
+                  cacheKeyWillBeUsed: async ({ request }) => {
+                    const url = new URL(request.url);
+                    url.hostname = url.hostname.replace(
+                      /^[a-z]\.tile\.openstreetmap\.org$/,
+                      'tile.openstreetmap.org'
+                    );
+                    return url.toString();
+                  }
+                }
+              ]
             }
           },
           {
             // OpenTopoMap basemap tiles — separate cache so switching basemaps
             // doesn't evict the other's offline area, and to allow a longer TTL
-            // (OpenTopoMap updates less often / stricter usage policy).
-            // WMS/WMTS layers are intentionally left out of the precache.
+            // (OpenTopoMap updates less often / stricter usage policy). Same
+            // subdomain normalization as OSM.
             urlPattern: ({ url }) => /tile\.opentopomap\.org/.test(url.href),
             handler: 'CacheFirst',
             options: {
               cacheName: 'opentopomap-tiles',
               expiration: { maxEntries: 500, maxAgeSeconds: 60 * 60 * 24 * 90 },
-              cacheableResponse: { statuses: [0, 200] }
+              cacheableResponse: { statuses: [0, 200] },
+              plugins: [
+                {
+                  cacheKeyWillBeUsed: async ({ request }) => {
+                    const url = new URL(request.url);
+                    url.hostname = url.hostname.replace(
+                      /^[a-z]\.tile\.opentopomap\.org$/,
+                      'tile.opentopomap.org'
+                    );
+                    return url.toString();
+                  }
+                }
+              ]
             }
           },
           {
@@ -158,21 +194,37 @@ export default defineConfig(({ mode }) => {
             }
           },
           {
-            // Photos & thumbnails on Azure Blob Storage
-            // (*.blob.core.windows.net — covers prod, staging, any container).
-            // The backend generates a random-prefixed path for every upload
-            // (see grottocenter-api FileService.generateName), so each URL is
-            // effectively content-addressed — a "replaced" file gets a brand
-            // new URL. Safe for CacheFirst with no TTL; only LRU-cap the cache
-            // to keep storage bounded.
+            // Thumbnails on Azure Blob Storage — small (10-50 KB each), served
+            // in every list/card, so we keep a lot of them. URL shape is
+            // `/thumbnails/{small|medium|large}/...` (see grottocenter-api
+            // ThumbnailService.getThumbnailPath).
+            urlPattern: ({ url, request }) =>
+              request.destination === 'image' &&
+              /\.blob\.core\.windows\.net$/.test(url.hostname) &&
+              url.pathname.includes('/thumbnails/'),
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'blob-thumbnails',
+              expiration: {
+                maxEntries: 400,
+                purgeOnQuotaError: true
+              },
+              cacheableResponse: { statuses: [0, 200] }
+            }
+          },
+          {
+            // Full-resolution photos on Azure Blob Storage — can weigh several
+            // MB each, so cap tight (50 × ~3 MB ≈ 150 MB max). URLs are
+            // content-addressed via a random prefix (see FileService
+            // .generateName), safe for CacheFirst without TTL.
             urlPattern: ({ url, request }) =>
               request.destination === 'image' &&
               /\.blob\.core\.windows\.net$/.test(url.hostname),
             handler: 'CacheFirst',
             options: {
-              cacheName: 'blob-images',
+              cacheName: 'blob-images-full',
               expiration: {
-                maxEntries: 300,
+                maxEntries: 50,
                 purgeOnQuotaError: true
               },
               cacheableResponse: { statuses: [0, 200] }
