@@ -66,7 +66,13 @@ export default defineConfig(({ mode }) => {
       // (webManifestUrl: .../manifest.json) stays valid. (Service worker stays
       // the default sw.js.)
       manifestFilename: 'manifest.json',
-      includeAssets: ['favicon.ico', 'logo.svg', 'apple-touch-icon.png'],
+      includeAssets: [
+        'favicon.ico',
+        'logo.svg',
+        'apple-touch-icon.png',
+        'shortcut-map.png',
+        'shortcut-entrances.png'
+      ],
       manifest: {
         id: '/',
         short_name: 'Grottocenter',
@@ -91,21 +97,30 @@ export default defineConfig(({ mode }) => {
           }
         ],
         // Long-press shortcuts on the installed app icon (Android). URLs must
-        // stay within `scope`. No per-shortcut icons yet — platforms fall back
-        // to the app icon; add dedicated 96×96 PNGs later to polish.
+        // stay within `scope`.
         shortcuts: [
           {
             name: 'Map',
             short_name: 'Map',
             description: 'Explore caves and entrances on the map',
-            url: '/ui/map'
+            url: '/ui/map',
+            icons: [
+              { src: 'shortcut-map.png', type: 'image/png', sizes: '96x96' }
+            ]
           },
           {
             name: 'Search entrances',
             short_name: 'Entrances',
             description: 'Search cave entrances',
-            url: '/ui/entrances'
-          },
+            url: '/ui/entrances',
+            icons: [
+              {
+                src: 'shortcut-entrances.png',
+                type: 'image/png',
+                sizes: '96x96'
+              }
+            ]
+          }
         ]
       },
       workbox: {
