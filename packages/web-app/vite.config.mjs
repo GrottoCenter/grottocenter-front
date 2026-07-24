@@ -121,6 +121,96 @@ export default defineConfig(({ mode }) => {
               }
             ]
           }
+        ],
+        // Shown in the browser/OS "richer install" UI (Chrome install dialog,
+        // Play Store TWA listing). Not service-worker-precached — fetched
+        // on-demand only when that UI is shown. All narrow (phone) shots share
+        // the same capture size.
+        screenshots: [
+          {
+            src: 'screenshots/home-mobile.jpg',
+            type: 'image/jpeg',
+            sizes: '1080x2340',
+            form_factor: 'narrow',
+            label: 'Home page'
+          },
+          {
+            src: 'screenshots/map-mobile.jpg',
+            type: 'image/jpeg',
+            sizes: '1080x2340',
+            form_factor: 'narrow',
+            label: 'Interactive map of caves and entrances'
+          },
+          {
+            src: 'screenshots/map-detail-mobile.jpg',
+            type: 'image/jpeg',
+            sizes: '1080x2340',
+            form_factor: 'narrow',
+            label: 'Map entry detail'
+          },
+          {
+            src: 'screenshots/entrances-list-mobile.jpg',
+            type: 'image/jpeg',
+            sizes: '1080x2340',
+            form_factor: 'narrow',
+            label: 'Search cave entrances'
+          },
+          {
+            src: 'screenshots/network-mobile.jpg',
+            type: 'image/jpeg',
+            sizes: '1080x2340',
+            form_factor: 'narrow',
+            label: 'Cave network view'
+          },
+          {
+            src: 'screenshots/massifs-mobile.jpg',
+            type: 'image/jpeg',
+            sizes: '1080x2340',
+            form_factor: 'narrow',
+            label: 'Massifs browser'
+          },
+          {
+            src: 'screenshots/topo-mobile.jpg',
+            type: 'image/jpeg',
+            sizes: '1080x2340',
+            form_factor: 'narrow',
+            label: 'Topographic survey viewer'
+          },
+          {
+            src: 'screenshots/riggings-mobile.jpg',
+            type: 'image/jpeg',
+            sizes: '1080x2340',
+            form_factor: 'narrow',
+            label: 'Rigging details'
+          },
+          {
+            src: 'screenshots/add-mobile.jpg',
+            type: 'image/jpeg',
+            sizes: '1080x2340',
+            form_factor: 'narrow',
+            label: 'Add a new entrance, document, massif or organization'
+          },
+          {
+            src: 'screenshots/activitites-mobile.jpg',
+            type: 'image/jpeg',
+            sizes: '1080x2340',
+            form_factor: 'narrow',
+            label: 'Recent activity feed'
+          },
+          {
+            src: 'screenshots/messages-mobile.jpg',
+            type: 'image/jpeg',
+            sizes: '1080x2340',
+            form_factor: 'narrow',
+            label: 'Messages'
+          },
+          {
+            src: 'screenshots/menu-mobile.jpg',
+            type: 'image/jpeg',
+            sizes: '1080x2340',
+            form_factor: 'narrow',
+            label: 'Navigation menu'
+          }
         ]
       },
       workbox: {
