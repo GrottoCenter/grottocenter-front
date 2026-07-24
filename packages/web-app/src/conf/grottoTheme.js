@@ -91,7 +91,7 @@ export const overridings = {
     mapControlIcon: '#333333'
   },
   shape: {
-    borderRadius: '4px'
+    borderRadius: 4
   },
   typography: {
     fontFamily,

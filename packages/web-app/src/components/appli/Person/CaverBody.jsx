@@ -5,15 +5,15 @@ import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined
 import TravelExploreOutlinedIcon from '@mui/icons-material/TravelExploreOutlined';
 import PermMediaOutlinedIcon from '@mui/icons-material/PermMediaOutlined';
 
-import { PersonPropTypes } from '../../../types/person.type';
-import PageTabs from '../../common/Layouts/PageTabs';
-import SectionStack from '../../common/Layouts/SectionStack';
-import ScrollableContent from '../../common/Layouts/Fixed/ScrollableContent';
-import Alert from '../../common/Alert';
-import DocumentsList from '../../common/DocumentsList/DocumentsList';
-import EntitiesList from '../../common/entitiesList/EntitiesList';
-import RelatedCaves from '../../common/RelatedCaves/RelatedCaves';
-import PersonProperties from '../../common/Person/PersonProperties';
+import { PersonPropTypes } from '@/types/person.type';
+import PageTabs from '@/components/common/Layouts/PageTabs';
+import SectionStack from '@/components/common/Layouts/SectionStack';
+import ScrollableContent from '@/components/common/Layouts/Fixed/ScrollableContent';
+import Alert from '@/components/common/Alert';
+import DocumentsList from '@/components/common/DocumentsList/DocumentsList';
+import EntitiesList from '@/components/common/entitiesList/EntitiesList';
+import RelatedCaves from '@/components/common/RelatedCaves/RelatedCaves';
+import PersonProperties from '@/components/common/Person/PersonProperties';
 
 const CaverBody = ({ person, canEdit, onRefresh }) => {
   const { formatMessage } = useIntl();

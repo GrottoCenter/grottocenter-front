@@ -148,6 +148,7 @@ MobileEntityCard.propTypes = {
   columns: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   link: PropTypes.func.isRequired,
   renderCellFn: PropTypes.func.isRequired,
+  // When a function, called with the row data to allow per-row icons
   icon: PropTypes.oneOfType([PropTypes.node, PropTypes.func]),
   selected: PropTypes.bool,
   onToggle: PropTypes.func,
@@ -296,6 +297,7 @@ MobileEntityList.propTypes = {
   onPageChange: PropTypes.func,
   rowsPerPage: PropTypes.number.isRequired,
   link: PropTypes.func.isRequired,
+  // When a function, called with the row data to allow per-row icons
   icon: PropTypes.oneOfType([PropTypes.node, PropTypes.func]),
   renderCellFn: PropTypes.func.isRequired,
   onSelected: PropTypes.func,

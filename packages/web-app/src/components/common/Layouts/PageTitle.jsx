@@ -15,16 +15,16 @@ const TitleGroup = styled('div')({
   minWidth: 0
 });
 
-const TitleHeading = styled(Typography)({
+const TitleHeading = styled(Typography)(({ theme }) => ({
   wordBreak: 'break-word',
   display: 'flex',
   alignItems: 'center',
-  gap: 8,
+  gap: theme.spacing(1),
   // Collapse h1's typographic leading so `align-items: center` centers the
   // icon on the em-box (≈ the visible letters) instead of on the taller
   // line-height box, which otherwise makes the icon look shifted.
   lineHeight: 1
-});
+}));
 
 const TitleIcon = styled('span')({
   display: 'inline-flex',

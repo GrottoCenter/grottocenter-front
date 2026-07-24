@@ -2,12 +2,12 @@ import React from 'react';
 import { useIntl } from 'react-intl';
 import { Box } from '@mui/material';
 
-import { PersonPropTypes } from '../../../types/person.type';
-import SectionStack from '../../common/Layouts/SectionStack';
-import ScrollableContent from '../../common/Layouts/Fixed/ScrollableContent';
-import Alert from '../../common/Alert';
-import DocumentsList from '../../common/DocumentsList/DocumentsList';
-import PersonProperties from '../../common/Person/PersonProperties';
+import { PersonPropTypes } from '@/types/person.type';
+import SectionStack from '@/components/common/Layouts/SectionStack';
+import ScrollableContent from '@/components/common/Layouts/Fixed/ScrollableContent';
+import Alert from '@/components/common/Alert';
+import DocumentsList from '@/components/common/DocumentsList/DocumentsList';
+import PersonProperties from '@/components/common/Person/PersonProperties';
 
 const AuthorBody = ({ person }) => {
   const { formatMessage } = useIntl();

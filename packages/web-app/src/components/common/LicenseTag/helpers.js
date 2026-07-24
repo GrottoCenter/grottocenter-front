@@ -51,9 +51,6 @@ export const NON_CC_BADGES = {
   'Licence Ouverte': '/images/licence-ouverte.svg'
 };
 
-const getLicenseName = license =>
-  typeof license === 'string' ? license : (license?.name ?? '');
-
 // Returns the ordered list of CC clause tokens for a license name, or null when
 // the license is not a Creative Commons one (including empty / nullish input —
 // callers can hand off unvalidated API values without extra guards). Tolerant
@@ -67,6 +64,9 @@ export const parseCcClauses = name => {
     return ['ZERO'];
   return tokens.slice(1).filter(token => CC_CLAUSE_DESCRIPTIONS[token]);
 };
+
+const getLicenseName = license =>
+  typeof license === 'string' ? license : (license?.name ?? '');
 
 // Single source of truth for everything the LicenseTag components need from a
 // license (string name or full object). Avoids repeating the string/object and

@@ -13,22 +13,22 @@ import {
   useUserProperties,
   usePermissions,
   useSharePage
-} from '../../../hooks';
-import { PersonPropTypes } from '../../../types/person.type';
-import PageContainer from '../../common/Layouts/PageContainer';
-import PageHeader from '../../common/Layouts/PageHeader';
-import SectionStack from '../../common/Layouts/SectionStack';
-import ResponsiveActions from '../../common/Layouts/ResponsiveActions';
-import CustomIcon from '../../common/CustomIcon';
-import Alert from '../../common/Alert';
-import { deletePerson } from '../../../actions/Person/DeletePerson';
-import { fetchPerson } from '../../../actions/Person/GetPerson';
-import { fetchConversations } from '../../../actions/Messaging/GetConversations';
+} from '@/hooks';
+import { PersonPropTypes } from '@/types/person.type';
+import PageContainer from '@/components/common/Layouts/PageContainer';
+import PageHeader from '@/components/common/Layouts/PageHeader';
+import SectionStack from '@/components/common/Layouts/SectionStack';
+import ResponsiveActions from '@/components/common/Layouts/ResponsiveActions';
+import CustomIcon from '@/components/common/CustomIcon';
+import Alert from '@/components/common/Alert';
+import { deletePerson } from '@/actions/Person/DeletePerson';
+import { fetchPerson } from '@/actions/Person/GetPerson';
+import { fetchConversations } from '@/actions/Messaging/GetConversations';
 
 import {
   DeleteConfirmationDialog,
   DELETED_ENTITIES
-} from '../../common/card/Deleted';
+} from '@/components/common/card/Deleted';
 import AuthorBody from './AuthorBody';
 import CaverBody from './CaverBody';
 
