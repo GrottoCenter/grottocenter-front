@@ -420,6 +420,35 @@ export default defineConfig(({ mode }) => {
               },
               cacheableResponse: { statuses: [0, 200] }
             }
+          },
+          {
+            // Same-origin raster images NOT covered by the precache glob
+            // (jpg/jpeg/gif/webp/avif — the glob only precaches png/svg/ico).
+            // Homepage backgrounds (images/caves/*.jpg), partner logos, the
+            // news image, etc. Matched by extension rather than
+            // request.destination: some of these are CSS `background-image`
+            // URLs (e.g. images/caves/topo.jpg) whose request destination is
+            // unreliable across browsers, but the pathname extension is not.
+            // CacheFirst: cached lazily on first fetch, then served offline.
+            // Excludes /screenshots/ (PWA install-UI assets, larger and rarely
+            // re-shown — kept out of this LRU by design, as they are the
+            // precache too). Document images live on Azure Blob (cross-origin)
+            // and are handled by the blob-* rules above, so they never match
+            // here.
+            urlPattern: ({ url, sameOrigin }) =>
+              sameOrigin &&
+              !url.pathname.startsWith('/screenshots/') &&
+              /\.(?:jpe?g|gif|webp|avif)$/i.test(url.pathname),
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'static-images',
+              expiration: {
+                maxEntries: 60,
+                maxAgeSeconds: 60 * 60 * 24 * 30,
+                purgeOnQuotaError: true
+              },
+              cacheableResponse: { statuses: [0, 200] }
+            }
           }
         ]
       },
