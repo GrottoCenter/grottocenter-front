@@ -16,6 +16,12 @@
     <link rel="icon" href="/favicon.ico" sizes="any" />
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
 
+    <!-- iOS / legacy add-to-home-screen (standalone mode, status bar, title) -->
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Grottocenter" />
+
     <!--
       The PWA manifest (and its <link rel="manifest">) is generated and injected
       automatically by vite-plugin-pwa at build time — see vite.config.mjs.
@@ -33,7 +39,7 @@
       content="The Wiki database made by cavers for cavers."
     />
     <meta property="og:locale" content="en_US" />
-    <meta property="og:image" content="/og-image.png" />
+    <meta property="og:image" content="https://grottocenter.org/og-image.png" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
 
@@ -44,7 +50,7 @@
       name="twitter:description"
       content="The Wiki database made by cavers for cavers."
     />
-    <meta name="twitter:image" content="/og-image.png" />
+    <meta name="twitter:image" content="https://grottocenter.org/og-image.png" />
 
     <!-- Google Fonts: preconnect to avoid render-blocking -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />

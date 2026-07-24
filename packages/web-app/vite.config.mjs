@@ -72,6 +72,9 @@ export default defineConfig(({ mode }) => {
         short_name: 'Grottocenter',
         name: 'Grottocenter',
         description: 'The Wiki database made by cavers for cavers.',
+        lang: 'en',
+        dir: 'ltr',
+        categories: ['education', 'navigation', 'travel'],
         scope: '/',
         start_url: '/',
         display: 'standalone',
@@ -86,6 +89,23 @@ export default defineConfig(({ mode }) => {
             sizes: '512x512',
             purpose: 'maskable'
           }
+        ],
+        // Long-press shortcuts on the installed app icon (Android). URLs must
+        // stay within `scope`. No per-shortcut icons yet — platforms fall back
+        // to the app icon; add dedicated 96×96 PNGs later to polish.
+        shortcuts: [
+          {
+            name: 'Map',
+            short_name: 'Map',
+            description: 'Explore caves and entrances on the map',
+            url: '/ui/map'
+          },
+          {
+            name: 'Search entrances',
+            short_name: 'Entrances',
+            description: 'Search cave entrances',
+            url: '/ui/entrances'
+          },
         ]
       },
       workbox: {
