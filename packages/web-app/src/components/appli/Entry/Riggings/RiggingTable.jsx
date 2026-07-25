@@ -102,15 +102,19 @@ const RiggingTable = ({ id, obstacles, title, previous, isDeleted }) => {
           <TableHead>
             <TableRow>
               <StyledTableCell $isDeleted={isDeleted} width="25%">
-                {formatMessage({ id: 'obstacles' })}
-                <ColumnLegend titleKey="Obstacle notation legend" items={OBSTACLE_LEGEND} />
+                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                  {formatMessage({ id: 'obstacles' })}
+                  <ColumnLegend titleKey="Obstacle notation legend" items={OBSTACLE_LEGEND} />
+                </Box>
               </StyledTableCell>
               <StyledTableCell $isDeleted={isDeleted} width="10%">
                 {formatMessage({ id: 'ropes' })}
               </StyledTableCell>
               <StyledTableCell $isDeleted={isDeleted} width="20%">
-                {formatMessage({ id: 'anchors' })}
-                <ColumnLegend titleKey="Anchor notation legend" items={ANCHOR_LEGEND} />
+                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                  {formatMessage({ id: 'anchors' })}
+                  <ColumnLegend titleKey="Anchor notation legend" items={ANCHOR_LEGEND} />
+                </Box>
               </StyledTableCell>
               <StyledTableCell $isDeleted={isDeleted}>
                 {formatMessage({ id: 'observations' })}

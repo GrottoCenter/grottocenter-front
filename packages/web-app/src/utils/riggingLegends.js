@@ -14,6 +14,7 @@ export const OBSTACLE_LEGEND = [
 export const ANCHOR_LEGEND = [
   { abbrevKey: 'anchor.abbrev.spit', labelKey: 'anchor.label.spit' },
   { abbrevKey: 'anchor.abbrev.bolt', labelKey: 'anchor.label.bolt' },
+  { abbrevKey: 'anchor.abbrev.expansion', labelKey: 'anchor.label.expansion' },
   { abbrevKey: 'anchor.abbrev.piton', labelKey: 'anchor.label.piton' },
   { abbrevKey: 'anchor.abbrev.natural', labelKey: 'anchor.label.natural' },
   { abbrevKey: 'anchor.abbrev.soft', labelKey: 'anchor.label.soft' },
