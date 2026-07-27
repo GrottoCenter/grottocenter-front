@@ -5,7 +5,7 @@
       "namespace": "android_app",
       "package_name": "org.grottocenter.app",
       "sha256_cert_fingerprints": [
-        "REPLACE_WITH_PLAY_APP_SIGNING_SHA256",
+        "F1:61:F5:8F:84:4D:0F:DD:EB:1A:22:B1:73:FB:32:39:28:59:AF:A0:B1:13:F1:91:AF:E0:FC:5D:6C:A6:D5:82",
         "REPLACE_WITH_UPLOAD_KEY_SHA256"
       ]
     }

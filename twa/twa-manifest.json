@@ -4,18 +4,25 @@
   "name": "Grottocenter",
   "launcherName": "Grottocenter",
   "display": "standalone",
-  "orientation": "default",
-  "themeColor": "#5d4037",
-  "navigationColor": "#5d4037",
-  "navigationColorDark": "#5d4037",
-  "navigationDividerColor": "#5d4037",
-  "navigationDividerColorDark": "#5d4037",
-  "backgroundColor": "#5d4037",
+  "themeColor": "#5D4037",
+  "themeColorDark": "#000000",
+  "navigationColor": "#5D4037",
+  "navigationColorDark": "#5D4037",
+  "navigationDividerColor": "#5D4037",
+  "navigationDividerColorDark": "#5D4037",
+  "backgroundColor": "#5D4037",
   "enableNotifications": false,
   "startUrl": "/",
   "iconUrl": "https://grottocenter.org/logo512.png",
   "maskableIconUrl": "https://grottocenter.org/logo512-maskable.png",
   "monochromeIconUrl": "https://grottocenter.org/logo192.png",
+  "splashScreenFadeOutDuration": 300,
+  "signingKey": {
+    "path": "./android.keystore",
+    "alias": "grottocenter"
+  },
+  "appVersionName": "0.1.0",
+  "appVersionCode": 4,
   "shortcuts": [],
   "generatorApp": "bubblewrap-cli",
   "webManifestUrl": "https://grottocenter.org/manifest.json",
@@ -36,16 +43,15 @@
   "isMetaQuest": false,
   "fullScopeUrl": "https://grottocenter.org/",
   "minSdkVersion": 21,
+  "orientation": "default",
   "fingerprints": [
     {
       "name": "grottocenter",
       "value": "REPLACE_WITH_YOUR_SHA256_FINGERPRINT"
     }
   ],
-  "signingKey": {
-    "path": "./android.keystore",
-    "alias": "grottocenter"
-  },
-  "appVersionName": "1.0.0",
-  "appVersionCode": 1
+  "additionalTrustedOrigins": [],
+  "retainedBundles": [],
+  "displayOverride": [],
+  "appVersion": "0.1.0"
 }
