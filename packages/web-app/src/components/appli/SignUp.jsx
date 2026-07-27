@@ -103,8 +103,7 @@ const SignUp = () => {
     onError(toastMessage);
     // Turnstile tokens are single-use — reset so the widget issues a fresh one.
     setCaptchaToken('');
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [signUpState.error]);
+  }, [signUpState.error, formatMessage, onError]);
 
   const isSubmitDisabled = Boolean(captchaSiteKey) && !captchaToken;
 

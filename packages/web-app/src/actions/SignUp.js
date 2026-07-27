@@ -53,6 +53,8 @@ export function postSignUp(data) {
       let code = null;
       let message = null;
       try {
+        // Clone before parsing so the original body stream stays available
+        // for the text() fallback if JSON parsing fails.
         const body = await response.clone().json();
         code = body.error || body.code || null;
         message = body.message || null;

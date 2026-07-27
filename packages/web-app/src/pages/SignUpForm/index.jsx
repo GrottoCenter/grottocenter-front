@@ -200,12 +200,18 @@ const SignUpForm = ({
               valueName={formatMessage({ id: 'Password confirmation' })}
             />
 
+            {/*
+              Honeypot: an invisible field bots tend to fill. The wrapper is
+              aria-hidden so assistive tech skips it; the input keeps a
+              plausible name/aria-label ("Website") — deliberately not
+              translated, since the audience is bots, not users.
+            */}
             <HoneypotWrapper aria-hidden="true">
-              <label htmlFor="signup-website">Website</label>
               <input
                 id="signup-website"
                 type="text"
                 name="website"
+                aria-label="Website"
                 tabIndex={-1}
                 autoComplete="off"
                 value={honeypot}
