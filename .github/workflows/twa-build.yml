@@ -52,17 +52,15 @@ jobs:
             # Tag push: derive the name from the tag (v1.2.3 -> 1.2.3).
             NAME="${GITHUB_REF_NAME#v}"
           fi
-          # Require strict semver X.Y.Z — the version code is derived from it.
+          # versionName must be strict semver X.Y.Z (human-facing version).
           if ! printf '%s' "$NAME" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+$'; then
             echo "::error::version must be semver X.Y.Z (got '$NAME')"
             exit 1
           fi
-          # Deterministic, monotonic version code from semver:
-          # major*10000 + minor*100 + patch (e.g. 1.2.3 -> 10203). Same value for
-          # both triggers, always increasing with the released version.
-          IFS='.' read -r MAJ MIN PAT <<< "$NAME"
-          # 10# forces base-10 so a zero-padded segment (e.g. 08) isn't read as octal.
-          CODE=$(( 10#$MAJ * 10000 + 10#$MIN * 100 + 10#$PAT ))
+          # versionCode = the CI run number: a counter GitHub increments on every
+          # run, so it is strictly increasing for each build (a hard Play Store
+          # requirement) and decoupled from versionName.
+          CODE="${{ github.run_number }}"
           echo "name=$NAME" >> "$GITHUB_OUTPUT"
           echo "code=$CODE" >> "$GITHUB_OUTPUT"
           echo "Resolved version: $NAME (code $CODE)"
@@ -98,22 +96,25 @@ jobs:
           KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
         run: echo "$KEYSTORE_BASE64" | base64 --decode > android.keystore
 
-      - name: Update version in twa-manifest.json
+      - name: Set version in app/build.gradle
+        # Edit the version Gradle actually uses, NOT twa-manifest.json — leaving the
+        # manifest untouched keeps it in sync with manifest-checksum.txt, so
+        # `bubblewrap build` detects no change and never prompts to regenerate.
         env:
           VERSION_NAME: ${{ steps.version.outputs.name }}
           VERSION_CODE: ${{ steps.version.outputs.code }}
         run: |
-          node -e "
-            const fs = require('fs');
-            const manifest = JSON.parse(fs.readFileSync('twa-manifest.json', 'utf8'));
-            manifest.appVersionName = process.env.VERSION_NAME;
-            manifest.appVersionCode = parseInt(process.env.VERSION_CODE, 10);
-            fs.writeFileSync('twa-manifest.json', JSON.stringify(manifest, null, 2));
-          "
+          sed -i -E "s/versionCode[[:space:]]+[0-9]+/versionCode ${VERSION_CODE}/" app/build.gradle
+          sed -i -E "s/versionName[[:space:]]+\"[^\"]*\"/versionName \"${VERSION_NAME}\"/" app/build.gradle
+          grep -E "versionCode|versionName" app/build.gradle
 
       - name: Build AAB with Bubblewrap
+        # `printf 'n\n'` answers "no" to any residual "apply manifest changes?"
+        # prompt, so the build never blocks and never regenerates over the version
+        # we just set. With manifest and checksum committed in sync this prompt
+        # should not appear at all — this is a non-interactive safety net.
         run: |
-          bubblewrap build \
+          printf 'n\n' | bubblewrap build \
             --skipPwaValidation \
             --key-store-password "${{ secrets.ANDROID_KEYSTORE_PASSWORD }}" \
             --key-password "${{ secrets.ANDROID_KEY_PASSWORD }}"
