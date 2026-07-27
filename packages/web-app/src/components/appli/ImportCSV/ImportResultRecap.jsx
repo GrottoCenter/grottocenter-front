@@ -1,12 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Box, Link, Paper, Typography, useTheme } from '@mui/material';
-import { useIntl } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import CancelIcon from '@mui/icons-material/Cancel';
 import FormatListNumberedIcon from '@mui/icons-material/FormatListNumbered';
 import Alert from '../../common/Alert';
+import AppLink from '../../common/AppLink';
 
 // Single terminal-state recap for the async import job. Reads its counts from
 // `progress` — the only payload guaranteed present on BOTH terminal states
@@ -153,7 +154,24 @@ const ImportResultRecap = ({ progress, status, reportUrls = null }) => {
 
       {reportUrls && (
         <Typography variant="caption" color="text.secondary">
-          {formatMessage({ id: 'csvImport.reportExpiry' })}
+          <FormattedMessage
+            id="csvImport.postImportInfo"
+            defaultMessage="A copy of this summary has been sent to your notifications, and by email if you enabled it in your {settingsLink}. Report download links expire after 7 days."
+            values={{
+              settingsLink: (
+                <Link
+                  component={AppLink}
+                  to="/ui/account"
+                  openInNewTabDesktop
+                  variant="caption">
+                  {formatMessage({
+                    id: 'csvImport.notificationSettingsLink',
+                    defaultMessage: 'notification settings'
+                  })}
+                </Link>
+              )
+            }}
+          />
         </Typography>
       )}
     </Box>

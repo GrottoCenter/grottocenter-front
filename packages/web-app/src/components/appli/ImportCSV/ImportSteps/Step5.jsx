@@ -1,9 +1,10 @@
 import React, { useContext } from 'react';
-import { Box, LinearProgress, Typography } from '@mui/material';
+import { Box, LinearProgress, Link as MuiLink, Typography } from '@mui/material';
 import ReplayIcon from '@mui/icons-material/Replay';
 import HomeIcon from '@mui/icons-material/Home';
+import NotificationsActiveOutlinedIcon from '@mui/icons-material/NotificationsActiveOutlined';
 import { useDispatch, useSelector } from 'react-redux';
-import { useIntl } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import { ImportPageContentContext } from '../Provider';
 import { resetImportState } from '../../../../actions/ImportCsv';
 import { useJobPolling } from '../../../../hooks';
@@ -91,6 +92,35 @@ const Step5 = () => {
             data-testid="csv-import-progress-bar"
           />
         </Box>
+      )}
+
+      {isEntranceImport && isPolling && (
+        <Alert
+          data-testid="csv-import-can-close-info"
+          severity="info"
+          icon={<NotificationsActiveOutlinedIcon fontSize="inherit" />}
+          content={
+            <Typography variant="body2">
+              <FormattedMessage
+                id="csvImport.canClosePage"
+                defaultMessage="You can safely close this page. You'll receive an in-app notification when the import completes, and an email if you enabled it in your {settingsLink}. Report download links stay valid for 7 days."
+                values={{
+                  settingsLink: (
+                    <MuiLink
+                      component={AppLink}
+                      to="/ui/account"
+                      openInNewTabDesktop>
+                      {formatMessage({
+                        id: 'csvImport.notificationSettingsLink',
+                        defaultMessage: 'notification settings'
+                      })}
+                    </MuiLink>
+                  )
+                }}
+              />
+            </Typography>
+          }
+        />
       )}
 
       {/* Unified async-job recap (success, duplicates, failures) built from the
