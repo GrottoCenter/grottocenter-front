@@ -94,7 +94,24 @@ jobs:
       - name: Decode keystore from secret
         env:
           KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
-        run: echo "$KEYSTORE_BASE64" | base64 --decode > android.keystore
+        run: printf '%s' "$KEYSTORE_BASE64" | base64 -d > android.keystore
+
+      - name: Verify keystore (debug — remove once green)
+        env:
+          BUBBLEWRAP_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+        run: |
+          echo "decoded keystore size: $(wc -c < android.keystore) bytes (expected ~2788)"
+          if keytool -list -keystore android.keystore \
+               -storepass "$BUBBLEWRAP_KEYSTORE_PASSWORD" >/dev/null 2>&1; then
+            echo "✅ KEYSTORE + PASSWORD OK — cause is downstream (apksigner/shell quoting)"
+          else
+            echo "❌ KEYSTORE/PASSWORD MISMATCH — the base64 or the password secret is wrong"
+          fi
+          # Does the password contain shell-special characters?
+          case "$BUBBLEWRAP_KEYSTORE_PASSWORD" in
+            *[!A-Za-z0-9]*) echo "⚠️  password contains non-alphanumeric characters (possible shell-quoting issue)";;
+            *) echo "password is alphanumeric-only";;
+          esac
 
       - name: Set version in app/build.gradle
         # Edit the version Gradle actually uses, NOT twa-manifest.json — leaving the
