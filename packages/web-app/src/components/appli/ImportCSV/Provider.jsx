@@ -25,7 +25,8 @@ const defaultFormSteps = [
   { id: 1, name: 'General Information', isValid: false },
   { id: 2, name: 'File input', isValid: false },
   { id: 3, name: 'Review', isValid: false },
-  { id: 4, name: 'Confirm or Rollback', isValid: true }
+  { id: 4, name: 'Confirm or Rollback', isValid: true },
+  { id: 5, name: 'Import', isValid: true }
 ];
 
 export const defaultContext = {

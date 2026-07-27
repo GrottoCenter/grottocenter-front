@@ -4,6 +4,7 @@ import Step1 from './ImportSteps/Step1';
 import Step2 from './ImportSteps/Step2';
 import Step3 from './ImportSteps/Step3';
 import Step4 from './ImportSteps/Step4';
+import Step5 from './ImportSteps/Step5';
 
 const ImportPageContent = ({ currentFormStepId }) => (
   <>
@@ -11,6 +12,7 @@ const ImportPageContent = ({ currentFormStepId }) => (
     {currentFormStepId === 2 && <Step2 stepId={2} />}
     {currentFormStepId === 3 && <Step3 stepId={3} />}
     {currentFormStepId === 4 && <Step4 stepId={4} />}
+    {currentFormStepId === 5 && <Step5 stepId={5} />}
   </>
 );
 

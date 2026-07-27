@@ -15,7 +15,13 @@ import ImportPageContent from './ImportPageContent';
 import FixedContent from '../../common/Layouts/Fixed/FixedContent';
 import Translate from '../../common/Translate';
 import { useBoolean } from '../../../hooks';
-import { ENTRANCE, DOCUMENT } from './constants';
+import {
+  ENTRANCE,
+  DOCUMENT,
+  STEP_GENERAL,
+  STEP_CONFIRM,
+  STEP_IMPORT
+} from './constants';
 
 const useStyles = makeStyles({
   stepper: {
@@ -86,6 +92,15 @@ const ImportContainer = () => {
       break;
   }
 
+  // Steps 1–3 navigate with the generic Next; the Confirm step (4) moves
+  // forward only through its own "Import" button (which advances to step 5
+  // once the submission is accepted), and the Import/result step (5) is
+  // terminal — no Back (it must not re-run the dry-run or undo an import) and
+  // no Next. The result step offers its own "New import" reset instead.
+  const showNextButton = currentFormStep < STEP_CONFIRM;
+  const showBackButton =
+    currentFormStep !== STEP_GENERAL && currentFormStep !== STEP_IMPORT;
+
   return (
     <FixedContent
       title={<Translate>{title}</Translate>}
@@ -98,11 +113,12 @@ const ImportContainer = () => {
             <Stepper
               className={classes.stepper}
               currentFormStepId={currentFormStep}
-              completedSteps={validatedSteps}
               formSteps={formSteps}
               isNextStepButtonDisabled={isNextStepDisabled}
               handleStepBack={handleStepBack}
               handleStepNext={handleStepNext}
+              showBackButton={showBackButton}
+              showNextButton={showNextButton}
             />
             <StyledDivider />
             <ImportPageContent currentFormStepId={currentFormStep} />

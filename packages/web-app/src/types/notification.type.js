@@ -10,7 +10,16 @@ const notificationType = shape({
   }),
   notificationType: shape({
     id: number.isRequired,
-    name: oneOf(['CREATE', 'DELETE', 'REJECT', 'UPDATE', 'VALIDATE'])
+    name: oneOf([
+      'CREATE',
+      'DELETE',
+      'IMPORT_COMPLETE',
+      'PERMANENT_DELETE',
+      'REJECT',
+      'RESTORE',
+      'UPDATE',
+      'VALIDATE'
+    ])
   }),
   cave: idNameType,
   description: shape({

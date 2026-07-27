@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { includes } from 'ramda';
 import { styled } from '@mui/material/styles';
 import {
   Button,
@@ -28,7 +27,7 @@ const NextStepButton = props => (
 const PreviousStepButton = props => (
   <Button
     {...props}
-    variant="contained"
+    variant="outlined"
     color="primary"
     startIcon={<NavigateBeforeIcon />}>
     <Translate>Back</Translate>
@@ -36,7 +35,10 @@ const PreviousStepButton = props => (
 );
 
 const ChangeStepWrapper = styled(FormControl)`
-  display: block;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: 100%;
 `;
 
 // ===================================
@@ -44,18 +46,19 @@ const ChangeStepWrapper = styled(FormControl)`
 const Stepper = ({
   currentFormStepId,
   formSteps,
-  completedSteps,
   handleStepBack,
   handleStepNext,
-  isNextStepButtonDisabled
+  isNextStepButtonDisabled,
+  showBackButton = true,
+  showNextButton = true
 }) => (
   <>
-    <MuiStepper activeStep={currentFormStepId.id - 1} alternativeLabel>
+    {/* Linear wizard: pass a 0-based activeStep and let MUI derive each step's
+        active/completed state (and the connector fill) from it, exactly like
+        the MFA enrollment stepper. Step ids are 1-based, hence the -1. */}
+    <MuiStepper activeStep={currentFormStepId - 1} alternativeLabel>
       {formSteps.map(step => (
-        <Step
-          key={step.id}
-          active={step.id === currentFormStepId}
-          completed={includes(step.id, completedSteps)}>
+        <Step key={step.id}>
           <StepLabel>
             <Translate>{step.name}</Translate>
           </StepLabel>
@@ -64,15 +67,19 @@ const Stepper = ({
     </MuiStepper>
 
     <ChangeStepWrapper>
-      <PreviousStepButton
-        disabled={currentFormStepId === 1}
-        onClick={handleStepBack}
-      />
-      <NextStepButton
-        disabled={isNextStepButtonDisabled}
-        onClick={handleStepNext}
-        style={{ float: 'right' }}
-      />
+      {showBackButton && (
+        <PreviousStepButton
+          disabled={currentFormStepId === 1}
+          onClick={handleStepBack}
+        />
+      )}
+      {showNextButton && (
+        <NextStepButton
+          disabled={isNextStepButtonDisabled}
+          onClick={handleStepNext}
+          sx={{ ml: 'auto' }}
+        />
+      )}
     </ChangeStepWrapper>
   </>
 );
@@ -80,10 +87,13 @@ const Stepper = ({
 Stepper.propTypes = {
   currentFormStepId: PropTypes.number.isRequired,
   formSteps: PropTypes.arrayOf(idNameType).isRequired,
-  completedSteps: PropTypes.arrayOf(PropTypes.number).isRequired,
   handleStepBack: PropTypes.func.isRequired,
   handleStepNext: PropTypes.func.isRequired,
-  isNextStepButtonDisabled: PropTypes.bool.isRequired
+  isNextStepButtonDisabled: PropTypes.bool.isRequired,
+  // Steps 4 (confirm) and 5 (import) drive their own actions instead of the
+  // generic Next/Back, so the container can hide either button per step.
+  showBackButton: PropTypes.bool,
+  showNextButton: PropTypes.bool
 };
 
 export default Stepper;

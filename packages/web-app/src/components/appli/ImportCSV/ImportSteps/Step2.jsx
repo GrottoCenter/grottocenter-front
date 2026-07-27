@@ -1,9 +1,11 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { useCSVReader, formatFileSize } from 'react-papaparse';
 import { useIntl } from 'react-intl';
+import { useDispatch } from 'react-redux';
 import Alert from '../../../common/Alert';
 import { ImportPageContentContext } from '../Provider';
 import checkData from '../checkData';
+import { resetImportState } from '../../../../actions/ImportCsv';
 
 // From https://github.com/Bunlong/react-papaparse/blob/v4.0.0/examples/CSVReaderClickAndDragUpload.tsx
 const GREY = '#CCC';
@@ -75,6 +77,7 @@ const Step2 = () => {
   const { updateAttribute, selectedType } = useContext(
     ImportPageContentContext
   );
+  const dispatch = useDispatch();
 
   const { formatMessage } = useIntl();
   const { CSVReader } = useCSVReader();
@@ -83,15 +86,20 @@ const Step2 = () => {
   const [zoneHover, setZoneHover] = useState(false);
 
   // react-papaparse reset its content if go back to that step, so do we.
+  // Also reset the Redux import state here: going back to the file input step
+  // is the point where the user starts over, so any batchId/progress/result
+  // from a previous import must not leak into the next one.
   useEffect(() => {
     updateAttribute('importData', undefined);
     updateAttribute('fileImported', false);
-  }, [updateAttribute]);
+    dispatch(resetImportState());
+  }, [updateAttribute, dispatch]);
 
   const handleOnRemove = () => {
     setRowErrors([]);
     updateAttribute('importData', undefined);
     updateAttribute('fileImported', false);
+    dispatch(resetImportState());
   };
 
   return (

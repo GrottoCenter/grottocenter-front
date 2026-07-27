@@ -2,6 +2,13 @@
 export const ENTRANCE = 0;
 export const DOCUMENT = 1;
 
+// Wizard step ids (see defaultFormSteps in Provider.jsx)
+export const STEP_GENERAL = 1;
+export const STEP_FILE = 2;
+export const STEP_REVIEW = 3;
+export const STEP_CONFIRM = 4;
+export const STEP_IMPORT = 5;
+
 export const ENTRANCE_KARSTLINK = 'karstlink:UndergroundCavity';
 export const DOCUMENT_KARSTLINK = 'dct:BibliographicResource';
 
