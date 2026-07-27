@@ -2440,6 +2440,7 @@ __metadata:
     "@date-fns/utc": "npm:^2.1.1"
     "@emotion/react": "npm:^11.14.0"
     "@emotion/styled": "npm:^11.14.1"
+    "@marsidev/react-turnstile": "npm:^1.5.3"
     "@mui/icons-material": "npm:^7.3.9"
     "@mui/lab": "npm:^7.0.1-beta.25"
     "@mui/material": "npm:^7.3.9"
@@ -2857,6 +2858,16 @@ __metadata:
     "@jridgewell/resolve-uri": "npm:^3.1.0"
     "@jridgewell/sourcemap-codec": "npm:^1.4.14"
   checksum: 10/da0283270e691bdb5543806077548532791608e52386cfbbf3b9e8fb00457859d1bd01d512851161c886eb3a2f3ce6fd9bcf25db8edf3bddedd275bd4a88d606
+  languageName: node
+  linkType: hard
+
+"@marsidev/react-turnstile@npm:^1.5.3":
+  version: 1.5.3
+  resolution: "@marsidev/react-turnstile@npm:1.5.3"
+  peerDependencies:
+    react: ^17.0.2 || ^18.0.0 || ^19.0
+    react-dom: ^17.0.2 || ^18.0.0 || ^19.0
+  checksum: 10/59ace811b841b573d7b078fe6e13af13fbcd69d558a8c277da7cc3b95f27e6f74e1d1f1cf18dd31a9eabc03ac5ef4cfd33d0132f99f1107d4ed6e698b67df495
   languageName: node
   linkType: hard
 

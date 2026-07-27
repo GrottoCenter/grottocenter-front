@@ -8,6 +8,8 @@ import { postSignUp } from '../../actions/SignUp';
 import { useNotification, usePermissions } from '../../hooks';
 import SignUpForm from '../../pages/SignUpForm';
 
+const captchaSiteKey = import.meta.env.VITE_TURNSTILE_SITE_KEY;
+
 const SignUp = () => {
   const dispatch = useDispatch();
   const { formatMessage } = useIntl();
@@ -22,6 +24,8 @@ const SignUp = () => {
   const [password, setPassword] = React.useState('');
   const [passwordConfirmation, setPasswordConfirmation] = React.useState('');
   const [surname, setSurname] = React.useState('');
+  const [captchaToken, setCaptchaToken] = React.useState('');
+  const [honeypot, setHoneypot] = React.useState('');
   const { onError } = useNotification();
   const permissions = usePermissions();
   const navigate = useNavigate();
@@ -65,7 +69,9 @@ const SignUp = () => {
           name,
           nickname,
           password,
-          surname
+          surname,
+          website: honeypot,
+          ...(captchaSiteKey ? { captchaToken } : {})
         })
       );
       setSignUpRequestSent(true);
@@ -84,6 +90,24 @@ const SignUp = () => {
     }
   }, [signUpState, signUpRequestSent]);
 
+  useEffect(() => {
+    if (!signUpState.error) return;
+    const { code, message } = signUpState.error;
+    const toastMessage = code
+      ? formatMessage({
+          id: code,
+          defaultMessage:
+            message || formatMessage({ id: 'unexpected error' })
+        })
+      : message || formatMessage({ id: 'unexpected error' });
+    onError(toastMessage);
+    // Turnstile tokens are single-use — reset so the widget issues a fresh one.
+    setCaptchaToken('');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [signUpState.error]);
+
+  const isSubmitDisabled = Boolean(captchaSiteKey) && !captchaToken;
+
   return (
     <SignUpForm
       loading={signUpState.isFetching}
@@ -93,12 +117,17 @@ const SignUp = () => {
       password={password}
       passwordConfirmation={passwordConfirmation}
       surname={surname}
+      honeypot={honeypot}
+      captchaSiteKey={captchaSiteKey}
+      isSubmitDisabled={isSubmitDisabled}
       onEmailChange={setEmail}
       onNameChange={setName}
       onNicknameChange={setNickname}
       onPasswordChange={setPassword}
       onPasswordConfirmationChange={setPasswordConfirmation}
       onSurnameChange={setSurname}
+      onHoneypotChange={setHoneypot}
+      onCaptchaTokenChange={setCaptchaToken}
       onSignUp={onSignUp}
       signUpRequestSucceeded={signUpRequestSucceeded}
     />

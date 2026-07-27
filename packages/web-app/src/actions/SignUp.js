@@ -1,6 +1,5 @@
 import fetch from 'isomorphic-fetch';
 import { signUpUrl } from '../conf/apiRoutes';
-import makeErrorMessage from '../helpers/makeErrorMessage';
 
 // ==========
 export const FETCH_SIGN_UP = 'FETCH_SIGN_UP';
@@ -30,38 +29,46 @@ export const fetchSignUpFailure = error => ({
  * - nickname {String}
  * - email {String}
  * - password {String}
+ * - website {String} — honeypot (must be empty)
+ * - captchaToken {String} (optional) — Cloudflare Turnstile token
  */
 export function postSignUp(data) {
-  return dispatch => {
+  return async dispatch => {
     dispatch(fetchSignUp());
 
-    const requestOptions = {
-      method: 'POST',
-      body: JSON.stringify(data)
-    };
-
-    return fetch(signUpUrl, requestOptions)
-      .then(response => {
-        if (response.ok) {
-          // there is no content in the response in case of success
-          dispatch(fetchSignUpSuccess());
-        } else {
-          throw response;
-        }
-      })
-      .catch(response => {
-        const statusCode = response.status;
-        response.text().then(responseText => {
-          const errorMessage =
-            statusCode === 500
-              ? 'A server error occurred, please try again later or contact Wikicaves for more information.'
-              : responseText;
-          dispatch(
-            fetchSignUpFailure(
-              makeErrorMessage(statusCode, `SignUp - ${errorMessage}`)
-            )
-          );
-        });
+    try {
+      const response = await fetch(signUpUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
       });
+
+      if (response.ok) {
+        // there is no content in the response in case of success
+        dispatch(fetchSignUpSuccess());
+        return;
+      }
+
+      const status = response.status;
+      let code = null;
+      let message = null;
+      try {
+        const body = await response.clone().json();
+        code = body.error || body.code || null;
+        message = body.message || null;
+      } catch {
+        message = await response.text();
+      }
+
+      dispatch(fetchSignUpFailure({ code, message, status }));
+    } catch (error) {
+      dispatch(
+        fetchSignUpFailure({
+          code: null,
+          message: error?.message || null,
+          status: null
+        })
+      );
+    }
   };
 }
