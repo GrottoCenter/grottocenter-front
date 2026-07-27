@@ -1,6 +1,15 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { Box, Breadcrumbs, Chip, Skeleton, Typography } from '@mui/material';
+import {
+  Box,
+  Breadcrumbs,
+  Button,
+  Chip,
+  Paper,
+  Skeleton,
+  Tooltip,
+  Typography
+} from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { useNavigate, useParams } from 'react-router-dom';
 import AppLink from '../../components/common/AppLink';
@@ -8,7 +17,9 @@ import { useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import Linkify from 'linkify-react';
 import CreateIcon from '@mui/icons-material/Create';
+import CancelIcon from '@mui/icons-material/Cancel';
 import DeleteIcon from '@mui/icons-material/Delete';
+import LinkIcon from '@mui/icons-material/Link';
 import ManageHistoryIcon from '@mui/icons-material/ManageHistory';
 import NewspaperIcon from '@mui/icons-material/Newspaper';
 import ShareIcon from '@mui/icons-material/Share';
@@ -36,11 +47,13 @@ import {
   TextLink
 } from './Section';
 import { fetchDocumentDetails } from '../../actions/Document/GetDocumentDetails';
+import { linkDocumentToEntrance } from '../../actions/LinkDocumentToEntrance';
+import SearchEntranceForm from '../../components/appli/SearchEntranceForm';
 import { fetchDocumentChildren } from '../../actions/Document/GetDocumentChildren';
 import { deleteDocument } from '../../actions/Document/DeleteDocument';
 import { restoreDocument } from '../../actions/Document/RestoreDocument';
 import { loadLanguages } from '../../actions/Language';
-import { usePermissions, useSharePage } from '../../hooks';
+import { useNotification, usePermissions, useSharePage } from '../../hooks';
 import PageContainer from '../../components/common/Layouts/PageContainer';
 import PageHeader from '../../components/common/Layouts/PageHeader';
 import SectionStack from '../../components/common/Layouts/SectionStack';
@@ -59,6 +72,7 @@ import {
   DocumentSimplePropTypes
 } from '../../types/document.type';
 import linkifyOptions from '../../helpers/linkifyOptions';
+import { formatDocumentReference } from '../../utils/documentReference';
 
 const HalfSplitContainer = styled('div')`
   display: flex;
@@ -100,9 +114,11 @@ const Document = ({
   const navigate = useNavigate();
   const permissions = usePermissions();
   const dispatch = useDispatch();
+  const { onSuccess } = useNotification();
   const { languages } = useSelector(state => state.language);
   const licenses = useSelector(state => state.licenses.data);
   const licensesLoading = useSelector(state => state.licenses.loading);
+  const [isEntranceSearchVisible, setIsEntranceSearchVisible] = useState(false);
   const [isDeleteConfirmationOpen, setIsDeleteConfirmationOpen] =
     useState(false);
   const [isDeleteConfirmationPermanent, setIsDeleteConfirmationPermanent] =
@@ -156,6 +172,20 @@ const Document = ({
 
   const mainLanguage =
     documentData?.mainLanguage === '000' ? null : documentData?.mainLanguage;
+
+  // ISO 690 citation, shown for reference-style documents (articles, books).
+  const reference = useMemo(
+    () => formatDocumentReference(documentData),
+    [documentData]
+  );
+
+  // identifierType may arrive as a plain string (e.g. "isbn") or as a populated
+  // object ({ id, name }); normalize it so the ISBN/DOI/… label always renders.
+  const identifierTypeLabel = useMemo(() => {
+    const type = documentData?.identifierType;
+    const name = typeof type === 'string' ? type : type?.name;
+    return name ? name.toUpperCase() : null;
+  }, [documentData]);
 
   const allAuthors = useMemo(() => {
     if (!documentData) return null;
@@ -269,6 +299,27 @@ const Document = ({
       ))
     ].filter(Boolean);
   }, [documentData, formatMessage]);
+
+  const canLinkEntrance = permissions.isAuth && !documentData?.isDeleted;
+
+  const handleLinkEntrances = async entrances => {
+    await Promise.all(
+      entrances.map(entrance =>
+        dispatch(
+          linkDocumentToEntrance({
+            entranceId: entrance.id,
+            document: documentData
+          })
+        )
+      )
+    );
+    setIsEntranceSearchVisible(false);
+    // Refresh the document so newly linked entrances appear in "Linked entities".
+    dispatch(fetchDocumentDetails(documentData.id));
+    onSuccess(
+      formatMessage({ id: 'Entrance(s) successfully linked to the document.' })
+    );
+  };
 
   const { isCollection, isEvent } = documentTypeHelpers;
   const docType = documentData?.type;
@@ -427,6 +478,26 @@ const Document = ({
                         })}
                       />
                     )}
+                    {reference && (
+                      <Paper
+                        variant="outlined"
+                        sx={{
+                          p: 1,
+                          borderRadius: 2,
+                          bgcolor: 'grey.50',
+                          borderLeft: 4,
+                          borderLeftColor: 'primary.main'
+                        }}>
+                        <Typography
+                          variant="overline"
+                          color="text.secondary"
+                          display="block"
+                          sx={{ lineHeight: 1.5 }}>
+                          {formatMessage({ id: 'Reference' })}
+                        </Typography>
+                        <Typography variant="body2">{reference}</Typography>
+                      </Paper>
+                    )}
                     <SummaryText>
                       <Linkify options={linkifyOptions}>
                         {documentData.description}
@@ -562,10 +633,10 @@ const Document = ({
                       />
                       <DetailItem
                         fullWidth
-                        label={documentData.identifierType?.toUpperCase()}
+                        label={identifierTypeLabel}
                         value={documentData.identifier}
                         url={
-                          documentData.identifierType === 'url'
+                          identifierTypeLabel === 'URL'
                             ? documentData.identifier
                             : undefined
                         }
@@ -648,11 +719,55 @@ const Document = ({
             }
           />
 
-          {linkedEntities.length > 0 && (
+          {(linkedEntities.length > 0 || canLinkEntrance) && (
             <ScrollableContent
               dense
               title={formatMessage({ id: 'Linked entities' })}
-              content={<EntitiesList>{linkedEntities}</EntitiesList>}
+              icon={
+                canLinkEntrance && (
+                  <Tooltip
+                    title={formatMessage({
+                      id: isEntranceSearchVisible
+                        ? 'Cancel this search'
+                        : 'Associate an existing entrance'
+                    })}>
+                    <Button
+                      color={isEntranceSearchVisible ? 'inherit' : 'secondary'}
+                      size="small"
+                      variant="outlined"
+                      onClick={() => setIsEntranceSearchVisible(v => !v)}
+                      startIcon={
+                        isEntranceSearchVisible ? <CancelIcon /> : <LinkIcon />
+                      }>
+                      {formatMessage({
+                        id: isEntranceSearchVisible ? 'Cancel' : 'Associate'
+                      })}
+                    </Button>
+                  </Tooltip>
+                )
+              }
+              content={
+                <>
+                  {isEntranceSearchVisible && (
+                    <SearchEntranceForm
+                      closeForm={() => setIsEntranceSearchVisible(false)}
+                      onSubmit={handleLinkEntrances}
+                    />
+                  )}
+                  {linkedEntities.length > 0 ? (
+                    <EntitiesList>{linkedEntities}</EntitiesList>
+                  ) : (
+                    !isEntranceSearchVisible && (
+                      <EmptySection
+                        icon={<CustomIcon type="entrance" size={40} />}
+                        message={formatMessage({
+                          id: 'No entities are linked to this document yet.'
+                        })}
+                      />
+                    )
+                  )}
+                </>
+              }
             />
           )}
 
