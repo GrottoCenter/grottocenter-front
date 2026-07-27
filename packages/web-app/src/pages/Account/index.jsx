@@ -59,6 +59,7 @@ import EntitiesList from '../../components/common/entitiesList/EntitiesList';
 import PageContainer from '../../components/common/Layouts/PageContainer';
 import PageHeader from '../../components/common/Layouts/PageHeader';
 import PageTabs from '../../components/common/Layouts/PageTabs';
+import SectionStack from '../../components/common/Layouts/SectionStack';
 import ScrollableContent from '../../components/common/Layouts/Fixed/ScrollableContent';
 import RelatedCaves from '../../components/common/RelatedCaves/RelatedCaves';
 import StandardDialog from '../../components/common/StandardDialog';
@@ -79,8 +80,7 @@ import { notificationPreferencesUrl } from '../../conf/apiRoutes';
 
 // ─── Shared styled components ─────────────────────────────────────────────────
 
-const SectionPaper = styled(Paper)(({ theme }) => ({
-  marginBottom: theme.spacing(1),
+const SectionPaper = styled(Paper)(() => ({
   overflow: 'hidden'
 }));
 
@@ -1212,23 +1212,23 @@ const AccountPage = () => {
   ];
 
   const settingsContent = (
-    <Box sx={{ p: { xs: 0.5, sm: 1 } }}>
+    <SectionStack>
       {isAccountLoading && (
         <>
           <Skeleton
             variant="rectangular"
             height={130}
-            sx={{ mb: 1, borderRadius: 1 }}
+            sx={{ borderRadius: 1 }}
           />
           <Skeleton
             variant="rectangular"
             height={160}
-            sx={{ mb: 1, borderRadius: 1 }}
+            sx={{ borderRadius: 1 }}
           />
           <Skeleton
             variant="rectangular"
             height={130}
-            sx={{ mb: 1, borderRadius: 1 }}
+            sx={{ borderRadius: 1 }}
           />
         </>
       )}
@@ -1251,7 +1251,7 @@ const AccountPage = () => {
           <PreferencesSection account={account} onSaved={handleSaved} />
         </>
       )}
-    </Box>
+    </SectionStack>
   );
 
   return (
@@ -1269,20 +1269,20 @@ const AccountPage = () => {
         {/* Tab Activités */}
         <div>
           {isPersonFetching ? (
-            <Box sx={{ px: 1 }}>
+            <SectionStack>
               <Skeleton
                 variant="rectangular"
                 height={100}
-                sx={{ mb: 1, borderRadius: 1 }}
+                sx={{ borderRadius: 1 }}
               />
               <Skeleton
                 variant="rectangular"
                 height={100}
                 sx={{ borderRadius: 1 }}
               />
-            </Box>
+            </SectionStack>
           ) : (
-            <>
+            <SectionStack>
               <ScrollableContent
                 anchorId="organizations"
                 title={formatMessage({ id: 'Organizations' })}
@@ -1374,43 +1374,49 @@ const AccountPage = () => {
                   />
                 }
               />
-            </>
+            </SectionStack>
           )}
         </div>
 
         {/* Tab Subscriptions — visible uniquement si isLeader */}
         {isLeader && (
           <div>
-            <ScrollableContent
-              collapsible={false}
-              content={
-                <SubscriptionsList
-                  canUnsubscribe
-                  subscriptions={subscriptions}
-                  subscriptionsStatus={
-                    subscriptionsStatus ?? REDUCER_STATUS.IDLE
-                  }
-                  userId={userId}
-                />
-              }
-            />
+            <SectionStack>
+              <ScrollableContent
+                collapsible={false}
+                content={
+                  <SubscriptionsList
+                    canUnsubscribe
+                    subscriptions={subscriptions}
+                    subscriptionsStatus={
+                      subscriptionsStatus ?? REDUCER_STATUS.IDLE
+                    }
+                    userId={userId}
+                  />
+                }
+              />
+            </SectionStack>
           </div>
         )}
 
         {/* Tab Documents */}
         <div>
           {isPersonFetching && (
-            <Card sx={{ m: 1, p: 2 }}>
-              <Skeleton height={40} width="100%" />
-              <Skeleton height={60} />
-              <Skeleton height={60} />
-            </Card>
+            <SectionStack>
+              <Card sx={{ p: 2 }}>
+                <Skeleton height={40} width="100%" />
+                <Skeleton height={60} />
+                <Skeleton height={60} />
+              </Card>
+            </SectionStack>
           )}
           {person?.id === userId && (
-            <ScrollableContent
-              collapsible={false}
-              content={<DocumentsList documents={person.documents} />}
-            />
+            <SectionStack>
+              <ScrollableContent
+                collapsible={false}
+                content={<DocumentsList documents={person.documents} />}
+              />
+            </SectionStack>
           )}
         </div>
       </PageTabs>
@@ -1422,10 +1428,16 @@ const AccountPage = () => {
         title={formatMessage({ id: 'Leave organization' })}
         actions={
           <>
-            <Button onClick={() => setPendingLeaveOrg(null)} variant="text">
+            <Button
+              onClick={() => setPendingLeaveOrg(null)}
+              variant="outlined">
               {formatMessage({ id: 'Cancel' })}
             </Button>
-            <Button onClick={handleConfirmLeaveOrg} color="error" autoFocus>
+            <Button
+              onClick={handleConfirmLeaveOrg}
+              variant="contained"
+              color="error"
+              autoFocus>
               {formatMessage({ id: 'Leave' })}
             </Button>
           </>

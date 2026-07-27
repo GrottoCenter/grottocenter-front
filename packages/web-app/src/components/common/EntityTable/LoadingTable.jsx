@@ -1,4 +1,5 @@
 import { TableCell, TableRow, TableHead } from '@mui/material';
+import PropTypes from 'prop-types';
 import Skeleton from '@mui/material/Skeleton';
 import React from 'react';
 
@@ -16,13 +17,24 @@ export const LoadingTableRow = () => (
   </>
 );
 
-export const LoadingTableHead = () => (
+export const LoadingTableHead = ({ stickyTop = 0 }) => (
   <TableHead>
     <TableRow>
-      <LoadingTableRow />
+      <TableCell sx={{ top: stickyTop }}>
+        <Skeleton />
+      </TableCell>
+      <TableCell sx={{ top: stickyTop }}>
+        <Skeleton />
+      </TableCell>
+      <TableCell sx={{ top: stickyTop }}>
+        <Skeleton />
+      </TableCell>
     </TableRow>
   </TableHead>
 );
+LoadingTableHead.propTypes = {
+  stickyTop: PropTypes.number
+};
 
 export const LoadingTableBodyInner = () => (
   <>

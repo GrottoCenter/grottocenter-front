@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import { useDispatch } from 'react-redux';
-import { useParams, useNavigate, Link as RouterLink } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { styled } from '@mui/material/styles';
 import Skeleton from '@mui/material/Skeleton';
 import {
@@ -10,9 +10,9 @@ import {
   Breadcrumbs,
   Card,
   CircularProgress,
-  Link,
   Typography
 } from '@mui/material';
+import AppLink from '../../common/AppLink';
 import { NavigateNext, Print } from '@mui/icons-material';
 import CreateIcon from '@mui/icons-material/Create';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -30,6 +30,7 @@ import { useReactToPrint } from 'react-to-print';
 import PageContainer from '../../common/Layouts/PageContainer';
 import PageHeader from '../../common/Layouts/PageHeader';
 import PageTabs from '../../common/Layouts/PageTabs';
+import SectionStack from '../../common/Layouts/SectionStack';
 import ResponsiveActions from '../../common/Layouts/ResponsiveActions';
 import ScrollableContent from '../../common/Layouts/Fixed/ScrollableContent';
 import CustomIcon from '../../common/CustomIcon';
@@ -183,13 +184,6 @@ export const Entry = ({
           hidden: !canEdit
         },
         {
-          key: 'delete',
-          icon: <DeleteIcon />,
-          label: formatMessage({ id: 'Delete' }),
-          onClick: onDelete,
-          hidden: !onDelete
-        },
-        {
           key: 'snapshot',
           icon: <HistoryIcon />,
           label: formatMessage({ id: 'History' }),
@@ -200,6 +194,13 @@ export const Entry = ({
           icon: <ManageHistoryIcon />,
           label: formatMessage({ id: 'Page history' }),
           onClick: () => openLink(`${snapshotUrl}&all=true`)
+        },
+        {
+          key: 'delete',
+          icon: <DeleteIcon />,
+          label: formatMessage({ id: 'Delete' }),
+          onClick: onDelete,
+          hidden: !onDelete
         }
       ]}
     />
@@ -213,8 +214,7 @@ export const Entry = ({
         '& .MuiBreadcrumbs-separator': { mx: { xs: '2px', md: '8px' } }
       }}>
       {entrance.country && (
-        <Link
-          component={RouterLink}
+        <AppLink
           to={`/ui/countries/${entrance.country}`}
           underline="hover"
           color="inherit"
@@ -225,7 +225,7 @@ export const Entry = ({
           }}>
           <CustomIcon type="country" size={16} />
           {entrance.country}
-        </Link>
+        </AppLink>
       )}
       {entrance.massifs?.length > 0 && (
         <Box
@@ -237,8 +237,7 @@ export const Entry = ({
           {entrance.massifs.map((massif, index) => (
             <React.Fragment key={massif.id}>
               {index > 0 && <span>·</span>}
-              <Link
-                component={RouterLink}
+              <AppLink
                 to={`/ui/massifs/${massif.id}`}
                 underline="hover"
                 color="inherit"
@@ -249,14 +248,13 @@ export const Entry = ({
                 }}>
                 <CustomIcon type="massif" size={16} />
                 {massif.name}
-              </Link>
+              </AppLink>
             </React.Fragment>
           ))}
         </Box>
       )}
       {isNetwork && (
-        <Link
-          component={RouterLink}
+        <AppLink
           to={`/ui/caves/${entrance.cave.id}`}
           underline="hover"
           color="inherit"
@@ -267,7 +265,7 @@ export const Entry = ({
           }}>
           <CustomIcon type="network" size={16} />
           {entrance.cave.name}
-        </Link>
+        </AppLink>
       )}
     </Breadcrumbs>
   ) : null;
@@ -319,39 +317,41 @@ export const Entry = ({
           {/* Tab Information */}
           <div>
             {isLoading && (
-              <Card sx={{ m: 1, p: 2 }}>
-                <Skeleton height={300} />
-                <Skeleton height={80} />
-                <Skeleton height={100} />
-                <Skeleton height={150} />
-                <Skeleton height={100} />
-              </Card>
+              <SectionStack>
+                <Card sx={{ p: 2 }}>
+                  <Skeleton height={300} />
+                  <Skeleton height={80} />
+                  <Skeleton height={100} />
+                  <Skeleton height={150} />
+                  <Skeleton height={100} />
+                </Card>
+              </SectionStack>
             )}
             {error && (
-              <Card sx={{ m: 1, p: 2 }}>
-                <Alert
-                  title={formatMessage({
-                    id: 'Error, the entrance data you are looking for is not available.'
-                  })}
-                  severity="error"
-                />
-              </Card>
+              <SectionStack>
+                <Card sx={{ p: 2 }}>
+                  <Alert
+                    title={formatMessage({
+                      id: 'Error, the entrance data you are looking for is not available.'
+                    })}
+                    severity="error"
+                  />
+                </Card>
+              </SectionStack>
             )}
             {entrance && (
-              <>
+              <SectionStack>
                 {entrance.isDeleted && (
-                  <Box sx={{ m: 1 }}>
-                    <DeletedCard
-                      entityType={DELETED_ENTITIES.entrance}
-                      entity={entrance}
-                      isLoading={isActionLoading}
-                      onRestorePress={onRestorePress}
-                      onPermanentDeletePress={() => {
-                        setIsDeleteConfirmationPermanent(true);
-                        setIsDeleteConfirmationOpen(true);
-                      }}
-                    />
-                  </Box>
+                  <DeletedCard
+                    entityType={DELETED_ENTITIES.entrance}
+                    entity={entrance}
+                    isLoading={isActionLoading}
+                    onRestorePress={onRestorePress}
+                    onPermanentDeletePress={() => {
+                      setIsDeleteConfirmationPermanent(true);
+                      setIsDeleteConfirmationOpen(true);
+                    }}
+                  />
                 )}
                 <DeleteConfirmationDialog
                   entityType={DELETED_ENTITIES.entrance}
@@ -363,18 +363,28 @@ export const Entry = ({
                     onDeletePress(entity?.id, isDeleteConfirmationPermanent);
                   }}
                 />
-                {entrance.isSensitive && isAdmin && (
-                  <Box sx={{ mx: 1, mt: 1 }}>
-                    <SensitiveCaveWarning />
-                  </Box>
-                )}
                 <ScrollableContent
                   content={
                     <>
                       <HalfSplitContainer>
-                        <Box sx={{ flex: 1, minHeight: 200, display: 'flex' }}>
+                        <Box
+                          sx={{
+                            flex: 1,
+                            minHeight: 200,
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: 1
+                          }}>
+                          {entrance.isSensitive && isAdmin && (
+                            <SensitiveCaveWarning />
+                          )}
                           {!entrance.isSensitive || isAdmin ? (
-                            <Map positions={mapPositions} loading={isLoading} />
+                            <Box sx={{ flex: 1, display: 'flex' }}>
+                              <Map
+                                positions={mapPositions}
+                                loading={isLoading}
+                              />
+                            </Box>
                           ) : (
                             <SensitiveLocationPlaceholder />
                           )}
@@ -450,26 +460,30 @@ export const Entry = ({
                   entranceId={entrance.id}
                   isEditAllowed={!entrance.isDeleted}
                 />
-              </>
+              </SectionStack>
             )}
           </div>
 
           {/* Tab 1 — Documents */}
           <div>
             {isLoading && (
-              <Card sx={{ m: 1, p: 2 }}>
-                <Skeleton height={40} width="100%" />
-                <Skeleton height={60} />
-                <Skeleton height={60} />
-                <Skeleton height={60} />
-              </Card>
+              <SectionStack>
+                <Card sx={{ p: 2 }}>
+                  <Skeleton height={40} width="100%" />
+                  <Skeleton height={60} />
+                  <Skeleton height={60} />
+                  <Skeleton height={60} />
+                </Card>
+              </SectionStack>
             )}
             {entrance && (
-              <Documents
-                documents={entrance.documents}
-                entranceId={entrance.id}
-                isEditAllowed={!entrance.isDeleted}
-              />
+              <SectionStack>
+                <Documents
+                  documents={entrance.documents}
+                  entranceId={entrance.id}
+                  isEditAllowed={!entrance.isDeleted}
+                />
+              </SectionStack>
             )}
           </div>
 
@@ -479,24 +493,30 @@ export const Entry = ({
             so `{isAdmin && <Science />}` works — but returning null or wrapping in a div would
             silently shift all subsequent tab panels. */}
           {isAdmin && entrance?.cave?.id && (
-            <Science caveId={entrance.cave.id} />
+            <SectionStack>
+              <Science caveId={entrance.cave.id} />
+            </SectionStack>
           )}
 
           {/* Tab 3 — Comments */}
           <div>
             {isLoading && (
-              <Card sx={{ m: 1, p: 2 }}>
-                <Skeleton height={40} width="100%" />
-                <Skeleton height={80} />
-                <Skeleton height={80} />
-              </Card>
+              <SectionStack>
+                <Card sx={{ p: 2 }}>
+                  <Skeleton height={40} width="100%" />
+                  <Skeleton height={80} />
+                  <Skeleton height={80} />
+                </Card>
+              </SectionStack>
             )}
             {entrance && (
-              <Comments
-                comments={entrance.comments}
-                entranceId={entrance.id}
-                isEditAllowed={!entrance.isDeleted}
-              />
+              <SectionStack>
+                <Comments
+                  comments={entrance.comments}
+                  entranceId={entrance.id}
+                  isEditAllowed={!entrance.isDeleted}
+                />
+              </SectionStack>
             )}
           </div>
         </PageTabs>

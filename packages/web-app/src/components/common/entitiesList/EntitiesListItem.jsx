@@ -3,9 +3,9 @@ import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import { useSelector } from 'react-redux';
 import { Box, Chip, Paper, Typography } from '@mui/material';
-import { Link } from 'react-router-dom';
 import { depthIcon, lengthIcon } from '../../../assets/icons';
 import CustomIcon from '../CustomIcon';
+import AppLink from '../AppLink';
 
 const StatBadge = ({ src, alt, value }) => (
   <Box sx={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
@@ -70,7 +70,7 @@ const cardLinkSx = {
 const BaseCard = ({ to, icon, children, itemActionButton }) => (
   <Paper variant="outlined" sx={cardPaperSx}>
     <Box sx={{ display: 'flex', alignItems: 'stretch', minHeight: 72 }}>
-      <Box component={Link} to={to} sx={cardLinkSx}>
+      <Box component={AppLink} to={to} sx={cardLinkSx}>
         <Box sx={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>
           {icon}
         </Box>

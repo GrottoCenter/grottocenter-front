@@ -14,6 +14,7 @@ import LinkIcon from '@mui/icons-material/Link';
 import CreateIcon from '@mui/icons-material/Create';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { useDispatch } from 'react-redux';
+import { EntityIcon } from '../../../pages/EntityCreation/entityConfig';
 import { usePermissions, useNotification } from '../../../hooks';
 import GuidelinePropTypes from '../../../types/guideline.type';
 import GuidelineForm from '../EntitiesForm/Guideline/index';
@@ -166,13 +167,13 @@ const Guidelines = ({ entityType, entityId, guidelines }) => {
               data-testid="guideline-mode-toggle">
               <Button
                 variant="outlined"
-                startIcon={<LinkIcon />}
+                startIcon={<EntityIcon iconType="guidelines" size={20} BadgeIcon={LinkIcon} />}
                 onClick={() => {
                   setMode(MODE_ATTACH);
                   setSelectedGuideline(null);
                   setAttachFetchTrigger(prev => prev + 1);
                 }}>
-                <FormattedMessage id="guidelines.attach_existing" />
+                <FormattedMessage id="Associate" />
               </Button>
               <Button variant="contained" startIcon={<CreateIcon />}>
                 <FormattedMessage id="guidelines.create_new" />
@@ -194,7 +195,7 @@ const Guidelines = ({ entityType, entityId, guidelines }) => {
               sx={{ mb: 1 }}
               data-testid="guideline-mode-toggle">
               <Button variant="contained" startIcon={<LinkIcon />}>
-                <FormattedMessage id="guidelines.attach_existing" />
+                <FormattedMessage id="Associate" />
               </Button>
               <Button
                 variant="outlined"
@@ -321,12 +322,9 @@ const Guidelines = ({ entityType, entityId, guidelines }) => {
               setMode(MODE_ATTACH);
               setAttachFetchTrigger(prev => prev + 1);
             }}
-            startIcon={<LinkIcon />}
+            startIcon={<EntityIcon iconType="guidelines" size={20} BadgeIcon={LinkIcon} />}
             data-testid="add-guideline-btn">
-            <FormattedMessage
-              id="guidelines.attach_existing"
-              defaultMessage="Attach an existing guideline"
-            />
+            <FormattedMessage id="Associate" />
           </Button>
         )
       }

@@ -1,6 +1,6 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
+import AppLink from '../AppLink';
 import {
   AppBar as MuiAppBar,
   Box,
@@ -89,7 +89,7 @@ const GrottoTxt = styled(AppTitle)(({ theme }) => ({
   [theme.breakpoints.down('sm')]: { display: 'none' }
 }));
 
-export const StyledLink = styled(Link)`
+export const StyledLink = styled(AppLink)`
   color: inherit;
   text-decoration: inherit;
   cursor: pointer;
@@ -102,6 +102,7 @@ const ActionsGroup = styled('div')(({ theme }) => ({
   gap: theme.spacing(0.5),
   marginLeft: theme.spacing(1),
   [theme.breakpoints.down('sm')]: {
+    gap: theme.spacing(0),
     marginLeft: theme.spacing(0.5)
   }
 }));

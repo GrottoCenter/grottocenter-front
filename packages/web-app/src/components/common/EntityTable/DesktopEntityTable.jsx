@@ -4,6 +4,7 @@ import { useIntl } from 'react-intl';
 import { styled, useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import useOpenLink from '../../../hooks/useOpenLink';
+import { useMeasuredHeight } from '../../../hooks';
 
 import {
   Box,
@@ -53,12 +54,13 @@ const EntityTableHead = ({
   onRequestSort,
   numSelected,
   rowCount,
-  onSelectAllClick
+  onSelectAllClick,
+  stickyTop = 0
 }) => (
   <TableHead>
     <TableRow>
       {onSelectAllClick && (
-        <TableCell padding="checkbox">
+        <TableCell padding="checkbox" sx={{ top: stickyTop }}>
           <Checkbox
             color="primary"
             indeterminate={numSelected > 0 && numSelected < rowCount}
@@ -72,6 +74,7 @@ const EntityTableHead = ({
         .map(headCell => (
           <TableCell
             key={headCell.field}
+            sx={{ top: stickyTop }}
             sortDirection={orderBy === headCell.field ? order : false}>
             {onRequestSort && headCell.sortable ? (
               <TableSortLabel
@@ -95,7 +98,8 @@ EntityTableHead.propTypes = {
   onSelectAllClick: PropTypes.func,
   order: PropTypes.oneOf(['', 'asc', 'desc']).isRequired,
   orderBy: PropTypes.string.isRequired,
-  rowCount: PropTypes.number.isRequired
+  rowCount: PropTypes.number.isRequired,
+  stickyTop: PropTypes.number
 };
 
 const EmptyState = () => (
@@ -208,6 +212,10 @@ const DesktopEntityTable = ({
   const [order, setOrder] = useState('');
   const [orderBy, setOrderBy] = useState('');
   const [selected, setSelected] = useState([]);
+  // Sticky results toolbar + sticky table header both pin to the same card
+  // scroller; the header sits just below the toolbar, at its measured height
+  // (see hook). 0 when the toolbar isn't rendered (shouldHideFooter).
+  const [toolbarRef, toolbarHeight] = useMeasuredHeight();
 
   const entityConfig = entitiesConfig[entityType ?? 'placeholder'];
 
@@ -348,7 +356,14 @@ const DesktopEntityTable = ({
   return (
     <Box sx={{ width: '100%' }}>
       {!shouldHideFooter && (
-        <>
+        <Box
+          ref={toolbarRef}
+          sx={{
+            position: 'sticky',
+            top: 0,
+            zIndex: theme => theme.zIndex.appBar - 1,
+            bgcolor: 'background.paper'
+          }}>
           <Toolbar
             disableGutters
             variant="dense"
@@ -476,16 +491,32 @@ const DesktopEntityTable = ({
             </Box>
           </Toolbar>
           <Divider />
-        </>
+        </Box>
       )}
       {isLoading && <LinearProgress color="secondary" />}
       <TableContainer
-        sx={compact ? { overflowX: 'auto', maxWidth: '100%' } : undefined}>
-        <Table stickyHeader sx={{ minWidth: compact ? 300 : 750 }} size="small">
+        sx={
+          compact
+            ? // Embedded (compact) tables keep their own inner horizontal
+              // scroll — they live inside other scroll areas, not the search
+              // page's single-scroll card.
+              { overflowX: 'auto', maxWidth: '100%' }
+            : // Full-page tables must NOT scroll on their own: overflow visible
+              // keeps this box from becoming a scroll container, so the sticky
+              // header escapes to the shared card scroller (CardContent), the
+              // same one the results toolbar sticks to. Horizontal scroll for
+              // wide tables is handled there instead.
+              { overflow: 'visible' }
+        }>
+        <Table
+          stickyHeader
+          sx={{ minWidth: compact ? 300 : 750 }}
+          size="small">
           {isLoading ? (
-            <LoadingTableHead />
+            <LoadingTableHead stickyTop={toolbarHeight} />
           ) : (
             <EntityTableHead
+              stickyTop={toolbarHeight}
               columns={entityColumns}
               numSelected={selected.length}
               order={order}

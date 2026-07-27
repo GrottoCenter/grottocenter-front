@@ -9,6 +9,7 @@ import ManageHistoryIcon from '@mui/icons-material/ManageHistory';
 
 import PageContainer from '../../../common/Layouts/PageContainer';
 import PageHeader from '../../../common/Layouts/PageHeader';
+import SectionStack from '../../../common/Layouts/SectionStack';
 import { fetchSnapshot } from '../../../../actions/Snapshot/GetSnapshots';
 import { fetchEntrance } from '../../../../actions/Entrance/GetEntrance';
 import { fetchCave } from '../../../../actions/Cave/GetCave';
@@ -189,9 +190,10 @@ const SnapshotPage = () => {
         icon={getAll ? <ManageHistoryIcon fontSize="inherit" /> : <HistoryIcon fontSize="inherit" />}
         subheader={backLink}
       />
-      {isSensitive && <SensitiveCaveWarning />}
-      <Card sx={{ mx: 1, mt: 0.5 }}>
-        <CardContent sx={{ p: 0.25, '&:last-child': { pb: 0.25 } }}>
+      <SectionStack>
+        {isSensitive && <SensitiveCaveWarning />}
+        <Card>
+          <CardContent sx={{ p: 0.25, '&:last-child': { pb: 0.25 } }}>
           {is403 && <Alert403 type={type} />}
           {is404 && <Alert404 type={type} />}
           {isLoading && <Skeleton height={300} />}
@@ -213,8 +215,9 @@ const SnapshotPage = () => {
                 isCurrentItemLoading={isCurrentItemLoading}
               />
             ))}
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      </SectionStack>
     </PageContainer>
   );
 };

@@ -2,21 +2,14 @@ import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
 import { useIntl } from 'react-intl';
-import {
-  Box,
-  Button,
-  Card,
-  CardContent,
-  Step,
-  StepLabel,
-  Stepper,
-  Typography
-} from '@mui/material';
+import { Box, Button, Step, StepLabel, Stepper } from '@mui/material';
 
 import {
   SET_WIZARD_STEP,
   RESET_WIZARD
 } from '../../../actions/Observations/importWizard';
+import FixedContent from '../../common/Layouts/Fixed/FixedContent';
+import { EntityIcon } from '../../../pages/EntityCreation/entityConfig';
 
 import UploadStep from './steps/UploadStep';
 import DeviceSensorsStep from './steps/DeviceSensorsStep';
@@ -179,54 +172,54 @@ const ImportObservationsWizard = ({ initialCaveId, caveIdLocked }) => {
   const isNextDisabled = getNextDisabled(currentStep, wizardState);
 
   return (
-    <Card sx={{ minWidth: 275 }}>
-      <CardContent>
-        <Typography color="secondary" variant="h1" sx={{ mb: 1 }}>
-          {formatMessage({ id: 'Import observations' })}
-        </Typography>
+    <FixedContent
+      title={formatMessage({ id: 'Import observations' })}
+      icon={<EntityIcon iconType="scientific_observation" />}
+      content={
+        <>
+          <Stepper activeStep={currentStep} sx={{ mb: 3 }}>
+            {stepLabels.map(label => (
+              <Step key={label}>
+                <StepLabel>{label}</StepLabel>
+              </Step>
+            ))}
+          </Stepper>
 
-        <Stepper activeStep={currentStep} sx={{ mb: 3 }}>
-          {stepLabels.map(label => (
-            <Step key={label}>
-              <StepLabel>{label}</StepLabel>
-            </Step>
-          ))}
-        </Stepper>
+          <Box sx={{ mb: 3 }}>
+            {renderStep(currentStep, initialCaveId, caveIdLocked)}
+          </Box>
 
-        <Box sx={{ mb: 3 }}>
-          {renderStep(currentStep, initialCaveId, caveIdLocked)}
-        </Box>
-
-        <Box sx={{ display: 'flex', gap: 1 }}>
-          <Button
-            data-testid="back-button"
-            disabled={isBackDisabled}
-            onClick={handleBack}
-            variant="outlined">
-            {formatMessage({ id: 'ImportObservationsWizard.back' })}
-          </Button>
-
-          <Button
-            color="secondary"
-            data-testid="start-over-button"
-            onClick={handleStartOver}
-            variant="outlined">
-            {formatMessage({ id: 'ImportObservationsWizard.startOver' })}
-          </Button>
-
-          {currentStep < STEP_COUNT - 1 && (
+          <Box sx={{ display: 'flex', gap: 1 }}>
             <Button
-              data-testid="next-button"
-              disabled={isNextDisabled}
-              onClick={handleNext}
-              variant="contained"
-              sx={{ ml: 'auto' }}>
-              {formatMessage({ id: 'ImportObservationsWizard.next' })}
+              data-testid="back-button"
+              disabled={isBackDisabled}
+              onClick={handleBack}
+              variant="outlined">
+              {formatMessage({ id: 'ImportObservationsWizard.back' })}
             </Button>
-          )}
-        </Box>
-      </CardContent>
-    </Card>
+
+            <Button
+              color="secondary"
+              data-testid="start-over-button"
+              onClick={handleStartOver}
+              variant="outlined">
+              {formatMessage({ id: 'ImportObservationsWizard.startOver' })}
+            </Button>
+
+            {currentStep < STEP_COUNT - 1 && (
+              <Button
+                data-testid="next-button"
+                disabled={isNextDisabled}
+                onClick={handleNext}
+                variant="contained"
+                sx={{ ml: 'auto' }}>
+                {formatMessage({ id: 'ImportObservationsWizard.next' })}
+              </Button>
+            )}
+          </Box>
+        </>
+      }
+    />
   );
 };
 

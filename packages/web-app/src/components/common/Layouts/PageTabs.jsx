@@ -25,8 +25,13 @@ const StickyTabsBar = styled(Card, {
   zIndex: theme.zIndex.appBar - 1,
   transition: 'margin 150ms ease, border-radius 150ms ease',
   ...(isStuck
-    ? { margin: 0, borderRadius: 0 }
-    : { margin: theme.spacing(0.5, 1, 0.25) }),
+    ? // Stuck: break out of PageContainer's frame padding (negative x-margin
+      // cancels it) so the bar spans edge to edge under the app bar.
+      { margin: theme.spacing(0, -1), borderRadius: 0 }
+    : // Flowing: no horizontal margin (PageContainer's frame insets it, so it
+      // lines up with the sections); no top margin (PageHeader's mb provides
+      // the gap above); just an 8px gap below before the panel content.
+      { margin: theme.spacing(0, 0, 1) }),
   '@media print': { display: 'none' }
 }));
 
@@ -117,7 +122,10 @@ const PageTabs = ({ tabs, children }) => {
 
   return (
     <>
-      {!isMobile && <div ref={sentinelRef} style={{ height: 1 }} />}
+      {/* height: 0 (not 1) — a taller sentinel would break margin collapsing
+          between PageHeader's bottom margin and StickyTabsBar's top margin,
+          doubling the visual gap instead of merging them into one. */}
+      {!isMobile && <div ref={sentinelRef} style={{ height: 0 }} />}
       {!isMobile && (
         <StickyTabsBar isStuck={isStuck}>
           <Tabs
@@ -166,9 +174,11 @@ const PageTabs = ({ tabs, children }) => {
           aria-labelledby={`page-tab-${i}`}
           sx={{
             display: activeTab !== i ? 'none' : 'block',
+            // Mobile keeps clearance for the fixed bottom nav; desktop adds
+            // nothing — PageContainer's frame already provides the bottom gutter.
             pb: isMobile
-              ? `calc(${BOTTOM_NAV_HEIGHT}px + env(safe-area-inset-bottom) + 8px)`
-              : 0.5
+              ? `calc(${BOTTOM_NAV_HEIGHT}px + env(safe-area-inset-bottom) + 4px)`
+              : 0
           }}>
           {child}
         </TabPanel>

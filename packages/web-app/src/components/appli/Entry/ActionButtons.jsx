@@ -11,7 +11,7 @@ import {
 import { useIntl } from 'react-intl';
 
 import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/DeleteOutlineRounded';
+import DeleteIcon from '@mui/icons-material/DeleteRounded';
 import DeleteForeverIcon from '@mui/icons-material/RemoveCircleRounded';
 import RestoreIcon from '@mui/icons-material/RestoreFromTrashRounded';
 import ArrowUpward from '@mui/icons-material/ArrowUpward';
@@ -66,21 +66,6 @@ const ActionButtons = ({
           </Button>
         </Tooltip>
       )}
-      {!isUpdating && (isDeleted ? canPermanentlyDelete : canDelete) && (
-        <Tooltip
-          title={
-            isDeleted
-              ? formatMessage({ id: 'Permanently delete' })
-              : formatMessage({ id: 'Delete' })
-          }>
-          <Button
-            onClick={() => onDeletePress(isDeleted)}
-            color="primary"
-            aria-label={formatMessage({ id: 'delete' })}>
-            {isDeleted ? <DeleteForeverIcon color="error" /> : <DeleteIcon />}
-          </Button>
-        </Tooltip>
-      )}
       {!isDeleted && canEdit && !isUpdating && (
         <Tooltip title={formatMessage({ id: 'Edit' })}>
           <Button
@@ -117,6 +102,21 @@ const ActionButtons = ({
         </Tooltip>
       )}
       {!isUpdating && snapshotEl}
+      {!isUpdating && (isDeleted ? canPermanentlyDelete : canDelete) && (
+        <Tooltip
+          title={
+            isDeleted
+              ? formatMessage({ id: 'Permanently delete' })
+              : formatMessage({ id: 'Delete' })
+          }>
+          <Button
+            onClick={() => onDeletePress(isDeleted)}
+            color="primary"
+            aria-label={formatMessage({ id: 'delete' })}>
+            {isDeleted ? <DeleteForeverIcon color="error" /> : <DeleteIcon />}
+          </Button>
+        </Tooltip>
+      )}
     </ButtonGroup>
   );
 };

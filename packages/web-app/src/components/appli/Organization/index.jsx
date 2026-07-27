@@ -2,11 +2,12 @@ import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
 import { useIntl } from 'react-intl';
-import { useParams, useNavigate, Link as RouterLink } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import Skeleton from '@mui/material/Skeleton';
 import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
-import { Box, Card, Link, Stack, Typography } from '@mui/material';
+import { Box, Card, Stack, Typography } from '@mui/material';
+import AppLink from '../../common/AppLink';
 import CreateIcon from '@mui/icons-material/Create';
 import DeleteIcon from '@mui/icons-material/Delete';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
@@ -18,6 +19,7 @@ import ShareIcon from '@mui/icons-material/Share';
 import StandardDialog from '../../common/StandardDialog';
 import PageContainer from '../../common/Layouts/PageContainer';
 import PageHeader from '../../common/Layouts/PageHeader';
+import SectionStack from '../../common/Layouts/SectionStack';
 import ResponsiveActions from '../../common/Layouts/ResponsiveActions';
 import ScrollableContent from '../../common/Layouts/Fixed/ScrollableContent';
 import CustomIcon from '../../common/CustomIcon';
@@ -188,15 +190,14 @@ const Organization = ({ error, isLoading, organization }) => {
         flexWrap="wrap"
         sx={{ fontSize: { xs: '1.2rem', md: '1.7rem' } }}>
         {organization.country && (
-          <Link
-            component={RouterLink}
+          <AppLink
             to={`/ui/countries/${organization.country}`}
             underline="hover"
             color="inherit"
             sx={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
             <CustomIcon type="country" size={16} />
             {organization.country}
-          </Link>
+          </AppLink>
         )}
         {organization.yearBirth && (
           <Typography
@@ -227,38 +228,40 @@ const Organization = ({ error, isLoading, organization }) => {
         actions={actions}
       />
       {isLoading && (
-        <Card sx={{ m: 1, p: 2 }}>
-          <Skeleton height={150} />
-          <Skeleton height={100} />
-          <Skeleton height={100} />
-          <Skeleton height={100} />
-        </Card>
+        <SectionStack>
+          <Card sx={{ p: 2 }}>
+            <Skeleton height={150} />
+            <Skeleton height={100} />
+            <Skeleton height={100} />
+            <Skeleton height={100} />
+          </Card>
+        </SectionStack>
       )}
       {error && (
-        <Card sx={{ m: 1, p: 2 }}>
-          <Alert
-            title={formatMessage({
-              id: 'Error, the organization data you are looking for is not available.'
-            })}
-            severity="error"
-          />
-        </Card>
+        <SectionStack>
+          <Card sx={{ p: 2 }}>
+            <Alert
+              title={formatMessage({
+                id: 'Error, the organization data you are looking for is not available.'
+              })}
+              severity="error"
+            />
+          </Card>
+        </SectionStack>
       )}
       {organization && (
-        <>
+        <SectionStack>
           {organization.isDeleted && (
-            <Box sx={{ m: 1 }}>
-              <DeletedCard
-                entityType={DELETED_ENTITIES.organization}
-                entity={organization}
-                isLoading={isActionLoading}
-                onRestorePress={onRestorePress}
-                onPermanentDeletePress={() => {
-                  setIsDeleteConfirmationPermanent(true);
-                  setIsDeleteConfirmationOpen(true);
-                }}
-              />
-            </Box>
+            <DeletedCard
+              entityType={DELETED_ENTITIES.organization}
+              entity={organization}
+              isLoading={isActionLoading}
+              onRestorePress={onRestorePress}
+              onPermanentDeletePress={() => {
+                setIsDeleteConfirmationPermanent(true);
+                setIsDeleteConfirmationOpen(true);
+              }}
+            />
           )}
           <DeleteConfirmationDialog
             entityType={DELETED_ENTITIES.organization}
@@ -392,7 +395,7 @@ const Organization = ({ error, isLoading, organization }) => {
               />
             }
           />
-        </>
+        </SectionStack>
       )}
       <StandardDialog
         open={!!pendingRemoveMember}
@@ -402,10 +405,16 @@ const Organization = ({ error, isLoading, organization }) => {
         title={formatMessage({ id: 'Remove member' })}
         actions={
           <>
-            <Button onClick={() => setPendingRemoveMember(null)} variant="text">
+            <Button
+              onClick={() => setPendingRemoveMember(null)}
+              variant="outlined">
               {formatMessage({ id: 'Cancel' })}
             </Button>
-            <Button onClick={handleConfirmRemoveMember} color="error" autoFocus>
+            <Button
+              onClick={handleConfirmRemoveMember}
+              variant="contained"
+              color="error"
+              autoFocus>
               {formatMessage({ id: 'Remove' })}
             </Button>
           </>

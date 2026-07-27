@@ -4,7 +4,6 @@ import PropTypes from 'prop-types';
 import { Box, TextField } from '@mui/material';
 import { useController } from 'react-hook-form';
 import AnchorToolbar from './AnchorToolbar';
-import ObstacleToolbar from './ObstacleToolbar';
 
 const LABEL_KEYS = {
   obstacle: 'Obstacle',
@@ -24,6 +23,9 @@ const ObstacleField = ({
   const label = formatMessage({ id: LABEL_KEYS[field] });
   const isObstacle = field === 'obstacle';
   const isAnchor = field === 'anchor';
+  // The anchor field hosts the symbol-insertion button overlaid at its right
+  // edge — reserve room so the button never covers the typed text.
+  const inputPadding = isAnchor ? { paddingRight: '32px' } : undefined;
 
   const inputRef = useRef(null);
   const onChangeRef = useRef(null);
@@ -65,6 +67,7 @@ const ObstacleField = ({
       minRows={1}
       size="small"
       fullWidth
+      hiddenLabel={!showLabel}
       autoFocus={autoFocus}
       required={isObstacle}
       error={!!error}
@@ -77,17 +80,9 @@ const ObstacleField = ({
       }
       label={showLabel ? label : undefined}
       inputRef={isAnchor ? inputRef : undefined}
-      slotProps={{ htmlInput: { 'aria-label': label } }}
+      slotProps={{ htmlInput: { 'aria-label': label, style: inputPadding } }}
     />
   );
-
-  if (isObstacle)
-    return (
-      <Box sx={{ position: 'relative' }}>
-        {textField}
-        <ObstacleToolbar />
-      </Box>
-    );
 
   if (isAnchor)
     return (

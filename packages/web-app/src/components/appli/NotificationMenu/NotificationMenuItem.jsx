@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box, ListItemIcon, MenuItem, Typography } from '@mui/material';
-import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
+import AppLink from '../../common/AppLink';
 import { useIntl } from 'react-intl';
 import { styled } from '@mui/material/styles';
 import UnreadNotificationIcon from '@mui/icons-material/FiberManualRecord';
@@ -43,7 +43,7 @@ const NotificationsMenuItem = ({ notification, onClick }) => {
     <StyledMenuItem
       dense
       $isRead={isRead}
-      component={Link}
+      component={AppLink}
       to={link}
       onClick={handleOnClick}>
       {iconPath && (

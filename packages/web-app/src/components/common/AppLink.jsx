@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Link as RouterLink } from 'react-router-dom';
 import { isMobile } from 'react-device-detect';
+import MuiLink from '@mui/material/Link';
 
 /**
  * Single link component for the whole app.
@@ -12,24 +13,28 @@ import { isMobile } from 'react-device-detect';
  *    tab instead (explicit, per-usage control).
  *  - `href` → external URL. Always opens in a new tab.
  *
- * It renders a bare anchor / React Router `<Link>` (no MUI styling) so callers
- * keep controlling the look through `className` — including `styled(AppLink)`.
+ * Renders MUI's `<Link>` so links pick up the theme's palette (no more
+ * browser-default blue). Callers can still refine the look via `className` —
+ * including `styled(AppLink)`.
  *
  * For imperative navigation (non-anchor elements) use the `useOpenLink` hook
  * instead.
  */
+// `target` and `rel` are placed AFTER `...rest` on purpose: callers must not
+// be able to weaken the new-tab security defaults (`noopener noreferrer`) by
+// accident.
 const AppLink = React.forwardRef(
   ({ to = null, href = null, openInNewTabDesktop = false, children, ...rest }, ref) => {
     if (href != null) {
       return (
-        <a
+        <MuiLink
           ref={ref}
           href={href}
+          {...rest}
           target="_blank"
-          rel="noopener noreferrer"
-          {...rest}>
+          rel="noopener noreferrer">
           {children}
-        </a>
+        </MuiLink>
       );
     }
 
@@ -45,21 +50,21 @@ const AppLink = React.forwardRef(
 
     if (openInNewTabDesktop && !isMobile) {
       return (
-        <a
+        <MuiLink
           ref={ref}
           href={to}
+          {...rest}
           target="_blank"
-          rel="noopener noreferrer"
-          {...rest}>
+          rel="noopener noreferrer">
           {children}
-        </a>
+        </MuiLink>
       );
     }
 
     return (
-      <RouterLink ref={ref} to={to} {...rest}>
+      <MuiLink ref={ref} component={RouterLink} to={to} {...rest}>
         {children}
-      </RouterLink>
+      </MuiLink>
     );
   }
 );

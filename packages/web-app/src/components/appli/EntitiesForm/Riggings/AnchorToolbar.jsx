@@ -3,18 +3,12 @@ import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
 import {
   Box,
-  Divider,
   IconButton,
   Popover,
-  Table,
-  TableBody,
-  TableCell,
-  TableRow,
   Tooltip,
   Typography
 } from '@mui/material';
 import EditNoteIcon from '@mui/icons-material/EditNote';
-import { ANCHOR_LEGEND } from '@/utils/riggingLegends';
 
 const ARROWS = ['↑', '↓', '←', '→'];
 
@@ -24,7 +18,7 @@ const AnchorToolbar = ({ onInsert }) => {
 
   return (
     <>
-      <Tooltip title={formatMessage({ id: 'Anchor notation legend' })} placement="top">
+      <Tooltip title={formatMessage({ id: 'Insert a symbol' })} placement="top">
         <IconButton
           size="small"
           onMouseDown={e => {
@@ -37,7 +31,7 @@ const AnchorToolbar = ({ onInsert }) => {
               setAnchorEl(e.currentTarget);
             }
           }}
-          aria-label={formatMessage({ id: 'Anchor notation legend' })}
+          aria-label={formatMessage({ id: 'Insert a symbol' })}
           sx={{
             position: 'absolute',
             top: '50%',
@@ -56,11 +50,11 @@ const AnchorToolbar = ({ onInsert }) => {
         onClose={() => setAnchorEl(null)}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
         transformOrigin={{ vertical: 'top', horizontal: 'right' }}>
-        <Box sx={{ pt: 1, px: 1, pb: 1, minWidth: 200 }}>
+        <Box sx={{ pt: 1, px: 1, pb: 1 }}>
           <Typography variant="caption" color="text.secondary" display="block" sx={{ mb: 0.5 }}>
             {formatMessage({ id: 'Click to insert' })}
           </Typography>
-          <Box sx={{ display: 'flex', gap: 0.5, mb: 1 }}>
+          <Box sx={{ display: 'flex', gap: 0.5 }}>
             {ARROWS.map(arrow => (
               <Tooltip key={arrow} title={`${formatMessage({ id: 'Click to insert' })} ${arrow}`}>
                 <IconButton
@@ -85,34 +79,6 @@ const AnchorToolbar = ({ onInsert }) => {
               </Tooltip>
             ))}
           </Box>
-          <Divider sx={{ mb: '12px' }} />
-          <Typography variant="subtitle2" fontWeight="bold" sx={{ mb: 0.5 }}>
-            {formatMessage({ id: 'Anchor notation legend' })}
-          </Typography>
-          <Divider sx={{ mb: 0.5 }} />
-          <Table size="small" sx={{ mb: 0.25 }}>
-            <TableBody>
-              {ANCHOR_LEGEND.map(({ abbrevKey, labelKey }) => (
-                <TableRow key={abbrevKey}>
-                  <TableCell sx={{
-                    border: 0,
-                    pr: 2
-                  }}>
-                    <Typography variant="body2" fontWeight="bold" component="span">
-                      {formatMessage({ id: abbrevKey })}
-                    </Typography>
-                  </TableCell>
-                  <TableCell sx={{
-                    border: 0
-                  }}>
-                    <Typography variant="body2" component="span">
-                      {formatMessage({ id: labelKey })}
-                    </Typography>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
         </Box>
       </Popover>
     </>

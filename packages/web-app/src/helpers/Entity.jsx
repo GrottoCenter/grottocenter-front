@@ -1,6 +1,7 @@
 import React from 'react';
 import { styled } from '@mui/material/styles';
 import {
+  authorIcon,
   bibliographyIcon,
   entranceIcon,
   networkIcon,
@@ -49,7 +50,7 @@ export const nomelizeSearchEntity = option => {
         if (title !== option.nickname) subtitle = option.nickname;
       }
 
-      iconSrc = caverIcon;
+      iconSrc = option.type === 'AUTHOR' ? authorIcon : caverIcon;
       break;
 
     case 'documents': {

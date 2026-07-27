@@ -1,8 +1,9 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { Box, Breadcrumbs, Chip, Link, Skeleton, Typography } from '@mui/material';
+import { Box, Breadcrumbs, Chip, Skeleton, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import { Link as RouterLink, useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
+import AppLink from '../../components/common/AppLink';
 import { useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import Linkify from 'linkify-react';
@@ -16,6 +17,8 @@ import { NavigateNext } from '@mui/icons-material';
 import useOpenLink from '../../hooks/useOpenLink';
 import CustomIcon from '../../components/common/CustomIcon';
 import DocumentTypeChip from '../../components/common/DocumentTypeChip';
+import { LicenseBadge } from '@/components/common/LicenseTag';
+import { fetchLicense } from '@/actions/Licenses';
 import {
   DOCUMENT_TYPE_ICONS,
   DOCUMENT_TYPE_FALLBACK_ICON,
@@ -40,6 +43,7 @@ import { loadLanguages } from '../../actions/Language';
 import { usePermissions, useSharePage } from '../../hooks';
 import PageContainer from '../../components/common/Layouts/PageContainer';
 import PageHeader from '../../components/common/Layouts/PageHeader';
+import SectionStack from '../../components/common/Layouts/SectionStack';
 import ResponsiveActions from '../../components/common/Layouts/ResponsiveActions';
 import ScrollableContent from '../../components/common/Layouts/Fixed/ScrollableContent';
 import Alert from '../../components/common/Alert';
@@ -97,6 +101,8 @@ const Document = ({
   const permissions = usePermissions();
   const dispatch = useDispatch();
   const { languages } = useSelector(state => state.language);
+  const licenses = useSelector(state => state.licenses.data);
+  const licensesLoading = useSelector(state => state.licenses.loading);
   const [isDeleteConfirmationOpen, setIsDeleteConfirmationOpen] =
     useState(false);
   const [isDeleteConfirmationPermanent, setIsDeleteConfirmationPermanent] =
@@ -107,6 +113,20 @@ const Document = ({
   useEffect(() => {
     if (documentData) setWantedDeletedState(documentData.isDeleted);
   }, [documentData]);
+
+  // The document detail only carries the license name; resolve the full license
+  // object (for its deed URL) from the licenses list.
+  useEffect(() => {
+    if (!licenses && !licensesLoading) dispatch(fetchLicense());
+  }, [dispatch, licenses, licensesLoading]);
+  // Stay `undefined` until the licenses list is loaded — otherwise the badge
+  // renders once with the bare name string (no deed URL), then re-renders as
+  // an object once the list arrives, causing a visible flicker where the
+  // link suddenly materialises.
+  const licenseObject = licenses
+    ? ((licenses.find(l => l.name === documentData?.license) ??
+        documentData?.license) || undefined)
+    : undefined;
 
   let onEdit = null;
   let onDelete = null;
@@ -276,8 +296,7 @@ const Document = ({
         fontSize: { xs: '1.2rem', md: '1.7rem' },
         '& .MuiBreadcrumbs-separator': { mx: { xs: '2px', md: '8px' } }
       }}>
-      <Link
-        component={RouterLink}
+      <AppLink
         to={`/ui/documents/${documentData.parent.id}`}
         underline="hover"
         color="inherit"
@@ -288,7 +307,7 @@ const Document = ({
         }}>
         <ParentTypeIcon sx={{ fontSize: 'inherit' }} />
         {documentData.parent.title}
-      </Link>
+      </AppLink>
     </Breadcrumbs>
   ) : null;
 
@@ -309,18 +328,18 @@ const Document = ({
           hidden: !onEdit
         },
         {
-          key: 'delete',
-          icon: <DeleteIcon />,
-          label: formatMessage({ id: 'Delete' }),
-          onClick: onDelete,
-          hidden: !onDelete
-        },
-        {
           key: 'snapshot',
           icon: <ManageHistoryIcon />,
           label: formatMessage({ id: 'Page history' }),
           onClick: snapshotUrl ? () => openLink(snapshotUrl) : undefined,
           hidden: !snapshotUrl
+        },
+        {
+          key: 'delete',
+          icon: <DeleteIcon />,
+          label: formatMessage({ id: 'Delete' }),
+          onClick: onDelete,
+          hidden: !onDelete
         }
       ]}
     />
@@ -334,22 +353,6 @@ const Document = ({
         subheader={breadcrumb}
         actions={actions}
       />
-      {documentData?.isDeleted && (
-        <ScrollableContent
-          content={
-            <DeletedCard
-              entityType={DELETED_ENTITIES.document}
-              entity={documentData}
-              isLoading={isActionLoading}
-              onRestorePress={onRestorePress}
-              onPermanentDeletePress={() => {
-                setIsDeleteConfirmationPermanent(true);
-                setIsDeleteConfirmationOpen(true);
-              }}
-            />
-          }
-        />
-      )}
       <DeleteConfirmationDialog
         entityType={DELETED_ENTITIES.document}
         isOpen={isDeleteConfirmationOpen}
@@ -360,34 +363,57 @@ const Document = ({
           onDeletePress(entity?.id, isDeleteConfirmationPermanent);
         }}
       />
+      {documentData?.isDeleted && (
+        <SectionStack>
+          <ScrollableContent
+            content={
+              <DeletedCard
+                entityType={DELETED_ENTITIES.document}
+                entity={documentData}
+                isLoading={isActionLoading}
+                standalone={false}
+                onRestorePress={onRestorePress}
+                onPermanentDeletePress={() => {
+                  setIsDeleteConfirmationPermanent(true);
+                  setIsDeleteConfirmationOpen(true);
+                }}
+              />
+            }
+          />
+        </SectionStack>
+      )}
       {isLoading && (
-        <ScrollableContent
-          content={
-            <>
-              <Skeleton width={75} />
-              <Skeleton />
-              <Skeleton width={100} />
-              <Skeleton variant="rectangular" height={150} />
-              <Skeleton width={125} />
-              <Skeleton variant="rectangular" height={80} />
-            </>
-          }
-        />
+        <SectionStack>
+          <ScrollableContent
+            content={
+              <>
+                <Skeleton width={75} />
+                <Skeleton />
+                <Skeleton width={100} />
+                <Skeleton variant="rectangular" height={150} />
+                <Skeleton width={125} />
+                <Skeleton variant="rectangular" height={80} />
+              </>
+            }
+          />
+        </SectionStack>
       )}
       {error && (
-        <ScrollableContent
-          content={
-            <Alert
-              title={formatMessage({
-                id: 'Error, the document data you are looking for is not available.'
-              })}
-              severity="error"
-            />
-          }
-        />
+        <SectionStack>
+          <ScrollableContent
+            content={
+              <Alert
+                title={formatMessage({
+                  id: 'Error, the document data you are looking for is not available.'
+                })}
+                severity="error"
+              />
+            }
+          />
+        </SectionStack>
       )}
       {documentData && (
-        <>
+        <SectionStack>
           <ScrollableContent
             content={
               <>
@@ -475,10 +501,16 @@ const Document = ({
                         value={documentData.issue}
                       />
                       {/* License only applies to attached files, not to the paper document itself */}
-                      {allFiles.length > 0 && (
+                      {allFiles.length > 0 && documentData.license && (
                         <DetailItem
                           label={formatMessage({ id: 'License' })}
-                          value={documentData.license}
+                          value={
+                            <LicenseBadge
+                              license={licenseObject}
+                              linkToDeed
+                              size={40}
+                            />
+                          }
                         />
                       )}
                       <DetailItem
@@ -499,11 +531,23 @@ const Document = ({
                       <DetailItem
                         fullWidth
                         label={formatMessage({ id: 'Editor' })}
-                        value={documentData.editor?.name}
-                        url={
-                          documentData.editor
-                            ? `/ui/organizations/${documentData.editor.id}`
-                            : undefined
+                        value={
+                          documentData.editor ? (
+                            <Box
+                              component="span"
+                              sx={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: 0.25
+                              }}
+                            >
+                              <CustomIcon type="organization" size={18} />
+                              <TextLink
+                                value={documentData.editor.name}
+                                url={`/ui/organizations/${documentData.editor.id}`}
+                              />
+                            </Box>
+                          ) : null
                         }
                       />
                       <DetailItem
@@ -674,7 +718,7 @@ const Document = ({
               }
             />
           )}
-        </>
+        </SectionStack>
       )}
     </PageContainer>
   );

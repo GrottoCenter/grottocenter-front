@@ -376,6 +376,22 @@ const GeocodingControl = ({ onLocationSelect }) => {
     };
   }, [query, locale, map, projections]);
 
+  // Drop a temporary marker that removes itself after 4s. Used to briefly point
+  // out the target of a search (coordinates and localities) once the view moved.
+  const dropTemporaryMarker = (lat, lng) => {
+    markerCleanupRef.current?.();
+    const marker = L.marker([lat, lng], { icon: CoordinatesMarker }).addTo(map);
+    const timer = setTimeout(() => {
+      marker.remove();
+      markerCleanupRef.current = null;
+    }, 4000);
+    markerCleanupRef.current = () => {
+      clearTimeout(timer);
+      marker.remove();
+      markerCleanupRef.current = null;
+    };
+  };
+
   const handleSelect = result => {
     document.activeElement?.blur();
     setQuery('');
@@ -388,18 +404,7 @@ const GeocodingControl = ({ onLocationSelect }) => {
       markerCleanupRef.current?.();
       const handle = setTimeout(() => {
         map.setView([lat, lng], 16);
-        const marker = L.marker([lat, lng], {
-          icon: CoordinatesMarker
-        }).addTo(map);
-        const timer = setTimeout(() => {
-          marker.remove();
-          markerCleanupRef.current = null;
-        }, 4000);
-        markerCleanupRef.current = () => {
-          clearTimeout(timer);
-          marker.remove();
-          markerCleanupRef.current = null;
-        };
+        dropTemporaryMarker(lat, lng);
       }, 150);
       markerCleanupRef.current = () => {
         clearTimeout(handle);
@@ -453,7 +458,8 @@ const GeocodingControl = ({ onLocationSelect }) => {
 
       // 100ms: shorter than the entrance case (no marker popup to wait for),
       // just enough for React to flush state before Leaflet animates.
-      setTimeout(() => {
+      markerCleanupRef.current?.();
+      const handle = setTimeout(() => {
         if (result.boundingbox) {
           const [south, north, west, east] = result.boundingbox.map(parseFloat);
           map.fitBounds([
@@ -463,7 +469,12 @@ const GeocodingControl = ({ onLocationSelect }) => {
         } else {
           map.setView([lat, lng], map.getZoom());
         }
+        dropTemporaryMarker(lat, lng);
       }, 100);
+      markerCleanupRef.current = () => {
+        clearTimeout(handle);
+        markerCleanupRef.current = null;
+      };
     }
   };
 

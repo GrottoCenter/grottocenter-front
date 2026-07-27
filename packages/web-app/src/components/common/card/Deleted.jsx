@@ -5,18 +5,21 @@ import { styled } from '@mui/material/styles';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   Button,
-  Tooltip,
   Box,
+  Card,
+  Stack,
   IconButton,
   Typography,
   CircularProgress
 } from '@mui/material';
 import RestoreIcon from '@mui/icons-material/RestoreFromTrashRounded';
-import DeleteForeverIcon from '@mui/icons-material/RemoveCircleRounded';
+import DeleteForeverIcon from '@mui/icons-material/DeleteForeverRounded';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 
 import StandardDialog from '../StandardDialog';
 import Alert from '../Alert';
+import AppLink from '../AppLink';
 import AuthorAndDate from '../Contribution/AuthorAndDate';
 import Layout from '../Layouts/Fixed/FixedContent';
 import { Property } from '../Properties';
@@ -63,12 +66,6 @@ export const DELETED_ENTITIES = {
   }
 };
 
-const StyledAuthor = styled('div')`
-  display: inline-grid;
-  padding-top: ${({ theme }) => theme.spacing(2)};
-  padding-left: ${({ theme }) => theme.spacing(0.5)};
-`;
-
 const StyledEntityIcon = styled(EntityIcon)`
   float: left;
 `;
@@ -77,11 +74,7 @@ export const Deleted = ({ entityType, entity }) => (
   <Layout
     title={entity.name}
     content={
-      <DeletedCard
-        entityType={entityType}
-        entity={entity}
-        includeSeparator={false}
-      />
+      <DeletedCard entityType={entityType} entity={entity} standalone={false} />
     }
   />
 );
@@ -92,14 +85,21 @@ export const DeletedCard = ({
   isLoading,
   onRestorePress,
   onPermanentDeletePress,
-  includeSeparator = true
+  standalone = true
 }) => {
   const { formatMessage } = useIntl();
   const entityI18n = formatMessage({ id: entityType.str });
   const redirectToUrl = entity.redirectTo
     ? entityType.url + entity.redirectTo
     : null;
-  return (
+
+  const hasActions =
+    !!redirectToUrl ||
+    !!onRestorePress ||
+    !!onPermanentDeletePress ||
+    isLoading;
+
+  const content = (
     <>
       <Alert
         disableMargins
@@ -119,7 +119,13 @@ export const DeletedCard = ({
                 value={entity.location}
               />
             )}
-            <StyledAuthor>
+            <Box
+              sx={{
+                mt: 1,
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'flex-start'
+              }}>
               <AuthorAndDate
                 author={entity.author}
                 date={entity.dateInscription}
@@ -131,57 +137,60 @@ export const DeletedCard = ({
                   verb="Deleted"
                 />
               )}
-            </StyledAuthor>
+            </Box>
           </>
         }
       />
-      <Box variant="outlined" sx={{ marginTop: 2 }}>
-        {!!redirectToUrl && (
-          <Button variant="contained" color="secondary" href={redirectToUrl}>
-            {formatMessage(
-              {
-                id: 'deleted-card-go-to-related-btn',
-                defaultMessage: 'Go to the linked {entityFmt}'
-              },
-              { entityFmt: entityI18n }
-            )}
-          </Button>
-        )}
-        {isLoading && (
-          <Box sx={{ margin: 1 }}>
-            <CircularProgress />
-          </Box>
-        )}
-
-        {!!onRestorePress && !isLoading && (
-          <Tooltip title={formatMessage({ id: 'Restore' })}>
+      {hasActions && (
+        <Stack
+          direction="row"
+          spacing={2}
+          useFlexGap
+          flexWrap="wrap"
+          alignItems="center"
+          sx={{ mt: 2 }}>
+          {!!redirectToUrl && (
             <Button
               variant="outlined"
-              sx={{ marginLeft: 2 }}
+              color="primary"
+              component={AppLink}
+              to={redirectToUrl}
+              startIcon={<ArrowForwardIcon />}>
+              {formatMessage(
+                {
+                  id: 'deleted-card-go-to-related-btn',
+                  defaultMessage: 'Go to the linked {entityFmt}'
+                },
+                { entityFmt: entityI18n }
+              )}
+            </Button>
+          )}
+          {isLoading && <CircularProgress size={28} />}
+          {!!onRestorePress && !isLoading && (
+            <Button
+              variant="outlined"
+              color="secondary"
               onClick={() => onRestorePress()}
-              color="primary"
-              aria-label={formatMessage({ id: 'restore' })}>
-              <RestoreIcon />
+              startIcon={<RestoreIcon />}>
+              {formatMessage({ id: 'Restore' })}
             </Button>
-          </Tooltip>
-        )}
-
-        {!!onPermanentDeletePress && !isLoading && (
-          <Tooltip title={formatMessage({ id: 'Permanently delete' })}>
+          )}
+          {!!onPermanentDeletePress && !isLoading && (
             <Button
-              variant="outlined"
-              sx={{ marginLeft: 2 }}
+              color="error"
               onClick={() => onPermanentDeletePress()}
-              color="primary"
-              aria-label={formatMessage({ id: 'delete' })}>
-              <DeleteForeverIcon color="error" />
+              startIcon={<DeleteForeverIcon />}>
+              {formatMessage({ id: 'Permanently delete' })}
             </Button>
-          </Tooltip>
-        )}
-      </Box>
-      {includeSeparator && <hr />}
+          )}
+        </Stack>
+      )}
     </>
   );
+
+  if (!standalone) return content;
+
+  return <Card sx={{ p: 2 }}>{content}</Card>;
 };
 
 export const DeleteConfirmationDialog = ({
@@ -289,11 +298,13 @@ export const DeleteConfirmationDialog = ({
               <CircularProgress />
             </Box>
           )}
-          <Button variant="outline" onClick={onClose} disabled={isLoading}>
+          <Button variant="outlined" onClick={onClose} disabled={isLoading}>
             {formatMessage({ id: 'Cancel' })}
           </Button>
           {!isLoading && (
             <Button
+              variant="contained"
+              color="error"
               disabled={isSearchMandatory && !selectedEntity}
               onClick={() => {
                 onConfirmation(selectedEntity);
@@ -402,7 +413,7 @@ DeletedCard.propTypes = {
   isLoading: PropTypes.bool,
   onRestorePress: PropTypes.func,
   onPermanentDeletePress: PropTypes.func,
-  includeSeparator: PropTypes.bool
+  standalone: PropTypes.bool
 };
 
 Deleted.propTypes = {

@@ -111,7 +111,7 @@ const Properties = ({ isLoading = false, entrance, dataQuality }) => {
               {cityValue && (
                 <Property
                   loading={isLoading}
-                  label={formatMessage({ id: 'City' })}
+                  label={formatMessage({ id: 'Territory' })}
                   value={cityValue}
                   icon={<CustomIcon type="location" />}
                   secondary

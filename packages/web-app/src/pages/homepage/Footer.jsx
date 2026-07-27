@@ -5,6 +5,7 @@ import { useIntl } from 'react-intl';
 import GCLogo from '../../components/common/GCLogo';
 import AppLink from '../../components/common/AppLink';
 import InternationalizedLink from '../../components/common/InternationalizedLink';
+import LicenseBadge from '../../components/common/LicenseTag/LicenseBadge';
 import {
   wikicavesLink,
   wikiLinks,
@@ -54,14 +55,19 @@ const NavList = styled(Box)(({ theme }) => ({
   }
 }));
 
-const LicenseBadge = styled('img')({
-  width: 72,
+// The shared LicenseBadge is a bare image; the footer wants it on a light
+// pill so it stays readable on the dark background. Wraps the shared badge
+// instead of forking it.
+const LicenseBadgeFrame = styled(Box)({
   backgroundColor: 'rgba(255,255,255,0.88)',
   borderRadius: 4,
   padding: '2px 4px',
-  display: 'block',
+  display: 'inline-flex',
+  alignItems: 'center',
   flexShrink: 0
 });
+
+const FOOTER_BADGE_SIZE = 36;
 
 const LicenseBar = styled(Box)({
   borderTop: '1px solid rgba(255,255,255,0.1)',
@@ -321,7 +327,9 @@ const Footer = () => {
       <LicenseBar>
         <LicenseLine>
           <InternationalizedLink links={licenceLinks}>
-            <LicenseBadge src="/images/CC-BY-SA.png" alt="CC-BY-SA licence" />
+            <LicenseBadgeFrame>
+              <LicenseBadge license="CC-BY-SA" size={FOOTER_BADGE_SIZE} />
+            </LicenseBadgeFrame>
           </InternationalizedLink>
           <Typography
             variant="caption"
@@ -333,7 +341,9 @@ const Footer = () => {
         </LicenseLine>
         <LicenseLine sx={{ mb: 0.25 }}>
           <InternationalizedLink links={licensesODBLink}>
-            <LicenseBadge src="/images/odbl.png" alt="ODbL licence" />
+            <LicenseBadgeFrame>
+              <LicenseBadge license="ODBL" size={FOOTER_BADGE_SIZE} />
+            </LicenseBadgeFrame>
           </InternationalizedLink>
           <Typography
             variant="caption"

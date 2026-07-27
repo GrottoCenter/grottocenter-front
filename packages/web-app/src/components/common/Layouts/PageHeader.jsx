@@ -1,49 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { is } from 'ramda';
-import { Box, Card, Skeleton, Typography } from '@mui/material';
-import { styled } from '@mui/material/styles';
+import { Card } from '@mui/material';
 
-const isString = is(String);
+import PageTitle from './PageTitle';
 
-const TitleHeading = styled(Typography)`
-  word-break: break-word;
-`;
-
-const TitleIcon = styled('span')`
-  display: inline-flex;
-  vertical-align: middle;
-  margin-right: 8px;
-  margin-bottom: 2px;
-`;
-
-const PageHeader = ({ title, icon, titleAdornment, subheader, actions }) => (
-  <Card sx={{ mx: 1, mt: 0.5, mb: 0.5, p: { xs: 1, md: 2 } }}>
-    <Box>
-      <Box
-        sx={{
-          display: 'flex',
-          alignItems: 'flex-start',
-          justifyContent: 'space-between',
-          gap: 0.5
-        }}>
-        <Box sx={{ flex: 1, minWidth: 0 }}>
-          {isString(title) ? (
-            <TitleHeading variant="h1" color="secondary">
-              {icon && <TitleIcon>{icon}</TitleIcon>}
-              {title}
-              {titleAdornment}
-            </TitleHeading>
-          ) : (
-            <TitleHeading variant="h1">
-              <Skeleton variant="text" width="100%" />
-            </TitleHeading>
-          )}
-        </Box>
-        {actions && <Box sx={{ flexShrink: 0 }}>{actions}</Box>}
-      </Box>
-      {subheader && <Box>{subheader}</Box>}
-    </Box>
+// mb only: horizontal + top gutter come from PageContainer's frame; this just
+// adds the 8px gap before the next block (tabs bar or first section).
+const PageHeader = props => (
+  <Card sx={{ mb: 1, p: { xs: 1, md: 2 } }}>
+    <PageTitle {...props} />
   </Card>
 );
 

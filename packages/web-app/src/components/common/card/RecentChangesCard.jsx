@@ -3,6 +3,7 @@ import { useIntl, FormattedRelativeTime } from 'react-intl';
 import PropTypes from 'prop-types';
 import { Box, Skeleton, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
+import QuestionMarkIcon from '@mui/icons-material/QuestionMark';
 import AppLink from '../AppLink';
 import CustomIcon from '../CustomIcon';
 
@@ -68,7 +69,7 @@ function getEntityIcon(type) {
   if (type === 'massif') return 'massif';
   if (type === 'document') return 'bibliography';
   if (type === 'grotto') return 'organization';
-  return 'entrance';
+  return null;
 }
 
 const TimelineItem = styled(Box)(({ theme }) => ({
@@ -93,20 +94,6 @@ const IconBubble = styled(Box)(({ theme }) => ({
   '& > span': { margin: 0 }
 }));
 
-const AuthorLink = styled(AppLink)(({ theme }) => ({
-  color: theme.palette.secondary.main,
-  fontWeight: 600,
-  textDecoration: 'none',
-  '&:hover': { textDecoration: 'underline' }
-}));
-
-const EntityLink = styled(AppLink)(({ theme }) => ({
-  color: theme.palette.primary.main,
-  fontWeight: 600,
-  textDecoration: 'none',
-  '&:hover': { textDecoration: 'underline' }
-}));
-
 const ChangeItem = ({ changeInfo }) => {
   const { formatMessage } = useIntl();
   const iconType = getEntityIcon(changeInfo.mainEntityType);
@@ -117,19 +104,22 @@ const ChangeItem = ({ changeInfo }) => {
   );
 
   const authorEl = (
-    <AuthorLink to={`/ui/persons/${changeInfo.authorId}`}>
+    <AppLink
+      to={`/ui/persons/${changeInfo.authorId}`}
+      color="secondary"
+      underline="hover"
+      sx={{ fontWeight: 600 }}>
       {changeInfo.author}
-    </AuthorLink>
+    </AppLink>
   );
 
   const entityEl = (
-    <EntityLink
-      to={getEntityLinkUrl(
-        changeInfo.mainEntityType,
-        changeInfo.mainEntityId
-      )}>
+    <AppLink
+      to={getEntityLinkUrl(changeInfo.mainEntityType, changeInfo.mainEntityId)}
+      underline="hover"
+      sx={{ fontWeight: 600 }}>
       {changeInfo.name}
-    </EntityLink>
+    </AppLink>
   );
 
   let sentence;
@@ -165,7 +155,11 @@ const ChangeItem = ({ changeInfo }) => {
   return (
     <TimelineItem>
       <IconBubble>
-        <CustomIcon type={iconType} size={20} />
+        {iconType ? (
+          <CustomIcon type={iconType} size={20} />
+        ) : (
+          <QuestionMarkIcon sx={{ fontSize: 20 }} color="primary" />
+        )}
       </IconBubble>
       <Box sx={{ flex: 1, minWidth: 0 }}>
         <Box

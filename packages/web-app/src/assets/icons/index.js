@@ -1,4 +1,5 @@
 export { default as altitudeIcon } from './altitude.svg';
+export { default as authorIcon } from './author.svg';
 export { default as batIcon } from './bat.svg';
 export { default as bibliographyIcon } from './bibliography.svg';
 export { default as categoryIcon } from './category.svg';
@@ -14,6 +15,7 @@ export { default as divingCaveIcon } from './diving-cave.svg';
 export { default as entranceMarkerIcon } from './entrance-marker.svg';
 export { default as entranceIcon } from './entrance.svg';
 export { default as floodingIcon } from './flooding.svg';
+export { default as guidelinesIcon } from './guidelines.svg';
 export { default as lengthIcon } from './length.svg';
 export { default as locationIcon } from './location.svg';
 export { default as massifIcon } from './massif.svg';

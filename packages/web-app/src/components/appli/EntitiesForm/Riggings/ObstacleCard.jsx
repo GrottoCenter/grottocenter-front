@@ -5,6 +5,14 @@ import { Box, Card, Stack, Typography } from '@mui/material';
 
 import ObstacleField from './ObstacleField';
 import ObstacleRowActions from './ObstacleRowActions';
+import ColumnLegend from '../../Entry/Riggings/ColumnLegend';
+
+const LegendSectionsShape = PropTypes.arrayOf(
+  PropTypes.shape({
+    titleKey: PropTypes.string.isRequired,
+    items: PropTypes.array.isRequired
+  })
+);
 
 const ObstacleCard = ({
   control,
@@ -14,7 +22,8 @@ const ObstacleCard = ({
   onMoveUp,
   onMoveDown,
   onDelete,
-  autoFocus = false
+  autoFocus = false,
+  legendSections
 }) => {
   const { formatMessage } = useIntl();
 
@@ -29,9 +38,14 @@ const ObstacleCard = ({
           justifyContent: 'space-between',
           mb: 0.25
         }}>
-        <Typography variant="caption" fontWeight="medium">
-          {`${formatMessage({ id: 'Obstacle' })} ${index + 1}`}
-        </Typography>
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          <Typography variant="caption" fontWeight="medium">
+            {`${formatMessage({ id: 'Obstacle' })} ${index + 1}`}
+          </Typography>
+          {legendSections && (
+            <ColumnLegend label="Notation legends" sections={legendSections} />
+          )}
+        </Box>
         <ObstacleRowActions
           isFirst={isFirst}
           isLast={isLast}
@@ -86,7 +100,8 @@ ObstacleCard.propTypes = {
   onMoveUp: PropTypes.func.isRequired,
   onMoveDown: PropTypes.func.isRequired,
   onDelete: PropTypes.func.isRequired,
-  autoFocus: PropTypes.bool
+  autoFocus: PropTypes.bool,
+  legendSections: LegendSectionsShape
 };
 
 export default ObstacleCard;

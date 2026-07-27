@@ -2,6 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { styled } from '@mui/material/styles';
 import { useIntl } from 'react-intl';
+import CallMergeIcon from '@mui/icons-material/CallMerge';
+import DeleteIcon from '@mui/icons-material/Delete';
 import ActionButton from '../../common/ActionButton';
 
 const Wrapper = styled('div')`
@@ -18,16 +20,18 @@ const TableActions = ({ isDisabled, onClickSelect, onClickDelete }) => {
   return (
     <Wrapper>
       <ActionButton
-        label={formatMessage({ id: 'Select' })}
+        label={formatMessage({ id: 'Manage' })}
         color="primary"
         onClick={onClickSelect}
         disabled={isDisabled}
+        icon={<CallMergeIcon />}
       />
       <ActionButton
         label={formatMessage({ id: 'Delete' })}
-        color="primary"
+        color="error"
         onClick={onClickDelete}
         disabled={isDisabled}
+        icon={<DeleteIcon />}
       />
     </Wrapper>
   );

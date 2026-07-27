@@ -1,28 +1,23 @@
 import React, { useContext, useEffect, useCallback } from 'react';
 import { includes } from 'ramda';
 import {
-  Card,
-  CardContent,
   Divider,
-  Typography,
   LinearProgress as MuiLinearProgress
 } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import { styled } from '@mui/material/styles';
+import PublishIcon from '@mui/icons-material/Publish';
 import { useSelector } from 'react-redux';
 import ImportTabs from './ImportTabs';
 import Stepper from '../../common/Form/Stepper';
 import Provider, { ImportPageContentContext } from './Provider';
 import ImportPageContent from './ImportPageContent';
+import FixedContent from '../../common/Layouts/Fixed/FixedContent';
 import Translate from '../../common/Translate';
 import { useBoolean } from '../../../hooks';
 import { ENTRANCE, DOCUMENT } from './constants';
 
 const useStyles = makeStyles({
-  root: {
-    minWidth: 275
-  },
-
   stepper: {
     margin: '0 0 1rem 0'
   }
@@ -92,15 +87,13 @@ const ImportContainer = () => {
   }
 
   return (
-    <>
-      <ImportTabs />
-      <Card className={classes.root}>
-        <CardContent>
-          <Typography color="secondary" variant="h1">
-            <Translate>{title}</Translate>
-          </Typography>
+    <FixedContent
+      title={<Translate>{title}</Translate>}
+      icon={<PublishIcon fontSize="large" color="secondary" />}
+      content={
+        <>
+          <ImportTabs />
           <LinearProgress $isLoading={isLoading} />
-
           <div style={isLoading ? { opacity: '0.6' } : {}}>
             <Stepper
               className={classes.stepper}
@@ -114,9 +107,9 @@ const ImportContainer = () => {
             <StyledDivider />
             <ImportPageContent currentFormStepId={currentFormStep} />
           </div>
-        </CardContent>
-      </Card>
-    </>
+        </>
+      }
+    />
   );
 };
 const HydratedImportContainer = () => (

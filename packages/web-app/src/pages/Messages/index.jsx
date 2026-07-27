@@ -6,6 +6,7 @@ import {
   Box,
   Tabs,
   Tab,
+  Fab,
   List,
   ListItem,
   ListItemText,
@@ -21,7 +22,7 @@ import {
   CardContent
 } from '@mui/material';
 
-import EditIcon from '@mui/icons-material/Edit';
+import RateReviewIcon from '@mui/icons-material/RateReview';
 import ArchiveIcon from '@mui/icons-material/Archive';
 import UnarchiveIcon from '@mui/icons-material/Unarchive';
 import { styled } from '@mui/material/styles';
@@ -64,13 +65,13 @@ const EmptyStateContainer = styled(Box)(({ theme }) => ({
 // Master-detail inbox: no card chrome and full-screen on mobile (like any mail
 // client), standard page card on desktop.
 //
-// The height fills the viewport minus everything around the card. Each term is
-// derived from the theme rather than hardcoded. `containerPb` must stay in sync
-// with PageContainer's own `pb: 1`.
+// The height fills the viewport minus everything around the card. The page is
+// rendered inside <PageContainer fullHeight>, which adds no padding of its own,
+// so the only chrome to subtract is the card's own margin: none on xs (the card
+// is edge to edge), and spacing(1) top + bottom on md and up.
 const StyledCard = styled(Card)(({ theme }) => {
-  const containerPb = theme.spacing(0.5);
-  const chromeXs = containerPb;
-  const chromeMd = `${theme.spacing(1)} * 2 + ${containerPb}`; // margins + pb
+  const chromeXs = '0px';
+  const chromeMd = `${theme.spacing(1)} * 2`; // top + bottom margins
   return `
   display: flex;
   flex-direction: column;
@@ -227,7 +228,7 @@ const MessagesPage = () => {
                   <UserAvatar
                     username={conv.otherParticipant?.nickname}
                     color="primary"
-                    sx={{ width: 40, height: 40 }}
+                    sx={{ width: 40, height: 40  }}
                   />
                 </Badge>
               </ListItemAvatar>
@@ -235,7 +236,12 @@ const MessagesPage = () => {
                 primary={conv.otherParticipant?.nickname || formatMessage({ id: 'Unknown' })}
                 secondary={
                   conv.lastMessage && (
-                    <Typography variant="body2" sx={{ fontSize: '0.75rem', opacity: 0.8 }}>
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        fontSize: { xs: '1rem', sm: '1.1rem' },
+                        opacity: 0.8
+                      }}>
                       <FormattedDate
                         value={conv.lastMessage.dateSent}
                         year="numeric"
@@ -243,8 +249,6 @@ const MessagesPage = () => {
                         day="2-digit"
                         hour="2-digit"
                         minute="2-digit"
-                        timeZone="UTC"
-                        timeZoneName="short"
                       />
                     </Typography>
                   )
@@ -258,7 +262,7 @@ const MessagesPage = () => {
   };
 
   return (
-    <PageContainer>
+    <PageContainer fullHeight>
       <StyledCard>
         <StyledCardContent>
           <AuthChecker
@@ -272,19 +276,31 @@ const MessagesPage = () => {
                   borderColor: 'divider',
                   display: { xs: conversationId ? 'none' : 'flex', md: 'flex' },
                   flexDirection: 'column',
-                  bgcolor: 'background.paper'
+                  bgcolor: 'background.paper',
+                  position: 'relative'
                 }}>
-                  <Box sx={{ p: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: 1, borderColor: 'divider' }}>
-                    <Typography variant="h6" component="h1">
+                  <Box sx={{
+                    p: 1,
+                    display: 'flex',
+                    justifyContent: { xs: 'center', md: 'space-between' },
+                    alignItems: 'center',
+                    borderBottom: 1,
+                    borderColor: 'divider'
+                  }}>
+                    <Typography
+                      variant="h5"
+                      component="h1"
+                      sx={{ fontSize: { xs: '2rem', md: '2.2rem' } }}>
                       {formatMessage({ id: 'Conversations', defaultMessage: 'Conversations' })}
                     </Typography>
                     <Button
                       variant="outlined"
                       color="secondary"
-                      startIcon={<EditIcon />}
+                      startIcon={<RateReviewIcon />}
                       onClick={() => {
                         setComposeOpen(true);
-                      }}>
+                      }}
+                      sx={{ display: { xs: 'none', md: 'inline-flex' } }}>
                       {formatMessage({ id: 'New Message' })}
                     </Button>
                   </Box>
@@ -315,6 +331,20 @@ const MessagesPage = () => {
                       </Box>
                     )}
                   </Box>
+                  <Fab
+                    aria-label={formatMessage({ id: 'New Message' })}
+                    onClick={() => setComposeOpen(true)}
+                    sx={{
+                      display: { xs: 'inline-flex', md: 'none' },
+                      position: 'absolute',
+                      right: 20,
+                      bottom: `max(30px, calc(env(safe-area-inset-bottom) + 16px))`,
+                      bgcolor: 'secondary.main',
+                      color: '#fff',
+                      '&:hover': { bgcolor: 'secondary.dark' }
+                    }}>
+                    <RateReviewIcon />
+                  </Fab>
                 </Box>
 
                 {/* Right Pane: Conversation Details */}

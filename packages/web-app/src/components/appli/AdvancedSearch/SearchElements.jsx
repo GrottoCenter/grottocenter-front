@@ -24,7 +24,9 @@ import {
   Select,
   MenuItem,
   Button,
-  CardActions
+  CardActions,
+  useMediaQuery,
+  useTheme
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
@@ -356,6 +358,8 @@ export const SearchSlider = ({
   max = 10,
   marks
 }) => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const { formatMessage } = useIntl();
   const isLinearScale = !marks;
   // For non-linear scales, store real (scaled) values so descale conversion is consistent
@@ -405,7 +409,7 @@ export const SearchSlider = ({
         sx={{
           display: 'flex',
           alignItems: 'center',
-          mb: -2
+          mb: isMobile ? -1 : 0
         }}>
         {icon}
         {label}
@@ -490,9 +494,10 @@ export const SearchBooleanToggle = ({ label, onChange, value, icon }) => {
         {icon}
         <Translate>{label}</Translate>
       </FormLabel>
-      <Box sx={{
-        display: 'flex'
-      }}>
+      <Box
+        sx={{
+          display: 'flex'
+        }}>
         <Chip
           label={formatMessage({ id: 'Yes' })}
           size="small"
@@ -618,10 +623,11 @@ export const SearchMatchAllFieldsToogle = ({ isChecked, onChange }) => {
         />
       }
       label={
-        <Box sx={{
-          display: 'flex',
-          alignItems: 'center'
-        }}>
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center'
+          }}>
           <Translate>Matching all fields</Translate>
           <Tooltip
             title={formatMessage({
@@ -783,7 +789,8 @@ SearchFilterAccordion.propTypes = {
 };
 
 export const SearchActionButtons = ({ onReset, showReset = true }) => (
-  <CardActions sx={{ padding: 0.25, justifyContent: 'flex-end', width: '100%' }}>
+  <CardActions
+    sx={{ padding: 0.25, justifyContent: 'flex-end', width: '100%' }}>
     {showReset && (
       <Button
         type="button"

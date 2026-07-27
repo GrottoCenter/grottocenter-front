@@ -2,9 +2,9 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useIntl } from 'react-intl';
 import { Typography, Skeleton, Box, Chip } from '@mui/material';
 import PropTypes from 'prop-types';
-import { Link } from 'react-router-dom';
 import { regionsSearchUrl } from '../../../conf/apiRoutes';
 import SearchInput from '../../common/SearchInput';
+import AppLink from '../../common/AppLink';
 
 /*
  * Regions list — layout decisions
@@ -115,7 +115,7 @@ const RegionsList = ({ countryId }) => {
           {filtered.map(region => (
             <Box
               key={region.iso}
-              component={Link}
+              component={AppLink}
               to={`/ui/countries/${countryId}/regions/${region.iso.split('-')[1]}`}
               sx={{
                 display: 'flex',

@@ -1,10 +1,11 @@
 import React, { useRef, useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
-import { useParams, useNavigate, Link as RouterLink } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import Skeleton from '@mui/material/Skeleton';
-import { Box, Breadcrumbs, Card, Link, Typography } from '@mui/material';
+import { Box, Breadcrumbs, Card, Typography } from '@mui/material';
+import AppLink from '../../common/AppLink';
 import { styled } from '@mui/material/styles';
 import { NavigateNext, Print } from '@mui/icons-material';
 import CreateIcon from '@mui/icons-material/Create';
@@ -18,6 +19,7 @@ import { usePermissions, useSharePage } from '../../../hooks';
 import PageContainer from '../../common/Layouts/PageContainer';
 import PageHeader from '../../common/Layouts/PageHeader';
 import PageTabs from '../../common/Layouts/PageTabs';
+import SectionStack from '../../common/Layouts/SectionStack';
 import ResponsiveActions from '../../common/Layouts/ResponsiveActions';
 import ScrollableContent from '../../common/Layouts/Fixed/ScrollableContent';
 import CustomIcon from '../../common/CustomIcon';
@@ -144,8 +146,7 @@ export const Network = ({ isLoading, error, cave }) => {
           '& .MuiBreadcrumbs-separator': { mx: { xs: '2px', md: '8px' } }
         }}>
         {country && (
-          <Link
-            component={RouterLink}
+          <AppLink
             to={`/ui/countries/${country}`}
             underline="hover"
             color="inherit"
@@ -156,7 +157,7 @@ export const Network = ({ isLoading, error, cave }) => {
             }}>
             <CustomIcon type="country" size={16} />
             {country}
-          </Link>
+          </AppLink>
         )}
         {(cave?.massifs?.length ?? 0) > 0 && (
           <Box
@@ -168,8 +169,7 @@ export const Network = ({ isLoading, error, cave }) => {
             {cave.massifs.map((massif, index) => (
               <React.Fragment key={massif.id}>
                 {index > 0 && <span>·</span>}
-                <Link
-                  component={RouterLink}
+                <AppLink
                   to={`/ui/massifs/${massif.id}`}
                   underline="hover"
                   color="inherit"
@@ -180,7 +180,7 @@ export const Network = ({ isLoading, error, cave }) => {
                   }}>
                   <CustomIcon type="massif" size={16} />
                   {massif.name}
-                </Link>
+                </AppLink>
               </React.Fragment>
             ))}
           </Box>
@@ -221,38 +221,40 @@ export const Network = ({ isLoading, error, cave }) => {
           {/* Tab 0 — Information */}
           <div>
             {isLoading && (
-              <Card sx={{ m: 1, p: 2 }}>
-                <Skeleton height={300} />
-                <Skeleton height={100} />
-                <Skeleton height={100} />
-                <Skeleton height={100} />
-              </Card>
+              <SectionStack>
+                <Card sx={{ p: 2 }}>
+                  <Skeleton height={300} />
+                  <Skeleton height={100} />
+                  <Skeleton height={100} />
+                  <Skeleton height={100} />
+                </Card>
+              </SectionStack>
             )}
             {error && (
-              <Card sx={{ m: 1, p: 2 }}>
-                <Alert
-                  title={formatMessage({
-                    id: 'Error, the network data you are looking for is not available.'
-                  })}
-                  severity="error"
-                />
-              </Card>
+              <SectionStack>
+                <Card sx={{ p: 2 }}>
+                  <Alert
+                    title={formatMessage({
+                      id: 'Error, the network data you are looking for is not available.'
+                    })}
+                    severity="error"
+                  />
+                </Card>
+              </SectionStack>
             )}
             {cave && (
-              <>
+              <SectionStack>
                 {cave.isDeleted && (
-                  <Box sx={{ m: 1 }}>
-                    <DeletedCard
-                      entityType={DELETED_ENTITIES.network}
-                      entity={cave}
-                      isLoading={isActionLoading}
-                      onRestorePress={onRestorePress}
-                      onPermanentDeletePress={() => {
-                        setIsDeleteConfirmationPermanent(true);
-                        setIsDeleteConfirmationOpen(true);
-                      }}
-                    />
-                  </Box>
+                  <DeletedCard
+                    entityType={DELETED_ENTITIES.network}
+                    entity={cave}
+                    isLoading={isActionLoading}
+                    onRestorePress={onRestorePress}
+                    onPermanentDeletePress={() => {
+                      setIsDeleteConfirmationPermanent(true);
+                      setIsDeleteConfirmationOpen(true);
+                    }}
+                  />
                 )}
                 <DeleteConfirmationDialog
                   entityType={DELETED_ENTITIES.network}
@@ -351,7 +353,7 @@ export const Network = ({ isLoading, error, cave }) => {
                     <NetworkForm networkValues={{ ...cave }} />
                   </StandardDialog>
                 )}
-              </>
+              </SectionStack>
             )}
           </div>
 
@@ -360,7 +362,11 @@ export const Network = ({ isLoading, error, cave }) => {
             PageTabs matches children to tabs by position. React.Children.toArray strips `false`,
             so `{isAdmin && <Science />}` works — but returning null or wrapping in a div would
             silently shift all subsequent tab panels. */}
-          {isAdmin && <Science caveId={caveId} />}
+          {isAdmin && (
+            <SectionStack>
+              <Science caveId={caveId} />
+            </SectionStack>
+          )}
         </PageTabs>
       </div>
     </PageContainer>

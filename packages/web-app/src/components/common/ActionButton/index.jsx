@@ -15,7 +15,7 @@ const ActionButton = ({
     color={color}
     disabled={disabled || loading}
     onClick={onClick}
-    endIcon={icon}
+    startIcon={icon}
     {...buttonProps}>
     {loading && (
       <CircularProgress
@@ -34,7 +34,7 @@ ActionButton.propTypes = {
   onClick: PropTypes.func,
   loading: PropTypes.bool,
   disabled: PropTypes.bool,
-  color: PropTypes.oneOf(['primary', 'secondary']),
+  color: PropTypes.oneOf(['primary', 'secondary', 'error', 'success']),
   icon: PropTypes.element
 };
 

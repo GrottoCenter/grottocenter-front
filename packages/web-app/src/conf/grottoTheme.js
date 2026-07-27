@@ -1,6 +1,5 @@
 import { brown, blue, orange, grey } from '@mui/material/colors';
 import { createTheme, alpha, responsiveFontSizes } from '@mui/material/styles';
-import { isMobile } from 'react-device-detect';
 
 const fontFamily = [
   '-apple-system',
@@ -57,7 +56,14 @@ export const overridings = {
       main: grey['100']
     },
     action: {},
-    backgroundColor: grey['100'],
+    // Page vs. surface separation. `default` tints the app background a light
+    // grey (applied to <body> by CssBaseline) so that white cards/Paper — which
+    // use `paper` — visibly float instead of blending into a white-on-white
+    // page. Reuses the existing grey scale rather than introducing new colours.
+    background: {
+      default: grey['100'],
+      paper: '#fff'
+    },
     contrastThreshold: 3,
     primary1Color: brown['500'],
     primary2Color: brown['700'],
@@ -85,7 +91,7 @@ export const overridings = {
     mapControlIcon: '#333333'
   },
   shape: {
-    borderRadius: '4px'
+    borderRadius: 4
   },
   typography: {
     fontFamily,
@@ -142,16 +148,22 @@ export const overridings = {
     },
     MuiCardContent: {
       styleOverrides: {
-        root: {
-          padding: isMobile ? paddingUnit : paddingUnit * 2
-        }
+        root: ({ theme }) => ({
+          padding: theme.spacing(1),
+          [theme.breakpoints.up('md')]: {
+            padding: theme.spacing(2)
+          }
+        })
       }
     },
     MuiCardHeader: {
       styleOverrides: {
-        root: {
-          padding: isMobile ? paddingUnit : paddingUnit * 2
-        }
+        root: ({ theme }) => ({
+          padding: theme.spacing(1),
+          [theme.breakpoints.up('md')]: {
+            padding: theme.spacing(2)
+          }
+        })
       }
     },
     MuiDialog: {
@@ -225,13 +237,6 @@ export const overridings = {
         },
         gutterBottom: {
           marginBottom: '1rem'
-        }
-      }
-    },
-    MuiLink: {
-      styleOverrides: {
-        root: {
-          display: 'flex'
         }
       }
     },

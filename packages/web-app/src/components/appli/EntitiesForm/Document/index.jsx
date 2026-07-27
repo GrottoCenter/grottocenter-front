@@ -252,7 +252,7 @@ const DocumentSubmission = ({ onCancel }) => {
           <DocumentSubmissionDialog isLoading={documentState.isLoading} isNewDocument={isNewDocument} />
           <form
             onSubmit={onFormSubmit}
-            style={{ marginTop: '16px', ...(documentState.isLoading ? { opacity: '0.6' } : {}) }}>
+            style={documentState.isLoading ? { opacity: '0.6' } : undefined}>
             <FromContent onCancel={onCancel} />
           </form>
 

@@ -32,7 +32,7 @@ const FlagImage = ({ iso2, alt }) => (
 
 FlagImage.propTypes = {
   iso2: PropTypes.string.isRequired,
-  alt: PropTypes.string.isRequired,
+  alt: PropTypes.string.isRequired
 };
 
 const CountryList = ({ countries = [] }) => {
@@ -49,8 +49,7 @@ const CountryList = ({ countries = [] }) => {
     }
   };
 
-  const languageDisplayName =
-    AVAILABLE_LANGUAGES[locale]?.refName || 'English';
+  const languageDisplayName = AVAILABLE_LANGUAGES[locale]?.refName || 'English';
 
   const localizedCountries = useMemo(
     () =>
@@ -92,9 +91,7 @@ const CountryList = ({ countries = [] }) => {
       content={
         <Box sx={{ maxWidth: 680 }}>
           <SearchInput value={search} onChange={setSearch} sx={{ mb: 1 }} />
-          <TableContainer
-            component={Paper}
-            sx={{ maxHeight: theme => `calc(100vh - ${theme.appBarHeight + 184}px)` }}>
+          <TableContainer component={Paper} sx={{ overflow: 'visible' }}>
             <Table size="small" stickyHeader>
               <TableHead>
                 <TableRow>

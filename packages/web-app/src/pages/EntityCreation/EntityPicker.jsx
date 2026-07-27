@@ -1,8 +1,8 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
 import { useIntl } from 'react-intl';
 import { Box, Card, CardContent, Typography } from '@mui/material';
 import Layout from '../../components/common/Layouts/Fixed/FixedContent';
+import AppLink from '../../components/common/AppLink';
 import { ENTITIES, EntityIcon } from './entityConfig';
 
 const EntityPicker = () => {
@@ -22,7 +22,7 @@ const EntityPicker = () => {
           {ENTITIES.map(({ path, iconType, titleKey, descriptionKey }) => (
             <Card
               key={path}
-              component={Link}
+              component={AppLink}
               to={path}
               variant="outlined"
               sx={{

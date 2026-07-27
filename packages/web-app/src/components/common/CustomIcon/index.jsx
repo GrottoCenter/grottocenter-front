@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { styled } from '@mui/material/styles';
 import {
   altitudeIcon,
+  authorIcon,
   batIcon,
   bibliographyIcon,
   categoryIcon,
@@ -18,6 +19,7 @@ import {
   entranceIcon,
   entranceMarkerIcon,
   floodingIcon,
+  guidelinesIcon,
   lengthIcon,
   locationIcon,
   massifIcon,
@@ -49,6 +51,7 @@ const Img = styled('img')`
 
 const iconSources = {
   altitude: altitudeIcon,
+  author: authorIcon,
   bat: batIcon,
   bibliography: bibliographyIcon,
   category: categoryIcon,
@@ -64,6 +67,7 @@ const iconSources = {
   entrance: entranceIcon,
   entrance_marker: entranceMarkerIcon,
   flooding: floodingIcon,
+  guidelines: guidelinesIcon,
   length: lengthIcon,
   location: locationIcon,
   massif: massifIcon,
@@ -82,6 +86,7 @@ const iconSources = {
 
 const altTexts = {
   altitude: 'Altitude',
+  author: 'Author',
   bat: 'Bat',
   bibliography: 'Bibliography',
   category: 'Category',
@@ -97,6 +102,7 @@ const altTexts = {
   entrance: 'Entrance',
   entrance_marker: 'Entrance marker',
   flooding: 'Flooding',
+  guidelines: 'Guidelines',
   length: 'Length',
   location: 'Location',
   massif: 'Massif',

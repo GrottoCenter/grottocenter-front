@@ -48,6 +48,11 @@ const MIXED_ENTITIES = ['persons', 'organizations'];
 const getOptionLabel = option =>
   (option._type === 'organizations' ? option.name : option.nickname) || '';
 
+const getPersonIconType = option => {
+  if (option._type === 'organizations') return 'organization';
+  return option.type === 'AUTHOR' ? 'author' : 'caver';
+};
+
 const stripType = ({ _type, ...rest }) => rest;
 
 const AuthorsSection = () => {
@@ -166,11 +171,7 @@ const AuthorsSection = () => {
                   label={
                     <Box sx={{ display: 'flex', alignItems: 'center' }}>
                       <CustomIcon
-                        type={
-                          option._type === 'organizations'
-                            ? 'organization'
-                            : 'caver'
-                        }
+                        type={getPersonIconType(option)}
                         size={18}
                       />
                       {getOptionLabel(option)}

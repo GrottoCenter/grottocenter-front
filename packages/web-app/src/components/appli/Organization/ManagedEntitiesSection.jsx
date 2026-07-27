@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
-import { Link as RouterLink } from 'react-router-dom';
-import { Box, Typography, Link, List, ListItem, ListItemText } from '@mui/material';
+import { Box, Typography, List, ListItem, ListItemText } from '@mui/material';
+import AppLink from '../../common/AppLink';
 
 const ManagedEntitiesSection = ({ organization }) => {
   const { formatMessage } = useIntl();
@@ -29,9 +29,7 @@ const ManagedEntitiesSection = ({ organization }) => {
         }}>
           <ListItemText
             primary={
-              <Link component={RouterLink} to={getLink(item)}>
-                {item.name}
-              </Link>
+              <AppLink to={getLink(item)}>{item.name}</AppLink>
             }
           />
         </ListItem>

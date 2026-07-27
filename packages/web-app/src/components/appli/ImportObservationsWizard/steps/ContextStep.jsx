@@ -23,6 +23,7 @@ import ClearIcon from '@mui/icons-material/Clear';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import CoordinateFormSection from '../../EntitiesForm/utils/CoordinateFormSection';
 import { coordinatesMarkerIcon } from '../../../../assets/icons';
+import LicenseTag from '@/components/common/LicenseTag';
 
 import {
   SET_CONTEXT,
@@ -578,10 +579,13 @@ const ContextStep = ({ initialCaveId, caveIdLocked }) => {
           label={formatMessage({ id: 'ImportObservationsWizard.ContextStep.licenseLabel' })}
           onChange={e => handleFieldChange('licenseId', e.target.value)}
           disabled={licensesLoading}
+          renderValue={id => (
+            <LicenseTag license={allowedLicenses.find(l => l.id === id)} />
+          )}
           data-testid="license-select">
           {allowedLicenses.map(license => (
             <MenuItem key={license.id} value={license.id}>
-              {license.name}
+              <LicenseTag license={license} />
             </MenuItem>
           ))}
         </Select>

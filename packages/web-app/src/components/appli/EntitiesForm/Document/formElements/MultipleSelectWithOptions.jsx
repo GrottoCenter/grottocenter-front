@@ -8,6 +8,8 @@ import { DocumentFormContext } from '../Provider';
 import Translate from '../../../../common/Translate';
 import { MultipleSelectWithOptionsTypes } from '../../../../common/Form/types';
 
+const CHIP_SLOT_PROPS = { chip: { color: 'primary' } };
+
 const MultipleSelectWithOptions = ({
   computeHasError,
   getOptionLabel,
@@ -74,6 +76,7 @@ const MultipleSelectWithOptions = ({
         renderOption={renderOption}
         isOptionEqualToValue={getOptionSelected}
         filterSelectedOptions
+        slotProps={CHIP_SLOT_PROPS}
         noOptionsText={noOptionsText}
         required={required}
         renderInput={params => (

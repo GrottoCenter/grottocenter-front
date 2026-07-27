@@ -190,7 +190,9 @@ const organizations = {
 const PERSON_TYPE_LABEL = { CAVER: 'Caver', AUTHOR: 'Author' };
 
 const persons = {
-  icon: <CustomIcon type="caver" size={16} />,
+  icon: doc => (
+    <CustomIcon type={doc?.type === 'AUTHOR' ? 'author' : 'caver'} size={16} />
+  ),
   columns: [
     { visible: true, field: 'id', label: 'Id', sortable: false },
     { visible: true, field: 'nickname', label: 'Username', sortable: true, isTitle: true },

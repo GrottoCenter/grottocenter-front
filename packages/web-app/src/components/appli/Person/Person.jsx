@@ -13,30 +13,24 @@ import {
   useUserProperties,
   usePermissions,
   useSharePage
-} from '../../../hooks';
-import { PersonPropTypes } from '../../../types/person.type';
-import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
-import TravelExploreOutlinedIcon from '@mui/icons-material/TravelExploreOutlined';
-import PermMediaOutlinedIcon from '@mui/icons-material/PermMediaOutlined';
-import PageContainer from '../../common/Layouts/PageContainer';
-import PageHeader from '../../common/Layouts/PageHeader';
-import PageTabs from '../../common/Layouts/PageTabs';
-import ResponsiveActions from '../../common/Layouts/ResponsiveActions';
-import ScrollableContent from '../../common/Layouts/Fixed/ScrollableContent';
-import CustomIcon from '../../common/CustomIcon';
-import Alert from '../../common/Alert';
-import DocumentsList from '../../common/DocumentsList/DocumentsList';
-import EntitiesList from '../../common/entitiesList/EntitiesList';
-import RelatedCaves from '../../common/RelatedCaves/RelatedCaves';
-import PersonProperties from '../../common/Person/PersonProperties';
-import { deletePerson } from '../../../actions/Person/DeletePerson';
-import { fetchPerson } from '../../../actions/Person/GetPerson';
-import { fetchConversations } from '../../../actions/Messaging/GetConversations';
+} from '@/hooks';
+import { PersonPropTypes } from '@/types/person.type';
+import PageContainer from '@/components/common/Layouts/PageContainer';
+import PageHeader from '@/components/common/Layouts/PageHeader';
+import SectionStack from '@/components/common/Layouts/SectionStack';
+import ResponsiveActions from '@/components/common/Layouts/ResponsiveActions';
+import CustomIcon from '@/components/common/CustomIcon';
+import Alert from '@/components/common/Alert';
+import { deletePerson } from '@/actions/Person/DeletePerson';
+import { fetchPerson } from '@/actions/Person/GetPerson';
+import { fetchConversations } from '@/actions/Messaging/GetConversations';
 
 import {
   DeleteConfirmationDialog,
   DELETED_ENTITIES
-} from '../../common/card/Deleted';
+} from '@/components/common/card/Deleted';
+import AuthorBody from './AuthorBody';
+import CaverBody from './CaverBody';
 
 const Person = ({ isLoading, person, error }) => {
   const dispatch = useDispatch();
@@ -76,7 +70,7 @@ const Person = ({ isLoading, person, error }) => {
         // We should implement a dedicated backend endpoint to retrieve a conversation by participant ID.
         // If not found, do a single fetch (first 50 conversations) to update the Redux store
         await dispatch(fetchConversations({ limit: 50, skip: 0 }, false));
-        
+
         // Read updated conversations from the store to avoid UI flashing from multiple page loads
         const state = store.getState();
         const updatedConversations = state.messaging?.activeConversations?.items || [];
@@ -96,8 +90,6 @@ const Person = ({ isLoading, person, error }) => {
     }
   }, [dispatch, person?.id, navigate, activeConversations, store]);
 
-
-
   let onDelete = null;
   if (person && (permissions.isAdmin || permissions.isModerator)) {
     onDelete = () => setIsDeleteConfirmationOpen(true);
@@ -116,25 +108,43 @@ const Person = ({ isLoading, person, error }) => {
   }
 
   // The API consistently returns "type": "CAVER" or "type": "AUTHOR" on person responses,
-  // undocumented in the API spec. Checking `person?.type !== 'AUTHOR'` correctly prevents
-  // showing the messaging action for authors.
+  // undocumented in the API spec. Authors are placeholders used to attribute documents to
+  // someone who does not have an account — they cannot log in, message, or record activity.
+  const isAuthor = person?.type === 'AUTHOR';
   const canMessage =
-    !canEdit && userId && person?.type !== 'AUTHOR' && !person?.isBanned && !person?.isDeleted;
+    !canEdit && userId && !isAuthor && !person?.isBanned && !person?.isDeleted;
 
-  const titleAdornment = canEdit ? (
-    <Chip
-      label={formatMessage({ id: 'You' }).toUpperCase()}
-      color="secondary"
-      sx={{
-        ml: 2,
-        fontSize: '1.4rem',
-        letterSpacing: 1.5,
-        verticalAlign: 'middle',
-        color: '#fff',
-        fontWeight: 700
-      }}
-    />
-  ) : null;
+  let titleAdornment = null;
+  if (canEdit) {
+    titleAdornment = (
+      <Chip
+        label={formatMessage({ id: 'You' }).toUpperCase()}
+        color="secondary"
+        sx={{
+          ml: 2,
+          fontSize: '1.4rem',
+          letterSpacing: 1.5,
+          verticalAlign: 'middle',
+          color: '#fff',
+          fontWeight: 700
+        }}
+      />
+    );
+  } else if (isAuthor) {
+    titleAdornment = (
+      <Chip
+        label={formatMessage({ id: 'Author' }).toUpperCase()}
+        variant="outlined"
+        sx={{
+          ml: 2,
+          fontSize: '1.4rem',
+          letterSpacing: 1.5,
+          verticalAlign: 'middle',
+          fontWeight: 700
+        }}
+      />
+    );
+  }
 
   const actions = person ? (
     <ResponsiveActions
@@ -174,147 +184,65 @@ const Person = ({ isLoading, person, error }) => {
     />
   ) : null;
 
-  const nbOrganizations = (person?.organizations ?? []).length;
-  const nbEntrances = (person?.exploredEntrances ?? []).length;
-
-  const tabs = [
-    {
-      id: 'profil',
-      label: formatMessage({ id: 'Profile' }),
-      icon: <AccountCircleOutlinedIcon fontSize="small" />
-    },
-    {
-      id: 'activities',
-      label: formatMessage({ id: 'Activities' }),
-      icon: <TravelExploreOutlinedIcon fontSize="small" />,
-      count: nbOrganizations + nbEntrances,
-      disabled: !!person && nbOrganizations + nbEntrances === 0
-    },
-    {
-      id: 'documents',
-      label: formatMessage({ id: 'Documents' }),
-      icon: <PermMediaOutlinedIcon fontSize="small" />,
-      count: person?.documents?.length,
-      disabled: !!person && (person.documents?.length ?? 0) === 0
-    }
-  ];
-
   return (
     <PageContainer>
-      <PageHeader
-        title={isLoading ? undefined : title}
-        icon={<CustomIcon type="caver" />}
-        titleAdornment={titleAdornment}
-        actions={actions}
-      />
-      <PageTabs tabs={tabs}>
-        {/* Tab Profil */}
-        <div>
-          {isLoading && (
-            <Card sx={{ m: 1, p: 2 }}>
-              <Skeleton />
-              <Skeleton height={200} />
-              <Skeleton height={100} />
-              <Skeleton height={100} />
-              <Skeleton height={100} />
-              <Skeleton height={100} />
-            </Card>
-          )}
-          {!!error && (
-            <Card sx={{ m: 1, p: 2 }}>
-              <Alert
-                title={formatMessage({
-                  id: 'Error, the person you are looking for is not available.'
-                })}
-                severity="error"
-              />
-            </Card>
-          )}
-          {person && (
-            <>
-              <DeleteConfirmationDialog
-                entityType={DELETED_ENTITIES.person}
-                isOpen={isDeleteConfirmationOpen}
-                isLoading={false}
-                isPermanent
-                onClose={() => setIsDeleteConfirmationOpen(false)}
-                onConfirmation={entity => onDeletePress(entity?.id, true)}
-              />
-              <ScrollableContent
-                content={<PersonProperties person={person} canEdit={canEdit} />}
-              />
-            </>
-          )}
-        </div>
-
-        {/* Tab Activités */}
-        <div>
-          {isLoading && (
-            <Card sx={{ m: 1, p: 2 }}>
-              <Skeleton height={100} />
-              <Skeleton height={100} />
-            </Card>
-          )}
-          {person && (
-            <>
-              <ScrollableContent
-                anchorId="organizations"
-                title={formatMessage({ id: 'Organizations' })}
-                defaultExpanded={nbOrganizations > 0}
-                count={nbOrganizations}
-                content={
-                  <EntitiesList
-                    type="organization"
-                    entities={person.organizations}
-                    emptyMessage={
-                      <Alert
-                        severity="info"
-                        content={formatMessage({
-                          id: 'This person is not a member of any organization yet.'
-                        })}
-                      />
-                    }
-                  />
-                }
-              />
-              <ScrollableContent
-                anchorId="related-caves"
-                title={formatMessage({ id: 'Explored entrances' })}
-                defaultExpanded={nbEntrances > 0}
-                count={nbEntrances}
-                content={
-                  <RelatedCaves
-                    exploredEntrances={person.exploredEntrances}
-                    entityId={person.id}
-                    isOrganization={false}
-                    canManageCaves={false}
-                    onRefresh={handleRefresh}
-                    userId={person.id}
-                  />
-                }
-              />
-            </>
-          )}
-        </div>
-
-        {/* Tab Documents */}
-        <div>
-          {isLoading && (
-            <Card sx={{ m: 1, p: 2 }}>
-              <Skeleton height={40} width="100%" />
-              <Skeleton height={60} />
-              <Skeleton height={60} />
-              <Skeleton height={60} />
-            </Card>
-          )}
-          {person && (
-            <ScrollableContent
-              collapsible={false}
-              content={<DocumentsList documents={person.documents} />}
+      {/* Keep the header whenever we have a person to describe (even if a
+          subsequent fetch errored on a stale entity) or while loading — so
+          the user retains title, chip and actions. Only hide it when there's
+          nothing to show: an error with no person in the store. */}
+      {(isLoading || person) && (
+        <PageHeader
+          title={isLoading ? undefined : title}
+          icon={<CustomIcon type={isAuthor ? 'author' : 'caver'} />}
+          titleAdornment={titleAdornment}
+          actions={actions}
+        />
+      )}
+      {isLoading && (
+        <SectionStack>
+          <Card sx={{ p: 2 }}>
+            <Skeleton />
+            <Skeleton height={200} />
+            <Skeleton height={100} />
+            <Skeleton height={100} />
+            <Skeleton height={100} />
+            <Skeleton height={100} />
+          </Card>
+        </SectionStack>
+      )}
+      {!!error && (
+        <SectionStack>
+          <Card sx={{ p: 2 }}>
+            <Alert
+              title={formatMessage({
+                id: 'Error, the person you are looking for is not available.'
+              })}
+              severity="error"
+            />
+          </Card>
+        </SectionStack>
+      )}
+      {person && (
+        <>
+          <DeleteConfirmationDialog
+            entityType={DELETED_ENTITIES.person}
+            isOpen={isDeleteConfirmationOpen}
+            isLoading={false}
+            isPermanent
+            onClose={() => setIsDeleteConfirmationOpen(false)}
+            onConfirmation={entity => onDeletePress(entity?.id, true)}
+          />
+          {isAuthor ? (
+            <AuthorBody person={person} />
+          ) : (
+            <CaverBody
+              person={person}
+              canEdit={canEdit}
+              onRefresh={handleRefresh}
             />
           )}
-        </div>
-      </PageTabs>
+        </>
+      )}
     </PageContainer>
   );
 };

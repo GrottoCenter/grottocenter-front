@@ -2,9 +2,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import { useNavigate } from 'react-router-dom';
-import { Box, Button } from '@mui/material';
-import FileUploadIcon from '@mui/icons-material/FileUpload';
+import { Box, Button, Tooltip } from '@mui/material';
 
+import { EntityIcon } from '../../../../pages/EntityCreation/entityConfig';
 import ScrollableContent from '../../../common/Layouts/Fixed/ScrollableContent';
 import Alert from '../../../common/Alert';
 
@@ -22,26 +22,30 @@ const Science = ({ caveId }) => {
       anchorId="science"
       defaultExpanded
       title={formatMessage({ id: 'Science' })}
-      content={
-        <>
-          <Alert
-            severity="info"
-            content={formatMessage({
-              id: 'Science data integration in progress.'
-            })}
-          />
-
-          <Box sx={{ mt: 1, display: 'flex', gap: 0.5 }}>
+      icon={
+        <Box display="flex" gap={0.5}>
+          <Tooltip title={formatMessage({ id: 'Import observations' })}>
             <Button
-              variant="outlined"
               color="secondary"
-              startIcon={<FileUploadIcon />}
+              size="small"
+              variant="outlined"
               onClick={handleImportObservations}
+              startIcon={
+                <EntityIcon iconType="scientific_observation" size={20} />
+              }
               data-testid="import-observations-btn">
-              {formatMessage({ id: 'Import observations' })}
+              {formatMessage({ id: 'New' })}
             </Button>
-          </Box>
-        </>
+          </Tooltip>
+        </Box>
+      }
+      content={
+        <Alert
+          severity="info"
+          content={formatMessage({
+            id: 'Science data integration in progress.'
+          })}
+        />
       }
     />
   );

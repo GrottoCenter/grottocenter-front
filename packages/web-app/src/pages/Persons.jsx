@@ -3,7 +3,10 @@ import EntitySearchPage from '../components/appli/AdvancedSearch/EntitySearchPag
 import PersonSearch from '../components/appli/AdvancedSearch/PersonSearch';
 
 const PersonsSearchPage = () => (
-  <EntitySearchPage title="Persons" entityType="persons">
+  <EntitySearchPage
+    title="Cavers"
+    entityType="persons"
+    initialFilter={{ type: 'CAVER' }}>
     <PersonSearch />
   </EntitySearchPage>
 );

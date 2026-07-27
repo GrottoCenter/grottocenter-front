@@ -220,10 +220,14 @@ const RelatedCaves = ({
         title={toolTipTitle}
         actions={
           <>
-            <Button onClick={handleCancelRemove} variant="text">
+            <Button onClick={handleCancelRemove} variant="outlined">
               {formatMessage({ id: 'Cancel' })}
             </Button>
-            <Button onClick={handleConfirmRemove} color="error" autoFocus>
+            <Button
+              onClick={handleConfirmRemove}
+              variant="contained"
+              color="error"
+              autoFocus>
               {formatMessage({ id: 'Remove' })}
             </Button>
           </>
