@@ -229,9 +229,17 @@ cd twa
 bubblewrap build --skipPwaValidation
 ```
 
-Bubblewrap prompts for the keystore and key passwords (or pass
-`--key-store-password` / `--key-password` to match the CI invocation). This produces,
-in `twa/`:
+Bubblewrap prompts for the keystore and key passwords. To run it non-interactively
+(as the CI does), set the passwords via **environment variables** instead — Bubblewrap
+has no password CLI flags:
+
+```bash
+export BUBBLEWRAP_KEYSTORE_PASSWORD='…'
+export BUBBLEWRAP_KEY_PASSWORD='…'
+bubblewrap build --skipPwaValidation
+```
+
+This produces, in `twa/`:
 
 - `app-release-bundle.aab` — the bundle you upload to the Play Console.
 - `app-release-signed.apk` — a signed APK for direct device installation.
