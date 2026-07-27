@@ -9,11 +9,11 @@ on:
         default: '1.0.0'
   push:
     tags:
-      # Only semver release tags (v1.0.0, v10.2.3…) trigger a build + Release.
+      # Only semver release tags (1.0.0, 10.2.3…) trigger a build + Release.
       # GitHub Actions tag filters are globs, not regex: [0-9] is a digit class
       # and + means "one or more of the preceding". The Resolve step still
       # validates strict semver as defense-in-depth (and for workflow_dispatch).
-      - 'v[0-9]+.[0-9]+.[0-9]+'
+      - '[0-9]+.[0-9]+.[0-9]+'
 
 jobs:
   build:
