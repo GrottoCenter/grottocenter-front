@@ -17,11 +17,11 @@
   "maskableIconUrl": "https://grottocenter.org/logo512-maskable.png",
   "splashScreenFadeOutDuration": 300,
   "signingKey": {
-    "path": "D:\\Paul\\Documents\\Dev\\workspace\\grottocenter-front\\twa\\android.keystore",
-    "alias": "android"
+    "path": "./android.keystore",
+    "alias": "grottocenter"
   },
-  "appVersionName": "1",
-  "appVersionCode": 1,
+  "appVersionName": "2",
+  "appVersionCode": 2,
   "shortcuts": [],
   "generatorApp": "bubblewrap-cli",
   "webManifestUrl": "https://grottocenter.org/manifest.json",
@@ -47,5 +47,5 @@
   "fileHandlers": [],
   "launchHandlerClientMode": "",
   "displayOverride": [],
-  "appVersion": "1"
+  "appVersion": "2"
 }
