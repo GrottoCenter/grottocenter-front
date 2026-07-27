@@ -38,11 +38,6 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Set up Node.js 20
-        uses: actions/setup-node@v5
-        with:
-          node-version: '20'
-
       - name: Resolve version
         id: version
         run: |
@@ -65,41 +60,14 @@ jobs:
           echo "code=$CODE" >> "$GITHUB_OUTPUT"
           echo "Resolved version: $NAME (code $CODE)"
 
-      - name: Install Bubblewrap CLI
-        run: npm install -g @bubblewrap/cli
-
-      - name: Configure Bubblewrap for CI (non-interactive)
-        # On a fresh runner Bubblewrap has no config and prompts to install the
-        # JDK/Android SDK, which hangs (then exits 130) in CI. Point it at the
-        # JDK from setup-java and the Android SDK preinstalled on the runner.
-        #
-        # Bubblewrap also validates that <sdk>/tools or <sdk>/bin exists, but the
-        # runner keeps its command-line tools under cmdline-tools/latest, so it
-        # rejects the SDK ("The provided androidSdk isn't correct."). Symlinking
-        # <sdk>/tools -> cmdline-tools/latest satisfies the check and keeps
-        # tools/bin/sdkmanager resolvable, while build-tools/ and platforms/
-        # remain at the SDK root for Gradle.
-        run: |
-          # ANDROID_SDK_ROOT/ANDROID_HOME are runner OS env vars, read from the
-          # shell (not the ${{ env }} workflow context, which wouldn't see them).
-          SDK="${ANDROID_SDK_ROOT:-$ANDROID_HOME}"
-          if [ ! -e "$SDK/tools" ] && [ -d "$SDK/cmdline-tools/latest" ]; then
-            ln -s "$SDK/cmdline-tools/latest" "$SDK/tools" \
-              || sudo ln -s "$SDK/cmdline-tools/latest" "$SDK/tools"
-          fi
-          mkdir -p "$HOME/.bubblewrap"
-          SDK="$SDK" node -e "require('fs').writeFileSync(process.env.HOME + '/.bubblewrap/config.json', JSON.stringify({ jdkPath: process.env.JAVA_HOME, androidSdkPath: process.env.SDK }))"
-          cat "$HOME/.bubblewrap/config.json"
-
       - name: Decode keystore from secret
         env:
           KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
-        run: echo "$KEYSTORE_BASE64" | base64 --decode > android.keystore
+        run: printf '%s' "$KEYSTORE_BASE64" | base64 -d > android.keystore
 
       - name: Set version in app/build.gradle
-        # Edit the version Gradle actually uses, NOT twa-manifest.json — leaving the
-        # manifest untouched keeps it in sync with manifest-checksum.txt, so
-        # `bubblewrap build` detects no change and never prompts to regenerate.
+        # Edit the version Gradle actually uses. (We build the committed Gradle
+        # project directly, so twa-manifest.json is not involved at build time.)
         env:
           VERSION_NAME: ${{ steps.version.outputs.name }}
           VERSION_CODE: ${{ steps.version.outputs.code }}
@@ -108,41 +76,43 @@ jobs:
           sed -i -E "s/versionName[[:space:]]+\"[^\"]*\"/versionName \"${VERSION_NAME}\"/" app/build.gradle
           grep -E "versionCode|versionName" app/build.gradle
 
-      - name: Build AAB with Bubblewrap
-        # Bubblewrap has NO password CLI flags — it reads the keystore/key passwords
-        # only from these env vars (both must be set). `printf 'n\n'` answers "no" to
-        # any residual "apply manifest changes?" prompt so the build never blocks and
-        # never regenerates over the version we just set. With manifest and checksum
-        # committed in sync, no prompt appears at all.
+      - name: Build signed AAB + APK with Gradle
+        # Sign via Gradle's signingConfig (see app/build.gradle): Gradle passes the
+        # passwords straight to the Java signing API — no shell command — so special
+        # characters in the password are safe. The Android SDK is auto-detected from
+        # ANDROID_SDK_ROOT on the runner.
         env:
-          BUBBLEWRAP_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
-          BUBBLEWRAP_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          KEYSTORE_FILE: ${{ github.workspace }}/twa/android.keystore
+          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: grottocenter
+          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
         run: |
-          printf 'n\n' | bubblewrap build --skipPwaValidation
+          chmod +x gradlew
+          ./gradlew bundleRelease assembleRelease --no-daemon --stacktrace
 
       - name: Upload AAB and APK artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: grottocenter-twa-${{ steps.version.outputs.name }}-v${{ steps.version.outputs.code }}
+          name: grottocenter-twa-${{ steps.version.outputs.name }}-b${{ steps.version.outputs.code }}
           # uses-step paths are relative to the repo root, not working-directory.
           path: |
-            twa/*.aab
-            twa/*.apk
-          if-no-files-found: warn
+            twa/app/build/outputs/bundle/release/*.aab
+            twa/app/build/outputs/apk/release/*.apk
+          if-no-files-found: error
           retention-days: 30
 
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          # On a tag push, GITHUB_REF_NAME is reused; on workflow_dispatch the tag
-          # is created from the resolved version name.
-          tag_name: v${{ steps.version.outputs.name }}
-          name: GrottoCenter TWA v${{ steps.version.outputs.name }} (build ${{ steps.version.outputs.code }})
+          # On a tag push GITHUB_REF_NAME is reused; on workflow_dispatch the tag
+          # is created from the resolved version name. Tags are plain semver (no v).
+          tag_name: ${{ steps.version.outputs.name }}
+          name: GrottoCenter TWA ${{ steps.version.outputs.name }} (build ${{ steps.version.outputs.code }})
           generate_release_notes: true
           # files are relative to the repo root, not working-directory.
           files: |
-            twa/*.aab
-            twa/*.apk
+            twa/app/build/outputs/bundle/release/*.aab
+            twa/app/build/outputs/apk/release/*.apk
 
       - name: Clean up keystore
         if: always()
