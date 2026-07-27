@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite';
+import { defineConfig, loadEnv } from 'vite';
 import { fileURLToPath, URL } from 'node:url';
 import react from '@vitejs/plugin-react';
 import svgr from 'vite-plugin-svgr';
@@ -6,7 +6,13 @@ import { compression } from 'vite-plugin-compression2';
 import { visualizer } from 'rollup-plugin-visualizer';
 import { VitePWA } from 'vite-plugin-pwa';
 
-export default defineConfig({
+export default defineConfig(({ mode }) => {
+  // Pull VITE_API_URL out of the env file so the SW's runtimeCaching pattern
+  // matches whichever backend this build targets (prod, staging, local).
+  const env = loadEnv(mode, process.cwd(), '');
+  const apiOrigin = env.VITE_API_URL ? new URL(env.VITE_API_URL).origin : null;
+
+  return {
   plugins: [
     react(),
     // SVG imported with `?react` becomes a React component; a bare `.svg`
@@ -104,6 +110,64 @@ export default defineConfig({
               cacheName: 'lang',
               expiration: { maxEntries: 30 }
             }
+          },
+          // Backend API (GET only). NetworkFirst so users see fresh data
+          // when online but still get the last-known response offline.
+          // networkTimeoutSeconds keeps a bad connection from stalling the UI
+          // — after 5s we fall back to the cache. Skipped entirely if
+          // VITE_API_URL isn't set at build time (e.g. some CI setups).
+          ...(apiOrigin
+            ? [
+                {
+                  urlPattern: ({ url, request }) =>
+                    url.origin === apiOrigin &&
+                    url.pathname.startsWith('/api/') &&
+                    request.method === 'GET',
+                  handler: 'NetworkFirst',
+                  options: {
+                    cacheName: 'api-get',
+                    networkTimeoutSeconds: 5,
+                    expiration: {
+                      maxEntries: 200,
+                      maxAgeSeconds: 60 * 60 * 24 * 7
+                    },
+                    cacheableResponse: { statuses: [0, 200] }
+                  }
+                }
+              ]
+            : []),
+          {
+            // Country flags from flagcdn.com — immutable per URL (ISO codes
+            // don't change), small PNGs, bounded set (~200 countries × 2
+            // sizes). CacheFirst with no TTL, just LRU-cap.
+            urlPattern: ({ url }) => url.hostname === 'flagcdn.com',
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'country-flags',
+              expiration: { maxEntries: 500, purgeOnQuotaError: true },
+              cacheableResponse: { statuses: [0, 200] }
+            }
+          },
+          {
+            // Photos & thumbnails on Azure Blob Storage
+            // (*.blob.core.windows.net — covers prod, staging, any container).
+            // The backend generates a random-prefixed path for every upload
+            // (see grottocenter-api FileService.generateName), so each URL is
+            // effectively content-addressed — a "replaced" file gets a brand
+            // new URL. Safe for CacheFirst with no TTL; only LRU-cap the cache
+            // to keep storage bounded.
+            urlPattern: ({ url, request }) =>
+              request.destination === 'image' &&
+              /\.blob\.core\.windows\.net$/.test(url.hostname),
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'blob-images',
+              expiration: {
+                maxEntries: 300,
+                purgeOnQuotaError: true
+              },
+              cacheableResponse: { statuses: [0, 200] }
+            }
           }
         ]
       },
@@ -161,4 +225,5 @@ export default defineConfig({
     setupFiles: './src/setupTests.js',
     css: true
   }
+  };
 });
