@@ -1101,6 +1101,12 @@ PreferencesSection.propTypes = {
 
 // ─── Offline data section ────────────────────────────────────────────────────
 
+// Browsers without a service worker (Safari private mode, unsupported UAs, dev
+// with devOptions.enabled: false) never populate the offline caches, so the
+// section would just show "0 MB" with no way to explain it. Skip entirely.
+const HAS_SERVICE_WORKER =
+  typeof navigator !== 'undefined' && 'serviceWorker' in navigator;
+
 const OfflineDataSection = () => {
   const { formatMessage, formatNumber } = useIntl();
   const { onSuccess, onError } = useNotification();
@@ -1368,8 +1374,9 @@ const AccountPage = () => {
         </>
       )}
       {/* Rendered even when the account fetch failed — clearing the cache
-          may be exactly what's needed to unstick the app. */}
-      <OfflineDataSection />
+          may be exactly what's needed to unstick the app. Hidden on browsers
+          with no service worker support (nothing to show / clear). */}
+      {HAS_SERVICE_WORKER && <OfflineDataSection />}
     </SectionStack>
   );
 

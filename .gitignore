@@ -107,3 +107,6 @@ android.keystore
 /twa/local.properties
 # Signed bundle/apk + v4 signature .idsig
 /twa/app-release*
+# Bubblewrap drift-detection artefact — regenerated on `bubblewrap update`,
+# no runtime value, causes noise when twa-manifest.json is edited by hand.
+/twa/manifest-checksum.txt
