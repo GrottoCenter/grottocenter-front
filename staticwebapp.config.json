@@ -1,7 +1,7 @@
 {
   "navigationFallback": {
     "rewrite": "index.html",
-    "exclude": ["/images/*", "/static/*"]
+    "exclude": ["/images/*", "/static/*", "/.well-known/*", "/sw.js"]
   },
   "globalHeaders": {
     "X-Content-Type-Options": "nosniff"
@@ -14,9 +14,22 @@
       }
     },
     {
+      "route": "/sw.js",
+      "headers": {
+        "Cache-Control": "no-cache"
+      }
+    },
+    {
       "route": "/static/*",
       "headers": {
         "Cache-Control": "public, max-age=31536000, immutable"
+      }
+    },
+    {
+      "route": "/.well-known/assetlinks.json",
+      "headers": {
+        "Content-Type": "application/json",
+        "Cache-Control": "no-cache"
       }
     }
   ]
