@@ -73,11 +73,24 @@ jobs:
       - name: Configure Bubblewrap for CI (non-interactive)
         # On a fresh runner Bubblewrap has no config and prompts to install the
         # JDK/Android SDK, which hangs (then exits 130) in CI. Point it at the
-        # JDK from setup-java and the Android SDK preinstalled on the runner so
-        # the build runs headless.
+        # JDK from setup-java and the Android SDK preinstalled on the runner.
+        #
+        # Bubblewrap also validates that <sdk>/tools or <sdk>/bin exists, but the
+        # runner keeps its command-line tools under cmdline-tools/latest, so it
+        # rejects the SDK ("The provided androidSdk isn't correct."). Symlinking
+        # <sdk>/tools -> cmdline-tools/latest satisfies the check and keeps
+        # tools/bin/sdkmanager resolvable, while build-tools/ and platforms/
+        # remain at the SDK root for Gradle.
         run: |
+          # ANDROID_SDK_ROOT/ANDROID_HOME are runner OS env vars, read from the
+          # shell (not the ${{ env }} workflow context, which wouldn't see them).
+          SDK="${ANDROID_SDK_ROOT:-$ANDROID_HOME}"
+          if [ ! -e "$SDK/tools" ] && [ -d "$SDK/cmdline-tools/latest" ]; then
+            ln -s "$SDK/cmdline-tools/latest" "$SDK/tools" \
+              || sudo ln -s "$SDK/cmdline-tools/latest" "$SDK/tools"
+          fi
           mkdir -p "$HOME/.bubblewrap"
-          node -e "require('fs').writeFileSync(process.env.HOME + '/.bubblewrap/config.json', JSON.stringify({ jdkPath: process.env.JAVA_HOME, androidSdkPath: process.env.ANDROID_SDK_ROOT || process.env.ANDROID_HOME }))"
+          SDK="$SDK" node -e "require('fs').writeFileSync(process.env.HOME + '/.bubblewrap/config.json', JSON.stringify({ jdkPath: process.env.JAVA_HOME, androidSdkPath: process.env.SDK }))"
           cat "$HOME/.bubblewrap/config.json"
 
       - name: Decode keystore from secret
