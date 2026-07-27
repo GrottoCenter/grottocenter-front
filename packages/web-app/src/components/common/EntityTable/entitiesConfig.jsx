@@ -372,9 +372,14 @@ const documents = {
       visible: true,
       field: 'authors',
       label: 'Author',
-      sortable: false,
+      sortable: true,
       render: cellsRender.documentAuthors,
-      apiField: 'authors.nickname'
+      // Export keeps the human-readable author names…
+      apiField: 'authors.nickname',
+      // …while sorting uses the backend's denormalized alphabetical-first-author
+      // key (`computeDocumentAuthorsSort` on the API). Requires the search index
+      // to be reindexed with the `authorsSort` field before deploy.
+      sortField: 'authorsSort'
     },
     { visible: false, field: 'library.name', label: 'Library', sortable: true },
     { visible: false, field: 'editor.name', label: 'Editor', sortable: true },
@@ -416,6 +421,8 @@ const documents = {
       visible: false,
       field: 'entrances',
       label: 'Entrances',
+      // Not sortable: the search index exposes no sortable `entrances` field
+      // (a document links to many entrances). Needs backend support first.
       sortable: false,
       render: cellsRender.keyArray('name')
     },

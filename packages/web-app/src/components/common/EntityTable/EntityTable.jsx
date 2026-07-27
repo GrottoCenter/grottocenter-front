@@ -13,6 +13,7 @@ import MobileToolbar from './MobileToolbar';
 import {
   SORT_FIELD_MAP,
   applyColumnVisibility,
+  getColumnsStorageKey,
   getStoredRowsPerPage,
   renderCell
 } from './tableUtils';
@@ -32,8 +33,7 @@ const initColumns = (
       visible: col.field === 'name'
     }));
   } else {
-    const storageKey = `entityTable_${entityType}_columns`;
-    const stored = localStorage.getItem(storageKey);
+    const stored = localStorage.getItem(getColumnsStorageKey(entityType));
     columns = stored
       ? applyColumnVisibility(entityConfig.columns, stored)
       : entityConfig.columns;
