@@ -199,10 +199,15 @@
       document.documentElement.lang = intlBootstrap.initialLocale;
       document.documentElement.dir = RTL_LOCALES.indexOf(intlBootstrap.initialLocale) !== -1 ? 'rtl' : 'ltr';
 
-      // While react is still loading we start to get the initial locale strings
+      // While react is still loading we start to get the initial locale strings.
+      // Swallow errors (e.g. offline first-launch of the PWA) so the app still
+      // boots — react-intl will fall back to raw message ids until a later
+      // fetch succeeds.
       intlBootstrap.initialFetchP = fetch(
         `/lang/${intlBootstrap.initialLocale}.json`
-      ).then(r => r.json());
+      )
+        .then(r => r.json())
+        .catch(() => ({}));
     </script>
     <script type="module" src="/src/index.jsx"></script>
   </body>

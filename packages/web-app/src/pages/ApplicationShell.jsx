@@ -24,7 +24,14 @@ import AppBar from '../components/common/AppBar';
 import LoginDialog from '../components/appli/Login';
 
 async function transitionToReact() {
-  await intlBootstrap.initialFetchP; // Make sure strings of the initial locale are loaded
+  // Wait for the initial locale strings, but never let a failure (e.g. PWA
+  // launched offline before /lang/*.json was cached) keep the splash loader
+  // on screen — better to render with untranslated ids than to be stuck.
+  try {
+    await intlBootstrap.initialFetchP;
+  } catch {
+    /* handled in index.html; kept here as belt-and-braces */
+  }
 
   const loaderEl = document.querySelector('.loader');
   if (!loaderEl) return;
