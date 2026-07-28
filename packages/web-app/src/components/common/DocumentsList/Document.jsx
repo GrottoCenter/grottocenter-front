@@ -25,6 +25,7 @@ import { SnapshotButton } from '../../appli/Entry/Snapshots/UtilityFunction';
 import Translate from '../Translate';
 import StandardDialog from '../StandardDialog';
 import linkifyOptions from '../../../helpers/linkifyOptions';
+import { formatDocumentReference } from '../../../utils/documentReference';
 
 const Document = ({
   document,
@@ -40,6 +41,9 @@ const Document = ({
   const [descriptionExpanded, setDescriptionExpanded] = useState(false);
   const [isClamped, setIsClamped] = useState(false);
   const descriptionRef = useRef(null);
+
+  // ISO 690 citation for articles/books; other types keep their plain title.
+  const reference = formatDocumentReference(document);
 
   useLayoutEffect(() => {
     const el = descriptionRef.current;
@@ -73,7 +77,7 @@ const Document = ({
             }}>
             <Typography variant="h4" component="span">
               <AppLink openInNewTabDesktop to={`/ui/documents/${document.id}`}>
-                {document.title}
+                {reference ?? document.title}
               </AppLink>
             </Typography>
             <DocumentTypeChip type={document.type} />
@@ -216,6 +220,22 @@ Document.propTypes = {
     type: PropTypes.string,
     isValidated: PropTypes.bool,
     description: PropTypes.string,
+    // Bibliographic fields used to build the ISO 690 citation heading.
+    // Entrance/massif payloads send them nullable (editor/library/parent) or
+    // as empty arrays (authors/authorsOrganization); oldBBS is always present.
+    datePublication: PropTypes.string,
+    authors: PropTypes.arrayOf(PropTypes.shape({ nickname: PropTypes.string })),
+    authorsOrganization: PropTypes.arrayOf(
+      PropTypes.shape({ name: PropTypes.string })
+    ),
+    editor: PropTypes.shape({ name: PropTypes.string }),
+    library: PropTypes.shape({ name: PropTypes.string }),
+    parent: PropTypes.shape({ title: PropTypes.string }),
+    identifier: PropTypes.string,
+    identifierType: PropTypes.string,
+    issue: PropTypes.string,
+    pages: PropTypes.string,
+    oldBBS: PropTypes.shape({ publicationOther: PropTypes.string }),
     files: Files.propTypes.files
   })
 };

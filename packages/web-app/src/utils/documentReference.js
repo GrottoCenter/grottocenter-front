@@ -55,7 +55,11 @@ export const formatDocumentReference = doc => {
   const segments = [lead, doc.title];
 
   if (doc.type === DocumentTypes.ARTICLE) {
-    segments.push(doc.parent?.title ?? doc.library?.name);
+    // Journal / periodical name: the parent document, else the BBS-legacy
+    // publication field, else the holding library as a last resort.
+    segments.push(
+      doc.parent?.title ?? doc.oldBBS?.publicationOther ?? doc.library?.name
+    );
     segments.push([doc.issue, doc.pages].filter(Boolean).join(', '));
   } else {
     segments.push(doc.editor?.name);
