@@ -293,6 +293,12 @@ bubblewrap update            # apply twa-manifest.json changes to the project
 > ```
 >
 > Without it the release build is unsigned and Play rejects it.
+>
+> ⚠️ Same problem for **`targetSdkVersion`**: it is not exposed in
+> `twa-manifest.json`, so `bubblewrap update` resets it to whatever the installed
+> Bubblewrap version emits. Google Play requires the target API to be at most one
+> year behind the latest Android release (**API 36 minimum from 2026-08-31**), so
+> check that line after every regeneration.
 
 Then **commit the regenerated project** so CI builds the updated app:
 
