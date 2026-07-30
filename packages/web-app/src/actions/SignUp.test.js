@@ -43,22 +43,28 @@ describe('postSignUp', () => {
     expect(mockDispatch).toHaveBeenCalledWith({ type: FETCH_SIGN_UP_SUCCESS });
   });
 
-  it('extracts the error code from a JSON body { error: "CAPTCHA_INVALID" }', async () => {
-    const body = { error: 'CAPTCHA_INVALID' };
-    fetch.mockResolvedValueOnce({
-      ok: false,
-      status: 400,
-      clone: () => ({ json: () => Promise.resolve(body) }),
-      text: () => Promise.resolve(JSON.stringify(body))
-    });
+  it.each([
+    ['CAPTCHA_MISSING', 400],
+    ['CAPTCHA_INVALID', 400]
+  ])(
+    'extracts the error code from a JSON body { error: "%s" }',
+    async (code, status) => {
+      const body = { error: code };
+      fetch.mockResolvedValueOnce({
+        ok: false,
+        status,
+        clone: () => ({ json: () => Promise.resolve(body) }),
+        text: () => Promise.resolve(JSON.stringify(body))
+      });
 
-    await postSignUp(payload)(mockDispatch);
+      await postSignUp(payload)(mockDispatch);
 
-    expect(mockDispatch).toHaveBeenCalledWith({
-      type: FETCH_SIGN_UP_FAILURE,
-      error: { code: 'CAPTCHA_INVALID', message: null, status: 400 }
-    });
-  });
+      expect(mockDispatch).toHaveBeenCalledWith({
+        type: FETCH_SIGN_UP_FAILURE,
+        error: { code, message: null, status }
+      });
+    }
+  );
 
   it('surfaces CAPTCHA_SERVICE_UNAVAILABLE with status 503', async () => {
     const body = { error: 'CAPTCHA_SERVICE_UNAVAILABLE' };

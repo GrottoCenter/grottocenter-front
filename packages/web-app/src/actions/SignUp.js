@@ -56,6 +56,8 @@ export function postSignUp(data) {
         // Clone before parsing so the original body stream stays available
         // for the text() fallback if JSON parsing fails.
         const body = await response.clone().json();
+        // `error` is the anti-bot/captcha response shape (e.g. CAPTCHA_INVALID),
+        // `code` is the general structured-error shape used by other API endpoints.
         code = body.error || body.code || null;
         message = body.message || null;
       } catch {
