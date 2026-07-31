@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useRef } from 'react';
 import { useMap } from 'react-leaflet';
 import useOpenLink from '../../../../hooks/useOpenLink';
 import PropTypes from 'prop-types';
-import * as L from 'leaflet';
+import L from 'leaflet';
 import { GlobalStyles } from '@mui/material';
 import useMarkers from '../common/Markers/useMarkers';
 import { makeIconTooltip } from '../common/Markers/tooltipHelpers';

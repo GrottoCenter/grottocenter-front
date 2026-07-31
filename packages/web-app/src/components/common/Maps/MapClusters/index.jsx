@@ -212,7 +212,7 @@ const HydratedMap = ({
 
   const handleUpdate = useCallback(() => {
     const currentZoom = map.getZoom();
-    // Below MARKERS_LIMIT we're in heatmap mode: entrances/networks/massifs
+    // Below MARKERS_LIMIT we're in cluster mode: entrances/networks/massifs
     // are drawn from the bulk "all coordinates" fetch done once at page load,
     // and per-tile marker fetches are pure waste. Gating here (using the live
     // `map.getZoom()`, not the batched `visibleMarkers` state) also fixes the

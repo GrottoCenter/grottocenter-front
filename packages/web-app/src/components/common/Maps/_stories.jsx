@@ -96,8 +96,8 @@ const meta = {
 
 export default meta;
 
-export const MainWithHeatmap = {
-  name: 'Main with heatmap',
+export const MainWithClusters = {
+  name: 'Main with clusters',
   render: () => <ClustersMap />
 };
 

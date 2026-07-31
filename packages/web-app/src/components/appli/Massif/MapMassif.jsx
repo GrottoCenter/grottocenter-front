@@ -122,9 +122,10 @@ const MapInternals = ({ geoJson, massifId }) => {
   useMapEvent('moveend', fetchMarkers);
 
   // One-shot heat fetch for the entire massif bbox.
-  // The hexbin layer filters client-side; no re-fetch needed on pan/zoom.
+  // The ClusterLayer builds a kD-tree from these coordinates and queries
+  // only the visible bbox on each moveend — no re-fetch needed on pan/zoom.
   // After storing the data, re-run the current zoom logic (via fetchMarkersRef) so the
-  // heatmap is displayed immediately if still at low zoom - avoids reading map.getZoom()
+  // cluster layer is shown immediately if still at low zoom - avoids reading map.getZoom()
   // asynchronously (race condition).
   //
   // Dep note: massifBounds is derived from geoJson via useMemo, and geoJson itself is
@@ -161,7 +162,7 @@ const MapInternals = ({ geoJson, massifId }) => {
   // Fit the map to the massif bounds once, triggering moveend → fetchMarkers.
   // If there's no polygon, moveend won't fire, so we call fetchMarkers manually.
   // Guard: if the map is hidden (tab not active), dimensions are 0×0 and fitBounds
-  // produces NaN coordinates that crash the hexbin layer. Observe the container
+  // produces NaN coordinates that crash Leaflet's rendering. Observe the container
   // directly and defer fitBounds until it has real dimensions. The setTimeout lets
   // MapContainer's ResizeObserver (which calls invalidateSize) run first.
   useEffect(() => {

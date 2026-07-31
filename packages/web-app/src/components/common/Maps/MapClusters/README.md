@@ -1,7 +1,7 @@
 # MapClusters
 
-Map overlay system for the GrottoCenter main map. Manages hexbin heat layers (entrances,
-networks, massifs), point markers, massif polygons, and the guided tour.
+Map overlay system for the GrottoCenter main map. Manages the cluster bubble layers
+(entrances, networks, massifs), point markers, massif polygons, and the guided tour.
 
 ---
 
