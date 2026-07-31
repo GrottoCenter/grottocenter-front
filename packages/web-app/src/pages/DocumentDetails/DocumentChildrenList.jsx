@@ -152,6 +152,10 @@ ChildrenSortSelect.propTypes = {
 /* Header controls                                                            */
 /* -------------------------------------------------------------------------- */
 
+// ScrollableContent renders this row through its `icon` slot, whose wrapper
+// forces the card open on click. Stopping propagation here keeps a click on
+// the sort select from expanding a collapsed card instead of opening the
+// dropdown.
 const ControlsRow = styled('div')(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
@@ -195,7 +199,7 @@ export const ChildrenControls = ({
   if (!hasFiles && !showSort) return null;
 
   return (
-    <ControlsRow>
+    <ControlsRow onClick={e => e.stopPropagation()}>
       {hasFiles && (
         <MarkerChip
           size="small"

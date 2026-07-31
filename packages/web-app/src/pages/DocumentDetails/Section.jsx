@@ -45,7 +45,7 @@ export const TextLink = ({ value, url, icon }) => {
     <>
       <Box
         component="span"
-        sx={{ display: 'inline-flex', verticalAlign: 'middle', mr: 0.25 }}>
+        sx={{ display: 'inline-flex', verticalAlign: 'text-bottom', mr: 0.25 }}>
         {icon}
       </Box>
       {label}

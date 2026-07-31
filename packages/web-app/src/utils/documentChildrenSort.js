@@ -59,6 +59,7 @@ export const sortDocumentChildren = (
   // silently degrade every sort into the browser default.
   const collatorOptions = { numeric: true, sensitivity: 'base' };
   let compare;
+  // .compare is a bound getter per ECMA-402, safe to destructure.
   try {
     ({ compare } = new Intl.Collator(locale, collatorOptions));
   } catch {

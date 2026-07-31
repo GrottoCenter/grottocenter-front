@@ -854,6 +854,9 @@ const DocumentDetails = ({ id, hideActions = false }) => {
         isDocumentChildrenLoading ||
         !isLanguagesLoaded
       }
+      // Deliberately not exclusive: a children-fetch failure alongside a
+      // successful detail fetch still renders the document content plus the
+      // error card, as a degraded state rather than blanking the whole page.
       error={error ?? childrenError}
       documentData={details}
       documentChildren={children}
