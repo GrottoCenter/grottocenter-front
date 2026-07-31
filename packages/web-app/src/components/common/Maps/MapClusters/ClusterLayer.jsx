@@ -28,8 +28,9 @@ const TYPE_OFFSET = {
 };
 
 // Standalone stylesheet — mounted once by the first ClusterLayer via
-// GlobalStyles and shared by all three type variants. Colors are keyed off a
-// data-type attribute so a single CSS block covers entrance/network/massif.
+// GlobalStyles and shared by all type variants. Each type has both a distinct
+// color AND a distinct shape so the map remains readable for users with color
+// vision deficiencies (WCAG 1.4.1 — never rely on color alone).
 export const ClusterGlobalCss = (
   <GlobalStyles
     styles={`
@@ -37,27 +38,83 @@ export const ClusterGlobalCss = (
         display: flex;
         align-items: center;
         justify-content: center;
-        border-radius: 50%;
         color: #fff;
         font-weight: 600;
         font-size: 12px;
         cursor: pointer;
+        box-sizing: border-box;
+        transition: transform 120ms ease-out, filter 120ms ease-out;
+      }
+      /* Entrance — circle */
+      .cluster-bubble[data-type="entrance"] {
+        background: rgba(139, 69, 19, 0.85);
         border: 2px solid rgba(255, 255, 255, 0.85);
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
-        transition: transform 120ms ease-out;
+        border-radius: 50%;
       }
-      .cluster-bubble:hover {
-        transform: scale(1.08);
-        filter: brightness(1.15);
-      }
-      .cluster-bubble[data-type="entrance"]     { background: rgba(139, 69, 19, 0.85); }
-      .cluster-bubble[data-type="network"]      { background: rgba(25, 118, 210, 0.85); }
-      .cluster-bubble[data-type="massif"]       { background: rgba(56, 142, 60, 0.85); }
-      /* Amber like the organization SVG marker (MUI amber[500]). Dark text
-         for legibility since amber is too light for white labels. */
+      /* Organization — rounded square. Amber like the organization SVG marker
+         (MUI amber[500]); dark text for legibility since amber is too light
+         for white labels. */
       .cluster-bubble[data-type="organization"] {
         background: rgba(255, 193, 7, 0.9);
         color: #3E2723;
+        border: 2px solid rgba(255, 255, 255, 0.85);
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+        border-radius: 22%;
+      }
+      /* Massif — rounded diamond. Achieved by rotating a rounded square 45°.
+         scale(0.88) gives the diamond a diagonal of ~1.25×D so its visible
+         AREA matches a circle of diameter D (a rotated square only fills
+         50% of its bounding box, vs ~78% for a circle — so matching bounding
+         boxes would leave the diamond looking undersized). Slight overflow
+         beyond the icon bounding box is fine; TYPE_OFFSET keeps stacked
+         layers from colliding. Label is counter-rotated to read upright. */
+      .cluster-bubble[data-type="massif"] {
+        background: rgba(56, 142, 60, 0.85);
+        border: 2px solid rgba(255, 255, 255, 0.85);
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+        border-radius: 22%;
+        transform: rotate(45deg) scale(0.88);
+      }
+      .cluster-bubble[data-type="massif"] .cluster-bubble-label {
+        display: inline-block;
+        transform: rotate(-45deg);
+      }
+      /* Network — regular flat-top hexagon. Rendered via inline SVG rather
+         than clip-path so we can draw a real white stroke (clip-path would
+         eat the border). Vertices at y=6.7% / 93.3% keep the sides equal
+         (regular hexagon fits a rect of ratio 2:√3, so it can't fill both
+         dimensions of a square). vector-effect keeps the stroke at 2 CSS
+         pixels regardless of the bubble's diameter. */
+      .cluster-bubble[data-type="network"] {
+        background: transparent;
+        position: relative;
+        filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.25));
+      }
+      .cluster-bubble[data-type="network"] .cluster-bubble-svg {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 0;
+      }
+      .cluster-bubble[data-type="network"] .cluster-bubble-label {
+        position: relative;
+        z-index: 1;
+      }
+
+      .cluster-bubble[data-type="entrance"]:hover,
+      .cluster-bubble[data-type="organization"]:hover {
+        transform: scale(1.08);
+        filter: brightness(1.15);
+      }
+      .cluster-bubble[data-type="massif"]:hover {
+        transform: rotate(45deg) scale(0.95);
+        filter: brightness(1.15);
+      }
+      .cluster-bubble[data-type="network"]:hover {
+        transform: scale(1.08);
+        filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.25)) brightness(1.15);
       }
     `}
   />
@@ -69,20 +126,37 @@ const formatCount = count => {
   return `${Math.round(count / 1000)}k`;
 };
 
-// Build an L.divIcon for one bubble. The size determines both the CSS class
-// and the iconSize/iconAnchor so Leaflet positions the marker by its center.
-// A per-type CSS translate offsets the bubble away from the geo point so the
-// three layers don't perfectly stack. Leaves (isolated points) render the
-// same as clusters with count=1 so users always see a labeled, clickable dot.
+// Regular flat-top hexagon inscribed in a 100×100 viewBox. Sides all equal
+// 50 units (see CSS comment for the geometric derivation).
+const NETWORK_HEX_SVG =
+  '<svg class="cluster-bubble-svg" viewBox="0 0 100 100" preserveAspectRatio="none">' +
+  '<polygon points="25,6.7 75,6.7 100,50 75,93.3 25,93.3 0,50" ' +
+  'fill="rgba(25,118,210,0.85)" ' +
+  'stroke="rgba(255,255,255,0.85)" ' +
+  'stroke-width="2" ' +
+  'vector-effect="non-scaling-stroke" ' +
+  'stroke-linejoin="round" />' +
+  '</svg>';
+
+// Build an L.divIcon for one bubble. The per-type offset (used to nudge
+// stacked layers apart at the same geo point) is baked into iconAnchor
+// rather than an inline transform, keeping the CSS transform slot free for
+// per-type shape rotations (see the massif rotated-diamond rule). The label
+// is wrapped in a span so it can be counter-rotated inside a rotated shape.
+// Network uses an inline SVG hexagon (see NETWORK_HEX_SVG) because clip-path
+// can't render a stroke; all other types get shape via CSS on the div itself.
+// Leaves (isolated points) render the same as clusters with count=1 so users
+// always see a labeled, clickable dot.
 const buildIcon = (count, type) => {
   const diameter = sizeForCount(count);
   const [ox, oy] = TYPE_OFFSET[type] || [0, 0];
-  const style = `width:${diameter}px;height:${diameter}px;transform:translate(${ox}px,${oy}px);`;
+  const label = `<span class="cluster-bubble-label">${formatCount(count)}</span>`;
+  const inner = type === 'network' ? `${NETWORK_HEX_SVG}${label}` : label;
   return L.divIcon({
-    html: `<div class="cluster-bubble" data-type="${type}" style="${style}">${formatCount(count)}</div>`,
+    html: `<div class="cluster-bubble" data-type="${type}" style="width:${diameter}px;height:${diameter}px;">${inner}</div>`,
     className: '',
     iconSize: [diameter, diameter],
-    iconAnchor: [diameter / 2, diameter / 2]
+    iconAnchor: [diameter / 2 - ox, diameter / 2 - oy]
   });
 };
 
