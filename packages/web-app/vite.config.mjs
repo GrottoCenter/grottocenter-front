@@ -4,6 +4,7 @@ import react from '@vitejs/plugin-react';
 import svgr from 'vite-plugin-svgr';
 import { compression } from 'vite-plugin-compression2';
 import { visualizer } from 'rollup-plugin-visualizer';
+import { VitePWA } from 'vite-plugin-pwa';
 
 export default defineConfig({
   plugins: [
@@ -13,7 +14,89 @@ export default defineConfig({
     svgr(),
     compression({ algorithm: 'gzip' }),
     compression({ algorithm: 'brotliCompress', deleteOriginalAssets: false }),
-    visualizer({ filename: 'dist/stats.html', gzipSize: true, brotliSize: true })
+    visualizer({ filename: 'dist/stats.html', gzipSize: true, brotliSize: true }),
+    // PWA / Service Worker (Workbox under the hood). Required to package the
+    // app as an Android TWA. SW is registered manually in src/index.jsx.
+    VitePWA({
+      registerType: 'autoUpdate',
+      injectRegister: false,
+      // Keep the historical manifest filename so the existing twa-manifest.json
+      // (webManifestUrl: .../manifest.json) stays valid. (Service worker stays
+      // the default sw.js.)
+      manifestFilename: 'manifest.json',
+      includeAssets: ['favicon.ico', 'logo.svg', 'apple-touch-icon.png'],
+      manifest: {
+        id: '/',
+        short_name: 'Grottocenter',
+        name: 'Grottocenter',
+        description: 'The Wiki database made by cavers for cavers.',
+        scope: '/',
+        start_url: '/',
+        display: 'standalone',
+        theme_color: '#5d4037',
+        background_color: '#5d4037',
+        icons: [
+          { src: 'logo192.png', type: 'image/png', sizes: '192x192' },
+          { src: 'logo512.png', type: 'image/png', sizes: '512x512' },
+          {
+            src: 'logo512-maskable.png',
+            type: 'image/png',
+            sizes: '512x512',
+            purpose: 'maskable'
+          }
+        ]
+      },
+      workbox: {
+        globPatterns: ['**/*.{js,css,html,svg,png,ico,woff2}'],
+        // stats.html is the bundle-analysis report (visualizer), ~8 MB — never
+        // precache it. Also keep the gzip/brotli copies out of the precache.
+        globIgnores: ['**/stats.html', '**/*.{gz,br}'],
+        // Take control of the page on the very first load so offline works
+        // from the first visit (matches the previous CRA SW's clientsClaim()).
+        clientsClaim: true,
+        navigateFallback: '/index.html',
+        navigateFallbackDenylist: [/^\/api/, /^\/\.well-known/],
+        cleanupOutdatedCaches: true,
+        runtimeCaching: [
+          {
+            // OpenStreetMap basemap tiles (default Leaflet layer).
+            urlPattern: ({ url }) => /tile\.openstreetmap\.org/.test(url.href),
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'osm-tiles',
+              expiration: { maxEntries: 500, maxAgeSeconds: 60 * 60 * 24 * 30 },
+              cacheableResponse: { statuses: [0, 200] }
+            }
+          },
+          {
+            // OpenTopoMap basemap tiles — separate cache so switching basemaps
+            // doesn't evict the other's offline area, and to allow a longer TTL
+            // (OpenTopoMap updates less often / stricter usage policy).
+            // WMS/WMTS layers are intentionally left out of the precache.
+            urlPattern: ({ url }) => /tile\.opentopomap\.org/.test(url.href),
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'opentopomap-tiles',
+              expiration: { maxEntries: 500, maxAgeSeconds: 60 * 60 * 24 * 90 },
+              cacheableResponse: { statuses: [0, 200] }
+            }
+          },
+          {
+            // Google Fonts (stylesheets + font files).
+            urlPattern: ({ url }) =>
+              url.origin === 'https://fonts.googleapis.com' ||
+              url.origin === 'https://fonts.gstatic.com',
+            handler: 'StaleWhileRevalidate',
+            options: {
+              cacheName: 'google-fonts',
+              expiration: { maxEntries: 20 }
+            }
+          }
+        ]
+      },
+      // No SW in dev — avoids confusing cache behaviour while developing.
+      devOptions: { enabled: false }
+    })
   ],
   resolve: {
     alias: [
