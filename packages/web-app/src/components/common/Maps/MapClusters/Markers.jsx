@@ -3,6 +3,7 @@ import { includes, values } from 'ramda';
 import PropTypes from 'prop-types';
 import { heatmapTypes } from './DataControl';
 import useMarkers, { MarkerGlobalCss } from '../common/Markers/useMarkers';
+import { makeIconTooltip } from '../common/Markers/tooltipHelpers';
 import useNetworkHighlight from './useNetworkHighlight';
 import { getEntranceCircleStyle } from './constants';
 import {
@@ -12,6 +13,11 @@ import {
   NetworkMarker,
   NetworkPopup
 } from '../common/Markers/Components';
+import {
+  entranceIcon,
+  networkIcon,
+  organizationIcon
+} from '../../../../assets/icons';
 
 export const markerTypes = {
   ORGANIZATIONS: 'organizations',
@@ -23,13 +29,14 @@ const isNetworks = includes(markerTypes.NETWORKS);
 const isOrganizations = includes(markerTypes.ORGANIZATIONS);
 
 const entrancePopup = entrance => <EntrancePopup entrance={entrance} />;
-const entranceTip = entrance => entrance?.name;
+const entranceTip = entrance => makeIconTooltip(entranceIcon, entrance?.name);
 const networkPopup = network => <NetworkPopup network={network} />;
-const networkTip = network => network?.name;
+const networkTip = network => makeIconTooltip(networkIcon, network?.name);
 const organizationPopup = organization => (
   <OrganizationPopup organization={organization} />
 );
-const organizationTip = organization => organization?.name;
+const organizationTip = organization =>
+  makeIconTooltip(organizationIcon, organization?.name);
 
 const Markers = ({
   visibleMarkers,
