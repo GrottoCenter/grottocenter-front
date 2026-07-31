@@ -23,10 +23,9 @@ const useCluster = (data, { radius = DEFAULT_RADIUS, maxZoom = DEFAULT_MAX_ZOOM 
     const index = new Supercluster({ radius, maxZoom });
     const points = new Array(data.length);
     for (let i = 0; i < data.length; i += 1) {
-      const [lng, lat] = data[i];
       points[i] = {
         type: 'Feature',
-        geometry: { type: 'Point', coordinates: [lng, lat] },
+        geometry: { type: 'Point', coordinates: data[i] },
         properties: { pointId: i }
       };
     }

@@ -346,14 +346,12 @@ const HydratedMap = ({
   // Each layer's cluster gives way to real markers (entrances/networks/orgs)
   // at zoom >= MARKERS_LIMIT (13), or to polygons (massifs) at zoom >=
   // MASSIFS_POLYGON_LIMIT (8).
-  const showEntranceClusters =
-    !!selectedLayers[layerTypes.ENTRANCES] && !isMarkersMode;
-  const showNetworkClusters =
-    !!selectedLayers[layerTypes.NETWORKS] && !isMarkersMode;
-  const showMassifClusters =
-    !!selectedLayers[layerTypes.MASSIFS] && !isMassifPolygonMode;
-  const showOrganizationClusters =
-    !!selectedLayers[layerTypes.ORGANIZATIONS] && !isMarkersMode;
+  const clusterConfigs = [
+    { type: 'entrance', layer: layerTypes.ENTRANCES, data: entrances, off: isMarkersMode },
+    { type: 'network', layer: layerTypes.NETWORKS, data: networks, off: isMarkersMode },
+    { type: 'massif', layer: layerTypes.MASSIFS, data: massifs, off: isMassifPolygonMode },
+    { type: 'organization', layer: layerTypes.ORGANIZATIONS, data: organizations, off: isMarkersMode }
+  ];
 
   return (
     <>
@@ -377,10 +375,14 @@ const HydratedMap = ({
         useLeafletControl
       />
       <ExploredOverlay points={showExplored && isAuth ? exploredPoints : []} />
-      <ClusterLayer data={entrances} type="entrance" enabled={showEntranceClusters} />
-      <ClusterLayer data={networks} type="network" enabled={showNetworkClusters} />
-      <ClusterLayer data={massifs} type="massif" enabled={showMassifClusters} />
-      <ClusterLayer data={organizations} type="organization" enabled={showOrganizationClusters} />
+      {clusterConfigs.map(({ type, layer, data, off }) => (
+        <ClusterLayer
+          key={type}
+          data={data}
+          type={type}
+          enabled={!!selectedLayers[layer] && !off}
+        />
+      ))}
       <Markers
         visibleMarkers={visibleMarkers}
         organizations={organizationMarkers}

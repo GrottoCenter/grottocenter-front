@@ -245,8 +245,6 @@ const DataControl = ({
       document.removeEventListener('pointerdown', handleClickOutside);
   }, [toggleExpanded]);
 
-  const handleLayerToggle = type => toggleLayer(type);
-
   return (
     <CustomControl
       {...props}
@@ -277,7 +275,7 @@ const DataControl = ({
                   type="checkbox"
                   name={type}
                   checked={!!selectedLayers[type]}
-                  onChange={() => handleLayerToggle(type)}
+                  onChange={() => toggleLayer(type)}
                 />
                 <MarkerIcon type={type} />
                 <span style={{ textTransform: 'capitalize' }}>

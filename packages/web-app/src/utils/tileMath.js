@@ -1,7 +1,7 @@
 // Slippy-map tile helpers (OpenStreetMap Z/X/Y scheme) used by the map tile
 // cache. See https://wiki.openstreetmap.org/wiki/Slippy_map_tilenames
 
-const clamp = (min, max, value) => Math.max(min, Math.min(max, value));
+import { clamp } from 'ramda';
 
 // Web Mercator's latitude domain, matching Leaflet's default projection.
 const MAX_LAT = 85.0511287798;
@@ -33,10 +33,12 @@ export const tileToBounds = (x, y, z) => {
 export const tilesForBounds = (bounds, z) => {
   const n = 2 ** z;
   const { sw_lat, sw_lng, ne_lat, ne_lng } = bounds;
-  const yMin = latLngToTile(ne_lat, sw_lng, z).y;
-  const yMax = latLngToTile(sw_lat, sw_lng, z).y;
-  const xMinWest = latLngToTile(sw_lat, sw_lng, z).x;
-  const xMaxEast = latLngToTile(sw_lat, ne_lng, z).x;
+  const nw = latLngToTile(ne_lat, sw_lng, z);
+  const se = latLngToTile(sw_lat, ne_lng, z);
+  const yMin = nw.y;
+  const yMax = se.y;
+  const xMinWest = nw.x;
+  const xMaxEast = se.x;
 
   const tiles = [];
   const pushRange = (xFrom, xTo) => {

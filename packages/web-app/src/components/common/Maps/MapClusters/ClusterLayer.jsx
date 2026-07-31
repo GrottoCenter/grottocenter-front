@@ -22,7 +22,6 @@ const sizeForCount = count =>
 // one perfectly-stacked pile. Kept small so a cluster's center stays visually
 // tied to its geographic anchor.
 const TYPE_OFFSET = {
-  entrance: [0, 0],
   network: [14, -10],
   massif: [-14, -10],
   organization: [0, 14]
@@ -98,6 +97,11 @@ const buildIcon = (count, type) => {
  */
 const ClusterLayer = ({ data, type, enabled = true, pane = null, onLeafClick = null }) => {
   const map = useMap();
+  // Build the supercluster kd-tree as soon as data arrives, not on `enabled`.
+  // The entrance layer (default on, ~130k points) toggles `enabled` on every
+  // zoom-in/out through MARKERS_LIMIT; gating the index on `enabled` would
+  // rebuild that kd-tree synchronously during render on each zoom-out,
+  // freezing the UI for hundreds of ms.
   const supercluster = useCluster(data);
   // key ("c:<id>" | "l:<pointId>") → L.Marker, for O(1) diff
   const markersRef = useRef(new Map());

@@ -127,15 +127,8 @@ registerEntity('networks', {
   label: 'networks'
 });
 
-const criteriaToBounds = ({ sw_lat, sw_lng, ne_lat, ne_lng }) => ({
-  sw_lat,
-  sw_lng,
-  ne_lat,
-  ne_lng
-});
-
 export const fetchNetworks = criteria => dispatch =>
-  fetchForBounds('networks', criteriaToBounds(criteria), criteria.zoom, dispatch);
+  fetchForBounds('networks', criteria, criteria.zoom, dispatch);
 
 export const fetchAllEntrancesCoordinates = () => dispatch => {
   dispatch({
@@ -174,7 +167,7 @@ registerEntity('entrances', {
 });
 
 export const fetchEntrances = criteria => dispatch =>
-  fetchForBounds('entrances', criteriaToBounds(criteria), criteria.zoom, dispatch);
+  fetchForBounds('entrances', criteria, criteria.zoom, dispatch);
 
 registerEntity('organizations', {
   url: getMapGrottosUrl,
@@ -184,7 +177,7 @@ registerEntity('organizations', {
 });
 
 export const fetchOrganizations = criteria => dispatch =>
-  fetchForBounds('organizations', criteriaToBounds(criteria), criteria.zoom, dispatch);
+  fetchForBounds('organizations', criteria, criteria.zoom, dispatch);
 
 // No dedicated /geoloc/organizationsCoordinates endpoint exists, so we hit the
 // normal organizations endpoint with world-wide bounds and strip everything

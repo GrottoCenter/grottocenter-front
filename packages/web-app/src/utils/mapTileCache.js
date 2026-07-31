@@ -78,6 +78,10 @@ const computeUnion = entity => {
 const scheduleEmit = entity => {
   const s = state[entity];
   if (!s || s.emitScheduled) return;
+  // Short-circuit when nothing has changed since the last emit — the common
+  // case when panning within already-cached tiles. Avoids the queueMicrotask
+  // + closure allocation per hot moveend.
+  if (s.lastEmittedVersion === s.tilesVersion) return;
   s.emitScheduled = true;
   queueMicrotask(() => {
     s.emitScheduled = false;
