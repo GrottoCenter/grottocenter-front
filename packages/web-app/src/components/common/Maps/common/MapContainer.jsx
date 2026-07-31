@@ -258,6 +258,7 @@ CustomMapContainer.propTypes = {
   style: PropTypes.shape({}),
   forceCentering: PropTypes.bool,
   mapRef: PropTypes.shape({ current: PropTypes.any }),
+  // A Leaflet renderer instance (L.canvas() / L.svg()), not a plain object.
   renderer: PropTypes.object
 };
 

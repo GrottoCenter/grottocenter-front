@@ -8,9 +8,9 @@ import React, {
 import PropTypes from 'prop-types';
 import { useMap, useMapEvent } from 'react-leaflet';
 import { useNavigate } from 'react-router-dom';
-import * as L from 'leaflet';
+import L from 'leaflet';
 
-import DataControl, { layerTypes, LAYER_TYPES_LIST } from './DataControl';
+import DataControl, { layerTypes } from './DataControl';
 import MapTour from './MapTour';
 import GeocodingControl from '../common/GeocodingControl';
 import {
@@ -350,7 +350,9 @@ const HydratedMap = ({
 
   // Each layer's cluster gives way to real markers (entrances/networks/orgs)
   // at zoom >= MARKERS_LIMIT (13), or to polygons (massifs) at zoom >=
-  // MASSIFS_POLYGON_LIMIT (8).
+  // MASSIFS_POLYGON_LIMIT (8). Rebuilt every render, but data (entrances,
+  // networks, ...) are stable Redux references that only change when new tile
+  // data arrives, so useCluster's kD-tree isn't rebuilt on unrelated renders.
   const clusterConfigs = [
     { type: 'entrance', layer: layerTypes.ENTRANCES, data: entrances, off: isMarkersMode },
     { type: 'network', layer: layerTypes.NETWORKS, data: networks, off: isMarkersMode },

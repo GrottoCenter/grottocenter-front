@@ -273,7 +273,11 @@ const ClusterLayer = ({ data = [], type, enabled = true, pane = null, onLeafClic
     }
   }, [map, supercluster, enabled, type, pane, onLeafClick]);
 
-  // Re-query on map movement and whenever data/enabled changes.
+  // Re-query on map movement and whenever data/enabled changes. refresh()
+  // reads markersRef.current synchronously inside its own body, so calling it
+  // directly here (rather than capturing the ref like the cleanup effect
+  // below) is safe — every dependency change does trigger a full marker
+  // rebuild, but enabled=false short-circuits immediately.
   useMapEvent('moveend', refresh);
   useEffect(() => {
     refresh();

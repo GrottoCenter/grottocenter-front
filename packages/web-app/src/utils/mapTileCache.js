@@ -180,6 +180,9 @@ export const fetchForBounds = (entity, bounds, apiZoom, dispatch) => {
     throw new Error(`mapTileCache: entity "${entity}" not registered`);
   }
   s.dispatch = dispatch;
+  // `bounds` here is the flat { sw_lat, sw_lng, ne_lat, ne_lng } criteria
+  // object built by callers (see Map.jsx's handleUpdate), not a Leaflet
+  // LatLngBounds instance — tilesForBounds() expects that plain shape.
   s.lastBounds = bounds;
   s.lastApiZoom = apiZoom;
 
@@ -211,6 +214,10 @@ export const fetchForBounds = (entity, bounds, apiZoom, dispatch) => {
 
 // Mark every tile of an entity as stale and refetch tiles overlapping the
 // current viewport. Called from the invalidation middleware after a mutation.
+// Deliberately does NOT bump s.tilesVersion: the union of cached tiles hasn't
+// changed yet (only fetchedAt flags), so scheduleEmit's version guard inside
+// the fetchForBounds call below correctly no-ops until the refetch actually
+// lands and calls scheduleEmit again with fresh data.
 export const invalidateAll = entity => {
   const s = state[entity];
   if (!s) return;

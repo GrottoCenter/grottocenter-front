@@ -58,11 +58,10 @@ const mapCacheInvalidationMiddleware = () => next => action => {
       invalidateAll('networks');
       break;
     case POST_ORGANIZATION_SUCCESS:
-      invalidateAtOrFallback(
-        'organizations',
-        action.type,
-        action.organization
-      );
+      // The Organization schema carries no latitude/longitude, so a targeted
+      // invalidation is never possible here — go straight to invalidateAll
+      // instead of routing through invalidateAtOrFallback's dev warning.
+      invalidateAll('organizations');
       break;
     case UPDATE_ENTRANCE_SUCCESS:
       // Payload is only httpCode today; fall back to nuclear invalidation.
@@ -88,6 +87,10 @@ const mapCacheInvalidationMiddleware = () => next => action => {
     case DELETE_ORGANIZATION_PERMANENT_SUCCESS:
       invalidateAll('organizations');
       break;
+    // Massif mutations are intentionally not handled here: the massif cluster
+    // layer is fed by fetchAllMassifsCoordinates(), a one-shot bulk fetch, not
+    // by the tile cache this middleware invalidates. A created/deleted massif
+    // only refreshes on the next page load.
     default:
       break;
   }
