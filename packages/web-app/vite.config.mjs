@@ -26,6 +26,27 @@ export default defineConfig(({ mode }) => {
   const apiPattern = apiOrigin
     ? new RegExp(`^${escapeRegex(apiOrigin)}/api/(?!.*[?&]sw_lat=)`)
     : null;
+  // /geoloc/{entrances,networks,massifs}Coordinates — server recomputes these
+  // in a daily batch job, so stale-while-revalidate is safe and dramatic: a
+  // reload serves the ~MB-sized point payload from cache instantly, then
+  // refreshes in the background. The dedicated `Coordinates` path suffix (vs
+  // the viewport endpoints `/geoloc/entrances`, `/geoloc/networks`, …) is
+  // what lets us match them narrowly.
+  const bulkDailyCoordsPattern = apiOrigin
+    ? new RegExp(
+        `^${escapeRegex(apiOrigin)}/api/geoloc/(entrances|networks|massifs)Coordinates(\\?|$)`
+      )
+    : null;
+  // /geoloc/organizations with world-wide bounds (sw_lat=-90) — same URL as
+  // the viewport endpoint, distinguished by the world-bounds param. Orgs can
+  // be created/edited at any moment by any user, so NetworkFirst (fresh
+  // online, cache fallback offline) with a short timeout to keep bad
+  // connections snappy.
+  const orgsBulkPattern = apiOrigin
+    ? new RegExp(
+        `^${escapeRegex(apiOrigin)}/api/geoloc/organizations\\?sw_lat=-90&`
+      )
+    : null;
 
   return {
   plugins: [
@@ -155,6 +176,51 @@ export default defineConfig(({ mode }) => {
               expiration: { maxEntries: 30 }
             }
           },
+          // Daily-recomputed bulk coordinates (entrances / networks / massifs).
+          // StaleWhileRevalidate: serve cached payload immediately (huge win
+          // for the ~MB entrance dataset on reload), refresh in the background.
+          // 2-day maxAge is a 2× safety net over the server's daily batch.
+          // Placed BEFORE the api-get rule so the sw_lat lookahead in api-get
+          // (which excludes viewport queries and would sweep these in too)
+          // is shadowed for these specific paths.
+          ...(bulkDailyCoordsPattern
+            ? [
+                {
+                  urlPattern: bulkDailyCoordsPattern,
+                  handler: 'StaleWhileRevalidate',
+                  options: {
+                    cacheName: 'api-map-coords-daily',
+                    expiration: {
+                      maxEntries: 5,
+                      maxAgeSeconds: 60 * 60 * 24 * 2
+                    },
+                    cacheableResponse: { statuses: [0, 200] },
+                    matchOptions: { ignoreVary: true }
+                  }
+                }
+              ]
+            : []),
+          // Organizations world-bounds bulk fetch. NetworkFirst because any
+          // user can create/edit an org at any time — we want fresh data
+          // online. 3s timeout falls back to cache on bad networks / offline.
+          ...(orgsBulkPattern
+            ? [
+                {
+                  urlPattern: orgsBulkPattern,
+                  handler: 'NetworkFirst',
+                  options: {
+                    cacheName: 'api-map-orgs-bulk',
+                    networkTimeoutSeconds: 3,
+                    expiration: {
+                      maxEntries: 2,
+                      maxAgeSeconds: 60 * 60 * 24 * 7
+                    },
+                    cacheableResponse: { statuses: [0, 200] },
+                    matchOptions: { ignoreVary: true }
+                  }
+                }
+              ]
+            : []),
           // Backend API (GET only — workbox defaults runtimeCaching to GET).
           // NetworkFirst so users see fresh data when online but still get the
           // last-known response offline. networkTimeoutSeconds keeps a bad
