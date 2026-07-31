@@ -247,6 +247,10 @@ export const fetchAllMassifsCoordinates = () => dispatch => {
     });
 };
 
+// Unlike the tile-cached thunks above, massif polygons aren't tile-cached
+// (registerEntity/fetchForBounds isn't used here), so the request rate isn't
+// bounded by the tile grid and `redux-debounced` is intentionally kept to
+// avoid firing on every moveend at polygon zoom.
 export const fetchMassifs = criteria => {
   const thunkToDebounce = function (dispatch) {
     dispatch({ type: FETCH_MAP_START_LOADING, key: LOADINGS.MASSIFS });

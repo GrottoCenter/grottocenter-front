@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { useMap } from 'react-leaflet';
-import * as L from 'leaflet';
+import L from 'leaflet';
 import PropTypes from 'prop-types';
 import { MassifPopup } from '../common/Markers/Components';
 import useRenderPopup from '../common/Markers/useRenderPopup';

@@ -302,6 +302,9 @@ ClusterLayer.propTypes = {
   type: PropTypes.oneOf(['entrance', 'network', 'massif', 'organization']).isRequired,
   enabled: PropTypes.bool,
   pane: PropTypes.string,
+  // Part of the `refresh` callback's dependency array — callers must memoize
+  // this (useCallback) to avoid rebuilding every cluster marker on each
+  // parent render.
   onLeafClick: PropTypes.func
 };
 

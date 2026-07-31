@@ -297,6 +297,49 @@ describe('mapTileCache', () => {
     });
   });
 
+  describe('eviction during an in-flight fetch', () => {
+    it('re-caches the tile on completion instead of throwing or dropping data', async () => {
+      registerEntity(ENTITY, CONFIG);
+
+      // Tile A: kick off a fetch and keep it pending so it stays the oldest
+      // (and therefore first-evicted) entry while everything else lands.
+      let resolveA;
+      fetchMock.mockImplementationOnce(
+        () =>
+          new Promise(res => {
+            resolveA = () =>
+              res({
+                status: 200,
+                text: () => Promise.resolve(JSON.stringify([{ id: 'A' }]))
+              });
+          })
+      );
+      fetchMock.mockImplementation(() => fetchOk([]));
+
+      fetchForBounds(ENTITY, singleTileBounds(0, 0), CACHE_ZOOM, dispatch);
+
+      // Fill the cache past MAX_TILES (500) with distinct tiles so
+      // evictIfNeeded kicks tile A's still-in-flight record out of the map
+      // before its fetch settles.
+      for (let x = 1; x <= 500; x += 1) {
+        fetchForBounds(ENTITY, singleTileBounds(x, 0), CACHE_ZOOM, dispatch);
+      }
+      await flushPromises();
+
+      // Now let tile A's fetch resolve. clearInFlight() must no-op on the
+      // already-evicted record instead of throwing, and the success handler
+      // must re-insert tile A's data rather than silently dropping it.
+      resolveA();
+      await flushPromises();
+
+      const successCalls = dispatch.mock.calls.filter(
+        ([a]) => a.type === CONFIG.successType
+      );
+      const finalData = successCalls[successCalls.length - 1][0].data;
+      expect(finalData.some(item => item.id === 'A')).toBe(true);
+    });
+  });
+
   describe('registerEntity guard', () => {
     it('throws when fetchForBounds is called before registerEntity', () => {
       expect(() =>

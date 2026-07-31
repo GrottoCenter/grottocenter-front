@@ -32,7 +32,7 @@ const now = () => Date.now();
 const state = {};
 
 const ensureEntity = entity => {
-  if (!state[entity]) {
+  if (state[entity] === undefined) {
     state[entity] = {
       tiles: new Map(),
       lastBounds: null,
