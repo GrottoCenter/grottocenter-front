@@ -35,9 +35,8 @@ import {
   TextLink
 } from './Section';
 import DocumentChildrenList, {
-  ChildrenAvailabilityLegend,
+  ChildrenControls,
   ChildrenSectionHeader,
-  ChildrenSortSelect,
   DocumentChildrenTiles
 } from './DocumentChildrenList';
 import {
@@ -89,12 +88,24 @@ const MainColumn = styled('div')`
   gap: ${({ theme }) => theme.spacing(1)};
 `;
 
-const SideColumn = styled('div')`
+const SideColumn = styled('div', {
+  shouldForwardProp: prop => prop[0] !== '$'
+})`
   flex: 1;
   min-width: 0;
   display: flex;
   flex-direction: column;
   gap: ${({ theme }) => theme.spacing(1)};
+
+  /* Collections only: their main column is a grid of dozens of issue tiles, so
+     once the columns stack on a phone the metadata would land far below the
+     fold — the notice has to stay next to the title it describes. Restricted to
+     below md, since side by side the panel is already in the right place. */
+  ${({ theme, $firstOnMobile }) =>
+    $firstOnMobile &&
+    `${theme.breakpoints.down('md')} {
+       order: -1;
+     }`}
 `;
 
 const Document = ({
@@ -474,18 +485,12 @@ const Document = ({
                               />
                             </Typography>
                           }
-                          legend={
-                            <ChildrenAvailabilityLegend
+                          controls={
+                            <ChildrenControls
                               documents={childIssues}
+                              sortOrder={issuesSortOrder}
+                              onSortOrderChange={setIssuesSortOrder}
                             />
-                          }
-                          action={
-                            childIssues.length > 1 && (
-                              <ChildrenSortSelect
-                                value={issuesSortOrder}
-                                onChange={setIssuesSortOrder}
-                              />
-                            )
                           }
                         />
                         {childIssues.length > 0 ? (
@@ -513,7 +518,7 @@ const Document = ({
                       <FilesSection files={allFiles} />
                     )}
                   </MainColumn>
-                  <SideColumn>
+                  <SideColumn $firstOnMobile={isCollection(docType)}>
                     <DetailsList>
                       <DetailItem
                         label={formatMessage({ id: 'Type' })}
@@ -715,24 +720,18 @@ const Document = ({
               dense
               title={formatMessage({ id: 'Articles' })}
               count={childArticles.length}
-              content={
-                <>
-                  <ChildrenSectionHeader
-                    legend={
-                      <ChildrenAvailabilityLegend documents={childArticles} />
-                    }
-                    action={
-                      childArticles.length > 1 && (
-                        <ChildrenSortSelect
-                          value={articlesSortOrder}
-                          onChange={setArticlesSortOrder}
-                        />
-                      )
-                    }
-                  />
-                  <DocumentChildrenList documents={sortedChildArticles} />
-                </>
+              // In the card's own header row rather than a row added inside the
+              // body: the card header and the content each carry their own
+              // padding, so an extra row there opened a wide empty band under
+              // the title.
+              icon={
+                <ChildrenControls
+                  documents={childArticles}
+                  sortOrder={articlesSortOrder}
+                  onSortOrderChange={setArticlesSortOrder}
+                />
               }
+              content={<DocumentChildrenList documents={sortedChildArticles} />}
             />
           )}
 
@@ -741,6 +740,7 @@ const Document = ({
               dense
               title={formatMessage({ id: 'Issues' })}
               count={childIssues.length}
+              icon={<ChildrenControls documents={childIssues} />}
               content={<DocumentChildrenList documents={childIssues} />}
             />
           )}
@@ -750,6 +750,7 @@ const Document = ({
               dense
               title={formatMessage({ id: 'Child documents' })}
               count={childOther.length}
+              icon={<ChildrenControls documents={childOther} />}
               content={<DocumentChildrenList documents={childOther} />}
             />
           )}

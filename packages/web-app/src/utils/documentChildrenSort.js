@@ -32,6 +32,20 @@ const compareDates = (a, b, locale, direction) => {
   return dateA < dateB ? -direction : direction;
 };
 
+/**
+ * Whether offering a sort order can change anything at all.
+ *
+ * compareDates falls back to the title as soon as two dates are equal, so when
+ * every document shares the same datePublication all three orders collapse onto
+ * the very same list. Lives next to the comparators on purpose: the answer is
+ * only true for as long as they behave that way.
+ */
+export const canReorderDocumentChildren = documents => {
+  if ((documents?.length ?? 0) < 2) return false;
+  const dates = new Set(documents.map(doc => doc.datePublication || ''));
+  return dates.size > 1;
+};
+
 export const sortDocumentChildren = (
   documents,
   order = DEFAULT_CHILDREN_SORT_ORDER,
