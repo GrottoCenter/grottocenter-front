@@ -70,6 +70,16 @@ jobs:
       - name: Install Bubblewrap CLI
         run: npm install -g @bubblewrap/cli
 
+      - name: Configure Bubblewrap for CI (non-interactive)
+        # On a fresh runner Bubblewrap has no config and prompts to install the
+        # JDK/Android SDK, which hangs (then exits 130) in CI. Point it at the
+        # JDK from setup-java and the Android SDK preinstalled on the runner so
+        # the build runs headless.
+        run: |
+          mkdir -p "$HOME/.bubblewrap"
+          node -e "require('fs').writeFileSync(process.env.HOME + '/.bubblewrap/config.json', JSON.stringify({ jdkPath: process.env.JAVA_HOME, androidSdkPath: process.env.ANDROID_SDK_ROOT || process.env.ANDROID_HOME }))"
+          cat "$HOME/.bubblewrap/config.json"
+
       - name: Decode keystore from secret
         env:
           KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
