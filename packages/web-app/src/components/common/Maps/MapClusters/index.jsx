@@ -9,9 +9,8 @@ import PropTypes from 'prop-types';
 import { useMap, useMapEvent } from 'react-leaflet';
 import { useNavigate } from 'react-router-dom';
 import * as L from 'leaflet';
-import { uniq } from 'ramda';
 
-import DataControl, { heatmapTypes, markerTypes } from './DataControl';
+import DataControl, { layerTypes, LAYER_TYPES_LIST } from './DataControl';
 import MapTour from './MapTour';
 import GeocodingControl from '../common/GeocodingControl';
 import {
@@ -66,7 +65,22 @@ import {
 
 const ZOOM_STATE = {
   MARKERS: 1,
-  HEAT: 2
+  CLUSTER: 2
+};
+
+// Types that render as real markers at high zoom (via <Markers>). Massifs
+// don't — they become polygons instead — so they never enter `visibleMarkers`.
+const MARKER_LAYERS = [
+  layerTypes.ENTRANCES,
+  layerTypes.NETWORKS,
+  layerTypes.ORGANIZATIONS
+];
+
+const DEFAULT_SELECTED_LAYERS = {
+  [layerTypes.ENTRANCES]: true,
+  [layerTypes.NETWORKS]: false,
+  [layerTypes.MASSIFS]: false,
+  [layerTypes.ORGANIZATIONS]: false
 };
 
 const HydratedMap = ({
@@ -75,6 +89,7 @@ const HydratedMap = ({
   networks,
   networkMarkers = [],
   organizations,
+  organizationMarkers = [],
   massifs,
   massifPolygons = [],
   onUpdate,
@@ -111,19 +126,19 @@ const HydratedMap = ({
   const initialZoom = useRef(map.getZoom()).current;
   const isInitiallyZoomedIn = initialZoom >= MARKERS_LIMIT;
 
-  const [selectedHeats, setSelectedHeats] = useLocalStorage(
-    'grottocenter_selectedHeats',
-    new Set([heatmapTypes.ENTRANCES]),
-    {
-      serialize: v => JSON.stringify([...v]),
-      deserialize: v => new Set(JSON.parse(v))
-    }
-  );
-  const [selectedMarkers, setSelectedMarkers] = useLocalStorage(
-    'grottocenter_selectedMarkers',
-    Object.fromEntries(Object.values(markerTypes).map(type => [type, false])),
+  // Single source of truth for which datasets the user wants visible on the
+  // map. A layer being true → clusters at low zoom + real markers (or polygons
+  // for massifs) at high zoom. The `merge: true` shields the state against
+  // future schema evolution: newly-added layer types get their default without
+  // wiping existing user preferences.
+  const [selectedLayers, setSelectedLayers] = useLocalStorage(
+    'grottocenter_selectedLayers',
+    DEFAULT_SELECTED_LAYERS,
     { merge: true }
   );
+  const toggleLayer = useCallback(type => {
+    setSelectedLayers(prev => ({ ...prev, [type]: !prev[type] }));
+  }, [setSelectedLayers]);
   const [activeEntranceFilters, setActiveEntranceFilters] = useLocalStorage(
     'grottocenter_activeEntranceFilters',
     Object.fromEntries(Object.values(CAVE_SIZE).map(size => [size, true])),
@@ -147,21 +162,16 @@ const HydratedMap = ({
     [entranceMarkers, activeEntranceFilters, activeQualityFilters]
   );
 
-  const selectedMarkersList = useMemo(
-    () =>
-      Object.entries(selectedMarkers)
-        .filter(([, v]) => v)
-        .map(([k]) => k),
-    [selectedMarkers]
+  // Marker-eligible layers currently selected — the set to fetch and render as
+  // real markers whenever we're above MARKERS_LIMIT. Massifs never appear here
+  // (they become polygons instead).
+  const enabledMarkerLayers = useMemo(
+    () => MARKER_LAYERS.filter(t => selectedLayers[t]),
+    [selectedLayers]
   );
 
   const [visibleMarkers, setVisibleMarkers] = useState(
-    isInitiallyZoomedIn
-      ? uniq([
-          heatmapTypes.ENTRANCES,
-          ...Object.keys(selectedMarkers).filter(k => selectedMarkers[k])
-        ])
-      : []
+    isInitiallyZoomedIn ? enabledMarkerLayers : []
   );
   // Bail out if content is unchanged so React.memo on Markers stays effective.
   // setVisibleMarkers(newArr) always creates a new reference even with the same items,
@@ -182,20 +192,18 @@ const HydratedMap = ({
     initialZoom >= MASSIFS_POLYGON_LIMIT
   );
   const zoomState = useRef(
-    isInitiallyZoomedIn ? ZOOM_STATE.MARKERS : ZOOM_STATE.HEAT
+    isInitiallyZoomedIn ? ZOOM_STATE.MARKERS : ZOOM_STATE.CLUSTER
   );
   const prevZoom = useRef(initialZoom);
 
-  const selectedHeatsRef = useRef(selectedHeats);
-  selectedHeatsRef.current = selectedHeats;
-  const selectedMarkersListRef = useRef(selectedMarkersList);
-  selectedMarkersListRef.current = selectedMarkersList;
+  const enabledMarkerLayersRef = useRef(enabledMarkerLayers);
+  enabledMarkerLayersRef.current = enabledMarkerLayers;
 
   const onUpdateRef = useRef(onUpdate);
   onUpdateRef.current = onUpdate;
 
   const showMassifPolygons =
-    selectedHeats.has(heatmapTypes.MASSIFS) && isMassifPolygonMode;
+    !!selectedLayers[layerTypes.MASSIFS] && isMassifPolygonMode;
 
   const handleUpdate = useCallback(() => {
     const currentZoom = map.getZoom();
@@ -216,50 +224,27 @@ const HydratedMap = ({
     });
   }, [visibleMarkers, showMassifPolygons, map]);
 
+  // Whenever the user toggles layers on/off, resync visibleMarkers so the
+  // marker layer picks up (or drops) that type immediately — but only when
+  // we're actually in markers mode. In cluster mode, visibleMarkers stays []
+  // and the ClusterLayer components pick up the change via their own props.
   useEffect(() => {
     if (zoomState.current === ZOOM_STATE.MARKERS) {
-      setVisibleMarkersStable(
-        uniq([...Array.from(selectedHeatsRef.current), ...selectedMarkersList])
-      );
-    } else {
-      setVisibleMarkersStable(selectedMarkersList);
+      setVisibleMarkersStable(enabledMarkerLayers);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedMarkers]);
+  }, [enabledMarkerLayers, setVisibleMarkersStable]);
 
-  const handleUpdateHeat = useCallback(
-    (type, isChecked) => {
-      setSelectedHeats(prev => {
-        const next = new Set(prev);
-        if (isChecked) next.add(type);
-        else next.delete(type);
-        return next;
-      });
-      if (zoomState.current === ZOOM_STATE.MARKERS) {
-        setVisibleMarkersStable(prev =>
-          isChecked ? uniq([...prev, type]) : prev.filter(t => t !== type)
-        );
-      }
-    },
-    [setSelectedHeats, setVisibleMarkersStable]
-  );
-
-  // zoomend: manages heatmap ↔ markers visibility only.
+  // zoomend: manages cluster ↔ markers visibility only.
   // It does NOT call handleUpdate directly - moveend fires right after zoomend
   // and handles that, ensuring the correct final position is always used.
   useMapEvent('zoomend', () => {
     const currentZoom = map.getZoom();
     const isZoomingIn = prevZoom.current < currentZoom;
 
-    // --- MARKERS_LIMIT threshold: heatmap ↔ point markers ---
+    // --- MARKERS_LIMIT threshold: cluster bubbles ↔ real point markers ---
     if (isZoomingIn && currentZoom >= MARKERS_LIMIT) {
       if (zoomState.current !== ZOOM_STATE.MARKERS) {
-        setVisibleMarkersStable(
-          uniq([
-            ...Array.from(selectedHeatsRef.current),
-            ...selectedMarkersListRef.current
-          ])
-        );
+        setVisibleMarkersStable(enabledMarkerLayersRef.current);
         setIsMarkersMode(true);
         zoomState.current = ZOOM_STATE.MARKERS;
       }
@@ -268,9 +253,11 @@ const HydratedMap = ({
       currentZoom < MARKERS_LIMIT &&
       zoomState.current === ZOOM_STATE.MARKERS
     ) {
-      zoomState.current = ZOOM_STATE.HEAT;
+      // Empty visibleMarkers below the threshold — clusters take over, no
+      // real marker (entrance/network/organization) should linger.
+      zoomState.current = ZOOM_STATE.CLUSTER;
       setIsMarkersMode(false);
-      setVisibleMarkersStable(selectedMarkersListRef.current);
+      setVisibleMarkersStable([]);
     }
 
     // --- Massif polygon mode threshold ---
@@ -356,15 +343,17 @@ const HydratedMap = ({
     handleUpdate();
   }, [handleUpdate]);
 
-  // Each layer's visibility follows the same rule as before: the massif layer
-  // gives way to polygons at zoom >= MASSIFS_POLYGON_LIMIT (8), entrances and
-  // networks give way to real markers at zoom >= MARKERS_LIMIT (13).
+  // Each layer's cluster gives way to real markers (entrances/networks/orgs)
+  // at zoom >= MARKERS_LIMIT (13), or to polygons (massifs) at zoom >=
+  // MASSIFS_POLYGON_LIMIT (8).
   const showEntranceClusters =
-    selectedHeats.has(heatmapTypes.ENTRANCES) && !isMarkersMode;
+    !!selectedLayers[layerTypes.ENTRANCES] && !isMarkersMode;
   const showNetworkClusters =
-    selectedHeats.has(heatmapTypes.NETWORKS) && !isMarkersMode;
+    !!selectedLayers[layerTypes.NETWORKS] && !isMarkersMode;
   const showMassifClusters =
-    selectedHeats.has(heatmapTypes.MASSIFS) && !isMassifPolygonMode;
+    !!selectedLayers[layerTypes.MASSIFS] && !isMassifPolygonMode;
+  const showOrganizationClusters =
+    !!selectedLayers[layerTypes.ORGANIZATIONS] && !isMarkersMode;
 
   return (
     <>
@@ -372,10 +361,8 @@ const HydratedMap = ({
       <GeocodingControl />
       <MeasureControl />
       <DataControl
-        updateHeatmap={handleUpdateHeat}
-        selectedHeats={selectedHeats}
-        selectedMarkers={selectedMarkers}
-        setSelectedMarkers={setSelectedMarkers}
+        selectedLayers={selectedLayers}
+        toggleLayer={toggleLayer}
         entranceFilters={ENTRANCE_MARKER_FILTERS}
         activeEntranceFilters={activeEntranceFilters}
         setActiveEntranceFilters={setActiveEntranceFilters}
@@ -393,9 +380,10 @@ const HydratedMap = ({
       <ClusterLayer data={entrances} type="entrance" enabled={showEntranceClusters} />
       <ClusterLayer data={networks} type="network" enabled={showNetworkClusters} />
       <ClusterLayer data={massifs} type="massif" enabled={showMassifClusters} />
+      <ClusterLayer data={organizations} type="organization" enabled={showOrganizationClusters} />
       <Markers
         visibleMarkers={visibleMarkers}
-        organizations={organizations}
+        organizations={organizationMarkers}
         networks={networkMarkers}
         entrances={filteredEntranceMarkers}
       />
@@ -520,7 +508,8 @@ HydratedMap.propTypes = {
   entranceMarkers: PropTypes.arrayOf(markerType),
   networks: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.number)),
   networkMarkers: PropTypes.arrayOf(markerType),
-  organizations: PropTypes.arrayOf(markerType),
+  organizations: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.number)),
+  organizationMarkers: PropTypes.arrayOf(markerType),
   massifs: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.number)),
   massifPolygons: PropTypes.arrayOf(massifPolygonType),
   onUpdate: PropTypes.func

@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef } from 'react';
 import { includes, values } from 'ramda';
 import PropTypes from 'prop-types';
-import { heatmapTypes } from './DataControl';
+import { layerTypes } from './DataControl';
 import useMarkers, { MarkerGlobalCss } from '../common/Markers/useMarkers';
 import { makeIconTooltip } from '../common/Markers/tooltipHelpers';
 import useNetworkHighlight from './useNetworkHighlight';
@@ -19,14 +19,9 @@ import {
   organizationIcon
 } from '../../../../assets/icons';
 
-export const markerTypes = {
-  ORGANIZATIONS: 'organizations',
-  ...heatmapTypes
-};
-
-const isEntrances = includes(markerTypes.ENTRANCES);
-const isNetworks = includes(markerTypes.NETWORKS);
-const isOrganizations = includes(markerTypes.ORGANIZATIONS);
+const isEntrances = includes(layerTypes.ENTRANCES);
+const isNetworks = includes(layerTypes.NETWORKS);
+const isOrganizations = includes(layerTypes.ORGANIZATIONS);
 
 const entrancePopup = entrance => <EntrancePopup entrance={entrance} />;
 const entranceTip = entrance => makeIconTooltip(entranceIcon, entrance?.name);
@@ -111,7 +106,7 @@ const Markers = ({
 const MemoizedMarkers = React.memo(Markers);
 
 Markers.propTypes = {
-  visibleMarkers: PropTypes.arrayOf(PropTypes.oneOf(values(markerTypes))),
+  visibleMarkers: PropTypes.arrayOf(PropTypes.oneOf(values(layerTypes))),
   organizations: PropTypes.arrayOf(PropTypes.shape({})),
   entrances: PropTypes.arrayOf(PropTypes.shape({})),
   networks: PropTypes.arrayOf(PropTypes.shape({}))

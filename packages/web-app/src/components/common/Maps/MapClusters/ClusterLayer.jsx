@@ -18,12 +18,14 @@ const sizeForCount = count =>
   SIZE_BUCKETS.find(b => count < b.max).size;
 
 // Per-type pixel offset applied to the bubble via CSS translate. Nudges the
-// three layers apart at the same geo point so users see three distinct
-// bubbles instead of one perfectly-stacked pile.
+// layers apart at the same geo point so users see distinct bubbles instead of
+// one perfectly-stacked pile. Kept small so a cluster's center stays visually
+// tied to its geographic anchor.
 const TYPE_OFFSET = {
   entrance: [0, 0],
   network: [14, -10],
-  massif: [-14, -10]
+  massif: [-14, -10],
+  organization: [0, 14]
 };
 
 // Standalone stylesheet — mounted once by the first ClusterLayer via
@@ -48,9 +50,15 @@ export const ClusterGlobalCss = (
       .cluster-bubble:hover {
         transform: scale(1.08);
       }
-      .cluster-bubble[data-type="entrance"] { background: rgba(139, 69, 19, 0.85); }
-      .cluster-bubble[data-type="network"]  { background: rgba(25, 118, 210, 0.85); }
-      .cluster-bubble[data-type="massif"]   { background: rgba(56, 142, 60, 0.85); }
+      .cluster-bubble[data-type="entrance"]     { background: rgba(139, 69, 19, 0.85); }
+      .cluster-bubble[data-type="network"]      { background: rgba(25, 118, 210, 0.85); }
+      .cluster-bubble[data-type="massif"]       { background: rgba(56, 142, 60, 0.85); }
+      /* Amber like the organization SVG marker (MUI amber[500]). Dark text
+         for legibility since amber is too light for white labels. */
+      .cluster-bubble[data-type="organization"] {
+        background: rgba(255, 193, 7, 0.9);
+        color: #3E2723;
+      }
       .cluster-bubble:hover { filter: brightness(1.15); }
     `}
   />
@@ -203,7 +211,7 @@ const ClusterLayer = ({ data, type, enabled = true, pane = null, onLeafClick = n
 
 ClusterLayer.propTypes = {
   data: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.number)),
-  type: PropTypes.oneOf(['entrance', 'network', 'massif']).isRequired,
+  type: PropTypes.oneOf(['entrance', 'network', 'massif', 'organization']).isRequired,
   enabled: PropTypes.bool,
   pane: PropTypes.string,
   onLeafClick: PropTypes.func

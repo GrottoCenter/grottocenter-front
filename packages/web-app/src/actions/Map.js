@@ -33,6 +33,10 @@ export const FETCH_MAP_ORGANIZATIONS_SUCCESS =
   'FETCH_MAP_ORGANIZATIONS_SUCCESS';
 export const FETCH_MAP_ORGANIZATIONS_FAILURE =
   'FETCH_MAP_ORGANIZATIONS_FAILURE';
+export const FETCH_MAP_ORGANIZATIONS_COORDINATES_SUCCESS =
+  'FETCH_MAP_ORGANIZATIONS_COORDINATES_SUCCESS';
+export const FETCH_MAP_ORGANIZATIONS_COORDINATES_FAILURE =
+  'FETCH_MAP_ORGANIZATIONS_COORDINATES_FAILURE';
 export const FETCH_MAP_MASSIFS_SUCCESS = 'FETCH_MAP_MASSIFS_SUCCESS';
 export const FETCH_MAP_MASSIFS_FAILURE = 'FETCH_MAP_MASSIFS_FAILURE';
 export const FETCH_MAP_MASSIFS_COORDINATES_SUCCESS =
@@ -45,6 +49,7 @@ export const LOADINGS = {
   ENTRANCES: 'entrances',
   ENTRANCES_COORDINATES: 'entrances_coordinates',
   ORGANIZATIONS: 'organizations',
+  ORGANIZATIONS_COORDINATES: 'organizations_coordinates',
   MASSIFS: 'massifs',
   MASSIFS_COORDINATES: 'massifs_coordinates'
 };
@@ -180,6 +185,45 @@ registerEntity('organizations', {
 
 export const fetchOrganizations = criteria => dispatch =>
   fetchForBounds('organizations', criteriaToBounds(criteria), criteria.zoom, dispatch);
+
+// No dedicated /geoloc/organizationsCoordinates endpoint exists, so we hit the
+// normal organizations endpoint with world-wide bounds and strip everything
+// but [longitude, latitude] client-side before storing. Organizations are few
+// enough (~thousands, not 100k+) that the one-shot fetch is fine.
+export const fetchAllOrganizationsCoordinates = () => dispatch => {
+  dispatch({
+    type: FETCH_MAP_START_LOADING,
+    key: LOADINGS.ORGANIZATIONS_COORDINATES
+  });
+  return fetchWithRetry(makeUrl(getMapGrottosUrl, MAX_BOUNDS))
+    .then(text => {
+      const parsed = JSON.parse(text);
+      const coords = Array.isArray(parsed)
+        ? parsed
+            .filter(o => o.longitude != null && o.latitude != null)
+            .map(o => [o.longitude, o.latitude])
+        : [];
+      dispatch({
+        type: FETCH_MAP_ORGANIZATIONS_COORDINATES_SUCCESS,
+        data: coords
+      });
+    })
+    .catch(error => {
+      dispatch({
+        type: FETCH_MAP_ORGANIZATIONS_COORDINATES_FAILURE,
+        error: makeErrorMessage(
+          error.message,
+          `Fetching all organizations coordinates`
+        )
+      });
+    })
+    .finally(() => {
+      dispatch({
+        type: FETCH_MAP_END_LOADING,
+        key: LOADINGS.ORGANIZATIONS_COORDINATES
+      });
+    });
+};
 
 export const fetchAllMassifsCoordinates = () => dispatch => {
   dispatch({
