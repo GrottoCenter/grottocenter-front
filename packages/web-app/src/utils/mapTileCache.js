@@ -23,6 +23,12 @@ const now = () => Date.now();
 // entity → { tiles, lastBounds, config, dispatch }
 // tiles is a JS Map<tileKey, { data, fetchedAt, inFlight? }>. Insertion
 // order gives us free LRU: iterating tiles.keys() yields oldest first.
+//
+// Lifecycle: this module holds a singleton across the app's lifetime. `dispatch`
+// is captured on each fetchForBounds call rather than at registerEntity time,
+// so a Redux store replacement (tests, or a future ApplicationShell remount)
+// picks up the new dispatch on the next fetch. Tests can call _resetForTests
+// to wipe the singleton between cases.
 const state = {};
 
 const ensureEntity = entity => {
@@ -63,8 +69,13 @@ const computeUnion = entity => {
     if (!rec.data) return;
     for (let i = 0; i < rec.data.length; i += 1) {
       const item = rec.data[i];
-      if (item == null || seen.has(item.id)) continue;
-      seen.add(item.id);
+      if (item == null) continue;
+      // Only dedupe when the item carries an id — otherwise every id-less
+      // item would collide on seen.has(undefined) and get silently dropped.
+      if (item.id != null) {
+        if (seen.has(item.id)) continue;
+        seen.add(item.id);
+      }
       out.push(item);
     }
   });
@@ -107,6 +118,17 @@ const fetchTile = (entity, tile, apiZoom) => {
     zoom: apiZoom
   });
 
+  // Clear inFlight explicitly on both success and failure. Replacing the
+  // whole record would also drop it — but if evictIfNeeded ran between the
+  // inFlight write below and the promise settling, the record would be gone
+  // and a concurrent fetchTile for the same key wouldn't find inFlight,
+  // kicking off a duplicate request. Mutating an already-evicted record is
+  // a harmless no-op.
+  const clearInFlight = () => {
+    const rec = s.tiles.get(key);
+    if (rec && rec.inFlight === promise) delete rec.inFlight;
+  };
+
   const promise = fetch(url)
     .then(response => {
       if (response.status >= 400) throw new Error(response.status);
@@ -114,6 +136,7 @@ const fetchTile = (entity, tile, apiZoom) => {
     })
     .then(text => JSON.parse(text))
     .then(data => {
+      clearInFlight();
       s.tiles.set(key, { data, fetchedAt: now() });
       s.tilesVersion += 1;
       evictIfNeeded(s.tiles);
@@ -127,6 +150,7 @@ const fetchTile = (entity, tile, apiZoom) => {
       // FAILURE_COOLDOWN_MS actually gates the next retry attempt from the
       // moment of failure — otherwise a stale `fetchedAt` would trip the
       // cooldown immediately and moveend would spam refetches.
+      clearInFlight();
       const prev = s.tiles.get(key);
       s.tiles.set(key, {
         ...(prev?.data !== undefined ? { data: prev.data } : {}),
@@ -159,6 +183,11 @@ export const fetchForBounds = (entity, bounds, apiZoom, dispatch) => {
   s.lastBounds = bounds;
   s.lastApiZoom = apiZoom;
 
+  // Fire once up-front so the initial moveend delivers whatever's already
+  // cached (empty on first load — that empty dispatch is intentional; it
+  // lets any loading UI observe the "we're asking" state before real tiles
+  // arrive). After the first emit, scheduleEmit's version guard short-
+  // circuits: subsequent moveends within already-cached tiles are free.
   scheduleEmit(entity);
 
   const tiles = tilesForBounds(bounds, CACHE_ZOOM);

@@ -210,7 +210,7 @@ const CustomMapContainer = ({
         touchRotate={false}
         shiftKeyRotate={false}
         ref={mapRefCallback}
-        renderer={renderer ?? undefined}
+        renderer={renderer || undefined}
         preferCanvas={!renderer}>
         {isFullscreenAllowed && shouldChangeControlInFullscreen && (
           <FullscreenInteraction

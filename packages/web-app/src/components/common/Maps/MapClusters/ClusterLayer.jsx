@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { useMap, useMapEvent } from 'react-leaflet';
-import * as L from 'leaflet';
+import L from 'leaflet';
 import { GlobalStyles } from '@mui/material';
 import useCluster from './useCluster';
 
@@ -48,6 +48,7 @@ export const ClusterGlobalCss = (
       }
       .cluster-bubble:hover {
         transform: scale(1.08);
+        filter: brightness(1.15);
       }
       .cluster-bubble[data-type="entrance"]     { background: rgba(139, 69, 19, 0.85); }
       .cluster-bubble[data-type="network"]      { background: rgba(25, 118, 210, 0.85); }
@@ -58,7 +59,6 @@ export const ClusterGlobalCss = (
         background: rgba(255, 193, 7, 0.9);
         color: #3E2723;
       }
-      .cluster-bubble:hover { filter: brightness(1.15); }
     `}
   />
 );
@@ -94,8 +94,12 @@ const buildIcon = (count, type) => {
  *
  * Clicking a cluster flies the map to `getClusterExpansionZoom(id)`, the
  * zoom at which that cluster splits into sub-clusters or leaves.
+ *
+ * Note: `onLeafClick` is part of the `refresh` callback's dependency array,
+ * so callers should memoize it (useCallback) to avoid rebuilding every
+ * cluster marker on each parent render.
  */
-const ClusterLayer = ({ data, type, enabled = true, pane = null, onLeafClick = null }) => {
+const ClusterLayer = ({ data = [], type, enabled = true, pane = null, onLeafClick = null }) => {
   const map = useMap();
   // Build the supercluster kd-tree as soon as data arrives, not on `enabled`.
   // The entrance layer (default on, ~130k points) toggles `enabled` on every
@@ -214,7 +218,7 @@ const ClusterLayer = ({ data, type, enabled = true, pane = null, onLeafClick = n
 };
 
 ClusterLayer.propTypes = {
-  data: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.number)),
+  data: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.number)).isRequired,
   type: PropTypes.oneOf(['entrance', 'network', 'massif', 'organization']).isRequired,
   enabled: PropTypes.bool,
   pane: PropTypes.string,

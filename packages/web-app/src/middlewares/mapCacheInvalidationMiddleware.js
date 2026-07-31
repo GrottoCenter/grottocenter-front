@@ -7,6 +7,24 @@
 // POST/PUT. Refetching the affected tile is the only way to keep the cache
 // a strict mirror of the server view.
 import { invalidateAll, invalidateTileAt } from '../utils/mapTileCache';
+import { POST_ENTRANCE_SUCCESS } from '../actions/Entrance/CreateEntrance';
+import { UPDATE_ENTRANCE_SUCCESS } from '../actions/Entrance/UpdateEntrance';
+import {
+  DELETE_ENTRANCE_SUCCESS,
+  DELETE_ENTRANCE_PERMANENT_SUCCESS
+} from '../actions/Entrance/DeleteEntrance';
+import { POST_CAVE_SUCCESS } from '../actions/Cave/CreateCave';
+import { UPDATE_CAVE_SUCCESS } from '../actions/Cave/UpdateCave';
+import {
+  DELETE_CAVE_SUCCESS,
+  DELETE_CAVE_PERMANENT_SUCCESS
+} from '../actions/Cave/DeleteCave';
+import { POST_ORGANIZATION_SUCCESS } from '../actions/Organization/CreateOrganization';
+import { UPDATE_ORGANIZATION_SUCCESS } from '../actions/Organization/UpdateOrganization';
+import {
+  DELETE_ORGANIZATION_SUCCESS,
+  DELETE_ORGANIZATION_PERMANENT_SUCCESS
+} from '../actions/Organization/DeleteOrganization';
 
 // Do a targeted single-tile invalidation when coords are present; otherwise
 // fall back to a full-entity invalidation. Warns in dev so a silent payload-
@@ -30,44 +48,44 @@ const invalidateAtOrFallback = (entity, actionType, coords) => {
 const mapCacheInvalidationMiddleware = () => next => action => {
   const result = next(action);
   switch (action?.type) {
-    case 'POST_ENTRANCE_SUCCESS':
+    case POST_ENTRANCE_SUCCESS:
       invalidateAtOrFallback('entrances', action.type, action.data);
       // A new entrance may also reshape its network's map projection.
       invalidateAll('networks');
       break;
-    case 'POST_CAVE_SUCCESS':
+    case POST_CAVE_SUCCESS:
       // Networks on the map are the projection of caves.
       invalidateAll('networks');
       break;
-    case 'POST_ORGANIZATION_SUCCESS':
+    case POST_ORGANIZATION_SUCCESS:
       invalidateAtOrFallback(
         'organizations',
         action.type,
         action.organization
       );
       break;
-    case 'UPDATE_ENTRANCE_SUCCESS':
+    case UPDATE_ENTRANCE_SUCCESS:
       // Payload is only httpCode today; fall back to nuclear invalidation.
       invalidateAll('entrances');
       invalidateAll('networks');
       break;
-    case 'UPDATE_CAVE_SUCCESS':
+    case UPDATE_CAVE_SUCCESS:
       invalidateAll('networks');
       break;
-    case 'UPDATE_ORGANIZATION_SUCCESS':
+    case UPDATE_ORGANIZATION_SUCCESS:
       invalidateAll('organizations');
       break;
-    case 'DELETE_ENTRANCE_SUCCESS':
-    case 'DELETE_ENTRANCE_PERMANENT_SUCCESS':
+    case DELETE_ENTRANCE_SUCCESS:
+    case DELETE_ENTRANCE_PERMANENT_SUCCESS:
       invalidateAll('entrances');
       invalidateAll('networks');
       break;
-    case 'DELETE_CAVE_SUCCESS':
-    case 'DELETE_CAVE_PERMANENT_SUCCESS':
+    case DELETE_CAVE_SUCCESS:
+    case DELETE_CAVE_PERMANENT_SUCCESS:
       invalidateAll('networks');
       break;
-    case 'DELETE_ORGANIZATION_SUCCESS':
-    case 'DELETE_ORGANIZATION_PERMANENT_SUCCESS':
+    case DELETE_ORGANIZATION_SUCCESS:
+    case DELETE_ORGANIZATION_PERMANENT_SUCCESS:
       invalidateAll('organizations');
       break;
     default:
