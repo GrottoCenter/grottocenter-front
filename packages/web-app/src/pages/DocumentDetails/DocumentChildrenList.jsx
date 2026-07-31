@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import {
@@ -147,7 +147,7 @@ const hasOwnDescription = doc => {
 // columns on a phone to 6 on a wide screen without any breakpoint.
 const TilesGrid = styled('div')(({ theme }) => ({
   display: 'grid',
-  gridTemplateColumns: 'repeat(auto-fill, minmax(210px, 1fr))',
+  gridTemplateColumns: 'repeat(auto-fill, minmax(230px, 1fr))',
   gap: theme.spacing(1)
 }));
 
@@ -174,26 +174,36 @@ const Tile = styled(AppLink)(({ theme }) => ({
 }));
 
 // An issue designation is short ("No 47", "n°6") and has to read at a glance
-// from across the grid, so it gets a display size. When a collection's titles
-// do not follow that pattern the label can be a whole phrase, which at that
-// size would be clipped after two or three words — it steps down instead of
-// forcing every tile to be sized for the worst case.
-const LARGE_LABEL_MAX_LENGTH = 10;
+// from across the grid, so it gets a display size. Collections whose titles do
+// not reduce to a short designation step down instead of forcing every tile to
+// be sized for the worst case.
+//
+// The tier is chosen ONCE per grid, from the longest label in it — never per
+// tile. Sizing each tile on its own label put "N° 9, Mars" at display size right
+// next to "N° 17, Février" at two thirds of it: the same kind of item rendered
+// two different ways inside one row.
+const LABEL_TIERS = [
+  { maxLength: 16, fontSize: '1.6rem', lineClamp: 2 },
+  { maxLength: 34, fontSize: '1.2rem', lineClamp: 3 },
+  { maxLength: Infinity, fontSize: '1rem', lineClamp: 3 }
+];
+
+const getLabelTier = labels => {
+  const longest = labels.reduce((max, label) => Math.max(max, label.length), 0);
+  return LABEL_TIERS.find(tier => longest <= tier.maxLength);
+};
 
 const TileLabel = styled('span', {
   shouldForwardProp: prop => prop[0] !== '$'
-})(({ theme, $compact }) => ({
-  fontSize: $compact ? '1.15rem' : '1.6rem',
+})(({ theme, $fontSize, $lineClamp }) => ({
+  fontSize: $fontSize,
   fontWeight: 700,
   lineHeight: 1.2,
   // No reserved height: grid items already stretch to their row, so tiles line
   // up without every short label paying for a second line it never uses.
   display: '-webkit-box',
   WebkitBoxOrient: 'vertical',
-  // Three lines: a designation never needs more than one, so this only ever
-  // spends height on the collections whose titles are actual phrases — and it
-  // is what keeps those from being cut mid-word.
-  WebkitLineClamp: 3,
+  WebkitLineClamp: $lineClamp,
   overflow: 'hidden',
   overflowWrap: 'anywhere',
   color: theme.palette.primary.main
@@ -228,10 +238,9 @@ const TileAvailabilityCorner = styled(TileCorner)(({ theme }) => ({
   insetInlineEnd: theme.spacing(0.5)
 }));
 
-const DocumentTile = ({ doc, collectionTitle }) => {
+const DocumentTile = ({ doc, label, labelTier }) => {
   const availability = getAvailability(doc);
   const year = getPublicationYear(doc.datePublication);
-  const label = getChildLabel(doc, collectionTitle);
   const tooltip = [doc.title, hasOwnDescription(doc) ? doc.description : null]
     .filter(Boolean)
     .join(' — ');
@@ -250,7 +259,10 @@ const DocumentTile = ({ doc, collectionTitle }) => {
             {availabilityIcon(availability)}
           </TileAvailabilityCorner>
         )}
-        <TileLabel $compact={label.length > LARGE_LABEL_MAX_LENGTH}>
+        <TileLabel
+          $fontSize={labelTier.fontSize}
+          $lineClamp={labelTier.lineClamp}
+        >
           {label}
         </TileLabel>
         <TileYear>{year ?? '—'}</TileYear>
@@ -261,18 +273,38 @@ const DocumentTile = ({ doc, collectionTitle }) => {
 
 DocumentTile.propTypes = {
   doc: DocumentChildPropTypes.isRequired,
-  collectionTitle: PropTypes.string
+  label: PropTypes.string,
+  labelTier: PropTypes.shape({
+    fontSize: PropTypes.string.isRequired,
+    lineClamp: PropTypes.number.isRequired
+  }).isRequired
 };
 
 export const DocumentChildrenTiles = ({ documents, collectionTitle }) => {
-  if (!documents?.length) return null;
+  // Labels are resolved here rather than inside each tile, because the type size
+  // has to be decided from the whole set before any tile renders.
+  const items = useMemo(
+    () =>
+      (documents ?? []).map(doc => ({
+        doc,
+        label: getChildLabel(doc, collectionTitle)
+      })),
+    [documents, collectionTitle]
+  );
+  const labelTier = useMemo(
+    () => getLabelTier(items.map(item => item.label)),
+    [items]
+  );
+
+  if (items.length === 0) return null;
   return (
     <TilesGrid>
-      {documents.map(doc => (
+      {items.map(({ doc, label }) => (
         <DocumentTile
           key={doc.id}
           doc={doc}
-          collectionTitle={collectionTitle}
+          label={label}
+          labelTier={labelTier}
         />
       ))}
     </TilesGrid>

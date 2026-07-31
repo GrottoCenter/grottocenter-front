@@ -558,11 +558,23 @@ const Document = ({
                       <DetailItem
                         fullWidth
                         label={formatMessage({ id: 'Parent document' })}
-                        value={documentData.parent?.title}
-                        url={
-                          documentData.parent
-                            ? `/ui/documents/${documentData.parent.id}`
-                            : undefined
+                        value={
+                          documentData.parent ? (
+                            <Box
+                              component="span"
+                              sx={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: 0.25
+                              }}
+                            >
+                              <ParentTypeIcon fontSize="small" />
+                              <TextLink
+                                value={documentData.parent.title}
+                                url={`/ui/documents/${documentData.parent.id}`}
+                              />
+                            </Box>
+                          ) : null
                         }
                       />
                       <DetailItem
