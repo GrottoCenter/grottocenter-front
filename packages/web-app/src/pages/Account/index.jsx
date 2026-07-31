@@ -1131,9 +1131,12 @@ const OfflineDataSection = () => {
     }
   };
 
+  // Intl.NumberFormat's `megabyte` unit is the SI megabyte (10^6 bytes = MB /
+  // Mo), NOT the binary mebibyte (2^20 bytes = MiB / Mio) — divide by 1e6 so
+  // the number matches the label. Intl doesn't support `mebibyte` as a unit.
   const formattedUsage =
     usageBytes != null
-      ? formatNumber(usageBytes / (1024 * 1024), {
+      ? formatNumber(usageBytes / 1_000_000, {
           style: 'unit',
           unit: 'megabyte',
           maximumFractionDigits: 1
