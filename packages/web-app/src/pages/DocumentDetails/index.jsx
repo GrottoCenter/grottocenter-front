@@ -136,6 +136,9 @@ const Document = ({
   const [articlesSortOrder, setArticlesSortOrder] = useState(
     CHILDREN_SORT_ORDERS.TITLE
   );
+  const [otherSortOrder, setOtherSortOrder] = useState(
+    DEFAULT_CHILDREN_SORT_ORDER
+  );
   const [isDeleteConfirmationOpen, setIsDeleteConfirmationOpen] =
     useState(false);
   const [isDeleteConfirmationPermanent, setIsDeleteConfirmationPermanent] =
@@ -155,7 +158,8 @@ const Document = ({
   // satisfies the condition again on the very next render and the page refetches
   // forever.
   useEffect(() => {
-    if (!licenses && !licensesLoading && !licensesError) dispatch(fetchLicense());
+    if (!licenses && !licensesLoading && !licensesError)
+      dispatch(fetchLicense());
   }, [dispatch, licenses, licensesLoading, licensesError]);
   // Stay `undefined` until the licenses list is loaded — otherwise the badge
   // renders once with the bare name string (no deed URL), then re-renders as
@@ -281,12 +285,9 @@ const Document = ({
       ),
     [documentChildren]
   );
-  // These two sections carry no sort control, so they simply take the default
-  // order — but they still take it here, from the same util as the others,
-  // rather than inheriting whatever order the fetch happened to store.
   const sortedChildOther = useMemo(
-    () => sortDocumentChildren(childOther, DEFAULT_CHILDREN_SORT_ORDER, locale),
-    [childOther, locale]
+    () => sortDocumentChildren(childOther, otherSortOrder, locale),
+    [childOther, otherSortOrder, locale]
   );
 
   // Holdings statement: the span the run actually covers.
@@ -441,346 +442,367 @@ const Document = ({
           onDeletePress(entity?.id, isDeleteConfirmationPermanent);
         }}
       />
-      {/* One section each, so no SectionStack: it exists to space sections
-          *apart*, and contributes nothing around a single child. */}
-      {documentData?.isDeleted && (
-        <ScrollableContent
-          content={
-            <DeletedCard
-              entityType={DELETED_ENTITIES.document}
-              entity={documentData}
-              isLoading={isActionLoading}
-              standalone={false}
-              onRestorePress={onRestorePress}
-              onPermanentDeletePress={() => {
-                setIsDeleteConfirmationPermanent(true);
-                setIsDeleteConfirmationOpen(true);
-              }}
-            />
-          }
-        />
-      )}
-      {isLoading && (
-        <ScrollableContent
-          content={
-            <>
-              <Skeleton width={75} />
-              <Skeleton />
-              <Skeleton width={100} />
-              <Skeleton variant="rectangular" height={150} />
-              <Skeleton width={125} />
-              <Skeleton variant="rectangular" height={80} />
-            </>
-          }
-        />
-      )}
-      {error && (
-        <ScrollableContent
-          content={
-            <Alert
-              title={formatMessage({
-                id: 'Error, the document data you are looking for is not available.'
-              })}
-              severity="error"
-            />
-          }
-        />
-      )}
-      {documentData && (
-        <SectionStack>
+      {/* One stack for the whole body rather than one per branch: a deleted
+          document still renders its sections underneath the notice, and an
+          error can arrive while the children are still loading. */}
+      <SectionStack>
+        {documentData?.isDeleted && (
+          <ScrollableContent
+            content={
+              <DeletedCard
+                entityType={DELETED_ENTITIES.document}
+                entity={documentData}
+                isLoading={isActionLoading}
+                standalone={false}
+                onRestorePress={onRestorePress}
+                onPermanentDeletePress={() => {
+                  setIsDeleteConfirmationPermanent(true);
+                  setIsDeleteConfirmationOpen(true);
+                }}
+              />
+            }
+          />
+        )}
+        {isLoading && (
           <ScrollableContent
             content={
               <>
-                <HalfSplitContainer>
-                  <MainColumn>
-                    {needsValidation && (
-                      <Alert
-                        severity="warning"
-                        content={formatMessage({
-                          id: 'A moderator needs to validate the last modification before being able to edit the document again.'
-                        })}
-                      />
-                    )}
-                    <SummaryText>{documentData.description}</SummaryText>
-                    {isCollection(docType) ? (
-                      <Box>
-                        <ChildrenSectionHeader
-                          title={
-                            // h2 in secondary with the shared CountBadge,
-                            // exactly like ScrollableContent's own titles: this
-                            // is a section heading among its peers, and h5 under
-                            // the page's h1 skipped three levels for no reason.
-                            <Typography variant="h2" color="secondary">
-                              {formatMessage({ id: 'Issues' })}
-                              <CountBadge count={childIssues.length} />
-                            </Typography>
-                          }
-                          controls={
-                            <ChildrenControls
-                              documents={childIssues}
-                              sortOrder={issuesSortOrder}
-                              onSortOrderChange={setIssuesSortOrder}
-                            />
-                          }
-                        />
-                        {childIssues.length > 0 ? (
-                          <DocumentChildrenTiles
-                            documents={sortedChildIssues}
-                            collectionTitle={documentData.title}
-                          />
-                        ) : (
-                          <EmptySection
-                            icon={
-                              <NewspaperIcon
-                                fontSize="large"
-                                color="disabled"
-                              />
-                            }
-                            message={formatMessage({
-                              id: 'No issues in this collection.'
-                            })}
-                          />
-                        )}
-                      </Box>
-                    ) : isEvent(docType) ? (
-                      <EventDateSection date={documentData.datePublication} />
-                    ) : (
-                      <FilesSection files={allFiles} />
-                    )}
-                  </MainColumn>
-                  <SideColumn $firstOnMobile={isCollection(docType)}>
-                    <DetailsList>
-                      <DetailItem
-                        label={formatMessage({ id: 'Type' })}
-                        value={
-                          documentData.type ? (
-                            <DocumentTypeChip type={documentData.type} />
-                          ) : null
-                        }
-                      />
-                      <DetailItem
-                        label={formatMessage({ id: 'Language' })}
-                        value={
-                          languages.find(e => e.id === mainLanguage)?.refName ??
-                          mainLanguage
-                        }
-                      />
-                      <DetailItem
-                        label={formatMessage({ id: 'Publication date' })}
-                        value={documentData.datePublication}
-                      />
-                      <DetailItem
-                        label={formatMessage({ id: 'Pages' })}
-                        value={documentData.pages}
-                      />
-                      <DetailItem
-                        label={formatMessage({ id: 'Issue' })}
-                        value={documentData.issue}
-                      />
-                      {/* License only applies to attached files, not to the paper document itself */}
-                      {allFiles.length > 0 && documentData.license && (
-                        <DetailItem
-                          label={formatMessage({ id: 'License' })}
-                          value={
-                            <LicenseBadge
-                              license={licenseObject}
-                              linkToDeed
-                              size={40}
-                            />
-                          }
-                        />
-                      )}
-                      <DetailItem
-                        fullWidth
-                        label={formatMessage({ id: 'Parent document' })}
-                        value={
-                          documentData.parent ? (
-                            <TextLink
-                              // primary, to read as one unit with the link it
-                              // labels rather than as a separate black glyph
-                              icon={
-                                <ParentTypeIcon
-                                  fontSize="small"
-                                  color="primary"
-                                />
-                              }
-                              value={documentData.parent.title}
-                              url={`/ui/documents/${documentData.parent.id}`}
-                            />
-                          ) : null
-                        }
-                      />
-                      <DetailItem
-                        fullWidth
-                        label={formatMessage({ id: 'Authors' })}
-                        value={allAuthors}
-                      />
-                      <DetailItem
-                        fullWidth
-                        label={formatMessage({ id: 'Editor' })}
-                        value={
-                          documentData.editor ? (
-                            <TextLink
-                              icon={<CustomIcon type="organization" size={18} />}
-                              value={documentData.editor.name}
-                              url={`/ui/organizations/${documentData.editor.id}`}
-                            />
-                          ) : null
-                        }
-                      />
-                      <DetailItem
-                        fullWidth
-                        label={formatMessage({ id: 'Library' })}
-                        value={
-                          documentData.library ? (
-                            <TextLink
-                              icon={<CustomIcon type="organization" size={18} />}
-                              value={documentData.library.name}
-                              url={`/ui/organizations/${documentData.library.id}`}
-                            />
-                          ) : null
-                        }
-                      />
-                      <DetailItem
-                        fullWidth
-                        label={documentData.identifierType?.toUpperCase()}
-                        value={documentData.identifier}
-                        url={
-                          documentData.identifierType === 'url'
-                            ? documentData.identifier
-                            : undefined
-                        }
-                      />
-                      <DetailItem
-                        fullWidth
-                        label={formatMessage({
-                          id: 'Publication (BBS legacy)'
-                        })}
-                        value={documentData?.oldBBS?.publicationOther}
-                      />
-                      <DetailItem
-                        fullWidth
-                        label={formatMessage({
-                          id: 'Publication number (BBS legacy)'
-                        })}
-                        value={documentData?.oldBBS?.publicationFascicule}
-                      />
-                      <DetailItem
-                        fullWidth
-                        label={formatMessage({ id: 'Subjects' })}
-                        value={
-                          documentData.subjects?.length
-                            ? documentData.subjects
-                                .map(
-                                  s =>
-                                    `${s.id} ${formatMessage({
-                                      id: s.id,
-                                      defaultMessage: s.subject
-                                    })}`
-                                )
-                                .join(' · ')
-                            : null
-                        }
-                      />
-                      <DetailItem
-                        fullWidth
-                        // Not "Regions": the field is iso3166 and most often
-                        // holds a country. "Regions" stays in use elsewhere for
-                        // actual region lists.
-                        label={formatMessage({ id: 'Geographic coverage' })}
-                        value={
-                          documentData.iso3166?.length
-                            ? documentData.iso3166
-                                .map(e => `${e.name} (${e.iso})`)
-                                .join(' · ')
-                            : null
-                        }
-                      />
-                      {permissions.isModerator && (
-                        <DetailItem
-                          fullWidth
-                          label={formatMessage({ id: 'Authorization' })}
-                          value={documentData?.authorizationDocument?.title}
-                          url={
-                            documentData?.authorizationDocument
-                              ? `/ui/documents/${documentData.authorizationDocument.id}`
-                              : undefined
-                          }
-                        />
-                      )}
-                      <DetailItem
-                        fullWidth
-                        label={formatMessage({ id: 'Source' })}
-                        value={
-                          documentData.importSource
-                            ? `${documentData.importId}#${documentData.importSource}`
-                            : null
-                        }
-                      />
-                    </DetailsList>
-                  </SideColumn>
-                </HalfSplitContainer>
-                <Box sx={{ mt: 0.5, mb: -1 }}>
-                  <AuthorAndDate
-                    author={documentData.creator}
-                    textColor="textSecondary"
-                    date={documentData.dateInscription}
-                    verb="Created"
-                  />
-                </Box>
+                <Skeleton width={75} />
+                <Skeleton />
+                <Skeleton width={100} />
+                <Skeleton variant="rectangular" height={150} />
+                <Skeleton width={125} />
+                <Skeleton variant="rectangular" height={80} />
               </>
             }
           />
-
-          {linkedEntities.length > 0 && (
+        )}
+        {error && (
+          <ScrollableContent
+            content={
+              <Alert
+                title={formatMessage({
+                  id: 'Error, the document data you are looking for is not available.'
+                })}
+                severity="error"
+              />
+            }
+          />
+        )}
+        {documentData && (
+          <>
             <ScrollableContent
-              dense
-              title={formatMessage({ id: 'Linked entities' })}
-              content={<EntitiesList>{linkedEntities}</EntitiesList>}
-            />
-          )}
-
-          {childArticles.length > 0 && (
-            <ScrollableContent
-              dense
-              title={formatMessage({ id: 'Articles' })}
-              count={childArticles.length}
-              // In the card's own header row rather than a row added inside the
-              // body: the card header and the content each carry their own
-              // padding, so an extra row there opened a wide empty band under
-              // the title.
-              icon={
-                <ChildrenControls
-                  documents={childArticles}
-                  sortOrder={articlesSortOrder}
-                  onSortOrderChange={setArticlesSortOrder}
-                />
+              content={
+                <>
+                  <HalfSplitContainer>
+                    <MainColumn>
+                      {needsValidation && (
+                        <Alert
+                          severity="warning"
+                          content={formatMessage({
+                            id: 'A moderator needs to validate the last modification before being able to edit the document again.'
+                          })}
+                        />
+                      )}
+                      <SummaryText>{documentData.description}</SummaryText>
+                      {isCollection(docType) ? (
+                        <Box>
+                          <ChildrenSectionHeader
+                            title={
+                              // h2 in secondary with the shared CountBadge,
+                              // exactly like ScrollableContent's own titles: this
+                              // is a section heading among its peers, and h5 under
+                              // the page's h1 skipped three levels for no reason.
+                              <Typography variant="h2" color="secondary">
+                                {formatMessage({ id: 'Issues' })}
+                                <CountBadge count={childIssues.length} />
+                              </Typography>
+                            }
+                            controls={
+                              <ChildrenControls
+                                documents={childIssues}
+                                sortOrder={issuesSortOrder}
+                                onSortOrderChange={setIssuesSortOrder}
+                              />
+                            }
+                          />
+                          {childIssues.length > 0 ? (
+                            <DocumentChildrenTiles
+                              documents={sortedChildIssues}
+                              collectionTitle={documentData.title}
+                            />
+                          ) : (
+                            <EmptySection
+                              icon={
+                                <NewspaperIcon
+                                  fontSize="large"
+                                  color="disabled"
+                                />
+                              }
+                              message={formatMessage({
+                                id: 'No issues in this collection.'
+                              })}
+                            />
+                          )}
+                        </Box>
+                      ) : isEvent(docType) ? (
+                        <EventDateSection date={documentData.datePublication} />
+                      ) : (
+                        <FilesSection files={allFiles} />
+                      )}
+                    </MainColumn>
+                    <SideColumn $firstOnMobile={isCollection(docType)}>
+                      <DetailsList>
+                        <DetailItem
+                          label={formatMessage({ id: 'Type' })}
+                          value={
+                            documentData.type ? (
+                              <DocumentTypeChip type={documentData.type} />
+                            ) : null
+                          }
+                        />
+                        <DetailItem
+                          label={formatMessage({ id: 'Language' })}
+                          value={
+                            languages.find(e => e.id === mainLanguage)
+                              ?.refName ?? mainLanguage
+                          }
+                        />
+                        <DetailItem
+                          label={formatMessage({ id: 'Publication date' })}
+                          value={documentData.datePublication}
+                        />
+                        <DetailItem
+                          label={formatMessage({ id: 'Pages' })}
+                          value={documentData.pages}
+                        />
+                        <DetailItem
+                          label={formatMessage({ id: 'Issue' })}
+                          value={documentData.issue}
+                        />
+                        {/* License only applies to attached files, not to the paper document itself */}
+                        {allFiles.length > 0 && documentData.license && (
+                          <DetailItem
+                            label={formatMessage({ id: 'License' })}
+                            value={
+                              <LicenseBadge
+                                license={licenseObject}
+                                linkToDeed
+                                size={40}
+                              />
+                            }
+                          />
+                        )}
+                        <DetailItem
+                          fullWidth
+                          label={formatMessage({ id: 'Parent document' })}
+                          value={
+                            documentData.parent ? (
+                              <TextLink
+                                // primary, to read as one unit with the link it
+                                // labels rather than as a separate black glyph
+                                icon={
+                                  <ParentTypeIcon
+                                    fontSize="small"
+                                    color="primary"
+                                  />
+                                }
+                                value={documentData.parent.title}
+                                url={`/ui/documents/${documentData.parent.id}`}
+                              />
+                            ) : null
+                          }
+                        />
+                        <DetailItem
+                          fullWidth
+                          label={formatMessage({ id: 'Authors' })}
+                          value={allAuthors}
+                        />
+                        <DetailItem
+                          fullWidth
+                          label={formatMessage({ id: 'Editor' })}
+                          value={
+                            documentData.editor ? (
+                              <TextLink
+                                icon={
+                                  <CustomIcon type="organization" size={18} />
+                                }
+                                value={documentData.editor.name}
+                                url={`/ui/organizations/${documentData.editor.id}`}
+                              />
+                            ) : null
+                          }
+                        />
+                        <DetailItem
+                          fullWidth
+                          label={formatMessage({ id: 'Library' })}
+                          value={
+                            documentData.library ? (
+                              <TextLink
+                                icon={
+                                  <CustomIcon type="organization" size={18} />
+                                }
+                                value={documentData.library.name}
+                                url={`/ui/organizations/${documentData.library.id}`}
+                              />
+                            ) : null
+                          }
+                        />
+                        <DetailItem
+                          fullWidth
+                          label={documentData.identifierType?.toUpperCase()}
+                          value={documentData.identifier}
+                          url={
+                            documentData.identifierType === 'url'
+                              ? documentData.identifier
+                              : undefined
+                          }
+                        />
+                        <DetailItem
+                          fullWidth
+                          label={formatMessage({
+                            id: 'Publication (BBS legacy)'
+                          })}
+                          value={documentData?.oldBBS?.publicationOther}
+                        />
+                        <DetailItem
+                          fullWidth
+                          label={formatMessage({
+                            id: 'Publication number (BBS legacy)'
+                          })}
+                          value={documentData?.oldBBS?.publicationFascicule}
+                        />
+                        <DetailItem
+                          fullWidth
+                          label={formatMessage({ id: 'Subjects' })}
+                          value={
+                            documentData.subjects?.length
+                              ? documentData.subjects
+                                  .map(
+                                    s =>
+                                      `${s.id} ${formatMessage({
+                                        id: s.id,
+                                        defaultMessage: s.subject
+                                      })}`
+                                  )
+                                  .join(' · ')
+                              : null
+                          }
+                        />
+                        <DetailItem
+                          fullWidth
+                          // Not "Regions": the field is iso3166 and most often
+                          // holds a country. "Regions" stays in use elsewhere for
+                          // actual region lists.
+                          label={formatMessage({ id: 'Geographic coverage' })}
+                          value={
+                            documentData.iso3166?.length
+                              ? documentData.iso3166
+                                  .map(e => `${e.name} (${e.iso})`)
+                                  .join(' · ')
+                              : null
+                          }
+                        />
+                        {permissions.isModerator && (
+                          <DetailItem
+                            fullWidth
+                            label={formatMessage({ id: 'Authorization' })}
+                            value={documentData?.authorizationDocument?.title}
+                            url={
+                              documentData?.authorizationDocument
+                                ? `/ui/documents/${documentData.authorizationDocument.id}`
+                                : undefined
+                            }
+                          />
+                        )}
+                        <DetailItem
+                          fullWidth
+                          label={formatMessage({ id: 'Source' })}
+                          value={
+                            documentData.importSource
+                              ? `${documentData.importId}#${documentData.importSource}`
+                              : null
+                          }
+                        />
+                      </DetailsList>
+                    </SideColumn>
+                  </HalfSplitContainer>
+                  <Box sx={{ mt: 0.5, mb: -1 }}>
+                    <AuthorAndDate
+                      author={documentData.creator}
+                      textColor="textSecondary"
+                      date={documentData.dateInscription}
+                      verb="Created"
+                    />
+                  </Box>
+                </>
               }
-              content={<DocumentChildrenList documents={sortedChildArticles} />}
             />
-          )}
 
-          {!isCollection(docType) && childIssues.length > 0 && (
-            <ScrollableContent
-              dense
-              title={formatMessage({ id: 'Issues' })}
-              count={childIssues.length}
-              icon={<ChildrenControls documents={childIssues} />}
-              content={<DocumentChildrenList documents={sortedChildIssues} />}
-            />
-          )}
+            {linkedEntities.length > 0 && (
+              <ScrollableContent
+                dense
+                title={formatMessage({ id: 'Linked entities' })}
+                content={<EntitiesList>{linkedEntities}</EntitiesList>}
+              />
+            )}
 
-          {childOther.length > 0 && (
-            <ScrollableContent
-              dense
-              title={formatMessage({ id: 'Child documents' })}
-              count={childOther.length}
-              icon={<ChildrenControls documents={childOther} />}
-              content={<DocumentChildrenList documents={sortedChildOther} />}
-            />
-          )}
-        </SectionStack>
-      )}
+            {childArticles.length > 0 && (
+              <ScrollableContent
+                dense
+                title={formatMessage({ id: 'Articles' })}
+                count={childArticles.length}
+                // In the card's own header row rather than a row added inside the
+                // body: the card header and the content each carry their own
+                // padding, so an extra row there opened a wide empty band under
+                // the title.
+                icon={
+                  <ChildrenControls
+                    documents={childArticles}
+                    sortOrder={articlesSortOrder}
+                    onSortOrderChange={setArticlesSortOrder}
+                  />
+                }
+                content={
+                  <DocumentChildrenList documents={sortedChildArticles} />
+                }
+              />
+            )}
+
+            {!isCollection(docType) && childIssues.length > 0 && (
+              <ScrollableContent
+                dense
+                title={formatMessage({ id: 'Issues' })}
+                count={childIssues.length}
+                icon={
+                  <ChildrenControls
+                    documents={childIssues}
+                    sortOrder={issuesSortOrder}
+                    onSortOrderChange={setIssuesSortOrder}
+                  />
+                }
+                content={<DocumentChildrenList documents={sortedChildIssues} />}
+              />
+            )}
+
+            {childOther.length > 0 && (
+              <ScrollableContent
+                dense
+                title={formatMessage({ id: 'Child documents' })}
+                count={childOther.length}
+                icon={
+                  <ChildrenControls
+                    documents={childOther}
+                    sortOrder={otherSortOrder}
+                    onSortOrderChange={setOtherSortOrder}
+                  />
+                }
+                content={<DocumentChildrenList documents={sortedChildOther} />}
+              />
+            )}
+          </>
+        )}
+      </SectionStack>
     </PageContainer>
   );
 };
@@ -819,6 +841,10 @@ const DocumentDetails = ({ id, hideActions = false }) => {
     <Deleted entityType={DELETED_ENTITIES.document} entity={details} />
   ) : (
     <Document
+      // Navigating between documents without leaving the page (breadcrumb, then
+      // a sibling) keeps the component mounted: without this the sort selects
+      // would still show the previous document's choice over the new children.
+      key={documentId}
       isLoading={
         !documentId ||
         isLoading ||

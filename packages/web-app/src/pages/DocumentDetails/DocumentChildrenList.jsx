@@ -171,8 +171,9 @@ const ControlsRow = styled('div')(({ theme }) => ({
  * result, as happens when every document carries the same date, is noise. The
  * legend likewise only lists the states actually present.
  *
- * With neither, the component returns null rather than an empty row: an element
- * that always renders still counts as a flex child and leaves a gap behind.
+ * With neither — including when `documents` is missing entirely — the component
+ * returns null rather than an empty row: an element that always renders still
+ * counts as a flex child and leaves a gap behind.
  */
 export const ChildrenControls = ({
   documents,
@@ -354,6 +355,7 @@ const TileAvailabilityCorner = styled(TileCorner)(({ theme }) => ({
 // All three props come from the store or from the memos below, so the bail-out
 // is complete.
 const DocumentTile = React.memo(({ doc, display, labelTier }) => {
+  const { formatMessage } = useIntl();
   const fileName = getAttachedFileName(doc);
   const tooltip = [doc.title, hasOwnDescription(doc) ? doc.description : null]
     .filter(Boolean)
@@ -363,8 +365,12 @@ const DocumentTile = React.memo(({ doc, display, labelTier }) => {
   return (
     <Tooltip title={tooltip} enterDelay={400}>
       {/* The visible label is trimmed down to "No 47"; screen readers get the
-          untouched title instead of the shortened form. */}
-      <Tile to={`/ui/documents/${doc.id}`} aria-label={tooltip || undefined}>
+          untouched title instead of the shortened form. An untitled child would
+          otherwise leave the link with no accessible name at all. */}
+      <Tile
+        to={`/ui/documents/${doc.id}`}
+        aria-label={tooltip || formatMessage({ id: 'Document' })}
+      >
         <TileTypeCorner>
           <TypeIcon fontSize="small" />
         </TileTypeCorner>

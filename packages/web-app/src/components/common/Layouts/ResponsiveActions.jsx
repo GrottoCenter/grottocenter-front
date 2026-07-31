@@ -53,6 +53,8 @@ const ResponsiveActions = ({ items }) => {
     Boolean(previous.destructive) !== Boolean(item.destructive);
 
   if (isDesktop) {
+    // Grouping runs on visibleItems, so a group's first item is a rendered one
+    // and its key is stable — never a hidden item that would silently move.
     const groups = [[]];
     visibleItems.forEach((item, index) => {
       if (startsNewGroup(item, visibleItems[index - 1])) groups.push([]);

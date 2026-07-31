@@ -56,14 +56,16 @@ export const getChildLabel = (doc, collectionTitle) => {
   )
     start += 1;
 
-  const words = titleWords.slice(start);
-
   // Removing the shared prefix often exposes the separator that followed it
-  // ("Bulletin 1960 - SMSP" -> "- SMSP"). Drop leading punctuation-only words,
+  // ("Bulletin 1960 - SMSP" -> "- SMSP"). Skip leading punctuation-only words,
   // never the last one.
-  while (words.length > 1 && normalizeWord(words[0]) === '') words.shift();
+  while (
+    start < titleWords.length - 1 &&
+    normalizeWord(titleWords[start]) === ''
+  )
+    start += 1;
 
-  const label = trimSeparators(words.join(' '));
+  const label = trimSeparators(titleWords.slice(start).join(' '));
   return label === '' ? title : label;
 };
 

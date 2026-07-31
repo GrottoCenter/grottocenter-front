@@ -25,6 +25,8 @@ const compareDates = (a, b, compare, direction) => {
   // Undated documents always close the list, whichever direction is asked for.
   if (!dateA) return 1;
   if (!dateB) return -1;
+  // `direction` is the sign given to "a is after b": 1 puts the later date last
+  // (ascending), -1 puts it first (descending).
   return dateA < dateB ? -direction : direction;
 };
 
