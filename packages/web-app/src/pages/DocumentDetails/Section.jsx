@@ -13,8 +13,10 @@ import {
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { EventAvailable, InsertDriveFile } from '@mui/icons-material';
+import Linkify from 'linkify-react';
 
 import AppLink from '../../components/common/AppLink';
+import linkifyOptions from '../../helpers/linkifyOptions';
 import Property from '../../components/common/Properties/Property';
 import ImageLightbox from '../../components/common/DocumentsList/ImageLightbox';
 import ImageThumbnail from '../../components/common/DocumentsList/ImageThumbnail';
@@ -32,9 +34,7 @@ export const TextLink = ({ value, url }) => {
   return url.startsWith('/ui') ? (
     <AppLink to={url}>{value}</AppLink>
   ) : (
-    <AppLink href={url}>
-      {value}
-    </AppLink>
+    <AppLink href={url}>{value}</AppLink>
   );
 };
 TextLink.propTypes = {
@@ -95,15 +95,21 @@ export const EntitiesList = ({ children }) => {
 };
 EntitiesList.propTypes = { children: PropTypes.node };
 
+// Takes the raw text and linkifies it itself. Callers used to pass
+// `<Linkify>{description}</Linkify>`, which made `children` a truthy element
+// even for an empty description: the guard below never fired and the component
+// rendered an empty block that still counted as a flex child, adding a gap
+// above the next section.
 export const SummaryText = ({ children }) => {
-  if (!children) return null;
+  const text = typeof children === 'string' ? children.trim() : children;
+  if (!text) return null;
   return (
     <Typography component="div" variant="body1" sx={{ whiteSpace: 'pre-wrap' }}>
-      {children}
+      <Linkify options={linkifyOptions}>{text}</Linkify>
     </Typography>
   );
 };
-SummaryText.propTypes = { children: PropTypes.node };
+SummaryText.propTypes = { children: PropTypes.string };
 
 const PropertiesGrid = styled(Box)(({ theme }) => ({
   display: 'grid',
@@ -124,7 +130,8 @@ export const DetailsList = ({ children }) => {
   return (
     <Paper
       variant="outlined"
-      sx={{ p: 1, borderRadius: 2, bgcolor: 'grey.50' }}>
+      sx={{ p: 1, borderRadius: 2, bgcolor: 'grey.50' }}
+    >
       <PropertiesGrid>{items}</PropertiesGrid>
     </Paper>
   );
@@ -241,7 +248,8 @@ export const EmptySection = ({ icon, message }) => (
       justifyContent: 'center',
       gap: 0.5,
       color: 'text.secondary'
-    }}>
+    }}
+  >
     {icon ?? <InsertDriveFile fontSize="large" color="disabled" />}
     <Typography variant="body2">{message}</Typography>
   </Paper>
@@ -264,7 +272,8 @@ export const EventDateSection = ({ date }) => {
         display: 'flex',
         alignItems: 'center',
         gap: 1
-      }}>
+      }}
+    >
       <EventAvailable sx={{ fontSize: 40, color: 'text.secondary' }} />
       <Box>
         <Typography variant="caption" color="text.secondary" display="block">
@@ -351,7 +360,8 @@ export const FilesSection = ({ files }) => {
               alignItems: 'center',
               gap: 0.5,
               mb: 0.5
-            }}>
+            }}
+          >
             {getFileIcon(file.fileName)}
             <AppLink href={file.completePath}>
               {decodeFileName(file.fileName)}
@@ -374,17 +384,14 @@ export const FilesSection = ({ files }) => {
               alignItems: 'center',
               gap: 0.5,
               mb: 0.5
-            }}>
+            }}
+          >
             {getFileIcon(file.fileName)}
             <AppLink href={file.completePath}>
               {decodeFileName(file.fileName)}
             </AppLink>
           </Box>
-          <VideoPreview
-            controls
-            preload="metadata"
-            src={file.completePath}
-          />
+          <VideoPreview controls preload="metadata" src={file.completePath} />
         </Box>
       ))}
       {audios.map(file => (
@@ -395,7 +402,8 @@ export const FilesSection = ({ files }) => {
               alignItems: 'center',
               gap: 0.5,
               mb: 0.5
-            }}>
+            }}
+          >
             {getFileIcon(file.fileName)}
             <AppLink href={file.completePath}>
               {decodeFileName(file.fileName)}

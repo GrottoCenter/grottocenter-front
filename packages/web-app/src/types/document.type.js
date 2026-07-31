@@ -15,6 +15,28 @@ export const DocumentSimplePropTypes = PropTypes.shape({
   description: PropTypes.string
 });
 
+// Shape returned by GET /documents/{id}/children — richer than the simple
+// shape: it carries the publication date the list is ordered on and the files
+// the availability indicator is derived from.
+export const DocumentChildPropTypes = PropTypes.shape({
+  id: PropTypes.number.isRequired,
+  type: PropTypes.string,
+  title: PropTypes.string,
+  description: PropTypes.string,
+  datePublication: PropTypes.string,
+  dateInscription: PropTypes.string,
+  dateReviewed: PropTypes.string,
+  isValidated: PropTypes.bool,
+  isDeleted: PropTypes.bool,
+  files: PropTypes.arrayOf(
+    PropTypes.shape({
+      fileName: PropTypes.string,
+      completePath: PropTypes.string,
+      thumbnails: ThumbnailsPropTypes
+    })
+  )
+});
+
 export const DocumentPropTypes = PropTypes.shape({
   id: PropTypes.number,
   importSource: PropTypes.string,

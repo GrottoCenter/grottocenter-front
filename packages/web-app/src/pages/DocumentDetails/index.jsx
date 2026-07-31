@@ -6,7 +6,6 @@ import { useNavigate, useParams } from 'react-router-dom';
 import AppLink from '../../components/common/AppLink';
 import { useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
-import Linkify from 'linkify-react';
 import CreateIcon from '@mui/icons-material/Create';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ManageHistoryIcon from '@mui/icons-material/ManageHistory';
@@ -35,6 +34,17 @@ import {
   SummaryText,
   TextLink
 } from './Section';
+import DocumentChildrenList, {
+  ChildrenAvailabilityLegend,
+  ChildrenSectionHeader,
+  ChildrenSortSelect,
+  DocumentChildrenTiles
+} from './DocumentChildrenList';
+import {
+  CHILDREN_SORT_ORDERS,
+  DEFAULT_CHILDREN_SORT_ORDER,
+  sortDocumentChildren
+} from '@/utils/documentChildrenSort';
 import { fetchDocumentDetails } from '../../actions/Document/GetDocumentDetails';
 import { fetchDocumentChildren } from '../../actions/Document/GetDocumentChildren';
 import { deleteDocument } from '../../actions/Document/DeleteDocument';
@@ -55,10 +65,9 @@ import {
 } from '../../components/common/card/Deleted';
 import AuthorAndDate from '../../components/common/Contribution/AuthorAndDate';
 import {
-  DocumentPropTypes,
-  DocumentSimplePropTypes
+  DocumentChildPropTypes,
+  DocumentPropTypes
 } from '../../types/document.type';
-import linkifyOptions from '../../helpers/linkifyOptions';
 
 const HalfSplitContainer = styled('div')`
   display: flex;
@@ -101,8 +110,17 @@ const Document = ({
   const permissions = usePermissions();
   const dispatch = useDispatch();
   const { languages } = useSelector(state => state.language);
+  const { locale } = useSelector(state => state.intl);
   const licenses = useSelector(state => state.licenses.data);
   const licensesLoading = useSelector(state => state.licenses.loading);
+  const [issuesSortOrder, setIssuesSortOrder] = useState(
+    DEFAULT_CHILDREN_SORT_ORDER
+  );
+  // Articles inside a collection rarely carry their own publication date, so
+  // the alphabetical order is the one that actually helps here.
+  const [articlesSortOrder, setArticlesSortOrder] = useState(
+    CHILDREN_SORT_ORDERS.TITLE
+  );
   const [isDeleteConfirmationOpen, setIsDeleteConfirmationOpen] =
     useState(false);
   const [isDeleteConfirmationPermanent, setIsDeleteConfirmationPermanent] =
@@ -124,8 +142,9 @@ const Document = ({
   // an object once the list arrives, causing a visible flicker where the
   // link suddenly materialises.
   const licenseObject = licenses
-    ? ((licenses.find(l => l.name === documentData?.license) ??
-        documentData?.license) || undefined)
+    ? (licenses.find(l => l.name === documentData?.license) ??
+        documentData?.license) ||
+      undefined
     : undefined;
 
   let onEdit = null;
@@ -225,9 +244,17 @@ const Document = ({
     () => (documentChildren ?? []).filter(d => d.type === 'Issue'),
     [documentChildren]
   );
+  const sortedChildIssues = useMemo(
+    () => sortDocumentChildren(childIssues, issuesSortOrder, locale),
+    [childIssues, issuesSortOrder, locale]
+  );
   const childArticles = useMemo(
     () => (documentChildren ?? []).filter(d => d.type === 'Article'),
     [documentChildren]
+  );
+  const sortedChildArticles = useMemo(
+    () => sortDocumentChildren(childArticles, articlesSortOrder, locale),
+    [childArticles, articlesSortOrder, locale]
   );
   const childOther = useMemo(
     () =>
@@ -295,7 +322,8 @@ const Document = ({
       sx={{
         fontSize: { xs: '1.2rem', md: '1.7rem' },
         '& .MuiBreadcrumbs-separator': { mx: { xs: '2px', md: '8px' } }
-      }}>
+      }}
+    >
       <AppLink
         to={`/ui/documents/${documentData.parent.id}`}
         underline="hover"
@@ -304,7 +332,8 @@ const Document = ({
           display: 'flex',
           alignItems: 'center',
           gap: { xs: '4px', md: '6px' }
-        }}>
+        }}
+      >
         <ParentTypeIcon sx={{ fontSize: 'inherit' }} />
         {documentData.parent.title}
       </AppLink>
@@ -427,37 +456,50 @@ const Document = ({
                         })}
                       />
                     )}
-                    <SummaryText>
-                      <Linkify options={linkifyOptions}>
-                        {documentData.description}
-                      </Linkify>
-                    </SummaryText>
+                    <SummaryText>{documentData.description}</SummaryText>
                     {isCollection(docType) ? (
                       <Box>
-                        <Typography variant="h5" gutterBottom>
-                          {formatMessage({ id: 'Issues' })}
-                          <Chip
-                            label={childIssues.length}
-                            size="small"
-                            sx={{ ml: 0.5, fontWeight: 600, verticalAlign: 'middle' }}
-                          />
-                        </Typography>
-                        {childIssues.length > 0 ? (
-                          <EntitiesList>
-                            {childIssues.map(doc => (
-                              <ListElement
-                                key={doc.id}
-                                icon={<CustomIcon type="bibliography" />}
-                                value={doc.title}
-                                secondary={doc.description}
-                                url={`/ui/documents/${doc.id}`}
+                        <ChildrenSectionHeader
+                          title={
+                            <Typography variant="h5">
+                              {formatMessage({ id: 'Issues' })}
+                              <Chip
+                                label={childIssues.length}
+                                size="small"
+                                sx={{
+                                  ml: 0.5,
+                                  fontWeight: 600,
+                                  verticalAlign: 'middle'
+                                }}
                               />
-                            ))}
-                          </EntitiesList>
+                            </Typography>
+                          }
+                          legend={
+                            <ChildrenAvailabilityLegend
+                              documents={childIssues}
+                            />
+                          }
+                          action={
+                            childIssues.length > 1 && (
+                              <ChildrenSortSelect
+                                value={issuesSortOrder}
+                                onChange={setIssuesSortOrder}
+                              />
+                            )
+                          }
+                        />
+                        {childIssues.length > 0 ? (
+                          <DocumentChildrenTiles
+                            documents={sortedChildIssues}
+                            collectionTitle={documentData.title}
+                          />
                         ) : (
                           <EmptySection
                             icon={
-                              <NewspaperIcon fontSize="large" color="disabled" />
+                              <NewspaperIcon
+                                fontSize="large"
+                                color="disabled"
+                              />
                             }
                             message={formatMessage({
                               id: 'No issues in this collection.'
@@ -662,17 +704,22 @@ const Document = ({
               title={formatMessage({ id: 'Articles' })}
               count={childArticles.length}
               content={
-                <EntitiesList>
-                  {childArticles.map(doc => (
-                    <ListElement
-                      key={doc.id}
-                      icon={<CustomIcon type="bibliography" />}
-                      value={doc.title}
-                      secondary={doc.description}
-                      url={`/ui/documents/${doc.id}`}
-                    />
-                  ))}
-                </EntitiesList>
+                <>
+                  <ChildrenSectionHeader
+                    legend={
+                      <ChildrenAvailabilityLegend documents={childArticles} />
+                    }
+                    action={
+                      childArticles.length > 1 && (
+                        <ChildrenSortSelect
+                          value={articlesSortOrder}
+                          onChange={setArticlesSortOrder}
+                        />
+                      )
+                    }
+                  />
+                  <DocumentChildrenList documents={sortedChildArticles} />
+                </>
               }
             />
           )}
@@ -682,19 +729,7 @@ const Document = ({
               dense
               title={formatMessage({ id: 'Issues' })}
               count={childIssues.length}
-              content={
-                <EntitiesList>
-                  {childIssues.map(doc => (
-                    <ListElement
-                      key={doc.id}
-                      icon={<CustomIcon type="bibliography" />}
-                      value={doc.title}
-                      secondary={doc.description}
-                      url={`/ui/documents/${doc.id}`}
-                    />
-                  ))}
-                </EntitiesList>
-              }
+              content={<DocumentChildrenList documents={childIssues} />}
             />
           )}
 
@@ -703,19 +738,7 @@ const Document = ({
               dense
               title={formatMessage({ id: 'Child documents' })}
               count={childOther.length}
-              content={
-                <EntitiesList>
-                  {childOther.map(doc => (
-                    <ListElement
-                      key={doc.id}
-                      icon={<CustomIcon type="bibliography" />}
-                      value={doc.title}
-                      secondary={doc.description}
-                      url={`/ui/documents/${doc.id}`}
-                    />
-                  ))}
-                </EntitiesList>
-              }
+              content={<DocumentChildrenList documents={childOther} />}
             />
           )}
         </SectionStack>
@@ -779,7 +802,7 @@ Document.propTypes = {
   isLoading: PropTypes.bool,
   error: PropTypes.shape({}),
   documentData: DocumentPropTypes,
-  documentChildren: PropTypes.arrayOf(DocumentSimplePropTypes),
+  documentChildren: PropTypes.arrayOf(DocumentChildPropTypes),
   hideActions: PropTypes.bool
 };
 

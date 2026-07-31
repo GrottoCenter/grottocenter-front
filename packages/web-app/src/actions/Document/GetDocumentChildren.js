@@ -1,6 +1,10 @@
 import fetch from 'isomorphic-fetch';
 import { getDocumentChildrenUrl } from '../../conf/apiRoutes';
 import { checkAndGetStatus } from '../utils';
+import {
+  DEFAULT_CHILDREN_SORT_ORDER,
+  sortDocumentChildren
+} from '../../utils/documentChildrenSort';
 
 export const FETCH_DOCUMENT_CHILDREN = 'FETCH_DOCUMENT_CHILDREN';
 export const FETCH_DOCUMENT_CHILDREN_SUCCESS =
@@ -16,14 +20,13 @@ export const fetchDocumentChildren =
       .then(checkAndGetStatus)
       .then(response => response.json())
       .then(data => {
-        data.documents.sort((a, b) =>
-          a.title
-            .toLowerCase()
-            .localeCompare(b.title.toLowerCase(), locale, { numeric: true })
-        );
         dispatch({
           type: FETCH_DOCUMENT_CHILDREN_SUCCESS,
-          data: data.documents
+          data: sortDocumentChildren(
+            data.documents,
+            DEFAULT_CHILDREN_SORT_ORDER,
+            locale
+          )
         });
       })
       .catch(error =>
