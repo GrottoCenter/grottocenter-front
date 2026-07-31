@@ -83,6 +83,11 @@ const DEFAULT_SELECTED_LAYERS = {
   [layerTypes.ORGANIZATIONS]: false
 };
 
+// Stable empty-array fallback for the projections selector — an inline `?? []`
+// would return a fresh reference each render and trip useSelector's Object.is
+// equality, forcing needless re-renders and a react-redux warning.
+const EMPTY_PROJECTIONS = [];
+
 const HydratedMap = ({
   entrances,
   entranceMarkers = [],
@@ -102,7 +107,7 @@ const HydratedMap = ({
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const projections = useSelector(
-    state => state.projections?.projections ?? []
+    state => state.projections?.projections ?? EMPTY_PROJECTIONS
   );
   const userId = useSelector(state => state.login.authTokenDecoded?.id ?? null);
   const [contextCoords, setContextCoords] = useState(null);
