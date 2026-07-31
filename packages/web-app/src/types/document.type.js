@@ -9,6 +9,12 @@ export const ThumbnailsPropTypes = PropTypes.shape({
   large: PropTypes.string
 });
 
+export const FilePropTypes = PropTypes.shape({
+  fileName: PropTypes.string,
+  completePath: PropTypes.string,
+  thumbnails: ThumbnailsPropTypes
+});
+
 export const DocumentSimplePropTypes = PropTypes.shape({
   id: PropTypes.number.isRequired,
   title: PropTypes.string,
@@ -28,13 +34,7 @@ export const DocumentChildPropTypes = PropTypes.shape({
   dateReviewed: PropTypes.string,
   isValidated: PropTypes.bool,
   isDeleted: PropTypes.bool,
-  files: PropTypes.arrayOf(
-    PropTypes.shape({
-      fileName: PropTypes.string,
-      completePath: PropTypes.string,
-      thumbnails: ThumbnailsPropTypes
-    })
-  )
+  files: PropTypes.arrayOf(FilePropTypes)
 });
 
 export const DocumentPropTypes = PropTypes.shape({
@@ -83,11 +83,5 @@ export const DocumentPropTypes = PropTypes.shape({
     publicationOther: PropTypes.string,
     publicationFascicule: PropTypes.string
   }),
-  files: PropTypes.arrayOf(
-    PropTypes.shape({
-      fileName: PropTypes.string,
-      completePath: PropTypes.string,
-      thumbnails: ThumbnailsPropTypes
-    })
-  )
+  files: PropTypes.arrayOf(FilePropTypes)
 });

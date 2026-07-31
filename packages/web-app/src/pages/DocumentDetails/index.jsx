@@ -596,7 +596,14 @@ const Document = ({
                         value={
                           documentData.parent ? (
                             <TextLink
-                              icon={<ParentTypeIcon fontSize="small" />}
+                              // primary, to read as one unit with the link it
+                              // labels rather than as a separate black glyph
+                              icon={
+                                <ParentTypeIcon
+                                  fontSize="small"
+                                  color="primary"
+                                />
+                              }
                               value={documentData.parent.title}
                               url={`/ui/documents/${documentData.parent.id}`}
                             />

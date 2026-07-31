@@ -20,7 +20,6 @@ import {
   TextField
 } from '@mui/material';
 
-import { styled } from '@mui/material/styles';
 import ErrorsList from './ErrorsList';
 import { useFileFormats } from '../../../../../../hooks';
 import {
@@ -41,10 +40,6 @@ import { getDocuments } from '../../../../../../actions/Document/GetDocuments';
 import { DocumentFormContext } from '../../Provider';
 
 const DEFAULT_LICENSE = 'CC-BY-SA';
-
-const LicenseLink = styled(InternationalizedLink)(({ theme }) => ({
-  color: theme.palette.primary.main
-}));
 
 const AuthDocSelect = ({ value, onChange, disabled = false }) => {
   const { formatMessage } = useIntl();
@@ -257,9 +252,9 @@ const AddFileForm = ({
                       id="license {license} applies"
                       values={{
                         license: (
-                          <LicenseLink links={licenceLinks}>
+                          <InternationalizedLink links={licenceLinks}>
                             CC-BY-SA
-                          </LicenseLink>
+                          </InternationalizedLink>
                         )
                       }}
                     />
