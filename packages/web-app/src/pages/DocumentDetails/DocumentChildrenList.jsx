@@ -27,10 +27,7 @@ import {
   DOCUMENT_TYPE_ICONS,
   DOCUMENT_TYPE_FALLBACK_ICON
 } from '@/utils/documentTypeHelpers';
-import {
-  getChildLabel,
-  getPublicationYear
-} from '@/utils/documentChildrenLabel';
+import { getChildDisplay } from '@/utils/documentChildrenLabel';
 import { DocumentChildPropTypes } from '@/types/document.type';
 
 /* -------------------------------------------------------------------------- */
@@ -255,10 +252,10 @@ ChildrenSectionHeader.propTypes = {
 /* -------------------------------------------------------------------------- */
 
 // A shelf of volumes. The issue designation leads — it is what identifies the
-// item — and the publication year sits under it as the chronological anchor.
-// Both come from data: the year from datePublication, the designation from the
-// title stripped of everything already displayed around it. Tiles reflow from 2
-// columns on a phone to 5 on a wide screen without any breakpoint.
+// item — with the date underneath as the chronological anchor. Both are derived
+// by getChildDisplay, which also decides when the date would merely repeat the
+// designation. Tiles reflow from 2 columns on a phone to 5 on a wide screen
+// without any breakpoint.
 const TilesGrid = styled('div')(({ theme }) => ({
   display: 'grid',
   gridTemplateColumns: 'repeat(auto-fill, minmax(230px, 1fr))',
@@ -326,9 +323,9 @@ const TileLabel = styled('span', {
   color: theme.palette.primary.main
 }));
 
-// Kept a clear step below the designation and in a muted tone: the year is the
+// Kept a clear step below the designation and in a muted tone: the date is the
 // chronological anchor, not the identity of the issue.
-const TileYear = styled('span')(({ theme }) => ({
+const TileDate = styled('span')(({ theme }) => ({
   fontSize: '1.7rem',
   lineHeight: 1.2,
   color: theme.palette.text.secondary
@@ -355,9 +352,8 @@ const TileAvailabilityCorner = styled(TileCorner)(({ theme }) => ({
   insetInlineEnd: theme.spacing(0.5)
 }));
 
-const DocumentTile = ({ doc, label, labelTier }) => {
+const DocumentTile = ({ doc, display, labelTier }) => {
   const fileName = getAttachedFileName(doc);
-  const year = getPublicationYear(doc.datePublication);
   const tooltip = [doc.title, hasOwnDescription(doc) ? doc.description : null]
     .filter(Boolean)
     .join(' — ');
@@ -380,9 +376,9 @@ const DocumentTile = ({ doc, label, labelTier }) => {
           $fontSize={labelTier.fontSize}
           $lineClamp={labelTier.lineClamp}
         >
-          {label}
+          {display.primary}
         </TileLabel>
-        <TileYear>{year ?? '—'}</TileYear>
+        {display.secondary && <TileDate>{display.secondary}</TileDate>}
       </Tile>
     </Tooltip>
   );
@@ -390,7 +386,10 @@ const DocumentTile = ({ doc, label, labelTier }) => {
 
 DocumentTile.propTypes = {
   doc: DocumentChildPropTypes.isRequired,
-  label: PropTypes.string,
+  display: PropTypes.shape({
+    primary: PropTypes.string.isRequired,
+    secondary: PropTypes.string
+  }).isRequired,
   labelTier: PropTypes.shape({
     fontSize: PropTypes.string.isRequired,
     lineClamp: PropTypes.number.isRequired
@@ -398,29 +397,29 @@ DocumentTile.propTypes = {
 };
 
 export const DocumentChildrenTiles = ({ documents, collectionTitle }) => {
-  // Labels are resolved here rather than inside each tile, because the type size
-  // has to be decided from the whole set before any tile renders.
+  // Resolved here rather than inside each tile, because the type size has to be
+  // decided from the whole set before any tile renders.
   const items = useMemo(
     () =>
       (documents ?? []).map(doc => ({
         doc,
-        label: getChildLabel(doc, collectionTitle)
+        display: getChildDisplay(doc, collectionTitle)
       })),
     [documents, collectionTitle]
   );
   const labelTier = useMemo(
-    () => getLabelTier(items.map(item => item.label)),
+    () => getLabelTier(items.map(item => item.display.primary)),
     [items]
   );
 
   if (items.length === 0) return null;
   return (
     <TilesGrid>
-      {items.map(({ doc, label }) => (
+      {items.map(({ doc, display }) => (
         <DocumentTile
           key={doc.id}
           doc={doc}
-          label={label}
+          display={display}
           labelTier={labelTier}
         />
       ))}

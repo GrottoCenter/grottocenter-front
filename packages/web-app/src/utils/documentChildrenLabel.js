@@ -1,7 +1,14 @@
-// Compare words while ignoring case and surrounding punctuation, so that
-// "Scialet" and "Scialet:" are recognised as the same word.
+// Words are compared ignoring case and surrounding punctuation, so "Scialet"
+// and "Scialet:" count as the same word.
 const normalizeWord = word =>
   word.toLowerCase().replace(/^[^\p{L}\p{N}]+|[^\p{L}\p{N}]+$/gu, '');
+
+const collapse = value => value.trim().toLowerCase().replace(/\s+/g, ' ');
+
+// Separators only — never a closing bracket, and never a full stop, which is
+// part of abbreviations such as "janv." or "Vol.".
+const trimSeparators = value =>
+  value.replace(/^[\s\-–—:;,/|]+|[\s\-–—:;,/|]+$/g, '');
 
 // datePublication is a truncated ISO string ("2011", "2011-06", "2011-06-15").
 export const getPublicationYear = datePublication => {
@@ -11,18 +18,23 @@ export const getPublicationYear = datePublication => {
 
 /**
  * Label of a child document shown inside its collection: its title, minus the
- * parts already displayed around it.
+ * leading words already displayed in the collection's own heading.
  *
- * Strictly subtractive and self-limiting — it only removes text that is proven
- * redundant, never parsed or guessed:
- *  - a leading run of words that is also the start of the collection title
- *    (i.e. words already displayed in the page heading);
- *  - a trailing year equal to the child's own datePublication, which the tile
- *    displays on its own line.
+ * Strictly subtractive and self-limiting. The only thing it removes is a run of
+ * leading words that is also the start of the collection title — text the reader
+ * has in front of them anyway — plus punctuation that run leaves behind. A title
+ * that does not follow the collection's pattern shares no leading word and comes
+ * back untouched, and the last word is never removed, so the label can never end
+ * up empty.
  *
- * A title that does not follow the collection's pattern shares no leading word
- * and comes back untouched, and the last word is never removed — so the label
- * can never end up empty.
+ * It deliberately does NOT strip a trailing year. Doing so looked harmless and
+ * was measured against 6148 real issues: it cut "(Jan.-Mar. 2005)" down to
+ * "(Jan.-Mar." leaving an unbalanced bracket, left orphan ":" and "–" behind,
+ * and — worst — collapsed "Monthly Newsletter - February 1996" and
+ * "… February 1993" onto the same label, making two different issues
+ * indistinguishable. In a date, the year is what identifies the issue; it is
+ * removed from the *display* by getChildDisplay only when something else on the
+ * tile already states it.
  */
 export const getChildLabel = (doc, collectionTitle) => {
   const title = (doc?.title ?? '').trim();
@@ -43,13 +55,49 @@ export const getChildLabel = (doc, collectionTitle) => {
   const words = titleWords.slice(start);
 
   // Removing the shared prefix often exposes the separator that followed it
-  // ("Bulletin 1960 - SMSP" -> "- SMSP"). Drop leading words made only of
-  // punctuation, never the last one.
+  // ("Bulletin 1960 - SMSP" -> "- SMSP"). Drop leading punctuation-only words,
+  // never the last one.
   while (words.length > 1 && normalizeWord(words[0]) === '') words.shift();
 
-  const year = getPublicationYear(doc?.datePublication);
-  if (year && words.length > 1 && normalizeWord(words.at(-1)) === year)
-    words.pop();
+  const label = trimSeparators(words.join(' '));
+  return label === '' ? title : label;
+};
 
-  return words.join(' ');
+// A trailing bracketed group is treated as a date qualifier only when it carries
+// a 4-digit year: "No 105 (Mars 2019)", "No 47 (2018)". Groups without one are
+// part of the name and stay put — "SMSP (Société Méridionale de Spéléologie)" is
+// not a date. This test is on the group's own content, so it works even when the
+// document has no datePublication of its own.
+const TRAILING_GROUP = /\s*[([]([^()[\]]*)[)\]]\s*$/;
+
+export const splitDateQualifier = label => {
+  const match = TRAILING_GROUP.exec(label);
+  if (!match) return { primary: label, secondary: null };
+
+  const inner = match[1].trim();
+  if (!/\d{4}/.test(inner)) return { primary: label, secondary: null };
+
+  const primary = trimSeparators(label.slice(0, match.index));
+  // A title that is nothing but a date keeps it as its label.
+  if (primary === '') return { primary: label, secondary: null };
+
+  return { primary, secondary: inner };
+};
+
+/**
+ * The two lines a tile shows: the issue designation, and the date underneath.
+ *
+ * The date comes from the title's own qualifier when it has one — "Mars 2019"
+ * is more informative than the bare year — and falls back to datePublication.
+ * It is dropped when the designation already states it, so a title that is
+ * itself a date ("Speleofotografia 2012" -> "2012") is not printed twice.
+ */
+export const getChildDisplay = (doc, collectionTitle) => {
+  const { primary, secondary } = splitDateQualifier(
+    getChildLabel(doc, collectionTitle)
+  );
+  const candidate = secondary ?? getPublicationYear(doc?.datePublication);
+  const isRedundant =
+    candidate !== null && collapse(primary).includes(collapse(candidate));
+  return { primary, secondary: isRedundant ? null : candidate };
 };
