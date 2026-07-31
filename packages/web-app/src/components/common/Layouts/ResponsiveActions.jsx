@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import {
+  Box,
   Button,
   ButtonGroup,
   ClickAwayListener,
@@ -33,19 +34,86 @@ const ResponsiveActions = ({ items }) => {
       <Button
         color={color || 'primary'}
         onClick={onClick}
-        {...(href ? { component: AppLink, to: href, target, rel: 'noopener noreferrer' } : {})}>
+        {...(href
+          ? { component: AppLink, to: href, target, rel: 'noopener noreferrer' }
+          : {})}
+      >
         {icon}
       </Button>
     </Tooltip>
   );
 
+  // An item marked `destructive` is set apart from the routine actions, so the
+  // trash never sits one pixel from "print" or "page history". Handled here
+  // rather than by each caller inserting a separator: six pages build their own
+  // items array, and a rule that has to be repeated six times is a rule that
+  // gets forgotten. An explicit `divider` item still forces a break.
+  const startsNewGroup = (item, previous) => {
+    if (!previous || previous.divider) return false;
+    return Boolean(previous.destructive) !== Boolean(item.destructive);
+  };
+
   if (isDesktop) {
+    const groups = [[]];
+    visibleItems.forEach((item, index) => {
+      if (item.divider) {
+        groups.push([]);
+        return;
+      }
+      if (startsNewGroup(item, visibleItems[index - 1])) groups.push([]);
+      groups[groups.length - 1].push(item);
+    });
+
     return (
-      <ButtonGroup color="primary">
-        {visibleItems.map(renderButton)}
-      </ButtonGroup>
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+        {groups
+          .filter(group => group.length > 0)
+          .map(group => (
+            <ButtonGroup key={group[0].key} color="primary">
+              {group.map(renderButton)}
+            </ButtonGroup>
+          ))}
+      </Box>
     );
   }
+
+  // Built as a flat array rather than with Fragments: MenuList inspects its
+  // children to drive keyboard focus, and wrapping items would break that.
+  const menuEntries = [];
+  visibleItems.forEach((item, index) => {
+    if (item.divider) {
+      menuEntries.push(<Divider key={`divider-${index}`} />);
+      return;
+    }
+    if (startsNewGroup(item, visibleItems[index - 1]))
+      menuEntries.push(<Divider key={`divider-before-${item.key}`} />);
+    const { key, icon, label, onClick, href, target, color } = item;
+    const colorSx =
+      color === 'secondary' || color === 'success'
+        ? { color: `${color}.main` }
+        : {};
+    menuEntries.push(
+      <MenuItem
+        key={key}
+        onClick={() => {
+          onClick?.();
+          closeMenu();
+        }}
+        sx={colorSx}
+        {...(href
+          ? {
+              component: AppLink,
+              to: href,
+              target,
+              rel: 'noopener noreferrer'
+            }
+          : {})}
+      >
+        <ListItemIcon sx={colorSx}>{icon}</ListItemIcon>
+        <ListItemText>{label}</ListItemText>
+      </MenuItem>
+    );
+  });
 
   return (
     <>
@@ -54,7 +122,8 @@ const ResponsiveActions = ({ items }) => {
           aria-label="actions"
           aria-haspopup="true"
           aria-expanded={Boolean(anchorEl)}
-          onClick={e => setAnchorEl(anchorEl ? null : e.currentTarget)}>
+          onClick={e => setAnchorEl(anchorEl ? null : e.currentTarget)}
+        >
           <MoreVertIcon />
         </Button>
       </ButtonGroup>
@@ -62,37 +131,17 @@ const ResponsiveActions = ({ items }) => {
         open={Boolean(anchorEl)}
         anchorEl={anchorEl}
         placement="bottom-end"
-        sx={{ zIndex: theme.zIndex.tooltip }}>
+        sx={{ zIndex: theme.zIndex.tooltip }}
+      >
         <Paper elevation={3}>
           <ClickAwayListener onClickAway={closeMenu}>
             <MenuList
               autoFocusItem={Boolean(anchorEl)}
               onKeyDown={e => {
                 if (e.key === 'Escape') closeMenu();
-              }}>
-              {visibleItems.map((item, index) => {
-                if (item.divider) return <Divider key={`d-${index}`} />;
-                const { key, icon, label, onClick, href, target, color } = item;
-                const colorSx =
-                  color === 'secondary' || color === 'success'
-                    ? { color: `${color}.main` }
-                    : {};
-                return (
-                  <MenuItem
-                    key={key}
-                    onClick={() => {
-                      onClick?.();
-                      closeMenu();
-                    }}
-                    sx={colorSx}
-                    {...(href
-                      ? { component: AppLink, to: href, target, rel: 'noopener noreferrer' }
-                      : {})}>
-                    <ListItemIcon sx={colorSx}>{icon}</ListItemIcon>
-                    <ListItemText>{label}</ListItemText>
-                  </MenuItem>
-                );
-              })}
+              }}
+            >
+              {menuEntries}
             </MenuList>
           </ClickAwayListener>
         </Paper>
@@ -106,12 +155,16 @@ ResponsiveActions.propTypes = {
     PropTypes.shape({
       key: PropTypes.string.isRequired,
       icon: PropTypes.node,
-      label: PropTypes.string.isRequired,
+      // Required for actions; a `divider` item carries only `key` and `divider`.
+      label: PropTypes.string,
       onClick: PropTypes.func,
       href: PropTypes.string,
       target: PropTypes.string,
       color: PropTypes.string,
       hidden: PropTypes.bool,
+      // Sets the item apart from the routine actions (separate ButtonGroup on
+      // desktop, divider in the popup menu). For delete and the like.
+      destructive: PropTypes.bool,
       divider: PropTypes.bool
     })
   )

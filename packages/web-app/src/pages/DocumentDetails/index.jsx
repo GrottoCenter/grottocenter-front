@@ -44,6 +44,7 @@ import {
   DEFAULT_CHILDREN_SORT_ORDER,
   sortDocumentChildren
 } from '@/utils/documentChildrenSort';
+import { getPublicationYear } from '@/utils/documentChildrenLabel';
 import { fetchDocumentDetails } from '../../actions/Document/GetDocumentDetails';
 import { fetchDocumentChildren } from '../../actions/Document/GetDocumentChildren';
 import { deleteDocument } from '../../actions/Document/DeleteDocument';
@@ -275,6 +276,23 @@ const Document = ({
     [documentChildren]
   );
 
+  // Holdings statement: the span the run actually covers. In library practice
+  // this is the central descriptive element of a serial, and it was missing
+  // entirely. Derived from the issues' datePublication, so it is present and
+  // accurate for every collection — unlike the sentence curators sometimes type
+  // into the description by hand. Years are 4-character strings, so comparing
+  // them as text orders them correctly.
+  const issuesYearRange = useMemo(() => {
+    const years = childIssues
+      .map(doc => getPublicationYear(doc.datePublication))
+      .filter(Boolean);
+    if (years.length === 0) return null;
+    return {
+      start: years.reduce((min, year) => (year < min ? year : min)),
+      end: years.reduce((max, year) => (year > max ? year : max))
+    };
+  }, [childIssues]);
+
   const linkedEntities = useMemo(() => {
     if (!documentData) return [];
     return [
@@ -351,6 +369,23 @@ const Document = ({
     </Breadcrumbs>
   ) : null;
 
+  // A collection is the root of its hierarchy, so its subheader slot is free for
+  // the holdings statement. If one ever does have a parent, navigation wins.
+  const coverage =
+    isCollection(docType) && issuesYearRange ? (
+      <Typography variant="body1" color="textSecondary">
+        {formatMessage(
+          {
+            id:
+              issuesYearRange.start === issuesYearRange.end
+                ? 'Published in {year}'
+                : 'Published from {start} to {end}'
+          },
+          { ...issuesYearRange, year: issuesYearRange.start }
+        )}
+      </Typography>
+    ) : null;
+
   const actions = hideActions ? null : (
     <ResponsiveActions
       items={[
@@ -379,7 +414,8 @@ const Document = ({
           icon: <DeleteIcon />,
           label: formatMessage({ id: 'Delete' }),
           onClick: onDelete,
-          hidden: !onDelete
+          hidden: !onDelete,
+          destructive: true
         }
       ]}
     />
@@ -390,7 +426,7 @@ const Document = ({
       <PageHeader
         title={documentData?.title ?? (isLoading ? undefined : '')}
         icon={<CustomIcon type="bibliography" />}
-        subheader={breadcrumb}
+        subheader={breadcrumb ?? coverage}
         actions={actions}
       />
       <DeleteConfirmationDialog
@@ -472,7 +508,11 @@ const Document = ({
                       <Box>
                         <ChildrenSectionHeader
                           title={
-                            <Typography variant="h5">
+                            // h2 in secondary, exactly like ScrollableContent's
+                            // own titles: this is a section heading among its
+                            // peers, and h5 under the page's h1 skipped three
+                            // levels for no reason.
+                            <Typography variant="h2" color="secondary">
                               {formatMessage({ id: 'Issues' })}
                               <Chip
                                 label={childIssues.length}
@@ -662,7 +702,10 @@ const Document = ({
                       />
                       <DetailItem
                         fullWidth
-                        label={formatMessage({ id: 'Regions' })}
+                        // Not "Regions": the field is iso3166 and most often
+                        // holds a country. "Regions" stays in use elsewhere for
+                        // actual region lists.
+                        label={formatMessage({ id: 'Geographic coverage' })}
                         value={
                           documentData.iso3166?.length
                             ? documentData.iso3166

@@ -169,7 +169,8 @@ const Organization = ({ error, isLoading, organization }) => {
           icon: <DeleteIcon />,
           label: formatMessage({ id: 'Delete' }),
           onClick: onDelete,
-          hidden: !onDelete
+          hidden: !onDelete,
+          destructive: true
         }
       ]}
     />
@@ -188,13 +189,15 @@ const Organization = ({ error, isLoading, organization }) => {
         }
         alignItems="center"
         flexWrap="wrap"
-        sx={{ fontSize: { xs: '1.2rem', md: '1.7rem' } }}>
+        sx={{ fontSize: { xs: '1.2rem', md: '1.7rem' } }}
+      >
         {organization.country && (
           <AppLink
             to={`/ui/countries/${organization.country}`}
             underline="hover"
             color="inherit"
-            sx={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+            sx={{ display: 'flex', alignItems: 'center', gap: '4px' }}
+          >
             <CustomIcon type="country" size={16} />
             {organization.country}
           </AppLink>
@@ -202,7 +205,8 @@ const Organization = ({ error, isLoading, organization }) => {
         {organization.yearBirth && (
           <Typography
             component="span"
-            sx={{ fontSize: 'inherit', color: 'inherit' }}>
+            sx={{ fontSize: 'inherit', color: 'inherit' }}
+          >
             {`${formatMessage({ id: 'Since' })} ${organization.yearBirth}`}
           </Typography>
         )}
@@ -211,7 +215,8 @@ const Organization = ({ error, isLoading, organization }) => {
             <HandshakeIcon sx={{ fontSize: 'inherit' }} />
             <Typography
               component="span"
-              sx={{ fontSize: 'inherit', color: 'inherit' }}>
+              sx={{ fontSize: 'inherit', color: 'inherit' }}
+            >
               {formatMessage({ id: 'Official partner' })}
             </Typography>
           </Box>
@@ -273,13 +278,21 @@ const Organization = ({ error, isLoading, organization }) => {
               onDeletePress(entity?.id, isDeleteConfirmationPermanent);
             }}
           />
-          <ScrollableContent content={<Details organization={organization} />} />
-          {(organization?.countries?.length > 0 || organization?.regions?.length > 0 || organization?.massifs?.length > 0) && (
+          <ScrollableContent
+            content={<Details organization={organization} />}
+          />
+          {(organization?.countries?.length > 0 ||
+            organization?.regions?.length > 0 ||
+            organization?.massifs?.length > 0) && (
             <ScrollableContent
               anchorId="managed-entities"
               title={formatMessage({ id: 'Managed entities' })}
               defaultExpanded
-              count={(organization?.countries?.length || 0) + (organization?.regions?.length || 0) + (organization?.massifs?.length || 0)}
+              count={
+                (organization?.countries?.length || 0) +
+                (organization?.regions?.length || 0) +
+                (organization?.massifs?.length || 0)
+              }
               content={<ManagedEntitiesSection organization={organization} />}
             />
           )}
@@ -293,7 +306,8 @@ const Organization = ({ error, isLoading, organization }) => {
                 <Tooltip
                   title={formatMessage({
                     id: isMember ? 'Leave organization' : 'Join organization'
-                  })}>
+                  })}
+                >
                   <Button
                     variant="outlined"
                     color="primary"
@@ -302,10 +316,12 @@ const Organization = ({ error, isLoading, organization }) => {
                     startIcon={
                       isMember ? <PersonRemoveIcon /> : <PersonAddIcon />
                     }
-                    sx={{ minWidth: 0 }}>
+                    sx={{ minWidth: 0 }}
+                  >
                     <Box
                       component="span"
-                      sx={{ display: { xs: 'none', sm: 'inline' } }}>
+                      sx={{ display: { xs: 'none', sm: 'inline' } }}
+                    >
                       {isMember
                         ? formatMessage({ id: 'Leave organization' })
                         : formatMessage({ id: 'Join organization' })}
@@ -366,15 +382,19 @@ const Organization = ({ error, isLoading, organization }) => {
               canManageCaves && (
                 <Tooltip
                   title={formatMessage({
-                    id: isCaveSearchVisible ? 'Cancel this search' : 'Add a cave'
-                  })}>
+                    id: isCaveSearchVisible
+                      ? 'Cancel this search'
+                      : 'Add a cave'
+                  })}
+                >
                   <Button
                     color={isCaveSearchVisible ? 'inherit' : 'secondary'}
                     variant="outlined"
                     onClick={() => setIsCaveSearchVisible(v => !v)}
                     startIcon={
                       isCaveSearchVisible ? <CancelIcon /> : <AddCircleIcon />
-                    }>
+                    }
+                  >
                     {formatMessage({
                       id: isCaveSearchVisible ? 'Cancel' : 'Add'
                     })}
@@ -407,18 +427,21 @@ const Organization = ({ error, isLoading, organization }) => {
           <>
             <Button
               onClick={() => setPendingRemoveMember(null)}
-              variant="outlined">
+              variant="outlined"
+            >
               {formatMessage({ id: 'Cancel' })}
             </Button>
             <Button
               onClick={handleConfirmRemoveMember}
               variant="contained"
               color="error"
-              autoFocus>
+              autoFocus
+            >
               {formatMessage({ id: 'Remove' })}
             </Button>
           </>
-        }>
+        }
+      >
         {formatMessage(
           {
             id: 'Are you sure you want to remove {name} from this organization?'
