@@ -22,6 +22,11 @@ jobs:
     permissions:
       # Required so the workflow can create the GitHub Release (and its tag on dispatch).
       contents: write
+    defaults:
+      run:
+        # The Bubblewrap project lives in twa/. All `run` steps execute there, so
+        # the keystore, manifest and build outputs stay scoped to that folder.
+        working-directory: twa
 
     steps:
       - name: Checkout repository
@@ -94,9 +99,10 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: grottocenter-twa-${{ steps.version.outputs.name }}-v${{ steps.version.outputs.code }}
+          # uses-step paths are relative to the repo root, not working-directory.
           path: |
-            *.aab
-            *.apk
+            twa/*.aab
+            twa/*.apk
           if-no-files-found: warn
           retention-days: 30
 
@@ -108,9 +114,10 @@ jobs:
           tag_name: v${{ steps.version.outputs.name }}
           name: GrottoCenter TWA v${{ steps.version.outputs.name }} (build ${{ steps.version.outputs.code }})
           generate_release_notes: true
+          # files are relative to the repo root, not working-directory.
           files: |
-            *.aab
-            *.apk
+            twa/*.aab
+            twa/*.apk
 
       - name: Clean up keystore
         if: always()

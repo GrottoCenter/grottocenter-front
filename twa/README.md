@@ -21,7 +21,7 @@ Browser / TWA  ──▶  https://grottocenter.org  (PWA: manifest.json + servic
         (ownership proof)       │                                    is allowed to open
                                 ▼                                    the domain full-screen
                           Android TWA (.aab)
-                          built from twa-manifest.json by Bubblewrap
+                          built from twa/twa-manifest.json by Bubblewrap
 ```
 
 For the verification to succeed (no Chrome URL bar inside the app), the SHA-256
@@ -30,15 +30,15 @@ installed APK.
 
 ### Files involved
 
-| File | Role | Tracked in git? |
-| --- | --- | --- |
-| `packages/web-app/vite.config.mjs` | `VitePWA` plugin: service worker + web manifest | ✅ |
-| `packages/web-app/public/.well-known/assetlinks.json` | Digital Asset Links (ownership proof) | ✅ (placeholders) |
-| `staticwebapp.config.json` | Azure headers/routing for `sw.js` and `assetlinks.json` | ✅ |
-| `twa-manifest.json` (repo root) | Bubblewrap config for the Android app | ✅ |
-| `.github/workflows/twa-build.yml` | CI that builds the signed `.aab` | ✅ |
-| `android.keystore` | **Upload signing key — SECRET** | ❌ (gitignored) |
-| `*.aab` / `*.apk`, `.gradle/`, `app/build/` | Build artifacts | ❌ (gitignored) |
+| File                                                  | Role                                                    | Tracked in git?   |
+| ----------------------------------------------------- | ------------------------------------------------------- | ----------------- |
+| `packages/web-app/vite.config.mjs`                    | `VitePWA` plugin: service worker + web manifest         | ✅                |
+| `packages/web-app/public/.well-known/assetlinks.json` | Digital Asset Links (ownership proof)                   | ✅ (placeholders) |
+| `staticwebapp.config.json`                            | Azure headers/routing for `sw.js` and `assetlinks.json` | ✅                |
+| `twa/twa-manifest.json`                               | Bubblewrap config for the Android app                   | ✅                |
+| `.github/workflows/twa-build.yml`                     | CI that builds the signed `.aab`                        | ✅                |
+| `android.keystore`                                    | **Upload signing key — SECRET**                         | ❌ (gitignored)   |
+| `*.aab` / `*.apk`, `.gradle/`, `app/build/`           | Build artifacts                                         | ❌ (gitignored)   |
 
 ---
 
@@ -61,9 +61,9 @@ produces) **uses Play App Signing by default**. Google generates and holds the r
 Consequence: there are **two** certificates, and `assetlinks.json` needs **both**
 fingerprints:
 
-| `assetlinks.json` placeholder | Comes from | Available when |
-| --- | --- | --- |
-| `REPLACE_WITH_UPLOAD_KEY_SHA256` | your `android.keystore` (`keytool`) | as soon as the keystore exists |
+| `assetlinks.json` placeholder          | Comes from                                                                   | Available when                      |
+| -------------------------------------- | ---------------------------------------------------------------------------- | ----------------------------------- |
+| `REPLACE_WITH_UPLOAD_KEY_SHA256`       | your `android.keystore` (`keytool`)                                          | as soon as the keystore exists      |
 | `REPLACE_WITH_PLAY_APP_SIGNING_SHA256` | Play Console → app → **Setup → App integrity → App signing key certificate** | only **after** the first AAB upload |
 
 > ⚠️ If `REPLACE_WITH_PLAY_APP_SIGNING_SHA256` is missing, the app installed from the
@@ -74,12 +74,17 @@ fingerprints:
 
 ## Step-by-step setup
 
+> The whole Bubblewrap project lives in **`twa/`** (`twa/twa-manifest.json` is the
+> only committed file; the generated Android project is gitignored). Run all
+> `bubblewrap` and `keytool` commands so that `android.keystore` ends up in `twa/`,
+> next to the manifest (its `signingKey.path` is `./android.keystore`).
+
 ### 1. Generate the upload keystore (do this **once**, keep it forever)
 
-The alias **must** be `grottocenter` (it is referenced in `twa-manifest.json`).
+The alias **must** be `grottocenter` (it is referenced in `twa/twa-manifest.json`).
 
 ```bash
-keytool -genkeypair -v -keystore android.keystore -alias grottocenter \
+keytool -genkeypair -v -keystore twa/android.keystore -alias grottocenter \
   -keyalg RSA -keysize 2048 -validity 9125
 ```
 
@@ -90,7 +95,7 @@ keytool -genkeypair -v -keystore android.keystore -alias grottocenter \
 ### 2. Get the upload key fingerprint and fill it in
 
 ```bash
-keytool -list -v -keystore android.keystore -alias grottocenter
+keytool -list -v -keystore twa/android.keystore -alias grottocenter
 ```
 
 Copy the `SHA256:` value into:
@@ -102,11 +107,11 @@ Copy the `SHA256:` value into:
 
 In **Settings → Secrets and variables → Actions**, create:
 
-| Secret | Value |
-| --- | --- |
-| `ANDROID_KEYSTORE_BASE64` | `base64 -w0 android.keystore` (the whole file, base64-encoded) |
-| `ANDROID_KEYSTORE_PASSWORD` | the keystore password chosen in step 1 |
-| `ANDROID_KEY_PASSWORD` | the key password chosen in step 1 |
+| Secret                      | Value                                                                                                                                                          |
+| --------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `ANDROID_KEYSTORE_BASE64`   | `base64 -w0 twa/android.keystore` on Linux or `[Convert]::ToBase64String([IO.File]::ReadAllBytes("twa/android.keystore"))` on Windows (the whole file, base64-encoded) |
+| `ANDROID_KEYSTORE_PASSWORD` | the keystore password chosen in step 1                                                                                                                         |
+| `ANDROID_KEY_PASSWORD`      | the key password chosen in step 1                                                                                                                              |
 
 > GitHub secrets are **write-only**: they cannot be read back, even by admins. They
 > are for CI only, not a way to share the keystore with humans.
@@ -133,7 +138,7 @@ The workflow signs with your upload key, then:
 2. publishes a **GitHub Release** `vX.Y.Z` with the `.aab`/`.apk` attached — this is
    the **permanent, versioned archive** of each build.
 
-(Local alternative: `bubblewrap build` from the repo root.)
+(Local alternative: `cd twa && bubblewrap build`.)
 
 > The signed AAB ultimately lives in two durable places: the **GitHub Release**
 > (archive) and, after upload, the **Play Console** (source of truth for
@@ -151,7 +156,7 @@ certificate** SHA-256 into:
 
 - `packages/web-app/public/.well-known/assetlinks.json` →
   replace `REPLACE_WITH_PLAY_APP_SIGNING_SHA256`
-- `twa-manifest.json` → `fingerprints[0].value`
+- `twa/twa-manifest.json` → `fingerprints[0].value`
   (replace `REPLACE_WITH_YOUR_SHA256_FINGERPRINT`)
 
 **Deploy the website** so the updated `assetlinks.json` is live **before** promoting
@@ -172,11 +177,11 @@ Once a test install opens **without a URL bar** (see
 
 The AAB is a shell; the content is served from the web.
 
-| Change | Action |
-| --- | --- |
-| Content, features, UI fixes, data, translations… | **Deploy the website** (push to `develop`). Users get it immediately, **no Play Store release**. |
-| App icon, name, `packageId`, chrome colors, `minSdkVersion`, native permissions | **Rebuild the AAB** (run the workflow with a higher `version_code`) and republish. |
-| Keystore rotation | Rebuild the AAB **and** update `assetlinks.json` fingerprints, then redeploy the web. |
+| Change                                                                          | Action                                                                                           |
+| ------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| Content, features, UI fixes, data, translations…                                | **Deploy the website** (push to `develop`). Users get it immediately, **no Play Store release**. |
+| App icon, name, `packageId`, chrome colors, `minSdkVersion`, native permissions | **Rebuild the AAB** (run the workflow with a higher `version_code`) and republish.               |
+| Keystore rotation                                                               | Rebuild the AAB **and** update `assetlinks.json` fingerprints, then redeploy the web.            |
 
 > In practice, after the first release the AAB is rebuilt **rarely**. That is the
 > main advantage of the TWA model for a small open-source team.
@@ -219,11 +224,11 @@ exact host `grottocenter.org`.
 
 Three distinct things, three different channels:
 
-| Item | For | Channel |
-| --- | --- | --- |
-| `android.keystore` (file) | trusted humans | shared **secrets manager** |
-| Keystore / key passwords | trusted humans | same secrets manager |
-| `ANDROID_*` GitHub secrets | CI only | GitHub Actions secrets (write-only) |
+| Item                       | For            | Channel                             |
+| -------------------------- | -------------- | ----------------------------------- |
+| `android.keystore` (file)  | trusted humans | shared **secrets manager**          |
+| Keystore / key passwords   | trusted humans | same secrets manager                |
+| `ANDROID_*` GitHub secrets | CI only        | GitHub Actions secrets (write-only) |
 
 Recommended secrets manager (pick one):
 
