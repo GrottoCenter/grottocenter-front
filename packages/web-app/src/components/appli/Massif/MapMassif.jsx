@@ -1,13 +1,13 @@
-import React, { useCallback, useEffect, useMemo, useRef } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import { GeoJSON, useMap, useMapEvent } from 'react-leaflet';
 import PropTypes from 'prop-types';
 import L from 'leaflet';
 
 import CustomMapContainer from '../../common/Maps/common/MapContainer';
-import useHeatLayer, {
-  HexGlobalCss
-} from '../../common/Maps/MapClusters/useHeatLayer';
+import ClusterLayer, {
+  ClusterGlobalCss
+} from '../../common/Maps/MapClusters/ClusterLayer';
 import useMarkers, {
   MarkerGlobalCss
 } from '../../common/Maps/common/Markers/useMarkers';
@@ -43,7 +43,6 @@ const MassifPolygonPane = () => {
 
 const MapInternals = ({ geoJson, massifId }) => {
   const map = useMap();
-  const { updateLayers } = useHeatLayer();
 
   const updateEntranceMarkers = useMarkers({
     circleMarkerStyle: getEntranceCircleStyle,
@@ -51,13 +50,18 @@ const MapInternals = ({ geoJson, massifId }) => {
     tooltipContent: entranceTip
   });
 
-  // Refs to latest updaters — keeps fetchMarkers free of their unstable identities.
-  const updateLayersRef = useRef(updateLayers);
-  updateLayersRef.current = updateLayers;
+  // Coordinates for the cluster layer. State (not ref) so ClusterLayer's
+  // supercluster index rebuilds when the fetch lands.
+  const [entranceCoordinates, setEntranceCoordinates] = useState([]);
+  // Toggle between cluster view (low zoom) and real marker view (high zoom).
+  const [showClusters, setShowClusters] = useState(
+    map.getZoom() < MARKERS_LIMIT
+  );
+
+  // Ref to latest marker updater — keeps fetchMarkers free of its unstable identity.
   const markersRef = useRef(updateEntranceMarkers);
   markersRef.current = updateEntranceMarkers;
 
-  const heatCoordinatesRef = useRef([]);
   const abortRef = useRef(null);
 
   useEffect(
@@ -70,16 +74,17 @@ const MapInternals = ({ geoJson, massifId }) => {
   // Computed once; both the heat fetch and fitBounds need it.
   const massifBounds = useMemo(() => L.geoJSON(geoJson).getBounds(), [geoJson]);
 
-  // moveend: at high zoom fetch viewport markers; at low zoom restore heatmap from cache.
+  // moveend: at high zoom fetch viewport markers; at low zoom the cluster layer
+  // (fed by `entranceCoordinates` state) takes over via the JSX.
   const fetchMarkers = useCallback(() => {
     const zoom = map.getZoom();
     if (zoom < MARKERS_LIMIT) {
       markersRef.current(null);
-      updateLayersRef.current({ entrances: heatCoordinatesRef.current }, ['entrances']);
+      setShowClusters(true);
       return;
     }
 
-    updateLayersRef.current({}, []);
+    setShowClusters(false);
 
     if (abortRef.current) abortRef.current.abort();
     abortRef.current = new AbortController();
@@ -143,7 +148,7 @@ const MapInternals = ({ geoJson, massifId }) => {
       .then(r => (r.ok ? r.json() : []))
       .then(data => {
         if (!Array.isArray(data)) return;
-        heatCoordinatesRef.current = data;
+        setEntranceCoordinates(data);
         fetchMarkersRef.current();
       })
       .catch(() => {});
@@ -178,8 +183,13 @@ const MapInternals = ({ geoJson, massifId }) => {
 
   return (
     <>
-      {HexGlobalCss}
+      {ClusterGlobalCss}
       {MarkerGlobalCss}
+      <ClusterLayer
+        data={entranceCoordinates}
+        type="entrance"
+        enabled={showClusters}
+      />
     </>
   );
 };

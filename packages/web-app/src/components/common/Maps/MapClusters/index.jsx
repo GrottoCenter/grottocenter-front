@@ -46,7 +46,7 @@ import { displayLoginDialog } from '../../../../actions/Login';
 import { EntityIcon } from '../../../../pages/EntityCreation/entityConfig';
 import CRSMenu from '../../CRSMenu';
 import MeasureControl from '../common/MeasureControl';
-import useHeatLayer, { HexGlobalCss } from './useHeatLayer';
+import ClusterLayer, { ClusterGlobalCss } from './ClusterLayer';
 import Markers from './Markers';
 import MassifPolygons, { massifPolygonType } from './MassifPolygons';
 import ExploredOverlay from './ExploredOverlay';
@@ -96,7 +96,6 @@ const HydratedMap = ({
   const [formatMenuAnchor, setFormatMenuAnchor] = useState(null);
   const [preferred, setPref] = useCoordinatePreference();
   const isTouch = useMediaQuery('(pointer: coarse)');
-  const { updateLayers } = useHeatLayer();
 
   const [showExplored, setShowExplored] = useLocalStorage(
     'grottocenter_showExploredCaves',
@@ -357,36 +356,19 @@ const HydratedMap = ({
     handleUpdate();
   }, [handleUpdate]);
 
-  // Feed the three layers whenever selection, data, or zoom mode changes.
-  // isMarkersMode/isMassifPolygonMode are included so zooming back out re-triggers this
-  // and re-populates the hex layers.
-  useEffect(() => {
-    const activeTypes = Array.from(selectedHeats).filter(t => {
-      if (t === heatmapTypes.MASSIFS) return !isMassifPolygonMode;
-      return !isMarkersMode;
-    });
-
-    updateLayers(
-      {
-        [heatmapTypes.ENTRANCES]: entrances,
-        [heatmapTypes.NETWORKS]: networks,
-        [heatmapTypes.MASSIFS]: massifs
-      },
-      activeTypes
-    );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    selectedHeats,
-    entrances,
-    networks,
-    massifs,
-    isMarkersMode,
-    isMassifPolygonMode
-  ]);
+  // Each layer's visibility follows the same rule as before: the massif layer
+  // gives way to polygons at zoom >= MASSIFS_POLYGON_LIMIT (8), entrances and
+  // networks give way to real markers at zoom >= MARKERS_LIMIT (13).
+  const showEntranceClusters =
+    selectedHeats.has(heatmapTypes.ENTRANCES) && !isMarkersMode;
+  const showNetworkClusters =
+    selectedHeats.has(heatmapTypes.NETWORKS) && !isMarkersMode;
+  const showMassifClusters =
+    selectedHeats.has(heatmapTypes.MASSIFS) && !isMassifPolygonMode;
 
   return (
     <>
-      {HexGlobalCss}
+      {ClusterGlobalCss}
       <GeocodingControl />
       <MeasureControl />
       <DataControl
@@ -408,6 +390,9 @@ const HydratedMap = ({
         useLeafletControl
       />
       <ExploredOverlay points={showExplored && isAuth ? exploredPoints : []} />
+      <ClusterLayer data={entrances} type="entrance" enabled={showEntranceClusters} />
+      <ClusterLayer data={networks} type="network" enabled={showNetworkClusters} />
+      <ClusterLayer data={massifs} type="massif" enabled={showMassifClusters} />
       <Markers
         visibleMarkers={visibleMarkers}
         organizations={organizations}

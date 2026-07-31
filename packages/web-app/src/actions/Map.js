@@ -49,12 +49,13 @@ export const LOADINGS = {
   MASSIFS_COORDINATES: 'massifs_coordinates'
 };
 
-// Heatmap coordinates are fetched once at startup with world-wide bounds rather than
-// on every moveend. The @asymmetrik/leaflet-d3 hexbin layer filters points client-side,
-// so it only renders hexagons visible in the current viewport regardless of dataset size.
+// Bulk coordinates are fetched once at startup with world-wide bounds. The
+// supercluster-backed ClusterLayer builds a kD-tree from these points and
+// queries only the visible bbox on each moveend — so the whole dataset lives
+// client-side without per-pan API calls.
 //
 // Benchmark (2025): ~130k entrances → ~2.6 MB uncompressed, ~700 KB gzipped.
-// One-time cost on page load vs. a bounded API call on every pan/zoom
+// One-time cost on page load vs. a bounded API call on every pan/zoom.
 
 // Retries the fetch up to maxRetries times with exponential backoff (1 s, 2 s, 4 s…).
 // Rejects only after all attempts are exhausted.
