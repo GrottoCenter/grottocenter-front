@@ -10,10 +10,13 @@ on:
   push:
     tags:
       # Only semver release tags (1.0.0, 10.2.3…) trigger a build + Release.
-      # GitHub Actions tag filters are globs, not regex: [0-9] is a digit class
-      # and + means "one or more of the preceding". The Resolve step still
-      # validates strict semver as defense-in-depth (and for workflow_dispatch).
-      - '[0-9]+.[0-9]+.[0-9]+'
+      # GitHub Actions tag filters are globs, not regex: [0-9] is a digit class,
+      # + means "one or more of the preceding", and \. escapes the literal dot
+      # (without escaping, `.` would match any character — including `-`, which
+      # would let tags like `1-0-0` trigger a build only to fail semver validation).
+      # The Resolve step still validates strict semver as defense-in-depth (and
+      # for workflow_dispatch).
+      - '[0-9]+\.[0-9]+\.[0-9]+'
 
 jobs:
   build:

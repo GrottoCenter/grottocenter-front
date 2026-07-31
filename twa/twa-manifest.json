@@ -40,7 +40,12 @@
   "fullScopeUrl": "https://grottocenter.org/",
   "minSdkVersion": 21,
   "orientation": "default",
-  "fingerprints": [],
+  "fingerprints": [
+    {
+      "name": "Play App Signing",
+      "value": "E7:FF:C1:29:60:28:26:EC:F5:00:35:A3:37:5A:13:48:4B:FE:BC:95:15:02:21:1D:51:AC:83:AB:A7:88:9C:40"
+    }
+  ],
   "additionalTrustedOrigins": [],
   "retainedBundles": [],
   "protocolHandlers": [],

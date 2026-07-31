@@ -38,6 +38,7 @@ installed APK.
 | `staticwebapp.config.json`                            | Azure headers/routing for `sw.js` and `assetlinks.json` | ✅                |
 | `twa/twa-manifest.json`                               | Bubblewrap config (source for regenerating the project) | ✅                |
 | `twa/app/`, `twa/build.gradle`, `twa/gradlew`, `twa/gradle/`, … | Generated Gradle project — committed so CI can build it | ✅                |
+| `twa/play_store_listing_icon.png`                     | 512×512 icon uploaded manually to the Play Console listing | ✅             |
 | `.github/workflows/twa-build.yml`                     | CI that builds the signed `.aab`                        | ✅                |
 | `twa/android.keystore`                                | **Upload signing key — SECRET**                         | ❌ (gitignored)   |
 | `twa/app-release*`, `twa/app/build/`, `twa/.gradle/`, `twa/local.properties` | Build outputs & caches                                  | ❌ (gitignored)   |
@@ -341,6 +342,13 @@ After deployment, confirm these respond with `200`:
 - `https://grottocenter.org/manifest.json`
 - `https://grottocenter.org/sw.js` (header `Cache-Control: no-cache`)
 - `https://grottocenter.org/.well-known/assetlinks.json` (`application/json`, `no-cache`)
+
+> ⚠️ **`public/robots.txt` currently sets `Disallow: /`**, which blocks
+> crawlers site-wide. That undermines the Play Store discoverability goal
+> (Play policies require the PWA to be indexable) and should be relaxed
+> before the app is promoted to production. Track this separately from the
+> TWA setup itself — the fix is a one-line edit on the web side, unrelated
+> to Bubblewrap / signing / assetlinks.
 
 ## Verifying the TWA
 

@@ -6,6 +6,8 @@ import { compression } from 'vite-plugin-compression2';
 import { visualizer } from 'rollup-plugin-visualizer';
 import { VitePWA } from 'vite-plugin-pwa';
 
+const escapeRegex = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
 export default defineConfig(({ mode }) => {
   // Pull VITE_API_URL out of the env file so the SW's runtimeCaching pattern
   // matches whichever backend this build targets (prod, staging, local).
@@ -22,10 +24,17 @@ export default defineConfig(({ mode }) => {
   // useful responses (/account, /notifications, /entrances/{id}, …). Skipping
   // them here means map endpoints just hit the network (no offline value lost:
   // the exact viewport is never reproduced offline anyway).
-  const escapeRegex = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   const apiPattern = apiOrigin
     ? new RegExp(`^${escapeRegex(apiOrigin)}/api/(?!.*[?&]sw_lat=)`)
     : null;
+  // A prod build without VITE_API_URL ships zero API caching. Surface it loudly
+  // so a misconfigured pipeline doesn't quietly break offline support.
+  if (!apiOrigin && mode !== 'development') {
+    // eslint-disable-next-line no-console
+    console.warn(
+      '[vite-plugin-pwa] VITE_API_URL is not set — API runtime caching disabled.'
+    );
+  }
   // /geoloc/{entrances,networks,massifs}Coordinates — server recomputes these
   // in a daily batch job, so stale-while-revalidate is safe and dramatic: a
   // reload serves the ~MB-sized point payload from cache instantly, then
@@ -191,7 +200,7 @@ export default defineConfig(({ mode }) => {
             label: 'Add a new entrance, document, massif or organization'
           },
           {
-            src: 'screenshots/activitites-mobile.jpg',
+            src: 'screenshots/activities-mobile.jpg',
             type: 'image/jpeg',
             sizes: '1080x2340',
             form_factor: 'narrow',
@@ -210,6 +219,36 @@ export default defineConfig(({ mode }) => {
             sizes: '1080x2340',
             form_factor: 'narrow',
             label: 'Navigation menu'
+          },
+          // Tablet (wide) shots — used by the Play Store tablet listing and by
+          // Chrome's install dialog on large screens.
+          {
+            src: 'screenshots/home-tablet10.png',
+            type: 'image/png',
+            sizes: '2732x2048',
+            form_factor: 'wide',
+            label: 'Home page (10" tablet)'
+          },
+          {
+            src: 'screenshots/home-tablet7.png',
+            type: 'image/png',
+            sizes: '2736x1824',
+            form_factor: 'wide',
+            label: 'Home page (7" tablet)'
+          },
+          {
+            src: 'screenshots/map-tablet10.png',
+            type: 'image/png',
+            sizes: '2732x2048',
+            form_factor: 'wide',
+            label: 'Interactive map (10" tablet)'
+          },
+          {
+            src: 'screenshots/map-tablet7.png',
+            type: 'image/png',
+            sizes: '2736x1824',
+            form_factor: 'wide',
+            label: 'Interactive map (7" tablet)'
           }
         ]
       },
@@ -219,7 +258,21 @@ export default defineConfig(({ mode }) => {
         globPatterns: ['**/*.{js,css,html,svg,png,ico,woff2,json}'],
         // stats.html is the bundle-analysis report (visualizer), ~8 MB — never
         // precache it. Also keep the gzip/brotli copies out of the precache.
-        globIgnores: ['**/stats.html', '**/*.{gz,br}'],
+        // /.well-known/assetlinks.json is a no-cache file by design (see
+        // staticwebapp.config.json): precaching it would serve a stale copy
+        // offline and silently break Digital Asset Links after a cert rotation.
+        // /screenshots/** are install-UI assets (Chrome install dialog / Play
+        // Store listing): fetched on-demand only when that UI is shown, so
+        // precaching would waste ~10 MB on every user (esp. the tablet PNGs)
+        // for content most will never see. Mobile JPGs are already outside
+        // the precache glob and excluded from the runtime image cache — this
+        // extends the same intent to the tablet PNGs.
+        globIgnores: [
+          '**/stats.html',
+          '**/*.{gz,br}',
+          '**/.well-known/**',
+          '**/screenshots/**'
+        ],
         // Take control of the page on the very first load so offline works
         // from the first visit (matches the previous CRA SW's clientsClaim()).
         clientsClaim: true,

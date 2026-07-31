@@ -9,11 +9,10 @@ const OfflineIndicator = () => {
   const { formatMessage } = useIntl();
   const [isOpen, setIsOpen] = useState(false);
   const anchorRef = useRef(null);
-
-  if (isOnline) return null;
-
   const label = formatMessage({ id: 'offlineIndicatorTitle' });
   const message = formatMessage({ id: 'offlineIndicator' });
+
+  if (isOnline) return null;
 
   return (
     <>
