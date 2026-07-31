@@ -1131,7 +1131,12 @@ const OfflineDataSection = () => {
       setIsDialogOpen(false);
       refreshUsage();
     } catch {
-      onError(formatMessage({ id: 'An error occurred. Please try again.' }));
+      onError(
+        formatMessage({
+          id: 'offlineDataClearError',
+          defaultMessage: 'An error occurred. Please try again.'
+        })
+      );
     } finally {
       setIsClearing(false);
     }

@@ -1890,6 +1890,7 @@
   "Official partner": "Socio oficial",
   "Offline data": "Datos sin conexión",
   "offlineDataCleared": "Datos sin conexión borrados.",
+  "offlineDataClearError": "Se produjo un error. Por favor, inténtelo de nuevo.",
   "offlineDataConfirmation": "Esto eliminará todas las páginas, imágenes y respuestas de API almacenadas en caché. La aplicación seguirá funcionando — los datos nuevos se descargarán la próxima vez que estés en línea.",
   "offlineDataDescription": "La aplicación guarda una copia local de las páginas que has visitado para que sigan funcionando sin conexión. Puedes borrar estos datos para liberar espacio o actualizar lo almacenado.",
   "offlineIndicator": "Estás sin conexión. Algunos datos pueden no estar disponibles o estar desactualizados.",

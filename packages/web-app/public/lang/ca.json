@@ -1890,6 +1890,7 @@
   "Official partner": "Col·laborador oficial",
   "Offline data": "Dades sense connexió",
   "offlineDataCleared": "Dades sense connexió esborrades.",
+  "offlineDataClearError": "S'ha produït un error. Torneu-ho a intentar.",
   "offlineDataConfirmation": "Això eliminarà totes les pàgines, imatges i respostes d'API emmagatzemades a la memòria cau. L'aplicació continuarà funcionant — les dades noves es descarregaran la propera vegada que estiguis en línia.",
   "offlineDataDescription": "L'aplicació manté una còpia local de les pàgines que has visitat perquè continuïn funcionant sense connexió. Pots esborrar aquestes dades per alliberar espai o refrescar el que hi ha emmagatzemat.",
   "offlineIndicator": "Esteu sense connexió. Algunes dades poden no estar disponibles o estar desactualitzades.",

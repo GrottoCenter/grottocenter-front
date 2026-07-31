@@ -1890,6 +1890,7 @@
   "Official partner": "Officiële partner",
   "Offline data": "Offline gegevens",
   "offlineDataCleared": "Offline gegevens gewist.",
+  "offlineDataClearError": "Er is een fout opgetreden. Probeer het opnieuw.",
   "offlineDataConfirmation": "Hiermee worden alle gecachte pagina's, afbeeldingen en API-reacties verwijderd. De app blijft werken — nieuwe gegevens worden opgehaald zodra je weer online bent.",
   "offlineDataDescription": "De app bewaart een lokale kopie van pagina's die je hebt bezocht, zodat ze ook zonder verbinding werken. Je kunt deze gegevens wissen om ruimte vrij te maken of het opgeslagene te verversen.",
   "offlineIndicator": "Je bent offline. Sommige gegevens zijn mogelijk niet beschikbaar of verouderd.",

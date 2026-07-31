@@ -1890,6 +1890,7 @@
   "Official partner": "Parceiro oficial",
   "Offline data": "Dados offline",
   "offlineDataCleared": "Dados offline limpos.",
+  "offlineDataClearError": "Ocorreu um erro. Por favor, tente novamente.",
   "offlineDataConfirmation": "Isto removerá todas as páginas, imagens e respostas da API armazenadas em cache. A aplicação continuará a funcionar — os novos dados serão obtidos quando estiver novamente online.",
   "offlineDataDescription": "A aplicação mantém uma cópia local das páginas que visitou para que continuem a funcionar sem ligação. Pode limpar estes dados para libertar espaço ou atualizar o que está armazenado.",
   "offlineIndicator": "Você está offline. Alguns dados podem estar indisponíveis ou desatualizados.",

@@ -1890,6 +1890,7 @@
   "Official partner": "Official partner",
   "Offline data": "Offline data",
   "offlineDataCleared": "Offline data cleared.",
+  "offlineDataClearError": "An error occurred. Please try again.",
   "offlineDataConfirmation": "This will remove all cached pages, images and API responses. The app will continue to work — new data will be fetched next time you're online.",
   "offlineDataDescription": "The app keeps a local copy of pages you've visited so they still work without a connection. You can clear this data to free up space or refresh what's stored.",
   "offlineIndicator": "You are offline. Some data may be unavailable or out of date.",

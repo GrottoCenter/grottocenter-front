@@ -2,7 +2,7 @@ import React, { useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { Box, IconButton, Popover, Tooltip, Typography } from '@mui/material';
 import WifiOffIcon from '@mui/icons-material/WifiOff';
-import { useOnlineStatus } from '../../../hooks';
+import { useOnlineStatus } from '@/hooks';
 
 const OfflineIndicator = () => {
   const isOnline = useOnlineStatus();
@@ -32,7 +32,7 @@ const OfflineIndicator = () => {
         onClose={() => setIsOpen(false)}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
         transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-        slotProps={{ paper: { sx: { mt: '4px' } } }}>
+        slotProps={{ paper: { sx: { mt: 0.5 } } }}>
         <Box sx={{ p: 2, maxWidth: 280 }}>
           <Typography variant="body2">{message}</Typography>
         </Box>

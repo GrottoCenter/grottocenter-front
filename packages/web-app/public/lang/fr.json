@@ -1890,6 +1890,7 @@
   "Official partner": "Partenaire officiel",
   "Offline data": "Données hors-ligne",
   "offlineDataCleared": "Données hors-ligne effacées.",
+  "offlineDataClearError": "Une erreur s'est produite. Veuillez réessayer.",
   "offlineDataConfirmation": "Cela supprimera toutes les pages, images et réponses d'API mises en cache. L'application continuera de fonctionner — les nouvelles données seront récupérées à votre prochaine connexion.",
   "offlineDataDescription": "L'application conserve une copie locale des pages que vous avez consultées pour qu'elles restent accessibles sans connexion. Vous pouvez effacer ces données pour libérer de l'espace ou rafraîchir ce qui est stocké.",
   "offlineIndicator": "Vous êtes hors-ligne. Certaines données peuvent être indisponibles ou obsolètes.",

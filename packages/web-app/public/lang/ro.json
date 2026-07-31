@@ -1890,6 +1890,7 @@
   "Official partner": "Partener oficial",
   "Offline data": "Date offline",
   "offlineDataCleared": "Date offline șterse.",
+  "offlineDataClearError": "A apărut o eroare. Vă rugăm să încercați din nou.",
   "offlineDataConfirmation": "Aceasta va elimina toate paginile, imaginile și răspunsurile API din cache. Aplicația va continua să funcționeze — noile date vor fi preluate la următoarea conectare.",
   "offlineDataDescription": "Aplicația păstrează o copie locală a paginilor pe care le-ai vizitat pentru ca acestea să funcționeze și fără conexiune. Poți șterge aceste date pentru a elibera spațiu sau pentru a actualiza ce este stocat.",
   "offlineIndicator": "Sunteți offline. Unele date pot fi indisponibile sau învechite.",

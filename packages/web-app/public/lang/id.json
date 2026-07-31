@@ -1890,6 +1890,7 @@
   "Official partner": "Mitra resmi",
   "Offline data": "Data offline",
   "offlineDataCleared": "Data offline dihapus.",
+  "offlineDataClearError": "Terjadi kesalahan. Silakan coba lagi.",
   "offlineDataConfirmation": "Ini akan menghapus semua halaman, gambar, dan respons API yang di-cache. Aplikasi akan tetap berfungsi — data baru akan diambil pada saat Anda online berikutnya.",
   "offlineDataDescription": "Aplikasi menyimpan salinan lokal halaman yang telah Anda kunjungi agar tetap dapat digunakan tanpa koneksi. Anda dapat menghapus data ini untuk membebaskan ruang atau menyegarkan yang tersimpan.",
   "offlineIndicator": "Anda sedang offline. Beberapa data mungkin tidak tersedia atau kedaluwarsa.",
