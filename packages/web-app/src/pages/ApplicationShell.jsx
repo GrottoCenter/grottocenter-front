@@ -10,7 +10,7 @@ import { thunk } from 'redux-thunk';
 import PropTypes from 'prop-types';
 import { styled } from '@mui/material/styles';
 import { Alert, Box, CircularProgress } from '@mui/material';
-import { usePermissions, useOnlineStatus } from '../hooks';
+import { usePermissions } from '../hooks';
 
 import GCReducer from '../reducers/GCReducer';
 import { bootstrapIntl } from '../actions/Intl';
@@ -165,17 +165,6 @@ const AdminSessionExpiryBanner = () => {
   );
 };
 
-const OfflineBanner = () => {
-  const isOnline = useOnlineStatus();
-  const { formatMessage } = useIntl();
-  if (isOnline) return null;
-  return (
-    <Alert severity="warning" sx={{ borderRadius: 0 }}>
-      {formatMessage({ id: 'offlineBanner' })}
-    </Alert>
-  );
-};
-
 const ApplicationLayout = () => {
   const isSideMenuOpen = useSelector(state => state.sideMenu.open);
   useLanguageSync();
@@ -193,7 +182,6 @@ const ApplicationLayout = () => {
           banner rendered BEFORE it would be visually hidden behind it. Keep
           banners after <AppBar /> so they sit right below the toolbar. */}
       <AppBar />
-      <OfflineBanner />
       <AdminSessionExpiryBanner />
       <SideMenu isOpen={isSideMenuOpen} />
       <MainWrapper $isSideMenuOpen={isSideMenuOpen}>

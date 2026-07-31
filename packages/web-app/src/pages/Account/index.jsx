@@ -37,6 +37,8 @@ import PermMediaOutlinedIcon from '@mui/icons-material/PermMediaOutlined';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import TuneIcon from '@mui/icons-material/Tune';
 import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
+import StorageOutlinedIcon from '@mui/icons-material/StorageOutlined';
 import { styled } from '@mui/material/styles';
 
 import fetch from 'isomorphic-fetch';
@@ -77,6 +79,7 @@ import {
   localeToLanguageId
 } from '../../utils/languageMapping';
 import { notificationPreferencesUrl } from '../../conf/apiRoutes';
+import { clearOfflineData, getStorageUsage } from '../../utils/offlineCache';
 
 // ─── Shared styled components ─────────────────────────────────────────────────
 
@@ -1096,6 +1099,116 @@ PreferencesSection.propTypes = {
   onSaved: PropTypes.func.isRequired
 };
 
+// ─── Offline data section ────────────────────────────────────────────────────
+
+const OfflineDataSection = () => {
+  const { formatMessage, formatNumber } = useIntl();
+  const { onSuccess, onError } = useNotification();
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isClearing, setIsClearing] = useState(false);
+  const [usageBytes, setUsageBytes] = useState(null);
+
+  const refreshUsage = useCallback(async () => {
+    const usage = await getStorageUsage();
+    setUsageBytes(usage);
+  }, []);
+
+  useEffect(() => {
+    refreshUsage();
+  }, [refreshUsage]);
+
+  const handleConfirm = async () => {
+    setIsClearing(true);
+    try {
+      await clearOfflineData();
+      onSuccess(formatMessage({ id: 'offlineDataCleared' }));
+      setIsDialogOpen(false);
+      refreshUsage();
+    } catch {
+      onError(formatMessage({ id: 'An error occurred. Please try again.' }));
+    } finally {
+      setIsClearing(false);
+    }
+  };
+
+  const formattedUsage =
+    usageBytes != null
+      ? formatNumber(usageBytes / (1024 * 1024), {
+          style: 'unit',
+          unit: 'megabyte',
+          maximumFractionDigits: 1
+        })
+      : null;
+
+  return (
+    <>
+      <SectionPaper elevation={2}>
+        <SectionHeader>
+          <SectionHeaderTitle>
+            <StorageOutlinedIcon color="action" />
+            <Typography variant="h6" fontWeight={600}>
+              {formatMessage({ id: 'Offline data' })}
+            </Typography>
+          </SectionHeaderTitle>
+          {formattedUsage && (
+            <Chip
+              size="small"
+              variant="outlined"
+              label={formattedUsage}
+              sx={{ fontWeight: 600 }}
+            />
+          )}
+        </SectionHeader>
+        <Divider />
+        <SectionBody>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+            {formatMessage({ id: 'offlineDataDescription' })}
+          </Typography>
+          <Button
+            variant="outlined"
+            color="warning"
+            startIcon={<DeleteOutlineIcon />}
+            onClick={() => setIsDialogOpen(true)}>
+            {formatMessage({ id: 'Clear offline data' })}
+          </Button>
+        </SectionBody>
+      </SectionPaper>
+      <StandardDialog
+        open={isDialogOpen}
+        onClose={() => !isClearing && setIsDialogOpen(false)}
+        fullWidth
+        maxWidth="xs"
+        title={formatMessage({ id: 'Clear offline data' })}
+        actions={
+          <>
+            <Button
+              onClick={() => setIsDialogOpen(false)}
+              variant="text"
+              disabled={isClearing}>
+              {formatMessage({ id: 'Cancel' })}
+            </Button>
+            <Button
+              onClick={handleConfirm}
+              color="warning"
+              variant="contained"
+              disabled={isClearing}
+              startIcon={
+                isClearing ? (
+                  <CircularProgress size={16} color="inherit" />
+                ) : null
+              }>
+              {formatMessage({ id: 'Clear' })}
+            </Button>
+          </>
+        }>
+        <Typography>
+          {formatMessage({ id: 'offlineDataConfirmation' })}
+        </Typography>
+      </StandardDialog>
+    </>
+  );
+};
+
 // ─── Main page ────────────────────────────────────────────────────────────────
 
 const AccountPage = () => {
@@ -1251,6 +1364,9 @@ const AccountPage = () => {
           <PreferencesSection account={account} onSaved={handleSaved} />
         </>
       )}
+      {/* Rendered even when the account fetch failed — clearing the cache
+          may be exactly what's needed to unstick the app. */}
+      <OfflineDataSection />
     </SectionStack>
   );
 
