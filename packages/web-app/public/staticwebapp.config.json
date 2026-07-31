@@ -1,7 +1,7 @@
 {
   "navigationFallback": {
     "rewrite": "index.html",
-    "exclude": ["/images/*", "/static/*", "/.well-known/*", "/sw.js"]
+    "exclude": ["/images/*", "/assets/*", "/.well-known/*", "/sw.js"]
   },
   "globalHeaders": {
     "X-Content-Type-Options": "nosniff"
@@ -20,7 +20,7 @@
       }
     },
     {
-      "route": "/static/*",
+      "route": "/assets/*",
       "headers": {
         "Cache-Control": "public, max-age=31536000, immutable"
       }
