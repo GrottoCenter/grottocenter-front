@@ -485,6 +485,8 @@ const Index = ({ center, zoom, isSideMenuOpen, mapRef, popupTarget = null, ...pr
   // vector layers on this map (entrances, massif polygons) share this single
   // canvas, so hit-testing is coordinated and no canvas blocks clicks meant
   // for another. A fresh instance per mount avoids stale state on remount.
+  // Empty dep array is intentional: this renderer must be created exactly once
+  // per component lifetime, not a missing-dependency oversight.
   const renderer = useMemo(() => L.canvas({ padding: 0.5 }), []);
 
   return (
@@ -521,7 +523,7 @@ HydratedMap.propTypes = {
   organizationMarkers: PropTypes.arrayOf(markerType),
   massifs: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.number)),
   massifPolygons: PropTypes.arrayOf(massifPolygonType),
-  onUpdate: PropTypes.func
+  onUpdate: PropTypes.func.isRequired
 };
 
 Index.propTypes = {

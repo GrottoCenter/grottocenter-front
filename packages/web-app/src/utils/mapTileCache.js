@@ -195,6 +195,10 @@ export const fetchForBounds = (entity, bounds, apiZoom, dispatch) => {
 
   const tiles = tilesForBounds(bounds, CACHE_ZOOM);
   const t = now();
+  // No inFlight check here: fetchTile itself dedupes concurrent requests for
+  // the same tile key (see the `existing?.inFlight` early-return in fetchTile),
+  // so this loop can safely call fetchTile whenever the record looks stale or
+  // missing without spawning duplicate requests.
   for (let i = 0; i < tiles.length; i += 1) {
     const tile = tiles[i];
     const rec = s.tiles.get(tileKey(entity, tile));

@@ -62,6 +62,9 @@ const MapInternals = ({ geoJson, massifId }) => {
   const markersRef = useRef(updateEntranceMarkers);
   markersRef.current = updateEntranceMarkers;
 
+  // abortRef only guards the high-zoom viewport marker fetch below (line ~90).
+  // The one-shot coordinates fetch further down manages its own AbortController
+  // via the useEffect return; both are aborted on unmount independently.
   const abortRef = useRef(null);
 
   useEffect(

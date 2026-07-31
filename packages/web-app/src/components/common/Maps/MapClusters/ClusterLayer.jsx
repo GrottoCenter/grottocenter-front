@@ -241,7 +241,9 @@ const ClusterLayer = ({ data = [], type, enabled = true, pane = null, onLeafClic
           // getClusterExpansionZoom returns the exact zoom where this cluster
           // splits — often just +1/+2. Boost it so a click feels like a real
           // "dive in" (min +3 vs current, +2 vs raw expansion), capped by the
-          // map's max zoom.
+          // map's max zoom. Intentional: from just under MARKERS_LIMIT the +3
+          // floor jumps straight past the threshold into real-marker territory
+          // — a click on a cluster should always resolve it, never re-cluster.
           const expansion = supercluster.getClusterExpansionZoom(clusterId);
           const targetZoom = Math.min(
             map.getMaxZoom(),
