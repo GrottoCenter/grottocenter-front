@@ -5,7 +5,7 @@ import MapMassif from './MapMassif';
 
 // --- Mocks ---
 
-const mockUpdateLayers = vi.fn();
+const mockClusterLayer = vi.fn();
 const mockUpdateEntranceMarkers = vi.fn();
 let mockZoom = 8;
 
@@ -58,12 +58,15 @@ vi.mock('../../common/Maps/common/MapContainer', () => {
   return { __esModule: true, default: MockMapContainer };
 });
 
-vi.mock('../../common/Maps/MapClusters/useHeatLayer', () => {
+vi.mock('../../common/Maps/MapClusters/ClusterLayer', () => {
   const React = require('react');
   return {
     __esModule: true,
-    default: () => ({ updateLayers: mockUpdateLayers }),
-    HexGlobalCss: React.createElement('div')
+    default: props => {
+      mockClusterLayer(props);
+      return null;
+    },
+    ClusterGlobalCss: React.createElement('div')
   };
 });
 
@@ -102,7 +105,7 @@ const samplePolygon = JSON.stringify({
 
 beforeEach(() => {
   vi.restoreAllMocks();
-  mockUpdateLayers.mockClear();
+  mockClusterLayer.mockClear();
   mockUpdateEntranceMarkers.mockClear();
   mockZoom = 8;
 });
@@ -113,7 +116,7 @@ afterEach(() => {
 
 describe('MapMassif', () => {
   describe('at low zoom (< MARKERS_LIMIT)', () => {
-    it('calls updateLayers with coordinates for entrances', async () => {
+    it('feeds the cluster layer with fetched coordinates', async () => {
       const coords = [[5.5, 44.1], [6.2, 43.8], [7.0, 45.0]];
       global.fetch = vi.fn().mockResolvedValue({
         ok: true,
@@ -123,7 +126,9 @@ describe('MapMassif', () => {
       render(<MapMassif massifId={42} geogPolygon={samplePolygon} />);
 
       await waitFor(() => {
-        expect(mockUpdateLayers).toHaveBeenCalledWith({ entrances: coords }, ['entrances']);
+        const lastCall = mockClusterLayer.mock.calls.at(-1)?.[0];
+        expect(lastCall?.data).toEqual(coords);
+        expect(lastCall?.enabled).toBe(true);
       });
     });
 
@@ -202,7 +207,7 @@ describe('MapMassif', () => {
       });
     });
 
-    it('clears heat layers when showing markers', async () => {
+    it('disables the cluster layer when showing markers', async () => {
       const entrances = [
         { id: 1, name: 'Cave A', latitude: 44.1, longitude: 5.5 }
       ];
@@ -214,7 +219,8 @@ describe('MapMassif', () => {
       render(<MapMassif massifId={42} geogPolygon={samplePolygon} />);
 
       await waitFor(() => {
-        expect(mockUpdateLayers).toHaveBeenCalledWith({}, []);
+        const lastCall = mockClusterLayer.mock.calls.at(-1)?.[0];
+        expect(lastCall?.enabled).toBe(false);
       });
     });
   });

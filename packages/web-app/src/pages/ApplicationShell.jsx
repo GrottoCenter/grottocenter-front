@@ -13,6 +13,7 @@ import { Alert, Box, CircularProgress } from '@mui/material';
 import { usePermissions } from '../hooks';
 
 import GCReducer from '../reducers/GCReducer';
+import mapCacheInvalidationMiddleware from '../middlewares/mapCacheInvalidationMiddleware';
 import { bootstrapIntl } from '../actions/Intl';
 import useLanguageSync from '../hooks/useLanguageSync';
 
@@ -43,7 +44,11 @@ async function transitionToReact() {
   }, 410);
 }
 
-const middlewares = applyMiddleware(createDebounce(), thunk);
+const middlewares = applyMiddleware(
+  createDebounce(),
+  thunk,
+  mapCacheInvalidationMiddleware
+);
 const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 const gcStore = createStore(GCReducer, composeEnhancers(middlewares));
 

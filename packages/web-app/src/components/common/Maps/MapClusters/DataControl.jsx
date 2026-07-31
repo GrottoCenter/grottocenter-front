@@ -45,19 +45,21 @@ const CAVE_SIZE_POPOVER_ROWS = [
   }
 ];
 
-export const heatmapTypes = {
+// Every dataset the user can toggle on the map. At low zoom each type shows as
+// clusters; at high zoom entrances/networks/organizations switch to real
+// markers and massifs to polygons — but a single toggle drives both modes.
+export const layerTypes = {
   ENTRANCES: 'entrances',
   NETWORKS: 'networks',
-  MASSIFS: 'massifs'
-};
-export const markerTypes = {
+  MASSIFS: 'massifs',
   ORGANIZATIONS: 'organizations'
 };
 
-const HEAT_TYPES_LIST = [
-  heatmapTypes.ENTRANCES,
-  heatmapTypes.NETWORKS,
-  heatmapTypes.MASSIFS
+export const LAYER_TYPES_LIST = [
+  layerTypes.ENTRANCES,
+  layerTypes.NETWORKS,
+  layerTypes.MASSIFS,
+  layerTypes.ORGANIZATIONS
 ];
 
 const ToggleButton = styled('button')`
@@ -167,10 +169,10 @@ CaveSizeDot.propTypes = {
 };
 
 const MARKER_ICON = {
-  [heatmapTypes.ENTRANCES]: entranceIcon,
-  [heatmapTypes.NETWORKS]: networkIcon,
-  [heatmapTypes.MASSIFS]: massifIcon,
-  [markerTypes.ORGANIZATIONS]: organizationIcon
+  [layerTypes.ENTRANCES]: entranceIcon,
+  [layerTypes.NETWORKS]: networkIcon,
+  [layerTypes.MASSIFS]: massifIcon,
+  [layerTypes.ORGANIZATIONS]: organizationIcon
 };
 
 const MarkerIcon = ({ type }) => {
@@ -193,10 +195,8 @@ MarkerIcon.propTypes = {
 };
 
 const DataControl = ({
-  updateHeatmap,
-  selectedHeats,
-  selectedMarkers,
-  setSelectedMarkers,
+  selectedLayers,
+  toggleLayer,
   entranceFilters,
   activeEntranceFilters,
   setActiveEntranceFilters,
@@ -245,14 +245,6 @@ const DataControl = ({
       document.removeEventListener('pointerdown', handleClickOutside);
   }, [toggleExpanded]);
 
-  const handleHeatToggle = type => {
-    updateHeatmap(type, !selectedHeats.has(type));
-  };
-
-  const handleMarkerChange = type => {
-    setSelectedMarkers(prev => ({ ...prev, [type]: !prev[type] }));
-  };
-
   return (
     <CustomControl
       {...props}
@@ -277,13 +269,13 @@ const DataControl = ({
             <SectionTitle>
               {formatMessage({ id: 'Data display' }).toUpperCase()}
             </SectionTitle>
-            {HEAT_TYPES_LIST.map(type => (
+            {LAYER_TYPES_LIST.map(type => (
               <OptionLabel key={type}>
                 <input
                   type="checkbox"
                   name={type}
-                  checked={selectedHeats.has(type)}
-                  onChange={() => handleHeatToggle(type)}
+                  checked={!!selectedLayers[type]}
+                  onChange={() => toggleLayer(type)}
                 />
                 <MarkerIcon type={type} />
                 <span style={{ textTransform: 'capitalize' }}>
@@ -291,27 +283,6 @@ const DataControl = ({
                 </span>
               </OptionLabel>
             ))}
-
-            <hr
-              style={{
-                margin: '6px 0',
-                border: 'none',
-                borderTop: '1px solid #ddd'
-              }}
-            />
-
-            <OptionLabel>
-              <input
-                type="checkbox"
-                name={markerTypes.ORGANIZATIONS}
-                checked={selectedMarkers[markerTypes.ORGANIZATIONS]}
-                onChange={() => handleMarkerChange(markerTypes.ORGANIZATIONS)}
-              />
-              <MarkerIcon type={markerTypes.ORGANIZATIONS} />
-              <span style={{ textTransform: 'capitalize' }}>
-                {formatMessage({ id: markerTypes.ORGANIZATIONS })}
-              </span>
-            </OptionLabel>
 
             {isAuth && (
               <div
@@ -343,7 +314,7 @@ const DataControl = ({
               </div>
             )}
 
-            {selectedHeats.has(heatmapTypes.ENTRANCES) && (
+            {selectedLayers[layerTypes.ENTRANCES] && (
               <div
                 style={
                   !isMarkersMode
@@ -440,10 +411,8 @@ const DataControl = ({
 const MemoizedDataControl = React.memo(DataControl);
 
 DataControl.propTypes = {
-  updateHeatmap: PropTypes.func.isRequired,
-  selectedHeats: PropTypes.instanceOf(Set).isRequired,
-  selectedMarkers: PropTypes.objectOf(PropTypes.bool).isRequired,
-  setSelectedMarkers: PropTypes.func.isRequired,
+  selectedLayers: PropTypes.objectOf(PropTypes.bool).isRequired,
+  toggleLayer: PropTypes.func.isRequired,
   entranceFilters: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.string.isRequired,

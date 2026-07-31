@@ -1,9 +1,11 @@
 import React, { useEffect, useRef } from 'react';
 import { useMap } from 'react-leaflet';
-import * as L from 'leaflet';
+import L from 'leaflet';
 import PropTypes from 'prop-types';
 import { MassifPopup } from '../common/Markers/Components';
 import useRenderPopup from '../common/Markers/useRenderPopup';
+import { makeIconTooltip } from '../common/Markers/tooltipHelpers';
+import { massifIcon } from '../../../../assets/icons';
 import { MASSIF_POLYGON_STYLE, MASSIF_POLYGON_HOVER_STYLE } from './constants';
 
 // Bounding-box area approximation — fast enough for sort ordering.
@@ -60,7 +62,10 @@ const MassifPolygons = ({ massifs = [] }) => {
           renderPopup(<MassifPopup massif={feature.properties} />)
         );
         if (feature.properties.name) {
-          layer.bindTooltip(feature.properties.name, { sticky: true });
+          layer.bindTooltip(
+            makeIconTooltip(massifIcon, feature.properties.name),
+            { sticky: true }
+          );
         }
         layer.on('mouseover', () => {
           layer.setStyle(MASSIF_POLYGON_HOVER_STYLE);

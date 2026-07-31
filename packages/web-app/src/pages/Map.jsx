@@ -8,6 +8,7 @@ import {
   fetchNetworks,
   fetchAllNetworksCoordinates,
   fetchOrganizations,
+  fetchAllOrganizationsCoordinates,
   fetchEntrances,
   fetchAllEntrancesCoordinates,
   fetchAllMassifsCoordinates,
@@ -87,6 +88,9 @@ const Map = () => {
     state => state.map.networksCoordinates
   );
   const organizations = useSelector(state => state.map.organizations);
+  const organizationsCoordinates = useSelector(
+    state => state.map.organizationsCoordinates
+  );
   const entrances = useSelector(state => state.map.entrances);
   const entrancesCoordinates = useSelector(
     state => state.map.entrancesCoordinates
@@ -150,6 +154,7 @@ const Map = () => {
     dispatch(fetchAllEntrancesCoordinates());
     dispatch(fetchAllNetworksCoordinates());
     dispatch(fetchAllMassifsCoordinates());
+    dispatch(fetchAllOrganizationsCoordinates());
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -182,7 +187,8 @@ const Map = () => {
         entranceMarkers={entrances}
         networks={networksCoordinates}
         networkMarkers={networks}
-        organizations={organizations}
+        organizations={organizationsCoordinates}
+        organizationMarkers={organizations}
         massifs={massifsCoordinates}
         massifPolygons={massifs}
         onUpdate={handleUpdate}

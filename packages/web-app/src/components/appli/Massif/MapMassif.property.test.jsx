@@ -6,7 +6,7 @@ import MapMassif from './MapMassif';
 
 // --- Mocks (same pattern as MapMassif.test.jsx) ---
 
-const mockUpdateLayers = vi.fn();
+const mockClusterLayer = vi.fn();
 const mockUpdateEntranceMarkers = vi.fn();
 
 vi.mock('react-leaflet', () => {
@@ -58,12 +58,15 @@ vi.mock('../../common/Maps/common/MapContainer', () => {
   return { __esModule: true, default: MockMapContainer };
 });
 
-vi.mock('../../common/Maps/MapClusters/useHeatLayer', () => {
+vi.mock('../../common/Maps/MapClusters/ClusterLayer', () => {
   const React = require('react');
   return {
     __esModule: true,
-    default: () => ({ updateLayers: mockUpdateLayers }),
-    HexGlobalCss: React.createElement('div')
+    default: props => {
+      mockClusterLayer(props);
+      return null;
+    },
+    ClusterGlobalCss: React.createElement('div')
   };
 });
 
@@ -97,7 +100,7 @@ const samplePolygon = JSON.stringify({
 });
 
 beforeEach(() => {
-  mockUpdateLayers.mockClear();
+  mockClusterLayer.mockClear();
   mockUpdateEntranceMarkers.mockClear();
 });
 
@@ -106,12 +109,11 @@ afterEach(() => {
 });
 
 /**
- * Property 1: updateHeatData receives the same data the API returned
+ * Property 1: the cluster layer receives the same data the API returned
  *
- * For any array of entrance coordinates returned by the
- * Geoloc_Endpoint (including the empty array), the MapMassif
- * component SHALL pass exactly that data to updateHeatData
- * (at low zoom, coordinates go to the heat layer).
+ * For any array of entrance coordinates returned by the Geoloc_Endpoint
+ * (including the empty array), the MapMassif component SHALL pass exactly
+ * that data to the ClusterLayer (at low zoom, coordinates feed the cluster).
  *
  * Validates: Requirements 2.3, 2.4
  */
@@ -126,10 +128,10 @@ describe('MapMassif property tests', () => {
     )
   );
 
-  it('passes all fetched coordinates to updateLayers for entrances', async () => {
+  it('passes all fetched coordinates to the cluster layer', async () => {
     await fc.assert(
       fc.asyncProperty(coordArb, async coords => {
-        mockUpdateLayers.mockClear();
+        mockClusterLayer.mockClear();
         mockUpdateEntranceMarkers.mockClear();
 
         global.fetch = vi.fn().mockResolvedValue({
@@ -142,7 +144,8 @@ describe('MapMassif property tests', () => {
         );
 
         await waitFor(() => {
-          expect(mockUpdateLayers).toHaveBeenCalledWith({ entrances: coords }, ['entrances']);
+          const lastCall = mockClusterLayer.mock.calls.at(-1)?.[0];
+          expect(lastCall?.data).toEqual(coords);
         });
 
         unmount();

@@ -2,9 +2,10 @@ import React, { useCallback, useEffect, useRef } from 'react';
 import { useMap } from 'react-leaflet';
 import useOpenLink from '../../../../hooks/useOpenLink';
 import PropTypes from 'prop-types';
-import * as L from 'leaflet';
+import L from 'leaflet';
 import { GlobalStyles } from '@mui/material';
 import useMarkers from '../common/Markers/useMarkers';
+import { makeIconTooltip } from '../common/Markers/tooltipHelpers';
 import { entranceIcon } from '../../../../assets/icons';
 
 export const ExploredGlobalCss = (
@@ -104,11 +105,10 @@ BoundsFitter.propTypes = {
 const ExploredOverlay = ({ points = [], shouldFitMapBound = false }) => {
   const openLink = useOpenLink();
 
-  const tooltipContent = useCallback(m => {
-    const HTML_ESCAPES = { '&': '&amp;', '<': '&lt;', '>': '&gt;' };
-    const safeName = (m.name ?? '—').replace(/[&<>]/g, c => HTML_ESCAPES[c]);
-    return `<span style="display:flex;align-items:center;gap:6px"><img src="${entranceIcon}" width="16" height="16">${safeName}</span>`;
-  }, []);
+  const tooltipContent = useCallback(
+    m => makeIconTooltip(entranceIcon, m.name),
+    []
+  );
 
   const onMarkerClick = useCallback(m => openLink(m.url), [openLink]);
 
