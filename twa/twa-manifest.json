@@ -20,6 +20,7 @@
     "path": "./android.keystore",
     "alias": "grottocenter"
   },
+  "_appVersionNote": "appVersionName/appVersionCode/appVersion are legacy fields from the initial Bubblewrap generation. They are overwritten by .github/workflows/twa-build.yml (sed on app/build.gradle) before every build, so the values below have no runtime impact on the APK/AAB that ships.",
   "appVersionName": "4",
   "appVersionCode": 4,
   "shortcuts": [],

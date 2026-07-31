@@ -11,4 +11,7 @@ createRoot(document.getElementById('root')).render(
 
 // Register the service worker (PWA). registerType: 'autoUpdate' makes the SW
 // update silently in the background; `immediate` registers without waiting.
+// No dev guard needed: vite-plugin-pwa is configured with devOptions.enabled
+// = false (see vite.config.mjs), so `virtual:pwa-register` exports a no-op
+// registerSW in development.
 registerSW({ immediate: true });

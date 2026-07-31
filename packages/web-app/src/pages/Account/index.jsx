@@ -264,8 +264,8 @@ const PersonalInfoSection = ({ account, onSaved }) => {
     } catch (error) {
       setSaveError(
         error?.status === 409
-          ? formatMessage({ id: 'This nickname is already taken.' })
-          : formatMessage({ id: 'An error occurred. Please try again.' })
+          ? formatMessage({ id: 'nicknameAlreadyTaken' })
+          : formatMessage({ id: 'genericError' })
       );
     } finally {
       setIsLoading(false);
@@ -452,10 +452,10 @@ const EmailSecuritySection = ({ account, onSaved, isAdmin = false }) => {
 
   const resolvePasswordError = error => {
     if (error?.status === 403)
-      return formatMessage({ id: 'Current password is incorrect.' });
+      return formatMessage({ id: 'currentPasswordIncorrect' });
     if (error?.status === 400 && error?.body?.message)
       return error.body.message;
-    return formatMessage({ id: 'An error occurred. Please try again.' });
+    return formatMessage({ id: 'genericError' });
   };
 
   const onPasswordSubmit = async data => {
@@ -529,9 +529,7 @@ const EmailSecuritySection = ({ account, onSaved, isAdmin = false }) => {
       {emailError && (
         <Alert
           severity="error"
-          content={formatMessage({
-            id: 'An error occurred. Please try again.'
-          })}
+          content={formatMessage({ id: 'genericError' })}
         />
       )}
       <EditActions isLoading={isEmailLoading} onCancel={handleCancelEmail} />
@@ -782,8 +780,8 @@ const MfaSection = () => {
               content={formatMessage({
                 id:
                   mfaReset.error === 'Mismatch'
-                    ? 'Current password is incorrect.'
-                    : 'An error occurred. Please try again.'
+                    ? 'currentPasswordIncorrect'
+                    : 'genericError'
               })}
             />
           )}
@@ -1073,9 +1071,7 @@ const PreferencesSection = ({ account, onSaved }) => {
       {saveError && (
         <Alert
           severity="error"
-          content={formatMessage({
-            id: 'An error occurred. Please try again.'
-          })}
+          content={formatMessage({ id: 'genericError' })}
         />
       )}
       <EditActions isLoading={isLoading} onCancel={handleCancel} />
@@ -1362,9 +1358,7 @@ const AccountPage = () => {
       {accountError && !isAccountLoading && (
         <Alert
           severity="error"
-          content={formatMessage({
-            id: 'An error occurred. Please try again.'
-          })}
+          content={formatMessage({ id: 'genericError' })}
         />
       )}
       {!isAccountLoading && account && (

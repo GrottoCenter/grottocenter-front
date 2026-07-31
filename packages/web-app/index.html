@@ -29,7 +29,14 @@
 
     <meta name="robots" content="noindex, nofollow" />
 
-    <!-- Open Graph (Google, Facebook, LinkedIn previews) -->
+    <!--
+      Open Graph (Google, Facebook, LinkedIn previews) and Twitter Card image
+      URLs are hardcoded to the production origin. Any non-prod deployment
+      (staging, Azure preview URLs, etc.) will therefore serve social cards
+      pointing at grottocenter.org rather than its own origin. This is
+      intentional: previews are not indexed (see robots meta above) and we
+      want production-quality cards when someone shares a preview link.
+    -->
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://grottocenter.org" />
     <meta property="og:site_name" content="Grottocenter" />
@@ -43,7 +50,7 @@
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
 
-    <!-- Twitter Card -->
+    <!-- Twitter Card — same hardcoded-prod-origin caveat as the OG image above. -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Grottocenter" />
     <meta

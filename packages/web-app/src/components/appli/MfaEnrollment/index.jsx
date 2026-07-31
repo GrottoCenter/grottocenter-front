@@ -40,7 +40,7 @@ const StepInstall = ({ onContinue, isLoading, error }) => {
             <Alert
               disableMargins
               severity="error"
-              content={formatMessage({ id: 'An error occurred. Please try again.' })}
+              content={formatMessage({ id: 'genericError' })}
             />
           </div>
         </Fade>
