@@ -37,6 +37,8 @@ import PermMediaOutlinedIcon from '@mui/icons-material/PermMediaOutlined';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import TuneIcon from '@mui/icons-material/Tune';
 import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
+import StorageOutlinedIcon from '@mui/icons-material/StorageOutlined';
 import { styled } from '@mui/material/styles';
 
 import fetch from 'isomorphic-fetch';
@@ -77,6 +79,7 @@ import {
   localeToLanguageId
 } from '../../utils/languageMapping';
 import { notificationPreferencesUrl } from '../../conf/apiRoutes';
+import { clearOfflineData, getStorageUsage } from '../../utils/offlineCache';
 
 // ─── Shared styled components ─────────────────────────────────────────────────
 
@@ -261,8 +264,8 @@ const PersonalInfoSection = ({ account, onSaved }) => {
     } catch (error) {
       setSaveError(
         error?.status === 409
-          ? formatMessage({ id: 'This nickname is already taken.' })
-          : formatMessage({ id: 'An error occurred. Please try again.' })
+          ? formatMessage({ id: 'nicknameAlreadyTaken' })
+          : formatMessage({ id: 'genericError' })
       );
     } finally {
       setIsLoading(false);
@@ -449,10 +452,10 @@ const EmailSecuritySection = ({ account, onSaved, isAdmin = false }) => {
 
   const resolvePasswordError = error => {
     if (error?.status === 403)
-      return formatMessage({ id: 'Current password is incorrect.' });
+      return formatMessage({ id: 'currentPasswordIncorrect' });
     if (error?.status === 400 && error?.body?.message)
       return error.body.message;
-    return formatMessage({ id: 'An error occurred. Please try again.' });
+    return formatMessage({ id: 'genericError' });
   };
 
   const onPasswordSubmit = async data => {
@@ -526,9 +529,7 @@ const EmailSecuritySection = ({ account, onSaved, isAdmin = false }) => {
       {emailError && (
         <Alert
           severity="error"
-          content={formatMessage({
-            id: 'An error occurred. Please try again.'
-          })}
+          content={formatMessage({ id: 'genericError' })}
         />
       )}
       <EditActions isLoading={isEmailLoading} onCancel={handleCancelEmail} />
@@ -779,8 +780,8 @@ const MfaSection = () => {
               content={formatMessage({
                 id:
                   mfaReset.error === 'Mismatch'
-                    ? 'Current password is incorrect.'
-                    : 'An error occurred. Please try again.'
+                    ? 'currentPasswordIncorrect'
+                    : 'genericError'
               })}
             />
           )}
@@ -1070,9 +1071,7 @@ const PreferencesSection = ({ account, onSaved }) => {
       {saveError && (
         <Alert
           severity="error"
-          content={formatMessage({
-            id: 'An error occurred. Please try again.'
-          })}
+          content={formatMessage({ id: 'genericError' })}
         />
       )}
       <EditActions isLoading={isLoading} onCancel={handleCancel} />
@@ -1094,6 +1093,130 @@ const PreferencesSection = ({ account, onSaved }) => {
 PreferencesSection.propTypes = {
   account: accountShape.isRequired,
   onSaved: PropTypes.func.isRequired
+};
+
+// ─── Offline data section ────────────────────────────────────────────────────
+
+// Browsers without a service worker (Safari private mode, unsupported UAs, dev
+// with devOptions.enabled: false) never populate the offline caches, so the
+// section would just show "0 MB" with no way to explain it. Skip entirely.
+const HAS_SERVICE_WORKER =
+  typeof navigator !== 'undefined' && 'serviceWorker' in navigator;
+
+const OfflineDataSection = () => {
+  const { formatMessage, formatNumber } = useIntl();
+  const { onSuccess, onError } = useNotification();
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isClearing, setIsClearing] = useState(false);
+  const [usageBytes, setUsageBytes] = useState(null);
+
+  const refreshUsage = useCallback(async () => {
+    const usage = await getStorageUsage();
+    setUsageBytes(usage);
+  }, []);
+
+  useEffect(() => {
+    refreshUsage();
+  }, [refreshUsage]);
+
+  const handleConfirm = async () => {
+    setIsClearing(true);
+    try {
+      await clearOfflineData();
+      onSuccess(formatMessage({ id: 'offlineDataCleared' }));
+      setIsDialogOpen(false);
+      refreshUsage();
+    } catch {
+      onError(
+        formatMessage({
+          id: 'offlineDataClearError',
+          defaultMessage: 'An error occurred. Please try again.'
+        })
+      );
+    } finally {
+      setIsClearing(false);
+    }
+  };
+
+  // Intl.NumberFormat's `megabyte` unit is the SI megabyte (10^6 bytes = MB /
+  // Mo), NOT the binary mebibyte (2^20 bytes = MiB / Mio) — divide by 1e6 so
+  // the number matches the label. Intl doesn't support `mebibyte` as a unit.
+  const formattedUsage =
+    usageBytes != null
+      ? formatNumber(usageBytes / 1_000_000, {
+          style: 'unit',
+          unit: 'megabyte',
+          maximumFractionDigits: 1
+        })
+      : null;
+
+  return (
+    <>
+      <SectionPaper elevation={2}>
+        <SectionHeader>
+          <SectionHeaderTitle>
+            <StorageOutlinedIcon color="action" />
+            <Typography variant="h6" fontWeight={600}>
+              {formatMessage({ id: 'Offline data' })}
+            </Typography>
+          </SectionHeaderTitle>
+          {formattedUsage && (
+            <Chip
+              size="small"
+              variant="outlined"
+              label={formattedUsage}
+              sx={{ fontWeight: 600 }}
+            />
+          )}
+        </SectionHeader>
+        <Divider />
+        <SectionBody>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+            {formatMessage({ id: 'offlineDataDescription' })}
+          </Typography>
+          <Button
+            variant="outlined"
+            color="warning"
+            startIcon={<DeleteOutlineIcon />}
+            onClick={() => setIsDialogOpen(true)}>
+            {formatMessage({ id: 'Clear offline data' })}
+          </Button>
+        </SectionBody>
+      </SectionPaper>
+      <StandardDialog
+        open={isDialogOpen}
+        onClose={() => !isClearing && setIsDialogOpen(false)}
+        fullWidth
+        maxWidth="xs"
+        title={formatMessage({ id: 'Clear offline data' })}
+        actions={
+          <>
+            <Button
+              onClick={() => setIsDialogOpen(false)}
+              variant="text"
+              disabled={isClearing}>
+              {formatMessage({ id: 'Cancel' })}
+            </Button>
+            <Button
+              onClick={handleConfirm}
+              color="warning"
+              variant="contained"
+              disabled={isClearing}
+              startIcon={
+                isClearing ? (
+                  <CircularProgress size={16} color="inherit" />
+                ) : null
+              }>
+              {formatMessage({ id: 'Clear' })}
+            </Button>
+          </>
+        }>
+        <Typography>
+          {formatMessage({ id: 'offlineDataConfirmation' })}
+        </Typography>
+      </StandardDialog>
+    </>
+  );
 };
 
 // ─── Main page ────────────────────────────────────────────────────────────────
@@ -1235,9 +1358,7 @@ const AccountPage = () => {
       {accountError && !isAccountLoading && (
         <Alert
           severity="error"
-          content={formatMessage({
-            id: 'An error occurred. Please try again.'
-          })}
+          content={formatMessage({ id: 'genericError' })}
         />
       )}
       {!isAccountLoading && account && (
@@ -1251,6 +1372,10 @@ const AccountPage = () => {
           <PreferencesSection account={account} onSaved={handleSaved} />
         </>
       )}
+      {/* Rendered even when the account fetch failed — clearing the cache
+          may be exactly what's needed to unstick the app. Hidden on browsers
+          with no service worker support (nothing to show / clear). */}
+      {HAS_SERVICE_WORKER && <OfflineDataSection />}
     </SectionStack>
   );
 

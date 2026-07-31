@@ -19,7 +19,7 @@ export const useMoveRelevanceWithUndo = moveThunk => {
             enqueueSnackbar(
               typeof result.error === 'string'
                 ? result.error
-                : formatMessage({ id: 'An error occurred. Please try again.' }),
+                : formatMessage({ id: 'genericError' }),
               { variant: 'error', autoHideDuration: 6000 }
             );
             return;
@@ -40,7 +40,7 @@ export const useMoveRelevanceWithUndo = moveThunk => {
                     .then(undoResult => {
                       if (undoResult?.error) {
                         enqueueSnackbar(
-                          formatMessage({ id: 'An error occurred. Please try again.' }),
+                          formatMessage({ id: 'genericError' }),
                           { variant: 'error', autoHideDuration: 6000 }
                         );
                         return;

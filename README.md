@@ -51,6 +51,13 @@ Github Actions is running 2 tasks on push and pull requests on `develop` :
 
 ### WIP
 
+## Android app (Google Play, TWA)
+
+GrottoCenter is packaged for the Google Play Store as a **Trusted Web Activity**
+that wraps the deployed PWA. See **[`twa/README.md`](twa/README.md)** for the full
+guide: PWA/service-worker setup, keystore generation, Play App Signing,
+`assetlinks.json`, the CI build workflow, and secret sharing.
+
 ## Production deployment (Azure)
 
 [Full wiki article](https://github.com/GrottoCenter/grottocenter-front/wiki/Production-deployment-(Azure))

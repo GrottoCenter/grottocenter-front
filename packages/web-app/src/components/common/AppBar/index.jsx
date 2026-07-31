@@ -23,6 +23,7 @@ import { logoGC } from '../../../conf/config';
 import LanguageSelector from '../LanguageSelector';
 import NotificationMenu from '../../appli/NotificationMenu';
 import MessagesIcon from './MessagesIcon';
+import OfflineIndicator from './OfflineIndicator';
 import QuickSearch from '../../appli/QuickSearch';
 
 import UserMenu from './User';
@@ -99,6 +100,7 @@ export const StyledLink = styled(AppLink)`
 
 const ActionsGroup = styled('div')(({ theme }) => ({
   display: 'flex',
+  alignItems: 'center',
   gap: theme.spacing(0.5),
   marginLeft: theme.spacing(1),
   [theme.breakpoints.down('sm')]: {
@@ -156,6 +158,7 @@ const AppBar = () => {
             </Box>
           </ToolsGroup>
           <ActionsGroup>
+            <OfflineIndicator />
             <NotificationMenu />
             <MessagesIcon />
             <UserMenu

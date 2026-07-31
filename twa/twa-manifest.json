@@ -1,0 +1,57 @@
+{
+  "packageId": "org.grottocenter.twa",
+  "host": "grottocenter.org",
+  "name": "Grottocenter",
+  "launcherName": "Grottocenter",
+  "display": "standalone",
+  "themeColor": "#5D4037",
+  "themeColorDark": "#000000",
+  "navigationColor": "#000000",
+  "navigationColorDark": "#000000",
+  "navigationDividerColor": "#000000",
+  "navigationDividerColorDark": "#000000",
+  "backgroundColor": "#5D4037",
+  "enableNotifications": true,
+  "startUrl": "/",
+  "iconUrl": "https://grottocenter.org/logo512.png",
+  "maskableIconUrl": "https://grottocenter.org/logo512-maskable.png",
+  "splashScreenFadeOutDuration": 300,
+  "signingKey": {
+    "path": "./android.keystore",
+    "alias": "grottocenter"
+  },
+  "_appVersionNote": "appVersionName/appVersionCode/appVersion are legacy fields from the initial Bubblewrap generation. They are overwritten by .github/workflows/twa-build.yml (sed on app/build.gradle) before every build, so the values below have no runtime impact on the APK/AAB that ships.",
+  "appVersionName": "4",
+  "appVersionCode": 4,
+  "shortcuts": [],
+  "generatorApp": "bubblewrap-cli",
+  "webManifestUrl": "https://grottocenter.org/manifest.json",
+  "fallbackType": "customtabs",
+  "features": {
+    "locationDelegation": {
+      "enabled": true
+    }
+  },
+  "alphaDependencies": {
+    "enabled": false
+  },
+  "enableSiteSettingsShortcut": true,
+  "isChromeOSOnly": false,
+  "isMetaQuest": false,
+  "fullScopeUrl": "https://grottocenter.org/",
+  "minSdkVersion": 21,
+  "orientation": "default",
+  "fingerprints": [
+    {
+      "name": "Play App Signing",
+      "value": "E7:FF:C1:29:60:28:26:EC:F5:00:35:A3:37:5A:13:48:4B:FE:BC:95:15:02:21:1D:51:AC:83:AB:A7:88:9C:40"
+    }
+  ],
+  "additionalTrustedOrigins": [],
+  "retainedBundles": [],
+  "protocolHandlers": [],
+  "fileHandlers": [],
+  "launchHandlerClientMode": "",
+  "displayOverride": [],
+  "appVersion": "4"
+}

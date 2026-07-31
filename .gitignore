@@ -91,3 +91,22 @@ packages/web-app/cypress/downloads/
 packages/web-app/cypress/screenshots/
 packages/web-app/cypress/videos/
 packages/web-app/cypress/fixtures/test-profile.json
+
+# Android TWA signing (NEVER commit)
+android.keystore
+*.keystore
+*.jks
+
+# Android TWA (Bubblewrap). The generated project under twa/ IS committed so CI
+# can build it directly — `bubblewrap build` and `gradle` do NOT regenerate the
+# project, they require it to exist. Only build outputs, caches, machine-specific
+# and signing files are ignored below.
+/twa/app/build/
+/twa/build/
+/twa/.gradle/
+/twa/local.properties
+# Signed bundle/apk + v4 signature .idsig
+/twa/app-release*
+# Bubblewrap drift-detection artefact — regenerated on `bubblewrap update`,
+# no runtime value, causes noise when twa-manifest.json is edited by hand.
+/twa/manifest-checksum.txt
