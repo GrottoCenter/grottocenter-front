@@ -42,13 +42,14 @@ export const TextLink = ({ value, url, icon }) => {
   );
   if (!icon) return label;
   return (
-    <Box
-      component="span"
-      sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.25 }}
-    >
-      {icon}
+    <>
+      <Box
+        component="span"
+        sx={{ display: 'inline-flex', verticalAlign: 'middle', mr: 0.25 }}>
+        {icon}
+      </Box>
       {label}
-    </Box>
+    </>
   );
 };
 TextLink.propTypes = {
@@ -144,8 +145,7 @@ export const DetailsList = ({ children }) => {
   return (
     <Paper
       variant="outlined"
-      sx={{ p: 1, borderRadius: 2, bgcolor: 'grey.50' }}
-    >
+      sx={{ p: 1, borderRadius: 2, bgcolor: 'grey.50' }}>
       <PropertiesGrid>{items}</PropertiesGrid>
     </Paper>
   );
@@ -262,8 +262,7 @@ export const EmptySection = ({ icon, message }) => (
       justifyContent: 'center',
       gap: 0.5,
       color: 'text.secondary'
-    }}
-  >
+    }}>
     {icon ?? <InsertDriveFile fontSize="large" color="disabled" />}
     <Typography variant="body2">{message}</Typography>
   </Paper>
@@ -286,8 +285,7 @@ export const EventDateSection = ({ date }) => {
         display: 'flex',
         alignItems: 'center',
         gap: 1
-      }}
-    >
+      }}>
       <EventAvailable sx={{ fontSize: 40, color: 'text.secondary' }} />
       <Box>
         <Typography variant="caption" color="text.secondary" display="block">
@@ -374,8 +372,7 @@ export const FilesSection = ({ files }) => {
               alignItems: 'center',
               gap: 0.5,
               mb: 0.5
-            }}
-          >
+            }}>
             {getFileIcon(file.fileName)}
             <AppLink href={file.completePath}>
               {decodeFileName(file.fileName)}
@@ -398,8 +395,7 @@ export const FilesSection = ({ files }) => {
               alignItems: 'center',
               gap: 0.5,
               mb: 0.5
-            }}
-          >
+            }}>
             {getFileIcon(file.fileName)}
             <AppLink href={file.completePath}>
               {decodeFileName(file.fileName)}
@@ -416,8 +412,7 @@ export const FilesSection = ({ files }) => {
               alignItems: 'center',
               gap: 0.5,
               mb: 0.5
-            }}
-          >
+            }}>
             {getFileIcon(file.fileName)}
             <AppLink href={file.completePath}>
               {decodeFileName(file.fileName)}

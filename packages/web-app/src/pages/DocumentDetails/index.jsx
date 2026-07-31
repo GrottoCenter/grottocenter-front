@@ -631,11 +631,14 @@ const Document = ({
                       <DetailItem
                         fullWidth
                         label={formatMessage({ id: 'Library' })}
-                        value={documentData.library?.name}
-                        url={
-                          documentData.library
-                            ? `/ui/organizations/${documentData.library.id}`
-                            : undefined
+                        value={
+                          documentData.library ? (
+                            <TextLink
+                              icon={<CustomIcon type="organization" size={18} />}
+                              value={documentData.library.name}
+                              url={`/ui/organizations/${documentData.library.id}`}
+                            />
+                          ) : null
                         }
                       />
                       <DetailItem
