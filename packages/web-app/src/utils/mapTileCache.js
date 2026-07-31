@@ -121,11 +121,18 @@ const fetchTile = (entity, tile, apiZoom) => {
       return data;
     })
     .catch(error => {
-      // Persist a failure marker with a real timestamp. Without this, the
-      // record would be left as `{}` (empty), and fetchForBounds's age
-      // comparison (NaN >= FRESH_MS = false) would treat the hole as "still
-      // fresh" — the tile would stay permanently empty until page reload.
-      s.tiles.set(key, { fetchedAt: now(), failed: true });
+      // Preserve previously-cached data on failure (stale-while-error): a
+      // transient network hiccup during background revalidation must not
+      // blank out the user's view. `fetchedAt` is refreshed to `now()` so
+      // FAILURE_COOLDOWN_MS actually gates the next retry attempt from the
+      // moment of failure — otherwise a stale `fetchedAt` would trip the
+      // cooldown immediately and moveend would spam refetches.
+      const prev = s.tiles.get(key);
+      s.tiles.set(key, {
+        ...(prev?.data !== undefined ? { data: prev.data } : {}),
+        fetchedAt: now(),
+        failed: true
+      });
       s.tilesVersion += 1;
       evictIfNeeded(s.tiles);
       s.dispatch?.({

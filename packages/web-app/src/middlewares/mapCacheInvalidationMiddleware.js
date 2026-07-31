@@ -8,16 +8,30 @@
 // a strict mirror of the server view.
 import { invalidateAll, invalidateTileAt } from '../utils/mapTileCache';
 
+// Do a targeted single-tile invalidation when coords are present; otherwise
+// fall back to a full-entity invalidation. Warns in dev so a silent payload-
+// shape drift (e.g. `action.data` → `action.payload`) surfaces before it ships
+// as a "why doesn't my new marker appear" bug.
+const invalidateAtOrFallback = (entity, actionType, coords) => {
+  if (coords?.latitude != null && coords?.longitude != null) {
+    invalidateTileAt(entity, coords.latitude, coords.longitude);
+    return;
+  }
+  if (process.env.NODE_ENV !== 'production') {
+    // eslint-disable-next-line no-console
+    console.warn(
+      `mapCacheInvalidationMiddleware: ${actionType} carried no {latitude, longitude}; ` +
+        `falling back to invalidateAll('${entity}'). Check the action payload shape.`
+    );
+  }
+  invalidateAll(entity);
+};
+
 const mapCacheInvalidationMiddleware = () => next => action => {
   const result = next(action);
   switch (action?.type) {
     case 'POST_ENTRANCE_SUCCESS':
-      // action.data carries the new entrance with coordinates
-      invalidateTileAt(
-        'entrances',
-        action.data?.latitude,
-        action.data?.longitude
-      );
+      invalidateAtOrFallback('entrances', action.type, action.data);
       // A new entrance may also reshape its network's map projection.
       invalidateAll('networks');
       break;
@@ -26,10 +40,10 @@ const mapCacheInvalidationMiddleware = () => next => action => {
       invalidateAll('networks');
       break;
     case 'POST_ORGANIZATION_SUCCESS':
-      invalidateTileAt(
+      invalidateAtOrFallback(
         'organizations',
-        action.organization?.latitude,
-        action.organization?.longitude
+        action.type,
+        action.organization
       );
       break;
     case 'UPDATE_ENTRANCE_SUCCESS':
