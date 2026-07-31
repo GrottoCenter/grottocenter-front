@@ -202,7 +202,11 @@ export const ChildrenControls = ({
           variant="outlined"
           label={
             <>
-              <InsertDriveFileIcon fontSize="small" color="action" />
+              <InsertDriveFileIcon
+                fontSize="small"
+                color="action"
+                aria-hidden="true"
+              />
               {formatMessage({ id: 'File available' })}
             </>
           }

@@ -1,7 +1,9 @@
 import {
   getChildDisplay,
   getChildLabel,
+  getIssuesYearRange,
   getPublicationYear,
+  hasOwnDescription,
   splitDateQualifier
 } from './documentChildrenLabel';
 
@@ -255,6 +257,100 @@ describe('getChildDisplay', () => {
       expect(getChildDisplay(doc(title, '2018'), 'Scialet').primary).not.toBe(
         ''
       );
+  });
+});
+
+describe('hasOwnDescription', () => {
+  it('hides a description that is a substring of the title', () => {
+    expect(
+      hasOwnDescription({ title: 'Scialet No 47 (2018)', description: 'Scialet' })
+    ).toBe(false);
+  });
+
+  it('ignores case and whitespace when comparing', () => {
+    expect(
+      hasOwnDescription({
+        title: 'Scialet  No 47',
+        description: '  scialet '
+      })
+    ).toBe(false);
+  });
+
+  it('shows a description that merely overlaps with the title', () => {
+    expect(
+      hasOwnDescription({
+        title: 'Scialet No 47 (2018)',
+        description: 'Scialet, bulletin du CDS Isère'
+      })
+    ).toBe(true);
+  });
+
+  it('shows a description that shares no text with the title', () => {
+    expect(
+      hasOwnDescription({
+        title: 'No 47',
+        description: 'Bulletin annuel'
+      })
+    ).toBe(true);
+  });
+
+  it.each([null, undefined, '', '   '])(
+    'hides a %s description',
+    description => {
+      expect(hasOwnDescription({ title: 'Scialet', description })).toBe(false);
+    }
+  );
+
+  it('tolerates a missing document', () => {
+    expect(hasOwnDescription(undefined)).toBe(false);
+  });
+});
+
+describe('getIssuesYearRange', () => {
+  it('returns the earliest and latest publication year', () => {
+    expect(
+      getIssuesYearRange([
+        { datePublication: '2005' },
+        { datePublication: '1998-06' },
+        { datePublication: '2012-01-01' }
+      ])
+    ).toEqual({ start: '1998', end: '2012' });
+  });
+
+  it('handles a single dated issue', () => {
+    expect(getIssuesYearRange([{ datePublication: '2011' }])).toEqual({
+      start: '2011',
+      end: '2011'
+    });
+  });
+
+  it('skips issues with no readable year', () => {
+    expect(
+      getIssuesYearRange([
+        { datePublication: '2005' },
+        { datePublication: 'n.d.' },
+        { datePublication: null },
+        { datePublication: '2010' }
+      ])
+    ).toEqual({ start: '2005', end: '2010' });
+  });
+
+  it('orders years correctly across the millennium boundary', () => {
+    expect(
+      getIssuesYearRange([
+        { datePublication: '2001' },
+        { datePublication: '1999' }
+      ])
+    ).toEqual({ start: '1999', end: '2001' });
+  });
+
+  it('returns null when nothing is dated', () => {
+    expect(getIssuesYearRange([{ datePublication: null }])).toBeNull();
+    expect(getIssuesYearRange([])).toBeNull();
+  });
+
+  it.each([null, undefined])('returns null for a %s list', input => {
+    expect(getIssuesYearRange(input)).toBeNull();
   });
 });
 

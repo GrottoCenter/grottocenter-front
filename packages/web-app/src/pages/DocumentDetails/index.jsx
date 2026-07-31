@@ -842,8 +842,11 @@ const DocumentDetails = ({ id, hideActions = false }) => {
   ) : (
     <Document
       // Navigating between documents without leaving the page (breadcrumb, then
-      // a sibling) keeps the component mounted: without this the sort selects
-      // would still show the previous document's choice over the new children.
+      // a sibling) keeps the component mounted: without the key, the three sort
+      // selects and wantedDeletedState would carry over from the previous
+      // document and act on the new one. Looks like an unusual key — don't
+      // remove as "redundant" during refactoring, it is what forces the state
+      // reset.
       key={documentId}
       isLoading={
         !documentId ||

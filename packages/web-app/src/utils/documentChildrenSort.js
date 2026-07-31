@@ -54,10 +54,16 @@ export const sortDocumentChildren = (
   // localeCompare bypasses the engine's cached default collator, so it builds a
   // fresh one on every single comparison — n log n of them on a collection that
   // can hold thousands of issues.
-  const { compare } = new Intl.Collator(locale, {
-    numeric: true,
-    sensitivity: 'base'
-  });
+  // The locale comes from Redux state and could in principle hold a value the
+  // runtime rejects; fall back to 'en' rather than let a malformed tag throw and
+  // silently degrade every sort into the browser default.
+  const collatorOptions = { numeric: true, sensitivity: 'base' };
+  let compare;
+  try {
+    ({ compare } = new Intl.Collator(locale, collatorOptions));
+  } catch {
+    ({ compare } = new Intl.Collator('en', collatorOptions));
+  }
   switch (order) {
     case CHILDREN_SORT_ORDERS.DATE_ASC:
       return sorted.sort((a, b) => compareDates(a, b, compare, 1));
