@@ -199,10 +199,19 @@ const HydratedMap = ({
     selectedHeats.has(heatmapTypes.MASSIFS) && isMassifPolygonMode;
 
   const handleUpdate = useCallback(() => {
+    const currentZoom = map.getZoom();
+    // Below MARKERS_LIMIT we're in heatmap mode: entrances/networks/massifs
+    // are drawn from the bulk "all coordinates" fetch done once at page load,
+    // and per-tile marker fetches are pure waste. Gating here (using the live
+    // `map.getZoom()`, not the batched `visibleMarkers` state) also fixes the
+    // transitional burst on big zoom-outs where `zoomend` sets the new state
+    // but `moveend` fires with a stale closure and would otherwise request
+    // hundreds of marker tiles for the whole world in one moveend.
+    const markersToFetch = currentZoom >= MARKERS_LIMIT ? visibleMarkers : [];
     onUpdateRef.current({
-      markers: visibleMarkers,
+      markers: markersToFetch,
       showMassifPolygons,
-      zoom: map.getZoom(),
+      zoom: currentZoom,
       center: map.getCenter(),
       bounds: map.getBounds()
     });

@@ -13,6 +13,9 @@ import {
 
 export const CACHE_ZOOM = 12;
 const FRESH_MS = 5 * 60 * 1000;
+// How long a failed tile stays "cached as failed" before we allow another
+// attempt. Prevents a moveend from re-firing the same tile that just failed.
+const FAILURE_COOLDOWN_MS = 30 * 1000;
 const MAX_TILES = 500;
 
 const now = () => Date.now();
@@ -114,15 +117,18 @@ const fetchTile = (entity, tile, apiZoom) => {
       return data;
     })
     .catch(error => {
+      // Persist a failure marker with a real timestamp. Without this, the
+      // record would be left as `{}` (empty), and fetchForBounds's age
+      // comparison (NaN >= FRESH_MS = false) would treat the hole as "still
+      // fresh" — the tile would stay permanently empty until page reload.
+      s.tiles.set(key, { fetchedAt: now(), failed: true });
+      s.tilesVersion += 1;
+      evictIfNeeded(s.tiles);
       s.dispatch?.({
         type: s.config.failureType,
         error: makeErrorMessage(error.message, `Fetching ${s.config.label}`)
       });
       throw error;
-    })
-    .finally(() => {
-      const rec = s.tiles.get(key);
-      if (rec && rec.inFlight === promise) delete rec.inFlight;
     });
 
   s.tiles.set(key, { ...(existing || {}), inFlight: promise });
@@ -149,9 +155,15 @@ export const fetchForBounds = (entity, bounds, apiZoom, dispatch) => {
   for (let i = 0; i < tiles.length; i += 1) {
     const tile = tiles[i];
     const rec = s.tiles.get(tileKey(entity, tile));
-    const age = rec ? t - rec.fetchedAt : Infinity;
-    // MISSING (no record OR fetchedAt=0 from invalidation) or STALE (>= FRESH_MS)
-    if (!rec || rec.fetchedAt === 0 || age >= FRESH_MS) {
+    // MISSING (no record OR fetchedAt=0 from invalidation).
+    if (!rec || rec.fetchedAt === 0) {
+      fetchTile(entity, tile, apiZoom).catch(() => {});
+      continue;
+    }
+    // Failed tiles use a shorter cooldown so an outage recovers quickly,
+    // successful tiles use the normal freshness TTL.
+    const ttl = rec.failed ? FAILURE_COOLDOWN_MS : FRESH_MS;
+    if (t - rec.fetchedAt >= ttl) {
       fetchTile(entity, tile, apiZoom).catch(() => {});
     }
   }
