@@ -60,6 +60,13 @@ const ErrorHandler = () => {
             })} - ${errorMessage}`
           );
           break;
+        case 429:
+          onWarning(
+            `${formatMessage({
+              id: 'Too many requests'
+            })} - ${errorMessage}`
+          );
+          break;
         default:
           break;
       }

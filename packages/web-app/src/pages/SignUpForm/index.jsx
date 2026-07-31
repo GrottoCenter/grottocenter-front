@@ -11,6 +11,7 @@ import {
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import { styled } from '@mui/material/styles';
+import { Turnstile } from '@marsidev/react-turnstile';
 import { isPasswordValid, isValidEmail } from '../../conf/config';
 import Layout from '../../components/common/Layouts/Fixed/FixedContent';
 import StringInput from '../../components/common/Form/StringInput';
@@ -28,6 +29,23 @@ const SpacedCenteredButton = styled(Button)`
   margin: ${({ theme }) => theme.spacing(0.5)} auto;
 `;
 
+const HoneypotWrapper = styled('div')`
+  position: absolute;
+  left: -9999px;
+  top: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+`;
+
+const CaptchaWrapper = styled('div')`
+  display: flex;
+  justify-content: center;
+  margin: ${({ theme }) => theme.spacing(1)} auto;
+`;
+
 const SignUpForm = ({
   email,
   name,
@@ -35,6 +53,9 @@ const SignUpForm = ({
   password,
   passwordConfirmation,
   surname,
+  honeypot,
+  captchaSiteKey = undefined,
+  isSubmitDisabled = false,
   onEmailChange,
   onNameChange,
   onNicknameChange,
@@ -42,6 +63,8 @@ const SignUpForm = ({
   onPasswordConfirmationChange,
   onSignUp,
   onSurnameChange,
+  onHoneypotChange,
+  onCaptchaTokenChange,
   loading,
   signUpRequestSucceeded
 }) => {
@@ -176,9 +199,42 @@ const SignUpForm = ({
               value={passwordConfirmation}
               valueName={formatMessage({ id: 'Password confirmation' })}
             />
+
+            {/*
+              Honeypot: an invisible field bots tend to fill. The wrapper is
+              aria-hidden so assistive tech skips it; the input keeps a
+              plausible name/aria-label ("Website") — deliberately not
+              translated, since the audience is bots, not users.
+            */}
+            <HoneypotWrapper aria-hidden="true">
+              <input
+                id="signup-website"
+                type="text"
+                name="website"
+                aria-label="Website"
+                tabIndex={-1}
+                autoComplete="off"
+                value={honeypot}
+                onChange={e => onHoneypotChange(e.target.value)}
+              />
+            </HoneypotWrapper>
+
+            {captchaSiteKey && (
+              <CaptchaWrapper>
+                <Turnstile
+                  siteKey={captchaSiteKey}
+                  onSuccess={onCaptchaTokenChange}
+                  onExpire={() => onCaptchaTokenChange('')}
+                  onError={() => onCaptchaTokenChange('')}
+                  options={{ theme: 'auto' }}
+                />
+              </CaptchaWrapper>
+            )}
+
             <SpacedCenteredButton
               type="submit"
               size="large"
+              disabled={loading || isSubmitDisabled}
               color={loading ? 'inherit' : 'primary'}>
               {loading ? (
                 <CircularProgress size="2.8rem" />
@@ -200,6 +256,9 @@ SignUpForm.propTypes = {
   password: PropTypes.string.isRequired,
   passwordConfirmation: PropTypes.string.isRequired,
   surname: PropTypes.string.isRequired,
+  honeypot: PropTypes.string.isRequired,
+  captchaSiteKey: PropTypes.string,
+  isSubmitDisabled: PropTypes.bool,
   onEmailChange: PropTypes.func.isRequired,
   onSignUp: PropTypes.func.isRequired,
   onNameChange: PropTypes.func.isRequired,
@@ -207,6 +266,8 @@ SignUpForm.propTypes = {
   onPasswordChange: PropTypes.func.isRequired,
   onPasswordConfirmationChange: PropTypes.func.isRequired,
   onSurnameChange: PropTypes.func.isRequired,
+  onHoneypotChange: PropTypes.func.isRequired,
+  onCaptchaTokenChange: PropTypes.func.isRequired,
   loading: PropTypes.bool.isRequired,
   signUpRequestSucceeded: PropTypes.bool.isRequired
 };
