@@ -84,9 +84,15 @@ fingerprints:
 The alias **must** be `grottocenter` (it is referenced in `twa/twa-manifest.json`).
 
 ```bash
-keytool -genkeypair -v -keystore twa/android.keystore -alias grottocenter \
-  -keyalg RSA -keysize 2048 -validity 9125
+keytool -genkeypair -v -keystore twa/android.keystore -alias grottocenter -keyalg RSA -keysize 2048 -validity 9125
 ```
+
+Quels sont vos nom et prénom ? Grottocenter Admin
+Quel est le nom de votre unité organisationnelle ? Wikicaves
+Quel est le nom de votre entreprise ? Wikicaves
+Quel est le nom de votre ville de résidence ? Bernex
+Quel est le nom de votre état ou province ? Haute-Savoie
+Quel est le code pays à deux lettres pour cette unité ? FR
 
 > 🔒 Losing this file means you can no longer sign updates with your upload key.
 > Back it up in **at least two** secure places and share it only via a secrets
@@ -107,11 +113,11 @@ Copy the `SHA256:` value into:
 
 In **Settings → Secrets and variables → Actions**, create:
 
-| Secret                      | Value                                                                                                                                                          |
-| --------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Secret                      | Value                                                                                                                                                                  |
+| --------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `ANDROID_KEYSTORE_BASE64`   | `base64 -w0 twa/android.keystore` on Linux or `[Convert]::ToBase64String([IO.File]::ReadAllBytes("twa/android.keystore"))` on Windows (the whole file, base64-encoded) |
-| `ANDROID_KEYSTORE_PASSWORD` | the keystore password chosen in step 1                                                                                                                         |
-| `ANDROID_KEY_PASSWORD`      | the key password chosen in step 1                                                                                                                              |
+| `ANDROID_KEYSTORE_PASSWORD` | the keystore password chosen in step 1                                                                                                                                 |
+| `ANDROID_KEY_PASSWORD`      | the key password chosen in step 1                                                                                                                                      |
 
 > GitHub secrets are **write-only**: they cannot be read back, even by admins. They
 > are for CI only, not a way to share the keystore with humans.
@@ -138,7 +144,7 @@ The workflow signs with your upload key, then:
 2. publishes a **GitHub Release** `vX.Y.Z` with the `.aab`/`.apk` attached — this is
    the **permanent, versioned archive** of each build.
 
-(Local alternative: `cd twa && bubblewrap build`.)
+(Local alternative: build it yourself — see [Building locally](#building-locally).)
 
 > The signed AAB ultimately lives in two durable places: the **GitHub Release**
 > (archive) and, after upload, the **Play Console** (source of truth for
@@ -170,6 +176,66 @@ curl https://grottocenter.org/.well-known/assetlinks.json
 
 Once a test install opens **without a URL bar** (see
 [Verifying the TWA](#verifying-the-twa)), promote the release in the Play Console.
+
+---
+
+## Building locally
+
+The CI workflow (`.github/workflows/twa-build.yml`) is the canonical way to produce a
+signed `.aab`. You can reproduce it locally to debug or to test on a device — all
+commands run **from the `twa/` folder**.
+
+### Prerequisites
+
+- **JDK 17+** and the **Android SDK** on `PATH` (Bubblewrap can install/download the
+  JDK and Android tools for you on first run if they are missing).
+- Bubblewrap CLI: `npm i -g @bubblewrap/cli`.
+- The upload keystore at `twa/android.keystore` (alias `grottocenter`) — see
+  [step 1](#1-generate-the-upload-keystore-do-this-once-keep-it-forever). Get it from
+  the team [secrets manager](#sharing-secrets-with-the-team) if you don't have it.
+
+### Build the AAB / APK
+
+```bash
+cd twa
+
+# Optional: bump the version before building (must be semver X.Y.Z).
+# The CI derives versionCode = major*10000 + minor*100 + patch — do the same by hand
+# if you want a monotonic code, or just edit twa-manifest.json.
+
+bubblewrap build --skipPwaValidation
+```
+
+Bubblewrap prompts for the keystore and key passwords (or pass
+`--key-store-password` / `--key-password` to match the CI invocation). This produces,
+in `twa/`:
+
+- `app-release-bundle.aab` — the bundle you upload to the Play Console.
+- `app-release-signed.apk` — a signed APK for direct device installation.
+
+> `--skipPwaValidation` mirrors the CI: it skips Bubblewrap's live Lighthouse check
+> against `https://grottocenter.org`. Drop the flag to have Bubblewrap validate the
+> deployed PWA as part of the build.
+
+### Install on a connected device
+
+```bash
+bubblewrap install   # installs app-release-signed.apk via adb on a plugged-in device
+```
+
+Then launch it and confirm there is **no Chrome URL bar** (see
+[Verifying the TWA](#verifying-the-twa)).
+
+### Regenerate the Android project from scratch
+
+The generated Gradle project (`twa/app/`) is gitignored. If it is missing or stale,
+recreate it from the committed manifest before building:
+
+```bash
+cd twa
+bubblewrap update   # regenerates the Android project from twa-manifest.json
+bubblewrap build --skipPwaValidation
+```
 
 ---
 
