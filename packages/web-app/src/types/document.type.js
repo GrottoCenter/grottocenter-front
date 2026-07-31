@@ -74,7 +74,7 @@ export const DocumentPropTypes = PropTypes.shape({
       name: PropTypes.string
     })
   ),
-  authorizationDocument: PropTypes.string,
+  authorizationDocument: DocumentSimplePropTypes,
   cave: idNameType,
   entrances: PropTypes.arrayOf(idNameType),
   massifs: PropTypes.arrayOf(idNameType),

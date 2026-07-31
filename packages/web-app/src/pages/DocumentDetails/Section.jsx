@@ -29,17 +29,32 @@ import {
 import { getFileIcon } from '../../components/common/DocumentsList/utils/fileIcons';
 import { ThumbnailsPropTypes } from '../../types/document.type';
 
-export const TextLink = ({ value, url }) => {
-  if (!url) return <Typography component="span">{value}</Typography>;
-  return url.startsWith('/ui') ? (
-    <AppLink to={url}>{value}</AppLink>
+// `icon` renders a small glyph inline before the label — the shape every
+// entity reference on the document page uses (author, editor, parent document).
+export const TextLink = ({ value, url, icon }) => {
+  const label = url ? (
+    // `to` vs `href` is AppLink's contract for internal vs external; stated once.
+    <AppLink {...(url.startsWith('/ui') ? { to: url } : { href: url })}>
+      {value}
+    </AppLink>
   ) : (
-    <AppLink href={url}>{value}</AppLink>
+    <Typography component="span">{value}</Typography>
+  );
+  if (!icon) return label;
+  return (
+    <Box
+      component="span"
+      sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.25 }}
+    >
+      {icon}
+      {label}
+    </Box>
   );
 };
 TextLink.propTypes = {
   value: PropTypes.oneOfType([PropTypes.string, PropTypes.node]).isRequired,
-  url: PropTypes.string
+  url: PropTypes.string,
+  icon: PropTypes.node
 };
 
 export const ListElement = ({ icon, value, secondary, url }) => {
@@ -101,11 +116,10 @@ EntitiesList.propTypes = { children: PropTypes.node };
 // rendered an empty block that still counted as a flex child, adding a gap
 // above the next section.
 export const SummaryText = ({ children }) => {
-  const text = typeof children === 'string' ? children.trim() : children;
-  if (!text) return null;
+  if (!children?.trim()) return null;
   return (
     <Typography component="div" variant="body1" sx={{ whiteSpace: 'pre-wrap' }}>
-      <Linkify options={linkifyOptions}>{text}</Linkify>
+      <Linkify options={linkifyOptions}>{children}</Linkify>
     </Typography>
   );
 };

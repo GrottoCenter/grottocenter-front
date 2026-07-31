@@ -11,21 +11,17 @@ export const DEFAULT_CHILDREN_SORT_ORDER = CHILDREN_SORT_ORDERS.DATE_DESC;
 // free text, it does not always hold an issue number, and a title that departs
 // from the collection's usual pattern ("Hors-série Vercors") lands wherever the
 // alphabet puts it. The chronology comes from datePublication, not from here.
-// A null title would throw on localeCompare and reject the whole fetch, so it
+// A null title would throw on the comparison and reject the whole fetch, so it
 // falls back to an empty string.
-const compareTitles = (a, b, locale) =>
-  (a.title ?? '').localeCompare(b.title ?? '', locale, {
-    numeric: true,
-    sensitivity: 'base'
-  });
+const compareTitles = (a, b, compare) => compare(a.title ?? '', b.title ?? '');
 
 // datePublication is a truncated ISO string ("2011", "2011-06", "2011-06-15"),
 // so plain string comparison already orders it chronologically — no parsing,
 // and no risk of reading a year-only value as a timestamp.
-const compareDates = (a, b, locale, direction) => {
+const compareDates = (a, b, compare, direction) => {
   const dateA = a.datePublication || '';
   const dateB = b.datePublication || '';
-  if (dateA === dateB) return compareTitles(a, b, locale);
+  if (dateA === dateB) return compareTitles(a, b, compare);
   // Undated documents always close the list, whichever direction is asked for.
   if (!dateA) return 1;
   if (!dateB) return -1;
@@ -52,13 +48,21 @@ export const sortDocumentChildren = (
   locale = 'en'
 ) => {
   const sorted = [...(documents ?? [])];
+  // One collator for the whole sort. Handing a locale and options to
+  // localeCompare bypasses the engine's cached default collator, so it builds a
+  // fresh one on every single comparison — n log n of them on a collection that
+  // can hold thousands of issues.
+  const { compare } = new Intl.Collator(locale, {
+    numeric: true,
+    sensitivity: 'base'
+  });
   switch (order) {
     case CHILDREN_SORT_ORDERS.DATE_ASC:
-      return sorted.sort((a, b) => compareDates(a, b, locale, 1));
+      return sorted.sort((a, b) => compareDates(a, b, compare, 1));
     case CHILDREN_SORT_ORDERS.TITLE:
-      return sorted.sort((a, b) => compareTitles(a, b, locale));
+      return sorted.sort((a, b) => compareTitles(a, b, compare));
     case CHILDREN_SORT_ORDERS.DATE_DESC:
     default:
-      return sorted.sort((a, b) => compareDates(a, b, locale, -1));
+      return sorted.sort((a, b) => compareDates(a, b, compare, -1));
   }
 };

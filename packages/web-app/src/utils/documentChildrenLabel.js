@@ -3,7 +3,11 @@
 const normalizeWord = word =>
   word.toLowerCase().replace(/^[^\p{L}\p{N}]+|[^\p{L}\p{N}]+$/gu, '');
 
-const collapse = value => value.trim().toLowerCase().replace(/\s+/g, ' ');
+// Case- and whitespace-insensitive form, for "is this the same text?" tests.
+// Shared so every such comparison in the document children UI agrees on what
+// counts as the same text.
+export const collapseWhitespace = value =>
+  (value ?? '').trim().toLowerCase().replace(/\s+/g, ' ');
 
 // Separators only — never a closing bracket, and never a full stop, which is
 // part of abbreviations such as "janv." or "Vol.".
@@ -98,6 +102,42 @@ export const getChildDisplay = (doc, collectionTitle) => {
   );
   const candidate = secondary ?? getPublicationYear(doc?.datePublication);
   const isRedundant =
-    candidate !== null && collapse(primary).includes(collapse(candidate));
+    candidate !== null &&
+    collapseWhitespace(primary).includes(collapseWhitespace(candidate));
   return { primary, secondary: isRedundant ? null : candidate };
+};
+
+/**
+ * Whether a child's description says anything its title does not.
+ *
+ * Imported children very often repeat the collection name as their description
+ * ("Scialet" under "Scialet No 47 (2018)"). Repeated on every row that is pure
+ * noise, so the description is only worth showing when it is not already
+ * contained in the title. Same notion of "the same text" as getChildDisplay's
+ * redundancy test — hence the shared normalizer.
+ */
+export const hasOwnDescription = doc => {
+  const description = collapseWhitespace(doc?.description);
+  return (
+    description !== '' && !collapseWhitespace(doc?.title).includes(description)
+  );
+};
+
+/**
+ * The span a collection's run actually covers, from its issues' publication
+ * dates — in library practice the central descriptive element of a serial.
+ *
+ * Derived rather than read from a curated sentence, so it is present and
+ * accurate for every collection. Years are 4-character strings, so comparing
+ * them as text orders them correctly. Returns null when no issue is dated.
+ */
+export const getIssuesYearRange = documents => {
+  const years = (documents ?? [])
+    .map(doc => getPublicationYear(doc?.datePublication))
+    .filter(Boolean);
+  if (years.length === 0) return null;
+  return {
+    start: years.reduce((min, year) => (year < min ? year : min)),
+    end: years.reduce((max, year) => (year > max ? year : max))
+  };
 };

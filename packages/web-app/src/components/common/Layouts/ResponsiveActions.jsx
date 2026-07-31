@@ -47,19 +47,14 @@ const ResponsiveActions = ({ items }) => {
   // trash never sits one pixel from "print" or "page history". Handled here
   // rather than by each caller inserting a separator: six pages build their own
   // items array, and a rule that has to be repeated six times is a rule that
-  // gets forgotten. An explicit `divider` item still forces a break.
-  const startsNewGroup = (item, previous) => {
-    if (!previous || previous.divider) return false;
-    return Boolean(previous.destructive) !== Boolean(item.destructive);
-  };
+  // gets forgotten.
+  const startsNewGroup = (item, previous) =>
+    Boolean(previous) &&
+    Boolean(previous.destructive) !== Boolean(item.destructive);
 
   if (isDesktop) {
     const groups = [[]];
     visibleItems.forEach((item, index) => {
-      if (item.divider) {
-        groups.push([]);
-        return;
-      }
       if (startsNewGroup(item, visibleItems[index - 1])) groups.push([]);
       groups[groups.length - 1].push(item);
     });
@@ -81,10 +76,6 @@ const ResponsiveActions = ({ items }) => {
   // children to drive keyboard focus, and wrapping items would break that.
   const menuEntries = [];
   visibleItems.forEach((item, index) => {
-    if (item.divider) {
-      menuEntries.push(<Divider key={`divider-${index}`} />);
-      return;
-    }
     if (startsNewGroup(item, visibleItems[index - 1]))
       menuEntries.push(<Divider key={`divider-before-${item.key}`} />);
     const { key, icon, label, onClick, href, target, color } = item;
@@ -155,8 +146,7 @@ ResponsiveActions.propTypes = {
     PropTypes.shape({
       key: PropTypes.string.isRequired,
       icon: PropTypes.node,
-      // Required for actions; a `divider` item carries only `key` and `divider`.
-      label: PropTypes.string,
+      label: PropTypes.string.isRequired,
       onClick: PropTypes.func,
       href: PropTypes.string,
       target: PropTypes.string,
@@ -164,8 +154,7 @@ ResponsiveActions.propTypes = {
       hidden: PropTypes.bool,
       // Sets the item apart from the routine actions (separate ButtonGroup on
       // desktop, divider in the popup menu). For delete and the like.
-      destructive: PropTypes.bool,
-      divider: PropTypes.bool
+      destructive: PropTypes.bool
     })
   )
 };

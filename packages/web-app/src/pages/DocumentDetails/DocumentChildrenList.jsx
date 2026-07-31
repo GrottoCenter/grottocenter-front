@@ -27,7 +27,10 @@ import {
   DOCUMENT_TYPE_ICONS,
   DOCUMENT_TYPE_FALLBACK_ICON
 } from '@/utils/documentTypeHelpers';
-import { getChildDisplay } from '@/utils/documentChildrenLabel';
+import {
+  getChildDisplay,
+  hasOwnDescription
+} from '@/utils/documentChildrenLabel';
 import { DocumentChildPropTypes } from '@/types/document.type';
 
 /* -------------------------------------------------------------------------- */
@@ -93,25 +96,10 @@ AvailabilityMarker.propTypes = {
 };
 
 /* -------------------------------------------------------------------------- */
-/* Shared helpers                                                             */
-/* -------------------------------------------------------------------------- */
-
-const normalize = value =>
-  (value ?? '').trim().toLowerCase().replace(/\s+/g, ' ');
-
-// Imported children very often repeat the collection name as their description
-// ("Scialet" under "Scialet No 47 (2018)"). Repeated on every row it is pure
-// noise. Keep the description only when it says something the title does not.
-const hasOwnDescription = doc => {
-  const description = normalize(doc.description);
-  return description !== '' && !normalize(doc.title).includes(description);
-};
-
-/* -------------------------------------------------------------------------- */
 /* Sort control                                                               */
 /* -------------------------------------------------------------------------- */
 
-export const ChildrenSortSelect = ({ value, onChange }) => {
+const ChildrenSortSelect = ({ value, onChange }) => {
   const { formatMessage } = useIntl();
   const labels = {
     [CHILDREN_SORT_ORDERS.DATE_DESC]: formatMessage({ id: 'Newest first' }),
@@ -192,9 +180,17 @@ export const ChildrenControls = ({
   onSortOrderChange
 }) => {
   const { formatMessage } = useIntl();
-  const hasFiles = (documents ?? []).some(doc => getAttachedFileName(doc));
-  const showSort =
-    Boolean(onSortOrderChange) && canReorderDocumentChildren(documents);
+  // Up to four of these are instantiated per page render, and the parent
+  // re-renders on every dialog / sort / license state change — so the array scan
+  // and the Set built by canReorderDocumentChildren are kept off that path.
+  const hasFiles = useMemo(
+    () => (documents ?? []).some(doc => getAttachedFileName(doc)),
+    [documents]
+  );
+  const showSort = useMemo(
+    () => Boolean(onSortOrderChange) && canReorderDocumentChildren(documents),
+    [documents, onSortOrderChange]
+  );
   if (!hasFiles && !showSort) return null;
 
   return (
@@ -352,7 +348,12 @@ const TileAvailabilityCorner = styled(TileCorner)(({ theme }) => ({
   insetInlineEnd: theme.spacing(0.5)
 }));
 
-const DocumentTile = ({ doc, display, labelTier }) => {
+// Memoized: a collection grid holds dozens to thousands of these, and every
+// unrelated state change on the page (sort select, delete dialog, licenses
+// arriving) would otherwise re-render all of them — Tooltip subtree included.
+// All three props come from the store or from the memos below, so the bail-out
+// is complete.
+const DocumentTile = React.memo(({ doc, display, labelTier }) => {
   const fileName = getAttachedFileName(doc);
   const tooltip = [doc.title, hasOwnDescription(doc) ? doc.description : null]
     .filter(Boolean)
@@ -382,7 +383,9 @@ const DocumentTile = ({ doc, display, labelTier }) => {
       </Tile>
     </Tooltip>
   );
-};
+});
+
+DocumentTile.displayName = 'DocumentTile';
 
 DocumentTile.propTypes = {
   doc: DocumentChildPropTypes.isRequired,
@@ -488,7 +491,10 @@ const Description = styled(Typography)`
   overflow-wrap: anywhere;
 `;
 
-const DocumentChildRow = ({ doc }) => {
+// Memoized for the same reason as DocumentTile: `doc` comes straight from the
+// store, so re-rendering a row on an unrelated page state change only costs a
+// pointless re-run of the linkify tokenizer over its description.
+const DocumentChildRow = React.memo(({ doc }) => {
   const TypeIcon = DOCUMENT_TYPE_ICONS[doc.type] ?? DOCUMENT_TYPE_FALLBACK_ICON;
   return (
     <ChildItem>
@@ -520,7 +526,9 @@ const DocumentChildRow = ({ doc }) => {
       </Box>
     </ChildItem>
   );
-};
+});
+
+DocumentChildRow.displayName = 'DocumentChildRow';
 
 DocumentChildRow.propTypes = { doc: DocumentChildPropTypes.isRequired };
 

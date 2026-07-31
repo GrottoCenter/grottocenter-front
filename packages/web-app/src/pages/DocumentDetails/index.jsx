@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { Box, Breadcrumbs, Chip, Skeleton, Typography } from '@mui/material';
+import { Box, Breadcrumbs, Skeleton, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { useNavigate, useParams } from 'react-router-dom';
 import AppLink from '../../components/common/AppLink';
@@ -44,7 +44,7 @@ import {
   DEFAULT_CHILDREN_SORT_ORDER,
   sortDocumentChildren
 } from '@/utils/documentChildrenSort';
-import { getPublicationYear } from '@/utils/documentChildrenLabel';
+import { getIssuesYearRange } from '@/utils/documentChildrenLabel';
 import { fetchDocumentDetails } from '../../actions/Document/GetDocumentDetails';
 import { fetchDocumentChildren } from '../../actions/Document/GetDocumentChildren';
 import { deleteDocument } from '../../actions/Document/DeleteDocument';
@@ -55,7 +55,9 @@ import PageContainer from '../../components/common/Layouts/PageContainer';
 import PageHeader from '../../components/common/Layouts/PageHeader';
 import SectionStack from '../../components/common/Layouts/SectionStack';
 import ResponsiveActions from '../../components/common/Layouts/ResponsiveActions';
-import ScrollableContent from '../../components/common/Layouts/Fixed/ScrollableContent';
+import ScrollableContent, {
+  CountBadge
+} from '../../components/common/Layouts/Fixed/ScrollableContent';
 import Alert from '../../components/common/Alert';
 import {
   DeleteConfirmationDialog,
@@ -125,6 +127,7 @@ const Document = ({
   const { locale } = useSelector(state => state.intl);
   const licenses = useSelector(state => state.licenses.data);
   const licensesLoading = useSelector(state => state.licenses.loading);
+  const licensesError = useSelector(state => state.licenses.error);
   const [issuesSortOrder, setIssuesSortOrder] = useState(
     DEFAULT_CHILDREN_SORT_ORDER
   );
@@ -146,9 +149,14 @@ const Document = ({
 
   // The document detail only carries the license name; resolve the full license
   // object (for its deed URL) from the licenses list.
+  //
+  // The error is part of the guard, not just the loading flag: the reducer
+  // resets `data` to null on failure, so without it a failed /licenses call
+  // satisfies the condition again on the very next render and the page refetches
+  // forever.
   useEffect(() => {
-    if (!licenses && !licensesLoading) dispatch(fetchLicense());
-  }, [dispatch, licenses, licensesLoading]);
+    if (!licenses && !licensesLoading && !licensesError) dispatch(fetchLicense());
+  }, [dispatch, licenses, licensesLoading, licensesError]);
   // Stay `undefined` until the licenses list is loaded — otherwise the badge
   // renders once with the bare name string (no deed URL), then re-renders as
   // an object once the list arrives, causing a visible flicker where the
@@ -207,14 +215,12 @@ const Document = ({
     if (items.length === 0) return null;
     return items.flatMap((a, i) => {
       const entry = (
-        <Box
-          component="span"
+        <TextLink
           key={a.id}
-          sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.25 }}
-        >
-          <CustomIcon type={a.iconType} size={18} />
-          <TextLink value={a.name} url={a.url} />
-        </Box>
+          icon={<CustomIcon type={a.iconType} size={18} />}
+          value={a.name}
+          url={a.url}
+        />
       );
       return i < items.length - 1 ? [entry, ' · '] : [entry];
     });
@@ -275,23 +281,19 @@ const Document = ({
       ),
     [documentChildren]
   );
+  // These two sections carry no sort control, so they simply take the default
+  // order — but they still take it here, from the same util as the others,
+  // rather than inheriting whatever order the fetch happened to store.
+  const sortedChildOther = useMemo(
+    () => sortDocumentChildren(childOther, DEFAULT_CHILDREN_SORT_ORDER, locale),
+    [childOther, locale]
+  );
 
-  // Holdings statement: the span the run actually covers. In library practice
-  // this is the central descriptive element of a serial, and it was missing
-  // entirely. Derived from the issues' datePublication, so it is present and
-  // accurate for every collection — unlike the sentence curators sometimes type
-  // into the description by hand. Years are 4-character strings, so comparing
-  // them as text orders them correctly.
-  const issuesYearRange = useMemo(() => {
-    const years = childIssues
-      .map(doc => getPublicationYear(doc.datePublication))
-      .filter(Boolean);
-    if (years.length === 0) return null;
-    return {
-      start: years.reduce((min, year) => (year < min ? year : min)),
-      end: years.reduce((max, year) => (year > max ? year : max))
-    };
-  }, [childIssues]);
+  // Holdings statement: the span the run actually covers.
+  const issuesYearRange = useMemo(
+    () => getIssuesYearRange(childIssues),
+    [childIssues]
+  );
 
   const linkedEntities = useMemo(() => {
     if (!documentData) return [];
@@ -439,54 +441,50 @@ const Document = ({
           onDeletePress(entity?.id, isDeleteConfirmationPermanent);
         }}
       />
+      {/* One section each, so no SectionStack: it exists to space sections
+          *apart*, and contributes nothing around a single child. */}
       {documentData?.isDeleted && (
-        <SectionStack>
-          <ScrollableContent
-            content={
-              <DeletedCard
-                entityType={DELETED_ENTITIES.document}
-                entity={documentData}
-                isLoading={isActionLoading}
-                standalone={false}
-                onRestorePress={onRestorePress}
-                onPermanentDeletePress={() => {
-                  setIsDeleteConfirmationPermanent(true);
-                  setIsDeleteConfirmationOpen(true);
-                }}
-              />
-            }
-          />
-        </SectionStack>
+        <ScrollableContent
+          content={
+            <DeletedCard
+              entityType={DELETED_ENTITIES.document}
+              entity={documentData}
+              isLoading={isActionLoading}
+              standalone={false}
+              onRestorePress={onRestorePress}
+              onPermanentDeletePress={() => {
+                setIsDeleteConfirmationPermanent(true);
+                setIsDeleteConfirmationOpen(true);
+              }}
+            />
+          }
+        />
       )}
       {isLoading && (
-        <SectionStack>
-          <ScrollableContent
-            content={
-              <>
-                <Skeleton width={75} />
-                <Skeleton />
-                <Skeleton width={100} />
-                <Skeleton variant="rectangular" height={150} />
-                <Skeleton width={125} />
-                <Skeleton variant="rectangular" height={80} />
-              </>
-            }
-          />
-        </SectionStack>
+        <ScrollableContent
+          content={
+            <>
+              <Skeleton width={75} />
+              <Skeleton />
+              <Skeleton width={100} />
+              <Skeleton variant="rectangular" height={150} />
+              <Skeleton width={125} />
+              <Skeleton variant="rectangular" height={80} />
+            </>
+          }
+        />
       )}
       {error && (
-        <SectionStack>
-          <ScrollableContent
-            content={
-              <Alert
-                title={formatMessage({
-                  id: 'Error, the document data you are looking for is not available.'
-                })}
-                severity="error"
-              />
-            }
-          />
-        </SectionStack>
+        <ScrollableContent
+          content={
+            <Alert
+              title={formatMessage({
+                id: 'Error, the document data you are looking for is not available.'
+              })}
+              severity="error"
+            />
+          }
+        />
       )}
       {documentData && (
         <SectionStack>
@@ -508,21 +506,13 @@ const Document = ({
                       <Box>
                         <ChildrenSectionHeader
                           title={
-                            // h2 in secondary, exactly like ScrollableContent's
-                            // own titles: this is a section heading among its
-                            // peers, and h5 under the page's h1 skipped three
-                            // levels for no reason.
+                            // h2 in secondary with the shared CountBadge,
+                            // exactly like ScrollableContent's own titles: this
+                            // is a section heading among its peers, and h5 under
+                            // the page's h1 skipped three levels for no reason.
                             <Typography variant="h2" color="secondary">
                               {formatMessage({ id: 'Issues' })}
-                              <Chip
-                                label={childIssues.length}
-                                size="small"
-                                sx={{
-                                  ml: 0.5,
-                                  fontWeight: 600,
-                                  verticalAlign: 'middle'
-                                }}
-                              />
+                              <CountBadge count={childIssues.length} />
                             </Typography>
                           }
                           controls={
@@ -605,20 +595,11 @@ const Document = ({
                         label={formatMessage({ id: 'Parent document' })}
                         value={
                           documentData.parent ? (
-                            <Box
-                              component="span"
-                              sx={{
-                                display: 'inline-flex',
-                                alignItems: 'center',
-                                gap: 0.25
-                              }}
-                            >
-                              <ParentTypeIcon fontSize="small" />
-                              <TextLink
-                                value={documentData.parent.title}
-                                url={`/ui/documents/${documentData.parent.id}`}
-                              />
-                            </Box>
+                            <TextLink
+                              icon={<ParentTypeIcon fontSize="small" />}
+                              value={documentData.parent.title}
+                              url={`/ui/documents/${documentData.parent.id}`}
+                            />
                           ) : null
                         }
                       />
@@ -632,20 +613,11 @@ const Document = ({
                         label={formatMessage({ id: 'Editor' })}
                         value={
                           documentData.editor ? (
-                            <Box
-                              component="span"
-                              sx={{
-                                display: 'inline-flex',
-                                alignItems: 'center',
-                                gap: 0.25
-                              }}
-                            >
-                              <CustomIcon type="organization" size={18} />
-                              <TextLink
-                                value={documentData.editor.name}
-                                url={`/ui/organizations/${documentData.editor.id}`}
-                              />
-                            </Box>
+                            <TextLink
+                              icon={<CustomIcon type="organization" size={18} />}
+                              value={documentData.editor.name}
+                              url={`/ui/organizations/${documentData.editor.id}`}
+                            />
                           ) : null
                         }
                       />
@@ -784,7 +756,7 @@ const Document = ({
               title={formatMessage({ id: 'Issues' })}
               count={childIssues.length}
               icon={<ChildrenControls documents={childIssues} />}
-              content={<DocumentChildrenList documents={childIssues} />}
+              content={<DocumentChildrenList documents={sortedChildIssues} />}
             />
           )}
 
@@ -794,7 +766,7 @@ const Document = ({
               title={formatMessage({ id: 'Child documents' })}
               count={childOther.length}
               icon={<ChildrenControls documents={childOther} />}
-              content={<DocumentChildrenList documents={childOther} />}
+              content={<DocumentChildrenList documents={sortedChildOther} />}
             />
           )}
         </SectionStack>
@@ -806,7 +778,6 @@ const Document = ({
 const DocumentDetails = ({ id, hideActions = false }) => {
   const dispatch = useDispatch();
   const permissions = usePermissions();
-  const { locale } = useSelector(state => state.intl);
   const { documentId: documentIdFromRoute } = useParams();
   const documentId = parseInt(documentIdFromRoute ?? id, 10);
   const { isLoading, details, error } = useSelector(
@@ -829,7 +800,7 @@ const DocumentDetails = ({ id, hideActions = false }) => {
   useEffect(() => {
     if (documentId) {
       dispatch(fetchDocumentDetails(documentId));
-      dispatch(fetchDocumentChildren(documentId, locale));
+      dispatch(fetchDocumentChildren(documentId));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [documentId]);

@@ -43,7 +43,9 @@ const StyledCardContent = styled(CardContent, {
   }
 `;
 
-const CountBadge = ({ count }) => (
+// Exported so a section heading rendered outside a card (e.g. inside a page
+// column) can carry the very same badge instead of re-creating its styling.
+export const CountBadge = ({ count }) => (
   <Chip
     label={count}
     size="small"
