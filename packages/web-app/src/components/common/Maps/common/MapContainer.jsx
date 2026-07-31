@@ -142,7 +142,8 @@ const CustomMapContainer = ({
   style,
   children,
   forceCentering,
-  mapRef
+  mapRef,
+  renderer = null
 }) => {
   const observerRef = useRef(null);
   const mapInstanceRef = useRef(null);
@@ -209,7 +210,8 @@ const CustomMapContainer = ({
         touchRotate={false}
         shiftKeyRotate={false}
         ref={mapRefCallback}
-        preferCanvas>
+        renderer={renderer ?? undefined}
+        preferCanvas={!renderer}>
         {isFullscreenAllowed && shouldChangeControlInFullscreen && (
           <FullscreenInteraction
             dragging={dragging}
@@ -255,7 +257,8 @@ CustomMapContainer.propTypes = {
   shouldChangeControlInFullscreen: PropTypes.bool,
   style: PropTypes.shape({}),
   forceCentering: PropTypes.bool,
-  mapRef: PropTypes.shape({ current: PropTypes.any })
+  mapRef: PropTypes.shape({ current: PropTypes.any }),
+  renderer: PropTypes.object
 };
 
 export default CustomMapContainer;

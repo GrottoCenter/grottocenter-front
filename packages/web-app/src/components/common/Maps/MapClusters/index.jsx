@@ -8,6 +8,7 @@ import React, {
 import PropTypes from 'prop-types';
 import { useMap, useMapEvent } from 'react-leaflet';
 import { useNavigate } from 'react-router-dom';
+import * as L from 'leaflet';
 import { uniq } from 'ramda';
 
 import DataControl, { heatmapTypes, markerTypes } from './DataControl';
@@ -487,6 +488,14 @@ const Index = ({ center, zoom, isSideMenuOpen, mapRef, popupTarget = null, ...pr
     setRunTour(false);
   }, []);
 
+  // Shared canvas renderer for the global map: widened clip area (padding 0.5
+  // vs Leaflet's default 0.1) means small pans stay within the canvas and only
+  // cost a CSS transform — no re-project of thousands of entrance points. All
+  // vector layers on this map (entrances, massif polygons) share this single
+  // canvas, so hit-testing is coordinated and no canvas blocks clicks meant
+  // for another. A fresh instance per mount avoids stale state on remount.
+  const renderer = useMemo(() => L.canvas({ padding: 0.5 }), []);
+
   return (
     <>
       <CustomMapContainer
@@ -496,7 +505,8 @@ const Index = ({ center, zoom, isSideMenuOpen, mapRef, popupTarget = null, ...pr
         isSideMenuOpen={isSideMenuOpen}
         isLocateControl
         isCompassControl
-        mapRef={mapRef}>
+        mapRef={mapRef}
+        renderer={renderer}>
         <HydratedMap {...props} popupTarget={popupTarget} />
       </CustomMapContainer>
       <MapTour run={runTour} onEnd={handleTourEnd} />

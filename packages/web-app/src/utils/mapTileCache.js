@@ -29,7 +29,12 @@ const ensureEntity = entity => {
       lastBounds: null,
       config: null,
       dispatch: null,
-      emitScheduled: false
+      emitScheduled: false,
+      // Bumped every time a tile's data is set (fetch success or invalidation).
+      // scheduleEmit uses this to skip dispatches when nothing has changed since
+      // the last emit — the common case when panning within already-cached tiles.
+      tilesVersion: 0,
+      lastEmittedVersion: -1
     };
   }
   return state[entity];
@@ -42,17 +47,13 @@ const evictIfNeeded = tiles => {
   }
 };
 
-// Bounds-based inclusion (not tile-based) so entities on tile edges aren't
-// duplicated or missed. Handles anti-meridian wrap.
-const withinBounds = (lat, lng, b) => {
-  if (lat < b.sw_lat || lat > b.ne_lat) return false;
-  if (b.ne_lng >= b.sw_lng) return lng >= b.sw_lng && lng <= b.ne_lng;
-  return lng >= b.sw_lng || lng <= b.ne_lng;
-};
-
+// Union of all cached tile data (deduped by id). No viewport-bounds filter:
+// Leaflet's canvas renderer culls off-screen points on its own, and filtering
+// here would make the union change on every pan — even one within already-
+// cached tiles — forcing a Redux dispatch and a full marker-diff for nothing.
 const computeUnion = entity => {
   const s = state[entity];
-  if (!s || !s.lastBounds) return [];
+  if (!s) return [];
   const seen = new Set();
   const out = [];
   s.tiles.forEach(rec => {
@@ -60,18 +61,17 @@ const computeUnion = entity => {
     for (let i = 0; i < rec.data.length; i += 1) {
       const item = rec.data[i];
       if (item == null || seen.has(item.id)) continue;
-      if (withinBounds(item.latitude, item.longitude, s.lastBounds)) {
-        seen.add(item.id);
-        out.push(item);
-      }
+      seen.add(item.id);
+      out.push(item);
     }
   });
   return out;
 };
 
 // Coalesce multiple in-flight tile completions into a single dispatch per
-// microtask, snapshotting lastBounds at emit time so late responses from a
-// stale viewport don't overwrite fresh data (they still populate the cache).
+// microtask. Skips the dispatch entirely when no tile has completed since the
+// last emit — this is what makes pans within already-cached tiles free
+// (no Redux state change → no re-render → no marker diff → no canvas redraw).
 const scheduleEmit = entity => {
   const s = state[entity];
   if (!s || s.emitScheduled) return;
@@ -79,6 +79,8 @@ const scheduleEmit = entity => {
   queueMicrotask(() => {
     s.emitScheduled = false;
     if (!s.dispatch || !s.config) return;
+    if (s.lastEmittedVersion === s.tilesVersion) return;
+    s.lastEmittedVersion = s.tilesVersion;
     s.dispatch({ type: s.config.successType, data: computeUnion(entity) });
   });
 };
@@ -106,6 +108,7 @@ const fetchTile = (entity, tile, apiZoom) => {
     .then(text => JSON.parse(text))
     .then(data => {
       s.tiles.set(key, { data, fetchedAt: now() });
+      s.tilesVersion += 1;
       evictIfNeeded(s.tiles);
       scheduleEmit(entity);
       return data;
