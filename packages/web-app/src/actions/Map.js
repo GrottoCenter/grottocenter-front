@@ -9,6 +9,10 @@ import {
   getMapMassifsCoordinatesUrl
 } from '../conf/apiRoutes';
 import makeErrorMessage from '../helpers/makeErrorMessage';
+import {
+  fetchForBounds,
+  registerEntity
+} from '../utils/mapTileCache';
 import { makeUrl } from './utils';
 
 export const FETCH_MAP_START_LOADING = 'FETCH_MAP_START_LOADING';
@@ -106,43 +110,26 @@ export const fetchAllNetworksCoordinates = () => dispatch => {
     });
 };
 
-export const fetchNetworks = criteria => {
-  const thunkToDebounce = function (dispatch) {
-    dispatch({ type: FETCH_MAP_START_LOADING, key: LOADINGS.NETWORKS });
-    const completedUrl = makeUrl(getMapCavesUrl, criteria);
-    return fetch(completedUrl)
-      .then(response => {
-        if (response.status >= 400) {
-          throw new Error(response.status);
-        }
-        return response.text();
-      })
-      .then(text => {
-        dispatch({ type: FETCH_MAP_NETWORKS_SUCCESS, data: JSON.parse(text) });
-      })
-      .catch(error => {
-        dispatch({
-          type: FETCH_MAP_NETWORKS_FAILURE,
-          error: makeErrorMessage(error.message, `Fetching networks`)
-        });
-      })
-      .finally(() => {
-        dispatch({
-          type: FETCH_MAP_END_LOADING,
-          key: LOADINGS.NETWORKS
-        });
-      });
-  };
+// Bounds-based thunks now go through the tile cache (utils/mapTileCache.js).
+// The cache handles per-tile dedup, TTL/SWR freshness, and coalesced dispatches,
+// so `redux-debounced` is no longer needed here — the request rate is bounded
+// by the tile grid.
+registerEntity('networks', {
+  url: getMapCavesUrl,
+  successType: FETCH_MAP_NETWORKS_SUCCESS,
+  failureType: FETCH_MAP_NETWORKS_FAILURE,
+  label: 'networks'
+});
 
-  thunkToDebounce.meta = {
-    debounce: {
-      time: 500,
-      key: 'FETCH_MAP_NETWORKS'
-    }
-  };
+const criteriaToBounds = ({ sw_lat, sw_lng, ne_lat, ne_lng }) => ({
+  sw_lat,
+  sw_lng,
+  ne_lat,
+  ne_lng
+});
 
-  return thunkToDebounce;
-};
+export const fetchNetworks = criteria => dispatch =>
+  fetchForBounds('networks', criteriaToBounds(criteria), criteria.zoom, dispatch);
 
 export const fetchAllEntrancesCoordinates = () => dispatch => {
   dispatch({
@@ -173,84 +160,25 @@ export const fetchAllEntrancesCoordinates = () => dispatch => {
     });
 };
 
-export const fetchEntrances = criteria => {
-  const thunkToDebounce = function (dispatch) {
-    dispatch({ type: FETCH_MAP_START_LOADING, key: LOADINGS.ENTRANCES });
-    const completedUrl = makeUrl(getMapEntrancesUrl, criteria);
-    return fetch(completedUrl)
-      .then(response => {
-        if (response.status >= 400) {
-          throw new Error(response.status);
-        }
-        return response.text();
-      })
-      .then(text => {
-        dispatch({ type: FETCH_MAP_ENTRANCES_SUCCESS, data: JSON.parse(text) });
-      })
-      .catch(error => {
-        dispatch({
-          type: FETCH_MAP_ENTRANCES_FAILURE,
-          error: makeErrorMessage(error.message, `Fetching entrances`)
-        });
-      })
-      .finally(() => {
-        dispatch({
-          type: FETCH_MAP_END_LOADING,
-          key: LOADINGS.ENTRANCES
-        });
-      });
-  };
+registerEntity('entrances', {
+  url: getMapEntrancesUrl,
+  successType: FETCH_MAP_ENTRANCES_SUCCESS,
+  failureType: FETCH_MAP_ENTRANCES_FAILURE,
+  label: 'entrances'
+});
 
-  thunkToDebounce.meta = {
-    debounce: {
-      time: 500,
-      key: 'FETCH_MAP_ENTRANCES'
-    }
-  };
+export const fetchEntrances = criteria => dispatch =>
+  fetchForBounds('entrances', criteriaToBounds(criteria), criteria.zoom, dispatch);
 
-  return thunkToDebounce;
-};
+registerEntity('organizations', {
+  url: getMapGrottosUrl,
+  successType: FETCH_MAP_ORGANIZATIONS_SUCCESS,
+  failureType: FETCH_MAP_ORGANIZATIONS_FAILURE,
+  label: 'organizations'
+});
 
-export const fetchOrganizations = criteria => {
-  const thunkToDebounce = function (dispatch) {
-    dispatch({ type: FETCH_MAP_START_LOADING, key: LOADINGS.ORGANIZATIONS });
-    const completedUrl = makeUrl(getMapGrottosUrl, criteria);
-    return fetch(completedUrl)
-      .then(response => {
-        if (response.status >= 400) {
-          throw new Error(response.status);
-        }
-        return response.text();
-      })
-      .then(text => {
-        dispatch({
-          type: FETCH_MAP_ORGANIZATIONS_SUCCESS,
-          data: JSON.parse(text)
-        });
-      })
-      .catch(error => {
-        dispatch({
-          type: FETCH_MAP_ORGANIZATIONS_FAILURE,
-          error: makeErrorMessage(error.message, `Fetching organizations`)
-        });
-      })
-      .finally(() => {
-        dispatch({
-          type: FETCH_MAP_END_LOADING,
-          key: LOADINGS.ORGANIZATIONS
-        });
-      });
-  };
-
-  thunkToDebounce.meta = {
-    debounce: {
-      time: 500,
-      key: 'FETCH_MAP_ORGANIZATIONS'
-    }
-  };
-
-  return thunkToDebounce;
-};
+export const fetchOrganizations = criteria => dispatch =>
+  fetchForBounds('organizations', criteriaToBounds(criteria), criteria.zoom, dispatch);
 
 export const fetchAllMassifsCoordinates = () => dispatch => {
   dispatch({
