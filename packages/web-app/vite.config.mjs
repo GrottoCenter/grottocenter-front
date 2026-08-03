@@ -67,9 +67,24 @@ export default defineConfig(({ mode }) => {
     compression({ algorithm: 'brotliCompress', deleteOriginalAssets: false }),
     visualizer({ filename: 'dist/stats.html', gzipSize: true, brotliSize: true }),
     // PWA / Service Worker (Workbox under the hood). Required to package the
-    // app as an Android TWA. SW is registered manually in src/index.jsx.
+    // app as an Android TWA. The SW is registered by <UpdatePrompt>
+    // (src/components/appli/UpdatePrompt.jsx), which also drives the update UI.
     VitePWA({
-      registerType: 'autoUpdate',
+      // 'prompt': a new SW installs, then WAITS until the user accepts the
+      // update. Deliberate choice, on two counts:
+      //  - the running page keeps the precache its own hashed chunks live in,
+      //    so lazy routes (App.jsx code-splitting) still resolve after a
+      //    deploy. A SW claiming clients mid-session swaps in a precache the
+      //    old chunk names are gone from → "Failed to fetch dynamically
+      //    imported module" on the next navigation to a not-yet-loaded route.
+      //  - the reload happens on a click, at a moment the user picked, instead
+      //    of silently discarding whatever they were doing.
+      // ⚠️ Do not switch back to 'autoUpdate' without also setting
+      // `workbox.skipWaiting: true`: the plugin only forces it when
+      // injectRegister is 'auto', so with `injectRegister: false` that combo
+      // builds a SW that never activates while a tab is open — the update
+      // silently never lands.
+      registerType: 'prompt',
       injectRegister: false,
       // Keep the historical manifest filename so the existing twa-manifest.json
       // (webManifestUrl: .../manifest.json) stays valid. (Service worker stays

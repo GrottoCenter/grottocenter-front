@@ -19,6 +19,7 @@ import useLanguageSync from '../hooks/useLanguageSync';
 
 import ErrorHandler from '../components/appli/ErrorHandler';
 import ErrorBoundary from '../components/appli/PageErrorBounary';
+import UpdatePrompt from '../components/appli/UpdatePrompt';
 import SideMenu from '../components/common/SideMenu';
 
 import AppBar from '../components/common/AppBar';
@@ -219,6 +220,9 @@ const ApplicationShell = () => (
       <Provider store={gcStore}>
         <HydratedIntlProvider onError={customOnIntlError}>
           <ErrorHandler />
+          {/* Outside the boundary on purpose: when a stale build crashes the
+              app, offering the update is exactly what fixes it. */}
+          <UpdatePrompt />
           <ErrorBoundary>
             <ApplicationLayout />
           </ErrorBoundary>
