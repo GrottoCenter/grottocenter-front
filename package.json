@@ -31,7 +31,7 @@
   "devDependencies": {
     "@commitlint/cli": "^20.5.0",
     "@commitlint/config-conventional": "20.5.3",
-    "baseline-browser-mapping": "^2.10.40",
+    "baseline-browser-mapping": "^2.11.6",
     "cross-env": "10.1.0",
     "eslint": "8.57.1",
     "eslint-config-airbnb": "19.0.4",
@@ -47,7 +47,7 @@
     "html-entities": "^2.6.0",
     "husky": "^9.1.7",
     "lint-staged": "16.4.0",
-    "prettier": "3.9.4",
+    "prettier": "3.9.6",
     "typescript": "5.9.3"
   },
   "engines": {
