@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { Alert, Button, Snackbar } from '@mui/material';
+import { Alert, Button, IconButton, Snackbar } from '@mui/material';
+import CloseIcon from '@mui/icons-material/Close';
 import SystemUpdateAltIcon from '@mui/icons-material/SystemUpdateAlt';
 import { useRegisterSW } from 'virtual:pwa-register/react';
 
@@ -64,23 +65,35 @@ const UpdatePrompt = () => {
       <Alert
         severity="info"
         icon={<SystemUpdateAltIcon fontSize="inherit" />}
-        sx={{ alignItems: 'center', typography: 'body1' }}
+        sx={{
+          alignItems: 'center',
+          typography: 'body1',
+          // Alert's action slot is top-aligned and padded by default, which
+          // reads as off-centre once the message wraps to two lines.
+          '& .MuiAlert-action': { alignItems: 'center', pt: 0 }
+        }}
         action={
           <>
+            {/* variant="text" is explicit: the theme defaults every MuiButton
+                to `contained`, which turns an alert action into a filled grey
+                block. nowrap keeps the label on one line — "Mettre à jour",
+                "Aktualisieren" … all wrap at 360dp otherwise. */}
             <Button
               color="inherit"
               size="small"
-              onClick={() => setNeedRefresh(false)}>
-              {formatMessage({ id: 'Later' })}
-            </Button>
-            <Button
-              color="inherit"
-              size="small"
-              variant="outlined"
+              variant="text"
               data-testid="update-app-btn"
+              sx={{ whiteSpace: 'nowrap' }}
               onClick={() => updateServiceWorker()}>
               {formatMessage({ id: 'Update' })}
             </Button>
+            <IconButton
+              color="inherit"
+              size="small"
+              aria-label={formatMessage({ id: 'Later' })}
+              onClick={() => setNeedRefresh(false)}>
+              <CloseIcon fontSize="small" />
+            </IconButton>
           </>
         }>
         {formatMessage({ id: 'A new version is available' })}
