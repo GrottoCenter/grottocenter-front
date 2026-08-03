@@ -33,7 +33,7 @@ const { isArticle, isIssue } = documentTypeHelpers;
 const FEATURED_TYPES = [
   DocumentTypes.IMAGE,
   DocumentTypes.TOPOGRAPHIC_DRAWING,
-  DocumentTypes.MOVING_IMAGE
+  DocumentTypes.REPORT
 ];
 
 const docTypePropType = PropTypes.shape({
@@ -47,53 +47,57 @@ const FeaturedCard = ({ docType, selected, onClick }) => {
   const Icon = DOCUMENT_TYPE_ICONS[docType.name] ?? DOCUMENT_TYPE_FALLBACK_ICON;
 
   return (
-    <Card
-      variant="outlined"
-      sx={{
-        borderColor: selected ? 'primary.main' : 'divider',
-        borderWidth: selected ? 2 : 1,
-        bgcolor: selected ? 'action.selected' : 'background.paper',
-        transition: 'border-color 0.15s, background-color 0.15s',
-        height: '100%'
-      }}>
-      <CardActionArea onClick={onClick} sx={{ height: '100%' }}>
-        <CardContent
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            gap: 0.5,
-            py: 2,
-            position: 'relative'
-          }}>
-          <Box
+    <Tooltip
+      title={docType.comment ? formatMessage({ id: docType.comment }) : ''}
+      placement="top">
+      <Card
+        variant="outlined"
+        sx={{
+          borderColor: selected ? 'primary.main' : 'divider',
+          borderWidth: selected ? 2 : 1,
+          bgcolor: selected ? 'action.selected' : 'background.paper',
+          transition: 'border-color 0.15s, background-color 0.15s',
+          height: '100%'
+        }}>
+        <CardActionArea onClick={onClick} sx={{ height: '100%' }}>
+          <CardContent
             sx={{
-              color: selected ? 'primary.main' : 'text.secondary',
               display: 'flex',
-              '& svg': { fontSize: 40 }
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: 0.5,
+              py: 2,
+              position: 'relative'
             }}>
-            <Icon />
-          </Box>
-          <Typography
-            variant="subtitle1"
-            fontWeight={600}
-            color={selected ? 'primary.main' : 'text.primary'}>
-            {formatMessage({ id: docType.name })}
-          </Typography>
-          {selected && (
-            <CheckCircleIcon
+            <Box
               sx={{
-                position: 'absolute',
-                top: 8,
-                right: 8,
-                fontSize: 18,
-                color: 'primary.main'
-              }}
-            />
-          )}
-        </CardContent>
-      </CardActionArea>
-    </Card>
+                color: selected ? 'primary.main' : 'text.secondary',
+                display: 'flex',
+                '& svg': { fontSize: 40 }
+              }}>
+              <Icon />
+            </Box>
+            <Typography
+              variant="subtitle1"
+              fontWeight={600}
+              color={selected ? 'primary.main' : 'text.primary'}>
+              {formatMessage({ id: docType.name })}
+            </Typography>
+            {selected && (
+              <CheckCircleIcon
+                sx={{
+                  position: 'absolute',
+                  top: 8,
+                  right: 8,
+                  fontSize: 18,
+                  color: 'primary.main'
+                }}
+              />
+            )}
+          </CardContent>
+        </CardActionArea>
+      </Card>
+    </Tooltip>
   );
 };
 

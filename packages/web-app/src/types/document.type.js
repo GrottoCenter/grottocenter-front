@@ -9,10 +9,32 @@ export const ThumbnailsPropTypes = PropTypes.shape({
   large: PropTypes.string
 });
 
+export const FilePropTypes = PropTypes.shape({
+  fileName: PropTypes.string,
+  completePath: PropTypes.string,
+  thumbnails: ThumbnailsPropTypes
+});
+
 export const DocumentSimplePropTypes = PropTypes.shape({
   id: PropTypes.number.isRequired,
   title: PropTypes.string,
   description: PropTypes.string
+});
+
+// Shape returned by GET /documents/{id}/children — richer than the simple
+// shape: it carries the publication date the list is ordered on and the files
+// the availability indicator is derived from.
+export const DocumentChildPropTypes = PropTypes.shape({
+  id: PropTypes.number.isRequired,
+  type: PropTypes.string,
+  title: PropTypes.string,
+  description: PropTypes.string,
+  datePublication: PropTypes.string,
+  dateInscription: PropTypes.string,
+  dateReviewed: PropTypes.string,
+  isValidated: PropTypes.bool,
+  isDeleted: PropTypes.bool,
+  files: PropTypes.arrayOf(FilePropTypes)
 });
 
 export const DocumentPropTypes = PropTypes.shape({
@@ -52,7 +74,7 @@ export const DocumentPropTypes = PropTypes.shape({
       name: PropTypes.string
     })
   ),
-  authorizationDocument: PropTypes.string,
+  authorizationDocument: DocumentSimplePropTypes,
   cave: idNameType,
   entrances: PropTypes.arrayOf(idNameType),
   massifs: PropTypes.arrayOf(idNameType),
@@ -61,11 +83,5 @@ export const DocumentPropTypes = PropTypes.shape({
     publicationOther: PropTypes.string,
     publicationFascicule: PropTypes.string
   }),
-  files: PropTypes.arrayOf(
-    PropTypes.shape({
-      fileName: PropTypes.string,
-      completePath: PropTypes.string,
-      thumbnails: ThumbnailsPropTypes
-    })
-  )
+  files: PropTypes.arrayOf(FilePropTypes)
 });

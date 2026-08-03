@@ -9,11 +9,7 @@ import CreateIcon from '@mui/icons-material/Create';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ShareIcon from '@mui/icons-material/Share';
 
-import {
-  useUserProperties,
-  usePermissions,
-  useSharePage
-} from '@/hooks';
+import { useUserProperties, usePermissions, useSharePage } from '@/hooks';
 import { PersonPropTypes } from '@/types/person.type';
 import PageContainer from '@/components/common/Layouts/PageContainer';
 import PageHeader from '@/components/common/Layouts/PageHeader';
@@ -73,7 +69,8 @@ const Person = ({ isLoading, person, error }) => {
 
         // Read updated conversations from the store to avoid UI flashing from multiple page loads
         const state = store.getState();
-        const updatedConversations = state.messaging?.activeConversations?.items || [];
+        const updatedConversations =
+          state.messaging?.activeConversations?.items || [];
         existingConv = updatedConversations.find(
           c => Number(c.otherParticipant?.id) === Number(person.id)
         );
@@ -178,7 +175,8 @@ const Person = ({ isLoading, person, error }) => {
           icon: <DeleteIcon />,
           label: formatMessage({ id: 'Delete' }),
           onClick: onDelete,
-          hidden: !onDelete
+          hidden: !onDelete,
+          destructive: true
         }
       ]}
     />

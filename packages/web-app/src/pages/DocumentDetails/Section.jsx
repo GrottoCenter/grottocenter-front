@@ -13,8 +13,10 @@ import {
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { EventAvailable, InsertDriveFile } from '@mui/icons-material';
+import Linkify from 'linkify-react';
 
 import AppLink from '../../components/common/AppLink';
+import linkifyOptions from '../../helpers/linkifyOptions';
 import Property from '../../components/common/Properties/Property';
 import ImageLightbox from '../../components/common/DocumentsList/ImageLightbox';
 import ImageThumbnail from '../../components/common/DocumentsList/ImageThumbnail';
@@ -27,19 +29,33 @@ import {
 import { getFileIcon } from '../../components/common/DocumentsList/utils/fileIcons';
 import { ThumbnailsPropTypes } from '../../types/document.type';
 
-export const TextLink = ({ value, url }) => {
-  if (!url) return <Typography component="span">{value}</Typography>;
-  return url.startsWith('/ui') ? (
-    <AppLink to={url}>{value}</AppLink>
-  ) : (
-    <AppLink href={url}>
+// `icon` renders a small glyph inline before the label — the shape every
+// entity reference on the document page uses (author, editor, parent document).
+export const TextLink = ({ value, url, icon }) => {
+  const label = url ? (
+    // `to` vs `href` is AppLink's contract for internal vs external; stated once.
+    <AppLink {...(url.startsWith('/ui') ? { to: url } : { href: url })}>
       {value}
     </AppLink>
+  ) : (
+    <Typography component="span">{value}</Typography>
+  );
+  if (!icon) return label;
+  return (
+    <>
+      <Box
+        component="span"
+        sx={{ display: 'inline-flex', verticalAlign: 'text-bottom', mr: 0.25 }}>
+        {icon}
+      </Box>
+      {label}
+    </>
   );
 };
 TextLink.propTypes = {
   value: PropTypes.oneOfType([PropTypes.string, PropTypes.node]).isRequired,
-  url: PropTypes.string
+  url: PropTypes.string,
+  icon: PropTypes.node
 };
 
 export const ListElement = ({ icon, value, secondary, url }) => {
@@ -95,15 +111,20 @@ export const EntitiesList = ({ children }) => {
 };
 EntitiesList.propTypes = { children: PropTypes.node };
 
+// Takes the raw text and linkifies it itself. Callers used to pass
+// `<Linkify>{description}</Linkify>`, which made `children` a truthy element
+// even for an empty description: the guard below never fired and the component
+// rendered an empty block that still counted as a flex child, adding a gap
+// above the next section.
 export const SummaryText = ({ children }) => {
-  if (!children) return null;
+  if (!children?.trim()) return null;
   return (
     <Typography component="div" variant="body1" sx={{ whiteSpace: 'pre-wrap' }}>
-      {children}
+      <Linkify options={linkifyOptions}>{children}</Linkify>
     </Typography>
   );
 };
-SummaryText.propTypes = { children: PropTypes.node };
+SummaryText.propTypes = { children: PropTypes.string };
 
 const PropertiesGrid = styled(Box)(({ theme }) => ({
   display: 'grid',
@@ -380,11 +401,7 @@ export const FilesSection = ({ files }) => {
               {decodeFileName(file.fileName)}
             </AppLink>
           </Box>
-          <VideoPreview
-            controls
-            preload="metadata"
-            src={file.completePath}
-          />
+          <VideoPreview controls preload="metadata" src={file.completePath} />
         </Box>
       ))}
       {audios.map(file => (
