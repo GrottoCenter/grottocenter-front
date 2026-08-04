@@ -300,7 +300,9 @@ describe('useGeolocation', () => {
       expect(geolocation.getCurrentPosition).toHaveBeenCalledTimes(1);
       expect(geolocation.getCurrentPosition.mock.calls[0][2]).toEqual({
         enableHighAccuracy: true,
-        timeout: 15000,
+        // Matches the one-shot timeout: at a 5s watchdog interval, a 15s
+        // poke timeout would allow three overlapping requests in flight.
+        timeout: 10000,
         maximumAge: 0
       });
       // A poke must never rebuild the watch — that is the next step up.

@@ -493,9 +493,7 @@ describe('LocationControl', () => {
       // dialog at all — once an origin is under its auto-embargo. Treating every
       // code 1 as final is what silently killed tracking mid-session.
       await waitFor(() => expect(mockOnError).toHaveBeenCalledTimes(1));
-      expect(label()).toBe(
-        'Location access denied. Enable it in your browser settings.'
-      );
+      expect(label()).toBe('location.error.denied');
     });
 
     it('does not demote a user activation when the permission lands afterwards', async () => {
