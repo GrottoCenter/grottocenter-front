@@ -82,7 +82,7 @@ const WaypointHud = ({ waypoint, userLocation }) => {
         bottom: theme.spacing(2),
         left: '50%',
         transform: 'translateX(-50%)',
-        zIndex: 1000,
+        zIndex: theme.zIndex.tooltip,
         pointerEvents: 'auto',
         maxWidth: `calc(100% - ${theme.spacing(4)})`
       }}>

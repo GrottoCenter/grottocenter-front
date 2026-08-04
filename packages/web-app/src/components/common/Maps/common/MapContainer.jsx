@@ -101,10 +101,13 @@ const FullscreenOnlyControls = () => {
   const isFullscreen = useIsFullscreen();
 
   // Leaving fullscreen unmounts the location control; restore north-up so the
-  // map isn't left rotated with no control to reset it.
-  useMapEvent('exitFullscreen', () => {
+  // map isn't left rotated with no control to reset it. Registered even when
+  // !isFullscreen (i.e. when this component renders null) since the listener
+  // must already be in place before the exitFullscreen event fires.
+  const handleExitFullscreen = useCallback(() => {
     if (typeof map.setBearing === 'function') map.setBearing(0);
-  });
+  }, [map]);
+  useMapEvent('exitFullscreen', handleExitFullscreen);
 
   if (!isFullscreen) return null;
   return (

@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import { useMap, useMapEvents } from 'react-leaflet';
 import * as L from 'leaflet';
-import { IconButton } from '@mui/material';
+import { IconButton, useTheme } from '@mui/material';
 import NavigationIcon from '@mui/icons-material/Navigation';
 import {
   WAYPOINT_COLOR,
@@ -20,6 +20,7 @@ const EDGE_MARGIN = 26;
 // map bearing: latLngToContainerPoint already accounts for leaflet-rotate.
 const WaypointOffscreenIndicator = ({ waypoint }) => {
   const map = useMap();
+  const theme = useTheme();
   const { formatMessage } = useIntl();
   // { x, y, angle } in container pixels, or null when the pin is on screen.
   const [indicator, setIndicator] = useState(null);
@@ -41,7 +42,7 @@ const WaypointOffscreenIndicator = ({ waypoint }) => {
       // Only reset when transitioning to on-screen: on a rotating map in
       // compass mode this fires on every heading update, so a blind setState
       // adds a render per tick even when nothing observable changed.
-      setIndicator(prev => (prev === null ? prev : null));
+      setIndicator(prev => (prev !== null ? null : prev));
       return;
     }
     const cx = width / 2;
@@ -108,7 +109,7 @@ const WaypointOffscreenIndicator = ({ waypoint }) => {
         left: indicator.x,
         top: indicator.y,
         transform: 'translate(-50%, -50%)',
-        zIndex: 1000,
+        zIndex: theme.zIndex.tooltip,
         width: 40,
         height: 40,
         bgcolor: WAYPOINT_COLOR,

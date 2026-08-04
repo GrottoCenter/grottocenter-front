@@ -407,6 +407,9 @@ const LocationControl = () => {
 
   // Each label announces what the *next* tap does, so it doubles as the
   // non-visual reading of the current mode.
+  // 'Use my location' predates the semantic-key convention used below
+  // ('location.error.denied', 'Compass mode', ...) — kept as-is to avoid an
+  // unrelated i18n key churn; it already exists in every lang file.
   let tooltipId = 'Use my location';
   if (isError) {
     tooltipId = GEO_ERROR_MESSAGES[geoError] || GEO_ERROR_MESSAGES[2];
