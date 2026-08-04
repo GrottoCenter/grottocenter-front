@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import { styled } from '@mui/material/styles';
 import {
   Box,
@@ -36,8 +37,11 @@ export const InputWrapper = styled('div')`
   flex-direction: column;
 `;
 
-// eslint-disable-next-line react/prop-types
 const ExpandIcon = ({ isOpen }) => (isOpen ? <ExpandLess /> : <ExpandMore />);
+
+ExpandIcon.propTypes = {
+  isOpen: PropTypes.bool.isRequired
+};
 
 const FormAutoComplete = ({
   getValueName,

@@ -221,10 +221,16 @@ Key custom rules:
 - `console.warn` / `console.error` OK — `console.log` is a warning
 - A leading `_` marks a binding as deliberately unused (arguments, caught errors)
 
-`yarn lint` must end with **0 errors and 0 warnings**. The airbnb rules are all
-enforced at `error`, including `react/prop-types`, `no-nested-ternary` and
-`consistent-return` — keep it that way rather than demoting a rule to make a
-change fit.
+`yarn lint` must end with **0 errors**. Warnings are the tracked design debt
+listed with `TODO` next to each rule in `packages/eslint-config/index.mjs`
+(currently `react/jsx-filename-extension`, `react/no-unstable-nested-components`,
+`react/jsx-props-no-spreading`, plus `no-console` for stray `console.log`). Do
+not add new ones — fix them as you touch the files, and clear a TODO by turning
+its rule to `error` once all the sites are gone.
+
+Everything else is enforced at `error`. In particular, the airbnb defaults for
+`react/prop-types`, `no-nested-ternary` and `consistent-return` are inherited
+unchanged — keep it that way rather than demoting a rule to make a change fit.
 
 A few rules are deliberately configured rather than followed blindly, each with
 the reason written next to it in `packages/eslint-config/index.mjs`: single named

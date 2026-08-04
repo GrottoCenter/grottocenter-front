@@ -271,7 +271,14 @@ const SensorConfigForm = ({ deviceId }) => {
             onChange={handleFieldChange('quantityKindId')}
             size="small"
             sx={{ flex: 1 }}
-            SelectProps={{ displayEmpty: true }}
+            SelectProps={{
+              displayEmpty: true,
+              MenuProps: {
+                slotProps: {
+                  paper: { 'data-testid': 'sensor-config-quantity-kind-menu' }
+                }
+              }
+            }}
             data-testid="sensor-config-quantity-kind">
             {sortedQuantityKinds.map(qk => (
               <MenuItem key={qk.id} value={qk.id}>

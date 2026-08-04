@@ -80,11 +80,9 @@ describe('Import Observations Wizard', () => {
 
       // Select a quantity kind (Temperature)
       cy.get('[data-testid="sensor-config-quantity-kind"]').click();
-      cy.get('.MuiMenu-paper')
-        .last()
-        .within(() => {
-          cy.get('[role="option"]').first().click();
-        });
+      cy.get('[data-testid="sensor-config-quantity-kind-menu"]').within(() => {
+        cy.get('[role="option"]').first().click();
+      });
 
       // Unit is auto-selected; submit the sensor config
       cy.get('[data-testid="sensor-config-submit"]').click();
@@ -98,11 +96,15 @@ describe('Import Observations Wizard', () => {
 
       // Assign first column as timestamp
       cy.get('[data-testid="role-select-0"]').click();
-      cy.get('.MuiMenu-paper').last().find('[data-value="timestamp"]').click();
+      cy.get('[data-testid="role-menu-0"]')
+        .find('[data-value="timestamp"]')
+        .click();
 
       // Configure timestamp type
       cy.get('[data-testid="timestamp-type-select-0"]').click();
-      cy.get('.MuiMenu-paper').last().find('[data-value="datetime"]').click();
+      cy.get('[data-testid="timestamp-type-menu-0"]')
+        .find('[data-value="datetime"]')
+        .click();
 
       // Type the format string directly
       cy.get('[data-testid="format-input"]')
@@ -114,18 +116,15 @@ describe('Import Observations Wizard', () => {
 
       // Assign second column as measurement
       cy.get('[data-testid="role-select-1"]').click();
-      cy.get('.MuiMenu-paper')
-        .last()
+      cy.get('[data-testid="role-menu-1"]')
         .find('[data-value="measurement"]')
         .click();
 
       // Link measurement column to sensor config
       cy.get('[data-testid="sensor-config-select-1"]').click();
-      cy.get('.MuiMenu-paper')
-        .last()
-        .within(() => {
-          cy.get('[role="option"]').last().click();
-        });
+      cy.get('[data-testid="sensor-config-menu-1"]').within(() => {
+        cy.get('[role="option"]').last().click();
+      });
 
       // Click Next to go to Validate step
       cy.get('[data-testid="next-button"]').click();
@@ -168,11 +167,9 @@ describe('Import Observations Wizard', () => {
 
       // Select license
       cy.get('[data-testid="license-select"]').click();
-      cy.get('.MuiMenu-paper')
-        .last()
-        .within(() => {
-          cy.get('[role="option"]').first().click();
-        });
+      cy.get('[data-testid="license-menu"]').within(() => {
+        cy.get('[role="option"]').first().click();
+      });
 
       // Click Next to go to Submit step
       cy.get('[data-testid="next-button"]').click();

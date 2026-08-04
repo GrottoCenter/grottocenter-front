@@ -18,6 +18,9 @@ export const files = ['**/*.{js,jsx,mjs,cjs,ts,tsx}'];
 export default [
   { files },
   js.configs.recommended,
+  // airbnb ships `no-nested-ternary`, `consistent-return`, `react/prop-types`
+  // and the a11y set at `error`. AGENTS.md commits to keeping them there:
+  // any override in the block below must state why explicitly.
   ...compat.extends(
     'airbnb',
     'airbnb/hooks',
@@ -146,7 +149,9 @@ export default [
       // MUI exposes `inputProps` (native input attributes) and `InputProps`
       // (Input component props) side by side: they are two distinct props.
       'react/jsx-no-duplicate-props': ['error', { ignoreCase: false }],
-      'react/no-unstable-nested-components': 'off', // TODO: remove it and fix them
+      // `warn`, not `off`, so the remaining instances stay visible in the lint
+      // output and can be picked off progressively. See AGENTS.md.
+      'react/no-unstable-nested-components': 'warn', // TODO: remove it and fix them
       'react/jsx-filename-extension': ['warn', { extensions: ['.js', '.jsx'] }], // TODO: Rename .js file
       'react/jsx-props-no-spreading': 'off', // TODO: Remove spreaded props
       'react/function-component-definition': [

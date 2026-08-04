@@ -226,7 +226,14 @@ const TimestampConfig = ({
             id: 'ImportObservationsWizard.MapColumnsStep.timestampType'
           })}
           onChange={handleTypeChange}
-          data-testid={`timestamp-type-select-${mapping.columnIndex}`}>
+          data-testid={`timestamp-type-select-${mapping.columnIndex}`}
+          MenuProps={{
+            slotProps: {
+              paper: {
+                'data-testid': `timestamp-type-menu-${mapping.columnIndex}`
+              }
+            }
+          }}>
           {TIMESTAMP_TYPES.map(t => (
             <MenuItem key={t} value={t}>
               {formatMessage({
@@ -299,7 +306,14 @@ const MeasurementConfig = ({ mapping, sensorConfigs, onUpdate }) => {
             id: 'ImportObservationsWizard.MapColumnsStep.sensorConfig'
           })}
           onChange={handleSensorChange}
-          data-testid={`sensor-config-select-${mapping.columnIndex}`}>
+          data-testid={`sensor-config-select-${mapping.columnIndex}`}
+          MenuProps={{
+            slotProps: {
+              paper: {
+                'data-testid': `sensor-config-menu-${mapping.columnIndex}`
+              }
+            }
+          }}>
           <MenuItem value="">
             <em>
               {formatMessage({
@@ -522,7 +536,14 @@ const ColumnRoleTable = ({
                               mediumId: null
                             });
                           }}
-                          data-testid={`role-select-${colIndex}`}>
+                          data-testid={`role-select-${colIndex}`}
+                          MenuProps={{
+                            slotProps: {
+                              paper: {
+                                'data-testid': `role-menu-${colIndex}`
+                              }
+                            }
+                          }}>
                           <MenuItem value="" disabled>
                             <em>
                               {formatMessage({

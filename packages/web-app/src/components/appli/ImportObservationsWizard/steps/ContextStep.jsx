@@ -601,7 +601,12 @@ const ContextStep = ({ initialCaveId, caveIdLocked }) => {
           renderValue={id => (
             <LicenseTag license={allowedLicenses.find(l => l.id === id)} />
           )}
-          data-testid="license-select">
+          data-testid="license-select"
+          MenuProps={{
+            slotProps: {
+              paper: { 'data-testid': 'license-menu' }
+            }
+          }}>
           {allowedLicenses.map(license => (
             <MenuItem key={license.id} value={license.id}>
               <LicenseTag license={license} />
