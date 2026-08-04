@@ -27,13 +27,20 @@ const UpdatePrompt = () => {
   const { formatMessage } = useIntl();
   const [registration, setRegistration] = useState(null);
 
+  // useRegisterSW exposes its signals as [value, setter] tuples matching
+  // React's useState convention — hence the nested destructuring below.
   const {
     needRefresh: [needRefresh, setNeedRefresh],
     updateServiceWorker
   } = useRegisterSW({
     immediate: true,
     onRegisteredSW: (_swUrl, swRegistration) =>
-      setRegistration(swRegistration ?? null)
+      setRegistration(swRegistration ?? null),
+    // A silent failure here would kill the update mechanism entirely with
+    // no trace; surface it so production monitoring can catch it.
+    onRegisterError: err =>
+      // eslint-disable-next-line no-console
+      console.warn('[UpdatePrompt] SW registration failed', err)
   });
 
   useEffect(() => {
@@ -58,6 +65,9 @@ const UpdatePrompt = () => {
     };
   }, [registration]);
 
+  // No `onClose` on purpose: MUI's default ClickAwayListener would let a
+  // stray outside click dismiss the prompt silently. We want the user to
+  // make an explicit choice (Update or Later), so we swallow those events.
   return (
     <Snackbar
       open={needRefresh}
