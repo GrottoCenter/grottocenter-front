@@ -144,7 +144,7 @@ const SettingSection = ({
       <SectionHeader>
         <SectionHeaderTitle>
           {icon}
-          <Typography variant="h6" fontWeight={600}>
+          <Typography variant="h3" component="h2">
             {title}
           </Typography>
         </SectionHeaderTitle>
@@ -541,7 +541,7 @@ const EmailSecuritySection = ({ account, onSaved, isAdmin = false }) => {
       <SectionHeader>
         <SectionHeaderTitle>
           <LockOutlinedIcon color="action" />
-          <Typography variant="h6" fontWeight={600}>
+          <Typography variant="h3" component="h2">
             <Translate>Email & Security</Translate>
           </Typography>
         </SectionHeaderTitle>
@@ -1156,7 +1156,7 @@ const OfflineDataSection = () => {
         <SectionHeader>
           <SectionHeaderTitle>
             <StorageOutlinedIcon color="action" />
-            <Typography variant="h6" fontWeight={600}>
+            <Typography variant="h3" component="h2">
               {formatMessage({ id: 'Offline data' })}
             </Typography>
           </SectionHeaderTitle>

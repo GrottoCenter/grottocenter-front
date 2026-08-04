@@ -88,7 +88,7 @@ const MobileEntityCard = React.memo(
                   variant="subtitle1"
                   color="secondary"
                   fontWeight="bold"
-                  sx={{ fontSize: '1.5rem', lineHeight: 1.3 }}>
+                  sx={{ fontSize: '0.9375rem', lineHeight: 1.3 }}>
                   {renderCellFn(doc, titleCol.field, titleCol.render)}
                 </Typography>
               </Box>

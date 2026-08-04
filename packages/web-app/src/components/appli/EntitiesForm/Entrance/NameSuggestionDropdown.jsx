@@ -172,7 +172,9 @@ const NameSuggestionDropdown = ({ control, formKey, enabled, children }) => {
           </Typography>
           {candidate && (
             <>
-              <Typography variant="h6">{candidate.name}</Typography>
+              <Typography variant="subtitle1" component="span">
+                {candidate.name}
+              </Typography>
               {candidateLocation && (
                 <Typography variant="body2" color="text.secondary">
                   {candidateLocation}

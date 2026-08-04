@@ -95,11 +95,11 @@ const OptionText = styled(ListItemText)`
   margin: 1px;
 
   .MuiListItemText-primary {
-    font-size: 1.6rem;
+    font-size: 1rem;
     line-height: 1.3;
   }
   .MuiListItemText-secondary {
-    font-size: 1.2rem;
+    font-size: 0.75rem;
     line-height: 1.2;
   }
 `;

@@ -24,7 +24,7 @@ import InputLanguage from '../utils/InputLanguage';
 import ObstacleField from './ObstacleField';
 import ObstacleRowActions from './ObstacleRowActions';
 import ObstacleCard from './ObstacleCard';
-import ColumnLegend from '../../Entry/Riggings/ColumnLegend';
+import ColumnLegend, { LegendHeader } from '../../Entry/Riggings/ColumnLegend';
 
 import { RiggingPropTypes } from '../../../../types/entrance.type';
 import { OBSTACLE_LEGEND, ANCHOR_LEGEND } from '@/utils/riggingLegends';
@@ -170,13 +170,15 @@ const CreateRiggingsForm = ({
                   <TableRow>
                     {FIELDS.map(field => (
                       <TableCell key={field} width={COLUMN_WIDTHS[field]}>
-                        {formatMessage({ id: HEADER_KEYS[field] })}
-                        {HEADER_LEGENDS[field] && (
-                          <ColumnLegend
-                            titleKey={HEADER_LEGENDS[field].titleKey}
-                            items={HEADER_LEGENDS[field].items}
-                          />
-                        )}
+                        <LegendHeader>
+                          {formatMessage({ id: HEADER_KEYS[field] })}
+                          {HEADER_LEGENDS[field] && (
+                            <ColumnLegend
+                              titleKey={HEADER_LEGENDS[field].titleKey}
+                              items={HEADER_LEGENDS[field].items}
+                            />
+                          )}
+                        </LegendHeader>
                       </TableCell>
                     ))}
                     <TableCell width="70px" />

@@ -24,14 +24,17 @@ const BrandRow = styled(Box)(({ theme }) => ({
 
 const Sitename = styled('h1')({
   fontWeight: 600,
-  fontSize: 'clamp(2rem, 10vw, 55px)',
+  fontSize: 'clamp(1.25rem, 10vw, 55px)',
   lineHeight: 1.2,
   letterSpacing: -2,
+  // Explicit since the global Skeleton-CSS `h1..h6 { margin-top: 0 }` is gone;
+  // the UA default (0.67em) would otherwise push the brand row down.
+  marginTop: 0,
   marginBottom: 2
 });
 
 const Slogan = styled('span')({
-  fontSize: '1.5rem',
+  fontSize: '0.9375rem',
   fontWeight: 400
 });
 

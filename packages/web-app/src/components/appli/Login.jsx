@@ -195,7 +195,7 @@ const Login = () => {
       }
       sx={{ mt: 1 }}>
       {isSubmitting ? (
-        <CircularProgress size="2.8rem" color="inherit" />
+        <CircularProgress size="1.75rem" color="inherit" />
       ) : (
         getLoginButtonLabel()
       )}
@@ -262,7 +262,8 @@ const Login = () => {
         />
       </Box>
       <Typography
-        variant="h6"
+        variant="subtitle1"
+        component="p"
         style={{ textAlign: 'center', paddingBottom: 5 }}>
         <Translate>
           For security reasons please create a new password.
@@ -299,7 +300,8 @@ const Login = () => {
         />
       </Box>
       <Typography
-        variant="h6"
+        variant="subtitle1"
+        component="p"
         style={{ textAlign: 'center', paddingBottom: 5 }}>
         <Translate>Your account is not verified yet.</Translate>
       </Typography>

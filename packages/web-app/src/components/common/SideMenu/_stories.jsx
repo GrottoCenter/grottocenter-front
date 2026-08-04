@@ -43,7 +43,7 @@ const WithState = () => {
             size="large">
             <MenuIcon />
           </IconButton>
-          <Typography variant="h6" noWrap>
+          <Typography variant="h4" noWrap>
             Side Menu
           </Typography>
         </Toolbar>

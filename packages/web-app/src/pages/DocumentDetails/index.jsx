@@ -349,13 +349,7 @@ const Document = ({
       DOCUMENT_TYPE_ICONS[documentData.parent.type]) ||
     DOCUMENT_TYPE_FALLBACK_ICON;
   const breadcrumb = documentData?.parent ? (
-    <Breadcrumbs
-      separator={<NavigateNext sx={{ fontSize: '1.2rem' }} />}
-      sx={{
-        fontSize: { xs: '1.2rem', md: '1.7rem' },
-        '& .MuiBreadcrumbs-separator': { mx: { xs: '2px', md: '8px' } }
-      }}
-    >
+    <Breadcrumbs separator={<NavigateNext fontSize="inherit" />}>
       <AppLink
         to={`/ui/documents/${documentData.parent.id}`}
         underline="hover"

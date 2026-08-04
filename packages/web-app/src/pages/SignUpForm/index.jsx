@@ -237,7 +237,7 @@ const SignUpForm = ({
               disabled={loading || isSubmitDisabled}
               color={loading ? 'inherit' : 'primary'}>
               {loading ? (
-                <CircularProgress size="2.8rem" />
+                <CircularProgress size="1.75rem" />
               ) : (
                 formatMessage({ id: 'Sign up' })
               )}

@@ -1,18 +1,8 @@
-import React, { useRef, useCallback, useEffect } from 'react';
+import { useRef, useCallback, useEffect } from 'react';
 import { useMap } from 'react-leaflet';
 import * as L from 'leaflet';
-import { GlobalStyles, useMediaQuery } from '@mui/material';
+import { useMediaQuery } from '@mui/material';
 import useRenderPopup from './useRenderPopup';
-
-export const MarkerGlobalCss = (
-  <GlobalStyles
-    styles={`
-      .leaflet-container {
-        font-size: 1rem;
-      }
-    `}
-  />
-);
 
 const useMarkers = ({
   icon,

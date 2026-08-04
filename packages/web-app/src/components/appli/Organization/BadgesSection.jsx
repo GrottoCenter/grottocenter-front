@@ -8,15 +8,15 @@ import { networkIcon, caverIcon, entranceIcon } from '../../../assets/icons';
 
 const CaverIcon = styled('img')`
   display: inline-block;
-  height: 4rem;
-  width: 4rem;
+  height: 2.5rem;
+  width: 2.5rem;
 `;
 
 const EntranceIcon = styled('img')`
   display: inline-block;
-  height: 4rem;
+  height: 2.5rem;
   vertical-align: text-bottom;
-  width: 4rem;
+  width: 2.5rem;
 `;
 
 const StyledBadge = styled(Badge)`

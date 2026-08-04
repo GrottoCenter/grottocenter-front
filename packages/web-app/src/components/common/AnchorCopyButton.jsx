@@ -15,6 +15,11 @@ export const AnchorHeadingWrapper = styled('span')`
     color: inherit;
     transition: opacity 0.15s;
     vertical-align: middle;
+    /* The icon is fontSize="inherit", so without this it scales with the
+       heading it sits in (24px in an h2) and the button grows taller than the
+       text line, stretching the whole card header. */
+    font-size: 1rem;
+    line-height: 1;
   }
 
   &:hover .anchor-link {

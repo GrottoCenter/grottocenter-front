@@ -407,6 +407,72 @@ sx={{ mt: 1.5, p: 0.5 }}
 
 ---
 
+## 🔤 Typography
+
+The root font-size is the **browser default (16px), so `1rem = 16px`**. The app
+previously shipped Skeleton CSS's `html { font-size: 62.5% }` paired with MUI's
+`htmlFontSize: 10` — that made `1rem = 10px` and silently rendered every
+third-party stylesheet (Swagger UI, Leaflet plugins, …) at 62.5% of its intended
+size. **Never reintroduce `htmlFontSize`.**
+
+### Three heading roles — and no more
+
+| Role             | Outline level | Visual scale | Component                      |
+| ---------------- | ------------- | ------------ | ------------------------------ |
+| Page title       | `h1`          | `h1`         | `PageTitle` (via `PageHeader`) |
+| Section title    | `h2`          | `h2`         | `ScrollableContent` card title |
+| Subsection title | `h3`          | `h5`         | `InfoSection`                  |
+
+`h4`–`h6` are item-level headings inside a section (e.g. `Entry/SectionTitle`),
+not new section roles.
+
+`InfoSection` is the worked example of the split below: it labels a group of
+properties, so it renders at the `h5` scale (16px/600) while staying at the `h3`
+level in the outline. That is the same visual token as `FormSection` in the
+entity forms, which labels the equivalent thing (a group of fields) — keep the
+two in step.
+
+```javascript
+// ❌ Hard-coded font sizes — bypasses the scale
+<Typography sx={{ fontSize: '1.4rem', fontWeight: 600 }}>Title</Typography>
+// ✅ Use a variant; size AND weight come from the theme
+<Typography variant="h3">Title</Typography>
+
+// ❌ Picking a variant for its size, silently breaking the document outline
+<Typography variant="h4">A section of an untitled card</Typography>
+// ✅ `variant` = visual scale, `component` = document outline. Splitting them is
+// correct and intended when a card has no title of its own.
+<Typography variant="h3" component="h2">…</Typography>
+```
+
+Headings must stay monotonic (`h1 → h2 → h3`, never `h1 → h3`). `InfoSection`
+takes a `component` prop (default `h3`) for exactly this reason.
+
+### Fluid sizing
+
+`clamp()` lives **only in the theme, and only on `h1`** (24.4→32px). It is the
+one level whose range is wide enough for the stepping to be visible while
+resizing; every level below spans two pixels at most, where a clamp costs a
+three-number contract and buys nothing you can see. Always mix `rem` with `vw`
+(`clamp(1.525rem, 1.26rem + 0.72vw, 2rem)`), never `vw` alone, or browser zoom
+stops scaling the text (WCAG 1.4.4).
+
+The resulting scale is a flat ladder — `32/23/20/18/16/14`, all at weight 600 —
+so hierarchy is carried by size alone and can be checked at a glance.
+
+**If you ever make another level fluid**, mind the invariant that bit us: it is
+the fluid step's _minimum_, not its maximum, that must clear the static step
+below it. `h1`'s floor is 24.4px precisely because `h2` sits at 23px. Get it wrong
+and the hierarchy inverts on phones only — where two levels collapse to the same
+size and the lower one, being no lighter, reads as the louder of the two.
+
+> ⚠️ Do **not** wrap the theme in `responsiveFontSizes()`. Its `remFontSize <= 1`
+> guard and its `min = 1 + (max - 1) / factor` formula are both anchored to a
+> literal `1rem`, so what it does depends on the root font-size — it used to
+> shrink body text to 13px below the `lg` breakpoint.
+
+---
+
 ## 📚 References
 
 - [Repository](https://github.com/GrottoCenter/grottocenter-front)

@@ -10,7 +10,7 @@ const AnchorBox = styled(Box)`
   scroll-margin-top: ${({ theme }) => theme.appBarHeight}px;
 `;
 
-const SectionTitle = ({ title, anchorId, isDeleted = false, marginBottom = 2 }) => {
+const SectionTitle = ({ title, anchorId, isDeleted = false, marginBottom = 1 }) => {
   const { formatMessage } = useIntl();
   useAnchorScroll(anchorId);
 

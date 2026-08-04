@@ -87,7 +87,7 @@ const NewsCard = ({
             {day} {month}
           </DateLabel>
         )}
-        <Typography variant="h6" fontWeight={600} sx={{ mt: '4px', mb: 0.5 }}>
+        <Typography variant="h4" component="h3" sx={{ mt: '4px', mb: 0.5 }}>
           {title}
         </Typography>
         <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>

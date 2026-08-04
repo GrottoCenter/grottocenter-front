@@ -108,7 +108,7 @@ const PageTabs = ({ tabs, children }) => {
           '& .MuiBadge-badge': {
             bgcolor: 'grey.200',
             color: 'text.secondary',
-            fontSize: '1rem',
+            fontSize: '0.625rem',
             minWidth: 18,
             height: 18,
             padding: 0.25
@@ -211,9 +211,9 @@ const PageTabs = ({ tabs, children }) => {
                 sx={{
                   color: 'primary.contrastText',
                   minWidth: 0,
-                  '& svg': { width: '2.2rem', height: '2.2rem' },
+                  '& svg': { width: '1.375rem', height: '1.375rem' },
                   '& .MuiBottomNavigationAction-label': {
-                    fontSize: '0.9rem !important'
+                    fontSize: '0.5625rem !important'
                   },
                   '&.Mui-selected': { color: 'secondary.main' },
                   '&.Mui-disabled': {

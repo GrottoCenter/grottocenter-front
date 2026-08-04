@@ -29,7 +29,7 @@ const StyledAvatar = styled(Avatar, {
   cursor: 'pointer',
   backgroundColor: theme.palette[$color].main,
   color: theme.palette.common.white,
-  fontSize: '1.5rem',
+  fontSize: '0.9375rem',
   fontWeight: 500
 }));
 

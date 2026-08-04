@@ -103,7 +103,7 @@ const HeroStats = () => {
                     sx={{
                       mt: 0.5,
                       [theme.breakpoints.down('sm')]: {
-                        fontSize: '1.5rem',
+                        fontSize: '0.9375rem',
                         mt: '0px'
                       }
                     }}>

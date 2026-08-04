@@ -17,7 +17,7 @@ import { ObstaclePropTypes } from '../../../../types/entrance.type';
 import { HighLightsLine } from '../../../common/Highlights';
 import SectionTitle from '../SectionTitle';
 import RiggingSummary from './RiggingSummary';
-import ColumnLegend from './ColumnLegend';
+import ColumnLegend, { LegendHeader } from './ColumnLegend';
 import { OBSTACLE_LEGEND, ANCHOR_LEGEND } from '@/utils/riggingLegends';
 
 const StyledTable = styled(Table)`
@@ -32,6 +32,9 @@ const StyledTableRow = styled(TableRow)`
 const StyledTableContainer = styled(TableContainer)`
   overflow-wrap: anywhere;
   overflow: auto;
+  /* Never let the table widen its ancestors: it scrolls inside this box
+     instead of pushing the page into a horizontal scroll. */
+  max-width: 100%;
 `;
 const StyledTableCell = styled(TableCell, {
   shouldForwardProp: prop => prop[0] !== '$'
@@ -42,7 +45,29 @@ const StyledTableCell = styled(TableCell, {
   min-width: 40px;
   thead & {
     text-transform: capitalize;
+    /* The four labels are single words, so wrapping can only break them
+       mid-word (the container sets overflow-wrap: anywhere). They stay on one
+       line; the table is made to fit below instead. */
     white-space: nowrap;
+  }
+
+  /* Those unwrappable headers plus their legend buttons set the table's
+     minimum width at ~360px — just over a phone's content width. Rather than
+     let it overflow, shrink the header itself: smaller type, tighter padding
+     and a more compact legend button, which together give back ~60px. */
+  ${props => props.theme.breakpoints.down('sm')} {
+    padding: 4px !important;
+
+    thead & {
+      font-size: 0.75rem;
+    }
+    thead & .MuiIconButton-root {
+      margin-left: 2px;
+      padding: 2px;
+    }
+    thead & .MuiSvgIcon-root {
+      font-size: 1rem;
+    }
   }
 `;
 
@@ -102,19 +127,25 @@ const RiggingTable = ({ id, obstacles, title, previous, isDeleted }) => {
           <TableHead>
             <TableRow>
               <StyledTableCell $isDeleted={isDeleted} width="25%">
-                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                <LegendHeader>
                   {formatMessage({ id: 'obstacles' })}
-                  <ColumnLegend titleKey="Obstacle notation legend" items={OBSTACLE_LEGEND} />
-                </Box>
+                  <ColumnLegend
+                    titleKey="Obstacle notation legend"
+                    items={OBSTACLE_LEGEND}
+                  />
+                </LegendHeader>
               </StyledTableCell>
               <StyledTableCell $isDeleted={isDeleted} width="10%">
                 {formatMessage({ id: 'ropes' })}
               </StyledTableCell>
               <StyledTableCell $isDeleted={isDeleted} width="20%">
-                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                <LegendHeader>
                   {formatMessage({ id: 'anchors' })}
-                  <ColumnLegend titleKey="Anchor notation legend" items={ANCHOR_LEGEND} />
-                </Box>
+                  <ColumnLegend
+                    titleKey="Anchor notation legend"
+                    items={ANCHOR_LEGEND}
+                  />
+                </LegendHeader>
               </StyledTableCell>
               <StyledTableCell $isDeleted={isDeleted}>
                 {formatMessage({ id: 'observations' })}

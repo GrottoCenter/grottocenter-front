@@ -59,7 +59,7 @@ const Welcome = () => {
           {BLOCKS.map(({ titleId, textIds }) => (
             <Grid key={titleId} size={{ xs: 12, sm: 4 }}>
               <BlockTitle
-                variant="h6"
+                variant="h3"
                 component="h2"
                 sx={{ mb: { xs: '4px', sm: 0.5 } }}>
                 {formatMessage({ id: titleId })}
@@ -80,7 +80,7 @@ const Welcome = () => {
               sx={{
                 px: 6,
                 py: '16px',
-                fontSize: '1.4rem',
+                fontSize: '0.875rem',
                 fontWeight: 600
               }}>
               {formatMessage({ id: 'Create an account' })}

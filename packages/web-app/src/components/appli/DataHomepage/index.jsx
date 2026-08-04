@@ -11,10 +11,18 @@ import DataLine from './components/DataLine';
 import CustomIcon from '../../common/CustomIcon';
 import AppLink from '../../common/AppLink';
 
+// Weight/leading/margins used to come from the global Skeleton-CSS `h1..h6`
+// rule; they are explicit now that it is gone. Known deviation from the theme
+// typography scale: this homepage hero title is deliberately larger and lighter
+// than any `h*` variant.
 const SectionTitle = styled('h3')`
   text-align: center;
-  padding: 20px;
-  font-size: 35px;
+  padding: ${({ theme }) => theme.spacing(2.5)};
+  margin: 0 0 ${({ theme }) => theme.spacing(2.5)};
+  font-size: 2.1875rem;
+  font-weight: 300;
+  line-height: 1.3;
+  letter-spacing: -1px;
   color: ${({ theme }) => theme.palette.secondary.main};
 `;
 

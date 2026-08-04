@@ -17,18 +17,18 @@ export const EntityIcon = styled('img')`
 `;
 
 const EntityTitle = styled('div')`
-  font-size: 1.5rem;
+  font-size: 0.9375rem;
   white-space: nowrap;
   margin: 0;
 `;
 
 const EntityId = styled('i')`
-  font-size: 1rem;
+  font-size: 0.625rem;
   color: #4f4f4ff2;
 `;
 
 const EntitySubtitle = styled('div')`
-  font-size: 1.2rem;
+  font-size: 0.75rem;
   white-space: nowrap;
   margin: 0;
 `;

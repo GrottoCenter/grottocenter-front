@@ -1,5 +1,5 @@
 import { brown, blue, orange, grey } from '@mui/material/colors';
-import { createTheme, alpha, responsiveFontSizes } from '@mui/material/styles';
+import { createTheme, alpha } from '@mui/material/styles';
 
 const fontFamily = [
   '-apple-system',
@@ -93,23 +93,92 @@ export const overridings = {
   shape: {
     borderRadius: 4
   },
+  // Root font-size is the browser default (16px): 1rem = 16px. The app used to
+  // pair Skeleton-CSS's `html { font-size: 62.5% }` with `htmlFontSize: 10`,
+  // which silently rendered every third-party stylesheet written for a 16px
+  // root at 62.5% of its intended size. Never reintroduce `htmlFontSize`.
+  //
+  // One scale, three heading roles: h1 = page title, h2 = section (card)
+  // title, h3 = subsection. h4-h6 are item-level. Every level states its own
+  // weight — relying on MUI's defaults left h1/h2 at 300 (light), which read as
+  // washed out at large sizes.
+  //
+  // Only h1 is fluid. It is the one level whose range is wide enough (26->32)
+  // for the stepping to be visible while resizing; every level below spans two
+  // pixels at most, where a clamp() costs a three-number contract and buys
+  // nothing you can see. Keeping the rest static also removes a whole class of
+  // bug: with a fluid level, it is its *minimum* — not its maximum — that has
+  // to clear the static level below, and getting that wrong inverts the
+  // hierarchy on phones only.
+  //
+  // The middle term mixes `rem` with `vw` (never `vw` alone) so browser zoom and
+  // the user's default font size still scale the text — a `vw`-only value would
+  // break WCAG 1.4.4.
+  //
+  // Deliberately NOT wrapped in responsiveFontSizes(): its `remFontSize <= 1`
+  // guard and its `min = 1 + (max - 1) / factor` formula are both anchored to a
+  // literal 1rem, so it silently rescaled every variant when the root font-size
+  // changed (it used to shrink body text to 13px below the lg breakpoint).
   typography: {
     fontFamily,
-    htmlFontSize: 10,
     h1: {
-      fontSize: '4.2rem'
+      // 24.4 at 360px, 32 from 1200px up. The floor stays above h2 (23).
+      fontSize: 'clamp(1.525rem, 1.26rem + 0.72vw, 2rem)',
+      fontWeight: 700,
+      lineHeight: 1.2
     },
     h2: {
-      fontSize: '3.5rem'
+      fontSize: '1.4375rem', // 23
+      fontWeight: 600,
+      lineHeight: 1.2
     },
     h3: {
-      fontSize: '2.9rem'
+      fontSize: '1.25rem', // 20
+      fontWeight: 600,
+      lineHeight: 1.3
     },
     h4: {
-      fontSize: '2.4rem'
+      fontSize: '1.125rem', // 18
+      fontWeight: 600
     },
     h5: {
-      fontSize: '2rem'
+      fontSize: '1rem', // 16
+      fontWeight: 600
+    },
+    h6: {
+      fontSize: '0.875rem', // 14
+      fontWeight: 600
+    },
+    subtitle1: {
+      fontSize: '1rem',
+      fontWeight: 500
+    },
+    subtitle2: {
+      fontSize: '0.875rem',
+      fontWeight: 500
+    },
+    // Body text steps down one notch on phones to claw back some density,
+    // but stops at 15px: below 16px iOS Safari auto-zooms on focused inputs,
+    // and the old implicit 13px (a side effect of responsiveFontSizes, never a
+    // deliberate choice) is under common legibility minimums.
+    // `sm` is MUI's default 600px — the theme does not override breakpoints.
+    body1: {
+      fontSize: '0.9375rem', // 15
+      fontWeight: 400,
+      '@media (min-width:600px)': {
+        fontSize: '1rem' // 16
+      }
+    },
+    body2: {
+      fontSize: '0.8125rem', // 13
+      fontWeight: 400,
+      '@media (min-width:600px)': {
+        fontSize: '0.875rem' // 14
+      }
+    },
+    caption: {
+      fontSize: '0.75rem',
+      fontWeight: 400
     }
   },
   components: {
@@ -128,6 +197,26 @@ export const overridings = {
         variant: 'contained'
       }
     },
+    // Breadcrumbs are secondary navigation, so they sit at body2 (14px) rather
+    // than competing with the page title. Centralised here because the same
+    // hard-coded size used to be copy-pasted into every detail page.
+    MuiBreadcrumbs: {
+      styleOverrides: {
+        // Spread the whole variant, not just `.fontSize`: body2 carries a
+        // nested media query for phones, which reading a single key drops.
+        root: ({ theme }) => ({
+          ...theme.typography.body2
+        }),
+        separator: ({ theme }) => ({
+          marginLeft: theme.spacing(0.25),
+          marginRight: theme.spacing(0.25),
+          [theme.breakpoints.up('md')]: {
+            marginLeft: theme.spacing(1),
+            marginRight: theme.spacing(1)
+          }
+        })
+      }
+    },
     MuiSkeleton: {
       styleOverrides: {
         root: {
@@ -142,7 +231,7 @@ export const overridings = {
       styleOverrides: {
         root: {
           color: brown['500'],
-          fontSize: '1.3rem'
+          fontSize: '0.8125rem'
         }
       }
     },
@@ -152,6 +241,15 @@ export const overridings = {
           padding: theme.spacing(1),
           [theme.breakpoints.up('md')]: {
             padding: theme.spacing(2)
+          },
+          // MUI ships `&:last-child { padding-bottom: 24px }` to leave room for
+          // CardActions. Our cards have none, so it just adds an unbalanced
+          // band under the content. Realign it with the padding above.
+          '&:last-child': {
+            paddingBottom: theme.spacing(1),
+            [theme.breakpoints.up('md')]: {
+              paddingBottom: theme.spacing(2)
+            }
           }
         })
       }
@@ -236,7 +334,7 @@ export const overridings = {
           height: `${appBarHeight}px`
         },
         gutterBottom: {
-          marginBottom: '1rem'
+          marginBottom: '0.625rem'
         }
       }
     },
@@ -292,4 +390,4 @@ export const overridings = {
   }
 };
 
-export default responsiveFontSizes(createTheme(overridings));
+export default createTheme(overridings);

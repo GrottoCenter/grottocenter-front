@@ -13,7 +13,7 @@ const KARSTLINK_URL = 'https://ontology.uis-speleo.org/ontology/';
 // convention), so a separate button for the same target is no longer needed.
 const KarstlinkLogoLink = styled(AppLink)`
   display: inline-flex;
-  border-radius: 0.5rem;
+  border-radius: 0.3125rem;
   transition: opacity 0.15s ease;
 
   &:hover {
@@ -24,11 +24,13 @@ const KarstlinkLogoLink = styled(AppLink)`
 const KarstlinkLogo = styled('img')`
   height: 38px;
   width: auto;
-  border-radius: 0.5rem;
+  border-radius: 0.3125rem;
 `;
 
+// Margins used to come from the global Skeleton-CSS `p` rule; explicit now.
 const KarstlinkParagraph = styled('p')`
   text-align: justify;
+  margin: 0 0 ${({ theme }) => theme.spacing(3)};
   font-weight: 300;
   font-size: large;
 `;

@@ -83,7 +83,9 @@ const Properties = ({ isLoading = false, entrance, dataQuality }) => {
       <Paper
         variant="outlined"
         sx={{ p: 1, borderRadius: 2, bgcolor: 'grey.50' }}>
-        <InfoSection title={formatMessage({ id: 'Location' })}>
+        <InfoSection
+          component="h2"
+          title={formatMessage({ id: 'Location' })}>
           <Box display="flex" flexDirection="column" gap={0.5}>
             {entrance.latitude && entrance.longitude && (
               <Property
@@ -138,7 +140,9 @@ const Properties = ({ isLoading = false, entrance, dataQuality }) => {
         <Paper
           variant="outlined"
           sx={{ p: 1, borderRadius: 2, bgcolor: 'grey.50' }}>
-          <InfoSection title={formatMessage({ id: 'Characteristics' })}>
+          <InfoSection
+            component="h2"
+            title={formatMessage({ id: 'Characteristics' })}>
             <Box
               sx={{
                 display: 'grid',
@@ -204,59 +208,59 @@ const Properties = ({ isLoading = false, entrance, dataQuality }) => {
             bgcolor: 'secondary.veryLight',
             borderColor: 'secondary.light'
           }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 0.5 }}>
-            <WarningAmber sx={{ color: 'secondary.main', fontSize: 20 }} />
-            <Typography
-              variant="subtitle1"
-              component="h3"
-              fontWeight={600}
-              color="secondary.main">
-              {formatMessage({ id: 'Hazards & restrictions' })}
-            </Typography>
-          </Box>
-          <Box
-            sx={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(2, 1fr)',
-              gap: 0.5
-            }}>
-            <HasBatProperty hasBat={entrance.hasBat} isLoading={isLoading} />
-            <DangerFloodingProperty
-              dangerFlooding={entrance.dangerFlooding}
-              isLoading={isLoading}
-            />
-            <DangerCO2Property
-              dangerCo2={entrance.dangerCo2}
-              isLoading={isLoading}
-            />
-            <NeedCleanGearProperty
-              needCleanGear={entrance.needCleanGear}
-              isLoading={isLoading}
-            />
-            <DangerPollutionProperty
-              dangerPollution={entrance.dangerPollution}
-              isLoading={isLoading}
-            />
-            <DangerRockfallProperty
-              dangerRockfall={entrance.dangerRockfall}
-              isLoading={isLoading}
-            />
-            <HasRulesProperty
-              hasRules={entrance.hasRules}
-              isLoading={isLoading}
-            />
-            <NeedStayOnTrailProperty
-              needStayOnTrail={entrance.needStayOnTrail}
-              isLoading={isLoading}
-            />
-          </Box>
+          <InfoSection
+            component="h2"
+            title={formatMessage({ id: 'Hazards & restrictions' })}
+            titleColor="secondary.main"
+            icon={
+              <WarningAmber sx={{ color: 'secondary.main', fontSize: 20 }} />
+            }>
+            <Box
+              sx={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(2, 1fr)',
+                gap: 0.5
+              }}>
+              <HasBatProperty hasBat={entrance.hasBat} isLoading={isLoading} />
+              <DangerFloodingProperty
+                dangerFlooding={entrance.dangerFlooding}
+                isLoading={isLoading}
+              />
+              <DangerCO2Property
+                dangerCo2={entrance.dangerCo2}
+                isLoading={isLoading}
+              />
+              <NeedCleanGearProperty
+                needCleanGear={entrance.needCleanGear}
+                isLoading={isLoading}
+              />
+              <DangerPollutionProperty
+                dangerPollution={entrance.dangerPollution}
+                isLoading={isLoading}
+              />
+              <DangerRockfallProperty
+                dangerRockfall={entrance.dangerRockfall}
+                isLoading={isLoading}
+              />
+              <HasRulesProperty
+                hasRules={entrance.hasRules}
+                isLoading={isLoading}
+              />
+              <NeedStayOnTrailProperty
+                needStayOnTrail={entrance.needStayOnTrail}
+                isLoading={isLoading}
+              />
+            </Box>
+          </InfoSection>
         </Paper>
       )}
       {entrance.cave?.exploringOrganizations?.length > 0 && (
         <Paper
           variant="outlined"
           sx={{ p: 1, borderRadius: 2, bgcolor: 'grey.50' }}>
-          <InfoSection title={formatMessage({ id: 'Exploring organizations' })}>
+          <InfoSection
+            component="h2"
+            title={formatMessage({ id: 'Exploring organizations' })}>
             <Box
               sx={{
                 display: 'grid',
@@ -278,7 +282,9 @@ const Properties = ({ isLoading = false, entrance, dataQuality }) => {
         <Paper
           variant="outlined"
           sx={{ p: 1, borderRadius: 2, bgcolor: 'grey.50' }}>
-          <InfoSection title={formatMessage({ id: 'Data quality' })}>
+          <InfoSection
+            component="h2"
+            title={formatMessage({ id: 'Data quality' })}>
             <Box display="flex" flexDirection="column">
               <Box display="flex" alignItems="center" gap={1} flexWrap="wrap">
                 <DataQualityBadge value={dataQuality.total} size={32} />

@@ -113,7 +113,7 @@ const EmptyState = () => (
       color: 'text.disabled'
     }}>
     <SearchOffIcon sx={{ fontSize: 56 }} />
-    <Typography variant="h6" color="text.secondary">
+    <Typography variant="subtitle1" component="p" color="text.secondary">
       <Translate>No results</Translate>
     </Typography>
     <Typography variant="body2" color="text.disabled">

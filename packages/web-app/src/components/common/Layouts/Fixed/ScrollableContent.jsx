@@ -5,7 +5,7 @@ import { isNil } from 'ramda';
 import {
   Card as MuiCard,
   CardContent,
-  CardHeader as MuiCardHeader,
+  CardHeader,
   Chip,
   Collapse,
   IconButton,
@@ -28,19 +28,23 @@ const Title = styled('div')`
   justify-content: space-between;
 `;
 
-const CardHeader = styled(MuiCardHeader, {
-  shouldForwardProp: prop => prop[0] !== '$'
-})`
-  ${({ $dense }) => $dense && `padding-bottom: 0px`}
-`;
-
+// `dense` means "tight" regardless of collapsibility: the top padding is
+// dropped because the header above already provides the separation. Gating this
+// on collapsibility left non-collapsible dense cards (Documents, Science) with
+// the full theme padding on both sides — a 32px band under their title.
+//
+// `&&` doubles the class specificity on purpose: this wrapper is created at
+// module-eval time, so its emotion class is inserted BEFORE the one MUI
+// generates from the theme's MuiCardContent styleOverride at first render, and
+// on equal specificity the later rule would win.
+//
+// The `:last-child` bottom padding is normalised in the theme instead — a `&&`
+// bump from here does not reliably beat MUI's own rule, whereas a styleOverride
+// composes into the same generated class and wins by source order.
 const StyledCardContent = styled(CardContent, {
   shouldForwardProp: prop => prop[0] !== '$'
 })`
-  ${({ $dense, $collapsible }) => $dense && $collapsible && `padding-top: 0;`}
-  &:last-child {
-    padding-bottom: ${({ theme }) => theme.spacing(1)};
-  }
+  ${({ $dense }) => $dense && `&& { padding-top: 0; }`}
 `;
 
 // Exported so a section heading rendered outside a card (e.g. inside a page
@@ -69,7 +73,6 @@ const ScrollableContent = ({
   children,
   anchorId,
   dense = false,
-  subTitle = false,
   subheader,
   collapsible = true,
   defaultExpanded = true
@@ -81,11 +84,13 @@ const ScrollableContent = ({
     if (defaultExpanded) setIsExpanded(true);
   }, [defaultExpanded]);
 
+  // A non-collapsible card is always open.
+  const isOpen = collapsible ? isExpanded : true;
+
   return (
     <Card id={anchorId}>
       {title && (
         <CardHeader
-          $dense={dense ? 1 : 0}
           subheader={subheader}
           onClick={collapsible ? () => setIsExpanded(v => !v) : undefined}
           sx={
@@ -93,9 +98,7 @@ const ScrollableContent = ({
           }
           title={
             <Title>
-              <Typography
-                variant={subTitle ? 'h3' : 'h2'}
-                color={subTitle ? 'textPrimary' : 'secondary'}>
+              <Typography variant="h2" color="secondary">
                 {anchorId ? (
                   <AnchorHeadingWrapper>
                     {title}
@@ -140,7 +143,7 @@ const ScrollableContent = ({
           }
         />
       )}
-      <Collapse in={collapsible ? isExpanded : true} timeout="auto">
+      <Collapse in={isOpen} timeout="auto">
         <StyledCardContent
           $dense={dense ? 1 : 0}
           $collapsible={collapsible ? 1 : 0}>
@@ -157,14 +160,15 @@ ScrollableContent.propTypes = {
   icon: PropTypes.node,
   content: (props, propName, componentName) => {
     if (!props.content && !props.children) {
-      return new Error(`${componentName} requires either 'content' or 'children' prop.`);
+      return new Error(
+        `${componentName} requires either 'content' or 'children' prop.`
+      );
     }
     return null;
   },
   children: PropTypes.node,
   anchorId: PropTypes.string,
   dense: PropTypes.bool,
-  subTitle: PropTypes.bool,
   subheader: PropTypes.node,
   collapsible: PropTypes.bool,
   defaultExpanded: PropTypes.bool

@@ -14,7 +14,17 @@ import {
   Tooltip,
   Typography
 } from '@mui/material';
+import { styled } from '@mui/material/styles';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+
+// The legend button is an inline-flex IconButton taller than the label's line
+// box, so `vertical-align` alone leaves it hanging below the text. Laying the
+// label and the button out as a flex row centres them on each other. Use this
+// wrapper around any label + <ColumnLegend> pair.
+export const LegendHeader = styled('span')`
+  display: inline-flex;
+  align-items: center;
+`;
 
 const LegendItemsShape = PropTypes.arrayOf(
   PropTypes.shape({
@@ -80,8 +90,7 @@ const ColumnLegend = ({ titleKey, items, sections, label }) => {
           sx={{
             ml: 0.5,
             color: 'inherit',
-            opacity: 0.8,
-            verticalAlign: 'middle'
+            opacity: 0.8
           }}>
           <InfoOutlinedIcon fontSize="small" />
         </IconButton>

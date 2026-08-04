@@ -51,7 +51,7 @@ const InfoImg = styled('img')({
 
 const WhiteRating = styled(MuiRating)({
   color: 'white',
-  fontSize: '1rem'
+  fontSize: '0.875rem'
 });
 
 const formatTime = timeStr => {
@@ -123,7 +123,7 @@ const RandomEntryCard = ({ entry, isFetching, fetch, onRefresh }) => {
         </IconButton>
       )}
       <Content>
-        <Typography variant="h6" fontWeight={600} sx={{ color: 'white' }}>
+        <Typography variant="h4" component="h3" sx={{ color: 'white' }}>
           {entry.name}
         </Typography>
         {locationParts.length > 0 && (

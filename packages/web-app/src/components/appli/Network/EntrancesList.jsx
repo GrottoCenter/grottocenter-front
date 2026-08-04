@@ -113,8 +113,8 @@ const EntrancesList = ({
       <Box sx={{ height: '100%', overflow: 'auto' }}>
         <Paper variant="outlined" sx={{ p: 1, borderRadius: 2, bgcolor: 'grey.50' }}>
           <InfoSection
+            component="h2"
             title={formatMessage({ id: 'Entrances' })}>
-
             {listContent}
           </InfoSection>
         </Paper>

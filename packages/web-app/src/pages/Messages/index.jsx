@@ -239,7 +239,7 @@ const MessagesPage = () => {
                     <Typography
                       variant="body2"
                       sx={{
-                        fontSize: { xs: '1rem', sm: '1.1rem' },
+                        fontSize: { xs: '0.6875rem', sm: '0.75rem' },
                         opacity: 0.8
                       }}>
                       <FormattedDate
@@ -287,10 +287,7 @@ const MessagesPage = () => {
                     borderBottom: 1,
                     borderColor: 'divider'
                   }}>
-                    <Typography
-                      variant="h5"
-                      component="h1"
-                      sx={{ fontSize: { xs: '2rem', md: '2.2rem' } }}>
+                    <Typography variant="h3" component="h1">
                       {formatMessage({ id: 'Conversations', defaultMessage: 'Conversations' })}
                     </Typography>
                     <Button

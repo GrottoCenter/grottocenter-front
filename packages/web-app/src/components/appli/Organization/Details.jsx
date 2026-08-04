@@ -165,7 +165,9 @@ const Details = ({ organization }) => {
         {/* Contact Paper */}
         {(hasAddress || organization.mail || organization.url) && (
           <SectionPaper variant="outlined">
-            <InfoSection title={formatMessage({ id: 'Contact' })}>
+            <InfoSection
+              component="h2"
+              title={formatMessage({ id: 'Contact' })}>
               {hasAddress && (
                 <InfoRow>
                   <LocationCityIcon
@@ -208,7 +210,9 @@ const Details = ({ organization }) => {
         {/* Description Paper */}
         {organization.customMessage && (
           <SectionPaper variant="outlined">
-            <InfoSection title={formatMessage({ id: 'Description' })}>
+            <InfoSection
+              component="h2"
+              title={formatMessage({ id: 'Description' })}>
               <MultilinesTypography>
                 <Linkify options={linkifyOptions}>
                   {organization.customMessage}

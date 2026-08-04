@@ -13,7 +13,7 @@ const FakeAuthControls = () => {
   const dispatch = useDispatch();
   return (
     <Paper
-      style={{ margin: '2rem', padding: '2rem', width: '300px' }}
+      style={{ margin: '1.25rem', padding: '1.25rem', width: '300px' }}
       align="center">
       <Typography variant="h2">Story controls</Typography>
       <Button onClick={() => dispatch(fetchLoginSuccess({}, 'fakeAuthTok3n'))}>
@@ -36,7 +36,7 @@ export const DefaultErrorComponent = {
   render: () => (
     <Provider store={store}>
       <FakeAuthControls />
-      <Paper style={{ margin: '2rem', padding: '2rem', width: '400px' }}>
+      <Paper style={{ margin: '1.25rem', padding: '1.25rem', width: '400px' }}>
         <AuthChecker
           componentToDisplay={
             <div>
@@ -56,7 +56,7 @@ export const CustomErrorComponent = {
   render: () => (
     <Provider store={store}>
       <FakeAuthControls />
-      <Paper style={{ margin: '2rem', padding: '2rem', width: '400px' }}>
+      <Paper style={{ margin: '1.25rem', padding: '1.25rem', width: '400px' }}>
         <AuthChecker
           componentToDisplay={
             <div>
