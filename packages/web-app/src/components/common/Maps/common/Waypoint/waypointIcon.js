@@ -11,6 +11,10 @@ export const WAYPOINT_ICON_ANCHOR = [15, 40];
 // stays screen-upright on a rotated map (leaflet-rotate keeps marker icons
 // screen-fixed unless rotateWithView is set), which is what we want for a pin —
 // only the guidance line rotates with the view.
+//
+// html is a module-level static string: fine while WAYPOINT_COLOR is a single
+// baked-in value. Move this to a factory function if the colour ever needs to
+// follow the MUI theme (light/dark, or user preference).
 const html = `
 <svg xmlns="http://www.w3.org/2000/svg" width="30" height="42" viewBox="0 0 26 38"
      style="filter: drop-shadow(0 1px 2px rgba(0,0,0,0.45))">

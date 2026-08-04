@@ -30,7 +30,10 @@ const WaypointLayer = ({
     // Suppress the native browser menu, and pass the *Leaflet* event to
     // stopPropagation so it flags originalEvent._stopped — that stops Leaflet
     // from also firing 'contextmenu' on the map (which would open the map's
-    // coordinate menu on top of ours).
+    // coordinate menu on top of ours). e.originalEvent.stopPropagation() is
+    // NOT equivalent here: Leaflet reads its own _stopped flag, not the DOM's
+    // propagation state, so only L.DomEvent.stopPropagation prevents the
+    // event from bubbling up to the map layer.
     e.originalEvent.preventDefault();
     L.DomEvent.stopPropagation(e);
     setMenuAnchor({

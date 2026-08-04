@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useMapEvent } from 'react-leaflet';
 import { useIntl } from 'react-intl';
 import {
@@ -35,14 +35,22 @@ const WaypointControl = () => {
   // { coords, anchor } while the long-press menu is open, else null.
   const [menu, setMenu] = useState(null);
 
-  useMapEvent('contextmenu', e => {
-    if (!isTouch || !isFullscreen) return;
-    e.originalEvent.preventDefault();
-    setMenu({
-      coords: { lat: e.latlng.lat, lng: e.latlng.lng },
-      anchor: { top: e.originalEvent.clientY, left: e.originalEvent.clientX }
-    });
-  });
+  // Stable handler: react-leaflet's useMapEvent leaks the previous listener
+  // whenever the callback identity changes, so passing an inline arrow would
+  // accumulate one Leaflet listener per render and end up spawning several
+  // menu states from a single long-press.
+  const handleContextMenu = useCallback(
+    e => {
+      if (!isTouch || !isFullscreen) return;
+      e.originalEvent.preventDefault();
+      setMenu({
+        coords: { lat: e.latlng.lat, lng: e.latlng.lng },
+        anchor: { top: e.originalEvent.clientY, left: e.originalEvent.clientX }
+      });
+    },
+    [isTouch, isFullscreen]
+  );
+  useMapEvent('contextmenu', handleContextMenu);
 
   // Leaving fullscreen only makes this component render null, it doesn't unmount
   // it — drop any pending menu so it doesn't pop back on the next entry.

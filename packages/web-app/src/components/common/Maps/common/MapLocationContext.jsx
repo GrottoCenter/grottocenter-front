@@ -109,17 +109,20 @@ export const MapLocationProvider = ({ children }) => {
   }, [headingCount, needsPermission, startOrientation, stopOrientation]);
 
   // useGeolocation already memoises its result, so `geo` only changes identity
-  // when something observable did — no need to spell its fields out here.
+  // when something observable did. `active` is derived as a plain boolean —
+  // NOT the raw requestCount — so bumping the count from 1 to 2 (another
+  // consumer requests tracking) doesn't fan out a re-render to every subscriber.
+  const active = requestCount > 0;
   const userLocation = useMemo(
     () => ({
       ...geo,
-      active: requestCount > 0,
+      active,
       enable,
       disable,
       requestAwake,
       releaseAwake
     }),
-    [geo, requestCount, enable, disable, requestAwake, releaseAwake]
+    [geo, active, enable, disable, requestAwake, releaseAwake]
   );
 
   const deviceHeading = useMemo(

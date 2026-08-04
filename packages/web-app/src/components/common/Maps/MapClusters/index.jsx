@@ -341,14 +341,18 @@ const HydratedMap = ({
     setContextCoords(null);
   }, [contextCoords, setWaypoint]);
 
-  useMapEvent('contextmenu', e => {
+  // Stable handler: react-leaflet's useMapEvent leaks the previous listener
+  // whenever the callback identity changes, so an inline arrow would
+  // accumulate one Leaflet listener per render.
+  const handleContextMenu = useCallback(e => {
     e.originalEvent.preventDefault();
     setContextCoords({ lat: e.latlng.lat, lng: e.latlng.lng });
     setContextMenuAnchor({
       top: e.originalEvent.clientY,
       left: e.originalEvent.clientX
     });
-  });
+  }, []);
+  useMapEvent('contextmenu', handleContextMenu);
 
   // moveend fires after ALL map movement has finished - including mobile inertia.
   useMapEvent('moveend', handleUpdate);
@@ -552,7 +556,7 @@ const Index = ({
         zoom={zoom}
         isFullscreenAllowed={false}
         isSideMenuOpen={isSideMenuOpen}
-        isLocationControl
+        isLocationControlAlways
         mapRef={mapRef}
         renderer={renderer}>
         <HydratedMap {...props} popupTarget={popupTarget} />

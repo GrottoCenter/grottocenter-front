@@ -38,7 +38,10 @@ const WaypointOffscreenIndicator = ({ waypoint }) => {
       p.y + (iconH - anchorY) >= 0 &&
       p.y - anchorY <= height;
     if (pinVisible) {
-      setIndicator(null);
+      // Only reset when transitioning to on-screen: on a rotating map in
+      // compass mode this fires on every heading update, so a blind setState
+      // adds a render per tick even when nothing observable changed.
+      setIndicator(prev => (prev === null ? prev : null));
       return;
     }
     const cx = width / 2;
@@ -54,7 +57,15 @@ const WaypointOffscreenIndicator = ({ waypoint }) => {
     );
     // NavigationIcon points up at 0°; clockwise angle from up to (dx, dy).
     const angle = (Math.atan2(dx, -dy) * 180) / Math.PI;
-    setIndicator({ x: cx + dx * scale, y: cy + dy * scale, angle });
+    const next = { x: cx + dx * scale, y: cy + dy * scale, angle };
+    setIndicator(prev =>
+      prev &&
+      prev.x === next.x &&
+      prev.y === next.y &&
+      prev.angle === next.angle
+        ? prev
+        : next
+    );
   }, [map, waypoint]);
 
   useEffect(() => {

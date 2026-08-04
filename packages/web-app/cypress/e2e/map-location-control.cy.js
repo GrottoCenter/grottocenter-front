@@ -100,7 +100,9 @@ describe('Map location control', () => {
     locationButton().first().click();
     cy.window().then(win => win.__setHeading(90));
 
-    // leaflet-rotate applies a non-zero bearing to the map.
-    cy.get('.leaflet-container', { timeout: 10000 }).should('exist');
+    // The north-reset control appears once compass mode has rotated the map —
+    // the observable side-effect of entering that mode, and the affordance
+    // that lets the user return to north-up.
+    cy.get('[aria-label="Reset to north"]', { timeout: 10000 }).should('exist');
   });
 });

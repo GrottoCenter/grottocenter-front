@@ -122,7 +122,11 @@ const CustomMapContainer = ({
   dragging = true,
   scrollWheelZoom = true,
   isSideMenuOpen = false,
-  isLocationControl = false,
+  // Location control + user-dot: `Always` mounts them regardless of fullscreen
+  // (used by the global map, which never enters fullscreen); `InFullscreen`
+  // mounts them only while the map is fullscreen (embedded maps, e.g. on an
+  // entrance page — a small inline map isn't a field-navigation context).
+  isLocationControlAlways = false,
   isLocationControlInFullscreen = false,
   isFullscreenAllowed = true,
   shouldChangeControlInFullscreen = true,
@@ -200,7 +204,7 @@ const CustomMapContainer = ({
         scrollWheelZoom={scrollWheelZoom}
         isSideMenuOpen={isSideMenuOpen}
         minZoom={1}
-        rotate={isLocationControl || isLocationControlInFullscreen}
+        rotate={isLocationControlAlways || isLocationControlInFullscreen}
         bearing={0}
         rotateControl={false}
         touchRotate={false}
@@ -222,7 +226,7 @@ const CustomMapContainer = ({
           {/* Bottom-right stack. Leaflet inserts each new bottom control above
               the previous one. */}
           <ScaleControl position="bottomright" />
-          {isLocationControl && (
+          {isLocationControlAlways && (
             <>
               <LocationControl />
               <UserLocationMarker />
@@ -245,7 +249,7 @@ CustomMapContainer.propTypes = {
   scrollWheelZoom: PropTypes.bool,
   children: PropTypes.node,
   isSideMenuOpen: PropTypes.bool,
-  isLocationControl: PropTypes.bool,
+  isLocationControlAlways: PropTypes.bool,
   isLocationControlInFullscreen: PropTypes.bool,
   isFullscreenAllowed: PropTypes.bool,
   shouldChangeControlInFullscreen: PropTypes.bool,

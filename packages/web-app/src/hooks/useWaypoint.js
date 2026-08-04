@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import useLocalStorage from './useLocalStorage';
 
 // The temporary navigation waypoint, shared by every map that offers field
@@ -10,6 +11,23 @@ import useLocalStorage from './useLocalStorage';
 // restored without silently turning the GPS on (see MapLocationContext).
 export const WAYPOINT_STORAGE_KEY = 'grottocenter_waypoint';
 
-const useWaypoint = () => useLocalStorage(WAYPOINT_STORAGE_KEY, null);
+// A previous session may have written garbage (partial write, unrelated code
+// clobbering the key, older schema) — pass anything but a finite lat/lng pair
+// into Leaflet and it throws. Guard here so every consumer reads a known-good
+// waypoint or null.
+const isValidWaypoint = v =>
+  v !== null &&
+  typeof v === 'object' &&
+  Number.isFinite(v.lat) &&
+  Number.isFinite(v.lng);
+
+const useWaypoint = () => {
+  const [raw, setWaypoint] = useLocalStorage(WAYPOINT_STORAGE_KEY, null);
+  const waypoint = useMemo(
+    () => (isValidWaypoint(raw) ? raw : null),
+    [raw]
+  );
+  return [waypoint, setWaypoint];
+};
 
 export default useWaypoint;

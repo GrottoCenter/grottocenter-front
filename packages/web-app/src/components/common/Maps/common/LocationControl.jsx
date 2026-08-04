@@ -25,17 +25,17 @@ import {
   HEADING_UP_OFFSET_RATIO
 } from './userLocationStyle';
 
-// GeolocationPositionError code → i18n id (reuse existing keys).
+// GeolocationPositionError code → semantic i18n key.
 // 1 denied · 2 unavailable · 3 timeout.
 const GEO_ERROR_MESSAGES = {
-  1: 'Location access denied. Enable it in your browser settings.',
-  2: 'Your position could not be determined.',
-  3: 'Location request timed out. Please try again.'
+  1: 'location.error.denied',
+  2: 'location.error.unavailable',
+  3: 'location.error.timeout'
 };
 
 const COMPASS_ERROR_MESSAGES = {
-  denied: 'Compass access denied. Enable it in your browser settings.',
-  unavailable: 'No compass available on this device.'
+  denied: 'compass.error.denied',
+  unavailable: 'compass.error.unavailable'
 };
 
 // off      → not tracking (no dot)
@@ -331,15 +331,25 @@ const LocationControl = () => {
     // compass: the map already recenters on every fix, so a recenter here would
     // be a no-op tap. Close the cycle instead — back to north-up follow, exactly
     // like the north button, which then disappears.
+    //
+    // Deliberately no path back to OFF from a tap: turning tracking off is
+    // handled implicitly (permission revoked, error) or by leaving the map.
+    // Two-tap cycles (follow ↔ compass) are the field-navigation gesture; an
+    // extra "off" state would demote it to a three-tap ring where the last
+    // step is a hazard — one accidental tap and the dot vanishes mid-walk.
     setMode(MODE.FOLLOW);
   };
 
   // Rotated, either because compass follow is actively rotating the map, or
-  // because a drag detached tracking and left the bearing frozen. Either way
-  // the floating north badge (top-right) offers a way to straighten it out.
+  // because the bearing was left frozen by a mode where nothing resets it —
+  // LOCATED after a drag out of compass, or FOLLOW re-entered from LOCATED
+  // (follow→located preserves the bearing, and located→follow doesn't reset).
+  // Either way the floating north badge (top-right) offers to straighten it.
   const normalizedBearing = ((needleBearing % 360) + 360) % 360;
   const showNorthButton =
-    mode === MODE.COMPASS || (mode === MODE.LOCATED && normalizedBearing !== 0);
+    mode === MODE.COMPASS ||
+    ((mode === MODE.LOCATED || mode === MODE.FOLLOW) &&
+      normalizedBearing !== 0);
 
   const handleNorthClick = () => {
     if (mode === MODE.COMPASS) {

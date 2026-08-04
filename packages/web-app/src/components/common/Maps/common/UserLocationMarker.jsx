@@ -69,7 +69,11 @@ const UserLocationMarker = () => {
     };
   }, []);
 
-  // Add/remove and reposition the dot as tracking state / position change.
+  // One effect for both position and heading, so the same commit that adds
+  // the marker to the map (shown flipping true) also gets a chance to paint
+  // the cone. Two split effects would run in declaration order, and the cone
+  // effect would silently no-op on the marker's first show because
+  // marker.getElement() is still null until the position effect calls addTo().
   useEffect(() => {
     const marker = markerRef.current;
     if (!marker) return;
@@ -79,12 +83,7 @@ const UserLocationMarker = () => {
     } else if (map.hasLayer(marker)) {
       marker.remove();
     }
-  }, [map, shown, location]);
-
-  // Rotate (or hide) the direction cone as the device heading changes.
-  useEffect(() => {
-    const marker = markerRef.current;
-    const el = marker && marker.getElement();
+    const el = marker.getElement();
     const cone = el && el.querySelector('.user-location-cone');
     if (!cone) return;
     if (facing == null) {
@@ -93,7 +92,7 @@ const UserLocationMarker = () => {
     }
     cone.style.display = '';
     cone.style.transform = `rotate(${facing}deg)`;
-  }, [facing, shown, location]);
+  }, [map, shown, location, facing]);
 
   if (!shown || !accuracy) return null;
   return (

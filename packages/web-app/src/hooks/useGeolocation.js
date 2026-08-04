@@ -155,13 +155,18 @@ const useGeolocation = ({
   //
   // Deliberately kept out of the subscription effect below: a resume only
   // re-subscribes, and must not blank the position already being displayed.
+  //
+  // Depends on `enabled` alone — NOT on `options` — because an
+  // enableHighAccuracy toggle from a re-rendering parent must not blank the
+  // position on screen. The subscription effect below handles the options
+  // change on its own by re-subscribing the watch.
   useEffect(() => {
     if (!enabled) return;
     setError(null);
     setFix(null);
     hasLocationRef.current = false;
     hasPreciseFixRef.current = false;
-  }, [enabled, options]);
+  }, [enabled]);
 
   // Screen off, phone back in a pocket, tab backgrounded: browsers suspend an
   // active watch and may drop it for good, yet the watchId stays valid so
@@ -231,9 +236,13 @@ const useGeolocation = ({
       // Failures are swallowed on purpose: the watch's own handler stays the
       // single source of truth for what the consumer sees, and a poke that
       // fails only says "no fresher fix" — the state we are already in.
+      //
+      // 10 s timeout matches the one-shot: at WATCHDOG_INTERVAL_MS = 5 s a
+      // 15 s timeout would let three pokes overlap in flight, wasted work
+      // that also burns battery on the GPS chip.
       navigator.geolocation.getCurrentPosition(onPosition, () => {}, {
         enableHighAccuracy: options.enableHighAccuracy,
-        timeout: STALE_AFTER_MS,
+        timeout: 10000,
         maximumAge: 0
       });
     }, WATCHDOG_INTERVAL_MS);

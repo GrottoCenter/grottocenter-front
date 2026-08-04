@@ -32,8 +32,17 @@ const WaypointHud = ({ waypoint, userLocation }) => {
   const theme = useTheme();
   // The relative arrow needs a compass heading, so the HUD asks for one — it
   // works whether or not the user also turned the location control on.
-  const { heading } = useDeviceHeading();
-  useRequestHeading(true);
+  //
+  // Gate on the sensor actually being usable: on a device with no compass
+  // (isSupported=false, or the first probe already returned 'unavailable'),
+  // an unconditional request would keep restarting the orientation subscription
+  // forever, each attempt failing the same way.
+  const {
+    heading,
+    isSupported: compassSupported,
+    error: compassError
+  } = useDeviceHeading();
+  useRequestHeading(compassSupported && compassError !== 'unavailable');
 
   // Keep the banner from bleeding taps/scroll through to the map underneath.
   // Attach through a ref callback so the effect runs exactly once per DOM node,
@@ -59,6 +68,10 @@ const WaypointHud = ({ waypoint, userLocation }) => {
   // 0 — i.e. on alignment, the one angle the user aims for. The animated
   // transform below would read 359° → 2° as "turn 357° the other way" and spin
   // the arrow right around at the very moment it should settle.
+  //
+  // First real reading after `heading` was null: useContinuousAngle passes the
+  // input through unchanged, so the arrow lands directly on the new angle
+  // rather than sweeping there from the accumulator's previous position.
   const arrowAngle = useContinuousAngle(relative);
 
   return (
