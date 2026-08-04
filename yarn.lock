@@ -2171,6 +2171,7 @@ __metadata:
     coordinate-parser: "npm:^1.0.7"
     cypress: "npm:^15.19.0"
     d3: "npm:^7.9.0"
+    d3-polygon: "npm:^3.0.1"
     date-fns: "npm:^4.4.0"
     diff: "npm:^8.0.4"
     fast-check: "npm:4.9.0"
@@ -2184,6 +2185,7 @@ __metadata:
     linkify-react: "npm:^4.3.3"
     linkifyjs: "npm:^4.3.3"
     notistack: "npm:^3.0.2"
+    papaparse: "npm:^5.5.4"
     proj4: "npm:^2.21.0"
     prop-types: "npm:^15.8.1"
     qrcode.react: "npm:^4.2.0"
@@ -7072,7 +7074,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"d3-polygon@npm:3":
+"d3-polygon@npm:3, d3-polygon@npm:^3.0.1":
   version: 3.0.1
   resolution: "d3-polygon@npm:3.0.1"
   checksum: 10/c4fa2ed19dcba13fd341815361d27e64597aa0d38d377e401e1353c4acbe8bd73c0afb3e49a1cf4119fadc3651ec8073d06aa6d0e34e664c868d071e58912cd1
@@ -11162,7 +11164,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"papaparse@npm:^5.4.1":
+"papaparse@npm:^5.4.1, papaparse@npm:^5.5.4":
   version: 5.5.4
   resolution: "papaparse@npm:5.5.4"
   checksum: 10/929466b2acb464b2ac4ad5542d58097967a5c0ef0ca8d9e05e0e8effadbb4077692f19c7601bb32dc56bd982941b38a8e83d7db9e5025483ca859abf7e9a5031
