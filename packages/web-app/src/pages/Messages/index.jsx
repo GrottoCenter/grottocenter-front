@@ -239,7 +239,7 @@ const MessagesPage = () => {
                     <Typography
                       variant="body2"
                       sx={{
-                        fontSize: { xs: '0.625rem', sm: '0.6875rem' },
+                        fontSize: { xs: '0.6875rem', sm: '0.75rem' },
                         opacity: 0.8
                       }}>
                       <FormattedDate

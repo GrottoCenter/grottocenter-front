@@ -457,12 +457,12 @@ contract and buys nothing you can see. Always mix `rem` with `vw`
 (`clamp(1.625rem, 1.46rem + 0.72vw, 2rem)`), never `vw` alone, or browser zoom
 stops scaling the text (WCAG 1.4.4).
 
-The resulting scale is a flat ladder — `32/24/20/18/16/14`, all at weight 600 —
+The resulting scale is a flat ladder — `32/23/20/18/16/14`, all at weight 600 —
 so hierarchy is carried by size alone and can be checked at a glance.
 
 **If you ever make another level fluid**, mind the invariant that bit us: it is
 the fluid step's _minimum_, not its maximum, that must clear the static step
-below it. `h1`'s floor is 26px precisely because `h2` sits at 24px. Get it wrong
+below it. `h1`'s floor is 26px precisely because `h2` sits at 23px. Get it wrong
 and the hierarchy inverts on phones only — where two levels collapse to the same
 size and the lower one, being no lighter, reads as the louder of the two.
 

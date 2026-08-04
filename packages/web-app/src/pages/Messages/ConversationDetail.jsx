@@ -752,7 +752,7 @@ Message Body: ${body}`;
               justifyContent: 'flex-end',
               px: 1,
               color: replyText.length > 5000 ? 'error.main' : 'text.secondary',
-              fontSize: '0.625rem'
+              fontSize: '0.75rem'
             }}>
             {replyText.length > 5000 &&
               formatMessage({
