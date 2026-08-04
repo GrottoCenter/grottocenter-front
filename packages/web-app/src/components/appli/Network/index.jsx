@@ -5,7 +5,6 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import Skeleton from '@mui/material/Skeleton';
 import { Box, Breadcrumbs, Card, Typography } from '@mui/material';
-import AppLink from '../../common/AppLink';
 import { styled } from '@mui/material/styles';
 import { NavigateNext, Print } from '@mui/icons-material';
 import CreateIcon from '@mui/icons-material/Create';
@@ -14,6 +13,7 @@ import ShareIcon from '@mui/icons-material/Share';
 import ExploreOutlinedIcon from '@mui/icons-material/ExploreOutlined';
 import BiotechIcon from '@mui/icons-material/Biotech';
 import { useReactToPrint } from 'react-to-print';
+import AppLink from '../../common/AppLink';
 
 import { usePermissions, useSharePage } from '../../../hooks';
 import PageContainer from '../../common/Layouts/PageContainer';

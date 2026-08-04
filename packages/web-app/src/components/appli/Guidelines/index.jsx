@@ -167,7 +167,13 @@ const Guidelines = ({ entityType, entityId, guidelines }) => {
               data-testid="guideline-mode-toggle">
               <Button
                 variant="outlined"
-                startIcon={<EntityIcon iconType="guidelines" size={20} BadgeIcon={LinkIcon} />}
+                startIcon={
+                  <EntityIcon
+                    iconType="guidelines"
+                    size={20}
+                    BadgeIcon={LinkIcon}
+                  />
+                }
                 onClick={() => {
                   setMode(MODE_ATTACH);
                   setSelectedGuideline(null);
@@ -322,7 +328,13 @@ const Guidelines = ({ entityType, entityId, guidelines }) => {
               setMode(MODE_ATTACH);
               setAttachFetchTrigger(prev => prev + 1);
             }}
-            startIcon={<EntityIcon iconType="guidelines" size={20} BadgeIcon={LinkIcon} />}
+            startIcon={
+              <EntityIcon
+                iconType="guidelines"
+                size={20}
+                BadgeIcon={LinkIcon}
+              />
+            }
             data-testid="add-guideline-btn">
             <FormattedMessage id="Associate" />
           </Button>

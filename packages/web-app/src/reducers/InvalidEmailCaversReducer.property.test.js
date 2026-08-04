@@ -104,17 +104,13 @@ describe('Feature: invalid-email-cavers, Property 2: Reducer state transitions',
               isLoading: true,
               error: null
             });
-          } else if (
-            lastAction.type === FETCH_INVALID_EMAIL_CAVERS_SUCCESS
-          ) {
+          } else if (lastAction.type === FETCH_INVALID_EMAIL_CAVERS_SUCCESS) {
             expect(state).toEqual({
               invalidEmailCavers: lastAction.cavers,
               isLoading: false,
               error: null
             });
-          } else if (
-            lastAction.type === FETCH_INVALID_EMAIL_CAVERS_FAILURE
-          ) {
+          } else if (lastAction.type === FETCH_INVALID_EMAIL_CAVERS_FAILURE) {
             expect(state).toEqual({
               invalidEmailCavers: [],
               isLoading: false,

@@ -14,6 +14,8 @@ import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
 import ShareIcon from '@mui/icons-material/Share';
 import { useReactToPrint } from 'react-to-print';
 
+import ExploreOutlinedIcon from '@mui/icons-material/ExploreOutlined';
+import PermMediaOutlinedIcon from '@mui/icons-material/PermMediaOutlined';
 import {
   usePermissions,
   useSubscriptions,
@@ -24,8 +26,6 @@ import { subscribeToMassif } from '../../../actions/Subscriptions/SubscribeToMas
 import { unsubscribeFromMassif } from '../../../actions/Subscriptions/UnsubscribeFromMassif';
 import { deleteMassif } from '../../../actions/Massif/DeleteMassif';
 import { restoreMassif } from '../../../actions/Massif/RestoreMassif';
-import ExploreOutlinedIcon from '@mui/icons-material/ExploreOutlined';
-import PermMediaOutlinedIcon from '@mui/icons-material/PermMediaOutlined';
 import PageContainer from '../../common/Layouts/PageContainer';
 import PageHeader from '../../common/Layouts/PageHeader';
 import PageTabs from '../../common/Layouts/PageTabs';

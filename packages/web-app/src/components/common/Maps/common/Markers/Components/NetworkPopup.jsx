@@ -3,11 +3,7 @@ import { Information } from './utils';
 import idNameType from '../../../../../../types/idName.type';
 
 export const NetworkPopup = ({ network }) => (
-  <Information
-    isTitle
-    value={network.name}
-    url={`/ui/caves/${network.id}`}
-  />
+  <Information isTitle value={network.name} url={`/ui/caves/${network.id}`} />
 );
 
 NetworkPopup.propTypes = {

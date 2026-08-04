@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
-import { useIntl } from 'react-intl';
+import { useIntl, defineMessages } from 'react-intl';
 import { Check } from '@mui/icons-material';
 import {
   Box,
@@ -18,8 +18,6 @@ import SearchInput from '../SearchInput';
 import Translate from '../Translate';
 import { WGS84_DD, DMS_CODE } from '../../../hooks';
 
-import { defineMessages } from 'react-intl';
-
 const WGS84_LABEL = 'Decimal degrees (WGS84)';
 const DMS_LABEL = 'Degrees Minutes Seconds';
 
@@ -28,8 +26,13 @@ defineMessages({
   dms: { id: 'Degrees Minutes Seconds' }
 });
 
-
-const CRSMenu = ({ anchorEl = null, onClose, preferred, projections = [], onSelect }) => {
+const CRSMenu = ({
+  anchorEl = null,
+  onClose,
+  preferred,
+  projections = [],
+  onSelect
+}) => {
   const { formatMessage, locale } = useIntl();
   const [filter, setFilter] = useState('');
 
@@ -192,6 +195,5 @@ CRSMenu.propTypes = {
   ),
   onSelect: PropTypes.func.isRequired
 };
-
 
 export default CRSMenu;

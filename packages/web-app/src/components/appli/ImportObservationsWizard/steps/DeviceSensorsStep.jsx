@@ -42,9 +42,7 @@ const DeviceSelector = ({ disabled, onCreateNew, onSelect }) => {
   const { formatMessage } = useIntl();
   const dispatch = useDispatch();
   const devices = useSelector(state => state.importWizard.deviceSearchResults);
-  const currentUserId = useSelector(
-    state => state.login.authTokenDecoded?.id
-  );
+  const currentUserId = useSelector(state => state.login.authTokenDecoded?.id);
 
   const [inputValue, setInputValue] = useState('');
   const [isSearching, setIsSearching] = useState(false);
@@ -72,7 +70,9 @@ const DeviceSelector = ({ disabled, onCreateNew, onSelect }) => {
       .finally(() => {
         if (!cancelled) setIsSearching(false);
       });
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [debouncedInput, dispatch, disabled, getFilter]);
 
   // Fetch on open or when checkbox is checked (no typed query)
@@ -88,7 +88,9 @@ const DeviceSelector = ({ disabled, onCreateNew, onSelect }) => {
       .finally(() => {
         if (!cancelled) setIsSearching(false);
       });
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
     // Excluding debouncedInput — this effect only runs when myDevicesOnly
     // changes or on initial load without a typed query.
   }, [myDevicesOnly, dispatch, disabled, getFilter]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -190,8 +192,7 @@ const DeviceSelector = ({ disabled, onCreateNew, onSelect }) => {
             <li key={key || option.id} {...rest}>
               <Box>
                 <Typography variant="body2">{option.name}</Typography>
-                <Box
-                  sx={{ display: 'flex', gap: 0.5, alignItems: 'center' }}>
+                <Box sx={{ display: 'flex', gap: 0.5, alignItems: 'center' }}>
                   {option.brandName && (
                     <Typography variant="caption" color="text.secondary">
                       {option.brandName}
@@ -363,7 +364,10 @@ const DeviceCreator = ({ onCancel, onSuccess }) => {
         />
       </Box>
       {createError && (
-        <Alert severity="error" sx={{ mt: 1 }} data-testid="create-device-error">
+        <Alert
+          severity="error"
+          sx={{ mt: 1 }}
+          data-testid="create-device-error">
           {createError}
         </Alert>
       )}
@@ -471,7 +475,10 @@ const DeviceSensorsStep = () => {
   useEffect(() => {
     let cancelled = false;
 
-    if (confirmedDevice && confirmedDevice.id !== confirmedDeviceIdRef.current) {
+    if (
+      confirmedDevice &&
+      confirmedDevice.id !== confirmedDeviceIdRef.current
+    ) {
       confirmedDeviceIdRef.current = confirmedDevice.id;
       dispatch(fetchSensorConfigs(confirmedDevice.id))
         .then(result => {

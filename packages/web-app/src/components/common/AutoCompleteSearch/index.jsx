@@ -79,7 +79,7 @@ const InputAdornments = ({ isLoading, hasError }) =>
   ) : null;
 
 const StyledPopper = hasFixWidth =>
-  (function(props) {
+  function (props) {
     return (
       <ResultsPopper
         {...props}
@@ -87,7 +87,7 @@ const StyledPopper = hasFixWidth =>
         placement="bottom-end"
       />
     );
-  });
+  };
 const AutoCompleteSearch = ({
   suggestions,
   renderOption,

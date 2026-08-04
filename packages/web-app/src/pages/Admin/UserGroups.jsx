@@ -103,9 +103,7 @@ const UserGroups = ({
         {formatMessage({ id: 'Banned' })}
       </Typography>
       <Tooltip
-        title={
-          isSelfUser ? formatMessage({ id: 'Cannot ban yourself' }) : ''
-        }
+        title={isSelfUser ? formatMessage({ id: 'Cannot ban yourself' }) : ''}
         arrow>
         <span>
           <FormControlLabel

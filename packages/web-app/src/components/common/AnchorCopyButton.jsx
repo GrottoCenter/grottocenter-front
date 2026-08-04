@@ -37,12 +37,15 @@ const AnchorCopyButton = ({ anchorId }) => {
   const { formatMessage } = useIntl();
   const [copied, setCopied] = useState(false);
 
-  const handleClick = useCallback(async e => {
-    e.preventDefault();
-    window.history.replaceState(null, '', `#${anchorId}`);
-    await copyToClipboard(window.location.href);
-    setCopied(true);
-  }, [anchorId]);
+  const handleClick = useCallback(
+    async e => {
+      e.preventDefault();
+      window.history.replaceState(null, '', `#${anchorId}`);
+      await copyToClipboard(window.location.href);
+      setCopied(true);
+    },
+    [anchorId]
+  );
 
   useEffect(() => {
     if (copied) {
@@ -53,7 +56,8 @@ const AnchorCopyButton = ({ anchorId }) => {
   }, [copied]);
 
   return (
-    <Tooltip title={formatMessage({ id: copied ? 'Link copied!' : 'Copy link' })}>
+    <Tooltip
+      title={formatMessage({ id: copied ? 'Link copied!' : 'Copy link' })}>
       <IconButton
         className="anchor-link"
         size="small"

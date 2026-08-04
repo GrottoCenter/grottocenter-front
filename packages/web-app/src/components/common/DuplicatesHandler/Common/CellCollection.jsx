@@ -1,7 +1,6 @@
 /* eslint-disable react/no-array-index-key */
 import React from 'react';
-import { Fab, InputAdornment, Typography, useTheme } from '@mui/material';
-import { Grid } from '@mui/material';
+import { Fab, InputAdornment, Typography, useTheme, Grid } from '@mui/material';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import RemoveIcon from '@mui/icons-material/Remove';

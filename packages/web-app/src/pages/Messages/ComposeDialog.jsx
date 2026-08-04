@@ -278,7 +278,9 @@ const ComposeDialog = ({ open, onClose, prefilledRecipientId }) => {
                     flexGrow: 1,
                     alignItems: 'stretch'
                   },
-                  '& .MuiInputBase-inputMultiline': { height: '100% !important' }
+                  '& .MuiInputBase-inputMultiline': {
+                    height: '100% !important'
+                  }
                 }
               : undefined
           }

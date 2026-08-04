@@ -52,7 +52,9 @@ const DocumentEdit = ({
   ) : (
     <Layout
       title={formatMessage({ id: 'BBS document submission form' })}
-      content={<DocumentSubmission initialValues={details} onCancel={onCancel} />}
+      content={
+        <DocumentSubmission initialValues={details} onCancel={onCancel} />
+      }
     />
   );
 };

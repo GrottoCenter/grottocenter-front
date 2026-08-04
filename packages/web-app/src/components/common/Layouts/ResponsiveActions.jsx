@@ -36,8 +36,7 @@ const ResponsiveActions = ({ items }) => {
         onClick={onClick}
         {...(href
           ? { component: AppLink, to: href, target, rel: 'noopener noreferrer' }
-          : {})}
-      >
+          : {})}>
         {icon}
       </Button>
     </Tooltip>
@@ -100,8 +99,7 @@ const ResponsiveActions = ({ items }) => {
               target,
               rel: 'noopener noreferrer'
             }
-          : {})}
-      >
+          : {})}>
         <ListItemIcon sx={colorSx}>{icon}</ListItemIcon>
         <ListItemText>{label}</ListItemText>
       </MenuItem>
@@ -115,8 +113,7 @@ const ResponsiveActions = ({ items }) => {
           aria-label="actions"
           aria-haspopup="true"
           aria-expanded={Boolean(anchorEl)}
-          onClick={e => setAnchorEl(anchorEl ? null : e.currentTarget)}
-        >
+          onClick={e => setAnchorEl(anchorEl ? null : e.currentTarget)}>
           <MoreVertIcon />
         </Button>
       </ButtonGroup>
@@ -124,16 +121,14 @@ const ResponsiveActions = ({ items }) => {
         open={Boolean(anchorEl)}
         anchorEl={anchorEl}
         placement="bottom-end"
-        sx={{ zIndex: theme.zIndex.tooltip }}
-      >
+        sx={{ zIndex: theme.zIndex.tooltip }}>
         <Paper elevation={3}>
           <ClickAwayListener onClickAway={closeMenu}>
             <MenuList
               autoFocusItem={Boolean(anchorEl)}
               onKeyDown={e => {
                 if (e.key === 'Escape') closeMenu();
-              }}
-            >
+              }}>
               {menuEntries}
             </MenuList>
           </ClickAwayListener>

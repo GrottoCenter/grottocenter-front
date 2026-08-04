@@ -26,8 +26,7 @@ export const detectSamplingInterval = utcTimestamps => {
 
   // Proper median: average the two middle values for even-length arrays
   const mid = Math.floor(diffs.length / 2);
-  const median = diffs.length % 2 === 0
-    ? (diffs[mid - 1] + diffs[mid]) / 2
-    : diffs[mid];
+  const median =
+    diffs.length % 2 === 0 ? (diffs[mid - 1] + diffs[mid]) / 2 : diffs[mid];
   return Math.floor(median);
 };

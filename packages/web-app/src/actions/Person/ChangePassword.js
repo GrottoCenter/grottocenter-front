@@ -15,7 +15,11 @@ const fetchChangePasswordFailure = error => ({
   error
 });
 
-export function postChangePassword(password, resetPasswordToken, currentPassword) {
+export function postChangePassword(
+  password,
+  resetPasswordToken,
+  currentPassword
+) {
   return (dispatch, getState) => {
     dispatch(fetchChangePassword());
 

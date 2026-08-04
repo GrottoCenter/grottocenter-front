@@ -1,7 +1,13 @@
 import isEmail from 'validator/lib/isEmail';
 
 export const AVAILABLE_LANGUAGES = {
-  ar: { nativeName: 'عربية', id: 'ara', part1: 'ar', refName: 'Arabic', direction: 'rtl' },
+  ar: {
+    nativeName: 'عربية',
+    id: 'ara',
+    part1: 'ar',
+    refName: 'Arabic',
+    direction: 'rtl'
+  },
   bg: { nativeName: 'Български', id: 'bul', part1: 'bg', refName: 'Bulgarian' },
   ca: { nativeName: 'Català', id: 'cat', part1: 'ca', refName: 'Catalan' },
   de: { nativeName: 'Deutsch', id: 'deu', part1: 'de', refName: 'German' },
@@ -14,7 +20,13 @@ export const AVAILABLE_LANGUAGES = {
   en: { nativeName: 'English', id: 'eng', part1: 'en', refName: 'English' },
   es: { nativeName: 'Español', id: 'spa', part1: 'es', refName: 'Spanish' },
   fr: { nativeName: 'Français', id: 'fra', part1: 'fr', refName: 'French' },
-  he: { nativeName: 'עברי', id: 'heb', part1: 'he', refName: 'Hebrew', direction: 'rtl' },
+  he: {
+    nativeName: 'עברי',
+    id: 'heb',
+    part1: 'he',
+    refName: 'Hebrew',
+    direction: 'rtl'
+  },
   id: {
     nativeName: 'Indonesia',
     id: 'ind',

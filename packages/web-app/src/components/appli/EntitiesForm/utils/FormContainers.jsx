@@ -63,9 +63,11 @@ export const FormSection = ({ title, children }) => (
         <Typography variant="h5" component="h2">
           <Translate>{title}</Translate>
         </Typography>
-        <Divider sx={{
-          mb: 2
-        }} />
+        <Divider
+          sx={{
+            mb: 2
+          }}
+        />
       </>
     )}
     {children}
@@ -103,7 +105,9 @@ export const FormActionRow = ({
         </MuiButton>
       )}
       <ActionButton
-        label={submitLabel ?? formatMessage({ id: isNew ? 'Create' : 'Update' })}
+        label={
+          submitLabel ?? formatMessage({ id: isNew ? 'Create' : 'Update' })
+        }
         loading={isSubmitting}
         disabled={disabled}
         color="primary"

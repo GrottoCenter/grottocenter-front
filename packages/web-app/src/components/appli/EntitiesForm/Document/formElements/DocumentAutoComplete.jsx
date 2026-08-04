@@ -20,11 +20,7 @@ import FormAutoCompleteComponent from '../../../../common/Form/FormAutoComplete'
 
 const resultEndAdornment = (
   <InputAdornment position="end">
-    <img
-      src={bibliographyIcon}
-      alt="Document icon"
-      style={{ width: '40px' }}
-    />
+    <img src={bibliographyIcon} alt="Document icon" style={{ width: '40px' }} />
   </InputAdornment>
 );
 

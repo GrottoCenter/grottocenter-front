@@ -23,7 +23,7 @@ const MassifSensitivityControl = ({ massif }) => {
   const permissions = usePermissions();
 
   const isSensitive = massif?.isSensitive;
-  const isAdmin = permissions.isAdmin;
+  const { isAdmin } = permissions;
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [isPreviewLoading, setIsPreviewLoading] = useState(false);
   const [previewCount, setPreviewCount] = useState(null);
@@ -33,8 +33,6 @@ const MassifSensitivityControl = ({ massif }) => {
   useEffect(() => {
     setOptimisticSensitive(!!isSensitive);
   }, [isSensitive]);
-
-
 
   if (!isAdmin || !massif?.id) return null;
 
@@ -71,20 +69,31 @@ const MassifSensitivityControl = ({ massif }) => {
         const count = previewCount ?? 0;
         notification.onSuccess(
           formatMessage(
-            { id: count > 0 ? 'Massif marked as sensitive. {count} entrances affected.' : 'Massif marked sensitive with no entrances affected.' },
+            {
+              id:
+                count > 0
+                  ? 'Massif marked as sensitive. {count} entrances affected.'
+                  : 'Massif marked sensitive with no entrances affected.'
+            },
             { count }
           )
         );
       } else {
         await dispatch(unmarkMassifSensitive(massif.id));
-        notification.onSuccess(formatMessage({ id: 'Massif unmarked as sensitive.' }));
+        notification.onSuccess(
+          formatMessage({ id: 'Massif unmarked as sensitive.' })
+        );
       }
       setOptimisticSensitive(!isSensitive);
       setIsConfirmOpen(false);
     } catch (error) {
       setIsConfirmOpen(false);
       if (error.status === 403) {
-        notification.onError(formatMessage({ id: 'Only administrators can modify massif sensitivity.' }));
+        notification.onError(
+          formatMessage({
+            id: 'Only administrators can modify massif sensitivity.'
+          })
+        );
       } else {
         notification.onError(error.message);
       }
@@ -93,24 +102,43 @@ const MassifSensitivityControl = ({ massif }) => {
     }
   };
 
-  const dialogTitle = formatMessage({ id: isSensitive ? 'Remove sensitivity' : 'Enable sensitivity' });
+  const dialogTitle = formatMessage({
+    id: isSensitive ? 'Remove sensitivity' : 'Enable sensitivity'
+  });
 
   let dialogBody;
   if (!isSensitive) {
     if (previewCount !== null) {
       dialogBody = formatMessage(
-        { id: previewCount > 0 ? 'This action will mark {count} entrances as sensitive. This designation must be based on applicable legislation. Do you want to continue?' : 'No entrances will be affected but the massif will still be marked as sensitive. This designation must be based on applicable legislation. Do you want to continue?' },
+        {
+          id:
+            previewCount > 0
+              ? 'This action will mark {count} entrances as sensitive. This designation must be based on applicable legislation. Do you want to continue?'
+              : 'No entrances will be affected but the massif will still be marked as sensitive. This designation must be based on applicable legislation. Do you want to continue?'
+        },
         { count: previewCount }
       );
     } else {
-      dialogBody = formatMessage({ id: 'Entrances within the massif polygon will be marked as sensitive. This designation must be based on applicable legislation. Do you want to continue?' });
+      dialogBody = formatMessage({
+        id: 'Entrances within the massif polygon will be marked as sensitive. This designation must be based on applicable legislation. Do you want to continue?'
+      });
     }
   } else {
-    dialogBody = formatMessage({ id: 'Removing sensitivity from the massif will not automatically remove the sensitivity flag from individual entrances. Those flags must be managed separately. Do you want to continue?' });
+    dialogBody = formatMessage({
+      id: 'Removing sensitivity from the massif will not automatically remove the sensitivity flag from individual entrances. Those flags must be managed separately. Do you want to continue?'
+    });
   }
 
   return (
-    <Box sx={{ mt: 2, mb: 2, p: 1, border: 1, borderColor: 'divider', borderRadius: 1 }}>
+    <Box
+      sx={{
+        mt: 2,
+        mb: 2,
+        p: 1,
+        border: 1,
+        borderColor: 'divider',
+        borderRadius: 1
+      }}>
       <Typography variant="h5" component="h3" gutterBottom>
         {formatMessage({ id: 'Sensitivity Management' })}
       </Typography>
@@ -141,12 +169,19 @@ const MassifSensitivityControl = ({ massif }) => {
             <Button onClick={handleCancel} disabled={isActionLoading}>
               {formatMessage({ id: 'Cancel' })}
             </Button>
-            <Button onClick={handleConfirm} color="primary" variant="contained" disabled={isActionLoading}>
-              {isActionLoading ? <CircularProgress size={24} /> : formatMessage({ id: 'Confirm' })}
+            <Button
+              onClick={handleConfirm}
+              color="primary"
+              variant="contained"
+              disabled={isActionLoading}>
+              {isActionLoading ? (
+                <CircularProgress size={24} />
+              ) : (
+                formatMessage({ id: 'Confirm' })
+              )}
             </Button>
           </>
-        }
-      >
+        }>
         <Typography>{dialogBody}</Typography>
       </StandardDialog>
     </Box>

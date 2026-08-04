@@ -33,12 +33,18 @@ vi.mock('../../../common/AutoCompleteSearch/CaveAutoCompleteSearch', () => {
   return {
     __esModule: true,
     default: ({ onSelection, disabled }) =>
-      React.createElement('div', { 'data-testid': 'cave-autocomplete-search' },
-        React.createElement('button', {
-          'data-testid': 'cave-select-button',
-          disabled,
-          onClick: () => onSelection({ id: 42, name: 'Test Cave' })
-        }, 'Select cave')
+      React.createElement(
+        'div',
+        { 'data-testid': 'cave-autocomplete-search' },
+        React.createElement(
+          'button',
+          {
+            'data-testid': 'cave-select-button',
+            disabled,
+            onClick: () => onSelection({ id: 42, name: 'Test Cave' })
+          },
+          'Select cave'
+        )
       )
   };
 });
@@ -87,27 +93,37 @@ vi.mock('../../EntitiesForm/utils/CoordinateFormSection', () => {
 const messages = {
   'ImportObservationsWizard.ContextStep.caveLabel': 'Cave',
   'ImportObservationsWizard.ContextStep.caveId': 'Cave ID',
-  'ImportObservationsWizard.ContextStep.caveIdHelper': 'Enter the numeric ID of the cave',
+  'ImportObservationsWizard.ContextStep.caveIdHelper':
+    'Enter the numeric ID of the cave',
   'ImportObservationsWizard.ContextStep.clearCave': 'Clear cave selection',
-  'ImportObservationsWizard.ContextStep.locationModeLabel': 'Location data available',
-  'ImportObservationsWizard.ContextStep.locationMode.pointAndCave': 'Point and cave',
+  'ImportObservationsWizard.ContextStep.locationModeLabel':
+    'Location data available',
+  'ImportObservationsWizard.ContextStep.locationMode.pointAndCave':
+    'Point and cave',
   'ImportObservationsWizard.ContextStep.locationMode.pointOnly': 'Point only',
   'ImportObservationsWizard.ContextStep.locationMode.caveOnly': 'Cave only',
-  'ImportObservationsWizard.ContextStep.unknownCoordinates': 'Unknown coordinates',
+  'ImportObservationsWizard.ContextStep.unknownCoordinates':
+    'Unknown coordinates',
   'ImportObservationsWizard.ContextStep.pointLabel': 'Point label',
-  'ImportObservationsWizard.ContextStep.pointLabelPlaceholder': 'e.g. Main gallery - sensor A',
+  'ImportObservationsWizard.ContextStep.pointLabelPlaceholder':
+    'e.g. Main gallery - sensor A',
   'ImportObservationsWizard.ContextStep.authorsLabel': 'Authors',
-  'ImportObservationsWizard.ContextStep.authorsNoOptions': 'No caver matches your search (type at least 3 characters)',
-  'Type at least {nbOfChars} character(s)': 'Type at least {nbOfChars} character(s)',
-  'Choose one or more authors among those already registered. If the author you are looking for does not exist in Grottocenter, it is possible to add him/her using the + button on the right.': 'Choose one or more authors among those already registered. If the author you are looking for does not exist in Grottocenter, it is possible to add him/her using the + button on the right.',
+  'ImportObservationsWizard.ContextStep.authorsNoOptions':
+    'No caver matches your search (type at least 3 characters)',
+  'Type at least {nbOfChars} character(s)':
+    'Type at least {nbOfChars} character(s)',
+  'Choose one or more authors among those already registered. If the author you are looking for does not exist in Grottocenter, it is possible to add him/her using the + button on the right.':
+    'Choose one or more authors among those already registered. If the author you are looking for does not exist in Grottocenter, it is possible to add him/her using the + button on the right.',
   'new entity': 'new entity',
-  'Surname': 'Surname',
+  Surname: 'Surname',
   'Caver.Name': 'Name',
-  'create': 'Create',
+  create: 'Create',
   'ImportObservationsWizard.ContextStep.licenseLabel': 'License',
   'ImportObservationsWizard.ContextStep.loadingLicenses': 'Loading licenses…',
-  'ImportObservationsWizard.ContextStep.samplingIntervalLabel': 'Sampling interval (seconds)',
-  'ImportObservationsWizard.ContextStep.samplingIntervalHelper': 'Auto-detected from data (seconds); you may adjust it',
+  'ImportObservationsWizard.ContextStep.samplingIntervalLabel':
+    'Sampling interval (seconds)',
+  'ImportObservationsWizard.ContextStep.samplingIntervalHelper':
+    'Auto-detected from data (seconds); you may adjust it',
   'ImportObservationsWizard.ContextStep.optionalFieldsTitle': 'Optional fields',
   'ImportObservationsWizard.ContextStep.observationName': 'Observation name',
   'ImportObservationsWizard.ContextStep.observationNamePlaceholder':
@@ -118,11 +134,11 @@ const messages = {
   'ImportObservationsWizard.ContextStep.dataQuality': 'Data quality',
   'ImportObservationsWizard.ContextStep.dataQuality.raw': 'Raw',
   'ImportObservationsWizard.ContextStep.dataQuality.validated': 'Validated',
-  'Language': 'Language',
+  Language: 'Language',
   'Select a language': 'Select a language',
   'Loading...': 'Loading...',
-  'English': 'English',
-  'French': 'French'
+  English: 'English',
+  French: 'French'
 };
 
 // ---- Default Redux state ----
@@ -214,7 +230,9 @@ describe('ContextStep', () => {
     it('should render the cave autocomplete search', () => {
       renderComponent({ caveIdLocked: false });
 
-      expect(screen.getByTestId('cave-autocomplete-search')).toBeInTheDocument();
+      expect(
+        screen.getByTestId('cave-autocomplete-search')
+      ).toBeInTheDocument();
     });
 
     it('should disable the cave search when caveIdLocked is true', () => {
@@ -322,7 +340,10 @@ describe('ContextStep', () => {
     });
 
     it('should show an empty point-label field when context.pointLabel is empty', () => {
-      renderComponent({}, { context: { ...defaultImportWizardState.context, pointLabel: '' } });
+      renderComponent(
+        {},
+        { context: { ...defaultImportWizardState.context, pointLabel: '' } }
+      );
 
       const pointLabelField = screen.getByTestId('point-label-field');
       const input = pointLabelField.querySelector('input');
@@ -330,7 +351,10 @@ describe('ContextStep', () => {
     });
 
     it('should dispatch SET_CONTEXT when pointLabel changes', () => {
-      renderComponent({}, { context: { ...defaultImportWizardState.context, pointLabel: '' } });
+      renderComponent(
+        {},
+        { context: { ...defaultImportWizardState.context, pointLabel: '' } }
+      );
 
       const pointLabelField = screen.getByTestId('point-label-field');
       const input = pointLabelField.querySelector('input');
@@ -371,35 +395,56 @@ describe('ContextStep', () => {
       renderComponent();
 
       expect(screen.getByTestId('point-label-field')).toBeInTheDocument();
-      expect(screen.getByTestId('cave-autocomplete-search')).toBeInTheDocument();
+      expect(
+        screen.getByTestId('cave-autocomplete-search')
+      ).toBeInTheDocument();
     });
 
     it('should hide cave section when pointOnly is selected', () => {
-      renderComponent({}, {
-        context: { ...defaultImportWizardState.context, locationMode: 'pointOnly' }
-      });
+      renderComponent(
+        {},
+        {
+          context: {
+            ...defaultImportWizardState.context,
+            locationMode: 'pointOnly'
+          }
+        }
+      );
 
       expect(screen.getByTestId('point-label-field')).toBeInTheDocument();
-      expect(screen.queryByTestId('cave-autocomplete-search')).not.toBeInTheDocument();
+      expect(
+        screen.queryByTestId('cave-autocomplete-search')
+      ).not.toBeInTheDocument();
     });
 
     it('should hide point section when caveOnly is selected', () => {
-      renderComponent({}, {
-        context: { ...defaultImportWizardState.context, locationMode: 'caveOnly' }
-      });
+      renderComponent(
+        {},
+        {
+          context: {
+            ...defaultImportWizardState.context,
+            locationMode: 'caveOnly'
+          }
+        }
+      );
 
       expect(screen.queryByTestId('point-label-field')).not.toBeInTheDocument();
-      expect(screen.getByTestId('cave-autocomplete-search')).toBeInTheDocument();
+      expect(
+        screen.getByTestId('cave-autocomplete-search')
+      ).toBeInTheDocument();
     });
 
     it('should dispatch SET_CONTEXT clearing point fields when switching to caveOnly', () => {
-      renderComponent({}, {
-        context: {
-          ...defaultImportWizardState.context,
-          locationMode: 'pointAndCave',
-          pointLabel: 'Some point'
+      renderComponent(
+        {},
+        {
+          context: {
+            ...defaultImportWizardState.context,
+            locationMode: 'pointAndCave',
+            pointLabel: 'Some point'
+          }
         }
-      });
+      );
 
       const caveOnlyRadio = screen.getByLabelText('Cave only');
       fireEvent.click(caveOnlyRadio);
@@ -419,13 +464,16 @@ describe('ContextStep', () => {
     });
 
     it('should dispatch SET_CONTEXT clearing caveId when switching to pointOnly', () => {
-      renderComponent({}, {
-        context: {
-          ...defaultImportWizardState.context,
-          locationMode: 'pointAndCave',
-          caveId: 42
+      renderComponent(
+        {},
+        {
+          context: {
+            ...defaultImportWizardState.context,
+            locationMode: 'pointAndCave',
+            caveId: 42
+          }
         }
-      });
+      );
 
       const pointOnlyRadio = screen.getByLabelText('Point only');
       fireEvent.click(pointOnlyRadio);
@@ -450,15 +498,18 @@ describe('ContextStep', () => {
     });
 
     it('should dispatch SET_CONTEXT with unknownCoordinates true when switching to pointAndCave', () => {
-      renderComponent({}, {
-        context: {
-          ...defaultImportWizardState.context,
-          locationMode: 'pointOnly',
-          unknownCoordinates: false,
-          latitude: 45.5,
-          longitude: 6.2
+      renderComponent(
+        {},
+        {
+          context: {
+            ...defaultImportWizardState.context,
+            locationMode: 'pointOnly',
+            unknownCoordinates: false,
+            latitude: 45.5,
+            longitude: 6.2
+          }
         }
-      });
+      );
 
       const pointAndCaveRadio = screen.getByLabelText('Point and cave');
       fireEvent.click(pointAndCaveRadio);
@@ -481,66 +532,116 @@ describe('ContextStep', () => {
     it('should render the unknown coordinates checkbox when locationMode is pointAndCave', () => {
       renderComponent();
 
-      expect(screen.getByTestId('unknown-coordinates-checkbox')).toBeInTheDocument();
+      expect(
+        screen.getByTestId('unknown-coordinates-checkbox')
+      ).toBeInTheDocument();
     });
 
     it('should not render the checkbox when locationMode is caveOnly', () => {
-      renderComponent({}, {
-        context: { ...defaultImportWizardState.context, locationMode: 'caveOnly' }
-      });
+      renderComponent(
+        {},
+        {
+          context: {
+            ...defaultImportWizardState.context,
+            locationMode: 'caveOnly'
+          }
+        }
+      );
 
-      expect(screen.queryByTestId('unknown-coordinates-checkbox')).not.toBeInTheDocument();
+      expect(
+        screen.queryByTestId('unknown-coordinates-checkbox')
+      ).not.toBeInTheDocument();
     });
 
     it('should not render the checkbox when locationMode is pointOnly', () => {
-      renderComponent({}, {
-        context: { ...defaultImportWizardState.context, locationMode: 'pointOnly', unknownCoordinates: false }
-      });
+      renderComponent(
+        {},
+        {
+          context: {
+            ...defaultImportWizardState.context,
+            locationMode: 'pointOnly',
+            unknownCoordinates: false
+          }
+        }
+      );
 
-      expect(screen.queryByTestId('unknown-coordinates-checkbox')).not.toBeInTheDocument();
+      expect(
+        screen.queryByTestId('unknown-coordinates-checkbox')
+      ).not.toBeInTheDocument();
     });
 
     it('should hide coordinate form section when unknownCoordinates is checked', () => {
-      renderComponent({}, {
-        context: { ...defaultImportWizardState.context, unknownCoordinates: true }
-      });
+      renderComponent(
+        {},
+        {
+          context: {
+            ...defaultImportWizardState.context,
+            unknownCoordinates: true
+          }
+        }
+      );
 
-      expect(screen.queryByTestId('coordinate-form-section')).not.toBeInTheDocument();
+      expect(
+        screen.queryByTestId('coordinate-form-section')
+      ).not.toBeInTheDocument();
     });
 
     it('should show coordinate form section when unknownCoordinates is unchecked', () => {
-      renderComponent({}, {
-        context: { ...defaultImportWizardState.context, unknownCoordinates: false }
-      });
+      renderComponent(
+        {},
+        {
+          context: {
+            ...defaultImportWizardState.context,
+            unknownCoordinates: false
+          }
+        }
+      );
 
       expect(screen.getByTestId('coordinate-form-section')).toBeInTheDocument();
     });
 
     it('should always show coordinate form section in pointOnly mode', () => {
-      renderComponent({}, {
-        context: { ...defaultImportWizardState.context, locationMode: 'pointOnly', unknownCoordinates: false }
-      });
+      renderComponent(
+        {},
+        {
+          context: {
+            ...defaultImportWizardState.context,
+            locationMode: 'pointOnly',
+            unknownCoordinates: false
+          }
+        }
+      );
 
       expect(screen.getByTestId('coordinate-form-section')).toBeInTheDocument();
     });
 
     it('should show coordinate form section in pointOnly mode even when unknownCoordinates is true (profile import)', () => {
-      renderComponent({}, {
-        context: { ...defaultImportWizardState.context, locationMode: 'pointOnly', unknownCoordinates: true }
-      });
+      renderComponent(
+        {},
+        {
+          context: {
+            ...defaultImportWizardState.context,
+            locationMode: 'pointOnly',
+            unknownCoordinates: true
+          }
+        }
+      );
 
       expect(screen.getByTestId('coordinate-form-section')).toBeInTheDocument();
     });
 
     it('should dispatch SET_CONTEXT clearing coordinates when checked', () => {
-      renderComponent({}, {
-        context: {
-          ...defaultImportWizardState.context,
-          unknownCoordinates: false,
-          latitude: 45.5,
-          longitude: 6.2
+      renderComponent(
+        {},
+        {
+          context: {
+            ...defaultImportWizardState.context,
+            unknownCoordinates: false,
+            latitude: 45.5,
+            longitude: 6.2
+          }
         }
-      });
+      );
 
       const checkbox = screen.getByTestId('unknown-coordinates-checkbox');
       fireEvent.click(checkbox);

@@ -14,9 +14,11 @@ import ImageLightbox from './ImageLightbox';
 import { isImageFile } from './utils/imageUtils';
 
 const DocumentSkeleton = () => (
-  <ListItem disableGutters sx={{
-    display: 'block'
-  }}>
+  <ListItem
+    disableGutters
+    sx={{
+      display: 'block'
+    }}>
     <Paper
       variant="outlined"
       sx={{ p: 1, borderRadius: 2, bgcolor: 'grey.50' }}>

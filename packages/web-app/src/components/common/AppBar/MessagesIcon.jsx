@@ -25,7 +25,7 @@ const MessagesIcon = () => {
   const { formatMessage } = useIntl();
   const { isAuth } = usePermissions();
   const dispatch = useDispatch();
-  
+
   const { active, archived, status } = useSelector(
     state => state.messaging.unreadCounts
   );

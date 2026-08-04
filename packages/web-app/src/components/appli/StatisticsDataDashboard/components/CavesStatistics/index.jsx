@@ -13,8 +13,8 @@ const StyledBox = styled(Box)(({ theme }) => ({
   gap: theme.spacing(1),
   [theme.breakpoints.down('sm')]: {
     gridTemplateColumns: '1fr !important',
-    '& hr': { display: 'none' },
-  },
+    '& hr': { display: 'none' }
+  }
 }));
 
 const styledImg = { width: '100%', height: 'auto' };
@@ -30,7 +30,13 @@ const CavesStatistics = ({ avgDepth, avgLength, totalLength }) => {
     avgDepth != null && (
       <InfoBlock
         key="depth"
-        icon={<img style={styledImg} src={depthIcon} alt={formatMessage({ id: 'Depth icon' })} />}
+        icon={
+          <img
+            style={styledImg}
+            src={depthIcon}
+            alt={formatMessage({ id: 'Depth icon' })}
+          />
+        }
         numberData={avgDepth}
         text={formatMessage({ id: 'average depth' })}
       />
@@ -38,7 +44,13 @@ const CavesStatistics = ({ avgDepth, avgLength, totalLength }) => {
     avgLength != null && (
       <InfoBlock
         key="length"
-        icon={<img style={styledImg} src={lengthIcon} alt={formatMessage({ id: 'Length icon' })} />}
+        icon={
+          <img
+            style={styledImg}
+            src={lengthIcon}
+            alt={formatMessage({ id: 'Length icon' })}
+          />
+        }
         numberData={avgLength}
         text={formatMessage({ id: 'average length' })}
       />
@@ -48,17 +60,23 @@ const CavesStatistics = ({ avgDepth, avgLength, totalLength }) => {
         key="total"
         icon={
           <Tooltip title={tooltipText}>
-            <img style={styledImg} src={lengthIcon} alt={formatMessage({ id: 'Length icon' })} />
+            <img
+              style={styledImg}
+              src={lengthIcon}
+              alt={formatMessage({ id: 'Length icon' })}
+            />
           </Tooltip>
         }
         numberData={totalLength.value}
         text={formatMessage({ id: 'cumulated length' })}
       />
-    ),
+    )
   ].filter(Boolean);
 
   // Each block gets a "1fr" column; between blocks, an "auto" column hosts the vertical <Divider>.
-  const cols = blocks.map((_, i) => (i < blocks.length - 1 ? ['1fr', 'auto'] : ['1fr'])).flat();
+  const cols = blocks
+    .map((_, i) => (i < blocks.length - 1 ? ['1fr', 'auto'] : ['1fr']))
+    .flat();
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column' }}>
@@ -69,7 +87,9 @@ const CavesStatistics = ({ avgDepth, avgLength, totalLength }) => {
         {blocks.map((block, i) => (
           <React.Fragment key={block.key}>
             {block}
-            {i < blocks.length - 1 && <Divider orientation="vertical" flexItem />}
+            {i < blocks.length - 1 && (
+              <Divider orientation="vertical" flexItem />
+            )}
           </React.Fragment>
         ))}
       </StyledBox>

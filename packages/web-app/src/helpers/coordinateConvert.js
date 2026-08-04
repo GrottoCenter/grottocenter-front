@@ -14,13 +14,14 @@ export const decimalToDMS = (decimal, isLatitude) => {
       ? 'N'
       : 'S'
     : decimal >= 0
-    ? 'E'
-    : 'W';
+      ? 'E'
+      : 'W';
   return `${deg}°${min}'${sec}"${direction}`;
 };
 
 // 'O' = Ouest (West) — French notation, same sign as 'W'.
-const isNegativeDir = (sign, dir) => sign === '-' || (dir && /^[SWOswo]$/.test(dir));
+const isNegativeDir = (sign, dir) =>
+  sign === '-' || (dir && /^[SWOswo]$/.test(dir));
 
 // Accepts DMS: "48°31'24.2"N", "48 31 24.2 N", "48d31m24.2sN"
 // Accepts DDM: "48°31.402'N"
@@ -61,7 +62,8 @@ const addZoneToUTM = (definition, zone) => {
   return `${parts[0]}+zone=${zone}${rest}`;
 };
 
-const removeSouthFromUTM = definition => definition.replace(/\s*\+south\b/g, '');
+const removeSouthFromUTM = definition =>
+  definition.replace(/\s*\+south\b/g, '');
 
 export const buildUTMProjection = (definition, zone, hemisphere) => {
   let proj = addZoneToUTM(definition, zone);
@@ -142,7 +144,12 @@ const tryProjectedConversion = (easting, northing, projection, format) => {
   if (!projection) return null;
   try {
     const result = convertProjectionToWGS84(easting, northing, projection);
-    if (result.lat >= -90 && result.lat <= 90 && result.lng >= -180 && result.lng <= 180)
+    if (
+      result.lat >= -90 &&
+      result.lat <= 90 &&
+      result.lng >= -180 &&
+      result.lng <= 180
+    )
       return { lat: result.lat, lng: result.lng, format };
     return null;
   } catch {
@@ -176,7 +183,8 @@ const inRange = (v, [min, max]) => v >= min && v <= max;
 const DMS_INDICATOR_RE = /['"]|[ms]/;
 
 // Replaces standalone 'O' (Ouest) with 'W' so all parsing paths see standard cardinals.
-const normalizeWest = input => input.replace(/(^|[^a-z0-9])[Oo](?![a-z0-9])/gi, '$1W');
+const normalizeWest = input =>
+  input.replace(/(^|[^a-z0-9])[Oo](?![a-z0-9])/gi, '$1W');
 
 const detectProjectedPair = (a, b) => {
   for (const crs of PROJECTED_CRS_RANGES) {
@@ -206,8 +214,14 @@ export const parseCoordinateString = (input, projections = []) => {
     const detected = detectProjectedPair(a, b);
 
     if (detected) {
-      const projection = projections.find(p => p.code === detected.crs.code) ?? null;
-      return tryProjectedConversion(detected.easting, detected.northing, projection, detected.crs.name);
+      const projection =
+        projections.find(p => p.code === detected.crs.code) ?? null;
+      return tryProjectedConversion(
+        detected.easting,
+        detected.northing,
+        projection,
+        detected.crs.name
+      );
     }
 
     // Fast path: two plain numbers with no DMS indicators AND no cardinal letters.

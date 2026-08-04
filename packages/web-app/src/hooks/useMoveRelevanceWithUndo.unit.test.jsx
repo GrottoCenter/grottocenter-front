@@ -61,9 +61,7 @@ beforeEach(() => {
 describe('useMoveRelevanceWithUndo', () => {
   it('shows success snackbar after successful move', async () => {
     const mockThunk = createMockThunk();
-    const { result } = renderHook(() =>
-      useMoveRelevanceWithUndo(mockThunk)
-    );
+    const { result } = renderHook(() => useMoveRelevanceWithUndo(mockThunk));
 
     await act(async () => {
       result.current.handleMove(1, -1);
@@ -77,9 +75,7 @@ describe('useMoveRelevanceWithUndo', () => {
 
   it('snackbar contains an Undo action button', async () => {
     const mockThunk = createMockThunk();
-    const { result } = renderHook(() =>
-      useMoveRelevanceWithUndo(mockThunk)
-    );
+    const { result } = renderHook(() => useMoveRelevanceWithUndo(mockThunk));
 
     await act(async () => {
       result.current.handleMove(1, -1);
@@ -97,9 +93,7 @@ describe('useMoveRelevanceWithUndo', () => {
 
   it('snackbar auto-dismiss is configured to 6000ms', async () => {
     const mockThunk = createMockThunk();
-    const { result } = renderHook(() =>
-      useMoveRelevanceWithUndo(mockThunk)
-    );
+    const { result } = renderHook(() => useMoveRelevanceWithUndo(mockThunk));
 
     await act(async () => {
       result.current.handleMove(1, -1);
@@ -113,9 +107,7 @@ describe('useMoveRelevanceWithUndo', () => {
 
   it('clicking Undo dispatches move with opposite direction', async () => {
     const mockThunk = createMockThunk();
-    const { result } = renderHook(() =>
-      useMoveRelevanceWithUndo(mockThunk)
-    );
+    const { result } = renderHook(() => useMoveRelevanceWithUndo(mockThunk));
 
     await act(async () => {
       result.current.handleMove(1, -1);
@@ -145,9 +137,7 @@ describe('useMoveRelevanceWithUndo', () => {
 
   it('undo success shows confirmation snackbar', async () => {
     const mockThunk = createMockThunk();
-    const { result } = renderHook(() =>
-      useMoveRelevanceWithUndo(mockThunk)
-    );
+    const { result } = renderHook(() => useMoveRelevanceWithUndo(mockThunk));
 
     await act(async () => {
       result.current.handleMove(1, 1);
@@ -179,9 +169,7 @@ describe('useMoveRelevanceWithUndo', () => {
 
   it('shows error snackbar and no success snackbar when move fails', async () => {
     const mockThunk = createMockThunk(failureResult);
-    const { result } = renderHook(() =>
-      useMoveRelevanceWithUndo(mockThunk)
-    );
+    const { result } = renderHook(() => useMoveRelevanceWithUndo(mockThunk));
 
     await act(async () => {
       result.current.handleMove(1, -1);
@@ -196,9 +184,7 @@ describe('useMoveRelevanceWithUndo', () => {
 
   it('shows error snackbar and no undo-success snackbar when undo fails', async () => {
     const mockThunk = createMockThunk();
-    const { result } = renderHook(() =>
-      useMoveRelevanceWithUndo(mockThunk)
-    );
+    const { result } = renderHook(() => useMoveRelevanceWithUndo(mockThunk));
 
     await act(async () => {
       result.current.handleMove(1, 1);
@@ -208,9 +194,7 @@ describe('useMoveRelevanceWithUndo', () => {
     const actionElement = actionFn('snackbar-1');
 
     mockEnqueueSnackbar.mockClear();
-    mockDispatch.mockImplementation(() =>
-      Promise.resolve(failureResult)
-    );
+    mockDispatch.mockImplementation(() => Promise.resolve(failureResult));
 
     await act(async () => {
       actionElement.props.onClick();

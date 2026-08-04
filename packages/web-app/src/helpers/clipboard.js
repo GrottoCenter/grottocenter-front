@@ -9,7 +9,9 @@ const copyToClipboard = async text => {
   if (navigator.clipboard?.writeText) {
     await navigator.clipboard.writeText(text);
   } else {
-    const el = Object.assign(document.createElement('textarea'), { value: text });
+    const el = Object.assign(document.createElement('textarea'), {
+      value: text
+    });
     el.style.cssText = 'position:fixed;opacity:0';
     document.body.appendChild(el);
     el.select();

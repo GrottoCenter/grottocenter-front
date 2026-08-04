@@ -30,7 +30,12 @@ import { useDebounce } from './useDebounce';
  */
 export const useEntitySearch = (
   entities,
-  { enabled = true, minChars = AUTOCOMPLETE_MIN_CHARACTERS, filter, skipQuery } = {}
+  {
+    enabled = true,
+    minChars = AUTOCOMPLETE_MIN_CHARACTERS,
+    filter,
+    skipQuery
+  } = {}
 ) => {
   const [inputValue, setInputValue] = useState('');
   const debouncedQuery = useDebounce(
@@ -52,7 +57,11 @@ export const useEntitySearch = (
   const filterKey = filter ? JSON.stringify(filter) : '';
 
   useEffect(() => {
-    if (!enabled || debouncedQuery.length < minChars || debouncedQuery === skipQuery) {
+    if (
+      !enabled ||
+      debouncedQuery.length < minChars ||
+      debouncedQuery === skipQuery
+    ) {
       requestIdRef.current += 1; // Cancel any in-flight response.
       setResults([]);
       setIsLoading(false);

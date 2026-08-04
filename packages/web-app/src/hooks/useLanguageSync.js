@@ -5,7 +5,10 @@ import { fetchAccount } from '../actions/Account/GetAccount';
 import { loadLanguages } from '../actions/Language';
 import { updateAccount } from '../actions/Account/UpdateAccount';
 import { usePermissions } from '.';
-import { languageIdToLocale, localeToLanguageId } from '../utils/languageMapping';
+import {
+  languageIdToLocale,
+  localeToLanguageId
+} from '../utils/languageMapping';
 
 const useLanguageSync = () => {
   const dispatch = useDispatch();
@@ -24,7 +27,7 @@ const useLanguageSync = () => {
       dispatch(fetchAccount());
       if (!languagesLoaded) dispatch(loadLanguages(true));
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAuth]);
 
   // account.language → UI locale (after login or after a PATCH)
@@ -36,7 +39,7 @@ const useLanguageSync = () => {
       window.localStorage.setItem('selectedLanguage', targetLocale);
       dispatch(changeLocale(targetLocale));
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [account?.language]);
 
   // UI locale → account.language (user changed the AppBar selector after mount)
@@ -53,7 +56,7 @@ const useLanguageSync = () => {
     const languageId = localeToLanguageId(locale);
     if (languageId && languageId !== account?.language)
       dispatch(updateAccount({ language: languageId }));
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [locale]);
 };
 

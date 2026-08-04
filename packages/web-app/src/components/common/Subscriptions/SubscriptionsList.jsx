@@ -38,7 +38,10 @@ const SubscriptionsList = ({
       labelId: 'Countries',
       emptyId: 'No country subscriptions',
       items: [...(countries ?? [])]
-        .map(c => ({ ...c, name: getLocalizedCountryName(c.id, locale, c.name) }))
+        .map(c => ({
+          ...c,
+          name: getLocalizedCountryName(c.id, locale, c.name)
+        }))
         .sort((a, b) => a.name.localeCompare(b.name)),
       type: 'COUNTRY'
     },

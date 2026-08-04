@@ -66,8 +66,7 @@ const EntranceDetail = ({
           alignItems: 'center',
           gap: 1,
           mt: 1
-        }}
-      >
+        }}>
         <NumberField
           name="entrance.altitude"
           control={control}

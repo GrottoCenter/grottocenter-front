@@ -29,7 +29,9 @@ export function archiveConversation(conversationId) {
         type: ARCHIVE_CONVERSATION_FAILURE,
         conversationId,
         conversation,
-        error: error.body || { message: error.message || 'Archiving conversation failed' }
+        error: error.body || {
+          message: error.message || 'Archiving conversation failed'
+        }
       });
     }
   };

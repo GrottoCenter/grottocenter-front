@@ -27,7 +27,11 @@ const CardLabel = ({ children }) => (
     <Typography
       variant="body1"
       fontWeight={600}
-      sx={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+      sx={{
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
+        whiteSpace: 'nowrap'
+      }}>
       {children}
     </Typography>
   </Box>
@@ -77,7 +81,9 @@ const BaseCard = ({ to, icon, children, itemActionButton }) => (
         {children}
       </Box>
       {itemActionButton && (
-        <Box className="remove-btn" sx={{ display: 'flex', alignItems: 'center', pr: 0.5 }}>
+        <Box
+          className="remove-btn"
+          sx={{ display: 'flex', alignItems: 'center', pr: 0.5 }}>
           {itemActionButton}
         </Box>
       )}
@@ -100,20 +106,40 @@ export const CaveCard = ({ cave, itemActionButton }) => {
       to={`/ui/caves/${cave.id}`}
       icon={<CustomIcon type="network" size={32} />}
       itemActionButton={itemActionButton}>
-      <Box sx={{ minWidth: 0, flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+      <Box
+        sx={{
+          minWidth: 0,
+          flex: 1,
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center'
+        }}>
         <Typography
           variant="body1"
           fontWeight={600}
-          sx={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', lineHeight: 1.3 }}>
+          sx={{
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+            lineHeight: 1.3
+          }}>
           {cave.name}
         </Typography>
         {(cave.depth || cave.length) && (
           <Box sx={{ display: 'flex', gap: 1, mt: 0.5 }}>
             {cave.depth && (
-              <StatBadge src={depthIcon} alt="depth" value={`${cave.depth.toLocaleString(locale)} m`} />
+              <StatBadge
+                src={depthIcon}
+                alt="depth"
+                value={`${cave.depth.toLocaleString(locale)} m`}
+              />
             )}
             {cave.length && (
-              <StatBadge src={lengthIcon} alt="length" value={`${cave.length.toLocaleString(locale)} m`} />
+              <StatBadge
+                src={lengthIcon}
+                alt="length"
+                value={`${cave.length.toLocaleString(locale)} m`}
+              />
             )}
           </Box>
         )}
@@ -178,15 +204,32 @@ export const OrganizationCard = ({ organization, itemActionButton }) => {
         to={to}
         icon={<CustomIcon type="organization" size={32} />}
         itemActionButton={itemActionButton}>
-        <Box sx={{ flex: 1, minWidth: 0, display: 'flex', alignItems: 'center', gap: 0.5, flexWrap: 'wrap' }}>
+        <Box
+          sx={{
+            flex: 1,
+            minWidth: 0,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 0.5,
+            flexWrap: 'wrap'
+          }}>
           <Typography
             variant="body1"
             fontWeight={600}
             color="text.disabled"
-            sx={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textDecoration: 'line-through' }}>
+            sx={{
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+              textDecoration: 'line-through'
+            }}>
             {organization.name}
           </Typography>
-          <Chip size="small" color="warning" label={formatMessage({ id: 'Deleted' })} />
+          <Chip
+            size="small"
+            color="warning"
+            label={formatMessage({ id: 'Deleted' })}
+          />
         </Box>
       </BaseCard>
     );

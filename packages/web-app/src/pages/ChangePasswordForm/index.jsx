@@ -176,5 +176,4 @@ ChangePasswordForm.propTypes = {
   passwordConfirmation: PropTypes.string.isRequired
 };
 
-
 export default ChangePasswordForm;

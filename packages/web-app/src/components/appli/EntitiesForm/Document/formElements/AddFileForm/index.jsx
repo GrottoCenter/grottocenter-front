@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef, useContext } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl, FormattedMessage } from 'react-intl';
 import { useDispatch, useSelector } from 'react-redux';
-import { useUserProperties } from '../../../../../../hooks';
 import { isEmpty, remove } from 'ramda';
 import {
   Autocomplete,
@@ -20,8 +19,8 @@ import {
   TextField
 } from '@mui/material';
 
+import { useUserProperties, useFileFormats } from '../../../../../../hooks';
 import ErrorsList from './ErrorsList';
-import { useFileFormats } from '../../../../../../hooks';
 import {
   IS_DELETED,
   IS_NEW,
@@ -258,7 +257,7 @@ const AddFileForm = ({
                         )
                       }}
                     />
-                    {')'}
+                    )
                   </>
                 }
               />

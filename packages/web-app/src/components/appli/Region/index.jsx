@@ -4,7 +4,6 @@ import { useIntl } from 'react-intl';
 import { Marker } from 'react-leaflet';
 import { Button, Card, CircularProgress } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import CustomIcon from '../../common/CustomIcon';
 import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
 import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
 import { Print } from '@mui/icons-material';
@@ -13,6 +12,8 @@ import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import { useReactToPrint } from 'react-to-print';
+import { isMobile } from 'react-device-detect';
+import CustomIcon from '../../common/CustomIcon';
 
 import Guidelines from '../Guidelines';
 import StatisticsDataDashboard from '../StatisticsDataDashboard';
@@ -25,7 +26,6 @@ import ScrollableContent from '../../common/Layouts/Fixed/ScrollableContent';
 import Alert from '../../common/Alert';
 import REDUCER_STATUS from '../../../reducers/ReducerStatus';
 import { CoordinatesMarker } from '../../common/Maps/common/Markers/Components';
-import { isMobile } from 'react-device-detect';
 import {
   usePermissions,
   useSubscriptions,

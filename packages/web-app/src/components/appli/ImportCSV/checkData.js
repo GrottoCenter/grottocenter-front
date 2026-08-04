@@ -52,7 +52,8 @@ const checkData = (data, selectedType, formatMessage) => {
         errorMessage: formatMessage(
           {
             id: 'csvImport.incorrectTypeColumn',
-            defaultMessage: "The 'type' column is incorrect, expecting {rowType}."
+            defaultMessage:
+              "The 'type' column is incorrect, expecting {rowType}."
           },
           { rowType }
         ),

@@ -28,9 +28,11 @@ const ObstacleCard = ({
   const { formatMessage } = useIntl();
 
   return (
-    <Card variant="outlined" sx={{
-      px: 0.5
-    }}>
+    <Card
+      variant="outlined"
+      sx={{
+        px: 0.5
+      }}>
       <Box
         sx={{
           display: 'flex',

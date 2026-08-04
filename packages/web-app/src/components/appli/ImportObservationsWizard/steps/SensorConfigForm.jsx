@@ -80,7 +80,7 @@ const SensorConfigForm = ({ deviceId }) => {
 
   const handleFieldChange = useCallback(
     field => e => {
-      const value = e.target.value;
+      const { value } = e.target;
       setForm(prev => {
         const next = { ...prev, [field]: value };
         // Preselect first compatible unit when quantity kind changes
@@ -111,10 +111,14 @@ const SensorConfigForm = ({ deviceId }) => {
 
   const validate = useCallback(() => {
     const errors = {};
-    const precLower = form.precisionLower !== '' ? Number(form.precisionLower) : null;
-    const precUpper = form.precisionUpper !== '' ? Number(form.precisionUpper) : null;
-    const detMin = form.detectionLimitMin !== '' ? Number(form.detectionLimitMin) : null;
-    const detMax = form.detectionLimitMax !== '' ? Number(form.detectionLimitMax) : null;
+    const precLower =
+      form.precisionLower !== '' ? Number(form.precisionLower) : null;
+    const precUpper =
+      form.precisionUpper !== '' ? Number(form.precisionUpper) : null;
+    const detMin =
+      form.detectionLimitMin !== '' ? Number(form.detectionLimitMin) : null;
+    const detMax =
+      form.detectionLimitMax !== '' ? Number(form.detectionLimitMax) : null;
 
     if (precLower != null && precUpper != null && precLower > precUpper) {
       errors.precisionLower = formatMessage({
@@ -157,8 +161,7 @@ const SensorConfigForm = ({ deviceId }) => {
               formula: form.selectedSubstance.formula || undefined,
               casNumber: form.selectedSubstance.casNumber || undefined,
               externalId: form.selectedSubstance.externalId || undefined,
-              externalSource:
-                form.selectedSubstance.externalSource || undefined
+              externalSource: form.selectedSubstance.externalSource || undefined
             })
           );
           idSubstance = persisted.id;
@@ -179,13 +182,9 @@ const SensorConfigForm = ({ deviceId }) => {
           form.precisionLower !== '' ? Number(form.precisionLower) : null,
         resolution: form.resolution !== '' ? Number(form.resolution) : null,
         detectionLimitMin:
-          form.detectionLimitMin !== ''
-            ? Number(form.detectionLimitMin)
-            : null,
+          form.detectionLimitMin !== '' ? Number(form.detectionLimitMin) : null,
         detectionLimitMax:
-          form.detectionLimitMax !== ''
-            ? Number(form.detectionLimitMax)
-            : null
+          form.detectionLimitMax !== '' ? Number(form.detectionLimitMax) : null
       };
 
       await dispatch(createSensorConfig(configData));
@@ -209,10 +208,22 @@ const SensorConfigForm = ({ deviceId }) => {
     } finally {
       setIsSubmitting(false);
     }
-  }, [form, substanceRequired, validate, dispatch, deviceId, formatMessage, onSuccess]);
+  }, [
+    form,
+    substanceRequired,
+    validate,
+    dispatch,
+    deviceId,
+    formatMessage,
+    onSuccess
+  ]);
 
   const endAdornment = unitSymbol
-    ? { endAdornment: <InputAdornment position="end">{unitSymbol}</InputAdornment> }
+    ? {
+        endAdornment: (
+          <InputAdornment position="end">{unitSymbol}</InputAdornment>
+        )
+      }
     : {};
 
   return (
@@ -230,7 +241,13 @@ const SensorConfigForm = ({ deviceId }) => {
           {submitError}
         </Alert>
       )}
-      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, maxWidth: 480 }}>
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 1,
+          maxWidth: 480
+        }}>
         {/* Label — optional human-readable name */}
         <TextField
           label={formatMessage({
@@ -294,9 +311,7 @@ const SensorConfigForm = ({ deviceId }) => {
         )}
 
         {/* Advanced fields */}
-        <Accordion
-          defaultExpanded={false}
-          data-testid="sensor-config-advanced">
+        <Accordion defaultExpanded={false} data-testid="sensor-config-advanced">
           <AccordionSummary expandIcon={<ExpandMoreIcon />}>
             <Typography variant="body2">
               {formatMessage({
@@ -305,8 +320,7 @@ const SensorConfigForm = ({ deviceId }) => {
             </Typography>
           </AccordionSummary>
           <AccordionDetails>
-            <Box
-              sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
               {/* Precision: lower first, side by side */}
               <Box sx={{ display: 'flex', gap: 1 }}>
                 <TextField

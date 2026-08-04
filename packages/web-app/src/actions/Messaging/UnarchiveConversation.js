@@ -29,7 +29,9 @@ export function unarchiveConversation(conversationId) {
         type: UNARCHIVE_CONVERSATION_FAILURE,
         conversationId,
         conversation,
-        error: error.body || { message: error.message || 'Unarchiving conversation failed' }
+        error: error.body || {
+          message: error.message || 'Unarchiving conversation failed'
+        }
       });
     }
   };

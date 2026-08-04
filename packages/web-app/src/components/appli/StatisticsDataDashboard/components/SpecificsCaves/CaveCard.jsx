@@ -29,13 +29,23 @@ const CaveCard = ({ idCave, nameCave, numberData, text, backgroundColor }) => {
       style={{ backgroundColor: alpha(backgroundColor, 0.75) }}
       to={`/ui/caves/${idCave}`}
       openInNewTabDesktop>
-      <Box sx={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 0.5 }}>
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'baseline',
+          justifyContent: 'space-between',
+          gap: 0.5
+        }}>
         <Typography variant="h4" fontWeight={700} noWrap>
           {numberData.toLocaleString(locale)} m
         </Typography>
       </Box>
-      <Typography variant="body2" fontWeight={600} noWrap>{nameCave}</Typography>
-      <Typography variant="caption" sx={{ opacity: 0.85 }}>{text}</Typography>
+      <Typography variant="body2" fontWeight={600} noWrap>
+        {nameCave}
+      </Typography>
+      <Typography variant="caption" sx={{ opacity: 0.85 }}>
+        {text}
+      </Typography>
     </StyledBox>
   );
 };

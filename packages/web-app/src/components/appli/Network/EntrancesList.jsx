@@ -53,8 +53,7 @@ const EntrancesList = ({
           .sort((e1, e2) => (e1.name ?? '').localeCompare(e2.name ?? ''))
           .map(entrance => {
             const isSelected = selectedEntrancesId.includes(entrance.id);
-            const isVisible =
-              selectedEntrancesId.length === 0 || isSelected;
+            const isVisible = selectedEntrancesId.length === 0 || isSelected;
             return (
               <ListItem
                 key={entrance.id}
@@ -111,7 +110,9 @@ const EntrancesList = ({
   if (inline) {
     return (
       <Box sx={{ height: '100%', overflow: 'auto' }}>
-        <Paper variant="outlined" sx={{ p: 1, borderRadius: 2, bgcolor: 'grey.50' }}>
+        <Paper
+          variant="outlined"
+          sx={{ p: 1, borderRadius: 2, bgcolor: 'grey.50' }}>
           <InfoSection
             component="h2"
             title={formatMessage({ id: 'Entrances' })}>

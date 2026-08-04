@@ -1,7 +1,6 @@
 import React, { useEffect } from 'react';
-import { Box, Grid, Skeleton, Typography } from '@mui/material';
+import { Box, Grid, Skeleton, Typography, useMediaQuery } from '@mui/material';
 import { styled, useTheme } from '@mui/material/styles';
-import { useMediaQuery } from '@mui/material';
 import { useSelector, useDispatch } from 'react-redux';
 import { useIntl } from 'react-intl';
 import CustomIcon from '../../components/common/CustomIcon';
@@ -85,7 +84,7 @@ const HeroStats = () => {
             <Grid key={key} size={{ xs: 4, md: 2 }}>
               <StatItem
                 to={href}
-                aria-label={`${stat?.number ? stat.number.toLocaleString() + ' ' : staticValue ? staticValue + ' ' : ''}${formatMessage({ id: labelId })}`}>
+                aria-label={`${stat?.number ? `${stat.number.toLocaleString()} ` : staticValue ? `${staticValue} ` : ''}${formatMessage({ id: labelId })}`}>
                 <Box
                   sx={{
                     display: 'flex',

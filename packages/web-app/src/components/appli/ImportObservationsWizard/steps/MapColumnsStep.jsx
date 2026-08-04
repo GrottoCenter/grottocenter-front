@@ -120,7 +120,12 @@ const formatTimezoneLabel = tz => {
 
 // ─── TimestampConfig ──────────────────────────────────────────────────────────
 
-const TimestampConfig = ({ mapping, columnMappings, sampleValues, onUpdate }) => {
+const TimestampConfig = ({
+  mapping,
+  columnMappings,
+  sampleValues,
+  onUpdate
+}) => {
   const { formatMessage } = useIntl();
 
   const handleTypeChange = useCallback(
@@ -172,15 +177,17 @@ const TimestampConfig = ({ mapping, columnMappings, sampleValues, onUpdate }) =>
     mapping.timestampType === 'dateOnly' ||
     mapping.timestampType === 'timeOnly';
 
-  const pillBuilderType = mapping.timestampType === 'timeOnly'
-    ? 'timeOnly'
-    : mapping.timestampType === 'dateOnly'
-      ? 'dateOnly'
-      : 'datetime';
+  const pillBuilderType =
+    mapping.timestampType === 'timeOnly'
+      ? 'timeOnly'
+      : mapping.timestampType === 'dateOnly'
+        ? 'dateOnly'
+        : 'datetime';
 
-  const currentFormat = mapping.timestampType === 'timeOnly'
-    ? mapping.timeFormat || ''
-    : mapping.dateFormat || '';
+  const currentFormat =
+    mapping.timestampType === 'timeOnly'
+      ? mapping.timeFormat || ''
+      : mapping.dateFormat || '';
 
   return (
     <Box
@@ -328,7 +335,10 @@ MeasurementConfig.propTypes = {
   mapping: PropTypes.shape({
     columnIndex: PropTypes.number.isRequired,
     role: PropTypes.string.isRequired,
-    sensorConfigurationId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    sensorConfigurationId: PropTypes.oneOfType([
+      PropTypes.string,
+      PropTypes.number
+    ]),
     mediumId: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
   }).isRequired,
   sensorConfigs: PropTypes.arrayOf(
@@ -459,7 +469,13 @@ const ColumnRoleTable = ({
                     </Tooltip>
                   </TableCell>
                   <TableCell>
-                    <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 0.5, flexWrap: 'wrap' }}>
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'flex-start',
+                        gap: 0.5,
+                        flexWrap: 'wrap'
+                      }}>
                       <FormControl size="small" sx={{ minWidth: 140 }}>
                         <Select
                           value={mapping.role || ''}
@@ -508,9 +524,10 @@ const ColumnRoleTable = ({
                         <TimestampConfig
                           mapping={mapping}
                           columnMappings={columnMappings}
-                          sampleValues={
-                            (sampleValues[colIndex] || []).slice(0, 10)
-                          }
+                          sampleValues={(sampleValues[colIndex] || []).slice(
+                            0,
+                            10
+                          )}
                           onUpdate={onUpdateMapping}
                         />
                       )}
@@ -591,16 +608,12 @@ const MapColumnsStep = () => {
 
   const rawRows = useSelector(state => state.importWizard.rawRows);
   const headerRow = useSelector(state => state.importWizard.headerRow);
-  const skipFirstRows = useSelector(
-    state => state.importWizard.skipFirstRows
-  );
+  const skipFirstRows = useSelector(state => state.importWizard.skipFirstRows);
   const skipLastRows = useSelector(state => state.importWizard.skipLastRows);
   const columnMappings = useSelector(
     state => state.importWizard.columnMappings
   );
-  const sensorConfigs = useSelector(
-    state => state.importWizard.sensorConfigs
-  );
+  const sensorConfigs = useSelector(state => state.importWizard.sensorConfigs);
 
   // Compute data rows (excluding header, skipped first rows, and skipped last rows)
   const dataRows = useMemo(() => {
@@ -687,54 +700,42 @@ const MapColumnsStep = () => {
   }, [columnHeaders, columnMappings, dispatch]);
 
   // Auto-select next logical timestamp type for new timestamp columns
-  const getAutoTimestampType = useCallback(
-    currentMappings => {
-      const existingTypes = currentMappings
-        .filter(
-          m => m.role === 'timestamp' && m.timestampType
-        )
-        .map(m => m.timestampType);
+  const getAutoTimestampType = useCallback(currentMappings => {
+    const existingTypes = currentMappings
+      .filter(m => m.role === 'timestamp' && m.timestampType)
+      .map(m => m.timestampType);
 
-      if (existingTypes.length === 0) return null;
+    if (existingTypes.length === 0) return null;
 
-      // Find the last assigned type in sequence and pick the next one
-      const lastType = existingTypes[existingTypes.length - 1];
-      const lastIdx = TIMESTAMP_TYPE_SEQUENCE.indexOf(lastType);
+    // Find the last assigned type in sequence and pick the next one
+    const lastType = existingTypes[existingTypes.length - 1];
+    const lastIdx = TIMESTAMP_TYPE_SEQUENCE.indexOf(lastType);
 
-      if (lastType === 'elapsed_seconds') {
+    if (lastType === 'elapsed_seconds') {
+      return 'elapsed_seconds';
+    }
+
+    if (lastIdx >= 0 && lastIdx < TIMESTAMP_TYPE_SEQUENCE.length - 1) {
+      const nextType = TIMESTAMP_TYPE_SEQUENCE[lastIdx + 1];
+      // Skip types already used (except elapsed_seconds)
+      if (nextType !== 'elapsed_seconds' && existingTypes.includes(nextType)) {
+        // Find next available
+        for (let i = lastIdx + 2; i < TIMESTAMP_TYPE_SEQUENCE.length; i += 1) {
+          const candidate = TIMESTAMP_TYPE_SEQUENCE[i];
+          if (
+            candidate === 'elapsed_seconds' ||
+            !existingTypes.includes(candidate)
+          ) {
+            return candidate;
+          }
+        }
         return 'elapsed_seconds';
       }
+      return nextType;
+    }
 
-      if (lastIdx >= 0 && lastIdx < TIMESTAMP_TYPE_SEQUENCE.length - 1) {
-        const nextType = TIMESTAMP_TYPE_SEQUENCE[lastIdx + 1];
-        // Skip types already used (except elapsed_seconds)
-        if (
-          nextType !== 'elapsed_seconds' &&
-          existingTypes.includes(nextType)
-        ) {
-          // Find next available
-          for (
-            let i = lastIdx + 2;
-            i < TIMESTAMP_TYPE_SEQUENCE.length;
-            i += 1
-          ) {
-            const candidate = TIMESTAMP_TYPE_SEQUENCE[i];
-            if (
-              candidate === 'elapsed_seconds' ||
-              !existingTypes.includes(candidate)
-            ) {
-              return candidate;
-            }
-          }
-          return 'elapsed_seconds';
-        }
-        return nextType;
-      }
-
-      return 'elapsed_seconds';
-    },
-    []
-  );
+    return 'elapsed_seconds';
+  }, []);
 
   const handleUpdateMapping = useCallback(
     updatedMapping => {

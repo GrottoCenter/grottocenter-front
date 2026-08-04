@@ -32,8 +32,7 @@ const EntranceEdit = () => {
   return (
     <Layout
       title={
-        entrance?.name ||
-        formatMessage({ id: 'Loading the entrance data...' })
+        entrance?.name || formatMessage({ id: 'Loading the entrance data...' })
       }
       content={
         error ? (

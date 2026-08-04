@@ -24,16 +24,19 @@ const timestampTypeArb = fc.constantFrom('datetime', 'dateOnly', 'timeOnly');
  */
 const tokenSubsequenceArb = timestampType => {
   const tokens = TOKENS_BY_TYPE[timestampType];
-  return fc.shuffledSubarray(tokens, { minLength: 0, maxLength: tokens.length });
+  return fc.shuffledSubarray(tokens, {
+    minLength: 0,
+    maxLength: tokens.length
+  });
 };
 
 /**
  * Generates a random array of separator selections (with repetition allowed).
  */
-const separatorSelectionArb = fc.array(
-  fc.constantFrom(...SEPARATORS),
-  { minLength: 0, maxLength: 10 }
-);
+const separatorSelectionArb = fc.array(fc.constantFrom(...SEPARATORS), {
+  minLength: 0,
+  maxLength: 10
+});
 
 /**
  * Generates a random interleaving of tokens and separators as pill objects.
@@ -52,9 +55,7 @@ const pillSequenceArb = timestampType =>
         maxLength: allPills.length
       });
     })
-    .map(pills =>
-      pills.map((p, i) => ({ id: `pill-${i + 1}`, ...p }))
-    );
+    .map(pills => pills.map((p, i) => ({ id: `pill-${i + 1}`, ...p })));
 
 /**
  * Generates a format string built from valid tokens and separators for a type.
@@ -78,7 +79,10 @@ describe('timestampFormatUtils - Property-Based Tests', () => {
         fc.property(timestampTypeArb, fc.gen(), (timestampType, gen) => {
           const tokens = getTokensForType(timestampType);
           // Generate a random sequence of selections
-          const selectionCount = gen(fc.integer, { min: 0, max: tokens.length + 5 });
+          const selectionCount = gen(fc.integer, {
+            min: 0,
+            max: tokens.length + 5
+          });
           const pills = [];
           const usedTokens = new Set();
 
@@ -125,77 +129,79 @@ describe('timestampFormatUtils - Property-Based Tests', () => {
   describe('Property 2: Token availability invariant', () => {
     it('available tokens equals full set minus used tokens, and all separators are always present', () => {
       fc.assert(
-        fc.property(
-          timestampTypeArb,
-          fc.gen(),
-          (timestampType, gen) => {
-            const fullTokens = getTokensForType(timestampType);
-            const pills = [];
+        fc.property(timestampTypeArb, fc.gen(), (timestampType, gen) => {
+          const fullTokens = getTokensForType(timestampType);
+          const pills = [];
 
-            // Perform a sequence of add/remove operations
-            const opCount = gen(fc.integer, { min: 1, max: 15 });
-            for (let i = 0; i < opCount; i += 1) {
-              const shouldRemove = pills.length > 0 && gen(fc.boolean);
-              if (shouldRemove) {
-                // Remove a random pill
-                const removeIdx = gen(fc.integer, { min: 0, max: pills.length - 1 });
-                pills.splice(removeIdx, 1);
-              } else {
-                // Add from available options
-                const available = getAvailableOptions(pills, timestampType);
-                if (available.length > 0) {
-                  const idx = gen(fc.integer, { min: 0, max: available.length - 1 });
-                  const selected = available[idx];
-                  pills.push({
-                    id: `pill-${Date.now()}-${i}`,
-                    value: selected.value,
-                    type: selected.type
-                  });
-                }
+          // Perform a sequence of add/remove operations
+          const opCount = gen(fc.integer, { min: 1, max: 15 });
+          for (let i = 0; i < opCount; i += 1) {
+            const shouldRemove = pills.length > 0 && gen(fc.boolean);
+            if (shouldRemove) {
+              // Remove a random pill
+              const removeIdx = gen(fc.integer, {
+                min: 0,
+                max: pills.length - 1
+              });
+              pills.splice(removeIdx, 1);
+            } else {
+              // Add from available options
+              const available = getAvailableOptions(pills, timestampType);
+              if (available.length > 0) {
+                const idx = gen(fc.integer, {
+                  min: 0,
+                  max: available.length - 1
+                });
+                const selected = available[idx];
+                pills.push({
+                  id: `pill-${Date.now()}-${i}`,
+                  value: selected.value,
+                  type: selected.type
+                });
               }
             }
-
-            // Verify invariant at current state
-            const available = getAvailableOptions(pills, timestampType);
-            const availableTokenValues = available
-              .filter(o => o.type === 'token')
-              .map(o => o.value);
-            const availableSepValues = available
-              .filter(o => o.type === 'separator')
-              .map(o => o.value);
-
-            const usedTokens = new Set(
-              pills.filter(p => p.type === 'token').map(p => p.value)
-            );
-
-            // Compute excluded tokens: used + their exclusive counterparts
-            const exclusivePairs = [
-              ['YYYY', 'YY'],
-              ['MM', 'M'],
-              ['DD', 'D'],
-              ['HH', 'H'],
-              ['HH', 'hh'],
-              ['HH', 'h'],
-              ['H', 'hh'],
-              ['H', 'h'],
-              ['hh', 'h'],
-              ['mm', 'm'],
-              ['ss', 's']
-            ];
-            const excludedTokens = new Set(usedTokens);
-            for (const [a, b] of exclusivePairs) {
-              if (usedTokens.has(a)) excludedTokens.add(b);
-              if (usedTokens.has(b)) excludedTokens.add(a);
-            }
-
-            const expectedTokens = fullTokens.filter(t => !excludedTokens.has(t));
-
-            // Token availability = full set minus used
-            expect(availableTokenValues.sort()).toEqual(expectedTokens.sort());
-            // All separators always present
-            expect(availableSepValues.sort()).toEqual([...SEPARATORS].sort());
           }
-        ),
+
+          // Verify invariant at current state
+          const available = getAvailableOptions(pills, timestampType);
+          const availableTokenValues = available
+            .filter(o => o.type === 'token')
+            .map(o => o.value);
+          const availableSepValues = available
+            .filter(o => o.type === 'separator')
+            .map(o => o.value);
+
+          const usedTokens = new Set(
+            pills.filter(p => p.type === 'token').map(p => p.value)
+          );
+
+          // Compute excluded tokens: used + their exclusive counterparts
+          const exclusivePairs = [
+            ['YYYY', 'YY'],
+            ['MM', 'M'],
+            ['DD', 'D'],
+            ['HH', 'H'],
+            ['HH', 'hh'],
+            ['HH', 'h'],
+            ['H', 'hh'],
+            ['H', 'h'],
+            ['hh', 'h'],
+            ['mm', 'm'],
+            ['ss', 's']
+          ];
+          const excludedTokens = new Set(usedTokens);
+          for (const [a, b] of exclusivePairs) {
+            if (usedTokens.has(a)) excludedTokens.add(b);
+            if (usedTokens.has(b)) excludedTokens.add(a);
+          }
+
+          const expectedTokens = fullTokens.filter(t => !excludedTokens.has(t));
+
+          // Token availability = full set minus used
+          expect(availableTokenValues.sort()).toEqual(expectedTokens.sort());
+          // All separators always present
+          expect(availableSepValues.sort()).toEqual([...SEPARATORS].sort());
+        }),
         { numRuns: 100 }
       );
     });
@@ -210,17 +216,17 @@ describe('timestampFormatUtils - Property-Based Tests', () => {
   describe('Property 3: Format string is concatenation of pill values', () => {
     it('format string equals concatenation of all pill values in display order', () => {
       fc.assert(
-        fc.property(timestampTypeArb, (timestampType) => {
+        fc.property(timestampTypeArb, timestampType =>
           // Test with generated pill sequence
-          return fc.assert(
-            fc.property(pillSequenceArb(timestampType), (pills) => {
+          fc.assert(
+            fc.property(pillSequenceArb(timestampType), pills => {
               const formatString = buildFormatString(pills);
               const expected = pills.map(p => p.value).join('');
               expect(formatString).toBe(expected);
             }),
             { numRuns: 50 }
-          );
-        }),
+          )
+        ),
         { numRuns: 3 }
       );
     });
@@ -252,18 +258,18 @@ describe('timestampFormatUtils - Property-Based Tests', () => {
       const formatArb = fc.constantFrom(...knownFormats);
 
       // Generate sample values: mix of valid dates and random strings
-      const validDateArb = fc.tuple(
-        fc.integer({ min: 2000, max: 2030 }),
-        fc.integer({ min: 1, max: 12 }),
-        fc.integer({ min: 1, max: 28 }),
-        fc.integer({ min: 0, max: 23 }),
-        fc.integer({ min: 0, max: 59 }),
-        fc.integer({ min: 0, max: 59 })
-      ).map(([y, m, d, h, min, s]) =>
-        new Date(y, m - 1, d, h, min, s)
-      );
+      const validDateArb = fc
+        .tuple(
+          fc.integer({ min: 2000, max: 2030 }),
+          fc.integer({ min: 1, max: 12 }),
+          fc.integer({ min: 1, max: 28 }),
+          fc.integer({ min: 0, max: 23 }),
+          fc.integer({ min: 0, max: 59 }),
+          fc.integer({ min: 0, max: 59 })
+        )
+        .map(([y, m, d, h, min, s]) => new Date(y, m - 1, d, h, min, s));
 
-      const sampleValuesArb = (format) => {
+      const sampleValuesArb = format => {
         const dfFmt = toDateFnsFormat(format);
         return fc.array(
           fc.oneof(
@@ -277,10 +283,10 @@ describe('timestampFormatUtils - Property-Based Tests', () => {
       };
 
       fc.assert(
-        fc.property(formatArb, (format) => {
+        fc.property(formatArb, format => {
           const dfFmt = toDateFnsFormat(format);
           fc.assert(
-            fc.property(sampleValuesArb(format), (samples) => {
+            fc.property(sampleValuesArb(format), samples => {
               const result = validateFormat(format, samples);
 
               // Independently verify: parse + strict round-trip
@@ -312,7 +318,7 @@ describe('timestampFormatUtils - Property-Based Tests', () => {
   describe('Property 5: Token filtering by timestampType', () => {
     it('initial available options match expected sets for each timestampType', () => {
       fc.assert(
-        fc.property(timestampTypeArb, (timestampType) => {
+        fc.property(timestampTypeArb, timestampType => {
           const emptyPills = [];
           const available = getAvailableOptions(emptyPills, timestampType);
           const tokenValues = available
@@ -361,9 +367,9 @@ describe('timestampFormatUtils - Property-Based Tests', () => {
   describe('Property 6: Format string round-trip (parse ↔ build)', () => {
     it('parsing a format string into pills and rebuilding produces the original format string', () => {
       fc.assert(
-        fc.property(timestampTypeArb, (timestampType) => {
+        fc.property(timestampTypeArb, timestampType => {
           fc.assert(
-            fc.property(validFormatStringArb(timestampType), (formatString) => {
+            fc.property(validFormatStringArb(timestampType), formatString => {
               const pills = parseFormatToPills(formatString, timestampType);
               const rebuilt = buildFormatString(pills);
               expect(rebuilt).toBe(formatString);

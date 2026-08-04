@@ -80,9 +80,11 @@ describe('Import Observations Wizard', () => {
 
       // Select a quantity kind (Temperature)
       cy.get('[data-testid="sensor-config-quantity-kind"]').click();
-      cy.get('.MuiMenu-paper').last().within(() => {
-        cy.get('[role="option"]').first().click();
-      });
+      cy.get('.MuiMenu-paper')
+        .last()
+        .within(() => {
+          cy.get('[role="option"]').first().click();
+        });
 
       // Unit is auto-selected; submit the sensor config
       cy.get('[data-testid="sensor-config-submit"]').click();
@@ -96,16 +98,15 @@ describe('Import Observations Wizard', () => {
 
       // Assign first column as timestamp
       cy.get('[data-testid="role-select-0"]').click();
-      cy.get('.MuiMenu-paper').last()
-        .find('[data-value="timestamp"]').click();
+      cy.get('.MuiMenu-paper').last().find('[data-value="timestamp"]').click();
 
       // Configure timestamp type
       cy.get('[data-testid="timestamp-type-select-0"]').click();
-      cy.get('.MuiMenu-paper').last()
-        .find('[data-value="datetime"]').click();
+      cy.get('.MuiMenu-paper').last().find('[data-value="datetime"]').click();
 
       // Type the format string directly
-      cy.get('[data-testid="format-input"]').find('input')
+      cy.get('[data-testid="format-input"]')
+        .find('input')
         .type('YYYY-MM-DD HH:mm:ss');
 
       // Wait for validation to pass
@@ -113,14 +114,18 @@ describe('Import Observations Wizard', () => {
 
       // Assign second column as measurement
       cy.get('[data-testid="role-select-1"]').click();
-      cy.get('.MuiMenu-paper').last()
-        .find('[data-value="measurement"]').click();
+      cy.get('.MuiMenu-paper')
+        .last()
+        .find('[data-value="measurement"]')
+        .click();
 
       // Link measurement column to sensor config
       cy.get('[data-testid="sensor-config-select-1"]').click();
-      cy.get('.MuiMenu-paper').last().within(() => {
-        cy.get('[role="option"]').last().click();
-      });
+      cy.get('.MuiMenu-paper')
+        .last()
+        .within(() => {
+          cy.get('[role="option"]').last().click();
+        });
 
       // Click Next to go to Validate step
       cy.get('[data-testid="next-button"]').click();
@@ -139,24 +144,35 @@ describe('Import Observations Wizard', () => {
 
       // Select "Point only" mode
       cy.get('[data-testid="location-mode-radio"]')
-        .find('input[value="pointOnly"]').click({ force: true });
+        .find('input[value="pointOnly"]')
+        .click({ force: true });
 
       // Requirement 13.6: Fill context fields
-      cy.get('[data-testid="point-label-field"]').find('input').type(
-        'Salle du Chaos - T1'
-      );
+      cy.get('[data-testid="point-label-field"]')
+        .find('input')
+        .type('Salle du Chaos - T1');
 
       // Fill coordinates (required in pointOnly mode)
       cy.get('[data-testid="context-step"]').within(() => {
-        cy.get('label').contains('Latitude').parent().find('input').type('43.123');
-        cy.get('label').contains('Longitude').parent().find('input').type('2.987');
+        cy.get('label')
+          .contains('Latitude')
+          .parent()
+          .find('input')
+          .type('43.123');
+        cy.get('label')
+          .contains('Longitude')
+          .parent()
+          .find('input')
+          .type('2.987');
       });
 
       // Select license
       cy.get('[data-testid="license-select"]').click();
-      cy.get('.MuiMenu-paper').last().within(() => {
-        cy.get('[role="option"]').first().click();
-      });
+      cy.get('.MuiMenu-paper')
+        .last()
+        .within(() => {
+          cy.get('[role="option"]').first().click();
+        });
 
       // Click Next to go to Submit step
       cy.get('[data-testid="next-button"]').click();
@@ -179,9 +195,11 @@ describe('Import Observations Wizard', () => {
 
       // Verify the profile file was downloaded
       const downloadsFolder = Cypress.config('downloadsFolder');
-      cy.readFile(
-        `${downloadsFolder}/SalleduChaos-T1_profile.json`
-      ).should('have.property', 'pointLabel', 'Salle du Chaos - T1');
+      cy.readFile(`${downloadsFolder}/SalleduChaos-T1_profile.json`).should(
+        'have.property',
+        'pointLabel',
+        'Salle du Chaos - T1'
+      );
 
       // Requirement 12.2: Submit the import
       cy.get('[data-testid="submit-button"]').click();
@@ -253,10 +271,7 @@ describe('Import Observations Wizard', () => {
       );
 
       // Verify wizard state is restored from profile
-      cy.get('[data-testid="encoding-select"]').should(
-        'contain.text',
-        'UTF-8'
-      );
+      cy.get('[data-testid="encoding-select"]').should('contain.text', 'UTF-8');
       cy.get('[data-testid="number-locale-select"]')
         .find('[role="combobox"]')
         .should('not.have.text', '');
@@ -305,7 +320,8 @@ describe('Import Observations Wizard', () => {
       cy.wait('@getCaver');
 
       // Point label should be restored
-      cy.get('[data-testid="point-label-field"]').find('input')
+      cy.get('[data-testid="point-label-field"]')
+        .find('input')
         .should('have.value', 'Salle du Chaos - T1');
 
       // Click Next to go to Submit step

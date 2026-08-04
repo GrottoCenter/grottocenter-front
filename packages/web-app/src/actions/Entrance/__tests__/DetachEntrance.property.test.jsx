@@ -36,7 +36,11 @@ const entranceNameArb = fc.oneof(
   },
   {
     weight: 1,
-    arbitrary: fc.string({ minLength: 1, maxLength: 20, unit: 'grapheme-ascii' })
+    arbitrary: fc.string({
+      minLength: 1,
+      maxLength: 20,
+      unit: 'grapheme-ascii'
+    })
   }
 );
 
@@ -272,8 +276,7 @@ describe('Feature: detach-entrance-from-cave, Property 4: Error propagation from
           mockFetch.mockImplementation(() =>
             Promise.resolve({
               status: errorStatus,
-              json: () =>
-                Promise.resolve({ message: `Error ${errorStatus}` })
+              json: () => Promise.resolve({ message: `Error ${errorStatus}` })
             })
           );
 
@@ -317,8 +320,7 @@ describe('Feature: detach-entrance-from-cave, Property 4: Error propagation from
             if (callCount === 2) {
               return Promise.resolve({
                 status: errorStatus,
-                json: () =>
-                  Promise.resolve({ message: `Error ${errorStatus}` })
+                json: () => Promise.resolve({ message: `Error ${errorStatus}` })
               });
             }
             return Promise.resolve({ status: 200 });

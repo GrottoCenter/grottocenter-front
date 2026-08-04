@@ -27,7 +27,10 @@ export const linkCave = (caveId, organizationId) => (dispatch, getState) => {
     headers: getState().login.authorizationHeader
   };
 
-  return fetch(linkCaveToOrganizationUrl(caveId, organizationId), requestOptions)
+  return fetch(
+    linkCaveToOrganizationUrl(caveId, organizationId),
+    requestOptions
+  )
     .then(checkAuthStatus(dispatch))
     .then(() => dispatch(linkCaveSuccess()))
     .catch(error => {
@@ -36,5 +39,3 @@ export const linkCave = (caveId, organizationId) => (dispatch, getState) => {
       throw error;
     });
 };
-
-

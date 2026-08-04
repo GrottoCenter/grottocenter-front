@@ -16,10 +16,12 @@ export const detectEncoding = bytes => {
   }
 
   // Check for UTF-8 BOM
-  if (bytes.length >= 3 &&
+  if (
+    bytes.length >= 3 &&
     bytes[0] === 0xef &&
     bytes[1] === 0xbb &&
-    bytes[2] === 0xbf) {
+    bytes[2] === 0xbf
+  ) {
     return 'UTF-8';
   }
 

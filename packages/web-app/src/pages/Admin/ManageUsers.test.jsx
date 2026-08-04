@@ -11,8 +11,7 @@ let mockStoreState = {};
 vi.mock('react-redux', async () => ({
   ...(await vi.importActual('react-redux')),
   useDispatch: () => mockDispatch,
-  useSelector: selector =>
-    selector(mockStoreState)
+  useSelector: selector => selector(mockStoreState)
 }));
 
 // ---- Action mocks ----

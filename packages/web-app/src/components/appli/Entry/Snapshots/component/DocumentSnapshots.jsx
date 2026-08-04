@@ -32,18 +32,16 @@ const DocumentSnapshots = ({ document, previous }) => {
     (validator?.name ? `${validator.name} ${validator.surname}` : null);
 
   const desc = description ?? intactDescriptions?.[0] ?? {};
-  const prevDesc =
-    previous?.descriptions?.[0] ?? previous?.description ?? {};
+  const prevDesc = previous?.descriptions?.[0] ?? previous?.description ?? {};
 
   const editorLabel = editor?.name
     ? `${editor.name} ${editor.surname}`
-    : editor?.nickname ?? null;
+    : (editor?.nickname ?? null);
   const prevEditorLabel = previous?.editor?.name
     ? `${previous.editor.name} ${previous.editor.surname}`
-    : previous?.editor?.nickname ?? null;
+    : (previous?.editor?.nickname ?? null);
 
-  const parentId =
-    parent?.id ?? (typeof parent === 'number' ? parent : null);
+  const parentId = parent?.id ?? (typeof parent === 'number' ? parent : null);
   const prevParentId =
     previous?.parent?.id ??
     (typeof previous?.parent === 'number' ? previous.parent : null);
@@ -88,7 +86,9 @@ const DocumentSnapshots = ({ document, previous }) => {
             <HighLightsLine
               newText={type ? formatMessage({ id: type }) : undefined}
               oldText={
-                previous?.type ? formatMessage({ id: previous.type }) : undefined
+                previous?.type
+                  ? formatMessage({ id: previous.type })
+                  : undefined
               }
             />
           }

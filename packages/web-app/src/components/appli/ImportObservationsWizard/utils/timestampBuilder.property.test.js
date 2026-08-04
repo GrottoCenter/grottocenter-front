@@ -64,9 +64,7 @@ describe('Property 1: timestamp round-trip — Validates: Requirements 14.1, 8.1
           .filter(d => !isNaN(d.getTime())),
         (fmt, date) => {
           // Truncate date to whole seconds (format has no sub-second precision)
-          const truncated = new Date(
-            Math.floor(date.getTime() / 1000) * 1000
-          );
+          const truncated = new Date(Math.floor(date.getTime() / 1000) * 1000);
 
           // Format the date as a string using date-fns (UTC to avoid TZ shift)
           const dateStr = formatUtc(truncated, fmt);

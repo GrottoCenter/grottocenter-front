@@ -1,7 +1,13 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 import { isMobile } from 'react-device-detect';
-import { Box, Divider, IconButton, LinearProgress, Tooltip } from '@mui/material';
+import {
+  Box,
+  Divider,
+  IconButton,
+  LinearProgress,
+  Tooltip
+} from '@mui/material';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import { useIntl } from 'react-intl';
 

@@ -1,5 +1,9 @@
 import { isMobileOnly } from 'react-device-detect';
-import { TOGGLE_SIDEMENU, OPEN_SIDEMENU, CLOSE_SIDEMENU } from '../actions/SideMenu';
+import {
+  TOGGLE_SIDEMENU,
+  OPEN_SIDEMENU,
+  CLOSE_SIDEMENU
+} from '../actions/SideMenu';
 
 const initialState = {
   open: !isMobileOnly

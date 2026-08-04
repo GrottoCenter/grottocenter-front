@@ -11,7 +11,8 @@ const EntranceCaveSnapshots = ({ entrance, previous }) => {
   const { cave } = entrance;
 
   const { formatMessage } = useIntl();
-  const hasCoordinates = entrance.latitude != null && entrance.longitude != null;
+  const hasCoordinates =
+    entrance.latitude != null && entrance.longitude != null;
   const hasPreviousCoordinates =
     previous?.latitude != null && previous?.longitude != null;
   const lat = Number(entrance.latitude);
@@ -107,7 +108,10 @@ const EntranceCaveSnapshots = ({ entrance, previous }) => {
           secondary
         />
       )}
-      <EntranceCharacteristicsSnapshot entrance={entrance} previous={previous} />
+      <EntranceCharacteristicsSnapshot
+        entrance={entrance}
+        previous={previous}
+      />
     </Box>
   );
 };

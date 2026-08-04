@@ -9,30 +9,35 @@ export const FETCH_COUNTRY_ENTRANCES_DATA_QUALITY_LOADING =
 export const FETCH_COUNTRY_ENTRANCES_DATA_QUALITY_ERROR =
   'FETCH_COUNTRY_ENTRANCES_DATA_QUALITY_ERROR';
 
-export const fetchCountryEntrances = (countryId, { limit, offset } = {}) => (dispatch, getState) => {
-  dispatch({ type: FETCH_COUNTRY_ENTRANCES_DATA_QUALITY_LOADING });
-  const requestOptions = {
-    headers: {
-      ...getState().login.authorizationHeader
-    }
-  };
-  return fetch(getCountryEntrancesUrl(countryId, { limit, offset }), requestOptions)
-    .then(response => {
-      if (response.status >= 400) {
-        throw new Error(response.status);
+export const fetchCountryEntrances =
+  (countryId, { limit, offset } = {}) =>
+  (dispatch, getState) => {
+    dispatch({ type: FETCH_COUNTRY_ENTRANCES_DATA_QUALITY_LOADING });
+    const requestOptions = {
+      headers: {
+        ...getState().login.authorizationHeader
       }
-      return response.json();
-    })
-    .then(data => {
-      dispatch({ type: FETCH_COUNTRY_ENTRANCES_DATA_QUALITY_SUCCESS, data });
-    })
-    .catch(error =>
-      dispatch({
-        type: FETCH_COUNTRY_ENTRANCES_DATA_QUALITY_ERROR,
-        error: makeErrorMessage(
-          error.message,
-          `Fetching entrances of country id ${countryId}`
-        )
+    };
+    return fetch(
+      getCountryEntrancesUrl(countryId, { limit, offset }),
+      requestOptions
+    )
+      .then(response => {
+        if (response.status >= 400) {
+          throw new Error(response.status);
+        }
+        return response.json();
       })
-    );
-};
+      .then(data => {
+        dispatch({ type: FETCH_COUNTRY_ENTRANCES_DATA_QUALITY_SUCCESS, data });
+      })
+      .catch(error =>
+        dispatch({
+          type: FETCH_COUNTRY_ENTRANCES_DATA_QUALITY_ERROR,
+          error: makeErrorMessage(
+            error.message,
+            `Fetching entrances of country id ${countryId}`
+          )
+        })
+      );
+  };

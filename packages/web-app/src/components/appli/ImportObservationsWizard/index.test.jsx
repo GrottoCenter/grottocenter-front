@@ -141,7 +141,9 @@ describe('ImportObservationsWizard — Step 1 Next button gate', () => {
       currentStep: 1,
       rawRows: [['a'], ['1']],
       confirmedDevice: null,
-      sensorConfigs: [{ id: 1, quantityKindCode: 'Temperature', unitSymbol: '°C' }],
+      sensorConfigs: [
+        { id: 1, quantityKindCode: 'Temperature', unitSymbol: '°C' }
+      ],
       sensorConfigsLoading: false
     });
 

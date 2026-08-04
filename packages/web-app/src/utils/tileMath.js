@@ -59,4 +59,5 @@ export const tilesForBounds = (bounds, z) => {
   return tiles;
 };
 
-export const tileKey = (entity, tile) => `${entity}:${tile.z}:${tile.x}:${tile.y}`;
+export const tileKey = (entity, tile) =>
+  `${entity}:${tile.z}:${tile.x}:${tile.y}`;

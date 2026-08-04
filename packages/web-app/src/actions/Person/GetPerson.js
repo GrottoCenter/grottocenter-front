@@ -64,9 +64,7 @@ export function fetchPerson(personId) {
     const { authorizationHeader } = loginState;
     const isAdmin = hasRole(loginState, 'Administrator');
     const requestOptions =
-      isAdmin && authorizationHeader
-        ? { headers: authorizationHeader }
-        : {};
+      isAdmin && authorizationHeader ? { headers: authorizationHeader } : {};
 
     return fetch(getCaverUrl + personId, requestOptions)
       .then(checkAndGetStatus)

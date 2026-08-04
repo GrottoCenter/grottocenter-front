@@ -221,12 +221,16 @@ const SubmitStep = () => {
                   <Typography
                     variant="body2"
                     fontWeight="bold"
-                    sx={{ mb: showRaw || errorDetails.length > 0 ? 0.5 : 0.25 }}>
+                    sx={{
+                      mb: showRaw || errorDetails.length > 0 ? 0.5 : 0.25
+                    }}>
                     {translatedMessage}
                   </Typography>
                 )}
                 {showRaw && (
-                  <Typography variant="body2" sx={{ mb: errorDetails.length > 0 ? 0.5 : 0.25 }}>
+                  <Typography
+                    variant="body2"
+                    sx={{ mb: errorDetails.length > 0 ? 0.5 : 0.25 }}>
                     {rawMessage}
                   </Typography>
                 )}
@@ -238,7 +242,10 @@ const SubmitStep = () => {
               {/* Error details have no stable unique ID — field may repeat */}
               {/* eslint-disable-next-line react/no-array-index-key */}
               {errorDetails.map((detail, index) => (
-                <ListItem key={detail.field ? `${detail.field}-${index}` : index} disableGutters sx={{ py: 0.25 }}>
+                <ListItem
+                  key={detail.field ? `${detail.field}-${index}` : index}
+                  disableGutters
+                  sx={{ py: 0.25 }}>
                   <ListItemText
                     primary={
                       detail.field
@@ -251,13 +258,15 @@ const SubmitStep = () => {
               ))}
             </List>
           )}
-          {!submission.error.message && !submission.error.code && errorDetails.length === 0 && (
-            <Typography variant="body2">
-              {formatMessage({
-                id: 'ImportObservationsWizard.SubmitStep.unknownError'
-              })}
-            </Typography>
-          )}
+          {!submission.error.message &&
+            !submission.error.code &&
+            errorDetails.length === 0 && (
+              <Typography variant="body2">
+                {formatMessage({
+                  id: 'ImportObservationsWizard.SubmitStep.unknownError'
+                })}
+              </Typography>
+            )}
           {submission.error.referenceId && (
             <Typography
               variant="caption"

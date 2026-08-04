@@ -307,7 +307,9 @@ const GeocodingControl = ({ onLocationSelect }) => {
               Promise.all(
                 massifs.map(massif =>
                   Promise.all([
-                    fetch(`${getMassifUrl}${massif.id}`, { signal }).then(res => res.json()),
+                    fetch(`${getMassifUrl}${massif.id}`, { signal }).then(res =>
+                      res.json()
+                    ),
                     fetch(getStatisticsMassifUrl(massif.id), { signal })
                       .then(res => res.json())
                       .catch(() => null)

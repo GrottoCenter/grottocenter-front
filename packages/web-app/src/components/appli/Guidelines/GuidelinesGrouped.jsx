@@ -22,8 +22,7 @@ const GuidelinesGrouped = ({ guidelines }) => {
   return (
     <ScrollableContent
       title={<FormattedMessage id="Guidelines" />}
-      anchorId="guidelines"
-    >
+      anchorId="guidelines">
       <Box p={1}>
         {groups.map((group, index) => (
           <Box key={group.key} mt={index > 0 ? 2 : 0.25}>

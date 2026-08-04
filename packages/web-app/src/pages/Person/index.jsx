@@ -14,7 +14,12 @@ const PersonPage = () => {
   }, [personId, dispatch]);
 
   return (
-    <Person key={personId} isLoading={isFetching} person={person} error={error} />
+    <Person
+      key={personId}
+      isLoading={isFetching}
+      person={person}
+      error={error}
+    />
   );
 };
 export default PersonPage;

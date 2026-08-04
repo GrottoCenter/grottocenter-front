@@ -41,8 +41,12 @@ const MultipleSubjectsSelect = ({
     const code = getSubjectCode(option);
     const depth = code.split('.').length - 1;
     return (
-      <Box component="li" {...props} sx={SUBJECT_DEPTH_STYLES[Math.min(depth, 3)]}>
-        {code}&nbsp;&nbsp;{formatMessage({ id: code, defaultMessage: option.subject })}
+      <Box
+        component="li"
+        {...props}
+        sx={SUBJECT_DEPTH_STYLES[Math.min(depth, 3)]}>
+        {code}&nbsp;&nbsp;
+        {formatMessage({ id: code, defaultMessage: option.subject })}
       </Box>
     );
   };

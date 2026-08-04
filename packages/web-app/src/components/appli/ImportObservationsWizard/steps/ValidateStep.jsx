@@ -316,8 +316,13 @@ const ValidateStep = () => {
     );
   }
 
-  const { blockingErrors, invalidRows, validRows, totalRows, invalidRowDetails } =
-    validationResult;
+  const {
+    blockingErrors,
+    invalidRows,
+    validRows,
+    totalRows,
+    invalidRowDetails
+  } = validationResult;
 
   return (
     <Box

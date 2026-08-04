@@ -98,8 +98,7 @@ const MoveEntranceToCaveForm = ({ entrance }) => {
               variant="body2"
               onClick={() =>
                 switchMode(mode === MODE_DETACH ? MODE_MOVE : MODE_DETACH)
-              }
-            >
+              }>
               {formatMessage({
                 id:
                   mode === MODE_DETACH

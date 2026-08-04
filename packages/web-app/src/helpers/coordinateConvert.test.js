@@ -24,8 +24,10 @@ const EPSG_27573 = {
 // Loose France bounds for result sanity checks
 const inFrance = result =>
   result !== null &&
-  result.lat >= 41 && result.lat <= 52 &&
-  result.lng >= -6 && result.lng <= 10;
+  result.lat >= 41 &&
+  result.lat <= 52 &&
+  result.lng >= -6 &&
+  result.lng <= 10;
 
 describe('parseCoordinateString', () => {
   describe('WGS84 decimal', () => {
@@ -80,7 +82,7 @@ describe('parseCoordinateString', () => {
     });
 
     it('parses DMS with "O" (Ouest) as west', () => {
-      const result = parseCoordinateString("22° 55' 4.4\" S, 64° 30' 42.1\" O");
+      const result = parseCoordinateString('22° 55\' 4.4" S, 64° 30\' 42.1" O');
       expect(result).not.toBeNull();
       expect(result.lat).toBeCloseTo(-22.9179, 2);
       expect(result.lng).toBeCloseTo(-64.5117, 2);
@@ -90,7 +92,7 @@ describe('parseCoordinateString', () => {
 
   describe('DMS', () => {
     it('parses degrees minutes seconds with N/E', () => {
-      const result = parseCoordinateString("45° 7' 4.6\" N, 5° 28' 43\" E");
+      const result = parseCoordinateString('45° 7\' 4.6" N, 5° 28\' 43" E');
       expect(result).not.toBeNull();
       expect(result.lat).toBeCloseTo(45.118, 2);
       expect(result.format).toBe('DMS');
@@ -114,8 +116,12 @@ describe('parseCoordinateString', () => {
     });
 
     it('parses Y X order (northing, easting) — inverted', () => {
-      const resultNormal = parseCoordinateString('843000, 6450000', [EPSG_2154]);
-      const resultInverted = parseCoordinateString('6450000, 843000', [EPSG_2154]);
+      const resultNormal = parseCoordinateString('843000, 6450000', [
+        EPSG_2154
+      ]);
+      const resultInverted = parseCoordinateString('6450000, 843000', [
+        EPSG_2154
+      ]);
       expect(inFrance(resultInverted)).toBe(true);
       expect(resultInverted.format).toBe('Lambert 93');
       expect(resultInverted.lat).toBeCloseTo(resultNormal.lat, 4);
@@ -127,7 +133,9 @@ describe('parseCoordinateString', () => {
     });
 
     it('returns null for values outside French Lambert 93 range', () => {
-      expect(parseCoordinateString('999999999, 111111111', [EPSG_2154])).toBeNull();
+      expect(
+        parseCoordinateString('999999999, 111111111', [EPSG_2154])
+      ).toBeNull();
     });
   });
 
@@ -140,8 +148,12 @@ describe('parseCoordinateString', () => {
     });
 
     it('parses Y X order (northing, easting) — inverted', () => {
-      const resultNormal = parseCoordinateString('722000, 3165000', [EPSG_27573]);
-      const resultInverted = parseCoordinateString('3165000, 722000', [EPSG_27573]);
+      const resultNormal = parseCoordinateString('722000, 3165000', [
+        EPSG_27573
+      ]);
+      const resultInverted = parseCoordinateString('3165000, 722000', [
+        EPSG_27573
+      ]);
       expect(inFrance(resultInverted)).toBe(true);
       expect(resultInverted.format).toBe('Lambert III carto');
       expect(resultInverted.lat).toBeCloseTo(resultNormal.lat, 4);

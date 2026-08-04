@@ -22,7 +22,16 @@ const ListItemStyled = styled(ListItem)`
   padding-bottom: ${({ theme }) => theme.spacing(0.5)};
 `;
 
-const History = ({ history, entranceId, isEditAllowed, isMoving, onMoveUp, onMoveDown, isFirst, isLast }) => {
+const History = ({
+  history,
+  entranceId,
+  isEditAllowed,
+  isMoving,
+  onMoveUp,
+  onMoveDown,
+  isFirst,
+  isLast
+}) => {
   const dispatch = useDispatch();
   const permissions = usePermissions();
   const [isUpdateFormVisible, setIsUpdateFormVisible] = useState(false);

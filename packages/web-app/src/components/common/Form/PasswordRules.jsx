@@ -37,8 +37,14 @@ const PasswordRules = ({ password }) => {
         labelId="password.rule.minLength"
         labelValues={{ n: PASSWORD_MIN_LENGTH }}
       />
-      <RuleItem satisfied={rules.hasUppercase} labelId="password.rule.uppercase" />
-      <RuleItem satisfied={rules.hasLowercase} labelId="password.rule.lowercase" />
+      <RuleItem
+        satisfied={rules.hasUppercase}
+        labelId="password.rule.uppercase"
+      />
+      <RuleItem
+        satisfied={rules.hasLowercase}
+        labelId="password.rule.lowercase"
+      />
       <RuleItem satisfied={rules.hasDigit} labelId="password.rule.digit" />
       <RuleItem satisfied={rules.hasSpecial} labelId="password.rule.special" />
     </Box>

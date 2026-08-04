@@ -14,11 +14,7 @@ const messages = {
 const renderDropdown = (props = {}) =>
   render(
     <IntlProvider locale="en" messages={messages}>
-      <ExportFormatDropdown
-        disabled={false}
-        onExport={vi.fn()}
-        {...props}
-      />
+      <ExportFormatDropdown disabled={false} onExport={vi.fn()} {...props} />
     </IntlProvider>
   );
 

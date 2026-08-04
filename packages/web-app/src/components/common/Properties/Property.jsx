@@ -39,11 +39,7 @@ const ValueComponent = ({ secondary, value, url }) => {
     </StyledTypography>
   );
   if (url) {
-    return (
-      <AppLink to={url}>
-        {valueText}
-      </AppLink>
-    );
+    return <AppLink to={url}>{valueText}</AppLink>;
   }
   return valueText;
 };

@@ -9,10 +9,7 @@ import {
   getMapMassifsCoordinatesUrl
 } from '../conf/apiRoutes';
 import makeErrorMessage from '../helpers/makeErrorMessage';
-import {
-  fetchForBounds,
-  registerEntity
-} from '../utils/mapTileCache';
+import { fetchForBounds, registerEntity } from '../utils/mapTileCache';
 import { makeUrl } from './utils';
 
 export const FETCH_MAP_START_LOADING = 'FETCH_MAP_START_LOADING';

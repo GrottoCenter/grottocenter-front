@@ -162,10 +162,7 @@ const AdminSessionExpiryBanner = () => {
   };
 
   return (
-    <Alert
-      severity="warning"
-      onClose={handleDismiss}
-      sx={{ borderRadius: 0 }}>
+    <Alert severity="warning" onClose={handleDismiss} sx={{ borderRadius: 0 }}>
       {formatMessage({ id: 'mfaSessionExpiryWarning' })}
     </Alert>
   );

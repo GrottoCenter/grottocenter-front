@@ -10,11 +10,7 @@ import {
   Paper,
   Typography
 } from '@mui/material';
-import {
-  WarningAmber,
-  ExpandMore,
-  ExpandLess
-} from '@mui/icons-material';
+import { WarningAmber, ExpandMore, ExpandLess } from '@mui/icons-material';
 import CoordinateDisplay from '../../common/CoordinateDisplay';
 import { useCoordinatePreference, getCRSLabel } from '../../../hooks';
 import DataQualityBadge from '../../common/DataQualityBadge';
@@ -56,7 +52,6 @@ const GlobalWrapper = styled('div')`
 const StyledRatings = styled(Ratings)`
   justify-content: space-evenly;
 `;
-
 
 const CATEGORY_KEYS = [
   { key: 'general', label: 'General data' },
@@ -289,7 +284,9 @@ const Properties = ({ isLoading = false, entrance, dataQuality }) => {
               <Box display="flex" alignItems="center" gap={1} flexWrap="wrap">
                 <DataQualityBadge value={dataQuality.total} size={32} />
                 <Typography variant="body2">
-                  {formatMessage({ id: getDataQualityLabelKey(dataQuality.total) })}
+                  {formatMessage({
+                    id: getDataQualityLabelKey(dataQuality.total)
+                  })}
                 </Typography>
                 <DataQualityHelpButton />
                 {dataQuality.categories && (

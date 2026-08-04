@@ -44,7 +44,12 @@ const SearchResults = ({ onSelected, hideExport, entityType, compact }) => {
         hideExport
           ? null
           : (columns, columnsName, format) => {
-              downloadAdvancedSearchResults({ ...queryParams, columns, columnsName, format });
+              downloadAdvancedSearchResults({
+                ...queryParams,
+                columns,
+                columnsName,
+                format
+              });
             }
       }
       onSelected={!onSelected ? null : ids => onSelected(ids, results)}

@@ -28,7 +28,14 @@ export const patchGuideline =
 
     const requestOptions = {
       method: 'PATCH',
-      body: JSON.stringify({ title, description, language, countries, regions, massifs }),
+      body: JSON.stringify({
+        title,
+        description,
+        language,
+        countries,
+        regions,
+        massifs
+      }),
       headers: {
         ...getState().login.authorizationHeader,
         'Content-Type': 'application/json'

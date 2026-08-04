@@ -24,13 +24,13 @@ const ManagedEntitiesSection = ({ organization }) => {
   const renderList = (items, getLink) => (
     <List dense disablePadding>
       {items.map(item => (
-        <ListItem key={item.id} sx={{
-          px: 0.25
-        }}>
+        <ListItem
+          key={item.id}
+          sx={{
+            px: 0.25
+          }}>
           <ListItemText
-            primary={
-              <AppLink to={getLink(item)}>{item.name}</AppLink>
-            }
+            primary={<AppLink to={getLink(item)}>{item.name}</AppLink>}
           />
         </ListItem>
       ))}
@@ -41,29 +41,44 @@ const ManagedEntitiesSection = ({ organization }) => {
     <Box sx={{ my: 1 }}>
       {sortedCountries.length > 0 && (
         <Box sx={{ mb: 1 }}>
-          <Typography variant="subtitle2" color="text.secondary" sx={{ textTransform: 'uppercase', mb: 0.5 }}>
+          <Typography
+            variant="subtitle2"
+            color="text.secondary"
+            sx={{ textTransform: 'uppercase', mb: 0.5 }}>
             {formatMessage({ id: 'Countries' })}
           </Typography>
-          {renderList(sortedCountries, country => `/ui/countries/${country.id}`)}
+          {renderList(
+            sortedCountries,
+            country => `/ui/countries/${country.id}`
+          )}
         </Box>
       )}
       {sortedRegions.length > 0 && (
         <Box sx={{ mb: 1 }}>
-          <Typography variant="subtitle2" color="text.secondary" sx={{ textTransform: 'uppercase', mb: 0.5 }}>
+          <Typography
+            variant="subtitle2"
+            color="text.secondary"
+            sx={{ textTransform: 'uppercase', mb: 0.5 }}>
             {formatMessage({ id: 'Regions' })}
           </Typography>
           {renderList(sortedRegions, region => {
             // Region IDs generally follow the full ISO 3166-2 'COUNTRY-REGION' format (e.g., 'FR-12').
-            // The frontend routing and backend API (/countries/:countryId/regions/:regionId) 
-            // both expect the country ID and the region suffix separately. 
+            // The frontend routing and backend API (/countries/:countryId/regions/:regionId)
+            // both expect the country ID and the region suffix separately.
             // We split at the first hyphen to extract the suffix (e.g., 'FR-ARA' -> country 'FR', region 'ARA').
             // If the ID does not contain a hyphen, the API is expected to provide `region.countryId`.
             // Without `countryId`, we fallback to the countries list to prevent broken links on 'undefined'.
             const regionIdStr = String(region.id);
             const firstHyphenIndex = regionIdStr.indexOf('-');
-            
-            const countryId = firstHyphenIndex !== -1 ? regionIdStr.substring(0, firstHyphenIndex) : region.countryId;
-            const regionId = firstHyphenIndex !== -1 ? regionIdStr.substring(firstHyphenIndex + 1) : region.id;
+
+            const countryId =
+              firstHyphenIndex !== -1
+                ? regionIdStr.substring(0, firstHyphenIndex)
+                : region.countryId;
+            const regionId =
+              firstHyphenIndex !== -1
+                ? regionIdStr.substring(firstHyphenIndex + 1)
+                : region.id;
 
             if (!countryId) {
               if (process.env.NODE_ENV !== 'production') {
@@ -81,7 +96,10 @@ const ManagedEntitiesSection = ({ organization }) => {
       )}
       {sortedMassifs.length > 0 && (
         <Box sx={{ mb: 1 }}>
-          <Typography variant="subtitle2" color="text.secondary" sx={{ textTransform: 'uppercase', mb: 0.5 }}>
+          <Typography
+            variant="subtitle2"
+            color="text.secondary"
+            sx={{ textTransform: 'uppercase', mb: 0.5 }}>
             {formatMessage({ id: 'Massifs' })}
           </Typography>
           {renderList(sortedMassifs, massif => `/ui/massifs/${massif.id}`)}

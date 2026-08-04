@@ -1,9 +1,6 @@
 import React, { useContext, useEffect, useCallback } from 'react';
 import { includes } from 'ramda';
-import {
-  Divider,
-  LinearProgress as MuiLinearProgress
-} from '@mui/material';
+import { Divider, LinearProgress as MuiLinearProgress } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import { styled } from '@mui/material/styles';
 import PublishIcon from '@mui/icons-material/Publish';
@@ -30,7 +27,7 @@ const useStyles = makeStyles({
 });
 
 const LinearProgress = styled(MuiLinearProgress, {
-  shouldForwardProp: (prop) => !prop.startsWith('$')
+  shouldForwardProp: prop => !prop.startsWith('$')
 })(({ $isLoading }) => ({
   visibility: $isLoading ? 'visible' : 'hidden'
 }));

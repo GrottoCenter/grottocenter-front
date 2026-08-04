@@ -29,7 +29,11 @@ const VisibleColumnsMenu = ({
         {label && (
           <Box
             component="span"
-            sx={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            sx={{
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap'
+            }}>
             <Translate>{label}</Translate>
           </Box>
         )}

@@ -38,9 +38,11 @@ const LocateMeControl = ({ onClick, loading = false, error = null }) => {
               '&:hover': { bgcolor: error ? 'error.dark' : '#f4f4f4' },
               '&.Mui-disabled': { bgcolor: 'background.paper', opacity: 0.6 }
             }}>
-            {loading
-              ? <CircularProgress size={20} color="inherit" />
-              : <MyLocationIcon sx={{ fontSize: 28 }} />}
+            {loading ? (
+              <CircularProgress size={20} color="inherit" />
+            ) : (
+              <MyLocationIcon sx={{ fontSize: 28 }} />
+            )}
           </IconButton>
         </span>
       </Tooltip>

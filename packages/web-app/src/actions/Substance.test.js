@@ -1,5 +1,5 @@
-import { searchSubstances, createSubstance } from './Substance';
 import fetch from 'isomorphic-fetch';
+import { searchSubstances, createSubstance } from './Substance';
 
 // Mock the Login module to prevent issues with checkAuthStatus
 vi.mock('./Login', () => ({
@@ -34,8 +34,22 @@ afterEach(() => {
 describe('searchSubstances', () => {
   it('returns results array on success', async () => {
     const mockResults = [
-      { id: 1, name: 'Nitrate', formula: 'NO₃⁻', casNumber: null, externalId: '943', externalSource: 'PubChem' },
-      { id: 2, name: 'Nitrite', formula: 'NO₂⁻', casNumber: null, externalId: null, externalSource: null }
+      {
+        id: 1,
+        name: 'Nitrate',
+        formula: 'NO₃⁻',
+        casNumber: null,
+        externalId: '943',
+        externalSource: 'PubChem'
+      },
+      {
+        id: 2,
+        name: 'Nitrite',
+        formula: 'NO₂⁻',
+        casNumber: null,
+        externalId: null,
+        externalSource: null
+      }
     ];
 
     fetch.mockResolvedValueOnce({

@@ -27,10 +27,12 @@ const EntryPage = () => {
     dispatch(resetNetworkCaveDescriptionsCount());
   }, [entranceId, dispatch]);
 
-  const networkCaveId = data?.cave?.entrances?.length > 1 ? data?.cave?.id : undefined;
+  const networkCaveId =
+    data?.cave?.entrances?.length > 1 ? data?.cave?.id : undefined;
 
   useEffect(() => {
-    if (networkCaveId) dispatch(fetchNetworkCaveDescriptionsCount(networkCaveId));
+    if (networkCaveId)
+      dispatch(fetchNetworkCaveDescriptionsCount(networkCaveId));
   }, [networkCaveId, dispatch]);
 
   return data?.isDeleted && !permissions.isModerator ? (

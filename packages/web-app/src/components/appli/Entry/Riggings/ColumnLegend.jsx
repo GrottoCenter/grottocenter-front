@@ -45,17 +45,19 @@ const LegendSection = ({ titleKey, items }) => {
         <TableBody>
           {items.map(({ abbrevKey, labelKey }) => (
             <TableRow key={abbrevKey}>
-              <TableCell sx={{
-                border: 0,
-                pr: 2
-              }}>
+              <TableCell
+                sx={{
+                  border: 0,
+                  pr: 2
+                }}>
                 <Typography variant="body2" fontWeight="bold" component="span">
                   {formatMessage({ id: abbrevKey })}
                 </Typography>
               </TableCell>
-              <TableCell sx={{
-                border: 0
-              }}>
+              <TableCell
+                sx={{
+                  border: 0
+                }}>
                 <Typography variant="body2" component="span">
                   {formatMessage({ id: labelKey })}
                 </Typography>

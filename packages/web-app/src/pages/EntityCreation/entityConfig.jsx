@@ -50,7 +50,11 @@ export const ENTITIES = [
   }
 ];
 
-export const EntityIcon = ({ iconType, size = 35, BadgeIcon = AddCircleIcon }) => (
+export const EntityIcon = ({
+  iconType,
+  size = 35,
+  BadgeIcon = AddCircleIcon
+}) => (
   <Box sx={{ position: 'relative', display: 'inline-flex' }}>
     <CustomIcon type={iconType} size={size} />
     <BadgeIcon

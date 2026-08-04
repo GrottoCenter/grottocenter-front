@@ -8,7 +8,13 @@ import Alert from '../../../common/Alert';
 import authorType from '../../../../types/author.type';
 import AccordionSnapshot from './AccordionSnapshot';
 
-const SUB_TYPES = ['descriptions', 'locations', 'histories', 'riggings', 'comments'];
+const SUB_TYPES = [
+  'descriptions',
+  'locations',
+  'histories',
+  'riggings',
+  'comments'
+];
 
 const AccordionSnapshotListPage = ({
   data,
@@ -142,14 +148,28 @@ const AccordionSnapshotListPage = ({
 
     items.sort((a, b) => b.date - a.date);
     return items;
-  }, [data, hasData, currentTItem, isCurrentItemLoading, type, isNetwork, latestByGroup, previousMap, renameInfoMap]);
+  }, [
+    data,
+    hasData,
+    currentTItem,
+    isCurrentItemLoading,
+    type,
+    isNetwork,
+    latestByGroup,
+    previousMap,
+    renameInfoMap
+  ]);
 
   const hasItems = timelineItems.length > 0;
 
   return (
     <Box sx={{ px: 1 }}>
       {isCurrentItemLoading && (
-        <Skeleton height={80} variant="rectangular" sx={{ borderRadius: 1, mb: 0.5 }} />
+        <Skeleton
+          height={80}
+          variant="rectangular"
+          sx={{ borderRadius: 1, mb: 0.5 }}
+        />
       )}
       {hasItems ? (
         <Timeline
@@ -185,7 +205,10 @@ AccordionSnapshotListPage.propTypes = {
     id: PropTypes.number,
     author: authorType,
     reviewer: authorType,
-    creator: PropTypes.shape({ id: PropTypes.number, nickname: PropTypes.string }),
+    creator: PropTypes.shape({
+      id: PropTypes.number,
+      nickname: PropTypes.string
+    }),
     descriptions: PropTypes.arrayOf(PropTypes.shape({})),
     locations: PropTypes.arrayOf(PropTypes.shape({})),
     histories: PropTypes.arrayOf(PropTypes.shape({})),

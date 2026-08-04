@@ -47,8 +47,7 @@ const BoolToggleChip = ({ name, label, icon, control, disabled = false }) => (
             borderColor: 'divider',
             backgroundColor: 'action.disabledBackground'
           }
-        }}
-      >
+        }}>
         {value && <CheckIcon fontSize="small" />}
         <CustomIcon type={icon} size={20} />
         <Translate>{label}</Translate>

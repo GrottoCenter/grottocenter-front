@@ -14,7 +14,16 @@ import RiggingTable from './RiggingTable';
 import { SnapshotButton } from '../Snapshots/UtilityFunction';
 import DiscardChangesDialog from '../../../common/DiscardChangesDialog';
 
-const Rigging = ({ rigging, entranceId, isEditAllowed, isMoving, onMoveUp, onMoveDown, isFirst, isLast }) => {
+const Rigging = ({
+  rigging,
+  entranceId,
+  isEditAllowed,
+  isMoving,
+  onMoveUp,
+  onMoveDown,
+  isFirst,
+  isLast
+}) => {
   const dispatch = useDispatch();
   const permissions = usePermissions();
   const [isUpdateFormVisible, setIsUpdateFormVisible] = useState(false);

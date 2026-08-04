@@ -33,7 +33,8 @@ const detectSupport = () => {
 const getScreenAngle = () => {
   if (typeof window === 'undefined') return 0;
   const orientation = window.screen && window.screen.orientation;
-  if (orientation && typeof orientation.angle === 'number') return orientation.angle;
+  if (orientation && typeof orientation.angle === 'number')
+    return orientation.angle;
   if (typeof window.orientation === 'number') return window.orientation;
   return 0;
 };
@@ -91,7 +92,11 @@ const useDeviceOrientation = () => {
   );
 
   const removeListeners = useCallback(() => {
-    window.removeEventListener('deviceorientationabsolute', handleOrientation, true);
+    window.removeEventListener(
+      'deviceorientationabsolute',
+      handleOrientation,
+      true
+    );
     window.removeEventListener('deviceorientation', handleOrientation, true);
   }, [handleOrientation]);
 
@@ -122,7 +127,11 @@ const useDeviceOrientation = () => {
     }
     // The component may have unmounted while awaiting the permission prompt.
     if (!mountedRef.current) return false;
-    window.addEventListener('deviceorientationabsolute', handleOrientation, true);
+    window.addEventListener(
+      'deviceorientationabsolute',
+      handleOrientation,
+      true
+    );
     window.addEventListener('deviceorientation', handleOrientation, true);
     // Surface a clear error if no reading ever comes (device without a sensor).
     clearNoDataTimer();

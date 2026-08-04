@@ -135,7 +135,10 @@ const FileSelectorInput = ({
           $isDragging={isDragging}
           role="button"
           tabIndex={0}
-          aria-label={t('Drop files here or click to select', 'Drop a file here or click to select')}
+          aria-label={t(
+            'Drop files here or click to select',
+            'Drop a file here or click to select'
+          )}
           onDragEnter={handleDragEnter}
           onDragLeave={handleDragLeave}
           onDragOver={handleDragOver}

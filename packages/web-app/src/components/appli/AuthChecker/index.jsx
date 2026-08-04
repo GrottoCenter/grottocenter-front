@@ -1,12 +1,11 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
-import { Button } from '@mui/material';
+import { Button, Alert } from '@mui/material';
 import { useIntl } from 'react-intl';
 import { useDispatch } from 'react-redux';
 import { styled } from '@mui/material/styles';
 
-import { Alert } from '@mui/material';
 import { displayLoginDialog } from '../../../actions/Login';
 import { usePermissions } from '../../../hooks';
 

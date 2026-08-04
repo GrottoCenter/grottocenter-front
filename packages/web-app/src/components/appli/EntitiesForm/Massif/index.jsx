@@ -74,11 +74,11 @@ export const MassifForm = ({ massifValues, onCancel }) => {
     defaultValues: {
       massif: massifValues
         ? {
-          nameId: massifValues.names[0]?.id,
-          name: massifValues.names[0]?.name,
-          language: massifValues.language,
-          geogPolygon: massifValues.geogPolygon
-        }
+            nameId: massifValues.names[0]?.id,
+            name: massifValues.names[0]?.name,
+            language: massifValues.language,
+            geogPolygon: massifValues.geogPolygon
+          }
         : defaultMassifValues
     }
   });
@@ -96,7 +96,10 @@ export const MassifForm = ({ massifValues, onCancel }) => {
       // Use the error code as i18n key if available, fall back to raw message,
       // then to a generic translated fallback.
       const message = code
-        ? formatMessage({ id: code, defaultMessage: rawMessage || FALLBACK_ERROR_MESSAGE })
+        ? formatMessage({
+            id: code,
+            defaultMessage: rawMessage || FALLBACK_ERROR_MESSAGE
+          })
         : rawMessage || formatMessage({ id: FALLBACK_ERROR_MESSAGE });
       onError(message);
       handleReset();

@@ -1,7 +1,6 @@
 import React from 'react';
 import { useIntl } from 'react-intl';
-import { Typography } from '@mui/material';
-import { Grid } from '@mui/material';
+import { Typography, Grid } from '@mui/material';
 import PropTypes from 'prop-types';
 import { styled } from '@mui/material/styles';
 import ActionButton from '../../ActionButton';

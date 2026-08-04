@@ -49,15 +49,13 @@ const ManageUsers = () => {
     state => state.groups
   );
 
-  const {
-    bannedCavers,
-    isLoading: isBannedLoading
-  } = useSelector(state => state.bannedCavers);
+  const { bannedCavers, isLoading: isBannedLoading } = useSelector(
+    state => state.bannedCavers
+  );
 
-  const {
-    invalidEmailCavers,
-    isLoading: isInvalidEmailLoading
-  } = useSelector(state => state.invalidEmailCavers);
+  const { invalidEmailCavers, isLoading: isInvalidEmailLoading } = useSelector(
+    state => state.invalidEmailCavers
+  );
 
   const { isLoading: isUpdateLoading, isSuccess: isUpdateSuccess } =
     useSelector(state => state.updatePersonGroups);
@@ -120,7 +118,9 @@ const ManageUsers = () => {
               <UserList
                 isLoading={isInvalidEmailLoading}
                 userList={invalidEmailCavers}
-                title={formatMessage({ id: 'List of cavers with invalid email' })}
+                title={formatMessage({
+                  id: 'List of cavers with invalid email'
+                })}
               />
             </>
           }

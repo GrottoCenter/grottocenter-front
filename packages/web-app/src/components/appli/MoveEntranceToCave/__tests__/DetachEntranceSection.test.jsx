@@ -56,8 +56,7 @@ const messages = {
   Cancel: 'Cancel',
   'Cannot detach: this entrance is the only one of its cave.':
     'Cannot detach: this entrance is the only one of its cave.',
-  'Entrance successfully detached.':
-    'Entrance successfully detached.',
+  'Entrance successfully detached.': 'Entrance successfully detached.',
   'An error occurred while detaching the entrance.':
     'An error occurred while detaching the entrance.'
 };

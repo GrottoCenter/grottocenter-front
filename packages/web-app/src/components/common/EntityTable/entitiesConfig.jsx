@@ -29,9 +29,7 @@ DateTimeCell.propTypes = {
 
 // React component so it can render AppLink; stops row click propagation.
 const PersonLinkCell = ({ person }) => (
-  <AppLink
-    to={`/ui/persons/${person.id}`}
-    onClick={e => e.stopPropagation()}>
+  <AppLink to={`/ui/persons/${person.id}`} onClick={e => e.stopPropagation()}>
     {person.nickname}
   </AppLink>
 );
@@ -195,7 +193,13 @@ const persons = {
   ),
   columns: [
     { visible: true, field: 'id', label: 'Id', sortable: false },
-    { visible: true, field: 'nickname', label: 'Username', sortable: true, isTitle: true },
+    {
+      visible: true,
+      field: 'nickname',
+      label: 'Username',
+      sortable: true,
+      isTitle: true
+    },
     { visible: true, field: 'name', label: 'First name', sortable: true },
     { visible: true, field: 'surname', label: 'Last name', sortable: true },
     {

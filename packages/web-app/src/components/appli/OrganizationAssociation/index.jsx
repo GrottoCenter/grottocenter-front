@@ -2,9 +2,9 @@ import React, { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import { useDispatch, useSelector } from 'react-redux';
-import { usePermissions, useNotification } from '../../../hooks';
 import { Skeleton, Box, Button, Typography } from '@mui/material';
 import LinkIcon from '@mui/icons-material/Link';
+import { usePermissions, useNotification } from '../../../hooks';
 
 import AssociationForm from './AssociationForm';
 import EntitiesList from '../../common/entitiesList/EntitiesList';
@@ -12,9 +12,21 @@ import Alert from '../../common/Alert';
 import { EntityIcon } from '../../../pages/EntityCreation/entityConfig';
 import StandardDialog from '../../common/StandardDialog';
 import ScrollableContent from '../../common/Layouts/Fixed/ScrollableContent';
-import { setCountryOrganization, removeCountryOrganization, resetCountryOrganization } from '../../../actions/Country/CountryOrganization';
-import { setRegionOrganization, removeRegionOrganization, resetRegionOrganization } from '../../../actions/Region/RegionOrganization';
-import { setMassifOrganization, removeMassifOrganization, resetMassifOrganization } from '../../../actions/Massif/MassifOrganization';
+import {
+  setCountryOrganization,
+  removeCountryOrganization,
+  resetCountryOrganization
+} from '../../../actions/Country/CountryOrganization';
+import {
+  setRegionOrganization,
+  removeRegionOrganization,
+  resetRegionOrganization
+} from '../../../actions/Region/RegionOrganization';
+import {
+  setMassifOrganization,
+  removeMassifOrganization,
+  resetMassifOrganization
+} from '../../../actions/Massif/MassifOrganization';
 import { fetchCountry } from '../../../actions/Country/GetCountry';
 import { fetchRegion } from '../../../actions/Region/GetRegion';
 import { loadMassif } from '../../../actions/Massif/GetMassif';
@@ -68,11 +80,14 @@ const AssociationSection = ({
         dispatch(loadMassif(entityId));
         dispatch(resetMassifOrganization());
       }
-      
+
       setOrgToRemove(null);
       setIsPending(false);
       pendingOperationRef.current = false;
-    } else if (pendingOperationRef.current && status === REDUCER_STATUS.FAILED) {
+    } else if (
+      pendingOperationRef.current &&
+      status === REDUCER_STATUS.FAILED
+    ) {
       // Surface the failure: without this, a rejected set/remove just silently
       // re-enables the buttons (the in-form Alert is masked once isPending
       // clears below), so the user gets no feedback. Covers both flows.
@@ -94,22 +109,30 @@ const AssociationSection = ({
     formatMessage
   ]);
 
-  useEffect(() => {
-    return () => {
+  useEffect(
+    () => () => {
       // Clean up reducer state on unmount to prevent stale status affecting other instances
       if (entityType === 'country') dispatch(resetCountryOrganization());
       else if (entityType === 'region') dispatch(resetRegionOrganization());
       else if (entityType === 'massif') dispatch(resetMassifOrganization());
-    };
-  }, [dispatch, entityType]);
+    },
+    [dispatch, entityType]
+  );
 
-  const handleSet = (orgData) => {
+  const handleSet = orgData => {
     setIsPending(true);
     pendingOperationRef.current = true;
     if (entityType === 'country') {
       dispatch(setCountryOrganization(entityId, orgData.id, orgData.name));
     } else if (entityType === 'region') {
-      dispatch(setRegionOrganization(parentEntityId, entityId, orgData.id, orgData.name));
+      dispatch(
+        setRegionOrganization(
+          parentEntityId,
+          entityId,
+          orgData.id,
+          orgData.name
+        )
+      );
     } else if (entityType === 'massif') {
       dispatch(setMassifOrganization(entityId, orgData.id, orgData.name));
     }
@@ -122,7 +145,9 @@ const AssociationSection = ({
     if (entityType === 'country') {
       dispatch(removeCountryOrganization(entityId, orgToRemove.id));
     } else if (entityType === 'region') {
-      dispatch(removeRegionOrganization(parentEntityId, entityId, orgToRemove.id));
+      dispatch(
+        removeRegionOrganization(parentEntityId, entityId, orgToRemove.id)
+      );
     } else if (entityType === 'massif') {
       dispatch(removeMassifOrganization(entityId, orgToRemove.id));
     }
@@ -138,8 +163,7 @@ const AssociationSection = ({
       onClick={() => setIsFormOpen(true)}
       startIcon={
         <EntityIcon iconType="organization" size={20} BadgeIcon={LinkIcon} />
-      }
-    >
+      }>
       {formatMessage({ id: 'Associate' })}
     </Button>
   );
@@ -156,7 +180,11 @@ const AssociationSection = ({
       icon={associateButton}
       content={
         isLoading ? (
-          <Skeleton variant="rectangular" height={60} sx={{ my: 0.5, borderRadius: 1 }} />
+          <Skeleton
+            variant="rectangular"
+            height={60}
+            sx={{ my: 0.5, borderRadius: 1 }}
+          />
         ) : (
           <Box sx={{ my: 0.5 }}>
             <EntitiesList
@@ -165,7 +193,9 @@ const AssociationSection = ({
               onItemRemove={
                 canManageAssociations
                   ? id =>
-                      setOrgToRemove(organizations.find(o => o.id === id) || null)
+                      setOrgToRemove(
+                        organizations.find(o => o.id === id) || null
+                      )
                   : undefined
               }
               toolTipTitle={formatMessage({ id: 'Remove association' })}
@@ -199,24 +229,23 @@ const AssociationSection = ({
                   <Button
                     variant="outlined"
                     onClick={() => setOrgToRemove(null)}
-                    disabled={isPending && status === REDUCER_STATUS.LOADING}
-                  >
+                    disabled={isPending && status === REDUCER_STATUS.LOADING}>
                     {formatMessage({ id: 'Cancel' })}
                   </Button>
                   <Button
                     color="error"
                     variant="contained"
                     onClick={handleRemove}
-                    disabled={isPending && status === REDUCER_STATUS.LOADING}
-                  >
+                    disabled={isPending && status === REDUCER_STATUS.LOADING}>
                     {formatMessage({ id: 'Remove' })}
                   </Button>
                 </>
-              }
-            >
+              }>
               <Typography>
                 {formatMessage(
-                  { id: 'Are you sure you want to remove the association with "{name}"?' },
+                  {
+                    id: 'Are you sure you want to remove the association with "{name}"?'
+                  },
                   { name: orgToRemove?.name || '' }
                 )}
               </Typography>
@@ -238,7 +267,8 @@ AssociationSection.propTypes = {
     })
   ),
   entityType: PropTypes.oneOf(['country', 'region', 'massif']).isRequired,
-  entityId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+  entityId: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+    .isRequired,
   parentEntityId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   isLoading: PropTypes.bool
 };

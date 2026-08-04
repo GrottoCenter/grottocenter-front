@@ -148,7 +148,10 @@ const CompassControl = () => {
     );
   } else if (isActivating) {
     icon = (
-      <CircularProgress size={20} sx={{ color: theme.palette.mapControlIcon }} />
+      <CircularProgress
+        size={20}
+        sx={{ color: theme.palette.mapControlIcon }}
+      />
     );
   } else {
     icon = (

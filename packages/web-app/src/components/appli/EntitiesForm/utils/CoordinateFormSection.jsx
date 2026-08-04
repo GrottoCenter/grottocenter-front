@@ -294,8 +294,7 @@ const CoordinateFormSection = ({
               // button line up exactly with the fields — on desktop (one field's
               // height) and on mobile (spanning both stacked lat/lng fields).
               my: '4px'
-            }}
-          >
+            }}>
             {crsButtonLabel}
           </Button>
         </Tooltip>
@@ -307,8 +306,7 @@ const CoordinateFormSection = ({
             display: 'flex',
             flexDirection: { xs: 'column', sm: 'row' },
             gap: 0.5
-          }}
-        >
+          }}>
           {isWGS84 ? (
             <>
               <Box sx={{ flex: 1, minWidth: 0 }}>
@@ -383,8 +381,7 @@ const CoordinateFormSection = ({
             value={utmHemisphere}
             onChange={e => setUtmHemisphere(e.target.value)}
             SelectProps={{ native: true }}
-            sx={{ width: 140 }}
-          >
+            sx={{ width: 140 }}>
             <option value="North">{formatMessage({ id: 'North' })}</option>
             <option value="South">{formatMessage({ id: 'South' })}</option>
           </TextField>

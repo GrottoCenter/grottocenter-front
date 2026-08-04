@@ -43,13 +43,13 @@ const OperationSummary = ({ entrance, newCave, variant = 'link' }) => {
   const targetCount =
     typeof newCave?.nbEntrances === 'number' ? newCave.nbEntrances : null;
   const isSameCave = newCave && Number(newCave.id) === sourceCave?.id;
-  const hasTarget = Boolean(newCave?.name) && !isSameCave && targetCount !== null;
+  const hasTarget =
+    Boolean(newCave?.name) && !isSameCave && targetCount !== null;
 
   // When the source is a 2-entrance network, the operation leaves it with a
   // single, now-standalone entrance. Show that entrance by its own name (the
   // entrance payload only carries sibling ids, so resolve it via the cave).
-  const willDissolve =
-    sourceCount === 2 && (variant === 'detach' || hasTarget);
+  const willDissolve = sourceCount === 2 && (variant === 'detach' || hasTarget);
   const otherEntranceName = useOtherEntranceName(
     sourceCave?.id,
     entrance.id,
@@ -115,8 +115,7 @@ const OperationSummary = ({ entrance, newCave, variant = 'link' }) => {
   const renderItem = (item, index) => (
     <Box
       key={`${item.icon}-${item.name ?? ''}-${index}`}
-      sx={{ p: 0.5, borderRadius: 1, bgcolor: 'action.hover', minWidth: 0 }}
-    >
+      sx={{ p: 0.5, borderRadius: 1, bgcolor: 'action.hover', minWidth: 0 }}>
       {item.icon === 'network' ? (
         <Box
           sx={{
@@ -125,8 +124,7 @@ const OperationSummary = ({ entrance, newCave, variant = 'link' }) => {
             flexWrap: 'wrap',
             columnGap: '4px',
             minWidth: 0
-          }}
-        >
+          }}>
           {item.caveId ? (
             <NetworkInlineLink caveId={item.caveId} label={item.name} />
           ) : (
@@ -138,8 +136,7 @@ const OperationSummary = ({ entrance, newCave, variant = 'link' }) => {
             <Typography
               variant="caption"
               color="text.secondary"
-              component="span"
-            >
+              component="span">
               {countLabel(item.count)}
             </Typography>
           )}
@@ -150,18 +147,13 @@ const OperationSummary = ({ entrance, newCave, variant = 'link' }) => {
           <Typography
             variant="body2"
             color={item.accent ? 'primary' : 'text.primary'}
-            sx={{ minWidth: 0, fontWeight: item.accent ? 600 : 400 }}
-          >
+            sx={{ minWidth: 0, fontWeight: item.accent ? 600 : 400 }}>
             {item.name}
           </Typography>
         </Box>
       )}
       {item.note && (
-        <Typography
-          variant="caption"
-          color="text.secondary"
-          display="block"
-        >
+        <Typography variant="caption" color="text.secondary" display="block">
           {item.note}
         </Typography>
       )}
@@ -174,8 +166,7 @@ const OperationSummary = ({ entrance, newCave, variant = 'link' }) => {
         variant="overline"
         color="text.secondary"
         display="block"
-        sx={{ mb: 0.5 }}
-      >
+        sx={{ mb: 0.5 }}>
         {label}
       </Typography>
       {items.length > 0 ? (
@@ -197,8 +188,7 @@ const OperationSummary = ({ entrance, newCave, variant = 'link' }) => {
         flexDirection: { xs: 'column', sm: 'row' },
         alignItems: { xs: 'stretch', sm: 'center' },
         gap: 1
-      }}
-    >
+      }}>
       {column(formatMessage({ id: 'Now' }), before)}
       <KeyboardArrowRightIcon
         fontSize="large"

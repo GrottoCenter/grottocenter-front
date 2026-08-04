@@ -2,8 +2,6 @@ import fetch from 'isomorphic-fetch';
 import { previewMassifSensitiveUrl } from '../../conf/apiRoutes';
 import { checkAuthStatus } from '../utils';
 
-
-
 /**
  * Fetch the preview count of affected entrances when marking a massif as sensitive.
  * @param {number} id - Massif ID

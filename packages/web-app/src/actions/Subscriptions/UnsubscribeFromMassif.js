@@ -35,20 +35,18 @@ export function unsubscribeFromMassif(massifId, userId = null) {
       headers: getState().login.authorizationHeader
     };
 
-    return fetch(url, requestOptions).then(
-      response => {
-        if (response.status >= 400) {
-          const error = `Unsubscribing you from massif with id ${massifId}`;
-          dispatch(
-            unsubscribeFromMassifActionFailure(
-              makeErrorMessage(response.status, error)
-            )
-          );
-        } else {
-          dispatch(unsubscribeFromMassifActionSuccess(massifId));
-        }
-        return response;
+    return fetch(url, requestOptions).then(response => {
+      if (response.status >= 400) {
+        const error = `Unsubscribing you from massif with id ${massifId}`;
+        dispatch(
+          unsubscribeFromMassifActionFailure(
+            makeErrorMessage(response.status, error)
+          )
+        );
+      } else {
+        dispatch(unsubscribeFromMassifActionSuccess(massifId));
       }
-    );
+      return response;
+    });
   };
 }

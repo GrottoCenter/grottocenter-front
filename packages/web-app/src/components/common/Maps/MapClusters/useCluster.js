@@ -17,7 +17,10 @@ const DEFAULT_MAX_ZOOM = 16;
  *
  * Returns null while data is missing (empty array is a valid, harmless index).
  */
-const useCluster = (data, { radius = DEFAULT_RADIUS, maxZoom = DEFAULT_MAX_ZOOM } = {}) =>
+const useCluster = (
+  data,
+  { radius = DEFAULT_RADIUS, maxZoom = DEFAULT_MAX_ZOOM } = {}
+) =>
   useMemo(() => {
     if (!Array.isArray(data)) return null;
     const index = new Supercluster({ radius, maxZoom });

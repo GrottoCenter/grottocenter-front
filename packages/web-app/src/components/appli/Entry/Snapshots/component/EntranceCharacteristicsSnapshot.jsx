@@ -25,15 +25,15 @@ const EntranceCharacteristicsSnapshot = ({ entrance, previous }) => {
         sx={
           isAdded
             ? {
-            bgcolor: 'rgba(70, 149, 74, 0.2)',
-            borderRadius: 1
-          }
+                bgcolor: 'rgba(70, 149, 74, 0.2)',
+                borderRadius: 1
+              }
             : isRemoved
-            ? {
-            bgcolor: 'rgba(229, 83, 74, 0.2)',
-            borderRadius: 1
-          }
-            : undefined
+              ? {
+                  bgcolor: 'rgba(229, 83, 74, 0.2)',
+                  borderRadius: 1
+                }
+              : undefined
         }>
         <Property
           value={formatMessage({ id: label })}

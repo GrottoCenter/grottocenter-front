@@ -98,10 +98,7 @@ const TotpStep = ({
             severity={isEnrollmentTokenExpired ? 'warning' : 'error'}
             action={
               isEnrollmentTokenExpired ? (
-                <Button
-                  color="inherit"
-                  size="small"
-                  onClick={onBackToLogin}>
+                <Button color="inherit" size="small" onClick={onBackToLogin}>
                   {formatMessage({ id: 'mfaEnrollmentTokenExpiredAction' })}
                 </Button>
               ) : null

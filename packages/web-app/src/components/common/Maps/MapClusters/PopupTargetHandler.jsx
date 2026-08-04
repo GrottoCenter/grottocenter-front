@@ -122,7 +122,8 @@ const PopupTargetHandler = ({ popupTarget }) => {
         map.openPopup(renderPopup(result.popup), [result.lat, result.lng]);
       })
       .catch(err => {
-        if (err.name !== 'AbortError') console.error('PopupTargetHandler:', err);
+        if (err.name !== 'AbortError')
+          console.error('PopupTargetHandler:', err);
       });
 
     return () => controller.abort();

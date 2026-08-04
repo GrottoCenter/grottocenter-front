@@ -2,10 +2,6 @@ import React, { useState, useCallback, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import {
-  formatCoordinatesForCopy,
-  formatWGS84
-} from '../../../helpers/coordinateConvert';
-import {
   Box,
   Chip,
   IconButton,
@@ -25,6 +21,10 @@ import {
   TravelExplore,
   Tune
 } from '@mui/icons-material';
+import {
+  formatCoordinatesForCopy,
+  formatWGS84
+} from '../../../helpers/coordinateConvert';
 import copyToClipboard from '../../../helpers/clipboard';
 import CRSMenu from '../CRSMenu';
 import AppLink from '../AppLink';

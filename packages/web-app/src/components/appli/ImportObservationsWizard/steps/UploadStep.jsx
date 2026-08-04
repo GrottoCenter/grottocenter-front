@@ -2,7 +2,6 @@ import React, { useRef } from 'react';
 import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
 import { useIntl } from 'react-intl';
-import { useNotification } from '../../../../hooks';
 import {
   Box,
   Button,
@@ -20,6 +19,7 @@ import {
 } from '@mui/material';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 import FileOpenIcon from '@mui/icons-material/FileOpen';
+import { useNotification } from '../../../../hooks';
 
 import {
   parseAndSetFile,
@@ -40,7 +40,12 @@ import { importProfile } from '../utils/profileManager';
 
 const PREVIEW_COUNT = 10;
 
-const FilePreviewTable = ({ rawRows, headerRow, skipFirstRows, skipLastRows }) => {
+const FilePreviewTable = ({
+  rawRows,
+  headerRow,
+  skipFirstRows,
+  skipLastRows
+}) => {
   const { formatMessage } = useIntl();
 
   // Data rows start after header row + skipped first rows
@@ -54,10 +59,13 @@ const FilePreviewTable = ({ rawRows, headerRow, skipFirstRows, skipLastRows }) =
       : [];
 
   // Determine column count from widest data row
-  const maxDataColCount = dataRows.length > 0
-    ? Math.max(...dataRows.slice(0, PREVIEW_COUNT).map(r => r.length),
-      ...dataRows.slice(-PREVIEW_COUNT).map(r => r.length))
-    : 0;
+  const maxDataColCount =
+    dataRows.length > 0
+      ? Math.max(
+          ...dataRows.slice(0, PREVIEW_COUNT).map(r => r.length),
+          ...dataRows.slice(-PREVIEW_COUNT).map(r => r.length)
+        )
+      : 0;
 
   // Use header cells only if they cover all data columns;
   // otherwise fall back to generic Col 1, Col 2, etc.
@@ -76,9 +84,7 @@ const FilePreviewTable = ({ rawRows, headerRow, skipFirstRows, skipLastRows }) =
 
   const firstRows = dataRows.slice(0, PREVIEW_COUNT);
   const lastRows =
-    dataRows.length > PREVIEW_COUNT
-      ? dataRows.slice(-PREVIEW_COUNT)
-      : [];
+    dataRows.length > PREVIEW_COUNT ? dataRows.slice(-PREVIEW_COUNT) : [];
   const hasGap = dataRows.length > PREVIEW_COUNT * 2;
 
   if (dataRows.length === 0) {
@@ -99,7 +105,8 @@ const FilePreviewTable = ({ rawRows, headerRow, skipFirstRows, skipLastRows }) =
         sx={{ minWidth: 400, tableLayout: 'fixed' }}>
         <TableHead>
           <TableRow>
-            <TableCell sx={{ fontWeight: 'bold', whiteSpace: 'nowrap', width: 50 }}>
+            <TableCell
+              sx={{ fontWeight: 'bold', whiteSpace: 'nowrap', width: 50 }}>
               #
             </TableCell>
             {columnHeaders.map((header, i) => (
@@ -145,13 +152,12 @@ const FilePreviewTable = ({ rawRows, headerRow, skipFirstRows, skipLastRows }) =
               <TableCell
                 colSpan={colCount + 1}
                 sx={{ textAlign: 'center', color: 'text.secondary' }}>
-                {'…'}
+                …
               </TableCell>
             </TableRow>
           )}
           {lastRows.map((row, rowIdx) => {
-            const actualRowIdx =
-              dataRows.length - lastRows.length + rowIdx;
+            const actualRowIdx = dataRows.length - lastRows.length + rowIdx;
             return (
               <TableRow
                 // eslint-disable-next-line react/no-array-index-key
@@ -237,7 +243,7 @@ const UploadStep = () => {
   };
 
   const handleHeaderRowChange = e => {
-    const value = e.target.value;
+    const { value } = e.target;
     const newHeaderRow = value === 'none' ? -1 : Number(value);
     dispatch({ type: SET_HEADER_ROW, headerRow: newHeaderRow });
     dispatch({ type: SET_COLUMN_MAPPINGS, columnMappings: [] });
@@ -327,13 +333,19 @@ const UploadStep = () => {
       }
 
       // Store device ID as a pending confirmed device (DeviceSensorsStep will fetch the full data)
-      const profileDeviceId = profileState.deviceId
-        ?? (profileState.confirmedDevice && profileState.confirmedDevice.id)
-        ?? null;
+      const profileDeviceId =
+        profileState.deviceId ??
+        (profileState.confirmedDevice && profileState.confirmedDevice.id) ??
+        null;
       if (profileDeviceId != null) {
         dispatch({
           type: SET_CONFIRMED_DEVICE,
-          device: { id: profileDeviceId, name: null, brandName: null, author: null }
+          device: {
+            id: profileDeviceId,
+            name: null,
+            brandName: null,
+            author: null
+          }
         });
       }
 
@@ -380,7 +392,9 @@ const UploadStep = () => {
       {/* File picker */}
       <Box>
         <Typography variant="subtitle1" gutterBottom>
-          {formatMessage({ id: 'ImportObservationsWizard.UploadStep.fileLabel' })}
+          {formatMessage({
+            id: 'ImportObservationsWizard.UploadStep.fileLabel'
+          })}
         </Typography>
         <input
           ref={fileInputRef}

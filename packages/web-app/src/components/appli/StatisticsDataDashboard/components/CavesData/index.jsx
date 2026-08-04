@@ -5,7 +5,13 @@ import { Box, Typography } from '@mui/material';
 import CustomIcon from '../../../../common/CustomIcon';
 import InlineData from './InlineData';
 
-const CavesData = ({ title, nbMassifs, nbCaves, nbDivingCaves, nbNetworks }) => {
+const CavesData = ({
+  title,
+  nbMassifs,
+  nbCaves,
+  nbDivingCaves,
+  nbNetworks
+}) => {
   const { formatMessage } = useIntl();
 
   return (
@@ -25,14 +31,20 @@ const CavesData = ({ title, nbMassifs, nbCaves, nbDivingCaves, nbNetworks }) => 
           <InlineData
             icon={<CustomIcon type="entrance" size={40} />}
             numberData={nbCaves}
-            text={formatMessage({ id: 'cave_with_entrances' }, { count: nbCaves })}
+            text={formatMessage(
+              { id: 'cave_with_entrances' },
+              { count: nbCaves }
+            )}
           />
         )}
         {nbDivingCaves !== undefined && nbDivingCaves !== null && (
           <InlineData
             icon={<CustomIcon type="diving_cave" size={40} />}
             numberData={nbDivingCaves}
-            text={formatMessage({ id: 'diveable_caves' }, { count: nbDivingCaves })}
+            text={formatMessage(
+              { id: 'diveable_caves' },
+              { count: nbDivingCaves }
+            )}
           />
         )}
         {nbNetworks !== undefined && nbNetworks !== null && (

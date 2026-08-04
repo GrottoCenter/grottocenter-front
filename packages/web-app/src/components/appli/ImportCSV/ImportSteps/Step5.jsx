@@ -1,5 +1,10 @@
 import React, { useContext } from 'react';
-import { Box, LinearProgress, Link as MuiLink, Typography } from '@mui/material';
+import {
+  Box,
+  LinearProgress,
+  Link as MuiLink,
+  Typography
+} from '@mui/material';
 import ReplayIcon from '@mui/icons-material/Replay';
 import HomeIcon from '@mui/icons-material/Home';
 import NotificationsActiveOutlinedIcon from '@mui/icons-material/NotificationsActiveOutlined';

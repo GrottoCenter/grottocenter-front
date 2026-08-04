@@ -15,7 +15,7 @@ const messages = {
   [areaErrorMessage]: areaErrorMessage
 };
 
-const renderWithIntl = (ui) =>
+const renderWithIntl = ui =>
   render(
     <MemoryRouter>
       <IntlProvider locale="en" messages={messages}>
@@ -31,7 +31,7 @@ describe('MassifForm area validation error display', () => {
     renderWithIntl(
       <FormProgressInfo
         isLoading={false}
-        isError={true}
+        isError
         labelLoading="Creating massif..."
         labelError={areaErrorMessage}
         resetFn={vi.fn()}
@@ -49,7 +49,7 @@ describe('MassifForm area validation error display', () => {
     renderWithIntl(
       <FormProgressInfo
         isLoading={false}
-        isError={true}
+        isError
         labelLoading="Creating massif..."
         labelError={areaErrorMessage}
         resetFn={resetFn}

@@ -57,7 +57,10 @@ export const NON_CC_BADGES = {
 // to both spellings the API uses ("CC-BY-SA" and "CC BY NC").
 export const parseCcClauses = name => {
   if (typeof name !== 'string' || !name) return null;
-  const tokens = name.toUpperCase().split(/[\s-]+/).filter(Boolean);
+  const tokens = name
+    .toUpperCase()
+    .split(/[\s-]+/)
+    .filter(Boolean);
   const first = tokens[0];
   if (first !== 'CC' && first !== 'CC0') return null;
   if (first === 'CC0' || tokens[1] === '0' || tokens.includes('ZERO'))

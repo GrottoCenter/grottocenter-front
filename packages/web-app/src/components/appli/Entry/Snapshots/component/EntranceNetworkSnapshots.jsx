@@ -10,7 +10,8 @@ import EntranceCharacteristicsSnapshot from './EntranceCharacteristicsSnapshot';
 
 const EntranceNetworkSnapshots = information => {
   const { entrance, previous } = information;
-  const hasCoordinates = entrance.latitude != null && entrance.longitude != null;
+  const hasCoordinates =
+    entrance.latitude != null && entrance.longitude != null;
   const hasPreviousCoordinates =
     previous?.latitude != null && previous?.longitude != null;
   const lat = Number(entrance.latitude);
@@ -67,7 +68,10 @@ const EntranceNetworkSnapshots = information => {
           url={`/ui/caves/${caveId}`}
         />
       )}
-      <EntranceCharacteristicsSnapshot entrance={entrance} previous={previous} />
+      <EntranceCharacteristicsSnapshot
+        entrance={entrance}
+        previous={previous}
+      />
     </Box>
   );
 };

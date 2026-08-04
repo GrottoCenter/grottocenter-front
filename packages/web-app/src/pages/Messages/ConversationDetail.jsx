@@ -25,14 +25,14 @@ import {
   useMediaQuery
 } from '@mui/material';
 import Linkify from 'linkify-react';
-import AppLink from '../../components/common/AppLink';
-import UserAvatar from '../../components/common/UserAvatar';
-import linkifyOptions from '../../helpers/linkifyOptions';
 import SendIcon from '@mui/icons-material/Send';
 import FlagIcon from '@mui/icons-material/Flag';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { styled, alpha } from '@mui/material/styles';
+import linkifyOptions from '../../helpers/linkifyOptions';
+import UserAvatar from '../../components/common/UserAvatar';
+import AppLink from '../../components/common/AppLink';
 
 import { fetchConversationMessages } from '../../actions/Messaging/GetConversationMessages';
 import { sendMessage } from '../../actions/Messaging/SendMessage';
@@ -755,10 +755,10 @@ Message Body: ${body}`;
               fontSize: '0.75rem'
             }}>
             {replyText.length > 5000 &&
-              formatMessage({
+              `${formatMessage({
                 id: 'Message exceeds 5000 characters limit.',
                 defaultMessage: 'Message exceeds 5000 characters limit.'
-              }) + ' '}
+              })} `}
             {replyText.length} / 5000
           </Box>
         )}

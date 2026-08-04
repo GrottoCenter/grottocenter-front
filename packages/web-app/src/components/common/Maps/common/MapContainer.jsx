@@ -171,11 +171,19 @@ const CustomMapContainer = ({
     // Phase 2 (after transition): one invalidateSize({ animate: false }) once size
     //   settles → corrects the geographic center, fires moveend once.
     const observer = new ResizeObserver(() => {
-      try { map.invalidateSize({ animate: false, pan: false }); } catch (e) { /* ignore */ }
+      try {
+        map.invalidateSize({ animate: false, pan: false });
+      } catch (e) {
+        /* ignore */
+      }
       clearTimeout(pendingStabilizeRef.current);
       pendingStabilizeRef.current = setTimeout(() => {
         pendingStabilizeRef.current = null;
-        try { map.invalidateSize({ animate: false }); } catch (e) { /* ignore */ }
+        try {
+          map.invalidateSize({ animate: false });
+        } catch (e) {
+          /* ignore */
+        }
       }, 100);
     });
     observer.observe(container);
@@ -185,13 +193,14 @@ const CustomMapContainer = ({
   }, []);
 
   // Disconnect observer and remove listeners on unmount
-  useEffect(() => {
-    return () => {
+  useEffect(
+    () => () => {
       clearTimeout(pendingStabilizeRef.current);
       observerRef.current?.disconnect();
       mapInstanceRef.current?.off('baselayerchange', baseLayerChange);
-    };
-  }, []);
+    },
+    []
+  );
 
   return (
     <Wrapper $wholePage={wholePage}>

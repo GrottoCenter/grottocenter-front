@@ -71,12 +71,9 @@ const getMultiPolygonCentroid = function (coordinates) {
   };
 };
 
-const calculateBoundsArea = bounds => {
-  return (
-    (bounds.getEast() - bounds.getWest()) *
-    (bounds.getNorth() - bounds.getSouth())
-  );
-};
+const calculateBoundsArea = bounds =>
+  (bounds.getEast() - bounds.getWest()) *
+  (bounds.getNorth() - bounds.getSouth());
 
 const sortByAreaDescending = (a, b) =>
   calculateBoundsArea(b.bounds) - calculateBoundsArea(a.bounds);

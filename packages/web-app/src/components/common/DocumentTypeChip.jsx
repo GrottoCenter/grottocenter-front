@@ -10,7 +10,8 @@ import {
 
 const DocumentTypeChip = ({ type, size = 'small' }) => {
   const { formatMessage } = useIntl();
-  const IconComponent = (type && DOCUMENT_TYPE_ICONS[type]) || DOCUMENT_TYPE_FALLBACK_ICON;
+  const IconComponent =
+    (type && DOCUMENT_TYPE_ICONS[type]) || DOCUMENT_TYPE_FALLBACK_ICON;
   const label = type
     ? formatMessage({ id: type })
     : formatMessage({ id: 'unknown' });

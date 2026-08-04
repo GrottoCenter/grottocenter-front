@@ -3,7 +3,6 @@ import { useIntl } from 'react-intl';
 import { Box, Breadcrumbs, Skeleton, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { useNavigate, useParams } from 'react-router-dom';
-import AppLink from '../../components/common/AppLink';
 import { useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import CreateIcon from '@mui/icons-material/Create';
@@ -12,6 +11,7 @@ import ManageHistoryIcon from '@mui/icons-material/ManageHistory';
 import NewspaperIcon from '@mui/icons-material/Newspaper';
 import ShareIcon from '@mui/icons-material/Share';
 import { NavigateNext } from '@mui/icons-material';
+import AppLink from '../../components/common/AppLink';
 
 import useOpenLink from '../../hooks/useOpenLink';
 import CustomIcon from '../../components/common/CustomIcon';
@@ -358,8 +358,7 @@ const Document = ({
           display: 'flex',
           alignItems: 'center',
           gap: { xs: '4px', md: '6px' }
-        }}
-      >
+        }}>
         <ParentTypeIcon sx={{ fontSize: 'inherit' }} />
         {documentData.parent.title}
       </AppLink>

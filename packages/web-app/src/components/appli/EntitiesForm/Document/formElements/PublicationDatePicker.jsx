@@ -118,10 +118,13 @@ const PublicationDatePicker = ({ required = false, label = null }) => {
             </Translate>
           )}
           {required && (
-            <Box component="span" aria-hidden sx={{
-              color: 'error.main'
-            }}>
-              {'*'}
+            <Box
+              component="span"
+              aria-hidden
+              sx={{
+                color: 'error.main'
+              }}>
+              *
             </Box>
           )}
         </Typography>

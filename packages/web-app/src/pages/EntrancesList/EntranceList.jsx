@@ -76,10 +76,7 @@ const EntrancesList = props => {
       {entrances && entrances.length > 0 ? (
         <StyledList>
           {entrances.map(entrance => (
-            <EntranceListItem
-              key={entrance.id_entrance}
-              entrance={entrance}
-            />
+            <EntranceListItem key={entrance.id_entrance} entrance={entrance} />
           ))}
         </StyledList>
       ) : (
@@ -104,7 +101,7 @@ EntrancesList.propTypes = {
       name_massif: PropTypes.string,
       date_of_update: PropTypes.string
     })
-  ),
+  )
 };
 
 export default EntrancesList;

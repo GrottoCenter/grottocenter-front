@@ -21,9 +21,7 @@ import {
   UNARCHIVE_CONVERSATION_SUCCESS,
   UNARCHIVE_CONVERSATION_FAILURE
 } from '../actions/Messaging/UnarchiveConversation';
-import {
-  SEND_MESSAGE_SUCCESS
-} from '../actions/Messaging/SendMessage';
+import { SEND_MESSAGE_SUCCESS } from '../actions/Messaging/SendMessage';
 import REDUCER_STATUS from './ReducerStatus';
 
 const initialState = {
@@ -84,7 +82,9 @@ const reducer = (state = initialState, action) => {
         }
       };
     case FETCH_CONVERSATIONS: {
-      const listKey = action.isArchived ? 'archivedConversations' : 'activeConversations';
+      const listKey = action.isArchived
+        ? 'archivedConversations'
+        : 'activeConversations';
       return {
         ...state,
         [listKey]: {
@@ -95,7 +95,9 @@ const reducer = (state = initialState, action) => {
       };
     }
     case FETCH_CONVERSATIONS_SUCCESS: {
-      const listKey = action.isArchived ? 'archivedConversations' : 'activeConversations';
+      const listKey = action.isArchived
+        ? 'archivedConversations'
+        : 'activeConversations';
       return {
         ...state,
         [listKey]: {
@@ -107,7 +109,9 @@ const reducer = (state = initialState, action) => {
       };
     }
     case FETCH_CONVERSATIONS_FAILURE: {
-      const listKey = action.isArchived ? 'archivedConversations' : 'activeConversations';
+      const listKey = action.isArchived
+        ? 'archivedConversations'
+        : 'activeConversations';
       return {
         ...state,
         [listKey]: {
@@ -131,10 +135,18 @@ const reducer = (state = initialState, action) => {
       const convId = Number(action.conversationId);
       const skip = action.skip || 0;
 
-      const activeConv = state.activeConversations.items.find(c => c.id === convId);
-      const archivedConv = state.archivedConversations.items.find(c => c.id === convId);
+      const activeConv = state.activeConversations.items.find(
+        c => c.id === convId
+      );
+      const archivedConv = state.archivedConversations.items.find(
+        c => c.id === convId
+      );
 
-      const unreadCountToClear = activeConv ? activeConv.unreadCount : (archivedConv ? archivedConv.unreadCount : 0);
+      const unreadCountToClear = activeConv
+        ? activeConv.unreadCount
+        : archivedConv
+          ? archivedConv.unreadCount
+          : 0;
 
       const activeListItems = state.activeConversations.items.map(c =>
         c.id === convId ? { ...c, unreadCount: 0 } : c
@@ -144,9 +156,10 @@ const reducer = (state = initialState, action) => {
         c.id === convId ? { ...c, unreadCount: 0 } : c
       );
 
-      const newItems = skip > 0
-        ? [...action.messages, ...state.activeConversationMessages.items]
-        : action.messages;
+      const newItems =
+        skip > 0
+          ? [...action.messages, ...state.activeConversationMessages.items]
+          : action.messages;
 
       return {
         ...state,
@@ -166,8 +179,12 @@ const reducer = (state = initialState, action) => {
         },
         unreadCounts: {
           ...state.unreadCounts,
-          active: activeConv ? Math.max(0, state.unreadCounts.active - unreadCountToClear) : state.unreadCounts.active,
-          archived: archivedConv ? Math.max(0, state.unreadCounts.archived - unreadCountToClear) : state.unreadCounts.archived
+          active: activeConv
+            ? Math.max(0, state.unreadCounts.active - unreadCountToClear)
+            : state.unreadCounts.active,
+          archived: archivedConv
+            ? Math.max(0, state.unreadCounts.archived - unreadCountToClear)
+            : state.unreadCounts.archived
         }
       };
     }
@@ -181,13 +198,17 @@ const reducer = (state = initialState, action) => {
         }
       };
     case ARCHIVE_CONVERSATION_SUCCESS: {
-      const removedConv = state.activeConversations.items.find(c => c.id === action.conversationId);
+      const removedConv = state.activeConversations.items.find(
+        c => c.id === action.conversationId
+      );
       const unreadCountToMove = removedConv ? removedConv.unreadCount : 0;
       return {
         ...state,
         activeConversations: {
           ...state.activeConversations,
-          items: state.activeConversations.items.filter(c => c.id !== action.conversationId),
+          items: state.activeConversations.items.filter(
+            c => c.id !== action.conversationId
+          ),
           totalCount: Math.max(0, state.activeConversations.totalCount - 1),
           error: null
         },
@@ -221,24 +242,34 @@ const reducer = (state = initialState, action) => {
         unreadCounts: {
           ...state.unreadCounts,
           active: state.unreadCounts.active + conversation.unreadCount,
-          archived: Math.max(0, state.unreadCounts.archived - conversation.unreadCount)
+          archived: Math.max(
+            0,
+            state.unreadCounts.archived - conversation.unreadCount
+          )
         }
       };
     }
     case UNARCHIVE_CONVERSATION_SUCCESS: {
-      const removedConv = state.archivedConversations.items.find(c => c.id === action.conversationId);
+      const removedConv = state.archivedConversations.items.find(
+        c => c.id === action.conversationId
+      );
       const unreadCountToMove = removedConv ? removedConv.unreadCount : 0;
       return {
         ...state,
         archivedConversations: {
           ...state.archivedConversations,
-          items: state.archivedConversations.items.filter(c => c.id !== action.conversationId),
+          items: state.archivedConversations.items.filter(
+            c => c.id !== action.conversationId
+          ),
           totalCount: Math.max(0, state.archivedConversations.totalCount - 1),
           error: null
         },
         unreadCounts: {
           ...state.unreadCounts,
-          archived: Math.max(0, state.unreadCounts.archived - unreadCountToMove),
+          archived: Math.max(
+            0,
+            state.unreadCounts.archived - unreadCountToMove
+          ),
           active: state.unreadCounts.active + unreadCountToMove
         }
       };
@@ -266,7 +297,10 @@ const reducer = (state = initialState, action) => {
         unreadCounts: {
           ...state.unreadCounts,
           archived: state.unreadCounts.archived + conversation.unreadCount,
-          active: Math.max(0, state.unreadCounts.active - conversation.unreadCount)
+          active: Math.max(
+            0,
+            state.unreadCounts.active - conversation.unreadCount
+          )
         }
       };
     }
@@ -274,7 +308,8 @@ const reducer = (state = initialState, action) => {
       const { message, recipient } = action;
       const convId = Number(message.conversation);
 
-      const currentConversationId = state.activeConversationMessages.items[0]?.conversation;
+      const currentConversationId =
+        state.activeConversationMessages.items[0]?.conversation;
       const isCurrentConversation =
         currentConversationId !== undefined &&
         Number(currentConversationId) === convId;
@@ -297,7 +332,9 @@ const reducer = (state = initialState, action) => {
         return c;
       };
 
-      let activeItems = state.activeConversations.items.map(updateConversationItem);
+      let activeItems = state.activeConversations.items.map(
+        updateConversationItem
+      );
       let newTotalCount = state.activeConversations.totalCount;
 
       const exists = state.activeConversations.items.some(c => c.id === convId);
@@ -314,7 +351,9 @@ const reducer = (state = initialState, action) => {
         newTotalCount += 1;
       }
 
-      const archivedItems = state.archivedConversations.items.map(updateConversationItem);
+      const archivedItems = state.archivedConversations.items.map(
+        updateConversationItem
+      );
 
       return {
         ...state,

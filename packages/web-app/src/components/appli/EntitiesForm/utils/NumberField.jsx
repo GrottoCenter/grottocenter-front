@@ -44,8 +44,7 @@ const NumberField = ({
                   disabled
                     ? { '& img': { filter: 'grayscale(1)', opacity: 0.5 } }
                     : undefined
-                }
-              >
+                }>
                 <CustomIcon type={icon} size={20} />
               </InputAdornment>
             ),

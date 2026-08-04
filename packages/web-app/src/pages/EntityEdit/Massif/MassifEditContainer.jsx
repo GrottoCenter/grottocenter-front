@@ -22,7 +22,11 @@ const MassifEditContainer = ({ isFetching, massif, onCancel }) => {
     <Layout
       title={massif?.name || formatMessage({ id: 'Loading massif data...' })}
       content={
-        isFetching ? <CircularProgress /> : <MassifForm massifValues={massif} onCancel={onCancel} />
+        isFetching ? (
+          <CircularProgress />
+        ) : (
+          <MassifForm massifValues={massif} onCancel={onCancel} />
+        )
       }
     />
   );

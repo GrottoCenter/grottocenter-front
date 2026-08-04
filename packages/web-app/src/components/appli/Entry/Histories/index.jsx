@@ -22,7 +22,8 @@ const Histories = ({ entranceId, histories, isEditAllowed }) => {
   const permissions = usePermissions();
   const dispatch = useDispatch();
   const [isFormVisible, setIsFormVisible] = useState(false);
-  const { movingId, handleMove } = useMoveRelevanceWithUndo(moveHistoryRelevance);
+  const { movingId, handleMove } =
+    useMoveRelevanceWithUndo(moveHistoryRelevance);
 
   const onSubmitForm = data => {
     dispatch(
@@ -37,9 +38,7 @@ const Histories = ({ entranceId, histories, isEditAllowed }) => {
 
   const sortedHistoryItems = useMemo(() => {
     const sorted = sortByRelevance(histories);
-    const activeIds = sorted
-      .filter(h => !h.isDeleted)
-      .map(h => h.id);
+    const activeIds = sorted.filter(h => !h.isDeleted).map(h => h.id);
     return sorted.map(history => (
       <React.Fragment key={history.id}>
         <History
@@ -70,15 +69,13 @@ const Histories = ({ entranceId, histories, isEditAllowed }) => {
               isFormVisible
                 ? formatMessage({ id: 'Cancel adding a new history' })
                 : formatMessage({ id: 'Add a new history' })
-            }
-          >
+            }>
             <Button
               color={isFormVisible ? 'inherit' : 'secondary'}
               size="small"
               variant="outlined"
               onClick={() => setIsFormVisible(!isFormVisible)}
-              startIcon={isFormVisible ? <CancelIcon /> : <AddCircleIcon />}
-            >
+              startIcon={isFormVisible ? <CancelIcon /> : <AddCircleIcon />}>
               {formatMessage({ id: isFormVisible ? 'Cancel' : 'New' })}
             </Button>
           </Tooltip>

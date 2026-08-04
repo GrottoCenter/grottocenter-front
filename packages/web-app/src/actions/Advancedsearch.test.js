@@ -160,9 +160,7 @@ describe('downloadAdvancedSearchResults', () => {
           `http://api/advanced-search/export?format=${format}`,
           expect.any(Object)
         );
-        expect(anchorElement.download).toMatch(
-          new RegExp(`\\.${format}$`)
-        );
+        expect(anchorElement.download).toMatch(new RegExp(`\\.${format}$`));
       }),
       { numRuns: 50 }
     );

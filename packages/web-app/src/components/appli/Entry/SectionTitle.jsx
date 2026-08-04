@@ -3,14 +3,21 @@ import React from 'react';
 import { Typography, Box } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { useIntl } from 'react-intl';
-import AnchorCopyButton, { AnchorHeadingWrapper } from '../../common/AnchorCopyButton';
+import AnchorCopyButton, {
+  AnchorHeadingWrapper
+} from '../../common/AnchorCopyButton';
 import { useAnchorScroll } from '../../../hooks';
 
 const AnchorBox = styled(Box)`
   scroll-margin-top: ${({ theme }) => theme.appBarHeight}px;
 `;
 
-const SectionTitle = ({ title, anchorId, isDeleted = false, marginBottom = 1 }) => {
+const SectionTitle = ({
+  title,
+  anchorId,
+  isDeleted = false,
+  marginBottom = 1
+}) => {
   const { formatMessage } = useIntl();
   useAnchorScroll(anchorId);
 

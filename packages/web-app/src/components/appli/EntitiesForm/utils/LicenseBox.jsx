@@ -31,8 +31,7 @@ const LicenceBox = () => {
         links={licensesODBLink}
         title={formatMessage({
           id: 'The ODBL license applies to all data that is not copyrighted.'
-        })}
-      >
+        })}>
         ODBL
       </InternationalizedLink>
     </LicenceBoxStyle>

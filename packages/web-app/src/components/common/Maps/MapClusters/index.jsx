@@ -10,9 +10,6 @@ import { useMap, useMapEvent } from 'react-leaflet';
 import { useNavigate } from 'react-router-dom';
 import L from 'leaflet';
 
-import DataControl, { layerTypes } from './DataControl';
-import MapTour from './MapTour';
-import GeocodingControl from '../common/GeocodingControl';
 import {
   Box,
   Divider,
@@ -29,6 +26,9 @@ import {
 import { ContentCopy, Tune } from '@mui/icons-material';
 import { useDispatch, useSelector } from 'react-redux';
 import { useIntl } from 'react-intl';
+import GeocodingControl from '../common/GeocodingControl';
+import MapTour from './MapTour';
+import DataControl, { layerTypes } from './DataControl';
 import {
   formatCoordinatesForCopy,
   formatWGS84
@@ -141,9 +141,12 @@ const HydratedMap = ({
     DEFAULT_SELECTED_LAYERS,
     { merge: true }
   );
-  const toggleLayer = useCallback(type => {
-    setSelectedLayers(prev => ({ ...prev, [type]: !prev[type] }));
-  }, [setSelectedLayers]);
+  const toggleLayer = useCallback(
+    type => {
+      setSelectedLayers(prev => ({ ...prev, [type]: !prev[type] }));
+    },
+    [setSelectedLayers]
+  );
   const [activeEntranceFilters, setActiveEntranceFilters] = useLocalStorage(
     'grottocenter_activeEntranceFilters',
     Object.fromEntries(Object.values(CAVE_SIZE).map(size => [size, true])),
@@ -354,10 +357,30 @@ const HydratedMap = ({
   // networks, ...) are stable Redux references that only change when new tile
   // data arrives, so useCluster's kD-tree isn't rebuilt on unrelated renders.
   const clusterConfigs = [
-    { type: 'entrance', layer: layerTypes.ENTRANCES, data: entrances, off: isMarkersMode },
-    { type: 'network', layer: layerTypes.NETWORKS, data: networks, off: isMarkersMode },
-    { type: 'massif', layer: layerTypes.MASSIFS, data: massifs, off: isMassifPolygonMode },
-    { type: 'organization', layer: layerTypes.ORGANIZATIONS, data: organizations, off: isMarkersMode }
+    {
+      type: 'entrance',
+      layer: layerTypes.ENTRANCES,
+      data: entrances,
+      off: isMarkersMode
+    },
+    {
+      type: 'network',
+      layer: layerTypes.NETWORKS,
+      data: networks,
+      off: isMarkersMode
+    },
+    {
+      type: 'massif',
+      layer: layerTypes.MASSIFS,
+      data: massifs,
+      off: isMassifPolygonMode
+    },
+    {
+      type: 'organization',
+      layer: layerTypes.ORGANIZATIONS,
+      data: organizations,
+      off: isMarkersMode
+    }
   ];
 
   return (
@@ -404,7 +427,9 @@ const HydratedMap = ({
         anchorReference="anchorPosition"
         anchorPosition={contextMenuAnchor}
         PaperProps={{ sx: { minWidth: 260 } }}>
-        <ListSubheader disableSticky sx={{ lineHeight: '32px', fontWeight: 'bold' }}>
+        <ListSubheader
+          disableSticky
+          sx={{ lineHeight: '32px', fontWeight: 'bold' }}>
           {`${formatMessage({ id: 'Point coordinates' })} (${getCRSLabel(preferred, projections)})`}
         </ListSubheader>
         <Box
@@ -465,7 +490,14 @@ const MAP_TOUR_SESSION_KEY = `mapTourSeenThisSession_v${MAP_TOUR_VERSION}`;
 // Set VITE_DISABLE_MAP_TOUR=true in .env.local to prevent the tour from launching in dev.
 const MAP_TOUR_DISABLED = import.meta.env.VITE_DISABLE_MAP_TOUR === 'true';
 
-const Index = ({ center, zoom, isSideMenuOpen, mapRef, popupTarget = null, ...props }) => {
+const Index = ({
+  center,
+  zoom,
+  isSideMenuOpen,
+  mapRef,
+  popupTarget = null,
+  ...props
+}) => {
   const [runTour, setRunTour] = useState(
     () =>
       !MAP_TOUR_DISABLED &&

@@ -22,9 +22,10 @@ const FormActions = ({
       color="primary"
       disabled={disabled || loading}
       onClick={onConfirm}
-      startIcon={loading ? <CircularProgress size={18} color="inherit" /> : null}
-      sx={{ width: { xs: '100%', sm: 'auto' } }}
-    >
+      startIcon={
+        loading ? <CircularProgress size={18} color="inherit" /> : null
+      }
+      sx={{ width: { xs: '100%', sm: 'auto' } }}>
       {confirmLabel}
     </Button>
   );
@@ -37,14 +38,12 @@ const FormActions = ({
         flexDirection: { xs: 'column-reverse', sm: 'row' },
         justifyContent: { sm: 'flex-end' },
         gap: 1
-      }}
-    >
+      }}>
       <Button
         variant="outlined"
         onClick={onCancel}
         disabled={loading}
-        sx={{ width: { xs: '100%', sm: 'auto' } }}
-      >
+        sx={{ width: { xs: '100%', sm: 'auto' } }}>
         {formatMessage({ id: 'Cancel' })}
       </Button>
       {confirmTooltip ? (

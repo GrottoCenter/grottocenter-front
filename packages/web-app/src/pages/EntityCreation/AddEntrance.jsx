@@ -23,7 +23,12 @@ const AddEntrance = () => {
     <Layout
       icon={<EntityIcon iconType="entrance" />}
       title={formatMessage({ id: 'Add an entrance' })}
-      content={<EntranceForm entranceValues={entranceValues} onCancel={() => navigate(-1)} />}
+      content={
+        <EntranceForm
+          entranceValues={entranceValues}
+          onCancel={() => navigate(-1)}
+        />
+      }
     />
   );
 };

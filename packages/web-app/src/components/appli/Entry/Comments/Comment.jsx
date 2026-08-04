@@ -32,7 +32,16 @@ const StyledRatings = styled(Ratings)`
   gap: ${({ theme }) => theme.spacing(1)};
 `;
 
-const Comment = ({ comment, entranceId, isEditAllowed, isMoving, onMoveUp, onMoveDown, isFirst, isLast }) => {
+const Comment = ({
+  comment,
+  entranceId,
+  isEditAllowed,
+  isMoving,
+  onMoveUp,
+  onMoveDown,
+  isFirst,
+  isLast
+}) => {
   const dispatch = useDispatch();
   const { formatMessage } = useIntl();
   const permissions = usePermissions();
@@ -90,7 +99,12 @@ const Comment = ({ comment, entranceId, isEditAllowed, isMoving, onMoveUp, onMov
           canEdit={isEditAllowed && permissions.isAuth && canEdit}
           canDelete={isEditAllowed && permissions.isModerator}
           snapshotEl={
-            <SnapshotButton id={comment.id} type="comments" parentId={entranceId} parentType="entrances" />
+            <SnapshotButton
+              id={comment.id}
+              type="comments"
+              parentId={entranceId}
+              parentType="entrances"
+            />
           }
           onDeletePress={onDeletePress}
           onRestorePress={onRestorePress}
@@ -138,11 +152,21 @@ const Comment = ({ comment, entranceId, isEditAllowed, isMoving, onMoveUp, onMov
               />
             }
           />
-          {(comment.aestheticism || comment.caving || comment.approach ||
+          {(comment.aestheticism ||
+            comment.caving ||
+            comment.approach ||
             comment.eTTrail?.length > 0 ||
             comment.eTUnderground?.length > 0) && (
-            <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 0.5, pt: 0.5 }}>
-              {(comment.eTTrail?.length > 0 || comment.eTUnderground?.length > 0) && (
+            <Box
+              sx={{
+                display: 'flex',
+                flexWrap: 'wrap',
+                alignItems: 'center',
+                gap: 0.5,
+                pt: 0.5
+              }}>
+              {(comment.eTTrail?.length > 0 ||
+                comment.eTUnderground?.length > 0) && (
                 <Box sx={{ display: 'flex', gap: 1 }}>
                   {comment.eTTrail?.length > 0 && (
                     <Duration
@@ -171,9 +195,16 @@ const Comment = ({ comment, entranceId, isEditAllowed, isMoving, onMoveUp, onMov
             </Box>
           )}
           {(comment.author || comment.reviewer || comment.language) && (
-            <Typography variant="caption" color="text.secondary" component="div">
+            <Typography
+              variant="caption"
+              color="text.secondary"
+              component="div">
               {comment.author && (
-                <AuthorAndDate author={comment.author} date={comment.dateInscription} textColor="inherit" />
+                <AuthorAndDate
+                  author={comment.author}
+                  date={comment.dateInscription}
+                  textColor="inherit"
+                />
               )}
               {comment.author && comment.reviewer && ' · '}
               {comment.reviewer && (
@@ -184,7 +215,9 @@ const Comment = ({ comment, entranceId, isEditAllowed, isMoving, onMoveUp, onMov
                   textColor="inherit"
                 />
               )}
-              {(comment.author || comment.reviewer) && comment.language && ' · '}
+              {(comment.author || comment.reviewer) &&
+                comment.language &&
+                ' · '}
               {comment.language &&
                 `${formatMessage({ id: 'Language' })} : ${comment.language.toUpperCase()}`}
             </Typography>

@@ -40,11 +40,25 @@ vi.mock('../components/SubstanceAutocomplete', () => {
   return {
     __esModule: true,
     default: ({ value, onChange }) =>
-      React.createElement('div', { 'data-testid': 'sensor-config-substance' },
-        React.createElement('button', {
-          'data-testid': 'substance-select-button',
-          onClick: () => onChange({ id: 1, name: 'Nitrate', formula: 'NO₃⁻', casNumber: null, externalId: '943', externalSource: 'PubChem' })
-        }, value ? value.name : 'Select substance')
+      React.createElement(
+        'div',
+        { 'data-testid': 'sensor-config-substance' },
+        React.createElement(
+          'button',
+          {
+            'data-testid': 'substance-select-button',
+            onClick: () =>
+              onChange({
+                id: 1,
+                name: 'Nitrate',
+                formula: 'NO₃⁻',
+                casNumber: null,
+                externalId: '943',
+                externalSource: 'PubChem'
+              })
+          },
+          value ? value.name : 'Select substance'
+        )
       )
   };
 });
@@ -54,15 +68,13 @@ const messages = {
     'Add sensor configuration',
   'ImportObservationsWizard.DeviceSensorsStep.addSensorConfig':
     'Add configuration',
-  'ImportObservationsWizard.DeviceSensorsStep.sensorConfigLabel':
-    'Label',
+  'ImportObservationsWizard.DeviceSensorsStep.sensorConfigLabel': 'Label',
   'ImportObservationsWizard.DeviceSensorsStep.quantityKind': 'Quantity kind',
   'ImportObservationsWizard.DeviceSensorsStep.unit': 'Unit',
   'ImportObservationsWizard.DeviceSensorsStep.substance': 'Substance',
   'ImportObservationsWizard.DeviceSensorsStep.substancePlaceholder':
     'Search substance...',
-  'ImportObservationsWizard.DeviceSensorsStep.substanceNoResults':
-    'No results',
+  'ImportObservationsWizard.DeviceSensorsStep.substanceNoResults': 'No results',
   'ImportObservationsWizard.DeviceSensorsStep.substanceViaPubChem':
     'via PubChem',
   'ImportObservationsWizard.DeviceSensorsStep.substanceSearchHint':
@@ -238,9 +250,7 @@ describe('SensorConfigForm', () => {
 
       await waitFor(() => {
         expect(
-          screen.getByText(
-            'Precision lower must be \u2264 precision upper'
-          )
+          screen.getByText('Precision lower must be \u2264 precision upper')
         ).toBeInTheDocument();
       });
     });
@@ -346,9 +356,7 @@ describe('SensorConfigForm', () => {
           screen.getByTestId('sensor-config-form-error')
         ).toBeInTheDocument();
         expect(
-          screen.getByText(
-            'Failed to create sensor configuration.'
-          )
+          screen.getByText('Failed to create sensor configuration.')
         ).toBeInTheDocument();
       });
     });
@@ -367,9 +375,7 @@ describe('SensorConfigForm', () => {
       renderComponent();
       selectQuantityKind('Concentration');
 
-      expect(
-        screen.getByTestId('sensor-config-substance')
-      ).toBeInTheDocument();
+      expect(screen.getByTestId('sensor-config-substance')).toBeInTheDocument();
     });
 
     it('hides substance field when Temperature (id 1) is selected', () => {

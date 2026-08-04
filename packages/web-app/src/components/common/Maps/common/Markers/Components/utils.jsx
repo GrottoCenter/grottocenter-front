@@ -20,11 +20,7 @@ export const Information = ({ icon, value, url, isTitle = false }) => (
       variant={isTitle ? 'subtitle1' : 'body2'}
       className={isTitle ? 'map-popup-title' : undefined}>
       {!url && value}
-      {url && (
-        <AppLink to={url}>
-          {value}
-        </AppLink>
-      )}
+      {url && <AppLink to={url}>{value}</AppLink>}
     </Typography>
   </div>
 );

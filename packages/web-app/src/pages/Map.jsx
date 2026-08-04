@@ -1,6 +1,18 @@
-import React, { useCallback, useEffect, useRef, Suspense, useState, useMemo } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useRef,
+  Suspense,
+  useState,
+  useMemo
+} from 'react';
 import { includes } from 'ramda';
-import { useNavigate, generatePath, useParams, useSearchParams } from 'react-router-dom';
+import {
+  useNavigate,
+  generatePath,
+  useParams,
+  useSearchParams
+} from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import PageLoader from '../components/common/PageLoader';
 
@@ -30,7 +42,12 @@ function getSavedPosition() {
     const saved = localStorage.getItem(MAP_POSITION_KEY);
     if (!saved) return null;
     const { lat, lng, zoom } = JSON.parse(saved);
-    if (typeof lat !== 'number' || typeof lng !== 'number' || typeof zoom !== 'number') return null;
+    if (
+      typeof lat !== 'number' ||
+      typeof lng !== 'number' ||
+      typeof zoom !== 'number'
+    )
+      return null;
     return { lat, lng, zoom };
   } catch {
     return null;
@@ -39,7 +56,10 @@ function getSavedPosition() {
 
 function savePosition(center, zoom) {
   try {
-    localStorage.setItem(MAP_POSITION_KEY, JSON.stringify({ lat: center.lat, lng: center.lng, zoom }));
+    localStorage.setItem(
+      MAP_POSITION_KEY,
+      JSON.stringify({ lat: center.lat, lng: center.lng, zoom })
+    );
   } catch {
     // ignore quota or private-mode errors
   }
@@ -76,13 +96,19 @@ const Map = () => {
   const { location: geoLocation, hasLocation } = useGeolocation();
   const mapRef = useRef(null);
   const { current: initialTarget } = useRef(decodeMapTarget(params.target));
-  const { current: savedPosition } = useRef(!initialTarget ? getSavedPosition() : null);
+  const { current: savedPosition } = useRef(
+    !initialTarget ? getSavedPosition() : null
+  );
   const [location, setLocation] = useState(() => {
-    if (initialTarget) return { lat: initialTarget.lat, lng: initialTarget.lng };
-    if (savedPosition) return { lat: savedPosition.lat, lng: savedPosition.lng };
+    if (initialTarget)
+      return { lat: initialTarget.lat, lng: initialTarget.lng };
+    if (savedPosition)
+      return { lat: savedPosition.lat, lng: savedPosition.lng };
     return defaultCoord;
   });
-  const { current: zoom } = useRef(initialTarget?.zoom ?? savedPosition?.zoom ?? defaultZoom);
+  const { current: zoom } = useRef(
+    initialTarget?.zoom ?? savedPosition?.zoom ?? defaultZoom
+  );
   const networks = useSelector(state => state.map.networks);
   const networksCoordinates = useSelector(
     state => state.map.networksCoordinates
@@ -103,51 +129,55 @@ const Map = () => {
   // Leaflet always handles the visual movement immediately on its own.
   const urlDebounceRef = useRef(null);
 
-  const handleUpdate = useCallback(({ markers, showMassifPolygons, zoom: newZoom, center, bounds }) => {
-    const criteria = {
-      /* eslint-disable no-underscore-dangle */
-      sw_lat: bounds._southWest.wrap().lat,
-      sw_lng: bounds._southWest.wrap().lng,
-      ne_lat: bounds._northEast.wrap().lat,
-      ne_lng: bounds._northEast.wrap().lng,
-      /* eslint-enable no-underscore-dangle */
-      zoom: newZoom
-    };
-    if (includes('organizations', markers)) {
-      dispatch(fetchOrganizations(criteria));
-    }
-    if (includes('networks', markers)) {
-      dispatch(fetchNetworks(criteria));
-    }
-    if (includes('entrances', markers)) {
-      dispatch(fetchEntrances(criteria));
-    }
-    if (showMassifPolygons) {
-      dispatch(fetchMassifs(criteria));
-    }
+  const handleUpdate = useCallback(
+    ({ markers, showMassifPolygons, zoom: newZoom, center, bounds }) => {
+      const criteria = {
+        /* eslint-disable no-underscore-dangle */
+        sw_lat: bounds._southWest.wrap().lat,
+        sw_lng: bounds._southWest.wrap().lng,
+        ne_lat: bounds._northEast.wrap().lat,
+        ne_lng: bounds._northEast.wrap().lng,
+        /* eslint-enable no-underscore-dangle */
+        zoom: newZoom
+      };
+      if (includes('organizations', markers)) {
+        dispatch(fetchOrganizations(criteria));
+      }
+      if (includes('networks', markers)) {
+        dispatch(fetchNetworks(criteria));
+      }
+      if (includes('entrances', markers)) {
+        dispatch(fetchEntrances(criteria));
+      }
+      if (showMassifPolygons) {
+        dispatch(fetchMassifs(criteria));
+      }
 
-    if (center.lat !== defaultCoord.lat || center.lng !== defaultCoord.lng) {
-      savePosition(center, newZoom);
-    }
+      if (center.lat !== defaultCoord.lat || center.lng !== defaultCoord.lng) {
+        savePosition(center, newZoom);
+      }
 
-    // Update the shareable URL after the user has settled
-    if (urlDebounceRef.current) clearTimeout(urlDebounceRef.current);
-    urlDebounceRef.current = setTimeout(() => {
-      urlDebounceRef.current = null;
-      navigate(
-        generatePath('/ui/map/:target', {
-          target: encodeMapTarget(center, newZoom)
-        }),
-        { replace: true }
-      );
-    }, 1000);
-  }, [dispatch, navigate]);
-
-  useEffect(() => {
-    return () => {
+      // Update the shareable URL after the user has settled
       if (urlDebounceRef.current) clearTimeout(urlDebounceRef.current);
-    };
-  }, []);
+      urlDebounceRef.current = setTimeout(() => {
+        urlDebounceRef.current = null;
+        navigate(
+          generatePath('/ui/map/:target', {
+            target: encodeMapTarget(center, newZoom)
+          }),
+          { replace: true }
+        );
+      }, 1000);
+    },
+    [dispatch, navigate]
+  );
+
+  useEffect(
+    () => () => {
+      if (urlDebounceRef.current) clearTimeout(urlDebounceRef.current);
+    },
+    []
+  );
 
   useEffect(() => {
     dispatch(fetchProjections());
@@ -161,7 +191,11 @@ const Map = () => {
   // When there is no URL target and no saved position, fall back to geolocation once available.
   const initialTargetRef = useRef(params.target);
   useEffect(() => {
-    if (!decodeMapTarget(initialTargetRef.current) && !savedPosition && geoLocation) {
+    if (
+      !decodeMapTarget(initialTargetRef.current) &&
+      !savedPosition &&
+      geoLocation
+    ) {
       setLocation(geoLocation);
     }
   }, [geoLocation, savedPosition]);
@@ -173,7 +207,12 @@ const Map = () => {
       target?.lng === defaultCoord.lng &&
       target?.zoom === defaultZoom;
 
-    if (hasLocation && !savedPosition && (!params.target || isDefaultTarget) && mapRef.current) {
+    if (
+      hasLocation &&
+      !savedPosition &&
+      (!params.target || isDefaultTarget) &&
+      mapRef.current
+    ) {
       mapRef.current.setView([geoLocation.lat, geoLocation.lng], focusZoom);
     }
   }, [hasLocation, geoLocation, params.target, savedPosition]);

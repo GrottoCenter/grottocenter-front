@@ -16,16 +16,16 @@ const entitiesArb = fc.array(entityArb, { minLength: 0, maxLength: 50 });
 describe('Property 1: Relevance sort invariant', () => {
   it('entities with defined relevance appear before those without', () => {
     fc.assert(
-      fc.property(entitiesArb, (entities) => {
+      fc.property(entitiesArb, entities => {
         const sorted = sortByRelevance(entities);
         const firstUndefinedIdx = sorted.findIndex(
-          (e) => e.relevance === undefined
+          e => e.relevance === undefined
         );
         if (firstUndefinedIdx === -1) return true;
         // Every item after the first undefined must also be undefined
-        return sorted.slice(firstUndefinedIdx).every(
-          (e) => e.relevance === undefined
-        );
+        return sorted
+          .slice(firstUndefinedIdx)
+          .every(e => e.relevance === undefined);
       }),
       { numRuns: 100 }
     );
@@ -33,11 +33,9 @@ describe('Property 1: Relevance sort invariant', () => {
 
   it('entities with defined relevance are in ascending order', () => {
     fc.assert(
-      fc.property(entitiesArb, (entities) => {
+      fc.property(entitiesArb, entities => {
         const sorted = sortByRelevance(entities);
-        const withRelevance = sorted.filter(
-          (e) => e.relevance !== undefined
-        );
+        const withRelevance = sorted.filter(e => e.relevance !== undefined);
         for (let i = 1; i < withRelevance.length; i++) {
           if (withRelevance[i].relevance < withRelevance[i - 1].relevance) {
             return false;
@@ -51,7 +49,7 @@ describe('Property 1: Relevance sort invariant', () => {
 
   it('entities with equal relevance preserve original relative order (stable)', () => {
     fc.assert(
-      fc.property(entitiesArb, (entities) => {
+      fc.property(entitiesArb, entities => {
         // Tag each entity with its original index for tracking
         const tagged = entities.map((e, i) => ({ ...e, _origIdx: i }));
         const sorted = sortByRelevance(tagged);
@@ -59,7 +57,8 @@ describe('Property 1: Relevance sort invariant', () => {
         // Group by relevance value (including undefined)
         const groups = new Map();
         for (const item of sorted) {
-          const key = item.relevance === undefined ? '__undef__' : item.relevance;
+          const key =
+            item.relevance === undefined ? '__undef__' : item.relevance;
           if (!groups.has(key)) groups.set(key, []);
           groups.get(key).push(item);
         }

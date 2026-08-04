@@ -2,12 +2,13 @@ import React, { useState, useMemo } from 'react';
 import { useDispatch } from 'react-redux';
 import PropTypes from 'prop-types';
 
+import { useIntl } from 'react-intl';
+import DataUsageIcon from '@mui/icons-material/DataUsage';
 import {
   fetchAdvancedSearchResults,
   resetAdvancedSearchResults
 } from '../../../actions/Advancedsearch';
 import SearchInput from '../../common/SearchInput';
-import { useIntl } from 'react-intl';
 
 import useSearchFilter from '../../../hooks/useSearchFilter';
 import {
@@ -28,7 +29,6 @@ import {
 import { ADVANCED_SEARCH_TYPES } from '../../../conf/config';
 import { getStoredRowsPerPage } from '../../common/EntityTable';
 import CustomIcon from '../../common/CustomIcon';
-import DataUsageIcon from '@mui/icons-material/DataUsage';
 
 const lengthMarks = [
   { value: 0, scaledValue: 0, label: '0' },
@@ -92,7 +92,11 @@ const initialFilterState = {
   dataQuality: null
 };
 
-const EntrancesSearch = ({ initialFilter = {}, lockedFilter = [], valueLabels = {} }) => {
+const EntrancesSearch = ({
+  initialFilter = {},
+  lockedFilter = [],
+  valueLabels = {}
+}) => {
   const dispatch = useDispatch();
 
   const mergedInitialState = useMemo(
@@ -158,7 +162,9 @@ const EntrancesSearch = ({ initialFilter = {}, lockedFilter = [], valueLabels = 
         filterCount={advancedFilterCount}
         expanded={advancedExpanded}
         onExpandedChange={setAdvancedExpanded}>
-        <SearchFieldset title="Localization" containerSx={{ justifyContent: 'flex-start' }}>
+        <SearchFieldset
+          title="Localization"
+          containerSx={{ justifyContent: 'flex-start' }}>
           {!lockedFilter.includes('country') && (
             <SearchTextAutocomplete
               ressourceType={searchEntity}
@@ -169,30 +175,31 @@ const EntrancesSearch = ({ initialFilter = {}, lockedFilter = [], valueLabels = 
               value={filterState.country}
             />
           )}
-          {!lockedFilter.includes('massifs.name') && !lockedFilter.includes('massifs.id') && (
-            <SearchTextAutocomplete
-              ressourceType={searchEntity}
-              ressourceField="massifs.name"
-              ressourceFilter={matchAllFields ? filterState : {}}
-              label="Massif"
-              onChange={e => updateFilter('massifs.name', e)}
-              value={filterState['massifs.name']}
-            />
-          )}
+          {!lockedFilter.includes('massifs.name') &&
+            !lockedFilter.includes('massifs.id') && (
+              <SearchTextAutocomplete
+                ressourceType={searchEntity}
+                ressourceField="massifs.name"
+                ressourceFilter={matchAllFields ? filterState : {}}
+                label="Massif"
+                onChange={e => updateFilter('massifs.name', e)}
+                value={filterState['massifs.name']}
+              />
+            )}
           {/* Hide the Region field when iso3166 is locked: the subdivision is already fixed via the
               ISO code, so the freeform region autocomplete would be redundant and confusing. */}
           {!lockedFilter.includes('region') &&
             !lockedFilter.includes('county') &&
             !lockedFilter.includes('iso3166') && (
-            <SearchTextAutocomplete
-              ressourceType={searchEntity}
-              ressourceField="region"
-              ressourceFilter={matchAllFields ? filterState : {}}
-              label="Region"
-              onChange={e => updateFilter('region', e)}
-              value={filterState.region}
-            />
-          )}
+              <SearchTextAutocomplete
+                ressourceType={searchEntity}
+                ressourceField="region"
+                ressourceFilter={matchAllFields ? filterState : {}}
+                label="Region"
+                onChange={e => updateFilter('region', e)}
+                value={filterState.region}
+              />
+            )}
           {!lockedFilter.includes('county') && (
             <SearchTextAutocomplete
               ressourceType={searchEntity}

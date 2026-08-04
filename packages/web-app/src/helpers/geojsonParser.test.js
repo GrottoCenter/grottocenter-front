@@ -67,16 +67,22 @@ const validPolygonGeometryArb = polygonCoordsArb.map(coords => ({
 
 /** A MultiPolygon geometry mixing valid and empty polygons. */
 const multiPolygonGeometryArb = fc
-  .array(
-    fc.oneof(polygonCoordsArb, polygonCoordsArb, emptyPolygonCoordsArb),
-    { minLength: 1, maxLength: 6 }
-  )
+  .array(fc.oneof(polygonCoordsArb, polygonCoordsArb, emptyPolygonCoordsArb), {
+    minLength: 1,
+    maxLength: 6
+  })
   .map(polys => ({ type: 'MultiPolygon', coordinates: polys }));
 
 /** Unsupported geometry types that the parser should ignore. */
 const unsupportedGeometryArb = fc.constantFrom(
   { type: 'Point', coordinates: [0, 0] },
-  { type: 'LineString', coordinates: [[0, 0], [1, 1]] },
+  {
+    type: 'LineString',
+    coordinates: [
+      [0, 0],
+      [1, 1]
+    ]
+  },
   { type: 'GeometryCollection', geometries: [] }
 );
 
@@ -99,11 +105,7 @@ const degenerateGeometryArb = fc.constantFrom(
 
 /** Count how many polygons in a geometry have a non-empty first ring. */
 function countValidPolygons(geometry) {
-  if (
-    !geometry ||
-    !geometry.coordinates ||
-    geometry.coordinates.length === 0
-  ) {
+  if (!geometry || !geometry.coordinates || geometry.coordinates.length === 0) {
     return 0;
   }
   if (geometry.type === 'Polygon') {
@@ -112,9 +114,7 @@ function countValidPolygons(geometry) {
       : 0;
   }
   if (geometry.type === 'MultiPolygon') {
-    return geometry.coordinates.filter(
-      p => p[0] && p[0].length > 0
-    ).length;
+    return geometry.coordinates.filter(p => p[0] && p[0].length > 0).length;
   }
   return 0;
 }

@@ -20,7 +20,7 @@ export const resolveRows = (rows, mappings) => {
     // The UI prevents this, but guard here for safety.
     if (colIndex === 0) continue; // eslint-disable-line no-continue
     for (const row of resolved) {
-      row[colIndex - 1] = (row[colIndex - 1] ?? '') + '.' + (row[colIndex] ?? '');
+      row[colIndex - 1] = `${row[colIndex - 1] ?? ''}.${row[colIndex] ?? ''}`;
       row[colIndex] = null;
     }
   }

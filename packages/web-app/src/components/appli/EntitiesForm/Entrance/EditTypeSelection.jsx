@@ -32,8 +32,7 @@ const EditTypeSelection = ({
             <NameSuggestionDropdown
               control={control}
               formKey="cave.name"
-              enabled={isNewEntrance}
-            >
+              enabled={isNewEntrance}>
               <InputText
                 formKey="cave.name"
                 labelName="Entrance name"
@@ -59,8 +58,7 @@ const EditTypeSelection = ({
             <NameSuggestionDropdown
               control={control}
               formKey="entrance.name"
-              enabled={isNewEntrance}
-            >
+              enabled={isNewEntrance}>
               <InputText
                 formKey="entrance.name"
                 labelName="Entrance name"

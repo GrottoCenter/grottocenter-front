@@ -24,7 +24,10 @@ import MuiLink from '@mui/material/Link';
 // be able to weaken the new-tab security defaults (`noopener noreferrer`) by
 // accident.
 const AppLink = React.forwardRef(
-  ({ to = null, href = null, openInNewTabDesktop = false, children, ...rest }, ref) => {
+  (
+    { to = null, href = null, openInNewTabDesktop = false, children, ...rest },
+    ref
+  ) => {
     if (href != null) {
       return (
         <MuiLink

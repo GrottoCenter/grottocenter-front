@@ -21,26 +21,17 @@ describe('detectSamplingInterval', () => {
 
   describe('exactly 2 timestamps returns their gap in seconds', () => {
     it('returns 60 for two timestamps 60 seconds apart', () => {
-      const timestamps = [
-        '2024-01-01T00:00:00Z',
-        '2024-01-01T00:01:00Z'
-      ];
+      const timestamps = ['2024-01-01T00:00:00Z', '2024-01-01T00:01:00Z'];
       expect(detectSamplingInterval(timestamps)).toBe(60);
     });
 
     it('returns 3600 for two timestamps 1 hour apart', () => {
-      const timestamps = [
-        '2024-01-01T00:00:00Z',
-        '2024-01-01T01:00:00Z'
-      ];
+      const timestamps = ['2024-01-01T00:00:00Z', '2024-01-01T01:00:00Z'];
       expect(detectSamplingInterval(timestamps)).toBe(3600);
     });
 
     it('returns correct gap regardless of input order', () => {
-      const timestamps = [
-        '2024-01-01T01:00:00Z',
-        '2024-01-01T00:00:00Z'
-      ];
+      const timestamps = ['2024-01-01T01:00:00Z', '2024-01-01T00:00:00Z'];
       expect(detectSamplingInterval(timestamps)).toBe(3600);
     });
   });

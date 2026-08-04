@@ -3,10 +3,7 @@ import PropTypes from 'prop-types';
 import { styled } from '@mui/material/styles';
 import { useIntl } from 'react-intl';
 import { isEmpty, pathOr } from 'ramda';
-import {
-  timeToGoIcon,
-  undergroundTimeIcon
-} from '../../../../../assets/icons';
+import { timeToGoIcon, undergroundTimeIcon } from '../../../../../assets/icons';
 
 import Ratings from '../../Ratings';
 import Duration from '../../../../common/Properties/Duration';

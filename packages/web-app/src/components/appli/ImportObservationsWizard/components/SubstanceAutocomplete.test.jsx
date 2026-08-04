@@ -1,5 +1,11 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
+import {
+  render,
+  screen,
+  fireEvent,
+  waitFor,
+  act
+} from '@testing-library/react';
 import { IntlProvider } from 'react-intl';
 import { Provider } from 'react-redux';
 
@@ -26,8 +32,7 @@ const messages = {
   'ImportObservationsWizard.DeviceSensorsStep.substance': 'Substance',
   'ImportObservationsWizard.DeviceSensorsStep.substancePlaceholder':
     'Search substance...',
-  'ImportObservationsWizard.DeviceSensorsStep.substanceNoResults':
-    'No results',
+  'ImportObservationsWizard.DeviceSensorsStep.substanceNoResults': 'No results',
   'ImportObservationsWizard.DeviceSensorsStep.substanceViaPubChem':
     'via PubChem',
   'ImportObservationsWizard.DeviceSensorsStep.substanceSearchHint':
@@ -54,11 +59,7 @@ const renderComponent = (props = {}) =>
   render(
     <Provider store={mockStore}>
       <IntlProvider locale="en" messages={messages}>
-        <SubstanceAutocomplete
-          value={null}
-          onChange={vi.fn()}
-          {...props}
-        />
+        <SubstanceAutocomplete value={null} onChange={vi.fn()} {...props} />
       </IntlProvider>
     </Provider>
   );
@@ -104,7 +105,14 @@ describe('SubstanceAutocomplete', () => {
 
   it('calls searchSubstances when input has 2+ characters', async () => {
     mockSearchResults.__resolveWith = [
-      { id: 1, name: 'Nitrate', formula: 'NO₃⁻', casNumber: null, externalId: '943', externalSource: 'PubChem' }
+      {
+        id: 1,
+        name: 'Nitrate',
+        formula: 'NO₃⁻',
+        casNumber: null,
+        externalId: '943',
+        externalSource: 'PubChem'
+      }
     ];
 
     renderComponent();
@@ -121,8 +129,22 @@ describe('SubstanceAutocomplete', () => {
 
   it('displays options after search resolves', async () => {
     mockSearchResults.__resolveWith = [
-      { id: 1, name: 'Nitrate', formula: 'NO₃⁻', casNumber: null, externalId: '943', externalSource: 'PubChem' },
-      { id: 2, name: 'Nitrite', formula: 'NO₂⁻', casNumber: null, externalId: null, externalSource: null }
+      {
+        id: 1,
+        name: 'Nitrate',
+        formula: 'NO₃⁻',
+        casNumber: null,
+        externalId: '943',
+        externalSource: 'PubChem'
+      },
+      {
+        id: 2,
+        name: 'Nitrite',
+        formula: 'NO₂⁻',
+        casNumber: null,
+        externalId: null,
+        externalSource: null
+      }
     ];
 
     renderComponent();
@@ -140,7 +162,14 @@ describe('SubstanceAutocomplete', () => {
 
   it('shows "via PubChem" for results with id null', async () => {
     mockSearchResults.__resolveWith = [
-      { id: null, name: 'Nitramine', formula: 'CH3N3O2', casNumber: null, externalId: '12345', externalSource: 'PubChem' }
+      {
+        id: null,
+        name: 'Nitramine',
+        formula: 'CH3N3O2',
+        casNumber: null,
+        externalId: '12345',
+        externalSource: 'PubChem'
+      }
     ];
 
     renderComponent();
@@ -172,7 +201,14 @@ describe('SubstanceAutocomplete', () => {
 
   it('calls onChange when user selects an option', async () => {
     const onChange = vi.fn();
-    const substance = { id: 1, name: 'Nitrate', formula: 'NO₃⁻', casNumber: null, externalId: '943', externalSource: 'PubChem' };
+    const substance = {
+      id: 1,
+      name: 'Nitrate',
+      formula: 'NO₃⁻',
+      casNumber: null,
+      externalId: '943',
+      externalSource: 'PubChem'
+    };
     mockSearchResults.__resolveWith = [substance];
 
     renderComponent({ onChange });

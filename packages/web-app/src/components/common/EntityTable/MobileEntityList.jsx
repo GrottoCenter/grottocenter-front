@@ -1,6 +1,5 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
-import AppLink from '../AppLink';
 import {
   Box,
   Button,
@@ -15,6 +14,7 @@ import {
 } from '@mui/material';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import SearchOffIcon from '@mui/icons-material/SearchOff';
+import AppLink from '../AppLink';
 import Translate from '../Translate';
 
 const MobileEntityCard = React.memo(
@@ -66,10 +66,11 @@ const MobileEntityCard = React.memo(
                 alignItems: 'center',
                 justifyContent: 'space-between'
               }}>
-              <Box sx={{
-                display: 'flex',
-                alignItems: 'center'
-              }}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center'
+                }}>
                 {onToggle && (
                   <Checkbox
                     checked={selected}
@@ -104,10 +105,11 @@ const MobileEntityCard = React.memo(
             </Box>
             <Divider />
             {bodyColumns.length > 0 && (
-              <Box sx={{
-                display: 'flex',
-                flexDirection: 'column'
-              }}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'column'
+                }}>
                 {bodyColumns.map(col => {
                   const value = renderCellFn(doc, col.field, col.render);
                   const isMissing = value === '-';

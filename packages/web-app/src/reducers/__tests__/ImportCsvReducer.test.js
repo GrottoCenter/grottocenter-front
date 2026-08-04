@@ -42,7 +42,11 @@ describe('ImportCsvReducer', () => {
   });
 
   it('handles CHECK_ROWS_SUCCESS and CHECK_ROWS_FAILURE', () => {
-    const result = { willBeCreated: [], willBeCreatedAsDuplicates: [], wontBeCreated: [] };
+    const result = {
+      willBeCreated: [],
+      willBeCreatedAsDuplicates: [],
+      wontBeCreated: []
+    };
     const successState = reducer(initialState, {
       type: CHECK_ROWS_SUCCESS,
       result
@@ -108,7 +112,11 @@ describe('ImportCsvReducer', () => {
         failures: 0
       };
       const result = {
-        reportUrls: { success: 'url-success', duplicates: 'url-dup', failures: null },
+        reportUrls: {
+          success: 'url-success',
+          duplicates: 'url-dup',
+          failures: null
+        },
         summary: { successes: 1700, duplicates: 300, failures: 0 }
       };
       const successState = reducer(progressState, {

@@ -15,7 +15,10 @@ const meta = {
 export default meta;
 
 export const InternalSameTab = {
-  args: { to: '/ui/entrances/42', children: 'Internal link (same tab on desktop)' }
+  args: {
+    to: '/ui/entrances/42',
+    children: 'Internal link (same tab on desktop)'
+  }
 };
 
 export const InternalNewTabDesktop = {

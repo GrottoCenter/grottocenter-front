@@ -14,7 +14,10 @@ const getBboxArea = geometry => {
     geometry.type === 'MultiPolygon'
       ? geometry.coordinates.flat(2)
       : geometry.coordinates.flat(1);
-  let minLng = Infinity, maxLng = -Infinity, minLat = Infinity, maxLat = -Infinity;
+  let minLng = Infinity;
+  let maxLng = -Infinity;
+  let minLat = Infinity;
+  let maxLat = -Infinity;
   for (const [lng, lat] of coords) {
     if (lng < minLng) minLng = lng;
     if (lng > maxLng) maxLng = lng;

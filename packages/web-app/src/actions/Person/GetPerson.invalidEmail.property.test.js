@@ -105,11 +105,10 @@ describe('Feature: invalid-email-cavers, Property 2: Missing cavers field falls 
     vi.restoreAllMocks();
   });
 
-  const responseWithoutCaversArb = fc
-    .dictionary(
-      fc.string({ minLength: 1, maxLength: 10 }).filter(k => k !== 'cavers'),
-      fc.jsonValue()
-    );
+  const responseWithoutCaversArb = fc.dictionary(
+    fc.string({ minLength: 1, maxLength: 10 }).filter(k => k !== 'cavers'),
+    fc.jsonValue()
+  );
 
   it('dispatches success with an empty array when cavers field is missing', async () => {
     const consoleSpy = vi.spyOn(console, 'warn').mockImplementation();
@@ -207,9 +206,7 @@ describe('Feature: invalid-email-cavers, Property 4: Auth errors skip failure di
     await fetchInvalidEmailCavers()(dispatch, getState);
 
     // Should see FETCH_INVALID_EMAIL_CAVERS and LOGOUT, but NOT FAILURE
-    expect(dispatched.map(a => a.type)).toContain(
-      'FETCH_INVALID_EMAIL_CAVERS'
-    );
+    expect(dispatched.map(a => a.type)).toContain('FETCH_INVALID_EMAIL_CAVERS');
     expect(dispatched.map(a => a.type)).toContain('LOGOUT');
     expect(dispatched.map(a => a.type)).not.toContain(
       'FETCH_INVALID_EMAIL_CAVERS_FAILURE'

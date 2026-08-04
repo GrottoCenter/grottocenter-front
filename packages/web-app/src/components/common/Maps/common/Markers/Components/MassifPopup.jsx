@@ -8,12 +8,22 @@ const capitalize = s => s.charAt(0).toUpperCase() + s.slice(1);
 
 export const MassifPopup = ({ massif }) => {
   const { formatMessage } = useIntl();
-  const entranceLabel = massif.entranceCount > 0
-    ? capitalize(formatMessage({ id: massif.entranceCount === 1 ? 'entrance' : 'entrances' }))
-    : null;
-  const networkLabel = massif.networkCount > 0
-    ? capitalize(formatMessage({ id: massif.networkCount === 1 ? 'network' : 'networks' }))
-    : null;
+  const entranceLabel =
+    massif.entranceCount > 0
+      ? capitalize(
+          formatMessage({
+            id: massif.entranceCount === 1 ? 'entrance' : 'entrances'
+          })
+        )
+      : null;
+  const networkLabel =
+    massif.networkCount > 0
+      ? capitalize(
+          formatMessage({
+            id: massif.networkCount === 1 ? 'network' : 'networks'
+          })
+        )
+      : null;
   return (
     <>
       <Information

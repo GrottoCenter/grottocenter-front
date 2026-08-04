@@ -3,8 +3,6 @@ import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import { styled, useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
-import useOpenLink from '../../../hooks/useOpenLink';
-import { useMeasuredHeight } from '../../../hooks';
 
 import {
   Box,
@@ -31,6 +29,8 @@ import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import SearchOffIcon from '@mui/icons-material/SearchOff';
 import ViewColumnIcon from '@mui/icons-material/ViewColumn';
 import ViewListIcon from '@mui/icons-material/ViewList';
+import { useMeasuredHeight } from '../../../hooks';
+import useOpenLink from '../../../hooks/useOpenLink';
 
 import entitiesConfig from './entitiesConfig';
 import ExportFormatDropdown from './ExportFormatDropdown';
@@ -394,19 +394,14 @@ const DesktopEntityTable = ({
                 gap: 0.5,
                 alignItems: 'center'
               }}>
-              {onExport &&
-                entityType === 'entrances' && (
-                  <ExportFormatDropdown
-                    disabled={nbTotalRows > MAX_DOCUMENTS_TO_EXPORT_IN_CSV}
-                    onExport={format => {
-                      onExport(
-                        exportColumns,
-                        exportColumnLabels,
-                        format
-                      );
-                    }}
-                  />
-                )}
+              {onExport && entityType === 'entrances' && (
+                <ExportFormatDropdown
+                  disabled={nbTotalRows > MAX_DOCUMENTS_TO_EXPORT_IN_CSV}
+                  onExport={format => {
+                    onExport(exportColumns, exportColumnLabels, format);
+                  }}
+                />
+              )}
               {onExport &&
                 entityType !== 'entrances' &&
                 (nbTotalRows <= MAX_DOCUMENTS_TO_EXPORT_IN_CSV ? (
@@ -414,10 +409,7 @@ const DesktopEntityTable = ({
                     variant="outlined"
                     size="small"
                     onClick={() => {
-                      onExport(
-                        exportColumns,
-                        exportColumnLabels
-                      );
+                      onExport(exportColumns, exportColumnLabels);
                     }}
                     startIcon={<FileDownloadIcon />}
                     sx={{ minWidth: 0 }}>
@@ -508,10 +500,7 @@ const DesktopEntityTable = ({
               // wide tables is handled there instead.
               { overflow: 'visible' }
         }>
-        <Table
-          stickyHeader
-          sx={{ minWidth: compact ? 300 : 750 }}
-          size="small">
+        <Table stickyHeader sx={{ minWidth: compact ? 300 : 750 }} size="small">
           {isLoading ? (
             <LoadingTableHead stickyTop={toolbarHeight} />
           ) : (

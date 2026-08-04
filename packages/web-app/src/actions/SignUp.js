@@ -49,7 +49,7 @@ export function postSignUp(data) {
         return;
       }
 
-      const status = response.status;
+      const { status } = response;
       let code = null;
       let message = null;
       try {

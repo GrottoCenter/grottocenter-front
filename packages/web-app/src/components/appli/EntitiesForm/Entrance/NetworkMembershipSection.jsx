@@ -54,8 +54,7 @@ const NetworkMembershipSection = ({
           flexDirection: { xs: 'column', sm: 'row' },
           gap: 1,
           mt: 1
-        }}
-      >
+        }}>
         <Button variant="outlined" onClick={() => navigate(movePath)}>
           {formatMessage({ id: 'Link to an existing entrance or network' })}
         </Button>
@@ -63,8 +62,7 @@ const NetworkMembershipSection = ({
           <Button
             variant="outlined"
             color="error"
-            onClick={() => navigate(`${movePath}?mode=detach`)}
-          >
+            onClick={() => navigate(`${movePath}?mode=detach`)}>
             {formatMessage({ id: 'Detach from current network' })}
           </Button>
         )}

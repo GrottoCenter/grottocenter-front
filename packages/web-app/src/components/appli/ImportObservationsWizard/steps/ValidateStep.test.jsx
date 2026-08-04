@@ -32,16 +32,24 @@ vi.mock('../utils/samplingIntervalDetector', () => ({
 // ---- i18n messages used by ValidateStep ----
 const messages = {
   'ImportObservationsWizard.ValidateStep.validating': 'Validating data…',
-  'ImportObservationsWizard.ValidateStep.allRowsValid': '{count, plural, one {All # row is valid.} other {All # rows are valid.}}',
-  'ImportObservationsWizard.ValidateStep.invalidRowsWarning': '{count, plural, one {# row out of {total} is invalid.} other {# rows out of {total} are invalid.}}',
-  'ImportObservationsWizard.ValidateStep.rowCountSummary': '{valid} valid rows out of {total}',
-  'ImportObservationsWizard.ValidateStep.blockingError.missingSensorConfig': 'All measurement columns must be linked to a sensor configuration before submitting.',
-  'ImportObservationsWizard.ValidateStep.blockingError.incompleteTimestamp': 'Timestamp configuration is incomplete. At least one datetime, date, or elapsed_seconds column must be configured.',
-  'ImportObservationsWizard.ValidateStep.invalidReason.timestamp': 'Invalid or missing timestamp',
-  'ImportObservationsWizard.ValidateStep.invalidReason.noValidNumbers': 'No valid numeric values in measurement columns',
+  'ImportObservationsWizard.ValidateStep.allRowsValid':
+    '{count, plural, one {All # row is valid.} other {All # rows are valid.}}',
+  'ImportObservationsWizard.ValidateStep.invalidRowsWarning':
+    '{count, plural, one {# row out of {total} is invalid.} other {# rows out of {total} are invalid.}}',
+  'ImportObservationsWizard.ValidateStep.rowCountSummary':
+    '{valid} valid rows out of {total}',
+  'ImportObservationsWizard.ValidateStep.blockingError.missingSensorConfig':
+    'All measurement columns must be linked to a sensor configuration before submitting.',
+  'ImportObservationsWizard.ValidateStep.blockingError.incompleteTimestamp':
+    'Timestamp configuration is incomplete. At least one datetime, date, or elapsed_seconds column must be configured.',
+  'ImportObservationsWizard.ValidateStep.invalidReason.timestamp':
+    'Invalid or missing timestamp',
+  'ImportObservationsWizard.ValidateStep.invalidReason.noValidNumbers':
+    'No valid numeric values in measurement columns',
   'ImportObservationsWizard.ValidateStep.invalidRowsTable.rowNumber': 'Row #',
   'ImportObservationsWizard.ValidateStep.invalidRowsTable.reason': 'Reason',
-  'ImportObservationsWizard.ValidateStep.invalidRowsTable.sampleValues': 'Sample values'
+  'ImportObservationsWizard.ValidateStep.invalidRowsTable.sampleValues':
+    'Sample values'
 };
 
 // ---- Base column mappings ----
@@ -70,7 +78,14 @@ const defaultState = {
     skipFirstRows: 0,
     skipLastRows: 0,
     columnMappings: [TIMESTAMP_MAPPING, MEASUREMENT_MAPPING],
-    sensorConfigs: [{ id: 'sensor-1', deviceName: 'Sensor A', quantityKind: 'Temperature', unit: '°C' }],
+    sensorConfigs: [
+      {
+        id: 'sensor-1',
+        deviceName: 'Sensor A',
+        quantityKind: 'Temperature',
+        unit: '°C'
+      }
+    ],
     numberLocale: 'en',
     validationResult: null
   }
@@ -142,7 +157,9 @@ describe('ValidateStep', () => {
           totalRows: 2,
           validRows: 0,
           invalidRows: 0,
-          blockingErrors: ['All measurement columns must be linked to a sensor configuration before submitting.'],
+          blockingErrors: [
+            'All measurement columns must be linked to a sensor configuration before submitting.'
+          ],
           invalidRowDetails: []
         }
       }
@@ -169,8 +186,16 @@ describe('ValidateStep', () => {
           invalidRows: 2,
           blockingErrors: [],
           invalidRowDetails: [
-            { rowIndex: 1, reason: 'Invalid or missing timestamp', sampleValues: ['bad', '20'] },
-            { rowIndex: 3, reason: 'Invalid or missing timestamp', sampleValues: ['bad2', '21'] }
+            {
+              rowIndex: 1,
+              reason: 'Invalid or missing timestamp',
+              sampleValues: ['bad', '20']
+            },
+            {
+              rowIndex: 3,
+              reason: 'Invalid or missing timestamp',
+              sampleValues: ['bad2', '21']
+            }
           ]
         }
       }
@@ -310,11 +335,11 @@ describe('ValidateStep', () => {
       importWizard: {
         ...defaultState.importWizard,
         rawRows: [
-          ['datetime', 'temperature'],  // headerRow = 0
-          ['skip1', '0'],               // skipFirstRows covers this
-          ['skip2', '0'],               // skipFirstRows covers this
+          ['datetime', 'temperature'], // headerRow = 0
+          ['skip1', '0'], // skipFirstRows covers this
+          ['skip2', '0'], // skipFirstRows covers this
           ['2024-01-01 10:00:00', '20.5'], // first data row
-          ['2024-01-01 10:15:00', '21.0']  // second data row
+          ['2024-01-01 10:15:00', '21.0'] // second data row
         ],
         headerRow: 0,
         skipFirstRows: 2,

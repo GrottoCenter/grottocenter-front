@@ -1,5 +1,8 @@
 import fetch from 'isomorphic-fetch';
-import { getConversationsUrl, getArchivedConversationsUrl } from '../../conf/apiRoutes';
+import {
+  getConversationsUrl,
+  getArchivedConversationsUrl
+} from '../../conf/apiRoutes';
 import makeErrorMessage from '../../helpers/makeErrorMessage';
 import { checkAuthStatus, getTotalCount, makeUrl } from '../utils';
 
@@ -7,12 +10,16 @@ export const FETCH_CONVERSATIONS = 'FETCH_CONVERSATIONS';
 export const FETCH_CONVERSATIONS_SUCCESS = 'FETCH_CONVERSATIONS_SUCCESS';
 export const FETCH_CONVERSATIONS_FAILURE = 'FETCH_CONVERSATIONS_FAILURE';
 
-const fetchConversationsAction = (isArchived) => ({
+const fetchConversationsAction = isArchived => ({
   type: FETCH_CONVERSATIONS,
   isArchived
 });
 
-const fetchConversationsActionSuccess = (conversations, totalCount, isArchived) => ({
+const fetchConversationsActionSuccess = (
+  conversations,
+  totalCount,
+  isArchived
+) => ({
   type: FETCH_CONVERSATIONS_SUCCESS,
   conversations,
   totalCount,
@@ -60,7 +67,8 @@ export function fetchConversations(criterias, isArchived = false) {
       if (error.isAuthError) return;
       return dispatch(
         fetchConversationsActionFailure(
-          error.body || makeErrorMessage(error.message, `Fetching user conversations`),
+          error.body ||
+            makeErrorMessage(error.message, `Fetching user conversations`),
           isArchived
         )
       );
