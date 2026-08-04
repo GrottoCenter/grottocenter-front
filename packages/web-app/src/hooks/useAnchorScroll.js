@@ -6,7 +6,7 @@ import { useLayoutEffect } from 'react';
  */
 export const useAnchorScroll = anchorId => {
   useLayoutEffect(() => {
-    if (!anchorId) return;
+    if (!anchorId) return undefined;
     const scrollIfMatch = () => {
       if (window.location.hash.slice(1) === anchorId)
         document.getElementById(anchorId)?.scrollIntoView({

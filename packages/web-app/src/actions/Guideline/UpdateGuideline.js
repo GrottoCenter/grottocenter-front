@@ -47,7 +47,7 @@ export const patchGuideline =
       .then(response => response.json())
       .then(data => dispatch(patchGuidelineSuccess(data)))
       .catch(error => {
-        if (error.isAuthError) return;
+        if (error.isAuthError) return null;
         dispatch(
           patchGuidelineFailure(
             makeErrorMessage(error.message, `Updating guideline`),

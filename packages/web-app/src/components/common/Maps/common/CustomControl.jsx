@@ -32,7 +32,7 @@ const CustomControl = ({
   }, []);
 
   useEffect(() => {
-    if (!useLeafletControl || !map) return;
+    if (!useLeafletControl || !map) return undefined;
     const control = L.control({ position });
     control.onAdd = () => {
       const div = L.DomUtil.create(

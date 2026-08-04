@@ -18,7 +18,7 @@ export const useOtherEntranceName = (caveId, currentEntranceId, enabled) => {
   useEffect(() => {
     if (!enabled || !caveId) {
       setName(null);
-      return;
+      return undefined;
     }
     requestIdRef.current += 1;
     const requestId = requestIdRef.current;

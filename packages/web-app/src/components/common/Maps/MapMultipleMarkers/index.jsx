@@ -21,7 +21,7 @@ const MultipleMarkers = ({ validPositions }) => {
   });
 
   useEffect(() => {
-    if (validPositions.length === 0) return;
+    if (validPositions.length === 0) return undefined;
     updateEntranceMarkers(validPositions);
 
     const latLngs = validPositions.map(p => [p.latitude, p.longitude]);

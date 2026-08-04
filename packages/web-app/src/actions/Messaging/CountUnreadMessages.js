@@ -45,7 +45,7 @@ export function fetchUnreadMessageCount() {
         countUnreadMessagesActionSuccess(data.active, data.archived)
       );
     } catch (error) {
-      if (error.isAuthError) return;
+      if (error.isAuthError) return undefined;
       return dispatch(
         countUnreadMessagesActionFailure(
           error.body ||

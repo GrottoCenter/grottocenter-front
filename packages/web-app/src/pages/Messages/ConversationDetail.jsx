@@ -475,7 +475,7 @@ const ConversationDetail = () => {
   }, [dispatch, conversationId, hasMore, messages.length, status]);
 
   useEffect(() => {
-    if (!hasMore || status === REDUCER_STATUS.LOADING) return;
+    if (!hasMore || status === REDUCER_STATUS.LOADING) return undefined;
 
     const observer = new IntersectionObserver(
       entries => {

@@ -133,7 +133,7 @@ const MapInternals = ({ geoJson, massifId }) => {
   // (string prop → parsed once), this fires exactly once. If geoJson ever comes from
   // Redux or a fetch, ensure its reference is stable to avoid double-fetching here.
   useEffect(() => {
-    if (!massifBounds.isValid()) return;
+    if (!massifBounds.isValid()) return undefined;
     const sw = massifBounds.getSouthWest();
     const ne = massifBounds.getNorthEast();
     const controller = new AbortController();
@@ -166,12 +166,12 @@ const MapInternals = ({ geoJson, massifId }) => {
   useEffect(() => {
     if (!massifBounds.isValid()) {
       fetchMarkersRef.current();
-      return;
+      return undefined;
     }
     const container = map.getContainer();
     if (container.offsetWidth > 0 && container.offsetHeight > 0) {
       map.fitBounds(massifBounds);
-      return;
+      return undefined;
     }
     const observer = new ResizeObserver(() => {
       if (container.offsetWidth > 0 && container.offsetHeight > 0) {

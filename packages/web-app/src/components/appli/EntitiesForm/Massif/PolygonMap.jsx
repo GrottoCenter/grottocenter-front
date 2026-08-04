@@ -241,10 +241,9 @@ const PolygonMap = ({ onChange, onValidationChange, data }) => {
   const ZOOM_LEVEL = hasCoordinates || hasLocation ? focusZoom : defaultZoom;
 
   useEffect(() => {
-    if (map) {
-      const t = setTimeout(() => map.invalidateSize(), 200);
-      return () => clearTimeout(t);
-    }
+    if (!map) return undefined;
+    const t = setTimeout(() => map.invalidateSize(), 200);
+    return () => clearTimeout(t);
   }, [map, isMobile]);
 
   useEffect(() => {

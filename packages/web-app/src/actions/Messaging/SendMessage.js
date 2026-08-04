@@ -33,7 +33,7 @@ export function sendMessage({ conversationId, recipientId, body, recipient }) {
       dispatch({ type: SEND_MESSAGE_SUCCESS, message, recipient });
       return message;
     } catch (error) {
-      if (error.isAuthError) return;
+      if (error.isAuthError) return undefined;
       console.error('Sending message failed:', error);
       throw error;
     }

@@ -46,7 +46,7 @@ export function fetchNotifications(criterias) {
         )
       );
     } catch (error) {
-      if (error.isAuthError) return;
+      if (error.isAuthError) return undefined;
       return dispatch(
         fetchNotificationsActionFailure(
           makeErrorMessage(error.message, `Fetching user notifications`),

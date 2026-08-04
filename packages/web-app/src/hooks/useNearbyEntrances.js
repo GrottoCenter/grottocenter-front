@@ -82,7 +82,7 @@ export const useNearbyEntrances = (
     if (!debouncedKey) {
       requestIdRef.current += 1;
       setEntrances([]);
-      return;
+      return undefined;
     }
 
     // Key is `${generation}:${lat},${lng}` — strip the generation prefix.
@@ -92,7 +92,7 @@ export const useNearbyEntrances = (
     if (!bbox) {
       requestIdRef.current += 1;
       setEntrances([]);
-      return;
+      return undefined;
     }
 
     requestIdRef.current += 1;

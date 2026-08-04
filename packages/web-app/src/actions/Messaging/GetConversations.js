@@ -64,7 +64,7 @@ export function fetchConversations(criterias, isArchived = false) {
         )
       );
     } catch (error) {
-      if (error.isAuthError) return;
+      if (error.isAuthError) return undefined;
       return dispatch(
         fetchConversationsActionFailure(
           error.body ||

@@ -201,7 +201,7 @@ const ShapefileImport = ({ onImport }) => {
         minAchievableCount: 0
       });
       setAnalyzing(false);
-      return;
+      return undefined;
     }
     setAnalyzing(true);
     // Double rAF ensures React commits the analyzing=true render and the

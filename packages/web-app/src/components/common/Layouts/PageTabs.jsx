@@ -58,9 +58,9 @@ const PageTabs = ({ tabs, children }) => {
       : parseInt(theme.appBarHeight, 10);
 
   useEffect(() => {
-    if (isMobile) return;
+    if (isMobile) return undefined;
     const sentinel = sentinelRef.current;
-    if (!sentinel || !tabs?.length) return;
+    if (!sentinel || !tabs?.length) return undefined;
     const observer = new IntersectionObserver(
       ([entry]) => setIsStuck(!entry.isIntersecting),
       { rootMargin: `-${appBarPx}px 0px 0px 0px` }

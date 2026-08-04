@@ -35,7 +35,7 @@ export const useNameDuplicateSuggestions = (name, enabled = true) => {
       requestIdRef.current += 1; // Cancel any in-flight response.
       setSuggestions([]);
       setIsLoading(false);
-      return;
+      return undefined;
     }
 
     requestIdRef.current += 1;

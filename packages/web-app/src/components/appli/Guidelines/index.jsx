@@ -56,7 +56,7 @@ const Guidelines = ({ entityType, entityId, guidelines }) => {
   });
 
   useEffect(() => {
-    if (mode !== MODE_ATTACH) return;
+    if (mode !== MODE_ATTACH) return undefined;
 
     let cancelled = false;
     setIsLoadingGuidelines(true);

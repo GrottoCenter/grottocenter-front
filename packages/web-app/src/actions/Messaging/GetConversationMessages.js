@@ -67,7 +67,7 @@ export function fetchConversationMessages(conversationId, criterias) {
         )
       );
     } catch (error) {
-      if (error.isAuthError) return;
+      if (error.isAuthError) return undefined;
       return dispatch(
         fetchConversationMessagesActionFailure(
           error.body ||
