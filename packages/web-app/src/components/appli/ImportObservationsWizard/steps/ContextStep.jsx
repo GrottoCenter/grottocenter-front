@@ -21,9 +21,9 @@ import {
 } from '@mui/material';
 import ClearIcon from '@mui/icons-material/Clear';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
+import LicenseTag from '@/components/common/LicenseTag';
 import CoordinateFormSection from '../../EntitiesForm/utils/CoordinateFormSection';
 import { coordinatesMarkerIcon } from '../../../../assets/icons';
-import LicenseTag from '@/components/common/LicenseTag';
 
 import {
   SET_CONTEXT,

@@ -19,6 +19,10 @@ import {
   TextField
 } from '@mui/material';
 
+import LicenseTag from '@/components/common/LicenseTag';
+import AppLink from '@/components/common/AppLink';
+import InternationalizedLink from '@/components/common/InternationalizedLink';
+import { licenceLinks } from '@/conf/externalLinks';
 import { useUserProperties, useFileFormats } from '../../../../../../hooks';
 import ErrorsList from './ErrorsList';
 import {
@@ -30,10 +34,6 @@ import {
   validateAndBuildFileEntries
 } from './FileHelpers';
 import FileSelectorInput from '../../../../../common/FileSelectorInput';
-import LicenseTag from '@/components/common/LicenseTag';
-import AppLink from '@/components/common/AppLink';
-import InternationalizedLink from '@/components/common/InternationalizedLink';
-import { licenceLinks } from '@/conf/externalLinks';
 import { fetchLicense } from '../../../../../../actions/Licenses';
 import { getDocuments } from '../../../../../../actions/Document/GetDocuments';
 import { DocumentFormContext } from '../../Provider';

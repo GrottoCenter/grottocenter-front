@@ -11,13 +11,13 @@ import ManageHistoryIcon from '@mui/icons-material/ManageHistory';
 import NewspaperIcon from '@mui/icons-material/Newspaper';
 import ShareIcon from '@mui/icons-material/Share';
 import { NavigateNext } from '@mui/icons-material';
+import { LicenseBadge } from '@/components/common/LicenseTag';
+import { fetchLicense } from '@/actions/Licenses';
 import AppLink from '../../components/common/AppLink';
 
 import useOpenLink from '../../hooks/useOpenLink';
 import CustomIcon from '../../components/common/CustomIcon';
 import DocumentTypeChip from '../../components/common/DocumentTypeChip';
-import { LicenseBadge } from '@/components/common/LicenseTag';
-import { fetchLicense } from '@/actions/Licenses';
 import {
   DOCUMENT_TYPE_ICONS,
   DOCUMENT_TYPE_FALLBACK_ICON,

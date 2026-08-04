@@ -18,9 +18,9 @@ import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
 import { pathOr } from 'ramda';
 
+import UserAvatar from '@/components/common/UserAvatar';
 import Translate from '../Translate';
 import { useUserProperties } from '../../../hooks';
-import UserAvatar from '@/components/common/UserAvatar';
 
 // Constants
 const MENU_MIN_WIDTH = 250;

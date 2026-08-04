@@ -2,6 +2,19 @@ module.exports = {
   env: {
     browser: true
   },
+  settings: {
+    // Overrides the shared `node` resolver: it reads the `@/*` alias from
+    // tsconfig.json (kept in sync with the Vite alias) and, unlike
+    // eslint-import-resolver-node, honours `exports` maps — several
+    // dependencies (react-to-print, storybook/actions) ship no `main` field.
+    'import/resolver': {
+      typescript: {
+        project: './packages/web-app/tsconfig.json'
+      }
+    },
+    // Vite virtual modules have no on-disk counterpart to resolve.
+    'import/core-modules': ['virtual:pwa-register']
+  },
   overrides: [
     {
       files: ['./src/reducers/**/*.js'],
