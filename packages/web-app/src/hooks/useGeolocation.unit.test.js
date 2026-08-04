@@ -283,6 +283,42 @@ describe('useGeolocation', () => {
       expect(geolocation.getCurrentPosition).toHaveBeenCalledTimes(1);
     });
 
+    it('never rebuilds a watch that only ever returned coarse fixes', () => {
+      renderHook(() =>
+        useGeolocation({ watch: true, enableHighAccuracy: true })
+      );
+      // A 1.2km cell fix: a normal first answer while the GPS is still cold,
+      // but no proof the provider works. Rebuilding here would restart the
+      // acquisition every 30s and the circle would never shrink.
+      act(() => {
+        const calls = geolocation.watchPosition.mock.calls;
+        calls[calls.length - 1][0](makePosition({ accuracy: 1200 }));
+      });
+
+      act(() => vi.advanceTimersByTime(120000));
+
+      expect(geolocation.watchPosition).toHaveBeenCalledTimes(1);
+      expect(geolocation.clearWatch).not.toHaveBeenCalled();
+      expect(geolocation.getCurrentPosition.mock.calls.length).toBeGreaterThan(
+        1
+      );
+    });
+
+    it('rebuilds once the provider has proved it can deliver a GPS fix', () => {
+      renderHook(() =>
+        useGeolocation({ watch: true, enableHighAccuracy: true })
+      );
+      act(() => {
+        const calls = geolocation.watchPosition.mock.calls;
+        calls[calls.length - 1][0](makePosition({ accuracy: 1200 }));
+        calls[calls.length - 1][0](makePosition({ accuracy: 8 }));
+      });
+
+      act(() => vi.advanceTimersByTime(31000));
+
+      expect(geolocation.watchPosition).toHaveBeenCalledTimes(2);
+    });
+
     it('never rebuilds a watch that has not delivered yet', () => {
       renderHook(() => useGeolocation({ watch: true }));
 

@@ -24,6 +24,15 @@ const WATCHDOG_INTERVAL_MS = 5000;
 const STALE_AFTER_MS = 15000;
 const DEAD_AFTER_MS = 30000;
 
+// Above this radius (m) a fix is a cell/wifi answer, not GPS. The platform
+// serves one within a second while the GPS is still cold, so it is a perfectly
+// normal *first* response — but it does not prove the provider is doing its
+// job, and a watch that only ever returns those is still acquiring. Rebuilding
+// on the strength of one restarts the GPS acquisition from scratch every
+// DEAD_AFTER_MS, so the fix can never converge: exactly the huge accuracy
+// circle that never shrinks. Poking such a watch is right; rebuilding is not.
+const PRECISE_ACCURACY_M = 100;
+
 // One-shot geolocation by default. Pass { watch: true } to keep tracking the
 // position (watchPosition) — used by the location marker and the waypoint
 // navigation to update the live distance and the as-the-crow-flies line as the
@@ -71,6 +80,10 @@ const useGeolocation = ({
   // When the last fix landed, for the watchdog. Re-armed on every subscription
   // so a freshly (re)started watch gets its full grace period to acquire.
   const lastFixAtRef = useRef(0);
+  // Whether the provider has ever proved it can deliver a usable fix, i.e. one
+  // good enough to place a caver on a map (see PRECISE_ACCURACY_M). Gates the
+  // rebuild, never the poke.
+  const hasPreciseFixRef = useRef(false);
 
   // Hoisted out of the subscription effect: the watchdog's one-shot poke feeds
   // its result back through the very same handler, so a revived provider lands
@@ -90,6 +103,9 @@ const useGeolocation = ({
       Number.isFinite(position.coords.speed) ? position.coords.speed : null
     );
     lastFixAtRef.current = Date.now();
+    if (position.coords.accuracy <= PRECISE_ACCURACY_M) {
+      hasPreciseFixRef.current = true;
+    }
     hasLocationRef.current = true;
     setHasLocation(true);
     setError(null);
@@ -122,6 +138,7 @@ const useGeolocation = ({
     setStatus('locating');
     setHasLocation(false);
     hasLocationRef.current = false;
+    hasPreciseFixRef.current = false;
   }, [watch, enabled, enableHighAccuracy, timeout, maximumAge]);
 
   // Screen off, phone back in a pocket, tab backgrounded: browsers suspend an
@@ -159,12 +176,13 @@ const useGeolocation = ({
       if (document.visibilityState !== 'visible') return;
       const age = Date.now() - lastFixAtRef.current;
       if (age < STALE_AFTER_MS) return;
-      // Rebuilding is only ever right for a watch that HAS delivered and then
-      // went quiet. Before the first fix, silence is the normal shape of a cold
-      // GPS acquisition — 30-60s under canopy, the very case NO_TIMEOUT exists
-      // for — and tearing the watch down would restart that acquisition from
-      // scratch, indefinitely. Keep poking instead: a poke can only help.
-      if (age >= DEAD_AFTER_MS && hasLocationRef.current) {
+      // Rebuilding is only ever right for a watch that HAS delivered a usable
+      // fix and then went quiet. Until then — no fix at all, or only coarse
+      // ones — silence is the normal shape of a cold GPS acquisition (30-60s
+      // under canopy, the very case NO_TIMEOUT exists for), and tearing the
+      // watch down would restart that acquisition from scratch, forever. Keep
+      // poking instead: a poke can only help.
+      if (age >= DEAD_AFTER_MS && hasPreciseFixRef.current) {
         // Re-arm the clock before restarting, so the rebuilt watch is judged on
         // its own acquisition time instead of being torn down on the next tick.
         lastFixAtRef.current = Date.now();
