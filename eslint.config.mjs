@@ -39,7 +39,10 @@ export default [
         }
       },
       // Vite virtual modules have no on-disk counterpart to resolve.
-      'import/core-modules': ['virtual:pwa-register']
+      'import/core-modules': [
+        'virtual:pwa-register',
+        'virtual:pwa-register/react'
+      ]
     }
   },
   {

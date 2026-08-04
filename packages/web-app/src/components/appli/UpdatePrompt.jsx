@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { Alert, Button, IconButton, Snackbar } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
@@ -37,7 +37,6 @@ const UpdatePrompt = () => {
     // A silent failure here would kill the update mechanism entirely with
     // no trace; surface it so production monitoring can catch it.
     onRegisterError: err =>
-      // eslint-disable-next-line no-console
       console.warn('[UpdatePrompt] SW registration failed', err)
   });
 
@@ -53,7 +52,6 @@ const UpdatePrompt = () => {
   const handleUpdate = () => {
     const waitingSW = registration?.waiting;
     if (!waitingSW) {
-      // eslint-disable-next-line no-console
       console.warn('[UpdatePrompt] Update clicked but no waiting SW found');
       // Best-effort dismissal so a broken state doesn't stay pinned on screen.
       setNeedRefresh(false);
