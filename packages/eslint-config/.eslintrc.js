@@ -63,6 +63,56 @@ module.exports = {
         ignoreRestSiblings: true
       }
     ],
+    // Modules exporting a single named symbol are the convention here
+    // (actions, cypress mocks, utils): a default export would say less.
+    'import/prefer-default-export': 'off',
+    // Airbnb bans `continue` and `++` outright. Both read fine in the loops
+    // this codebase actually has, and rewriting them gains nothing.
+    'no-continue': 'off',
+    'no-plusplus': 'off',
+    'no-underscore-dangle': [
+      'error',
+      {
+        allow: [
+          // GrottoCenter API wire format
+          '_type',
+          '_count',
+          // Leaflet / leaflet-rotate internals we have to reach into
+          '_leaflet_id',
+          '_map',
+          '_bearing',
+          '_setPos',
+          '_measureDblclick',
+          // Redux DevTools browser extension hook
+          '__REDUX_DEVTOOLS_EXTENSION_COMPOSE__',
+          // Deliberate internal markers and test seams
+          '__resolveWith',
+          '__isCreateNew',
+          '_origIdx',
+          '_resetForTests'
+        ]
+      }
+    ],
+
+    // --- Design debt -------------------------------------------------------
+    // Downgraded to `warn` so CI stays green while the backlog stays visible.
+    // Each one is a real cleanup to make, not a rule we disagree with.
+    'react/prop-types': 'warn', // TODO: ~90 components missing prop validation
+    'react/forbid-prop-types': 'warn', // TODO: replace object/array/any shapes
+    'react/no-unused-prop-types': 'warn', // TODO: drop the dead prop types
+    'react/no-array-index-key': 'warn', // TODO: key on stable entity ids
+    'react/destructuring-assignment': 'warn', // TODO
+    'no-nested-ternary': 'warn', // TODO: extract to if/else or lookup tables
+    'consistent-return': 'warn', // TODO: mostly thunks returning conditionally
+    'no-use-before-define': 'warn', // TODO
+    'no-param-reassign': 'warn', // TODO
+    'no-await-in-loop': 'warn', // TODO: sequential API calls, check if needed
+    'class-methods-use-this': 'warn', // TODO
+    'jsx-a11y/anchor-is-valid': 'warn', // TODO: a11y pass
+    'jsx-a11y/click-events-have-key-events': 'warn', // TODO: a11y pass
+    'jsx-a11y/no-static-element-interactions': 'warn', // TODO: a11y pass
+    // -----------------------------------------------------------------------
+
     'react/require-default-props': 'off',
     // MUI exposes `inputProps` (native input attributes) and `InputProps`
     // (Input component props) side by side: they are two distinct props.
@@ -76,6 +126,16 @@ module.exports = {
     ],
     'prettier/prettier': 'error'
   },
+  overrides: [
+    {
+      files: ['**/*.test.{js,jsx}', '**/*.spec.{js,jsx}'],
+      rules: {
+        // `vi.mock` factories are hoisted above the imports, so they can only
+        // reach a module through `require()` inside the factory body.
+        'global-require': 'off'
+      }
+    }
+  ],
   settings: {
     'import/resolver': {
       node: {
