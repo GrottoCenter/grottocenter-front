@@ -65,6 +65,16 @@ describe('buildFormData', () => {
     expect(value.name).toBe('topo.png');
   });
 
+  it('appends Date values as their string representation instead of iterating them', () => {
+    const formData = new FormData();
+    const datePublication = new Date('2024-01-01T00:00:00.000Z');
+    buildFormData(formData, { datePublication });
+
+    const [[key, value]] = entries(formData);
+    expect(key).toBe('datePublication');
+    expect(value).toBe(datePublication.toString());
+  });
+
   it('appends nested data under the given parent key', () => {
     const formData = new FormData();
     buildFormData(formData, { id: 4, fileName: 'a.png' }, 'deletedFiles[0]');
