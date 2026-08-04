@@ -21,7 +21,7 @@ export const defaultDocAttributes = {
   datePublication: '',
   creatorComment: '',
   authors: [],
-  authorsGrotto: [],
+  authorsOrganization: [],
   editor: null,
   library: null,
   type: -1,
@@ -71,7 +71,7 @@ const checkFormValidation = document => {
   )
     isValid = false;
 
-  if (document.authors.length + document.authorsGrotto.length === 0)
+  if (document.authors.length + document.authorsOrganization.length === 0)
     isValid = false;
   if (!isDocumentPagesFormatValid(document.pages)) isValid = false;
   if (document.identifier && !document.identifierType) isValid = false;
@@ -115,10 +115,7 @@ const normalizeInitialValues = values => {
     ...rest,
     selectOptionAuthorizationDocument: option ?? null,
     files: (files ?? []).map(f => ({ ...f, state: IS_INTACT })),
-    // The API reads organization-authors as `authorsOrganization` but expects
-    // them back as `authorsGrotto` on write; the form only ever uses the
-    // write-side name internally.
-    authorsGrotto: authorsOrganization ?? []
+    authorsOrganization: authorsOrganization ?? []
   };
 };
 

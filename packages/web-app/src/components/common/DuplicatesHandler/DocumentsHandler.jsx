@@ -121,7 +121,7 @@ const DocumentsHandler = ({
     // Organizations-as-authors have no atomic "create + attach" endpoint yet
     // (backend follow-up), so only pre-existing organizations (with an id)
     // can come out of the merge — new items are never produced here.
-    const { previousItems: previousAuthorsGrotto } =
+    const { previousItems: previousAuthorsOrganization } =
       retrieveFromObjectCollection(authorsOrganization);
 
     const {
@@ -154,7 +154,7 @@ const DocumentsHandler = ({
         parent: getIdOrUndefined(parent),
         license: license.id,
         authors: onlyIfFilled(previousAuthors),
-        authorsGrotto: onlyIfFilled(previousAuthorsGrotto),
+        authorsOrganization: onlyIfFilled(previousAuthorsOrganization),
         // Subjects coming from the database carry their code as `id` (the
         // TSubject primary key is the `code` column); only subjects coming from
         // an imported duplicate carry a `code` field.
