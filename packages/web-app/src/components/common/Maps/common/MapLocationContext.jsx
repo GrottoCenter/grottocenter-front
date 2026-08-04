@@ -159,9 +159,13 @@ export const useDeviceHeading = () => {
 };
 
 // Declarative helper: keep the shared geolocation watch alive while `active` is
-// true, releasing it on unmount or when `active` goes false. Ref-counted, so
-// several consumers (location control, waypoint navigation) can request it
-// independently without stepping on each other.
+// true, releasing it on unmount or when `active` goes false. Ref-counted like
+// its heading counterpart, but the location control is deliberately its only
+// caller: it owns the watch, so `active` in the context and the control's own
+// mode can never disagree. Features that merely *use* the position (the waypoint
+// navigation) read it without requesting it, and degrade until the user turns
+// tracking on — that is what keeps the button honest and the permission prompt
+// tied to a real user gesture.
 export const useRequestUserLocation = active => {
   const { enable, disable } = useUserLocation();
   useEffect(() => {
