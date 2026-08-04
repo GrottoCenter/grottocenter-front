@@ -35,7 +35,15 @@ const NorthResetControl = ({ bearing, onClick }) => {
             boxShadow: 2,
             height: 44,
             width: 44,
-            '&:hover': { bgcolor: '#f4f4f4' }
+            '&:hover': { bgcolor: '#f4f4f4' },
+            // Leaflet's touch stylesheet gives .leaflet-bar and
+            // .leaflet-control-layers a 2px border, so every other control in
+            // this column is 48px wide against this one's 44px. They are all
+            // right-floated, hence share a right edge, and that difference
+            // pushes the circle 2px out of the column. Dropping the bar frame
+            // above is deliberate (it would square off the circle) — so give
+            // back just the width it used to occupy, where Leaflet adds it.
+            '.leaflet-touch &': { mr: 0.25 }
           }}>
           <CompassNeedle
             bearing={bearing}
