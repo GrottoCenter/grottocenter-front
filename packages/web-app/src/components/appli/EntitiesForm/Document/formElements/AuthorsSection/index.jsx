@@ -57,15 +57,25 @@ const stripType = ({ _type, ...rest }) => rest;
 
 const AuthorsSection = () => {
   const { formatMessage } = useIntl();
-  const { document: doc, updateAttribute } = useContext(DocumentFormContext);
+  const {
+    document: doc,
+    isNewDocument,
+    updateAttribute
+  } = useContext(DocumentFormContext);
   const currentUser = useUserProperties();
   const hasPrefilledRef = useRef(false);
 
+  // Convenience prefill for a brand new document only: never attribute
+  // authorship to whoever edits an existing one. A document is validly authored
+  // by at least one person OR one organization, so an existing organization
+  // author is enough to leave the field alone.
   useEffect(() => {
     if (
       hasPrefilledRef.current ||
+      !isNewDocument ||
       !currentUser.id ||
       doc.authors.length > 0 ||
+      doc.authorsGrotto.length > 0 ||
       doc.selectOptionAuthorizationDocument === DOCUMENT_AUTHORIZE_TO_PUBLISH
     )
       return;
@@ -73,9 +83,9 @@ const AuthorsSection = () => {
     updateAttribute('authors', [
       { id: currentUser.id, nickname: currentUser.nickname }
     ]);
-    // doc.authors and updateAttribute are stable; currentUser.id guards async hydration
+    // doc author collections and updateAttribute are stable; currentUser.id guards async hydration
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentUser.id, doc.selectOptionAuthorizationDocument]);
+  }, [currentUser.id, isNewDocument, doc.selectOptionAuthorizationDocument]);
 
   const value = useMemo(
     () => [
@@ -200,6 +210,7 @@ const AuthorsSection = () => {
                 {...params}
                 variant="filled"
                 label={formatMessage({ id: 'Authors' })}
+                required
                 error={hasError}
                 InputProps={{
                   ...params.InputProps,
