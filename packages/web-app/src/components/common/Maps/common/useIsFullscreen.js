@@ -8,9 +8,14 @@ import { useMap, useMapEvents } from 'react-leaflet';
 //
 // Map-scoped rather than in src/hooks/: it reads the react-leaflet context, so
 // it only works inside a MapContainer (same rule as useMarkers).
-// leaflet.fullscreen's own flag, and the only reading that covers native AND
-// pseudo fullscreen alike. Kept here so exactly one line in the codebase reaches
-// into the plugin's private state.
+
+// `_isFullscreen` is leaflet.fullscreen's own flag, and the only reading that
+// covers native AND pseudo fullscreen alike — the browser's own
+// document.fullscreenElement misses the latter, which is what iOS Safari falls
+// back to. Kept here so exactly one line in the codebase reaches into the
+// plugin's private state: if a leaflet.fullscreen upgrade ever renames it, this
+// is the single place to repoint (a `fullscreenchange` DOM listener is the
+// obvious fallback, at the cost of missing pseudo fullscreen).
 // eslint-disable-next-line no-underscore-dangle
 export const isMapFullscreen = map => !!map._isFullscreen;
 

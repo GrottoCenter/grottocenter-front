@@ -129,8 +129,29 @@ const emitHeading = heading =>
     window.dispatchEvent(event);
   });
 
+// Every key the control can put on the button, with its en.json value. Spelled
+// out rather than left to an empty messages map: with no messages react-intl
+// echoes the id back, and since the mode labels ARE their own English text the
+// assertions below would have passed just as well on a key that no longer
+// exists in any lang file. Listing them makes the tests exercise a real lookup,
+// and the semantic error keys — whose value differs from the id — turn a
+// missing translation into a failure rather than a silent pass.
+const MESSAGES = {
+  'Use my location': 'Use my location',
+  'Compass mode': 'Compass mode',
+  'Recenter on your location': 'Recenter on your location',
+  'Reset to north': 'Reset to north',
+  'location.error.denied':
+    'Location access denied. Enable it in your browser settings.',
+  'location.error.unavailable': 'Your position could not be determined.',
+  'location.error.timeout': 'Location request timed out. Please try again.',
+  'compass.error.denied':
+    'Compass access denied. Enable it in your browser settings.',
+  'compass.error.unavailable': 'No compass available on this device.'
+};
+
 const tree = (
-  <IntlProvider locale="en" messages={{}}>
+  <IntlProvider locale="en" messages={MESSAGES}>
     <MapLocationProvider>
       <LocationControl />
     </MapLocationProvider>
@@ -493,7 +514,7 @@ describe('LocationControl', () => {
       // dialog at all — once an origin is under its auto-embargo. Treating every
       // code 1 as final is what silently killed tracking mid-session.
       await waitFor(() => expect(mockOnError).toHaveBeenCalledTimes(1));
-      expect(label()).toBe('location.error.denied');
+      expect(label()).toBe(MESSAGES['location.error.denied']);
     });
 
     it('does not demote a user activation when the permission lands afterwards', async () => {

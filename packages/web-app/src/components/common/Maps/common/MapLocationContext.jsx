@@ -112,6 +112,13 @@ export const MapLocationProvider = ({ children }) => {
   // when something observable did. `active` is derived as a plain boolean —
   // NOT the raw requestCount — so bumping the count from 1 to 2 (another
   // consumer requests tracking) doesn't fan out a re-render to every subscriber.
+  //
+  // Not the same thing as `isWatching`, and deliberately not folded into it:
+  // `active` is what consumers asked for, `isWatching` is what the hardware is
+  // doing. The keep-warm grace period above is precisely where they diverge —
+  // the last consumer has let go (active false) while the watch stays up for
+  // another KEEP_WARM_MS. Exposing the hardware state would make the control
+  // look on after it was switched off.
   const active = requestCount > 0;
   const userLocation = useMemo(
     () => ({

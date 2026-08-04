@@ -191,6 +191,12 @@ const useGeolocation = ({
     // Gated on `persisted` so ordinary navigations don't churn the provider;
     // and unlike above no staleness check, because `persisted` is proof in
     // itself that the page was frozen and the watch went with it.
+    //
+    // The price is a needless rebuild when the user leaves and comes back
+    // within STALE_AFTER_MS — worth paying: a bfcache restore is a rare event
+    // (it takes a real navigation away and back), whereas the screen wakes the
+    // staleness check guards against happen constantly in the field. One
+    // re-subscribe costs far less than the frozen dot the alternative leaves.
     const onPageShow = event => {
       if (event.persisted) setResumeTick(n => n + 1);
     };

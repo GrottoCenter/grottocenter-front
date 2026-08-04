@@ -38,7 +38,16 @@ const WaypointControl = () => {
   // Stable handler: react-leaflet's useMapEvent leaks the previous listener
   // whenever the callback identity changes, so passing an inline arrow would
   // accumulate one Leaflet listener per render and end up spawning several
-  // menu states from a single long-press.
+  // menu states from a single long-press. Keeping the deps down to the two
+  // activation conditions is what makes that identity change a rare event
+  // rather than a per-render one.
+  //
+  // The guard repeats the render-time one below on purpose: the listener stays
+  // registered outside fullscreen (leaving it only renders null, see the effect
+  // after this one), so the handler must decline the event itself instead of
+  // relying on being unsubscribed. Not a workaround for the leak above — it is
+  // the activation check, in the one place that still runs when the component
+  // renders nothing.
   const handleContextMenu = useCallback(
     e => {
       if (!isTouch || !isFullscreen) return;

@@ -345,6 +345,11 @@ const LocationControl = () => {
   // LOCATED after a drag out of compass, or FOLLOW re-entered from LOCATED
   // (follow→located preserves the bearing, and located→follow doesn't reset).
   // Either way the floating north badge (top-right) offers to straighten it.
+  //
+  // OFF is absent from the list because it cannot be rotated: like FOLLOW it
+  // goes through resetNorth() in the mode effect above, so by the time it is
+  // the current mode the bearing is already 0 and the badge would have nothing
+  // to offer. LOCATED is the only mode that leaves one standing.
   const normalizedBearing = ((needleBearing % 360) + 360) % 360;
   const showNorthButton =
     mode === MODE.COMPASS ||
