@@ -330,6 +330,30 @@ describe('LocationControl', () => {
     expect(screen.getAllByRole('button')).toHaveLength(2);
   });
 
+  it('settles the needle on north instead of unwinding a full turn', async () => {
+    renderControl();
+    act(() => button().click());
+    await waitFor(() => expect(watchSuccess).toBeDefined());
+    emitPosition();
+    emitHeading(90);
+    act(() => button().click()); // → compass
+    emitHeading(90);
+    await waitFor(() => expect(mockMap.setBearing).toHaveBeenCalledWith(-90));
+
+    // Freeze the rotation so the north badge stays up while we tap it.
+    act(() => mapEventHandlers.followdetach());
+    const northButton = () => screen.getAllByRole('button')[1];
+    // The needle carries the unwrapped bearing, not a value wrapped to [0, 360).
+    expect(northButton().querySelector('svg').style.transform).toBe(
+      'rotate(-90deg)'
+    );
+
+    // Straightening must reach north the short way: assigning 0 outright would
+    // have animated -90° → 0° here, but +270° once the user had turned around.
+    act(() => northButton().click());
+    await waitFor(() => expect(screen.getAllByRole('button')).toHaveLength(1));
+  });
+
   it('detaches following when the user drags the map', async () => {
     renderControl();
     act(() => button().click());

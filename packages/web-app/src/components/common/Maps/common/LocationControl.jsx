@@ -5,9 +5,10 @@ import MyLocationIcon from '@mui/icons-material/MyLocation';
 import ExploreIcon from '@mui/icons-material/Explore';
 import LocationSearchingIcon from '@mui/icons-material/LocationSearching';
 import { useMap, useMapEvent } from 'react-leaflet';
-import { headingToBearing, shortestAngleDelta } from '@/utils/compass';
+import { headingToBearing } from '@/utils/compass';
 import { followCenterYOffset } from '@/utils/geo';
 import { useNotification } from '@/hooks';
+import useContinuousAngle from '@/hooks/useContinuousAngle';
 import { focusZoom } from '@/conf/config';
 import CustomControl from './CustomControl';
 import NorthResetControl from './NorthResetControl';
@@ -89,9 +90,14 @@ const LocationControl = () => {
   // Zoom to apply on the next recenter (focusZoom on first activation, else keep).
   const pendingZoomRef = useRef(null);
 
-  // Continuous (unwrapped) needle rotation for shortest-path animation.
-  const [needleBearing, setNeedleBearing] = useState(0);
-  const needleBearingRef = useRef(0);
+  // Last bearing actually applied to the map, and its unwrapped counterpart for
+  // the needle: CompassNeedle animates its transform, so it must be fed a
+  // continuous angle or it spins the long way round whenever the bearing crosses
+  // the 0/360 boundary. Going through the accumulator on EVERY path — including
+  // resetNorth — is what keeps straightening the map from whipping the needle
+  // back through a full turn.
+  const [appliedBearing, setAppliedBearing] = useState(0);
+  const needleBearing = useContinuousAngle(appliedBearing);
   const targetBearingRef = useRef(0);
   const zoomingRef = useRef(false);
 
@@ -126,11 +132,7 @@ const LocationControl = () => {
   const applyBearing = useCallback(
     target => {
       map.setBearing(target);
-      const next =
-        needleBearingRef.current +
-        shortestAngleDelta(needleBearingRef.current, target);
-      needleBearingRef.current = next;
-      setNeedleBearing(next);
+      setAppliedBearing(target);
       // Rotation pivots around the container centre; recenter so the user stays
       // fixed at the offset point instead of swinging around it.
       recenter(false);
@@ -140,8 +142,11 @@ const LocationControl = () => {
 
   const resetNorth = useCallback(() => {
     targetBearingRef.current = 0;
-    needleBearingRef.current = 0;
-    setNeedleBearing(0);
+    // Through the accumulator, not a hard 0: after the user has turned around,
+    // needleBearing sits at -350 (or -710) and assigning 0 outright made the
+    // needle animate the whole way back. The accumulator lands on the nearest
+    // equivalent of north instead, so it just settles.
+    setAppliedBearing(0);
     if (typeof map.setBearing === 'function') map.setBearing(0);
   }, [map]);
 

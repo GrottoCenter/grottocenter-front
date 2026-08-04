@@ -14,6 +14,7 @@ import {
   useDeviceHeading,
   useRequestHeading
 } from '@/components/common/Maps/common/MapLocationContext';
+import useContinuousAngle from '@/hooks/useContinuousAngle';
 import { WAYPOINT_COLOR } from './waypointIcon';
 
 const pointShape = PropTypes.shape({
@@ -54,6 +55,11 @@ const WaypointHud = ({ waypoint, userLocation }) => {
   // Direction to the waypoint relative to where the user currently faces (0 =
   // straight ahead). Null when the device has no usable compass heading.
   const relative = heading == null ? null : relativeBearing(bearing, heading);
+  // relativeBearing wraps to [0, 360), and its discontinuity sits exactly on
+  // 0 — i.e. on alignment, the one angle the user aims for. The animated
+  // transform below would read 359° → 2° as "turn 357° the other way" and spin
+  // the arrow right around at the very moment it should settle.
+  const arrowAngle = useContinuousAngle(relative);
 
   return (
     <Box
@@ -77,18 +83,18 @@ const WaypointHud = ({ waypoint, userLocation }) => {
           alignItems: 'center',
           gap: 1.5
         }}>
-        {relative != null && (
+        {arrowAngle != null && (
           <NavigationIcon
             aria-hidden="true"
             sx={{
               fontSize: 40,
               color: WAYPOINT_COLOR,
-              transform: `rotate(${relative}deg)`,
+              transform: `rotate(${arrowAngle}deg)`,
               transition: 'transform 0.1s linear'
             }}
           />
         )}
-        <Box sx={{ textAlign: relative != null ? 'left' : 'center' }}>
+        <Box sx={{ textAlign: arrowAngle != null ? 'left' : 'center' }}>
           <Typography
             variant="subtitle1"
             sx={{ fontWeight: 700, lineHeight: 1.2 }}>
