@@ -61,12 +61,7 @@ const LocationControl = () => {
   const { onError: notifyError } = useNotification();
   const overlayContainer = useMapOverlayContainer();
 
-  const {
-    location,
-    hasLocation,
-    error: geoError,
-    status: geoStatus
-  } = useUserLocation();
+  const { location, hasLocation, error: geoError } = useUserLocation();
   const {
     heading,
     isSupported: compassSupported,
@@ -303,7 +298,7 @@ const LocationControl = () => {
   };
 
   const isError = Boolean(geoError) && mode !== MODE.OFF;
-  const isLocating = mode !== MODE.OFF && !hasLocation && geoStatus !== 'error';
+  const isLocating = mode !== MODE.OFF && !hasLocation && !geoError;
 
   let icon;
   if (isError) {

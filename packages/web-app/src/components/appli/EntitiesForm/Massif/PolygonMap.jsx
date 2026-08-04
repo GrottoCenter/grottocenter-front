@@ -34,7 +34,7 @@ import {
 } from '../../../../utils/polygonValidation';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-draw/dist/leaflet.draw.css';
-import { defaultZoom, focusZoom } from '../../../../conf/config';
+import { defaultCoord, defaultZoom, focusZoom } from '../../../../conf/config';
 
 // SVG from MUI ErrorOutline icon, rendered as a Leaflet DivIcon
 const KINK_ICON_SIZE = 24;
@@ -237,7 +237,7 @@ const PolygonMap = ({ onChange, onValidationChange, data }) => {
     ? getMultiPolygonCentroid(
         data.type === 'Polygon' ? data.coordinates[0] : data.coordinates[0][0]
       )
-    : geoLocation;
+    : (geoLocation ?? defaultCoord);
   const ZOOM_LEVEL = hasCoordinates || hasLocation ? focusZoom : defaultZoom;
 
   useEffect(() => {

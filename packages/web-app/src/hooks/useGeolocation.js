@@ -1,5 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { defaultCoord } from '../conf/config';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 // The Geolocation spec's own default for PositionOptions.timeout (~49 days, i.e.
 // no practical limit). Spelled out rather than passed as Infinity: `timeout` is a
@@ -45,33 +44,23 @@ const PRECISE_ACCURACY_M = 100;
 //   "center the map on where I am" style consumers, and much faster/cheaper on
 //   battery. Field-navigation consumers (LocationControl, WaypointNavigation)
 //   opt in explicitly via the shared MapLocationProvider.
+//
+// `location` is null until a fix lands. The hook used to hand out defaultCoord
+// instead, which reads as a real position: a consumer forgetting to check
+// hasLocation would silently place the user on null island (0, 0) rather than
+// fail. Callers that want a fallback view now spell it out themselves.
 const useGeolocation = ({
   watch = false,
   enabled = true,
-  enableHighAccuracy = false,
-  // A one-shot must not hang forever: a finite timeout turns a denied or
-  // unreachable sensor into an error the consumer can report. A watch is the
-  // opposite — its contract is "tell me when you know", and the timeout applies
-  // to EVERY acquisition, so a finite one manufactures TIMEOUT errors out of
-  // ordinary field conditions (a cold GPS fix under canopy takes 30-60s) and
-  // leaves tracking looking broken while it is simply still searching.
-  timeout = watch ? NO_TIMEOUT : 10000,
-  // Navigation wants the freshest fix the device has; only a one-shot
-  // "where am I" can afford to reuse a recent cached one.
-  maximumAge = watch ? 0 : 10000
+  enableHighAccuracy = false
 } = {}) => {
-  const [location, setLocation] = useState(defaultCoord);
-  const [hasLocation, setHasLocation] = useState(false);
-  const [accuracy, setAccuracy] = useState(null);
-  // GPS-derived course (deg) and speed (m/s). Only defined while moving, so they
-  // are a fallback heading source when the device has no magnetometer.
-  const [gpsHeading, setGpsHeading] = useState(null);
-  const [speed, setSpeed] = useState(null);
+  // The whole fix in one state: coordinates, accuracy, course and speed always
+  // arrive together, from a single callback, and are only ever read together.
+  const [fix, setFix] = useState(null);
   // GeolocationPositionError code: 1 denied, 2 unavailable, 3 timeout — or null.
   const [error, setError] = useState(null);
-  // 'idle' | 'locating' | 'active' | 'error'
-  const [status, setStatus] = useState('idle');
-  // Bumped on every return to the foreground to re-subscribe (see below).
+  // Bumped to re-subscribe: on every return to the foreground, and by the
+  // watchdog when a watch is judged dead (see below).
   const [resumeTick, setResumeTick] = useState(0);
 
   // Read by the error callback, which must know whether a fix is already on
@@ -85,31 +74,51 @@ const useGeolocation = ({
   // rebuild, never the poke.
   const hasPreciseFixRef = useRef(false);
 
+  // Both effects below take the same options, and neither should re-run unless
+  // they actually change — hence one memoised object rather than three loose
+  // dependencies. `timeout` and `maximumAge` are derived, never passed in: they
+  // have exactly one sensible value per mode and no caller has a say.
+  const options = useMemo(
+    () => ({
+      enableHighAccuracy,
+      // A one-shot must not hang forever: a finite timeout turns a denied or
+      // unreachable sensor into an error the consumer can report. A watch is
+      // the opposite — its contract is "tell me when you know", and the timeout
+      // applies to EVERY acquisition, so a finite one manufactures TIMEOUT
+      // errors out of ordinary field conditions (a cold GPS fix under canopy
+      // takes 30-60s) and leaves tracking looking broken while it is simply
+      // still searching.
+      timeout: watch ? NO_TIMEOUT : 10000,
+      // Navigation wants the freshest fix the device has; only a one-shot
+      // "where am I" can afford to reuse a recent cached one.
+      maximumAge: watch ? 0 : 10000
+    }),
+    [watch, enableHighAccuracy]
+  );
+
   // Hoisted out of the subscription effect: the watchdog's one-shot poke feeds
   // its result back through the very same handler, so a revived provider lands
   // a position exactly as the watch would have.
   const onPosition = useCallback(position => {
-    setLocation({
-      lat: position.coords.latitude,
-      lng: position.coords.longitude
-    });
-    setAccuracy(position.coords.accuracy);
-    // coords.heading / coords.speed are null (or NaN) while the device is
-    // stationary — normalise both to a finite number or null.
-    setGpsHeading(
-      Number.isFinite(position.coords.heading) ? position.coords.heading : null
-    );
-    setSpeed(
-      Number.isFinite(position.coords.speed) ? position.coords.speed : null
-    );
+    const { latitude, longitude, accuracy, heading, speed } = position.coords;
     lastFixAtRef.current = Date.now();
-    if (position.coords.accuracy <= PRECISE_ACCURACY_M) {
+    hasLocationRef.current = true;
+    if (Number.isFinite(accuracy) && accuracy <= PRECISE_ACCURACY_M) {
       hasPreciseFixRef.current = true;
     }
-    hasLocationRef.current = true;
-    setHasLocation(true);
+    setFix({
+      // Nested so its reference is tied to the fix rather than to the render:
+      // consumers follow `location` alone and recentre the map on every change
+      // of it, so rebuilding it per render would recentre forever.
+      location: { lat: latitude, lng: longitude },
+      accuracy,
+      // heading / speed are null (or NaN) while the device is stationary —
+      // normalise both to a finite number or null. They give a fallback
+      // heading source when the device has no magnetometer.
+      gpsHeading: Number.isFinite(heading) ? heading : null,
+      speed: Number.isFinite(speed) ? speed : null
+    });
     setError(null);
-    setStatus('active');
   }, []);
 
   const onError = useCallback(err => {
@@ -121,7 +130,6 @@ const useGeolocation = ({
     // activation is never a silent no-op.
     if (err.code !== 1 && hasLocationRef.current) return;
     setError(err.code);
-    setStatus('error');
   }, []);
 
   // Fresh session: clear a stale error from the previous run so the consumer's
@@ -135,11 +143,10 @@ const useGeolocation = ({
   useEffect(() => {
     if (!enabled) return;
     setError(null);
-    setStatus('locating');
-    setHasLocation(false);
+    setFix(null);
     hasLocationRef.current = false;
     hasPreciseFixRef.current = false;
-  }, [watch, enabled, enableHighAccuracy, timeout, maximumAge]);
+  }, [enabled, options]);
 
   // Screen off, phone back in a pocket, tab backgrounded: browsers suspend an
   // active watch and may drop it for good, yet the watchId stays valid so
@@ -193,18 +200,16 @@ const useGeolocation = ({
       // single source of truth for what the consumer sees, and a poke that
       // fails only says "no fresher fix" — the state we are already in.
       navigator.geolocation.getCurrentPosition(onPosition, () => {}, {
-        enableHighAccuracy,
+        enableHighAccuracy: options.enableHighAccuracy,
         timeout: STALE_AFTER_MS,
         maximumAge: 0
       });
     }, WATCHDOG_INTERVAL_MS);
     return () => clearInterval(id);
-  }, [enabled, watch, enableHighAccuracy, onPosition]);
+  }, [enabled, watch, options, onPosition]);
 
   useEffect(() => {
     if (!enabled || !navigator.geolocation) return undefined;
-
-    const options = { enableHighAccuracy, timeout, maximumAge };
 
     if (!watch) {
       navigator.geolocation.getCurrentPosition(onPosition, onError, options);
@@ -218,18 +223,21 @@ const useGeolocation = ({
       options
     );
     return () => navigator.geolocation.clearWatch(watchId);
-  }, [
-    watch,
-    enabled,
-    enableHighAccuracy,
-    timeout,
-    maximumAge,
-    resumeTick,
-    onPosition,
-    onError
-  ]);
+  }, [enabled, watch, options, resumeTick, onPosition, onError]);
 
-  return { location, hasLocation, accuracy, gpsHeading, speed, error, status };
+  // Memoised so the whole result keeps a stable identity between renders where
+  // nothing observable changed — consumers spread it into a context value.
+  return useMemo(
+    () => ({
+      location: fix?.location ?? null,
+      hasLocation: fix !== null,
+      accuracy: fix?.accuracy ?? null,
+      gpsHeading: fix?.gpsHeading ?? null,
+      speed: fix?.speed ?? null,
+      error
+    }),
+    [fix, error]
+  );
 };
 
 export default useGeolocation;

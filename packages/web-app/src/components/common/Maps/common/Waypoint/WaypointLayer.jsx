@@ -16,7 +16,12 @@ const pointShape = PropTypes.shape({
 // Renders the waypoint pin, the as-the-crow-flies line to the user (only when a
 // live position is available), and — on a long-press / right-click of the pin —
 // a small context menu to delete it.
-const WaypointLayer = ({ waypoint, userLocation, hasLocation, onDelete }) => {
+const WaypointLayer = ({
+  waypoint,
+  userLocation = null,
+  hasLocation,
+  onDelete
+}) => {
   const { formatMessage } = useIntl();
   const overlayContainer = useMapOverlayContainer();
   const [menuAnchor, setMenuAnchor] = useState(null);
@@ -84,7 +89,8 @@ const WaypointLayer = ({ waypoint, userLocation, hasLocation, onDelete }) => {
 
 WaypointLayer.propTypes = {
   waypoint: pointShape.isRequired,
-  userLocation: pointShape.isRequired,
+  // Null until a fix lands; the line it feeds is gated on hasLocation anyway.
+  userLocation: pointShape,
   hasLocation: PropTypes.bool.isRequired,
   onDelete: PropTypes.func.isRequired
 };

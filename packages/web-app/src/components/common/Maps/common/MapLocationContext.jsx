@@ -97,31 +97,11 @@ export const MapLocationProvider = ({ children }) => {
     if (!needsPermission) startOrientation();
   }, [headingCount, needsPermission, startOrientation, stopOrientation]);
 
+  // useGeolocation already memoises its result, so `geo` only changes identity
+  // when something observable did — no need to spell its fields out here.
   const userLocation = useMemo(
-    () => ({
-      location: geo.location,
-      accuracy: geo.accuracy,
-      gpsHeading: geo.gpsHeading,
-      speed: geo.speed,
-      hasLocation: geo.hasLocation,
-      error: geo.error,
-      status: geo.status,
-      active: requestCount > 0,
-      enable,
-      disable
-    }),
-    [
-      geo.location,
-      geo.accuracy,
-      geo.gpsHeading,
-      geo.speed,
-      geo.hasLocation,
-      geo.error,
-      geo.status,
-      requestCount,
-      enable,
-      disable
-    ]
+    () => ({ ...geo, active: requestCount > 0, enable, disable }),
+    [geo, requestCount, enable, disable]
   );
 
   const deviceHeading = useMemo(

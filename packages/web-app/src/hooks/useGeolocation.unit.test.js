@@ -86,7 +86,17 @@ describe('useGeolocation', () => {
     expect(geolocation.clearWatch).toHaveBeenCalledWith(42);
   });
 
-  it('exposes the position, accuracy and an active status', () => {
+  it('exposes no position at all until a fix lands', () => {
+    // A sentinel position would read as a real one, and a consumer forgetting
+    // to check hasLocation would silently place the user on null island (0, 0)
+    // instead of failing.
+    const { result } = renderHook(() => useGeolocation());
+    expect(result.current.location).toBeNull();
+    expect(result.current.accuracy).toBeNull();
+    expect(result.current.hasLocation).toBe(false);
+  });
+
+  it('exposes the position and its accuracy once a fix lands', () => {
     const { result } = renderHook(() => useGeolocation());
     const onPosition = geolocation.getCurrentPosition.mock.calls[0][0];
     act(() => onPosition(makePosition()));
@@ -94,8 +104,19 @@ describe('useGeolocation', () => {
     expect(result.current.location).toEqual({ lat: 45.1, lng: 5.7 });
     expect(result.current.accuracy).toBe(12);
     expect(result.current.hasLocation).toBe(true);
-    expect(result.current.status).toBe('active');
     expect(result.current.error).toBeNull();
+  });
+
+  it('keeps the location reference stable across unrelated renders', () => {
+    const { result, rerender } = renderHook(() => useGeolocation());
+    act(() => geolocation.getCurrentPosition.mock.calls[0][0](makePosition()));
+
+    const first = result.current.location;
+    rerender();
+
+    // Consumers recentre the map on every change of `location`; a fresh object
+    // per render would make that fire forever.
+    expect(result.current.location).toBe(first);
   });
 
   it('normalises a stationary device to a null heading and speed', () => {
@@ -123,7 +144,6 @@ describe('useGeolocation', () => {
     act(() => onError({ code: 1 }));
 
     expect(result.current.error).toBe(1);
-    expect(result.current.status).toBe('error');
     expect(result.current.hasLocation).toBe(false);
   });
 
@@ -138,7 +158,6 @@ describe('useGeolocation', () => {
     act(() => onError({ code: 3 }));
 
     expect(result.current.error).toBeNull();
-    expect(result.current.status).toBe('active');
     expect(result.current.location).toEqual({ lat: 45.1, lng: 5.7 });
   });
 
@@ -150,7 +169,6 @@ describe('useGeolocation', () => {
     act(() => onError({ code: 1 }));
 
     expect(result.current.error).toBe(1);
-    expect(result.current.status).toBe('error');
   });
 
   it('re-subscribes the watch on returning to the foreground', () => {
@@ -376,7 +394,6 @@ describe('useGeolocation', () => {
     rerender({ enabled: true });
 
     expect(result.current.error).toBeNull();
-    expect(result.current.status).toBe('locating');
   });
 
   it('drops the previous fix on re-enable so follow doesn’t snap to a stale position', () => {
