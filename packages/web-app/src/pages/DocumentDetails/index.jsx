@@ -350,9 +350,9 @@ const Document = ({
     DOCUMENT_TYPE_FALLBACK_ICON;
   const breadcrumb = documentData?.parent ? (
     <Breadcrumbs
-      separator={<NavigateNext sx={{ fontSize: '1.2rem' }} />}
+      separator={<NavigateNext sx={{ fontSize: '0.75rem' }} />}
       sx={{
-        fontSize: { xs: '1.2rem', md: '1.7rem' },
+        fontSize: { xs: '0.75rem', md: '1.0625rem' },
         '& .MuiBreadcrumbs-separator': { mx: { xs: '2px', md: '8px' } }
       }}
     >

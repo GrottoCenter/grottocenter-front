@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
-import { Typography } from '@mui/material';
+import { Divider, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 
 import {
@@ -96,7 +96,7 @@ const ManageUsers = () => {
           componentToDisplay={
             <>
               <ManageUserGroups />
-              <hr />
+              <Divider sx={{ my: 4 }} />
               <UserList
                 isLoading={isLoading}
                 userList={administrators}

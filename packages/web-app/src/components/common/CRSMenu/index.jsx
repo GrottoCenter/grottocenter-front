@@ -110,7 +110,7 @@ const CRSMenu = ({ anchorEl = null, onClose, preferred, projections = [], onSele
         <SearchInput
           value={filter}
           onChange={setFilter}
-          sx={{ '& input': { fontSize: '1.4rem' } }}
+          sx={{ '& input': { fontSize: '0.875rem' } }}
         />
       </Box>
       <MenuList

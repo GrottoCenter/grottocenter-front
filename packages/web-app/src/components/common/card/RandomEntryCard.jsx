@@ -51,7 +51,7 @@ const InfoImg = styled('img')({
 
 const WhiteRating = styled(MuiRating)({
   color: 'white',
-  fontSize: '1rem'
+  fontSize: '0.625rem'
 });
 
 const formatTime = timeStr => {

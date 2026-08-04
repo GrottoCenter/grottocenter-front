@@ -62,12 +62,7 @@ const PageTitle = ({ title, icon, titleAdornment, subheader, actions }) => {
         </TitleGroup>
         {actions && <Actions>{actions}</Actions>}
       </Row>
-      {subheader && (
-        // Kill the legacy Skeleton-CSS `li { margin-bottom: 1rem }` rule from
-        // App.css that leaks into MUI Breadcrumbs items and stacks unwanted
-        // vertical space below the subheader.
-        <Box sx={{ '& li': { mb: 0 } }}>{subheader}</Box>
-      )}
+      {subheader && <Box>{subheader}</Box>}
     </Box>
   );
 };

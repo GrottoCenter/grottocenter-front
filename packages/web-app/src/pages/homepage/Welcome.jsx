@@ -80,7 +80,7 @@ const Welcome = () => {
               sx={{
                 px: 6,
                 py: '16px',
-                fontSize: '1.4rem',
+                fontSize: '0.875rem',
                 fontWeight: 600
               }}>
               {formatMessage({ id: 'Create an account' })}

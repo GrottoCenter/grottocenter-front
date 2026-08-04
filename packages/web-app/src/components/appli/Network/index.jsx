@@ -141,9 +141,9 @@ export const Network = ({ isLoading, error, cave }) => {
   const breadcrumb =
     country || (cave?.massifs?.length ?? 0) > 0 ? (
       <Breadcrumbs
-        separator={<NavigateNext sx={{ fontSize: '1rem' }} />}
+        separator={<NavigateNext sx={{ fontSize: '0.625rem' }} />}
         sx={{
-          fontSize: { xs: '1.2rem', md: '1.7rem' },
+          fontSize: { xs: '0.75rem', md: '1.0625rem' },
           '& .MuiBreadcrumbs-separator': { mx: { xs: '2px', md: '8px' } }
         }}
       >

@@ -24,7 +24,7 @@ const VerifyEmailPage = ({
   if (loading) {
     content = (
       <div style={{ textAlign: 'center' }}>
-        <CircularProgress size="4rem" />
+        <CircularProgress size="2.5rem" />
         <Typography variant="h6" style={{ marginTop: '20px' }}>
           {formatMessage({ id: 'Verifying your email...' })}
         </Typography>

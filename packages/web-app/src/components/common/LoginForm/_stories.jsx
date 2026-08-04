@@ -25,9 +25,9 @@ const DefaultLoginForm = () => {
 
 const StoryControlsWrapper = styled('div')`
   background-color: ${({ theme }) => theme.palette.primary.light};
-  font-size: 1.5rem;
+  font-size: 0.9375rem;
   left: 0;
-  padding: 0.5rem;
+  padding: 0.3125rem;
   position: absolute;
   right: 0;
   top: -75px;
@@ -76,7 +76,7 @@ const DialogLoginForm = ({
           color={isLoading ? 'inherit' : 'primary'}
           key={0}>
           {isLoading ? (
-            <CircularProgress size="2.8rem" />
+            <CircularProgress size="1.75rem" />
           ) : (
             <Translate>Log in</Translate>
           )}

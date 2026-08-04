@@ -24,12 +24,12 @@ import {
 import Translate from '../Translate';
 
 const SectionHeader = styled(ListSubheader)(({ theme }) => ({
-  fontSize: '1.15rem',
+  fontSize: '0.71875rem',
   fontWeight: 600,
   letterSpacing: '1px',
   textTransform: 'uppercase',
   color: theme.palette.text.secondary,
-  lineHeight: '2rem',
+  lineHeight: '1.25rem',
   paddingTop: theme.spacing(0.5)
 }));
 

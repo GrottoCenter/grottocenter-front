@@ -7,7 +7,7 @@ import { styled } from '@mui/material/styles';
 import UnreadNotificationIcon from '@mui/icons-material/FiberManualRecord';
 import formatNotification from '../../../utils/formatNotification';
 
-const ICON_WIDTH = '2.5rem';
+const ICON_WIDTH = '1.5625rem';
 const Icon = styled('img')`
   width: ${ICON_WIDTH};
 `;

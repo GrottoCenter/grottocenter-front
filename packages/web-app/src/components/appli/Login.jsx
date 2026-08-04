@@ -195,7 +195,7 @@ const Login = () => {
       }
       sx={{ mt: 1 }}>
       {isSubmitting ? (
-        <CircularProgress size="2.8rem" color="inherit" />
+        <CircularProgress size="1.75rem" color="inherit" />
       ) : (
         getLoginButtonLabel()
       )}

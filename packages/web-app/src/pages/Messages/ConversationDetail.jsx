@@ -114,7 +114,7 @@ const MessageBubble = styled(Paper, {
 });
 
 const MessageDate = styled(Box)(({ theme }) => ({
-  fontSize: '1.1rem',
+  fontSize: '0.6875rem',
   color: theme.palette.text.secondary,
   opacity: 0.7,
   marginTop: '2px',
@@ -137,7 +137,7 @@ const DaySeparatorChip = styled(Typography)(({ theme }) => ({
   border: `1px solid ${theme.palette.divider}`,
   textTransform: 'capitalize',
   [theme.breakpoints.down('sm')]: {
-    fontSize: '1.1rem'
+    fontSize: '0.6875rem'
   }
 }));
 
@@ -749,7 +749,7 @@ Message Body: ${body}`;
               justifyContent: 'flex-end',
               px: 1,
               color: replyText.length > 5000 ? 'error.main' : 'text.secondary',
-              fontSize: '1rem'
+              fontSize: '0.625rem'
               
             }}>
             {replyText.length > 5000 &&

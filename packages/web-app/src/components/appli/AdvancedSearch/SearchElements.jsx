@@ -120,8 +120,8 @@ SearchFieldset.propTypes = {
 
 const StyledTextField = styled(TextField)(({ theme }) => ({
   flex: 1,
-  minWidth: '15rem',
-  maxWidth: '30rem',
+  minWidth: '9.375rem',
+  maxWidth: '18.75rem',
   '& .MuiOutlinedInput-root': {
     borderRadius: 6,
     backgroundColor: theme.palette.action.hover,
@@ -289,8 +289,8 @@ export const SearchTextAutocomplete = ({
     <Autocomplete
       sx={{
         flex: 1,
-        minWidth: '15rem',
-        maxWidth: '30rem'
+        minWidth: '9.375rem',
+        maxWidth: '18.75rem'
       }}
       options={options}
       loading={loading}

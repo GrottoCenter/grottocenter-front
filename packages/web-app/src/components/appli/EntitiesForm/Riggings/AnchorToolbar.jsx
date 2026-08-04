@@ -69,7 +69,7 @@ const AnchorToolbar = ({ onInsert }) => {
                     border: '1px solid',
                     borderColor: 'divider',
                     borderRadius: 1,
-                    fontSize: '1.3rem',
+                    fontSize: '0.8125rem',
                     fontWeight: 'bold',
                     lineHeight: 1,
                     color: 'text.primary'

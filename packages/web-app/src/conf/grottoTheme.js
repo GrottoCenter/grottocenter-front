@@ -93,23 +93,26 @@ export const overridings = {
   shape: {
     borderRadius: 4
   },
+  // Root font-size is the browser default (16px): 1rem = 16px. The app used to
+  // pair Skeleton-CSS's `html { font-size: 62.5% }` with `htmlFontSize: 10`,
+  // which silently rendered every third-party stylesheet written for a 16px
+  // root at 62.5% of its intended size. Never reintroduce `htmlFontSize`.
   typography: {
     fontFamily,
-    htmlFontSize: 10,
     h1: {
-      fontSize: '4.2rem'
+      fontSize: '2.625rem'
     },
     h2: {
-      fontSize: '3.5rem'
+      fontSize: '2.1875rem'
     },
     h3: {
-      fontSize: '2.9rem'
+      fontSize: '1.8125rem'
     },
     h4: {
-      fontSize: '2.4rem'
+      fontSize: '1.5rem'
     },
     h5: {
-      fontSize: '2rem'
+      fontSize: '1.25rem'
     }
   },
   components: {
@@ -142,7 +145,7 @@ export const overridings = {
       styleOverrides: {
         root: {
           color: brown['500'],
-          fontSize: '1.3rem'
+          fontSize: '0.8125rem'
         }
       }
     },
@@ -236,7 +239,7 @@ export const overridings = {
           height: `${appBarHeight}px`
         },
         gutterBottom: {
-          marginBottom: '1rem'
+          marginBottom: '0.625rem'
         }
       }
     },

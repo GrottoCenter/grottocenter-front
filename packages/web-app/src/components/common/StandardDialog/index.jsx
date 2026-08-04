@@ -12,9 +12,9 @@ import CloseIcon from '@mui/icons-material/Close';
 import IconButton from '@mui/material/IconButton';
 
 const CustomDialogTitle = styled(DialogTitle)`
-  margin-top: 1rem;
+  margin-top: 0.625rem;
   @media (max-width: 600px) {
-    margin-top: 0.5rem;
+    margin-top: 0.3125rem;
     padding: 16px 16px 8px;
   }
 `;

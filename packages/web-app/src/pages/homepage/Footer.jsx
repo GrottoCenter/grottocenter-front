@@ -47,7 +47,7 @@ const NavList = styled(Box)(({ theme }) => ({
   '& a, & a:visited': {
     color: 'rgba(255,255,255,0.75)',
     textDecoration: 'none',
-    fontSize: '1.3rem',
+    fontSize: '0.8125rem',
     fontWeight: 400,
     display: 'block',
     marginBottom: 10,

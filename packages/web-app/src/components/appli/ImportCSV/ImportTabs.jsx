@@ -7,10 +7,10 @@ import { DOCUMENT, ENTRANCE } from './constants';
 import { entranceIcon, bibliographyIcon } from '../../../assets/icons';
 
 const TabIcon = styled('img')`
-  height: 2rem;
+  height: 1.25rem;
   margin-right: 5px;
   vertical-align: middle;
-  width: 2rem;
+  width: 1.25rem;
 `;
 
 const ImportTabs = () => {

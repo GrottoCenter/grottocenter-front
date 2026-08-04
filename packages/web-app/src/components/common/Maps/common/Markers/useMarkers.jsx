@@ -8,7 +8,7 @@ export const MarkerGlobalCss = (
   <GlobalStyles
     styles={`
       .leaflet-container {
-        font-size: 1rem;
+        font-size: 0.625rem;
       }
     `}
   />
