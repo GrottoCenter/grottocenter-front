@@ -107,6 +107,13 @@ const DocumentsHandler = ({
   const isSubmittable = () =>
     !(isEmpty(author) || isEmpty(type) || isEmpty(license));
 
+  // Every collection state starts empty and is only filled when the moderator
+  // clicks a value, so an empty array means "not touched", not "clear all".
+  // The API reads an explicit [] as a deliberate clear (it replaces the whole
+  // collection), so untouched collections must be omitted from the payload.
+  const onlyIfFilled = collection =>
+    collection.length > 0 ? collection : undefined;
+
   const onSubmit = () => {
     const { newItems: newAuthors, previousItems: previousAuthors } =
       retrieveFromObjectCollection(authors);
@@ -146,9 +153,12 @@ const DocumentsHandler = ({
         type: type.id,
         parent: getIdOrUndefined(parent),
         license: license.id,
-        authors: previousAuthors,
-        authorsGrotto: previousAuthorsGrotto,
-        subjects: subjects.map(sub => sub.code),
+        authors: onlyIfFilled(previousAuthors),
+        authorsGrotto: onlyIfFilled(previousAuthorsGrotto),
+        // Subjects coming from the database carry their code as `id` (the
+        // TSubject primary key is the `code` column); only subjects coming from
+        // an imported duplicate carry a `code` field.
+        subjects: onlyIfFilled(subjects.map(sub => sub.id ?? sub.code)),
         descriptions: previousDescriptions,
         languages: languages.map(lang => lang.id)
       },
