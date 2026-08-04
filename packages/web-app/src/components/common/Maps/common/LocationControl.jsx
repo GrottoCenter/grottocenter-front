@@ -177,10 +177,25 @@ const LocationControl = () => {
     };
   }, [map, applyBearing]);
 
-  // A user drag detaches follow/compass (the dot stays, the button goes hollow).
-  useMapEvent('dragstart', () => {
-    setMode(m => (m === MODE.FOLLOW || m === MODE.COMPASS ? MODE.LOCATED : m));
-  });
+  // Acting on the map content detaches follow/compass back to 'located' (the dot
+  // stays, rotation stops, the bearing freezes). While following, every fix
+  // recenters the map, so any view change the user asks for would otherwise be
+  // undone within a second — detaching is what makes those interactions work.
+  const detach = useCallback(
+    () =>
+      setMode(m =>
+        m === MODE.FOLLOW || m === MODE.COMPASS ? MODE.LOCATED : m
+      ),
+    []
+  );
+
+  // dragstart: a manual pan. popupopen: every entity tap (entrance, network,
+  // organization, massif, search result) goes through a popup. 'followdetach':
+  // the explicit signal for affordances that move the map without a popup —
+  // the off-screen waypoint badge, cluster dives, geocoding jumps.
+  useMapEvent('dragstart', detach);
+  useMapEvent('popupopen', detach);
+  useMapEvent('followdetach', detach);
 
   // Follow (north-up) and off snap the map back to north. Detaching from compass
   // to 'located' keeps the current rotation frozen — the floating north-reset
@@ -241,9 +256,10 @@ const LocationControl = () => {
       else recenter(true);
       return;
     }
-    // compass: this button only tracks/recenters now — the separate north
-    // button (below) is what exits compass mode.
-    recenter(true);
+    // compass: the map already recenters on every fix, so a recenter here would
+    // be a no-op tap. Close the cycle instead — back to north-up follow, exactly
+    // like the north button, which then disappears.
+    setMode(MODE.FOLLOW);
   };
 
   // Rotated, either because compass follow is actively rotating the map, or
@@ -274,8 +290,14 @@ const LocationControl = () => {
         sx={{ color: theme.palette.mapControlIcon }}
       />
     );
-  } else if (mode === MODE.FOLLOW || mode === MODE.COMPASS) {
+  } else if (mode === MODE.COMPASS) {
+    // The four modes must each be recognisable: the button's next action now
+    // differs in every one of them. Shape separates off / tracking / heading-up,
+    // colour separates a passive fix from an active follow, and the four
+    // distinct labels below carry the same information for screen readers.
     icon = <ExploreIcon sx={{ fontSize: 26, color: USER_LOCATION_COLOR }} />;
+  } else if (mode === MODE.FOLLOW) {
+    icon = <MyLocationIcon sx={{ fontSize: 26, color: USER_LOCATION_COLOR }} />;
   } else if (mode === MODE.LOCATED) {
     icon = (
       <MyLocationIcon
@@ -290,12 +312,16 @@ const LocationControl = () => {
     );
   }
 
+  // Each label announces what the *next* tap does, so it doubles as the
+  // non-visual reading of the current mode.
   let tooltipId = 'Use my location';
   if (isError) {
     tooltipId = GEO_ERROR_MESSAGES[geoError] || GEO_ERROR_MESSAGES[2];
+  } else if (mode === MODE.COMPASS) {
+    tooltipId = 'Reset to north';
   } else if (mode === MODE.FOLLOW) {
     tooltipId = canUseCompass ? 'Compass mode' : 'Recenter on your location';
-  } else if (mode === MODE.COMPASS || mode === MODE.LOCATED) {
+  } else if (mode === MODE.LOCATED) {
     tooltipId = 'Recenter on your location';
   }
   const label = formatMessage({ id: tooltipId });

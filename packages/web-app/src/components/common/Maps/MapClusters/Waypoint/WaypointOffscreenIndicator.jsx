@@ -86,7 +86,12 @@ const WaypointOffscreenIndicator = ({ waypoint }) => {
       ref={setRef}
       aria-label={label}
       title={label}
-      onClick={() => map.panTo([waypoint.lat, waypoint.lng])}
+      onClick={() => {
+        // Detach the location control's follow first: while it is on, every fix
+        // recenters the map on the user and this pan would be undone at once.
+        map.fire('followdetach');
+        map.panTo([waypoint.lat, waypoint.lng]);
+      }}
       sx={{
         position: 'absolute',
         left: indicator.x,

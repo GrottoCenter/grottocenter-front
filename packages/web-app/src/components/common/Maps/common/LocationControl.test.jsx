@@ -221,7 +221,68 @@ describe('LocationControl', () => {
     await waitFor(() => expect(mockMap.setBearing).toHaveBeenCalledWith(0));
   });
 
-  it('recentering while in compass mode does not exit it', async () => {
+  it('exits compass mode from the main button, resetting to north', async () => {
+    renderControl();
+    act(() => button().click());
+    await waitFor(() => expect(watchSuccess).toBeDefined());
+    emitPosition();
+    emitHeading(90);
+    act(() => button().click()); // → compass
+    emitHeading(90);
+    await waitFor(() => expect(mockMap.setBearing).toHaveBeenCalledWith(-90));
+    expect(screen.getAllByRole('button')).toHaveLength(2);
+
+    // The map already recenters on every fix in compass mode, so the main
+    // button closes the cycle instead: back to north-up follow, north button
+    // gone — same outcome as tapping the north button itself.
+    mockMap.setBearing.mockClear();
+    act(() => screen.getAllByRole('button')[0].click());
+
+    await waitFor(() => expect(mockMap.setBearing).toHaveBeenCalledWith(0));
+    expect(screen.getAllByRole('button')).toHaveLength(1);
+  });
+
+  it('shows a distinct button state for each of the four modes', async () => {
+    renderControl();
+    // The north button joins the stack in compass mode, so always read the
+    // main one: it is the first control rendered.
+    const mainButton = () => screen.getAllByRole('button')[0];
+    const labelOf = () => mainButton().getAttribute('aria-label');
+
+    expect(labelOf()).toBe('Use my location'); // off
+    act(() => mainButton().click());
+    await waitFor(() => expect(watchSuccess).toBeDefined());
+    emitPosition();
+    emitHeading(90);
+    await waitFor(() => expect(labelOf()).toBe('Compass mode')); // follow
+
+    act(() => mainButton().click());
+    await waitFor(() => expect(labelOf()).toBe('Reset to north')); // compass
+
+    act(() => mapEventHandlers.dragstart());
+    await waitFor(() =>
+      expect(labelOf()).toBe('Recenter on your location') // located
+    );
+  });
+
+  it('detaches following when a popup opens on the map', async () => {
+    renderControl();
+    act(() => button().click());
+    await waitFor(() => expect(watchSuccess).toBeDefined());
+    emitPosition();
+    await waitFor(() => expect(mockMap.setView).toHaveBeenCalled());
+
+    // Tapping an entrance (or any entity) opens a popup; following would
+    // otherwise pan the map away from it on the next fix.
+    act(() => mapEventHandlers.popupopen());
+    const callsAfterPopup = mockMap.setView.mock.calls.length;
+
+    emitPosition({ latitude: 45.3, longitude: 5.7 });
+    await new Promise(r => setTimeout(r, 20));
+    expect(mockMap.setView.mock.calls.length).toBe(callsAfterPopup);
+  });
+
+  it('stops rotating — and freezes the bearing — on a detach request', async () => {
     renderControl();
     act(() => button().click());
     await waitFor(() => expect(watchSuccess).toBeDefined());
@@ -231,11 +292,16 @@ describe('LocationControl', () => {
     emitHeading(90);
     await waitFor(() => expect(mockMap.setBearing).toHaveBeenCalledWith(-90));
 
-    // Clicking the location button itself only recenters, it no longer exits
-    // compass mode — that is the separate north button's job now.
+    // Fired by map affordances that move the view without opening a popup
+    // (off-screen waypoint badge, cluster dive, geocoding jump).
+    act(() => mapEventHandlers.followdetach());
     mockMap.setBearing.mockClear();
-    act(() => screen.getAllByRole('button')[0].click());
+
+    emitHeading(180);
+    await new Promise(r => setTimeout(r, 20));
     expect(mockMap.setBearing).not.toHaveBeenCalled();
+    // The bearing stays where it was; the north button remains to straighten it.
+    expect(screen.getAllByRole('button')).toHaveLength(2);
   });
 
   it('detaches following when the user drags the map', async () => {
