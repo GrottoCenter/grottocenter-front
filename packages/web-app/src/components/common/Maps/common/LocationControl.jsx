@@ -18,7 +18,8 @@ import CompassNeedle from './CompassNeedle';
 import {
   useUserLocation,
   useDeviceHeading,
-  useRequestUserLocation
+  useRequestUserLocation,
+  useRequestHeading
 } from './MapLocationContext';
 import {
   USER_LOCATION_COLOR,
@@ -68,14 +69,16 @@ const LocationControl = () => {
     heading,
     isSupported: compassSupported,
     error: compassError,
-    start: startCompass,
-    stop: stopCompass
+    start: startCompass
   } = useDeviceHeading();
 
   const [mode, setMode] = useState(MODE.OFF);
 
-  // Keep the shared geolocation watch alive whenever we are tracking.
+  // Keep the shared geolocation watch and orientation sensor alive whenever we
+  // are tracking. The provider owns their lifecycle (ref-counted), so the sensor
+  // stays on for other consumers — e.g. the waypoint arrow — independently.
   useRequestUserLocation(mode !== MODE.OFF);
+  useRequestHeading(mode !== MODE.OFF);
 
   // Refs read by stable callbacks / effects without widening their deps.
   const modeRef = useRef(mode);
@@ -192,11 +195,6 @@ const LocationControl = () => {
     map.fire('compassfollowchange', { following: mode === MODE.COMPASS });
   }, [map, mode]);
 
-  // Stop the orientation sensor when we stop tracking altogether.
-  useEffect(() => {
-    if (mode === MODE.OFF) stopCompass();
-  }, [mode, stopCompass]);
-
   // Surface geolocation failures as a toast — never a silent no-op. A denied
   // permission ends tracking; a transient error keeps the current mode.
   const notifiedGeoErrorRef = useRef(null);
@@ -226,10 +224,9 @@ const LocationControl = () => {
 
   const handleClick = () => {
     if (mode === MODE.OFF) {
-      // Activate: request a high-accuracy fix (via useRequestUserLocation) and
-      // start the compass sensor best-effort (it powers the dot's heading cone
-      // even north-up). Calling start() directly keeps it in the user gesture,
-      // required by the iOS permission prompt.
+      // Activate: request a high-accuracy fix and a heading (both declared
+      // above). Also call start() here so iOS gets its permission prompt from
+      // inside the user gesture — the only place it is allowed.
       if (map.getZoom() < focusZoom) pendingZoomRef.current = focusZoom;
       startCompass();
       setMode(MODE.FOLLOW);

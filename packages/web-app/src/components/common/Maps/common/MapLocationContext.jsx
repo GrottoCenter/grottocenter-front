@@ -29,9 +29,34 @@ export const MapLocationProvider = ({ children }) => {
   );
 
   const geo = useGeolocation({ watch: true, enabled: requestCount > 0 });
-  // Orientation lifecycle is owned by the location control (start() must run in
-  // a user gesture for the iOS permission prompt); everyone else just reads it.
   const orientation = useDeviceOrientation();
+
+  // Same ref-counted lazy activation for the orientation sensor, so whoever
+  // needs a heading (the location dot's direction cone, the waypoint arrow) gets
+  // one without having to own the sensor's lifecycle.
+  const [headingCount, setHeadingCount] = useState(0);
+  const requestHeading = useCallback(() => setHeadingCount(n => n + 1), []);
+  const releaseHeading = useCallback(
+    () => setHeadingCount(n => Math.max(0, n - 1)),
+    []
+  );
+
+  const {
+    start: startOrientation,
+    stop: stopOrientation,
+    needsPermission
+  } = orientation;
+
+  // Auto-start where no user gesture is required. On iOS the Device Orientation
+  // API only grants permission from inside a gesture, so there we wait for the
+  // location control's tap to call start() itself.
+  useEffect(() => {
+    if (headingCount === 0) {
+      stopOrientation();
+      return;
+    }
+    if (!needsPermission) startOrientation();
+  }, [headingCount, needsPermission, startOrientation, stopOrientation]);
 
   const userLocation = useMemo(
     () => ({
@@ -60,8 +85,13 @@ export const MapLocationProvider = ({ children }) => {
     ]
   );
 
+  const deviceHeading = useMemo(
+    () => ({ ...orientation, requestHeading, releaseHeading }),
+    [orientation, requestHeading, releaseHeading]
+  );
+
   return (
-    <DeviceHeadingContext.Provider value={orientation}>
+    <DeviceHeadingContext.Provider value={deviceHeading}>
       <UserLocationContext.Provider value={userLocation}>
         {children}
       </UserLocationContext.Provider>
@@ -100,4 +130,16 @@ export const useRequestUserLocation = active => {
     enable();
     return disable;
   }, [active, enable, disable]);
+};
+
+// Same declarative contract for the compass heading: any consumer that draws a
+// heading (the dot's cone, the waypoint arrow) requests one while it is mounted,
+// instead of one component owning the sensor for everybody.
+export const useRequestHeading = active => {
+  const { requestHeading, releaseHeading } = useDeviceHeading();
+  useEffect(() => {
+    if (!active) return undefined;
+    requestHeading();
+    return releaseHeading;
+  }, [active, requestHeading, releaseHeading]);
 };

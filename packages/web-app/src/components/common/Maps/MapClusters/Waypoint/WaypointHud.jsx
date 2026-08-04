@@ -10,7 +10,10 @@ import {
   formatDistance,
   relativeBearing
 } from '@/utils/geo';
-import { useDeviceHeading } from '@/components/common/Maps/common/MapLocationContext';
+import {
+  useDeviceHeading,
+  useRequestHeading
+} from '@/components/common/Maps/common/MapLocationContext';
 import { WAYPOINT_COLOR } from './waypointIcon';
 
 const pointShape = PropTypes.shape({
@@ -26,7 +29,10 @@ const pointShape = PropTypes.shape({
 const WaypointHud = ({ waypoint, userLocation }) => {
   const { locale } = useIntl();
   const theme = useTheme();
+  // The relative arrow needs a compass heading, so the HUD asks for one — it
+  // works whether or not the user also turned the location control on.
   const { heading } = useDeviceHeading();
+  useRequestHeading(true);
 
   // Keep the banner from bleeding taps/scroll through to the map underneath.
   const ref = useRef(null);

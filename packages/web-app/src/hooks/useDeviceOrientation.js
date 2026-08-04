@@ -154,7 +154,16 @@ const useDeviceOrientation = () => {
     };
   }, [clearNoDataTimer, removeListeners]);
 
-  return { heading, isSupported, error, start, stop };
+  // Consumers need to know whether starting requires a user gesture (iOS), so
+  // they can auto-start where it is safe and defer to a tap where it is not.
+  return {
+    heading,
+    isSupported,
+    error,
+    start,
+    stop,
+    needsPermission: needsPermissionRequest()
+  };
 };
 
 export default useDeviceOrientation;

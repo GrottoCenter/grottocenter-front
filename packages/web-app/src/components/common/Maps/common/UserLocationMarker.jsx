@@ -1,7 +1,11 @@
 import { useEffect, useRef } from 'react';
 import { Circle, useMap } from 'react-leaflet';
 import * as L from 'leaflet';
-import { useUserLocation, useDeviceHeading } from './MapLocationContext';
+import {
+  useUserLocation,
+  useDeviceHeading,
+  useRequestHeading
+} from './MapLocationContext';
 import {
   USER_LOCATION_COLOR,
   ACCURACY_CIRCLE_STYLE
@@ -44,6 +48,9 @@ const UserLocationMarker = () => {
   // Magnetometer heading when available, else the GPS course (only while moving).
   const facing = heading ?? gpsHeading;
   const shown = active && hasLocation;
+
+  // The cone is the reason we need a heading, so it asks for one itself.
+  useRequestHeading(shown);
 
   // Create the marker once (rotateWithView lets leaflet-rotate spin it with the
   // map bearing). interactive:false so it never swallows clicks meant for the map.
