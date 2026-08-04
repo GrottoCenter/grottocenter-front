@@ -35,6 +35,22 @@ export const initialBearing = (a, b) => {
 export const bearingToCardinal = deg =>
   CARDINALS[Math.round(normalizeDeg(deg) / 22.5) % 16];
 
+// Direction to a target expressed relative to where the user currently faces:
+// 0 = straight ahead, 90 = to the right, 180 = behind, 270 = to the left.
+// Used to draw the waypoint HUD arrow relative to the device heading.
+export const relativeBearing = (bearing, heading) =>
+  normalizeDeg(bearing - heading);
+
+// Vertical container-pixel offset from the user's screen position to the map
+// center that places the user at `offsetRatio` down the viewport
+// (0.5 = centered, ~0.66 = lower third, navigation "heading-up" style). The
+// result is negative when the center must sit ABOVE the user, so the user
+// appears lower on screen. Kept Leaflet-free: the caller turns the user's
+// container point + this offset into a lat/lng via the map's own (rotation-
+// aware) containerPointToLatLng.
+export const followCenterYOffset = (height, offsetRatio) =>
+  height * (0.5 - offsetRatio);
+
 // Human-readable distance: metric (m below 1 km, else km) plus imperial (miles).
 // Uses Intl.NumberFormat so the unit label follows the active locale.
 // Moved here from MeasureControl so both the measure tool and the waypoint HUD

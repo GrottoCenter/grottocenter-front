@@ -2,15 +2,40 @@ import { useEffect, useState } from 'react';
 import { defaultCoord } from '../conf/config';
 
 // One-shot geolocation by default. Pass { watch: true } to keep tracking the
-// position (watchPosition) — used by the waypoint navigation to update the live
-// distance and the as-the-crow-flies line as the user moves.
-const useGeolocation = ({ watch = false } = {}) => {
+// position (watchPosition) — used by the location marker and the waypoint
+// navigation to update the live distance and the as-the-crow-flies line as the
+// user moves.
+//
+// - enabled=false keeps the hook dormant (no permission prompt, no tracking)
+//   until the consumer flips it on — used by the location control's lazy
+//   activation, so we never prompt for geolocation before the user asks for it.
+// - High accuracy is on by default: the primary use is field navigation towards
+//   a cave entrance, where a coarse network fix is not good enough.
+// - A finite timeout means a denied/unreachable sensor surfaces an error instead
+//   of hanging forever, so consumers can give feedback.
+const useGeolocation = ({
+  watch = false,
+  enabled = true,
+  enableHighAccuracy = true,
+  timeout = 10000,
+  maximumAge = 10000
+} = {}) => {
   const [location, setLocation] = useState(defaultCoord);
   const [hasLocation, setHasLocation] = useState(false);
   const [accuracy, setAccuracy] = useState(null);
+  // GPS-derived course (deg) and speed (m/s). Only defined while moving, so they
+  // are a fallback heading source when the device has no magnetometer.
+  const [gpsHeading, setGpsHeading] = useState(null);
+  const [speed, setSpeed] = useState(null);
+  // GeolocationPositionError code: 1 denied, 2 unavailable, 3 timeout — or null.
+  const [error, setError] = useState(null);
+  // 'idle' | 'locating' | 'active' | 'error'
+  const [status, setStatus] = useState('idle');
 
   useEffect(() => {
-    if (!navigator.geolocation) return undefined;
+    if (!enabled || !navigator.geolocation) return undefined;
+
+    setStatus('locating');
 
     const onPosition = position => {
       setLocation({
@@ -18,19 +43,42 @@ const useGeolocation = ({ watch = false } = {}) => {
         lng: position.coords.longitude
       });
       setAccuracy(position.coords.accuracy);
+      // coords.heading / coords.speed are null (or NaN) while the device is
+      // stationary — normalise both to a finite number or null.
+      setGpsHeading(
+        Number.isFinite(position.coords.heading)
+          ? position.coords.heading
+          : null
+      );
+      setSpeed(
+        Number.isFinite(position.coords.speed) ? position.coords.speed : null
+      );
       setHasLocation(true);
+      setError(null);
+      setStatus('active');
     };
 
+    const onError = err => {
+      setError(err.code);
+      setStatus('error');
+    };
+
+    const options = { enableHighAccuracy, timeout, maximumAge };
+
     if (!watch) {
-      navigator.geolocation.getCurrentPosition(onPosition);
+      navigator.geolocation.getCurrentPosition(onPosition, onError, options);
       return undefined;
     }
 
-    const watchId = navigator.geolocation.watchPosition(onPosition);
+    const watchId = navigator.geolocation.watchPosition(
+      onPosition,
+      onError,
+      options
+    );
     return () => navigator.geolocation.clearWatch(watchId);
-  }, [watch]);
+  }, [watch, enabled, enableHighAccuracy, timeout, maximumAge]);
 
-  return { location, hasLocation, accuracy };
+  return { location, hasLocation, accuracy, gpsHeading, speed, error, status };
 };
 
 export default useGeolocation;

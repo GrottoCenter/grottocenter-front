@@ -13,8 +13,10 @@ import './setupLeafletRotate';
 import 'leaflet-rotate';
 import LayersControl from './LayersControl';
 import FullscreenControl from './FullscreenControl';
-import LocateControl from './LocateControl';
-import CompassControl from './CompassControl';
+import LocationControl from './LocationControl';
+import NorthResetControl from './NorthResetControl';
+import UserLocationMarker from './UserLocationMarker';
+import { MapLocationProvider } from './MapLocationContext';
 
 const Wrapper = styled('div', {
   shouldForwardProp: prop => !prop.startsWith('$')
@@ -90,10 +92,10 @@ FullscreenInteraction.propTypes = {
   scrollWheelZoom: PropTypes.bool
 };
 
-// Locate / compass controls that only appear while the map is in fullscreen
-// (the field-navigation context — e.g. entrance maps on mobile). The compass
-// button self-hides on non-touch devices, so it stays mobile-only.
-const FullscreenOnlyControls = ({ isLocateControl, isCompassControl }) => {
+// Unified location control + user-position marker that only appear while the
+// map is in fullscreen (the field-navigation context — e.g. entrance maps on
+// mobile). The compass part of the control self-degrades on non-touch devices.
+const FullscreenOnlyControls = () => {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const map = useMapEvents({
     enterFullscreen() {
@@ -101,29 +103,20 @@ const FullscreenOnlyControls = ({ isLocateControl, isCompassControl }) => {
     },
     exitFullscreen() {
       setIsFullscreen(false);
-      // Leaving fullscreen unmounts the compass button; restore north-up so the
-      // map isn't left rotated with no control to reset it.
+      // Leaving fullscreen unmounts the location control; restore north-up so
+      // the map isn't left rotated with no control to reset it.
       if (typeof map.setBearing === 'function') map.setBearing(0);
     }
   });
 
-  // Both are field-navigation helpers, shown only in fullscreen. Mounting them
-  // together on enter (rather than keeping locate always-mounted and hidden by
-  // CSS) guarantees a stable bottom-right stack: the compass mounts first, so
-  // Leaflet inserts the locate button above it — the same order as the other
-  // maps (bottom controls are inserted before the current first child).
   if (!isFullscreen) return null;
   return (
     <>
-      {isCompassControl && <CompassControl />}
-      {isLocateControl && <LocateControl />}
+      <LocationControl />
+      <NorthResetControl />
+      <UserLocationMarker />
     </>
   );
-};
-
-FullscreenOnlyControls.propTypes = {
-  isLocateControl: PropTypes.bool,
-  isCompassControl: PropTypes.bool
 };
 
 const CustomMapContainer = ({
@@ -133,10 +126,8 @@ const CustomMapContainer = ({
   dragging = true,
   scrollWheelZoom = true,
   isSideMenuOpen = false,
-  isLocateControl = false,
-  isCompassControl = false,
-  isLocateControlInFullscreen = false,
-  isCompassControlInFullscreen = false,
+  isLocationControl = false,
+  isLocationControlInFullscreen = false,
   isFullscreenAllowed = true,
   shouldChangeControlInFullscreen = true,
   style,
@@ -213,7 +204,7 @@ const CustomMapContainer = ({
         scrollWheelZoom={scrollWheelZoom}
         isSideMenuOpen={isSideMenuOpen}
         minZoom={1}
-        rotate={isCompassControl || isCompassControlInFullscreen}
+        rotate={isLocationControl || isLocationControlInFullscreen}
         bearing={0}
         rotateControl={false}
         touchRotate={false}
@@ -221,30 +212,31 @@ const CustomMapContainer = ({
         ref={mapRefCallback}
         renderer={renderer || undefined}
         preferCanvas={!renderer}>
-        {isFullscreenAllowed && shouldChangeControlInFullscreen && (
-          <FullscreenInteraction
-            dragging={dragging}
-            scrollWheelZoom={scrollWheelZoom}
-          />
-        )}
-        {isFullscreenAllowed && !shouldChangeControlInFullscreen && (
-          <FullscreenControl forceSeparateButton="true" />
-        )}
-        {forceCentering && <Centerer center={center} zoom={zoom} />}
-        {/* Bottom-right stack. Leaflet inserts each new bottom control above the
-            previous one, so mount order bottom→top is: Scale, Compass, Locate.
-            That keeps the locate button on top, above the compass when present. */}
-        <ScaleControl position="bottomright" />
-        {isCompassControl && <CompassControl />}
-        {isLocateControl && <LocateControl />}
-        {(isLocateControlInFullscreen || isCompassControlInFullscreen) && (
-          <FullscreenOnlyControls
-            isLocateControl={isLocateControlInFullscreen}
-            isCompassControl={isCompassControlInFullscreen}
-          />
-        )}
-        <LayersControl position="topright" />
-        {children}
+        <MapLocationProvider>
+          {isFullscreenAllowed && shouldChangeControlInFullscreen && (
+            <FullscreenInteraction
+              dragging={dragging}
+              scrollWheelZoom={scrollWheelZoom}
+            />
+          )}
+          {isFullscreenAllowed && !shouldChangeControlInFullscreen && (
+            <FullscreenControl forceSeparateButton="true" />
+          )}
+          {forceCentering && <Centerer center={center} zoom={zoom} />}
+          {/* Bottom-right stack. Leaflet inserts each new bottom control above
+              the previous one. */}
+          <ScaleControl position="bottomright" />
+          {isLocationControl && (
+            <>
+              <LocationControl />
+              <NorthResetControl />
+              <UserLocationMarker />
+            </>
+          )}
+          {isLocationControlInFullscreen && <FullscreenOnlyControls />}
+          <LayersControl position="topright" />
+          {children}
+        </MapLocationProvider>
       </MapContainer>
     </Wrapper>
   );
@@ -258,10 +250,8 @@ CustomMapContainer.propTypes = {
   scrollWheelZoom: PropTypes.bool,
   children: PropTypes.node,
   isSideMenuOpen: PropTypes.bool,
-  isLocateControl: PropTypes.bool,
-  isCompassControl: PropTypes.bool,
-  isLocateControlInFullscreen: PropTypes.bool,
-  isCompassControlInFullscreen: PropTypes.bool,
+  isLocationControl: PropTypes.bool,
+  isLocationControlInFullscreen: PropTypes.bool,
   isFullscreenAllowed: PropTypes.bool,
   shouldChangeControlInFullscreen: PropTypes.bool,
   style: PropTypes.shape({}),

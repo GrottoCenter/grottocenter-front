@@ -1,4 +1,10 @@
-import { initialBearing, bearingToCardinal, formatDistance } from './geo';
+import {
+  initialBearing,
+  bearingToCardinal,
+  formatDistance,
+  relativeBearing,
+  followCenterYOffset
+} from './geo';
 
 describe('initialBearing', () => {
   const origin = { lat: 0, lng: 0 };
@@ -27,6 +33,47 @@ describe('bearingToCardinal', () => {
     [-22.5, 'NNW']
   ])('maps %p° to %p', (deg, expected) => {
     expect(bearingToCardinal(deg)).toBe(expected);
+  });
+});
+
+describe('relativeBearing', () => {
+  it.each([
+    ['target ahead when facing it', 90, 90, 0],
+    ['target to the right', 90, 0, 90],
+    ['target to the left', 0, 90, 270],
+    ['target behind', 180, 0, 180],
+    ['wraps across North', 10, 350, 20],
+    ['wraps the other way', 350, 10, 340]
+  ])('%s → %p°', (_label, bearing, heading, expected) => {
+    expect(relativeBearing(bearing, heading)).toBeCloseTo(expected, 5);
+  });
+
+  it('always returns a value within [0, 360)', () => {
+    for (let bearing = 0; bearing < 360; bearing += 37) {
+      for (let heading = 0; heading < 360; heading += 53) {
+        const result = relativeBearing(bearing, heading);
+        expect(result).toBeGreaterThanOrEqual(0);
+        expect(result).toBeLessThan(360);
+      }
+    }
+  });
+});
+
+describe('followCenterYOffset', () => {
+  it('is zero when the user stays centered', () => {
+    expect(followCenterYOffset(600, 0.5)).toBe(0);
+  });
+
+  it('is negative so the center sits above the user (user appears lower)', () => {
+    // ratio 0.66 → user at 66% down the viewport, center 16% of height above it.
+    expect(followCenterYOffset(600, 0.66)).toBeCloseTo(-96, 5);
+  });
+
+  it('scales with the viewport height', () => {
+    expect(followCenterYOffset(300, 0.66)).toBeCloseTo(
+      followCenterYOffset(600, 0.66) / 2,
+      5
+    );
   });
 });
 

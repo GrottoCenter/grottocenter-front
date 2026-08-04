@@ -3,7 +3,15 @@ import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import * as L from 'leaflet';
 import { Box, Card, Typography, useTheme } from '@mui/material';
-import { initialBearing, bearingToCardinal, formatDistance } from '@/utils/geo';
+import NavigationIcon from '@mui/icons-material/Navigation';
+import {
+  initialBearing,
+  bearingToCardinal,
+  formatDistance,
+  relativeBearing
+} from '@/utils/geo';
+import { useDeviceHeading } from '@/components/common/Maps/common/MapLocationContext';
+import { WAYPOINT_COLOR } from './waypointIcon';
 
 const pointShape = PropTypes.shape({
   lat: PropTypes.number.isRequired,
@@ -11,12 +19,14 @@ const pointShape = PropTypes.shape({
 });
 
 // Bottom banner showing the straight-line distance and bearing to the waypoint.
-// Mounted only while navigation is active (a live position is available). The
-// directional guidance is carried by the red line on the (compass-rotated) map
-// and the off-screen indicator, so the banner stays text-only.
+// Mounted only while navigation is active (a live position is available). When
+// the device heading is known, a large arrow points to the waypoint relative to
+// where the user faces ("turn this way"); otherwise it falls back to the text
+// absolute bearing only.
 const WaypointHud = ({ waypoint, userLocation }) => {
   const { locale } = useIntl();
   const theme = useTheme();
+  const { heading } = useDeviceHeading();
 
   // Keep the banner from bleeding taps/scroll through to the map underneath.
   const ref = useRef(null);
@@ -37,6 +47,10 @@ const WaypointHud = ({ waypoint, userLocation }) => {
     [userLocation, waypoint]
   );
 
+  // Direction to the waypoint relative to where the user currently faces (0 =
+  // straight ahead). Null when the device has no usable compass heading.
+  const relative = heading == null ? null : relativeBearing(bearing, heading);
+
   return (
     <Box
       ref={ref}
@@ -51,13 +65,38 @@ const WaypointHud = ({ waypoint, userLocation }) => {
       }}>
       <Card
         elevation={4}
-        sx={{ px: 2, py: 1, borderRadius: 2, textAlign: 'center' }}>
-        <Typography variant="subtitle1" sx={{ fontWeight: 700, lineHeight: 1.2 }}>
-          {formatDistance(distance, locale)}
-        </Typography>
-        <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.2 }}>
-          {`${Math.round(bearing)}° ${bearingToCardinal(bearing)}`}
-        </Typography>
+        sx={{
+          px: 2,
+          py: 1,
+          borderRadius: 2,
+          display: 'flex',
+          alignItems: 'center',
+          gap: 1.5
+        }}>
+        {relative != null && (
+          <NavigationIcon
+            aria-hidden="true"
+            sx={{
+              fontSize: 40,
+              color: WAYPOINT_COLOR,
+              transform: `rotate(${relative}deg)`,
+              transition: 'transform 0.1s linear'
+            }}
+          />
+        )}
+        <Box sx={{ textAlign: relative != null ? 'left' : 'center' }}>
+          <Typography
+            variant="subtitle1"
+            sx={{ fontWeight: 700, lineHeight: 1.2 }}>
+            {formatDistance(distance, locale)}
+          </Typography>
+          <Typography
+            variant="body2"
+            color="text.secondary"
+            sx={{ lineHeight: 1.2 }}>
+            {`${Math.round(bearing)}° ${bearingToCardinal(bearing)}`}
+          </Typography>
+        </Box>
       </Card>
     </Box>
   );

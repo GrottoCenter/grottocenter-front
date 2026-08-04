@@ -117,7 +117,10 @@ const HydratedMap = ({
   // Temporary navigation waypoint (mobile/touch only). Persisted so it survives
   // a reload in the field. The live position watch lives in WaypointNavigation,
   // mounted only while a waypoint exists.
-  const [waypoint, setWaypoint] = useLocalStorage('grottocenter_waypoint', null);
+  const [waypoint, setWaypoint] = useLocalStorage(
+    'grottocenter_waypoint',
+    null
+  );
   // Dev-only: when mocking, drop a reference point at the current map center so
   // the full waypoint UI renders without placing one (see waypointMock.js).
   const mockWaypoint = useMemo(() => {
@@ -561,8 +564,7 @@ const Index = ({
         zoom={zoom}
         isFullscreenAllowed={false}
         isSideMenuOpen={isSideMenuOpen}
-        isLocateControl
-        isCompassControl
+        isLocationControl
         mapRef={mapRef}
         renderer={renderer}>
         <HydratedMap {...props} popupTarget={popupTarget} />
