@@ -9,9 +9,13 @@ import React, {
 import PropTypes from 'prop-types';
 import useGeolocation from '@/hooks/useGeolocation';
 import useDeviceOrientation from '@/hooks/useDeviceOrientation';
+import useWakeLock from '@/hooks/useWakeLock';
 
 const UserLocationContext = createContext(null);
 const DeviceHeadingContext = createContext(null);
+
+// How long a working watch survives its last consumer (see below).
+const KEEP_WARM_MS = 30000;
 
 // Shared, map-scoped location + orientation. Mounted once inside the map so the
 // unified location control, the user-location marker and the waypoint HUD all
@@ -30,12 +34,41 @@ export const MapLocationProvider = ({ children }) => {
 
   // Field-navigation context: the primary use is guiding the user to a cave
   // entrance, so a coarse network fix isn't good enough — opt into GPS.
+  const [isWatching, setIsWatching] = useState(false);
   const geo = useGeolocation({
     watch: true,
-    enabled: requestCount > 0,
+    enabled: isWatching,
     enableHighAccuracy: true
   });
   const orientation = useDeviceOrientation();
+
+  // Losing the last consumer doesn't stop a *working* watch straight away:
+  // re-acquiring a GPS fix from cold costs tens of seconds in the field, and
+  // turning the location control off then on again is an ordinary gesture. A
+  // grace period makes the position instant on the way back.
+  //
+  // A watch that never delivered has nothing to keep warm, and stopping it at
+  // once is what makes the next activation a genuine retry — cleared error,
+  // permission prompt re-issued.
+  const hasFix = geo.hasLocation;
+  useEffect(() => {
+    if (requestCount > 0) {
+      setIsWatching(true);
+      return undefined;
+    }
+    if (!hasFix) {
+      setIsWatching(false);
+      return undefined;
+    }
+    const id = setTimeout(() => setIsWatching(false), KEEP_WARM_MS);
+    return () => clearTimeout(id);
+  }, [requestCount, hasFix]);
+
+  // Tracking is only ever requested for field navigation, where the screen
+  // locking is both a usability problem and the main reason the watch stops
+  // delivering. Tie the lock to the request count, not to `isWatching`: the
+  // warm-up window above is not a reason to keep the screen on.
+  useWakeLock(requestCount > 0);
 
   // Same ref-counted lazy activation for the orientation sensor, so whoever
   // needs a heading (the location dot's direction cone, the waypoint arrow) gets
