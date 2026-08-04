@@ -66,7 +66,6 @@ const Content = styled('div')`
   flex-grow: 1;
   overflow-y: auto;
   padding: 0 8px 8px;
-  font-size: 0.59375rem;
   touch-action: pan-y;
 `;
 

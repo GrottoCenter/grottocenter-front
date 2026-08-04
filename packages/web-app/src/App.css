@@ -85,7 +85,7 @@ code {
  */
 .leaflet-control-attribution,
 .leaflet-control-scale-line {
-  font-size: 0.46875rem;
+  font-size: 0.5rem;
 }
 
 @media print {

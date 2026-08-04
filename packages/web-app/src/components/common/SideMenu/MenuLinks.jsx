@@ -29,7 +29,7 @@ const SectionHeader = styled(ListSubheader)(({ theme }) => ({
   letterSpacing: '1px',
   textTransform: 'uppercase',
   color: theme.palette.text.secondary,
-  lineHeight: '1.25rem',
+  lineHeight: 1.5,
   paddingTop: theme.spacing(0.5)
 }));
 
