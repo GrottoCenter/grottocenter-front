@@ -55,7 +55,10 @@ export const FormSection = ({ title, children }) => (
   <Box component="section" sx={{ mt: { xs: 2, sm: 3 } }}>
     {title && (
       <>
-        <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
+        {/* Same visual token as InfoSection on the read pages: both label a
+            group (fields here, properties there). `component` keeps the outline
+            right — a section of the form sits under the page title. */}
+        <Typography variant="h5" component="h2">
           <Translate>{title}</Translate>
         </Typography>
         <Divider sx={{
