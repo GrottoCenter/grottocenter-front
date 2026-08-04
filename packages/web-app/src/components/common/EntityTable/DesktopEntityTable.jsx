@@ -243,6 +243,19 @@ const DesktopEntityTable = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const handleRowSelect = (event, doc) => {
+    event.stopPropagation();
+    const newSelected = [...selected];
+    const selectedIndex = selected.indexOf(doc.id);
+    if (selectedIndex === -1) {
+      newSelected.push(doc.id);
+    } else {
+      newSelected.splice(selectedIndex, 1);
+    }
+    setSelected(newSelected);
+    onSelected(newSelected);
+  };
+
   const handleRowClick = (event, doc) => {
     if (onSelected && !onRowClick) {
       handleRowSelect(event, doc);
@@ -255,19 +268,6 @@ const DesktopEntityTable = ({
     const url = entityConfig.link(doc);
     if (!url) return;
     openLink(url);
-  };
-
-  const handleRowSelect = (event, doc) => {
-    event.stopPropagation();
-    const newSelected = [...selected];
-    const selectedIndex = selected.indexOf(doc.id);
-    if (selectedIndex === -1) {
-      newSelected.push(doc.id);
-    } else {
-      newSelected.splice(selectedIndex, 1);
-    }
-    setSelected(newSelected);
-    onSelected(newSelected);
   };
 
   const handleRequestSort = (event, property) => {

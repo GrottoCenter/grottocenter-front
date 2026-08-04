@@ -2,6 +2,11 @@ import fc from 'fast-check';
 import fetch from 'isomorphic-fetch';
 import { postBanCaver, postUnbanCaver } from './BanCaver';
 
+// Hoisted so the vi.mock factories below can reference it.
+const mockPostLogoutThunk = vi.hoisted(() => dispatch => {
+  dispatch({ type: 'LOGOUT' });
+});
+
 // Mock isomorphic-fetch
 vi.mock('isomorphic-fetch', () => ({ default: vi.fn() }));
 
@@ -9,10 +14,6 @@ vi.mock('isomorphic-fetch', () => ({ default: vi.fn() }));
 vi.mock('../Login', () => ({
   postLogout: () => mockPostLogoutThunk
 }));
-
-const mockPostLogoutThunk = dispatch => {
-  dispatch({ type: 'LOGOUT' });
-};
 
 /**
  * Property 7: Ban/Unban action creator dispatch sequence

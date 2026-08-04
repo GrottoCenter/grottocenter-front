@@ -106,27 +106,6 @@ export const MassifForm = ({ massifValues, onCancel }) => {
     }
   }, [massifError, nameError, handleReset, onError, formatMessage]);
 
-  const handleFormSubmit = e => {
-    if (polygonErrors) {
-      e.preventDefault();
-      return;
-    }
-    const editingElements = document.querySelectorAll('.leaflet-editing-icon');
-    const visibleEditingElements = Array.from(editingElements).filter(
-      el => el.offsetParent !== null && getComputedStyle(el).display !== 'none'
-    );
-    if (visibleEditingElements.length > 0) {
-      e.preventDefault();
-      onWarning(
-        formatMessage({
-          id: 'Please finish editing the polygon before submitting.'
-        })
-      );
-      return;
-    }
-    handleSubmit(onSubmit)(e);
-  };
-
   const onSubmit = async data => {
     if (data.massif.geogPolygon?.coordinates?.length === 0) {
       return;
@@ -156,6 +135,27 @@ export const MassifForm = ({ massifValues, onCancel }) => {
       }
       dispatch(updateMassif(body));
     }
+  };
+
+  const handleFormSubmit = e => {
+    if (polygonErrors) {
+      e.preventDefault();
+      return;
+    }
+    const editingElements = document.querySelectorAll('.leaflet-editing-icon');
+    const visibleEditingElements = Array.from(editingElements).filter(
+      el => el.offsetParent !== null && getComputedStyle(el).display !== 'none'
+    );
+    if (visibleEditingElements.length > 0) {
+      e.preventDefault();
+      onWarning(
+        formatMessage({
+          id: 'Please finish editing the polygon before submitting.'
+        })
+      );
+      return;
+    }
+    handleSubmit(onSubmit)(e);
   };
 
   if (

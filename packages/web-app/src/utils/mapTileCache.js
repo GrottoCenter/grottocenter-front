@@ -124,12 +124,16 @@ const fetchTile = (entity, tile, apiZoom) => {
   // and a concurrent fetchTile for the same key wouldn't find inFlight,
   // kicking off a duplicate request. Mutating an already-evicted record is
   // a harmless no-op.
+  // Declared up front: clearInFlight closes over `promise`, and `promise`'s
+  // own handlers call clearInFlight. Only the assignment order matters — the
+  // closure never runs before the promise exists.
+  let promise;
   const clearInFlight = () => {
     const rec = s.tiles.get(key);
     if (rec && rec.inFlight === promise) delete rec.inFlight;
   };
 
-  const promise = fetch(url)
+  promise = fetch(url)
     .then(response => {
       if (response.status >= 400) throw new Error(response.status);
       return response.text();

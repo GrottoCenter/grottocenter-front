@@ -1,16 +1,17 @@
 import fc from 'fast-check';
 import { checkAuthStatus } from './utils';
 
+// Hoisted so the vi.mock factories below can reference it.
+const mockPostLogoutThunk = vi.hoisted(() => dispatch => {
+  dispatch({ type: 'LOGOUT' });
+});
+
 // Mock the Login module's postLogout thunk.
 // The real postLogout dispatches LOGOUT and redirects; here we only
 // verify that checkAuthStatus delegates to it on 401.
 vi.mock('./Login', () => ({
   postLogout: () => mockPostLogoutThunk
 }));
-
-const mockPostLogoutThunk = dispatch => {
-  dispatch({ type: 'LOGOUT' });
-};
 
 /**
  * Property 10: 401 interceptor dispatches postLogout and marks auth error
