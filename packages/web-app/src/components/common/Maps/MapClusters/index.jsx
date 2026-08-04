@@ -35,6 +35,7 @@ import {
   getCRSLabel
 } from '../../../../hooks';
 import useLocalStorage from '../../../../hooks/useLocalStorage';
+import useWaypoint from '../../../../hooks/useWaypoint';
 import { displayLoginDialog } from '../../../../actions/Login';
 import { EntityIcon } from '../../../../pages/EntityCreation/entityConfig';
 import CRSMenu from '../../CRSMenu';
@@ -45,8 +46,8 @@ import MassifPolygons, { massifPolygonType } from './MassifPolygons';
 import ExploredOverlay from './ExploredOverlay';
 import useExploredEntrances from './useExploredEntrances';
 import PopupTargetHandler from './PopupTargetHandler';
-import WaypointNavigation from './Waypoint/WaypointNavigation';
-import { WAYPOINT_COLOR } from './Waypoint/waypointIcon';
+import WaypointNavigation from '../common/Waypoint/WaypointNavigation';
+import { WAYPOINT_COLOR } from '../common/Waypoint/waypointIcon';
 import CustomMapContainer from '../common/MapContainer';
 import {
   MARKERS_LIMIT,
@@ -113,13 +114,9 @@ const HydratedMap = ({
   const [preferred, setPref] = useCoordinatePreference();
   const isTouch = useMediaQuery('(pointer: coarse)');
 
-  // Temporary navigation waypoint (mobile/touch only). Persisted so it survives
-  // a reload in the field. The live position watch lives in WaypointNavigation,
-  // mounted only while a waypoint exists.
-  const [waypoint, setWaypoint] = useLocalStorage(
-    'grottocenter_waypoint',
-    null
-  );
+  // Temporary navigation waypoint (mobile/touch only), shared with the
+  // fullscreen entrance map through a single storage key — see useWaypoint.
+  const [waypoint, setWaypoint] = useWaypoint();
 
   const [showExplored, setShowExplored] = useLocalStorage(
     'grottocenter_showExploredCaves',
