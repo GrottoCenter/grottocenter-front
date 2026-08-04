@@ -51,6 +51,14 @@ vi.mock('@/hooks', () => ({
   useNotification: () => ({ onError: mockOnError })
 }));
 
+// Drives the browser permission state synchronously; the real hook resolves
+// asynchronously and has its own suite. 'prompt' is the default so the control
+// behaves exactly as it did before auto-start existed.
+let permissionState = 'prompt';
+vi.mock('@/hooks/useGeolocationPermission', () => ({
+  default: () => permissionState
+}));
+
 // --- Helpers ---
 
 let watchSuccess;
@@ -69,6 +77,20 @@ const setupGeolocation = () => {
       }),
       clearWatch: vi.fn()
     }
+  });
+};
+
+const mockWakeLockRequest = vi.fn();
+
+const setupWakeLock = () => {
+  mockWakeLockRequest.mockResolvedValue({
+    release: vi.fn(),
+    addEventListener: vi.fn()
+  });
+  Object.defineProperty(navigator, 'wakeLock', {
+    configurable: true,
+    writable: true,
+    value: { request: mockWakeLockRequest }
   });
 };
 
@@ -107,24 +129,31 @@ const emitHeading = heading =>
     window.dispatchEvent(event);
   });
 
-const renderControl = () =>
-  render(
-    <IntlProvider locale="en" messages={{}}>
-      <MapLocationProvider>
-        <LocationControl />
-      </MapLocationProvider>
-    </IntlProvider>
-  );
+const tree = (
+  <IntlProvider locale="en" messages={{}}>
+    <MapLocationProvider>
+      <LocationControl />
+    </MapLocationProvider>
+  </IntlProvider>
+);
+
+const renderControl = () => render(tree);
 
 const button = () => screen.getByRole('button');
+// The north badge joins the stack in compass mode, so read the main control.
+const label = () => screen.getAllByRole('button')[0].getAttribute('aria-label');
 
 beforeEach(() => {
   vi.clearAllMocks();
+  permissionState = 'prompt';
+  watchSuccess = undefined;
+  watchError = undefined;
   mockMap.getZoom.mockReturnValue(6);
   mockMap.getBearing.mockReturnValue(0);
   Object.keys(mapEventHandlers).forEach(k => delete mapEventHandlers[k]);
   setupGeolocation();
   setupOrientation();
+  setupWakeLock();
 });
 
 // --- Tests ---
@@ -401,6 +430,102 @@ describe('LocationControl', () => {
     act(() => watchError({ code: 1 }));
 
     await waitFor(() => expect(mockOnError).toHaveBeenCalledTimes(2));
+  });
+
+  describe('already-granted permission', () => {
+    it('shows the position on arrival, without a tap and without a dialog', async () => {
+      permissionState = 'granted';
+      renderControl();
+
+      await waitFor(() =>
+        expect(navigator.geolocation.watchPosition).toHaveBeenCalledTimes(1)
+      );
+      emitPosition();
+
+      // LOCATED, never FOLLOW: the dot and its accuracy circle appear, but a map
+      // the user may have opened on a specific target is not ours to move.
+      await waitFor(() => expect(label()).toBe('Recenter on your location'));
+      expect(mockMap.setView).not.toHaveBeenCalled();
+    });
+
+    it('leaves the screen alone until the user asks to navigate', async () => {
+      permissionState = 'granted';
+      renderControl();
+      await waitFor(() => expect(watchSuccess).toBeDefined());
+      emitPosition();
+      await waitFor(() => expect(label()).toBe('Recenter on your location'));
+
+      // Tracking nobody asked for must not burn the battery keeping the screen
+      // lit; only a deliberate tap is a statement of intent to navigate.
+      expect(mockWakeLockRequest).not.toHaveBeenCalled();
+
+      act(() => button().click()); // LOCATED → FOLLOW
+      await waitFor(() => expect(mockWakeLockRequest).toHaveBeenCalled());
+    });
+
+    it('zooms in and asks for the compass on the first tap after an auto-start', async () => {
+      permissionState = 'granted';
+      renderControl();
+      await waitFor(() => expect(watchSuccess).toBeDefined());
+      emitPosition();
+      await waitFor(() => expect(label()).toBe('Recenter on your location'));
+
+      act(() => button().click());
+
+      // LOCATED was reached without a gesture, so this tap is the real
+      // activation: zoom 6 is below focusZoom, and iOS only grants the
+      // orientation permission from inside a gesture.
+      await waitFor(() => expect(mockMap.setView).toHaveBeenCalled());
+      const [, zoom] = mockMap.setView.mock.calls[0];
+      expect(zoom).toBe(13);
+    });
+
+    it('keeps tracking through a spurious denial', async () => {
+      permissionState = 'granted';
+      renderControl();
+      await waitFor(() => expect(watchError).toBeDefined());
+      emitPosition();
+      await waitFor(() => expect(label()).toBe('Recenter on your location'));
+
+      act(() => watchError({ code: 1 }));
+
+      // Chrome reports code 1 for a dialog merely dismissed, and again — with no
+      // dialog at all — once an origin is under its auto-embargo. Treating every
+      // code 1 as final is what silently killed tracking mid-session.
+      await waitFor(() => expect(mockOnError).toHaveBeenCalledTimes(1));
+      expect(label()).toBe(
+        'Location access denied. Enable it in your browser settings.'
+      );
+    });
+
+    it('does not demote a user activation when the permission lands afterwards', async () => {
+      const view = renderControl();
+      act(() => button().click()); // → follow
+      await waitFor(() => expect(watchSuccess).toBeDefined());
+      emitPosition();
+      emitHeading(90);
+      await waitFor(() => expect(label()).toBe('Compass mode'));
+
+      // The user answered the dialog: PermissionStatus fires 'change'. The tap
+      // must have closed the auto-start, or the arriving 'granted' would pull
+      // FOLLOW back down to LOCATED and undo it.
+      permissionState = 'granted';
+      act(() => view.rerender(tree));
+
+      expect(label()).toBe('Compass mode');
+    });
+  });
+
+  it('says so immediately instead of starting a doomed watch when blocked', async () => {
+    permissionState = 'denied';
+    renderControl();
+
+    act(() => button().click());
+
+    await waitFor(() => expect(mockOnError).toHaveBeenCalledTimes(1));
+    // No dialog will ever come back from here, so a watch would only buy a
+    // doomed acquisition and a delayed toast.
+    expect(navigator.geolocation.watchPosition).not.toHaveBeenCalled();
   });
 
   it('signals compass follow state so heavy layers can react', async () => {

@@ -9,6 +9,7 @@ import { headingToBearing } from '@/utils/compass';
 import { followCenterYOffset } from '@/utils/geo';
 import { useNotification } from '@/hooks';
 import useContinuousAngle from '@/hooks/useContinuousAngle';
+import useGeolocationPermission from '@/hooks/useGeolocationPermission';
 import { focusZoom } from '@/conf/config';
 import CustomControl from './CustomControl';
 import NorthResetControl from './NorthResetControl';
@@ -70,12 +71,33 @@ const LocationControl = () => {
   } = useDeviceHeading();
 
   const [mode, setMode] = useState(MODE.OFF);
+  const permission = useGeolocationPermission();
+
+  // Whether tracking was turned on by a tap rather than by the auto-start below.
+  // Only a tap is a statement of intent to navigate, and only that earns the
+  // wake lock.
+  const [userActivated, setUserActivated] = useState(false);
 
   // Keep the shared geolocation watch and orientation sensor alive whenever we
   // are tracking. The provider owns their lifecycle (ref-counted), so the sensor
   // stays on for other consumers — e.g. the waypoint arrow — independently.
-  useRequestUserLocation(mode !== MODE.OFF);
+  useRequestUserLocation(mode !== MODE.OFF, userActivated);
   useRequestHeading(mode !== MODE.OFF);
+
+  // Already-granted permission: show the user where they are without making them
+  // ask for something they have already agreed to. Reading the permission never
+  // raises a dialog (see useGeolocationPermission), so this can never prompt.
+  //
+  // LOCATED, never FOLLOW: the dot and its accuracy circle appear, the map does
+  // not move. Recentring and zooming a map the user may have opened on a
+  // specific target — a URL, a saved position — is something only a tap gets to
+  // do. The tap cycle is simply shifted by one: tap 1 → FOLLOW, tap 2 → COMPASS.
+  const autoStartDoneRef = useRef(false);
+  useEffect(() => {
+    if (autoStartDoneRef.current || permission !== 'granted') return;
+    autoStartDoneRef.current = true;
+    setMode(MODE.LOCATED);
+  }, [permission]);
 
   // Refs read by stable callbacks / effects without widening their deps.
   const modeRef = useRef(mode);
@@ -244,9 +266,15 @@ const LocationControl = () => {
           id: GEO_ERROR_MESSAGES[geoError] || GEO_ERROR_MESSAGES[2]
         })
       );
-      if (geoError === 1) setMode(MODE.OFF);
+      // PERMISSION_DENIED is only terminal when the permission really is gone.
+      // Chrome reports code 1 for a dialog the user merely dismissed, and again
+      // — without any dialog — once an origin is under its auto-embargo, so
+      // treating every code 1 as final is what silently killed tracking and
+      // made the dot vanish mid-session. Under a live grant it is a platform
+      // hiccup: report it, keep tracking.
+      if (geoError === 1 && permission !== 'granted') setMode(MODE.OFF);
     }
-  }, [geoError, mode, notifyError, formatMessage]);
+  }, [geoError, mode, permission, notifyError, formatMessage]);
 
   // A compass failure while heading-up drops back to north-up follow + a toast.
   useEffect(() => {
@@ -257,6 +285,21 @@ const LocationControl = () => {
   }, [mode, compassError, notifyError, formatMessage]);
 
   const handleClick = () => {
+    // A tap is the statement of intent the auto-start above deliberately isn't:
+    // it earns the wake lock, and it closes the auto-start for good. Without the
+    // latter, a user tapping while the permission is still 'prompt' and then
+    // granting would see the arriving 'granted' fire the auto-start effect and
+    // demote their FOLLOW back to LOCATED.
+    autoStartDoneRef.current = true;
+    setUserActivated(true);
+
+    if (permission === 'denied') {
+      // No dialog will ever come back from here, so starting a watch would only
+      // buy a doomed acquisition and a delayed toast. Say so straight away.
+      notifyError(formatMessage({ id: GEO_ERROR_MESSAGES[1] }));
+      return;
+    }
+
     if (mode === MODE.OFF) {
       // Activate: request a high-accuracy fix and a heading (both declared
       // above). Also call start() here so iOS gets its permission prompt from
@@ -267,6 +310,15 @@ const LocationControl = () => {
       return;
     }
     if (mode === MODE.LOCATED) {
+      // First tap after an auto-start: LOCATED was reached without a gesture, so
+      // this tap is the real activation and gets what OFF → FOLLOW gets — the
+      // zoom-in from a far-out view, and startCompass() from inside the gesture,
+      // the only place iOS grants the orientation permission. Tapping back after
+      // a drag is a different thing and must not re-zoom.
+      if (!userActivated) {
+        if (map.getZoom() < focusZoom) pendingZoomRef.current = focusZoom;
+        startCompass();
+      }
       setMode(MODE.FOLLOW);
       recenter(true);
       return;

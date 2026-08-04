@@ -25,6 +25,7 @@ export { useNearbyEntrances } from './useNearbyEntrances';
 export { useEntitySearch } from './useEntitySearch';
 export { useOtherEntranceName } from './useOtherEntranceName';
 export { default as useDeviceOrientation } from './useDeviceOrientation';
+export { default as useGeolocationPermission } from './useGeolocationPermission';
 export { useMeasuredHeight } from './useMeasuredHeight';
 export { useLongPress } from './useLongPress';
 export { useJobPolling } from './useJobPolling';

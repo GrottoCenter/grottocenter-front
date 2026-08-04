@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import useGeolocationPermission from './useGeolocationPermission';
 
 // The Geolocation spec's own default for PositionOptions.timeout (~49 days, i.e.
 // no practical limit). Spelled out rather than passed as Infinity: `timeout` is a
@@ -73,6 +74,20 @@ const useGeolocation = ({
   // good enough to place a caver on a map (see PRECISE_ACCURACY_M). Gates the
   // rebuild, never the poke.
   const hasPreciseFixRef = useRef(false);
+
+  // Whether touching the geolocation API on our own initiative is off limits —
+  // only a user gesture may do it from here on.
+  //
+  // 'prompt' is the dangerous one: re-subscribing is a clearWatch + a fresh
+  // watchPosition, which a browser reads as "the site stopped using location,
+  // then asked again", and a one-time grant (Chrome's default answer) is
+  // consumed exactly there. Every rebuild then raises a new dialog, which is how
+  // a stalled GPS became a prompt every 30s in the field. In 'denied' nothing
+  // can succeed anyway. 'unknown' stays permissive on purpose: a browser that
+  // cannot tell us (see useGeolocationPermission) keeps today's behaviour rather
+  // than losing the stall recovery these retries exist for.
+  const permission = useGeolocationPermission();
+  const needsUserGesture = permission === 'prompt' || permission === 'denied';
 
   // Both effects below take the same options, and neither should re-run unless
   // they actually change — hence one memoised object rather than three loose
@@ -151,15 +166,26 @@ const useGeolocation = ({
   // Screen off, phone back in a pocket, tab backgrounded: browsers suspend an
   // active watch and may drop it for good, yet the watchId stays valid so
   // nothing ever re-arms it — from then on tracking looks frozen. Re-subscribe
-  // on every return to the foreground.
+  // on returning to the foreground.
   useEffect(() => {
-    if (!enabled || !watch) return undefined;
+    if (!enabled || !watch || needsUserGesture) return undefined;
     const onVisibilityChange = () => {
-      if (document.visibilityState === 'visible') setResumeTick(n => n + 1);
+      if (document.visibilityState !== 'visible') return;
+      // A watch that was delivering moments ago is almost certainly still
+      // alive, and visibilitychange fires for a two-second glance at another
+      // tab as readily as for a night in a pocket. Re-subscribing on all of
+      // them meant a full teardown/rebuild on EVERY screen wake — constant in
+      // field navigation, and one dialog each time on a one-time grant. The
+      // watchdog below still catches the watches that really are dead, at the
+      // cost of a few seconds.
+      if (Date.now() - lastFixAtRef.current < STALE_AFTER_MS) return;
+      setResumeTick(n => n + 1);
     };
     // A bfcache restore resurrects the page — and its dead watch — without
     // necessarily going through a usable visibilitychange on iOS Safari.
-    // Gated on `persisted` so ordinary navigations don't churn the provider.
+    // Gated on `persisted` so ordinary navigations don't churn the provider;
+    // and unlike above no staleness check, because `persisted` is proof in
+    // itself that the page was frozen and the watch went with it.
     const onPageShow = event => {
       if (event.persisted) setResumeTick(n => n + 1);
     };
@@ -169,13 +195,19 @@ const useGeolocation = ({
       document.removeEventListener('visibilitychange', onVisibilityChange);
       window.removeEventListener('pageshow', onPageShow);
     };
-  }, [enabled, watch]);
+  }, [enabled, watch, needsUserGesture]);
 
   // Liveness watchdog — the foreground counterpart of the resume handler above,
   // and the only thing that can unfreeze a watch without the user leaving the
   // app. See the constants at the top of the file for the strategy.
   useEffect(() => {
-    if (!enabled || !watch || !navigator.geolocation) return undefined;
+    // needsUserGesture: no fix can reach us without a grant, so neither the poke
+    // nor the rebuild can achieve anything here except raise another dialog —
+    // the loop reported from the field. Stay entirely quiet; the permission's
+    // own 'change' event brings us back the moment the user answers.
+    if (!enabled || !watch || !navigator.geolocation || needsUserGesture) {
+      return undefined;
+    }
     const id = setInterval(() => {
       // Hidden page: the watch is *supposed* to be quiet, so every age here is
       // a false positive. Rebuilding a watch nothing can feed would only burn a
@@ -206,7 +238,7 @@ const useGeolocation = ({
       });
     }, WATCHDOG_INTERVAL_MS);
     return () => clearInterval(id);
-  }, [enabled, watch, options, onPosition]);
+  }, [enabled, watch, options, onPosition, needsUserGesture]);
 
   useEffect(() => {
     if (!enabled || !navigator.geolocation) return undefined;

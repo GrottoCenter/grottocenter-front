@@ -1,6 +1,13 @@
 import { renderHook, act } from '@testing-library/react';
 import useGeolocation from './useGeolocation';
 
+// The real hook resolves asynchronously and is covered by its own suite; here we
+// only need to drive the state the watch reacts to, synchronously.
+let permissionState = 'granted';
+vi.mock('./useGeolocationPermission', () => ({
+  default: () => permissionState
+}));
+
 const makePosition = (overrides = {}) => ({
   coords: {
     latitude: 45.1,
@@ -29,6 +36,7 @@ describe('useGeolocation', () => {
   let geolocation;
 
   beforeEach(() => {
+    permissionState = 'granted';
     geolocation = {
       getCurrentPosition: vi.fn(),
       watchPosition: vi.fn().mockReturnValue(42),
@@ -172,19 +180,59 @@ describe('useGeolocation', () => {
   });
 
   it('re-subscribes the watch on returning to the foreground', () => {
-    const { result } = renderHook(() => useGeolocation({ watch: true }));
+    vi.useFakeTimers();
+    try {
+      const { result } = renderHook(() => useGeolocation({ watch: true }));
+      const onPosition = geolocation.watchPosition.mock.calls[0][0];
+      act(() => onPosition(makePosition()));
+      // Long enough away that the watch is genuinely suspect.
+      act(() => vi.advanceTimersByTime(16000));
+
+      // A locked screen suspends — and sometimes silently drops — the watch,
+      // while the watchId stays valid so nothing ever re-arms it.
+      goToBackgroundAndBack();
+
+      expect(geolocation.clearWatch).toHaveBeenCalledWith(42);
+      expect(geolocation.watchPosition).toHaveBeenCalledTimes(2);
+      // Re-subscribing must not blank the dot while the new watch acquires.
+      expect(result.current.hasLocation).toBe(true);
+      expect(result.current.location).toEqual({ lat: 45.1, lng: 5.7 });
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('leaves a watch that is still delivering alone on returning to the foreground', () => {
+    renderHook(() => useGeolocation({ watch: true }));
     const onPosition = geolocation.watchPosition.mock.calls[0][0];
     act(() => onPosition(makePosition()));
 
-    // A locked screen suspends — and sometimes silently drops — the watch,
-    // while the watchId stays valid so nothing ever re-arms it.
+    // visibilitychange fires for a two-second glance at another tab as readily
+    // as for a night in a pocket. Tearing the watch down and rebuilding it here
+    // is what a browser reads as "stopped using location, then asked again" —
+    // one permission dialog per screen wake on a one-time grant.
     goToBackgroundAndBack();
 
-    expect(geolocation.clearWatch).toHaveBeenCalledWith(42);
-    expect(geolocation.watchPosition).toHaveBeenCalledTimes(2);
-    // Re-subscribing must not blank the dot while the new watch acquires.
-    expect(result.current.hasLocation).toBe(true);
-    expect(result.current.location).toEqual({ lat: 45.1, lng: 5.7 });
+    expect(geolocation.watchPosition).toHaveBeenCalledTimes(1);
+    expect(geolocation.clearWatch).not.toHaveBeenCalled();
+  });
+
+  it('never re-subscribes while a permission dialog could appear', () => {
+    vi.useFakeTimers();
+    try {
+      permissionState = 'prompt';
+      renderHook(() => useGeolocation({ watch: true }));
+      const onPosition = geolocation.watchPosition.mock.calls[0][0];
+      act(() => onPosition(makePosition()));
+      act(() => vi.advanceTimersByTime(16000));
+
+      goToBackgroundAndBack();
+
+      expect(geolocation.watchPosition).toHaveBeenCalledTimes(1);
+      expect(geolocation.clearWatch).not.toHaveBeenCalled();
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it('leaves a one-shot fix alone on returning to the foreground', () => {
@@ -377,6 +425,67 @@ describe('useGeolocation', () => {
       rerender({ enabled: false });
       act(() => vi.advanceTimersByTime(60000));
       expect(geolocation.getCurrentPosition).not.toHaveBeenCalled();
+    });
+
+    it('goes silent while a permission dialog is pending or was dismissed', () => {
+      permissionState = 'prompt';
+      renderHook(() => useGeolocation({ watch: true, enableHighAccuracy: true }));
+      act(() => {
+        const calls = geolocation.watchPosition.mock.calls;
+        calls[calls.length - 1][0](makePosition({ accuracy: 8 }));
+      });
+
+      act(() => vi.advanceTimersByTime(120000));
+
+      // No fix can reach us without a grant, so poking and rebuilding can only
+      // raise another dialog — the every-30s prompt loop reported from the
+      // field. Both must stop dead until the permission lands.
+      expect(geolocation.getCurrentPosition).not.toHaveBeenCalled();
+      expect(geolocation.watchPosition).toHaveBeenCalledTimes(1);
+      expect(geolocation.clearWatch).not.toHaveBeenCalled();
+    });
+
+    it('stays silent once the permission is denied outright', () => {
+      permissionState = 'denied';
+      renderHook(() => useGeolocation({ watch: true }));
+
+      act(() => vi.advanceTimersByTime(120000));
+
+      expect(geolocation.getCurrentPosition).not.toHaveBeenCalled();
+      expect(geolocation.watchPosition).toHaveBeenCalledTimes(1);
+    });
+
+    it('supervises as before on a browser that cannot report the permission', () => {
+      // Safari < 16 and some WebViews: losing the stall recovery there would be
+      // a worse trade than the dialog it guards against, so 'unknown' keeps the
+      // watchdog running exactly as it always did.
+      permissionState = 'unknown';
+      renderHook(() => useGeolocation({ watch: true, enableHighAccuracy: true }));
+      act(() => {
+        const calls = geolocation.watchPosition.mock.calls;
+        calls[calls.length - 1][0](makePosition({ accuracy: 8 }));
+      });
+
+      act(() => vi.advanceTimersByTime(31000));
+
+      expect(geolocation.getCurrentPosition).toHaveBeenCalled();
+      expect(geolocation.watchPosition).toHaveBeenCalledTimes(2);
+    });
+
+    it('resumes supervising as soon as the permission is granted', () => {
+      permissionState = 'prompt';
+      const { rerender } = renderHook(() =>
+        useGeolocation({ watch: true, enableHighAccuracy: true })
+      );
+      act(() => vi.advanceTimersByTime(60000));
+      expect(geolocation.getCurrentPosition).not.toHaveBeenCalled();
+
+      // What the PermissionStatus 'change' event does once the user answers.
+      permissionState = 'granted';
+      rerender();
+
+      act(() => vi.advanceTimersByTime(16000));
+      expect(geolocation.getCurrentPosition).toHaveBeenCalled();
     });
   });
 

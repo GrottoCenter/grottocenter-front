@@ -28,6 +28,7 @@ import {
 } from '../actions/Map';
 import { fetchProjections } from '../actions/Projections';
 import useGeolocation from '../hooks/useGeolocation';
+import useGeolocationPermission from '../hooks/useGeolocationPermission';
 import 'leaflet/dist/leaflet.css';
 import { defaultZoom, defaultCoord, focusZoom } from '../conf/config';
 
@@ -98,11 +99,15 @@ const Map = () => {
   const { current: savedPosition } = useRef(
     !initialTarget ? getSavedPosition() : null
   );
-  // Only ask the browser for the user's position (and its permission prompt)
-  // when we have no target to restore — URL param and localStorage take priority.
+  // Centre the map on the user only when we have no target to restore — URL
+  // param and localStorage take priority — AND the permission is already
+  // granted, which we can read without asking for anything. Framing the initial
+  // view is a convenience, and a convenience is never worth a permission dialog
+  // the visitor did not ask for by pressing anything.
+  const geolocationPermission = useGeolocationPermission();
   const needsGeolocationFallback = !initialTarget && !savedPosition;
   const { location: geoLocation, hasLocation } = useGeolocation({
-    enabled: needsGeolocationFallback
+    enabled: needsGeolocationFallback && geolocationPermission === 'granted'
   });
   const [location, setLocation] = useState(() => {
     if (initialTarget)

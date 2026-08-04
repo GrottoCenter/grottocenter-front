@@ -32,6 +32,17 @@ export const MapLocationProvider = ({ children }) => {
     []
   );
 
+  // Counted separately from the watch, because the two no longer coincide: the
+  // location control starts tracking on its own when the permission is already
+  // granted, and holding the screen awake off the back of a page load — rather
+  // than of a deliberate tap — is not something to do to someone's battery.
+  const [awakeCount, setAwakeCount] = useState(0);
+  const requestAwake = useCallback(() => setAwakeCount(n => n + 1), []);
+  const releaseAwake = useCallback(
+    () => setAwakeCount(n => Math.max(0, n - 1)),
+    []
+  );
+
   // Field-navigation context: the primary use is guiding the user to a cave
   // entrance, so a coarse network fix isn't good enough — opt into GPS.
   const [isWatching, setIsWatching] = useState(false);
@@ -64,11 +75,11 @@ export const MapLocationProvider = ({ children }) => {
     return () => clearTimeout(id);
   }, [requestCount, hasFix]);
 
-  // Tracking is only ever requested for field navigation, where the screen
-  // locking is both a usability problem and the main reason the watch stops
-  // delivering. Tie the lock to the request count, not to `isWatching`: the
-  // warm-up window above is not a reason to keep the screen on.
-  useWakeLock(requestCount > 0);
+  // Field navigation is where the screen locking is both a usability problem and
+  // the main reason the watch stops delivering. Tie the lock to its own count,
+  // not to `isWatching`: neither the warm-up window above nor tracking the user
+  // asked for merely by loading the page is a reason to keep the screen on.
+  useWakeLock(awakeCount > 0);
 
   // Same ref-counted lazy activation for the orientation sensor, so whoever
   // needs a heading (the location dot's direction cone, the waypoint arrow) gets
@@ -100,8 +111,15 @@ export const MapLocationProvider = ({ children }) => {
   // useGeolocation already memoises its result, so `geo` only changes identity
   // when something observable did — no need to spell its fields out here.
   const userLocation = useMemo(
-    () => ({ ...geo, active: requestCount > 0, enable, disable }),
-    [geo, requestCount, enable, disable]
+    () => ({
+      ...geo,
+      active: requestCount > 0,
+      enable,
+      disable,
+      requestAwake,
+      releaseAwake
+    }),
+    [geo, requestCount, enable, disable, requestAwake, releaseAwake]
   );
 
   const deviceHeading = useMemo(
@@ -143,16 +161,25 @@ export const useDeviceHeading = () => {
 // its heading counterpart, but the location control is deliberately its only
 // caller: it owns the watch, so `active` in the context and the control's own
 // mode can never disagree. Features that merely *use* the position (the waypoint
-// navigation) read it without requesting it, and degrade until the user turns
-// tracking on — that is what keeps the button honest and the permission prompt
-// tied to a real user gesture.
-export const useRequestUserLocation = active => {
-  const { enable, disable } = useUserLocation();
+// navigation) read it without requesting it, and degrade until tracking is on —
+// that is what keeps the button honest.
+//
+// `keepScreenAwake` is the second, narrower request: tracking that the user
+// asked for by tapping the control is field navigation and deserves the wake
+// lock; tracking auto-started from an already-granted permission is not, and
+// must leave the screen alone.
+export const useRequestUserLocation = (active, keepScreenAwake = false) => {
+  const { enable, disable, requestAwake, releaseAwake } = useUserLocation();
   useEffect(() => {
     if (!active) return undefined;
     enable();
     return disable;
   }, [active, enable, disable]);
+  useEffect(() => {
+    if (!active || !keepScreenAwake) return undefined;
+    requestAwake();
+    return releaseAwake;
+  }, [active, keepScreenAwake, requestAwake, releaseAwake]);
 };
 
 // Same declarative contract for the compass heading: any consumer that draws a
