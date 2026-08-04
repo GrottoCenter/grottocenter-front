@@ -3,6 +3,8 @@ module.exports = {
     'eslint:recommended',
     'airbnb',
     'airbnb/hooks',
+    // Disables react/react-in-jsx-scope: React 17+ automatic JSX runtime
+    'plugin:react/jsx-runtime',
     'prettier',
     'plugin:cypress/recommended',
     'plugin:storybook/recommended'
