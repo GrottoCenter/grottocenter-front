@@ -103,7 +103,7 @@ const SubmitStep = () => {
       data-testid="submit-step">
       {/* Summary section */}
       <Box>
-        <Typography variant="h6" gutterBottom>
+        <Typography variant="h3" component="h2" gutterBottom>
           {formatMessage({
             id: 'ImportObservationsWizard.SubmitStep.summaryTitle'
           })}

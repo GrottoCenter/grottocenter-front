@@ -42,7 +42,7 @@ const EntityPicker = () => {
               <CardContent>
                 <Box display="flex" alignItems="center" gap={1}>
                   <EntityIcon iconType={iconType} />
-                  <Typography variant="h6" fontWeight={600}>
+                  <Typography variant="h4" component="h2">
                     {formatMessage({ id: titleKey })}
                   </Typography>
                 </Box>

@@ -111,7 +111,7 @@ const MassifSensitivityControl = ({ massif }) => {
 
   return (
     <Box sx={{ mt: 2, mb: 2, p: 1, border: 1, borderColor: 'divider', borderRadius: 1 }}>
-      <Typography variant="h6" gutterBottom>
+      <Typography variant="h5" component="h3" gutterBottom>
         {formatMessage({ id: 'Sensitivity Management' })}
       </Typography>
       <FormControlLabel

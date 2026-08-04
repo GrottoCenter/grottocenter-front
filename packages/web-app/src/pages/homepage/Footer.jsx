@@ -153,7 +153,7 @@ const Footer = () => {
                 }}>
                 <GCLogo showLink={false} />
               </Box>
-              <Typography variant="h6" sx={{ color: 'white', fontWeight: 600 }}>
+              <Typography variant="h4" component="p" sx={{ color: 'white' }}>
                 Grottocenter
               </Typography>
             </Box>
@@ -187,9 +187,7 @@ const Footer = () => {
             <NavList
               component="nav"
               aria-label={formatMessage({ id: 'Navigation' })}>
-              <AppLink to="/ui/faq">
-                {formatMessage({ id: 'FAQ' })}
-              </AppLink>
+              <AppLink to="/ui/faq">{formatMessage({ id: 'FAQ' })}</AppLink>
               <InternationalizedLink links={wikiLinks}>
                 {formatMessage({ id: 'Wiki' })}
               </InternationalizedLink>

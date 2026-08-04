@@ -23,7 +23,7 @@ const MarginBottomBlock = styled('div')`
 
 const UserList = ({ isLoading, title, userList }) => (
   <MarginBottomBlock>
-    <Typography variant="h6" component="div" gutterBottom>
+    <Typography variant="h3" component="h2" gutterBottom>
       {title}
     </Typography>
     <EntityTable

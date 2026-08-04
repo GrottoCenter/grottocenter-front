@@ -528,7 +528,7 @@ const DeviceSensorsStep = () => {
     <Box
       sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}
       data-testid="device-sensors-step">
-      <Typography variant="h6">
+      <Typography variant="h3" component="h2">
         {formatMessage({
           id: 'ImportObservationsWizard.DeviceSensorsStep.title'
         })}

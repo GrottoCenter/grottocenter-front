@@ -89,7 +89,7 @@ const DocumentValidationPage = () => {
           <AuthChecker
             componentToDisplay={
               <Wrapper>
-                <Typography variant="h6" component="div" gutterBottom>
+                <Typography variant="h3" component="h2" gutterBottom>
                   <Translate>Documents</Translate>
                 </Typography>
                 <EntityTable

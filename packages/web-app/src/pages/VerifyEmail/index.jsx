@@ -25,21 +25,21 @@ const VerifyEmailPage = ({
     content = (
       <div style={{ textAlign: 'center' }}>
         <CircularProgress size="2.5rem" />
-        <Typography variant="h6" style={{ marginTop: '20px' }}>
+        <Typography variant="subtitle1" component="p" style={{ marginTop: '20px' }}>
           {formatMessage({ id: 'Verifying your email...' })}
         </Typography>
       </div>
     );
   } else if (invalidToken) {
     content = (
-      <Typography align="center" variant="h6" color="error">
+      <Typography align="center" variant="subtitle1" component="p" color="error">
         {formatMessage({ id: 'The verification link is invalid.' })}
       </Typography>
     );
   } else if (success && alreadyVerified) {
     content = (
       <>
-        <Typography align="center" variant="h6" color="primary">
+        <Typography align="center" variant="subtitle1" component="p" color="primary">
           {formatMessage({
             id: 'Your email address is already verified. You can log in.'
           })}
@@ -56,7 +56,7 @@ const VerifyEmailPage = ({
   } else if (success) {
     content = (
       <>
-        <Typography align="center" variant="h6" color="primary">
+        <Typography align="center" variant="subtitle1" component="p" color="primary">
           {formatMessage({
             id: 'Email successfully verified. You can now log in.'
           })}
@@ -72,7 +72,7 @@ const VerifyEmailPage = ({
     );
   } else {
     content = (
-      <Typography align="center" variant="h6" color="error">
+      <Typography align="center" variant="subtitle1" component="p" color="error">
         {error || formatMessage({ id: 'The verification link is invalid.' })}
       </Typography>
     );
