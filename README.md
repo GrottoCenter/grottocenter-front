@@ -22,7 +22,6 @@ This project uses [Yarn](https://yarnpkg.com/) & [Yarn workspaces](https://yarnp
 
 - **Configurations**:
   - [eslint-config](/packages/eslint-config/README.md)
-  - `eslint-config-typescript`
   - [`prettier-config`](/packages/prettier-config/README.md)
   - `ts-config`
 

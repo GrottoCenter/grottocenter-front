@@ -16,7 +16,7 @@ GrottoCenter is a web application frontend for the speleology (cave exploration)
 
 ### Development Tools
 - **Yarn 4.5.0** with workspaces - Package management
-- **ESLint 8.57.1** + **Prettier 3.3.3** - Code quality
+- **ESLint 9.39.5** (flat config) + **Prettier 3.9.4** - Code quality
 - **Storybook 8.3.5** - Component development
 - **Cypress 13.15.0** - E2E testing
 - **Husky 9.1.6** - Git hooks
@@ -29,7 +29,6 @@ grottocenter-front/
 ├── packages/
 │   ├── web-app/                 # Main React application
 │   ├── eslint-config/           # Shared ESLint configuration
-│   ├── eslint-config-typescript/# TypeScript ESLint config
 │   ├── prettier-config/         # Shared Prettier configuration
 │   └── ts-config/              # Shared TypeScript configuration
 ├── scripts/                     # Utility scripts for translations
