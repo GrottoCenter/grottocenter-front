@@ -132,8 +132,7 @@ const ChildrenSortSelect = ({ value, onChange }) => {
           paddingTop: 0,
           paddingBottom: 0
         }
-      })}
-    >
+      })}>
       {Object.entries(labels).map(([order, label]) => (
         <MenuItem key={order} value={order}>
           {label}
@@ -240,8 +239,7 @@ export const ChildrenSectionHeader = ({ title, controls }) => (
       columnGap: 2,
       rowGap: 0.5,
       mb: 1
-    }}
-  >
+    }}>
     {title}
     {controls}
   </Box>
@@ -377,8 +375,7 @@ const DocumentTile = React.memo(({ doc, display, labelTier }) => {
           otherwise leave the link with no accessible name at all. */}
       <Tile
         to={`/ui/documents/${doc.id}`}
-        aria-label={tooltip || formatMessage({ id: 'Document' })}
-      >
+        aria-label={tooltip || formatMessage({ id: 'Document' })}>
         <TileTypeCorner>
           <TypeIcon fontSize="small" />
         </TileTypeCorner>
@@ -389,8 +386,7 @@ const DocumentTile = React.memo(({ doc, display, labelTier }) => {
         )}
         <TileLabel
           $fontSize={labelTier.fontSize}
-          $lineClamp={labelTier.lineClamp}
-        >
+          $lineClamp={labelTier.lineClamp}>
           {display.primary}
         </TileLabel>
         {display.secondary && <TileDate>{display.secondary}</TileDate>}
@@ -532,8 +528,7 @@ const DocumentChildRow = React.memo(({ doc }) => {
             variant="body2"
             component="div"
             color="text.secondary"
-            title={doc.description}
-          >
+            title={doc.description}>
             <Linkify options={linkifyOptions}>{doc.description}</Linkify>
           </Description>
         )}

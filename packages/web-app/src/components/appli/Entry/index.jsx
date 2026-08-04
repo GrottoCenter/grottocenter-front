@@ -218,8 +218,7 @@ export const Entry = ({
             display: 'flex',
             alignItems: 'center',
             gap: { xs: '2px', md: '4px' }
-          }}
-        >
+          }}>
           <CustomIcon type="country" size={16} />
           {entrance.country}
         </AppLink>
@@ -230,8 +229,7 @@ export const Entry = ({
             display: 'flex',
             alignItems: 'center',
             gap: { xs: '2px', md: '4px' }
-          }}
-        >
+          }}>
           {entrance.massifs.map((massif, index) => (
             <React.Fragment key={massif.id}>
               {index > 0 && <span>·</span>}
@@ -243,8 +241,7 @@ export const Entry = ({
                   display: 'flex',
                   alignItems: 'center',
                   gap: { xs: '2px', md: '4px' }
-                }}
-              >
+                }}>
                 <CustomIcon type="massif" size={16} />
                 {massif.name}
               </AppLink>
@@ -261,8 +258,7 @@ export const Entry = ({
             display: 'flex',
             alignItems: 'center',
             gap: { xs: '2px', md: '4px' }
-          }}
-        >
+          }}>
           <CustomIcon type="network" size={16} />
           {entrance.cave.name}
         </AppLink>
@@ -374,8 +370,7 @@ export const Entry = ({
                             display: 'flex',
                             flexDirection: 'column',
                             gap: 1
-                          }}
-                        >
+                          }}>
                           {entrance.isSensitive && isAdmin && (
                             <SensitiveCaveWarning />
                           )}
@@ -404,8 +399,7 @@ export const Entry = ({
                           component="div"
                           variant="caption"
                           color="text.secondary"
-                          sx={{ mt: 1 }}
-                        >
+                          sx={{ mt: 1 }}>
                           {entrance.author && (
                             <AuthorAndDate
                               author={entrance.author}

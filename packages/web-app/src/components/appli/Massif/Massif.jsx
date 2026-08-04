@@ -275,8 +275,7 @@ const Massif = ({ isLoading, error, massif }) => {
                             component="div"
                             variant="caption"
                             color="text.secondary"
-                            sx={{ mt: massif?.geogPolygon ? 1 : 0.25 }}
-                          >
+                            sx={{ mt: massif?.geogPolygon ? 1 : 0.25 }}>
                             {massif.author && (
                               <AuthorAndDate
                                 author={massif.author}
@@ -312,8 +311,7 @@ const Massif = ({ isLoading, error, massif }) => {
                   color="primary"
                   size="large"
                   startIcon={<CustomIcon type="entrance" size={24} />}
-                  onClick={() => navigate(`/ui/massifs/${massifId}/entrances`)}
-                >
+                  onClick={() => navigate(`/ui/massifs/${massifId}/entrances`)}>
                   {formatMessage({ id: 'Entrances list' })}
                   {dataMassif?.nb_caves ? ` (${dataMassif.nb_caves})` : ''}
                 </Button>
