@@ -221,10 +221,16 @@ Key custom rules:
 - `console.warn` / `console.error` OK — `console.log` is a warning
 - A leading `_` marks a binding as deliberately unused (arguments, caught errors)
 
-`yarn lint` must end with **0 errors**. It currently reports ~219 warnings: these are
-the tracked design-debt rules (`react/prop-types`, `no-nested-ternary`,
-`consistent-return`, the a11y set…), each marked with a `TODO` in the shared config.
-Do not add new ones — fix them as you touch the files.
+`yarn lint` must end with **0 errors and 0 warnings**. The airbnb rules are all
+enforced at `error`, including `react/prop-types`, `no-nested-ternary` and
+`consistent-return` — keep it that way rather than demoting a rule to make a
+change fit.
+
+A few rules are deliberately configured rather than followed blindly, each with
+the reason written next to it in `packages/eslint-config/index.mjs`: single named
+exports are the convention here, `continue`/`++` are allowed, the underscore
+identifiers that come from the API, from Leaflet or from test seams are listed
+one by one, and test doubles skip `react/prop-types`.
 
 **Never use `// eslint-disable`** without a written justification in the preceding comment.
 Unused directives are reported and removed by `--fix`, so a stale one will not survive.
