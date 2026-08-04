@@ -1,4 +1,3 @@
-import React from 'react';
 import { Box, Grid, Typography } from '@mui/material';
 import { keyframes, styled } from '@mui/material/styles';
 import { useIntl } from 'react-intl';

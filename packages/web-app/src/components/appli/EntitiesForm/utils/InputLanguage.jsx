@@ -1,4 +1,3 @@
-import React from 'react';
 import PropTypes from 'prop-types';
 import { Controller } from 'react-hook-form';
 import LanguageSelect from '../../../common/LanguageSelect';

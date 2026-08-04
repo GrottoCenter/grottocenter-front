@@ -1,5 +1,4 @@
 import { useIntl } from 'react-intl';
-import { React } from 'react';
 // import { useWatch } from 'react-hook-form'; // To uncomment when API will accept phone number
 import PropTypes from 'prop-types';
 // import PhoneInput from 'react-phone-input-2'; // To uncomment when API will accept phone number

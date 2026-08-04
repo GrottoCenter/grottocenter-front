@@ -1,5 +1,4 @@
 // Pure inline SVG — no MUI/emotion, safe for Leaflet renderToString contexts (requires react-intl).
-import React from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import {

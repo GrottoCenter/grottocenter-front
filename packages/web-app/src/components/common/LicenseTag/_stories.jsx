@@ -1,4 +1,3 @@
-import React from 'react';
 import LicenseTag, { LicenseBadge } from './index';
 
 const meta = {

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Box, Chip, Collapse, IconButton, Typography } from '@mui/material';
 import {
   TimelineItem,

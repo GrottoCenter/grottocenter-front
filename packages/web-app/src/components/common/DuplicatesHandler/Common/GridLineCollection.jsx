@@ -1,4 +1,3 @@
-import React from 'react';
 import { Grid } from '@mui/material';
 import PropTypes from 'prop-types';
 import { includes } from 'ramda';

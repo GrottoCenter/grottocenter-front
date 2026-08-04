@@ -1,4 +1,3 @@
-import React from 'react';
 import { GpsFixed } from '@mui/icons-material';
 
 import Rating from './Rating';

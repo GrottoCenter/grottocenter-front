@@ -6,7 +6,6 @@ import {
   FormLabel,
   Typography
 } from '@mui/material';
-import { React } from 'react';
 import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
 import ActionButton from '../../../common/ActionButton';

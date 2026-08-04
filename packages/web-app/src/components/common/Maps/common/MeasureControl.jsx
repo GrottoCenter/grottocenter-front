@@ -1,10 +1,4 @@
-import React, {
-  useState,
-  useRef,
-  useCallback,
-  useEffect,
-  useMemo
-} from 'react';
+import { useState, useRef, useCallback, useEffect, useMemo } from 'react';
 import { useMap, useMapEvents } from 'react-leaflet';
 import * as L from 'leaflet';
 import StraightenIcon from '@mui/icons-material/Straighten';

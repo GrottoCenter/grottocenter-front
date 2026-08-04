@@ -1,5 +1,4 @@
 import { Box } from '@mui/material';
-import React from 'react';
 import PropTypes from 'prop-types';
 import { useController } from 'react-hook-form';
 import { ENTRANCE_ONLY, ENTRANCE_AND_CAVE } from './caveType';

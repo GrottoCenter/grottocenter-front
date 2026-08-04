@@ -1,4 +1,3 @@
-import React from 'react';
 import { Tabs, Tab } from '@mui/material';
 import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';

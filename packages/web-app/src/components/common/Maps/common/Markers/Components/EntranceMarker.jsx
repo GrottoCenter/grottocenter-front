@@ -1,7 +1,6 @@
 import { Icon } from '@mui/material';
 import * as L from 'leaflet';
 import { renderToString } from 'react-dom/server';
-import React from 'react';
 import { entranceMarkerIcon } from '../../../../../../assets/icons';
 
 const EntranceIconMap = () => (

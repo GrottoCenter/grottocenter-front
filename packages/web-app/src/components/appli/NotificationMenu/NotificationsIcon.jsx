@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { useIntl } from 'react-intl';
 import { Badge, CircularProgress, IconButton } from '@mui/material';
 import MuiNotificationsIcon from '@mui/icons-material/Notifications';

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Box, ListItem, ListItemText } from '@mui/material';
 import { useDispatch } from 'react-redux';
 import { styled } from '@mui/material/styles';

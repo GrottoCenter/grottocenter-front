@@ -1,4 +1,3 @@
-import React from 'react';
 import { useCSVDownloader } from 'react-papaparse';
 import PropTypes from 'prop-types';
 import CloudDownloadIcon from '@mui/icons-material/CloudDownload';

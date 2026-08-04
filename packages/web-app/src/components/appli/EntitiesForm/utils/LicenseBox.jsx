@@ -1,5 +1,4 @@
 import { Typography } from '@mui/material';
-import { React } from 'react';
 import { useIntl } from 'react-intl';
 import { styled } from '@mui/material/styles';
 import InternationalizedLink from '../../../common/InternationalizedLink';

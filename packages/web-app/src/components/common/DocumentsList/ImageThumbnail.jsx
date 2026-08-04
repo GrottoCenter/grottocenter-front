@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import PropTypes from 'prop-types';
 import { Card, CardActionArea, Skeleton, Box } from '@mui/material';
 import { styled } from '@mui/material/styles';

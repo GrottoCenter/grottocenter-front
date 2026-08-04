@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { useMap } from 'react-leaflet';
 import PropTypes from 'prop-types';
 import L from 'leaflet';

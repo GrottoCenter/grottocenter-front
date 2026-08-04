@@ -1,4 +1,3 @@
-import React from 'react';
 import { Button, Paper, Typography } from '@mui/material';
 import { createStore } from 'redux';
 import { Provider, useDispatch } from 'react-redux';

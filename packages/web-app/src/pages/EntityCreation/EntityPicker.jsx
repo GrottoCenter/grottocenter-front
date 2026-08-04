@@ -1,4 +1,3 @@
-import React from 'react';
 import { useIntl } from 'react-intl';
 import { Box, Card, CardContent, Typography } from '@mui/material';
 import Layout from '../../components/common/Layouts/Fixed/FixedContent';

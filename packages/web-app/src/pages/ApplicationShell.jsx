@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState, Suspense } from 'react';
+import { useRef, useEffect, useState, Suspense } from 'react';
 import { Provider, useSelector, useDispatch } from 'react-redux';
 import { Outlet } from 'react-router-dom';
 import { IntlProvider, useIntl } from 'react-intl';

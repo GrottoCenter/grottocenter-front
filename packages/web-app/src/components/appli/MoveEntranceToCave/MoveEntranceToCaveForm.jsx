@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Box, Link } from '@mui/material';
 import { useIntl } from 'react-intl';
 import { useDispatch, useSelector } from 'react-redux';

@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { Box, Breadcrumbs, Skeleton, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';

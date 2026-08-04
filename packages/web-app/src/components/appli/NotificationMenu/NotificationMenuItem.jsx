@@ -1,4 +1,3 @@
-import React from 'react';
 import { Box, ListItemIcon, MenuItem, Typography } from '@mui/material';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';

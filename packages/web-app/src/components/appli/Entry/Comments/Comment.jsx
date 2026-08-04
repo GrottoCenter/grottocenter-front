@@ -1,5 +1,5 @@
 import { ListItem, Box, ListItemText, Typography } from '@mui/material';
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { styled } from '@mui/material/styles';
 import { useDispatch } from 'react-redux';
 import { useIntl } from 'react-intl';

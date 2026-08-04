@@ -1,4 +1,4 @@
-import React, { useRef, useMemo } from 'react';
+import { useRef, useMemo } from 'react';
 import { Fab, Grid } from '@mui/material';
 import { MapContainer, TileLayer, Marker } from 'react-leaflet';
 import { isNil } from 'ramda';

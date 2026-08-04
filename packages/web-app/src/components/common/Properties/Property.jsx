@@ -1,7 +1,6 @@
 import { isNil } from 'ramda';
 import { Typography } from '@mui/material';
 import Skeleton from '@mui/material/Skeleton';
-import React from 'react';
 import { styled } from '@mui/material/styles';
 import PropTypes from 'prop-types';
 

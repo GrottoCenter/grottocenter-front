@@ -1,6 +1,5 @@
 import * as L from 'leaflet';
 import { renderToString } from 'react-dom/server';
-import React from 'react';
 import { blue } from '@mui/material/colors';
 
 // Dedicated network marker: a blue hexagon (blue is the network semantic

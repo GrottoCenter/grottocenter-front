@@ -1,4 +1,3 @@
-import React from 'react';
 import { useLocation } from 'react-router-dom';
 import { useIntl } from 'react-intl';
 import { Tooltip, Button } from '@mui/material';

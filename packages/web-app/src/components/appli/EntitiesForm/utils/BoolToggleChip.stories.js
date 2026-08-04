@@ -1,4 +1,3 @@
-import React from 'react';
 import { storiesOf } from '@storybook/react';
 import { Box } from '@mui/material';
 import { useForm } from 'react-hook-form';

@@ -1,7 +1,6 @@
 import { TableCell, TableRow, TableHead } from '@mui/material';
 import PropTypes from 'prop-types';
 import Skeleton from '@mui/material/Skeleton';
-import React from 'react';
 
 export const LoadingTableRow = () => (
   <>

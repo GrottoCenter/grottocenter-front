@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { useIntl } from 'react-intl';
 import { Box, Grid, Tooltip } from '@mui/material';
 import { styled } from '@mui/material/styles';

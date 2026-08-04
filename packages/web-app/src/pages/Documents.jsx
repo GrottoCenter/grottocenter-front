@@ -1,4 +1,3 @@
-import React from 'react';
 import EntitySearchPage from '../components/appli/AdvancedSearch/EntitySearchPage';
 import DocumentSearch from '../components/appli/AdvancedSearch/DocumentSearch';
 import NewEntityButton from '../components/common/NewEntityButton';

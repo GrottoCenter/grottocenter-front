@@ -1,5 +1,5 @@
 /* eslint-disable react/forbid-prop-types */
-import React, { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { Grid } from '@mui/material';
 import PropTypes from 'prop-types';
 import { isEmpty } from 'ramda';

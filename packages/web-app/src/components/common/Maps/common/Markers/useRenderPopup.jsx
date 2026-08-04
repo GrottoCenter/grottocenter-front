@@ -1,4 +1,4 @@
-import React, { useRef, useCallback } from 'react';
+import { useRef, useCallback } from 'react';
 import { renderToString } from 'react-dom/server';
 // Imported from react-router-dom (which re-exports react-router) and NOT from
 // react-router directly: react-router-dom pins react-router to an exact version,

@@ -1,4 +1,3 @@
-import React from 'react';
 import BoolIcon from '../BoolIcon';
 import entitiesConfig from './entitiesConfig';
 

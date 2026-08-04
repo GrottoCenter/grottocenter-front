@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect, useRef } from 'react';
+import { useContext, useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 // eslint-disable-next-line camelcase
 import {

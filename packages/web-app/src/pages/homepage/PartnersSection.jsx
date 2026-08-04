@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Box, Skeleton, Typography } from '@mui/material';
 import { HandshakeOutlined } from '@mui/icons-material';

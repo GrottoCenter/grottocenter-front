@@ -1,4 +1,3 @@
-import React from 'react';
 import { useTheme, styled } from '@mui/material/styles';
 import makeStyles from '@mui/styles/makeStyles';
 import { useIntl } from 'react-intl';

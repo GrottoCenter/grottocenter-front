@@ -1,4 +1,3 @@
-import React from 'react';
 import PropTypes from 'prop-types';
 import { Chip, Tooltip } from '@mui/material';
 import { useNavigate } from 'react-router-dom';

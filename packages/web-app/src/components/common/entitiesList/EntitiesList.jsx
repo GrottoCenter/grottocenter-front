@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
 import { Box, Tooltip, IconButton } from '@mui/material';

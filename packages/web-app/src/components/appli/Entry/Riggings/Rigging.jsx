@@ -1,6 +1,6 @@
 import { Box } from '@mui/material';
 import { useDispatch } from 'react-redux';
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { usePermissions } from '../../../../hooks';
 import { updateRiggings } from '../../../../actions/Riggings/UpdateRigging';

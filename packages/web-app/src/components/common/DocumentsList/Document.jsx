@@ -16,7 +16,7 @@ import HourglassEmptyIcon from '@mui/icons-material/HourglassEmpty';
 import LinkOffIcon from '@mui/icons-material/LinkOff';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
-import React, { useState, useLayoutEffect, useRef } from 'react';
+import { useState, useLayoutEffect, useRef } from 'react';
 import Linkify from 'linkify-react';
 import DocumentTypeChip from '../DocumentTypeChip';
 import AppLink from '../AppLink';

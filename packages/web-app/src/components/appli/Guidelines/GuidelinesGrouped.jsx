@@ -1,4 +1,3 @@
-import React from 'react';
 import PropTypes from 'prop-types';
 import { Box, Typography, List } from '@mui/material';
 import { FormattedMessage } from 'react-intl';

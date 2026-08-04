@@ -1,4 +1,3 @@
-import React from 'react';
 import { Box, Typography } from '@mui/material';
 import { HistoryOutlined } from '@mui/icons-material';
 import { styled } from '@mui/material/styles';

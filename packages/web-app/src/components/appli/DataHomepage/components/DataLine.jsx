@@ -1,5 +1,4 @@
 // DataHomepage
-import React from 'react';
 import { useIntl } from 'react-intl';
 import { Box, CircularProgress, Typography, Grid } from '@mui/material';
 import { alpha, styled } from '@mui/material/styles';

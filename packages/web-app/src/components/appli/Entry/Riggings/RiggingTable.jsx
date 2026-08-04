@@ -8,7 +8,6 @@ import {
   TableCell,
   TableBody
 } from '@mui/material';
-import React from 'react';
 import { isNil } from 'ramda';
 import { styled } from '@mui/material/styles';
 import PropTypes from 'prop-types';

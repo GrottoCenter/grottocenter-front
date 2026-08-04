@@ -1,4 +1,3 @@
-import React from 'react';
 import { Card as MuiCard, Paper } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import * as d3 from 'd3';

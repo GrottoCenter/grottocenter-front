@@ -1,4 +1,3 @@
-import React from 'react';
 import { isNil, anyPass, isEmpty, head } from 'ramda';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';

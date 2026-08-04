@@ -1,4 +1,3 @@
-import React from 'react';
 import { useIntl } from 'react-intl';
 import { useSelector } from 'react-redux';
 import PropTypes from 'prop-types';

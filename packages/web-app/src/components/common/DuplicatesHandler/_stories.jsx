@@ -1,4 +1,3 @@
-import React from 'react';
 import { action } from 'storybook/actions';
 import PropTypes from 'prop-types';
 import DuplicatesHandler from './index';

@@ -1,4 +1,3 @@
-import React from 'react';
 import PropTypes from 'prop-types';
 import { ToggleButton } from '@mui/material';
 import { alpha } from '@mui/material/styles';

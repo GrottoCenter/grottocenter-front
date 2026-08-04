@@ -1,4 +1,3 @@
-import React from 'react';
 import { useIntl } from 'react-intl';
 import Layout from '../../components/common/Layouts/Fixed/FixedContent';
 import DocumentSubmission from '../../components/appli/EntitiesForm/Document';

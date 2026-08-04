@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import { useContext } from 'react';
 import { styled } from '@mui/material/styles';
 import { Tab, Tabs } from '@mui/material';
 import Translate from '../../common/Translate';

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { FormControlLabel, Paper, Switch, Typography } from '@mui/material';
 import ChangePasswordForm from './index';
 

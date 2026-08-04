@@ -1,4 +1,3 @@
-import React from 'react';
 import { Information } from './utils';
 import idNameType from '../../../../../../types/idName.type';
 

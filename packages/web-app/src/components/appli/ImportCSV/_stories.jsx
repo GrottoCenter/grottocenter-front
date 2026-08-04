@@ -1,4 +1,3 @@
-import React from 'react';
 import HydratedImportContainer from './ImportContainer';
 
 const meta = {

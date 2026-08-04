@@ -1,4 +1,3 @@
-import React from 'react';
 import PropTypes from 'prop-types';
 import CustomIcon from '../../../../CustomIcon';
 import { Information } from './utils';

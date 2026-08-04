@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useIntl, FormattedDate } from 'react-intl';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';

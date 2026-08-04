@@ -1,4 +1,3 @@
-import * as React from 'react';
 import { useIntl } from 'react-intl';
 import { Box } from '@mui/material';
 import PropTypes from 'prop-types';

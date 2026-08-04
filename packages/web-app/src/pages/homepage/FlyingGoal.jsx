@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import { Component } from 'react';
 import PropTypes from 'prop-types';
 import SyncIcon from '@mui/icons-material/Sync';
 import { styled } from '@mui/material/styles';

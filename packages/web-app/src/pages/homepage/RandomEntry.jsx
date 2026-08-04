@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import { useCallback } from 'react';
 import { Box, Typography } from '@mui/material';
 import { ExploreOutlined } from '@mui/icons-material';
 import { styled } from '@mui/material/styles';

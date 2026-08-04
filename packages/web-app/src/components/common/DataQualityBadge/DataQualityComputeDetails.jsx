@@ -1,4 +1,3 @@
-import React from 'react';
 import { useIntl } from 'react-intl';
 import { useTheme } from '@mui/material/styles';
 import { Box, Typography } from '@mui/material';
