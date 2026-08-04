@@ -207,7 +207,13 @@ export const documentTypeHelpers = {
   isUnknown
 };
 
-const BASE_PAYLOAD_FIELDS = ['id', 'type', 'title', 'authors', 'authorsOrganization'];
+const BASE_PAYLOAD_FIELDS = [
+  'id',
+  'type',
+  'title',
+  'authors',
+  'authorsOrganization'
+];
 const LANGUAGE_PAYLOAD_FIELDS = ['mainLanguage', 'mainLanguageName'];
 const FILE_PAYLOAD_FIELDS = [
   'files',
