@@ -28,7 +28,13 @@ export const MapLocationProvider = ({ children }) => {
     []
   );
 
-  const geo = useGeolocation({ watch: true, enabled: requestCount > 0 });
+  // Field-navigation context: the primary use is guiding the user to a cave
+  // entrance, so a coarse network fix isn't good enough — opt into GPS.
+  const geo = useGeolocation({
+    watch: true,
+    enabled: requestCount > 0,
+    enableHighAccuracy: true
+  });
   const orientation = useDeviceOrientation();
 
   // Same ref-counted lazy activation for the orientation sensor, so whoever

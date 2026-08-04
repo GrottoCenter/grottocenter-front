@@ -54,25 +54,37 @@ export const followCenterYOffset = (height, offsetRatio) =>
 // Human-readable distance: metric (m below 1 km, else km) plus imperial (miles).
 // Uses Intl.NumberFormat so the unit label follows the active locale.
 // Moved here from MeasureControl so both the measure tool and the waypoint HUD
-// share a single implementation.
+// share a single implementation. Intl.NumberFormat instances are cached per
+// locale — the waypoint HUD reformats the distance on every position update.
+const formatterCache = new Map();
+const getFormatters = locale => {
+  let cached = formatterCache.get(locale);
+  if (!cached) {
+    cached = {
+      meter: new Intl.NumberFormat(locale, {
+        style: 'unit',
+        unit: 'meter',
+        maximumFractionDigits: 0
+      }),
+      km: new Intl.NumberFormat(locale, {
+        style: 'unit',
+        unit: 'kilometer',
+        maximumFractionDigits: 2
+      }),
+      mile: new Intl.NumberFormat(locale, {
+        style: 'unit',
+        unit: 'mile',
+        maximumFractionDigits: 2
+      })
+    };
+    formatterCache.set(locale, cached);
+  }
+  return cached;
+};
+
 export const formatDistance = (meters, locale) => {
-  const fmtMeter = new Intl.NumberFormat(locale, {
-    style: 'unit',
-    unit: 'meter',
-    maximumFractionDigits: 0
-  });
-  const fmtKm = new Intl.NumberFormat(locale, {
-    style: 'unit',
-    unit: 'kilometer',
-    maximumFractionDigits: 2
-  });
-  const fmtMile = new Intl.NumberFormat(locale, {
-    style: 'unit',
-    unit: 'mile',
-    maximumFractionDigits: 2
-  });
-  const metricStr =
-    meters < 1000 ? fmtMeter.format(meters) : fmtKm.format(meters / 1000);
-  const imperialStr = fmtMile.format(meters / METERS_PER_MILE);
+  const { meter, km, mile } = getFormatters(locale);
+  const metricStr = meters < 1000 ? meter.format(meters) : km.format(meters / 1000);
+  const imperialStr = mile.format(meters / METERS_PER_MILE);
   return `${metricStr} · ${imperialStr}`;
 };

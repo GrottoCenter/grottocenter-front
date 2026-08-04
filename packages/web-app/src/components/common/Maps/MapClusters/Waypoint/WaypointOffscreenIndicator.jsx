@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import { useMap, useMapEvents } from 'react-leaflet';
 import * as L from 'leaflet';
-import { Box } from '@mui/material';
+import { IconButton } from '@mui/material';
 import NavigationIcon from '@mui/icons-material/Navigation';
 import {
   WAYPOINT_COLOR,
@@ -82,10 +82,8 @@ const WaypointOffscreenIndicator = ({ waypoint }) => {
   const label = formatMessage({ id: 'Recenter on waypoint' });
 
   return (
-    <Box
+    <IconButton
       ref={setRef}
-      role="button"
-      tabIndex={0}
       aria-label={label}
       title={label}
       onClick={() => map.panTo([waypoint.lat, waypoint.lng])}
@@ -97,22 +95,18 @@ const WaypointOffscreenIndicator = ({ waypoint }) => {
         zIndex: 1000,
         width: 40,
         height: 40,
-        borderRadius: '50%',
         bgcolor: WAYPOINT_COLOR,
         color: 'common.white',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
         boxShadow: 3,
-        cursor: 'pointer',
         pointerEvents: 'auto',
-        border: '2px solid #ffffff'
+        border: '2px solid #ffffff',
+        '&:hover': { bgcolor: WAYPOINT_COLOR }
       }}>
       <NavigationIcon
         aria-hidden="true"
         sx={{ fontSize: 22, transform: `rotate(${indicator.angle}deg)` }}
       />
-    </Box>
+    </IconButton>
   );
 };
 

@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef } from 'react';
+import React, { useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import * as L from 'leaflet';
@@ -35,23 +35,21 @@ const WaypointHud = ({ waypoint, userLocation }) => {
   useRequestHeading(true);
 
   // Keep the banner from bleeding taps/scroll through to the map underneath.
-  const ref = useRef(null);
-  useEffect(() => {
-    if (ref.current) {
-      L.DomEvent.disableClickPropagation(ref.current);
-      L.DomEvent.disableScrollPropagation(ref.current);
-    }
+  // Attach through a ref callback so the effect runs exactly once per DOM node,
+  // even under StrictMode's mount → cleanup → mount cycle (an empty-deps effect
+  // would re-attach and duplicate the L.DomEvent listeners).
+  const setRef = useCallback(node => {
+    if (!node) return;
+    L.DomEvent.disableClickPropagation(node);
+    L.DomEvent.disableScrollPropagation(node);
   }, []);
 
-  const { distance, bearing } = useMemo(
-    () => ({
-      distance: L.latLng(userLocation.lat, userLocation.lng).distanceTo(
-        L.latLng(waypoint.lat, waypoint.lng)
-      ),
-      bearing: initialBearing(userLocation, waypoint)
-    }),
-    [userLocation, waypoint]
+  // userLocation changes reference on every fix, so memoising this trivial
+  // computation would recompute every render anyway — cheaper to compute inline.
+  const distance = L.latLng(userLocation.lat, userLocation.lng).distanceTo(
+    L.latLng(waypoint.lat, waypoint.lng)
   );
+  const bearing = initialBearing(userLocation, waypoint);
 
   // Direction to the waypoint relative to where the user currently faces (0 =
   // straight ahead). Null when the device has no usable compass heading.
@@ -59,7 +57,7 @@ const WaypointHud = ({ waypoint, userLocation }) => {
 
   return (
     <Box
-      ref={ref}
+      ref={setRef}
       sx={{
         position: 'absolute',
         bottom: theme.spacing(2),

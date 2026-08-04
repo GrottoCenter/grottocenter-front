@@ -28,15 +28,21 @@ describe('useGeolocation', () => {
     });
   });
 
-  it('requests a high-accuracy fix with a finite timeout by default', () => {
+  it('requests a coarse fix with a finite timeout by default (opt in to GPS)', () => {
     renderHook(() => useGeolocation());
     expect(geolocation.getCurrentPosition).toHaveBeenCalledTimes(1);
     const options = geolocation.getCurrentPosition.mock.calls[0][2];
     expect(options).toEqual({
-      enableHighAccuracy: true,
+      enableHighAccuracy: false,
       timeout: 10000,
       maximumAge: 10000
     });
+  });
+
+  it('respects enableHighAccuracy=true when the consumer needs GPS', () => {
+    renderHook(() => useGeolocation({ enableHighAccuracy: true }));
+    const options = geolocation.getCurrentPosition.mock.calls[0][2];
+    expect(options.enableHighAccuracy).toBe(true);
   });
 
   it('stays dormant while disabled (no prompt, no tracking)', () => {
@@ -108,5 +114,20 @@ describe('useGeolocation', () => {
 
     expect(result.current.error).toBeNull();
     expect(result.current.status).toBe('locating');
+  });
+
+  it('drops the previous fix on re-enable so follow doesn’t snap to a stale position', () => {
+    const { result, rerender } = renderHook(
+      ({ enabled }) => useGeolocation({ watch: true, enabled }),
+      { initialProps: { enabled: true } }
+    );
+    const onPosition = geolocation.watchPosition.mock.calls[0][0];
+    act(() => onPosition(makePosition()));
+    expect(result.current.hasLocation).toBe(true);
+
+    rerender({ enabled: false });
+    rerender({ enabled: true });
+
+    expect(result.current.hasLocation).toBe(false);
   });
 });

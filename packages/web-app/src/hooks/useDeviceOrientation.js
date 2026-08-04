@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { computeHeading } from '../utils/compass';
 
 // Hard rate limit (ms) between two heading updates, plus the minimum angular
@@ -154,16 +154,19 @@ const useDeviceOrientation = () => {
     };
   }, [clearNoDataTimer, removeListeners]);
 
-  // Consumers need to know whether starting requires a user gesture (iOS), so
-  // they can auto-start where it is safe and defer to a tap where it is not.
-  return {
-    heading,
-    isSupported,
-    error,
-    start,
-    stop,
-    needsPermission: needsPermissionRequest()
-  };
+  // needsPermissionRequest() is a pure feature detect (iOS gate) — stable for
+  // the life of the tab, safe to compute once.
+  const needsPermission = useMemo(() => needsPermissionRequest(), []);
+
+  // Memoise so the return object keeps a stable reference across renders where
+  // nothing observable changed. Consumers of the shared MapLocationContext
+  // spread this object into their context value, so an unstable reference here
+  // would fan out re-renders to every useDeviceHeading() consumer on every
+  // position tick from the geolocation watch.
+  return useMemo(
+    () => ({ heading, isSupported, error, start, stop, needsPermission }),
+    [heading, isSupported, error, start, stop, needsPermission]
+  );
 };
 
 export default useDeviceOrientation;

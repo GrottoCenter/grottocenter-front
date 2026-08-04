@@ -9,14 +9,16 @@ import { defaultCoord } from '../conf/config';
 // - enabled=false keeps the hook dormant (no permission prompt, no tracking)
 //   until the consumer flips it on — used by the location control's lazy
 //   activation, so we never prompt for geolocation before the user asks for it.
-// - High accuracy is on by default: the primary use is field navigation towards
-//   a cave entrance, where a coarse network fix is not good enough.
+// - High accuracy is off by default: coarse network-based fixes are fine for
+//   "center the map on where I am" style consumers, and much faster/cheaper on
+//   battery. Field-navigation consumers (LocationControl, WaypointNavigation)
+//   opt in explicitly via the shared MapLocationProvider.
 // - A finite timeout means a denied/unreachable sensor surfaces an error instead
 //   of hanging forever, so consumers can give feedback.
 const useGeolocation = ({
   watch = false,
   enabled = true,
-  enableHighAccuracy = true,
+  enableHighAccuracy = false,
   timeout = 10000,
   maximumAge = 10000
 } = {}) => {
@@ -37,9 +39,12 @@ const useGeolocation = ({
 
     // Fresh session: clear a stale error from the previous run so the consumer's
     // "notify once per error code" logic re-arms and the button doesn't flash
-    // red before the first fix (or first fresh error) comes in.
+    // red before the first fix (or first fresh error) comes in. Also drop the
+    // previous fix so a follow consumer doesn't briefly recentre on the old
+    // position (and its spinner shows) until the first fresh fix arrives.
     setError(null);
     setStatus('locating');
+    setHasLocation(false);
 
     const onPosition = position => {
       setLocation({
