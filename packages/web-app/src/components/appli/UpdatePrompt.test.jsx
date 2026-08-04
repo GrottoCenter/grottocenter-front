@@ -1,10 +1,9 @@
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, act } from '@testing-library/react';
 import { IntlProvider } from 'react-intl';
 import UpdatePrompt from './UpdatePrompt';
 
 const useRegisterSWMock = vi.fn();
-const updateServiceWorkerMock = vi.fn();
 const setNeedRefreshMock = vi.fn();
 
 vi.mock('virtual:pwa-register/react', () => ({
@@ -24,18 +23,37 @@ const renderUpdatePrompt = () =>
     </IntlProvider>
   );
 
-const mockRegisterSW = ({ needRefresh }) => {
-  useRegisterSWMock.mockReturnValue({
-    needRefresh: [needRefresh, setNeedRefreshMock],
-    updateServiceWorker: updateServiceWorkerMock
+const mockRegisterSW = ({ needRefresh, waitingSW = null }) => {
+  let delivered = false;
+  useRegisterSWMock.mockImplementation(options => {
+    // Deliver the registration once, asynchronously, so the setState it
+    // triggers doesn't cascade into an infinite re-render during the current
+    // render pass.
+    if (!delivered) {
+      delivered = true;
+      queueMicrotask(() =>
+        options?.onRegisteredSW?.('sw.js', { waiting: waitingSW })
+      );
+    }
+    return {
+      needRefresh: [needRefresh, setNeedRefreshMock],
+      updateServiceWorker: vi.fn()
+    };
   });
 };
 
 describe('UpdatePrompt', () => {
   beforeEach(() => {
     useRegisterSWMock.mockReset();
-    updateServiceWorkerMock.mockReset();
     setNeedRefreshMock.mockReset();
+    // Stub the SW container just enough for the component to attach listeners.
+    Object.defineProperty(navigator, 'serviceWorker', {
+      configurable: true,
+      value: {
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn()
+      }
+    });
   });
 
   it('renders nothing visible when no refresh is needed', () => {
@@ -57,13 +75,24 @@ describe('UpdatePrompt', () => {
     expect(screen.getByLabelText('Later')).toBeInTheDocument();
   });
 
-  it('calls updateServiceWorker when the Update button is clicked', () => {
-    mockRegisterSW({ needRefresh: true });
+  it('posts SKIP_WAITING to the waiting SW when Update is clicked', () => {
+    const postMessageMock = vi.fn();
+    mockRegisterSW({
+      needRefresh: true,
+      waitingSW: { postMessage: postMessageMock }
+    });
     renderUpdatePrompt();
 
-    fireEvent.click(screen.getByTestId('update-app-btn'));
+    act(() => {
+      fireEvent.click(screen.getByTestId('update-app-btn'));
+    });
 
-    expect(updateServiceWorkerMock).toHaveBeenCalledTimes(1);
+    expect(postMessageMock).toHaveBeenCalledWith({ type: 'SKIP_WAITING' });
+    expect(navigator.serviceWorker.addEventListener).toHaveBeenCalledWith(
+      'controllerchange',
+      expect.any(Function),
+      { once: true }
+    );
   });
 
   it('dismisses the snackbar when the Later button is clicked', () => {
@@ -71,6 +100,17 @@ describe('UpdatePrompt', () => {
     renderUpdatePrompt();
 
     fireEvent.click(screen.getByLabelText('Later'));
+
+    expect(setNeedRefreshMock).toHaveBeenCalledWith(false);
+  });
+
+  it('dismisses the snackbar when Update is clicked with no waiting SW', () => {
+    mockRegisterSW({ needRefresh: true, waitingSW: null });
+    renderUpdatePrompt();
+
+    act(() => {
+      fireEvent.click(screen.getByTestId('update-app-btn'));
+    });
 
     expect(setNeedRefreshMock).toHaveBeenCalledWith(false);
   });

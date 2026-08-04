@@ -17,8 +17,7 @@ const UPDATE_CHECK_INTERVAL_MS = 60 * 60 * 1000;
  * Registers the service worker and, when a new build is waiting, offers the
  * user an explicit "update now" action. `registerType: 'prompt'` (see
  * vite.config.mjs) means the new SW stays in `waiting` until the click below
- * sends it SKIP_WAITING — vite-plugin-pwa then reloads the page itself once
- * the new SW takes control.
+ * sends it SKIP_WAITING; we then reload as soon as the new SW takes control.
  *
  * Rendered once, at app level. In development the virtual module resolves to a
  * no-op hook (devOptions.enabled: false), so nothing is ever shown.
@@ -30,8 +29,7 @@ const UpdatePrompt = () => {
   // useRegisterSW exposes its signals as [value, setter] tuples matching
   // React's useState convention — hence the nested destructuring below.
   const {
-    needRefresh: [needRefresh, setNeedRefresh],
-    updateServiceWorker
+    needRefresh: [needRefresh, setNeedRefresh]
   } = useRegisterSW({
     immediate: true,
     onRegisteredSW: (_swUrl, swRegistration) =>
@@ -42,6 +40,32 @@ const UpdatePrompt = () => {
       // eslint-disable-next-line no-console
       console.warn('[UpdatePrompt] SW registration failed', err)
   });
+
+  // We drive skip-waiting + reload ourselves rather than delegating to the
+  // hook's `updateServiceWorker`. That helper wraps workbox-window's
+  // `messageSkipWaiting`, which posts to a cached `_registration.waiting`
+  // reference — and on Firefox that reference has been observed to go stale
+  // between the "waiting" event and the click (our own hourly
+  // registration.update() calls can swap the waiting SW under it), which
+  // makes the button silently no-op. Talking directly to the live
+  // `registration.waiting` and listening for `controllerchange` on
+  // navigator.serviceWorker sidesteps the whole issue.
+  const handleUpdate = () => {
+    const waitingSW = registration?.waiting;
+    if (!waitingSW) {
+      // eslint-disable-next-line no-console
+      console.warn('[UpdatePrompt] Update clicked but no waiting SW found');
+      // Best-effort dismissal so a broken state doesn't stay pinned on screen.
+      setNeedRefresh(false);
+      return;
+    }
+    navigator.serviceWorker.addEventListener(
+      'controllerchange',
+      () => window.location.reload(),
+      { once: true }
+    );
+    waitingSW.postMessage({ type: 'SKIP_WAITING' });
+  };
 
   useEffect(() => {
     if (!registration) return undefined;
@@ -94,7 +118,7 @@ const UpdatePrompt = () => {
               variant="text"
               data-testid="update-app-btn"
               sx={{ whiteSpace: 'nowrap' }}
-              onClick={() => updateServiceWorker()}>
+              onClick={handleUpdate}>
               {formatMessage({ id: 'Update' })}
             </Button>
             <IconButton
