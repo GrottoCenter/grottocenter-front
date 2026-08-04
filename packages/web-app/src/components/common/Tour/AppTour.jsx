@@ -1,12 +1,8 @@
-import { createContext, useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { TourProvider, useTour } from '@reactour/tour';
 import TourTooltip from './TourTooltip';
-
-export const DontShowContext = createContext({
-  dontShowAgain: false,
-  setDontShowAgain: () => {}
-});
+import DontShowContext from './DontShowContext';
 
 const TourSync = ({ run }) => {
   const { setIsOpen, setCurrentStep } = useTour();
@@ -34,8 +30,13 @@ const AppTour = ({ run, steps, onEnd }) => {
     onEnd(dontShowRef.current);
   }, [onEnd]);
 
+  const dontShowValue = useMemo(
+    () => ({ dontShowAgain, setDontShowAgain }),
+    [dontShowAgain]
+  );
+
   return (
-    <DontShowContext.Provider value={{ dontShowAgain, setDontShowAgain }}>
+    <DontShowContext.Provider value={dontShowValue}>
       <TourProvider
         steps={steps}
         ContentComponent={TourTooltip}
