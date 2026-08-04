@@ -204,7 +204,7 @@ describe('LocationControl', () => {
     expect(offsetCall[1]).toBeCloseTo(expectedY, 5);
   });
 
-  it('resets the map to north when leaving compass mode', async () => {
+  it('resets the map to north when leaving compass mode via the north button', async () => {
     renderControl();
     act(() => button().click());
     await waitFor(() => expect(watchSuccess).toBeDefined());
@@ -214,8 +214,28 @@ describe('LocationControl', () => {
     emitHeading(90);
     await waitFor(() => expect(mockMap.setBearing).toHaveBeenCalledWith(-90));
 
-    act(() => button().click()); // → back to follow
+    // A second button now appears, stacked above, to exit compass mode.
+    const buttons = screen.getAllByRole('button');
+    expect(buttons).toHaveLength(2);
+    act(() => buttons[1].click());
     await waitFor(() => expect(mockMap.setBearing).toHaveBeenCalledWith(0));
+  });
+
+  it('recentering while in compass mode does not exit it', async () => {
+    renderControl();
+    act(() => button().click());
+    await waitFor(() => expect(watchSuccess).toBeDefined());
+    emitPosition();
+    emitHeading(90);
+    act(() => button().click()); // → compass
+    emitHeading(90);
+    await waitFor(() => expect(mockMap.setBearing).toHaveBeenCalledWith(-90));
+
+    // Clicking the location button itself only recenters, it no longer exits
+    // compass mode — that is the separate north button's job now.
+    mockMap.setBearing.mockClear();
+    act(() => screen.getAllByRole('button')[0].click());
+    expect(mockMap.setBearing).not.toHaveBeenCalled();
   });
 
   it('detaches following when the user drags the map', async () => {

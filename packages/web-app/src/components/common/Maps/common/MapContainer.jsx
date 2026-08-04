@@ -14,7 +14,6 @@ import 'leaflet-rotate';
 import LayersControl from './LayersControl';
 import FullscreenControl from './FullscreenControl';
 import LocationControl from './LocationControl';
-import NorthResetControl from './NorthResetControl';
 import UserLocationMarker from './UserLocationMarker';
 import { MapLocationProvider } from './MapLocationContext';
 
@@ -113,7 +112,6 @@ const FullscreenOnlyControls = () => {
   return (
     <>
       <LocationControl />
-      <NorthResetControl />
       <UserLocationMarker />
     </>
   );
@@ -229,7 +227,6 @@ const CustomMapContainer = ({
           {isLocationControl && (
             <>
               <LocationControl />
-              <NorthResetControl />
               <UserLocationMarker />
             </>
           )}

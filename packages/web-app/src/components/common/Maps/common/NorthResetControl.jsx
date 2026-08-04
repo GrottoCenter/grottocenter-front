@@ -1,37 +1,26 @@
-import React, { useState } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import { IconButton, Tooltip, useTheme } from '@mui/material';
-import { useMap, useMapEvent } from 'react-leaflet';
 import CustomControl from './CustomControl';
 import CompassNeedle from './CompassNeedle';
 
-const getBearing = map =>
-  typeof map.getBearing === 'function' ? map.getBearing() : 0;
-
-// Floating north indicator: appears whenever the map is left rotated but NOT
-// actively following the compass (e.g. after detaching a heading-up follow with
-// a pan). Tapping it straightens the map back to north. It hides while compass
-// follow is on, since the location control's own needle already resets north
-// there — and resetting while following would just snap straight back.
-const NorthResetControl = () => {
+// Floating north button, stacked above the location control by LocationControl
+// (the sole source of map rotation). Shown whenever the map is left rotated:
+// either actively, while heading-up compass follow rotates it (tap exits
+// compass), or frozen after a drag detached tracking from compass mode (tap
+// just straightens the map).
+const NorthResetControl = ({ bearing, onClick }) => {
   const { formatMessage } = useIntl();
   const theme = useTheme();
-  const map = useMap();
-  const [bearing, setBearing] = useState(() => getBearing(map));
-  const [following, setFollowing] = useState(false);
-
-  useMapEvent('rotate', () => setBearing(getBearing(map)));
-  useMapEvent('compassfollowchange', e => setFollowing(e.following));
-
-  if (following || Math.round(bearing) % 360 === 0) return null;
-
   const label = formatMessage({ id: 'Reset to north' });
+
   return (
     <CustomControl position="bottomright" useLeafletControl>
       <Tooltip title={label} placement="left" arrow>
         <IconButton
           size="small"
-          onClick={() => map.setBearing(0)}
+          onClick={onClick}
           aria-label={label}
           sx={{
             bgcolor: 'background.paper',
@@ -49,6 +38,11 @@ const NorthResetControl = () => {
       </Tooltip>
     </CustomControl>
   );
+};
+
+NorthResetControl.propTypes = {
+  bearing: PropTypes.number.isRequired,
+  onClick: PropTypes.func.isRequired
 };
 
 export default NorthResetControl;

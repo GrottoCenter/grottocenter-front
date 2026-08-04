@@ -10,7 +10,7 @@ import { followCenterYOffset } from '@/utils/geo';
 import { useNotification } from '@/hooks';
 import { focusZoom } from '@/conf/config';
 import CustomControl from './CustomControl';
-import CompassNeedle from './CompassNeedle';
+import NorthResetControl from './NorthResetControl';
 import {
   useUserLocation,
   useDeviceHeading,
@@ -46,9 +46,12 @@ const MODE = {
   COMPASS: 'compass'
 };
 
-// Single "locate + compass" control replacing the old separate LocateControl
-// (leaflet.locatecontrol) and CompassControl. One button cycles through the
-// tracking modes, mirroring the location control of standard navigation apps.
+// "Locate + compass" control replacing the old separate LocateControl
+// (leaflet.locatecontrol) and CompassControl. This button tracks the user
+// (off → follow, drag detaches to located) and enters compass mode from
+// follow; a separate north button (rendered here, stacked above) appears
+// whenever the map ends up rotated and offers to straighten it back out —
+// mirroring the location + compass controls of standard navigation apps.
 const LocationControl = () => {
   const { formatMessage } = useIntl();
   const theme = useTheme();
@@ -238,8 +241,24 @@ const LocationControl = () => {
       else recenter(true);
       return;
     }
-    // compass → back to north-up follow (the effect above resets the bearing).
-    setMode(MODE.FOLLOW);
+    // compass: this button only tracks/recenters now — the separate north
+    // button (below) is what exits compass mode.
+    recenter(true);
+  };
+
+  // Rotated, either because compass follow is actively rotating the map, or
+  // because a drag detached tracking and left the bearing frozen. Either way
+  // the floating north button (below) offers a way to straighten it out.
+  const normalizedBearing = ((needleBearing % 360) + 360) % 360;
+  const showNorthButton =
+    mode === MODE.COMPASS || (mode === MODE.LOCATED && normalizedBearing !== 0);
+
+  const handleNorthClick = () => {
+    if (mode === MODE.COMPASS) {
+      setMode(MODE.FOLLOW);
+    } else {
+      resetNorth();
+    }
   };
 
   const isError = Boolean(geoError) && mode !== MODE.OFF;
@@ -255,16 +274,8 @@ const LocationControl = () => {
         sx={{ color: theme.palette.mapControlIcon }}
       />
     );
-  } else if (mode === MODE.COMPASS) {
-    icon = (
-      <CompassNeedle
-        bearing={needleBearing}
-        northColor={theme.palette.error.main}
-        southColor={theme.palette.grey[500]}
-      />
-    );
-  } else if (mode === MODE.FOLLOW) {
-    icon = <ExploreIcon sx={{ fontSize: 26 }} />;
+  } else if (mode === MODE.FOLLOW || mode === MODE.COMPASS) {
+    icon = <ExploreIcon sx={{ fontSize: 26, color: USER_LOCATION_COLOR }} />;
   } else if (mode === MODE.LOCATED) {
     icon = (
       <MyLocationIcon
@@ -282,39 +293,42 @@ const LocationControl = () => {
   let tooltipId = 'Use my location';
   if (isError) {
     tooltipId = GEO_ERROR_MESSAGES[geoError] || GEO_ERROR_MESSAGES[2];
-  } else if (mode === MODE.COMPASS) {
-    tooltipId = 'Reset to north';
   } else if (mode === MODE.FOLLOW) {
     tooltipId = canUseCompass ? 'Compass mode' : 'Recenter on your location';
-  } else if (mode === MODE.LOCATED) {
+  } else if (mode === MODE.COMPASS || mode === MODE.LOCATED) {
     tooltipId = 'Recenter on your location';
   }
   const label = formatMessage({ id: tooltipId });
 
   return (
-    <CustomControl position="bottomright" useLeafletControl>
-      <Tooltip
-        title={label}
-        open={isError ? true : undefined}
-        placement="left"
-        arrow>
-        <span>
-          <IconButton
-            size="small"
-            onClick={handleClick}
-            aria-label={label}
-            sx={{
-              bgcolor: isError ? 'error.main' : 'background.paper',
-              borderRadius: '4px',
-              height: 44,
-              width: 44,
-              '&:hover': { bgcolor: isError ? 'error.dark' : '#f4f4f4' }
-            }}>
-            {icon}
-          </IconButton>
-        </span>
-      </Tooltip>
-    </CustomControl>
+    <>
+      <CustomControl position="bottomright" useLeafletControl>
+        <Tooltip
+          title={label}
+          open={isError ? true : undefined}
+          placement="left"
+          arrow>
+          <span>
+            <IconButton
+              size="small"
+              onClick={handleClick}
+              aria-label={label}
+              sx={{
+                bgcolor: isError ? 'error.main' : 'background.paper',
+                borderRadius: '4px',
+                height: 44,
+                width: 44,
+                '&:hover': { bgcolor: isError ? 'error.dark' : '#f4f4f4' }
+              }}>
+              {icon}
+            </IconButton>
+          </span>
+        </Tooltip>
+      </CustomControl>
+      {showNorthButton && (
+        <NorthResetControl bearing={needleBearing} onClick={handleNorthClick} />
+      )}
+    </>
   );
 };
 
