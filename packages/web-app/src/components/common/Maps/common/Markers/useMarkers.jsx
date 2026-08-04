@@ -1,7 +1,7 @@
 import React, { useRef, useCallback, useEffect } from 'react';
 import { useMap } from 'react-leaflet';
 import * as L from 'leaflet';
-import { GlobalStyles } from '@mui/material';
+import { GlobalStyles, useMediaQuery } from '@mui/material';
 import useRenderPopup from './useRenderPopup';
 
 export const MarkerGlobalCss = (
@@ -31,6 +31,7 @@ const useMarkers = ({
   // Map<id, L.Marker> for O(1) lookups during diff
   const markersRef = useRef(new Map());
   const renderPopup = useRenderPopup();
+  const isTouch = useMediaQuery('(pointer: coarse)');
 
   const createLeafletMarker = useCallback(
     marker => {
@@ -52,14 +53,25 @@ const useMarkers = ({
         markerEl.bindPopup(() => renderPopup(popupContent(marker)));
       }
 
-      if (tooltipContent) {
+      // Tooltips are a hover affordance, and binding one makes Leaflet listen
+      // for mouseover/mouseout on the marker. That turns the marker into a
+      // hoverable element, and iOS Safari then withholds the click of the first
+      // tap on such an element: only the hover events are delivered, so the
+      // tooltip opens while `_openPopup` never runs. The popup — the only thing
+      // carrying a link to the entrance page — stays unreachable, and the
+      // second tap lands on a tooltip that Leaflet renders with
+      // `pointer-events: none`, passing through to the map which closes it.
+      // Binding them only where a pointer can hover removes the conflict at the
+      // source; on touch the first tap now opens the popup directly.
+      if (tooltipContent && !isTouch) {
         markerEl.bindTooltip(`${tooltipContent(marker)}`, {});
-        // On touch devices a tap fires both tooltip and popup; hide tooltip on click
-        // (fires before popupopen, works reliably for both L.marker and L.circleMarker)
-        markerEl.on('click', () => {
-          markerEl.closeTooltip();
-          if (onMarkerClick) onMarkerClick(marker);
-        });
+      }
+
+      // Registered on its own rather than alongside the tooltip: ExploredOverlay
+      // drives its navigation through this callback, so tying it to the tooltip
+      // would silently disable it on the very devices we are fixing here.
+      if (onMarkerClick) {
+        markerEl.on('click', () => onMarkerClick(marker));
       }
 
       // Listeners are cleaned up by Leaflet when markerEl.remove() is called.
@@ -79,6 +91,7 @@ const useMarkers = ({
       popupContent,
       renderPopup,
       tooltipContent,
+      isTouch,
       onMarkerClick,
       onMarkerOver,
       onMarkerOut,
