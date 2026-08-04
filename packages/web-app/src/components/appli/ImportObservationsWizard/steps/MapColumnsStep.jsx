@@ -436,7 +436,7 @@ const ColumnRoleTable = ({
                 : null;
 
             return (
-              <React.Fragment key={colIndex}>
+              <React.Fragment key={`col-${mapping.columnIndex}`}>
                 <TableRow
                   sx={getRowSx(mapping.role)}
                   data-testid={`column-row-${colIndex}`}>

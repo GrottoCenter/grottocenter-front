@@ -28,6 +28,9 @@ const HighLightsChar = ({ oldText, newText }) => {
   }
 
   const result = diffWords(oldText, newText);
+  // A diff chunk has no identity beyond its offset in the result, and the
+  // whole list is recomputed from (oldText, newText) on every render.
+  /* eslint-disable react/no-array-index-key */
   return result.map((change, index) => {
     if (change.added) {
       return <AddedText key={index}>{change.value}</AddedText>;
@@ -48,6 +51,7 @@ const HighLightsLine = ({ oldText, newText }) => {
   }
 
   const result = diffSentences(oldText, newText);
+  /* eslint-disable react/no-array-index-key */
   return result.map((change, index) => {
     if (change.added) {
       return (

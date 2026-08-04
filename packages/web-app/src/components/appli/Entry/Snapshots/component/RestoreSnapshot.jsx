@@ -29,9 +29,8 @@ function sleep(ms) {
   // eslint-disable-next-line no-promise-executor-return
   return new Promise(resolve => setTimeout(resolve, ms));
 }
-const RestoreSnapshot = item => {
+const RestoreSnapshot = ({ snapshot, snapshotType, isNetwork, actualItem }) => {
   const dispatch = useDispatch();
-  const { snapshot, snapshotType, isNetwork, actualItem } = item;
   const userId = pathOr(null, ['id'], useUserProperties());
   const permissions = usePermissions();
   const { formatMessage } = useIntl();
@@ -229,7 +228,11 @@ const RestoreSnapshot = item => {
 };
 
 RestoreSnapshot.propTypes = {
-  snapshot: PropTypes.shape({}).isRequired,
+  snapshot: PropTypes.shape({
+    author: PropTypes.shape({
+      id: PropTypes.oneOfType([PropTypes.number, PropTypes.string])
+    })
+  }).isRequired,
   snapshotType: PropTypes.string.isRequired,
   isNetwork: PropTypes.bool,
   actualItem: PropTypes.shape({

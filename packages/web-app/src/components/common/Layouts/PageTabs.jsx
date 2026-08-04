@@ -166,6 +166,9 @@ const PageTabs = ({ tabs, children }) => {
           </Tabs>
         </StickyTabsBar>
       )}
+      {/* A tab panel is identified by its position: the ARIA wiring below
+          pairs page-tabpanel-i with page-tab-i. */}
+      {/* eslint-disable react/no-array-index-key */}
       {childrenArray.map((child, i) => (
         <TabPanel
           key={i}
@@ -183,6 +186,7 @@ const PageTabs = ({ tabs, children }) => {
           {child}
         </TabPanel>
       ))}
+      {/* eslint-enable react/no-array-index-key */}
       {isMobile && (
         <Paper
           elevation={3}

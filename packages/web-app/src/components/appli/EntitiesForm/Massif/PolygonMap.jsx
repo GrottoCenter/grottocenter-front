@@ -730,9 +730,9 @@ const PolygonMap = ({ onChange, onValidationChange, data }) => {
             <LayersControl position="topright" />
 
             <KinkPane />
-            {allKinkPoints.map((point, idx) => (
+            {allKinkPoints.map(point => (
               <Marker
-                key={`kink-${point.lat}-${point.lng}-${idx}`}
+                key={`kink-${point.lat}-${point.lng}`}
                 position={[point.lat, point.lng]}
                 icon={kinkIcon}
                 interactive={false}
