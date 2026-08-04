@@ -214,7 +214,7 @@ describe('LocationControl', () => {
     emitHeading(90);
     await waitFor(() => expect(mockMap.setBearing).toHaveBeenCalledWith(-90));
 
-    // A second button now appears, stacked above, to exit compass mode.
+    // The round north badge now appears (top-right) to exit compass mode.
     const buttons = screen.getAllByRole('button');
     expect(buttons).toHaveLength(2);
     act(() => buttons[1].click());

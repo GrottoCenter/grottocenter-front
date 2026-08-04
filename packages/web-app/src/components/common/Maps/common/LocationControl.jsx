@@ -49,7 +49,7 @@ const MODE = {
 // "Locate + compass" control replacing the old separate LocateControl
 // (leaflet.locatecontrol) and CompassControl. This button tracks the user
 // (off → follow, drag detaches to located) and enters compass mode from
-// follow; a separate north button (rendered here, stacked above) appears
+// follow; a separate round north button (rendered here, top-right) appears
 // whenever the map ends up rotated and offers to straighten it back out —
 // mirroring the location + compass controls of standard navigation apps.
 const LocationControl = () => {
@@ -282,7 +282,7 @@ const LocationControl = () => {
 
   // Rotated, either because compass follow is actively rotating the map, or
   // because a drag detached tracking and left the bearing frozen. Either way
-  // the floating north button (below) offers a way to straighten it out.
+  // the floating north badge (top-right) offers a way to straighten it out.
   const normalizedBearing = ((needleBearing % 360) + 360) % 360;
   const showNorthButton =
     mode === MODE.COMPASS || (mode === MODE.LOCATED && normalizedBearing !== 0);
