@@ -4,6 +4,7 @@ import { useIntl } from 'react-intl';
 import { IconButton, Tooltip, useTheme } from '@mui/material';
 import CustomControl from './CustomControl';
 import CompassNeedle from './CompassNeedle';
+import useMapOverlayContainer from './useMapOverlayContainer';
 
 // Floating north button, rendered by LocationControl (the sole source of map
 // rotation). Shown whenever the map is left rotated: either actively, while
@@ -18,6 +19,7 @@ import CompassNeedle from './CompassNeedle';
 const NorthResetControl = ({ bearing, onClick }) => {
   const { formatMessage } = useIntl();
   const theme = useTheme();
+  const overlayContainer = useMapOverlayContainer();
   const label = formatMessage({ id: 'Reset to north' });
 
   return (
@@ -25,7 +27,11 @@ const NorthResetControl = ({ bearing, onClick }) => {
       position="topright"
       containerClassName="leaflet-control"
       useLeafletControl>
-      <Tooltip title={label} placement="left" arrow>
+      <Tooltip
+        title={label}
+        placement="left"
+        arrow
+        slotProps={{ popper: { container: overlayContainer } }}>
         <IconButton
           onClick={onClick}
           aria-label={label}

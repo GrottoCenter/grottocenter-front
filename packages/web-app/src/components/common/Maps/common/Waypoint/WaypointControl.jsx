@@ -11,6 +11,7 @@ import {
 import LocationOn from '@mui/icons-material/LocationOn';
 import useWaypoint from '@/hooks/useWaypoint';
 import useIsFullscreen from '../useIsFullscreen';
+import useMapOverlayContainer from '../useMapOverlayContainer';
 import WaypointNavigation from './WaypointNavigation';
 import { WAYPOINT_COLOR } from './waypointIcon';
 
@@ -30,6 +31,7 @@ const WaypointControl = () => {
   const isTouch = useMediaQuery('(pointer: coarse)');
   const [waypoint, setWaypoint] = useWaypoint();
   const isFullscreen = useIsFullscreen();
+  const overlayContainer = useMapOverlayContainer();
   // { coords, anchor } while the long-press menu is open, else null.
   const [menu, setMenu] = useState(null);
 
@@ -64,6 +66,7 @@ const WaypointControl = () => {
         />
       )}
       <Menu
+        container={overlayContainer}
         open={Boolean(menu)}
         onClose={() => setMenu(null)}
         anchorReference="anchorPosition"

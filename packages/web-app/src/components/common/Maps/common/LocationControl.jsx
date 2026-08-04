@@ -12,6 +12,7 @@ import useContinuousAngle from '@/hooks/useContinuousAngle';
 import { focusZoom } from '@/conf/config';
 import CustomControl from './CustomControl';
 import NorthResetControl from './NorthResetControl';
+import useMapOverlayContainer from './useMapOverlayContainer';
 import {
   useUserLocation,
   useDeviceHeading,
@@ -58,6 +59,7 @@ const LocationControl = () => {
   const theme = useTheme();
   const map = useMap();
   const { onError: notifyError } = useNotification();
+  const overlayContainer = useMapOverlayContainer();
 
   const {
     location,
@@ -362,7 +364,8 @@ const LocationControl = () => {
           title={label}
           open={isError ? true : undefined}
           placement="left"
-          arrow>
+          arrow
+          slotProps={{ popper: { container: overlayContainer } }}>
           <span>
             <IconButton
               size="small"

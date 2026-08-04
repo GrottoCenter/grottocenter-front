@@ -29,6 +29,11 @@ vi.mock('react-leaflet', () => ({
   // Record the handler so tests can simulate a user drag.
   useMapEvent: (type, handler) => {
     mapEventHandlers[type] = handler;
+  },
+  // useIsFullscreen (via useMapOverlayContainer) subscribes by handler map.
+  useMapEvents: handlers => {
+    Object.assign(mapEventHandlers, handlers);
+    return mockMap;
   }
 }));
 

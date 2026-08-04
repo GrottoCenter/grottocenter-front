@@ -5,6 +5,7 @@ import * as L from 'leaflet';
 import { useIntl } from 'react-intl';
 import { ListItemIcon, ListItemText, Menu, MenuItem } from '@mui/material';
 import LocationOffIcon from '@mui/icons-material/LocationOff';
+import useMapOverlayContainer from '../useMapOverlayContainer';
 import waypointIcon, { WAYPOINT_COLOR } from './waypointIcon';
 
 const pointShape = PropTypes.shape({
@@ -17,6 +18,7 @@ const pointShape = PropTypes.shape({
 // a small context menu to delete it.
 const WaypointLayer = ({ waypoint, userLocation, hasLocation, onDelete }) => {
   const { formatMessage } = useIntl();
+  const overlayContainer = useMapOverlayContainer();
   const [menuAnchor, setMenuAnchor] = useState(null);
 
   const handleMarkerContextMenu = e => {
@@ -62,6 +64,7 @@ const WaypointLayer = ({ waypoint, userLocation, hasLocation, onDelete }) => {
         eventHandlers={{ contextmenu: handleMarkerContextMenu }}
       />
       <Menu
+        container={overlayContainer}
         open={Boolean(menuAnchor)}
         onClose={() => setMenuAnchor(null)}
         anchorReference="anchorPosition"
