@@ -42,6 +42,12 @@ export default [
       parserOptions: { ecmaFeatures: { jsx: true } }
     },
     settings: {
+      // Deliberately the plain `node` resolver: this package is consumed by
+      // workspaces that have no tsconfig, so it cannot assume the TypeScript
+      // resolver. The trade-off is that `node` ignores `exports` maps and knows
+      // nothing about path aliases — any workspace needing either must override
+      // `import/resolver` itself, as the root eslint.config.mjs does for
+      // packages/web-app (`@/*` alias + `exports`-only dependencies).
       'import/resolver': {
         node: {
           extensions: ['.js', '.jsx', '.ts', '.tsx'],

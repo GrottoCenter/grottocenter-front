@@ -171,6 +171,7 @@ const DeviceSelector = ({ disabled, onCreateNew, onSelect }) => {
         value={null}
         onChange={handleChange}
         loading={isSearching}
+        slotProps={{ popper: { 'data-testid': 'device-search-popper' } }}
         isOptionEqualToValue={(opt, val) =>
           opt.id !== undefined && val.id !== undefined
             ? String(opt.id) === String(val.id)

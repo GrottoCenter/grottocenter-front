@@ -48,7 +48,7 @@ const AuthChecker = ({ errorMessageComponent, componentToDisplay }) => {
     <CenteredBlock>
       {errorMessageComponent || (
         <>
-          <Alert severity="error" sx={{ mb: 1 }}>
+          <Alert severity="error" sx={{ mb: 1 }} data-testid="auth-error-alert">
             {formatMessage({
               id: 'You must be authenticated in order to use this feature.'
             })}

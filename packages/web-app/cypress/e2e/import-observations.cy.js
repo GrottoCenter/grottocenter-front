@@ -25,7 +25,7 @@ describe('Import Observations Wizard', () => {
       cy.get('[data-testid="start-over-button"]').should('not.exist');
       cy.get('[data-testid="next-button"]').should('not.exist');
       // An alert should be visible indicating auth is required
-      cy.get('.MuiAlert-root').should('be.visible');
+      cy.get('[data-testid="auth-error-alert"]').should('be.visible');
     });
   });
 
@@ -68,7 +68,7 @@ describe('Import Observations Wizard', () => {
       cy.wait('@searchDevices');
 
       // Select the device from results
-      cy.get('.MuiAutocomplete-popper').within(() => {
+      cy.get('[data-testid="device-search-popper"]').within(() => {
         cy.contains('TinyTag Plus 2').click();
       });
 

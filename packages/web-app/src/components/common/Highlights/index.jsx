@@ -1,3 +1,5 @@
+// `React.Fragment` with a `key` prop needs the React namespace: the automatic
+// JSX runtime covers `<>…</>`, which cannot take a key. Do not strip.
 import React from 'react';
 import PropTypes from 'prop-types';
 import { diffWords, diffSentences } from 'diff';
@@ -51,6 +53,8 @@ const HighLightsLine = ({ oldText, newText }) => {
   }
 
   const result = diffSentences(oldText, newText);
+  // A diff chunk has no identity beyond its offset in the result, and the
+  // whole list is recomputed from (oldText, newText) on every render.
   /* eslint-disable react/no-array-index-key */
   return result.map((change, index) => {
     if (change.added) {
