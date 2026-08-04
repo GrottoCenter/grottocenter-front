@@ -108,14 +108,15 @@ const CoordinateDisplay = ({
   const grottoMapUrl = `/ui/map/${latitude},${longitude},${GROTTOCENTER_LINK_ZOOM}${grottoMapPopup}`;
 
   const precisionSeverity = computePrecisionSeverity(precision);
-  const precisionText =
-    precision === 0
-      ? formatMessage({
-          id: 'Coordinates precision unavailable for restricted access entrance.'
-        })
-      : precision != null
-        ? `±${precision}m`
-        : null;
+  // A precision of exactly 0 marks a restricted entrance, not a perfect fix.
+  let precisionText = null;
+  if (precision === 0) {
+    precisionText = formatMessage({
+      id: 'Coordinates precision unavailable for restricted access entrance.'
+    });
+  } else if (precision != null) {
+    precisionText = `±${precision}m`;
+  }
 
   if (compact) {
     return (

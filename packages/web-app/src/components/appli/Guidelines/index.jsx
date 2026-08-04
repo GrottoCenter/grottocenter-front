@@ -31,6 +31,9 @@ const MODE_NONE = 'none';
 const MODE_CREATE = 'create';
 const MODE_ATTACH = 'attach';
 
+// Guidelines attach to a country, a region or a massif; massif is the default.
+const ENTITY_LABEL_IDS = { countries: 'country', regions: 'region' };
+
 const Guidelines = ({ entityType, entityId, guidelines }) => {
   const permissions = usePermissions();
   const { onError } = useNotification();
@@ -47,12 +50,7 @@ const Guidelines = ({ entityType, entityId, guidelines }) => {
   const [attachFetchTrigger, setAttachFetchTrigger] = useState(0);
 
   const entityLabel = formatMessage({
-    id:
-      entityType === 'countries'
-        ? 'country'
-        : entityType === 'regions'
-          ? 'region'
-          : 'massif'
+    id: ENTITY_LABEL_IDS[entityType] ?? 'massif'
   });
 
   useEffect(() => {

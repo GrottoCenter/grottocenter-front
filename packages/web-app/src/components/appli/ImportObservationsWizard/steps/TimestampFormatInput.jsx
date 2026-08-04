@@ -24,6 +24,12 @@ import {
   validateFormat
 } from './utils/timestampFormatUtils';
 
+const PLACEHOLDERS = {
+  timeOnly: 'HH:mm:ss',
+  dateOnly: 'YYYY-MM-DD',
+  datetime: 'YYYY-MM-DD HH:mm:ss'
+};
+
 // ─── Token descriptions (keyed by token value) ───────────────────────────────
 
 const TOKEN_DESCRIPTIONS = {
@@ -247,12 +253,7 @@ const TimestampFormatInput = ({
     [onChange]
   );
 
-  const placeholder =
-    timestampType === 'timeOnly'
-      ? 'HH:mm:ss'
-      : timestampType === 'dateOnly'
-        ? 'YYYY-MM-DD'
-        : 'YYYY-MM-DD HH:mm:ss';
+  const placeholder = PLACEHOLDERS[timestampType] ?? PLACEHOLDERS.datetime;
 
   return (
     <Box data-testid="format-pill-builder">

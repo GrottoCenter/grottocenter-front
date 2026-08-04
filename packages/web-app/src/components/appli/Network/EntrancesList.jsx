@@ -53,6 +53,15 @@ const EntrancesList = ({
           .map(entrance => {
             const isSelected = selectedEntrancesId.includes(entrance.id);
             const isVisible = selectedEntrancesId.length === 0 || isSelected;
+            // Clicking the only selected entrance clears the filter rather
+            // than hiding the last one on the map.
+            let toggleLabelId = 'Show on map';
+            if (isSelected) {
+              toggleLabelId =
+                selectedEntrancesId.length === 1
+                  ? 'Show all on map'
+                  : 'Hide from map';
+            }
             return (
               <ListItem
                 key={entrance.id}
@@ -61,14 +70,7 @@ const EntrancesList = ({
                   onToggleSelection && (
                     <Tooltip
                       placement="left"
-                      title={formatMessage({
-                        id:
-                          selectedEntrancesId.length === 1 && isSelected
-                            ? 'Show all on map'
-                            : isSelected
-                              ? 'Hide from map'
-                              : 'Show on map'
-                      })}>
+                      title={formatMessage({ id: toggleLabelId })}>
                       <IconButton
                         edge="end"
                         size="small"

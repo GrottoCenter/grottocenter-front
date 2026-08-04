@@ -142,11 +142,8 @@ const reducer = (state = initialState, action) => {
         c => c.id === convId
       );
 
-      const unreadCountToClear = activeConv
-        ? activeConv.unreadCount
-        : archivedConv
-          ? archivedConv.unreadCount
-          : 0;
+      const unreadCountToClear =
+        activeConv?.unreadCount ?? archivedConv?.unreadCount ?? 0;
 
       const activeListItems = state.activeConversations.items.map(c =>
         c.id === convId ? { ...c, unreadCount: 0 } : c

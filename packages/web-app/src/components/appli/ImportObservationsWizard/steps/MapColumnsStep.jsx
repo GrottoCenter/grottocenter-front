@@ -62,6 +62,10 @@ const TIMESTAMP_TYPE_SEQUENCE = [
 
 const PREVIEW_COUNT = 10;
 
+// Types the pill builder can edit directly; everything else falls back to
+// the full datetime builder.
+const PILL_BUILDER_TYPES = ['datetime', 'dateOnly', 'timeOnly'];
+
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 const getIanaTimezones = () => {
@@ -177,12 +181,9 @@ const TimestampConfig = ({
     mapping.timestampType === 'dateOnly' ||
     mapping.timestampType === 'timeOnly';
 
-  const pillBuilderType =
-    mapping.timestampType === 'timeOnly'
-      ? 'timeOnly'
-      : mapping.timestampType === 'dateOnly'
-        ? 'dateOnly'
-        : 'datetime';
+  const pillBuilderType = PILL_BUILDER_TYPES.includes(mapping.timestampType)
+    ? mapping.timestampType
+    : 'datetime';
 
   const currentFormat =
     mapping.timestampType === 'timeOnly'
@@ -649,12 +650,14 @@ const MapColumnsStep = () => {
   // Compute sample values per column (first 10 + last 10)
   const sampleValues = useMemo(() => {
     const firstRows = dataRows.slice(0, PREVIEW_COUNT);
-    const lastRows =
-      dataRows.length > PREVIEW_COUNT * 2
-        ? dataRows.slice(-PREVIEW_COUNT)
-        : dataRows.length > PREVIEW_COUNT
-          ? dataRows.slice(PREVIEW_COUNT)
-          : [];
+    // Enough rows for two disjoint windows: take the last ones. Enough for
+    // one and a bit: take whatever follows the first window. Otherwise the
+    // first window already covers everything.
+    let lastRows = [];
+    if (dataRows.length > PREVIEW_COUNT * 2)
+      lastRows = dataRows.slice(-PREVIEW_COUNT);
+    else if (dataRows.length > PREVIEW_COUNT)
+      lastRows = dataRows.slice(PREVIEW_COUNT);
     const sampleRows = [...firstRows, ...lastRows];
 
     return columnHeaders.map((_, colIdx) =>

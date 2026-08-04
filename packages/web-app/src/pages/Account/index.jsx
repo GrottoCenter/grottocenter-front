@@ -943,6 +943,49 @@ const PreferencesSection = ({ account, onSaved }) => {
     AVAILABLE_LANGUAGES[languageIdToLocale(account?.language)]?.nativeName ??
     '—';
 
+  let notificationRows = (
+    <>
+      <InfoRow>
+        <InfoLabel variant="body2">
+          {formatMessage({
+            id: 'Email notifications for subscriptions'
+          })}
+        </InfoLabel>
+        <BoolValue value={notifPrefs.send_notification_by_email} />
+      </InfoRow>
+      <InfoRow>
+        <InfoLabel variant="body2">
+          {formatMessage({
+            id: 'Email notifications for messages'
+          })}
+        </InfoLabel>
+        <BoolValue value={notifPrefs.send_message_notification_by_email} />
+      </InfoRow>
+      <InfoRow>
+        <InfoLabel variant="body2">
+          {formatMessage({ id: 'Alert for news' })}
+        </InfoLabel>
+        <BoolValue value={notifPrefs.alert_for_news} />
+      </InfoRow>
+    </>
+  );
+  if (isNotifLoading) {
+    notificationRows = (
+      <InfoRow>
+        <CircularProgress size={20} />
+      </InfoRow>
+    );
+  } else if (notifError) {
+    notificationRows = (
+      <Alert
+        severity="warning"
+        content={formatMessage({
+          id: 'Failed to load notification preferences'
+        })}
+      />
+    );
+  }
+
   const viewContent = (
     <>
       <InfoRow>
@@ -951,43 +994,7 @@ const PreferencesSection = ({ account, onSaved }) => {
         </InfoLabel>
         <Typography variant="body1">{nativeName}</Typography>
       </InfoRow>
-      {isNotifLoading ? (
-        <InfoRow>
-          <CircularProgress size={20} />
-        </InfoRow>
-      ) : notifError ? (
-        <Alert
-          severity="warning"
-          content={formatMessage({
-            id: 'Failed to load notification preferences'
-          })}
-        />
-      ) : (
-        <>
-          <InfoRow>
-            <InfoLabel variant="body2">
-              {formatMessage({
-                id: 'Email notifications for subscriptions'
-              })}
-            </InfoLabel>
-            <BoolValue value={notifPrefs.send_notification_by_email} />
-          </InfoRow>
-          <InfoRow>
-            <InfoLabel variant="body2">
-              {formatMessage({
-                id: 'Email notifications for messages'
-              })}
-            </InfoLabel>
-            <BoolValue value={notifPrefs.send_message_notification_by_email} />
-          </InfoRow>
-          <InfoRow>
-            <InfoLabel variant="body2">
-              {formatMessage({ id: 'Alert for news' })}
-            </InfoLabel>
-            <BoolValue value={notifPrefs.alert_for_news} />
-          </InfoRow>
-        </>
-      )}
+      {notificationRows}
     </>
   );
 

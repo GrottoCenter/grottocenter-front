@@ -63,6 +63,16 @@ const CATEGORY_KEYS = [
   { key: 'comment', label: 'Comments' }
 ];
 
+// Data-quality score buckets, highest first.
+const QUALITY_COLORS = [
+  { min: 70, color: 'success' },
+  { min: 40, color: 'warning' },
+  { min: 0, color: 'error' }
+];
+
+const qualityColor = score =>
+  QUALITY_COLORS.find(({ min }) => score >= min).color;
+
 const Properties = ({ isLoading = false, entrance, dataQuality }) => {
   const { formatMessage } = useIntl();
   const [categoriesOpen, setCategoriesOpen] = useState(false);
@@ -327,12 +337,7 @@ const Properties = ({ isLoading = false, entrance, dataQuality }) => {
                     {CATEGORY_KEYS.map(({ key, label }) => {
                       const score = dataQuality.categories[key];
                       if (score == null) return null;
-                      const color =
-                        score >= 70
-                          ? 'success'
-                          : score >= 40
-                            ? 'warning'
-                            : 'error';
+                      const color = qualityColor(score);
                       return (
                         <Box
                           key={key}

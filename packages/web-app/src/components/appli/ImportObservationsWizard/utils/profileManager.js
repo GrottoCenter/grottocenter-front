@@ -1,5 +1,13 @@
 import { DEFAULT_DOCUMENT_LANGUAGE } from '../constants/defaults';
 
+// Profiles written before multi-author support carry a single `authorId`.
+const normalizeAuthorIds = json => {
+  if (Array.isArray(json.authorIds) && json.authorIds.length > 0) {
+    return json.authorIds;
+  }
+  return json.authorId != null ? [json.authorId] : [];
+};
+
 /**
  * Serialises the current wizard state to the Profile JSON format.
  * Conforms to the observation-import-profile-contract.md API contract.
@@ -156,12 +164,7 @@ export const importProfile = json => {
         pointLabel: json.pointLabel,
         latitude: json.latitude,
         longitude: json.longitude,
-        authorIds:
-          Array.isArray(json.authorIds) && json.authorIds.length > 0
-            ? json.authorIds
-            : json.authorId != null
-              ? [json.authorId]
-              : [],
+        authorIds: normalizeAuthorIds(json),
         licenseId: json.licenseId,
         documentTitle: json.documentTitle,
         observationName: json.observationName,

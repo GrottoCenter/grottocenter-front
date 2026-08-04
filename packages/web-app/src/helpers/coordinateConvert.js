@@ -9,13 +9,8 @@ export const decimalToDMS = (decimal, isLatitude) => {
   const minFloat = (abs - deg) * 60;
   const min = Math.floor(minFloat);
   const sec = ((minFloat - min) * 60).toFixed(1);
-  const direction = isLatitude
-    ? decimal >= 0
-      ? 'N'
-      : 'S'
-    : decimal >= 0
-      ? 'E'
-      : 'W';
+  const [positive, negative] = isLatitude ? ['N', 'S'] : ['E', 'W'];
+  const direction = decimal >= 0 ? positive : negative;
   return `${deg}°${min}'${sec}"${direction}`;
 };
 

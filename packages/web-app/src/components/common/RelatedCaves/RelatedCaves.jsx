@@ -171,6 +171,44 @@ const RelatedCaves = ({
       (exploredEntrances ?? []).length === 0
     : (exploredEntrances ?? []).length === 0;
 
+  let listContent = (
+    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+      {isOrganization && (
+        <EntitiesList
+          type="cave"
+          entities={exploredNetworks}
+          onItemRemove={canManageCaves ? id => requestUnlink(id, 'cave') : null}
+          toolTipTitle={toolTipTitle}
+        />
+      )}
+      <EntitiesList
+        type="entrance"
+        entities={exploredEntrances}
+        onItemRemove={
+          canManageCaves ? id => requestUnlink(id, 'entrance') : null
+        }
+        toolTipTitle={toolTipTitle}
+      />
+    </Box>
+  );
+  if (isAdding) {
+    listContent = (
+      <Alert severity="info" title={formatMessage({ id: 'Loading ...' })} />
+    );
+  } else if (isEmpty && !isCaveSearchVisible) {
+    // While the search form is open the empty state would just be noise.
+    listContent = (
+      <Alert
+        severity="info"
+        content={formatMessage({
+          id: isOrganization
+            ? 'No explored caves found.'
+            : 'No explored entrances found.'
+        })}
+      />
+    );
+  }
+
   return (
     <>
       {isCaveSearchVisible && (
@@ -184,39 +222,7 @@ const RelatedCaves = ({
           <ExploredEntrancesMap userId={userId} />
         </Box>
       )}
-      {isAdding ? (
-        <Alert severity="info" title={formatMessage({ id: 'Loading ...' })} />
-      ) : isEmpty && !isCaveSearchVisible ? (
-        <Alert
-          severity="info"
-          content={formatMessage({
-            id: isOrganization
-              ? 'No explored caves found.'
-              : 'No explored entrances found.'
-          })}
-        />
-      ) : (
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-          {isOrganization && (
-            <EntitiesList
-              type="cave"
-              entities={exploredNetworks}
-              onItemRemove={
-                canManageCaves ? id => requestUnlink(id, 'cave') : null
-              }
-              toolTipTitle={toolTipTitle}
-            />
-          )}
-          <EntitiesList
-            type="entrance"
-            entities={exploredEntrances}
-            onItemRemove={
-              canManageCaves ? id => requestUnlink(id, 'entrance') : null
-            }
-            toolTipTitle={toolTipTitle}
-          />
-        </Box>
-      )}
+      {listContent}
       <StandardDialog
         open={!!pendingRemove}
         onClose={handleCancelRemove}

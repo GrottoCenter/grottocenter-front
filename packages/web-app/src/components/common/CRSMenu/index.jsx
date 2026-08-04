@@ -56,9 +56,12 @@ const CRSMenu = ({
           name,
           [...projs].sort((a, b) => a.title.localeCompare(b.title))
         ])
-        .sort(([a], [b]) =>
-          a === worldLabel ? -1 : b === worldLabel ? 1 : a.localeCompare(b)
-        ),
+        // The world-wide group is pinned first, the rest is alphabetical.
+        .sort(([a], [b]) => {
+          if (a === worldLabel) return -1;
+          if (b === worldLabel) return 1;
+          return a.localeCompare(b);
+        }),
     [projections, locale, worldLabel]
   );
 

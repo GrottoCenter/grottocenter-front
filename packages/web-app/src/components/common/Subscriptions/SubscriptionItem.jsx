@@ -11,20 +11,19 @@ import regionType from '../../../types/region.type';
 import { unsubscribeFromCountry } from '../../../actions/Subscriptions/UnsubscribeFromCountry';
 import { unsubscribeFromRegion } from '../../../actions/Subscriptions/UnsubscribeFromRegion';
 
+// A region id encodes its country: "US-AL" is Alabama in the United States.
+const subscriptionUrl = (type, id) => {
+  if (type === 'MASSIF') return `/ui/massifs/${id}`;
+  if (type !== 'REGION') return `/ui/countries/${id}`;
+  const [countryId, regionId] = id.split('-');
+  return `/ui/countries/${countryId}/regions/${regionId}`;
+};
+
 const SubscriptionItem = ({ canUnsubscribe, subscription, type, userId }) => {
   const { formatMessage } = useIntl();
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const url =
-    type === 'MASSIF'
-      ? `/ui/massifs/${subscription.id}`
-      : type === 'REGION'
-        ? (() => {
-            // Parse region ID to extract country and region parts (format: "US-AL")
-            const [countryId, regionId] = subscription.id.split('-');
-            return `/ui/countries/${countryId}/regions/${regionId}`;
-          })()
-        : `/ui/countries/${subscription.id}`;
+  const url = subscriptionUrl(type, subscription.id);
 
   const handleUnsubscribe = () => {
     if (type === 'MASSIF')

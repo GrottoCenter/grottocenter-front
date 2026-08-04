@@ -250,12 +250,8 @@ const CoordinateFormSection = ({
     ? formatMessage({ id: 'Northing' })
     : formatMessage({ id: 'Longitude' });
 
-  const crsButtonLabel =
-    selectedCRS.code === WGS84_DD
-      ? 'WGS84'
-      : selectedCRS.code === DMS_CODE
-        ? 'DMS'
-        : selectedCRS.title;
+  const crsShortLabels = { [WGS84_DD]: 'WGS84', [DMS_CODE]: 'DMS' };
+  const crsButtonLabel = crsShortLabels[selectedCRS.code] ?? selectedCRS.title;
 
   return (
     <>

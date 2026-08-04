@@ -80,11 +80,23 @@ const HeroStats = () => {
       <Grid container justifyContent="center">
         {STATS.map(({ key, iconType, labelId, href, staticValue }) => {
           const stat = dynamicNumber?.[key];
+          // Static entries carry their own value; dynamic ones read it
+          // from the store once the fetch lands.
+          let statPrefix = '';
+          if (stat?.number) statPrefix = `${stat.number.toLocaleString()} `;
+          else if (staticValue) statPrefix = `${staticValue} `;
+          let statValue = staticValue;
+          if (!statValue) {
+            if (stat?.isFetching) {
+              statValue = <Skeleton variant="text" width={80} />;
+            } else
+              statValue = stat?.number ? stat.number.toLocaleString() : '—';
+          }
           return (
             <Grid key={key} size={{ xs: 4, md: 2 }}>
               <StatItem
                 to={href}
-                aria-label={`${stat?.number ? `${stat.number.toLocaleString()} ` : staticValue ? `${staticValue} ` : ''}${formatMessage({ id: labelId })}`}>
+                aria-label={`${statPrefix}${formatMessage({ id: labelId })}`}>
                 <Box
                   sx={{
                     display: 'flex',
@@ -106,14 +118,7 @@ const HeroStats = () => {
                         mt: '0px'
                       }
                     }}>
-                    {staticValue ||
-                      (stat?.isFetching ? (
-                        <Skeleton variant="text" width={80} />
-                      ) : stat?.number ? (
-                        stat.number.toLocaleString()
-                      ) : (
-                        '—'
-                      ))}
+                    {statValue}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
                     {formatMessage({ id: labelId })}

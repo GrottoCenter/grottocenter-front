@@ -249,86 +249,9 @@ const Login = () => {
     );
   }
 
-  const DialogContent = authState.isMustResetMessageDisplayed ? (
-    <>
-      <Box
-        display="flex"
-        height={60}
-        alignItems="center"
-        justifyContent="center">
-        <WarningRounded
-          htmlColor="#f44336"
-          style={{ fontSize: 80, paddingBottom: 20 }}
-        />
-      </Box>
-      <Typography
-        variant="subtitle1"
-        component="p"
-        style={{ textAlign: 'center', paddingBottom: 5 }}>
-        <Translate>
-          For security reasons please create a new password.
-        </Translate>
-      </Typography>
-      <Typography
-        variant="body2"
-        style={{ textAlign: 'center', paddingBottom: 10 }}>
-        <Translate>
-          We have changed the way passwords are saved to make it more secure.
-        </Translate>
-      </Typography>
-      <Typography variant="body1" style={{ textAlign: 'center' }}>
-        <Translate>An email will be sent to:</Translate>{' '}
-        <b>{email || authState.notVerifiedEmail}</b>
-      </Typography>
-      {serverError && (
-        <Alert severity="error" sx={{ mt: 1 }}>
-          {serverError}
-        </Alert>
-      )}
-      {LoginButton}
-    </>
-  ) : authState.isNotVerifiedMessageDisplayed ? (
-    <>
-      <Box
-        display="flex"
-        height={60}
-        alignItems="center"
-        justifyContent="center">
-        <WarningRounded
-          htmlColor="#ff9800"
-          style={{ fontSize: 80, paddingBottom: 20 }}
-        />
-      </Box>
-      <Typography
-        variant="subtitle1"
-        component="p"
-        style={{ textAlign: 'center', paddingBottom: 5 }}>
-        <Translate>Your account is not verified yet.</Translate>
-      </Typography>
-      <Typography
-        variant="body1"
-        style={{ textAlign: 'center', paddingBottom: 10 }}>
-        {authState.notVerifiedContext === 'forgotPassword' ? (
-          <Translate>
-            You must verify your email address before you can reset your
-            password.
-          </Translate>
-        ) : (
-          <Translate>Please check your email to activate it.</Translate>
-        )}
-      </Typography>
-      <Typography variant="body2" style={{ textAlign: 'center' }}>
-        <Translate>You can request a new verification email for:</Translate>{' '}
-        <b>{email || authState.notVerifiedEmail}</b>
-      </Typography>
-      {serverError && (
-        <Alert severity="error" sx={{ mt: 1 }}>
-          {serverError}
-        </Alert>
-      )}
-      {LoginButton}
-    </>
-  ) : (
+  // The dialog shows the login form unless the account first needs a
+  // password reset or an email verification.
+  let DialogContent = (
     <>
       <LoginForm
         email={email}
@@ -367,6 +290,90 @@ const Login = () => {
       </Box>
     </>
   );
+  if (authState.isMustResetMessageDisplayed) {
+    DialogContent = (
+      <>
+        <Box
+          display="flex"
+          height={60}
+          alignItems="center"
+          justifyContent="center">
+          <WarningRounded
+            htmlColor="#f44336"
+            style={{ fontSize: 80, paddingBottom: 20 }}
+          />
+        </Box>
+        <Typography
+          variant="subtitle1"
+          component="p"
+          style={{ textAlign: 'center', paddingBottom: 5 }}>
+          <Translate>
+            For security reasons please create a new password.
+          </Translate>
+        </Typography>
+        <Typography
+          variant="body2"
+          style={{ textAlign: 'center', paddingBottom: 10 }}>
+          <Translate>
+            We have changed the way passwords are saved to make it more secure.
+          </Translate>
+        </Typography>
+        <Typography variant="body1" style={{ textAlign: 'center' }}>
+          <Translate>An email will be sent to:</Translate>{' '}
+          <b>{email || authState.notVerifiedEmail}</b>
+        </Typography>
+        {serverError && (
+          <Alert severity="error" sx={{ mt: 1 }}>
+            {serverError}
+          </Alert>
+        )}
+        {LoginButton}
+      </>
+    );
+  } else if (authState.isNotVerifiedMessageDisplayed) {
+    DialogContent = (
+      <>
+        <Box
+          display="flex"
+          height={60}
+          alignItems="center"
+          justifyContent="center">
+          <WarningRounded
+            htmlColor="#ff9800"
+            style={{ fontSize: 80, paddingBottom: 20 }}
+          />
+        </Box>
+        <Typography
+          variant="subtitle1"
+          component="p"
+          style={{ textAlign: 'center', paddingBottom: 5 }}>
+          <Translate>Your account is not verified yet.</Translate>
+        </Typography>
+        <Typography
+          variant="body1"
+          style={{ textAlign: 'center', paddingBottom: 10 }}>
+          {authState.notVerifiedContext === 'forgotPassword' ? (
+            <Translate>
+              You must verify your email address before you can reset your
+              password.
+            </Translate>
+          ) : (
+            <Translate>Please check your email to activate it.</Translate>
+          )}
+        </Typography>
+        <Typography variant="body2" style={{ textAlign: 'center' }}>
+          <Translate>You can request a new verification email for:</Translate>{' '}
+          <b>{email || authState.notVerifiedEmail}</b>
+        </Typography>
+        {serverError && (
+          <Alert severity="error" sx={{ mt: 1 }}>
+            {serverError}
+          </Alert>
+        )}
+        {LoginButton}
+      </>
+    );
+  }
 
   return (
     <StandardDialog

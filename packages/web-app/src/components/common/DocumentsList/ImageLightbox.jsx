@@ -129,6 +129,10 @@ const ImageLightbox = ({
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
   const [isTouchPanning, setIsTouchPanning] = useState(false);
+
+  // Only a zoomed-in image can be panned, so only it gets a grab cursor.
+  let panCursor = 'default';
+  if (zoom > 1) panCursor = isDragging ? 'grabbing' : 'grab';
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const touchStartDistance = useRef(null);
   const zoomAtPinchStart = useRef(1);
@@ -319,7 +323,7 @@ const ImageLightbox = ({
             transition:
               isDragging || isTouchPanning ? 'none' : 'transform 0.2s',
             transformOrigin: 'center',
-            cursor: zoom > 1 ? (isDragging ? 'grabbing' : 'grab') : 'default'
+            cursor: panCursor
           }}
         />
 

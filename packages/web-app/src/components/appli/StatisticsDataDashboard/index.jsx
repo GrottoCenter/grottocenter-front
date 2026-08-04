@@ -57,18 +57,12 @@ const StatisticsDataDashboard = ({
     entityType = 'massif';
   }
 
-  const isLoading =
-    entityType === 'region'
-      ? loadingRegion
-      : entityType === 'country'
-        ? loadingCountry
-        : loadingMassif;
-  const hasError =
-    entityType === 'region'
-      ? errorRegion
-      : entityType === 'country'
-        ? errorCountry
-        : errorMassif;
+  const requestState = {
+    region: { isLoading: loadingRegion, hasError: errorRegion },
+    country: { isLoading: loadingCountry, hasError: errorCountry },
+    massif: { isLoading: loadingMassif, hasError: errorMassif }
+  }[entityType];
+  const { isLoading, hasError } = requestState;
   const hasData = data && data.nb_caves > 0 && !hasError;
   const isEmpty =
     !isLoading &&
