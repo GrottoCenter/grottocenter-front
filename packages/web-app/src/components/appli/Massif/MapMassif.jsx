@@ -92,7 +92,6 @@ const MapInternals = ({ geoJson, massifId }) => {
     const { signal } = abortRef.current;
 
     const bounds = map.getBounds();
-    /* eslint-disable no-underscore-dangle */
     const criteria = {
       sw_lat: bounds._southWest.wrap().lat,
       sw_lng: bounds._southWest.wrap().lng,
@@ -100,7 +99,6 @@ const MapInternals = ({ geoJson, massifId }) => {
       ne_lng: bounds._northEast.wrap().lng,
       massif: massifId
     };
-    /* eslint-enable no-underscore-dangle */
 
     fetch(makeUrl(getMapEntrancesUrl, criteria), { signal })
       .then(r => (r.ok ? r.json() : []))

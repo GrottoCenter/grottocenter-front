@@ -188,8 +188,7 @@ const Organization = ({ error, isLoading, organization }) => {
           </Typography>
         }
         alignItems="center"
-        flexWrap="wrap"
-      >
+        flexWrap="wrap">
         {organization.country && (
           <AppLink
             to={`/ui/countries/${organization.country}`}

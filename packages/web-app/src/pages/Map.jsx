@@ -132,12 +132,10 @@ const Map = () => {
   const handleUpdate = useCallback(
     ({ markers, showMassifPolygons, zoom: newZoom, center, bounds }) => {
       const criteria = {
-        /* eslint-disable no-underscore-dangle */
         sw_lat: bounds._southWest.wrap().lat,
         sw_lng: bounds._southWest.wrap().lng,
         ne_lat: bounds._northEast.wrap().lat,
         ne_lng: bounds._northEast.wrap().lng,
-        /* eslint-enable no-underscore-dangle */
         zoom: newZoom
       };
       if (includes('organizations', markers)) {

@@ -88,9 +88,7 @@ const Properties = ({ isLoading = false, entrance, dataQuality }) => {
       <Paper
         variant="outlined"
         sx={{ p: 1, borderRadius: 2, bgcolor: 'grey.50' }}>
-        <InfoSection
-          component="h2"
-          title={formatMessage({ id: 'Location' })}>
+        <InfoSection component="h2" title={formatMessage({ id: 'Location' })}>
           <Box display="flex" flexDirection="column" gap={0.5}>
             {entrance.latitude && entrance.longitude && (
               <Property

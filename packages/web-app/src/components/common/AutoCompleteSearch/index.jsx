@@ -69,6 +69,8 @@ const ResultsPopper = styled(Popper, {
   }
 `;
 
+// Purely internal rendering helper; its props are enforced by the
+// AutoCompleteSearch PropTypes above, not at this call-site level.
 // eslint-disable-next-line react/prop-types
 const InputAdornments = ({ isLoading, hasError }) =>
   isLoading || hasError ? (

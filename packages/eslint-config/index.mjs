@@ -128,6 +128,9 @@ export default [
             '_bearing',
             '_setPos',
             '_measureDblclick',
+            // LatLngBounds internals (getBounds() result)
+            '_southWest',
+            '_northEast',
             // Redux DevTools browser extension hook
             '__REDUX_DEVTOOLS_EXTENSION_COMPOSE__',
             // Deliberate internal markers and test seams
