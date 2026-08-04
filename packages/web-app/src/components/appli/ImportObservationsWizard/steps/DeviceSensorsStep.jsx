@@ -306,8 +306,7 @@ const DeviceCreator = ({ onCancel, onSuccess }) => {
     <Paper
       variant="outlined"
       sx={{ p: 1, mt: 1 }}
-      data-testid="create-device-form"
-    >
+      data-testid="create-device-form">
       <Typography variant="subtitle2" sx={{ mb: 1 }}>
         {formatMessage({
           id: 'ImportObservationsWizard.DeviceSensorsStep.newDeviceTitle'
@@ -372,8 +371,7 @@ const DeviceCreator = ({ onCancel, onSuccess }) => {
         <Alert
           severity="error"
           sx={{ mt: 1 }}
-          data-testid="create-device-error"
-        >
+          data-testid="create-device-error">
           {createError}
         </Alert>
       )}
@@ -383,8 +381,7 @@ const DeviceCreator = ({ onCancel, onSuccess }) => {
           onClick={handleSubmit}
           disabled={!isNameValid || isCreating}
           size="small"
-          data-testid="create-device-submit"
-        >
+          data-testid="create-device-submit">
           {isCreating ? (
             <CircularProgress size={18} />
           ) : (
@@ -397,8 +394,7 @@ const DeviceCreator = ({ onCancel, onSuccess }) => {
           variant="outlined"
           onClick={onCancel}
           size="small"
-          data-testid="create-device-cancel"
-        >
+          data-testid="create-device-cancel">
           {formatMessage({ id: 'ImportObservationsWizard.cancel' })}
         </Button>
       </Box>
@@ -423,8 +419,7 @@ const SelectedDeviceCard = ({ device, onChangeDevice }) => {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between'
-        }}
-      >
+        }}>
         <Box>
           <Typography variant="subtitle1">{device.name}</Typography>
           {device.brandName && (
@@ -447,8 +442,7 @@ const SelectedDeviceCard = ({ device, onChangeDevice }) => {
           size="small"
           startIcon={<EditIcon />}
           onClick={onChangeDevice}
-          data-testid="change-device-button"
-        >
+          data-testid="change-device-button">
           {formatMessage({
             id: 'ImportObservationsWizard.DeviceSensorsStep.changeDevice'
           })}
