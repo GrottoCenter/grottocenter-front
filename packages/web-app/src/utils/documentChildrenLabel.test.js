@@ -263,7 +263,10 @@ describe('getChildDisplay', () => {
 describe('hasOwnDescription', () => {
   it('hides a description that is a substring of the title', () => {
     expect(
-      hasOwnDescription({ title: 'Scialet No 47 (2018)', description: 'Scialet' })
+      hasOwnDescription({
+        title: 'Scialet No 47 (2018)',
+        description: 'Scialet'
+      })
     ).toBe(false);
   });
 
