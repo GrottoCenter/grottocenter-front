@@ -92,4 +92,21 @@ describe('useGeolocation', () => {
     expect(result.current.status).toBe('error');
     expect(result.current.hasLocation).toBe(false);
   });
+
+  it('clears a stale error when re-enabled so the next session starts fresh', () => {
+    const { result, rerender } = renderHook(
+      ({ enabled }) => useGeolocation({ watch: true, enabled }),
+      { initialProps: { enabled: true } }
+    );
+    const onError = geolocation.watchPosition.mock.calls[0][1];
+    act(() => onError({ code: 1 }));
+    expect(result.current.error).toBe(1);
+
+    // Off → on cycle: the retry must not inherit the previous denial.
+    rerender({ enabled: false });
+    rerender({ enabled: true });
+
+    expect(result.current.error).toBeNull();
+    expect(result.current.status).toBe('locating');
+  });
 });

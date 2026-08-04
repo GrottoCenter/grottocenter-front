@@ -245,6 +245,23 @@ describe('LocationControl', () => {
     await waitFor(() => expect(mockOnError).toHaveBeenCalledTimes(1));
   });
 
+  it('re-notifies and drops back to off when the user retries after a denial', async () => {
+    renderControl();
+    act(() => button().click());
+    await waitFor(() => expect(watchError).toBeDefined());
+    act(() => watchError({ code: 1 }));
+    await waitFor(() => expect(mockOnError).toHaveBeenCalledTimes(1));
+
+    // Retry: without clearing the stale error, the second denial was silent.
+    act(() => button().click());
+    await waitFor(() =>
+      expect(navigator.geolocation.watchPosition).toHaveBeenCalledTimes(2)
+    );
+    act(() => watchError({ code: 1 }));
+
+    await waitFor(() => expect(mockOnError).toHaveBeenCalledTimes(2));
+  });
+
   it('signals compass follow state so heavy layers can react', async () => {
     renderControl();
     act(() => button().click());

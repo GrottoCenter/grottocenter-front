@@ -35,6 +35,10 @@ const useGeolocation = ({
   useEffect(() => {
     if (!enabled || !navigator.geolocation) return undefined;
 
+    // Fresh session: clear a stale error from the previous run so the consumer's
+    // "notify once per error code" logic re-arms and the button doesn't flash
+    // red before the first fix (or first fresh error) comes in.
+    setError(null);
     setStatus('locating');
 
     const onPosition = position => {
