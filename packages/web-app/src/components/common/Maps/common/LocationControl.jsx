@@ -168,8 +168,19 @@ const LocationControl = () => {
   }, [mode, resetNorth]);
 
   // Recenter on every position update while following.
+  const recenteredModeRef = useRef(mode);
   useEffect(() => {
-    if (mode === MODE.FOLLOW || mode === MODE.COMPASS) recenter(true);
+    const previous = recenteredModeRef.current;
+    recenteredModeRef.current = mode;
+    if (mode !== MODE.FOLLOW && mode !== MODE.COMPASS) return;
+    // Entering or leaving compass mode changes the bearing and the offset ratio
+    // in this very commit, and the rotation above is instantaneous. Recenter
+    // unanimated so both land in the same frame and read as one motion, instead
+    // of an instant straighten followed by a glide. Every other recenter — a new
+    // fix, re-attaching after a pan — keeps its animation.
+    const rotated =
+      previous !== mode && (previous === MODE.COMPASS || mode === MODE.COMPASS);
+    recenter(!rotated);
   }, [location, mode, recenter]);
 
   // Suspend bearing updates during zoom animations to avoid thrashing.
