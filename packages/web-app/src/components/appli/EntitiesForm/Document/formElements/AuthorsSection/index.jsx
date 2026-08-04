@@ -75,7 +75,7 @@ const AuthorsSection = () => {
       !isNewDocument ||
       !currentUser.id ||
       doc.authors.length > 0 ||
-      doc.authorsGrotto.length > 0 ||
+      doc.authorsOrganization.length > 0 ||
       doc.selectOptionAuthorizationDocument === DOCUMENT_AUTHORIZE_TO_PUBLISH
     )
       return;
@@ -90,9 +90,9 @@ const AuthorsSection = () => {
   const value = useMemo(
     () => [
       ...doc.authors.map(a => ({ ...a, _type: 'persons' })),
-      ...doc.authorsGrotto.map(o => ({ ...o, _type: 'organizations' }))
+      ...doc.authorsOrganization.map(o => ({ ...o, _type: 'organizations' }))
     ],
-    [doc.authors, doc.authorsGrotto]
+    [doc.authors, doc.authorsOrganization]
   );
 
   const { inputValue, setInputValue, results, isLoading, hasError } =
@@ -112,7 +112,7 @@ const AuthorsSection = () => {
       newValue.filter(v => v._type === 'persons').map(stripType)
     );
     updateAttribute(
-      'authorsGrotto',
+      'authorsOrganization',
       newValue.filter(v => v._type === 'organizations').map(stripType)
     );
   };

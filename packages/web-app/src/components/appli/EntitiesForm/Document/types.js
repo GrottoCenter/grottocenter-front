@@ -48,7 +48,7 @@ export const defaultDocumentValuesTypes = PropTypes.shape({
   datePublication: PropTypes.string,
   creatorComment: PropTypes.string,
   authors: PropTypes.arrayOf(simpleCaverType),
-  authorsGrotto: PropTypes.arrayOf(simpleOrganisationType),
+  authorsOrganization: PropTypes.arrayOf(simpleOrganisationType),
   editor: simpleOrganisationType,
   library: simpleOrganisationType,
   type: PropTypes.string,
