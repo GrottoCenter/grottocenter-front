@@ -122,7 +122,7 @@ export const overridings = {
   typography: {
     fontFamily,
     h1: {
-      // 26 at 360px, 32 from 1200px up. The floor stays above h2 (23).
+      // 24.4 at 360px, 32 from 1200px up. The floor stays above h2 (23).
       fontSize: 'clamp(1.525rem, 1.26rem + 0.72vw, 2rem)',
       fontWeight: 700,
       lineHeight: 1.2
