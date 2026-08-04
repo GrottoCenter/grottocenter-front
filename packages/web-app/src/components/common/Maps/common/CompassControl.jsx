@@ -79,7 +79,11 @@ const CompassControl = () => {
     const target = headingToBearing(heading);
     targetBearingRef.current = target;
     if (!zoomingRef.current) applyBearing(target);
-  }, [active, heading, applyBearing]);
+    // Re-broadcast the live heading on the map event bus so other consumers
+    // (e.g. the waypoint HUD) can guide relative to the device heading without
+    // opening a second orientation-sensor session.
+    map.fire('compassheading', { heading });
+  }, [active, heading, applyBearing, map]);
 
   // Suspend bearing updates during zoom animations to avoid thrashing.
   useEffect(() => {
