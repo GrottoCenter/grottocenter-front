@@ -21,7 +21,9 @@ const RuleItem = ({ satisfied, labelId, labelValues = undefined }) => {
 RuleItem.propTypes = {
   satisfied: PropTypes.bool.isRequired,
   labelId: PropTypes.string.isRequired,
-  labelValues: PropTypes.object
+  labelValues: PropTypes.objectOf(
+    PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+  )
 };
 
 const PasswordRules = ({ password }) => {

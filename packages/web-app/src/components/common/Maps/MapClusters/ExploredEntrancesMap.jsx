@@ -29,8 +29,18 @@ const ExploredEntrancesMapInner = ({ points }) => (
   <ExploredOverlay points={points} shouldFitMapBound />
 );
 
+const pointsPropType = PropTypes.arrayOf(
+  PropTypes.shape({
+    id: PropTypes.string.isRequired,
+    latitude: PropTypes.number.isRequired,
+    longitude: PropTypes.number.isRequired,
+    name: PropTypes.string,
+    url: PropTypes.string
+  })
+);
+
 ExploredEntrancesMapInner.propTypes = {
-  points: PropTypes.array.isRequired
+  points: pointsPropType.isRequired
 };
 
 /**

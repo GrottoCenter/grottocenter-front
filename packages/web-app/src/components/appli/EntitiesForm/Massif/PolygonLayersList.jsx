@@ -241,7 +241,12 @@ PolygonLayersList.propTypes = {
   layers: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.number.isRequired,
-      latlngs: PropTypes.array.isRequired,
+      latlngs: PropTypes.arrayOf(
+        PropTypes.shape({
+          lat: PropTypes.number.isRequired,
+          lng: PropTypes.number.isRequired
+        })
+      ).isRequired,
       isHole: PropTypes.bool,
       isNeedle: PropTypes.bool,
       hasSelfIntersection: PropTypes.bool,

@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import { useMap } from 'react-leaflet';
 import L from 'leaflet';
 import PropTypes from 'prop-types';
+import { areaCoordinatesPropType } from '@/types/geojson.type';
 import { MassifPopup } from '../common/Markers/Components';
 import useRenderPopup from '../common/Markers/useRenderPopup';
 import { makeIconTooltip } from '../common/Markers/tooltipHelpers';
@@ -108,7 +109,7 @@ export const massifPolygonType = PropTypes.shape({
   name: PropTypes.string,
   geogPolygon: PropTypes.shape({
     type: PropTypes.string,
-    coordinates: PropTypes.array
+    coordinates: areaCoordinatesPropType
   }),
   entranceCount: PropTypes.number,
   networkCount: PropTypes.number

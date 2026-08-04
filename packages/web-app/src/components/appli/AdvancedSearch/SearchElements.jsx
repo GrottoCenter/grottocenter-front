@@ -37,6 +37,7 @@ import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import LockIcon from '@mui/icons-material/Lock';
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
+import { sxPropType } from '@/types/mui.type';
 import { fetchFieldSearch } from '../../../actions/FieldSearch';
 import Translate from '../../common/Translate';
 import { AUTOCOMPLETE_DEBOUNCE_DELAY } from '../../../conf/config';
@@ -115,7 +116,7 @@ SearchFieldset.propTypes = {
   children: PropTypes.node.isRequired,
   title: PropTypes.string,
   isMultiline: PropTypes.bool,
-  containerSx: PropTypes.object
+  containerSx: sxPropType
 };
 
 const StyledTextField = styled(TextField)(({ theme }) => ({
@@ -609,7 +610,7 @@ SearchSelect.propTypes = {
   optionDescription: PropTypes.string.isRequired,
   options: PropTypes.arrayOf(PropTypes.shape({})),
   onChange: PropTypes.func.isRequired,
-  sx: PropTypes.object
+  sx: sxPropType
 };
 
 export const SearchMatchAllFieldsToogle = ({ isChecked, onChange }) => {

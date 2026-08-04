@@ -190,7 +190,7 @@ const CRSMenu = ({
 };
 
 CRSMenu.propTypes = {
-  anchorEl: PropTypes.object,
+  anchorEl: PropTypes.instanceOf(Element),
   onClose: PropTypes.func.isRequired,
   preferred: PropTypes.string.isRequired,
   projections: PropTypes.arrayOf(

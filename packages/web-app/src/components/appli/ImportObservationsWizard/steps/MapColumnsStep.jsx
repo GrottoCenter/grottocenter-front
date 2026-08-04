@@ -122,6 +122,24 @@ const formatTimezoneLabel = tz => {
   return `${tz} (UTC${sign}${offset})`;
 };
 
+const columnMappingPropType = PropTypes.shape({
+  columnIndex: PropTypes.number.isRequired,
+  role: PropTypes.string,
+  timestampType: PropTypes.string,
+  dateFormat: PropTypes.string,
+  timeFormat: PropTypes.string,
+  timezone: PropTypes.string,
+  sensorConfigurationId: PropTypes.number,
+  mediumId: PropTypes.number
+});
+
+const sensorConfigPropType = PropTypes.shape({
+  id: PropTypes.number.isRequired,
+  quantityKindCode: PropTypes.string,
+  substanceName: PropTypes.string,
+  unitSymbol: PropTypes.string
+});
+
 // ─── TimestampConfig ──────────────────────────────────────────────────────────
 
 const TimestampConfig = ({
@@ -240,7 +258,7 @@ TimestampConfig.propTypes = {
     timeFormat: PropTypes.string,
     timezone: PropTypes.string
   }).isRequired,
-  columnMappings: PropTypes.arrayOf(PropTypes.object).isRequired,
+  columnMappings: PropTypes.arrayOf(columnMappingPropType).isRequired,
   sampleValues: PropTypes.arrayOf(PropTypes.string).isRequired,
   onUpdate: PropTypes.func.isRequired
 };
@@ -596,8 +614,8 @@ ColumnRoleTable.propTypes = {
   columnHeaders: PropTypes.arrayOf(PropTypes.string).isRequired,
   sampleValues: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.string))
     .isRequired,
-  columnMappings: PropTypes.arrayOf(PropTypes.object).isRequired,
-  sensorConfigs: PropTypes.arrayOf(PropTypes.object).isRequired,
+  columnMappings: PropTypes.arrayOf(columnMappingPropType).isRequired,
+  sensorConfigs: PropTypes.arrayOf(sensorConfigPropType).isRequired,
   onUpdateMapping: PropTypes.func.isRequired
 };
 

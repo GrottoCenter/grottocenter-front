@@ -2,6 +2,7 @@ import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import { TextField, InputAdornment } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
+import { sxPropType } from '@/types/mui.type';
 
 const SearchInput = ({ value, onChange, placeholder, sx }) => {
   const { formatMessage } = useIntl();
@@ -44,7 +45,7 @@ SearchInput.propTypes = {
   value: PropTypes.string.isRequired,
   onChange: PropTypes.func.isRequired,
   placeholder: PropTypes.string,
-  sx: PropTypes.object
+  sx: sxPropType
 };
 
 export default SearchInput;

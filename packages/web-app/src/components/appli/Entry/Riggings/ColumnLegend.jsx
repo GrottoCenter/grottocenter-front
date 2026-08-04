@@ -26,7 +26,7 @@ export const LegendHeader = styled('span')`
   align-items: center;
 `;
 
-const LegendItemsShape = PropTypes.arrayOf(
+export const LegendItemsShape = PropTypes.arrayOf(
   PropTypes.shape({
     abbrevKey: PropTypes.string.isRequired,
     labelKey: PropTypes.string.isRequired

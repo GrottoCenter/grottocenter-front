@@ -110,9 +110,9 @@ const ManagedEntitiesSection = ({ organization }) => {
 
 ManagedEntitiesSection.propTypes = {
   organization: PropTypes.shape({
-    countries: PropTypes.array,
-    regions: PropTypes.array,
-    massifs: PropTypes.array
+    countries: PropTypes.arrayOf(PropTypes.shape({})),
+    regions: PropTypes.arrayOf(PropTypes.shape({})),
+    massifs: PropTypes.arrayOf(PropTypes.shape({}))
   }).isRequired
 };
 

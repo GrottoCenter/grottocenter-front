@@ -4,12 +4,14 @@ import { Box, Card, Stack, Typography } from '@mui/material';
 
 import ObstacleField from './ObstacleField';
 import ObstacleRowActions from './ObstacleRowActions';
-import ColumnLegend from '../../Entry/Riggings/ColumnLegend';
+import ColumnLegend, {
+  LegendItemsShape
+} from '../../Entry/Riggings/ColumnLegend';
 
 const LegendSectionsShape = PropTypes.arrayOf(
   PropTypes.shape({
     titleKey: PropTypes.string.isRequired,
-    items: PropTypes.array.isRequired
+    items: LegendItemsShape.isRequired
   })
 );
 

@@ -339,7 +339,7 @@ const MessageItem = ({ item, isMenuOpen, onOpenMenu }) => {
 
 MessageItem.propTypes = {
   item: PropTypes.shape({
-    msg: PropTypes.object.isRequired,
+    msg: PropTypes.shape({}).isRequired,
     isMine: PropTypes.bool.isRequired,
     isFirstOfGroup: PropTypes.bool.isRequired,
     isLastOfGroup: PropTypes.bool.isRequired

@@ -202,7 +202,12 @@ AutoCompleteSearch.propTypes = {
   isLoading: PropTypes.bool,
   disabled: PropTypes.bool,
   hasFixWidth: PropTypes.bool,
-  value: PropTypes.any
+  // Whatever shape the caller's options carry; compared by reference.
+  value: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.number,
+    PropTypes.shape({})
+  ])
 };
 
 export default AutoCompleteSearch;

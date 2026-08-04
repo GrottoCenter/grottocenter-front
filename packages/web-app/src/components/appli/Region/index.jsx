@@ -24,6 +24,7 @@ import SectionStack from '../../common/Layouts/SectionStack';
 import ResponsiveActions from '../../common/Layouts/ResponsiveActions';
 import ScrollableContent from '../../common/Layouts/Fixed/ScrollableContent';
 import Alert from '../../common/Alert';
+import GuidelinePropTypes from '../../../types/guideline.type';
 import REDUCER_STATUS from '../../../reducers/ReducerStatus';
 import { CoordinatesMarker } from '../../common/Maps/common/Markers/Components';
 import {
@@ -219,7 +220,7 @@ Region.propTypes = {
     name: PropTypes.string,
     latitude: PropTypes.number,
     longitude: PropTypes.number,
-    guidelines: PropTypes.array
+    guidelines: PropTypes.arrayOf(GuidelinePropTypes)
   }),
   error: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
   onSubscribe: PropTypes.func,

@@ -556,7 +556,7 @@ Index.propTypes = {
   isSideMenuOpen: PropTypes.bool,
   center: PropTypes.arrayOf(PropTypes.number),
   zoom: PropTypes.number,
-  mapRef: PropTypes.shape({ current: PropTypes.any }),
+  mapRef: PropTypes.shape({ current: PropTypes.shape({}) }),
   ...HydratedMap.propTypes
 };
 

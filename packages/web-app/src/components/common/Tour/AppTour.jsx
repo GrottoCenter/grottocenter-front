@@ -60,7 +60,15 @@ const AppTour = ({ run, steps, onEnd }) => {
 
 AppTour.propTypes = {
   run: PropTypes.bool.isRequired,
-  steps: PropTypes.arrayOf(PropTypes.object).isRequired,
+  steps: PropTypes.arrayOf(
+    PropTypes.shape({
+      selector: PropTypes.string.isRequired,
+      // `title` is a custom field TourTooltip reads; @reactour has none.
+      title: PropTypes.string,
+      content: PropTypes.node,
+      position: PropTypes.oneOf(['top', 'right', 'bottom', 'left', 'center'])
+    })
+  ).isRequired,
   onEnd: PropTypes.func.isRequired
 };
 

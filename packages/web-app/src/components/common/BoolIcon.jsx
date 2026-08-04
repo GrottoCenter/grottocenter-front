@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import CancelIcon from '@mui/icons-material/Cancel';
+import { sxPropType } from '@/types/mui.type';
 
 const BoolIcon = ({ value, fontSize = 'small', sx }) =>
   value ? (
@@ -12,7 +13,7 @@ const BoolIcon = ({ value, fontSize = 'small', sx }) =>
 BoolIcon.propTypes = {
   value: PropTypes.bool.isRequired,
   fontSize: PropTypes.string,
-  sx: PropTypes.object
+  sx: sxPropType
 };
 
 export default BoolIcon;
