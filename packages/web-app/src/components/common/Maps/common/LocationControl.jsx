@@ -291,13 +291,19 @@ const LocationControl = () => {
       />
     );
   } else if (mode === MODE.COMPASS) {
-    // The four modes must each be recognisable: the button's next action now
-    // differs in every one of them. Shape separates off / tracking / heading-up,
-    // colour separates a passive fix from an active follow, and the four
-    // distinct labels below carry the same information for screen readers.
+    // The four modes must each be recognisable: the button's next action differs
+    // in every one of them. Shape tells how far up the cycle we are (no fix →
+    // fix → locked on the user), colour is reserved for the heading-up map.
     icon = <ExploreIcon sx={{ fontSize: 26, color: USER_LOCATION_COLOR }} />;
   } else if (mode === MODE.FOLLOW) {
-    icon = <MyLocationIcon sx={{ fontSize: 26, color: USER_LOCATION_COLOR }} />;
+    // Following north-up: the compass rose previews the step a tap gives, still
+    // grey since the map is not rotated yet. Without a usable compass the cycle
+    // ends here, so keep the tracking icon rather than advertise a dead end.
+    icon = canUseCompass ? (
+      <ExploreIcon sx={{ fontSize: 26, color: theme.palette.mapControlIcon }} />
+    ) : (
+      <MyLocationIcon sx={{ fontSize: 26, color: USER_LOCATION_COLOR }} />
+    );
   } else if (mode === MODE.LOCATED) {
     icon = (
       <MyLocationIcon
