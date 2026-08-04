@@ -93,12 +93,17 @@ const Map = () => {
     if (!type || Number.isNaN(id)) return null;
     return { type, id };
   }, [searchParams]);
-  const { location: geoLocation, hasLocation } = useGeolocation();
   const mapRef = useRef(null);
   const { current: initialTarget } = useRef(decodeMapTarget(params.target));
   const { current: savedPosition } = useRef(
     !initialTarget ? getSavedPosition() : null
   );
+  // Only ask the browser for the user's position (and its permission prompt)
+  // when we have no target to restore — URL param and localStorage take priority.
+  const needsGeolocationFallback = !initialTarget && !savedPosition;
+  const { location: geoLocation, hasLocation } = useGeolocation({
+    enabled: needsGeolocationFallback
+  });
   const [location, setLocation] = useState(() => {
     if (initialTarget)
       return { lat: initialTarget.lat, lng: initialTarget.lng };
