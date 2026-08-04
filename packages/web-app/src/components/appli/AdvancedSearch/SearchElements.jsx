@@ -120,8 +120,8 @@ SearchFieldset.propTypes = {
 
 const StyledTextField = styled(TextField)(({ theme }) => ({
   flex: 1,
-  minWidth: '9.375rem',
-  maxWidth: '18.75rem',
+  minWidth: 150,
+  maxWidth: 300,
   '& .MuiOutlinedInput-root': {
     borderRadius: 6,
     backgroundColor: theme.palette.action.hover,
@@ -289,8 +289,8 @@ export const SearchTextAutocomplete = ({
     <Autocomplete
       sx={{
         flex: 1,
-        minWidth: '9.375rem',
-        maxWidth: '18.75rem'
+        minWidth: 150,
+        maxWidth: 300
       }}
       options={options}
       loading={loading}
@@ -771,7 +771,7 @@ export const SearchFilterAccordion = ({
             size="small"
             label={filterCount}
             color="primary"
-            sx={{ height: 20, fontSize: '0.4375rem' }}
+            sx={{ height: 20, fontSize: '0.7rem' }}
           />
         )}
       </Box>

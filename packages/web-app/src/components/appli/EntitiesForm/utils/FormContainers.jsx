@@ -57,7 +57,9 @@ export const FormSection = ({ title, children }) => (
       <>
         {/* Same visual token as InfoSection on the read pages: both label a
             group (fields here, properties there). `component` keeps the outline
-            right — a section of the form sits under the page title. */}
+            right — a section of the form sits under the page title. Assumes the
+            form is not nested in a card that already renders an h2 (e.g.
+            ScrollableContent); such a caller must override `component`. */}
         <Typography variant="h5" component="h2">
           <Translate>{title}</Translate>
         </Typography>

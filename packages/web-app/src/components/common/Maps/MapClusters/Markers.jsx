@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useRef } from 'react';
 import { includes, values } from 'ramda';
 import PropTypes from 'prop-types';
 import { layerTypes } from './DataControl';
-import useMarkers, { MarkerGlobalCss } from '../common/Markers/useMarkers';
+import useMarkers from '../common/Markers/useMarkers';
 import { makeIconTooltip } from '../common/Markers/tooltipHelpers';
 import useNetworkHighlight from './useNetworkHighlight';
 import { getEntranceCircleStyle } from './constants';
@@ -100,7 +100,7 @@ const Markers = ({
     );
   }, [organizations, visibleMarkers, updateOrganizationMarkers]);
 
-  return MarkerGlobalCss;
+  return null;
 };
 
 const MemoizedMarkers = React.memo(Markers);

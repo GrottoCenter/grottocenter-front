@@ -8,9 +8,7 @@ import CustomMapContainer from '../../common/Maps/common/MapContainer';
 import ClusterLayer, {
   ClusterGlobalCss
 } from '../../common/Maps/MapClusters/ClusterLayer';
-import useMarkers, {
-  MarkerGlobalCss
-} from '../../common/Maps/common/Markers/useMarkers';
+import useMarkers from '../../common/Maps/common/Markers/useMarkers';
 import { EntrancePopup } from '../../common/Maps/common/Markers/Components';
 import {
   MASSIF_POLYGON_STYLE,
@@ -188,7 +186,6 @@ const MapInternals = ({ geoJson, massifId }) => {
   return (
     <>
       {ClusterGlobalCss}
-      {MarkerGlobalCss}
       <ClusterLayer
         data={entranceCoordinates}
         type="entrance"

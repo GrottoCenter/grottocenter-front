@@ -17,7 +17,7 @@ import { ObstaclePropTypes } from '../../../../types/entrance.type';
 import { HighLightsLine } from '../../../common/Highlights';
 import SectionTitle from '../SectionTitle';
 import RiggingSummary from './RiggingSummary';
-import ColumnLegend from './ColumnLegend';
+import ColumnLegend, { LegendHeader } from './ColumnLegend';
 import { OBSTACLE_LEGEND, ANCHOR_LEGEND } from '@/utils/riggingLegends';
 
 const StyledTable = styled(Table)`
@@ -127,21 +127,25 @@ const RiggingTable = ({ id, obstacles, title, previous, isDeleted }) => {
           <TableHead>
             <TableRow>
               <StyledTableCell $isDeleted={isDeleted} width="25%">
-                {formatMessage({ id: 'obstacles' })}
-                <ColumnLegend
-                  titleKey="Obstacle notation legend"
-                  items={OBSTACLE_LEGEND}
-                />
+                <LegendHeader>
+                  {formatMessage({ id: 'obstacles' })}
+                  <ColumnLegend
+                    titleKey="Obstacle notation legend"
+                    items={OBSTACLE_LEGEND}
+                  />
+                </LegendHeader>
               </StyledTableCell>
               <StyledTableCell $isDeleted={isDeleted} width="10%">
                 {formatMessage({ id: 'ropes' })}
               </StyledTableCell>
               <StyledTableCell $isDeleted={isDeleted} width="20%">
-                {formatMessage({ id: 'anchors' })}
-                <ColumnLegend
-                  titleKey="Anchor notation legend"
-                  items={ANCHOR_LEGEND}
-                />
+                <LegendHeader>
+                  {formatMessage({ id: 'anchors' })}
+                  <ColumnLegend
+                    titleKey="Anchor notation legend"
+                    items={ANCHOR_LEGEND}
+                  />
+                </LegendHeader>
               </StyledTableCell>
               <StyledTableCell $isDeleted={isDeleted}>
                 {formatMessage({ id: 'observations' })}

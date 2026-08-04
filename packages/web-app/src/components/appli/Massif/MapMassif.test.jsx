@@ -70,14 +70,10 @@ vi.mock('../../common/Maps/MapClusters/ClusterLayer', () => {
   };
 });
 
-vi.mock('../../common/Maps/common/Markers/useMarkers', () => {
-  const React = require('react');
-  return {
-    __esModule: true,
-    default: () => mockUpdateEntranceMarkers,
-    MarkerGlobalCss: React.createElement('div')
-  };
-});
+vi.mock('../../common/Maps/common/Markers/useMarkers', () => ({
+  __esModule: true,
+  default: () => mockUpdateEntranceMarkers
+}));
 
 vi.mock('../../common/Maps/common/Markers/Components', () => ({
   EntranceMarker: 'entrance-marker',
