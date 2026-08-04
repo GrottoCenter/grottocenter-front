@@ -47,6 +47,7 @@ import useExploredEntrances from './useExploredEntrances';
 import PopupTargetHandler from './PopupTargetHandler';
 import WaypointNavigation from './Waypoint/WaypointNavigation';
 import { WAYPOINT_COLOR } from './Waypoint/waypointIcon';
+import { WAYPOINT_MOCK_ENABLED } from './Waypoint/waypointMock';
 import CustomMapContainer from '../common/MapContainer';
 import {
   MARKERS_LIMIT,
@@ -117,6 +118,14 @@ const HydratedMap = ({
   // a reload in the field. The live position watch lives in WaypointNavigation,
   // mounted only while a waypoint exists.
   const [waypoint, setWaypoint] = useLocalStorage('grottocenter_waypoint', null);
+  // Dev-only: when mocking, drop a reference point at the current map center so
+  // the full waypoint UI renders without placing one (see waypointMock.js).
+  const mockWaypoint = useMemo(() => {
+    if (!WAYPOINT_MOCK_ENABLED) return null;
+    const c = map.getCenter();
+    return { lat: c.lat, lng: c.lng };
+  }, [map]);
+  const activeWaypoint = waypoint ?? mockWaypoint;
 
   const [showExplored, setShowExplored] = useLocalStorage(
     'grottocenter_showExploredCaves',
@@ -427,9 +436,9 @@ const HydratedMap = ({
       />
       <MassifPolygons massifs={showMassifPolygons ? massifPolygons : []} />
       <PopupTargetHandler popupTarget={popupTarget} />
-      {isTouch && waypoint && (
+      {(isTouch || WAYPOINT_MOCK_ENABLED) && activeWaypoint && (
         <WaypointNavigation
-          waypoint={waypoint}
+          waypoint={activeWaypoint}
           onDelete={() => setWaypoint(null)}
         />
       )}
