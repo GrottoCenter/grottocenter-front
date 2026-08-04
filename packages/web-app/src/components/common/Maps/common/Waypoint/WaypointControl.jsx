@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useMapEvents } from 'react-leaflet';
+import React, { useEffect, useState } from 'react';
+import { useMapEvent } from 'react-leaflet';
 import { useIntl } from 'react-intl';
 import {
   ListItemIcon,
@@ -10,6 +10,7 @@ import {
 } from '@mui/material';
 import LocationOn from '@mui/icons-material/LocationOn';
 import useWaypoint from '@/hooks/useWaypoint';
+import useIsFullscreen from '../useIsFullscreen';
 import WaypointNavigation from './WaypointNavigation';
 import { WAYPOINT_COLOR } from './waypointIcon';
 
@@ -28,25 +29,24 @@ const WaypointControl = () => {
   const { formatMessage } = useIntl();
   const isTouch = useMediaQuery('(pointer: coarse)');
   const [waypoint, setWaypoint] = useWaypoint();
-  const [isFullscreen, setIsFullscreen] = useState(false);
+  const isFullscreen = useIsFullscreen();
   // { coords, anchor } while the long-press menu is open, else null.
   const [menu, setMenu] = useState(null);
 
-  useMapEvents({
-    enterFullscreen: () => setIsFullscreen(true),
-    exitFullscreen: () => {
-      setIsFullscreen(false);
-      setMenu(null);
-    },
-    contextmenu: e => {
-      if (!isTouch || !isFullscreen) return;
-      e.originalEvent.preventDefault();
-      setMenu({
-        coords: { lat: e.latlng.lat, lng: e.latlng.lng },
-        anchor: { top: e.originalEvent.clientY, left: e.originalEvent.clientX }
-      });
-    }
+  useMapEvent('contextmenu', e => {
+    if (!isTouch || !isFullscreen) return;
+    e.originalEvent.preventDefault();
+    setMenu({
+      coords: { lat: e.latlng.lat, lng: e.latlng.lng },
+      anchor: { top: e.originalEvent.clientY, left: e.originalEvent.clientX }
+    });
   });
+
+  // Leaving fullscreen only makes this component render null, it doesn't unmount
+  // it — drop any pending menu so it doesn't pop back on the next entry.
+  useEffect(() => {
+    if (!isFullscreen) setMenu(null);
+  }, [isFullscreen]);
 
   const handlePlaceWaypoint = () => {
     setWaypoint(menu.coords);

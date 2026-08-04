@@ -3,6 +3,7 @@ import { styled } from '@mui/material/styles';
 import {
   MapContainer,
   useMap,
+  useMapEvent,
   useMapEvents,
   ScaleControl
 } from 'react-leaflet';
@@ -15,6 +16,7 @@ import LayersControl from './LayersControl';
 import FullscreenControl from './FullscreenControl';
 import LocationControl from './LocationControl';
 import UserLocationMarker from './UserLocationMarker';
+import useIsFullscreen from './useIsFullscreen';
 import { MapLocationProvider } from './MapLocationContext';
 
 const Wrapper = styled('div', {
@@ -95,17 +97,13 @@ FullscreenInteraction.propTypes = {
 // map is in fullscreen (the field-navigation context — e.g. entrance maps on
 // mobile). The compass part of the control self-degrades on non-touch devices.
 const FullscreenOnlyControls = () => {
-  const [isFullscreen, setIsFullscreen] = useState(false);
-  const map = useMapEvents({
-    enterFullscreen() {
-      setIsFullscreen(true);
-    },
-    exitFullscreen() {
-      setIsFullscreen(false);
-      // Leaving fullscreen unmounts the location control; restore north-up so
-      // the map isn't left rotated with no control to reset it.
-      if (typeof map.setBearing === 'function') map.setBearing(0);
-    }
+  const map = useMap();
+  const isFullscreen = useIsFullscreen();
+
+  // Leaving fullscreen unmounts the location control; restore north-up so the
+  // map isn't left rotated with no control to reset it.
+  useMapEvent('exitFullscreen', () => {
+    if (typeof map.setBearing === 'function') map.setBearing(0);
   });
 
   if (!isFullscreen) return null;
