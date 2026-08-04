@@ -541,6 +541,9 @@ const GeocodingControl = ({ onLocationSelect }) => {
           defaultMessage: 'No results'
         })}
         renderOption={(props, result) => {
+          // MUI hands `key` inside renderOption's props bag and React 19 requires
+          // extracting it before the spread; this callback is not a component.
+          // eslint-disable-next-line react/prop-types
           const { key: _key, ...optionProps } = props;
 
           let icon;

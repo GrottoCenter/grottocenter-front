@@ -220,7 +220,8 @@ Region.propTypes = {
     name: PropTypes.string,
     latitude: PropTypes.number,
     longitude: PropTypes.number,
-    guidelines: PropTypes.arrayOf(GuidelinePropTypes)
+    guidelines: PropTypes.arrayOf(GuidelinePropTypes),
+    organizations: PropTypes.arrayOf(PropTypes.shape({}))
   }),
   error: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
   onSubscribe: PropTypes.func,

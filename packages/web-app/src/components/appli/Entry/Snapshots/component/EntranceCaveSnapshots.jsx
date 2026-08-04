@@ -114,8 +114,21 @@ const EntranceCaveSnapshots = ({ entrance, previous }) => {
     </Box>
   );
 };
+// Only the fields this component diffs; a snapshot carries many more.
+const snapshotPropType = PropTypes.shape({
+  latitude: PropTypes.number,
+  longitude: PropTypes.number,
+  altitude: PropTypes.number,
+  cave: PropTypes.shape({
+    depth: PropTypes.number,
+    length: PropTypes.number,
+    temperature: PropTypes.number,
+    isDiving: PropTypes.bool
+  })
+});
+
 EntranceCaveSnapshots.propTypes = {
-  entrance: PropTypes.shape({}),
-  previous: PropTypes.shape({})
+  entrance: snapshotPropType,
+  previous: snapshotPropType
 };
 export default EntranceCaveSnapshots;

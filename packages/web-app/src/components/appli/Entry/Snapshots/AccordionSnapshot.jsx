@@ -270,6 +270,7 @@ AccordionSnapshot.propTypes = {
     title: PropTypes.string,
     name: PropTypes.string,
     caveName: PropTypes.string,
+    description: PropTypes.shape({ title: PropTypes.string }),
     date: PropTypes.string,
     dateReviewed: PropTypes.string
   }),

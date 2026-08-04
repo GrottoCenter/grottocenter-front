@@ -80,6 +80,9 @@ const SubstanceAutocomplete = ({ value, onChange }) => {
       noOptionsText={noOptionsText}
       isOptionEqualToValue={(opt, val) => opt.name === val.name}
       renderOption={(props, option) => {
+        // MUI hands `key` inside renderOption's props bag and React 19 requires
+        // extracting it before the spread; this callback is not a component.
+        // eslint-disable-next-line react/prop-types
         const { key, ...rest } = props;
         return (
           <li key={key || option.externalId || option.name} {...rest}>

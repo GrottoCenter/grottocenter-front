@@ -177,6 +177,9 @@ const DeviceSelector = ({ disabled, onCreateNew, onSelect }) => {
             : opt === val
         }
         renderOption={(props, option) => {
+          // MUI hands `key` inside renderOption's props bag and React 19 requires
+          // extracting it before the spread; this callback is not a component.
+          // eslint-disable-next-line react/prop-types
           const { key, ...rest } = props;
           if (option.__isCreateNew) {
             return (

@@ -130,21 +130,6 @@ export default [
         }
       ],
 
-      // --- Design debt -----------------------------------------------------
-      // Downgraded to `warn` so CI stays green while the backlog stays
-      // visible. Each one is a real cleanup to make, not a rule we disagree
-      // with.
-      'react/prop-types': 'warn', // TODO: ~90 components missing prop validation
-      'react/forbid-prop-types': 'warn', // TODO: replace object/array/any shapes
-      'react/no-unused-prop-types': 'warn', // TODO: drop the dead prop types
-      'react/no-array-index-key': 'warn', // TODO: key on stable entity ids
-      'react/destructuring-assignment': 'warn', // TODO
-      'no-nested-ternary': 'warn', // TODO: extract to if/else or lookup tables
-      'consistent-return': 'warn', // TODO: mostly thunks returning conditionally
-      'no-use-before-define': 'warn', // TODO
-      'no-param-reassign': 'warn', // TODO
-      'no-await-in-loop': 'warn', // TODO: sequential API calls, check if needed
-      'class-methods-use-this': 'warn', // TODO
       // Airbnb maps the bare name `Link` to an anchor. Here `Link` is MUI's,
       // which is polymorphic — `component="button"` renders a real button.
       // The project's actual anchor component is AppLink.
@@ -156,7 +141,6 @@ export default [
           aspects: ['noHref', 'invalidHref', 'preferButton']
         }
       ],
-      // ---------------------------------------------------------------------
 
       'react/require-default-props': 'off',
       // MUI exposes `inputProps` (native input attributes) and `InputProps`
@@ -173,11 +157,14 @@ export default [
     }
   },
   {
-    files: ['**/*.test.{js,jsx}', '**/*.spec.{js,jsx}'],
+    files: ['**/*.test.{js,jsx}', '**/*.spec.{js,jsx}', '**/__mocks__/**'],
     rules: {
       // `vi.mock` factories are hoisted above the imports, so they can only
       // reach a module through `require()` inside the factory body.
-      'global-require': 'off'
+      'global-require': 'off',
+      // Test doubles are shaped by the test that renders them; runtime prop
+      // validation on a stub adds noise, not safety.
+      'react/prop-types': 'off'
     }
   }
 ];
