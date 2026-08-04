@@ -242,6 +242,32 @@ describe('LocationControl', () => {
     expect(screen.getAllByRole('button')).toHaveLength(1);
   });
 
+  it('straightens the map before recentering when leaving compass mode', async () => {
+    renderControl();
+    act(() => button().click());
+    await waitFor(() => expect(watchSuccess).toBeDefined());
+    emitPosition();
+    emitHeading(90);
+    act(() => button().click()); // → compass
+    emitHeading(90);
+    await waitFor(() => expect(mockMap.setBearing).toHaveBeenCalledWith(-90));
+
+    mockMap.setBearing.mockClear();
+    mockMap.setView.mockClear();
+    act(() => screen.getAllByRole('button')[0].click()); // → follow
+    await waitFor(() => expect(mockMap.setBearing).toHaveBeenCalledWith(0));
+
+    // The recenter target comes from the map's rotation-aware container
+    // conversions, so it is only valid for the bearing in force when it is
+    // computed. Recentering first aimed at a target built for the old bearing
+    // and then rotated it around a pivot caught mid-animation — the map landed
+    // off-centre until the next fix silently corrected it.
+    expect(mockMap.setView).toHaveBeenCalled();
+    expect(mockMap.setBearing.mock.invocationCallOrder[0]).toBeLessThan(
+      mockMap.setView.mock.invocationCallOrder[0]
+    );
+  });
+
   it('shows a distinct button state for each of the four modes', async () => {
     renderControl();
     // The north button joins the stack in compass mode, so always read the

@@ -153,6 +153,20 @@ const LocationControl = () => {
     if (!zoomingRef.current) applyBearing(target);
   }, [mode, heading, applyBearing]);
 
+  // Follow (north-up) and off snap the map back to north. Detaching from compass
+  // to 'located' keeps the current rotation frozen — the floating north-reset
+  // control then offers to straighten it, like standard navigation apps.
+  //
+  // Declared BEFORE the recenter effect on purpose: setBearing pivots around the
+  // container centre, and in compass mode the user sits well below it, so
+  // straightening swings them away. Recentering afterwards computes the target
+  // under the final bearing and puts them back; the reverse order recentered
+  // towards a target computed for the old bearing, then rotated around a pivot
+  // caught mid-animation — the map landed off and only the next fix fixed it.
+  useEffect(() => {
+    if (mode === MODE.FOLLOW || mode === MODE.OFF) resetNorth();
+  }, [mode, resetNorth]);
+
   // Recenter on every position update while following.
   useEffect(() => {
     if (mode === MODE.FOLLOW || mode === MODE.COMPASS) recenter(true);
@@ -196,13 +210,6 @@ const LocationControl = () => {
   useMapEvent('dragstart', detach);
   useMapEvent('popupopen', detach);
   useMapEvent('followdetach', detach);
-
-  // Follow (north-up) and off snap the map back to north. Detaching from compass
-  // to 'located' keeps the current rotation frozen — the floating north-reset
-  // control then offers to straighten it, like standard navigation apps.
-  useEffect(() => {
-    if (mode === MODE.FOLLOW || mode === MODE.OFF) resetNorth();
-  }, [mode, resetNorth]);
 
   // Let heavy layers (heatmaps) hide while the map is continuously rotating.
   useEffect(() => {
