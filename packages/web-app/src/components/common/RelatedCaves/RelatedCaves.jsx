@@ -119,6 +119,10 @@ const RelatedCaves = ({
       setIsAdding(true);
 
       try {
+        // Linking is sequential on purpose: each entrance is a separate
+        // mutation, and a failure must be reported for that entrance alone
+        // without cancelling the ones that follow.
+        /* eslint-disable no-await-in-loop */
         for (const entrance of selectedEntrances) {
           const entranceId = entrance.id || entrance['@id'];
           try {
@@ -138,6 +142,7 @@ const RelatedCaves = ({
             }
           }
         }
+        /* eslint-enable no-await-in-loop */
         onRefresh();
       } catch (error) {
         console.error('Error linking entrance:', error);

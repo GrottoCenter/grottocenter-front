@@ -103,7 +103,12 @@ const ScrollableContent = ({
                   <AnchorHeadingWrapper>
                     {title}
                     {!isNil(count) && <CountBadge count={count} />}
-                    <span onClick={e => e.stopPropagation()}>
+                    {/* Presentational wrapper: it only keeps the click from
+                        reaching the collapsible header. The button inside
+                        stays the real, focusable control. */}
+                    <span
+                      role="presentation"
+                      onClick={e => e.stopPropagation()}>
                       <AnchorCopyButton anchorId={anchorId} />
                     </span>
                   </AnchorHeadingWrapper>
@@ -117,6 +122,7 @@ const ScrollableContent = ({
               <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
                 {!isNil(icon) && (
                   <div
+                    role="presentation"
                     onClick={e => {
                       e.stopPropagation();
                       if (!isExpanded) setIsExpanded(true);

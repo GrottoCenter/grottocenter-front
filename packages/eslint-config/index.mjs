@@ -145,9 +145,17 @@ export default [
       'no-param-reassign': 'warn', // TODO
       'no-await-in-loop': 'warn', // TODO: sequential API calls, check if needed
       'class-methods-use-this': 'warn', // TODO
-      'jsx-a11y/anchor-is-valid': 'warn', // TODO: a11y pass
-      'jsx-a11y/click-events-have-key-events': 'warn', // TODO: a11y pass
-      'jsx-a11y/no-static-element-interactions': 'warn', // TODO: a11y pass
+      // Airbnb maps the bare name `Link` to an anchor. Here `Link` is MUI's,
+      // which is polymorphic — `component="button"` renders a real button.
+      // The project's actual anchor component is AppLink.
+      'jsx-a11y/anchor-is-valid': [
+        'error',
+        {
+          components: ['AppLink'],
+          specialLink: ['to'],
+          aspects: ['noHref', 'invalidHref', 'preferButton']
+        }
+      ],
       // ---------------------------------------------------------------------
 
       'react/require-default-props': 'off',

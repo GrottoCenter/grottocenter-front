@@ -115,6 +115,9 @@ describe('downloadAdvancedSearchResults', () => {
     for (const { format, ext } of formats) {
       setupFetchBlob();
 
+      // One format at a time: each iteration re-arms the fetch mock and then
+      // asserts on the single anchor element they all share.
+      // eslint-disable-next-line no-await-in-loop
       await downloadAdvancedSearchResults({
         query: 'test',
         entity: 'entrances',

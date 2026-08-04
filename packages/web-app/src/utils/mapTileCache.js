@@ -226,6 +226,9 @@ export const invalidateAll = entity => {
   const s = state[entity];
   if (!s) return;
   s.tiles.forEach(rec => {
+    // The cache records are mutable by design: marking them stale in place is
+    // what keeps the tile identities (and the Map keys) stable.
+    // eslint-disable-next-line no-param-reassign
     rec.fetchedAt = 0;
   });
   if (s.lastBounds && s.dispatch && s.config) {

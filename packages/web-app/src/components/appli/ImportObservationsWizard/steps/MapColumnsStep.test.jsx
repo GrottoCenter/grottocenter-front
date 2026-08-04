@@ -33,15 +33,20 @@ vi.mock('@mui/material/styles', async () => ({
 // We mock TimestampFormatInput to isolate integration tests for MapColumnsStep.
 // The mock renders a testable element exposing received props and a trigger for onChange.
 vi.mock('./TimestampFormatInput', () => {
-  const MockTimestampFormatInput = props => (
+  const MockTimestampFormatInput = ({
+    timestampType,
+    currentFormat,
+    sampleValues,
+    onChange
+  }) => (
     <div
       data-testid="mock-format-pill-builder"
-      data-timestamp-type={props.timestampType}
-      data-current-format={props.currentFormat}
-      data-sample-values={JSON.stringify(props.sampleValues)}>
+      data-timestamp-type={timestampType}
+      data-current-format={currentFormat}
+      data-sample-values={JSON.stringify(sampleValues)}>
       <button
         data-testid="mock-pill-builder-change"
-        onClick={() => props.onChange('YYYY-MM-DD')}
+        onClick={() => onChange('YYYY-MM-DD')}
         type="button">
         Trigger onChange
       </button>
