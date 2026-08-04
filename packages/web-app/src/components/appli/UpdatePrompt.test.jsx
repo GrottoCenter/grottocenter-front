@@ -75,7 +75,7 @@ describe('UpdatePrompt', () => {
     expect(screen.getByLabelText('Later')).toBeInTheDocument();
   });
 
-  it('posts SKIP_WAITING to the waiting SW when Update is clicked', () => {
+  it('posts SKIP_WAITING to the waiting SW when Update is clicked', async () => {
     const postMessageMock = vi.fn();
     mockRegisterSW({
       needRefresh: true,
@@ -83,9 +83,12 @@ describe('UpdatePrompt', () => {
     });
     renderUpdatePrompt();
 
-    act(() => {
-      fireEvent.click(screen.getByTestId('update-app-btn'));
+    // Let the deferred onRegisteredSW callback resolve (setRegistration).
+    await act(async () => {
+      await Promise.resolve();
     });
+
+    fireEvent.click(screen.getByTestId('update-app-btn'));
 
     expect(postMessageMock).toHaveBeenCalledWith({ type: 'SKIP_WAITING' });
     expect(navigator.serviceWorker.addEventListener).toHaveBeenCalledWith(
@@ -104,13 +107,15 @@ describe('UpdatePrompt', () => {
     expect(setNeedRefreshMock).toHaveBeenCalledWith(false);
   });
 
-  it('dismisses the snackbar when Update is clicked with no waiting SW', () => {
+  it('dismisses the snackbar when Update is clicked with no waiting SW', async () => {
     mockRegisterSW({ needRefresh: true, waitingSW: null });
     renderUpdatePrompt();
 
-    act(() => {
-      fireEvent.click(screen.getByTestId('update-app-btn'));
+    await act(async () => {
+      await Promise.resolve();
     });
+
+    fireEvent.click(screen.getByTestId('update-app-btn'));
 
     expect(setNeedRefreshMock).toHaveBeenCalledWith(false);
   });
