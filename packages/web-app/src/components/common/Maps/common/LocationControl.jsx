@@ -1,12 +1,8 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
-import {
-  CircularProgress,
-  IconButton,
-  Tooltip,
-  useTheme
-} from '@mui/material';
+import { CircularProgress, IconButton, Tooltip, useTheme } from '@mui/material';
 import MyLocationIcon from '@mui/icons-material/MyLocation';
+import ExploreIcon from '@mui/icons-material/Explore';
 import LocationSearchingIcon from '@mui/icons-material/LocationSearching';
 import { useMap, useMapEvent } from 'react-leaflet';
 import { headingToBearing, shortestAngleDelta } from '@/utils/compass';
@@ -206,7 +202,9 @@ const LocationControl = () => {
     if (mode !== MODE.OFF && geoError !== notifiedGeoErrorRef.current) {
       notifiedGeoErrorRef.current = geoError;
       notifyError(
-        formatMessage({ id: GEO_ERROR_MESSAGES[geoError] || GEO_ERROR_MESSAGES[2] })
+        formatMessage({
+          id: GEO_ERROR_MESSAGES[geoError] || GEO_ERROR_MESSAGES[2]
+        })
       );
       if (geoError === 1) setMode(MODE.OFF);
     }
@@ -215,9 +213,7 @@ const LocationControl = () => {
   // A compass failure while heading-up drops back to north-up follow + a toast.
   useEffect(() => {
     if (mode === MODE.COMPASS && compassError) {
-      notifyError(
-        formatMessage({ id: COMPASS_ERROR_MESSAGES[compassError] })
-      );
+      notifyError(formatMessage({ id: COMPASS_ERROR_MESSAGES[compassError] }));
       setMode(MODE.FOLLOW);
     }
   }, [mode, compassError, notifyError, formatMessage]);
@@ -254,7 +250,10 @@ const LocationControl = () => {
     icon = <MyLocationIcon sx={{ fontSize: 26, color: 'white' }} />;
   } else if (isLocating) {
     icon = (
-      <CircularProgress size={20} sx={{ color: theme.palette.mapControlIcon }} />
+      <CircularProgress
+        size={20}
+        sx={{ color: theme.palette.mapControlIcon }}
+      />
     );
   } else if (mode === MODE.COMPASS) {
     icon = (
@@ -265,10 +264,12 @@ const LocationControl = () => {
       />
     );
   } else if (mode === MODE.FOLLOW) {
-    icon = <MyLocationIcon sx={{ fontSize: 26, color: USER_LOCATION_COLOR }} />;
+    icon = <ExploreIcon sx={{ fontSize: 26 }} />;
   } else if (mode === MODE.LOCATED) {
     icon = (
-      <MyLocationIcon sx={{ fontSize: 26, color: theme.palette.mapControlIcon }} />
+      <MyLocationIcon
+        sx={{ fontSize: 26, color: theme.palette.mapControlIcon }}
+      />
     );
   } else {
     icon = (
