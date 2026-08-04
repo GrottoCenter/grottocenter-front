@@ -1,9 +1,9 @@
 import { useContext, useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
-// eslint-disable-next-line camelcase
 import {
   useNavigate,
-  unstable_usePrompt,
+  // eslint-disable-next-line camelcase -- react-router still ships it unstable-prefixed
+  unstable_usePrompt as usePrompt,
   useSearchParams
 } from 'react-router-dom';
 import {
@@ -184,7 +184,7 @@ const DocumentSubmission = ({ onCancel }) => {
   ]);
 
   // eslint-disable-next-line camelcase
-  unstable_usePrompt({
+  usePrompt({
     message: formatMessage({ id: DONT_LEAVE_MESSAGE }),
     when: ({ currentLocation, nextLocation }) =>
       permissions.isAuth &&

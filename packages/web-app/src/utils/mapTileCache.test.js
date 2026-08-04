@@ -33,7 +33,10 @@ const singleTileBounds = (x, y) => {
 };
 
 // Resolve every microtask/promise scheduled up to now.
-const flushPromises = () => new Promise(r => setTimeout(r, 0));
+const flushPromises = () =>
+  new Promise(r => {
+    setTimeout(r, 0);
+  });
 
 describe('mapTileCache', () => {
   let fetchMock;

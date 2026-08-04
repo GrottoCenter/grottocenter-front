@@ -87,7 +87,7 @@ const PageTabs = ({ tabs, children }) => {
   }, [activeTab, isMobile, appBarPx]);
 
   if (!tabs || tabs.length === 0) {
-    return <>{children}</>;
+    return children;
   }
 
   const handleChange = (_, newValue) => {

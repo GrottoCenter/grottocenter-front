@@ -292,7 +292,7 @@ describe('timestampFormatUtils - Property-Based Tests', () => {
               // Independently verify: parse + strict round-trip
               const allValid = samples.every(v => {
                 const parsed = parse(v, dfFmt, new Date(0));
-                if (!isValidDate(parsed) || isNaN(parsed.getTime())) {
+                if (!isValidDate(parsed) || Number.isNaN(parsed.getTime())) {
                   return false;
                 }
                 // Strict: format back and compare

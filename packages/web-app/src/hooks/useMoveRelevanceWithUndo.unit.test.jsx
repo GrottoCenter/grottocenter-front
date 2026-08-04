@@ -40,7 +40,7 @@ const failureResult = {
 };
 
 const createMockThunk = (result = successResult) => {
-  const thunk = vi.fn((id, direction) => () => Promise.resolve(result));
+  const thunk = vi.fn(() => () => Promise.resolve(result));
   return thunk;
 };
 

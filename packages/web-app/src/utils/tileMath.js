@@ -32,9 +32,10 @@ export const tileToBounds = (x, y, z) => {
 // Handles anti-meridian wrap when ne_lng < sw_lng (viewport crosses ±180).
 export const tilesForBounds = (bounds, z) => {
   const n = 2 ** z;
-  const { sw_lat, sw_lng, ne_lat, ne_lng } = bounds;
-  const nw = latLngToTile(ne_lat, sw_lng, z);
-  const se = latLngToTile(sw_lat, ne_lng, z);
+  // The bounds keys are snake_case: they are the API query parameter names.
+  const { sw_lat: swLat, sw_lng: swLng, ne_lat: neLat, ne_lng: neLng } = bounds;
+  const nw = latLngToTile(neLat, swLng, z);
+  const se = latLngToTile(swLat, neLng, z);
   const yMin = nw.y;
   const yMax = se.y;
   const xMinWest = nw.x;
@@ -49,7 +50,7 @@ export const tilesForBounds = (bounds, z) => {
     }
   };
 
-  if (ne_lng >= sw_lng) {
+  if (neLng >= swLng) {
     pushRange(xMinWest, xMaxEast);
   } else {
     // Viewport crosses the anti-meridian: two contiguous ranges.

@@ -13,7 +13,7 @@ import SubstanceAutocomplete from './SubstanceAutocomplete';
 // Mock the Substance actions
 const mockSearchResults = vi.fn();
 vi.mock('../../../../actions/Substance', () => ({
-  searchSubstances: query => dispatch => {
+  searchSubstances: query => () => {
     mockSearchResults(query);
     return mockSearchResults.__resolveWith
       ? Promise.resolve(mockSearchResults.__resolveWith)

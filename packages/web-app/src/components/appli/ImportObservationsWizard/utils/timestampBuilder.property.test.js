@@ -61,7 +61,7 @@ describe('Property 1: timestamp round-trip — Validates: Requirements 14.1, 8.1
             max: new Date('2030-12-31T23:59:59Z'),
             noInvalidDate: true
           })
-          .filter(d => !isNaN(d.getTime())),
+          .filter(d => !Number.isNaN(d.getTime())),
         (fmt, date) => {
           // Truncate date to whole seconds (format has no sub-second precision)
           const truncated = new Date(Math.floor(date.getTime() / 1000) * 1000);

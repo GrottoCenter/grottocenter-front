@@ -33,13 +33,15 @@ const selectedOverlays = getStoredOverlays();
 const localStorageOpacity = parseFloat(
   window.localStorage.getItem('layerOpacity')
 );
-const selectedOpacity = !isNaN(localStorageOpacity) ? localStorageOpacity : 1;
+const selectedOpacity = Number.isNaN(localStorageOpacity)
+  ? 1
+  : localStorageOpacity;
 
-const usePanes = layers => {
+const usePanes = paneLayers => {
   const map = useMap();
 
   useEffect(() => {
-    const panes = [...new Set(layers.map(l => l.pane).filter(Boolean))];
+    const panes = [...new Set(paneLayers.map(l => l.pane).filter(Boolean))];
     // When the map is rotatable (leaflet-rotate), custom tile panes must be
     // created inside the rotatePane. Otherwise Leaflet attaches them to the
     // mapPane — a sibling of the rotatePane — so their tiles stay north-up
@@ -53,7 +55,7 @@ const usePanes = layers => {
         pane.style.zIndex = 200 + index * 10;
       }
     });
-  }, [map, layers]);
+  }, [map, paneLayers]);
 };
 
 const createWMTSTileLayer = (layer, opacity = 1) => (

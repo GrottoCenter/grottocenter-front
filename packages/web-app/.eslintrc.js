@@ -23,6 +23,14 @@ module.exports = {
       }
     },
     {
+      // Build-time Node scripts, not shipped code: logging is their output.
+      files: ['./scripts/**/*.js'],
+      env: { node: true },
+      rules: {
+        'no-console': 'off'
+      }
+    },
+    {
       files: ['./cypress/**/*.js'],
       globals: {
         cy: 'readonly',

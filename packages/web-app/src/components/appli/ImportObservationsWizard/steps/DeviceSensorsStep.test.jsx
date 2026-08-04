@@ -60,6 +60,7 @@ vi.mock('../components/SubstanceAutocomplete', () => {
           'button',
           {
             'data-testid': 'substance-select-button',
+            type: 'button',
             onClick: () =>
               onChange({
                 id: 1,

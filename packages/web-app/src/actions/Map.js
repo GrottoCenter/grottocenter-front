@@ -70,9 +70,9 @@ const fetchWithRetry = (url, maxRetries = 3) => {
       })
       .catch(error => {
         if (retriesLeft === 0) throw error;
-        return new Promise(resolve => setTimeout(resolve, delay)).then(() =>
-          attempt(retriesLeft - 1, delay * 2)
-        );
+        return new Promise(resolve => {
+          setTimeout(resolve, delay);
+        }).then(() => attempt(retriesLeft - 1, delay * 2));
       });
   return attempt(maxRetries, 1000);
 };

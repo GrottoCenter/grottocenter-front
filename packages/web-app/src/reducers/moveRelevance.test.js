@@ -36,7 +36,7 @@ const entityListArb = fc
       fc.integer({ min: 0, max: 1000 })
     );
   })
-  .filter(([entities, movedIdx, swappedIdx]) => movedIdx !== swappedIdx)
+  .filter(([_entities, movedIdx, swappedIdx]) => movedIdx !== swappedIdx)
   .map(([entities, movedIdx, swappedIdx, newMovedRel, newSwappedRel]) => {
     const list = [...entities];
     const moved = { ...list[movedIdx], relevance: newMovedRel };

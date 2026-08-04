@@ -361,7 +361,7 @@ const DesktopEntityTable = ({
           sx={{
             position: 'sticky',
             top: 0,
-            zIndex: theme => theme.zIndex.appBar - 1,
+            zIndex: theme.zIndex.appBar - 1,
             bgcolor: 'background.paper'
           }}>
           <Toolbar

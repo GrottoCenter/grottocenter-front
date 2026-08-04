@@ -91,8 +91,9 @@ export function postDocument(docAttributes) {
           return createdDocument;
         })
       )
-      .catch(err => {
-        if (err.isAuthError) return;
+      .catch(() => {
+        // Failures are already reported to the store above; this catch only
+        // stops the rejection from escaping as an unhandled promise.
       });
   };
 }

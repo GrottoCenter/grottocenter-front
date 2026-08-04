@@ -97,10 +97,11 @@ const analyzeSimplificationCurve = (multiPolygon, rawVertexCount) => {
   for (const polygon of multiPolygon.coordinates) {
     for (const ring of polygon) {
       for (const coord of ring) {
-        if (coord[0] < minX) minX = coord[0];
-        if (coord[0] > maxX) maxX = coord[0];
-        if (coord[1] < minY) minY = coord[1];
-        if (coord[1] > maxY) maxY = coord[1];
+        const [x, y] = coord;
+        if (x < minX) minX = x;
+        if (x > maxX) maxX = x;
+        if (y < minY) minY = y;
+        if (y > maxY) maxY = y;
       }
     }
   }

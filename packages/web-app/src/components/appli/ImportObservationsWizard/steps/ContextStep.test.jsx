@@ -39,6 +39,7 @@ vi.mock('../../../common/AutoCompleteSearch/CaveAutoCompleteSearch', () => {
           'button',
           {
             'data-testid': 'cave-select-button',
+            type: 'button',
             disabled,
             onClick: () => onSelection({ id: 42, name: 'Test Cave' })
           },
