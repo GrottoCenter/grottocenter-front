@@ -53,7 +53,6 @@ const IdentifierEditor = () => {
       return allIdentifierTypes.find(e => e.id === document.identifierType);
 
     return document.identifierType;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [allIdentifierTypes, document.identifierType]);
 
   const regexp = identifierType?.regexp ?? null;

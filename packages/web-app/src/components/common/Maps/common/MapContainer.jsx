@@ -173,7 +173,7 @@ const CustomMapContainer = ({
     const observer = new ResizeObserver(() => {
       try {
         map.invalidateSize({ animate: false, pan: false });
-      } catch (e) {
+      } catch {
         /* ignore */
       }
       clearTimeout(pendingStabilizeRef.current);
@@ -181,7 +181,7 @@ const CustomMapContainer = ({
         pendingStabilizeRef.current = null;
         try {
           map.invalidateSize({ animate: false });
-        } catch (e) {
+        } catch {
           /* ignore */
         }
       }, 100);

@@ -61,7 +61,6 @@ const Actions = ({ selectedIds, onEdit }) => {
       setIsConfirmationDialogOpen(false);
       setComment('');
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [success]);
 
   return (

@@ -75,7 +75,6 @@ describe('SubstanceAutocomplete', () => {
     // Suppress React act() warnings from async effect cleanup
     vi.spyOn(console, 'error').mockImplementation(msg => {
       if (typeof msg === 'string' && msg.includes('not wrapped in act')) return;
-      // eslint-disable-next-line no-console
       console.warn(msg);
     });
   });

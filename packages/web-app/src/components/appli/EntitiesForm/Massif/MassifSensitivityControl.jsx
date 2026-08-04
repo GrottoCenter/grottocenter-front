@@ -44,7 +44,7 @@ const MassifSensitivityControl = ({ massif }) => {
         const count = await dispatch(previewSensitiveMassif(massif.id));
         setPreviewCount(count);
         setIsConfirmOpen(true);
-      } catch (error) {
+      } catch {
         // Fallback if preview fails: still show dialog but without count
         setPreviewCount(null);
         setIsConfirmOpen(true);

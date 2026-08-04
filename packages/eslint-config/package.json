@@ -1,18 +1,26 @@
 {
   "name": "@grotto-front/eslint-config",
-  "version": "1.0.0",
-  "description": "Custom eslint rules",
-  "main": ".eslintrc.js",
+  "version": "2.0.0",
+  "description": "Custom eslint rules (flat config)",
+  "type": "module",
+  "main": "index.mjs",
+  "exports": {
+    ".": "./index.mjs",
+    "./package.json": "./package.json"
+  },
   "peerDependencies": {
-    "eslint": ">=8",
+    "@eslint/eslintrc": ">=3",
+    "@eslint/js": ">=9",
+    "eslint": ">=9",
     "eslint-config-airbnb": ">=19",
     "eslint-config-prettier": ">=8",
-    "eslint-plugin-cypress": ">=2",
+    "eslint-plugin-cypress": ">=6",
     "eslint-plugin-import": ">=2",
     "eslint-plugin-jsx-a11y": ">=6",
     "eslint-plugin-prettier": ">=5",
     "eslint-plugin-react": ">=7",
     "eslint-plugin-react-hooks": ">=4",
+    "eslint-plugin-storybook": ">=0.12",
     "prettier": ">=3"
   }
 }

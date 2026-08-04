@@ -178,7 +178,7 @@ export const importProfile = json => {
     }
 
     return { ok: true, state };
-  } catch (e) {
+  } catch {
     return { ok: false, error: 'Invalid JSON' };
   }
 };

@@ -132,7 +132,6 @@ export const importDocumentRows = data => (dispatch, getState) => {
     headers: getState().login.authorizationHeader
   };
 
-  // eslint-disable-next-line consistent-return
   return fetch(importRowsDocumentsUrl, requestOptions)
     .then(checkAuthStatus(dispatch))
     .then(response => response.json())
@@ -191,7 +190,6 @@ export const importEntranceRows = data => (dispatch, getState) => {
     headers: getState().login.authorizationHeader
   };
 
-  // eslint-disable-next-line consistent-return
   return fetch(importRowsEntrancesUrl, requestOptions)
     .then(checkAuthStatus(dispatch))
     .then(response => response.json())

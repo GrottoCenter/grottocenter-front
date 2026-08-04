@@ -109,7 +109,7 @@ const MapInternals = ({ geoJson, massifId }) => {
       })
       .catch(err => {
         if (err.name !== 'AbortError')
-          console.error('Failed to fetch map markers:', err); // eslint-disable-line no-console
+          console.error('Failed to fetch map markers:', err);
       });
   }, [map, massifId]);
 

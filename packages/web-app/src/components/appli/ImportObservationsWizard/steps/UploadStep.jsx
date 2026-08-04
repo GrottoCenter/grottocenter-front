@@ -134,7 +134,6 @@ const FilePreviewTable = ({
               </TableCell>
               {Array.from({ length: colCount }, (_, colIdx) => (
                 <TableCell
-                  // eslint-disable-next-line react/no-array-index-key
                   key={colIdx}
                   sx={{
                     whiteSpace: 'nowrap',
@@ -168,7 +167,6 @@ const FilePreviewTable = ({
                 </TableCell>
                 {Array.from({ length: colCount }, (_, colIdx) => (
                   <TableCell
-                    // eslint-disable-next-line react/no-array-index-key
                     key={colIdx}
                     sx={{
                       whiteSpace: 'nowrap',

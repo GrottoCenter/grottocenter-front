@@ -59,7 +59,6 @@ const checkData = (data, selectedType, formatMessage) => {
         ),
         row: i + 2
       });
-      // eslint-disable-next-line no-continue
       continue;
     }
 

@@ -120,7 +120,7 @@ const useDeviceOrientation = () => {
           setError('denied');
           return false;
         }
-      } catch (e) {
+      } catch {
         setError('denied');
         return false;
       }

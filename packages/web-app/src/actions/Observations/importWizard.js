@@ -154,7 +154,6 @@ export const searchDevices =
       .catch(error => {
         if (error.isAuthError) return;
         // Logging for debugging — the error is re-thrown for caller handling
-        // eslint-disable-next-line no-console
         console.error('Device search failed:', error.message);
         throw error;
       });
@@ -186,7 +185,6 @@ export const createDevice = deviceData => (dispatch, getState) => {
     .then(data => normalizeDevice(data))
     .catch(error => {
       if (error.isAuthError) return;
-      // eslint-disable-next-line no-console
       console.error('Device creation failed:', error.message);
       throw error;
     });
@@ -335,7 +333,6 @@ export const fetchCaveById =
       .then(response => response.json())
       .catch(error => {
         if (error.isAuthError) return undefined;
-        // eslint-disable-next-line no-console
         console.error(`Failed to fetch cave ${caveId}:`, error.message);
         return undefined;
       });
@@ -357,7 +354,6 @@ export const fetchCaverById =
       .then(response => response.json())
       .catch(error => {
         if (error.isAuthError) return undefined;
-        // eslint-disable-next-line no-console
         console.error(`Failed to fetch caver ${caverId}:`, error.message);
         return undefined;
       });

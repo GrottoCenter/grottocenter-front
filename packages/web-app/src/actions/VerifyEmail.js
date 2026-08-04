@@ -43,10 +43,10 @@ export function getVerifyEmail(token) {
             try {
               const json = JSON.parse(text);
               errorMessage = json.message || json.error || text;
-            } catch (e) {
+            } catch {
               errorMessage = text;
             }
-          } catch (e) {
+          } catch {
             errorMessage = 'Unknown error';
           }
 

@@ -22,7 +22,6 @@ export const searchSubstances = searchTerm => (dispatch, getState) => {
     .catch(error => {
       if (error.isAuthError) return [];
       // Graceful degradation — return empty results on failure
-      // eslint-disable-next-line no-console
       console.error('Substance search failed:', error.message);
       return [];
     });
@@ -50,7 +49,6 @@ export const createSubstance = data => (dispatch, getState) => {
     .then(response => response.json())
     .catch(error => {
       if (error.isAuthError) return undefined;
-      // eslint-disable-next-line no-console
       console.error('Substance creation failed:', error.message);
       throw error;
     });

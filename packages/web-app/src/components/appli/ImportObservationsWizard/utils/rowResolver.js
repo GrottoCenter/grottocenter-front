@@ -18,7 +18,7 @@ export const resolveRows = (rows, mappings) => {
   for (const colIndex of decimalPartIndices) {
     // Guard: decimal_part at column 0 is invalid (no preceding column to merge into).
     // The UI prevents this, but guard here for safety.
-    if (colIndex === 0) continue; // eslint-disable-line no-continue
+    if (colIndex === 0) continue;
     for (const row of resolved) {
       row[colIndex - 1] = `${row[colIndex - 1] ?? ''}.${row[colIndex] ?? ''}`;
       row[colIndex] = null;

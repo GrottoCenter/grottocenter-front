@@ -240,7 +240,7 @@ const SubmitStep = () => {
           {errorDetails.length > 0 && (
             <List dense disablePadding>
               {/* Error details have no stable unique ID — field may repeat */}
-              {/* eslint-disable-next-line react/no-array-index-key */}
+              {}
               {errorDetails.map((detail, index) => (
                 <ListItem
                   key={detail.field ? `${detail.field}-${index}` : index}

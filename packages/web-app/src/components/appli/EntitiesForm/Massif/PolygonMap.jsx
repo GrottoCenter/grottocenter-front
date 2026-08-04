@@ -592,7 +592,6 @@ const PolygonMap = ({ onChange, onValidationChange, data }) => {
       const polygons =
         data.type === 'Polygon' ? [data.coordinates] : data.coordinates;
 
-      // eslint-disable-next-line no-restricted-syntax
       for (const polygon of polygons) {
         // Add outer ring (first ring of each polygon)
         const outerRing = polygon[0].map(coords => [coords[1], coords[0]]);

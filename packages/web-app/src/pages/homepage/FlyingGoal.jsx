@@ -41,7 +41,6 @@ class Goal extends Component {
   render() {
     const { className, textColor, entry } = this.props;
     return (
-      // eslint-disable-next-line jsx-a11y/mouse-events-have-key-events
       <div
         className={className}
         onMouseOver={event => this.handleMouseOver(event)}

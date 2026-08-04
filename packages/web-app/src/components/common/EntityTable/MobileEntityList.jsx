@@ -212,7 +212,6 @@ const MobileEntityList = ({
   useEffect(() => {
     if (!hasInteracted.current) return;
     if (onSelectedRef.current) onSelectedRef.current(selectedIds);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedIds]);
 
   // Stable reference — does not depend on onSelected directly

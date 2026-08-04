@@ -273,7 +273,6 @@ const DesktopEntityTable = ({
   const handleRequestSort = (event, property) => {
     const fieldMap = SORT_FIELD_MAP[entityType];
     if (!fieldMap || !(property in fieldMap)) {
-      // eslint-disable-next-line no-console
       console.warn(
         `Sort blocked: field "${property}" is not allowed for entity type "${entityType}"`
       );

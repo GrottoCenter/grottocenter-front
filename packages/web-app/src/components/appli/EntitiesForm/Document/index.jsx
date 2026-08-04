@@ -2,7 +2,6 @@ import { useContext, useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import {
   useNavigate,
-  // eslint-disable-next-line camelcase -- react-router still ships it unstable-prefixed
   unstable_usePrompt as usePrompt,
   useSearchParams
 } from 'react-router-dom';
@@ -183,7 +182,6 @@ const DocumentSubmission = ({ onCancel }) => {
     dispatch
   ]);
 
-  // eslint-disable-next-line camelcase
   usePrompt({
     message: formatMessage({ id: DONT_LEAVE_MESSAGE }),
     when: ({ currentLocation, nextLocation }) =>
