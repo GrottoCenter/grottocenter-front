@@ -210,6 +210,7 @@ const AuthorsSection = () => {
                 {...params}
                 variant="filled"
                 label={formatMessage({ id: 'Authors' })}
+                required
                 error={hasError}
                 InputProps={{
                   ...params.InputProps,
