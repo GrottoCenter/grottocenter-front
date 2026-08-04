@@ -771,7 +771,7 @@ export const SearchFilterAccordion = ({
             size="small"
             label={filterCount}
             color="primary"
-            sx={{ height: 20, fontSize: '0.7rem' }}
+            sx={{ height: 20, fontSize: '0.4375rem' }}
           />
         )}
       </Box>

@@ -213,7 +213,7 @@ const PageTabs = ({ tabs, children }) => {
                   minWidth: 0,
                   '& svg': { width: '1.375rem', height: '1.375rem' },
                   '& .MuiBottomNavigationAction-label': {
-                    fontSize: '0.9rem !important'
+                    fontSize: '0.5625rem !important'
                   },
                   '&.Mui-selected': { color: 'secondary.main' },
                   '&.Mui-disabled': {

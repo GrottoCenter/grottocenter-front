@@ -287,10 +287,7 @@ const MessagesPage = () => {
                     borderBottom: 1,
                     borderColor: 'divider'
                   }}>
-                    <Typography
-                      variant="h5"
-                      component="h1"
-                      sx={{ fontSize: { xs: '1.25rem', md: '1.375rem' } }}>
+                    <Typography variant="h3" component="h1">
                       {formatMessage({ id: 'Conversations', defaultMessage: 'Conversations' })}
                     </Typography>
                     <Button

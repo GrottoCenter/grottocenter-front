@@ -1,4 +1,10 @@
-import React, { useEffect, useState, useRef, useCallback, useMemo } from 'react';
+import React, {
+  useEffect,
+  useState,
+  useRef,
+  useCallback,
+  useMemo
+} from 'react';
 import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams, useNavigate } from 'react-router-dom';
@@ -118,7 +124,7 @@ const MessageDate = styled(Box)(({ theme }) => ({
   color: theme.palette.text.secondary,
   opacity: 0.7,
   marginTop: '2px',
-  textAlign: 'right',
+  textAlign: 'right'
 }));
 
 const DaySeparatorContainer = styled(Box)(({ theme }) => ({
@@ -203,7 +209,11 @@ const buildRenderedItems = (msgs, myCaverId) => {
   msgs.forEach(msg => {
     const dayKey = startOfDay(msg.dateSent).toISOString();
     if (dayKey !== prevDayKey) {
-      items.push({ type: 'separator', key: `sep-${dayKey}`, date: msg.dateSent });
+      items.push({
+        type: 'separator',
+        key: `sep-${dayKey}`,
+        date: msg.dateSent
+      });
       prevDayKey = dayKey;
       prevMsg = null;
     }
@@ -253,12 +263,7 @@ const DaySeparator = ({ date }) => {
     content = formatMessage({ id: 'Yesterday', defaultMessage: 'Yesterday' });
   } else {
     content = (
-      <FormattedDate
-        value={date}
-        year="numeric"
-        month="long"
-        day="2-digit"
-      />
+      <FormattedDate value={date} year="numeric" month="long" day="2-digit" />
     );
   }
   return (
@@ -332,11 +337,7 @@ const MessageItem = ({ item, isMenuOpen, onOpenMenu }) => {
         )}
       </Box>
       <MessageDate>
-        <FormattedDate
-          value={msg.dateSent}
-          hour="2-digit"
-          minute="2-digit"
-        />
+        <FormattedDate value={msg.dateSent} hour="2-digit" minute="2-digit" />
       </MessageDate>
     </MessageBubble>
   );
@@ -656,11 +657,11 @@ Message Body: ${body}`;
             sx={{
               display: { xs: 'inline-flex', md: 'none' },
               width: 36,
-              height: 36,
+              height: 36
             }}
           />
         )}
-        <Typography variant="h6">
+        <Typography variant="h3" component="h2">
           {otherParticipant ? (
             <AppLink
               to={`/ui/persons/${otherParticipant.id}`}
@@ -734,7 +735,9 @@ Message Body: ${body}`;
             // Pressing a button moves focus to it, which closes the virtual
             // keyboard. Suppressing the default keeps focus in the input.
             onMouseDown={e => e.preventDefault()}
-            disabled={!replyText.trim() || replyText.length > 5000 || isSending}>
+            disabled={
+              !replyText.trim() || replyText.length > 5000 || isSending
+            }>
             {isSending ? (
               <CircularProgress size={20} color="inherit" />
             ) : (
@@ -750,7 +753,6 @@ Message Body: ${body}`;
               px: 1,
               color: replyText.length > 5000 ? 'error.main' : 'text.secondary',
               fontSize: '0.625rem'
-              
             }}>
             {replyText.length > 5000 &&
               formatMessage({

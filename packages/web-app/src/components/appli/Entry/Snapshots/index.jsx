@@ -130,7 +130,7 @@ const SnapshotPage = () => {
     persons: 'Person',
     organizations: 'Organization',
     descriptions: 'Description',
-    locations: 'Location',
+    locations: 'Access',
     histories: 'History',
     riggings: 'Rigging',
     comments: 'Comment'

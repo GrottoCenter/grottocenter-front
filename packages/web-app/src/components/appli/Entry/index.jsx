@@ -208,13 +208,7 @@ export const Entry = ({
   ) : null;
 
   const breadcrumb = entrance ? (
-    <Breadcrumbs
-      separator={<NavigateNext sx={{ fontSize: '0.75rem' }} />}
-      sx={{
-        fontSize: { xs: '0.75rem', md: '1.0625rem' },
-        '& .MuiBreadcrumbs-separator': { mx: { xs: '2px', md: '8px' } }
-      }}
-    >
+    <Breadcrumbs separator={<NavigateNext fontSize="inherit" />}>
       {entrance.country && (
         <AppLink
           to={`/ui/countries/${entrance.country}`}

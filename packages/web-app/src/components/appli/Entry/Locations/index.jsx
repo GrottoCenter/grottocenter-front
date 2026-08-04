@@ -43,7 +43,7 @@ const Locations = ({ entranceId, locations, isSensitive, isEditAllowed }) => {
       dense
       anchorId="location"
       defaultExpanded={locations.length > 0}
-      title={formatMessage({ id: 'Location' })}
+      title={formatMessage({ id: 'Access' })}
       icon={
         // Hidden for non-admins on sensitive entrances: they cannot add locations
         permissions.isAuth &&

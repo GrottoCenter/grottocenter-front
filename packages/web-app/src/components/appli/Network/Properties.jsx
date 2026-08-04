@@ -33,7 +33,9 @@ const Properties = ({ isLoading, cave }) => {
     <GlobalWrapper>
       {hasCharacteristics && (
         <Paper variant="outlined" sx={{ p: 1, borderRadius: 2, bgcolor: 'grey.50' }}>
-          <InfoSection title={formatMessage({ id: 'Characteristics' })}>
+          <InfoSection
+            component="h2"
+            title={formatMessage({ id: 'Characteristics' })}>
             <Box
               sx={{
                 display: 'grid',
@@ -53,7 +55,9 @@ const Properties = ({ isLoading, cave }) => {
       )}
       {cave?.exploringOrganizations?.length > 0 && (
         <Paper variant="outlined" sx={{ p: 1, borderRadius: 2, bgcolor: 'grey.50' }}>
-          <InfoSection title={formatMessage({ id: 'Exploring organizations' })}>
+          <InfoSection
+            component="h2"
+            title={formatMessage({ id: 'Exploring organizations' })}>
             <Box
               sx={{
                 display: 'grid',

@@ -189,7 +189,6 @@ const Organization = ({ error, isLoading, organization }) => {
         }
         alignItems="center"
         flexWrap="wrap"
-        sx={{ fontSize: { xs: '0.75rem', md: '1.0625rem' } }}
       >
         {organization.country && (
           <AppLink

@@ -43,6 +43,11 @@ code {
   font-size: 1.0625rem;
   font-weight: 600;
   line-height: 1.3;
+  /* MUI renders subtitle1 as an <h6>. Popups are serialized with renderToString
+     into detached HTML where emotion's classes don't reach, so Typography's own
+     `margin: 0` never applies and the element falls back to the UA default
+     (margin: 2.33em 0 ≈ 40px). Reset it explicitly here. */
+  margin: 0 0 8px;
   /* Reserve room for Leaflet's absolutely-positioned close button (top-right),
      so a long title wraps instead of running under the × */
   padding-right: 5px;
@@ -69,6 +74,18 @@ code {
 
 .leaflet-tooltip {
   font-size: 13px;
+}
+
+/*
+ * Leaflet 1.9 sets `.leaflet-container { font-size: 0.75rem }`, which resolved
+ * to 7.5px under the app's former 62.5% root and now resolves to its intended
+ * 12px. Credit and scale are incidental map chrome, not content, so they are
+ * pinned back to their previous size. Scoped to these two controls rather than
+ * `.leaflet-container`, whose font-size also cascades into popups and tooltips.
+ */
+.leaflet-control-attribution,
+.leaflet-control-scale-line {
+  font-size: 0.46875rem;
 }
 
 @media print {

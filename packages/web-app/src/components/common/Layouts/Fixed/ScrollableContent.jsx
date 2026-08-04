@@ -28,19 +28,35 @@ const Title = styled('div')`
   justify-content: space-between;
 `;
 
+// `&&` doubles the class specificity on purpose. These wrappers are created at
+// module-eval time, so their emotion classes are inserted BEFORE the ones MUI
+// generates from the theme's MuiCardHeader / MuiCardContent styleOverrides at
+// first render. On equal specificity the later rule wins, so the theme's
+// `padding: spacing(2)` silently beat these and `dense` did nothing at all.
+//
+// The reduced bottom padding tightens the gap between the header and the
+// content, so it only applies while the card is open. Collapsed, there is no
+// content below it and trimming only the bottom would leave the header
+// visibly lopsided against the theme's (responsive) top padding.
 const CardHeader = styled(MuiCardHeader, {
   shouldForwardProp: prop => prop[0] !== '$'
 })`
-  ${({ $dense }) => $dense && `padding-bottom: 0px`}
+  ${({ $dense, $open, theme }) =>
+    $dense && $open && `&& { padding-bottom: ${theme.spacing(1)}; }`}
 `;
 
+// `dense` means "tight" regardless of collapsibility: the top padding is
+// dropped because the header above already provides the separation. Gating this
+// on $collapsible left non-collapsible dense cards (Documents, Science) with the
+// full theme padding on both sides — a 32px band under their title.
+// The `:last-child` bottom padding is normalised in the theme (MuiCardContent),
+// not here: a `&&` specificity bump from this wrapper does not reliably beat
+// MUI's own rule, whereas a styleOverride composes into the same generated
+// class and wins by source order.
 const StyledCardContent = styled(CardContent, {
   shouldForwardProp: prop => prop[0] !== '$'
 })`
-  ${({ $dense, $collapsible }) => $dense && $collapsible && `padding-top: 0;`}
-  &:last-child {
-    padding-bottom: ${({ theme }) => theme.spacing(1)};
-  }
+  ${({ $dense }) => $dense && `&& { padding-top: 0; }`}
 `;
 
 // Exported so a section heading rendered outside a card (e.g. inside a page
@@ -69,7 +85,6 @@ const ScrollableContent = ({
   children,
   anchorId,
   dense = false,
-  subTitle = false,
   subheader,
   collapsible = true,
   defaultExpanded = true
@@ -80,6 +95,9 @@ const ScrollableContent = ({
   useEffect(() => {
     if (defaultExpanded) setIsExpanded(true);
   }, [defaultExpanded]);
+
+  // A non-collapsible card is always open.
+  const isOpen = collapsible ? isExpanded : true;
 
   return (
     <Card id={anchorId}>
@@ -93,9 +111,7 @@ const ScrollableContent = ({
           }
           title={
             <Title>
-              <Typography
-                variant={subTitle ? 'h3' : 'h2'}
-                color={subTitle ? 'textPrimary' : 'secondary'}>
+              <Typography variant="h2" color="secondary">
                 {anchorId ? (
                   <AnchorHeadingWrapper>
                     {title}
@@ -140,7 +156,7 @@ const ScrollableContent = ({
           }
         />
       )}
-      <Collapse in={collapsible ? isExpanded : true} timeout="auto">
+      <Collapse in={isOpen} timeout="auto">
         <StyledCardContent
           $dense={dense ? 1 : 0}
           $collapsible={collapsible ? 1 : 0}>
@@ -157,14 +173,15 @@ ScrollableContent.propTypes = {
   icon: PropTypes.node,
   content: (props, propName, componentName) => {
     if (!props.content && !props.children) {
-      return new Error(`${componentName} requires either 'content' or 'children' prop.`);
+      return new Error(
+        `${componentName} requires either 'content' or 'children' prop.`
+      );
     }
     return null;
   },
   children: PropTypes.node,
   anchorId: PropTypes.string,
   dense: PropTypes.bool,
-  subTitle: PropTypes.bool,
   subheader: PropTypes.node,
   collapsible: PropTypes.bool,
   defaultExpanded: PropTypes.bool
