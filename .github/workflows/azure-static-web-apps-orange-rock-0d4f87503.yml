@@ -9,6 +9,15 @@ on:
     branches:
       - develop
 
+# Two deployments to the same target must not race: on two quick merges the
+# slower upload could land after the newer one. Keyed on the target rather than
+# flat, so previews — which each own a distinct environment — queue per PR
+# instead of behind production, and a PR teardown waits for that PR's upload.
+# Never cancel in progress: an interrupted upload leaves the target half-built.
+concurrency:
+  group: azure-deploy-${{ github.event.pull_request.number || 'production' }}
+  cancel-in-progress: false
+
 env:
   # Pinned to a major so a git-cliff release cannot silently change how versions
   # are computed between two deployments. Keep in sync with release.yml.
