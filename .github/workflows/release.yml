@@ -11,7 +11,10 @@ on:
   push:
     branches: [develop]
 
-  # Allows you to run this workflow manually from the Actions tab
+  # Allows you to run this workflow manually from the Actions tab. No inputs:
+  # a manual run always re-derives the version from the tip of develop, so
+  # this is only useful to retry after a transient failure, not to target a
+  # specific commit or override the computed version.
   workflow_dispatch:
 
 permissions:

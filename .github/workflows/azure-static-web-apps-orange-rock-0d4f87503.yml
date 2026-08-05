@@ -9,6 +9,11 @@ on:
     branches:
       - develop
 
+env:
+  # Pinned to a major so a git-cliff release cannot silently change how versions
+  # are computed between two deployments. Keep in sync with release.yml.
+  GIT_CLIFF: git-cliff@2
+
 jobs:
   build_and_deploy_job:
     if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
@@ -29,7 +34,7 @@ jobs:
         id: version
         run: |
           set -euo pipefail
-          VERSION="$(npx --yes git-cliff@2 --bumped-version)"
+          VERSION="$(npx --yes "$GIT_CLIFF" --bumped-version)"
           if ! printf '%s' "$VERSION" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+$'; then
             echo "::error::git-cliff returned an unusable version ('$VERSION')"
             exit 1

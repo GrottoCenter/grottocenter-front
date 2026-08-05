@@ -150,7 +150,7 @@ Make sure the PWA is already deployed and valid at `https://grottocenter.org`
 >
 > | Tag         | Created by                                         | Ships                        |
 > | ----------- | -------------------------------------------------- | ---------------------------- |
-> | `X.Y.Z`     | release-please (`.github/workflows/release.yml`)   | the web app + `CHANGELOG.md` |
+> | `X.Y.Z`     | git-cliff (`.github/workflows/release.yml`)        | the web app (release notes in GitHub Releases) |
 > | `app-X.Y.Z` | you, when the Android shell itself needs a rebuild | the signed `.aab` / `.apk`   |
 >
 > Without the prefix, every web release would trigger a full Android build and both
@@ -182,7 +182,7 @@ The workflow signs with your upload key, then:
    debugging only, not durable storage), and
 2. publishes a **GitHub Release** `app-X.Y.Z` with the `.aab`/`.apk` attached — this is
    the **permanent, versioned archive** of each build. It is a separate release from
-   the web one release-please publishes under the bare `X.Y.Z` tag.
+   the web one `.github/workflows/release.yml` publishes under the bare `X.Y.Z` tag.
 
 (Local alternative: build it yourself — see [Building locally](#building-locally).)
 
