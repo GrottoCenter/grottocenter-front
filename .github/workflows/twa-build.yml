@@ -11,9 +11,9 @@ on:
     tags:
       # Only Android release tags (app-1.0.0, app-10.2.3…) trigger a build.
       # The `app-` namespace keeps this workflow off the web release tags: bare
-      # semver (1.0.0) belongs to release-please, which tags the web app on every
-      # merged release PR. Android ships on its own cadence, so it gets its own
-      # prefix — but the version inside the tag stays plain semver.
+      # semver (1.0.0) belongs to git-cliff (.github/workflows/release.yml), which
+      # tags the web app on every merge into develop. Android ships on its own cadence,
+      # so it gets its own prefix — but the version inside the tag stays plain semver.
       # GitHub Actions tag filters are globs, not regex: [0-9] is a digit class,
       # + means "one or more of the preceding", and \. escapes the literal dot
       # (without escaping, `.` would match any character — including `-`, which
@@ -115,7 +115,7 @@ jobs:
         with:
           # Always the app- namespaced tag: on a tag push it matches the tag that
           # triggered the run, on workflow_dispatch it is created here. Never the
-          # bare semver tag — that one is release-please's web release.
+          # bare semver tag — that one is git-cliff's web release.
           tag_name: ${{ steps.version.outputs.tag }}
           name: Grottocenter App ${{ steps.version.outputs.name }} (build ${{ steps.version.outputs.code }})
           generate_release_notes: true
