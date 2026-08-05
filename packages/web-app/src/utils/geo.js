@@ -12,10 +12,22 @@ const toDeg = rad => (rad * 180) / Math.PI;
 
 // 16-point compass rose, clockwise from North.
 const CARDINALS = [
-  'N', 'NNE', 'NE', 'ENE',
-  'E', 'ESE', 'SE', 'SSE',
-  'S', 'SSW', 'SW', 'WSW',
-  'W', 'WNW', 'NW', 'NNW'
+  'N',
+  'NNE',
+  'NE',
+  'ENE',
+  'E',
+  'ESE',
+  'SE',
+  'SSE',
+  'S',
+  'SSW',
+  'SW',
+  'WSW',
+  'W',
+  'WNW',
+  'NW',
+  'NNW'
 ];
 
 // Initial great-circle bearing (forward azimuth) from `a` to `b`, in degrees
@@ -26,8 +38,7 @@ export const initialBearing = (a, b) => {
   const Δλ = toRad(b.lng - a.lng);
   const y = Math.sin(Δλ) * Math.cos(φ2);
   const x =
-    Math.cos(φ1) * Math.sin(φ2) -
-    Math.sin(φ1) * Math.cos(φ2) * Math.cos(Δλ);
+    Math.cos(φ1) * Math.sin(φ2) - Math.sin(φ1) * Math.cos(φ2) * Math.cos(Δλ);
   return normalizeDeg(toDeg(Math.atan2(y, x)));
 };
 
@@ -85,7 +96,8 @@ const getFormatters = locale => {
 
 export const formatDistance = (meters, locale) => {
   const { meter, km, mile } = getFormatters(locale);
-  const metricStr = meters < 1000 ? meter.format(meters) : km.format(meters / 1000);
+  const metricStr =
+    meters < 1000 ? meter.format(meters) : km.format(meters / 1000);
   const imperialStr = mile.format(meters / METERS_PER_MILE);
   return `${metricStr} · ${imperialStr}`;
 };

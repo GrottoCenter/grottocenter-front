@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { CircularProgress, IconButton, Tooltip, useTheme } from '@mui/material';
 import MyLocationIcon from '@mui/icons-material/MyLocation';

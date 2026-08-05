@@ -1,6 +1,13 @@
 // End-to-end checks for the unified location control on the main map: the mode
 // machine (off → follow → compass), the user-location dot with its accuracy
 // circle, the heading-up rotation and the north-reset affordance.
+//
+// Cypress's onBeforeLoad(win) exists specifically to attach test doubles onto
+// the page's window before the app boots — mutating `win` here is the intended
+// use of the parameter, not an accidental side effect. The double-underscore
+// names namespace the test-only globals so they can't collide with anything
+// the app itself defines.
+/* eslint-disable no-underscore-dangle, no-param-reassign */
 
 const USER = { latitude: 45.111, longitude: 5.5244, accuracy: 15 };
 

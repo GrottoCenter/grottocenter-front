@@ -1,4 +1,3 @@
-import React from 'react';
 import PropTypes from 'prop-types';
 
 // Two-tone compass needle: the coloured tip points to true North. Rotated by the

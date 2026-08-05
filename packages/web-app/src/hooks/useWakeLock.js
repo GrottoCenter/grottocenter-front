@@ -32,7 +32,7 @@ const useWakeLock = active => {
         lock.addEventListener('release', () => {
           sentinel = null;
         });
-      } catch (e) {
+      } catch (_e) {
         // Unsupported or refused — tracking still works, just not the screen.
       }
     };

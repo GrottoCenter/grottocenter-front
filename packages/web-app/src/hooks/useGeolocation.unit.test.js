@@ -271,7 +271,7 @@ describe('useGeolocation', () => {
 
     const deliverFix = () =>
       act(() => {
-        const calls = geolocation.watchPosition.mock.calls;
+        const { calls } = geolocation.watchPosition.mock;
         calls[calls.length - 1][0](makePosition());
       });
 
@@ -359,7 +359,7 @@ describe('useGeolocation', () => {
       // but no proof the provider works. Rebuilding here would restart the
       // acquisition every 30s and the circle would never shrink.
       act(() => {
-        const calls = geolocation.watchPosition.mock.calls;
+        const { calls } = geolocation.watchPosition.mock;
         calls[calls.length - 1][0](makePosition({ accuracy: 1200 }));
       });
 
@@ -377,7 +377,7 @@ describe('useGeolocation', () => {
         useGeolocation({ watch: true, enableHighAccuracy: true })
       );
       act(() => {
-        const calls = geolocation.watchPosition.mock.calls;
+        const { calls } = geolocation.watchPosition.mock;
         calls[calls.length - 1][0](makePosition({ accuracy: 1200 }));
         calls[calls.length - 1][0](makePosition({ accuracy: 8 }));
       });
@@ -431,9 +431,11 @@ describe('useGeolocation', () => {
 
     it('goes silent while a permission dialog is pending or was dismissed', () => {
       permissionState = 'prompt';
-      renderHook(() => useGeolocation({ watch: true, enableHighAccuracy: true }));
+      renderHook(() =>
+        useGeolocation({ watch: true, enableHighAccuracy: true })
+      );
       act(() => {
-        const calls = geolocation.watchPosition.mock.calls;
+        const { calls } = geolocation.watchPosition.mock;
         calls[calls.length - 1][0](makePosition({ accuracy: 8 }));
       });
 
@@ -462,9 +464,11 @@ describe('useGeolocation', () => {
       // a worse trade than the dialog it guards against, so 'unknown' keeps the
       // watchdog running exactly as it always did.
       permissionState = 'unknown';
-      renderHook(() => useGeolocation({ watch: true, enableHighAccuracy: true }));
+      renderHook(() =>
+        useGeolocation({ watch: true, enableHighAccuracy: true })
+      );
       act(() => {
-        const calls = geolocation.watchPosition.mock.calls;
+        const { calls } = geolocation.watchPosition.mock;
         calls[calls.length - 1][0](makePosition({ accuracy: 8 }));
       });
 

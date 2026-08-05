@@ -9,12 +9,12 @@ const mockMap = { hasLayer: vi.fn(() => false) };
 const circleProps = vi.fn();
 
 vi.mock('react-leaflet', () => {
-  const React = require('react');
+  const { createElement } = require('react');
   return {
     useMap: () => mockMap,
     Circle: props => {
       circleProps(props);
-      return React.createElement('div', { 'data-testid': 'accuracy-circle' });
+      return createElement('div', { 'data-testid': 'accuracy-circle' });
     }
   };
 });

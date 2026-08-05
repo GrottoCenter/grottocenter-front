@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, screen, act, waitFor } from '@testing-library/react';
 import { IntlProvider } from 'react-intl';
 import LocationControl from './LocationControl';
@@ -103,7 +102,11 @@ const setupOrientation = () => {
   });
   window.matchMedia =
     window.matchMedia ||
-    (() => ({ matches: true, addListener: () => {}, removeListener: () => {} }));
+    (() => ({
+      matches: true,
+      addListener: () => {},
+      removeListener: () => {}
+    }));
 };
 
 const emitPosition = (coords = {}) =>
@@ -230,7 +233,9 @@ describe('LocationControl', () => {
     act(() => button().click());
     await waitFor(() => expect(watchSuccess).toBeDefined());
     emitPosition();
-    await waitFor(() => expect(mockMap.containerPointToLatLng).toHaveBeenCalled());
+    await waitFor(() =>
+      expect(mockMap.containerPointToLatLng).toHaveBeenCalled()
+    );
 
     // Container point of the user is (400, 300) in a 800x600 map: centered means
     // the requested center keeps the same x and y.
@@ -342,8 +347,8 @@ describe('LocationControl', () => {
     await waitFor(() => expect(labelOf()).toBe('Reset to north')); // compass
 
     act(() => mapEventHandlers.dragstart());
-    await waitFor(() =>
-      expect(labelOf()).toBe('Recenter on your location') // located
+    await waitFor(
+      () => expect(labelOf()).toBe('Recenter on your location') // located
     );
   });
 
@@ -360,7 +365,9 @@ describe('LocationControl', () => {
     const callsAfterPopup = mockMap.setView.mock.calls.length;
 
     emitPosition({ latitude: 45.3, longitude: 5.7 });
-    await new Promise(r => setTimeout(r, 20));
+    await new Promise(r => {
+      setTimeout(r, 20);
+    });
     expect(mockMap.setView.mock.calls.length).toBe(callsAfterPopup);
   });
 
@@ -380,7 +387,9 @@ describe('LocationControl', () => {
     mockMap.setBearing.mockClear();
 
     emitHeading(180);
-    await new Promise(r => setTimeout(r, 20));
+    await new Promise(r => {
+      setTimeout(r, 20);
+    });
     expect(mockMap.setBearing).not.toHaveBeenCalled();
     // The bearing stays where it was; the north button remains to straighten it.
     expect(screen.getAllByRole('button')).toHaveLength(2);
@@ -423,7 +432,9 @@ describe('LocationControl', () => {
 
     // A new fix must no longer move the map.
     emitPosition({ latitude: 45.3, longitude: 5.7 });
-    await new Promise(r => setTimeout(r, 20));
+    await new Promise(r => {
+      setTimeout(r, 20);
+    });
     expect(mockMap.setView.mock.calls.length).toBe(callsAfterDrag);
   });
 

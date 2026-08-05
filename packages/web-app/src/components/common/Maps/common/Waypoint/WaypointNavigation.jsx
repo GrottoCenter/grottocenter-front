@@ -1,4 +1,3 @@
-import React from 'react';
 import PropTypes from 'prop-types';
 import { useUserLocation } from '@/components/common/Maps/common/MapLocationContext';
 import WaypointLayer from './WaypointLayer';

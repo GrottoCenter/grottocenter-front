@@ -25,7 +25,8 @@ const useContinuousAngle = angle => {
   continuousRef.current =
     continuousRef.current == null
       ? angle
-      : continuousRef.current + shortestAngleDelta(continuousRef.current, angle);
+      : continuousRef.current +
+        shortestAngleDelta(continuousRef.current, angle);
   return continuousRef.current;
 };
 

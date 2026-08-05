@@ -14,6 +14,8 @@ vi.mock('react-leaflet', () => ({
 
 beforeEach(() => {
   Object.keys(handlers).forEach(k => delete handlers[k]);
+  // Mocking leaflet.fullscreen's own flag — see useIsFullscreen.js.
+  // eslint-disable-next-line no-underscore-dangle
   delete mockMap._isFullscreen;
 });
 
@@ -37,6 +39,7 @@ describe('useIsFullscreen', () => {
     // never receive 'enterFullscreen'. Reading events alone left them believing
     // they were windowed, and their MUI overlays portaled out of the fullscreen
     // element — where a browser paints nothing.
+    // eslint-disable-next-line no-underscore-dangle
     mockMap._isFullscreen = true;
     const { result } = renderHook(() => useIsFullscreen());
     expect(result.current).toBe(true);

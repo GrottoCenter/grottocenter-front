@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useMapEvent } from 'react-leaflet';
 import { useIntl } from 'react-intl';
 import {

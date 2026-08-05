@@ -25,10 +25,7 @@ const isValidWaypoint = v =>
 
 const useWaypoint = () => {
   const [raw, setWaypoint] = useLocalStorage(WAYPOINT_STORAGE_KEY, null);
-  const waypoint = useMemo(
-    () => (isValidWaypoint(raw) ? raw : null),
-    [raw]
-  );
+  const waypoint = useMemo(() => (isValidWaypoint(raw) ? raw : null), [raw]);
   return [waypoint, setWaypoint];
 };
 

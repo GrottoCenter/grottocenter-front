@@ -10,6 +10,8 @@ vi.mock('react-leaflet', () => ({
 }));
 
 beforeEach(() => {
+  // Mocking leaflet.fullscreen's own flag — see useIsFullscreen.js.
+  // eslint-disable-next-line no-underscore-dangle
   delete mockMap._isFullscreen;
 });
 
@@ -24,6 +26,7 @@ describe('useMapOverlayContainer', () => {
   it('portals into the map container once fullscreen', () => {
     // The map container IS the fullscreen element, and a browser paints nothing
     // outside it: an overlay left on document.body is simply never shown.
+    // eslint-disable-next-line no-underscore-dangle
     mockMap._isFullscreen = true;
     const { result } = renderHook(() => useMapOverlayContainer());
     expect(result.current).toBe(mapContainer);

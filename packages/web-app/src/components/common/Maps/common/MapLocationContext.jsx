@@ -1,4 +1,4 @@
-import React, {
+import {
   createContext,
   useCallback,
   useContext,
@@ -151,7 +151,9 @@ MapLocationProvider.propTypes = { children: PropTypes.node };
 export const useUserLocation = () => {
   const ctx = useContext(UserLocationContext);
   if (!ctx) {
-    throw new Error('useUserLocation must be used within a MapLocationProvider');
+    throw new Error(
+      'useUserLocation must be used within a MapLocationProvider'
+    );
   }
   return ctx;
 };
