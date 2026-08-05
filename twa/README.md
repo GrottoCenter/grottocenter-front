@@ -142,13 +142,27 @@ Make sure the PWA is already deployed and valid at `https://grottocenter.org`
 
 - **Manually** — GitHub → Actions → _TWA Android Build_ → Run workflow, providing a
   `version_name` in strict semver `X.Y.Z` (e.g. `1.0.0`).
-- **By pushing a tag** `X.Y.Z` (plain semver, no `v` prefix) — the version name is the tag.
+- **By pushing a tag** `app-X.Y.Z` (e.g. `app-1.0.0`) — the version name is the tag
+  without its `app-` prefix.
+
+> **Why the `app-` prefix?** The repository has two independent release tracks, so the
+> tags are namespaced to keep them apart:
+>
+> | Tag         | Created by                                         | Ships                        |
+> | ----------- | -------------------------------------------------- | ---------------------------- |
+> | `X.Y.Z`     | release-please (`.github/workflows/release.yml`)   | the web app + `CHANGELOG.md` |
+> | `app-X.Y.Z` | you, when the Android shell itself needs a rebuild | the signed `.aab` / `.apk`   |
+>
+> Without the prefix, every web release would trigger a full Android build and both
+> workflows would fight over the same tag. **The version stays plain semver
+> everywhere** — the prefix is a tag namespace only, and it is stripped before the
+> version reaches Gradle or the Play Store.
 
 Version handling **decouples the two Android version fields**, which is the standard
 Play Store practice:
 
-- **`versionName`** (the human-facing version) = the semver above. A non-semver value
-  fails the build early.
+- **`versionName`** (the human-facing version) = the semver above, never the raw tag:
+  `app-1.2.3` produces `versionName "1.2.3"`. A non-semver value fails the build early.
 - **`versionCode`** (the integer Play compares) = **`github.run_number`**, a
   CI-managed counter that GitHub increments on every run. This guarantees it is
   **strictly increasing** for each build regardless of the version name — a hard Play
@@ -166,8 +180,9 @@ The workflow signs with your upload key, then:
 
 1. uploads `*.aab` / `*.apk` as a **workflow artifact** (30-day retention — for quick
    debugging only, not durable storage), and
-2. publishes a **GitHub Release** `vX.Y.Z` with the `.aab`/`.apk` attached — this is
-   the **permanent, versioned archive** of each build.
+2. publishes a **GitHub Release** `app-X.Y.Z` with the `.aab`/`.apk` attached — this is
+   the **permanent, versioned archive** of each build. It is a separate release from
+   the web one release-please publishes under the bare `X.Y.Z` tag.
 
 (Local alternative: build it yourself — see [Building locally](#building-locally).)
 
@@ -322,7 +337,7 @@ The AAB is a shell; the content is served from the web.
 | Change                                                                          | Action                                                                                           |
 | ------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
 | Content, features, UI fixes, data, translations…                                | **Deploy the website** (push to `develop`). Users get it immediately, **no Play Store release**. |
-| App icon, name, `packageId`, chrome colors, `minSdkVersion`, native permissions | **Regenerate + commit** the project (see above), then run the workflow (tag or dispatch) and republish. |
+| App icon, name, `packageId`, chrome colors, `minSdkVersion`, native permissions | **Regenerate + commit** the project (see above), then run the workflow (push an `app-X.Y.Z` tag, or dispatch it manually) and republish. |
 | Keystore rotation                                                               | Rebuild the AAB **and** update `assetlinks.json` fingerprints, then redeploy the web.            |
 
 > In practice, after the first release the AAB is rebuilt **rarely**. That is the

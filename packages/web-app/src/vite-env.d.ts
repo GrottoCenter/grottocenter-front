@@ -10,6 +10,9 @@ interface ImportMetaEnv {
   readonly VITE_BI_URL?: string;
   readonly VITE_DISABLE_MAP_TOUR?: string;
   readonly VITE_TURNSTILE_SITE_KEY?: string;
+  // Injected by CI at build time from the version about to be tagged; .env
+  // provides a placeholder for local development.
+  readonly VITE_APP_VERSION?: string;
 }
 
 interface ImportMeta {

@@ -9,14 +9,18 @@ on:
         default: '1.0.0'
   push:
     tags:
-      # Only semver release tags (1.0.0, 10.2.3…) trigger a build + Release.
+      # Only Android release tags (app-1.0.0, app-10.2.3…) trigger a build.
+      # The `app-` namespace keeps this workflow off the web release tags: bare
+      # semver (1.0.0) belongs to release-please, which tags the web app on every
+      # merged release PR. Android ships on its own cadence, so it gets its own
+      # prefix — but the version inside the tag stays plain semver.
       # GitHub Actions tag filters are globs, not regex: [0-9] is a digit class,
       # + means "one or more of the preceding", and \. escapes the literal dot
       # (without escaping, `.` would match any character — including `-`, which
-      # would let tags like `1-0-0` trigger a build only to fail semver validation).
+      # would let tags like `app-1-0-0` trigger a build only to fail validation).
       # The Resolve step still validates strict semver as defense-in-depth (and
       # for workflow_dispatch).
-      - '[0-9]+\.[0-9]+\.[0-9]+'
+      - 'app-[0-9]+\.[0-9]+\.[0-9]+'
 
 jobs:
   build:
@@ -47,10 +51,11 @@ jobs:
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             NAME="${{ github.event.inputs.version_name }}"
           else
-            # Tag push: derive the name from the tag (v1.2.3 -> 1.2.3).
-            NAME="${GITHUB_REF_NAME#v}"
+            # Tag push: strip the namespace prefix (app-1.2.3 -> 1.2.3).
+            NAME="${GITHUB_REF_NAME#app-}"
           fi
-          # versionName must be strict semver X.Y.Z (human-facing version).
+          # versionName must be strict semver X.Y.Z (human-facing version): the
+          # `app-` prefix is a tag namespace only and must never reach Gradle.
           if ! printf '%s' "$NAME" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+$'; then
             echo "::error::version must be semver X.Y.Z (got '$NAME')"
             exit 1
@@ -61,7 +66,8 @@ jobs:
           CODE="${{ github.run_number }}"
           echo "name=$NAME" >> "$GITHUB_OUTPUT"
           echo "code=$CODE" >> "$GITHUB_OUTPUT"
-          echo "Resolved version: $NAME (code $CODE)"
+          echo "tag=app-$NAME" >> "$GITHUB_OUTPUT"
+          echo "Resolved version: $NAME (code $CODE, tag app-$NAME)"
 
       - name: Decode keystore from secret
         env:
@@ -107,9 +113,10 @@ jobs:
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          # On a tag push GITHUB_REF_NAME is reused; on workflow_dispatch the tag
-          # is created from the resolved version name. Tags are plain semver (no v).
-          tag_name: ${{ steps.version.outputs.name }}
+          # Always the app- namespaced tag: on a tag push it matches the tag that
+          # triggered the run, on workflow_dispatch it is created here. Never the
+          # bare semver tag — that one is release-please's web release.
+          tag_name: ${{ steps.version.outputs.tag }}
           name: Grottocenter App ${{ steps.version.outputs.name }} (build ${{ steps.version.outputs.code }})
           generate_release_notes: true
           # files are relative to the repo root, not working-directory.
