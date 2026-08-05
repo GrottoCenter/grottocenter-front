@@ -56,6 +56,7 @@ export const followCenterYOffset = (height, offsetRatio) =>
 // Moved here from MeasureControl so both the measure tool and the waypoint HUD
 // share a single implementation. Intl.NumberFormat instances are cached per
 // locale — the waypoint HUD reformats the distance on every position update.
+// Never cleared — bounded in practice by the handful of locales the app ships.
 const formatterCache = new Map();
 const getFormatters = locale => {
   let cached = formatterCache.get(locale);

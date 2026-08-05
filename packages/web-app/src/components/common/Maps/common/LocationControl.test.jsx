@@ -233,8 +233,9 @@ describe('LocationControl', () => {
     await waitFor(() => expect(mockMap.containerPointToLatLng).toHaveBeenCalled());
 
     // Container point of the user is (400, 300) in a 800x600 map: centered means
-    // the requested center keeps the same y.
+    // the requested center keeps the same x and y.
     const point = mockMap.containerPointToLatLng.mock.calls[0][0];
+    expect(point[0]).toBe(400);
     expect(point[1]).toBe(300);
   });
 

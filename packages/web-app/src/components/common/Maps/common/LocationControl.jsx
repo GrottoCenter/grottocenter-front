@@ -78,11 +78,18 @@ const LocationControl = () => {
   // wake lock.
   const [userActivated, setUserActivated] = useState(false);
 
-  // Keep the shared geolocation watch and orientation sensor alive whenever we
-  // are tracking. The provider owns their lifecycle (ref-counted), so the sensor
-  // stays on for other consumers — e.g. the waypoint arrow — independently.
+  // Keep the shared geolocation watch alive whenever we are tracking (LOCATED
+  // and up). The heading sensor is narrower: requesting it during a
+  // permission-granted auto-start (LOCATED reached without a tap) would start
+  // the orientation sensor — and its no-data timeout — before the user asked
+  // for anything, so it only turns on once FOLLOW/COMPASS is reached or the
+  // user has actually tapped. The provider is ref-counted, so other consumers
+  // (the location dot's cone, the waypoint arrow) still get a heading
+  // independently via their own request.
   useRequestUserLocation(mode !== MODE.OFF, userActivated);
-  useRequestHeading(mode !== MODE.OFF);
+  useRequestHeading(
+    (mode !== MODE.OFF && mode !== MODE.LOCATED) || userActivated
+  );
 
   // Already-granted permission: show the user where they are without making them
   // ask for something they have already agreed to. Reading the permission never

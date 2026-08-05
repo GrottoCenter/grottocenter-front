@@ -431,6 +431,10 @@ const HydratedMap = ({
       />
       <MassifPolygons massifs={showMassifPolygons ? massifPolygons : []} />
       <PopupTargetHandler popupTarget={popupTarget} />
+      {/* HydratedMap is always rendered inside CustomMapContainer's
+          MapLocationProvider, so WaypointNavigation needs no provider of its
+          own — the provider only starts subscribing on the first
+          enable()/requestHeading() call, so non-touch users pay nothing. */}
       {isTouch && waypoint && (
         <WaypointNavigation
           waypoint={waypoint}

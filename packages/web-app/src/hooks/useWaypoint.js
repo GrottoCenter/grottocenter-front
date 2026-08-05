@@ -14,7 +14,9 @@ export const WAYPOINT_STORAGE_KEY = 'grottocenter_waypoint';
 // A previous session may have written garbage (partial write, unrelated code
 // clobbering the key, older schema) — pass anything but a finite lat/lng pair
 // into Leaflet and it throws. Guard here so every consumer reads a known-good
-// waypoint or null.
+// waypoint or null. Forward-compatible: an object with extra keys beyond
+// lat/lng (a future schema addition) still passes through unchanged —
+// downstream consumers only ever read lat/lng off it.
 const isValidWaypoint = v =>
   v !== null &&
   typeof v === 'object' &&

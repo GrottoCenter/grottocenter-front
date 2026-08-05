@@ -178,6 +178,8 @@ export const useDeviceHeading = () => {
 // asked for by tapping the control is field navigation and deserves the wake
 // lock; tracking auto-started from an already-granted permission is not, and
 // must leave the screen alone.
+//
+// Returns void — calling it is the only step, the effects above own the rest.
 export const useRequestUserLocation = (active, keepScreenAwake = false) => {
   const { enable, disable, requestAwake, releaseAwake } = useUserLocation();
   useEffect(() => {
@@ -195,6 +197,8 @@ export const useRequestUserLocation = (active, keepScreenAwake = false) => {
 // Same declarative contract for the compass heading: any consumer that draws a
 // heading (the dot's cone, the waypoint arrow) requests one while it is mounted,
 // instead of one component owning the sensor for everybody.
+//
+// Returns void — calling it is the only step, the effect above owns the rest.
 export const useRequestHeading = active => {
   const { requestHeading, releaseHeading } = useDeviceHeading();
   useEffect(() => {
