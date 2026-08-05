@@ -39,10 +39,10 @@ export const useMoveRelevanceWithUndo = moveThunk => {
                   dispatch(moveThunk(entityId, direction * -1))
                     .then(undoResult => {
                       if (undoResult?.error) {
-                        enqueueSnackbar(
-                          formatMessage({ id: 'genericError' }),
-                          { variant: 'error', autoHideDuration: 6000 }
-                        );
+                        enqueueSnackbar(formatMessage({ id: 'genericError' }), {
+                          variant: 'error',
+                          autoHideDuration: 6000
+                        });
                         return;
                       }
                       enqueueSnackbar(

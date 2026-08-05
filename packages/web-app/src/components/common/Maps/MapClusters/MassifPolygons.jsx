@@ -1,7 +1,8 @@
-import React, { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { useMap } from 'react-leaflet';
 import L from 'leaflet';
 import PropTypes from 'prop-types';
+import { areaCoordinatesPropType } from '@/types/geojson.type';
 import { MassifPopup } from '../common/Markers/Components';
 import useRenderPopup from '../common/Markers/useRenderPopup';
 import { makeIconTooltip } from '../common/Markers/tooltipHelpers';
@@ -14,7 +15,10 @@ const getBboxArea = geometry => {
     geometry.type === 'MultiPolygon'
       ? geometry.coordinates.flat(2)
       : geometry.coordinates.flat(1);
-  let minLng = Infinity, maxLng = -Infinity, minLat = Infinity, maxLat = -Infinity;
+  let minLng = Infinity;
+  let maxLng = -Infinity;
+  let minLat = Infinity;
+  let maxLat = -Infinity;
   for (const [lng, lat] of coords) {
     if (lng < minLng) minLng = lng;
     if (lng > maxLng) maxLng = lng;
@@ -105,7 +109,7 @@ export const massifPolygonType = PropTypes.shape({
   name: PropTypes.string,
   geogPolygon: PropTypes.shape({
     type: PropTypes.string,
-    coordinates: PropTypes.array
+    coordinates: areaCoordinatesPropType
   }),
   entranceCount: PropTypes.number,
   networkCount: PropTypes.number

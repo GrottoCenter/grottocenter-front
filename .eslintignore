@@ -1,9 +1,0 @@
-**/node_modules/**
-**/*.d.ts
-**/dist/**
-**/storybook-static/**
-**/coverage/**
-**/build/**
-**/.git/**
-**/public/**
-!.eslintrc.js

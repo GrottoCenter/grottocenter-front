@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useIntl } from 'react-intl';
 import { Typography, Skeleton, Box, Chip } from '@mui/material';
 import PropTypes from 'prop-types';

@@ -17,7 +17,6 @@ import { sortByRelevance } from '../../../../helpers/sortByRelevance';
 import Alert from '../../../common/Alert';
 import DiscardChangesDialog from '../../../common/DiscardChangesDialog';
 
-
 const Riggings = ({ riggings, entranceId, isEditAllowed }) => {
   const { formatMessage } = useIntl();
   const dispatch = useDispatch();
@@ -25,7 +24,8 @@ const Riggings = ({ riggings, entranceId, isEditAllowed }) => {
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [isFormDirty, setIsFormDirty] = useState(false);
   const [isDiscardDialogOpen, setIsDiscardDialogOpen] = useState(false);
-  const { movingId, handleMove } = useMoveRelevanceWithUndo(moveRiggingRelevance);
+  const { movingId, handleMove } =
+    useMoveRelevanceWithUndo(moveRiggingRelevance);
 
   const closeForm = () => {
     setIsFormVisible(false);
@@ -66,15 +66,13 @@ const Riggings = ({ riggings, entranceId, isEditAllowed }) => {
               isFormVisible
                 ? formatMessage({ id: 'Cancel adding a new rigging' })
                 : formatMessage({ id: 'Add a new rigging' })
-            }
-          >
+            }>
             <Button
               color={isFormVisible ? 'inherit' : 'secondary'}
               size="small"
               variant="outlined"
               onClick={handleToggleForm}
-              startIcon={isFormVisible ? <CancelIcon /> : <AddCircleIcon />}
-            >
+              startIcon={isFormVisible ? <CancelIcon /> : <AddCircleIcon />}>
               {formatMessage({ id: isFormVisible ? 'Cancel' : 'New' })}
             </Button>
           </Tooltip>

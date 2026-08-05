@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
 import { useIntl } from 'react-intl';
@@ -21,9 +21,9 @@ import {
 } from '@mui/material';
 import ClearIcon from '@mui/icons-material/Clear';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
+import LicenseTag from '@/components/common/LicenseTag';
 import CoordinateFormSection from '../../EntitiesForm/utils/CoordinateFormSection';
 import { coordinatesMarkerIcon } from '../../../../assets/icons';
-import LicenseTag from '@/components/common/LicenseTag';
 
 import {
   SET_CONTEXT,
@@ -104,7 +104,8 @@ const ContextStep = ({ initialCaveId, caveIdLocked }) => {
     if (
       watchedLat === prevCoordsRef.current.lat &&
       watchedLng === prevCoordsRef.current.lng
-    ) return;
+    )
+      return;
     prevCoordsRef.current = { lat: watchedLat, lng: watchedLng };
 
     const lat = watchedLat === '' ? null : Number(watchedLat);
@@ -132,18 +133,14 @@ const ContextStep = ({ initialCaveId, caveIdLocked }) => {
     const reduxLng = context.longitude;
 
     if (reduxLat !== formLat) {
-      setCoordValue(
-        'latitude',
-        reduxLat != null ? String(reduxLat) : '',
-        { shouldValidate: false }
-      );
+      setCoordValue('latitude', reduxLat != null ? String(reduxLat) : '', {
+        shouldValidate: false
+      });
     }
     if (reduxLng !== formLng) {
-      setCoordValue(
-        'longitude',
-        reduxLng != null ? String(reduxLng) : '',
-        { shouldValidate: false }
-      );
+      setCoordValue('longitude', reduxLng != null ? String(reduxLng) : '', {
+        shouldValidate: false
+      });
     }
     // Intentionally excluding watchedLat/watchedLng and setCoordValue — this
     // effect syncs Redux → form only when Redux coordinates change externally
@@ -160,7 +157,11 @@ const ContextStep = ({ initialCaveId, caveIdLocked }) => {
 
   // Pre-fill cave when locked
   useEffect(() => {
-    if (caveIdLocked && initialCaveId !== null && context.caveId !== initialCaveId) {
+    if (
+      caveIdLocked &&
+      initialCaveId !== null &&
+      context.caveId !== initialCaveId
+    ) {
       dispatch({
         type: SET_CONTEXT,
         context: { caveId: initialCaveId, caveIdLocked: true }
@@ -207,44 +208,43 @@ const ContextStep = ({ initialCaveId, caveIdLocked }) => {
 
     const abortController = new AbortController();
 
-    dispatch(fetchCaveById(context.caveId, { signal: abortController.signal }))
-      .then(data => {
-        if (!data) return;
-        const name = data.name
-          || (data.entrances && data.entrances[0] && data.entrances[0].name)
-          || `#${data.id}`;
-        setSelectedCave({
-          id: data.id,
-          name,
-          depth: data.depth || null,
-          length: data.length || null
-        });
-
-        const eligibleEntrances = (data.entrances || []).filter(
-          e =>
-            !e.isSensitive &&
-            e.latitude != null &&
-            e.longitude != null
-        );
-        setCaveEntrances(eligibleEntrances);
-
-        if (
-          context.locationMode === 'pointAndCave' &&
-          !context.unknownCoordinates &&
-          context.latitude == null &&
-          context.longitude == null &&
-          eligibleEntrances.length > 0
-        ) {
-          const entrance = eligibleEntrances[0];
-          dispatch({
-            type: SET_CONTEXT,
-            context: {
-              latitude: entrance.latitude,
-              longitude: entrance.longitude
-            }
-          });
-        }
+    dispatch(
+      fetchCaveById(context.caveId, { signal: abortController.signal })
+    ).then(data => {
+      if (!data) return;
+      const name =
+        data.name ||
+        (data.entrances && data.entrances[0] && data.entrances[0].name) ||
+        `#${data.id}`;
+      setSelectedCave({
+        id: data.id,
+        name,
+        depth: data.depth || null,
+        length: data.length || null
       });
+
+      const eligibleEntrances = (data.entrances || []).filter(
+        e => !e.isSensitive && e.latitude != null && e.longitude != null
+      );
+      setCaveEntrances(eligibleEntrances);
+
+      if (
+        context.locationMode === 'pointAndCave' &&
+        !context.unknownCoordinates &&
+        context.latitude == null &&
+        context.longitude == null &&
+        eligibleEntrances.length > 0
+      ) {
+        const entrance = eligibleEntrances[0];
+        dispatch({
+          type: SET_CONTEXT,
+          context: {
+            latitude: entrance.latitude,
+            longitude: entrance.longitude
+          }
+        });
+      }
+    });
 
     return () => abortController.abort();
     // Excluding dispatch, selectedCave, context.latitude,
@@ -255,7 +255,11 @@ const ContextStep = ({ initialCaveId, caveIdLocked }) => {
 
   // Restore authors from context.authorIds when selectedAuthors is empty (e.g. from profile import)
   useEffect(() => {
-    if (!context.authorIds || context.authorIds.length === 0 || selectedAuthors.length > 0)
+    if (
+      !context.authorIds ||
+      context.authorIds.length === 0 ||
+      selectedAuthors.length > 0
+    )
       return undefined;
 
     const abortController = new AbortController();
@@ -319,7 +323,7 @@ const ContextStep = ({ initialCaveId, caveIdLocked }) => {
   };
 
   const handleUnknownCoordinatesChange = e => {
-    const checked = e.target.checked;
+    const { checked } = e.target;
     const updates = { unknownCoordinates: checked };
 
     if (checked) {
@@ -358,33 +362,29 @@ const ContextStep = ({ initialCaveId, caveIdLocked }) => {
 
     if (cave) {
       // Fetch cave details and populate entrances for map display
-      dispatch(fetchCaveById(cave.id))
-        .then(data => {
-          if (!data || !data.entrances) return;
-          const eligibleEntrances = data.entrances.filter(
-            e =>
-              !e.isSensitive &&
-              e.latitude != null &&
-              e.longitude != null
-          );
-          setCaveEntrances(eligibleEntrances);
+      dispatch(fetchCaveById(cave.id)).then(data => {
+        if (!data || !data.entrances) return;
+        const eligibleEntrances = data.entrances.filter(
+          e => !e.isSensitive && e.latitude != null && e.longitude != null
+        );
+        setCaveEntrances(eligibleEntrances);
 
-          // Pre-fill coordinates only in "pointAndCave" mode
-          const entrance = eligibleEntrances[0];
-          if (
-            entrance &&
-            context.locationMode === 'pointAndCave' &&
-            !context.unknownCoordinates
-          ) {
-            dispatch({
-              type: SET_CONTEXT,
-              context: {
-                latitude: entrance.latitude,
-                longitude: entrance.longitude
-              }
-            });
-          }
-        });
+        // Pre-fill coordinates only in "pointAndCave" mode
+        const entrance = eligibleEntrances[0];
+        if (
+          entrance &&
+          context.locationMode === 'pointAndCave' &&
+          !context.unknownCoordinates
+        ) {
+          dispatch({
+            type: SET_CONTEXT,
+            context: {
+              latitude: entrance.latitude,
+              longitude: entrance.longitude
+            }
+          });
+        }
+      });
     } else {
       setCaveEntrances([]);
     }
@@ -408,7 +408,10 @@ const ContextStep = ({ initialCaveId, caveIdLocked }) => {
     setLocalSamplingInterval(raw);
     const parsed = parseInt(raw, 10);
     const newValue = raw === '' || Number.isNaN(parsed) ? null : parsed;
-    dispatch({ type: SET_SAMPLING_INTERVAL, samplingIntervalSeconds: newValue });
+    dispatch({
+      type: SET_SAMPLING_INTERVAL,
+      samplingIntervalSeconds: newValue
+    });
   };
 
   // ===== Render =====
@@ -416,8 +419,8 @@ const ContextStep = ({ initialCaveId, caveIdLocked }) => {
   const showPoint = context.locationMode !== 'caveOnly';
   const showCave = context.locationMode !== 'pointOnly';
   const coordinatesRequired = context.locationMode === 'pointOnly';
-  const showCoordinates = showPoint &&
-    (coordinatesRequired || !context.unknownCoordinates);
+  const showCoordinates =
+    showPoint && (coordinatesRequired || !context.unknownCoordinates);
 
   return (
     <Box
@@ -464,7 +467,9 @@ const ContextStep = ({ initialCaveId, caveIdLocked }) => {
         <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 0.5 }}>
           <Box sx={{ flex: 1, maxWidth: 480 }}>
             <Typography variant="subtitle2" gutterBottom>
-              {formatMessage({ id: 'ImportObservationsWizard.ContextStep.caveLabel' })}
+              {formatMessage({
+                id: 'ImportObservationsWizard.ContextStep.caveLabel'
+              })}
             </Typography>
             <CaveAutoCompleteSearch
               key={selectedCave ? selectedCave.id : 'empty'}
@@ -493,7 +498,9 @@ const ContextStep = ({ initialCaveId, caveIdLocked }) => {
           <TextField
             required
             variant="filled"
-            label={formatMessage({ id: 'ImportObservationsWizard.ContextStep.pointLabel' })}
+            label={formatMessage({
+              id: 'ImportObservationsWizard.ContextStep.pointLabel'
+            })}
             placeholder={formatMessage({
               id: 'ImportObservationsWizard.ContextStep.pointLabelPlaceholder'
             })}
@@ -533,7 +540,13 @@ const ContextStep = ({ initialCaveId, caveIdLocked }) => {
         </Box>
       )}
       {/* Observation name + language */}
-      <Box sx={{ display: 'flex', gap: 1, maxWidth: 480, alignItems: 'flex-start' }}>
+      <Box
+        sx={{
+          display: 'flex',
+          gap: 1,
+          maxWidth: 480,
+          alignItems: 'flex-start'
+        }}>
         <TextField
           variant="filled"
           label={formatMessage({
@@ -562,7 +575,9 @@ const ContextStep = ({ initialCaveId, caveIdLocked }) => {
         <AuthorsSelect
           value={selectedAuthors}
           onChange={handleAuthorsChange}
-          label={formatMessage({ id: 'ImportObservationsWizard.ContextStep.authorsLabel' })}
+          label={formatMessage({
+            id: 'ImportObservationsWizard.ContextStep.authorsLabel'
+          })}
           noOptionsText={formatMessage({
             id: 'ImportObservationsWizard.ContextStep.authorsNoOptions'
           })}
@@ -571,18 +586,27 @@ const ContextStep = ({ initialCaveId, caveIdLocked }) => {
       {/* License selector */}
       <FormControl size="small" sx={{ minWidth: 240, maxWidth: 320 }} required>
         <InputLabel id="license-label">
-          {formatMessage({ id: 'ImportObservationsWizard.ContextStep.licenseLabel' })}
+          {formatMessage({
+            id: 'ImportObservationsWizard.ContextStep.licenseLabel'
+          })}
         </InputLabel>
         <Select
           labelId="license-label"
           value={context.licenseId !== null ? context.licenseId : ''}
-          label={formatMessage({ id: 'ImportObservationsWizard.ContextStep.licenseLabel' })}
+          label={formatMessage({
+            id: 'ImportObservationsWizard.ContextStep.licenseLabel'
+          })}
           onChange={e => handleFieldChange('licenseId', e.target.value)}
           disabled={licensesLoading}
           renderValue={id => (
             <LicenseTag license={allowedLicenses.find(l => l.id === id)} />
           )}
-          data-testid="license-select">
+          data-testid="license-select"
+          MenuProps={{
+            slotProps: {
+              paper: { 'data-testid': 'license-menu' }
+            }
+          }}>
           {allowedLicenses.map(license => (
             <MenuItem key={license.id} value={license.id}>
               <LicenseTag license={license} />
@@ -591,7 +615,9 @@ const ContextStep = ({ initialCaveId, caveIdLocked }) => {
         </Select>
         {licensesLoading && (
           <FormHelperText>
-            {formatMessage({ id: 'ImportObservationsWizard.ContextStep.loadingLicenses' })}
+            {formatMessage({
+              id: 'ImportObservationsWizard.ContextStep.loadingLicenses'
+            })}
           </FormHelperText>
         )}
       </FormControl>
@@ -621,14 +647,24 @@ const ContextStep = ({ initialCaveId, caveIdLocked }) => {
       {/* Optional fields */}
       <Box>
         <Typography variant="subtitle2" gutterBottom>
-          {formatMessage({ id: 'ImportObservationsWizard.ContextStep.optionalFieldsTitle' })}
+          {formatMessage({
+            id: 'ImportObservationsWizard.ContextStep.optionalFieldsTitle'
+          })}
         </Typography>
 
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, maxWidth: 480 }}>
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 1,
+            maxWidth: 480
+          }}>
           {/* Data quality */}
           <FormControl size="small" sx={{ minWidth: 200, maxWidth: 240 }}>
             <InputLabel id="data-quality-label">
-              {formatMessage({ id: 'ImportObservationsWizard.ContextStep.dataQuality' })}
+              {formatMessage({
+                id: 'ImportObservationsWizard.ContextStep.dataQuality'
+              })}
             </InputLabel>
             <Select
               labelId="data-quality-label"

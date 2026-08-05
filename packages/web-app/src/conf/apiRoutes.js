@@ -66,7 +66,11 @@ export const getRegionUrl = (countryId, regionId) =>
   `${API_BASE_PATH}/countries/${countryId}/regions/${regionId}`;
 export const getStatisticsRegionUrl = (countryId, regionId) =>
   `${API_BASE_PATH}/countries/${countryId}/regions/${regionId}/statistics`;
-export const getRegionEntrancesUrl = (countryId, regionId, { limit, offset } = {}) => {
+export const getRegionEntrancesUrl = (
+  countryId,
+  regionId,
+  { limit, offset } = {}
+) => {
   const params = new URLSearchParams();
   if (limit !== undefined) params.append('limit', limit);
   if (offset !== undefined) params.append('offset', offset);
@@ -79,7 +83,11 @@ export const deleteCountryOrganizationUrl = (countryId, organizationId) =>
   `${API_BASE_PATH}/countries/${countryId}/organizations/${organizationId}`;
 export const putRegionOrganizationUrl = (countryId, regionId, organizationId) =>
   `${API_BASE_PATH}/countries/${countryId}/regions/${regionId}/organizations/${organizationId}`;
-export const deleteRegionOrganizationUrl = (countryId, regionId, organizationId) =>
+export const deleteRegionOrganizationUrl = (
+  countryId,
+  regionId,
+  organizationId
+) =>
   `${API_BASE_PATH}/countries/${countryId}/regions/${regionId}/organizations/${organizationId}`;
 
 // ===== Descriptions urls
@@ -87,7 +95,8 @@ export const postDescriptionUrl = `${API_BASE_PATH}/descriptions`;
 export const putDescriptionUrl = descriptionId =>
   `${API_BASE_PATH}/descriptions/${descriptionId}`;
 export const deleteDescriptionUrl = (descriptionId, isPermanent = false) =>
-  `${API_BASE_PATH}/descriptions/${descriptionId}?${isPermanent ? 'isPermanent=1' : ''
+  `${API_BASE_PATH}/descriptions/${descriptionId}?${
+    isPermanent ? 'isPermanent=1' : ''
   }`;
 export const restoreDescriptionUrl = descriptionId =>
   `${API_BASE_PATH}/descriptions/${descriptionId}/restore`;
@@ -99,7 +108,8 @@ export const postCommentUrl = `${API_BASE_PATH}/comments`;
 export const putCommentUrl = commentId =>
   `${API_BASE_PATH}/comments/${commentId}`;
 export const deleteCommentUrl = (commentId, isPermanent = false) =>
-  `${API_BASE_PATH}/comments/${commentId}?${isPermanent ? 'isPermanent=1' : ''
+  `${API_BASE_PATH}/comments/${commentId}?${
+    isPermanent ? 'isPermanent=1' : ''
   }`;
 export const restoreCommentUrl = commentId =>
   `${API_BASE_PATH}/comments/${commentId}/restore`;
@@ -111,7 +121,8 @@ export const postRiggingsUrl = `${API_BASE_PATH}/riggings`;
 export const putRiggingsUrl = riggingsId =>
   `${API_BASE_PATH}/riggings/${riggingsId}`;
 export const deleteRiggingsUrl = (riggingsId, isPermanent = false) =>
-  `${API_BASE_PATH}/riggings/${riggingsId}?${isPermanent ? 'isPermanent=1' : ''
+  `${API_BASE_PATH}/riggings/${riggingsId}?${
+    isPermanent ? 'isPermanent=1' : ''
   }`;
 export const restoreRiggingsUrl = riggingsId =>
   `${API_BASE_PATH}/riggings/${riggingsId}/restore`;
@@ -213,7 +224,8 @@ export const postHistoryUrl = `${API_BASE_PATH}/histories`;
 export const putHistoryUrl = historyId =>
   `${API_BASE_PATH}/histories/${historyId}`;
 export const deleteHistoryUrl = (historyId, isPermanent = false) =>
-  `${API_BASE_PATH}/histories/${historyId}?${isPermanent ? 'isPermanent=1' : ''
+  `${API_BASE_PATH}/histories/${historyId}?${
+    isPermanent ? 'isPermanent=1' : ''
   }`;
 export const restoreHistoryUrl = historyId =>
   `${API_BASE_PATH}/histories/${historyId}/restore`;
@@ -225,7 +237,8 @@ export const postLocationUrl = `${API_BASE_PATH}/locations`;
 export const putLocationUrl = locationId =>
   `${API_BASE_PATH}/locations/${locationId}`;
 export const deleteLocationUrl = (locationId, isPermanent = false) =>
-  `${API_BASE_PATH}/locations/${locationId}?${isPermanent ? 'isPermanent=1' : ''
+  `${API_BASE_PATH}/locations/${locationId}?${
+    isPermanent ? 'isPermanent=1' : ''
   }`;
 export const restoreLocationUrl = locationId =>
   `${API_BASE_PATH}/locations/${locationId}/restore`;
@@ -233,7 +246,8 @@ export const moveLocationRelevanceUrl = locationId =>
   `${API_BASE_PATH}/locations/${locationId}/move-relevance`;
 // ===== Snapshots urls
 export const getSnapshotsUrl = (typeId, typeName, isNetwork, getAll) =>
-  `${API_BASE_PATH}/${typeName}/${typeId}/${getAll ? 'all-snapshots' : 'snapshots'
+  `${API_BASE_PATH}/${typeName}/${typeId}/${
+    getAll ? 'all-snapshots' : 'snapshots'
   }${isNetwork ? `?isNetwork=${isNetwork}` : ''}`;
 
 // ===== Massifs urls
@@ -325,8 +339,7 @@ export const postPersonGroupsUrl = userId =>
   `${API_BASE_PATH}/cavers/${userId}/groups`;
 export const putCaverUrl = userId => `${API_BASE_PATH}/cavers/${userId}`;
 export const getDbExportUrls = `${API_BASE_PATH}/cavers/export/db`;
-export const banCaverUrl = caverId =>
-  `${API_BASE_PATH}/cavers/${caverId}/ban`;
+export const banCaverUrl = caverId => `${API_BASE_PATH}/cavers/${caverId}/ban`;
 export const unbanCaverUrl = caverId =>
   `${API_BASE_PATH}/cavers/${caverId}/unban`;
 export const deletePersonUrl = (userId, entityId) =>
@@ -373,8 +386,7 @@ export const observationsImportUrl = `${API_BASE_PATH}/observations/import`;
 // ===== Devices urls
 export const devicesUrl = `${API_BASE_PATH}/devices`;
 export const devicesSearchUrl = `${API_BASE_PATH}/devices/search`;
-export const getDeviceUrl = deviceId =>
-  `${API_BASE_PATH}/devices/${deviceId}`;
+export const getDeviceUrl = deviceId => `${API_BASE_PATH}/devices/${deviceId}`;
 export const deviceConfigurationsUrl = deviceId =>
   `${API_BASE_PATH}/devices/${deviceId}/configurations`;
 

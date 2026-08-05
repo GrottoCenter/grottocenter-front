@@ -1,9 +1,8 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { Box, Breadcrumbs, Skeleton, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { useNavigate, useParams } from 'react-router-dom';
-import AppLink from '../../components/common/AppLink';
 import { useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import CreateIcon from '@mui/icons-material/Create';
@@ -12,12 +11,19 @@ import ManageHistoryIcon from '@mui/icons-material/ManageHistory';
 import NewspaperIcon from '@mui/icons-material/Newspaper';
 import ShareIcon from '@mui/icons-material/Share';
 import { NavigateNext } from '@mui/icons-material';
+import { LicenseBadge } from '@/components/common/LicenseTag';
+import { fetchLicense } from '@/actions/Licenses';
+import {
+  CHILDREN_SORT_ORDERS,
+  DEFAULT_CHILDREN_SORT_ORDER,
+  sortDocumentChildren
+} from '@/utils/documentChildrenSort';
+import { getIssuesYearRange } from '@/utils/documentChildrenLabel';
+import AppLink from '../../components/common/AppLink';
 
 import useOpenLink from '../../hooks/useOpenLink';
 import CustomIcon from '../../components/common/CustomIcon';
 import DocumentTypeChip from '../../components/common/DocumentTypeChip';
-import { LicenseBadge } from '@/components/common/LicenseTag';
-import { fetchLicense } from '@/actions/Licenses';
 import {
   DOCUMENT_TYPE_ICONS,
   DOCUMENT_TYPE_FALLBACK_ICON,
@@ -39,12 +45,6 @@ import DocumentChildrenList, {
   ChildrenSectionHeader,
   DocumentChildrenTiles
 } from './DocumentChildrenList';
-import {
-  CHILDREN_SORT_ORDERS,
-  DEFAULT_CHILDREN_SORT_ORDER,
-  sortDocumentChildren
-} from '@/utils/documentChildrenSort';
-import { getIssuesYearRange } from '@/utils/documentChildrenLabel';
 import { fetchDocumentDetails } from '../../actions/Document/GetDocumentDetails';
 import { fetchDocumentChildren } from '../../actions/Document/GetDocumentChildren';
 import { deleteDocument } from '../../actions/Document/DeleteDocument';
@@ -358,8 +358,7 @@ const Document = ({
           display: 'flex',
           alignItems: 'center',
           gap: { xs: '4px', md: '6px' }
-        }}
-      >
+        }}>
         <ParentTypeIcon sx={{ fontSize: 'inherit' }} />
         {documentData.parent.title}
       </AppLink>
@@ -417,6 +416,51 @@ const Document = ({
       ]}
     />
   );
+
+  // What sits under the description depends on the document type: a
+  // collection lists its issues, an event shows its date, anything else
+  // shows the attached files.
+  let bodySection = <FilesSection files={allFiles} />;
+  if (isCollection(docType)) {
+    bodySection = (
+      <Box>
+        <ChildrenSectionHeader
+          title={
+            // h2 in secondary with the shared CountBadge, exactly like
+            // ScrollableContent's own titles: this is a section heading among
+            // its peers, and h5 under the page's h1 skipped three levels for
+            // no reason.
+            <Typography variant="h2" color="secondary">
+              {formatMessage({ id: 'Issues' })}
+              <CountBadge count={childIssues.length} />
+            </Typography>
+          }
+          controls={
+            <ChildrenControls
+              documents={childIssues}
+              sortOrder={issuesSortOrder}
+              onSortOrderChange={setIssuesSortOrder}
+            />
+          }
+        />
+        {childIssues.length > 0 ? (
+          <DocumentChildrenTiles
+            documents={sortedChildIssues}
+            collectionTitle={documentData.title}
+          />
+        ) : (
+          <EmptySection
+            icon={<NewspaperIcon fontSize="large" color="disabled" />}
+            message={formatMessage({
+              id: 'No issues in this collection.'
+            })}
+          />
+        )}
+      </Box>
+    );
+  } else if (isEvent(docType)) {
+    bodySection = <EventDateSection date={documentData.datePublication} />;
+  }
 
   return (
     <PageContainer>
@@ -499,51 +543,7 @@ const Document = ({
                         />
                       )}
                       <SummaryText>{documentData.description}</SummaryText>
-                      {isCollection(docType) ? (
-                        <Box>
-                          <ChildrenSectionHeader
-                            title={
-                              // h2 in secondary with the shared CountBadge,
-                              // exactly like ScrollableContent's own titles: this
-                              // is a section heading among its peers, and h5 under
-                              // the page's h1 skipped three levels for no reason.
-                              <Typography variant="h2" color="secondary">
-                                {formatMessage({ id: 'Issues' })}
-                                <CountBadge count={childIssues.length} />
-                              </Typography>
-                            }
-                            controls={
-                              <ChildrenControls
-                                documents={childIssues}
-                                sortOrder={issuesSortOrder}
-                                onSortOrderChange={setIssuesSortOrder}
-                              />
-                            }
-                          />
-                          {childIssues.length > 0 ? (
-                            <DocumentChildrenTiles
-                              documents={sortedChildIssues}
-                              collectionTitle={documentData.title}
-                            />
-                          ) : (
-                            <EmptySection
-                              icon={
-                                <NewspaperIcon
-                                  fontSize="large"
-                                  color="disabled"
-                                />
-                              }
-                              message={formatMessage({
-                                id: 'No issues in this collection.'
-                              })}
-                            />
-                          )}
-                        </Box>
-                      ) : isEvent(docType) ? (
-                        <EventDateSection date={documentData.datePublication} />
-                      ) : (
-                        <FilesSection files={allFiles} />
-                      )}
+                      {bodySection}
                     </MainColumn>
                     <SideColumn $firstOnMobile={isCollection(docType)}>
                       <DetailsList>

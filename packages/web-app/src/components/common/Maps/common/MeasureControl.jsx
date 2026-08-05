@@ -1,10 +1,4 @@
-import React, {
-  useState,
-  useRef,
-  useCallback,
-  useEffect,
-  useMemo
-} from 'react';
+import { useState, useRef, useCallback, useEffect, useMemo } from 'react';
 import { useMap, useMapEvents } from 'react-leaflet';
 import * as L from 'leaflet';
 import StraightenIcon from '@mui/icons-material/Straighten';
@@ -140,7 +134,8 @@ const MeasureControl = () => {
     waypointsRef.current = [];
     totalDistRef.current = 0;
     setWaypointCount(0);
-    targetMap.getContainer().style.cursor = '';
+    const container = targetMap.getContainer();
+    container.style.cursor = '';
   }, []);
 
   const handleFinish = useCallback(() => {
@@ -221,7 +216,8 @@ const MeasureControl = () => {
       if (stateRef.current !== STATES.MEASURING) return;
       e.originalEvent._measureDblclick = true;
       map.once('click', evt => {
-        evt.originalEvent._measureDblclick = true;
+        const { originalEvent } = evt;
+        originalEvent._measureDblclick = true;
       });
       handleFinish();
     },

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
@@ -14,6 +14,8 @@ import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
 import ShareIcon from '@mui/icons-material/Share';
 import { useReactToPrint } from 'react-to-print';
 
+import ExploreOutlinedIcon from '@mui/icons-material/ExploreOutlined';
+import PermMediaOutlinedIcon from '@mui/icons-material/PermMediaOutlined';
 import {
   usePermissions,
   useSubscriptions,
@@ -24,8 +26,6 @@ import { subscribeToMassif } from '../../../actions/Subscriptions/SubscribeToMas
 import { unsubscribeFromMassif } from '../../../actions/Subscriptions/UnsubscribeFromMassif';
 import { deleteMassif } from '../../../actions/Massif/DeleteMassif';
 import { restoreMassif } from '../../../actions/Massif/RestoreMassif';
-import ExploreOutlinedIcon from '@mui/icons-material/ExploreOutlined';
-import PermMediaOutlinedIcon from '@mui/icons-material/PermMediaOutlined';
 import PageContainer from '../../common/Layouts/PageContainer';
 import PageHeader from '../../common/Layouts/PageHeader';
 import PageTabs from '../../common/Layouts/PageTabs';
@@ -275,8 +275,7 @@ const Massif = ({ isLoading, error, massif }) => {
                             component="div"
                             variant="caption"
                             color="text.secondary"
-                            sx={{ mt: massif?.geogPolygon ? 1 : 0.25 }}
-                          >
+                            sx={{ mt: massif?.geogPolygon ? 1 : 0.25 }}>
                             {massif.author && (
                               <AuthorAndDate
                                 author={massif.author}
@@ -312,8 +311,7 @@ const Massif = ({ isLoading, error, massif }) => {
                   color="primary"
                   size="large"
                   startIcon={<CustomIcon type="entrance" size={24} />}
-                  onClick={() => navigate(`/ui/massifs/${massifId}/entrances`)}
-                >
+                  onClick={() => navigate(`/ui/massifs/${massifId}/entrances`)}>
                   {formatMessage({ id: 'Entrances list' })}
                   {dataMassif?.nb_caves ? ` (${dataMassif.nb_caves})` : ''}
                 </Button>

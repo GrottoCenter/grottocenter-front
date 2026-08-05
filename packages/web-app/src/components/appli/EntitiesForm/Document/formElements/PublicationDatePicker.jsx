@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import { useContext, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import {
@@ -118,10 +118,13 @@ const PublicationDatePicker = ({ required = false, label = null }) => {
             </Translate>
           )}
           {required && (
-            <Box component="span" aria-hidden sx={{
-              color: 'error.main'
-            }}>
-              {'*'}
+            <Box
+              component="span"
+              aria-hidden
+              sx={{
+                color: 'error.main'
+              }}>
+              *
             </Box>
           )}
         </Typography>

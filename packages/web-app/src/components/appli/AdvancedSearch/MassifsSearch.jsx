@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useIntl } from 'react-intl';
 
@@ -16,7 +16,7 @@ const MassifsSearch = () => {
   const { formatMessage } = useIntl();
   const [query, setQuery] = useState('');
 
-  const startAdvancedsearch = (overrideQuery) =>
+  const startAdvancedsearch = overrideQuery =>
     dispatch(
       fetchAdvancedSearchResults({
         entity: ADVANCED_SEARCH_TYPES.MASSIFS,

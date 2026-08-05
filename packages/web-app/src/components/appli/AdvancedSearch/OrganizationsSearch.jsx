@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useIntl } from 'react-intl';
 
@@ -47,13 +47,18 @@ const OrganizationsSearch = () => {
   const [advancedExpanded, setAdvancedExpanded] = useState(false);
   const searchEntity = ADVANCED_SEARCH_TYPES.ORGANIZATIONS;
 
-  const startAdvancedsearch = (overrideQuery, overrideFilter, overrideMatchAll) =>
+  const startAdvancedsearch = (
+    overrideQuery,
+    overrideFilter,
+    overrideMatchAll
+  ) =>
     dispatch(
       fetchAdvancedSearchResults({
         entity: searchEntity,
         query: overrideQuery !== undefined ? overrideQuery : query,
         filter: overrideFilter !== undefined ? overrideFilter : filterState,
-        matchAllFields: overrideMatchAll !== undefined ? overrideMatchAll : matchAllFields,
+        matchAllFields:
+          overrideMatchAll !== undefined ? overrideMatchAll : matchAllFields,
         size: getStoredRowsPerPage()
       })
     );

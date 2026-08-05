@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
@@ -144,27 +144,45 @@ const DocumentSearch = () => {
     );
 
   const advancedFilterCount = countActiveFilters(filterState, [
-    'title', 'description', 'subjects.code',
-    'identifierType', 'identifier', 'importSource', 'importId',
-    'datePublication', 'iso3166.iso', 'license', 'pages',
-    'authors.nickname', 'authorsOrganization.name', 'editor.name', 'library.name', 'issue',
-    'parent.title', 'cave.name', 'entrances.name', 'massifs.name'
+    'title',
+    'description',
+    'subjects.code',
+    'identifierType',
+    'identifier',
+    'importSource',
+    'importId',
+    'datePublication',
+    'iso3166.iso',
+    'license',
+    'pages',
+    'authors.nickname',
+    'authorsOrganization.name',
+    'editor.name',
+    'library.name',
+    'issue',
+    'parent.title',
+    'cave.name',
+    'entrances.name',
+    'massifs.name'
   ]);
 
   const docTypeOptions = useMemo(
     () =>
-      documentTypes.filter(e => e.isAvailable).map(e => {
-        const Icon = DOCUMENT_TYPE_ICONS[e.name] ?? DOCUMENT_TYPE_FALLBACK_ICON;
-        return [
-          e.name,
-          <Box
-            key={e.name}
-            sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-            <Icon sx={{ fontSize: 18, color: 'text.secondary' }} />
-            <Translate>{e.name}</Translate>
-          </Box>
-        ];
-      }),
+      documentTypes
+        .filter(e => e.isAvailable)
+        .map(e => {
+          const Icon =
+            DOCUMENT_TYPE_ICONS[e.name] ?? DOCUMENT_TYPE_FALLBACK_ICON;
+          return [
+            e.name,
+            <Box
+              key={e.name}
+              sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+              <Icon sx={{ fontSize: 18, color: 'text.secondary' }} />
+              <Translate>{e.name}</Translate>
+            </Box>
+          ];
+        }),
     [documentTypes]
   );
 
@@ -292,7 +310,9 @@ const DocumentSearch = () => {
           </SearchFormContainer>
         </SearchFieldset>
 
-        <SearchFieldset title="Contributors" containerSx={{ justifyContent: 'flex-start' }}>
+        <SearchFieldset
+          title="Contributors"
+          containerSx={{ justifyContent: 'flex-start' }}>
           <SearchTextAutocomplete
             ressourceType={searchEntity}
             ressourceField="authors.nickname"

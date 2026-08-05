@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useMemo } from 'react';
+import { useContext, useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { styled } from '@mui/material/styles';
 import {
@@ -53,7 +53,6 @@ const IdentifierEditor = () => {
       return allIdentifierTypes.find(e => e.id === document.identifierType);
 
     return document.identifierType;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [allIdentifierTypes, document.identifierType]);
 
   const regexp = identifierType?.regexp ?? null;
@@ -104,7 +103,10 @@ const IdentifierEditor = () => {
         {shouldShowIdentifierTypeInput && (
           <Fade in={shouldShowIdentifierTypeInput}>
             <IdentifierTypeContainer>
-              <Typography variant="caption" color="text.secondary" display="block">
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                display="block">
                 <Translate>DOI, ISBN, ISSN, URL…</Translate>
               </Typography>
               <FormControl

@@ -80,17 +80,14 @@ describe('tileToBounds', () => {
 
   it('produces bounds where sw < ne on each axis', () => {
     fc.assert(
-      fc.property(
-        fc.integer({ min: 0, max: 12 }),
-        (z) => {
-          const n = 2 ** z;
-          const x = Math.min(n - 1, Math.floor(n / 3));
-          const y = Math.min(n - 1, Math.floor(n / 3));
-          const b = tileToBounds(x, y, z);
-          expect(b.sw_lat).toBeLessThan(b.ne_lat);
-          expect(b.sw_lng).toBeLessThan(b.ne_lng);
-        }
-      )
+      fc.property(fc.integer({ min: 0, max: 12 }), z => {
+        const n = 2 ** z;
+        const x = Math.min(n - 1, Math.floor(n / 3));
+        const y = Math.min(n - 1, Math.floor(n / 3));
+        const b = tileToBounds(x, y, z);
+        expect(b.sw_lat).toBeLessThan(b.ne_lat);
+        expect(b.sw_lng).toBeLessThan(b.ne_lng);
+      })
     );
   });
 });
@@ -138,7 +135,12 @@ describe('tilesForBounds', () => {
 
   it('covers the whole world at zoom 1', () => {
     const tiles = tilesForBounds(
-      { sw_lat: -MAX_LAT + 0.1, sw_lng: -179.9, ne_lat: MAX_LAT - 0.1, ne_lng: 179.9 },
+      {
+        sw_lat: -MAX_LAT + 0.1,
+        sw_lng: -179.9,
+        ne_lat: MAX_LAT - 0.1,
+        ne_lng: 179.9
+      },
       1
     );
     // 2x2 grid at zoom 1.
@@ -177,7 +179,9 @@ describe('tilesForBounds', () => {
 
 describe('tileKey', () => {
   it('joins entity, z, x, y with colons', () => {
-    expect(tileKey('entrances', { x: 3, y: 5, z: 12 })).toBe('entrances:12:3:5');
+    expect(tileKey('entrances', { x: 3, y: 5, z: 12 })).toBe(
+      'entrances:12:3:5'
+    );
   });
 
   it('is unique per (entity, tile) tuple', () => {

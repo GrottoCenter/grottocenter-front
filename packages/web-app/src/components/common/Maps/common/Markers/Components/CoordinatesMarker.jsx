@@ -1,6 +1,5 @@
 import * as L from 'leaflet';
 import { renderToString } from 'react-dom/server';
-import React from 'react';
 import { Icon } from '@mui/material';
 import markers from '../../../../../../conf/MapMarkersConfig';
 

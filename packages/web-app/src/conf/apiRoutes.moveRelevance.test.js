@@ -28,7 +28,7 @@ describe('Property 4: URL builder correctness', () => {
   builders.forEach(({ fn, plural }) => {
     it(`${plural} URL builder produces correct path for any positive ID`, () => {
       fc.assert(
-        fc.property(fc.integer({ min: 1, max: 999999 }), (id) => {
+        fc.property(fc.integer({ min: 1, max: 999999 }), id => {
           const url = fn(id);
           return url.endsWith(`/${plural}/${id}/move-relevance`);
         }),

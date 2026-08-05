@@ -1,4 +1,3 @@
-import * as React from 'react';
 import { Box } from '@mui/material';
 import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
@@ -10,7 +9,8 @@ import EntranceCharacteristicsSnapshot from './EntranceCharacteristicsSnapshot';
 
 const EntranceNetworkSnapshots = information => {
   const { entrance, previous } = information;
-  const hasCoordinates = entrance.latitude != null && entrance.longitude != null;
+  const hasCoordinates =
+    entrance.latitude != null && entrance.longitude != null;
   const hasPreviousCoordinates =
     previous?.latitude != null && previous?.longitude != null;
   const lat = Number(entrance.latitude);
@@ -67,7 +67,10 @@ const EntranceNetworkSnapshots = information => {
           url={`/ui/caves/${caveId}`}
         />
       )}
-      <EntranceCharacteristicsSnapshot entrance={entrance} previous={previous} />
+      <EntranceCharacteristicsSnapshot
+        entrance={entrance}
+        previous={previous}
+      />
     </Box>
   );
 };

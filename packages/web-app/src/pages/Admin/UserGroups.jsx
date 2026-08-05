@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import { styled } from '@mui/material/styles';
@@ -103,9 +103,7 @@ const UserGroups = ({
         {formatMessage({ id: 'Banned' })}
       </Typography>
       <Tooltip
-        title={
-          isSelfUser ? formatMessage({ id: 'Cannot ban yourself' }) : ''
-        }
+        title={isSelfUser ? formatMessage({ id: 'Cannot ban yourself' }) : ''}
         arrow>
         <span>
           <FormControlLabel

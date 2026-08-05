@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import { Component } from 'react';
 import PropTypes from 'prop-types';
 import SyncIcon from '@mui/icons-material/Sync';
 import { styled } from '@mui/material/styles';
@@ -41,7 +41,6 @@ class Goal extends Component {
   render() {
     const { className, textColor, entry } = this.props;
     return (
-      // eslint-disable-next-line jsx-a11y/mouse-events-have-key-events
       <div
         className={className}
         onMouseOver={event => this.handleMouseOver(event)}

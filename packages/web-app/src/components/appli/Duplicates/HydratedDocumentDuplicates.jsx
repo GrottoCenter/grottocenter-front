@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useIntl } from 'react-intl';
 import { LinearProgress as MuiLinearProgress } from '@mui/material';
@@ -63,14 +63,12 @@ const HydratedDocumentDuplicates = ({
     } else {
       goBack();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentDuplicate]);
 
   useEffect(() => {
     if ([200, 204].includes(latestHttpCode)) {
       dispatch(deleteDuplicate(currentDuplicateId, 'document'));
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [latestHttpCode]);
 
   useEffect(() => {
@@ -78,7 +76,6 @@ const HydratedDocumentDuplicates = ({
       onSuccessSubmit();
       setCurrentDuplicate(currentDuplicate + 1);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [latestHttpCodeOnDelete]);
 
   useEffect(() => {
@@ -86,7 +83,6 @@ const HydratedDocumentDuplicates = ({
       onSuccessNotDuplicateSubmit();
       setCurrentDuplicate(currentDuplicate + 1);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [latestHttpCodeOnCreate]);
 
   return (

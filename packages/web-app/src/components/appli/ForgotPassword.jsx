@@ -3,7 +3,10 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useIntl } from 'react-intl';
 import { useNavigate } from 'react-router-dom';
 import { isValidEmail } from '../../conf/config';
-import { postForgotPassword, resetForgotPassword } from '../../actions/ForgotPassword';
+import {
+  postForgotPassword,
+  resetForgotPassword
+} from '../../actions/ForgotPassword';
 import { useBoolean, useNotification, usePermissions } from '../../hooks';
 import ForgotPasswordPage from '../../pages/ForgotPassword';
 

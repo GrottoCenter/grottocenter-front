@@ -1,8 +1,9 @@
-import React, { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 
+import { useIntl } from 'react-intl';
 import { updateEntrance } from '../../../../actions/Entrance/UpdateEntrance';
 import { postEntrance } from '../../../../actions/Entrance/CreateEntrance';
 import {
@@ -12,7 +13,6 @@ import {
 
 import { FormContainer, FormActionRow } from '../utils/FormContainers';
 import { normelizeCoordinate } from '../utils/InputCoordinate';
-import { useIntl } from 'react-intl';
 import { usePermissions, useNotification } from '../../../../hooks';
 import FormProgressInfo from '../utils/FormProgressInfo';
 import LicenseBox from '../utils/LicenseBox';

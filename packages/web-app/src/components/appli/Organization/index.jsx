@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
 import { useIntl } from 'react-intl';
@@ -7,7 +7,6 @@ import Skeleton from '@mui/material/Skeleton';
 import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import { Box, Card, Stack, Typography } from '@mui/material';
-import AppLink from '../../common/AppLink';
 import CreateIcon from '@mui/icons-material/Create';
 import DeleteIcon from '@mui/icons-material/Delete';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
@@ -16,6 +15,7 @@ import AddCircleIcon from '@mui/icons-material/AddCircle';
 import CancelIcon from '@mui/icons-material/Cancel';
 import HandshakeIcon from '@mui/icons-material/Handshake';
 import ShareIcon from '@mui/icons-material/Share';
+import AppLink from '../../common/AppLink';
 import StandardDialog from '../../common/StandardDialog';
 import PageContainer from '../../common/Layouts/PageContainer';
 import PageHeader from '../../common/Layouts/PageHeader';
@@ -188,15 +188,13 @@ const Organization = ({ error, isLoading, organization }) => {
           </Typography>
         }
         alignItems="center"
-        flexWrap="wrap"
-      >
+        flexWrap="wrap">
         {organization.country && (
           <AppLink
             to={`/ui/countries/${organization.country}`}
             underline="hover"
             color="inherit"
-            sx={{ display: 'flex', alignItems: 'center', gap: '4px' }}
-          >
+            sx={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
             <CustomIcon type="country" size={16} />
             {organization.country}
           </AppLink>
@@ -204,8 +202,7 @@ const Organization = ({ error, isLoading, organization }) => {
         {organization.yearBirth && (
           <Typography
             component="span"
-            sx={{ fontSize: 'inherit', color: 'inherit' }}
-          >
+            sx={{ fontSize: 'inherit', color: 'inherit' }}>
             {`${formatMessage({ id: 'Since' })} ${organization.yearBirth}`}
           </Typography>
         )}
@@ -214,8 +211,7 @@ const Organization = ({ error, isLoading, organization }) => {
             <HandshakeIcon sx={{ fontSize: 'inherit' }} />
             <Typography
               component="span"
-              sx={{ fontSize: 'inherit', color: 'inherit' }}
-            >
+              sx={{ fontSize: 'inherit', color: 'inherit' }}>
               {formatMessage({ id: 'Official partner' })}
             </Typography>
           </Box>
@@ -305,8 +301,7 @@ const Organization = ({ error, isLoading, organization }) => {
                 <Tooltip
                   title={formatMessage({
                     id: isMember ? 'Leave organization' : 'Join organization'
-                  })}
-                >
+                  })}>
                   <Button
                     variant="outlined"
                     color="primary"
@@ -315,12 +310,10 @@ const Organization = ({ error, isLoading, organization }) => {
                     startIcon={
                       isMember ? <PersonRemoveIcon /> : <PersonAddIcon />
                     }
-                    sx={{ minWidth: 0 }}
-                  >
+                    sx={{ minWidth: 0 }}>
                     <Box
                       component="span"
-                      sx={{ display: { xs: 'none', sm: 'inline' } }}
-                    >
+                      sx={{ display: { xs: 'none', sm: 'inline' } }}>
                       {isMember
                         ? formatMessage({ id: 'Leave organization' })
                         : formatMessage({ id: 'Join organization' })}
@@ -384,16 +377,14 @@ const Organization = ({ error, isLoading, organization }) => {
                     id: isCaveSearchVisible
                       ? 'Cancel this search'
                       : 'Add a cave'
-                  })}
-                >
+                  })}>
                   <Button
                     color={isCaveSearchVisible ? 'inherit' : 'secondary'}
                     variant="outlined"
                     onClick={() => setIsCaveSearchVisible(v => !v)}
                     startIcon={
                       isCaveSearchVisible ? <CancelIcon /> : <AddCircleIcon />
-                    }
-                  >
+                    }>
                     {formatMessage({
                       id: isCaveSearchVisible ? 'Cancel' : 'Add'
                     })}
@@ -426,21 +417,18 @@ const Organization = ({ error, isLoading, organization }) => {
           <>
             <Button
               onClick={() => setPendingRemoveMember(null)}
-              variant="outlined"
-            >
+              variant="outlined">
               {formatMessage({ id: 'Cancel' })}
             </Button>
             <Button
               onClick={handleConfirmRemoveMember}
               variant="contained"
               color="error"
-              autoFocus
-            >
+              autoFocus>
               {formatMessage({ id: 'Remove' })}
             </Button>
           </>
-        }
-      >
+        }>
         {formatMessage(
           {
             id: 'Are you sure you want to remove {name} from this organization?'

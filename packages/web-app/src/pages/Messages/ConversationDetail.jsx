@@ -1,10 +1,4 @@
-import React, {
-  useEffect,
-  useState,
-  useRef,
-  useCallback,
-  useMemo
-} from 'react';
+import { useEffect, useState, useRef, useCallback, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams, useNavigate } from 'react-router-dom';
@@ -25,14 +19,14 @@ import {
   useMediaQuery
 } from '@mui/material';
 import Linkify from 'linkify-react';
-import AppLink from '../../components/common/AppLink';
-import UserAvatar from '../../components/common/UserAvatar';
-import linkifyOptions from '../../helpers/linkifyOptions';
 import SendIcon from '@mui/icons-material/Send';
 import FlagIcon from '@mui/icons-material/Flag';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { styled, alpha } from '@mui/material/styles';
+import linkifyOptions from '../../helpers/linkifyOptions';
+import UserAvatar from '../../components/common/UserAvatar';
+import AppLink from '../../components/common/AppLink';
 
 import { fetchConversationMessages } from '../../actions/Messaging/GetConversationMessages';
 import { sendMessage } from '../../actions/Messaging/SendMessage';
@@ -345,7 +339,10 @@ const MessageItem = ({ item, isMenuOpen, onOpenMenu }) => {
 
 MessageItem.propTypes = {
   item: PropTypes.shape({
-    msg: PropTypes.object.isRequired,
+    msg: PropTypes.shape({
+      body: PropTypes.string,
+      dateSent: PropTypes.string
+    }).isRequired,
     isMine: PropTypes.bool.isRequired,
     isFirstOfGroup: PropTypes.bool.isRequired,
     isLastOfGroup: PropTypes.bool.isRequired
@@ -481,7 +478,7 @@ const ConversationDetail = () => {
   }, [dispatch, conversationId, hasMore, messages.length, status]);
 
   useEffect(() => {
-    if (!hasMore || status === REDUCER_STATUS.LOADING) return;
+    if (!hasMore || status === REDUCER_STATUS.LOADING) return undefined;
 
     const observer = new IntersectionObserver(
       entries => {
@@ -755,10 +752,10 @@ Message Body: ${body}`;
               fontSize: '0.75rem'
             }}>
             {replyText.length > 5000 &&
-              formatMessage({
+              `${formatMessage({
                 id: 'Message exceeds 5000 characters limit.',
                 defaultMessage: 'Message exceeds 5000 characters limit.'
-              }) + ' '}
+              })} `}
             {replyText.length} / 5000
           </Box>
         )}

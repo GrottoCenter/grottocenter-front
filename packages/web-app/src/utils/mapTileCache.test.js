@@ -33,7 +33,10 @@ const singleTileBounds = (x, y) => {
 };
 
 // Resolve every microtask/promise scheduled up to now.
-const flushPromises = () => new Promise(r => setTimeout(r, 0));
+const flushPromises = () =>
+  new Promise(r => {
+    setTimeout(r, 0);
+  });
 
 describe('mapTileCache', () => {
   let fetchMock;
@@ -68,8 +71,18 @@ describe('mapTileCache', () => {
       registerEntity(ENTITY, CONFIG);
       // Two adjacent tiles each carrying an overlapping id.
       fetchMock
-        .mockReturnValueOnce(fetchOk([{ id: 1, name: 'A' }, { id: 2, name: 'B' }]))
-        .mockReturnValueOnce(fetchOk([{ id: 2, name: 'B' }, { id: 3, name: 'C' }]));
+        .mockReturnValueOnce(
+          fetchOk([
+            { id: 1, name: 'A' },
+            { id: 2, name: 'B' }
+          ])
+        )
+        .mockReturnValueOnce(
+          fetchOk([
+            { id: 2, name: 'B' },
+            { id: 3, name: 'C' }
+          ])
+        );
 
       // Bounds spanning two adjacent tiles horizontally at CACHE_ZOOM.
       const left = tileToBounds(100, 100, CACHE_ZOOM);
@@ -94,7 +107,9 @@ describe('mapTileCache', () => {
     it('keeps id-less items (does not collide on undefined)', async () => {
       registerEntity(ENTITY, CONFIG);
       // Two id-less items in the same tile — both must appear in the union.
-      fetchMock.mockReturnValueOnce(fetchOk([{ name: 'no-id-1' }, { name: 'no-id-2' }]));
+      fetchMock.mockReturnValueOnce(
+        fetchOk([{ name: 'no-id-1' }, { name: 'no-id-2' }])
+      );
 
       fetchForBounds(ENTITY, singleTileBounds(200, 200), CACHE_ZOOM, dispatch);
       await flushPromises();
@@ -108,7 +123,9 @@ describe('mapTileCache', () => {
 
     it('skips null items inside tile data', async () => {
       registerEntity(ENTITY, CONFIG);
-      fetchMock.mockReturnValueOnce(fetchOk([null, { id: 1 }, null, { id: 2 }]));
+      fetchMock.mockReturnValueOnce(
+        fetchOk([null, { id: 1 }, null, { id: 2 }])
+      );
 
       fetchForBounds(ENTITY, singleTileBounds(210, 210), CACHE_ZOOM, dispatch);
       await flushPromises();
@@ -136,7 +153,9 @@ describe('mapTileCache', () => {
       // dispatch is version-gated and only lands when the version differs
       // from lastEmittedVersion (true on first ever call → 1 dispatch).
       expect(successCalls.length).toBeGreaterThanOrEqual(1);
-      expect(successCalls[successCalls.length - 1][0].data).toEqual([{ id: 1 }]);
+      expect(successCalls[successCalls.length - 1][0].data).toEqual([
+        { id: 1 }
+      ]);
     });
 
     it('does not re-dispatch when panning within already-cached tiles', async () => {
@@ -217,7 +236,9 @@ describe('mapTileCache', () => {
       await flushPromises();
 
       // Force the TTL to expire so the next call actually re-fetches.
-      const spy = vi.spyOn(Date, 'now').mockReturnValue(Date.now() + 10 * 60 * 1000);
+      const spy = vi
+        .spyOn(Date, 'now')
+        .mockReturnValue(Date.now() + 10 * 60 * 1000);
       fetchMock.mockReturnValueOnce(fetchFail(500));
 
       fetchForBounds(ENTITY, singleTileBounds(260, 260), CACHE_ZOOM, dispatch);
@@ -343,7 +364,12 @@ describe('mapTileCache', () => {
   describe('registerEntity guard', () => {
     it('throws when fetchForBounds is called before registerEntity', () => {
       expect(() =>
-        fetchForBounds('never-registered', singleTileBounds(0, 0), CACHE_ZOOM, dispatch)
+        fetchForBounds(
+          'never-registered',
+          singleTileBounds(0, 0),
+          CACHE_ZOOM,
+          dispatch
+        )
       ).toThrow(/not registered/);
     });
   });

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useMap } from 'react-leaflet';
 import PropTypes from 'prop-types';
@@ -32,10 +32,13 @@ const CustomControl = ({
   }, []);
 
   useEffect(() => {
-    if (!useLeafletControl || !map) return;
+    if (!useLeafletControl || !map) return undefined;
     const control = L.control({ position });
     control.onAdd = () => {
-      const div = L.DomUtil.create('div', containerClassName || 'leaflet-bar leaflet-control');
+      const div = L.DomUtil.create(
+        'div',
+        containerClassName || 'leaflet-bar leaflet-control'
+      );
       L.DomEvent.disableClickPropagation(div);
       L.DomEvent.disableScrollPropagation(div);
       setContainer(div);
@@ -54,7 +57,10 @@ const CustomControl = ({
 
   return (
     <div className={POSITION_CLASSES[position]} style={style}>
-      <div ref={controlRef} className="leaflet-control leaflet-bar" {...containerProps}>
+      <div
+        ref={controlRef}
+        className="leaflet-control leaflet-bar"
+        {...containerProps}>
         {children}
       </div>
     </div>

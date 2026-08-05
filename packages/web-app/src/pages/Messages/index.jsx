@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useIntl, FormattedDate } from 'react-intl';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
@@ -51,7 +51,7 @@ const StyledListItem = styled(ListItem, {
   },
   ...($isUnread && {
     '& .MuiListItemText-primary': {
-      fontWeight: 'bold',
+      fontWeight: 'bold'
     }
   })
 }));
@@ -131,12 +131,20 @@ const MessagesPage = () => {
   const isArchived = tabValue === 1;
   const listKey = isArchived ? 'archivedConversations' : 'activeConversations';
 
-  const { items: conversations, totalCount, status, error } = useSelector(
-    state => state.messaging[listKey]
-  );
+  const {
+    items: conversations,
+    totalCount,
+    status,
+    error
+  } = useSelector(state => state.messaging[listKey]);
 
   useEffect(() => {
-    dispatch(fetchConversations({ limit: PAGE_SIZE, skip: (page - 1) * PAGE_SIZE }, isArchived));
+    dispatch(
+      fetchConversations(
+        { limit: PAGE_SIZE, skip: (page - 1) * PAGE_SIZE },
+        isArchived
+      )
+    );
   }, [dispatch, page, isArchived]);
 
   const handleTabChange = (event, newValue) => {
@@ -161,7 +169,12 @@ const MessagesPage = () => {
       return (
         <Alert
           severity="error"
-          title={error?.message || formatMessage({ id: 'An error occurred while fetching conversations.' })}
+          title={
+            error?.message ||
+            formatMessage({
+              id: 'An error occurred while fetching conversations.'
+            })
+          }
         />
       );
     }
@@ -181,8 +194,12 @@ const MessagesPage = () => {
       if (a.unreadCount > 0 && b.unreadCount === 0) return -1;
       if (a.unreadCount === 0 && b.unreadCount > 0) return 1;
 
-      const dateA = a.lastMessage ? new Date(a.lastMessage.dateSent) : new Date(a.dateInscription);
-      const dateB = b.lastMessage ? new Date(b.lastMessage.dateSent) : new Date(b.dateInscription);
+      const dateA = a.lastMessage
+        ? new Date(a.lastMessage.dateSent)
+        : new Date(a.dateInscription);
+      const dateB = b.lastMessage
+        ? new Date(b.lastMessage.dateSent)
+        : new Date(b.dateInscription);
       return dateB - dateA;
     });
 
@@ -197,11 +214,14 @@ const MessagesPage = () => {
               divider
               onClick={() => navigate(`/ui/messages/${conv.id}`)}
               secondaryAction={
-                <Tooltip title={formatMessage({ id: isArchived ? 'Unarchive' : 'Archive' })}>
+                <Tooltip
+                  title={formatMessage({
+                    id: isArchived ? 'Unarchive' : 'Archive'
+                  })}>
                   <IconButton
                     edge="end"
-                    aria-label={isArchived ? "unarchive" : "archive"}
-                    onClick={(e) => {
+                    aria-label={isArchived ? 'unarchive' : 'archive'}
+                    onClick={e => {
                       e.stopPropagation();
                       if (isArchived) {
                         dispatch(unarchiveConversation(conv.id));
@@ -214,8 +234,7 @@ const MessagesPage = () => {
                           navigate('/ui/messages');
                         }
                       }
-                    }}
-                  >
+                    }}>
                     {isArchived ? <UnarchiveIcon /> : <ArchiveIcon />}
                   </IconButton>
                 </Tooltip>
@@ -228,12 +247,15 @@ const MessagesPage = () => {
                   <UserAvatar
                     username={conv.otherParticipant?.nickname}
                     color="primary"
-                    sx={{ width: 40, height: 40  }}
+                    sx={{ width: 40, height: 40 }}
                   />
                 </Badge>
               </ListItemAvatar>
               <ListItemText
-                primary={conv.otherParticipant?.nickname || formatMessage({ id: 'Unknown' })}
+                primary={
+                  conv.otherParticipant?.nickname ||
+                  formatMessage({ id: 'Unknown' })
+                }
                 secondary={
                   conv.lastMessage && (
                     <Typography
@@ -269,26 +291,34 @@ const MessagesPage = () => {
             componentToDisplay={
               <Box sx={{ display: 'flex', height: '100%', width: '100%' }}>
                 {/* Left Pane: Conversation List */}
-                <Box sx={{
-                  width: { xs: '100%', md: '350px' },
-                  flexShrink: 0,
-                  borderRight: 1,
-                  borderColor: 'divider',
-                  display: { xs: conversationId ? 'none' : 'flex', md: 'flex' },
-                  flexDirection: 'column',
-                  bgcolor: 'background.paper',
-                  position: 'relative'
-                }}>
-                  <Box sx={{
-                    p: 1,
-                    display: 'flex',
-                    justifyContent: { xs: 'center', md: 'space-between' },
-                    alignItems: 'center',
-                    borderBottom: 1,
-                    borderColor: 'divider'
+                <Box
+                  sx={{
+                    width: { xs: '100%', md: '350px' },
+                    flexShrink: 0,
+                    borderRight: 1,
+                    borderColor: 'divider',
+                    display: {
+                      xs: conversationId ? 'none' : 'flex',
+                      md: 'flex'
+                    },
+                    flexDirection: 'column',
+                    bgcolor: 'background.paper',
+                    position: 'relative'
                   }}>
+                  <Box
+                    sx={{
+                      p: 1,
+                      display: 'flex',
+                      justifyContent: { xs: 'center', md: 'space-between' },
+                      alignItems: 'center',
+                      borderBottom: 1,
+                      borderColor: 'divider'
+                    }}>
                     <Typography variant="h3" component="h1">
-                      {formatMessage({ id: 'Conversations', defaultMessage: 'Conversations' })}
+                      {formatMessage({
+                        id: 'Conversations',
+                        defaultMessage: 'Conversations'
+                      })}
                     </Typography>
                     <Button
                       variant="outlined"
@@ -317,7 +347,12 @@ const MessagesPage = () => {
                     {renderContent()}
 
                     {totalCount > PAGE_SIZE && (
-                      <Box sx={{ display: 'flex', justifyContent: 'center', py: 1 }}>
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          justifyContent: 'center',
+                          py: 1
+                        }}>
                         <Pagination
                           count={Math.ceil(totalCount / PAGE_SIZE)}
                           page={page}
@@ -345,12 +380,16 @@ const MessagesPage = () => {
                 </Box>
 
                 {/* Right Pane: Conversation Details */}
-                <Box sx={{
-                  flexGrow: 1,
-                  display: { xs: conversationId ? 'block' : 'none', md: 'block' },
-                  height: '100%',
-                  bgcolor: 'background.default'
-                }}>
+                <Box
+                  sx={{
+                    flexGrow: 1,
+                    display: {
+                      xs: conversationId ? 'block' : 'none',
+                      md: 'block'
+                    },
+                    height: '100%',
+                    bgcolor: 'background.default'
+                  }}>
                   <ConversationDetail />
                 </Box>
 

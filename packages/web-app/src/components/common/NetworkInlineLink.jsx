@@ -1,4 +1,3 @@
-import React from 'react';
 import PropTypes from 'prop-types';
 import { Link as MuiLink } from '@mui/material';
 import { networkIcon } from '../../assets/icons';
@@ -13,8 +12,7 @@ const NetworkInlineLink = ({ caveId, label, size = 16, variant = 'body2' }) => (
     to={`/ui/caves/${caveId}`}
     openInNewTabDesktop
     variant={variant}
-    sx={{ verticalAlign: 'baseline', display: 'inline' }}
-  >
+    sx={{ verticalAlign: 'baseline', display: 'inline' }}>
     <img
       src={networkIcon}
       alt=""

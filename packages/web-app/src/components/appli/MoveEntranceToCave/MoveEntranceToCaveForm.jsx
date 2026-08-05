@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Box, Link } from '@mui/material';
 import { useIntl } from 'react-intl';
 import { useDispatch, useSelector } from 'react-redux';
@@ -98,8 +98,7 @@ const MoveEntranceToCaveForm = ({ entrance }) => {
               variant="body2"
               onClick={() =>
                 switchMode(mode === MODE_DETACH ? MODE_MOVE : MODE_DETACH)
-              }
-            >
+              }>
               {formatMessage({
                 id:
                   mode === MODE_DETACH

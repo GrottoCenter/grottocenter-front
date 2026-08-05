@@ -7,7 +7,10 @@ export const FETCH_ACCOUNT_SUCCESS = 'FETCH_ACCOUNT_SUCCESS';
 export const FETCH_ACCOUNT_FAILURE = 'FETCH_ACCOUNT_FAILURE';
 
 const fetchAccountAction = () => ({ type: FETCH_ACCOUNT });
-const fetchAccountSuccess = account => ({ type: FETCH_ACCOUNT_SUCCESS, account });
+const fetchAccountSuccess = account => ({
+  type: FETCH_ACCOUNT_SUCCESS,
+  account
+});
 const fetchAccountFailure = error => ({ type: FETCH_ACCOUNT_FAILURE, error });
 
 export const fetchAccount = () => (dispatch, getState) => {

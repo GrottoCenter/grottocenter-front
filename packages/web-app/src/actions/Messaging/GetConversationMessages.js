@@ -4,15 +4,22 @@ import makeErrorMessage from '../../helpers/makeErrorMessage';
 import { checkAuthStatus, getTotalCount, makeUrl } from '../utils';
 
 export const FETCH_CONVERSATION_MESSAGES = 'FETCH_CONVERSATION_MESSAGES';
-export const FETCH_CONVERSATION_MESSAGES_SUCCESS = 'FETCH_CONVERSATION_MESSAGES_SUCCESS';
-export const FETCH_CONVERSATION_MESSAGES_FAILURE = 'FETCH_CONVERSATION_MESSAGES_FAILURE';
+export const FETCH_CONVERSATION_MESSAGES_SUCCESS =
+  'FETCH_CONVERSATION_MESSAGES_SUCCESS';
+export const FETCH_CONVERSATION_MESSAGES_FAILURE =
+  'FETCH_CONVERSATION_MESSAGES_FAILURE';
 
-const fetchConversationMessagesAction = (skip) => ({
+const fetchConversationMessagesAction = skip => ({
   type: FETCH_CONVERSATION_MESSAGES,
   skip
 });
 
-const fetchConversationMessagesActionSuccess = (messages, totalCount, conversationId, skip) => ({
+const fetchConversationMessagesActionSuccess = (
+  messages,
+  totalCount,
+  conversationId,
+  skip
+) => ({
   type: FETCH_CONVERSATION_MESSAGES_SUCCESS,
   messages,
   totalCount,
@@ -42,7 +49,10 @@ export function fetchConversationMessages(conversationId, criterias) {
 
     try {
       const response = await checkAuthStatus(dispatch)(
-        await fetch(makeUrl(getConversationMessagesUrl(conversationId), criterias), requestOptions)
+        await fetch(
+          makeUrl(getConversationMessagesUrl(conversationId), criterias),
+          requestOptions
+        )
       );
 
       const data = await response.json();
@@ -57,10 +67,11 @@ export function fetchConversationMessages(conversationId, criterias) {
         )
       );
     } catch (error) {
-      if (error.isAuthError) return;
+      if (error.isAuthError) return undefined;
       return dispatch(
         fetchConversationMessagesActionFailure(
-          error.body || makeErrorMessage(error.message, `Fetching conversation messages`)
+          error.body ||
+            makeErrorMessage(error.message, `Fetching conversation messages`)
         )
       );
     }

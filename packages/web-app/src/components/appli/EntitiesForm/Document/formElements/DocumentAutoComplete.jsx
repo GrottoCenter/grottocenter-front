@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import { useContext } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import { InputAdornment } from '@mui/material';
@@ -20,11 +20,7 @@ import FormAutoCompleteComponent from '../../../../common/Form/FormAutoComplete'
 
 const resultEndAdornment = (
   <InputAdornment position="end">
-    <img
-      src={bibliographyIcon}
-      alt="Document icon"
-      style={{ width: '40px' }}
-    />
+    <img src={bibliographyIcon} alt="Document icon" style={{ width: '40px' }} />
   </InputAdornment>
 );
 

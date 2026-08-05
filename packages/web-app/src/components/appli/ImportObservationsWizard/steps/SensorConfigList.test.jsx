@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { IntlProvider } from 'react-intl';
 
@@ -72,10 +71,10 @@ describe('SensorConfigList', () => {
   it('shows error alert with retry button on failure', () => {
     renderComponent({ sensorConfigsError: 'Network error' });
 
+    expect(screen.getByTestId('sensor-config-list-error')).toBeInTheDocument();
     expect(
-      screen.getByTestId('sensor-config-list-error')
+      screen.getByText('Failed to load sensor configurations.')
     ).toBeInTheDocument();
-    expect(screen.getByText('Failed to load sensor configurations.')).toBeInTheDocument();
     expect(
       screen.getByTestId('sensor-config-retry-button')
     ).toBeInTheDocument();
@@ -93,13 +92,9 @@ describe('SensorConfigList', () => {
   it('shows empty state when no configs exist', () => {
     renderComponent({ sensorConfigs: [] });
 
+    expect(screen.getByTestId('sensor-config-list-empty')).toBeInTheDocument();
     expect(
-      screen.getByTestId('sensor-config-list-empty')
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText(
-        'No sensor configurations yet. Add one below.'
-      )
+      screen.getByText('No sensor configurations yet. Add one below.')
     ).toBeInTheDocument();
   });
 

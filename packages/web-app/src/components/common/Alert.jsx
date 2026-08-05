@@ -1,4 +1,3 @@
-import React from 'react';
 import { Alert as MuiAlert, AlertTitle } from '@mui/material';
 import PropTypes from 'prop-types';
 import { styled } from '@mui/material/styles';

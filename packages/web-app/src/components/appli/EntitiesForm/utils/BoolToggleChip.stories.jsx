@@ -1,5 +1,3 @@
-import React from 'react';
-import { storiesOf } from '@storybook/react';
 import { Box } from '@mui/material';
 import { useForm } from 'react-hook-form';
 
@@ -27,6 +25,12 @@ const ChipsGroup = () => {
   );
 };
 
-storiesOf('EntitiesForm/BoolToggleChip', module).add('group', () => (
-  <ChipsGroup />
-));
+const meta = {
+  title: 'EntitiesForm/BoolToggleChip',
+  component: BoolToggleChip
+};
+export default meta;
+
+export const Group = {
+  render: () => <ChipsGroup />
+};

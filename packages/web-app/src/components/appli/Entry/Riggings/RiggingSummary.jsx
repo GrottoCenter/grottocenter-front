@@ -1,4 +1,3 @@
-import React from 'react';
 import { useIntl } from 'react-intl';
 import { Chip, Stack, Tooltip } from '@mui/material';
 import PropTypes from 'prop-types';

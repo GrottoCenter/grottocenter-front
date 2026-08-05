@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { Box, IconButton, Popover, Tooltip, Typography } from '@mui/material';
 import WifiOffIcon from '@mui/icons-material/WifiOff';

@@ -4,7 +4,12 @@ import {
   mfaVerifyUrl,
   mfaResetUrl
 } from '../conf/apiRoutes';
-import { fetchLoginSuccess, hideLoginDialog, decodeJWT, postLogout } from './Login';
+import {
+  fetchLoginSuccess,
+  hideLoginDialog,
+  decodeJWT,
+  postLogout
+} from './Login';
 
 export const FETCH_MFA_ENROLL = 'FETCH_MFA_ENROLL';
 export const FETCH_MFA_ENROLL_SUCCESS = 'FETCH_MFA_ENROLL_SUCCESS';
@@ -146,7 +151,10 @@ export function postMfaReset(password) {
         dispatch(postLogout());
         return;
       }
-      dispatch({ type: FETCH_MFA_RESET_FAILURE, error: json?.status ?? 'error' });
+      dispatch({
+        type: FETCH_MFA_RESET_FAILURE,
+        error: json?.status ?? 'error'
+      });
     } catch (_) {
       dispatch({ type: FETCH_MFA_RESET_FAILURE, error: 'network' });
     }

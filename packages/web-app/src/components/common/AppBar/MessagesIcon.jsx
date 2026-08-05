@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { useIntl } from 'react-intl';
 import { Badge, CircularProgress, IconButton } from '@mui/material';
 import MailIcon from '@mui/icons-material/Mail';
@@ -25,7 +25,7 @@ const MessagesIcon = () => {
   const { formatMessage } = useIntl();
   const { isAuth } = usePermissions();
   const dispatch = useDispatch();
-  
+
   const { active, archived, status } = useSelector(
     state => state.messaging.unreadCounts
   );

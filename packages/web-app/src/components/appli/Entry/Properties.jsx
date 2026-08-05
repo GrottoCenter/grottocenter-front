@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import { styled } from '@mui/material/styles';
@@ -10,11 +10,7 @@ import {
   Paper,
   Typography
 } from '@mui/material';
-import {
-  WarningAmber,
-  ExpandMore,
-  ExpandLess
-} from '@mui/icons-material';
+import { WarningAmber, ExpandMore, ExpandLess } from '@mui/icons-material';
 import CoordinateDisplay from '../../common/CoordinateDisplay';
 import { useCoordinatePreference, getCRSLabel } from '../../../hooks';
 import DataQualityBadge from '../../common/DataQualityBadge';
@@ -57,7 +53,6 @@ const StyledRatings = styled(Ratings)`
   justify-content: space-evenly;
 `;
 
-
 const CATEGORY_KEYS = [
   { key: 'general', label: 'General data' },
   { key: 'location', label: 'Location' },
@@ -67,6 +62,16 @@ const CATEGORY_KEYS = [
   { key: 'history', label: 'History' },
   { key: 'comment', label: 'Comments' }
 ];
+
+// Data-quality score buckets, highest first.
+const QUALITY_COLORS = [
+  { min: 70, color: 'success' },
+  { min: 40, color: 'warning' },
+  { min: 0, color: 'error' }
+];
+
+const qualityColor = score =>
+  QUALITY_COLORS.find(({ min }) => score >= min).color;
 
 const Properties = ({ isLoading = false, entrance, dataQuality }) => {
   const { formatMessage } = useIntl();
@@ -83,9 +88,7 @@ const Properties = ({ isLoading = false, entrance, dataQuality }) => {
       <Paper
         variant="outlined"
         sx={{ p: 1, borderRadius: 2, bgcolor: 'grey.50' }}>
-        <InfoSection
-          component="h2"
-          title={formatMessage({ id: 'Location' })}>
+        <InfoSection component="h2" title={formatMessage({ id: 'Location' })}>
           <Box display="flex" flexDirection="column" gap={0.5}>
             {entrance.latitude && entrance.longitude && (
               <Property
@@ -289,7 +292,9 @@ const Properties = ({ isLoading = false, entrance, dataQuality }) => {
               <Box display="flex" alignItems="center" gap={1} flexWrap="wrap">
                 <DataQualityBadge value={dataQuality.total} size={32} />
                 <Typography variant="body2">
-                  {formatMessage({ id: getDataQualityLabelKey(dataQuality.total) })}
+                  {formatMessage({
+                    id: getDataQualityLabelKey(dataQuality.total)
+                  })}
                 </Typography>
                 <DataQualityHelpButton />
                 {dataQuality.categories && (
@@ -330,12 +335,7 @@ const Properties = ({ isLoading = false, entrance, dataQuality }) => {
                     {CATEGORY_KEYS.map(({ key, label }) => {
                       const score = dataQuality.categories[key];
                       if (score == null) return null;
-                      const color =
-                        score >= 70
-                          ? 'success'
-                          : score >= 40
-                            ? 'warning'
-                            : 'error';
+                      const color = qualityColor(score);
                       return (
                         <Box
                           key={key}

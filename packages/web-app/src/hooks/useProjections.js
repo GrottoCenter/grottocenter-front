@@ -10,9 +10,7 @@ const useProjections = () => {
     state => state.projections?.projections ?? null
   );
 
-  const isLoading = useSelector(
-    state => state.projections?.loading ?? false
-  );
+  const isLoading = useSelector(state => state.projections?.loading ?? false);
 
   useEffect(() => {
     if (rawProjections === null && !isLoading) dispatch(fetchProjections());

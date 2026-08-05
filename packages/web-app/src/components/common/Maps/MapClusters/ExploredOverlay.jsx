@@ -1,9 +1,9 @@
-import React, { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { useMap } from 'react-leaflet';
-import useOpenLink from '../../../../hooks/useOpenLink';
 import PropTypes from 'prop-types';
 import L from 'leaflet';
 import { GlobalStyles } from '@mui/material';
+import useOpenLink from '../../../../hooks/useOpenLink';
 import useMarkers from '../common/Markers/useMarkers';
 import { makeIconTooltip } from '../common/Markers/tooltipHelpers';
 import { entranceIcon } from '../../../../assets/icons';

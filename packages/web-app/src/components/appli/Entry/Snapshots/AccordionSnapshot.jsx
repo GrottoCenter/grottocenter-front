@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Box, Chip, Collapse, IconButton, Typography } from '@mui/material';
 import {
   TimelineItem,
@@ -59,11 +59,41 @@ const AccordionSnapshot = ({
     : snapshot.id;
   const displayDate = rawDate ? new Date(rawDate) : null;
 
+  // Who to credit, and for what. A rename is always an update, even when only
+  // the original author is known; otherwise a reviewer means an update and a
+  // bare author means the creation.
+  let attribution = null;
+  if (isNameChange && (reviewer ?? author)) {
+    attribution = { author: reviewer ?? author, verb: 'Updated' };
+  } else if (reviewer) {
+    attribution = { author: reviewer, verb: 'Updated' };
+  } else if (author) {
+    attribution = { author, verb: 'Created' };
+  }
+
+  // The current version and entrance snapshots show a plain label: for
+  // entrances, name/caveName are contextual labels resolved across tables
+  // rather than diffable fields, and renames get their own snapshot.
+  let titleContent = snapshotTitle;
+  if (!isCurrent && isNameChange) {
+    // The name IS the change: snapshotTitle holds the OLD name (raw h_name
+    // value) and newName is resolved from the next real snapshot.
+    titleContent = <HighLightsChar oldText={snapshotTitle} newText={newName} />;
+  } else if (!isCurrent && !isEntranceSnapshot) {
+    titleContent = (
+      <HighLightsChar oldText={previousVersionTitle} newText={snapshotTitle} />
+    );
+  }
+
+  let dotColor = 'grey';
+  if (isNameChange) dotColor = 'secondary';
+  else if (isCurrent) dotColor = 'primary';
+
   return (
     <TimelineItem sx={{ '&::before': { flex: 0, padding: 0.25 } }}>
       <TimelineSeparator>
         <TimelineDot
-          color={isNameChange ? 'secondary' : isCurrent ? 'primary' : 'grey'}
+          color={dotColor}
           variant={isCurrent ? 'filled' : 'outlined'}
           sx={{ mt: '10px' }}
         />
@@ -121,25 +151,13 @@ const AccordionSnapshot = ({
                     ? `${displayDate.toLocaleDateString()} - ${displayDate.toLocaleTimeString()}`
                     : ''}
                 </Typography>
-                {isNameChange ? (
+                {attribution && (
                   <AuthorAndDate
-                    author={reviewer ?? author}
-                    verb="Updated"
+                    author={attribution.author}
+                    verb={attribution.verb}
                     textColor="inherit"
                   />
-                ) : reviewer ? (
-                  <AuthorAndDate
-                    author={reviewer}
-                    verb="Updated"
-                    textColor="inherit"
-                  />
-                ) : author ? (
-                  <AuthorAndDate
-                    author={author}
-                    verb="Created"
-                    textColor="inherit"
-                  />
-                ) : null}
+                )}
               </Box>
               <Box
                 sx={{
@@ -154,24 +172,7 @@ const AccordionSnapshot = ({
                   variant="body2"
                   component="span"
                   fontWeight={isCurrent ? 'bold' : 'regular'}>
-                  {isCurrent ? (
-                    snapshotTitle
-                  ) : isNameChange ? (
-                    // Rename snapshot: the name IS the change — show old → new.
-                    // snapshotTitle holds the OLD name (raw h_name value);
-                    // newName is resolved from the next real snapshot.
-                    <HighLightsChar oldText={snapshotTitle} newText={newName} />
-                  ) : isEntranceSnapshot ? (
-                    // Regular entrance snapshot: name/caveName are contextual
-                    // labels resolved across tables, not diffable fields. Renames
-                    // are surfaced by the dedicated rename snapshot above.
-                    snapshotTitle
-                  ) : (
-                    <HighLightsChar
-                      oldText={previousVersionTitle}
-                      newText={snapshotTitle}
-                    />
-                  )}
+                  {titleContent}
                 </Typography>
                 {isCurrent && (
                   <Chip
@@ -269,6 +270,7 @@ AccordionSnapshot.propTypes = {
     title: PropTypes.string,
     name: PropTypes.string,
     caveName: PropTypes.string,
+    description: PropTypes.shape({ title: PropTypes.string }),
     date: PropTypes.string,
     dateReviewed: PropTypes.string
   }),

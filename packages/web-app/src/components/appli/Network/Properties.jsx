@@ -1,4 +1,3 @@
-import React from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import { styled } from '@mui/material/styles';
@@ -24,15 +23,14 @@ const Properties = ({ isLoading, cave }) => {
   const { formatMessage } = useIntl();
 
   const hasCharacteristics =
-    cave?.depth ||
-    cave?.length ||
-    cave?.isDiving ||
-    cave?.temperature;
+    cave?.depth || cave?.length || cave?.isDiving || cave?.temperature;
 
   return (
     <GlobalWrapper>
       {hasCharacteristics && (
-        <Paper variant="outlined" sx={{ p: 1, borderRadius: 2, bgcolor: 'grey.50' }}>
+        <Paper
+          variant="outlined"
+          sx={{ p: 1, borderRadius: 2, bgcolor: 'grey.50' }}>
           <InfoSection
             component="h2"
             title={formatMessage({ id: 'Characteristics' })}>
@@ -54,7 +52,9 @@ const Properties = ({ isLoading, cave }) => {
         </Paper>
       )}
       {cave?.exploringOrganizations?.length > 0 && (
-        <Paper variant="outlined" sx={{ p: 1, borderRadius: 2, bgcolor: 'grey.50' }}>
+        <Paper
+          variant="outlined"
+          sx={{ p: 1, borderRadius: 2, bgcolor: 'grey.50' }}>
           <InfoSection
             component="h2"
             title={formatMessage({ id: 'Exploring organizations' })}>

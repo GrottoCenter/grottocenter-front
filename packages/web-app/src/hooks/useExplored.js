@@ -31,9 +31,7 @@ const useExplored = ({ entranceId, userId }) => {
   useEffect(() => {
     if (!entranceId) return;
     if (userId && !isPersonCurrent) return; // wait for the current person's data
-    setIsExplored(
-      !!person?.exploredEntrances?.some(e => e?.id === entranceId)
-    );
+    setIsExplored(!!person?.exploredEntrances?.some(e => e?.id === entranceId));
   }, [person, entranceId, userId, isPersonCurrent]);
 
   const handleToggleExplored = async () => {

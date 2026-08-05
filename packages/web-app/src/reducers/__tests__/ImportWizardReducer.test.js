@@ -84,7 +84,10 @@ describe('ImportWizardReducer', () => {
       ...initialState,
       currentStep: 3,
       encoding: 'UTF-16',
-      rawRows: [['a', 'b'], ['1', '2']],
+      rawRows: [
+        ['a', 'b'],
+        ['1', '2']
+      ],
       confirmedDevice: { id: 1, name: 'Sensor A' },
       deviceSearchResults: [{ id: 1, name: 'Sensor A' }],
       sensorConfigs: [{ id: 'abc', deviceId: 1 }],
@@ -222,8 +225,18 @@ describe('ImportWizardReducer', () => {
   describe('FETCH_SENSOR_CONFIGS_SUCCESS', () => {
     it('should set sensorConfigs and clear loading', () => {
       const configs = [
-        { id: 1, deviceId: 5, quantityKindCode: 'Temperature', unitSymbol: '°C' },
-        { id: 2, deviceId: 5, quantityKindCode: 'RelativeHumidity', unitSymbol: '%' }
+        {
+          id: 1,
+          deviceId: 5,
+          quantityKindCode: 'Temperature',
+          unitSymbol: '°C'
+        },
+        {
+          id: 2,
+          deviceId: 5,
+          quantityKindCode: 'RelativeHumidity',
+          unitSymbol: '%'
+        }
       ];
       const loadingState = {
         ...initialState,
@@ -327,7 +340,11 @@ describe('ImportWizardReducer', () => {
   });
 
   it('should handle SUBMIT_OBSERVATIONS_IMPORT without altering other fields', () => {
-    const stateWithData = { ...initialState, currentStep: 5, encoding: 'UTF-16' };
+    const stateWithData = {
+      ...initialState,
+      currentStep: 5,
+      encoding: 'UTF-16'
+    };
     const state = reducer(stateWithData, { type: SUBMIT_OBSERVATIONS_IMPORT });
     expect(state.currentStep).toBe(5);
     expect(state.encoding).toBe('UTF-16');

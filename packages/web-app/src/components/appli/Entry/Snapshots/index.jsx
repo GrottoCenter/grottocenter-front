@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { useIntl } from 'react-intl';
@@ -26,7 +26,13 @@ import { sortSnapshots } from './UtilityFunction';
 import AccordionSnapshotListPage from './AccordionSnapshotListPage';
 import { capitalize } from '../../../../utils/strings';
 
-const SUB_ENTITY_TYPES = ['descriptions', 'locations', 'histories', 'riggings', 'comments'];
+const SUB_ENTITY_TYPES = [
+  'descriptions',
+  'locations',
+  'histories',
+  'riggings',
+  'comments'
+];
 
 const SnapshotPage = () => {
   const dispatch = useDispatch();
@@ -47,14 +53,28 @@ const SnapshotPage = () => {
   const { id, type } = useParams();
 
   // All entity selectors declared unconditionally (rules of hooks)
-  const { data: currentEntrance, loading: isEntranceLoading } = useSelector(s => s.entrance);
-  const { cave: currentCave, loading: isCaveLoading } = useSelector(s => s.cave);
-  const { details: currentDocument, isLoading: isDocumentLoading } = useSelector(s => s.documentDetails);
-  const { massif: currentMassif, isFetching: isMassifLoading } = useSelector(s => s.massif);
-  const { person: currentPerson, isFetching: isPersonLoading } = useSelector(s => s.person);
-  const { organization: currentOrganization, isLoading: isOrganizationLoading } = useSelector(s => s.organization);
+  const { data: currentEntrance, loading: isEntranceLoading } = useSelector(
+    s => s.entrance
+  );
+  const { cave: currentCave, loading: isCaveLoading } = useSelector(
+    s => s.cave
+  );
+  const { details: currentDocument, isLoading: isDocumentLoading } =
+    useSelector(s => s.documentDetails);
+  const { massif: currentMassif, isFetching: isMassifLoading } = useSelector(
+    s => s.massif
+  );
+  const { person: currentPerson, isFetching: isPersonLoading } = useSelector(
+    s => s.person
+  );
+  const {
+    organization: currentOrganization,
+    isLoading: isOrganizationLoading
+  } = useSelector(s => s.organization);
 
-  const { data, status, latestHttpCode } = useSelector(state => state.snapshots);
+  const { data, status, latestHttpCode } = useSelector(
+    state => state.snapshots
+  );
 
   useEffect(() => {
     dispatch(fetchSnapshot(id, type, isNetwork, getAll));
@@ -92,11 +112,13 @@ const SnapshotPage = () => {
     massifs: currentMassif
   };
   const parentData = parentDataByType[parentType] ?? currentEntrance;
-  const isParentLoading = parentType === 'massifs' ? isMassifLoading : isEntranceLoading;
+  const isParentLoading =
+    parentType === 'massifs' ? isMassifLoading : isEntranceLoading;
 
-  const currentSubEntity = isSubEntityType && parentData
-    ? (parentData[type] ?? []).find(item => String(item.id) === id) ?? null
-    : null;
+  const currentSubEntity =
+    isSubEntityType && parentData
+      ? ((parentData[type] ?? []).find(item => String(item.id) === id) ?? null)
+      : null;
 
   const entityByType = {
     entrances: [currentEntrance, isEntranceLoading],
@@ -107,14 +129,20 @@ const SnapshotPage = () => {
     organizations: [currentOrganization, isOrganizationLoading],
     // Guidelines have no route to fetch from; the marker only carries isDeleted
     // to gate the rollback button and intentionally renders no "current" card.
-    guidelines: [hasIsDeletedParam ? { isDeleted: isDeletedParam } : null, false],
+    guidelines: [
+      hasIsDeletedParam ? { isDeleted: isDeletedParam } : null,
+      false
+    ],
     descriptions: [currentSubEntity, isParentLoading],
     locations: [currentSubEntity, isParentLoading],
     histories: [currentSubEntity, isParentLoading],
     riggings: [currentSubEntity, isParentLoading],
     comments: [currentSubEntity, isParentLoading]
   };
-  const [currentTItem, isCurrentItemLoading] = entityByType[type] ?? [null, false];
+  const [currentTItem, isCurrentItemLoading] = entityByType[type] ?? [
+    null,
+    false
+  ];
 
   const isLoading = status === REDUCER_STATUS.LOADING;
   const isSuccess = status === REDUCER_STATUS.SUCCEEDED;
@@ -187,34 +215,40 @@ const SnapshotPage = () => {
     <PageContainer>
       <PageHeader
         title={pageTitle}
-        icon={getAll ? <ManageHistoryIcon fontSize="inherit" /> : <HistoryIcon fontSize="inherit" />}
+        icon={
+          getAll ? (
+            <ManageHistoryIcon fontSize="inherit" />
+          ) : (
+            <HistoryIcon fontSize="inherit" />
+          )
+        }
         subheader={backLink}
       />
       <SectionStack>
         {isSensitive && <SensitiveCaveWarning />}
         <Card>
           <CardContent sx={{ p: 0.25, '&:last-child': { pb: 0.25 } }}>
-          {is403 && <Alert403 type={type} />}
-          {is404 && <Alert404 type={type} />}
-          {isLoading && <Skeleton height={300} />}
-          {isSuccess &&
-            (getAll ? (
-              <AccordionSnapshotListPage
-                data={sortSnapshots(data)}
-                type={type}
-                isNetwork={isNetwork}
-                currentTItem={currentTItem}
-                isCurrentItemLoading={isCurrentItemLoading}
-              />
-            ) : (
-              <AccordionSnapshotList
-                data={data}
-                type={type}
-                isNetwork={isNetwork}
-                currentItem={currentTItem}
-                isCurrentItemLoading={isCurrentItemLoading}
-              />
-            ))}
+            {is403 && <Alert403 type={type} />}
+            {is404 && <Alert404 type={type} />}
+            {isLoading && <Skeleton height={300} />}
+            {isSuccess &&
+              (getAll ? (
+                <AccordionSnapshotListPage
+                  data={sortSnapshots(data)}
+                  type={type}
+                  isNetwork={isNetwork}
+                  currentTItem={currentTItem}
+                  isCurrentItemLoading={isCurrentItemLoading}
+                />
+              ) : (
+                <AccordionSnapshotList
+                  data={data}
+                  type={type}
+                  isNetwork={isNetwork}
+                  currentItem={currentTItem}
+                  isCurrentItemLoading={isCurrentItemLoading}
+                />
+              ))}
           </CardContent>
         </Card>
       </SectionStack>

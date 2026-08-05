@@ -75,7 +75,7 @@ describe('Property 8: Ban reducer state transitions', () => {
       fc.property(
         fc.array(actionArb, { minLength: 1, maxLength: 20 }),
         actions => {
-          let state = undefined;
+          let state;
           for (const action of actions) {
             state = reducer(state, action);
           }
@@ -110,14 +110,14 @@ describe('Property 8: Ban reducer state transitions', () => {
   it('returns initial state for unknown action types', () => {
     fc.assert(
       fc.property(
-        fc.string({ minLength: 1, maxLength: 30 }).filter(
-          type =>
-            ![
-              ...loadingTypes,
-              ...successTypes,
-              ...failureTypes
-            ].includes(type)
-        ),
+        fc
+          .string({ minLength: 1, maxLength: 30 })
+          .filter(
+            type =>
+              ![...loadingTypes, ...successTypes, ...failureTypes].includes(
+                type
+              )
+          ),
         type => {
           const state = reducer(undefined, { type });
           expect(state).toEqual({

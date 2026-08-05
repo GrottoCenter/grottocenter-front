@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import Autocomplete from '@mui/material/Autocomplete';
@@ -69,6 +69,8 @@ const ResultsPopper = styled(Popper, {
   }
 `;
 
+// Purely internal rendering helper; its props are enforced by the
+// AutoCompleteSearch PropTypes above, not at this call-site level.
 // eslint-disable-next-line react/prop-types
 const InputAdornments = ({ isLoading, hasError }) =>
   isLoading || hasError ? (
@@ -79,7 +81,7 @@ const InputAdornments = ({ isLoading, hasError }) =>
   ) : null;
 
 const StyledPopper = hasFixWidth =>
-  (function(props) {
+  function (props) {
     return (
       <ResultsPopper
         {...props}
@@ -87,7 +89,7 @@ const StyledPopper = hasFixWidth =>
         placement="bottom-end"
       />
     );
-  });
+  };
 const AutoCompleteSearch = ({
   suggestions,
   renderOption,
@@ -202,7 +204,12 @@ AutoCompleteSearch.propTypes = {
   isLoading: PropTypes.bool,
   disabled: PropTypes.bool,
   hasFixWidth: PropTypes.bool,
-  value: PropTypes.any
+  // Whatever shape the caller's options carry; compared by reference.
+  value: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.number,
+    PropTypes.shape({})
+  ])
 };
 
 export default AutoCompleteSearch;

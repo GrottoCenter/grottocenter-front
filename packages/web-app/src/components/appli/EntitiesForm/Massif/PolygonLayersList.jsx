@@ -1,4 +1,3 @@
-import React from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import {
@@ -60,7 +59,12 @@ const PolygonLayersList = ({
   };
 
   return (
-    <Paper sx={{ width: { xs: '100%', md: 250 }, maxHeight: { xs: 300, md: '70vh' }, overflow: 'auto' }}>
+    <Paper
+      sx={{
+        width: { xs: '100%', md: 250 },
+        maxHeight: { xs: 300, md: '70vh' },
+        overflow: 'auto'
+      }}>
       {allHoles && (
         <Alert severity="error" sx={{ py: 0.25 }}>
           {formatMessage({
@@ -116,8 +120,7 @@ const PolygonLayersList = ({
               justifyContent: 'space-between',
               lineHeight: '32px',
               py: '4px'
-            }}
-          >
+            }}>
             <Typography variant="caption" sx={{ fontWeight: 'bold' }}>
               {formatMessage({ id: 'Polygon' })}
             </Typography>
@@ -127,16 +130,14 @@ const PolygonLayersList = ({
                 alignItems: 'center',
                 gap: '4px',
                 pr: '4px'
-              }}
-            >
+              }}>
               <Typography variant="caption" sx={{ fontWeight: 'bold' }}>
                 {formatMessage({ id: 'Hole' })}
               </Typography>
               <Box sx={{ width: 28 }} />
             </Box>
           </ListSubheader>
-        }
-      >
+        }>
         {[...layers]
           .sort((a, b) => b.latlngs.length - a.latlngs.length)
           .map(layer => (
@@ -151,16 +152,16 @@ const PolygonLayersList = ({
                 cursor: 'pointer'
               }}
               secondaryAction={
-                <Box sx={{
-                  display: 'flex',
-                  alignItems: 'center'
-                }}>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center'
+                  }}>
                   <Tooltip
                     title={formatMessage({
                       id: 'Mark this polygon as a hole (inner ring) within another polygon'
                     })}
-                    arrow
-                  >
+                    arrow>
                     <Checkbox
                       checked={layer.isHole || false}
                       onChange={e => {
@@ -183,24 +184,21 @@ const PolygonLayersList = ({
                       e.stopPropagation();
                       onLayerDelete(layer.id);
                     }}
-                    aria-label={formatMessage({ id: 'Delete' })}
-                  >
+                    aria-label={formatMessage({ id: 'Delete' })}>
                     <DeleteIcon fontSize="small" />
                   </IconButton>
                 </Box>
-              }
-            >
+              }>
               <ListItemText
                 primary={
-                  <Box component="span" sx={{
-                    display: 'inline-flex',
-                    alignItems: 'center'
-                  }}>
+                  <Box
+                    component="span"
+                    sx={{
+                      display: 'inline-flex',
+                      alignItems: 'center'
+                    }}>
                     {(layer.hasSelfIntersection || layer.tooFewPoints) && (
-                      <Tooltip
-                        title={getErrorTooltip(layer)}
-                        arrow
-                      >
+                      <Tooltip title={getErrorTooltip(layer)} arrow>
                         <ErrorOutlineIcon
                           fontSize="small"
                           color="error"
@@ -213,8 +211,7 @@ const PolygonLayersList = ({
                         title={formatMessage({
                           id: 'This polygon is very thin or elongated (needle shape). It may represent a stream corridor or narrow buffer. Verify it is intentional.'
                         })}
-                        arrow
-                      >
+                        arrow>
                         <WarningAmberIcon
                           fontSize="small"
                           color="warning"
@@ -244,7 +241,12 @@ PolygonLayersList.propTypes = {
   layers: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.number.isRequired,
-      latlngs: PropTypes.array.isRequired,
+      latlngs: PropTypes.arrayOf(
+        PropTypes.shape({
+          lat: PropTypes.number.isRequired,
+          lng: PropTypes.number.isRequired
+        })
+      ).isRequired,
       isHole: PropTypes.bool,
       isNeedle: PropTypes.bool,
       hasSelfIntersection: PropTypes.bool,

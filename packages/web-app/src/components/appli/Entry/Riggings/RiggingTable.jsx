@@ -8,17 +8,16 @@ import {
   TableCell,
   TableBody
 } from '@mui/material';
-import React from 'react';
 import { isNil } from 'ramda';
 import { styled } from '@mui/material/styles';
 import PropTypes from 'prop-types';
+import { OBSTACLE_LEGEND, ANCHOR_LEGEND } from '@/utils/riggingLegends';
 import { ObstaclePropTypes } from '../../../../types/entrance.type';
 
 import { HighLightsLine } from '../../../common/Highlights';
 import SectionTitle from '../SectionTitle';
 import RiggingSummary from './RiggingSummary';
 import ColumnLegend, { LegendHeader } from './ColumnLegend';
-import { OBSTACLE_LEGEND, ANCHOR_LEGEND } from '@/utils/riggingLegends';
 
 const StyledTable = styled(Table)`
   border-left: 1px solid ${props => props.theme.palette.primary.veryLight};
@@ -116,7 +115,14 @@ const RiggingTable = ({ id, obstacles, title, previous, isDeleted }) => {
 
   return (
     <Box>
-      <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 0.5, mb: 0.5 }}>
+      <Box
+        sx={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          alignItems: 'center',
+          gap: 0.5,
+          mb: 0.5
+        }}>
         {titleEl}
         {previous === undefined && <RiggingSummary obstacles={obstacles} />}
       </Box>

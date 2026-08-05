@@ -43,9 +43,15 @@ describe('Feature: substance-reference-table, Property 3: Normalizer extracts su
   const substanceObjectArb = fc.record({
     id: fc.integer({ min: 1, max: 10000 }),
     name: fc.string({ minLength: 1, maxLength: 200 }),
-    formula: fc.option(fc.string({ minLength: 1, maxLength: 100 }), { nil: null }),
-    casNumber: fc.option(fc.string({ minLength: 1, maxLength: 20 }), { nil: null }),
-    externalId: fc.option(fc.string({ minLength: 1, maxLength: 50 }), { nil: null }),
+    formula: fc.option(fc.string({ minLength: 1, maxLength: 100 }), {
+      nil: null
+    }),
+    casNumber: fc.option(fc.string({ minLength: 1, maxLength: 20 }), {
+      nil: null
+    }),
+    externalId: fc.option(fc.string({ minLength: 1, maxLength: 50 }), {
+      nil: null
+    }),
     externalSource: fc.option(fc.constant('PubChem'), { nil: null })
   });
 

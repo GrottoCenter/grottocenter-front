@@ -99,16 +99,18 @@ const SignUpForm = ({
       title={formatMessage({ id: 'Join Grottocenter' })}
       content={
         signUpRequestSucceeded ? (
-          <>
-            <Typography align="center">
-              {formatMessage({
-                id: 'Your account has been successfully created!'
-              })}{'\n'}
-              {formatMessage({
+          <Typography align="center">
+            {formatMessage({
+              id: 'Your account has been successfully created!'
+            })}
+            {'\n'}
+            {formatMessage(
+              {
                 id: 'An email has been sent to {email} to verify your account. Please click the link in the email to activate your account.'
-              }, { email })}
-            </Typography>
-          </>
+              },
+              { email }
+            )}
+          </Typography>
         ) : (
           <FormWrapper onSubmit={onSignUp}>
             <StringInput

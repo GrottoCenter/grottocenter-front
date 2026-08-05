@@ -1,4 +1,3 @@
-import React from 'react';
 import PropTypes from 'prop-types';
 import { Badge, Tooltip } from '@mui/material';
 import { styled } from '@mui/material/styles';

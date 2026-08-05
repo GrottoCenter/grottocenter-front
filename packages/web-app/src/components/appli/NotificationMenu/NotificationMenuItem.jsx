@@ -1,10 +1,9 @@
-import React from 'react';
 import { Box, ListItemIcon, MenuItem, Typography } from '@mui/material';
 import PropTypes from 'prop-types';
-import AppLink from '../../common/AppLink';
 import { useIntl } from 'react-intl';
 import { styled } from '@mui/material/styles';
 import UnreadNotificationIcon from '@mui/icons-material/FiberManualRecord';
+import AppLink from '../../common/AppLink';
 import formatNotification from '../../../utils/formatNotification';
 
 const ICON_WIDTH = '1.5625rem';
@@ -13,7 +12,7 @@ const Icon = styled('img')`
 `;
 
 const StyledMenuItem = styled(MenuItem, {
-  shouldForwardProp: (prop) => !prop.startsWith('$')
+  shouldForwardProp: prop => !prop.startsWith('$')
 })(({ $isRead, theme }) => ({
   background: !$isRead && theme.palette.secondary.veryLight,
   whiteSpace: 'normal',

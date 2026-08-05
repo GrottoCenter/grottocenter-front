@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import PropTypes from 'prop-types';
 import { useDispatch } from 'react-redux';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -73,15 +73,13 @@ const Descriptions = ({
               isFormVisible
                 ? formatMessage({ id: 'Cancel adding a new description' })
                 : formatMessage({ id: 'Add a new description' })
-            }
-          >
+            }>
             <Button
               color={isFormVisible ? 'inherit' : 'secondary'}
               size="small"
               variant="outlined"
               onClick={() => setIsFormVisible(!isFormVisible)}
-              startIcon={isFormVisible ? <CancelIcon /> : <AddCircleIcon />}
-            >
+              startIcon={isFormVisible ? <CancelIcon /> : <AddCircleIcon />}>
               {formatMessage({ id: isFormVisible ? 'Cancel' : 'New' })}
             </Button>
           </Tooltip>
@@ -92,7 +90,10 @@ const Descriptions = ({
           {hasNetworkDescriptions && (
             <>
               <Divider sx={{ mb: 0.5 }} />
-              <Typography variant="body1" color="text.secondary" sx={{ mb: 0.5 }}>
+              <Typography
+                variant="body1"
+                color="text.secondary"
+                sx={{ mb: 0.5 }}>
                 <FormattedMessage
                   id="network.descriptions.callout"
                   values={{
@@ -110,8 +111,7 @@ const Descriptions = ({
                         to={`/ui/caves/${networkId}#description`}
                         openInNewTabDesktop
                         variant="body1"
-                        sx={{ display: 'inline', verticalAlign: 'baseline' }}
-                      >
+                        sx={{ display: 'inline', verticalAlign: 'baseline' }}>
                         {formatMessage(
                           { id: 'network.descriptions.count' },
                           { count: networkDescriptionsCount }

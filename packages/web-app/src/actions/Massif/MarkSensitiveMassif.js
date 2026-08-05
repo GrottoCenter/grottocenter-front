@@ -10,9 +10,7 @@ const markMassifSensitiveSuccess = (massif, count) => ({
   type: MARK_MASSIF_SENSITIVE_SUCCESS
 });
 
-
 export const markMassifSensitive = id => (dispatch, getState) => {
-
   const requestOptions = {
     method: 'POST',
     headers: getState().login.authorizationHeader

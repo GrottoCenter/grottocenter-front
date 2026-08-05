@@ -1,10 +1,9 @@
 import { Box, FormControlLabel, Switch } from '@mui/material';
-import React, { useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { Controller, useWatch } from 'react-hook-form';
 import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
 import { usePermissions, useNearbyEntrances } from '../../../../hooks';
-import { ENTRANCE_ONLY, ENTRANCE_AND_CAVE } from './caveType';
 import Alert from '../../../common/Alert';
 import CoordinateFormSection from '../utils/CoordinateFormSection';
 import { FormSection } from '../utils/FormContainers';
@@ -66,8 +65,7 @@ const EntranceDetail = ({
           alignItems: 'center',
           gap: 1,
           mt: 1
-        }}
-      >
+        }}>
         <NumberField
           name="entrance.altitude"
           control={control}
@@ -123,15 +121,7 @@ EntranceDetail.propTypes = {
   }),
   control: PropTypes.shape({}),
   getValues: PropTypes.func.isRequired, // React-hook-form getValues() function
-  isNewEntrance: PropTypes.bool,
-  allLanguages: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.string.isRequired,
-      refName: PropTypes.string.isRequired
-    })
-  ),
-  setFocus: PropTypes.func,
-  entityType: PropTypes.oneOf([ENTRANCE_AND_CAVE, ENTRANCE_ONLY])
+  isNewEntrance: PropTypes.bool
 };
 
 export default EntranceDetail;

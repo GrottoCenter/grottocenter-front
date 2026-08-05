@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from 'react';
+import { useEffect, useState, useContext } from 'react';
 import { useIntl } from 'react-intl';
 import Autocomplete from '@mui/material/Autocomplete';
 import {

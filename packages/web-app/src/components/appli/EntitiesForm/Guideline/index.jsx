@@ -1,4 +1,3 @@
-import React from 'react';
 import { useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import { useForm } from 'react-hook-form';
@@ -16,12 +15,7 @@ const getDefaultValues = language => ({
   language
 });
 
-const GuidelineForm = ({
-  closeForm,
-  onSubmit,
-  values,
-  isNew
-}) => {
+const GuidelineForm = ({ closeForm, onSubmit, values, isNew }) => {
   const { locale, AVAILABLE_LANGUAGES } = useSelector(state => state.intl);
   const { formatMessage } = useIntl();
 
@@ -36,7 +30,8 @@ const GuidelineForm = ({
     control,
     formState: { errors, isSubmitting }
   } = useForm({
-    defaultValues: normalizedValues ?? getDefaultValues(AVAILABLE_LANGUAGES[locale].id)
+    defaultValues:
+      normalizedValues ?? getDefaultValues(AVAILABLE_LANGUAGES[locale].id)
   });
 
   const isTitleLengthValid = value => !value || value.length <= 150;
@@ -54,7 +49,13 @@ const GuidelineForm = ({
             isError={!!errors?.title}
             isRequired
             validatorFn={isTitleLengthValid}
-            helperText={errors?.title ? formatMessage({ id: 'Title must be less than 150 characters.' }) : undefined}
+            helperText={
+              errors?.title
+                ? formatMessage({
+                    id: 'Title must be less than 150 characters.'
+                  })
+                : undefined
+            }
           />
 
           <InputLanguage
@@ -70,7 +71,13 @@ const GuidelineForm = ({
           control={control}
           isError={!!errors?.description}
           validatorFn={isDescriptionLengthValid}
-          helperText={errors?.description ? formatMessage({ id: 'Description must be less than 500 characters.' }) : undefined}
+          helperText={
+            errors?.description
+              ? formatMessage({
+                  id: 'Description must be less than 500 characters.'
+                })
+              : undefined
+          }
         />
 
         <FormActionRow

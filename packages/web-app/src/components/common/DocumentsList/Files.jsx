@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import PropTypes from 'prop-types';
 import { Button, ListItem, Grid } from '@mui/material';
 import { styled } from '@mui/material/styles';
@@ -20,9 +20,12 @@ const FileListItem = styled(ListItem)`
   padding: 0;
 `;
 
-
-
-const Files = ({ files = [], description, onImageClick, imageIndexOffset = 0 }) => {
+const Files = ({
+  files = [],
+  description,
+  onImageClick,
+  imageIndexOffset = 0
+}) => {
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
 
@@ -45,11 +48,17 @@ const Files = ({ files = [], description, onImageClick, imageIndexOffset = 0 }) 
     <>
       {/* Image thumbnails section */}
       {imageFiles.length > 0 && (
-        <Grid container rowSpacing={1} columnSpacing={{ xs: 0.25, sm: 1 }} sx={{ mb: 1 }}>
+        <Grid
+          container
+          rowSpacing={1}
+          columnSpacing={{ xs: 0.25, sm: 1 }}
+          sx={{ mb: 1 }}>
           {imageFiles.map((file, index) => {
             const { src, srcSet } = getThumbnailSources(file);
             return (
-              <Grid key={file.fileName} sx={{ width: { xs: '100%', sm: 'auto' } }}>
+              <Grid
+                key={file.fileName}
+                sx={{ width: { xs: '100%', sm: 'auto' } }}>
                 <ImageThumbnail
                   src={src}
                   srcSet={srcSet}

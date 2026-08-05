@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useIntl } from 'react-intl';
 
@@ -31,7 +31,9 @@ const ChangePassword = () => {
   const checkIfValuesAreValid = () => {
     const errors = [];
     if (!token && !currentPassword) {
-      errors.push(formatMessage({ id: 'You must provide your current password.' }));
+      errors.push(
+        formatMessage({ id: 'You must provide your current password.' })
+      );
     }
     if (password !== passwordConfirmation) {
       errors.push(formatMessage({ id: 'The passwords must match.' }));

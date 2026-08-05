@@ -6,7 +6,7 @@
  * @param {Array} items - Array of entities with optional `relevance` field
  * @returns {Array} A new sorted array (does not mutate the input)
  */
-export const sortByRelevance = (items) =>
+export const sortByRelevance = items =>
   [...items].sort((a, b) => {
     const ra = a.relevance ?? Number.MAX_SAFE_INTEGER;
     const rb = b.relevance ?? Number.MAX_SAFE_INTEGER;

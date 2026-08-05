@@ -43,7 +43,6 @@ grottocenter-front/
 │   │   ├── public/lang/              # i18n translation files (en.json, fr.json, …)
 │   │   └── cypress/                  # E2E tests
 │   ├── eslint-config/
-│   ├── eslint-config-typescript/
 │   ├── prettier-config/
 │   └── ts-config/
 ├── scripts/                          # Build and utility scripts
@@ -210,13 +209,37 @@ Existing `../` imports are left in place and migrated progressively (dedicated `
 
 ### ESLint & Prettier
 
-The project uses **ESLint 8 + Airbnb config**. Key custom rules:
+The project uses **ESLint 9 (flat config) + Airbnb config**. The whole setup lives in
+`eslint.config.mjs` at the repo root, composing `packages/eslint-config`. There are no
+`.eslintrc` files and flat config has no cascade: per-directory rules are `files`-scoped
+blocks in the root config.
+
+Key custom rules:
 
 - No trailing commas
 - Arrow functions for named components
 - `console.warn` / `console.error` OK — `console.log` is a warning
+- A leading `_` marks a binding as deliberately unused (arguments, caught errors)
+
+`yarn lint` must end with **0 errors**. Warnings are the tracked design debt
+listed with `TODO` next to each rule in `packages/eslint-config/index.mjs`
+(currently `react/jsx-filename-extension`, `react/no-unstable-nested-components`,
+`react/jsx-props-no-spreading`, plus `no-console` for stray `console.log`). Do
+not add new ones — fix them as you touch the files, and clear a TODO by turning
+its rule to `error` once all the sites are gone.
+
+Everything else is enforced at `error`. In particular, the airbnb defaults for
+`react/prop-types`, `no-nested-ternary` and `consistent-return` are inherited
+unchanged — keep it that way rather than demoting a rule to make a change fit.
+
+A few rules are deliberately configured rather than followed blindly, each with
+the reason written next to it in `packages/eslint-config/index.mjs`: single named
+exports are the convention here, `continue`/`++` are allowed, the underscore
+identifiers that come from the API, from Leaflet or from test seams are listed
+one by one, and test doubles skip `react/prop-types`.
 
 **Never use `// eslint-disable`** without a written justification in the preceding comment.
+Unused directives are reported and removed by `--fix`, so a stale one will not survive.
 
 Prettier: single quotes, semicolons, 80-char width, 2-space indent, no trailing commas, `arrowParens: 'avoid'`.
 

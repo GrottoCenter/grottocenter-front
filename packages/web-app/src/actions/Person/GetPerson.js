@@ -64,9 +64,7 @@ export function fetchPerson(personId) {
     const { authorizationHeader } = loginState;
     const isAdmin = hasRole(loginState, 'Administrator');
     const requestOptions =
-      isAdmin && authorizationHeader
-        ? { headers: authorizationHeader }
-        : {};
+      isAdmin && authorizationHeader ? { headers: authorizationHeader } : {};
 
     return fetch(getCaverUrl + personId, requestOptions)
       .then(checkAndGetStatus)
@@ -110,7 +108,6 @@ export function fetchBannedCavers() {
       .then(response => response.json())
       .then(data => {
         if (data.banned === undefined) {
-          // eslint-disable-next-line no-console
           console.warn(
             'fetchBannedCavers: unexpected API response shape — "banned" field is missing'
           );
@@ -138,7 +135,6 @@ export function fetchInvalidEmailCavers() {
       .then(response => response.json())
       .then(data => {
         if (data.cavers === undefined) {
-          // eslint-disable-next-line no-console
           console.warn(
             'fetchInvalidEmailCavers: unexpected API response shape — "cavers" field is missing'
           );

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
 import { useIntl } from 'react-intl';
@@ -316,8 +316,13 @@ const ValidateStep = () => {
     );
   }
 
-  const { blockingErrors, invalidRows, validRows, totalRows, invalidRowDetails } =
-    validationResult;
+  const {
+    blockingErrors,
+    invalidRows,
+    validRows,
+    totalRows,
+    invalidRowDetails
+  } = validationResult;
 
   return (
     <Box

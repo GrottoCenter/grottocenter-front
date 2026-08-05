@@ -6,20 +6,20 @@ GrottoCenter is a web application frontend for the speleology (cave exploration)
 ## Architecture & Tech Stack
 
 ### Core Technologies
-- **React 18.3.1** - Main UI framework
-- **Material-UI (MUI) 5.16.7** - Component library and theming
-- **Redux 5.0.1** + **Redux Thunk 3.1.0** - State management
-- **React Router 6.26.2** - Client-side routing
-- **React Intl 6.7.0** - Internationalization
-- **Leaflet 1.9.4** + **React Leaflet 4.2.1** - Interactive maps
-- **TypeScript 5.6.2** - Type safety (partial adoption)
+- **React 19** - Main UI framework
+- **Material-UI (MUI) 7** - Component library and theming
+- **Redux 5** + **Redux Thunk 3** - State management
+- **React Router 7** - Client-side routing
+- **React Intl 8** - Internationalization
+- **Leaflet 1.9** + **React Leaflet 5** - Interactive maps
+- **TypeScript 5.9** - Type safety (partial adoption)
 
 ### Development Tools
-- **Yarn 4.5.0** with workspaces - Package management
-- **ESLint 8.57.1** + **Prettier 3.3.3** - Code quality
-- **Storybook 8.3.5** - Component development
-- **Cypress 13.15.0** - E2E testing
-- **Husky 9.1.6** - Git hooks
+- **Yarn 4.5** with workspaces - Package management
+- **ESLint 9** (flat config) + **Prettier 3** - Code quality
+- **Storybook 10** - Component development
+- **Cypress 15** - E2E testing
+- **Husky 9** - Git hooks
 
 ## Project Structure
 
@@ -29,7 +29,6 @@ grottocenter-front/
 ├── packages/
 │   ├── web-app/                 # Main React application
 │   ├── eslint-config/           # Shared ESLint configuration
-│   ├── eslint-config-typescript/# TypeScript ESLint config
 │   ├── prettier-config/         # Shared Prettier configuration
 │   └── ts-config/              # Shared TypeScript configuration
 ├── scripts/                     # Utility scripts for translations
@@ -84,31 +83,31 @@ src/
 ## Dependencies & Their Roles
 
 ### UI & Styling
-- `@mui/material` (5.16.7) - Core Material-UI components
-- `@mui/icons-material` (5.16.7) - Material Design icons
+- `@mui/material` (7) - Core Material-UI components
+- `@mui/icons-material` (7) - Material Design icons
 - `@emotion/react` & `@emotion/styled` - CSS-in-JS styling
-- `@mui/x-date-pickers` (7.19.0) - Date/time picker components
+- `@mui/x-date-pickers` (9) - Date/time picker components
 
 ### State Management & Data Fetching
-- `redux` (5.0.1) - Predictable state container
-- `redux-thunk` (3.1.0) - Async action creators
-- `isomorphic-fetch` (3.0.0) - HTTP requests
+- `redux` (5) - Predictable state container
+- `redux-thunk` (3) - Async action creators
+- `isomorphic-fetch` (3) - HTTP requests
 
 ### Maps & Geospatial
-- `leaflet` (1.9.4) - Interactive map library
-- `react-leaflet` (4.2.1) - React bindings for Leaflet
-- `leaflet-draw` (1.0.4) - Drawing tools for maps
-- `proj4` (2.12.1) - Coordinate system transformations
-- `d3` (7.9.0) + `d3-hexbin` (0.2.2) - Data visualization
+- `leaflet` (1.9) - Interactive map library
+- `react-leaflet` (5) - React bindings for Leaflet
+- `leaflet-draw` - Drawing tools for maps
+- `proj4` (2) - Coordinate system transformations
+- `d3` (7) + `d3-hexbin` - Data visualization
 
 ### Internationalization
-- `react-intl` (6.7.0) - React internationalization
-- `date-fns` (4.1.0) - Date formatting and manipulation
+- `react-intl` (8) - React internationalization
+- `date-fns` (4) - Date formatting and manipulation
 
 ### Forms & Validation
-- `react-hook-form` (7.53.0) - Form state management
-- `react-select-country-list` (2.2.3) - Country selection
-- `react-phone-input-2` (2.15.1) - Phone number input
+- `react-hook-form` (7) - Form state management
+- `react-select-country-list` - Country selection
+- `react-phone-input-2` - Phone number input
 
 ### File Handling & CSV
 - `react-dropzone-uploader` (2.11.0) - File upload component
@@ -199,7 +198,7 @@ Arabic, Bulgarian, Catalan, German, Greek, English, Spanish, French, Hebrew, Ind
 - **Usage**: Component isolation and visual testing
 
 ### Unit Testing
-- **Framework**: React Testing Library + Jest
+- **Framework**: Vitest + React Testing Library
 - **Setup**: `src/setupTests.js`
 - **Pattern**: Co-located test files
 

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { useMap } from 'react-leaflet';
 import * as L from 'leaflet';
 import PropTypes from 'prop-types';
@@ -122,7 +122,8 @@ const PopupTargetHandler = ({ popupTarget }) => {
         map.openPopup(renderPopup(result.popup), [result.lat, result.lng]);
       })
       .catch(err => {
-        if (err.name !== 'AbortError') console.error('PopupTargetHandler:', err);
+        if (err.name !== 'AbortError')
+          console.error('PopupTargetHandler:', err);
       });
 
     return () => controller.abort();

@@ -1,4 +1,3 @@
-import React from 'react';
 import PropTypes from 'prop-types';
 import Step1 from './ImportSteps/Step1';
 import Step2 from './ImportSteps/Step2';

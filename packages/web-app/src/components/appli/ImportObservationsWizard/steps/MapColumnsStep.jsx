@@ -62,6 +62,10 @@ const TIMESTAMP_TYPE_SEQUENCE = [
 
 const PREVIEW_COUNT = 10;
 
+// Types the pill builder can edit directly; everything else falls back to
+// the full datetime builder.
+const PILL_BUILDER_TYPES = ['datetime', 'dateOnly', 'timeOnly'];
+
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 const getIanaTimezones = () => {
@@ -118,9 +122,32 @@ const formatTimezoneLabel = tz => {
   return `${tz} (UTC${sign}${offset})`;
 };
 
+const columnMappingPropType = PropTypes.shape({
+  columnIndex: PropTypes.number.isRequired,
+  role: PropTypes.string,
+  timestampType: PropTypes.string,
+  dateFormat: PropTypes.string,
+  timeFormat: PropTypes.string,
+  timezone: PropTypes.string,
+  sensorConfigurationId: PropTypes.number,
+  mediumId: PropTypes.number
+});
+
+const sensorConfigPropType = PropTypes.shape({
+  id: PropTypes.number.isRequired,
+  quantityKindCode: PropTypes.string,
+  substanceName: PropTypes.string,
+  unitSymbol: PropTypes.string
+});
+
 // ─── TimestampConfig ──────────────────────────────────────────────────────────
 
-const TimestampConfig = ({ mapping, columnMappings, sampleValues, onUpdate }) => {
+const TimestampConfig = ({
+  mapping,
+  columnMappings,
+  sampleValues,
+  onUpdate
+}) => {
   const { formatMessage } = useIntl();
 
   const handleTypeChange = useCallback(
@@ -172,15 +199,14 @@ const TimestampConfig = ({ mapping, columnMappings, sampleValues, onUpdate }) =>
     mapping.timestampType === 'dateOnly' ||
     mapping.timestampType === 'timeOnly';
 
-  const pillBuilderType = mapping.timestampType === 'timeOnly'
-    ? 'timeOnly'
-    : mapping.timestampType === 'dateOnly'
-      ? 'dateOnly'
-      : 'datetime';
+  const pillBuilderType = PILL_BUILDER_TYPES.includes(mapping.timestampType)
+    ? mapping.timestampType
+    : 'datetime';
 
-  const currentFormat = mapping.timestampType === 'timeOnly'
-    ? mapping.timeFormat || ''
-    : mapping.dateFormat || '';
+  const currentFormat =
+    mapping.timestampType === 'timeOnly'
+      ? mapping.timeFormat || ''
+      : mapping.dateFormat || '';
 
   return (
     <Box
@@ -200,7 +226,14 @@ const TimestampConfig = ({ mapping, columnMappings, sampleValues, onUpdate }) =>
             id: 'ImportObservationsWizard.MapColumnsStep.timestampType'
           })}
           onChange={handleTypeChange}
-          data-testid={`timestamp-type-select-${mapping.columnIndex}`}>
+          data-testid={`timestamp-type-select-${mapping.columnIndex}`}
+          MenuProps={{
+            slotProps: {
+              paper: {
+                'data-testid': `timestamp-type-menu-${mapping.columnIndex}`
+              }
+            }
+          }}>
           {TIMESTAMP_TYPES.map(t => (
             <MenuItem key={t} value={t}>
               {formatMessage({
@@ -232,7 +265,7 @@ TimestampConfig.propTypes = {
     timeFormat: PropTypes.string,
     timezone: PropTypes.string
   }).isRequired,
-  columnMappings: PropTypes.arrayOf(PropTypes.object).isRequired,
+  columnMappings: PropTypes.arrayOf(columnMappingPropType).isRequired,
   sampleValues: PropTypes.arrayOf(PropTypes.string).isRequired,
   onUpdate: PropTypes.func.isRequired
 };
@@ -273,7 +306,14 @@ const MeasurementConfig = ({ mapping, sensorConfigs, onUpdate }) => {
             id: 'ImportObservationsWizard.MapColumnsStep.sensorConfig'
           })}
           onChange={handleSensorChange}
-          data-testid={`sensor-config-select-${mapping.columnIndex}`}>
+          data-testid={`sensor-config-select-${mapping.columnIndex}`}
+          MenuProps={{
+            slotProps: {
+              paper: {
+                'data-testid': `sensor-config-menu-${mapping.columnIndex}`
+              }
+            }
+          }}>
           <MenuItem value="">
             <em>
               {formatMessage({
@@ -328,7 +368,10 @@ MeasurementConfig.propTypes = {
   mapping: PropTypes.shape({
     columnIndex: PropTypes.number.isRequired,
     role: PropTypes.string.isRequired,
-    sensorConfigurationId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    sensorConfigurationId: PropTypes.oneOfType([
+      PropTypes.string,
+      PropTypes.number
+    ]),
     mediumId: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
   }).isRequired,
   sensorConfigs: PropTypes.arrayOf(
@@ -426,7 +469,7 @@ const ColumnRoleTable = ({
                 : null;
 
             return (
-              <React.Fragment key={colIndex}>
+              <React.Fragment key={`col-${mapping.columnIndex}`}>
                 <TableRow
                   sx={getRowSx(mapping.role)}
                   data-testid={`column-row-${colIndex}`}>
@@ -459,7 +502,13 @@ const ColumnRoleTable = ({
                     </Tooltip>
                   </TableCell>
                   <TableCell>
-                    <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 0.5, flexWrap: 'wrap' }}>
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'flex-start',
+                        gap: 0.5,
+                        flexWrap: 'wrap'
+                      }}>
                       <FormControl size="small" sx={{ minWidth: 140 }}>
                         <Select
                           value={mapping.role || ''}
@@ -487,7 +536,14 @@ const ColumnRoleTable = ({
                               mediumId: null
                             });
                           }}
-                          data-testid={`role-select-${colIndex}`}>
+                          data-testid={`role-select-${colIndex}`}
+                          MenuProps={{
+                            slotProps: {
+                              paper: {
+                                'data-testid': `role-menu-${colIndex}`
+                              }
+                            }
+                          }}>
                           <MenuItem value="" disabled>
                             <em>
                               {formatMessage({
@@ -508,9 +564,10 @@ const ColumnRoleTable = ({
                         <TimestampConfig
                           mapping={mapping}
                           columnMappings={columnMappings}
-                          sampleValues={
-                            (sampleValues[colIndex] || []).slice(0, 10)
-                          }
+                          sampleValues={(sampleValues[colIndex] || []).slice(
+                            0,
+                            10
+                          )}
                           onUpdate={onUpdateMapping}
                         />
                       )}
@@ -578,8 +635,8 @@ ColumnRoleTable.propTypes = {
   columnHeaders: PropTypes.arrayOf(PropTypes.string).isRequired,
   sampleValues: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.string))
     .isRequired,
-  columnMappings: PropTypes.arrayOf(PropTypes.object).isRequired,
-  sensorConfigs: PropTypes.arrayOf(PropTypes.object).isRequired,
+  columnMappings: PropTypes.arrayOf(columnMappingPropType).isRequired,
+  sensorConfigs: PropTypes.arrayOf(sensorConfigPropType).isRequired,
   onUpdateMapping: PropTypes.func.isRequired
 };
 
@@ -591,16 +648,12 @@ const MapColumnsStep = () => {
 
   const rawRows = useSelector(state => state.importWizard.rawRows);
   const headerRow = useSelector(state => state.importWizard.headerRow);
-  const skipFirstRows = useSelector(
-    state => state.importWizard.skipFirstRows
-  );
+  const skipFirstRows = useSelector(state => state.importWizard.skipFirstRows);
   const skipLastRows = useSelector(state => state.importWizard.skipLastRows);
   const columnMappings = useSelector(
     state => state.importWizard.columnMappings
   );
-  const sensorConfigs = useSelector(
-    state => state.importWizard.sensorConfigs
-  );
+  const sensorConfigs = useSelector(state => state.importWizard.sensorConfigs);
 
   // Compute data rows (excluding header, skipped first rows, and skipped last rows)
   const dataRows = useMemo(() => {
@@ -636,12 +689,14 @@ const MapColumnsStep = () => {
   // Compute sample values per column (first 10 + last 10)
   const sampleValues = useMemo(() => {
     const firstRows = dataRows.slice(0, PREVIEW_COUNT);
-    const lastRows =
-      dataRows.length > PREVIEW_COUNT * 2
-        ? dataRows.slice(-PREVIEW_COUNT)
-        : dataRows.length > PREVIEW_COUNT
-          ? dataRows.slice(PREVIEW_COUNT)
-          : [];
+    // Enough rows for two disjoint windows: take the last ones. Enough for
+    // one and a bit: take whatever follows the first window. Otherwise the
+    // first window already covers everything.
+    let lastRows = [];
+    if (dataRows.length > PREVIEW_COUNT * 2)
+      lastRows = dataRows.slice(-PREVIEW_COUNT);
+    else if (dataRows.length > PREVIEW_COUNT)
+      lastRows = dataRows.slice(PREVIEW_COUNT);
     const sampleRows = [...firstRows, ...lastRows];
 
     return columnHeaders.map((_, colIdx) =>
@@ -687,54 +742,42 @@ const MapColumnsStep = () => {
   }, [columnHeaders, columnMappings, dispatch]);
 
   // Auto-select next logical timestamp type for new timestamp columns
-  const getAutoTimestampType = useCallback(
-    currentMappings => {
-      const existingTypes = currentMappings
-        .filter(
-          m => m.role === 'timestamp' && m.timestampType
-        )
-        .map(m => m.timestampType);
+  const getAutoTimestampType = useCallback(currentMappings => {
+    const existingTypes = currentMappings
+      .filter(m => m.role === 'timestamp' && m.timestampType)
+      .map(m => m.timestampType);
 
-      if (existingTypes.length === 0) return null;
+    if (existingTypes.length === 0) return null;
 
-      // Find the last assigned type in sequence and pick the next one
-      const lastType = existingTypes[existingTypes.length - 1];
-      const lastIdx = TIMESTAMP_TYPE_SEQUENCE.indexOf(lastType);
+    // Find the last assigned type in sequence and pick the next one
+    const lastType = existingTypes[existingTypes.length - 1];
+    const lastIdx = TIMESTAMP_TYPE_SEQUENCE.indexOf(lastType);
 
-      if (lastType === 'elapsed_seconds') {
+    if (lastType === 'elapsed_seconds') {
+      return 'elapsed_seconds';
+    }
+
+    if (lastIdx >= 0 && lastIdx < TIMESTAMP_TYPE_SEQUENCE.length - 1) {
+      const nextType = TIMESTAMP_TYPE_SEQUENCE[lastIdx + 1];
+      // Skip types already used (except elapsed_seconds)
+      if (nextType !== 'elapsed_seconds' && existingTypes.includes(nextType)) {
+        // Find next available
+        for (let i = lastIdx + 2; i < TIMESTAMP_TYPE_SEQUENCE.length; i += 1) {
+          const candidate = TIMESTAMP_TYPE_SEQUENCE[i];
+          if (
+            candidate === 'elapsed_seconds' ||
+            !existingTypes.includes(candidate)
+          ) {
+            return candidate;
+          }
+        }
         return 'elapsed_seconds';
       }
+      return nextType;
+    }
 
-      if (lastIdx >= 0 && lastIdx < TIMESTAMP_TYPE_SEQUENCE.length - 1) {
-        const nextType = TIMESTAMP_TYPE_SEQUENCE[lastIdx + 1];
-        // Skip types already used (except elapsed_seconds)
-        if (
-          nextType !== 'elapsed_seconds' &&
-          existingTypes.includes(nextType)
-        ) {
-          // Find next available
-          for (
-            let i = lastIdx + 2;
-            i < TIMESTAMP_TYPE_SEQUENCE.length;
-            i += 1
-          ) {
-            const candidate = TIMESTAMP_TYPE_SEQUENCE[i];
-            if (
-              candidate === 'elapsed_seconds' ||
-              !existingTypes.includes(candidate)
-            ) {
-              return candidate;
-            }
-          }
-          return 'elapsed_seconds';
-        }
-        return nextType;
-      }
-
-      return 'elapsed_seconds';
-    },
-    []
-  );
+    return 'elapsed_seconds';
+  }, []);
 
   const handleUpdateMapping = useCallback(
     updatedMapping => {

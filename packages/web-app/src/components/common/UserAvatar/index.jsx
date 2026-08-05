@@ -1,7 +1,7 @@
-import React from 'react';
 import { Avatar } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import PropTypes from 'prop-types';
+import { sxPropType } from '@/types/mui.type';
 
 const COLORS = ['primary', 'secondary', 'error', 'warning', 'info', 'success'];
 
@@ -46,7 +46,7 @@ const UserAvatar = ({ username, color = 'secondary', sx, ...props }) => {
 UserAvatar.propTypes = {
   username: PropTypes.string,
   color: PropTypes.oneOf(COLORS),
-  sx: PropTypes.object
+  sx: sxPropType
 };
 
 export default UserAvatar;

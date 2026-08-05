@@ -7,7 +7,10 @@ export const OBSTACLE_LEGEND = [
   { abbrevKey: 'obstacle.abbrev.pit', labelKey: 'obstacle.label.pit' },
   { abbrevKey: 'obstacle.abbrev.step', labelKey: 'obstacle.label.step' },
   { abbrevKey: 'obstacle.abbrev.climb', labelKey: 'obstacle.label.climb' },
-  { abbrevKey: 'obstacle.abbrev.waterfall', labelKey: 'obstacle.label.waterfall' },
+  {
+    abbrevKey: 'obstacle.abbrev.waterfall',
+    labelKey: 'obstacle.label.waterfall'
+  },
   { abbrevKey: 'obstacle.abbrev.handline', labelKey: 'obstacle.label.handline' }
 ];
 

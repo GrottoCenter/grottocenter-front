@@ -7,12 +7,11 @@ const isTokenExpired = authState => {
       return true;
     }
     return false;
-  } catch (err) {
+  } catch {
     return false;
   }
 };
 
-// eslint-disable-next-line import/prefer-default-export
 export function usePermissions() {
   const authState = useSelector(state => state.login);
   return {

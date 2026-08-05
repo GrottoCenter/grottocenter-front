@@ -1,6 +1,5 @@
-import React, { useRef, useMemo } from 'react';
-import { Fab } from '@mui/material';
-import { Grid } from '@mui/material';
+import { useRef, useMemo } from 'react';
+import { Fab, Grid } from '@mui/material';
 import { MapContainer, TileLayer, Marker } from 'react-leaflet';
 import { isNil } from 'ramda';
 import PropTypes from 'prop-types';
@@ -78,11 +77,7 @@ const MapLine = ({
       container
       direction="row"
       style={{ paddingBottom: paddingVertical, paddingTop: paddingVertical }}>
-      <Grid
-        container
-        size={4}
-        justifyContent="flex-start"
-        alignItems="center">
+      <Grid container size={4} justifyContent="flex-start" alignItems="center">
         <MapComponent position={position1} />
         <Fab
           onClick={() => onAddButtonClick(position1)}

@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import {
   FeatureGroup,
@@ -71,12 +71,9 @@ const getMultiPolygonCentroid = function (coordinates) {
   };
 };
 
-const calculateBoundsArea = bounds => {
-  return (
-    (bounds.getEast() - bounds.getWest()) *
-    (bounds.getNorth() - bounds.getSouth())
-  );
-};
+const calculateBoundsArea = bounds =>
+  (bounds.getEast() - bounds.getWest()) *
+  (bounds.getNorth() - bounds.getSouth());
 
 const sortByAreaDescending = (a, b) =>
   calculateBoundsArea(b.bounds) - calculateBoundsArea(a.bounds);
@@ -244,10 +241,9 @@ const PolygonMap = ({ onChange, onValidationChange, data }) => {
   const ZOOM_LEVEL = hasCoordinates || hasLocation ? focusZoom : defaultZoom;
 
   useEffect(() => {
-    if (map) {
-      const t = setTimeout(() => map.invalidateSize(), 200);
-      return () => clearTimeout(t);
-    }
+    if (!map) return undefined;
+    const t = setTimeout(() => map.invalidateSize(), 200);
+    return () => clearTimeout(t);
   }, [map, isMobile]);
 
   useEffect(() => {
@@ -595,7 +591,6 @@ const PolygonMap = ({ onChange, onValidationChange, data }) => {
       const polygons =
         data.type === 'Polygon' ? [data.coordinates] : data.coordinates;
 
-      // eslint-disable-next-line no-restricted-syntax
       for (const polygon of polygons) {
         // Add outer ring (first ring of each polygon)
         const outerRing = polygon[0].map(coords => [coords[1], coords[0]]);
@@ -734,9 +729,9 @@ const PolygonMap = ({ onChange, onValidationChange, data }) => {
             <LayersControl position="topright" />
 
             <KinkPane />
-            {allKinkPoints.map((point, idx) => (
+            {allKinkPoints.map(point => (
               <Marker
-                key={`kink-${point.lat}-${point.lng}-${idx}`}
+                key={`kink-${point.lat}-${point.lng}`}
                 position={[point.lat, point.lng]}
                 icon={kinkIcon}
                 interactive={false}

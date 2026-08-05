@@ -1,4 +1,3 @@
-import React from 'react';
 import { styled } from '@mui/material/styles';
 import {
   authorIcon,
@@ -37,7 +36,6 @@ export const nomelizeSearchEntity = option => {
   let iconSrc;
   let title = option.name; // Default for all entities
   let subtitle = '';
-  // eslint-disable-next-line no-underscore-dangle
   switch (option._type) {
     case 'persons':
       if (!option.name && !option.surname) {

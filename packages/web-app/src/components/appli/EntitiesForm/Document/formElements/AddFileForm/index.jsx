@@ -1,8 +1,7 @@
-import React, { useState, useEffect, useRef, useContext } from 'react';
+import { useState, useEffect, useRef, useContext } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl, FormattedMessage } from 'react-intl';
 import { useDispatch, useSelector } from 'react-redux';
-import { useUserProperties } from '../../../../../../hooks';
 import { isEmpty, remove } from 'ramda';
 import {
   Autocomplete,
@@ -20,8 +19,12 @@ import {
   TextField
 } from '@mui/material';
 
+import LicenseTag from '@/components/common/LicenseTag';
+import AppLink from '@/components/common/AppLink';
+import InternationalizedLink from '@/components/common/InternationalizedLink';
+import { licenceLinks } from '@/conf/externalLinks';
+import { useUserProperties, useFileFormats } from '../../../../../../hooks';
 import ErrorsList from './ErrorsList';
-import { useFileFormats } from '../../../../../../hooks';
 import {
   IS_DELETED,
   IS_NEW,
@@ -31,10 +34,6 @@ import {
   validateAndBuildFileEntries
 } from './FileHelpers';
 import FileSelectorInput from '../../../../../common/FileSelectorInput';
-import LicenseTag from '@/components/common/LicenseTag';
-import AppLink from '@/components/common/AppLink';
-import InternationalizedLink from '@/components/common/InternationalizedLink';
-import { licenceLinks } from '@/conf/externalLinks';
 import { fetchLicense } from '../../../../../../actions/Licenses';
 import { getDocuments } from '../../../../../../actions/Document/GetDocuments';
 import { DocumentFormContext } from '../../Provider';
@@ -258,7 +257,7 @@ const AddFileForm = ({
                         )
                       }}
                     />
-                    {')'}
+                    )
                   </>
                 }
               />

@@ -44,7 +44,9 @@ export function unsubscribeFromRegion(countryId, regionId, userId = null) {
           )
         );
       } else {
-        dispatch(unsubscribeFromRegionActionSuccess(`${countryId}-${regionId}`));
+        dispatch(
+          unsubscribeFromRegionActionSuccess(`${countryId}-${regionId}`)
+        );
       }
       return response;
     });

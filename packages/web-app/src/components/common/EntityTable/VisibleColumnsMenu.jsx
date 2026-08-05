@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import { Box, Button, Checkbox, Menu, MenuItem } from '@mui/material';
@@ -29,7 +29,11 @@ const VisibleColumnsMenu = ({
         {label && (
           <Box
             component="span"
-            sx={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            sx={{
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap'
+            }}>
             <Translate>{label}</Translate>
           </Box>
         )}

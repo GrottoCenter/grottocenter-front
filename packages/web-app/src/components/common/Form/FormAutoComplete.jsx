@@ -1,4 +1,4 @@
-import React from 'react';
+import PropTypes from 'prop-types';
 import { styled } from '@mui/material/styles';
 import {
   Box,
@@ -37,8 +37,11 @@ export const InputWrapper = styled('div')`
   flex-direction: column;
 `;
 
-// eslint-disable-next-line react/prop-types
 const ExpandIcon = ({ isOpen }) => (isOpen ? <ExpandLess /> : <ExpandMore />);
+
+ExpandIcon.propTypes = {
+  isOpen: PropTypes.bool.isRequired
+};
 
 const FormAutoComplete = ({
   getValueName,
@@ -54,53 +57,51 @@ const FormAutoComplete = ({
   sideActionDisabled = true,
   isSideActionOpen = false,
   children
-}) => {
-  return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
-      {helperContent && (
-        <Typography variant="caption" color="text.secondary" display="block">
-          {helperContent}
-        </Typography>
-      )}
-      <FormControl
-        variant="filled"
-        required={required}
-        error={hasError}
-        fullWidth>
-        <InputLabel>
-          <Translate>{label}</Translate>
-        </InputLabel>
-        <StyledInput
-          disabled
-          value={value !== null ? getValueName(value) : ''}
-          endAdornment={resultEndAdornment}
-        />
+}) => (
+  <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
+    {helperContent && (
+      <Typography variant="caption" color="text.secondary" display="block">
+        {helperContent}
+      </Typography>
+    )}
+    <FormControl
+      variant="filled"
+      required={required}
+      error={hasError}
+      fullWidth>
+      <InputLabel>
+        <Translate>{label}</Translate>
+      </InputLabel>
+      <StyledInput
+        disabled
+        value={value !== null ? getValueName(value) : ''}
+        endAdornment={resultEndAdornment}
+      />
 
-        {autoCompleteSearch && (
-          <StyledFormControl
-            variant="filled"
-            required={required}
-            error={hasError}>
-            <InputWrapper>
-              {autoCompleteSearch}
-              {children && <Collapse in={isSideActionOpen}>{children}</Collapse>}
-            </InputWrapper>
-            {onSideAction && (
-              <IconButton
-                size="small"
-                onClick={onSideAction}
-                disabled={sideActionDisabled}
-                color="secondary"
-                aria-label="new entity">
-                {sideActionIcon || <ExpandIcon isOpen={isSideActionOpen} />}
-              </IconButton>
-            )}
-          </StyledFormControl>
-        )}
-      </FormControl>
-    </Box>
-  );
-};
+      {autoCompleteSearch && (
+        <StyledFormControl
+          variant="filled"
+          required={required}
+          error={hasError}>
+          <InputWrapper>
+            {autoCompleteSearch}
+            {children && <Collapse in={isSideActionOpen}>{children}</Collapse>}
+          </InputWrapper>
+          {onSideAction && (
+            <IconButton
+              size="small"
+              onClick={onSideAction}
+              disabled={sideActionDisabled}
+              color="secondary"
+              aria-label="new entity">
+              {sideActionIcon || <ExpandIcon isOpen={isSideActionOpen} />}
+            </IconButton>
+          )}
+        </StyledFormControl>
+      )}
+    </FormControl>
+  </Box>
+);
 
 FormAutoComplete.propTypes = {
   ...FormAutoCompleteTypes

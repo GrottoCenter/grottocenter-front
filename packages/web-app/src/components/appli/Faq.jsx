@@ -13,10 +13,7 @@ import { useIntl } from 'react-intl';
 import { useSelector } from 'react-redux';
 import AppLink from '../common/AppLink';
 import InternationalizedLink from '../common/InternationalizedLink';
-import {
-  contributorsLink,
-  contributeLinks
-} from '../../conf/externalLinks';
+import { contributorsLink, contributeLinks } from '../../conf/externalLinks';
 
 const FaqRoot = styled('main')(({ theme }) => ({
   backgroundColor: theme.palette.background.default,
@@ -93,11 +90,18 @@ const Faq = () => {
     <FaqRoot>
       <Container maxWidth="md">
         <PageHeader>
-          <Typography variant="h4" component="h1" color="primary" fontWeight={600} gutterBottom>
+          <Typography
+            variant="h4"
+            component="h1"
+            color="primary"
+            fontWeight={600}
+            gutterBottom>
             {formatMessage({ id: 'Frequently asked questions' })}
           </Typography>
           <Typography variant="body1" color="text.secondary">
-            {formatMessage({ id: 'Find answers to common questions about GrottoCenter' })}
+            {formatMessage({
+              id: 'Find answers to common questions about GrottoCenter'
+            })}
           </Typography>
         </PageHeader>
 
@@ -118,7 +122,6 @@ const Faq = () => {
                   id: 'Cave protection is a priority. A procedure has been defined for sensitive locations.'
                 })}
               </Typography>
-
             </StyledDetails>
           </StyledAccordion>
 

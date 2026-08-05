@@ -17,16 +17,16 @@ describe('makeUrl property tests', () => {
     fc.assert(
       fc.property(
         fc.dictionary(
-          fc.stringMatching(/^[a-zA-Z_][a-zA-Z0-9_]*$/).filter(
-            (s) => s.length > 0
-          ),
+          fc
+            .stringMatching(/^[a-zA-Z_][a-zA-Z0-9_]*$/)
+            .filter(s => s.length > 0),
           fc.oneof(
             fc.string(),
             fc.integer(),
             fc.float({ noNaN: true, noDefaultInfinity: true })
           )
         ),
-        (criteria) => {
+        criteria => {
           const url = makeUrl(baseUrl, criteria);
           const keys = Object.keys(criteria);
 
@@ -42,7 +42,7 @@ describe('makeUrl property tests', () => {
           const paramKeys = [...params.keys()];
 
           // Every criteria key appears as a query parameter
-          keys.forEach((key) => {
+          keys.forEach(key => {
             expect(paramKeys).toContain(key);
           });
 
@@ -50,10 +50,8 @@ describe('makeUrl property tests', () => {
           expect(paramKeys.length).toBe(keys.length);
 
           // Each value is the URI-encoded version of the original
-          keys.forEach((key) => {
-            expect(params.get(key)).toBe(
-              String(criteria[key])
-            );
+          keys.forEach(key => {
+            expect(params.get(key)).toBe(String(criteria[key]));
           });
         }
       ),

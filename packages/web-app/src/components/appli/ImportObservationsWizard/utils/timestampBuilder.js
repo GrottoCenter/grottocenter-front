@@ -219,7 +219,8 @@ export const buildTimestamp = (row, mappings, timezone) => {
         const year = parseInt(yearVal, 10);
         const month = parseInt(monthVal, 10);
         const day = parseInt(dayVal, 10);
-        if (Number.isNaN(year) || Number.isNaN(month) || Number.isNaN(day)) return null;
+        if (Number.isNaN(year) || Number.isNaN(month) || Number.isNaN(day))
+          return null;
 
         const hourMapping = firstByType('hour');
         const minuteMapping = firstByType('minute');
@@ -235,7 +236,8 @@ export const buildTimestamp = (row, mappings, timezone) => {
           ? parseInt(getValue(secondMapping) || '0', 10)
           : 0;
 
-        if (Number.isNaN(hour) || Number.isNaN(minute) || Number.isNaN(second)) return null;
+        if (Number.isNaN(hour) || Number.isNaN(minute) || Number.isNaN(second))
+          return null;
 
         // Build a Date whose UTC fields represent the wall-clock time
         const localWallClock = new Date(
@@ -243,8 +245,7 @@ export const buildTimestamp = (row, mappings, timezone) => {
         );
         if (Number.isNaN(localWallClock.getTime())) return null;
 
-        const componentTz =
-          (yearMapping.timezone || tz);
+        const componentTz = yearMapping.timezone || tz;
         baseUtc = zonedTimeToUtc(localWallClock, componentTz);
         if (Number.isNaN(baseUtc.getTime())) return null;
       }

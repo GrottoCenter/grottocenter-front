@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import { GeoJSON, useMap, useMapEvent } from 'react-leaflet';
 import PropTypes from 'prop-types';
@@ -92,7 +92,6 @@ const MapInternals = ({ geoJson, massifId }) => {
     const { signal } = abortRef.current;
 
     const bounds = map.getBounds();
-    /* eslint-disable no-underscore-dangle */
     const criteria = {
       sw_lat: bounds._southWest.wrap().lat,
       sw_lng: bounds._southWest.wrap().lng,
@@ -100,7 +99,6 @@ const MapInternals = ({ geoJson, massifId }) => {
       ne_lng: bounds._northEast.wrap().lng,
       massif: massifId
     };
-    /* eslint-enable no-underscore-dangle */
 
     fetch(makeUrl(getMapEntrancesUrl, criteria), { signal })
       .then(r => (r.ok ? r.json() : []))
@@ -109,7 +107,7 @@ const MapInternals = ({ geoJson, massifId }) => {
       })
       .catch(err => {
         if (err.name !== 'AbortError')
-          console.error('Failed to fetch map markers:', err); // eslint-disable-line no-console
+          console.error('Failed to fetch map markers:', err);
       });
   }, [map, massifId]);
 
@@ -133,7 +131,7 @@ const MapInternals = ({ geoJson, massifId }) => {
   // (string prop → parsed once), this fires exactly once. If geoJson ever comes from
   // Redux or a fetch, ensure its reference is stable to avoid double-fetching here.
   useEffect(() => {
-    if (!massifBounds.isValid()) return;
+    if (!massifBounds.isValid()) return undefined;
     const sw = massifBounds.getSouthWest();
     const ne = massifBounds.getNorthEast();
     const controller = new AbortController();
@@ -166,12 +164,12 @@ const MapInternals = ({ geoJson, massifId }) => {
   useEffect(() => {
     if (!massifBounds.isValid()) {
       fetchMarkersRef.current();
-      return;
+      return undefined;
     }
     const container = map.getContainer();
     if (container.offsetWidth > 0 && container.offsetHeight > 0) {
       map.fitBounds(massifBounds);
-      return;
+      return undefined;
     }
     const observer = new ResizeObserver(() => {
       if (container.offsetWidth > 0 && container.offsetHeight > 0) {

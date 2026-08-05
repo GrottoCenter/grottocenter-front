@@ -46,6 +46,9 @@ const LinkBehavior = React.forwardRef(({ to, ...props }, ref) => (
   <Link {...props} to={to} ref={ref} />
 ));
 LinkBehavior.displayName = 'LinkBehavior';
+LinkBehavior.propTypes = {
+  to: PropTypes.string.isRequired
+};
 
 export const LinkedItem = ({ href = '', ItemIcon, label, onClick }) => (
   <ListItemButton

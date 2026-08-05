@@ -1,4 +1,3 @@
-import * as React from 'react';
 import { styled } from '@mui/material/styles';
 import { action } from 'storybook/actions';
 import SendIcon from '@mui/icons-material/Send';

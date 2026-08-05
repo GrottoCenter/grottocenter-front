@@ -1,13 +1,7 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
-import {
-  Box,
-  IconButton,
-  Popover,
-  Tooltip,
-  Typography
-} from '@mui/material';
+import { Box, IconButton, Popover, Tooltip, Typography } from '@mui/material';
 import EditNoteIcon from '@mui/icons-material/EditNote';
 
 const ARROWS = ['↑', '↓', '←', '→'];
@@ -51,12 +45,18 @@ const AnchorToolbar = ({ onInsert }) => {
         anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
         transformOrigin={{ vertical: 'top', horizontal: 'right' }}>
         <Box sx={{ pt: 1, px: 1, pb: 1 }}>
-          <Typography variant="caption" color="text.secondary" display="block" sx={{ mb: 0.5 }}>
+          <Typography
+            variant="caption"
+            color="text.secondary"
+            display="block"
+            sx={{ mb: 0.5 }}>
             {formatMessage({ id: 'Click to insert' })}
           </Typography>
           <Box sx={{ display: 'flex', gap: 0.5 }}>
             {ARROWS.map(arrow => (
-              <Tooltip key={arrow} title={`${formatMessage({ id: 'Click to insert' })} ${arrow}`}>
+              <Tooltip
+                key={arrow}
+                title={`${formatMessage({ id: 'Click to insert' })} ${arrow}`}>
                 <IconButton
                   onClick={() => {
                     onInsert(arrow);

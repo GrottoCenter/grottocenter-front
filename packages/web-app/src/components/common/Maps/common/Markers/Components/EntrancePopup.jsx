@@ -1,4 +1,3 @@
-import React from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import CustomIcon from '../../../../CustomIcon';
@@ -48,7 +47,9 @@ export const EntrancePopup = ({ entrance }) => {
       {dataQualityValue != null && (
         <Information
           icon={<DataQualityBadge value={dataQualityValue} size={25} />}
-          value={formatMessage({ id: getDataQualityLabelKey(dataQualityValue) })}
+          value={formatMessage({
+            id: getDataQualityLabelKey(dataQualityValue)
+          })}
         />
       )}
     </>

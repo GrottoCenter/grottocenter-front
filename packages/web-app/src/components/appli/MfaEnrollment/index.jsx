@@ -21,7 +21,11 @@ import { QRCodeSVG } from 'qrcode.react';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import Alert from '../../common/Alert';
 import { useNotification } from '../../../hooks';
-import { postMfaEnroll, postMfaVerify, clearMfaState } from '../../../actions/Mfa';
+import {
+  postMfaEnroll,
+  postMfaVerify,
+  clearMfaState
+} from '../../../actions/Mfa';
 import { normalizeOtp } from '../../../utils/otpHelpers';
 
 // ─── Step 1: Install authenticator ───────────────────────────────────────────
@@ -50,7 +54,9 @@ const StepInstall = ({ onContinue, isLoading, error }) => {
           variant="contained"
           onClick={onContinue}
           disabled={isLoading}
-          startIcon={isLoading ? <CircularProgress size={16} color="inherit" /> : null}>
+          startIcon={
+            isLoading ? <CircularProgress size={16} color="inherit" /> : null
+          }>
           {formatMessage({ id: 'Continue' })}
         </Button>
       </Box>
@@ -93,9 +99,12 @@ const StepScanQr = ({ otpauthUri, secret, onContinue, onBack }) => {
         <QRCodeSVG value={otpauthUri} size={180} />
       </Box>
       <Box sx={{ width: '100%' }}>
-        <Typography variant="caption" color="text.secondary" sx={{
-          display: 'block'
-        }}>
+        <Typography
+          variant="caption"
+          color="text.secondary"
+          sx={{
+            display: 'block'
+          }}>
           {formatMessage({ id: 'mfaSecretLabel' })}
         </Typography>
         <Box
@@ -111,7 +120,11 @@ const StepScanQr = ({ otpauthUri, secret, onContinue, onBack }) => {
           <Typography
             variant="caption"
             component="code"
-            sx={{ fontFamily: 'monospace', flexGrow: 1, wordBreak: 'break-all' }}>
+            sx={{
+              fontFamily: 'monospace',
+              flexGrow: 1,
+              wordBreak: 'break-all'
+            }}>
             {secret}
           </Typography>
           <Tooltip title={formatMessage({ id: 'mfaCopySecret' })}>
@@ -142,7 +155,14 @@ StepScanQr.propTypes = {
 
 // ─── Step 3: Verify code ──────────────────────────────────────────────────────
 
-const StepVerify = ({ onSubmit, isLoading, error, isEnrollmentTokenExpired, onBack, onBackToLogin }) => {
+const StepVerify = ({
+  onSubmit,
+  isLoading,
+  error,
+  isEnrollmentTokenExpired,
+  onBack,
+  onBackToLogin
+}) => {
   const { formatMessage } = useIntl();
   const [code, setCode] = React.useState('');
 
@@ -220,7 +240,11 @@ const StepVerify = ({ onSubmit, isLoading, error, isEnrollmentTokenExpired, onBa
       )}
       {!isEnrollmentTokenExpired && (
         <Box>
-          <Button variant="text" size="small" onClick={onBack} disabled={isLoading}>
+          <Button
+            variant="text"
+            size="small"
+            onClick={onBack}
+            disabled={isLoading}>
             {formatMessage({ id: 'Back' })}
           </Button>
         </Box>

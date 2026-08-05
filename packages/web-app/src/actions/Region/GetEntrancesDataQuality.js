@@ -10,14 +10,18 @@ export const FETCH_REGION_ENTRANCES_DATA_QUALITY_ERROR =
   'FETCH_REGION_ENTRANCES_DATA_QUALITY_ERROR';
 
 export const fetchRegionEntrances =
-  (countryId, regionId, { limit, offset } = {}) => (dispatch, getState) => {
+  (countryId, regionId, { limit, offset } = {}) =>
+  (dispatch, getState) => {
     dispatch({ type: FETCH_REGION_ENTRANCES_DATA_QUALITY_LOADING });
     const requestOptions = {
       headers: {
         ...getState().login.authorizationHeader
       }
     };
-    return fetch(getRegionEntrancesUrl(countryId, regionId, { limit, offset }), requestOptions)
+    return fetch(
+      getRegionEntrancesUrl(countryId, regionId, { limit, offset }),
+      requestOptions
+    )
       .then(response => {
         if (response.status >= 400) {
           throw new Error(response.status);

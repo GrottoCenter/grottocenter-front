@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import { List, Typography, Box } from '@mui/material';
@@ -76,10 +76,7 @@ const EntrancesList = props => {
       {entrances && entrances.length > 0 ? (
         <StyledList>
           {entrances.map(entrance => (
-            <EntranceListItem
-              key={entrance.id_entrance}
-              entrance={entrance}
-            />
+            <EntranceListItem key={entrance.id_entrance} entrance={entrance} />
           ))}
         </StyledList>
       ) : (
@@ -104,7 +101,7 @@ EntrancesList.propTypes = {
       name_massif: PropTypes.string,
       date_of_update: PropTypes.string
     })
-  ),
+  )
 };
 
 export default EntrancesList;

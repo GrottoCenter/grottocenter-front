@@ -1,4 +1,3 @@
-import React from 'react';
 import PropTypes from 'prop-types';
 import { Box, Typography } from '@mui/material';
 import { useIntl } from 'react-intl';
@@ -16,8 +15,7 @@ const Header = ({ entrance }) => {
       title={formatMessage(
         { id: 'Move entrance: {name}' },
         { name: entrance.name }
-      )}
-    >
+      )}>
       <Box sx={{ display: 'flex', alignItems: 'center', minWidth: 0 }}>
         <CustomIcon type="entrance" size={18} />
         <Typography variant="body1">{entrance.name}</Typography>

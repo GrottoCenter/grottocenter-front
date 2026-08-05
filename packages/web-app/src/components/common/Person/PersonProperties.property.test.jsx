@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { IntlProvider } from 'react-intl';
 import fc from 'fast-check';
@@ -45,10 +44,9 @@ const personArb = isBanned =>
       surname: fc.option(fc.string({ minLength: 1, maxLength: 20 }), {
         nil: undefined
       }),
-      language: fc.option(
-        fc.constantFrom('en', 'fr', 'es', 'de', 'it', 'pt'),
-        { nil: undefined }
-      ),
+      language: fc.option(fc.constantFrom('en', 'fr', 'es', 'de', 'it', 'pt'), {
+        nil: undefined
+      }),
       groups: fc.option(fc.array(groupArb, { minLength: 0, maxLength: 3 }), {
         nil: undefined
       }),

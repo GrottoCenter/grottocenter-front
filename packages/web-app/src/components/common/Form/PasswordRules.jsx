@@ -1,4 +1,3 @@
-import React from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import { Box, Typography } from '@mui/material';
@@ -22,7 +21,9 @@ const RuleItem = ({ satisfied, labelId, labelValues = undefined }) => {
 RuleItem.propTypes = {
   satisfied: PropTypes.bool.isRequired,
   labelId: PropTypes.string.isRequired,
-  labelValues: PropTypes.object
+  labelValues: PropTypes.objectOf(
+    PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+  )
 };
 
 const PasswordRules = ({ password }) => {
@@ -37,8 +38,14 @@ const PasswordRules = ({ password }) => {
         labelId="password.rule.minLength"
         labelValues={{ n: PASSWORD_MIN_LENGTH }}
       />
-      <RuleItem satisfied={rules.hasUppercase} labelId="password.rule.uppercase" />
-      <RuleItem satisfied={rules.hasLowercase} labelId="password.rule.lowercase" />
+      <RuleItem
+        satisfied={rules.hasUppercase}
+        labelId="password.rule.uppercase"
+      />
+      <RuleItem
+        satisfied={rules.hasLowercase}
+        labelId="password.rule.lowercase"
+      />
       <RuleItem satisfied={rules.hasDigit} labelId="password.rule.digit" />
       <RuleItem satisfied={rules.hasSpecial} labelId="password.rule.special" />
     </Box>

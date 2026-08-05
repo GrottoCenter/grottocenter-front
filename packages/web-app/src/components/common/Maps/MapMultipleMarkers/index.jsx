@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { useMap } from 'react-leaflet';
 import { isMobile } from 'react-device-detect';
@@ -21,7 +21,7 @@ const MultipleMarkers = ({ validPositions }) => {
   });
 
   useEffect(() => {
-    if (validPositions.length === 0) return;
+    if (validPositions.length === 0) return undefined;
     updateEntranceMarkers(validPositions);
 
     const latLngs = validPositions.map(p => [p.latitude, p.longitude]);
@@ -29,8 +29,7 @@ const MultipleMarkers = ({ validPositions }) => {
       map.fitBounds(latLngs, { padding: [40, 40], maxZoom: 16 });
 
     const container = map.getContainer();
-    let wasHidden =
-      container.clientWidth === 0 || container.clientHeight === 0;
+    let wasHidden = container.clientWidth === 0 || container.clientHeight === 0;
 
     // Re-fit bounds each time the map transitions from hidden to visible.
     // The one-shot pattern broke tab navigation: invalidateSize() fires 'resize'
@@ -55,7 +54,10 @@ MultipleMarkers.propTypes = {
 };
 
 const MapMultipleMarkers = ({ style, zoom, positions }) => {
-  const validPositions = useMemo(() => filterValidPositions(positions), [positions]);
+  const validPositions = useMemo(
+    () => filterValidPositions(positions),
+    [positions]
+  );
   if (validPositions.length === 0) return null;
 
   return (

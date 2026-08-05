@@ -185,13 +185,13 @@ export function postForgotPassword(email, onSuccess) {
             return;
           }
           errorMessage = json.message || json.error || text;
-        } catch (e) {
+        } catch {
           errorMessage =
             statusCode === 500
               ? 'A server error occurred, please try again later or contact Wikicaves for more information.'
               : text;
         }
-      } catch (e) {
+      } catch {
         errorMessage = 'Unknown error';
       }
     } catch (_) {

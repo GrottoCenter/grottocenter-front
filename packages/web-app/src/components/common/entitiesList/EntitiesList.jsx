@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
 import { Box, Tooltip, IconButton } from '@mui/material';
@@ -21,7 +21,12 @@ const EntitiesList = ({
   const { formatMessage } = useIntl();
   const compareKey = type === 'person' ? 'nickname' : 'name';
   const sorted = useMemo(
-    () => entities.slice().sort((a, b) => (a[compareKey] ?? '').localeCompare(b[compareKey] ?? '')),
+    () =>
+      entities
+        .slice()
+        .sort((a, b) =>
+          (a[compareKey] ?? '').localeCompare(b[compareKey] ?? '')
+        ),
     [entities, compareKey]
   );
 
@@ -41,8 +46,14 @@ const EntitiesList = ({
     : () => null;
 
   const cardConfig = {
-    cave: { Component: CaveCard, props: e => ({ cave: e, itemActionButton: itemAction(e) }) },
-    person: { Component: PersonCard, props: e => ({ person: e, itemActionButton: itemAction(e) }) },
+    cave: {
+      Component: CaveCard,
+      props: e => ({ cave: e, itemActionButton: itemAction(e) })
+    },
+    person: {
+      Component: PersonCard,
+      props: e => ({ person: e, itemActionButton: itemAction(e) })
+    },
     entrance: {
       Component: EntranceCard,
       props: e => ({
@@ -51,15 +62,23 @@ const EntitiesList = ({
         itemActionButton: itemAction(e)
       })
     },
-    organization: { Component: OrganizationCard, props: e => ({ organization: e, itemActionButton: itemAction(e) }) }
+    organization: {
+      Component: OrganizationCard,
+      props: e => ({ organization: e, itemActionButton: itemAction(e) })
+    }
   };
-  const { Component: ListItemComponent, props: listItemProps } = cardConfig[type];
+  const { Component: ListItemComponent, props: listItemProps } =
+    cardConfig[type];
 
   return entities.length > 0 ? (
     <Box
       sx={{
         display: 'grid',
-        gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(3, 1fr)' },
+        gridTemplateColumns: {
+          xs: '1fr',
+          sm: 'repeat(2, 1fr)',
+          md: 'repeat(3, 1fr)'
+        },
         gap: { xs: 1, md: 2 }
       }}>
       {sorted.map(e => (

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { head, pluck } from 'ramda';
 import {
   LayerGroup,
@@ -30,14 +30,18 @@ const getStoredOverlays = () => {
   }
 };
 const selectedOverlays = getStoredOverlays();
-const localStorageOpacity = parseFloat(window.localStorage.getItem('layerOpacity'));
-const selectedOpacity = !isNaN(localStorageOpacity) ? localStorageOpacity : 1;
+const localStorageOpacity = parseFloat(
+  window.localStorage.getItem('layerOpacity')
+);
+const selectedOpacity = Number.isNaN(localStorageOpacity)
+  ? 1
+  : localStorageOpacity;
 
-const usePanes = (layers) => {
+const usePanes = paneLayers => {
   const map = useMap();
 
   useEffect(() => {
-    const panes = [...new Set(layers.map(l => l.pane).filter(Boolean))];
+    const panes = [...new Set(paneLayers.map(l => l.pane).filter(Boolean))];
     // When the map is rotatable (leaflet-rotate), custom tile panes must be
     // created inside the rotatePane. Otherwise Leaflet attaches them to the
     // mapPane — a sibling of the rotatePane — so their tiles stay north-up
@@ -51,7 +55,7 @@ const usePanes = (layers) => {
         pane.style.zIndex = 200 + index * 10;
       }
     });
-  }, [map, layers]);
+  }, [map, paneLayers]);
 };
 
 const createWMTSTileLayer = (layer, opacity = 1) => (
@@ -62,7 +66,10 @@ const createWMTSTileLayer = (layer, opacity = 1) => (
     minZoom={layer.minZoom}
     maxZoom={layer.maxZoom ?? 22}
     maxNativeZoom={layer.maxNativeZoom ?? 22}
-    bounds={layer.bounds ?? new L.LatLngBounds(new L.LatLng(-90, -180), new L.LatLng(90, 180))}
+    bounds={
+      layer.bounds ??
+      new L.LatLngBounds(new L.LatLng(-90, -180), new L.LatLng(90, 180))
+    }
     opacity={opacity}
     referrerPolicy={layer.referrerPolicy}
   />
@@ -143,7 +150,7 @@ const OpacityControl = ({ position, opacity, setOpacity }) => {
           min="0"
           max="100"
           value={opacity * 100}
-          onChange={(e) => setOpacity(e.target.value / 100)}
+          onChange={e => setOpacity(e.target.value / 100)}
           isExpanded={isExpanded}
         />
       </OpacityControlContainer>
@@ -158,13 +165,17 @@ OpacityControl.propTypes = {
 };
 
 const LayersControl = ({
-                         position = 'topleft',
-                         initialSelectedBaseLayer = selectedBaseLayer,
-                         initialSelectedOverlays = selectedOverlays
-                       }) => {
+  position = 'topleft',
+  initialSelectedBaseLayer = selectedBaseLayer,
+  initialSelectedOverlays = selectedOverlays
+}) => {
   const [opacity, setOpacity] = useState(selectedOpacity);
-  const [currentBaseLayer, setCurrentBaseLayer] = useState(initialSelectedBaseLayer);
-  const [currentOverlays, setCurrentOverlays] = useState(initialSelectedOverlays);
+  const [currentBaseLayer, setCurrentBaseLayer] = useState(
+    initialSelectedBaseLayer
+  );
+  const [currentOverlays, setCurrentOverlays] = useState(
+    initialSelectedOverlays
+  );
   const [isMapReady, setIsMapReady] = useState(false);
   const map = useMap();
 
@@ -191,7 +202,7 @@ const LayersControl = ({
   );
 
   useEffect(() => {
-    const onChange = (e) => {
+    const onChange = e => {
       setCurrentBaseLayer(e.name);
       window.localStorage.setItem('selectedBaseLayer', e.name);
     };
@@ -203,18 +214,26 @@ const LayersControl = ({
   }, [map]);
 
   useEffect(() => {
-    const onAdd = (e) => {
+    const onAdd = e => {
       setCurrentOverlays(prev => {
         const updated = Array.isArray(prev) ? [...prev, e.name] : [e.name];
-        window.localStorage.setItem('selectedOverlays', JSON.stringify(updated));
+        window.localStorage.setItem(
+          'selectedOverlays',
+          JSON.stringify(updated)
+        );
         return updated;
       });
     };
-    const onRemove = (e) => {
+    const onRemove = e => {
       setCurrentOverlays(prev => {
-        const updated = Array.isArray(prev) ? prev.filter(name => name !== e.name) : [];
+        const updated = Array.isArray(prev)
+          ? prev.filter(name => name !== e.name)
+          : [];
         if (updated.length > 0) {
-          window.localStorage.setItem('selectedOverlays', JSON.stringify(updated));
+          window.localStorage.setItem(
+            'selectedOverlays',
+            JSON.stringify(updated)
+          );
         } else {
           window.localStorage.removeItem('selectedOverlays');
         }
@@ -239,8 +258,7 @@ const LayersControl = ({
           <LeafletLayersControl.BaseLayer
             key={layer.id}
             checked={layer.name === initialSelectedBaseLayer}
-            name={layer.name}
-          >
+            name={layer.name}>
             {renderLayer(layer, 1)}
           </LeafletLayersControl.BaseLayer>
         ))}
@@ -248,15 +266,22 @@ const LayersControl = ({
           <LeafletLayersControl.Overlay
             key={layer.id}
             name={layer.name}
-            checked={Array.isArray(initialSelectedOverlays) && initialSelectedOverlays.includes(layer.name)}
-          >
-            <LayerGroup>
-              {renderLayer(layer, opacity)}
-            </LayerGroup>
+            checked={
+              Array.isArray(initialSelectedOverlays) &&
+              initialSelectedOverlays.includes(layer.name)
+            }>
+            <LayerGroup>{renderLayer(layer, opacity)}</LayerGroup>
           </LeafletLayersControl.Overlay>
         ))}
       </LeafletLayersControl>
-      {currentOverlays?.length > 0 && <OpacityControl key={currentBaseLayer} position={position} opacity={opacity} setOpacity={setOpacity} />}
+      {currentOverlays?.length > 0 && (
+        <OpacityControl
+          key={currentBaseLayer}
+          position={position}
+          opacity={opacity}
+          setOpacity={setOpacity}
+        />
+      )}
     </>
   );
 };

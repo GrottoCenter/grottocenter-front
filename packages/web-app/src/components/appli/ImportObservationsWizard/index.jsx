@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
 import { useIntl } from 'react-intl';
@@ -22,8 +22,14 @@ import SubmitStep from './steps/SubmitStep';
 
 const isStep0NextDisabled = rawRows => rawRows.length === 0;
 
-const isStep1NextDisabled = (confirmedDevice, sensorConfigs, sensorConfigsLoading) =>
-  confirmedDevice === null || sensorConfigsLoading || sensorConfigs.length === 0;
+const isStep1NextDisabled = (
+  confirmedDevice,
+  sensorConfigs,
+  sensorConfigsLoading
+) =>
+  confirmedDevice === null ||
+  sensorConfigsLoading ||
+  sensorConfigs.length === 0;
 
 const isStep2NextDisabled = columnMappings => {
   if (columnMappings.length === 0) return true;
@@ -42,7 +48,8 @@ const isStep2NextDisabled = columnMappings => {
   // All measurement columns must have a sensorConfigurationId
   const measurementCols = columnMappings.filter(m => m.role === 'measurement');
   const allMeasurementsHaveSensor = measurementCols.every(
-    m => m.sensorConfigurationId !== null && m.sensorConfigurationId !== undefined
+    m =>
+      m.sensorConfigurationId !== null && m.sensorConfigurationId !== undefined
   );
   if (!allMeasurementsHaveSensor) return true;
 
@@ -50,12 +57,18 @@ const isStep2NextDisabled = columnMappings => {
 };
 
 const isStep3NextDisabled = validationResult =>
-  validationResult === null ||
-  validationResult.blockingErrors.length > 0;
+  validationResult === null || validationResult.blockingErrors.length > 0;
 
 const isStep4NextDisabled = context => {
-  const { locationMode, pointLabel, caveId, licenseId, latitude, longitude,
-    authorIds } = context;
+  const {
+    locationMode,
+    pointLabel,
+    caveId,
+    licenseId,
+    latitude,
+    longitude,
+    authorIds
+  } = context;
   if (!licenseId) return true;
   if (!authorIds || authorIds.length === 0) return true;
   switch (locationMode) {

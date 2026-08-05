@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { useIntl, FormattedRelativeTime } from 'react-intl';
 import PropTypes from 'prop-types';
 import { Box, Skeleton, Typography } from '@mui/material';
@@ -197,6 +197,9 @@ const RecentChangesCard = ({ changes, isFetching, fetch }) => {
   if (isFetching || !changes) {
     return (
       <Box>
+        {/* Fixed-length skeleton placeholders: position is the only identity
+            they have, and the list never reorders. */}
+        {/* eslint-disable react/no-array-index-key */}
         {[...Array(5)].map((_, i) => (
           <Box
             key={i}
@@ -218,14 +221,18 @@ const RecentChangesCard = ({ changes, isFetching, fetch }) => {
             </Box>
           </Box>
         ))}
+        {/* eslint-enable react/no-array-index-key */}
       </Box>
     );
   }
 
   return (
     <Box>
-      {changes.map((e, index) => (
-        <ChangeItem changeInfo={e} key={`${e.date}-${index}`} />
+      {changes.map(e => (
+        <ChangeItem
+          changeInfo={e}
+          key={`${e.date}-${e.mainEntityType}-${e.mainEntityId}`}
+        />
       ))}
     </Box>
   );

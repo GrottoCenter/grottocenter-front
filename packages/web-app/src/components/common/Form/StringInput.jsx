@@ -1,4 +1,3 @@
-import React from 'react';
 import PropTypes from 'prop-types';
 import {
   Box,
@@ -26,7 +25,12 @@ const StringInput = ({
   };
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', width: fullWidth ? '100%' : undefined }}>
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        width: fullWidth ? '100%' : undefined
+      }}>
       {helperText && (
         <Typography variant="caption" color="text.secondary">
           {helperText}

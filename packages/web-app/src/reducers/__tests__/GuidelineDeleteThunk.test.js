@@ -51,9 +51,13 @@ describe('permanent delete thunk -> store', () => {
   it('204 No Content removes the guideline and reports success', async () => {
     const store = makeStore(seededMassif);
     mockFetch({ status: 204, body: undefined });
-    const ok = await store.dispatch(deleteGuideline({ id: 7, isPermanent: true }));
+    const ok = await store.dispatch(
+      deleteGuideline({ id: 7, isPermanent: true })
+    );
     expect(ok).toBe(true);
-    expect(store.getState().massif.massif.guidelines.map(g => g.id)).toEqual([8]);
+    expect(store.getState().massif.massif.guidelines.map(g => g.id)).toEqual([
+      8
+    ]);
   });
 
   it('200 with the deleted guideline body removes it', async () => {
@@ -63,22 +67,30 @@ describe('permanent delete thunk -> store', () => {
       body: { id: 7, title: 'g7', isDeleted: true, massifs: [{ id: 42 }] }
     });
     await store.dispatch(deleteGuideline({ id: 7, isPermanent: true }));
-    expect(store.getState().massif.massif.guidelines.map(g => g.id)).toEqual([8]);
+    expect(store.getState().massif.massif.guidelines.map(g => g.id)).toEqual([
+      8
+    ]);
   });
 
   it('200 with a string id in the body still removes it', async () => {
     const store = makeStore(seededMassif);
     mockFetch({ status: 200, body: { id: '7' } });
     await store.dispatch(deleteGuideline({ id: 7, isPermanent: true }));
-    expect(store.getState().massif.massif.guidelines.map(g => g.id)).toEqual([8]);
+    expect(store.getState().massif.massif.guidelines.map(g => g.id)).toEqual([
+      8
+    ]);
   });
 
   it('403 error leaves the guideline in place and reports failure', async () => {
     const store = makeStore(seededMassif);
     mockFetch({ status: 403, body: { message: 'forbidden' } });
-    const ok = await store.dispatch(deleteGuideline({ id: 7, isPermanent: true }));
+    const ok = await store.dispatch(
+      deleteGuideline({ id: 7, isPermanent: true })
+    );
     expect(ok).toBe(false);
-    expect(store.getState().massif.massif.guidelines.map(g => g.id)).toEqual([7, 8]);
+    expect(store.getState().massif.massif.guidelines.map(g => g.id)).toEqual([
+      7, 8
+    ]);
   });
 
   it('FULL LIFECYCLE: load -> soft delete -> permanent delete', async () => {
@@ -110,6 +122,8 @@ describe('permanent delete thunk -> store', () => {
     // 2. Permanent delete of the now soft-deleted guideline.
     mockFetch({ status: 204, body: undefined });
     await store.dispatch(deleteGuideline({ id: 7, isPermanent: true }));
-    expect(store.getState().massif.massif.guidelines.map(g => g.id)).toEqual([8]);
+    expect(store.getState().massif.massif.guidelines.map(g => g.id)).toEqual([
+      8
+    ]);
   });
 });

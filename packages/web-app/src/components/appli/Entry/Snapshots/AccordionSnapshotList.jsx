@@ -1,4 +1,3 @@
-import React from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import { Box, Skeleton } from '@mui/material';
@@ -108,26 +107,28 @@ const AccordionSnapshotList = ({
   return (
     <Box sx={{ px: 1 }}>
       {isCurrentItemLoading && (
-        <Skeleton height={80} variant="rectangular" sx={{ borderRadius: 1, mb: 0.5 }} />
+        <Skeleton
+          height={80}
+          variant="rectangular"
+          sx={{ borderRadius: 1, mb: 0.5 }}
+        />
       )}
       {hasItems ? (
-        <>
-          <Timeline sx={TIMELINE_SX}>
-            {hasCurrentItem && (
-              <AccordionSnapshot
-                snapshot={currentItem}
-                snapshotType={type}
-                isNetwork={isNetwork}
-                author={currentItem.author}
-                reviewer={currentItem.reviewer}
-                previous={mostRecentSnapshot}
-                isCurrent
-                actualItem={currentItem}
-              />
-            )}
-            {hasRevisions && snapshotElements}
-          </Timeline>
-        </>
+        <Timeline sx={TIMELINE_SX}>
+          {hasCurrentItem && (
+            <AccordionSnapshot
+              snapshot={currentItem}
+              snapshotType={type}
+              isNetwork={isNetwork}
+              author={currentItem.author}
+              reviewer={currentItem.reviewer}
+              previous={mostRecentSnapshot}
+              isCurrent
+              actualItem={currentItem}
+            />
+          )}
+          {hasRevisions && snapshotElements}
+        </Timeline>
       ) : (
         !isCurrentItemLoading && (
           <Alert

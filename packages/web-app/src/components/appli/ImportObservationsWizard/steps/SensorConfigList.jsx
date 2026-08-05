@@ -1,4 +1,3 @@
-import React from 'react';
 import PropTypes from 'prop-types';
 import { useSelector, useDispatch } from 'react-redux';
 import { useIntl } from 'react-intl';
@@ -19,12 +18,8 @@ const SensorConfigList = ({ deviceId }) => {
   const { formatMessage } = useIntl();
   const dispatch = useDispatch();
 
-  const sensorConfigs = useSelector(
-    state => state.importWizard.sensorConfigs
-  );
-  const loading = useSelector(
-    state => state.importWizard.sensorConfigsLoading
-  );
+  const sensorConfigs = useSelector(state => state.importWizard.sensorConfigs);
+  const loading = useSelector(state => state.importWizard.sensorConfigsLoading);
   const error = useSelector(state => state.importWizard.sensorConfigsError);
 
   const handleRetry = () => {
@@ -78,10 +73,7 @@ const SensorConfigList = ({ deviceId }) => {
     <List dense data-testid="sensor-config-list">
       {sensorConfigs.map(config => {
         const secondaryParts = [];
-        if (
-          config.precisionLower != null &&
-          config.precisionUpper != null
-        ) {
+        if (config.precisionLower != null && config.precisionUpper != null) {
           secondaryParts.push(
             formatMessage(
               {
@@ -113,9 +105,7 @@ const SensorConfigList = ({ deviceId }) => {
             <ListItemText
               primary={
                 <Typography variant="body2">
-                  {config.label
-                    ? `${config.label} — `
-                    : ''}
+                  {config.label ? `${config.label} — ` : ''}
                   {config.substanceName
                     ? `${formatMessage({ id: `quantityKind.${config.quantityKindCode}` })} [${config.substanceName}] (${config.unitSymbol || ''})`
                     : `${formatMessage({ id: `quantityKind.${config.quantityKindCode}` })} (${config.unitSymbol || ''})`}

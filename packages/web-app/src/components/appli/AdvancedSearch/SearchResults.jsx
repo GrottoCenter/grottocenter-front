@@ -1,4 +1,3 @@
-import React from 'react';
 import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
 import {
@@ -44,7 +43,12 @@ const SearchResults = ({ onSelected, hideExport, entityType, compact }) => {
         hideExport
           ? null
           : (columns, columnsName, format) => {
-              downloadAdvancedSearchResults({ ...queryParams, columns, columnsName, format });
+              downloadAdvancedSearchResults({
+                ...queryParams,
+                columns,
+                columnsName,
+                format
+              });
             }
       }
       onSelected={!onSelected ? null : ids => onSelected(ids, results)}

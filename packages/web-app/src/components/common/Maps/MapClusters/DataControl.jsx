@@ -229,9 +229,7 @@ const DataControl = ({
   }, []);
 
   // Remove expanded class on unmount
-  useEffect(() => {
-    return () => toggleExpanded(false);
-  }, [toggleExpanded]);
+  useEffect(() => () => toggleExpanded(false), [toggleExpanded]);
 
   // Close panel when touching outside on mobile
   useEffect(() => {
@@ -261,7 +259,9 @@ const DataControl = ({
           disabled={fullScreen}
           data-tour="data-control-toggle"
           onClick={() => toggleExpanded(true)}>
-          <VisibilityIcon sx={{ color: theme => theme.palette.mapControlIcon }} />
+          <VisibilityIcon
+            sx={{ color: theme => theme.palette.mapControlIcon }}
+          />
         </ToggleButton>
 
         <section className="leaflet-control-layers-list">

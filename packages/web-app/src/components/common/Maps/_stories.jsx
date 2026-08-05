@@ -1,4 +1,4 @@
-import React from 'react';
+import PropTypes from 'prop-types';
 import { Card as MuiCard, Paper } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import * as d3 from 'd3';
@@ -35,12 +35,15 @@ const positions = {
   ]
 };
 
-// eslint-disable-next-line react/prop-types
 const MultipleMarkersMap = ({ selection }) => (
   <Card style={{ width: '500px' }}>
     <MultipleMarkers positions={selection} />
   </Card>
 );
+
+MultipleMarkersMap.propTypes = {
+  selection: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.number)).isRequired
+};
 
 const center = [46, 2];
 const latFn = d3.randomNormal(center[0], 1);

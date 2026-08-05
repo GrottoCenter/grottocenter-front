@@ -38,7 +38,9 @@ describe('computeBoundingBox', () => {
     });
 
     it('coerces numeric strings (the form passes strings)', () => {
-      expect(computeBoundingBox('0', '0', 1)).toEqual(computeBoundingBox(0, 0, 1));
+      expect(computeBoundingBox('0', '0', 1)).toEqual(
+        computeBoundingBox(0, 0, 1)
+      );
     });
 
     it('falls back to a full-longitude box near the poles', () => {
@@ -98,17 +100,23 @@ describe('computeBoundingBox', () => {
 
     it('grows (never shrinks) the latitude span as the radius grows', () => {
       fc.assert(
-        fc.property(latArb, lngArb, radiusArb, radiusArb, (lat, lng, r1, r2) => {
-          const small = Math.min(r1, r2);
-          const large = Math.max(r1, r2);
-          const spanSmall =
-            computeBoundingBox(lat, lng, small).ne_lat -
-            computeBoundingBox(lat, lng, small).sw_lat;
-          const spanLarge =
-            computeBoundingBox(lat, lng, large).ne_lat -
-            computeBoundingBox(lat, lng, large).sw_lat;
-          expect(spanLarge).toBeGreaterThanOrEqual(spanSmall);
-        }),
+        fc.property(
+          latArb,
+          lngArb,
+          radiusArb,
+          radiusArb,
+          (lat, lng, r1, r2) => {
+            const small = Math.min(r1, r2);
+            const large = Math.max(r1, r2);
+            const spanSmall =
+              computeBoundingBox(lat, lng, small).ne_lat -
+              computeBoundingBox(lat, lng, small).sw_lat;
+            const spanLarge =
+              computeBoundingBox(lat, lng, large).ne_lat -
+              computeBoundingBox(lat, lng, large).sw_lat;
+            expect(spanLarge).toBeGreaterThanOrEqual(spanSmall);
+          }
+        ),
         { numRuns: 200 }
       );
     });

@@ -51,7 +51,7 @@ export function fetchMenuNotifications(criterias) {
         )
       );
     } catch (error) {
-      if (error.isAuthError) return;
+      if (error.isAuthError) return undefined;
       return dispatch(
         fetchMenuNotificationsActionFailure(
           makeErrorMessage(error.message, `Fetching menu notifications`),

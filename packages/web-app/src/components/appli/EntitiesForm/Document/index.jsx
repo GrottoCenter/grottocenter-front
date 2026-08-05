@@ -1,7 +1,10 @@
-import React, { useContext, useState, useEffect, useRef } from 'react';
+import { useContext, useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
-// eslint-disable-next-line camelcase
-import { useNavigate, unstable_usePrompt, useSearchParams } from 'react-router-dom';
+import {
+  useNavigate,
+  unstable_usePrompt as usePrompt,
+  useSearchParams
+} from 'react-router-dom';
 import {
   Button,
   Dialog,
@@ -26,9 +29,7 @@ import { displayLoginDialog } from '../../../../actions/Login';
 import { linkDocumentToEntrance } from '../../../../actions/LinkDocumentToEntrance';
 import { fetchEntrance } from '../../../../actions/Entrance/GetEntrance';
 
-import DocumentFormProvider, {
-  DocumentFormContext
-} from './Provider';
+import DocumentFormProvider, { DocumentFormContext } from './Provider';
 import { defaultDocumentValuesTypes } from './types';
 import FromContent from './FormContent';
 import DocumentSubmissionDialog from './DocumentSubmissionDialog';
@@ -48,7 +49,6 @@ const CenteredBlock = styled('div')`
 const Spacer = styled('div')`
   height: 20px;
 `;
-
 
 const DONT_LEAVE_MESSAGE =
   'If you leave now, some data would be lost. Are you sure you want to leave this page?';
@@ -76,7 +76,9 @@ const DocumentSubmission = ({ onCancel }) => {
 
   const createDocumentState = useSelector(state => state.createDocument);
   const updateDocumentState = useSelector(state => state.updateDocument);
-  const documentState = isNewDocument ? createDocumentState : updateDocumentState;
+  const documentState = isNewDocument
+    ? createDocumentState
+    : updateDocumentState;
   const entranceState = useSelector(state => state.entrance);
 
   const entranceIdParam = searchParams.get('entranceId')
@@ -94,7 +96,11 @@ const DocumentSubmission = ({ onCancel }) => {
   }, [entranceIdParam]);
 
   useEffect(() => {
-    if (entranceIdParam && entranceState.data?.id === entranceIdParam && !linkedEntrance) {
+    if (
+      entranceIdParam &&
+      entranceState.data?.id === entranceIdParam &&
+      !linkedEntrance
+    ) {
       setLinkedEntrance({ id: entranceIdParam, name: entranceState.data.name });
     }
   }, [entranceState.data, entranceIdParam, linkedEntrance, setLinkedEntrance]);
@@ -152,7 +158,12 @@ const DocumentSubmission = ({ onCancel }) => {
     if (!isDocSubmitted) return;
     if (documentState.latestHttpCode === 200) {
       setDocSubmittedWithSuccess(true);
-      if (isNewDocument && linkedEntrance && documentState.createdDocument && !hasLinked.current) {
+      if (
+        isNewDocument &&
+        linkedEntrance &&
+        documentState.createdDocument &&
+        !hasLinked.current
+      ) {
         hasLinked.current = true;
         dispatch(
           linkDocumentToEntrance({
@@ -171,8 +182,7 @@ const DocumentSubmission = ({ onCancel }) => {
     dispatch
   ]);
 
-  // eslint-disable-next-line camelcase
-  unstable_usePrompt({
+  usePrompt({
     message: formatMessage({ id: DONT_LEAVE_MESSAGE }),
     when: ({ currentLocation, nextLocation }) =>
       permissions.isAuth &&
@@ -249,7 +259,10 @@ const DocumentSubmission = ({ onCancel }) => {
       )}
       {permissions.isAuth && !isDocSubmittedWithSuccess && (
         <>
-          <DocumentSubmissionDialog isLoading={documentState.isLoading} isNewDocument={isNewDocument} />
+          <DocumentSubmissionDialog
+            isLoading={documentState.isLoading}
+            isNewDocument={isNewDocument}
+          />
           <form
             onSubmit={onFormSubmit}
             style={documentState.isLoading ? { opacity: '0.6' } : undefined}>

@@ -1,4 +1,4 @@
-import React, { useMemo, useCallback } from 'react';
+import { useMemo, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import {
@@ -23,6 +23,12 @@ import {
   SEPARATORS,
   validateFormat
 } from './utils/timestampFormatUtils';
+
+const PLACEHOLDERS = {
+  timeOnly: 'HH:mm:ss',
+  dateOnly: 'YYYY-MM-DD',
+  datetime: 'YYYY-MM-DD HH:mm:ss'
+};
 
 // ─── Token descriptions (keyed by token value) ───────────────────────────────
 
@@ -149,23 +155,26 @@ const TokenReferenceContent = ({ tokens }) => {
       <Table size="small">
         <TableHead>
           <TableRow>
-            <TableCell sx={{
-              fontWeight: 'bold'
-            }}>
+            <TableCell
+              sx={{
+                fontWeight: 'bold'
+              }}>
               {formatMessage({
                 id: 'ImportObservationsWizard.FormatInput.tokenColumn'
               })}
             </TableCell>
-            <TableCell sx={{
-              fontWeight: 'bold'
-            }}>
+            <TableCell
+              sx={{
+                fontWeight: 'bold'
+              }}>
               {formatMessage({
                 id: 'ImportObservationsWizard.FormatInput.meaningColumn'
               })}
             </TableCell>
-            <TableCell sx={{
-              fontWeight: 'bold'
-            }}>
+            <TableCell
+              sx={{
+                fontWeight: 'bold'
+              }}>
               {formatMessage({
                 id: 'ImportObservationsWizard.FormatInput.exampleColumn'
               })}
@@ -175,9 +184,10 @@ const TokenReferenceContent = ({ tokens }) => {
         <TableBody>
           {tokens.map(token => (
             <TableRow key={token}>
-              <TableCell sx={{
-                fontFamily: 'monospace'
-              }}>
+              <TableCell
+                sx={{
+                  fontFamily: 'monospace'
+                }}>
                 {token}
               </TableCell>
               <TableCell>
@@ -185,9 +195,10 @@ const TokenReferenceContent = ({ tokens }) => {
                   id: `ImportObservationsWizard.FormatInput.token.${token}`
                 })}
               </TableCell>
-              <TableCell sx={{
-                fontFamily: 'monospace'
-              }}>
+              <TableCell
+                sx={{
+                  fontFamily: 'monospace'
+                }}>
                 {TOKEN_DESCRIPTIONS[token]?.example || ''}
               </TableCell>
             </TableRow>
@@ -233,8 +244,7 @@ const TimestampFormatInput = ({
     [currentFormat, sampleValues]
   );
 
-  const showValidation =
-    currentFormat.length > 0 && sampleValues.length > 0;
+  const showValidation = currentFormat.length > 0 && sampleValues.length > 0;
 
   const handleChange = useCallback(
     e => {
@@ -243,12 +253,7 @@ const TimestampFormatInput = ({
     [onChange]
   );
 
-  const placeholder =
-    timestampType === 'timeOnly'
-      ? 'HH:mm:ss'
-      : timestampType === 'dateOnly'
-        ? 'YYYY-MM-DD'
-        : 'YYYY-MM-DD HH:mm:ss';
+  const placeholder = PLACEHOLDERS[timestampType] ?? PLACEHOLDERS.datetime;
 
   return (
     <Box data-testid="format-pill-builder">
@@ -268,7 +273,12 @@ const TimestampFormatInput = ({
                     placement="bottom-start"
                     slotProps={{
                       tooltip: {
-                        sx: { maxWidth: 500, bgcolor: 'background.paper', color: 'text.primary', boxShadow: 4 }
+                        sx: {
+                          maxWidth: 500,
+                          bgcolor: 'background.paper',
+                          color: 'text.primary',
+                          boxShadow: 4
+                        }
                       }
                     }}>
                     <IconButton

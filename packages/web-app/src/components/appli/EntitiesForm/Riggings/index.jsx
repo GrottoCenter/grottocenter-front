@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
@@ -18,6 +18,7 @@ import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd';
 import { useForm, useFieldArray, useWatch } from 'react-hook-form';
 import { useTheme } from '@mui/material/styles';
 
+import { OBSTACLE_LEGEND, ANCHOR_LEGEND } from '@/utils/riggingLegends';
 import { FormContainer, FormActionRow, FormRow } from '../utils/FormContainers';
 import InputText from '../utils/InputText';
 import InputLanguage from '../utils/InputLanguage';
@@ -27,7 +28,6 @@ import ObstacleCard from './ObstacleCard';
 import ColumnLegend, { LegendHeader } from '../../Entry/Riggings/ColumnLegend';
 
 import { RiggingPropTypes } from '../../../../types/entrance.type';
-import { OBSTACLE_LEGEND, ANCHOR_LEGEND } from '@/utils/riggingLegends';
 
 const FIELDS = ['obstacle', 'rope', 'anchor', 'observation'];
 const COLUMN_WIDTHS = {

@@ -2,6 +2,11 @@ import fc from 'fast-check';
 import fetch from 'isomorphic-fetch';
 import { fetchInvalidEmailCavers } from './GetPerson';
 
+// Hoisted so the vi.mock factories below can reference it.
+const mockPostLogoutThunk = vi.hoisted(() => dispatch => {
+  dispatch({ type: 'LOGOUT' });
+});
+
 // Mock isomorphic-fetch
 vi.mock('isomorphic-fetch', () => ({ default: vi.fn() }));
 
@@ -9,10 +14,6 @@ vi.mock('isomorphic-fetch', () => ({ default: vi.fn() }));
 vi.mock('../Login', () => ({
   postLogout: () => mockPostLogoutThunk
 }));
-
-const mockPostLogoutThunk = dispatch => {
-  dispatch({ type: 'LOGOUT' });
-};
 
 const caverArb = fc.record({
   id: fc.integer({ min: 1, max: 999999 }),
@@ -105,11 +106,10 @@ describe('Feature: invalid-email-cavers, Property 2: Missing cavers field falls 
     vi.restoreAllMocks();
   });
 
-  const responseWithoutCaversArb = fc
-    .dictionary(
-      fc.string({ minLength: 1, maxLength: 10 }).filter(k => k !== 'cavers'),
-      fc.jsonValue()
-    );
+  const responseWithoutCaversArb = fc.dictionary(
+    fc.string({ minLength: 1, maxLength: 10 }).filter(k => k !== 'cavers'),
+    fc.jsonValue()
+  );
 
   it('dispatches success with an empty array when cavers field is missing', async () => {
     const consoleSpy = vi.spyOn(console, 'warn').mockImplementation();
@@ -207,9 +207,7 @@ describe('Feature: invalid-email-cavers, Property 4: Auth errors skip failure di
     await fetchInvalidEmailCavers()(dispatch, getState);
 
     // Should see FETCH_INVALID_EMAIL_CAVERS and LOGOUT, but NOT FAILURE
-    expect(dispatched.map(a => a.type)).toContain(
-      'FETCH_INVALID_EMAIL_CAVERS'
-    );
+    expect(dispatched.map(a => a.type)).toContain('FETCH_INVALID_EMAIL_CAVERS');
     expect(dispatched.map(a => a.type)).toContain('LOGOUT');
     expect(dispatched.map(a => a.type)).not.toContain(
       'FETCH_INVALID_EMAIL_CAVERS_FAILURE'

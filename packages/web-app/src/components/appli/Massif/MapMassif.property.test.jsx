@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, waitFor } from '@testing-library/react';
 import fc from 'fast-check';
 
@@ -92,7 +91,17 @@ vi.mock('../../../conf/apiRoutes', () => ({
 
 const samplePolygon = JSON.stringify({
   type: 'MultiPolygon',
-  coordinates: [[[[0, 0], [1, 0], [1, 1], [0, 1], [0, 0]]]]
+  coordinates: [
+    [
+      [
+        [0, 0],
+        [1, 0],
+        [1, 1],
+        [0, 1],
+        [0, 0]
+      ]
+    ]
+  ]
 });
 
 beforeEach(() => {

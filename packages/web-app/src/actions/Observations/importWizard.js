@@ -78,16 +78,11 @@ const normalizeSensorConfig = config => ({
     config.precisionUpper != null ? Number(config.precisionUpper) : null,
   precisionLower:
     config.precisionLower != null ? Number(config.precisionLower) : null,
-  resolution:
-    config.resolution != null ? Number(config.resolution) : null,
+  resolution: config.resolution != null ? Number(config.resolution) : null,
   detectionLimitMin:
-    config.detectionLimitMin != null
-      ? Number(config.detectionLimitMin)
-      : null,
+    config.detectionLimitMin != null ? Number(config.detectionLimitMin) : null,
   detectionLimitMax:
-    config.detectionLimitMax != null
-      ? Number(config.detectionLimitMax)
-      : null
+    config.detectionLimitMax != null ? Number(config.detectionLimitMax) : null
 });
 
 /**
@@ -130,38 +125,39 @@ export const parseAndSetFile = (file, encoding) => async dispatch => {
   dispatch({ type: SET_RAW_ROWS, rawRows });
 };
 
-export const searchDevices = (query, { filter, sort = 'name:asc' } = {}) => (dispatch, getState) => {
-  const { authorizationHeader } = getState().login;
-  const params = { sort };
-  if (query) params.query = query;
-  if (filter) {
-    Object.entries(filter).forEach(([key, value]) => {
-      params[`filter[${key}]`] = value;
-    });
-  }
-  const url = makeUrl(devicesSearchUrl, params);
+export const searchDevices =
+  (query, { filter, sort = 'name:asc' } = {}) =>
+  (dispatch, getState) => {
+    const { authorizationHeader } = getState().login;
+    const params = { sort };
+    if (query) params.query = query;
+    if (filter) {
+      Object.entries(filter).forEach(([key, value]) => {
+        params[`filter[${key}]`] = value;
+      });
+    }
+    const url = makeUrl(devicesSearchUrl, params);
 
-  const requestOptions = {
-    method: 'GET',
-    headers: authorizationHeader
+    const requestOptions = {
+      method: 'GET',
+      headers: authorizationHeader
+    };
+
+    return fetch(url, requestOptions)
+      .then(checkAuthStatus(dispatch))
+      .then(response => response.json())
+      .then(data => {
+        const devices = (data.results || []).map(normalizeSearchDevice);
+        dispatch({ type: SET_DEVICES, devices });
+        return devices;
+      })
+      .catch(error => {
+        if (error.isAuthError) return;
+        // Logging for debugging — the error is re-thrown for caller handling
+        console.error('Device search failed:', error.message);
+        throw error;
+      });
   };
-
-  return fetch(url, requestOptions)
-    .then(checkAuthStatus(dispatch))
-    .then(response => response.json())
-    .then(data => {
-      const devices = (data.results || []).map(normalizeSearchDevice);
-      dispatch({ type: SET_DEVICES, devices });
-      return devices;
-    })
-    .catch(error => {
-      if (error.isAuthError) return;
-      // Logging for debugging — the error is re-thrown for caller handling
-      // eslint-disable-next-line no-console
-      console.error('Device search failed:', error.message);
-      throw error;
-    });
-};
 
 export const createDevice = deviceData => (dispatch, getState) => {
   const { authorizationHeader } = getState().login;
@@ -189,7 +185,6 @@ export const createDevice = deviceData => (dispatch, getState) => {
     .then(data => normalizeDevice(data))
     .catch(error => {
       if (error.isAuthError) return;
-      // eslint-disable-next-line no-console
       console.error('Device creation failed:', error.message);
       throw error;
     });
@@ -242,7 +237,9 @@ export const createSensorConfig = configData => (dispatch, getState) => {
     label: configData.label || undefined,
     quantityKind: configData.quantityKindId,
     unit: configData.unitId,
-    ...(configData.idSubstance != null && { idSubstance: configData.idSubstance }),
+    ...(configData.idSubstance != null && {
+      idSubstance: configData.idSubstance
+    }),
     precisionUpper: configData.precisionUpper ?? null,
     precisionLower: configData.precisionLower ?? null,
     resolution: configData.resolution ?? null,
@@ -320,42 +317,44 @@ export const submitObservationsImport =
       });
   };
 
-export const fetchCaveById = (caveId, { signal } = {}) => (dispatch, getState) => {
-  const { authorizationHeader } = getState().login;
+export const fetchCaveById =
+  (caveId, { signal } = {}) =>
+  (dispatch, getState) => {
+    const { authorizationHeader } = getState().login;
 
-  const requestOptions = {
-    method: 'GET',
-    headers: authorizationHeader,
-    signal
+    const requestOptions = {
+      method: 'GET',
+      headers: authorizationHeader,
+      signal
+    };
+
+    return fetch(`${getCaveUrl}${caveId}`, requestOptions)
+      .then(checkAuthStatus(dispatch))
+      .then(response => response.json())
+      .catch(error => {
+        if (error.isAuthError) return undefined;
+        console.error(`Failed to fetch cave ${caveId}:`, error.message);
+        return undefined;
+      });
   };
 
-  return fetch(`${getCaveUrl}${caveId}`, requestOptions)
-    .then(checkAuthStatus(dispatch))
-    .then(response => response.json())
-    .catch(error => {
-      if (error.isAuthError) return undefined;
-      // eslint-disable-next-line no-console
-      console.error(`Failed to fetch cave ${caveId}:`, error.message);
-      return undefined;
-    });
-};
+export const fetchCaverById =
+  (caverId, { signal } = {}) =>
+  (dispatch, getState) => {
+    const { authorizationHeader } = getState().login;
 
-export const fetchCaverById = (caverId, { signal } = {}) => (dispatch, getState) => {
-  const { authorizationHeader } = getState().login;
+    const requestOptions = {
+      method: 'GET',
+      headers: authorizationHeader,
+      signal
+    };
 
-  const requestOptions = {
-    method: 'GET',
-    headers: authorizationHeader,
-    signal
+    return fetch(`${getCaverUrl}${caverId}`, requestOptions)
+      .then(checkAuthStatus(dispatch))
+      .then(response => response.json())
+      .catch(error => {
+        if (error.isAuthError) return undefined;
+        console.error(`Failed to fetch caver ${caverId}:`, error.message);
+        return undefined;
+      });
   };
-
-  return fetch(`${getCaverUrl}${caverId}`, requestOptions)
-    .then(checkAuthStatus(dispatch))
-    .then(response => response.json())
-    .catch(error => {
-      if (error.isAuthError) return undefined;
-      // eslint-disable-next-line no-console
-      console.error(`Failed to fetch caver ${caverId}:`, error.message);
-      return undefined;
-    });
-};

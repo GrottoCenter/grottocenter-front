@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState, Suspense } from 'react';
+import { useRef, useEffect, useState, Suspense } from 'react';
 import { Provider, useSelector, useDispatch } from 'react-redux';
 import { Outlet } from 'react-router-dom';
 import { IntlProvider, useIntl } from 'react-intl';
@@ -162,10 +162,7 @@ const AdminSessionExpiryBanner = () => {
   };
 
   return (
-    <Alert
-      severity="warning"
-      onClose={handleDismiss}
-      sx={{ borderRadius: 0 }}>
+    <Alert severity="warning" onClose={handleDismiss} sx={{ borderRadius: 0 }}>
       {formatMessage({ id: 'mfaSessionExpiryWarning' })}
     </Alert>
   );

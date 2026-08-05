@@ -52,13 +52,13 @@ const checkData = (data, selectedType, formatMessage) => {
         errorMessage: formatMessage(
           {
             id: 'csvImport.incorrectTypeColumn',
-            defaultMessage: "The 'type' column is incorrect, expecting {rowType}."
+            defaultMessage:
+              "The 'type' column is incorrect, expecting {rowType}."
           },
           { rowType }
         ),
         row: i + 2
       });
-      // eslint-disable-next-line no-continue
       continue;
     }
 

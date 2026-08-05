@@ -1,4 +1,4 @@
-import React, {
+import {
   useState,
   createContext,
   useCallback,
@@ -60,7 +60,10 @@ const checkFormValidation = document => {
   let isValid = true;
 
   if (!document.title) isValid = false;
-  if (!DESCRIPTION_OPTIONAL_TYPES.includes(document.type) && !document.description)
+  if (
+    !DESCRIPTION_OPTIONAL_TYPES.includes(document.type) &&
+    !document.description
+  )
     isValid = false;
   if (document.type === DocumentTypes.EVENT && !document.datePublication)
     isValid = false;
@@ -89,7 +92,8 @@ const checkFormValidation = document => {
     if (!document.selectOptionAuthorizationDocument) isValid = false;
     if (!document.license) isValid = false;
     if (
-      document.selectOptionAuthorizationDocument === DOCUMENT_AUTHORIZE_TO_PUBLISH &&
+      document.selectOptionAuthorizationDocument ===
+        DOCUMENT_AUTHORIZE_TO_PUBLISH &&
       !document.authorizationDocument
     )
       isValid = false;
@@ -142,9 +146,12 @@ const Provider = ({ children, initialValues }) => {
     setIsFormValid(checkFormValidation(document));
   }, [document, setIsFormValid]);
 
-  const resetContext = useCallback((overrides = {}) => {
-    setDocument({ ...defaultDocAttributes, ...overrides });
-  }, [setDocument]);
+  const resetContext = useCallback(
+    (overrides = {}) => {
+      setDocument({ ...defaultDocAttributes, ...overrides });
+    },
+    [setDocument]
+  );
 
   const contextValue = useMemo(
     () => ({
@@ -156,7 +163,14 @@ const Provider = ({ children, initialValues }) => {
       linkedEntrance,
       setLinkedEntrance
     }),
-    [document, initialValues, isFormValid, updateAttribute, resetContext, linkedEntrance]
+    [
+      document,
+      initialValues,
+      isFormValid,
+      updateAttribute,
+      resetContext,
+      linkedEntrance
+    ]
   );
 
   return (

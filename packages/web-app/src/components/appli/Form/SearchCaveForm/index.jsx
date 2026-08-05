@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useIntl } from 'react-intl';
 import { useDispatch } from 'react-redux';
 import PropTypes from 'prop-types';
@@ -47,7 +47,12 @@ const SearchCaveForm = ({ onSubmit, submitLabel = null }) => {
         resourceType={ADVANCED_SEARCH_TYPES.ENTRANCES}
         resetResults={resetAdvancedSearch}
       />
-      <SearchResults onSelected={handleSelection} hideExport compact entityType={ADVANCED_SEARCH_TYPES.ENTRANCES} />
+      <SearchResults
+        onSelected={handleSelection}
+        hideExport
+        compact
+        entityType={ADVANCED_SEARCH_TYPES.ENTRANCES}
+      />
       <Box sx={{ mt: 1, mb: 2, textAlign: 'center' }}>
         <Button
           disabled={selectedEntrances.length === 0}

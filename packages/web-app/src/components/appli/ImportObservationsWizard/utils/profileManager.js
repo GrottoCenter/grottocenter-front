@@ -1,5 +1,13 @@
 import { DEFAULT_DOCUMENT_LANGUAGE } from '../constants/defaults';
 
+// Profiles written before multi-author support carry a single `authorId`.
+const normalizeAuthorIds = json => {
+  if (Array.isArray(json.authorIds) && json.authorIds.length > 0) {
+    return json.authorIds;
+  }
+  return json.authorId != null ? [json.authorId] : [];
+};
+
 /**
  * Serialises the current wizard state to the Profile JSON format.
  * Conforms to the observation-import-profile-contract.md API contract.
@@ -20,7 +28,9 @@ export const exportProfile = state => {
   const datetimeMapping = columnMappings.find(
     m => m.role === 'timestamp' && m.timestampType === 'datetime'
   );
-  const dateFormat = datetimeMapping ? datetimeMapping.dateFormat || null : null;
+  const dateFormat = datetimeMapping
+    ? datetimeMapping.dateFormat || null
+    : null;
 
   // Extract dateOnlyFormat from dateOnly column mapping
   const dateOnlyMapping = columnMappings.find(
@@ -66,14 +76,18 @@ export const exportProfile = state => {
     caveId: context.caveId != null ? Number(context.caveId) : null,
     locationMode: context.locationMode || 'pointAndCave',
     pointLabel: context.pointLabel,
-    latitude: context.latitude != null && context.latitude !== ''
-      && !Number.isNaN(Number(context.latitude))
-      ? Number(context.latitude)
-      : null,
-    longitude: context.longitude != null && context.longitude !== ''
-      && !Number.isNaN(Number(context.longitude))
-      ? Number(context.longitude)
-      : null,
+    latitude:
+      context.latitude != null &&
+      context.latitude !== '' &&
+      !Number.isNaN(Number(context.latitude))
+        ? Number(context.latitude)
+        : null,
+    longitude:
+      context.longitude != null &&
+      context.longitude !== '' &&
+      !Number.isNaN(Number(context.longitude))
+        ? Number(context.longitude)
+        : null,
     authorIds: Array.isArray(context.authorIds)
       ? context.authorIds.map(Number)
       : [],
@@ -140,18 +154,17 @@ export const importProfile = json => {
       numberLocale: json.numberLocale,
       documentLanguage: json.documentLanguage || DEFAULT_DOCUMENT_LANGUAGE,
       columnMappings,
-      deviceId: json.deviceId != null
-        ? json.deviceId
-        : (json.confirmedDevice && json.confirmedDevice.id) || null,
+      deviceId:
+        json.deviceId != null
+          ? json.deviceId
+          : (json.confirmedDevice && json.confirmedDevice.id) || null,
       context: {
         locationMode: json.locationMode || 'pointAndCave',
         caveId: json.caveId,
         pointLabel: json.pointLabel,
         latitude: json.latitude,
         longitude: json.longitude,
-        authorIds: Array.isArray(json.authorIds) && json.authorIds.length > 0
-          ? json.authorIds
-          : (json.authorId != null ? [json.authorId] : []),
+        authorIds: normalizeAuthorIds(json),
         licenseId: json.licenseId,
         documentTitle: json.documentTitle,
         observationName: json.observationName,
@@ -168,7 +181,7 @@ export const importProfile = json => {
     }
 
     return { ok: true, state };
-  } catch (e) {
+  } catch {
     return { ok: false, error: 'Invalid JSON' };
   }
 };

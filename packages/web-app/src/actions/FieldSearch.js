@@ -2,7 +2,6 @@ import fetch from 'isomorphic-fetch';
 import { fieldSearchUrl } from '../conf/apiRoutes';
 import { checkAndGetStatus } from './utils';
 
-// eslint-disable-next-line import/prefer-default-export
 export const fetchFieldSearch = ({ entity, field, query, filter }) => {
   const requestOptions = {
     method: 'POST',

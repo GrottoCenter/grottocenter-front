@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { ImportPageContentContext } from '../Provider';
 import { DOCUMENT } from '../constants';

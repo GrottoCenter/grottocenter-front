@@ -1,6 +1,5 @@
-import React from 'react';
-import { storiesOf } from '@storybook/react';
 import { Box } from '@mui/material';
+import PropTypes from 'prop-types';
 import { useForm } from 'react-hook-form';
 
 import NumberField from './NumberField';
@@ -39,6 +38,20 @@ const NumberFieldsGroup = ({ disabled = false }) => {
   );
 };
 
-storiesOf('EntitiesForm/NumberField', module)
-  .add('group', () => <NumberFieldsGroup />)
-  .add('disabled', () => <NumberFieldsGroup disabled />);
+NumberFieldsGroup.propTypes = {
+  disabled: PropTypes.bool
+};
+
+const meta = {
+  title: 'EntitiesForm/NumberField',
+  component: NumberField
+};
+export default meta;
+
+export const Group = {
+  render: () => <NumberFieldsGroup />
+};
+
+export const Disabled = {
+  render: () => <NumberFieldsGroup disabled />
+};

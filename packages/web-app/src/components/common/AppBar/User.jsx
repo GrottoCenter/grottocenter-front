@@ -12,15 +12,15 @@ import {
 import LogoutIcon from '@mui/icons-material/Logout';
 import AccountBoxIcon from '@mui/icons-material/AccountBox';
 import DashboardIcon from '@mui/icons-material/Dashboard';
-import React, { useState, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
 import { pathOr } from 'ramda';
 
+import UserAvatar from '@/components/common/UserAvatar';
 import Translate from '../Translate';
 import { useUserProperties } from '../../../hooks';
-import UserAvatar from '@/components/common/UserAvatar';
 
 // Constants
 const MENU_MIN_WIDTH = 250;

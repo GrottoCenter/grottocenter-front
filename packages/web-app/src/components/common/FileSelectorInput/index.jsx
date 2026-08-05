@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import {
@@ -135,7 +135,10 @@ const FileSelectorInput = ({
           $isDragging={isDragging}
           role="button"
           tabIndex={0}
-          aria-label={t('Drop files here or click to select', 'Drop a file here or click to select')}
+          aria-label={t(
+            'Drop files here or click to select',
+            'Drop a file here or click to select'
+          )}
           onDragEnter={handleDragEnter}
           onDragLeave={handleDragLeave}
           onDragOver={handleDragOver}

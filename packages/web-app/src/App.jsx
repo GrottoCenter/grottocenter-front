@@ -1,4 +1,4 @@
-import React, { lazy } from 'react';
+import { lazy } from 'react';
 import { ThemeProvider, StyledEngineProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import { GlobalStyles } from '@mui/material';
@@ -26,12 +26,12 @@ const Api = lazy(() => import('./components/appli/Api'));
 const Dashboard = lazy(() => import('./pages/Dashboard'));
 const ApiDoc = lazy(() => import('./pages/ApiDoc'));
 const DocumentDetails = lazy(() => import('./pages/DocumentDetails'));
-const DuplicateImportHandle = lazy(() =>
-  import('./pages/DuplicateImportHandle')
+const DuplicateImportHandle = lazy(
+  () => import('./pages/DuplicateImportHandle')
 );
 const Faq = lazy(() => import('./components/appli/Faq'));
-const LatestBlogNewsSection = lazy(() =>
-  import('./pages/homepage/LatestBlogNewsSection')
+const LatestBlogNewsSection = lazy(
+  () => import('./pages/homepage/LatestBlogNewsSection')
 );
 const ChangePassword = lazy(() => import('./components/appli/ChangePassword'));
 const SignUp = lazy(() => import('./components/appli/SignUp'));
@@ -45,13 +45,13 @@ const EntityPicker = lazy(() => import('./pages/EntityCreation/EntityPicker'));
 const AddEntrance = lazy(() => import('./pages/EntityCreation/AddEntrance'));
 const AddDocument = lazy(() => import('./pages/EntityCreation/AddDocument'));
 const AddMassif = lazy(() => import('./pages/EntityCreation/AddMassif'));
-const AddOrganization = lazy(() =>
-  import('./pages/EntityCreation/AddOrganization')
+const AddOrganization = lazy(
+  () => import('./pages/EntityCreation/AddOrganization')
 );
 const EntryPage = lazy(() => import('./pages/Entry'));
 const ImportContainer = lazy(() => import('./pages/ImportCSV'));
-const ImportObservationsPage = lazy(() =>
-  import('./pages/ImportObservationsPage')
+const ImportObservationsPage = lazy(
+  () => import('./pages/ImportObservationsPage')
 );
 const ManageUsers = lazy(() => import('./pages/Admin/ManageUsers'));
 const Map = lazy(() => import('./pages/Map'));
@@ -60,13 +60,13 @@ const MoveEntranceToCave = lazy(() => import('./pages/MoveEntranceToCave'));
 const NetworkPage = lazy(() => import('./pages/Network'));
 const PersonPage = lazy(() => import('./pages/Person'));
 const OrganizationPage = lazy(() => import('./pages/Organization'));
-const EntranceEdit = lazy(() =>
-  import('./pages/EntityEdit/Entrance/EntranceEdit')
+const EntranceEdit = lazy(
+  () => import('./pages/EntityEdit/Entrance/EntranceEdit')
 );
 const MassifEdit = lazy(() => import('./pages/EntityEdit/Massif/MassifEdit'));
 const PersonEdit = lazy(() => import('./pages/PersonEdit'));
-const OrganizationEdit = lazy(() =>
-  import('./pages/EntityEdit/Organization/OrganizationEdit')
+const OrganizationEdit = lazy(
+  () => import('./pages/EntityEdit/Organization/OrganizationEdit')
 );
 const CountryPage = lazy(() => import('./pages/Country'));
 const RegionPage = lazy(() => import('./pages/Region'));
@@ -155,14 +155,20 @@ const router = createBrowserRouter(
           path="/ui/observations/import"
           element={<ImportObservationsPage />}
         />
-        <Route path="/ui/entrances/:entranceId/edit" element={<EntranceEdit />} />
+        <Route
+          path="/ui/entrances/:entranceId/edit"
+          element={<EntranceEdit />}
+        />
         <Route
           path="/ui/organizations/:organizationId/edit"
           element={<OrganizationEdit />}
         />
         <Route path="/ui/massifs/:massifId/edit" element={<MassifEdit />} />
         <Route path="/ui/persons/:personId/edit" element={<PersonEdit />} />
-        <Route path="/ui/documents/:documentId/edit" element={<DocumentEdit />} />
+        <Route
+          path="/ui/documents/:documentId/edit"
+          element={<DocumentEdit />}
+        />
       </Route>
 
       <Route path="/ui/*" element={<Navigate to="/" replace />} />

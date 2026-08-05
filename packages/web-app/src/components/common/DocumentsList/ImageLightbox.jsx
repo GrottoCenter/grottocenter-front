@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { Dialog, IconButton, Box, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
@@ -9,7 +9,11 @@ import {
   Download
 } from '@mui/icons-material';
 import { useIntl } from 'react-intl';
-import { decodeFileName, downloadFile, getLightboxSrc } from './utils/imageUtils';
+import {
+  decodeFileName,
+  downloadFile,
+  getLightboxSrc
+} from './utils/imageUtils';
 import { ThumbnailsPropTypes } from '../../../types/document.type';
 
 const LightboxDialog = styled(Dialog)`
@@ -125,6 +129,10 @@ const ImageLightbox = ({
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
   const [isTouchPanning, setIsTouchPanning] = useState(false);
+
+  // Only a zoomed-in image can be panned, so only it gets a grab cursor.
+  let panCursor = 'default';
+  if (zoom > 1) panCursor = isDragging ? 'grabbing' : 'grab';
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const touchStartDistance = useRef(null);
   const zoomAtPinchStart = useRef(1);
@@ -167,13 +175,22 @@ const ImageLightbox = ({
       const dy = e.touches[0].clientY - e.touches[1].clientY;
       const dist = Math.sqrt(dx * dx + dy * dy);
       setZoom(
-        Math.min(Math.max(zoomAtPinchStart.current * (dist / touchStartDistance.current), 0.5), 5)
+        Math.min(
+          Math.max(
+            zoomAtPinchStart.current * (dist / touchStartDistance.current),
+            0.5
+          ),
+          5
+        )
       );
     } else if (e.touches.length === 1 && touchPanStart.current !== null) {
       e.preventDefault();
       const dx = e.touches[0].clientX - touchPanStart.current.x;
       const dy = e.touches[0].clientY - touchPanStart.current.y;
-      touchPanStart.current = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+      touchPanStart.current = {
+        x: e.touches[0].clientX,
+        y: e.touches[0].clientY
+      };
       setIsTouchPanning(true);
       setPosition(prev => ({ x: prev.x + dx, y: prev.y + dy }));
     }
@@ -223,7 +240,10 @@ const ImageLightbox = ({
         touchPanStart.current = null;
       } else if (e.touches.length === 1 && zoom > 1) {
         touchStartDistance.current = null;
-        touchPanStart.current = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+        touchPanStart.current = {
+          x: e.touches[0].clientX,
+          y: e.touches[0].clientY
+        };
       } else {
         touchStartDistance.current = null;
         touchPanStart.current = null;
@@ -300,16 +320,14 @@ const ImageLightbox = ({
             transform: `scale(${zoom}) translate(${position.x / zoom}px, ${
               position.y / zoom
             }px)`,
-            transition: isDragging || isTouchPanning ? 'none' : 'transform 0.2s',
+            transition:
+              isDragging || isTouchPanning ? 'none' : 'transform 0.2s',
             transformOrigin: 'center',
-            cursor:
-              zoom > 1 ? (isDragging ? 'grabbing' : 'grab') : 'default'
+            cursor: panCursor
           }}
         />
 
-        {zoom !== 1 && (
-          <ZoomIndicator>{Math.round(zoom * 100)}%</ZoomIndicator>
-        )}
+        {zoom !== 1 && <ZoomIndicator>{Math.round(zoom * 100)}%</ZoomIndicator>}
 
         <TopBar>
           <OverlayButton

@@ -1,5 +1,4 @@
 import { useIntl } from 'react-intl';
-import * as React from 'react';
 import {
   Dialog,
   DialogActions,

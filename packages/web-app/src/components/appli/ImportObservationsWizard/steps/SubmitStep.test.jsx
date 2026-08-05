@@ -1,13 +1,9 @@
-import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { IntlProvider } from 'react-intl';
 
 import SubmitStep from './SubmitStep';
 import { submitObservationsImport } from '../../../../actions/Observations/importWizard';
-import {
-  exportProfile,
-  deriveProfileFileName
-} from '../utils/profileManager';
+import { exportProfile, deriveProfileFileName } from '../utils/profileManager';
 
 // ---- React Router mock ----
 const mockNavigate = vi.fn();
@@ -42,16 +38,18 @@ const messages = {
   'ImportObservationsWizard.SubmitStep.summary.fileName': 'File',
   'ImportObservationsWizard.SubmitStep.summary.caveId': 'Cave ID',
   'ImportObservationsWizard.SubmitStep.summary.pointLabel': 'Point label',
-  'ImportObservationsWizard.SubmitStep.summary.sensorConfigs': 'Sensor configurations',
+  'ImportObservationsWizard.SubmitStep.summary.sensorConfigs':
+    'Sensor configurations',
   'ImportObservationsWizard.SubmitStep.summary.validRows': 'Valid rows',
   'ImportObservationsWizard.SubmitStep.noFile': 'No file selected',
   'ImportObservationsWizard.SubmitStep.notSet': 'Not set',
   'ImportObservationsWizard.SubmitStep.submit': 'Submit',
   'ImportObservationsWizard.SubmitStep.submitting': 'Submitting…',
   'ImportObservationsWizard.SubmitStep.exportProfile': 'Export profile',
-  'ImportObservationsWizard.SubmitStep.unknownError': 'An unknown error occurred. Please try again.',
-  'IMPORT_PARSE_ERROR': 'The file could not be parsed.',
-  'IMPORT_VALIDATION_ERROR': 'Profile validation failed.'
+  'ImportObservationsWizard.SubmitStep.unknownError':
+    'An unknown error occurred. Please try again.',
+  IMPORT_PARSE_ERROR: 'The file could not be parsed.',
+  IMPORT_VALIDATION_ERROR: 'Profile validation failed.'
 };
 
 // ---- Base state factory ----
@@ -66,7 +64,12 @@ const makeState = (overrides = {}) => ({
       { id: 's1', deviceName: 'Sensor A' },
       { id: 's2', deviceName: 'Sensor B' }
     ],
-    validationResult: { validRows: 150, invalidRows: 3, totalRows: 153, blockingErrors: [] },
+    validationResult: {
+      validRows: 150,
+      invalidRows: 3,
+      totalRows: 153,
+      blockingErrors: []
+    },
     samplingIntervalSeconds: 900,
     submission: { status: 'IDLE', error: null, documentId: null },
     ...overrides
@@ -99,13 +102,17 @@ describe('SubmitStep', () => {
 
     // Verify the action thunk was called and dispatched
     expect(submitObservationsImport).toHaveBeenCalled();
-    expect(submitObservationsImport.mock.calls[0][0]).toEqual({ name: 'data.csv' });
+    expect(submitObservationsImport.mock.calls[0][0]).toEqual({
+      name: 'data.csv'
+    });
     expect(mockDispatch).toHaveBeenCalled();
   });
 
   // Requirements: 12.3 — submit button disabled during loading
   it('should disable submit button while submission status is LOADING', () => {
-    renderComponent({ submission: { status: 'LOADING', error: null, documentId: null } });
+    renderComponent({
+      submission: { status: 'LOADING', error: null, documentId: null }
+    });
 
     const button = screen.getByTestId('submit-button');
     expect(button).toBeDisabled();
@@ -113,7 +120,9 @@ describe('SubmitStep', () => {
 
   // Requirements: 12.3 — spinner shown during loading
   it('should show CircularProgress spinner during loading', () => {
-    renderComponent({ submission: { status: 'LOADING', error: null, documentId: null } });
+    renderComponent({
+      submission: { status: 'LOADING', error: null, documentId: null }
+    });
 
     expect(screen.getByTestId('submit-spinner')).toBeInTheDocument();
   });
@@ -231,9 +240,7 @@ describe('SubmitStep', () => {
   it('should display the sensor config count in the summary', () => {
     renderComponent();
 
-    expect(screen.getByTestId('summary-sensor-configs')).toHaveTextContent(
-      '2'
-    );
+    expect(screen.getByTestId('summary-sensor-configs')).toHaveTextContent('2');
   });
 
   // Requirements: 19.1 — summary shows valid row count
@@ -277,7 +284,9 @@ describe('SubmitStep', () => {
       revokeObjectURLMock = vi.fn();
       global.URL.createObjectURL = createObjectURLMock;
       global.URL.revokeObjectURL = revokeObjectURLMock;
-      anchorClickSpy = vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {});
+      anchorClickSpy = vi
+        .spyOn(HTMLAnchorElement.prototype, 'click')
+        .mockImplementation(() => {});
     });
 
     afterEach(() => {

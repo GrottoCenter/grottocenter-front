@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useForm } from 'react-hook-form';
 import { useSelector, useDispatch } from 'react-redux';
@@ -74,11 +74,11 @@ export const MassifForm = ({ massifValues, onCancel }) => {
     defaultValues: {
       massif: massifValues
         ? {
-          nameId: massifValues.names[0]?.id,
-          name: massifValues.names[0]?.name,
-          language: massifValues.language,
-          geogPolygon: massifValues.geogPolygon
-        }
+            nameId: massifValues.names[0]?.id,
+            name: massifValues.names[0]?.name,
+            language: massifValues.language,
+            geogPolygon: massifValues.geogPolygon
+          }
         : defaultMassifValues
     }
   });
@@ -96,33 +96,15 @@ export const MassifForm = ({ massifValues, onCancel }) => {
       // Use the error code as i18n key if available, fall back to raw message,
       // then to a generic translated fallback.
       const message = code
-        ? formatMessage({ id: code, defaultMessage: rawMessage || FALLBACK_ERROR_MESSAGE })
+        ? formatMessage({
+            id: code,
+            defaultMessage: rawMessage || FALLBACK_ERROR_MESSAGE
+          })
         : rawMessage || formatMessage({ id: FALLBACK_ERROR_MESSAGE });
       onError(message);
       handleReset();
     }
   }, [massifError, nameError, handleReset, onError, formatMessage]);
-
-  const handleFormSubmit = e => {
-    if (polygonErrors) {
-      e.preventDefault();
-      return;
-    }
-    const editingElements = document.querySelectorAll('.leaflet-editing-icon');
-    const visibleEditingElements = Array.from(editingElements).filter(
-      el => el.offsetParent !== null && getComputedStyle(el).display !== 'none'
-    );
-    if (visibleEditingElements.length > 0) {
-      e.preventDefault();
-      onWarning(
-        formatMessage({
-          id: 'Please finish editing the polygon before submitting.'
-        })
-      );
-      return;
-    }
-    handleSubmit(onSubmit)(e);
-  };
 
   const onSubmit = async data => {
     if (data.massif.geogPolygon?.coordinates?.length === 0) {
@@ -153,6 +135,27 @@ export const MassifForm = ({ massifValues, onCancel }) => {
       }
       dispatch(updateMassif(body));
     }
+  };
+
+  const handleFormSubmit = e => {
+    if (polygonErrors) {
+      e.preventDefault();
+      return;
+    }
+    const editingElements = document.querySelectorAll('.leaflet-editing-icon');
+    const visibleEditingElements = Array.from(editingElements).filter(
+      el => el.offsetParent !== null && getComputedStyle(el).display !== 'none'
+    );
+    if (visibleEditingElements.length > 0) {
+      e.preventDefault();
+      onWarning(
+        formatMessage({
+          id: 'Please finish editing the polygon before submitting.'
+        })
+      );
+      return;
+    }
+    handleSubmit(onSubmit)(e);
   };
 
   if (

@@ -28,53 +28,51 @@ export const resetDetachEntrance = () => ({
   type: DETACH_ENTRANCE_RESET
 });
 
-export const detachEntranceToNewCave = entrance => async (
-  dispatch,
-  getState
-) => {
-  dispatch(detachEntranceAction());
+export const detachEntranceToNewCave =
+  entrance => async (dispatch, getState) => {
+    dispatch(detachEntranceAction());
 
-  const { authorizationHeader } = getState().login;
+    const { authorizationHeader } = getState().login;
 
-  try {
-    // Step 1: Create a new cave with the entrance's name and language
-    const createCaveResponse = await fetch(postCreateCaveUrl, {
-      method: 'POST',
-      body: JSON.stringify({
-        name: { text: entrance.name, language: entrance.language }
-      }),
-      headers: authorizationHeader
-    }).then(checkAuthStatus(dispatch));
-
-    const newCave = await createCaveResponse.json();
-
-    // Step 2: Move the entrance to the newly created cave
     try {
-      await fetch(moveEntranceToCaveUrl(entrance.id, newCave.id), {
-        method: 'PATCH',
+      // Step 1: Create a new cave with the entrance's name and language
+      const createCaveResponse = await fetch(postCreateCaveUrl, {
+        method: 'POST',
+        body: JSON.stringify({
+          name: { text: entrance.name, language: entrance.language }
+        }),
         headers: authorizationHeader
       }).then(checkAuthStatus(dispatch));
 
-      dispatch(detachEntranceSuccess());
-    } catch (moveError) {
-      if (moveError.isAuthError) return;
+      const newCave = await createCaveResponse.json();
 
-      // Rollback: delete the created cave (best-effort, no checkAuthStatus
-      // since the token may have expired and we don't want to trigger logout
-      // during error handling)
+      // Step 2: Move the entrance to the newly created cave
       try {
-        await fetch(deleteCaveUrl(newCave.id, {}), {
-          method: 'DELETE',
+        await fetch(moveEntranceToCaveUrl(entrance.id, newCave.id), {
+          method: 'PATCH',
           headers: authorizationHeader
-        });
-      } catch {
-        // Swallow rollback error silently
-      }
+        }).then(checkAuthStatus(dispatch));
 
-      dispatch(detachEntranceFailure(moveError.message || 'Move failed'));
+        dispatch(detachEntranceSuccess());
+      } catch (moveError) {
+        if (moveError.isAuthError) return;
+
+        // Rollback: delete the created cave (best-effort, no checkAuthStatus
+        // since the token may have expired and we don't want to trigger logout
+        // during error handling)
+        try {
+          await fetch(deleteCaveUrl(newCave.id, {}), {
+            method: 'DELETE',
+            headers: authorizationHeader
+          });
+        } catch {
+          // Swallow rollback error silently
+        }
+
+        dispatch(detachEntranceFailure(moveError.message || 'Move failed'));
+      }
+    } catch (error) {
+      if (error.isAuthError) return;
+      dispatch(detachEntranceFailure(error.message || 'Cave creation failed'));
     }
-  } catch (error) {
-    if (error.isAuthError) return;
-    dispatch(detachEntranceFailure(error.message || 'Cave creation failed'));
-  }
-};
+  };

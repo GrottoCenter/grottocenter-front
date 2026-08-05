@@ -10,6 +10,9 @@
 // import resolves cleanly. It is wired in via a `resolve.alias` in
 // vite.config.mjs.
 import L from 'leaflet';
+// Deep import into the package dist: the extension is what makes it resolve
+// to the bundled IIFE, so import/extensions cannot apply here.
+// eslint-disable-next-line import/extensions
 import 'leaflet-draw/dist/leaflet.draw.js';
 
 export default L.Draw;

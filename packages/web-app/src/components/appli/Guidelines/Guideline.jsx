@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { Box, ListItem, ListItemText } from '@mui/material';
 import { useDispatch } from 'react-redux';
@@ -22,16 +22,15 @@ const ListItemStyled = styled(ListItem)`
   padding-bottom: ${({ theme }) => theme.spacing(0.5)};
 `;
 
-const Guideline = ({
-  guideline,
-  isEditAllowed
-}) => {
+const Guideline = ({ guideline, isEditAllowed }) => {
   const dispatch = useDispatch();
   const permissions = usePermissions();
   const { formatMessage } = useIntl();
   const { onError } = useNotification();
   const [isUpdateFormVisible, setIsUpdateFormVisible] = useState(false);
-  const [wantedDeletedState, setWantedDeletedState] = useState(guideline.isDeleted);
+  const [wantedDeletedState, setWantedDeletedState] = useState(
+    guideline.isDeleted
+  );
 
   useEffect(() => {
     setWantedDeletedState(guideline.isDeleted);
@@ -54,7 +53,9 @@ const Guideline = ({
     // On success the reducer removes/updates the guideline in place. On failure
     // the request errored (e.g. a non-2xx response): surface it instead of
     // leaving the view silently stale, and revert the optimistic loading state.
-    const ok = await dispatch(deleteGuideline({ id: guideline.id, isPermanent }));
+    const ok = await dispatch(
+      deleteGuideline({ id: guideline.id, isPermanent })
+    );
     if (!ok) {
       setWantedDeletedState(guideline.isDeleted);
       onError(

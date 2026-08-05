@@ -138,4 +138,5 @@ export const getThumbnailSources = file => {
  * @param {object} file - File object with `completePath` and optional `thumbnails`
  * @returns {string}
  */
-export const getLightboxSrc = file => file.thumbnails?.large || file.completePath;
+export const getLightboxSrc = file =>
+  file.thumbnails?.large || file.completePath;

@@ -17,7 +17,11 @@ export const DOCUMENT_AUTHORIZE_TO_PUBLISH =
  * Validates and converts a FileList/array of File objects into the internal file entry format.
  * Returns { entries, errors } where entries are ready to append and errors are i18n strings.
  */
-export const validateAndBuildFileEntries = (newFiles, existingFiles, formatMessage) => {
+export const validateAndBuildFileEntries = (
+  newFiles,
+  existingFiles,
+  formatMessage
+) => {
   const filesArray = Array.from(newFiles);
   const errors = [];
   const entries = filesArray
@@ -30,7 +34,10 @@ export const validateAndBuildFileEntries = (newFiles, existingFiles, formatMessa
               defaultMessage:
                 'The following file is too big: {file}. Max accepted size: {maxSize}'
             },
-            { file: file.name, maxSize: `${MAX_SIZE_OF_UPLOADED_FILES / 1000000} Mo` }
+            {
+              file: file.name,
+              maxSize: `${MAX_SIZE_OF_UPLOADED_FILES / 1000000} Mo`
+            }
           )
         );
         return false;

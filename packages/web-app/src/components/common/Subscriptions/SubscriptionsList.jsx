@@ -1,4 +1,3 @@
-import React from 'react';
 import PropTypes from 'prop-types';
 import { Box, CircularProgress, Typography } from '@mui/material';
 import { useIntl } from 'react-intl';
@@ -38,7 +37,10 @@ const SubscriptionsList = ({
       labelId: 'Countries',
       emptyId: 'No country subscriptions',
       items: [...(countries ?? [])]
-        .map(c => ({ ...c, name: getLocalizedCountryName(c.id, locale, c.name) }))
+        .map(c => ({
+          ...c,
+          name: getLocalizedCountryName(c.id, locale, c.name)
+        }))
         .sort((a, b) => a.name.localeCompare(b.name)),
       type: 'COUNTRY'
     },

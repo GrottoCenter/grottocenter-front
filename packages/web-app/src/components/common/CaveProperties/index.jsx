@@ -1,4 +1,4 @@
-import React from 'react';
+import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import { styled } from '@mui/material/styles';
 import CustomIcon from '../CustomIcon';
@@ -201,4 +201,88 @@ export const IsTouristicProperty = ({ isTouristic, isLoading }) => {
       secondary
     />
   );
+};
+
+// Every entry renders at most one <Property>, and returns null when the
+
+// value it describes is absent.
+
+DepthProperty.propTypes = {
+  depth: PropTypes.number,
+  isLoading: PropTypes.bool
+};
+
+LengthProperty.propTypes = {
+  length: PropTypes.number,
+  isLoading: PropTypes.bool
+};
+
+TemperatureProperty.propTypes = {
+  temperature: PropTypes.number,
+  isLoading: PropTypes.bool
+};
+
+MassifProperty.propTypes = {
+  massif: PropTypes.shape({
+    id: PropTypes.number,
+    name: PropTypes.string
+  }),
+  secondary: PropTypes.bool
+};
+
+OrganizationProperty.propTypes = {
+  organization: PropTypes.shape({
+    id: PropTypes.number,
+    name: PropTypes.string
+  }).isRequired
+};
+
+DivingProperty.propTypes = {
+  isDiving: PropTypes.bool,
+  isLoading: PropTypes.bool
+};
+
+HasBatProperty.propTypes = {
+  hasBat: PropTypes.bool,
+  isLoading: PropTypes.bool
+};
+
+DangerFloodingProperty.propTypes = {
+  dangerFlooding: PropTypes.bool,
+  isLoading: PropTypes.bool
+};
+
+DangerCO2Property.propTypes = {
+  dangerCo2: PropTypes.bool,
+  isLoading: PropTypes.bool
+};
+
+NeedCleanGearProperty.propTypes = {
+  needCleanGear: PropTypes.bool,
+  isLoading: PropTypes.bool
+};
+
+DangerPollutionProperty.propTypes = {
+  dangerPollution: PropTypes.bool,
+  isLoading: PropTypes.bool
+};
+
+DangerRockfallProperty.propTypes = {
+  dangerRockfall: PropTypes.bool,
+  isLoading: PropTypes.bool
+};
+
+HasRulesProperty.propTypes = {
+  hasRules: PropTypes.bool,
+  isLoading: PropTypes.bool
+};
+
+NeedStayOnTrailProperty.propTypes = {
+  needStayOnTrail: PropTypes.bool,
+  isLoading: PropTypes.bool
+};
+
+IsTouristicProperty.propTypes = {
+  isTouristic: PropTypes.bool,
+  isLoading: PropTypes.bool
 };

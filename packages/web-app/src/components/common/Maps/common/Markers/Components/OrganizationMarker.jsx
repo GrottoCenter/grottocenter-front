@@ -1,6 +1,5 @@
 import * as L from 'leaflet';
 import { renderToString } from 'react-dom/server';
-import React from 'react';
 import { amber } from '@mui/material/colors';
 
 // viewBox keeps the original organization.svg coordinate space (100×100) for the

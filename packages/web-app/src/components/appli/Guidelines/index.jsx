@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import {
   Box,
@@ -31,6 +31,9 @@ const MODE_NONE = 'none';
 const MODE_CREATE = 'create';
 const MODE_ATTACH = 'attach';
 
+// Guidelines attach to a country, a region or a massif; massif is the default.
+const ENTITY_LABEL_IDS = { countries: 'country', regions: 'region' };
+
 const Guidelines = ({ entityType, entityId, guidelines }) => {
   const permissions = usePermissions();
   const { onError } = useNotification();
@@ -47,16 +50,11 @@ const Guidelines = ({ entityType, entityId, guidelines }) => {
   const [attachFetchTrigger, setAttachFetchTrigger] = useState(0);
 
   const entityLabel = formatMessage({
-    id:
-      entityType === 'countries'
-        ? 'country'
-        : entityType === 'regions'
-          ? 'region'
-          : 'massif'
+    id: ENTITY_LABEL_IDS[entityType] ?? 'massif'
   });
 
   useEffect(() => {
-    if (mode !== MODE_ATTACH) return;
+    if (mode !== MODE_ATTACH) return undefined;
 
     let cancelled = false;
     setIsLoadingGuidelines(true);
@@ -167,7 +165,13 @@ const Guidelines = ({ entityType, entityId, guidelines }) => {
               data-testid="guideline-mode-toggle">
               <Button
                 variant="outlined"
-                startIcon={<EntityIcon iconType="guidelines" size={20} BadgeIcon={LinkIcon} />}
+                startIcon={
+                  <EntityIcon
+                    iconType="guidelines"
+                    size={20}
+                    BadgeIcon={LinkIcon}
+                  />
+                }
                 onClick={() => {
                   setMode(MODE_ATTACH);
                   setSelectedGuideline(null);
@@ -248,6 +252,9 @@ const Guidelines = ({ entityType, entityId, guidelines }) => {
                     id: 'guidelines.no_results'
                   })}
                   renderOption={(props, option) => {
+                    // MUI hands `key` inside renderOption's props bag and React 19 requires
+                    // extracting it before the spread; this callback is not a component.
+                    // eslint-disable-next-line react/prop-types
                     const { key, ...otherProps } = props;
                     return (
                       <li key={key} {...otherProps}>
@@ -322,7 +329,13 @@ const Guidelines = ({ entityType, entityId, guidelines }) => {
               setMode(MODE_ATTACH);
               setAttachFetchTrigger(prev => prev + 1);
             }}
-            startIcon={<EntityIcon iconType="guidelines" size={20} BadgeIcon={LinkIcon} />}
+            startIcon={
+              <EntityIcon
+                iconType="guidelines"
+                size={20}
+                BadgeIcon={LinkIcon}
+              />
+            }
             data-testid="add-guideline-btn">
             <FormattedMessage id="Associate" />
           </Button>

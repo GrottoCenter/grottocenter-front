@@ -26,7 +26,12 @@ const useLocalStorage = (
       const raw = localStorage.getItem(key);
       if (raw === null) return defaultValue;
       const stored = desRef.current(raw);
-      if (merge && stored && typeof stored === 'object' && !Array.isArray(stored)) {
+      if (
+        merge &&
+        stored &&
+        typeof stored === 'object' &&
+        !Array.isArray(stored)
+      ) {
         return { ...defaultValue, ...stored };
       }
       return stored;
@@ -41,7 +46,9 @@ const useLocalStorage = (
         const nextValue = typeof next === 'function' ? next(prev) : next;
         try {
           localStorage.setItem(key, serRef.current(nextValue));
-        } catch { /* noop — storage quota or private mode */ }
+        } catch {
+          /* noop — storage quota or private mode */
+        }
         return nextValue;
       });
     },

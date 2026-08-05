@@ -1,4 +1,3 @@
-import React from 'react';
 import PropTypes from 'prop-types';
 import { Controller } from 'react-hook-form';
 import { useIntl } from 'react-intl';
@@ -44,8 +43,7 @@ const NumberField = ({
                   disabled
                     ? { '& img': { filter: 'grayscale(1)', opacity: 0.5 } }
                     : undefined
-                }
-              >
+                }>
                 <CustomIcon type={icon} size={20} />
               </InputAdornment>
             ),

@@ -91,8 +91,12 @@ export function postDocument(docAttributes) {
           return createdDocument;
         })
       )
-      .catch(err => {
-        if (err.isAuthError) return;
+      .catch(() => {
+        // Two error paths land here and both are already handled: HTTP 4xx/5xx
+        // responses dispatched postDocumentFailure before re-throwing, and an
+        // HTTP 401 was turned into an isAuthError by checkAuthStatus, which
+        // already dispatched postLogout(). This catch only swallows the
+        // rejection so it does not surface as an unhandled promise.
       });
   };
 }

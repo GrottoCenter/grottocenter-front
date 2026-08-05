@@ -5,7 +5,18 @@ import { toDateFnsFormat } from '../../utils/momentToDateFnsFormat';
 // ─── Constants ────────────────────────────────────────────────────────────────
 
 export const DATE_TOKENS = ['YYYY', 'YY', 'MM', 'M', 'DD', 'D'];
-export const TIME_TOKENS = ['HH', 'H', 'hh', 'h', 'mm', 'm', 'ss', 's', 'SSS', 'A'];
+export const TIME_TOKENS = [
+  'HH',
+  'H',
+  'hh',
+  'h',
+  'mm',
+  'm',
+  'ss',
+  's',
+  'SSS',
+  'A'
+];
 export const ALL_TOKENS = [...DATE_TOKENS, ...TIME_TOKENS];
 
 export const SEPARATORS = ['/', '-', ':', ' ', 'T', '.'];
@@ -153,7 +164,11 @@ export const validateFormat = (formatString, sampleValues) => {
   try {
     dfFormat = toDateFnsFormat(formatString);
   } catch {
-    return { isValid: false, parsedFirst: null, failCount: sampleValues.length };
+    return {
+      isValid: false,
+      parsedFirst: null,
+      failCount: sampleValues.length
+    };
   }
 
   let failCount = 0;

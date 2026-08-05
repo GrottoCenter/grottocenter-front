@@ -5,7 +5,6 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import Skeleton from '@mui/material/Skeleton';
 import { Box, Breadcrumbs, Card, Typography } from '@mui/material';
-import AppLink from '../../common/AppLink';
 import { styled } from '@mui/material/styles';
 import { NavigateNext, Print } from '@mui/icons-material';
 import CreateIcon from '@mui/icons-material/Create';
@@ -14,6 +13,7 @@ import ShareIcon from '@mui/icons-material/Share';
 import ExploreOutlinedIcon from '@mui/icons-material/ExploreOutlined';
 import BiotechIcon from '@mui/icons-material/Biotech';
 import { useReactToPrint } from 'react-to-print';
+import AppLink from '../../common/AppLink';
 
 import { usePermissions, useSharePage } from '../../../hooks';
 import PageContainer from '../../common/Layouts/PageContainer';
@@ -150,8 +150,7 @@ export const Network = ({ isLoading, error, cave }) => {
               display: 'flex',
               alignItems: 'center',
               gap: { xs: '2px', md: '4px' }
-            }}
-          >
+            }}>
             <CustomIcon type="country" size={16} />
             {country}
           </AppLink>
@@ -162,8 +161,7 @@ export const Network = ({ isLoading, error, cave }) => {
               display: 'flex',
               alignItems: 'center',
               gap: { xs: '2px', md: '4px' }
-            }}
-          >
+            }}>
             {cave.massifs.map((massif, index) => (
               <React.Fragment key={massif.id}>
                 {index > 0 && <span>·</span>}
@@ -175,8 +173,7 @@ export const Network = ({ isLoading, error, cave }) => {
                     display: 'flex',
                     alignItems: 'center',
                     gap: { xs: '2px', md: '4px' }
-                  }}
-                >
+                  }}>
                   <CustomIcon type="massif" size={16} />
                   {massif.name}
                 </AppLink>
@@ -279,8 +276,7 @@ export const Network = ({ isLoading, error, cave }) => {
                             display: 'flex',
                             flexDirection: 'column',
                             gap: 1
-                          }}
-                        >
+                          }}>
                           <Box sx={{ minHeight: 200 }}>
                             <EntrancesMap
                               isLoading={isLoading}
@@ -305,8 +301,7 @@ export const Network = ({ isLoading, error, cave }) => {
                           component="div"
                           variant="caption"
                           color="text.secondary"
-                          sx={{ mt: 1 }}
-                        >
+                          sx={{ mt: 1 }}>
                           {cave.author && (
                             <AuthorAndDate
                               author={cave.author}
@@ -350,8 +345,7 @@ export const Network = ({ isLoading, error, cave }) => {
                     open={isEditing}
                     onClose={() => setEditing(false)}
                     scrollable
-                    title={formatMessage({ id: 'Network edition' })}
-                  >
+                    title={formatMessage({ id: 'Network edition' })}>
                     <NetworkForm networkValues={{ ...cave }} />
                   </StandardDialog>
                 )}

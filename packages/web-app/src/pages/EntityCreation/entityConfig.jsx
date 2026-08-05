@@ -1,4 +1,3 @@
-import React from 'react';
 import PropTypes from 'prop-types';
 import { defineMessages } from 'react-intl';
 import { Box } from '@mui/material';
@@ -50,7 +49,11 @@ export const ENTITIES = [
   }
 ];
 
-export const EntityIcon = ({ iconType, size = 35, BadgeIcon = AddCircleIcon }) => (
+export const EntityIcon = ({
+  iconType,
+  size = 35,
+  BadgeIcon = AddCircleIcon
+}) => (
   <Box sx={{ position: 'relative', display: 'inline-flex' }}>
     <CustomIcon type={iconType} size={size} />
     <BadgeIcon

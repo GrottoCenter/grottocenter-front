@@ -1,6 +1,4 @@
-import React from 'react';
-import { Typography, Button } from '@mui/material';
-import { Grid } from '@mui/material';
+import { Typography, Button, Grid } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { useSelector } from 'react-redux';
 import { useIntl } from 'react-intl';

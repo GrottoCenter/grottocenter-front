@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import {
@@ -35,14 +35,15 @@ const SortMenu = ({
   const label = activeCol
     ? formatMessage({ id: activeCol.label })
     : formatMessage({ id: 'Sort by' });
-  const startIcon =
-    orderBy && order === 'desc' ? (
-      <ArrowDownwardIcon fontSize="small" />
-    ) : orderBy ? (
-      <ArrowUpwardIcon fontSize="small" />
-    ) : (
-      <SwapVertIcon fontSize="small" />
-    );
+  let startIcon = <SwapVertIcon fontSize="small" />;
+  if (orderBy) {
+    startIcon =
+      order === 'desc' ? (
+        <ArrowDownwardIcon fontSize="small" />
+      ) : (
+        <ArrowUpwardIcon fontSize="small" />
+      );
+  }
 
   return (
     <>

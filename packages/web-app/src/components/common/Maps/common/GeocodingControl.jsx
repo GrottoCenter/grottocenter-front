@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { useMap } from 'react-leaflet';
 import * as L from 'leaflet';
 import { styled } from '@mui/material/styles';
@@ -307,7 +307,9 @@ const GeocodingControl = ({ onLocationSelect }) => {
               Promise.all(
                 massifs.map(massif =>
                   Promise.all([
-                    fetch(`${getMassifUrl}${massif.id}`, { signal }).then(res => res.json()),
+                    fetch(`${getMassifUrl}${massif.id}`, { signal }).then(res =>
+                      res.json()
+                    ),
                     fetch(getStatisticsMassifUrl(massif.id), { signal })
                       .then(res => res.json())
                       .catch(() => null)
@@ -539,6 +541,9 @@ const GeocodingControl = ({ onLocationSelect }) => {
           defaultMessage: 'No results'
         })}
         renderOption={(props, result) => {
+          // MUI hands `key` inside renderOption's props bag and React 19 requires
+          // extracting it before the spread; this callback is not a component.
+          // eslint-disable-next-line react/prop-types
           const { key: _key, ...optionProps } = props;
 
           let icon;

@@ -1,5 +1,10 @@
-import React from 'react';
 import MuiLink from '@mui/material/Link';
+
+const renderMuiLink = ({ attributes, content }) => (
+  <MuiLink {...attributes} sx={{ display: 'inline' }}>
+    {content}
+  </MuiLink>
+);
 
 const linkifyOptions = {
   attributes: { target: '_blank', rel: 'noopener noreferrer' },
@@ -20,13 +25,5 @@ const linkifyOptions = {
     email: renderMuiLink
   }
 };
-
-function renderMuiLink({ attributes, content }) {
-  return (
-    <MuiLink {...attributes} sx={{ display: 'inline' }}>
-      {content}
-    </MuiLink>
-  );
-}
 
 export default linkifyOptions;

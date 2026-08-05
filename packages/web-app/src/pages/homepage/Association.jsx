@@ -1,4 +1,3 @@
-import React from 'react';
 import { Box, Button, Grid, Typography } from '@mui/material';
 import {
   CampaignOutlined,
@@ -177,7 +176,10 @@ const Association = () => {
             mb: 3,
             maxWidth: 680,
             mx: 'auto',
-            '& a': { color: 'rgba(255,255,255,0.9)', textDecoration: 'underline' }
+            '& a': {
+              color: 'rgba(255,255,255,0.9)',
+              textDecoration: 'underline'
+            }
           }}>
           <FormattedMessage
             id="In partnership with the FSE and the UIS, Wikicaves hosts the Speleological Abstracts (BBS/SA) and participates in the Karstlink initiative."

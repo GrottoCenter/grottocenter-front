@@ -58,9 +58,9 @@ const PageTabs = ({ tabs, children }) => {
       : parseInt(theme.appBarHeight, 10);
 
   useEffect(() => {
-    if (isMobile) return;
+    if (isMobile) return undefined;
     const sentinel = sentinelRef.current;
-    if (!sentinel || !tabs?.length) return;
+    if (!sentinel || !tabs?.length) return undefined;
     const observer = new IntersectionObserver(
       ([entry]) => setIsStuck(!entry.isIntersecting),
       { rootMargin: `-${appBarPx}px 0px 0px 0px` }
@@ -87,7 +87,7 @@ const PageTabs = ({ tabs, children }) => {
   }, [activeTab, isMobile, appBarPx]);
 
   if (!tabs || tabs.length === 0) {
-    return <>{children}</>;
+    return children;
   }
 
   const handleChange = (_, newValue) => {
@@ -166,6 +166,9 @@ const PageTabs = ({ tabs, children }) => {
           </Tabs>
         </StickyTabsBar>
       )}
+      {/* A tab panel is identified by its position: the ARIA wiring below
+          pairs page-tabpanel-i with page-tab-i. */}
+      {/* eslint-disable react/no-array-index-key */}
       {childrenArray.map((child, i) => (
         <TabPanel
           key={i}
@@ -183,6 +186,7 @@ const PageTabs = ({ tabs, children }) => {
           {child}
         </TabPanel>
       ))}
+      {/* eslint-enable react/no-array-index-key */}
       {isMobile && (
         <Paper
           elevation={3}

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import Person from '../../components/appli/Person/Person';
@@ -14,7 +14,12 @@ const PersonPage = () => {
   }, [personId, dispatch]);
 
   return (
-    <Person key={personId} isLoading={isFetching} person={person} error={error} />
+    <Person
+      key={personId}
+      isLoading={isFetching}
+      person={person}
+      error={error}
+    />
   );
 };
 export default PersonPage;

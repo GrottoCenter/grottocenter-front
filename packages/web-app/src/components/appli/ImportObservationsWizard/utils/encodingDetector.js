@@ -1,45 +1,8 @@
 /**
- * Detects the character encoding of a file by inspecting its first bytes.
- *
- * Decision logic:
- * 1. UTF-8 BOM (0xEF, 0xBB, 0xBF) → 'UTF-8'
- * 2. UTF-16 LE BOM (0xFF, 0xFE) or UTF-16 BE BOM (0xFE, 0xFF) → 'UTF-16'
- * 3. Invalid UTF-8 byte sequences detected → 'windows-1252'
- * 4. Otherwise → 'UTF-8'
- *
- * @param {Uint8Array} bytes - First 4096 bytes of the file
- * @returns {'UTF-8' | 'UTF-16' | 'windows-1252'}
+ * @param {number} byte
+ * @returns {boolean}
  */
-export const detectEncoding = bytes => {
-  if (!bytes || bytes.length === 0) {
-    return 'UTF-8';
-  }
-
-  // Check for UTF-8 BOM
-  if (bytes.length >= 3 &&
-    bytes[0] === 0xef &&
-    bytes[1] === 0xbb &&
-    bytes[2] === 0xbf) {
-    return 'UTF-8';
-  }
-
-  // Check for UTF-16 LE BOM
-  if (bytes.length >= 2 && bytes[0] === 0xff && bytes[1] === 0xfe) {
-    return 'UTF-16';
-  }
-
-  // Check for UTF-16 BE BOM
-  if (bytes.length >= 2 && bytes[0] === 0xfe && bytes[1] === 0xff) {
-    return 'UTF-16';
-  }
-
-  // Scan for invalid UTF-8 sequences
-  if (hasInvalidUtf8(bytes)) {
-    return 'windows-1252';
-  }
-
-  return 'UTF-8';
-};
+const isContinuation = byte => byte >= 0x80 && byte <= 0xbf;
 
 /**
  * Checks whether the byte array contains sequences that are invalid in UTF-8.
@@ -127,7 +90,46 @@ const hasInvalidUtf8 = bytes => {
 };
 
 /**
- * @param {number} byte
- * @returns {boolean}
+ * Detects the character encoding of a file by inspecting its first bytes.
+ *
+ * Decision logic:
+ * 1. UTF-8 BOM (0xEF, 0xBB, 0xBF) → 'UTF-8'
+ * 2. UTF-16 LE BOM (0xFF, 0xFE) or UTF-16 BE BOM (0xFE, 0xFF) → 'UTF-16'
+ * 3. Invalid UTF-8 byte sequences detected → 'windows-1252'
+ * 4. Otherwise → 'UTF-8'
+ *
+ * @param {Uint8Array} bytes - First 4096 bytes of the file
+ * @returns {'UTF-8' | 'UTF-16' | 'windows-1252'}
  */
-const isContinuation = byte => byte >= 0x80 && byte <= 0xbf;
+export const detectEncoding = bytes => {
+  if (!bytes || bytes.length === 0) {
+    return 'UTF-8';
+  }
+
+  // Check for UTF-8 BOM
+  if (
+    bytes.length >= 3 &&
+    bytes[0] === 0xef &&
+    bytes[1] === 0xbb &&
+    bytes[2] === 0xbf
+  ) {
+    return 'UTF-8';
+  }
+
+  // Check for UTF-16 LE BOM
+  if (bytes.length >= 2 && bytes[0] === 0xff && bytes[1] === 0xfe) {
+    return 'UTF-16';
+  }
+
+  // Check for UTF-16 BE BOM
+  if (bytes.length >= 2 && bytes[0] === 0xfe && bytes[1] === 0xff) {
+    return 'UTF-16';
+  }
+
+  // Scan for invalid UTF-8 sequences
+  if (hasInvalidUtf8(bytes)) {
+    return 'windows-1252';
+  }
+
+  return 'UTF-8';
+};

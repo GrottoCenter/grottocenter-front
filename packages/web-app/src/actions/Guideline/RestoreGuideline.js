@@ -31,23 +31,25 @@ export const restoreGuideline =
       headers: getState().login.authorizationHeader
     };
 
-    return fetch(restoreGuidelineUrl(id), requestOptions)
-      .then(checkAuthStatus(dispatch))
-      .then(response => response.json())
-      .then(data => {
-        dispatch(restoreGuidelineSuccess(data));
-        return true;
-      })
-      // Return success/failure (truthy = success) so the caller can surface a
-      // message instead of leaving the view silently stale on error.
-      .catch(error => {
-        if (error.isAuthError) return false;
-        dispatch(
-          restoreGuidelineFailure(
-            makeErrorMessage(error.message, `Restoring guideline`),
-            error.message
-          )
-        );
-        return false;
-      });
+    return (
+      fetch(restoreGuidelineUrl(id), requestOptions)
+        .then(checkAuthStatus(dispatch))
+        .then(response => response.json())
+        .then(data => {
+          dispatch(restoreGuidelineSuccess(data));
+          return true;
+        })
+        // Return success/failure (truthy = success) so the caller can surface a
+        // message instead of leaving the view silently stale on error.
+        .catch(error => {
+          if (error.isAuthError) return false;
+          dispatch(
+            restoreGuidelineFailure(
+              makeErrorMessage(error.message, `Restoring guideline`),
+              error.message
+            )
+          );
+          return false;
+        })
+    );
   };

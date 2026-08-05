@@ -1,15 +1,9 @@
-import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import AppLink from '../AppLink';
-import {
-  AppBar as MuiAppBar,
-  Box,
-  Toolbar,
-  IconButton
-} from '@mui/material';
+import { AppBar as MuiAppBar, Box, Toolbar, IconButton } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import { styled } from '@mui/material/styles';
 import { isMobileOnly } from 'react-device-detect';
+import AppLink from '../AppLink';
 
 import {
   displayLoginDialog,

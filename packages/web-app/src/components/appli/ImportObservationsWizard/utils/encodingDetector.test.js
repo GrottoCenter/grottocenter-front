@@ -3,7 +3,9 @@ import { detectEncoding } from './encodingDetector';
 describe('detectEncoding', () => {
   describe('UTF-8 BOM (EF BB BF)', () => {
     it('returns UTF-8 when bytes start with UTF-8 BOM', () => {
-      const bytes = new Uint8Array([0xef, 0xbb, 0xbf, 0x48, 0x65, 0x6c, 0x6c, 0x6f]);
+      const bytes = new Uint8Array([
+        0xef, 0xbb, 0xbf, 0x48, 0x65, 0x6c, 0x6c, 0x6f
+      ]);
       expect(detectEncoding(bytes)).toBe('UTF-8');
     });
 

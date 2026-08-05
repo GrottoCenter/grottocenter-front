@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import {
@@ -88,11 +88,7 @@ const AuthorsSelect = ({
 
   return (
     <>
-      <Typography
-        variant="caption"
-        color="text.secondary"
-        display="block"
-      >
+      <Typography variant="caption" color="text.secondary" display="block">
         {formatMessage({ id: HELPER_TEXT_KEY })}
       </Typography>
       <Wrapper>
@@ -164,8 +160,7 @@ const AuthorsSelect = ({
           onClick={handleToggleCreate}
           disabled={!sideActionEnabled}
           color="secondary"
-          aria-label={formatMessage({ id: 'new entity' })}
-        >
+          aria-label={formatMessage({ id: 'new entity' })}>
           {isCreateOpen ? (
             <Cancel fontSize="large" />
           ) : (

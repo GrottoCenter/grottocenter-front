@@ -35,20 +35,18 @@ export function unsubscribeFromCountry(countryId, userId = null) {
       headers: getState().login.authorizationHeader
     };
 
-    return fetch(url, requestOptions).then(
-      response => {
-        if (response.status >= 400) {
-          const error = `Unsubscribing you from country with id ${countryId}`;
-          dispatch(
-            unsubscribeFromCountryActionFailure(
-              makeErrorMessage(response.status, error)
-            )
-          );
-        } else {
-          dispatch(unsubscribeFromCountryActionSuccess(countryId));
-        }
-        return response;
+    return fetch(url, requestOptions).then(response => {
+      if (response.status >= 400) {
+        const error = `Unsubscribing you from country with id ${countryId}`;
+        dispatch(
+          unsubscribeFromCountryActionFailure(
+            makeErrorMessage(response.status, error)
+          )
+        );
+      } else {
+        dispatch(unsubscribeFromCountryActionSuccess(countryId));
       }
-    );
+      return response;
+    });
   };
 }

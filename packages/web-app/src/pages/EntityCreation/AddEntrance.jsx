@@ -1,4 +1,3 @@
-import React from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useIntl } from 'react-intl';
 import Layout from '../../components/common/Layouts/Fixed/FixedContent';
@@ -23,7 +22,12 @@ const AddEntrance = () => {
     <Layout
       icon={<EntityIcon iconType="entrance" />}
       title={formatMessage({ id: 'Add an entrance' })}
-      content={<EntranceForm entranceValues={entranceValues} onCancel={() => navigate(-1)} />}
+      content={
+        <EntranceForm
+          entranceValues={entranceValues}
+          onCancel={() => navigate(-1)}
+        />
+      }
     />
   );
 };

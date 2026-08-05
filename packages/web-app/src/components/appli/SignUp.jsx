@@ -96,8 +96,7 @@ const SignUp = () => {
     const toastMessage = code
       ? formatMessage({
           id: code,
-          defaultMessage:
-            message || formatMessage({ id: 'unexpected error' })
+          defaultMessage: message || formatMessage({ id: 'unexpected error' })
         })
       : message || formatMessage({ id: 'unexpected error' });
     onError(toastMessage);

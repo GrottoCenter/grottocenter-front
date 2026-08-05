@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useIntl } from 'react-intl';
 import { useDispatch } from 'react-redux';
 import PropTypes from 'prop-types';
@@ -46,7 +46,12 @@ const SearchOrganizationForm = ({ onSubmit }) => {
         resourceType={ADVANCED_SEARCH_TYPES.ORGANIZATIONS}
         resetResults={resetAdvancedSearch}
       />
-      <SearchResults onSelected={handleSelection} hideExport compact entityType={ADVANCED_SEARCH_TYPES.ORGANIZATIONS} />
+      <SearchResults
+        onSelected={handleSelection}
+        hideExport
+        compact
+        entityType={ADVANCED_SEARCH_TYPES.ORGANIZATIONS}
+      />
       <Box sx={{ mt: 1, mb: 2, textAlign: 'center' }}>
         <Button
           disabled={selectedOrganizations.length === 0}

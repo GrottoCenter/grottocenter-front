@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import { CircularProgress, IconButton, Tooltip, useTheme } from '@mui/material';
@@ -148,7 +148,10 @@ const CompassControl = () => {
     );
   } else if (isActivating) {
     icon = (
-      <CircularProgress size={20} sx={{ color: theme.palette.mapControlIcon }} />
+      <CircularProgress
+        size={20}
+        sx={{ color: theme.palette.mapControlIcon }}
+      />
     );
   } else {
     icon = (

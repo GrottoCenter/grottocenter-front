@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import { useContext } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import Box from '@mui/material/Box';
@@ -11,7 +11,7 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import CloseIcon from '@mui/icons-material/Close';
-import { DontShowContext } from './AppTour';
+import DontShowContext from './DontShowContext';
 
 // ContentComponent for @reactour/tour.
 // Receives: currentStep, steps (full array), setCurrentStep, setIsOpen.

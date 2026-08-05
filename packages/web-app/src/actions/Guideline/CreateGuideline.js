@@ -47,7 +47,7 @@ export const postGuideline =
       .then(response => response.json())
       .then(data => dispatch(postGuidelineSuccess(data)))
       .catch(error => {
-        if (error.isAuthError) return;
+        if (error.isAuthError) return null;
         dispatch(
           postGuidelineFailure(
             makeErrorMessage(error.message, `Creating a new guideline`),

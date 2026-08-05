@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useIntl } from 'react-intl';
 import { useNavigate } from 'react-router-dom';
@@ -125,6 +125,9 @@ const ComposeDialog = ({ open, onClose, prefilledRecipientId }) => {
   };
 
   const renderRecipientOption = (props, option) => {
+    // MUI hands `key` inside renderOption's props bag and React 19 requires
+    // extracting it before the spread; this callback is not a component.
+    // eslint-disable-next-line react/prop-types
     const { key, ...otherProps } = props;
     return (
       <li key={key || `recipient-${option.id}`} {...otherProps}>
@@ -278,7 +281,9 @@ const ComposeDialog = ({ open, onClose, prefilledRecipientId }) => {
                     flexGrow: 1,
                     alignItems: 'stretch'
                   },
-                  '& .MuiInputBase-inputMultiline': { height: '100% !important' }
+                  '& .MuiInputBase-inputMultiline': {
+                    height: '100% !important'
+                  }
                 }
               : undefined
           }

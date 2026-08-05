@@ -1,5 +1,5 @@
 import { Alert, Box } from '@mui/material';
-import React, { useCallback } from 'react';
+import { useCallback } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
 

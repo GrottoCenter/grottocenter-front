@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import { Box, Button, Divider, Tooltip } from '@mui/material';
@@ -40,94 +40,92 @@ const Documents = ({ documents, entranceId, isEditAllowed }) => {
   };
 
   return (
-    <>
-      <ScrollableContent
-        dense
-        collapsible={false}
-        anchorId="documents"
-        title={formatMessage({ id: 'Documents' })}
-        icon={
-          permissions.isAuth &&
-          isEditAllowed && (
-            <Box display="flex" gap={0.5}>
-              <Tooltip title={formatMessage({ id: 'Create a new document' })}>
-                <Button
-                  color="secondary"
-                  size="small"
-                  variant="outlined"
-                  onClick={navigateToNewDocument}
-                  startIcon={<EntityIcon iconType="bibliography" size={20} />}>
-                  {formatMessage({ id: 'New' })}
-                </Button>
-              </Tooltip>
-              <Tooltip
-                title={
-                  isDocumentSearchVisible
-                    ? formatMessage({ id: 'Cancel this search' })
-                    : formatMessage({ id: 'Assign an existing document' })
+    <ScrollableContent
+      dense
+      collapsible={false}
+      anchorId="documents"
+      title={formatMessage({ id: 'Documents' })}
+      icon={
+        permissions.isAuth &&
+        isEditAllowed && (
+          <Box display="flex" gap={0.5}>
+            <Tooltip title={formatMessage({ id: 'Create a new document' })}>
+              <Button
+                color="secondary"
+                size="small"
+                variant="outlined"
+                onClick={navigateToNewDocument}
+                startIcon={<EntityIcon iconType="bibliography" size={20} />}>
+                {formatMessage({ id: 'New' })}
+              </Button>
+            </Tooltip>
+            <Tooltip
+              title={
+                isDocumentSearchVisible
+                  ? formatMessage({ id: 'Cancel this search' })
+                  : formatMessage({ id: 'Assign an existing document' })
+              }>
+              <Button
+                color={isDocumentSearchVisible ? 'inherit' : 'secondary'}
+                size="small"
+                variant="outlined"
+                onClick={() =>
+                  setIsDocumentSearchVisible(!isDocumentSearchVisible)
+                }
+                startIcon={
+                  isDocumentSearchVisible ? (
+                    <CancelIcon />
+                  ) : (
+                    <EntityIcon
+                      iconType="bibliography"
+                      size={20}
+                      BadgeIcon={LinkIcon}
+                    />
+                  )
                 }>
-                <Button
-                  color={isDocumentSearchVisible ? 'inherit' : 'secondary'}
-                  size="small"
-                  variant="outlined"
-                  onClick={() =>
-                    setIsDocumentSearchVisible(!isDocumentSearchVisible)
-                  }
-                  startIcon={
-                    isDocumentSearchVisible ? (
-                      <CancelIcon />
-                    ) : (
-                      <EntityIcon
-                        iconType="bibliography"
-                        size={20}
-                        BadgeIcon={LinkIcon}
-                      />
-                    )
-                  }>
-                  {formatMessage({
-                    id: isDocumentSearchVisible ? 'Cancel' : 'Associate'
-                  })}
-                </Button>
-              </Tooltip>
-            </Box>
-          )
-        }
-        content={
-          <>
-            {isDocumentSearchVisible && (
-              <>
-                <SearchDocumentForm onSubmit={onSubmitForm} />
-                <DividerStyled />
-              </>
-            )}
+                {formatMessage({
+                  id: isDocumentSearchVisible ? 'Cancel' : 'Associate'
+                })}
+              </Button>
+            </Tooltip>
+          </Box>
+        )
+      }
+      content={
+        <>
+          {isDocumentSearchVisible && (
+            <>
+              <SearchDocumentForm onSubmit={onSubmitForm} />
+              <DividerStyled />
+            </>
+          )}
 
-            <DocumentsList
-              documents={documents}
-              emptyMessageComponent={
-                <Alert
-                  severity="info"
-                  content={formatMessage({
-                    id: 'There is currently no document for this entrance.'
-                  })}
-                />
-              }
-              onUnlink={
-                permissions.isModerator && isEditAllowed
-                  ? async document => {
-                      dispatch(
-                        unlinkDocumentToEntrance({
-                          entranceId,
-                          documentId: document.id
-                        })
-                      );
-                    }
-                  : null
-              }
-            />
-          </>
-        }
-      />
-    </>
+          <DocumentsList
+            documents={documents}
+            emptyMessageComponent={
+              <Alert
+                severity="info"
+                content={formatMessage({
+                  id: 'There is currently no document for this entrance.'
+                })}
+              />
+            }
+            onUnlink={
+              permissions.isModerator && isEditAllowed
+                ? async document => {
+                    dispatch(
+                      unlinkDocumentToEntrance({
+                        entranceId,
+                        documentId: document.id
+                      })
+                    );
+                  }
+                : null
+            }
+          />
+        </>
+      }
+    />
   );
 };
 

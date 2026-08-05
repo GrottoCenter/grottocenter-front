@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import { Card, Chip, Skeleton } from '@mui/material';
@@ -48,6 +48,11 @@ const Person = ({ isLoading, person, error }) => {
   }
   const canAdminEdit =
     person && !canEdit && (permissions.isAdmin || permissions.isModerator);
+  // Own profile goes to the account page; a moderator edits the person record.
+  let editPropertiesTarget = null;
+  if (canEdit) editPropertiesTarget = '/ui/account';
+  else if (canAdminEdit)
+    editPropertiesTarget = `/ui/persons/${person?.id}/edit`;
 
   const handleRefresh = useCallback(() => {
     dispatch(fetchPerson(person.id));
@@ -163,11 +168,9 @@ const Person = ({ isLoading, person, error }) => {
           key: 'edit',
           icon: <CreateIcon />,
           label: formatMessage({ id: 'Edit properties' }),
-          onClick: canEdit
-            ? () => navigate('/ui/account')
-            : canAdminEdit
-              ? () => navigate(`/ui/persons/${person?.id}/edit`)
-              : undefined,
+          onClick: editPropertiesTarget
+            ? () => navigate(editPropertiesTarget)
+            : undefined,
           hidden: !canEdit && !canAdminEdit
         },
         {

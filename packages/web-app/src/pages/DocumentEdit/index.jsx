@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { CircularProgress } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
@@ -52,7 +52,9 @@ const DocumentEdit = ({
   ) : (
     <Layout
       title={formatMessage({ id: 'BBS document submission form' })}
-      content={<DocumentSubmission initialValues={details} onCancel={onCancel} />}
+      content={
+        <DocumentSubmission initialValues={details} onCancel={onCancel} />
+      }
     />
   );
 };

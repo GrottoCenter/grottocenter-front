@@ -5,7 +5,10 @@ import { fetchAccount } from '../actions/Account/GetAccount';
 import { loadLanguages } from '../actions/Language';
 import { updateAccount } from '../actions/Account/UpdateAccount';
 import { usePermissions } from '.';
-import { languageIdToLocale, localeToLanguageId } from '../utils/languageMapping';
+import {
+  languageIdToLocale,
+  localeToLanguageId
+} from '../utils/languageMapping';
 
 const useLanguageSync = () => {
   const dispatch = useDispatch();
@@ -24,7 +27,10 @@ const useLanguageSync = () => {
       dispatch(fetchAccount());
       if (!languagesLoaded) dispatch(loadLanguages(true));
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // Deliberately keyed on the auth transition alone. Adding `languagesLoaded`
+    // would re-run this as soon as `loadLanguages` resolves and refetch the
+    // account for nothing; `dispatch` is a stable reference.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAuth]);
 
   // account.language → UI locale (after login or after a PATCH)
@@ -36,7 +42,10 @@ const useLanguageSync = () => {
       window.localStorage.setItem('selectedLanguage', targetLocale);
       dispatch(changeLocale(targetLocale));
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // `locale` is read but must not be a dependency: this effect only reacts to
+    // the account being the source of truth. Listing `locale` would re-run it on
+    // a user-initiated language change and immediately revert that choice.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [account?.language]);
 
   // UI locale → account.language (user changed the AppBar selector after mount)
@@ -53,7 +62,10 @@ const useLanguageSync = () => {
     const languageId = localeToLanguageId(locale);
     if (languageId && languageId !== account?.language)
       dispatch(updateAccount({ language: languageId }));
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // Mirror of the effect above: only a locale change may trigger the PATCH.
+    // `account?.language` is read as a guard, but listing it would re-run this
+    // when the PATCH response lands and loop the two effects against each other.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [locale]);
 };
 

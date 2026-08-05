@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
 import {
@@ -26,7 +26,7 @@ export const LegendHeader = styled('span')`
   align-items: center;
 `;
 
-const LegendItemsShape = PropTypes.arrayOf(
+export const LegendItemsShape = PropTypes.arrayOf(
   PropTypes.shape({
     abbrevKey: PropTypes.string.isRequired,
     labelKey: PropTypes.string.isRequired
@@ -45,17 +45,19 @@ const LegendSection = ({ titleKey, items }) => {
         <TableBody>
           {items.map(({ abbrevKey, labelKey }) => (
             <TableRow key={abbrevKey}>
-              <TableCell sx={{
-                border: 0,
-                pr: 2
-              }}>
+              <TableCell
+                sx={{
+                  border: 0,
+                  pr: 2
+                }}>
                 <Typography variant="body2" fontWeight="bold" component="span">
                   {formatMessage({ id: abbrevKey })}
                 </Typography>
               </TableCell>
-              <TableCell sx={{
-                border: 0
-              }}>
+              <TableCell
+                sx={{
+                  border: 0
+                }}>
                 <Typography variant="body2" component="span">
                   {formatMessage({ id: labelKey })}
                 </Typography>

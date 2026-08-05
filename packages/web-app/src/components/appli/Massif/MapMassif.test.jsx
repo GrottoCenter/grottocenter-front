@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 
 import MapMassif from './MapMassif';
@@ -94,7 +93,17 @@ vi.mock('../../../conf/apiRoutes', () => ({
 
 const samplePolygon = JSON.stringify({
   type: 'MultiPolygon',
-  coordinates: [[[[0, 0], [1, 0], [1, 1], [0, 1], [0, 0]]]]
+  coordinates: [
+    [
+      [
+        [0, 0],
+        [1, 0],
+        [1, 1],
+        [0, 1],
+        [0, 0]
+      ]
+    ]
+  ]
 });
 
 // --- Tests ---
@@ -113,7 +122,11 @@ afterEach(() => {
 describe('MapMassif', () => {
   describe('at low zoom (< MARKERS_LIMIT)', () => {
     it('feeds the cluster layer with fetched coordinates', async () => {
-      const coords = [[5.5, 44.1], [6.2, 43.8], [7.0, 45.0]];
+      const coords = [
+        [5.5, 44.1],
+        [6.2, 43.8],
+        [7.0, 45.0]
+      ];
       global.fetch = vi.fn().mockResolvedValue({
         ok: true,
         json: () => Promise.resolve(coords)
@@ -154,9 +167,7 @@ describe('MapMassif', () => {
         expect(global.fetch).toHaveBeenCalled();
       });
 
-      expect(global.fetch.mock.calls[0][0]).toContain(
-        'entrancesCoordinates'
-      );
+      expect(global.fetch.mock.calls[0][0]).toContain('entrancesCoordinates');
     });
   });
 
@@ -197,9 +208,7 @@ describe('MapMassif', () => {
       render(<MapMassif massifId={42} geogPolygon={samplePolygon} />);
 
       await waitFor(() => {
-        expect(mockUpdateEntranceMarkers).toHaveBeenCalledWith(
-          entrances
-        );
+        expect(mockUpdateEntranceMarkers).toHaveBeenCalledWith(entrances);
       });
     });
 

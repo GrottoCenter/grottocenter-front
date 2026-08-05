@@ -1,4 +1,4 @@
-import React, { useRef, useState, useMemo, useEffect } from 'react';
+import { useRef, useState, useMemo, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import {
@@ -16,9 +16,7 @@ import {
 import { Upload } from '@mui/icons-material';
 import simplify from 'simplify-js';
 import shp from 'shpjs';
-import {
-  countMultiPolygonVertices
-} from '../../../../helpers/vertexCount';
+import { countMultiPolygonVertices } from '../../../../helpers/vertexCount';
 import { parseGeoJsonToMultiPolygon } from '../../../../helpers/geojsonParser';
 import FileSelectorInput from '../../../common/FileSelectorInput';
 
@@ -82,7 +80,11 @@ const SLIDER_STEPS = 200;
  */
 const analyzeSimplificationCurve = (multiPolygon, rawVertexCount) => {
   if (rawVertexCount <= 3) {
-    return { maxTolerance: 0.001, step: 0.00001, minAchievableCount: rawVertexCount };
+    return {
+      maxTolerance: 0.001,
+      step: 0.00001,
+      minAchievableCount: rawVertexCount
+    };
   }
 
   // Compute bounding box diagonal as an upper bound for tolerance.
@@ -95,10 +97,11 @@ const analyzeSimplificationCurve = (multiPolygon, rawVertexCount) => {
   for (const polygon of multiPolygon.coordinates) {
     for (const ring of polygon) {
       for (const coord of ring) {
-        if (coord[0] < minX) minX = coord[0];
-        if (coord[0] > maxX) maxX = coord[0];
-        if (coord[1] < minY) minY = coord[1];
-        if (coord[1] > maxY) maxY = coord[1];
+        const [x, y] = coord;
+        if (x < minX) minX = x;
+        if (x > maxX) maxX = x;
+        if (y < minY) minY = y;
+        if (y > maxY) maxY = y;
       }
     }
   }
@@ -110,7 +113,11 @@ const analyzeSimplificationCurve = (multiPolygon, rawVertexCount) => {
   const lowerBound = diagonal / 100000;
 
   if (upperBound <= 0 || lowerBound <= 0) {
-    return { maxTolerance: 0.001, step: 0.00001, minAchievableCount: rawVertexCount };
+    return {
+      maxTolerance: 0.001,
+      step: 0.00001,
+      minAchievableCount: rawVertexCount
+    };
   }
 
   // Probe on a log scale
@@ -194,7 +201,7 @@ const ShapefileImport = ({ onImport }) => {
         minAchievableCount: 0
       });
       setAnalyzing(false);
-      return;
+      return undefined;
     }
     setAnalyzing(true);
     // Double rAF ensures React commits the analyzing=true render and the
@@ -442,7 +449,8 @@ const ShapefileImport = ({ onImport }) => {
                     max={maxTolerance}
                     step={step}
                   />
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <Box
+                    sx={{ display: 'flex', justifyContent: 'space-between' }}>
                     <Typography variant="caption" color="text.secondary">
                       {formatMessage({ id: 'Precise' })}
                     </Typography>

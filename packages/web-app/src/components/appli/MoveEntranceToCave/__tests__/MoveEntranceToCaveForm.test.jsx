@@ -1,4 +1,3 @@
-import React from 'react';
 import {
   render,
   screen,
@@ -59,8 +58,7 @@ vi.mock('../../../common/AutoCompleteSearch/CaveAutoCompleteSearch', () => ({
       <button
         type="button"
         data-testid="mock-cave-search"
-        onClick={() => onSelection({ id: '42', name: 'Destination Cave' })}
-      >
+        onClick={() => onSelection({ id: '42', name: 'Destination Cave' })}>
         Select Cave
       </button>
     );
@@ -92,8 +90,7 @@ vi.mock('../FormActions', () => ({
         type="button"
         data-testid="validate"
         disabled={disabled}
-        onClick={onConfirm}
-      >
+        onClick={onConfirm}>
         Validate
       </button>
     );

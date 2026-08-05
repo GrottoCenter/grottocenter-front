@@ -1,4 +1,3 @@
-import React from 'react';
 import PropTypes from 'prop-types';
 import { Box, Typography, List } from '@mui/material';
 import { FormattedMessage } from 'react-intl';
@@ -22,8 +21,7 @@ const GuidelinesGrouped = ({ guidelines }) => {
   return (
     <ScrollableContent
       title={<FormattedMessage id="Guidelines" />}
-      anchorId="guidelines"
-    >
+      anchorId="guidelines">
       <Box p={1}>
         {groups.map((group, index) => (
           <Box key={group.key} mt={index > 0 ? 2 : 0.25}>

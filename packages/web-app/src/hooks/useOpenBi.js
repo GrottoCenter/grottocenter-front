@@ -85,7 +85,6 @@ export const useOpenBi = () => {
       biTab?.close();
       // On a 401 the user is being logged out and redirected; no toast needed.
       if (error.isAuthError) return;
-      // eslint-disable-next-line no-console
       console.error('BI SSO failed:', error);
       onError(
         formatMessage({

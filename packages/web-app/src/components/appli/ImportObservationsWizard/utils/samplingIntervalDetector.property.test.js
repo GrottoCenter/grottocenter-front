@@ -33,10 +33,10 @@ describe('Property 8: sampling interval median — Validates: Requirements 20.1'
   const maxDate = new Date('2099-12-31T23:59:59.999Z');
 
   const timestampsArb = fc
-    .array(
-      fc.date({ min: minDate, max: maxDate, noInvalidDate: true }),
-      { minLength: 2, maxLength: 50 }
-    )
+    .array(fc.date({ min: minDate, max: maxDate, noInvalidDate: true }), {
+      minLength: 2,
+      maxLength: 50
+    })
     .map(dates => dates.map(d => d.toISOString()));
 
   it('detectSamplingInterval returns the proper median of consecutive time diffs in seconds', () => {
@@ -63,9 +63,10 @@ describe('Property 8: sampling interval median — Validates: Requirements 20.1'
 
         // 4. Proper median: average the two middle values for even-length
         const mid = Math.floor(diffs.length / 2);
-        const median = diffs.length % 2 === 0
-          ? (diffs[mid - 1] + diffs[mid]) / 2
-          : diffs[mid];
+        const median =
+          diffs.length % 2 === 0
+            ? (diffs[mid - 1] + diffs[mid]) / 2
+            : diffs[mid];
         const expectedMedian = Math.floor(median);
 
         // Assert

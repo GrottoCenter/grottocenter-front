@@ -1,18 +1,25 @@
-import React from 'react';
-import { storiesOf } from '@storybook/react';
 import { Typography } from '@mui/material';
 
 import NetworkInlineLink from './NetworkInlineLink';
 
-storiesOf('Common/NetworkInlineLink', module)
-  .add('default', () => (
+const meta = {
+  title: 'Common/NetworkInlineLink',
+  component: NetworkInlineLink
+};
+export default meta;
+
+export const Default = {
+  render: () => (
     <Typography>
       This entrance belongs to the network{' '}
       <NetworkInlineLink caveId={123} label="Trou Qui Souffle" /> of 5
       entrances.
     </Typography>
-  ))
-  .add('custom size and variant', () => (
+  )
+};
+
+export const CustomSizeAndVariant = {
+  render: () => (
     <Typography variant="body1">
       This entrance is part of{' '}
       <NetworkInlineLink
@@ -23,4 +30,5 @@ storiesOf('Common/NetworkInlineLink', module)
       />{' '}
       which also has 2 descriptions.
     </Typography>
-  ));
+  )
+};

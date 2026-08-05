@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import Massif from '../../components/appli/Massif/Massif';
@@ -30,7 +30,12 @@ const MassifPage = () => {
   return massif?.isDeleted && !permissions.isModerator ? (
     <Deleted entityType={DELETED_ENTITIES.massif} entity={massif} />
   ) : (
-    <Massif key={massifId} isLoading={isFetching} error={error} massif={massif} />
+    <Massif
+      key={massifId}
+      isLoading={isFetching}
+      error={error}
+      massif={massif}
+    />
   );
 };
 export default MassifPage;

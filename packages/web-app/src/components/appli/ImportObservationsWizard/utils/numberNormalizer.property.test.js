@@ -20,7 +20,7 @@ import { normalizeNumber } from './numberNormalizer';
 const dotDecimalString = fc
   .tuple(
     fc.integer({ min: -999999, max: 999999 }),
-    fc.integer({ min: 0, max: 99 }),
+    fc.integer({ min: 0, max: 99 })
   )
   .map(([intPart, fracPart]) => {
     const frac = String(fracPart).padStart(2, '0');
@@ -35,7 +35,7 @@ const dotDecimalString = fc
 const commaDecimalString = fc
   .tuple(
     fc.integer({ min: -999999, max: 999999 }),
-    fc.integer({ min: 0, max: 99 }),
+    fc.integer({ min: 0, max: 99 })
   )
   .map(([intPart, fracPart]) => {
     const frac = String(fracPart).padStart(2, '0');
@@ -58,7 +58,7 @@ describe('Property 3: dot-decimal round-trip — Validates: Requirements 15.1, 4
         const result = normalizeNumber(str, 'en');
         expect(result).toBe(expected);
       }),
-      { numRuns: 100 },
+      { numRuns: 100 }
     );
   });
 });
@@ -80,7 +80,7 @@ describe('Property 4: comma-decimal round-trip — Validates: Requirements 15.2,
         const result = normalizeNumber(str, 'fr');
         expect(result).toBe(expected);
       }),
-      { numRuns: 100 },
+      { numRuns: 100 }
     );
   });
 });
@@ -103,7 +103,7 @@ describe('Property 5: output finiteness — Validates: Requirements 15.3', () =>
           expect(Number.isFinite(result)).toBe(true);
         }
       }),
-      { numRuns: 100 },
+      { numRuns: 100 }
     );
   });
 });

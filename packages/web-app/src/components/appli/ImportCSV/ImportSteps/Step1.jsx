@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import { useContext } from 'react';
 import ImportKarstlinkInfo from '../ImportKarstlinkInfo';
 import { ImportPageContentContext } from '../Provider';
 

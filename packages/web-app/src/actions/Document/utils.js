@@ -4,7 +4,6 @@
 // as "leave this collection untouched". The literal string '[]' is the agreed
 // sentinel meaning "clear this collection" (see config/constants/document.js and
 // DocumentService.getConvertedDataFromClient in grottocenter-api).
-// eslint-disable-next-line import/prefer-default-export
 export const buildFormData = (formData, data, parentKey) => {
   if (parentKey && Array.isArray(data) && data.length === 0) {
     formData.append(parentKey, '[]');

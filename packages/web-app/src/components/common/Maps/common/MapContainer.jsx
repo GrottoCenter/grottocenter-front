@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, useCallback } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { styled } from '@mui/material/styles';
 import {
   MapContainer,
@@ -171,11 +171,19 @@ const CustomMapContainer = ({
     // Phase 2 (after transition): one invalidateSize({ animate: false }) once size
     //   settles → corrects the geographic center, fires moveend once.
     const observer = new ResizeObserver(() => {
-      try { map.invalidateSize({ animate: false, pan: false }); } catch (e) { /* ignore */ }
+      try {
+        map.invalidateSize({ animate: false, pan: false });
+      } catch {
+        /* ignore */
+      }
       clearTimeout(pendingStabilizeRef.current);
       pendingStabilizeRef.current = setTimeout(() => {
         pendingStabilizeRef.current = null;
-        try { map.invalidateSize({ animate: false }); } catch (e) { /* ignore */ }
+        try {
+          map.invalidateSize({ animate: false });
+        } catch {
+          /* ignore */
+        }
       }, 100);
     });
     observer.observe(container);
@@ -185,13 +193,14 @@ const CustomMapContainer = ({
   }, []);
 
   // Disconnect observer and remove listeners on unmount
-  useEffect(() => {
-    return () => {
+  useEffect(
+    () => () => {
       clearTimeout(pendingStabilizeRef.current);
       observerRef.current?.disconnect();
       mapInstanceRef.current?.off('baselayerchange', baseLayerChange);
-    };
-  }, []);
+    },
+    []
+  );
 
   return (
     <Wrapper $wholePage={wholePage}>
@@ -257,9 +266,9 @@ CustomMapContainer.propTypes = {
   shouldChangeControlInFullscreen: PropTypes.bool,
   style: PropTypes.shape({}),
   forceCentering: PropTypes.bool,
-  mapRef: PropTypes.shape({ current: PropTypes.any }),
+  mapRef: PropTypes.shape({ current: PropTypes.shape({}) }),
   // A Leaflet renderer instance (L.canvas() / L.svg()), not a plain object.
-  renderer: PropTypes.object
+  renderer: PropTypes.shape({})
 };
 
 export default CustomMapContainer;

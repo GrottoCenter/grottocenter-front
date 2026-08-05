@@ -1,10 +1,4 @@
-import React, {
-  useContext,
-  useEffect,
-  useMemo,
-  useRef,
-  useState
-} from 'react';
+import { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Autocomplete,
   Box,
@@ -145,8 +139,7 @@ const AuthorsSection = () => {
         variant="caption"
         color="text.secondary"
         display="block"
-        sx={{ mb: 0.5 }}
-      >
+        sx={{ mb: 0.5 }}>
         {formatMessage({
           id: 'AuthorsSection.helperText',
           defaultMessage:
@@ -180,10 +173,7 @@ const AuthorsSection = () => {
                   color="primary"
                   label={
                     <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                      <CustomIcon
-                        type={getPersonIconType(option)}
-                        size={18}
-                      />
+                      <CustomIcon type={getPersonIconType(option)} size={18} />
                       {getOptionLabel(option)}
                     </Box>
                   }
@@ -234,8 +224,7 @@ const AuthorsSection = () => {
                 id: 'AuthorsSection.createEntityType',
                 defaultMessage: 'Type to create'
               })}
-              sx={{ display: 'flex', width: '100%', mb: 1 }}
-            >
+              sx={{ display: 'flex', width: '100%', mb: 1 }}>
               <ToggleButton value="person" sx={{ flex: 1, gap: 0.5 }}>
                 <CustomIcon type="caver" size={20} />
                 {formatMessage({ id: 'Person' })}
@@ -266,8 +255,7 @@ const AuthorsSection = () => {
           onClick={handleToggleCreate}
           disabled={!sideActionEnabled}
           color="secondary"
-          aria-label={formatMessage({ id: 'new entity' })}
-        >
+          aria-label={formatMessage({ id: 'new entity' })}>
           {isCreateOpen ? (
             <Cancel fontSize="large" />
           ) : (

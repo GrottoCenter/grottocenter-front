@@ -1,4 +1,3 @@
-import React from 'react';
 import PropTypes from 'prop-types';
 import { styled } from '@mui/material/styles';
 import {
@@ -121,7 +120,12 @@ const altTexts = {
 
 const CustomIcon = ({ type, size = 35 }) => (
   <Icon size={size}>
-    <Img src={iconSources[type]} alt={altTexts[type] ?? type} height={size} width={size} />
+    <Img
+      src={iconSources[type]}
+      alt={altTexts[type] ?? type}
+      height={size}
+      width={size}
+    />
   </Icon>
 );
 

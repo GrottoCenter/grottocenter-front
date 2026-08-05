@@ -1,12 +1,10 @@
-import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
-import { Button } from '@mui/material';
+import { Button, Alert } from '@mui/material';
 import { useIntl } from 'react-intl';
 import { useDispatch } from 'react-redux';
 import { styled } from '@mui/material/styles';
 
-import { Alert } from '@mui/material';
 import { displayLoginDialog } from '../../../actions/Login';
 import { usePermissions } from '../../../hooks';
 
@@ -50,7 +48,7 @@ const AuthChecker = ({ errorMessageComponent, componentToDisplay }) => {
     <CenteredBlock>
       {errorMessageComponent || (
         <>
-          <Alert severity="error" sx={{ mb: 1 }}>
+          <Alert severity="error" sx={{ mb: 1 }} data-testid="auth-error-alert">
             {formatMessage({
               id: 'You must be authenticated in order to use this feature.'
             })}

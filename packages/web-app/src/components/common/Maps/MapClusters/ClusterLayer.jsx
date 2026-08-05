@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useCallback } from 'react';
+import { useEffect, useRef, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { useMap, useMapEvent } from 'react-leaflet';
 import L from 'leaflet';
@@ -14,8 +14,7 @@ const SIZE_BUCKETS = [
   { max: Infinity, size: 66 }
 ];
 
-const sizeForCount = count =>
-  SIZE_BUCKETS.find(b => count < b.max).size;
+const sizeForCount = count => SIZE_BUCKETS.find(b => count < b.max).size;
 
 // Per-type pixel offset applied to the bubble via CSS translate. Nudges the
 // layers apart at the same geo point so users see distinct bubbles instead of
@@ -173,7 +172,13 @@ const buildIcon = (count, type) => {
  * so callers should memoize it (useCallback) to avoid rebuilding every
  * cluster marker on each parent render.
  */
-const ClusterLayer = ({ data = [], type, enabled = true, pane = null, onLeafClick = null }) => {
+const ClusterLayer = ({
+  data = [],
+  type,
+  enabled = true,
+  pane = null,
+  onLeafClick = null
+}) => {
   const map = useMap();
   // Build the supercluster kd-tree as soon as data arrives, not on `enabled`.
   // The entrance layer (default on, ~130k points) toggles `enabled` on every
@@ -205,10 +210,15 @@ const ClusterLayer = ({ data = [], type, enabled = true, pane = null, onLeafClic
 
     const nextKeys = new Set();
     for (const feature of clusters) {
-      const { cluster: isCluster, cluster_id: clusterId, point_count: count } =
-        feature.properties;
+      const {
+        cluster: isCluster,
+        cluster_id: clusterId,
+        point_count: count
+      } = feature.properties;
       const displayCount = isCluster ? count : 1;
-      const key = isCluster ? `c:${clusterId}` : `l:${feature.properties.pointId}`;
+      const key = isCluster
+        ? `c:${clusterId}`
+        : `l:${feature.properties.pointId}`;
       nextKeys.add(key);
 
       const [lng, lat] = feature.geometry.coordinates;
@@ -299,7 +309,8 @@ const ClusterLayer = ({ data = [], type, enabled = true, pane = null, onLeafClic
 
 ClusterLayer.propTypes = {
   data: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.number)).isRequired,
-  type: PropTypes.oneOf(['entrance', 'network', 'massif', 'organization']).isRequired,
+  type: PropTypes.oneOf(['entrance', 'network', 'massif', 'organization'])
+    .isRequired,
   enabled: PropTypes.bool,
   pane: PropTypes.string,
   // Part of the `refresh` callback's dependency array — callers must memoize

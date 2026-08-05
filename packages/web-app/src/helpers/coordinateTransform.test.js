@@ -17,7 +17,7 @@ vi.mock('proj4', () => {
   proj4Mock.defs = (code, definition) => {
     if (definition !== undefined) {
       registeredDefs[code] = definition;
-      return;
+      return undefined;
     }
     return registeredDefs[code] || null;
   };

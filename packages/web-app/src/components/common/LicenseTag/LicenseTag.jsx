@@ -1,4 +1,3 @@
-import React from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import { Box, Chip, Typography } from '@mui/material';
@@ -23,7 +22,9 @@ const LicenseTag = ({ license, size = 34, recommended = false }) => {
     description =
       clauses.length > 0
         ? clauses
-            .map(clause => formatMessage({ id: CC_CLAUSE_DESCRIPTIONS[clause] }))
+            .map(clause =>
+              formatMessage({ id: CC_CLAUSE_DESCRIPTIONS[clause] })
+            )
             .join(' · ')
         : null;
   } else {
@@ -36,7 +37,12 @@ const LicenseTag = ({ license, size = 34, recommended = false }) => {
   return (
     <Box
       component="span"
-      sx={{ display: 'inline-flex', alignItems: 'center', gap: 2, minWidth: 0 }}>
+      sx={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: 2,
+        minWidth: 0
+      }}>
       {/* Fixed-width column for CC badges so every description lines up. All
           badges share ~the same aspect ratio, so width ≈ 3× the height. */}
       <Box

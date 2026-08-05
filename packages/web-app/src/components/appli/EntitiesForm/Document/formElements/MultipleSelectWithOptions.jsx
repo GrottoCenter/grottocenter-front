@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import { useContext, useState } from 'react';
 import PropTypes from 'prop-types';
 
 import Autocomplete from '@mui/material/Autocomplete';
@@ -60,7 +60,10 @@ const MultipleSelectWithOptions = ({
   return (
     <>
       {helperText && (
-        <Typography variant="caption" color={hasError ? 'error' : 'text.secondary'} display="block">
+        <Typography
+          variant="caption"
+          color={hasError ? 'error' : 'text.secondary'}
+          display="block">
           <Translate>{helperText}</Translate>
         </Typography>
       )}

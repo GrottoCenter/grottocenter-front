@@ -1,16 +1,17 @@
-import React from 'react';
 import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
 import { Box, Card, Stack, Typography } from '@mui/material';
 
 import ObstacleField from './ObstacleField';
 import ObstacleRowActions from './ObstacleRowActions';
-import ColumnLegend from '../../Entry/Riggings/ColumnLegend';
+import ColumnLegend, {
+  LegendItemsShape
+} from '../../Entry/Riggings/ColumnLegend';
 
 const LegendSectionsShape = PropTypes.arrayOf(
   PropTypes.shape({
     titleKey: PropTypes.string.isRequired,
-    items: PropTypes.array.isRequired
+    items: LegendItemsShape.isRequired
   })
 );
 
@@ -28,9 +29,11 @@ const ObstacleCard = ({
   const { formatMessage } = useIntl();
 
   return (
-    <Card variant="outlined" sx={{
-      px: 0.5
-    }}>
+    <Card
+      variant="outlined"
+      sx={{
+        px: 0.5
+      }}>
       <Box
         sx={{
           display: 'flex',

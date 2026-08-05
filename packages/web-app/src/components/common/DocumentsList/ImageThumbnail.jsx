@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import PropTypes from 'prop-types';
 import { Card, CardActionArea, Skeleton, Box } from '@mui/material';
 import { styled } from '@mui/material/styles';
@@ -39,7 +39,13 @@ const FallbackIconWrapper = styled(Box)`
 // Mirrors ThumbnailCard's breakpoint above: full width below `sm`, fixed 240px from `sm` up.
 const DEFAULT_SIZES = '(max-width: 599px) 100vw, 240px';
 
-const ImageThumbnail = ({ src, srcSet, sizes = DEFAULT_SIZES, alt, onClick }) => {
+const ImageThumbnail = ({
+  src,
+  srcSet,
+  sizes = DEFAULT_SIZES,
+  alt,
+  onClick
+}) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
 

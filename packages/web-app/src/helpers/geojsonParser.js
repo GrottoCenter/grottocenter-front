@@ -12,11 +12,7 @@ import { transformToWGS84 } from './coordinateTransform';
  * @returns {Array} Array of polygon coordinate arrays to push into a MultiPolygon
  */
 const extractPolygons = (geometry, sourceCRS) => {
-  if (
-    !geometry ||
-    !geometry.coordinates ||
-    geometry.coordinates.length === 0
-  ) {
+  if (!geometry || !geometry.coordinates || geometry.coordinates.length === 0) {
     return [];
   }
 
@@ -77,13 +73,8 @@ export const parseGeoJsonToMultiPolygon = geojson => {
     multiPolygon.coordinates.push(
       ...extractPolygons(geojson.geometry, sourceCRS)
     );
-  } else if (
-    geojson.type === 'Polygon' ||
-    geojson.type === 'MultiPolygon'
-  ) {
-    multiPolygon.coordinates.push(
-      ...extractPolygons(geojson, sourceCRS)
-    );
+  } else if (geojson.type === 'Polygon' || geojson.type === 'MultiPolygon') {
+    multiPolygon.coordinates.push(...extractPolygons(geojson, sourceCRS));
   }
 
   return multiPolygon.coordinates.length > 0 ? multiPolygon : null;

@@ -1,5 +1,4 @@
 import PropTypes from 'prop-types';
-import React from 'react';
 import {
   ButtonGroup,
   Button,
@@ -55,7 +54,10 @@ const ActionButtons = ({
   const showReorder = onMoveUp && onMoveDown;
 
   return (
-    <ButtonGroup color="primary" size="small" orientation={isSmall ? 'vertical' : 'horizontal'}>
+    <ButtonGroup
+      color="primary"
+      size="small"
+      orientation={isSmall ? 'vertical' : 'horizontal'}>
       {!isUpdating && canDelete && isDeleted && (
         <Tooltip title={formatMessage({ id: 'Restore' })}>
           <Button

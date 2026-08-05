@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { IntlProvider } from 'react-intl';
 
@@ -34,15 +33,20 @@ vi.mock('@mui/material/styles', async () => ({
 // We mock TimestampFormatInput to isolate integration tests for MapColumnsStep.
 // The mock renders a testable element exposing received props and a trigger for onChange.
 vi.mock('./TimestampFormatInput', () => {
-  const MockTimestampFormatInput = props => (
+  const MockTimestampFormatInput = ({
+    timestampType,
+    currentFormat,
+    sampleValues,
+    onChange
+  }) => (
     <div
       data-testid="mock-format-pill-builder"
-      data-timestamp-type={props.timestampType}
-      data-current-format={props.currentFormat}
-      data-sample-values={JSON.stringify(props.sampleValues)}>
+      data-timestamp-type={timestampType}
+      data-current-format={currentFormat}
+      data-sample-values={JSON.stringify(sampleValues)}>
       <button
         data-testid="mock-pill-builder-change"
-        onClick={() => props.onChange('YYYY-MM-DD')}
+        onClick={() => onChange('YYYY-MM-DD')}
         type="button">
         Trigger onChange
       </button>
@@ -55,7 +59,8 @@ vi.mock('./TimestampFormatInput', () => {
 // ---- i18n messages used by MapColumnsStep ----
 const messages = {
   'ImportObservationsWizard.MapColumnsStep.title': 'Map Columns',
-  'ImportObservationsWizard.MapColumnsStep.description': 'Assign a role to each column. Timestamp columns define when measurements were taken. Measurement columns contain numeric sensor readings.',
+  'ImportObservationsWizard.MapColumnsStep.description':
+    'Assign a role to each column. Timestamp columns define when measurements were taken. Measurement columns contain numeric sensor readings.',
   'ImportObservationsWizard.MapColumnsStep.columnHeader': 'Column',
   'ImportObservationsWizard.MapColumnsStep.sampleValuesHeader': 'Sample values',
   'ImportObservationsWizard.MapColumnsStep.roleHeader': 'Role',
@@ -66,9 +71,11 @@ const messages = {
   'ImportObservationsWizard.MapColumnsStep.role.excluded': 'Excluded',
   'ImportObservationsWizard.MapColumnsStep.timestampType': 'Timestamp type',
   'ImportObservationsWizard.MapColumnsStep.timestampType.dateOnly': 'Date only',
-  'ImportObservationsWizard.MapColumnsStep.timestampType.datetime': 'Date & time',
+  'ImportObservationsWizard.MapColumnsStep.timestampType.datetime':
+    'Date & time',
   'ImportObservationsWizard.MapColumnsStep.timestampType.day': 'Day',
-  'ImportObservationsWizard.MapColumnsStep.timestampType.elapsed_seconds': 'Elapsed seconds',
+  'ImportObservationsWizard.MapColumnsStep.timestampType.elapsed_seconds':
+    'Elapsed seconds',
   'ImportObservationsWizard.MapColumnsStep.timestampType.hour': 'Hour',
   'ImportObservationsWizard.MapColumnsStep.timestampType.minute': 'Minute',
   'ImportObservationsWizard.MapColumnsStep.timestampType.month': 'Month',
@@ -78,11 +85,15 @@ const messages = {
   'ImportObservationsWizard.MapColumnsStep.dateFormat': 'Date format',
   'ImportObservationsWizard.MapColumnsStep.timeFormat': 'Time format',
   'ImportObservationsWizard.MapColumnsStep.timezone': 'Timezone',
-  'ImportObservationsWizard.MapColumnsStep.sensorConfig': 'Sensor configuration',
+  'ImportObservationsWizard.MapColumnsStep.sensorConfig':
+    'Sensor configuration',
   'ImportObservationsWizard.MapColumnsStep.selectSensor': 'Select sensor…',
-  'ImportObservationsWizard.MapColumnsStep.decimalPartFirstColumnError': 'Decimal part cannot be assigned to the first column.',
-  'ImportObservationsWizard.MapColumnsStep.decimalPartPrecedingError': 'Decimal part must immediately follow a measurement column.',
-  'ImportObservationsWizard.MapColumnsStep.noColumns': 'No columns available. Please upload a file first.',
+  'ImportObservationsWizard.MapColumnsStep.decimalPartFirstColumnError':
+    'Decimal part cannot be assigned to the first column.',
+  'ImportObservationsWizard.MapColumnsStep.decimalPartPrecedingError':
+    'Decimal part must immediately follow a measurement column.',
+  'ImportObservationsWizard.MapColumnsStep.noColumns':
+    'No columns available. Please upload a file first.',
   'ImportObservationsWizard.MapColumnsStep.medium': 'Medium',
   'ImportObservationsWizard.MapColumnsStep.selectMedium': 'Select medium…',
   'ImportObservationsWizard.MapColumnsStep.medium.water': 'Water',
@@ -168,9 +179,7 @@ describe('MapColumnsStep', () => {
         ]
       });
 
-      expect(
-        screen.getByTestId('decimal-part-error-0')
-      ).toBeInTheDocument();
+      expect(screen.getByTestId('decimal-part-error-0')).toBeInTheDocument();
     });
 
     it('does not show decimal-part-error when decimal_part is preceded by a measurement column', () => {
@@ -198,9 +207,7 @@ describe('MapColumnsStep', () => {
         ]
       });
 
-      expect(
-        screen.getByTestId('decimal-part-error-1')
-      ).toBeInTheDocument();
+      expect(screen.getByTestId('decimal-part-error-1')).toBeInTheDocument();
     });
 
     it('shows decimal-part-error when decimal_part column is preceded by a timestamp column', () => {
@@ -220,9 +227,7 @@ describe('MapColumnsStep', () => {
         ]
       });
 
-      expect(
-        screen.getByTestId('decimal-part-error-1')
-      ).toBeInTheDocument();
+      expect(screen.getByTestId('decimal-part-error-1')).toBeInTheDocument();
     });
   });
 
@@ -302,9 +307,10 @@ describe('MapColumnsStep', () => {
       expect(
         screen.getByTestId('mock-format-pill-builder')
       ).toBeInTheDocument();
-      expect(
-        screen.getByTestId('mock-format-pill-builder')
-      ).toHaveAttribute('data-timestamp-type', 'datetime');
+      expect(screen.getByTestId('mock-format-pill-builder')).toHaveAttribute(
+        'data-timestamp-type',
+        'datetime'
+      );
     });
 
     it('renders TimestampFormatInput when timestamp type is dateOnly', () => {
@@ -326,9 +332,10 @@ describe('MapColumnsStep', () => {
       expect(
         screen.getByTestId('mock-format-pill-builder')
       ).toBeInTheDocument();
-      expect(
-        screen.getByTestId('mock-format-pill-builder')
-      ).toHaveAttribute('data-timestamp-type', 'dateOnly');
+      expect(screen.getByTestId('mock-format-pill-builder')).toHaveAttribute(
+        'data-timestamp-type',
+        'dateOnly'
+      );
     });
 
     it('renders TimestampFormatInput when timestamp type is timeOnly', () => {
@@ -350,9 +357,10 @@ describe('MapColumnsStep', () => {
       expect(
         screen.getByTestId('mock-format-pill-builder')
       ).toBeInTheDocument();
-      expect(
-        screen.getByTestId('mock-format-pill-builder')
-      ).toHaveAttribute('data-timestamp-type', 'timeOnly');
+      expect(screen.getByTestId('mock-format-pill-builder')).toHaveAttribute(
+        'data-timestamp-type',
+        'timeOnly'
+      );
     });
 
     it('does NOT render TimestampFormatInput for elapsed_seconds type', () => {
@@ -470,10 +478,7 @@ describe('MapColumnsStep', () => {
       });
 
       const pillBuilder = screen.getByTestId('mock-format-pill-builder');
-      expect(pillBuilder).toHaveAttribute(
-        'data-current-format',
-        'HH:mm:ss'
-      );
+      expect(pillBuilder).toHaveAttribute('data-current-format', 'HH:mm:ss');
     });
 
     it('dispatches UPDATE_COLUMN_MAPPING with dateFormat when onChange is called for datetime type', () => {
@@ -708,9 +713,7 @@ describe('MapColumnsStep', () => {
           'elapsed_seconds'
         );
       } else if (batchCall) {
-        const col1 = batchCall[0].columnMappings.find(
-          m => m.columnIndex === 1
-        );
+        const col1 = batchCall[0].columnMappings.find(m => m.columnIndex === 1);
         expect(col1.timestampType).toBe('elapsed_seconds');
       } else {
         // A dispatch should have been made

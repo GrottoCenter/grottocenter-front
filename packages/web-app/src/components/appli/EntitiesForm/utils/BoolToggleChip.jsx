@@ -1,4 +1,3 @@
-import React from 'react';
 import PropTypes from 'prop-types';
 import { ToggleButton } from '@mui/material';
 import { alpha } from '@mui/material/styles';
@@ -47,8 +46,7 @@ const BoolToggleChip = ({ name, label, icon, control, disabled = false }) => (
             borderColor: 'divider',
             backgroundColor: 'action.disabledBackground'
           }
-        }}
-      >
+        }}>
         {value && <CheckIcon fontSize="small" />}
         <CustomIcon type={icon} size={20} />
         <Translate>{label}</Translate>

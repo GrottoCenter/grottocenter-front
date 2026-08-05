@@ -24,9 +24,7 @@ describe('Property 1: Ban/Unban URL construction', () => {
       fc.property(caverIdArb, caverId => {
         const url = banCaverUrl(caverId);
         expect(url).toContain('/api/v1/cavers/');
-        expect(url).toMatch(
-          new RegExp(`/cavers/${String(caverId)}/ban$`)
-        );
+        expect(url).toMatch(new RegExp(`/cavers/${String(caverId)}/ban$`));
       }),
       { numRuns: 100 }
     );
@@ -37,9 +35,7 @@ describe('Property 1: Ban/Unban URL construction', () => {
       fc.property(caverIdArb, caverId => {
         const url = unbanCaverUrl(caverId);
         expect(url).toContain('/api/v1/cavers/');
-        expect(url).toMatch(
-          new RegExp(`/cavers/${String(caverId)}/unban$`)
-        );
+        expect(url).toMatch(new RegExp(`/cavers/${String(caverId)}/unban$`));
       }),
       { numRuns: 100 }
     );

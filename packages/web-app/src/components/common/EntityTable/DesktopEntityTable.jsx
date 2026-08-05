@@ -1,10 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import { styled, useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
-import useOpenLink from '../../../hooks/useOpenLink';
-import { useMeasuredHeight } from '../../../hooks';
 
 import {
   Box,
@@ -31,6 +29,8 @@ import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import SearchOffIcon from '@mui/icons-material/SearchOff';
 import ViewColumnIcon from '@mui/icons-material/ViewColumn';
 import ViewListIcon from '@mui/icons-material/ViewList';
+import { useMeasuredHeight } from '../../../hooks';
+import useOpenLink from '../../../hooks/useOpenLink';
 
 import entitiesConfig from './entitiesConfig';
 import ExportFormatDropdown from './ExportFormatDropdown';
@@ -243,6 +243,19 @@ const DesktopEntityTable = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const handleRowSelect = (event, doc) => {
+    event.stopPropagation();
+    const newSelected = [...selected];
+    const selectedIndex = selected.indexOf(doc.id);
+    if (selectedIndex === -1) {
+      newSelected.push(doc.id);
+    } else {
+      newSelected.splice(selectedIndex, 1);
+    }
+    setSelected(newSelected);
+    onSelected(newSelected);
+  };
+
   const handleRowClick = (event, doc) => {
     if (onSelected && !onRowClick) {
       handleRowSelect(event, doc);
@@ -257,23 +270,9 @@ const DesktopEntityTable = ({
     openLink(url);
   };
 
-  const handleRowSelect = (event, doc) => {
-    event.stopPropagation();
-    const newSelected = [...selected];
-    const selectedIndex = selected.indexOf(doc.id);
-    if (selectedIndex === -1) {
-      newSelected.push(doc.id);
-    } else {
-      newSelected.splice(selectedIndex, 1);
-    }
-    setSelected(newSelected);
-    onSelected(newSelected);
-  };
-
   const handleRequestSort = (event, property) => {
     const fieldMap = SORT_FIELD_MAP[entityType];
     if (!fieldMap || !(property in fieldMap)) {
-      // eslint-disable-next-line no-console
       console.warn(
         `Sort blocked: field "${property}" is not allowed for entity type "${entityType}"`
       );
@@ -361,7 +360,7 @@ const DesktopEntityTable = ({
           sx={{
             position: 'sticky',
             top: 0,
-            zIndex: theme => theme.zIndex.appBar - 1,
+            zIndex: theme.zIndex.appBar - 1,
             bgcolor: 'background.paper'
           }}>
           <Toolbar
@@ -394,19 +393,14 @@ const DesktopEntityTable = ({
                 gap: 0.5,
                 alignItems: 'center'
               }}>
-              {onExport &&
-                entityType === 'entrances' && (
-                  <ExportFormatDropdown
-                    disabled={nbTotalRows > MAX_DOCUMENTS_TO_EXPORT_IN_CSV}
-                    onExport={format => {
-                      onExport(
-                        exportColumns,
-                        exportColumnLabels,
-                        format
-                      );
-                    }}
-                  />
-                )}
+              {onExport && entityType === 'entrances' && (
+                <ExportFormatDropdown
+                  disabled={nbTotalRows > MAX_DOCUMENTS_TO_EXPORT_IN_CSV}
+                  onExport={format => {
+                    onExport(exportColumns, exportColumnLabels, format);
+                  }}
+                />
+              )}
               {onExport &&
                 entityType !== 'entrances' &&
                 (nbTotalRows <= MAX_DOCUMENTS_TO_EXPORT_IN_CSV ? (
@@ -414,10 +408,7 @@ const DesktopEntityTable = ({
                     variant="outlined"
                     size="small"
                     onClick={() => {
-                      onExport(
-                        exportColumns,
-                        exportColumnLabels
-                      );
+                      onExport(exportColumns, exportColumnLabels);
                     }}
                     startIcon={<FileDownloadIcon />}
                     sx={{ minWidth: 0 }}>
@@ -508,10 +499,7 @@ const DesktopEntityTable = ({
               // wide tables is handled there instead.
               { overflow: 'visible' }
         }>
-        <Table
-          stickyHeader
-          sx={{ minWidth: compact ? 300 : 750 }}
-          size="small">
+        <Table stickyHeader sx={{ minWidth: compact ? 300 : 750 }} size="small">
           {isLoading ? (
             <LoadingTableHead stickyTop={toolbarHeight} />
           ) : (

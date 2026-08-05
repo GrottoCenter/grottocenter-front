@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useWatch, useController } from 'react-hook-form';
 import {
   Circle,
@@ -104,7 +104,10 @@ const ZoomReporter = ({ onZoomChange }) => {
   const onZoomChangeRef = useRef(onZoomChange);
   onZoomChangeRef.current = onZoomChange;
 
-  const report = useCallback(() => onZoomChangeRef.current(map.getZoom()), [map]);
+  const report = useCallback(
+    () => onZoomChangeRef.current(map.getZoom()),
+    [map]
+  );
   useMapEvent('moveend', report);
   useMapEvent('zoomend', report);
   useEffect(() => {
@@ -154,7 +157,8 @@ const LOCATE_ZOOM = 18;
 // How long after the map writes to the form before we allow form→map updates.
 // Prevents the map pan → form update → map recenter loop.
 const MAP_WRITE_GUARD_MS = 400;
-const hasGeolocation = typeof navigator !== 'undefined' && Boolean(navigator.geolocation);
+const hasGeolocation =
+  typeof navigator !== 'undefined' && Boolean(navigator.geolocation);
 const ACCURACY_CIRCLE_STYLE = {
   color: '#1976d2',
   fillColor: '#1976d2',
@@ -162,7 +166,16 @@ const ACCURACY_CIRCLE_STYLE = {
   weight: 1
 };
 
-const MapMarkerSelector = ({ control, formLatitudeKey, formLongitudeKey, additionalPositions = [], additionalMarkersLabel, onZoomChange, markerIcon, mapHeight = '40svh' }) => {
+const MapMarkerSelector = ({
+  control,
+  formLatitudeKey,
+  formLongitudeKey,
+  additionalPositions = [],
+  additionalMarkersLabel,
+  onZoomChange,
+  markerIcon,
+  mapHeight = '40svh'
+}) => {
   const [locating, setLocating] = useState(false);
   const [locateError, setLocateError] = useState(null);
   const [initialized, setInitialized] = useState(false);
@@ -250,7 +263,7 @@ const MapMarkerSelector = ({ control, formLatitudeKey, formLongitudeKey, additio
         dragging={!isMobile} // For usability only use two fingers drag/zoom on mobile
         scrollWheelZoom="center" // To avoid losing the coordinate when only zooming
         doubleClickZoom="center"
-        touchZoom={true}
+        touchZoom
         rotateControl={false}
         preferCanvas>
         <GeocodingControl
@@ -265,7 +278,11 @@ const MapMarkerSelector = ({ control, formLatitudeKey, formLongitudeKey, additio
         <ScaleControl position="bottomright" />
         <LayersControl position="topright" />
 
-        <MapBind center={currentPosition} zoom={zoomLevel} onMoveEnd={onMoveEnd} />
+        <MapBind
+          center={currentPosition}
+          zoom={zoomLevel}
+          onMoveEnd={onMoveEnd}
+        />
 
         {onZoomChange && <ZoomReporter onZoomChange={onZoomChange} />}
 

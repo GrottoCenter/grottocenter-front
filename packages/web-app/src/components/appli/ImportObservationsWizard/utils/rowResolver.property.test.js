@@ -21,10 +21,7 @@ describe('rowResolver property tests — Property 6: decimal-part merging', () =
   it('should merge measurement and decimal_part columns into rawM + "." + rawD', () => {
     fc.assert(
       fc.property(
-        fc.tuple(
-          fc.string({ minLength: 1 }),
-          fc.string({ minLength: 1 })
-        ),
+        fc.tuple(fc.string({ minLength: 1 }), fc.string({ minLength: 1 })),
         ([rawM, rawD]) => {
           const row = [rawM, rawD];
           const mappings = [
@@ -35,7 +32,7 @@ describe('rowResolver property tests — Property 6: decimal-part merging', () =
           const result = resolveRows([row], mappings);
 
           // The merged value MUST be rawM + '.' + rawD (string concatenation)
-          expect(result[0][0]).toBe(rawM + '.' + rawD);
+          expect(result[0][0]).toBe(`${rawM}.${rawD}`);
           // The decimal_part column MUST be set to null after merging
           expect(result[0][1]).toBeNull();
         }
@@ -71,10 +68,10 @@ describe('rowResolver property tests — Property 7: row filtering count', () =>
     fc.assert(
       fc.property(
         fc.tuple(
-          fc.array(
-            fc.array(fc.string(), { minLength: 1, maxLength: 5 }),
-            { minLength: 2, maxLength: 50 }
-          ),
+          fc.array(fc.array(fc.string(), { minLength: 1, maxLength: 5 }), {
+            minLength: 2,
+            maxLength: 50
+          }),
           fc.nat()
         ),
         ([rows, rawHeaderRow]) => {

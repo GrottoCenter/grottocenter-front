@@ -1,10 +1,18 @@
 # ESLint config
 
-These are settings for [ESLint](https://eslint.org/).
+These are settings for [ESLint](https://eslint.org/), in the
+[flat config](https://eslint.org/docs/latest/use/configure/configuration-files)
+format (ESLint 9+). Legacy `.eslintrc` files are not supported.
 
 ## What it does
 
-This setup lints your JavaScript code based on practices. Check the [.eslintrc.js](.eslintrc.js) file to see what is included.
+Lints JavaScript and JSX on top of the Airbnb style guide, with Prettier,
+React, React Hooks, import, jsx-a11y, Cypress and Storybook rules. Check
+[index.mjs](index.mjs) to see what is included and why each rule deviates.
+
+`eslint-config-airbnb` has no flat build and is no longer released, so it is
+converted at load time through `FlatCompat`. Everything else is wired through
+its own flat export.
 
 ## Installing
 
@@ -12,26 +20,35 @@ In your project folder, run:
 
 ```
 yarn install --dev @grotto-front/eslint-config
-install required peerDep
 ```
 
-It includes `react` specific rules included as dependency in [CRA](https://www.npmjs.com/package/eslint-config-react-app#usage-in-create-react-app-projects)
+Then install the peer dependencies listed in `package.json` — ESLint itself,
+`@eslint/js`, `@eslint/eslintrc`, and the shared plugins.
 
 ## Usage
 
-Create / update `.eslintrc` `.eslintrc.js` file with the following content:
-
-```json
-{
-  "extends": ["@grotto-front/eslint-config"]
-}
-```
+Create / update `eslint.config.mjs` with the following content:
 
 ```js
-module.exports = {
-  extends: ['@grotto-front/eslint-config']
-};
+import grottoConfig from '@grotto-front/eslint-config';
+
+export default [...grottoConfig];
 ```
+
+The package also exports the `files` glob it targets, so a consuming config can
+reuse it for its own blocks:
+
+```js
+import grottoConfig, { files } from '@grotto-front/eslint-config';
+
+export default [
+  ...grottoConfig,
+  { files, rules: { 'no-console': 'off' } }
+];
+```
+
+Flat config has no cascade: per-directory rules that used to live in nested
+`.eslintrc.js` files are expressed as `files`-scoped blocks in the root config.
 
 ---
 

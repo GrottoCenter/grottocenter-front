@@ -99,12 +99,12 @@ const AssociationForm = ({ open, onClose, onSubmit, status, error }) => {
               InputProps={{
                 ...params.InputProps,
                 endAdornment: (
-                  <React.Fragment>
+                  <>
                     {isLoading ? (
                       <CircularProgress color="inherit" size={20} />
                     ) : null}
                     {params.InputProps.endAdornment}
-                  </React.Fragment>
+                  </>
                 )
               }}
             />
@@ -128,8 +128,7 @@ const AssociationForm = ({ open, onClose, onSubmit, status, error }) => {
         <Button
           variant="outlined"
           onClick={handleClose}
-          disabled={status === REDUCER_STATUS.LOADING}
-        >
+          disabled={status === REDUCER_STATUS.LOADING}>
           {formatMessage({ id: 'Cancel' })}
         </Button>
         <Button
@@ -141,8 +140,7 @@ const AssociationForm = ({ open, onClose, onSubmit, status, error }) => {
             status === REDUCER_STATUS.LOADING ? (
               <CircularProgress size={20} />
             ) : null
-          }
-        >
+          }>
           {formatMessage({ id: 'Associate' })}
         </Button>
       </DialogActions>

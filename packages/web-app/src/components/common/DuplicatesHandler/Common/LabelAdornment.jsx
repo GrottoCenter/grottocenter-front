@@ -1,4 +1,3 @@
-import React from 'react';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import {
   useTheme,

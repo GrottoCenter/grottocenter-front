@@ -1,4 +1,3 @@
-import React from 'react';
 import BoolIcon from '../BoolIcon';
 import entitiesConfig from './entitiesConfig';
 
@@ -21,7 +20,6 @@ export const SORT_FIELD_MAP = Object.fromEntries(
 export const getObjectPath = (obj, path) => {
   const pathParts = path.split('.');
   let out = obj;
-  // eslint-disable-next-line no-plusplus
   for (let i = 0; i < pathParts.length; i++) {
     if (!out || typeof out !== 'object' || !(pathParts[i] in out)) return null;
     out = out[pathParts[i]];
@@ -47,7 +45,7 @@ export const applyColumnVisibility = (columns, storedVisibility) => {
       ...col,
       visible: visibleFields.includes(col.field)
     }));
-  } catch (e) {
+  } catch {
     return columns;
   }
 };

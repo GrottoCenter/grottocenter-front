@@ -1,4 +1,3 @@
-import * as React from 'react';
 import { useIntl } from 'react-intl';
 import { Box } from '@mui/material';
 import PropTypes from 'prop-types';
@@ -11,7 +10,8 @@ const EntranceCaveSnapshots = ({ entrance, previous }) => {
   const { cave } = entrance;
 
   const { formatMessage } = useIntl();
-  const hasCoordinates = entrance.latitude != null && entrance.longitude != null;
+  const hasCoordinates =
+    entrance.latitude != null && entrance.longitude != null;
   const hasPreviousCoordinates =
     previous?.latitude != null && previous?.longitude != null;
   const lat = Number(entrance.latitude);
@@ -107,12 +107,28 @@ const EntranceCaveSnapshots = ({ entrance, previous }) => {
           secondary
         />
       )}
-      <EntranceCharacteristicsSnapshot entrance={entrance} previous={previous} />
+      <EntranceCharacteristicsSnapshot
+        entrance={entrance}
+        previous={previous}
+      />
     </Box>
   );
 };
+// Only the fields this component diffs; a snapshot carries many more.
+const snapshotPropType = PropTypes.shape({
+  latitude: PropTypes.number,
+  longitude: PropTypes.number,
+  altitude: PropTypes.number,
+  cave: PropTypes.shape({
+    depth: PropTypes.number,
+    length: PropTypes.number,
+    temperature: PropTypes.number,
+    isDiving: PropTypes.bool
+  })
+});
+
 EntranceCaveSnapshots.propTypes = {
-  entrance: PropTypes.shape({}),
-  previous: PropTypes.shape({})
+  entrance: snapshotPropType,
+  previous: snapshotPropType
 };
 export default EntranceCaveSnapshots;

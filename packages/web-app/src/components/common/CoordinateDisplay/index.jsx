@@ -1,10 +1,6 @@
-import React, { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
-import {
-  formatCoordinatesForCopy,
-  formatWGS84
-} from '../../../helpers/coordinateConvert';
 import {
   Box,
   Chip,
@@ -25,6 +21,10 @@ import {
   TravelExplore,
   Tune
 } from '@mui/icons-material';
+import {
+  formatCoordinatesForCopy,
+  formatWGS84
+} from '../../../helpers/coordinateConvert';
 import copyToClipboard from '../../../helpers/clipboard';
 import CRSMenu from '../CRSMenu';
 import AppLink from '../AppLink';
@@ -108,14 +108,15 @@ const CoordinateDisplay = ({
   const grottoMapUrl = `/ui/map/${latitude},${longitude},${GROTTOCENTER_LINK_ZOOM}${grottoMapPopup}`;
 
   const precisionSeverity = computePrecisionSeverity(precision);
-  const precisionText =
-    precision === 0
-      ? formatMessage({
-          id: 'Coordinates precision unavailable for restricted access entrance.'
-        })
-      : precision != null
-        ? `±${precision}m`
-        : null;
+  // A precision of exactly 0 marks a restricted entrance, not a perfect fix.
+  let precisionText = null;
+  if (precision === 0) {
+    precisionText = formatMessage({
+      id: 'Coordinates precision unavailable for restricted access entrance.'
+    });
+  } else if (precision != null) {
+    precisionText = `±${precision}m`;
+  }
 
   if (compact) {
     return (

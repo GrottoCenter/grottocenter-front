@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { IntlProvider } from 'react-intl';
 
@@ -11,8 +10,7 @@ let mockStoreState = {};
 vi.mock('react-redux', async () => ({
   ...(await vi.importActual('react-redux')),
   useDispatch: () => mockDispatch,
-  useSelector: selector =>
-    selector(mockStoreState)
+  useSelector: selector => selector(mockStoreState)
 }));
 
 // ---- Action mocks ----

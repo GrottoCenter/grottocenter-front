@@ -16,7 +16,7 @@ import { MOVE_DESCRIPTION_RELEVANCE_SUCCESS } from '../actions/Description/MoveR
  */
 
 // Generator: entity with unique id and a relevance value
-const entityArb = (id) =>
+const entityArb = id =>
   fc.record({
     id: fc.constant(id),
     relevance: fc.integer({ min: 0, max: 1000 }),
@@ -26,19 +26,17 @@ const entityArb = (id) =>
 // Generator: array of entities with unique ids (min 2 so we can pick a pair)
 const entityListArb = fc
   .integer({ min: 2, max: 20 })
-  .chain((size) => {
+  .chain(size => {
     const ids = Array.from({ length: size }, (_, i) => i + 1);
     return fc.tuple(
-      fc.tuple(...ids.map((id) => entityArb(id))),
+      fc.tuple(...ids.map(id => entityArb(id))),
       fc.integer({ min: 0, max: size - 1 }),
       fc.integer({ min: 0, max: size - 1 }),
       fc.integer({ min: 0, max: 1000 }),
       fc.integer({ min: 0, max: 1000 })
     );
   })
-  .filter(
-    ([entities, movedIdx, swappedIdx]) => movedIdx !== swappedIdx
-  )
+  .filter(([_entities, movedIdx, swappedIdx]) => movedIdx !== swappedIdx)
   .map(([entities, movedIdx, swappedIdx, newMovedRel, newSwappedRel]) => {
     const list = [...entities];
     const moved = { ...list[movedIdx], relevance: newMovedRel };
@@ -77,28 +75,26 @@ describe('Property 3: Reducer swap correctness', () => {
           expect(resultLocations).toHaveLength(list.length);
 
           // Moved entity has new relevance
-          const resultMoved = resultLocations.find(
-            (e) => e.id === moved.id
-          );
+          const resultMoved = resultLocations.find(e => e.id === moved.id);
           expect(resultMoved.relevance).toBe(moved.relevance);
           // Non-relevance fields preserved
-          expect(resultMoved.title).toBe(list.find(e => e.id === moved.id).title);
+          expect(resultMoved.title).toBe(
+            list.find(e => e.id === moved.id).title
+          );
 
           // Swapped entity has new relevance
-          const resultSwapped = resultLocations.find(
-            (e) => e.id === swapped.id
-          );
+          const resultSwapped = resultLocations.find(e => e.id === swapped.id);
           expect(resultSwapped.relevance).toBe(swapped.relevance);
           // Non-relevance fields preserved
-          expect(resultSwapped.title).toBe(list.find(e => e.id === swapped.id).title);
+          expect(resultSwapped.title).toBe(
+            list.find(e => e.id === swapped.id).title
+          );
 
           // All other entities unchanged
           for (const original of list) {
             if (original.id === moved.id || original.id === swapped.id)
               continue;
-            const found = resultLocations.find(
-              (e) => e.id === original.id
-            );
+            const found = resultLocations.find(e => e.id === original.id);
             expect(found).toEqual(original);
           }
         }),
@@ -128,20 +124,16 @@ describe('Property 3: Reducer swap correctness', () => {
 
           expect(resultDescs).toHaveLength(list.length);
 
-          const resultMoved = resultDescs.find(
-            (e) => e.id === moved.id
-          );
+          const resultMoved = resultDescs.find(e => e.id === moved.id);
           expect(resultMoved.relevance).toBe(moved.relevance);
 
-          const resultSwapped = resultDescs.find(
-            (e) => e.id === swapped.id
-          );
+          const resultSwapped = resultDescs.find(e => e.id === swapped.id);
           expect(resultSwapped.relevance).toBe(swapped.relevance);
 
           for (const original of list) {
             if (original.id === moved.id || original.id === swapped.id)
               continue;
-            const found = resultDescs.find((e) => e.id === original.id);
+            const found = resultDescs.find(e => e.id === original.id);
             expect(found).toEqual(original);
           }
         }),
@@ -171,20 +163,16 @@ describe('Property 3: Reducer swap correctness', () => {
 
           expect(resultDescs).toHaveLength(list.length);
 
-          const resultMoved = resultDescs.find(
-            (e) => e.id === moved.id
-          );
+          const resultMoved = resultDescs.find(e => e.id === moved.id);
           expect(resultMoved.relevance).toBe(moved.relevance);
 
-          const resultSwapped = resultDescs.find(
-            (e) => e.id === swapped.id
-          );
+          const resultSwapped = resultDescs.find(e => e.id === swapped.id);
           expect(resultSwapped.relevance).toBe(swapped.relevance);
 
           for (const original of list) {
             if (original.id === moved.id || original.id === swapped.id)
               continue;
-            const found = resultDescs.find((e) => e.id === original.id);
+            const found = resultDescs.find(e => e.id === original.id);
             expect(found).toEqual(original);
           }
         }),

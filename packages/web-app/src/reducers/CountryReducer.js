@@ -81,7 +81,9 @@ const reducer = (state = initialState, action) => {
         country: {
           ...state.country,
           guidelines: exists
-            ? guidelines.map(g => (g.id === action.guideline.id ? action.guideline : g))
+            ? guidelines.map(g =>
+                g.id === action.guideline.id ? action.guideline : g
+              )
             : [...guidelines, action.guideline]
         }
       };

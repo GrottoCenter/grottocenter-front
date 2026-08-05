@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, screen, fireEvent, act } from '@testing-library/react';
 import { IntlProvider } from 'react-intl';
 
@@ -29,13 +28,14 @@ vi.mock('../../../../hooks', () => ({
 // ---- Actions mock ----
 vi.mock('../../../../actions/Observations/importWizard', () => ({
   searchDevices: vi.fn(() => () => Promise.resolve([])),
-  createDevice: vi.fn(data => () =>
-    Promise.resolve({
-      id: 1,
-      name: data.name,
-      brandName: data.brandName || null,
-      author: null
-    })
+  createDevice: vi.fn(
+    data => () =>
+      Promise.resolve({
+        id: 1,
+        name: data.name,
+        brandName: data.brandName || null,
+        author: null
+      })
   ),
   fetchSensorConfigs: vi.fn(() => () => Promise.resolve([])),
   createSensorConfig: vi.fn(() => () => Promise.resolve()),
@@ -53,11 +53,26 @@ vi.mock('../components/SubstanceAutocomplete', () => {
   return {
     __esModule: true,
     default: ({ value, onChange }) =>
-      React.createElement('div', { 'data-testid': 'sensor-config-substance' },
-        React.createElement('button', {
-          'data-testid': 'substance-select-button',
-          onClick: () => onChange({ id: 1, name: 'Nitrate', formula: 'NO₃⁻', casNumber: null, externalId: '943', externalSource: 'PubChem' })
-        }, value ? value.name : 'Select substance')
+      React.createElement(
+        'div',
+        { 'data-testid': 'sensor-config-substance' },
+        React.createElement(
+          'button',
+          {
+            'data-testid': 'substance-select-button',
+            type: 'button',
+            onClick: () =>
+              onChange({
+                id: 1,
+                name: 'Nitrate',
+                formula: 'NO₃⁻',
+                casNumber: null,
+                externalId: '943',
+                externalSource: 'PubChem'
+              })
+          },
+          value ? value.name : 'Select substance'
+        )
       )
   };
 });
@@ -108,8 +123,7 @@ const messages = {
   'ImportObservationsWizard.DeviceSensorsStep.substance': 'Substance',
   'ImportObservationsWizard.DeviceSensorsStep.substancePlaceholder':
     'Search substance...',
-  'ImportObservationsWizard.DeviceSensorsStep.substanceNoResults':
-    'No results',
+  'ImportObservationsWizard.DeviceSensorsStep.substanceNoResults': 'No results',
   'ImportObservationsWizard.DeviceSensorsStep.substanceViaPubChem':
     'via PubChem',
   'ImportObservationsWizard.DeviceSensorsStep.substanceSearchHint':
@@ -186,10 +200,8 @@ beforeEach(() => {
 const originalConsoleError = console.error;
 beforeAll(() => {
   console.error = (...args) => {
-    if (
-      typeof args[0] === 'string' &&
-      args[0].includes('not wrapped in act')
-    ) return;
+    if (typeof args[0] === 'string' && args[0].includes('not wrapped in act'))
+      return;
     originalConsoleError(...args);
   };
 });

@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { IntlProvider } from 'react-intl';
 
@@ -50,23 +49,31 @@ vi.mock('../utils/profileManager', () => ({
 
 // ---- i18n messages used by UploadStep ----
 const messages = {
-  'ImportObservationsWizard.UploadStep.fileLabel': 'Upload CSV / TSV / TXT file',
+  'ImportObservationsWizard.UploadStep.fileLabel':
+    'Upload CSV / TSV / TXT file',
   'ImportObservationsWizard.UploadStep.chooseFile': 'Choose file',
-  'ImportObservationsWizard.UploadStep.dataRowCount': '{count, plural, one {# data row} other {# data rows}}',
+  'ImportObservationsWizard.UploadStep.dataRowCount':
+    '{count, plural, one {# data row} other {# data rows}}',
   'ImportObservationsWizard.UploadStep.encodingLabel': 'Character encoding',
   'ImportObservationsWizard.UploadStep.headerRowLabel': 'Header row',
   'ImportObservationsWizard.UploadStep.noRowsToSkip': 'No rows to skip',
   'ImportObservationsWizard.UploadStep.skipLastRowsLabel': 'Skip last rows',
-  'ImportObservationsWizard.UploadStep.skipFirstRowsLabel': 'Skip first rows (after header)',
+  'ImportObservationsWizard.UploadStep.skipFirstRowsLabel':
+    'Skip first rows (after header)',
   'ImportObservationsWizard.UploadStep.numberLocaleLabel': 'Number format',
-  'ImportObservationsWizard.UploadStep.dotDecimal': 'Dot decimal (e.g. 1,234.56)',
-  'ImportObservationsWizard.UploadStep.commaDecimal': 'Comma decimal (e.g. 1.234,56)',
+  'ImportObservationsWizard.UploadStep.dotDecimal':
+    'Dot decimal (e.g. 1,234.56)',
+  'ImportObservationsWizard.UploadStep.commaDecimal':
+    'Comma decimal (e.g. 1.234,56)',
   'ImportObservationsWizard.UploadStep.importProfile': 'Import profile',
-  'ImportObservationsWizard.UploadStep.previewTitle': 'Data preview (first 10 + last 10 rows)',
+  'ImportObservationsWizard.UploadStep.previewTitle':
+    'Data preview (first 10 + last 10 rows)',
   'ImportObservationsWizard.UploadStep.rowLabel': 'Row {row}',
   'ImportObservationsWizard.UploadStep.noDataRows': 'No data rows to preview.',
-  'ImportObservationsWizard.UploadStep.profileImportError': 'Failed to import profile: {error}',
-  'ImportObservationsWizard.UploadStep.profileImportSuccess': 'Profile imported successfully'
+  'ImportObservationsWizard.UploadStep.profileImportError':
+    'Failed to import profile: {error}',
+  'ImportObservationsWizard.UploadStep.profileImportSuccess':
+    'Profile imported successfully'
 };
 
 const defaultState = {
@@ -140,7 +147,10 @@ describe('UploadStep', () => {
 
     // Should dispatch SET_ENCODING and then parseAndSetFile
     expect(mockDispatch).toHaveBeenCalledWith(
-      expect.objectContaining({ type: 'SET_ENCODING', encoding: 'windows-1252' })
+      expect.objectContaining({
+        type: 'SET_ENCODING',
+        encoding: 'windows-1252'
+      })
     );
     expect(mockParseAndSetFile).toHaveBeenCalledWith(
       stateWithFile.importWizard.file,

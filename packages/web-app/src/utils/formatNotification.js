@@ -146,9 +146,7 @@ const formatNotification = notification => {
       console.warn(
         `[formatNotification] Unknown notificationType: ${notificationType.name}`
       );
-      verb = notificationType.name
-        ? notificationType.name.toLowerCase()
-        : '';
+      verb = notificationType.name ? notificationType.name.toLowerCase() : '';
   }
 
   // Entity data

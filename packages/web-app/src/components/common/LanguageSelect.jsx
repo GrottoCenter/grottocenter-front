@@ -1,12 +1,7 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
-import {
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Select
-} from '@mui/material';
+import { FormControl, InputLabel, MenuItem, Select } from '@mui/material';
 import { loadLanguages } from '../../actions/Language';
 import Translate from './Translate';
 
@@ -27,16 +22,16 @@ const LanguageSelect = ({
 
   return (
     <FormControl variant="standard" fullWidth required={required} error={error}>
-      <InputLabel shrink>
-        {label ?? <Translate>Language</Translate>}
-      </InputLabel>
+      <InputLabel shrink>{label ?? <Translate>Language</Translate>}</InputLabel>
       <Select
         value={isLoaded ? (value ?? '000') : '000'}
         onChange={e => onChange(e.target.value)}
         disabled={disabled}>
         <MenuItem value="000" disabled>
           <i>
-            <Translate>{isLoaded ? 'Select a language' : 'Loading...'}</Translate>
+            <Translate>
+              {isLoaded ? 'Select a language' : 'Loading...'}
+            </Translate>
           </i>
         </MenuItem>
         {languages.map(l => (

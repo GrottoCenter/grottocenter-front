@@ -124,12 +124,16 @@ const fetchTile = (entity, tile, apiZoom) => {
   // and a concurrent fetchTile for the same key wouldn't find inFlight,
   // kicking off a duplicate request. Mutating an already-evicted record is
   // a harmless no-op.
+  // Declared up front: clearInFlight closes over `promise`, and `promise`'s
+  // own handlers call clearInFlight. Only the assignment order matters — the
+  // closure never runs before the promise exists.
+  let promise;
   const clearInFlight = () => {
     const rec = s.tiles.get(key);
     if (rec && rec.inFlight === promise) delete rec.inFlight;
   };
 
-  const promise = fetch(url)
+  promise = fetch(url)
     .then(response => {
       if (response.status >= 400) throw new Error(response.status);
       return response.text();
@@ -226,6 +230,9 @@ export const invalidateAll = entity => {
   const s = state[entity];
   if (!s) return;
   s.tiles.forEach(rec => {
+    // The cache records are mutable by design: marking them stale in place is
+    // what keeps the tile identities (and the Map keys) stable.
+    // eslint-disable-next-line no-param-reassign
     rec.fetchedAt = 0;
   });
   if (s.lastBounds && s.dispatch && s.config) {

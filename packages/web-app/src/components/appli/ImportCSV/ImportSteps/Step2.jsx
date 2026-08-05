@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { useCSVReader, formatFileSize } from 'react-papaparse';
 import { useIntl } from 'react-intl';
 import { useDispatch } from 'react-redux';

@@ -49,9 +49,12 @@ const columnMappingArb = fc.oneof(
   fc.record({
     columnIndex: fc.nat({ max: 10 }),
     role: fc.constant('measurement'),
-    sensorConfigurationId: fc.option(fc.string({ minLength: 1, maxLength: 36 }), {
-      nil: null
-    }),
+    sensorConfigurationId: fc.option(
+      fc.string({ minLength: 1, maxLength: 36 }),
+      {
+        nil: null
+      }
+    ),
     mediumId: fc.option(fc.nat(), { nil: null })
   })
 );
@@ -71,10 +74,9 @@ const wizardStateArbitrary = fc.record({
     }),
     { minLength: 0, maxLength: 3 }
   ),
-  confirmedDevice: fc.option(
-    fc.record({ id: fc.nat(), name: fc.string() }),
-    { nil: null }
-  ),
+  confirmedDevice: fc.option(fc.record({ id: fc.nat(), name: fc.string() }), {
+    nil: null
+  }),
   context: fc.record({
     locationMode: fc.constantFrom('pointAndCave', 'pointOnly', 'caveOnly'),
     caveId: fc.option(fc.nat(), { nil: null }),
@@ -136,7 +138,9 @@ describe('Property 9: Profile export/import round-trip', () => {
         );
 
         // Context fields
-        expect(restored.context.locationMode).toEqual(state.context.locationMode);
+        expect(restored.context.locationMode).toEqual(
+          state.context.locationMode
+        );
         expect(restored.context.caveId).toEqual(state.context.caveId);
         expect(restored.context.pointLabel).toEqual(state.context.pointLabel);
         expect(restored.context.authorIds).toEqual(state.context.authorIds);
@@ -148,8 +152,12 @@ describe('Property 9: Profile export/import round-trip', () => {
           const n = Number(v);
           return Number.isNaN(n) ? null : n;
         };
-        expect(restored.context.latitude).toEqual(coerceCoord(state.context.latitude));
-        expect(restored.context.longitude).toEqual(coerceCoord(state.context.longitude));
+        expect(restored.context.latitude).toEqual(
+          coerceCoord(state.context.latitude)
+        );
+        expect(restored.context.longitude).toEqual(
+          coerceCoord(state.context.longitude)
+        );
 
         expect(restored.context.observationName).toEqual(
           state.context.observationName
@@ -157,9 +165,7 @@ describe('Property 9: Profile export/import round-trip', () => {
         expect(restored.context.documentTitle).toEqual(
           state.context.documentTitle
         );
-        expect(restored.context.dataQuality).toEqual(
-          state.context.dataQuality
-        );
+        expect(restored.context.dataQuality).toEqual(state.context.dataQuality);
 
         // samplingIntervalSeconds: omitted when null
         if (state.samplingIntervalSeconds === null) {

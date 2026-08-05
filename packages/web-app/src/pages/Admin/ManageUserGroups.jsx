@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useIntl } from 'react-intl';
 import { styled } from '@mui/material/styles';
@@ -131,8 +131,7 @@ const ManageUserGroups = () => {
     if (!didSaveBan || isBanLoading) return;
     if (isBanSuccess)
       onSuccess(formatMessage({ id: 'Ban updated with success!' }));
-    else if (banError)
-      onError(getBanErrorMessage(banError, formatMessage));
+    else if (banError) onError(getBanErrorMessage(banError, formatMessage));
     else return; // still in initial state — don't reset
     setDidSaveBan(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -183,9 +182,7 @@ const ManageUserGroups = () => {
             </FlexBlock>
             <FlexBlock style={{ flexBasis: '200px' }}>
               <UserGroups
-                isLoading={
-                  isUpdateLoading || isBanLoading || isPersonFetching
-                }
+                isLoading={isUpdateLoading || isBanLoading || isPersonFetching}
                 onBeforeSave={({ isGroupsChanged: g, isBanChanged: b }) => {
                   setDidSaveGroups(g);
                   setDidSaveBan(b);

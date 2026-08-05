@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Controller, useForm, useWatch } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
@@ -71,7 +71,11 @@ import { FormRow } from '../../components/appli/EntitiesForm/utils/FormContainer
 import PasswordRules from '../../components/common/Form/PasswordRules';
 import SearchOrganizationForm from '../../components/appli/Form/SearchOrganizationForm';
 import Translate from '../../components/common/Translate';
-import { useUserProperties, usePermissions, useNotification } from '../../hooks';
+import {
+  useUserProperties,
+  usePermissions,
+  useNotification
+} from '../../hooks';
 import AppLink from '../../components/common/AppLink';
 import { AVAILABLE_LANGUAGES, isPasswordValid } from '../../conf/config';
 import {
@@ -698,7 +702,13 @@ const MfaSection = () => {
       <InfoLabel variant="body2">
         {formatMessage({ id: 'mfaStatus' })}
       </InfoLabel>
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, flexWrap: 'wrap' }}>
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 0.5,
+          flexWrap: 'wrap'
+        }}>
         {isMfaEnabled ? (
           <>
             <Chip
@@ -740,7 +750,10 @@ const MfaSection = () => {
         title={formatMessage({ id: 'mfaResetTitle' })}
         actions={
           <>
-            <Button onClick={handleClose} variant="text" disabled={mfaReset.isLoading}>
+            <Button
+              onClick={handleClose}
+              variant="text"
+              disabled={mfaReset.isLoading}>
               {formatMessage({ id: 'Cancel' })}
             </Button>
             <Button
@@ -846,8 +859,7 @@ const PreferencesSection = ({ account, onSaved }) => {
         const data = await response.json();
         const prefs = {
           alert_for_news: data.alert_for_news ?? false,
-          send_notification_by_email:
-            data.send_notification_by_email ?? false,
+          send_notification_by_email: data.send_notification_by_email ?? false,
           send_message_notification_by_email:
             data.send_message_notification_by_email ?? false
         };
@@ -931,6 +943,49 @@ const PreferencesSection = ({ account, onSaved }) => {
     AVAILABLE_LANGUAGES[languageIdToLocale(account?.language)]?.nativeName ??
     '—';
 
+  let notificationRows = (
+    <>
+      <InfoRow>
+        <InfoLabel variant="body2">
+          {formatMessage({
+            id: 'Email notifications for subscriptions'
+          })}
+        </InfoLabel>
+        <BoolValue value={notifPrefs.send_notification_by_email} />
+      </InfoRow>
+      <InfoRow>
+        <InfoLabel variant="body2">
+          {formatMessage({
+            id: 'Email notifications for messages'
+          })}
+        </InfoLabel>
+        <BoolValue value={notifPrefs.send_message_notification_by_email} />
+      </InfoRow>
+      <InfoRow>
+        <InfoLabel variant="body2">
+          {formatMessage({ id: 'Alert for news' })}
+        </InfoLabel>
+        <BoolValue value={notifPrefs.alert_for_news} />
+      </InfoRow>
+    </>
+  );
+  if (isNotifLoading) {
+    notificationRows = (
+      <InfoRow>
+        <CircularProgress size={20} />
+      </InfoRow>
+    );
+  } else if (notifError) {
+    notificationRows = (
+      <Alert
+        severity="warning"
+        content={formatMessage({
+          id: 'Failed to load notification preferences'
+        })}
+      />
+    );
+  }
+
   const viewContent = (
     <>
       <InfoRow>
@@ -939,47 +994,7 @@ const PreferencesSection = ({ account, onSaved }) => {
         </InfoLabel>
         <Typography variant="body1">{nativeName}</Typography>
       </InfoRow>
-      {isNotifLoading ? (
-        <InfoRow>
-          <CircularProgress size={20} />
-        </InfoRow>
-      ) : notifError ? (
-        <Alert
-          severity="warning"
-          content={formatMessage({
-            id: 'Failed to load notification preferences'
-          })}
-        />
-      ) : (
-        <>
-          <InfoRow>
-            <InfoLabel variant="body2">
-              {formatMessage({
-                id: 'Email notifications for subscriptions'
-              })}
-            </InfoLabel>
-            <BoolValue
-              value={notifPrefs.send_notification_by_email}
-            />
-          </InfoRow>
-          <InfoRow>
-            <InfoLabel variant="body2">
-              {formatMessage({
-                id: 'Email notifications for messages'
-              })}
-            </InfoLabel>
-            <BoolValue
-              value={notifPrefs.send_message_notification_by_email}
-            />
-          </InfoRow>
-          <InfoRow>
-            <InfoLabel variant="body2">
-              {formatMessage({ id: 'Alert for news' })}
-            </InfoLabel>
-            <BoolValue value={notifPrefs.alert_for_news} />
-          </InfoRow>
-        </>
-      )}
+      {notificationRows}
     </>
   );
 
@@ -1009,10 +1024,7 @@ const PreferencesSection = ({ account, onSaved }) => {
         />
       </FormRow>
       <Box sx={{ mt: 1 }}>
-        <Typography
-          variant="subtitle2"
-          color="text.secondary"
-          sx={{ mb: 0.5 }}>
+        <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 0.5 }}>
           {formatMessage({ id: 'Notification Preferences' })}
         </Typography>
         <Controller
@@ -1045,9 +1057,7 @@ const PreferencesSection = ({ account, onSaved }) => {
                   color="primary"
                 />
               }
-              label={
-                <Translate>Email notifications for messages</Translate>
-              }
+              label={<Translate>Email notifications for messages</Translate>}
             />
           )}
         />
@@ -1553,9 +1563,7 @@ const AccountPage = () => {
         title={formatMessage({ id: 'Leave organization' })}
         actions={
           <>
-            <Button
-              onClick={() => setPendingLeaveOrg(null)}
-              variant="outlined">
+            <Button onClick={() => setPendingLeaveOrg(null)} variant="outlined">
               {formatMessage({ id: 'Cancel' })}
             </Button>
             <Button

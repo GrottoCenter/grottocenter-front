@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import { styled } from '@mui/material/styles';
@@ -61,7 +61,6 @@ const Actions = ({ selectedIds, onEdit }) => {
       setIsConfirmationDialogOpen(false);
       setComment('');
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [success]);
 
   return (

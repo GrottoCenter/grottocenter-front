@@ -9,10 +9,7 @@ import {
   getMapMassifsCoordinatesUrl
 } from '../conf/apiRoutes';
 import makeErrorMessage from '../helpers/makeErrorMessage';
-import {
-  fetchForBounds,
-  registerEntity
-} from '../utils/mapTileCache';
+import { fetchForBounds, registerEntity } from '../utils/mapTileCache';
 import { makeUrl } from './utils';
 
 export const FETCH_MAP_START_LOADING = 'FETCH_MAP_START_LOADING';
@@ -73,9 +70,9 @@ const fetchWithRetry = (url, maxRetries = 3) => {
       })
       .catch(error => {
         if (retriesLeft === 0) throw error;
-        return new Promise(resolve => setTimeout(resolve, delay)).then(() =>
-          attempt(retriesLeft - 1, delay * 2)
-        );
+        return new Promise(resolve => {
+          setTimeout(resolve, delay);
+        }).then(() => attempt(retriesLeft - 1, delay * 2));
       });
   return attempt(maxRetries, 1000);
 };

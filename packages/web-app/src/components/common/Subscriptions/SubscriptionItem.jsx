@@ -1,4 +1,3 @@
-import React from 'react';
 import PropTypes from 'prop-types';
 import { Chip, Tooltip } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
@@ -12,24 +11,25 @@ import regionType from '../../../types/region.type';
 import { unsubscribeFromCountry } from '../../../actions/Subscriptions/UnsubscribeFromCountry';
 import { unsubscribeFromRegion } from '../../../actions/Subscriptions/UnsubscribeFromRegion';
 
+// A region id encodes its country: "US-AL" is Alabama in the United States.
+const subscriptionUrl = (type, id) => {
+  if (type === 'MASSIF') return `/ui/massifs/${id}`;
+  if (type !== 'REGION') return `/ui/countries/${id}`;
+  const [countryId, regionId] = id.split('-');
+  return `/ui/countries/${countryId}/regions/${regionId}`;
+};
+
 const SubscriptionItem = ({ canUnsubscribe, subscription, type, userId }) => {
   const { formatMessage } = useIntl();
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const url =
-    type === 'MASSIF'
-      ? `/ui/massifs/${subscription.id}`
-      : type === 'REGION'
-      ? (() => {
-          // Parse region ID to extract country and region parts (format: "US-AL")
-          const [countryId, regionId] = subscription.id.split('-');
-          return `/ui/countries/${countryId}/regions/${regionId}`;
-        })()
-      : `/ui/countries/${subscription.id}`;
+  const url = subscriptionUrl(type, subscription.id);
 
   const handleUnsubscribe = () => {
-    if (type === 'MASSIF') dispatch(unsubscribeFromMassif(subscription.id, userId));
-    if (type === 'COUNTRY') dispatch(unsubscribeFromCountry(subscription.id, userId));
+    if (type === 'MASSIF')
+      dispatch(unsubscribeFromMassif(subscription.id, userId));
+    if (type === 'COUNTRY')
+      dispatch(unsubscribeFromCountry(subscription.id, userId));
     if (type === 'REGION') {
       // Parse region ID to extract country and region parts (format: "US-AL")
       const [countryId, regionId] = subscription.id.split('-');
@@ -57,7 +57,11 @@ const SubscriptionItem = ({ canUnsubscribe, subscription, type, userId }) => {
 
 SubscriptionItem.propTypes = {
   canUnsubscribe: PropTypes.bool,
-  subscription: PropTypes.oneOfType([countryType, MassifSimpleTypes, regionType]),
+  subscription: PropTypes.oneOfType([
+    countryType,
+    MassifSimpleTypes,
+    regionType
+  ]),
   type: PropTypes.oneOf(['COUNTRY', 'MASSIF', 'REGION']).isRequired,
   userId: PropTypes.number
 };

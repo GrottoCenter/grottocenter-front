@@ -5,9 +5,15 @@ const GuidelinePropTypes = shape({
   id: number.isRequired,
   title: string.isRequired,
   description: string,
-  countries: arrayOf(oneOfType([string, number, shape({ id: oneOfType([string, number]) })])),
-  regions: arrayOf(oneOfType([string, number, shape({ id: oneOfType([string, number]) })])),
-  massifs: arrayOf(oneOfType([string, number, shape({ id: oneOfType([string, number]) })])),
+  countries: arrayOf(
+    oneOfType([string, number, shape({ id: oneOfType([string, number]) })])
+  ),
+  regions: arrayOf(
+    oneOfType([string, number, shape({ id: oneOfType([string, number]) })])
+  ),
+  massifs: arrayOf(
+    oneOfType([string, number, shape({ id: oneOfType([string, number]) })])
+  ),
   language: oneOfType([string, shape({ id: string })]),
   author: authorType,
   reviewer: authorType,

@@ -12,13 +12,13 @@ import {
   useMediaQuery,
   useTheme
 } from '@mui/material';
-import DocumentTypeChip from '../DocumentTypeChip';
 import HourglassEmptyIcon from '@mui/icons-material/HourglassEmpty';
 import LinkOffIcon from '@mui/icons-material/LinkOff';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
-import React, { useState, useLayoutEffect, useRef } from 'react';
+import { useState, useLayoutEffect, useRef } from 'react';
 import Linkify from 'linkify-react';
+import DocumentTypeChip from '../DocumentTypeChip';
 import AppLink from '../AppLink';
 import Files from './Files';
 import { SnapshotButton } from '../../appli/Entry/Snapshots/UtilityFunction';
@@ -48,9 +48,11 @@ const Document = ({
   }, [document.description, isMobileView]);
 
   return (
-    <ListItem disableGutters sx={{
-      display: 'block'
-    }}>
+    <ListItem
+      disableGutters
+      sx={{
+        display: 'block'
+      }}>
       <Paper
         variant="outlined"
         sx={{ p: 1, borderRadius: 2, bgcolor: 'grey.50' }}>
