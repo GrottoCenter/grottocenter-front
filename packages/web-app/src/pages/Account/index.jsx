@@ -84,8 +84,9 @@ import {
 import { notificationPreferencesUrl } from '../../conf/apiRoutes';
 import {
   clearOfflineData,
-  getStorageUsage,
-  isStoragePersisted
+  getOfflineDataUsage,
+  isStoragePersisted,
+  rememberOfflineBaseline
 } from '../../utils/offlineCache';
 
 // ─── Shared styled components ─────────────────────────────────────────────────
@@ -1125,8 +1126,7 @@ const OfflineDataSection = () => {
   const [isPersisted, setIsPersisted] = useState(false);
 
   const refreshUsage = useCallback(async () => {
-    const usage = await getStorageUsage();
-    setUsageBytes(usage);
+    setUsageBytes(await getOfflineDataUsage());
     setIsPersisted((await isStoragePersisted()) === true);
   }, []);
 
@@ -1138,9 +1138,17 @@ const OfflineDataSection = () => {
     setIsClearing(true);
     try {
       await clearOfflineData();
+      // Every runtime cache is gone, so the offline copy weighs 0 by
+      // construction. Say so now rather than re-reading the usage: the
+      // browser's quota figure lags the deletion by a second or two, so a
+      // reading taken here would still report the pre-clear size and the
+      // counter would look stuck.
+      setUsageBytes(0);
+      // Background, deliberately not awaited: it only records the floor for
+      // the next visit (see rememberOfflineBaseline).
+      rememberOfflineBaseline();
       onSuccess(formatMessage({ id: 'offlineDataCleared' }));
       setIsDialogOpen(false);
-      refreshUsage();
     } catch {
       onError(
         formatMessage({
