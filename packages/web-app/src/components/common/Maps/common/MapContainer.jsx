@@ -151,7 +151,6 @@ const CustomMapContainer = ({
   zoom,
   dragging = true,
   scrollWheelZoom = true,
-  isSideMenuOpen = false,
   // Location control + user-dot: `Always` mounts them regardless of fullscreen
   // (used by the global map, which never enters fullscreen); `InFullscreen`
   // mounts them only while the map is fullscreen (embedded maps, e.g. on an
@@ -232,7 +231,6 @@ const CustomMapContainer = ({
         zoom={zoom}
         dragging={dragging}
         scrollWheelZoom={scrollWheelZoom}
-        isSideMenuOpen={isSideMenuOpen}
         minZoom={1}
         rotate={isLocationControlAlways || isLocationControlInFullscreen}
         bearing={0}
@@ -279,7 +277,6 @@ CustomMapContainer.propTypes = {
   dragging: PropTypes.bool,
   scrollWheelZoom: PropTypes.bool,
   children: PropTypes.node,
-  isSideMenuOpen: PropTypes.bool,
   isLocationControlAlways: PropTypes.bool,
   isLocationControlInFullscreen: PropTypes.bool,
   isFullscreenAllowed: PropTypes.bool,

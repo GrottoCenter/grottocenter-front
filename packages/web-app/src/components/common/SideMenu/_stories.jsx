@@ -1,55 +1,71 @@
-import React from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { styled } from '@mui/material/styles';
-import { isMobileOnly } from 'react-device-detect';
 
 import { AppBar, Toolbar, Typography, IconButton } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
+import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 
 import SideMenu from './index';
+import {
+  openMobileSideMenu,
+  setSideMenuExpanded
+} from '../../../actions/SideMenu';
+import { useIsDesktopLayout, useSideMenuOffset } from '../../../hooks';
 
-const MainWrapper = styled('main')`
+const MainWrapper = styled('main', {
+  shouldForwardProp: prop => prop !== '$offset' && prop !== '$transition'
+})`
   flex-grow: 1;
   padding: ${({ theme }) => theme.spacing(2)};
-  transition: ${({ theme, isSideMenuOpen }) =>
-    !isMobileOnly &&
-    theme.transitions.create('margin', {
-      easing: isSideMenuOpen
-        ? theme.transitions.easing.easeOut
-        : theme.transitions.easing.sharp,
-      duration: isSideMenuOpen
-        ? theme.transitions.duration.enteringScreen
-        : theme.transitions.duration.leavingScreen
-    })};
-  margin-left: ${({ theme, isSideMenuOpen }) =>
-    !isMobileOnly && (isSideMenuOpen ? theme.sideMenuWidth : 0)}px;
+  transition: ${({ $transition }) => $transition};
+  margin-left: ${({ $offset }) => $offset}px;
 `;
 
 const WithState = () => {
-  const [isSideMenuOpen, setToggleSideMenu] = React.useState(false);
+  const dispatch = useDispatch();
+  const isDesktop = useIsDesktopLayout();
+  const isExpanded = useSelector(state => state.sideMenu.isExpanded);
+  const { width: offset, transition } = useSideMenuOffset();
 
-  const toggleSideMenu = () => {
-    setToggleSideMenu(!isSideMenuOpen);
-  };
+  const handleClick = () =>
+    dispatch(
+      isDesktop ? setSideMenuExpanded(!isExpanded) : openMobileSideMenu()
+    );
+
+  const chevron = isExpanded ? <ChevronLeftIcon /> : <ChevronRightIcon />;
 
   return (
     <>
-      <AppBar position="fixed">
+      <AppBar
+        position="fixed"
+        sx={{
+          width: `calc(100% - ${offset}px)`,
+          ml: `${offset}px`,
+          transition
+        }}>
         <Toolbar>
           <IconButton
             color="inherit"
-            aria-label="open drawer"
-            edge="end"
-            onClick={toggleSideMenu}
+            aria-label="toggle menu"
+            edge="start"
+            onClick={handleClick}
             size="large">
-            <MenuIcon />
+            {isDesktop ? chevron : <MenuIcon />}
           </IconButton>
           <Typography variant="h4" noWrap>
             Side Menu
           </Typography>
         </Toolbar>
       </AppBar>
-      <SideMenu isOpen={isSideMenuOpen} />
-      <MainWrapper isSideMenuOpen={isSideMenuOpen}>
+      <SideMenu />
+      <MainWrapper $offset={offset} $transition={transition}>
+        <Typography paragraph>
+          Resize the preview across 900px to switch between the permanent
+          desktop rail and the temporary mobile overlay. Below that width the
+          menu is an overlay opened by the burger; above it, the chevron folds
+          the rail down to its icons instead of hiding it.
+        </Typography>
         <Typography paragraph>
           Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
           eiusmod tempor incididunt ut labore et dolore magna aliqua. Rhoncus
@@ -61,23 +77,7 @@ const WithState = () => {
           integer quis. Cursus euismod quis viverra nibh cras. Metus vulputate
           eu scelerisque felis imperdiet proin fermentum leo. Mauris commodo
           quis imperdiet massa tincidunt. Cras tincidunt lobortis feugiat
-          vivamus at augue. At augue eget arcu dictum varius duis at consectetur
-          lorem. Velit sed ullamcorper morbi tincidunt. Lorem donec massa sapien
-          faucibus et molestie ac.
-        </Typography>
-        <Typography paragraph>
-          Consequat mauris nunc congue nisi vitae suscipit. Fringilla est
-          ullamcorper eget nulla facilisi etiam dignissim diam. Pulvinar
-          elementum integer enim neque volutpat ac tincidunt. Ornare suspendisse
-          sed nisi lacus sed viverra tellus. Purus sit amet volutpat consequat
-          mauris. Elementum eu facilisis sed odio morbi. Euismod lacinia at quis
-          risus sed vulputate odio. Morbi tincidunt ornare massa eget egestas
-          purus viverra accumsan in. In hendrerit gravida rutrum quisque non
-          tellus orci ac. Pellentesque nec nam aliquam sem et tortor. Habitant
-          morbi tristique senectus et. Adipiscing elit duis tristique
-          sollicitudin nibh sit. Ornare aenean euismod elementum nisi quis
-          eleifend. Commodo viverra maecenas accumsan lacus vel facilisis. Nulla
-          posuere sollicitudin aliquam ultrices sagittis orci a.
+          vivamus at augue.
         </Typography>
       </MainWrapper>
     </>

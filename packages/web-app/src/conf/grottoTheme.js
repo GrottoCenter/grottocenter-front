@@ -15,6 +15,18 @@ const fontFamily = [
 ].join(',');
 
 const sideMenuWidth = 240;
+// Width of the desktop rail once collapsed. The rail never goes to 0: on
+// desktop the navigation stays visible at all times, it only trades its labels
+// for icons.
+//
+// NOT a free parameter — it is twice the expanded icon centre, so that the icon
+// column does not jump sideways when the rail folds. With SideMenu's 8px content
+// inset, an 8px item inset and MENU_ICON_SIZE (32) icons, that centre is at 32:
+//   8 + 8 + 32/2 = 32  →  rail = 64
+// At that width the collapsed icons also land on the same 16px left edge as the
+// expanded ones, so neither the centres nor the edges move. Change any of those
+// three inputs and this has to be recomputed with them.
+const sideMenuCollapsedWidth = 64;
 const appBarHeight = 56;
 const breadcrumpHeight = 24;
 const paddingUnit = 8;
@@ -26,6 +38,7 @@ export const overridings = {
   // custom array-based scale, they resolve correctly instead of being dropped.
   spacing: paddingUnit,
   sideMenuWidth,
+  sideMenuCollapsedWidth,
   appBarHeight,
   breadcrumpHeight,
   palette: {
@@ -282,21 +295,10 @@ export const overridings = {
         }
       }
     },
-    MuiDrawer: {
-      styleOverrides: {
-        root: {
-          width: sideMenuWidth,
-          flexShrink: 0
-        },
-        paper: {
-          top: 0,
-          height: '100%',
-          width: sideMenuWidth,
-          display: 'flex',
-          flexDirection: 'column'
-        }
-      }
-    },
+    // No MuiDrawer override: the app has a single Drawer (SideMenu) and its
+    // width is dynamic (expanded rail vs mini rail), so it is styled at the
+    // component level. A hardcoded `width` here would have to be overridden on
+    // every render anyway, and would silently apply to any Drawer added later.
     MuiDivider: {
       styleOverrides: {
         root: {

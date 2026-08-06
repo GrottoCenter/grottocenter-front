@@ -136,12 +136,17 @@ const NEARBY_ENTRANCE_MARKER_STYLE = {
   fillOpacity: 0.9
 };
 
+// Module-level: stable reference so useMarkers's useCallback deps don't change,
+// and so the popup renderer is not redefined on every render — React would see a
+// new component type each time and throw away the popup's DOM.
+const NEARBY_ENTRANCE_MARKER_OPTIONS = {
+  circleMarkerStyle: NEARBY_ENTRANCE_MARKER_STYLE,
+  tooltipContent: entrance => entrance?.name,
+  popupContent: entrance => <EntrancePopup entrance={entrance} />
+};
+
 const AdditionalMarkers = ({ positions }) => {
-  const updateMarkers = useMarkers({
-    circleMarkerStyle: NEARBY_ENTRANCE_MARKER_STYLE,
-    tooltipContent: entrance => entrance?.name,
-    popupContent: entrance => <EntrancePopup entrance={entrance} />
-  });
+  const updateMarkers = useMarkers(NEARBY_ENTRANCE_MARKER_OPTIONS);
 
   useEffect(() => {
     updateMarkers(positions);
