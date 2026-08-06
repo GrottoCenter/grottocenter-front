@@ -22,6 +22,28 @@ The alias also works in `vite.config.mjs` test configuration (Vitest resolves it
 
 ---
 
+## 📌 Pinned dependencies
+
+`@mui/material` and `@mui/icons-material` are pinned to an exact **7.3.9** — do not
+restore the `^` range without testing a swipe-to-close of the mobile side menu.
+
+From 7.3.10, `Slide`'s `getTranslateValue` blanks the inline `transform` and calls
+`getBoundingClientRect()` before restoring it. The forced reflow commits
+`transform: none` as the transition's before-change style, so a drawer released
+mid-swipe animates from the fully-open position instead of from the finger — the
+panel visibly snaps back open before sliding out. Only `SwipeableDrawer` is
+affected, since it is the only place a transform is applied outside `Slide`.
+
+`@mui/lab` still asks for `^7.3.11`; the mismatch is patch-level and the peer
+warning is expected.
+
+> ⚠️ After changing any dependency version, restart the dev server with
+> `yarn start --force` (or delete `node_modules/.vite`). A running server keeps
+> serving its pre-bundled deps, so you will be testing the **old** version and
+> get a false result — that is exactly how this bug was misdiagnosed once.
+
+---
+
 ## 📁 src/hooks/ vs src/utils/
 
 - **`src/hooks/`** — Custom React hooks only. Every file must export one or more functions whose name starts with `use`. No plain constants or pure utility functions.

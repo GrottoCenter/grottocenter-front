@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { memo, useCallback, useMemo } from 'react';
 import {
   Box,
   Button,
@@ -80,6 +80,12 @@ const HeaderLogo = styled(GCLogo)(({ theme }) => ({
   '&:hover': { opacity: 0.7 }
 }));
 
+// The menu's only scroll container — both drawer papers are pinned to
+// `overflow: hidden` to keep it that way, overriding MUI's `overflow-y: auto`.
+// Scrolling here rather than on the paper is what keeps the header pinned, and
+// a single scroller is what keeps the mobile swipe reliable: SwipeableDrawer
+// arbitrates each gesture by walking the ancestors for scrollable ones, and a
+// second candidate is one more way for a drag to go to the wrong element.
 const Content = styled('div')`
   display: flex;
   flex-direction: column;
@@ -113,9 +119,13 @@ const ContributeButton = styled(Button, {
       })
 }));
 
-// The whole menu body. Shared verbatim between the two drawers so the mobile
-// overlay keeps rendering exactly what it rendered before the rail existed.
-const SideMenuContent = ({ isExpanded, onNavigate }) => {
+// The whole menu body, shared by both drawers.
+//
+// Memoised because opening the mobile overlay is a Redux update: without it,
+// the body (a MUI Autocomplete, nine Tooltips, eight ripple-bearing rows) would
+// re-render synchronously in the commit that sets `open`, delaying the first
+// frame of the slide. Keep both props shallow-stable or the bailout is lost.
+const SideMenuContent = memo(({ isExpanded, onNavigate }) => {
   const { locale } = useSelector(state => state.intl);
   const theme = useTheme();
   const { formatMessage } = useIntl();
@@ -240,7 +250,9 @@ const SideMenuContent = ({ isExpanded, onNavigate }) => {
       </Content>
     </>
   );
-};
+});
+
+SideMenuContent.displayName = 'SideMenuContent';
 
 SideMenuContent.propTypes = {
   isExpanded: PropTypes.bool.isRequired,
@@ -275,9 +287,10 @@ const MiniDrawer = styled(Drawer, {
     // flexbox — only the width and its animation are ours.
     '& .MuiDrawer-paper': {
       width,
-      // Labels are still in the DOM while collapsed (faded out), so they must
-      // not be able to widen the paper or spill a scrollbar.
-      overflowX: 'hidden',
+      // `overflow`, not `overflowX`: the X axis is about the labels, which are
+      // still in the DOM while collapsed and must not be able to widen the
+      // paper. The Y axis is about who scrolls — see `Content`.
+      overflow: 'hidden',
       transition
     }
   };
@@ -286,7 +299,10 @@ const MiniDrawer = styled(Drawer, {
 const SideMenu = () => {
   const dispatch = useDispatch();
   const isDesktop = useIsDesktopLayout();
-  const { isExpanded, isMobileOpen } = useSelector(state => state.sideMenu);
+  // Two primitive selections rather than one slice object: each drawer only
+  // cares about its own flag, so neither re-renders for the other's.
+  const isExpanded = useSelector(state => state.sideMenu.isExpanded);
+  const isMobileOpen = useSelector(state => state.sideMenu.isMobileOpen);
 
   const handleClose = useCallback(
     () => dispatch(closeMobileSideMenu()),
@@ -297,6 +313,35 @@ const SideMenu = () => {
     [dispatch]
   );
   const theme = useTheme();
+
+  // Stable identity so the two blocking renders SwipeableDrawer forces per
+  // gesture (`flushSync` on the first touchmove and on touchend) don't make
+  // emotion re-serialise these `sx` objects.
+  //
+  // `slotProps`, not the legacy PaperProps/SwipeAreaProps — MUI resolves them
+  // as `slotProps.paper ?? PaperProps`, so mixing the two silently drops one.
+  const slotProps = useMemo(
+    () => ({
+      paper: {
+        // `Content` is the only scroller — see the note there.
+        sx: { width: theme.sideMenuWidth, overflow: 'hidden' }
+      },
+      // SwipeableDrawer sizes the exit to continue at the drag velocity, so the
+      // curve has to decelerate from it; Slide's default `sharp` restarts from
+      // a standstill and lags behind the fling. `enter` restates Slide's own
+      // default: a missing key falls through to `transitions.create`'s
+      // easeInOut, not to Slide's.
+      transition: {
+        easing: {
+          enter: theme.transitions.easing.easeOut,
+          exit: theme.transitions.easing.easeOut
+        }
+      },
+      // Below the AppBar, so the edge-swipe strip can't swallow taps on it.
+      swipeArea: { sx: { top: theme.appBarHeight } }
+    }),
+    [theme]
+  );
 
   if (isDesktop) {
     return (
@@ -313,24 +358,20 @@ const SideMenu = () => {
       open={isMobileOpen}
       onClose={handleClose}
       onOpen={handleOpen}
-      // keepMounted prevents React from unmounting the drawer content when closed
-      // (variant="temporary" unmounts by default). Without it, the first swipe
-      // triggers a full React mount during the gesture, causing jank.
-      ModalProps={{ keepMounted: true }}
-      // The theme used to width every Drawer paper; now that each drawer owns
-      // its own width, the overlay states its own.
-      PaperProps={{ sx: { width: theme.sideMenuWidth } }}
+      slotProps={slotProps}
       // Snappier than the default (0.52): drawer commits to open after 30% dragged.
       hysteresis={0.3}
       // More responsive than the default (450 px/s): a short fast fling is enough.
       minFlingVelocity={300}
-      // Standard MUI iOS/Android pattern:
-      // - disableBackdropTransition: skip the backdrop fade on Android to save GPU.
-      // - disableDiscovery: disable the edge peek on iOS only, where it conflicts
-      //   with the native "swipe to go back" system gesture.
-      disableBackdropTransition={!isIOS}
-      disableDiscovery={isIOS}
-      SwipeAreaProps={{ style: { top: theme.appBarHeight } }}>
+      // The edge peek fights iOS's native swipe-to-go-back.
+      //
+      // Do NOT pair it with `disableBackdropTransition` as MUI's demo does:
+      // that flag is an FPS escape hatch for low-end devices, and it is what
+      // drives the scrim from the drag offset. With it on, the page goes fully
+      // black while the panel is still a few pixels in.
+      disableDiscovery={isIOS}>
+      {/* No `ModalProps={{ keepMounted: true }}`: SwipeableDrawer already
+          forces it for `variant="temporary"`. */}
       {/* Always expanded: the overlay covers the page, there is nothing to
           reclaim by hiding the labels. */}
       <SideMenuContent isExpanded onNavigate={handleClose} />
