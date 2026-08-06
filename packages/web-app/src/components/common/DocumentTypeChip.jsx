@@ -21,6 +21,16 @@ const DocumentTypeChip = ({ type, size = 'small' }) => {
       size={size}
       icon={<IconComponent />}
       label={label}
+      sx={{
+        // Type labels are long ("Topographic drawing", "Interactive resource")
+        // and the chip is rendered in half-width property cells: MUI's default
+        // nowrap label would either spill out of the cell or be ellipsized down
+        // to an unreadable stub. Wrap onto a second line instead — no effect
+        // wherever the chip already has the room.
+        height: 'auto',
+        py: 0.25,
+        '& .MuiChip-label': { whiteSpace: 'normal', overflow: 'visible' }
+      }}
     />
   );
 };
