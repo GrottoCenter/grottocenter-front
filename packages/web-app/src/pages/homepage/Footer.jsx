@@ -68,6 +68,10 @@ const LicenseBadgeFrame = styled(Box)({
 
 const FOOTER_BADGE_SIZE = 36;
 
+// Injected at build time by CI from the version being tagged; falls back to the
+// .env placeholder in local development.
+const appVersion = import.meta.env.VITE_APP_VERSION;
+
 const LicenseBar = styled(Box)({
   borderTop: '1px solid rgba(255,255,255,0.1)',
   padding: '14px 24px',
@@ -350,6 +354,19 @@ const Footer = () => {
             })}
           </Typography>
         </LicenseLine>
+        {appVersion && (
+          <Typography
+            variant="caption"
+            sx={{
+              // Dimmer than the license text above: informative, never
+              // competing with the legal notices for attention.
+              color: 'rgba(255,255,255,0.3)',
+              display: 'block',
+              textAlign: 'center'
+            }}>
+            Grottocenter web v{appVersion}
+          </Typography>
+        )}
       </LicenseBar>
     </FooterRoot>
   );

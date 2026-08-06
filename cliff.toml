@@ -1,0 +1,48 @@
+# Version and release notes configuration.
+#
+# Both workflows read this file on the same commit: the Azure one bakes
+# `git cliff --bumped-version` into the bundle it deploys, the Release one tags
+# that version and publishes `git cliff --bump --unreleased` as the release body.
+
+[changelog]
+header = ""
+# The `<!-- n -->` prefixes only force the section order (git-cliff sorts groups
+# alphabetically); `striptags` removes them before rendering.
+body = """
+{% for group, commits in commits | group_by(attribute="group") %}
+### {{ group | striptags | trim }}
+
+{% for commit in commits %}
+- {% if commit.breaking %}**BREAKING** {% endif %}\
+{% if commit.scope %}**{{ commit.scope }}**: {% endif %}\
+{{ commit.message | upper_first }}
+{% endfor %}
+{% endfor %}
+"""
+footer = ""
+trim = true
+
+[git]
+conventional_commits = true
+# Every merge on develop must produce a release, so a commit that does not
+# follow the convention still counts instead of vanishing.
+filter_unconventional = false
+protect_breaking_commits = true
+sort_commits = "oldest"
+# Bare semver only — this is what keeps the Android tags (app-3.1.0) out of the
+# web version history. See twa/README.md.
+tag_pattern = '^[0-9]+\.[0-9]+\.[0-9]+$'
+commit_parsers = [
+  { message = "^feat", group = "<!-- 0 -->✨ New features" },
+  { message = "^improvement", group = "<!-- 1 -->🚀 Improvements" },
+  { message = "^fix", group = "<!-- 2 -->🐛 Bug fixes" },
+  { message = "^perf", group = "<!-- 3 -->⚡ Performance" },
+  { message = "^revert", group = "<!-- 4 -->⏪ Reverts" },
+  { message = "^docs", group = "<!-- 5 -->📝 Documentation" },
+  { message = "^tech", group = "<!-- 6 -->🔧 Technical" },
+  { message = "^refactor", group = "<!-- 6 -->🔧 Technical" },
+  { message = "^chore", group = "<!-- 7 -->📦 Maintenance" },
+  { message = "^style", group = "<!-- 7 -->📦 Maintenance" },
+  { message = "^test", group = "<!-- 7 -->📦 Maintenance" },
+  { message = ".*", group = "<!-- 8 -->Other changes" }
+]
