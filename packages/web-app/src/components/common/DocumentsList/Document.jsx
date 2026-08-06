@@ -21,6 +21,7 @@ import Linkify from 'linkify-react';
 import DocumentTypeChip from '../DocumentTypeChip';
 import AppLink from '../AppLink';
 import Files from './Files';
+import { isImageFile } from './utils/imageUtils';
 import { SnapshotButton } from '../../appli/Entry/Snapshots/UtilityFunction';
 import Translate from '../Translate';
 import StandardDialog from '../StandardDialog';
@@ -133,8 +134,12 @@ const Document = ({
           )}
         </Box>
 
-        {/* Description with truncation */}
-        {document.description && (
+        {/* Description with truncation.
+            Hidden when the document has any image file: the description is
+            already shown in the lightbox next to the image, so repeating it
+            here just eats vertical space. */}
+        {document.description &&
+          !document.files?.some(f => isImageFile(f.fileName)) && (
           <Box mt={0.5}>
             <Typography
               ref={descriptionRef}

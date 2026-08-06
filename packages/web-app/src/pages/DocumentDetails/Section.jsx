@@ -19,7 +19,9 @@ import AppLink from '../../components/common/AppLink';
 import linkifyOptions from '../../helpers/linkifyOptions';
 import Property from '../../components/common/Properties/Property';
 import ImageLightbox from '../../components/common/DocumentsList/ImageLightbox';
-import ImageThumbnail from '../../components/common/DocumentsList/ImageThumbnail';
+import ImageThumbnail, {
+  ThumbnailsGrid
+} from '../../components/common/DocumentsList/ImageThumbnail';
 import {
   decodeFileName,
   getFileExtension,
@@ -298,12 +300,6 @@ export const EventDateSection = ({ date }) => {
 };
 EventDateSection.propTypes = { date: PropTypes.string };
 
-const ImageGallery = styled(Box)(({ theme }) => ({
-  display: 'flex',
-  flexWrap: 'wrap',
-  gap: theme.spacing(1)
-}));
-
 export const FilesSection = ({ files }) => {
   const { formatMessage } = useIntl();
   const [lightboxIndex, setLightboxIndex] = useState(null);
@@ -349,7 +345,7 @@ export const FilesSection = ({ files }) => {
   return (
     <Stack spacing={2}>
       {images.length > 0 && (
-        <ImageGallery>
+        <ThumbnailsGrid $count={images.length}>
           {images.map((file, idx) => {
             const { src, srcSet } = getThumbnailSources(file);
             return (
@@ -362,7 +358,7 @@ export const FilesSection = ({ files }) => {
               />
             );
           })}
-        </ImageGallery>
+        </ThumbnailsGrid>
       )}
       {pdfs.map(file => (
         <Box key={file.completePath}>

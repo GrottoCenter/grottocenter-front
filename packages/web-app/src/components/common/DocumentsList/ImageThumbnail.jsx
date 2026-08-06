@@ -4,16 +4,37 @@ import { Card, CardActionArea, Skeleton, Box } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { Description } from '@mui/icons-material';
 
+// The track layout scales with the image count so a lone image doesn't stretch
+// full-width and a large gallery still tiles densely. Below `sm` everything
+// collapses to a single column.
+//
+// - 1 image  → capped single column
+// - 2-3 images → exactly `count` columns (avoids `auto-fill` sometimes only
+//   fitting 1 track in narrow parents like DocumentDetails' MainColumn)
+// - 4+ images → auto-fill dense grid
+export const ThumbnailsGrid = styled(Box, {
+  shouldForwardProp: prop => prop[0] !== '$'
+})(({ theme, $count }) => {
+  let gridTemplateColumns;
+  if ($count <= 1) gridTemplateColumns = 'minmax(0, 400px)';
+  else if ($count <= 3)
+    gridTemplateColumns = `repeat(${$count}, minmax(0, 400px))`;
+  else gridTemplateColumns = 'repeat(auto-fill, minmax(180px, 260px))';
+  return {
+    display: 'grid',
+    gap: theme.spacing(1),
+    [theme.breakpoints.up('sm')]: {
+      gridTemplateColumns,
+      justifyContent: 'start'
+    }
+  };
+});
+
 const ThumbnailCard = styled(Card)(({ theme }) => ({
   width: '100%',
   aspectRatio: '4 / 3',
   cursor: 'pointer',
   transition: 'box-shadow 0.3s ease',
-  [theme.breakpoints.up('sm')]: {
-    width: 240,
-    height: 180,
-    aspectRatio: 'auto'
-  },
   '&:hover': {
     boxShadow: theme.shadows[4]
   }
@@ -36,8 +57,10 @@ const FallbackIconWrapper = styled(Box)`
   border-radius: 4px;
 `;
 
-// Mirrors ThumbnailCard's breakpoint above: full width below `sm`, fixed 240px from `sm` up.
-const DEFAULT_SIZES = '(max-width: 599px) 100vw, 240px';
+// Thumbnails now stretch inside a CSS-Grid track (`minmax(270px, 1fr)`); on desktop
+// a single track can grow well past 270px on wide containers, so overshoot a bit
+// to let the browser pick the higher-res srcSet variant instead of upscaling.
+const DEFAULT_SIZES = '(max-width: 599px) 100vw, 400px';
 
 const ImageThumbnail = ({
   src,
