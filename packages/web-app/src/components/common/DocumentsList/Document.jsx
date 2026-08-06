@@ -140,43 +140,49 @@ const Document = ({
             here just eats vertical space. */}
         {document.description &&
           !document.files?.some(f => isImageFile(f.fileName)) && (
-          <Box mt={0.5}>
-            <Typography
-              ref={descriptionRef}
-              variant="body2"
-              sx={{
-                whiteSpace: 'break-spaces',
-                color: 'text.primary',
-                ...(isMobileView &&
-                  !descriptionExpanded && {
-                    overflow: 'hidden',
-                    display: '-webkit-box',
-                    WebkitLineClamp: 3,
-                    WebkitBoxOrient: 'vertical'
-                  })
-              }}>
-              <Linkify options={linkifyOptions}>{document.description}</Linkify>
-            </Typography>
-            {isMobileView && isClamped && (
-              <Button
-                size="small"
-                variant="text"
-                endIcon={
-                  descriptionExpanded ? <ExpandLessIcon /> : <ExpandMoreIcon />
-                }
+            <Box mt={0.5}>
+              <Typography
+                ref={descriptionRef}
+                variant="body2"
                 sx={{
-                  p: 0.25,
-                  minWidth: 0,
-                  textTransform: 'none'
-                }}
-                onClick={() => setDescriptionExpanded(e => !e)}>
-                {formatMessage({
-                  id: descriptionExpanded ? 'Show less' : 'Read more'
-                })}
-              </Button>
-            )}
-          </Box>
-        )}
+                  whiteSpace: 'break-spaces',
+                  color: 'text.primary',
+                  ...(isMobileView &&
+                    !descriptionExpanded && {
+                      overflow: 'hidden',
+                      display: '-webkit-box',
+                      WebkitLineClamp: 3,
+                      WebkitBoxOrient: 'vertical'
+                    })
+                }}>
+                <Linkify options={linkifyOptions}>
+                  {document.description}
+                </Linkify>
+              </Typography>
+              {isMobileView && isClamped && (
+                <Button
+                  size="small"
+                  variant="text"
+                  endIcon={
+                    descriptionExpanded ? (
+                      <ExpandLessIcon />
+                    ) : (
+                      <ExpandMoreIcon />
+                    )
+                  }
+                  sx={{
+                    p: 0.25,
+                    minWidth: 0,
+                    textTransform: 'none'
+                  }}
+                  onClick={() => setDescriptionExpanded(e => !e)}>
+                  {formatMessage({
+                    id: descriptionExpanded ? 'Show less' : 'Read more'
+                  })}
+                </Button>
+              )}
+            </Box>
+          )}
 
         {/* Files */}
         {document.files && (
