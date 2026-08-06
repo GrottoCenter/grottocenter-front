@@ -102,11 +102,23 @@ const BottomBar = styled(Box)`
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 12px 16px;
+  padding: 24px 16px 12px;
   gap: 2px;
-  background: linear-gradient(transparent, rgba(0, 0, 0, 0.7));
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.85) 0%,
+    rgba(0, 0, 0, 0.65) 60%,
+    transparent 100%
+  );
   z-index: 2;
   pointer-events: none;
+
+  /* Text-shadow is the belt to the gradient's suspenders: a bright pixel at
+     the very top edge of the gradient can still leak through, so we keep the
+     labels legible on any background. */
+  & > * {
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
+  }
 `;
 
 const LightboxImage = styled('img')`
@@ -370,7 +382,7 @@ const ImageLightbox = ({
         <BottomBar>
           <Typography
             variant="caption"
-            sx={{ color: 'rgba(255,255,255,0.6)', textAlign: 'center' }}>
+            sx={{ color: 'rgba(255,255,255,0.85)', textAlign: 'center' }}>
             {currentImage.documentTitle ||
               documentTitle ||
               decodeFileName(currentImage.fileName)}
@@ -385,7 +397,7 @@ const ImageLightbox = ({
           {hasMultipleImages && (
             <Typography
               variant="caption"
-              sx={{ color: 'rgba(255,255,255,0.45)' }}>
+              sx={{ color: 'rgba(255,255,255,0.75)' }}>
               {formatMessage(
                 { id: 'Image {current} of {total}' },
                 { current: currentIndex + 1, total: images.length }
