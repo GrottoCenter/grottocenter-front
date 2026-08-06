@@ -17,7 +17,7 @@ import { STALE } from '../../conf/queryClient';
  * reuses the count instead of hammering the endpoint. It also routes the
  * error through the global onError, keeping 401 handling in one place.
  *
- * @returns {(massifId: number) => Promise<number>}
+ * @returns {(massifId: number) => Promise<{count: number, lockedCount: number}>}
  */
 export const usePreviewSensitiveMassif = () => {
   const queryClient = useQueryClient();
@@ -29,7 +29,10 @@ export const usePreviewSensitiveMassif = () => {
           queryFn: () => apiGet(previewMassifSensitiveUrl(massifId)),
           staleTime: STALE.VOLATILE
         })
-        .then(data => data?.count ?? 0),
+        .then(data => ({
+          count: data?.count ?? 0,
+          lockedCount: data?.lockedCount ?? 0
+        })),
     [queryClient]
   );
 };

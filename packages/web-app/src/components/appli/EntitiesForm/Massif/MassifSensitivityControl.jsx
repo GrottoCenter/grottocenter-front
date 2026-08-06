@@ -9,12 +9,15 @@ import {
   CircularProgress
 } from '@mui/material';
 import StandardDialog from '../../../common/StandardDialog';
+import Alert from '../../../common/Alert';
+import SensitivityLockToggle from '../../../common/SensitivityLockToggle';
 import {
   useMarkMassifSensitive,
-  useUnmarkMassifSensitive,
   useNotification,
   usePermissions,
-  usePreviewSensitiveMassif
+  usePreviewSensitiveMassif,
+  useSetMassifSensitiveLock,
+  useUnmarkMassifSensitive
 } from '../../../../hooks';
 import { MassifTypes } from '../../../../types/massif.type';
 
@@ -24,33 +27,51 @@ const MassifSensitivityControl = ({ massif }) => {
   const permissions = usePermissions();
   const markMutation = useMarkMassifSensitive();
   const unmarkMutation = useUnmarkMassifSensitive();
+  const lockMutation = useSetMassifSensitiveLock();
   const previewSensitiveMassif = usePreviewSensitiveMassif();
 
   const isSensitive = massif?.isSensitive;
   const { isAdmin } = permissions;
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [isPreviewLoading, setIsPreviewLoading] = useState(false);
-  const [previewCount, setPreviewCount] = useState(null);
+  const [preview, setPreview] = useState(null);
   const [isActionLoading, setIsActionLoading] = useState(false);
   const [optimisticSensitive, setOptimisticSensitive] = useState(!!isSensitive);
+  const [isLocked, setIsLocked] = useState(!!massif?.isSensitiveLocked);
+  const [isLockLoading, setIsLockLoading] = useState(false);
 
   useEffect(() => {
     setOptimisticSensitive(!!isSensitive);
   }, [isSensitive]);
 
+  useEffect(() => {
+    setIsLocked(!!massif?.isSensitiveLocked);
+  }, [massif?.isSensitiveLocked]);
+
   if (!isAdmin || !massif?.id) return null;
+
+  const notifyActionError = error => {
+    if (error.status === 403) {
+      notification.onError(
+        formatMessage({
+          id: 'Only administrators can modify massif sensitivity.'
+        })
+      );
+    } else {
+      notification.onError(error.message);
+    }
+  };
 
   const handleToggle = async () => {
     if (!isSensitive) {
       // Flow for enabling: Preview -> Confirm -> Mark
       setIsPreviewLoading(true);
       try {
-        const count = await previewSensitiveMassif(massif.id);
-        setPreviewCount(count);
+        setPreview(await previewSensitiveMassif(massif.id));
         setIsConfirmOpen(true);
       } catch {
         // Fallback if preview fails: still show dialog but without count
-        setPreviewCount(null);
+        setPreview(null);
         setIsConfirmOpen(true);
       } finally {
         setIsPreviewLoading(false);
@@ -58,6 +79,23 @@ const MassifSensitivityControl = ({ massif }) => {
     } else {
       // Flow for disabling: Confirm -> Unmark
       setIsConfirmOpen(true);
+    }
+  };
+
+  const handleLockToggle = async nextIsLocked => {
+    const previousIsLocked = isLocked;
+    setIsLocked(nextIsLocked);
+    setIsLockLoading(true);
+    try {
+      await lockMutation.mutateAsync({
+        id: massif.id,
+        isSensitiveLocked: nextIsLocked
+      });
+    } catch (error) {
+      setIsLocked(previousIsLocked);
+      notifyActionError(error);
+    } finally {
+      setIsLockLoading(false);
     }
   };
 
@@ -69,20 +107,24 @@ const MassifSensitivityControl = ({ massif }) => {
     setIsActionLoading(true);
     try {
       if (!isSensitive) {
-        await markMutation.mutateAsync(massif.id);
-        const count = previewCount ?? 0;
+        const result = await markMutation.mutateAsync(massif.id);
+        const count = result?.count ?? preview?.count ?? 0;
+        const lockedCount =
+          result?.skippedLockedCount ?? preview?.lockedCount ?? 0;
+        let messageId;
+        if (lockedCount > 0) {
+          messageId =
+            'Massif marked as sensitive. {count} entrances affected, {lockedCount} locked entrances skipped.';
+        } else if (count > 0) {
+          messageId = 'Massif marked as sensitive. {count} entrances affected.';
+        } else {
+          messageId = 'Massif marked sensitive with no entrances affected.';
+        }
         notification.onSuccess(
-          formatMessage(
-            {
-              id:
-                count > 0
-                  ? 'Massif marked as sensitive. {count} entrances affected.'
-                  : 'Massif marked sensitive with no entrances affected.'
-            },
-            { count }
-          )
+          formatMessage({ id: messageId }, { count, lockedCount })
         );
       } else {
+        // Unmarking never cascades to entrances, so it reports no counts.
         await unmarkMutation.mutateAsync(massif.id);
         notification.onSuccess(
           formatMessage({ id: 'Massif unmarked as sensitive.' })
@@ -92,15 +134,7 @@ const MassifSensitivityControl = ({ massif }) => {
       setIsConfirmOpen(false);
     } catch (error) {
       setIsConfirmOpen(false);
-      if (error.status === 403) {
-        notification.onError(
-          formatMessage({
-            id: 'Only administrators can modify massif sensitivity.'
-          })
-        );
-      } else {
-        notification.onError(error.message);
-      }
+      notifyActionError(error);
     } finally {
       setIsActionLoading(false);
     }
@@ -112,16 +146,23 @@ const MassifSensitivityControl = ({ massif }) => {
 
   let dialogBody;
   if (!isSensitive) {
-    if (previewCount !== null) {
-      dialogBody = formatMessage(
-        {
-          id:
-            previewCount > 0
-              ? 'This action will mark {count} entrances as sensitive. This designation must be based on applicable legislation. Do you want to continue?'
-              : 'No entrances will be affected but the massif will still be marked as sensitive. This designation must be based on applicable legislation. Do you want to continue?'
-        },
-        { count: previewCount }
-      );
+    if (preview !== null) {
+      const { count, lockedCount } = preview;
+      let bodyId;
+      if (count > 0 && lockedCount > 0) {
+        bodyId =
+          'This action will mark {count} entrances as sensitive. {lockedCount} locked entrances will be skipped. This designation must be based on applicable legislation. Do you want to continue?';
+      } else if (count > 0) {
+        bodyId =
+          'This action will mark {count} entrances as sensitive. This designation must be based on applicable legislation. Do you want to continue?';
+      } else if (lockedCount > 0) {
+        bodyId =
+          'No entrances will be affected because the {lockedCount} entrances of this massif have a locked sensitivity, but the massif will still be marked as sensitive. This designation must be based on applicable legislation. Do you want to continue?';
+      } else {
+        bodyId =
+          'No entrances will be affected but the massif will still be marked as sensitive. This designation must be based on applicable legislation. Do you want to continue?';
+      }
+      dialogBody = formatMessage({ id: bodyId }, { count, lockedCount });
     } else {
       dialogBody = formatMessage({
         id: 'Entrances within the massif polygon will be marked as sensitive. This designation must be based on applicable legislation. Do you want to continue?'
@@ -146,16 +187,32 @@ const MassifSensitivityControl = ({ massif }) => {
       <Typography variant="h5" component="h3" gutterBottom>
         {formatMessage({ id: 'Sensitivity Management' })}
       </Typography>
-      <FormControlLabel
-        control={
-          <Switch
-            checked={optimisticSensitive}
-            onChange={handleToggle}
-            disabled={isPreviewLoading || isActionLoading}
-          />
-        }
-        label={formatMessage({ id: 'Sensitive massif' })}
-      />
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+        <FormControlLabel
+          control={
+            <Switch
+              checked={optimisticSensitive}
+              onChange={handleToggle}
+              disabled={isLocked || isPreviewLoading || isActionLoading}
+            />
+          }
+          label={formatMessage({ id: 'Sensitive massif' })}
+        />
+        <SensitivityLockToggle
+          isLocked={isLocked}
+          onChange={handleLockToggle}
+          disabled={isLockLoading}
+        />
+        {isLockLoading && <CircularProgress size={20} />}
+      </Box>
+      {isLocked && (
+        <Alert
+          severity="info"
+          content={formatMessage({
+            id: 'The sensitivity of this massif is locked. Unlock it to change its sensitivity.'
+          })}
+        />
+      )}
       <Typography variant="body2" color="textSecondary">
         {formatMessage({
           id: isSensitive

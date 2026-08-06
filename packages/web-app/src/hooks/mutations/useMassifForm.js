@@ -43,6 +43,15 @@ export const useUpdateMassif = () => {
   });
 };
 
+export const useSetMassifSensitiveLock = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, isSensitiveLocked }) =>
+      apiPut(putMassifUrl(id), { isSensitiveLocked }),
+    onSuccess: () => invalidateMassifs(queryClient)
+  });
+};
+
 export const useMarkMassifSensitive = () => {
   const queryClient = useQueryClient();
   return useMutation({

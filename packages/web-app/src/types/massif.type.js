@@ -14,6 +14,8 @@ export const MassifTypes = PropTypes.shape({
     })
   ),
   language: PropTypes.string,
+  isSensitive: PropTypes.bool,
+  isSensitiveLocked: PropTypes.bool,
   geogPolygon: PropTypes.string,
   descriptions: PropTypes.arrayOf(DescriptionSimpleTypes),
   networks: PropTypes.arrayOf(PropTypes.shape({})),
