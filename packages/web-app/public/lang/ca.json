@@ -1792,6 +1792,7 @@
   "News": "Comunicats",
   "Next": "Següent",
   "Next image": "Imatge següent",
+  "Next page": "Pàgina següent",
   "Next Page": "Pàgina següent",
   "Nicaragua": "Nicaragua",
   "nickname": "sobrenom (nickname)",
@@ -1945,6 +1946,7 @@
   "Original id from an imported database": "ID original d'una base de dades importada",
   "Other types": "Altres tipus",
   "Output": "Sortida",
+  "Page {current} of {total}": "Pàgina {current} de {total}",
   "Page {start} of {title}": "Pàgina {start} de {title}",
   "Page Comment": "Comentari de la pàgina",
   "Page history": "Historial de la pàgina",
@@ -2032,6 +2034,7 @@
   "Previous image": "Imatge anterior",
   "Previous name": "Nom anterior",
   "Previous nickname": "Sobrenom anterior",
+  "Previous page": "Pàgina anterior",
   "Previous Page": "Pàgina anterior",
   "Previous surname": "Cognom anterior",
   "Print": "Imprimir",
@@ -2533,6 +2536,7 @@
   "UK03": "Regne Unit: Escòcia (Berwick, Perth, Sutherland, etc.)",
   "UK04": "Regne Unit: Irlanda del Nord (Fermanagh, Antrim, etc.)",
   "Ukraine": "Ucraïna",
+  "Unable to display this PDF.": "No es pot mostrar aquest PDF.",
   "Unable to open the statistics dashboard. Please try again.": "No s'ha pogut obrir el tauler d'estadístiques. Torneu-ho a provar.",
   "Unarchive": "Desarxivar",
   "Underground time": "Moment de ficar-se sota terra",
@@ -2749,5 +2753,7 @@
   "Zanzibar": "Tansània",
   "Zimbabwe": "Zimbàbue",
   "Zip code": "Codi postal",
-  "Zone": "Zona"
+  "Zone": "Zona",
+  "Zoom in": "Ampliar",
+  "Zoom out": "Reduir"
 }

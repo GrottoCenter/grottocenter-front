@@ -45,6 +45,7 @@
     "linkifyjs": "^4.3.3",
     "notistack": "^3.0.2",
     "papaparse": "^5.5.4",
+    "pdfjs-dist": "^6.2.108",
     "proj4": "^2.21.0",
     "prop-types": "^15.8.1",
     "qrcode.react": "^4.2.0",

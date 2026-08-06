@@ -1792,6 +1792,7 @@
   "News": "ニュース：",
   "Next": "次へ",
   "Next image": "次の画像",
+  "Next page": "次のページ",
   "Next Page": "次のページ",
   "Nicaragua": "ニカラグア",
   "nickname": "ニックネーム",
@@ -1945,6 +1946,7 @@
   "Original id from an imported database": "インポートされたデータベースの元のID",
   "Other types": "その他の種類",
   "Output": "出力",
+  "Page {current} of {total}": "{total} ページ中 {current} ページ",
   "Page {start} of {title}": "{title}のページ{start}",
   "Page Comment": "ページコメント",
   "Page history": "ページ履歴",
@@ -2032,6 +2034,7 @@
   "Previous image": "前の画像",
   "Previous name": "以前の名前",
   "Previous nickname": "以前のニックネーム",
+  "Previous page": "前のページ",
   "Previous Page": "前のページ",
   "Previous surname": "以前の姓",
   "Print": "印刷",
@@ -2533,6 +2536,7 @@
   "UK03": "イギリス：スコットランド（バーウィック、パース、サザーランドなど）",
   "UK04": "イギリス：北アイルランド（ファーマナー、アントリムなど）",
   "Ukraine": "ウクライナ",
+  "Unable to display this PDF.": "この PDF を表示できません。",
   "Unable to open the statistics dashboard. Please try again.": "統計ダッシュボードを開けませんでした。もう一度お試しください。",
   "Unarchive": "アーカイブ解除",
   "Underground time": "地下時間",
@@ -2749,5 +2753,7 @@
   "Zanzibar": "ザンジバル",
   "Zimbabwe": "ジンバブエ",
   "Zip code": "郵便番号",
-  "Zone": "ゾーン"
+  "Zone": "ゾーン",
+  "Zoom in": "拡大",
+  "Zoom out": "縮小"
 }

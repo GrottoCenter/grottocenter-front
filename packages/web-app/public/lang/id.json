@@ -1792,6 +1792,7 @@
   "News": "Berita",
   "Next": "Berikutnya",
   "Next image": "Gambar berikutnya",
+  "Next page": "Halaman berikutnya",
   "Next Page": "Halaman berikutnya",
   "Nicaragua": "Nikaragua",
   "nickname": "nama panggilan",
@@ -1945,6 +1946,7 @@
   "Original id from an imported database": "ID asli dari database yang diimpor",
   "Other types": "Jenis lainnya",
   "Output": "Keluaran",
+  "Page {current} of {total}": "Halaman {current} dari {total}",
   "Page {start} of {title}": "Halaman {start} dari {title}",
   "Page Comment": "Komentar halaman",
   "Page history": "Riwayat halaman",
@@ -2032,6 +2034,7 @@
   "Previous image": "Gambar sebelumnya",
   "Previous name": "Nama sebelumnya",
   "Previous nickname": "Nama panggilan sebelumnya",
+  "Previous page": "Halaman sebelumnya",
   "Previous Page": "Halaman sebelumnya",
   "Previous surname": "Nama belakang sebelumnya",
   "Print": "Cetak",
@@ -2533,6 +2536,7 @@
   "UK03": "Britania Raya: Skotlandia (Berwick, Perth, Sutherland, dst)",
   "UK04": "Britania Raya: Irlandia Utara (Fermanagh, Antrim dst)",
   "Ukraine": "Ukraina",
+  "Unable to display this PDF.": "Tidak dapat menampilkan PDF ini.",
   "Unable to open the statistics dashboard. Please try again.": "Tidak dapat membuka dasbor statistik. Silakan coba lagi.",
   "Unarchive": "Batal Arsip",
   "Underground time": "Waktu bawah tanah",
@@ -2749,5 +2753,7 @@
   "Zanzibar": "Zanzibar",
   "Zimbabwe": "Zimbabwe",
   "Zip code": "Kode pos",
-  "Zone": "Zona"
+  "Zone": "Zona",
+  "Zoom in": "Perbesar",
+  "Zoom out": "Perkecil"
 }
