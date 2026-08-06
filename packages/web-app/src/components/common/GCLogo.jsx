@@ -6,13 +6,13 @@ const GCLogo = ({ className, showLink = true }) => {
   if (showLink) {
     return (
       <AppLink to="/" className={className}>
-        <img src={logoGC} alt="GrottoCenter" />
+        <img src={logoGC} alt="Grottocenter" />
       </AppLink>
     );
   }
   return (
     <span className={className}>
-      <img src={logoGC} alt="GrottoCenter" />
+      <img src={logoGC} alt="Grottocenter" />
     </span>
   );
 };

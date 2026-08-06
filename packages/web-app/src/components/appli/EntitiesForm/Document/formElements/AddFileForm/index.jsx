@@ -274,7 +274,7 @@ const AddFileForm = ({
                 disabled={isAuthForced}
                 control={<Radio size="small" />}
                 label={formatMessage({
-                  id: 'There is an authorization to publish from the author on GrottoCenter'
+                  id: 'There is an authorization to publish from the author on Grottocenter'
                 })}
               />
             </RadioGroup>

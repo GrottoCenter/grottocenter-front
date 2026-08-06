@@ -1,5 +1,5 @@
 /**
  * Default ISO 639-3 language code used when no document language is specified.
- * GrottoCenter uses 3-letter ISO 639-3 codes for document languages.
+ * Grottocenter uses 3-letter ISO 639-3 codes for document languages.
  */
 export const DEFAULT_DOCUMENT_LANGUAGE = 'eng';

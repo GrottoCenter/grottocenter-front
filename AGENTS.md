@@ -1,18 +1,18 @@
-# GrottoCenter Front — Agent Guide
+# Grottocenter Front — Agent Guide
 
-> AI agent and contributor reference for the GrottoCenter frontend.
+> AI agent and contributor reference for the Grottocenter frontend.
 > For web-app specifics (i18n, Redux, testing, deployment), see [`packages/web-app/AGENTS.md`](packages/web-app/AGENTS.md).
 
 ---
 
 ## 📋 Project Overview
 
-**GrottoCenter Front** is the web frontend for GrottoCenter, an international collaborative database for speleology and caves.
+**Grottocenter Front** is the web frontend for Grottocenter, an international collaborative database for speleology and caves.
 
 - **Type**: React SPA · Yarn monorepo
 - **License**: CC-BY-SA-3.0
-- **Repository**: <https://github.com/GrottoCenter/grottocenter-front>
-- **Backend API**: <https://github.com/GrottoCenter/grottocenter-api>
+- **Repository**: <https://github.com/Grottocenter/grottocenter-front>
+- **Backend API**: <https://github.com/Grottocenter/grottocenter-api>
 - **Production**: <https://fr.wikicaves.org/>
 - **API Swagger UI**: <https://grottocenter.org/ui/api/1>
 - **API raw spec**: <https://api.grottocenter.org/api/v1/swagger.yaml>
@@ -35,7 +35,7 @@ grottocenter-front/
 │   │   │   │   └── common/           # Small, reusable UI components
 │   │   │   ├── containers/           # ⚠️ DEPRECATED HOC components — use hooks instead
 │   │   │   ├── pages/                # Page-level components (full-screen views)
-│   │   │   ├── hooks/                # Custom GrottoCenter hooks
+│   │   │   ├── hooks/                # Custom Grottocenter hooks
 │   │   │   ├── helpers/              # ⚠️ DEPRECATED utilities — prefer hooks
 │   │   │   ├── utils/                # Utilities (dates, strings, validation)
 │   │   │   ├── conf/                 # Configuration (API routes, themes, i18n)
@@ -54,7 +54,7 @@ grottocenter-front/
 
 ---
 
-## 📚 GrottoCenter Vocabulary
+## 📚 Grottocenter Vocabulary
 
 Understanding the domain terminology is essential before writing any code.
 
@@ -498,9 +498,9 @@ size and the lower one, being no lighter, reads as the louder of the two.
 
 ## 📚 References
 
-- [Repository](https://github.com/GrottoCenter/grottocenter-front)
-- [Wiki](https://github.com/GrottoCenter/grottocenter-front/wiki)
-- [Backend API](https://github.com/GrottoCenter/grottocenter-api)
+- [Repository](https://github.com/Grottocenter/grottocenter-front)
+- [Wiki](https://github.com/Grottocenter/grottocenter-front/wiki)
+- [Backend API](https://github.com/Grottocenter/grottocenter-api)
 - [ESLint Airbnb](https://github.com/airbnb/javascript)
 - [Redux Style Guide](https://redux.js.org/style-guide)
 - [React-Intl](https://formatjs.io/docs/react-intl/)

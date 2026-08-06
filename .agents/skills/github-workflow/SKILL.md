@@ -1,6 +1,6 @@
 ---
 name: github-workflow
-description: GrottoCenter GitHub conventions — conventional commits with scope, branch from upstream develop, open a PR using the project template.
+description: Grottocenter GitHub conventions — conventional commits with scope, branch from upstream develop, open a PR using the project template.
 argument-hint: '[issue-id]'
 ---
 

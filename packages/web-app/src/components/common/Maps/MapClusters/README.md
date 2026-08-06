@@ -1,6 +1,6 @@
 # MapClusters
 
-Map overlay system for the GrottoCenter main map. Manages the cluster bubble layers
+Map overlay system for the Grottocenter main map. Manages the cluster bubble layers
 (entrances, networks, massifs), point markers, massif polygons, and the guided tour.
 
 ---

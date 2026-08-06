@@ -1,10 +1,10 @@
 ---
 name: translate
-description: Sync and translate missing i18n keys across all GrottoCenter frontend language files. Detects new keys from git diff or a key filter, translates via AI, injects with proper JSON handling, and sorts.
+description: Sync and translate missing i18n keys across all Grottocenter frontend language files. Detects new keys from git diff or a key filter, translates via AI, injects with proper JSON handling, and sorts.
 argument-hint: '[key substring to target specific keys]'
 ---
 
-You are updating translations for the GrottoCenter frontend. The lang files live in `packages/web-app/public/lang/`. `en.json` is the source of truth. Follow each phase in order.
+You are updating translations for the Grottocenter frontend. The lang files live in `packages/web-app/public/lang/`. `en.json` is the source of truth. Follow each phase in order.
 
 ---
 

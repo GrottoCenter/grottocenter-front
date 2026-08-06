@@ -125,7 +125,7 @@ const Association = () => {
             mx: 'auto'
           }}>
           <FormattedMessage
-            id="The international voluntary association WikiCaves operates the GrottoCenter web application WikiCaves has as goals:"
+            id="The international voluntary association WikiCaves operates the Grottocenter web application WikiCaves has as goals:"
             values={{
               wikicaves: (
                 <InternationalizedLink links={wikicavesLink}>

@@ -1,7 +1,7 @@
-# GrottoCenter Frontend - LLM-Friendly Project Summary
+# Grottocenter Frontend - LLM-Friendly Project Summary
 
 ## Overview
-GrottoCenter is a web application frontend for the speleology (cave exploration) community. It's a React-based application that provides a comprehensive platform for managing cave data, documents, organizations, and user contributions. The project uses a modern tech stack with Material-UI components, Redux for state management, and supports multiple languages.
+Grottocenter is a web application frontend for the speleology (cave exploration) community. It's a React-based application that provides a comprehensive platform for managing cave data, documents, organizations, and user contributions. The project uses a modern tech stack with Material-UI components, Redux for state management, and supports multiple languages.
 
 ## Architecture & Tech Stack
 

@@ -8,7 +8,7 @@ import { useRegisterSW } from 'virtual:pwa-register/react';
 import { useNotification } from '../../hooks';
 
 // A browser only re-checks sw.js when a document in scope is loaded (plus a
-// 24h safety net). GrottoCenter is a client-routed SPA — and, once installed,
+// 24h safety net). Grottocenter is a client-routed SPA — and, once installed,
 // a PWA/TWA users leave in the background for days — so that check can go a
 // very long time without happening. We drive it ourselves instead: hourly, and
 // every time the app comes back to the foreground (the moment that matters for

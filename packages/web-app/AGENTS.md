@@ -1,4 +1,4 @@
-# GrottoCenter Web App — Agent Guide
+# Grottocenter Web App — Agent Guide
 
 > Detailed reference for `packages/web-app`. Read alongside the [root AGENTS.md](../../AGENTS.md).
 
@@ -90,7 +90,7 @@ const MyComponent = () => {
   const { formatMessage } = useIntl();
   return (
     <div>
-      <FormattedMessage id="Welcome to GrottoCenter" />
+      <FormattedMessage id="Welcome to Grottocenter" />
       <input placeholder={formatMessage({ id: 'Search caves...' })} />
       <FormattedMessage id="Found {count} caves" values={{ count: 42 }} />
     </div>

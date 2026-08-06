@@ -33,7 +33,7 @@ export const getFileExtension = fileName => {
  * valid UTF-8 would be wrongly re-decoded (rare in practice).
  *
  * TODO: remove once the backend returns filenames with the correct encoding.
- * See: https://github.com/GrottoCenter/grottocenter-api/issues/1503
+ * See: https://github.com/Grottocenter/grottocenter-api/issues/1503
  *
  * @param {string} str - The potentially garbled filename
  * @returns {string} The decoded filename, or the original if decoding fails

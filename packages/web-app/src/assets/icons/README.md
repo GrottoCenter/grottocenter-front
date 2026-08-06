@@ -1,4 +1,4 @@
-# GrottoCenter Icon Spec
+# Grottocenter Icon Spec
 
 All application icons in this directory share a common visual language. Follow this spec when creating or modifying icons.
 
@@ -126,7 +126,7 @@ Copy the card path verbatim:
 
 ## Adapting a MUI Icon
 
-MUI icons ship as 24×24 `<path>` data. Follow these steps to turn any of them into a GrottoCenter card icon.
+MUI icons ship as 24×24 `<path>` data. Follow these steps to turn any of them into a Grottocenter card icon.
 
 ### Step 1 - find the raw path
 

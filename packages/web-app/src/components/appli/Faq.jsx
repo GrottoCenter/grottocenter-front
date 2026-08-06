@@ -100,7 +100,7 @@ const Faq = () => {
           </Typography>
           <Typography variant="body1" color="text.secondary">
             {formatMessage({
-              id: 'Find answers to common questions about GrottoCenter'
+              id: 'Find answers to common questions about Grottocenter'
             })}
           </Typography>
         </PageHeader>
@@ -131,7 +131,7 @@ const Faq = () => {
             <StyledSummary expandIcon={<ExpandMoreIcon />}>
               <Typography component="h2" variant="subtitle1" fontWeight={500}>
                 {formatMessage({
-                  id: 'How can you guarantee the quality of the data on GrottoCenter?'
+                  id: 'How can you guarantee the quality of the data on Grottocenter?'
                 })}
               </Typography>
             </StyledSummary>
@@ -172,7 +172,7 @@ const Faq = () => {
             <StyledSummary expandIcon={<ExpandMoreIcon />}>
               <Typography component="h2" variant="subtitle1" fontWeight={500}>
                 {formatMessage({
-                  id: 'One of my caving buddies told me I should NOT post anything at all on GrottoCenter. That sometimes makes it hard to contribute!'
+                  id: 'One of my caving buddies told me I should NOT post anything at all on Grottocenter. That sometimes makes it hard to contribute!'
                 })}
               </Typography>
             </StyledSummary>
@@ -190,13 +190,13 @@ const Faq = () => {
             onChange={handleChange('who')}>
             <StyledSummary expandIcon={<ExpandMoreIcon />}>
               <Typography component="h2" variant="subtitle1" fontWeight={500}>
-                {formatMessage({ id: 'Who is behind GrottoCenter?' })}
+                {formatMessage({ id: 'Who is behind Grottocenter?' })}
               </Typography>
             </StyledSummary>
             <StyledDetails>
               <Typography variant="body2" sx={{ mb: 1 }}>
                 {formatMessage({
-                  id: 'GrottoCenter is built and maintained by the Wikicaves association and a community of volunteer contributors.'
+                  id: 'Grottocenter is built and maintained by the Wikicaves association and a community of volunteer contributors.'
                 })}
               </Typography>
               <InternationalizedLink links={contributorsLink}>
@@ -211,14 +211,14 @@ const Faq = () => {
             <StyledSummary expandIcon={<ExpandMoreIcon />}>
               <Typography component="h2" variant="subtitle1" fontWeight={500}>
                 {formatMessage({
-                  id: 'I want to share my data only with fellow cavers. Is it possible on GrottoCenter?'
+                  id: 'I want to share my data only with fellow cavers. Is it possible on Grottocenter?'
                 })}
               </Typography>
             </StyledSummary>
             <StyledDetails>
               <Typography variant="body2">
                 {formatMessage({
-                  id: 'On GrottoCenter, data is published under a free licence and is accessible to anyone who needs it.'
+                  id: 'On Grottocenter, data is published under a free licence and is accessible to anyone who needs it.'
                 })}
               </Typography>
             </StyledDetails>

@@ -140,7 +140,7 @@ const Step5 = () => {
         />
       )}
 
-      {/* Poll failure or any error without the detailed recap above. GrottoCenter
+      {/* Poll failure or any error without the detailed recap above. Grottocenter
           uses the English string itself as the translation key, so formatMessage
           localizes known messages / keys and falls back to the raw text. */}
       {importCsv.error && !(status === 'failed' && progress) && (

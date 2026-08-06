@@ -1,6 +1,6 @@
 # Android App (Trusted Web Activity)
 
-GrottoCenter is published on the **Google Play Store** as a **Trusted Web Activity
+Grottocenter is published on the **Google Play Store** as a **Trusted Web Activity
 (TWA)**: a thin Android wrapper that launches the live PWA (`https://grottocenter.org`)
 inside Chrome. The app ships no business logic — it loads the deployed web app, so
 content changes go live by deploying the website, **not** by releasing a new APK.
@@ -95,7 +95,7 @@ keytool -genkeypair -v -keystore twa/android.keystore -alias grottocenter -keyal
 ```
 
 `keytool` then asks for the certificate's distinguished name. The values used for
-GrottoCenter (the answers don't affect signing, but keep them consistent):
+Grottocenter (the answers don't affect signing, but keep them consistent):
 
 ```text
 Quels sont vos nom et prénom ? Grottocenter Admin

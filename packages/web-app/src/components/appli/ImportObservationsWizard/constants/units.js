@@ -1,4 +1,4 @@
-// Source of truth: GrottoCenter API database (t_unit table).
+// Source of truth: Grottocenter API database (t_unit table).
 // If the backend adds a new unit, this file must be updated manually.
 // TODO: Consider fetching these from an API endpoint to avoid drift.
 export const UNITS = [

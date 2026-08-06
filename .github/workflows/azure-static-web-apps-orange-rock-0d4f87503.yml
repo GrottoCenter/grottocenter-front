@@ -54,7 +54,7 @@ jobs:
             VERSION="${VERSION}-preview"
           fi
           echo "value=$VERSION" >> "$GITHUB_OUTPUT"
-          echo "Building GrottoCenter $VERSION"
+          echo "Building Grottocenter $VERSION"
       - name: Build And Deploy
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1

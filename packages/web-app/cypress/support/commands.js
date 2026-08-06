@@ -1,5 +1,5 @@
 // ***********************************************
-// Reusable custom commands for GrottoCenter e2e tests.
+// Reusable custom commands for Grottocenter e2e tests.
 // Loaded automatically via support/e2e.js.
 // ***********************************************
 
