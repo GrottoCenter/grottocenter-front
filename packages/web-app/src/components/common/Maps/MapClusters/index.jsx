@@ -39,6 +39,7 @@ import useLocalStorage from '../../../../hooks/useLocalStorage';
 import useWaypoint from '../../../../hooks/useWaypoint';
 import { displayLoginDialog } from '../../../../actions/Login';
 import { EntityIcon } from '../../../../pages/EntityCreation/entityConfig';
+import OfflineDisabled from '../../OfflineDisabled';
 import CRSMenu from '../../CRSMenu';
 import MeasureControl from '../common/MeasureControl';
 import ClusterLayer, { ClusterGlobalCss } from './ClusterLayer';
@@ -508,14 +509,20 @@ const HydratedMap = ({
           </Tooltip>
         </Box>
         <Divider />
-        <MenuItem onClick={handleCreateEntrance}>
-          <ListItemIcon>
-            <EntityIcon iconType="entrance" size={20} />
-          </ListItemIcon>
-          <ListItemText>
-            {formatMessage({ id: 'Create an entrance here' })}
-          </ListItemText>
-        </MenuItem>
+        {/* The creation form ends in a POST, so this is a dead end offline —
+            same "block at the door" rule as the Contribute button in the side
+            menu. fullWidth so the wrapper doesn't shrink the item inside the
+            menu. */}
+        <OfflineDisabled fullWidth>
+          <MenuItem onClick={handleCreateEntrance} disabled={!isOnline}>
+            <ListItemIcon>
+              <EntityIcon iconType="entrance" size={20} />
+            </ListItemIcon>
+            <ListItemText>
+              {formatMessage({ id: 'Create an entrance here' })}
+            </ListItemText>
+          </MenuItem>
+        </OfflineDisabled>
         {isTouch && (
           <MenuItem onClick={handlePlaceWaypoint}>
             <ListItemIcon>
