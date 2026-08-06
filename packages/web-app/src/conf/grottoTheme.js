@@ -124,30 +124,30 @@ export const overridings = {
     h1: {
       // 24.4 at 360px, 32 from 1200px up. The floor stays above h2 (23).
       fontSize: 'clamp(1.525rem, 1.26rem + 0.72vw, 2rem)',
-      fontWeight: 700,
+      fontWeight: 600,
       lineHeight: 1.2
     },
     h2: {
       fontSize: '1.4375rem', // 23
-      fontWeight: 600,
+      fontWeight: 550,
       lineHeight: 1.2
     },
     h3: {
       fontSize: '1.25rem', // 20
-      fontWeight: 600,
+      fontWeight: 550,
       lineHeight: 1.3
     },
     h4: {
       fontSize: '1.125rem', // 18
-      fontWeight: 600
+      fontWeight: 550
     },
     h5: {
       fontSize: '1rem', // 16
-      fontWeight: 600
+      fontWeight: 550
     },
     h6: {
       fontSize: '0.875rem', // 14
-      fontWeight: 600
+      fontWeight: 550
     },
     subtitle1: {
       fontSize: '1rem',
