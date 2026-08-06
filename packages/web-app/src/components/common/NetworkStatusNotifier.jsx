@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { useIntl } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import { useNotification, useOnlineStatus } from '../../hooks';
 import { createCloseAction } from './snackbarActions';
 
@@ -29,15 +29,20 @@ const NetworkStatusNotifier = () => {
   useEffect(() => {
     if (!isOnline) {
       hasBeenOffline.current = true;
-      // Changing the language while offline re-runs this effect (formatMessage
-      // is a new identity), but preventDuplicate keys on OFFLINE_SNACKBAR_KEY,
-      // so the snackbar is not re-added — it just keeps its original wording
-      // until the connection is back. Accepted: replacing it would flash.
-      onWarning(formatMessage({ id: 'offlineIndicator' }), {
+      // A NODE, not a formatMessage() string: this snackbar is persistent and
+      // keyed, so preventDuplicate makes notistack DISCARD every re-enqueue —
+      // whatever text it was created with is the text it keeps for good. And
+      // launching already offline enqueues it before bootstrapIntl has resolved
+      // /lang/*.json, i.e. while IntlProvider still has no messages at all, so
+      // that text would be the raw message id. Passing the node lets the
+      // rendered snackbar follow the context instead: it picks up the
+      // translation when it lands, and any later locale change, with no
+      // re-enqueue and no flash.
+      onWarning(<FormattedMessage id="offlineIndicator" />, {
         key: OFFLINE_SNACKBAR_KEY,
         persist: true,
         preventDuplicate: true,
-        action: createCloseAction(onClose, formatMessage({ id: 'Close' }))
+        action: createCloseAction(onClose)
       });
       return;
     }
@@ -48,6 +53,10 @@ const NetworkStatusNotifier = () => {
       // online (a locale change gives formatMessage a new identity) cannot
       // announce a reconnection that never happened.
       hasBeenOffline.current = false;
+      // A string here, unlike the offline message above: this one is transient
+      // and keyless, so it is never re-enqueued and has nothing to go stale.
+      // Nodes are for the persistent, keyed snackbars — the ones whose text
+      // preventDuplicate would otherwise freeze forever.
       onSuccess(formatMessage({ id: 'backOnline' }));
     }
   }, [isOnline, formatMessage, onWarning, onSuccess, onClose]);

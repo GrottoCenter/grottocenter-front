@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useIntl } from 'react-intl';
+import { FormattedMessage } from 'react-intl';
 import { useNotification, useSessionExpiry } from '../../hooks';
 import { createCloseAction } from './snackbarActions';
 
@@ -27,7 +27,6 @@ const dismissStorageKey = userId =>
  */
 const SessionExpiryNotifier = () => {
   const { isExpiringSoon, userId } = useSessionExpiry();
-  const { formatMessage } = useIntl();
   const { onWarning, onClose } = useNotification();
 
   useEffect(() => {
@@ -47,17 +46,18 @@ const SessionExpiryNotifier = () => {
       onClose(key);
     };
 
-    // Changing the language re-runs this effect (formatMessage is a new
-    // identity), but preventDuplicate keys on SESSION_EXPIRY_SNACKBAR_KEY, so
-    // the snackbar is not re-added — it keeps its original wording until
-    // dismissed. Same accepted trade-off as NetworkStatusNotifier.
-    onWarning(formatMessage({ id: 'mfaSessionExpiryWarning' }), {
+    // A NODE, not a formatMessage() string: persistent + keyed means
+    // preventDuplicate discards every re-enqueue, so the text this is created
+    // with is the text it keeps. Passing the node lets the rendered snackbar
+    // follow the intl context — translations landing after mount, and later
+    // locale changes — with no re-enqueue and no flash.
+    onWarning(<FormattedMessage id="mfaSessionExpiryWarning" />, {
       key: SESSION_EXPIRY_SNACKBAR_KEY,
       persist: true,
       preventDuplicate: true,
-      action: createCloseAction(dismiss, formatMessage({ id: 'Close' }))
+      action: createCloseAction(dismiss)
     });
-  }, [isExpiringSoon, userId, formatMessage, onWarning, onClose]);
+  }, [isExpiringSoon, userId, onWarning, onClose]);
 
   return null;
 };

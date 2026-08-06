@@ -228,6 +228,12 @@ const ApplicationShell = () => {
       {/* Single snackbar system for the whole app — nothing renders a bare MUI
           <Snackbar>, or it would stack independently and overlap this one.
 
+          SnackbarProvider sits INSIDE Provider and HydratedIntlProvider, not
+          around them: notistack renders snackbar content in its own subtree, so
+          it must be below every context that content reads. That is what lets a
+          persistent snackbar carry a <FormattedMessage> node and keep following
+          the locale — see NetworkStatusNotifier.
+
           maxSnack MUST stay greater than the number of `persist` snackbars that
           can coexist (network-offline, sw-update, session-expiry): once every
           slot holds a persistent one, notistack stops queueing and dismisses the
@@ -240,13 +246,13 @@ const ApplicationShell = () => {
           link with it (useMoveRelevanceWithUndo). The three persistent
           notifiers each pass `preventDuplicate` themselves, keyed, which is
           where the flag actually belongs. */}
-      <SnackbarProvider
-        maxSnack={4}
-        dense={isCompact}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-        Components={SNACKBAR_COMPONENTS}>
-        <Provider store={gcStore}>
-          <HydratedIntlProvider onError={customOnIntlError}>
+      <Provider store={gcStore}>
+        <HydratedIntlProvider onError={customOnIntlError}>
+          <SnackbarProvider
+            maxSnack={4}
+            dense={isCompact}
+            anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+            Components={SNACKBAR_COMPONENTS}>
             <ErrorHandler />
             {/* Outside the boundary on purpose: when a stale build crashes the
                 app, offering the update is exactly what fixes it. */}
@@ -256,9 +262,9 @@ const ApplicationShell = () => {
             <ErrorBoundary>
               <ApplicationLayout />
             </ErrorBoundary>
-          </HydratedIntlProvider>
-        </Provider>
-      </SnackbarProvider>
+          </SnackbarProvider>
+        </HydratedIntlProvider>
+      </Provider>
     </div>
   );
 };

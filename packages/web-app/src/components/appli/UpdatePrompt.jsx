@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { useIntl } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
+import PropTypes from 'prop-types';
 import { Button, IconButton } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import SystemUpdateAltIcon from '@mui/icons-material/SystemUpdateAlt';
@@ -16,35 +17,49 @@ const UPDATE_CHECK_INTERVAL_MS = 60 * 60 * 1000;
 
 const UPDATE_SNACKBAR_KEY = 'sw-update';
 
+// A component, so both labels are resolved at render time rather than captured
+// when the snackbar is enqueued. The prompt is persistent and keyed, so
+// notistack discards any re-enqueue — anything formatted up front would stay
+// frozen in the language (or the raw message id) of that first moment.
+const UpdateSnackbarActions = ({ onUpdate, onDismiss }) => {
+  const { formatMessage } = useIntl();
+  return (
+    <>
+      {/* variant="text" is explicit: the theme defaults every MuiButton
+          to `contained`, which turns an alert action into a filled grey
+          block. nowrap keeps the label on one line — "Mettre à jour",
+          "Aktualisieren" … all wrap at 360dp otherwise. */}
+      <Button
+        color="inherit"
+        size="small"
+        variant="text"
+        data-testid="update-app-btn"
+        sx={{ whiteSpace: 'nowrap' }}
+        onClick={onUpdate}>
+        {formatMessage({ id: 'Update' })}
+      </Button>
+      <IconButton
+        color="inherit"
+        size="small"
+        aria-label={formatMessage({ id: 'Later' })}
+        onClick={onDismiss}>
+        <CloseIcon fontSize="small" />
+      </IconButton>
+    </>
+  );
+};
+
+UpdateSnackbarActions.propTypes = {
+  onUpdate: PropTypes.func.isRequired,
+  onDismiss: PropTypes.func.isRequired
+};
+
 // Kept at module scope on purpose: notistack wants `action` as a `key => node`
 // function, and defining one inside the component would make React see a new
 // component type on every render (react/no-unstable-nested-components).
-const updateAction = (onUpdate, onDismiss, updateLabel, laterLabel) =>
+const updateAction = (onUpdate, onDismiss) =>
   function UpdateAction() {
-    return (
-      <>
-        {/* variant="text" is explicit: the theme defaults every MuiButton
-            to `contained`, which turns an alert action into a filled grey
-            block. nowrap keeps the label on one line — "Mettre à jour",
-            "Aktualisieren" … all wrap at 360dp otherwise. */}
-        <Button
-          color="inherit"
-          size="small"
-          variant="text"
-          data-testid="update-app-btn"
-          sx={{ whiteSpace: 'nowrap' }}
-          onClick={onUpdate}>
-          {updateLabel}
-        </Button>
-        <IconButton
-          color="inherit"
-          size="small"
-          aria-label={laterLabel}
-          onClick={onDismiss}>
-          <CloseIcon fontSize="small" />
-        </IconButton>
-      </>
-    );
+    return <UpdateSnackbarActions onUpdate={onUpdate} onDismiss={onDismiss} />;
   };
 
 /**
@@ -59,7 +74,6 @@ const updateAction = (onUpdate, onDismiss, updateLabel, laterLabel) =>
  * (devOptions.enabled: false), so nothing is ever shown.
  */
 const UpdatePrompt = () => {
-  const { formatMessage } = useIntl();
   const { onInfo, onClose } = useNotification();
   const [registration, setRegistration] = useState(null);
   // Same value as the state above, mirrored in a ref so that handleUpdate can
@@ -123,22 +137,19 @@ const UpdatePrompt = () => {
     // by an outside click either — which is what the previous MUI <Snackbar>
     // had to opt out of ClickAwayListener to achieve.
     //
-    // A locale change gives formatMessage a new identity and re-runs this
-    // effect, but preventDuplicate keys on UPDATE_SNACKBAR_KEY so the snackbar
-    // is not re-added — it keeps its original wording until dismissed.
-    onInfo(formatMessage({ id: 'A new version is available' }), {
+    // A NODE, not a formatMessage() string: persistent + keyed means
+    // preventDuplicate discards every re-enqueue, so whatever text this is
+    // created with is the text it keeps. The node follows the intl context
+    // instead, which covers both a locale change and a prompt raised before
+    // /lang/*.json has loaded.
+    onInfo(<FormattedMessage id="A new version is available" />, {
       key: UPDATE_SNACKBAR_KEY,
       persist: true,
       preventDuplicate: true,
       icon: <SystemUpdateAltIcon fontSize="inherit" />,
-      action: updateAction(
-        handleUpdate,
-        handleDismiss,
-        formatMessage({ id: 'Update' }),
-        formatMessage({ id: 'Later' })
-      )
+      action: updateAction(handleUpdate, handleDismiss)
     });
-  }, [needRefresh, formatMessage, onInfo, handleUpdate, handleDismiss]);
+  }, [needRefresh, onInfo, handleUpdate, handleDismiss]);
 
   useEffect(() => {
     if (!registration) return undefined;
