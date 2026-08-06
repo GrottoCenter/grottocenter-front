@@ -26,6 +26,12 @@ const StyledMuiAppBar = styled(MuiAppBar, {
   shouldForwardProp: prop => prop !== '$isSideMenuOpen'
 })(({ theme, $isSideMenuOpen }) => ({
   flexGrow: 1,
+  // The bar overlays the full-screen map, which handles pinch itself. Without
+  // this, a pinch that lands on the bar zooms the whole page instead — and the
+  // bar is then the only spot left to pinch back out, since the map swallows
+  // the gesture everywhere else. `pan-y` drops pinch- and double-tap-zoom while
+  // keeping drag-to-scroll on the header.
+  touchAction: 'pan-y',
   ...(!isMobileOnly && {
     transition: theme.transitions.create(['margin', 'width'], {
       easing: $isSideMenuOpen

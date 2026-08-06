@@ -77,6 +77,18 @@
         width: 100%;
         height: 100%;
         margin: 0;
+        /*
+          Keeps the document scroll from chaining out to the browser: no
+          pull-to-refresh (it reloads the app and wipes the Redux state — a known
+          gesture in a browser tab, but the installed PWA/TWA has no URL bar to
+          explain it) and no rubber-band bounce revealing the void behind the
+          page. Scrolling itself is unaffected, unlike a zoom lock.
+
+          `-y` on purpose, not the shorthand: horizontal overscroll is what
+          desktop Chrome/Safari use for two-finger swipe-to-go-back, and there is
+          nothing to gain from blocking it.
+        */
+        overscroll-behavior-y: none;
       }
       .loader {
         width: 100%;
