@@ -34,15 +34,26 @@ export default defineConfig(({ mode }) => {
       '[vite-plugin-pwa] VITE_API_URL is not set — API runtime caching disabled.'
     );
   }
+  // ⚠️ Every /geoloc rule below MUST include the API version segment: routes are
+  // built as `${VITE_API_URL}/api/${apiVersion}/…` (see src/conf/apiRoutes.js),
+  // so the real path is `/api/v1/geoloc/…`. A pattern written `/api/geoloc/…`
+  // matches nothing — and fails silently, because the generic `api-get` rule
+  // below cannot pick up the slack either (its `sw_lat` lookahead excludes
+  // exactly these URLs). The result is a map with zero offline data. Matched as
+  // `v\d+` rather than a literal `v1` so bumping apiVersion doesn't quietly
+  // disable offline support again.
+  const apiVersionedPrefix = apiOrigin
+    ? `^${escapeRegex(apiOrigin)}/api/v\\d+`
+    : null;
   // /geoloc/{entrances,networks,massifs}Coordinates — server recomputes these
   // in a daily batch job, so stale-while-revalidate is safe and dramatic: a
   // reload serves the ~MB-sized point payload from cache instantly, then
   // refreshes in the background. The dedicated `Coordinates` path suffix (vs
   // the viewport endpoints `/geoloc/entrances`, `/geoloc/networks`, …) is
   // what lets us match them narrowly.
-  const bulkDailyCoordsPattern = apiOrigin
+  const bulkDailyCoordsPattern = apiVersionedPrefix
     ? new RegExp(
-        `^${escapeRegex(apiOrigin)}/api/geoloc/(entrances|networks|massifs)Coordinates(\\?|$)`
+        `${apiVersionedPrefix}/geoloc/(entrances|networks|massifs)Coordinates(\\?|$)`
       )
     : null;
   // /geoloc/organizations with world-wide bounds (sw_lat=-90) — same URL as
@@ -50,10 +61,8 @@ export default defineConfig(({ mode }) => {
   // be created/edited at any moment by any user, so NetworkFirst (fresh
   // online, cache fallback offline) with a short timeout to keep bad
   // connections snappy.
-  const orgsBulkPattern = apiOrigin
-    ? new RegExp(
-        `^${escapeRegex(apiOrigin)}/api/geoloc/organizations\\?sw_lat=-90&`
-      )
+  const orgsBulkPattern = apiVersionedPrefix
+    ? new RegExp(`${apiVersionedPrefix}/geoloc/organizations\\?sw_lat=-90&`)
     : null;
   // Map viewport data, requested on a FIXED slippy-tile grid (see
   // src/utils/mapTileCache.js): bounds are derived from {z,x,y} at CACHE_ZOOM,
@@ -68,9 +77,9 @@ export default defineConfig(({ mode }) => {
   // no negative lookahead here: it would depend on the parameter order
   // produced by makeUrl (i.e. on the key order of MAX_BOUNDS in
   // actions/Map.js), an invisible coupling across files.
-  const mapTilePattern = apiOrigin
+  const mapTilePattern = apiVersionedPrefix
     ? new RegExp(
-        `^${escapeRegex(apiOrigin)}/api/geoloc/(entrances|networks|organizations)\\?`
+        `${apiVersionedPrefix}/geoloc/(entrances|networks|organizations)\\?`
       )
     : null;
 
