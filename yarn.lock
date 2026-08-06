@@ -2194,9 +2194,9 @@ __metadata:
     "@emotion/react": "npm:^11.14.0"
     "@emotion/styled": "npm:^11.14.1"
     "@marsidev/react-turnstile": "npm:^1.5.4"
-    "@mui/icons-material": "npm:^7.3.9"
+    "@mui/icons-material": "npm:7.3.9"
     "@mui/lab": "npm:^7.0.1-beta.25"
-    "@mui/material": "npm:^7.3.9"
+    "@mui/material": "npm:7.3.9"
     "@mui/styles": "npm:^6.4.8"
     "@mui/x-date-pickers": "npm:^9.10.1"
     "@react-leaflet/core": "npm:3.0.0"
@@ -2658,26 +2658,26 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@mui/core-downloads-tracker@npm:^7.3.11":
+"@mui/core-downloads-tracker@npm:^7.3.9":
   version: 7.3.11
   resolution: "@mui/core-downloads-tracker@npm:7.3.11"
   checksum: 10/722ea7a10698d8a8b92c985a444af56eefb29d56fc6cb85e426980c4e241059d5006ef4089350378735142b81ceee13000e65ed91e55ca18f02522844d78eec5
   languageName: node
   linkType: hard
 
-"@mui/icons-material@npm:^7.3.9":
-  version: 7.3.11
-  resolution: "@mui/icons-material@npm:7.3.11"
+"@mui/icons-material@npm:7.3.9":
+  version: 7.3.9
+  resolution: "@mui/icons-material@npm:7.3.9"
   dependencies:
     "@babel/runtime": "npm:^7.28.6"
   peerDependencies:
-    "@mui/material": ^7.3.11
+    "@mui/material": ^7.3.9
     "@types/react": ^17.0.0 || ^18.0.0 || ^19.0.0
     react: ^17.0.0 || ^18.0.0 || ^19.0.0
   peerDependenciesMeta:
     "@types/react":
       optional: true
-  checksum: 10/330167c053fa8d7c811055816539d60e334acc8a6c02077105c18843532b11b722ff526b0dbc84cff6d6c7014b7b40751a62a387ad0d60ff79b86c4c404a20b1
+  checksum: 10/8d80e85984f443e8e7b89265eed442fb24486d27f43c4e1e776824d1c51711d0dbd09ee2cc4ffae0ab23298d3b4970c90566bfb797816bf7e8a2ab666c126a56
   languageName: node
   linkType: hard
 
@@ -2712,15 +2712,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@mui/material@npm:^7.3.9":
-  version: 7.3.11
-  resolution: "@mui/material@npm:7.3.11"
+"@mui/material@npm:7.3.9":
+  version: 7.3.9
+  resolution: "@mui/material@npm:7.3.9"
   dependencies:
     "@babel/runtime": "npm:^7.28.6"
-    "@mui/core-downloads-tracker": "npm:^7.3.11"
-    "@mui/system": "npm:^7.3.11"
+    "@mui/core-downloads-tracker": "npm:^7.3.9"
+    "@mui/system": "npm:^7.3.9"
     "@mui/types": "npm:^7.4.12"
-    "@mui/utils": "npm:^7.3.11"
+    "@mui/utils": "npm:^7.3.9"
     "@popperjs/core": "npm:^2.11.8"
     "@types/react-transition-group": "npm:^4.4.12"
     clsx: "npm:^2.1.1"
@@ -2731,7 +2731,7 @@ __metadata:
   peerDependencies:
     "@emotion/react": ^11.5.0
     "@emotion/styled": ^11.3.0
-    "@mui/material-pigment-css": ^7.3.11
+    "@mui/material-pigment-css": ^7.3.9
     "@types/react": ^17.0.0 || ^18.0.0 || ^19.0.0
     react: ^17.0.0 || ^18.0.0 || ^19.0.0
     react-dom: ^17.0.0 || ^18.0.0 || ^19.0.0
@@ -2744,7 +2744,7 @@ __metadata:
       optional: true
     "@types/react":
       optional: true
-  checksum: 10/c8e2776055eb6341b69d527ae2532b2f13034f7af73f38cbd4d5ce21f922a05b28403c3b0fcdafdca579a028f854068df73f90054d65bc065b4a96dbf2ed6a39
+  checksum: 10/eac1bc4c8c9caf4f8a05afac601055711556be327ca266c962efd1bd250c4a0a188a94c5ecb04a6bfc9820dbe606cf98fbc70aa34233326e76e9ed692b677e0e
   languageName: node
   linkType: hard
 
@@ -2836,7 +2836,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@mui/system@npm:^7.3.11":
+"@mui/system@npm:^7.3.11, @mui/system@npm:^7.3.9":
   version: 7.3.11
   resolution: "@mui/system@npm:7.3.11"
   dependencies:
@@ -2924,7 +2924,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@mui/utils@npm:^7.3.11":
+"@mui/utils@npm:^7.3.11, @mui/utils@npm:^7.3.9":
   version: 7.3.11
   resolution: "@mui/utils@npm:7.3.11"
   dependencies:
