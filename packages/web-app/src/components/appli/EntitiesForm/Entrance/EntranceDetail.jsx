@@ -5,6 +5,7 @@ import { useIntl } from 'react-intl';
 import PropTypes from 'prop-types';
 import { usePermissions, useNearbyEntrances } from '../../../../hooks';
 import Alert from '../../../common/Alert';
+import SensitivityLockToggle from '../../../common/SensitivityLockToggle';
 import CoordinateFormSection from '../utils/CoordinateFormSection';
 import { FormSection } from '../utils/FormContainers';
 import NumberField from '../utils/NumberField';
@@ -38,12 +39,41 @@ const EntranceDetail = ({
   const values = getValues();
   const initialIsSensitive = useRef(values.entrance.isSensitive).current;
 
-  const isSensitiveDisabled = !permissions.isAdmin && initialIsSensitive;
   const isSensitive = useWatch({ control, name: 'entrance.isSensitive' });
+  const isSensitiveLocked = !!useWatch({
+    control,
+    name: 'entrance.isSensitiveLocked'
+  });
+
+  // The precise location of an already sensitive entrance stays hidden from
+  // non-admin users, who therefore can't unrestrict it either.
+  const areCoordinatesHidden = !permissions.isAdmin && initialIsSensitive;
+  // A lock freezes the sensitivity for everyone but administrators, who keep
+  // changing it either way — the API enforces the same rule on update.
+  const isLockedForUser = isSensitiveLocked && !permissions.isAdmin;
+  const isSensitiveDisabled = isLockedForUser || areCoordinatesHidden;
+
+  let sensitivityAlert = null;
+  if (isLockedForUser) {
+    sensitivityAlert = {
+      severity: 'info',
+      id: 'An administrator locked the sensitivity of this entrance. It can no longer be changed here.'
+    };
+  } else if (areCoordinatesHidden) {
+    sensitivityAlert = {
+      severity: 'info',
+      id: "You can't unrestrict a cave access."
+    };
+  } else if (isSensitive) {
+    sensitivityAlert = {
+      severity: 'warning',
+      id: 'To be used for a cave requiring special protection. For more details see the User Guide. When a cave access is marked as "restricted", location of the entrance will no longer be available to Grottocenter users and visitors.'
+    };
+  }
 
   return (
     <FormSection title="Location">
-      {!isSensitiveDisabled && (
+      {!areCoordinatesHidden && (
         <CoordinateFormSection
           control={control}
           formLatitudeKey="entrance.latitude"
@@ -92,15 +122,21 @@ const EntranceDetail = ({
             />
           )}
         />
+        {permissions.isAdmin && (
+          <Controller
+            name="entrance.isSensitiveLocked"
+            control={control}
+            defaultValue={false}
+            render={({ field: { value, onChange } }) => (
+              <SensitivityLockToggle isLocked={!!value} onChange={onChange} />
+            )}
+          />
+        )}
       </Box>
-      {(isSensitive || isSensitiveDisabled) && (
+      {sensitivityAlert && (
         <Alert
-          severity={isSensitiveDisabled ? 'info' : 'warning'}
-          content={formatMessage({
-            id: isSensitiveDisabled
-              ? "You can't unrestrict a cave access."
-              : 'To be used for a cave requiring special protection. For more details see the User Guide. When a cave access is marked as "restricted", location of the entrance will no longer be available to Grottocenter users and visitors.'
-          })}
+          severity={sensitivityAlert.severity}
+          content={formatMessage({ id: sensitivityAlert.id })}
         />
       )}
     </FormSection>

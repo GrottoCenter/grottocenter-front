@@ -31,6 +31,7 @@ const EntranceEdit = () => {
           length: entrance.length,
           id: entrance.id,
           isSensitive: entrance.isSensitive,
+          isSensitiveLocked: entrance.isSensitiveLocked,
           hasBat: entrance.hasBat,
           dangerFlooding: entrance.dangerFlooding,
           dangerCo2: entrance.dangerCo2,
